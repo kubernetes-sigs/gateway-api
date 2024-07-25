@@ -143,64 +143,66 @@ func (rm *ResourceModel) addPolicyIfTargetExists(policies ...policymanager.Polic
 		policy := policy
 		policyNode := NewPolicyNode(&policy)
 
-		switch {
-		case policy.TargetRef().Group == gatewayv1.GroupName:
-			switch policy.TargetRef().Kind {
-			case "GatewayClass":
-				gwcID := GatewayClassID(policy.TargetRef().Name)
-				gatewayClassNode, ok := rm.GatewayClasses[gwcID]
+		for _, targetRef := range policy.TargetRefs() {
+			switch {
+			case targetRef.Group == gatewayv1.GroupName:
+				switch targetRef.Kind {
+				case "GatewayClass":
+					gwcID := GatewayClassID(targetRef.Name)
+					gatewayClassNode, ok := rm.GatewayClasses[gwcID]
+					if !ok {
+						klog.V(1).ErrorS(nil, "Skipping policy since targetRef GatewayClass does not exist in ResourceModel", "policy", policy.Name(), "gatewayClassID", gwcID)
+						continue
+					}
+					rm.Policies[policyNode.ID()] = policyNode
+					policyNode.GatewayClass = gatewayClassNode
+					gatewayClassNode.Policies[policyNode.ID()] = policyNode
+
+				case "Gateway":
+					gwID := GatewayID(targetRef.Namespace, targetRef.Name)
+					gatewayNode, ok := rm.Gateways[gwID]
+					if !ok {
+						klog.V(1).ErrorS(nil, "Skipping policy since targetRef Gateway does not exist in ResourceModel", "policy", policy.Name(), "gatewayID", gwID)
+						continue
+					}
+					rm.Policies[policyNode.ID()] = policyNode
+					policyNode.Gateway = gatewayNode
+					gatewayNode.Policies[policyNode.ID()] = policyNode
+
+				case "HTTPRoute":
+					hrID := HTTPRouteID(targetRef.Namespace, targetRef.Name)
+					httpRouteNode, ok := rm.HTTPRoutes[hrID]
+					if !ok {
+						klog.V(1).ErrorS(nil, "Skipping policy since targetRef HTTPRoute does not exist in ResourceModel", "policy", policy.Name(), "httpRouteID", hrID)
+						continue
+					}
+					rm.Policies[policyNode.ID()] = policyNode
+					policyNode.HTTPRoute = httpRouteNode
+					httpRouteNode.Policies[policyNode.ID()] = policyNode
+				}
+
+			case targetRef.Group == corev1.GroupName && targetRef.Kind == "Namespace":
+				nsID := NamespaceID(targetRef.Name)
+				namespaceNode, ok := rm.Namespaces[nsID]
 				if !ok {
-					klog.V(1).ErrorS(nil, "Skipping policy since targetRef GatewayClass does not exist in ResourceModel", "policy", policy.Name(), "gatewayClassID", gwcID)
+					klog.V(1).ErrorS(nil, "Skipping policy since targetRef Namespace does not exist in ResourceModel", "policy", policy.Name(), "namespaceID", nsID)
 					continue
 				}
 				rm.Policies[policyNode.ID()] = policyNode
-				policyNode.GatewayClass = gatewayClassNode
-				gatewayClassNode.Policies[policyNode.ID()] = policyNode
+				policyNode.Namespace = namespaceNode
+				namespaceNode.Policies[policyNode.ID()] = policyNode
 
-			case "Gateway":
-				gwID := GatewayID(policy.TargetRef().Namespace, policy.TargetRef().Name)
-				gatewayNode, ok := rm.Gateways[gwID]
+			default: // Assume attached to backend and evaluate further.
+				bID := BackendID(targetRef.Group, targetRef.Kind, targetRef.Namespace, targetRef.Name)
+				backendNode, ok := rm.Backends[bID]
 				if !ok {
-					klog.V(1).ErrorS(nil, "Skipping policy since targetRef Gateway does not exist in ResourceModel", "policy", policy.Name(), "gatewayID", gwID)
+					klog.V(1).ErrorS(nil, "Skipping policy since targetRef Backend does not exist in ResourceModel", "policy", policy.Name(), "backendID", bID)
 					continue
 				}
 				rm.Policies[policyNode.ID()] = policyNode
-				policyNode.Gateway = gatewayNode
-				gatewayNode.Policies[policyNode.ID()] = policyNode
-
-			case "HTTPRoute":
-				hrID := HTTPRouteID(policy.TargetRef().Namespace, policy.TargetRef().Name)
-				httpRouteNode, ok := rm.HTTPRoutes[hrID]
-				if !ok {
-					klog.V(1).ErrorS(nil, "Skipping policy since targetRef HTTPRoute does not exist in ResourceModel", "policy", policy.Name(), "httpRouteID", hrID)
-					continue
-				}
-				rm.Policies[policyNode.ID()] = policyNode
-				policyNode.HTTPRoute = httpRouteNode
-				httpRouteNode.Policies[policyNode.ID()] = policyNode
+				policyNode.Backend = backendNode
+				backendNode.Policies[policyNode.ID()] = policyNode
 			}
-
-		case policy.TargetRef().Group == corev1.GroupName && policy.TargetRef().Kind == "Namespace":
-			nsID := NamespaceID(policy.TargetRef().Name)
-			namespaceNode, ok := rm.Namespaces[nsID]
-			if !ok {
-				klog.V(1).ErrorS(nil, "Skipping policy since targetRef Namespace does not exist in ResourceModel", "policy", policy.Name(), "namespaceID", nsID)
-				continue
-			}
-			rm.Policies[policyNode.ID()] = policyNode
-			policyNode.Namespace = namespaceNode
-			namespaceNode.Policies[policyNode.ID()] = policyNode
-
-		default: // Assume attached to backend and evaluate further.
-			bID := BackendID(policy.TargetRef().Group, policy.TargetRef().Kind, policy.TargetRef().Namespace, policy.TargetRef().Name)
-			backendNode, ok := rm.Backends[bID]
-			if !ok {
-				klog.V(1).ErrorS(nil, "Skipping policy since targetRef Backend does not exist in ResourceModel", "policy", policy.Name(), "backendID", bID)
-				continue
-			}
-			rm.Policies[policyNode.ID()] = policyNode
-			policyNode.Backend = backendNode
-			backendNode.Policies[policyNode.ID()] = policyNode
 		}
 	}
 }

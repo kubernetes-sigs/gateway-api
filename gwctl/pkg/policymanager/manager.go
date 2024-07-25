@@ -22,14 +22,13 @@ import (
 	"fmt"
 	"strings"
 
-	"sigs.k8s.io/controller-runtime/pkg/client"
-
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/dynamic"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	gatewayv1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
@@ -216,10 +215,10 @@ func (p PolicyCRD) IsClusterScoped() bool {
 
 type Policy struct {
 	u unstructured.Unstructured
-	// targetRef references the target object this policy is attached to. This
+	// targetRefs references the target object this policy is attached to. This
 	// only makes sense in case of a directly-attached-policy, or an
 	// unmerged-inherited-policy.
-	targetRef common.ObjRef
+	targetRefs []common.ObjRef
 	// Indicates whether the policy is supposed to be "inherited" (as opposed to
 	// "direct").
 	inherited bool
@@ -230,29 +229,32 @@ func (p Policy) ClientObject() client.Object { return p.Unstructured() }
 func PolicyFromUnstructured(u unstructured.Unstructured, policyCRDs map[PolicyCrdID]PolicyCRD) (Policy, error) {
 	result := Policy{u: u}
 
-	// Identify targetRef of Policy.
+	// Identify targetRefs of Policy.
 	type genericPolicy struct {
 		metav1.TypeMeta   `json:",inline"`
 		metav1.ObjectMeta `json:"metadata,omitempty"`
 		Spec              struct {
-			TargetRef gatewayv1alpha2.NamespacedPolicyTargetReference
+			TargetRefs []gatewayv1alpha2.NamespacedPolicyTargetReference `json:"targetRefs"`
 		}
 	}
 	structuredPolicy := &genericPolicy{}
 	if err := runtime.DefaultUnstructuredConverter.FromUnstructured(u.UnstructuredContent(), structuredPolicy); err != nil {
 		return Policy{}, fmt.Errorf("failed to convert unstructured policy resource to structured: %v", err)
 	}
-	result.targetRef = common.ObjRef{
-		Group:     string(structuredPolicy.Spec.TargetRef.Group),
-		Kind:      string(structuredPolicy.Spec.TargetRef.Kind),
-		Name:      string(structuredPolicy.Spec.TargetRef.Name),
-		Namespace: structuredPolicy.GetNamespace(),
-	}
-	if result.targetRef.Namespace == "" {
-		result.targetRef.Namespace = result.u.GetNamespace()
-	}
-	if structuredPolicy.Spec.TargetRef.Namespace != nil {
-		result.targetRef.Namespace = string(*structuredPolicy.Spec.TargetRef.Namespace)
+	for _, targetRef := range structuredPolicy.Spec.TargetRefs {
+		objRef := common.ObjRef{
+			Group:     string(targetRef.Group),
+			Kind:      string(targetRef.Kind),
+			Name:      string(targetRef.Name),
+			Namespace: u.GetNamespace(),
+		}
+		if objRef.Namespace == "" {
+			objRef.Namespace = u.GetNamespace()
+		}
+		if targetRef.Namespace != nil {
+			objRef.Namespace = string(*targetRef.Namespace)
+		}
+		result.targetRefs = append(result.targetRefs, objRef)
 	}
 
 	// Get the CRD corresponding to this policy object.
@@ -274,8 +276,8 @@ func (p Policy) PolicyCrdID() PolicyCrdID {
 	return PolicyCrdID(p.u.GetObjectKind().GroupVersionKind().Kind + "." + p.u.GetObjectKind().GroupVersionKind().Group)
 }
 
-func (p Policy) TargetRef() common.ObjRef {
-	return p.targetRef
+func (p Policy) TargetRefs() []common.ObjRef {
+	return p.targetRefs
 }
 
 func (p Policy) IsInherited() bool {
@@ -287,19 +289,24 @@ func (p Policy) IsDirect() bool {
 }
 
 func (p Policy) IsAttachedTo(objRef common.ObjRef) bool {
-	if p.targetRef.Kind == "Namespace" && p.targetRef.Name == "" {
-		p.targetRef.Name = "default"
+	for _, targetRef := range p.targetRefs {
+		if targetRef.Kind == "Namespace" && targetRef.Name == "" {
+			targetRef.Name = "default"
+		}
+		if objRef.Kind == "Namespace" && objRef.Name == "" {
+			objRef.Name = "default"
+		}
+		if targetRef.Kind != "Namespace" && targetRef.Namespace == "" {
+			targetRef.Namespace = "default"
+		}
+		if objRef.Kind != "Namespace" && objRef.Namespace == "" {
+			objRef.Namespace = "default"
+		}
+		if targetRef == objRef {
+			return true
+		}
 	}
-	if objRef.Kind == "Namespace" && objRef.Name == "" {
-		objRef.Name = "default"
-	}
-	if p.targetRef.Kind != "Namespace" && p.targetRef.Namespace == "" {
-		p.targetRef.Namespace = "default"
-	}
-	if objRef.Kind != "Namespace" && objRef.Namespace == "" {
-		objRef.Namespace = "default"
-	}
-	return p.targetRef == objRef
+	return false
 }
 
 func (p Policy) Unstructured() *unstructured.Unstructured {
@@ -308,9 +315,9 @@ func (p Policy) Unstructured() *unstructured.Unstructured {
 
 func (p Policy) DeepCopy() Policy {
 	clone := Policy{
-		u:         *p.u.DeepCopy(),
-		targetRef: p.targetRef,
-		inherited: p.inherited,
+		u:          *p.u.DeepCopy(),
+		targetRefs: p.targetRefs,
+		inherited:  p.inherited,
 	}
 	return clone
 }

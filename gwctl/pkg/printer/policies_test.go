@@ -73,10 +73,12 @@ func TestPoliciesPrinter_Print_And_PrintDescribeView(t *testing.T) {
 						"key2": "value-parent-2",
 						"key4": "value-parent-4",
 					},
-					"targetRef": map[string]interface{}{
-						"group": "gateway.networking.k8s.io",
-						"kind":  "GatewayClass",
-						"name":  "foo-gatewayclass",
+					"targetRefs": []interface{}{
+						map[string]interface{}{
+							"group": "gateway.networking.k8s.io",
+							"kind":  "GatewayClass",
+							"name":  "foo-gatewayclass",
+						},
 					},
 				},
 			},
@@ -97,11 +99,13 @@ func TestPoliciesPrinter_Print_And_PrintDescribeView(t *testing.T) {
 						"key2": "value-child-2",
 						"key5": "value-child-5",
 					},
-					"targetRef": map[string]interface{}{
-						"group":     "gateway.networking.k8s.io",
-						"kind":      "Gateway",
-						"name":      "foo-gateway",
-						"namespace": "default",
+					"targetRefs": []interface{}{
+						map[string]interface{}{
+							"group":     "gateway.networking.k8s.io",
+							"kind":      "Gateway",
+							"name":      "foo-gateway",
+							"namespace": "default",
+						},
 					},
 				},
 			},
@@ -135,9 +139,11 @@ func TestPoliciesPrinter_Print_And_PrintDescribeView(t *testing.T) {
 				"spec": map[string]interface{}{
 					"condition": "path=/abc",
 					"seconds":   int64(30),
-					"targetRef": map[string]interface{}{
-						"kind": "Namespace",
-						"name": "default",
+					"targetRefs": []interface{}{
+						map[string]interface{}{
+							"kind": "Namespace",
+							"name": "default",
+						},
 					},
 				},
 			},
@@ -153,10 +159,12 @@ func TestPoliciesPrinter_Print_And_PrintDescribeView(t *testing.T) {
 				"spec": map[string]interface{}{
 					"condition": "path=/def",
 					"seconds":   int64(60),
-					"targetRef": map[string]interface{}{
-						"group": "gateway.networking.k8s.io",
-						"kind":  "HTTPRoute",
-						"name":  "foo-httproute",
+					"targetRefs": []interface{}{
+						map[string]interface{}{
+							"group": "gateway.networking.k8s.io",
+							"kind":  "HTTPRoute",
+							"name":  "foo-httproute",
+						},
 					},
 				},
 			},
@@ -174,11 +182,11 @@ func TestPoliciesPrinter_Print_And_PrintDescribeView(t *testing.T) {
 	pp.PrintPolicies(policyManager.GetPolicies(), utils.OutputFormatTable)
 	got := pp.Writer.(*bytes.Buffer).String()
 	want := `
-NAME                       KIND                       TARGET NAME       TARGET KIND   POLICY TYPE  AGE
-health-check-gateway       HealthCheckPolicy.foo.com  foo-gateway       Gateway       Inherited    20d
-health-check-gatewayclass  HealthCheckPolicy.foo.com  foo-gatewayclass  GatewayClass  Inherited    6d
-timeout-policy-httproute   TimeoutPolicy.bar.com      foo-httproute     HTTPRoute     Direct       13m
-timeout-policy-namespace   TimeoutPolicy.bar.com      default           Namespace     Direct       5m
+NAME                       KIND                       TARGET REFS                      POLICY TYPE  AGE
+health-check-gateway       HealthCheckPolicy.foo.com  foo-gateway (Gateway)            Inherited    20d
+health-check-gatewayclass  HealthCheckPolicy.foo.com  foo-gatewayclass (GatewayClass)  Inherited    6d
+timeout-policy-httproute   TimeoutPolicy.bar.com      foo-httproute (HTTPRoute)        Direct       13m
+timeout-policy-namespace   TimeoutPolicy.bar.com      default (Namespace)              Direct       5m
 `
 	if diff := cmp.Diff(common.YamlString(want), common.YamlString(got), common.YamlStringTransformer); diff != "" {
 		t.Errorf("Print: Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", got, want, diff)
@@ -198,8 +206,8 @@ Spec:
     key5: value-child-5
   override:
     key1: value-child-1
-  targetRef:
-    group: gateway.networking.k8s.io
+  targetRefs:
+  - group: gateway.networking.k8s.io
     kind: Gateway
     name: foo-gateway
     namespace: default
@@ -217,8 +225,8 @@ Spec:
     key1: value-parent-1
     key3: value-parent-3
     key5: value-parent-5
-  targetRef:
-    group: gateway.networking.k8s.io
+  targetRefs:
+  - group: gateway.networking.k8s.io
     kind: GatewayClass
     name: foo-gatewayclass
 
@@ -230,8 +238,8 @@ Inherited: "false"
 Spec:
   condition: path=/def
   seconds: 60
-  targetRef:
-    group: gateway.networking.k8s.io
+  targetRefs:
+  - group: gateway.networking.k8s.io
     kind: HTTPRoute
     name: foo-httproute
 
@@ -243,8 +251,263 @@ Inherited: "false"
 Spec:
   condition: path=/abc
   seconds: 30
-  targetRef:
-    kind: Namespace
+  targetRefs:
+  - kind: Namespace
+    name: default
+`
+	if diff := cmp.Diff(common.YamlString(want), common.YamlString(got), common.YamlStringTransformer); diff != "" {
+		t.Errorf("PrintDescribeView: Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", got, want, diff)
+	}
+}
+
+func TestPoliciesPrinter_Print_And_PrintDescribeView2(t *testing.T) {
+	fakeClock := testingclock.NewFakeClock(time.Now())
+	objects := []runtime.Object{
+		&apiextensionsv1.CustomResourceDefinition{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "healthcheckpolicies.foo.com",
+				Labels: map[string]string{
+					gatewayv1alpha2.PolicyLabelKey: "inherited",
+				},
+			},
+			Spec: apiextensionsv1.CustomResourceDefinitionSpec{
+				Scope:    apiextensionsv1.ClusterScoped,
+				Group:    "foo.com",
+				Versions: []apiextensionsv1.CustomResourceDefinitionVersion{{Name: "v1"}},
+				Names: apiextensionsv1.CustomResourceDefinitionNames{
+					Plural: "healthcheckpolicies",
+					Kind:   "HealthCheckPolicy",
+				},
+			},
+		},
+		&unstructured.Unstructured{
+			Object: map[string]interface{}{
+				"apiVersion": "foo.com/v1",
+				"kind":       "HealthCheckPolicy",
+				"metadata": map[string]interface{}{
+					"name":              "health-check-gatewayclass",
+					"creationTimestamp": fakeClock.Now().Add(-6 * 24 * time.Hour).Format(time.RFC3339),
+				},
+				"spec": map[string]interface{}{
+					"override": map[string]interface{}{
+						"key1": "value-parent-1",
+						"key3": "value-parent-3",
+						"key5": "value-parent-5",
+					},
+					"default": map[string]interface{}{
+						"key2": "value-parent-2",
+						"key4": "value-parent-4",
+					},
+					"targetRefs": []interface{}{
+						map[string]interface{}{
+							"group": "gateway.networking.k8s.io",
+							"kind":  "GatewayClass",
+							"name":  "foo-gatewayclass",
+						},
+						map[string]interface{}{
+							"group":     "gateway.networking.k8s.io",
+							"kind":      "Gateway",
+							"name":      "foo-gateway",
+							"namespace": "default",
+						},
+						map[string]interface{}{
+							"group":     "gateway.networking.k8s.io",
+							"kind":      "Gateway",
+							"name":      "bar-gateway",
+							"namespace": "default",
+						},
+						map[string]interface{}{
+							"group":     "gateway.networking.k8s.io",
+							"kind":      "Gateway",
+							"name":      "foo-gateway2",
+							"namespace": "default",
+						},
+					},
+				},
+			},
+		},
+		&unstructured.Unstructured{
+			Object: map[string]interface{}{
+				"apiVersion": "foo.com/v1",
+				"kind":       "HealthCheckPolicy",
+				"metadata": map[string]interface{}{
+					"name":              "health-check-gateway",
+					"creationTimestamp": fakeClock.Now().Add(-20 * 24 * time.Hour).Format(time.RFC3339),
+				},
+				"spec": map[string]interface{}{
+					"override": map[string]interface{}{
+						"key1": "value-child-1",
+					},
+					"default": map[string]interface{}{
+						"key2": "value-child-2",
+						"key5": "value-child-5",
+					},
+					"targetRefs": []interface{}{
+						map[string]interface{}{
+							"group":     "gateway.networking.k8s.io",
+							"kind":      "Gateway",
+							"name":      "foo-gateway",
+							"namespace": "default",
+						},
+					},
+				},
+			},
+		},
+
+		&apiextensionsv1.CustomResourceDefinition{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "timeoutpolicies.bar.com",
+				Labels: map[string]string{
+					gatewayv1alpha2.PolicyLabelKey: "direct",
+				},
+			},
+			Spec: apiextensionsv1.CustomResourceDefinitionSpec{
+				Scope:    apiextensionsv1.ClusterScoped,
+				Group:    "bar.com",
+				Versions: []apiextensionsv1.CustomResourceDefinitionVersion{{Name: "v1"}},
+				Names: apiextensionsv1.CustomResourceDefinitionNames{
+					Plural: "timeoutpolicies",
+					Kind:   "TimeoutPolicy",
+				},
+			},
+		},
+		&unstructured.Unstructured{
+			Object: map[string]interface{}{
+				"apiVersion": "bar.com/v1",
+				"kind":       "TimeoutPolicy",
+				"metadata": map[string]interface{}{
+					"name":              "timeout-policy-namespace",
+					"creationTimestamp": fakeClock.Now().Add(-5 * time.Minute).Format(time.RFC3339),
+				},
+				"spec": map[string]interface{}{
+					"condition": "path=/abc",
+					"seconds":   int64(30),
+					"targetRefs": []interface{}{
+						map[string]interface{}{
+							"kind": "Namespace",
+							"name": "default",
+						},
+					},
+				},
+			},
+		},
+		&unstructured.Unstructured{
+			Object: map[string]interface{}{
+				"apiVersion": "bar.com/v1",
+				"kind":       "TimeoutPolicy",
+				"metadata": map[string]interface{}{
+					"name":              "timeout-policy-httproute",
+					"creationTimestamp": fakeClock.Now().Add(-13 * time.Minute).Format(time.RFC3339),
+				},
+				"spec": map[string]interface{}{
+					"condition": "path=/def",
+					"seconds":   int64(60),
+					"targetRefs": []interface{}{
+						map[string]interface{}{
+							"group": "gateway.networking.k8s.io",
+							"kind":  "HTTPRoute",
+							"name":  "foo-httproute",
+						},
+					},
+				},
+			},
+		},
+	}
+
+	k8sClients := common.MustClientsForTest(t, objects...)
+	policyManager := utils.MustPolicyManagerForTest(t, k8sClients)
+
+	pp := &PoliciesPrinter{
+		Writer: &bytes.Buffer{},
+		Clock:  fakeClock,
+	}
+
+	pp.PrintPolicies(policyManager.GetPolicies(), utils.OutputFormatTable)
+	got := pp.Writer.(*bytes.Buffer).String()
+	want := `
+NAME                       KIND                       TARGET REFS                                                      POLICY TYPE  AGE
+health-check-gateway       HealthCheckPolicy.foo.com  foo-gateway (Gateway)                                            Inherited    20d
+health-check-gatewayclass  HealthCheckPolicy.foo.com  foo-gatewayclass (GatewayClass), foo-gateway (Gateway), +2 more  Inherited    6d
+timeout-policy-httproute   TimeoutPolicy.bar.com      foo-httproute (HTTPRoute)                                        Direct       13m
+timeout-policy-namespace   TimeoutPolicy.bar.com      default (Namespace)                                              Direct       5m
+`
+	if diff := cmp.Diff(common.YamlString(want), common.YamlString(got), common.YamlStringTransformer); diff != "" {
+		t.Errorf("Print: Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", got, want, diff)
+	}
+
+	pp.Writer = &bytes.Buffer{}
+	pp.PrintPoliciesDescribeView(policyManager.GetPolicies())
+	got = pp.Writer.(*bytes.Buffer).String()
+	want = `
+Name: health-check-gateway
+Group: foo.com
+Kind: HealthCheckPolicy
+Inherited: "true"
+Spec:
+  default:
+    key2: value-child-2
+    key5: value-child-5
+  override:
+    key1: value-child-1
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: foo-gateway
+    namespace: default
+
+
+Name: health-check-gatewayclass
+Group: foo.com
+Kind: HealthCheckPolicy
+Inherited: "true"
+Spec:
+  default:
+    key2: value-parent-2
+    key4: value-parent-4
+  override:
+    key1: value-parent-1
+    key3: value-parent-3
+    key5: value-parent-5
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: GatewayClass
+    name: foo-gatewayclass
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: foo-gateway
+    namespace: default
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: bar-gateway
+    namespace: default
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: foo-gateway2
+    namespace: default
+
+
+Name: timeout-policy-httproute
+Group: bar.com
+Kind: TimeoutPolicy
+Inherited: "false"
+Spec:
+  condition: path=/def
+  seconds: 60
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: foo-httproute
+
+
+Name: timeout-policy-namespace
+Group: bar.com
+Kind: TimeoutPolicy
+Inherited: "false"
+Spec:
+  condition: path=/abc
+  seconds: 30
+  targetRefs:
+  - kind: Namespace
     name: default
 `
 	if diff := cmp.Diff(common.YamlString(want), common.YamlString(got), common.YamlStringTransformer); diff != "" {
@@ -290,11 +553,13 @@ func TestPoliciesPrinter_PrintCRDs(t *testing.T) {
 						"key2": "value-child-2",
 						"key5": "value-child-5",
 					},
-					"targetRef": map[string]interface{}{
-						"group":     "gateway.networking.k8s.io",
-						"kind":      "Gateway",
-						"name":      "foo-gateway",
-						"namespace": "default",
+					"targetRefs": []interface{}{
+						map[string]interface{}{
+							"group":     "gateway.networking.k8s.io",
+							"kind":      "Gateway",
+							"name":      "foo-gateway",
+							"namespace": "default",
+						},
 					},
 				},
 			},
@@ -330,9 +595,11 @@ func TestPoliciesPrinter_PrintCRDs(t *testing.T) {
 				"spec": map[string]interface{}{
 					"condition": "path=/abc",
 					"seconds":   int64(30),
-					"targetRef": map[string]interface{}{
-						"kind": "Namespace",
-						"name": "default",
+					"targetRefs": []interface{}{
+						map[string]interface{}{
+							"kind": "Namespace",
+							"name": "default",
+						},
 					},
 				},
 			},
@@ -405,11 +672,13 @@ func TestPoliciesPrinter_PrintCRDs_JsonYaml(t *testing.T) {
 						"key2": "value-child-2",
 						"key5": "value-child-5",
 					},
-					"targetRef": map[string]interface{}{
-						"group":     "gateway.networking.k8s.io",
-						"kind":      "Gateway",
-						"name":      "foo-gateway",
-						"namespace": "default",
+					"targetRefs": []interface{}{
+						map[string]interface{}{
+							"group":     "gateway.networking.k8s.io",
+							"kind":      "Gateway",
+							"name":      "foo-gateway",
+							"namespace": "default",
+						},
 					},
 				},
 			},
@@ -449,9 +718,11 @@ func TestPoliciesPrinter_PrintCRDs_JsonYaml(t *testing.T) {
 				"spec": map[string]interface{}{
 					"condition": "path=/abc",
 					"seconds":   int64(30),
-					"targetRef": map[string]interface{}{
-						"kind": "Namespace",
-						"name": "default",
+					"targetRefs": []interface{}{
+						map[string]interface{}{
+							"kind": "Namespace",
+							"name": "default",
+						},
 					},
 				},
 			},
@@ -651,11 +922,13 @@ func TestPolicyCrd_PrintDescribeView(t *testing.T) {
 						"key2": "value-child-2",
 						"key5": "value-child-5",
 					},
-					"targetRef": map[string]interface{}{
-						"group":     "gateway.networking.k8s.io",
-						"kind":      "Gateway",
-						"name":      "foo-gateway",
-						"namespace": "default",
+					"targetRefs": []interface{}{
+						map[string]interface{}{
+							"group":     "gateway.networking.k8s.io",
+							"kind":      "Gateway",
+							"name":      "foo-gateway",
+							"namespace": "default",
+						},
 					},
 				},
 			},
@@ -693,9 +966,11 @@ func TestPolicyCrd_PrintDescribeView(t *testing.T) {
 				"spec": map[string]interface{}{
 					"condition": "path=/abc",
 					"seconds":   int64(30),
-					"targetRef": map[string]interface{}{
-						"kind": "Namespace",
-						"name": "default",
+					"targetRefs": []interface{}{
+						map[string]interface{}{
+							"kind": "Namespace",
+							"name": "default",
+						},
 					},
 				},
 			},

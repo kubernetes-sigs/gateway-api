@@ -230,10 +230,12 @@ func TestHTTPRoutesPrinter_PrintTable(t *testing.T) {
 				"spec": map[string]interface{}{
 					"condition": "path=/def",
 					"seconds":   int64(60),
-					"targetRef": map[string]interface{}{
-						"group": "gateway.networking.k8s.io",
-						"kind":  "HTTPRoute",
-						"name":  "foo-httproute-1",
+					"targetRefs": []interface{}{
+						map[string]interface{}{
+							"group": "gateway.networking.k8s.io",
+							"kind":  "HTTPRoute",
+							"name":  "foo-httproute-1",
+						},
 					},
 				},
 			},
@@ -324,20 +326,18 @@ func TestHTTPRoutesPrinter_PrintDescribeView(t *testing.T) {
 						"key2": "value-parent-2",
 						"key4": "value-parent-4",
 					},
-					"targetRef": map[string]interface{}{
-						"group": "gateway.networking.k8s.io",
-						"kind":  "GatewayClass",
-						"name":  "foo-gatewayclass",
+					"targetRefs": []interface{}{
+						map[string]interface{}{
+							"group": "gateway.networking.k8s.io",
+							"kind":  "GatewayClass",
+							"name":  "foo-gatewayclass",
+						},
 					},
 				},
 			},
 		},
 
 		&gatewayv1.Gateway{
-			TypeMeta: metav1.TypeMeta{
-				APIVersion: gatewayv1.GroupVersion.String(),
-				Kind:       "Gateway",
-			},
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "foo-gateway",
 				Namespace: "default",
@@ -362,11 +362,13 @@ func TestHTTPRoutesPrinter_PrintDescribeView(t *testing.T) {
 						"key2": "value-child-2",
 						"key5": "value-child-5",
 					},
-					"targetRef": map[string]interface{}{
-						"group":     "gateway.networking.k8s.io",
-						"kind":      "Gateway",
-						"name":      "foo-gateway",
-						"namespace": "default",
+					"targetRefs": []interface{}{
+						map[string]interface{}{
+							"group":     "gateway.networking.k8s.io",
+							"kind":      "Gateway",
+							"name":      "foo-gateway",
+							"namespace": "default",
+						},
 					},
 				},
 			},
@@ -402,10 +404,12 @@ func TestHTTPRoutesPrinter_PrintDescribeView(t *testing.T) {
 				"spec": map[string]interface{}{
 					"condition": "path=/def",
 					"seconds":   int64(60),
-					"targetRef": map[string]interface{}{
-						"group": "gateway.networking.k8s.io",
-						"kind":  "HTTPRoute",
-						"name":  "foo-httproute",
+					"targetRefs": []interface{}{
+						map[string]interface{}{
+							"group": "gateway.networking.k8s.io",
+							"kind":  "HTTPRoute",
+							"name":  "foo-httproute",
+						},
 					},
 				},
 			},
@@ -456,9 +460,11 @@ func TestHTTPRoutesPrinter_PrintDescribeView(t *testing.T) {
 				"spec": map[string]interface{}{
 					"condition": "path=/abc",
 					"seconds":   int64(30),
-					"targetRef": map[string]interface{}{
-						"kind": "Namespace",
-						"name": "default",
+					"targetRefs": []interface{}{
+						map[string]interface{}{
+							"kind": "Namespace",
+							"name": "default",
+						},
 					},
 				},
 			},
@@ -522,7 +528,12 @@ EffectivePolicies:
     TimeoutPolicy.bar.com:
       condition: path=/def
       seconds: 60
+      targetRefs:
+      - group: gateway.networking.k8s.io
+        kind: HTTPRoute
+        name: foo-httproute
 Events: <none>
+
 `
 	if diff := cmp.Diff(common.YamlString(want), common.YamlString(got), common.YamlStringTransformer); diff != "" {
 		t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", got, want, diff)

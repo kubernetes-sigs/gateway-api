@@ -101,9 +101,11 @@ func TestNamespacePrinter_PrintTable(t *testing.T) {
 				"spec": map[string]interface{}{
 					"condition": "path=/abc",
 					"seconds":   int64(30),
-					"targetRef": map[string]interface{}{
-						"kind": "Namespace",
-						"name": "ns1",
+					"targetRefs": []interface{}{
+						map[string]interface{}{
+							"kind": "Namespace",
+							"name": "ns1",
+						},
 					},
 				},
 			},
@@ -212,9 +214,11 @@ func TestNamespacePrinter_PrintDescribeView(t *testing.T) {
 						"key2": "value-parent-2",
 						"key4": "value-parent-4",
 					},
-					"targetRef": map[string]interface{}{
-						"kind": "Namespace",
-						"name": "development",
+					"targetRefs": []interface{}{
+						map[string]interface{}{
+							"kind": "Namespace",
+							"name": "development",
+						},
 					},
 				},
 			},
@@ -260,9 +264,11 @@ func TestNamespacePrinter_PrintDescribeView(t *testing.T) {
 				"spec": map[string]interface{}{
 					"condition": "path=/abc",
 					"seconds":   int64(30),
-					"targetRef": map[string]interface{}{
-						"kind": "Namespace",
-						"name": "production",
+					"targetRefs": []interface{}{
+						map[string]interface{}{
+							"kind": "Namespace",
+							"name": "production",
+						},
 					},
 				},
 			},

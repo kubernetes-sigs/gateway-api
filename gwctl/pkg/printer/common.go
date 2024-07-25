@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
 	"sort"
 	"strings"
 	"text/tabwriter"
@@ -30,8 +31,6 @@ import (
 	"k8s.io/utils/clock"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/yaml"
-
-	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
 )
 
 // DescriberKV stores key-value pairs that are used with Describing a resource.
@@ -154,6 +153,46 @@ func convertEventsSliceToTable(events []corev1.Event, clock clock.Clock) *Table 
 	return table
 }
 
+//	func convertPoliciesToRefsTable(policies []*resourcediscovery.PolicyNode, includeTarget bool) *Table {
+//		table := &Table{
+//			ColumnNames:  []string{"Type", "Name"},
+//			UseSeparator: true,
+//		}
+//		if includeTarget {
+//			table.ColumnNames = append(table.ColumnNames, "Target Kind", "Target Name")
+//		}
+//
+//		for _, policyNode := range policies {
+//			policyType := fmt.Sprintf("%v.%v", policyNode.Policy.Unstructured().GroupVersionKind().Kind, policyNode.Policy.Unstructured().GroupVersionKind().Group)
+//
+//			policyName := policyNode.Policy.Unstructured().GetName()
+//			if ns := policyNode.Policy.Unstructured().GetNamespace(); ns != "" {
+//				policyName = fmt.Sprintf("%v/%v", ns, policyName)
+//			}
+//
+//			targetKind := policyNode.Policy.TargetRef().Kind
+//
+//			targetName := policyNode.Policy.TargetRef().Name
+//			if ns := policyNode.Policy.TargetRef().Namespace; ns != "" {
+//				targetName = fmt.Sprintf("%v/%v", ns, targetName)
+//			}
+//
+//			row := []string{
+//				policyType, // Type
+//				policyName, // Name
+//			}
+//
+//			if includeTarget {
+//				row = append(row,
+//					targetKind, // Target Kind
+//					targetName, // Target Name
+//				)
+//			}
+//
+//			table.Rows = append(table.Rows, row)
+//		}
+//		return table
+//	}
 func convertPoliciesToRefsTable(policies []*resourcediscovery.PolicyNode, includeTarget bool) *Table {
 	table := &Table{
 		ColumnNames:  []string{"Type", "Name"},
@@ -171,26 +210,27 @@ func convertPoliciesToRefsTable(policies []*resourcediscovery.PolicyNode, includ
 			policyName = fmt.Sprintf("%v/%v", ns, policyName)
 		}
 
-		targetKind := policyNode.Policy.TargetRef().Kind
+		// Iterate over each TargetRef
+		for _, targetRef := range policyNode.Policy.TargetRefs() {
+			targetKind := targetRef.Kind
+			targetName := targetRef.Name
+			if ns := targetRef.Namespace; ns != "" {
+				targetName = fmt.Sprintf("%v/%v", ns, targetName)
+			}
 
-		targetName := policyNode.Policy.TargetRef().Name
-		if ns := policyNode.Policy.TargetRef().Namespace; ns != "" {
-			targetName = fmt.Sprintf("%v/%v", ns, targetName)
+			row := []string{
+				policyType, // Type
+				policyName, // Name
+			}
+
+			if includeTarget {
+				row = append(row,
+					targetKind, // Target Kind
+					targetName, // Target Name
+				)
+			}
+			table.Rows = append(table.Rows, row)
 		}
-
-		row := []string{
-			policyType, // Type
-			policyName, // Name
-		}
-
-		if includeTarget {
-			row = append(row,
-				targetKind, // Target Kind
-				targetName, // Target Name
-			)
-		}
-
-		table.Rows = append(table.Rows, row)
 	}
 	return table
 }

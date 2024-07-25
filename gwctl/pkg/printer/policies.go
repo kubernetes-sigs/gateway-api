@@ -21,6 +21,7 @@ import (
 	"io"
 	"os"
 	"sort"
+	"strings"
 
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -54,7 +55,7 @@ func (pp *PoliciesPrinter) printClientObjects(objects []client.Object, format ut
 
 func (pp *PoliciesPrinter) printPoliciesTable(sortedPoliciesList []policymanager.Policy) {
 	table := &Table{
-		ColumnNames:  []string{"NAME", "KIND", "TARGET NAME", "TARGET KIND", "POLICY TYPE", "AGE"},
+		ColumnNames:  []string{"NAME", "KIND", "TARGET REFS", "POLICY TYPE", "AGE"},
 		UseSeparator: false,
 	}
 
@@ -65,14 +66,23 @@ func (pp *PoliciesPrinter) printPoliciesTable(sortedPoliciesList []policymanager
 		}
 
 		kind := fmt.Sprintf("%v.%v", policy.Unstructured().GroupVersionKind().Kind, policy.Unstructured().GroupVersionKind().Group)
-
 		age := duration.HumanDuration(pp.Clock.Since(policy.Unstructured().GetCreationTimestamp().Time))
+
+		targetRefs := policy.TargetRefs()
+		var displayedRefs []string
+		for i, targetRef := range targetRefs {
+			if i >= 2 {
+				displayedRefs = append(displayedRefs, fmt.Sprintf("+%d more", len(targetRefs)-2))
+				break
+			}
+			displayedRefs = append(displayedRefs, fmt.Sprintf("%s (%s)", targetRef.Name, targetRef.Kind))
+		}
+		targetRefsDisplay := strings.Join(displayedRefs, ", ")
 
 		row := []string{
 			policy.Unstructured().GetName(),
 			kind,
-			policy.TargetRef().Name,
-			policy.TargetRef().Kind,
+			targetRefsDisplay,
 			policyType,
 			age,
 		}

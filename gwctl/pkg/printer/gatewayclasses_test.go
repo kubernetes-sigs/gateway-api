@@ -228,10 +228,12 @@ func TestGatewayClassesPrinter_PrintDescribeView(t *testing.T) {
 							"name": "policy-name",
 						},
 						"spec": map[string]interface{}{
-							"targetRef": map[string]interface{}{
-								"group": "gateway.networking.k8s.io",
-								"kind":  "GatewayClass",
-								"name":  "foo-gatewayclass",
+							"targetRefs": []interface{}{
+								map[string]interface{}{
+									"group": "gateway.networking.k8s.io",
+									"kind":  "GatewayClass",
+									"name":  "foo-gatewayclass",
+								},
 							},
 						},
 					},

@@ -128,9 +128,11 @@ func TestResourceModel_calculateInheritedPolicies(t *testing.T) {
 							"name": "timeout-policy-on-namespace",
 						},
 						"spec": map[string]interface{}{
-							"targetRef": map[string]interface{}{
-								"kind": "Namespace",
-								"name": "default",
+							"targetRefs": []interface{}{
+								map[string]interface{}{
+									"kind": "Namespace",
+									"name": "default",
+								},
 							},
 						},
 					},
@@ -162,10 +164,12 @@ func TestResourceModel_calculateInheritedPolicies(t *testing.T) {
 							"namespace": "default",
 						},
 						"spec": map[string]interface{}{
-							"targetRef": map[string]interface{}{
-								"group": "gateway.networking.k8s.io",
-								"kind":  "HTTPRoute",
-								"name":  "foo-httproute",
+							"targetRefs": []interface{}{
+								map[string]interface{}{
+									"group": "gateway.networking.k8s.io",
+									"kind":  "HTTPRoute",
+									"name":  "foo-httproute",
+								},
 							},
 						},
 					},
@@ -198,10 +202,12 @@ func TestResourceModel_calculateInheritedPolicies(t *testing.T) {
 							"namespace": "default",
 						},
 						"spec": map[string]interface{}{
-							"targetRef": map[string]interface{}{
-								"group": "gateway.networking.k8s.io",
-								"kind":  "HTTPRoute",
-								"name":  "foo-httproute",
+							"targetRefs": []interface{}{
+								map[string]interface{}{
+									"group": "gateway.networking.k8s.io",
+									"kind":  "HTTPRoute",
+									"name":  "foo-httproute",
+								},
 							},
 						},
 					},

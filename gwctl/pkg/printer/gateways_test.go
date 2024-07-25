@@ -228,10 +228,12 @@ func TestGatewaysPrinter_PrintTable(t *testing.T) {
 						"key2": "value-parent-2",
 						"key4": "value-parent-4",
 					},
-					"targetRef": map[string]interface{}{
-						"group": "gateway.networking.k8s.io",
-						"kind":  "GatewayClass",
-						"name":  "regional-internal-class",
+					"targetRefs": []interface{}{
+						map[string]interface{}{
+							"group": "gateway.networking.k8s.io",
+							"kind":  "GatewayClass",
+							"name":  "regional-internal-class",
+						},
 					},
 				},
 			},
@@ -251,11 +253,13 @@ func TestGatewaysPrinter_PrintTable(t *testing.T) {
 						"key2": "value-child-2",
 						"key5": "value-child-5",
 					},
-					"targetRef": map[string]interface{}{
-						"group":     "gateway.networking.k8s.io",
-						"kind":      "Gateway",
-						"name":      "random-gateway",
-						"namespace": "default",
+					"targetRefs": []interface{}{
+						map[string]interface{}{
+							"group":     "gateway.networking.k8s.io",
+							"kind":      "Gateway",
+							"name":      "random-gateway",
+							"namespace": "default",
+						},
 					},
 				},
 			},
@@ -386,10 +390,12 @@ func TestGatewaysPrinter_PrintDescribeView(t *testing.T) {
 						"key2": "value-parent-2",
 						"key4": "value-parent-4",
 					},
-					"targetRef": map[string]interface{}{
-						"group": "gateway.networking.k8s.io",
-						"kind":  "GatewayClass",
-						"name":  "foo-gatewayclass",
+					"targetRefs": []interface{}{
+						map[string]interface{}{
+							"group": "gateway.networking.k8s.io",
+							"kind":  "GatewayClass",
+							"name":  "foo-gatewayclass",
+						},
 					},
 				},
 			},
@@ -409,11 +415,12 @@ func TestGatewaysPrinter_PrintDescribeView(t *testing.T) {
 						"key2": "value-child-2",
 						"key5": "value-child-5",
 					},
-					"targetRef": map[string]interface{}{
-						"group":     "gateway.networking.k8s.io",
-						"kind":      "Gateway",
-						"name":      "foo-gateway",
-						"namespace": "default",
+					"targetRefs": []interface{}{
+						map[string]interface{}{
+							"group": "gateway.networking.k8s.io",
+							"kind":  "Gateway",
+							"name":  "foo-gateway",
+						},
 					},
 				},
 			},
@@ -446,9 +453,11 @@ func TestGatewaysPrinter_PrintDescribeView(t *testing.T) {
 				"spec": map[string]interface{}{
 					"condition": "path=/abc",
 					"seconds":   int64(30),
-					"targetRef": map[string]interface{}{
-						"kind": "Namespace",
-						"name": "default",
+					"targetRefs": []interface{}{
+						map[string]interface{}{
+							"kind": "Namespace",
+							"name": "default",
+						},
 					},
 				},
 			},
@@ -525,6 +534,9 @@ EffectivePolicies:
   TimeoutPolicy.bar.com:
     condition: path=/abc
     seconds: 30
+    targetRefs:
+    - kind: Namespace
+      name: default
 Events:
   Type    Reason  Age      From                   Message
   ----    ------  ---      ----                   -------

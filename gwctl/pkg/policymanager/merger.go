@@ -58,7 +58,14 @@ func MergePoliciesOfSimilarKind(policies []Policy) (map[PolicyCrdID]Policy, erro
 			return nil, err
 		}
 
-		result[policyCrdID] = mergedPolicies[policyCrdID]
+		mergedPolicy := mergedPolicies[policyCrdID]
+
+		// Check and set targetRefs to nil if it's an empty slice
+		if len(mergedPolicy.targetRefs) == 0 {
+			mergedPolicy.targetRefs = nil
+		}
+
+		result[policyCrdID] = mergedPolicy
 	}
 	return result, nil
 }
@@ -149,8 +156,24 @@ func mergePolicy(parent, child Policy) (Policy, error) {
 	result.u.SetUnstructuredContent(resultUnstructured)
 	// Merging two policies means the targetRef no longer makes any sense since
 	// since they can be conflicting. So we unset the targetRef.
-	result.targetRef = common.ObjRef{}
+	result.targetRefs = mergeTargetRefs(parent.targetRefs, child.targetRefs)
 	return result, nil
+}
+
+// Helper function to merge targetRefs from two policies
+func mergeTargetRefs(refs1, refs2 []common.ObjRef) []common.ObjRef {
+	refMap := make(map[common.ObjRef]struct{})
+	for _, ref := range refs1 {
+		refMap[ref] = struct{}{}
+	}
+	for _, ref := range refs2 {
+		refMap[ref] = struct{}{}
+	}
+	result := make([]common.ObjRef, 0, len(refMap))
+	for ref := range refMap {
+		result = append(result, ref)
+	}
+	return result
 }
 
 func mergeUnstructured(parent, patch map[string]interface{}) (map[string]interface{}, error) {
