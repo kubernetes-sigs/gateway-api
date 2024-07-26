@@ -29,16 +29,17 @@ readonly HERE=$(cd $(dirname $0) && pwd)
 readonly REPO=$(cd ${HERE}/../.. && pwd)
 
 gendoc::build() {
-    go install github.com/ahmetb/gen-crd-api-reference-docs
+    go install github.com/elastic/crd-ref-docs
 }
 
 # Exec the doc generator.
 gendoc::exec() {
     local readonly confdir="${REPO}/hack/api-docs"
 
-    ${GOBIN}/gen-crd-api-reference-docs \
-        -template-dir ${confdir} \
-        -config ${confdir}/config.json \
+    ${GOBIN}/crd-ref-docs \
+        --templates-dir ${confdir} \
+        --config ${confdir}/config.yaml \
+        --renderer markdown \
         "$@"
 }
 
@@ -49,5 +50,5 @@ fi
 
 gendoc::build
 gendoc::exec \
-    -api-dir "sigs.k8s.io/gateway-api/apis/" \
-    -out-file "${1}"
+    --source-path "${REPO}/apis/" \
+    --output-path "${1}"
