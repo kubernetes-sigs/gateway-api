@@ -534,9 +534,6 @@ EffectivePolicies:
   TimeoutPolicy.bar.com:
     condition: path=/abc
     seconds: 30
-    targetRefs:
-    - kind: Namespace
-      name: default
 Events:
   Type    Reason  Age      From                   Message
   ----    ------  ---      ----                   -------

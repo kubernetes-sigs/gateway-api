@@ -117,13 +117,11 @@ func TestPoliciesPrinter_Print_And_PrintDescribeView(t *testing.T) {
 						"key2": "value-child-2",
 						"key5": "value-child-5",
 					},
-					"targetRefs": []interface{}{
-						map[string]interface{}{
-							"group":     "gateway.networking.k8s.io",
-							"kind":      "Gateway",
-							"name":      "foo-gateway",
-							"namespace": "default",
-						},
+					"targetRef": map[string]interface{}{
+						"group":     "gateway.networking.k8s.io",
+						"kind":      "Gateway",
+						"name":      "foo-gateway",
+						"namespace": "default",
 					},
 				},
 			},
@@ -157,11 +155,9 @@ func TestPoliciesPrinter_Print_And_PrintDescribeView(t *testing.T) {
 				"spec": map[string]interface{}{
 					"condition": "path=/abc",
 					"seconds":   int64(30),
-					"targetRefs": []interface{}{
-						map[string]interface{}{
-							"kind": "Namespace",
-							"name": "default",
-						},
+					"targetRef": map[string]interface{}{
+						"kind": "Namespace",
+						"name": "default",
 					},
 				},
 			},
@@ -177,12 +173,10 @@ func TestPoliciesPrinter_Print_And_PrintDescribeView(t *testing.T) {
 				"spec": map[string]interface{}{
 					"condition": "path=/def",
 					"seconds":   int64(60),
-					"targetRefs": []interface{}{
-						map[string]interface{}{
-							"group": "gateway.networking.k8s.io",
-							"kind":  "HTTPRoute",
-							"name":  "foo-httproute",
-						},
+					"targetRef": map[string]interface{}{
+						"group": "gateway.networking.k8s.io",
+						"kind":  "HTTPRoute",
+						"name":  "foo-httproute",
 					},
 				},
 			},

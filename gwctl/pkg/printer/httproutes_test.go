@@ -528,10 +528,6 @@ EffectivePolicies:
     TimeoutPolicy.bar.com:
       condition: path=/def
       seconds: 60
-      targetRefs:
-      - group: gateway.networking.k8s.io
-        kind: HTTPRoute
-        name: foo-httproute
 Events: <none>
 
 `

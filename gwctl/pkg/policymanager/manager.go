@@ -235,13 +235,34 @@ func PolicyFromUnstructured(u unstructured.Unstructured, policyCRDs map[PolicyCr
 		metav1.ObjectMeta `json:"metadata,omitempty"`
 		Spec              struct {
 			TargetRefs []gatewayv1alpha2.NamespacedPolicyTargetReference `json:"targetRefs"`
+			TargetRef  *gatewayv1alpha2.NamespacedPolicyTargetReference  `json:"targetRef"`
 		}
 	}
 	structuredPolicy := &genericPolicy{}
 	if err := runtime.DefaultUnstructuredConverter.FromUnstructured(u.UnstructuredContent(), structuredPolicy); err != nil {
 		return Policy{}, fmt.Errorf("failed to convert unstructured policy resource to structured: %v", err)
 	}
+
+	// Process targetRefs
 	for _, targetRef := range structuredPolicy.Spec.TargetRefs {
+		objRef := common.ObjRef{
+			Group:     string(targetRef.Group),
+			Kind:      string(targetRef.Kind),
+			Name:      string(targetRef.Name),
+			Namespace: u.GetNamespace(),
+		}
+		if objRef.Namespace == "" {
+			objRef.Namespace = u.GetNamespace()
+		}
+		if targetRef.Namespace != nil {
+			objRef.Namespace = string(*targetRef.Namespace)
+		}
+		result.targetRefs = append(result.targetRefs, objRef)
+	}
+
+	// Process single targetRef (if present and targetRefs is empty)
+	if structuredPolicy.Spec.TargetRef != nil && len(result.targetRefs) == 0 {
+		targetRef := structuredPolicy.Spec.TargetRef
 		objRef := common.ObjRef{
 			Group:     string(targetRef.Group),
 			Kind:      string(targetRef.Kind),
@@ -327,11 +348,20 @@ func (p Policy) Spec() map[string]interface{} {
 	if err != nil || !ok {
 		return nil
 	}
-
 	result, ok := spec.(map[string]interface{})
 	if !ok {
 		return nil
 	}
+
+	if targetRef, hasTargetRef := result["targetRef"]; hasTargetRef {
+		if _, hasTargetRefs := result["targetRefs"]; !hasTargetRefs {
+			result["targetRefs"] = []interface{}{targetRef}
+		} else {
+			result["targetRefs"] = append(result["targetRefs"].([]interface{}), targetRef)
+		}
+		delete(result, "targetRef")
+	}
+
 	return result
 }
 
@@ -339,6 +369,7 @@ func (p Policy) EffectiveSpec() (map[string]interface{}, error) {
 	if !p.IsInherited() {
 		// No merging is required in case of Direct policies.
 		result := p.Spec()
+		delete(result, "targetRefs")
 		delete(result, "targetRef")
 		return result, nil
 	}
