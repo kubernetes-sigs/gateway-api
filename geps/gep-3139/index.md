@@ -10,9 +10,10 @@
 Similar to the HTTPRoute Timeouts (GEP # 1742), the goal of this GEP is to create a design for implementing GRPCRoute Timeouts
 
 ## Goals
+@arkodg (original requester of this experimental feature) had the following listed in the discussion, which is a good starting point the API of GRPCRoute timeouts
 
-- Create some method to configure timeouts for GRPCRoutes
-- Config must be applicable to most of GatewayAPI implementations
+- The ability to set a request timeout for unary RPC
+- The ability to disable timeouts (set to 0s) for streaming RPC
 
 ## Non-Goals
 
@@ -22,7 +23,7 @@ Create a design for bidirectional streaming. Although this would be very useful,
 
 This GEP intends to find common timeouts that we can build into the Gateway API for GRPC Route.
 
-It is noted that gRPC also has the following 4 cases:
+gRPC has the following 4 cases:
 - Unary (single req, single res)
 - Client Stream (Client sends a stream of messages, server replies with a res)
 - Server Stream (Client sends a single req, Server replies with a stream)
@@ -33,6 +34,7 @@ For this initial design however, we’ll focus on unary connections, and provide
 Most implementations have a proxy for GRPC, as listed in the table here. From the table, implementations rely on either Envoy, Nginx, F5 BigIP, Pipy, HAProxy, Litespeed, or Traefik as their proxy in their dataplane. 
 For the sake of brevity, the flow of timeouts are shown in a generic flow diagram (same diagram as [GEP 1742](https://gateway-api.sigs.k8s.io/geps/gep-1742/#flow-diagrams-with-available-timeouts)):
 
+```mermaid
 sequenceDiagram
     participant C as Client
     participant P as Proxy
@@ -53,7 +55,7 @@ sequenceDiagram
     P->>C: Finishes Response
     Note right of P: Repeat if connection sharing
     U->>C: Connection ended
-
+```
 
 Some differences from HTTPRoute timeouts
 
@@ -64,11 +66,6 @@ Nginx uses grpc_<>_timeout is used to configure of GRPC timeouts, which occurs b
 ## API
 
 The proxy implementations for the dataplane for the majority have some way to configure GRPC timeouts.
-
-@arko (original requester of this experimental feature) had the following listed in the discussion, which is a good starting point the API of GRPCRoute timeouts
-
-- The ability to set a request timeout for unary RPC
-- The ability to disable timeouts (set to 0s) for streaming RPC
 
 ### Timeout Values
 
