@@ -2,7 +2,7 @@
 
 <h3 id="{{ anchorIDForType . }}">
     {{- .Name.Name }}
-    {{ if eq .Kind "Alias" }}(<code>{{.Underlying}}</code> alias)</p>{{ end -}}
+    {{ if eq .Kind "Alias" }}(<code>{{.Underlying}}</code> alias){{ end -}}
     <a class="headerlink" href="#{{ anchorIDForType . }}" title="Permanent link">¶</a>
 </h3>
 {{ with (typeReferences .) }}
