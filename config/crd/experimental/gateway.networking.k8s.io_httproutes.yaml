@@ -2929,8 +2929,9 @@ spec:
                 maxItems: 16
                 type: array
                 x-kubernetes-validations:
-                - message: While 16 rules and 64 matches are allowed, the total matches
-                    must be less than 128
+                - message: While 16 rules and 64 matches per rule are allowed, the
+                    total number of matches across all rules in a route must be less
+                    than 128
                   rule: '(self.size() > 0 ? self[0].matches.size() : 0) + (self.size()
                     > 1 ? self[1].matches.size() : 0) + (self.size() > 2 ? self[2].matches.size()
                     : 0) + (self.size() > 3 ? self[3].matches.size() : 0) + (self.size()
@@ -6174,8 +6175,9 @@ spec:
                 maxItems: 16
                 type: array
                 x-kubernetes-validations:
-                - message: While 16 rules and 64 matches are allowed, the total matches
-                    must be less than 128
+                - message: While 16 rules and 64 matches per rule are allowed, the
+                    total number of matches across all rules in a route must be less
+                    than 128
                   rule: '(self.size() > 0 ? self[0].matches.size() : 0) + (self.size()
                     > 1 ? self[1].matches.size() : 0) + (self.size() > 2 ? self[2].matches.size()
                     : 0) + (self.size() > 3 ? self[3].matches.size() : 0) + (self.size()
