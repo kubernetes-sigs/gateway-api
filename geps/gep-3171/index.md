@@ -1,7 +1,7 @@
 # GEP-3171: Percentage-based Request Mirroring
 
 * Issue: [#3171](https://github.com/kubernetes-sigs/gateway-api/issues/3171)
-* Status: **Provisional**
+* Status: **Implementable**
 
 (See status definitions [here](/geps/overview/#gep-states).)
 
