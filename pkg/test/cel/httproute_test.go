@@ -1211,7 +1211,7 @@ func TestHTTPRouteRule(t *testing.T) {
 		},
 		{
 			name:       "too many matches and rules",
-			wantErrors: []string{"the total matches must be less than 128"},
+			wantErrors: []string{"total number of matches across all rules in a route must be less than 128"},
 			rules: func() []gatewayv1.HTTPRouteRule {
 				match := gatewayv1.HTTPRouteMatch{
 					Path: &gatewayv1.HTTPPathMatch{
