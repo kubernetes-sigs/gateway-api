@@ -1,7 +1,7 @@
 # GEP-1016: GRPCRoute
 
 * Issue: [#1016](https://github.com/kubernetes-sigs/gateway-api/issues/1016)
-* Status: Experimental
+* Status: Standard
 
 > **Note**: This GEP is exempt from the [Probationary Period][expprob] rules of
 > our GEP overview as it existed before those rules did, and so it has been
@@ -74,10 +74,10 @@ The user experience would also degrade significantly if forced to route at the l
 
 - Encoding services and methods as URIs (an implementation detail of gRPC)
 - The [Transfer Encoding header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Transfer-Encoding) for trailers
-- Many features supported by HTTP/2 but not by gRPC, such as
-  - Query parameters
-  - Methods besides `POST`
-  - [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS)
+- Many features supported by HTTP/2 but not by gRPC, such as:
+    - Query parameters
+    - Methods besides `POST`
+    - [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS)
 
 
 #### Proxyless Service Mesh
