@@ -26,6 +26,12 @@ More broadly, large scale gateway users often expose `O(1000)` domains, but are 
 The spec currently has language to indicate implementations `MAY` merge `Gateways` resources but the mechanic isn't defined.
 https://github.com/kubernetes-sigs/gateway-api/blob/541e9fc2b3c2f62915cb58dc0ee5e43e4096b3e2/apis/v1beta1/gateway_types.go#L76-L78
 
+## Feature Details
+
+We define `ListenerSet` as the name of the feature outlined in this GEP.
+The feature will be part of the experimental branches as an extended feature, which implementations can choose to support. At that time, all the requirements in this document that use MUST apply to their implementation of the feature.
+
+
 ## API
 
 This proposal introduces a new `ListenerSet` resource that has the ability to attach to a set of listeners to a parent `Gateway`.
