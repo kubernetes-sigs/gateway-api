@@ -326,14 +326,29 @@ type HTTPRouteRetry struct {
 // * "503"
 // * "504"
 //
-// Implementations SHOULD support the `"5xx"` shorthand for matching any
-// status code in the 500-599 range, and SHOULD support specifying any
-// status code within the valid 100-599 (inclusive) range.
+// Implementations SHOULD support the `"5xx"` shorthand for matching status
+// codes in the 500-599 range. For implementations supporting `"5xx"`, this
+// shorthand MUST match the following status codes:
 //
-// Implementations MAY support values in the 600-999 (inclusive) range,
-// which are not valid for HTTP clients, but are sometimes used for
-// communicating application-specific errors, or additional shorthand 
-// codes for any `[0-9]xx` range.
+// * "500"
+// * "502"
+// * "503"
+// * "504"
+//
+// The `"5xx"` shorthand MAY additionally match a well-documented subset of
+// arbitrary status codes in the 500-599 range, or match all status codes in
+// this range.
+//
+// Implementations SHOULD NOT support retrying status codes in the 100-399
+// range, as these responses are generally not appropriate to retry.
+//
+// Implementations MAY support specifying discrete values in the 400-499 range,
+// which are often inadvisable to retry, and MAY support discrete values in the
+// 600-999 (inclusive) range, which are not valid for HTTP clients, but are
+// sometimes used for communicating application-specific errors.
+//
+// Implementations MAY support additional shorthand codes for any `[0-9]xx`
+// range.
 //
 // +kubebuilder:validation:Pattern=`^[1-9](?:[0-9][0-9]|xx)$`
 type HTTPRouteRetryStatusCode string
@@ -391,9 +406,11 @@ This may be a reasonable approach for configuring broad default retry policies, 
 TODO
 
 ### What accommodations are needed for future retry budget support?
+
 Should the `retry` stanza follow the Kubernetes "tagged union" pattern with something like a `mode: "count"` to allow future design space for `mode: "budget"` with distinct sibling fields?
 
 ### Should whether to retry on connection errors be configurable?
+
 Retrying on connection errors (disconnect, reset, timeout, TCP failure) is typically default behavior for most dataplanes, even those that don't support configurable retries based on HTTP status codes. Some proxies allow this to be configurable, but retrying attempts on these sort of errors is typically desirable and excluding it from the Gateway API spec both allows a simpler UX with less boilerplate, and avoids nuances between how these are defined and configured in different proxies.
 
 ### Should whether to retry on a backend timeout be configurable?
