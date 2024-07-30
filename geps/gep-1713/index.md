@@ -275,7 +275,7 @@ spec:
 
 #### Listener Validation
 
-Implementations MUST treat the parent `Gateway`s as having the concatenated list of all listeners from itself and attached `ListenerSets`
+Implementations MUST treat the parent `Gateway`s as having the concatenated list of all listeners from itself and attached `ListenerSets`. See 'Listener Precedence' for more details on ordering.
 Validation of this list of listeners MUST behave the same as if the list were part of a single `Gateway`.
 
 From the earlier example the above resources would be equivalent to a single `Gateway` where the listeners are collapsed into a single list.
