@@ -20,6 +20,7 @@ The `Gateway` Resource is a point of contention since it is the only place to at
 Knative generates on demand per-service certificates using HTTP-01 challenges.
 There can be O(1000) Knative `Services` in the cluster which means we have O(1000) distinct certificates.
 Thus updating a single `Gateway` resource with this many certificates is a contention point and inhibits horizontal scaling of our controllers.
+[Istio Ambient](https://istio.io/v1.15/blog/2022/introducing-ambient-mesh/), similarly, creates a listener per Kubernetes service.
 
 More broadly, large scale gateway users often expose `O(1000)` domains, but are currently limited by the maximum of 64 `listeners`.
 
