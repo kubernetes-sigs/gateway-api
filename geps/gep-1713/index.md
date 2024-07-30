@@ -34,7 +34,7 @@ The feature will be part of the experimental branches as an extended feature, wh
 
 ## API
 
-This proposal introduces a new `ListenerSet` resource that has the ability to attach to a set of listeners to a parent `Gateway`.
+This proposal introduces a new `ListenerSet` resource that has the ability to attach to a set of listeners to multiple parent `Gateways`.
 
 #### Go
 
@@ -67,7 +67,7 @@ type ListenerNamespaces struct {
 
 // ListenerSet defines a set of additional listeners to attach to an existing Gateway. 
 type ListenerSet struct {
-    metav1.TypeMeta   `json:",inline"`
+	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 	
 	// Spec defines the desired state of ListenerSet.
@@ -79,11 +79,11 @@ type ListenerSet struct {
 
 // ListenerSetSpec defines the desired state of a ListenerSet.
 type ListenerSetSpec struct {
-    // ParentRef references the Gateway that the listeners are attached to.
-    ParentRef ParentGatewayReference `json:"parentRefs,omitempty"`
+	// ParentRefs references the Gateway that the listeners are attached to.
+	ParentRefs []ParentGatewayReference `json:"parentRefs,omitempty"`
     
-    // Listeners associated with this ListenerSet. Listeners define
-    // logical endpoints that are bound on this referenced parent Gateway's addresses.
+	// Listeners associated with this ListenerSet. Listeners define
+	// logical endpoints that are bound on this referenced parent Gateway's addresses.
 	//
 	// At least one Listener MUST be specified.
 	//
@@ -93,7 +93,7 @@ type ListenerSetSpec struct {
 
 // ListenerSetStatus defines the observed state of ListenerSet.
 type ListenerSetStatus struct {
-    // Listeners provide status for each unique listener port defined in the Spec.
+	// Listeners provide status for each unique listener port defined in the Spec.
 	//
 	// +optional
 	// +listType=map
@@ -163,11 +163,9 @@ apiVersion: gateway.networking.k8s.io/v1alpha1
 kind: ListenerSet
 metadata:
   name: first-workload-listeners
-  labels:
-    gateway.networking.k8s.io/gateway.name: parent-gateway
 spec:
-  parentRef:
-    name: parent-gateway
+  parentRefs:
+  - name: parent-gateway
     kind: Gateway
     group: gateway.networking.k8s.io
   listeners:
@@ -186,11 +184,9 @@ apiVersion: gateway.networking.k8s.io/v1alpha1
 kind: ListenerSet
 metadata:
   name: second-workload-listeners
-  labels:
-    gateway.networking.k8s.io/gateway.name: parent-gateway
 spec:
-  parentRef:
-    name: parent-gateway
+  parentRefs:
+  - name: parent-gateway
     kind: Gateway
     group: gateway.networking.k8s.io
   listeners:
@@ -220,23 +216,6 @@ spec:
   allowedListeners:
   - from: None
 ```
-
-#### Listeners
-
-####  `ListenerSet.spec.parentRef` is immutable
-
-A `ListenerSet` `MUST` be created with a `parentRef` Updating the `parentRef` of a ListenerSet `MUST` be rejected by the API.
-
-#### `ListenerSet` Default Labels
-
-In order for clients of the API to easily discover `Gateways` and their `ListenerSets` we propose a set of labels to be defaulted when creating `ListenerSets`. This only applies if the `parentRef.kind` is a `Gateway`
-
-- `gateway.networking.k8s.io/gateway.name` is equal to `spec.parentRef.name`
-- `gateway.networking.k8s.io/gateway.namespace` is equal to `spec.parentRef.namespace`
-
-This allows clients to perform API [lookups](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#list-and-watch-filtering) using label selectors.
-
-TBD: Can conditional defaulting be done with CEL?
 
 #### GatewaySpec.Listeners MinItems
 
