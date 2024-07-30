@@ -338,8 +338,6 @@ The condition's `Status` has the following values:
 
 Parent `Gateways` MUST NOT have `ListenerSet` listeners in their `status.listeners` conditions list.
 
-It is up to the implementation whether an invalid listener affects other listeners in the Gateway.
-
 ### ListenerSet Conditions
 
 `ListenerSets` MUST NOT have their parent `Gateway`'s' listeners in the associated `status.parents.listeners` conditions list.  An implementation MAY reject listeners with `ListenerConditionAccepted=False` and Reason `TooManyListeners` `ListenerSets`, like a `Gateway`, also have two top-level conditions: `Accepted` and `Programmed`. These conditions, when surfacing details about listeners, MUST only summarize the `status.listener` conditions that are exclusive to the `ListenerSet`.
