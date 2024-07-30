@@ -80,6 +80,14 @@ func TestBackendLBPolicyConfig(t *testing.T) {
 			},
 			wantErrors: []string{},
 		},
+		{
+			name: "valid BackendLBPolicyConfig header-based session persistence",
+			sessionPersistence: gatewayv1a2.SessionPersistence{
+				SessionName: ptrTo("foo"),
+				Type:        ptrTo(gatewayv1.HeaderBasedSessionPersistence),
+			},
+			wantErrors: []string{},
+		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {

@@ -1,6 +1,6 @@
 # GEP-1867: Per-Gateway Infrastructure
 
-* Status: Experimental
+* Status: Standard
 * Issue: [#1867](https://github.com/kubernetes-sigs/gateway-api/issues/1867)
 
 ## Overview
