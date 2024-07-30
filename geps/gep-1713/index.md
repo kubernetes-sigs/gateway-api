@@ -223,6 +223,13 @@ spec:
 ```
 ## Semantics
 
+### Gateway Changes
+
+When an implementation supports `ListenerSets` `Gateways` MUST allow the list of listeners to be empty. Thus the present `minItems=1` constraint on the listener list will be removed. This allows implementations to avoid security, cost etc. concerns with having dummy listeners. 
+When there are no listeners the `Gateway`'s `status.listeners` should be empty or unset. `status.listeners` is already an optional field.
+
+Implementations, when creating a `Gateway`, may provision underlying infrastructure when there are no listeners present. The status conditions `Accepted` and `Programmed` conditions should reflect state of this provisioning.
+
 ### Gateway <> ListenerSet Handshake
 
 By default a `Gateway` will allow `ListenerSets` in the same namespace to be attached. Users can prevent this behaviour by configuring their `Gateway` to disallow any listener attachment:
@@ -236,13 +243,6 @@ spec:
   allowedListeners:
   - from: None
 ```
-
-### GatewaySpec.Listeners MinItems
-
-TBD: Do we want to make this change?
-
-Currently when creating a Gateway you must specify at least a single listener. With `ListenerSets` this opens the possibility of wanting to create a Gateway with no listeners.
-
 
 ### Route Attaching
 
