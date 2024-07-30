@@ -28,13 +28,14 @@ https://github.com/kubernetes-sigs/gateway-api/blob/541e9fc2b3c2f62915cb58dc0ee5
 
 ## API
 
-This proposal has introduces a new resource `ListenerSet` that has the ability to attach to a set of listeners to a parent `Gateway`. 
+This proposal introduces a new `ListenerSet` resource that has the ability to attach to a set of listeners to a parent `Gateway`.
 
 #### Go
 
 ```go
 type GatewaySpec struct {
   ...
+  // Note: this is a list to allow future potential features
   AllowedListeners []*AllowedListeners `json:"allowedListeners"`
   ...
 }
@@ -75,7 +76,7 @@ type ListenerSetSpec struct {
     ParentRef ParentGatewayReference `json:"parentRefs,omitempty"`
     
     // Listeners associated with this ListenerSet. Listeners define
-	// logical endpoints that are bound on this referenced parent Gateway's addresses.
+    // logical endpoints that are bound on this referenced parent Gateway's addresses.
 	//
 	// At least one Listener MUST be specified.
 	//
@@ -131,14 +132,6 @@ type ParentGatewayReference struct {
 
 	// Name is the name of the referent.
 	Name ObjectName `json:"name"`
-
-	// Namespace is the namespace of the referenced object. When unspecified, the local
-	// namespace is inferred.
-	//
-	// Support: Core
-	//
-	// +optional
-	Namespace *Namespace `json:"namespace,omitempty"`
 }
 ```
 
@@ -186,6 +179,8 @@ apiVersion: gateway.networking.k8s.io/v1alpha1
 kind: ListenerSet
 metadata:
   name: second-workload-listeners
+  labels:
+    gateway.networking.k8s.io/gateway.name: parent-gateway
 spec:
   parentRef:
     name: parent-gateway
@@ -404,5 +399,5 @@ Prior Discussions:
 - https://github.com/kubernetes-sigs/gateway-api/discussions/1248
 - https://github.com/kubernetes-sigs/gateway-api/discussions/1246
 
-Gateway Hiearchy Brainstorming
+Gateway Hierarchy Brainstorming
 - https://docs.google.com/document/d/1qj7Xog2t2fWRuzOeTsWkabUaVeOF7_2t_7appe8EXwA/edit
