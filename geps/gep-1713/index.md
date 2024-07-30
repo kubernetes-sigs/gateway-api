@@ -55,6 +55,7 @@ type ListenerNamespaces struct {
 	//
 	// +optional
 	// +kubebuilder:default=Same
+	// +kubebuilder:validation:Enum=Same;None
 	From *FromNamespaces `json:"from,omitempty"`
 }
 
