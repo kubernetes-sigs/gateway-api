@@ -247,8 +247,9 @@ spec:
 
 ### Route Attaching
 
-Routes MUST be able to specify a `ListenerSet` as a `parentRef` and make use of the `sectionName` field in `ParentReference` to help target a specific listener. If no listener is targeted (`sectionName`/`port` are unset) then the Route references all the listeners on the `ListenerSet`. It `MUST NOT` attach to additional listeners on the parent `Gateway`.
+Routes MUST be able to specify a `ListenerSet` as a `parentRef`. Routes can use `sectionName`/`port` fields in `ParentReference` to help target a specific listener. If no listener is targeted (`sectionName`/`port` are unset) then the Route attaches to all the listeners on the `ListenerSet` and it `MUST NOT` attach to any listeners in the `ListenerSet`'s parent `Gateways`.
 
+eg.
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1beta1
 kind: HTTPRoute
@@ -261,7 +262,7 @@ spec:
     sectionName: second
 ```
 
-For instance, the following `HTTPRoute` attemps to attach to a listener defined in the parent `Gateway` using the sectionName `foo`. This is not valid and the route's status should reflect that.
+For instance, the following `HTTPRoute` attempts to attach to a listener defined in the parent `Gateway` using the sectionName `foo`. This is not valid and the route's status should reflect that.
 
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1beta1
@@ -272,6 +273,22 @@ spec:
   parentRefs:
   - name: some-workload-listeners
     kind: ListenerSet
+    sectionName: foo
+```
+
+To attach to listeners in both a `Gateway` and `ListenerSet` the route must have two `parentRefs`:
+```yaml
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: HTTPRoute
+metadata:
+  name: httproute-example
+spec:
+  parentRefs:
+  - name: second-workload-listeners
+    kind: ListenerSet
+    sectionName: second
+	- name: parent-gateway
+    kind: Gateway
     sectionName: foo
 ```
 
