@@ -260,7 +260,7 @@ spec:
     sectionName: second
 ```
 
-For instance, the following `HTTPRoute` attemps to attach to a listener defined in the parent `Gateway`. This is not valid and the route's status should reflect that.
+For instance, the following `HTTPRoute` attemps to attach to a listener defined in the parent `Gateway` using the sectionName `foo`. This is not valid and the route's status should reflect that.
 
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1beta1
