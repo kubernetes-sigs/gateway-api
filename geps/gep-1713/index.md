@@ -226,7 +226,7 @@ spec:
 
 ### Gateway Changes
 
-When an implementation supports `ListenerSets` `Gateways` MUST allow the list of listeners to be empty. Thus the present `minItems=1` constraint on the listener list will be removed. This allows implementations to avoid security, cost etc. concerns with having dummy listeners. 
+When an implementation supports `ListenerSets` `Gateways` MUST allow the list of listeners to be empty. Thus the present `minItems=1` constraint on the listener list will be removed. This allows implementations to avoid security, cost etc. concerns with having dummy listeners.
 When there are no listeners the `Gateway`'s `status.listeners` should be empty or unset. `status.listeners` is already an optional field.
 
 Implementations, when creating a `Gateway`, may provision underlying infrastructure when there are no listeners present. The status conditions `Accepted` and `Programmed` conditions should reflect state of this provisioning.
@@ -327,14 +327,16 @@ If there are listener conflicts, this should be reported as `Conflicted=True` in
 
 ###  Gateway Conditions
 
-`Gateway` currently supports the following top-level condition types: `Accepted` and `Programmed`
+`Gateway`'s `Accepted` and `Programmed` top-level conditions remain unchanged and reflect the status of the local configuration.
 
-For a `Gateway`, `Accepted` should be set based on the entire set of merged listeners.
-For instance, if a `ListenerSet` listener is invalid, `ListenersNotValid` would be reported.
-`Programmed` is not expected, generally, to depend on the children resources, but if an implementation does depend on these
-they should consider child resources when reporting this status.
+Implementations MUST support a new condition type `AttachedListeners`.
 
-Parent gateways MUST NOT have `ListenerSet` listeners in their `status.listeners` conditions list.
+The condition's `Status` has the following values:
+- `True` when `AllowedListeners` is set and at least one child Listener arrives from a `ListenerSet`
+- `False` when `AllowedListeners` is set but has no valid listeners are attached
+- `Unknown` when no `AllowedListeners` config is present
+
+Parent `Gateways` MUST NOT have `ListenerSet` listeners in their `status.listeners` conditions list.
 
 It is up to the implementation whether an invalid listener affects other listeners in the Gateway.
 
