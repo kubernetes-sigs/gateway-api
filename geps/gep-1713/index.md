@@ -36,7 +36,7 @@ The feature will be part of the experimental branches as an extended feature, wh
 
 This proposal introduces a new `ListenerSet` resource that has the ability to attach to a set of listeners to multiple parent `Gateways`.
 
-#### Go
+### Go
 
 ```go
 type GatewaySpec struct {
@@ -162,7 +162,7 @@ type ParentGatewayReference struct {
 }
 ```
 
-#### YAML
+### YAML
 
 The following example shows a `Gateway` with an HTTP listener and two child HTTPS `ListenerSets` with unique hostnames and certificates.
 
@@ -221,9 +221,9 @@ spec:
         group: ""
         name: second-workload-cert # Provisioned via HTTP01 challenge
 ```
-### Semantics
+## Semantics
 
-#### Gateway <> ListenerSet Handshake
+### Gateway <> ListenerSet Handshake
 
 By default a `Gateway` will allow `ListenerSets` in the same namespace to be attached. Users can prevent this behaviour by configuring their `Gateway` to disallow any listener attachment:
 
@@ -237,13 +237,14 @@ spec:
   - from: None
 ```
 
-#### GatewaySpec.Listeners MinItems
+### GatewaySpec.Listeners MinItems
 
 TBD: Do we want to make this change?
 
 Currently when creating a Gateway you must specify at least a single listener. With `ListenerSets` this opens the possibility of wanting to create a Gateway with no listeners.
 
-#### Route Attaching
+
+### Route Attaching
 
 Routes MUST be able to specify a `ListenerSet` as a `parentRef` and make use of the `sectionName` field in `ParentReference` to help target a specific listener. If no listener is targeted (`sectionName`/`port` are unset) then the Route references all the listeners on the `ListenerSet`. It `MUST NOT` attach to additional listeners on the parent `Gateway`.
 
@@ -273,7 +274,7 @@ spec:
     sectionName: foo
 ```
 
-#### Listener Validation
+### Listener Validation
 
 Implementations MUST treat the parent `Gateway`s as having the concatenated list of all listeners from itself and attached `ListenerSets`. See 'Listener Precedence' for more details on ordering.
 Validation of this list of listeners MUST behave the same as if the list were part of a single `Gateway`.
@@ -314,7 +315,7 @@ spec:
         name: second-workload-cert # Provisioned via HTTP01 challenge
 ```
 
-#### Listener Precedence
+### Listener Precedence
 
 Listeners should be merged using the following precedence:
 1. "parent" Gateway
@@ -352,7 +353,7 @@ For example, if I have a `Gateway` named `parent`, and two `ListenerSets` named 
 When reporting status of a child, an implementation SHOULD be cautious about what information from the parent or siblings are reported
 to avoid accidentally leaking sensitive information that the child would not otherwise have access to.
 
-#### Policy Attachment
+### Policy Attachment
 
 Policy attachment is [under discussion] in https://github.com/kubernetes-sigs/gateway-api/discussions/2927
 
@@ -362,28 +363,28 @@ If the implementation cannot apply the policy to only specific listeners, it sho
 
 ## Alternatives
 
-#### Re-using Gateway Resource
+### Re-using Gateway Resource
 
 The [first iteration of this GEP](https://github.com/kubernetes-sigs/gateway-api/pull/1863) proposed re-using the `Gateway` resource and introducing an `attachTo` property in the `infrastructure` stanza.
 
 The main downside of this approach is that users still require `Gateway` write access to create listeners. Secondly, it introduces complexity to future `Gateway` features as GEP authors would have now have to account for merging semantics.
 
-#### New 'GatewayGroup' Resource
+### New 'GatewayGroup' Resource
 
 This was proposed in the Gateway Hiearchy Brainstorming document (see references below). The idea is to introduce a central resource that will coalease Gateways together and offer forms of delegation.
 
 Issues with this is complexity with status propagation, cluster vs. namespace scoping etc. It also lacks a migration path for existing Gateways to help shard listeners.
 
-#### Use of Multiple Disjointed Gateways
+### Use of Multiple Disjointed Gateways
 
 An alternative would be to encourage users to not use overly large Gateways to minimize the blast radius of any issues. Use of disjoint Gateways could accomplish this but it has the disadvantage of consuming more resources and introducing complexity when it comes to operations work (eg. setting up DNS records etc.)
 
-#### Increase the Listener Limit
+### Increase the Listener Limit
 
 Increasing the limit may help in situations where you are creating many listeners such as adding certificates created using an ACME HTTP01 challenge. Unfortunately this still makes the Gateway a single point of contention. Unfortunately, there will always be an upper bound because of etcd limitations.
 For workloads like Knative we can have O(1000) Services on the cluster with unique subdomains.
 
-#### Expand Route Functionality
+### Expand Route Functionality
 
 For workloads with many certificates one option would be to introduce a `tls` stanza somewhere in the Route types. These Routes would then attach to a single Gateway. Then application operators can provide their own certificates. This probably would require some ability to have a handshake agreement with the Gateway.
 
