@@ -42,112 +42,6 @@ BackendTLSPolicy).
 Specifying credentials at the gateway level is the default operation mode, where all
 backends will be presented with a single gateway certificate.
 
-#### Service-level (Implementation-specific support)
-Specifying credentials at the service level allows to provide different credentials
-to connect to specific backends or completely disable client certificates. This allows
-to support a wide variety of corner cases, mostly around application-compatibility, e.g.:
-- given OOTB software requires clients to use self-signed, certificates issued by a
-  different issuer, or certificates with a very specific SAN.
-- given OOTB software uses optional certificates for end-user authentication, if the
-  certificate is missing, it falls back to a different application-level authentication
-  method - in such case not providing any certificate is the only way to operate
-
-**1. Add a new `BackendTLS` field at the top level of Gateways**
-
-```go
-type GatewaySpec struct {
-  // BackendTLS configures TLS settings for when this Gateway is connecting to
-  // backends with TLS.
-  BackendTLS GatewayBackendTLS `json:"backendTLS,omitempty"'
-}
-
-type GatewayBackendTLS struct {
-  // ClientCertificateRef is a reference to an object that contains a Client
-  // Certificate and the associated private key.
-  //
-  // References to a resource in different namespace are invalid UNLESS there
-  // is a ReferenceGrant in the target namespace that allows the certificate
-  // to be attached. If a ReferenceGrant does not allow this reference, the
-  // "ResolvedRefs" condition MUST be set to False for this listener with the
-  // "RefNotPermitted" reason.
-  //
-  // ClientCertificateRef can reference to standard Kubernetes resources, i.e.
-  // Secret, or implementation-specific custom resources.
-  //
-  // This setting can be overriden on the service level by use of BackendTLSPolicy.
-  ClientCertificateRef SecretObjectReference `json:"clientCertificateRef,omitempty"`
-}
-```
-
-**2. Add a new `ClientCertificateMode` and `ClientCertificateRef` fields at the top
-level of BackendTLSPolicy**
-
-```go
-// +kubebuilder:validation:Enum=Default;Override;Disable
-type ClientCertificateInheritanceMode string
-
-const (
-  // Default determines the gateway certificate will be used. If no certificate is
-  // configured on the gateway level, no client certificate will be used.
-  //
-  // Support: Core
-  DefaultClientCertificateInheritanceMode ClientCertificateInheritanceMode = "Default"
-
-  // Override determines the certificate specified in ClientCertificateRef field will be used.
-  //
-  // Support: Implementation-specific
-  OverrideClientCertificateInheritanceMode ClientCertificateInheritanceMode = "Override"
-
-  // Disable determines the certificate will be not provided to the backend, even if it is
-  // configured at the gateway level and requested by the backend.
-  //
-  // Support: Implementation-specific
-  DisableClientCertificateInheritanceMode ClientCertificateInheritanceMode = "Disable"
-)
-
-type BackendTLSPolicySpec {
-  // ClientCertificateMode determines the inheritance mode for client certifacate.
-  //
-  // If ClientCertificateMode is unset, the value assumed is Default.
-  ClientCertificateMode ClientCertificateInheritanceMode `json:"clientCertificateMode,omitempty"`
-
-  // ClientCertificateRef is a reference to an object that contains a Client
-  // Certificate.
-  //
-  // This value takes effect and is required only if the ClientCertificateMode is set to 
-  // Override, otherwise it is ignored.
-  //
-  // References to a resource in different namespace are invalid UNLESS there
-  // is a ReferenceGrant in the target namespace that allows the certificate
-  // to be attached. If a ReferenceGrant does not allow this reference, the
-  // "ResolvedRefs" condition MUST be set to False for this listener with the
-  // "RefNotPermitted" reason.
-  //
-  // CertificateRef can reference to standard Kubernetes resources, i.e.
-  // Secret, or implementation-specific custom resources.
-  //
-  // Support: Implementation-specific
-  ClientCertificateRef SecretObjectReference `json:"clientCertificateRef,omitempty"`
-}
-```
-
-#### Limitations
-
-Configuring client certificate on the service level may result in multiple Gateways
-from different vendors sharing the same identity when connecting to a single service.
-
-However, given that:
-
-1. per-service certificate configuration is a niche configuration, required to support
-application-specific compatbility corner-cases
-1. cross-namespace service usage is protected by the reference grants
-
-this limitations should consitute an acceptable trade off.
-
-The possible need for more fine-grained settings can be mitigated by allowing shared 
-policies to selectively target specific Gateway instances, GatewayClasses or gateway 
-namespaces.
-
 ### SANs on BackendTLSPolicy
 
 This change enables the certificate to have a different identity than the SNI
@@ -158,6 +52,9 @@ as per https://www.rfc-editor.org/rfc/rfc6066.html#section-3.
 In such case either connection properties or an arbitrary SNI, like cluster-local 
 service name could be used for certificate selection, while the identity validation
 will be done based on SubjectAltNames field.
+When specified, at least one of certificate's Subject Alternate Names MUST match at least one of the specified SubjectAltNames.
+
+
 
 **1. Add a new `SubjectAltNames` field to `BackendTLSPolicyValidation`**
 
@@ -208,14 +105,12 @@ Before:
 
 After:
 ```go
-  // 2. Hostname MUST be used for authentication and MUST match the certificate
-  //     served by the matching backend UNLESS SubjectAltNames is specified. If
-  //     SubjectAltNames is specified, Hostname MUST only be used for setting
-  //     the SNI sent, and the SubjectAltNames MUST be used for validating the
-  //     serving certificate.
+  // 2. Only if SubjectAltNames is not specified, Hostname MUST be used for 
+  //    authentication and MUST match the certificate served by the matching
+  //    backend.
 ```
 
-### Allow per-service mTLS settings BackendTLSPolicy
+### Allow per-service TLS settings BackendTLSPolicy
 
 Gateway level TLS configuration already includes an `options` field. This has
 been helpful for implementation-specific TLS configurations, or simply features
@@ -257,6 +152,11 @@ Conformance tests will be written to ensure the following:
 2. When a Client Certificate is specified on a Gateway:
   - It is applied to all services.
   - The appropriate status condition is populated if the reference is invalid
+
+## Future work
+This GEP does not cover per-service overrides for client certificate. This is mostly for two reasons:
+- it supports only the niche use cases - it should be reconsidered in future
+- in current model, where BackendTLSPolicy shares namespace with the service instead of the Gateway, there are non-trivial security implications to adding client certificate configuration at this level - therefore ownership and colocation of BackendTLSPolicy (Service vs Gateway) needs to be figured out first
 
 ## References
 
