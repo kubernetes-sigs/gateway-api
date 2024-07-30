@@ -346,11 +346,6 @@ For example, if I have a `Gateway` named `parent`, and two `ListenerSets` named 
 When reporting status of a child, an implementation SHOULD be cautious about what information from the parent or siblings are reported
 to avoid accidentally leaking sensitive information that the child would not otherwise have access to.
 
-TBD: The following situations aren't possible to handle since there's no 'gatewayClass' on the `ListenerSet`
-* If `child-1` references a parent that doesn't exist then `child-1` will report `Accepted=False`
-* If `child-1` references itself then `child-1` will report `Accepted=False`
-* If `child-1` and `parent` have different gatewayClassNames then `child-1` will report `Accepted=False`
-
 #### Policy Attachment
 
 Policies attached to a parent `Gateway` apply to both the parent and all `ListenerSet` listeners.
