@@ -17,8 +17,8 @@ The `Gateway` Resource is a point of contention since it is the only place to at
 
 ## Introduction
 
-Knative generates on demand per-service certificates using HTTP-01 challenges. 
-There can be O(1000) Knative `Services` in the cluster which means we have O(1000) distinct certificates. 
+Knative generates on demand per-service certificates using HTTP-01 challenges.
+There can be O(1000) Knative `Services` in the cluster which means we have O(1000) distinct certificates.
 Thus updating a single `Gateway` resource with this many certificates is a contention point and inhibits horizontal scaling of our controllers.
 
 More broadly, large scale gateway users often expose `O(1000)` domains, but are currently limited by the maximum of 64 `listeners`.
@@ -40,15 +40,15 @@ This proposal introduces a new `ListenerSet` resource that has the ability to at
 
 ```go
 type GatewaySpec struct {
-  ...
-  // Note: this is a list to allow future potential features
-  AllowedListeners []*AllowedListeners `json:"allowedListeners"`
-  ...
+	...
+	// Note: this is a list to allow future potential features
+	AllowedListeners []*AllowedListeners `json:"allowedListeners"`
+	...
 }
 
 type AllowedListeners struct {
-    // +kubebuilder:default={from: Same}
-    Namespaces *ListenerNamespaces `json:"namespaces,omitempty"`
+	// +kubebuilder:default={from: Same}
+	Namespaces *ListenerNamespaces `json:"namespaces,omitempty"`
 }
 
 // ListenerNamespaces indicate which namespaces ListenerSets should be selected from.
@@ -65,11 +65,11 @@ type ListenerNamespaces struct {
 	From *FromNamespaces `json:"from,omitempty"`
 }
 
-// ListenerSet defines a set of additional listeners to attach to an existing Gateway. 
+// ListenerSet defines a set of additional listeners to attach to an existing Gateway.
 type ListenerSet struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
-	
+
 	// Spec defines the desired state of ListenerSet.
 	Spec ListenerSetSpec `json:"spec"`
 
@@ -80,19 +80,39 @@ type ListenerSet struct {
 // ListenerSetSpec defines the desired state of a ListenerSet.
 type ListenerSetSpec struct {
 	// ParentRefs references the Gateway that the listeners are attached to.
+	//
+	// +kubebuilder:validation:MaxItems=32
 	ParentRefs []ParentGatewayReference `json:"parentRefs,omitempty"`
-    
+
 	// Listeners associated with this ListenerSet. Listeners define
 	// logical endpoints that are bound on this referenced parent Gateway's addresses.
 	//
 	// At least one Listener MUST be specified.
 	//
 	// Note: this is the same Listener type in the GatewaySpec struct
-    Listeners []Listener 
+	Listeners []Listener
 }
 
-// ListenerSetStatus defines the observed state of ListenerSet.
+// ListenerSetStatus defines the observed state of a ListenerSet
 type ListenerSetStatus struct {
+	// Parents is a list of parent resources (usually Gateways) that are
+	// associated with the route, and the status of the route with respect to
+	// each parent. When this route attaches to a parent, the controller that
+	// manages the parent must add an entry to this list when the controller
+	// first sees the route and should update the entry as appropriate when the
+	// route or gateway is modified.
+	//
+	// +kubebuilder:validation:MaxItems=32
+	Parents []ListenerSetParentStatus `json:"parents"`
+}
+
+// ListenerSetParentStatus defines the observed state of ListenerSet with
+// to an associated Parent.
+type ListenerSetParentStatus struct {
+	// ParentRef corresponds with a ParentRef in the spec that this
+	// RouteParentStatus struct describes the status of.
+	ParentRef ParentGatewayReference `json:"parentRef"`
+
 	// Listeners provide status for each unique listener port defined in the Spec.
 	//
 	// +optional
@@ -102,7 +122,7 @@ type ListenerSetStatus struct {
 	//
 	// Note: this is the same ListenerStatus type in the GatewayStatus struct
 	Listeners []ListenerStatus `json:"listeners,omitempty"`
-	
+
 	// Conditions describe the current conditions of the ListenerSet.
 	//
 	// Implementations should prefer to express ListenerSet conditions
@@ -144,7 +164,7 @@ type ParentGatewayReference struct {
 
 #### YAML
 
-The following example shows a `Gateway` with an HTTP listener and two child HTTPS `ListenerSets` with unique hostnames and certificates. 
+The following example shows a `Gateway` with an HTTP listener and two child HTTPS `ListenerSets` with unique hostnames and certificates.
 
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
@@ -255,7 +275,7 @@ spec:
 
 #### Listener Validation
 
-Implementations MUST treat the parent `Gateway` as having the concatenated list of all listeners from itself and attached `ListenerSets`
+Implementations MUST treat the parent `Gateway`s as having the concatenated list of all listeners from itself and attached `ListenerSets`
 Validation of this list of listeners MUST behave the same as if the list were part of a single `Gateway`.
 
 From the earlier example the above resources would be equivalent to a single `Gateway` where the listeners are collapsed into a single list.
@@ -301,14 +321,14 @@ Listeners should be merged using the following precedence:
 2. ListenerSet ordered by creation time (oldest first)
 3. ListenerSet ordered alphabetically by “{namespace}/{name}”.
 
-If there are listener conflicts, this should be reported as `Conflicted=True` in the ListenerStatus as usual. See 'Conditions' section below for more details on object should report the conflict.
+If there are listener conflicts, this should be reported as `Conflicted=True` in the `ListenerSetParentStatus` as usual. See 'Conditions' section below for more details on object should report the conflict.
 
 ###  Gateway Conditions
 
 `Gateway` currently supports the following top-level condition types: `Accepted` and `Programmed`
 
 For a `Gateway`, `Accepted` should be set based on the entire set of merged listeners.
-For instance, if a `ListenerSet` listener is invalid, `ListenersNotValid` would be reported. 
+For instance, if a `ListenerSet` listener is invalid, `ListenersNotValid` would be reported.
 `Programmed` is not expected, generally, to depend on the children resources, but if an implementation does depend on these
 they should consider child resources when reporting this status.
 
@@ -318,7 +338,7 @@ It is up to the implementation whether an invalid listener affects other listene
 
 ### ListenerSet Conditions
 
-`ListenerSets` MUST NOT have their parent `Gateway`'s' listeners in the `status.listeners` conditions list.  An implementation MAY reject listeners with `ListenerConditionAccepted=False` and Reason `TooManyListeners` `ListenerSets`, like a `Gateway`, also have two top-level conditions: `Accepted` and `Programmed`. These conditions, when surfacing details about listeners, MUST only summarize the `status.listener` conditions that are exclusive to the `ListenerSet`. 
+`ListenerSets` MUST NOT have their parent `Gateway`'s' listeners in the associated `status.parents.listeners` conditions list.  An implementation MAY reject listeners with `ListenerConditionAccepted=False` and Reason `TooManyListeners` `ListenerSets`, like a `Gateway`, also have two top-level conditions: `Accepted` and `Programmed`. These conditions, when surfacing details about listeners, MUST only summarize the `status.listener` conditions that are exclusive to the `ListenerSet`.
 
 These conditions MUST also surface top-level `Gateway` conditions that impact the `ListenerSet`. For example, if a `Gateway` requests an invalid address and it cannot be accepted/programmed then the `ListenerSet`'s' `Accepted` condition MUST be set to `False`.
 
@@ -326,7 +346,7 @@ For example, if I have a `Gateway` named `parent`, and two `ListenerSets` named 
 * If `parent` is entirely invalid (for example, an invalid `address`) and `Accepted=False`, all two `ListenerSets` will reported `Accepted=False`.
 * If `child-1` has an invalid listener, `parent` and `child-1` will report `ListenersNotValid`, while `child-2` will not.
 * If `child-1` references a parent that doesn't allow merging then `child-1` will report `Accepted=False`
-* If `child-1` references another child (eg. `child-2`) then `child-1` will report `Accepted=False` 
+* If `child-1` references another child (eg. `child-2`) then `child-1` will report `Accepted=False`
 * If `child-1` is valid, then when `child-2` is created if it conflicts with `child-1` then `child-2` will report `Accepted=False`. `child-1` status conditions will remain unchanged. `parent` will report `ListenersNotValid`
 
 When reporting status of a child, an implementation SHOULD be cautious about what information from the parent or siblings are reported
@@ -334,9 +354,10 @@ to avoid accidentally leaking sensitive information that the child would not oth
 
 #### Policy Attachment
 
-Policies attached to a parent `Gateway` apply to both the parent and all `ListenerSet` listeners.
+Policy attachment is [under discussion] in https://github.com/kubernetes-sigs/gateway-api/discussions/2927
 
-Policies that attach to a `ListenerSet` apply to all listeners defined in that resource, but do not impact listeners in the parent `Gateway`
+Similar to Routes, `ListenerSet` can inherit policy from a Gateway.
+Policies that attach to a `ListenerSet` apply to all listeners defined in that resource, but do not impact listeners in the parent `Gateway`. This allows `ListenerSets` attached to the same `Gateway` to have different policies.
 If the implementation cannot apply the policy to only specific listeners, it should reject the policy.
 
 ## Alternatives
