@@ -27,6 +27,7 @@ To allow configuration of a Gateway to retry unsuccessful requests to backends b
 * To allow more granular control of the backoff strategy than many dataplanes allow customizing, such as whether to use an exponential backoff interval between retry attempts, add jitter, or cap the backoff interval to a maximum duration.
 * To allow specification of a default retry policy for all routes in a given namespace or attached to a particular Gateway.
 * A standard API for approaches for retry logic other than max count or "budget", such as interaction with rate limiting headers.
+* Support for unary or bidirectional streams, which may have different considerations for timeouts or request/response patterns within the stream after establishment.
 
 ## Introduction
 
