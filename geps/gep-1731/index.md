@@ -32,7 +32,15 @@ To allow configuration of a Gateway to retry unsuccessful requests to backends b
 
 ## Introduction
 
-TODO
+A Gateway API implementation should be able to retry failed HTTP requests to backends before delivering a response to a client for several reasons:
+
+* Network Reliability: Networks can be unreliable, and connections might drop or time out. Retrying requests helps ensure that temporary issues don’t prevent the request from being completed.
+* Load Balancing: If a server is temporarily overloaded or down, an implementation can retry the request to another server in a load-balanced environment.
+* Error Handling: Some HTTP errors, like 500 Internal Server Error or 503 Service Unavailable, might be transient. Retrying the request can help bypass these temporary issues.
+
+A primary audience for retries in Gateway API configuration are application developers (Ana) who want to ensure their applications are highly available and resilient. These users are best equipped to write sensible configuration, knowing which responses from their application should be retried and tolerances for timeouts and retry attempts to avoid overwhelming their applications with a ["retry storm"](https://learn.microsoft.com/en-us/azure/architecture/antipatterns/retry-storm/) which can cause performance issues, instability or outages.
+
+Several Gateway API dataplanes support configuring retry semantics using their own bespoke configuration, but the details of these implementations and their user-facing configuration lack consistency between vendors. This proposal is an attempt to reconcile a minimal commonly implementable (and sufficiently useful) API from these divergent existing implementations.
 
 ### Background on implementations
 
