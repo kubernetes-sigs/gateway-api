@@ -340,7 +340,7 @@ Listeners should be merged using the following precedence:
 2. ListenerSet ordered by creation time (oldest first)
 3. ListenerSet ordered alphabetically by “{namespace}/{name}”.
 
-If there are listener conflicts, this should be reported as `Conflicted=True` in the `ListenerSetParentStatus` as usual. See 'Conditions' section below for more details on object should report the conflict.
+Conflicts are covered in the section 'ListenerConditions within a ListenerSet'
 
 ###  Gateway Conditions
 
@@ -372,9 +372,11 @@ The `Programmed` condition MUST be set on every `ListenerSet` and have a similar
 
 `ListenerSets` MUST NOT have their parent `Gateway`'s' listeners in the associated `status.parents.listeners` conditions list.
 
-### ListenerSetStatus.Parents.ListenerConditions
+### ListenerConditions within a ListenerSet
 
-An implementation MAY reject listeners by setting the ListenerStatus `Accepted` condition to `False` with the `Reason` `TooManyListeners`
+An implementation MAY reject listeners by setting the `ListenerStatus` `Accepted` condition to `False` with the `Reason` `TooManyListeners`
+
+If a listener has a conflict, this should be reported in the `ListenerStatus` of the conflicted `ListenerSet` by setting the `Conflicted` condition to `True`.
 
 Implementation SHOULD be cautious about what information from the parent or siblings are reported to avoid accidentally leaking sensitive information that the child would not otherwise have access to.
 
