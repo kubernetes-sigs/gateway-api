@@ -357,9 +357,6 @@ type HTTPRouteRetry struct {
 // 600-999 (inclusive) range, which are not valid for HTTP clients, but are
 // sometimes used for communicating application-specific errors.
 //
-// Implementations MAY support additional shorthand codes for any `[0-9]xx`
-// range.
-//
 // +kubebuilder:validation:Pattern=`^[1-9](?:[0-9][0-9]|xx)$`
 type HTTPRouteRetryStatusCode string
 
@@ -404,7 +401,7 @@ Retrying requests based on HTTP status codes will be gated under the following f
   * 500, 502, 503 and 504 will all be tested for conformance.
   * Arbitrary status codes in the 500-599 (inclusive) range will not be tested for conformance.
 
-Implementations MAY support specifying additional individual error codes in the valid 100-599 (inclusive) range, invalid 600-999 (inclusive) range or prefix shorthands for any `[0-9]xx` range, but none of these will be tested in conformance.
+Implementations MAY support specifying additional individual error codes in the valid 100-599 (inclusive) range or invalid 600-999 (inclusive) range, but none of these will be tested in conformance.
 
 ## Alternatives
 
