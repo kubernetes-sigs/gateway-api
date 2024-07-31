@@ -384,11 +384,11 @@ spec:
   - backendRefs:
     - name: some-service
       port: 8080
-      retry:
-        codes:
-        - 5xx
-        attempts: 2
-        backoff: 100ms
+    retry:
+      codes:
+      - 5xx
+      attempts: 2
+      backoff: 100ms
 ```
 
 ## Conformance Details
