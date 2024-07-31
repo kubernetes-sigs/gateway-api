@@ -414,7 +414,9 @@ This may be a reasonable approach for configuring broad default retry policies, 
 
 ### HTTPRoute filter
 
-TODO
+Implementing a `requestRetryPolicy` [HTTPRouteFilter](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.HTTPRouteFilter) type is likely a reasonable alternative implementation (with the downside of slightly deeping nesting and more complex structural configuration) that was not fully explored.
+
+Adding a new field to HTTPRouteRule instead is proposed for parity with the similar and intersecting configuration of [HTTPRouteTimeouts](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.HTTPRouteTimeouts).
 
 ### What accommodations are needed for future retry budget support?
 
