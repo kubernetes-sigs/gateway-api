@@ -21,6 +21,7 @@ To allow configuration of a Gateway to retry unsuccessful requests to backends b
 
 * To allow specification of gRPC status codes for which a request should be retried.
 * To allow specification of a retry ["budget"](https://finagle.github.io/blog/2016/02/08/retry-budgets/) to determine whether a request should be retried, and any shared configuration or interaction with max count retry configuration.
+* Define more precise semantics for retry configuration on "consumer" vs "producer" routes for mesh implementations.
 
 ## Non-Goals
 
