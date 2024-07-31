@@ -357,19 +357,26 @@ Parent `Gateways` MUST NOT have `ListenerSet` listeners in their `status.listene
 
 ### ListenerSet Conditions
 
-`ListenerSets` MUST NOT have their parent `Gateway`'s' listeners in the associated `status.parents.listeners` conditions list.  An implementation MAY reject listeners with `ListenerConditionAccepted=False` and Reason `TooManyListeners` `ListenerSets`, like a `Gateway`, also have two top-level conditions: `Accepted` and `Programmed`. These conditions, when surfacing details about listeners, MUST only summarize the `status.listener` conditions that are exclusive to the `ListenerSet`.
+`ListenerSets` have a top-level `Accepted` and `Programmed` conditions.
 
-These conditions MUST also surface top-level `Gateway` conditions that impact the `ListenerSet`. For example, if a `Gateway` requests an invalid address and it cannot be accepted/programmed then the `ListenerSet`'s' `Accepted` condition MUST be set to `False`.
+The `Accepted` condition MUST be set on every `ListenerSet`, and indicates that the `ListenerSet` is semantically valid and accepted by its `parentRefs`.
 
-For example, if I have a `Gateway` named `parent`, and two `ListenerSets` named `child-1`, and `child-2` then:
-* If `parent` is entirely invalid (for example, an invalid `address`) and `Accepted=False`, all two `ListenerSets` will reported `Accepted=False`.
-* If `child-1` has an invalid listener, `parent` and `child-1` will report `ListenersNotValid`, while `child-2` will not.
-* If `child-1` references a parent that doesn't allow merging then `child-1` will report `Accepted=False`
-* If `child-1` references another child (eg. `child-2`) then `child-1` will report `Accepted=False`
-* If `child-1` is valid, then when `child-2` is created if it conflicts with `child-1` then `child-2` will report `Accepted=False`. `child-1` status conditions will remain unchanged. `parent` will report `ListenersNotValid`
+Valid reasons for `Accepted` being `False` are:
+- `NotAllowed` - the `parentRef` doesn't allow attachment
+- `ParentNotAccepted` - the `parentRef` isn't accepted (eg. invalid address)
+- `UnsupportedValue` - a listener in the set is using an unsupported feature/value
 
-When reporting status of a child, an implementation SHOULD be cautious about what information from the parent or siblings are reported
-to avoid accidentally leaking sensitive information that the child would not otherwise have access to.
+The `Programmed` condition MUST be set on every `ListenerSet` and have a similar meaning to the Gateway `Programmed` condition but only reflect the listeners in this `ListenerSet`.
+
+`Accepted` and `Programmed` conditions when surfacing details about listeners, MUST only summarize the `status.parents.listeners` conditions that are exclusive to the `ListenerSet`.
+
+`ListenerSets` MUST NOT have their parent `Gateway`'s' listeners in the associated `status.parents.listeners` conditions list.
+
+### ListenerSetStatus.Parents.ListenerConditions
+
+An implementation MAY reject listeners by setting the ListenerStatus `Accepted` condition to `False` with the `Reason` `TooManyListeners`
+
+Implementation SHOULD be cautious about what information from the parent or siblings are reported to avoid accidentally leaking sensitive information that the child would not otherwise have access to.
 
 ### Policy Attachment
 
