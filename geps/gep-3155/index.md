@@ -40,11 +40,38 @@ BackendTLSPolicy).
 
 #### Gateway-level (Core support)
 Specifying credentials at the gateway level is the default operation mode, where all
-backends will be presented with a single gateway certificate.
+backends will be presented with a single gateway certificate. Per-service overrides are
+subject for consideration as the future work.
+
+**1. Add a new `BackendTLS` field at the top level of Gateways**
+
+```go
+type GatewaySpec struct {
+  // BackendTLS configures TLS settings for when this Gateway is connecting to
+  // backends with TLS.
+  BackendTLS GatewayBackendTLS `json:"backendTLS,omitempty"'
+}
+type GatewayBackendTLS struct {
+  // ClientCertificateRef is a reference to an object that contains a Client
+  // Certificate and the associated private key.
+  //
+  // References to a resource in different namespace are invalid UNLESS there
+  // is a ReferenceGrant in the target namespace that allows the certificate
+  // to be attached. If a ReferenceGrant does not allow this reference, the
+  // "ResolvedRefs" condition MUST be set to False for this listener with the
+  // "RefNotPermitted" reason.
+  //
+  // ClientCertificateRef can reference to standard Kubernetes resources, i.e.
+  // Secret, or implementation-specific custom resources.
+  //
+  // This setting can be overriden on the service level by use of BackendTLSPolicy.
+  ClientCertificateRef SecretObjectReference `json:"clientCertificateRef,omitempty"`
+}
+```
 
 ### SANs on BackendTLSPolicy
 
-This change enables the certificate to have a different identity than the SNI
+This change enables the backend certificate to have a different identity than the SNI
 (both are currently tied to the hostname field). This is particularly useful
 when using SPIFFE, which relies on URI Subject Names which are not valid SNIs 
 as per https://www.rfc-editor.org/rfc/rfc6066.html#section-3.
@@ -52,7 +79,9 @@ as per https://www.rfc-editor.org/rfc/rfc6066.html#section-3.
 In such case either connection properties or an arbitrary SNI, like cluster-local 
 service name could be used for certificate selection, while the identity validation
 will be done based on SubjectAltNames field.
-When specified, at least one of certificate's Subject Alternate Names MUST match at least one of the specified SubjectAltNames.
+
+When specified, the certificate served from the backend MUST have at least one Subject
+Alternate Name matching one of the specified SubjectAltNames.
 
 
 
@@ -61,8 +90,8 @@ When specified, at least one of certificate's Subject Alternate Names MUST match
 ```go
 type BackendTLSPolicyValidation struct {
   // SubjectAltNames contains one or more Subject Alternative Names.
-  // When specified, at least one of certificate's Subject Alternate Names MUST 
-  // match at least one of the specified SubjectAltNames.
+  // When specified, the certificate served from the backend MUST have at least on
+  // Subject Alternate Name matching one of the specified SubjectAltNames.
   // +kubebuilder:validation:MaxItems=5
   SubjectAltNames []SubjectAltName `json:"subjectAltNames,omitempty"`
 }
