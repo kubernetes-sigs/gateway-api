@@ -174,7 +174,7 @@ The `max_fails` and `fail_timeout` parameters in the [`server`](http://nginx.org
 
 * `fail_timeout=time` Sets the time during which the specified number of unsuccessful attempts to communicate with the server should happen to consider the server unavailable; and the period of time the server will be considered unavailable. By default, the parameter is set to 10 seconds. Equivalent to Gateway API Request timeout.
 
-May be possible to implement more advanced logic through Lua scripting.
+May be possible to implement more advanced logic through Lua scripting or NGINX JavaScript.
 
 #### HAProxy
 
