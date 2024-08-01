@@ -418,9 +418,11 @@ Implementing a `requestRetryPolicy` [HTTPRouteFilter](https://gateway-api.sigs.k
 
 Adding a new field to HTTPRouteRule instead is proposed for parity with the similar and intersecting configuration of [HTTPRouteTimeouts](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.HTTPRouteTimeouts).
 
+## Other considerations
+
 ### What accommodations are needed for future retry budget support?
 
-Should the `retry` stanza follow the Kubernetes "tagged union" pattern with something like a `mode: "count"` to allow future design space for `mode: "budget"` with distinct sibling fields?
+Changing the retry stanza to a Kubernetes "tagged union" pattern with something like `mode: "budget"` to support mutually-exclusive distinct sibling fields is possible as a non-breaking change if omitting the `mode` field defaults to the currently proposed behavior (which could retroactively become something like `mode: count`).
 
 ### Should whether to retry on connection errors be configurable?
 
