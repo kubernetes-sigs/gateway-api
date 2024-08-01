@@ -408,7 +408,8 @@ type HTTPRouteTimeouts struct {
 	// request stream has been received instead of immediately after the transaction is
 	// initiated by the client.
 	//
-	// When this field is unspecified, request timeout behavior is implementation-specific.
+	// The value of Request is a Gateway API Duration string as defined by GEP-2257. When this
+	// field is unspecified, request timeout behavior is implementation-specific.
 	//
 	// Support: Extended
 	//
@@ -423,8 +424,10 @@ type HTTPRouteTimeouts struct {
 	// may result in more than one call from the gateway to the destination backend,
 	// for example, if automatic retries are supported.
 	//
-	// Because the Request timeout encompasses the BackendRequest timeout, the value of
-	// BackendRequest must be <= the value of Request timeout.
+	// The value of BackendRequest must be a Gateway API Duration string as defined by
+	// GEP-2257.  When this field is unspecified, its behavior is implementation-specific;
+	// when specified, the value of BackendRequest must be no more than the value of the
+	// Request timeout (since the Request timeout encompasses the BackendRequest timeout).
 	//
 	// Support: Extended
 	//
