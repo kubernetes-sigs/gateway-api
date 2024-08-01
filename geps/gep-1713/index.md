@@ -579,6 +579,7 @@ Conflicts are covered in the section 'ListenerConditions within a ListenerSet'
 Implementations MUST support a new condition type `AttachedListeners`.
 
 The condition's `Status` has the following values:
+
 - `True` when `AllowedListeners` is set and at least one child Listener arrives from a `ListenerSet`
 - `False` when `AllowedListeners` is set but has no valid listeners are attached
 - `Unknown` when no `AllowedListeners` config is present
@@ -651,14 +652,18 @@ Sorta related there was a Route Delegation GEP (https://github.com/kubernetes-si
 ## References
 
 First Revision of the GEP
+
 - https://github.com/kubernetes-sigs/gateway-api/pull/1863
 
 Mentioned in Prior GEPs:
+
 - https://github.com/kubernetes-sigs/gateway-api/pull/1757
 
 Prior Discussions:
+
 - https://github.com/kubernetes-sigs/gateway-api/discussions/1248
 - https://github.com/kubernetes-sigs/gateway-api/discussions/1246
 
-Gateway Hierarchy Brainstorming
+Gateway Hierarchy Brainstorming:
+
 - https://docs.google.com/document/d/1qj7Xog2t2fWRuzOeTsWkabUaVeOF7_2t_7appe8EXwA/edit
