@@ -48,10 +48,9 @@ Durations are a subset of what `time.ParseDuration` supports:
   `1h500ms` is supported (although probably not terribly useful).
 
 - Units MAY be repeated, although users SHOULD NOT rely on this support since
-  this GEP is Experimental, and future revisions may remove support for
-  repeated units. If units are repeated, the total duration remains the sum of
-  all components: a GEP-2257 duration of `1h2h20m10m` is a duration of 3 hours
-  30 minutes.
+  future revisions of this GEP may remove support for repeated units. If units
+  are repeated, the total duration remains the sum of all components: a
+  GEP-2257 duration of `1h2h20m10m` is a duration of 3 hours 30 minutes.
 
 - Since the value and the unit are both required within a component, `0` is
   not a valid GEP-2257 duration string (though `0s` is). Likewise the empty
