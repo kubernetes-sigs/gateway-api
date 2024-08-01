@@ -626,7 +626,7 @@ An implementation MAY reject listeners by setting the `ListenerEntryStatus` `Acc
 
 If a listener has a conflict, this should be reported in the `ListenerEntryStatus` of the conflicted `ListenerSet` by setting the `Conflicted` condition to `True`.
 
-Implementation SHOULD be cautious about what information from the parent or siblings are reported to avoid accidentally leaking sensitive information that the child would not otherwise have access to.
+Implementations SHOULD be cautious about what information from the parent or siblings are reported to avoid accidentally leaking sensitive information that the child would not otherwise have access to. This can include contents of secrets etc.
 
 ### Policy Attachment
 
