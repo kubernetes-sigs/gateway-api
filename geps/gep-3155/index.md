@@ -185,6 +185,7 @@ Conformance tests will be written to ensure the following:
 
 ## Future work
 This GEP does not cover per-service overrides for client certificate. This is mostly for two reasons:
+
 - it supports only the niche use cases - it should be reconsidered in future
 - in current model, where BackendTLSPolicy shares namespace with the service instead of the Gateway, there are non-trivial security implications to adding client certificate configuration at this level - therefore ownership and colocation of BackendTLSPolicy (Service vs Gateway) needs to be figured out first
 
