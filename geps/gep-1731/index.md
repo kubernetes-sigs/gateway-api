@@ -28,7 +28,7 @@ To allow configuration of a Gateway to retry unsuccessful requests to backends b
 * To allow specification of a default retry policy for all routes in a given namespace or attached to a particular Gateway.
 * A standard API for approaches for retry logic other than max count or "budget", such as interaction with rate limiting headers.
 * To allow specification of gRPC status codes for which a request should be retried (this should be covered in a separate GEP).
-* Support for unary or bidirectional streams, which may have different considerations for timeouts or request/response patterns within the stream after establishment.
+* Support for unary or bidirectional streams, which may have different considerations for timeouts or request/response patterns within the stream after establishment (this should be a separate GEP).
 
 ## Introduction
 
