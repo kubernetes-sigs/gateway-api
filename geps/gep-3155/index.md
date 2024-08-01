@@ -174,6 +174,7 @@ type BackendTLSPolicySpec struct {
 Conformance tests will be written to ensure the following:
 
 1. When SubjectAltNames are specified in BackendTLSPolicy:
+
   - The hostname field is still used as SNI, if specified
   - A certificate with at least one matching SubjectAltName is accepted
   - A certificate without a matching SubjectAltName is rejected
