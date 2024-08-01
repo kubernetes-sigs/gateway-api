@@ -290,7 +290,7 @@ type HTTPRouteRetry struct {
     //
     // For example, setting the `rules[].retry.backoff` field to the value
     // `100ms` will cause a backend request to first be retried approximately
-    // 100 milliseconds after timing out or reciveing a response code configured
+    // 100 milliseconds after timing out or receiving a response code configured
     // to be retryable.
     //
     // An implementation MAY use an exponential or alternative backoff strategy
