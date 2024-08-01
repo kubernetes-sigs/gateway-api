@@ -2,9 +2,9 @@
 
 ## Table of Contents
 
-| API channel  | Implementation version                                       | Mode    | Report                     |
-|--------------|--------------------------------------------------------------|---------|----------------------------|
-| experimental | [1.16](https://github.com/cilium/cilium/releases/tag/1.16.0-rc.0) | default | [link](./experimental-1.16-default-report.yaml) |
+| API channel  | Implementation version                                       | Mode    | Report                                          |
+|--------------|--------------------------------------------------------------|---------|-------------------------------------------------|
+| experimental | [1.16](https://github.com/cilium/cilium/releases/tag/1.16.0) | default | [link](./experimental-1.16-default-report.yaml) |
 
 ## Reproduce
 
