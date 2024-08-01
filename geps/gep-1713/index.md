@@ -516,7 +516,7 @@ spec:
   - name: second-workload-listeners
     kind: ListenerSet
     sectionName: second
-	- name: parent-gateway
+  - name: parent-gateway
     kind: Gateway
     sectionName: foo
 ```
@@ -565,6 +565,7 @@ spec:
 ### Listener Precedence
 
 Listeners should be merged using the following precedence:
+
 1. "parent" Gateway
 2. ListenerSet ordered by creation time (oldest first)
 3. ListenerSet ordered alphabetically by “{namespace}/{name}”.
@@ -591,6 +592,7 @@ Parent `Gateways` MUST NOT have `ListenerSet` listeners in their `status.listene
 The `Accepted` condition MUST be set on every `ListenerSet`, and indicates that the `ListenerSet` is semantically valid and accepted by its `parentRefs`.
 
 Valid reasons for `Accepted` being `False` are:
+
 - `NotAllowed` - the `parentRef` doesn't allow attachment
 - `ParentNotAccepted` - the `parentRef` isn't accepted (eg. invalid address)
 - `UnsupportedValue` - a listener in the set is using an unsupported feature/value
