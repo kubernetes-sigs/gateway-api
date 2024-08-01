@@ -48,7 +48,7 @@ type GatewaySpec struct {
 }
 
 type AllowedListeners struct {
-	// +kubebuilder:default={from: Same}
+	// +kubebuilder:default={from: None}
 	Namespaces *ListenerNamespaces `json:"namespaces,omitempty"`
 }
 
@@ -462,7 +462,7 @@ Implementations, when creating a `Gateway`, may provision underlying infrastruct
 
 ### Gateway <> ListenerSet Handshake
 
-By default a `Gateway` will allow `ListenerSets` in the same namespace to be attached. Users can prevent this behaviour by configuring their `Gateway` to disallow any listener attachment:
+By default a `Gateway` MUST NOT allow `ListenerSets` to be attached. Users can enable this behaviour by configuring their `Gateway` to allow `ListenerSet` attachment:
 
 ```
 apiVersion: gateway.networking.k8s.io/v1
@@ -471,7 +471,7 @@ metadata:
   name: parent-gateway
 spec:
   allowedListeners:
-  - from: None
+  - from: Same
 ```
 
 ### Route Attaching
