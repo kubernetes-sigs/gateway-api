@@ -619,9 +619,9 @@ The `Programmed` condition MUST be set on every `ListenerSet` and have a similar
 
 ### ListenerConditions within a ListenerSet
 
-An implementation MAY reject listeners by setting the `ListenerStatus` `Accepted` condition to `False` with the `Reason` `TooManyListeners`
+An implementation MAY reject listeners by setting the `ListenerEntryStatus` `Accepted` condition to `False` with the `Reason` `TooManyListeners`
 
-If a listener has a conflict, this should be reported in the `ListenerStatus` of the conflicted `ListenerSet` by setting the `Conflicted` condition to `True`.
+If a listener has a conflict, this should be reported in the `ListenerEntryStatus` of the conflicted `ListenerSet` by setting the `Conflicted` condition to `True`.
 
 Implementation SHOULD be cautious about what information from the parent or siblings are reported to avoid accidentally leaking sensitive information that the child would not otherwise have access to.
 
