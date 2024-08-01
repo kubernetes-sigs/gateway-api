@@ -180,6 +180,7 @@ Conformance tests will be written to ensure the following:
   - A certificate without a matching SubjectAltName is rejected
 
 2. When a Client Certificate is specified on a Gateway:
+
   - It is applied to all services.
   - The appropriate status condition is populated if the reference is invalid
 
