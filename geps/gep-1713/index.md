@@ -82,15 +82,18 @@ type ListenerSet struct {
 type ListenerSetSpec struct {
 	// ParentRefs references the Gateway that the listeners are attached to.
 	//
-	// +kubebuilder:validation:MaxItems=32
+	// +kubebuilder:validation:MaxItems=2
 	ParentRefs []ParentGatewayReference `json:"parentRefs,omitempty"`
 
 	// Listeners associated with this ListenerSet. Listeners define
 	// logical endpoints that are bound on this referenced parent Gateway's addresses.
 	//
-	// At least one Listener MUST be specified.
 	//
 	// Note: this is the same Listener type in the GatewaySpec struct
+	// +listType=map
+	// +listMapKey=name
+	// +kubebuilder:validation:MinItems=1
+	// +kubebuilder:validation:MaxItems=16
 	Listeners []Listener
 }
 
@@ -103,7 +106,7 @@ type ListenerSetStatus struct {
 	// first sees the route and should update the entry as appropriate when the
 	// route or gateway is modified.
 	//
-	// +kubebuilder:validation:MaxItems=32
+	// +kubebuilder:validation:MaxItems=2
 	Parents []ListenerSetParentStatus `json:"parents"`
 }
 
@@ -119,7 +122,7 @@ type ListenerSetParentStatus struct {
 	// +optional
 	// +listType=map
 	// +listMapKey=name
-	// +kubebuilder:validation:MaxItems=64
+	// +kubebuilder:validation:MaxItems=16
 	//
 	// Note: this is the same ListenerStatus type in the GatewayStatus struct
 	Listeners []ListenerStatus `json:"listeners,omitempty"`
