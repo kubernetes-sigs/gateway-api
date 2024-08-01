@@ -435,7 +435,7 @@ Retrying on connection errors (disconnect, reset, timeout, TCP failure) is typic
 
 ### Should whether to retry on a backend timeout be configurable?
 
-On Kubernetes, retrying should _typically_ route a backend request to a different pod if the original destination has become unhealthy and therefore should generally be safe. Even if a [BackendLBPolicy](https://gateway-api.sigs.k8s.io/geps/gep-1619/) is configured, most dataplane implementations implement "soft" affinity rather than strict session routing. The warnings against this practice in NGINX and HAProxy documentation seem to reference risks with legacy deployment models using a small number of statically-defined servers.
+On Kubernetes, retrying should _typically_ route a backend request to a different pod if the original destination has become unhealthy and therefore should generally be safe. Even if a [BackendLBPolicy](https://gateway-api.sigs.k8s.io/geps/gep-1619/) is configured, most dataplane implementations implement "soft" affinity rather than strict session routing. The warnings against this practice in NGINX and HAProxy documentation seem to reference risks with legacy deployment models using a small number of statically-defined servers. We could consider adding something like a `excludeRetryOnTimeout` boolean field (implementable by NGINX and HAProxy, not by Envoy) in the future if this behavior is desirable, while still retaining the retry-on-timeout behavior as a default.
 
 ## References
 
