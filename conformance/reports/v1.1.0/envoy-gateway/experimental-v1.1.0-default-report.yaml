@@ -1,5 +1,5 @@
 apiVersion: gateway.networking.k8s.io/v1alpha1
-date: "2024-07-23T01:46:12Z"
+date: "2024-07-31T19:28:39Z"
 gatewayAPIChannel: experimental
 gatewayAPIVersion: v1.1.0
 implementation:
@@ -12,6 +12,26 @@ implementation:
 kind: ConformanceReport
 mode: default
 profiles:
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 12
+      Skipped: 0
+  extended:
+    result: partial
+    skippedTests:
+    - GatewayStaticAddresses
+    statistics:
+      Failed: 0
+      Passed: 0
+      Skipped: 1
+    supportedFeatures:
+    - GatewayHTTPListenerIsolation
+    - GatewayPort8080
+    - GatewayStaticAddresses
+  name: GATEWAY-GRPC
+  summary: Core tests succeeded. Extended tests partially succeeded with 1 test skips.
 - core:
     result: success
     statistics:
