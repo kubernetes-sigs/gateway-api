@@ -432,7 +432,7 @@ type HTTPRouteTimeouts struct {
 	BackendRequest *Duration `json:"backendRequest,omitempty"`
 }
 
-// Duration is a string value representing a duration in time. The foramat is as specified
+// Duration is a string value representing a duration in time. The format is as specified
 // in GEP-2257, a strict subset of the syntax parsed by Golang time.ParseDuration.
 //
 // +kubebuilder:validation:Pattern=`^([0-9]{1,5}(h|m|s|ms)){1,4}$`
@@ -474,7 +474,7 @@ Timeouts could be configured using policy attachments or in objects other than `
 Instead of configuring timeouts directly on an API object, they could be configured using policy
 attachments. The advantage to this approach would be that timeout policies can be not only
 configured for an `HTTPRouteRule`, but can also be added/overriden at a more fine
-(e.g., `HTTPBackendRef`) or course (e.g. `HTTPRoute`) level of granularity.
+(e.g., `HTTPBackendRef`) or coarse (e.g. `HTTPRoute`) level of granularity.
 
 The downside, however, is complexity introduced for the most common use case, adding a simple
 timeout for an HTTP request. Setting a single field in the route rule, instead of needing to
