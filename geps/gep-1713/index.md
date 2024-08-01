@@ -5,7 +5,7 @@
 
 (See status definitions [here](overview.md#status).)
 
-## tl;dr
+## Introduction
 
 The `Gateway` Resource is a point of contention since it is the only place to attach listeners with certificates. We propose a new resource called `ListenerSet` to allow a shared list of listeners to be attached to a single `Gateway`.
 
@@ -15,7 +15,7 @@ The `Gateway` Resource is a point of contention since it is the only place to at
 ## Future Goals (Beyond the GEP)
 - Attaching listeners to `Gateways` in different namespaces
 
-## Introduction
+## Use Cases & Motivation
 
 Knative generates on demand per-service certificates using HTTP-01 challenges.
 There can be O(1000) Knative `Services` in the cluster which means we have O(1000) distinct certificates.
