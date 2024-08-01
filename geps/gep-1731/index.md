@@ -19,7 +19,6 @@ To allow configuration of a Gateway to retry unsuccessful requests to backends b
 
 ## Future Goals
 
-* To allow specification of gRPC status codes for which a request should be retried.
 * To allow specification of a retry ["budget"](https://finagle.github.io/blog/2016/02/08/retry-budgets/) to determine whether a request should be retried, and any shared configuration or interaction with max count retry configuration.
 * Define more precise semantics for retry configuration on "consumer" vs "producer" routes for mesh implementations.
 
@@ -28,6 +27,7 @@ To allow configuration of a Gateway to retry unsuccessful requests to backends b
 * To allow more granular control of the backoff strategy than many dataplanes allow customizing, such as whether to use an exponential backoff interval between retry attempts, add jitter, or cap the backoff interval to a maximum duration.
 * To allow specification of a default retry policy for all routes in a given namespace or attached to a particular Gateway.
 * A standard API for approaches for retry logic other than max count or "budget", such as interaction with rate limiting headers.
+* To allow specification of gRPC status codes for which a request should be retried (this should be covered in a separate GEP).
 * Support for unary or bidirectional streams, which may have different considerations for timeouts or request/response patterns within the stream after establishment.
 
 ## Introduction
@@ -109,14 +109,6 @@ By default, Envoy uses a fully jittered exponential back-off algorithm for retri
     * `retriable-headers` Allows specifying headers in the response for which a request should be retried.
 
     * `http3-post-connect-failure` Retry if a request is sent over HTTP/3 to the upstream server and fails after connecting.
-
-  * [**gRPC**](https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/router_filter#x-envoy-retry-grpc-on)
-
-    * `cancelled`
-    * `deadline-exceeded`
-    * `internal`
-    * `resource-exhausted`
-    * `unavailable`
 
 * `num_retries` The allowed number of retries, defaults to 1. Further notes on specific behavior can be found under [`x-envoy-max-retries`](https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/router_filter#x-envoy-max-retries).
 
