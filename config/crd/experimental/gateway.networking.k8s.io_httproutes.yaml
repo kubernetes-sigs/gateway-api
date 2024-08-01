@@ -2815,13 +2815,11 @@ spec:
                         rule: '!has(self.cookieConfig) || !has(self.cookieConfig.lifetimeType)
                           || self.cookieConfig.lifetimeType != ''Permanent'' || has(self.absoluteTimeout)'
                     timeouts:
-                      description: |+
+                      description: |-
                         Timeouts defines the timeouts that can be configured for an HTTP request.
 
 
                         Support: Extended
-
-
                       properties:
                         backendRequest:
                           description: |-
@@ -2841,8 +2839,10 @@ spec:
                             for example, if automatic retries are supported.
 
 
-                            Because the Request timeout encompasses the BackendRequest timeout, the value of
-                            BackendRequest must be <= the value of Request timeout.
+                            The value of BackendRequest must be a Gateway API Duration string as defined by
+                            GEP-2257.  When this field is unspecified, its behavior is implementation-specific;
+                            when specified, the value of BackendRequest must be no more than the value of the
+                            Request timeout (since the Request timeout encompasses the BackendRequest timeout).
 
 
                             Support: Extended
@@ -2872,7 +2872,8 @@ spec:
                             initiated by the client.
 
 
-                            When this field is unspecified, request timeout behavior is implementation-specific.
+                            The value of Request is a Gateway API Duration string as defined by GEP-2257. When this
+                            field is unspecified, request timeout behavior is implementation-specific.
 
 
                             Support: Extended
@@ -6061,13 +6062,11 @@ spec:
                         rule: '!has(self.cookieConfig) || !has(self.cookieConfig.lifetimeType)
                           || self.cookieConfig.lifetimeType != ''Permanent'' || has(self.absoluteTimeout)'
                     timeouts:
-                      description: |+
+                      description: |-
                         Timeouts defines the timeouts that can be configured for an HTTP request.
 
 
                         Support: Extended
-
-
                       properties:
                         backendRequest:
                           description: |-
@@ -6087,8 +6086,10 @@ spec:
                             for example, if automatic retries are supported.
 
 
-                            Because the Request timeout encompasses the BackendRequest timeout, the value of
-                            BackendRequest must be <= the value of Request timeout.
+                            The value of BackendRequest must be a Gateway API Duration string as defined by
+                            GEP-2257.  When this field is unspecified, its behavior is implementation-specific;
+                            when specified, the value of BackendRequest must be no more than the value of the
+                            Request timeout (since the Request timeout encompasses the BackendRequest timeout).
 
 
                             Support: Extended
@@ -6118,7 +6119,8 @@ spec:
                             initiated by the client.
 
 
-                            When this field is unspecified, request timeout behavior is implementation-specific.
+                            The value of Request is a Gateway API Duration string as defined by GEP-2257. When this
+                            field is unspecified, request timeout behavior is implementation-specific.
 
 
                             Support: Extended
