@@ -89,12 +89,183 @@ type ListenerSetSpec struct {
 	// logical endpoints that are bound on this referenced parent Gateway's addresses.
 	//
 	//
-	// Note: this is the same Listener type in the GatewaySpec struct
 	// +listType=map
 	// +listMapKey=name
 	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:MaxItems=16
-	Listeners []Listener
+	Listeners []ListenerEntry
+}
+// ListenerEntry embodies the concept of a logical endpoint where a Gateway accepts
+// network connections.
+type ListenerEntry struct {
+	// Name is the name of the Listener. This name MUST be unique within a
+	// Gateway.
+	//
+	// Support: Core
+	Name SectionName `json:"name"`
+
+	// Hostname specifies the virtual hostname to match for protocol types that
+	// define this concept. When unspecified, all hostnames are matched. This
+	// field is ignored for protocols that don't require hostname based
+	// matching.
+	//
+	// Implementations MUST apply Hostname matching appropriately for each of
+	// the following protocols:
+	//
+	// * TLS: The Listener Hostname MUST match the SNI.
+	// * HTTP: The Listener Hostname MUST match the Host header of the request.
+	// * HTTPS: The Listener Hostname SHOULD match at both the TLS and HTTP
+	//   protocol layers as described above. If an implementation does not
+	//   ensure that both the SNI and Host header match the Listener hostname,
+	//   it MUST clearly document that.
+	//
+	// For HTTPRoute and TLSRoute resources, there is an interaction with the
+	// `spec.hostnames` array. When both listener and route specify hostnames,
+	// there MUST be an intersection between the values for a Route to be
+	// accepted. For more information, refer to the Route specific Hostnames
+	// documentation.
+	//
+	// Hostnames that are prefixed with a wildcard label (`*.`) are interpreted
+	// as a suffix match. That means that a match for `*.example.com` would match
+	// both `test.example.com`, and `foo.test.example.com`, but not `example.com`.
+	//
+	// Support: Core
+	//
+	// +optional
+	Hostname *Hostname `json:"hostname,omitempty"`
+
+	// Port is the network port. Multiple listeners may use the
+	// same port, subject to the Listener compatibility rules.
+	//
+	// Support: Core
+	Port PortNumber `json:"port"`
+
+	// Protocol specifies the network protocol this listener expects to receive.
+	//
+	// Support: Core
+	Protocol ProtocolType `json:"protocol"`
+
+	// TLS is the TLS configuration for the Listener. This field is required if
+	// the Protocol field is "HTTPS" or "TLS". It is invalid to set this field
+	// if the Protocol field is "HTTP", "TCP", or "UDP".
+	//
+	// The association of SNIs to Certificate defined in GatewayTLSConfig is
+	// defined based on the Hostname field for this listener.
+	//
+	// The GatewayClass MUST use the longest matching SNI out of all
+	// available certificates for any TLS handshake.
+	//
+	// Support: Core
+	//
+	// +optional
+	TLS *ListenerSetTLSConfig `json:"tls,omitempty"`
+
+	// AllowedRoutes defines the types of routes that MAY be attached to a
+	// Listener and the trusted namespaces where those Route resources MAY be
+	// present.
+	//
+	// Although a client request may match multiple route rules, only one rule
+	// may ultimately receive the request. Matching precedence MUST be
+	// determined in order of the following criteria:
+	//
+	// * The most specific match as defined by the Route type.
+	// * The oldest Route based on creation timestamp. For example, a Route with
+	//   a creation timestamp of "2020-09-08 01:02:03" is given precedence over
+	//   a Route with a creation timestamp of "2020-09-08 01:02:04".
+	// * If everything else is equivalent, the Route appearing first in
+	//   alphabetical order (namespace/name) should be given precedence. For
+	//   example, foo/bar is given precedence over foo/baz.
+	//
+	// All valid rules within a Route attached to this Listener should be
+	// implemented. Invalid Route rules can be ignored (sometimes that will mean
+	// the full Route). If a Route rule transitions from valid to invalid,
+	// support for that Route rule should be dropped to ensure consistency. For
+	// example, even if a filter specified by a Route rule is invalid, the rest
+	// of the rules within that Route should still be supported.
+	//
+	// Support: Core
+	// +kubebuilder:default={namespaces:{from: Same}}
+	// +optional
+	AllowedRoutes *AllowedRoutes `json:"allowedRoutes,omitempty"`
+}
+
+// ListenerSetTLSConfig describes a TLS configuration.
+//
+// +kubebuilder:validation:XValidation:message="certificateRefs or options must be specified when mode is Terminate",rule="self.mode == 'Terminate' ? size(self.certificateRefs) > 0 || size(self.options) > 0 : true"
+type ListenerSetTLSConfig struct {
+	// Mode defines the TLS behavior for the TLS session initiated by the client.
+	// There are two possible modes:
+	//
+	// - Terminate: The TLS session between the downstream client and the
+	//   Gateway is terminated at the Gateway. This mode requires certificates
+	//   to be specified in some way, such as populating the certificateRefs
+	//   field.
+	// - Passthrough: The TLS session is NOT terminated by the Gateway. This
+	//   implies that the Gateway can't decipher the TLS stream except for
+	//   the ClientHello message of the TLS protocol. The certificateRefs field
+	//   is ignored in this mode.
+	//
+	// Support: Core
+	//
+	// +optional
+	// +kubebuilder:default=Terminate
+	Mode *TLSModeType `json:"mode,omitempty"`
+
+	// CertificateRefs contains a series of references to Kubernetes objects that
+	// contains TLS certificates and private keys. These certificates are used to
+	// establish a TLS handshake for requests that match the hostname of the
+	// associated listener.
+	//
+	// A single CertificateRef to a Kubernetes Secret has "Core" support.
+	// Implementations MAY choose to support attaching multiple certificates to
+	// a Listener, but this behavior is implementation-specific.
+	//
+	// References to a resource in different namespace are invalid UNLESS there
+	// is a ReferenceGrant in the target namespace that allows the certificate
+	// to be attached. If a ReferenceGrant does not allow this reference, the
+	// "ResolvedRefs" condition MUST be set to False for this listener with the
+	// "RefNotPermitted" reason.
+	//
+	// This field is required to have at least one element when the mode is set
+	// to "Terminate" (default) and is optional otherwise.
+	//
+	// CertificateRefs can reference to standard Kubernetes resources, i.e.
+	// Secret, or implementation-specific custom resources.
+	//
+	// Support: Core - A single reference to a Kubernetes Secret of type kubernetes.io/tls
+	//
+	// Support: Implementation-specific (More than one reference or other resource types)
+	//
+	// +optional
+	// +kubebuilder:validation:MaxItems=64
+	CertificateRefs []SecretObjectReference `json:"certificateRefs,omitempty"`
+
+	// FrontendValidation holds configuration information for validating the frontend (client).
+	// Setting this field will require clients to send a client certificate
+	// required for validation during the TLS handshake. In browsers this may result in a dialog appearing
+	// that requests a user to specify the client certificate.
+	// The maximum depth of a certificate chain accepted in verification is Implementation specific.
+	//
+	// Support: Extended
+	//
+	// +optional
+	// <gateway:experimental>
+	FrontendValidation *FrontendTLSValidation `json:"frontendValidation,omitempty"`
+
+	// Options are a list of key/value pairs to enable extended TLS
+	// configuration for each implementation. For example, configuring the
+	// minimum TLS version or supported cipher suites.
+	//
+	// A set of common keys MAY be defined by the API in the future. To avoid
+	// any ambiguity, implementation-specific definitions MUST use
+	// domain-prefixed names, such as `example.com/my-custom-option`.
+	// Un-prefixed names are reserved for key names defined by Gateway API.
+	//
+	// Support: Implementation-specific
+	//
+	// +optional
+	// +kubebuilder:validation:MaxProperties=16
+	Options map[AnnotationKey]AnnotationValue `json:"options,omitempty"`
 }
 
 // ListenerSetStatus defines the observed state of a ListenerSet
@@ -123,9 +294,7 @@ type ListenerSetParentStatus struct {
 	// +listType=map
 	// +listMapKey=name
 	// +kubebuilder:validation:MaxItems=16
-	//
-	// Note: this is the same ListenerStatus type in the GatewayStatus struct
-	Listeners []ListenerStatus `json:"listeners,omitempty"`
+	Listeners []ListenerEntryStatus `json:"listeners,omitempty"`
 
 	// Conditions describe the current conditions of the ListenerSet.
 	//
@@ -144,6 +313,51 @@ type ListenerSetParentStatus struct {
 	// +listMapKey=type
 	// +kubebuilder:validation:MaxItems=8
 	Conditions []metav1.Condition `json:"conditions,omitempty"`
+}
+
+// ListenerEntryStatus is the status associated with a ListenerEntry.
+type ListenerEntryStatus struct {
+	// Name is the name of the Listener that this status corresponds to.
+	Name SectionName `json:"name"`
+
+	// SupportedKinds is the list indicating the Kinds supported by this
+	// listener. This MUST represent the kinds an implementation supports for
+	// that Listener configuration.
+	//
+	// If kinds are specified in Spec that are not supported, they MUST NOT
+	// appear in this list and an implementation MUST set the "ResolvedRefs"
+	// condition to "False" with the "InvalidRouteKinds" reason. If both valid
+	// and invalid Route kinds are specified, the implementation MUST
+	// reference the valid Route kinds that have been specified.
+	//
+	// +kubebuilder:validation:MaxItems=8
+	SupportedKinds []RouteGroupKind `json:"supportedKinds"`
+
+	// AttachedRoutes represents the total number of Routes that have been
+	// successfully attached to this Listener.
+	//
+	// Successful attachment of a Route to a Listener is based solely on the
+	// combination of the AllowedRoutes field on the corresponding Listener
+	// and the Route's ParentRefs field. A Route is successfully attached to
+	// a Listener when it is selected by the Listener's AllowedRoutes field
+	// AND the Route has a valid ParentRef selecting the whole Gateway
+	// resource or a specific Listener as a parent resource (more detail on
+	// attachment semantics can be found in the documentation on the various
+	// Route kinds ParentRefs fields). Listener or Route status does not impact
+	// successful attachment, i.e. the AttachedRoutes field count MUST be set
+	// for Listeners with condition Accepted: false and MUST count successfully
+	// attached Routes that may themselves have Accepted: false conditions.
+	//
+	// Uses for this field include troubleshooting Route attachment and
+	// measuring blast radius/impact of changes to a Listener.
+	AttachedRoutes int32 `json:"attachedRoutes"`
+
+	// Conditions describe the current condition of this listener.
+	//
+	// +listType=map
+	// +listMapKey=type
+	// +kubebuilder:validation:MaxItems=8
+	Conditions []metav1.Condition `json:"conditions"`
 }
 
 // ParentGatewayReference identifies an API object including its namespace,
@@ -225,6 +439,18 @@ spec:
         group: ""
         name: second-workload-cert # Provisioned via HTTP01 challenge
 ```
+### ListenerEntry
+
+TBD: `ListenerEntry` is currently a copy of the `Listener` struct but we have the opportunity to make changes here.
+
+From robscott https://github.com/kubernetes-sigs/gateway-api/pull/3213#discussion_r1699248634:
+
+> Since this would be a new API, it could be worth exploring some potential regrets of Listeners:
+>
+> 1. Should we have made it easier to leave port empty or do port ranges?
+> 2. Should we support multiple hostnames?
+> 3. Are there any validations that we wish we'd tightened up?
+
 ## Semantics
 
 ### Gateway Changes
