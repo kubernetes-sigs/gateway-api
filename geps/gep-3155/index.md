@@ -90,7 +90,7 @@ Alternate Name matching one of the specified SubjectAltNames.
 ```go
 type BackendTLSPolicyValidation struct {
   // SubjectAltNames contains one or more Subject Alternative Names.
-  // When specified, the certificate served from the backend MUST have at least on
+  // When specified, the certificate served from the backend MUST have at least one
   // Subject Alternate Name matching one of the specified SubjectAltNames.
   // +kubebuilder:validation:MaxItems=5
   SubjectAltNames []SubjectAltName `json:"subjectAltNames,omitempty"`
