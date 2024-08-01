@@ -1,7 +1,7 @@
 apiVersion: internal.gateway.networking.k8s.io/v1alpha1
 kind: GEPDetails
 number: 1731
-name: Configurable Retries
+name: HTTPRoute Retries
 status: Implementable
 # Any authors who contribute to the GEP in any way should be listed here using
 # their Github handle.
@@ -36,6 +36,7 @@ references:
 # are any. This will allow us to track which feature was introduced by which GEP.
 featureNames:
   - SupportHTTPRouteRetry
+  - SupportHTTPRouteRetryBackoff
   - SupportHTTPRouteRetryCodes
   - SupportHTTPRouteRetryCodes5xx
 # changelog is a list of hyperlinks to PRs that make changes to the GEP, in
