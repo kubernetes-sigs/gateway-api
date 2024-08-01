@@ -616,6 +616,7 @@ Valid reasons for `Accepted` being `False` are:
 The `Programmed` condition MUST be set on every `ListenerSet` and have a similar meaning to the Gateway `Programmed` condition but only reflect the listeners in this `ListenerSet`.
 
 `Accepted` and `Programmed` conditions when surfacing details about listeners, MUST only summarize the `status.parents.listeners` conditions that are exclusive to the `ListenerSet`.
+An exception to this is when the parent `Gateway`'s `Accepted` or `Programmed` conditions transition to `False`
 
 `ListenerSets` MUST NOT have their parent `Gateway`'s' listeners in the associated `status.parents.listeners` conditions list.
 
