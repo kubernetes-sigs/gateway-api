@@ -395,12 +395,17 @@ Basic support for configuring retries in HTTPRoute up to a specified maximum cou
 Retrying requests based on HTTP status codes will be gated under the following features:
 
 * `SupportHTTPRRouteRetryBackoff`
+
   * Backoff will only be tested that a retry does not start before the duration specified for conformance, not that the backoff duration is precise.
   * Not currently supportable by NGINX or HAProxy.
+
 * `SupportHTTPRRouteRetryCodes`
+
   * Only 500, 502, 503 and 504 will be tested for conformance.
   * Traefik does not seem to support specifying error codes, and will only retry on backend timeouts.
+
 * `SupportHTTPRRouteRetryCode5xx`
+
   * 500, 502, 503 and 504 will all be tested for conformance.
   * Arbitrary status codes in the 500-599 (inclusive) range will not be tested for conformance.
 
