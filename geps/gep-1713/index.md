@@ -488,9 +488,10 @@ spec:
 
 ### Route Attaching
 
-Routes MUST be able to specify a `ListenerSet` as a `parentRef`. Routes can use `sectionName`/`port` fields in `ParentReference` to help target a specific listener. If no listener is targeted (`sectionName`/`port` are unset) then the Route attaches to all the listeners on the `ListenerSet` and it `MUST NOT` attach to any listeners in the `ListenerSet`'s parent `Gateways`.
+Routes MUST be able to specify a `ListenerSet` as a `parentRef`. Routes can use `sectionName`/`port` fields in `ParentReference` to help target a specific listener. If no listener is targeted (`sectionName`/`port` are unset) then the Route attaches to all the listeners in the `ListenerSet`.
 
-eg.
+Routes MUST be able to attach to a `ListenerSet` and it's parent `Gateway` by having multiple `parentRefs` eg:
+
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1beta1
 kind: HTTPRoute
@@ -517,7 +518,7 @@ spec:
     sectionName: foo
 ```
 
-To attach to listeners in both a `Gateway` and `ListenerSet` the route must have two `parentRefs`:
+To attach to listeners in both a `Gateway` and `ListenerSet` the route MUST have two `parentRefs`:
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1beta1
 kind: HTTPRoute
