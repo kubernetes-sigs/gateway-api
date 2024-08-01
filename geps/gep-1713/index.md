@@ -577,6 +577,8 @@ spec:
 
 ### Listener Precedence
 
+Listeners in a `Gateway` and their attached `ListenerSets` are concatenated as a list when programming the underlying infrastructure
+
 Listeners should be merged using the following precedence:
 
 1. "parent" Gateway
