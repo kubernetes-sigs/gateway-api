@@ -1,7 +1,7 @@
 # GEP-1742: HTTPRoute Timeouts
 
 * Issue: [#1742](https://github.com/kubernetes-sigs/gateway-api/issues/1742)
-* Status: Experimental
+* Status: Standard
 
 (See status definitions [here](overview.md#status).)
 
@@ -383,7 +383,7 @@ type HTTPRouteRule struct {
 	// Support: Extended
 	//
 	// +optional
-	// <gateway:experimental>
+	// <gateway:standard>
 	Timeouts *HTTPRouteTimeouts `json:"timeouts,omitempty"`
 
 	// ...
@@ -503,5 +503,4 @@ previous section, is likely a better way to handle timeout configuration above t
 
 ## References
 
-(Add any additional document links. Again, we should try to avoid
-too much content not in version control to avoid broken links)
+[GEP-2257]:/geps/gep-2257/
