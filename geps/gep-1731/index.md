@@ -215,9 +215,15 @@ Supports configuration of a [Circuit Breaker](https://doc.traefik.io/traefik/mid
 
 #### linkerd2-proxy
 
-Linkerd supports a configurable [retry budget](https://linkerd.io/2.15/features/retries-and-timeouts/) per-route using its [ServiceProfile](https://linkerd.io/2.15/reference/service-profiles/) CRD. The default budget is 20%, but Linkerd also supports a certain number of "extra" retries every second (10 by default), for a better user experience with low-traffic services.
-
-Linkerd is unique in that it does not currently support counted retries, although this is an area of active development.
+Linkerd supports [budgeted retries](https://linkerd.io/2.15/features/retries-and-timeouts/) and - as of [edge-24.7.5](https://github.com/linkerd/linkerd2/releases/tag/edge-24.7.5) - counted retries. In all cases, retries are implemented by the `linkerd2-proxy` making the request on behalf on an application workload.
+	
+Linkerd's budgeted retries allow retrying an indefinite number of times, as long as the fraction of retries remains within the budget. Budgeted retries are supported only using Linkerd's native ServiceProfile CRD, which allows enabling retries, setting the retry budget (by default, 20% plus 10 "extra" retries per second), and configuring the window over which the fraction of retries to non-retries is calculated.
+	
+Linkerd's counted retries work in much the same way as other retry implementations, permitted a fixed maximum number of retries for a given request. Counted retries can be configured with annotations on Service, HTTPRoute, and GRPCRoute resources, all of which allow setting the maximum number of retries and the maximum time a request will be permitted to linger before cancelling it and retrying.
+	
+For Service and HTTPRoute, Linkerd permits setting which HTTP statuses will be retried. For Service and GRPCRoute, Linkerd permits setting which gRPC statuses will be retried. Retry configurations on HTTPRoute and GRPCRoute resources take precedence over retry configurations on Service resources.
+	
+Neither type of Linkerd retries supports configuring retries based on connection status (e.g. connection timed out). The `linkerd2-proxy` maintains long-lived connections to destinations in use, and manages connection state independently of the application making requests. In this world, individual requests don't correlate well with connections being made or broken, which means that retries on connection state changes don't really make sense.
 
 #### F5 BIG-IP
 
