@@ -1,4 +1,4 @@
-# GEP-1731: Configurable Retries
+# GEP-1731: HTTPRoute Retries
 
 * Issue: [#1731](https://github.com/kubernetes-sigs/gateway-api/issues/1731)
 * Status: Implementable
