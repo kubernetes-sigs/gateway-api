@@ -216,13 +216,13 @@ Supports configuration of a [Circuit Breaker](https://doc.traefik.io/traefik/mid
 #### linkerd2-proxy
 
 Linkerd supports [budgeted retries](https://linkerd.io/2.15/features/retries-and-timeouts/) and - as of [edge-24.7.5](https://github.com/linkerd/linkerd2/releases/tag/edge-24.7.5) - counted retries. In all cases, retries are implemented by the `linkerd2-proxy` making the request on behalf on an application workload.
-	
+
 Linkerd's budgeted retries allow retrying an indefinite number of times, as long as the fraction of retries remains within the budget. Budgeted retries are supported only using Linkerd's native ServiceProfile CRD, which allows enabling retries, setting the retry budget (by default, 20% plus 10 "extra" retries per second), and configuring the window over which the fraction of retries to non-retries is calculated.
-	
+
 Linkerd's counted retries work in much the same way as other retry implementations, permitted a fixed maximum number of retries for a given request. Counted retries can be configured with annotations on Service, HTTPRoute, and GRPCRoute resources, all of which allow setting the maximum number of retries and the maximum time a request will be permitted to linger before cancelling it and retrying.
-	
+
 For Service and HTTPRoute, Linkerd permits setting which HTTP statuses will be retried. For Service and GRPCRoute, Linkerd permits setting which gRPC statuses will be retried. Retry configurations on HTTPRoute and GRPCRoute resources take precedence over retry configurations on Service resources.
-	
+
 Neither type of Linkerd retries supports configuring retries based on connection status (e.g. connection timed out). The `linkerd2-proxy` maintains long-lived connections to destinations in use, and manages connection state independently of the application making requests. In this world, individual requests don't correlate well with connections being made or broken, which means that retries on connection state changes don't really make sense.
 
 #### F5 BIG-IP
@@ -238,6 +238,9 @@ TODO
 TODO
 
 ## API
+
+!! warning
+    Expectations for how implementations should handle connection errors are currently UNRESOLVED due to inconsistency between data planes, including how connections are established or maintained, granularity of how different types of errors are bucketed, default behavior and expected user needs. Please see comment thread at <https://github.com/kubernetes-sigs/gateway-api/pull/3199#discussion_r1697201266> for more detail.
 
 ### Go
 
@@ -256,7 +259,7 @@ type HTTPRouteRule struct {
 
 // HTTPRouteRetry defines retry configuration for an HTTPRoute.
 //
-// Implementations MUST retry on connection errors (disconnect, reset, timeout,
+// Implementations SHOULD retry on connection errors (disconnect, reset, timeout,
 // TCP failure) if a retry stanza is configured.
 //
 type HTTPRouteRetry struct {
@@ -392,6 +395,10 @@ Basic support for configuring retries in HTTPRoute up to a specified maximum cou
 
 Retrying requests based on HTTP status codes will be gated under the following features:
 
+* `SupportHTTPRRouteRetryBackendTimeout`
+
+  * Will test that backend requests that exceed a BackendRequest timeout duration are retried if a `retry` stanza is configured.
+
 * `SupportHTTPRRouteRetryBackoff`
 
   * Backoff will only be tested that a retry does not start before the duration specified for conformance, not that the backoff duration is precise.
@@ -408,6 +415,10 @@ Retrying requests based on HTTP status codes will be gated under the following f
   * Arbitrary status codes in the 500-599 (inclusive) range will not be tested for conformance.
 
 Implementations MAY support specifying additional individual error codes in the valid 100-599 (inclusive) range or invalid 600-999 (inclusive) range, but none of these will be tested in conformance.
+
+* `SupportHTTPRRouteRetryConnectionError`
+
+  * Will test that connections interrupted by a TCP failure, disconnect or reset are retried if a `retry` stanza is configured.
 
 ## Alternatives
 

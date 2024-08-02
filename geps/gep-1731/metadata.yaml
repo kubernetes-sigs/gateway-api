@@ -36,9 +36,11 @@ references:
 # are any. This will allow us to track which feature was introduced by which GEP.
 featureNames:
   - SupportHTTPRouteRetry
+  - SupportHTTPRouteRetryBackendTimeout
   - SupportHTTPRouteRetryBackoff
   - SupportHTTPRouteRetryCodes
   - SupportHTTPRouteRetryCodes5xx
+  - SupportHTTPRouteRetryConnectionError
 # changelog is a list of hyperlinks to PRs that make changes to the GEP, in
 # ascending date order.
 changelog: {}
