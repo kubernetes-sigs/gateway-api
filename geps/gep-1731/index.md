@@ -239,7 +239,7 @@ TODO
 
 ## API
 
-!! warning
+!!! warning
     Expectations for how implementations should handle connection errors are currently UNRESOLVED due to inconsistency between data planes, including how connections are established or maintained, granularity of how different types of errors are bucketed, default behavior and expected user needs. Please see comment thread at <https://github.com/kubernetes-sigs/gateway-api/pull/3199#discussion_r1697201266> for more detail.
 
 ### Go
