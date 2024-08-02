@@ -332,34 +332,27 @@ type HTTPRouteRetry struct {
 //
 // Implementations MUST support the following status codes as retryable:
 //
-// * "500"
-// * "502"
-// * "503"
-// * "504"
+// * 500
+// * 502
+// * 503
+// * 504
 //
-// Implementations SHOULD support the `"5xx"` shorthand for matching status
-// codes in the 500-599 range. For implementations supporting `"5xx"`, this
-// shorthand MUST match the following status codes:
-//
-// * "500"
-// * "502"
-// * "503"
-// * "504"
-//
-// The `"5xx"` shorthand MAY additionally match a well-documented subset of
-// arbitrary status codes in the 500-599 range, or match all status codes in
-// this range.
+// Implementations MAY support specifying additional discrete values in the
+// 500-599 range.
 //
 // Implementations SHOULD NOT support retrying status codes in the 100-399
 // range, as these responses are generally not appropriate to retry.
 //
 // Implementations MAY support specifying discrete values in the 400-499 range,
-// which are often inadvisable to retry, and MAY support discrete values in the
-// 600-999 (inclusive) range, which are not valid for HTTP clients, but are
-// sometimes used for communicating application-specific errors.
+// which are often inadvisable to retry.
 //
-// +kubebuilder:validation:Pattern=`^[1-9](?:[0-9][0-9]|xx)$`
-type HTTPRouteRetryStatusCode string
+// Implementations MAY support discrete values in the 600-999 (inclusive)
+// range, which are not valid for HTTP clients, but are sometimes used for
+// communicating application-specific errors.
+//
+// +kubebuilder:validation:Minimum:=100
+// +kubebuilder:validation:Maximum:=999
+type HTTPRouteRetryStatusCode int
 
 // Duration is a string value representing a duration in time. The foramat is
 // as specified in GEP-2257, a strict subset of the syntax parsed by Golang
@@ -384,7 +377,10 @@ spec:
       port: 8080
     retry:
       codes:
-      - 5xx
+      - 500
+      - 502
+      - 503
+      - 504
       attempts: 2
       backoff: 100ms
 ```
@@ -408,13 +404,6 @@ Retrying requests based on HTTP status codes will be gated under the following f
 
   * Only 500, 502, 503 and 504 will be tested for conformance.
   * Traefik does not seem to support specifying error codes, and will only retry on backend timeouts.
-
-* `SupportHTTPRRouteRetryCode5xx`
-
-  * 500, 502, 503 and 504 will all be tested for conformance.
-  * Arbitrary status codes in the 500-599 (inclusive) range will not be tested for conformance.
-
-Implementations MAY support specifying additional individual error codes in the valid 100-599 (inclusive) range or invalid 600-999 (inclusive) range, but none of these will be tested in conformance.
 
 * `SupportHTTPRRouteRetryConnectionError`
 

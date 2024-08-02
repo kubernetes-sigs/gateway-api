@@ -39,7 +39,6 @@ featureNames:
   - SupportHTTPRouteRetryBackendTimeout
   - SupportHTTPRouteRetryBackoff
   - SupportHTTPRouteRetryCodes
-  - SupportHTTPRouteRetryCodes5xx
   - SupportHTTPRouteRetryConnectionError
 # changelog is a list of hyperlinks to PRs that make changes to the GEP, in
 # ascending date order.
