@@ -764,7 +764,7 @@ the Policy itself has been updated.
 
 There is already a similar Condition to be placed on _Policy_ objects, rather
 than on the _targeted_ objects, so this solution is also being included in the
-Condiions section below.
+Conditions section below.
 
 #### GatewayClass status Extension Types listing
 
