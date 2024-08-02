@@ -1,5 +1,5 @@
-apiVersion: gateway.networking.k8s.io/v1alpha1
-date: "2024-06-07T06:33:39Z"
+apiVersion: gateway.networking.k8s.io/v1
+date: "2024-08-02T12:50:00Z"
 gatewayAPIChannel: experimental
 gatewayAPIVersion: v1.1.0
 implementation:
@@ -16,56 +16,19 @@ profiles:
       result: success
       statistics:
         Failed: 0
-        Passed: 33
-        Skipped: 0
-    extended:
-      result: success
-      statistics:
-        Failed: 0
-        Passed: 16
-        Skipped: 0
-      supportedFeatures:
-        - GatewayHTTPListenerIsolation
-        - GatewayPort8080
-        - HTTPRouteBackendRequestHeaderModification
-        - HTTPRouteBackendTimeout
-        - HTTPRouteHostRewrite
-        - HTTPRouteMethodMatching
-        - HTTPRoutePathRedirect
-        - HTTPRoutePathRewrite
-        - HTTPRoutePortRedirect
-        - HTTPRouteQueryParamMatching
-        - HTTPRouteRequestMirror
-        - HTTPRouteRequestMultipleMirrors
-        - HTTPRouteRequestTimeout
-        - HTTPRouteResponseHeaderModification
-        - HTTPRouteSchemeRedirect
-      unsupportedFeatures:
-        - GatewayStaticAddresses
-        - HTTPRouteParentRefPort
-    name: GATEWAY-HTTP
-    summary: Core tests succeeded. Extended tests succeeded.
-  - core:
-      result: success
-      statistics:
-        Failed: 0
-        Passed: 11
-        Skipped: 0
-    name: GATEWAY-TLS
-    summary: Core tests succeeded.
-  - core:
-      result: success
-      statistics:
-        Failed: 0
         Passed: 3
         Skipped: 0
     extended:
-      result: success
+      result: partial
+      skippedTests:
+        - MeshConsumerRoute
       statistics:
         Failed: 0
-        Passed: 2
-        Skipped: 0
+        Passed: 3
+        Skipped: 1
       supportedFeatures:
+        - HTTPRouteBackendProtocolH2C
+        - HTTPRouteBackendProtocolWebSocket
         - HTTPRouteBackendRequestHeaderModification
         - HTTPRouteBackendTimeout
         - HTTPRouteHostRewrite
@@ -80,16 +43,83 @@ profiles:
         - HTTPRouteResponseHeaderModification
         - HTTPRouteSchemeRedirect
         - MeshClusterIPMatching
-      unsupportedFeatures:
-        - HTTPRouteParentRefPort
         - MeshConsumerRoute
     name: MESH-HTTP
-    summary: Core tests succeeded. Extended tests succeeded.
+    summary: Core tests succeeded. Extended tests partially succeeded with 1 test skips.
   - core:
       result: success
       statistics:
         Failed: 0
         Passed: 12
         Skipped: 0
+    extended:
+      result: partial
+      skippedTests:
+        - GatewayStaticAddresses
+      statistics:
+        Failed: 0
+        Passed: 0
+        Skipped: 1
+      supportedFeatures:
+        - GatewayHTTPListenerIsolation
+        - GatewayPort8080
+        - GatewayStaticAddresses
     name: GATEWAY-GRPC
-    summary: Core tests succeeded.
+    summary: Core tests succeeded. Extended tests partially succeeded with 1 test skips.
+  - core:
+      result: success
+      statistics:
+        Failed: 0
+        Passed: 33
+        Skipped: 0
+    extended:
+      result: partial
+      skippedTests:
+        - GatewayStaticAddresses
+        - HTTPRouteListenerPortMatching
+      statistics:
+        Failed: 0
+        Passed: 19
+        Skipped: 2
+      supportedFeatures:
+        - GatewayHTTPListenerIsolation
+        - GatewayPort8080
+        - GatewayStaticAddresses
+        - HTTPRouteBackendProtocolH2C
+        - HTTPRouteBackendProtocolWebSocket
+        - HTTPRouteBackendRequestHeaderModification
+        - HTTPRouteBackendTimeout
+        - HTTPRouteHostRewrite
+        - HTTPRouteMethodMatching
+        - HTTPRouteParentRefPort
+        - HTTPRoutePathRedirect
+        - HTTPRoutePathRewrite
+        - HTTPRoutePortRedirect
+        - HTTPRouteQueryParamMatching
+        - HTTPRouteRequestMirror
+        - HTTPRouteRequestMultipleMirrors
+        - HTTPRouteRequestTimeout
+        - HTTPRouteResponseHeaderModification
+        - HTTPRouteSchemeRedirect
+    name: GATEWAY-HTTP
+    summary: Core tests succeeded. Extended tests partially succeeded with 2 test skips.
+  - core:
+      result: success
+      statistics:
+        Failed: 0
+        Passed: 11
+        Skipped: 0
+    extended:
+      result: partial
+      skippedTests:
+        - GatewayStaticAddresses
+      statistics:
+        Failed: 0
+        Passed: 0
+        Skipped: 1
+      supportedFeatures:
+        - GatewayHTTPListenerIsolation
+        - GatewayPort8080
+        - GatewayStaticAddresses
+    name: GATEWAY-TLS
+    summary: Core tests succeeded. Extended tests partially succeeded with 1 test skips.
