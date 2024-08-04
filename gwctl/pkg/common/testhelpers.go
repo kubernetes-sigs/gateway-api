@@ -26,35 +26,27 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// YamlString defines a custom type for wrapping yaml texts. It makes use of
-// YamlStringTransformer to generate slightly better diffing output from
-// cmp.Diff() for multi-line yaml texts.
-type YamlString string
+// MultiLine defines a custom type for wrapping texts spanning multilpe lines.
+// It makes use of MultiLineTransformer to generate slightly better diffing
+// output from cmp.Diff() for multi-line texts.
+type MultiLine string
 
-// YamlStringTransformer transforms a YamlString into a slice of strings by
+// MultiLineTransformer transforms a MultiLine into a slice of strings by
 // splitting on each new line. This allows the diffing function (used in tests)
 // to compare each line independently. The result is that the diff output marks
 // each line where a diff was observed.
-var YamlStringTransformer = cmp.Transformer("YamlLines", func(s YamlString) []string {
-	// Split string on each new line.
-	lines := strings.Split(string(s), "\n")
-
-	// Remove any empty lines from the start and end.
-	var start, end int
-	for i := range lines {
-		if lines[i] != "" {
-			start = i
-			break
-		}
-	}
-	for i := len(lines) - 1; i >= 0; i-- {
-		if lines[i] != "" {
-			end = i
-			break
-		}
-	}
-	return lines[start : end+1]
+var MultiLineTransformer = cmp.Transformer("MultiLine", func(m MultiLine) []string {
+	return strings.Split(string(m), "\n")
 })
+
+const (
+	beginMarker = "#################################### BEGIN #####################################"
+	endMarker   = "##################################### END ######################################"
+)
+
+func (m MultiLine) String() string {
+	return fmt.Sprintf("%v\n%v%v", beginMarker, string(m), endMarker)
+}
 
 type JSONString string
 
@@ -83,4 +75,12 @@ func NamespaceForTest(name string) *corev1.Namespace {
 			Phase: corev1.NamespaceActive,
 		},
 	}
+}
+
+func MustPrettyPrint(data any) {
+	b, err := json.MarshalIndent(data, "", "  ")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(string(b))
 }

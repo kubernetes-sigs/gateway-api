@@ -12,6 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+GIT_COMMIT := $(shell git rev-parse HEAD)
+BUILD_DATE := $(shell date +%Y-%m-%dT%H:%M:%S%z)
+
+BIN_DIR := bin
+
+$(BIN_DIR):
+	mkdir -p $(BIN_DIR)
+
 deps:
 	@echo "Installing dependencies..."
 	@go version
@@ -20,4 +28,13 @@ deps:
 
 build: deps
 	@echo "Building gwctl..."
-	@go build -o bin/gwctl main.go
+	@echo "GIT_COMMIT=$(GIT_COMMIT)"
+	@echo "BUILD_DATE=$(BUILD_DATE)"
+	@go build -ldflags="-X sigs.k8s.io/gateway-api/gwctl/pkg/version.gitCommit=$(GIT_COMMIT) -X sigs.k8s.io/gateway-api/gwctl/pkg/version.buildDate=$(BUILD_DATE)" -o bin/gwctl main.go
+	@echo "Done"
+
+clean:
+	@echo "Cleaning up..."
+	@rm -rf $(BIN_DIR)
+
+.DEFAULT_GOAL := build

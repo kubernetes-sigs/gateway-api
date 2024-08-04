@@ -17,104 +17,132 @@ limitations under the License.
 package printer
 
 import (
-	"context"
 	"fmt"
 	"io"
 
 	"golang.org/x/exp/maps"
 	"k8s.io/apimachinery/pkg/util/duration"
-	"k8s.io/utils/clock"
 
-	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
+	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
+	"sigs.k8s.io/gateway-api/gwctl/pkg/extension/directlyattachedpolicy"
+	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
+	"sigs.k8s.io/gateway-api/gwctl/pkg/topology"
+	topologygw "sigs.k8s.io/gateway-api/gwctl/pkg/topology/gateway"
 )
 
-var _ Printer = (*GatewayClassesPrinter)(nil)
-
-type GatewayClassesPrinter struct {
-	io.Writer
-	Clock        clock.Clock
-	EventFetcher eventFetcher
-}
-
-func (gcp *GatewayClassesPrinter) GetPrintableNodes(resourceModel *resourcediscovery.ResourceModel) []NodeResource {
-	return NodeResources(maps.Values(resourceModel.GatewayClasses))
-}
-
-func (gcp *GatewayClassesPrinter) PrintTable(resourceModel *resourcediscovery.ResourceModel, wide bool) {
-	var columnNames []string
-	if wide {
-		columnNames = []string{"NAME", "CONTROLLER", "ACCEPTED", "AGE", "GATEWAYS"}
-	} else {
-		columnNames = []string{"NAME", "CONTROLLER", "ACCEPTED", "AGE"}
-	}
-	table := &Table{
-		ColumnNames:  columnNames,
-		UseSeparator: false,
+func (p *TablePrinter) printGatewayClass(gatewayClassNode *topology.Node, w io.Writer) error {
+	if err := p.checkTypeChange("GatewayClass", w); err != nil {
+		return err
 	}
 
-	gatewayClassNodes := maps.Values(resourceModel.GatewayClasses)
-
-	for _, gatewayClassNode := range SortByString(gatewayClassNodes) {
-		accepted := "Unknown"
-		for _, condition := range gatewayClassNode.GatewayClass.Status.Conditions {
-			if condition.Type == "Accepted" {
-				accepted = string(condition.Status)
-			}
+	if p.table == nil {
+		var columnNames []string
+		if p.OutputFormat == OutputFormatWide {
+			columnNames = []string{"NAME", "CONTROLLER", "ACCEPTED", "AGE", "GATEWAYS"}
+		} else {
+			columnNames = []string{"NAME", "CONTROLLER", "ACCEPTED", "AGE"}
 		}
+		p.table = &Table{
+			ColumnNames:  columnNames,
+			UseSeparator: false,
+		}
+	}
 
-		age := duration.HumanDuration(gcp.Clock.Since(gatewayClassNode.GatewayClass.GetCreationTimestamp().Time))
+	gatewayClass := topology.MustAccessObject(gatewayClassNode, &gatewayv1.GatewayClass{})
 
+	accepted := "Unknown"
+	for _, condition := range gatewayClass.Status.Conditions {
+		if condition.Type == "Accepted" {
+			accepted = string(condition.Status)
+		}
+	}
+
+	age := "<unknown>"
+	creationTimestamp := gatewayClass.GetCreationTimestamp()
+	if !creationTimestamp.IsZero() {
+		age = duration.HumanDuration(p.Clock.Since(creationTimestamp.Time))
+	}
+
+	row := []string{
+		gatewayClass.GetName(),
+		string(gatewayClass.Spec.ControllerName),
+		accepted,
+		age,
+	}
+	if p.OutputFormat == OutputFormatWide {
+		gatewayCount := fmt.Sprintf("%d", len(topologygw.GatewayClassNode(gatewayClassNode).Gateways()))
+		row = append(row, gatewayCount)
+	}
+	p.table.Rows = append(p.table.Rows, row)
+	return nil
+}
+
+func (p *DescriptionPrinter) printGatewayClass(gatewayClassNode *topology.Node, w io.Writer) error {
+	if p.printSeparator {
+		fmt.Fprintf(w, "\n\n")
+	}
+	p.printSeparator = true
+
+	gatewayClass := topology.MustAccessObject(gatewayClassNode, &gatewayv1.GatewayClass{})
+
+	metadata := gatewayClass.ObjectMeta.DeepCopy()
+	metadata.Labels = nil
+	metadata.Annotations = nil
+	metadata.Name = ""
+	metadata.Namespace = ""
+	metadata.ManagedFields = nil
+
+	pairs := []*DescriberKV{
+		{Key: "Name", Value: gatewayClass.GetName()},
+		{Key: "Labels", Value: gatewayClass.GetLabels()},
+		{Key: "Annotations", Value: gatewayClass.GetAnnotations()},
+		{Key: "APIVersion", Value: gatewayClass.APIVersion},
+		{Key: "Kind", Value: gatewayClass.Kind},
+		{Key: "Metadata", Value: metadata},
+		{Key: "Spec", Value: &gatewayClass.Spec},
+		{Key: "Status", Value: &gatewayClass.Status},
+	}
+
+	const (
+		maxGateways = 10
+	)
+
+	// AttachedGateways
+	attachedGateways := &Table{
+		ColumnNames:  []string{"Kind", "Name"},
+		UseSeparator: true,
+	}
+	gatewaysCount := 0
+	gatewayNodes := maps.Values(topologygw.GatewayClassNode(gatewayClassNode).Gateways())
+	for _, gatewayNode := range topology.SortedNodes(gatewayNodes) {
+		gatewaysCount++
+		if gatewaysCount > maxGateways {
+			attachedGateways.Rows = append(attachedGateways.Rows, []string{fmt.Sprintf("(Truncated)")})
+			break
+		}
 		row := []string{
-			gatewayClassNode.GatewayClass.GetName(),
-			string(gatewayClassNode.GatewayClass.Spec.ControllerName),
-			accepted,
-			age,
+			gatewayNode.GKNN().Kind,                      // Kind
+			gatewayNode.GKNN().NamespacedName().String(), // Name
 		}
-		if wide {
-			gatewayCount := fmt.Sprintf("%d", len(gatewayClassNode.Gateways))
-			row = append(row, gatewayCount)
-		}
-		table.Rows = append(table.Rows, row)
+		attachedGateways.Rows = append(attachedGateways.Rows, row)
 	}
+	pairs = append(pairs, &DescriberKV{Key: "AttachedGateways", Value: attachedGateways})
 
-	table.Write(gcp, 0)
-}
-
-func (gcp *GatewayClassesPrinter) PrintDescribeView(resourceModel *resourcediscovery.ResourceModel) {
-	index := 0
-	for _, gatewayClassNode := range resourceModel.GatewayClasses {
-		index++
-
-		metadata := gatewayClassNode.GatewayClass.ObjectMeta.DeepCopy()
-		metadata.Labels = nil
-		metadata.Annotations = nil
-		metadata.Name = ""
-		metadata.Namespace = ""
-		metadata.ManagedFields = nil
-
-		pairs := []*DescriberKV{
-			{Key: "Name", Value: gatewayClassNode.GatewayClass.GetName()},
-			{Key: "Labels", Value: gatewayClassNode.GatewayClass.GetLabels()},
-			{Key: "Annotations", Value: gatewayClassNode.GatewayClass.GetAnnotations()},
-			{Key: "APIVersion", Value: gatewayClassNode.GatewayClass.APIVersion},
-			{Key: "Kind", Value: gatewayClassNode.GatewayClass.Kind},
-			{Key: "Metadata", Value: metadata},
-			{Key: "Spec", Value: &gatewayClassNode.GatewayClass.Spec},
-			{Key: "Status", Value: &gatewayClassNode.GatewayClass.Status},
-		}
-
-		// DirectlyAttachedPolicies
-		policies := SortByString(maps.Values(gatewayClassNode.Policies))
-		pairs = append(pairs, &DescriberKV{Key: "DirectlyAttachedPolicies", Value: convertPoliciesToRefsTable(policies, false)})
-
-		// Events
-		eventList := gcp.EventFetcher.FetchEventsFor(context.Background(), gatewayClassNode.GatewayClass)
-		pairs = append(pairs, &DescriberKV{Key: "Events", Value: convertEventsSliceToTable(eventList.Items, gcp.Clock)})
-
-		Describe(gcp, pairs)
-
-		if index+1 <= len(resourceModel.GatewayClasses) {
-			fmt.Fprintf(gcp, "\n\n")
-		}
+	// DirectlyAttachedPolicies
+	policiesMap, err := directlyattachedpolicy.Access(gatewayClassNode)
+	if err != nil {
+		return err
 	}
+	policies := policymanager.ConvertPoliciesMapToSlice(policiesMap)
+	pairs = append(pairs, &DescriberKV{Key: "DirectlyAttachedPolicies", Value: convertPoliciesToRefsTable(policies, false)})
+
+	// Events
+	events, err := p.EventFetcher.FetchEventsFor(gatewayClass)
+	if err != nil {
+		return err
+	}
+	pairs = append(pairs, &DescriberKV{Key: "Events", Value: convertEventsSliceToTable(events, p.Clock)})
+
+	Describe(w, pairs)
+	return nil
 }

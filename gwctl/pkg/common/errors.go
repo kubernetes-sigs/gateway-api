@@ -14,12 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package resourcediscovery
+package common
 
 import (
 	"fmt"
-
-	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
 )
 
 type ReferenceToNonExistentResourceError struct {
@@ -45,10 +43,10 @@ func (r ReferenceNotPermittedError) Error() string {
 type ReferenceFromTo struct {
 	// ReferringObject is the "from" object which is referring "to" some other
 	// object.
-	ReferringObject common.ObjRef
+	ReferringObject GKNN
 	// ReferredObject is the actual object which is being referenced by another
 	// object.
-	ReferredObject common.ObjRef
+	ReferredObject GKNN
 }
 
 // referringObjectKind returns a human readable Kind.

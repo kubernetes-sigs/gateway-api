@@ -21,15 +21,10 @@ import "sigs.k8s.io/gateway-api/gwctl/pkg/common"
 // ToPolicyRefs returns the Object references of all given policies. Note that
 // these are not the value of targetRef within the Policies but rather the
 // reference to the Policy object itself.
-func ToPolicyRefs(policies []Policy) []common.ObjRef {
-	var result []common.ObjRef
+func ToPolicyRefs(policies []Policy) []common.GKNN {
+	var result []common.GKNN
 	for _, policy := range policies {
-		result = append(result, common.ObjRef{
-			Group:     policy.Unstructured().GroupVersionKind().Group,
-			Kind:      policy.Unstructured().GroupVersionKind().Kind,
-			Name:      policy.Unstructured().GetName(),
-			Namespace: policy.Unstructured().GetNamespace(),
-		})
+		result = append(result, policy.GKNN())
 	}
 	return result
 }

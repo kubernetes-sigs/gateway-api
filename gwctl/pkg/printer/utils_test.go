@@ -18,6 +18,7 @@ package printer
 
 import (
 	"bytes"
+	"strings"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -57,8 +58,7 @@ func TestDescribe(t *testing.T) {
 	Describe(writable, pairs)
 
 	got := writable.String()
-	want := `
-Key1: string
+	want := `Key1: string
 Key2:
 - list-string1
 - 1234
@@ -78,8 +78,8 @@ Key4-table:
   row2-a  row2-b  row2-c
   row3-a  row3-b  row3-c
 `
-	if diff := cmp.Diff(common.YamlString(want), common.YamlString(got), common.YamlStringTransformer); diff != "" {
-		t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", got, want, diff)
+	if diff := cmp.Diff(common.MultiLine(want), common.MultiLine(got), common.MultiLineTransformer); diff != "" {
+		t.Fatalf("Unexpected diff:\n\ngot =\n\n%v\n\nwant =\n\n%v\n\ndiff (-want, +got) =\n\n%v", common.MultiLine(got), common.MultiLine(want), common.MultiLine(diff))
 	}
 }
 
@@ -149,9 +149,10 @@ TCPRoute   ns2/my-tcproute
 			writable := &bytes.Buffer{}
 			tc.table.Write(writable, tc.indent)
 
-			got := writable.String()
-			if diff := cmp.Diff(common.YamlString(tc.want), common.YamlString(got), common.YamlStringTransformer); diff != "" {
-				t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", got, tc.want, diff)
+			got := common.MultiLine(writable.String())
+			want := common.MultiLine(strings.TrimPrefix(tc.want, "\n"))
+			if diff := cmp.Diff(want, got, common.MultiLineTransformer); diff != "" {
+				t.Fatalf("Unexpected diff:\n\ngot =\n\n%v\n\nwant =\n\n%v\n\ndiff (-want, +got) =\n\n%v", got, want, common.MultiLine(diff))
 			}
 		})
 	}
