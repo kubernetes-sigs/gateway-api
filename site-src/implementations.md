@@ -373,12 +373,16 @@ The [LiteSpeed Ingress Controller](https://litespeedtech.com/products/litespeed-
 
 [![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.1.0-NGINX Gateway Fabric-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.1.0/nginxinc-nginx-gateway-fabric)
 
-[NGINX Gateway Fabric][nginx-gateway-fabric] is an open-source project that provides an implementation of the Gateway API using [NGINX][nginx] as the data plane. The goal of this project is to implement the core Gateway API -- Gateway, GatewayClass, HTTPRoute, TCPRoute, TLSRoute, and UDPRoute -- to configure an HTTP or TCP/UDP load balancer, reverse-proxy, or API gateway for applications running on Kubernetes. NGINX Gateway Fabric supports a subset of the Gateway API.
+[NGINX Gateway Fabric][nginx-gateway-fabric] is an open-source project that provides an implementation of the Gateway API using [NGINX][nginx] as the data plane. The goal of this project is to implement the core Gateway API to configure an HTTP or TCP/UDP load balancer, reverse-proxy, or API gateway for applications running on Kubernetes. You can find the comprehensive NGINX Gateway Fabric user documentation on the [NGINX Documentation][nginx-docs] website.
+
+For a list of supported Gateway API resources and features, see the [Gateway API Compatibility][nginx-compat] doc.
 
 If you have any suggestions or experience issues with NGINX Gateway Fabric, please [create an issue][nginx-issue-new] or a [discussion][nginx-disc-new] on GitHub. You can also ask for help in the [#nginx-gateway-fabric channel on NGINX slack][nginx-slack].
 
 [nginx-gateway-fabric]:https://github.com/nginxinc/nginx-gateway-fabric
 [nginx]:https://nginx.org/
+[nginx-docs]:https://docs.nginx.com/nginx-gateway-fabric/
+[nginx-compat]:https://docs.nginx.com/nginx-gateway-fabric/overview/gateway-api-compatibility/
 [nginx-issue-new]:https://github.com/nginxinc/nginx-gateway-fabric/issues/new
 [nginx-disc-new]:https://github.com/nginxinc/nginx-gateway-fabric/discussions/new
 [nginx-slack]:https://nginxcommunity.slack.com/channels/nginx-gateway-fabric
