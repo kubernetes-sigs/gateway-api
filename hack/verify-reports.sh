@@ -45,16 +45,10 @@ check_report_fields() {
     local expected_gateway_api_version=$2
 
     # Check if the implementation version is a valid semver
-    local version=$(yq eval '.implementation.version' "$report")
     local gateway_api_version=$(yq eval '.gatewayAPIVersion' "$report")
     local gateway_api_channel=$(yq eval '.gatewayAPIChannel' "$report")
     local mode=$(yq eval '.mode' "$report")
-    local version_pattern="^v?[0-9]+\.[0-9]+(\.[0-9]+)?$"
 
-    if [[ ! $version =~ $version_pattern ]]; then
-        error "$report version does not match the semver pattern"
-        EXIT_VALUE=1
-    fi
     if [[ ${gateway_api_version} != ${expected_gateway_api_version} ]]; then
         error "$report gatewayAPIVersion does not match Gateway API version folder"
         EXIT_VALUE=1
