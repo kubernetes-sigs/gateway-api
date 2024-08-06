@@ -20,12 +20,18 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"path"
 
 	"github.com/spf13/cobra"
+	"k8s.io/cli-runtime/pkg/genericclioptions"
+	"k8s.io/cli-runtime/pkg/genericiooptions"
 	"k8s.io/klog/v2"
 
-	"sigs.k8s.io/gateway-api/gwctl/pkg/utils"
+	cmdanalyze "sigs.k8s.io/gateway-api/gwctl/cmd/analyze"
+	cmdapply "sigs.k8s.io/gateway-api/gwctl/cmd/apply"
+	cmddelete "sigs.k8s.io/gateway-api/gwctl/cmd/delete"
+	cmdget "sigs.k8s.io/gateway-api/gwctl/cmd/get"
+	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
+	"sigs.k8s.io/gateway-api/gwctl/pkg/version"
 )
 
 func newRootCmd() *cobra.Command {
@@ -35,8 +41,8 @@ func newRootCmd() *cobra.Command {
 		Long:  `gwctl provides a familiar kubectl-like interface for navigating the Kubernetes Gateway API's multi-resource model, offering visibility into resource relationships and the policies that affect them.`,
 	}
 
-	var kubeConfigPath string
-	rootCmd.PersistentFlags().StringVar(&kubeConfigPath, "kubeconfig", "", "path to kubeconfig file (default is the KUBECONFIG environment variable and if it isn't set, falls back to $HOME/.kube/config)")
+	globalConfig := genericclioptions.NewConfigFlags(true)
+	globalConfig.AddFlags(rootCmd.PersistentFlags())
 
 	// Initialize flags for klog.
 	//
@@ -49,21 +55,19 @@ func newRootCmd() *cobra.Command {
 	klog.InitFlags(klogFlags)
 
 	cobra.OnInitialize(func() {
-		if kubeConfigPath == "" {
-			kubeConfigPath = os.Getenv("KUBECONFIG")
-			if kubeConfigPath == "" {
-				kubeConfigPath = path.Join(os.Getenv("HOME"), ".kube/config")
-			}
-		}
 		if err := klogFlags.Set("v", fmt.Sprintf("%v", verbosity)); err != nil {
 			fmt.Fprintf(os.Stderr, "Failed to configure verbosity for logging")
 		}
 	})
 
-	factory := utils.NewFactory(&kubeConfigPath)
-
-	rootCmd.AddCommand(NewSubCommand(factory, os.Stdout, commandNameGet))
-	rootCmd.AddCommand(NewSubCommand(factory, os.Stdout, commandNameDescribe))
+	ioStreams := genericiooptions.IOStreams{In: os.Stdin, Out: os.Stdout, ErrOut: os.Stderr}
+	factory := common.NewFactory(globalConfig)
+	rootCmd.AddCommand(cmdapply.NewCmd(factory, ioStreams))
+	rootCmd.AddCommand(cmdget.NewCmd(factory, ioStreams, false))
+	rootCmd.AddCommand(cmdget.NewCmd(factory, ioStreams, true))
+	rootCmd.AddCommand(cmddelete.NewCmd(factory, ioStreams))
+	rootCmd.AddCommand(cmdanalyze.NewCmd(factory, ioStreams))
+	rootCmd.AddCommand(newVersionCommand())
 
 	return rootCmd
 }
@@ -77,22 +81,14 @@ func Execute() {
 	}
 }
 
-func addNamespaceFlag(p *string, cmd *cobra.Command) {
-	cmd.Flags().StringVarP(p, "namespace", "n", "default", "")
-}
-
-func addAllNamespacesFlag(p *bool, cmd *cobra.Command) {
-	cmd.Flags().BoolVarP(p, "all-namespaces", "A", false, "If present, list requested resources from all namespaces.")
-}
-
-func addLabelSelectorFlag(p *string, cmd *cobra.Command) {
-	cmd.Flags().StringVarP(p, "selector", "l", "", "Selector (label query) to filter on, supports '=', '==', and '!='.(e.g. -l key1=value1,key2=value2). Matching objects must satisfy all of the specified label constraints.")
-}
-
-func addOutputFormatFlag(p *string, cmd *cobra.Command) {
-	cmd.Flags().StringVarP(p, "output", "o", "", `Output format. Must be one of (yaml, json)`)
-}
-
-func addForFlag(p *string, cmd *cobra.Command) {
-	cmd.Flags().StringVar(p, "for", "", `Filter results to only those related to the specified resource. Format: TYPE[/NAMESPACE]/NAME. Not specifying a NAMESPACE assumes the 'default' value. Examples: gateway/ns2/foo-gateway, httproute/bar-httproute, service/ns1/my-svc`)
+func newVersionCommand() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "version",
+		Short: "Print the version information of gwctl",
+		Long:  `Print the version information of gwctl, including version, git commit and build date.`,
+		Run: func(*cobra.Command, []string) {
+			fmt.Println(version.GetVersionInfo())
+		},
+	}
+	return cmd
 }

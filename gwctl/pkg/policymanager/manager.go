@@ -17,70 +17,92 @@ limitations under the License.
 package policymanager
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
+	"sort"
 	"strings"
 
-	"sigs.k8s.io/controller-runtime/pkg/client"
-
+	"golang.org/x/exp/maps"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	"k8s.io/client-go/dynamic"
 
 	gatewayv1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
 )
 
 type PolicyManager struct {
-	dc dynamic.Interface
+	Fetcher common.GroupKindFetcher
 
 	// policyCRDs maps a CRD name to the CRD object.
-	policyCRDs map[PolicyCrdID]PolicyCRD
+	policyCRDs map[PolicyCrdID]*PolicyCRD
 	// policies maps a policy name to the policy object.
-	policies map[string]Policy
+	policies map[common.GKNN]*Policy
 }
 
-func New(dc dynamic.Interface) *PolicyManager {
+func New(fetcher common.GroupKindFetcher) *PolicyManager {
 	return &PolicyManager{
-		dc:         dc,
-		policyCRDs: make(map[PolicyCrdID]PolicyCRD),
-		policies:   make(map[string]Policy),
+		Fetcher:    fetcher,
+		policyCRDs: make(map[PolicyCrdID]*PolicyCRD),
+		policies:   make(map[common.GKNN]*Policy),
 	}
 }
 
 // Init will construct a local cache of all Policy CRDs and Policy Resources.
-func (p *PolicyManager) Init(ctx context.Context) error {
-	allCRDs, err := fetchCRDs(ctx, p.dc)
+func (p *PolicyManager) Init() error {
+	err := p.initPolicyCRDs()
 	if err != nil {
 		return err
 	}
-	for _, crd := range allCRDs {
-		policyCRD := PolicyCRD{crd}
+
+	return p.initPolicies()
+}
+
+func (p *PolicyManager) initPolicyCRDs() error {
+	crdGK := schema.GroupKind{Group: apiextensionsv1.GroupName, Kind: "CustomResourceDefinition"}
+
+	allUnstructuredCRDs, err := p.Fetcher.Fetch(crdGK)
+	if err != nil {
+		return err
+	}
+	for _, uCRD := range allUnstructuredCRDs {
+		crd := &apiextensionsv1.CustomResourceDefinition{}
+		if err := runtime.DefaultUnstructuredConverter.FromUnstructured(uCRD.UnstructuredContent(), crd); err != nil {
+			panic(fmt.Sprintf("failed to convert unstructured CustomResourceDefinition to structured: %v", err))
+		}
+		policyCRD := &PolicyCRD{crd}
 		// Check if the CRD is a Gateway Policy CRD
 		if policyCRD.IsValid() {
 			p.policyCRDs[policyCRD.ID()] = policyCRD
 		}
 	}
 
-	allPolicies, err := fetchPolicies(ctx, p.dc, p.policyCRDs)
-	if err != nil {
-		return err
-	}
-	for _, unstrucutredPolicy := range allPolicies {
-		if err := p.AddPolicy(unstrucutredPolicy); err != nil {
-			return err
-		}
-	}
-
 	return nil
 }
 
-func (p *PolicyManager) PoliciesAttachedTo(objRef common.ObjRef) []Policy {
-	var result []Policy
+func (p *PolicyManager) initPolicies() error {
+	for _, policyCRD := range p.policyCRDs {
+		gk := schema.GroupKind{Group: policyCRD.CRD.Spec.Group, Kind: policyCRD.CRD.Spec.Names.Kind}
+		policies, err := p.Fetcher.Fetch(gk)
+		if err != nil {
+			return err
+		}
+
+		for _, unstrucutredPolicy := range policies {
+			policy, err := ConstructPolicy(unstrucutredPolicy, policyCRD.IsInheritable())
+			if err != nil {
+				return err
+			}
+			p.policies[policy.GKNN()] = &policy
+		}
+	}
+	return nil
+}
+
+func (p *PolicyManager) PoliciesAttachedTo(objRef common.GKNN) []*Policy {
+	var result []*Policy
 	for _, policy := range p.policies {
 		if policy.IsAttachedTo(objRef) {
 			result = append(result, policy)
@@ -89,146 +111,69 @@ func (p *PolicyManager) PoliciesAttachedTo(objRef common.ObjRef) []Policy {
 	return result
 }
 
-func (p *PolicyManager) GetCRDs() []PolicyCRD {
-	var result []PolicyCRD
-	for _, policyCRD := range p.policyCRDs {
-		result = append(result, policyCRD)
-	}
-	return result
+func (p *PolicyManager) GetCRDs() []*PolicyCRD {
+	return maps.Values(p.policyCRDs)
 }
 
-func (p *PolicyManager) GetCRD(name string) (PolicyCRD, bool) {
+func (p *PolicyManager) GetCRD(name string) (*PolicyCRD, bool) {
 	for _, policyCrd := range p.policyCRDs {
-		if name == policyCrd.CRD().Name {
+		if name == policyCrd.CRD.Name {
 			return policyCrd, true
 		}
 	}
 
-	return PolicyCRD{}, false
+	return nil, false
 }
 
-func (p *PolicyManager) GetPolicies() []Policy {
-	var result []Policy
-	for _, policy := range p.policies {
-		result = append(result, policy)
-	}
-	return result
-}
-
-func (p *PolicyManager) GetPolicy(namespacedName string) (Policy, bool) {
-	policy, ok := p.policies[namespacedName]
-	return policy, ok
-}
-
-func (p *PolicyManager) AddPolicy(unstrucutredPolicy unstructured.Unstructured) error {
-	policy, err := PolicyFromUnstructured(unstrucutredPolicy, p.policyCRDs)
-	if err != nil {
-		return err
-	}
-	p.policies[unstrucutredPolicy.GetNamespace()+"/"+unstrucutredPolicy.GetName()] = policy
-	return nil
-}
-
-// fetchCRDs will fetch all CRDs from the API Server
-func fetchCRDs(ctx context.Context, dc dynamic.Interface) ([]apiextensionsv1.CustomResourceDefinition, error) {
-	gvr := schema.GroupVersionResource{Group: "apiextensions.k8s.io", Version: "v1", Resource: "customresourcedefinitions"}
-	unstructuredCRDs, err := dc.Resource(gvr).List(ctx, metav1.ListOptions{})
-	if err != nil {
-		return []apiextensionsv1.CustomResourceDefinition{}, fmt.Errorf("failed to list CRDs: %v", err)
-	}
-
-	crds := &apiextensionsv1.CustomResourceDefinitionList{}
-	if err := runtime.DefaultUnstructuredConverter.FromUnstructured(unstructuredCRDs.UnstructuredContent(), crds); err != nil {
-		return []apiextensionsv1.CustomResourceDefinition{}, fmt.Errorf("failed to convert unstructured CRDs to structured: %v", err)
-	}
-
-	return crds.Items, nil
-}
-
-// fetchPolicies will fetch all policy resources corresponding to the CRDs
-// present in policyCRDs.
-func fetchPolicies(ctx context.Context, dc dynamic.Interface, policyCRDs map[PolicyCrdID]PolicyCRD) ([]unstructured.Unstructured, error) {
-	var result []unstructured.Unstructured
-
-	for _, policyCRD := range policyCRDs {
-		gvr := schema.GroupVersionResource{
-			Group:    policyCRD.crd.Spec.Group,
-			Version:  policyCRD.crd.Spec.Versions[0].Name,
-			Resource: policyCRD.crd.Spec.Names.Plural, // CRD Kinds directly map to the Resource.
-		}
-
-		var policies *unstructured.UnstructuredList
-		var err error
-		if policyCRD.IsClusterScoped() {
-			policies, err = dc.Resource(gvr).List(ctx, metav1.ListOptions{})
-		} else {
-			// For a namespace-scoped resource, fetch policies from ALL namespaces by
-			// passing an empty "" namespace.
-			policies, err = dc.Resource(gvr).Namespace("").List(ctx, metav1.ListOptions{})
-		}
-		if err != nil {
-			return result, err
-		}
-
-		result = append(result, policies.Items...)
-	}
-
-	return result, nil
+func (p *PolicyManager) GetPolicies() []*Policy {
+	return maps.Values(p.policies)
 }
 
 // PolicyCrdID has the structurued "<CRD Kind>.<CRD Group>"
 type PolicyCrdID string
 
 type PolicyCRD struct {
-	crd apiextensionsv1.CustomResourceDefinition
+	CRD *apiextensionsv1.CustomResourceDefinition
 }
-
-func (p PolicyCRD) ClientObject() client.Object { return p.CRD() }
 
 // ID returns a unique identifier for this PolicyCRD.
 func (p PolicyCRD) ID() PolicyCrdID {
-	return PolicyCrdID(p.crd.Spec.Names.Kind + "." + p.crd.Spec.Group)
+	return PolicyCrdID(p.CRD.Spec.Names.Kind + "." + p.CRD.Spec.Group)
 }
 
 // IsValid return true if the PolicyCRD satisfies requirements for qualifying as
 // a Gateway Policy CRD.
 func (p PolicyCRD) IsValid() bool {
-	return p.IsInherited() || p.IsDirect() || p.crd.GetLabels()[gatewayv1alpha2.PolicyLabelKey] == "true"
+	return p.IsInheritable() || p.IsDirect() || p.CRD.GetLabels()[gatewayv1alpha2.PolicyLabelKey] == "true"
 }
 
-func (p PolicyCRD) IsInherited() bool {
-	return strings.ToLower(p.crd.GetLabels()[gatewayv1alpha2.PolicyLabelKey]) == "inherited"
+func (p PolicyCRD) IsInheritable() bool {
+	return strings.ToLower(p.CRD.GetLabels()[gatewayv1alpha2.PolicyLabelKey]) == "inherited"
 }
 
 func (p PolicyCRD) IsDirect() bool {
-	return strings.ToLower(p.crd.GetLabels()[gatewayv1alpha2.PolicyLabelKey]) == "direct"
-}
-
-func (p PolicyCRD) CRD() *apiextensionsv1.CustomResourceDefinition {
-	return p.crd.DeepCopy()
+	return strings.ToLower(p.CRD.GetLabels()[gatewayv1alpha2.PolicyLabelKey]) == "direct"
 }
 
 // IsClusterScoped returns true if the CRD is cluster scoped. Such policies can
 // be used to target a cluster scoped resource like GatewayClass.
 func (p PolicyCRD) IsClusterScoped() bool {
-	return p.crd.Spec.Scope == apiextensionsv1.ClusterScoped
+	return p.CRD.Spec.Scope == apiextensionsv1.ClusterScoped
 }
 
 type Policy struct {
-	u unstructured.Unstructured
-	// targetRef references the target object this policy is attached to. This
+	Unstructured *unstructured.Unstructured
+	// TargetRefs references the target objects this policy is attached to. This
 	// only makes sense in case of a directly-attached-policy, or an
 	// unmerged-inherited-policy.
-	targetRef common.ObjRef
+	TargetRef common.GKNN
 	// Indicates whether the policy is supposed to be "inherited" (as opposed to
 	// "direct").
-	inherited bool
+	Inheritable bool
 }
 
-func (p Policy) ClientObject() client.Object { return p.Unstructured() }
-
-func PolicyFromUnstructured(u unstructured.Unstructured, policyCRDs map[PolicyCrdID]PolicyCRD) (Policy, error) {
-	result := Policy{u: u}
+func ConstructPolicy(u *unstructured.Unstructured, inherited bool) (Policy, error) {
+	result := Policy{Unstructured: u}
 
 	// Identify targetRef of Policy.
 	type genericPolicy struct {
@@ -242,81 +187,73 @@ func PolicyFromUnstructured(u unstructured.Unstructured, policyCRDs map[PolicyCr
 	if err := runtime.DefaultUnstructuredConverter.FromUnstructured(u.UnstructuredContent(), structuredPolicy); err != nil {
 		return Policy{}, fmt.Errorf("failed to convert unstructured policy resource to structured: %v", err)
 	}
-	result.targetRef = common.ObjRef{
+	result.TargetRef = common.GKNN{
 		Group:     string(structuredPolicy.Spec.TargetRef.Group),
 		Kind:      string(structuredPolicy.Spec.TargetRef.Kind),
-		Name:      string(structuredPolicy.Spec.TargetRef.Name),
 		Namespace: structuredPolicy.GetNamespace(),
+		Name:      string(structuredPolicy.Spec.TargetRef.Name),
 	}
-	if result.targetRef.Namespace == "" {
-		result.targetRef.Namespace = result.u.GetNamespace()
+	if result.TargetRef.Namespace == "" {
+		result.TargetRef.Namespace = result.Unstructured.GetNamespace()
 	}
 	if structuredPolicy.Spec.TargetRef.Namespace != nil {
-		result.targetRef.Namespace = string(*structuredPolicy.Spec.TargetRef.Namespace)
+		result.TargetRef.Namespace = string(*structuredPolicy.Spec.TargetRef.Namespace)
 	}
 
-	// Get the CRD corresponding to this policy object.
-	policyCRD, ok := policyCRDs[result.PolicyCrdID()]
-	if !ok {
-		return Policy{}, fmt.Errorf("unable to find CRD corresponding to policy object")
-	}
-	result.inherited = policyCRD.IsInherited()
+	result.Inheritable = inherited
 
 	return result, nil
 }
 
-func (p Policy) Name() string {
-	return fmt.Sprintf("%v/%v/%v", p.PolicyCrdID(), p.u.GetNamespace(), p.u.GetName())
+func (p Policy) GKNN() common.GKNN {
+	return common.GKNN{
+		Group:     p.Unstructured.GroupVersionKind().Group,
+		Kind:      p.Unstructured.GroupVersionKind().Kind,
+		Namespace: p.Unstructured.GetNamespace(),
+		Name:      p.Unstructured.GetName(),
+	}
 }
 
 // PolicyCrdID returns a unique identifier for the CRD of this policy.
 func (p Policy) PolicyCrdID() PolicyCrdID {
-	return PolicyCrdID(p.u.GetObjectKind().GroupVersionKind().Kind + "." + p.u.GetObjectKind().GroupVersionKind().Group)
+	return PolicyCrdID(p.Unstructured.GetObjectKind().GroupVersionKind().Kind + "." + p.Unstructured.GetObjectKind().GroupVersionKind().Group)
 }
 
-func (p Policy) TargetRef() common.ObjRef {
-	return p.targetRef
-}
-
-func (p Policy) IsInherited() bool {
-	return p.inherited
+func (p Policy) IsInheritable() bool {
+	return p.Inheritable
 }
 
 func (p Policy) IsDirect() bool {
-	return !p.inherited
+	return !p.Inheritable
 }
 
-func (p Policy) IsAttachedTo(objRef common.ObjRef) bool {
-	if p.targetRef.Kind == "Namespace" && p.targetRef.Name == "" {
-		p.targetRef.Name = "default"
+func (p Policy) IsAttachedTo(objRef common.GKNN) bool {
+	if p.TargetRef.Kind == "Namespace" && p.TargetRef.Name == "" {
+		p.TargetRef.Name = "default"
 	}
 	if objRef.Kind == "Namespace" && objRef.Name == "" {
 		objRef.Name = "default"
 	}
-	if p.targetRef.Kind != "Namespace" && p.targetRef.Namespace == "" {
-		p.targetRef.Namespace = "default"
+	if p.TargetRef.Kind != "Namespace" && p.TargetRef.Namespace == "" {
+		p.TargetRef.Namespace = "default"
 	}
 	if objRef.Kind != "Namespace" && objRef.Namespace == "" {
 		objRef.Namespace = "default"
 	}
-	return p.targetRef == objRef
+	return p.TargetRef == objRef
 }
 
-func (p Policy) Unstructured() *unstructured.Unstructured {
-	return &p.u
-}
-
-func (p Policy) DeepCopy() Policy {
-	clone := Policy{
-		u:         *p.u.DeepCopy(),
-		targetRef: p.targetRef,
-		inherited: p.inherited,
+func (p Policy) DeepCopy() *Policy {
+	clone := &Policy{
+		Unstructured: p.Unstructured.DeepCopy(),
+		TargetRef:    p.TargetRef,
+		Inheritable:  p.Inheritable,
 	}
 	return clone
 }
 
 func (p Policy) Spec() map[string]interface{} {
-	spec, ok, err := unstructured.NestedFieldCopy(p.u.UnstructuredContent(), "spec")
+	spec, ok, err := unstructured.NestedFieldCopy(p.Unstructured.UnstructuredContent(), "spec")
 	if err != nil || !ok {
 		return nil
 	}
@@ -329,7 +266,7 @@ func (p Policy) Spec() map[string]interface{} {
 }
 
 func (p Policy) EffectiveSpec() (map[string]interface{}, error) {
-	if !p.IsInherited() {
+	if !p.IsInheritable() {
 		// No merging is required in case of Direct policies.
 		result := p.Spec()
 		delete(result, "targetRef")
@@ -365,10 +302,20 @@ func (p Policy) EffectiveSpec() (map[string]interface{}, error) {
 	return result, nil
 }
 
-func (p Policy) MarshalJSON() ([]byte, error) {
+func (p *Policy) MarshalJSON() ([]byte, error) {
 	effectiveSpec, err := p.EffectiveSpec()
 	if err != nil {
 		return nil, err
 	}
 	return json.Marshal(effectiveSpec)
+}
+
+func ConvertPoliciesMapToSlice(policies map[common.GKNN]*Policy) []*Policy {
+	result := maps.Values(policies)
+	sort.Slice(result, func(i, j int) bool {
+		a := fmt.Sprintf("%v/%v/%v", result[i].PolicyCrdID(), result[i].Unstructured.GetNamespace(), result[i].Unstructured.GetName())
+		b := fmt.Sprintf("%v/%v/%v", result[j].PolicyCrdID(), result[j].Unstructured.GetNamespace(), result[j].Unstructured.GetName())
+		return a < b
+	})
+	return result
 }

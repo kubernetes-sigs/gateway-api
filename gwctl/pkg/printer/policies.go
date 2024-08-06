@@ -19,230 +19,168 @@ package printer
 import (
 	"fmt"
 	"io"
-	"os"
-	"sort"
 
-	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/duration"
-	"k8s.io/utils/clock"
-	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/yaml"
+	"k8s.io/klog/v2"
 
+	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
-	"sigs.k8s.io/gateway-api/gwctl/pkg/utils"
+	"sigs.k8s.io/gateway-api/gwctl/pkg/topology"
 )
 
-type PoliciesPrinter struct {
-	io.Writer
-	Clock clock.Clock
+func (p *TablePrinter) printPolicy(policyNode *topology.Node, w io.Writer) error {
+	if err := p.checkTypeChange("Policy", w); err != nil {
+		return err
+	}
+
+	if p.table == nil {
+		p.table = &Table{
+			ColumnNames:  []string{"NAME", "KIND", "TARGET NAME", "TARGET KIND", "POLICY TYPE", "AGE"},
+			UseSeparator: false,
+		}
+	}
+
+	var err error
+	var policy *policymanager.Policy
+	if policy, err = accessPolicyOrCRD[policymanager.Policy](policyNode, common.PolicyGK); err != nil {
+		return err
+	}
+
+	policyType := "Direct"
+	if policy.IsInheritable() {
+		policyType = "Inherited"
+	}
+
+	kind := fmt.Sprintf("%v.%v", policy.Unstructured.GroupVersionKind().Kind, policy.Unstructured.GroupVersionKind().Group)
+
+	age := "<unknown>"
+	creationTimestamp := policy.Unstructured.GetCreationTimestamp()
+	if !creationTimestamp.IsZero() {
+		age = duration.HumanDuration(p.Clock.Since(creationTimestamp.Time))
+	}
+
+	row := []string{
+		policy.Unstructured.GetName(),
+		kind,
+		policy.TargetRef.Name,
+		policy.TargetRef.Kind,
+		policyType,
+		age,
+	}
+	p.table.Rows = append(p.table.Rows, row)
+
+	return nil
 }
 
-func (pp *PoliciesPrinter) printClientObjects(objects []client.Object, format utils.OutputFormat) {
-	printablePayload, err := renderPrintableObject(objects)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "failed to render the printable objects %v\n", err)
-		os.Exit(1)
+func (p *TablePrinter) printPolicyCRD(policyCRDNode *topology.Node, w io.Writer) error {
+	if err := p.checkTypeChange("Policy", w); err != nil {
+		return err
 	}
-	output, err := utils.MarshalWithFormat(printablePayload, format)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "failed to marshal the object %v\n", err)
-		os.Exit(1)
+
+	if p.table == nil {
+		p.table = &Table{
+			ColumnNames:  []string{"NAME", "POLICY TYPE", "SCOPE", "AGE"},
+			UseSeparator: false,
+		}
 	}
-	fmt.Fprint(pp, string(output))
+
+	var err error
+	var policyCRD *policymanager.PolicyCRD
+	if policyCRD, err = accessPolicyOrCRD[policymanager.PolicyCRD](policyCRDNode, common.PolicyCRDGK); err != nil {
+		return err
+	}
+
+	policyType := "Direct"
+	if policyCRD.IsInheritable() {
+		policyType = "Inherited"
+	}
+
+	age := "<unknown>"
+	creationTimestamp := policyCRD.CRD.GetCreationTimestamp()
+	if !creationTimestamp.IsZero() {
+		age = duration.HumanDuration(p.Clock.Since(creationTimestamp.Time))
+	}
+
+	row := []string{
+		policyCRD.CRD.Name,
+		policyType,
+		string(policyCRD.CRD.Spec.Scope),
+		age,
+	}
+	p.table.Rows = append(p.table.Rows, row)
+	return nil
 }
 
-func (pp *PoliciesPrinter) printPoliciesTable(sortedPoliciesList []policymanager.Policy) {
-	table := &Table{
-		ColumnNames:  []string{"NAME", "KIND", "TARGET NAME", "TARGET KIND", "POLICY TYPE", "AGE"},
-		UseSeparator: false,
+func (p *DescriptionPrinter) printPolicy(policyNode *topology.Node, w io.Writer) error {
+	if p.printSeparator {
+		fmt.Fprintf(w, "\n\n")
+	}
+	p.printSeparator = true
+
+	var err error
+	var policy *policymanager.Policy
+	if policy, err = accessPolicyOrCRD[policymanager.Policy](policyNode, common.PolicyGK); err != nil {
+		return err
 	}
 
-	for _, policy := range sortedPoliciesList {
-		policyType := "Direct"
-		if policy.IsInherited() {
-			policyType = "Inherited"
-		}
-
-		kind := fmt.Sprintf("%v.%v", policy.Unstructured().GroupVersionKind().Kind, policy.Unstructured().GroupVersionKind().Group)
-
-		age := duration.HumanDuration(pp.Clock.Since(policy.Unstructured().GetCreationTimestamp().Time))
-
-		row := []string{
-			policy.Unstructured().GetName(),
-			kind,
-			policy.TargetRef().Name,
-			policy.TargetRef().Kind,
-			policyType,
-			age,
-		}
-		table.Rows = append(table.Rows, row)
+	pairs := []*DescriberKV{
+		{Key: "Name", Value: policy.Unstructured.GetName()},
+		{Key: "Namespace", Value: policy.Unstructured.GetNamespace()},
+		{Key: "Group", Value: policy.Unstructured.GroupVersionKind().Group},
+		{Key: "Kind", Value: policy.Unstructured.GroupVersionKind().Kind},
+		{Key: "Inherited", Value: fmt.Sprintf("%v", policy.IsInheritable())},
+		{Key: "Spec", Value: policy.Spec()},
 	}
-	table.Write(pp, 0)
+
+	Describe(w, pairs)
+	return nil
 }
 
-func (pp *PoliciesPrinter) PrintPolicies(policies []policymanager.Policy, format utils.OutputFormat) {
-	sortedPolicies := SortByString(policies)
-	clientObjects := ClientObjects(sortedPolicies)
-
-	switch format {
-	case utils.OutputFormatJSON, utils.OutputFormatYAML:
-		pp.printClientObjects(clientObjects, format)
-	case utils.OutputFormatTable, utils.OutputFormatWide:
-		pp.printPoliciesTable(sortedPolicies)
-	default:
-		fmt.Fprintf(os.Stderr, "unknown output format '%s' found\n", format)
-		os.Exit(1)
+func (p *DescriptionPrinter) printPolicyCRD(policyCRDNode *topology.Node, w io.Writer) error {
+	if p.printSeparator {
+		fmt.Fprintf(w, "\n\n")
 	}
-}
+	p.printSeparator = true
 
-func (pp *PoliciesPrinter) printCRDsTable(sortedPolicyCRDsList []policymanager.PolicyCRD) {
-	table := &Table{
-		ColumnNames:  []string{"NAME", "POLICY TYPE", "SCOPE", "AGE"},
-		UseSeparator: false,
+	var err error
+	var policyCRD *policymanager.PolicyCRD
+	if policyCRD, err = accessPolicyOrCRD[policymanager.PolicyCRD](policyCRDNode, common.PolicyCRDGK); err != nil {
+		return err
 	}
 
-	for _, policyCRD := range sortedPolicyCRDsList {
-		policyType := "Direct"
-		if policyCRD.IsInherited() {
-			policyType = "Inherited"
-		}
+	crd := policyCRD.CRD
 
-		age := duration.HumanDuration(pp.Clock.Since(policyCRD.CRD().GetCreationTimestamp().Time))
+	metadata := crd.ObjectMeta.DeepCopy()
+	metadata.Labels = nil
+	metadata.Annotations = nil
+	metadata.Name = ""
+	metadata.Namespace = ""
 
-		row := []string{
-			policyCRD.CRD().Name,
-			policyType,
-			string(policyCRD.CRD().Spec.Scope),
-			age,
-		}
-		table.Rows = append(table.Rows, row)
+	pairs := []*DescriberKV{
+		{Key: "Name", Value: crd.Name},
+		{Key: "Namespace", Value: crd.Namespace},
+		{Key: "APIVersion", Value: crd.APIVersion},
+		{Key: "Kind", Value: crd.Kind},
+		{Key: "Labels", Value: crd.Labels},
+		{Key: "Annotations", Value: crd.Annotations},
+		{Key: "Metadata", Value: metadata},
+		{Key: "Spec", Value: crd.Spec},
+		{Key: "Status", Value: crd.Status},
 	}
-
-	table.Write(pp, 0)
+	Describe(w, pairs)
+	return nil
 }
 
-func (pp *PoliciesPrinter) PrintCRDs(policyCRDs []policymanager.PolicyCRD, format utils.OutputFormat) {
-	sortedPolicyCRDs := SortByString(policyCRDs)
-	clientObjects := ClientObjects(sortedPolicyCRDs)
-
-	switch format {
-	case utils.OutputFormatJSON, utils.OutputFormatYAML:
-		pp.printClientObjects(clientObjects, format)
-	case utils.OutputFormatTable, utils.OutputFormatWide:
-		pp.printCRDsTable(sortedPolicyCRDs)
-	default:
-		fmt.Fprintf(os.Stderr, "unknown output format '%s' found\n", format)
-		os.Exit(1)
+func accessPolicyOrCRD[T any](node *topology.Node, gk schema.GroupKind) (*T, error) {
+	rawData, ok := node.Metadata[gk.String()]
+	if !ok || rawData == nil {
+		klog.V(3).InfoS(fmt.Sprintf("no %v found in node", gk.String()), "node", node.GKNN())
+		return nil, nil
 	}
-}
-
-type policyDescribeView struct {
-	Name      string                 `json:",omitempty"`
-	Namespace string                 `json:",omitempty"`
-	Group     string                 `json:",omitempty"`
-	Kind      string                 `json:",omitempty"`
-	Inherited string                 `json:",omitempty"`
-	Spec      map[string]interface{} `json:",omitempty"`
-}
-
-func (pp *PoliciesPrinter) PrintPoliciesDescribeView(policies []policymanager.Policy) {
-	for i, policy := range SortByString(policies) {
-		views := []policyDescribeView{
-			{
-				Name:      policy.Unstructured().GetName(),
-				Namespace: policy.Unstructured().GetNamespace(),
-			},
-			{
-				Group: policy.Unstructured().GroupVersionKind().Group,
-				Kind:  policy.Unstructured().GroupVersionKind().Kind,
-			},
-			{
-				Inherited: fmt.Sprintf("%v", policy.IsInherited()),
-			},
-			{
-				Spec: policy.Spec(),
-			},
-		}
-
-		for _, view := range views {
-			b, err := yaml.Marshal(view)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "failed to marshal to yaml: %v\n", err)
-				os.Exit(1)
-			}
-			fmt.Fprint(pp, string(b))
-		}
-
-		if i+1 != len(policies) {
-			fmt.Fprintf(pp, "\n\n")
-		}
+	data, ok := rawData.(*T)
+	if !ok {
+		return nil, fmt.Errorf("unable to perform type assertion to %v in node %v", gk.String(), node.GKNN())
 	}
-}
-
-type policyCrdDescribeView struct {
-	Name        string                                          `json:",omitempty"`
-	Namespace   string                                          `json:",omitempty"`
-	APIVersion  string                                          `json:",omitempty"`
-	Kind        string                                          `json:",omitempty"`
-	Labels      map[string]string                               `json:",omitempty"`
-	Annotations map[string]string                               `json:",omitempty"`
-	Metadata    *metav1.ObjectMeta                              `json:",omitempty"`
-	Spec        *apiextensionsv1.CustomResourceDefinitionSpec   `json:",omitempty"`
-	Status      *apiextensionsv1.CustomResourceDefinitionStatus `json:",omitempty"`
-}
-
-func (pp *PoliciesPrinter) PrintPolicyCRDsDescribeView(policyCrds []policymanager.PolicyCRD) {
-	sort.Slice(policyCrds, func(i, j int) bool {
-		a := fmt.Sprintf("%v/%v", policyCrds[i].CRD().GetNamespace(), policyCrds[i].CRD().GetName())
-		b := fmt.Sprintf("%v/%v", policyCrds[j].CRD().GetNamespace(), policyCrds[j].CRD().GetName())
-		return a < b
-	})
-
-	for i, policyCrd := range policyCrds {
-		crd := policyCrd.CRD()
-
-		metadata := crd.ObjectMeta.DeepCopy()
-		metadata.Labels = nil
-		metadata.Annotations = nil
-		metadata.Name = ""
-		metadata.Namespace = ""
-
-		views := []policyCrdDescribeView{
-			{
-				Name:      crd.Name,
-				Namespace: crd.Namespace,
-			},
-			{
-				APIVersion: crd.APIVersion,
-				Kind:       crd.Kind,
-			},
-			{
-				Labels:      crd.Labels,
-				Annotations: crd.Annotations,
-			},
-			{
-				Metadata: metadata,
-			},
-			{
-				Spec: &crd.Spec,
-			},
-			{
-				Status: &crd.Status,
-			},
-		}
-
-		for _, view := range views {
-			b, err := yaml.Marshal(view)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "failed to marshal to yaml: %v\n", err)
-				os.Exit(1)
-			}
-			fmt.Fprint(pp, string(b))
-		}
-
-		if i+1 != len(policyCrds) {
-			fmt.Fprintf(pp, "\n\n")
-		}
-	}
+	return data, nil
 }

@@ -14,20 +14,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package resourcediscovery
+package topology
 
 import (
-	"flag"
-	"os"
-	"testing"
-
-	"k8s.io/klog/v2"
+	"sort"
 )
 
-func TestMain(m *testing.M) {
-	fs := flag.NewFlagSet("mock-flags", flag.PanicOnError)
-	klog.InitFlags(fs)
-	fs.Set("v", "3") // Set klog verbosity.
-
-	os.Exit(m.Run())
+func SortedNodes(nodes []*Node) []*Node {
+	sort.Slice(nodes, func(i, j int) bool {
+		a := nodes[i].GKNN().String()
+		b := nodes[j].GKNN().String()
+		return a < b
+	})
+	return nodes
 }

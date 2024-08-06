@@ -1,0 +1,361 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ns2
+---
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: GatewayClass
+metadata:
+  name: foo-com-external-gateway-class
+spec:
+  controllerName: foo.com/external-gateway-class
+  description: Create an external load balancer
+---
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: GatewayClass
+metadata:
+  name: bar-com-internal-gateway-class
+spec:
+  controllerName: bar.baz/internal-gateway-class
+  description: Create an internal load balancer
+---
+kind: Gateway
+apiVersion: gateway.networking.k8s.io/v1beta1
+metadata:
+  name: demo-gateway-1
+  namespace: default
+spec:
+  gatewayClassName: foo-com-external-gateway-class
+  listeners:
+  - name: http
+    protocol: HTTP
+    port: 80
+---
+kind: Gateway
+apiVersion: gateway.networking.k8s.io/v1beta1
+metadata:
+  name: demo-gateway-2
+  namespace: ns2
+spec:
+  gatewayClassName: bar-com-internal-gateway-class
+  listeners:
+  - name: http
+    protocol: HTTP
+    port: 80
+---
+kind: HTTPRoute
+apiVersion: gateway.networking.k8s.io/v1beta1
+metadata:
+  name: demo-httproute-1
+spec:
+  parentRefs:
+  - kind: Gateway
+    name: demo-gateway-1
+  hostnames:
+  - "demo.com"
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /example
+    backendRefs:
+    - name: demo-svc
+      port: 80
+---
+kind: HTTPRoute
+apiVersion: gateway.networking.k8s.io/v1beta1
+metadata:
+  name: demo-httproute-2
+  namespace: default
+spec:
+  parentRefs:
+  - kind: Gateway
+    name: demo-gateway-1
+  hostnames:
+  - "example.com"
+  - "example2.com"
+  - "example3.com"
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /example
+    backendRefs:
+    - name: demo-svc
+      port: 80
+---
+kind: HTTPRoute
+apiVersion: gateway.networking.k8s.io/v1beta1
+metadata:
+  name: demo-httproute-3
+  namespace: default
+spec:
+  parentRefs:
+  - kind: Gateway
+    name: demo-gateway-1
+  hostnames:
+  - "demo.com"
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /example
+    backendRefs:
+    - name: demo-svc
+      port: 80
+---
+kind: HTTPRoute
+apiVersion: gateway.networking.k8s.io/v1beta1
+metadata:
+  name: demo-httproute-3
+  namespace: ns2
+spec:
+  parentRefs:
+  - kind: Gateway
+    name: demo-gateway-2
+  hostnames:
+  - "example.com"
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /example
+    backendRefs:
+    - name: demo-svc
+      namespace: default
+      port: 80
+---
+kind: HTTPRoute
+apiVersion: gateway.networking.k8s.io/v1beta1
+metadata:
+  name: demo-httproute-4
+  namespace: ns2
+spec:
+  parentRefs:
+  - kind: Gateway
+    name: demo-gateway-1
+    namespace: default
+  hostnames:
+  - "demo.com"
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /example
+    backendRefs:
+    - name: demo-svc
+      port: 80
+---
+apiVersion: bar.com/v1
+kind: TimeoutPolicy
+metadata:
+  name: demo-timeout-policy-on-gatewayclass
+spec:
+  targetRef:
+    group: "gateway.networking.k8s.io"
+    kind: GatewayClass
+    name: foo-com-external-gateway-class
+  override:
+    timeout1: "parent"
+    timeout3: "parent"
+  default:
+    timeout1: "parent"
+    timeout4: "parent"
+---
+apiVersion: bar.com/v1
+kind: TimeoutPolicy
+metadata:
+  name: demo-timeout-policy-on-namespace
+spec:
+  targetRef:
+    group: ""
+    kind: Namespace
+    name: default
+  override:
+    timeout1: "child"
+    timeout2: "child"
+    timeout3: "child"
+  default:
+    timeout4: "child"
+---
+apiVersion: foo.com/v1
+kind: RetryOnPolicy
+metadata:
+  name: demo-retry-policy-1
+  namespace: default
+spec:
+  targetRef:
+    group: "gateway.networking.k8s.io"
+    kind: Gateway
+    name: demo-gateway-1
+  sampleParentField:
+    sampleField: "namaste"
+---
+apiVersion: baz.com/v1
+kind: TLSMinimumVersionPolicy
+metadata:
+  name: demo-tls-min-version-policy-1
+  namespace: default
+spec:
+  targetRef:
+    group: "gateway.networking.k8s.io"
+    kind: HTTPRoute
+    name: demo-httproute-1
+---
+apiVersion: foo.com/v1
+kind: RetryOnPolicy
+metadata:
+  name: demo-retry-policy-2
+  namespace: default
+spec:
+  targetRef:
+    group: "gateway.networking.k8s.io"
+    kind: HTTPRoute
+    name: demo-httproute-2
+  sampleParentField:
+    sampleField: "hey"
+---
+apiVersion: foo.com/v1
+kind: HealthCheckPolicy
+metadata:
+  name: demo-health-check-1
+  namespace: default
+spec:
+  targetRef:
+    group: "gateway.networking.k8s.io"
+    kind: Gateway
+    name: demo-gateway-1
+  sampleParentField:
+    sampleField: "hello"
+---
+apiVersion: baz.com/v1
+kind: TLSMinimumVersionPolicy
+metadata:
+  name: demo-tls-min-version-policy-2
+  namespace: ns2
+spec:
+  targetRef:
+    group: "gateway.networking.k8s.io"
+    kind: Gateway
+    name: demo-gateway-2
+  sampleParentField:
+    sampleField: "whatsup"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: demo-svc
+spec:
+  type: ClusterIP
+  selector:
+    app: demo-app
+  ports:
+  - name: tcp
+    port: 80
+    protocol: TCP
+    targetPort: echo-port
+---
+apiVersion: baz.com/v1
+kind: TLSMinimumVersionPolicy
+metadata:
+  name: demo-tls-min-version-policy-3
+  namespace: default
+spec:
+  targetRef:
+    group: ""
+    kind: Service
+    name: demo-svc
+  sampleParentField:
+    sampleField: "this-is-for-Service"
+---
+kind: HTTPRoute
+apiVersion: gateway.networking.k8s.io/v1beta1
+metadata:
+  name: httproute-with-x-ns-backend
+  namespace: ns2
+spec:
+  parentRefs:
+  - kind: Gateway
+    name: demo-gateway-1
+  hostnames:
+  - "demo.com"
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /example
+    backendRefs:
+    - name: demo-svc
+      namespace: default
+      port: 80
+---
+kind: ReferenceGrant
+apiVersion: gateway.networking.k8s.io/v1beta1
+metadata:
+  name: my-reference-grant
+  namespace: default
+spec:
+  from:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    namespace: ns2
+  to:
+  - group: ""
+    kind: Service
+---
+apiVersion: gateway.networking.k8s.io/v1alpha3
+kind: BackendTLSPolicy
+metadata:
+  name: tls-upstream-dev
+spec:
+  targetRefs:
+  - kind: Service
+    name: dev-service
+    group: ""
+  validation:
+    wellKnownCACertificates: "System"
+    hostname: dev.example.com
+---
+################################################################################
+# Pods
+################################################################################
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-pod-1
+  namespace: default
+spec:
+  containers:
+  - name: pause
+    image: registry.k8s.io/pause:latest
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-pod-2
+  namespace: default
+spec:
+  containers:
+  - name: pause
+    image: registry.k8s.io/pause:latest
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-pod-1
+  namespace: default
+spec:
+  containers:
+  - name: pause
+    image: registry.k8s.io/pause:latest
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-pod-3
+  namespace: ns2
+spec:
+  containers:
+  - name: pause
+    image: registry.k8s.io/pause:latest
+---

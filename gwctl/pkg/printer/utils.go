@@ -17,21 +17,24 @@ limitations under the License.
 package printer
 
 import (
-	"context"
 	"fmt"
 	"io"
 	"os"
-	"sort"
 	"strings"
 	"text/tabwriter"
 
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/duration"
+	"k8s.io/client-go/kubernetes/scheme"
+	"k8s.io/klog/v2"
 	"k8s.io/utils/clock"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/yaml"
 
-	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
+	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
+	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
 )
 
 // DescriberKV stores key-value pairs that are used with Describing a resource.
@@ -55,7 +58,7 @@ func Describe(w io.Writer, pairs []*DescriberKV) {
 				fmt.Fprintf(w, "%v: <none>\n", pair.Key)
 			} else {
 				fmt.Fprintf(w, "%v:\n", pair.Key)
-				table.Write(w, defaultDescribeTableIndentSpaces)
+				_ = table.Write(w, defaultDescribeTableIndentSpaces)
 			}
 			continue
 		}
@@ -81,7 +84,7 @@ type Table struct {
 
 // Write will write a formatted table to the writer. indent controls the
 // number of spaces at the beginning of each row.
-func (t *Table) Write(w io.Writer, indent int) {
+func (t *Table) Write(w io.Writer, indent int) error {
 	tw := tabwriter.NewWriter(w, 0, 0, 2, ' ', 0)
 
 	// Print column names.
@@ -89,8 +92,7 @@ func (t *Table) Write(w io.Writer, indent int) {
 		row := t.indentRow(t.ColumnNames, indent)
 		_, err := tw.Write([]byte(strings.Join(row, "\t") + "\n"))
 		if err != nil {
-			fmt.Fprint(os.Stderr, err)
-			os.Exit(1)
+			return err
 		}
 	}
 
@@ -103,8 +105,7 @@ func (t *Table) Write(w io.Writer, indent int) {
 		row = t.indentRow(row, indent)
 		_, err := tw.Write([]byte(strings.Join(row, "\t") + "\n"))
 		if err != nil {
-			fmt.Fprint(os.Stderr, err)
-			os.Exit(1)
+			return err
 		}
 	}
 
@@ -113,11 +114,10 @@ func (t *Table) Write(w io.Writer, indent int) {
 		row = t.indentRow(row, indent)
 		_, err := tw.Write([]byte(strings.Join(row, "\t") + "\n"))
 		if err != nil {
-			fmt.Fprint(os.Stderr, err)
-			os.Exit(1)
+			return err
 		}
 	}
-	tw.Flush()
+	return tw.Flush()
 }
 
 // indentRow will add 'indent' spaces to the beginning of the row.
@@ -131,7 +131,7 @@ func (t *Table) indentRow(row []string, indent int) []string {
 	return newRow
 }
 
-func convertEventsSliceToTable(events []corev1.Event, clock clock.Clock) *Table {
+func convertEventsSliceToTable(events []*corev1.Event, clock clock.Clock) *Table {
 	table := &Table{
 		ColumnNames:  []string{"Type", "Reason", "Age", "From", "Message"},
 		UseSeparator: true,
@@ -154,7 +154,7 @@ func convertEventsSliceToTable(events []corev1.Event, clock clock.Clock) *Table 
 	return table
 }
 
-func convertPoliciesToRefsTable(policies []*resourcediscovery.PolicyNode, includeTarget bool) *Table {
+func convertPoliciesToRefsTable(policies []*policymanager.Policy, includeTarget bool) *Table {
 	table := &Table{
 		ColumnNames:  []string{"Type", "Name"},
 		UseSeparator: true,
@@ -163,18 +163,18 @@ func convertPoliciesToRefsTable(policies []*resourcediscovery.PolicyNode, includ
 		table.ColumnNames = append(table.ColumnNames, "Target Kind", "Target Name")
 	}
 
-	for _, policyNode := range policies {
-		policyType := fmt.Sprintf("%v.%v", policyNode.Policy.Unstructured().GroupVersionKind().Kind, policyNode.Policy.Unstructured().GroupVersionKind().Group)
+	for _, policy := range policies {
+		policyType := fmt.Sprintf("%v.%v", policy.Unstructured.GroupVersionKind().Kind, policy.Unstructured.GroupVersionKind().Group)
 
-		policyName := policyNode.Policy.Unstructured().GetName()
-		if ns := policyNode.Policy.Unstructured().GetNamespace(); ns != "" {
+		policyName := policy.Unstructured.GetName()
+		if ns := policy.Unstructured.GetNamespace(); ns != "" {
 			policyName = fmt.Sprintf("%v/%v", ns, policyName)
 		}
 
-		targetKind := policyNode.Policy.TargetRef().Kind
+		targetKind := policy.TargetRef.Kind
 
-		targetName := policyNode.Policy.TargetRef().Name
-		if ns := policyNode.Policy.TargetRef().Namespace; ns != "" {
+		targetName := policy.TargetRef.Name
+		if ns := policy.TargetRef.Namespace; ns != "" {
 			targetName = fmt.Sprintf("%v/%v", ns, targetName)
 		}
 
@@ -203,35 +203,61 @@ func convertErrorsToString(errors []error) []string {
 	return result
 }
 
-type NodeResource interface {
-	ClientObject() client.Object
-}
-
-func ClientObjects[K NodeResource](nodes []K) []client.Object {
-	clientObjects := make([]client.Object, len(nodes))
-	for i, node := range nodes {
-		clientObjects[i] = node.ClientObject()
-	}
-	return clientObjects
-}
-
-func SortByString[K NodeResource](items []K) []K {
-	sort.Slice(items, func(i, j int) bool {
-		a := client.ObjectKeyFromObject(items[i].ClientObject()).String()
-		b := client.ObjectKeyFromObject(items[j].ClientObject()).String()
-		return a < b
-	})
-	return items
-}
-
-func NodeResources[K NodeResource](items []K) []NodeResource {
-	output := make([]NodeResource, len(items))
-	for i, item := range items {
-		output[i] = item
-	}
-	return output
-}
-
 type eventFetcher interface {
-	FetchEventsFor(context.Context, client.Object) *corev1.EventList
+	FetchEventsFor(client.Object) ([]*corev1.Event, error)
+}
+
+var _ eventFetcher = (*DefaultEventFetcher)(nil)
+
+type DefaultEventFetcher struct {
+	factory common.Factory
+}
+
+func NewDefaultEventFetcher(factory common.Factory) *DefaultEventFetcher {
+	return &DefaultEventFetcher{factory: factory}
+}
+
+func (d DefaultEventFetcher) FetchEventsFor(object client.Object) ([]*corev1.Event, error) {
+	eventGK := schema.GroupKind{Group: corev1.GroupName, Kind: "Event"}
+
+	infos, err := d.factory.NewBuilder().
+		WithScheme(scheme.Scheme, scheme.Scheme.PrioritizedVersionsAllGroups()...).
+		Flatten().
+		AllNamespaces(true).
+		ResourceTypeOrNameArgs(true, []string{fmt.Sprintf("%v.%v", eventGK.Kind, eventGK.Group)}...).
+		FieldSelectorParam(fmt.Sprintf("involvedObject.uid=%v", string(object.GetUID()))).
+		ContinueOnError().
+		Do().
+		Infos()
+	if err != nil {
+		return nil, err
+	}
+
+	var result []*corev1.Event
+	for _, info := range infos {
+		eventObj, ok := info.Object.(*corev1.Event)
+
+		converted := false
+		if !ok {
+			// If direct conversion was not successful, attempt using unstructured.
+			obj, err := runtime.DefaultUnstructuredConverter.ToUnstructured(info.Object)
+			if err == nil {
+				eventObj = &corev1.Event{}
+				err = runtime.DefaultUnstructuredConverter.FromUnstructured(obj, eventObj)
+				if err == nil {
+					converted = true
+				}
+			}
+		}
+
+		if !converted {
+			err := fmt.Errorf("failed to convert runtime.Object to *corev1.Event")
+			klog.V(3).ErrorS(nil, err.Error(), "info.Object", info.Object)
+			return nil, err
+		}
+
+		result = append(result, eventObj)
+	}
+
+	return result, nil
 }
