@@ -43,6 +43,7 @@ aliases:
   gateway-api-gep-reviewers:
     - candita
     - gcs278
+    - kflynn
     - LiorLieberman
 
   gwctl-approvers:
