@@ -74,7 +74,7 @@ func clientAndServer(t *testing.T) (pb.GrpcEchoClient, serverConfig, string) {
 	dialOpts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
 
 	serverTarget := fmt.Sprintf("%s:%d", ServerAddress, httpPort)
-	conn, err := grpc.Dial(serverTarget, dialOpts...)
+	conn, err := grpc.NewClient(serverTarget, dialOpts...)
 	if err != nil {
 		t.Fatal(err)
 	}
