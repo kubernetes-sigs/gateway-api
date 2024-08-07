@@ -40,6 +40,7 @@ aliases:
     - sunjayBhatia
 
   gateway-api-gep-reviewers:
+    - arkodg
     - candita
     - gcs278
     - kflynn
