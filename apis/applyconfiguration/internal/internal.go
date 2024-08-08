@@ -533,8 +533,10 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         list:
           elementType:
-            scalar: string
+            namedType: io.k8s.sigs.gateway-api.apis.v1.SupportedFeature
           elementRelationship: associative
+          keys:
+          - name
 - name: io.k8s.sigs.gateway-api.apis.v1.GatewayInfrastructure
   map:
     fields:
@@ -1124,6 +1126,13 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: type
       type:
         scalar: string
+- name: io.k8s.sigs.gateway-api.apis.v1.SupportedFeature
+  map:
+    fields:
+    - name: name
+      type:
+        scalar: string
+      default: ""
 - name: io.k8s.sigs.gateway-api.apis.v1alpha2.BackendLBPolicy
   map:
     fields:

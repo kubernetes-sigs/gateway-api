@@ -265,15 +265,22 @@ spec:
               supportedFeatures:
                 description: |
                   SupportedFeatures is the set of features the GatewayClass support.
-                  It MUST be sorted in ascending alphabetical order.
+                  It MUST be sorted in ascending alphabetical order by the Name key.
                 items:
-                  description: |-
-                    SupportedFeature is used to describe distinct features that are covered by
-                    conformance tests.
-                  type: string
+                  properties:
+                    name:
+                      description: |-
+                        FeatureName is used to describe distinct features that are covered by
+                        conformance tests.
+                      type: string
+                  required:
+                  - name
+                  type: object
                 maxItems: 64
                 type: array
-                x-kubernetes-list-type: set
+                x-kubernetes-list-map-keys:
+                - name
+                x-kubernetes-list-type: map
             type: object
         required:
         - spec
@@ -527,15 +534,22 @@ spec:
               supportedFeatures:
                 description: |
                   SupportedFeatures is the set of features the GatewayClass support.
-                  It MUST be sorted in ascending alphabetical order.
+                  It MUST be sorted in ascending alphabetical order by the Name key.
                 items:
-                  description: |-
-                    SupportedFeature is used to describe distinct features that are covered by
-                    conformance tests.
-                  type: string
+                  properties:
+                    name:
+                      description: |-
+                        FeatureName is used to describe distinct features that are covered by
+                        conformance tests.
+                      type: string
+                  required:
+                  - name
+                  type: object
                 maxItems: 64
                 type: array
-                x-kubernetes-list-type: set
+                x-kubernetes-list-map-keys:
+                - name
+                x-kubernetes-list-type: map
             type: object
         required:
         - spec

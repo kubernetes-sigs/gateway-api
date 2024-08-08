@@ -1,0 +1,52 @@
+apiVersion: gateway.networking.k8s.io/v1
+date: "2024-08-01T23:42:20Z"
+gatewayAPIChannel: standard
+gatewayAPIVersion: v1.1.0
+implementation:
+  contact:
+  - https://github.com/GoogleCloudPlatform/gke-gateway-api/discussions/new/choose
+  organization: GKE
+  project: gke-gateway
+  url: https://cloud.google.com/kubernetes-engine/docs/concepts/gateway-api
+  version: 1.30.3-gke.1211000
+kind: ConformanceReport
+mode: gke-l7-regional-external-managed
+profiles:
+- core:
+    result: partial
+    skippedTests:
+    - HTTPRouteHostnameIntersection
+    statistics:
+      Failed: 0
+      Passed: 32
+      Skipped: 1
+  extended:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 6
+      Skipped: 0
+    supportedFeatures:
+    - GatewayPort8080
+    - HTTPRouteHostRewrite
+    - HTTPRoutePathRedirect
+    - HTTPRouteRequestMirror
+    - HTTPRouteResponseHeaderModification
+    - HTTPRouteSchemeRedirect
+    unsupportedFeatures:
+    - GatewayHTTPListenerIsolation
+    - GatewayInfrastructurePropagation
+    - GatewayStaticAddresses
+    - HTTPRouteBackendProtocolH2C
+    - HTTPRouteBackendProtocolWebSocket
+    - HTTPRouteBackendRequestHeaderModification
+    - HTTPRouteBackendTimeout
+    - HTTPRouteMethodMatching
+    - HTTPRouteParentRefPort
+    - HTTPRoutePathRewrite
+    - HTTPRoutePortRedirect
+    - HTTPRouteQueryParamMatching
+    - HTTPRouteRequestMultipleMirrors
+    - HTTPRouteRequestTimeout
+  name: GATEWAY-HTTP
+  summary: Core tests partially succeeded with 1 test skips. Extended tests succeeded.
