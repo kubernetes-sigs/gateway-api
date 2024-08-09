@@ -265,9 +265,5 @@ The following is a summary of all the Routes and the TLS termination mode they s
 | `HTTPRoute` | yes | no |
 | `GRPCRoute` | yes | no |
 | `TLSRoute` | yes | yes |
-| `TCPRoute` | yes | yes |
+| `TCPRoute` | no | no |
 | `UDPRoute` | no | no |
-
-It is worth highlighting that both `TLSRoute` and `TCPRoute` support TLS with `Termination`
-and `Passthrough`, but they are intended to be used in different use cases, as `TCPRoute`s
-allow destination port routing, while `TLSRoute`s allow SNI-based routing.
