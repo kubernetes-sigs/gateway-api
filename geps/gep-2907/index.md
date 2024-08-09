@@ -78,8 +78,8 @@ The above diagram depicts these four segments as edges in a graph.
 TLS can be configured with two distinct modes:
 
 * **Terminate**: the TLS connection is instantiated between the frontend and the
-  Gateway. The connection between the Gateway and the backend is either left unencrypted
-  or a new TLS connection between the two entities is instantiated.
+  Gateway. The connection between the Gateway and the backend is left unencrypted
+ unless a new TLS connection between the two entities is configured via BackendTLSPolicy.
 * **Passthrough**: the TLS connection is instantiated between the frontend and the
   backend. The traffic flows through the Gateway encrypted, and the Gateway is not
   able to decrypt or inspect the TLS stream.
