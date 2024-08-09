@@ -174,15 +174,13 @@ type BackendTLSPolicySpec struct {
 Conformance tests will be written to ensure the following:
 
 1. When SubjectAltNames are specified in BackendTLSPolicy:
-
-  - The hostname field is still used as SNI, if specified
-  - A certificate with at least one matching SubjectAltName is accepted
-  - A certificate without a matching SubjectAltName is rejected
+    - The hostname field is still used as SNI, if specified
+    - A certificate with at least one matching SubjectAltName is accepted
+    - A certificate without a matching SubjectAltName is rejected
 
 2. When a Client Certificate is specified on a Gateway:
-
-  - It is applied to all services.
-  - The appropriate status condition is populated if the reference is invalid
+    - It is applied to all services.
+    - The appropriate status condition is populated if the reference is invalid
 
 ## Future work
 This GEP does not cover per-service overrides for client certificate. This is mostly for two reasons:
