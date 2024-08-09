@@ -1,0 +1,4 @@
+## Annotations for CRDs
+##
+#crds:
+#  annotations: {}
