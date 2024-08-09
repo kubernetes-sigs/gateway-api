@@ -515,6 +515,10 @@ DirectlyAttachedPolicies:
   Type                       Name
   ----                       ----
   HealthCheckPolicy.foo.com  health-check-gateway
+InheritedPolicies:
+  Type                       Name                       Target Kind   Target Name
+  ----                       ----                       -----------   -----------
+  HealthCheckPolicy.foo.com  health-check-gatewayclass  GatewayClass  foo-gatewayclass
 EffectivePolicies:
   HealthCheckPolicy.foo.com:
     key1: value-parent-1

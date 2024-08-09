@@ -137,6 +137,10 @@ func (bp *BackendsPrinter) PrintDescribeView(resourceModel *resourcediscovery.Re
 		policies := SortByString(maps.Values(backendNode.Policies))
 		pairs = append(pairs, &DescriberKV{Key: "DirectlyAttachedPolicies", Value: convertPoliciesToRefsTable(policies, false)})
 
+		// InheritedPolicies
+		inheritedPolicies := SortByString(maps.Values(backendNode.InheritedPolicies))
+		pairs = append(pairs, &DescriberKV{Key: "InheritedPolicies", Value: convertPoliciesToRefsTable(inheritedPolicies, true)})
+
 		// EffectivePolicies
 		if len(backendNode.EffectivePolicies) != 0 {
 			pairs = append(pairs, &DescriberKV{Key: "EffectivePolicies", Value: backendNode.EffectivePolicies})
