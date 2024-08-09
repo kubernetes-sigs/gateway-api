@@ -87,9 +87,11 @@ func TestMergePoliciesOfSimilarKind(t *testing.T) {
 					"spec": map[string]interface{}{
 						"condition": "path=/def",
 						"seconds":   float64(30),
-						"targetRef": map[string]interface{}{
-							"kind": "Namespace",
-							"name": "default",
+						"targetRefs": []interface{}{
+							map[string]interface{}{
+								"kind": "Namespace",
+								"name": "default",
+							},
 						},
 					},
 				},
@@ -106,9 +108,11 @@ func TestMergePoliciesOfSimilarKind(t *testing.T) {
 					"spec": map[string]interface{}{
 						"condition": "path=/abc",
 						"seconds":   float64(60),
-						"targetRef": map[string]interface{}{
-							"kind": "Namespace",
-							"name": "default",
+						"targetRefs": []interface{}{
+							map[string]interface{}{
+								"kind": "Namespace",
+								"name": "default",
+							},
 						},
 					},
 				},
@@ -152,9 +156,11 @@ func TestMergePoliciesOfSimilarKind(t *testing.T) {
 					"spec": map[string]interface{}{
 						"condition": "path=/def",
 						"seconds":   float64(30),
-						"targetRef": map[string]interface{}{
-							"kind": "Namespace",
-							"name": "default",
+						"targetRefs": []interface{}{
+							map[string]interface{}{
+								"kind": "Namespace",
+								"name": "default",
+							},
 						},
 					},
 				},

@@ -164,11 +164,19 @@ func TestBackendsPrinter_Print(t *testing.T) {
 					"default": map[string]interface{}{
 						"key2": "value-parent-2",
 					},
-					"targetRef": map[string]interface{}{
-						"group":     "",
-						"kind":      "Service",
-						"name":      "foo-svc-1",
-						"namespace": "ns1",
+					"targetRefs": []interface{}{
+						map[string]interface{}{
+							"group":     "",
+							"kind":      "Service",
+							"name":      "foo-svc-1",
+							"namespace": "ns1",
+						},
+						map[string]interface{}{
+							"group":     "",
+							"kind":      "Service",
+							"name":      "foo-svc-2",
+							"namespace": "ns1",
+						},
 					},
 				},
 			},
@@ -219,7 +227,7 @@ ns1        foo-svc-2  Service  2d
 	want2 := `
 NAMESPACE  NAME       TYPE     AGE  REFERRED BY ROUTES                                 POLICIES
 ns1        foo-svc-1  Service  3d   ns1/foo-httproute-1                                1
-ns1        foo-svc-2  Service  2d   ns1/foo-httproute-2, ns1/foo-httproute-3 + 2 more  0
+ns1        foo-svc-2  Service  2d   ns1/foo-httproute-2, ns1/foo-httproute-3 + 2 more  1
 `
 	if diff := cmp.Diff(common.YamlString(want2), common.YamlString(got2), common.YamlStringTransformer); diff != "" {
 		t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", got2, want2, diff)

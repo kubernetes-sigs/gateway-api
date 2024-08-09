@@ -171,26 +171,27 @@ func convertPoliciesToRefsTable(policies []*resourcediscovery.PolicyNode, includ
 			policyName = fmt.Sprintf("%v/%v", ns, policyName)
 		}
 
-		targetKind := policyNode.Policy.TargetRef().Kind
+		// Iterate over each TargetRef
+		for _, targetRef := range policyNode.Policy.TargetRefs() {
+			targetKind := targetRef.Kind
+			targetName := targetRef.Name
+			if ns := targetRef.Namespace; ns != "" {
+				targetName = fmt.Sprintf("%v/%v", ns, targetName)
+			}
 
-		targetName := policyNode.Policy.TargetRef().Name
-		if ns := policyNode.Policy.TargetRef().Namespace; ns != "" {
-			targetName = fmt.Sprintf("%v/%v", ns, targetName)
+			row := []string{
+				policyType, // Type
+				policyName, // Name
+			}
+
+			if includeTarget {
+				row = append(row,
+					targetKind, // Target Kind
+					targetName, // Target Name
+				)
+			}
+			table.Rows = append(table.Rows, row)
 		}
-
-		row := []string{
-			policyType, // Type
-			policyName, // Name
-		}
-
-		if includeTarget {
-			row = append(row,
-				targetKind, // Target Kind
-				targetName, // Target Name
-			)
-		}
-
-		table.Rows = append(table.Rows, row)
 	}
 	return table
 }
