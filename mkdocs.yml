@@ -130,13 +130,11 @@ nav:
       - geps/gep-1731/index.md
     - Experimental:
       - geps/gep-1619/index.md
-      - geps/gep-1742/index.md
       - geps/gep-1748/index.md
       - geps/gep-1762/index.md
       - geps/gep-1897/index.md
       - geps/gep-1911/index.md
       - geps/gep-2162/index.md
-      - geps/gep-2257/index.md
     - Standard:
       - geps/gep-709/index.md
       - geps/gep-718/index.md
@@ -152,6 +150,8 @@ nav:
       - geps/gep-1426/index.md
       - geps/gep-1686/index.md
       - geps/gep-1709/index.md
+      - geps/gep-1742/index.md
+      - geps/gep-2257/index.md
     - Memorandum:
       - geps/gep-713/index.md
       - geps/gep-917/index.md

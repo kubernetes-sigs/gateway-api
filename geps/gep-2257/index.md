@@ -1,7 +1,7 @@
 # GEP-2257: Gateway API Duration Format
 
 * Issue: [#2257](https://github.com/kubernetes-sigs/gateway-api/issues/2257)
-* Status: Experimental
+* Status: Standard
 
 ## TL;DR
 
@@ -48,10 +48,9 @@ Durations are a subset of what `time.ParseDuration` supports:
   `1h500ms` is supported (although probably not terribly useful).
 
 - Units MAY be repeated, although users SHOULD NOT rely on this support since
-  this GEP is Experimental, and future revisions may remove support for
-  repeated units. If units are repeated, the total duration remains the sum of
-  all components: a GEP-2257 duration of `1h2h20m10m` is a duration of 3 hours
-  30 minutes.
+  future revisions of this GEP may remove support for repeated units. If units
+  are repeated, the total duration remains the sum of all components: a
+  GEP-2257 duration of `1h2h20m10m` is a duration of 3 hours 30 minutes.
 
 - Since the value and the unit are both required within a component, `0` is
   not a valid GEP-2257 duration string (though `0s` is). Likewise the empty
@@ -107,6 +106,82 @@ There is (a lot) more discussion in [PR 2155].
 
 [PR 2155]:https://github.com/kubernetes-sigs/gateway-api/pull/2155
 
+## Test Vectors
+
+### Parsing
+
+Valid GEP-2257 Duration strings, their canonical forms, and the components of
+the resulting durations:
+
+| Input | Canonical Form | Hours | Minutes | Seconds | Milliseconds |
+|-------|-----------------|-------|---------|---------|--------------|
+| `0h` | `0s` | 0 | 0 | 0 | 0 |
+| `0s` | `0s` | 0 | 0 | 0 | 0 |
+| `0h0m0s` | `0s` | 0 | 0 | 0 | 0 |
+| `1h` | `1h` | 1 | 0 | 0 | 0 |
+| `30m` | `30m` | 0 | 30 | 0 | 0 |
+| `10s` | `10s` | 0 | 0 | 10 | 0 |
+| `500ms` | `500ms` | 0 | 0 | 0 | 500 |
+| `2h30m` | `2h30m` | 2 | 30 | 0 | 0 |
+| `150m` | `2h30m` | 2 | 30 | 0 | 0 |
+| `7230s` | `2h30s` | 2 | 0 | 30 | 0 |
+| `1h30m10s` | `1h30m10s` | 1 | 30 | 10 | 0 |
+| `10s30m1h` | `1h30m10s` | 1 | 30 | 10 | 0 |
+| `100ms200ms300ms` | `600ms` | 0 | 0 | 0 | 600 |
+
+Invalid GEP-2257 Duration strings:
+
+| Input | Reason |
+|-------|--------|
+| `1` | Missing unit |
+| `1m1` | Missing unit |
+| `1d` | Days are not supported |
+| `1h30m10s20ms50h` | Too many components |
+| `999999h` | Too many digits |
+| `1.5h` | Floating point is not supported |
+| `-15m` | Negative durations are not supported |
+
+### Formatting
+
+Valid durations and their canonical GEP-2257 forms:
+
+| Hours | Minutes | Seconds | Milliseconds | Canonical Form |
+|-------|---------|---------|--------------|----------------|
+| 0 | 0 | 0 | 0 | `0s` |
+| 1 | 0 | 0 | 0 | `1h` |
+| 0 | 30 | 0 | 0 | `30m` |
+| 0 | 0 | 10 | 0 | `10s` |
+| 0 | 0 | 0 | 500 | `500ms` |
+| 2 | 30 | 0 | 0 | `2h30m` |
+| 1 | 30 | 10 | 0 | `1h30m10s` |
+| 0 | 0 | 0 | 600 | `600ms` |
+| 2 | 0 | 0 | 600 | `2h600ms` |
+| 2 | 30 | 0 | 600 | `2h30m600ms` |
+| 2 | 30 | 10 | 600 | `2h30m10s600ms` |
+| 0 | 0.5 | 0 | 0 | `30s` |
+| 0 | 0 | 0.5 | 0 | `500ms` |
+| 10 days | 0 | 0 | 0 | `240h` |
+
+Note the last three durations: while `0.5m`, for example, is not a valid
+GEP-2257 Duration, it is possible to express a half-minute duration using
+GEP-2257. Implementations that support formatting durations SHOULD support
+these cases and, if they do, MUST always format them as valid GEP-2257
+Durations.
+
+Note also that, as stated above, implementations MUST NOT modify resources
+supplied by a user. The formatting vectors above describe correctness when an
+implementation needs to format a duration for output; no requirement to
+normalize user input is implied.
+
+Invalid durations:
+
+| Duration | Reason |
+|----------|--------|
+| 100 microseconds | Sub-millisecond precision is not supported |
+| 0.5 milliseconds | Sub-millisecond precision is not supported |
+| 10000 days | Out of range (more than 99999 hours) |
+| -15 minutes | Negative durations are not supported |
+
 ## Graduation Criteria
 
 To graduate GEP-2257 to Standard channel, we need to meet the following
@@ -119,4 +194,7 @@ criteria:
 
 - Have a custom CEL validator for GEP-2257 Duration fields.
 
-- Have support for GEP-2257 Durations in standard Kubernetes libraries.
+The previous graduation criterion of "Have support for GEP-2257 Durations in
+standard Kubernetes libraries" has been removed. Work is in progress to add
+such parsers to `kube-rs`, `client-go`, and `client-python`, but it is not
+necessary to gate the graduation of GEP-2257 on this work.
