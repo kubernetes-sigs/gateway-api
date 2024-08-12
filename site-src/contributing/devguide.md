@@ -102,7 +102,7 @@ kubectl get crds
 
 ### Manual Test
 
-Install a gateway controller and test out the change. Take a look at some 
+Install a [gateway API implementation](https://gateway-api.sigs.k8s.io/implementations/) and test out the change. Take a look at some 
 examples [here](https://gateway-api.sigs.k8s.io/guides/).
 
 ### Verify
