@@ -1,6 +1,6 @@
-# Dev Guide
+# Development Guide
 
-## Project management
+## Project Management
 
 We are using the GitHub issues and project dashboard to manage the list of TODOs
 for this project:
@@ -36,12 +36,13 @@ command in PR and issue comments][issue-cmds]. For example,
 Before you start developing with Gateway API, we'd recommend having the
 following prerequisites installed:
 
-* [Kind](https://kubernetes.io/docs/tasks/tools/#kind): This is a standalone local Kubernetes cluster. It requires either [Docker](https://docs.docker.com/engine/install/) or [Podman](https://podman.io/docs/installation) installed.
+* [Kind](https://kubernetes.io/docs/tasks/tools/#kind): This is a standalone local Kubernetes cluster. At least one container runtime is required. We recommend installing [Docker](https://docs.docker.com/engine/install/). While you can opt for alternatives like [Podman](https://podman.io/docs/installation), please be aware that doing so is at your own risk.
 * [Kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl): This is the Kubernetes command-line tool.
 * [Go](https://golang.org/doc/install): It is the main programming language in this project. Please check this [file](https://github.com/kubernetes-sigs/gateway-api/blob/main/go.mod#L3) to find out the least Go version otherwise you might encounter compiling errors.
+* [Digest::SHA](https://metacpan.org/pod/Digest::SHA): It is a required dependency. You can obtain it by installing the `perl-Digest-SHA` package.
 
 
-## Development: Building, deploying, testing, and Verifying
+## Development: Building, Deploying, Testing, and Verifying
 
 Clone the repo:
 
@@ -56,14 +57,7 @@ This project works with Go modules; you can choose to setup your environment
 outside $GOPATH as well.
 
 
-### Build the code
-
-To build the code, it needs `shasum`. On Fedora and RHEL, this command is called sha1sum. 
-Run the following `bash` command to fix this error.
-
-```shell
-ln -s /usr/bin/sha1sum /usr/bin/shasum
-```
+### Build the Code
 
 The project uses `make` to drive the build. `make` will run code generators, and
 run static analysis against the code and generate Kubernetes CRDs. You can kick
@@ -74,7 +68,7 @@ make generate
 ```
 
 
-#### Adding Experimental Fields
+#### Add Experimental Fields
 
 All additions to the API must start in the Experimental release channel.
 Experimental fields must be marked with the `<gateway:experimental>` annotation
@@ -86,7 +80,7 @@ removed from the go struct, with a tombstone comment
 ([example](https://github.com/kubernetes/kubernetes/blob/707b8b6efd1691b84095c9f995f2c259244e276c/staging/src/k8s.io/api/core/v1/types.go#L4444-L4445))
 ensuring the field name will not be reused.
 
-### Deploy the code
+### Deploy the Code
 
 Use the following command to deploy CRDs to the pre-existing `Kind` cluster.
 
@@ -100,7 +94,7 @@ Use the following command to check if the CRDs have been deployed.
 kubectl get crds
 ```
 
-### Manual Test
+### Test Manually
 
 Install a [gateway API implementation](https://gateway-api.sigs.k8s.io/implementations/) and test out the change. Take a look at some 
 examples [here](https://gateway-api.sigs.k8s.io/guides/).
@@ -118,7 +112,7 @@ make verify
 [prow-setup]: https://github.com/kubernetes/test-infra/tree/master/config/jobs/kubernetes-sigs/gateway-api
 
 
-## Post development: Pull Request, Documentation, and more Tests
+## Post-Development: Pull Request, Documentation, and more Tests
 ### Submit a Pull Request
 
 Gateway API follows a similar pull request process as
