@@ -820,6 +820,12 @@ func GatewayAndTLSRoutesMustBeAccepted(t *testing.T, c client.Client, timeoutCon
 	return gwAddr, hostnames
 }
 
+// GatewayHTTPRouteAndBackendTLSPolicyMustBeAccepted waits until the specified Gateway has an IP
+// address assigned to it, HTTP Route has a ParentRef referring to the
+// Gateway and the BackendTLSPolicy has a ancestorRef referring to the
+// Gateway. The test will fail if these conditions are not met before the
+// timeouts.
+
 // TLSRouteMustHaveCondition checks that the supplied TLSRoute has the supplied Condition,
 // halting after the specified timeout is exceeded.
 func TLSRouteMustHaveCondition(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeNN types.NamespacedName, gwNN types.NamespacedName, condition metav1.Condition) {

@@ -9,7 +9,7 @@ spec:
   - name: https-with-hostname
     port: 443
     protocol: TLS
-    hostname: "*.example.org"
+    hostname: "*.abc.example.com"
     allowedRoutes:
       namespaces:
         from: Same
@@ -17,7 +17,7 @@ spec:
       certificateRefs:
       - group: ""
         kind: Secret
-        name: tls-validity-checks-certificate
+        name: backend-tls-checks-certificate
         namespace: gateway-conformance-infra
 ---
 apiVersion: gateway.networking.k8s.io/v1
@@ -27,7 +27,7 @@ metadata:
   namespace: gateway-conformance-infra
 spec:
   hostnames:
-  - www.example.org
+  - www.abc.example.com
   parentRefs:
   - group: gateway.networking.k8s.io
     kind: Gateway
@@ -59,8 +59,8 @@ spec:
     caCertificateRefs:
     - group: ""
       kind: "Secret"
-      name: "tls-validity-checks-certificate"
-    hostname: www.example.org
+      name: "backend-tls-checks-certificate"
+    hostname: www.abc.example.com
 ---
 apiVersion: v1
 kind: Service
@@ -117,7 +117,7 @@ spec:
       volumes:
       - name: secret-volume
         secret:
-          secretName: tls-passthrough-checks-certificate
+          secretName: backend-tls-checks-certificate
           items:
           - key: tls.crt
             path: crt

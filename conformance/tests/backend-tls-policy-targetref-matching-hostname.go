@@ -19,6 +19,8 @@ package tests
 import (
 	"testing"
 
+	"k8s.io/apimachinery/pkg/types"
+	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
 	"sigs.k8s.io/gateway-api/pkg/features"
 )
@@ -39,11 +41,20 @@ var BackendTLSPolicyTargetRefMatchingHostname = suite.ConformanceTest{
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 
 		// Setup cluster with:
-		// 	 gateway: gateway-conformance-infra/tls-backend-gateway with certificateRef and example.org hostname
+		// 	 gateway: gateway-conformance-infra/tls-backend-gateway with certificateRef backend-tls-checks-certificate and abc.example.com hostname
 		//   httpRoute:  gateway-conformance-infra/tls-backend-route
-		// 	 deployment: gateway-conformance-infra/tls-backend that serves a cert with common name "www.example.org"
+		// 	 deployment: gateway-conformance-infra/tls-backend that serves a cert with common name "www.abc.example.com"
 		//   backend service with a cert: gateway-conformance-infra/tls-backend
-		// 	 backendTLSPolicy: gateway-conformance-infra/tls-backend-tls-policy with CACertificateRef gateway-conformance-infra/tls-validity-checks-certificate
+		// 	 backendTLSPolicy: gateway-conformance-infra/tls-backend-tls-policy with CACertificateRef gateway-conformance-infra/backend-tls-checks-certificate
+
+		ns := "gateway-conformance-infra"
+		routeNN := types.NamespacedName{Name: "tls-backend-route", Namespace: ns}
+		gwNN := types.NamespacedName{Name: "tls-backend-gateway", Namespace: ns}
+		certNN := types.NamespacedName{Name: "backend-tls-checks-certificate", Namespace: ns}
+
+		kubernetes.NamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, []string{ns})
+
+		// wait until the specified Gateway has an IP and the specified HTTPRoute and BackendTLSPolicy is accepted
 
 	},
 }
