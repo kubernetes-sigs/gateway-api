@@ -139,7 +139,7 @@ func main() {
 			fmt.Printf("Starting server, listening on port %s (https)\n", httpsPort)
 			// TODO - probably don't need to pass these in.
 			err := listenAndServeTLS(fmt.Sprintf(":%s", httpsPort), os.Getenv("TLS_SERVER_CERT"), os.Getenv("TLS_SERVER_PRIVKEY"),
-				os.Getenv("TLS_CLIENT_CACERTS"), os.Getenv("TLS_CLIENT_CERT"), os.Getenv("TLS_CLIENT_KEY"), httpHandler)
+				os.Getenv("TLS_CLIENT_CACERTS"), httpHandler)
 			if err != nil {
 				errchan <- err
 			}
@@ -292,7 +292,7 @@ func processError(w http.ResponseWriter, err error, code int) { //nolint:unparam
 	_, _ = w.Write(body)
 }
 
-func listenAndServeTLS(addr string, serverCert string, serverPrivKey string, clientCA string, clientCert string, clientPrivKey string, handler http.Handler) error {
+func listenAndServeTLS(addr string, serverCert string, serverPrivKey string, clientCA string, handler http.Handler) error {
 	var config tls.Config
 
 	// Optionally enable client certificate validation when client CA certificates are given.
