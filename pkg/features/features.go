@@ -262,6 +262,20 @@ var GRPCRouteCoreFeatures = sets.New(
 )
 
 // -----------------------------------------------------------------------------
+// Features - BackendTLSPolicy Conformance
+// -----------------------------------------------------------------------------
+const (
+	// This option indicates support for BackendTLSPolicy
+	SupportBackendTLSPolicy SupportedFeature = "BackendTLSPolicy"
+)
+
+// BackendTLSPolicyCoreFeatures includes all the supported features for BackendTLSPolicy at
+// a Core level of support.
+var BackendTLSPolicyCoreFeatures = sets.New(
+	SupportBackendTLSPolicy,
+)
+
+// -----------------------------------------------------------------------------
 // Features - Compilations
 // -----------------------------------------------------------------------------
 
@@ -279,4 +293,5 @@ var AllFeatures = sets.New[SupportedFeature]().
 	Insert(TLSRouteCoreFeatures.UnsortedList()...).
 	Insert(MeshCoreFeatures.UnsortedList()...).
 	Insert(MeshExtendedFeatures.UnsortedList()...).
-	Insert(GRPCRouteCoreFeatures.UnsortedList()...)
+	Insert(GRPCRouteCoreFeatures.UnsortedList()...).
+	Insert(BackendTLSPolicyCoreFeatures.UnsortedList()...)
