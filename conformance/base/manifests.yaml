@@ -747,9 +747,9 @@ spec:
   selector:
     app: backendtlspolicy-test
   ports:
-    - protocol: TCP
-      port: 443
-      targetPort: 8443
+  - protocol: TCP
+    port: 443
+    targetPort: 8443
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -769,34 +769,33 @@ spec:
         app: backendtlspolicy-test
     spec:
       containers:
-        - name: backendtlspolicy-test
-          image: gcr.io/k8s-staging-gateway-api/echo-basic:v20240412-v1.0.0-394-g40c666fd
-          volumeMounts:
-            - name: secret-volume
-              mountPath: /etc/secret-volume
-          env:
-            - name: POD_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.name
-            - name: NAMESPACE
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.namespace
-            - name: CA_CERT
-              value: /etc/secret-volume/crt
-            - name: CA_CERT_KEY
-              value: /etc/secret-volume/key
-          resources:
-            requests:
-              cpu: 10m
-      volumes:
+      - name: backendtlspolicy-test
+        image: gcr.io/k8s-staging-gateway-api/echo-basic:v20240412-v1.0.0-394-g40c666fd
+        volumeMounts:
         - name: secret-volume
-          secret:
-            secretName: backend-tls-checks-certificate
-            items:
-              - key: tls.crt
-                path: crt
-              - key: tls.key
-                path: key
----
+          mountPath: /etc/secret-volume
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: CA_CERT
+          value: /etc/secret-volume/crt
+        - name: CA_CERT_KEY
+          value: /etc/secret-volume/key
+        resources:
+          requests:
+            cpu: 10m
+      volumes:
+      - name: secret-volume
+        secret:
+          secretName: backend-tls-checks-certificate
+          items:
+          - key: tls.crt
+            path: crt
+          - key: tls.key
+            path: key
