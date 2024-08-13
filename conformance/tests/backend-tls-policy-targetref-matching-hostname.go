@@ -49,7 +49,7 @@ var BackendTLSPolicyTargetRefMatchingHostname = suite.ConformanceTest{
 		//   backend service with a cert: gateway-conformance-infra/tls-backend
 		// 	 backendTLSPolicy: gateway-conformance-infra/tls-backend-tls-policy with CACertificateRef gateway-conformance-infra/backend-tls-checks-certificate
 		// 	 service account?
-		ns := "gateway-conformance-infra"
+		ns := "tls-backend-gateway"
 		routeNN := types.NamespacedName{Name: "tls-backend-route", Namespace: ns}
 		gwNN := types.NamespacedName{Name: "tls-backend-gateway", Namespace: ns}
 		certNN := types.NamespacedName{Name: "backend-tls-checks-certificate", Namespace: ns}
