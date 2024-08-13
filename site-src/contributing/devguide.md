@@ -1,6 +1,6 @@
-# Dev Guide
+# Developer Guide
 
-## Project management
+## Project Management
 
 We are using the GitHub issues and project dashboard to manage the list of TODOs
 for this project:
@@ -36,14 +36,13 @@ command in PR and issue comments][issue-cmds]. For example,
 Before you start developing with Gateway API, we'd recommend having the
 following prerequisites installed:
 
-* [Go](https://golang.org/doc/install)
-* [Kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl)
-* [Kind](https://kubernetes.io/docs/tasks/tools/#kind)
+* [Kind](https://kubernetes.io/docs/tasks/tools/#kind): This is a standalone local Kubernetes cluster. At least one container runtime is required. We recommend installing [Docker](https://docs.docker.com/engine/install/). While you can opt for alternatives like [Podman](https://podman.io/docs/installation), please be aware that doing so is at your own risk.
+* [Kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl): This is the Kubernetes command-line tool.
+* [Go](https://golang.org/doc/install): It is the main programming language in this project. Please check this [file](https://github.com/kubernetes-sigs/gateway-api/blob/main/go.mod#L3) to find out the least `Go` version otherwise you might encounter compilation errors.
+* [Digest::SHA](https://metacpan.org/pod/Digest::SHA): It is a required dependency. You can obtain it by installing the `perl-Digest-SHA` package.
 
-Note that Kind and many of our build tasks also have a dependency on Docker or
-Podman.
 
-### Building, testing and deploying
+## Development: Building, Deploying, Testing, and Verifying
 
 Clone the repo:
 
@@ -54,10 +53,11 @@ git clone https://github.com/kubernetes-sigs/gateway-api
 cd gateway-api
 ```
 
-This project works with Go modules; you can chose to setup your environment
+This project works with Go modules; you can choose to setup your environment
 outside $GOPATH as well.
 
-### Building the code
+
+### Build the Code
 
 The project uses `make` to drive the build. `make` will run code generators, and
 run static analysis against the code and generate Kubernetes CRDs. You can kick
@@ -67,7 +67,8 @@ off an overall build from the top-level makefile:
 make generate
 ```
 
-### Adding Experimental Fields
+
+#### Add Experimental Fields
 
 All additions to the API must start in the Experimental release channel.
 Experimental fields must be marked with the `<gateway:experimental>` annotation
@@ -79,17 +80,24 @@ removed from the go struct, with a tombstone comment
 ([example](https://github.com/kubernetes/kubernetes/blob/707b8b6efd1691b84095c9f995f2c259244e276c/staging/src/k8s.io/api/core/v1/types.go#L4444-L4445))
 ensuring the field name will not be reused.
 
-### Submitting a Pull Request
+### Deploy the Code
 
-Gateway API follows a similar pull request process as
-[Kubernetes](https://github.com/kubernetes/community/blob/master/contributors/guide/pull-requests.md).
-Merging a pull request requires the following steps to be completed before the
-pull request will be merged automatically.
+Use the following command to deploy CRDs to the pre-existing `Kind` cluster.
 
-- [Sign the CLA](https://git.k8s.io/community/CLA.md) (prerequisite)
-- [Open a pull request](https://help.github.com/articles/about-pull-requests/)
-- Pass [verification](#verify) tests
-- Get all necessary approvals from reviewers and code owners
+```shell
+make crd
+```
+
+Use the following command to check if the CRDs have been deployed.
+
+```shell
+kubectl get crds
+```
+
+### Test Manually
+
+Install a [gateway API implementation](https://gateway-api.sigs.k8s.io/implementations/) and test out the change. Take a look at some 
+examples [here](https://gateway-api.sigs.k8s.io/guides/).
 
 ### Verify
 
@@ -102,6 +110,21 @@ make verify
 ```
 
 [prow-setup]: https://github.com/kubernetes/test-infra/tree/master/config/jobs/kubernetes-sigs/gateway-api
+
+
+## Post-Development: Pull Request, Documentation, and more Tests
+### Submit a Pull Request
+
+Gateway API follows a similar pull request process as
+[Kubernetes](https://github.com/kubernetes/community/blob/master/contributors/guide/pull-requests.md).
+Merging a pull request requires the following steps to be completed before the
+pull request will be merged automatically.
+
+- [Sign the CLA](https://git.k8s.io/community/CLA.md) (prerequisite)
+- [Open a pull request](https://help.github.com/articles/about-pull-requests/)
+- Pass [verification](#verify) tests
+- Get all necessary approvals from reviewers and code owners
+
 
 ### Documentation
 
@@ -134,7 +157,7 @@ INFO    -  Building documentation...
 For more information on how documentation should be written, refer to our
 [Documentation Style Guide](/contributing/style-guide).
 
-## Conformance Tests
+### Conformance Tests
 
 To develop or run conformance tests, refer to the [Conformance Test
 Documentation](/concepts/conformance/#running-tests).
