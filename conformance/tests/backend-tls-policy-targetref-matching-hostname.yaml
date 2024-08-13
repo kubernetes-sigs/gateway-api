@@ -6,19 +6,12 @@ metadata:
 spec:
   gatewayClassName: "{GATEWAY_CLASS_NAME}"
   listeners:
-  - name: https-with-hostname
-    port: 443
-    protocol: TLS
-    hostname: "*.abc.example.com"
+  - name: http
+    port: 80
+    protocol: HTTP
     allowedRoutes:
       namespaces:
         from: Same
-    tls:
-      certificateRefs:
-      - group: ""
-        kind: Secret
-        name: backend-tls-checks-certificate
-        namespace: gateway-conformance-infra
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
@@ -27,7 +20,7 @@ metadata:
   namespace: gateway-conformance-infra
 spec:
   hostnames:
-  - www.abc.example.com
+  - "www.abc.example.com"
   parentRefs:
   - group: gateway.networking.k8s.io
     kind: Gateway
@@ -37,7 +30,7 @@ spec:
     - group: ""
       kind: Service
       name: tls-backend
-      port: 443
+      port: 3000
       weight: 1
     matches:
     - path:
@@ -71,9 +64,9 @@ spec:
   selector:
     app: tls-backend
   ports:
-  - protocol: TCP
-    port: 443
-    targetPort: 8443
+  - name: http
+    port: 3000
+    targetPort: 3000
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -95,6 +88,9 @@ spec:
       containers:
       - name: tls-backend
         image: gcr.io/k8s-staging-gateway-api/echo-basic:v20240412-v1.0.0-394-g40c666fd
+        imagePullPolicy: IfNotPresent
+        ports:
+          - containerPort: 3000
         volumeMounts:
         - name: secret-volume
           mountPath: /etc/secret-volume
