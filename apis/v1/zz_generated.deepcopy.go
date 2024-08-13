@@ -200,7 +200,7 @@ func (in *GRPCHeaderMatch) DeepCopyInto(out *GRPCHeaderMatch) {
 	*out = *in
 	if in.Type != nil {
 		in, out := &in.Type, &out.Type
-		*out = new(HeaderMatchType)
+		*out = new(GRPCHeaderMatchType)
 		**out = **in
 	}
 }

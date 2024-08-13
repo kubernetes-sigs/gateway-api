@@ -4704,7 +4704,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteRule(ref common.ReferenceCall
 					},
 					"timeouts": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Timeouts defines the timeouts that can be configured for an HTTP request.\n\nSupport: Extended\n\n<gateway:experimental>",
+							Description: "Timeouts defines the timeouts that can be configured for an HTTP request.\n\nSupport: Extended",
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.HTTPRouteTimeouts"),
 						},
 					},
@@ -4819,14 +4819,14 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteTimeouts(ref common.Reference
 				Properties: map[string]spec.Schema{
 					"request": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Request specifies the maximum duration for a gateway to respond to an HTTP request. If the gateway has not been able to respond before this deadline is met, the gateway MUST return a timeout error.\n\nFor example, setting the `rules.timeouts.request` field to the value `10s` in an `HTTPRoute` will cause a timeout if a client request is taking longer than 10 seconds to complete.\n\nSetting a timeout to the zero duration (e.g. \"0s\") SHOULD disable the timeout completely. Implementations that cannot completely disable the timeout MUST instead interpret the zero duration as the longest possible value to which the timeout can be set.\n\nThis timeout is intended to cover as close to the whole request-response transaction as possible although an implementation MAY choose to start the timeout after the entire request stream has been received instead of immediately after the transaction is initiated by the client.\n\nWhen this field is unspecified, request timeout behavior is implementation-specific.\n\nSupport: Extended",
+							Description: "Request specifies the maximum duration for a gateway to respond to an HTTP request. If the gateway has not been able to respond before this deadline is met, the gateway MUST return a timeout error.\n\nFor example, setting the `rules.timeouts.request` field to the value `10s` in an `HTTPRoute` will cause a timeout if a client request is taking longer than 10 seconds to complete.\n\nSetting a timeout to the zero duration (e.g. \"0s\") SHOULD disable the timeout completely. Implementations that cannot completely disable the timeout MUST instead interpret the zero duration as the longest possible value to which the timeout can be set.\n\nThis timeout is intended to cover as close to the whole request-response transaction as possible although an implementation MAY choose to start the timeout after the entire request stream has been received instead of immediately after the transaction is initiated by the client.\n\nThe value of Request is a Gateway API Duration string as defined by GEP-2257. When this field is unspecified, request timeout behavior is implementation-specific.\n\nSupport: Extended",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
 					"backendRequest": {
 						SchemaProps: spec.SchemaProps{
-							Description: "BackendRequest specifies a timeout for an individual request from the gateway to a backend. This covers the time from when the request first starts being sent from the gateway to when the full response has been received from the backend.\n\nSetting a timeout to the zero duration (e.g. \"0s\") SHOULD disable the timeout completely. Implementations that cannot completely disable the timeout MUST instead interpret the zero duration as the longest possible value to which the timeout can be set.\n\nAn entire client HTTP transaction with a gateway, covered by the Request timeout, may result in more than one call from the gateway to the destination backend, for example, if automatic retries are supported.\n\nBecause the Request timeout encompasses the BackendRequest timeout, the value of BackendRequest must be <= the value of Request timeout.\n\nSupport: Extended",
+							Description: "BackendRequest specifies a timeout for an individual request from the gateway to a backend. This covers the time from when the request first starts being sent from the gateway to when the full response has been received from the backend.\n\nSetting a timeout to the zero duration (e.g. \"0s\") SHOULD disable the timeout completely. Implementations that cannot completely disable the timeout MUST instead interpret the zero duration as the longest possible value to which the timeout can be set.\n\nAn entire client HTTP transaction with a gateway, covered by the Request timeout, may result in more than one call from the gateway to the destination backend, for example, if automatic retries are supported.\n\nThe value of BackendRequest must be a Gateway API Duration string as defined by GEP-2257.  When this field is unspecified, its behavior is implementation-specific; when specified, the value of BackendRequest must be no more than the value of the Request timeout (since the Request timeout encompasses the BackendRequest timeout).\n\nSupport: Extended",
 							Type:        []string{"string"},
 							Format:      "",
 						},

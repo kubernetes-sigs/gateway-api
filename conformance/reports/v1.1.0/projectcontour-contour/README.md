@@ -4,15 +4,7 @@
 
 |API channel|Implementation version|Mode|Report|
 |-----------|----------------------|----|------|
-|experimental|[v1.28.1](https://github.com/projectcontour/contour/releases/tag/v1.28.1)|x|[link](./v1.28.1-report.yaml)|
-|experimental|[v1.28.2](https://github.com/projectcontour/contour/releases/tag/v1.28.2)|x|[link](./v1.28.2-report.yaml)|
-|experimental|[v1.28.3](https://github.com/projectcontour/contour/releases/tag/v1.28.3)|x|[link](./v1.28.3-report.yaml)|
-|experimental|[v1.28.4](https://github.com/projectcontour/contour/releases/tag/v1.28.4)|x|[link](./v1.28.4-report.yaml)|
-|experimental|[v1.28.5](https://github.com/projectcontour/contour/releases/tag/v1.28.5)|x|[link](./experimental-v1.28.5-default-report.yaml)|
-|experimental|[v1.28.6](https://github.com/projectcontour/contour/releases/tag/v1.28.6)|x|[link](./experimental-v1.28.6-default-report.yaml)|
-|experimental|[v1.29.0](https://github.com/projectcontour/contour/releases/tag/v1.29.0)|x|[link](./v1.29.0-report.yaml)|
-|experimental|[v1.29.1](https://github.com/projectcontour/contour/releases/tag/v1.29.1)|x|[link](./experimental-v1.29.1-default-report.yaml)|
-|experimental|[v1.29.2](https://github.com/projectcontour/contour/releases/tag/v1.29.2)|x|[link](./experimental-v1.29.2-default-report.yaml)|
+|experimental|[v1.30.0](https://github.com/projectcontour/contour/releases/tag/v1.30.0)|x|[link](./experimental-v1.30.0-default-report.yaml)|
 
 ## Reproduce
 

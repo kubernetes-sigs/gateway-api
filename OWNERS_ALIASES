@@ -30,19 +30,20 @@ aliases:
     - keithmattix
 
   gateway-api-conformance-reviewers:
-    - arkodg
-    - LiorLieberman
     - michaelbeaumont
     - sunjayBhatia
     - xunzhuo
 
   gateway-api-conformance-approvers:
     - arkodg
+    - LiorLieberman
     - sunjayBhatia
 
   gateway-api-gep-reviewers:
+    - arkodg
     - candita
     - gcs278
+    - kflynn
     - LiorLieberman
 
   gwctl-approvers:

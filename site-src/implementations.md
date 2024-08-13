@@ -171,22 +171,22 @@ effort, check out the #development channel or join our [weekly developer meeting
 
 ### Contour
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.0.0-Contour-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.0.0/projectcontour-contour)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.1.0-Contour-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.1.0/projectcontour-contour)
 
 [Contour][contour] is a CNCF open source Envoy-based ingress controller for Kubernetes.
 
-Contour [v1.29.1][contour-release] implements Gateway API v1.0.0.
+Contour [v1.30.0][contour-release] implements Gateway API v1.1.0.
 All [Standard channel][contour-standard] v1 API group resources (GatewayClass, Gateway, HTTPRoute, ReferenceGrant), plus most v1alpha2 API group resources (TLSRoute, TCPRoute, GRPCRoute, ReferenceGrant, and BackendTLSPolicy) are supported.
-Contour's implementation passes all core and most extended Gateway API conformance tests included in the v1.0.0 release.
+Contour's implementation passes all core and most extended Gateway API conformance tests included in the v1.1.0 release.
 
 See the [Contour Gateway API Guide][contour-guide] for information on how to deploy and use Contour's Gateway API implementation.
 
 For help and support with Contour's implementation, [create an issue][contour-issue-new] or ask for help in the [#contour channel on Kubernetes slack][contour-slack].
 
 [contour]:https://projectcontour.io
-[contour-release]:https://github.com/projectcontour/contour/releases/tag/v1.29.1
+[contour-release]:https://github.com/projectcontour/contour/releases/tag/v1.30.0
 [contour-standard]:https://gateway-api.sigs.k8s.io/concepts/versioning/#release-channels-eg-experimental-standard
-[contour-guide]:https://projectcontour.io/docs/1.29/guides/gateway-api/
+[contour-guide]:https://projectcontour.io/docs/1.30/guides/gateway-api/
 [contour-issue-new]:https://github.com/projectcontour/contour/issues/new/choose
 [contour-slack]:https://kubernetes.slack.com/archives/C8XRH2R4J
 
@@ -250,6 +250,8 @@ Gloo Gateway 2.0 brings the full power and community support of Gateway API to i
 
 ### Google Kubernetes Engine
 
+[![Conformance](https://img.shields.io/badge/Gateway_API_Partial_Conformance_v1.1.0-Google_Kubernetes_Engine-orange)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.1.0/gke-gateway)
+
 [Google Kubernetes Engine (GKE)][gke] is a managed Kubernetes platform offered
 by Google Cloud. GKE's implementation of the Gateway API is through the [GKE
 Gateway controller][gke-gateway] which provisions Google Cloud Load Balancers
@@ -259,6 +261,9 @@ The GKE Gateway controller supports weighted traffic splitting, mirroring,
 advanced routing, multi-cluster load balancing and more. See the docs to deploy
 [private or public Gateways][gke-gateway-deploy] and also [multi-cluster
 Gateways][gke-multi-cluster-gateway].
+
+The GKE Gateway controller passes all the core Gateway API conformance tests in the
+v1.1.0 release for the GATEWAY_HTTP conformance profile except `HTTPRouteHostnameIntersection`.
 
 [gke]:https://cloud.google.com/kubernetes-engine
 [gke-gateway]:https://cloud.google.com/kubernetes-engine/docs/concepts/gateway-api
@@ -373,12 +378,16 @@ The [LiteSpeed Ingress Controller](https://litespeedtech.com/products/litespeed-
 
 [![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.1.0-NGINX Gateway Fabric-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.1.0/nginxinc-nginx-gateway-fabric)
 
-[NGINX Gateway Fabric][nginx-gateway-fabric] is an open-source project that provides an implementation of the Gateway API using [NGINX][nginx] as the data plane. The goal of this project is to implement the core Gateway API -- Gateway, GatewayClass, HTTPRoute, TCPRoute, TLSRoute, and UDPRoute -- to configure an HTTP or TCP/UDP load balancer, reverse-proxy, or API gateway for applications running on Kubernetes. NGINX Gateway Fabric supports a subset of the Gateway API.
+[NGINX Gateway Fabric][nginx-gateway-fabric] is an open-source project that provides an implementation of the Gateway API using [NGINX][nginx] as the data plane. The goal of this project is to implement the core Gateway API to configure an HTTP or TCP/UDP load balancer, reverse-proxy, or API gateway for applications running on Kubernetes. You can find the comprehensive NGINX Gateway Fabric user documentation on the [NGINX Documentation][nginx-docs] website.
+
+For a list of supported Gateway API resources and features, see the [Gateway API Compatibility][nginx-compat] doc.
 
 If you have any suggestions or experience issues with NGINX Gateway Fabric, please [create an issue][nginx-issue-new] or a [discussion][nginx-disc-new] on GitHub. You can also ask for help in the [#nginx-gateway-fabric channel on NGINX slack][nginx-slack].
 
 [nginx-gateway-fabric]:https://github.com/nginxinc/nginx-gateway-fabric
 [nginx]:https://nginx.org/
+[nginx-docs]:https://docs.nginx.com/nginx-gateway-fabric/
+[nginx-compat]:https://docs.nginx.com/nginx-gateway-fabric/overview/gateway-api-compatibility/
 [nginx-issue-new]:https://github.com/nginxinc/nginx-gateway-fabric/issues/new
 [nginx-disc-new]:https://github.com/nginxinc/nginx-gateway-fabric/discussions/new
 [nginx-slack]:https://nginxcommunity.slack.com/channels/nginx-gateway-fabric
