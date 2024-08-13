@@ -23,9 +23,9 @@ metadata:
   namespace: gateway-conformance-infra
 spec:
   targetRefs:
-    - group: ""
-      kind: Service
-      name: "backendtlspolicy-test"
+  - group: ""
+    kind: Service
+    name: "backendtlspolicy-test"
   validation:
     caCertificateRefs:
       group: ""

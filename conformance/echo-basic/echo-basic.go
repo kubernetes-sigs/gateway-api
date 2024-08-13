@@ -226,7 +226,9 @@ func echoHandler(w http.ResponseWriter, r *http.Request) {
 	if strings.Contains(r.RequestURI, "backendTLS") {
 		sni, err = sniffForSNI(r.RemoteAddr)
 		if err != nil {
-			// Todo: research if for some test cases there won't be one
+			// TODO: research if for some test cases there won't be SNI available.
+			processError(w, err, http.StatusBadRequest)
+			return
 		}
 	}
 
@@ -340,14 +342,15 @@ func sniffForSNI(addr string) (string, error) {
 			return "", fmt.Errorf("could not read socket: %v", err)
 		}
 		// Take an incoming TLS Client Hello and return the SNI name.
-		sni, err = parser.GetHostname(data[:])
+		sni, err = parser.GetHostname(data)
 		if err != nil {
 			return "", fmt.Errorf("error getting SNI: %v", err)
 		}
 		if sni == "" {
 			return "", fmt.Errorf("no server name indication found")
+		} else { //nolint:revive
+			return sni, nil
 		}
-		return sni, nil
 	}
 }
 
