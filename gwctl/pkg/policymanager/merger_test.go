@@ -29,9 +29,9 @@ import (
 func TestMergePoliciesOfSimilarKind(t *testing.T) {
 	timeSmall := metav1.Time{Time: time.Now().Add(-1 * time.Hour)}.String()
 	timeLarge := metav1.Time{Time: time.Now()}.String()
-	policies := []Policy{
+	policies := []*Policy{
 		{
-			u: unstructured.Unstructured{
+			Unstructured: &unstructured.Unstructured{
 				Object: map[string]interface{}{
 					"apiVersion": "foo.com/v1",
 					"kind":       "HealthCheckPolicy",
@@ -52,10 +52,10 @@ func TestMergePoliciesOfSimilarKind(t *testing.T) {
 					},
 				},
 			},
-			inherited: true,
+			Inheritable: true,
 		},
 		{
-			u: unstructured.Unstructured{
+			Unstructured: &unstructured.Unstructured{
 				Object: map[string]interface{}{
 					"apiVersion": "foo.com/v1",
 					"kind":       "HealthCheckPolicy",
@@ -74,10 +74,10 @@ func TestMergePoliciesOfSimilarKind(t *testing.T) {
 					},
 				},
 			},
-			inherited: true,
+			Inheritable: true,
 		},
 		{
-			u: unstructured.Unstructured{
+			Unstructured: &unstructured.Unstructured{
 				Object: map[string]interface{}{
 					"apiVersion": "bar.com/v1",
 					"kind":       "TimeoutPolicy",
@@ -96,7 +96,7 @@ func TestMergePoliciesOfSimilarKind(t *testing.T) {
 			},
 		},
 		{
-			u: unstructured.Unstructured{
+			Unstructured: &unstructured.Unstructured{
 				Object: map[string]interface{}{
 					"apiVersion": "bar.com/v1",
 					"kind":       "TimeoutPolicy",
@@ -116,9 +116,9 @@ func TestMergePoliciesOfSimilarKind(t *testing.T) {
 		},
 	}
 
-	want := map[PolicyCrdID]Policy{
+	want := map[PolicyCrdID]*Policy{
 		PolicyCrdID("HealthCheckPolicy.foo.com"): {
-			u: unstructured.Unstructured{
+			Unstructured: &unstructured.Unstructured{
 				Object: map[string]interface{}{
 					"apiVersion": "foo.com/v1",
 					"kind":       "HealthCheckPolicy",
@@ -139,10 +139,10 @@ func TestMergePoliciesOfSimilarKind(t *testing.T) {
 					},
 				},
 			},
-			inherited: true,
+			Inheritable: true,
 		},
 		PolicyCrdID("TimeoutPolicy.bar.com"): {
-			u: unstructured.Unstructured{
+			Unstructured: &unstructured.Unstructured{
 				Object: map[string]interface{}{
 					"apiVersion": "bar.com/v1",
 					"kind":       "TimeoutPolicy",
@@ -177,17 +177,17 @@ func TestMergePoliciesOfSimilarKind(t *testing.T) {
 func TestMergePoliciesOfDifferentHierarchy(t *testing.T) {
 	testCases := []struct {
 		name           string
-		parentPolicies []Policy
-		childPolicies  []Policy
+		parentPolicies []*Policy
+		childPolicies  []*Policy
 
-		wantMergedPolicies []Policy
+		wantMergedPolicies []*Policy
 		wantErr            bool
 	}{
 		{
 			name: "parent and child both have overrides and defaults",
-			parentPolicies: []Policy{{
-				inherited: true,
-				u: unstructured.Unstructured{
+			parentPolicies: []*Policy{{
+				Inheritable: true,
+				Unstructured: &unstructured.Unstructured{
 					Object: map[string]interface{}{
 						"apiVersion": "bar.com/v1",
 						"kind":       "TimeoutPolicy",
@@ -207,9 +207,9 @@ func TestMergePoliciesOfDifferentHierarchy(t *testing.T) {
 					},
 				},
 			}},
-			childPolicies: []Policy{{
-				inherited: true,
-				u: unstructured.Unstructured{
+			childPolicies: []*Policy{{
+				Inheritable: true,
+				Unstructured: &unstructured.Unstructured{
 					Object: map[string]interface{}{
 						"apiVersion": "bar.com/v1",
 						"kind":       "TimeoutPolicy",
@@ -229,9 +229,9 @@ func TestMergePoliciesOfDifferentHierarchy(t *testing.T) {
 					},
 				},
 			}},
-			wantMergedPolicies: []Policy{{
-				inherited: true,
-				u: unstructured.Unstructured{
+			wantMergedPolicies: []*Policy{{
+				Inheritable: true,
+				Unstructured: &unstructured.Unstructured{
 					Object: map[string]interface{}{
 						"apiVersion": "bar.com/v1",
 						"kind":       "TimeoutPolicy",
@@ -256,9 +256,9 @@ func TestMergePoliciesOfDifferentHierarchy(t *testing.T) {
 		},
 		{
 			name: "parent has defaults, child has overrides",
-			parentPolicies: []Policy{{
-				inherited: true,
-				u: unstructured.Unstructured{
+			parentPolicies: []*Policy{{
+				Inheritable: true,
+				Unstructured: &unstructured.Unstructured{
 					Object: map[string]interface{}{
 						"apiVersion": "bar.com/v1",
 						"kind":       "TimeoutPolicy",
@@ -274,9 +274,9 @@ func TestMergePoliciesOfDifferentHierarchy(t *testing.T) {
 					},
 				},
 			}},
-			childPolicies: []Policy{{
-				inherited: true,
-				u: unstructured.Unstructured{
+			childPolicies: []*Policy{{
+				Inheritable: true,
+				Unstructured: &unstructured.Unstructured{
 					Object: map[string]interface{}{
 						"apiVersion": "bar.com/v1",
 						"kind":       "TimeoutPolicy",
@@ -292,9 +292,9 @@ func TestMergePoliciesOfDifferentHierarchy(t *testing.T) {
 					},
 				},
 			}},
-			wantMergedPolicies: []Policy{{
-				inherited: true,
-				u: unstructured.Unstructured{
+			wantMergedPolicies: []*Policy{{
+				Inheritable: true,
+				Unstructured: &unstructured.Unstructured{
 					Object: map[string]interface{}{
 						"apiVersion": "bar.com/v1",
 						"kind":       "TimeoutPolicy",
@@ -317,9 +317,9 @@ func TestMergePoliciesOfDifferentHierarchy(t *testing.T) {
 		},
 		{
 			name: "policies of different kind do not intersect with each other",
-			parentPolicies: []Policy{{
-				inherited: true,
-				u: unstructured.Unstructured{
+			parentPolicies: []*Policy{{
+				Inheritable: true,
+				Unstructured: &unstructured.Unstructured{
 					Object: map[string]interface{}{
 						"apiVersion": "foo.com/v1",
 						"kind":       "HealthCheckPolicy",
@@ -340,9 +340,9 @@ func TestMergePoliciesOfDifferentHierarchy(t *testing.T) {
 					},
 				},
 			}},
-			childPolicies: []Policy{{
-				inherited: true,
-				u: unstructured.Unstructured{
+			childPolicies: []*Policy{{
+				Inheritable: true,
+				Unstructured: &unstructured.Unstructured{
 					Object: map[string]interface{}{
 						"apiVersion": "bar.com/v1",
 						"kind":       "TimeoutPolicy",
@@ -362,10 +362,10 @@ func TestMergePoliciesOfDifferentHierarchy(t *testing.T) {
 					},
 				},
 			}},
-			wantMergedPolicies: []Policy{
+			wantMergedPolicies: []*Policy{
 				{
-					inherited: true,
-					u: unstructured.Unstructured{
+					Inheritable: true,
+					Unstructured: &unstructured.Unstructured{
 						Object: map[string]interface{}{
 							"apiVersion": "bar.com/v1",
 							"kind":       "TimeoutPolicy",
@@ -386,8 +386,8 @@ func TestMergePoliciesOfDifferentHierarchy(t *testing.T) {
 					},
 				},
 				{
-					inherited: true,
-					u: unstructured.Unstructured{
+					Inheritable: true,
+					Unstructured: &unstructured.Unstructured{
 						Object: map[string]interface{}{
 							"apiVersion": "foo.com/v1",
 							"kind":       "HealthCheckPolicy",
@@ -427,8 +427,8 @@ func TestMergePoliciesOfDifferentHierarchy(t *testing.T) {
 			// that we are interested in testing.
 			cmpopts := cmp.Transformer("PolicyTransformer", func(p Policy) map[string]interface{} {
 				return map[string]interface{}{
-					"u":         p.u,
-					"inherited": p.inherited,
+					"Object":    p.Unstructured,
+					"Inherited": p.Inheritable,
 				}
 			})
 			if diff := cmp.Diff(policySliceToMap(tc.wantMergedPolicies), gotMergedPolicies, cmpopts); diff != "" {
@@ -438,8 +438,8 @@ func TestMergePoliciesOfDifferentHierarchy(t *testing.T) {
 	}
 }
 
-func policySliceToMap(policies []Policy) map[PolicyCrdID]Policy {
-	res := make(map[PolicyCrdID]Policy)
+func policySliceToMap(policies []*Policy) map[PolicyCrdID]*Policy {
+	res := make(map[PolicyCrdID]*Policy)
 	for _, policy := range policies {
 		res[policy.PolicyCrdID()] = policy
 	}

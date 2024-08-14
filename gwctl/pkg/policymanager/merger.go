@@ -29,8 +29,8 @@ import (
 // MergePoliciesOfSimilarKind will convert a slice a policies to a map of
 // policies by merging policies of similar kind. The returned map will have the
 // policy kind as the key.
-func MergePoliciesOfSimilarKind(policies []Policy) (map[PolicyCrdID]Policy, error) {
-	result := make(map[PolicyCrdID]Policy)
+func MergePoliciesOfSimilarKind(policies []*Policy) (map[PolicyCrdID]*Policy, error) {
+	result := make(map[PolicyCrdID]*Policy)
 	for _, policy := range policies {
 		policyCrdID := policy.PolicyCrdID()
 
@@ -47,10 +47,10 @@ func MergePoliciesOfSimilarKind(policies []Policy) (map[PolicyCrdID]Policy, erro
 		// Merge existing policy with new policy. Reuse existing function to merge
 		// policies of similar hierarchy.
 		mergedPolicies, err := MergePoliciesOfSameHierarchy(
-			map[PolicyCrdID]Policy{
+			map[PolicyCrdID]*Policy{
 				policyCrdID: result[policyCrdID], // Existing policy.
 			},
-			map[PolicyCrdID]Policy{
+			map[PolicyCrdID]*Policy{
 				policyCrdID: policy, // New policy.
 			},
 		)
@@ -63,20 +63,20 @@ func MergePoliciesOfSimilarKind(policies []Policy) (map[PolicyCrdID]Policy, erro
 	return result, nil
 }
 
-func MergePoliciesOfSameHierarchy(policies1, policies2 map[PolicyCrdID]Policy) (map[PolicyCrdID]Policy, error) {
+func MergePoliciesOfSameHierarchy(policies1, policies2 map[PolicyCrdID]*Policy) (map[PolicyCrdID]*Policy, error) {
 	return mergePolicies(policies1, policies2, orderPolicyByPrecedence)
 }
 
-func MergePoliciesOfDifferentHierarchy(parentPolicies, childPolicies map[PolicyCrdID]Policy) (map[PolicyCrdID]Policy, error) {
-	return mergePolicies(parentPolicies, childPolicies, func(a, b Policy) (Policy, Policy) { return a, b })
+func MergePoliciesOfDifferentHierarchy(parentPolicies, childPolicies map[PolicyCrdID]*Policy) (map[PolicyCrdID]*Policy, error) {
+	return mergePolicies(parentPolicies, childPolicies, func(a, b *Policy) (*Policy, *Policy) { return a, b })
 }
 
 // mergePolicies will merge policies which are partitioned by their Kind.
 //
 // precedence function will order two policies such that the second policy
 // returned will have a higher precedence.
-func mergePolicies(policies1, policies2 map[PolicyCrdID]Policy, precedence func(a, b Policy) (Policy, Policy)) (map[PolicyCrdID]Policy, error) {
-	result := make(map[PolicyCrdID]Policy)
+func mergePolicies(policies1, policies2 map[PolicyCrdID]*Policy, precedence func(a, b *Policy) (*Policy, *Policy)) (map[PolicyCrdID]*Policy, error) {
+	result := make(map[PolicyCrdID]*Policy)
 
 	// Copy policies1 into result.
 	for policyCrdID, policy := range policies1 {
@@ -111,24 +111,24 @@ func mergePolicies(policies1, policies2 map[PolicyCrdID]Policy, precedence func(
 //     child.
 //   - defaults from child will take precedence over the defaults from the
 //     parent.
-func mergePolicy(parent, child Policy) (Policy, error) {
+func mergePolicy(parent, child *Policy) (*Policy, error) {
 	// Only policies of similar kind can be merged.
 	if parent.PolicyCrdID() != child.PolicyCrdID() {
-		return Policy{}, fmt.Errorf("cannot merge policies of different kind; kind1=%v, kind2=%v", parent.PolicyCrdID(), child.PolicyCrdID())
+		return nil, fmt.Errorf("cannot merge policies of different kind; kind1=%v, kind2=%v", parent.PolicyCrdID(), child.PolicyCrdID())
 	}
 
-	resultUnstructured, err := mergeUnstructured(parent.u.UnstructuredContent(), child.u.UnstructuredContent())
+	resultUnstructured, err := mergeUnstructured(parent.Unstructured.UnstructuredContent(), child.Unstructured.UnstructuredContent())
 	if err != nil {
-		return Policy{}, err
+		return nil, err
 	}
 
-	if parent.IsInherited() {
+	if parent.IsInheritable() {
 		// In case of an Inherited policy, the "spec.override" field of the parent
 		// should take precedence over the child. So we patch the override field
 		// from the parent into the result.
-		override, ok, err := unstructured.NestedFieldCopy(parent.u.UnstructuredContent(), "spec", "override")
+		override, ok, err := unstructured.NestedFieldCopy(parent.Unstructured.UnstructuredContent(), "spec", "override")
 		if err != nil {
-			return Policy{}, err
+			return nil, err
 		}
 		// If ok=false, it means "spec.override" field was missing, so we have
 		// nothing to do in that case. On the other hand, ok=true means
@@ -140,16 +140,16 @@ func mergePolicy(parent, child Policy) (Policy, error) {
 				},
 			})
 			if err != nil {
-				return Policy{}, err
+				return nil, err
 			}
 		}
 	}
 
 	result := child.DeepCopy()
-	result.u.SetUnstructuredContent(resultUnstructured)
+	result.Unstructured.SetUnstructuredContent(resultUnstructured)
 	// Merging two policies means the targetRef no longer makes any sense since
 	// since they can be conflicting. So we unset the targetRef.
-	result.targetRef = common.ObjRef{}
+	result.TargetRef = common.GKNN{}
 	return result, nil
 }
 
@@ -182,19 +182,19 @@ func mergeUnstructured(parent, patch map[string]interface{}) (map[string]interfa
 // precedence.
 //
 // [Gateway Specification]: https://gateway-api.sigs.k8s.io/geps/gep-713/#conflict-resolution
-func orderPolicyByPrecedence(a, b Policy) (Policy, Policy) {
+func orderPolicyByPrecedence(a, b *Policy) (*Policy, *Policy) {
 	lowerPolicy := a.DeepCopy()  // lowerPolicy will have lower precedence.
 	higherPolicy := b.DeepCopy() // higherPolicy will have higher precedence.
 
-	if lowerPolicy.u.GetCreationTimestamp() == higherPolicy.u.GetCreationTimestamp() {
+	if lowerPolicy.Unstructured.GetCreationTimestamp() == higherPolicy.Unstructured.GetCreationTimestamp() {
 		// Policies have the same creation time, so precedence is decided based
 		// on alphabetical ordering.
-		higherNN := fmt.Sprintf("%v/%v", higherPolicy.u.GetNamespace(), higherPolicy.u.GetName())
-		lowerNN := fmt.Sprintf("%v/%v", lowerPolicy.u.GetNamespace(), lowerPolicy.u.GetName())
+		higherNN := fmt.Sprintf("%v/%v", higherPolicy.Unstructured.GetNamespace(), higherPolicy.Unstructured.GetName())
+		lowerNN := fmt.Sprintf("%v/%v", lowerPolicy.Unstructured.GetNamespace(), lowerPolicy.Unstructured.GetName())
 		if higherNN > lowerNN {
 			higherPolicy, lowerPolicy = lowerPolicy, higherPolicy
 		}
-	} else if higherPolicy.u.GetCreationTimestamp().Time.After(lowerPolicy.u.GetCreationTimestamp().Time) {
+	} else if higherPolicy.Unstructured.GetCreationTimestamp().Time.After(lowerPolicy.Unstructured.GetCreationTimestamp().Time) {
 		// Policies have difference creation time, so this will decide the precedence
 		higherPolicy, lowerPolicy = lowerPolicy, higherPolicy
 	}
