@@ -17,154 +17,206 @@ limitations under the License.
 package printer
 
 import (
-	"context"
 	"fmt"
 	"io"
 	"strings"
 
 	"golang.org/x/exp/maps"
 	"k8s.io/apimachinery/pkg/util/duration"
-	"k8s.io/utils/clock"
 
-	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
+	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
+	"sigs.k8s.io/gateway-api/gwctl/pkg/extension/directlyattachedpolicy"
+	"sigs.k8s.io/gateway-api/gwctl/pkg/extension/gatewayeffectivepolicy"
+	extensionutils "sigs.k8s.io/gateway-api/gwctl/pkg/extension/utils"
+	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
+	"sigs.k8s.io/gateway-api/gwctl/pkg/topology"
+	topologygw "sigs.k8s.io/gateway-api/gwctl/pkg/topology/gateway"
 )
 
-var _ Printer = (*GatewaysPrinter)(nil)
-
-type GatewaysPrinter struct {
-	io.Writer
-	Clock        clock.Clock
-	EventFetcher eventFetcher
-}
-
-func (gp *GatewaysPrinter) GetPrintableNodes(resourceModel *resourcediscovery.ResourceModel) []NodeResource {
-	return NodeResources(maps.Values(resourceModel.Gateways))
-}
-
-func (gp *GatewaysPrinter) PrintTable(resourceModel *resourcediscovery.ResourceModel, wide bool) {
-	var columnNames []string
-	if wide {
-		columnNames = []string{"NAMESPACE", "NAME", "CLASS", "ADDRESSES", "PORTS", "PROGRAMMED", "AGE", "POLICIES", "HTTPROUTES"}
-	} else {
-		columnNames = []string{"NAMESPACE", "NAME", "CLASS", "ADDRESSES", "PORTS", "PROGRAMMED", "AGE"}
-	}
-	table := &Table{
-		ColumnNames:  columnNames,
-		UseSeparator: false,
+func (p *TablePrinter) printGateway(gatewayNode *topology.Node, w io.Writer) error {
+	if err := p.checkTypeChange("Gateway", w); err != nil {
+		return err
 	}
 
-	gatewayNodes := maps.Values(resourceModel.Gateways)
-
-	for _, gatewayNode := range SortByString(gatewayNodes) {
-		var addresses []string
-		for _, address := range gatewayNode.Gateway.Status.Addresses {
-			addresses = append(addresses, address.Value)
+	if p.table == nil {
+		var columnNames []string
+		if p.OutputFormat == OutputFormatWide {
+			columnNames = []string{"NAMESPACE", "NAME", "CLASS", "ADDRESSES", "PORTS", "PROGRAMMED", "AGE", "POLICIES", "HTTPROUTES"}
+		} else {
+			columnNames = []string{"NAMESPACE", "NAME", "CLASS", "ADDRESSES", "PORTS", "PROGRAMMED", "AGE"}
 		}
-		addressesOutput := strings.Join(addresses, ",")
-		if cnt := len(addresses); cnt > 2 {
-			addressesOutput = fmt.Sprintf("%v + %v more", strings.Join(addresses[:2], ","), cnt-2)
+		p.table = &Table{
+			ColumnNames:  columnNames,
+			UseSeparator: false,
 		}
+	}
 
-		var ports []string
-		for _, listener := range gatewayNode.Gateway.Spec.Listeners {
-			ports = append(ports, fmt.Sprintf("%d", int(listener.Port)))
+	gateway := topology.MustAccessObject(gatewayNode, &gatewayv1.Gateway{})
+
+	var addresses []string
+	for _, address := range gateway.Status.Addresses {
+		addresses = append(addresses, address.Value)
+	}
+	addressesOutput := strings.Join(addresses, ",")
+	if cnt := len(addresses); cnt > 2 {
+		addressesOutput = fmt.Sprintf("%v + %v more", strings.Join(addresses[:2], ","), cnt-2)
+	}
+
+	var ports []string
+	for _, listener := range gateway.Spec.Listeners {
+		ports = append(ports, fmt.Sprintf("%d", int(listener.Port)))
+	}
+	portsOutput := strings.Join(ports, ",")
+
+	programmedStatus := "Unknown"
+	for _, condition := range gateway.Status.Conditions {
+		if condition.Type == "Programmed" {
+			programmedStatus = string(condition.Status)
+			break
 		}
-		portsOutput := strings.Join(ports, ",")
+	}
 
-		programmedStatus := "Unknown"
-		for _, condition := range gatewayNode.Gateway.Status.Conditions {
-			if condition.Type == "Programmed" {
-				programmedStatus = string(condition.Status)
+	age := "<unknown>"
+	creationTimestamp := gateway.GetCreationTimestamp()
+	if !creationTimestamp.IsZero() {
+		age = duration.HumanDuration(p.Clock.Since(creationTimestamp.Time))
+	}
+
+	row := []string{
+		gateway.GetNamespace(),
+		gateway.GetName(),
+		string(gateway.Spec.GatewayClassName),
+		addressesOutput,
+		portsOutput,
+		programmedStatus,
+		age,
+	}
+	if p.OutputFormat == OutputFormatWide {
+		policiesMap, err := directlyattachedpolicy.Access(gatewayNode)
+		if err != nil {
+			return err
+		}
+		policiesCount := fmt.Sprintf("%d", len(policiesMap))
+
+		httpRoutesCount := fmt.Sprintf("%d", len(topologygw.GatewayNode(gatewayNode).HTTPRoutes()))
+
+		row = append(row, policiesCount, httpRoutesCount)
+	}
+	p.table.Rows = append(p.table.Rows, row)
+
+	return nil
+}
+
+func (p *DescriptionPrinter) printGateway(gatewayNode *topology.Node, w io.Writer) error {
+	if p.printSeparator {
+		fmt.Fprintf(w, "\n\n")
+	}
+	p.printSeparator = true
+
+	gateway := topology.MustAccessObject(gatewayNode, &gatewayv1.Gateway{})
+
+	metadata := gateway.ObjectMeta.DeepCopy()
+	metadata.Labels = nil
+	metadata.Annotations = nil
+	metadata.Name = ""
+	metadata.Namespace = ""
+	metadata.ManagedFields = nil
+
+	pairs := []*DescriberKV{
+		{Key: "Name", Value: gateway.GetName()},
+		{Key: "Namespace", Value: gateway.GetNamespace()},
+		{Key: "Labels", Value: gateway.Labels},
+		{Key: "Annotations", Value: gateway.Annotations},
+		{Key: "APIVersion", Value: gateway.APIVersion},
+		{Key: "Kind", Value: gateway.Kind},
+		{Key: "Metadata", Value: metadata},
+		{Key: "Spec", Value: &gateway.Spec},
+		{Key: "Status", Value: &gateway.Status},
+	}
+
+	const (
+		maxHTTPRoutes = 10
+		maxBackends   = 10
+	)
+
+	// AttachedRoutes
+	attachedRoutes := &Table{
+		ColumnNames:  []string{"Kind", "Name"},
+		UseSeparator: true,
+	}
+	// Backends
+	backends := &Table{
+		ColumnNames:  []string{"Kind", "Name"},
+		UseSeparator: true,
+	}
+	httpRouteCount, backendsCount := 0, 0
+	httpRouteNodes := maps.Values(topologygw.GatewayNode(gatewayNode).HTTPRoutes())
+	for _, httpRouteNode := range topology.SortedNodes(httpRouteNodes) {
+		httpRouteCount++
+		if httpRouteCount > maxHTTPRoutes {
+			attachedRoutes.Rows = append(attachedRoutes.Rows, []string{fmt.Sprintf("(Truncated)")})
+			break
+		}
+		row := []string{
+			httpRouteNode.GKNN().Kind,                      // Kind
+			httpRouteNode.GKNN().NamespacedName().String(), // Name
+		}
+		attachedRoutes.Rows = append(attachedRoutes.Rows, row)
+
+		backendNodes := maps.Values(topologygw.HTTPRouteNode(httpRouteNode).Backends())
+		for _, backendNode := range topology.SortedNodes(backendNodes) {
+			backendsCount++
+			if backendsCount > maxBackends {
+				backends.Rows = append(backends.Rows, []string{fmt.Sprintf("(Truncated)")})
 				break
 			}
-		}
-
-		age := duration.HumanDuration(gp.Clock.Since(gatewayNode.Gateway.GetCreationTimestamp().Time))
-
-		row := []string{
-			gatewayNode.Gateway.GetNamespace(),
-			gatewayNode.Gateway.GetName(),
-			string(gatewayNode.Gateway.Spec.GatewayClassName),
-			addressesOutput,
-			portsOutput,
-			programmedStatus,
-			age,
-		}
-		if wide {
-			policiesCount := fmt.Sprintf("%d", len(gatewayNode.Policies))
-			httpRoutesCount := fmt.Sprintf("%d", len(gatewayNode.HTTPRoutes))
-			row = append(row, policiesCount, httpRoutesCount)
-		}
-		table.Rows = append(table.Rows, row)
-	}
-
-	table.Write(gp, 0)
-}
-
-func (gp *GatewaysPrinter) PrintDescribeView(resourceModel *resourcediscovery.ResourceModel) {
-	index := 0
-	for _, gatewayNode := range resourceModel.Gateways {
-		index++
-
-		metadata := gatewayNode.Gateway.ObjectMeta.DeepCopy()
-		metadata.Labels = nil
-		metadata.Annotations = nil
-		metadata.Name = ""
-		metadata.Namespace = ""
-		metadata.ManagedFields = nil
-
-		pairs := []*DescriberKV{
-			{Key: "Name", Value: gatewayNode.Gateway.GetName()},
-			{Key: "Namespace", Value: gatewayNode.Gateway.GetNamespace()},
-			{Key: "Labels", Value: gatewayNode.Gateway.Labels},
-			{Key: "Annotations", Value: gatewayNode.Gateway.Annotations},
-			{Key: "APIVersion", Value: gatewayNode.Gateway.APIVersion},
-			{Key: "Kind", Value: gatewayNode.Gateway.Kind},
-			{Key: "Metadata", Value: metadata},
-			{Key: "Spec", Value: &gatewayNode.Gateway.Spec},
-			{Key: "Status", Value: &gatewayNode.Gateway.Status},
-		}
-
-		// AttachedRoutes
-		attachedRoutes := &Table{
-			ColumnNames:  []string{"Kind", "Name"},
-			UseSeparator: true,
-		}
-		for _, httpRouteNode := range gatewayNode.HTTPRoutes {
 			row := []string{
-				httpRouteNode.HTTPRoute.Kind, // Kind
-				fmt.Sprintf("%v/%v", httpRouteNode.HTTPRoute.Namespace, httpRouteNode.HTTPRoute.Name), // Name
+				backendNode.GKNN().Kind,                      // Kind
+				backendNode.GKNN().NamespacedName().String(), // Name
 			}
-			attachedRoutes.Rows = append(attachedRoutes.Rows, row)
-		}
-		pairs = append(pairs, &DescriberKV{Key: "AttachedRoutes", Value: attachedRoutes})
-
-		// DirectlyAttachedPolicies
-		policies := SortByString(maps.Values(gatewayNode.Policies))
-		pairs = append(pairs, &DescriberKV{Key: "DirectlyAttachedPolicies", Value: convertPoliciesToRefsTable(policies, false)})
-
-		// InheritedPolicies
-		inheritedPolicies := SortByString(maps.Values(gatewayNode.InheritedPolicies))
-		pairs = append(pairs, &DescriberKV{Key: "InheritedPolicies", Value: convertPoliciesToRefsTable(inheritedPolicies, true)})
-
-		// EffectivePolicies
-		if len(gatewayNode.EffectivePolicies) != 0 {
-			pairs = append(pairs, &DescriberKV{Key: "EffectivePolicies", Value: gatewayNode.EffectivePolicies})
-		}
-
-		// Analysis
-		if len(gatewayNode.Errors) != 0 {
-			pairs = append(pairs, &DescriberKV{Key: "Analysis", Value: convertErrorsToString(gatewayNode.Errors)})
-		}
-
-		// Events
-		eventList := gp.EventFetcher.FetchEventsFor(context.Background(), gatewayNode.Gateway)
-		pairs = append(pairs, &DescriberKV{Key: "Events", Value: convertEventsSliceToTable(eventList.Items, gp.Clock)})
-
-		Describe(gp, pairs)
-
-		if index+1 <= len(resourceModel.Gateways) {
-			fmt.Fprintf(gp, "\n\n")
+			backends.Rows = append(backends.Rows, row)
 		}
 	}
+	pairs = append(pairs, &DescriberKV{Key: "AttachedRoutes", Value: attachedRoutes})
+	pairs = append(pairs, &DescriberKV{Key: "Backends", Value: backends})
+
+	// DirectlyAttachedPolicies
+	policiesMap, err := directlyattachedpolicy.Access(gatewayNode)
+	if err != nil {
+		return err
+	}
+	policies := policymanager.ConvertPoliciesMapToSlice(policiesMap)
+	pairs = append(pairs, &DescriberKV{Key: "DirectlyAttachedPolicies", Value: convertPoliciesToRefsTable(policies, false)})
+
+	// InheritedPolicies
+	effectivePolicies, err := gatewayeffectivepolicy.Access(gatewayNode)
+	if err != nil {
+		return err
+	}
+	policies = policymanager.ConvertPoliciesMapToSlice(effectivePolicies.GatewayInheritedPolicies)
+	pairs = append(pairs, &DescriberKV{Key: "InheritedPolicies", Value: convertPoliciesToRefsTable(policies, true)})
+
+	// EffectivePolicies``
+	if len(effectivePolicies.GatewayEffectivePolicies) != 0 {
+		pairs = append(pairs, &DescriberKV{Key: "EffectivePolicies", Value: effectivePolicies.GatewayEffectivePolicies})
+	}
+
+	// // Analysis
+	analysisErrors, err := extensionutils.AggregateAnalysisErrors(gatewayNode)
+	if err != nil {
+		return err
+	}
+	if len(analysisErrors) != 0 {
+		pairs = append(pairs, &DescriberKV{Key: "Analysis", Value: convertErrorsToString(analysisErrors)})
+	}
+
+	// Events
+	events, err := p.EventFetcher.FetchEventsFor(gateway)
+	if err != nil {
+		return err
+	}
+	pairs = append(pairs, &DescriberKV{Key: "Events", Value: convertEventsSliceToTable(events, p.Clock)})
+
+	Describe(w, pairs)
+	return nil
 }

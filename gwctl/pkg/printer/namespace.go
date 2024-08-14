@@ -17,92 +17,97 @@ limitations under the License.
 package printer
 
 import (
-	"context"
 	"fmt"
 	"io"
 
-	"golang.org/x/exp/maps"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/duration"
-	"k8s.io/utils/clock"
 
-	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
+	"sigs.k8s.io/gateway-api/gwctl/pkg/extension/directlyattachedpolicy"
+	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
+	"sigs.k8s.io/gateway-api/gwctl/pkg/topology"
 )
 
-var _ Printer = (*NamespacesPrinter)(nil)
+func (p *TablePrinter) printNamespace(namespaceNode *topology.Node, w io.Writer) error {
+	if err := p.checkTypeChange("Namespace", w); err != nil {
+		return err
+	}
 
-type NamespacesPrinter struct {
-	io.Writer
-	Clock        clock.Clock
-	EventFetcher eventFetcher
+	if p.table == nil {
+		var columnNames []string
+		if p.OutputFormat == OutputFormatWide {
+			columnNames = []string{"NAME", "STATUS", "AGE", "POLICIES"}
+		} else {
+			columnNames = []string{"NAME", "STATUS", "AGE"}
+		}
+		p.table = &Table{
+			ColumnNames:  columnNames,
+			UseSeparator: false,
+		}
+	}
+
+	ns := topology.MustAccessObject(namespaceNode, &corev1.Namespace{})
+
+	age := "<unknown>"
+	creationTimestamp := ns.GetCreationTimestamp()
+	if !creationTimestamp.IsZero() {
+		age = duration.HumanDuration(p.Clock.Since(creationTimestamp.Time))
+	}
+
+	row := []string{
+		ns.Name,
+		string(ns.Status.Phase),
+		age,
+	}
+	if p.OutputFormat == OutputFormatWide {
+		policiesMap, err := directlyattachedpolicy.Access(namespaceNode)
+		if err != nil {
+			return err
+		}
+		policiesCount := fmt.Sprintf("%d", len(policiesMap))
+		row = append(row, policiesCount)
+	}
+	p.table.Rows = append(p.table.Rows, row)
+	return nil
 }
 
-func (nsp *NamespacesPrinter) GetPrintableNodes(resourceModel *resourcediscovery.ResourceModel) []NodeResource {
-	return NodeResources(maps.Values(resourceModel.Namespaces))
-}
+func (p *DescriptionPrinter) printNamespace(namespaceNode *topology.Node, w io.Writer) error {
+	if p.printSeparator {
+		fmt.Fprintf(w, "\n\n")
+	}
+	p.printSeparator = true
 
-func (nsp *NamespacesPrinter) PrintTable(resourceModel *resourcediscovery.ResourceModel, wide bool) {
-	var columnNames []string
-	if wide {
-		columnNames = []string{"NAME", "STATUS", "AGE", "POLICIES"}
-	} else {
-		columnNames = []string{"NAME", "STATUS", "AGE"}
+	namespace := topology.MustAccessObject(namespaceNode, &corev1.Namespace{})
+
+	metadata := namespace.ObjectMeta.DeepCopy()
+	metadata.Labels = nil
+	metadata.Annotations = nil
+	metadata.Name = ""
+	metadata.Namespace = ""
+	metadata.ManagedFields = nil
+
+	pairs := []*DescriberKV{
+		{Key: "Name", Value: namespace.GetName()},
+		{Key: "Labels", Value: namespace.Labels},
+		{Key: "Annotations", Value: namespace.Annotations},
+		{Key: "Status", Value: &namespace.Status},
 	}
 
-	table := &Table{
-		ColumnNames:  columnNames,
-		UseSeparator: false,
+	// DirectlyAttachedPolicies
+	policiesMap, err := directlyattachedpolicy.Access(namespaceNode)
+	if err != nil {
+		return err
 	}
+	policies := policymanager.ConvertPoliciesMapToSlice(policiesMap)
+	pairs = append(pairs, &DescriberKV{Key: "DirectlyAttachedPolicies", Value: convertPoliciesToRefsTable(policies, false)})
 
-	namespaceNodes := maps.Values(resourceModel.Namespaces)
-	for _, namespaceNode := range SortByString(namespaceNodes) {
-		age := duration.HumanDuration(nsp.Clock.Since(namespaceNode.Namespace.CreationTimestamp.Time))
-		row := []string{
-			namespaceNode.Namespace.Name,
-			string(namespaceNode.Namespace.Status.Phase),
-			age,
-		}
-		if wide {
-			policiesCount := fmt.Sprintf("%d", len(namespaceNode.Policies))
-			row = append(row, policiesCount)
-		}
-		table.Rows = append(table.Rows, row)
+	// Events
+	events, err := p.EventFetcher.FetchEventsFor(namespace)
+	if err != nil {
+		return err
 	}
+	pairs = append(pairs, &DescriberKV{Key: "Events", Value: convertEventsSliceToTable(events, p.Clock)})
 
-	table.Write(nsp, 0)
-}
-
-func (nsp *NamespacesPrinter) PrintDescribeView(resourceModel *resourcediscovery.ResourceModel) {
-	namespaceNodes := maps.Values(resourceModel.Namespaces)
-	index := 0
-	for _, namespaceNode := range SortByString(namespaceNodes) {
-		index++
-
-		metadata := namespaceNode.Namespace.ObjectMeta.DeepCopy()
-		metadata.Labels = nil
-		metadata.Annotations = nil
-		metadata.Name = ""
-		metadata.Namespace = ""
-		metadata.ManagedFields = nil
-
-		pairs := []*DescriberKV{
-			{Key: "Name", Value: namespaceNode.Namespace.GetName()},
-			{Key: "Labels", Value: namespaceNode.Namespace.Labels},
-			{Key: "Annotations", Value: namespaceNode.Namespace.Annotations},
-			{Key: "Status", Value: &namespaceNode.Namespace.Status},
-		}
-
-		// DirectlyAttachedPolicies
-		policies := SortByString(maps.Values(namespaceNode.Policies))
-		pairs = append(pairs, &DescriberKV{Key: "DirectlyAttachedPolicies", Value: convertPoliciesToRefsTable(policies, false)})
-
-		// Events
-		eventList := nsp.EventFetcher.FetchEventsFor(context.Background(), namespaceNode.Namespace)
-		pairs = append(pairs, &DescriberKV{Key: "Events", Value: convertEventsSliceToTable(eventList.Items, nsp.Clock)})
-
-		Describe(nsp, pairs)
-
-		if index+1 <= len(resourceModel.Namespaces) {
-			fmt.Fprintf(nsp, "\n\n")
-		}
-	}
+	Describe(w, pairs)
+	return nil
 }
