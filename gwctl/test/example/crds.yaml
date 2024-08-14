@@ -1,0 +1,377 @@
+################################################################################
+# CRD Definitions for Policies
+################################################################################
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  labels:
+    gateway.networking.k8s.io/policy: "true"
+  name: healthcheckpolicies.foo.com
+spec:
+  group: foo.com
+  names:
+    kind: HealthCheckPolicy
+    listKind: HealthCheckPolicyList
+    plural: healthcheckpolicies
+    singular: healthcheckpolicy
+  scope: Namespaced
+  versions:
+  - name: v1
+    schema:
+      openAPIV3Schema:
+        description: "healthcheckpolicy"
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: Spec
+            properties:
+              sampleParentField:
+                description: Default defines default policy configuration for the
+                  targeted resource.
+                properties:
+                  sampleField:
+                    description: sampleField
+                    type: string
+                type: object
+              targetRef:
+                description: TargetRef identifies an API object to apply policy to.
+                properties:
+                  group:
+                    description: Group is the group of the target resource.
+                    maxLength: 253
+                    pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+                    type: string
+                  kind:
+                    description: Kind is kind of the target resource.
+                    maxLength: 63
+                    minLength: 1
+                    pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
+                    type: string
+                  name:
+                    description: Name is the name of the target resource.
+                    maxLength: 253
+                    minLength: 1
+                    type: string
+                  namespace:
+                    description: Namespace is the namespace of the referent. When
+                      unspecified, the local namespace is inferred. Even when policy
+                      targets a resource in a different namespace, it MUST only apply
+                      to traffic originating from the same namespace as the policy.
+                    maxLength: 63
+                    minLength: 1
+                    pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                    type: string
+                required:
+                - group
+                - kind
+                - name
+                type: object
+            required:
+            - targetRef
+            type: object
+        required:
+        - spec
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  labels:
+    gateway.networking.k8s.io/policy: "inherited"
+  name: timeoutpolicies.bar.com
+spec:
+  group: bar.com
+  names:
+    kind: TimeoutPolicy
+    listKind: TimeoutPolicyList
+    plural: timeoutpolicies
+    singular: timeoutpolicy
+  scope: Cluster
+  versions:
+  - name: v1
+    schema:
+      openAPIV3Schema:
+        description: "timeoutpolicy"
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: Spec
+            properties:
+              default:
+                description: Default defines default policy configuration for the
+                  targeted resource.
+                properties:
+                  timeout1:
+                    description: timeout
+                    type: string
+                  timeout2:
+                    description: timeout
+                    type: string
+                  timeout3:
+                    description: timeout
+                    type: string
+                  timeout4:
+                    description: timeout
+                    type: string
+                type: object
+              override:
+                description: Override defines default policy configuration for the
+                  targeted resource.
+                properties:
+                  timeout1:
+                    description: timeout
+                    type: string
+                  timeout2:
+                    description: timeout
+                    type: string
+                  timeout3:
+                    description: timeout
+                    type: string
+                  timeout4:
+                    description: timeout
+                    type: string
+                type: object
+              targetRef:
+                description: TargetRef identifies an API object to apply policy to.
+                properties:
+                  group:
+                    description: Group is the group of the target resource.
+                    maxLength: 253
+                    pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+                    type: string
+                  kind:
+                    description: Kind is kind of the target resource.
+                    maxLength: 63
+                    minLength: 1
+                    pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
+                    type: string
+                  name:
+                    description: Name is the name of the target resource.
+                    maxLength: 253
+                    minLength: 1
+                    type: string
+                  namespace:
+                    description: Namespace is the namespace of the referent. When
+                      unspecified, the local namespace is inferred. Even when policy
+                      targets a resource in a different namespace, it MUST only apply
+                      to traffic originating from the same namespace as the policy.
+                    maxLength: 63
+                    minLength: 1
+                    pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                    type: string
+                required:
+                - group
+                - kind
+                - name
+                type: object
+            required:
+            - targetRef
+            type: object
+        required:
+        - spec
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  labels:
+    gateway.networking.k8s.io/policy: "true"
+  name: retryonpolicies.foo.com
+spec:
+  group: foo.com
+  names:
+    kind: RetryOnPolicy
+    listKind: RetryOnPolicyList
+    plural: retryonpolicies
+    singular: retryonpolicy
+  scope: Namespaced
+  versions:
+  - name: v1
+    schema:
+      openAPIV3Schema:
+        description: "retryonpolicy"
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: Spec
+            properties:
+              sampleParentField:
+                description: sampleParentField defines default policy configuration for the
+                  targeted resource.
+                properties:
+                  sampleField:
+                    description: sampleField
+                    type: string
+                type: object
+              targetRef:
+                description: TargetRef identifies an API object to apply policy to.
+                properties:
+                  group:
+                    description: Group is the group of the target resource.
+                    maxLength: 253
+                    pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+                    type: string
+                  kind:
+                    description: Kind is kind of the target resource.
+                    maxLength: 63
+                    minLength: 1
+                    pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
+                    type: string
+                  name:
+                    description: Name is the name of the target resource.
+                    maxLength: 253
+                    minLength: 1
+                    type: string
+                  namespace:
+                    description: Namespace is the namespace of the referent. When
+                      unspecified, the local namespace is inferred. Even when policy
+                      targets a resource in a different namespace, it MUST only apply
+                      to traffic originating from the same namespace as the policy.
+                    maxLength: 63
+                    minLength: 1
+                    pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                    type: string
+                required:
+                - group
+                - kind
+                - name
+                type: object
+            required:
+            - targetRef
+            type: object
+        required:
+        - spec
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  labels:
+    gateway.networking.k8s.io/policy: "true"
+  name: tlsminimumversionpolicies.baz.com
+spec:
+  group: baz.com
+  names:
+    kind: TLSMinimumVersionPolicy
+    listKind: TLSMinimumVersionPolicyList
+    plural: tlsminimumversionpolicies
+    singular: tlsminimumversionpolicy
+  scope: Namespaced
+  versions:
+  - name: v1
+    schema:
+      openAPIV3Schema:
+        description: "tlsminimumversionpolicy"
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: Spec
+            properties:
+              sampleParentField:
+                description: sampleParentField defines sampleParentField policy configuration for the
+                  targeted resource.
+                properties:
+                  sampleField:
+                    description: sampleField
+                    type: string
+                type: object
+              targetRef:
+                description: TargetRef identifies an API object to apply policy to.
+                properties:
+                  group:
+                    description: Group is the group of the target resource.
+                    maxLength: 253
+                    pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+                    type: string
+                  kind:
+                    description: Kind is kind of the target resource.
+                    maxLength: 63
+                    minLength: 1
+                    pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
+                    type: string
+                  name:
+                    description: Name is the name of the target resource.
+                    maxLength: 253
+                    minLength: 1
+                    type: string
+                  namespace:
+                    description: Namespace is the namespace of the referent. When
+                      unspecified, the local namespace is inferred. Even when policy
+                      targets a resource in a different namespace, it MUST only apply
+                      to traffic originating from the same namespace as the policy.
+                    maxLength: 63
+                    minLength: 1
+                    pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                    type: string
+                required:
+                - group
+                - kind
+                - name
+                type: object
+            required:
+            - targetRef
+            type: object
+        required:
+        - spec
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+---

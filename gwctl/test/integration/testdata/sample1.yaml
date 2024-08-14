@@ -1,0 +1,207 @@
+################################################################################
+# GatewayClasses
+################################################################################
+apiVersion: gateway.networking.k8s.io/v1
+kind: GatewayClass
+metadata:
+  name: foo-com-external-gateway-class
+spec:
+  controllerName: foo.com/external-gateway-class
+  description: Create an external load balancer
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: GatewayClass
+metadata:
+  name: bar-com-internal-gateway-class
+spec:
+  controllerName: bar.baz/internal-gateway-class
+  description: Create an internal load balancer
+---
+################################################################################
+# Namespaces
+################################################################################
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: test
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: default
+---
+################################################################################
+# Gateways
+################################################################################
+kind: Gateway
+apiVersion: gateway.networking.k8s.io/v1
+metadata:
+  name: gateway-1
+  namespace: test
+  uid: uid-for-test-gateway-1
+spec:
+  gatewayClassName: foo-com-external-gateway-class
+  listeners:
+  - name: http
+    protocol: HTTP
+    port: 80
+---
+kind: Gateway
+apiVersion: gateway.networking.k8s.io/v1
+metadata:
+  name: gateway-2
+  namespace: test
+spec:
+  gatewayClassName: bar-com-internal-gateway-class
+  listeners:
+  - name: https
+    protocol: HTTPS
+    port: 443
+---
+kind: Gateway
+apiVersion: gateway.networking.k8s.io/v1
+metadata:
+  name: gateway-3
+  namespace: default
+spec:
+  gatewayClassName: foo-com-external-gateway-class
+  listeners:
+  - name: http
+    protocol: HTTP
+    port: 80
+---
+################################################################################
+# HTTPRoutes
+################################################################################
+kind: HTTPRoute
+apiVersion: gateway.networking.k8s.io/v1
+metadata:
+  name: httproute-1
+  namespace: test
+spec:
+  parentRefs:
+  - kind: Gateway
+    name: gateway-1
+  hostnames:
+  - "demo.com"
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /example
+    backendRefs:
+    - name: svc-1
+      port: 80
+---
+kind: HTTPRoute
+apiVersion: gateway.networking.k8s.io/v1
+metadata:
+  name: httproute-2
+  namespace: test
+spec:
+  parentRefs:
+  - kind: Gateway
+    name: gateway-1
+  - kind: Gateway
+    name: gateway-2
+  hostnames:
+  - "example.com"
+  - "example2.com"
+  - "example3.com"
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /example
+    backendRefs:
+    - name: svc-2
+      port: 80
+---
+kind: HTTPRoute
+apiVersion: gateway.networking.k8s.io/v1
+metadata:
+  name: httproute-3
+  namespace: default
+spec:
+  parentRefs:
+  - kind: Gateway
+    name: gateway-3
+  hostnames:
+  - "example4.com"
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /example
+    backendRefs:
+    - name: svc-3
+      port: 80
+---
+################################################################################
+# Services
+################################################################################
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-1
+  namespace: test
+spec:
+  type: ClusterIP
+  selector:
+    app: demo-app
+  ports:
+  - name: tcp
+    port: 80
+    protocol: TCP
+    targetPort: echo-port
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-2
+  namespace: test
+spec:
+  type: ClusterIP
+  selector:
+    app: demo-app
+  ports:
+  - name: udp
+    port: 90
+    protocol: UDP
+    targetPort: 9090
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-3
+  namespace: default
+spec:
+  type: ClusterIP
+  selector:
+    app: demo-app
+  ports:
+  - name: tcp
+    port: 80
+    protocol: TCP
+    targetPort: 8080
+---
+################################################################################
+# Events
+################################################################################
+apiVersion: v1
+kind: Event
+metadata:
+  name: demo-backend-policy-2.17c7bce61233ca4f
+  namespace: test
+count: 188
+involvedObject:
+  apiVersion: gateway.networking.k8s.io/v1
+  kind: Gateway
+  namespace: test
+  name: gateway-1
+  uid: uid-for-test-gateway-1
+message: 'test message'
+reason: SYNC
+source:
+  component: my-gateway-controller
+type: Warning
