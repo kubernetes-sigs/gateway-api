@@ -1928,7 +1928,7 @@ spec:
                       maxItems: 8
                       type: array
                     name:
-                      description: |-
+                      description: |
                         Name is the name of the route rule. This name MUST be unique within a Route if it is set.
 
 
@@ -2061,9 +2061,6 @@ spec:
                     : 0) : 0) + (self.size() > 14 ? (has(self[14].matches) ? self[14].matches.size()
                     : 0) : 0) + (self.size() > 15 ? (has(self[15].matches) ? self[15].matches.size()
                     : 0) : 0) <= 128'
-                - message: Rule name must be unique within the route
-                  rule: self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name)
-                    && l1.name == l2.name))
             type: object
           status:
             description: Status defines the current state of GRPCRoute.
@@ -4289,7 +4286,7 @@ spec:
                       maxItems: 8
                       type: array
                     name:
-                      description: |-
+                      description: |
                         Name is the name of the route rule. This name MUST be unique within a Route if it is set.
 
 
@@ -4422,9 +4419,6 @@ spec:
                     : 0) : 0) + (self.size() > 14 ? (has(self[14].matches) ? self[14].matches.size()
                     : 0) : 0) + (self.size() > 15 ? (has(self[15].matches) ? self[15].matches.size()
                     : 0) : 0) <= 128'
-                - message: Rule name must be unique within the route
-                  rule: self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name)
-                    && l1.name == l2.name))
             type: object
           status:
             description: Status defines the current state of GRPCRoute.

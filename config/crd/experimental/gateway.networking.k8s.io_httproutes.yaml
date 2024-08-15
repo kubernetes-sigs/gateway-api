@@ -2715,7 +2715,7 @@ spec:
                       maxItems: 64
                       type: array
                     name:
-                      description: |-
+                      description: |
                         Name is the name of the route rule. This name MUST be unique within a Route if it is set.
 
 
@@ -2940,9 +2940,6 @@ spec:
                 maxItems: 16
                 type: array
                 x-kubernetes-validations:
-                - message: Rule name must be unique within the route
-                  rule: self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name)
-                    && l1.name == l2.name))
                 - message: While 16 rules and 64 matches per rule are allowed, the
                     total number of matches across all rules in a route must be less
                     than 128
@@ -5975,7 +5972,7 @@ spec:
                       maxItems: 64
                       type: array
                     name:
-                      description: |-
+                      description: |
                         Name is the name of the route rule. This name MUST be unique within a Route if it is set.
 
 
@@ -6200,9 +6197,6 @@ spec:
                 maxItems: 16
                 type: array
                 x-kubernetes-validations:
-                - message: Rule name must be unique within the route
-                  rule: self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name)
-                    && l1.name == l2.name))
                 - message: While 16 rules and 64 matches per rule are allowed, the
                     total number of matches across all rules in a route must be less
                     than 128

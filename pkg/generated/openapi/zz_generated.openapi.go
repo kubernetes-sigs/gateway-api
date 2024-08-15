@@ -3287,7 +3287,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GRPCRouteRule(ref common.ReferenceCall
 				Properties: map[string]spec.Schema{
 					"name": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Name is the name of the route rule. This name MUST be unique within a Route if it is set.\n\nSupport: Extended",
+							Description: "Name is the name of the route rule. This name MUST be unique within a Route if it is set.\n\nSupport: Extended <gateway:experimental>",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -4669,7 +4669,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteRule(ref common.ReferenceCall
 				Properties: map[string]spec.Schema{
 					"name": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Name is the name of the route rule. This name MUST be unique within a Route if it is set.\n\nSupport: Extended",
+							Description: "Name is the name of the route rule. This name MUST be unique within a Route if it is set.\n\nSupport: Extended <gateway:experimental>",
 							Type:        []string{"string"},
 							Format:      "",
 						},
