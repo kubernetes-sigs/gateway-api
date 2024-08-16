@@ -424,7 +424,10 @@ spec:
                   - path:
                       type: PathPrefix
                       value: /
-                description: Rules are a list of HTTP matchers, filters and actions.
+                description: |+
+                  Rules are a list of HTTP matchers, filters and actions.
+
+
                 items:
                   description: |-
                     HTTPRouteRule defines semantics for matching an HTTP request based on
@@ -2954,6 +2957,9 @@ spec:
                     : 0) + (self.size() > 12 ? self[12].matches.size() : 0) + (self.size()
                     > 13 ? self[13].matches.size() : 0) + (self.size() > 14 ? self[14].matches.size()
                     : 0) + (self.size() > 15 ? self[15].matches.size() : 0) <= 128'
+                - message: Rule name must be unique within the route
+                  rule: self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name)
+                    && l1.name == l2.name))
             type: object
           status:
             description: Status defines the current state of HTTPRoute.
@@ -3681,7 +3687,10 @@ spec:
                   - path:
                       type: PathPrefix
                       value: /
-                description: Rules are a list of HTTP matchers, filters and actions.
+                description: |+
+                  Rules are a list of HTTP matchers, filters and actions.
+
+
                 items:
                   description: |-
                     HTTPRouteRule defines semantics for matching an HTTP request based on
@@ -6211,6 +6220,9 @@ spec:
                     : 0) + (self.size() > 12 ? self[12].matches.size() : 0) + (self.size()
                     > 13 ? self[13].matches.size() : 0) + (self.size() > 14 ? self[14].matches.size()
                     : 0) + (self.size() > 15 ? self[15].matches.size() : 0) <= 128'
+                - message: Rule name must be unique within the route
+                  rule: self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name)
+                    && l1.name == l2.name))
             type: object
           status:
             description: Status defines the current state of HTTPRoute.

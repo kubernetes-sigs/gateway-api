@@ -324,7 +324,10 @@ spec:
                     || p2.port == 0)) || (has(p1.port) && has(p2.port) && p1.port
                     == p2.port))))
               rules:
-                description: Rules are a list of UDP matchers and actions.
+                description: |+
+                  Rules are a list of UDP matchers and actions.
+
+
                 items:
                   description: UDPRouteRule is the configuration for a given rule.
                   properties:
@@ -500,6 +503,10 @@ spec:
                 maxItems: 16
                 minItems: 1
                 type: array
+                x-kubernetes-validations:
+                - message: Rule name must be unique within the route
+                  rule: self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name)
+                    && l1.name == l2.name))
             required:
             - rules
             type: object
