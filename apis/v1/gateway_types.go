@@ -226,7 +226,6 @@ type GatewaySpec struct {
 	//
 	// Support: Core
 	//
-	// <gateway:experimental>
 	// +optional
 	Infrastructure *GatewayInfrastructure `json:"infrastructure,omitempty"`
 
