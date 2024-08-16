@@ -37,7 +37,7 @@ func ParseDuration(s string) (*time.Duration, error) {
 
 		See https://gateway-api.sigs.k8s.io/geps/gep-2257/ for more details.
 	*/
-	if matched := re.MatchString(s); matched == false {
+	if !re.MatchString(s) {
 		return nil, errors.New("Invalid duration format")
 	}
 	parsedTime, err := time.ParseDuration(s)
@@ -46,10 +46,11 @@ func ParseDuration(s string) (*time.Duration, error) {
 	}
 
 	return &parsedTime, nil
-
 }
 
 var reSplit = regexp.MustCompile(`[0-9]{1,5}(h|ms|s|m)`)
+
+const maxDuration = 99999*time.Hour + 59*time.Minute + 59*time.Second + 999*time.Millisecond
 
 func FormatDuration(duration time.Duration) (string, error) {
 	/*
@@ -66,9 +67,17 @@ func FormatDuration(duration time.Duration) (string, error) {
 
 		Returns: string or error if duration cannot be expressed as a GEP-2257 Duration format.
 	*/
-	m, _ := time.ParseDuration("0s")
-	if duration == m {
+	if duration == 0 {
 		return "0s", nil
+	}
+
+	// check if a negative value
+	if duration < 0 {
+		return "", errors.New("Invalid duration format. Cannot have negative durations")
+	}
+	// check for the maximum value allowed to be expressed
+	if duration > maxDuration {
+		return "", errors.New("Invalid duration format. Duration larger than maximum expression allowed in GEP-2257")
 	}
 	// time.Duration allows for floating point ms, which is not allowed in GEP-2257
 	durationMicroseconds := duration.Microseconds()
@@ -77,7 +86,7 @@ func FormatDuration(duration time.Duration) (string, error) {
 		return "", errors.New("Cannot express sub-milliseconds precision in GEP-2257")
 	}
 
-	//Golang's time.Duration allows for floating point seconds instead of converting to ms
+	// Golang's time.Duration allows for floating point seconds instead of converting to ms
 	durationMilliseconds := duration.Milliseconds()
 
 	var ms int64
@@ -90,11 +99,6 @@ func FormatDuration(duration time.Duration) (string, error) {
 	durationString := duration.String()
 	if ms > 0 {
 		durationString += fmt.Sprintf("%dms", ms)
-	}
-
-	// check if a negative value
-	if duration < 0 {
-		return "", errors.New("Invalid duration format. Cannot have negative durations")
 	}
 
 	// trim the 0 values from the string (for example, 30m0s should result in 30m)
@@ -110,7 +114,7 @@ func FormatDuration(duration time.Duration) (string, error) {
 	}
 
 	// check if there are floating number points
-	if matched := re.MatchString(res); matched == false {
+	if !re.MatchString(res) {
 		return "", errors.New("Invalid duration format")
 	}
 
