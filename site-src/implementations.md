@@ -222,8 +222,8 @@ few simple steps.
 
 [eg-home]:https://gateway.envoyproxy.io/
 [envoy-org]:https://github.com/envoyproxy
-[eg-supported]: https://gateway.envoyproxy.io/v1.0.0/user/traffic/gatewayapi-support/
-[eg-quickstart]:https://gateway.envoyproxy.io/v1.0.0/user/quickstart
+[eg-supported]:https://gateway.envoyproxy.io/docs/tasks/quickstart/
+[eg-quickstart]:https://gateway.envoyproxy.io/docs/tasks/quickstart
 
 ### Flomesh Service Mesh (FSM)
 
