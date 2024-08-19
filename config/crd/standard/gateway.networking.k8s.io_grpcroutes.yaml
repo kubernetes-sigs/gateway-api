@@ -412,7 +412,10 @@ spec:
                     == '')) || (has(p1.sectionName) && has(p2.sectionName) && p1.sectionName
                     == p2.sectionName))))
               rules:
-                description: Rules are a list of GRPC matchers, filters and actions.
+                description: |+
+                  Rules are a list of GRPC matchers, filters and actions.
+
+
                 items:
                   description: |-
                     GRPCRouteRule defines the semantics for matching a gRPC request based on
@@ -2616,7 +2619,10 @@ spec:
                     == '')) || (has(p1.sectionName) && has(p2.sectionName) && p1.sectionName
                     == p2.sectionName))))
               rules:
-                description: Rules are a list of GRPC matchers, filters and actions.
+                description: |+
+                  Rules are a list of GRPC matchers, filters and actions.
+
+
                 items:
                   description: |-
                     GRPCRouteRule defines the semantics for matching a gRPC request based on

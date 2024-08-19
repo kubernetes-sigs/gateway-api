@@ -395,7 +395,10 @@ spec:
                   - path:
                       type: PathPrefix
                       value: /
-                description: Rules are a list of HTTP matchers, filters and actions.
+                description: |+
+                  Rules are a list of HTTP matchers, filters and actions.
+
+
                 items:
                   description: |-
                     HTTPRouteRule defines semantics for matching an HTTP request based on
@@ -3498,7 +3501,10 @@ spec:
                   - path:
                       type: PathPrefix
                       value: /
-                description: Rules are a list of HTTP matchers, filters and actions.
+                description: |+
+                  Rules are a list of HTTP matchers, filters and actions.
+
+
                 items:
                   description: |-
                     HTTPRouteRule defines semantics for matching an HTTP request based on

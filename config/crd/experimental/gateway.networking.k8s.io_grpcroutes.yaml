@@ -441,7 +441,10 @@ spec:
                     || p2.port == 0)) || (has(p1.port) && has(p2.port) && p1.port
                     == p2.port))))
               rules:
-                description: Rules are a list of GRPC matchers, filters and actions.
+                description: |+
+                  Rules are a list of GRPC matchers, filters and actions.
+
+
                 items:
                   description: |-
                     GRPCRouteRule defines the semantics for matching a gRPC request based on
@@ -1927,6 +1930,16 @@ spec:
                         type: object
                       maxItems: 8
                       type: array
+                    name:
+                      description: |
+                        Name is the name of the route rule. This name MUST be unique within a Route if it is set.
+
+
+                        Support: Extended
+                      maxLength: 253
+                      minLength: 1
+                      pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+                      type: string
                     sessionPersistence:
                       description: |+
                         SessionPersistence defines and configures session persistence
@@ -2051,6 +2064,9 @@ spec:
                     : 0) : 0) + (self.size() > 14 ? (has(self[14].matches) ? self[14].matches.size()
                     : 0) : 0) + (self.size() > 15 ? (has(self[15].matches) ? self[15].matches.size()
                     : 0) : 0) <= 128'
+                - message: Rule name must be unique within the route
+                  rule: self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name)
+                    && l1.name == l2.name))
             type: object
           status:
             description: Status defines the current state of GRPCRoute.
@@ -2789,7 +2805,10 @@ spec:
                     || p2.port == 0)) || (has(p1.port) && has(p2.port) && p1.port
                     == p2.port))))
               rules:
-                description: Rules are a list of GRPC matchers, filters and actions.
+                description: |+
+                  Rules are a list of GRPC matchers, filters and actions.
+
+
                 items:
                   description: |-
                     GRPCRouteRule defines the semantics for matching a gRPC request based on
@@ -4275,6 +4294,16 @@ spec:
                         type: object
                       maxItems: 8
                       type: array
+                    name:
+                      description: |
+                        Name is the name of the route rule. This name MUST be unique within a Route if it is set.
+
+
+                        Support: Extended
+                      maxLength: 253
+                      minLength: 1
+                      pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+                      type: string
                     sessionPersistence:
                       description: |+
                         SessionPersistence defines and configures session persistence
@@ -4399,6 +4428,9 @@ spec:
                     : 0) : 0) + (self.size() > 14 ? (has(self[14].matches) ? self[14].matches.size()
                     : 0) : 0) + (self.size() > 15 ? (has(self[15].matches) ? self[15].matches.size()
                     : 0) : 0) <= 128'
+                - message: Rule name must be unique within the route
+                  rule: self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name)
+                    && l1.name == l2.name))
             type: object
           status:
             description: Status defines the current state of GRPCRoute.
