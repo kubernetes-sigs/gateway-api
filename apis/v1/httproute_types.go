@@ -1153,6 +1153,34 @@ type HTTPRequestMirrorFilter struct {
 	//
 	// Support: Implementation-specific for any other resource
 	BackendRef BackendObjectReference `json:"backendRef"`
+
+	// Percent represents the percentage of requests that should be
+        // mirrored to BackendRef. Its minimum value is 0 (indicating 0% of
+        // requests) and its maximum value is 100 (indicating 100% of requests).
+        //
+        // If both Percent and Fraction are specified, Fraction will take
+        // priority. If Percent is unspecified, it will have a default value of
+        // 100. If Fraction is unspecified, it will have a default value of
+        // 100/100. This means that if neither field is specified, 100% of
+        // requests will be mirrored.
+        //
+        // +optional
+        // +kubebuilder:default=100
+        // +kubebuilder:validation:Minimum=0
+        // +kubebuilder:validation:Maximum=100
+        Percent int32 `json:"percent,omitempty"`
+
+        // Fraction represents the fraction of requests that should be
+        // mirrored to BackendRef.
+        //
+        // If both Percent and Fraction are specified, Fraction will take
+        // priority. If Percent is unspecified, it will have a default value of
+        // 100. If Fraction is unspecified, it will have a default value of
+        // 100/100. This means that if neither field is specified, 100% of
+        // requests will be mirrored.
+        //
+        // +optional
+        Fraction Fraction `json:"fraction,omitempty"`
 }
 
 // HTTPBackendRef defines how a HTTPRoute forwards a HTTP request.
