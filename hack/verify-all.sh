@@ -65,7 +65,7 @@ do
     if bash "$t" &> /dev/null; then
       echo -e "${color_green}SUCCESS${color_norm}"
     else
-      echo -e "${color_red}FAILED${color_norm}"
+      echo -e "${color_red}FAILED: $t ${color_norm}"
       ret=1
     fi
   else
