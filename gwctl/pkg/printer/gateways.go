@@ -143,6 +143,10 @@ func (gp *GatewaysPrinter) PrintDescribeView(resourceModel *resourcediscovery.Re
 		policies := SortByString(maps.Values(gatewayNode.Policies))
 		pairs = append(pairs, &DescriberKV{Key: "DirectlyAttachedPolicies", Value: convertPoliciesToRefsTable(policies, false)})
 
+		// InheritedPolicies
+		inheritedPolicies := SortByString(maps.Values(gatewayNode.InheritedPolicies))
+		pairs = append(pairs, &DescriberKV{Key: "InheritedPolicies", Value: convertPoliciesToRefsTable(inheritedPolicies, true)})
+
 		// EffectivePolicies
 		if len(gatewayNode.EffectivePolicies) != 0 {
 			pairs = append(pairs, &DescriberKV{Key: "EffectivePolicies", Value: gatewayNode.EffectivePolicies})

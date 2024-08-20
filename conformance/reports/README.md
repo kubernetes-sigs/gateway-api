@@ -121,7 +121,18 @@ comply with the following rules:
 - `mode`: it is the mode of the implementation used to run the tests. If different
   from `default`, it must correspond to a specific setup of the implementation.
 - Test result: in order to have a report valid to be accepted, all the profiles
-  need to have the `result` fields (core and extended) set to `success`. It means
-  that all the core conformance tests have been successfully run as well as all
-  the tests related to the supported extended features. No reports with partial
-  or failing results can be accepted.
+  need to have the `result` fields (core and extended) set to `success` or `partial`.
+  `partial` reports will be displayed separately from the `success` ones in the
+  [implementations table][implementations-table].
+
+  A `success` report implies **all** the following:
+  - all the core conformance tests have been successfully run
+  - all the tests related to the supported extended features have been successfully
+    run.
+  
+  A `partial` report implies **at least one** of the following:
+  - some core conformance tests have been skipped
+  - some tests related to the supported extended features have been skipped
+  - the conformance test run required some steps unexpected by the suite.
+
+[implementations-table]: https://gateway-api.sigs.k8s.io/implementations/v1.1/

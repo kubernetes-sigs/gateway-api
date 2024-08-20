@@ -1,7 +1,7 @@
 # GEP-1742: HTTPRoute Timeouts
 
 * Issue: [#1742](https://github.com/kubernetes-sigs/gateway-api/issues/1742)
-* Status: Experimental
+* Status: Standard
 
 (See status definitions [here](overview.md#status).)
 
@@ -383,7 +383,7 @@ type HTTPRouteRule struct {
 	// Support: Extended
 	//
 	// +optional
-	// <gateway:experimental>
+	// <gateway:standard>
 	Timeouts *HTTPRouteTimeouts `json:"timeouts,omitempty"`
 
 	// ...
@@ -408,7 +408,8 @@ type HTTPRouteTimeouts struct {
 	// request stream has been received instead of immediately after the transaction is
 	// initiated by the client.
 	//
-	// When this field is unspecified, request timeout behavior is implementation-specific.
+	// The value of Request is a Gateway API Duration string as defined by GEP-2257. When this
+	// field is unspecified, request timeout behavior is implementation-specific.
 	//
 	// Support: Extended
 	//
@@ -423,8 +424,10 @@ type HTTPRouteTimeouts struct {
 	// may result in more than one call from the gateway to the destination backend,
 	// for example, if automatic retries are supported.
 	//
-	// Because the Request timeout encompasses the BackendRequest timeout, the value of
-	// BackendRequest must be <= the value of Request timeout.
+	// The value of BackendRequest must be a Gateway API Duration string as defined by
+	// GEP-2257.  When this field is unspecified, its behavior is implementation-specific;
+	// when specified, the value of BackendRequest must be no more than the value of the
+	// Request timeout (since the Request timeout encompasses the BackendRequest timeout).
 	//
 	// Support: Extended
 	//
@@ -432,7 +435,7 @@ type HTTPRouteTimeouts struct {
 	BackendRequest *Duration `json:"backendRequest,omitempty"`
 }
 
-// Duration is a string value representing a duration in time. The foramat is as specified
+// Duration is a string value representing a duration in time. The format is as specified
 // in GEP-2257, a strict subset of the syntax parsed by Golang time.ParseDuration.
 //
 // +kubebuilder:validation:Pattern=`^([0-9]{1,5}(h|m|s|ms)){1,4}$`
@@ -474,7 +477,7 @@ Timeouts could be configured using policy attachments or in objects other than `
 Instead of configuring timeouts directly on an API object, they could be configured using policy
 attachments. The advantage to this approach would be that timeout policies can be not only
 configured for an `HTTPRouteRule`, but can also be added/overriden at a more fine
-(e.g., `HTTPBackendRef`) or course (e.g. `HTTPRoute`) level of granularity.
+(e.g., `HTTPBackendRef`) or coarse (e.g. `HTTPRoute`) level of granularity.
 
 The downside, however, is complexity introduced for the most common use case, adding a simple
 timeout for an HTTP request. Setting a single field in the route rule, instead of needing to
@@ -503,5 +506,4 @@ previous section, is likely a better way to handle timeout configuration above t
 
 ## References
 
-(Add any additional document links. Again, we should try to avoid
-too much content not in version control to avoid broken links)
+[GEP-2257]:/geps/gep-2257/

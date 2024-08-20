@@ -41,11 +41,10 @@ Each GEP has a state, which tracks where it is in the GEP process.
 
 GEPs can move to some states from any other state:
 
-  * **Declined**: The GEP has been declined and further work will not occur.
   * **Deferred:** We do not currently have bandwidth to handle this GEP, it
     may be revisited in the future.
   * **Declined:** This proposal was considered by the community but ultimately
-  rejected.
+  rejected and further work will not occur.
   * **Withdrawn:** This proposal was considered by the community but ultimately
   withdrawn by the author.
 

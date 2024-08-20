@@ -1,0 +1,48 @@
+apiVersion: gateway.networking.k8s.io/v1alpha1
+date: "2024-07-31T18:39:39Z"
+gatewayAPIVersion: v1.0.0
+implementation:
+  contact:
+  - '@projectcontour/maintainers'
+  organization: projectcontour
+  project: contour
+  url: https://projectcontour.io/
+  version: v1.29.2
+kind: ConformanceReport
+profiles:
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 29
+      Skipped: 0
+    summary: ""
+  extended:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 12
+      Skipped: 0
+    summary: ""
+    supportedFeatures:
+    - HTTPRoutePathRedirect
+    - HTTPRouteRequestMultipleMirrors
+    - HTTPRouteResponseHeaderModification
+    - HTTPRoutePortRedirect
+    - HTTPRouteHostRewrite
+    - HTTPRoutePathRewrite
+    - HTTPRouteRequestTimeout
+    - HTTPRouteBackendTimeout
+    - HTTPRouteRequestMirror
+    - HTTPRouteMethodMatching
+    - HTTPRouteSchemeRedirect
+    - HTTPRouteQueryParamMatching
+  name: HTTP
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 10
+      Skipped: 0
+    summary: ""
+  name: TLS

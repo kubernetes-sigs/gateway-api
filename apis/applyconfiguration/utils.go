@@ -145,6 +145,8 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1.SecretObjectReferenceApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("SessionPersistence"):
 		return &apisv1.SessionPersistenceApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("SupportedFeature"):
+		return &apisv1.SupportedFeatureApplyConfiguration{}
 
 		// Group=gateway.networking.k8s.io, Version=v1alpha2
 	case v1alpha2.SchemeGroupVersion.WithKind("BackendLBPolicy"):
