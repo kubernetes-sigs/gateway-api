@@ -67,6 +67,7 @@ func FormatDuration(duration time.Duration) (string, error) {
 
 		Returns: string or error if duration cannot be expressed as a GEP-2257 Duration format.
 	*/
+
 	if duration == 0 {
 		return "0s", nil
 	}
@@ -86,37 +87,36 @@ func FormatDuration(duration time.Duration) (string, error) {
 		return "", errors.New("Cannot express sub-milliseconds precision in GEP-2257")
 	}
 
+	output := ""
+	seconds := int(duration.Seconds())
+
+	// calculating the hours
+	hours := int(seconds / 3600)
+
+	if hours > 0 {
+		output += fmt.Sprintf("%dh", hours)
+		seconds -= hours * 3600
+	}
+
+	// calculating the minutes
+	minutes := int(seconds / 60)
+
+	if minutes > 0 {
+		output += fmt.Sprintf("%dm", minutes)
+		seconds -= minutes * 60
+	}
+
+	if seconds > 0 {
+		output += fmt.Sprintf("%ds", seconds)
+	}
+
 	// Golang's time.Duration allows for floating point seconds instead of converting to ms
-	durationMilliseconds := duration.Milliseconds()
+	durationMilliseconds := durationMicroseconds / 1000
 
-	var ms int64
-	if durationMilliseconds%1000 != 0 {
-		ms = durationMilliseconds % 1000
-		durationMilliseconds -= ms
-		duration = time.Millisecond * time.Duration(durationMilliseconds)
+	ms := durationMilliseconds % 1000
+	if ms != 0 {
+		output += fmt.Sprintf("%dms", ms)
 	}
 
-	durationString := duration.String()
-	if ms > 0 {
-		durationString += fmt.Sprintf("%dms", ms)
-	}
-
-	// trim the 0 values from the string (for example, 30m0s should result in 30m)
-	// going to have a regexp that finds the index of the time units with 0, then appropriately trim those away
-	temp := reSplit.FindAll([]byte(durationString), -1)
-	res := ""
-	for _, t := range temp {
-		if t[0] != '0' {
-			res += string(t)
-		} else {
-			continue
-		}
-	}
-
-	// check if there are floating number points
-	if !re.MatchString(res) {
-		return "", errors.New("Invalid duration format")
-	}
-
-	return res, nil
+	return output, nil
 }
