@@ -857,8 +857,6 @@ const (
 )
 
 type Fraction struct {
-        // +optional
-        // +kubebuilder:default=100
         // +kubebuilder:validation:Minimum=0
         Numerator int32 `json:"numerator"`
 
