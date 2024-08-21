@@ -1168,7 +1168,8 @@ type HTTPRequestMirrorFilter struct {
         // +kubebuilder:default=100
         // +kubebuilder:validation:Minimum=0
         // +kubebuilder:validation:Maximum=100
-        Percent int32 `json:"percent,omitempty"`
+	<gateway:experimental>
+	Percent int32 `json:"percent,omitempty"`
 
         // Fraction represents the fraction of requests that should be
         // mirrored to BackendRef.
