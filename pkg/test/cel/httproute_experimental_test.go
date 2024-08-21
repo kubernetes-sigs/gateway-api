@@ -432,3 +432,43 @@ func TestHTTPRouteRuleExperimental(t *testing.T) {
 		})
 	}
 }
+
+func TestHTTPRequestMirrorFilter(t *testing.T) {
+	tests := []struct {
+		name       string
+		wantErrors []string
+		rules      []gatewayv1.HTTPRouteRule
+	}{
+		{
+			name: "Only one of fraction or percent may be specified",
+			wantErrors: []string{"Only one of fraction or percent may be specified"},
+			rules: []gatewayv1.HTTPRouteRule{{
+				Type: gatewayv1.HTTPRouteFilterRequestMirror,
+				RequestMirror: &gatewayv1.HTTPRequestMirrorFilter{
+					BackendRef: gatewayv1.BackendObjectReference{
+						Name: testService,
+						Port: ptrTo(gatewayv1.PortNumber(8081)),
+					},
+					Percent: 42,
+					Fraction{
+						Numerator: 567,
+						Denominator: 1000,
+					},
+				},
+			}},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			route := &gatewayv1.HTTPRoute{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      fmt.Sprintf("foo-%v", time.Now().UnixNano()),
+					Namespace: metav1.NamespaceDefault,
+				},
+				Spec: gatewayv1.HTTPRouteSpec{Rules: tc.rules},
+			}
+			validateHTTPRoute(t, route, tc.wantErrors)
+		})
+	}
+}
