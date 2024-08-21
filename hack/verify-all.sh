@@ -90,4 +90,6 @@ else
   echo -e "\n${color_green}All tests passed successfully.${color_norm}"
 fi
 
+exit $ret
+
 # ex: ts=2 sw=2 et filetype=sh
