@@ -45,6 +45,8 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1.CommonRouteSpecApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("CookieConfig"):
 		return &apisv1.CookieConfigApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("Fraction"):
+		return &apisv1.FractionApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("FrontendTLSValidation"):
 		return &apisv1.FrontendTLSValidationApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("Gateway"):

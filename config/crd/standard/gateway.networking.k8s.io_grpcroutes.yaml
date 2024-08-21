@@ -817,6 +817,10 @@ spec:
                                   required:
                                   - backendRef
                                   type: object
+                                  x-kubernetes-validations:
+                                  - message: Only one of fraction or percent may be
+                                      specified
+                                    rule: '!(has(self.percent) && has(self.fraction))'
                                 responseHeaderModifier:
                                   description: |-
                                     ResponseHeaderModifier defines a schema for a filter that modifies response
@@ -1487,6 +1491,9 @@ spec:
                             required:
                             - backendRef
                             type: object
+                            x-kubernetes-validations:
+                            - message: Only one of fraction or percent may be specified
+                              rule: '!(has(self.percent) && has(self.fraction))'
                           responseHeaderModifier:
                             description: |-
                               ResponseHeaderModifier defines a schema for a filter that modifies response
@@ -3024,6 +3031,10 @@ spec:
                                   required:
                                   - backendRef
                                   type: object
+                                  x-kubernetes-validations:
+                                  - message: Only one of fraction or percent may be
+                                      specified
+                                    rule: '!(has(self.percent) && has(self.fraction))'
                                 responseHeaderModifier:
                                   description: |-
                                     ResponseHeaderModifier defines a schema for a filter that modifies response
@@ -3694,6 +3705,9 @@ spec:
                             required:
                             - backendRef
                             type: object
+                            x-kubernetes-validations:
+                            - message: Only one of fraction or percent may be specified
+                              rule: '!(has(self.percent) && has(self.fraction))'
                           responseHeaderModifier:
                             description: |-
                               ResponseHeaderModifier defines a schema for a filter that modifies response
