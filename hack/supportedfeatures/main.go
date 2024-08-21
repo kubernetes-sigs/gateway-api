@@ -27,7 +27,7 @@ import (
 func main() {
 	feats := make([]string, features.AllFeatures.Len())
 	for i, feat := range features.AllFeatures.UnsortedList() {
-		feats[i] = string(feat)
+		feats[i] = string(feat.Name)
 	}
 	sort.Strings(feats)
 	fmt.Println(strings.Join(feats, ";"))
