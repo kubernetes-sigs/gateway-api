@@ -856,6 +856,7 @@ const (
 	PermanentCookieLifetimeType CookieLifetimeType = "Permanent"
 )
 
+// +kubebuilder:validation:XValidation:message="numerator must be less than or equal to denominator",rule="self.numerator <= self.denominator"
 type Fraction struct {
         // +kubebuilder:validation:Minimum=0
         Numerator int32 `json:"numerator"`
