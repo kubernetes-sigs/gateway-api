@@ -864,5 +864,5 @@ type Fraction struct {
         // +optional
         // +kubebuilder:default=100
         // +kubebuilder:validation:Minimum=1
-        Denominator int32 `json:"denominator"`
+        Denominator *int32 `json:"denominator,omitempty"`
 }
