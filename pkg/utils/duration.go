@@ -48,8 +48,6 @@ func ParseDuration(s string) (*time.Duration, error) {
 	return &parsedTime, nil
 }
 
-var reSplit = regexp.MustCompile(`[0-9]{1,5}(h|ms|s|m)`)
-
 const maxDuration = 99999*time.Hour + 59*time.Minute + 59*time.Second + 999*time.Millisecond
 
 func FormatDuration(duration time.Duration) (string, error) {
@@ -91,7 +89,7 @@ func FormatDuration(duration time.Duration) (string, error) {
 	seconds := int(duration.Seconds())
 
 	// calculating the hours
-	hours := int(seconds / 3600)
+	hours := seconds / 3600
 
 	if hours > 0 {
 		output += fmt.Sprintf("%dh", hours)
@@ -99,18 +97,19 @@ func FormatDuration(duration time.Duration) (string, error) {
 	}
 
 	// calculating the minutes
-	minutes := int(seconds / 60)
+	minutes := seconds / 60
 
 	if minutes > 0 {
 		output += fmt.Sprintf("%dm", minutes)
 		seconds -= minutes * 60
 	}
 
+	// calculating the seconds
 	if seconds > 0 {
 		output += fmt.Sprintf("%ds", seconds)
 	}
 
-	// Golang's time.Duration allows for floating point seconds instead of converting to ms
+	// calculating the milliseconds
 	durationMilliseconds := durationMicroseconds / 1000
 
 	ms := durationMilliseconds % 1000
