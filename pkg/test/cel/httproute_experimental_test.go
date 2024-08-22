@@ -451,7 +451,7 @@ func TestHTTPRequestMirrorFilter(t *testing.T) {
 						Port: ptrTo(gatewayv1.PortNumber(8081)),
 					},
 					Percent: 42,
-					Fraction{
+					Fraction: gatewayv1.Fraction{
 						Numerator: 567,
 						Denominator: 1000,
 					},
