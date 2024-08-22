@@ -434,6 +434,7 @@ func TestHTTPRouteRuleExperimental(t *testing.T) {
 }
 
 func TestHTTPRequestMirrorFilter(t *testing.T) {
+	testService := gatewayv1.ObjectName("test-service")
 	tests := []struct {
 		name       string
 		wantErrors []string
