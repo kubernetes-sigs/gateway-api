@@ -4,7 +4,6 @@
 
 |API channel|Implementation version|Mode|Report|
 |-----------|----------------------|----|------|
-|x|[v2.0.0-beta1](https://github.com/solo-io/gloo/releases/tag/v2.0.0-beta1)|x|[link](./v2.0.0-beta1-report.yaml)|
 |x|[v1.17.4](https://github.com/solo-io/gloo/releases/tag/v1.17.4)|x|[link](./v1.17.4-report.yaml)|
 
 ## Reproduce
