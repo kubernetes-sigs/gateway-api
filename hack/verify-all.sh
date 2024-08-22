@@ -81,9 +81,9 @@ do
   fi
 done
 
-if [ ${#FAILED_TESTS[@]} -ne 0 ]; then
+if [ ${#FAILED_TEST[@]} -ne 0 ]; then
   echo -e "\n${color_red}Summary of failed tests:${color_norm}"
-  for test in "${FAILED_TESTS[@]}"; do
+  for test in "${FAILED_TEST[@]}"; do
     echo -e "${color_red}- $test${color_norm}"
   done
 else
