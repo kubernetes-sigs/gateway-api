@@ -444,18 +444,20 @@ func TestHTTPRequestMirrorFilter(t *testing.T) {
 			name: "Only one of fraction or percent may be specified",
 			wantErrors: []string{"Only one of fraction or percent may be specified"},
 			rules: []gatewayv1.HTTPRouteRule{{
-				Type: gatewayv1.HTTPRouteFilterRequestMirror,
-				RequestMirror: &gatewayv1.HTTPRequestMirrorFilter{
-					BackendRef: gatewayv1.BackendObjectReference{
-						Name: testService,
-						Port: ptrTo(gatewayv1.PortNumber(8081)),
+				Filters: []gatewayv1.HTTPRouteFilter{{
+					Type: gatewayv1.HTTPRouteFilterRequestMirror,
+					RequestMirror: &gatewayv1.HTTPRequestMirrorFilter{
+						BackendRef: gatewayv1.BackendObjectReference{
+							Name: testService,
+							Port: ptrTo(gatewayv1.PortNumber(8081)),
+						},
+						Percent: 42,
+						Fraction: gatewayv1.Fraction{
+							Numerator: 567,
+							Denominator: 1000,
+						},
 					},
-					Percent: 42,
-					Fraction: gatewayv1.Fraction{
-						Numerator: 567,
-						Denominator: 1000,
-					},
-				},
+				}},
 			}},
 		},
 	}
