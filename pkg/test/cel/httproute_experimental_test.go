@@ -453,9 +453,9 @@ func TestHTTPRequestMirrorFilterExperimental(t *testing.T) {
 							Port: ptrTo(gatewayv1.PortNumber(8081)),
 						},
 						Fraction: &gatewayv1.Fraction{
-							Numerator: 568
-							Denominator: &denominator
-						}
+							Numerator: 568,
+							Denominator: &denominator,
+						},
 					},
 				}},
 			}},
