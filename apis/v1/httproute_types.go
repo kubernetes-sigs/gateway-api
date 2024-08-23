@@ -757,6 +757,8 @@ type HTTPRouteFilter struct {
 	// Support: Extended
 	//
 	// +optional
+	//
+	// <gateway:experimental:validation:XValidation:message="testing testing testing",rule="false">
 	RequestMirror *HTTPRequestMirrorFilter `json:"requestMirror,omitempty"`
 
 	// RequestRedirect defines a schema for a filter that responds to the
@@ -1128,8 +1130,6 @@ type HTTPURLRewriteFilter struct {
 }
 
 // HTTPRequestMirrorFilter defines configuration for the RequestMirror filter.
-//
-// <gateway:experimental:validation:XValidation:message="testing testing testing",rule="false">
 type HTTPRequestMirrorFilter struct {
 	// BackendRef references a resource where mirrored requests are sent.
 	//
