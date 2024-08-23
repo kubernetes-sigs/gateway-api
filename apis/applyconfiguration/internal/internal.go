@@ -288,7 +288,6 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: denominator
       type:
         scalar: numeric
-      default: 0
     - name: numerator
       type:
         scalar: numeric
@@ -770,7 +769,6 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: fraction
       type:
         namedType: io.k8s.sigs.gateway-api.apis.v1.Fraction
-      default: {}
     - name: percent
       type:
         scalar: numeric
