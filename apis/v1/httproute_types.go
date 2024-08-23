@@ -1177,7 +1177,7 @@ type HTTPRequestMirrorFilter struct {
 	//
 	// +optional
 	// <gateway:experimental>
-	Fraction Fraction `json:"fraction,omitempty"`
+	Fraction *Fraction `json:"fraction,omitempty"`
 }
 
 // HTTPBackendRef defines how a HTTPRoute forwards a HTTP request.
