@@ -444,7 +444,7 @@ func TestHTTPRequestMirrorFilterExperimental(t *testing.T) {
 	}{
 		{
 			name: "Testing",
-			wantErrors: []string{"testing testing testing"},
+			wantErrors: []string{"Only one of percent or fraction may be specified in HTTPRequestMirrorFilter"},
 			rules: []gatewayv1.HTTPRouteRule{{
 				Filters: []gatewayv1.HTTPRouteFilter{{
 					Type: gatewayv1.HTTPRouteFilterRequestMirror,
