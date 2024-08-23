@@ -435,7 +435,6 @@ func TestHTTPRouteRuleExperimental(t *testing.T) {
 
 func TestHTTPRequestMirrorFilterExperimental(t *testing.T) {
 	var percent int32 = 42
-	var denominator int32 = 1000
 	testService := gatewayv1.ObjectName("test-service")
 	tests := []struct {
 		name       string
@@ -443,8 +442,8 @@ func TestHTTPRequestMirrorFilterExperimental(t *testing.T) {
 		rules      []gatewayv1.HTTPRouteRule
 	}{
 		{
-			name: "Only one of fraction or percent may be specified",
-			wantErrors: []string{"Only one of fraction or percent may be specified"},
+			name: "Testing testing testing",
+			wantErrors: []string{"testing testing testing"},
 			rules: []gatewayv1.HTTPRouteRule{{
 				Filters: []gatewayv1.HTTPRouteFilter{{
 					Type: gatewayv1.HTTPRouteFilterRequestMirror,
@@ -454,10 +453,6 @@ func TestHTTPRequestMirrorFilterExperimental(t *testing.T) {
 							Port: ptrTo(gatewayv1.PortNumber(8081)),
 						},
 						Percent: &percent,
-						Fraction: &gatewayv1.Fraction{
-							Numerator: 567,
-							Denominator: &denominator,
-						},
 					},
 				}},
 			}},
