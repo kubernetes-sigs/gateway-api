@@ -4548,7 +4548,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteFilter(ref common.ReferenceCa
 					},
 					"requestMirror": {
 						SchemaProps: spec.SchemaProps{
-							Description: "RequestMirror defines a schema for a filter that mirrors requests. Requests are sent to the specified destination, but responses from that destination are ignored.\n\nThis filter can be used multiple times within the same rule. Note that not all implementations will be able to support mirroring to multiple backends.\n\nSupport: Extended",
+							Description: "RequestMirror defines a schema for a filter that mirrors requests. Requests are sent to the specified destination, but responses from that destination are ignored.\n\nThis filter can be used multiple times within the same rule. Note that not all implementations will be able to support mirroring to multiple backends.\n\nSupport: Extended\n\n\n<gateway:experimental:validation:XValidation:message=\"Only one of percent or fraction may be specified in HTTPRequestMirrorFilter\",rule=\"!(has(self.percent) && has(self.fraction))\">",
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.HTTPRequestMirrorFilter"),
 						},
 					},
