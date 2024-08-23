@@ -1129,7 +1129,7 @@ type HTTPURLRewriteFilter struct {
 
 // HTTPRequestMirrorFilter defines configuration for the RequestMirror filter.
 //
-// <gateway:experimental:validation:XValidation:message="Only one of fraction or percent may be specified",rule="!(has(self.percent) && has(self.fraction))">
+// <gateway:experimental:validation:XValidation:message="testing testing testing",rule="!has(self.percent)">
 type HTTPRequestMirrorFilter struct {
 	// BackendRef references a resource where mirrored requests are sent.
 	//
