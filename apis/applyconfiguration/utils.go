@@ -51,6 +51,8 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1.GatewayApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("GatewayAddress"):
 		return &apisv1.GatewayAddressApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("GatewayBackendTLS"):
+		return &apisv1.GatewayBackendTLSApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("GatewayClass"):
 		return &apisv1.GatewayClassApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("GatewayClassSpec"):
@@ -197,6 +199,8 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1alpha3.BackendTLSPolicySpecApplyConfiguration{}
 	case v1alpha3.SchemeGroupVersion.WithKind("BackendTLSPolicyValidation"):
 		return &apisv1alpha3.BackendTLSPolicyValidationApplyConfiguration{}
+	case v1alpha3.SchemeGroupVersion.WithKind("SubjectAltName"):
+		return &apisv1alpha3.SubjectAltNameApplyConfiguration{}
 
 		// Group=gateway.networking.k8s.io, Version=v1beta1
 	case v1beta1.SchemeGroupVersion.WithKind("Gateway"):

@@ -487,6 +487,12 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         scalar: string
       default: ""
+- name: io.k8s.sigs.gateway-api.apis.v1.GatewayBackendTLS
+  map:
+    fields:
+    - name: clientCertificateRef
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1.SecretObjectReference
 - name: io.k8s.sigs.gateway-api.apis.v1.GatewayClass
   map:
     fields:
@@ -565,6 +571,9 @@ var schemaYAML = typed.YAMLObject(`types:
           elementType:
             namedType: io.k8s.sigs.gateway-api.apis.v1.GatewayAddress
           elementRelationship: atomic
+    - name: backendTLS
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1.GatewayBackendTLS
     - name: gatewayClassName
       type:
         scalar: string
@@ -1476,6 +1485,11 @@ var schemaYAML = typed.YAMLObject(`types:
 - name: io.k8s.sigs.gateway-api.apis.v1alpha3.BackendTLSPolicySpec
   map:
     fields:
+    - name: options
+      type:
+        map:
+          elementType:
+            scalar: string
     - name: targetRefs
       type:
         list:
@@ -1499,7 +1513,26 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         scalar: string
       default: ""
+    - name: subjectAltNames
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v1alpha3.SubjectAltName
+          elementRelationship: atomic
     - name: wellKnownCACertificates
+      type:
+        scalar: string
+- name: io.k8s.sigs.gateway-api.apis.v1alpha3.SubjectAltName
+  map:
+    fields:
+    - name: hostname
+      type:
+        scalar: string
+    - name: type
+      type:
+        scalar: string
+      default: ""
+    - name: uri
       type:
         scalar: string
 - name: io.k8s.sigs.gateway-api.apis.v1beta1.Gateway

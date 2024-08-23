@@ -20,6 +20,8 @@ package v1alpha3
 
 import (
 	v1alpha2 "sigs.k8s.io/gateway-api/apis/applyconfiguration/apis/v1alpha2"
+
+	v1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
 // BackendTLSPolicySpecApplyConfiguration represents an declarative configuration of the BackendTLSPolicySpec type for use
@@ -27,6 +29,7 @@ import (
 type BackendTLSPolicySpecApplyConfiguration struct {
 	TargetRefs []v1alpha2.LocalPolicyTargetReferenceWithSectionNameApplyConfiguration `json:"targetRefs,omitempty"`
 	Validation *BackendTLSPolicyValidationApplyConfiguration                          `json:"validation,omitempty"`
+	Options    map[v1.AnnotationKey]v1.AnnotationValue                                `json:"options,omitempty"`
 }
 
 // BackendTLSPolicySpecApplyConfiguration constructs an declarative configuration of the BackendTLSPolicySpec type for use with
@@ -53,5 +56,19 @@ func (b *BackendTLSPolicySpecApplyConfiguration) WithTargetRefs(values ...*v1alp
 // If called multiple times, the Validation field is set to the value of the last call.
 func (b *BackendTLSPolicySpecApplyConfiguration) WithValidation(value *BackendTLSPolicyValidationApplyConfiguration) *BackendTLSPolicySpecApplyConfiguration {
 	b.Validation = value
+	return b
+}
+
+// WithOptions puts the entries into the Options field in the declarative configuration
+// and returns the receiver, so that objects can be build by chaining "With" function invocations.
+// If called multiple times, the entries provided by each call will be put on the Options field,
+// overwriting an existing map entries in Options field with the same key.
+func (b *BackendTLSPolicySpecApplyConfiguration) WithOptions(entries map[v1.AnnotationKey]v1.AnnotationValue) *BackendTLSPolicySpecApplyConfiguration {
+	if b.Options == nil && len(entries) > 0 {
+		b.Options = make(map[v1.AnnotationKey]v1.AnnotationValue, len(entries))
+	}
+	for k, v := range entries {
+		b.Options[k] = v
+	}
 	return b
 }
