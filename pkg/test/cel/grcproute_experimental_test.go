@@ -54,7 +54,7 @@ func TestHTTPRequestMirrorFilterForGRPCRouteExperimental(t *testing.T) {
 		rules      []gatewayv1.GRPCRouteRule
 	}{
 		{
-			name: "Testing",
+			name: "GRPCRoute - Invalid because both percent and fraction are specified",
 			wantErrors: []string{"Only one of percent or fraction may be specified in HTTPRequestMirrorFilter"},
 			rules: []gatewayv1.GRPCRouteRule{{
 				Filters: []gatewayv1.GRPCRouteFilter{{
