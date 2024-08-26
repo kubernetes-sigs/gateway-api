@@ -443,7 +443,7 @@ func TestHTTPRequestMirrorFilterExperimental(t *testing.T) {
 		rules      []gatewayv1.HTTPRouteRule
 	}{
 		{
-			name: "Testing",
+			name: "HTTPRoute - Invalid because both percent and fraction are specified",
 			wantErrors: []string{"Only one of percent or fraction may be specified in HTTPRequestMirrorFilter"},
 			rules: []gatewayv1.HTTPRouteRule{{
 				Filters: []gatewayv1.HTTPRouteFilter{{
