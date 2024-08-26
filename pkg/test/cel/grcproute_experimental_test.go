@@ -51,14 +51,14 @@ func TestHTTPRequestMirrorFilterExperimental(t *testing.T) {
 	tests := []struct {
 		name       string
 		wantErrors []string
-		rules      []gatewayv1.HTTPRouteRule
+		rules      []gatewayv1.GRPCRouteRule
 	}{
 		{
 			name: "Testing",
 			wantErrors: []string{"Only one of percent or fraction may be specified in HTTPRequestMirrorFilter"},
-			rules: []gatewayv1.HTTPRouteRule{{
-				Filters: []gatewayv1.HTTPRouteFilter{{
-					Type: gatewayv1.HTTPRouteFilterRequestMirror,
+			rules: []gatewayv1.GRPCRouteRule{{
+				Filters: []gatewayv1.GRPCRouteFilter{{
+					Type: gatewayv1.GRPCRouteFilterRequestMirror,
 					RequestMirror: &gatewayv1.HTTPRequestMirrorFilter{
 						BackendRef: gatewayv1.BackendObjectReference{
 							Name: testService,
@@ -77,14 +77,14 @@ func TestHTTPRequestMirrorFilterExperimental(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			route := &gatewayv1.HTTPRoute{
+			route := &gatewayv1.GRPCRoute{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      fmt.Sprintf("foo-%v", time.Now().UnixNano()),
 					Namespace: metav1.NamespaceDefault,
 				},
-				Spec: gatewayv1.HTTPRouteSpec{Rules: tc.rules},
+				Spec: gatewayv1.GRPCRouteSpec{Rules: tc.rules},
 			}
-			validateHTTPRoute(t, route, tc.wantErrors)
+			validateGRPCRoute(t, route, tc.wantErrors)
 		})
 	}
 }
