@@ -223,13 +223,11 @@ spec:
                 minLength: 1
                 type: string
               infrastructure:
-                description: |+
+                description: |-
                   Infrastructure defines infrastructure level attributes about this Gateway instance.
 
 
                   Support: Core
-
-
                 properties:
                   annotations:
                     additionalProperties:
@@ -1551,13 +1549,11 @@ spec:
                 minLength: 1
                 type: string
               infrastructure:
-                description: |+
+                description: |-
                   Infrastructure defines infrastructure level attributes about this Gateway instance.
 
 
                   Support: Core
-
-
                 properties:
                   annotations:
                     additionalProperties:
