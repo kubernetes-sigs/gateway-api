@@ -696,7 +696,7 @@ spec:
                                       x-kubernetes-list-type: map
                                   type: object
                                 requestMirror:
-                                  description: |-
+                                  description: |+
                                     RequestMirror defines a schema for a filter that mirrors requests.
                                     Requests are sent to the specified destination, but responses from
                                     that destination are ignored.
@@ -708,6 +708,8 @@ spec:
 
 
                                     Support: Extended
+
+
                                   properties:
                                     backendRef:
                                       description: |-
@@ -1366,7 +1368,7 @@ spec:
                                 x-kubernetes-list-type: map
                             type: object
                           requestMirror:
-                            description: |-
+                            description: |+
                               RequestMirror defines a schema for a filter that mirrors requests.
                               Requests are sent to the specified destination, but responses from
                               that destination are ignored.
@@ -1378,6 +1380,8 @@ spec:
 
 
                               Support: Extended
+
+
                             properties:
                               backendRef:
                                 description: |-
@@ -2903,7 +2907,7 @@ spec:
                                       x-kubernetes-list-type: map
                                   type: object
                                 requestMirror:
-                                  description: |-
+                                  description: |+
                                     RequestMirror defines a schema for a filter that mirrors requests.
                                     Requests are sent to the specified destination, but responses from
                                     that destination are ignored.
@@ -2915,6 +2919,8 @@ spec:
 
 
                                     Support: Extended
+
+
                                   properties:
                                     backendRef:
                                       description: |-
@@ -3573,7 +3579,7 @@ spec:
                                 x-kubernetes-list-type: map
                             type: object
                           requestMirror:
-                            description: |-
+                            description: |+
                               RequestMirror defines a schema for a filter that mirrors requests.
                               Requests are sent to the specified destination, but responses from
                               that destination are ignored.
@@ -3585,6 +3591,8 @@ spec:
 
 
                               Support: Extended
+
+
                             properties:
                               backendRef:
                                 description: |-

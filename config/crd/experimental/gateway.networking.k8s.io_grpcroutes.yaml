@@ -725,7 +725,7 @@ spec:
                                       x-kubernetes-list-type: map
                                   type: object
                                 requestMirror:
-                                  description: |-
+                                  description: |+
                                     RequestMirror defines a schema for a filter that mirrors requests.
                                     Requests are sent to the specified destination, but responses from
                                     that destination are ignored.
@@ -737,6 +737,8 @@ spec:
 
 
                                     Support: Extended
+
+
                                   properties:
                                     backendRef:
                                       description: |-
@@ -888,6 +890,10 @@ spec:
                                   required:
                                   - backendRef
                                   type: object
+                                  x-kubernetes-validations:
+                                  - message: Only one of percent or fraction may be
+                                      specified in HTTPRequestMirrorFilter
+                                    rule: '!(has(self.percent) && has(self.fraction))'
                                 responseHeaderModifier:
                                   description: |-
                                     ResponseHeaderModifier defines a schema for a filter that modifies response
@@ -1437,7 +1443,7 @@ spec:
                                 x-kubernetes-list-type: map
                             type: object
                           requestMirror:
-                            description: |-
+                            description: |+
                               RequestMirror defines a schema for a filter that mirrors requests.
                               Requests are sent to the specified destination, but responses from
                               that destination are ignored.
@@ -1449,6 +1455,8 @@ spec:
 
 
                               Support: Extended
+
+
                             properties:
                               backendRef:
                                 description: |-
@@ -1600,6 +1608,10 @@ spec:
                             required:
                             - backendRef
                             type: object
+                            x-kubernetes-validations:
+                            - message: Only one of percent or fraction may be specified
+                                in HTTPRequestMirrorFilter
+                              rule: '!(has(self.percent) && has(self.fraction))'
                           responseHeaderModifier:
                             description: |-
                               ResponseHeaderModifier defines a schema for a filter that modifies response
@@ -3173,7 +3185,7 @@ spec:
                                       x-kubernetes-list-type: map
                                   type: object
                                 requestMirror:
-                                  description: |-
+                                  description: |+
                                     RequestMirror defines a schema for a filter that mirrors requests.
                                     Requests are sent to the specified destination, but responses from
                                     that destination are ignored.
@@ -3185,6 +3197,8 @@ spec:
 
 
                                     Support: Extended
+
+
                                   properties:
                                     backendRef:
                                       description: |-
@@ -3336,6 +3350,10 @@ spec:
                                   required:
                                   - backendRef
                                   type: object
+                                  x-kubernetes-validations:
+                                  - message: Only one of percent or fraction may be
+                                      specified in HTTPRequestMirrorFilter
+                                    rule: '!(has(self.percent) && has(self.fraction))'
                                 responseHeaderModifier:
                                   description: |-
                                     ResponseHeaderModifier defines a schema for a filter that modifies response
@@ -3885,7 +3903,7 @@ spec:
                                 x-kubernetes-list-type: map
                             type: object
                           requestMirror:
-                            description: |-
+                            description: |+
                               RequestMirror defines a schema for a filter that mirrors requests.
                               Requests are sent to the specified destination, but responses from
                               that destination are ignored.
@@ -3897,6 +3915,8 @@ spec:
 
 
                               Support: Extended
+
+
                             properties:
                               backendRef:
                                 description: |-
@@ -4048,6 +4068,10 @@ spec:
                             required:
                             - backendRef
                             type: object
+                            x-kubernetes-validations:
+                            - message: Only one of percent or fraction may be specified
+                                in HTTPRequestMirrorFilter
+                              rule: '!(has(self.percent) && has(self.fraction))'
                           responseHeaderModifier:
                             description: |-
                               ResponseHeaderModifier defines a schema for a filter that modifies response
