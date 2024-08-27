@@ -436,6 +436,7 @@ func TestHTTPRouteRuleExperimental(t *testing.T) {
 func TestHTTPRequestMirrorFilterExperimental(t *testing.T) {
 	var percent int32 = 42
 	var denominator int32 = 1000
+	var bad_denominator int32 = 0
 	testService := gatewayv1.ObjectName("test-service")
 	tests := []struct {
 		name       string
@@ -454,6 +455,96 @@ func TestHTTPRequestMirrorFilterExperimental(t *testing.T) {
 							Port: ptrTo(gatewayv1.PortNumber(8081)),
 						},
 						Percent: &percent,
+						Fraction: gatewayv1.Fraction{
+							Numerator: 83,
+							Denominator: &denominator,
+						},
+					},
+				}},
+			}},
+		},
+		{
+			name: "HTTPRoute - Invalid fraction - numerator greater than denominator",
+			wantErrors: []string{"numerator must be less than or equal to denominator"},
+			rules: []gatewayv1.HTTPRouteRule{{
+				Filters: []gatewayv1.HTTPRouteFilter{{
+					Type: gatewayv1.HTTPRouteFilterRequestMirror,
+					RequestMirror: &gatewayv1.HTTPRequestMirrorFilter{
+						BackendRef: gatewayv1.BackendObjectReference{
+							Name: testService,
+							Port: ptrTo(gatewayv1.PortNumber(8081)),
+						},
+						Fraction: gatewayv1.Fraction{
+							Numerator: 1001,
+							Denominator: &denominator,
+						},
+					},
+				}},
+			}},
+		},
+		{
+			name: "HTTPRoute - Invalid fraction - denominator is 0",
+			wantErrors: []string{"denominator minimum value is 1"},
+			rules: []gatewayv1.HTTPRouteRule{{
+				Filters: []gatewayv1.HTTPRouteFilter{{
+					Type: gatewayv1.HTTPRouteFilterRequestMirror,
+					RequestMirror: &gatewayv1.HTTPRequestMirrorFilter{
+						BackendRef: gatewayv1.BackendObjectReference{
+							Name: testService,
+							Port: ptrTo(gatewayv1.PortNumber(8081)),
+						},
+						Fraction: gatewayv1.Fraction{
+							Numerator: 0,
+							Denominator: &bad_denominator,
+						},
+					},
+				}},
+			}},
+		},
+		{
+			name: "HTTPRoute - Invalid fraction - numerator is negative",
+			wantErrors: []string{"numerator minimum value is 0"},
+			rules: []gatewayv1.HTTPRouteRule{{
+				Filters: []gatewayv1.HTTPRouteFilter{{
+					Type: gatewayv1.HTTPRouteFilterRequestMirror,
+					RequestMirror: &gatewayv1.HTTPRequestMirrorFilter{
+						BackendRef: gatewayv1.BackendObjectReference{
+							Name: testService,
+							Port: ptrTo(gatewayv1.PortNumber(8081)),
+						},
+						Fraction: gatewayv1.Fraction{
+							Numerator: -1,
+							Denominator: &denominator,
+						},
+					},
+				}},
+			}},
+		},
+		{
+			name: "HTTPRoute - Valid with percent",
+			rules: []gatewayv1.HTTPRouteRule{{
+				Filters: []gatewayv1.HTTPRouteFilter{{
+					Type: gatewayv1.HTTPRouteFilterRequestMirror,
+					RequestMirror: &gatewayv1.HTTPRequestMirrorFilter{
+						BackendRef: gatewayv1.BackendObjectReference{
+							Name: testService,
+							Port: ptrTo(gatewayv1.PortNumber(8081)),
+						},
+						Percent: &percent,
+					},
+				}},
+			}},
+		},
+		{
+			name: "HTTPRoute - Valid with fraction",
+			rules: []gatewayv1.HTTPRouteRule{{
+				Filters: []gatewayv1.HTTPRouteFilter{{
+					Type: gatewayv1.HTTPRouteFilterRequestMirror,
+					RequestMirror: &gatewayv1.HTTPRequestMirrorFilter{
+						BackendRef: gatewayv1.BackendObjectReference{
+							Name: testService,
+							Port: ptrTo(gatewayv1.PortNumber(8081)),
+						},
 						Fraction: gatewayv1.Fraction{
 							Numerator: 83,
 							Denominator: &denominator,
