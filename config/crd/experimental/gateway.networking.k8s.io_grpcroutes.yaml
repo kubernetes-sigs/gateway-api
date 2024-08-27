@@ -725,7 +725,7 @@ spec:
                                       x-kubernetes-list-type: map
                                   type: object
                                 requestMirror:
-                                  description: |-
+                                  description: |+
                                     RequestMirror defines a schema for a filter that mirrors requests.
                                     Requests are sent to the specified destination, but responses from
                                     that destination are ignored.
@@ -737,6 +737,8 @@ spec:
 
 
                                     Support: Extended
+
+
                                   properties:
                                     backendRef:
                                       description: |-
@@ -843,9 +845,55 @@ spec:
                                       - message: Must have port for Service reference
                                         rule: '(size(self.group) == 0 && self.kind
                                           == ''Service'') ? has(self.port) : true'
+                                    fraction:
+                                      description: |+
+                                        Fraction represents the fraction of requests that should be
+                                        mirrored to BackendRef.
+
+
+                                        Only one of Fraction or Percent may be specified. If neither field
+                                        is specified, 100% of requests will be mirrored.
+
+
+                                      properties:
+                                        denominator:
+                                          default: 100
+                                          format: int32
+                                          minimum: 1
+                                          type: integer
+                                        numerator:
+                                          format: int32
+                                          minimum: 0
+                                          type: integer
+                                      required:
+                                      - numerator
+                                      type: object
+                                      x-kubernetes-validations:
+                                      - message: numerator must be less than or equal
+                                          to denominator
+                                        rule: self.numerator <= self.denominator
+                                    percent:
+                                      description: |+
+                                        Percent represents the percentage of requests that should be
+                                        mirrored to BackendRef. Its minimum value is 0 (indicating 0% of
+                                        requests) and its maximum value is 100 (indicating 100% of requests).
+
+
+                                        Only one of Fraction or Percent may be specified. If neither field
+                                        is specified, 100% of requests will be mirrored.
+
+
+                                      format: int32
+                                      maximum: 100
+                                      minimum: 0
+                                      type: integer
                                   required:
                                   - backendRef
                                   type: object
+                                  x-kubernetes-validations:
+                                  - message: Only one of percent or fraction may be
+                                      specified in HTTPRequestMirrorFilter
+                                    rule: '!(has(self.percent) && has(self.fraction))'
                                 responseHeaderModifier:
                                   description: |-
                                     ResponseHeaderModifier defines a schema for a filter that modifies response
@@ -1395,7 +1443,7 @@ spec:
                                 x-kubernetes-list-type: map
                             type: object
                           requestMirror:
-                            description: |-
+                            description: |+
                               RequestMirror defines a schema for a filter that mirrors requests.
                               Requests are sent to the specified destination, but responses from
                               that destination are ignored.
@@ -1407,6 +1455,8 @@ spec:
 
 
                               Support: Extended
+
+
                             properties:
                               backendRef:
                                 description: |-
@@ -1513,9 +1563,55 @@ spec:
                                 - message: Must have port for Service reference
                                   rule: '(size(self.group) == 0 && self.kind == ''Service'')
                                     ? has(self.port) : true'
+                              fraction:
+                                description: |+
+                                  Fraction represents the fraction of requests that should be
+                                  mirrored to BackendRef.
+
+
+                                  Only one of Fraction or Percent may be specified. If neither field
+                                  is specified, 100% of requests will be mirrored.
+
+
+                                properties:
+                                  denominator:
+                                    default: 100
+                                    format: int32
+                                    minimum: 1
+                                    type: integer
+                                  numerator:
+                                    format: int32
+                                    minimum: 0
+                                    type: integer
+                                required:
+                                - numerator
+                                type: object
+                                x-kubernetes-validations:
+                                - message: numerator must be less than or equal to
+                                    denominator
+                                  rule: self.numerator <= self.denominator
+                              percent:
+                                description: |+
+                                  Percent represents the percentage of requests that should be
+                                  mirrored to BackendRef. Its minimum value is 0 (indicating 0% of
+                                  requests) and its maximum value is 100 (indicating 100% of requests).
+
+
+                                  Only one of Fraction or Percent may be specified. If neither field
+                                  is specified, 100% of requests will be mirrored.
+
+
+                                format: int32
+                                maximum: 100
+                                minimum: 0
+                                type: integer
                             required:
                             - backendRef
                             type: object
+                            x-kubernetes-validations:
+                            - message: Only one of percent or fraction may be specified
+                                in HTTPRequestMirrorFilter
+                              rule: '!(has(self.percent) && has(self.fraction))'
                           responseHeaderModifier:
                             description: |-
                               ResponseHeaderModifier defines a schema for a filter that modifies response
@@ -3089,7 +3185,7 @@ spec:
                                       x-kubernetes-list-type: map
                                   type: object
                                 requestMirror:
-                                  description: |-
+                                  description: |+
                                     RequestMirror defines a schema for a filter that mirrors requests.
                                     Requests are sent to the specified destination, but responses from
                                     that destination are ignored.
@@ -3101,6 +3197,8 @@ spec:
 
 
                                     Support: Extended
+
+
                                   properties:
                                     backendRef:
                                       description: |-
@@ -3207,9 +3305,55 @@ spec:
                                       - message: Must have port for Service reference
                                         rule: '(size(self.group) == 0 && self.kind
                                           == ''Service'') ? has(self.port) : true'
+                                    fraction:
+                                      description: |+
+                                        Fraction represents the fraction of requests that should be
+                                        mirrored to BackendRef.
+
+
+                                        Only one of Fraction or Percent may be specified. If neither field
+                                        is specified, 100% of requests will be mirrored.
+
+
+                                      properties:
+                                        denominator:
+                                          default: 100
+                                          format: int32
+                                          minimum: 1
+                                          type: integer
+                                        numerator:
+                                          format: int32
+                                          minimum: 0
+                                          type: integer
+                                      required:
+                                      - numerator
+                                      type: object
+                                      x-kubernetes-validations:
+                                      - message: numerator must be less than or equal
+                                          to denominator
+                                        rule: self.numerator <= self.denominator
+                                    percent:
+                                      description: |+
+                                        Percent represents the percentage of requests that should be
+                                        mirrored to BackendRef. Its minimum value is 0 (indicating 0% of
+                                        requests) and its maximum value is 100 (indicating 100% of requests).
+
+
+                                        Only one of Fraction or Percent may be specified. If neither field
+                                        is specified, 100% of requests will be mirrored.
+
+
+                                      format: int32
+                                      maximum: 100
+                                      minimum: 0
+                                      type: integer
                                   required:
                                   - backendRef
                                   type: object
+                                  x-kubernetes-validations:
+                                  - message: Only one of percent or fraction may be
+                                      specified in HTTPRequestMirrorFilter
+                                    rule: '!(has(self.percent) && has(self.fraction))'
                                 responseHeaderModifier:
                                   description: |-
                                     ResponseHeaderModifier defines a schema for a filter that modifies response
@@ -3759,7 +3903,7 @@ spec:
                                 x-kubernetes-list-type: map
                             type: object
                           requestMirror:
-                            description: |-
+                            description: |+
                               RequestMirror defines a schema for a filter that mirrors requests.
                               Requests are sent to the specified destination, but responses from
                               that destination are ignored.
@@ -3771,6 +3915,8 @@ spec:
 
 
                               Support: Extended
+
+
                             properties:
                               backendRef:
                                 description: |-
@@ -3877,9 +4023,55 @@ spec:
                                 - message: Must have port for Service reference
                                   rule: '(size(self.group) == 0 && self.kind == ''Service'')
                                     ? has(self.port) : true'
+                              fraction:
+                                description: |+
+                                  Fraction represents the fraction of requests that should be
+                                  mirrored to BackendRef.
+
+
+                                  Only one of Fraction or Percent may be specified. If neither field
+                                  is specified, 100% of requests will be mirrored.
+
+
+                                properties:
+                                  denominator:
+                                    default: 100
+                                    format: int32
+                                    minimum: 1
+                                    type: integer
+                                  numerator:
+                                    format: int32
+                                    minimum: 0
+                                    type: integer
+                                required:
+                                - numerator
+                                type: object
+                                x-kubernetes-validations:
+                                - message: numerator must be less than or equal to
+                                    denominator
+                                  rule: self.numerator <= self.denominator
+                              percent:
+                                description: |+
+                                  Percent represents the percentage of requests that should be
+                                  mirrored to BackendRef. Its minimum value is 0 (indicating 0% of
+                                  requests) and its maximum value is 100 (indicating 100% of requests).
+
+
+                                  Only one of Fraction or Percent may be specified. If neither field
+                                  is specified, 100% of requests will be mirrored.
+
+
+                                format: int32
+                                maximum: 100
+                                minimum: 0
+                                type: integer
                             required:
                             - backendRef
                             type: object
+                            x-kubernetes-validations:
+                            - message: Only one of percent or fraction may be specified
+                                in HTTPRequestMirrorFilter
+                              rule: '!(has(self.percent) && has(self.fraction))'
                           responseHeaderModifier:
                             description: |-
                               ResponseHeaderModifier defines a schema for a filter that modifies response

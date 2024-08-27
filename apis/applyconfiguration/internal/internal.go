@@ -282,6 +282,16 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: lifetimeType
       type:
         scalar: string
+- name: io.k8s.sigs.gateway-api.apis.v1.Fraction
+  map:
+    fields:
+    - name: denominator
+      type:
+        scalar: numeric
+    - name: numerator
+      type:
+        scalar: numeric
+      default: 0
 - name: io.k8s.sigs.gateway-api.apis.v1.FrontendTLSValidation
   map:
     fields:
@@ -756,6 +766,13 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         namedType: io.k8s.sigs.gateway-api.apis.v1.BackendObjectReference
       default: {}
+    - name: fraction
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1.Fraction
+      default: {}
+    - name: percent
+      type:
+        scalar: numeric
 - name: io.k8s.sigs.gateway-api.apis.v1.HTTPRequestRedirectFilter
   map:
     fields:

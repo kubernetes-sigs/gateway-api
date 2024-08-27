@@ -432,3 +432,48 @@ func TestHTTPRouteRuleExperimental(t *testing.T) {
 		})
 	}
 }
+
+func TestHTTPRequestMirrorFilterExperimental(t *testing.T) {
+	var percent int32 = 42
+	var denominator int32 = 1000
+	testService := gatewayv1.ObjectName("test-service")
+	tests := []struct {
+		name       string
+		wantErrors []string
+		rules      []gatewayv1.HTTPRouteRule
+	}{
+		{
+			name: "HTTPRoute - Invalid because both percent and fraction are specified",
+			wantErrors: []string{"Only one of percent or fraction may be specified in HTTPRequestMirrorFilter"},
+			rules: []gatewayv1.HTTPRouteRule{{
+				Filters: []gatewayv1.HTTPRouteFilter{{
+					Type: gatewayv1.HTTPRouteFilterRequestMirror,
+					RequestMirror: &gatewayv1.HTTPRequestMirrorFilter{
+						BackendRef: gatewayv1.BackendObjectReference{
+							Name: testService,
+							Port: ptrTo(gatewayv1.PortNumber(8081)),
+						},
+						Percent: &percent,
+						Fraction: gatewayv1.Fraction{
+							Numerator: 83,
+							Denominator: &denominator,
+						},
+					},
+				}},
+			}},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			route := &gatewayv1.HTTPRoute{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      fmt.Sprintf("foo-%v", time.Now().UnixNano()),
+					Namespace: metav1.NamespaceDefault,
+				},
+				Spec: gatewayv1.HTTPRouteSpec{Rules: tc.rules},
+			}
+			validateHTTPRoute(t, route, tc.wantErrors)
+		})
+	}
+}
