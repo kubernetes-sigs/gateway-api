@@ -4408,7 +4408,6 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRequestMirrorFilter(ref common.Ref
 					"fraction": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Fraction represents the fraction of requests that should be mirrored to BackendRef.\n\nOnly one of Fraction or Percent may be specified. If neither field is specified, 100% of requests will be mirrored.\n\n<gateway:experimental>",
-							Default:     map[string]interface{}{},
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.Fraction"),
 						},
 					},
