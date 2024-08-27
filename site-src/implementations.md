@@ -25,7 +25,7 @@ cover, and documentation to help users get started.
 - [Emissary-Ingress (Ambassador API Gateway)][4] (alpha)
 - [Envoy Gateway][18] (GA)
 - [Flomesh Service Mesh][17] (beta)
-- [Gloo Gateway 2.0][5] (beta)
+- [Gloo Gateway][5] (GA)
 - [Google Kubernetes Engine][6] (GA)
 - [HAProxy Ingress][7] (alpha)
 - [HAProxy Kubernetes Ingress Controller][32] (GA)
@@ -243,9 +243,9 @@ FSM support of Gateway API is built on top [Flomesh Gateway API](fgw) and it cur
 [![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.0.0-GlooGateway-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.0.0/gloo-gateway)
 
 [Gloo Gateway][gloogateway] by [Solo.io][solo] is a feature-rich, Kubernetes-native ingress controller and next-generation API gateway.
-Gloo Gateway 2.0 brings the full power and community support of Gateway API to its existing control-plane implementation.
+Gloo Gateway brings the full power and community support of Gateway API to its existing control-plane implementation.
 
-[gloogateway]:https://docs.solo.io/gloo-gateway/v2
+[gloogateway]:https://docs.solo.io/gateway/latest/
 [solo]:https://www.solo.io
 
 ### Google Kubernetes Engine
@@ -421,7 +421,7 @@ STUNner currently supports version `v1alpha2` of the Gateway API specification. 
 [Traefik Proxy][traefik-proxy] is an open source cloud-native application proxy.
 
 Traefik Proxy currently supports version `v1.1.0` of the Gateway API specification, check the [Kubernetes Gateway Provider Documentation][traefik-proxy-gateway-api-doc] for more information on how to deploy and use it.
-Traefik Proxy's implementation passes all HTTP core and some extended conformance tests, but also supports the TCPRoute and TLSRoute features from the Experimental channel. 
+Traefik Proxy's implementation passes all HTTP core and some extended conformance tests, but also supports the TCPRoute and TLSRoute features from the Experimental channel.
 
 For help and support with Traefik Proxy, [create an issue][traefik-proxy-issue-new] or ask for help in the [Traefik Labs Community Forum][traefiklabs-community-forum].
 

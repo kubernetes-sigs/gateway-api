@@ -30,6 +30,7 @@ aliases:
     - keithmattix
 
   gateway-api-conformance-reviewers:
+    - candita
     - michaelbeaumont
     - sunjayBhatia
     - xunzhuo
