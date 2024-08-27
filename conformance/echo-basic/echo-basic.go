@@ -227,7 +227,7 @@ func echoHandler(w http.ResponseWriter, r *http.Request) {
 		sni, err = sniffForSNI(r.RemoteAddr)
 		if err != nil {
 			// TODO: research if for some test cases there won't be SNI available.
-			processError(w, err, http.StatusBadRequest)
+			processError(w, err, http.StatusBadGateway)
 			return
 		}
 	}
