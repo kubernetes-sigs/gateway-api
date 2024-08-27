@@ -114,7 +114,7 @@ func TestGRPCRequestMirrorFilterExperimental(t *testing.T) {
 		},
 		{
 			name: "GRPCRoute - Invalid fraction - numerator is negative",
-			wantErrors: []string{"numerator minimum value is 0"},
+			wantErrors: []string{"spec.rules[0].filters[0].requestMirror.fraction.numerator in body should be greater than or equal to 0"},
 			rules: []gatewayv1.GRPCRouteRule{{
 				Filters: []gatewayv1.GRPCRouteFilter{{
 					Type: gatewayv1.GRPCRouteFilterRequestMirror,
