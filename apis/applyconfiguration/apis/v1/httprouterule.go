@@ -30,6 +30,7 @@ type HTTPRouteRuleApplyConfiguration struct {
 	Filters            []HTTPRouteFilterApplyConfiguration   `json:"filters,omitempty"`
 	BackendRefs        []HTTPBackendRefApplyConfiguration    `json:"backendRefs,omitempty"`
 	Timeouts           *HTTPRouteTimeoutsApplyConfiguration  `json:"timeouts,omitempty"`
+	Retry              *HTTPRouteRetryApplyConfiguration     `json:"retry,omitempty"`
 	SessionPersistence *SessionPersistenceApplyConfiguration `json:"sessionPersistence,omitempty"`
 }
 
@@ -91,6 +92,14 @@ func (b *HTTPRouteRuleApplyConfiguration) WithBackendRefs(values ...*HTTPBackend
 // If called multiple times, the Timeouts field is set to the value of the last call.
 func (b *HTTPRouteRuleApplyConfiguration) WithTimeouts(value *HTTPRouteTimeoutsApplyConfiguration) *HTTPRouteRuleApplyConfiguration {
 	b.Timeouts = value
+	return b
+}
+
+// WithRetry sets the Retry field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the Retry field is set to the value of the last call.
+func (b *HTTPRouteRuleApplyConfiguration) WithRetry(value *HTTPRouteRetryApplyConfiguration) *HTTPRouteRuleApplyConfiguration {
+	b.Retry = value
 	return b
 }
 

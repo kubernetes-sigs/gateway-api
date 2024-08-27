@@ -861,6 +861,21 @@ var schemaYAML = typed.YAMLObject(`types:
           elementRelationship: associative
           keys:
           - name
+- name: io.k8s.sigs.gateway-api.apis.v1.HTTPRouteRetry
+  map:
+    fields:
+    - name: attempts
+      type:
+        scalar: numeric
+    - name: backoff
+      type:
+        scalar: string
+    - name: codes
+      type:
+        list:
+          elementType:
+            scalar: numeric
+          elementRelationship: atomic
 - name: io.k8s.sigs.gateway-api.apis.v1.HTTPRouteRule
   map:
     fields:
@@ -885,6 +900,9 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: name
       type:
         scalar: string
+    - name: retry
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1.HTTPRouteRetry
     - name: sessionPersistence
       type:
         namedType: io.k8s.sigs.gateway-api.apis.v1.SessionPersistence
