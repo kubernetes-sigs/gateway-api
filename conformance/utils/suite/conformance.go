@@ -55,7 +55,7 @@ func (test *ConformanceTest) Run(t *testing.T, suite *ConformanceTestSuite) {
 				t.Skipf("Skipping %s: suite does not support %s", test.ShortName, featureName)
 			}
 			feature := features.GetFeature(featureName)
-			featuresInfo = fmt.Sprintf("%s%s-%s, ", featuresInfo, feature.Name, feature.Status)
+			featuresInfo = fmt.Sprintf("%s%s-%s", featuresInfo, feature.Name, feature.Status)
 			if i < len(featureName)-1 {
 				featuresInfo += ", "
 			}
