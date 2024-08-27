@@ -36,9 +36,9 @@ import (
 //
 // Ensure that tests for newly added CEL validations are added in the correctly
 // named test function. For example, if you added a test at the
-// `HTTPRouteFilter` hierarchy (i.e. either at the struct level, or on one of
+// `GRPCRouteFilter` hierarchy (i.e. either at the struct level, or on one of
 // the immediate descendent fields), then the test will go in the
-// TestHTTPRouteFilter function. If the appropriate test function does not
+// TestGRPCRouteFilter function. If the appropriate test function does not
 // exist, please create one.
 //
 ////////////////////////////////////////////////////////////////////////////////
@@ -47,6 +47,7 @@ import (
 func TestGRPCRequestMirrorFilterExperimental(t *testing.T) {
 	var percent int32 = 42
 	var denominator int32 = 1000
+	var bad_denominator int32 = 0
 	testService := gatewayv1.ObjectName("test-service")
 	tests := []struct {
 		name       string
@@ -65,6 +66,96 @@ func TestGRPCRequestMirrorFilterExperimental(t *testing.T) {
 							Port: ptrTo(gatewayv1.PortNumber(8081)),
 						},
 						Percent: &percent,
+						Fraction: gatewayv1.Fraction{
+							Numerator: 83,
+							Denominator: &denominator,
+						},
+					},
+				}},
+			}},
+		},
+		{
+			name: "GRPCRoute - Invalid fraction - numerator greater than denominator",
+			wantErrors: []string{"numerator must be less than or equal to denominator"},
+			rules: []gatewayv1.GRPCRouteRule{{
+				Filters: []gatewayv1.GRPCRouteFilter{{
+					Type: gatewayv1.GRPCRouteFilterRequestMirror,
+					RequestMirror: &gatewayv1.HTTPRequestMirrorFilter{
+						BackendRef: gatewayv1.BackendObjectReference{
+							Name: testService,
+							Port: ptrTo(gatewayv1.PortNumber(8081)),
+						},
+						Fraction: gatewayv1.Fraction{
+							Numerator: 1001,
+							Denominator: &denominator,
+						},
+					},
+				}},
+			}},
+		},
+		{
+			name: "GRPCRoute - Invalid fraction - denominator is 0",
+			wantErrors: []string{"denominator minimum value is 1"},
+			rules: []gatewayv1.GRPCRouteRule{{
+				Filters: []gatewayv1.GRPCRouteFilter{{
+					Type: gatewayv1.GRPCRouteFilterRequestMirror,
+					RequestMirror: &gatewayv1.HTTPRequestMirrorFilter{
+						BackendRef: gatewayv1.BackendObjectReference{
+							Name: testService,
+							Port: ptrTo(gatewayv1.PortNumber(8081)),
+						},
+						Fraction: gatewayv1.Fraction{
+							Numerator: 0,
+							Denominator: &bad_denominator,
+						},
+					},
+				}},
+			}},
+		},
+		{
+			name: "GRPCRoute - Invalid fraction - numerator is negative",
+			wantErrors: []string{"numerator minimum value is 0"},
+			rules: []gatewayv1.GRPCRouteRule{{
+				Filters: []gatewayv1.GRPCRouteFilter{{
+					Type: gatewayv1.GRPCRouteFilterRequestMirror,
+					RequestMirror: &gatewayv1.HTTPRequestMirrorFilter{
+						BackendRef: gatewayv1.BackendObjectReference{
+							Name: testService,
+							Port: ptrTo(gatewayv1.PortNumber(8081)),
+						},
+						Fraction: gatewayv1.Fraction{
+							Numerator: -1,
+							Denominator: &denominator,
+						},
+					},
+				}},
+			}},
+		},
+		{
+			name: "GRPCRoute - Valid with percent",
+			rules: []gatewayv1.GRPCRouteRule{{
+				Filters: []gatewayv1.GRPCRouteFilter{{
+					Type: gatewayv1.GRPCRouteFilterRequestMirror,
+					RequestMirror: &gatewayv1.HTTPRequestMirrorFilter{
+						BackendRef: gatewayv1.BackendObjectReference{
+							Name: testService,
+							Port: ptrTo(gatewayv1.PortNumber(8081)),
+						},
+						Percent: &percent,
+					},
+				}},
+			}},
+		},
+		{
+			name: "GRPCRoute - Valid with fraction",
+			rules: []gatewayv1.GRPCRouteRule{{
+				Filters: []gatewayv1.GRPCRouteFilter{{
+					Type: gatewayv1.GRPCRouteFilterRequestMirror,
+					RequestMirror: &gatewayv1.HTTPRequestMirrorFilter{
+						BackendRef: gatewayv1.BackendObjectReference{
+							Name: testService,
+							Port: ptrTo(gatewayv1.PortNumber(8081)),
+						},
 						Fraction: gatewayv1.Fraction{
 							Numerator: 83,
 							Denominator: &denominator,
