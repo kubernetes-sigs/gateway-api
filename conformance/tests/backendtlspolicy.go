@@ -28,17 +28,17 @@ import (
 )
 
 func init() {
-	ConformanceTests = append(ConformanceTests, BackendTLSPolicyNormative)
+	ConformanceTests = append(ConformanceTests, BackendTLSPolicy)
 }
 
-var BackendTLSPolicyNormative = suite.ConformanceTest{
-	ShortName:   "BackendTLSPolicyNormative",
+var BackendTLSPolicy = suite.ConformanceTest{
+	ShortName:   "BackendTLSPolicy",
 	Description: "A single service that is targeted by a BackendTLSPolicy must successfully complete TLS termination",
 	Features: []features.SupportedFeature{
 		features.SupportGateway,
 		features.SupportBackendTLSPolicy,
 	},
-	Manifests: []string{"tests/backendtlspolicy-normative.yaml"},
+	Manifests: []string{"tests/backendtlspolicy.yaml"},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
 		routeNN := types.NamespacedName{Name: "gateway-conformance-infra-test", Namespace: ns}
@@ -48,6 +48,7 @@ var BackendTLSPolicyNormative = suite.ConformanceTest{
 
 		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
 
+		// Verify that the response to a call to /backendTLS will return the matching SNI.
 		t.Run("Simple request targeting BackendTLSPolicy should reach infra-backend", func(t *testing.T) {
 			http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr,
 				http.ExpectedResponse{
@@ -58,7 +59,6 @@ var BackendTLSPolicyNormative = suite.ConformanceTest{
 					Backend:   "infra-backend-v1",
 					Namespace: "gateway-conformance-infra",
 					SNI:       "abc.example.com",
-					// TODO - in addition to the SNI, we also need to check if the cert that was seen is the correct one.
 				})
 		})
 	},
