@@ -66,7 +66,7 @@ func TestGRPCRequestMirrorFilterExperimental(t *testing.T) {
 							Port: ptrTo(gatewayv1.PortNumber(8081)),
 						},
 						Percent: &percent,
-						Fraction: gatewayv1.Fraction{
+						Fraction: &gatewayv1.Fraction{
 							Numerator: 83,
 							Denominator: &denominator,
 						},
@@ -85,7 +85,7 @@ func TestGRPCRequestMirrorFilterExperimental(t *testing.T) {
 							Name: testService,
 							Port: ptrTo(gatewayv1.PortNumber(8081)),
 						},
-						Fraction: gatewayv1.Fraction{
+						Fraction: &gatewayv1.Fraction{
 							Numerator: 1001,
 							Denominator: &denominator,
 						},
@@ -104,7 +104,7 @@ func TestGRPCRequestMirrorFilterExperimental(t *testing.T) {
 							Name: testService,
 							Port: ptrTo(gatewayv1.PortNumber(8081)),
 						},
-						Fraction: gatewayv1.Fraction{
+						Fraction: &gatewayv1.Fraction{
 							Numerator: 0,
 							Denominator: &bad_denominator,
 						},
@@ -123,7 +123,7 @@ func TestGRPCRequestMirrorFilterExperimental(t *testing.T) {
 							Name: testService,
 							Port: ptrTo(gatewayv1.PortNumber(8081)),
 						},
-						Fraction: gatewayv1.Fraction{
+						Fraction: &gatewayv1.Fraction{
 							Numerator: -1,
 							Denominator: &denominator,
 						},
@@ -156,7 +156,7 @@ func TestGRPCRequestMirrorFilterExperimental(t *testing.T) {
 							Name: testService,
 							Port: ptrTo(gatewayv1.PortNumber(8081)),
 						},
-						Fraction: gatewayv1.Fraction{
+						Fraction: &gatewayv1.Fraction{
 							Numerator: 83,
 							Denominator: &denominator,
 						},
