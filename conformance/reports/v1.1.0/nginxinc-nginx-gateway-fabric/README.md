@@ -4,7 +4,7 @@
 
 | API channel | Implementation version                                                         | Mode    | Report                                       |
 |-------------|--------------------------------------------------------------------------------|---------|----------------------------------------------|
-| standard    | [v1.3.0](https://github.com/nginxinc/nginx-gateway-fabric/releases/tag/v1.3.0) | default | [link](./standard-1.3.0-default-report.yaml) |
+| experimental    | [v1.4.0](https://github.com/nginxinc/nginx-gateway-fabric/releases/tag/v1.4.0) | default | [link](./experimental-1.4.0-default-report.yaml) |
 
 ## Reproduce
 
