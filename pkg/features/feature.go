@@ -75,8 +75,8 @@ func init() {
 // Features - Helpers
 // -----------------------------------------------------------------------------
 
-// FeaturesSetsToFeatureNamesSet merges multiple sets of features into a single one and returns it.
-func FeaturesSetsToFeatureNamesSet(featuresSets ...sets.Set[Feature]) sets.Set[FeatureName] {
+// SetsToNamesSet merges multiple sets of features into a single one and returns it.
+func SetsToNamesSet(featuresSets ...sets.Set[Feature]) sets.Set[FeatureName] {
 	res := sets.Set[FeatureName]{}
 	for _, set := range featuresSets {
 		for _, feature := range set.UnsortedList() {

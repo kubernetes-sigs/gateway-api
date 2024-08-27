@@ -220,7 +220,7 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 	// cover all features, if they don't they'll need to have provided a
 	// conformance profile or at least some specific features they support.
 	if options.EnableAllSupportedFeatures {
-		options.SupportedFeatures = features.FeaturesSetsToFeatureNamesSet(features.AllFeatures)
+		options.SupportedFeatures = features.SetsToNamesSet(features.AllFeatures)
 	} else if options.SupportedFeatures == nil {
 		options.SupportedFeatures = sets.New[features.FeatureName]()
 	}

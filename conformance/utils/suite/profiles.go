@@ -78,7 +78,7 @@ var (
 			features.SupportHTTPRoute,
 		),
 		ExtendedFeatures: sets.New[features.FeatureName]().
-			Insert(features.FeaturesSetsToFeatureNamesSet(
+			Insert(features.SetsToNamesSet(
 				features.GatewayExtendedFeatures,
 				features.HTTPRouteExtendedFeatures,
 			).UnsortedList()...),
@@ -93,7 +93,7 @@ var (
 			features.SupportReferenceGrant,
 			features.SupportTLSRoute,
 		),
-		ExtendedFeatures: features.FeaturesSetsToFeatureNamesSet(features.GatewayExtendedFeatures),
+		ExtendedFeatures: features.SetsToNamesSet(features.GatewayExtendedFeatures),
 	}
 
 	// GatewayGRPCConformanceProfile is a ConformanceProfile that covers testing GRPC
@@ -105,7 +105,7 @@ var (
 			features.SupportReferenceGrant,
 			features.SupportGRPCRoute,
 		),
-		ExtendedFeatures: features.FeaturesSetsToFeatureNamesSet(features.GatewayExtendedFeatures),
+		ExtendedFeatures: features.SetsToNamesSet(features.GatewayExtendedFeatures),
 	}
 
 	// MeshHTTPConformanceProfile is a ConformanceProfile that covers testing HTTP
@@ -117,7 +117,7 @@ var (
 			features.SupportHTTPRoute,
 		),
 		ExtendedFeatures: sets.New[features.FeatureName]().
-			Insert(features.FeaturesSetsToFeatureNamesSet(
+			Insert(features.SetsToNamesSet(
 				features.MeshExtendedFeatures,
 				features.HTTPRouteExtendedFeatures,
 			).UnsortedList()...),
@@ -131,7 +131,7 @@ var (
 			features.SupportMesh,
 			features.SupportGRPCRoute,
 		),
-		ExtendedFeatures: features.FeaturesSetsToFeatureNamesSet(features.MeshExtendedFeatures),
+		ExtendedFeatures: features.SetsToNamesSet(features.MeshExtendedFeatures),
 	}
 )
 
