@@ -29,8 +29,8 @@ const (
 
 var (
 	TLSRouteFeature = Feature{
-		Name:   SupportTLSRoute,
-		Status: FeatureStatusTrial,
+		Name:    SupportTLSRoute,
+		Channel: FeatureChannelExperimental,
 	}
 )
 

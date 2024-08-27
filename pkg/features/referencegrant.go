@@ -28,8 +28,8 @@ const (
 )
 
 var ReferenceGrantFeature = Feature{
-	Name:   SupportReferenceGrant,
-	Status: FeatureStatusStable,
+	Name:    SupportReferenceGrant,
+	Channel: FeatureChannelStandard,
 }
 
 // ReferenceGrantCoreFeatures includes all SupportedFeatures needed to be

@@ -23,14 +23,14 @@ import "k8s.io/apimachinery/pkg/util/sets"
 // -----------------------------------------------------------------------------
 
 const (
-	// This option indicates general support for service mesh
+	// This option indicates general support for GRPCRoute.
 	SupportGRPCRoute FeatureName = "GRPCRoute"
 )
 
 var (
 	GRPCRouteFeature = Feature{
-		Name:   SupportGRPCRoute,
-		Status: FeatureStatusStable,
+		Name:    SupportGRPCRoute,
+		Channel: FeatureChannelStandard,
 	}
 )
 

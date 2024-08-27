@@ -55,8 +55,8 @@ func (test *ConformanceTest) Run(t *testing.T, suite *ConformanceTestSuite) {
 				t.Skipf("Skipping %s: suite does not support %s", test.ShortName, featureName)
 			}
 			feature := features.GetFeature(featureName)
-			featuresInfo = fmt.Sprintf("%s%s-%s", featuresInfo, feature.Name, feature.Status)
-			if i < len(featureName)-1 {
+			featuresInfo = fmt.Sprintf("%s%s-%s", featuresInfo, feature.Name, feature.Channel)
+			if i < len(test.Features)-1 {
 				featuresInfo += ", "
 			}
 		}
@@ -73,7 +73,7 @@ func (test *ConformanceTest) Run(t *testing.T, suite *ConformanceTestSuite) {
 	}
 
 	if featuresInfo != "" {
-		t.Logf("Running %s, relying on the following features: %s", test.ShortName, featuresInfo)
+		tlog.Logf(t, "Running %s, relying on the following features: %s", test.ShortName, featuresInfo)
 	}
 	test.Test(t, suite)
 }

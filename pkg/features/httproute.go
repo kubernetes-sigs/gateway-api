@@ -29,8 +29,8 @@ const (
 
 var (
 	HTTPRouteFeature = Feature{
-		Name:   SupportHTTPRoute,
-		Status: FeatureStatusStable,
+		Name:    SupportHTTPRoute,
+		Channel: FeatureChannelStandard,
 	}
 )
 
@@ -45,6 +45,9 @@ var HTTPRouteCoreFeatures = sets.New(
 // -----------------------------------------------------------------------------
 
 const (
+	// This option indicates support for Destination Port matching.
+	SupportHTTPRouteDestinationPortMatching FeatureName = "HTTPRouteDestinationPortMatching"
+
 	// This option indicates support for HTTPRoute backend request header modification
 	SupportHTTPRouteBackendRequestHeaderModification FeatureName = "HTTPRouteBackendRequestHeaderModification"
 
@@ -95,84 +98,73 @@ const (
 )
 
 var (
+	HTTPRouteDestinationPortMatchingFeature = Feature{
+		Name:    SupportHTTPRouteDestinationPortMatching,
+		Channel: FeatureChannelExperimental,
+	}
 	HTTPRouteBackendRequestHeaderModificationFeature = Feature{
-		Name:   SupportHTTPRouteBackendRequestHeaderModification,
-		Status: FeatureStatusStable,
+		Name:    SupportHTTPRouteBackendRequestHeaderModification,
+		Channel: FeatureChannelStandard,
 	}
-
 	HTTPRouteQueryParamMatchingFeature = Feature{
-		Name:   SupportHTTPRouteQueryParamMatching,
-		Status: FeatureStatusStable,
+		Name:    SupportHTTPRouteQueryParamMatching,
+		Channel: FeatureChannelStandard,
 	}
-
 	HTTPRouteMethodMatchingFeature = Feature{
-		Name:   SupportHTTPRouteMethodMatching,
-		Status: FeatureStatusStable,
+		Name:    SupportHTTPRouteMethodMatching,
+		Channel: FeatureChannelStandard,
 	}
-
 	HTTPRouteResponseHeaderModificationFeature = Feature{
-		Name:   SupportHTTPRouteResponseHeaderModification,
-		Status: FeatureStatusStable,
+		Name:    SupportHTTPRouteResponseHeaderModification,
+		Channel: FeatureChannelStandard,
 	}
-
 	HTTPRoutePortRedirectFeature = Feature{
-		Name:   SupportHTTPRoutePortRedirect,
-		Status: FeatureStatusStable,
+		Name:    SupportHTTPRoutePortRedirect,
+		Channel: FeatureChannelStandard,
 	}
-
 	HTTPRouteSchemeRedirectFeature = Feature{
-		Name:   SupportHTTPRouteSchemeRedirect,
-		Status: FeatureStatusStable,
+		Name:    SupportHTTPRouteSchemeRedirect,
+		Channel: FeatureChannelStandard,
 	}
-
 	HTTPRoutePathRedirectFeature = Feature{
-		Name:   SupportHTTPRoutePathRedirect,
-		Status: FeatureStatusStable,
+		Name:    SupportHTTPRoutePathRedirect,
+		Channel: FeatureChannelStandard,
 	}
-
 	HTTPRouteHostRewriteFeature = Feature{
-		Name:   SupportHTTPRouteHostRewrite,
-		Status: FeatureStatusStable,
+		Name:    SupportHTTPRouteHostRewrite,
+		Channel: FeatureChannelStandard,
 	}
-
 	HTTPRoutePathRewriteFeature = Feature{
-		Name:   SupportHTTPRoutePathRewrite,
-		Status: FeatureStatusStable,
+		Name:    SupportHTTPRoutePathRewrite,
+		Channel: FeatureChannelStandard,
 	}
-
 	HTTPRouteRequestMirrorFeature = Feature{
-		Name:   SupportHTTPRouteRequestMirror,
-		Status: FeatureStatusStable,
+		Name:    SupportHTTPRouteRequestMirror,
+		Channel: FeatureChannelStandard,
 	}
-
 	HTTPRouteRequestMultipleMirrorsFeature = Feature{
-		Name:   SupportHTTPRouteRequestMultipleMirrors,
-		Status: FeatureStatusStable,
+		Name:    SupportHTTPRouteRequestMultipleMirrors,
+		Channel: FeatureChannelStandard,
 	}
-
 	HTTPRouteRequestTimeoutFeature = Feature{
-		Name:   SupportHTTPRouteRequestTimeout,
-		Status: FeatureStatusStable,
+		Name:    SupportHTTPRouteRequestTimeout,
+		Channel: FeatureChannelStandard,
 	}
-
 	HTTPRouteBackendTimeoutFeature = Feature{
-		Name:   SupportHTTPRouteBackendTimeout,
-		Status: FeatureStatusStable,
+		Name:    SupportHTTPRouteBackendTimeout,
+		Channel: FeatureChannelStandard,
 	}
-
 	HTTPRouteParentRefPortFeature = Feature{
-		Name:   SupportHTTPRouteParentRefPort,
-		Status: FeatureStatusStable,
+		Name:    SupportHTTPRouteParentRefPort,
+		Channel: FeatureChannelStandard,
 	}
-
 	HTTPRouteBackendProtocolH2CFeature = Feature{
-		Name:   SupportHTTPRouteBackendProtocolH2C,
-		Status: FeatureStatusStable,
+		Name:    SupportHTTPRouteBackendProtocolH2C,
+		Channel: FeatureChannelStandard,
 	}
-
 	HTTPRouteBackendProtocolWebSocketFeature = Feature{
-		Name:   SupportHTTPRouteBackendProtocolWebSocket,
-		Status: FeatureStatusStable,
+		Name:    SupportHTTPRouteBackendProtocolWebSocket,
+		Channel: FeatureChannelStandard,
 	}
 )
 
@@ -180,6 +172,7 @@ var (
 // conformance and can be used to opt-in to run all HTTPRoute extended features tests.
 // This does not include any Core Features.
 var HTTPRouteExtendedFeatures = sets.New(
+	HTTPRouteDestinationPortMatchingFeature,
 	HTTPRouteBackendRequestHeaderModificationFeature,
 	HTTPRouteQueryParamMatchingFeature,
 	HTTPRouteMethodMatchingFeature,
@@ -196,27 +189,4 @@ var HTTPRouteExtendedFeatures = sets.New(
 	HTTPRouteParentRefPortFeature,
 	HTTPRouteBackendProtocolH2CFeature,
 	HTTPRouteBackendProtocolWebSocketFeature,
-)
-
-// -----------------------------------------------------------------------------
-// Features - HTTPRoute Conformance (Experimental)
-// -----------------------------------------------------------------------------
-
-const (
-	// This option indicates support for Destination Port matching.
-	SupportHTTPRouteDestinationPortMatching FeatureName = "HTTPRouteDestinationPortMatching"
-)
-
-var (
-	HTTPRouteDestinationPortMatchingFeature = Feature{
-		Name:   SupportHTTPRouteDestinationPortMatching,
-		Status: FeatureStatusTrial,
-	}
-)
-
-// HTTPRouteExperimentalFeatures includes all the supported experimental features, currently only
-// available in our experimental release channel.
-// Implementations have the flexibility to opt-in for either specific features or the entire set.
-var HTTPRouteExperimentalFeatures = sets.New(
-	HTTPRouteDestinationPortMatchingFeature,
 )

@@ -30,8 +30,8 @@ const (
 
 var (
 	GatewayFeature = Feature{
-		Name:   SupportGateway,
-		Status: FeatureStatusStable,
+		Name:    SupportGateway,
+		Channel: FeatureChannelStandard,
 	}
 )
 
@@ -65,23 +65,20 @@ const (
 
 var (
 	GatewayPort8080Feature = Feature{
-		Name:   SupportGatewayPort8080,
-		Status: FeatureStatusStable, // TODO: figure it out
+		Name:    SupportGatewayPort8080,
+		Channel: FeatureChannelStandard,
 	}
-
 	GatewayStaticAddressesFeature = Feature{
-		Name:   SupportGatewayStaticAddresses,
-		Status: FeatureStatusStable, // TODO: figure it out
+		Name:    SupportGatewayStaticAddresses,
+		Channel: FeatureChannelStandard,
 	}
-
 	GatewayHTTPListenerIsolationFeature = Feature{
-		Name:   SupportGatewayHTTPListenerIsolation,
-		Status: FeatureStatusStable, // TODO: figure it out
+		Name:    SupportGatewayHTTPListenerIsolation,
+		Channel: FeatureChannelStandard,
 	}
-
 	GatewayInfrastructurePropagationFeature = Feature{
-		Name:   SupportGatewayInfrastructurePropagation,
-		Status: FeatureStatusStable, // TODO: figure it out
+		Name:    SupportGatewayInfrastructurePropagation,
+		Channel: FeatureChannelExperimental,
 	}
 )
 

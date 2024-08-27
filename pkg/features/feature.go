@@ -22,22 +22,23 @@ import "k8s.io/apimachinery/pkg/util/sets"
 // Features - Types
 // -----------------------------------------------------------------------------
 
-// FeatureName allows opting in to additional conformance tests at an
-// individual feature granularity.
+// FeatureName is the type used to represent the name of a feature.
 type FeatureName string
 
-type FeatureStatus string
+// FeatureChannel is the type used to represent the channel a feature belongs to.
+type FeatureChannel string
 
-// TODO: comment
 const (
-	FeatureStatusTrial  = "TRIAL"
-	FeatureStatusStable = "STABLE"
+	// FeatureChannelExperimental is used for experimental features.
+	FeatureChannelExperimental = "experimental"
+	// FeatureChannelStandard is used for standard features.
+	FeatureChannelStandard = "standard"
 )
 
-// TODO: comment
+// Feature is a struct that represents a feature.
 type Feature struct {
-	Name   FeatureName
-	Status FeatureStatus
+	Name    FeatureName
+	Channel FeatureChannel
 }
 
 // -----------------------------------------------------------------------------
@@ -56,7 +57,6 @@ var (
 			Insert(ReferenceGrantCoreFeatures.UnsortedList()...).
 			Insert(HTTPRouteCoreFeatures.UnsortedList()...).
 			Insert(HTTPRouteExtendedFeatures.UnsortedList()...).
-			Insert(HTTPRouteExperimentalFeatures.UnsortedList()...).
 			Insert(TLSRouteCoreFeatures.UnsortedList()...).
 			Insert(MeshCoreFeatures.UnsortedList()...).
 			Insert(MeshExtendedFeatures.UnsortedList()...).
@@ -71,7 +71,11 @@ func init() {
 	}
 }
 
-// TODO: comment
+// -----------------------------------------------------------------------------
+// Features - Helpers
+// -----------------------------------------------------------------------------
+
+// FeaturesSetsToFeatureNamesSet merges multiple sets of features into a single one and returns it.
 func FeaturesSetsToFeatureNamesSet(featuresSets ...sets.Set[Feature]) sets.Set[FeatureName] {
 	res := sets.Set[FeatureName]{}
 	for _, set := range featuresSets {
@@ -82,6 +86,7 @@ func FeaturesSetsToFeatureNamesSet(featuresSets ...sets.Set[Feature]) sets.Set[F
 	return res
 }
 
+// GetFeature returns the feature with the given name.
 func GetFeature(name FeatureName) Feature {
 	return featureMap[name]
 }

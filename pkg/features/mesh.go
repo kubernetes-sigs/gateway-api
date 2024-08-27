@@ -25,24 +25,12 @@ import "k8s.io/apimachinery/pkg/util/sets"
 const (
 	// This option indicates general support for service mesh
 	SupportMesh FeatureName = "Mesh"
-	// This option indicates support for matching Service traffic specifically by Cluster IP rather than other mechanisms.
-	SupportMeshClusterIPMatching FeatureName = "MeshClusterIPMatching"
-	// This option indicates support for "consumer" routes, where a namespace creates a route for a service in another namespace.
-	SupportMeshConsumerRoute FeatureName = "MeshConsumerRoute"
 )
 
 var (
 	MeshFeature = Feature{
-		Name:   SupportMesh,
-		Status: FeatureStatusStable,
-	}
-	MeshClusterIPMatchingFeature = Feature{
-		Name:   SupportMeshClusterIPMatching,
-		Status: FeatureStatusStable,
-	}
-	MeshConsumerRouteFeature = Feature{
-		Name:   SupportMeshConsumerRoute,
-		Status: FeatureStatusStable,
+		Name:    SupportMesh,
+		Channel: FeatureChannelStandard,
 	}
 )
 
@@ -50,6 +38,28 @@ var (
 // a Core level of support.
 var MeshCoreFeatures = sets.New(
 	MeshFeature,
+)
+
+// -----------------------------------------------------------------------------
+// Features - Mesh Conformance (Extended)
+// -----------------------------------------------------------------------------
+
+const (
+	// This option indicates support for matching Service traffic specifically by Cluster IP rather than other mechanisms.
+	SupportMeshClusterIPMatching FeatureName = "MeshClusterIPMatching"
+	// This option indicates support for "consumer" routes, where a namespace creates a route for a service in another namespace.
+	SupportMeshConsumerRoute FeatureName = "MeshConsumerRoute"
+)
+
+var (
+	MeshClusterIPMatchingFeature = Feature{
+		Name:    SupportMeshClusterIPMatching,
+		Channel: FeatureChannelStandard,
+	}
+	MeshConsumerRouteFeature = Feature{
+		Name:    SupportMeshConsumerRoute,
+		Channel: FeatureChannelStandard,
+	}
 )
 
 // MeshExtendedFeatures includes all the supported features for the service mesh at
