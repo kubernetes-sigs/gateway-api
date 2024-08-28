@@ -380,7 +380,6 @@ type HTTPRouteRetry struct {
 	// Support: Extended
 	//
 	// +optional
-	// <gateway:experimental>
 	Codes []HTTPRouteRetryStatusCode `json:"codes,omitempty"`
 
 	// Attempts specifies the maxmimum number of times an individual request
