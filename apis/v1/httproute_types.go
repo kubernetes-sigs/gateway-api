@@ -463,8 +463,8 @@ type HTTPRouteRetry struct {
 // range, which are not valid for HTTP clients, but are sometimes used for
 // communicating application-specific errors.
 //
-// +kubebuilder:validation:Minimum:=100
-// +kubebuilder:validation:Maximum:=999
+// +kubebuilder:validation:Minimum:=400
+// +kubebuilder:validation:Maximum:=599
 // <gateway:experimental>
 type HTTPRouteRetryStatusCode int
 
