@@ -394,7 +394,6 @@ type HTTPRouteRetry struct {
 	// Support: Extended
 	//
 	// +optional
-	// <gateway:experimental>
 	Attempts *int `json:"attempts,omitempty"`
 
 	// Backoff specifies the minimum duration a Gateway should wait between
@@ -435,7 +434,6 @@ type HTTPRouteRetry struct {
 	// Support: Extended
 	//
 	// +optional
-	// <gateway:experimental>
 	Backoff *Duration `json:"backoff,omitempty"`
 }
 
