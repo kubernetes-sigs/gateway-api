@@ -2833,7 +2833,7 @@ spec:
 
                       properties:
                         attempts:
-                          description: |+
+                          description: |-
                             Attempts specifies the maxmimum number of times an individual request
                             from the gateway to a backend should be retried.
 
@@ -2847,11 +2847,9 @@ spec:
 
 
                             Support: Extended
-
-
                           type: integer
                         backoff:
-                          description: |+
+                          description: |-
                             Backoff specifies the minimum duration a Gateway should wait between
                             retry attempts and is represented in Gateway API Duration formatting.
 
@@ -2895,19 +2893,15 @@ spec:
 
 
                             Support: Extended
-
-
                           pattern: ^([0-9]{1,5}(h|m|s|ms)){1,4}$
                           type: string
                         codes:
-                          description: |+
+                          description: |-
                             Codes defines the HTTP response status codes for which a backend request
                             should be retried.
 
 
                             Support: Extended
-
-
                           items:
                             description: |-
                               HTTPRouteRetryStatusCode defines an HTTP response status code for
@@ -2941,8 +2935,8 @@ spec:
 
 
                               <gateway:experimental>
-                            maximum: 999
-                            minimum: 100
+                            maximum: 599
+                            minimum: 400
                             type: integer
                           type: array
                       type: object
@@ -6315,7 +6309,7 @@ spec:
 
                       properties:
                         attempts:
-                          description: |+
+                          description: |-
                             Attempts specifies the maxmimum number of times an individual request
                             from the gateway to a backend should be retried.
 
@@ -6329,11 +6323,9 @@ spec:
 
 
                             Support: Extended
-
-
                           type: integer
                         backoff:
-                          description: |+
+                          description: |-
                             Backoff specifies the minimum duration a Gateway should wait between
                             retry attempts and is represented in Gateway API Duration formatting.
 
@@ -6377,19 +6369,15 @@ spec:
 
 
                             Support: Extended
-
-
                           pattern: ^([0-9]{1,5}(h|m|s|ms)){1,4}$
                           type: string
                         codes:
-                          description: |+
+                          description: |-
                             Codes defines the HTTP response status codes for which a backend request
                             should be retried.
 
 
                             Support: Extended
-
-
                           items:
                             description: |-
                               HTTPRouteRetryStatusCode defines an HTTP response status code for
@@ -6423,8 +6411,8 @@ spec:
 
 
                               <gateway:experimental>
-                            maximum: 999
-                            minimum: 100
+                            maximum: 599
+                            minimum: 400
                             type: integer
                           type: array
                       type: object
