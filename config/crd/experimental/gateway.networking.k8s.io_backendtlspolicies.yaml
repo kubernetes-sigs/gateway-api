@@ -53,6 +53,31 @@ spec:
           spec:
             description: Spec defines the desired state of BackendTLSPolicy.
             properties:
+              options:
+                additionalProperties:
+                  description: |-
+                    AnnotationValue is the value of an annotation in Gateway API. This is used
+                    for validation of maps such as TLS options. This roughly matches Kubernetes
+                    annotation validation, although the length validation in that case is based
+                    on the entire size of the annotations struct.
+                  maxLength: 4096
+                  minLength: 0
+                  type: string
+                description: |-
+                  Options are a list of key/value pairs to enable extended TLS
+                  configuration for each implementation. For example, configuring the
+                  minimum TLS version or supported cipher suites.
+
+
+                  A set of common keys MAY be defined by the API in the future. To avoid
+                  any ambiguity, implementation-specific definitions MUST use
+                  domain-prefixed names, such as `example.com/my-custom-option`.
+                  Un-prefixed names are reserved for key names defined by Gateway API.
+
+
+                  Support: Implementation-specific
+                maxProperties: 16
+                type: object
               targetRefs:
                 description: |-
                   TargetRefs identifies an API object to apply the policy to.
@@ -199,8 +224,9 @@ spec:
 
 
                       1. Hostname MUST be used as the SNI to connect to the backend (RFC 6066).
-                      2. Hostname MUST be used for authentication and MUST match the certificate
-                         served by the matching backend.
+                      2. If SubjectAltNames is not specified, Hostname MUST be used for
+                         authentication and MUST match the certificate served by the matching
+                         backend.
 
 
                       Support: Core
@@ -208,6 +234,73 @@ spec:
                     minLength: 1
                     pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                     type: string
+                  subjectAltNames:
+                    description: |-
+                      SubjectAltNames contains one or more Subject Alternative Names.
+                      When specified, the certificate served from the backend MUST have at least one
+                      Subject Alternate Name matching one of the specified SubjectAltNames.
+
+
+                      Support: Core
+                    items:
+                      description: SubjectAltName represents Subject Alternative Name.
+                      properties:
+                        hostname:
+                          description: |-
+                            Hostname contains Subject Alternative Name specified in DNS name format.
+                            Required when Type is set to Hostname, ignored otherwise.
+
+
+                            Support: Core
+                          maxLength: 253
+                          minLength: 1
+                          pattern: ^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+                          type: string
+                        type:
+                          description: |-
+                            Type determines the format of the Subject Alternative Name. Always required.
+
+
+                            Support: Core
+                          enum:
+                          - Hostname
+                          - URI
+                          type: string
+                        uri:
+                          description: |-
+                            URI contains Subject Alternative Name specified in a full URI format.
+                            It MUST include both a scheme (e.g., "http" or "ftp") and a scheme-specific-part.
+                            Common values include SPIFFE IDs like "spiffe://mycluster.example.com/ns/myns/sa/svc1sa".
+                            Required when Type is set to URI, ignored otherwise.
+
+
+                            Support: Core
+                          maxLength: 253
+                          minLength: 1
+                          pattern: ^(([^:/?#]+):)(//([^/?#]*))([^?#]*)(\?([^#]*))?(#(.*))?
+                          type: string
+                      required:
+                      - type
+                      type: object
+                      x-kubernetes-validations:
+                      - message: SubjectAltName element must contain Hostname, if
+                          Type is set to Hostname
+                        rule: '!(self.type == "Hostname" && (!has(self.hostname) ||
+                          self.hostname == ""))'
+                      - message: SubjectAltName element must not contain Hostname,
+                          if Type is not set to Hostname
+                        rule: '!(self.type != "Hostname" && has(self.hostname) &&
+                          self.hostname != "")'
+                      - message: SubjectAltName element must contain URI, if Type
+                          is set to URI
+                        rule: '!(self.type == "URI" && (!has(self.uri) || self.uri
+                          == ""))'
+                      - message: SubjectAltName element must not contain URI, if Type
+                          is not set to URI
+                        rule: '!(self.type != "URI" && has(self.uri) && self.uri !=
+                          "")'
+                    maxItems: 5
+                    type: array
                   wellKnownCACertificates:
                     description: |-
                       WellKnownCACertificates specifies whether system CA certificates may be used in

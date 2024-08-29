@@ -103,6 +103,167 @@ func TestBackendTLSPolicyValidation(t *testing.T) {
 			},
 			wantErrors: []string{"spec.validation.hostname in body should be at least 1 chars long"},
 		},
+		{
+			name: "valid BackendTLSPolicyValidation with SubjectAltName type Hostname",
+			routeConfig: gatewayv1a3.BackendTLSPolicyValidation{
+				CACertificateRefs: []v1beta1.LocalObjectReference{
+					{
+						Group: "group",
+						Kind:  "kind",
+						Name:  "name",
+					},
+				},
+				Hostname: "foo.example.com",
+				SubjectAltNames: []gatewayv1a3.SubjectAltName{
+					{
+						Type:     "Hostname",
+						Hostname: "foo.example.com",
+					},
+				},
+			},
+			wantErrors: []string{},
+		},
+		{
+			name: "valid BackendTLSPolicyValidation with SubjectAltName type URI",
+			routeConfig: gatewayv1a3.BackendTLSPolicyValidation{
+				CACertificateRefs: []v1beta1.LocalObjectReference{
+					{
+						Group: "group",
+						Kind:  "kind",
+						Name:  "name",
+					},
+				},
+				Hostname: "foo.example.com",
+				SubjectAltNames: []gatewayv1a3.SubjectAltName{
+					{
+						Type: "URI",
+						URI:  "spiffe://mycluster.example",
+					},
+				},
+			},
+			wantErrors: []string{},
+		},
+		{
+			name: "invalid BackendTLSPolicyValidation with SubjectAltName type Hostname and empty Hostname field",
+			routeConfig: gatewayv1a3.BackendTLSPolicyValidation{
+				CACertificateRefs: []v1beta1.LocalObjectReference{
+					{
+						Group: "group",
+						Kind:  "kind",
+						Name:  "name",
+					},
+				},
+				Hostname: "foo.example.com",
+				SubjectAltNames: []gatewayv1a3.SubjectAltName{
+					{
+						Type:     "Hostname",
+						Hostname: "",
+					},
+				},
+			},
+			wantErrors: []string{"SubjectAltName element must contain Hostname, if Type is set to Hostname"},
+		},
+		{
+			name: "invalid BackendTLSPolicyValidation with SubjectAltName type URI and non-empty Hostname field",
+			routeConfig: gatewayv1a3.BackendTLSPolicyValidation{
+				CACertificateRefs: []v1beta1.LocalObjectReference{
+					{
+						Group: "group",
+						Kind:  "kind",
+						Name:  "name",
+					},
+				},
+				Hostname: "foo.example.com",
+				SubjectAltNames: []gatewayv1a3.SubjectAltName{
+					{
+						Type:     "URI",
+						Hostname: "foo.example.com",
+					},
+				},
+			},
+			wantErrors: []string{"SubjectAltName element must not contain Hostname, if Type is not set to Hostname"},
+		},
+		{
+			name: "invalid BackendTLSPolicyValidation with SubjectAltName type URI and empty URI field",
+			routeConfig: gatewayv1a3.BackendTLSPolicyValidation{
+				CACertificateRefs: []v1beta1.LocalObjectReference{
+					{
+						Group: "group",
+						Kind:  "kind",
+						Name:  "name",
+					},
+				},
+				Hostname: "foo.example.com",
+				SubjectAltNames: []gatewayv1a3.SubjectAltName{
+					{
+						Type: "URI",
+						URI:  "",
+					},
+				},
+			},
+			wantErrors: []string{"SubjectAltName element must contain URI, if Type is set to URI"},
+		},
+		{
+			name: "invalid BackendTLSPolicyValidation with SubjectAltName type Hostname and non-empty URI field",
+			routeConfig: gatewayv1a3.BackendTLSPolicyValidation{
+				CACertificateRefs: []v1beta1.LocalObjectReference{
+					{
+						Group: "group",
+						Kind:  "kind",
+						Name:  "name",
+					},
+				},
+				Hostname: "foo.example.com",
+				SubjectAltNames: []gatewayv1a3.SubjectAltName{
+					{
+						Type: "Hostname",
+						URI:  "test",
+					},
+				},
+			},
+			wantErrors: []string{"SubjectAltName element must not contain URI, if Type is not set to URI"},
+		},
+		{
+			name: "invalid BackendTLSPolicyValidation with SubjectAltName type Hostname and both Hostname and URI specified",
+			routeConfig: gatewayv1a3.BackendTLSPolicyValidation{
+				CACertificateRefs: []v1beta1.LocalObjectReference{
+					{
+						Group: "group",
+						Kind:  "kind",
+						Name:  "name",
+					},
+				},
+				Hostname: "foo.example.com",
+				SubjectAltNames: []gatewayv1a3.SubjectAltName{
+					{
+						Type:     "Hostname",
+						Hostname: "foo.example.com",
+						URI:      "test",
+					},
+				},
+			},
+			wantErrors: []string{"SubjectAltName element must not contain URI, if Type is not set to URI"},
+		},
+		{
+			name: "invalid BackendTLSPolicyValidation incorrect URI SAN",
+			routeConfig: gatewayv1a3.BackendTLSPolicyValidation{
+				CACertificateRefs: []v1beta1.LocalObjectReference{
+					{
+						Group: "group",
+						Kind:  "kind",
+						Name:  "name",
+					},
+				},
+				Hostname: "foo.example.com",
+				SubjectAltNames: []gatewayv1a3.SubjectAltName{
+					{
+						Type: "URI",
+						URI:  "foo.example.com",
+					},
+				},
+			},
+			wantErrors: []string{"spec.validation.subjectAltNames[0].uri in body should match '^(([^:/?#]+):)(//([^/?#]*))([^?#]*)(\\?([^#]*))?(#(.*))?'"},
+		},
 	}
 
 	for _, tc := range tests {

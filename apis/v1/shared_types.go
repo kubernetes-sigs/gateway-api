@@ -535,6 +535,19 @@ type Hostname string
 // +kubebuilder:validation:Pattern=`^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$`
 type PreciseHostname string
 
+// AbsoluteURI represents a Uniform Resource Identifier (URI) as defined by RFC3986.
+
+// The AbsoluteURI MUST NOT be a relative URI, and it MUST follow the URI syntax and
+// encoding rules specified in RFC3986.  The AbsoluteURI MUST include both a
+// scheme (e.g., "http" or "spiffe") and a scheme-specific-part.  URIs that
+// include an authority MUST include a fully qualified domain name or
+// IP address as the host.
+
+// +kubebuilder:validation:MinLength=1
+// +kubebuilder:validation:MaxLength=253
+// +kubebuilder:validation:Pattern=`^(([^:/?#]+):)(//([^/?#]*))([^?#]*)(\?([^#]*))?(#(.*))?`
+type AbsoluteURI string
+
 // Group refers to a Kubernetes Group. It must either be an empty string or a
 // RFC 1123 subdomain.
 //

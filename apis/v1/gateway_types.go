@@ -229,6 +229,15 @@ type GatewaySpec struct {
 	// <gateway:experimental>
 	// +optional
 	Infrastructure *GatewayInfrastructure `json:"infrastructure,omitempty"`
+
+	// BackendTLS configures TLS settings for when this Gateway is connecting to
+	// backends with TLS.
+	//
+	// Support: Core
+	//
+	// +optional
+	// <gateway:experimental>
+	BackendTLS *GatewayBackendTLS `json:"backendTLS,omitempty"`
 }
 
 // Listener embodies the concept of a logical endpoint where a Gateway accepts
@@ -373,6 +382,29 @@ const (
 	// Accepts UDP packets.
 	UDPProtocolType ProtocolType = "UDP"
 )
+
+// GatewayBackendTLS describes backend TLS configuration for gateway.
+type GatewayBackendTLS struct {
+	// ClientCertificateRef is a reference to an object that contains a Client
+	// Certificate and the associated private key.
+	//
+	// References to a resource in different namespace are invalid UNLESS there
+	// is a ReferenceGrant in the target namespace that allows the certificate
+	// to be attached. If a ReferenceGrant does not allow this reference, the
+	// "ResolvedRefs" condition MUST be set to False for this listener with the
+	// "RefNotPermitted" reason.
+	//
+	// ClientCertificateRef can reference to standard Kubernetes resources, i.e.
+	// Secret, or implementation-specific custom resources.
+	//
+	// This setting can be overridden on the service level by use of BackendTLSPolicy.
+	//
+	// Support: Core
+	//
+	// +optional
+	// <gateway:experimental>
+	ClientCertificateRef *SecretObjectReference `json:"clientCertificateRef,omitempty"`
+}
 
 // GatewayTLSConfig describes a TLS configuration.
 //
