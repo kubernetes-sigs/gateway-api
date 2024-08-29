@@ -39,7 +39,8 @@ EOF
 ```shell script
 go test ../../../conformance -run TestConformance -args \
     --gateway-class=envoy-gateway \
-    --supported-features=Gateway
+    --supported-features=Gateway \
+    --allow-crds-mismatch
 ```
 
 ## (Optional) Step 4: Delete kind cluster
