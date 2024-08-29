@@ -42,6 +42,7 @@ var (
 	testFailed       resultType = "FAILED"
 	testSkipped      resultType = "SKIPPED"
 	testNotSupported resultType = "NOT_SUPPORTED"
+	testTrialSkipped resultType = "TRIAL_SKIPPED"
 )
 
 type profileReportsMap map[ConformanceProfileName]confv1.ProfileReport

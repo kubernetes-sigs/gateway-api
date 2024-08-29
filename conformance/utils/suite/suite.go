@@ -71,6 +71,7 @@ type ConformanceTestSuite struct {
 	SupportedFeatures        sets.Set[features.FeatureName]
 	TimeoutConfig            config.TimeoutConfig
 	SkipTests                sets.Set[string]
+	SkipTrialTests           bool
 	RunTest                  string
 	ManifestFS               []fs.FS
 	UsableNetworkAddresses   []v1beta1.GatewayAddress
@@ -144,6 +145,8 @@ type ConformanceOptions struct {
 	// SkipTests contains all the tests not to be run and can be used to opt out
 	// of specific tests
 	SkipTests []string
+	// SkipTrialTests indicates whether or not to skip trial tests.
+	SkipTrialTests bool
 	// RunTest is a single test to run, mostly for development/debugging convenience.
 	RunTest string
 
@@ -248,6 +251,7 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 		TimeoutConfig:               options.TimeoutConfig,
 		SkipTests:                   sets.New(options.SkipTests...),
 		RunTest:                     options.RunTest,
+		SkipTrialTests:              options.SkipTrialTests,
 		ManifestFS:                  options.ManifestFS,
 		UsableNetworkAddresses:      options.UsableNetworkAddresses,
 		UnusableNetworkAddresses:    options.UnusableNetworkAddresses,
@@ -431,6 +435,9 @@ func (suite *ConformanceTestSuite) Run(t *testing.T, tests []ConformanceTest) er
 		if suite.SkipTests.Has(test.ShortName) {
 			res = testSkipped
 		}
+		if suite.SkipTrialTests && test.Trial {
+			res = testTrialSkipped
+		}
 		if !suite.SupportedFeatures.HasAll(test.Features...) {
 			res = testNotSupported
 		}
@@ -486,8 +493,15 @@ func (suite *ConformanceTestSuite) Report() (*confv1.ConformanceReport, error) {
 	}
 	sort.Strings(testNames)
 	profileReports := newReports()
+	succeededTrialTestSet := sets.Set[string]{}
 	for _, tN := range testNames {
 		testResult := suite.results[tN]
+		if testResult.result == testTrialSkipped {
+			continue
+		}
+		if testResult.result == testSucceeded && testResult.test.Trial {
+			succeededTrialTestSet.Insert(tN)
+		}
 		conformanceProfiles := getConformanceProfilesForTest(testResult.test, suite.conformanceProfiles).UnsortedList()
 		sort.Slice(conformanceProfiles, func(i, j int) bool {
 			return conformanceProfiles[i].Name < conformanceProfiles[j].Name
@@ -495,6 +509,10 @@ func (suite *ConformanceTestSuite) Report() (*confv1.ConformanceReport, error) {
 		for _, profile := range conformanceProfiles {
 			profileReports.addTestResults(*profile, testResult)
 		}
+	}
+	var succeededTrialTests []string
+	if len(succeededTrialTestSet) > 0 {
+		succeededTrialTests = succeededTrialTestSet.UnsortedList()
 	}
 
 	profileReports.compileResults(suite.extendedSupportedFeatures, suite.extendedUnsupportedFeatures)
@@ -504,12 +522,13 @@ func (suite *ConformanceTestSuite) Report() (*confv1.ConformanceReport, error) {
 			APIVersion: confv1.GroupVersion.String(),
 			Kind:       "ConformanceReport",
 		},
-		Date:              time.Now().Format(time.RFC3339),
-		Mode:              suite.mode,
-		Implementation:    suite.implementation,
-		GatewayAPIVersion: suite.apiVersion,
-		GatewayAPIChannel: suite.apiChannel,
-		ProfileReports:    profileReports.list(),
+		Date:                time.Now().Format(time.RFC3339),
+		Mode:                suite.mode,
+		Implementation:      suite.implementation,
+		GatewayAPIVersion:   suite.apiVersion,
+		GatewayAPIChannel:   suite.apiChannel,
+		ProfileReports:      profileReports.list(),
+		SucceededTrialTests: succeededTrialTests,
 	}, nil
 }
 

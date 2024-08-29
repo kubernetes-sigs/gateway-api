@@ -46,6 +46,10 @@ type ConformanceReport struct {
 	// ProfileReports is a list of the individual reports for each conformance
 	// profile that was enabled for a test run.
 	ProfileReports []ProfileReport `json:"profiles"`
+
+	// SucceededTrialTests is a list of the names of the trial tests that
+	// have been successfully run.
+	SucceededTrialTests []string `json:"succeededTrialTests,omitempty"`
 }
 
 // Implementation provides metadata information on the downstream
