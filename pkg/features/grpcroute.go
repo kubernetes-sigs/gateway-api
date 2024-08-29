@@ -28,6 +28,7 @@ const (
 )
 
 var (
+	// GRPCRouteFeature contains metadata for the GRPCRoute feature.
 	GRPCRouteFeature = Feature{
 		Name:    SupportGRPCRoute,
 		Channel: FeatureChannelStandard,

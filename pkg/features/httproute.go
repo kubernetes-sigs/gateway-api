@@ -28,6 +28,7 @@ const (
 )
 
 var (
+	// HTTPRouteFeature contains metadata for the HTTPRoute feature.
 	HTTPRouteFeature = Feature{
 		Name:    SupportHTTPRoute,
 		Channel: FeatureChannelStandard,
@@ -98,70 +99,87 @@ const (
 )
 
 var (
+	// HTTPRouteDestinationPortMatchingFeature contains metadata for the HTTPRouteDestinationPortMatching feature.
 	HTTPRouteDestinationPortMatchingFeature = Feature{
 		Name:    SupportHTTPRouteDestinationPortMatching,
 		Channel: FeatureChannelExperimental,
 	}
+	// HTTPRouteBackendRequestHeaderModificationFeature contains metadata for the HTTPRouteBackendRequestHeaderModification feature.
 	HTTPRouteBackendRequestHeaderModificationFeature = Feature{
 		Name:    SupportHTTPRouteBackendRequestHeaderModification,
 		Channel: FeatureChannelStandard,
 	}
+	// HTTPRouteQueryParamMatchingFeature contains metadata for the HTTPRouteQueryParamMatching feature.
 	HTTPRouteQueryParamMatchingFeature = Feature{
 		Name:    SupportHTTPRouteQueryParamMatching,
 		Channel: FeatureChannelStandard,
 	}
+	// HTTPRouteMethodMatchingFeature contains metadata for the HTTPRouteMethodMatching feature.
 	HTTPRouteMethodMatchingFeature = Feature{
 		Name:    SupportHTTPRouteMethodMatching,
 		Channel: FeatureChannelStandard,
 	}
+	// HTTPRouteResponseHeaderModificationFeature contains metadata for the HTTPRouteResponseHeaderModification feature.
 	HTTPRouteResponseHeaderModificationFeature = Feature{
 		Name:    SupportHTTPRouteResponseHeaderModification,
 		Channel: FeatureChannelStandard,
 	}
+	// HTTPRoutePortRedirectFeature contains metadata for the HTTPRoutePortRedirect feature.
 	HTTPRoutePortRedirectFeature = Feature{
 		Name:    SupportHTTPRoutePortRedirect,
 		Channel: FeatureChannelStandard,
 	}
+	// HTTPRouteSchemeRedirectFeature contains metadata for the HTTPRouteSchemeRedirect feature.
 	HTTPRouteSchemeRedirectFeature = Feature{
 		Name:    SupportHTTPRouteSchemeRedirect,
 		Channel: FeatureChannelStandard,
 	}
+	// HTTPRoutePathRedirectFeature contains metadata for the HTTPRoutePathRedirect feature.
 	HTTPRoutePathRedirectFeature = Feature{
 		Name:    SupportHTTPRoutePathRedirect,
 		Channel: FeatureChannelStandard,
 	}
+	// HTTPRouteHostRewriteFeature contains metadata for the HTTPRouteHostRewrite feature.
 	HTTPRouteHostRewriteFeature = Feature{
 		Name:    SupportHTTPRouteHostRewrite,
 		Channel: FeatureChannelStandard,
 	}
+	// HTTPRoutePathRewriteFeature contains metadata for the HTTPRoutePathRewrite feature.
 	HTTPRoutePathRewriteFeature = Feature{
 		Name:    SupportHTTPRoutePathRewrite,
 		Channel: FeatureChannelStandard,
 	}
+	// HTTPRouteRequestMirrorFeature contains metadata for the HTTPRouteRequestMirror feature.
 	HTTPRouteRequestMirrorFeature = Feature{
 		Name:    SupportHTTPRouteRequestMirror,
 		Channel: FeatureChannelStandard,
 	}
+	// HTTPRouteRequestMultipleMirrorsFeature contains metadata for the HTTPRouteRequestMultipleMirrors feature.
 	HTTPRouteRequestMultipleMirrorsFeature = Feature{
 		Name:    SupportHTTPRouteRequestMultipleMirrors,
 		Channel: FeatureChannelStandard,
 	}
+	// HTTPRouteRequestTimeoutFeature contains metadata for the HTTPRouteRequestTimeout feature.
 	HTTPRouteRequestTimeoutFeature = Feature{
 		Name:    SupportHTTPRouteRequestTimeout,
 		Channel: FeatureChannelStandard,
 	}
+	// HTTPRouteBackendTimeoutFeature contains metadata for the HTTPRouteBackendTimeout feature.
 	HTTPRouteBackendTimeoutFeature = Feature{
 		Name:    SupportHTTPRouteBackendTimeout,
 		Channel: FeatureChannelStandard,
 	}
+	// HTTPRouteParentRefPortFeature contains metadata for the HTTPRouteParentRefPort feature.
 	HTTPRouteParentRefPortFeature = Feature{
 		Name:    SupportHTTPRouteParentRefPort,
 		Channel: FeatureChannelStandard,
 	}
+	// HTTPRouteBackendProtocolH2CFeature contains metadata for the HTTPRouteBackendProtocolH2C feature.
 	HTTPRouteBackendProtocolH2CFeature = Feature{
 		Name:    SupportHTTPRouteBackendProtocolH2C,
 		Channel: FeatureChannelStandard,
 	}
+	// HTTPRouteBackendProtocolWebSocketFeature contains metadata for the HTTPRouteBackendProtocolWebSocket feature.
 	HTTPRouteBackendProtocolWebSocketFeature = Feature{
 		Name:    SupportHTTPRouteBackendProtocolWebSocket,
 		Channel: FeatureChannelStandard,

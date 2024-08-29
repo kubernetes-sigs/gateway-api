@@ -26,6 +26,7 @@ const (
 )
 
 var (
+	// UDPRouteFeature contains metadata for the UDPRoute feature.
 	UDPRouteFeature = Feature{
 		Name:    SupportUDPRoute,
 		Channel: FeatureChannelExperimental,

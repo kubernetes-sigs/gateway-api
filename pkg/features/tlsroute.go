@@ -28,6 +28,7 @@ const (
 )
 
 var (
+	// TLSRouteFeature contains metadata for the TLSRoute feature.
 	TLSRouteFeature = Feature{
 		Name:    SupportTLSRoute,
 		Channel: FeatureChannelExperimental,

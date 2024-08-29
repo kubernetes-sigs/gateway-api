@@ -28,6 +28,7 @@ const (
 )
 
 var (
+	// MeshFeature contains metadata for the Mesh feature.
 	MeshFeature = Feature{
 		Name:    SupportMesh,
 		Channel: FeatureChannelStandard,
@@ -52,10 +53,12 @@ const (
 )
 
 var (
+	// MeshClusterIPMatchingFeature contains metadata for the MeshClusterIPMatching feature.
 	MeshClusterIPMatchingFeature = Feature{
 		Name:    SupportMeshClusterIPMatching,
 		Channel: FeatureChannelStandard,
 	}
+	// MeshConsumerRouteFeature contains metadata for the MeshConsumerRoute feature.
 	MeshConsumerRouteFeature = Feature{
 		Name:    SupportMeshConsumerRoute,
 		Channel: FeatureChannelStandard,

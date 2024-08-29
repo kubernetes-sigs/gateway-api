@@ -29,6 +29,7 @@ const (
 )
 
 var (
+	// GatewayFeature contains metadata for the Gateway feature.
 	GatewayFeature = Feature{
 		Name:    SupportGateway,
 		Channel: FeatureChannelStandard,
@@ -64,18 +65,22 @@ const (
 )
 
 var (
+	// GatewayPort8080Feature contains metadata for the GatewayPort8080 feature.
 	GatewayPort8080Feature = Feature{
 		Name:    SupportGatewayPort8080,
 		Channel: FeatureChannelStandard,
 	}
+	// GatewayStaticAddressesFeature contains metadata for the GatewayStaticAddresses feature.
 	GatewayStaticAddressesFeature = Feature{
 		Name:    SupportGatewayStaticAddresses,
 		Channel: FeatureChannelStandard,
 	}
+	// GatewayHTTPListenerIsolationFeature contains metadata for the GatewayHTTPListenerIsolation feature.
 	GatewayHTTPListenerIsolationFeature = Feature{
 		Name:    SupportGatewayHTTPListenerIsolation,
 		Channel: FeatureChannelStandard,
 	}
+	// GatewayInfrastructurePropagationFeature contains metadata for the GatewayInfrastructurePropagation feature.
 	GatewayInfrastructurePropagationFeature = Feature{
 		Name:    SupportGatewayInfrastructurePropagation,
 		Channel: FeatureChannelExperimental,
