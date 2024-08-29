@@ -27,13 +27,11 @@ const (
 	SupportMesh FeatureName = "Mesh"
 )
 
-var (
-	// MeshFeature contains metadata for the Mesh feature.
-	MeshFeature = Feature{
-		Name:    SupportMesh,
-		Channel: FeatureChannelStandard,
-	}
-)
+// MeshFeature contains metadata for the Mesh feature.
+var MeshFeature = Feature{
+	Name:    SupportMesh,
+	Channel: FeatureChannelStandard,
+}
 
 // MeshCoreFeatures includes all the supported features for the service mesh at
 // a Core level of support.

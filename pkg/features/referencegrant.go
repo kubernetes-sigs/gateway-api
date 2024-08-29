@@ -27,13 +27,11 @@ const (
 	SupportReferenceGrant FeatureName = "ReferenceGrant"
 )
 
-var (
-	// ReferenceGrantFeature contains metadata for the ReferenceGrant feature.
-	ReferenceGrantFeature = Feature{
-		Name:    SupportReferenceGrant,
-		Channel: FeatureChannelStandard,
-	}
-)
+// ReferenceGrantFeature contains metadata for the ReferenceGrant feature.
+var ReferenceGrantFeature = Feature{
+	Name:    SupportReferenceGrant,
+	Channel: FeatureChannelStandard,
+}
 
 // ReferenceGrantCoreFeatures includes all SupportedFeatures needed to be
 // conformant with the ReferenceGrant resource.

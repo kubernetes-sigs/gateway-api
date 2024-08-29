@@ -25,13 +25,11 @@ const (
 	SupportUDPRoute FeatureName = "UDPRoute"
 )
 
-var (
-	// UDPRouteFeature contains metadata for the UDPRoute feature.
-	UDPRouteFeature = Feature{
-		Name:    SupportUDPRoute,
-		Channel: FeatureChannelExperimental,
-	}
-)
+// UDPRouteFeature contains metadata for the UDPRoute feature.
+var UDPRouteFeature = Feature{
+	Name:    SupportUDPRoute,
+	Channel: FeatureChannelExperimental,
+}
 
 // UDPRouteCoreFeatures includes all SupportedFeatures needed to be conformant with
 // the UDPRoute resource.

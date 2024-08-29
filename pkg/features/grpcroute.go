@@ -27,13 +27,11 @@ const (
 	SupportGRPCRoute FeatureName = "GRPCRoute"
 )
 
-var (
-	// GRPCRouteFeature contains metadata for the GRPCRoute feature.
-	GRPCRouteFeature = Feature{
-		Name:    SupportGRPCRoute,
-		Channel: FeatureChannelStandard,
-	}
-)
+// GRPCRouteFeature contains metadata for the GRPCRoute feature.
+var GRPCRouteFeature = Feature{
+	Name:    SupportGRPCRoute,
+	Channel: FeatureChannelStandard,
+}
 
 // GRPCRouteCoreFeatures includes all the supported features for GRPCRoute at
 // a Core level of support.

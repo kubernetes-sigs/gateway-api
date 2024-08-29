@@ -27,13 +27,11 @@ const (
 	SupportTLSRoute FeatureName = "TLSRoute"
 )
 
-var (
-	// TLSRouteFeature contains metadata for the TLSRoute feature.
-	TLSRouteFeature = Feature{
-		Name:    SupportTLSRoute,
-		Channel: FeatureChannelExperimental,
-	}
-)
+// TLSRouteFeature contains metadata for the TLSRoute feature.
+var TLSRouteFeature = Feature{
+	Name:    SupportTLSRoute,
+	Channel: FeatureChannelExperimental,
+}
 
 // TLSCoreFeatures includes all the supported features for the TLSRoute API at
 // a Core level of support.

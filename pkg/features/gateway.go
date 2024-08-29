@@ -28,13 +28,11 @@ const (
 	SupportGateway FeatureName = "Gateway"
 )
 
-var (
-	// GatewayFeature contains metadata for the Gateway feature.
-	GatewayFeature = Feature{
-		Name:    SupportGateway,
-		Channel: FeatureChannelStandard,
-	}
-)
+// GatewayFeature contains metadata for the Gateway feature.
+var GatewayFeature = Feature{
+	Name:    SupportGateway,
+	Channel: FeatureChannelStandard,
+}
 
 // GatewayCoreFeatures are the features that are required to be conformant with
 // the Gateway resource.

@@ -27,13 +27,11 @@ const (
 	SupportHTTPRoute FeatureName = "HTTPRoute"
 )
 
-var (
-	// HTTPRouteFeature contains metadata for the HTTPRoute feature.
-	HTTPRouteFeature = Feature{
-		Name:    SupportHTTPRoute,
-		Channel: FeatureChannelStandard,
-	}
-)
+// HTTPRouteFeature contains metadata for the HTTPRoute feature.
+var HTTPRouteFeature = Feature{
+	Name:    SupportHTTPRoute,
+	Channel: FeatureChannelStandard,
+}
 
 // HTTPRouteCoreFeatures includes all SupportedFeatures needed to be conformant with
 // the HTTPRoute resource.
