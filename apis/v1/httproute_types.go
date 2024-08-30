@@ -456,10 +456,6 @@ type HTTPRouteRetry struct {
 // Implementations MAY support specifying discrete values in the 400-499 range,
 // which are often inadvisable to retry.
 //
-// Implementations MAY support discrete values in the 600-999 (inclusive)
-// range, which are not valid for HTTP clients, but are sometimes used for
-// communicating application-specific errors.
-//
 // +kubebuilder:validation:Minimum:=400
 // +kubebuilder:validation:Maximum:=599
 // <gateway:experimental>
