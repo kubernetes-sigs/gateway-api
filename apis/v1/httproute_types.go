@@ -450,9 +450,6 @@ type HTTPRouteRetry struct {
 // Implementations MAY support specifying additional discrete values in the
 // 500-599 range.
 //
-// Implementations SHOULD NOT support retrying status codes in the 100-399
-// range, as these responses are generally not appropriate to retry.
-//
 // Implementations MAY support specifying discrete values in the 400-499 range,
 // which are often inadvisable to retry.
 //
