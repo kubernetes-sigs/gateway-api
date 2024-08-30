@@ -1,7 +1,7 @@
 # GEP-1731: HTTPRoute Retries
 
 * Issue: [#1731](https://github.com/kubernetes-sigs/gateway-api/issues/1731)
-* Status: Implementable
+* Status: Experimental
 
 (See status definitions [here](/geps/overview/#gep-states).)
 
