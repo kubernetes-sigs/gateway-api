@@ -100,6 +100,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"sigs.k8s.io/gateway-api/apis/v1.GRPCRouteStatus":                                 schema_sigsk8sio_gateway_api_apis_v1_GRPCRouteStatus(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.Gateway":                                         schema_sigsk8sio_gateway_api_apis_v1_Gateway(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.GatewayAddress":                                  schema_sigsk8sio_gateway_api_apis_v1_GatewayAddress(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.GatewayBackendTLS":                               schema_sigsk8sio_gateway_api_apis_v1_GatewayBackendTLS(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.GatewayClass":                                    schema_sigsk8sio_gateway_api_apis_v1_GatewayClass(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.GatewayClassList":                                schema_sigsk8sio_gateway_api_apis_v1_GatewayClassList(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.GatewayClassSpec":                                schema_sigsk8sio_gateway_api_apis_v1_GatewayClassSpec(ref),
@@ -174,6 +175,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"sigs.k8s.io/gateway-api/apis/v1alpha3.BackendTLSPolicyList":                      schema_sigsk8sio_gateway_api_apis_v1alpha3_BackendTLSPolicyList(ref),
 		"sigs.k8s.io/gateway-api/apis/v1alpha3.BackendTLSPolicySpec":                      schema_sigsk8sio_gateway_api_apis_v1alpha3_BackendTLSPolicySpec(ref),
 		"sigs.k8s.io/gateway-api/apis/v1alpha3.BackendTLSPolicyValidation":                schema_sigsk8sio_gateway_api_apis_v1alpha3_BackendTLSPolicyValidation(ref),
+		"sigs.k8s.io/gateway-api/apis/v1alpha3.SubjectAltName":                            schema_sigsk8sio_gateway_api_apis_v1alpha3_SubjectAltName(ref),
 		"sigs.k8s.io/gateway-api/apis/v1beta1.Gateway":                                    schema_sigsk8sio_gateway_api_apis_v1beta1_Gateway(ref),
 		"sigs.k8s.io/gateway-api/apis/v1beta1.GatewayClass":                               schema_sigsk8sio_gateway_api_apis_v1beta1_GatewayClass(ref),
 		"sigs.k8s.io/gateway-api/apis/v1beta1.GatewayClassList":                           schema_sigsk8sio_gateway_api_apis_v1beta1_GatewayClassList(ref),
@@ -3543,6 +3545,27 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewayAddress(ref common.ReferenceCal
 	}
 }
 
+func schema_sigsk8sio_gateway_api_apis_v1_GatewayBackendTLS(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "GatewayBackendTLS describes backend TLS configuration for gateway.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"clientCertificateRef": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ClientCertificateRef is a reference to an object that contains a Client Certificate and the associated private key.\n\nReferences to a resource in different namespace are invalid UNLESS there is a ReferenceGrant in the target namespace that allows the certificate to be attached. If a ReferenceGrant does not allow this reference, the \"ResolvedRefs\" condition MUST be set to False for this listener with the \"RefNotPermitted\" reason.\n\nClientCertificateRef can reference to standard Kubernetes resources, i.e. Secret, or implementation-specific custom resources.\n\nThis setting can be overridden on the service level by use of BackendTLSPolicy.\n\nSupport: Core\n\n<gateway:experimental>",
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.SecretObjectReference"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"sigs.k8s.io/gateway-api/apis/v1.SecretObjectReference"},
+	}
+}
+
 func schema_sigsk8sio_gateway_api_apis_v1_GatewayClass(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -3897,12 +3920,18 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewaySpec(ref common.ReferenceCallba
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.GatewayInfrastructure"),
 						},
 					},
+					"backendTLS": {
+						SchemaProps: spec.SchemaProps{
+							Description: "BackendTLS configures TLS settings for when this Gateway is connecting to backends with TLS.\n\nSupport: Core\n\n<gateway:experimental>",
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.GatewayBackendTLS"),
+						},
+					},
 				},
 				Required: []string{"gatewayClassName", "listeners"},
 			},
 		},
 		Dependencies: []string{
-			"sigs.k8s.io/gateway-api/apis/v1.GatewayAddress", "sigs.k8s.io/gateway-api/apis/v1.GatewayInfrastructure", "sigs.k8s.io/gateway-api/apis/v1.Listener"},
+			"sigs.k8s.io/gateway-api/apis/v1.GatewayAddress", "sigs.k8s.io/gateway-api/apis/v1.GatewayBackendTLS", "sigs.k8s.io/gateway-api/apis/v1.GatewayInfrastructure", "sigs.k8s.io/gateway-api/apis/v1.Listener"},
 	}
 }
 
@@ -6882,6 +6911,22 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha3_BackendTLSPolicySpec(ref common.
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1alpha3.BackendTLSPolicyValidation"),
 						},
 					},
+					"options": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Options are a list of key/value pairs to enable extended TLS configuration for each implementation. For example, configuring the minimum TLS version or supported cipher suites.\n\nA set of common keys MAY be defined by the API in the future. To avoid any ambiguity, implementation-specific definitions MUST use domain-prefixed names, such as `example.com/my-custom-option`. Un-prefixed names are reserved for key names defined by Gateway API.\n\nSupport: Implementation-specific",
+							Type:        []string{"object"},
+							AdditionalProperties: &spec.SchemaOrBool{
+								Allows: true,
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: "",
+										Type:    []string{"string"},
+										Format:  "",
+									},
+								},
+							},
+						},
+					},
 				},
 				Required: []string{"targetRefs", "validation"},
 			},
@@ -6921,10 +6966,24 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha3_BackendTLSPolicyValidation(ref c
 					},
 					"hostname": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Hostname is used for two purposes in the connection between Gateways and backends:\n\n1. Hostname MUST be used as the SNI to connect to the backend (RFC 6066). 2. Hostname MUST be used for authentication and MUST match the certificate\n   served by the matching backend.\n\nSupport: Core",
+							Description: "Hostname is used for two purposes in the connection between Gateways and backends:\n\n1. Hostname MUST be used as the SNI to connect to the backend (RFC 6066). 2. If SubjectAltNames is not specified, Hostname MUST be used for\n   authentication and MUST match the certificate served by the matching\n   backend.\n\nSupport: Core",
 							Default:     "",
 							Type:        []string{"string"},
 							Format:      "",
+						},
+					},
+					"subjectAltNames": {
+						SchemaProps: spec.SchemaProps{
+							Description: "SubjectAltNames contains one or more Subject Alternative Names. When specified, the certificate served from the backend MUST have at least one Subject Alternate Name matching one of the specified SubjectAltNames.\n\nSupport: Core",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1alpha3.SubjectAltName"),
+									},
+								},
+							},
 						},
 					},
 				},
@@ -6932,7 +6991,43 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha3_BackendTLSPolicyValidation(ref c
 			},
 		},
 		Dependencies: []string{
-			"sigs.k8s.io/gateway-api/apis/v1.LocalObjectReference"},
+			"sigs.k8s.io/gateway-api/apis/v1.LocalObjectReference", "sigs.k8s.io/gateway-api/apis/v1alpha3.SubjectAltName"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apis_v1alpha3_SubjectAltName(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "SubjectAltName represents Subject Alternative Name.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"type": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Type determines the format of the Subject Alternative Name. Always required.\n\nSupport: Core",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"hostname": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Hostname contains Subject Alternative Name specified in DNS name format. Required when Type is set to Hostname, ignored otherwise.\n\nSupport: Core",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"uri": {
+						SchemaProps: spec.SchemaProps{
+							Description: "URI contains Subject Alternative Name specified in a full URI format. It MUST include both a scheme (e.g., \"http\" or \"ftp\") and a scheme-specific-part. Common values include SPIFFE IDs like \"spiffe://mycluster.example.com/ns/myns/sa/svc1sa\". Required when Type is set to URI, ignored otherwise.\n\nSupport: Core",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"type"},
+			},
+		},
 	}
 }
 
