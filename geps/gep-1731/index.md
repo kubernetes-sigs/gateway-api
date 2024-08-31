@@ -1,7 +1,7 @@
 # GEP-1731: HTTPRoute Retries
 
 * Issue: [#1731](https://github.com/kubernetes-sigs/gateway-api/issues/1731)
-* Status: Implementable
+* Status: Experimental
 
 (See status definitions [here](/geps/overview/#gep-states).)
 
@@ -304,12 +304,12 @@ type HTTPRouteRetry struct {
     // route, the entire duration of the initial request and any retry attempts
     // MUST not exceed the Request timeout duration. If any retry attempts are
     // still in progress when the Request timeout duration has been reached,
-    // these SHOULD be cancelled if possible and the Gateway MUST immediately
+    // these SHOULD be canceled if possible and the Gateway MUST immediately
     // return a timeout error.
     //
     // If a BackendRequest timeout (`rules[].timeouts.backendRequest`) is
     // configured on the route, any retry attempts which reach the configured
-    // BackendRequest timeout duration without a response SHOULD be cancelled if
+    // BackendRequest timeout duration without a response SHOULD be canceled if
     // possible and the Gateway should wait for at least the specified backoff
     // duration before attempting to retry the backend request again.
     //

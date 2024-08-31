@@ -2,7 +2,7 @@ apiVersion: internal.gateway.networking.k8s.io/v1alpha1
 kind: GEPDetails
 number: 1731
 name: HTTPRoute Retries
-status: Implementable
+status: Experimental
 # Any authors who contribute to the GEP in any way should be listed here using
 # their Github handle.
 authors:

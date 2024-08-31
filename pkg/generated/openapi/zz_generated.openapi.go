@@ -123,6 +123,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"sigs.k8s.io/gateway-api/apis/v1.HTTPRouteFilter":                                 schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteFilter(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.HTTPRouteList":                                   schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteList(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.HTTPRouteMatch":                                  schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteMatch(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.HTTPRouteRetry":                                  schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteRetry(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.HTTPRouteRule":                                   schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteRule(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.HTTPRouteSpec":                                   schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteSpec(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.HTTPRouteStatus":                                 schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteStatus(ref),
@@ -4700,6 +4701,48 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteMatch(ref common.ReferenceCal
 	}
 }
 
+func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteRetry(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "HTTPRouteRetry defines retry configuration for an HTTPRoute.\n\nImplementations SHOULD retry on connection errors (disconnect, reset, timeout, TCP failure) if a retry stanza is configured.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"codes": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Codes defines the HTTP response status codes for which a backend request should be retried.\n\nSupport: Extended",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: 0,
+										Type:    []string{"integer"},
+										Format:  "int32",
+									},
+								},
+							},
+						},
+					},
+					"attempts": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Attempts specifies the maxmimum number of times an individual request from the gateway to a backend should be retried.\n\nIf the maximum number of retries has been attempted without a successful response from the backend, the Gateway MUST return an error.\n\nWhen this field is unspecified, the number of times to attempt to retry a backend request is implementation-specific.\n\nSupport: Extended",
+							Type:        []string{"integer"},
+							Format:      "int32",
+						},
+					},
+					"backoff": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Backoff specifies the minimum duration a Gateway should wait between retry attempts and is represented in Gateway API Duration formatting.\n\nFor example, setting the `rules[].retry.backoff` field to the value `100ms` will cause a backend request to first be retried approximately 100 milliseconds after timing out or receiving a response code configured to be retryable.\n\nAn implementation MAY use an exponential or alternative backoff strategy for subsequent retry attempts, MAY cap the maximum backoff duration to some amount greater than the specified minimum, and MAY add arbitrary jitter to stagger requests, as long as unsuccessful backend requests are not retried before the configured minimum duration.\n\nIf a Request timeout (`rules[].timeouts.request`) is configured on the route, the entire duration of the initial request and any retry attempts MUST not exceed the Request timeout duration. If any retry attempts are still in progress when the Request timeout duration has been reached, these SHOULD be canceled if possible and the Gateway MUST immediately return a timeout error.\n\nIf a BackendRequest timeout (`rules[].timeouts.backendRequest`) is configured on the route, any retry attempts which reach the configured BackendRequest timeout duration without a response SHOULD be canceled if possible and the Gateway should wait for at least the specified backoff duration before attempting to retry the backend request again.\n\nIf a BackendRequest timeout is _not_ configured on the route, retry attempts MAY time out after an implementation default duration, or MAY remain pending until a configured Request timeout or implementation default duration for total request time is reached.\n\nWhen this field is unspecified, the time to wait between retry attempts is implementation-specific.\n\nSupport: Extended",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
 func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteRule(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -4762,6 +4805,12 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteRule(ref common.ReferenceCall
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.HTTPRouteTimeouts"),
 						},
 					},
+					"retry": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Retry defines the configuration for when to retry an HTTP request.\n\nSupport: Extended\n\n<gateway:experimental>",
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.HTTPRouteRetry"),
+						},
+					},
 					"sessionPersistence": {
 						SchemaProps: spec.SchemaProps{
 							Description: "SessionPersistence defines and configures session persistence for the route rule.\n\nSupport: Extended\n\n<gateway:experimental>",
@@ -4772,7 +4821,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteRule(ref common.ReferenceCall
 			},
 		},
 		Dependencies: []string{
-			"sigs.k8s.io/gateway-api/apis/v1.HTTPBackendRef", "sigs.k8s.io/gateway-api/apis/v1.HTTPRouteFilter", "sigs.k8s.io/gateway-api/apis/v1.HTTPRouteMatch", "sigs.k8s.io/gateway-api/apis/v1.HTTPRouteTimeouts", "sigs.k8s.io/gateway-api/apis/v1.SessionPersistence"},
+			"sigs.k8s.io/gateway-api/apis/v1.HTTPBackendRef", "sigs.k8s.io/gateway-api/apis/v1.HTTPRouteFilter", "sigs.k8s.io/gateway-api/apis/v1.HTTPRouteMatch", "sigs.k8s.io/gateway-api/apis/v1.HTTPRouteRetry", "sigs.k8s.io/gateway-api/apis/v1.HTTPRouteTimeouts", "sigs.k8s.io/gateway-api/apis/v1.SessionPersistence"},
 	}
 }
 

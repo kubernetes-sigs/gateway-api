@@ -125,11 +125,10 @@ nav:
       - geps/gep-2649/index.md
     - Implementable:
       - geps/gep-995/index.md
-      - geps/gep-1731/index.md
       - geps/gep-3155/index.md
-      - geps/gep-1731/index.md
     - Experimental:
       - geps/gep-1619/index.md
+      - geps/gep-1731/index.md
       - geps/gep-1748/index.md
       - geps/gep-1762/index.md
       - geps/gep-1897/index.md

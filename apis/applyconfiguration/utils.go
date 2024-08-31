@@ -111,6 +111,8 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1.HTTPRouteFilterApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("HTTPRouteMatch"):
 		return &apisv1.HTTPRouteMatchApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("HTTPRouteRetry"):
+		return &apisv1.HTTPRouteRetryApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("HTTPRouteRule"):
 		return &apisv1.HTTPRouteRuleApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("HTTPRouteSpec"):
