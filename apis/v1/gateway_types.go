@@ -224,7 +224,7 @@ type GatewaySpec struct {
 
 	// Infrastructure defines infrastructure level attributes about this Gateway instance.
 	//
-	// Support: Core
+	// Support: Extended
 	//
 	// +optional
 	Infrastructure *GatewayInfrastructure `json:"infrastructure,omitempty"`
