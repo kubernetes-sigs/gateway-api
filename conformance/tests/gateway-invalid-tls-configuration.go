@@ -35,7 +35,7 @@ func init() {
 var GatewayInvalidTLSConfiguration = suite.ConformanceTest{
 	ShortName:   "GatewayInvalidTLSConfiguration",
 	Description: "A Gateway should fail to become ready if the Gateway has an invalid TLS configuration",
-	Features: []features.SupportedFeature{
+	Features: []features.FeatureName{
 		features.SupportGateway,
 	},
 	Manifests: []string{"tests/gateway-invalid-tls-configuration.yaml"},
