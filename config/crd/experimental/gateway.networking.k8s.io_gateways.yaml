@@ -283,6 +283,9 @@ spec:
                       pattern: ^(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])?$
                       type: string
                     description: |-
+                      Labels that SHOULD be applied to any resources created in response to this Gateway.
+
+
                       For implementations creating other Kubernetes objects, this should be the `metadata.labels` field on resources.
                       For other implementations, this refers to any relevant (implementation specific) "labels" concepts.
 
@@ -1610,6 +1613,9 @@ spec:
                       pattern: ^(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])?$
                       type: string
                     description: |-
+                      Labels that SHOULD be applied to any resources created in response to this Gateway.
+
+
                       For implementations creating other Kubernetes objects, this should be the `metadata.labels` field on resources.
                       For other implementations, this refers to any relevant (implementation specific) "labels" concepts.
 
