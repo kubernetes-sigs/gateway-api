@@ -679,7 +679,7 @@ type GatewayController string
 //
 // +kubebuilder:validation:MinLength=1
 // +kubebuilder:validation:MaxLength=253
-// +kubebuilder:validation:Pattern=`^(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9]/?)*$`
+// +kubebuilder:validation:Pattern=`^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?([A-Za-z0-9][-A-Za-z0-9_.]{0,61})?[A-Za-z0-9]$`
 type AnnotationKey string
 
 // AnnotationValue is the value of an annotation in Gateway API. This is used
@@ -690,6 +690,45 @@ type AnnotationKey string
 // +kubebuilder:validation:MinLength=0
 // +kubebuilder:validation:MaxLength=4096
 type AnnotationValue string
+
+// LabelKey is the key of a label in the Gateway API. This is used for validation
+// of maps such as Gateway infrastructure labels. This matches the Kubernetes
+// "qualified name" validation that is used for labels.
+//
+// Valid values include:
+//
+// * example
+// * example.com
+// * example.com/path
+// * example.com/path.html
+//
+// Invalid values include:
+//
+// * example~ - "~" is an invalid character
+// * example.com. - can not start or end with "."
+//
+// +kubebuilder:validation:MinLength=1
+// +kubebuilder:validation:MaxLength=253
+// +kubebuilder:validation:Pattern=`^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?([A-Za-z0-9][-A-Za-z0-9_.]{0,61})?[A-Za-z0-9]$`
+type LabelKey string
+
+// LabelValue is the value of a label in the Gateway API. This is used for validation
+// of maps such as Gateway infrastructure labels. This matches the Kubernetes
+// label validation rules:
+// * must be 63 characters or less (can be empty),
+// * unless empty, must begin and end with an alphanumeric character ([a-z0-9A-Z]),
+// * could contain dashes (-), underscores (_), dots (.), and alphanumerics between.
+//
+// Valid values include:
+//
+// * MyValue
+// * my.name
+// * 123-my-value
+//
+// +kubebuilder:validation:MinLength=0
+// +kubebuilder:validation:MaxLength=63
+// +kubebuilder:validation:Pattern=`^(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])?$`
+type LabelValue string
 
 // AddressType defines how a network address is represented as a text string.
 // This may take two possible forms:

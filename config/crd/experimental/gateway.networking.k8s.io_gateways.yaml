@@ -255,15 +255,34 @@ spec:
                       Support: Extended
                     maxProperties: 8
                     type: object
+                    x-kubernetes-validations:
+                    - message: Annotation keys must be in the form of an optional
+                        DNS subdomain prefix followed by a required name segment of
+                        up to 63 characters.
+                      rule: self.all(key, key.matches(r"""^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?([A-Za-z0-9][-A-Za-z0-9_.]{0,61})?[A-Za-z0-9]$"""))
+                    - message: If specified, the annotation key's prefix must be a
+                        DNS subdomain not longer than 253 characters in total.
+                      rule: self.all(key, key.split("/")[0].size() < 253)
                   labels:
                     additionalProperties:
                       description: |-
-                        AnnotationValue is the value of an annotation in Gateway API. This is used
-                        for validation of maps such as TLS options. This roughly matches Kubernetes
-                        annotation validation, although the length validation in that case is based
-                        on the entire size of the annotations struct.
-                      maxLength: 4096
+                        LabelValue is the value of a label in the Gateway API. This is used for validation
+                        of maps such as Gateway infrastructure labels. This matches the Kubernetes
+                        label validation rules:
+                        * must be 63 characters or less (can be empty),
+                        * unless empty, must begin and end with an alphanumeric character ([a-z0-9A-Z]),
+                        * could contain dashes (-), underscores (_), dots (.), and alphanumerics between.
+
+
+                        Valid values include:
+
+
+                        * MyValue
+                        * my.name
+                        * 123-my-value
+                      maxLength: 63
                       minLength: 0
+                      pattern: ^(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])?$
                       type: string
                     description: |-
                       Labels that SHOULD be applied to any resources created in response to this Gateway.
@@ -279,6 +298,13 @@ spec:
                       Support: Extended
                     maxProperties: 8
                     type: object
+                    x-kubernetes-validations:
+                    - message: Label keys must be in the form of an optional DNS subdomain
+                        prefix followed by a required name segment of up to 63 characters.
+                      rule: self.all(key, key.matches(r"""^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?([A-Za-z0-9][-A-Za-z0-9_.]{0,61})?[A-Za-z0-9]$"""))
+                    - message: If specified, the label key's prefix must be a DNS
+                        subdomain not longer than 253 characters in total.
+                      rule: self.all(key, key.split("/")[0].size() < 253)
                   parametersRef:
                     description: |-
                       ParametersRef is a reference to a resource that contains the configuration
@@ -1557,15 +1583,34 @@ spec:
                       Support: Extended
                     maxProperties: 8
                     type: object
+                    x-kubernetes-validations:
+                    - message: Annotation keys must be in the form of an optional
+                        DNS subdomain prefix followed by a required name segment of
+                        up to 63 characters.
+                      rule: self.all(key, key.matches(r"""^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?([A-Za-z0-9][-A-Za-z0-9_.]{0,61})?[A-Za-z0-9]$"""))
+                    - message: If specified, the annotation key's prefix must be a
+                        DNS subdomain not longer than 253 characters in total.
+                      rule: self.all(key, key.split("/")[0].size() < 253)
                   labels:
                     additionalProperties:
                       description: |-
-                        AnnotationValue is the value of an annotation in Gateway API. This is used
-                        for validation of maps such as TLS options. This roughly matches Kubernetes
-                        annotation validation, although the length validation in that case is based
-                        on the entire size of the annotations struct.
-                      maxLength: 4096
+                        LabelValue is the value of a label in the Gateway API. This is used for validation
+                        of maps such as Gateway infrastructure labels. This matches the Kubernetes
+                        label validation rules:
+                        * must be 63 characters or less (can be empty),
+                        * unless empty, must begin and end with an alphanumeric character ([a-z0-9A-Z]),
+                        * could contain dashes (-), underscores (_), dots (.), and alphanumerics between.
+
+
+                        Valid values include:
+
+
+                        * MyValue
+                        * my.name
+                        * 123-my-value
+                      maxLength: 63
                       minLength: 0
+                      pattern: ^(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])?$
                       type: string
                     description: |-
                       Labels that SHOULD be applied to any resources created in response to this Gateway.
@@ -1581,6 +1626,13 @@ spec:
                       Support: Extended
                     maxProperties: 8
                     type: object
+                    x-kubernetes-validations:
+                    - message: Label keys must be in the form of an optional DNS subdomain
+                        prefix followed by a required name segment of up to 63 characters.
+                      rule: self.all(key, key.matches(r"""^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?([A-Za-z0-9][-A-Za-z0-9_.]{0,61})?[A-Za-z0-9]$"""))
+                    - message: If specified, the label key's prefix must be a DNS
+                        subdomain not longer than 253 characters in total.
+                      rule: self.all(key, key.split("/")[0].size() < 253)
                   parametersRef:
                     description: |-
                       ParametersRef is a reference to a resource that contains the configuration

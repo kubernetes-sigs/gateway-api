@@ -715,7 +715,9 @@ type GatewayInfrastructure struct {
 	//
 	// +optional
 	// +kubebuilder:validation:MaxProperties=8
-	Labels map[AnnotationKey]AnnotationValue `json:"labels,omitempty"`
+	// +kubebuilder:validation:XValidation:message="Label keys must be in the form of an optional DNS subdomain prefix followed by a required name segment of up to 63 characters.",rule="self.all(key, key.matches(r\"\"\"^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?([A-Za-z0-9][-A-Za-z0-9_.]{0,61})?[A-Za-z0-9]$\"\"\"))"
+	// +kubebuilder:validation:XValidation:message="If specified, the label key's prefix must be a DNS subdomain not longer than 253 characters in total.",rule="self.all(key, key.split(\"/\")[0].size() < 253)"
+	Labels map[LabelKey]LabelValue `json:"labels,omitempty"`
 
 	// Annotations that SHOULD be applied to any resources created in response to this Gateway.
 	//
@@ -728,6 +730,8 @@ type GatewayInfrastructure struct {
 	//
 	// +optional
 	// +kubebuilder:validation:MaxProperties=8
+	// +kubebuilder:validation:XValidation:message="Annotation keys must be in the form of an optional DNS subdomain prefix followed by a required name segment of up to 63 characters.",rule="self.all(key, key.matches(r\"\"\"^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?([A-Za-z0-9][-A-Za-z0-9_.]{0,61})?[A-Za-z0-9]$\"\"\"))"
+	// +kubebuilder:validation:XValidation:message="If specified, the annotation key's prefix must be a DNS subdomain not longer than 253 characters in total.",rule="self.all(key, key.split(\"/\")[0].size() < 253)"
 	Annotations map[AnnotationKey]AnnotationValue `json:"annotations,omitempty"`
 
 	// ParametersRef is a reference to a resource that contains the configuration
