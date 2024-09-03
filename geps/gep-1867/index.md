@@ -85,58 +85,58 @@ The fields as defined below are, at time of writing, the existing fields covered
 ```go
 type GatewaySpec struct {
   // Infrastructure defines infrastructure level attributes about this Gateway instance.
-	//
-	// Support: Extended
-	//
-	// +optional
+  //
+  // Support: Extended
+  //
+  // +optional
   Infrastructure GatewayInfrastructure `json:"infrastructure"`
   // ...
 }
 
 type GatewayInfrastructure struct {
   // Labels that SHOULD be applied to any resources created in response to this Gateway.
-	//
-	// For implementations creating other Kubernetes objects, this should be the `metadata.labels` field on resources.
-	// For other implementations, this refers to any relevant (implementation specific) "labels" concepts.
-	//
-	// An implementation may chose to add additional implementation-specific labels as they see fit.
-	//
-	// If an implementation maps these labels to Pods, or any other resource that would need to be recreated when labels
-	// change, it SHOULD clearly warn about this behavior in documentation.
-	//
-	// Support: Extended
-	//
-	// +optional
-	// +kubebuilder:validation:MaxProperties=8
-	Labels map[AnnotationKey]AnnotationValue `json:"labels,omitempty"`
+  //
+  // For implementations creating other Kubernetes objects, this should be the `metadata.labels` field on resources.
+  // For other implementations, this refers to any relevant (implementation specific) "labels" concepts.
+  //
+  // An implementation may chose to add additional implementation-specific labels as they see fit.
+  //
+  // If an implementation maps these labels to Pods, or any other resource that would need to be recreated when labels
+  // change, it SHOULD clearly warn about this behavior in documentation.
+  //
+  // Support: Extended
+  //
+  // +optional
+  // +kubebuilder:validation:MaxProperties=8
+  Labels map[AnnotationKey]AnnotationValue `json:"labels,omitempty"`
 
-	// Annotations that SHOULD be applied to any resources created in response to this Gateway.
-	//
-	// For implementations creating other Kubernetes objects, this should be the `metadata.annotations` field on resources.
-	// For other implementations, this refers to any relevant (implementation specific) "annotations" concepts.
-	//
-	// An implementation may chose to add additional implementation-specific annotations as they see fit.
-	//
-	// Support: Extended
-	//
-	// +optional
-	// +kubebuilder:validation:MaxProperties=8
-	Annotations map[AnnotationKey]AnnotationValue `json:"annotations,omitempty"`
+  // Annotations that SHOULD be applied to any resources created in response to this Gateway.
+  //
+  // For implementations creating other Kubernetes objects, this should be the `metadata.annotations` field on resources.
+  // For other implementations, this refers to any relevant (implementation specific) "annotations" concepts.
+  //
+  // An implementation may chose to add additional implementation-specific annotations as they see fit.
+  //
+  // Support: Extended
+  //
+  // +optional
+  // +kubebuilder:validation:MaxProperties=8
+  Annotations map[AnnotationKey]AnnotationValue `json:"annotations,omitempty"`
 
-	// ParametersRef is a reference to a resource that contains the configuration
-	// parameters corresponding to the Gateway. This is optional if the
-	// controller does not require any additional configuration.
-	//
-	// This follows the same semantics as GatewayClass's `parametersRef`, but on a per-Gateway basis
-	//
-	// The Gateway's GatewayClass may provide its own `parametersRef`. When both are specified,
-	// the merging behavior is implementation specific.
-	// It is generally recommended that GatewayClass provides defaults that can be overridden by a Gateway.
-	//
-	// Support: Implementation-specific
-	//
-	// +optional
-	ParametersRef *LocalParametersReference `json:"parametersRef,omitempty"`
+  // ParametersRef is a reference to a resource that contains the configuration
+  // parameters corresponding to the Gateway. This is optional if the
+  // controller does not require any additional configuration.
+  //
+  // This follows the same semantics as GatewayClass's `parametersRef`, but on a per-Gateway basis
+  //
+  // The Gateway's GatewayClass may provide its own `parametersRef`. When both are specified,
+  // the merging behavior is implementation specific.
+  // It is generally recommended that GatewayClass provides defaults that can be overridden by a Gateway.
+  //
+  // Support: Implementation-specific
+  //
+  // +optional
+  ParametersRef *LocalParametersReference `json:"parametersRef,omitempty"`
 }
 
 type GatewayClassInfrastructure struct {
