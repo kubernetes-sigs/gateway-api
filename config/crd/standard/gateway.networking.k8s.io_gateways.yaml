@@ -152,7 +152,7 @@ spec:
                   Infrastructure defines infrastructure level attributes about this Gateway instance.
 
 
-                  Support: Core
+                  Support: Extended
                 properties:
                   annotations:
                     additionalProperties:
@@ -1279,7 +1279,7 @@ spec:
                   Infrastructure defines infrastructure level attributes about this Gateway instance.
 
 
-                  Support: Core
+                  Support: Extended
                 properties:
                   annotations:
                     additionalProperties:

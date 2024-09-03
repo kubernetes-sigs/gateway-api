@@ -3916,7 +3916,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewaySpec(ref common.ReferenceCallba
 					},
 					"infrastructure": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Infrastructure defines infrastructure level attributes about this Gateway instance.\n\nSupport: Core",
+							Description: "Infrastructure defines infrastructure level attributes about this Gateway instance.\n\nSupport: Extended",
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.GatewayInfrastructure"),
 						},
 					},
