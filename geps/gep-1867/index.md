@@ -101,9 +101,6 @@ type GatewayInfrastructure struct {
   //
   // An implementation may chose to add additional implementation-specific labels as they see fit.
   //
-  // If an implementation maps these labels to Pods, or any other resource that would need to be recreated when labels
-  // change, it SHOULD clearly warn about this behavior in documentation.
-  //
   // Support: Extended
   //
   // +optional
