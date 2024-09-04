@@ -1,0 +1,57 @@
+apiVersion: gateway.networking.k8s.io/v1alpha1
+date: "2024-08-29T09:25:53Z"
+gatewayAPIChannel: experimental
+gatewayAPIVersion: v1.1.0
+implementation:
+  contact:
+  - github.com/kong/kubernetes-ingress-controller/issues/new/choose
+  organization: Kong
+  project: kubernetes-ingress-controller
+  url: github.com/kong/kubernetes-ingress-controller
+  version: v3.3.1
+kind: ConformanceReport
+mode: expressions
+profiles:
+- core:
+    result: partial
+    skippedTests:
+    - GRPCRouteListenerHostnameMatching
+    statistics:
+      Failed: 0
+      Passed: 11
+      Skipped: 1
+  name: GATEWAY-GRPC
+  summary: Core tests partially succeeded with 1 test skips.
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 33
+      Skipped: 0
+  extended:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 5
+      Skipped: 0
+    supportedFeatures:
+    - HTTPRouteHostRewrite
+    - HTTPRouteMethodMatching
+    - HTTPRoutePathRewrite
+    - HTTPRouteQueryParamMatching
+    - HTTPRouteResponseHeaderModification
+    unsupportedFeatures:
+    - GatewayHTTPListenerIsolation
+    - GatewayPort8080
+    - GatewayStaticAddresses
+    - HTTPRouteBackendRequestHeaderModification
+    - HTTPRouteBackendTimeout
+    - HTTPRouteParentRefPort
+    - HTTPRoutePathRedirect
+    - HTTPRoutePortRedirect
+    - HTTPRouteRequestMirror
+    - HTTPRouteRequestMultipleMirrors
+    - HTTPRouteRequestTimeout
+    - HTTPRouteSchemeRedirect
+  name: GATEWAY-HTTP
+  summary: Core tests succeeded. Extended tests succeeded.
