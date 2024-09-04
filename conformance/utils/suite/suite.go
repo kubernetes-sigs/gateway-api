@@ -495,19 +495,19 @@ func (suite *ConformanceTestSuite) Report() (*confv1.ConformanceReport, error) {
 	profileReports := newReports()
 	succeededTrialTestSet := sets.Set[string]{}
 	for _, tN := range testNames {
-		testResult := suite.results[tN]
-		if testResult.result == testTrialSkipped {
+		tr := suite.results[tN]
+		if tr.result == testTrialSkipped {
 			continue
 		}
-		if testResult.result == testSucceeded && testResult.test.Trial {
+		if tr.result == testSucceeded && tr.test.Trial {
 			succeededTrialTestSet.Insert(tN)
 		}
-		conformanceProfiles := getConformanceProfilesForTest(testResult.test, suite.conformanceProfiles).UnsortedList()
+		conformanceProfiles := getConformanceProfilesForTest(tr.test, suite.conformanceProfiles).UnsortedList()
 		sort.Slice(conformanceProfiles, func(i, j int) bool {
 			return conformanceProfiles[i].Name < conformanceProfiles[j].Name
 		})
 		for _, profile := range conformanceProfiles {
-			profileReports.addTestResults(*profile, testResult)
+			profileReports.addTestResults(*profile, tr)
 		}
 	}
 	var succeededTrialTests []string

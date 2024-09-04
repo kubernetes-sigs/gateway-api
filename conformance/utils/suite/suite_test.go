@@ -24,6 +24,7 @@ import (
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/sets"
+
 	confv1 "sigs.k8s.io/gateway-api/conformance/apis/v1"
 	"sigs.k8s.io/gateway-api/pkg/consts"
 	"sigs.k8s.io/gateway-api/pkg/features"
@@ -186,13 +187,11 @@ const (
 	testProfileName ConformanceProfileName = "testProfile"
 )
 
-var (
-	testProfile = ConformanceProfile{
-		Name:             "testProfile",
-		CoreFeatures:     sets.New(coreFeature),
-		ExtendedFeatures: sets.New(extendedFeature),
-	}
-)
+var testProfile = ConformanceProfile{
+	Name:             "testProfile",
+	CoreFeatures:     sets.New(coreFeature),
+	ExtendedFeatures: sets.New(extendedFeature),
+}
 
 var (
 	coreTest = ConformanceTest{
@@ -216,7 +215,7 @@ var (
 )
 
 func TestSuiteReport(t *testing.T) {
-	var testCases = []struct {
+	testCases := []struct {
 		name                      string
 		features                  sets.Set[features.FeatureName]
 		extendedSupportedFeatures map[ConformanceProfileName]sets.Set[features.FeatureName]
@@ -391,7 +390,6 @@ func TestSuiteReport(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			conformanceProfileMap[testProfileName] = testProfile
 
