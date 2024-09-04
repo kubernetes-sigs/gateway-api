@@ -224,9 +224,8 @@ type GatewaySpec struct {
 
 	// Infrastructure defines infrastructure level attributes about this Gateway instance.
 	//
-	// Support: Core
+	// Support: Extended
 	//
-	// <gateway:experimental>
 	// +optional
 	Infrastructure *GatewayInfrastructure `json:"infrastructure,omitempty"`
 
@@ -710,6 +709,9 @@ type GatewayInfrastructure struct {
 	// For other implementations, this refers to any relevant (implementation specific) "labels" concepts.
 	//
 	// An implementation may chose to add additional implementation-specific labels as they see fit.
+	//
+	// If an implementation maps these labels to Pods, or any other resource that would need to be recreated when labels
+	// change, it SHOULD clearly warn about this behavior in documentation.
 	//
 	// Support: Extended
 	//

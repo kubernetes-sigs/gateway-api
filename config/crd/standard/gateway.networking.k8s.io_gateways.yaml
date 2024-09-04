@@ -147,6 +147,130 @@ spec:
                 maxLength: 253
                 minLength: 1
                 type: string
+              infrastructure:
+                description: |-
+                  Infrastructure defines infrastructure level attributes about this Gateway instance.
+
+
+                  Support: Extended
+                properties:
+                  annotations:
+                    additionalProperties:
+                      description: |-
+                        AnnotationValue is the value of an annotation in Gateway API. This is used
+                        for validation of maps such as TLS options. This roughly matches Kubernetes
+                        annotation validation, although the length validation in that case is based
+                        on the entire size of the annotations struct.
+                      maxLength: 4096
+                      minLength: 0
+                      type: string
+                    description: |-
+                      Annotations that SHOULD be applied to any resources created in response to this Gateway.
+
+
+                      For implementations creating other Kubernetes objects, this should be the `metadata.annotations` field on resources.
+                      For other implementations, this refers to any relevant (implementation specific) "annotations" concepts.
+
+
+                      An implementation may chose to add additional implementation-specific annotations as they see fit.
+
+
+                      Support: Extended
+                    maxProperties: 8
+                    type: object
+                    x-kubernetes-validations:
+                    - message: Annotation keys must be in the form of an optional
+                        DNS subdomain prefix followed by a required name segment of
+                        up to 63 characters.
+                      rule: self.all(key, key.matches(r"""^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?([A-Za-z0-9][-A-Za-z0-9_.]{0,61})?[A-Za-z0-9]$"""))
+                    - message: If specified, the annotation key's prefix must be a
+                        DNS subdomain not longer than 253 characters in total.
+                      rule: self.all(key, key.split("/")[0].size() < 253)
+                  labels:
+                    additionalProperties:
+                      description: |-
+                        LabelValue is the value of a label in the Gateway API. This is used for validation
+                        of maps such as Gateway infrastructure labels. This matches the Kubernetes
+                        label validation rules:
+                        * must be 63 characters or less (can be empty),
+                        * unless empty, must begin and end with an alphanumeric character ([a-z0-9A-Z]),
+                        * could contain dashes (-), underscores (_), dots (.), and alphanumerics between.
+
+
+                        Valid values include:
+
+
+                        * MyValue
+                        * my.name
+                        * 123-my-value
+                      maxLength: 63
+                      minLength: 0
+                      pattern: ^(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])?$
+                      type: string
+                    description: |-
+                      Labels that SHOULD be applied to any resources created in response to this Gateway.
+
+
+                      For implementations creating other Kubernetes objects, this should be the `metadata.labels` field on resources.
+                      For other implementations, this refers to any relevant (implementation specific) "labels" concepts.
+
+
+                      An implementation may chose to add additional implementation-specific labels as they see fit.
+
+
+                      If an implementation maps these labels to Pods, or any other resource that would need to be recreated when labels
+                      change, it SHOULD clearly warn about this behavior in documentation.
+
+
+                      Support: Extended
+                    maxProperties: 8
+                    type: object
+                    x-kubernetes-validations:
+                    - message: Label keys must be in the form of an optional DNS subdomain
+                        prefix followed by a required name segment of up to 63 characters.
+                      rule: self.all(key, key.matches(r"""^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?([A-Za-z0-9][-A-Za-z0-9_.]{0,61})?[A-Za-z0-9]$"""))
+                    - message: If specified, the label key's prefix must be a DNS
+                        subdomain not longer than 253 characters in total.
+                      rule: self.all(key, key.split("/")[0].size() < 253)
+                  parametersRef:
+                    description: |-
+                      ParametersRef is a reference to a resource that contains the configuration
+                      parameters corresponding to the Gateway. This is optional if the
+                      controller does not require any additional configuration.
+
+
+                      This follows the same semantics as GatewayClass's `parametersRef`, but on a per-Gateway basis
+
+
+                      The Gateway's GatewayClass may provide its own `parametersRef`. When both are specified,
+                      the merging behavior is implementation specific.
+                      It is generally recommended that GatewayClass provides defaults that can be overridden by a Gateway.
+
+
+                      Support: Implementation-specific
+                    properties:
+                      group:
+                        description: Group is the group of the referent.
+                        maxLength: 253
+                        pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+                        type: string
+                      kind:
+                        description: Kind is kind of the referent.
+                        maxLength: 63
+                        minLength: 1
+                        pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
+                        type: string
+                      name:
+                        description: Name is the name of the referent.
+                        maxLength: 253
+                        minLength: 1
+                        type: string
+                    required:
+                    - group
+                    - kind
+                    - name
+                    type: object
+                type: object
               listeners:
                 description: |-
                   Listeners associated with this Gateway. Listeners define
@@ -1180,6 +1304,130 @@ spec:
                 maxLength: 253
                 minLength: 1
                 type: string
+              infrastructure:
+                description: |-
+                  Infrastructure defines infrastructure level attributes about this Gateway instance.
+
+
+                  Support: Extended
+                properties:
+                  annotations:
+                    additionalProperties:
+                      description: |-
+                        AnnotationValue is the value of an annotation in Gateway API. This is used
+                        for validation of maps such as TLS options. This roughly matches Kubernetes
+                        annotation validation, although the length validation in that case is based
+                        on the entire size of the annotations struct.
+                      maxLength: 4096
+                      minLength: 0
+                      type: string
+                    description: |-
+                      Annotations that SHOULD be applied to any resources created in response to this Gateway.
+
+
+                      For implementations creating other Kubernetes objects, this should be the `metadata.annotations` field on resources.
+                      For other implementations, this refers to any relevant (implementation specific) "annotations" concepts.
+
+
+                      An implementation may chose to add additional implementation-specific annotations as they see fit.
+
+
+                      Support: Extended
+                    maxProperties: 8
+                    type: object
+                    x-kubernetes-validations:
+                    - message: Annotation keys must be in the form of an optional
+                        DNS subdomain prefix followed by a required name segment of
+                        up to 63 characters.
+                      rule: self.all(key, key.matches(r"""^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?([A-Za-z0-9][-A-Za-z0-9_.]{0,61})?[A-Za-z0-9]$"""))
+                    - message: If specified, the annotation key's prefix must be a
+                        DNS subdomain not longer than 253 characters in total.
+                      rule: self.all(key, key.split("/")[0].size() < 253)
+                  labels:
+                    additionalProperties:
+                      description: |-
+                        LabelValue is the value of a label in the Gateway API. This is used for validation
+                        of maps such as Gateway infrastructure labels. This matches the Kubernetes
+                        label validation rules:
+                        * must be 63 characters or less (can be empty),
+                        * unless empty, must begin and end with an alphanumeric character ([a-z0-9A-Z]),
+                        * could contain dashes (-), underscores (_), dots (.), and alphanumerics between.
+
+
+                        Valid values include:
+
+
+                        * MyValue
+                        * my.name
+                        * 123-my-value
+                      maxLength: 63
+                      minLength: 0
+                      pattern: ^(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])?$
+                      type: string
+                    description: |-
+                      Labels that SHOULD be applied to any resources created in response to this Gateway.
+
+
+                      For implementations creating other Kubernetes objects, this should be the `metadata.labels` field on resources.
+                      For other implementations, this refers to any relevant (implementation specific) "labels" concepts.
+
+
+                      An implementation may chose to add additional implementation-specific labels as they see fit.
+
+
+                      If an implementation maps these labels to Pods, or any other resource that would need to be recreated when labels
+                      change, it SHOULD clearly warn about this behavior in documentation.
+
+
+                      Support: Extended
+                    maxProperties: 8
+                    type: object
+                    x-kubernetes-validations:
+                    - message: Label keys must be in the form of an optional DNS subdomain
+                        prefix followed by a required name segment of up to 63 characters.
+                      rule: self.all(key, key.matches(r"""^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?([A-Za-z0-9][-A-Za-z0-9_.]{0,61})?[A-Za-z0-9]$"""))
+                    - message: If specified, the label key's prefix must be a DNS
+                        subdomain not longer than 253 characters in total.
+                      rule: self.all(key, key.split("/")[0].size() < 253)
+                  parametersRef:
+                    description: |-
+                      ParametersRef is a reference to a resource that contains the configuration
+                      parameters corresponding to the Gateway. This is optional if the
+                      controller does not require any additional configuration.
+
+
+                      This follows the same semantics as GatewayClass's `parametersRef`, but on a per-Gateway basis
+
+
+                      The Gateway's GatewayClass may provide its own `parametersRef`. When both are specified,
+                      the merging behavior is implementation specific.
+                      It is generally recommended that GatewayClass provides defaults that can be overridden by a Gateway.
+
+
+                      Support: Implementation-specific
+                    properties:
+                      group:
+                        description: Group is the group of the referent.
+                        maxLength: 253
+                        pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+                        type: string
+                      kind:
+                        description: Kind is kind of the referent.
+                        maxLength: 63
+                        minLength: 1
+                        pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
+                        type: string
+                      name:
+                        description: Name is the name of the referent.
+                        maxLength: 253
+                        minLength: 1
+                        type: string
+                    required:
+                    - group
+                    - kind
+                    - name
+                    type: object
+                type: object
               listeners:
                 description: |-
                   Listeners associated with this Gateway. Listeners define

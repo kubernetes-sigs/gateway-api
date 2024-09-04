@@ -223,13 +223,11 @@ spec:
                 minLength: 1
                 type: string
               infrastructure:
-                description: |+
+                description: |-
                   Infrastructure defines infrastructure level attributes about this Gateway instance.
 
 
-                  Support: Core
-
-
+                  Support: Extended
                 properties:
                   annotations:
                     additionalProperties:
@@ -293,6 +291,10 @@ spec:
 
 
                       An implementation may chose to add additional implementation-specific labels as they see fit.
+
+
+                      If an implementation maps these labels to Pods, or any other resource that would need to be recreated when labels
+                      change, it SHOULD clearly warn about this behavior in documentation.
 
 
                       Support: Extended
@@ -1551,13 +1553,11 @@ spec:
                 minLength: 1
                 type: string
               infrastructure:
-                description: |+
+                description: |-
                   Infrastructure defines infrastructure level attributes about this Gateway instance.
 
 
-                  Support: Core
-
-
+                  Support: Extended
                 properties:
                   annotations:
                     additionalProperties:
@@ -1621,6 +1621,10 @@ spec:
 
 
                       An implementation may chose to add additional implementation-specific labels as they see fit.
+
+
+                      If an implementation maps these labels to Pods, or any other resource that would need to be recreated when labels
+                      change, it SHOULD clearly warn about this behavior in documentation.
 
 
                       Support: Extended

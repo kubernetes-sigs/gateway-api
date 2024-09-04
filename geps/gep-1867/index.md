@@ -75,42 +75,73 @@ For example, if I wanted to represent a `version` field and change that to trigg
 
 ## API
 
-In order to address the concerns above, I propose a standard `infrastructure` API is added to `Gateway` and `GatewayClass`.
-Note the important part of this is the `Gateway` change; the `GatewayClass` aspect is mostly for consistency.
+In order to address the concerns above, I propose a standard `infrastructure` API is added to `Gateway`.
 
 The exact fields are out of scope for this GEP and will be handled by additional GEPs.
 One example GEP already depending on this is [GEP-1651](/geps/gep-1651).
 
-The fields as defined below are, of course, not useful.
-This is intended as a basis for other PRs, not to provide value on its own.
-This GEP will remain in provisional until at least one field is ready to be promoted.
+The fields as defined below are, at time of writing, the existing fields covered by this GEP. More fields may be added as needed.
 
 ```go
 type GatewaySpec struct {
   // Infrastructure defines infrastructure level attributes about this Gateway instance.
+  //
+  // Support: Extended
+  //
+  // +optional
   Infrastructure GatewayInfrastructure `json:"infrastructure"`
   // ...
 }
 
-type GatewayClassSpec struct {
-  // Infrastructure defines infrastructure level attributes for all Gateways in this class.
-  // A Gateway may provide configuration for the same values; as all fields in GatewayInfrastructure are implementation specific,
-  // the merging logic between these is as well. However, the GatewayClass is generally expected to be providing defaults
-  // rather than overrides.
-  Infrastructure GatewayClassInfrastructure `json:"infrastructure"`
-  // ...
-}
-
 type GatewayInfrastructure struct {
-  // ParametersRef provides a arbitrary implementation-specific configuration for
-  // fields not expressed directly in this struct.
-  // This follows the same semantics as GatewayClass's ParametersRef, but lives on the Gateway.
-  ParametersRef ParametersReference
+  // Labels that SHOULD be applied to any resources created in response to this Gateway.
+  //
+  // For implementations creating other Kubernetes objects, this should be the `metadata.labels` field on resources.
+  // For other implementations, this refers to any relevant (implementation specific) "labels" concepts.
+  //
+  // An implementation may chose to add additional implementation-specific labels as they see fit.
+  //
+  // Support: Extended
+  //
+  // +optional
+  // +kubebuilder:validation:MaxProperties=8
+  Labels map[AnnotationKey]AnnotationValue `json:"labels,omitempty"`
+
+  // Annotations that SHOULD be applied to any resources created in response to this Gateway.
+  //
+  // For implementations creating other Kubernetes objects, this should be the `metadata.annotations` field on resources.
+  // For other implementations, this refers to any relevant (implementation specific) "annotations" concepts.
+  //
+  // An implementation may chose to add additional implementation-specific annotations as they see fit.
+  //
+  // Support: Extended
+  //
+  // +optional
+  // +kubebuilder:validation:MaxProperties=8
+  Annotations map[AnnotationKey]AnnotationValue `json:"annotations,omitempty"`
+
+  // ParametersRef is a reference to a resource that contains the configuration
+  // parameters corresponding to the Gateway. This is optional if the
+  // controller does not require any additional configuration.
+  //
+  // This follows the same semantics as GatewayClass's `parametersRef`, but on a per-Gateway basis
+  //
+  // The Gateway's GatewayClass may provide its own `parametersRef`. When both are specified,
+  // the merging behavior is implementation specific.
+  // It is generally recommended that GatewayClass provides defaults that can be overridden by a Gateway.
+  //
+  // Support: Implementation-specific
+  //
+  // +optional
+  ParametersRef *LocalParametersReference `json:"parametersRef,omitempty"`
 }
 
 type GatewayClassInfrastructure struct {
 }
 ```
+
+!!! warning
+    Modifying pod labels via `infrastructure.labels` could result in data plane pods being replaced (depending on the implementation). The way in which the pods are replaced is implementation specific and may result in downtime. Implementations should document how they handle changes to `infrastructure.labels`.
 
 ### API Principles
 
@@ -124,11 +155,6 @@ while vendor specific or niche fields will remain extensions.
 Because infrastructure is somewhat inherently implementation specific, it is likely most fields will be Extended or ImplementationSpecific.
 However, there are still a variety of concepts that have some meaning between implementations that can provide value to users.
 
-Introduction at Gateway or GatewayClass level will depend on the specific field and use cases for the field.
-In general, it makes sense to provide defaults (GatewayClass) and specific settings (Gateway) for most fields, but
-this will be evaluated on a case-by-case basis.
-
 ### Status
 
-The API should likely expose some status. However, it is not yet clear what that will look like.
-This will be addressed prior to promotion beyond "Provisional".
+At this time, no fields defined as part of this GEP are exposed via `status`.
