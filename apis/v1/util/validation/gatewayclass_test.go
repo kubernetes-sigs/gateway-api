@@ -57,7 +57,6 @@ func TestIsControllerNameValid(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			isValid := validationtutils.IsControllerNameValid(tc.controllerName)
 			if isValid != tc.isvalid {

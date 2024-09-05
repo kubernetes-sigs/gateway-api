@@ -114,7 +114,6 @@ func TestBuildSummary(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			tc := tc
 			summary := buildSummary(tc.report)
 			require.Equal(t, tc.expectedSummary, summary)
 		})
