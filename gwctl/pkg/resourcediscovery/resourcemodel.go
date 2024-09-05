@@ -55,7 +55,6 @@ func (rm *ResourceModel) addGatewayClasses(gatewayClasses ...gatewayv1.GatewayCl
 		rm.GatewayClasses = make(map[gatewayClassID]*GatewayClassNode)
 	}
 	for _, gatewayClass := range gatewayClasses {
-		gatewayClass := gatewayClass
 		gatewayClassNode := NewGatewayClassNode(&gatewayClass)
 		if _, ok := rm.GatewayClasses[gatewayClassNode.ID()]; !ok {
 			rm.GatewayClasses[gatewayClassNode.ID()] = gatewayClassNode
@@ -82,7 +81,6 @@ func (rm *ResourceModel) addGateways(gateways ...gatewayv1.Gateway) {
 		rm.Gateways = make(map[gatewayID]*GatewayNode)
 	}
 	for _, gateway := range gateways {
-		gateway := gateway
 		gatewayNode := NewGatewayNode(&gateway)
 		if _, ok := rm.Gateways[gatewayNode.ID()]; !ok {
 			rm.Gateways[gatewayNode.ID()] = gatewayNode
@@ -96,7 +94,6 @@ func (rm *ResourceModel) addHTTPRoutes(httpRoutes ...gatewayv1.HTTPRoute) {
 		rm.HTTPRoutes = make(map[httpRouteID]*HTTPRouteNode)
 	}
 	for _, httpRoute := range httpRoutes {
-		httpRoute := httpRoute
 		httpRouteNode := NewHTTPRouteNode(&httpRoute)
 		if _, ok := rm.HTTPRoutes[httpRouteNode.ID()]; !ok {
 			rm.HTTPRoutes[httpRouteNode.ID()] = httpRouteNode
@@ -110,7 +107,6 @@ func (rm *ResourceModel) addBackends(backends ...unstructured.Unstructured) {
 		rm.Backends = make(map[backendID]*BackendNode)
 	}
 	for _, backend := range backends {
-		backend := backend
 		backendNode := NewBackendNode(&backend)
 		if _, ok := rm.Backends[backendNode.ID()]; !ok {
 			rm.Backends[backendNode.ID()] = backendNode
@@ -124,7 +120,6 @@ func (rm *ResourceModel) addReferenceGrants(referenceGrants ...gatewayv1beta1.Re
 		rm.ReferenceGrants = make(map[referenceGrantID]*ReferenceGrantNode)
 	}
 	for _, referenceGrant := range referenceGrants {
-		referenceGrant := referenceGrant
 		referenceGrantNode := NewReferenceGrantNode(&referenceGrant)
 		if _, ok := rm.ReferenceGrants[referenceGrantNode.ID()]; !ok {
 			rm.ReferenceGrants[referenceGrantNode.ID()] = referenceGrantNode
@@ -140,7 +135,6 @@ func (rm *ResourceModel) addPolicyIfTargetExists(policies ...policymanager.Polic
 		rm.Policies = make(map[policyID]*PolicyNode)
 	}
 	for _, policy := range policies {
-		policy := policy
 		policyNode := NewPolicyNode(&policy)
 
 		switch {

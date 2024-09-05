@@ -389,7 +389,6 @@ func TestGRPCMethodMatch(t *testing.T) {
 	}
 
 	for _, tc := range tests {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			route := gatewayv1.GRPCRoute{
 				ObjectMeta: metav1.ObjectMeta{

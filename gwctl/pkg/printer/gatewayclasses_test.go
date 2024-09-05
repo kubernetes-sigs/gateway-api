@@ -316,7 +316,6 @@ Events: <none>
 	}
 
 	for _, tc := range testcases {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			k8sClients := common.MustClientsForTest(t, tc.objects...)
 			policyManager := utils.MustPolicyManagerForTest(t, k8sClients)

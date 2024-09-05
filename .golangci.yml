@@ -1,10 +1,7 @@
 run:
   timeout: 10m
   issues-exit-code: 1
-  max-issues-per-linter: 0
-  max-same-issues: 0
   tests: true
-  skip-dirs-use-default: true
   modules-download-mode: readonly
   allow-parallel-runners: false
 
@@ -12,7 +9,7 @@ linters:
   fast: false
   enable:
   - errcheck
-  - exportloopref
+  - copyloopvar
   - gocritic
   - gofumpt
   - goimports
@@ -25,8 +22,6 @@ linters:
   - unparam
   - unused
   - whitespace
-  disable:
-  - scopelint
   disable-all: false
   presets:
   - bugs
@@ -39,11 +34,13 @@ linters-settings:
     simplify: true
   goimports:
     local-prefixes: sigs.k8s.io/gateway-api
-  golint:
-    min-confidence: 0.9
   govet:
-    # report about shadowed variables
-    check-shadowing: true
+    enable:
+      - shadow
+    settings:
+      shadow:
+        # Whether to be strict about shadowing; can be noisy.
+        strict: false
   misspell:
     locale: US
     ignore-words: []
@@ -58,6 +55,8 @@ linters-settings:
             reason: "Deprecation of package ioutil in Go 1.16."
 
 issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0
   exclude-rules:
     # Exclude some linters from running on tests files.
     - path: _test\.go
