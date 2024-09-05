@@ -20,6 +20,7 @@ import (
 	"context"
 	"crypto/tls"
 	"encoding/pem"
+	"errors"
 	"fmt"
 	"net"
 	"os"
@@ -81,9 +82,9 @@ func (s *echoServer) doEcho(methodName string, ctx context.Context, in *pb.EchoR
 	fmt.Printf("Received over %s: %v\n", connectionType, in)
 	mdElems, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
-		msg := "Failed to retrieve metadata from incoming request.\n"
-		fmt.Print(msg)
-		return nil, fmt.Errorf(msg)
+		msg := "failed to retrieve metadata from incoming request"
+		fmt.Println(msg)
+		return nil, errors.New(msg)
 	}
 	authority := ""
 	headers := []*pb.Header{}
@@ -111,15 +112,15 @@ func (s *echoServer) doEcho(methodName string, ctx context.Context, in *pb.EchoR
 		tlsAssertions := &pb.TLSAssertions{}
 		p, ok := peer.FromContext(ctx)
 		if !ok {
-			msg := "Failed to retrieve auth info from request\n"
-			fmt.Print(msg)
-			return nil, fmt.Errorf(msg)
+			msg := "failed to retrieve auth info from request"
+			fmt.Println(msg)
+			return nil, errors.New(msg)
 		}
 		tlsInfo, ok := p.AuthInfo.(credentials.TLSInfo)
 		if !ok {
-			msg := "Failed to retrieve TLS info from request\n"
-			fmt.Print(msg)
-			return nil, fmt.Errorf(msg)
+			msg := "failed to retrieve TLS info from request"
+			fmt.Println(msg)
+			return nil, errors.New(msg)
 		}
 		switch tlsInfo.State.Version {
 		case tls.VersionTLS13:

@@ -150,6 +150,7 @@ func TestHTTPPathMatch(t *testing.T) {
 
 func TestBackendObjectReference(t *testing.T) {
 	portPtr := func(n int) *gatewayv1.PortNumber {
+		//nolint:gosec
 		p := gatewayv1.PortNumber(n)
 		return &p
 	}

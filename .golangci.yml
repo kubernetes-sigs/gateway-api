@@ -9,7 +9,7 @@ linters:
   fast: false
   enable:
   - errcheck
-  - exportloopref
+  - copyloopvar
   - gocritic
   - gofumpt
   - goimports
@@ -22,8 +22,6 @@ linters:
   - unparam
   - unused
   - whitespace
-  disable:
-  - scopelint
   disable-all: false
   presets:
   - bugs
