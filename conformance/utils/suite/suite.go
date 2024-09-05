@@ -512,7 +512,7 @@ func (suite *ConformanceTestSuite) Report() (*confv1.ConformanceReport, error) {
 	}
 	var succeededTrialTests []string
 	if len(succeededTrialTestSet) > 0 {
-		succeededTrialTests = succeededTrialTestSet.UnsortedList()
+		succeededTrialTests = sets.List(succeededTrialTestSet)
 	}
 
 	profileReports.compileResults(suite.extendedSupportedFeatures, suite.extendedUnsupportedFeatures)

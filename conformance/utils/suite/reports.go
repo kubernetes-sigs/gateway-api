@@ -18,7 +18,6 @@ package suite
 
 import (
 	"fmt"
-	"sort"
 
 	"k8s.io/apimachinery/pkg/util/sets"
 
@@ -137,10 +136,7 @@ func (p profileReportsMap) compileResults(supportedFeaturesMap map[ConformancePr
 		supportedFeatures := supportedFeaturesMap[ConformanceProfileName(report.Name)]
 		if report.Extended != nil {
 			if supportedFeatures != nil {
-				supportedFeatures := supportedFeatures.UnsortedList()
-				sort.Slice(supportedFeatures, func(i, j int) bool {
-					return supportedFeatures[i] < supportedFeatures[j]
-				})
+				supportedFeatures := sets.List(supportedFeatures)
 				for _, f := range supportedFeatures {
 					report.Extended.SupportedFeatures = append(report.Extended.SupportedFeatures, string(f))
 				}
@@ -150,10 +146,7 @@ func (p profileReportsMap) compileResults(supportedFeaturesMap map[ConformancePr
 		unsupportedFeatures := unsupportedFeaturesMap[ConformanceProfileName(report.Name)]
 		if report.Extended != nil {
 			if unsupportedFeatures != nil {
-				unsupportedFeatures := unsupportedFeatures.UnsortedList()
-				sort.Slice(unsupportedFeatures, func(i, j int) bool {
-					return unsupportedFeatures[i] < unsupportedFeatures[j]
-				})
+				unsupportedFeatures := sets.List(unsupportedFeatures)
 				for _, f := range unsupportedFeatures {
 					report.Extended.UnsupportedFeatures = append(report.Extended.UnsupportedFeatures, string(f))
 				}
