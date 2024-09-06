@@ -35,7 +35,7 @@ it will also enable higher level automation to simplify this process for users.
 ### Client Certs on Gateways
 
 A key requirement of mutual TLS is that the Gateway can provide a client cert to the
-backend. This adds that configuration to both Gateway and Service (via 
+backend. This adds that configuration to both Gateway and Service (via
 BackendTLSPolicy).
 
 #### Gateway-level (Core support)
@@ -49,7 +49,7 @@ subject for consideration as the future work.
 type GatewaySpec struct {
   // BackendTLS configures TLS settings for when this Gateway is connecting to
   // backends with TLS.
-  BackendTLS GatewayBackendTLS `json:"backendTLS,omitempty"'
+  BackendTLS GatewayBackendTLS `json:"backendTLS,omitempty"'`
 }
 type GatewayBackendTLS struct {
   // ClientCertificateRef is a reference to an object that contains a Client
@@ -73,10 +73,10 @@ type GatewayBackendTLS struct {
 
 This change enables the backend certificate to have a different identity than the SNI
 (both are currently tied to the hostname field). This is particularly useful
-when using SPIFFE, which relies on URI Subject Names which are not valid SNIs 
+when using SPIFFE, which relies on URI Subject Names which are not valid SNIs
 as per https://www.rfc-editor.org/rfc/rfc6066.html#section-3.
 
-In such case either connection properties or an arbitrary SNI, like cluster-local 
+In such case either connection properties or an arbitrary SNI, like cluster-local
 service name could be used for certificate selection, while the identity validation
 will be done based on SubjectAltNames field.
 
@@ -134,7 +134,7 @@ Before:
 
 After:
 ```go
-  // 2. Only if SubjectAltNames is not specified, Hostname MUST be used for 
+  // 2. Only if SubjectAltNames is not specified, Hostname MUST be used for
   //    authentication and MUST match the certificate served by the matching
   //    backend.
 ```
