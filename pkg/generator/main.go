@@ -222,6 +222,19 @@ func gatewayTweaks(channel string, props map[string]apiext.JSONSchemaProps) map[
 			jsonProps.Description = strings.ReplaceAll(jsonProps.Description, endTag, "")
 		}
 
+		startTag = "<gateway:util:excludeFromCRD>"
+		endTag = "</gateway:util:excludeFromCRD>"
+		regexPattern = `(?:\r?\n)*` + regexp.QuoteMeta(startTag) + `(?s:(.*?))` + regexp.QuoteMeta(endTag) + `(?:\r?\n)*`
+		if strings.Contains(jsonProps.Description, "<gateway:util:excludeFromCRD>") {
+			re := regexp.MustCompile(regexPattern)
+			match := re.FindStringSubmatch(jsonProps.Description)
+			if len(match) != 2 {
+				log.Fatalf("Invalid <gateway:util:excludeFromCRD> tag for %s", name)
+			}
+			modifiedDescription := re.ReplaceAllString(jsonProps.Description, "\n\n")
+			jsonProps.Description = modifiedDescription
+		}
+
 		if numValid < numExpressions {
 			fmt.Printf("Description: %s\n", jsonProps.Description)
 			log.Fatalf("Found %d Gateway validation expressions, but only %d were valid", numExpressions, numValid)
