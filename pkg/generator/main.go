@@ -222,6 +222,8 @@ func gatewayTweaks(channel string, props map[string]apiext.JSONSchemaProps) map[
 			jsonProps.Description = strings.ReplaceAll(jsonProps.Description, endTag, "")
 		}
 
+		// Comments within "gateway:util:excludeFromCRD" tag is not included in the generated CRD and all trailing \n operators before
+		// and after the tags are removed and replaced with three \n operators.
 		startTag = "<gateway:util:excludeFromCRD>"
 		endTag = "</gateway:util:excludeFromCRD>"
 		regexPattern = `\n*` + regexp.QuoteMeta(startTag) + `(?s:(.*?))` + regexp.QuoteMeta(endTag) + `\n*`
