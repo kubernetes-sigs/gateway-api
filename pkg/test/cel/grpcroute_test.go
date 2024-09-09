@@ -22,7 +22,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"strings"
 	"testing"
 	"time"
 
@@ -424,7 +423,7 @@ func validateGRPCRoute(t *testing.T, route *gatewayv1.GRPCRoute, wantErrors []st
 
 	var missingErrorStrings []string
 	for _, wantError := range wantErrors {
-		if !strings.Contains(strings.ToLower(err.Error()), strings.ToLower(wantError)) {
+		if !celErrorStringMatches(err.Error(), wantError) {
 			missingErrorStrings = append(missingErrorStrings, wantError)
 		}
 	}
