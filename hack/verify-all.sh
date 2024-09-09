@@ -54,10 +54,14 @@ fi
 
 EXCLUDE="verify-all.sh"
 
+# TODO(mlavacca): once the prow configuration will be updated with a new target for 
+# test-crds-validation.sh, we can remove it from the find command, otherwise it will be run twice.
+SCRIPTS=$(find "${SCRIPT_ROOT}"/hack -name "verify-*.sh" -o -name "test-crds-validation.sh")
+
 ret=0
-for t in `ls $SCRIPT_ROOT/hack/verify-*.sh`
+for t in $SCRIPTS;
 do
-  if is-excluded $t ; then
+  if is-excluded "${t}" ; then
     echo "Skipping $t"
     continue
   fi
