@@ -22,6 +22,8 @@ package v1
 // with apply.
 type HTTPRequestMirrorFilterApplyConfiguration struct {
 	BackendRef *BackendObjectReferenceApplyConfiguration `json:"backendRef,omitempty"`
+	Percent    *int32                                    `json:"percent,omitempty"`
+	Fraction   *FractionApplyConfiguration               `json:"fraction,omitempty"`
 }
 
 // HTTPRequestMirrorFilterApplyConfiguration constructs an declarative configuration of the HTTPRequestMirrorFilter type for use with
@@ -35,5 +37,21 @@ func HTTPRequestMirrorFilter() *HTTPRequestMirrorFilterApplyConfiguration {
 // If called multiple times, the BackendRef field is set to the value of the last call.
 func (b *HTTPRequestMirrorFilterApplyConfiguration) WithBackendRef(value *BackendObjectReferenceApplyConfiguration) *HTTPRequestMirrorFilterApplyConfiguration {
 	b.BackendRef = value
+	return b
+}
+
+// WithPercent sets the Percent field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the Percent field is set to the value of the last call.
+func (b *HTTPRequestMirrorFilterApplyConfiguration) WithPercent(value int32) *HTTPRequestMirrorFilterApplyConfiguration {
+	b.Percent = &value
+	return b
+}
+
+// WithFraction sets the Fraction field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the Fraction field is set to the value of the last call.
+func (b *HTTPRequestMirrorFilterApplyConfiguration) WithFraction(value *FractionApplyConfiguration) *HTTPRequestMirrorFilterApplyConfiguration {
+	b.Fraction = value
 	return b
 }

@@ -45,12 +45,16 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1.CommonRouteSpecApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("CookieConfig"):
 		return &apisv1.CookieConfigApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("Fraction"):
+		return &apisv1.FractionApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("FrontendTLSValidation"):
 		return &apisv1.FrontendTLSValidationApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("Gateway"):
 		return &apisv1.GatewayApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("GatewayAddress"):
 		return &apisv1.GatewayAddressApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("GatewayBackendTLS"):
+		return &apisv1.GatewayBackendTLSApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("GatewayClass"):
 		return &apisv1.GatewayClassApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("GatewayClassSpec"):
@@ -109,6 +113,8 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1.HTTPRouteFilterApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("HTTPRouteMatch"):
 		return &apisv1.HTTPRouteMatchApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("HTTPRouteRetry"):
+		return &apisv1.HTTPRouteRetryApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("HTTPRouteRule"):
 		return &apisv1.HTTPRouteRuleApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("HTTPRouteSpec"):
@@ -145,6 +151,8 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1.SecretObjectReferenceApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("SessionPersistence"):
 		return &apisv1.SessionPersistenceApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("SupportedFeature"):
+		return &apisv1.SupportedFeatureApplyConfiguration{}
 
 		// Group=gateway.networking.k8s.io, Version=v1alpha2
 	case v1alpha2.SchemeGroupVersion.WithKind("BackendLBPolicy"):
@@ -195,6 +203,8 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1alpha3.BackendTLSPolicySpecApplyConfiguration{}
 	case v1alpha3.SchemeGroupVersion.WithKind("BackendTLSPolicyValidation"):
 		return &apisv1alpha3.BackendTLSPolicyValidationApplyConfiguration{}
+	case v1alpha3.SchemeGroupVersion.WithKind("SubjectAltName"):
+		return &apisv1alpha3.SubjectAltNameApplyConfiguration{}
 
 		// Group=gateway.networking.k8s.io, Version=v1beta1
 	case v1beta1.SchemeGroupVersion.WithKind("Gateway"):
