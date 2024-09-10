@@ -19,7 +19,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"strings"
 	"testing"
 	"time"
 
@@ -72,7 +71,7 @@ func TestValidateGatewayClassUpdate(t *testing.T) {
 			if (tc.wantError != "") != (err != nil) {
 				t.Fatalf("Unexpected error while updating GatewayClass; got err=\n%v\n;want error=%v", err, tc.wantError != "")
 			}
-			if tc.wantError != "" && !strings.Contains(strings.ToLower(err.Error()), strings.ToLower(tc.wantError)) {
+			if tc.wantError != "" && !celErrorStringMatches(err.Error(), tc.wantError) {
 				t.Fatalf("Unexpected error while updating GatewayClass; got err=\n%v\n;want substring within error=%q", err, tc.wantError)
 			}
 		})

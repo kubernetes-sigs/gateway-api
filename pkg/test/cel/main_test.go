@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"strings"
 	"testing"
 
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
@@ -58,4 +59,27 @@ func TestMain(m *testing.M) {
 
 func ptrTo[T any](a T) *T {
 	return &a
+}
+
+func celErrorStringMatches(got, want string) bool {
+	gotL := strings.ToLower(got)
+	wantL := strings.ToLower(want)
+
+	// Starting in k8s v1.28, CEL error messages stopped adding spec and status prefixes to path names
+	wantLAdjusted := strings.ReplaceAll(wantL, "spec.", "")
+	wantLAdjusted = strings.ReplaceAll(wantLAdjusted, "status.", "")
+
+	// Enum validation messages changed in k8s v1.28:
+	// Before: must be one of ['Exact', 'PathPrefix', 'RegularExpression']
+	// After: supported values: "Exact", "PathPrefix", "RegularExpression"
+	if strings.Contains(wantLAdjusted, "must be one of") {
+		r := strings.NewReplacer(
+			"must be one of", "supported values:",
+			"[", "",
+			"]", "",
+			"'", "\"",
+		)
+		wantLAdjusted = r.Replace(wantLAdjusted)
+	}
+	return strings.Contains(gotL, wantL) || strings.Contains(gotL, wantLAdjusted)
 }

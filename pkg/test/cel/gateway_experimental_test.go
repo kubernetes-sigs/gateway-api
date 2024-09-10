@@ -123,7 +123,7 @@ func TestGatewayInfrastructureLabels(t *testing.T) {
 
 			var missingErrorStrings []string
 			for _, wantError := range tc.wantErrors {
-				if !strings.Contains(strings.ToLower(err.Error()), strings.ToLower(wantError)) {
+				if !celErrorStringMatches(err.Error(), wantError) {
 					missingErrorStrings = append(missingErrorStrings, wantError)
 				}
 			}
