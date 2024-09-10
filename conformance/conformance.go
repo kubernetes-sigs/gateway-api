@@ -96,7 +96,7 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 		SkipTests:                  skipTests,
 		SupportedFeatures:          supportedFeatures,
 		TimeoutConfig:              conformanceconfig.DefaultTimeoutConfig(),
-		SkipTrialTests:             *flags.SkipTrialTests,
+		SkipProvisionalTests:       *flags.SkipProvisionalTests,
 	}
 }
 

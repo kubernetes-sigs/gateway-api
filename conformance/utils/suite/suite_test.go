@@ -202,15 +202,15 @@ var (
 		ShortName: "extendedTest",
 		Features:  []features.FeatureName{extendedFeature},
 	}
-	coreTrialTest = ConformanceTest{
-		ShortName: "coreTrialTest",
-		Features:  []features.FeatureName{coreFeature},
-		Trial:     true,
+	coreProvisionalTest = ConformanceTest{
+		ShortName:   "coreProvisionalTest",
+		Features:    []features.FeatureName{coreFeature},
+		Provisional: true,
 	}
-	extendedTrialTest = ConformanceTest{
-		ShortName: "extendedTrialTest",
-		Features:  []features.FeatureName{extendedFeature},
-		Trial:     true,
+	extendedProvisionalTest = ConformanceTest{
+		ShortName:   "extendedProvisionalTest",
+		Features:    []features.FeatureName{extendedFeature},
+		Provisional: true,
 	}
 )
 
@@ -220,7 +220,7 @@ func TestSuiteReport(t *testing.T) {
 		features                  sets.Set[features.FeatureName]
 		extendedSupportedFeatures map[ConformanceProfileName]sets.Set[features.FeatureName]
 		profiles                  sets.Set[ConformanceProfileName]
-		skipTrialTests            bool
+		skipProvisionalTests      bool
 		results                   map[string]testResult
 		expectedReport            confv1.ConformanceReport
 		expectedError             error
@@ -241,13 +241,13 @@ func TestSuiteReport(t *testing.T) {
 					result: testSucceeded,
 					test:   extendedTest,
 				},
-				coreTrialTest.ShortName: {
+				coreProvisionalTest.ShortName: {
 					result: testSucceeded,
-					test:   coreTrialTest,
+					test:   coreProvisionalTest,
 				},
-				extendedTrialTest.ShortName: {
+				extendedProvisionalTest.ShortName: {
 					result: testSucceeded,
-					test:   extendedTrialTest,
+					test:   extendedProvisionalTest,
 				},
 			},
 			expectedReport: confv1.ConformanceReport{
@@ -272,9 +272,9 @@ func TestSuiteReport(t *testing.T) {
 						},
 					},
 				},
-				SucceededTrialTests: []string{
-					coreTrialTest.ShortName,
-					extendedTrialTest.ShortName,
+				SucceededProvisionalTests: []string{
+					coreProvisionalTest.ShortName,
+					extendedProvisionalTest.ShortName,
 				},
 			},
 		},
@@ -294,13 +294,13 @@ func TestSuiteReport(t *testing.T) {
 					result: testSkipped,
 					test:   extendedTest,
 				},
-				coreTrialTest.ShortName: {
+				coreProvisionalTest.ShortName: {
 					result: testSucceeded,
-					test:   coreTrialTest,
+					test:   coreProvisionalTest,
 				},
-				extendedTrialTest.ShortName: {
-					result: testTrialSkipped,
-					test:   extendedTrialTest,
+				extendedProvisionalTest.ShortName: {
+					result: testProvisionalSkipped,
+					test:   extendedProvisionalTest,
 				},
 			},
 			expectedReport: confv1.ConformanceReport{
@@ -332,19 +332,19 @@ func TestSuiteReport(t *testing.T) {
 						},
 					},
 				},
-				SucceededTrialTests: []string{
-					coreTrialTest.ShortName,
+				SucceededProvisionalTests: []string{
+					coreProvisionalTest.ShortName,
 				},
 			},
 		},
 		{
-			name:     "skip trial tests",
+			name:     "skip provisional tests",
 			features: sets.New(coreFeature, extendedFeature),
 			extendedSupportedFeatures: map[ConformanceProfileName]sets.Set[features.FeatureName]{
 				testProfileName: sets.New(extendedFeature),
 			},
-			profiles:       sets.New(testProfileName),
-			skipTrialTests: true,
+			profiles:             sets.New(testProfileName),
+			skipProvisionalTests: true,
 			results: map[string]testResult{
 				coreTest.ShortName: {
 					result: testSucceeded,
@@ -354,13 +354,13 @@ func TestSuiteReport(t *testing.T) {
 					result: testSucceeded,
 					test:   extendedTest,
 				},
-				coreTrialTest.ShortName: {
-					result: testTrialSkipped,
-					test:   coreTrialTest,
+				coreProvisionalTest.ShortName: {
+					result: testProvisionalSkipped,
+					test:   coreProvisionalTest,
 				},
-				extendedTrialTest.ShortName: {
-					result: testTrialSkipped,
-					test:   extendedTrialTest,
+				extendedProvisionalTest.ShortName: {
+					result: testProvisionalSkipped,
+					test:   extendedProvisionalTest,
 				},
 			},
 			expectedReport: confv1.ConformanceReport{
@@ -398,11 +398,11 @@ func TestSuiteReport(t *testing.T) {
 				SupportedFeatures:         tc.features,
 				extendedSupportedFeatures: tc.extendedSupportedFeatures,
 				results:                   tc.results,
-				SkipTrialTests:            tc.skipTrialTests,
+				SkipProvisionalTests:      tc.skipProvisionalTests,
 			}
 			report, err := suite.Report()
 			assert.Equal(t, tc.expectedReport.ProfileReports, report.ProfileReports)
-			assert.Equal(t, tc.expectedReport.SucceededTrialTests, report.SucceededTrialTests)
+			assert.Equal(t, tc.expectedReport.SucceededProvisionalTests, report.SucceededProvisionalTests)
 			assert.Equal(t, tc.expectedError, err)
 		})
 	}

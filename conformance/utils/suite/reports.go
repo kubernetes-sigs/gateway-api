@@ -37,11 +37,11 @@ type testResult struct {
 type resultType string
 
 var (
-	testSucceeded    resultType = "SUCCEEDED"
-	testFailed       resultType = "FAILED"
-	testSkipped      resultType = "SKIPPED"
-	testNotSupported resultType = "NOT_SUPPORTED"
-	testTrialSkipped resultType = "TRIAL_SKIPPED"
+	testSucceeded          resultType = "SUCCEEDED"
+	testFailed             resultType = "FAILED"
+	testSkipped            resultType = "SKIPPED"
+	testNotSupported       resultType = "NOT_SUPPORTED"
+	testProvisionalSkipped resultType = "PROVISIONAL_SKIPPED"
 )
 
 type profileReportsMap map[ConformanceProfileName]confv1.ProfileReport
