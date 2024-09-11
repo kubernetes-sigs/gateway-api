@@ -23,8 +23,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/sets"
 
+	confv1 "sigs.k8s.io/gateway-api/conformance/apis/v1"
 	"sigs.k8s.io/gateway-api/pkg/consts"
+	"sigs.k8s.io/gateway-api/pkg/features"
 )
 
 func TestGetAPIVersionAndChannel(t *testing.T) {
@@ -173,6 +176,234 @@ func TestGetAPIVersionAndChannel(t *testing.T) {
 			assert.Equal(t, tc.expectedVersion, version)
 			assert.Equal(t, tc.expectedChannel, channel)
 			assert.Equal(t, tc.err, err)
+		})
+	}
+}
+
+const (
+	coreFeature     features.FeatureName = "coreFature"
+	extendedFeature features.FeatureName = "extendedFeature"
+
+	testProfileName ConformanceProfileName = "testProfile"
+)
+
+var testProfile = ConformanceProfile{
+	Name:             "testProfile",
+	CoreFeatures:     sets.New(coreFeature),
+	ExtendedFeatures: sets.New(extendedFeature),
+}
+
+var (
+	coreTest = ConformanceTest{
+		ShortName: "coreTest",
+		Features:  []features.FeatureName{coreFeature},
+	}
+	extendedTest = ConformanceTest{
+		ShortName: "extendedTest",
+		Features:  []features.FeatureName{extendedFeature},
+	}
+	coreProvisionalTest = ConformanceTest{
+		ShortName:   "coreProvisionalTest",
+		Features:    []features.FeatureName{coreFeature},
+		Provisional: true,
+	}
+	extendedProvisionalTest = ConformanceTest{
+		ShortName:   "extendedProvisionalTest",
+		Features:    []features.FeatureName{extendedFeature},
+		Provisional: true,
+	}
+)
+
+func TestSuiteReport(t *testing.T) {
+	testCases := []struct {
+		name                      string
+		features                  sets.Set[features.FeatureName]
+		extendedSupportedFeatures map[ConformanceProfileName]sets.Set[features.FeatureName]
+		profiles                  sets.Set[ConformanceProfileName]
+		skipProvisionalTests      bool
+		results                   map[string]testResult
+		expectedReport            confv1.ConformanceReport
+		expectedError             error
+	}{
+		{
+			name:     "all tests succeeded",
+			features: sets.New(coreFeature, extendedFeature),
+			extendedSupportedFeatures: map[ConformanceProfileName]sets.Set[features.FeatureName]{
+				testProfileName: sets.New(extendedFeature),
+			},
+			profiles: sets.New(testProfileName),
+			results: map[string]testResult{
+				coreTest.ShortName: {
+					result: testSucceeded,
+					test:   coreTest,
+				},
+				extendedTest.ShortName: {
+					result: testSucceeded,
+					test:   extendedTest,
+				},
+				coreProvisionalTest.ShortName: {
+					result: testSucceeded,
+					test:   coreProvisionalTest,
+				},
+				extendedProvisionalTest.ShortName: {
+					result: testSucceeded,
+					test:   extendedProvisionalTest,
+				},
+			},
+			expectedReport: confv1.ConformanceReport{
+				ProfileReports: []confv1.ProfileReport{
+					{
+						Name:    string(testProfileName),
+						Summary: "Core tests succeeded. Extended tests succeeded.",
+						Core: confv1.Status{
+							Result: confv1.Success,
+							Statistics: confv1.Statistics{
+								Passed: 2,
+							},
+						},
+						Extended: &confv1.ExtendedStatus{
+							Status: confv1.Status{
+								Result: confv1.Success,
+								Statistics: confv1.Statistics{
+									Passed: 2,
+								},
+							},
+							SupportedFeatures: []string{string(extendedFeature)},
+						},
+					},
+				},
+				SucceededProvisionalTests: []string{
+					coreProvisionalTest.ShortName,
+					extendedProvisionalTest.ShortName,
+				},
+			},
+		},
+		{
+			name:     "mixed results",
+			features: sets.New(coreFeature, extendedFeature),
+			extendedSupportedFeatures: map[ConformanceProfileName]sets.Set[features.FeatureName]{
+				testProfileName: sets.New(extendedFeature),
+			},
+			profiles: sets.New(testProfileName),
+			results: map[string]testResult{
+				coreTest.ShortName: {
+					result: testFailed,
+					test:   coreTest,
+				},
+				extendedTest.ShortName: {
+					result: testSkipped,
+					test:   extendedTest,
+				},
+				coreProvisionalTest.ShortName: {
+					result: testSucceeded,
+					test:   coreProvisionalTest,
+				},
+				extendedProvisionalTest.ShortName: {
+					result: testProvisionalSkipped,
+					test:   extendedProvisionalTest,
+				},
+			},
+			expectedReport: confv1.ConformanceReport{
+				ProfileReports: []confv1.ProfileReport{
+					{
+						Name:    string(testProfileName),
+						Summary: "Core tests failed with 1 test failures. Extended tests partially succeeded with 1 test skips.",
+						Core: confv1.Status{
+							Result: confv1.Failure,
+							Statistics: confv1.Statistics{
+								Passed: 1,
+								Failed: 1,
+							},
+							FailedTests: []string{
+								coreTest.ShortName,
+							},
+						},
+						Extended: &confv1.ExtendedStatus{
+							Status: confv1.Status{
+								Result: confv1.Partial,
+								Statistics: confv1.Statistics{
+									Skipped: 1,
+								},
+								SkippedTests: []string{
+									extendedTest.ShortName,
+								},
+							},
+							SupportedFeatures: []string{string(extendedFeature)},
+						},
+					},
+				},
+				SucceededProvisionalTests: []string{
+					coreProvisionalTest.ShortName,
+				},
+			},
+		},
+		{
+			name:     "skip provisional tests",
+			features: sets.New(coreFeature, extendedFeature),
+			extendedSupportedFeatures: map[ConformanceProfileName]sets.Set[features.FeatureName]{
+				testProfileName: sets.New(extendedFeature),
+			},
+			profiles:             sets.New(testProfileName),
+			skipProvisionalTests: true,
+			results: map[string]testResult{
+				coreTest.ShortName: {
+					result: testSucceeded,
+					test:   coreTest,
+				},
+				extendedTest.ShortName: {
+					result: testSucceeded,
+					test:   extendedTest,
+				},
+				coreProvisionalTest.ShortName: {
+					result: testProvisionalSkipped,
+					test:   coreProvisionalTest,
+				},
+				extendedProvisionalTest.ShortName: {
+					result: testProvisionalSkipped,
+					test:   extendedProvisionalTest,
+				},
+			},
+			expectedReport: confv1.ConformanceReport{
+				ProfileReports: []confv1.ProfileReport{
+					{
+						Name:    string(testProfileName),
+						Summary: "Core tests succeeded. Extended tests succeeded.",
+						Core: confv1.Status{
+							Result: confv1.Success,
+							Statistics: confv1.Statistics{
+								Passed: 1,
+							},
+						},
+						Extended: &confv1.ExtendedStatus{
+							Status: confv1.Status{
+								Result: confv1.Success,
+								Statistics: confv1.Statistics{
+									Passed: 1,
+								},
+							},
+							SupportedFeatures: []string{string(extendedFeature)},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			conformanceProfileMap[testProfileName] = testProfile
+
+			suite := ConformanceTestSuite{
+				conformanceProfiles:       tc.profiles,
+				SupportedFeatures:         tc.features,
+				extendedSupportedFeatures: tc.extendedSupportedFeatures,
+				results:                   tc.results,
+				SkipProvisionalTests:      tc.skipProvisionalTests,
+			}
+			report, err := suite.Report()
+			assert.Equal(t, tc.expectedReport.ProfileReports, report.ProfileReports)
+			assert.Equal(t, tc.expectedReport.SucceededProvisionalTests, report.SucceededProvisionalTests)
+			assert.Equal(t, tc.expectedError, err)
 		})
 	}
 }
