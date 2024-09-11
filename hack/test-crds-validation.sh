@@ -73,6 +73,7 @@ else
 fi
 
 K8S_IMAGE=${KIND_IMAGES[$((INDEX-1))]}
+echo "Using Kubernetes image: ${K8S_IMAGE}"
 
 # For exit code
 res=0
