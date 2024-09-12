@@ -26,9 +26,12 @@ import (
 	"time"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/utils/ptr"
+
+	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	gatewayv1a2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
 	gatewayv1a3 "sigs.k8s.io/gateway-api/apis/v1alpha3"
-	v1beta1 "sigs.k8s.io/gateway-api/apis/v1beta1"
+	"sigs.k8s.io/gateway-api/apis/v1beta1"
 )
 
 func TestBackendTLSPolicyValidation(t *testing.T) {
@@ -50,7 +53,7 @@ func TestBackendTLSPolicyValidation(t *testing.T) {
 			routeConfig: gatewayv1a3.BackendTLSPolicyValidation{
 				CACertificateRefs: []v1beta1.LocalObjectReference{
 					{
-						Group: "group",
+						Group: ptr.To[gatewayv1.Group]("group"),
 						Kind:  "kind",
 						Name:  "name",
 					},
@@ -69,7 +72,7 @@ func TestBackendTLSPolicyValidation(t *testing.T) {
 			routeConfig: gatewayv1a3.BackendTLSPolicyValidation{
 				CACertificateRefs: []v1beta1.LocalObjectReference{
 					{
-						Group: "group",
+						Group: ptr.To[gatewayv1.Group]("group"),
 						Kind:  "kind",
 						Name:  "name",
 					},
@@ -93,7 +96,7 @@ func TestBackendTLSPolicyValidation(t *testing.T) {
 			routeConfig: gatewayv1a3.BackendTLSPolicyValidation{
 				CACertificateRefs: []v1beta1.LocalObjectReference{
 					{
-						Group: "group",
+						Group: ptr.To[gatewayv1.Group]("group"),
 						Kind:  "kind",
 						Name:  "name",
 					},
@@ -107,7 +110,7 @@ func TestBackendTLSPolicyValidation(t *testing.T) {
 			routeConfig: gatewayv1a3.BackendTLSPolicyValidation{
 				CACertificateRefs: []v1beta1.LocalObjectReference{
 					{
-						Group: "group",
+						Group: ptr.To[gatewayv1.Group]("group"),
 						Kind:  "kind",
 						Name:  "name",
 					},
@@ -127,7 +130,7 @@ func TestBackendTLSPolicyValidation(t *testing.T) {
 			routeConfig: gatewayv1a3.BackendTLSPolicyValidation{
 				CACertificateRefs: []v1beta1.LocalObjectReference{
 					{
-						Group: "group",
+						Group: ptr.To[gatewayv1.Group]("group"),
 						Kind:  "kind",
 						Name:  "name",
 					},
@@ -147,7 +150,7 @@ func TestBackendTLSPolicyValidation(t *testing.T) {
 			routeConfig: gatewayv1a3.BackendTLSPolicyValidation{
 				CACertificateRefs: []v1beta1.LocalObjectReference{
 					{
-						Group: "group",
+						Group: ptr.To[gatewayv1.Group]("group"),
 						Kind:  "kind",
 						Name:  "name",
 					},
@@ -167,7 +170,7 @@ func TestBackendTLSPolicyValidation(t *testing.T) {
 			routeConfig: gatewayv1a3.BackendTLSPolicyValidation{
 				CACertificateRefs: []v1beta1.LocalObjectReference{
 					{
-						Group: "group",
+						Group: ptr.To[gatewayv1.Group]("group"),
 						Kind:  "kind",
 						Name:  "name",
 					},
@@ -187,7 +190,7 @@ func TestBackendTLSPolicyValidation(t *testing.T) {
 			routeConfig: gatewayv1a3.BackendTLSPolicyValidation{
 				CACertificateRefs: []v1beta1.LocalObjectReference{
 					{
-						Group: "group",
+						Group: ptr.To[gatewayv1.Group]("group"),
 						Kind:  "kind",
 						Name:  "name",
 					},
@@ -207,7 +210,7 @@ func TestBackendTLSPolicyValidation(t *testing.T) {
 			routeConfig: gatewayv1a3.BackendTLSPolicyValidation{
 				CACertificateRefs: []v1beta1.LocalObjectReference{
 					{
-						Group: "group",
+						Group: ptr.To[gatewayv1.Group]("group"),
 						Kind:  "kind",
 						Name:  "name",
 					},
@@ -227,7 +230,7 @@ func TestBackendTLSPolicyValidation(t *testing.T) {
 			routeConfig: gatewayv1a3.BackendTLSPolicyValidation{
 				CACertificateRefs: []v1beta1.LocalObjectReference{
 					{
-						Group: "group",
+						Group: ptr.To[gatewayv1.Group]("group"),
 						Kind:  "kind",
 						Name:  "name",
 					},
@@ -248,7 +251,7 @@ func TestBackendTLSPolicyValidation(t *testing.T) {
 			routeConfig: gatewayv1a3.BackendTLSPolicyValidation{
 				CACertificateRefs: []v1beta1.LocalObjectReference{
 					{
-						Group: "group",
+						Group: ptr.To[gatewayv1.Group]("group"),
 						Kind:  "kind",
 						Name:  "name",
 					},

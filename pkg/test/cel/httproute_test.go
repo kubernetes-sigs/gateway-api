@@ -23,6 +23,7 @@ import (
 	"time"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/utils/ptr"
 
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
@@ -330,7 +331,7 @@ func TestHTTPRouteFilter(t *testing.T) {
 			routeFilter: gatewayv1.HTTPRouteFilter{
 				Type: gatewayv1.HTTPRouteFilterExtensionRef,
 				ExtensionRef: &gatewayv1.LocalObjectReference{
-					Group: "group",
+					Group: ptr.To[gatewayv1.Group]("group"),
 					Kind:  "kind",
 					Name:  "name",
 				},

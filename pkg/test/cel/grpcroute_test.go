@@ -28,6 +28,7 @@ import (
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/utils/ptr"
 )
 
 func TestGRPCRouteFilter(t *testing.T) {
@@ -121,7 +122,7 @@ func TestGRPCRouteFilter(t *testing.T) {
 			routeFilter: gatewayv1.GRPCRouteFilter{
 				Type: gatewayv1.GRPCRouteFilterExtensionRef,
 				ExtensionRef: &gatewayv1.LocalObjectReference{
-					Group: "group",
+					Group: ptr.To[gatewayv1.Group]("group"),
 					Kind:  "kind",
 					Name:  "name",
 				},
