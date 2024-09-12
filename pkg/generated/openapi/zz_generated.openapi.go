@@ -5134,7 +5134,6 @@ func schema_sigsk8sio_gateway_api_apis_v1_LocalObjectReference(ref common.Refere
 					"group": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Group is the group of the referent. For example, \"gateway.networking.k8s.io\". When unspecified or empty string, core API group is inferred.",
-							Default:     "",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -5156,7 +5155,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_LocalObjectReference(ref common.Refere
 						},
 					},
 				},
-				Required: []string{"group", "kind", "name"},
+				Required: []string{"kind", "name"},
 			},
 		},
 	}

@@ -121,7 +121,9 @@ func (in *BackendTLSPolicyValidation) DeepCopyInto(out *BackendTLSPolicyValidati
 	if in.CACertificateRefs != nil {
 		in, out := &in.CACertificateRefs, &out.CACertificateRefs
 		*out = make([]v1.LocalObjectReference, len(*in))
-		copy(*out, *in)
+		for i := range *in {
+			(*in)[i].DeepCopyInto(&(*out)[i])
+		}
 	}
 	if in.WellKnownCACertificates != nil {
 		in, out := &in.WellKnownCACertificates, &out.WellKnownCACertificates
