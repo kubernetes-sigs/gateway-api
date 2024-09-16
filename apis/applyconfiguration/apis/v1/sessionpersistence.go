@@ -22,7 +22,7 @@ import (
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
-// SessionPersistenceApplyConfiguration represents an declarative configuration of the SessionPersistence type for use
+// SessionPersistenceApplyConfiguration represents a declarative configuration of the SessionPersistence type for use
 // with apply.
 type SessionPersistenceApplyConfiguration struct {
 	SessionName     *string                         `json:"sessionName,omitempty"`
@@ -32,7 +32,7 @@ type SessionPersistenceApplyConfiguration struct {
 	CookieConfig    *CookieConfigApplyConfiguration `json:"cookieConfig,omitempty"`
 }
 
-// SessionPersistenceApplyConfiguration constructs an declarative configuration of the SessionPersistence type for use with
+// SessionPersistenceApplyConfiguration constructs a declarative configuration of the SessionPersistence type for use with
 // apply.
 func SessionPersistence() *SessionPersistenceApplyConfiguration {
 	return &SessionPersistenceApplyConfiguration{}

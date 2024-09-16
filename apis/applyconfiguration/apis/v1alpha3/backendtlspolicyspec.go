@@ -20,11 +20,10 @@ package v1alpha3
 
 import (
 	v1alpha2 "sigs.k8s.io/gateway-api/apis/applyconfiguration/apis/v1alpha2"
-
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
-// BackendTLSPolicySpecApplyConfiguration represents an declarative configuration of the BackendTLSPolicySpec type for use
+// BackendTLSPolicySpecApplyConfiguration represents a declarative configuration of the BackendTLSPolicySpec type for use
 // with apply.
 type BackendTLSPolicySpecApplyConfiguration struct {
 	TargetRefs []v1alpha2.LocalPolicyTargetReferenceWithSectionNameApplyConfiguration `json:"targetRefs,omitempty"`
@@ -32,7 +31,7 @@ type BackendTLSPolicySpecApplyConfiguration struct {
 	Options    map[v1.AnnotationKey]v1.AnnotationValue                                `json:"options,omitempty"`
 }
 
-// BackendTLSPolicySpecApplyConfiguration constructs an declarative configuration of the BackendTLSPolicySpec type for use with
+// BackendTLSPolicySpecApplyConfiguration constructs a declarative configuration of the BackendTLSPolicySpec type for use with
 // apply.
 func BackendTLSPolicySpec() *BackendTLSPolicySpecApplyConfiguration {
 	return &BackendTLSPolicySpecApplyConfiguration{}

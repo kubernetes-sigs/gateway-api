@@ -22,7 +22,7 @@ import (
 	apisv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
-// HTTPRouteSpecApplyConfiguration represents an declarative configuration of the HTTPRouteSpec type for use
+// HTTPRouteSpecApplyConfiguration represents a declarative configuration of the HTTPRouteSpec type for use
 // with apply.
 type HTTPRouteSpecApplyConfiguration struct {
 	CommonRouteSpecApplyConfiguration `json:",inline"`
@@ -30,7 +30,7 @@ type HTTPRouteSpecApplyConfiguration struct {
 	Rules                             []HTTPRouteRuleApplyConfiguration `json:"rules,omitempty"`
 }
 
-// HTTPRouteSpecApplyConfiguration constructs an declarative configuration of the HTTPRouteSpec type for use with
+// HTTPRouteSpecApplyConfiguration constructs a declarative configuration of the HTTPRouteSpec type for use with
 // apply.
 func HTTPRouteSpec() *HTTPRouteSpecApplyConfiguration {
 	return &HTTPRouteSpecApplyConfiguration{}

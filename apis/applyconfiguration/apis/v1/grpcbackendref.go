@@ -22,14 +22,14 @@ import (
 	apisv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
-// GRPCBackendRefApplyConfiguration represents an declarative configuration of the GRPCBackendRef type for use
+// GRPCBackendRefApplyConfiguration represents a declarative configuration of the GRPCBackendRef type for use
 // with apply.
 type GRPCBackendRefApplyConfiguration struct {
 	BackendRefApplyConfiguration `json:",inline"`
 	Filters                      []GRPCRouteFilterApplyConfiguration `json:"filters,omitempty"`
 }
 
-// GRPCBackendRefApplyConfiguration constructs an declarative configuration of the GRPCBackendRef type for use with
+// GRPCBackendRefApplyConfiguration constructs a declarative configuration of the GRPCBackendRef type for use with
 // apply.
 func GRPCBackendRef() *GRPCBackendRefApplyConfiguration {
 	return &GRPCBackendRefApplyConfiguration{}

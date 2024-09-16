@@ -18,13 +18,13 @@ limitations under the License.
 
 package v1
 
-// GatewayBackendTLSApplyConfiguration represents an declarative configuration of the GatewayBackendTLS type for use
+// GatewayBackendTLSApplyConfiguration represents a declarative configuration of the GatewayBackendTLS type for use
 // with apply.
 type GatewayBackendTLSApplyConfiguration struct {
 	ClientCertificateRef *SecretObjectReferenceApplyConfiguration `json:"clientCertificateRef,omitempty"`
 }
 
-// GatewayBackendTLSApplyConfiguration constructs an declarative configuration of the GatewayBackendTLS type for use with
+// GatewayBackendTLSApplyConfiguration constructs a declarative configuration of the GatewayBackendTLS type for use with
 // apply.
 func GatewayBackendTLS() *GatewayBackendTLSApplyConfiguration {
 	return &GatewayBackendTLSApplyConfiguration{}

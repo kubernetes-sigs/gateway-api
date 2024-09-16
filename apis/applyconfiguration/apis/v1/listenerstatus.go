@@ -20,11 +20,10 @@ package v1
 
 import (
 	metav1 "k8s.io/client-go/applyconfigurations/meta/v1"
-
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
-// ListenerStatusApplyConfiguration represents an declarative configuration of the ListenerStatus type for use
+// ListenerStatusApplyConfiguration represents a declarative configuration of the ListenerStatus type for use
 // with apply.
 type ListenerStatusApplyConfiguration struct {
 	Name           *v1.SectionName                      `json:"name,omitempty"`
@@ -33,7 +32,7 @@ type ListenerStatusApplyConfiguration struct {
 	Conditions     []metav1.ConditionApplyConfiguration `json:"conditions,omitempty"`
 }
 
-// ListenerStatusApplyConfiguration constructs an declarative configuration of the ListenerStatus type for use with
+// ListenerStatusApplyConfiguration constructs a declarative configuration of the ListenerStatus type for use with
 // apply.
 func ListenerStatus() *ListenerStatusApplyConfiguration {
 	return &ListenerStatusApplyConfiguration{}

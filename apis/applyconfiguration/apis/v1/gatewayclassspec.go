@@ -22,7 +22,7 @@ import (
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
-// GatewayClassSpecApplyConfiguration represents an declarative configuration of the GatewayClassSpec type for use
+// GatewayClassSpecApplyConfiguration represents a declarative configuration of the GatewayClassSpec type for use
 // with apply.
 type GatewayClassSpecApplyConfiguration struct {
 	ControllerName *v1.GatewayController                  `json:"controllerName,omitempty"`
@@ -30,7 +30,7 @@ type GatewayClassSpecApplyConfiguration struct {
 	Description    *string                                `json:"description,omitempty"`
 }
 
-// GatewayClassSpecApplyConfiguration constructs an declarative configuration of the GatewayClassSpec type for use with
+// GatewayClassSpecApplyConfiguration constructs a declarative configuration of the GatewayClassSpec type for use with
 // apply.
 func GatewayClassSpec() *GatewayClassSpecApplyConfiguration {
 	return &GatewayClassSpecApplyConfiguration{}

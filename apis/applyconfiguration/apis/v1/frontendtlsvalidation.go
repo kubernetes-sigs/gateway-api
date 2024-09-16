@@ -18,13 +18,13 @@ limitations under the License.
 
 package v1
 
-// FrontendTLSValidationApplyConfiguration represents an declarative configuration of the FrontendTLSValidation type for use
+// FrontendTLSValidationApplyConfiguration represents a declarative configuration of the FrontendTLSValidation type for use
 // with apply.
 type FrontendTLSValidationApplyConfiguration struct {
 	CACertificateRefs []ObjectReferenceApplyConfiguration `json:"caCertificateRefs,omitempty"`
 }
 
-// FrontendTLSValidationApplyConfiguration constructs an declarative configuration of the FrontendTLSValidation type for use with
+// FrontendTLSValidationApplyConfiguration constructs a declarative configuration of the FrontendTLSValidation type for use with
 // apply.
 func FrontendTLSValidation() *FrontendTLSValidationApplyConfiguration {
 	return &FrontendTLSValidationApplyConfiguration{}

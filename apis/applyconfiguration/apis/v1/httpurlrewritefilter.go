@@ -22,14 +22,14 @@ import (
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
-// HTTPURLRewriteFilterApplyConfiguration represents an declarative configuration of the HTTPURLRewriteFilter type for use
+// HTTPURLRewriteFilterApplyConfiguration represents a declarative configuration of the HTTPURLRewriteFilter type for use
 // with apply.
 type HTTPURLRewriteFilterApplyConfiguration struct {
 	Hostname *v1.PreciseHostname                 `json:"hostname,omitempty"`
 	Path     *HTTPPathModifierApplyConfiguration `json:"path,omitempty"`
 }
 
-// HTTPURLRewriteFilterApplyConfiguration constructs an declarative configuration of the HTTPURLRewriteFilter type for use with
+// HTTPURLRewriteFilterApplyConfiguration constructs a declarative configuration of the HTTPURLRewriteFilter type for use with
 // apply.
 func HTTPURLRewriteFilter() *HTTPURLRewriteFilterApplyConfiguration {
 	return &HTTPURLRewriteFilterApplyConfiguration{}

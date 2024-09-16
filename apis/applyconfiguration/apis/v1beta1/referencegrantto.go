@@ -22,7 +22,7 @@ import (
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
-// ReferenceGrantToApplyConfiguration represents an declarative configuration of the ReferenceGrantTo type for use
+// ReferenceGrantToApplyConfiguration represents a declarative configuration of the ReferenceGrantTo type for use
 // with apply.
 type ReferenceGrantToApplyConfiguration struct {
 	Group *v1.Group      `json:"group,omitempty"`
@@ -30,7 +30,7 @@ type ReferenceGrantToApplyConfiguration struct {
 	Name  *v1.ObjectName `json:"name,omitempty"`
 }
 
-// ReferenceGrantToApplyConfiguration constructs an declarative configuration of the ReferenceGrantTo type for use with
+// ReferenceGrantToApplyConfiguration constructs a declarative configuration of the ReferenceGrantTo type for use with
 // apply.
 func ReferenceGrantTo() *ReferenceGrantToApplyConfiguration {
 	return &ReferenceGrantToApplyConfiguration{}

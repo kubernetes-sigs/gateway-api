@@ -22,13 +22,13 @@ import (
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
-// CookieConfigApplyConfiguration represents an declarative configuration of the CookieConfig type for use
+// CookieConfigApplyConfiguration represents a declarative configuration of the CookieConfig type for use
 // with apply.
 type CookieConfigApplyConfiguration struct {
 	LifetimeType *v1.CookieLifetimeType `json:"lifetimeType,omitempty"`
 }
 
-// CookieConfigApplyConfiguration constructs an declarative configuration of the CookieConfig type for use with
+// CookieConfigApplyConfiguration constructs a declarative configuration of the CookieConfig type for use with
 // apply.
 func CookieConfig() *CookieConfigApplyConfiguration {
 	return &CookieConfigApplyConfiguration{}

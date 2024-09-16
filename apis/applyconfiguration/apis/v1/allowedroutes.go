@@ -18,14 +18,14 @@ limitations under the License.
 
 package v1
 
-// AllowedRoutesApplyConfiguration represents an declarative configuration of the AllowedRoutes type for use
+// AllowedRoutesApplyConfiguration represents a declarative configuration of the AllowedRoutes type for use
 // with apply.
 type AllowedRoutesApplyConfiguration struct {
 	Namespaces *RouteNamespacesApplyConfiguration `json:"namespaces,omitempty"`
 	Kinds      []RouteGroupKindApplyConfiguration `json:"kinds,omitempty"`
 }
 
-// AllowedRoutesApplyConfiguration constructs an declarative configuration of the AllowedRoutes type for use with
+// AllowedRoutesApplyConfiguration constructs a declarative configuration of the AllowedRoutes type for use with
 // apply.
 func AllowedRoutes() *AllowedRoutesApplyConfiguration {
 	return &AllowedRoutesApplyConfiguration{}

@@ -22,14 +22,14 @@ import (
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
-// GatewayClassStatusApplyConfiguration represents an declarative configuration of the GatewayClassStatus type for use
+// GatewayClassStatusApplyConfiguration represents a declarative configuration of the GatewayClassStatus type for use
 // with apply.
 type GatewayClassStatusApplyConfiguration struct {
 	Conditions        []v1.ConditionApplyConfiguration     `json:"conditions,omitempty"`
 	SupportedFeatures []SupportedFeatureApplyConfiguration `json:"supportedFeatures,omitempty"`
 }
 
-// GatewayClassStatusApplyConfiguration constructs an declarative configuration of the GatewayClassStatus type for use with
+// GatewayClassStatusApplyConfiguration constructs a declarative configuration of the GatewayClassStatus type for use with
 // apply.
 func GatewayClassStatus() *GatewayClassStatusApplyConfiguration {
 	return &GatewayClassStatusApplyConfiguration{}

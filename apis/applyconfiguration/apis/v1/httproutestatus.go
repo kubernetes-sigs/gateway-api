@@ -18,13 +18,13 @@ limitations under the License.
 
 package v1
 
-// HTTPRouteStatusApplyConfiguration represents an declarative configuration of the HTTPRouteStatus type for use
+// HTTPRouteStatusApplyConfiguration represents a declarative configuration of the HTTPRouteStatus type for use
 // with apply.
 type HTTPRouteStatusApplyConfiguration struct {
 	RouteStatusApplyConfiguration `json:",inline"`
 }
 
-// HTTPRouteStatusApplyConfiguration constructs an declarative configuration of the HTTPRouteStatus type for use with
+// HTTPRouteStatusApplyConfiguration constructs a declarative configuration of the HTTPRouteStatus type for use with
 // apply.
 func HTTPRouteStatus() *HTTPRouteStatusApplyConfiguration {
 	return &HTTPRouteStatusApplyConfiguration{}

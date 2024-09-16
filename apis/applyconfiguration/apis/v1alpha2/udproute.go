@@ -23,12 +23,11 @@ import (
 	types "k8s.io/apimachinery/pkg/types"
 	managedfields "k8s.io/apimachinery/pkg/util/managedfields"
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
-
 	internal "sigs.k8s.io/gateway-api/apis/applyconfiguration/internal"
 	apisv1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
 )
 
-// UDPRouteApplyConfiguration represents an declarative configuration of the UDPRoute type for use
+// UDPRouteApplyConfiguration represents a declarative configuration of the UDPRoute type for use
 // with apply.
 type UDPRouteApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
@@ -37,7 +36,7 @@ type UDPRouteApplyConfiguration struct {
 	Status                           *UDPRouteStatusApplyConfiguration `json:"status,omitempty"`
 }
 
-// UDPRoute constructs an declarative configuration of the UDPRoute type for use with
+// UDPRoute constructs a declarative configuration of the UDPRoute type for use with
 // apply.
 func UDPRoute(name, namespace string) *UDPRouteApplyConfiguration {
 	b := &UDPRouteApplyConfiguration{}
@@ -256,4 +255,10 @@ func (b *UDPRouteApplyConfiguration) WithSpec(value *UDPRouteSpecApplyConfigurat
 func (b *UDPRouteApplyConfiguration) WithStatus(value *UDPRouteStatusApplyConfiguration) *UDPRouteApplyConfiguration {
 	b.Status = value
 	return b
+}
+
+// GetName retrieves the value of the Name field in the declarative configuration.
+func (b *UDPRouteApplyConfiguration) GetName() *string {
+	b.ensureObjectMetaApplyConfigurationExists()
+	return b.Name
 }

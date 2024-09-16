@@ -22,7 +22,7 @@ import (
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
-// HTTPRequestRedirectFilterApplyConfiguration represents an declarative configuration of the HTTPRequestRedirectFilter type for use
+// HTTPRequestRedirectFilterApplyConfiguration represents a declarative configuration of the HTTPRequestRedirectFilter type for use
 // with apply.
 type HTTPRequestRedirectFilterApplyConfiguration struct {
 	Scheme     *string                             `json:"scheme,omitempty"`
@@ -32,7 +32,7 @@ type HTTPRequestRedirectFilterApplyConfiguration struct {
 	StatusCode *int                                `json:"statusCode,omitempty"`
 }
 
-// HTTPRequestRedirectFilterApplyConfiguration constructs an declarative configuration of the HTTPRequestRedirectFilter type for use with
+// HTTPRequestRedirectFilterApplyConfiguration constructs a declarative configuration of the HTTPRequestRedirectFilter type for use with
 // apply.
 func HTTPRequestRedirectFilter() *HTTPRequestRedirectFilterApplyConfiguration {
 	return &HTTPRequestRedirectFilterApplyConfiguration{}

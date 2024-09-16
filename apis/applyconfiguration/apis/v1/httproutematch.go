@@ -22,7 +22,7 @@ import (
 	apisv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
-// HTTPRouteMatchApplyConfiguration represents an declarative configuration of the HTTPRouteMatch type for use
+// HTTPRouteMatchApplyConfiguration represents a declarative configuration of the HTTPRouteMatch type for use
 // with apply.
 type HTTPRouteMatchApplyConfiguration struct {
 	Path        *HTTPPathMatchApplyConfiguration        `json:"path,omitempty"`
@@ -31,7 +31,7 @@ type HTTPRouteMatchApplyConfiguration struct {
 	Method      *apisv1.HTTPMethod                      `json:"method,omitempty"`
 }
 
-// HTTPRouteMatchApplyConfiguration constructs an declarative configuration of the HTTPRouteMatch type for use with
+// HTTPRouteMatchApplyConfiguration constructs a declarative configuration of the HTTPRouteMatch type for use with
 // apply.
 func HTTPRouteMatch() *HTTPRouteMatchApplyConfiguration {
 	return &HTTPRouteMatchApplyConfiguration{}

@@ -22,7 +22,7 @@ import (
 	apisv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
-// GRPCRouteSpecApplyConfiguration represents an declarative configuration of the GRPCRouteSpec type for use
+// GRPCRouteSpecApplyConfiguration represents a declarative configuration of the GRPCRouteSpec type for use
 // with apply.
 type GRPCRouteSpecApplyConfiguration struct {
 	CommonRouteSpecApplyConfiguration `json:",inline"`
@@ -30,7 +30,7 @@ type GRPCRouteSpecApplyConfiguration struct {
 	Rules                             []GRPCRouteRuleApplyConfiguration `json:"rules,omitempty"`
 }
 
-// GRPCRouteSpecApplyConfiguration constructs an declarative configuration of the GRPCRouteSpec type for use with
+// GRPCRouteSpecApplyConfiguration constructs a declarative configuration of the GRPCRouteSpec type for use with
 // apply.
 func GRPCRouteSpec() *GRPCRouteSpecApplyConfiguration {
 	return &GRPCRouteSpecApplyConfiguration{}

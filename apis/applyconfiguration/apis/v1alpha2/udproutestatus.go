@@ -22,13 +22,13 @@ import (
 	v1 "sigs.k8s.io/gateway-api/apis/applyconfiguration/apis/v1"
 )
 
-// UDPRouteStatusApplyConfiguration represents an declarative configuration of the UDPRouteStatus type for use
+// UDPRouteStatusApplyConfiguration represents a declarative configuration of the UDPRouteStatus type for use
 // with apply.
 type UDPRouteStatusApplyConfiguration struct {
 	v1.RouteStatusApplyConfiguration `json:",inline"`
 }
 
-// UDPRouteStatusApplyConfiguration constructs an declarative configuration of the UDPRouteStatus type for use with
+// UDPRouteStatusApplyConfiguration constructs a declarative configuration of the UDPRouteStatus type for use with
 // apply.
 func UDPRouteStatus() *UDPRouteStatusApplyConfiguration {
 	return &UDPRouteStatusApplyConfiguration{}

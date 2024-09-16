@@ -22,14 +22,14 @@ import (
 	apisv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
-// HTTPBackendRefApplyConfiguration represents an declarative configuration of the HTTPBackendRef type for use
+// HTTPBackendRefApplyConfiguration represents a declarative configuration of the HTTPBackendRef type for use
 // with apply.
 type HTTPBackendRefApplyConfiguration struct {
 	BackendRefApplyConfiguration `json:",inline"`
 	Filters                      []HTTPRouteFilterApplyConfiguration `json:"filters,omitempty"`
 }
 
-// HTTPBackendRefApplyConfiguration constructs an declarative configuration of the HTTPBackendRef type for use with
+// HTTPBackendRefApplyConfiguration constructs a declarative configuration of the HTTPBackendRef type for use with
 // apply.
 func HTTPBackendRef() *HTTPBackendRefApplyConfiguration {
 	return &HTTPBackendRefApplyConfiguration{}

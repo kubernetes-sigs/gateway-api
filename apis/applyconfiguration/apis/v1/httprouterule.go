@@ -22,7 +22,7 @@ import (
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
-// HTTPRouteRuleApplyConfiguration represents an declarative configuration of the HTTPRouteRule type for use
+// HTTPRouteRuleApplyConfiguration represents a declarative configuration of the HTTPRouteRule type for use
 // with apply.
 type HTTPRouteRuleApplyConfiguration struct {
 	Name               *v1.SectionName                       `json:"name,omitempty"`
@@ -34,7 +34,7 @@ type HTTPRouteRuleApplyConfiguration struct {
 	SessionPersistence *SessionPersistenceApplyConfiguration `json:"sessionPersistence,omitempty"`
 }
 
-// HTTPRouteRuleApplyConfiguration constructs an declarative configuration of the HTTPRouteRule type for use with
+// HTTPRouteRuleApplyConfiguration constructs a declarative configuration of the HTTPRouteRule type for use with
 // apply.
 func HTTPRouteRule() *HTTPRouteRuleApplyConfiguration {
 	return &HTTPRouteRuleApplyConfiguration{}

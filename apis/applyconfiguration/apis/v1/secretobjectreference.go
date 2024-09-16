@@ -22,7 +22,7 @@ import (
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
-// SecretObjectReferenceApplyConfiguration represents an declarative configuration of the SecretObjectReference type for use
+// SecretObjectReferenceApplyConfiguration represents a declarative configuration of the SecretObjectReference type for use
 // with apply.
 type SecretObjectReferenceApplyConfiguration struct {
 	Group     *v1.Group      `json:"group,omitempty"`
@@ -31,7 +31,7 @@ type SecretObjectReferenceApplyConfiguration struct {
 	Namespace *v1.Namespace  `json:"namespace,omitempty"`
 }
 
-// SecretObjectReferenceApplyConfiguration constructs an declarative configuration of the SecretObjectReference type for use with
+// SecretObjectReferenceApplyConfiguration constructs a declarative configuration of the SecretObjectReference type for use with
 // apply.
 func SecretObjectReference() *SecretObjectReferenceApplyConfiguration {
 	return &SecretObjectReferenceApplyConfiguration{}

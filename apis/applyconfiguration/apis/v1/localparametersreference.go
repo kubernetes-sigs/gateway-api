@@ -22,7 +22,7 @@ import (
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
-// LocalParametersReferenceApplyConfiguration represents an declarative configuration of the LocalParametersReference type for use
+// LocalParametersReferenceApplyConfiguration represents a declarative configuration of the LocalParametersReference type for use
 // with apply.
 type LocalParametersReferenceApplyConfiguration struct {
 	Group *v1.Group `json:"group,omitempty"`
@@ -30,7 +30,7 @@ type LocalParametersReferenceApplyConfiguration struct {
 	Name  *string   `json:"name,omitempty"`
 }
 
-// LocalParametersReferenceApplyConfiguration constructs an declarative configuration of the LocalParametersReference type for use with
+// LocalParametersReferenceApplyConfiguration constructs a declarative configuration of the LocalParametersReference type for use with
 // apply.
 func LocalParametersReference() *LocalParametersReferenceApplyConfiguration {
 	return &LocalParametersReferenceApplyConfiguration{}

@@ -22,7 +22,7 @@ import (
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
-// BackendObjectReferenceApplyConfiguration represents an declarative configuration of the BackendObjectReference type for use
+// BackendObjectReferenceApplyConfiguration represents a declarative configuration of the BackendObjectReference type for use
 // with apply.
 type BackendObjectReferenceApplyConfiguration struct {
 	Group     *v1.Group      `json:"group,omitempty"`
@@ -32,7 +32,7 @@ type BackendObjectReferenceApplyConfiguration struct {
 	Port      *v1.PortNumber `json:"port,omitempty"`
 }
 
-// BackendObjectReferenceApplyConfiguration constructs an declarative configuration of the BackendObjectReference type for use with
+// BackendObjectReferenceApplyConfiguration constructs a declarative configuration of the BackendObjectReference type for use with
 // apply.
 func BackendObjectReference() *BackendObjectReferenceApplyConfiguration {
 	return &BackendObjectReferenceApplyConfiguration{}

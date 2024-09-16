@@ -23,14 +23,14 @@ import (
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
-// TCPRouteRuleApplyConfiguration represents an declarative configuration of the TCPRouteRule type for use
+// TCPRouteRuleApplyConfiguration represents a declarative configuration of the TCPRouteRule type for use
 // with apply.
 type TCPRouteRuleApplyConfiguration struct {
 	Name        *v1.SectionName                       `json:"name,omitempty"`
 	BackendRefs []apisv1.BackendRefApplyConfiguration `json:"backendRefs,omitempty"`
 }
 
-// TCPRouteRuleApplyConfiguration constructs an declarative configuration of the TCPRouteRule type for use with
+// TCPRouteRuleApplyConfiguration constructs a declarative configuration of the TCPRouteRule type for use with
 // apply.
 func TCPRouteRule() *TCPRouteRuleApplyConfiguration {
 	return &TCPRouteRuleApplyConfiguration{}

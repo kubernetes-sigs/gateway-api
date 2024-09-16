@@ -44,22 +44,24 @@ var backendlbpoliciesKind = v1alpha2.SchemeGroupVersion.WithKind("BackendLBPolic
 
 // Get takes name of the backendLBPolicy, and returns the corresponding backendLBPolicy object, and an error if there is any.
 func (c *FakeBackendLBPolicies) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha2.BackendLBPolicy, err error) {
+	emptyResult := &v1alpha2.BackendLBPolicy{}
 	obj, err := c.Fake.
-		Invokes(testing.NewGetAction(backendlbpoliciesResource, c.ns, name), &v1alpha2.BackendLBPolicy{})
+		Invokes(testing.NewGetActionWithOptions(backendlbpoliciesResource, c.ns, name, options), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha2.BackendLBPolicy), err
 }
 
 // List takes label and field selectors, and returns the list of BackendLBPolicies that match those selectors.
 func (c *FakeBackendLBPolicies) List(ctx context.Context, opts v1.ListOptions) (result *v1alpha2.BackendLBPolicyList, err error) {
+	emptyResult := &v1alpha2.BackendLBPolicyList{}
 	obj, err := c.Fake.
-		Invokes(testing.NewListAction(backendlbpoliciesResource, backendlbpoliciesKind, c.ns, opts), &v1alpha2.BackendLBPolicyList{})
+		Invokes(testing.NewListActionWithOptions(backendlbpoliciesResource, backendlbpoliciesKind, c.ns, opts), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 
 	label, _, _ := testing.ExtractFromListOptions(opts)
@@ -78,40 +80,43 @@ func (c *FakeBackendLBPolicies) List(ctx context.Context, opts v1.ListOptions) (
 // Watch returns a watch.Interface that watches the requested backendLBPolicies.
 func (c *FakeBackendLBPolicies) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
 	return c.Fake.
-		InvokesWatch(testing.NewWatchAction(backendlbpoliciesResource, c.ns, opts))
+		InvokesWatch(testing.NewWatchActionWithOptions(backendlbpoliciesResource, c.ns, opts))
 
 }
 
 // Create takes the representation of a backendLBPolicy and creates it.  Returns the server's representation of the backendLBPolicy, and an error, if there is any.
 func (c *FakeBackendLBPolicies) Create(ctx context.Context, backendLBPolicy *v1alpha2.BackendLBPolicy, opts v1.CreateOptions) (result *v1alpha2.BackendLBPolicy, err error) {
+	emptyResult := &v1alpha2.BackendLBPolicy{}
 	obj, err := c.Fake.
-		Invokes(testing.NewCreateAction(backendlbpoliciesResource, c.ns, backendLBPolicy), &v1alpha2.BackendLBPolicy{})
+		Invokes(testing.NewCreateActionWithOptions(backendlbpoliciesResource, c.ns, backendLBPolicy, opts), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha2.BackendLBPolicy), err
 }
 
 // Update takes the representation of a backendLBPolicy and updates it. Returns the server's representation of the backendLBPolicy, and an error, if there is any.
 func (c *FakeBackendLBPolicies) Update(ctx context.Context, backendLBPolicy *v1alpha2.BackendLBPolicy, opts v1.UpdateOptions) (result *v1alpha2.BackendLBPolicy, err error) {
+	emptyResult := &v1alpha2.BackendLBPolicy{}
 	obj, err := c.Fake.
-		Invokes(testing.NewUpdateAction(backendlbpoliciesResource, c.ns, backendLBPolicy), &v1alpha2.BackendLBPolicy{})
+		Invokes(testing.NewUpdateActionWithOptions(backendlbpoliciesResource, c.ns, backendLBPolicy, opts), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha2.BackendLBPolicy), err
 }
 
 // UpdateStatus was generated because the type contains a Status member.
 // Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-func (c *FakeBackendLBPolicies) UpdateStatus(ctx context.Context, backendLBPolicy *v1alpha2.BackendLBPolicy, opts v1.UpdateOptions) (*v1alpha2.BackendLBPolicy, error) {
+func (c *FakeBackendLBPolicies) UpdateStatus(ctx context.Context, backendLBPolicy *v1alpha2.BackendLBPolicy, opts v1.UpdateOptions) (result *v1alpha2.BackendLBPolicy, err error) {
+	emptyResult := &v1alpha2.BackendLBPolicy{}
 	obj, err := c.Fake.
-		Invokes(testing.NewUpdateSubresourceAction(backendlbpoliciesResource, "status", c.ns, backendLBPolicy), &v1alpha2.BackendLBPolicy{})
+		Invokes(testing.NewUpdateSubresourceActionWithOptions(backendlbpoliciesResource, "status", c.ns, backendLBPolicy, opts), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha2.BackendLBPolicy), err
 }
@@ -126,7 +131,7 @@ func (c *FakeBackendLBPolicies) Delete(ctx context.Context, name string, opts v1
 
 // DeleteCollection deletes a collection of objects.
 func (c *FakeBackendLBPolicies) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
-	action := testing.NewDeleteCollectionAction(backendlbpoliciesResource, c.ns, listOpts)
+	action := testing.NewDeleteCollectionActionWithOptions(backendlbpoliciesResource, c.ns, opts, listOpts)
 
 	_, err := c.Fake.Invokes(action, &v1alpha2.BackendLBPolicyList{})
 	return err
@@ -134,11 +139,12 @@ func (c *FakeBackendLBPolicies) DeleteCollection(ctx context.Context, opts v1.De
 
 // Patch applies the patch and returns the patched backendLBPolicy.
 func (c *FakeBackendLBPolicies) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha2.BackendLBPolicy, err error) {
+	emptyResult := &v1alpha2.BackendLBPolicy{}
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(backendlbpoliciesResource, c.ns, name, pt, data, subresources...), &v1alpha2.BackendLBPolicy{})
+		Invokes(testing.NewPatchSubresourceActionWithOptions(backendlbpoliciesResource, c.ns, name, pt, data, opts, subresources...), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha2.BackendLBPolicy), err
 }
@@ -156,11 +162,12 @@ func (c *FakeBackendLBPolicies) Apply(ctx context.Context, backendLBPolicy *apis
 	if name == nil {
 		return nil, fmt.Errorf("backendLBPolicy.Name must be provided to Apply")
 	}
+	emptyResult := &v1alpha2.BackendLBPolicy{}
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(backendlbpoliciesResource, c.ns, *name, types.ApplyPatchType, data), &v1alpha2.BackendLBPolicy{})
+		Invokes(testing.NewPatchSubresourceActionWithOptions(backendlbpoliciesResource, c.ns, *name, types.ApplyPatchType, data, opts.ToPatchOptions()), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha2.BackendLBPolicy), err
 }
@@ -179,11 +186,12 @@ func (c *FakeBackendLBPolicies) ApplyStatus(ctx context.Context, backendLBPolicy
 	if name == nil {
 		return nil, fmt.Errorf("backendLBPolicy.Name must be provided to Apply")
 	}
+	emptyResult := &v1alpha2.BackendLBPolicy{}
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(backendlbpoliciesResource, c.ns, *name, types.ApplyPatchType, data, "status"), &v1alpha2.BackendLBPolicy{})
+		Invokes(testing.NewPatchSubresourceActionWithOptions(backendlbpoliciesResource, c.ns, *name, types.ApplyPatchType, data, opts.ToPatchOptions(), "status"), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha2.BackendLBPolicy), err
 }

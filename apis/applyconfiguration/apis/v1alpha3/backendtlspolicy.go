@@ -24,12 +24,11 @@ import (
 	managedfields "k8s.io/apimachinery/pkg/util/managedfields"
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 	v1alpha2 "sigs.k8s.io/gateway-api/apis/applyconfiguration/apis/v1alpha2"
-
 	internal "sigs.k8s.io/gateway-api/apis/applyconfiguration/internal"
 	apisv1alpha3 "sigs.k8s.io/gateway-api/apis/v1alpha3"
 )
 
-// BackendTLSPolicyApplyConfiguration represents an declarative configuration of the BackendTLSPolicy type for use
+// BackendTLSPolicyApplyConfiguration represents a declarative configuration of the BackendTLSPolicy type for use
 // with apply.
 type BackendTLSPolicyApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
@@ -38,7 +37,7 @@ type BackendTLSPolicyApplyConfiguration struct {
 	Status                           *v1alpha2.PolicyStatusApplyConfiguration `json:"status,omitempty"`
 }
 
-// BackendTLSPolicy constructs an declarative configuration of the BackendTLSPolicy type for use with
+// BackendTLSPolicy constructs a declarative configuration of the BackendTLSPolicy type for use with
 // apply.
 func BackendTLSPolicy(name, namespace string) *BackendTLSPolicyApplyConfiguration {
 	b := &BackendTLSPolicyApplyConfiguration{}
@@ -257,4 +256,10 @@ func (b *BackendTLSPolicyApplyConfiguration) WithSpec(value *BackendTLSPolicySpe
 func (b *BackendTLSPolicyApplyConfiguration) WithStatus(value *v1alpha2.PolicyStatusApplyConfiguration) *BackendTLSPolicyApplyConfiguration {
 	b.Status = value
 	return b
+}
+
+// GetName retrieves the value of the Name field in the declarative configuration.
+func (b *BackendTLSPolicyApplyConfiguration) GetName() *string {
+	b.ensureObjectMetaApplyConfigurationExists()
+	return b.Name
 }

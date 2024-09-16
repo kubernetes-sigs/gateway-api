@@ -18,13 +18,13 @@ limitations under the License.
 
 package v1
 
-// RouteStatusApplyConfiguration represents an declarative configuration of the RouteStatus type for use
+// RouteStatusApplyConfiguration represents a declarative configuration of the RouteStatus type for use
 // with apply.
 type RouteStatusApplyConfiguration struct {
 	Parents []RouteParentStatusApplyConfiguration `json:"parents,omitempty"`
 }
 
-// RouteStatusApplyConfiguration constructs an declarative configuration of the RouteStatus type for use with
+// RouteStatusApplyConfiguration constructs a declarative configuration of the RouteStatus type for use with
 // apply.
 func RouteStatus() *RouteStatusApplyConfiguration {
 	return &RouteStatusApplyConfiguration{}

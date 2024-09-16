@@ -22,14 +22,14 @@ import (
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
-// HTTPHeaderApplyConfiguration represents an declarative configuration of the HTTPHeader type for use
+// HTTPHeaderApplyConfiguration represents a declarative configuration of the HTTPHeader type for use
 // with apply.
 type HTTPHeaderApplyConfiguration struct {
 	Name  *v1.HTTPHeaderName `json:"name,omitempty"`
 	Value *string            `json:"value,omitempty"`
 }
 
-// HTTPHeaderApplyConfiguration constructs an declarative configuration of the HTTPHeader type for use with
+// HTTPHeaderApplyConfiguration constructs a declarative configuration of the HTTPHeader type for use with
 // apply.
 func HTTPHeader() *HTTPHeaderApplyConfiguration {
 	return &HTTPHeaderApplyConfiguration{}

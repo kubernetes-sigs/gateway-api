@@ -22,7 +22,7 @@ import (
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
-// GatewayTLSConfigApplyConfiguration represents an declarative configuration of the GatewayTLSConfig type for use
+// GatewayTLSConfigApplyConfiguration represents a declarative configuration of the GatewayTLSConfig type for use
 // with apply.
 type GatewayTLSConfigApplyConfiguration struct {
 	Mode               *v1.TLSModeType                           `json:"mode,omitempty"`
@@ -31,7 +31,7 @@ type GatewayTLSConfigApplyConfiguration struct {
 	Options            map[v1.AnnotationKey]v1.AnnotationValue   `json:"options,omitempty"`
 }
 
-// GatewayTLSConfigApplyConfiguration constructs an declarative configuration of the GatewayTLSConfig type for use with
+// GatewayTLSConfigApplyConfiguration constructs a declarative configuration of the GatewayTLSConfig type for use with
 // apply.
 func GatewayTLSConfig() *GatewayTLSConfigApplyConfiguration {
 	return &GatewayTLSConfigApplyConfiguration{}

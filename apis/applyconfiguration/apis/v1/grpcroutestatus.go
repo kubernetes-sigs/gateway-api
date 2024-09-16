@@ -18,13 +18,13 @@ limitations under the License.
 
 package v1
 
-// GRPCRouteStatusApplyConfiguration represents an declarative configuration of the GRPCRouteStatus type for use
+// GRPCRouteStatusApplyConfiguration represents a declarative configuration of the GRPCRouteStatus type for use
 // with apply.
 type GRPCRouteStatusApplyConfiguration struct {
 	RouteStatusApplyConfiguration `json:",inline"`
 }
 
-// GRPCRouteStatusApplyConfiguration constructs an declarative configuration of the GRPCRouteStatus type for use with
+// GRPCRouteStatusApplyConfiguration constructs a declarative configuration of the GRPCRouteStatus type for use with
 // apply.
 func GRPCRouteStatus() *GRPCRouteStatusApplyConfiguration {
 	return &GRPCRouteStatusApplyConfiguration{}
