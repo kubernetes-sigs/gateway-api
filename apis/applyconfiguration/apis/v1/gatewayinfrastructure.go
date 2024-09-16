@@ -22,7 +22,7 @@ import (
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
-// GatewayInfrastructureApplyConfiguration represents an declarative configuration of the GatewayInfrastructure type for use
+// GatewayInfrastructureApplyConfiguration represents a declarative configuration of the GatewayInfrastructure type for use
 // with apply.
 type GatewayInfrastructureApplyConfiguration struct {
 	Labels        map[v1.LabelKey]v1.LabelValue               `json:"labels,omitempty"`
@@ -30,7 +30,7 @@ type GatewayInfrastructureApplyConfiguration struct {
 	ParametersRef *LocalParametersReferenceApplyConfiguration `json:"parametersRef,omitempty"`
 }
 
-// GatewayInfrastructureApplyConfiguration constructs an declarative configuration of the GatewayInfrastructure type for use with
+// GatewayInfrastructureApplyConfiguration constructs a declarative configuration of the GatewayInfrastructure type for use with
 // apply.
 func GatewayInfrastructure() *GatewayInfrastructureApplyConfiguration {
 	return &GatewayInfrastructureApplyConfiguration{}

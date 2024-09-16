@@ -22,7 +22,7 @@ import (
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
-// HTTPHeaderMatchApplyConfiguration represents an declarative configuration of the HTTPHeaderMatch type for use
+// HTTPHeaderMatchApplyConfiguration represents a declarative configuration of the HTTPHeaderMatch type for use
 // with apply.
 type HTTPHeaderMatchApplyConfiguration struct {
 	Type  *v1.HeaderMatchType `json:"type,omitempty"`
@@ -30,7 +30,7 @@ type HTTPHeaderMatchApplyConfiguration struct {
 	Value *string             `json:"value,omitempty"`
 }
 
-// HTTPHeaderMatchApplyConfiguration constructs an declarative configuration of the HTTPHeaderMatch type for use with
+// HTTPHeaderMatchApplyConfiguration constructs a declarative configuration of the HTTPHeaderMatch type for use with
 // apply.
 func HTTPHeaderMatch() *HTTPHeaderMatchApplyConfiguration {
 	return &HTTPHeaderMatchApplyConfiguration{}

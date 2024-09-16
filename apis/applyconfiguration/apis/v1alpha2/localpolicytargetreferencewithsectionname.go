@@ -22,14 +22,14 @@ import (
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
-// LocalPolicyTargetReferenceWithSectionNameApplyConfiguration represents an declarative configuration of the LocalPolicyTargetReferenceWithSectionName type for use
+// LocalPolicyTargetReferenceWithSectionNameApplyConfiguration represents a declarative configuration of the LocalPolicyTargetReferenceWithSectionName type for use
 // with apply.
 type LocalPolicyTargetReferenceWithSectionNameApplyConfiguration struct {
 	LocalPolicyTargetReferenceApplyConfiguration `json:",inline"`
 	SectionName                                  *v1.SectionName `json:"sectionName,omitempty"`
 }
 
-// LocalPolicyTargetReferenceWithSectionNameApplyConfiguration constructs an declarative configuration of the LocalPolicyTargetReferenceWithSectionName type for use with
+// LocalPolicyTargetReferenceWithSectionNameApplyConfiguration constructs a declarative configuration of the LocalPolicyTargetReferenceWithSectionName type for use with
 // apply.
 func LocalPolicyTargetReferenceWithSectionName() *LocalPolicyTargetReferenceWithSectionNameApplyConfiguration {
 	return &LocalPolicyTargetReferenceWithSectionNameApplyConfiguration{}

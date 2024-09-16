@@ -22,7 +22,7 @@ import (
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
-// GRPCHeaderMatchApplyConfiguration represents an declarative configuration of the GRPCHeaderMatch type for use
+// GRPCHeaderMatchApplyConfiguration represents a declarative configuration of the GRPCHeaderMatch type for use
 // with apply.
 type GRPCHeaderMatchApplyConfiguration struct {
 	Type  *v1.GRPCHeaderMatchType `json:"type,omitempty"`
@@ -30,7 +30,7 @@ type GRPCHeaderMatchApplyConfiguration struct {
 	Value *string                 `json:"value,omitempty"`
 }
 
-// GRPCHeaderMatchApplyConfiguration constructs an declarative configuration of the GRPCHeaderMatch type for use with
+// GRPCHeaderMatchApplyConfiguration constructs a declarative configuration of the GRPCHeaderMatch type for use with
 // apply.
 func GRPCHeaderMatch() *GRPCHeaderMatchApplyConfiguration {
 	return &GRPCHeaderMatchApplyConfiguration{}

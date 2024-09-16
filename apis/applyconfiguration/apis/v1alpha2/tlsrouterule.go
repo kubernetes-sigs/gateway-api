@@ -23,14 +23,14 @@ import (
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
-// TLSRouteRuleApplyConfiguration represents an declarative configuration of the TLSRouteRule type for use
+// TLSRouteRuleApplyConfiguration represents a declarative configuration of the TLSRouteRule type for use
 // with apply.
 type TLSRouteRuleApplyConfiguration struct {
 	Name        *v1.SectionName                       `json:"name,omitempty"`
 	BackendRefs []apisv1.BackendRefApplyConfiguration `json:"backendRefs,omitempty"`
 }
 
-// TLSRouteRuleApplyConfiguration constructs an declarative configuration of the TLSRouteRule type for use with
+// TLSRouteRuleApplyConfiguration constructs a declarative configuration of the TLSRouteRule type for use with
 // apply.
 func TLSRouteRule() *TLSRouteRuleApplyConfiguration {
 	return &TLSRouteRuleApplyConfiguration{}

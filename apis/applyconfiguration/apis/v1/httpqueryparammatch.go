@@ -22,7 +22,7 @@ import (
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
-// HTTPQueryParamMatchApplyConfiguration represents an declarative configuration of the HTTPQueryParamMatch type for use
+// HTTPQueryParamMatchApplyConfiguration represents a declarative configuration of the HTTPQueryParamMatch type for use
 // with apply.
 type HTTPQueryParamMatchApplyConfiguration struct {
 	Type  *v1.QueryParamMatchType `json:"type,omitempty"`
@@ -30,7 +30,7 @@ type HTTPQueryParamMatchApplyConfiguration struct {
 	Value *string                 `json:"value,omitempty"`
 }
 
-// HTTPQueryParamMatchApplyConfiguration constructs an declarative configuration of the HTTPQueryParamMatch type for use with
+// HTTPQueryParamMatchApplyConfiguration constructs a declarative configuration of the HTTPQueryParamMatch type for use with
 // apply.
 func HTTPQueryParamMatch() *HTTPQueryParamMatchApplyConfiguration {
 	return &HTTPQueryParamMatchApplyConfiguration{}

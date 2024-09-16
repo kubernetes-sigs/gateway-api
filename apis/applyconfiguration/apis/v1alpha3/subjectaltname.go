@@ -23,7 +23,7 @@ import (
 	v1alpha3 "sigs.k8s.io/gateway-api/apis/v1alpha3"
 )
 
-// SubjectAltNameApplyConfiguration represents an declarative configuration of the SubjectAltName type for use
+// SubjectAltNameApplyConfiguration represents a declarative configuration of the SubjectAltName type for use
 // with apply.
 type SubjectAltNameApplyConfiguration struct {
 	Type     *v1alpha3.SubjectAltNameType `json:"type,omitempty"`
@@ -31,7 +31,7 @@ type SubjectAltNameApplyConfiguration struct {
 	URI      *v1.AbsoluteURI              `json:"uri,omitempty"`
 }
 
-// SubjectAltNameApplyConfiguration constructs an declarative configuration of the SubjectAltName type for use with
+// SubjectAltNameApplyConfiguration constructs a declarative configuration of the SubjectAltName type for use with
 // apply.
 func SubjectAltName() *SubjectAltNameApplyConfiguration {
 	return &SubjectAltNameApplyConfiguration{}

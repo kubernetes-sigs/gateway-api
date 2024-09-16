@@ -22,7 +22,7 @@ import (
 	metav1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
-// GatewayStatusApplyConfiguration represents an declarative configuration of the GatewayStatus type for use
+// GatewayStatusApplyConfiguration represents a declarative configuration of the GatewayStatus type for use
 // with apply.
 type GatewayStatusApplyConfiguration struct {
 	Addresses  []GatewayStatusAddressApplyConfiguration `json:"addresses,omitempty"`
@@ -30,7 +30,7 @@ type GatewayStatusApplyConfiguration struct {
 	Listeners  []ListenerStatusApplyConfiguration       `json:"listeners,omitempty"`
 }
 
-// GatewayStatusApplyConfiguration constructs an declarative configuration of the GatewayStatus type for use with
+// GatewayStatusApplyConfiguration constructs a declarative configuration of the GatewayStatus type for use with
 // apply.
 func GatewayStatus() *GatewayStatusApplyConfiguration {
 	return &GatewayStatusApplyConfiguration{}

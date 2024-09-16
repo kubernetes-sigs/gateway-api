@@ -22,7 +22,7 @@ import (
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
-// ParametersReferenceApplyConfiguration represents an declarative configuration of the ParametersReference type for use
+// ParametersReferenceApplyConfiguration represents a declarative configuration of the ParametersReference type for use
 // with apply.
 type ParametersReferenceApplyConfiguration struct {
 	Group     *v1.Group     `json:"group,omitempty"`
@@ -31,7 +31,7 @@ type ParametersReferenceApplyConfiguration struct {
 	Namespace *v1.Namespace `json:"namespace,omitempty"`
 }
 
-// ParametersReferenceApplyConfiguration constructs an declarative configuration of the ParametersReference type for use with
+// ParametersReferenceApplyConfiguration constructs a declarative configuration of the ParametersReference type for use with
 // apply.
 func ParametersReference() *ParametersReferenceApplyConfiguration {
 	return &ParametersReferenceApplyConfiguration{}

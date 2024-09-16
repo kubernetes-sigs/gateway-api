@@ -18,14 +18,14 @@ limitations under the License.
 
 package v1
 
-// FractionApplyConfiguration represents an declarative configuration of the Fraction type for use
+// FractionApplyConfiguration represents a declarative configuration of the Fraction type for use
 // with apply.
 type FractionApplyConfiguration struct {
 	Numerator   *int32 `json:"numerator,omitempty"`
 	Denominator *int32 `json:"denominator,omitempty"`
 }
 
-// FractionApplyConfiguration constructs an declarative configuration of the Fraction type for use with
+// FractionApplyConfiguration constructs a declarative configuration of the Fraction type for use with
 // apply.
 func Fraction() *FractionApplyConfiguration {
 	return &FractionApplyConfiguration{}

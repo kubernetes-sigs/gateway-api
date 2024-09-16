@@ -18,13 +18,13 @@ limitations under the License.
 
 package v1
 
-// CommonRouteSpecApplyConfiguration represents an declarative configuration of the CommonRouteSpec type for use
+// CommonRouteSpecApplyConfiguration represents a declarative configuration of the CommonRouteSpec type for use
 // with apply.
 type CommonRouteSpecApplyConfiguration struct {
 	ParentRefs []ParentReferenceApplyConfiguration `json:"parentRefs,omitempty"`
 }
 
-// CommonRouteSpecApplyConfiguration constructs an declarative configuration of the CommonRouteSpec type for use with
+// CommonRouteSpecApplyConfiguration constructs a declarative configuration of the CommonRouteSpec type for use with
 // apply.
 func CommonRouteSpec() *CommonRouteSpecApplyConfiguration {
 	return &CommonRouteSpecApplyConfiguration{}

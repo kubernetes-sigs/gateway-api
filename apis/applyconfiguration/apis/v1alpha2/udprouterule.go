@@ -23,14 +23,14 @@ import (
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
-// UDPRouteRuleApplyConfiguration represents an declarative configuration of the UDPRouteRule type for use
+// UDPRouteRuleApplyConfiguration represents a declarative configuration of the UDPRouteRule type for use
 // with apply.
 type UDPRouteRuleApplyConfiguration struct {
 	Name        *v1.SectionName                       `json:"name,omitempty"`
 	BackendRefs []apisv1.BackendRefApplyConfiguration `json:"backendRefs,omitempty"`
 }
 
-// UDPRouteRuleApplyConfiguration constructs an declarative configuration of the UDPRouteRule type for use with
+// UDPRouteRuleApplyConfiguration constructs a declarative configuration of the UDPRouteRule type for use with
 // apply.
 func UDPRouteRule() *UDPRouteRuleApplyConfiguration {
 	return &UDPRouteRuleApplyConfiguration{}

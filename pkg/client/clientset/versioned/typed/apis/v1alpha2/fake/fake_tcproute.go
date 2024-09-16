@@ -44,22 +44,24 @@ var tcproutesKind = v1alpha2.SchemeGroupVersion.WithKind("TCPRoute")
 
 // Get takes name of the tCPRoute, and returns the corresponding tCPRoute object, and an error if there is any.
 func (c *FakeTCPRoutes) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha2.TCPRoute, err error) {
+	emptyResult := &v1alpha2.TCPRoute{}
 	obj, err := c.Fake.
-		Invokes(testing.NewGetAction(tcproutesResource, c.ns, name), &v1alpha2.TCPRoute{})
+		Invokes(testing.NewGetActionWithOptions(tcproutesResource, c.ns, name, options), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha2.TCPRoute), err
 }
 
 // List takes label and field selectors, and returns the list of TCPRoutes that match those selectors.
 func (c *FakeTCPRoutes) List(ctx context.Context, opts v1.ListOptions) (result *v1alpha2.TCPRouteList, err error) {
+	emptyResult := &v1alpha2.TCPRouteList{}
 	obj, err := c.Fake.
-		Invokes(testing.NewListAction(tcproutesResource, tcproutesKind, c.ns, opts), &v1alpha2.TCPRouteList{})
+		Invokes(testing.NewListActionWithOptions(tcproutesResource, tcproutesKind, c.ns, opts), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 
 	label, _, _ := testing.ExtractFromListOptions(opts)
@@ -78,40 +80,43 @@ func (c *FakeTCPRoutes) List(ctx context.Context, opts v1.ListOptions) (result *
 // Watch returns a watch.Interface that watches the requested tCPRoutes.
 func (c *FakeTCPRoutes) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
 	return c.Fake.
-		InvokesWatch(testing.NewWatchAction(tcproutesResource, c.ns, opts))
+		InvokesWatch(testing.NewWatchActionWithOptions(tcproutesResource, c.ns, opts))
 
 }
 
 // Create takes the representation of a tCPRoute and creates it.  Returns the server's representation of the tCPRoute, and an error, if there is any.
 func (c *FakeTCPRoutes) Create(ctx context.Context, tCPRoute *v1alpha2.TCPRoute, opts v1.CreateOptions) (result *v1alpha2.TCPRoute, err error) {
+	emptyResult := &v1alpha2.TCPRoute{}
 	obj, err := c.Fake.
-		Invokes(testing.NewCreateAction(tcproutesResource, c.ns, tCPRoute), &v1alpha2.TCPRoute{})
+		Invokes(testing.NewCreateActionWithOptions(tcproutesResource, c.ns, tCPRoute, opts), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha2.TCPRoute), err
 }
 
 // Update takes the representation of a tCPRoute and updates it. Returns the server's representation of the tCPRoute, and an error, if there is any.
 func (c *FakeTCPRoutes) Update(ctx context.Context, tCPRoute *v1alpha2.TCPRoute, opts v1.UpdateOptions) (result *v1alpha2.TCPRoute, err error) {
+	emptyResult := &v1alpha2.TCPRoute{}
 	obj, err := c.Fake.
-		Invokes(testing.NewUpdateAction(tcproutesResource, c.ns, tCPRoute), &v1alpha2.TCPRoute{})
+		Invokes(testing.NewUpdateActionWithOptions(tcproutesResource, c.ns, tCPRoute, opts), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha2.TCPRoute), err
 }
 
 // UpdateStatus was generated because the type contains a Status member.
 // Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-func (c *FakeTCPRoutes) UpdateStatus(ctx context.Context, tCPRoute *v1alpha2.TCPRoute, opts v1.UpdateOptions) (*v1alpha2.TCPRoute, error) {
+func (c *FakeTCPRoutes) UpdateStatus(ctx context.Context, tCPRoute *v1alpha2.TCPRoute, opts v1.UpdateOptions) (result *v1alpha2.TCPRoute, err error) {
+	emptyResult := &v1alpha2.TCPRoute{}
 	obj, err := c.Fake.
-		Invokes(testing.NewUpdateSubresourceAction(tcproutesResource, "status", c.ns, tCPRoute), &v1alpha2.TCPRoute{})
+		Invokes(testing.NewUpdateSubresourceActionWithOptions(tcproutesResource, "status", c.ns, tCPRoute, opts), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha2.TCPRoute), err
 }
@@ -126,7 +131,7 @@ func (c *FakeTCPRoutes) Delete(ctx context.Context, name string, opts v1.DeleteO
 
 // DeleteCollection deletes a collection of objects.
 func (c *FakeTCPRoutes) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
-	action := testing.NewDeleteCollectionAction(tcproutesResource, c.ns, listOpts)
+	action := testing.NewDeleteCollectionActionWithOptions(tcproutesResource, c.ns, opts, listOpts)
 
 	_, err := c.Fake.Invokes(action, &v1alpha2.TCPRouteList{})
 	return err
@@ -134,11 +139,12 @@ func (c *FakeTCPRoutes) DeleteCollection(ctx context.Context, opts v1.DeleteOpti
 
 // Patch applies the patch and returns the patched tCPRoute.
 func (c *FakeTCPRoutes) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha2.TCPRoute, err error) {
+	emptyResult := &v1alpha2.TCPRoute{}
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(tcproutesResource, c.ns, name, pt, data, subresources...), &v1alpha2.TCPRoute{})
+		Invokes(testing.NewPatchSubresourceActionWithOptions(tcproutesResource, c.ns, name, pt, data, opts, subresources...), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha2.TCPRoute), err
 }
@@ -156,11 +162,12 @@ func (c *FakeTCPRoutes) Apply(ctx context.Context, tCPRoute *apisv1alpha2.TCPRou
 	if name == nil {
 		return nil, fmt.Errorf("tCPRoute.Name must be provided to Apply")
 	}
+	emptyResult := &v1alpha2.TCPRoute{}
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(tcproutesResource, c.ns, *name, types.ApplyPatchType, data), &v1alpha2.TCPRoute{})
+		Invokes(testing.NewPatchSubresourceActionWithOptions(tcproutesResource, c.ns, *name, types.ApplyPatchType, data, opts.ToPatchOptions()), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha2.TCPRoute), err
 }
@@ -179,11 +186,12 @@ func (c *FakeTCPRoutes) ApplyStatus(ctx context.Context, tCPRoute *apisv1alpha2.
 	if name == nil {
 		return nil, fmt.Errorf("tCPRoute.Name must be provided to Apply")
 	}
+	emptyResult := &v1alpha2.TCPRoute{}
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(tcproutesResource, c.ns, *name, types.ApplyPatchType, data, "status"), &v1alpha2.TCPRoute{})
+		Invokes(testing.NewPatchSubresourceActionWithOptions(tcproutesResource, c.ns, *name, types.ApplyPatchType, data, opts.ToPatchOptions(), "status"), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha2.TCPRoute), err
 }

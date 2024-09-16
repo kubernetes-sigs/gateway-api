@@ -18,7 +18,7 @@ limitations under the License.
 
 package v1
 
-// HTTPRequestMirrorFilterApplyConfiguration represents an declarative configuration of the HTTPRequestMirrorFilter type for use
+// HTTPRequestMirrorFilterApplyConfiguration represents a declarative configuration of the HTTPRequestMirrorFilter type for use
 // with apply.
 type HTTPRequestMirrorFilterApplyConfiguration struct {
 	BackendRef *BackendObjectReferenceApplyConfiguration `json:"backendRef,omitempty"`
@@ -26,7 +26,7 @@ type HTTPRequestMirrorFilterApplyConfiguration struct {
 	Fraction   *FractionApplyConfiguration               `json:"fraction,omitempty"`
 }
 
-// HTTPRequestMirrorFilterApplyConfiguration constructs an declarative configuration of the HTTPRequestMirrorFilter type for use with
+// HTTPRequestMirrorFilterApplyConfiguration constructs a declarative configuration of the HTTPRequestMirrorFilter type for use with
 // apply.
 func HTTPRequestMirrorFilter() *HTTPRequestMirrorFilterApplyConfiguration {
 	return &HTTPRequestMirrorFilterApplyConfiguration{}

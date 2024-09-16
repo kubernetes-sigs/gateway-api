@@ -22,13 +22,13 @@ import (
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
-// SupportedFeatureApplyConfiguration represents an declarative configuration of the SupportedFeature type for use
+// SupportedFeatureApplyConfiguration represents a declarative configuration of the SupportedFeature type for use
 // with apply.
 type SupportedFeatureApplyConfiguration struct {
 	Name *v1.FeatureName `json:"name,omitempty"`
 }
 
-// SupportedFeatureApplyConfiguration constructs an declarative configuration of the SupportedFeature type for use with
+// SupportedFeatureApplyConfiguration constructs a declarative configuration of the SupportedFeature type for use with
 // apply.
 func SupportedFeature() *SupportedFeatureApplyConfiguration {
 	return &SupportedFeatureApplyConfiguration{}

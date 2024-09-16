@@ -22,14 +22,14 @@ import (
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
-// HTTPRouteTimeoutsApplyConfiguration represents an declarative configuration of the HTTPRouteTimeouts type for use
+// HTTPRouteTimeoutsApplyConfiguration represents a declarative configuration of the HTTPRouteTimeouts type for use
 // with apply.
 type HTTPRouteTimeoutsApplyConfiguration struct {
 	Request        *v1.Duration `json:"request,omitempty"`
 	BackendRequest *v1.Duration `json:"backendRequest,omitempty"`
 }
 
-// HTTPRouteTimeoutsApplyConfiguration constructs an declarative configuration of the HTTPRouteTimeouts type for use with
+// HTTPRouteTimeoutsApplyConfiguration constructs a declarative configuration of the HTTPRouteTimeouts type for use with
 // apply.
 func HTTPRouteTimeouts() *HTTPRouteTimeoutsApplyConfiguration {
 	return &HTTPRouteTimeoutsApplyConfiguration{}

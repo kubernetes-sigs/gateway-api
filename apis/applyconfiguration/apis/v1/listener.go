@@ -22,7 +22,7 @@ import (
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
-// ListenerApplyConfiguration represents an declarative configuration of the Listener type for use
+// ListenerApplyConfiguration represents a declarative configuration of the Listener type for use
 // with apply.
 type ListenerApplyConfiguration struct {
 	Name          *v1.SectionName                     `json:"name,omitempty"`
@@ -33,7 +33,7 @@ type ListenerApplyConfiguration struct {
 	AllowedRoutes *AllowedRoutesApplyConfiguration    `json:"allowedRoutes,omitempty"`
 }
 
-// ListenerApplyConfiguration constructs an declarative configuration of the Listener type for use with
+// ListenerApplyConfiguration constructs a declarative configuration of the Listener type for use with
 // apply.
 func Listener() *ListenerApplyConfiguration {
 	return &ListenerApplyConfiguration{}

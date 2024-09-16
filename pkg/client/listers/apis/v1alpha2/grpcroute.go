@@ -19,8 +19,8 @@ limitations under the License.
 package v1alpha2
 
 import (
-	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/client-go/listers"
 	"k8s.io/client-go/tools/cache"
 	v1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
 )
@@ -38,25 +38,17 @@ type GRPCRouteLister interface {
 
 // gRPCRouteLister implements the GRPCRouteLister interface.
 type gRPCRouteLister struct {
-	indexer cache.Indexer
+	listers.ResourceIndexer[*v1alpha2.GRPCRoute]
 }
 
 // NewGRPCRouteLister returns a new GRPCRouteLister.
 func NewGRPCRouteLister(indexer cache.Indexer) GRPCRouteLister {
-	return &gRPCRouteLister{indexer: indexer}
-}
-
-// List lists all GRPCRoutes in the indexer.
-func (s *gRPCRouteLister) List(selector labels.Selector) (ret []*v1alpha2.GRPCRoute, err error) {
-	err = cache.ListAll(s.indexer, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha2.GRPCRoute))
-	})
-	return ret, err
+	return &gRPCRouteLister{listers.New[*v1alpha2.GRPCRoute](indexer, v1alpha2.Resource("grpcroute"))}
 }
 
 // GRPCRoutes returns an object that can list and get GRPCRoutes.
 func (s *gRPCRouteLister) GRPCRoutes(namespace string) GRPCRouteNamespaceLister {
-	return gRPCRouteNamespaceLister{indexer: s.indexer, namespace: namespace}
+	return gRPCRouteNamespaceLister{listers.NewNamespaced[*v1alpha2.GRPCRoute](s.ResourceIndexer, namespace)}
 }
 
 // GRPCRouteNamespaceLister helps list and get GRPCRoutes.
@@ -74,26 +66,5 @@ type GRPCRouteNamespaceLister interface {
 // gRPCRouteNamespaceLister implements the GRPCRouteNamespaceLister
 // interface.
 type gRPCRouteNamespaceLister struct {
-	indexer   cache.Indexer
-	namespace string
-}
-
-// List lists all GRPCRoutes in the indexer for a given namespace.
-func (s gRPCRouteNamespaceLister) List(selector labels.Selector) (ret []*v1alpha2.GRPCRoute, err error) {
-	err = cache.ListAllByNamespace(s.indexer, s.namespace, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha2.GRPCRoute))
-	})
-	return ret, err
-}
-
-// Get retrieves the GRPCRoute from the indexer for a given namespace and name.
-func (s gRPCRouteNamespaceLister) Get(name string) (*v1alpha2.GRPCRoute, error) {
-	obj, exists, err := s.indexer.GetByKey(s.namespace + "/" + name)
-	if err != nil {
-		return nil, err
-	}
-	if !exists {
-		return nil, errors.NewNotFound(v1alpha2.Resource("grpcroute"), name)
-	}
-	return obj.(*v1alpha2.GRPCRoute), nil
+	listers.ResourceIndexer[*v1alpha2.GRPCRoute]
 }

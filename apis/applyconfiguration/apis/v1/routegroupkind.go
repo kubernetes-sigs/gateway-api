@@ -22,14 +22,14 @@ import (
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
-// RouteGroupKindApplyConfiguration represents an declarative configuration of the RouteGroupKind type for use
+// RouteGroupKindApplyConfiguration represents a declarative configuration of the RouteGroupKind type for use
 // with apply.
 type RouteGroupKindApplyConfiguration struct {
 	Group *v1.Group `json:"group,omitempty"`
 	Kind  *v1.Kind  `json:"kind,omitempty"`
 }
 
-// RouteGroupKindApplyConfiguration constructs an declarative configuration of the RouteGroupKind type for use with
+// RouteGroupKindApplyConfiguration constructs a declarative configuration of the RouteGroupKind type for use with
 // apply.
 func RouteGroupKind() *RouteGroupKindApplyConfiguration {
 	return &RouteGroupKindApplyConfiguration{}

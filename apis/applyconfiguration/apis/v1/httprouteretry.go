@@ -22,7 +22,7 @@ import (
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
-// HTTPRouteRetryApplyConfiguration represents an declarative configuration of the HTTPRouteRetry type for use
+// HTTPRouteRetryApplyConfiguration represents a declarative configuration of the HTTPRouteRetry type for use
 // with apply.
 type HTTPRouteRetryApplyConfiguration struct {
 	Codes    []v1.HTTPRouteRetryStatusCode `json:"codes,omitempty"`
@@ -30,7 +30,7 @@ type HTTPRouteRetryApplyConfiguration struct {
 	Backoff  *v1.Duration                  `json:"backoff,omitempty"`
 }
 
-// HTTPRouteRetryApplyConfiguration constructs an declarative configuration of the HTTPRouteRetry type for use with
+// HTTPRouteRetryApplyConfiguration constructs a declarative configuration of the HTTPRouteRetry type for use with
 // apply.
 func HTTPRouteRetry() *HTTPRouteRetryApplyConfiguration {
 	return &HTTPRouteRetryApplyConfiguration{}

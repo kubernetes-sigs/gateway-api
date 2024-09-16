@@ -20,12 +20,11 @@ package v1alpha3
 
 import (
 	v1 "sigs.k8s.io/gateway-api/apis/applyconfiguration/apis/v1"
-
 	apisv1 "sigs.k8s.io/gateway-api/apis/v1"
 	v1alpha3 "sigs.k8s.io/gateway-api/apis/v1alpha3"
 )
 
-// BackendTLSPolicyValidationApplyConfiguration represents an declarative configuration of the BackendTLSPolicyValidation type for use
+// BackendTLSPolicyValidationApplyConfiguration represents a declarative configuration of the BackendTLSPolicyValidation type for use
 // with apply.
 type BackendTLSPolicyValidationApplyConfiguration struct {
 	CACertificateRefs       []v1.LocalObjectReferenceApplyConfiguration `json:"caCertificateRefs,omitempty"`
@@ -34,7 +33,7 @@ type BackendTLSPolicyValidationApplyConfiguration struct {
 	SubjectAltNames         []SubjectAltNameApplyConfiguration          `json:"subjectAltNames,omitempty"`
 }
 
-// BackendTLSPolicyValidationApplyConfiguration constructs an declarative configuration of the BackendTLSPolicyValidation type for use with
+// BackendTLSPolicyValidationApplyConfiguration constructs a declarative configuration of the BackendTLSPolicyValidation type for use with
 // apply.
 func BackendTLSPolicyValidation() *BackendTLSPolicyValidationApplyConfiguration {
 	return &BackendTLSPolicyValidationApplyConfiguration{}

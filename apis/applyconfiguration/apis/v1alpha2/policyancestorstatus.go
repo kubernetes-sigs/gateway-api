@@ -24,7 +24,7 @@ import (
 	apisv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
-// PolicyAncestorStatusApplyConfiguration represents an declarative configuration of the PolicyAncestorStatus type for use
+// PolicyAncestorStatusApplyConfiguration represents a declarative configuration of the PolicyAncestorStatus type for use
 // with apply.
 type PolicyAncestorStatusApplyConfiguration struct {
 	AncestorRef    *v1.ParentReferenceApplyConfiguration `json:"ancestorRef,omitempty"`
@@ -32,7 +32,7 @@ type PolicyAncestorStatusApplyConfiguration struct {
 	Conditions     []metav1.ConditionApplyConfiguration  `json:"conditions,omitempty"`
 }
 
-// PolicyAncestorStatusApplyConfiguration constructs an declarative configuration of the PolicyAncestorStatus type for use with
+// PolicyAncestorStatusApplyConfiguration constructs a declarative configuration of the PolicyAncestorStatus type for use with
 // apply.
 func PolicyAncestorStatus() *PolicyAncestorStatusApplyConfiguration {
 	return &PolicyAncestorStatusApplyConfiguration{}

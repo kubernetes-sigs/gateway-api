@@ -28,7 +28,7 @@ import (
 	v1beta1 "sigs.k8s.io/gateway-api/apis/v1beta1"
 )
 
-// HTTPRouteApplyConfiguration represents an declarative configuration of the HTTPRoute type for use
+// HTTPRouteApplyConfiguration represents a declarative configuration of the HTTPRoute type for use
 // with apply.
 type HTTPRouteApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
@@ -37,7 +37,7 @@ type HTTPRouteApplyConfiguration struct {
 	Status                           *apisv1.HTTPRouteStatusApplyConfiguration `json:"status,omitempty"`
 }
 
-// HTTPRoute constructs an declarative configuration of the HTTPRoute type for use with
+// HTTPRoute constructs a declarative configuration of the HTTPRoute type for use with
 // apply.
 func HTTPRoute(name, namespace string) *HTTPRouteApplyConfiguration {
 	b := &HTTPRouteApplyConfiguration{}
@@ -256,4 +256,10 @@ func (b *HTTPRouteApplyConfiguration) WithSpec(value *apisv1.HTTPRouteSpecApplyC
 func (b *HTTPRouteApplyConfiguration) WithStatus(value *apisv1.HTTPRouteStatusApplyConfiguration) *HTTPRouteApplyConfiguration {
 	b.Status = value
 	return b
+}
+
+// GetName retrieves the value of the Name field in the declarative configuration.
+func (b *HTTPRouteApplyConfiguration) GetName() *string {
+	b.ensureObjectMetaApplyConfigurationExists()
+	return b.Name
 }

@@ -22,7 +22,7 @@ import (
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
-// GRPCRouteRuleApplyConfiguration represents an declarative configuration of the GRPCRouteRule type for use
+// GRPCRouteRuleApplyConfiguration represents a declarative configuration of the GRPCRouteRule type for use
 // with apply.
 type GRPCRouteRuleApplyConfiguration struct {
 	Name               *v1.SectionName                       `json:"name,omitempty"`
@@ -32,7 +32,7 @@ type GRPCRouteRuleApplyConfiguration struct {
 	SessionPersistence *SessionPersistenceApplyConfiguration `json:"sessionPersistence,omitempty"`
 }
 
-// GRPCRouteRuleApplyConfiguration constructs an declarative configuration of the GRPCRouteRule type for use with
+// GRPCRouteRuleApplyConfiguration constructs a declarative configuration of the GRPCRouteRule type for use with
 // apply.
 func GRPCRouteRule() *GRPCRouteRuleApplyConfiguration {
 	return &GRPCRouteRuleApplyConfiguration{}

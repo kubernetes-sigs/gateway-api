@@ -22,7 +22,7 @@ import (
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
-// GRPCRouteFilterApplyConfiguration represents an declarative configuration of the GRPCRouteFilter type for use
+// GRPCRouteFilterApplyConfiguration represents a declarative configuration of the GRPCRouteFilter type for use
 // with apply.
 type GRPCRouteFilterApplyConfiguration struct {
 	Type                   *v1.GRPCRouteFilterType                    `json:"type,omitempty"`
@@ -32,7 +32,7 @@ type GRPCRouteFilterApplyConfiguration struct {
 	ExtensionRef           *LocalObjectReferenceApplyConfiguration    `json:"extensionRef,omitempty"`
 }
 
-// GRPCRouteFilterApplyConfiguration constructs an declarative configuration of the GRPCRouteFilter type for use with
+// GRPCRouteFilterApplyConfiguration constructs a declarative configuration of the GRPCRouteFilter type for use with
 // apply.
 func GRPCRouteFilter() *GRPCRouteFilterApplyConfiguration {
 	return &GRPCRouteFilterApplyConfiguration{}

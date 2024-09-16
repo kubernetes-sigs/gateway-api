@@ -23,12 +23,11 @@ import (
 	types "k8s.io/apimachinery/pkg/types"
 	managedfields "k8s.io/apimachinery/pkg/util/managedfields"
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
-
 	internal "sigs.k8s.io/gateway-api/apis/applyconfiguration/internal"
 	gatewayapiapisv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
-// GatewayApplyConfiguration represents an declarative configuration of the Gateway type for use
+// GatewayApplyConfiguration represents a declarative configuration of the Gateway type for use
 // with apply.
 type GatewayApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
@@ -37,7 +36,7 @@ type GatewayApplyConfiguration struct {
 	Status                           *GatewayStatusApplyConfiguration `json:"status,omitempty"`
 }
 
-// Gateway constructs an declarative configuration of the Gateway type for use with
+// Gateway constructs a declarative configuration of the Gateway type for use with
 // apply.
 func Gateway(name, namespace string) *GatewayApplyConfiguration {
 	b := &GatewayApplyConfiguration{}
@@ -256,4 +255,10 @@ func (b *GatewayApplyConfiguration) WithSpec(value *GatewaySpecApplyConfiguratio
 func (b *GatewayApplyConfiguration) WithStatus(value *GatewayStatusApplyConfiguration) *GatewayApplyConfiguration {
 	b.Status = value
 	return b
+}
+
+// GetName retrieves the value of the Name field in the declarative configuration.
+func (b *GatewayApplyConfiguration) GetName() *string {
+	b.ensureObjectMetaApplyConfigurationExists()
+	return b.Name
 }

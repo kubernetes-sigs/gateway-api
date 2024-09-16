@@ -28,7 +28,7 @@ import (
 	v1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
 )
 
-// ReferenceGrantApplyConfiguration represents an declarative configuration of the ReferenceGrant type for use
+// ReferenceGrantApplyConfiguration represents a declarative configuration of the ReferenceGrant type for use
 // with apply.
 type ReferenceGrantApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
@@ -36,7 +36,7 @@ type ReferenceGrantApplyConfiguration struct {
 	Spec                             *v1beta1.ReferenceGrantSpecApplyConfiguration `json:"spec,omitempty"`
 }
 
-// ReferenceGrant constructs an declarative configuration of the ReferenceGrant type for use with
+// ReferenceGrant constructs a declarative configuration of the ReferenceGrant type for use with
 // apply.
 func ReferenceGrant(name, namespace string) *ReferenceGrantApplyConfiguration {
 	b := &ReferenceGrantApplyConfiguration{}
@@ -247,4 +247,10 @@ func (b *ReferenceGrantApplyConfiguration) ensureObjectMetaApplyConfigurationExi
 func (b *ReferenceGrantApplyConfiguration) WithSpec(value *v1beta1.ReferenceGrantSpecApplyConfiguration) *ReferenceGrantApplyConfiguration {
 	b.Spec = value
 	return b
+}
+
+// GetName retrieves the value of the Name field in the declarative configuration.
+func (b *ReferenceGrantApplyConfiguration) GetName() *string {
+	b.ensureObjectMetaApplyConfigurationExists()
+	return b.Name
 }
