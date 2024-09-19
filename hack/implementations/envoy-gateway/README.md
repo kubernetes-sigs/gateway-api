@@ -12,7 +12,7 @@ Make sure you have these tools installed
 * Skip this step if you have an existing Kubernetes you would like to use.
 
 ```shell script
-./create-cluster.sh
+../common/create-cluster.sh
 ```
 
 ## Step 2: Install Envoy Gateway (`v0.0.0-latest`)
