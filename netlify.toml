@@ -25,3 +25,9 @@
     to = "http://main.gateway-api.sigs.k8s.io/:splat"
     status = 301
     force = true
+
+[[redirects]]
+    from = "/geps/gep-1426"
+    to = "/geps/gep-1294"
+    status = 301
+    force = true
