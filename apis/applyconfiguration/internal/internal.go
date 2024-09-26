@@ -1021,7 +1021,6 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: group
       type:
         scalar: string
-      default: ""
     - name: kind
       type:
         scalar: string
