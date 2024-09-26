@@ -36,7 +36,7 @@ should be attached to. The following example shows how the combination
 of `Gateway` and `GRPCRoute` would be configured to serve gRPC traffic:
 
 ```yaml
-{% include 'experimental/v1alpha2/grpc-routing/gateway.yaml' %}
+{% include 'standard/grpc-routing/gateway.yaml' %}
 ```
 
 A `GRPCRoute` can match against a [single set of hostnames][spec].
@@ -52,7 +52,7 @@ only one match specified, only requests for the `com.example.User.Login` method 
 by this Route.
 
 ```yaml
-{% include 'experimental/v1alpha2/grpc-routing/foo-grpcroute.yaml' %}
+{% include 'standard/grpc-routing/foo-grpcroute.yaml' %}
 ```
 
 Similarly, the `bar-route` GRPCRoute matches RPCs for `bar.example.com`. All
@@ -62,7 +62,7 @@ canary` header will be forwarded to `bar-svc-canary` and if the header is
 missing or does not have the value `canary` then it will be forwarded to `bar-svc`.
 
 ```yaml
-{% include 'experimental/v1alpha2/grpc-routing/bar-grpcroute.yaml' %}
+{% include 'standard/grpc-routing/bar-grpcroute.yaml' %}
 ```
 
 [gRPC
@@ -77,7 +77,7 @@ be enabled in production environments only after the security implications have
 been considered.
 
 ```yaml
-{% include 'experimental/v1alpha2/grpc-routing/reflection-grpcroute.yaml' %}
+{% include 'standard/grpc-routing/reflection-grpcroute.yaml' %}
 ```
 
 [gateway]: /reference/spec/#gateway.networking.k8s.io/v1.Gateway
