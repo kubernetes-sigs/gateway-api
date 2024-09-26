@@ -36,6 +36,7 @@ spec:
     caCertificateRefs:
     - group: ""
       kind: Secret
+      # This secret is generated dynamically by the test suite.
       name: "backend-tls-checks-certificate"
     hostname: "abc.example.com"
 ---
