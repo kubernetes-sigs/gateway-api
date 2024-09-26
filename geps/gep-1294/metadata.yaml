@@ -1,6 +1,6 @@
 apiVersion: internal.gateway.networking.k8s.io/v1alpha1
 kind: GEPDetails
-number: 1426
+number: 1294
 name: xRoutes Mesh Binding
 status: Standard
 authors:

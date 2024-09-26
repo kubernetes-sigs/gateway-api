@@ -2,7 +2,7 @@ apiVersion: internal.gateway.networking.k8s.io/v1alpha1
 kind: GEPDetails
 number: 3155
 name: Complete Backend mutual TLS Configuration
-status: Implementable
+status: Experimental
 authors:
   - mkosieradzki
   - robscott

@@ -1,6 +1,6 @@
 # GEP-1762: In Cluster Gateway Deployments
 
-* Status: Experimental
+* Status: Standard
 
 ## Overview
 

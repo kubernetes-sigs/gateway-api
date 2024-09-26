@@ -123,17 +123,16 @@ nav:
       - geps/gep-1867/index.md
       - geps/gep-2648/index.md
       - geps/gep-2649/index.md
-    - Implementable:
-      - geps/gep-995/index.md
-      - geps/gep-3155/index.md
+    # - Implementable:
     - Experimental:
+      - geps/gep-995/index.md
       - geps/gep-1619/index.md
       - geps/gep-1731/index.md
       - geps/gep-1748/index.md
-      - geps/gep-1762/index.md
       - geps/gep-1897/index.md
-      - geps/gep-1911/index.md
       - geps/gep-2162/index.md
+      - geps/gep-3155/index.md
+      - geps/gep-3171/index.md
     - Standard:
       - geps/gep-709/index.md
       - geps/gep-718/index.md
@@ -144,12 +143,14 @@ nav:
       - geps/gep-851/index.md
       - geps/gep-957/index.md
       - geps/gep-1016/index.md
+      - geps/gep-1294/index.md
       - geps/gep-1323/index.md
       - geps/gep-1364/index.md
-      - geps/gep-1426/index.md
       - geps/gep-1686/index.md
       - geps/gep-1709/index.md
       - geps/gep-1742/index.md
+      - geps/gep-1762/index.md
+      - geps/gep-1911/index.md
       - geps/gep-2257/index.md
     - Memorandum:
       - geps/gep-713/index.md

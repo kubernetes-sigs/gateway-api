@@ -1,4 +1,4 @@
-# GEP-1426: xRoutes Mesh Binding
+# GEP-1294: xRoutes Mesh Binding
 
 * Issue: [#1294](https://github.com/kubernetes-sigs/gateway-api/issues/1294)
 * Status: Standard
