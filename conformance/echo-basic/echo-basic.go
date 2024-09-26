@@ -32,7 +32,6 @@ import (
 	"time"
 
 	"github.com/paultag/sniff/parser"
-
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 	"golang.org/x/net/websocket"
@@ -58,7 +57,7 @@ type RequestAssertions struct {
 type TLSAssertions struct {
 	Version          string   `json:"version"`
 	PeerCertificates []string `json:"peerCertificates,omitempty"`
-	// ServerName is the SNI.
+	// ServerName is the name sent from the peer using SNI.
 	ServerName         string `json:"serverName"`
 	NegotiatedProtocol string `json:"negotiatedProtocol,omitempty"`
 	CipherSuite        string `json:"cipherSuite"`

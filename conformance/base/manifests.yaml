@@ -793,6 +793,7 @@ spec:
       volumes:
       - name: secret-volume
         secret:
+          # This secret is generated dynamically by the test suite.
           secretName: backend-tls-checks-certificate
           items:
           - key: tls.crt
