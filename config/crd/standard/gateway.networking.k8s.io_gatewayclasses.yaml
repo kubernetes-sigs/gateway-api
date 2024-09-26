@@ -3,7 +3,7 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     api-approved.kubernetes.io: https://github.com/kubernetes-sigs/gateway-api/pull/2997
-    gateway.networking.k8s.io/bundle-version: v1.2.0-rc1
+    gateway.networking.k8s.io/bundle-version: v1.2.0-rc2
     gateway.networking.k8s.io/channel: standard
   creationTimestamp: null
   name: gatewayclasses.gateway.networking.k8s.io
