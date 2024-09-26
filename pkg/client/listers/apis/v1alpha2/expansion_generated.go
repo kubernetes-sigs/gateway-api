@@ -26,22 +26,6 @@ type BackendLBPolicyListerExpansion interface{}
 // BackendLBPolicyNamespaceLister.
 type BackendLBPolicyNamespaceListerExpansion interface{}
 
-// GRPCRouteListerExpansion allows custom methods to be added to
-// GRPCRouteLister.
-type GRPCRouteListerExpansion interface{}
-
-// GRPCRouteNamespaceListerExpansion allows custom methods to be added to
-// GRPCRouteNamespaceLister.
-type GRPCRouteNamespaceListerExpansion interface{}
-
-// ReferenceGrantListerExpansion allows custom methods to be added to
-// ReferenceGrantLister.
-type ReferenceGrantListerExpansion interface{}
-
-// ReferenceGrantNamespaceListerExpansion allows custom methods to be added to
-// ReferenceGrantNamespaceLister.
-type ReferenceGrantNamespaceListerExpansion interface{}
-
 // TCPRouteListerExpansion allows custom methods to be added to
 // TCPRouteLister.
 type TCPRouteListerExpansion interface{}

@@ -162,8 +162,6 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1alpha2.BackendLBPolicyApplyConfiguration{}
 	case v1alpha2.SchemeGroupVersion.WithKind("BackendLBPolicySpec"):
 		return &apisv1alpha2.BackendLBPolicySpecApplyConfiguration{}
-	case v1alpha2.SchemeGroupVersion.WithKind("GRPCRoute"):
-		return &apisv1alpha2.GRPCRouteApplyConfiguration{}
 	case v1alpha2.SchemeGroupVersion.WithKind("LocalPolicyTargetReference"):
 		return &apisv1alpha2.LocalPolicyTargetReferenceApplyConfiguration{}
 	case v1alpha2.SchemeGroupVersion.WithKind("LocalPolicyTargetReferenceWithSectionName"):
@@ -172,8 +170,6 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1alpha2.PolicyAncestorStatusApplyConfiguration{}
 	case v1alpha2.SchemeGroupVersion.WithKind("PolicyStatus"):
 		return &apisv1alpha2.PolicyStatusApplyConfiguration{}
-	case v1alpha2.SchemeGroupVersion.WithKind("ReferenceGrant"):
-		return &apisv1alpha2.ReferenceGrantApplyConfiguration{}
 	case v1alpha2.SchemeGroupVersion.WithKind("TCPRoute"):
 		return &apisv1alpha2.TCPRouteApplyConfiguration{}
 	case v1alpha2.SchemeGroupVersion.WithKind("TCPRouteRule"):

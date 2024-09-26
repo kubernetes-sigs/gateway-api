@@ -32,14 +32,6 @@ func (c *FakeGatewayV1alpha2) BackendLBPolicies(namespace string) v1alpha2.Backe
 	return &FakeBackendLBPolicies{c, namespace}
 }
 
-func (c *FakeGatewayV1alpha2) GRPCRoutes(namespace string) v1alpha2.GRPCRouteInterface {
-	return &FakeGRPCRoutes{c, namespace}
-}
-
-func (c *FakeGatewayV1alpha2) ReferenceGrants(namespace string) v1alpha2.ReferenceGrantInterface {
-	return &FakeReferenceGrants{c, namespace}
-}
-
 func (c *FakeGatewayV1alpha2) TCPRoutes(namespace string) v1alpha2.TCPRouteInterface {
 	return &FakeTCPRoutes{c, namespace}
 }
