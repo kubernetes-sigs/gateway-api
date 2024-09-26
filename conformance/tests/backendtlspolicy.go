@@ -34,7 +34,7 @@ func init() {
 var BackendTLSPolicy = suite.ConformanceTest{
 	ShortName:   "BackendTLSPolicy",
 	Description: "A single service that is targeted by a BackendTLSPolicy must successfully complete TLS termination",
-	Features: []features.SupportedFeature{
+	Features: []features.FeatureName{
 		features.SupportGateway,
 		features.SupportBackendTLSPolicy,
 	},
@@ -55,10 +55,10 @@ var BackendTLSPolicy = suite.ConformanceTest{
 					Request: http.Request{
 						Path: "/backendTLS",
 					},
-					Response:  http.Response{StatusCode: 200},
-					Backend:   "infra-backend-v1",
-					Namespace: "gateway-conformance-infra",
-					SNI:       "abc.example.com",
+					Response:   http.Response{StatusCode: 200},
+					Backend:    "infra-backend-v1",
+					Namespace:  "gateway-conformance-infra",
+					ServerName: "abc.example.com",
 				})
 		})
 	},
