@@ -37,11 +37,11 @@ release.
 
 The following steps must be done by one of the [Gateway API maintainers][gateway-api-team]:
 
-For a **PATCH** release:
+#### For a **PATCH** release:
 - Create a new branch in your fork named something like `<githubuser>/release-x.x.x`. Use the new branch
   in the upcoming steps.
 - Use `git` to cherry-pick all relevant PRs into your branch.
-- Update `pkg/generator/main.go` with the new semver tag and any updates to the API review URL.
+- Update `pkg/consts/consts.go` with the new semver tag and any updates to the API review URL.
 - Run the following command `BASE_REF=vmajor.minor.patch make generate` which
   will update generated docs with the correct version info. (Note that you can't
   test with these YAMLs yet as they contain references to elements which wont
@@ -56,10 +56,10 @@ For a **PATCH** release:
   Attach these files to the GitHub release.
 - Update the `README.md` and `site-src/guides/index.md` files to point links and examples to the new release.
 
-For a **MAJOR** or **MINOR** release:
+#### For a **MAJOR** or **MINOR** release:
 - Cut a `release-major.minor` branch that we can tag things in as needed.
 - Check out the `release-major.minor` release branch locally.
-- Update `pkg/generator/main.go` with the new semver tag and any updates to the API review URL.
+- Update `pkg/consts/consts.go` with the new semver tag and any updates to the API review URL.
 - Run the following command `BASE_REF=vmajor.minor.patch make generate` which
   will update generated docs with the correct version info. (Note that you can't
   test with these YAMLs yet as they contain references to elements which wont
@@ -70,10 +70,11 @@ For a **MAJOR** or **MINOR** release:
 - Run the `make build-install-yaml` command which will generate install files in the `release/` directory.
   Attach these files to the GitHub release.
 - Update the `README.md` and `site-src/guides/index.md` files to point links and examples to the new release.
-- Update the implementation table path (`nav.Implementations.Comparison`) in the nav of `mkdocs.yml` to point to the latest release file (for example Implementation Comparison points to `implmenetation-table-v1.1.0.md`). Add the now past version under `Past Version Comparisons`, and edit the text blurb in `mkdocs-generate-conformance.py` to also reflect the added past version.  
-For an **RC** release:
-- Update `pkg/generator/main.go` with the new semver tag and any updates to the API review URL.
-- Run the following command `BASE_REF=vmajor.minor.patch make generate` which
+- Update the implementation table path (`nav.Implementations.Comparison`) in the nav of `mkdocs.yml` to point to the latest release file (for example Implementation Comparison points to `implmenetation-table-v1.1.0.md`). Add the now past version under `Past Version Comparisons`, and edit the text blurb in `mkdocs-generate-conformance.py` to also reflect the added past version.
+
+#### For an **RC** release:
+- Update `pkg/consts/consts.go` with the new semver tag (like `v1.2.0-rc1`) and any updates to the API review URL.
+- Run the following command `make generate` which
   will update generated docs with the correct version info. (Note that you can't
   test with these YAMLs yet as they contain references to elements which wont
   exist until the tag is cut and image is promoted to production registry.)
