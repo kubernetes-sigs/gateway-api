@@ -56,6 +56,10 @@ type TimeoutConfig struct {
 	// Max value for conformant implementation: None
 	GWCMustBeAccepted time.Duration
 
+	// GWCMustBeSupportedVersion represents the maximum time for a GatewayClass to have a SupportedVersion condition set to true.
+	// Max value for conformant implementation: None
+	GWCMustBeSupportedVersion time.Duration
+
 	// HTTPRouteMustNotHaveParents represents the maximum time for an HTTPRoute to have either no parents or a single parent that is not accepted.
 	// Max value for conformant implementation: None
 	HTTPRouteMustNotHaveParents time.Duration
@@ -115,6 +119,7 @@ func DefaultTimeoutConfig() TimeoutConfig {
 		GatewayStatusMustHaveListeners:     60 * time.Second,
 		GatewayListenersMustHaveConditions: 60 * time.Second,
 		GWCMustBeAccepted:                  180 * time.Second,
+		GWCMustBeSupportedVersion:          180 * time.Second,
 		HTTPRouteMustNotHaveParents:        60 * time.Second,
 		HTTPRouteMustHaveCondition:         60 * time.Second,
 		TLSRouteMustHaveCondition:          60 * time.Second,
@@ -154,6 +159,9 @@ func SetupTimeoutConfig(timeoutConfig *TimeoutConfig) {
 	}
 	if timeoutConfig.GWCMustBeAccepted == 0 {
 		timeoutConfig.GWCMustBeAccepted = defaultTimeoutConfig.GWCMustBeAccepted
+	}
+	if timeoutConfig.GWCMustBeSupportedVersion == 0 {
+		timeoutConfig.GWCMustBeSupportedVersion = defaultTimeoutConfig.GWCMustBeSupportedVersion
 	}
 	if timeoutConfig.HTTPRouteMustNotHaveParents == 0 {
 		timeoutConfig.HTTPRouteMustNotHaveParents = defaultTimeoutConfig.HTTPRouteMustNotHaveParents
