@@ -211,7 +211,7 @@ The following example uses the `weight` field to forward 90% of gRPC requests to
 Service:
 
 ```yaml
-{% include 'experimental/traffic-splitting/grpc-traffic-split-2.yaml' %}
+{% include 'standard/traffic-splitting/grpc-traffic-split-2.yaml' %}
 ```
 
 Reference the [backendRef][backendRef] API documentation for additional details
