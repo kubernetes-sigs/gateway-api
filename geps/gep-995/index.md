@@ -41,19 +41,10 @@ This GEP proposes to add a new optional `name` field to the [GRPCRouteRule](http
 
 ### Format
 
-The name of a route rule, if present, MUST be a string that begins with a single lowercase letter (`a-z`) and is followed by any number of characters, from 0 to a maximum of 252, that is either a letter, a digit, or any of the following symbols `-`, `_`. The value of the `name` field MUST be treated as case-sensitive.
-
-A simple regular expression that can be used to test a string conforms with the format of the `name` field for route rules, compatible with Golang's [`regexp`](https://pkg.go.dev/regexp) package, is: `^[a-z][-_a-zA-Z0-9]{0,252}$`. (Provided as example)
-
-A set of [kubebuilder](https://book.kubebuilder.io/reference/markers/crd-validation) annotations for the validation of patterns compatible with the `name` field, to be used in CRDs, is: (Provided as example)
-
-```yaml
-// +kubebuilder:validation:Pattern=`^[a-z][-_a-zA-Z0-9]*$`
-// +kubebuilder:validation:MinLength=1
-// +kubebuilder:validation:MaxLength=253
-```
-
-This format for the `name` field of route rules differs from the pattern adopted for the [`SectionName`](https://github.com/kubernetes-sigs/gateway-api/blob/f544a46ef92b7f234ee3e7bf50da35b05f862c35/apis/v1/shared_types.go#L624C10-L624C10) type, which was thought for specifying mainly DNS subdomain names ([RFC 1123](https://www.rfc-editor.org/rfc/rfc1123)), due to its use in the gateway listeners originally.
+If specified, the name of a route rule MUST comply with the [`SectionName`](https://github.com/kubernetes-sigs/gateway-api/blob/v1.0.0/apis/v1/shared_types.go#L607-L624) type:
+- starts and ends with a lower case Latin letter (`a-z`) or digit (`0-9`);
+- accepts any lower case Latin letter (`a-z`), digits (`0-9`), and the following special characters: `-`, `.`;
+- contains a minimum of 1 and maximum of 253 characters.
 
 ### Volition
 
