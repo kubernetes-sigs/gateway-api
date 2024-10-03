@@ -49,7 +49,7 @@ func TestGetAPIVersionAndChannel(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "gateways.gateway.networking.k8s.io",
 						Annotations: map[string]string{
-							consts.BundleVersionAnnotation: "v1.2.0-rc2",
+							consts.BundleVersionAnnotation: "v1.2.0",
 							consts.ChannelAnnotation:       "standard",
 						},
 					},
@@ -58,13 +58,13 @@ func TestGetAPIVersionAndChannel(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "httproutes.gateway.networking.k8s.io",
 						Annotations: map[string]string{
-							consts.BundleVersionAnnotation: "v1.2.0-rc2",
+							consts.BundleVersionAnnotation: "v1.2.0",
 							consts.ChannelAnnotation:       "standard",
 						},
 					},
 				},
 			},
-			expectedVersion: "v1.2.0-rc2",
+			expectedVersion: "v1.2.0",
 			expectedChannel: "standard",
 		},
 		{
@@ -74,7 +74,7 @@ func TestGetAPIVersionAndChannel(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "gateways.gateway.networking.k8s.io",
 						Annotations: map[string]string{
-							consts.BundleVersionAnnotation: "v1.2.0-rc2",
+							consts.BundleVersionAnnotation: "v1.2.0",
 							consts.ChannelAnnotation:       "standard",
 						},
 					},
@@ -83,7 +83,7 @@ func TestGetAPIVersionAndChannel(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "httproutes.gateway.networking.k8s.io",
 						Annotations: map[string]string{
-							consts.BundleVersionAnnotation: "v1.2.0-rc2",
+							consts.BundleVersionAnnotation: "v1.2.0",
 							consts.ChannelAnnotation:       "standard",
 						},
 					},
@@ -94,7 +94,7 @@ func TestGetAPIVersionAndChannel(t *testing.T) {
 					},
 				},
 			},
-			expectedVersion: "v1.2.0-rc2",
+			expectedVersion: "v1.2.0",
 			expectedChannel: "standard",
 		},
 		{
@@ -104,7 +104,7 @@ func TestGetAPIVersionAndChannel(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "gateways.gateway.networking.k8s.io",
 						Annotations: map[string]string{
-							consts.BundleVersionAnnotation: "v1.2.0-rc2",
+							consts.BundleVersionAnnotation: "v1.2.0",
 							consts.ChannelAnnotation:       "standard",
 						},
 					},
@@ -128,7 +128,7 @@ func TestGetAPIVersionAndChannel(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "gateways.gateway.networking.k8s.io",
 						Annotations: map[string]string{
-							consts.BundleVersionAnnotation: "v1.2.0-rc2",
+							consts.BundleVersionAnnotation: "v1.2.0",
 							consts.ChannelAnnotation:       "standard",
 						},
 					},
@@ -137,7 +137,7 @@ func TestGetAPIVersionAndChannel(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "httproutes.gateway.networking.k8s.io",
 						Annotations: map[string]string{
-							consts.BundleVersionAnnotation: "v1.2.0-rc2",
+							consts.BundleVersionAnnotation: "v1.2.0",
 							consts.ChannelAnnotation:       "experimental",
 						},
 					},
@@ -152,7 +152,7 @@ func TestGetAPIVersionAndChannel(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "gateways.gateway.networking.k8s.io",
 						Annotations: map[string]string{
-							consts.BundleVersionAnnotation: "v1.2.0-rc2",
+							consts.BundleVersionAnnotation: "v1.2.0",
 							consts.ChannelAnnotation:       "standard",
 						},
 					},
@@ -161,7 +161,7 @@ func TestGetAPIVersionAndChannel(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "httproutes.gateway.networking.k8s.io",
 						Annotations: map[string]string{
-							consts.BundleVersionAnnotation: "v1.2.0-rc2",
+							consts.BundleVersionAnnotation: "v1.2.0",
 						},
 					},
 				},
