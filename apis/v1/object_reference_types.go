@@ -27,6 +27,7 @@ package v1
 type LocalObjectReference struct {
 	// Group is the group of the referent. For example, "gateway.networking.k8s.io".
 	// When unspecified or empty string, core API group is inferred.
+	// +optional
 	Group Group `json:"group"`
 
 	// Kind is kind of the referent. For example "HTTPRoute" or "Service".
