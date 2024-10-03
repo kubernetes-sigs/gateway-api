@@ -31,5 +31,5 @@ const (
 
 	// ApprovalLink is the value used for the "api-approved.kubernetes.io" annotation.
 	// These value must be updated during the release process.
-	ApprovalLink = "https://github.com/kubernetes-sigs/gateway-api/pull/2997"
+	ApprovalLink = "https://github.com/kubernetes-sigs/gateway-api/pull/3328"
 )
