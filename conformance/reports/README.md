@@ -113,7 +113,9 @@ comply with the following rules:
     can be an email address or a support URL (e.g. Github new issue page).
   - `url`: it must be a valid url for a GitHub repository, or any other website with
     information related to the project.
-  - `version`: it must be a semver.
+  - `version`: it must be a snapshot of the project, which means it can be a commit,
+    a tag, a release, or any other means of specifying a version. It can't be a
+    branch name.
 - `gatewayAPIVersion`: it must contain the version of the Gateway API used to run
   the conformance tests.
 - `gatewayAPIChannel`: it must contain the channel of the Gateway API used to run
