@@ -1,8 +1,8 @@
 # Backend Protocol
 
-??? example "Experimental Channel since v1.0.0"
+??? success "Standard Channel since v1.2.0"
 
-    This concept has been part of the Experimental Channel since `v1.0.0`.
+    This concept has been part of the Standard Channel since `v1.2.0`.
     For more information on release channels, refer to our
     [versioning guide](/concepts/versioning).
 
