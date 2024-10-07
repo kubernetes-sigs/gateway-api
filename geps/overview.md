@@ -188,7 +188,7 @@ maintainers.
 
 ### 5. Graduate the GEP to "Standard"
 
-Once this feature has met the [graduation criteria](/concepts/versioning/#graduation-criteria), it is
+Once this feature has met the [graduation criteria](/site-src/concepts/versioning.md#graduation-criteria), it is
 time to graduate it to the "Standard" channel of the API. Depending on the feature, this may include
 any of the following:
 
