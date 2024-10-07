@@ -77,9 +77,24 @@ func GWCMustHaveAcceptedConditionTrue(t *testing.T, c client.Client, timeoutConf
 	return gwcMustBeAccepted(t, c, timeoutConfig, gwcName, string(metav1.ConditionTrue))
 }
 
+// GWCMustHaveSupportedVersionConditionTrue waits until the specified GatewayClass has a SupportedVersion condition set with a status value equal to True.
+func GWCMustHaveSupportedVersionConditionTrue(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, gwcName string) string {
+	return gwcMustBeSupportedVersion(t, c, timeoutConfig, gwcName, string(metav1.ConditionTrue))
+}
+
+// GWCMustHaveSupportedVersionConditionFalse waits until the specified GatewayClass has a SupportedVersion condition set with a status value equal to False.
+func GWCMustHaveSupportedVersionConditionFalse(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, gwcName string) string {
+	return gwcMustBeSupportedVersion(t, c, timeoutConfig, gwcName, string(metav1.ConditionFalse))
+}
+
 // GWCMustHaveAcceptedConditionAny waits until the specified GatewayClass has an Accepted condition set with a status set to any value.
 func GWCMustHaveAcceptedConditionAny(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, gwcName string) string {
 	return gwcMustBeAccepted(t, c, timeoutConfig, gwcName, "")
+}
+
+// GWCMustHaveSupportedVersionConditionAny waits until the specified GatewayClass has a SupportedVersion condition set to any value.
+func GWCMustHaveSupportedVersionConditionAny(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, gwcName string) string {
+	return gwcMustBeSupportedVersion(t, c, timeoutConfig, gwcName, "")
 }
 
 // gwcMustBeAccepted waits until the specified GatewayClass has an Accepted
@@ -108,6 +123,35 @@ func gwcMustBeAccepted(t *testing.T, c client.Client, timeoutConfig config.Timeo
 		return findConditionInList(t, gwc.Status.Conditions, "Accepted", expectedStatus, ""), nil
 	})
 	require.NoErrorf(t, waitErr, "error waiting for %s GatewayClass to have Accepted condition to be set: %v", gwcName, waitErr)
+
+	return controllerName
+}
+
+// gwcMustBeSupportedVersion waits until the specified GatewayClass has a SupportedVersion condition set.
+// Passing an empty status string means that any value will be accepted. It also returns the ControllerName
+// for the GatewayClass. This will cause the test to halt if the specified timeout is exceeded.
+func gwcMustBeSupportedVersion(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, gwcName, expectedStatus string) string {
+	t.Helper()
+
+	var controllerName string
+	waitErr := wait.PollUntilContextTimeout(context.Background(), 1*time.Second, timeoutConfig.GWCMustBeSupportedVersion, true, func(ctx context.Context) (bool, error) {
+		gwc := &gatewayv1.GatewayClass{}
+		err := c.Get(ctx, types.NamespacedName{Name: gwcName}, gwc)
+		if err != nil {
+			return false, fmt.Errorf("error fetching GatewayClass: %w", err)
+		}
+
+		controllerName = string(gwc.Spec.ControllerName)
+
+		if err := ConditionsHaveLatestObservedGeneration(gwc, gwc.Status.Conditions); err != nil {
+			tlog.Log(t, "GatewayClass", err)
+			return false, nil
+		}
+
+		// Passing an empty string as the Reason means that any Reason will do.
+		return findConditionInList(t, gwc.Status.Conditions, "SupportedVersion", expectedStatus, ""), nil
+	})
+	require.NoErrorf(t, waitErr, "error waiting for %s GatewayClass to have SupportedVersion condition to be set: %v", gwcName, waitErr)
 
 	return controllerName
 }
@@ -247,6 +291,52 @@ func NamespacesMustBeReady(t *testing.T, c client.Client, timeoutConfig config.T
 		return true, nil
 	})
 	require.NoErrorf(t, waitErr, "error waiting for %s namespaces to be ready", strings.Join(namespaces, ", "))
+}
+
+// GatewayClassMustHaveCondition checks that the supplied GatewayClass has the supplied Condition,
+// halting after the specified timeout is exceeded.
+func GatewayClassMustHaveCondition(
+	t *testing.T,
+	client client.Client,
+	timeoutConfig config.TimeoutConfig,
+	gcName string,
+	expectedCondition metav1.Condition,
+) {
+	t.Helper()
+
+	waitErr := wait.PollUntilContextTimeout(
+		context.Background(),
+		1*time.Second,
+		timeoutConfig.GWCMustBeSupportedVersion,
+		true,
+		func(ctx context.Context) (bool, error) {
+			gc := &gatewayv1.GatewayClass{}
+			gcNN := types.NamespacedName{
+				Name: gcName,
+			}
+			err := client.Get(ctx, gcNN, gc)
+			if err != nil {
+				return false, fmt.Errorf("error fetching GatewayClass: %w", err)
+			}
+
+			if err := ConditionsHaveLatestObservedGeneration(gc, gc.Status.Conditions); err != nil {
+				return false, err
+			}
+
+			if findConditionInList(t,
+				gc.Status.Conditions,
+				expectedCondition.Type,
+				string(expectedCondition.Status),
+				expectedCondition.Reason,
+			) {
+				return true, nil
+			}
+
+			return false, nil
+		},
+	)
+
+	require.NoErrorf(t, waitErr, "error waiting for GatewayClass status to have a Condition matching expectations")
 }
 
 // GatewayMustHaveCondition checks that the supplied Gateway has the supplied Condition,
