@@ -20,11 +20,10 @@ package v1alpha2
 
 import (
 	v1 "sigs.k8s.io/gateway-api/apis/applyconfiguration/apis/v1"
-
 	apisv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
-// TLSRouteSpecApplyConfiguration represents an declarative configuration of the TLSRouteSpec type for use
+// TLSRouteSpecApplyConfiguration represents a declarative configuration of the TLSRouteSpec type for use
 // with apply.
 type TLSRouteSpecApplyConfiguration struct {
 	v1.CommonRouteSpecApplyConfiguration `json:",inline"`
@@ -32,7 +31,7 @@ type TLSRouteSpecApplyConfiguration struct {
 	Rules                                []TLSRouteRuleApplyConfiguration `json:"rules,omitempty"`
 }
 
-// TLSRouteSpecApplyConfiguration constructs an declarative configuration of the TLSRouteSpec type for use with
+// TLSRouteSpecApplyConfiguration constructs a declarative configuration of the TLSRouteSpec type for use with
 // apply.
 func TLSRouteSpec() *TLSRouteSpecApplyConfiguration {
 	return &TLSRouteSpecApplyConfiguration{}

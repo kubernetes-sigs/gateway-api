@@ -39,6 +39,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"k8s.io/apimachinery/pkg/apis/meta/v1.CreateOptions":                              schema_pkg_apis_meta_v1_CreateOptions(ref),
 		"k8s.io/apimachinery/pkg/apis/meta/v1.DeleteOptions":                              schema_pkg_apis_meta_v1_DeleteOptions(ref),
 		"k8s.io/apimachinery/pkg/apis/meta/v1.Duration":                                   schema_pkg_apis_meta_v1_Duration(ref),
+		"k8s.io/apimachinery/pkg/apis/meta/v1.FieldSelectorRequirement":                   schema_pkg_apis_meta_v1_FieldSelectorRequirement(ref),
 		"k8s.io/apimachinery/pkg/apis/meta/v1.FieldsV1":                                   schema_pkg_apis_meta_v1_FieldsV1(ref),
 		"k8s.io/apimachinery/pkg/apis/meta/v1.GetOptions":                                 schema_pkg_apis_meta_v1_GetOptions(ref),
 		"k8s.io/apimachinery/pkg/apis/meta/v1.GroupKind":                                  schema_pkg_apis_meta_v1_GroupKind(ref),
@@ -86,6 +87,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"sigs.k8s.io/gateway-api/apis/v1.BackendRef":                                      schema_sigsk8sio_gateway_api_apis_v1_BackendRef(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.CommonRouteSpec":                                 schema_sigsk8sio_gateway_api_apis_v1_CommonRouteSpec(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.CookieConfig":                                    schema_sigsk8sio_gateway_api_apis_v1_CookieConfig(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.Fraction":                                        schema_sigsk8sio_gateway_api_apis_v1_Fraction(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.FrontendTLSValidation":                           schema_sigsk8sio_gateway_api_apis_v1_FrontendTLSValidation(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.GRPCBackendRef":                                  schema_sigsk8sio_gateway_api_apis_v1_GRPCBackendRef(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.GRPCHeaderMatch":                                 schema_sigsk8sio_gateway_api_apis_v1_GRPCHeaderMatch(ref),
@@ -99,6 +101,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"sigs.k8s.io/gateway-api/apis/v1.GRPCRouteStatus":                                 schema_sigsk8sio_gateway_api_apis_v1_GRPCRouteStatus(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.Gateway":                                         schema_sigsk8sio_gateway_api_apis_v1_Gateway(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.GatewayAddress":                                  schema_sigsk8sio_gateway_api_apis_v1_GatewayAddress(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.GatewayBackendTLS":                               schema_sigsk8sio_gateway_api_apis_v1_GatewayBackendTLS(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.GatewayClass":                                    schema_sigsk8sio_gateway_api_apis_v1_GatewayClass(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.GatewayClassList":                                schema_sigsk8sio_gateway_api_apis_v1_GatewayClassList(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.GatewayClassSpec":                                schema_sigsk8sio_gateway_api_apis_v1_GatewayClassSpec(ref),
@@ -122,6 +125,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"sigs.k8s.io/gateway-api/apis/v1.HTTPRouteFilter":                                 schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteFilter(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.HTTPRouteList":                                   schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteList(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.HTTPRouteMatch":                                  schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteMatch(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.HTTPRouteRetry":                                  schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteRetry(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.HTTPRouteRule":                                   schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteRule(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.HTTPRouteSpec":                                   schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteSpec(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.HTTPRouteStatus":                                 schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteStatus(ref),
@@ -140,6 +144,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"sigs.k8s.io/gateway-api/apis/v1.RouteStatus":                                     schema_sigsk8sio_gateway_api_apis_v1_RouteStatus(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.SecretObjectReference":                           schema_sigsk8sio_gateway_api_apis_v1_SecretObjectReference(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.SessionPersistence":                              schema_sigsk8sio_gateway_api_apis_v1_SessionPersistence(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.SupportedFeature":                                schema_sigsk8sio_gateway_api_apis_v1_SupportedFeature(ref),
 		"sigs.k8s.io/gateway-api/apis/v1alpha2.BackendLBPolicy":                           schema_sigsk8sio_gateway_api_apis_v1alpha2_BackendLBPolicy(ref),
 		"sigs.k8s.io/gateway-api/apis/v1alpha2.BackendLBPolicyList":                       schema_sigsk8sio_gateway_api_apis_v1alpha2_BackendLBPolicyList(ref),
 		"sigs.k8s.io/gateway-api/apis/v1alpha2.BackendLBPolicySpec":                       schema_sigsk8sio_gateway_api_apis_v1alpha2_BackendLBPolicySpec(ref),
@@ -171,6 +176,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"sigs.k8s.io/gateway-api/apis/v1alpha3.BackendTLSPolicyList":                      schema_sigsk8sio_gateway_api_apis_v1alpha3_BackendTLSPolicyList(ref),
 		"sigs.k8s.io/gateway-api/apis/v1alpha3.BackendTLSPolicySpec":                      schema_sigsk8sio_gateway_api_apis_v1alpha3_BackendTLSPolicySpec(ref),
 		"sigs.k8s.io/gateway-api/apis/v1alpha3.BackendTLSPolicyValidation":                schema_sigsk8sio_gateway_api_apis_v1alpha3_BackendTLSPolicyValidation(ref),
+		"sigs.k8s.io/gateway-api/apis/v1alpha3.SubjectAltName":                            schema_sigsk8sio_gateway_api_apis_v1alpha3_SubjectAltName(ref),
 		"sigs.k8s.io/gateway-api/apis/v1beta1.Gateway":                                    schema_sigsk8sio_gateway_api_apis_v1beta1_Gateway(ref),
 		"sigs.k8s.io/gateway-api/apis/v1beta1.GatewayClass":                               schema_sigsk8sio_gateway_api_apis_v1beta1_GatewayClass(ref),
 		"sigs.k8s.io/gateway-api/apis/v1beta1.GatewayClassList":                           schema_sigsk8sio_gateway_api_apis_v1beta1_GatewayClassList(ref),
@@ -834,6 +840,56 @@ func schema_pkg_apis_meta_v1_Duration(ref common.ReferenceCallback) common.OpenA
 				Description: "Duration is a wrapper around time.Duration which supports correct marshaling to YAML and JSON. In particular, it marshals into strings, which can be used as map keys in json.",
 				Type:        v1.Duration{}.OpenAPISchemaType(),
 				Format:      v1.Duration{}.OpenAPISchemaFormat(),
+			},
+		},
+	}
+}
+
+func schema_pkg_apis_meta_v1_FieldSelectorRequirement(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "FieldSelectorRequirement is a selector that contains values, a key, and an operator that relates the key and values.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"key": {
+						SchemaProps: spec.SchemaProps{
+							Description: "key is the field selector key that the requirement applies to.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"operator": {
+						SchemaProps: spec.SchemaProps{
+							Description: "operator represents a key's relationship to a set of values. Valid operators are In, NotIn, Exists, DoesNotExist. The list of operators may grow in the future.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"values": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-type": "atomic",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "values is an array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: "",
+										Type:    []string{"string"},
+										Format:  "",
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"key", "operator"},
 			},
 		},
 	}
@@ -2915,6 +2971,32 @@ func schema_sigsk8sio_gateway_api_apis_v1_CookieConfig(ref common.ReferenceCallb
 	}
 }
 
+func schema_sigsk8sio_gateway_api_apis_v1_Fraction(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Type: []string{"object"},
+				Properties: map[string]spec.Schema{
+					"numerator": {
+						SchemaProps: spec.SchemaProps{
+							Default: 0,
+							Type:    []string{"integer"},
+							Format:  "int32",
+						},
+					},
+					"denominator": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"integer"},
+							Format: "int32",
+						},
+					},
+				},
+				Required: []string{"numerator"},
+			},
+		},
+	}
+}
+
 func schema_sigsk8sio_gateway_api_apis_v1_FrontendTLSValidation(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -3166,7 +3248,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GRPCRouteFilter(ref common.ReferenceCa
 					},
 					"requestMirror": {
 						SchemaProps: spec.SchemaProps{
-							Description: "RequestMirror defines a schema for a filter that mirrors requests. Requests are sent to the specified destination, but responses from that destination are ignored.\n\nThis filter can be used multiple times within the same rule. Note that not all implementations will be able to support mirroring to multiple backends.\n\nSupport: Extended",
+							Description: "RequestMirror defines a schema for a filter that mirrors requests. Requests are sent to the specified destination, but responses from that destination are ignored.\n\nThis filter can be used multiple times within the same rule. Note that not all implementations will be able to support mirroring to multiple backends.\n\nSupport: Extended\n\n\n<gateway:experimental:validation:XValidation:message=\"Only one of percent or fraction may be specified in HTTPRequestMirrorFilter\",rule=\"!(has(self.percent) && has(self.fraction))\">",
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.HTTPRequestMirrorFilter"),
 						},
 					},
@@ -3284,6 +3366,13 @@ func schema_sigsk8sio_gateway_api_apis_v1_GRPCRouteRule(ref common.ReferenceCall
 				Description: "GRPCRouteRule defines the semantics for matching a gRPC request based on conditions (matches), processing it (filters), and forwarding the request to an API object (backendRefs).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
+					"name": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Name is the name of the route rule. This name MUST be unique within a Route if it is set.\n\nSupport: Extended <gateway:experimental>",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
 					"matches": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Matches define conditions used for matching the rule against incoming gRPC requests. Each match is independent, i.e. this rule will be matched if **any** one of the matches is satisfied.\n\nFor example, take the following matches configuration:\n\n``` matches: - method:\n    service: foo.bar\n  headers:\n    values:\n      version: 2\n- method:\n    service: foo.bar.v2\n```\n\nFor a request to match against this rule, it MUST satisfy EITHER of the two conditions:\n\n- service of foo.bar AND contains the header `version: 2` - service of foo.bar.v2\n\nSee the documentation for GRPCRouteMatch on how to specify multiple match conditions to be ANDed together.\n\nIf no matches are specified, the implementation MUST match every gRPC request.\n\nProxy or Load Balancer routing configuration generated from GRPCRoutes MUST prioritize rules based on the following criteria, continuing on ties. Merging MUST not be done between GRPCRoutes and HTTPRoutes. Precedence MUST be given to the rule with the largest number of:\n\n* Characters in a matching non-wildcard hostname. * Characters in a matching hostname. * Characters in a matching service. * Characters in a matching method. * Header matches.\n\nIf ties still exist across multiple Routes, matching precedence MUST be determined in order of the following criteria, continuing on ties:\n\n* The oldest Route based on creation timestamp. * The Route appearing first in alphabetical order by\n  \"{namespace}/{name}\".\n\nIf ties still exist within the Route that has been given precedence, matching precedence MUST be granted to the first matching rule meeting the above criteria.",
@@ -3378,7 +3467,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GRPCRouteSpec(ref common.ReferenceCall
 					},
 					"rules": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Rules are a list of GRPC matchers, filters and actions.",
+							Description: "Rules are a list of GRPC matchers, filters and actions.\n\n<gateway:experimental:validation:XValidation:message=\"Rule name must be unique within the route\",rule=\"self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name) && l1.name == l2.name))\">",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -3504,6 +3593,27 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewayAddress(ref common.ReferenceCal
 				Required: []string{"value"},
 			},
 		},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apis_v1_GatewayBackendTLS(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "GatewayBackendTLS describes backend TLS configuration for gateway.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"clientCertificateRef": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ClientCertificateRef is a reference to an object that contains a Client Certificate and the associated private key.\n\nReferences to a resource in different namespace are invalid UNLESS there is a ReferenceGrant in the target namespace that allows the certificate to be attached. If a ReferenceGrant does not allow this reference, the \"ResolvedRefs\" condition MUST be set to False for this listener with the \"RefNotPermitted\" reason.\n\nClientCertificateRef can reference to standard Kubernetes resources, i.e. Secret, or implementation-specific custom resources.\n\nThis setting can be overridden on the service level by use of BackendTLSPolicy.\n\nSupport: Core\n\n<gateway:experimental>",
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.SecretObjectReference"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"sigs.k8s.io/gateway-api/apis/v1.SecretObjectReference"},
 	}
 }
 
@@ -3675,18 +3785,20 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewayClassStatus(ref common.Referenc
 					"supportedFeatures": {
 						VendorExtensible: spec.VendorExtensible{
 							Extensions: spec.Extensions{
-								"x-kubernetes-list-type": "set",
+								"x-kubernetes-list-map-keys": []interface{}{
+									"name",
+								},
+								"x-kubernetes-list-type": "map",
 							},
 						},
 						SchemaProps: spec.SchemaProps{
-							Description: "SupportedFeatures is the set of features the GatewayClass support. It MUST be sorted in ascending alphabetical order. <gateway:experimental>",
+							Description: "SupportedFeatures is the set of features the GatewayClass support. It MUST be sorted in ascending alphabetical order by the Name key. <gateway:experimental>",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: "",
-										Type:    []string{"string"},
-										Format:  "",
+										Default: map[string]interface{}{},
+										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.SupportedFeature"),
 									},
 								},
 							},
@@ -3696,7 +3808,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewayClassStatus(ref common.Referenc
 			},
 		},
 		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.Condition"},
+			"k8s.io/apimachinery/pkg/apis/meta/v1.Condition", "sigs.k8s.io/gateway-api/apis/v1.SupportedFeature"},
 	}
 }
 
@@ -3709,7 +3821,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewayInfrastructure(ref common.Refer
 				Properties: map[string]spec.Schema{
 					"labels": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Labels that SHOULD be applied to any resources created in response to this Gateway.\n\nFor implementations creating other Kubernetes objects, this should be the `metadata.labels` field on resources. For other implementations, this refers to any relevant (implementation specific) \"labels\" concepts.\n\nAn implementation may chose to add additional implementation-specific labels as they see fit.\n\nSupport: Extended",
+							Description: "Labels that SHOULD be applied to any resources created in response to this Gateway.\n\nFor implementations creating other Kubernetes objects, this should be the `metadata.labels` field on resources. For other implementations, this refers to any relevant (implementation specific) \"labels\" concepts.\n\nAn implementation may chose to add additional implementation-specific labels as they see fit.\n\nIf an implementation maps these labels to Pods, or any other resource that would need to be recreated when labels change, it SHOULD clearly warn about this behavior in documentation.\n\nSupport: Extended",
 							Type:        []string{"object"},
 							AdditionalProperties: &spec.SchemaOrBool{
 								Allows: true,
@@ -3855,8 +3967,14 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewaySpec(ref common.ReferenceCallba
 					},
 					"infrastructure": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Infrastructure defines infrastructure level attributes about this Gateway instance.\n\nSupport: Core\n\n<gateway:experimental>",
+							Description: "Infrastructure defines infrastructure level attributes about this Gateway instance.\n\nSupport: Extended",
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.GatewayInfrastructure"),
+						},
+					},
+					"backendTLS": {
+						SchemaProps: spec.SchemaProps{
+							Description: "BackendTLS configures TLS settings for when this Gateway is connecting to backends with TLS.\n\nSupport: Core\n\n<gateway:experimental>",
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.GatewayBackendTLS"),
 						},
 					},
 				},
@@ -3864,7 +3982,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewaySpec(ref common.ReferenceCallba
 			},
 		},
 		Dependencies: []string{
-			"sigs.k8s.io/gateway-api/apis/v1.GatewayAddress", "sigs.k8s.io/gateway-api/apis/v1.GatewayInfrastructure", "sigs.k8s.io/gateway-api/apis/v1.Listener"},
+			"sigs.k8s.io/gateway-api/apis/v1.GatewayAddress", "sigs.k8s.io/gateway-api/apis/v1.GatewayBackendTLS", "sigs.k8s.io/gateway-api/apis/v1.GatewayInfrastructure", "sigs.k8s.io/gateway-api/apis/v1.Listener"},
 	}
 }
 
@@ -4361,12 +4479,25 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRequestMirrorFilter(ref common.Ref
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.BackendObjectReference"),
 						},
 					},
+					"percent": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Percent represents the percentage of requests that should be mirrored to BackendRef. Its minimum value is 0 (indicating 0% of requests) and its maximum value is 100 (indicating 100% of requests).\n\nOnly one of Fraction or Percent may be specified. If neither field is specified, 100% of requests will be mirrored.\n\n<gateway:experimental>",
+							Type:        []string{"integer"},
+							Format:      "int32",
+						},
+					},
+					"fraction": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Fraction represents the fraction of requests that should be mirrored to BackendRef.\n\nOnly one of Fraction or Percent may be specified. If neither field is specified, 100% of requests will be mirrored.\n\n<gateway:experimental>",
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.Fraction"),
+						},
+					},
 				},
 				Required: []string{"backendRef"},
 			},
 		},
 		Dependencies: []string{
-			"sigs.k8s.io/gateway-api/apis/v1.BackendObjectReference"},
+			"sigs.k8s.io/gateway-api/apis/v1.BackendObjectReference", "sigs.k8s.io/gateway-api/apis/v1.Fraction"},
 	}
 }
 
@@ -4498,7 +4629,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteFilter(ref common.ReferenceCa
 					},
 					"requestMirror": {
 						SchemaProps: spec.SchemaProps{
-							Description: "RequestMirror defines a schema for a filter that mirrors requests. Requests are sent to the specified destination, but responses from that destination are ignored.\n\nThis filter can be used multiple times within the same rule. Note that not all implementations will be able to support mirroring to multiple backends.\n\nSupport: Extended",
+							Description: "RequestMirror defines a schema for a filter that mirrors requests. Requests are sent to the specified destination, but responses from that destination are ignored.\n\nThis filter can be used multiple times within the same rule. Note that not all implementations will be able to support mirroring to multiple backends.\n\nSupport: Extended\n\n\n<gateway:experimental:validation:XValidation:message=\"Only one of percent or fraction may be specified in HTTPRequestMirrorFilter\",rule=\"!(has(self.percent) && has(self.fraction))\">",
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.HTTPRequestMirrorFilter"),
 						},
 					},
@@ -4650,6 +4781,48 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteMatch(ref common.ReferenceCal
 	}
 }
 
+func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteRetry(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "HTTPRouteRetry defines retry configuration for an HTTPRoute.\n\nImplementations SHOULD retry on connection errors (disconnect, reset, timeout, TCP failure) if a retry stanza is configured.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"codes": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Codes defines the HTTP response status codes for which a backend request should be retried.\n\nSupport: Extended",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: 0,
+										Type:    []string{"integer"},
+										Format:  "int32",
+									},
+								},
+							},
+						},
+					},
+					"attempts": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Attempts specifies the maximum number of times an individual request from the gateway to a backend should be retried.\n\nIf the maximum number of retries has been attempted without a successful response from the backend, the Gateway MUST return an error.\n\nWhen this field is unspecified, the number of times to attempt to retry a backend request is implementation-specific.\n\nSupport: Extended",
+							Type:        []string{"integer"},
+							Format:      "int32",
+						},
+					},
+					"backoff": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Backoff specifies the minimum duration a Gateway should wait between retry attempts and is represented in Gateway API Duration formatting.\n\nFor example, setting the `rules[].retry.backoff` field to the value `100ms` will cause a backend request to first be retried approximately 100 milliseconds after timing out or receiving a response code configured to be retryable.\n\nAn implementation MAY use an exponential or alternative backoff strategy for subsequent retry attempts, MAY cap the maximum backoff duration to some amount greater than the specified minimum, and MAY add arbitrary jitter to stagger requests, as long as unsuccessful backend requests are not retried before the configured minimum duration.\n\nIf a Request timeout (`rules[].timeouts.request`) is configured on the route, the entire duration of the initial request and any retry attempts MUST not exceed the Request timeout duration. If any retry attempts are still in progress when the Request timeout duration has been reached, these SHOULD be canceled if possible and the Gateway MUST immediately return a timeout error.\n\nIf a BackendRequest timeout (`rules[].timeouts.backendRequest`) is configured on the route, any retry attempts which reach the configured BackendRequest timeout duration without a response SHOULD be canceled if possible and the Gateway should wait for at least the specified backoff duration before attempting to retry the backend request again.\n\nIf a BackendRequest timeout is _not_ configured on the route, retry attempts MAY time out after an implementation default duration, or MAY remain pending until a configured Request timeout or implementation default duration for total request time is reached.\n\nWhen this field is unspecified, the time to wait between retry attempts is implementation-specific.\n\nSupport: Extended",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
 func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteRule(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -4657,6 +4830,13 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteRule(ref common.ReferenceCall
 				Description: "HTTPRouteRule defines semantics for matching an HTTP request based on conditions (matches), processing it (filters), and forwarding the request to an API object (backendRefs).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
+					"name": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Name is the name of the route rule. This name MUST be unique within a Route if it is set.\n\nSupport: Extended <gateway:experimental>",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
 					"matches": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Matches define conditions used for matching the rule against incoming HTTP requests. Each match is independent, i.e. this rule will be matched if **any** one of the matches is satisfied.\n\nFor example, take the following matches configuration:\n\n``` matches: - path:\n    value: \"/foo\"\n  headers:\n  - name: \"version\"\n    value: \"v2\"\n- path:\n    value: \"/v2/foo\"\n```\n\nFor a request to match against this rule, a request must satisfy EITHER of the two conditions:\n\n- path prefixed with `/foo` AND contains the header `version: v2` - path prefix of `/v2/foo`\n\nSee the documentation for HTTPRouteMatch on how to specify multiple match conditions that should be ANDed together.\n\nIf no matches are specified, the default is a prefix path match on \"/\", which has the effect of matching every HTTP request.\n\nProxy or Load Balancer routing configuration generated from HTTPRoutes MUST prioritize matches based on the following criteria, continuing on ties. Across all rules specified on applicable Routes, precedence must be given to the match having:\n\n* \"Exact\" path match. * \"Prefix\" path match with largest number of characters. * Method match. * Largest number of header matches. * Largest number of query param matches.\n\nNote: The precedence of RegularExpression path matches are implementation-specific.\n\nIf ties still exist across multiple Routes, matching precedence MUST be determined in order of the following criteria, continuing on ties:\n\n* The oldest Route based on creation timestamp. * The Route appearing first in alphabetical order by\n  \"{namespace}/{name}\".\n\nIf ties still exist within an HTTPRoute, matching precedence MUST be granted to the FIRST matching rule (in list order) with a match meeting the above criteria.\n\nWhen no rules matching a request have been successfully attached to the parent a request is coming from, a HTTP 404 status code MUST be returned.",
@@ -4687,7 +4867,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteRule(ref common.ReferenceCall
 					},
 					"backendRefs": {
 						SchemaProps: spec.SchemaProps{
-							Description: "BackendRefs defines the backend(s) where matching requests should be sent.\n\nFailure behavior here depends on how many BackendRefs are specified and how many are invalid.\n\nIf *all* entries in BackendRefs are invalid, and there are also no filters specified in this route rule, *all* traffic which matches this rule MUST receive a 500 status code.\n\nSee the HTTPBackendRef definition for the rules about what makes a single HTTPBackendRef invalid.\n\nWhen a HTTPBackendRef is invalid, 500 status codes MUST be returned for requests that would have otherwise been routed to an invalid backend. If multiple backends are specified, and some are invalid, the proportion of requests that would otherwise have been routed to an invalid backend MUST receive a 500 status code.\n\nFor example, if two backends are specified with equal weights, and one is invalid, 50 percent of traffic must receive a 500. Implementations may choose how that 50 percent is determined.\n\nSupport: Core for Kubernetes Service\n\nSupport: Extended for Kubernetes ServiceImport\n\nSupport: Implementation-specific for any other resource\n\nSupport for weight: Core",
+							Description: "BackendRefs defines the backend(s) where matching requests should be sent.\n\nFailure behavior here depends on how many BackendRefs are specified and how many are invalid.\n\nIf *all* entries in BackendRefs are invalid, and there are also no filters specified in this route rule, *all* traffic which matches this rule MUST receive a 500 status code.\n\nSee the HTTPBackendRef definition for the rules about what makes a single HTTPBackendRef invalid.\n\nWhen a HTTPBackendRef is invalid, 500 status codes MUST be returned for requests that would have otherwise been routed to an invalid backend. If multiple backends are specified, and some are invalid, the proportion of requests that would otherwise have been routed to an invalid backend MUST receive a 500 status code.\n\nFor example, if two backends are specified with equal weights, and one is invalid, 50 percent of traffic must receive a 500. Implementations may choose how that 50 percent is determined.\n\nWhen a HTTPBackendRef refers to a Service that has no ready endpoints, implementations SHOULD return a 503 for requests to that backend instead. If an implementation chooses to do this, all of the above rules for 500 responses MUST also apply for responses that return a 503.\n\nSupport: Core for Kubernetes Service\n\nSupport: Extended for Kubernetes ServiceImport\n\nSupport: Implementation-specific for any other resource\n\nSupport for weight: Core",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -4701,8 +4881,14 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteRule(ref common.ReferenceCall
 					},
 					"timeouts": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Timeouts defines the timeouts that can be configured for an HTTP request.\n\nSupport: Extended\n\n<gateway:experimental>",
+							Description: "Timeouts defines the timeouts that can be configured for an HTTP request.\n\nSupport: Extended",
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.HTTPRouteTimeouts"),
+						},
+					},
+					"retry": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Retry defines the configuration for when to retry an HTTP request.\n\nSupport: Extended\n\n<gateway:experimental>",
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.HTTPRouteRetry"),
 						},
 					},
 					"sessionPersistence": {
@@ -4715,7 +4901,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteRule(ref common.ReferenceCall
 			},
 		},
 		Dependencies: []string{
-			"sigs.k8s.io/gateway-api/apis/v1.HTTPBackendRef", "sigs.k8s.io/gateway-api/apis/v1.HTTPRouteFilter", "sigs.k8s.io/gateway-api/apis/v1.HTTPRouteMatch", "sigs.k8s.io/gateway-api/apis/v1.HTTPRouteTimeouts", "sigs.k8s.io/gateway-api/apis/v1.SessionPersistence"},
+			"sigs.k8s.io/gateway-api/apis/v1.HTTPBackendRef", "sigs.k8s.io/gateway-api/apis/v1.HTTPRouteFilter", "sigs.k8s.io/gateway-api/apis/v1.HTTPRouteMatch", "sigs.k8s.io/gateway-api/apis/v1.HTTPRouteRetry", "sigs.k8s.io/gateway-api/apis/v1.HTTPRouteTimeouts", "sigs.k8s.io/gateway-api/apis/v1.SessionPersistence"},
 	}
 }
 
@@ -4757,7 +4943,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteSpec(ref common.ReferenceCall
 					},
 					"rules": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Rules are a list of HTTP matchers, filters and actions.",
+							Description: "Rules are a list of HTTP matchers, filters and actions.\n\n<gateway:experimental:validation:XValidation:message=\"Rule name must be unique within the route\",rule=\"self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name) && l1.name == l2.name))\">",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -4816,14 +5002,14 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteTimeouts(ref common.Reference
 				Properties: map[string]spec.Schema{
 					"request": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Request specifies the maximum duration for a gateway to respond to an HTTP request. If the gateway has not been able to respond before this deadline is met, the gateway MUST return a timeout error.\n\nFor example, setting the `rules.timeouts.request` field to the value `10s` in an `HTTPRoute` will cause a timeout if a client request is taking longer than 10 seconds to complete.\n\nSetting a timeout to the zero duration (e.g. \"0s\") SHOULD disable the timeout completely. Implementations that cannot completely disable the timeout MUST instead interpret the zero duration as the longest possible value to which the timeout can be set.\n\nThis timeout is intended to cover as close to the whole request-response transaction as possible although an implementation MAY choose to start the timeout after the entire request stream has been received instead of immediately after the transaction is initiated by the client.\n\nWhen this field is unspecified, request timeout behavior is implementation-specific.\n\nSupport: Extended",
+							Description: "Request specifies the maximum duration for a gateway to respond to an HTTP request. If the gateway has not been able to respond before this deadline is met, the gateway MUST return a timeout error.\n\nFor example, setting the `rules.timeouts.request` field to the value `10s` in an `HTTPRoute` will cause a timeout if a client request is taking longer than 10 seconds to complete.\n\nSetting a timeout to the zero duration (e.g. \"0s\") SHOULD disable the timeout completely. Implementations that cannot completely disable the timeout MUST instead interpret the zero duration as the longest possible value to which the timeout can be set.\n\nThis timeout is intended to cover as close to the whole request-response transaction as possible although an implementation MAY choose to start the timeout after the entire request stream has been received instead of immediately after the transaction is initiated by the client.\n\nThe value of Request is a Gateway API Duration string as defined by GEP-2257. When this field is unspecified, request timeout behavior is implementation-specific.\n\nSupport: Extended",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
 					"backendRequest": {
 						SchemaProps: spec.SchemaProps{
-							Description: "BackendRequest specifies a timeout for an individual request from the gateway to a backend. This covers the time from when the request first starts being sent from the gateway to when the full response has been received from the backend.\n\nSetting a timeout to the zero duration (e.g. \"0s\") SHOULD disable the timeout completely. Implementations that cannot completely disable the timeout MUST instead interpret the zero duration as the longest possible value to which the timeout can be set.\n\nAn entire client HTTP transaction with a gateway, covered by the Request timeout, may result in more than one call from the gateway to the destination backend, for example, if automatic retries are supported.\n\nBecause the Request timeout encompasses the BackendRequest timeout, the value of BackendRequest must be <= the value of Request timeout.\n\nSupport: Extended",
+							Description: "BackendRequest specifies a timeout for an individual request from the gateway to a backend. This covers the time from when the request first starts being sent from the gateway to when the full response has been received from the backend.\n\nSetting a timeout to the zero duration (e.g. \"0s\") SHOULD disable the timeout completely. Implementations that cannot completely disable the timeout MUST instead interpret the zero duration as the longest possible value to which the timeout can be set.\n\nAn entire client HTTP transaction with a gateway, covered by the Request timeout, may result in more than one call from the gateway to the destination backend, for example, if automatic retries are supported.\n\nThe value of BackendRequest must be a Gateway API Duration string as defined by GEP-2257.  When this field is unspecified, its behavior is implementation-specific; when specified, the value of BackendRequest must be no more than the value of the Request timeout (since the Request timeout encompasses the BackendRequest timeout).\n\nSupport: Extended",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -5441,6 +5627,26 @@ func schema_sigsk8sio_gateway_api_apis_v1_SessionPersistence(ref common.Referenc
 		},
 		Dependencies: []string{
 			"sigs.k8s.io/gateway-api/apis/v1.CookieConfig"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apis_v1_SupportedFeature(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Type: []string{"object"},
+				Properties: map[string]spec.Schema{
+					"name": {
+						SchemaProps: spec.SchemaProps{
+							Default: "",
+							Type:    []string{"string"},
+							Format:  "",
+						},
+					},
+				},
+				Required: []string{"name"},
+			},
+		},
 	}
 }
 
@@ -6093,6 +6299,13 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_TCPRouteRule(ref common.Referenc
 				Description: "TCPRouteRule is the configuration for a given rule.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
+					"name": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Name is the name of the route rule. This name MUST be unique within a Route if it is set.\n\nSupport: Extended",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
 					"backendRefs": {
 						SchemaProps: spec.SchemaProps{
 							Description: "BackendRefs defines the backend(s) where matching requests should be sent. If unspecified or invalid (refers to a non-existent resource or a Service with no endpoints), the underlying implementation MUST actively reject connection attempts to this backend. Connection rejections must respect weight; if an invalid backend is requested to have 80% of connections, then 80% of connections must be rejected instead.\n\nSupport: Core for Kubernetes Service\n\nSupport: Extended for Kubernetes ServiceImport\n\nSupport: Implementation-specific for any other resource\n\nSupport for weight: Extended",
@@ -6138,7 +6351,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_TCPRouteSpec(ref common.Referenc
 					},
 					"rules": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Rules are a list of TCP matchers and actions.",
+							Description: "Rules are a list of TCP matchers and actions.\n\n<gateway:experimental:validation:XValidation:message=\"Rule name must be unique within the route\",rule=\"self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name) && l1.name == l2.name))\">",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -6295,6 +6508,13 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_TLSRouteRule(ref common.Referenc
 				Description: "TLSRouteRule is the configuration for a given rule.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
+					"name": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Name is the name of the route rule. This name MUST be unique within a Route if it is set.\n\nSupport: Extended",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
 					"backendRefs": {
 						SchemaProps: spec.SchemaProps{
 							Description: "BackendRefs defines the backend(s) where matching requests should be sent. If unspecified or invalid (refers to a non-existent resource or a Service with no endpoints), the rule performs no forwarding; if no filters are specified that would result in a response being sent, the underlying implementation must actively reject request attempts to this backend, by rejecting the connection or returning a 500 status code. Request rejections must respect weight; if an invalid backend is requested to have 80% of requests, then 80% of requests must be rejected instead.\n\nSupport: Core for Kubernetes Service\n\nSupport: Extended for Kubernetes ServiceImport\n\nSupport: Implementation-specific for any other resource\n\nSupport for weight: Extended",
@@ -6355,7 +6575,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_TLSRouteSpec(ref common.Referenc
 					},
 					"rules": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Rules are a list of TLS matchers and actions.",
+							Description: "Rules are a list of TLS matchers and actions.\n\n<gateway:experimental:validation:XValidation:message=\"Rule name must be unique within the route\",rule=\"self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name) && l1.name == l2.name))\">",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -6512,6 +6732,13 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_UDPRouteRule(ref common.Referenc
 				Description: "UDPRouteRule is the configuration for a given rule.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
+					"name": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Name is the name of the route rule. This name MUST be unique within a Route if it is set.\n\nSupport: Extended",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
 					"backendRefs": {
 						SchemaProps: spec.SchemaProps{
 							Description: "BackendRefs defines the backend(s) where matching requests should be sent. If unspecified or invalid (refers to a non-existent resource or a Service with no endpoints), the underlying implementation MUST actively reject connection attempts to this backend. Packet drops must respect weight; if an invalid backend is requested to have 80% of the packets, then 80% of packets must be dropped instead.\n\nSupport: Core for Kubernetes Service\n\nSupport: Extended for Kubernetes ServiceImport\n\nSupport: Implementation-specific for any other resource\n\nSupport for weight: Extended",
@@ -6557,7 +6784,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_UDPRouteSpec(ref common.Referenc
 					},
 					"rules": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Rules are a list of UDP matchers and actions.",
+							Description: "Rules are a list of UDP matchers and actions.\n\n<gateway:experimental:validation:XValidation:message=\"Rule name must be unique within the route\",rule=\"self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name) && l1.name == l2.name))\">",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -6735,6 +6962,22 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha3_BackendTLSPolicySpec(ref common.
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1alpha3.BackendTLSPolicyValidation"),
 						},
 					},
+					"options": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Options are a list of key/value pairs to enable extended TLS configuration for each implementation. For example, configuring the minimum TLS version or supported cipher suites.\n\nA set of common keys MAY be defined by the API in the future. To avoid any ambiguity, implementation-specific definitions MUST use domain-prefixed names, such as `example.com/my-custom-option`. Un-prefixed names are reserved for key names defined by Gateway API.\n\nSupport: Implementation-specific",
+							Type:        []string{"object"},
+							AdditionalProperties: &spec.SchemaOrBool{
+								Allows: true,
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: "",
+										Type:    []string{"string"},
+										Format:  "",
+									},
+								},
+							},
+						},
+					},
 				},
 				Required: []string{"targetRefs", "validation"},
 			},
@@ -6774,10 +7017,24 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha3_BackendTLSPolicyValidation(ref c
 					},
 					"hostname": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Hostname is used for two purposes in the connection between Gateways and backends:\n\n1. Hostname MUST be used as the SNI to connect to the backend (RFC 6066). 2. Hostname MUST be used for authentication and MUST match the certificate\n   served by the matching backend.\n\nSupport: Core",
+							Description: "Hostname is used for two purposes in the connection between Gateways and backends:\n\n1. Hostname MUST be used as the SNI to connect to the backend (RFC 6066). 2. If SubjectAltNames is not specified, Hostname MUST be used for\n   authentication and MUST match the certificate served by the matching\n   backend.\n\nSupport: Core",
 							Default:     "",
 							Type:        []string{"string"},
 							Format:      "",
+						},
+					},
+					"subjectAltNames": {
+						SchemaProps: spec.SchemaProps{
+							Description: "SubjectAltNames contains one or more Subject Alternative Names. When specified, the certificate served from the backend MUST have at least one Subject Alternate Name matching one of the specified SubjectAltNames.\n\nSupport: Core",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1alpha3.SubjectAltName"),
+									},
+								},
+							},
 						},
 					},
 				},
@@ -6785,7 +7042,43 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha3_BackendTLSPolicyValidation(ref c
 			},
 		},
 		Dependencies: []string{
-			"sigs.k8s.io/gateway-api/apis/v1.LocalObjectReference"},
+			"sigs.k8s.io/gateway-api/apis/v1.LocalObjectReference", "sigs.k8s.io/gateway-api/apis/v1alpha3.SubjectAltName"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apis_v1alpha3_SubjectAltName(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "SubjectAltName represents Subject Alternative Name.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"type": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Type determines the format of the Subject Alternative Name. Always required.\n\nSupport: Core",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"hostname": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Hostname contains Subject Alternative Name specified in DNS name format. Required when Type is set to Hostname, ignored otherwise.\n\nSupport: Core",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"uri": {
+						SchemaProps: spec.SchemaProps{
+							Description: "URI contains Subject Alternative Name specified in a full URI format. It MUST include both a scheme (e.g., \"http\" or \"ftp\") and a scheme-specific-part. Common values include SPIFFE IDs like \"spiffe://mycluster.example.com/ns/myns/sa/svc1sa\". Required when Type is set to URI, ignored otherwise.\n\nSupport: Core",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"type"},
+			},
+		},
 	}
 }
 

@@ -28,7 +28,7 @@ import (
 	v1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
 )
 
-// GRPCRouteApplyConfiguration represents an declarative configuration of the GRPCRoute type for use
+// GRPCRouteApplyConfiguration represents a declarative configuration of the GRPCRoute type for use
 // with apply.
 type GRPCRouteApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
@@ -37,7 +37,7 @@ type GRPCRouteApplyConfiguration struct {
 	Status                           *apisv1.GRPCRouteStatusApplyConfiguration `json:"status,omitempty"`
 }
 
-// GRPCRoute constructs an declarative configuration of the GRPCRoute type for use with
+// GRPCRoute constructs a declarative configuration of the GRPCRoute type for use with
 // apply.
 func GRPCRoute(name, namespace string) *GRPCRouteApplyConfiguration {
 	b := &GRPCRouteApplyConfiguration{}
@@ -256,4 +256,10 @@ func (b *GRPCRouteApplyConfiguration) WithSpec(value *apisv1.GRPCRouteSpecApplyC
 func (b *GRPCRouteApplyConfiguration) WithStatus(value *apisv1.GRPCRouteStatusApplyConfiguration) *GRPCRouteApplyConfiguration {
 	b.Status = value
 	return b
+}
+
+// GetName retrieves the value of the Name field in the declarative configuration.
+func (b *GRPCRouteApplyConfiguration) GetName() *string {
+	b.ensureObjectMetaApplyConfigurationExists()
+	return b.Name
 }

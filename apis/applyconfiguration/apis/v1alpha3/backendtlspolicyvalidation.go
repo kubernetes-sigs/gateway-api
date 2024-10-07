@@ -24,15 +24,16 @@ import (
 	v1alpha3 "sigs.k8s.io/gateway-api/apis/v1alpha3"
 )
 
-// BackendTLSPolicyValidationApplyConfiguration represents an declarative configuration of the BackendTLSPolicyValidation type for use
+// BackendTLSPolicyValidationApplyConfiguration represents a declarative configuration of the BackendTLSPolicyValidation type for use
 // with apply.
 type BackendTLSPolicyValidationApplyConfiguration struct {
 	CACertificateRefs       []v1.LocalObjectReferenceApplyConfiguration `json:"caCertificateRefs,omitempty"`
 	WellKnownCACertificates *v1alpha3.WellKnownCACertificatesType       `json:"wellKnownCACertificates,omitempty"`
 	Hostname                *apisv1.PreciseHostname                     `json:"hostname,omitempty"`
+	SubjectAltNames         []SubjectAltNameApplyConfiguration          `json:"subjectAltNames,omitempty"`
 }
 
-// BackendTLSPolicyValidationApplyConfiguration constructs an declarative configuration of the BackendTLSPolicyValidation type for use with
+// BackendTLSPolicyValidationApplyConfiguration constructs a declarative configuration of the BackendTLSPolicyValidation type for use with
 // apply.
 func BackendTLSPolicyValidation() *BackendTLSPolicyValidationApplyConfiguration {
 	return &BackendTLSPolicyValidationApplyConfiguration{}
@@ -64,5 +65,18 @@ func (b *BackendTLSPolicyValidationApplyConfiguration) WithWellKnownCACertificat
 // If called multiple times, the Hostname field is set to the value of the last call.
 func (b *BackendTLSPolicyValidationApplyConfiguration) WithHostname(value apisv1.PreciseHostname) *BackendTLSPolicyValidationApplyConfiguration {
 	b.Hostname = &value
+	return b
+}
+
+// WithSubjectAltNames adds the given value to the SubjectAltNames field in the declarative configuration
+// and returns the receiver, so that objects can be build by chaining "With" function invocations.
+// If called multiple times, values provided by each call will be appended to the SubjectAltNames field.
+func (b *BackendTLSPolicyValidationApplyConfiguration) WithSubjectAltNames(values ...*SubjectAltNameApplyConfiguration) *BackendTLSPolicyValidationApplyConfiguration {
+	for i := range values {
+		if values[i] == nil {
+			panic("nil value passed to WithSubjectAltNames")
+		}
+		b.SubjectAltNames = append(b.SubjectAltNames, *values[i])
+	}
 	return b
 }

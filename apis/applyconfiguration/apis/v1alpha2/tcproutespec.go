@@ -22,14 +22,14 @@ import (
 	v1 "sigs.k8s.io/gateway-api/apis/applyconfiguration/apis/v1"
 )
 
-// TCPRouteSpecApplyConfiguration represents an declarative configuration of the TCPRouteSpec type for use
+// TCPRouteSpecApplyConfiguration represents a declarative configuration of the TCPRouteSpec type for use
 // with apply.
 type TCPRouteSpecApplyConfiguration struct {
 	v1.CommonRouteSpecApplyConfiguration `json:",inline"`
 	Rules                                []TCPRouteRuleApplyConfiguration `json:"rules,omitempty"`
 }
 
-// TCPRouteSpecApplyConfiguration constructs an declarative configuration of the TCPRouteSpec type for use with
+// TCPRouteSpecApplyConfiguration constructs a declarative configuration of the TCPRouteSpec type for use with
 // apply.
 func TCPRouteSpec() *TCPRouteSpecApplyConfiguration {
 	return &TCPRouteSpecApplyConfiguration{}

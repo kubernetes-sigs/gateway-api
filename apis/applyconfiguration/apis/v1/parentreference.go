@@ -22,7 +22,7 @@ import (
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
-// ParentReferenceApplyConfiguration represents an declarative configuration of the ParentReference type for use
+// ParentReferenceApplyConfiguration represents a declarative configuration of the ParentReference type for use
 // with apply.
 type ParentReferenceApplyConfiguration struct {
 	Group       *v1.Group       `json:"group,omitempty"`
@@ -33,7 +33,7 @@ type ParentReferenceApplyConfiguration struct {
 	Port        *v1.PortNumber  `json:"port,omitempty"`
 }
 
-// ParentReferenceApplyConfiguration constructs an declarative configuration of the ParentReference type for use with
+// ParentReferenceApplyConfiguration constructs a declarative configuration of the ParentReference type for use with
 // apply.
 func ParentReference() *ParentReferenceApplyConfiguration {
 	return &ParentReferenceApplyConfiguration{}

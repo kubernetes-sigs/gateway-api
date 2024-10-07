@@ -45,7 +45,7 @@ beta, including GatewayClass, Gateway, HTTPRoute, and ReferenceGrant. To install
 this channel, run the following kubectl command:
 
 ```bash
-kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.1.0/standard-install.yaml
+kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.2.0/standard-install.yaml
 ```
 
 ### Install Experimental Channel
@@ -63,8 +63,62 @@ documentation](/concepts/versioning/).
 To install the experimental channel, run the following kubectl command:
 
 ```bash
-kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.1.0/experimental-install.yaml
+kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.2.0/experimental-install.yaml
 ```
+
+### v1.2 Upgrade Notes
+Before upgrading to Gateway API v1.2, you'll want to confirm that any
+implementations of Gateway API have been upgraded to support the `v1` API
+version of these resources instead of the `v1alpha2` API version. Note that
+even if you've been using `v1` in your YAML manifests, a controller may still be
+using `v1alpha2` which would cause it to fail during this upgrade.
+
+Once you've confirmed that the implementations you're relying on have upgraded
+to v1, it's time to install the v1.2 CRDs. In most cases, this will work without
+any additional effort.
+
+If you ran into issues installing these CRDs, it likely means that you have
+`v1alpha2` in the `storedVersions` of one or both of these CRDs. This field is
+used to indicate which API versions have ever been used to persist one of these
+resources. Unfortunately, this field is not automatically pruned. To check these
+values, you can run the following commands:
+
+```
+kubectl get crd grpcroutes.gateway.networking.k8s.io -ojsonpath="{.status.storedVersions}"
+kubectl get crd referencegrants.gateway.networking.k8s.io -ojsonpath="{.status.storedVersions}"
+```
+
+If either of these return a list that includes "v1alpha2", it means that we need
+to manually remove that version from `storedVersions`.
+
+Before doing that, it would be good to ensure that all your ReferenceGrants and
+GRPCRoutes have been updated to the latest storage version:
+
+```
+crds=("GRPCRoutes" "ReferenceGrants")
+
+for crd in "${crds[@]}"; do
+  output=$(kubectl get "${crd}" -A -o json)
+
+  echo "$output" | jq -c '.items[]' | while IFS= read -r resource; do
+    namespace=$(echo "$resource" | jq -r '.metadata.namespace')
+    name=$(echo "$resource" | jq -r '.metadata.name')
+    kubectl patch "${crd}" "${name}" -n "${namespace}" --type='json' -p='[{"op": "replace", "path": "/metadata/annotations/migration-time", "value": "'"$(date +%Y-%m-%dT%H:%M:%S)"'" }]'
+  done
+done
+```
+
+Now that all your ReferenceGrant and GRPCRoute resources have been updated to
+use the latest storage version, you can patch the ReferenceGrant and GRPCRoute
+CRDs:
+
+```
+kubectl patch customresourcedefinitions referencegrants.gateway.networking.k8s.io --subresource='status' --type='merge' -p '{"status":{"storedVersions":["v1beta1"]}}'
+kubectl patch customresourcedefinitions grpcroutes.gateway.networking.k8s.io --subresource='status' --type='merge' -p '{"status":{"storedVersions":["v1"]}}'
+```
+
+With these steps complete, upgrading to the latest GRPCRoute and ReferenceGrant
+should work well now.
 
 ### v1.1 Upgrade Notes
 If you are already using previous versions of GRPCRoute or BackendTLSPolicy

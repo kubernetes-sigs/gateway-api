@@ -22,16 +22,17 @@ import (
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
-// GatewaySpecApplyConfiguration represents an declarative configuration of the GatewaySpec type for use
+// GatewaySpecApplyConfiguration represents a declarative configuration of the GatewaySpec type for use
 // with apply.
 type GatewaySpecApplyConfiguration struct {
 	GatewayClassName *v1.ObjectName                           `json:"gatewayClassName,omitempty"`
 	Listeners        []ListenerApplyConfiguration             `json:"listeners,omitempty"`
 	Addresses        []GatewayAddressApplyConfiguration       `json:"addresses,omitempty"`
 	Infrastructure   *GatewayInfrastructureApplyConfiguration `json:"infrastructure,omitempty"`
+	BackendTLS       *GatewayBackendTLSApplyConfiguration     `json:"backendTLS,omitempty"`
 }
 
-// GatewaySpecApplyConfiguration constructs an declarative configuration of the GatewaySpec type for use with
+// GatewaySpecApplyConfiguration constructs a declarative configuration of the GatewaySpec type for use with
 // apply.
 func GatewaySpec() *GatewaySpecApplyConfiguration {
 	return &GatewaySpecApplyConfiguration{}
@@ -76,5 +77,13 @@ func (b *GatewaySpecApplyConfiguration) WithAddresses(values ...*GatewayAddressA
 // If called multiple times, the Infrastructure field is set to the value of the last call.
 func (b *GatewaySpecApplyConfiguration) WithInfrastructure(value *GatewayInfrastructureApplyConfiguration) *GatewaySpecApplyConfiguration {
 	b.Infrastructure = value
+	return b
+}
+
+// WithBackendTLS sets the BackendTLS field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the BackendTLS field is set to the value of the last call.
+func (b *GatewaySpecApplyConfiguration) WithBackendTLS(value *GatewayBackendTLSApplyConfiguration) *GatewaySpecApplyConfiguration {
+	b.BackendTLS = value
 	return b
 }

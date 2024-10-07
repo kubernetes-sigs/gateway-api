@@ -22,14 +22,14 @@ import (
 	v1 "sigs.k8s.io/gateway-api/apis/applyconfiguration/apis/v1"
 )
 
-// UDPRouteSpecApplyConfiguration represents an declarative configuration of the UDPRouteSpec type for use
+// UDPRouteSpecApplyConfiguration represents a declarative configuration of the UDPRouteSpec type for use
 // with apply.
 type UDPRouteSpecApplyConfiguration struct {
 	v1.CommonRouteSpecApplyConfiguration `json:",inline"`
 	Rules                                []UDPRouteRuleApplyConfiguration `json:"rules,omitempty"`
 }
 
-// UDPRouteSpecApplyConfiguration constructs an declarative configuration of the UDPRouteSpec type for use with
+// UDPRouteSpecApplyConfiguration constructs a declarative configuration of the UDPRouteSpec type for use with
 // apply.
 func UDPRouteSpec() *UDPRouteSpecApplyConfiguration {
 	return &UDPRouteSpecApplyConfiguration{}

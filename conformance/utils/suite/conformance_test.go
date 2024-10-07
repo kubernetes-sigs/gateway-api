@@ -32,13 +32,13 @@ func TestParseSupportedFeatures(t *testing.T) {
 		"b,c,d",
 	}
 
-	s1 := sets.Set[features.SupportedFeature]{}
+	s1 := sets.Set[features.FeatureName]{}
 	s1.Insert("a")
-	s2 := sets.Set[features.SupportedFeature]{}
+	s2 := sets.Set[features.FeatureName]{}
 	s2.Insert("b")
 	s2.Insert("c")
 	s2.Insert("d")
-	features := []sets.Set[features.SupportedFeature]{nil, s1, s2}
+	features := []sets.Set[features.FeatureName]{nil, s1, s2}
 
 	for i, f := range flags {
 		expect := features[i]

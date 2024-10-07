@@ -22,6 +22,7 @@ SCRIPT_ROOT=$(dirname "${BASH_SOURCE}")/..
 source "${SCRIPT_ROOT}/hack/kube-env.sh"
 
 SILENT=true
+FAILED_TEST=()
 
 function is-excluded {
   for e in $EXCLUDE; do
@@ -53,10 +54,12 @@ fi
 
 EXCLUDE="verify-all.sh"
 
+SCRIPTS=$(find "${SCRIPT_ROOT}"/hack -name "verify-*.sh")
+
 ret=0
-for t in `ls $SCRIPT_ROOT/hack/verify-*.sh`
+for t in $SCRIPTS;
 do
-  if is-excluded $t ; then
+  if is-excluded "${t}" ; then
     echo "Skipping $t"
     continue
   fi
@@ -65,7 +68,8 @@ do
     if bash "$t" &> /dev/null; then
       echo -e "${color_green}SUCCESS${color_norm}"
     else
-      echo -e "${color_red}FAILED${color_norm}"
+      echo -e "${color_red}FAILED: $t ${color_norm}"
+      FAILED_TEST+=("$t")
       ret=1
     fi
   else
@@ -73,10 +77,20 @@ do
       echo -e "${color_green}SUCCESS: $t ${color_norm}"
     else
       echo -e "${color_red}Test FAILED: $t ${color_norm}"
+       FAILED_TEST+=("$t")
       ret=1
     fi
   fi
 done
+
+if [ ${#FAILED_TEST[@]} -ne 0 ]; then
+  echo -e "\n${color_red}Summary of failed tests:${color_norm}"
+  for test in "${FAILED_TEST[@]}"; do
+    echo -e "${color_red}- $test${color_norm}"
+  done
+else
+  echo -e "\n${color_green}All tests passed successfully.${color_norm}"
+fi
 
 exit $ret
 

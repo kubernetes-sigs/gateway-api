@@ -19,13 +19,12 @@ package main
 import (
 	"context"
 	"fmt"
-	"strings"
 	"testing"
 	"time"
 
-	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
-
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -75,7 +74,7 @@ func TestHTTPPathMatch(t *testing.T) {
 		},
 		{
 			name:       "invalid type",
-			wantErrors: []string{"type must be one of ['Exact', 'PathPrefix', 'RegularExpression']"},
+			wantErrors: []string{"must be one of ['Exact', 'PathPrefix', 'RegularExpression']"},
 			path: &gatewayv1.HTTPPathMatch{
 				Type:  ptrTo(gatewayv1.PathMatchType("FooBar")),
 				Value: ptrTo("/path"),
@@ -150,6 +149,7 @@ func TestHTTPPathMatch(t *testing.T) {
 
 func TestBackendObjectReference(t *testing.T) {
 	portPtr := func(n int) *gatewayv1.PortNumber {
+		//nolint:gosec
 		p := gatewayv1.PortNumber(n)
 		return &p
 	}
@@ -739,13 +739,13 @@ func TestHTTPRouteRule(t *testing.T) {
 			}},
 		},
 		{
-			name:       "invalid URLRewrite filter because too many path matches",
+			name:       "invalid URLRewrite filter because wrong path match type",
 			wantErrors: []string{"When using URLRewrite filter with path.replacePrefixMatch, exactly one PathPrefix match must be specified"},
 			rules: []gatewayv1.HTTPRouteRule{{
 				Matches: []gatewayv1.HTTPRouteMatch{
 					{
 						Path: &gatewayv1.HTTPPathMatch{
-							Type:  ptrTo(gatewayv1.PathMatchType(gatewayv1.FullPathHTTPPathModifier)), // Incorrect Patch match Type for URLRewrite filter with ReplacePrefixMatch.
+							Type:  ptrTo(gatewayv1.PathMatchRegularExpression), // Incorrect Path match Type for URLRewrite filter with ReplacePrefixMatch.
 							Value: ptrTo("/foo"),
 						},
 					},
@@ -813,13 +813,13 @@ func TestHTTPRouteRule(t *testing.T) {
 			}},
 		},
 		{
-			name:       "invalid RequestRedirect filter because path match has type ReplaceFullPath",
+			name:       "invalid RequestRedirect filter because path match has type RegularExpression",
 			wantErrors: []string{"When using RequestRedirect filter with path.replacePrefixMatch, exactly one PathPrefix match must be specified"},
 			rules: []gatewayv1.HTTPRouteRule{{
 				Matches: []gatewayv1.HTTPRouteMatch{
 					{
 						Path: &gatewayv1.HTTPPathMatch{
-							Type:  ptrTo(gatewayv1.PathMatchType(gatewayv1.FullPathHTTPPathModifier)), // Incorrect Patch match Type for RequestRedirect filter with ReplacePrefixMatch.
+							Type:  ptrTo(gatewayv1.PathMatchRegularExpression), // Incorrect Path match Type for RequestRedirect filter with ReplacePrefixMatch.
 							Value: ptrTo("/foo"),
 						},
 					},
@@ -907,13 +907,13 @@ func TestHTTPRouteRule(t *testing.T) {
 			}},
 		},
 		{
-			name:       "invalid URLRewrite filter (within backendRefs) because path match has type ReplaceFullPath",
+			name:       "invalid URLRewrite filter (within backendRefs) because path match has type RegularExpression",
 			wantErrors: []string{"Within backendRefs, When using URLRewrite filter with path.replacePrefixMatch, exactly one PathPrefix match must be specified"},
 			rules: []gatewayv1.HTTPRouteRule{{
 				Matches: []gatewayv1.HTTPRouteMatch{
 					{
 						Path: &gatewayv1.HTTPPathMatch{
-							Type:  ptrTo(gatewayv1.PathMatchType(gatewayv1.FullPathHTTPPathModifier)), // Incorrect Patch match Type for URLRewrite filter with ReplacePrefixMatch.
+							Type:  ptrTo(gatewayv1.PathMatchRegularExpression), // Incorrect Path match Type for URLRewrite filter with ReplacePrefixMatch.
 							Value: ptrTo("/foo"),
 						},
 					},
@@ -1011,13 +1011,13 @@ func TestHTTPRouteRule(t *testing.T) {
 			}},
 		},
 		{
-			name:       "invalid RequestRedirect filter (within backendRefs) because path match has type ReplaceFullPath",
+			name:       "invalid RequestRedirect filter (within backendRefs) because path match has type RegularExpression",
 			wantErrors: []string{"Within backendRefs, when using RequestRedirect filter with path.replacePrefixMatch, exactly one PathPrefix match must be specified"},
 			rules: []gatewayv1.HTTPRouteRule{{
 				Matches: []gatewayv1.HTTPRouteMatch{
 					{
 						Path: &gatewayv1.HTTPPathMatch{
-							Type:  ptrTo(gatewayv1.PathMatchType(gatewayv1.FullPathHTTPPathModifier)), // Incorrect Patch match Type for RequestRedirect filter with ReplacePrefixMatch.
+							Type:  ptrTo(gatewayv1.PathMatchRegularExpression), // Incorrect Path match Type for RequestRedirect filter with ReplacePrefixMatch.
 							Value: ptrTo("/foo"),
 						},
 					},
@@ -1209,6 +1209,48 @@ func TestHTTPRouteRule(t *testing.T) {
 				},
 			},
 		},
+		{
+			name:       "too many matches and rules",
+			wantErrors: []string{"total number of matches across all rules in a route must be less than 128"},
+			rules: func() []gatewayv1.HTTPRouteRule {
+				match := gatewayv1.HTTPRouteMatch{
+					Path: &gatewayv1.HTTPPathMatch{
+						Type:  ptrTo(gatewayv1.PathMatchType("PathPrefix")),
+						Value: ptrTo("/"),
+					},
+				}
+				var rules []gatewayv1.HTTPRouteRule
+				for range 7 { // rules
+					rule := gatewayv1.HTTPRouteRule{}
+					for range 20 { // matches
+						rule.Matches = append(rule.Matches, match)
+					}
+					rules = append(rules, rule)
+				}
+				return rules
+			}(),
+		},
+		{
+			name:       "many matches and few rules",
+			wantErrors: nil,
+			rules: func() []gatewayv1.HTTPRouteRule {
+				match := gatewayv1.HTTPRouteMatch{
+					Path: &gatewayv1.HTTPPathMatch{
+						Type:  ptrTo(gatewayv1.PathMatchType("PathPrefix")),
+						Value: ptrTo("/"),
+					},
+				}
+				var rules []gatewayv1.HTTPRouteRule
+				for range 2 { // rules
+					rule := gatewayv1.HTTPRouteRule{}
+					for range 48 { // matches
+						rule.Matches = append(rule.Matches, match)
+					}
+					rules = append(rules, rule)
+				}
+				return rules
+			}(),
+		},
 	}
 
 	for _, tc := range tests {
@@ -1318,6 +1360,7 @@ func TestHTTPPathModifier(t *testing.T) {
 			name:       "type must be 'ReplaceFullPath' when replaceFullPath is set",
 			wantErrors: []string{"type must be 'ReplaceFullPath' when replaceFullPath is set"},
 			pathModifier: gatewayv1.HTTPPathModifier{
+				Type:            gatewayv1.PrefixMatchHTTPPathModifier,
 				ReplaceFullPath: ptrTo("foo"),
 			},
 		},
@@ -1339,6 +1382,7 @@ func TestHTTPPathModifier(t *testing.T) {
 			name:       "type must be 'ReplacePrefixMatch' when replacePrefixMatch is set",
 			wantErrors: []string{"type must be 'ReplacePrefixMatch' when replacePrefixMatch is set"},
 			pathModifier: gatewayv1.HTTPPathModifier{
+				Type:               gatewayv1.FullPathHTTPPathModifier,
 				ReplacePrefixMatch: ptrTo("/foo"),
 			},
 		},
@@ -1384,7 +1428,7 @@ func validateHTTPRoute(t *testing.T, route *gatewayv1.HTTPRoute, wantErrors []st
 
 	var missingErrorStrings []string
 	for _, wantError := range wantErrors {
-		if !strings.Contains(strings.ToLower(err.Error()), strings.ToLower(wantError)) {
+		if !celErrorStringMatches(err.Error(), wantError) {
 			missingErrorStrings = append(missingErrorStrings, wantError)
 		}
 	}

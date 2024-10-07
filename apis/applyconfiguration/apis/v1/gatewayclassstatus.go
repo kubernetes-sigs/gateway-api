@@ -20,17 +20,16 @@ package v1
 
 import (
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
-	apisv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
-// GatewayClassStatusApplyConfiguration represents an declarative configuration of the GatewayClassStatus type for use
+// GatewayClassStatusApplyConfiguration represents a declarative configuration of the GatewayClassStatus type for use
 // with apply.
 type GatewayClassStatusApplyConfiguration struct {
-	Conditions        []v1.ConditionApplyConfiguration `json:"conditions,omitempty"`
-	SupportedFeatures []apisv1.SupportedFeature        `json:"supportedFeatures,omitempty"`
+	Conditions        []v1.ConditionApplyConfiguration     `json:"conditions,omitempty"`
+	SupportedFeatures []SupportedFeatureApplyConfiguration `json:"supportedFeatures,omitempty"`
 }
 
-// GatewayClassStatusApplyConfiguration constructs an declarative configuration of the GatewayClassStatus type for use with
+// GatewayClassStatusApplyConfiguration constructs a declarative configuration of the GatewayClassStatus type for use with
 // apply.
 func GatewayClassStatus() *GatewayClassStatusApplyConfiguration {
 	return &GatewayClassStatusApplyConfiguration{}
@@ -52,9 +51,12 @@ func (b *GatewayClassStatusApplyConfiguration) WithConditions(values ...*v1.Cond
 // WithSupportedFeatures adds the given value to the SupportedFeatures field in the declarative configuration
 // and returns the receiver, so that objects can be build by chaining "With" function invocations.
 // If called multiple times, values provided by each call will be appended to the SupportedFeatures field.
-func (b *GatewayClassStatusApplyConfiguration) WithSupportedFeatures(values ...apisv1.SupportedFeature) *GatewayClassStatusApplyConfiguration {
+func (b *GatewayClassStatusApplyConfiguration) WithSupportedFeatures(values ...*SupportedFeatureApplyConfiguration) *GatewayClassStatusApplyConfiguration {
 	for i := range values {
-		b.SupportedFeatures = append(b.SupportedFeatures, values[i])
+		if values[i] == nil {
+			panic("nil value passed to WithSupportedFeatures")
+		}
+		b.SupportedFeatures = append(b.SupportedFeatures, *values[i])
 	}
 	return b
 }

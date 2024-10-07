@@ -22,14 +22,14 @@ import (
 	apisv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
-// BackendRefApplyConfiguration represents an declarative configuration of the BackendRef type for use
+// BackendRefApplyConfiguration represents a declarative configuration of the BackendRef type for use
 // with apply.
 type BackendRefApplyConfiguration struct {
 	BackendObjectReferenceApplyConfiguration `json:",inline"`
 	Weight                                   *int32 `json:"weight,omitempty"`
 }
 
-// BackendRefApplyConfiguration constructs an declarative configuration of the BackendRef type for use with
+// BackendRefApplyConfiguration constructs a declarative configuration of the BackendRef type for use with
 // apply.
 func BackendRef() *BackendRefApplyConfiguration {
 	return &BackendRefApplyConfiguration{}

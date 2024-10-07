@@ -18,20 +18,34 @@ limitations under the License.
 
 package v1
 
-// HTTPRouteRuleApplyConfiguration represents an declarative configuration of the HTTPRouteRule type for use
+import (
+	v1 "sigs.k8s.io/gateway-api/apis/v1"
+)
+
+// HTTPRouteRuleApplyConfiguration represents a declarative configuration of the HTTPRouteRule type for use
 // with apply.
 type HTTPRouteRuleApplyConfiguration struct {
+	Name               *v1.SectionName                       `json:"name,omitempty"`
 	Matches            []HTTPRouteMatchApplyConfiguration    `json:"matches,omitempty"`
 	Filters            []HTTPRouteFilterApplyConfiguration   `json:"filters,omitempty"`
 	BackendRefs        []HTTPBackendRefApplyConfiguration    `json:"backendRefs,omitempty"`
 	Timeouts           *HTTPRouteTimeoutsApplyConfiguration  `json:"timeouts,omitempty"`
+	Retry              *HTTPRouteRetryApplyConfiguration     `json:"retry,omitempty"`
 	SessionPersistence *SessionPersistenceApplyConfiguration `json:"sessionPersistence,omitempty"`
 }
 
-// HTTPRouteRuleApplyConfiguration constructs an declarative configuration of the HTTPRouteRule type for use with
+// HTTPRouteRuleApplyConfiguration constructs a declarative configuration of the HTTPRouteRule type for use with
 // apply.
 func HTTPRouteRule() *HTTPRouteRuleApplyConfiguration {
 	return &HTTPRouteRuleApplyConfiguration{}
+}
+
+// WithName sets the Name field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the Name field is set to the value of the last call.
+func (b *HTTPRouteRuleApplyConfiguration) WithName(value v1.SectionName) *HTTPRouteRuleApplyConfiguration {
+	b.Name = &value
+	return b
 }
 
 // WithMatches adds the given value to the Matches field in the declarative configuration
@@ -78,6 +92,14 @@ func (b *HTTPRouteRuleApplyConfiguration) WithBackendRefs(values ...*HTTPBackend
 // If called multiple times, the Timeouts field is set to the value of the last call.
 func (b *HTTPRouteRuleApplyConfiguration) WithTimeouts(value *HTTPRouteTimeoutsApplyConfiguration) *HTTPRouteRuleApplyConfiguration {
 	b.Timeouts = value
+	return b
+}
+
+// WithRetry sets the Retry field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the Retry field is set to the value of the last call.
+func (b *HTTPRouteRuleApplyConfiguration) WithRetry(value *HTTPRouteRetryApplyConfiguration) *HTTPRouteRuleApplyConfiguration {
+	b.Retry = value
 	return b
 }
 

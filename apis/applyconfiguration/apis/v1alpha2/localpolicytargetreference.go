@@ -22,7 +22,7 @@ import (
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
-// LocalPolicyTargetReferenceApplyConfiguration represents an declarative configuration of the LocalPolicyTargetReference type for use
+// LocalPolicyTargetReferenceApplyConfiguration represents a declarative configuration of the LocalPolicyTargetReference type for use
 // with apply.
 type LocalPolicyTargetReferenceApplyConfiguration struct {
 	Group *v1.Group      `json:"group,omitempty"`
@@ -30,7 +30,7 @@ type LocalPolicyTargetReferenceApplyConfiguration struct {
 	Name  *v1.ObjectName `json:"name,omitempty"`
 }
 
-// LocalPolicyTargetReferenceApplyConfiguration constructs an declarative configuration of the LocalPolicyTargetReference type for use with
+// LocalPolicyTargetReferenceApplyConfiguration constructs a declarative configuration of the LocalPolicyTargetReference type for use with
 // apply.
 func LocalPolicyTargetReference() *LocalPolicyTargetReferenceApplyConfiguration {
 	return &LocalPolicyTargetReferenceApplyConfiguration{}

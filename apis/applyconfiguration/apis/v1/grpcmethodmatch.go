@@ -22,7 +22,7 @@ import (
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
-// GRPCMethodMatchApplyConfiguration represents an declarative configuration of the GRPCMethodMatch type for use
+// GRPCMethodMatchApplyConfiguration represents a declarative configuration of the GRPCMethodMatch type for use
 // with apply.
 type GRPCMethodMatchApplyConfiguration struct {
 	Type    *v1.GRPCMethodMatchType `json:"type,omitempty"`
@@ -30,7 +30,7 @@ type GRPCMethodMatchApplyConfiguration struct {
 	Method  *string                 `json:"method,omitempty"`
 }
 
-// GRPCMethodMatchApplyConfiguration constructs an declarative configuration of the GRPCMethodMatch type for use with
+// GRPCMethodMatchApplyConfiguration constructs a declarative configuration of the GRPCMethodMatch type for use with
 // apply.
 func GRPCMethodMatch() *GRPCMethodMatchApplyConfiguration {
 	return &GRPCMethodMatchApplyConfiguration{}

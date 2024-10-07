@@ -81,7 +81,11 @@ test:
 	go test -race -cover ./apis/... ./conformance/utils/...
 # Run tests for each submodule.
 	cd "conformance/echo-basic" && go test -race -cover ./...
-	cd "gwctl" && go test -race -cover ./...
+
+# Run tests for CRDs validation
+.PHONY: test.crds-validation
+test.crds-validation:
+	./hack/test-crds-validation.sh $(VERSION)
 
 # Run conformance tests against controller implementation
 .PHONY: conformance

@@ -28,7 +28,7 @@ import (
 	v1beta1 "sigs.k8s.io/gateway-api/apis/v1beta1"
 )
 
-// GatewayClassApplyConfiguration represents an declarative configuration of the GatewayClass type for use
+// GatewayClassApplyConfiguration represents a declarative configuration of the GatewayClass type for use
 // with apply.
 type GatewayClassApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
@@ -37,7 +37,7 @@ type GatewayClassApplyConfiguration struct {
 	Status                           *apisv1.GatewayClassStatusApplyConfiguration `json:"status,omitempty"`
 }
 
-// GatewayClass constructs an declarative configuration of the GatewayClass type for use with
+// GatewayClass constructs a declarative configuration of the GatewayClass type for use with
 // apply.
 func GatewayClass(name string) *GatewayClassApplyConfiguration {
 	b := &GatewayClassApplyConfiguration{}
@@ -254,4 +254,10 @@ func (b *GatewayClassApplyConfiguration) WithSpec(value *apisv1.GatewayClassSpec
 func (b *GatewayClassApplyConfiguration) WithStatus(value *apisv1.GatewayClassStatusApplyConfiguration) *GatewayClassApplyConfiguration {
 	b.Status = value
 	return b
+}
+
+// GetName retrieves the value of the Name field in the declarative configuration.
+func (b *GatewayClassApplyConfiguration) GetName() *string {
+	b.ensureObjectMetaApplyConfigurationExists()
+	return b.Name
 }

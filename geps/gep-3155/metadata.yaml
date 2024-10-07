@@ -1,0 +1,13 @@
+apiVersion: internal.gateway.networking.k8s.io/v1alpha1
+kind: GEPDetails
+number: 3155
+name: Complete Backend mutual TLS Configuration
+status: Experimental
+authors:
+  - mkosieradzki
+  - robscott
+relationships:
+  seeAlso:
+    - number: 2907
+      name: TLS Configuration Placement and Terminology
+      description: Will use some of the terminology defined by this GEP.

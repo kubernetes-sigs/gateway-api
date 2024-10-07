@@ -10,6 +10,7 @@ aliases:
 
   # Reference: https://github.com/kubernetes/org/blob/main/config/kubernetes-sigs/sig-network/teams.yaml
   gateway-api-maintainers:
+    - mlavacca
     - robscott
     - shaneutt
     - youngnick
@@ -29,26 +30,26 @@ aliases:
     - keithmattix
 
   gateway-api-conformance-reviewers:
-    - arkodg
-    - LiorLieberman
+    - candita
     - michaelbeaumont
-    - mlavacca
     - sunjayBhatia
     - xunzhuo
 
   gateway-api-conformance-approvers:
     - arkodg
-    - mlavacca
+    - LiorLieberman
     - sunjayBhatia
 
   gateway-api-gep-reviewers:
+    - arkodg
     - candita
     - gcs278
+    - kflynn
     - LiorLieberman
-    - mlavacca
 
   gwctl-approvers:
     - gauravkghildiyal
 
   gwctl-reviewers:
     - gauravkghildiyal
+    - guicassolato

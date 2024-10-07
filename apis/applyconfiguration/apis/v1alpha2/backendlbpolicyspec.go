@@ -22,14 +22,14 @@ import (
 	v1 "sigs.k8s.io/gateway-api/apis/applyconfiguration/apis/v1"
 )
 
-// BackendLBPolicySpecApplyConfiguration represents an declarative configuration of the BackendLBPolicySpec type for use
+// BackendLBPolicySpecApplyConfiguration represents a declarative configuration of the BackendLBPolicySpec type for use
 // with apply.
 type BackendLBPolicySpecApplyConfiguration struct {
 	TargetRefs         []LocalPolicyTargetReferenceApplyConfiguration `json:"targetRefs,omitempty"`
 	SessionPersistence *v1.SessionPersistenceApplyConfiguration       `json:"sessionPersistence,omitempty"`
 }
 
-// BackendLBPolicySpecApplyConfiguration constructs an declarative configuration of the BackendLBPolicySpec type for use with
+// BackendLBPolicySpecApplyConfiguration constructs a declarative configuration of the BackendLBPolicySpec type for use with
 // apply.
 func BackendLBPolicySpec() *BackendLBPolicySpecApplyConfiguration {
 	return &BackendLBPolicySpecApplyConfiguration{}

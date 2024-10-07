@@ -23,12 +23,11 @@ import (
 	types "k8s.io/apimachinery/pkg/types"
 	managedfields "k8s.io/apimachinery/pkg/util/managedfields"
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
-
 	internal "sigs.k8s.io/gateway-api/apis/applyconfiguration/internal"
 	apisv1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
 )
 
-// TLSRouteApplyConfiguration represents an declarative configuration of the TLSRoute type for use
+// TLSRouteApplyConfiguration represents a declarative configuration of the TLSRoute type for use
 // with apply.
 type TLSRouteApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
@@ -37,7 +36,7 @@ type TLSRouteApplyConfiguration struct {
 	Status                           *TLSRouteStatusApplyConfiguration `json:"status,omitempty"`
 }
 
-// TLSRoute constructs an declarative configuration of the TLSRoute type for use with
+// TLSRoute constructs a declarative configuration of the TLSRoute type for use with
 // apply.
 func TLSRoute(name, namespace string) *TLSRouteApplyConfiguration {
 	b := &TLSRouteApplyConfiguration{}
@@ -256,4 +255,10 @@ func (b *TLSRouteApplyConfiguration) WithSpec(value *TLSRouteSpecApplyConfigurat
 func (b *TLSRouteApplyConfiguration) WithStatus(value *TLSRouteStatusApplyConfiguration) *TLSRouteApplyConfiguration {
 	b.Status = value
 	return b
+}
+
+// GetName retrieves the value of the Name field in the declarative configuration.
+func (b *TLSRouteApplyConfiguration) GetName() *string {
+	b.ensureObjectMetaApplyConfigurationExists()
+	return b.Name
 }

@@ -22,14 +22,14 @@ import (
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
-// HTTPPathMatchApplyConfiguration represents an declarative configuration of the HTTPPathMatch type for use
+// HTTPPathMatchApplyConfiguration represents a declarative configuration of the HTTPPathMatch type for use
 // with apply.
 type HTTPPathMatchApplyConfiguration struct {
 	Type  *v1.PathMatchType `json:"type,omitempty"`
 	Value *string           `json:"value,omitempty"`
 }
 
-// HTTPPathMatchApplyConfiguration constructs an declarative configuration of the HTTPPathMatch type for use with
+// HTTPPathMatchApplyConfiguration constructs a declarative configuration of the HTTPPathMatch type for use with
 // apply.
 func HTTPPathMatch() *HTTPPathMatchApplyConfiguration {
 	return &HTTPPathMatchApplyConfiguration{}

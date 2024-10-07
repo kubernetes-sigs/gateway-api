@@ -22,7 +22,7 @@ import (
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
-// ObjectReferenceApplyConfiguration represents an declarative configuration of the ObjectReference type for use
+// ObjectReferenceApplyConfiguration represents a declarative configuration of the ObjectReference type for use
 // with apply.
 type ObjectReferenceApplyConfiguration struct {
 	Group     *v1.Group      `json:"group,omitempty"`
@@ -31,7 +31,7 @@ type ObjectReferenceApplyConfiguration struct {
 	Namespace *v1.Namespace  `json:"namespace,omitempty"`
 }
 
-// ObjectReferenceApplyConfiguration constructs an declarative configuration of the ObjectReference type for use with
+// ObjectReferenceApplyConfiguration constructs a declarative configuration of the ObjectReference type for use with
 // apply.
 func ObjectReference() *ObjectReferenceApplyConfiguration {
 	return &ObjectReferenceApplyConfiguration{}

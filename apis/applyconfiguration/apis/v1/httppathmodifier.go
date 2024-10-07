@@ -22,7 +22,7 @@ import (
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
-// HTTPPathModifierApplyConfiguration represents an declarative configuration of the HTTPPathModifier type for use
+// HTTPPathModifierApplyConfiguration represents a declarative configuration of the HTTPPathModifier type for use
 // with apply.
 type HTTPPathModifierApplyConfiguration struct {
 	Type               *v1.HTTPPathModifierType `json:"type,omitempty"`
@@ -30,7 +30,7 @@ type HTTPPathModifierApplyConfiguration struct {
 	ReplacePrefixMatch *string                  `json:"replacePrefixMatch,omitempty"`
 }
 
-// HTTPPathModifierApplyConfiguration constructs an declarative configuration of the HTTPPathModifier type for use with
+// HTTPPathModifierApplyConfiguration constructs a declarative configuration of the HTTPPathModifier type for use with
 // apply.
 func HTTPPathModifier() *HTTPPathModifierApplyConfiguration {
 	return &HTTPPathModifierApplyConfiguration{}

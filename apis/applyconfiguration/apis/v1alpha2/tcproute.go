@@ -23,12 +23,11 @@ import (
 	types "k8s.io/apimachinery/pkg/types"
 	managedfields "k8s.io/apimachinery/pkg/util/managedfields"
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
-
 	internal "sigs.k8s.io/gateway-api/apis/applyconfiguration/internal"
 	apisv1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
 )
 
-// TCPRouteApplyConfiguration represents an declarative configuration of the TCPRoute type for use
+// TCPRouteApplyConfiguration represents a declarative configuration of the TCPRoute type for use
 // with apply.
 type TCPRouteApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
@@ -37,7 +36,7 @@ type TCPRouteApplyConfiguration struct {
 	Status                           *TCPRouteStatusApplyConfiguration `json:"status,omitempty"`
 }
 
-// TCPRoute constructs an declarative configuration of the TCPRoute type for use with
+// TCPRoute constructs a declarative configuration of the TCPRoute type for use with
 // apply.
 func TCPRoute(name, namespace string) *TCPRouteApplyConfiguration {
 	b := &TCPRouteApplyConfiguration{}
@@ -256,4 +255,10 @@ func (b *TCPRouteApplyConfiguration) WithSpec(value *TCPRouteSpecApplyConfigurat
 func (b *TCPRouteApplyConfiguration) WithStatus(value *TCPRouteStatusApplyConfiguration) *TCPRouteApplyConfiguration {
 	b.Status = value
 	return b
+}
+
+// GetName retrieves the value of the Name field in the declarative configuration.
+func (b *TCPRouteApplyConfiguration) GetName() *string {
+	b.ensureObjectMetaApplyConfigurationExists()
+	return b.Name
 }

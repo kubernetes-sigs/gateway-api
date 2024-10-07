@@ -19,25 +19,35 @@ limitations under the License.
 package v1alpha2
 
 import (
-	v1 "sigs.k8s.io/gateway-api/apis/applyconfiguration/apis/v1"
+	apisv1 "sigs.k8s.io/gateway-api/apis/applyconfiguration/apis/v1"
+	v1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
-// TCPRouteRuleApplyConfiguration represents an declarative configuration of the TCPRouteRule type for use
+// TCPRouteRuleApplyConfiguration represents a declarative configuration of the TCPRouteRule type for use
 // with apply.
 type TCPRouteRuleApplyConfiguration struct {
-	BackendRefs []v1.BackendRefApplyConfiguration `json:"backendRefs,omitempty"`
+	Name        *v1.SectionName                       `json:"name,omitempty"`
+	BackendRefs []apisv1.BackendRefApplyConfiguration `json:"backendRefs,omitempty"`
 }
 
-// TCPRouteRuleApplyConfiguration constructs an declarative configuration of the TCPRouteRule type for use with
+// TCPRouteRuleApplyConfiguration constructs a declarative configuration of the TCPRouteRule type for use with
 // apply.
 func TCPRouteRule() *TCPRouteRuleApplyConfiguration {
 	return &TCPRouteRuleApplyConfiguration{}
 }
 
+// WithName sets the Name field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the Name field is set to the value of the last call.
+func (b *TCPRouteRuleApplyConfiguration) WithName(value v1.SectionName) *TCPRouteRuleApplyConfiguration {
+	b.Name = &value
+	return b
+}
+
 // WithBackendRefs adds the given value to the BackendRefs field in the declarative configuration
 // and returns the receiver, so that objects can be build by chaining "With" function invocations.
 // If called multiple times, values provided by each call will be appended to the BackendRefs field.
-func (b *TCPRouteRuleApplyConfiguration) WithBackendRefs(values ...*v1.BackendRefApplyConfiguration) *TCPRouteRuleApplyConfiguration {
+func (b *TCPRouteRuleApplyConfiguration) WithBackendRefs(values ...*apisv1.BackendRefApplyConfiguration) *TCPRouteRuleApplyConfiguration {
 	for i := range values {
 		if values[i] == nil {
 			panic("nil value passed to WithBackendRefs")

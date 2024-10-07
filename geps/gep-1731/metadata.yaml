@@ -1,0 +1,45 @@
+apiVersion: internal.gateway.networking.k8s.io/v1alpha1
+kind: GEPDetails
+number: 1731
+name: HTTPRoute Retries
+status: Experimental
+# Any authors who contribute to the GEP in any way should be listed here using
+# their Github handle.
+authors:
+  - mikemorris
+relationships:
+  # obsoletes indicates that a GEP makes the linked GEP obsolete, and completely
+  # replaces that GEP. The obsoleted GEP MUST have its obsoletedBy field
+  # set back to this GEP, and MUST be moved to Declined.
+  obsoletes: {}
+  obsoletedBy: {}
+  # extends indicates that a GEP extends the linkned GEP, adding more detail
+  # or additional implementation. The extended GEP MUST have its extendedBy
+  # field set back to this GEP.
+  extends: {}
+  extendedBy: {}
+  # seeAlso indicates other GEPs that are relevant in some way without being
+  # covered by an existing relationship.
+  seeAlso:
+    - number: 2257
+      name: Gateway API Duration Format
+      description: Uses duration format introduced in this GEP.
+    - number: 1742
+      name: HTTPRoute Timeouts
+      description: Covers some overlapping considerations around when requests should be retried.
+# references is a list of hyperlinks to relevant external references.
+# It's intended to be used for storing Github discussions, Google docs, etc.
+references:
+  - https://www.rfc-editor.org/rfc/rfc9110
+  - https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml
+# featureNames is a list of the feature names introduced by the GEP, if there
+# are any. This will allow us to track which feature was introduced by which GEP.
+featureNames:
+  - SupportHTTPRouteRetry
+  - SupportHTTPRouteRetryBackendTimeout
+  - SupportHTTPRouteRetryBackoff
+  - SupportHTTPRouteRetryCodes
+  - SupportHTTPRouteRetryConnectionError
+# changelog is a list of hyperlinks to PRs that make changes to the GEP, in
+# ascending date order.
+changelog: {}

@@ -19,25 +19,35 @@ limitations under the License.
 package v1alpha2
 
 import (
-	v1 "sigs.k8s.io/gateway-api/apis/applyconfiguration/apis/v1"
+	apisv1 "sigs.k8s.io/gateway-api/apis/applyconfiguration/apis/v1"
+	v1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
-// UDPRouteRuleApplyConfiguration represents an declarative configuration of the UDPRouteRule type for use
+// UDPRouteRuleApplyConfiguration represents a declarative configuration of the UDPRouteRule type for use
 // with apply.
 type UDPRouteRuleApplyConfiguration struct {
-	BackendRefs []v1.BackendRefApplyConfiguration `json:"backendRefs,omitempty"`
+	Name        *v1.SectionName                       `json:"name,omitempty"`
+	BackendRefs []apisv1.BackendRefApplyConfiguration `json:"backendRefs,omitempty"`
 }
 
-// UDPRouteRuleApplyConfiguration constructs an declarative configuration of the UDPRouteRule type for use with
+// UDPRouteRuleApplyConfiguration constructs a declarative configuration of the UDPRouteRule type for use with
 // apply.
 func UDPRouteRule() *UDPRouteRuleApplyConfiguration {
 	return &UDPRouteRuleApplyConfiguration{}
 }
 
+// WithName sets the Name field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the Name field is set to the value of the last call.
+func (b *UDPRouteRuleApplyConfiguration) WithName(value v1.SectionName) *UDPRouteRuleApplyConfiguration {
+	b.Name = &value
+	return b
+}
+
 // WithBackendRefs adds the given value to the BackendRefs field in the declarative configuration
 // and returns the receiver, so that objects can be build by chaining "With" function invocations.
 // If called multiple times, values provided by each call will be appended to the BackendRefs field.
-func (b *UDPRouteRuleApplyConfiguration) WithBackendRefs(values ...*v1.BackendRefApplyConfiguration) *UDPRouteRuleApplyConfiguration {
+func (b *UDPRouteRuleApplyConfiguration) WithBackendRefs(values ...*apisv1.BackendRefApplyConfiguration) *UDPRouteRuleApplyConfiguration {
 	for i := range values {
 		if values[i] == nil {
 			panic("nil value passed to WithBackendRefs")

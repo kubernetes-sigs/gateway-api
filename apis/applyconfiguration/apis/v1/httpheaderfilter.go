@@ -18,7 +18,7 @@ limitations under the License.
 
 package v1
 
-// HTTPHeaderFilterApplyConfiguration represents an declarative configuration of the HTTPHeaderFilter type for use
+// HTTPHeaderFilterApplyConfiguration represents a declarative configuration of the HTTPHeaderFilter type for use
 // with apply.
 type HTTPHeaderFilterApplyConfiguration struct {
 	Set    []HTTPHeaderApplyConfiguration `json:"set,omitempty"`
@@ -26,7 +26,7 @@ type HTTPHeaderFilterApplyConfiguration struct {
 	Remove []string                       `json:"remove,omitempty"`
 }
 
-// HTTPHeaderFilterApplyConfiguration constructs an declarative configuration of the HTTPHeaderFilter type for use with
+// HTTPHeaderFilterApplyConfiguration constructs a declarative configuration of the HTTPHeaderFilter type for use with
 // apply.
 func HTTPHeaderFilter() *HTTPHeaderFilterApplyConfiguration {
 	return &HTTPHeaderFilterApplyConfiguration{}

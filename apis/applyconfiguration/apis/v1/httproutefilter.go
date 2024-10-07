@@ -22,7 +22,7 @@ import (
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
-// HTTPRouteFilterApplyConfiguration represents an declarative configuration of the HTTPRouteFilter type for use
+// HTTPRouteFilterApplyConfiguration represents a declarative configuration of the HTTPRouteFilter type for use
 // with apply.
 type HTTPRouteFilterApplyConfiguration struct {
 	Type                   *v1.HTTPRouteFilterType                      `json:"type,omitempty"`
@@ -34,7 +34,7 @@ type HTTPRouteFilterApplyConfiguration struct {
 	ExtensionRef           *LocalObjectReferenceApplyConfiguration      `json:"extensionRef,omitempty"`
 }
 
-// HTTPRouteFilterApplyConfiguration constructs an declarative configuration of the HTTPRouteFilter type for use with
+// HTTPRouteFilterApplyConfiguration constructs a declarative configuration of the HTTPRouteFilter type for use with
 // apply.
 func HTTPRouteFilter() *HTTPRouteFilterApplyConfiguration {
 	return &HTTPRouteFilterApplyConfiguration{}

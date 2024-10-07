@@ -44,22 +44,24 @@ var udproutesKind = v1alpha2.SchemeGroupVersion.WithKind("UDPRoute")
 
 // Get takes name of the uDPRoute, and returns the corresponding uDPRoute object, and an error if there is any.
 func (c *FakeUDPRoutes) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha2.UDPRoute, err error) {
+	emptyResult := &v1alpha2.UDPRoute{}
 	obj, err := c.Fake.
-		Invokes(testing.NewGetAction(udproutesResource, c.ns, name), &v1alpha2.UDPRoute{})
+		Invokes(testing.NewGetActionWithOptions(udproutesResource, c.ns, name, options), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha2.UDPRoute), err
 }
 
 // List takes label and field selectors, and returns the list of UDPRoutes that match those selectors.
 func (c *FakeUDPRoutes) List(ctx context.Context, opts v1.ListOptions) (result *v1alpha2.UDPRouteList, err error) {
+	emptyResult := &v1alpha2.UDPRouteList{}
 	obj, err := c.Fake.
-		Invokes(testing.NewListAction(udproutesResource, udproutesKind, c.ns, opts), &v1alpha2.UDPRouteList{})
+		Invokes(testing.NewListActionWithOptions(udproutesResource, udproutesKind, c.ns, opts), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 
 	label, _, _ := testing.ExtractFromListOptions(opts)
@@ -78,40 +80,43 @@ func (c *FakeUDPRoutes) List(ctx context.Context, opts v1.ListOptions) (result *
 // Watch returns a watch.Interface that watches the requested uDPRoutes.
 func (c *FakeUDPRoutes) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
 	return c.Fake.
-		InvokesWatch(testing.NewWatchAction(udproutesResource, c.ns, opts))
+		InvokesWatch(testing.NewWatchActionWithOptions(udproutesResource, c.ns, opts))
 
 }
 
 // Create takes the representation of a uDPRoute and creates it.  Returns the server's representation of the uDPRoute, and an error, if there is any.
 func (c *FakeUDPRoutes) Create(ctx context.Context, uDPRoute *v1alpha2.UDPRoute, opts v1.CreateOptions) (result *v1alpha2.UDPRoute, err error) {
+	emptyResult := &v1alpha2.UDPRoute{}
 	obj, err := c.Fake.
-		Invokes(testing.NewCreateAction(udproutesResource, c.ns, uDPRoute), &v1alpha2.UDPRoute{})
+		Invokes(testing.NewCreateActionWithOptions(udproutesResource, c.ns, uDPRoute, opts), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha2.UDPRoute), err
 }
 
 // Update takes the representation of a uDPRoute and updates it. Returns the server's representation of the uDPRoute, and an error, if there is any.
 func (c *FakeUDPRoutes) Update(ctx context.Context, uDPRoute *v1alpha2.UDPRoute, opts v1.UpdateOptions) (result *v1alpha2.UDPRoute, err error) {
+	emptyResult := &v1alpha2.UDPRoute{}
 	obj, err := c.Fake.
-		Invokes(testing.NewUpdateAction(udproutesResource, c.ns, uDPRoute), &v1alpha2.UDPRoute{})
+		Invokes(testing.NewUpdateActionWithOptions(udproutesResource, c.ns, uDPRoute, opts), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha2.UDPRoute), err
 }
 
 // UpdateStatus was generated because the type contains a Status member.
 // Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-func (c *FakeUDPRoutes) UpdateStatus(ctx context.Context, uDPRoute *v1alpha2.UDPRoute, opts v1.UpdateOptions) (*v1alpha2.UDPRoute, error) {
+func (c *FakeUDPRoutes) UpdateStatus(ctx context.Context, uDPRoute *v1alpha2.UDPRoute, opts v1.UpdateOptions) (result *v1alpha2.UDPRoute, err error) {
+	emptyResult := &v1alpha2.UDPRoute{}
 	obj, err := c.Fake.
-		Invokes(testing.NewUpdateSubresourceAction(udproutesResource, "status", c.ns, uDPRoute), &v1alpha2.UDPRoute{})
+		Invokes(testing.NewUpdateSubresourceActionWithOptions(udproutesResource, "status", c.ns, uDPRoute, opts), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha2.UDPRoute), err
 }
@@ -126,7 +131,7 @@ func (c *FakeUDPRoutes) Delete(ctx context.Context, name string, opts v1.DeleteO
 
 // DeleteCollection deletes a collection of objects.
 func (c *FakeUDPRoutes) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
-	action := testing.NewDeleteCollectionAction(udproutesResource, c.ns, listOpts)
+	action := testing.NewDeleteCollectionActionWithOptions(udproutesResource, c.ns, opts, listOpts)
 
 	_, err := c.Fake.Invokes(action, &v1alpha2.UDPRouteList{})
 	return err
@@ -134,11 +139,12 @@ func (c *FakeUDPRoutes) DeleteCollection(ctx context.Context, opts v1.DeleteOpti
 
 // Patch applies the patch and returns the patched uDPRoute.
 func (c *FakeUDPRoutes) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha2.UDPRoute, err error) {
+	emptyResult := &v1alpha2.UDPRoute{}
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(udproutesResource, c.ns, name, pt, data, subresources...), &v1alpha2.UDPRoute{})
+		Invokes(testing.NewPatchSubresourceActionWithOptions(udproutesResource, c.ns, name, pt, data, opts, subresources...), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha2.UDPRoute), err
 }
@@ -156,11 +162,12 @@ func (c *FakeUDPRoutes) Apply(ctx context.Context, uDPRoute *apisv1alpha2.UDPRou
 	if name == nil {
 		return nil, fmt.Errorf("uDPRoute.Name must be provided to Apply")
 	}
+	emptyResult := &v1alpha2.UDPRoute{}
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(udproutesResource, c.ns, *name, types.ApplyPatchType, data), &v1alpha2.UDPRoute{})
+		Invokes(testing.NewPatchSubresourceActionWithOptions(udproutesResource, c.ns, *name, types.ApplyPatchType, data, opts.ToPatchOptions()), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha2.UDPRoute), err
 }
@@ -179,11 +186,12 @@ func (c *FakeUDPRoutes) ApplyStatus(ctx context.Context, uDPRoute *apisv1alpha2.
 	if name == nil {
 		return nil, fmt.Errorf("uDPRoute.Name must be provided to Apply")
 	}
+	emptyResult := &v1alpha2.UDPRoute{}
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(udproutesResource, c.ns, *name, types.ApplyPatchType, data, "status"), &v1alpha2.UDPRoute{})
+		Invokes(testing.NewPatchSubresourceActionWithOptions(udproutesResource, c.ns, *name, types.ApplyPatchType, data, opts.ToPatchOptions(), "status"), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha2.UDPRoute), err
 }

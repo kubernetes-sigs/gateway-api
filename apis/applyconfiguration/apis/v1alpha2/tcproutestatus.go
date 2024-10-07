@@ -22,13 +22,13 @@ import (
 	v1 "sigs.k8s.io/gateway-api/apis/applyconfiguration/apis/v1"
 )
 
-// TCPRouteStatusApplyConfiguration represents an declarative configuration of the TCPRouteStatus type for use
+// TCPRouteStatusApplyConfiguration represents a declarative configuration of the TCPRouteStatus type for use
 // with apply.
 type TCPRouteStatusApplyConfiguration struct {
 	v1.RouteStatusApplyConfiguration `json:",inline"`
 }
 
-// TCPRouteStatusApplyConfiguration constructs an declarative configuration of the TCPRouteStatus type for use with
+// TCPRouteStatusApplyConfiguration constructs a declarative configuration of the TCPRouteStatus type for use with
 // apply.
 func TCPRouteStatus() *TCPRouteStatusApplyConfiguration {
 	return &TCPRouteStatusApplyConfiguration{}

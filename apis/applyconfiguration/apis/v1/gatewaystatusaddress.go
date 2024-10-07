@@ -22,14 +22,14 @@ import (
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
-// GatewayStatusAddressApplyConfiguration represents an declarative configuration of the GatewayStatusAddress type for use
+// GatewayStatusAddressApplyConfiguration represents a declarative configuration of the GatewayStatusAddress type for use
 // with apply.
 type GatewayStatusAddressApplyConfiguration struct {
 	Type  *v1.AddressType `json:"type,omitempty"`
 	Value *string         `json:"value,omitempty"`
 }
 
-// GatewayStatusAddressApplyConfiguration constructs an declarative configuration of the GatewayStatusAddress type for use with
+// GatewayStatusAddressApplyConfiguration constructs a declarative configuration of the GatewayStatusAddress type for use with
 // apply.
 func GatewayStatusAddress() *GatewayStatusAddressApplyConfiguration {
 	return &GatewayStatusAddressApplyConfiguration{}

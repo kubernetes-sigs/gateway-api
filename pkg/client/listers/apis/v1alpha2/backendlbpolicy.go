@@ -19,8 +19,8 @@ limitations under the License.
 package v1alpha2
 
 import (
-	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/client-go/listers"
 	"k8s.io/client-go/tools/cache"
 	v1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
 )
@@ -38,25 +38,17 @@ type BackendLBPolicyLister interface {
 
 // backendLBPolicyLister implements the BackendLBPolicyLister interface.
 type backendLBPolicyLister struct {
-	indexer cache.Indexer
+	listers.ResourceIndexer[*v1alpha2.BackendLBPolicy]
 }
 
 // NewBackendLBPolicyLister returns a new BackendLBPolicyLister.
 func NewBackendLBPolicyLister(indexer cache.Indexer) BackendLBPolicyLister {
-	return &backendLBPolicyLister{indexer: indexer}
-}
-
-// List lists all BackendLBPolicies in the indexer.
-func (s *backendLBPolicyLister) List(selector labels.Selector) (ret []*v1alpha2.BackendLBPolicy, err error) {
-	err = cache.ListAll(s.indexer, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha2.BackendLBPolicy))
-	})
-	return ret, err
+	return &backendLBPolicyLister{listers.New[*v1alpha2.BackendLBPolicy](indexer, v1alpha2.Resource("backendlbpolicy"))}
 }
 
 // BackendLBPolicies returns an object that can list and get BackendLBPolicies.
 func (s *backendLBPolicyLister) BackendLBPolicies(namespace string) BackendLBPolicyNamespaceLister {
-	return backendLBPolicyNamespaceLister{indexer: s.indexer, namespace: namespace}
+	return backendLBPolicyNamespaceLister{listers.NewNamespaced[*v1alpha2.BackendLBPolicy](s.ResourceIndexer, namespace)}
 }
 
 // BackendLBPolicyNamespaceLister helps list and get BackendLBPolicies.
@@ -74,26 +66,5 @@ type BackendLBPolicyNamespaceLister interface {
 // backendLBPolicyNamespaceLister implements the BackendLBPolicyNamespaceLister
 // interface.
 type backendLBPolicyNamespaceLister struct {
-	indexer   cache.Indexer
-	namespace string
-}
-
-// List lists all BackendLBPolicies in the indexer for a given namespace.
-func (s backendLBPolicyNamespaceLister) List(selector labels.Selector) (ret []*v1alpha2.BackendLBPolicy, err error) {
-	err = cache.ListAllByNamespace(s.indexer, s.namespace, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha2.BackendLBPolicy))
-	})
-	return ret, err
-}
-
-// Get retrieves the BackendLBPolicy from the indexer for a given namespace and name.
-func (s backendLBPolicyNamespaceLister) Get(name string) (*v1alpha2.BackendLBPolicy, error) {
-	obj, exists, err := s.indexer.GetByKey(s.namespace + "/" + name)
-	if err != nil {
-		return nil, err
-	}
-	if !exists {
-		return nil, errors.NewNotFound(v1alpha2.Resource("backendlbpolicy"), name)
-	}
-	return obj.(*v1alpha2.BackendLBPolicy), nil
+	listers.ResourceIndexer[*v1alpha2.BackendLBPolicy]
 }

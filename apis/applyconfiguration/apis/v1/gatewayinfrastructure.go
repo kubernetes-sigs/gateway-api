@@ -22,15 +22,15 @@ import (
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
-// GatewayInfrastructureApplyConfiguration represents an declarative configuration of the GatewayInfrastructure type for use
+// GatewayInfrastructureApplyConfiguration represents a declarative configuration of the GatewayInfrastructure type for use
 // with apply.
 type GatewayInfrastructureApplyConfiguration struct {
-	Labels        map[v1.AnnotationKey]v1.AnnotationValue     `json:"labels,omitempty"`
+	Labels        map[v1.LabelKey]v1.LabelValue               `json:"labels,omitempty"`
 	Annotations   map[v1.AnnotationKey]v1.AnnotationValue     `json:"annotations,omitempty"`
 	ParametersRef *LocalParametersReferenceApplyConfiguration `json:"parametersRef,omitempty"`
 }
 
-// GatewayInfrastructureApplyConfiguration constructs an declarative configuration of the GatewayInfrastructure type for use with
+// GatewayInfrastructureApplyConfiguration constructs a declarative configuration of the GatewayInfrastructure type for use with
 // apply.
 func GatewayInfrastructure() *GatewayInfrastructureApplyConfiguration {
 	return &GatewayInfrastructureApplyConfiguration{}
@@ -40,9 +40,9 @@ func GatewayInfrastructure() *GatewayInfrastructureApplyConfiguration {
 // and returns the receiver, so that objects can be build by chaining "With" function invocations.
 // If called multiple times, the entries provided by each call will be put on the Labels field,
 // overwriting an existing map entries in Labels field with the same key.
-func (b *GatewayInfrastructureApplyConfiguration) WithLabels(entries map[v1.AnnotationKey]v1.AnnotationValue) *GatewayInfrastructureApplyConfiguration {
+func (b *GatewayInfrastructureApplyConfiguration) WithLabels(entries map[v1.LabelKey]v1.LabelValue) *GatewayInfrastructureApplyConfiguration {
 	if b.Labels == nil && len(entries) > 0 {
-		b.Labels = make(map[v1.AnnotationKey]v1.AnnotationValue, len(entries))
+		b.Labels = make(map[v1.LabelKey]v1.LabelValue, len(entries))
 	}
 	for k, v := range entries {
 		b.Labels[k] = v

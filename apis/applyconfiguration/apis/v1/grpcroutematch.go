@@ -18,14 +18,14 @@ limitations under the License.
 
 package v1
 
-// GRPCRouteMatchApplyConfiguration represents an declarative configuration of the GRPCRouteMatch type for use
+// GRPCRouteMatchApplyConfiguration represents a declarative configuration of the GRPCRouteMatch type for use
 // with apply.
 type GRPCRouteMatchApplyConfiguration struct {
 	Method  *GRPCMethodMatchApplyConfiguration  `json:"method,omitempty"`
 	Headers []GRPCHeaderMatchApplyConfiguration `json:"headers,omitempty"`
 }
 
-// GRPCRouteMatchApplyConfiguration constructs an declarative configuration of the GRPCRouteMatch type for use with
+// GRPCRouteMatchApplyConfiguration constructs a declarative configuration of the GRPCRouteMatch type for use with
 // apply.
 func GRPCRouteMatch() *GRPCRouteMatchApplyConfiguration {
 	return &GRPCRouteMatchApplyConfiguration{}

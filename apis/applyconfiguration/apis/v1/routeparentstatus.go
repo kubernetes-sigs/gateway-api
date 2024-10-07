@@ -20,11 +20,10 @@ package v1
 
 import (
 	metav1 "k8s.io/client-go/applyconfigurations/meta/v1"
-
 	apisv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
-// RouteParentStatusApplyConfiguration represents an declarative configuration of the RouteParentStatus type for use
+// RouteParentStatusApplyConfiguration represents a declarative configuration of the RouteParentStatus type for use
 // with apply.
 type RouteParentStatusApplyConfiguration struct {
 	ParentRef      *ParentReferenceApplyConfiguration   `json:"parentRef,omitempty"`
@@ -32,7 +31,7 @@ type RouteParentStatusApplyConfiguration struct {
 	Conditions     []metav1.ConditionApplyConfiguration `json:"conditions,omitempty"`
 }
 
-// RouteParentStatusApplyConfiguration constructs an declarative configuration of the RouteParentStatus type for use with
+// RouteParentStatusApplyConfiguration constructs a declarative configuration of the RouteParentStatus type for use with
 // apply.
 func RouteParentStatus() *RouteParentStatusApplyConfiguration {
 	return &RouteParentStatusApplyConfiguration{}

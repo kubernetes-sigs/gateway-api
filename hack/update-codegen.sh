@@ -184,7 +184,7 @@ readonly PROTOC_LINUX_X86_URL="${PROTOC_REPO}/releases/download/v${PROTOC_VERSIO
 readonly PROTOC_LINUX_X86_CHECKSUM="4805ba56594556402a6c327a8d885a47640ee363  ${PROTOC_BINARY}"
 
 readonly PROTOC_LINUX_ARM64_URL="${PROTOC_REPO}/releases/download/v${PROTOC_VERSION}/protoc-${PROTOC_VERSION}-linux-aarch_64.zip"
-readonly PROTOC_LINUX_ARM63_CHECKSUM="47285b2386f990da319e9eef92cadec2dfa28733  ${PROTOC_BINARY}"
+readonly PROTOC_LINUX_ARM64_CHECKSUM="47285b2386f990da319e9eef92cadec2dfa28733  ${PROTOC_BINARY}"
 
 readonly PROTOC_MAC_UNIVERSAL_URL="${PROTOC_REPO}/releases/download/v${PROTOC_VERSION}/protoc-${PROTOC_VERSION}-osx-universal_binary.zip"
 readonly PROTOC_MAC_UNIVERSAL_CHECKSUM="2a79d0eb235c808eca8de893762072b94dc6144c  ${PROTOC_BINARY}"
@@ -193,15 +193,11 @@ PROTOC_URL=""
 PROTOC_CHECKSUM=""
 
 ARCH=$(uname -m)
-RAW_OS=$(uname -o)
+OS=$(uname)
 
-OS=""
-if echo "${RAW_OS}" | grep -i "Linux" >/dev/null; then
-  OS="Linux"
-elif echo "${RAW_OS}" | grep -i "Darwin" >/dev/null; then
-  OS="Mac"
-else
-  echo "Unsupported operating system"
+if [[ "${OS}" != "Linux" ]] && [[ "${OS}" != "Darwin" ]]; then
+  echo "Unsupported operating system ${OS}" >/dev/stderr
+  exit 1
 fi
 
 if [[ "${OS}" == "Linux" ]]; then
@@ -211,11 +207,14 @@ if [[ "${OS}" == "Linux" ]]; then
   elif [[ "$ARCH" == "arm64" ]]; then
     PROTOC_URL="$PROTOC_LINUX_ARM64_URL"
     PROTOC_CHECKSUM="$PROTOC_LINUX_ARM64_CHECKSUM"
+  elif [[ "$ARCH" == "aarch64" ]]; then
+    PROTOC_URL="$PROTOC_LINUX_ARM64_URL"
+    PROTOC_CHECKSUM="$PROTOC_LINUX_ARM64_CHECKSUM"
   else
     echo "Architecture ${ARCH} is not supported on OS ${OS}." >/dev/stderr
     exit 1
   fi
-elif [[ "${OS}" == "Mac" ]]; then
+elif [[ "${OS}" == "Darwin" ]]; then
     PROTOC_URL="$PROTOC_MAC_UNIVERSAL_URL"
     PROTOC_CHECKSUM="$PROTOC_MAC_UNIVERSAL_CHECKSUM"
 fi

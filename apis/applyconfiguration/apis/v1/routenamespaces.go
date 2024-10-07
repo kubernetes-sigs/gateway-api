@@ -23,14 +23,14 @@ import (
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
-// RouteNamespacesApplyConfiguration represents an declarative configuration of the RouteNamespaces type for use
+// RouteNamespacesApplyConfiguration represents a declarative configuration of the RouteNamespaces type for use
 // with apply.
 type RouteNamespacesApplyConfiguration struct {
 	From     *v1.FromNamespaces                      `json:"from,omitempty"`
 	Selector *metav1.LabelSelectorApplyConfiguration `json:"selector,omitempty"`
 }
 
-// RouteNamespacesApplyConfiguration constructs an declarative configuration of the RouteNamespaces type for use with
+// RouteNamespacesApplyConfiguration constructs a declarative configuration of the RouteNamespaces type for use with
 // apply.
 func RouteNamespaces() *RouteNamespacesApplyConfiguration {
 	return &RouteNamespacesApplyConfiguration{}

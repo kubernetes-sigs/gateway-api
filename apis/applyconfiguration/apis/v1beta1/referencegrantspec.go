@@ -18,14 +18,14 @@ limitations under the License.
 
 package v1beta1
 
-// ReferenceGrantSpecApplyConfiguration represents an declarative configuration of the ReferenceGrantSpec type for use
+// ReferenceGrantSpecApplyConfiguration represents a declarative configuration of the ReferenceGrantSpec type for use
 // with apply.
 type ReferenceGrantSpecApplyConfiguration struct {
 	From []ReferenceGrantFromApplyConfiguration `json:"from,omitempty"`
 	To   []ReferenceGrantToApplyConfiguration   `json:"to,omitempty"`
 }
 
-// ReferenceGrantSpecApplyConfiguration constructs an declarative configuration of the ReferenceGrantSpec type for use with
+// ReferenceGrantSpecApplyConfiguration constructs a declarative configuration of the ReferenceGrantSpec type for use with
 // apply.
 func ReferenceGrantSpec() *ReferenceGrantSpecApplyConfiguration {
 	return &ReferenceGrantSpecApplyConfiguration{}
