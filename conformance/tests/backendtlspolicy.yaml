@@ -15,7 +15,7 @@ spec:
       - group: ""
         kind: Secret
         name: tls-checks-certificate
-    hostname: "*.example.com"
+    hostname: "abc.example.com"
     allowedRoutes:
       namespaces:
         from: Same
@@ -52,6 +52,7 @@ spec:
   hostnames:
   - abc.example.com
   rules:
-  - backendRefs:
-    - name: tls-backend
-      port: 443
+  - matches:
+    - path:
+        type: Exact
+        value: /backendTLS

@@ -20,7 +20,6 @@ import (
 	"testing"
 
 	"k8s.io/apimachinery/pkg/types"
-
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
@@ -48,17 +47,22 @@ var BackendTLSPolicy = suite.ConformanceTest{
 
 		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
 
+		serverStr := "abc.example.com"
+		headers := make(map[string]string)
+		headers["Host"] = serverStr
+
 		// Verify that the response to a call to /backendTLS will return the matching SNI.
 		t.Run("Simple request targeting BackendTLSPolicy should reach infra-backend", func(t *testing.T) {
-			http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr,
+			http.MakeHTTPSRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr,
 				http.ExpectedResponse{
 					Request: http.Request{
-						Path: "/backendTLS",
+						Headers: headers,
+						Host:    serverStr,
+						Path:    "/backendTLS",
 					},
 					Response:   http.Response{StatusCode: 200},
-					Backend:    "infra-backend-v1",
 					Namespace:  "gateway-conformance-infra",
-					ServerName: "abc.example.com",
+					ServerName: serverStr,
 				})
 		})
 	},
