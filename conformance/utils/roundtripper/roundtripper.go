@@ -228,6 +228,17 @@ func (d *DefaultRoundTripper) defaultRoundTrip(request Request, transport http.R
 
 	resp, err := client.Do(req)
 	if err != nil {
+		if d.Debug {
+			var dump []byte
+			if resp != nil {
+				dump, err = httputil.DumpResponse(resp, true)
+				if err != nil {
+					return nil, nil, err
+				}
+				tlog.Logf(request.T, "Error sending request:\n%s\n\n", formatDump(dump, "< "))
+			}
+			tlog.Log(request.T, "Error sending request: no response\n")
+		}
 		return nil, nil, err
 	}
 	defer resp.Body.Close()
