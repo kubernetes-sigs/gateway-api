@@ -99,7 +99,7 @@ func generateRSACert(hosts []string, keyOut, certOut io.Writer) error {
 	for _, h := range hosts {
 		if ip := net.ParseIP(h); ip != nil {
 			template.IPAddresses = append(template.IPAddresses, ip)
-		} else if err := validateHost(h); err == nil {
+		} else if err = validateHost(h); err == nil {
 			template.DNSNames = append(template.DNSNames, h)
 		}
 	}

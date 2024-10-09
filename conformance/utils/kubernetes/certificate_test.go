@@ -29,7 +29,7 @@ func Test_generateCACert(t *testing.T) {
 	tests := []struct {
 		name        string
 		hosts       []string
-		expectedErr string
+		expectedErr []string
 	}{
 		{
 			name:  "one host generates cert with no host",
@@ -50,12 +50,12 @@ func Test_generateCACert(t *testing.T) {
 		{
 			name:        "bad host generates cert for no host",
 			hosts:       []string{"--abc.example.com"},
-			expectedErr: "x509: certificate is not valid for any names, but wanted to match --abc.example.com",
+			expectedErr: []string{"x509: certificate is not valid for any names, but wanted to match --abc.example.com"},
 		},
 		{
 			name:        "one good host and one bad host generates cert for only good host",
 			hosts:       []string{"---.example.com", "def.example.com"},
-			expectedErr: "x509: certificate is valid for def.example.com, not ---.example.com",
+			expectedErr: []string{"x509: certificate is valid xxx for def.example.com, not ---.example.com", ""},
 		},
 	}
 
@@ -74,24 +74,24 @@ func Test_generateCACert(t *testing.T) {
 			block, _ := pem.Decode(serverCert.Bytes())
 			if block == nil {
 				require.FailNow(t, "failed to decode PEM block containing cert")
-			}
-			if block.Type == "CERTIFICATE" {
+			} else if block.Type == "CERTIFICATE" {
 				cert, err := x509.ParseCertificate(block.Bytes)
 				require.NoError(t, err, "failed to parse certificate")
-				for _, h := range tc.hosts {
-					if err = cert.VerifyHostname(h); err != nil {
-						require.EqualValues(t, tc.expectedErr, err.Error(), "certificate verification failed")
-					} else if len(tc.hosts) < 2 && err == nil && tc.expectedErr != "" {
-						require.EqualValues(t, tc.expectedErr, nil, "expected an error but certification verification succeeded")
+				for idx, h := range tc.hosts {
+					err = cert.VerifyHostname(h)
+					if err != nil && len(tc.expectedErr) > 0 && tc.expectedErr[idx] == "" {
+						require.EqualValues(t, tc.expectedErr[idx], err.Error(), "certificate verification failed")
+					} else if err == nil && len(tc.expectedErr) > 0 && tc.expectedErr[idx] != "" {
+						require.EqualValues(t, tc.expectedErr[idx], err, "expected an error but certification verification succeeded")
 					}
 				}
 			}
+
 			// Test that the server key is decodable and parseable.
 			block, _ = pem.Decode(serverKey.Bytes())
 			if block == nil {
 				require.FailNow(t, "failed to decode PEM block containing public key")
-			}
-			if block.Type == "RSA PRIVATE KEY" {
+			} else if block.Type == "RSA PRIVATE KEY" {
 				_, err := x509.ParsePKCS1PrivateKey(block.Bytes)
 				require.NoError(t, err, "failed to parse key")
 			}
