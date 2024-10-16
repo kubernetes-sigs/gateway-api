@@ -92,16 +92,16 @@ test.crds-validation:
 conformance:
 	go test ${GO_TEST_FLAGS} -v ./conformance -run TestConformance -args ${CONFORMANCE_FLAGS}
 	
-# Install CRD's and example resources to a pre-existing cluster.
+# Install CRD's and example resources to a preexisting cluster.
 .PHONY: install
 install: crd example
 
-# Install the CRD's to a pre-existing cluster.
+# Install the CRD's to a preexisting cluster.
 .PHONY: crd
 crd:
 	kubectl kustomize config/crd | kubectl apply -f -
 
-# Install the example resources to a pre-existing cluster.
+# Install the example resources to a preexisting cluster.
 .PHONY: example
 example:
 	hack/install-examples.sh
