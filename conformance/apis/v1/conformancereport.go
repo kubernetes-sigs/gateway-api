@@ -90,19 +90,19 @@ type Implementation struct {
 func (i *Implementation) Validate() error {
 	// TODO: add data validation https://github.com/kubernetes-sigs/gateway-api/issues/2178
 	if i.Organization == "" {
-		return errors.New("implementation's organization can not be empty")
+		return errors.New("implementation's organization cannot be empty")
 	}
 	if i.Project == "" {
-		return errors.New("implementation's project can not be empty")
+		return errors.New("implementation's project cannot be empty")
 	}
 	if i.URL == "" {
-		return errors.New("implementation's url can not be empty")
+		return errors.New("implementation's url cannot be empty")
 	}
 	if i.Version == "" {
-		return errors.New("implementation's version can not be empty")
+		return errors.New("implementation's version cannot be empty")
 	}
 	if len(i.Contact) == 0 {
-		return errors.New("implementation's contact can not be empty")
+		return errors.New("implementation's contact cannot be empty")
 	}
 	return nil
 }

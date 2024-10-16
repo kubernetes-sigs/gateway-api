@@ -185,7 +185,7 @@ Conformance levels are defined by the filter type:
 
 Specifying a core filter multiple times has unspecified or custom conformance.
 
-If an implementation can not support a combinations of filters, they must clearly
+If an implementation cannot support a combinations of filters, they must clearly
 document that limitation. In cases where incompatible or unsupported
 filters are specified and cause the `Accepted` condition to be set to status
 `False`, implementations may use the `IncompatibleFilters` reason to specify

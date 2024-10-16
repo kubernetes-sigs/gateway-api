@@ -210,7 +210,7 @@ type HTTPRouteRule struct {
 	// they are specified.
 	//
 	// Implementations MAY choose to implement this ordering strictly, rejecting
-	// any combination or order of filters that can not be supported. If implementations
+	// any combination or order of filters that cannot be supported. If implementations
 	// choose a strict interpretation of filter ordering, they MUST clearly document
 	// that behavior.
 	//
@@ -232,7 +232,7 @@ type HTTPRouteRule struct {
 	//
 	// All filters are expected to be compatible with each other except for the
 	// URLRewrite and RequestRedirect filters, which may not be combined. If an
-	// implementation can not support other combinations of filters, they must clearly
+	// implementation cannot support other combinations of filters, they must clearly
 	// document that limitation. In cases where incompatible or unsupported
 	// filters are specified and cause the `Accepted` condition to be set to status
 	// `False`, implementations may use the `IncompatibleFilters` reason to specify
