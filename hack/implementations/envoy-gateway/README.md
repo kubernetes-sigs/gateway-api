@@ -37,10 +37,10 @@ EOF
 ## Step 4: Run a specific conformance test
 
 ```shell script
-go test ../../../conformance -run TestConformance -args \
-    --gateway-class=envoy-gateway \
-    --supported-features=Gateway \
-    --allow-crds-mismatch
+go test -v ./conformance \
+--run TestConformance/TLSRouteSimpleSameNamespace \
+--gateway-class=envoy-gateway --supported-features=Gateway,TLSRoute \
+--allow-crds-mismatch
 ```
 
 ## (Optional) Step 4: Delete kind cluster
