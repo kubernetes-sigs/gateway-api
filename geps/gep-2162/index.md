@@ -123,7 +123,7 @@ Every feature should:
 
 #### Conformance test names
 
-Conformance tests file names should try to follow the the `pascal-case-name.go` format.
+Conformance tests file names should try to follow the `pascal-case-name.go` format.
 For example for `HTTPRoutePortRedirect` - the test file would be `httproute-port-redirect.go`.
 
 We should treat this guidance as "best effort" because we might have test files that check the combination of several features and can't follow the same format.

@@ -80,7 +80,7 @@ producer).
   - Assert that traffic from a client in a different `Namespace` is routed by the
     `HTTPRoute`
 
-A consumer `HTTPRoute` is in the same `Namespace` as the the request sender (the
+A consumer `HTTPRoute` is in the same `Namespace` as the request sender (the
 consumer), a different `Namespace` as the `parentRef` `Service`.
 
 - Given a consumer `HTTPRoute`
