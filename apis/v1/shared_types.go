@@ -469,7 +469,7 @@ type RouteParentStatus struct {
 	// There are a number of cases where the "Accepted" condition may not be set
 	// due to lack of controller visibility, that includes when:
 	//
-	// * The Route refers to a non-existent parent.
+	// * The Route refers to a nonexistent parent.
 	// * The Route is of a type that the controller does not support.
 	// * The Route is in a namespace the controller does not have access to.
 	//

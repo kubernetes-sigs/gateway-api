@@ -424,7 +424,7 @@ type GRPCRouteRule struct {
 	// BackendRefs defines the backend(s) where matching requests should be
 	// sent.
 
-	// If unspecified or invalid (refers to a non-existent resource or a Service
+	// If unspecified or invalid (refers to a nonexistent resource or a Service
 	// with no endpoints), the rule performs no forwarding. If there are also no
 	// filters specified that would result in a response being sent, a gRPC `UNAVAILABLE`
 	// status is returned. `UNAVAILABLE` responses must be sent so that the overall
