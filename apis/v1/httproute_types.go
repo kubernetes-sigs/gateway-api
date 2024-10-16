@@ -596,7 +596,7 @@ type HTTPHeaderMatch struct {
 	Type *HeaderMatchType `json:"type,omitempty"`
 
 	// Name is the name of the HTTP Header to be matched. Name matching MUST be
-	// case insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
+	// case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
 	//
 	// If multiple entries specify equivalent header names, only the first
 	// entry with an equivalent name MUST be considered for a match. Subsequent
@@ -947,7 +947,7 @@ const (
 // HTTPHeader represents an HTTP Header name and value as defined by RFC 7230.
 type HTTPHeader struct {
 	// Name is the name of the HTTP Header to be matched. Name matching MUST be
-	// case insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
+	// case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
 	//
 	// If multiple entries specify equivalent header names, the first entry with
 	// an equivalent name MUST be considered for a match. Subsequent entries

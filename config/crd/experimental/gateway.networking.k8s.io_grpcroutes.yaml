@@ -532,7 +532,7 @@ spec:
                                           name:
                                             description: |-
                                               Name is the name of the HTTP Header to be matched. Name matching MUST be
-                                              case insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
+                                              case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
 
                                               If multiple entries specify equivalent header names, the first entry with
                                               an equivalent name MUST be considered for a match. Subsequent entries
@@ -607,7 +607,7 @@ spec:
                                           name:
                                             description: |-
                                               Name is the name of the HTTP Header to be matched. Name matching MUST be
-                                              case insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
+                                              case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
 
                                               If multiple entries specify equivalent header names, the first entry with
                                               an equivalent name MUST be considered for a match. Subsequent entries
@@ -815,7 +815,7 @@ spec:
                                           name:
                                             description: |-
                                               Name is the name of the HTTP Header to be matched. Name matching MUST be
-                                              case insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
+                                              case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
 
                                               If multiple entries specify equivalent header names, the first entry with
                                               an equivalent name MUST be considered for a match. Subsequent entries
@@ -890,7 +890,7 @@ spec:
                                           name:
                                             description: |-
                                               Name is the name of the HTTP Header to be matched. Name matching MUST be
-                                              case insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
+                                              case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
 
                                               If multiple entries specify equivalent header names, the first entry with
                                               an equivalent name MUST be considered for a match. Subsequent entries
@@ -1182,7 +1182,7 @@ spec:
                                     name:
                                       description: |-
                                         Name is the name of the HTTP Header to be matched. Name matching MUST be
-                                        case insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
+                                        case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
 
                                         If multiple entries specify equivalent header names, the first entry with
                                         an equivalent name MUST be considered for a match. Subsequent entries
@@ -1256,7 +1256,7 @@ spec:
                                     name:
                                       description: |-
                                         Name is the name of the HTTP Header to be matched. Name matching MUST be
-                                        case insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
+                                        case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
 
                                         If multiple entries specify equivalent header names, the first entry with
                                         an equivalent name MUST be considered for a match. Subsequent entries
@@ -1463,7 +1463,7 @@ spec:
                                     name:
                                       description: |-
                                         Name is the name of the HTTP Header to be matched. Name matching MUST be
-                                        case insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
+                                        case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
 
                                         If multiple entries specify equivalent header names, the first entry with
                                         an equivalent name MUST be considered for a match. Subsequent entries
@@ -1537,7 +1537,7 @@ spec:
                                     name:
                                       description: |-
                                         Name is the name of the HTTP Header to be matched. Name matching MUST be
-                                        case insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
+                                        case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
 
                                         If multiple entries specify equivalent header names, the first entry with
                                         an equivalent name MUST be considered for a match. Subsequent entries
