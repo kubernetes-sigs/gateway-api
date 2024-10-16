@@ -42,7 +42,7 @@ these changes.
 
 The constants that mark the deprecated types will be also marked as deprecated,
 and will no longer be tested as part of conformance. They'll still be present,
-and will work, but they won't be part of the spec any more. This should give
+and will work, but they won't be part of the spec anymore. This should give
 implementations and users a release to transition to the new design (in UX terms).
 This grace period should be one release (so, the constants will be removed in
 v0.7.0.)
