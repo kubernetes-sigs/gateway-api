@@ -618,7 +618,7 @@ bar namespace. Unfortunately that would be very difficult to recreate with
 ReferenceGrant.
 
 ReferenceGrant is fundamentally about trusting references from resource of kind
-Foo in to resources of kind Bar. Names and section names are intentionally
+Foo in resources of kind Bar. Names and section names are intentionally
 excluded. If we added both of those concepts to ReferenceGrant, this would be
 possible, but quite complex and verbose. This is what the example from above
 would look like with this approach:
