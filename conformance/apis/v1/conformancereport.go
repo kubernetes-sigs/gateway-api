@@ -76,10 +76,10 @@ type Implementation struct {
 
 	// Contact is contact information for the maintainers so that Gateway API
 	// maintainers can get ahold of them as needed. Ideally this should be
-	// Github usernames (in the form of `@<username>`) or team names (in the
+	// GitHub usernames (in the form of `@<username>`) or team names (in the
 	// form of `@<team>/<name>`), but when that's not possible it can be email
 	// addresses.
-	// Rather than Github usernames or email addresses you can provide a URL to the relevant
+	// Rather than GitHub usernames or email addresses you can provide a URL to the relevant
 	// support pages for the project. Ideally this would be something like the issue creation page
 	// on a repository, but for projects without a publicly exposed repository a general support
 	// page URL can be provided.

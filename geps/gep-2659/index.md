@@ -127,7 +127,7 @@ relationships:
   # covered by an existing relationship.
   seeAlso: {}
 # references is a list of hyperlinks to relevant external references.
-# It's intended to be used for storing Github discussions, Google docs, etc.
+# It's intended to be used for storing GitHub discussions, Google docs, etc.
 references: {}
 # featureNames is a list of the feature names introduced by the GEP, if there
 # are any. This will allow us to track which feature was introduced by which GEP.
