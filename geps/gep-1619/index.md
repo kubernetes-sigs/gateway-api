@@ -1069,7 +1069,7 @@ TODO
 ### Open Questions
 
 - What happens when session persistence causes traffic splitting scenarios to overload a backend?
-- Should we add status somewhere when a user gets in to a "risky" configuration with session persistence?
+- Should we add status somewhere when a user gets into a "risky" configuration with session persistence?
 - Should there be an API configuration field that specifies how already established sessions are handled?
 - How do implementations drain established sessions during backend upgrades without disruption?
     - Do we need a "session draining timeout" as documented by [A55: xDS-Based Stateful Session Affinity for Proxyless gRPC](https://github.com/grpc/proposal/blob/master/A55-xds-stateful-session-affinity.md#background)

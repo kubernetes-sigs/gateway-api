@@ -789,7 +789,7 @@ This solution:
 - is low cost in terms of apiserver updates (because it's only on the GatewayClass,
   and only on implementation startup)
 - provides a standard place for all users to look for relevant objects
-- ties in to the Conformance Profiles design and other efforts about GatewayClass 
+- ties into the Conformance Profiles design and other efforts about GatewayClass 
   status
 
 #### Standard status stanza

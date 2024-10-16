@@ -418,7 +418,7 @@ For many implementations (certainly for Envoy-based ones), getting this informat
 correctly and avoiding races on applying it is surprisingly difficult. 
 
 For this reason, this GEP proposes that we exclude the `Ready` condition from Core
-conformance, and make it a feature that implementations may opt in to - making it
+conformance, and make it a feature that implementations may opt into - making it
 an Extended condition.
 
 It will have the following behavior:
