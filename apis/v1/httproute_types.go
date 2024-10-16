@@ -487,7 +487,7 @@ const (
 	PathMatchExact PathMatchType = "Exact"
 
 	// Matches based on a URL path prefix split by `/`. Matching is
-	// case sensitive and done on a path element by element basis. A
+	// case-sensitive and done on a path element by element basis. A
 	// path element refers to the list of labels in the path split by
 	// the `/` separator. When specified, a trailing `/` is ignored.
 	//
