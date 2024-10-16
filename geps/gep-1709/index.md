@@ -358,7 +358,7 @@ profiles:
 
 > **WARNING**: It is an important clarification that this is NOT a full
 > Kubernetes API. It uses `TypeMeta` for some fields that made sense to re-use
-> and were familiar, but otherwise has it's own structure. It is not a [Custom
+> and were familiar, but otherwise has its own structure. It is not a [Custom
 > Resource Definition (CRD)][crd] nor will it be made available along with our
 > CRDs. It will be used only by conformance test tooling.
 
