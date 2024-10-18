@@ -87,7 +87,7 @@ Memorandum GEPs after this GEP is merged.
 
 ### Addition of YAML metadata file
 
-The core Gateway API mainatainers were hoping not to need metadata YAMLs for a
+The core Gateway API maintainers were hoping not to need metadata YAMLs for a
 while, but the addition of relationships has turbocharged the need for machine
 parseable GEP metadata.
 
