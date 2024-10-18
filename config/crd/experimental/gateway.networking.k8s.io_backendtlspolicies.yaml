@@ -174,7 +174,7 @@ spec:
 
                       If CACertificateRefs is empty or unspecified, then WellKnownCACertificates must be
                       specified. Only one of CACertificateRefs or WellKnownCACertificates may be specified,
-                      not both. If CACertifcateRefs is empty or unspecified, the configuration for
+                      not both. If CACertificateRefs is empty or unspecified, the configuration for
                       WellKnownCACertificates MUST be honored instead if supported by the implementation.
 
                       References to a resource in a different namespace are invalid for the

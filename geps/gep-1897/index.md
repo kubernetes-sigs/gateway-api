@@ -216,9 +216,9 @@ specified as "").  The use and definition of system certificates is implementati
 these certificates are obtained from the underlying operating system. CACertificateRefs contains one or more
 references to Kubernetes objects that contain PEM-encoded TLS certificates, which are used to establish a TLS handshake
 between the gateway and backend pod. References to a resource in a different namespace are invalid.
-If ClientCertifcateRefs is unspecified, then WellKnownCACertificates must be set to "System" for a valid configuration.
+If ClientCertificateRefs is unspecified, then WellKnownCACertificates must be set to "System" for a valid configuration.
 If WellKnownCACertificates is unspecified, then CACertificateRefs must be specified with at least one entry for a valid configuration.
-If WellKnownCACertficates is set to "System" and there are no system trusted certificates or the implementation doesn't define system
+If WellKnownCACertificates is set to "System" and there are no system trusted certificates or the implementation doesn't define system
 trusted certificates, then the associated TLS connection must fail.
 
 The `Hostname` field is required and is to be used to configure the SNI the Gateway should use to connect to the backend.
