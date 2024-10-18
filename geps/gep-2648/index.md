@@ -95,7 +95,7 @@ the Policy object, the DataplaneConfig object does not affect if the Policy is
 a Direct one or not. This is because _a user can understand the state of the
 hierarchy by looking at all the objects in the hierarchy_. DataplaneConfig is
 _outside_ the hierarchy in terms of understanding the state of the Policy.
-Direct Attacthed Policy is intended as a way to _manage the complexity_ of
+Direct Attached Policy is intended as a way to _manage the complexity_ of
 Policy objects and allow a _limited_ set of Policies to follow vastly more
 simple design patterns _if they meet a set of criteria_.
 
