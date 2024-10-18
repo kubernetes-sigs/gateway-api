@@ -300,7 +300,7 @@ const (
 Implementations that use Direct Policy objects SHOULD put a Condition into
 `status.Conditions` of any objects affected by a Direct Policy, if that field
 is present. Ideally, there should be a set of Conditions that can be namespaced
-by the implementing controller, but if that is not posisble, use the guidance below.
+by the implementing controller, but if that is not possible, use the guidance below.
 
 If they do, that Condition MUST have a `type` ending in `PolicyAffected` (like
 `gateway.networking.k8s.io/PolicyAffected`),
