@@ -978,7 +978,7 @@ spec:
 
 This is an invalid configuration as two separate sessions cannot have the same cookie name. Implementations SHOULD
 address this scenario in manner they deem appropriate. Implementations MAY choose to reject the configuration, or they
-MAY non-deterministicly allow one cookie to work (e.g. whichever cookie is configured first).
+MAY non-deterministically allow one cookie to work (e.g. whichever cookie is configured first).
 
 #### Traffic Splitting with route rule inline sessionPersistence field
 
