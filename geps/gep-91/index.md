@@ -151,7 +151,7 @@ spec:
 This section highlights use cases that may be covered in a future iteration of this GEP
 
 * Using system CA certificates as the trust anchor to validate the certificates presented by the frontend client.
-* Supporting a mode where validating client certficates is optional, useful for debugging and migrating to strict TLS.
+* Supporting a mode where validating client certificates is optional, useful for debugging and migrating to strict TLS.
 * Supporting an optional `subjectAltNames` field within `FrontendTLSValidation` that can be used to specify one or more alternate names to verify the subject identity in the certificate presented by the client. This field falls under Authorization, the initial focus here is on Client Authentication and will be revisited when Authorization is tackled as a whole in the project.
 * Specifying the verification depth in the client certificate chain. This is being deferred because the default verification depth differs across implementations.
 
