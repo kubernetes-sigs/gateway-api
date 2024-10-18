@@ -25,7 +25,7 @@ GAMMA intends to introduce a "Mesh" [conformance profile](https://gateway-api.si
 
 This approach will enable service meshes to certify that an implementation follows the GAMMA spec without requiring a North/South implementation, and importantly avoid any expectation that North/South Gateway API implementations expand their scope to understand GAMMA and E/W traffic flows.
 
-Leveraging existing tests for common functionality between N/S and E/W implementations will both ensure consistency across Gateway API implementations and help limit the maintence burden for the conformance testing suite.
+Leveraging existing tests for common functionality between N/S and E/W implementations will both ensure consistency across Gateway API implementations and help limit the maintenance burden for the conformance testing suite.
 
 ### Support Levels
 
