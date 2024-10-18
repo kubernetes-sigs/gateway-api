@@ -118,7 +118,7 @@ relationships:
   # set back to this GEP, and MUST be moved to Declined.
   obsoletes: {}
   obsoletedBy: {}
-  # extends indicates that a GEP extends the linkned GEP, adding more detail
+  # extends indicates that a GEP extends the linked GEP, adding more detail
   # or additional implementation. The extended GEP MUST have its extendedBy
   # field set back to this GEP.
   extends: {}
