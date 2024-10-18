@@ -555,7 +555,7 @@ that _every_ Policy update does not require a status update.
 
 Because Policy Attachment is a pattern for APIs, not an API, and needs to address
 all the problems above, the strategy this GEP proposes is to define a range of
-options for increasing the discoverabilty of Policy resources, and provide
+options for increasing the discoverability of Policy resources, and provide
 guidelines for when they should be used.
 
 It's likely that at some stage, the Gateway API CRDs will include some Policy
