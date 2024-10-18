@@ -354,7 +354,7 @@ type HTTPRouteRetry struct {
 // +kubebuilder:validation:Maximum:=999
 type HTTPRouteRetryStatusCode int
 
-// Duration is a string value representing a duration in time. The foramat is
+// Duration is a string value representing a duration in time. The format is
 // as specified in GEP-2257, a strict subset of the syntax parsed by Golang
 // time.ParseDuration.
 //
