@@ -54,7 +54,7 @@ more resources, and are consequently harder to understand and require a more
 complex status design.
 
 Splitting these two design patterns apart into separate GEPs is intended to
-allow proceeding with stablizing the simpler (Direct) case while we work on
+allow proceeding with stabilizing the simpler (Direct) case while we work on
 solving the status problem for the more complex (Inherited) case.
 
 Direct Attached Policies are further specified in the addendum GEP GEP-2648,
