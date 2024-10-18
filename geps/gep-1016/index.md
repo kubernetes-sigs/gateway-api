@@ -50,7 +50,7 @@ lower layer protocol already exists. We propose the following criteria for such
 an addition.
 
 - Users of the encapsulated protocol would miss out on significant conventional features from their ecosystem if forced to route at a lower layer.
-- Users of the enapsulated protocol would experience a degraded user experience if forced to route at a lower layer.
+- Users of the encapsulated protocol would experience a degraded user experience if forced to route at a lower layer.
 - The encapsulated protocol has a significant user base, particularly in the Kubernetes community.
 
 gRPC meets _all_ of these criteria and is therefore, we contend, a strong

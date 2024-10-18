@@ -33,7 +33,7 @@ level, it is acceptable to introduce a route resource at the higher layer when
 the following criteria are met:
 
 - Users of the encapsulated protocol would miss out on significant conventional features from their ecosystem if forced to route at a lower layer.
-- Users of the enapsulated protocol would experience a degraded user experience if forced to route at a lower layer.
+- Users of the encapsulated protocol would experience a degraded user experience if forced to route at a lower layer.
 - The encapsulated protocol has a significant user base, particularly in the Kubernetes community.
 
 gRPC meets all of these criteria, so the decision was made to include `GRPCRoute`in Gateway API.
