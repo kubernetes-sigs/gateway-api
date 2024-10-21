@@ -116,7 +116,7 @@ This was dropped in favour of supporting Kubernetes Standard Application Protoco
 ### Multiple Protocol Meta-resources
 
 Rather than bundle protocol details into a single resource an alternative would be to create distinct meta resources.
-ie. `HTTP2Backend`, `GPRCBackend`, `WebsocketBackend`.
+ie. `HTTP2Backend`, `GRPCBackend`, `WebsocketBackend`.
 
 The advantages of this approach are:
 
