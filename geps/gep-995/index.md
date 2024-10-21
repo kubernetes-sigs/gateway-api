@@ -50,7 +50,7 @@ If specified, the name of a route rule MUST comply with the [`SectionName`](http
 
 To preserve backward compatibility with previous version of the affected APIs, the `name` field for route rules should be introduced in the API as optional – i.e., end-user are not forced to add it to their existing or new route objects.
 
-Implementations MAY recommend the usage of the `name` field for enabling specific features, such as for supporting policy attachment targetting individual route rules, and more assertive log messages and/or status reporting that include on the name of the rule. However, because as by API design the presence of the field is optional, implementations MUST take into account that a value may sometimes not be available. For such cases, implementations are free to decide whether to provide the feature depending the `name` field, if the feature is not required for Core compliance, or to enable the feature relying on another method of referencing of choice.
+Implementations MAY recommend the usage of the `name` field for enabling specific features, such as for supporting policy attachment targeting individual route rules, and more assertive log messages and/or status reporting that include on the name of the rule. However, because as by API design the presence of the field is optional, implementations MUST take into account that a value may sometimes not be available. For such cases, implementations are free to decide whether to provide the feature depending the `name` field, if the feature is not required for Core compliance, or to enable the feature relying on another method of referencing of choice.
 
 ### Default value
 
