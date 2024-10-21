@@ -871,7 +871,7 @@ contains `status` information.
 
 ```yaml
 kind: EffectivePolicy
-apiVersion: gateway.networkking.k8s.io/v1alpha2
+apiVersion: gateway.networking.k8s.io/v1alpha2
 metadata:
   name: targeted-object
   namespace: targeted-object-namespace
