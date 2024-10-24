@@ -56,7 +56,7 @@ def generate_conformance_tables(reports, currVersion):
     gateway_tls_table = pandas.DataFrame()
     gateway_grpc_table = pandas.DataFrame()
 
-    if currVersion == allVersions[-1]:
+    if currVersion != 'v1.0.0':
         gateway_http_table = generate_profiles_report(reports, 'GATEWAY-HTTP')
 
         gateway_grpc_table = generate_profiles_report(reports, 'GATEWAY-GRPC')
@@ -86,7 +86,7 @@ def generate_conformance_tables(reports, currVersion):
         f.write("## Gateway Profile\n\n")
         f.write("### HTTPRoute\n\n")
         f.write(gateway_http_table.to_markdown()+'\n\n')
-        if currVersion == allVersions[-1]:
+        if currVersion != 'v1.0.0': 
             f.write('### GRPCRoute\n\n')
             f.write(gateway_grpc_table.to_markdown()+'\n\n')
             f.write('### TLSRoute\n\n')
