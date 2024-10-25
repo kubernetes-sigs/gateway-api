@@ -24,6 +24,10 @@ import (
 
 // +genclient
 // +kubebuilder:object:root=true
+// +kubebuilder:resource:categories=gateway-api
+// +kubebuilder:subresource:status
+// +kubebuilder:printcolumn:name="Hostnames",type=string,JSONPath=`.spec.hostnames`
+// +kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 // +kubebuilder:deprecatedversion:warning="The v1alpha2 version of GRPCRoute has been deprecated and will be removed in a future release of the API. Please upgrade to v1."
 type GRPCRoute v1.GRPCRoute
 
