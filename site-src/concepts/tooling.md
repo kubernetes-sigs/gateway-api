@@ -15,7 +15,8 @@ A command line tool for managing your Gateway API resouces. Explore your policie
 
 Get started [here](https://github.com/kubernetes-sigs/gwctl?tab=readme-ov-file#installation)!
 
-## `policy-machinery`
+## Other Tooling
+### `policy-machinery`
 
 Machinery for implmeneting Gateway API policies and policy controllers.
 
