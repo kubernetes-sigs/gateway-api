@@ -59,6 +59,9 @@ With this configuration, an implementation:
 
 * MUST mark the Gateway as `Programmed` and provide an address in `Status.Addresses` where the Gateway can be reached on each configured port.
 * MUST label all generated resources (Service, Deployment, etc) with `gateway.networking.k8s.io/gateway-name: my-gateway` (where `my-gateway` is the name of the Gateway resource).
+  * In the case that a Gateway resource name is longer than the maximum label value length of 63 characters, implementations MUST set the value of the label to the first 20 characters of the Gateway name with a `-` character appended and then the `sha1` checksum of the remainder of the name (40 characters long) appended.
+  * For example for a Gateway with name `example-very-very-very-very-very-very-very-very-very-long-gateway-name` (70 characters long), the resulting label value would be `example-very-very-ve-65cb6f84bc9e50270d0a6c2f845fd98c6fe8d89f`.
+  * Cluster Operators creating Gateways are encouraged to limit Gateway names to a maximum of 63 characters to ensure the label value avoids this truncation/hashing and is human readable.
 * MUST provision generated resources in the same namespace as the Gateway if they are namespace scoped resources.
   * Cluster scoped resources are not recommended.
 * SHOULD name all generated resources `my-gateway-example` (`<NAME>-<GATEWAY CLASS>`).
