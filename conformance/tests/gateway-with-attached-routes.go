@@ -127,6 +127,34 @@ var GatewayWithAttachedRoutes = suite.ConformanceTest{
 
 			kubernetes.HTTPRouteMustHaveCondition(t, s.Client, s.TimeoutConfig, hrouteNN, gwNN, unresolved)
 		})
+
+		t.Run("Gateway listener should not have attached route by not specifying the sectionName", func(t *testing.T) {
+			gwNN := types.NamespacedName{Name: "gateway-with-one-listener-and-no-attached-route", Namespace: "gateway-conformance-infra"}
+			listeners := []v1.ListenerStatus{
+				{
+					Name: v1.SectionName("http-unattached"),
+					SupportedKinds: []v1.RouteGroupKind{{
+						Group: (*v1.Group)(&v1.GroupVersion.Group),
+						Kind:  v1.Kind("HTTPRoute"),
+					}},
+					Conditions: []metav1.Condition{
+						{
+							Type:   string(v1.ListenerConditionAccepted),
+							Status: metav1.ConditionTrue,
+							Reason: "", // any reason
+						},
+						{
+							Type:   string(v1.ListenerConditionResolvedRefs),
+							Status: metav1.ConditionTrue,
+							Reason: "", // any reason
+						},
+					},
+					AttachedRoutes: 0,
+				},
+			}
+
+			kubernetes.GatewayStatusMustHaveListeners(t, s.Client, s.TimeoutConfig, gwNN, listeners)
+		})
 	},
 }
 
