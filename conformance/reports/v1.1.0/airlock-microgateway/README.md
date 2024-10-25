@@ -12,5 +12,5 @@ The Airlock Microgateway conformance report can be reproduced by following the s
 
 > [!NOTE]
 > The `HTTPRouteWeight` test fires 10 concurrent request to 3 backends totaling in 500 requests to assert a distribution that matches the configured weight.
-> Please be aware that this test exceeds the [5 req/sec rate-limit](https://docs.airlock.com/microgateway/latest/#data/1675772882054.html) enforced in the [community edition](https://www.airlock.com/en/secure-access-hub/components/microgateway/community-edition), causing the test to fail.
-> To successfully pass this test a [premium license](https://www.airlock.com/en/secure-access-hub/components/microgateway/premium-edition) is required.
+> Please be aware that this test exceeds the [5 req/sec rate-limit](https://docs.airlock.com/microgateway/latest/#data/1675772882054.html) enforced in the <!-- markdown-link-check-disable --> [community edition](https://www.airlock.com/en/secure-access-hub/components/microgateway/community-edition) <!-- markdown-link-check-enable -->, causing the test to fail.
+> To successfully pass this test a <!-- markdown-link-check-disable --> [premium license](https://www.airlock.com/en/secure-access-hub/components/microgateway/premium-edition)  <!-- markdown-link-check-enable --> is required.
