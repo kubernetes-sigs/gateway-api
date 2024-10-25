@@ -95,7 +95,7 @@ the Policy object, the DataplaneConfig object does not affect if the Policy is
 a Direct one or not. This is because _a user can understand the state of the
 hierarchy by looking at all the objects in the hierarchy_. DataplaneConfig is
 _outside_ the hierarchy in terms of understanding the state of the Policy.
-Direct Attacthed Policy is intended as a way to _manage the complexity_ of
+Direct Attached Policy is intended as a way to _manage the complexity_ of
 Policy objects and allow a _limited_ set of Policies to follow vastly more
 simple design patterns _if they meet a set of criteria_.
 
@@ -300,7 +300,7 @@ const (
 Implementations that use Direct Policy objects SHOULD put a Condition into
 `status.Conditions` of any objects affected by a Direct Policy, if that field
 is present. Ideally, there should be a set of Conditions that can be namespaced
-by the implementing controller, but if that is not posisble, use the guidance below.
+by the implementing controller, but if that is not possible, use the guidance below.
 
 If they do, that Condition MUST have a `type` ending in `PolicyAffected` (like
 `gateway.networking.k8s.io/PolicyAffected`),

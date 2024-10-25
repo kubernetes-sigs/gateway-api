@@ -181,7 +181,7 @@ func TestGetAPIVersionAndChannel(t *testing.T) {
 }
 
 const (
-	coreFeature     features.FeatureName = "coreFature"
+	coreFeature     features.FeatureName = "coreFeature"
 	extendedFeature features.FeatureName = "extendedFeature"
 
 	testProfileName ConformanceProfileName = "testProfile"

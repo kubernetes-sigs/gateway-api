@@ -41,8 +41,8 @@ using an explicit object reference.
 to use.
 
 #### Where can I find Gateway API releases?
-Gateway API releases are tags of the [Github
-repository](https://github.com/kubernetes-sigs/gateway-api). The [Github
+Gateway API releases are tags of the [GitHub
+repository](https://github.com/kubernetes-sigs/gateway-api). The [GitHub
 releases](https://github.com/kubernetes-sigs/gateway-api/releases) page shows
 all the releases.
 

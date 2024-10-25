@@ -82,7 +82,7 @@ ensuring the field name will not be reused.
 
 ### Deploy the Code
 
-Use the following command to deploy CRDs to the pre-existing `Kind` cluster.
+Use the following command to deploy CRDs to the preexisting `Kind` cluster.
 
 ```shell
 make crd
