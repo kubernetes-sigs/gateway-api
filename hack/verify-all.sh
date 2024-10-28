@@ -53,10 +53,12 @@ fi
 
 EXCLUDE="verify-all.sh"
 
+SCRIPTS=$(find "${SCRIPT_ROOT}"/hack -name "verify-*.sh")
+
 ret=0
-for t in `ls $SCRIPT_ROOT/hack/verify-*.sh`
+for t in $SCRIPTS;
 do
-  if is-excluded $t ; then
+  if is-excluded "${t}" ; then
     echo "Skipping $t"
     continue
   fi

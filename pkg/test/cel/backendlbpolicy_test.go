@@ -22,7 +22,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"strings"
 	"testing"
 	"time"
 
@@ -122,7 +121,7 @@ func validateBackendLBPolicy(t *testing.T, lbPolicy *gatewayv1a2.BackendLBPolicy
 
 	var missingErrorStrings []string
 	for _, wantError := range wantErrors {
-		if !strings.Contains(strings.ToLower(err.Error()), strings.ToLower(wantError)) {
+		if !celErrorStringMatches(err.Error(), wantError) {
 			missingErrorStrings = append(missingErrorStrings, wantError)
 		}
 	}
