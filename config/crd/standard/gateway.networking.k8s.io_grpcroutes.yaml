@@ -2205,7 +2205,14 @@ spec:
     storage: true
     subresources:
       status: {}
-  - deprecated: true
+  - additionalPrinterColumns:
+    - jsonPath: .spec.hostnames
+      name: Hostnames
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    deprecated: true
     deprecationWarning: The v1alpha2 version of GRPCRoute has been deprecated and
       will be removed in a future release of the API. Please upgrade to v1.
     name: v1alpha2
@@ -4386,6 +4393,8 @@ spec:
         type: object
     served: false
     storage: false
+    subresources:
+      status: {}
 status:
   acceptedNames:
     kind: ""
