@@ -8,16 +8,16 @@ Interested in seeing what your ingress resources will look like in Gateway API? 
 
 Get started [here](https://github.com/kubernetes-sigs/ingress2gateway?tab=readme-ov-file#installation)!
 
-
 ## `gwctl`
 
 A command line tool for managing your Gateway API resouces. Explore your policies, xRoutes, and interact with your resources.
 
 Get started [here](https://github.com/kubernetes-sigs/gwctl?tab=readme-ov-file#installation)!
 
-## Other Tooling
+## Third-Party Tooling
+
 ### `policy-machinery`
 
-Machinery for implmeneting Gateway API policies and policy controllers.
+Machinery for implementing Gateway API policies and policy controllers.
 
 Get started [here](https://github.com/Kuadrant/policy-machinery/tree/main)
