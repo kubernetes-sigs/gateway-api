@@ -74,6 +74,7 @@ nav:
         Conformance: concepts/conformance.md
         Roles and Personas: concepts/roles-and-personas.md
         Security Model: concepts/security-model.md
+        Tools: concepts/tooling.md
         Use Cases: concepts/use-cases.md
         Versioning: concepts/versioning.md
     - Service Mesh:
