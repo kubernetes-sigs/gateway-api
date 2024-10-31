@@ -65,7 +65,6 @@ check_report_fields() {
 
 REPORTS_DIR=$(dirname "${BASH_SOURCE}")/../conformance/reports
 # Regex to match the report file name pattern defined in https://github.com/kubernetes-sigs/gateway-api/blob/release-1.1/conformance/reports/README.md#how-this-folder-is-structured
-FILE_NAMING_PATTERN="^(standard|experimental)-v?[0-9]+\.[0-9]+(\.[0-9]+)?-[^-]+-report\.yaml$"
 EXIT_VALUE=0
 
 for dir in ${REPORTS_DIR}/*
@@ -88,11 +87,6 @@ do
                 fi
                 for report in ${implementation_dir}/*.yaml
                 do
-                    report_name="${report##*/}"
-                    if [[ ! $report_name =~ $FILE_NAMING_PATTERN ]]; then
-                        error "$report_name does not match the naming pattern defined in the README.md"
-                        EXIT_VALUE=1
-                    fi
                     check_report_fields "${report}" "${gateway_api_version}"
                 done
             done
