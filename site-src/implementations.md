@@ -15,6 +15,7 @@ cover, and documentation to help users get started.
 ## Gateway Controller Implementation Status <a name="gateways"></a>
 
 - [Acnodal EPIC][1]
+- [Airlock Microgateway][34]
 - [Amazon Elastic Kubernetes Service][23] (alpha)
 - [Apache APISIX][2] (beta)
 - [Avi Kubernetes Operator][31] (tech preview)
@@ -87,6 +88,7 @@ cover, and documentation to help users get started.
 [31]:#avi-kubernetes-operator
 [32]:#haproxy-kubernetes-ingress-controller
 [33]:#ngrok-kubernetes-operator
+[34]:#airlock-microgateway
 
 [gamma]:/concepts/gamma/
 
@@ -104,6 +106,35 @@ In this section you will find specific links to blog posts, documentation and ot
 
 [epicdocs]:https://www.epic-gateway.org/
 [epicsource]:https://github.com/epic-gateway
+
+### Airlock Microgateway
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.1.0-Airlock%20Microgateway-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.1.0/airlock-microgateway)
+
+[Airlock Microgateway][airlock-microgateway] is a Kubernetes native WAAP (Web Application and API Protection) solution to protect microservices.
+Modern application security is embedded in the development workflow and follows DevSecOps paradigms.
+Airlock Microgateway protects your applications and microservices with the tried-and-tested Airlock security features against attacks, while also providing a high degree of scalability.
+
+With [Airlock Microgateway 4.4][airlock-microgateway-v4.4], Airlock Microgateway introduces a sidecarless data plane mode
+based on Gateway API to avoid the operational complexity of sidecars.
+
+#### Features
+- Kubernetes native integration with sidecar injection and Gateway API support
+- Reverse proxy functionality with request routing rules, TLS termination and remote IP extraction
+- Using native Envoy HTTP filters like Lua scripting, RBAC, ext_authz, JWT authentication
+- Content security filters for protecting against known attacks (OWASP Top 10)
+- API security features like JSON parsing, OpenAPI specification enforcement or GraphQL schema validation
+
+#### Documentation and links
+- [Product documentation][airlock-microgateway-documentation]
+- [Gateway specific documentation][airlock-microgateway-guide]
+- Check our [Airlock community forum][airlock-microgateway-community-support] and [support process][airlock-microgateway-premium-support] for support.
+
+[airlock-microgateway]:https://www.airlock.com/en/secure-access-hub/components/microgateway
+[airlock-microgateway-v4.4]:https://docs.airlock.com/microgateway/4.4/#data/1725073468781.html
+[airlock-microgateway-documentation]:https://docs.airlock.com/microgateway/latest
+[airlock-microgateway-guide]:https://docs.airlock.com/microgateway/4.4/#data/1726159368351.html
+[airlock-microgateway-community-support]:https://forum.airlock.com/
+[airlock-microgateway-premium-support]:https://techzone.ergon.ch/support-process
 
 ### Amazon Elastic Kubernetes Service
 
