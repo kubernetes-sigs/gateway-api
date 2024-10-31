@@ -127,8 +127,7 @@ based on Gateway API to avoid the operational complexity of sidecars.
 #### Documentation and links
 - [Product documentation][airlock-microgateway-documentation]
 - [Gateway specific documentation][airlock-microgateway-guide]
-- Check our [Airlock community forum][airlock-microgateway-community-support] for support
-- Extended support is available for paid licenses following [the premium support process][airlock-microgateway-premium-support]
+- Check our [Airlock community forum][airlock-microgateway-community-support] and [support process][airlock-microgateway-premium-support] for support.
 
 [airlock-microgateway]:https://www.airlock.com/en/secure-access-hub/components/microgateway
 [airlock-microgateway-v4.4]:https://docs.airlock.com/microgateway/4.4/#data/1725073468781.html
