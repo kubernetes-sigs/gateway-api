@@ -236,8 +236,9 @@ func (d *DefaultRoundTripper) defaultRoundTrip(request Request, transport http.R
 					return nil, nil, err
 				}
 				tlog.Logf(request.T, "Error sending request:\n%s\n\n", formatDump(dump, "< "))
+			} else {
+				tlog.Logf(request.T, "Error sending request: %v (no response)\n", err)
 			}
-			tlog.Log(request.T, "Error sending request: no response\n")
 		}
 		return nil, nil, err
 	}
