@@ -67,11 +67,16 @@ func Test_generateCACert(t *testing.T) {
 			serverKey.Reset()
 			// Test the function generateCACert.  We can only test normative function
 			// and hostnames, everything else is hardcoded.
-			err := generateCACert(tc.hosts, &serverKey, &serverCert)
+			caBytes, err := generateCACert(tc.hosts)
 			require.NoError(t, err, "unexpected error generating RSA certificate")
 
+			var certData bytes.Buffer
+			if err := pem.Encode(&certData, &pem.Block{Type: "CERTIFICATE", Bytes: caBytes}); err != nil {
+				require.NoError(t, err, "failed to create certificater")
+			}
+
 			// Test that the CA certificate is decodable, parseable, and has the configured hostname/s.
-			block, _ := pem.Decode(serverCert.Bytes())
+			block, _ := pem.Decode(certData.Bytes())
 			if block == nil {
 				require.FailNow(t, "failed to decode PEM block containing cert")
 			} else if block.Type == "CERTIFICATE" {
@@ -85,15 +90,6 @@ func Test_generateCACert(t *testing.T) {
 						require.EqualValues(t, tc.expectedErr[idx], err, "expected an error but certification verification succeeded")
 					}
 				}
-			}
-
-			// Test that the server key is decodable and parseable.
-			block, _ = pem.Decode(serverKey.Bytes())
-			if block == nil {
-				require.FailNow(t, "failed to decode PEM block containing public key")
-			} else if block.Type == "RSA PRIVATE KEY" {
-				_, err := x509.ParsePKCS1PrivateKey(block.Bytes)
-				require.NoError(t, err, "failed to parse key")
 			}
 		})
 	}
