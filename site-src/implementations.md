@@ -272,9 +272,13 @@ FSM support of Gateway API is built on top [Flomesh Gateway API](fgw) and it cur
 ### Gloo Gateway
 
 [![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.0.0-GlooGateway-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.0.0/gloo-gateway)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Partial%20Conformance%20v1.1.0-GlooGateway-orange)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.1.0/gloo-gateway)
 
 [Gloo Gateway][gloogateway] by [Solo.io][solo] is a feature-rich, Kubernetes-native ingress controller and next-generation API gateway.
 Gloo Gateway brings the full power and community support of Gateway API to its existing control-plane implementation.
+
+The Gloo Gateway ingress controller passes all the core Gateway API conformance tests in the v1.1.0 release for the GATEWAY_HTTP conformance 
+profile except `HTTPRouteServiceTypes`.
 
 [gloogateway]:https://docs.solo.io/gateway/latest/
 [solo]:https://www.solo.io

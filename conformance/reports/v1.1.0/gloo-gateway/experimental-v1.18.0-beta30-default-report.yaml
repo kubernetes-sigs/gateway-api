@@ -1,0 +1,49 @@
+apiVersion: gateway.networking.k8s.io/v1alpha1
+date: "2024-10-31T10:29:26+02:00"
+gatewayAPIChannel: experimental
+gatewayAPIVersion: v1.1.0
+implementation:
+  contact:
+  - github.com/solo-io/gloo/issues/new/choose
+  organization: solo.io
+  project: gloo-gateway
+  url: github.com/solo-io/gloo
+  version: v1.18.0-beta30
+kind: ConformanceReport
+mode: default
+profiles:
+- core:
+    result: partial
+    skippedTests:
+    - HTTPRouteServiceTypes
+    statistics:
+      Failed: 0
+      Passed: 32
+      Skipped: 1
+  extended:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 9
+      Skipped: 0
+    supportedFeatures:
+    - HTTPRouteHostRewrite
+    - HTTPRouteMethodMatching
+    - HTTPRoutePathRedirect
+    - HTTPRoutePathRewrite
+    - HTTPRoutePortRedirect
+    - HTTPRouteQueryParamMatching
+    - HTTPRouteRequestMirror
+    - HTTPRouteResponseHeaderModification
+    - HTTPRouteSchemeRedirect
+    unsupportedFeatures:
+    - GatewayHTTPListenerIsolation
+    - GatewayPort8080
+    - GatewayStaticAddresses
+    - HTTPRouteBackendRequestHeaderModification
+    - HTTPRouteBackendTimeout
+    - HTTPRouteParentRefPort
+    - HTTPRouteRequestMultipleMirrors
+    - HTTPRouteRequestTimeout
+  name: GATEWAY-HTTP
+  summary: Core tests partially succeeded with 1 test skips. Extended tests succeeded.
