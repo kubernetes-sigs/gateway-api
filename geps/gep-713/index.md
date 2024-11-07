@@ -246,9 +246,12 @@ ties:
   only come up in exceptional circumstances.
 * Inside Inherited Policies, the same setting in `overrides` beats the one in
   `defaults`.
-* The oldest Policy based on creation timestamp beats a newer one. For example,
-  a Policy with a creation timestamp of "2021-07-15 01:02:03" MUST be given
-  precedence over a Policy with a creation timestamp of "2021-07-15 01:02:04".
+* The older Policy based on creation timestamp beats a newer one. For example,
+  a Policy with a creation timestamp of "2021-07-15 01:02:03" MUST be given
+  precedence over a Policy with a creation timestamp of "2021-07-15 01:02:04".
+  The goal is to ensure that introducing new, unused policies doesn’t disrupt
+  existing ones, since changing active rules can cause outages while altering
+  unused policies poses no risk.
 * The Policy appearing first in alphabetical order by `{namespace}/{name}`. For
   example, foo/bar is given precedence over foo/baz.
 
