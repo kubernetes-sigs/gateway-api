@@ -57,18 +57,18 @@ def generate_conformance_tables(reports, currVersion):
     gateway_grpc_table = pandas.DataFrame()
 
     if currVersion != 'v1.0.0':
-        gateway_http_table = generate_profiles_report(reports, 'GATEWAY-HTTP')
+        gateway_http_table = generate_profiles_report(reports, 'GATEWAY-HTTP',currVersion)
 
-        gateway_grpc_table = generate_profiles_report(reports, 'GATEWAY-GRPC')
+        gateway_grpc_table = generate_profiles_report(reports, 'GATEWAY-GRPC',currVersion)
         gateway_grpc_table = gateway_grpc_table.rename_axis('Organization')
 
-        gateway_tls_table = generate_profiles_report(reports, 'GATEWAY-TLS')
+        gateway_tls_table = generate_profiles_report(reports, 'GATEWAY-TLS',currVersion)
         gateway_tls_table = gateway_tls_table.rename_axis('Organization')
 
-        mesh_http_table = generate_profiles_report(reports, 'MESH-HTTP')
+        mesh_http_table = generate_profiles_report(reports, 'MESH-HTTP',currVersion)
     else:
-        gateway_http_table = generate_profiles_report(reports, "HTTP")
-        mesh_http_table = generate_profiles_report(reports, "MESH")
+        gateway_http_table = generate_profiles_report(reports, "HTTP",currVersion)
+        mesh_http_table = generate_profiles_report(reports, "MESH",currVersion)
 
     gateway_http_table = gateway_http_table.rename_axis('Organization')
     mesh_http_table = mesh_http_table.rename_axis('Organization')
@@ -97,7 +97,7 @@ def generate_conformance_tables(reports, currVersion):
         f.write(mesh_http_table.to_markdown())
 
 
-def generate_profiles_report(reports, route):
+def generate_profiles_report(reports, route,version):
 
     http_reports = reports.loc[reports["name"] == route]
     http_reports.set_index('organization')
@@ -105,21 +105,23 @@ def generate_profiles_report(reports, route):
 
     http_table = pandas.DataFrame(
         columns=http_reports['organization'])
+
     http_table = http_reports[['organization', 'project',
-                               'version', 'extended.supportedFeatures']].T
+                               'version','mode', 'extended.supportedFeatures']].T
     http_table.columns = http_table.iloc[0]
     http_table = http_table[1:].T
     
     for row in http_table.itertuples():
-        if type(row._3) is list:
-            for feat in row._3:
+        if type(row._4) is list:
+            for feat in row._4:
                 http_table.loc[row.Index, feat] = ':white_check_mark:'
     http_table = http_table.fillna(':x:')
     http_table = http_table.drop(['extended.supportedFeatures'], axis=1)
 
     http_table = http_table.rename(
-        columns={"project": "Project", "version": "Version"})
-
+        columns={"project": "Project", "version": "Version", "mode":"Mode"})
+    if version == 'v1.0.0':
+        http_table = http_table.drop(columns=["Mode"])
     return http_table
 
 
@@ -149,7 +151,7 @@ def getYaml(conf_path):
 
             x = load_yaml(p)
             profiles = pandas.json_normalize(
-                x, record_path='profiles', meta=["implementation"])
+                x, record_path=['profiles'], meta=["mode","implementation"], errors='ignore')
 
             implementation = pandas.json_normalize(profiles.implementation)
             yamls.append(pandas.concat([implementation, profiles], axis=1))
