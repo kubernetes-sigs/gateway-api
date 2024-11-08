@@ -107,7 +107,7 @@ It also supports setting a timeout for the entire retry process using the `timeo
 
 ### Traefik
 1. **Retry Conditions**: Traefik allows for retries based on HTTP-level conditions (e.g., connection errors and
-certain HTTP status codes like 500, 502, 503, and 504), but it does not natively interpret specific gRPC error codes
+certain HTTP status codes like 500, 502, 503, and 504), but it does not natively interpret specific gRPC status codes
 like `UNAVAILABLE` or `DEADLINE_EXCEEDED`. This means that, while Traefik can retry requests on common HTTP errors
 that might represent temporary issues, it lacks the ability to directly handle and retry based on
 gRPC-specific error codes, limiting its alignment with the GEP’s requirement for granular gRPC error handling.
