@@ -273,7 +273,7 @@ established a `retry` field in the HTTPRouteRule, it makes sense to extend this 
 
 ## References
 
-- [gRPC Retry Design](https://grpc.io/blog/guides/retry/)
+- [gRPC Retry Design](https://grpc.io/docs/guides/retry/)
 - [gRPC Status Codes](https://grpc.io/docs/guides/error/)
 - [Envoy Retry Policy](https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/route/v3/route_components.proto#envoy-v3-api-msg-config-route-v3-retry-policy)
 - [Nginx gRPC Module](https://nginx.org/en/docs/http/ngx_http_grpc_module.html)
