@@ -100,7 +100,7 @@ trigger retries if specified, while errors like `403` and `404` are not retryabl
 ### HAProxy
 1. **Retry Conditions**: HAProxy can retry requests based on various network conditions
 (e.g., connection failures, timeouts) and some HTTP error codes. While HAProxy does support gRPC via HTTP/2, it does not
-have built-in support for handling specific gRPC error codes (like `Cancelled`, `Deadline Exceeded`).
+have built-in support for handling specific gRPC status codes (like `Cancelled`, `Deadline Exceeded`).
 It relies on HTTP-level conditions for retries, so its gRPC support is less granular than the GEP requires.
 2. **Retry Limits**: HAProxy allows you to set a maximum number of retries for a request using the `retries` directive.
 It also supports setting a timeout for the entire retry process using the `timeout connect` and `timeout server` directives.
@@ -110,7 +110,7 @@ It also supports setting a timeout for the entire retry process using the `timeo
 certain HTTP status codes like 500, 502, 503, and 504), but it does not natively interpret specific gRPC status codes
 like `UNAVAILABLE` or `DEADLINE_EXCEEDED`. This means that, while Traefik can retry requests on common HTTP errors
 that might represent temporary issues, it lacks the ability to directly handle and retry based on
-gRPC-specific error codes, limiting its alignment with the GEP’s requirement for granular gRPC error handling.
+gRPC-specific error codes, limiting its alignment with the GEP’s requirement for granular gRPC status codes handling.
 2. **Retry Limits**: Traefik provides configurable retry attempts and can set a maximum number of retries. However,
 Traefik does not offer per-try timeout controls specific to each retry attempt. Instead, it typically relies on a
 global request timeout, limiting the flexibility needed for more precise gRPC retry management (like Envoy’s `per_try_timeout`).
@@ -140,28 +140,28 @@ type GRPCRouteRule struct {
 
 // GRPCRouteRetry defines retry configuration for a GRPCRoute.
 //
-// Implementations SHOULD retry on common transient gRPC errors
+// Implementations SHOULD retry on common transient gRPC status codes
 // if a retry configuration is specified.
 //
 type GRPCRouteRetry struct {
-    // Reasons defines the gRPC error conditions for which a backend request
+    // Reasons defines the gRPC status codes for which a backend request
     // should be retried.
     //
-    // Supported gRPC error conditions:
-    // * "cancelled"
-    // * "deadline-exceeded"
-    // * "internal"
-    // * "resource-exhausted"
-    // * "unavailable"
+    // Supported gRPC status codes:
+    // * "CANCELLED"
+    // * "DEADLINE_EXCEEDED"
+    // * "INTERNAL"
+    // * "RESOURCE_EXHAUSTED"
+    // * "UNAVAILABLE"
     //
-    // Implementations MUST support retrying requests for these conditions
+    // Implementations MUST support retrying requests for these status codes
     // when specified.
     //
     // Support: Extended
     //
     // +optional
     // <gateway:experimental>
-    Reasons []GRPCRouteRetryCondition `json:"reasons,omitempty"`
+    Reasons []GRPCRouteRetryStatusCode `json:"reasons,omitempty"`
 
     // Attempts specifies the maximum number of times an individual request
     // from the gateway to a backend should be retried.
@@ -200,21 +200,21 @@ type GRPCRouteRetry struct {
     Backoff *Duration `json:"backoff,omitempty"`
 }
 
-// GRPCRouteRetryCondition defines a gRPC error condition for which a backend
+// GRPCRouteRetryStatusCode defines a gRPC status code for which a backend
 // request should be retried.
 //
-// The following conditions are considered retryable:
+// The following status codes are considered retryable:
 //
-// * "cancelled"
-// * "deadline-exceeded"
-// * "internal"
-// * "resource-exhausted"
-// * "unavailable"
+// * "CANCELLED"
+// * "DEADLINE_EXCEEDED"
+// * "INTERNAL"
+// * "RESOURCE_EXHAUSTED"
+// * "UNAVAILABLE"
 //
-// Implementations MAY support additional gRPC error codes if applicable.
+// Implementations MAY support additional gRPC status codes if applicable.
 //
-// +kubebuilder:validation:Enum=cancelled;deadline-exceeded;internal;resource-exhausted;unavailable
-type GRPCRouteRetryCondition string
+// +kubebuilder:validation:Enum=CANCELLED;DEADLINE_EXCEEDED;INTERNAL;RESOURCE_EXHAUSTED;UNAVAILABLE
+type GRPCRouteRetryStatusCode string
 
 // Duration is a string value representing a duration in time.
 // Format follows GEP-2257, which is a subset of Golang's time.ParseDuration syntax.
@@ -259,7 +259,7 @@ To ensure correct gRPC retry functionality, the following tests must be implemen
     - **Test**: Verify retries respect the BackendRequestTimeout. Requests should fail if the timeout is reached, even with retries.
     - **Expected**: Retries occur within the configured timeout, and fail if exceeded.
 2. `SupportGRPCRouteRetry`
-    - **Test**: Ensure retries are triggered for retryable gRPC errors (cancelled, deadline-exceeded, internal, resource-exhausted, unavailable).
+    - **Test**: Ensure retries are triggered for retryable gRPC status codes (cancelled, deadline-exceeded, internal, resource-exhausted, unavailable).
     - **Expected**: Retries for retryable errors; no retries for non-retryable errors.
 3. `SupportGRPCRouteRetryBackoff`
     - **Test**: Confirm retries use the configured backoff strategy.
