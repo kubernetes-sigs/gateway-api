@@ -40,7 +40,7 @@ functionality in a way that is broadly applicable across implementations.
 
 ## Background on implementations
 
-Researching how different Gateway API implementations handle retries for gRPC requests.
+Below we list how different data planes handle retries for gRPC requests.
 
 ### Envoy
 Envoy supports retries for gRPC requests using the `retry_policy` field in the `route` configuration of the HTTP filter.
