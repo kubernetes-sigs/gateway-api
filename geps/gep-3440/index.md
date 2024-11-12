@@ -13,6 +13,8 @@ allowing for configuration of retry attempts, backoff duration, and retryable st
 - To allow specification of the maximum number of times to retry a gRPC request.
 - To allow specification of the minimum backoff interval between retry attempts for gRPC requests.
 - Retry configuration must be applicable to most known Gateway API implementations for gRPC.
+- Retry configuration must be applicable for errors that happen on the HTTP layer (e.g., connection errors, timeouts) 
+but don't have a direct mapping to gRPC status codes.
 - To define any interaction with configured gRPC timeouts and backoff.
 
 ## Non-Goals
