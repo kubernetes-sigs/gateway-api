@@ -48,7 +48,16 @@ extract_external_links() {
   
 validate_url() {  
     local url="$1"  
-    local http_status=$(curl -o /dev/null -s -w "%{http_code}\n" "$url")  
+    local http_status=$(curl -o /dev/null -s -w "%{http_code}\n" "$url")
+    local excluded_domains=("foo.ns.service.cluster.local")
+
+    # Check if the URL contains any of the excluded domains
+    for excluded_domain in "${excluded_domains[@]}"; do
+        if [[ "$url" == *"$excluded_domain"* ]]; then
+            log_info "Skipping excluded URL: $url"
+            return 0
+        fi
+    done
   
     # Check if the status code indicates success (200-399)  
     if [[ "$http_status" -ge 200 && "$http_status" -lt 400 ]]; then  
