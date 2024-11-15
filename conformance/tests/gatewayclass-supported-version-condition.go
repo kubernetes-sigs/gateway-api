@@ -40,9 +40,8 @@ var GatewayClassSupportedVersionCondition = suite.ConformanceTest{
 		features.SupportGateway,
 	},
 	Description: "A GatewayClass should set the SupportedVersion condition based on the presence and version of Gateway API CRDs in the cluster",
-	Manifests:   []string{"tests/gatewayclass-supported-version-condition.yaml"},
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
-		gwc := types.NamespacedName{Name: "gatewayclass-supported-version-condition"}
+		gwc := types.NamespacedName{Name: s.GatewayClassName}
 
 		t.Run("SupportedVersion condition should be set correctly", func(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.Background(), s.TimeoutConfig.DefaultTestTimeout)
