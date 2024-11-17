@@ -21,7 +21,7 @@ both Linkerd and Istio injection using the following Gateway configuration, maki
 it simpler for the infrastructure to be incorporated into whichever service mesh
 you've installed.
 
-```
+```yaml
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
