@@ -8,13 +8,13 @@
 
 Gateway API implementations are responsible for creating the backing
 infrastructure needed to make each Gateway work. For example, implementations
-running in a Kubernetes cluster often create [Services](service) and
-[Deployments](deployment), while cloud-based implementations may create cloud
+running in a Kubernetes cluster often create [Services][service] and
+[Deployments][deployment], while cloud-based implementations may create cloud
 load balancer resources. In many cases, it can be helpful to be able to
 propagate labels or annotations to these generated resources.
 
 
-The [`infrastructure` field](infrastructure) on a Gateway allows you to specify
+The [`infrastructure` field][infrastructure] on a Gateway allows you to specify
 labels and annotations for the infrastructure created by the Gateway API controller.
 For example, if your Gateway infrastructure is running in-cluster, you can specify
 both Linkerd and Istio injection using the following Gateway configuration, making
