@@ -267,3 +267,9 @@ The following is a summary of all the Routes and the TLS termination mode they s
 | `TLSRoute` | yes | yes |
 | `TCPRoute` | no | no |
 | `UDPRoute` | no | no |
+
+> [!NOTE]
+> When the traffic is routed to the backend via `TCPRoute`, the packets
+> are left untouched by the gateway. In order to terminate the TLS connection to
+> the gateway and forward the traffic unencrypted to the backend, a `TLSRoute` configured
+> with `Terminate` as TLS mode has to be used.
