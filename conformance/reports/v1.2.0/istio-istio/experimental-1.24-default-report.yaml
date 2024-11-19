@@ -1,5 +1,5 @@
 apiVersion: gateway.networking.k8s.io/v1
-date: "2024-10-20T03:00:03Z"
+date: "2024-11-05T21:23:10Z"
 gatewayAPIChannel: experimental
 gatewayAPIVersion: v1.2.0
 implementation:
@@ -8,7 +8,7 @@ implementation:
   organization: istio
   project: istio
   url: https://istio.io/
-  version: 1.24.0-alpha.0
+  version: "1.24"
 kind: ConformanceReport
 mode: default
 profiles:
