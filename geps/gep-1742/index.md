@@ -270,15 +270,15 @@ sequenceDiagram
     Note right of P: respondingTimeouts<br/>readTimeout
     C->>P: Finishes request
     deactivate P
-    P->>U: Connection Started
     activate U
+    P->>U: Connection Started
     Note right of U: forwardingTimeouts<br/>dialTimeout
     deactivate U
+    activate U
     P->>U: Starts sending Request
     P->>U: Finishes request
     P->>U: Finishes Headers
     U->>P: Starts Response
-    activate U
     note right of U: forwardingTimeouts<br/>responseHeaderTimeout
     U->>P: Finishes Headers
     deactivate U
@@ -418,7 +418,7 @@ type HTTPRouteTimeouts struct {
 
 	// BackendRequest specifies a timeout for an individual request from the gateway
 	// to a backend. This covers the time from when the request first starts being
-	// sent from the gateway to when the full response has been received from the backend.
+	// sent from the gateway to when the response headers have been received from the backend.
 	//
 	// An entire client HTTP transaction with a gateway, covered by the Request timeout,
 	// may result in more than one call from the gateway to the destination backend,
