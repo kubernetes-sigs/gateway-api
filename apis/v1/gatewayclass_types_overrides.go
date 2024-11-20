@@ -26,7 +26,8 @@ import (
 // We are overriding the UnmarshalJSON function to be able to handle cases where
 // users had the old version of the GatewayClass CRD applied with SupportedFeatures
 // as a list of strings and not list of objects.
-// See https://github.com/istio/istio/issues/53846 for more information.
+// See https://github.com/kubernetes-sigs/gateway-api/issues/3464
+// for more information.
 
 func (s *SupportedFeature) UnmarshalJSON(data []byte) error {
 	var oldSupportedFeature oldSupportedFeature
