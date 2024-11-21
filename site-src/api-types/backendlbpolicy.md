@@ -82,7 +82,7 @@ required object reference that specifies a Service by its Name, Kind (Service), 
 
 !!! info "Restrictions"
 
-    - Cross-namespace for `BackendLBPolicy` are not allowed.
+    - Cross-namespace target references for `BackendLBPolicy` are not allowed.
 
 ### Session Persistence
 
