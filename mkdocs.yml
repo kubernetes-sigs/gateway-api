@@ -104,6 +104,7 @@ nav:
       - gRPC Routing: guides/grpc-routing.md
       - Migrating from Ingress: guides/migrating-from-ingress.md
       - Backend Protocol Selection: guides/backend-protocol.md
+      - Infrastructure attributes: guides/infrastructure.md
     - API Design: guides/api-design.md
     - CRD Management: guides/crd-management.md
     - Implementer's Guide: guides/implementers.md
