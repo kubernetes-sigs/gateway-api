@@ -88,6 +88,6 @@ required object reference that specifies a Service by its Name, Kind (Service), 
 
 This field defined the settings for session between the Gateway and the backend. It supports two types:
 
-   - Cookie-Based Session Persistence - It ensures the client are consistently routed to the same backend using a cookie.
-   - Header-Based Session Persistence - It uses the custom header for session tracking.
+   - Cookie-Based Session Persistence - Ensures the client are consistently routed to the same backend using a cookie.
+   - Header-Based Session Persistence - Uses the custom header for session tracking.
 
