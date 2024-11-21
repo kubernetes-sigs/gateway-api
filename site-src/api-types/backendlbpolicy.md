@@ -25,7 +25,7 @@ In future, BackendLBPolicy enhancements may be added for features like connectio
 
 BackendLBPolicy API currently supports Session persistence configuration.
 
-- Cookie-Based Persistence - Core feture
+- Cookie-Based Persistence - Core feature for the object. Although supporting `BackendLBPolicy` is optional, if the object is supported, then Cookie-Based Persistence must also be supported.;
 - Header-Based Persistence - It will be extended feature and optional.
 
 ## Spec
