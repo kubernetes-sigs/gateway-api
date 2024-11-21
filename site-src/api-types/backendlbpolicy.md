@@ -19,7 +19,7 @@ For more information on load balancing configuration in the Gateway API, refer t
 BackendLBPolicy is a Direct [PolicyAttachment](https://gateway-api.sigs.k8s.io/reference/policy-attachment/)
 applied to a Service that accesses a backend. It does not include defaults or overrides and resides in the same namespace as the targeted backend.
 
-In future, BackendLBPolicy enhancements will be there which add additional configurations which includes connection draining, logging that makes central manageable backend traffic policies.
+In future, BackendLBPolicy enhancements may be added for features like connection draining or logging.
 
 ## Features
 
