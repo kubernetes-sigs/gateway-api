@@ -1,0 +1,53 @@
+apiVersion: gateway.networking.k8s.io/v1
+date: "2024-11-19T11:51:58+01:00"
+gatewayAPIChannel: standard
+gatewayAPIVersion: v1.2.0
+implementation:
+  contact:
+  - https://github.com/kong/gateway-operator/issues/new/choose
+  organization: Kong
+  project: gateway-operator
+  url: https://github.com/kong/gateway-operator
+  version: v1.4.0
+kind: ConformanceReport
+mode: expressions
+profiles:
+- core:
+    result: partial
+    skippedTests:
+    - HTTPRouteWeight
+    statistics:
+      Failed: 0
+      Passed: 32
+      Skipped: 1
+  extended:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 6
+      Skipped: 0
+    supportedFeatures:
+    - GatewayPort8080
+    - HTTPRouteHostRewrite
+    - HTTPRouteMethodMatching
+    - HTTPRoutePathRewrite
+    - HTTPRouteQueryParamMatching
+    - HTTPRouteResponseHeaderModification
+    unsupportedFeatures:
+    - GatewayHTTPListenerIsolation
+    - GatewayInfrastructurePropagation
+    - GatewayStaticAddresses
+    - HTTPRouteBackendProtocolH2C
+    - HTTPRouteBackendProtocolWebSocket
+    - HTTPRouteBackendRequestHeaderModification
+    - HTTPRouteBackendTimeout
+    - HTTPRouteDestinationPortMatching
+    - HTTPRouteParentRefPort
+    - HTTPRoutePathRedirect
+    - HTTPRoutePortRedirect
+    - HTTPRouteRequestMirror
+    - HTTPRouteRequestMultipleMirrors
+    - HTTPRouteRequestTimeout
+    - HTTPRouteSchemeRedirect
+  name: GATEWAY-HTTP
+  summary: Core tests partially succeeded with 1 test skips. Extended tests succeeded.
