@@ -413,7 +413,7 @@ The [LiteSpeed Ingress Controller](https://litespeedtech.com/products/litespeed-
 
 ### LoxiLB
 
-[kube-loxilb][kube-loxilb-gh] is a [LoxiLB's][loxilb-org] implementation of Gateway API and kubernetes service load-balancer spec which includes support for load-balancer class, advanced IPAM (shared or exclusive) etc. kube-loxilb manages Gateway API resources with [LoxiLB][loxilb-gh] as L4 service LB and [loxilb-ingress][loxilb-ingress-gh] for Ingress(L7) resources.  
+[kube-loxilb][kube-loxilb-gh] is [LoxiLB's][loxilb-org] implementation of Gateway API and kubernetes service load-balancer spec which includes support for load-balancer class, advanced IPAM (shared or exclusive) etc. kube-loxilb manages Gateway API resources with [LoxiLB][loxilb-gh] as L4 service LB and [loxilb-ingress][loxilb-ingress-gh] for Ingress(L7) resources.  
 
 Follow the [quickstart guide][loxigw-guide] to get LoxiLB running with Gateway API in a few simple steps.
 
