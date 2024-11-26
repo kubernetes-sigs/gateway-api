@@ -2,8 +2,8 @@
 
 ## Table of Contents
 
-| API channel  | Implementation version                                                         | Mode    | Report                                       |
-|--------------|--------------------------------------------------------------------------------|---------|----------------------------------------------|
+| API channel  | Implementation version                                                         | Mode    | Report                                           |
+|--------------|--------------------------------------------------------------------------------|---------|--------------------------------------------------|
 | experimental | [v1.5.0](https://github.com/nginxinc/nginx-gateway-fabric/releases/tag/v1.5.0) | default | [link](./experimental-1.5.0-default-report.yaml) |
 
 ## Reproduce
