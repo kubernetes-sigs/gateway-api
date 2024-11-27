@@ -5,7 +5,7 @@ go 1.22.0
 require (
 	github.com/ahmetb/gen-crd-api-reference-docs v0.3.0
 	github.com/miekg/dns v1.1.62
-	github.com/stretchr/testify v1.9.0
+	github.com/stretchr/testify v1.10.0
 	golang.org/x/net v0.31.0
 	golang.org/x/sync v0.9.0
 	google.golang.org/grpc v1.67.1
