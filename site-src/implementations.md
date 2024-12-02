@@ -36,6 +36,7 @@ cover, and documentation to help users get started.
 - [Kong Gateway Operator][35] (GA)
 - [Kuma][11] (GA)
 - [LiteSpeed Ingress Controller][19]
+- [LoxiLB][36] (beta)
 - [NGINX Gateway Fabric][12] (GA)
 - [ngrok][33] (preview)
 - [STUNner][21] (beta)
@@ -91,6 +92,8 @@ cover, and documentation to help users get started.
 [33]:#ngrok-kubernetes-operator
 [34]:#airlock-microgateway
 [35]:#kong-gateway-operator
+[36]:#loxilb
+
 
 [gamma]:/concepts/gamma/
 
@@ -421,6 +424,19 @@ The [LiteSpeed Ingress Controller](https://litespeedtech.com/products/litespeed-
 - [Product documentation](https://docs.litespeedtech.com/cloud/kubernetes/).
 - [Gateway specific documentation](https://docs.litespeedtech.com/cloud/kubernetes/gateway).
 - Full support is available on the [LiteSpeed support web site](https://www.litespeedtech.com/support).
+
+### LoxiLB
+
+[kube-loxilb][kube-loxilb-gh] is [LoxiLB's][loxilb-org] implementation of Gateway API and kubernetes service load-balancer spec which includes support for load-balancer class, advanced IPAM (shared or exclusive) etc. kube-loxilb manages Gateway API resources with [LoxiLB][loxilb-gh] as L4 service LB and [loxilb-ingress][loxilb-ingress-gh] for Ingress(L7) resources.  
+
+Follow the [quickstart guide][loxigw-guide] to get LoxiLB running with Gateway API in a few simple steps.
+
+[loxilb-home]:https://loxilb.io/
+[loxilb-org]:https://github.com/loxilb-io
+[loxilb-gh]:https://github.com/loxilb-io/loxilb
+[kube-loxilb-gh]:https://github.com/loxilb-io/kube-loxilb
+[loxilb-ingress-gh]:https://github.com/loxilb-io/loxilb-ingress
+[loxigw-guide]:https://docs.loxilb.io/latest/gw-api/
 
 ### NGINX Gateway Fabric
 
