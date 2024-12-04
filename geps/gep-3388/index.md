@@ -7,8 +7,9 @@
 
 ## TLDR
 
-To allow budgeted retry configuration of a Gateway, in order to retry unsuccessful requests based on a percentage of it's
-active request load, as opposed to a static max retry value.
+To allow configuration of a "retry budget" in HTTPRoute, to make total
+client-side retries a percentage of a destination service's active request
+load, in place of configuring a static max count retry value.
 
 ## Goals
 
@@ -16,12 +17,14 @@ active request load, as opposed to a static max retry value.
   ["budget"](https://finagle.github.io/blog/2016/02/08/retry-budgets/) to
   determine whether a request should be retried, and any shared configuration
   or interaction with max count retry configuration.
-* To allow specification of the percentage of active requests that should be able to be retried at the same time.
-* To allow specification of the minimum number of retries that should be
+* To allow specification of a percentage of active requests that should be able
+  to be retried concurrently.
+* To allow specification of a *minimum* number of retries that should be
   allowed per second or concurrently, such that the budget for retries never
   goes below this minimum value.
 * To define a standard for retry budgets that reconciles the known
-  differences in retry budget functionality between Gateway API implementations.
+  differences in retry budget functionality between Gateway API data plane
+  implementations.
 
 ## Future Goals
 
@@ -30,24 +33,23 @@ active request load, as opposed to a static max retry value.
 ## Introduction
 
 Multiple data plane proxies offer optional configuration for budgeted retries,
-either as a circuit breaker threshold for concurrent retries or as an
+either as a circuit breaker threshold for concurrent retries, or as an
 alternative for configuring a
 static retry limit for client retries. In the case of Linkerd, retry budgets
 are the default retry policy configuration for HTTP retries, with static max
-retries being a fairly recent addition.
+retries being a [fairly recent addition](https://linkerd.io/2024/08/13/announcing-linkerd-2.16/).
 
 Configuring a limit for client retries is an important factor in building a
-resilient system in order to
-allow for requests to be successfully retried during periods of intermittent
-failure. But too many client-side retries can also exacerbate consistent
+resilient system, allowing requests to be successfully retried during periods
+of intermittent failure. But too many client-side retries can also exacerbate consistent
 failures and slow down recovery, quickly overwhelming a failing
 system and leading to retry
 storms. Configuring a sane
 limit for max client-side retries is often challenging in complex
 systems. Allowing an application developer (Ana) to instead configure a dynamic
-"retry budget" prevents them from needing to decide on a static max retry value
+"retry budget", prevents them from needing to decide on a static max retry value
 that will perform as expected in both times of high & low request load, as well
-as periods of intermittent or consistent failures.
+as both during periods of intermittent & consistent failures.
 
 While HTTPRoute retry budget configuration has been a frequently discussed
 feature within the community, differences in semantics between different data
@@ -62,22 +64,16 @@ CRD](https://istio.io/latest/docs/reference/config/networking/destination-rule/#
 which
 applies rules to clients of a service after routing has already occurred.
 The linkerd implementation of
-retry budgets is configured on specific routes, and instead limits the number
-of total retry attempts as a percentage of original requests. This creates a
-challenge for
-defining where retry budget's should be configured within the Gateway API,
-and how data plane proxies may need to be altered to accommodate the correct
-path forward. If Istio were to implement Envoy's retry budget threshold also
-at the per-route level in their API, retry budget
+retry budgets is configured within the ServiceProfile CRD, limiting the number
+of total retry attempts across routes as a percentage of original requests.
+This creates a question of where retry budget's should be defined within the
+Gateway API,
+and whether data plane proxies may need to be altered to accommodate the correct
+path forward. If Istio were to implement Envoy's retry budget
+threshold where
+routing occurs in their API, retry budget
 configuration would need to be introduced within [the VirtualService
 CRD](https://istio.io/latest/docs/reference/config/networking/virtual-service/#HTTPRetry).
-Envoy's retry budget threshold does not address overall retry attempts on the
-client-side, though. A potential solution would be for Envoy to additionally
-allow a budget for retry *attempts* as well as a concurrent retry threshold.
-
-When configuring a retry budget on the route, you
-subsequently need to define this value for each one. Defining a single
-retry budget threshold for a destination is a simpler approach.
 
 ### Background on implementations
 
