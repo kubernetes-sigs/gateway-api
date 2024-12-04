@@ -17,7 +17,9 @@ relationships:
   # or additional implementation. The extended GEP MUST have its extendedBy
   # field set back to this GEP.
   extends: {}
-  extendedBy: {}
+  extendedBy:
+    - number: 3388
+      name: HTTPRoute Retry Budget
   # seeAlso indicates other GEPs that are relevant in some way without being
   # covered by an existing relationship.
   seeAlso:
