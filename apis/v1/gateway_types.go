@@ -116,13 +116,25 @@ type GatewaySpec struct {
 	// The set of listeners that all share a protocol value MUST have _different_
 	// values for _at least one_ of these fields to be distinct:
 	//
-	// * **HTTP**: Port, Hostname
-	// * **HTTPS**: Port, Hostname
-	// * **TLS**: Port, Hostname
-	// * **TCP**: Port,
-	// * **UDP**: Port
+	// * **HTTP, HTTPS, TLS**: Port, Hostname
+	// * **TCP, UDP**: Port
 	//
-	// Note that TLS is not used for determining if a listener is distinct, because
+	// One **very** important rule to call out involves what happens when an
+	// implementation:
+	//
+	// * Supports TCP protocol Listeners, as well as HTTP, HTTPS, or TLS protocol
+	//   Listeners, and
+	// * sees HTTP, HTTPS, or TLS protocols with the same `port` as one with TCP
+	//   Protocol.
+	//
+	// In this case all the Listeners that share a port with the
+	// TCP Listener are not distinct and so MUST NOT be accepted.
+	//
+	// If an implementation does not support TCP Protocol Listeners, then the
+	// previous rule does not apply, and the TCP Listeners SHOULD NOT be
+	// accepted.
+	//
+	// Note that the `tls` field is not used for determining if a listener is distinct, because
 	// Listeners that _only_ differ on TLS config will still conflict in all cases.
 	//
 	// ### Listeners that are distinct only by Hostname
@@ -153,7 +165,7 @@ type GatewaySpec struct {
 	// Listeners are _Conflicted_, and the implementation MUST set the "Conflicted"
 	// condition in the Listener Status to "True".
 	//
-	// The words "indistict" and "conflicted" are considered synonyms for the
+	// The words "indistict" and "conflicted" are considered equivalent for the
 	// purpose of this documentation.
 	//
 	// Implementations MAY choose to accept a Gateway with some Conflicted
@@ -182,12 +194,14 @@ type GatewaySpec struct {
 	// request to "foo.example.com" SHOULD only be routed using routes attached
 	// to the "foo.example.com" Listener (and not the "*.example.com" Listener).
 	//
-	// This concept is known as "Listener Isolation". Implementations that do
-	// not support Listener Isolation MUST clearly document this, and MUST NOT
-	// claim support for the `GatewayHTTPListenerIsolation` feature.
+	// This concept is known as "Listener Isolation", and it is an Extended feature
+	// of Gateway API. Implementations that do not support Listener Isolation MUST
+	// clearly document this, and MUST NOT claim support for the
+	// `GatewayHTTPListenerIsolation` feature.
 	//
 	// Implementations that _do_ support Listener Isolation SHOULD claim support
-	// for the `GatewayHTTPListenerIsolation` feature and pass the associated conformance tests.
+	// for the Extended `GatewayHTTPListenerIsolation` feature and pass the associated
+	// conformance tests.
 	//
 	// ## Compatible Listeners
 	//
