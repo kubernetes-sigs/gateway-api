@@ -25,7 +25,7 @@ command in PR and issue comments][issue-cmds]. For example,
 `/priority important-soon`.
 
 [gh-issues]: https://github.com/kubernetes-sigs/gateway-api/issues
-[gh-dashboard]: https://github.com/kubernetes-sigs/gateway-api/projects/1
+[gh-dashboard]: https://github.com/kubernetes-sigs/gateway-api/projects
 [gh-milestones]: https://github.com/kubernetes-sigs/gateway-api/milestones
 [semver]:https://semver.org/
 [prio-labels]:https://github.com/kubernetes-sigs/gateway-api/labels?q=priority
