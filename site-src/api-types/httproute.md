@@ -339,3 +339,4 @@ resolution applies to merging, refer to the [API specification][httprouterule].
 [parentRef]: /reference/spec/#gateway.networking.k8s.io/v1.ParentRef
 [timeouts]: /reference/spec/#gateway.networking.k8s.io/v1.HTTPRouteTimeouts
 [appProtocol]: https://kubernetes.io/docs/concepts/services-networking/service/#application-protocol
+[name]: /reference/spec/#gateway.networking.k8s.io/v1.SectionName
