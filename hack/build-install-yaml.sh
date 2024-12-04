@@ -18,13 +18,22 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-thisyear=`date +"%Y"`
+thisyear=$(date +"%Y")
 
 mkdir -p release/
 
 # Make clean files with boilerplate
 cat hack/boilerplate/boilerplate.sh.txt > release/experimental-install.yaml
-sed -i "s/YEAR/$thisyear/g" release/experimental-install.yaml
+
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    sed -i "s/YEAR/$thisyear/g" release/experimental-install.yaml
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+    sed -i '' "s/YEAR/$thisyear/g" release/experimental-install.yaml
+else
+    echo "Unsupported OS"
+    exit 1
+fi
+
 cat << EOF >> release/experimental-install.yaml
 #
 # Gateway API Experimental channel install
@@ -32,29 +41,38 @@ cat << EOF >> release/experimental-install.yaml
 EOF
 
 cat hack/boilerplate/boilerplate.sh.txt > release/standard-install.yaml
-sed -i "s/YEAR/$thisyear/g" release/standard-install.yaml
+
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    sed -i "s/YEAR/$thisyear/g" release/experimental-install.yaml
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+    sed -i '' "s/YEAR/$thisyear/g" release/experimental-install.yaml
+else
+    echo "Unsupported OS"
+    exit 1
+fi
+
 cat << EOF >> release/standard-install.yaml
 #
 # Gateway API Standard channel install
 #
 EOF
 
-for file in `ls config/crd/experimental/gateway*.yaml`
+for file in config/crd/experimental/gateway*.yaml
 do
     echo "---" >> release/experimental-install.yaml
     echo "#" >> release/experimental-install.yaml
     echo "# $file" >> release/experimental-install.yaml
     echo "#" >> release/experimental-install.yaml
-    cat $file >> release/experimental-install.yaml
+    cat "$file" >> release/experimental-install.yaml
 done
 
-for file in `ls config/crd/standard/*.yaml`
+for file in config/crd/standard/*.yaml
 do
     echo "---" >> release/standard-install.yaml
     echo "#" >> release/standard-install.yaml
     echo "# $file" >> release/standard-install.yaml
     echo "#" >> release/standard-install.yaml
-    cat $file >> release/standard-install.yaml
+    cat "$file" >> release/standard-install.yaml
 done
 
 echo "Generated:" release/*-install.yaml
