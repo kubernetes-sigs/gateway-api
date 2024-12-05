@@ -20,7 +20,7 @@ The specification of an HTTPRoute consists of:
 - [Rules][httprouterule]- Define a list of rules to perform actions against
   matching HTTP requests. Each rule consists of [matches][matches],
   [filters][filters] (optional), [backendRefs][backendRef] (optional),
-  [timeouts][timeouts] (optional), and [name][name] (optional) fields.
+  [timeouts][timeouts] (optional), and [name][sectionName] (optional) fields.
 
 The following illustrates an HTTPRoute that sends all traffic to one Service:
 ![httproute-basic-example](/images/httproute-basic-example.svg)
