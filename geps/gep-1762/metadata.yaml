@@ -5,7 +5,7 @@ name: In Cluster Gateway Deployments
 status: Standard
 authors:
   - howardjohn
-  - frakbu
+  - frankbu
 relationships:
   extendedBy:
     - number: 1867

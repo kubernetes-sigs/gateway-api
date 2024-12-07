@@ -358,7 +358,7 @@ profiles:
 
 > **WARNING**: It is an important clarification that this is NOT a full
 > Kubernetes API. It uses `TypeMeta` for some fields that made sense to re-use
-> and were familiar, but otherwise has it's own structure. It is not a [Custom
+> and were familiar, but otherwise has its own structure. It is not a [Custom
 > Resource Definition (CRD)][crd] nor will it be made available along with our
 > CRDs. It will be used only by conformance test tooling.
 
@@ -368,11 +368,11 @@ profiles:
 > theoretically have multiple projects and should submit separate reports for
 > each of them.
 
-> **NOTE**: The `contact` field indicates the Github usernames or team
+> **NOTE**: The `contact` field indicates the GitHub usernames or team
 > names of those who are responsible for maintaining this file, so they can be
 > easily contacted when needed (e.g. for relevant release announcements
 > regarding conformance, e.t.c.). Optionally, it can be an email address or
-> a support URL (e.g. Github new issue page).
+> a support URL (e.g. GitHub new issue page).
 
 The above report describes an implementation that just released `v1`, uses gateway
 API `v0.8.0` `experimental` channel, and has `HTTP` `core` and `extended` and `TCP`
