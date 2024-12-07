@@ -142,8 +142,8 @@ matches:
       service: com.example.User
       method: Login
     headers:
-      values:
-        version: "2"
+    - name: version
+      value: "2"
   - method:
       service: com.example.v2.User
       method: Login
