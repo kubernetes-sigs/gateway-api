@@ -176,7 +176,7 @@ type TLSRouteOverrideType string
 
 const (
     // Allows the parameter to be configured from all routes.
-    TLSROuteOVerrideAllow TLSRouteOverrideType = "Allow"
+    TLSRouteOverrideAllow TLSRouteOverrideType = "Allow"
 
     // Prohibits the parameter from being configured from any route.
     TLSRouteOverrideDeny TLSRouteOverrideType = "Deny"

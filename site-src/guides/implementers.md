@@ -101,7 +101,7 @@ Gateway API conformance is version-specific. An implementation that passes
 conformance for version N may not pass conformance for version N+1 without changes.
 
 Implementations SHOULD submit a report from the conformance testing suite back
-to the Gateway API Github repo containing details of their testing.
+to the Gateway API GitHub repo containing details of their testing.
 
 The conformance suite output includes the Gateway API version supported.
 
