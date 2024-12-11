@@ -20,7 +20,7 @@ The specification of an HTTPRoute consists of:
 - [Rules][httprouterule]- Define a list of rules to perform actions against
   matching HTTP requests. Each rule consists of [matches][matches],
   [filters][filters] (optional), [backendRefs][backendRef] (optional),
-  [timeouts][timeouts] (optional), and [name][name] (optional) fields.
+  [timeouts][timeouts] (optional), and [name][sectionName] (optional) fields.
 
 The following illustrates an HTTPRoute that sends all traffic to one Service:
 ![httproute-basic-example](/images/httproute-basic-example.svg)
@@ -339,3 +339,4 @@ resolution applies to merging, refer to the [API specification][httprouterule].
 [parentRef]: /reference/spec/#gateway.networking.k8s.io/v1.ParentRef
 [timeouts]: /reference/spec/#gateway.networking.k8s.io/v1.HTTPRouteTimeouts
 [appProtocol]: https://kubernetes.io/docs/concepts/services-networking/service/#application-protocol
+[sectionName]: /reference/spec/#gateway.networking.k8s.io/v1.SectionName

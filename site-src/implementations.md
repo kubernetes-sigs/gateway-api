@@ -32,9 +32,11 @@ cover, and documentation to help users get started.
 - [HAProxy Kubernetes Ingress Controller][32] (GA)
 - [HashiCorp Consul][8]
 - [Istio][9] (GA)
-- [Kong][10] (GA)
+- [Kong Ingress Controller][10] (GA)
+- [Kong Gateway Operator][35] (GA)
 - [Kuma][11] (GA)
 - [LiteSpeed Ingress Controller][19]
+- [LoxiLB][36] (beta)
 - [NGINX Gateway Fabric][12] (GA)
 - [ngrok][33] (preview)
 - [STUNner][21] (beta)
@@ -65,7 +67,7 @@ cover, and documentation to help users get started.
 [7]:#haproxy-ingress
 [8]:#hashicorp-consul
 [9]:#istio
-[10]:#kong
+[10]:#kong-kubernetes-ingress-controller
 [11]:#kuma
 [12]:#nginx-gateway-fabric
 [13]:#traefik-proxy
@@ -89,6 +91,9 @@ cover, and documentation to help users get started.
 [32]:#haproxy-kubernetes-ingress-controller
 [33]:#ngrok-kubernetes-operator
 [34]:#airlock-microgateway
+[35]:#kong-gateway-operator
+[36]:#loxilb
+
 
 [gamma]:/concepts/gamma/
 
@@ -272,9 +277,13 @@ FSM support of Gateway API is built on top [Flomesh Gateway API](fgw) and it cur
 ### Gloo Gateway
 
 [![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.0.0-GlooGateway-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.0.0/gloo-gateway)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Partial%20Conformance%20v1.1.0-GlooGateway-orange)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.1.0/gloo-gateway)
 
 [Gloo Gateway][gloogateway] by [Solo.io][solo] is a feature-rich, Kubernetes-native ingress controller and next-generation API gateway.
 Gloo Gateway brings the full power and community support of Gateway API to its existing control-plane implementation.
+
+The Gloo Gateway ingress controller passes all the core Gateway API conformance tests in the v1.1.0 release for the GATEWAY_HTTP conformance 
+profile except `HTTPRouteServiceTypes`.
 
 [gloogateway]:https://docs.solo.io/gateway/latest/
 [solo]:https://www.solo.io
@@ -350,25 +359,36 @@ Check out the [Gateway API task][istio-2] for more information about the Gateway
 [istio-1]:https://istio.io/latest/docs/tasks/traffic-management/ingress/
 [istio-2]:https://istio.io/latest/docs/tasks/traffic-management/ingress/gateway-api/
 
-### Kong
+### Kong Kubernetes Ingress Controller
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.0.0-Kong%20Ingress%20Controller-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.0.0/kong-kubernetes-ingress-controller)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.1.0-Kong%20Ingress%20Controller-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.1.0/kong-kubernetes-ingress-controller)
 
 [Kong][kong] is an open source API Gateway built for hybrid and multi-cloud environments.
 
-Kong supports Gateway API in the [Kong Kubernetes Ingress Controller (KIC)][kic], see the [Gateway API Guide][kong-gw-guide] for usage information.
+The [Kong Kubernetes Ingress Controller (KIC)][kic] can be used to configure unmanaged Gateways. See the [Gateway API Guide][kong-gw-guide] for usage information.. See the [Gateway API Guide][kong-gw-guide] for usage information.
 
-Kong also supports Gateway API in the [Kong Gateway Operator][kgo].
-
-For help and support with Kong's implementations please feel free to [create an issue][kong-issue-new] or a [discussion][kong-disc-new]. You can also ask for help in the [#kong channel on Kubernetes slack][kong-slack].
+For help and support with Kong Kubernetes Ingress Controller please feel free to [create an issue][kic-issue-new] or a [discussion][kic-disc-new]. You can also ask for help in the [#kong channel on Kubernetes slack][kong-slack].
 
 [kong]:https://konghq.com
 [kic]:https://github.com/kong/kubernetes-ingress-controller
 [kong-gw-guide]:https://docs.konghq.com/kubernetes-ingress-controller/latest/guides/using-gateway-api/
-[kgo]:https://docs.konghq.com/gateway-operator/latest/
-[kong-issue-new]:https://github.com/Kong/kubernetes-ingress-controller/issues/new
-[kong-disc-new]:https://github.com/Kong/kubernetes-ingress-controller/discussions/new
+[kic-issue-new]:https://github.com/Kong/kubernetes-ingress-controller/issues/new
+[kic-disc-new]:https://github.com/Kong/kubernetes-ingress-controller/discussions/new
 [kong-slack]:https://kubernetes.slack.com/archives/CDCA87FRD
+
+### Kong Gateway Operator
+
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.2.0-Kong%20Gateway%20Operator-orange)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.2.0/kong-gateway-operator)
+
+[Kong][kong] is an open source API Gateway built for hybrid and multi-cloud environments.
+
+The [Kong Gateway operator (KGO)][kgo] can be used to configure managed Gateways and orchestrate instances of [Kong Kubernetes Ingress Controllers](#kong-kubernetes-ingress-controller).
+
+For help and support with Kong Gateway operator please feel free to [create an issue][kgo-issue-new] or a [discussion][kgo-disc-new]. You can also ask for help in the [#kong channel on Kubernetes slack][kong-slack].
+
+[kgo]:https://docs.konghq.com/gateway-operator/latest/
+[kgo-issue-new]:https://github.com/Kong/gateway-operator/issues/new
+[kgo-disc-new]:https://github.com/Kong/gateway-operator/discussions/new
 
 ### Kuma
 
@@ -404,6 +424,19 @@ The [LiteSpeed Ingress Controller](https://litespeedtech.com/products/litespeed-
 - [Product documentation](https://docs.litespeedtech.com/cloud/kubernetes/).
 - [Gateway specific documentation](https://docs.litespeedtech.com/cloud/kubernetes/gateway).
 - Full support is available on the [LiteSpeed support web site](https://www.litespeedtech.com/support).
+
+### LoxiLB
+
+[kube-loxilb][kube-loxilb-gh] is [LoxiLB's][loxilb-org] implementation of Gateway API and kubernetes service load-balancer spec which includes support for load-balancer class, advanced IPAM (shared or exclusive) etc. kube-loxilb manages Gateway API resources with [LoxiLB][loxilb-gh] as L4 service LB and [loxilb-ingress][loxilb-ingress-gh] for Ingress(L7) resources.  
+
+Follow the [quickstart guide][loxigw-guide] to get LoxiLB running with Gateway API in a few simple steps.
+
+[loxilb-home]:https://loxilb.io/
+[loxilb-org]:https://github.com/loxilb-io
+[loxilb-gh]:https://github.com/loxilb-io/loxilb
+[kube-loxilb-gh]:https://github.com/loxilb-io/kube-loxilb
+[loxilb-ingress-gh]:https://github.com/loxilb-io/loxilb-ingress
+[loxigw-guide]:https://docs.loxilb.io/latest/gw-api/
 
 ### NGINX Gateway Fabric
 

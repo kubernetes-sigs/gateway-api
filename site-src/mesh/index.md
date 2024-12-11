@@ -38,6 +38,8 @@ Service.
 [service-mesh]:/concepts/glossary#service-mesh
 [service-facets]:/concepts/service-facets
 
+## Connecting routes and services <a name="gateway-api-for-mesh">
+
 GAMMA specifies that individual Route resources attach directly to a Service,
 representing configuration meant to be applied to _any traffic directed to the
 Service_.

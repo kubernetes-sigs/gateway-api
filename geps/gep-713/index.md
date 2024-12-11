@@ -246,9 +246,12 @@ ties:
   only come up in exceptional circumstances.
 * Inside Inherited Policies, the same setting in `overrides` beats the one in
   `defaults`.
-* The oldest Policy based on creation timestamp beats a newer one. For example,
-  a Policy with a creation timestamp of "2021-07-15 01:02:03" MUST be given
-  precedence over a Policy with a creation timestamp of "2021-07-15 01:02:04".
+* The older Policy based on creation timestamp beats a newer one. For example,
+  a Policy with a creation timestamp of "2021-07-15 01:02:03" MUST be given
+  precedence over a Policy with a creation timestamp of "2021-07-15 01:02:04".
+  The goal is to ensure that introducing new, unused policies doesn’t disrupt
+  existing ones, since changing active rules can cause outages while altering
+  unused policies poses no risk.
 * The Policy appearing first in alphabetical order by `{namespace}/{name}`. For
   example, foo/bar is given precedence over foo/baz.
 
@@ -274,10 +277,10 @@ past two and a half weeks, but after successfully deploying version 3.6.0 of
 the `baker` service this morning, she's escaped early to try to unwind a bit.
 
 Her shoulders are just starting to unknot when her phone pings with a text
-from Charlie, down in the NOC. Waterproof phones are a blessing, but also a
+from Chihiro, down in the NOC. Waterproof phones are a blessing, but also a
 curse.
 
-**Charlie**: _Hey Ana. Things are still running, more or less, but latencies
+**Chihiro**: _Hey Ana. Things are still running, more or less, but latencies
 on everything in the `baker` namespace are crazy high after your last rollout,
 and `baker` itself has a weirdly high load. Sorry to interrupt you on the lake
 but can you take a look? Thanks!!_
@@ -294,18 +297,18 @@ duplicates? Ana checks her HTTPRoute again, though she's pretty sure you
 can't configure retries there, and finds nothing. But it definitely looks like
 clients are retrying when they shouldn’t be.
 
-She pings Charlie.
+She pings Chihiro.
 
-**Ana**: _Hey Charlie. Something weird is up, looks like requests to `baker`
+**Ana**: _Hey Chihiro. Something weird is up, looks like requests to `baker`
 are failing but getting retried??_
 
 A minute later they answer.
 
-**Charlie**: 🤷 _Did you configure retries?_
+**Chihiro**: 🤷 _Did you configure retries?_
 
 **Ana**: _Dude. I don’t even know how to._ 😂
 
-**Charlie**: _You just attach a RetryPolicy to your HTTPRoute._
+**Chihiro**: _You just attach a RetryPolicy to your HTTPRoute._
 
 **Ana**: _Nope. Definitely didn’t do that._
 
@@ -313,11 +316,11 @@ She types `kubectl get retrypolicy -n baker` and gets a permission error.
 
 **Ana**: _Huh, I actually don’t have permissions for RetryPolicy._ 🤔
 
-**Charlie**: 🤷 _Feels like you should but OK, guess that can’t be it._
+**Chihiro**: 🤷 _Feels like you should but OK, guess that can’t be it._
 
 Minutes pass while both look at logs.
 
-**Charlie**: _I’m an idiot. There’s a RetryPolicy for the whole namespace –
+**Chihiro**: _I’m an idiot. There’s a RetryPolicy for the whole namespace –
 sorry, too many policies in the dashboard and I missed it. Deleting that since
 you don’t want retries._
 
@@ -329,17 +332,17 @@ through them: there’s one for every single service in the `baker` namespace.
 
 **Ana**: _PUT IT BACK!!_
 
-**Charlie**: _Just did. Be glad you couldn't hear all the alarms here._ 😕
+**Chihiro**: _Just did. Be glad you couldn't hear all the alarms here._ 😕
 
 **Ana**: _What the hell just happened??_
 
-**Charlie**: _At a guess, all the workloads in the `baker` namespace actually
+**Chihiro**: _At a guess, all the workloads in the `baker` namespace actually
 fail a lot, but they seem OK because there are retries across the whole
 namespace?_ 🤔
 
 Ana's blood runs cold.
 
-**Charlie**: _Yeah. Looking a little closer, I think your `baker` rollout this
+**Chihiro**: _Yeah. Looking a little closer, I think your `baker` rollout this
 morning would have failed without those retries._ 😕
 
 There is a pause while Ana's mind races through increasingly unpleasant
@@ -348,25 +351,25 @@ possibilities.
 **Ana**: _I don't even know where to start here. How long did that
 RetryPolicy go in? Is it the only thing like it?_
 
-**Charlie**: _Didn’t look closely before deleting it, but I think it said a few
+**Chihiro**: _Didn’t look closely before deleting it, but I think it said a few
 months ago. And there are lots of different kinds of policy and lots of
 individual policies, hang on a minute..._
 
-**Charlie**: _Looks like about 47 for your chunk of the world, a couple hundred
+**Chihiro**: _Looks like about 47 for your chunk of the world, a couple hundred
 system-wide._
 
 **Ana**: 😱 _Can you tell me what they’re doing for each of our services? I
 can’t even_ look _at these things._ 😕
 
-**Charlie**: _That's gonna take awhile. Our tooling to show us which policies
+**Chihiro**: _That's gonna take awhile. Our tooling to show us which policies
 bind to a given workload doesn't go the other direction._
 
 **Ana**: _...wait. You have to_ build tools _to know if retries are turned on??_
 
 Pause.
 
-**Charlie**: _Policy attachment is more complex than we’d like, yeah._ 😐
-_Look, how ‘bout roll back your `baker` change for now? We can get together in
+**Chihiro**: _Policy attachment is more complex than we’d like, yeah._ 😐
+_Look, how about roll back your `baker` change for now? We can get together in
 the morning and start sorting this out._
 
 Ana shakes her head and rolls back her edits to the `baker` Deployment, then
@@ -374,14 +377,14 @@ sits looking out over the lake as the deployment progresses.
 
 **Ana**: _Done. Are things happier now?_
 
-**Charlie**: _Looks like, thanks. Reckon you can get back to your sailboard._ 🙂
+**Chihiro**: _Looks like, thanks. Reckon you can get back to your sailboard._ 🙂
 
 Ana sighs.
 
 **Ana**: _Wish I could. Wind’s died down, though, and it'll be dark soon.
 Just gonna head home._
 
-**Charlie**: _Ouch. Sorry to hear that._ 😐
+**Chihiro**: _Ouch. Sorry to hear that._ 😐
 
 One more look out at the lake.
 
@@ -398,13 +401,13 @@ listed in increasing order of desirability:
 - _Which_ Policy is (or Policies are) affecting a particular object
 - _What_ settings in the Policy are affecting the object.
 
-In the parable, if Ana and Charlie had known that there were Policies affecting
+In the parable, if Ana and Chihiro had known that there were Policies affecting
 the relevant object, then they could have gone looking for the relevant Policies
 and things would have played out differently. If they knew which Policies, they
 would need to look less hard, and if they knew what the settings being applied
 were, then the parable would have been able to be very short indeed.
 
-(There’s also another use case to consider, in that Charlie should have been able
+(There’s also another use case to consider, in that Chihiro should have been able
 to see that the Policy on the namespace was in use in many places before deleting
 it.)
 
@@ -429,7 +432,7 @@ ways at an API level to the Application Developer's concerns.
 
 An important note here is that a key piece of information for Policy Admins and
 Cluster Operators is “How many things does this Policy affect?”. In the parable,
-this would have enabled Charlie to know that deleting the Namespace Policy would
+this would have enabled Chihiro to know that deleting the Namespace Policy would
 affect many other people than just Ana.
 
 ### Problems we need to solve
