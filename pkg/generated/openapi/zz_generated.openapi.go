@@ -145,6 +145,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"sigs.k8s.io/gateway-api/apis/v1.SecretObjectReference":                           schema_sigsk8sio_gateway_api_apis_v1_SecretObjectReference(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.SessionPersistence":                              schema_sigsk8sio_gateway_api_apis_v1_SessionPersistence(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.SupportedFeature":                                schema_sigsk8sio_gateway_api_apis_v1_SupportedFeature(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.supportedFeatureInternal":                        schema_sigsk8sio_gateway_api_apis_v1_supportedFeatureInternal(ref),
 		"sigs.k8s.io/gateway-api/apis/v1alpha2.BackendLBPolicy":                           schema_sigsk8sio_gateway_api_apis_v1alpha2_BackendLBPolicy(ref),
 		"sigs.k8s.io/gateway-api/apis/v1alpha2.BackendLBPolicyList":                       schema_sigsk8sio_gateway_api_apis_v1alpha2_BackendLBPolicyList(ref),
 		"sigs.k8s.io/gateway-api/apis/v1alpha2.BackendLBPolicySpec":                       schema_sigsk8sio_gateway_api_apis_v1alpha2_BackendLBPolicySpec(ref),
@@ -3797,8 +3798,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewayClassStatus(ref common.Referenc
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.SupportedFeature"),
+										Ref: ref("sigs.k8s.io/gateway-api/apis/v1.SupportedFeature"),
 									},
 								},
 							},
@@ -5635,6 +5635,27 @@ func schema_sigsk8sio_gateway_api_apis_v1_SupportedFeature(ref common.ReferenceC
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
 				Type: []string{"object"},
+				Properties: map[string]spec.Schema{
+					"name": {
+						SchemaProps: spec.SchemaProps{
+							Default: "",
+							Type:    []string{"string"},
+							Format:  "",
+						},
+					},
+				},
+				Required: []string{"name"},
+			},
+		},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apis_v1_supportedFeatureInternal(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "This is solely for the purpose of ensuring backward compatibility and SHOULD NOT be used elsewhere.",
+				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"name": {
 						SchemaProps: spec.SchemaProps{

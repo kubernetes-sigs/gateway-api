@@ -30,13 +30,13 @@ Each of the following URLs has a different origin from the others.
    http://example.org/
    http://ietf.org/
  
-Before the actual cross-origin requests, clients will initiate an extra "preflight" request to determine whether that the server will permit the actual requests. 
+Before the actual cross-origin requests, clients will initiate an extra "preflight" request to determine whether the server will permit the actual requests. 
 The CORS "preflight" request uses `OPTIONS` as method and includes the following headers:
     `Origin` request header indicates where a request originates from.
     `Access-Control-Request-Method` request header lets the server know which HTTP method will be used when the actual cross-origin request is made.
     `Access-Control-Request-Headers` is an optional request header indicates which headers the actual cross-origin request might use.
 
-The server response for the CORS "preflight" request include the following headers:
+The server response for the CORS "preflight" request includes the following headers:
     `Access-Control-Allow-Origin` response header indicates whether the response can be shared with requested resource from the given `Origin`.
     `Access-Control-Allow-Methods` response header specifies one or more HTTP methods are accepted by the server when accessing the requested resource. 
     `Access-Control-Allow-Headers` response header indicates which HTTP headers can be used during the actual cross-origin request.
@@ -102,7 +102,7 @@ type HTTPCORSFilter struct {
     // Access-Control-Allow-Origin same as the `Origin` header provided by the client.
     //
     // The status code of a successful response to a "preflight" request is an OK status (i.e., 204 or 200). 
-    // For the "preflight" request, if the request `Origin` dos not match the configured allowed origins,
+    // For the "preflight" request, if the request `Origin` does not match the configured allowed origins,
     // the gateway will return a response with error status (e.g., 403). 
     // Moreover, the gateway will omit the relevant cross-origin response headers.
     // Then, the client will not send actual cross-origin request.
