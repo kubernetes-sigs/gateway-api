@@ -153,6 +153,44 @@ func TestBackendTLSPolicyTargetRefs(t *testing.T) {
 				SectionName: ptrTo(gatewayv1a2.SectionName("foo")),
 			}},
 		},
+		{
+			name:       "valid because duplicate target refs with different kinds",
+			wantErrors: []string{},
+			targetRefs: []gatewayv1a2.LocalPolicyTargetReferenceWithSectionName{{
+				LocalPolicyTargetReference: gatewayv1a2.LocalPolicyTargetReference{
+					Group: gatewayv1a2.Group(corev1.GroupName),
+					Kind:  gatewayv1a2.Kind("Service"),
+					Name:  "example",
+				},
+				SectionName: ptrTo(gatewayv1a2.SectionName("foo")),
+			}, {
+				LocalPolicyTargetReference: gatewayv1a2.LocalPolicyTargetReference{
+					Group: gatewayv1a2.Group(corev1.GroupName),
+					Kind:  gatewayv1a2.Kind("NotService"),
+					Name:  "example",
+				},
+				SectionName: ptrTo(gatewayv1a2.SectionName("foo")),
+			}},
+		},
+		{
+			name:       "valid because duplicate target refs with different groups",
+			wantErrors: []string{},
+			targetRefs: []gatewayv1a2.LocalPolicyTargetReferenceWithSectionName{{
+				LocalPolicyTargetReference: gatewayv1a2.LocalPolicyTargetReference{
+					Group: gatewayv1a2.Group(corev1.GroupName),
+					Kind:  gatewayv1a2.Kind("Service"),
+					Name:  "example",
+				},
+				SectionName: ptrTo(gatewayv1a2.SectionName("foo")),
+			}, {
+				LocalPolicyTargetReference: gatewayv1a2.LocalPolicyTargetReference{
+					Group: gatewayv1a2.Group("svc.other.io"),
+					Kind:  gatewayv1a2.Kind("Service"),
+					Name:  "example",
+				},
+				SectionName: ptrTo(gatewayv1a2.SectionName("foo")),
+			}},
+		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
