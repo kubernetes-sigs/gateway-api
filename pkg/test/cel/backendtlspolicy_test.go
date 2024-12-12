@@ -68,6 +68,12 @@ func TestBackendTLSPolicyTargetRefs(t *testing.T) {
 				LocalPolicyTargetReference: gatewayv1a2.LocalPolicyTargetReference{
 					Group: gatewayv1a2.Group(corev1.GroupName),
 					Kind:  gatewayv1a2.Kind("Service"),
+					Name:  "example2",
+				},
+			}, {
+				LocalPolicyTargetReference: gatewayv1a2.LocalPolicyTargetReference{
+					Group: gatewayv1a2.Group(corev1.GroupName),
+					Kind:  gatewayv1a2.Kind("Service"),
 					Name:  "example",
 				},
 				SectionName: ptrTo(gatewayv1a2.SectionName("foo")),
@@ -83,6 +89,13 @@ func TestBackendTLSPolicyTargetRefs(t *testing.T) {
 					Name:  "example",
 				},
 				SectionName: ptrTo(gatewayv1a2.SectionName("foo")),
+			}, {
+				LocalPolicyTargetReference: gatewayv1a2.LocalPolicyTargetReference{
+					Group: gatewayv1a2.Group(corev1.GroupName),
+					Kind:  gatewayv1a2.Kind("Service"),
+					Name:  "example",
+				},
+				SectionName: ptrTo(gatewayv1a2.SectionName("bar")),
 			}, {
 				LocalPolicyTargetReference: gatewayv1a2.LocalPolicyTargetReference{
 					Group: gatewayv1a2.Group(corev1.GroupName),
@@ -132,6 +145,13 @@ func TestBackendTLSPolicyTargetRefs(t *testing.T) {
 					Name:  "example",
 				},
 				SectionName: ptrTo(gatewayv1a2.SectionName("bar")),
+			}, {
+				LocalPolicyTargetReference: gatewayv1a2.LocalPolicyTargetReference{
+					Group: gatewayv1a2.Group(corev1.GroupName),
+					Kind:  gatewayv1a2.Kind("Service"),
+					Name:  "example",
+				},
+				SectionName: ptrTo(gatewayv1a2.SectionName("jin")),
 			}},
 		},
 		{
@@ -149,6 +169,13 @@ func TestBackendTLSPolicyTargetRefs(t *testing.T) {
 					Group: gatewayv1a2.Group(corev1.GroupName),
 					Kind:  gatewayv1a2.Kind("Service"),
 					Name:  "example2",
+				},
+				SectionName: ptrTo(gatewayv1a2.SectionName("foo")),
+			}, {
+				LocalPolicyTargetReference: gatewayv1a2.LocalPolicyTargetReference{
+					Group: gatewayv1a2.Group(corev1.GroupName),
+					Kind:  gatewayv1a2.Kind("Service"),
+					Name:  "example3",
 				},
 				SectionName: ptrTo(gatewayv1a2.SectionName("foo")),
 			}},
