@@ -100,7 +100,7 @@ type HTTPCORSFilter struct {
     //    to the left of its position.
     // * A wildcard by itself matches all hosts.
     //
-    // An Origin value that includes _only_ the `*` character indicates requests from all `Origin`s
+    // An origin value that includes _only_ the `*` character indicates requests from all `Origin`s
     // are allowed.
     //
     // When responding to a credentialed requests, the gateway must specify 
@@ -119,10 +119,13 @@ type HTTPCORSFilter struct {
     // For a simple cross-origin interaction, the gateway sets value of the header 
     // Access-Control-Allow-Origin same as the `Origin` header provided by the client.
     //
-    // The status code of a successful response to a "preflight" request is an OK status (i.e., 204 or 200). 
-    // For the "preflight" request, if the request `Origin` does not match the configured allowed origins,
-    // the gateway will return a response with error status (e.g., 403). 
-    // Moreover, the gateway will omit the relevant cross-origin response headers.
+    // The status code of a successful response to a "preflight" request is always an OK status (i.e., 204 or 200). 
+    // Gateway always returns 204/200 to the CORS-preflight request even if the request `Origin` 
+    // does not match the configured allowed origins.
+    //
+    // Alternatively, if CORS is not enabled or no CORS rule matches the preflight request, 
+    // the Gateway responds with status code 403 (Forbidden) to the CORS-preflight request.
+    // Moreover, the gateway will omit the relevant cross-origin response headers. 
     // Then, the client will not send actual cross-origin request.
     // 
     // Input:
