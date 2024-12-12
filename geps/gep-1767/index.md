@@ -83,11 +83,29 @@ type HTTPCORSFilter struct {
     // AllowOrigins indicates whether the response can be shared with 
     // requested resource from the given `Origin`.
     // 
-    // A wildcard indicates that the requests from all `Origin` are allowed.
+    // The origin consists of a scheme and a host, with an optional port, 
+    // and takes the form `<scheme>://<host>(:<port>)`.
+    //
+    // Valid values for scheme are: `http` and `https`.
+    //
+    // Valid values for port are any integer between 1 and 65535 (the list of available TCP/UDP ports).
+    // Note that, if not included, port `80` is assumed for `http` scheme origins, and port `443` is
+    // assumed for `https` origins. This may affect origin matching.
+    //
+    // The host part of the origin may contain the wildcard character `*`.
+    // These wildcard characters behave as follows:
+    //
+    // * `*` is a greedy match to the _left_, including any number of DNS labels to the left of
+    //    its position. This also means that `*` will include any number of period `.` characters
+    //    to the left of its position.
+    // * A wildcard by itself matches all hosts.
+    //
+    // An Origin value that includes _only_ the `*` character indicates requests from all `Origin`s
+    // are allowed.
     //
     // When responding to a credentialed requests, the gateway must specify 
     // an origin in the value of the Access-Control-Allow-Origin response header, 
-    // instead of specifying the * wildcard.
+    // instead of specifying the `*` wildcard.
     //
     // Input:
     //   Origin: https://foo.example
@@ -148,7 +166,12 @@ type HTTPCORSFilter struct {
 
     // AllowMethods indicates which HTTP methods are supported 
     // for accessing the requested resource.
-    // The method is case-sensitive.
+    //
+    // Valid values are any method defined by RFC9110, 
+    // along with the special value `*`, which represents all HTTP methods are allowed.
+    //
+    // Method names are case sensitive, so these values are also case-sensitive.
+    // (See https://www.rfc-editor.org/rfc/rfc2616#section-5.1.1)
     //
     // Config:
     //   allowMethods: ["GET, PUT, POST, DELETE, PATCH, OPTIONS"]
@@ -156,10 +179,9 @@ type HTTPCORSFilter struct {
     // Output:
     //   Access-Control-Allow-Methods: GET, PUT, POST, DELETE, PATCH, OPTIONS
     //
-    // A wildcard indicates that the requests with all HTTP methods are allowed.
     // When responding to a credentialed requests, the gateway must specify 
     // one or more HTTP methods in the value of the Access-Control-Allow-Methods response header, 
-    // instead of specifying the * wildcard.
+    // instead of specifying the `*` wildcard.
     //
     // Config:
     //   allowMethods: ["*"]
@@ -186,7 +208,7 @@ type HTTPCORSFilter struct {
     // A wildcard indicates that the requests with all HTTP headers are allowed.
     // When responding to a credentialed requests, the gateway must specify 
     // one or more HTTP headers in the value of the Access-Control-Allow-Headers response header, 
-    // instead of specifying the * wildcard.
+    // instead of specifying the `*` wildcard.
     //
     // Config:
     //   allowHeaders: ["*"]
@@ -212,7 +234,7 @@ type HTTPCORSFilter struct {
     // A wildcard indicates that the responses with all HTTP headers are exposed to clients.
     // When responding to a credentialed requests, the gateway must specify 
     // one or more HTTP headers in the value of the Access-Control-Expose-Headers response header, 
-    // instead of specifying the * wildcard.
+    // instead of specifying the `*` wildcard.
     //
     // Config:
     //   exposeHeaders: ["*"]
@@ -698,4 +720,3 @@ spec:
 * [NGINX Ingress Controller `ResponseHeaders`](https://docs.nginx.com/nginx-ingress-controller/configuration/virtualserver-and-virtualserverroute-resources/#actionproxyresponseheaders)
 * [Istio `CorsPolicy`](https://istio.io/latest/docs/reference/config/networking/virtual-service/#CorsPolicy)
 * [Traefik `CORS Headers`](https://doc.traefik.io/traefik/middlewares/http/headers/#cors-headers)
-
