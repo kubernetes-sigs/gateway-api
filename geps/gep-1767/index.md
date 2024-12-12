@@ -83,7 +83,25 @@ type HTTPCORSFilter struct {
     // AllowOrigins indicates whether the response can be shared with 
     // requested resource from the given `Origin`.
     // 
-    // A wildcard indicates that the requests from all `Origin` are allowed.
+    // The Origin consists of a scheme and a hostname, with an optional Port, and takes the form
+    // `<scheme>://<hostname>(:<port>)`.
+    //
+    // Valid values for scheme are: `http` and `https`.
+    //
+    // Valid values for port are any integer between 1 and 65535 (the list of available TCP ports).
+    // Note that, if not included, port `80` is assumed for `http` scheme Origins, and port `443` is
+    // assumed for `https` Origins. This may affect Origin matching.
+    //
+    // The hostname part of the Origin may contain the wildcard character `*`.
+    // These wildcard characters behave as follows:
+    //
+    // * `*` is a greedy match to the _left_, including any number of DNS labels to the left of
+    //    its position. This also means that `*` will include any number of period `.` characters
+    //    to the left of its position.
+    // * A wildcard by itself matches all hostnames.
+    //
+    // An Origin value that includes _only_ the `*` character indicates requests from all `Origin`s
+    // are allowed.
     //
     // When responding to a credentialed requests, the gateway must specify 
     // an origin in the value of the Access-Control-Allow-Origin response header, 
@@ -148,7 +166,10 @@ type HTTPCORSFilter struct {
 
     // AllowMethods indicates which HTTP methods are supported 
     // for accessing the requested resource.
-    // The method is case-sensitive.
+    // Valid values are any method defined by the HTTP RFC (add number and link here), along
+    // with the special value `*`, which represents all HTTP methods.
+    //
+    // Method names are case sensitive per the HTTP RFCs, so these values are also case-sensitive.
     //
     // Config:
     //   allowMethods: ["GET, PUT, POST, DELETE, PATCH, OPTIONS"]
