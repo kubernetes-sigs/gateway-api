@@ -6964,7 +6964,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha3_BackendTLSPolicySpec(ref common.
 				Properties: map[string]spec.Schema{
 					"targetRefs": {
 						SchemaProps: spec.SchemaProps{
-							Description: "TargetRefs identifies an API object to apply the policy to. Only Services have Extended support. Implementations MAY support additional objects, with Implementation Specific support. Note that this config applies to the entire referenced resource by default, but this default may change in the future to provide a more granular application of the policy.\n\nSupport: Extended for Kubernetes Service\n\nSupport: Implementation-specific for any other resource",
+							Description: "TargetRefs identifies an API object to apply the policy to. Only Services have Extended support. Implementations MAY support additional objects, with Implementation Specific support. Note that this config applies to the entire referenced resource by default, but this default may change in the future to provide a more granular application of the policy.\n\nTargetRefs must be _distinct_. This means either that:\n\n* They select different objects. If this is the case, then targetRef\n  entries are distinct. In terms of fields, this means that the\n  multi-part key defined by `group`, `kind`, and `name` must\n  be unique across all targetRef entries in the BackendTLSPolicy.\n* They do not select different objects, each TargetRef that selects\n  the same object must set the sectionName to a different value.\n\nSupport: Extended for Kubernetes Service\n\nSupport: Implementation-specific for any other resource",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
