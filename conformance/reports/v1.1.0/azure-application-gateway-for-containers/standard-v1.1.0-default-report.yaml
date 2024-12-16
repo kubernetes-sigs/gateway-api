@@ -1,7 +1,7 @@
-apiversion: gateway.networking.k8s.io/v1alpha1
+apiVersion: gateway.networking.k8s.io/v1alpha1
 date: "2024-12-16T20:12:47Z"
-gatewayapiversion: v1.1.1
-gatewayapichannel: standard
+gatewayAPIVersion: v1.1.0
+gatewayAPIChannel: standard
 implementation:
   organization: Microsoft Azure
   project: Application Gateway for Containers
@@ -11,7 +11,7 @@ implementation:
   - agcfeedback@microsoft.com
 mode: default
 kind: ConformanceReport
-profilereports:
+profiles:
 - name: GATEWAY-GRPC
   summary: Core tests succeeded.
   core:
@@ -20,8 +20,8 @@ profilereports:
       passed: 12
       skipped: 0
       failed: 0
-    skippedtests: []
-    failedtests: []
+    skippedTests: []
+    failedTests: []
   extended: null
 - name: GATEWAY-HTTP
   summary: Core tests succeeded. Extended tests succeeded.
@@ -31,8 +31,8 @@ profilereports:
       passed: 33
       skipped: 0
       failed: 0
-    skippedtests: []
-    failedtests: []
+    skippedTests: []
+    failedTests: []
   extended:
     status:
       result: success
@@ -40,9 +40,9 @@ profilereports:
         passed: 8
         skipped: 0
         failed: 0
-      skippedtests: []
-      failedtests: []
-    supportedfeatures:
+      skippedTests: []
+      failedTests: []
+    supportedFeatures:
     - HTTPRouteHostRewrite
     - HTTPRouteMethodMatching
     - HTTPRoutePathRedirect
@@ -51,7 +51,7 @@ profilereports:
     - HTTPRouteQueryParamMatching
     - HTTPRouteResponseHeaderModification
     - HTTPRouteSchemeRedirect
-    unsupportedfeatures:
+    unsupportedFeatures:
     - GatewayHTTPListenerIsolation
     - GatewayPort8080
     - GatewayStaticAddresses
