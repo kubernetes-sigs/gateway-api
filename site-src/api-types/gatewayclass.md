@@ -58,7 +58,7 @@ metadata:
 spec:
   controllerName: "example.net/gateway-controller"
   parametersRef:
-    group: example.net/v1alpha1
+    group: example.net
     kind: Config
     name: internet-gateway-config
 ---
