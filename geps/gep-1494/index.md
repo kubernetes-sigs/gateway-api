@@ -8,10 +8,12 @@
 
 ## TLDR
 
-Provide a method for configuring **Gateway API implementations** to add HTTP Authentication for north-south traffic. The method may also include Authorization config if practical.
+Provide a method for configuring **Gateway API implementations** to add HTTP Authentication for north-south traffic. The method may also include Authorization config if practical. At the time of writing, this authentication is only for ingress traffic to the cluster.
 
 
 ## Goals
+
+(Using the [Gateway API Personas](https://gateway-api.sigs.k8s.io/concepts/roles-and-personas/))
 
 * A way to configure a Gateway Implementation to perform Authentication (at least), with optional Authorization on behalf of Ana the Application Developer.
 
@@ -116,12 +118,23 @@ This section lays out some examples (updates with extra examples we've missed ar
 
 ## Conformance Details
 
-(This section describes the names to be used for the feature or
-features in conformance tests and profiles.
+(from https://github.com/kubernetes-sigs/gateway-api/blob/main/geps/gep-2162/index.md#standardize-features-and-conformance-tests-names)
 
-These should be `CamelCase` names that specify the feature as
-precisely as possible, and are particularly important for
-Extended features, since they may be surfaced to users.)
+#### Feature Names
+
+Every feature should:
+
+1. Start with the resource name. i.e HTTPRouteXXX
+2. Follow the PascalCase convention. Note that the resource name in the string should come as is and not be converted to PascalCase, i.e HTTPRoutePortRedirect and not HttpRoutePortRedirect.
+3. Not exceed 128 characters.
+4. Contain only letters and numbers
+
+### Conformance tests 
+
+Conformance tests file names should try to follow the the `pascal-case-name.go` format.
+For example for `HTTPRoutePortRedirect` - the test file would be `httproute-port-redirect.go`.
+Treat this guidance as "best effort" because we might have test files that check the combination of several features and can't follow the same format.
+In any case, the conformance tests file names should be meaningful and easy to understand.
 
 ## Alternatives
 
