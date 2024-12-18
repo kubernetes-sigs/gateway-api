@@ -67,12 +67,11 @@ type BackendTLSPolicySpec struct {
 	//
 	// TargetRefs must be _distinct_. This means either that:
 	//
-	// * They select different objects. If this is the case, then targetRef
+	// * They select different targets. If this is the case, then targetRef
 	//   entries are distinct. In terms of fields, this means that the
 	//   multi-part key defined by `group`, `kind`, and `name` must
 	//   be unique across all targetRef entries in the BackendTLSPolicy.
-	// * They do not select different objects, each TargetRef that selects
-	//   the same object must set the sectionName to a different value.
+	// * They select different sectionNames in the same target.
 	//
 	// Support: Extended for Kubernetes Service
 	//
