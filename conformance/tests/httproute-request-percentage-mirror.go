@@ -38,7 +38,7 @@ import (
 
 const (
 	concurrentRequests    = 10
-	tolerancePercentage   = 15.0
+	tolerancePercentage   = 5.0
 	totalRequests         = 500.0
 	numDistributionChecks = 5
 )
@@ -54,7 +54,7 @@ var HTTPRouteRequestPercentageMirror = suite.ConformanceTest{
 	Features: []features.FeatureName{
 		features.SupportGateway,
 		features.SupportHTTPRoute,
-		features.SupportHTTPRouteRequestPercentageMirror,
+		// features.SupportHTTPRouteRequestPercentageMirror,
 	},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		var (
@@ -66,7 +66,6 @@ var HTTPRouteRequestPercentageMirror = suite.ConformanceTest{
 
 		kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN)
 
-		// TODO(liorlieberman) add another test to show fraction takes precedence over percent
 		testCases := []http.ExpectedResponse{
 			{
 				Request:   http.Request{Path: "/percent-mirror"},
@@ -101,12 +100,12 @@ var HTTPRouteRequestPercentageMirror = suite.ConformanceTest{
 							Name:      "infra-backend-v2",
 							Namespace: ns,
 						},
-						Percent: ptrTo(int32(50)), // 1000/2000
+						Percent: ptrTo(int32(50)),
 					},
 				},
 			}, {
 				Request: http.Request{
-					Path: "/percent-multi-mirror-and-modify-headers",
+					Path: "/percent-mirror-and-modify-headers",
 					Headers: map[string]string{
 						"X-Header-Remove":     "remove-val",
 						"X-Header-Add-Append": "append-val-1",
@@ -114,7 +113,7 @@ var HTTPRouteRequestPercentageMirror = suite.ConformanceTest{
 				},
 				ExpectedRequest: &http.ExpectedRequest{
 					Request: http.Request{
-						Path: "/percent-multi-mirror-and-modify-headers",
+						Path: "/percent-mirror-and-modify-headers",
 						Headers: map[string]string{
 							"X-Header-Add":        "header-val-1",
 							"X-Header-Add-Append": "append-val-1,header-val-2",
@@ -133,20 +132,11 @@ var HTTPRouteRequestPercentageMirror = suite.ConformanceTest{
 						},
 						Percent: ptrTo(int32(35)),
 					},
-					{
-						BackendRef: http.BackendRef{
-							Name:      "infra-backend-v3",
-							Namespace: ns,
-						},
-						Percent: ptrTo(int32(50)),
-					},
 				},
 			},
 		}
 
 		for i := range testCases {
-			// Declare tc here to avoid loop variable
-			// reuse issues across parallel tests.
 			expected := testCases[i]
 			t.Run(expected.GetTestCaseName(i), func(t *testing.T) {
 				// Assert request succeeds before doing our distribution check

@@ -44,7 +44,7 @@ spec:
   - matches:
     - path:
         type: PathPrefix
-        value: /percent-multi-mirror-and-modify-headers
+        value: /percent-mirror-and-modify-headers
     filters:
     - type: RequestHeaderModifier
       requestHeaderModifier:
@@ -65,13 +65,6 @@ spec:
           namespace: gateway-conformance-infra
           port: 8080
         percent: 35
-    - type: RequestMirror
-      requestMirror:
-        backendRef:
-          name: infra-backend-v3
-          namespace: gateway-conformance-infra
-          port: 8080
-        percent: 50
     backendRefs:
     - name: infra-backend-v1
       port: 8080
