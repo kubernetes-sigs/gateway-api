@@ -1,7 +1,7 @@
 ---
 description: >
   We are excited to announce the v0.8.0 release of Gateway API, where service
-  mesh support has has now reached Experimental status, we've introduced CEL
+  mesh support has now reached Experimental status, we've introduced CEL
   validation and a Mesh conformance profile, and more!
 ---
 

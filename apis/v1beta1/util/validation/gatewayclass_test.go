@@ -20,7 +20,7 @@ import (
 	"testing"
 
 	gatewayv1b1 "sigs.k8s.io/gateway-api/apis/v1beta1"
-	validationtutils "sigs.k8s.io/gateway-api/apis/v1beta1/util/validation"
+	validationutil "sigs.k8s.io/gateway-api/apis/v1beta1/util/validation"
 )
 
 func TestIsControllerNameValid(t *testing.T) {
@@ -58,7 +58,7 @@ func TestIsControllerNameValid(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			isValid := validationtutils.IsControllerNameValid(tc.controllerName)
+			isValid := validationutil.IsControllerNameValid(tc.controllerName)
 			if isValid != tc.isvalid {
 				t.Errorf("Expected validity %t, got %t", tc.isvalid, isValid)
 			}

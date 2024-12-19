@@ -476,7 +476,7 @@ Timeouts could be configured using policy attachments or in objects other than `
 
 Instead of configuring timeouts directly on an API object, they could be configured using policy
 attachments. The advantage to this approach would be that timeout policies can be not only
-configured for an `HTTPRouteRule`, but can also be added/overriden at a more fine
+configured for an `HTTPRouteRule`, but can also be added/overridden at a more fine
 (e.g., `HTTPBackendRef`) or coarse (e.g. `HTTPRoute`) level of granularity.
 
 The downside, however, is complexity introduced for the most common use case, adding a simple

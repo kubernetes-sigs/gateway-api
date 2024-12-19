@@ -59,7 +59,7 @@ of stability of the change described in the GEP:
 
   * **Provisional:** The goals described by this GEP have consensus but
     implementation details have not been agreed to yet.
-  * **Prototyping:** An extension of `Provisional` which can be opted in to in
+  * **Prototyping:** An optional extension of `Provisional` in
     order to indicate to the community that there are some active practical tests
     and experiments going on which are intended to be a part of the development
     of this GEP. This may include APIs or code, but that content _must_ not be
