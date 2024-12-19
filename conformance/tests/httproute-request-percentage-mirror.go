@@ -27,6 +27,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"k8s.io/apimachinery/pkg/types"
 
+	"k8s.io/utils/ptr"
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
@@ -54,8 +55,9 @@ var HTTPRouteRequestPercentageMirror = suite.ConformanceTest{
 	Features: []features.FeatureName{
 		features.SupportGateway,
 		features.SupportHTTPRoute,
-		// features.SupportHTTPRouteRequestPercentageMirror,
+		features.SupportHTTPRouteRequestPercentageMirror,
 	},
+	Provisional: true,
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		var (
 			ns      = "gateway-conformance-infra"
@@ -82,7 +84,7 @@ var HTTPRouteRequestPercentageMirror = suite.ConformanceTest{
 							Name:      "infra-backend-v2",
 							Namespace: ns,
 						},
-						Percent: ptrTo(int32(20)),
+						Percent: ptr.To(int32(20)),
 					},
 				},
 			}, {
@@ -100,7 +102,7 @@ var HTTPRouteRequestPercentageMirror = suite.ConformanceTest{
 							Name:      "infra-backend-v2",
 							Namespace: ns,
 						},
-						Percent: ptrTo(int32(50)),
+						Percent: ptr.To(int32(50)),
 					},
 				},
 			}, {
@@ -130,7 +132,7 @@ var HTTPRouteRequestPercentageMirror = suite.ConformanceTest{
 							Name:      "infra-backend-v2",
 							Namespace: ns,
 						},
-						Percent: ptrTo(int32(35)),
+						Percent: ptr.To(int32(35)),
 					},
 				},
 			},
@@ -229,8 +231,4 @@ func testMirroredRequestsDistribution(t *testing.T, suite *suite.ConformanceTest
 	}
 	tlog.Log(t, "Validated mirrored request logs across all desired backends within the given tolerance")
 	return nil
-}
-
-func ptrTo[T any](a T) *T {
-	return &a
 }

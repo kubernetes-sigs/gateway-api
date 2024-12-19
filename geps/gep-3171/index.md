@@ -15,6 +15,7 @@ Enable percentage-based request mirroring with Gateway and Gateway for mesh APIs
 
 ## Scope
 
+<!-- TODO(https://github.com/kubernetes-sigs/gateway-api/issues/3514) Add GRPCRoute supportedFeatures and coverage -->
 The scope of this GEP is to add support for this feature in both HTTPRoute and GRPCRoute
 
 ## Introduction
@@ -211,4 +212,4 @@ spec:
 
 A new Supported Feature with the following name SupportHTTPRouteRequestPercentageMirror is introduced along with a corresponding conformance test.
 
-<!-- TODO(liorlieberman) Different supportedFeature for mesh> -->
+<!-- TODO(https://github.com/kubernetes-sigs/gateway-api/issues/3515) Different supportedFeature for mesh> -->
