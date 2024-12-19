@@ -25,21 +25,229 @@ import (
 	"testing"
 	"time"
 
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	gatewayv1a2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
 	gatewayv1a3 "sigs.k8s.io/gateway-api/apis/v1alpha3"
 	v1beta1 "sigs.k8s.io/gateway-api/apis/v1beta1"
 )
 
+func TestBackendTLSPolicyTargetRefs(t *testing.T) {
+	tests := []struct {
+		name       string
+		wantErrors []string
+		targetRefs []gatewayv1a2.LocalPolicyTargetReferenceWithSectionName
+	}{
+		{
+			name:       "invalid because duplicate target refs without section name",
+			wantErrors: []string{"sectionName must be unique when targetRefs includes 2 or more references to the same target"},
+			targetRefs: []gatewayv1a2.LocalPolicyTargetReferenceWithSectionName{{
+				LocalPolicyTargetReference: gatewayv1a2.LocalPolicyTargetReference{
+					Group: gatewayv1a2.Group(corev1.GroupName),
+					Kind:  gatewayv1a2.Kind("Service"),
+					Name:  "example",
+				},
+			}, {
+				LocalPolicyTargetReference: gatewayv1a2.LocalPolicyTargetReference{
+					Group: gatewayv1a2.Group(corev1.GroupName),
+					Kind:  gatewayv1a2.Kind("Service"),
+					Name:  "example",
+				},
+			}},
+		},
+		{
+			name:       "invalid because duplicate target refs with only one section name",
+			wantErrors: []string{"sectionName must be specified when targetRefs includes 2 or more references to the same target"},
+			targetRefs: []gatewayv1a2.LocalPolicyTargetReferenceWithSectionName{{
+				LocalPolicyTargetReference: gatewayv1a2.LocalPolicyTargetReference{
+					Group: gatewayv1a2.Group(corev1.GroupName),
+					Kind:  gatewayv1a2.Kind("Service"),
+					Name:  "example",
+				},
+			}, {
+				LocalPolicyTargetReference: gatewayv1a2.LocalPolicyTargetReference{
+					Group: gatewayv1a2.Group(corev1.GroupName),
+					Kind:  gatewayv1a2.Kind("Service"),
+					Name:  "example2",
+				},
+			}, {
+				LocalPolicyTargetReference: gatewayv1a2.LocalPolicyTargetReference{
+					Group: gatewayv1a2.Group(corev1.GroupName),
+					Kind:  gatewayv1a2.Kind("Service"),
+					Name:  "example",
+				},
+				SectionName: ptrTo(gatewayv1a2.SectionName("foo")),
+			}},
+		},
+		{
+			name:       "invalid because duplicate target refs with duplicate section names",
+			wantErrors: []string{"sectionName must be unique when targetRefs includes 2 or more references to the same target"},
+			targetRefs: []gatewayv1a2.LocalPolicyTargetReferenceWithSectionName{{
+				LocalPolicyTargetReference: gatewayv1a2.LocalPolicyTargetReference{
+					Group: gatewayv1a2.Group(corev1.GroupName),
+					Kind:  gatewayv1a2.Kind("Service"),
+					Name:  "example",
+				},
+				SectionName: ptrTo(gatewayv1a2.SectionName("foo")),
+			}, {
+				LocalPolicyTargetReference: gatewayv1a2.LocalPolicyTargetReference{
+					Group: gatewayv1a2.Group(corev1.GroupName),
+					Kind:  gatewayv1a2.Kind("Service"),
+					Name:  "example",
+				},
+				SectionName: ptrTo(gatewayv1a2.SectionName("bar")),
+			}, {
+				LocalPolicyTargetReference: gatewayv1a2.LocalPolicyTargetReference{
+					Group: gatewayv1a2.Group(corev1.GroupName),
+					Kind:  gatewayv1a2.Kind("Service"),
+					Name:  "example",
+				},
+				SectionName: ptrTo(gatewayv1a2.SectionName("foo")),
+			}},
+		},
+		{
+			name:       "valid single targetRef without sectionName",
+			wantErrors: []string{},
+			targetRefs: []gatewayv1a2.LocalPolicyTargetReferenceWithSectionName{{
+				LocalPolicyTargetReference: gatewayv1a2.LocalPolicyTargetReference{
+					Group: gatewayv1a2.Group(corev1.GroupName),
+					Kind:  gatewayv1a2.Kind("Service"),
+					Name:  "example",
+				},
+			}},
+		},
+		{
+			name:       "valid single targetRef with sectionName",
+			wantErrors: []string{},
+			targetRefs: []gatewayv1a2.LocalPolicyTargetReferenceWithSectionName{{
+				LocalPolicyTargetReference: gatewayv1a2.LocalPolicyTargetReference{
+					Group: gatewayv1a2.Group(corev1.GroupName),
+					Kind:  gatewayv1a2.Kind("Service"),
+					Name:  "example",
+				},
+				SectionName: ptrTo(gatewayv1a2.SectionName("foo")),
+			}},
+		},
+		{
+			name:       "valid because duplicate target refs with different section names",
+			wantErrors: []string{},
+			targetRefs: []gatewayv1a2.LocalPolicyTargetReferenceWithSectionName{{
+				LocalPolicyTargetReference: gatewayv1a2.LocalPolicyTargetReference{
+					Group: gatewayv1a2.Group(corev1.GroupName),
+					Kind:  gatewayv1a2.Kind("Service"),
+					Name:  "example",
+				},
+				SectionName: ptrTo(gatewayv1a2.SectionName("foo")),
+			}, {
+				LocalPolicyTargetReference: gatewayv1a2.LocalPolicyTargetReference{
+					Group: gatewayv1a2.Group(corev1.GroupName),
+					Kind:  gatewayv1a2.Kind("Service"),
+					Name:  "example",
+				},
+				SectionName: ptrTo(gatewayv1a2.SectionName("bar")),
+			}, {
+				LocalPolicyTargetReference: gatewayv1a2.LocalPolicyTargetReference{
+					Group: gatewayv1a2.Group(corev1.GroupName),
+					Kind:  gatewayv1a2.Kind("Service"),
+					Name:  "example",
+				},
+				SectionName: ptrTo(gatewayv1a2.SectionName("jin")),
+			}},
+		},
+		{
+			name:       "valid because duplicate target refs with different names",
+			wantErrors: []string{},
+			targetRefs: []gatewayv1a2.LocalPolicyTargetReferenceWithSectionName{{
+				LocalPolicyTargetReference: gatewayv1a2.LocalPolicyTargetReference{
+					Group: gatewayv1a2.Group(corev1.GroupName),
+					Kind:  gatewayv1a2.Kind("Service"),
+					Name:  "example",
+				},
+				SectionName: ptrTo(gatewayv1a2.SectionName("foo")),
+			}, {
+				LocalPolicyTargetReference: gatewayv1a2.LocalPolicyTargetReference{
+					Group: gatewayv1a2.Group(corev1.GroupName),
+					Kind:  gatewayv1a2.Kind("Service"),
+					Name:  "example2",
+				},
+				SectionName: ptrTo(gatewayv1a2.SectionName("foo")),
+			}, {
+				LocalPolicyTargetReference: gatewayv1a2.LocalPolicyTargetReference{
+					Group: gatewayv1a2.Group(corev1.GroupName),
+					Kind:  gatewayv1a2.Kind("Service"),
+					Name:  "example3",
+				},
+				SectionName: ptrTo(gatewayv1a2.SectionName("foo")),
+			}},
+		},
+		{
+			name:       "valid because duplicate target refs with different kinds",
+			wantErrors: []string{},
+			targetRefs: []gatewayv1a2.LocalPolicyTargetReferenceWithSectionName{{
+				LocalPolicyTargetReference: gatewayv1a2.LocalPolicyTargetReference{
+					Group: gatewayv1a2.Group(corev1.GroupName),
+					Kind:  gatewayv1a2.Kind("Service"),
+					Name:  "example",
+				},
+				SectionName: ptrTo(gatewayv1a2.SectionName("foo")),
+			}, {
+				LocalPolicyTargetReference: gatewayv1a2.LocalPolicyTargetReference{
+					Group: gatewayv1a2.Group(corev1.GroupName),
+					Kind:  gatewayv1a2.Kind("NotService"),
+					Name:  "example",
+				},
+				SectionName: ptrTo(gatewayv1a2.SectionName("foo")),
+			}},
+		},
+		{
+			name:       "valid because duplicate target refs with different groups",
+			wantErrors: []string{},
+			targetRefs: []gatewayv1a2.LocalPolicyTargetReferenceWithSectionName{{
+				LocalPolicyTargetReference: gatewayv1a2.LocalPolicyTargetReference{
+					Group: gatewayv1a2.Group(corev1.GroupName),
+					Kind:  gatewayv1a2.Kind("Service"),
+					Name:  "example",
+				},
+				SectionName: ptrTo(gatewayv1a2.SectionName("foo")),
+			}, {
+				LocalPolicyTargetReference: gatewayv1a2.LocalPolicyTargetReference{
+					Group: gatewayv1a2.Group("svc.other.io"),
+					Kind:  gatewayv1a2.Kind("Service"),
+					Name:  "example",
+				},
+				SectionName: ptrTo(gatewayv1a2.SectionName("foo")),
+			}},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			policy := &gatewayv1a3.BackendTLSPolicy{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      fmt.Sprintf("foo-%v", time.Now().UnixNano()),
+					Namespace: metav1.NamespaceDefault,
+				},
+				Spec: gatewayv1a3.BackendTLSPolicySpec{
+					TargetRefs: tc.targetRefs,
+					Validation: gatewayv1a3.BackendTLSPolicyValidation{
+						WellKnownCACertificates: ptrTo(gatewayv1a3.WellKnownCACertificatesType("System")),
+						Hostname:                "foo.example.com",
+					},
+				},
+			}
+			validateBackendTLSPolicy(t, policy, tc.wantErrors)
+		})
+	}
+}
+
 func TestBackendTLSPolicyValidation(t *testing.T) {
 	tests := []struct {
-		name        string
-		wantErrors  []string
-		routeConfig gatewayv1a3.BackendTLSPolicyValidation
+		name             string
+		wantErrors       []string
+		policyValidation gatewayv1a3.BackendTLSPolicyValidation
 	}{
 		{
 			name: "valid BackendTLSPolicyValidation with WellKnownCACertificates",
-			routeConfig: gatewayv1a3.BackendTLSPolicyValidation{
+			policyValidation: gatewayv1a3.BackendTLSPolicyValidation{
 				WellKnownCACertificates: ptrTo(gatewayv1a3.WellKnownCACertificatesType("System")),
 				Hostname:                "foo.example.com",
 			},
@@ -47,7 +255,7 @@ func TestBackendTLSPolicyValidation(t *testing.T) {
 		},
 		{
 			name: "valid BackendTLSPolicyValidation with CACertificateRefs",
-			routeConfig: gatewayv1a3.BackendTLSPolicyValidation{
+			policyValidation: gatewayv1a3.BackendTLSPolicyValidation{
 				CACertificateRefs: []v1beta1.LocalObjectReference{
 					{
 						Group: "group",
@@ -60,13 +268,13 @@ func TestBackendTLSPolicyValidation(t *testing.T) {
 			wantErrors: []string{},
 		},
 		{
-			name:        "invalid BackendTLSPolicyValidation with missing fields",
-			routeConfig: gatewayv1a3.BackendTLSPolicyValidation{},
-			wantErrors:  []string{"spec.validation.hostname in body should be at least 1 chars long", "must specify either CACertificateRefs or WellKnownCACertificates"},
+			name:             "invalid BackendTLSPolicyValidation with missing fields",
+			policyValidation: gatewayv1a3.BackendTLSPolicyValidation{},
+			wantErrors:       []string{"spec.validation.hostname in body should be at least 1 chars long", "must specify either CACertificateRefs or WellKnownCACertificates"},
 		},
 		{
 			name: "invalid BackendTLSPolicyValidation with both CACertificateRefs and WellKnownCACertificates",
-			routeConfig: gatewayv1a3.BackendTLSPolicyValidation{
+			policyValidation: gatewayv1a3.BackendTLSPolicyValidation{
 				CACertificateRefs: []v1beta1.LocalObjectReference{
 					{
 						Group: "group",
@@ -82,7 +290,7 @@ func TestBackendTLSPolicyValidation(t *testing.T) {
 		},
 		{
 			name: "invalid BackendTLSPolicyValidation with Unsupported value for WellKnownCACertificates",
-			routeConfig: gatewayv1a3.BackendTLSPolicyValidation{
+			policyValidation: gatewayv1a3.BackendTLSPolicyValidation{
 				WellKnownCACertificates: ptrTo(gatewayv1a3.WellKnownCACertificatesType("bar")),
 				Hostname:                "foo.example.com",
 			},
@@ -90,7 +298,7 @@ func TestBackendTLSPolicyValidation(t *testing.T) {
 		},
 		{
 			name: "invalid BackendTLSPolicyValidation with empty Hostname field",
-			routeConfig: gatewayv1a3.BackendTLSPolicyValidation{
+			policyValidation: gatewayv1a3.BackendTLSPolicyValidation{
 				CACertificateRefs: []v1beta1.LocalObjectReference{
 					{
 						Group: "group",
@@ -104,7 +312,7 @@ func TestBackendTLSPolicyValidation(t *testing.T) {
 		},
 		{
 			name: "valid BackendTLSPolicyValidation with SubjectAltName type Hostname",
-			routeConfig: gatewayv1a3.BackendTLSPolicyValidation{
+			policyValidation: gatewayv1a3.BackendTLSPolicyValidation{
 				CACertificateRefs: []v1beta1.LocalObjectReference{
 					{
 						Group: "group",
@@ -124,7 +332,7 @@ func TestBackendTLSPolicyValidation(t *testing.T) {
 		},
 		{
 			name: "valid BackendTLSPolicyValidation with SubjectAltName type URI",
-			routeConfig: gatewayv1a3.BackendTLSPolicyValidation{
+			policyValidation: gatewayv1a3.BackendTLSPolicyValidation{
 				CACertificateRefs: []v1beta1.LocalObjectReference{
 					{
 						Group: "group",
@@ -144,7 +352,7 @@ func TestBackendTLSPolicyValidation(t *testing.T) {
 		},
 		{
 			name: "invalid BackendTLSPolicyValidation with SubjectAltName type Hostname and empty Hostname field",
-			routeConfig: gatewayv1a3.BackendTLSPolicyValidation{
+			policyValidation: gatewayv1a3.BackendTLSPolicyValidation{
 				CACertificateRefs: []v1beta1.LocalObjectReference{
 					{
 						Group: "group",
@@ -164,7 +372,7 @@ func TestBackendTLSPolicyValidation(t *testing.T) {
 		},
 		{
 			name: "invalid BackendTLSPolicyValidation with SubjectAltName type URI and non-empty Hostname field",
-			routeConfig: gatewayv1a3.BackendTLSPolicyValidation{
+			policyValidation: gatewayv1a3.BackendTLSPolicyValidation{
 				CACertificateRefs: []v1beta1.LocalObjectReference{
 					{
 						Group: "group",
@@ -184,7 +392,7 @@ func TestBackendTLSPolicyValidation(t *testing.T) {
 		},
 		{
 			name: "invalid BackendTLSPolicyValidation with SubjectAltName type URI and empty URI field",
-			routeConfig: gatewayv1a3.BackendTLSPolicyValidation{
+			policyValidation: gatewayv1a3.BackendTLSPolicyValidation{
 				CACertificateRefs: []v1beta1.LocalObjectReference{
 					{
 						Group: "group",
@@ -204,7 +412,7 @@ func TestBackendTLSPolicyValidation(t *testing.T) {
 		},
 		{
 			name: "invalid BackendTLSPolicyValidation with SubjectAltName type Hostname and non-empty URI field",
-			routeConfig: gatewayv1a3.BackendTLSPolicyValidation{
+			policyValidation: gatewayv1a3.BackendTLSPolicyValidation{
 				CACertificateRefs: []v1beta1.LocalObjectReference{
 					{
 						Group: "group",
@@ -224,7 +432,7 @@ func TestBackendTLSPolicyValidation(t *testing.T) {
 		},
 		{
 			name: "invalid BackendTLSPolicyValidation with SubjectAltName type Hostname and both Hostname and URI specified",
-			routeConfig: gatewayv1a3.BackendTLSPolicyValidation{
+			policyValidation: gatewayv1a3.BackendTLSPolicyValidation{
 				CACertificateRefs: []v1beta1.LocalObjectReference{
 					{
 						Group: "group",
@@ -245,7 +453,7 @@ func TestBackendTLSPolicyValidation(t *testing.T) {
 		},
 		{
 			name: "invalid BackendTLSPolicyValidation incorrect URI SAN",
-			routeConfig: gatewayv1a3.BackendTLSPolicyValidation{
+			policyValidation: gatewayv1a3.BackendTLSPolicyValidation{
 				CACertificateRefs: []v1beta1.LocalObjectReference{
 					{
 						Group: "group",
@@ -267,7 +475,7 @@ func TestBackendTLSPolicyValidation(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			route := &gatewayv1a3.BackendTLSPolicy{
+			policy := &gatewayv1a3.BackendTLSPolicy{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      fmt.Sprintf("foo-%v", time.Now().UnixNano()),
 					Namespace: metav1.NamespaceDefault,
@@ -284,22 +492,22 @@ func TestBackendTLSPolicyValidation(t *testing.T) {
 							ptrTo(gatewayv1a2.SectionName("section")),
 						},
 					},
-					Validation: tc.routeConfig,
+					Validation: tc.policyValidation,
 				},
 			}
-			validateBackendTLSPolicy(t, route, tc.wantErrors)
+			validateBackendTLSPolicy(t, policy, tc.wantErrors)
 		})
 	}
 }
 
-func validateBackendTLSPolicy(t *testing.T, route *gatewayv1a3.BackendTLSPolicy, wantErrors []string) {
+func validateBackendTLSPolicy(t *testing.T, policy *gatewayv1a3.BackendTLSPolicy, wantErrors []string) {
 	t.Helper()
 
 	ctx := context.Background()
-	err := k8sClient.Create(ctx, route)
+	err := k8sClient.Create(ctx, policy)
 
 	if (len(wantErrors) != 0) != (err != nil) {
-		t.Fatalf("Unexpected response while creating BackendTLSPolicy %q; got err=\n%v\n;want error=%v", fmt.Sprintf("%v/%v", route.Namespace, route.Name), err, wantErrors)
+		t.Fatalf("Unexpected response while creating BackendTLSPolicy %q; got err=\n%v\n;want error=%v", fmt.Sprintf("%v/%v", policy.Namespace, policy.Name), err, wantErrors)
 	}
 
 	var missingErrorStrings []string
@@ -309,6 +517,6 @@ func validateBackendTLSPolicy(t *testing.T, route *gatewayv1a3.BackendTLSPolicy,
 		}
 	}
 	if len(missingErrorStrings) != 0 {
-		t.Errorf("Unexpected response while creating BackendTLSPolicy %q; got err=\n%v\n;missing strings within error=%q", fmt.Sprintf("%v/%v", route.Namespace, route.Name), err, missingErrorStrings)
+		t.Errorf("Unexpected response while creating BackendTLSPolicy %q; got err=\n%v\n;missing strings within error=%q", fmt.Sprintf("%v/%v", policy.Namespace, policy.Name), err, missingErrorStrings)
 	}
 }
