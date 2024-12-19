@@ -1,0 +1,19 @@
+apiVersion: internal.gateway.networking.k8s.io/v1alpha1
+kind: GEPDetails
+number: 1494
+name: HTTP Auth in Gateway API
+status: Provisional
+# Any authors who contribute to the GEP in any way should be listed here using
+# their Github handle.
+authors:
+  - youngnick
+  - jgao1025
+# references is a list of hyperlinks to relevant external references.
+# It's intended to be used for storing Github discussions, Google docs, etc.
+references: {}
+# featureNames is a list of the feature names introduced by the GEP, if there
+# are any. This will allow us to track which feature was introduced by which GEP.
+featureNames: {}
+# changelog is a list of hyperlinks to PRs that make changes to the GEP, in
+# ascending date order.
+changelog: {}
