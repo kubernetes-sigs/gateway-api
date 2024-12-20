@@ -104,7 +104,7 @@ type ListenerSetSpec struct {
 	// +listType=map
 	// +listMapKey=name
 	// +kubebuilder:validation:MinItems=1
-	// +kubebuilder:validation:MaxItems=16
+	// +kubebuilder:validation:MaxItems=64
 	Listeners []ListenerEntry
 }
 // ListenerEntry embodies the concept of a logical endpoint where a Gateway accepts
@@ -305,7 +305,7 @@ type ListenerSetParentStatus struct {
 	// +optional
 	// +listType=map
 	// +listMapKey=name
-	// +kubebuilder:validation:MaxItems=16
+	// +kubebuilder:validation:MaxItems=64
 	Listeners []ListenerEntryStatus `json:"listeners,omitempty"`
 
 	// Conditions describe the current conditions of the ListenerSet.
