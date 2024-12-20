@@ -41,7 +41,7 @@ request for enhancement if that enhancement is non-trivial (which we will define
 as either: _implicates changes to the API specification_
 OR _has some kind of end-user impact_).
 
-Please use our [Github Discussions][discussion] forum as the initial place to
+Please use our [GitHub Discussions][discussion] forum as the initial place to
 start, and feel free to bring that discussion up for synchronous conversation in
 one of our [community meetings][meetings]. If the created request doesn't
 include reference to a discussion and/or recordings of discussion in our

@@ -87,7 +87,7 @@ Memorandum GEPs after this GEP is merged.
 
 ### Addition of YAML metadata file
 
-The core Gateway API mainatainers were hoping not to need metadata YAMLs for a
+The core Gateway API maintainers were hoping not to need metadata YAMLs for a
 while, but the addition of relationships has turbocharged the need for machine
 parseable GEP metadata.
 
@@ -118,7 +118,7 @@ relationships:
   # set back to this GEP, and MUST be moved to Declined.
   obsoletes: {}
   obsoletedBy: {}
-  # extends indicates that a GEP extends the linkned GEP, adding more detail
+  # extends indicates that a GEP extends the linked GEP, adding more detail
   # or additional implementation. The extended GEP MUST have its extendedBy
   # field set back to this GEP.
   extends: {}
@@ -127,7 +127,7 @@ relationships:
   # covered by an existing relationship.
   seeAlso: {}
 # references is a list of hyperlinks to relevant external references.
-# It's intended to be used for storing Github discussions, Google docs, etc.
+# It's intended to be used for storing GitHub discussions, Google docs, etc.
 references: {}
 # featureNames is a list of the feature names introduced by the GEP, if there
 # are any. This will allow us to track which feature was introduced by which GEP.
