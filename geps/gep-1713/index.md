@@ -100,6 +100,14 @@ type ListenerSetSpec struct {
 	// Listeners associated with this ListenerSet. Listeners define
 	// logical endpoints that are bound on this referenced parent Gateway's addresses.
 	//
+	// Listeners in a `Gateway` and their attached `ListenerSets` are concatenated
+	// as a list when programming the underlying infrastructure.
+	//
+	// Listeners should be merged using the following precedence:
+	//
+	// 1. "parent" Gateway
+	// 2. ListenerSet ordered by creation time (oldest first)
+	// 3. ListenerSet ordered alphabetically by “{namespace}/{name}”.
 	//
 	// +listType=map
 	// +listMapKey=name
