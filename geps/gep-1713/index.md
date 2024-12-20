@@ -399,7 +399,7 @@ Implementations, when creating a `Gateway`, may provision underlying infrastruct
 
 By default a `Gateway` MUST NOT allow `ListenerSets` to be attached. Users can enable this behaviour by configuring their `Gateway` to allow `ListenerSet` attachment:
 
-```
+```yaml
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
@@ -416,7 +416,7 @@ Routes MUST be able to specify a `ListenerSet` as a `parentRef`. Routes can use 
 Routes MUST be able to attach to a `ListenerSet` and it's parent `Gateway` by having multiple `parentRefs` eg:
 
 ```yaml
-apiVersion: gateway.networking.k8s.io/v1beta1
+apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
   name: httproute-example
@@ -430,7 +430,7 @@ spec:
 For instance, the following `HTTPRoute` attempts to attach to a listener defined in the parent `Gateway` using the sectionName `foo`. This is not valid and the route's status `Accepted` condition should be set to `False`
 
 ```yaml
-apiVersion: gateway.networking.k8s.io/v1beta1
+apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
   name: httproute-example
@@ -443,7 +443,7 @@ spec:
 
 To attach to listeners in both a `Gateway` and `ListenerSet` the route MUST have two `parentRefs`:
 ```yaml
-apiVersion: gateway.networking.k8s.io/v1beta1
+apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
   name: httproute-example
