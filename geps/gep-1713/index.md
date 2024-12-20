@@ -593,13 +593,13 @@ Conflicts are covered in the section 'ListenerConditions within a ListenerSet'
 
 `Gateway`'s `Accepted` and `Programmed` top-level conditions remain unchanged and reflect the status of the local configuration.
 
-Implementations MUST support a new condition type `AttachedListeners`.
+Implementations MUST support a new `Gateway` condition type `AttachedListenerSets`.
 
 The condition's `Status` has the following values:
 
-- `True` when `AllowedListeners` is set and at least one child Listener arrives from a `ListenerSet`
-- `False` when `AllowedListeners` is set but has no valid listeners are attached
-- `Unknown` when no `AllowedListeners` config is present
+- `True` when `Spec.AllowedListeners` is set and at least one child Listener arrives from a `ListenerSet`
+- `False` when `Spec.AllowedListeners` is set but has no valid listeners are attached
+- `Unknown` when no `Spec.AllowedListeners` config is present
 
 Parent `Gateways` MUST NOT have `ListenerSet` listeners in their `status.listeners` conditions list.
 
