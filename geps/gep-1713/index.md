@@ -204,11 +204,11 @@ type ListenerEntry struct {
 // ListenerSetStatus defines the observed state of a ListenerSet
 type ListenerSetStatus struct {
 	// Parents is a list of parent resources (usually Gateways) that are
-	// associated with the route, and the status of the route with respect to
-	// each parent. When this route attaches to a parent, the controller that
+	// associated with the ListenerSet, and the status of the ListenerSet with respect to
+	// each parent. When this ListenerSet attaches to a parent, the controller that
 	// manages the parent must add an entry to this list when the controller
-	// first sees the route and should update the entry as appropriate when the
-	// route or gateway is modified.
+	// first sees the ListenerSet and should update the entry as appropriate when the
+	// ListenerSet or gateway is modified.
 	//
 	// +kubebuilder:validation:MaxItems=2
 	Parents []ListenerSetParentStatus `json:"parents"`
