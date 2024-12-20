@@ -11,7 +11,12 @@ Enhance the existing [Request Mirroring](https://gateway-api.sigs.k8s.io/guides/
 
 ## Goals
 
-Successfully implement the feature.
+Enable percentage-based request mirroring with Gateway and Gateway for mesh APIs.
+
+## Scope
+
+<!-- TODO(https://github.com/kubernetes-sigs/gateway-api/issues/3514) Add GRPCRoute supportedFeatures and coverage -->
+The scope of this GEP is to add support for this feature in both HTTPRoute and GRPCRoute
 
 ## Introduction
 
@@ -26,7 +31,7 @@ This feature is already [supported by Envoy](https://www.envoyproxy.io/docs/envo
 | Envoy | [config.route.v3.RouteAction.RequestMirrorPolicy](config.route.v3.RouteAction.RequestMirrorPolicy) |
 | HAProxy | [HAProxy SPOP](https://github.com/haproxytech/spoa-mirror) |
 | NGINX | [ngx_http_mirror_module](https://nginx.org/en/docs/http/ngx_http_mirror_module.html) |
-| gCloud | [RequestMirrorPolicy](https://cloud.google.com/python/docs/reference/compute/latest/google.cloud.compute_v1.types.RequestMirrorPolicy) |
+
 
 ## API
 
@@ -111,12 +116,12 @@ type HTTPRequestMirrorFilter struct {
 }
 ```
 
-## Example
+## Examples for North/South traffic
 
 An example with Percent:
 
 
-```
+```yaml
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
@@ -140,12 +145,12 @@ spec:
           port: 8080
         percent: 42
 ```
+
 This would result in 42% of requests going to `foo-v1` to be mirrored to `foo-v2`.    
 
 An example with Fraction:
 
-
-```
+```yaml
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
@@ -171,4 +176,40 @@ spec:
           numerator: 5
           denominator: 1000
 ```
+
 This would result in 0.5% of requests going to `foo-v1` to be mirrored to `foo-v2`.
+
+## Examples for East/West traffic
+
+Similarly, here is how it would be for mesh.
+
+```yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: http-filter-mirror
+  labels:
+    service: mirror-service
+spec:
+  parentRefs:
+  - group: ""
+    kind: Service
+    name: mirror-service
+  rules:
+  - backendRefs:
+    - name: foo-v1
+      port: 8080
+    filters:
+    - type: RequestMirror
+      requestMirror:
+        backendRef:
+          name: foo-v2
+          port: 8080
+        percent: 42
+```
+
+## Conformance Details
+
+A new Supported Feature with the following name SupportHTTPRouteRequestPercentageMirror is introduced along with a corresponding conformance test.
+
+<!-- TODO(https://github.com/kubernetes-sigs/gateway-api/issues/3515) Different supportedFeature for mesh> -->
