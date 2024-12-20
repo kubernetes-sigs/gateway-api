@@ -36,13 +36,13 @@ Thus updating a single `Gateway` resource with this many certificates is a conte
 
 More broadly, large scale gateway users often expose `O(1000)` domains, but are currently limited by the maximum of 64 `listeners`.
 
-The spec currently has language to indicate implementations `MAY` merge `Gateways` resources but the mechanic isn't defined.
+The spec currently has language to indicate implementations `MAY` merge `Gateways` resources but does not define any specific requirements for how that should work.
 https://github.com/kubernetes-sigs/gateway-api/blob/541e9fc2b3c2f62915cb58dc0ee5e43e4096b3e2/apis/v1beta1/gateway_types.go#L76-L78
 
 ## Feature Details
 
 We define `ListenerSet` as the name of the feature outlined in this GEP.
-The feature will be part of the experimental branches as an extended feature, which implementations can choose to support. At that time, all the requirements in this document that use MUST apply to their implementation of the feature.
+The feature will be part of the experimental channel, which implementations can choose to support. All the `MUST` requirements in this document apply to implementations that choose to support this feature.
 
 
 ## API
