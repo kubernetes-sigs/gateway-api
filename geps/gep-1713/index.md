@@ -467,7 +467,9 @@ From robscott https://github.com/kubernetes-sigs/gateway-api/pull/3213#discussio
 
 ### Gateway Changes
 
-When an implementation supports `ListenerSets` `Gateways` MUST allow the list of listeners to be empty. Thus the present `minItems=1` constraint on the listener list will be removed. This allows implementations to avoid security, cost etc. concerns with having dummy listeners.
+An initial experimental release of `ListenerSets` _will have no modifications_ to listener list on the `Gateway` resource. Using `ListenerSets` will  require a dummy listener to be configured.
+
+In a future (potential) release when an implementation supports `ListenerSets`, `Gateways` MUST allow the list of listeners to be empty. Thus the present `minItems=1` constraint on the listener list will be removed. This allows implementations to avoid security, cost etc. concerns with having dummy listeners.
 When there are no listeners the `Gateway`'s `status.listeners` should be empty or unset. `status.listeners` is already an optional field.
 
 Implementations, when creating a `Gateway`, may provision underlying infrastructure when there are no listeners present. The status conditions `Accepted` and `Programmed` conditions should reflect state of this provisioning.
