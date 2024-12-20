@@ -170,7 +170,7 @@ type ListenerEntry struct {
 	// Support: Core
 	//
 	// +optional
-	TLS *ListenerSetTLSConfig `json:"tls,omitempty"`
+	TLS *GatewayTLSConfig `json:"tls,omitempty"`
 
 	// AllowedRoutes defines the types of routes that MAY be attached to a
 	// Listener and the trusted namespaces where those Route resources MAY be
@@ -199,85 +199,6 @@ type ListenerEntry struct {
 	// +kubebuilder:default={namespaces:{from: Same}}
 	// +optional
 	AllowedRoutes *AllowedRoutes `json:"allowedRoutes,omitempty"`
-}
-
-// ListenerSetTLSConfig describes a TLS configuration.
-//
-// +kubebuilder:validation:XValidation:message="certificateRefs or options must be specified when mode is Terminate",rule="self.mode == 'Terminate' ? size(self.certificateRefs) > 0 || size(self.options) > 0 : true"
-type ListenerSetTLSConfig struct {
-	// Mode defines the TLS behavior for the TLS session initiated by the client.
-	// There are two possible modes:
-	//
-	// - Terminate: The TLS session between the downstream client and the
-	//   Gateway is terminated at the Gateway. This mode requires certificates
-	//   to be specified in some way, such as populating the certificateRefs
-	//   field.
-	// - Passthrough: The TLS session is NOT terminated by the Gateway. This
-	//   implies that the Gateway can't decipher the TLS stream except for
-	//   the ClientHello message of the TLS protocol. The certificateRefs field
-	//   is ignored in this mode.
-	//
-	// Support: Core
-	//
-	// +optional
-	// +kubebuilder:default=Terminate
-	Mode *TLSModeType `json:"mode,omitempty"`
-
-	// CertificateRefs contains a series of references to Kubernetes objects that
-	// contains TLS certificates and private keys. These certificates are used to
-	// establish a TLS handshake for requests that match the hostname of the
-	// associated listener.
-	//
-	// A single CertificateRef to a Kubernetes Secret has "Core" support.
-	// Implementations MAY choose to support attaching multiple certificates to
-	// a Listener, but this behavior is implementation-specific.
-	//
-	// References to a resource in different namespace are invalid UNLESS there
-	// is a ReferenceGrant in the target namespace that allows the certificate
-	// to be attached. If a ReferenceGrant does not allow this reference, the
-	// "ResolvedRefs" condition MUST be set to False for this listener with the
-	// "RefNotPermitted" reason.
-	//
-	// This field is required to have at least one element when the mode is set
-	// to "Terminate" (default) and is optional otherwise.
-	//
-	// CertificateRefs can reference to standard Kubernetes resources, i.e.
-	// Secret, or implementation-specific custom resources.
-	//
-	// Support: Core - A single reference to a Kubernetes Secret of type kubernetes.io/tls
-	//
-	// Support: Implementation-specific (More than one reference or other resource types)
-	//
-	// +optional
-	// +kubebuilder:validation:MaxItems=64
-	CertificateRefs []SecretObjectReference `json:"certificateRefs,omitempty"`
-
-	// FrontendValidation holds configuration information for validating the frontend (client).
-	// Setting this field will require clients to send a client certificate
-	// required for validation during the TLS handshake. In browsers this may result in a dialog appearing
-	// that requests a user to specify the client certificate.
-	// The maximum depth of a certificate chain accepted in verification is Implementation specific.
-	//
-	// Support: Extended
-	//
-	// +optional
-	// <gateway:experimental>
-	FrontendValidation *FrontendTLSValidation `json:"frontendValidation,omitempty"`
-
-	// Options are a list of key/value pairs to enable extended TLS
-	// configuration for each implementation. For example, configuring the
-	// minimum TLS version or supported cipher suites.
-	//
-	// A set of common keys MAY be defined by the API in the future. To avoid
-	// any ambiguity, implementation-specific definitions MUST use
-	// domain-prefixed names, such as `example.com/my-custom-option`.
-	// Un-prefixed names are reserved for key names defined by Gateway API.
-	//
-	// Support: Implementation-specific
-	//
-	// +optional
-	// +kubebuilder:validation:MaxProperties=16
-	Options map[AnnotationKey]AnnotationValue `json:"options,omitempty"`
 }
 
 // ListenerSetStatus defines the observed state of a ListenerSet
