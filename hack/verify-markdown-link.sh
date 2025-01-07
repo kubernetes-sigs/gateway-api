@@ -50,7 +50,8 @@ validate_url() {
     local url="$1"  
     local http_status=$(curl -o /dev/null -s -w "%{http_code}\n" "$url")
     local excluded_domains=("foo.ns.service.cluster.local")
-
+    excluded_domains+=("redirect.example")
+    excluded_domains+=("rewrite.example")
     # Check if the URL contains any of the excluded domains
     for excluded_domain in "${excluded_domains[@]}"; do
         if [[ "$url" == *"$excluded_domain"* ]]; then
