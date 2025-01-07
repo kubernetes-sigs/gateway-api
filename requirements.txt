@@ -16,7 +16,7 @@ mkdocs-redirects==1.2.2
 mkdocs-mermaid2-plugin==1.2.1
 pandas>=2.0.3
 pep562==1.1
-Pygments==2.18.0
+Pygments==2.19.0
 pymdown-extensions==10.12
 PyYAML==6.0.2
 six==1.17.0
