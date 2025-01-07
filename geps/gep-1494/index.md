@@ -17,9 +17,9 @@ Provide a method for configuring **Gateway API implementations** to add HTTP Aut
 
 * A way to configure a Gateway Implementation to perform Authentication (at least), with optional Authorization on behalf of Ana the Application Developer.
 
-* A way for Chihiro the Cluster Admin to configure a default Authentication and/or Authorization config for some set of HTTPRoutes.
+* A way for Chihiro the Cluster Admin to configure a default Authentication and/or Authorization config for some set of HTTP or GRPC matching criteria.
 
-* Optionally, a way for Ana to have the ability to disable Authentication and/or Authorization for specific routes when needed, allowing certain routes to not be protected.
+* Optionally, a way for Ana to have the ability to disable Authentication and/or Authorization for specific routes when needed, allowing certain routes to not be protected. This would probably need to work something like a default enabling at Gateway level, that can be specifically set at lower levels, but further design is TBD.
 
 
 ## Non-Goals
@@ -30,10 +30,11 @@ Provide a method for configuring **Gateway API implementations** to add HTTP Aut
 ## Deferred Goals
 
 * (Not performed during the Provisional Phase) Defining the API or configuration to be used.
+* Handling GRPCRoute (We will handle plain HTTP first)
 
 ## Introduction
 
-A common request for Gateway API has been a way to direct implementations to automatically request various forms of authentication (AuthN) and authorization (AuthZ). (see the [GEP Issue](https://github.com/kubernetes-sigs/gateway-api/issues/1494) for some of the history.)
+A common request for Gateway API has been a way to direct implementations to automatically request various forms of authentication and authorization. (see the [GEP Issue](https://github.com/kubernetes-sigs/gateway-api/issues/1494) for some of the history.)
 
 **Authentication (AuthN for short)** refers to proving the requesting party's identity in some fashion.
 
@@ -51,7 +52,10 @@ Before discussing any proposed Auth* solution, it's important to discuss some Au
 
 In Basic HTTP Auth, a server asks for authentication as part of returning a `401` status response, and the client includes an `Authorization` header that includes a Base64-encoded username and password.
 
-Because the password is only _encoded_ and not _encrypted_, Basic Auth is totally unsafe when used outside of an encrypted session (like a HTTPS connection).
+Use of passwords in this way is very vulnerable to replay attacks (since if you get the password, you can use
+it as many times as you like), which is why Basic Auth is generally used for lower-security use cases.
+
+However, even in the lowest-security use cases, using TLS to at least prevent man-in-the-middle password interception is very necessary.
 
 Basic auth is defined in [RFC-7617](https://datatracker.ietf.org/doc/html/rfc7617).
 
@@ -59,9 +63,11 @@ Basic auth is defined in [RFC-7617](https://datatracker.ietf.org/doc/html/rfc761
 
 TLS includes the possibility of having both the client and server present certificates for the other party to validate. (This is often called "mutual TLS", but is distinct from the use of that term in Service Mesh contexts, where it means something more like "mutual TLS with short-lifetime, automatically created and managed dynamic keypairs for both client and server").
 
-In this case, the server authenticates the client based on the client presenting a certificate that's signed by an authority that's also trusted by the server's trust chain. Some implementations also allow details about the certificate to be passed through to backend clients, to be used in authorization decisions.
+In this case, the server also authenticates the client, based on the certificate chain presented by the client. Some implementations also allow details about the certificate to be passed through to backend clients, to be used in authorization decisions.
 
-TLS v1.3 is defined in [RFC-8446](https://datatracker.ietf.org/doc/html/rfc8446), with v1.2 defined in [RFC-5246](https://datatracker.ietf.org/doc/html/rfc5246).
+TLS v1.3 is defined in [RFC-8446](https://datatracker.ietf.org/doc/html/rfc8446), with v1.2 defined in [RFC-5246](https://datatracker.ietf.org/doc/html/rfc5246). Earlier versions of TLS (v1.1 and v1.0) were deprecated in [RFC-8996](https://datatracker.ietf.org/doc/html/rfc8996) and should no longer be used.
+
+Gateway API already has some work in progress to handle this for straightforward use cases, in [GEP-91](https://gateway-api.sigs.k8s.io/geps/gep-91/).
 
 #### JWT
 
@@ -87,6 +93,7 @@ Open ID Conect (OIDC) is a protocol based on the OAuth 2 framework, that allows 
 
 
 * As Ana the Application Developer, I wish to be able to configure that some or all of my service exposed via Gateway API requires Authentication, and ideally to be able to make Authorization decisions about _which_ authenticated clients are allowed to access.
+* As Ana the Application Developer, I wish to be able to redirect users to a login page when they lack authentication, while unauthenticated API access gets the proper 40x response.
 * As Chihiro the Cluster Admin, I wish to be able to configure default Authentication settings (at least), with an option to enforce Authentication settings (preferable but not required) for some set of services exposed via Gateway API inside my cluster.
 * More User Stories welcomed here!
 
