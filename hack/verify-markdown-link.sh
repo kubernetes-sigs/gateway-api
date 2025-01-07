@@ -52,6 +52,7 @@ validate_url() {
     local excluded_domains=("foo.ns.service.cluster.local")
     excluded_domains+=("redirect.example")
     excluded_domains+=("rewrite.example")
+    excluded_domains+=("elsewhere.example")
     # Check if the URL contains any of the excluded domains
     for excluded_domain in "${excluded_domains[@]}"; do
         if [[ "$url" == *"$excluded_domain"* ]]; then
