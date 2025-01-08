@@ -36,15 +36,16 @@ extract_external_links() {
         local content=$(<"$file_path")  
         # Use grep with a refined regex pattern to extract links  
         while IFS= read -r link; do  
-            # Trim trailing characters like ')' or ']'  
-            link=$(echo "$link" | sed 's/[)"]$//')  
+            # Trim trailing characters like ']', ')' or '"'  
+            link=$(echo "$link" | sed -E 's/[]")\]]+$//')  
             links_array+=("$link")  
-        done < <(echo "$content" | grep -oP 'https?://[^\s")]+')  
+        done < <(echo "$content" | grep -oP 'https?://[^\s")\]]+')  
     else  
         log_error "File does not exist or is not readable: $file_path"  
         return 1  
     fi  
-}  
+}
+
   
 validate_url() {  
     local url="$1"  
