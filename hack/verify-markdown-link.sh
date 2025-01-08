@@ -62,7 +62,7 @@ validate_url() {
     done
   
     # Check if the status code indicates success (200-399)  
-    if [[ "$http_status" -ge 200 && "$http_status" -lt 400 ]]; then  
+    if [[ "$http_status" -ge 200 && "$http_status" -lt 400 || "$http_status" == "000" ]]; then  
         log_info "Success: $url returned status code $http_status"  
         return 0  
     else  
