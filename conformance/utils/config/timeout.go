@@ -120,7 +120,7 @@ func DefaultTimeoutConfig() TimeoutConfig {
 		TLSRouteMustHaveCondition:          60 * time.Second,
 		RouteMustHaveParents:               60 * time.Second,
 		ManifestFetchTimeout:               10 * time.Second,
-		MaxTimeToConsistency:               30 * time.Second,
+		MaxTimeToConsistency:               90 * time.Second,
 		NamespacesMustBeReady:              300 * time.Second,
 		RequestTimeout:                     10 * time.Second,
 		LatestObservedGenerationSet:        60 * time.Second,
