@@ -26,8 +26,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 	"k8s.io/apimachinery/pkg/types"
-
 	"k8s.io/utils/ptr"
+
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
@@ -151,7 +151,7 @@ var HTTPRouteRequestPercentageMirror = suite.ConformanceTest{
 				var wg sync.WaitGroup
 
 				for k := 0; k < numDistributionChecks; k++ {
-					time := time.Now()
+					timeNow := time.Now()
 					for j := 0; j < totalRequests; j++ {
 						wg.Add(1)
 						semaphore <- struct{}{}
@@ -162,9 +162,9 @@ var HTTPRouteRequestPercentageMirror = suite.ConformanceTest{
 						}(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, expected)
 					}
 					wg.Wait()
-
-					if err := testMirroredRequestsDistribution(t, suite, expected, time); err != nil {
+					if err := testMirroredRequestsDistribution(t, suite, expected, timeNow); err != nil {
 						t.Logf("Traffic distribution test failed (%d/%d): %s", k+1, numDistributionChecks, err)
+						time.Sleep(2 * time.Second)
 					} else {
 						return
 					}
