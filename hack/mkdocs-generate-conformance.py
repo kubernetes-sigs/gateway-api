@@ -74,6 +74,10 @@ def generate_conformance_tables(reports, currVersion):
     mesh_http_table = mesh_http_table.rename_axis('Organization')
 
     versionFile = ".".join(currVersion.split(".")[:2])
+    entries =  gateway_http_table.nunique()
+
+    if entries.Project < 3:
+        return
 
     with open('site-src/implementations/'+versionFile+'.md', 'w') as f:
 
