@@ -6,7 +6,7 @@
 
 |API channel|Implementation version|Mode|Report|
 |-----------|----------------------|----|------|
-|x|[v1.1.0](https://learn.microsoft.com/azure/application-gateway/for-containers/alb-controller-release-notes#latest-release-recommended)|x|[link](./v1.1.0-report.yaml)|
+|x|[v1.1.0](https://learn.microsoft.com/azure/application-gateway/for-containers/alb-controller-release-notes#latest-release-recommended)|x|[link](./standard-v1.1.0-default-report.yaml)|
 
 
 [azure-application-gateway-for-containers]:https://aka.ms/appgwcontainers/docs
