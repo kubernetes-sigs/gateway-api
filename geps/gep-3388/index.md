@@ -7,7 +7,7 @@
 
 ## TLDR
 
-To allow configuration of a "retry budget" in HTTPRoute, to limit the rate of client-side retries based on a percentage of the active request load across all endpoints of a destination service.
+To allow configuration of a "retry budget" in HTTPRoute, to determine when to prevent additional client-side retries, by limiting the percentage of the active request load that may consist of retries, across all endpoints of a destination service.
 
 ## Goals
 
@@ -32,7 +32,7 @@ Configuring a limit for client retries is an important factor in building a resi
 
 While HTTPRoute retry budget configuration has been a frequently discussed feature within the community, differences in semantics between different data plane proxies creates a challenge for a consensus on the correct location for the configuration.
 
-Envoy, for example, offers retry budgets as a configurable circuit breaker threshold for concurrent retries to an upstream cluster, in favor of configuring a static active retry threshold. In Istio, Envoy circuit breaker thresholds are typically configured [within the DestinationRule CRD](https://istio.io/latest/docs/reference/config/networking/destination-rule/#ConnectionPoolSettings-HTTPSettings), which applies rules to clients of a service after routing has already occurred. The linkerd implementation of retry budgets is configured alongside service route configuration, within the [ServiceProfile CRD](https://linkerd.io/2.12/reference/service-profiles/), limiting the number of total retries for a service as a percentage of the number of recent requests. This proposal aims to determine where retry budget's should be defined within the Gateway API, and whether data plane proxies may need to be altered to accommodate the specification.
+Envoy, for example, offers retry budgets as a configurable circuit breaker threshold for concurrent retries to an upstream cluster, in favor of configuring a static active retry threshold. In Istio, Envoy circuit breaker thresholds are typically configured [within the DestinationRule CRD](https://istio.io/latest/docs/reference/config/networking/destination-rule/#ConnectionPoolSettings-HTTPSettings), which applies rules to clients of a service after routing has already occurred. The Linkerd implementation of retry budgets is configured alongside service route configuration, within the [ServiceProfile CRD](https://linkerd.io/2.12/reference/service-profiles/), limiting the number of total retries for a service as a percentage of the number of recent requests. This proposal aims to determine where retry budget's should be defined within the Gateway API, and whether data plane proxies may need to be altered to accommodate the specification.
 
 ### Background on implementations
 
