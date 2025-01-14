@@ -15,11 +15,11 @@ Provide a method for configuring **Gateway API implementations** to add HTTP Aut
 
 (Using the [Gateway API Personas](https://gateway-api.sigs.k8s.io/concepts/roles-and-personas/))
 
-* A way to configure a Gateway Implementation to perform Authentication (at least), with optional Authorization on behalf of Ana the Application Developer.
+* A way for Ana the Application Developer to configure a Gateway API implementation to perform Authentication (at least), with optional Authorization.
 
 * A way for Chihiro the Cluster Admin to configure a default Authentication and/or Authorization config for some set of HTTP or GRPC matching criteria.
 
-* Optionally, a way for Ana to have the ability to disable Authentication and/or Authorization for specific routes when needed, allowing certain routes to not be protected. This would probably need to work something like a default enabling at Gateway level, that can be specifically set at lower levels, but further design is TBD.
+* Optionally, a way for Ana to have the ability to disable Authentication and/or Authorization for specific routes when needed, allowing certain routes to not be protected. This would probably need to work something like a default enabling at Gateway level, that can be specifically set at lower levels, but further design is TBD. This goal comes from the relatively-common desire for Chihiro to be able to set reasonably-secure defaults, and for Ana or others to be able to _disable_ for specific paths for purposes of healthchecking. The fact that this is relatively undefined is why this goal is _optional_.
 
 
 ## Non-Goals
@@ -31,6 +31,7 @@ Provide a method for configuring **Gateway API implementations** to add HTTP Aut
 
 * (Not performed during the Provisional Phase) Defining the API or configuration to be used.
 * Handling GRPCRoute (We will handle plain HTTP first)
+* Any decisions about doing Auth for non-HTTP protocols (this is a whole other problem that could significantly impact timelines)
 
 ## Introduction
 
@@ -88,6 +89,7 @@ Oauth2 is an _authorization framework_, which allows clients and servers to defi
 
 Open ID Conect (OIDC) is a protocol based on the OAuth 2 framework, that allows Users to talk to Identity Providers (IDPs), on behalf of a Relying Party (RP), and have the IDP give the user an Identity Token (which the User's browser can then provide as Authentication to the Relying Party), and also allows the RP to request Claims about the User, which can be used for Authorization.
 
+Usually, the Identity Token is delivered using JWT, although that is not required.
 
 ## Auth* User Stories
 
@@ -99,7 +101,7 @@ Open ID Conect (OIDC) is a protocol based on the OAuth 2 framework, that allows 
 
 ## Currently implemented Auth mechanisms in implementations
 
-Many Gateway API implementations have implemented some method of configuring Auth* that are currently Implementation Specific.
+Many Gateway API implementations have implemented some method of configuring Auth* that are either delivered outside of the Gateway API framework, or if they are inside, are currently Implementation Specific.
 
 This section lays out some examples (updates with extra examples we've missed are very welcome).
 
@@ -113,11 +115,16 @@ This section lays out some examples (updates with extra examples we've missed ar
 |[ingress-nginx](https://kubernetes.github.io/ingress-nginx/examples/customization/external-auth-headers/)|[httpbin](https://httpbin.org) ([Basic](https://kubernetes.github.io/ingress-nginx/examples/auth/external-auth/), [OAuth](https://kubernetes.github.io/ingress-nginx/examples/auth/oauth-external-auth/))|[Basic](https://kubernetes.github.io/ingress-nginx/examples/auth/basic/), [Client Certificate](https://kubernetes.github.io/ingress-nginx/examples/auth/client-certs/)|
 |[Envoy](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/http/ext_authz/v3/ext_authz.proto)|[External Authorization server (ext_authz filter)](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/http/ext_authz/v3/ext_authz.proto) |[JWT](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/http/jwt_authn/v3/config.proto)|
 |[Contour](https://projectcontour.io/docs/1.24/config/client-authorization/)|[Envoy](https://projectcontour.io/docs/1.24/config/client-authorization/)|[Envoy(JWT)](https://projectcontour.io/docs/1.24/config/jwt-verification/)|
-|[Istio](https://istio.io/latest/docs/tasks/security/authorization/authz-custom/)|[Envoy + istio (peer authN)](https://istio.io/latest/docs/concepts/security/#mutual-tls-authentication)|[JWT (Request authN)](https://istio.io/latest/docs/concepts/security/#authentication)|
+|[Istio](https://istio.io/latest/docs/tasks/security/authorization/)|[mutual TLS ingress gateway](https://istio.io/latest/docs/tasks/traffic-management/ingress/secure-ingress/#configure-a-mutual-tls-ingress-gateway), [External Authorization](https://istio.io/latest/docs/tasks/security/authorization/authz-custom/)|[JWT (RequestAuthentication)](https://istio.io/latest/docs/reference/config/security/request_authentication/)|
 |[Envoy Gateway](https://gateway.envoyproxy.io/docs/tasks/security/ext-auth/)| [Envoy](https://gateway.envoyproxy.io/docs/tasks/security/ext-auth/#http-external-authorization-service) | [Envoy(JWT)](https://gateway.envoyproxy.io/docs/tasks/security/jwt-authentication/), [Basic](https://gateway.envoyproxy.io/docs/tasks/security/basic-auth/) |
 |[Consul](https://developer.hashicorp.com/consul/docs/connect/gateways/api-gateway/secure-traffic/verify-jwts-k8s)|[Envoy](https://developer.hashicorp.com/consul/docs/connect/proxies/envoy-extensions/configuration/ext-authz)| [JWT](https://developer.hashicorp.com/consul/docs/connect/gateways/api-gateway/secure-traffic/verify-jwts-k8s#use-jwts-to-verify-requests-to-api-gateways-on-kubernetes)|
 
 
+## Outstanding Questions and Concerns (TODO)
+
+From @ongy, some additional goals to keep in mind:
+* The API of the proposed implementation provides enough flexibility to integrate with an authorization mechanism and protect resources entirely in the gateway
+* The API allows to inject information about the authentication result into the requests and allows backend application to make authorization decisions based on this.
 
 ## API
 
