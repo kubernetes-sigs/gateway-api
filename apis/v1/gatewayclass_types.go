@@ -185,7 +185,7 @@ const (
 	// * a cluster-scoped resource but the Namespace field is set, or
 	// * a nonexistent object, or
 	// * an unsupported resource or kind, or
-	// * a legit and existent resource but the data within that resource is malformed.
+	// * an existing resource but the data within that resource is malformed.
 	GatewayClassReasonInvalidParameters GatewayClassConditionReason = "InvalidParameters"
 
 	// This reason is used with the "Accepted" condition when the
