@@ -3,10 +3,10 @@ date: "2024-03-21T15:55:19Z"
 gatewayAPIVersion: 1.0.0
 implementation:
   contact:
-  - https://github.com/nginxinc/nginx-gateway-fabric/discussions/new/choose
-  organization: nginxinc
+  - https://github.com/nginx/nginx-gateway-fabric/discussions/new/choose
+  organization: nginx
   project: nginx-gateway-fabric
-  url: https://github.com/nginxinc/nginx-gateway-fabric
+  url: https://github.com/nginx/nginx-gateway-fabric
   version: v1.2.0
 kind: ConformanceReport
 profiles:
