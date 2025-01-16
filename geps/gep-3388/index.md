@@ -21,14 +21,14 @@ To allow configuration of a "retry budget" in HTTPRoute, to determine when to pr
 * To allow specifying a default retry budget policy across a namespace or attached to a specific gateway.
 * To allow configuration of a back-off strategy or timeout window within the retry budget spec.
 * To allow specifying inclusion of specific HTTP status codes and responses within the retry budget spec.
-* To allow specification of more than one retry budget for a given service, for specific subsets of its traffic.
+* To allow specification of more than one retry budget for a given service, or for specific subsets of its traffic.
 
 
 ## Introduction
 
 Multiple data plane proxies offer optional configuration for budgeted retries, in order to create a dynamic limit on the amount of a service's active request that is being retried across its clients. In the case of Linkerd, retry budgets are the default retry policy configuration for HTTP retries within the [ServiceProfile CRD](https://linkerd.io/2.12/reference/service-profiles/), with static max retries being a [fairly recent addition](https://linkerd.io/2024/08/13/announcing-linkerd-2.16/).
 
-Configuring a limit for client retries is an important factor in building a resilient system, allowing requests to be successfully retried during periods of intermittent failure. But too many client-side retries can also exacerbate consistent failures and slow down recovery, quickly overwhelming a failing system and leading to cascading failures such as retry storms. Configuring a sane limit for max client-side retries is often challenging in complex systems. Allowing an application developer (Ana) to configure a dynamic "retry budget", reducing the risk of a high number of retries across clients, allows a service to perform as expected in both times of high & low request load, as well as both during periods of intermittent & consistent failures.
+Configuring a limit for client retries is an important factor in building a resilient system, allowing requests to be successfully retried during periods of intermittent failure. But too many client-side retries can also exacerbate consistent failures and slow down recovery, quickly overwhelming a failing system and leading to cascading failures such as retry storms. Configuring a sane limit for max client-side retries is often challenging in complex systems. Allowing an application developer (Ana) to configure a dynamic "retry budget" reduces the risk of a high number of retries across clients. It allows a service to perform as expected in both times of high & low request load, as well as both during periods of intermittent & consistent failures.
 
 While HTTPRoute retry budget configuration has been a frequently discussed feature within the community, differences in semantics between different data plane proxies creates a challenge for a consensus on the correct location for the configuration.
 
@@ -38,11 +38,13 @@ Envoy, for example, offers retry budgets as a configurable circuit breaker thres
 
 #### Envoy
 
-Supports configuring a [RetryBudget](https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/cluster/v3/circuit_breaker.proto#envoy-v3-api-msg-config-cluster-v3-circuitbreakers-thresholds-retrybudget) CircuitBreaker threshold across a group of upstream endpoints, with the following parameters.
+Supports configuring an optional [RetryBudget](https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/cluster/v3/circuit_breaker.proto#envoy-v3-api-msg-config-cluster-v3-circuitbreakers-thresholds-retrybudget) CircuitBreaker threshold across a group of upstream endpoints, with the following parameters:
 
 * `budget_percent` Specifies the limit on concurrent retries as a percentage of the sum of active requests and active pending requests. For example, if there are 100 active requests and the budget_percent is set to 25, there may be 25 active retries. This parameter is optional. Defaults to 20%.
 
 * `min_retry_concurrency` Specifies the minimum retry concurrency allowed for the retry budget. The limit on the number of active retries may never go below this number. This parameter is optional. Defaults to 3.
+
+By default, Envoy uses a static threshold for retries. But when configured, Envoy's retry budget threshold overrides any other retry circuit breaker that has been configured.
 
 #### linkerd2-proxy
 
