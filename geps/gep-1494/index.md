@@ -8,7 +8,7 @@
 
 ## TLDR
 
-Provide a method for configuring **Gateway API implementations** to add HTTP Authentication for north-south traffic. The method may also include Authorization config if practical. At the time of writing, this authentication is only for ingress traffic to the cluster.
+Provide a method for configuring **Gateway API implementations** to add HTTP Authentication for north-south traffic. The method may also include Authorization config if practical. At the time of writing, this authentication is only for ingress traffic to the Gateway.
 
 
 ## Goals
@@ -18,6 +18,8 @@ Provide a method for configuring **Gateway API implementations** to add HTTP Aut
 * A way for Ana the Application Developer to configure a Gateway API implementation to perform Authentication (at least), with optional Authorization.
 
 * A way for Chihiro the Cluster Admin to configure a default Authentication and/or Authorization config for some set of HTTP or GRPC matching criteria.
+
+## Stretch Goals
 
 * Optionally, a way for Ana to have the ability to disable Authentication and/or Authorization for specific routes when needed, allowing certain routes to not be protected. This would probably need to work something like a default enabling at Gateway level, that can be specifically set at lower levels, but further design is TBD. This goal comes from the relatively-common desire for Chihiro to be able to set reasonably-secure defaults, and for Ana or others to be able to _disable_ for specific paths for purposes of healthchecking. The fact that this is relatively undefined is why this goal is _optional_.
 
@@ -30,7 +32,7 @@ Provide a method for configuring **Gateway API implementations** to add HTTP Aut
 ## Deferred Goals
 
 * (Not performed during the Provisional Phase) Defining the API or configuration to be used.
-* Handling GRPCRoute (We will handle plain HTTP first)
+* Handling GRPC (We will handle plain HTTP first)
 * Any decisions about doing Auth for non-HTTP protocols (this is a whole other problem that could significantly impact timelines)
 
 ## Introduction
