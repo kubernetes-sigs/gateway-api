@@ -50,9 +50,15 @@ By default, Envoy uses a static threshold for retries. But when configured, Envo
 
 The Linkerd implementation of retry budgets is configured alongside service route configuration, within the [ServiceProfile CRD](https://linkerd.io/2.12/reference/service-profiles/), limiting the number of total retries for a service as a percentage of the number of recent requests. In practice, this functions similarly to Envoy's retry budget implementation, as it is configured in a single location and measures the ratio of retry requests to original requests across all traffic destined for the service.
 
-Linkerd supports [budgeted retries](https://linkerd.io/2.15/features/retries-and-timeouts/), the default way to specify retries to a service, and - as of [edge-24.7.5](https://github.com/linkerd/linkerd2/releases/tag/edge-24.7.5) - counted retries. In all cases, retries are implemented by the `linkerd2-proxy` making the request on behalf on an application workload.
+Linkerd uses [budgeted retries](https://linkerd.io/2.15/features/retries-and-timeouts/) as the default configuration to specify retries to a service, but - as of [edge-24.7.5](https://github.com/linkerd/linkerd2/releases/tag/edge-24.7.5) - supports counted retries. In all cases, retries are implemented by the `linkerd2-proxy` making the request on behalf on an application workload.
 
-Linkerd's budgeted retries allow retrying an indefinite number of times, as long as the fraction of retries remains within the budget. Budgeted retries are supported only using Linkerd's native ServiceProfile CRD, which allows enabling retries, setting the retry budget (by default, 20% plus 10 "extra" retries per second), and configuring the window over which the fraction of retries to non-retries is calculated.
+Linkerd's budgeted retries allow retrying an indefinite number of times, as long as the fraction of retries remains within the budget. Budgeted retries are supported only using Linkerd's native ServiceProfile CRD, which allows enabling retries, setting the retry budget (by default, 20% plus 10 "extra" retries per second), and configuring the window over which the fraction of retries to non-retries is calculated. The `retryBudget` field of the ServiceProfile spec can be configured with the following optional parameters:
+
+* `retryRatio` Specifies a ratio of retry requests to original requests that is allowed. The default is 0.2, meaning that retries may add up to 20% to the request load.
+
+* `minRetriesPerSecond` Specifies the minimum rate of retries per second that is allowed, so that retries are not prevented when the request load is very low. The default is 10.
+
+* `ttl` A duration specifying how long requests are considered for when calculating the retry threshold. The default is 10s.
 
 ### Proposed Design
 
@@ -68,7 +74,9 @@ While current retry behavior is defined at the routing rule level within HTTPRou
 
 Configuring a retry budget through a Policy Attachment may produce some confusion from a UX perspective, as users will be able to configure retries in two different places (HTTPRoute for static retries, versus a policy attachment for a dynamic retry threshold). Though this is likely a fair trade-off.
 
-Discrepancies in the semantics of retry budget behavior and configuration options between Envoy and Linkerd may require a change in either implementation to accommodate the Gateway API specification.
+Discrepancies in the semantics of retry budget behavior and configuration options between Envoy and Linkerd may require a change in either implementation to accommodate the Gateway API specification. While Envoy's `min_retry_concurrency` setting may behave similarly in practice to Linkerd's `minRetriesPerSecond`, they are not directly equivalent.
+
+A version of Linkerd's `ttl` parameter may also need to be implemented within Envoy.
 
 ## API
 
