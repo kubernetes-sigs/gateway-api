@@ -1,4 +1,4 @@
-# GEP-3388: HTTPRoute Retry Budget
+# GEP-3388: HTTP Retry Budget
 
 * Issue: [#3388](https://github.com/kubernetes-sigs/gateway-api/issues/3388)
 * Status: Provisional
@@ -7,7 +7,7 @@
 
 ## TLDR
 
-To allow configuration of a "retry budget" in HTTPRoute, to determine when to prevent additional client-side retries, by limiting the percentage of the active request load that may consist of retries, across all endpoints of a destination service.
+To allow configuration of a "retry budget" across all endpoints of a destination service, preventing additional client-side retries when the percentage of the active request load consisting of retries reaches a certain threshold.
 
 ## Goals
 
@@ -30,15 +30,15 @@ Multiple data plane proxies offer optional configuration for budgeted retries, i
 
 Configuring a limit for client retries is an important factor in building a resilient system, allowing requests to be successfully retried during periods of intermittent failure. But too many client-side retries can also exacerbate consistent failures and slow down recovery, quickly overwhelming a failing system and leading to cascading failures such as retry storms. Configuring a sane limit for max client-side retries is often challenging in complex systems. Allowing an application developer (Ana) to configure a dynamic "retry budget" reduces the risk of a high number of retries across clients. It allows a service to perform as expected in both times of high & low request load, as well as both during periods of intermittent & consistent failures.
 
-While HTTPRoute retry budget configuration has been a frequently discussed feature within the community, differences in semantics between different data plane proxies creates a challenge for a consensus on the correct location for the configuration.
-
-Envoy, for example, offers retry budgets as a configurable circuit breaker threshold for concurrent retries to an upstream cluster, in favor of configuring a static active retry threshold. In Istio, Envoy circuit breaker thresholds are typically configured [within the DestinationRule CRD](https://istio.io/latest/docs/reference/config/networking/destination-rule/#ConnectionPoolSettings-HTTPSettings), which applies rules to clients of a service after routing has already occurred. The Linkerd implementation of retry budgets is configured alongside service route configuration, within the [ServiceProfile CRD](https://linkerd.io/2.12/reference/service-profiles/), limiting the number of total retries for a service as a percentage of the number of recent requests. This proposal aims to determine where retry budget's should be defined within the Gateway API, and whether data plane proxies may need to be altered to accommodate the specification.
+While retry budget configuration has been a frequently discussed feature within the community, differences in the semantics between data plane implementations creates a challenge for a consensus on the correct location for the configuration. This proposal aims to determine where retry budget's should be defined within the Gateway API, and whether data plane proxies may need to be altered to accommodate the specification. 
 
 ### Background on implementations
 
 #### Envoy
 
-Supports configuring an optional [RetryBudget](https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/cluster/v3/circuit_breaker.proto#envoy-v3-api-msg-config-cluster-v3-circuitbreakers-thresholds-retrybudget) CircuitBreaker threshold across a group of upstream endpoints, with the following parameters:
+Envoy offers retry budgets as a configurable circuit breaker threshold for concurrent retries to an upstream cluster, in favor of configuring a static max retry threshold. In Istio, Envoy circuit breaker thresholds are typically configured [within the DestinationRule CRD](https://istio.io/latest/docs/reference/config/networking/destination-rule/#ConnectionPoolSettings-HTTPSettings), which applies rules to clients of a service after routing has already occurred.
+
+The optional [RetryBudget](https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/cluster/v3/circuit_breaker.proto#envoy-v3-api-msg-config-cluster-v3-circuitbreakers-thresholds-retrybudget) CircuitBreaker threshold can be configured with the following parameters:
 
 * `budget_percent` Specifies the limit on concurrent retries as a percentage of the sum of active requests and active pending requests. For example, if there are 100 active requests and the budget_percent is set to 25, there may be 25 active retries. This parameter is optional. Defaults to 20%.
 
@@ -48,9 +48,27 @@ By default, Envoy uses a static threshold for retries. But when configured, Envo
 
 #### linkerd2-proxy
 
+The Linkerd implementation of retry budgets is configured alongside service route configuration, within the [ServiceProfile CRD](https://linkerd.io/2.12/reference/service-profiles/), limiting the number of total retries for a service as a percentage of the number of recent requests. In practice, this functions similarly to Envoy's retry budget implementation, as it is configured in a single location and measures the ratio of retry requests to original requests across all traffic destined for the service.
+
 Linkerd supports [budgeted retries](https://linkerd.io/2.15/features/retries-and-timeouts/), the default way to specify retries to a service, and - as of [edge-24.7.5](https://github.com/linkerd/linkerd2/releases/tag/edge-24.7.5) - counted retries. In all cases, retries are implemented by the `linkerd2-proxy` making the request on behalf on an application workload.
 
 Linkerd's budgeted retries allow retrying an indefinite number of times, as long as the fraction of retries remains within the budget. Budgeted retries are supported only using Linkerd's native ServiceProfile CRD, which allows enabling retries, setting the retry budget (by default, 20% plus 10 "extra" retries per second), and configuring the window over which the fraction of retries to non-retries is calculated.
+
+### Proposed Design
+
+#### Retry Budget Policy Attachment
+
+While current retry behavior is defined at the routing rule level within HTTPRoute, exposing retry budget configuration as a policy attachment offers some advantages:
+
+* Users could define a single policy, targeting a service, that would dynamically configure a retry threshold based on the percentage of active requests across *all routes* destined for that service's backends.
+
+* In both Envoy and Linkerd data plane implementations, a retry budget is configured once to match all endpoints of a service, regardless of the routing rule that the request matches on. A policy attachment will allow for a single configuration for a service's retry budget, as opposed to configuring the retry budget across multiple HTTPRoute objects (see [Alternatives](#httproute-retry-budget)).
+
+* Being able to configure a dynamic threshold of retries at the service level, alongside a static max number of retries on the route level. In practice, application developers would then be allowed more granular control of which requests should be retried. For example, an application developer may not want to perform retries on a specific route where requests are not idempotent, and can disable retries for that route. By having a retry budget policy configured, retries from other routes will still benefit from the budgeted retries.
+
+Configuring a retry budget through a Policy Attachment may produce some confusion from a UX perspective, as users will be able to configure retries in two different places (HTTPRoute for static retries, versus a policy attachment for a dynamic retry threshold). Though this is likely a fair trade-off.
+
+Discrepancies in the semantics of retry budget behavior and configuration options between Envoy and Linkerd may require a change in either implementation to accommodate the Gateway API specification.
 
 ## API
 
@@ -68,17 +86,15 @@ TODO
 
 ## Alternatives
 
-### Policy Attachment
+### HTTPRoute Retry Budget
 
-TODO
+* The desired UX for retry budgets is to apply the policy at the service level, rather than individually across each route targeting the service. Placing the retry budget configuration within HTTPRoute would violate this requirement, as separate HTTPRoute objects could each have routing rules targeting the same destination service, and a single HTTPRoute object can target multiple destinations. To apply a retry budget to all routes targeting a service, a user would need to duplicate the configuration across multiple routing rules.
+
+* If we wanted retry budgets to be configured on a per-route basis (as opposed to at the service level), it would require a change to be made in Envoy Route. And more than likely, similar changes would need to be made for Linkerd.
 
 ## Other considerations
 
 TODO
-
-### What accommodations are needed for retry budget support?
-
-Changing the retry stanza to a Kubernetes "tagged union" pattern with something like `mode: "budget"` to support mutually-exclusive distinct sibling fields is possible as a non-breaking change if omitting the `mode` field defaults to the currently proposed behavior (which could retroactively become something like `mode: count`).
 
 ## References
 
