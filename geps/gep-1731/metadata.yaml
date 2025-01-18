@@ -19,7 +19,7 @@ relationships:
   extends: {}
   extendedBy:
     - number: 3388
-      name: HTTPRoute Retry Budget
+      name: Retry Budgets
   # seeAlso indicates other GEPs that are relevant in some way without being
   # covered by an existing relationship.
   seeAlso:

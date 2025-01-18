@@ -1,4 +1,4 @@
-# GEP-3388: HTTP Retry Budget
+# GEP-3388: Retry Budgets
 
 * Issue: [#3388](https://github.com/kubernetes-sigs/gateway-api/issues/3388)
 * Status: Provisional
@@ -23,10 +23,9 @@ To allow configuration of a "retry budget" across all endpoints of a destination
 * To allow specifying inclusion of specific HTTP status codes and responses within the retry budget spec.
 * To allow specification of more than one retry budget for a given service, or for specific subsets of its traffic.
 
-
 ## Introduction
 
-Multiple data plane proxies offer optional configuration for budgeted retries, in order to create a dynamic limit on the amount of a service's active request that is being retried across its clients. In the case of Linkerd, retry budgets are the default retry policy configuration for HTTP retries within the [ServiceProfile CRD](https://linkerd.io/2.12/reference/service-profiles/), with static max retries being a [fairly recent addition](https://linkerd.io/2024/08/13/announcing-linkerd-2.16/).
+Multiple data plane proxies offer optional configuration for budgeted retries, in order to create a dynamic limit on the amount of a service's active request load that is comprised of retries from across its clients. In the case of Linkerd, retry budgets are the default retry policy configuration for HTTP retries within the [ServiceProfile CRD](https://linkerd.io/2.12/reference/service-profiles/), with static max retries being a [fairly recent addition](https://linkerd.io/2024/08/13/announcing-linkerd-2.16/).
 
 Configuring a limit for client retries is an important factor in building a resilient system, allowing requests to be successfully retried during periods of intermittent failure. But too many client-side retries can also exacerbate consistent failures and slow down recovery, quickly overwhelming a failing system and leading to cascading failures such as retry storms. Configuring a sane limit for max client-side retries is often challenging in complex systems. Allowing an application developer (Ana) to configure a dynamic "retry budget" reduces the risk of a high number of retries across clients. It allows a service to perform as expected in both times of high & low request load, as well as both during periods of intermittent & consistent failures.
 
@@ -76,7 +75,7 @@ Configuring a retry budget through a Policy Attachment may produce some confusio
 
 Discrepancies in the semantics of retry budget behavior and configuration options between Envoy and Linkerd may require a change in either implementation to accommodate the Gateway API specification. While Envoy's `min_retry_concurrency` setting may behave similarly in practice to Linkerd's `minRetriesPerSecond`, they are not directly equivalent.
 
-A version of Linkerd's `ttl` parameter may also need to be implemented within Envoy.
+The implementation of a version of Linkerd's `ttl` parameter within Envoy might be a path towards reconciling the behavior of these implementations, as it could allow Envoy to express a `budget_percent` and minimum number of permissible retries over a period of time rather than by tracking active and pending connections. It is not currently clear which of these models is preferable, but being able to specify a budget as requests over a window of time seems like it might offer more predictable behavior.
 
 ## API
 
@@ -102,11 +101,14 @@ TODO
 
 ## Other considerations
 
-TODO
+* Is it worth allowing the budget to be expressed as a `Fraction` similar to `HTTPRequestMirrorFilter` as described in [GEP-3171](https://gateway-api.sigs.k8s.io/geps/gep-3171/), or is a percentage sufficient for this use case? (Expressing a sub-1% budget for retries seems less necessary than for mirroring or redirecting traffic at significant scale.)
+* As there isn't anything inherently specific to HTTP requests in either known implementation, a retry budget policy on a target Service could likely be applicable to GRPCRoute as well as HTTPRoute requests.
+* While retry budgets are commonly associated with service mesh uses cases to handle many distributed clients, a retry budget policy may also be desirable for north/south implementations of Gateway API to prioritize new inbound requests and minimize tail latency during periods of service instability.
 
 ## References
 
 * <https://gateway-api.sigs.k8s.io/geps/gep-1731/>
+* <https://finagle.github.io/blog/2016/02/08/retry-budgets/>
 * <https://linkerd.io/2019/02/22/how-we-designed-retries-in-linkerd-2-2/>
 * <https://linkerd.io/2.11/tasks/configuring-retries/>
 * <https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/cluster/v3/circuit_breaker.proto#config-cluster-v3-circuitbreakers-thresholds-retrybudget>

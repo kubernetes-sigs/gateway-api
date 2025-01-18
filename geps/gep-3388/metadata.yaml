@@ -1,7 +1,7 @@
 apiVersion: internal.gateway.networking.k8s.io/v1alpha1
 kind: GEPDetails
 number: 3388
-name: HTTP Retry Budget
+name: Retry Budgets
 status: Provisional
 # Any authors who contribute to the GEP in any way should be listed here using
 # their Github handle.
