@@ -712,6 +712,55 @@ spec:
     addVaryHeader: true
 ```
 
+## Alternatives Considered
+### Use top level field in HTTPRouteRule to implement CORS
+As suggested in [this comment](https://github.com/kubernetes-sigs/gateway-api/pull/3435/#discussion_r1874186947), a new field `CORS` is added to `HTTPRouteRule`, which allows for handling the cross-origin requests before the response is sent to the client. This is similar to the `Timeouts` field in `HTTPRouteRule`. 
+
+```golang
+type HTTPRouteRule struct {
+	Name *SectionName `json:"name,omitempty"`
+
+	Matches []HTTPRouteMatch `json:"matches,omitempty"`
+
+	Filters []HTTPRouteFilter `json:"filters,omitempty"`
+
+	BackendRefs []HTTPBackendRef `json:"backendRefs,omitempty"`
+
+	Timeouts *HTTPRouteTimeouts `json:"timeouts,omitempty"`
+
+	Retry *HTTPRouteRetry `json:"retry,omitempty"`
+
+	SessionPersistence *SessionPersistence `json:"sessionPersistence,omitempty"`
+
+  // CORS defines the CORS rules that respond to the 
+  // cross-origin request based on HTTP response header.
+  //
+  // Support: Extended
+  //
+  // +optional
+  CORS *HTTPCORS `json:"cors,omitempty"`
+}
+```
+
+If a filter logically as a 
+```rust
+fn run_filter(req: HTTPRequest) -> FilterResponse;
+enum FilterResponse {
+  Request(HTTPRequest),
+  Response(HTTPResonse)
+```
+
+A `Timeouts` doesn't really meet that, but `CORS` does:
+```rust
+fn run_filter(req: HTTPRequest) -> FilterResponse {
+  if req.method == origin { return Response(cors_response()) }
+    return Request(req)
+}
+```
+
+Moreover, CORS is a HTTP feature based on HTTP-header. This fits as a filter.
+
+
 ## References
 * [RFC2616](https://www.rfc-editor.org/rfc/rfc2616)
 * [RFC6454](https://www.rfc-editor.org/rfc/rfc6454)
