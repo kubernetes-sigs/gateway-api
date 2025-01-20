@@ -718,27 +718,27 @@ As suggested in [this comment](https://github.com/kubernetes-sigs/gateway-api/pu
 
 ```golang
 type HTTPRouteRule struct {
-	Name *SectionName `json:"name,omitempty"`
+  Name *SectionName `json:"name,omitempty"`
 
-	Matches []HTTPRouteMatch `json:"matches,omitempty"`
+  Matches []HTTPRouteMatch `json:"matches,omitempty"`
 
-	Filters []HTTPRouteFilter `json:"filters,omitempty"`
+  Filters []HTTPRouteFilter `json:"filters,omitempty"`
 
-	BackendRefs []HTTPBackendRef `json:"backendRefs,omitempty"`
+  BackendRefs []HTTPBackendRef `json:"backendRefs,omitempty"`
 
-	Timeouts *HTTPRouteTimeouts `json:"timeouts,omitempty"`
+  Timeouts *HTTPRouteTimeouts `json:"timeouts,omitempty"`
 
-	Retry *HTTPRouteRetry `json:"retry,omitempty"`
+  Retry *HTTPRouteRetry `json:"retry,omitempty"`
 
-	SessionPersistence *SessionPersistence `json:"sessionPersistence,omitempty"`
+  SessionPersistence *SessionPersistence `json:"sessionPersistence,omitempty"`
 
-	// CORS defines the CORS rules that respond to the 
-	// cross-origin request based on HTTP response header.
-	//
-	// Support: Extended
-	//
-	// +optional
-	CORS *HTTPCORS `json:"cors,omitempty"`
+  // CORS defines the CORS rules that respond to the 
+  // cross-origin request based on HTTP response header.
+  //
+  // Support: Extended
+  //
+  // +optional
+  CORS *HTTPCORS `json:"cors,omitempty"`
 }
 ```
 
