@@ -732,13 +732,13 @@ type HTTPRouteRule struct {
 
 	SessionPersistence *SessionPersistence `json:"sessionPersistence,omitempty"`
 
-  // CORS defines the CORS rules that respond to the 
-  // cross-origin request based on HTTP response header.
-  //
-  // Support: Extended
-  //
-  // +optional
-  CORS *HTTPCORS `json:"cors,omitempty"`
+	// CORS defines the CORS rules that respond to the 
+	// cross-origin request based on HTTP response header.
+	//
+	// Support: Extended
+	//
+	// +optional
+	CORS *HTTPCORS `json:"cors,omitempty"`
 }
 ```
 
