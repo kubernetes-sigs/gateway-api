@@ -172,7 +172,7 @@ Documentation to deploy and use AKO Gateway API can be found at [Avi Kubernetes 
 
 ### Azure Application Gateway for Containers
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Partial%20Conformance%20v1.0.0-Azure%20Application%20Gateway%20for%20Containers-orange)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.0.0/azure-application-gateway-for-containers)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Partial%20Conformance%20v1.1.1-Azure%20Application%20Gateway%20for%20Containers-orange)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.1.0/azure-application-gateway-for-containers)
 
 [Application Gateway for Containers][azure-application-gateway-for-containers] is a managed application (layer 7) load balancing solution, providing dynamic traffic management capabilities for workloads running in a Kubernetes cluster in Azure. Follow the [quickstart guide][azure-application-gateway-for-containers-quickstart-controller] to deploy the ALB controller and get started with Gateway API.
 
@@ -361,7 +361,7 @@ Check out the [Gateway API task][istio-2] for more information about the Gateway
 
 ### Kong Kubernetes Ingress Controller
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.1.0-Kong%20Ingress%20Controller-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.1.0/kong-kubernetes-ingress-controller)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.2.1-Kong%20Ingress%20Controller-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.2.1/kong-kubernetes-ingress-controller)
 
 [Kong][kong] is an open source API Gateway built for hybrid and multi-cloud environments.
 
@@ -463,10 +463,10 @@ If you have any suggestions or experience issues with NGINX Gateway Fabric, plea
 
 You can read our [docs][ngrok-k8s-gwapi-docs] for more information. If you have any feature requests or bug reports, please [create an issue][ngrok-issue-new]. You can also reach out for help on [Slack][ngrok-slack]
 
-[ngrok-k8s-operator]:https://github.com/ngrok/kubernetes-ingress-controller
+[ngrok-k8s-operator]:https://github.com/ngrok/ngrok-operator
 [ngrok]:https://ngrok.com
 [ngrok-k8s-gwapi-docs]:https://ngrok.com/docs/k8s/
-[ngrok-issue-new]: https://github.com/ngrok/kubernetes-ingress-controller/issues/new
+[ngrok-issue-new]: https://github.com/ngrok/ngrok-operator/issues/new/choose
 [ngrok-slack]:https://ngrokcommunity.slack.com/channels/general
 
 ### STUNner
@@ -480,11 +480,11 @@ STUNner currently supports version `v1alpha2` of the Gateway API specification. 
 
 ### Traefik Proxy
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.2.0-Traefik Proxy-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.2.0/traefik-traefik)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.2.1-Traefik Proxy-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.2.1/traefik-traefik)
 
 [Traefik Proxy][traefik-proxy] is an open source cloud-native application proxy.
 
-Traefik Proxy currently supports version `v1.2.0` of the Gateway API specification, check the [Kubernetes Gateway Provider Documentation][traefik-proxy-gateway-api-doc] for more information on how to deploy and use it.
+Traefik Proxy currently supports version `v1.2.1` of the Gateway API specification, check the [Kubernetes Gateway Provider Documentation][traefik-proxy-gateway-api-doc] for more information on how to deploy and use it.
 Traefik Proxy's implementation passes all HTTP core and some extended conformance tests, like GRPCRoute, but also supports TCPRoute and TLSRoute features from the Experimental channel.
 
 For help and support with Traefik Proxy, [create an issue][traefik-proxy-issue-new] or ask for help in the [Traefik Labs Community Forum][traefiklabs-community-forum].
