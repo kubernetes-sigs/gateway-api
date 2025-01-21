@@ -57,6 +57,15 @@ If HTTPCORSFilter is set, then the gateway will generate the response of the pre
 For the actual cross-origin request, the gateway will add CORS headers to the response before it is sent to the client.
 
 ```golang
+// AllowCredentialsType describes valid value of config `AllowCredentials`.
+//
+// +kubebuilder:validation:Enum=true
+type AllowCredentialsType string
+
+const (
+	AllowCredentialsTrue AllowCredentialsType = "true"
+)
+
 const (
     // HTTPRouteFilterCORS can be used to add CORS headers to an 
     // HTTP response before it is sent to the client.
@@ -147,9 +156,9 @@ type HTTPCORSFilter struct {
     //
     // The only valid value for the header `Access-Control-Allow-Credentials` is true (case-sensitive).
     //
-    // The default value of the config AllowCredentials is false.
     // If the credentials are not allowed in cross-origin requests, 
-    // the gateway will omit the header `Access-Control-Allow-Credentials` entirely.
+    // the gateway will omit the header `Access-Control-Allow-Credentials` entirely 
+    // rather than setting its value to false.
     //
     // Input:
     //   Origin: https://foo.example
@@ -164,8 +173,7 @@ type HTTPCORSFilter struct {
     // Support: Extended
     //
     // +optional
-    // +kubebuilder:default=false
-    AllowCredentials bool `json:"allowCredentials,omitempty"`
+    AllowCredentials AllowCredentialsType `json:"allowCredentials,omitempty"`
 
     // AllowMethods indicates which HTTP methods are supported 
     // for accessing the requested resource.
