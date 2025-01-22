@@ -1,14 +1,14 @@
-apiVersion: gateway.networking.k8s.io/v1
-date: "2024-11-20T21:04:59Z"
-gatewayAPIChannel: experimental
-gatewayAPIVersion: v1.2.0
+apiVersion: gateway.networking.k8s.io/v1alpha1
+date: "2024-06-11T17:06:57Z"
+gatewayAPIChannel: standard
+gatewayAPIVersion: v1.1.0
 implementation:
   contact:
-  - https://github.com/nginxinc/nginx-gateway-fabric/discussions/new/choose
-  organization: nginxinc
+  - https://github.com/nginx/nginx-gateway-fabric/discussions/new/choose
+  organization: nginx
   project: nginx-gateway-fabric
-  url: https://github.com/nginxinc/nginx-gateway-fabric
-  version: v1.5.0
+  url: https://github.com/nginx/nginx-gateway-fabric
+  version: v1.3.0
 kind: ConformanceReport
 mode: default
 profiles:
@@ -43,13 +43,9 @@ profiles:
     - HTTPRouteSchemeRedirect
     unsupportedFeatures:
     - GatewayHTTPListenerIsolation
-    - GatewayInfrastructurePropagation
     - GatewayStaticAddresses
-    - HTTPRouteBackendProtocolH2C
-    - HTTPRouteBackendProtocolWebSocket
     - HTTPRouteBackendRequestHeaderModification
     - HTTPRouteBackendTimeout
-    - HTTPRouteDestinationPortMatching
     - HTTPRouteParentRefPort
     - HTTPRoutePathRedirect
     - HTTPRouteRequestMirror
@@ -57,11 +53,3 @@ profiles:
     - HTTPRouteRequestTimeout
   name: GATEWAY-HTTP
   summary: Core tests succeeded. Extended tests succeeded.
-- core:
-    result: success
-    statistics:
-      Failed: 0
-      Passed: 11
-      Skipped: 0
-  name: GATEWAY-TLS
-  summary: Core tests succeeded.

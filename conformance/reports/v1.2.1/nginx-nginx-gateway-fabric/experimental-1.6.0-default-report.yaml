@@ -1,14 +1,14 @@
-apiVersion: gateway.networking.k8s.io/v1alpha1
-date: "2024-08-20T18:43:28Z"
+apiVersion: gateway.networking.k8s.io/v1
+date: "2025-01-15T19:59:39Z"
 gatewayAPIChannel: experimental
-gatewayAPIVersion: v1.1.0
+gatewayAPIVersion: v1.2.1
 implementation:
   contact:
-  - https://github.com/nginxinc/nginx-gateway-fabric/discussions/new/choose
-  organization: nginxinc
+  - https://github.com/nginx/nginx-gateway-fabric/discussions/new/choose
+  organization: nginx
   project: nginx-gateway-fabric
-  url: https://github.com/nginxinc/nginx-gateway-fabric
-  version: v1.4.0
+  url: https://github.com/nginx/nginx-gateway-fabric
+  version: v1.6.0
 kind: ConformanceReport
 mode: default
 profiles:
@@ -30,12 +30,13 @@ profiles:
     result: success
     statistics:
       Failed: 0
-      Passed: 9
+      Passed: 10
       Skipped: 0
     supportedFeatures:
     - GatewayPort8080
     - HTTPRouteHostRewrite
     - HTTPRouteMethodMatching
+    - HTTPRoutePathRedirect
     - HTTPRoutePathRewrite
     - HTTPRoutePortRedirect
     - HTTPRouteQueryParamMatching
@@ -43,11 +44,14 @@ profiles:
     - HTTPRouteSchemeRedirect
     unsupportedFeatures:
     - GatewayHTTPListenerIsolation
+    - GatewayInfrastructurePropagation
     - GatewayStaticAddresses
+    - HTTPRouteBackendProtocolH2C
+    - HTTPRouteBackendProtocolWebSocket
     - HTTPRouteBackendRequestHeaderModification
     - HTTPRouteBackendTimeout
+    - HTTPRouteDestinationPortMatching
     - HTTPRouteParentRefPort
-    - HTTPRoutePathRedirect
     - HTTPRouteRequestMirror
     - HTTPRouteRequestMultipleMirrors
     - HTTPRouteRequestTimeout

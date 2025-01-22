@@ -1,13 +1,13 @@
 apiVersion: gateway.networking.k8s.io/v1alpha1
-date: "2023-10-24T19:04:37Z"
-gatewayAPIVersion: 0.8.1
+date: "2024-03-21T15:55:19Z"
+gatewayAPIVersion: 1.0.0
 implementation:
   contact:
-  - https://github.com/nginxinc/nginx-gateway-fabric/discussions/new/choose
-  organization: nginxinc
+  - https://github.com/nginx/nginx-gateway-fabric/discussions/new/choose
+  organization: nginx
   project: nginx-gateway-fabric
-  url: https://github.com/nginxinc/nginx-gateway-fabric
-  version: v1.0.0
+  url: https://github.com/nginx/nginx-gateway-fabric
+  version: v1.2.0
 kind: ConformanceReport
 profiles:
 - core:
@@ -21,19 +21,21 @@ profiles:
     result: success
     statistics:
       Failed: 0
-      Passed: 4
+      Passed: 6
       Skipped: 0
     summary: ""
     supportedFeatures:
+    - HTTPRoutePortRedirect
+    - HTTPRouteHostRewrite
+    - HTTPRouteQueryParamMatching
     - HTTPRouteMethodMatching
     - HTTPRouteSchemeRedirect
-    - HTTPRouteQueryParamMatching
-    - HTTPRoutePortRedirect
-    unsupportedFeatures:
-    - HTTPRouteHostRewrite
     - HTTPRoutePathRewrite
+    unsupportedFeatures:
+    - HTTPRouteRequestTimeout
+    - HTTPRouteBackendTimeout
+    - HTTPRouteResponseHeaderModification
+    - HTTPRoutePathRedirect
     - HTTPRouteRequestMirror
     - HTTPRouteRequestMultipleMirrors
-    - HTTPResponseHeaderModification
-    - HTTPRoutePathRedirect
   name: HTTP
