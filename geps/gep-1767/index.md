@@ -202,7 +202,7 @@ type HTTPCORSFilter struct {
     //
     // +listType=set
     // +kubebuilder:validation:MaxItems=16
-    AllowMethods []string `json:"allowMethods,omitempty"`
+    AllowMethods []HTTPMethod `json:"allowMethods,omitempty"`
  
     // AllowHeaders indicates which HTTP request headers are supported 
     // for accessing the requested resource.
