@@ -41,7 +41,7 @@ The server response for the CORS "preflight" request includes the following head
     `Access-Control-Allow-Methods` response header specifies one or more HTTP methods are accepted by the server when accessing the requested resource. 
     `Access-Control-Allow-Headers` response header indicates which HTTP headers can be used during the actual cross-origin request.
     
-The `Access-Control-Max-Age` optional response header indicates how long (in seconds) the information provided by the headers `Access-Control-Allow-Methods` and `Access-Control-Allow-Headers` can be cached by client. The default value for `Access-Control-Max-Age` is 5 seconds. Until the time specified by `Access-Control-Max-Age` elapses, the client doesn’t have to send another "preflight" request.
+The `Access-Control-Max-Age` optional response header indicates how long (in seconds) the information provided by the headers `Access-Control-Allow-Methods` and `Access-Control-Allow-Headers` can be cached by client. The default value for `Access-Control-Max-Age` is 5 seconds. Until the time specified by `Access-Control-Max-Age` elapses, the client doesn't have to send another "preflight" request.
 
 The optional response header `Access-Control-Expose-Headers` controls which HTTP response headers are exposed to clients for the actual cross-origin request. 
 
@@ -49,11 +49,80 @@ If the server specifies the response header `Access-Control-Allow-Credentials: t
 Credentials are cookies, TLS client certificates, or authentication headers containing a username and password.
 
 After the server has permitted the CORS "preflight" request, the client will be able to send actual cross-origin request.
-If the server doesn’t want to allow cross-origin access, it will respond with an error message to the client.
+If the server doesn't want to allow cross-origin access, it will omit the CORS headers to the client.
+Therefore, the client doesn't attempt the actual cross-origin request.
+
+## Cross-origin Examples
+
+* In a simple cross-origin interaction, the client sends the request and cross-origin headers at the same time. These are usually GET data requests and are considered low-risk.
+
+For example, a client sends a GET request with cross-origin header `Origin`.
+```
+GET /resource/foo HTTP/1.1
+Host: http.route.cors.com
+Origin: https://foo.example
+```
+
+The server sets response header Access-Control-Allow-Origin with "*", which means that the requested resource can be accessed from the any `Origin`.
+```
+HTTP/1.1 200 OK
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Methods: GET, HEAD, POST
+Access-Control-Allow-Headers: Accept,Accept-Language,Content-Language,Content-Type,Range
+```
+
+* Some HTTP requests are considered complex and require server confirmation before the actual cross-origin request is sent. Before the actual cross-origin requests, clients will initiate an extra "preflight" request to determine whether that the server will permit the actual requests.
+
+For example, a client sends a cross-origin "preflight" request for asking a server whether it would allow a PUT request before the actual cross-origin request is sent.
+```
+OPTIONS /resource/foo HTTP/1.1
+Host: http.route.cors.com
+Origin: https://foo.example
+Access-Control-Request-Method: PUT
+```
+
+If the "preflight" request is denied, the requested resource will end up not being shared.
+The server returns 200 OK but doesn't set the cross-origin response headers.
+Therefore, the client doesn't attempt the actual cross-origin request.
+```
+HTTP/1.1 200 OK
+Content-Type: text/plain charset=UTF-8
+Content-Length: 0
+```
+
+If the server allows it, it will respond with an OK status (i.e., 204 or 200) and the following response headers.
+```
+HTTP/1.1 204 No Content
+Access-Control-Allow-Origin: https://foo.example
+Access-Control-Allow-Credentials: true
+Access-Control-Allow-Methods: GET, PUT, POST, DELETE, PATCH, OPTIONS
+Access-Control-Allow-Headers: DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization
+Access-Control-Max-Age: 1728000
+Content-Type: text/plain charset=UTF-8
+Content-Length: 0
+```
+
+Then, the client will be able to send actual cross-origin request.
+```
+PUT /resource/foo HTTP/1.1
+Host: http.route.cors.com
+Keep-Alive: timeout=5, max=1000
+Origin: https://foo.example
+Authorization: Basic YWxhZGRpbjpvcGVuc2VzYW1l
+```
+
+At last, the cross-origin response headers will be added by the server to the response.
+```
+Access-Control-Allow-Origin: https://foo.example
+Access-Control-Allow-Credentials: true
+Access-Control-Allow-Methods: GET, PUT, POST, DELETE, PATCH, OPTIONS
+Access-Control-Allow-Headers: DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization
+Access-Control-Expose-Headers: Content-Security-Policy
+```
 
 ## API
 This GEP proposes to add a new field `HTTPCORSFilter` to `HTTPRouteFilter`.
-If HTTPCORSFilter is set, then the gateway will generate the response of the preflight requests and send back it to the client directly.
+If HTTPCORSFilter is set, then the gateway will generate the response of the "preflight" requests and send back it to the client directly.
 For the actual cross-origin request, the gateway will add CORS headers to the response before it is sent to the client.
 
 ```golang
@@ -63,7 +132,8 @@ For the actual cross-origin request, the gateway will add CORS headers to the re
 type AllowCredentialsType string
 
 const (
-	AllowCredentialsTrue AllowCredentialsType = "true"
+	// The actual cross-origin request allows to include credentials.
+  AllowCredentials AllowCredentialsType = "true"
 )
 
 const (
@@ -277,7 +347,7 @@ type HTTPCORSFilter struct {
 
 The following example shows how a HTTPRoute supports secure cross-origin requests and data transfers between clients and servers.
 
-* In a simple cross-origin interaction, the client sends the request and cross-origin headers at the same time. These are usually GET data requests and are considered low-risk.
+### Simple cross-origin interaction
 
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
@@ -322,6 +392,7 @@ A client sends a GET request with cross-origin header `Origin`.
 GET /resource/foo HTTP/1.1
 Host: http.route.cors.com
 Origin: https://foo.example
+
 ```
 
 The cross-origin response headers will be added by the gateway to the response based on the above HTTPRoute.
@@ -333,7 +404,9 @@ Access-Control-Allow-Methods: GET, HEAD, POST
 Access-Control-Allow-Headers: Accept,Accept-Language,Content-Language,Content-Type,Range
 ```
 
-* Some HTTP requests are considered complex and require server confirmation before the actual cross-origin request is sent. Before the actual cross-origin requests, clients will initiate an extra "preflight" request to determine whether that the server will permit the actual requests.
+###  Complex cross-origin interaction
+
+Some HTTP requests are considered complex and require server confirmation before the actual cross-origin request is sent. Before the actual cross-origin requests, clients will initiate an extra "preflight" request to determine whether that the server will permit the actual requests.
 
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
@@ -361,6 +434,7 @@ spec:
       - allowOrigins:
         - https://foo.example
         - http://foo.example
+        allowCredentials: "true"
         allowMethods: 
         - GET
         - PUT
@@ -393,7 +467,8 @@ Access-Control-Request-Method: PUT
 ```
 
 The status code of a successful response to a "preflight" request is an OK status (i.e., 204 or 200). 
-Based on the above HTTPRoute, a successful "preflight" response will be generated by the gateway. Moreover, the gateway will send the "preflight" response to the client directly.
+Based on the above HTTPRoute, a successful "preflight" response will be generated by the gateway. 
+Moreover, the gateway will send the "preflight" response to the client directly.
 
 ```
 HTTP/1.1 204 No Content
@@ -763,7 +838,6 @@ fn run_filter(req: HTTPRequest) -> FilterResponse {
 ```
 
 Moreover, CORS is a HTTP feature based on HTTP-header. This fits as a filter.
-
 
 ## References
 * [RFC2616](https://www.rfc-editor.org/rfc/rfc2616)
