@@ -132,8 +132,8 @@ For the actual cross-origin request, the gateway will add CORS headers to the re
 type AllowCredentialsType string
 
 const (
-	// The actual cross-origin request allows to include credentials.
-  AllowCredentials AllowCredentialsType = "true"
+    // The actual cross-origin request allows to include credentials.
+    AllowCredentials AllowCredentialsType = "true"
 )
 
 const (
