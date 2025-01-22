@@ -19,8 +19,25 @@ import pandas
 from fnmatch import fnmatch
 import glob
 import os
+import re
 
 log = logging.getLogger('mkdocs')
+
+
+def process_feature_name(feature):
+    """
+    Process feature names by:
+    1. Removing HTTPRoute and Gateway prefixes
+    2. Splitting camelCase into space-separated words
+    """
+    # Remove prefixes
+    feature = re.sub(r'^(HTTPRoute|Gateway)', '', feature)
+    
+    # Split camelCase
+    words = re.findall(r'[A-Z]+(?=[A-Z][a-z]|\d|\W|$)|[A-Z][a-z]+|\d+', feature)
+    
+    # Join words with spaces and title case each word
+    return ' '.join(word.title() for word in words)
 
 
 @plugins.event_priority(100)
@@ -114,7 +131,9 @@ def generate_profiles_report(reports, route,version):
     for row in http_table.itertuples():
         if type(row._4) is list:
             for feat in row._4:
-                http_table.loc[row.Index, feat] = ':white_check_mark:'
+                # Process feature name before using it as a column
+                processed_feat = process_feature_name(feat)
+                http_table.loc[row.Index, processed_feat] = ':white_check_mark:'
     http_table = http_table.fillna(':x:')
     http_table = http_table.drop(['extended.supportedFeatures'], axis=1)
 
