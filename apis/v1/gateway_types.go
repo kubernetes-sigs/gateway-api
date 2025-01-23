@@ -165,7 +165,7 @@ type GatewaySpec struct {
 	// Listeners are _Conflicted_, and the implementation MUST set the "Conflicted"
 	// condition in the Listener Status to "True".
 	//
-	// The words "indistict" and "conflicted" are considered equivalent for the
+	// The words "indistinct" and "conflicted" are considered equivalent for the
 	// purpose of this documentation.
 	//
 	// Implementations MAY choose to accept a Gateway with some Conflicted
