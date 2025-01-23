@@ -1,7 +1,7 @@
 # GEP 1767: CORS Filter
 
 * Issue: [#1767](https://github.com/kubernetes-sigs/gateway-api/issues/1767)
-* Status: Experimental
+* Status: Provisional
 
 ## TLDR
 Cross-origin resource sharing (CORS) is an HTTP-header based mechanism that allows a web page to access restricted resources from a server on an origin (domain, scheme, or port) different than the domain that served the web page.
