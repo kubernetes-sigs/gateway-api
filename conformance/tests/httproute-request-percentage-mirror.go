@@ -1,5 +1,5 @@
 /*
-Copyright 2024 The Kubernetes Authors.
+Copyright 2025 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -145,7 +145,9 @@ var HTTPRouteRequestPercentageMirror = suite.ConformanceTest{
 				http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, expected)
 
 				// Override to not have more requests than expected
-				suite.TimeoutConfig.RequiredConsecutiveSuccesses = 1
+				var dedicatedTimeoutConfig config.TimeoutConfig
+				dedicatedTimeoutConfig = suite.TimeoutConfig
+				dedicatedTimeoutConfig.RequiredConsecutiveSuccesses = 1
 				// used to limit number of parallel go routines
 				semaphore := make(chan struct{}, concurrentRequests)
 				var wg sync.WaitGroup
@@ -159,7 +161,7 @@ var HTTPRouteRequestPercentageMirror = suite.ConformanceTest{
 							defer wg.Done()
 							defer func() { <-semaphore }()
 							http.MakeRequestAndExpectEventuallyConsistentResponse(t, r, timeoutConfig, gwAddr, expected)
-						}(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, expected)
+						}(t, suite.RoundTripper, dedicatedTimeoutConfig, gwAddr, expected)
 					}
 					wg.Wait()
 					if err := testMirroredRequestsDistribution(t, suite, expected, timeNow); err != nil {
