@@ -29,7 +29,7 @@ Each of the following URLs has a different origin from the others.
    https://example.com/
    http://example.org/
    http://ietf.org/
- 
+
 Before the actual cross-origin requests, clients will initiate an extra "preflight" request to determine whether the server will permit the actual requests. 
 The CORS "preflight" request uses `OPTIONS` as method and includes the following headers:
     `Origin` request header indicates where a request originates from.
@@ -52,9 +52,7 @@ After the server has permitted the CORS "preflight" request, the client will be 
 If the server doesn't want to allow cross-origin access, it will omit the CORS headers to the client.
 Therefore, the client doesn't attempt the actual cross-origin request.
 
-## Cross-origin Examples
-
-* In a simple cross-origin interaction, the client sends the request and cross-origin headers at the same time. These are usually GET data requests and are considered low-risk.
+In a simple cross-origin interaction, the client sends the request and cross-origin headers at the same time. These are usually GET data requests and are considered low-risk.
 
 For example, a client sends a GET request with cross-origin header `Origin`.
 ```
@@ -71,7 +69,7 @@ Access-Control-Allow-Methods: GET, HEAD, POST
 Access-Control-Allow-Headers: Accept,Accept-Language,Content-Language,Content-Type,Range
 ```
 
-* Some HTTP requests are considered complex and require server confirmation before the actual cross-origin request is sent. Before the actual cross-origin requests, clients will initiate an extra "preflight" request to determine whether that the server will permit the actual requests.
+Some HTTP requests are considered complex and require server confirmation before the actual cross-origin request is sent. Before the actual cross-origin requests, clients will initiate an extra "preflight" request to determine whether that the server will permit the actual requests.
 
 For example, a client sends a cross-origin "preflight" request for asking a server whether it would allow a PUT request before the actual cross-origin request is sent.
 ```
@@ -97,6 +95,7 @@ Access-Control-Allow-Origin: https://foo.example
 Access-Control-Allow-Credentials: true
 Access-Control-Allow-Methods: GET, PUT, POST, DELETE, PATCH, OPTIONS
 Access-Control-Allow-Headers: DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization
+Access-Control-Expose-Headers: Content-Security-Policy
 Access-Control-Max-Age: 1728000
 Content-Type: text/plain charset=UTF-8
 Content-Length: 0
@@ -162,7 +161,7 @@ type HTTPCORSFilter struct {
     // AllowOrigins indicates whether the response can be shared with 
     // requested resource from the given `Origin`.
     // 
-    // The origin consists of a scheme and a host, with an optional port, 
+    // The `Origin` consists of a scheme and a host, with an optional port, 
     // and takes the form `<scheme>://<host>(:<port>)`.
     //
     // Valid values for scheme are: `http` and `https`.
@@ -210,7 +209,7 @@ type HTTPCORSFilter struct {
     // 403 status to the "preflight" request is denied, coupled with omitting 
     // the CORS headers. Therefore, the client doesn't attempt the actual 
     // cross-origin request.
-    // 
+    //
     // Input:
     //   Origin: https://foo.example
     //
@@ -259,6 +258,9 @@ type HTTPCORSFilter struct {
     // Method names are case sensitive, so these values are also case-sensitive.
     // (See https://www.rfc-editor.org/rfc/rfc2616#section-5.1.1)
     //
+    // Multiple method names in the value of the Access-Control-Allow-Methods 
+    // response header are separated by a comma (",").
+    //
     // Config:
     //   allowMethods: ["GET, PUT, POST, DELETE, PATCH, OPTIONS"]
     // 
@@ -271,9 +273,9 @@ type HTTPCORSFilter struct {
     //
     // Config:
     //   allowMethods: ["*"]
-    // 
+    //
     // Output:
-    //   Access-Control-Allow-Methods: ["*"]
+    //   Access-Control-Allow-Methods: *
     //
     // Support: Extended
     //
@@ -283,7 +285,11 @@ type HTTPCORSFilter struct {
  
     // AllowHeaders indicates which HTTP request headers are supported 
     // for accessing the requested resource.
+    //
     // Header names are not case sensitive.
+    //
+    // Multiple header names in the value of the Access-Control-Allow-Headers 
+    // response header are separated by a comma (",").
     //
     // Config:
     //   allowHeaders: ["DNT", "Keep-Alive", "User-Agent", "X-Requested-With", "If-Modified-Since", "Cache-Control", "Content-Type", "Range", "Authorization"]
@@ -306,9 +312,29 @@ type HTTPCORSFilter struct {
     // +kubebuilder:validation:MaxItems=64
     AllowHeaders []string `json:"allowHeaders,omitempty"`
 
-    // ExposeHeaders indicates which HTTP response headers are exposed to 
-    // clients for the cross-origin request that is not a "preflight" request.
+    // ExposeHeaders indicates which HTTP response headers can be exposed 
+    // to client-side scripts in response to a cross-origin request.
+    //
+    // A CORS-safelisted response header is an HTTP header in a CORS response 
+    // that it is considered safe to expose to the client scripts. 
+    // The CORS-safelisted response headers includes the following headers:
+    // `Cache-Control`
+    // `Content-Language`
+    // `Content-Length`
+    // `Content-Type`
+    // `Expires`
+    // `Last-Modified`
+    // `Pragma`
+    // (See https://fetch.spec.whatwg.org/#cors-safelisted-response-header-name)
+    // The CORS-safelisted response headers are exposed to client by default.
+    //
+    // When an HTTP header name is specified using the ExposeHeaders field, this 
+    // additional header will be exposed as part of the response to the client.
+    //
     // Header names are not case sensitive.
+    //
+    // Multiple header names in the value of the Access-Control-Expose-Headers 
+    // response header are separated by a comma (",").
     //
     // Config:
     //   exposeHeaders: ["Content-Security-Policy"]
@@ -337,6 +363,7 @@ type HTTPCORSFilter struct {
     // the results of a "preflight" request. 
     //
     // The default value of header Access-Control-Max-Age is 5 (seconds).
+    //
     // When this field is unspecified, the gateway sets the response header 
     // "Access-Control-Max-Age: 5" by default.
     //
@@ -487,6 +514,7 @@ Access-Control-Allow-Origin: https://foo.example
 Access-Control-Allow-Credentials: true
 Access-Control-Allow-Methods: GET, PUT, POST, DELETE, PATCH, OPTIONS
 Access-Control-Allow-Headers: DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization
+Access-Control-Expose-Headers: Content-Security-Policy
 Access-Control-Max-Age: 1728000
 Content-Type: text/plain charset=UTF-8
 Content-Length: 0
