@@ -183,32 +183,12 @@ type HTTPCORSFilter struct {
     // An origin value that includes _only_ the `*` character indicates 
     // requests from all `Origin`s are allowed.
     //
-    // When responding to a credentialed requests, the gateway must specify 
-    // a single origin in the value of the Access-Control-Allow-Origin 
-    // response header, instead of specifying the `*` wildcard.
-    //
-    // Input:
-    //   Origin: https://foo.example
-    //
-    // Config:
-    //   allowOrigins: ["*"]
-    //
-    // Output:
-    //   Access-Control-Allow-Origin: *
-    //
     // For a simple cross-origin interaction, the gateway sets value of 
     // the header Access-Control-Allow-Origin same as the `Origin` header 
     // provided by the client.
     //
     // The status code of a successful response to a "preflight" request 
     // is always an OK status (i.e., 204 or 200). 
-    //
-    // If the request `Origin` does not match the configured allowed origins, 
-    // the gateway returns 204/200 response but doesn't set the relevant 
-    // cross-origin response headers. Alternatively, the gateway responds with 
-    // 403 status to the "preflight" request is denied, coupled with omitting 
-    // the CORS headers. Therefore, the client doesn't attempt the actual 
-    // cross-origin request.
     //
     // Input:
     //   Origin: https://foo.example
@@ -219,6 +199,50 @@ type HTTPCORSFilter struct {
     // Output:
     //   Access-Control-Allow-Origin: https://foo.example
     //
+    // If the request `Origin` does not match the configured allowed origins, 
+    // the gateway returns 204/200 response but doesn't set the relevant 
+    // cross-origin response headers. Alternatively, the gateway responds with 
+    // 403 status to the "preflight" request is denied, coupled with omitting 
+    // the CORS headers. The cross-origin request fails. Therefore, the client 
+    // doesn't attempt the actual cross-origin request.
+    //
+    // Input:
+    //   Origin: https://foo.example
+    //
+    // Config:
+    //   allowOrigins: ["https://test.example", "http://test.example"]
+    //
+    // Output:
+    //
+    // The Access-Control-Allow-Origin response header can only use `*` 
+    // wildcard as value when the field AllowCredentials is unspecified.
+    //
+    // Input:
+    //   Origin: https://foo.example
+    //
+    // Config:
+    //   allowOrigins: ["*"]
+    //
+    // Output:
+    //   Access-Control-Allow-Origin: *
+    //
+    // When the field AllowCredentials is specified, the gateway must specify 
+    // a single origin in the value of the Access-Control-Allow-Origin 
+    // response header, instead of specifying the `*` wildcard. The value 
+    // of the header Access-Control-Allow-Origin same as the `Origin` header 
+    // provided by the client.
+    //
+    // Input:
+    //   Origin: https://foo.example
+    //
+    // Config:
+    //   allowOrigins: ["*"]
+    //   allowCredentials: true
+    //
+    // Output:
+    //   Access-Control-Allow-Origin: https://foo.example
+    //   Access-Control-Allow-Credentials: true
+    //
     // Support: Extended
     // +listType=set
     // +kubebuilder:validation:MaxItems=64
@@ -227,12 +251,8 @@ type HTTPCORSFilter struct {
     // AllowCredentials indicates whether the actual cross-origin request 
     // allows to include credentials.
     //
-    // The only valid value for the header `Access-Control-Allow-Credentials` 
-    // is true (case-sensitive).
-    //
-    // If the credentials are not allowed in cross-origin requests, 
-    // the gateway will omit the header `Access-Control-Allow-Credentials` 
-    // entirely rather than setting its value to false.
+    // The only valid value for the `Access-Control-Allow-Credentials` 
+    // response header is true (case-sensitive).
     //
     // Input:
     //   Origin: https://foo.example
@@ -243,6 +263,10 @@ type HTTPCORSFilter struct {
     // Output:
     //   Access-Control-Allow-Origin: https://foo.example
     //   Access-Control-Allow-Credentials: true
+    //
+    // If the credentials are not allowed in cross-origin requests, 
+    // the gateway will omit the header `Access-Control-Allow-Credentials` 
+    // entirely rather than setting its value to false.
     //
     // Support: Extended
     //
@@ -261,21 +285,48 @@ type HTTPCORSFilter struct {
     // Multiple method names in the value of the Access-Control-Allow-Methods 
     // response header are separated by a comma (",").
     //
+    // A CORS-safelisted method is a method that is `GET`, `HEAD`, or `POST`.
+    // (See https://fetch.spec.whatwg.org/#cors-safelisted-method)
+    // The CORS-safelisted methods are always allowed, regardless of whether 
+    // they are specified in the AllowMethods field.
+    //
+    // Input:
+    //   Access-Control-Request-Method: PUT
+    //
     // Config:
-    //   allowMethods: ["GET, PUT, POST, DELETE, PATCH, OPTIONS"]
-    // 
+    //   allowMethods: ["GET", "PUT", "POST", "DELETE", "PATCH", "OPTIONS"]
+    //
     // Output:
     //   Access-Control-Allow-Methods: GET, PUT, POST, DELETE, PATCH, OPTIONS
     //
-    // When responding to a credentialed requests, the gateway must specify 
-    // one or more HTTP methods in the value of the Access-Control-Allow-Methods 
-    // response header, instead of specifying the `*` wildcard.
+    // The Access-Control-Allow-Methods response header can only use `*` 
+    // wildcard as value when the field AllowCredentials is unspecified.
+    //
+    // Input:
+    //   Access-Control-Request-Method: PUT
     //
     // Config:
     //   allowMethods: ["*"]
     //
     // Output:
     //   Access-Control-Allow-Methods: *
+    //
+    // When the field AllowCredentials is specified, the gateway must specify 
+    // one HTTP method in the value of the Access-Control-Allow-Methods response 
+    // header, instead of specifying the `*` wildcard. The value of the header 
+    // Access-Control-Allow-Methods same as the Access-Control-Request-Method 
+    // header provided by the client.
+    //
+    // Input:
+    //   Access-Control-Request-Method: PUT
+    //
+    // Config:
+    //   allowMethods: ["*"]
+    //   allowCredentials: true
+    //
+    // Output:
+    //   Access-Control-Allow-Methods: PUT
+    //   Access-Control-Allow-Credentials: true
     //
     // Support: Extended
     //
@@ -293,18 +344,39 @@ type HTTPCORSFilter struct {
     //
     // Config:
     //   allowHeaders: ["DNT", "Keep-Alive", "User-Agent", "X-Requested-With", "If-Modified-Since", "Cache-Control", "Content-Type", "Range", "Authorization"]
+    //
     // Output:
     //   Access-Control-Allow-Headers: DNT, Keep-Alive, User-Agent, X-Requested-With, If-Modified-Since, Cache-Control, Content-Type, Range, Authorization
     //
     // A wildcard indicates that the requests with all HTTP headers are allowed.
-    // When responding to a credentialed requests, the gateway must specify 
-    // one or more HTTP headers in the value of the Access-Control-Allow-Headers 
-    // response header, instead of specifying the `*` wildcard.
+    // The Access-Control-Allow-Headers response header can only use `*` wildcard 
+    // as value when the field AllowCredentials is unspecified.
+    //
+    // Input:
+    //   Access-Control-Request-Headers: Content-Type, Cache-Control
     //
     // Config:
     //   allowHeaders: ["*"]
+    //
     // Output:
     //   Access-Control-Allow-Headers: *
+    //
+    // When the field AllowCredentials is specified, the gateway must specify 
+    // one or more HTTP headers in the value of the Access-Control-Allow-Headers 
+    // response header, instead of specifying the `*` wildcard. The value of the 
+    // header Access-Control-Allow-Headers same as the Access-Control-Request-Headers 
+    // header provided by the client.
+    //
+    // Input:
+    //   Access-Control-Request-Headers: Content-Type, Cache-Control
+    //
+    // Config:
+    //   allowHeaders: ["*"]
+    //   allowCredentials: true
+    //
+    // Output:
+    //   Access-Control-Allow-Headers: Content-Type, Cache-Control 
+    //   Access-Control-Allow-Credentials: true
     //
     // Support: Extended
     //
@@ -317,7 +389,7 @@ type HTTPCORSFilter struct {
     //
     // A CORS-safelisted response header is an HTTP header in a CORS response 
     // that it is considered safe to expose to the client scripts. 
-    // The CORS-safelisted response headers includes the following headers:
+    // The CORS-safelisted response headers include the following headers:
     // `Cache-Control`
     // `Content-Language`
     // `Content-Length`
@@ -337,18 +409,18 @@ type HTTPCORSFilter struct {
     // response header are separated by a comma (",").
     //
     // Config:
-    //   exposeHeaders: ["Content-Security-Policy"]
-    // Output:
-    //   Access-Control-Expose-Headers: Content-Security-Policy
+    //   exposeHeaders: ["Content-Security-Policy", "Content-Encoding"]
     //
-    // A wildcard indicates that the responses with all HTTP headers are 
-    // exposed to clients. When responding to a credentialed requests, 
-    // the gateway must specify one or more HTTP headers in the value of 
-    // the Access-Control-Expose-Headers response header, instead of 
-    // specifying the `*` wildcard.
+    // Output:
+    //   Access-Control-Expose-Headers: Content-Security-Policy, Content-Encoding
+    //
+    // A wildcard indicates that the responses with all HTTP headers are exposed 
+    // to clients. The Access-Control-Expose-Headers response header can only use 
+    // `*` wildcard as value when the field AllowCredentials is unspecified.
     //
     // Config:
     //   exposeHeaders: ["*"]
+    //
     // Output:
     //   Access-Control-Expose-Headers: *
     //
@@ -369,6 +441,7 @@ type HTTPCORSFilter struct {
     //
     // Config:
     //   maxAge: 1728000
+    //
     // Output:
     //   Access-Control-Max-Age: 1728000
     //
