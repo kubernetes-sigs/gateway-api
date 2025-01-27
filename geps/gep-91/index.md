@@ -37,7 +37,9 @@ This table highlights the support. Please feel free to add any missing implement
 
 * Introduce a `FrontendValidation` field of type `FrontendTLSValidation` within [GatewayTLSConfig][] that can be used to validate the peer (frontend) with which the TLS connection is being made.
 * Introduce a `caCertificateRefs` field within `FrontendTLSValidation` that can be used to specify a list of CA Certificates that can be used as a trust anchor to validate the certificates presented by the client.
-* This new field is mutually exclusive with the [BackendTLSPolicy][] configuation which is used to validate the TLS certificate presented by the backend peer on the connection between the Gateway and the backend, and this GEP is adding support for validating the TLS certificate presented by the frontend client on the connection between the Gateway and the frontend. Both these configurations can coexist at the same time without affecting one another.
+* This new field is separate from the existing [BackendTLSPolicy][] configuration. [BackendTLSPolicy][] controls TLS certificate validation for connections *from* the
+  Gateway to the backend service.  This proposal adds the ability to validate the TLS certificate presented by the *client* connecting to the Gateway (the
+  frontend). These two validation mechanisms operate independently and can be used simultaneously.
 * Also introduce a `ObjectReference` structure that can be used to specify `caCertificateRefs` references.
 
 #### GO
