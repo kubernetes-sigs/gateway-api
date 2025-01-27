@@ -17,14 +17,14 @@ The CORS protocol is the current specification to support secure cross-origin re
 A CORS request is an HTTP request that includes an `Origin` header. 
 An origin consists of three parts: the scheme, host and port. Two URLs have the same origin if they have the same scheme, host, and port.
 All of the following URLs have the same origin.
-```
+```text
    http://example.com/
    http://example.com:80/
    http://example.com/path/file
 ```
 
 Each of the following URLs has a different origin from the others.
-```
+```text
    http://example.com/
    http://example.com:8080/
    http://www.example.com/
