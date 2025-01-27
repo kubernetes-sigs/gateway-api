@@ -361,7 +361,7 @@ type HTTPCORSFilter struct {
     //
     // Header names are not case sensitive.
     //
-    // Multiple header names in the value of the Access-Control-Allow-Headers 
+    // Multiple header names in the value of the `Access-Control-Allow-Headers` 
     // response header are separated by a comma (",").
     //
     // When the `AllowHeaders` field is configured with one or more headers, 
@@ -476,8 +476,8 @@ type HTTPCORSFilter struct {
     // the results of a "preflight" request.
     //
     // The information provided by the `Access-Control-Allow-Methods` and 
-    // `Access-Control-Allow-Headers` headers can be cached by the client 
-    // until the time specified by `Access-Control-Max-Age` elapses.
+    // `Access-Control-Allow-Headers` response headers can be cached by the 
+    // client until the time specified by `Access-Control-Max-Age` elapses.
     //
     // The default value of `Access-Control-Max-Age` response header is 
     // 5 (seconds). 
