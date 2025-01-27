@@ -17,11 +17,14 @@ The CORS protocol is the current specification to support secure cross-origin re
 A CORS request is an HTTP request that includes an `Origin` header. 
 An origin consists of three parts: the scheme, host and port. Two URLs have the same origin if they have the same scheme, host, and port.
 All of the following URLs have the same origin.
+```
    http://example.com/
    http://example.com:80/
    http://example.com/path/file
+```
 
 Each of the following URLs has a different origin from the others.
+```
    http://example.com/
    http://example.com:8080/
    http://www.example.com/
@@ -29,6 +32,7 @@ Each of the following URLs has a different origin from the others.
    https://example.com/
    http://example.org/
    http://ietf.org/
+```
 
 Before the actual cross-origin requests, clients will initiate an extra "preflight" request to determine whether the server will permit the actual requests. 
 The CORS "preflight" request uses `OPTIONS` as method and includes the following headers:
@@ -121,7 +125,7 @@ Access-Control-Expose-Headers: Content-Security-Policy
 
 ## API
 This GEP proposes to add a new field `HTTPCORSFilter` to `HTTPRouteFilter`.
-If HTTPCORSFilter is set, then the gateway will generate the response of the "preflight" requests and send back it to the client directly.
+If `HTTPCORSFilter` is set, then the gateway will generate the response of the "preflight" requests and send back it to the client directly.
 For the actual cross-origin request, the gateway will add CORS headers to the response before it is sent to the client.
 
 ```golang
@@ -229,11 +233,12 @@ type HTTPCORSFilter struct {
     // Output:
     //   Access-Control-Allow-Origin: *
     //
-    // When the `AllowCredentials` field is specified, the gateway must return 
-    // a single origin in the value of the `Access-Control-Allow-Origin` response 
-    // header, instead of specifying the `*` wildcard. The value of the header 
-    // `Access-Control-Allow-Origin` is same as the `Origin` header provided by the 
-    // client.
+    // When the `AllowCredentials` field is specified and `AllowOrigins` 
+    // field specified with the `*` wildcard, the gateway must return a 
+    // single origin in the value of the `Access-Control-Allow-Origin` 
+    // response header, instead of specifying the `*` wildcard. The value 
+    // of the header `Access-Control-Allow-Origin` is same as the `Origin` 
+    // header provided by the client.
     //
     // Input:
     //   Origin: https://foo.example
