@@ -128,6 +128,7 @@ nav:
       - geps/gep-1867/index.md
       - geps/gep-2648/index.md
       - geps/gep-2649/index.md
+      - geps/gep-3388/index.md
     - Implementable:
       - geps/gep-3155/index.md
     - Experimental:
