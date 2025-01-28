@@ -101,7 +101,6 @@ TODO
 
 ## Other considerations
 
-* Is it worth allowing the budget to be expressed as a `Fraction` similar to `HTTPRequestMirrorFilter` as described in [GEP-3171](https://gateway-api.sigs.k8s.io/geps/gep-3171/), or is a percentage sufficient for this use case? (Expressing a sub-1% budget for retries seems less necessary than for mirroring or redirecting traffic at significant scale.)
 * As there isn't anything inherently specific to HTTP requests in either known implementation, a retry budget policy on a target Service could likely be applicable to GRPCRoute as well as HTTPRoute requests.
 * While retry budgets are commonly associated with service mesh uses cases to handle many distributed clients, a retry budget policy may also be desirable for north/south implementations of Gateway API to prioritize new inbound requests and minimize tail latency during periods of service instability.
 
