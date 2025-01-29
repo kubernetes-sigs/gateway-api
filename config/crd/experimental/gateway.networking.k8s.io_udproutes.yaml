@@ -51,7 +51,7 @@ spec:
             description: Spec defines the desired state of UDPRoute.
             properties:
               parentRefs:
-                description: |+
+                description: |-
                   ParentRefs references the resources (usually Gateways) that a Route wants
                   to be attached to. Note that the referenced parent resource needs to
                   allow this for the attachment to be complete. For Gateways, that means
@@ -113,11 +113,6 @@ spec:
                   connections originating from the same namespace as the Route, for which
                   the intended destination of the connections are a Service targeted as a
                   ParentRef of the Route.
-
-
-
-
-
                 items:
                   description: |-
                     ParentReference identifies an API object (usually a Gateway) that can be considered
@@ -291,9 +286,7 @@ spec:
                     || p2.port == 0)) || (has(p1.port) && has(p2.port) && p1.port
                     == p2.port))))
               rules:
-                description: |+
-                  Rules are a list of UDP matchers and actions.
-
+                description: Rules are a list of UDP matchers and actions.
                 items:
                   description: UDPRouteRule is the configuration for a given rule.
                   properties:
@@ -323,7 +316,6 @@ spec:
                           namespace's owner to accept the reference. See the ReferenceGrant
                           documentation for details.
 
-                          <gateway:experimental:description>
 
                           When the BackendRef points to a Kubernetes Service, implementations SHOULD
                           honor the appProtocol field if it is set for the target Service Port.
@@ -339,7 +331,6 @@ spec:
                           protocol then the backend is considered invalid. Implementations MUST set the
                           "ResolvedRefs" condition to "False" with the "UnsupportedProtocol" reason.
 
-                          </gateway:experimental:description>
 
                           Note that when the BackendTLSPolicy object is enabled by the implementation,
                           there are some extra rules about validity to consider here. See the fields

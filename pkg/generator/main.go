@@ -206,51 +206,64 @@ func gatewayTweaks(channel string, props map[string]apiext.JSONSchemaProps) map[
 				})
 			}
 		}
-		startTag := "<gateway:experimental:description>"
-		endTag := "</gateway:experimental:description>"
-		regexPattern := regexp.QuoteMeta(startTag) + `(?s:(.*?))` + regexp.QuoteMeta(endTag)
-		if channel == "standard" && strings.Contains(jsonProps.Description, "<gateway:experimental:description>") {
-			re := regexp.MustCompile(regexPattern)
-			match := re.FindStringSubmatch(jsonProps.Description)
-			if len(match) != 2 {
-				log.Fatalf("Invalid <gateway:experimental:description> tag for %s", name)
-			}
-			modifiedDescription := re.ReplaceAllString(jsonProps.Description, "")
-			jsonProps.Description = modifiedDescription
-		} else {
-			jsonProps.Description = strings.ReplaceAll(jsonProps.Description, startTag, "")
-			jsonProps.Description = strings.ReplaceAll(jsonProps.Description, endTag, "")
-		}
-
-		// Comments within "gateway:util:excludeFromCRD" tag is not included in the generated CRD and all trailing \n operators before
-		// and after the tags are removed and replaced with three \n operators.
-		startTag = "<gateway:util:excludeFromCRD>"
-		endTag = "</gateway:util:excludeFromCRD>"
-		regexPattern = `\n*` + regexp.QuoteMeta(startTag) + `(?s:(.*?))` + regexp.QuoteMeta(endTag) + `\n*`
-		if strings.Contains(jsonProps.Description, "<gateway:util:excludeFromCRD>") {
-			re := regexp.MustCompile(regexPattern)
-			match := re.FindStringSubmatch(jsonProps.Description)
-			if len(match) != 2 {
-				log.Fatalf("Invalid <gateway:util:excludeFromCRD> tag for %s", name)
-			}
-			modifiedDescription := re.ReplaceAllString(jsonProps.Description, "\n\n\n")
-			jsonProps.Description = modifiedDescription
-		}
 
 		if numValid < numExpressions {
 			fmt.Printf("Description: %s\n", jsonProps.Description)
 			log.Fatalf("Found %d Gateway validation expressions, but only %d were valid", numExpressions, numValid)
 		}
 
-		gatewayRe := regexp.MustCompile(`<gateway:.*>`)
-		jsonProps.Description = gatewayRe.ReplaceAllLiteralString(jsonProps.Description, "")
+		jsonProps.Description = formatDescription(jsonProps.Description, channel, name)
 
 		if len(jsonProps.Properties) > 0 {
 			jsonProps.Properties = gatewayTweaks(channel, jsonProps.Properties)
 		} else if jsonProps.Items != nil && jsonProps.Items.Schema != nil {
+			jsonProps.Items.Schema.Description = formatDescription(jsonProps.Items.Schema.Description, channel, name)
 			jsonProps.Items.Schema.Properties = gatewayTweaks(channel, jsonProps.Items.Schema.Properties)
 		}
+
 		props[name] = jsonProps
 	}
 	return props
+}
+
+func formatDescription(description string, channel string, name string) string {
+	startTag := "<gateway:experimental:description>"
+	endTag := "</gateway:experimental:description>"
+	if channel == "standard" && strings.Contains(description, "<gateway:experimental:description>") {
+		regexPattern := `\n*` + regexp.QuoteMeta(startTag) + `(?s:(.*?))` + regexp.QuoteMeta(endTag) + `\n*`
+		re := regexp.MustCompile(regexPattern)
+		match := re.FindStringSubmatch(description)
+		if len(match) != 2 {
+			log.Fatalf("Invalid <gateway:experimental:description> tag for %s", name)
+		}
+		description = re.ReplaceAllString(description, "\n\n")
+	} else {
+		description = strings.ReplaceAll(description, startTag, "")
+		description = strings.ReplaceAll(description, endTag, "")
+	}
+
+	// Comments within "gateway:util:excludeFromCRD" tag is not included in the generated CRD and all trailing \n operators before
+	// and after the tags are removed and replaced with three \n operators.
+	startTag = "<gateway:util:excludeFromCRD>"
+	endTag = "</gateway:util:excludeFromCRD>"
+	if strings.Contains(description, "<gateway:util:excludeFromCRD>") {
+		regexPattern := `\n*` + regexp.QuoteMeta(startTag) + `(?s:(.*?))` + regexp.QuoteMeta(endTag) + `\n*`
+		re := regexp.MustCompile(regexPattern)
+		match := re.FindStringSubmatch(description)
+		if len(match) != 2 {
+			log.Fatalf("Invalid <gateway:util:excludeFromCRD> tag for %s", name)
+		}
+		description = re.ReplaceAllString(description, "\n\n\n")
+	}
+
+	gatewayRe := regexp.MustCompile(`<gateway:.*>`)
+	description = gatewayRe.ReplaceAllLiteralString(description, "")
+
+	// Remove any extra \n (more than 3 and all trailing at the end)
+	regexPattern := `\n\n\n+`
+	re := regexp.MustCompile(regexPattern)
+	description = re.ReplaceAllString(description, "\n\n\n")
+	description = strings.Trim(description, "\n")
+
+	return description
 }

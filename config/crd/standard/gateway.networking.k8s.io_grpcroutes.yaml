@@ -152,7 +152,7 @@ spec:
                 maxItems: 16
                 type: array
               parentRefs:
-                description: |+
+                description: |-
                   ParentRefs references the resources (usually Gateways) that a Route wants
                   to be attached to. Note that the referenced parent resource needs to
                   allow this for the attachment to be complete. For Gateways, that means
@@ -203,12 +203,6 @@ spec:
                   allowed by something in the namespace they are referring to. For example,
                   Gateway has the AllowedRoutes field, and ReferenceGrant provides a
                   generic way to enable other kinds of cross-namespace reference.
-
-
-
-
-
-
                 items:
                   description: |-
                     ParentReference identifies an API object (usually a Gateway) that can be considered
@@ -270,8 +264,6 @@ spec:
                         Gateway has the AllowedRoutes field, and ReferenceGrant provides a
                         generic way to enable any other kind of cross-namespace reference.
 
-
-
                         Support: Core
                       maxLength: 63
                       minLength: 1
@@ -289,8 +281,6 @@ spec:
                         as opposed to a listener(s) whose port(s) may be changed. When both Port
                         and SectionName are specified, the name and port of the selected listener
                         must match both specified values.
-
-
 
                         Implementations MAY choose to support other parent resources.
                         Implementations supporting other types of parent resources MUST clearly
@@ -365,9 +355,7 @@ spec:
                     == '')) || (has(p1.sectionName) && has(p2.sectionName) && p1.sectionName
                     == p2.sectionName))))
               rules:
-                description: |+
-                  Rules are a list of GRPC matchers, filters and actions.
-
+                description: Rules are a list of GRPC matchers, filters and actions.
                 items:
                   description: |-
                     GRPCRouteRule defines the semantics for matching a gRPC request based on
@@ -412,24 +400,6 @@ spec:
                           ReferenceGrant object is required in the referent namespace to allow that
                           namespace's owner to accept the reference. See the ReferenceGrant
                           documentation for details.
-
-                          <gateway:experimental:description>
-
-                          When the BackendRef points to a Kubernetes Service, implementations SHOULD
-                          honor the appProtocol field if it is set for the target Service Port.
-
-                          Implementations supporting appProtocol SHOULD recognize the Kubernetes
-                          Standard Application Protocols defined in KEP-3726.
-
-                          If a Service appProtocol isn't specified, an implementation MAY infer the
-                          backend protocol through its own means. Implementations MAY infer the
-                          protocol from the Route type referring to the backend Service.
-
-                          If a Route is not able to send traffic to the backend using the specified
-                          protocol then the backend is considered invalid. Implementations MUST set the
-                          "ResolvedRefs" condition to "False" with the "UnsupportedProtocol" reason.
-
-                          </gateway:experimental:description>
                         properties:
                           filters:
                             description: |-
@@ -618,7 +588,7 @@ spec:
                                       x-kubernetes-list-type: map
                                   type: object
                                 requestMirror:
-                                  description: |+
+                                  description: |-
                                     RequestMirror defines a schema for a filter that mirrors requests.
                                     Requests are sent to the specified destination, but responses from
                                     that destination are ignored.
@@ -628,7 +598,6 @@ spec:
                                     backends.
 
                                     Support: Extended
-
                                   properties:
                                     backendRef:
                                       description: |-
@@ -862,7 +831,7 @@ spec:
                                       x-kubernetes-list-type: map
                                   type: object
                                 type:
-                                  description: |+
+                                  description: |-
                                     Type identifies the type of filter to apply. As with other API fields,
                                     types are classified into three conformance levels:
 
@@ -887,7 +856,6 @@ spec:
                                     If a reference to a custom filter type cannot be resolved, the filter
                                     MUST NOT be skipped. Instead, requests that would have been processed by
                                     that filter MUST receive a HTTP error response.
-
                                   enum:
                                   - ResponseHeaderModifier
                                   - RequestHeaderModifier
@@ -1229,7 +1197,7 @@ spec:
                                 x-kubernetes-list-type: map
                             type: object
                           requestMirror:
-                            description: |+
+                            description: |-
                               RequestMirror defines a schema for a filter that mirrors requests.
                               Requests are sent to the specified destination, but responses from
                               that destination are ignored.
@@ -1239,7 +1207,6 @@ spec:
                               backends.
 
                               Support: Extended
-
                             properties:
                               backendRef:
                                 description: |-
@@ -1471,7 +1438,7 @@ spec:
                                 x-kubernetes-list-type: map
                             type: object
                           type:
-                            description: |+
+                            description: |-
                               Type identifies the type of filter to apply. As with other API fields,
                               types are classified into three conformance levels:
 
@@ -1496,7 +1463,6 @@ spec:
                               If a reference to a custom filter type cannot be resolved, the filter
                               MUST NOT be skipped. Instead, requests that would have been processed by
                               that filter MUST receive a HTTP error response.
-
                             enum:
                             - ResponseHeaderModifier
                             - RequestHeaderModifier
@@ -1915,8 +1881,6 @@ spec:
                             Gateway has the AllowedRoutes field, and ReferenceGrant provides a
                             generic way to enable any other kind of cross-namespace reference.
 
-
-
                             Support: Core
                           maxLength: 63
                           minLength: 1
@@ -1934,8 +1898,6 @@ spec:
                             as opposed to a listener(s) whose port(s) may be changed. When both Port
                             and SectionName are specified, the name and port of the selected listener
                             must match both specified values.
-
-
 
                             Implementations MAY choose to support other parent resources.
                             Implementations supporting other types of parent resources MUST clearly
