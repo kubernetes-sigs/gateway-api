@@ -47,7 +47,7 @@ The feature will be part of the experimental channel, which implementations can 
 
 ## API
 
-This proposal introduces a new `ListenerSet` resource that has the ability to attach to a set of listeners to multiple parent `Gateways`.
+This proposal introduces a new `ListenerSet` resource that has the ability to attach a set of listeners to multiple parent `Gateways`.
 
 ### Go
 
@@ -60,6 +60,7 @@ type GatewaySpec struct {
 }
 
 type AllowedListeners struct {
+	// TODO - discuss changing this to Same in the future
 	// +kubebuilder:default={from: None}
 	Namespaces *ListenerNamespaces `json:"namespaces,omitempty"`
 }
