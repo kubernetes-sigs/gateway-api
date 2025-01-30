@@ -38,6 +38,8 @@ the content into the GEP as online documents are easier to lose
 
 #### Feature Names
 
+(Does it require seperate feature name for mesh? Please add it if necessary)
+
 Every feature should:
 
 1. Start with the resource name. i.e HTTPRouteXXX
@@ -53,6 +55,8 @@ For example for `HTTPRoutePortRedirect` - the test file would be `httproute-port
 Treat this guidance as "best effort" because we might have test files that check the combination of several features and can't follow the same format.
 
 In any case, the conformance tests file names should be meaningful and easy to understand.
+
+(MAKE sure to also include conformance tests that covers mesh)
 
 ## Alternatives
 
