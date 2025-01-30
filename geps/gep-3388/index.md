@@ -1,7 +1,7 @@
 # GEP-3388: Retry Budgets
 
 * Issue: [#3388](https://github.com/kubernetes-sigs/gateway-api/issues/3388)
-* Status: Provisional
+* Status: Implementable
 
 (See status definitions [here](/geps/overview/#gep-states).)
 
@@ -29,7 +29,7 @@ Multiple data plane proxies offer optional configuration for budgeted retries, i
 
 Configuring a limit for client retries is an important factor in building a resilient system, allowing requests to be successfully retried during periods of intermittent failure. But too many client-side retries can also exacerbate consistent failures and slow down recovery, quickly overwhelming a failing system and leading to cascading failures such as retry storms. Configuring a sane limit for max client-side retries is often challenging in complex systems. Allowing an application developer (Ana) to configure a dynamic "retry budget" reduces the risk of a high number of retries across clients. It allows a service to perform as expected in both times of high & low request load, as well as both during periods of intermittent & consistent failures.
 
-While retry budget configuration has been a frequently discussed feature within the community, differences in the semantics between data plane implementations creates a challenge for a consensus on the correct location for the configuration. This proposal aims to determine where retry budget's should be defined within the Gateway API, and whether data plane proxies may need to be altered to accommodate the specification. 
+While retry budget configuration has been a frequently discussed feature within the community, differences in the semantics between data plane implementations creates a challenge for a consensus on the correct location for the configuration. This proposal aims to determine where retry budget's should be defined within the Gateway API, and whether data plane proxies may need to be altered to accommodate the specification.
 
 ### Background on implementations
 
@@ -85,7 +85,112 @@ TODO
 
 ### YAML
 
-TODO
+```yaml
+apiVersion: gateway.networking.x-k8s.io/v1alpha1
+kind: RetryPolicy
+metadata:
+  name: retry-policy-example
+spec:
+  targetRefs:
+    - group: ""
+      kind: Service
+      name: foo
+  from:
+    - kind: Mesh
+      namespace: istio-system
+      name: istio
+    - kind: Gateway
+      name: foo-ingress
+  codes:
+  - 500
+  - 502
+  - 503
+  - 504
+  attempts: 2
+  backoff: 100ms
+  budgetPercent: 20
+  budgetInterval: 10s
+  minRetryRate:
+    count: 3
+    interval: 1s
+status:
+  ancestors:
+  - ancestorRef:
+      kind: Mesh
+      namespace: istio-system
+      name: istio
+    controllerName: "istio.io/mesh-controller"
+    conditions:
+    - type: "Accepted"
+      status: "True"
+      reason: "Accepted"
+  - ancestorRef:
+      kind: Gateway
+      namespace: foo-ns
+      name: foo-ingress
+    controllerName: "istio.io/mesh-controller"
+    conditions:
+    - type: "Accepted"
+      status: "False"
+      reason: "Invalid"
+      message: "RetryPolicy fields budgetPercentage, budgetInterval and minRetryRate are not supported for Istio ingress gateways."
+```
+
+```yaml
+apiVersion: gateway.networking.x-k8s.io/v1alpha1
+kind: BackendTrafficPolicy
+metadata:
+  name: traffic-policy-example
+spec:
+  targetRefs:
+    - group: ""
+      kind: Service
+      name: foo
+  from:
+    - kind: Mesh
+      namespace: istio-system
+      name: istio
+    - kind: Gateway
+      name: foo-ingress
+  retry:
+    codes:
+    - 500
+    - 502
+    - 503
+    - 504
+    attempts: 2
+    backoff: 100ms
+    budgetPercent: 20
+    budgetInterval: 10s
+    minRetryRate:
+      count: 3
+      interval: 1s
+  sessionPersistence:
+    ...
+  status:
+    ancestors:
+    - ancestorRef:
+        kind: Mesh
+        namespace: istio-system
+        name: istio
+      controllerName: "istio.io/mesh-controller"
+      conditions:
+      - type: "Accepted"
+        status: "False"
+        reason: "Invalid"
+        message: "BackendTrafficPolicy field sessionPersistence is not supported for Istio mesh traffic."
+    - ancestorRef:
+        kind: Gateway
+        namespace: foo-ns
+        name: foo-ingress
+      controllerName: "istio.io/mesh-controller"
+      conditions:
+      - type: "Accepted"
+        status: "False"
+        reason: "Invalid"
+        message: "BackendTrafficPolicy fields retry.budgetPercentage, retry.budgetInterval and retry.minRetryRate are not supported for Istio ingress gateways."
+    ...
+```
 
 ## Conformance Details
 
