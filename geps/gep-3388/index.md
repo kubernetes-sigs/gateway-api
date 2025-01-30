@@ -1,7 +1,7 @@
 # GEP-3388: Retry Budgets
 
 * Issue: [#3388](https://github.com/kubernetes-sigs/gateway-api/issues/3388)
-* Status: Provisional
+* Status: Implementable
 
 (See status definitions [here](/geps/overview/#gep-states).)
 
@@ -29,7 +29,7 @@ Multiple data plane proxies offer optional configuration for budgeted retries, i
 
 Configuring a limit for client retries is an important factor in building a resilient system, allowing requests to be successfully retried during periods of intermittent failure. But too many client-side retries can also exacerbate consistent failures and slow down recovery, quickly overwhelming a failing system and leading to cascading failures such as retry storms. Configuring a sane limit for max client-side retries is often challenging in complex systems. Allowing an application developer (Ana) to configure a dynamic "retry budget" reduces the risk of a high number of retries across clients. It allows a service to perform as expected in both times of high & low request load, as well as both during periods of intermittent & consistent failures.
 
-While retry budget configuration has been a frequently discussed feature within the community, differences in the semantics between data plane implementations creates a challenge for a consensus on the correct location for the configuration. This proposal aims to determine where retry budget's should be defined within the Gateway API, and whether data plane proxies may need to be altered to accommodate the specification. 
+While retry budget configuration has been a frequently discussed feature within the community, differences in the semantics between data plane implementations creates a challenge for a consensus on the correct location for the configuration. This proposal aims to determine where retry budget's should be defined within the Gateway API, and whether data plane proxies may need to be altered to accommodate the specification.
 
 ### Background on implementations
 
@@ -79,13 +79,265 @@ The implementation of a version of Linkerd's `ttl` parameter within Envoy might 
 
 ## API
 
+Two possible API designs are provided below, likely only one should be selected for implementation.
+
 ### Go
 
-TODO
+```golang
+type RetryPolicy struct {
+    // RetryPolicy defines the configuration for when to retry a request to a target backend.
+    // Implementations SHOULD retry on connection errors (disconnect, reset, timeout,
+    // TCP failure) if a retry stanza is configured.
+    //
+    // Support: Extended
+    //
+    // +optional
+    // <gateway:experimental>
+    //
+    // Note: there is no Override or Default policy configuration.
+
+    metav1.TypeMeta   `json:",inline"`
+    metav1.ObjectMeta `json:"metadata,omitempty"`
+
+    // Spec defines the desired state of BackendLBPolicy.
+    Spec RetryPolicySpec `json:"spec"`
+
+    // Status defines the current state of BackendLBPolicy.
+    Status PolicyStatus `json:"status,omitempty"`
+}
+
+type RetryPolicySpec struct {
+  // TargetRef identifies an API object to apply policy to.
+  // Currently, Backends (i.e. Service, ServiceImport, or any
+  // implementation-specific backendRef) are the only valid API
+  // target references.
+  // +listType=map
+  // +listMapKey=group
+  // +listMapKey=kind
+  // +listMapKey=name
+  // +kubebuilder:validation:MinItems=1
+  // +kubebuilder:validation:MaxItems=16
+  TargetRefs []LocalPolicyTargetReference `json:"targetRefs"`
+
+  // TODO: This captures the basic idea, but should likely be a new type.
+  From []ReferenceGrantFrom `json:"from,omitempty"`
+
+  CommonRetryPolicy `json:",inline"`
+}
+
+type BackendTrafficPolicy struct {
+    // BackendTrafficPolicy defines the configuration for how traffic to a target backend should be handled.
+    //
+    // Support: Extended
+    //
+    // +optional
+    // <gateway:experimental>
+    //
+    // Note: there is no Override or Default policy configuration.
+
+    metav1.TypeMeta   `json:",inline"`
+    metav1.ObjectMeta `json:"metadata,omitempty"`
+
+    // Spec defines the desired state of BackendTrafficPolicy.
+    Spec BackendTrafficPolicySpec `json:"spec"`
+    
+    // Status defines the current state of BackendTrafficPolicy.
+    Status PolicyStatus `json:"status,omitempty"`
+}
+
+type BackendTrafficPolicySpec struct {
+  // TargetRef identifies an API object to apply policy to.
+  // Currently, Backends (i.e. Service, ServiceImport, or any
+  // implementation-specific backendRef) are the only valid API
+  // target references.
+  // +listType=map
+  // +listMapKey=group
+  // +listMapKey=kind
+  // +listMapKey=name
+  // +kubebuilder:validation:MinItems=1
+  // +kubebuilder:validation:MaxItems=16
+  TargetRefs []LocalPolicyTargetReference `json:"targetRefs"`
+
+  // TODO: This captures the basic idea, but should likely be a new type.
+  From []ReferenceGrantFrom `json:"from,omitempty"`
+
+  // Retry defines the configuration for when to retry a request to a target backend.
+  //
+  // Implementations SHOULD retry on connection errors (disconnect, reset, timeout,
+  // TCP failure) if a retry stanza is configured.
+  //
+  // Support: Extended
+  //
+  // +optional
+  // <gateway:experimental>
+  Retry *CommonRetryPolicy `json:"retry,omitempty"`
+
+  // SessionPersistence defines and configures session persistence
+  // for the backend.
+  //
+  // Support: Extended
+  //
+  // +optional
+  SessionPersistence *SessionPersistence `json:"sessionPersistence,omitempty"`
+}
+
+// CommonRetryPolicy defines the configuration for when to retry a request.
+//
+type CommonRetryPolicy struct {
+    // TODO: Does it make sense to include this configuration in the policy or not?
+    //
+    // Support: Extended
+    //
+    // +optional
+    HTTP *HTTPRouteRetry `json:"http,omitempty"`
+
+    // Support: Extended
+    //
+    // +optional
+    BudgetPercent *Int `json:"budgetPercent,omitempty"`
+
+    // Support: Extended
+    //
+    // +optional
+    BudgetInterval *Duration `json:"budgetInterval,omitempty"`
+
+    // Support: Extended
+    //
+    // +optional
+    minRetryRate *RequestRate `json:"retryRate,omitempty"`
+}
+
+// RequestRate expresses a rate of requests over a given period of time.
+//
+type RequestRate struct {
+    // Support: Extended
+    //
+    // +optional
+    Count *Int `json:"count,omitempty"`
+
+    // Support: Extended
+    //
+    // +optional
+    Interval *Duration `json:"interval,omitempty"`
+}
+
+// Duration is a string value representing a duration in time. The foramat is
+// as specified in GEP-2257, a strict subset of the syntax parsed by Golang
+// time.ParseDuration.
+//
+// +kubebuilder:validation:Pattern=`^([0-9]{1,5}(h|m|s|ms)){1,4}$`
+type Duration string
 
 ### YAML
 
-TODO
+```yaml
+apiVersion: gateway.networking.x-k8s.io/v1alpha1
+kind: RetryPolicy
+metadata:
+  name: retry-policy-example
+spec:
+  targetRefs:
+    - group: ""
+      kind: Service
+      name: foo
+  from:
+    - kind: Mesh
+      namespace: istio-system
+      name: istio
+    - kind: Gateway
+      name: foo-ingress
+  http:
+    codes:
+    - 500
+    - 502
+    - 503
+    - 504
+    attempts: 2
+    backoff: 100ms
+  budgetPercent: 20
+  budgetInterval: 10s
+  minRetryRate:
+    count: 3
+    interval: 1s
+status:
+  ancestors:
+  - ancestorRef:
+      kind: Mesh
+      namespace: istio-system
+      name: istio
+    controllerName: "istio.io/mesh-controller"
+    conditions:
+    - type: "Accepted"
+      status: "True"
+      reason: "Accepted"
+  - ancestorRef:
+      kind: Gateway
+      namespace: foo-ns
+      name: foo-ingress
+    controllerName: "istio.io/mesh-controller"
+    conditions:
+    - type: "Accepted"
+      status: "False"
+      reason: "Invalid"
+      message: "RetryPolicy fields budgetPercentage, budgetInterval and minRetryRate are not supported for Istio ingress gateways."
+```
+
+```yaml
+apiVersion: gateway.networking.x-k8s.io/v1alpha1
+kind: BackendTrafficPolicy
+metadata:
+  name: traffic-policy-example
+spec:
+  targetRefs:
+    - group: ""
+      kind: Service
+      name: foo
+  from:
+    - kind: Mesh
+      namespace: istio-system
+      name: istio
+    - kind: Gateway
+      name: foo-ingress
+  retry:
+    http:
+      codes:
+      - 500
+      - 502
+      - 503
+      - 504
+      attempts: 2
+      backoff: 100ms
+    budgetPercent: 20
+    budgetInterval: 10s
+    minRetryRate:
+      count: 3
+      interval: 1s
+  sessionPersistence:
+    ...
+  status:
+    ancestors:
+    - ancestorRef:
+        kind: Mesh
+        namespace: istio-system
+        name: istio
+      controllerName: "istio.io/mesh-controller"
+      conditions:
+      - type: "Accepted"
+        status: "False"
+        reason: "Invalid"
+        message: "BackendTrafficPolicy field sessionPersistence is not supported for Istio mesh traffic."
+    - ancestorRef:
+        kind: Gateway
+        namespace: foo-ns
+        name: foo-ingress
+      controllerName: "istio.io/mesh-controller"
+      conditions:
+      - type: "Accepted"
+        status: "False"
+        reason: "Invalid"
+        message: "BackendTrafficPolicy fields retry.budgetPercentage, retry.budgetInterval and retry.minRetryRate are not supported for Istio ingress gateways."
+    ...
+```
 
 ## Conformance Details
 
