@@ -204,7 +204,7 @@ type CommonRetryPolicy struct {
     // Support: Extended
     //
     // +optional
-    minRetryRate *RequestRate `json:"retryRate,omitempty"`
+    MinRetryRate *RequestRate `json:"minRetryRate,omitempty"`
 }
 
 // RequestRate expresses a rate of requests over a given period of time.
@@ -221,7 +221,7 @@ type RequestRate struct {
     Interval *Duration `json:"interval,omitempty"`
 }
 
-// Duration is a string value representing a duration in time. The foramat is
+// Duration is a string value representing a duration in time. The format is
 // as specified in GEP-2257, a strict subset of the syntax parsed by Golang
 // time.ParseDuration.
 //
