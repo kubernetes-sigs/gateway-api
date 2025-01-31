@@ -788,6 +788,11 @@ type GatewayInfrastructure struct {
 	// the merging behavior is implementation specific.
 	// It is generally recommended that GatewayClass provides defaults that can be overridden by a Gateway.
 	//
+	// If the referent cannot be found, refers to an unsupported kind, or when
+	// the data within that resource is malformed, the Gateway SHOULD be
+	// rejected with the "Accepted" status condition set to "False" and an
+	// "InvalidParameters" reason.
+	//
 	// Support: Implementation-specific
 	//
 	// +optional

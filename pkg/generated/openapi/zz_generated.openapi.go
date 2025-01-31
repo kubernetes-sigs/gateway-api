@@ -3853,7 +3853,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewayInfrastructure(ref common.Refer
 					},
 					"parametersRef": {
 						SchemaProps: spec.SchemaProps{
-							Description: "ParametersRef is a reference to a resource that contains the configuration parameters corresponding to the Gateway. This is optional if the controller does not require any additional configuration.\n\nThis follows the same semantics as GatewayClass's `parametersRef`, but on a per-Gateway basis\n\nThe Gateway's GatewayClass may provide its own `parametersRef`. When both are specified, the merging behavior is implementation specific. It is generally recommended that GatewayClass provides defaults that can be overridden by a Gateway.\n\nSupport: Implementation-specific",
+							Description: "ParametersRef is a reference to a resource that contains the configuration parameters corresponding to the Gateway. This is optional if the controller does not require any additional configuration.\n\nThis follows the same semantics as GatewayClass's `parametersRef`, but on a per-Gateway basis\n\nThe Gateway's GatewayClass may provide its own `parametersRef`. When both are specified, the merging behavior is implementation specific. It is generally recommended that GatewayClass provides defaults that can be overridden by a Gateway.\n\nIf the referent cannot be found, refers to an unsupported kind, or when the data within that resource is malformed, the Gateway SHOULD be rejected with the \"Accepted\" status condition set to \"False\" and an \"InvalidParameters\" reason.\n\nSupport: Implementation-specific",
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.LocalParametersReference"),
 						},
 					},
