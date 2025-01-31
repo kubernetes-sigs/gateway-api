@@ -82,7 +82,7 @@ TLS can be configured with two distinct modes:
  unless a new TLS connection between the two entities is configured via BackendTLSPolicy.
 * **Passthrough**: the TLS connection is instantiated between the frontend and the
   backend. The traffic flows through the Gateway encrypted, and the Gateway is not
-  able to decrypt or inspect the TLS stream.
+  able to decrypt or inspect the encrypted portions of the TLS stream.
 
 ## Proposed Segments
 Note that this does not represent any form of commitment that any of these
@@ -272,4 +272,4 @@ The following is a summary of all the Routes and the TLS termination mode they s
 > When the traffic is routed to the backend via `TCPRoute`, the packets
 > are left untouched by the gateway. In order to terminate the TLS connection to
 > the gateway and forward the traffic unencrypted to the backend, a `TLSRoute` configured
-> with `Terminate` as TLS mode has to be used.
+> with `Terminate` as TLS mode must be used.
