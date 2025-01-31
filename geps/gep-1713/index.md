@@ -93,10 +93,8 @@ type ListenerSet struct {
 
 // ListenerSetSpec defines the desired state of a ListenerSet.
 type ListenerSetSpec struct {
-	// ParentRefs references the Gateway that the listeners are attached to.
-	//
-	// +kubebuilder:validation:MaxItems=2
-	ParentRefs []ParentGatewayReference `json:"parentRefs,omitempty"`
+	// ParentRef references the Gateway that the listeners are attached to.
+	ParentRef ParentGatewayReference `json:"parentRef,omitempty"`
 
 	// Listeners associated with this ListenerSet. Listeners define
 	// logical endpoints that are bound on this referenced parent Gateway's addresses.
@@ -114,7 +112,8 @@ type ListenerSetSpec struct {
 	// +listMapKey=name
 	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:MaxItems=64
-	Listeners []ListenerEntry
+	Listeners []ListenerEntry `json:"listeners"`
+
 }
 // ListenerEntry embodies the concept of a logical endpoint where a Gateway accepts
 // network connections.
@@ -219,24 +218,6 @@ type ListenerEntry struct {
 
 // ListenerSetStatus defines the observed state of a ListenerSet
 type ListenerSetStatus struct {
-	// Parents is a list of parent resources (usually Gateways) that are
-	// associated with the ListenerSet, and the status of the ListenerSet with respect to
-	// each parent. When this ListenerSet attaches to a parent, the controller that
-	// manages the parent must add an entry to this list when the controller
-	// first sees the ListenerSet and should update the entry as appropriate when the
-	// ListenerSet or gateway is modified.
-	//
-	// +kubebuilder:validation:MaxItems=2
-	Parents []ListenerSetParentStatus `json:"parents"`
-}
-
-// ListenerSetParentStatus defines the observed state of ListenerSet with
-// to an associated Parent.
-type ListenerSetParentStatus struct {
-	// ParentRef corresponds with a ParentRef in the spec that this
-	// RouteParentStatus struct describes the status of.
-	ParentRef ParentGatewayReference `json:"parentRef"`
-
 	// Listeners provide status for each unique listener port defined in the Spec.
 	//
 	// +optional
@@ -354,8 +335,8 @@ kind: ListenerSet
 metadata:
   name: first-workload-listeners
 spec:
-  parentRefs:
-  - name: parent-gateway
+  parentRef:
+    name: parent-gateway
     kind: Gateway
     group: gateway.networking.k8s.io
   listeners:
@@ -375,8 +356,8 @@ kind: ListenerSet
 metadata:
   name: second-workload-listeners
 spec:
-  parentRefs:
-  - name: parent-gateway
+  parentRef:
+    name: parent-gateway
     kind: Gateway
     group: gateway.networking.k8s.io
   listeners:
@@ -540,7 +521,7 @@ Parent `Gateways` MUST NOT have `ListenerSet` listeners in their `status.listene
 
 `ListenerSets` have a top-level `Accepted` and `Programmed` conditions.
 
-The `Accepted` condition MUST be set on every `ListenerSet`, and indicates that the `ListenerSet` is semantically valid and accepted by its `parentRefs`.
+The `Accepted` condition MUST be set on every `ListenerSet`, and indicates that the `ListenerSet` is semantically valid and accepted by its `parentRef`.
 
 Valid reasons for `Accepted` being `False` are:
 
