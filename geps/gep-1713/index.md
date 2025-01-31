@@ -158,8 +158,15 @@ type ListenerEntry struct {
 	// Port is the network port. Multiple listeners may use the
 	// same port, subject to the Listener compatibility rules.
 	//
+	// If the port is specified as zero, the implementation will assign
+	// a unique port. If the implementation does not support dynamic port
+	// assignment, it MUST set `Accepted` condition to `False` with the
+	// `UnsupportedPort` reason.
+	//
 	// Support: Core
-	Port PortNumber `json:"port"`
+	//
+	// +optional
+	Port *PortNumber `json:"port,omitempty"`
 
 	// Protocol specifies the network protocol this listener expects to receive.
 	//
@@ -261,6 +268,9 @@ type ListenerSetParentStatus struct {
 type ListenerEntryStatus struct {
 	// Name is the name of the Listener that this status corresponds to.
 	Name SectionName `json:"name"`
+
+	// Port is the network port that this listener is listening on.
+	Port PortNumber `json:"port"`
 
 	// SupportedKinds is the list indicating the Kinds supported by this
 	// listener. This MUST represent the kinds an implementation supports for
