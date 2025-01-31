@@ -132,7 +132,7 @@ spec:
                 maxItems: 16
                 type: array
               parentRefs:
-                description: |+
+                description: |-
                   ParentRefs references the resources (usually Gateways) that a Route wants
                   to be attached to. Note that the referenced parent resource needs to
                   allow this for the attachment to be complete. For Gateways, that means
@@ -194,11 +194,6 @@ spec:
                   connections originating from the same namespace as the Route, for which
                   the intended destination of the connections are a Service targeted as a
                   ParentRef of the Route.
-
-
-
-
-
                 items:
                   description: |-
                     ParentReference identifies an API object (usually a Gateway) that can be considered
@@ -377,9 +372,7 @@ spec:
                   - path:
                       type: PathPrefix
                       value: /
-                description: |+
-                  Rules are a list of HTTP matchers, filters and actions.
-
+                description: Rules are a list of HTTP matchers, filters and actions.
                 items:
                   description: |-
                     HTTPRouteRule defines semantics for matching an HTTP request based on
@@ -432,7 +425,6 @@ spec:
                           namespace's owner to accept the reference. See the ReferenceGrant
                           documentation for details.
 
-                          <gateway:experimental:description>
 
                           When the BackendRef points to a Kubernetes Service, implementations SHOULD
                           honor the appProtocol field if it is set for the target Service Port.
@@ -447,8 +439,6 @@ spec:
                           If a Route is not able to send traffic to the backend using the specified
                           protocol then the backend is considered invalid. Implementations MUST set the
                           "ResolvedRefs" condition to "False" with the "UnsupportedProtocol" reason.
-
-                          </gateway:experimental:description>
                         properties:
                           filters:
                             description: |-
@@ -637,7 +627,7 @@ spec:
                                       x-kubernetes-list-type: map
                                   type: object
                                 requestMirror:
-                                  description: |+
+                                  description: |-
                                     RequestMirror defines a schema for a filter that mirrors requests.
                                     Requests are sent to the specified destination, but responses from
                                     that destination are ignored.
@@ -647,7 +637,6 @@ spec:
                                     backends.
 
                                     Support: Extended
-
                                   properties:
                                     backendRef:
                                       description: |-
@@ -743,13 +732,12 @@ spec:
                                         rule: '(size(self.group) == 0 && self.kind
                                           == ''Service'') ? has(self.port) : true'
                                     fraction:
-                                      description: |+
+                                      description: |-
                                         Fraction represents the fraction of requests that should be
                                         mirrored to BackendRef.
 
                                         Only one of Fraction or Percent may be specified. If neither field
                                         is specified, 100% of requests will be mirrored.
-
                                       properties:
                                         denominator:
                                           default: 100
@@ -768,14 +756,13 @@ spec:
                                           to denominator
                                         rule: self.numerator <= self.denominator
                                     percent:
-                                      description: |+
+                                      description: |-
                                         Percent represents the percentage of requests that should be
                                         mirrored to BackendRef. Its minimum value is 0 (indicating 0% of
                                         requests) and its maximum value is 100 (indicating 100% of requests).
 
                                         Only one of Fraction or Percent may be specified. If neither field
                                         is specified, 100% of requests will be mirrored.
-
                                       format: int32
                                       maximum: 100
                                       minimum: 0
@@ -1576,7 +1563,7 @@ spec:
                                 x-kubernetes-list-type: map
                             type: object
                           requestMirror:
-                            description: |+
+                            description: |-
                               RequestMirror defines a schema for a filter that mirrors requests.
                               Requests are sent to the specified destination, but responses from
                               that destination are ignored.
@@ -1586,7 +1573,6 @@ spec:
                               backends.
 
                               Support: Extended
-
                             properties:
                               backendRef:
                                 description: |-
@@ -1682,13 +1668,12 @@ spec:
                                   rule: '(size(self.group) == 0 && self.kind == ''Service'')
                                     ? has(self.port) : true'
                               fraction:
-                                description: |+
+                                description: |-
                                   Fraction represents the fraction of requests that should be
                                   mirrored to BackendRef.
 
                                   Only one of Fraction or Percent may be specified. If neither field
                                   is specified, 100% of requests will be mirrored.
-
                                 properties:
                                   denominator:
                                     default: 100
@@ -1707,14 +1692,13 @@ spec:
                                     denominator
                                   rule: self.numerator <= self.denominator
                               percent:
-                                description: |+
+                                description: |-
                                   Percent represents the percentage of requests that should be
                                   mirrored to BackendRef. Its minimum value is 0 (indicating 0% of
                                   requests) and its maximum value is 100 (indicating 100% of requests).
 
                                   Only one of Fraction or Percent may be specified. If neither field
                                   is specified, 100% of requests will be mirrored.
-
                                 format: int32
                                 maximum: 100
                                 minimum: 0
@@ -2496,7 +2480,7 @@ spec:
                       maxItems: 64
                       type: array
                     name:
-                      description: |
+                      description: |-
                         Name is the name of the route rule. This name MUST be unique within a Route if it is set.
 
                         Support: Extended
@@ -2505,11 +2489,10 @@ spec:
                       pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                       type: string
                     retry:
-                      description: |+
+                      description: |-
                         Retry defines the configuration for when to retry an HTTP request.
 
                         Support: Extended
-
                       properties:
                         attempts:
                           description: |-
@@ -2587,20 +2570,17 @@ spec:
 
                               Implementations MAY support specifying discrete values in the 400-499 range,
                               which are often inadvisable to retry.
-
-                              <gateway:experimental>
                             maximum: 599
                             minimum: 400
                             type: integer
                           type: array
                       type: object
                     sessionPersistence:
-                      description: |+
+                      description: |-
                         SessionPersistence defines and configures session persistence
                         for the route rule.
 
                         Support: Extended
-
                       properties:
                         absoluteTimeout:
                           description: |-
@@ -3200,7 +3180,7 @@ spec:
                 maxItems: 16
                 type: array
               parentRefs:
-                description: |+
+                description: |-
                   ParentRefs references the resources (usually Gateways) that a Route wants
                   to be attached to. Note that the referenced parent resource needs to
                   allow this for the attachment to be complete. For Gateways, that means
@@ -3262,11 +3242,6 @@ spec:
                   connections originating from the same namespace as the Route, for which
                   the intended destination of the connections are a Service targeted as a
                   ParentRef of the Route.
-
-
-
-
-
                 items:
                   description: |-
                     ParentReference identifies an API object (usually a Gateway) that can be considered
@@ -3445,9 +3420,7 @@ spec:
                   - path:
                       type: PathPrefix
                       value: /
-                description: |+
-                  Rules are a list of HTTP matchers, filters and actions.
-
+                description: Rules are a list of HTTP matchers, filters and actions.
                 items:
                   description: |-
                     HTTPRouteRule defines semantics for matching an HTTP request based on
@@ -3500,7 +3473,6 @@ spec:
                           namespace's owner to accept the reference. See the ReferenceGrant
                           documentation for details.
 
-                          <gateway:experimental:description>
 
                           When the BackendRef points to a Kubernetes Service, implementations SHOULD
                           honor the appProtocol field if it is set for the target Service Port.
@@ -3515,8 +3487,6 @@ spec:
                           If a Route is not able to send traffic to the backend using the specified
                           protocol then the backend is considered invalid. Implementations MUST set the
                           "ResolvedRefs" condition to "False" with the "UnsupportedProtocol" reason.
-
-                          </gateway:experimental:description>
                         properties:
                           filters:
                             description: |-
@@ -3705,7 +3675,7 @@ spec:
                                       x-kubernetes-list-type: map
                                   type: object
                                 requestMirror:
-                                  description: |+
+                                  description: |-
                                     RequestMirror defines a schema for a filter that mirrors requests.
                                     Requests are sent to the specified destination, but responses from
                                     that destination are ignored.
@@ -3715,7 +3685,6 @@ spec:
                                     backends.
 
                                     Support: Extended
-
                                   properties:
                                     backendRef:
                                       description: |-
@@ -3811,13 +3780,12 @@ spec:
                                         rule: '(size(self.group) == 0 && self.kind
                                           == ''Service'') ? has(self.port) : true'
                                     fraction:
-                                      description: |+
+                                      description: |-
                                         Fraction represents the fraction of requests that should be
                                         mirrored to BackendRef.
 
                                         Only one of Fraction or Percent may be specified. If neither field
                                         is specified, 100% of requests will be mirrored.
-
                                       properties:
                                         denominator:
                                           default: 100
@@ -3836,14 +3804,13 @@ spec:
                                           to denominator
                                         rule: self.numerator <= self.denominator
                                     percent:
-                                      description: |+
+                                      description: |-
                                         Percent represents the percentage of requests that should be
                                         mirrored to BackendRef. Its minimum value is 0 (indicating 0% of
                                         requests) and its maximum value is 100 (indicating 100% of requests).
 
                                         Only one of Fraction or Percent may be specified. If neither field
                                         is specified, 100% of requests will be mirrored.
-
                                       format: int32
                                       maximum: 100
                                       minimum: 0
@@ -4644,7 +4611,7 @@ spec:
                                 x-kubernetes-list-type: map
                             type: object
                           requestMirror:
-                            description: |+
+                            description: |-
                               RequestMirror defines a schema for a filter that mirrors requests.
                               Requests are sent to the specified destination, but responses from
                               that destination are ignored.
@@ -4654,7 +4621,6 @@ spec:
                               backends.
 
                               Support: Extended
-
                             properties:
                               backendRef:
                                 description: |-
@@ -4750,13 +4716,12 @@ spec:
                                   rule: '(size(self.group) == 0 && self.kind == ''Service'')
                                     ? has(self.port) : true'
                               fraction:
-                                description: |+
+                                description: |-
                                   Fraction represents the fraction of requests that should be
                                   mirrored to BackendRef.
 
                                   Only one of Fraction or Percent may be specified. If neither field
                                   is specified, 100% of requests will be mirrored.
-
                                 properties:
                                   denominator:
                                     default: 100
@@ -4775,14 +4740,13 @@ spec:
                                     denominator
                                   rule: self.numerator <= self.denominator
                               percent:
-                                description: |+
+                                description: |-
                                   Percent represents the percentage of requests that should be
                                   mirrored to BackendRef. Its minimum value is 0 (indicating 0% of
                                   requests) and its maximum value is 100 (indicating 100% of requests).
 
                                   Only one of Fraction or Percent may be specified. If neither field
                                   is specified, 100% of requests will be mirrored.
-
                                 format: int32
                                 maximum: 100
                                 minimum: 0
@@ -5564,7 +5528,7 @@ spec:
                       maxItems: 64
                       type: array
                     name:
-                      description: |
+                      description: |-
                         Name is the name of the route rule. This name MUST be unique within a Route if it is set.
 
                         Support: Extended
@@ -5573,11 +5537,10 @@ spec:
                       pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                       type: string
                     retry:
-                      description: |+
+                      description: |-
                         Retry defines the configuration for when to retry an HTTP request.
 
                         Support: Extended
-
                       properties:
                         attempts:
                           description: |-
@@ -5655,20 +5618,17 @@ spec:
 
                               Implementations MAY support specifying discrete values in the 400-499 range,
                               which are often inadvisable to retry.
-
-                              <gateway:experimental>
                             maximum: 599
                             minimum: 400
                             type: integer
                           type: array
                       type: object
                     sessionPersistence:
-                      description: |+
+                      description: |-
                         SessionPersistence defines and configures session persistence
                         for the route rule.
 
                         Support: Extended
-
                       properties:
                         absoluteTimeout:
                           description: |-

@@ -238,7 +238,7 @@ spec:
                 - type
                 x-kubernetes-list-type: map
               supportedFeatures:
-                description: |
+                description: |-
                   SupportedFeatures is the set of features the GatewayClass support.
                   It MUST be sorted in ascending alphabetical order by the Name key.
                 items:
@@ -482,7 +482,7 @@ spec:
                 - type
                 x-kubernetes-list-type: map
               supportedFeatures:
-                description: |
+                description: |-
                   SupportedFeatures is the set of features the GatewayClass support.
                   It MUST be sorted in ascending alphabetical order by the Name key.
                 items:

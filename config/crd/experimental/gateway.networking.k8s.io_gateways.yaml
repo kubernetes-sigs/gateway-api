@@ -61,7 +61,7 @@ spec:
             description: Spec defines the desired state of Gateway.
             properties:
               addresses:
-                description: |+
+                description: |-
                   Addresses requested for this Gateway. This is optional and behavior can
                   depend on the implementation. If a value is set in the spec and the
                   requested address is invalid or unavailable, the implementation MUST
@@ -82,7 +82,6 @@ spec:
                   GatewayStatus.Addresses.
 
                   Support: Extended
-
                 items:
                   description: GatewayAddress describes an address that can be bound
                     to a Gateway.
@@ -135,15 +134,14 @@ spec:
                   rule: 'self.all(a1, a1.type == ''Hostname'' ? self.exists_one(a2,
                     a2.type == a1.type && a2.value == a1.value) : true )'
               backendTLS:
-                description: |+
+                description: |-
                   BackendTLS configures TLS settings for when this Gateway is connecting to
                   backends with TLS.
 
                   Support: Core
-
                 properties:
                   clientCertificateRef:
-                    description: |+
+                    description: |-
                       ClientCertificateRef is a reference to an object that contains a Client
                       Certificate and the associated private key.
 
@@ -159,7 +157,6 @@ spec:
                       This setting can be overridden on the service level by use of BackendTLSPolicy.
 
                       Support: Core
-
                     properties:
                       group:
                         default: ""
@@ -782,7 +779,7 @@ spec:
                           maxItems: 64
                           type: array
                         frontendValidation:
-                          description: |+
+                          description: |-
                             FrontendValidation holds configuration information for validating the frontend (client).
                             Setting this field will require clients to send a client certificate
                             required for validation during the TLS handshake. In browsers this may result in a dialog appearing
@@ -790,7 +787,6 @@ spec:
                             The maximum depth of a certificate chain accepted in verification is Implementation specific.
 
                             Support: Extended
-
                           properties:
                             caCertificateRefs:
                               description: |-
@@ -967,7 +963,7 @@ spec:
             description: Status defines the current state of Gateway.
             properties:
               addresses:
-                description: |+
+                description: |-
                   Addresses lists the network addresses that have been bound to the
                   Gateway.
 
@@ -977,7 +973,6 @@ spec:
                     * no addresses are specified, all addresses are dynamically assigned
                     * a combination of specified and dynamic addresses are assigned
                     * a specified address was unusable (e.g. already in use)
-
                 items:
                   description: GatewayStatusAddress describes a network address that
                     is bound to a Gateway.
@@ -1295,7 +1290,7 @@ spec:
             description: Spec defines the desired state of Gateway.
             properties:
               addresses:
-                description: |+
+                description: |-
                   Addresses requested for this Gateway. This is optional and behavior can
                   depend on the implementation. If a value is set in the spec and the
                   requested address is invalid or unavailable, the implementation MUST
@@ -1316,7 +1311,6 @@ spec:
                   GatewayStatus.Addresses.
 
                   Support: Extended
-
                 items:
                   description: GatewayAddress describes an address that can be bound
                     to a Gateway.
@@ -1369,15 +1363,14 @@ spec:
                   rule: 'self.all(a1, a1.type == ''Hostname'' ? self.exists_one(a2,
                     a2.type == a1.type && a2.value == a1.value) : true )'
               backendTLS:
-                description: |+
+                description: |-
                   BackendTLS configures TLS settings for when this Gateway is connecting to
                   backends with TLS.
 
                   Support: Core
-
                 properties:
                   clientCertificateRef:
-                    description: |+
+                    description: |-
                       ClientCertificateRef is a reference to an object that contains a Client
                       Certificate and the associated private key.
 
@@ -1393,7 +1386,6 @@ spec:
                       This setting can be overridden on the service level by use of BackendTLSPolicy.
 
                       Support: Core
-
                     properties:
                       group:
                         default: ""
@@ -2016,7 +2008,7 @@ spec:
                           maxItems: 64
                           type: array
                         frontendValidation:
-                          description: |+
+                          description: |-
                             FrontendValidation holds configuration information for validating the frontend (client).
                             Setting this field will require clients to send a client certificate
                             required for validation during the TLS handshake. In browsers this may result in a dialog appearing
@@ -2024,7 +2016,6 @@ spec:
                             The maximum depth of a certificate chain accepted in verification is Implementation specific.
 
                             Support: Extended
-
                           properties:
                             caCertificateRefs:
                               description: |-
@@ -2201,7 +2192,7 @@ spec:
             description: Status defines the current state of Gateway.
             properties:
               addresses:
-                description: |+
+                description: |-
                   Addresses lists the network addresses that have been bound to the
                   Gateway.
 
@@ -2211,7 +2202,6 @@ spec:
                     * no addresses are specified, all addresses are dynamically assigned
                     * a combination of specified and dynamic addresses are assigned
                     * a specified address was unusable (e.g. already in use)
-
                 items:
                   description: GatewayStatusAddress describes a network address that
                     is bound to a Gateway.
