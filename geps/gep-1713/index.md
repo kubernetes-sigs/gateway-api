@@ -393,15 +393,8 @@ spec:
 ```
 ### ListenerEntry
 
-TBD: `ListenerEntry` is currently a copy of the `Listener` struct but we have the opportunity to make changes here.
-
-From robscott https://github.com/kubernetes-sigs/gateway-api/pull/3213#discussion_r1699248634:
-
-> Since this would be a new API, it could be worth exploring some potential regrets of Listeners:
->
-> 1. Should we have made it easier to leave port empty or do port ranges?
-> 2. Should we support multiple hostnames?
-> 3. Are there any validations that we wish we'd tightened up?
+`ListenerEntry` is currently a copy of the `Listener` struct with some changes
+1. `Port` is now a pointer to allow for dynamic port assignment.
 
 ## Semantics
 
