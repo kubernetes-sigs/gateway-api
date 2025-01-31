@@ -339,7 +339,7 @@ spec:
     protocol: HTTP
     port: 80
 ---
-apiVersion: gateway.networking.k8s.io/v1alpha1
+apiVersion: gateway.networking.x-k8s.io/v1alpha1
 kind: ListenerSet
 metadata:
   name: first-workload-listeners
@@ -360,7 +360,7 @@ spec:
         group: ""
         name: first-workload-cert # Provisioned via HTTP01 challenge
 ---
-apiVersion: gateway.networking.k8s.io/v1alpha1
+apiVersion: gateway.networking.x-k8s.io/v1alpha1
 kind: ListenerSet
 metadata:
   name: second-workload-listeners
