@@ -49,5 +49,6 @@ ln -s "${SCRIPT_ROOT}" "$GOPATH/src/sigs.k8s.io/gateway-api"
 echo "Generating CRDs"
 go run ./pkg/generator
 
-./hack/update-clientset.sh 
+./hack/update-clientset.sh
+./hack/update-clientset.sh experimental
 ./hack/update-protos.sh
