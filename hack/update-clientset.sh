@@ -37,7 +37,7 @@ readonly COMMON_FLAGS="${VERIFY_FLAG:-} --go-header-file ${SCRIPT_ROOT}/hack/boi
 readonly APIS_PKG=sigs.k8s.io/gateway-api
 readonly CLIENTSET_NAME=versioned
 readonly CLIENTSET_PKG_NAME=clientset
-readonly VERSIONS=($(find ./${API_PATH} -depth 1 -name "v*" -exec bash -c 'basename {}' \; | xargs))
+readonly VERSIONS=($(find ./${API_PATH} -maxdepth 1 -name "v*" -exec bash -c 'basename {}' \; | xargs))
 
 if [[ "${1:-stable}" == "experimental" ]]; then
     readonly OUTPUT_DIR=pkg/clientx
