@@ -25,8 +25,10 @@ set -o pipefail
 
 
 if [[ "${1:-stable}" == "experimental" ]]; then
+  echo "Generating experimental clientset"
   readonly API_PATH="apisx"
 else
+  echo "Generating stable clientset"
   readonly API_PATH="apis"
 fi
 

@@ -85,6 +85,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.ListenerEntry":           schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerEntry(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.ListenerEntryStatus":     schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerEntryStatus(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.ListenerSet":             schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerSet(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.ListenerSetList":         schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerSetList(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.ListenerSetSpec":         schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerSetSpec(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.ListenerSetStatus":       schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerSetStatus(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.ParentGatewayReference":  schema_sigsk8sio_gateway_api_apisx_v1alpha1_ParentGatewayReference(ref),
@@ -2860,6 +2861,54 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerSet(ref common.Referenc
 		},
 		Dependencies: []string{
 			"k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta", "sigs.k8s.io/gateway-api/apisx/v1alpha1.ListenerSetSpec", "sigs.k8s.io/gateway-api/apisx/v1alpha1.ListenerSetStatus"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerSetList(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Type: []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
+						},
+					},
+					"items": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.ListenerSet"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"items"},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta", "sigs.k8s.io/gateway-api/apisx/v1alpha1.ListenerSet"},
 	}
 }
 
