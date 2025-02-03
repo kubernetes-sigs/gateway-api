@@ -573,3 +573,10 @@ const (
 	// Deprecated: Ready is reserved for future use
 	ListenerEntryReasonReady ListenerEntryConditionReason = "Ready"
 )
+
+// +kubebuilder:object:root=true
+type ListenerSetList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []ListenerSet `json:"items"`
+}
