@@ -258,18 +258,20 @@ a Gateway with no Listener matching the protocol needed by the Route, the Route
 
 ### What Routes are allowed by Listeners with TLS
 
-The following is a summary of all the Routes and the TLS termination mode they support.
+The following is a summary of all the Routes and the TLS termination mode they support, along
+with the compatible protocol.
 
-| Route | TLS with Terminate | TLS with Passthrough |
-|-|-|-|
-| `HTTPRoute` | yes | no |
-| `GRPCRoute` | yes | no |
-| `TLSRoute` | yes | yes |
-| `TCPRoute` | no | no |
-| `UDPRoute` | no | no |
+| Protocol  |  Routes | TLS Terminate | TLS Passthough |
+|-----------|---------|---------------|----------------|
+| HTTP  | `HTTPRoute` | no  | no  |
+| HTTPS | `HTTPRoute` | yes | no  |
+| GRPC  | `GRPCRoute` | yes | no  |
+| TLS   | `TLSRoute`  | yes | yes | 
+| TCP   | `TCPRoute`  | yes | no  |
+| UDP   | `UDPRoute`  | no  | no  |
 
 > [!NOTE]
-> When the traffic is routed to the backend via `TCPRoute`, the packets
-> are left untouched by the gateway. In order to terminate the TLS connection to
-> the gateway and forward the traffic unencrypted to the backend, a `TLSRoute` configured
-> with `Terminate` as TLS mode must be used.
+> When the traffic is routed to the backend via a listener configured with TLS `Passthrough`
+> and a compatible route, the packets are left untouched by the gateway. In order to
+> terminate the TLS connection to the gateway and forward the traffic unencrypted to the backend,
+> a listener configured with TLS `Terminate` and a compatible route must be used.
