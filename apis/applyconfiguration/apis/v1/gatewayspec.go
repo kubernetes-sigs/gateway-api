@@ -30,6 +30,7 @@ type GatewaySpecApplyConfiguration struct {
 	Addresses        []GatewayAddressApplyConfiguration       `json:"addresses,omitempty"`
 	Infrastructure   *GatewayInfrastructureApplyConfiguration `json:"infrastructure,omitempty"`
 	BackendTLS       *GatewayBackendTLSApplyConfiguration     `json:"backendTLS,omitempty"`
+	AllowedListeners *[]AllowedListenersApplyConfiguration    `json:"allowedListeners,omitempty"`
 }
 
 // GatewaySpecApplyConfiguration constructs a declarative configuration of the GatewaySpec type for use with
@@ -85,5 +86,25 @@ func (b *GatewaySpecApplyConfiguration) WithInfrastructure(value *GatewayInfrast
 // If called multiple times, the BackendTLS field is set to the value of the last call.
 func (b *GatewaySpecApplyConfiguration) WithBackendTLS(value *GatewayBackendTLSApplyConfiguration) *GatewaySpecApplyConfiguration {
 	b.BackendTLS = value
+	return b
+}
+
+func (b *GatewaySpecApplyConfiguration) ensureAllowedListenersApplyConfigurationExists() {
+	if b.AllowedListeners == nil {
+		b.AllowedListeners = &[]AllowedListenersApplyConfiguration{}
+	}
+}
+
+// WithAllowedListeners adds the given value to the AllowedListeners field in the declarative configuration
+// and returns the receiver, so that objects can be build by chaining "With" function invocations.
+// If called multiple times, values provided by each call will be appended to the AllowedListeners field.
+func (b *GatewaySpecApplyConfiguration) WithAllowedListeners(values ...*AllowedListenersApplyConfiguration) *GatewaySpecApplyConfiguration {
+	b.ensureAllowedListenersApplyConfigurationExists()
+	for i := range values {
+		if values[i] == nil {
+			panic("nil value passed to WithAllowedListeners")
+		}
+		*b.AllowedListeners = append(*b.AllowedListeners, *values[i])
+	}
 	return b
 }

@@ -38,6 +38,8 @@ import (
 func ForKind(kind schema.GroupVersionKind) interface{} {
 	switch kind {
 	// Group=gateway.networking.k8s.io, Version=v1
+	case v1.SchemeGroupVersion.WithKind("AllowedListeners"):
+		return &apisv1.AllowedListenersApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("AllowedRoutes"):
 		return &apisv1.AllowedRoutesApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("BackendObjectReference"):
@@ -130,6 +132,8 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1.HTTPURLRewriteFilterApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("Listener"):
 		return &apisv1.ListenerApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("ListenerNamespaces"):
+		return &apisv1.ListenerNamespacesApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("ListenerStatus"):
 		return &apisv1.ListenerStatusApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("LocalObjectReference"):

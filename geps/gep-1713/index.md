@@ -74,7 +74,7 @@ type ListenerNamespaces struct {
 	// * None: Only listeners defined in the Gateway's spec are allowed
 	//
 	// +optional
-	// +kubebuilder:default=Same
+	// +kubebuilder:default=None
 	// +kubebuilder:validation:Enum=Same;None
 	From *FromNamespaces `json:"from,omitempty"`
 }
