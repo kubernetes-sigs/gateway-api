@@ -30,7 +30,7 @@ the content into the GEP as online documents are easier to lose
 (Include API details for North/South usecases)
 
 ### Gateway For Mesh (East/West)
-(Include East/West API considerations, examples, and if differnet - apis)
+(Include East/West API considerations, examples, and if different - APIs)
 
 ## Conformance Details
 
@@ -38,7 +38,7 @@ the content into the GEP as online documents are easier to lose
 
 #### Feature Names
 
-(Does it require seperate feature name for mesh? Please add it if necessary)
+(Does it require separate feature(s) for mesh? Please add them if necessary)
 
 Every feature should:
 
@@ -56,7 +56,7 @@ Treat this guidance as "best effort" because we might have test files that check
 
 In any case, the conformance tests file names should be meaningful and easy to understand.
 
-(MAKE sure to also include conformance tests that covers mesh)
+(Make sure to also include conformance tests that cover mesh)
 
 ## Alternatives
 
