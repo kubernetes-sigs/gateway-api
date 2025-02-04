@@ -347,7 +347,7 @@ Please see the [Consul API Gateway documentation][consul-api-gw-doocs] for curre
 A minimal install of Istio can be used to provide a fully compliant
 implementation of the Kubernetes Gateway API for cluster ingress traffic
 control. For service mesh users, Istio also fully supports the [GAMMA
-initiative's][gamma] experimental Gateway API [support for east-west traffic
+initiative's][gamma] Gateway API [support for east-west traffic
 management][gamma] within the mesh.
 
 Much of Istio's documentation, including all of the [ingress tasks][istio-1] and several mesh-internal traffic management tasks, already includes parallel instructions for
@@ -398,7 +398,7 @@ For help and support with Kong Gateway operator please feel free to [create an i
 
 Kuma implements the Gateway API specification for the Kuma built-in, Envoy-based Gateway with a beta stability guarantee. Check the [Gateway API Documentation][kuma-1] for information on how to setup a Kuma built-in gateway using the Gateway API.
 
-Kuma 2.3 and later support the [GAMMA initiative's][gamma] experimental
+Kuma 2.3 and later support the [GAMMA initiative's][gamma]
 Gateway API [support for east-west traffic management][gamma] within the mesh.
 
 [kuma]:https://kuma.io
@@ -411,7 +411,7 @@ It is the only major mesh not based on Envoy, instead relying on a
 purpose-built Rust micro-proxy to bring security, observability, and
 reliability to Kubernetes, without the complexity.
 
-Linkerd 2.14 and later support the [GAMMA initiative's][gamma] experimental
+Linkerd 2.14 and later support the [GAMMA initiative's][gamma]
 Gateway API [support for east-west traffic management][gamma] within the mesh.
 
 [linkerd]:https://linkerd.io/
