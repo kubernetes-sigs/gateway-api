@@ -636,21 +636,23 @@ type AllowedRoutes struct {
 	Kinds []RouteGroupKind `json:"kinds,omitempty"`
 }
 
-// FromNamespaces specifies namespace from which Routes may be attached to a
+// FromNamespaces specifies namespace from which Routes/ListenerSets may be attached to a
 // Gateway.
 //
-// +kubebuilder:validation:Enum=All;Selector;Same
+// +kubebuilder:validation:Enum=All;Selector;Same;None
 type FromNamespaces string
 
 const (
-	// Routes in all namespaces may be attached to this Gateway.
+	// Routes/ListenerSets in all namespaces may be attached to this Gateway.
 	NamespacesFromAll FromNamespaces = "All"
-	// Only Routes in namespaces selected by the selector may be attached to
+	// Only Routes/ListenerSets in namespaces selected by the selector may be attached to
 	// this Gateway.
 	NamespacesFromSelector FromNamespaces = "Selector"
-	// Only Routes in the same namespace as the Gateway may be attached to this
+	// Only Routes/ListenerSets in the same namespace as the Gateway may be attached to this
 	// Gateway.
 	NamespacesFromSame FromNamespaces = "Same"
+	// No Routes/ListenerSets may be attached to this Gateway.
+	NamespacesFromNone FromNamespaces = "None"
 )
 
 // RouteNamespaces indicate which namespaces Routes should be selected from.
