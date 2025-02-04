@@ -279,6 +279,40 @@ type GatewaySpec struct {
 	// +optional
 	// <gateway:experimental>
 	BackendTLS *GatewayBackendTLS `json:"backendTLS,omitempty"`
+
+	// AllowedListeners defines which ListenerSets can be attached to this Gateway.
+	// While this feature is experimental, the default value is to allow no ListenerSets.
+	//
+	// <gateway:experimental>
+	//
+	// +optional
+	AllowedListeners *[]AllowedListeners `json:"allowedListeners,omitempty"`
+}
+
+// AllowedListeners defines which ListenerSets can be attached to this Gateway.
+type AllowedListeners struct {
+	// Namespaces defines which namespaces ListenerSets can be attached to this Gateway.
+	// While this feature is experimental, the default value is to allow no ListenerSets.
+	//
+	// +optional
+	// +kubebuilder:default={from: None}
+	Namespaces *ListenerNamespaces `json:"namespaces,omitempty"`
+}
+
+// ListenerNamespaces indicate which namespaces ListenerSets should be selected from.
+type ListenerNamespaces struct {
+	// From indicates where ListenerSets can attach to this Gateway. Possible
+	// values are:
+	//
+	// * Same: Only ListenerSets in the same namespace may be attached to this Gateway.
+	// * None: Only listeners defined in the Gateway's spec are allowed
+	//
+	// While this feature is experimental, the default value None
+	//
+	// +optional
+	// +kubebuilder:default=None
+	// +kubebuilder:validation:Enum=Same;None
+	From *FromNamespaces `json:"from,omitempty"`
 }
 
 // Listener embodies the concept of a logical endpoint where a Gateway accepts

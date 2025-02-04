@@ -223,6 +223,12 @@ var schemaYAML = typed.YAMLObject(`types:
     elementRelationship: atomic
 - name: io.k8s.apimachinery.pkg.apis.meta.v1.Time
   scalar: untyped
+- name: io.k8s.sigs.gateway-api.apis.v1.AllowedListeners
+  map:
+    fields:
+    - name: namespaces
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1.ListenerNamespaces
 - name: io.k8s.sigs.gateway-api.apis.v1.AllowedRoutes
   map:
     fields:
@@ -580,6 +586,12 @@ var schemaYAML = typed.YAMLObject(`types:
         list:
           elementType:
             namedType: io.k8s.sigs.gateway-api.apis.v1.GatewayAddress
+          elementRelationship: atomic
+    - name: allowedListeners
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v1.AllowedListeners
           elementRelationship: atomic
     - name: backendTLS
       type:
@@ -990,6 +1002,12 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: tls
       type:
         namedType: io.k8s.sigs.gateway-api.apis.v1.GatewayTLSConfig
+- name: io.k8s.sigs.gateway-api.apis.v1.ListenerNamespaces
+  map:
+    fields:
+    - name: from
+      type:
+        scalar: string
 - name: io.k8s.sigs.gateway-api.apis.v1.ListenerStatus
   map:
     fields:
