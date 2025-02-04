@@ -151,7 +151,7 @@ type BackendTLSPolicyValidation struct {
 	// backends:
 	//
 	// 1. Hostname MUST be used as the SNI to connect to the backend (RFC 6066).
-	// 2. If SubjectAltNames is not specified, Hostname MUST be used for
+	// 2. If SubjectAltNames is not specified or unsupported, Hostname MUST be used for
 	//    authentication and MUST match the certificate served by the matching
 	//    backend.
 	//
@@ -159,10 +159,10 @@ type BackendTLSPolicyValidation struct {
 	Hostname v1.PreciseHostname `json:"hostname"`
 
 	// SubjectAltNames contains one or more Subject Alternative Names.
-	// When specified, the certificate served from the backend MUST have at least one
-	// Subject Alternate Name matching one of the specified SubjectAltNames.
+	// When specified, if supported, the certificate served from the backend MUST
+	// have at least one Subject Alternate Name matching one of the specified SubjectAltNames.
 	//
-	// Support: Core
+	// Support: Extended
 	//
 	// +optional
 	// +kubebuilder:validation:MaxItems=5
