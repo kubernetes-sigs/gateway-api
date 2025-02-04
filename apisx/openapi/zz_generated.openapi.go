@@ -2936,7 +2936,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerSetSpec(ref common.Refe
 							},
 						},
 						SchemaProps: spec.SchemaProps{
-							Description: "Listeners associated with this ListenerSet. Listeners define logical endpoints that are bound on this referenced parent Gateway's addresses.\n\nListeners in a `Gateway` and their attached `ListenerSets` are concatenated as a list when programming the underlying infrastructure.\n\nListeners should be merged using the following precedence:\n\n1. \"parent\" Gateway 2. ListenerSet ordered by creation time (oldest first) 3. ListenerSet ordered alphabetically by “{namespace}/{name}”.\n\n\n# TODO: Figure out how to allow empty port here #+kubebuilder:validation:XValidation:message=\"Combination of port, protocol and hostname must be unique for each listener\",rule=\"self.all(l1, self.exists_one(l2, l1.port == l2.port && l1.protocol == l2.protocol && (has(l1.hostname) && has(l2.hostname) ? l1.hostname == l2.hostname : !has(l1.hostname) && !has(l2.hostname))))\"",
+							Description: "Listeners associated with this ListenerSet. Listeners define logical endpoints that are bound on this referenced parent Gateway's addresses.\n\nListeners in a `Gateway` and their attached `ListenerSets` are concatenated as a list when programming the underlying infrastructure.\n\nListeners should be merged using the following precedence:\n\n1. \"parent\" Gateway 2. ListenerSet ordered by creation time (oldest first) 3. ListenerSet ordered alphabetically by “{namespace}/{name}”.",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{

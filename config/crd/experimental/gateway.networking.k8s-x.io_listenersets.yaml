@@ -70,9 +70,6 @@ spec:
                   1. "parent" Gateway
                   2. ListenerSet ordered by creation time (oldest first)
                   3. ListenerSet ordered alphabetically by “{namespace}/{name}”.
-
-                  # TODO: Figure out how to allow empty port here
-                  #+kubebuilder:validation:XValidation:message="Combination of port, protocol and hostname must be unique for each listener",rule="self.all(l1, self.exists_one(l2, l1.port == l2.port && l1.protocol == l2.protocol && (has(l1.hostname) && has(l2.hostname) ? l1.hostname == l2.hostname : !has(l1.hostname) && !has(l2.hostname))))"
                 items:
                   properties:
                     allowedRoutes:
@@ -531,6 +528,12 @@ spec:
                     || l.hostname == '''') : true)'
                 - message: Listener name must be unique within the Gateway
                   rule: self.all(l1, self.exists_one(l2, l1.name == l2.name))
+                - message: Combination of port, protocol and hostname must be unique
+                    for each listener
+                  rule: 'self.all(l1, !has(l1.port) || self.exists_one(l2, has(l2.port)
+                    && l1.port == l2.port && l1.protocol == l2.protocol && (has(l1.hostname)
+                    && has(l2.hostname) ? l1.hostname == l2.hostname : !has(l1.hostname)
+                    && !has(l2.hostname))))'
               parentRef:
                 description: ParentRef references the Gateway that the listeners are
                   attached to.
