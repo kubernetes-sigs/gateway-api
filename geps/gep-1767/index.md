@@ -165,8 +165,8 @@ type HTTPCORSFilter struct {
     // AllowOrigins indicates whether the response can be shared with 
     // requested resource from the given `Origin`.
     // 
-    // The `Origin` consists of a scheme and a host, with an optional port, 
-    // and takes the form `<scheme>://<host>(:<port>)`.
+    // The `Origin` consists of a scheme and a host, with an optional 
+    // port, and takes the form `<scheme>://<host>(:<port>)`.
     //
     // Valid values for scheme are: `http` and `https`.
     //
@@ -184,18 +184,18 @@ type HTTPCORSFilter struct {
     //   left of its position.
     // * A wildcard by itself matches all hosts.
     //
-    // An origin value that includes _only_ the `*` character indicates 
-    // requests from all `Origin`s are allowed.
+    // An origin value that includes _only_ the `*` character 
+    // indicates requests from all `Origin`s are allowed.
     //
-    // When the `AllowOrigins` field is configured with multiple origins, 
-    // it means the server supports clients from multiple origins. If the 
-    // request `Origin` matches the configured allowed origins, the gateway 
-    // must return the given `Origin` and sets value of the header 
-    // `Access-Control-Allow-Origin` same as the `Origin` header provided 
-    // by the client.
+    // When the `AllowOrigins` field is configured with multiple 
+    // origins, it means the server supports clients from multiple 
+    // origins. If the request `Origin` matches the configured 
+    // allowed origins, the gateway must return the given `Origin` 
+    // and sets value of the header `Access-Control-Allow-Origin` 
+    // same as the `Origin` header provided by the client.
     //
-    // The status code of a successful response to a "preflight" request 
-    // is always an OK status (i.e., 204 or 200). 
+    // The status code of a successful response to a "preflight" 
+    // request is always an OK status (i.e., 204 or 200). 
     //
     // Input:
     //   Origin: https://foo.example
@@ -298,13 +298,14 @@ type HTTPCORSFilter struct {
     // The CORS-safelisted methods are always allowed, regardless of whether 
     // they are specified in the `AllowMethods` field.
     //
-    // When the `AllowMethods` field is configured with one or more methods, the 
-    // gateway must return the `Access-Control-Allow-Methods` response header which 
-    // value is present in the `AllowMethods` field.
+    // When the `AllowMethods` field is configured with one or more methods, 
+    // the gateway must return the `Access-Control-Allow-Methods` response 
+    // header which value is present in the `AllowMethods` field.
     //
     // If the HTTP method of the `Access-Control-Request-Method` request header 
     // is not included in the list of methods specified by the response header 
-    // `Access-Control-Allow-Methods`, it will present an error on the client side.
+    // `Access-Control-Allow-Methods`, it will present an error on the client 
+    // side.
     // 
     // Input:
     //   Access-Control-Request-Method: PUT
@@ -328,16 +329,15 @@ type HTTPCORSFilter struct {
     //   Access-Control-Allow-Methods: *
     //
     // When the `AllowCredentials` field is specified and `AllowMethods` 
-    // field specified with the `*` wildcard, the gateway must specify 
-    // one HTTP method in the value of the Access-Control-Allow-Methods 
-    // response header. The value of the header `Access-Control-Allow-Methods` 
-    // is same as the `Access-Control-Request-Method` header provided by 
-    // the client. 
-    //
-    // If the header `Access-Control-Request-Method` is not included in 
-    // the request, the gateway will omit the `Access-Control-Allow-Methods` 
+    // field specified with the `*` wildcard, the gateway must specify one 
+    // HTTP method in the value of the Access-Control-Allow-Methods response 
+    // header. The value of the header `Access-Control-Allow-Methods` is same 
+    // as the `Access-Control-Request-Method` header provided by the client. 
+    // If the header `Access-Control-Request-Method` is not included in the 
+    // request, the gateway will omit the `Access-Control-Allow-Methods` 
     // response header, instead of specifying the `*` wildcard. A Gateway 
-    // implementation may choose to add implementation-specific default methods.
+    // implementation may choose to add implementation-specific default 
+    // methods.
     //
     // Input:
     //   Access-Control-Request-Method: PUT
@@ -370,9 +370,9 @@ type HTTPCORSFilter struct {
     //
     // If any header name in the `Access-Control-Request-Headers` request header 
     // is not included in the list of header names specified by the response header 
-    // `Access-Control-Allow-Methods`, it will present an error on the client side.
+    // `Access-Control-Allow-Headers`, it will present an error on the client side.
     //
-    // If any header name in the `Access-Control-Allow-Methods` response header does 
+    // If any header name in the `Access-Control-Allow-Headers` response header does 
     // not recognize by the client, it will also occur an error on the client side.
     //
     // Input:
@@ -401,12 +401,11 @@ type HTTPCORSFilter struct {
     // specified with the `*` wildcard, the gateway must specify one or more 
     // HTTP headers in the value of the `Access-Control-Allow-Headers` response 
     // header. The value of the header `Access-Control-Allow-Headers` is same as 
-    // the `Access-Control-Request-Headers` header provided by the client. 
-    //
-    // If the header `Access-Control-Request-Headers` is not included in 
-    // the request, the gateway will omit the `Access-Control-Allow-Headers` 
-    // response header, instead of specifying the `*` wildcard. A Gateway 
-    // implementation may choose to add implementation-specific default headers.
+    // the `Access-Control-Request-Headers` header provided by the client. If 
+    // the header `Access-Control-Request-Headers` is not included in the request, 
+    // the gateway will omit the `Access-Control-Allow-Headers` response header, 
+    // instead of specifying the `*` wildcard. A Gateway implementation may choose 
+    // to add implementation-specific default headers.
     //
     // Input:
     //   Access-Control-Request-Headers: Content-Type, Cache-Control
