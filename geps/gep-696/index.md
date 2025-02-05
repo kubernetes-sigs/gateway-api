@@ -24,14 +24,21 @@ the content into the GEP as online documents are easier to lose
 -- e.g. owner messes up the permissions, accidental deletion)
 
 ## API
-
 (... details, can point to PR with changes)
+
+### Gateway for Ingress (North/South)
+(Include API details for North/South usecases)
+
+### Gateway For Mesh (East/West)
+(Include East/West API considerations, examples, and if different - APIs)
 
 ## Conformance Details
 
 (from https://github.com/kubernetes-sigs/gateway-api/blob/main/geps/gep-2162/index.md#standardize-features-and-conformance-tests-names)
 
 #### Feature Names
+
+(Does it require separate feature(s) for mesh? Please add them if necessary)
 
 Every feature should:
 
@@ -48,6 +55,8 @@ For example for `HTTPRoutePortRedirect` - the test file would be `httproute-port
 Treat this guidance as "best effort" because we might have test files that check the combination of several features and can't follow the same format.
 
 In any case, the conformance tests file names should be meaningful and easy to understand.
+
+(Make sure to also include conformance tests that cover mesh)
 
 ## Alternatives
 
