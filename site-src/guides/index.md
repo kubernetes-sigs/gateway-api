@@ -52,7 +52,7 @@ kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/downloa
 
 The experimental release channel includes everything in the standard release
 channel plus some experimental resources and fields. This includes
-TCPRoute, TLSRoute, UDPRoute and GRPCRoute.
+TCPRoute, TLSRoute, and UDPRoute.
 
 Note that future releases of the API could include breaking changes to
 experimental resources and fields. For example, any experimental resource or
