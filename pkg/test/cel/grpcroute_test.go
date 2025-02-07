@@ -282,7 +282,67 @@ func TestGRPCRouteRule(t *testing.T) {
 				},
 			},
 		},
-	}
+		{
+			name:       "too many matches and rules",
+			wantErrors: []string{"total number of matches across all rules in a route must be less than 128"},
+			rules: func() []gatewayv1.GRPCRouteRule {
+				match := gatewayv1.GRPCRouteMatch{
+					Headers: []gatewayv1.GRPCHeaderMatch{
+						{
+							Type:  ptrTo(gatewayv1.GRPCHeaderMatchExact),
+							Name:  "version",
+							Value: "v1",
+						},
+					},
+					Method: &gatewayv1.GRPCMethodMatch{
+						Type:    ptrTo(gatewayv1.GRPCMethodMatchExact),
+						Service: ptrTo("foo"),
+						Method:  ptrTo("bar"),
+					},
+				}
+
+				var rules []gatewayv1.GRPCRouteRule
+				for i := 0; i < 7; i++ { // Create 7 rules
+					rule := gatewayv1.GRPCRouteRule{}
+					for j := 0; j < 20; j++ { // Each rule has 20 matches
+						rule.Matches = append(rule.Matches, match)
+					}
+					rules = append(rules, rule)
+				}
+				return rules
+			}(),
+		},
+		{
+			name:       "many matches and few rules",
+			wantErrors: nil,
+			rules: func() []gatewayv1.GRPCRouteRule {
+				match := gatewayv1.GRPCRouteMatch{
+					Headers: []gatewayv1.GRPCHeaderMatch{
+						{
+							Type:  ptrTo(gatewayv1.GRPCHeaderMatchExact),
+							Name:  "version",
+							Value: "v1",
+						},
+					},
+					Method: &gatewayv1.GRPCMethodMatch{
+						Type:    ptrTo(gatewayv1.GRPCMethodMatchExact),
+						Service: ptrTo("foo"),
+						Method:  ptrTo("bar"),
+					},
+				}
+
+				var rules []gatewayv1.GRPCRouteRule
+				for i := 0; i < 2; i++ { // Create 2 rules
+					rule := gatewayv1.GRPCRouteRule{}
+					for j := 0; j < 48; j++ { // Each rule has 48 matches
+						rule.Matches = append(rule.Matches, match)
+					}
+					rules = append(rules, rule)
+				}
+				return rules
+			}(),
+		}}
+
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			route := &gatewayv1.GRPCRoute{
