@@ -16,7 +16,7 @@ cover, and documentation to help users get started.
 
 - [Acnodal EPIC][1]
 - [Airlock Microgateway][34]
-- [Amazon Elastic Kubernetes Service][23] (alpha)
+- [Amazon Elastic Kubernetes Service][23] (GA)
 - [Apache APISIX][2] (beta)
 - [Avi Kubernetes Operator][31] (tech preview)
 - [Azure Application Gateway for Containers][27] (GA)
