@@ -29,7 +29,7 @@ Multiple data plane proxies offer optional configuration for budgeted retries, i
 
 Configuring a limit for client retries is an important factor in building a resilient system, allowing requests to be successfully retried during periods of intermittent failure. But too many client-side retries can also exacerbate consistent failures and slow down recovery, quickly overwhelming a failing system and leading to cascading failures such as retry storms. Configuring a sane limit for max client-side retries is often challenging in complex systems. Allowing an application developer (Ana) to configure a dynamic "retry budget" reduces the risk of a high number of retries across clients. It allows a service to perform as expected in both times of high & low request load, as well as both during periods of intermittent & consistent failures.
 
-While retry budget configuration has been a frequently discussed feature within the community, differences in the semantics between data plane implementations creates a challenge for a consensus on the correct location for the configuration. This proposal aims to determine where retry budget's should be defined within the Gateway API, and whether data plane proxies may need to be altered to accommodate the specification.
+While retry budget configuration has been a frequently discussed feature within the community, differences in the semantics between data plane implementations creates a challenge for a consensus on the correct location for the configuration. This proposal aims to determine where retry budgets should be defined within the Gateway API, and whether data plane proxies may need to be altered to accommodate the specification.
 
 ### Background on implementations
 
