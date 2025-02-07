@@ -184,13 +184,6 @@ type BackendTrafficPolicySpec struct {
 // CommonRetryPolicy defines the configuration for when to retry a request.
 //
 type CommonRetryPolicy struct {
-    // TODO: Does it make sense to include this configuration in the policy or not?
-    //
-    // Support: Extended
-    //
-    // +optional
-    HTTP *HTTPRouteRetry `json:"http,omitempty"`
-
     // Support: Extended
     //
     // +optional
@@ -246,14 +239,6 @@ spec:
       name: istio
     - kind: Gateway
       name: foo-ingress
-  http:
-    codes:
-    - 500
-    - 502
-    - 503
-    - 504
-    attempts: 2
-    backoff: 100ms
   budgetPercent: 20
   budgetInterval: 10s
   minRetryRate:
@@ -299,14 +284,6 @@ spec:
     - kind: Gateway
       name: foo-ingress
   retry:
-    http:
-      codes:
-      - 500
-      - 502
-      - 503
-      - 504
-      attempts: 2
-      backoff: 100ms
     budgetPercent: 20
     budgetInterval: 10s
     minRetryRate:
