@@ -79,52 +79,9 @@ The implementation of a version of Linkerd's `ttl` parameter within Envoy might 
 
 ## API
 
-Two possible API designs are provided below, likely only one should be selected for implementation.
-
 ### Go
 
 ```golang
-type RetryPolicy struct {
-    // RetryPolicy defines the configuration for when to retry a request to a target backend.
-    // Implementations SHOULD retry on connection errors (disconnect, reset, timeout,
-    // TCP failure) if a retry stanza is configured.
-    //
-    // Support: Extended
-    //
-    // +optional
-    // <gateway:experimental>
-    //
-    // Note: there is no Override or Default policy configuration.
-
-    metav1.TypeMeta   `json:",inline"`
-    metav1.ObjectMeta `json:"metadata,omitempty"`
-
-    // Spec defines the desired state of BackendLBPolicy.
-    Spec RetryPolicySpec `json:"spec"`
-
-    // Status defines the current state of BackendLBPolicy.
-    Status PolicyStatus `json:"status,omitempty"`
-}
-
-type RetryPolicySpec struct {
-  // TargetRef identifies an API object to apply policy to.
-  // Currently, Backends (i.e. Service, ServiceImport, or any
-  // implementation-specific backendRef) are the only valid API
-  // target references.
-  // +listType=map
-  // +listMapKey=group
-  // +listMapKey=kind
-  // +listMapKey=name
-  // +kubebuilder:validation:MinItems=1
-  // +kubebuilder:validation:MaxItems=16
-  TargetRefs []LocalPolicyTargetReference `json:"targetRefs"`
-
-  // TODO: This captures the basic idea, but should likely be a new type.
-  From []ReferenceGrantFrom `json:"from,omitempty"`
-
-  CommonRetryPolicy `json:",inline"`
-}
-
 type BackendTrafficPolicy struct {
     // BackendTrafficPolicy defines the configuration for how traffic to a target backend should be handled.
     //
@@ -158,9 +115,6 @@ type BackendTrafficPolicySpec struct {
   // +kubebuilder:validation:MaxItems=16
   TargetRefs []LocalPolicyTargetReference `json:"targetRefs"`
 
-  // TODO: This captures the basic idea, but should likely be a new type.
-  From []ReferenceGrantFrom `json:"from,omitempty"`
-
   // Retry defines the configuration for when to retry a request to a target backend.
   //
   // Implementations SHOULD retry on connection errors (disconnect, reset, timeout,
@@ -184,13 +138,6 @@ type BackendTrafficPolicySpec struct {
 // CommonRetryPolicy defines the configuration for when to retry a request.
 //
 type CommonRetryPolicy struct {
-    // TODO: Does it make sense to include this configuration in the policy or not?
-    //
-    // Support: Extended
-    //
-    // +optional
-    HTTP *HTTPRouteRetry `json:"http,omitempty"`
-
     // Support: Extended
     //
     // +optional
@@ -232,58 +179,6 @@ type Duration string
 
 ```yaml
 apiVersion: gateway.networking.x-k8s.io/v1alpha1
-kind: RetryPolicy
-metadata:
-  name: retry-policy-example
-spec:
-  targetRefs:
-    - group: ""
-      kind: Service
-      name: foo
-  from:
-    - kind: Mesh
-      namespace: istio-system
-      name: istio
-    - kind: Gateway
-      name: foo-ingress
-  http:
-    codes:
-    - 500
-    - 502
-    - 503
-    - 504
-    attempts: 2
-    backoff: 100ms
-  budgetPercent: 20
-  budgetInterval: 10s
-  minRetryRate:
-    count: 3
-    interval: 1s
-status:
-  ancestors:
-  - ancestorRef:
-      kind: Mesh
-      namespace: istio-system
-      name: istio
-    controllerName: "istio.io/mesh-controller"
-    conditions:
-    - type: "Accepted"
-      status: "True"
-      reason: "Accepted"
-  - ancestorRef:
-      kind: Gateway
-      namespace: foo-ns
-      name: foo-ingress
-    controllerName: "istio.io/mesh-controller"
-    conditions:
-    - type: "Accepted"
-      status: "False"
-      reason: "Invalid"
-      message: "RetryPolicy fields budgetPercentage, budgetInterval and minRetryRate are not supported for Istio ingress gateways."
-```
-
-```yaml
-apiVersion: gateway.networking.x-k8s.io/v1alpha1
 kind: BackendTrafficPolicy
 metadata:
   name: traffic-policy-example
@@ -292,21 +187,7 @@ spec:
     - group: ""
       kind: Service
       name: foo
-  from:
-    - kind: Mesh
-      namespace: istio-system
-      name: istio
-    - kind: Gateway
-      name: foo-ingress
   retry:
-    http:
-      codes:
-      - 500
-      - 502
-      - 503
-      - 504
-      attempts: 2
-      backoff: 100ms
     budgetPercent: 20
     budgetInterval: 10s
     minRetryRate:
