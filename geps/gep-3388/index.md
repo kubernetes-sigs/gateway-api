@@ -79,49 +79,9 @@ The implementation of a version of Linkerd's `ttl` parameter within Envoy might 
 
 ## API
 
-Two possible API designs are provided below, likely only one should be selected for implementation.
-
 ### Go
 
 ```golang
-type RetryPolicy struct {
-    // RetryPolicy defines the configuration for when to retry a request to a target backend.
-    // Implementations SHOULD retry on connection errors (disconnect, reset, timeout,
-    // TCP failure) if a retry stanza is configured.
-    //
-    // Support: Extended
-    //
-    // +optional
-    // <gateway:experimental>
-    //
-    // Note: there is no Override or Default policy configuration.
-
-    metav1.TypeMeta   `json:",inline"`
-    metav1.ObjectMeta `json:"metadata,omitempty"`
-
-    // Spec defines the desired state of BackendLBPolicy.
-    Spec RetryPolicySpec `json:"spec"`
-
-    // Status defines the current state of BackendLBPolicy.
-    Status PolicyStatus `json:"status,omitempty"`
-}
-
-type RetryPolicySpec struct {
-  // TargetRef identifies an API object to apply policy to.
-  // Currently, Backends (i.e. Service, ServiceImport, or any
-  // implementation-specific backendRef) are the only valid API
-  // target references.
-  // +listType=map
-  // +listMapKey=group
-  // +listMapKey=kind
-  // +listMapKey=name
-  // +kubebuilder:validation:MinItems=1
-  // +kubebuilder:validation:MaxItems=16
-  TargetRefs []LocalPolicyTargetReference `json:"targetRefs"`
-
-  CommonRetryPolicy `json:",inline"`
-}
-
 type BackendTrafficPolicy struct {
     // BackendTrafficPolicy defines the configuration for how traffic to a target backend should be handled.
     //
@@ -216,44 +176,6 @@ type RequestRate struct {
 type Duration string
 
 ### YAML
-
-```yaml
-apiVersion: gateway.networking.x-k8s.io/v1alpha1
-kind: RetryPolicy
-metadata:
-  name: retry-policy-example
-spec:
-  targetRefs:
-    - group: ""
-      kind: Service
-      name: foo
-  budgetPercent: 20
-  budgetInterval: 10s
-  minRetryRate:
-    count: 3
-    interval: 1s
-status:
-  ancestors:
-  - ancestorRef:
-      kind: Mesh
-      namespace: istio-system
-      name: istio
-    controllerName: "istio.io/mesh-controller"
-    conditions:
-    - type: "Accepted"
-      status: "True"
-      reason: "Accepted"
-  - ancestorRef:
-      kind: Gateway
-      namespace: foo-ns
-      name: foo-ingress
-    controllerName: "istio.io/mesh-controller"
-    conditions:
-    - type: "Accepted"
-      status: "False"
-      reason: "Invalid"
-      message: "RetryPolicy fields budgetPercentage, budgetInterval and minRetryRate are not supported for Istio ingress gateways."
-```
 
 ```yaml
 apiVersion: gateway.networking.x-k8s.io/v1alpha1
