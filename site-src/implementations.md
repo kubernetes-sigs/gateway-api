@@ -56,7 +56,7 @@ cover, and documentation to help users get started.
 - [cert-manager][15] (alpha)
 - [argo-rollouts][22] (alpha)
 - [Knative][24] (alpha)
-- [Kuadrant][26] (work in progress)
+- [Kuadrant][26] (GA)
 
 [1]:#acnodal-epic
 [2]:#apisix
@@ -555,13 +555,14 @@ cert-manager can generate TLS certificates for Gateway resources. This is config
 
 ### Kuadrant
 
-[Kuadrant][kuadrant] is an open source multi cluster Gateway API controller that integrates with and provides policies to other Gateway API providers.
+[Kuadrant][kuadrant] is an open source multi cluster Gateway API controller that integrates with and provides policies via policy attachment to other Gateway API providers.
 
-Kuadrant supports Gateway API for defining gateways centrally and attaching policies such as DNS, TLS, Auth and Rate Limiting that apply to all gateway instances in a multi cluster environment.
-Kuadrant works with Istio as the underlying gateway provider, with plans to work with other gateway providers such as Envoy Gateway.
+Kuadrant supports Gateway API for defining gateways centrally and attaching policies such as DNS, TLS, Auth and Rate Limiting that apply to all of your Gateways.
+
+Kuadrant works with both Istio and Envoy Gateway as underlying Gateway API providers, with plans to work with other gateway providers in future.
 
 For help and support with Kuadrant's implementation please feel free to [create an issue][kuadrant-issue-new] or ask for help in the [#kuadrant channel on Kubernetes slack][kuadrant-slack].
 
 [kuadrant]:https://kuadrant.io/
-[kuadrant-issue-new]:https://github.com/Kuadrant/multicluster-gateway-controller/issues/new
+[kuadrant-issue-new]:https://github.com/Kuadrant/kuadrant-operator/issues/new
 [kuadrant-slack]:https://kubernetes.slack.com/archives/C05J0D0V525
