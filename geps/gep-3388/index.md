@@ -119,9 +119,6 @@ type RetryPolicySpec struct {
   // +kubebuilder:validation:MaxItems=16
   TargetRefs []LocalPolicyTargetReference `json:"targetRefs"`
 
-  // TODO: This captures the basic idea, but should likely be a new type.
-  From []ReferenceGrantFrom `json:"from,omitempty"`
-
   CommonRetryPolicy `json:",inline"`
 }
 
@@ -157,9 +154,6 @@ type BackendTrafficPolicySpec struct {
   // +kubebuilder:validation:MinItems=1
   // +kubebuilder:validation:MaxItems=16
   TargetRefs []LocalPolicyTargetReference `json:"targetRefs"`
-
-  // TODO: This captures the basic idea, but should likely be a new type.
-  From []ReferenceGrantFrom `json:"from,omitempty"`
 
   // Retry defines the configuration for when to retry a request to a target backend.
   //
@@ -233,12 +227,6 @@ spec:
     - group: ""
       kind: Service
       name: foo
-  from:
-    - kind: Mesh
-      namespace: istio-system
-      name: istio
-    - kind: Gateway
-      name: foo-ingress
   budgetPercent: 20
   budgetInterval: 10s
   minRetryRate:
@@ -277,12 +265,6 @@ spec:
     - group: ""
       kind: Service
       name: foo
-  from:
-    - kind: Mesh
-      namespace: istio-system
-      name: istio
-    - kind: Gateway
-      name: foo-ingress
   retry:
     budgetPercent: 20
     budgetInterval: 10s
