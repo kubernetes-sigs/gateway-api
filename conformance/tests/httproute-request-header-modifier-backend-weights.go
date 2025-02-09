@@ -73,7 +73,7 @@ var HTTPRouteRequestHeaderModifierBackendWeights = suite.ConformanceTest{
 			expectedBackends := cReq.Headers["Backend"]
 
 			if len(expectedBackends) != 1 {
-				t.Fatalf("expected a single 'backend' header to have been set, got %d", len(expectedBackends))
+				t.Fatalf("expected a single 'Backend' header to have been set, got %d", len(expectedBackends))
 			}
 
 			if !strings.HasPrefix(cReq.Pod, expectedBackends[0]) {
