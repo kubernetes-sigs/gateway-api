@@ -14,6 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# https://github.com/kubernetes/code-generator provides generator code to generate a custom typed
+# and versioned client for custom API types similar to what https://github.com/kubernetes/client-go
+# provides for core types. This script generates such a client for the Gateway API types, in service of any
+# projects that need them.
+
 set -o errexit
 set -o nounset
 set -o pipefail
