@@ -21,87 +21,104 @@ import (
 )
 
 type BackendTrafficPolicy struct {
-    // BackendTrafficPolicy defines the configuration for how traffic to a target backend should be handled.
-    //
-    // Support: Extended
-    //
-    // +optional
-    // <gateway:experimental>
-    //
-    // Note: there is no Override or Default policy configuration.
+	// BackendTrafficPolicy defines the configuration for how traffic to a
+	// target backend should be handled.
+	//
+	// Support: Extended
+	//
+	// +optional
+	// <gateway:experimental>
+	//
+	// Note: there is no Override or Default policy configuration.
 
-    metav1.TypeMeta   `json:",inline"`
-    metav1.ObjectMeta `json:"metadata,omitempty"`
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-    // Spec defines the desired state of BackendTrafficPolicy.
-    Spec BackendTrafficPolicySpec `json:"spec"`
-    
-    // Status defines the current state of BackendTrafficPolicy.
-    Status PolicyStatus `json:"status,omitempty"`
+	// Spec defines the desired state of BackendTrafficPolicy.
+	Spec BackendTrafficPolicySpec `json:"spec"`
+
+	// Status defines the current state of BackendTrafficPolicy.
+	Status PolicyStatus `json:"status,omitempty"`
 }
 
 type BackendTrafficPolicySpec struct {
-  // TargetRef identifies an API object to apply policy to.
-  // Currently, Backends (i.e. Service, ServiceImport, or any
-  // implementation-specific backendRef) are the only valid API
-  // target references.
-  // +listType=map
-  // +listMapKey=group
-  // +listMapKey=kind
-  // +listMapKey=name
-  // +kubebuilder:validation:MinItems=1
-  // +kubebuilder:validation:MaxItems=16
-  TargetRefs []LocalPolicyTargetReference `json:"targetRefs"`
+	// TargetRef identifies an API object to apply policy to.
+	// Currently, Backends (i.e. Service, ServiceImport, or any
+	// implementation-specific backendRef) are the only valid API
+	// target references.
+	// +listType=map
+	// +listMapKey=group
+	// +listMapKey=kind
+	// +listMapKey=name
+	// +kubebuilder:validation:MinItems=1
+	// +kubebuilder:validation:MaxItems=16
+	TargetRefs []LocalPolicyTargetReference `json:"targetRefs"`
 
-  // Retry defines the configuration for when to retry a request to a target backend.
-  //
-  // Implementations SHOULD retry on connection errors (disconnect, reset, timeout,
-  // TCP failure) if a retry stanza is configured.
-  //
-  // Support: Extended
-  //
-  // +optional
-  // <gateway:experimental>
-  Retry *CommonRetryPolicy `json:"retry,omitempty"`
+	// Retry defines the configuration for when to retry a request to a target
+	// backend.
+	//
+	// Implementations SHOULD retry on connection errors (disconnect, reset, timeout,
+	// TCP failure) if a retry stanza is configured.
+	//
+	// Support: Extended
+	//
+	// +optional
+	// <gateway:experimental>
+	Retry *CommonRetryPolicy `json:"retry,omitempty"`
 
-  // SessionPersistence defines and configures session persistence
-  // for the backend.
-  //
-  // Support: Extended
-  //
-  // +optional
-  SessionPersistence *SessionPersistence `json:"sessionPersistence,omitempty"`
+	// SessionPersistence defines and configures session persistence
+	// for the backend.
+	//
+	// Support: Extended
+	//
+	// +optional
+	SessionPersistence *SessionPersistence `json:"sessionPersistence,omitempty"`
 }
 
 // CommonRetryPolicy defines the configuration for when to retry a request.
-//
 type CommonRetryPolicy struct {
-    // Support: Extended
-    //
-    // +optional
-    BudgetPercent *int `json:"budgetPercent,omitempty"`
+	// BudgetPercent defines the maximum percentage of active requests that may
+	// be made up of retries.
+	//
+	// Support: Extended
+	//
+	// +optional
+	BudgetPercent *int `json:"budgetPercent,omitempty"`
 
-    // Support: Extended
-    //
-    // +optional
-    BudgetInterval *Duration `json:"budgetInterval,omitempty"`
+	// BudgetInterval defines the duration in which requests will be considered
+	// for calculating the budget for retries.
+	//
+	// Support: Extended
+	//
+	// +optional
+	BudgetInterval *Duration `json:"budgetInterval,omitempty"`
 
-    // Support: Extended
-    //
-    // +optional
-    MinRetryRate *RequestRate `json:"minRetryRate,omitempty"`
+	// MinRetryRate defines the minimum rate of retries that will be allowable
+	// over a specified duration of time.
+	//
+	// Ensures that requests can still be retried during periods of low
+	// traffic.
+	//
+	// Support: Extended
+	//
+	// +optional
+	MinRetryRate *RequestRate `json:"minRetryRate,omitempty"`
 }
 
 // RequestRate expresses a rate of requests over a given period of time.
-//
 type RequestRate struct {
-    // Support: Extended
-    //
-    // +optional
-    Count *int `json:"count,omitempty"`
+	// Count specifies the number of requests per time interval.
+	//
+	// Support: Extended
+	//
+	// +optional
+	Count *int `json:"count,omitempty"`
 
-    // Support: Extended
-    //
-    // +optional
-    Interval *Duration `json:"interval,omitempty"`
+	// Interval specifies the divisor of the rate of requests, the amount of
+	// time during which the given count of requests occr.
+	//
+	// Support: Extended
+	//
+	// +optional
+	Interval *Duration `json:"interval,omitempty"`
 }
