@@ -63,6 +63,7 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 	scheme.AddKnownTypes(SchemeGroupVersion,
 		&BackendLBPolicy{},
 		&BackendLBPolicyList{},
+		&BackendTrafficPolicy{},
 		&GRPCRoute{},
 		&GRPCRouteList{},
 		&ReferenceGrant{},
