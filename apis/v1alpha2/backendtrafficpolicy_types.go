@@ -111,15 +111,11 @@ type RequestRate struct {
 	// Count specifies the number of requests per time interval.
 	//
 	// Support: Extended
-	//
-	// +optional
 	Count *int `json:"count,omitempty"`
 
 	// Interval specifies the divisor of the rate of requests, the amount of
 	// time during which the given count of requests occur.
 	//
 	// Support: Extended
-	//
-	// +optional
 	Interval *Duration `json:"interval,omitempty"`
 }
