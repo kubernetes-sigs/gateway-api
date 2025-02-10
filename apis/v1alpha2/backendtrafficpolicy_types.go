@@ -96,8 +96,9 @@ type CommonRetryPolicy struct {
 	// MinRetryRate defines the minimum rate of retries that will be allowable
 	// over a specified duration of time.
 	//
-	// Ensures that requests can still be retried during periods of low
-	// traffic.
+	// This ensures that requests can still be retried during periods of low
+	// traffic, where the budget for retries may be calculated as a very low
+	// value.
 	//
 	// Support: Extended
 	//
@@ -115,7 +116,7 @@ type RequestRate struct {
 	Count *int `json:"count,omitempty"`
 
 	// Interval specifies the divisor of the rate of requests, the amount of
-	// time during which the given count of requests occr.
+	// time during which the given count of requests occur.
 	//
 	// Support: Extended
 	//
