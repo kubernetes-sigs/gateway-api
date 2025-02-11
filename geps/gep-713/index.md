@@ -242,11 +242,15 @@ Meta resource kinds that implement more than one merge strategy MUST provide fie
 
 #### Conflict resolution
 
-If multiple meta resources target the same context, the following criteria MUST be applied in order to resolve the conflict and thus calculate the effective spec, continuing on ties:
+If multiple meta resources target the same context, this is considered to be a conflict.
 
-1. Between two meta resources at different levels of the hierarchy, higher level specs dictate the *merge strategy* according to which the conflict must be resolved, defaulting to the lower spec (more specific) beating the higher one if not specified otherwise.
-2. Between two meta resources at the same level of the hierarchy, the older meta resource based on creation timestamp beats a newer one.
-3. Between two meta resources at the same level of the hierarchy and identical creation timestamps, the meta resource appearing first in alphabetical order by `{namespace}/{name}` beats another.
+Conflicts must be resolved by applying a defined *merge strategy* (see further definition in the next section), where the meta resource considered higher between two conflicting specs dictates the merge strategy according to which the conflict must be resolved, defaulting to the lower spec (more specific) beating the higher one if not specified otherwise.
+
+The following criteria MUST be applied to determine which meta resources are higher or lower and thus infer which merge strategy to apply to calculate the effective spec, continuing on ties:
+
+1. Between two meta resources at different levels of the hierarchy, the one attached higher in the hierarchy MUST be considered higher than the one attached lower in the hierarchy.
+2. Between two meta resources at the same level of the hierarchy, the older meta resource based on creation timestamp MUST be considered higher than the newer one.
+3. Between two meta resources at the same level of the hierarchy and identical creation timestamps, the meta resource appearing first in alphabetical order by `{namespace}/{name}` MUST be considered higher than the other.
 
 #### Abstract process for calculating Effective meta resources
 
