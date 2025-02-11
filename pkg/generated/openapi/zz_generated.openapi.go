@@ -5901,7 +5901,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_BackendTrafficPolicySpec(ref com
 					},
 					"retry": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Retry defines the configuration for when to retry a request to a target backend.\n\nImplementations SHOULD retry on connection errors (disconnect, reset, timeout, TCP failure) if a retry stanza is configured.\n\nSupport: Extended\n\n<gateway:experimental>",
+							Description: "Retry defines the configuration for when to allow or prevent retries to a target backend.\n\nWhile the static number of retries performed by the client are configured within HTTPRoute Retry stanzas, configuring the CommonRetryPolicy allows you to constrain further retries after a dynamic budget for retries has been exceeded.\n\nSupport: Extended\n\n<gateway:experimental>",
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1alpha2.CommonRetryPolicy"),
 						},
 					},
@@ -5943,7 +5943,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_CommonRetryPolicy(ref common.Ref
 					},
 					"minRetryRate": {
 						SchemaProps: spec.SchemaProps{
-							Description: "MinRetryRate defines the minimum rate of retries that will be allowable over a specified duration of time.\n\nEnsures that requests can still be retried during periods of low traffic.\n\nSupport: Extended",
+							Description: "MinRetryRate defines the minimum rate of retries that will be allowable over a specified duration of time.\n\nThis ensures that requests can still be retried during periods of low traffic, where the budget for retries may be calculated as a very low value.\n\nSupport: Extended",
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1alpha2.RequestRate"),
 						},
 					},
@@ -6369,7 +6369,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_RequestRate(ref common.Reference
 					},
 					"interval": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Interval specifies the divisor of the rate of requests, the amount of time during which the given count of requests occr.\n\nSupport: Extended",
+							Description: "Interval specifies the divisor of the rate of requests, the amount of time during which the given count of requests occur.\n\nSupport: Extended",
 							Type:        []string{"string"},
 							Format:      "",
 						},

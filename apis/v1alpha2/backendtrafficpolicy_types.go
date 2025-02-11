@@ -54,11 +54,13 @@ type BackendTrafficPolicySpec struct {
 	// +kubebuilder:validation:MaxItems=16
 	TargetRefs []LocalPolicyTargetReference `json:"targetRefs"`
 
-	// Retry defines the configuration for when to retry a request to a target
-	// backend.
+	// Retry defines the configuration for when to allow or prevent retries to a
+	// target backend.
 	//
-	// Implementations SHOULD retry on connection errors (disconnect, reset, timeout,
-	// TCP failure) if a retry stanza is configured.
+	// While the static number of retries performed by the client are
+	// configured within HTTPRoute Retry stanzas, configuring the
+	// CommonRetryPolicy allows you to constrain further retries after a
+	// dynamic budget for retries has been exceeded.
 	//
 	// Support: Extended
 	//
@@ -83,6 +85,9 @@ type CommonRetryPolicy struct {
 	// Support: Extended
 	//
 	// +optional
+	// +kubebuilder:default=20
+	// +kubebuilder:validation:Minimum=0
+	// +kubebuilder:validation:Maximum=100
 	BudgetPercent *int `json:"budgetPercent,omitempty"`
 
 	// BudgetInterval defines the duration in which requests will be considered
@@ -91,6 +96,7 @@ type CommonRetryPolicy struct {
 	// Support: Extended
 	//
 	// +optional
+	// +kubebuilder:default=10s
 	BudgetInterval *Duration `json:"budgetInterval,omitempty"`
 
 	// MinRetryRate defines the minimum rate of retries that will be allowable
@@ -103,6 +109,7 @@ type CommonRetryPolicy struct {
 	// Support: Extended
 	//
 	// +optional
+	// +kubebuilder:default={count: 10, interval: 1s}
 	MinRetryRate *RequestRate `json:"minRetryRate,omitempty"`
 }
 
