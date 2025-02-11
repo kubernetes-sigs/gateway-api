@@ -609,7 +609,7 @@ That condition MUST be named according to the pattern `<meta-resource-kind>Affec
 
 Implementations should use their own unique domain prefix for this condition type. Gateway API implementations, for instance, should use the same domain as in the `controllerName` field on `GatewayClass` (or some other implementation-unique domain for implementations that do not use `GatewayClass`.)
 
-For objects that do not have a `status.Conditions` field available (`Secret` is a good example), that object MUST instead have an annotation of `colors.controller.k8s.io/ColorPolicyAffected: true` added instead.
+For objects that do not have a `status.Conditions` field available (`Secret` is a good example), that object SHOULD instead have an annotation of `colors.controller.k8s.io/ColorPolicyAffected: true` added instead.
 
 #### Status needs to be namespaced by implementation
 
