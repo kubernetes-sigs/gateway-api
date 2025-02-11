@@ -72,12 +72,12 @@ nav:
       - geps/gep-1731/index.md
       - geps/gep-1748/index.md
       - geps/gep-1767/index.md
-      - geps/gep-2649/index.md
       - geps/gep-3155/index.md
       - geps/gep-3388/index.md
       - geps/gep-3567/index.md
     - Standard:
       - geps/gep-709/index.md
+      - geps/gep-713/index.md
       - geps/gep-718/index.md
       - geps/gep-724/index.md
       - geps/gep-726/index.md
@@ -101,10 +101,11 @@ nav:
       - geps/gep-2257/index.md
       - geps/gep-3171/index.md
     - Memorandum:
-      - geps/gep-713/index.md
       - geps/gep-917/index.md
       - geps/gep-922/index.md
       - geps/gep-1324/index.md
+      - geps/gep-2648/index.md
+      - geps/gep-2649/index.md
       - geps/gep-2722/index.md
       - geps/gep-2907/index.md
   - Contributing:

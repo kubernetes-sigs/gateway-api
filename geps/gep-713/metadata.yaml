@@ -2,13 +2,14 @@ apiVersion: internal.gateway.networking.k8s.io/v1alpha1
 kind: GEPDetails
 number: 713
 name: Metaresources and Policy Attachment
-status: Memorandum
+status: Standard
 authors:
   - youngnick
   - robscott
   - kflynn
   - sanjaypujare
   - spacewander
+  - guicassolato
 relationships:
   extendedBy:
     - name: Direct Policy Attachment
