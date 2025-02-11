@@ -1,7 +1,7 @@
 # GEP-3539: ClusterIP Gateway - Gateway API to Expose Pods on Cluster-Internal IP Address
 
 * Issue: [#3539](https://github.com/kubernetes-sigs/gateway-api/issues/3539)
-* Status: Experimental
+* Status: Memorandum
 
 ## TLDR
 
