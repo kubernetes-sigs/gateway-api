@@ -1,1157 +1,743 @@
-# GEP-713: Metaresources and Policy Attachment
+# GEP-713: Meta resources and Policy Attachment
 
 * Issue: [#713](https://github.com/kubernetes-sigs/gateway-api/issues/713)
-* Status: Memorandum
+* Status: Standard
+
+(See status definitions [here](/geps/overview/#gep-states))
 
 ## TLDR
 
-!!! danger
-    This GEP is in the process of being updated.
-    Please see the discussion at https://github.com/kubernetes-sigs/gateway-api/discussions/2927
-    and expect further changes, although they will not be as extensive as the
-    more focussed GEP-2648 and GEP-2649.
-    Some options under discussion there may make the distinction between Direct
-    and Inherited Policies moot, which would require a rework.
+This GEP aims to standardize terminology and processes around using one Kubernetes object to modify the functions of one or more other objects.
 
-This GEP aims to standardize terminology and processes around using one Kubernetes
-object to modify the functions of one or more other objects.
+It lays out guidelines for Gateway API implementations and other stakeholders for the design and/or handling of custom “meta resources” definitions in compliance with a standard known as Policy Attachment.
 
-This GEP defines some terms, firstly: _Metaresource_.
-
-A Kubernetes object that _augments_ the behavior of an object
-in a standard way is called a _Metaresource_.
-
-This document proposes controlling the creation of configuration in the underlying
-Gateway data plane using two types of Policy Attachment.
-A "Policy Attachment" is a specific type of _metaresource_ that can affect specific
-settings across either one object (this is "Direct Policy Attachment"), or objects
-in a hierarchy (this is "Inherited Policy Attachment").
-
-Individual policy APIs:
-
-- MUST be their own CRDs (e.g. `TimeoutPolicy`, `RetryPolicy` etc),
-- MUST include both `spec` and `status` stanzas
-- MUST have the `status` stanza include a `conditions` section using the standard
-  upstream Condition type
-- MAY be included in the Gateway API group and installation or be defined by
-  implementations
-- MUST include a common `TargetRef` struct in their specification to identify
-  how and where to apply that policy.
-- MAY affect more objects than the object specified in the `targetRef`. In this
-  case, the Policy is an Inherited Policy. A common way to do this is to include
-  either a `defaults` section, an `overrides` section, or both.
-- Policy objects that affect _only_ the object specified in the `targetRef` are
-  Direct Attached Policies (or more simply, Direct Policies.)
-
-The biggest difference between the two types of Policy is that Direct Attached
-Policies are a strict subset of Policy objects with criteria designed to make
-it _much_ easier to understand the state of the system, and so are simpler to
-use and can use a more simple `status` design.
-
-However, Inherited Policies, because of the nature of the useful feature of having
-settings cascade across multiple objects in a hierarchy, require knowledge of
-more resources, and are consequently harder to understand and require a more
-complex status design.
-
-Splitting these two design patterns apart into separate GEPs is intended to
-allow proceeding with stabilizing the simpler (Direct) case while we work on
-solving the status problem for the more complex (Inherited) case.
-
-Direct Attached Policies are further specified in the addendum GEP GEP-2648,
-Direct Policy Attachment.
-
-Inherited Policies are further specified in the addendum GEP-2649, Inherited
-Policy Attachment. GEP-2649 also describes a set of expected behaviors
-for how settings can flow across a defined hierarchy.
-
+This GEP specifies a _pattern_, not an API field or new object. It defines some terms, including _Meta resource_, _Policies_ and _Policy Attachment_, and their related concepts.
 
 ## Goals
 
-* Establish a pattern for Policy resources which will be used for any policies
-  included in the Gateway API spec
-* Establish a pattern for Policy attachment, whether Direct or Inherited,
-  which must be used for any implementation specific policies used with
-  Gateway API resources
-* Discuss the problems with communicating status for Policy objects, and suggest
-  mechanisms that Policy APIs can use to mitigate some of them.
-* Provide a way to distinguish between required and default values for all
-  policy API implementations
-* Enable policy attachment at all relevant scopes, including Gateways, Routes,
-  Backends, along with how values should flow across a hierarchy if necessary
-* Ensure the policy attachment specification is generic and forward thinking
-  enough that it could be easily adapted to other grouping mechanisms like
-  Namespaces in the future
-* Provide a means of attachment that works for both ingress and mesh
-  implementations of this API
-* Provide a consistent specification that will ensure familiarity between both
-  included and implementation-specific policies so they can both be interpreted
-  the same way.
-
-## Deferred Goals and Discussions
-
-* Should Policy objects be able to target more than one object? At the time of
-  writing, the answer to this is _no_, in the interests of managing complexity
-  in one change. But this rule can and should be discussed and reexamined in
-  light of community feedback that users _really_ want this. Any discussion will
-  need to consider the complexity tradeoffs here.
+* Establish a pattern for meta resources which will be used for any meta resources and policies included in the Gateway API spec.
+* Establish a pattern that must be adopted for any implementation-specific meta resources and policies used with Gateway API resources.
+* Discuss the problems with communicating status for meta resource objects, and suggest mechanisms that APIs can use to mitigate some of them.
+* Provide a way to distinguish between required and default values for all meta resource API implementations.
+* Enable Policy Attachment at all relevant scopes in Gateway API, including Gateways, Routes, Backends, along with how values should flow across a hierarchy if necessary.
+* Ensure the Policy Attachment specification is generic and forward thinking enough that it could be easily adapted to other grouping mechanisms like Namespaces in the future.
+* Provide a means of attachment that works for both ingress and mesh implementations of Gateway API.
+* Provide a consistent specification that will ensure familiarity between both included and implementation-specific meta resources so they can both be interpreted the same way.
+* Provide a reference pattern to other implementations of meta resource and policy APIs outside of Gateway API, that are based on similar concepts (i.e., augmenting the behavior of other Kubernetes objects, attachment points, nested contexts and inheritance, Defaults & Overrides, etc.)
 
 ## Out of scope
 
-* Define all potential policies that may be attached to resources
-* Design the full structure and configuration of policies
+* Define all potential meta resource and policy kinds that may be attached to resources.
 
-## Background and concepts
+## Background
 
-When designing Gateway API, one of the things we’ve found is that we often need to be
-able change the behavior of objects without being able to make changes to the spec
-of those objects. Sometimes, this is because we can’t change the spec of the object
-to hold the information we need ( ReferenceGrant, from
-[GEP-709](../gep-709/index.md), affecting Secrets
-and Services is an example, as is Direct Policy Attachment), and sometimes it’s
-because we want the behavior change to flow across multiple objects
-(this is what Inherited Policy Attachment is for).
+When designing Gateway API, it was found a frequent need to change the behavior of objects without being able to make changes to the spec of those objects. Sometimes, this is because changing the spec of the object to hold the new piece of information is not possible (e.g., `ReferenceGrant`, from [GEP-709](../gep-709/index.md), when affecting Secrets and Services), and sometimes it’s because the behavior change is intended to flow across multiple objects (see [Semantics](#semantics-why) of meta resources and [Inherited](#inherited) class of meta resources).
 
-To put this another way, sometimes we need ways to be able to affect how an object
-is interpreted in the API, without representing the description of those effects
-inside the spec of the object.
+To put this another way, sometimes we need ways to be able to affect how an object is interpreted in the API, without representing the description of those effects inside the spec of the object. This document describes the ways to design objects to meet use cases like these.
 
-This document describes the ways we design objects to meet these two use cases,
-and why you might choose one or the other.
+A new concept of “meta resource” has been introduced, a term used to describe the class of objects that _only_ augment the behavior of another Kubernetes object, regardless of what they are targeting.
 
-We use the term “metaresource” to describe the class of objects that _only_ augment
-the behavior of another Kubernetes object, regardless of what they are targeting.
+“Meta” here is used in its Greek sense of “more comprehensive” or “transcending”, and “resource” rather than “object” because “meta resource” is more pronounceable than “meta object”.
 
-“Meta” here is used in its Greek sense of “more comprehensive”
-or “transcending”, and “resource” rather than “object” because “metaresource”
-is more pronounceable than “metaobject”. Additionally, a single word is better
-than a phrase like “wrapper object” or “wrapper resource” overall, although both
-of those terms are effectively synonymous with “metaresource”.
+After a few iterations of Gateway API experimenting with this pattern－both, with its own common kinds of meta resources such as the `BackendTLSPolicy`, as well as via multiple implementation-specific kinds of meta resources (see examples of [current use of meta resources](#current-use-of-meta-resources))－ and rounds of discussion such as the one at [kubernetes-sigs/gateway-api/discussions#2927](https://github.com/kubernetes-sigs/gateway-api/discussions/2927), the pattern has been enhanced to its current form.
 
-A "Policy Attachment" is a metaresource that affects the fields in existing objects
-(like Gateway or Routes), or influences the configuration that's generated in an
-underlying data plane.
+## Definition
 
-"Direct Policy Attachment" is when a Policy object references a single object _only_,
-and only modifies the fields of or the configuration associated with that object.
+### Meta resources
 
-"Inherited Policy Attachment" is when a Policy object references a single object
-_and any child objects of that object_ (according to some defined hierarchy), and
-modifies fields of the child objects, or configuration associated with the child
-objects.
+*Meta resources* are objects that augment the behavior of other objects (*targets*) in a clean and standard way, by declaring additional specification for these targets “from the outside”－i.e., without directly modifying the objects whose behavior the meta resource intends to affect, nor requiring any reference from the objects to the meta resources that affect them.
 
-In either case, a Policy may either affect an object by controlling the value
-of one of the existing _fields_ in the `spec` of an object, or it may add
-additional fields that are _not_ in the `spec` of the object.
+Meta resources follow a well-known structure that declares clearly a *target* and an *intent*.
 
-### Why use Policy Attachment at all?
+#### Meta resources are well-structured CRDs
 
+Meta resources are typically implemented as Custom Resource Definitions (CRDs) that comply with a particular structure. This structure includes fields for specifying references to one or more other objects－called “targets“－whose behavior the instances of the meta resource intend to augment (i.e. declare additional specification), along with resource-specific fields－the “spec proper”－to describe the intended augmented behavior.
 
-Consistent UX across GW implementations
+While the targets of a meta resource give the meta resource a *context*, the spec proper declares the *intent* within that context.
 
-Support for common tooling such as gwctl that can compute and display effective policies at each layer
-
-Avoid annotation hell
-
-
-### Direct Policy Attachment
-
-For more description of the details of Direct Policy Attachment,
-see [GEP-2648](../gep-2648/index.md).
-
-### Inherited Policy Attachment
-
-For more description of the details of Inherited Policy Attachment,
-see [GEP-2649](../gep-2649/index.md).
-
-### How to determine if a Policy is a Direct or Inherited one
-
-The basic rule here is "Does the Policy affect _any_ other object aside from
-the one it targets?" If not, it's Direct. If so, it's Inherited.
-
-The reason for this is that Direct Attached Policies make it _much_ easier to
-understand the state of the system, and so can use a more simple `status` design.
-However, Inherited Policies require knowledge of more resources, and consequently
-a more complex status design.
-
-#### Policy type examples
-
-The separate GEPs have more examples of policies of each type, but here are two
-small examples. Please see the separated GEPs for more examples.
-
-**BackendTLSPolicy** is the canonical example of a Direct Attached Policy because
-it _only_ affects the Service that the Policy attaches to, and affects how that
-Service is consumed. But you can know everything you need to about the Service
-and BackendTLSPolicy just by looking at those two objects.
-
-**Hypothetical max body size Policy**: Kate Osborn
-[raised this on Slack](https://kubernetes.slack.com/archives/CR0H13KGA/p1708723178714389),
-asking if a policy applied to a Gateway configures a data plane setting that
-affects routes counts as an Inherited Policy, giving the example of a max body
-size Policy.
-
-In this sort of case, the object does count as an Inherited Policy because
-it's affecting not just the properties of the Gateway, but properties of the
-Routes attached to it (and you thus need to know about the Policy, the Gateway,
-_and_ the Routes to be able to understand the system).
-
-
-## Naming Policy objects
-
-Although Direct and Inherited Policies behave differently in many respects, in
-general they should be named using similar rules.
-
-Policy objects MUST be clearly named so as to indicate that they are Policy
-metaresources.
-
-The simplest way to do that is to ensure that the type's name contains the `Policy`
-string.
-
-Implementations SHOULD use `Policy` as the last part of the names of object types
-that use this pattern.
-
-If an implementation does not, then they MUST clearly document what objects
-are Policy metaresources in their documentation. Again, this is _not recommended_
-without a _very_ good reason.
-
-### Targeting Virtual Types
-In some cases (likely limited to mesh) we may want to apply policies to requests
-to external services. To accomplish this, implementations MAY choose to support
-a reference to a virtual resource type. For example:
+A typical meta resource looks like the following – example provided based on a hypothetical `ColorPolicy` kind of meta resource:
 
 ```yaml
-apiVersion: networking.acme.io/v1alpha1
-kind: RetryPolicy
+apiVersion: policies.controller.io/v1
+kind: ColorPolicy
 metadata:
-  name: foo
+  name: my-color-policy
 spec:
-  default:
-    maxRetries: 5
+  targetRefs: ## target objects whose behaviour to augment
+  - group: gateway.networking.k8s.io/v1
+    kind: Gateway
+    name: my-gateway
+  rules:      ## the "spec proper" describing the intent, i.e. color the traffic blue
+    color: blue
+```
+
+#### Properties of meta resources
+
+##### Targetability (“where”)
+
+Meta resources specify one or more target resources or specific sections of resources, whose behavior the meta resource intends to augment.
+
+##### Semantics (“why”)
+
+Targeting a resource (or section of a resource) must be interpreted within a given semantics that is proper to the meta resource kind.
+
+Two different meta resource kinds that allow targeting resources of a same a given kind X may have very different semantics, not only because the purpose of the two meta resource kinds differ, but because the mechanics of calculating and applying the augment behavior for X can as well be very different between meta resource kinds.
+
+Often, the semantics of a meta resource is tightly coupled to the relationships and connections a target has with other kinds of objects, typically organized in a hierarchy of nested contexts. In this sense, targeting a given resource kind may have the semantics of spanning effect across yet other objects to which the target is related.
+
+##### Mergeability (“how”)
+
+Meta resources specify so-called *merge strategies* that dictate how multiple instances of the meta resource affecting a same resource (or section of a resource) should be dealt with in terms of calculating and enforcing a single set of rules specified by the meta resources.
+
+The merge strategies typically include strategies for dealing with conflicting and/or missing specs, such as for applying default and/or override values on the target resources.
+
+### Policies and Policy Attachment
+
+Often when applying a meta resource, the intent has to do with specifying *rules* that control the behavior of the targets in action. E.g., for networking resources, the augmented behavior specified by a meta resource targeting an object can relate to conditions to let traffic flow or to block traffic at particular points of the network; in a different scenario, it can describe rules to mutate the traffic while it flows through the network at the point represented by the target object.
+
+The semantics of *applying rules to a target* characterizes these particular instances of meta resources as *policies*, thus here emerging in relation to this pattern the concept of *Policy Attachment*.
+
+Policies are therefore a strict subset of meta resources which distinguish itself subtly from the whole on the fact that the augmented behavior described by policies resemble *conditional rules*, while the mechanism of targeting an object or set of objects (“attaching to objects”) is nonetheless exactly the same as in the general definition of meta resources.
+
+Without loss of generality, the very activation of the context (targets) of meta resources can be understood as the _conditions_ for the enforcement of the intended augment behavior (rules) that are specified in the meta resources, and therefore these can often be refered to as policies interchangeably.
+
+## Applications
+
+### Reasons for using meta resources and policies
+
+These are a few reasons for using meta resources and policies over another (possibly more direct) way to modify the spec (“augment the behavior”) of an object:
+
+* Extending otherwise stable APIs – e.g. to specify additional network settings for the Kubernetes Service object.
+* Defining implementation-specific functionalities for otherwise common APIs－e.g. to specify implementation-specific behavior for Gateway API HTTPRoute objects.
+* Decoupling concerns for targeting personas with specific functionality and configuration－ delegation of responsibilities, fine-grained RBAC.
+* Decoupling responsibility over the management and implementation of the meta resources themselves.
+* Avoid alternatives based on annotations which are often non-standardized, poorly documented, and generally hard to maintain.
+
+### Examples of applications of meta resources and policies
+
+* Specifying traffic rules for Kubernetes Services
+* Configuring implementation-specific authentication features on ingress Gateways
+* Delegating responsibility over parts of the configuration (e.g. auth) to other users
+* Inspecting and auditing focused aspects of a resource (e.g. auth policies)
+
+## Guide-level explanation
+
+### Defining context: scoping intent in relation to targets
+
+The objects targeted by a meta resource define a *context* where the *intent* that is specified in the meta resource itself is expected to be honored. This context exists in the form of other Kubernetes objects (or parts of objects) and referenced in the meta resources directly or indirectly by name or other referencing mechanisms.
+
+#### Ways of targeting objects
+
+Meta resources can be designed to allow targeting objects by name (“reference by name”), using label selectors, and with or without cross-namespace references allowed. In all cases, the targets shall be declared within a `targetRefs` field within the spec of the meta resource instance.
+
+##### Reference by name
+
+The target reference includes the exact name of an object whose behavior to augment:
+
+```yaml
+apiVersion: policies.controller.io/v1
+kind: ColorPolicy
+metadata:
+  name: my-color-policy
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io/v1
+    kind: Gateway
+    name: my-gateway ## name of the target object of Gateway kind
+  rules:
+    color: blue
+```
+
+##### Label selectors
+
+The target reference includes the label selectors used to select a set of objects whose behavior to augment:
+
+```yaml
+apiVersion: policies.controller.io/v1
+kind: ColorPolicy
+metadata:
+  name: my-color-policy
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io/v1
+    kind: Gateway
+    selector: ## label selectors to a set of objects of the Gateway kind
+      matchLabels:
+        env: production
+  rules:
+    color: blue
+```
+
+##### Cross namespace references
+
+Meta resources can opt for allowing instances to target objects across Kubernetes namespaces, in which case an optional `namespace` field MUST be defined with the target reference.
+
+Although not strictly forbidden, this is in general discouraged due to [discoverability](#the-discoverability-problem) issues and security implications. Implementations that opt for designing meta resources that allow for cross namespace references should consider supporting [ReferenceGrants](https://gateway-api.sigs.k8s.io/api-types/referencegrant/?h=referencegrant) to address the security concern.
+
+#### Spanning behavior across relationships of a target
+
+Because the target objects that give a meta resource context sometimes are themselves inserted into a broader context of their own, composed of other interrelated objects, the effects of a meta resource can be limited to a target object itself or span across the links between this object and other objects that the object is related to.
+
+E.g. – a meta resource that targets a Namespace may declare intent that affects the behavior of the namespace itself (for what concerns to the implementation of Namespaces in Kubernetes) or alternatively it can act as a means to affect the behavior of other objects that exist in the referred namespace (e.g. ConfigMaps). While in the former case, the (direct) target object is the Namespace itself, in the latter the (indirect) target is a set of objects of a different kind (e.g. ConfigMaps.)
+
+To avoid any ambiguity in the interpretation of the targets, meta resources MUST clearly define the extent of their effects respectively to the object kinds they target (semantics of attaching a meta resource). This is usually defined in terms of a known hierarchy of resource kinds.
+
+See also: [Declared targets versus Effective targets](#declared-targets-versus-effective-targets) and [Hierarchy of target kinds and mechanics for calculating Effective meta resources](#hierarchy-of-target-kinds-and-mechanics-for-calculating-effective-meta-resources).
+
+#### Narrowing the target to sections of an object
+
+Meta resource CRDs can offer the option to target a section of an object whose spec defines sections uniquely identifiable by name. These meta resources typically include a field `spec.targetRefs.sectionName` that can be used along with compatible kinds.
+
+E.g. – a meta resource that specifies additional behaviour for a given listener of a Gateway API Gateway object, though not for all listeners of the Gateway, MUST (i) require the Gateway listener to be uniquely named and (ii) provide the `sectionName` field of target reference with the name of the targeted listener.
+
+#### Targeting virtual types
+
+In some cases, one may want to apply meta resources to objects that are not actual Kubernetes kinds. An example of such, from Gateway API mesh case, would be a hypothetical need for defining a policy to "color" requests to external services. To accomplish this, implementations MAY choose to support a reference to a _virtual resource type_. E.g.:
+
+```yaml
+apiVersion: policies.controller.io/v1
+kind: ColorPolicy
+metadata:
+  name: my-color-policy
+spec:
   targetRef:
     group: networking.acme.io
     kind: ExternalService
     name: foo.com
+  rules:
+    color: blue
 ```
 
-### Conflict Resolution
-It is possible for multiple policies to target the same object _and_ the same
-fields inside that object. If multiple policy resources target
-the same resource _and_ have an identical field specified with different values,
-precedence MUST be determined in order of the following criteria, continuing on
-ties:
+As a pattern, targeting virtual types has prior art in Kubernetes with the Role Based Access Control (RBAC), where Roles and ClusterRoles can used to specify permissions regarding any kind of resource including non-Kubernetes resources.
 
-* Direct Policies override Inherited Policies. If preventing settings from
-  being overwritten is important, implementations should only use Inherited
-  Policies, and the `override` stanza that implies. Note also that it's not
-  intended that Direct and Inherited Policies should overlap, so this should
-  only come up in exceptional circumstances.
-* Inside Inherited Policies, the same setting in `overrides` beats the one in
-  `defaults`.
-* The older Policy based on creation timestamp beats a newer one. For example,
-  a Policy with a creation timestamp of "2021-07-15 01:02:03" MUST be given
-  precedence over a Policy with a creation timestamp of "2021-07-15 01:02:04".
-  The goal is to ensure that introducing new, unused policies doesn’t disrupt
-  existing ones, since changing active rules can cause outages while altering
-  unused policies poses no risk.
-* The Policy appearing first in alphabetical order by `{namespace}/{name}`. For
-  example, foo/bar is given precedence over foo/baz.
+### Conflicting specs and Inheritance
 
-For a better user experience, a validating webhook can be implemented to prevent
-these kinds of conflicts all together.
+Declaring additional specifications to objects from the outside can yield conflicts that need to be addressed in the implementation of meta resources. Multiple instances of a meta resource kind may affect an object (directly or indirectly), thus posing a possible conflict to resolve regarding which intent among the multiple meta resource specs a controller shall honor.
 
-## Status and the Discoverability Problem
+In some cases, the most recent between two conflicting specs may be desired to win, whereas in other cases it might be the oldest; often the winning spec is determined by the hierarchical level (implicit or explicit) of the context which the meta resource applies, and sometimes other criteria must be adopted to resolve conflicts between meta resources ultimately affecting a same target or section of a target.
 
-So far, this document has talked about what Policy Attachment is, different types
-of attachment, and how those attachments work.
+The hierarchical relationships of the object that are targeted by meta resources – whether corresponding to their parent contexts or in relation to their inner sections – may yield indirect conflicts of specs (conflicting intents). Meta resource kinds that allow for their instances to target at multiple levels of a hierarchy of resource kinds (e.g. Gateway API `Gateway` and `HTTPRoute` kinds), entire resources as well as sections of a resource, or resources and filtered contexts of these resource kind (e.g. with `gatewayClassName`) will often generate cases where the behavior specified by the meta resource either is fully enforced or partially enforced, either honored or overridden by another.
 
-Probably the biggest impediment to this GEP moving forward is the discoverability
-problem; that is, it’s critical that an object owner be able to know what policy
-is affecting their object, and ideally its contents.
+Meta resource CRDs MUST clearly define the hierarchy of target resources they have effects upon, as well as the semantics of targeting each kind of resource in the hierarchy. Moreover, lower levels in the hierarchy *inherit* the definitions applied at the higher levels, in such a way that higher level rules may be understood as having an “umbrella effect” over everything under that level.
 
-To understand this a bit better, let’s consider this parable, with thanks to Flynn:
+E.g., in Gateway API’s hierarchy of network resources for the ingress use case `GatewayClass` \> `Gateway` \> `HTTPRoute` \> `Backend`, a meta resource that attaches to a `GatewayClass` object, if defined as a meta resource kind ultimately to augment the behavior of `HTTPRoute` objects, affects all `Gateways` under the `GatewayClass`, as well as all `HTTPRoutes` under those `Gateways`. Any other instance of this meta resource kind targeting a lower level than the `GatewayClass` (e.g. `Gateway` or `HTTPRoute`) should be be treated as a conflict against the higher level meta resource spec, for the specific scope (“context”) of the subset of the hierarchy it attaches to. This conflict MUST be resolved according to some defined *merge strategy*.
 
-### The Parable
+### Declared targets versus Effective targets
 
-It's a sunny Wednesday afternoon, and the lead microservices developer for
-Evil Genius Cupcakes is windsurfing. Work has been eating Ana alive for the
-past two and a half weeks, but after successfully deploying version 3.6.0 of
-the `baker` service this morning, she's escaped early to try to unwind a bit.
+A kind specified in the target reference of a meta resource can be the actual kind of object whose behavior the meta resource intends to augment or an indirection to targeting other kinds the object is hierarchically related to.
 
-Her shoulders are just starting to unknot when her phone pings with a text
-from Chihiro, down in the NOC. Waterproof phones are a blessing, but also a
-curse.
+E.g. targeting a Gateway API `Gateway` object with a meta resource can be a way to augment the behavior of the `Gateway` object itself (e.g. reconcile cloud infrastructure provider settings from the spec declared by the `Gateway` according the rules specified by the meta resource attached to the `Gateway`) or a means to augment the behavior of all `HTTPRoute` objects attached to the `Gateway` (in a way that every new `HTTPRoute` that gets created or modified so it enters the context of the `Gateway` is automatically put in the scope of the meta resource.)
 
-**Chihiro**: _Hey Ana. Things are still running, more or less, but latencies
-on everything in the `baker` namespace are crazy high after your last rollout,
-and `baker` itself has a weirdly high load. Sorry to interrupt you on the lake
-but can you take a look? Thanks!!_
+The target kinds specified in the target references of a meta resource are referred to as *Declared target* kinds. When declared targets are not equal to the actual targets augmented by the meta resource, but rather they serve as a means for reaching other levels (typically lower level) of related object kinds, these other kinds of target objects whose behavior are actually augmented by the meta resource are referred to as *Effective target* kinds.
 
-Ana stares at the phone for a long moment, heart sinking, then sighs and
-turns back to shore.
+### Hierarchy of target kinds and mechanics for calculating Effective meta resources
 
-What she finds when dries off and grabs her laptop is strange. `baker` does
-seem to be taking much more load than its clients are sending, and its clients
-report much higher latencies than they’d expect. She doublechecks the
-Deployment, the Service, and all the HTTPRoutes around `baker`; everything
-looks good. `baker`’s logs show her mostly failed requests... with a lot of
-duplicates? Ana checks her HTTPRoute again, though she's pretty sure you
-can't configure retries there, and finds nothing. But it definitely looks like
-clients are retrying when they shouldn’t be.
+Target kinds MUST be organized in a well-known hierarchy of target kinds, from the least specific declared target kinds to the most specific effective ones. This hierarchy shall thus induce a logical representation of the relationships between instances of target objects, in the form of a Directed Acyclic Graph (DAG) whose roots are the least specific objects and the leaves are the most specific ones (and ultimately the effective targets of the meta resources).
+
+The hierarchy of target kinds, as well as the logical representation of hierarchical relationships between instances of target objects, serve as a map for orderly resolving meta resource specs for each combinatorial context that is ultimately affected by the meta resources (i.e. for each Effective target). This process corresponds to resolving the intended augmented behavior that is collectively described by the set of meta resource specs in the context. The spec that summarizes the intended augmented behavior for a given context is referred to as the *Effective meta resource* (or *Effective policy*).
+
+The process of calculating Effective meta resources (Effective policies) consists of walking the hierarchy of target objects, from most specific to least specific (i.e., bottom-up, from the leaves towards the roots of the DAG of target objects) or from least specific to most specific (top-down), map reducing to a single meta resource spec each pair of meta resources adjacent to each other in the hierarchy, applying at each step one of the supported merge strategies described below, until no more than one spec remains for each effective target.
+
+Meta resource kinds that implement more than one merge strategy MUST provide fields for the instances of the meta resource to specify a chosen strategy (described in the next section). The least specific meta resource of the pair of meta resources whose specs are merged into one dictates the merge strategy to apply in such cases.
+
+#### Conflict resolution
+
+If multiple meta resources target the same context, the following criteria MUST be applied in order to resolve the conflict and thus calculate the effective spec, continuing on ties:
+
+1. Between two meta resources at different levels of the hierarchy, higher level specs dictate the *merge strategy* according to which the conflict must be resolved, defaulting to the lower spec (more specific) beating the higher one if not specified otherwise.
+2. Between two meta resources at the same level of the hierarchy, the older meta resource based on creation timestamp beats a newer one.
+3. Between two meta resources at the same level of the hierarchy and identical creation timestamps, the meta resource appearing first in alphabetical order by `{namespace}/{name}` beats another.
+
+#### Abstract process for calculating Effective meta resources
+
+The following is a description of an abstract process for calculating effective meta resources.
+
+Given:
+
+* the target resource kinds `A`, `B` and `C`, organized in a hierarchy of resource kinds where `A` \> `B` \> `C`, i.e. `A` is the least specific kind (roots of the hierarchical tree) and `C` is the most specific kind (leaves of the tree)－without loss of generality for cases where these kinds are not necessarily proper Kubernetes kinds, but also possibly named sections of a proper Kubernetes kind;
+* the meta resource kind `M`, whose instances can target resources of kind `A`, `B` or `C`, ultimately intending to augment the behavior of instances of resource kind `C`;
+* the tree of targetable resources `a1` \> (`b1` \> `c1`, `b2` \> (`c1`, `c2`)), where `x` \> `Y` represents all the directed relationships from targetable resource `x` of kind `X` and its children, and recursively for `Y`, without loss of generality for any other set of instances of target resources;
+* the instances of meta resource `m1` \-\> `a1` and `m2` \-\> `b2`, where `m` \-\> `y` represents the attachment of meta resource `m` of kind `M` to the target resource `y` of kind `A`, `B` or `C`, without loss of generality for any other set of instances of meta resources.
+
+For each expanded context that is induced by the instances of targetable resource of kind `C` and its relationships given by the hierarchy, i.e. for each of: `a1` \> `b1` \> `c1`, `a1` \> `b2` \> `c1`, and `a1` \> `b2` \> `c2`, stack the meta resources targeting the context at any level, ordered from the most specific level (i.e. `C`) to the least specific one (i.e. `A`)－i.e. `A` is on top of the stack:
+
+1. Pop two meta resources from the stack and combine them into one effective meta resource applying the conflict resolution rules (described in the previous subsection).
+2. Push the effective meta resource back into the stack.
+3. Repeat until there is no more than one meta resource in the stack.
+
+The last meta resource in each stack (if any) specifies the intended augmented behavior for the effective target resource of kind `C` within that corresponding context.
+
+For the exemplified instances, the expected outcome of the described process is:
+
+* `c1` is augmented by `m1`, whenever activated in the context of `b1`;
+* `c1` is augmented by the combination of `m1` \+ `m2`, whenever activated in the context of `b2`;
+* `c2` is augmented by the combination of `m1` \+ `m2`.
+
+The next section describes the different ways to combine meta resource instances (known as *merge strategiesI*), including a trivial merge strategy of not merging specs at all.
+
+In the most trivial case where meta resources can only directly target the objects whose behavior they intend to augment (i.e. instances of `C` without any indirections) and no meta resource specs are merged at all, the outcome of the process of calculating effective meta resources is simplified to a 1:1 mapping between meta resource and target object at most, where the declared meta resource equals the effective one, with no combinatorial specs nor contextual variations.
+
+### Merge strategies
+
+#### Basic merge strategies
+
+There are 3 *basic merge strategies*:
+
+* **None:** the meta resource with the oldest creation timestamp that is attached to a target wins, while all the other meta resources attached to the same target are rejected (`Accepted` status condition set to false).
+* **Defaults:** more specific specs beats less specific ones.
+* **Overrides:** less specific specs beats more specific ones.
+
+Meta resource CRDs may opt to implement any of these strategies, including multiple strategies.
+
+Meta resource CRDs that implement more than one merge strategy MUST define a clear structure for the instances of meta resource to specify which of the supported strategies to apply. Instances of these meta resources MUST NOT be allowed to declare more than one merge strategy, but only one of the supported strategies at a time.
+
+#### Atomicity of merging specs
+
+Meta resource CRDs that implement specifically the Defaults or the Overrides base merge strategies SHOULD specify one or more *atomicity levels* to dictate how these base merge strategies must be applied:
+
+* **Atomic spec:** the spec of the meta resource is treated as atomic, i.e., either one spec wins or another, but 2 specs are never mixed into a composition of specs. This is the default atomicity applied if not specified otherwise.
+* **Scalar values (“Patch”):** the specs of 2 meta resources are merged into one by applying the winning spec (according to semantics dictated by the base merge strategy, i.e., the more specific if Defaults or the less specific one if Overrides) over the other spec, in a JSON patch operation.
+* **\<Custom\>:** the spec of 2 meta resources are mixed into a composition of both specs, following a custom merge algorithm specified by the meta resource or policy kind.
+
+#### Combined merge strategies
+
+The final set of *merge strategies* therefore supported by a meta resource CRD (base \+ atomicity) is any subset of the following, where \<Custom\> is implementation-specific:
+
+* None
+* Atomic Defaults
+* Atomic Overrides
+* Patch Defaults
+* Patch Overrides
+* \<Custom\> Defaults
+* \<Custom\> Overrides
+
+Meta resource CRDs that support combined merged strategies are encouraged to define a `strategy` field for the instances to specify the exact strategy to apply.
+
+### Classes of meta resources
+
+The following two classes of meta resource kinds are defined: *Direct* and *Inherited*.
+
+#### Direct
+
+* A single kind supported in `spec.targetRefs.kind`
+* Effects of the meta resources do not span across the hierarchy, i.e. the _Declared target kind_ is equal to the _Effective target kind_
+* *None* is the only merge strategy supported
+* If supported, could typically be implemented by directly extending the API of the target kind with the fields otherwise defined at the meta resource (e.g. Gateway API filter)
+
+#### Inherited
+
+* Superset of the above
+* Any meta resource kind that do not comply with at least one characteristic of the Direct class of meta resources
+
+## End-to-end examples
+
+This section presents a series of synthetic examples of applications of meta resources for different kinds of topologies and contexts.
+
+In all cases, the background of targetable object kinds is assumed to be a hierarchy of network resource kinds `Gateway` (`g`) \> `Route` (`r`) \> `Backend` (`b`), where `Gateway` is the least specific kind (instances denoted “`gX`”) and `Backend` is the most specific kind (instances denoted “`bX`”).
+
+Moreover, a `ColorPolicy` meta resource kind (or “policy kind”, equivalently) is defined however with variations in its semantics across examples to accommodate for each case. Instances of the `ColorPolicy` kind (denoted “`pX[spec]`” and referred to simply as “policies”) may target one or more kinds of targetable resources, depending on each example. A policy represents an intent to “color” the network traffic that flows through the portion of the network corresponding to the target with a given color or color set that is specified in the policy.
+
+### Example 1. Direct Policy
+
+In this example, the `ColorPolicy` policy kind is defined as an instance of the Direct class of meta resources. Instances of the `ColorPolicy` kind in this example can only target `Backend` resources.
+
+Given:
+
+the following state of targetable resources:
+
+* `g1` \> `r1` \> `b1`
+* `g1` \> `r2` \> `b2`
+  and the following state of `ColorPolicy` (`p`) policies, where `pX[spec]` \-\> `bX` denotes a policy `pX` attached to (“targeting”) a `Backend` resource `bX`, intending to augment `bX`‘s behavior with `spec`:
+
+* `p1[color:red]` \-\> `b1`
+* `p2[color:blue]` \-\> `b1` (conflicting policy, `p2.creationTimestamp` \> `p1.creationTimestamp`)
+
+The expected outcome to be implemented by the controller is:
+
+1. All traffic directed to `Backend` `b1` must be colored `red`.
+2. Status of `Backend` `b1` should be reported as affected by the `ColorPolicy` `p1`.
+3. Status of `Backend` `b2` should NOT be reported as affected by any policy.
+4. Status of `ColorPolicy` `p1` must be reported as enforced.
+5. Status of `ColorPolicy` `p2` must be reported as NOT enforced, due to conflict with `ColorPolicy` `p1`.
+
+### Example 2. Defaults & Overrides
+
+In this example, the `ColorPolicy` policy kind is defined as an instance of the Inherited class of meta resources. Instances of the `ColorPolicy` kind in this example can target resources of the `Gateway` and `Route` kinds, always aiming to augment the behavior of resources of the `Backend` kind in the hierarchy. The policies can specify either `defaults` (assumed unless specified otherwise) or `overrides`, that are always treated at the atomic level.
+
+Given:
+
+the following state of targetable resources:
+
+* `g1` \> `r1` \> `b1`
+* `g1` \> `r2` \> `b1`
+* `g2` \> `r3` \> `b1`
+* `g2` \> `r4` \> `b2`
+  and the following state of `ColorPolicy` (`p`) policies, where `pX[spec]` \-\> `yX` denotes a policy `pX` attached to (“targeting”) a resource `yX`, `y` ∈ {`g`, `r`}, intending to augment with `spec` the behavior of `Backend` resources when activated via `yX`:
+
+* `p1[color:red]` \-\> `g1`
+* `p2[color:blue]` \-\> `r1`
+* `p3[overrides:{color:yellow}]` \-\> `g2`
+* `p4[color:green]` \-\> `r4`
+
+The expected outcome to be implemented by the controller is:
+
+1. Traffic directed to `g1` \> `r1` \> `b1` must be colored `blue` (more specific `p2` spec beats less specific defaults at `p1`).
+2. Traffic directed to `g1` \> `r2` \> `b1` must be colored `red` (implicit defaults specified at `p1` not replaced by any other policy).
+3. Traffic directed to `g2` \> `r3` \> `b1` must be colored `yellow` (overrides specified at `p3` not replaced by any other policy).
+4. Traffic directed to `g2` \> `r4` \> `b2` must be colored `yellow` (overrides specified at `p3` beats more specific policy `p4`).
+5. Status of `Backend` `b1` should be reported as affected by the `ColorPolicy` resources `p1`, `p2` and `p3`.
+6. Status of `Backend` `b2` should be reported as affected by the `ColorPolicy` resource `p3`.
+7. Status of `ColorPolicy` `p1` must be reported as partially enforced, due to in some cases beaten by `p2`.
+8. Status of `ColorPolicy` `p2` must be reported as enforced.
+9. Status of `ColorPolicy` `p3` must be reported as enforced.
+10. Status of `ColorPolicy` `p4` must be reported as NOT enforced, due to being overridden by `ColorPolicy` `p3`.
+
+### Example 3. Merged specs
+
+In this example, the `ColorPolicy` policy kind is defined as an instance of the Inherited class of meta resources. Instances of the `ColorPolicy` kind in this example can target resources of the `Gateway` and `Route` kinds, always aiming to augment the behavior of resources of the `Backend` kind in the hierarchy. The policies can specify either `defaults` (assumed unless specified otherwise) or `overrides`. Moreover, policies specify a complex color scheme composed of `dark` and `light` entries, as well as a `strategy` field to specify one of two supported merge strategies, `atomic` (assumed unless specified otherwise) or `patch`.
+
+Given:
+
+the following state of targetable resources:
+
+* `g1` \> `r1` \> `b1`
+* `g1` \> `r2` \> `b1`
+* `g2` \> `r3` \> `b1`
+* `g2` \> `r4` \> `b2`
+  and the following state of `ColorPolicy` (`p`) policies, where `pX[spec]` \-\> `yX` denotes a policy `pX` attached to (“targeting”) a resource `yX`, `y` ∈ {`g`, `r`}, intending to augment with `spec` the behavior of `Backend` resources when activated via `yX`:
+
+* `p1[colors:{dark:brown,light:red},strategy:atomic]` \-\> `g1`
+* `p2[colors:{light:blue}]` \-\> `r1`
+* `p3[overrides:{colors:{light:yellow},strategy:patch}]` \-\> `g2`
+* `p4[colors:{dark:olive,light:green}]` \-\> `r4`
+
+The expected outcome to be implemented by the controller is:
+
+1. Traffic directed to `g1` \> `r1` \> `b1` must be colored `dark:UNDEFINED,light:blue` (more specific `p2` spec beats less specific atomic defaults from `p1`.
+2. Traffic directed to `g1` \> `r2` \> `b1` must be colored `dark:brown,light:red` (implicit atomic defaults specified at `p1` not replaced by any other policy).
+3. Traffic directed to `g2` \> `r3` \> `b1` must be colored `dark:UNDEFINED,light:yellow` (patch overrides specified at `p3` not replaced, nor extended by any other policy).
+4. Traffic directed to `g2` \> `r4` \> `b2` must be colored `dark:olive,light:yellow` (patch overrides specified by `p3` beats more specific policy `p4`, which still extends the spec with a specific value for `dark`.
+5. Status of `Backend` `b1` should be reported as affected by the `ColorPolicy` resources `p1`, `p2` and `p3`.
+6. Status of `Backend` `b2` should be reported as affected by the `ColorPolicy` resource `p3` and `p4`.
+7. Status of `ColorPolicy` `p1` must be reported as partially enforced, due to in some cases atomically beaten by `p2`.
+8. Status of `ColorPolicy` `p2` must be reported as enforced.
+9. Status of `ColorPolicy` `p3` must be reported as enforced.
+10. Status of `ColorPolicy` `p4` must be reported as partially enforced, due to being partially overridden by `ColorPolicy` `p3`.
+
+## Managing meta resources in real life
+
+### Responsibility
+
+Meta resources are typically implemented and managed by a custom controller. This controller can be the same controller that is responsible for managing the objects that are targeted by the meta resources or another controller specifically responsible for the aspect of the object that the meta resource augments or modifies. For policy kinds of meta resources, this controller is often referred to as the “policy controller”.
+
+Ultimately, it is the responsibility of the controller to provide enough information to resource owners that help circumvent or mitigate the discoverability problem (described in the next section). This typically involves populating the status stanza of the target objects, although may as well resort to additional tools (e.g. CRDs, CLI tools) that help visualize the hierarchical topology of target objects and meta resources, effective meta resource specs, etc.
+
+### The discoverability problem
+
+A well-known problem of declaring specifications into separate objects, that ultimately will reshape or govern the behavior of their targeted ones, regards the discoverability of meta resources. That is, how an object owner gets to know what meta resource (or set of meta resources) is affecting their object and with what content.
+
+Even though Kubernetes already has analogous problems in its core－the most obvious example being the Kubernetes Role Based Access Control (RBAC)－, the discoverability issue remains a challenging one to be addressed. To better understand it, consider the following parable described in the context of Gateway API, with thanks to @flynn:
+
+#### The Parabol
+
+It's a sunny Wednesday afternoon, and the lead microservices developer for Evil Genius Cupcakes is windsurfing. Work has been eating Ana alive for the past two and a half weeks, but after successfully deploying version 3.6.0 of the `baker` service this morning, she's escaped early to try to unwind a bit.
+
+Her shoulders are just starting to unknot when her phone pings with a text from Chihiro, down in the NOC. Waterproof phones are a blessing, but also a curse.
+
+**Chihiro**: *Hey Ana. Things are still running, more or less, but latencies on everything in the `baker` namespace are crazy high after your last rollout, and `baker` itself has a weirdly high load. Sorry to interrupt you on the lake but can you take a look? Thanks\!\!*
+
+Ana stares at the phone for a long moment, heart sinking, then sighs and turns back to shore.
+
+What she finds when dries off and grabs her laptop is strange. `baker` does seem to be taking much more load than its clients are sending, and its clients report much higher latencies than they’d expect. She doublechecks the Deployment, the Service, and all the HTTPRoutes around `baker`; everything looks good. `baker`’s logs show her mostly failed requests... with a lot of duplicates? Ana checks her HTTPRoute again, though she's pretty sure you can't configure retries there, and finds nothing. But it definitely looks like clients are retrying when they shouldn’t be.
 
 She pings Chihiro.
 
-**Ana**: _Hey Chihiro. Something weird is up, looks like requests to `baker`
-are failing but getting retried??_
+**Ana**: *Hey Chihiro. Something weird is up, looks like requests to `baker` are failing but getting retried??*
 
 A minute later they answer.
 
-**Chihiro**: 🤷 _Did you configure retries?_
+**Chihiro**: 🤷 *Did you configure retries?*
 
-**Ana**: _Dude. I don’t even know how to._ 😂
+**Ana**: *Dude. I don’t even know how to.* 😂
 
-**Chihiro**: _You just attach a RetryPolicy to your HTTPRoute._
+**Chihiro**: *You just attach a RetryPolicy to your HTTPRoute.*
 
-**Ana**: _Nope. Definitely didn’t do that._
+**Ana**: *Nope. Definitely didn’t do that.*
 
 She types `kubectl get retrypolicy -n baker` and gets a permission error.
 
-**Ana**: _Huh, I actually don’t have permissions for RetryPolicy._ 🤔
+**Ana**: *Huh, I actually don’t have permissions for RetryPolicy.* 🤔
 
-**Chihiro**: 🤷 _Feels like you should but OK, guess that can’t be it._
+**Chihiro**: 🤷 *Feels like you should but OK, guess that can’t be it.*
 
 Minutes pass while both look at logs.
 
-**Chihiro**: _I’m an idiot. There’s a RetryPolicy for the whole namespace –
-sorry, too many policies in the dashboard and I missed it. Deleting that since
-you don’t want retries._
+**Chihiro**: *I’m an idiot. There’s a RetryPolicy for the whole namespace – sorry, too many policies in the dashboard and I missed it. Deleting that since you don’t want retries.*
 
-**Ana**: _Are you sure that’s a good–_
+**Ana**: *Are you sure that’s a good–*
 
-Ana’s phone shrills while she’s typing, and she drops it. When she picks it
-up again she sees a stack of alerts. She goes pale as she quickly flips
-through them: there’s one for every single service in the `baker` namespace.
+Ana’s phone shrills while she’s typing, and she drops it. When she picks it up again she sees a stack of alerts. She goes pale as she quickly flips through them: there’s one for every single service in the `baker` namespace.
 
-**Ana**: _PUT IT BACK!!_
+**Ana**: *PUT IT BACK\!\!*
 
-**Chihiro**: _Just did. Be glad you couldn't hear all the alarms here._ 😕
+**Chihiro**: *Just did. Be glad you couldn't hear all the alarms here.* 😕
 
-**Ana**: _What the hell just happened??_
+**Ana**: *What the hell just happened??*
 
-**Chihiro**: _At a guess, all the workloads in the `baker` namespace actually
-fail a lot, but they seem OK because there are retries across the whole
-namespace?_ 🤔
+**Chihiro**: *At a guess, all the workloads in the `baker` namespace actually fail a lot, but they seem OK because there are retries across the whole namespace?* 🤔
 
 Ana's blood runs cold.
 
-**Chihiro**: _Yeah. Looking a little closer, I think your `baker` rollout this
-morning would have failed without those retries._ 😕
+**Chihiro**: *Yeah. Looking a little closer, I think your `baker` rollout this morning would have failed without those retries.* 😕
 
-There is a pause while Ana's mind races through increasingly unpleasant
-possibilities.
+There is a pause while Ana's mind races through increasingly unpleasant possibilities.
 
-**Ana**: _I don't even know where to start here. How long did that
-RetryPolicy go in? Is it the only thing like it?_
+**Ana**: *I don't even know where to start here. How long did that RetryPolicy go in? Is it the only thing like it?*
 
-**Chihiro**: _Didn’t look closely before deleting it, but I think it said a few
-months ago. And there are lots of different kinds of policy and lots of
-individual policies, hang on a minute..._
+**Chihiro**: *Didn’t look closely before deleting it, but I think it said a few months ago. And there are lots of different kinds of policy and lots of individual policies, hang on a minute...*
 
-**Chihiro**: _Looks like about 47 for your chunk of the world, a couple hundred
-system-wide._
+**Chihiro**: *Looks like about 47 for your chunk of the world, a couple hundred system-wide.*
 
-**Ana**: 😱 _Can you tell me what they’re doing for each of our services? I
-can’t even_ look _at these things._ 😕
+**Ana**: 😱 *Can you tell me what they’re doing for each of our services? I can’t even* look *at these things.* 😕
 
-**Chihiro**: _That's gonna take awhile. Our tooling to show us which policies
-bind to a given workload doesn't go the other direction._
+**Chihiro**: *That's gonna take awhile. Our tooling to show us which policies bind to a given workload doesn't go the other direction.*
 
-**Ana**: _...wait. You have to_ build tools _to know if retries are turned on??_
+**Ana**: *...wait. You have to* build tools *to know if retries are turned on??*
 
 Pause.
 
-**Chihiro**: _Policy attachment is more complex than we’d like, yeah._ 😐
-_Look, how about roll back your `baker` change for now? We can get together in
-the morning and start sorting this out._
+**Chihiro**: *Policy Attachment is more complex than we’d like, yeah.* 😐 *Look, how about roll back your `baker` change for now? We can get together in the morning and start sorting this out.*
 
-Ana shakes her head and rolls back her edits to the `baker` Deployment, then
-sits looking out over the lake as the deployment progresses.
+Ana shakes her head and rolls back her edits to the `baker` Deployment, then sits looking out over the lake as the deployment progresses.
 
-**Ana**: _Done. Are things happier now?_
+**Ana**: *Done. Are things happier now?*
 
-**Chihiro**: _Looks like, thanks. Reckon you can get back to your sailboard._ 🙂
+**Chihiro**: *Looks like, thanks. Reckon you can get back to your sailboard.* 🙂
 
 Ana sighs.
 
-**Ana**: _Wish I could. Wind’s died down, though, and it'll be dark soon.
-Just gonna head home._
+**Ana**: *Wish I could. Wind’s died down, though, and it'll be dark soon. Just gonna head home.*
 
-**Chihiro**: _Ouch. Sorry to hear that._ 😐
+**Chihiro**: *Ouch. Sorry to hear that.* 😐
 
 One more look out at the lake.
 
-**Ana**: _Thanks for the help. Wish we’d found better answers._ 😢
+**Ana**: *Thanks for the help. Wish we’d found better answers.* 😢
 
-### The Problem, restated
-What this parable makes clear is that, in the absence of information about what
-Policy is affecting an object, it’s very easy to make poor decisions.
+#### The Problem, restated
 
-It’s critical that this proposal solve the problem of showing up to three things,
-listed in increasing order of desirability:
+What this parable makes clear is that, in the absence of information about what meta resource is affecting an object, it’s very easy to make poor decisions.
 
-- _That_ some Policy is affecting a particular object
-- _Which_ Policy is (or Policies are) affecting a particular object
-- _What_ settings in the Policy are affecting the object.
+It’s critical that this proposal solve the problem of showing up to three things, listed in increasing order of desirability:
 
-In the parable, if Ana and Chihiro had known that there were Policies affecting
-the relevant object, then they could have gone looking for the relevant Policies
-and things would have played out differently. If they knew which Policies, they
-would need to look less hard, and if they knew what the settings being applied
-were, then the parable would have been able to be very short indeed.
+* *That* some meta resource/policy is affecting a particular object
+* *Which* meta resource/policy is (or meta resources/policies are) affecting a particular object
+* *What* settings in the meta resource/policy are affecting the object.
 
-(There’s also another use case to consider, in that Chihiro should have been able
-to see that the Policy on the namespace was in use in many places before deleting
-it.)
+In the parable, if Ana and Chihiro had known that there were Policies affecting the relevant object, then they could have gone looking for the relevant Policies and things would have played out differently. If they knew which policies, they would need to look less hard, and if they knew what the settings being applied were, then the parable would have been able to be very short indeed.
 
-To put this another way, Policy Attachment is effectively adding a fourth Persona,
-the Policy Admin, to Gateway API’s persona list, and without a solution to the
-discoverability problem, their actions are largely invisible to the Application
-Developer. Not only that, but their concerns cut across the previously established
-levels.
+(There’s also another use case to consider, in that Chihiro should have been able to see that the meta resource on the namespace was in use in many places before deleting it.)
+
+To put this another way, Meta resources and Policy Attachment is effectively adding another persona among the stakeholders, the Policy Admin, and without a solution to the discoverability problem, their actions are largely invisible to the Application Developer. Not only that, but their concerns cut across the previously established levels.
 
 ![Gateway API diagram with Policy Admin](images/713-the-diagram-with-policy-admin.png)
 
+From the Policy Admin’s point of view, they need to know across their whole remit (which conceivably could be the whole cluster):
 
-From the Policy Admin’s point of view, they need to know across their whole remit
-(which conceivably could be the whole cluster):
+* *What* meta resource/policy has been created
+* *Where* it’s applied
+* *What* the resultant (effective) meta resource/policy is saying
 
-- _What_ Policy has been created
-- _Where_ it’s applied
-- _What_ the resultant policy is saying
+Which again, comes down to discoverability, and can probably be addressed in similar ways at an API level to the Application Developer's concerns.
 
-Which again, come down to discoverability, and can probably be addressed in similar
-ways at an API level to the Application Developer's concerns.
+An important note here is that a key piece of information for Policy Admins and Cluster Operators is “How many things does this Policy affect?”. In the parable, this would have enabled Chihiro to know that deleting the Namespace Policy would affect many other people than just Ana.
 
-An important note here is that a key piece of information for Policy Admins and
-Cluster Operators is “How many things does this Policy affect?”. In the parable,
-this would have enabled Chihiro to know that deleting the Namespace Policy would
-affect many other people than just Ana.
+#### Gateway API personas and the discoverability problem
 
-### Problems we need to solve
+Let's go through the various users of Gateway API and what they need to know about Meta resources affecting their objects.
 
-Before we can get into solutions, we need to discuss the problems that solutions
-may need to solve, so that we have some criteria for evaluating those solutions.
+In all of these cases, keeping the troubleshooting distance low is desired; that is, that there should be a minimum of hops required between objects from the one owned by the user to the one responsible for a setting.
 
-#### User discoverability
-
-Let's go through the various users of Gateway API and what they need to know about
-Policy Attachment.
-
-In all of these cases, we should aim to keep the troubleshooting distance low;
-that is, that there should be a minimum of hops required between objects from the
-one owned by the user to the one responsible for a setting.
-
-Another way to think of the troubleshooting distance in this context is "How many
-`kubectl` commands would the user need to do to understand that a Policy is relevant,
-which Policy is relevant, and what configuration the full set of Policy is setting?"
+Another way to think of the troubleshooting distance in this context is "How many `kubectl` commands would the user need to do to understand that a meta resource is relevant, which meta resource is relevant, and what configuration the full set of meta resource is setting?"
 
 ##### Application Developer Discoverability
 
-How does Ana, or any Application Developer who owns one or more Route objects know
-that their object is affected by Policy, which Policy is affecting it, and what
-the content of the Policy is?
+How does Ana, or any Application Developer who owns one or more Route objects know that their object is affected by a meta resource, which meta resource is affecting it, and what the content of the meta resource is?
 
-The best outcome is that Ana needs to look only at a specific route to know what
-Policy settings are being applied to that Route, and where they come from.
-However, some of the other problems below make it very difficult to achieve this.
+The best outcome is that Ana needs to look only at a specific route to know what meta resource settings are being applied to that Route, and where they come from. However, some of the other problems below make it very difficult to achieve this.
 
 ##### Policy Admin Discoverability
 
-How does the Policy Admin know what Policy is applied where, and what the content
-of that Policy is?
-How do they validate that Policy is being used in ways acceptable to their organization?
-For any given Policy object, how do they know how many places it's being used?
+How does the Policy Admin know what meta resource is applied where, and what the content of that meta resource is? How do they validate that the meta resource is being used in ways acceptable to their organization? For any given meta resource object, how do they know how many places it's being used?
 
 ##### Cluster Admin Discoverability
 
-The Cluster Admin has similar concerns to the Policy Admin, but with a focus on
-being able to determine what's relevant when something is broken.
+The Cluster Admin has similar concerns to the Policy Admin, but with a focus on being able to determine what's relevant when something is broken.
 
-How does the Cluster Admin know what Policy is applied where, and what the content
-of that Policy is?
+How does the Cluster Admin know what meta resource is applied where, and what the content of that meta resource is?
 
-For any given Policy object, how do they know how many places it's being used?
+For any given meta resource object, how do they know how many places it's being used?
 
-#### Evaluating and Displaying Resultant Policy
+#### Hinting on a solution for the discoverability problem
 
-For any given Policy type, whether Direct Attached or Inherited, implementations
-will need to be able to _calculate_ the resultant set of Policy to be able to
-apply that Policy to the correct parts of their data plane configuration.
-However, _displaying_ that resultant set of Policy in a way that is straightforward
-for the various personas to consume is much harder.
+Querying the status of objects stored in the cluster may be the Kubernetes way of knowing the state of the system, in a world where objects are declarative and there are only so many links between objects to jump in between. However, this is still a proxy used to model a real life problem that often has otherwise different ways to be thought about as well.
 
-The easiest possible option for Application Developers would be for the
-implementation to make the full resultant set of Policy available in the status
-of objects that the Policy affects. However, this runs into a few problems:
+In the context of traffic networking, for example, often the question asked by users is *“What happens when a network request X comes in?”*, stated in terms of a concrete “X”. There is an implicit expectation that a set of Kubernetes resources suffices to represent all the rules for a given workload to be activated and thus process request X, and often that is the case. For more complex cases however (multiple personas, application concerns separated into dedicated resource kinds, interaction between groups of users, etc), real life can get more complicated than a simple `kubectl get x`, or at least additional steps must be automated to encompass complexity into what can be achieved with a single declarative object.
 
-- The status needs to be namespaced by the implementation
-- The status could get large if there are a lot of Policy objects affecting an
-  object
-- Building a common data representation pattern that can fit into a single common
-  schema is not straightforward.
-- Updating one Policy object could cause many affected objects to need to be
-  updated themselves. This sort of fan-out problem can be very bad for apiserver
-  load, particularly if Policy changes rapidly, there are a lot of objects, or both.
+With that in mind, a possible solution for the discoverability problem may involve designing tools (e.g. CLI tools/plugins), new CRDs, etc that let users ask questions in terms of the real life problems they have to deal with on a daily basis, rather than shaped by the underlying technologies used in the process. For instance, a simple Kubernetes object that is used to declare the rules to process a HTTP request cannot have its status reported simply as Ready/Not ready. By being a complex object composed of multiple routing rules, potentially affected by specifications declared from other objects as well, its status MUST account for that complexity and be structured in such a way that informs the owner with respect to each possible case, whether the ones induced by the internal specification declared by the object itself or its external relationships.
 
-##### Status needs to be namespaced by implementation
+In other words, the discoverability problem exists and must be addressed in light of the complexity associated with the topology of contexts induced by a set of hierarchically related resources. One should always have that topology in mind while asking questions regarding the behavior of a given resource, because just like a routing object (e.g. HTTPRoute) does not exist independently from its parent contexts (e.g. Gateways) or its children (e.g. Backends), any resource in focus may be just a part of a whole.
 
-Because an object can be affected by multiple implementations at once, any status
-we add must be namespaced by the implementation.
+### Status reporting
 
-In Route Parent status, we've used the parentRef plus the controller name for this.
+#### Meta resource status
 
-For Policy, we can do something similar and namespace by the reference to the
-implementation's controller name.
+Meta resource CRDs should define a status stanza that allows for reporting the status of the meta resource with respect to each context the resource may apply.
 
-We can't easily namespace by the originating Policy because the source could be
-more than one Policy object.
+The basic status conditions are:
 
-##### Creating common data representation patterns
+* **Accepted**: the meta resource passed both syntactic validation by the API server and semantic validation enforced by the controller, such as whether the target objects exist.
+* **Enforced**: the meta resource’s spec is guaranteed to be fully enforced, to the extent of what the controller can ensure.
+* **Partially enforced**: parts of the meta resource’s spec is guaranteed to be enforced, while other parts are known to have been superseded by other specs, to the extent of what the controller can ensure. The status should include details highlighting which parts of the meta resource are enforced and which parts have been superseded, with the references to all other related meta resources.
+* **Overridden**: the meta resource’s spec is known to have been fully overridden by other specs. The status should include the references to the other related meta resources.
 
-The problem here is that we need to have a _common_ pattern for including the
-details of an _arbitrarily defined_ object, that needs to be included in the base
-API.
+#### Target object status
 
-So we can't use structured data, because we have no way of knowing what the
-structure will be beforehand.
+Implementations of meta resources MUST put a condition into `status.Conditions` of any objects affected by the meta resource.
 
-This suggests that we need to use unstructured data for representing the main
-body of an arbitrary Policy object.
+That condition MUST be named according to the pattern `<meta-resource-kind>Affected` (e.g. `colors.controller.k8s.io/ColorPolicyAffected`), and have the optional `observedGeneration` field kept up to date when the spec of the target object changes.
 
-Practically, this will need to be a string representation of the YAML form of the
-body of the Policy object (absent the metadata part of every Kubernetes object).
+Implementations should use their own unique domain prefix for this condition type. Gateway API implementations, for instance, should use the same domain as in the `controllerName` field on `GatewayClass` (or some other implementation-unique domain for implementations that do not use `GatewayClass`.)
 
-Policy Attachment does not mandate anything about the design of the object's top
-level except that it must be a Kubernetes object, so the only thing we can rely
-on is the presence of the Kubernetes metadata elements: `apiVersion`, `kind`,
-and `metadata`.
+For objects that do not have a `status.Conditions` field available (`Secret` is a good example), that object MUST instead have an annotation of `colors.controller.k8s.io/ColorPolicyAffected: true` added instead.
 
-A string representation of the rest of the file is the best we can do here.
+#### Status needs to be namespaced by implementation
 
-##### Fanout status update problems
+Because an object can be affected by multiple implementations at once, any added status MUST be namespaced by the implementation.
 
-The fanout problem is that, when an update takes place in a single object (a
-Policy, or an object with a Policy attached), an implementation may need to
-update _many_ objects if it needs to place details of what Policy applies, or
-what the resultant set of policy is on _every_ object.
+In Gateway API's Route Parent status, `parentRef` plus the controller name have been used for this.
 
-Historically, this is a risky strategy and needs to be carefully applied, as
-it's an excellent way to create apiserver load problems, which can produce a large
-range of bad effects for cluster stability.
+For a meta resource, something similar can be done, namespacing by the reference to the implementation's controller name.
 
-This does not mean that we can't do anything at all that affects multiple objects,
-but that we need to carefully consider what information is stored in status so 
-that _every_ Policy update does not require a status update.
+Namespacing by the originating meta resource cannot easily be done because the source could be more than one meta resource object.
 
-#### Solution summary
+#### Creating common data representation patterns
 
-Because Policy Attachment is a pattern for APIs, not an API, and needs to address
-all the problems above, the strategy this GEP proposes is to define a range of
-options for increasing the discoverability of Policy resources, and provide
-guidelines for when they should be used.
+Defining a _common_ pattern for including the details of an _arbitrarily defined_ object, to be included in a library for all possible implementations, is challenging, to say the least.
 
-It's likely that at some stage, the Gateway API CRDs will include some Policy
-resources, and these will be designed with all these discoverabiity solutions
-in mind.
+Structured data cannot be used because there is no way of knowing what the structure will be beforehand. This suggests a need to use unstructured data for representing the main body of the arbitrary meta resource objects. Practically, this will have to be a string representation of the YAML form (or JSON, equivalently) of the body of the meta resource object (absent the metadata part of every Kubernetes object).
 
+Meta resources and Policy Attachment does not mandate anything about the design of the object's top level except that it must be a Kubernetes object, so the only possible thing to rely upon here is the presence of the Kubernetes metadata elements: `apiVersion`, `kind`, and `metadata`.
 
-### Solution cookbook
+Therefore, a string representation of the rest of the file is likely the best that can be done here.
 
-This section contains some required patterns for Policy objects and some
-suggestions. Each will be marked as MUST, SHOULD, or MAY, using the standard 
-meanings of those terms.
+#### Fanout status update problems
 
-Additionally, the status of each solution is noted at the beginning of the section.
+The fanout problem is that, when an update takes place in a single object (a meta resource, or an object with a meta resource attached), an implementation may need to update _many_ objects if it needs to place details of what meta resource applies, or what the resultant set of policy is on _every_ object.
 
-#### Standard label on CRD objects
+Historically, this is a risky strategy and needs to be carefully applied, as it's an excellent way to create apiserver load problems, which can produce a large range of bad effects for cluster stability.
 
-Status: Required
-
-Each CRD that defines a Policy object MUST include a label that specifies that
-it is a Policy object, and that label MUST specify the _type_ of Policy attachment
-in use.
-
-The label is `gateway.networking.k8s.io/policy: inherited|direct`.
-
-This solution is intended to allow both users and tooling to identify which CRDs
-in the cluster should be treated as Policy objects, and so is intended to help
-with discoverability generally. It will also be used by the forthcoming `kubectl`
-plugin.
-
-##### Design considerations
-
-This is already part of the API pattern, but is being lifted to more prominence
-here.
-
-#### Standard status struct
-
-Status: Experimental
-
-Included in the Direct Policy Attachment GEP.
-
-Policy objects SHOULD use the upstream `PolicyAncestorStatus` struct in their respective
-Status structs. Please see the included `PolicyAncestorStatus` struct, and its use in
-the `BackendTLSPolicy` object for detailed examples. Included here is a representative
-version.
-
-This pattern enables different conditions to be set for different "Ancestors"
-of the target resource. This is particularly helpful for policies that may be
-implemented by multiple controllers or attached to resources with different
-capabilities. This pattern also provides a clear view of what resources a
-policy is affecting.
-
-For the best integration with community tooling and consistency across
-the broader community, we recommend that all implementations transition 
-to Policy status with this kind of nested structure.
-
-This is an `Ancestor` status rather than a `Parent` status, as in the Route status
-because for Policy attachment, the relevant object may or may not be the direct
-parent.
-
-For example, `BackendTLSPolicy` directly attaches to a Service, which may be included
-in multiple Routes, in multiple Gateways. However, for many implementations, 
-the status of the `BackendTLSPolicy` will be different only at the Gateway level, 
-so Gateway is the relevant Ancestor for the status.
-
-Each Gateway that has a Route that includes a backend with an attached `BackendTLSPolicy`
-MUST have a separate `PolicyAncestorStatus` section in the `BackendTLSPolicy`'s
-`status.ancestors` stanza, which mandates that entries must be distinct using the
-combination of the `AncestorRef` and the `ControllerName` fields as a key.
-
-See [GEP-1897][gep-1897] for the exact details.
-
-[gep-1897]: ../gep-1897/index.md
-
-```go
-// PolicyAncestorStatus describes the status of a route with respect to an
-// associated Ancestor.
-//
-// Ancestors refer to objects that are either the Target of a policy or above it in terms
-// of object hierarchy. For example, if a policy targets a Service, an Ancestor could be
-// a Route or a Gateway. 
-
-// In the context of policy attachment, the Ancestor is used to distinguish which
-// resource results in a distinct application of this policy. For example, if a policy
-// targets a Service, it may have a distinct result per attached Gateway.
-// 
-// Policies targeting the same resource may have different effects depending on the 
-// ancestors of those resources. For example, different Gateways targeting the same
-// Service may have different capabilities, especially if they have different underlying
-// implementations. 
-//
-// For example, in BackendTLSPolicy, the Policy attaches to a Service that is
-// used as a backend in a HTTPRoute that is itself attached to a Gateway.
-// In this case, the relevant object for status is the Gateway, and that is the
-// ancestor object referred to in this status.
-//
-// Note that a Target of a Policy is also a valid Ancestor, so for objects where
-// the Target is the relevant object for status, this struct SHOULD still be used.
-type PolicyAncestorStatus struct {
-	// AncestorRef corresponds with a ParentRef in the spec that this
-	// RouteParentStatus struct describes the status of.
-	AncestorRef ParentReference `json:"ancestorRef"`
-
-	// ControllerName is a domain/path string that indicates the name of the
-	// controller that wrote this status. This corresponds with the
-	// controllerName field on GatewayClass.
-	//
-	// Example: "example.net/gateway-controller".
-	//
-	// The format of this field is DOMAIN "/" PATH, where DOMAIN and PATH are
-	// valid Kubernetes names
-	// (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names).
-	//
-	// Controllers MUST populate this field when writing status. Controllers should ensure that
-	// entries to status populated with their ControllerName are cleaned up when they are no
-	// longer necessary.
-	ControllerName GatewayController `json:"controllerName"`
-
-	// Conditions describes the status of the Policy with respect to the given Ancestor.
-	//
-	// +listType=map
-	// +listMapKey=type
-	// +kubebuilder:validation:MinItems=1
-	// +kubebuilder:validation:MaxItems=8
-	Conditions []metav1.Condition `json:"conditions,omitempty"`
-}
-
-
-// PolicyStatus defines the common attributes that all Policies SHOULD include
-// within their status.
-type PolicyStatus struct {
-	// Ancestors is a list of ancestor resources (usually Gateways) that are
-	// associated with the route, and the status of the route with respect to
-	// each ancestor. When this route attaches to a parent, the controller that
-	// manages the parent and the ancestors MUST add an entry to this list when
-	// the controller first sees the route and SHOULD update the entry as
-	// appropriate when the relevant ancestor is modified.
-	//
-	// Note that choosing the relevant ancestor is left to the Policy designers;
-	// an important part of Policy design is designing the right object level at
-	// which to namespace this status.
-	//
-	// Note also that implementations MUST ONLY populate ancestor status for 
-	// the Ancestor resources they are responsible for. Implementations MUST
-	// use the ControllerName field to uniquely identify the entries in this list
-	// that they are responsible for.
-	//
-	// A maximum of 32 ancestors will be represented in this list. An empty list
-	// means the Policy is not relevant for any ancestors.
-	//
-	// +kubebuilder:validation:MaxItems=32
-	Ancestors []PolicyAncestorStatus `json:"ancestors"`
-}
-```
-
-##### Design considerations
-
-This is recommended as the base for Policy object's status. As Policy Attachment
-is a pattern, not an API, "recommended" is the strongest we can make this, but
-we believe that standardizing this will help a lot with discoverability.
-
-Note that is likely that all Gateway API tooling will expect policy status to follow
-this structure. To benefit from broader consistency and discoverability, we
-recommend transitioning to this structure for all Gateway API Policies.
-
-#### Standard status Condition on Policy-affected objects
-
-Support: Provisional
-
-This solution is IN PROGRESS and so is not binding yet.
-
-However, a version of this proposal is now included in the Direct Policy
-Attachment GEP.
-
-This solution requires definition in a GEP of its own to become binding.
-[GEP-2923](https://github.com/kubernetes-sigs/gateway-api/issues/2923) has been
-opened to cover some aspects of this work.
-
-**The description included here is intended to illustrate the sort of solution
-that an eventual GEP will need to provide, _not to be a binding design.**
-
-Implementations that use Policy objects MUST put a Condition into `status.Conditions`
-of any objects affected by a Policy.
-
-That Condition MUST have a `type` ending in `PolicyAffected` (like
-`gateway.networking.k8s.io/PolicyAffected`),
-and have the optional `observedGeneration` field kept up to date when the `spec`
-of the Policy-attached object changes.
-
-Implementations SHOULD use their own unique domain prefix for this Condition
-`type` - it is recommended that implementations use the same domain as in the
-`controllerName` field on GatewayClass (or some other implementation-unique
-domain for implementations that do not use GatewayClass).)
-
-For objects that do _not_ have a `status.Conditions` field available (`Secret`
-is a good example), that object MUST instead have an annotation of
-`gateway.networking.k8s.io/PolicyAffected: true` (or with an
-implementation-specific domain prefix) added instead.
-
-
-##### Design Considerations
-The intent here is to add at least a breadcrumb that leads object owners to have
-some way to know that their object is being affected by another object, while
-minimizing the number of updates necessary.
-
-Minimizing the object updates is done by only having an update be necessary when
-the affected object starts or stops being affected by a Policy, rather than if
-the Policy itself has been updated.
-
-There is already a similar Condition to be placed on _Policy_ objects, rather
-than on the _targeted_ objects, so this solution is also being included in the
-Conditions section below.
-
-#### GatewayClass status Extension Types listing
-
-Support: Provisional
-
-This solution is IN PROGRESS, and so is not binding yet.
-
-Each implementation MUST list all relevant CRDs in its GatewayClass status (like
-Policy, and other extension types, like paramsRef targets, filters, and so on). 
-
-This is going to be tracked in its own GEP, https://github.com/kubernetes-sigs/gateway-api/discussions/2118
-is the initial discussion. This document will be updated with the details once
-that GEP is opened.
-
-##### Design Considerations
-
-This solution:
-
-- is low cost in terms of apiserver updates (because it's only on the GatewayClass,
-  and only on implementation startup)
-- provides a standard place for all users to look for relevant objects
-- ties into the Conformance Profiles design and other efforts about GatewayClass 
-  status
-
-#### Standard status stanza
-
-Support: Provisional
-
-This solution is IN PROGRESS and so is not binding yet.
-
-This solution requires definition in a GEP of its own to become binding.
-
-**The description included here is intended to illustrate the sort of solution
-that an eventual GEP will need to provide, _not to be a binding design. THIS IS
-AN EXPERIMENTAL SOLUTION DO NOT USE THIS YET.**
-
-An implementation SHOULD include the name, namespace, apiGroup and Kind of Policies
-affecting an object in the new `effectivePolicy` status stanza on Gateway API
-objects.
-
-This stanza looks like this:
-```yaml
-kind: Gateway
-...
-status:
-  effectivePolicy:
-  - name: some-policy
-    namespace: some-namespace
-    apiGroup: implementation.io
-    kind: AwesomePolicy
-  ...
-```
-
-##### Design Considerations
-
-This solution is designed to limit the number of status updates required by an
-implementation to when a Policy starts or stops being relevant for an object,
-rather than if that Policy's settings are updated.
-
-It helps a lot with discoverability, but comes at the cost of a reasonably high
-fanout cost. Implementations using this solution SHOULD ensure that status updates
-are deduplicated and only sent to the apiserver when absolutely necessary.
-
-Ideally, these status updates SHOULD be in a separate, lower-priority queue than
-other status updates or similar solution.
-
-#### PolicyBinding resource
-
-Support: Provisional
-
-This solution is IN PROGRESS and so is not binding yet.
-
-This solution requires definition in a GEP of its own to become binding.
-
-**The description included here is intended to illustrate the sort of solution
-that the eventual GEP will need to provide, _not to be a binding design. THIS IS
-AN EXPERIMENTAL SOLUTION DO NOT USE THIS YET.**
-
-Implementations SHOULD create an instance of a new `gateway.networking.k8s.io/EffectivePolicy`
-object when one or more Policy objects become relevant to the target object.
-
-The `EffectivePolicy` object MUST be in the same namespace as the object targeted
-by the Policy, and must have the _same name_ as the object targeted like the Policy.
-This is intended to mirror the Services/Endpoints naming convention, to allow for
-ease of discovery.
-
-The `EffectivePolicy` object MUST set the following information:
-
-- The name, namespace, apiGroup and Kind of Policy objects affecting the targeted
-  object.
-- The full resultant set of Policy affecting the targeted object.
-
-The above details MUST be namespaced using the `controllerName` of the implementation
-(could also be by GatewayClass), similar to Route status being namespaced by
-`parentRef`.
-
-An example `EffectivePolicy` object is included here - this may be superseded by
-a later GEP and should be updated or removed in that case. Note that it does
-_not_ contain a `spec` and a `status` stanza - by definition this object _only_
-contains `status` information.
-
-```yaml
-kind: EffectivePolicy
-apiVersion: gateway.networking.k8s.io/v1alpha2
-metadata:
-  name: targeted-object
-  namespace: targeted-object-namespace
-policies:
-- controllerName: implementation.io/ControllerName
-  objects:
-  - name: some-policy
-    namespace: some-namespace
-    apiGroup: implementation.io
-    kind: AwesomePolicy
-  resultantPolicy:
-    awesomePolicy:
-      configitem1:
-        defaults:
-          foo: 1
-        overrides:
-          bar: important-setting
-
-```
-
-Note here that the `resultantPolicy` setting is defined using the same mechanisms
-as an `unstructured.Unstructured` object in the Kubernetes Go libraries - it's
-effectively a `map[string]struct{}` that is stored as a `map[string]string` -
-which allows an arbitrary object to be specified there.
-
-Users or tools reading the config underneath `resultantPolicy` SHOULD display
-it in its encoded form, and not try to deserialize it in any way.
-
-The rendered YAML MUST be usable as the `spec` for the type given.
-
-##### Design considerations
-
-This will provide _full_ visibility to end users of the _actual settings_ being
-applied to their object, which is a big discoverability win.
-
-However, it relies on the establishment and communication of a convention ("An 
-EffectivePolicy is right next to your affected object"), that may not be desirable.
-
-Thus its status as EXPERIMENTAL DO NOT USE YET.
-
-#### Validating Admission Controller to inform users about relevant Policy
-
-Implementations MAY supply a Validating Admission Webhook that will return a
-WARNING message when an applied object is affected by some Policy.
-
-The warning message MAY include the name, namespace, apiGroup and Kind of relevant
-Policy objects.
-
-##### Design Considerations
-
-Pro:
-
-- This gives object owners a very clear signal that something some Policy is
-  going to affect their object, at apply time, which helps a lot with discoverability.
-
-Cons:
-
-- Implementations would have to have a webhook, which is another thing to run.
-- The webhook will need to have the same data model that the implementation uses,
-  and keep track of which GatewayClasses, Gateways, Routes, and Policies are
-  relevant. Experience suggests this will not be a trivial engineering exercise,and will add a lot of implementation complexity.
-
-#### `kubectl` plugin or command-line tool
-To help improve UX and standardization, a kubectl plugin will be developed that
-will be capable of describing the computed sum of policy that applies to a given
-resource, including policies applied to parent resources.
-
-Each Policy CRD that wants to be supported by this plugin will need to follow
-the API structure defined above and add the [corresponding label](index.md#standard-label-on-crd-objects)
-to the CRD.
-
-### Conditions
-
-Implementations using Policy objects MUST include a `spec` and `status` stanza,
-and the `status` stanza MUST contain a `conditions` stanza, using the standard
-Condition format.
-
-Policy authors should consider namespacing the `conditions` stanza with a
-`controllerName`, as in Route status, if more than one implementation will be
-reconciling the Policy type.
-
-#### On `Policy` objects
-
-Controllers using the Gateway API policy attachment model MUST populate the 
-`Accepted` condition and reasons as defined below on policy resources to provide
-a consistent experience across implementations.
-
-```go
-// PolicyConditionType is a type of condition for a policy.
-type PolicyConditionType string
-
-// PolicyConditionReason is a reason for a policy condition.
-type PolicyConditionReason string
-
-const (
-  // PolicyConditionAccepted indicates whether the policy has been accepted or rejected
-  // by a targeted resource, and why.
-  //
-  // Possible reasons for this condition to be True are:
-  //
-  // * "Accepted"
-  //
-  // Possible reasons for this condition to be False are:
-  //
-  // * "Conflicted"
-  // * "Invalid"
-  // * "TargetNotFound"
-  //
-  PolicyConditionAccepted PolicyConditionType = "Accepted"
-
-  // PolicyReasonAccepted is used with the "Accepted" condition when the policy has been
-  // accepted by the targeted resource.
-  PolicyReasonAccepted PolicyConditionReason = "Accepted"
-
-  // PolicyReasonConflicted is used with the "Accepted" condition when the policy has not
-  // been accepted by a targeted resource because there is another policy that targets the same
-  // resource and a merge is not possible.
-  PolicyReasonConflicted PolicyConditionReason = "Conflicted"
-
-  // PolicyReasonInvalid is used with the "Accepted" condition when the policy is syntactically
-  // or semantically invalid.
-  PolicyReasonInvalid PolicyConditionReason = "Invalid"
-
-  // PolicyReasonTargetNotFound is used with the "Accepted" condition when the policy is attached to
-  // an invalid target resource
-  PolicyReasonTargetNotFound PolicyConditionReason = "TargetNotFound"
-)
-```
-
-#### On targeted resources
-
-(copied from [Standard status Condition on Policy-affected objects](#standard-status-condition-on-policy-affected-objects))
-
-This solution requires definition in a GEP of its own to become binding.
-
-**The description included here is intended to illustrate the sort of solution
-that an eventual GEP will need to provide, _not to be a binding design.**
-
-Implementations that use Policy objects MUST put a Condition into `status.Conditions`
-of any objects affected by a Policy.
-
-That Condition must have a `type` ending in `PolicyAffected` (like
-`gateway.networking.k8s.io/PolicyAffected`),
-and have the optional `observedGeneration` field kept up to date when the `spec`
-of the Policy-attached object changes.
-
-Implementations _should_ use their own unique domain prefix for this Condition
-`type` - it is recommended that implementations use the same domain as in the
-`controllerName` field on GatewayClass (or some other implementation-unique
-domain for implementations that do not use GatewayClass).)
-
-For objects that do _not_ have a `status.Conditions` field available (`Secret`
-is a good example), that object MUST instead have an annotation of
-`gateway.networking.k8s.io/PolicyAffected: true` (or with an
-implementation-specific domain prefix) added instead.
-
-### Interaction with Custom Filters and other extension points
-There are multiple methods of custom extension in the Gateway API. Policy
-attachment and custom Route filters are two of these. Policy attachment is
-designed to provide arbitrary configuration fields that decorate Gateway API
-resources. Route filters provide custom request/response filters embedded inside
-Route resources. Both are extension methods for fields that cannot easily be
-standardized as core or extended fields of the Gateway API. The following
-guidance should be considered when introducing a custom field into any Gateway
-controller implementation:
-
-1. For any given field that a Gateway controller implementation needs, the
-   possibility of using core or extended should always be considered before
-   using custom policy resources. This is encouraged to promote standardization
-   and, over time, to absorb capabilities into the API as first class fields,
-   which offer a more streamlined UX than custom policy attachment.
-
-2. Although it's possible that arbitrary fields could be supported by custom
-   policy, custom route filters, and core/extended fields concurrently, it is
-   recommended that implementations only use multiple mechanisms for
-   representing the same fields when those fields really _need_ the defaulting
-   and/or overriding behavior that Policy Attachment provides. For example, a
-   custom filter that allowed the configuration of Authentication inside a
-   HTTPRoute object might also have an associated Policy resource that allowed
-   the filter's settings to be defaulted or overridden. It should be noted that
-   doing this in the absence of a solution to the status problem is likely to
-   be *very* difficult to troubleshoot.
-
-## Removing BackendPolicy
-BackendPolicy represented the initial attempt to cover policy attachment for
-Gateway API. Although this proposal ended up with a similar structure to
-BackendPolicy, it is not clear that we ever found sufficient value or use cases
-for BackendPolicy. Given that this proposal provides more powerful ways to
-attach policy, BackendPolicy was removed.
-
-## Alternatives considered
-
-### 1. ServiceBinding for attaching Policies and Routes for Mesh
-A new ServiceBinding resource has been proposed for mesh use cases. This would
-provide a way to attach policies, including Routes to a Service.
-
-Most notably, these provide a way to attach different policies to requests
-coming from namespaces or specific Gateways. In the example below, a
-ServiceBinding in the consumer namespace would be applied to the selected
-Gateway and affect all requests from that Gateway to the foo Service. Beyond
-policy attachment, this would also support attaching Routes as policies, in this
-case the attached HTTPRoute would split requests between the foo-a and foo-b
-Service instead of the foo Service.
-
-![Simple Service Binding Example](images/713-servicebinding-simple.png)
-
-This approach can be used to attach a default set of policies to all requests
-coming from a namespace. The example below shows a ServiceBinding defined in the
-producer namespace that would apply to all requests from within the same
-namespace or from other namespaces that did not have their own ServiceBindings
-defined.
-
-![Complex Service Binding Example](images/713-servicebinding-complex.png)
-
-#### Advantages
-* Works well for mesh and any use cases where requests don’t always transit
-  through Gateways and Routes.
-* Allows policies to apply to an entire namespace.
-* Provides very clear attachment of polices, routes, and more to a specific
-  Service.
-* Works well for ‘shrink-wrap application developers’ - the packaged app does
-  not need to know about hostnames or policies or have extensive templates.
-* Works well for ‘dynamic’ / programmatic creation of workloads ( Pods,etc - see
-  CertManager)
-* It is easy to understand what policy applies to a workload - by listing the
-  bindings in the namespace.
-
-#### Disadvantages
-* Unclear how this would work with an ingress model. If Gateways, Routes, and
-  Backends are all in different namespaces, and each of those namespaces has
-  different ServiceBindings applying different sets of policies, it’s difficult
-  to understand which policy would be applied.
-* Unclear if/how this would interact with existing the ingress focused policy
-  proposal described below. If both coexisted, would it be possible for a user
-  to understand which policies were being applied to their requests?
-* Route status could get confusing when Routes were referenced as a policy by
-  ServiceBinding
-* Introduces a new mesh specific resource.
-
-### 2. Attaching Policies for Ingress
-An earlier proposal for policy attachment in the Gateway API suggested adding
-policy references to each Resource. This works very naturally for Ingress use
-cases where all requests follow a path through Gateways, Routes, and Backends.
-Adding policy attachment at each level enables different roles to define
-defaults and allow overrides at different levels.
-
-![Simple Ingress Attachment Example](images/713-ingress-attachment.png)
-
-#### Advantages
-* Consistent policy attachment at each level
-* Clear which policies apply to each component
-* Naturally translates to hierarchical Ingress model with ability to delegate
-  policy decisions to different roles
-
-#### Disadvantages
-* Policy overrides could become complicated
-* At least initially, policy attachment on Service would have to rely on Service
-  annotations or references from policy to Service(s)
-* No way to attach policy to other resources such as namespace or ServiceImport
-* May be difficult to modify Routes and Services if other components/roles are
-  managing them (eg Knative)
-
-### 3. Shared Policy Resource
-This is really just a slight variation or extension of the main proposal in this
-GEP. We would introduce a shared policy resource. This resource would follow the
-guidelines described above, including the `targetRef` as defined as well as
-`default` and `override` fields. Instead of carefully crafted CRD schemas for
-each of the `default` and `override` fields, we would use more generic
-`map[string]string` values. This would allow similar flexibility to annotations
-while still enabling the default and override concepts that are key to this
-proposal.
-
-Unfortunately this would be difficult to validate and would come with many of
-the downsides of annotations. A validating webhook would be required for any
-validation which could result in just as much or more work to maintain than
-CRDs. At this point we believe that the best experience will be from
-implementations providing their own policy CRDs that follow the patterns
-described in this GEP. We may want to explore tooling or guidance to simplify
-the creation of these policy CRDs to help simplify implementation and extension
-of this API.
+This does not mean that nothing at all that affects multiple objects can be done, but that careful consideration of what information is stored in status, so that _every_ meta resource update does not require a corresponding status update, is advised.
+
+## Current use of meta resources
+
+### Implementations
+
+These are a few known implementations of meta resources in compliance with this standard:
+
+#### Gateway API (core)
+
+Gateway API defines two kinds of Direct meta resources (Direct policies), both for augmenting the behavior of Kubernetes `Service` resources:
+
+* **BackendTLSPolicy:** Direct policy type for specifying the TLS configuration of the connection from the Gateway to a backend pod (set of pods) via the Service API object.
+* **BackendLBPolicy:** Direct policy for Session Persistence (Experimental).
+
+#### Envoy Gateway
+
+<small>https://gateway.envoyproxy.io/docs/api/extension_types/</small>
+
+Gateway API implementation that defines the following kinds of meta resources:
+
+* **ClientTrafficPolicy:** to configure the behavior of the connection between the downstream client and Envoy Proxy listener.
+* **BackendTrafficPolicy:** to configure the behavior of the connection between the Envoy Proxy listener and the backend service.
+* **EnvoyExtensionPolicy:** to configure various envoy extensibility options for the Gateway.
+* **EnvoyPatchPolicy:** to modify the generated Envoy xDS resources by Envoy Gateway using this patch API.
+* **SecurityPolicy:** to configure various security settings for a Gateway.
+
+#### Istio
+
+<small>https://istio.io/latest/docs/reference/config/</small>
+
+Gateway API implementation that defines the following kinds of meta resources:
+
+* **EnvoyFilter:** to customize the Envoy configuration generated by istiod, e.g. modify values for certain fields, add specific filters, or even add entirely new listeners, clusters.
+* **RequestAuthentication:** to define request authentication methods supported by a workload.
+* **AuthorizationPolicy:** to enable access control on workloads in the mesh.
+* **WasmPlugin:** to extend the functionality provided by the Istio proxy through WebAssembly filters.
+* **Telemetry:** defines how telemetry (metrics, logs and traces) is generated for workloads within a mesh.
+
+#### NGINX Gateway Fabric
+
+<small>https://docs.nginx.com/nginx-gateway-fabric/overview/gateway-api-compatibility</small>
+
+Gateway API implementation that supports Gateway API’s `BackendTLSPolicy` as well as the following kinds of meta resources:
+
+* **ClientSettingsPolicy:** Inherited policy to configure connection behavior between client and NGINX.
+* **ObservabilityPolicy:** Direct policy to define settings related to tracing, metrics, or logging.
+
+#### Gloo Gateway
+
+<small>https://docs.solo.io/gateway/latest/about/custom-resources/#policies</small>
+
+Gateway API implementation that defines the following kinds of meta resources:
+
+* **ListenerOption:** to augment behavior of one, multiple, or all gateway listeners.
+* **HTTPListenerOption:** to augment behavior of one, multiple, or all HTTP and HTTPS listeners.
+* **RouteOption:** to augment behavior of one, multiple, or all routes in an HTTPRoute resource.
+* **VirtualHostOption:** to augment behavior of the hosts on one, multiple, or all gateway listeners.
+
+#### Kuadrant
+
+<small>https://docs.kuadrant.io</small>
+
+First Gateway API integration entirely based on the Meta resources and Policy Attachment pattern. Defines the following kinds of meta resources:
+
+* **DNSPolicy:** to manage the lifecycle of DNS records in external DNS providers such as AWS Route53, Google DNS, and Azure DNS.
+* **TLSPolicy:** to manage the lifecycle of TLS certificate configuration on gateways using CertManager.
+* **AuthPolicy:** Inherited policy with full support of Defaults & Overrides and merge strategies that can be attached to gateways and routes to specify authentication and authorization rules.
+* **RateLimitPolicy:** Inherited policy with full support of Defaults & Overrides and merge strategies that can be attached to gateways and routes to specify rate limiting rules.
+
+### Other meta resource-like implementations
+
+#### Network Policy API (Working Group, SIG-NETWORK)
+
+<small>https://network-policy-api.sigs.k8s.io/</small>
+
+Defines two kinds of meta resources respectively for specifying *default* and *override* of networking policy rules: **AdminNetworkPolicy** and **BaselineAdminNetworkPolicy**. Builds on top of Kubernetes core `NetworkPolicy` kind.
+
+Although the Network Policy API custom resources do not strictly implement the Meta resources and Policy Attachment pattern, they are based on similar concepts that involve policy rules for augmenting the behavior of other Kubernetes objects (pods), attachment points, nested contexts (through namespaces and pod selectors), and Defaults & Overrides.
+
+#### Open Cluster Management
+
+<small>https://open-cluster-management.io/docs/getting-started/integration/policy-controllers/policy-framework/</small>
+
+Does not implement Meta resources and Policy Attachment. However, defines a virtual policy kind (**ConfigurationPolicy**) and supports distributing other third-party kinds of policies such as Gatekeeper's **ConstraintTemplate** kind, via a **Policy** resource whose targets are nonetheless controlled by a separate set of resource (**Placement** and **PlacementBinding**).
+
+## Tools
+
+The following tools can be useful for implementing and supporting meta resources and meta resource custom controllers.
+
+#### gwctl
+
+<small>https://github.com/kubernetes-sigs/gwctl</small>
+
+CLI tool for visualizing and managing Gateway API resources in a Kubernetes cluster. Includes commands to visualize effective policies affecting the resources in compliance with the Meta resources and Policy Attachment pattern.
+
+#### policy-machinery
+
+<small>https://github.com/Kuadrant/policy-machinery</small>
+
+Golang library for implementing policy controllers. Defines types and functions to build Directed Acyclic Graphs (DAG) to represent hierarchies of targetable resources and attached meta resources, calculate effective policies based on standard and custom merge strategies, etc. Includes helpers for applications based on Gateway API.
 
 ## References
 
