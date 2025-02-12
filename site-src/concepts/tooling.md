@@ -12,7 +12,7 @@ Get started [here](https://github.com/kubernetes-sigs/ingress2gateway?tab=readme
 
 A command line tool for managing your Gateway API resources. Explore your policies, xRoutes, and interact with your resources.
 
-Get started [here](https://github.com/kubernetes-sigs/gwctl?tab=readme-ov-file#installation)!
+Get started with [kubernetes-sigs/gwctl: installation](https://github.com/kubernetes-sigs/gwctl?tab=readme-ov-file#installation)!
 
 ## Third-Party Tooling
 
