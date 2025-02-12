@@ -132,7 +132,7 @@ type ReferenceGrantSpec struct {
 
 // ReferenceGrantFrom describes trusted namespaces and kinds.
 type ReferenceGrantFrom struct {
-    // Group is the group of the referrent.
+    // Group is the group of the referent.
     //
     // Support: Core
     //
@@ -140,7 +140,7 @@ type ReferenceGrantFrom struct {
     // +kubebuilder:validation:MaxLength=253
     Group string `json:"group"`
 
-    // Kind is the kind of the referrent. Although implementations may support
+    // Kind is the kind of the referent. Although implementations may support
     // additional resources, the following Route types are part of the "Core"
     // support level for this field:
     //
@@ -153,7 +153,7 @@ type ReferenceGrantFrom struct {
     // +kubebuilder:validation:MaxLength=253
     Kind string `json:"kind"`
 
-    // Namespace is the namespace of the referrent.
+    // Namespace is the namespace of the referent.
     //
     // Support: Core
     //
@@ -165,7 +165,7 @@ type ReferenceGrantFrom struct {
 // ReferenceGrantTo describes what Kinds are allowed as targets of the
 // references.
 type ReferenceGrantTo struct {
-    // Group is the group of the referrent.
+    // Group is the group of the referent.
     //
     // Support: Core
     //
@@ -173,7 +173,7 @@ type ReferenceGrantTo struct {
     // +kubebuilder:validation:MaxLength=253
     Group string `json:"group"`
 
-    // Kind is the kind of the referrent. Although implementations may support
+    // Kind is the kind of the referent. Although implementations may support
     // additional resources, the following types are part of the "Core"
     // support level for this field:
     //

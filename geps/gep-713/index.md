@@ -54,7 +54,7 @@ more resources, and are consequently harder to understand and require a more
 complex status design.
 
 Splitting these two design patterns apart into separate GEPs is intended to
-allow proceeding with stablizing the simpler (Direct) case while we work on
+allow proceeding with stabilizing the simpler (Direct) case while we work on
 solving the status problem for the more complex (Inherited) case.
 
 Direct Attached Policies are further specified in the addendum GEP GEP-2648,
@@ -555,7 +555,7 @@ that _every_ Policy update does not require a status update.
 
 Because Policy Attachment is a pattern for APIs, not an API, and needs to address
 all the problems above, the strategy this GEP proposes is to define a range of
-options for increasing the discoverabilty of Policy resources, and provide
+options for increasing the discoverability of Policy resources, and provide
 guidelines for when they should be used.
 
 It's likely that at some stage, the Gateway API CRDs will include some Policy
@@ -588,7 +588,7 @@ plugin.
 
 ##### Design considerations
 
-This is already part of the API pattern, but is being lifted to more prominience
+This is already part of the API pattern, but is being lifted to more prominence
 here.
 
 #### Standard status struct
@@ -789,7 +789,7 @@ This solution:
 - is low cost in terms of apiserver updates (because it's only on the GatewayClass,
   and only on implementation startup)
 - provides a standard place for all users to look for relevant objects
-- ties in to the Conformance Profiles design and other efforts about GatewayClass 
+- ties into the Conformance Profiles design and other efforts about GatewayClass 
   status
 
 #### Standard status stanza
@@ -871,7 +871,7 @@ contains `status` information.
 
 ```yaml
 kind: EffectivePolicy
-apiVersion: gateway.networkking.k8s.io/v1alpha2
+apiVersion: gateway.networking.k8s.io/v1alpha2
 metadata:
   name: targeted-object
   namespace: targeted-object-namespace

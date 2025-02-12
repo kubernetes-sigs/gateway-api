@@ -60,7 +60,7 @@ an Inherited Policy.
 
 Note that the same object may be have some properties of both an Inherited Policy
 _and_ a Direct Policy if it can attach to multiple points of a hierarchy, such
-as if the same Policy can be atttached to a Gateway (where it affects all Routes
+as if the same Policy can be attached to a Gateway (where it affects all Routes
 attached to that Gateway) or to a Route (where it affects only that Route).
 
 If a Policy _can be_ used as an Inherited Policy, it MUST be treated as an

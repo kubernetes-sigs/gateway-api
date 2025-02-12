@@ -48,7 +48,7 @@ At the moment there exists three defined constants:
 
 ### New Protocols & Reserved Prefix
 
-To add support for a new protocol it should first become a Kubernetes Standard Application Protocol by updating the [KEP-3726][kep-3726]. [KEP-3726][kep-3726] also states the `appProtocol` field accepts a domain-prefixed implementation specific value. Thus, if the suggested protocol is not suited to have a `kubernetes.io/*` prefix, then the Gateway API MAY support the new protocol using it's own prefix `gateway.networking.k8s.io/*`.  Please make a PR to this GEP.
+To add support for a new protocol it should first become a Kubernetes Standard Application Protocol by updating the [KEP-3726][kep-3726]. [KEP-3726][kep-3726] also states the `appProtocol` field accepts a domain-prefixed implementation specific value. Thus, if the suggested protocol is not suited to have a `kubernetes.io/*` prefix, then the Gateway API MAY support the new protocol using its own prefix `gateway.networking.k8s.io/*`.  Please make a PR to this GEP.
 
 For example we may want to add a sentinel `appProtocol` value that prevents Gateway implementations from discovering the protocol of the application. Instead they should just refer to the Service's `protocol` field. Such a constant was rejected upstream (https://github.com/kubernetes/enhancements/pull/4106) but as an example it could be defined in a future addition to this GEP as `gateway.networking.k8s.io/no-sniff`.
 
@@ -116,7 +116,7 @@ This was dropped in favour of supporting Kubernetes Standard Application Protoco
 ### Multiple Protocol Meta-resources
 
 Rather than bundle protocol details into a single resource an alternative would be to create distinct meta resources.
-ie. `HTTP2Backend`, `GPRCBackend`, `WebsocketBackend`.
+ie. `HTTP2Backend`, `GRPCBackend`, `WebsocketBackend`.
 
 The advantages of this approach are:
 

@@ -64,7 +64,7 @@ type GatewayBackendTLS struct {
   // ClientCertificateRef can reference to standard Kubernetes resources, i.e.
   // Secret, or implementation-specific custom resources.
   //
-  // This setting can be overriden on the service level by use of BackendTLSPolicy.
+  // This setting can be overridden on the service level by use of BackendTLSPolicy.
   ClientCertificateRef SecretObjectReference `json:"clientCertificateRef,omitempty"`
 }
 ```

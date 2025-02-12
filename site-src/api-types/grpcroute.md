@@ -33,7 +33,7 @@ level, it is acceptable to introduce a route resource at the higher layer when
 the following criteria are met:
 
 - Users of the encapsulated protocol would miss out on significant conventional features from their ecosystem if forced to route at a lower layer.
-- Users of the enapsulated protocol would experience a degraded user experience if forced to route at a lower layer.
+- Users of the encapsulated protocol would experience a degraded user experience if forced to route at a lower layer.
 - The encapsulated protocol has a significant user base, particularly in the Kubernetes community.
 
 gRPC meets all of these criteria, so the decision was made to include `GRPCRoute`in Gateway API.
@@ -185,7 +185,7 @@ Conformance levels are defined by the filter type:
 
 Specifying a core filter multiple times has unspecified or custom conformance.
 
-If an implementation can not support a combinations of filters, they must clearly
+If an implementation cannot support a combinations of filters, they must clearly
 document that limitation. In cases where incompatible or unsupported
 filters are specified and cause the `Accepted` condition to be set to status
 `False`, implementations may use the `IncompatibleFilters` reason to specify
@@ -272,7 +272,7 @@ Multiple GRPCRoutes can be attached to a single Gateway resource. Importantly,
 only one Route rule may match each request. For more information on how conflict
 resolution applies to merging, refer to the [API specification][grpcrouterule].
 
-[grpcroute]: /reference/spec/#gateway.networking.k8s.io/v1.GRPCPRoute
+[grpcroute]: /reference/spec/#gateway.networking.k8s.io/v1.GRPCRoute
 [grpcrouterule]: /reference/spec/#gateway.networking.k8s.io/v1.GRPCRouteRule
 [hostname]: /reference/spec/#gateway.networking.k8s.io/v1.Hostname
 [rfc-3986]: https://tools.ietf.org/html/rfc3986

@@ -37,10 +37,10 @@ The specification of a [BackendTLSPolicy][backendtlspolicy] consists of:
 WellKnownCACertificates.
 - [Hostname][hostname] - Defines the Server Name Indication (SNI) that the Gateway uses to connect to the backend.
 - [CACertificateRefs][caCertificateRefs] - Defines one or more references to objects that contain PEM-encoded TLS certificates,
-which are used to establish a TLS handshake between the Gateway and backend Pod.  Either CACertficateRefs or
+which are used to establish a TLS handshake between the Gateway and backend Pod.  Either CACertificateRefs or
 WellKnownCACertificates may be specified, but not both.
 - [WellKnownCACertificates][wellKnownCACertificates] - Specifies whether system CA certificates may be used in the TLS
-handshake between the Gateway and backend Pod.  Either CACertficateRefs or WellKnownCACertificates may be specified, but not both.
+handshake between the Gateway and backend Pod.  Either CACertificateRefs or WellKnownCACertificates may be specified, but not both.
 
 The following chart outlines the object definitions and relationship:
 ```mermaid
@@ -57,7 +57,7 @@ flowchart LR
     spec -->targetRefs & validation
     status -->ancestorStatus
     targetRefs -->service
-    note[<em>choose only one<hr> caCerticateRefs OR wellKnownCACertificates</em>]
+    note[<em>choose only one<hr> caCertificateRefs OR wellKnownCACertificates</em>]
     style note fill:#fff
     validation -.- note
 ```
@@ -117,7 +117,7 @@ The BackendTLSPolicyValidation must contain a certificate reference of some kind
 certificate to use for backend TLS, CACertificateRefs and WellKnownCACertificates.  Only one of these may be used per
 BackendTLSPolicyValidation.
 
-##### CACertficateRefs
+##### CACertificateRefs
 
 CACertificateRefs refer to one or more PEM-encoded TLS certificates.
 

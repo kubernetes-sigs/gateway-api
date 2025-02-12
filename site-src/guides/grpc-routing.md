@@ -63,7 +63,7 @@ missing or does not have the value `canary` then it will be forwarded to `bar-sv
 Reflection](https://github.com/grpc/grpc/blob/v1.49.1/doc/server-reflection.md)
 is required to use interactive clients such as
 [`grpcurl`](https://github.com/fullstorydev/grpcurl) without having a local copy
-of the target service's protocol buffers present on your local filesysem. To
+of the target service's protocol buffers present on your local filesystem. To
 enable this, first ensure that you have a gRPC reflection server listening on
 your application pods, then add the reflection method to your `GRPCRoute`. This
 is likely to be useful in development and staging environments, but this should

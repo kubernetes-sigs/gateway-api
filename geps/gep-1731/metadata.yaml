@@ -4,7 +4,7 @@ number: 1731
 name: HTTPRoute Retries
 status: Experimental
 # Any authors who contribute to the GEP in any way should be listed here using
-# their Github handle.
+# their GitHub handle.
 authors:
   - mikemorris
 relationships:
@@ -13,7 +13,7 @@ relationships:
   # set back to this GEP, and MUST be moved to Declined.
   obsoletes: {}
   obsoletedBy: {}
-  # extends indicates that a GEP extends the linkned GEP, adding more detail
+  # extends indicates that a GEP extends the linked GEP, adding more detail
   # or additional implementation. The extended GEP MUST have its extendedBy
   # field set back to this GEP.
   extends: {}
@@ -30,7 +30,7 @@ relationships:
       name: HTTPRoute Timeouts
       description: Covers some overlapping considerations around when requests should be retried.
 # references is a list of hyperlinks to relevant external references.
-# It's intended to be used for storing Github discussions, Google docs, etc.
+# It's intended to be used for storing GitHub discussions, Google docs, etc.
 references:
   - https://www.rfc-editor.org/rfc/rfc9110
   - https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml

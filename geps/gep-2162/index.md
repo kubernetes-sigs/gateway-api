@@ -123,7 +123,7 @@ Every feature should:
 
 #### Conformance test names
 
-Conformance tests file names should try to follow the the `pascal-case-name.go` format.
+Conformance tests file names should try to follow the `pascal-case-name.go` format.
 For example for `HTTPRoutePortRedirect` - the test file would be `httproute-port-redirect.go`.
 
 We should treat this guidance as "best effort" because we might have test files that check the combination of several features and can't follow the same format.
@@ -179,7 +179,7 @@ Once the GatewayClass features support are is published into the status we could
 
 ### Add Gateway API Version field to the GatewayClass Status
 
-We got some feedback that it will be useful to indicate what what Gateway API version the implementation supports. So when we have supported features published in the GatewayClass Status, users will also be able to understand that those are the supported features for a specific Gateway API version.
+We got some feedback that it will be useful to indicate which Gateway API version the implementation supports. So when we have supported features published in the GatewayClass Status, users will also be able to understand that those are the supported features for a specific Gateway API version.
 
 This work is likely to require its own small GEP but ideally what this field would mean is that an implementation supports Max(vX.X). 
 

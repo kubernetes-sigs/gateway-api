@@ -216,9 +216,9 @@ specified as "").  The use and definition of system certificates is implementati
 these certificates are obtained from the underlying operating system. CACertificateRefs contains one or more
 references to Kubernetes objects that contain PEM-encoded TLS certificates, which are used to establish a TLS handshake
 between the gateway and backend pod. References to a resource in a different namespace are invalid.
-If ClientCertifcateRefs is unspecified, then WellKnownCACertificates must be set to "System" for a valid configuration.
+If ClientCertificateRefs is unspecified, then WellKnownCACertificates must be set to "System" for a valid configuration.
 If WellKnownCACertificates is unspecified, then CACertificateRefs must be specified with at least one entry for a valid configuration.
-If WellKnownCACertficates is set to "System" and there are no system trusted certificates or the implementation doesn't define system
+If WellKnownCACertificates is set to "System" and there are no system trusted certificates or the implementation doesn't define system
 trusted certificates, then the associated TLS connection must fail.
 
 The `Hostname` field is required and is to be used to configure the SNI the Gateway should use to connect to the backend.
@@ -342,7 +342,7 @@ Ref: [TLS Origination](https://www.getambassador.io/docs/emissary/latest/topics/
 ### NGINX implementation through CRDs (Comparable to Route or Policy of Gateway API) supports both TLS and mTLS
 
 * In the Upstream section of a VirtualServer or VirtualServerRoute (equivalent to HTTPRoute) there is a simple toggle to enable TLS.  This does not validate the certificate of the backend and implicitly trusts the backend in order to form the SSL tunnel.  This is not about validating the certificate but obfuscating the traffic with TLS/SSL.
-* A Policy attachment can be provided when certification validation is required that is called egressMTLS (egress from the proxy to the upstream).  This can be tuned to perform various certificate validation tests.  It was created as a Policy becuase it implies some type of AuthN/AuthZ due to the additional checks.  This was also compatible with Open Service Mesh and NGINX Service Mesh and removed the need for a sidecar at the ingress controller.
+* A Policy attachment can be provided when certification validation is required that is called egressMTLS (egress from the proxy to the upstream).  This can be tuned to perform various certificate validation tests.  It was created as a Policy because it implies some type of AuthN/AuthZ due to the additional checks.  This was also compatible with Open Service Mesh and NGINX Service Mesh and removed the need for a sidecar at the ingress controller.
 * A corresponding 'IngressMTLS' policy also exists for mTLS verification of client connections to the proxy.  The Policy object is used for anything that implies AuthN/AuthZ.
 
 Ref: [Upstream.TLS](https://docs.nginx.com/nginx-ingress-controller/configuration/virtualserver-and-virtualserverroute-resources/#upstreamtls)

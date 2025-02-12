@@ -477,7 +477,7 @@ spec:
                                           name:
                                             description: |-
                                               Name is the name of the HTTP Header to be matched. Name matching MUST be
-                                              case insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
+                                              case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
 
                                               If multiple entries specify equivalent header names, the first entry with
                                               an equivalent name MUST be considered for a match. Subsequent entries
@@ -552,7 +552,7 @@ spec:
                                           name:
                                             description: |-
                                               Name is the name of the HTTP Header to be matched. Name matching MUST be
-                                              case insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
+                                              case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
 
                                               If multiple entries specify equivalent header names, the first entry with
                                               an equivalent name MUST be considered for a match. Subsequent entries
@@ -873,7 +873,7 @@ spec:
                                           name:
                                             description: |-
                                               Name is the name of the HTTP Header to be matched. Name matching MUST be
-                                              case insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
+                                              case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
 
                                               If multiple entries specify equivalent header names, the first entry with
                                               an equivalent name MUST be considered for a match. Subsequent entries
@@ -948,7 +948,7 @@ spec:
                                           name:
                                             description: |-
                                               Name is the name of the HTTP Header to be matched. Name matching MUST be
-                                              case insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
+                                              case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
 
                                               If multiple entries specify equivalent header names, the first entry with
                                               an equivalent name MUST be considered for a match. Subsequent entries
@@ -1269,7 +1269,7 @@ spec:
                         they are specified.
 
                         Implementations MAY choose to implement this ordering strictly, rejecting
-                        any combination or order of filters that can not be supported. If implementations
+                        any combination or order of filters that cannot be supported. If implementations
                         choose a strict interpretation of filter ordering, they MUST clearly document
                         that behavior.
 
@@ -1291,7 +1291,7 @@ spec:
 
                         All filters are expected to be compatible with each other except for the
                         URLRewrite and RequestRedirect filters, which may not be combined. If an
-                        implementation can not support other combinations of filters, they must clearly
+                        implementation cannot support other combinations of filters, they must clearly
                         document that limitation. In cases where incompatible or unsupported
                         filters are specified and cause the `Accepted` condition to be set to status
                         `False`, implementations may use the `IncompatibleFilters` reason to specify
@@ -1374,7 +1374,7 @@ spec:
                                     name:
                                       description: |-
                                         Name is the name of the HTTP Header to be matched. Name matching MUST be
-                                        case insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
+                                        case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
 
                                         If multiple entries specify equivalent header names, the first entry with
                                         an equivalent name MUST be considered for a match. Subsequent entries
@@ -1448,7 +1448,7 @@ spec:
                                     name:
                                       description: |-
                                         Name is the name of the HTTP Header to be matched. Name matching MUST be
-                                        case insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
+                                        case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
 
                                         If multiple entries specify equivalent header names, the first entry with
                                         an equivalent name MUST be considered for a match. Subsequent entries
@@ -1768,7 +1768,7 @@ spec:
                                     name:
                                       description: |-
                                         Name is the name of the HTTP Header to be matched. Name matching MUST be
-                                        case insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
+                                        case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
 
                                         If multiple entries specify equivalent header names, the first entry with
                                         an equivalent name MUST be considered for a match. Subsequent entries
@@ -1842,7 +1842,7 @@ spec:
                                     name:
                                       description: |-
                                         Name is the name of the HTTP Header to be matched. Name matching MUST be
-                                        case insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
+                                        case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
 
                                         If multiple entries specify equivalent header names, the first entry with
                                         an equivalent name MUST be considered for a match. Subsequent entries
@@ -2142,7 +2142,7 @@ spec:
                                 name:
                                   description: |-
                                     Name is the name of the HTTP Header to be matched. Name matching MUST be
-                                    case insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
+                                    case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
 
                                     If multiple entries specify equivalent header names, only the first
                                     entry with an equivalent name MUST be considered for a match. Subsequent
@@ -2515,7 +2515,7 @@ spec:
                         There are a number of cases where the "Accepted" condition may not be set
                         due to lack of controller visibility, that includes when:
 
-                        * The Route refers to a non-existent parent.
+                        * The Route refers to a nonexistent parent.
                         * The Route is of a type that the controller does not support.
                         * The Route is in a namespace the controller does not have access to.
                       items:
@@ -3192,7 +3192,7 @@ spec:
                                           name:
                                             description: |-
                                               Name is the name of the HTTP Header to be matched. Name matching MUST be
-                                              case insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
+                                              case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
 
                                               If multiple entries specify equivalent header names, the first entry with
                                               an equivalent name MUST be considered for a match. Subsequent entries
@@ -3267,7 +3267,7 @@ spec:
                                           name:
                                             description: |-
                                               Name is the name of the HTTP Header to be matched. Name matching MUST be
-                                              case insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
+                                              case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
 
                                               If multiple entries specify equivalent header names, the first entry with
                                               an equivalent name MUST be considered for a match. Subsequent entries
@@ -3588,7 +3588,7 @@ spec:
                                           name:
                                             description: |-
                                               Name is the name of the HTTP Header to be matched. Name matching MUST be
-                                              case insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
+                                              case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
 
                                               If multiple entries specify equivalent header names, the first entry with
                                               an equivalent name MUST be considered for a match. Subsequent entries
@@ -3663,7 +3663,7 @@ spec:
                                           name:
                                             description: |-
                                               Name is the name of the HTTP Header to be matched. Name matching MUST be
-                                              case insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
+                                              case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
 
                                               If multiple entries specify equivalent header names, the first entry with
                                               an equivalent name MUST be considered for a match. Subsequent entries
@@ -3984,7 +3984,7 @@ spec:
                         they are specified.
 
                         Implementations MAY choose to implement this ordering strictly, rejecting
-                        any combination or order of filters that can not be supported. If implementations
+                        any combination or order of filters that cannot be supported. If implementations
                         choose a strict interpretation of filter ordering, they MUST clearly document
                         that behavior.
 
@@ -4006,7 +4006,7 @@ spec:
 
                         All filters are expected to be compatible with each other except for the
                         URLRewrite and RequestRedirect filters, which may not be combined. If an
-                        implementation can not support other combinations of filters, they must clearly
+                        implementation cannot support other combinations of filters, they must clearly
                         document that limitation. In cases where incompatible or unsupported
                         filters are specified and cause the `Accepted` condition to be set to status
                         `False`, implementations may use the `IncompatibleFilters` reason to specify
@@ -4089,7 +4089,7 @@ spec:
                                     name:
                                       description: |-
                                         Name is the name of the HTTP Header to be matched. Name matching MUST be
-                                        case insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
+                                        case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
 
                                         If multiple entries specify equivalent header names, the first entry with
                                         an equivalent name MUST be considered for a match. Subsequent entries
@@ -4163,7 +4163,7 @@ spec:
                                     name:
                                       description: |-
                                         Name is the name of the HTTP Header to be matched. Name matching MUST be
-                                        case insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
+                                        case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
 
                                         If multiple entries specify equivalent header names, the first entry with
                                         an equivalent name MUST be considered for a match. Subsequent entries
@@ -4483,7 +4483,7 @@ spec:
                                     name:
                                       description: |-
                                         Name is the name of the HTTP Header to be matched. Name matching MUST be
-                                        case insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
+                                        case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
 
                                         If multiple entries specify equivalent header names, the first entry with
                                         an equivalent name MUST be considered for a match. Subsequent entries
@@ -4557,7 +4557,7 @@ spec:
                                     name:
                                       description: |-
                                         Name is the name of the HTTP Header to be matched. Name matching MUST be
-                                        case insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
+                                        case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
 
                                         If multiple entries specify equivalent header names, the first entry with
                                         an equivalent name MUST be considered for a match. Subsequent entries
@@ -4857,7 +4857,7 @@ spec:
                                 name:
                                   description: |-
                                     Name is the name of the HTTP Header to be matched. Name matching MUST be
-                                    case insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
+                                    case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
 
                                     If multiple entries specify equivalent header names, only the first
                                     entry with an equivalent name MUST be considered for a match. Subsequent
@@ -5230,7 +5230,7 @@ spec:
                         There are a number of cases where the "Accepted" condition may not be set
                         due to lack of controller visibility, that includes when:
 
-                        * The Route refers to a non-existent parent.
+                        * The Route refers to a nonexistent parent.
                         * The Route is of a type that the controller does not support.
                         * The Route is in a namespace the controller does not have access to.
                       items:

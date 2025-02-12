@@ -56,7 +56,7 @@ type GEPDetail struct {
 	// Valid values are provided in the constants for the GEPStatus type.
 	Status GEPStatus `json:"status"`
 
-	// The GEP's authors, listed as their Github handles.
+	// The GEP's authors, listed as their GitHub handles.
 	Authors []string `json:"authors"`
 
 	// Relationships describes the possible relationships between this GEP and
