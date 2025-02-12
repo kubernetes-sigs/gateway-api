@@ -14,7 +14,7 @@ The `Gateway` Resource is a point of contention since it is the only place to at
 
 ## Future Potential Goals (Beyond the GEP)
 
-From [Gateway Hiearchy Brainstorming](https://docs.google.com/document/d/1qj7Xog2t2fWRuzOeTsWkabUaVeOF7_2t_7appe8EXwA/edit#heading=h.w311n4l5qmwk):
+From [Gateway Hierarchy Brainstorming](https://docs.google.com/document/d/1qj7Xog2t2fWRuzOeTsWkabUaVeOF7_2t_7appe8EXwA/edit#heading=h.w311n4l5qmwk):
 
 - Attaching listeners to `Gateways` in different namespaces
 - Standardize merging multiple lists of Listeners together ([\#1863](https://github.com/kubernetes-sigs/gateway-api/pull/1863))
@@ -562,7 +562,7 @@ The main downside of this approach is that users still require `Gateway` write a
 
 ### New 'GatewayGroup' Resource
 
-This was proposed in the Gateway Hiearchy Brainstorming document (see references below). The idea is to introduce a central resource that will coalesce Gateways together and offer forms of delegation.
+This was proposed in the Gateway Hierarchy Brainstorming document (see references below). The idea is to introduce a central resource that will coalesce Gateways together and offer forms of delegation.
 
 Issues with this is complexity with status propagation, cluster vs. namespace scoping etc. It also lacks a migration path for existing Gateways to help shard listeners.
 
