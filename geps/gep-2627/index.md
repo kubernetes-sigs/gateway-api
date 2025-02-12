@@ -16,7 +16,7 @@ For gateway infrastructure to be valuable we need to be able to connect clients 
 ## Non-Goals
 
 * Anything to do with configuring in-cluster DNS. This support is for configuration outside the cluster only.
-* Ways to define if the Gateway API resources are allowed to request particular hostnames. These choices should be left to the implementations that actually actuate the requests for hostnames. However, `status` flows should be specified so as to make clear if a hostname provisioning request cannot be performed.
+* Providing any upstream hostname validation mechanisms. We can provide status for validation failure, but implementations are responsible for validation.
 * Cover more complex DNS routing strategies that come into play for multi-cluster topologies such as round robin, failover, health checks, weighted and geo location with this first pass. Supporting these types of use cases for distributed gateways (e.g., in different regions or multiple gateways for resilience within a region) and offering a form of global load balancing leveraging DNS is a potential future goal.
 
 ## Use Cases
