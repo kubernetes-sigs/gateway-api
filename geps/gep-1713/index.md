@@ -590,7 +590,7 @@ For workloads like Knative we can have O(1000) Services on the cluster with uniq
 
 For workloads with many certificates one option would be to introduce a `tls` stanza somewhere in the Route types. These Routes would then attach to a single Gateway. Then application operators can provide their own certificates. This probably would require some ability to have a handshake agreement with the Gateway.
 
-Sorta related there was a Route Delegation GEP (https://github.com/kubernetes-sigs/gateway-api/issues/1058) that was abandoned
+Somewhat related, there was a Route Delegation GEP (https://github.com/kubernetes-sigs/gateway-api/issues/1058) that was abandoned
 
 ## References
 
