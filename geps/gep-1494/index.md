@@ -21,7 +21,7 @@ Provide a method for configuring **Gateway API implementations** to add HTTP Aut
 
 ## Stretch Goals
 
-* Optionally, a way for Ana to have the ability to disable Authentication and/or Authorization for specific routes when needed, allowing certain routes to not be protected. This would probably need to work something like a default enabling at Gateway level, that can be specifically set at lower levels, but further design is TBD. This goal comes from the relatively-common desire for Chihiro to be able to set reasonably-secure defaults, and for Ana or others to be able to _disable_ for specific paths for purposes of healthchecking. The fact that this is relatively undefined is why this goal is _optional_.
+* Optionally, a way for Ana to have the ability to disable Authentication and/or Authorization for specific routes when needed, allowing certain routes to not be protected. This would probably need to work something like a default enabling at Gateway level, that can be specifically set at lower levels, but further design is TBD. This goal comes from the relatively-common desire for Chihiro to be able to set reasonably-secure defaults, and for Ana or others to be able to _disable_ for specific paths for purposes of health checks. The fact that this is relatively undefined is why this goal is _optional_.
 
 
 ## Non-Goals
