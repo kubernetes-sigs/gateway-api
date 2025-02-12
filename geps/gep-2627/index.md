@@ -10,7 +10,7 @@ For gateway infrastructure to be valuable we need to be able to connect clients 
 ## Goals
 * Provide DNS specification for Gateway resources
 * Support multiple DNS providers and a selection mechanism for Gateways
-* Ensure that any method is based on structured fields and makes the most of `status` on whatever resources are relevant, whether they are existing Gateway API resources or new resources.
+* Provide Gateway status to communicate the state of provisioned DNS
 * Increase portability and supportability between Gateway API implementations and third party controllers offering DNS integration.
 * Clarity on the scope of hostnames under management. (This should _not_ be able to be used to affect the standard in-cluster DNS configuration)
 
