@@ -620,11 +620,11 @@ Metaresource implementations SHOULD support these basic status conditions.
 
 #### Target object status
 
-Implementations of metaresources MUST put a condition into `status.Conditions` of any objects affected by the metaresource.
+Implementations of metaresources SHOULD put a condition into `status.Conditions` of any objects affected by the metaresource.
 
-That condition MUST be named according to the pattern `<meta-resource-kind>Affected` (e.g. `colors.controller.k8s.io/ColorPolicyAffected`), and have the optional `observedGeneration` field kept up to date when the spec of the target object changes.
+That condition, if added, MUST be named according to the pattern `<meta-resource-kind>Affected` (e.g. `colors.controller.k8s.io/ColorPolicyAffected`), and have the optional `observedGeneration` field kept up to date when the spec of the target object changes.
 
-Implementations should use their own unique domain prefix for this condition type. Gateway API implementations, for instance, should use the same domain as in the `controllerName` field on `GatewayClass` (or some other implementation-unique domain for implementations that do not use `GatewayClass`.)
+Implementations SHOULD use their own unique domain prefix for this condition type. Gateway API implementations, for instance, should use the same domain as in the `controllerName` field on `GatewayClass` (or some other implementation-unique domain for implementations that do not use `GatewayClass`.)
 
 E.g. – given a `Gateway` object that is targeted by a hypothetical `ColorPolicy` metaresource named `policy-namespace/my-policy`, which is owned by a `colors.controller.k8s.io` controller and with status `Enforced` or `PartiallyEnforced`. The controller SHOULD add to the status of the `Gateway` object a condition `colors.controller.k8s.io/ColorPolicyAffected: true`, and reason ideally referring to the `policy-namespace/my-policy` by name.
 
