@@ -222,7 +222,7 @@ The hierarchical relationships of the object that are targeted by metaresources 
 
 Metaresource CRDs MUST clearly define the hierarchy of target resources they have effects upon, as well as the semantics of targeting each kind of resource in the hierarchy. Moreover, lower levels in the hierarchy *inherit* the definitions applied at the higher levels, in such a way that higher level rules may be understood as having an “umbrella effect” over everything under that level.
 
-E.g., in Gateway API’s hierarchy of network resources for the ingress use case `GatewayClass` \> `Gateway` \> `HTTPRoute` \> `Backend`, a metaresource that attaches to a `GatewayClass` object, if defined as a metaresource kind ultimately to augment the behavior of `HTTPRoute` objects, affects all `Gateways` under the `GatewayClass`, as well as all `HTTPRoutes` under those `Gateways`. Any other instance of this metaresource kind targeting a lower level than the `GatewayClass` (e.g. `Gateway` or `HTTPRoute`) should be be treated as a conflict against the higher level metaresource spec, for the specific scope (“context”) of the subset of the hierarchy it attaches to. This conflict MUST be resolved according to some defined *merge strategy*.
+E.g., in Gateway API’s hierarchy of network resources for the ingress use case `GatewayClass` > `Gateway` > `HTTPRoute` > `Backend`, a metaresource that attaches to a `GatewayClass` object, if defined as a metaresource kind ultimately to augment the behavior of `HTTPRoute` objects, affects all `Gateways` under the `GatewayClass`, as well as all `HTTPRoutes` under those `Gateways`. Any other instance of this metaresource kind targeting a lower level than the `GatewayClass` (e.g. `Gateway` or `HTTPRoute`) should be be treated as a conflict against the higher level metaresource spec, for the specific scope (“context”) of the subset of the hierarchy it attaches to. This conflict MUST be resolved according to some defined *merge strategy*.
 
 ### Declared targets versus Effective targets
 
@@ -269,12 +269,12 @@ The following is a description of an abstract process for calculating effective 
 
 Given:
 
-* the target resource kinds `A`, `B` and `C`, organized in a hierarchy of resource kinds where `A` \> `B` \> `C`, i.e. `A` is the least specific kind (roots of the hierarchical tree) and `C` is the most specific kind (leaves of the tree)－without loss of generality for cases where these kinds are not necessarily proper Kubernetes kinds, but also possibly named sections of a proper Kubernetes kind;
+* the target resource kinds `A`, `B` and `C`, organized in a hierarchy of resource kinds where `A` > `B` > `C`, i.e. `A` is the least specific kind (roots of the hierarchical tree) and `C` is the most specific kind (leaves of the tree)－without loss of generality for cases where these kinds are not necessarily proper Kubernetes kinds, but also possibly named sections of a proper Kubernetes kind;
 * the metaresource kind `M`, whose instances can target resources of kind `A`, `B` or `C`, ultimately intending to augment the behavior of instances of resource kind `C`;
-* the tree of targetable resources `a1` \> (`b1` \> `c1`, `b2` \> (`c1`, `c2`)), where `x` \> `Y` represents all the directed relationships from targetable resource `x` of kind `X` and its children, and recursively for `Y`, without loss of generality for any other set of instances of target resources;
-* the instances of metaresource `m1` \-\> `a1` and `m2` \-\> `b2`, where `m` \-\> `y` represents the attachment of metaresource `m` of kind `M` to the target resource `y` of kind `A`, `B` or `C`, without loss of generality for any other set of instances of metaresources.
+* the tree of targetable resources `a1` > (`b1` > `c1`, `b2` > (`c1`, `c2`)), where `x` > `Y` represents all the directed relationships from targetable resource `x` of kind `X` and its children, and recursively for `Y`, without loss of generality for any other set of instances of target resources;
+* the instances of metaresource `m1` → `a1` and `m2` → `b2`, where `m` → `y` represents the attachment of metaresource `m` of kind `M` to the target resource `y` of kind `A`, `B` or `C`, without loss of generality for any other set of instances of metaresources.
 
-For each expanded context that is induced by the instances of targetable resource of kind `C` and its relationships given by the hierarchy, i.e. for each of: `a1` \> `b1` \> `c1`, `a1` \> `b2` \> `c1`, and `a1` \> `b2` \> `c2`, stack the metaresources targeting the context at any level, ordered from the most specific level (i.e. `C`) to the least specific one (i.e. `A`)－i.e. `A` is on top of the stack:
+For each expanded context that is induced by the instances of targetable resource of kind `C` and its relationships given by the hierarchy, i.e. for each of: `a1` > `b1` > `c1`, `a1` > `b2` > `c1`, and `a1` > `b2` > `c2`, stack the metaresources targeting the context at any level, ordered from the most specific level (i.e. `C`) to the least specific one (i.e. `A`)－i.e. `A` is on top of the stack:
 
 1. Pop two metaresources from the stack and combine them into one effective metaresource applying the conflict resolution rules (described in the previous subsection).
 2. Push the effective metaresource back into the stack.
@@ -312,19 +312,19 @@ Metaresource CRDs that implement specifically the Defaults or the Overrides base
 
 * **Atomic spec:** the spec of the metaresource is treated as atomic, i.e., either one spec wins or another, but 2 specs are never mixed into a composition of specs. This is the default atomicity applied if not specified otherwise.
 * **Scalar values (“Patch”):** the specs of 2 metaresources are merged into one by applying the winning spec (according to semantics dictated by the base merge strategy, i.e., the more specific if Defaults or the less specific one if Overrides) over the other spec, in a JSON patch operation.
-* **\<Custom\>:** the spec of 2 metaresources are mixed into a composition of both specs, following a custom merge algorithm specified by the metaresource or policy kind.
+* **\<Custom>:** the spec of 2 metaresources are mixed into a composition of both specs, following a custom merge algorithm specified by the metaresource or policy kind.
 
 #### Combined merge strategies
 
-The final set of *merge strategies* therefore supported by a metaresource CRD (base \+ atomicity) is any subset of the following, where \<Custom\> is implementation-specific:
+The final set of *merge strategies* therefore supported by a metaresource CRD (base \+ atomicity) is any subset of the following, where \<Custom> is implementation-specific:
 
 * None
 * Atomic Defaults
 * Atomic Overrides
 * Patch Defaults
 * Patch Overrides
-* \<Custom\> Defaults
-* \<Custom\> Overrides
+* \<Custom> Defaults
+* \<Custom> Overrides
 
 Metaresource CRDs that support combined merged strategies are encouraged to define a `strategy` field for the instances to specify the exact strategy to apply.
 
@@ -348,7 +348,7 @@ The following two classes of metaresource kinds are defined: *Direct* and *Inher
 
 This section presents a series of synthetic examples of applications of metaresources for different kinds of topologies and contexts.
 
-In all cases, the background of targetable object kinds is assumed to be a hierarchy of network resource kinds `Gateway` (`g`) \> `Route` (`r`) \> `Backend` (`b`), where `Gateway` is the least specific kind (instances denoted “`gX`”) and `Backend` is the most specific kind (instances denoted “`bX`”).
+In all cases, the background of targetable object kinds is assumed to be a hierarchy of network resource kinds `Gateway` (`g`) > `Route` (`r`) > `Backend` (`b`), where `Gateway` is the least specific kind (instances denoted “`gX`”) and `Backend` is the most specific kind (instances denoted “`bX`”).
 
 Moreover, a `ColorPolicy` metaresource kind (or “policy kind”, equivalently) is defined however with variations in its semantics across examples to accommodate for each case. Instances of the `ColorPolicy` kind (denoted “`pX[spec]`” and referred to simply as “policies”) may target one or more kinds of targetable resources, depending on each example. A policy represents an intent to “color” the network traffic that flows through the portion of the network corresponding to the target with a given color or color set that is specified in the policy.
 
@@ -360,12 +360,12 @@ Given:
 
 the following state of targetable resources:
 
-* `g1` \> `r1` \> `b1`
-* `g1` \> `r2` \> `b2`
-  and the following state of `ColorPolicy` (`p`) policies, where `pX[spec]` \-\> `bX` denotes a policy `pX` attached to (“targeting”) a `Backend` resource `bX`, intending to augment `bX`‘s behavior with `spec`:
+* `g1` > `r1` > `b1`
+* `g1` > `r2` > `b2`
+  and the following state of `ColorPolicy` (`p`) policies, where `pX[spec]` → `bX` denotes a policy `pX` attached to (“targeting”) a `Backend` resource `bX`, intending to augment `bX`‘s behavior with `spec`:
 
-* `p1[color:red]` \-\> `b1`
-* `p2[color:blue]` \-\> `b1` (conflicting policy, `p2.creationTimestamp` \> `p1.creationTimestamp`)
+* `p1[color:red]` → `b1`
+* `p2[color:blue]` → `b1` (conflicting policy, `p2.creationTimestamp` > `p1.creationTimestamp`)
 
 The expected outcome to be implemented by the controller is:
 
@@ -383,23 +383,23 @@ Given:
 
 the following state of targetable resources:
 
-* `g1` \> `r1` \> `b1`
-* `g1` \> `r2` \> `b1`
-* `g2` \> `r3` \> `b1`
-* `g2` \> `r4` \> `b2`
-  and the following state of `ColorPolicy` (`p`) policies, where `pX[spec]` \-\> `yX` denotes a policy `pX` attached to (“targeting”) a resource `yX`, `y` ∈ {`g`, `r`}, intending to augment with `spec` the behavior of `Backend` resources when activated via `yX`:
+* `g1` > `r1` > `b1`
+* `g1` > `r2` > `b1`
+* `g2` > `r3` > `b1`
+* `g2` > `r4` > `b2`
+  and the following state of `ColorPolicy` (`p`) policies, where `pX[spec]` → `yX` denotes a policy `pX` attached to (“targeting”) a resource `yX`, `y` ∈ {`g`, `r`}, intending to augment with `spec` the behavior of `Backend` resources when activated via `yX`:
 
-* `p1[color:red]` \-\> `g1`
-* `p2[color:blue]` \-\> `r1`
-* `p3[overrides:{color:yellow}]` \-\> `g2`
-* `p4[color:green]` \-\> `r4`
+* `p1[color:red]` → `g1`
+* `p2[color:blue]` → `r1`
+* `p3[overrides:{color:yellow}]` → `g2`
+* `p4[color:green]` → `r4`
 
 The expected outcome to be implemented by the controller is:
 
-1. Traffic directed to `g1` \> `r1` \> `b1` must be colored `blue` (more specific `p2` spec beats less specific defaults at `p1`).
-2. Traffic directed to `g1` \> `r2` \> `b1` must be colored `red` (implicit defaults specified at `p1` not replaced by any other policy).
-3. Traffic directed to `g2` \> `r3` \> `b1` must be colored `yellow` (overrides specified at `p3` not replaced by any other policy).
-4. Traffic directed to `g2` \> `r4` \> `b2` must be colored `yellow` (overrides specified at `p3` beats more specific policy `p4`).
+1. Traffic directed to `g1` > `r1` > `b1` must be colored `blue` (more specific `p2` spec beats less specific defaults at `p1`).
+2. Traffic directed to `g1` > `r2` > `b1` must be colored `red` (implicit defaults specified at `p1` not replaced by any other policy).
+3. Traffic directed to `g2` > `r3` > `b1` must be colored `yellow` (overrides specified at `p3` not replaced by any other policy).
+4. Traffic directed to `g2` > `r4` > `b2` must be colored `yellow` (overrides specified at `p3` beats more specific policy `p4`).
 5. Status of `Backend` `b1` should be reported as affected by the `ColorPolicy` resources `p1`, `p2` and `p3`.
 6. Status of `Backend` `b2` should be reported as affected by the `ColorPolicy` resource `p3`.
 7. Status of `ColorPolicy` `p1` must be reported as partially enforced, due to in some cases beaten by `p2`.
@@ -415,23 +415,23 @@ Given:
 
 the following state of targetable resources:
 
-* `g1` \> `r1` \> `b1`
-* `g1` \> `r2` \> `b1`
-* `g2` \> `r3` \> `b1`
-* `g2` \> `r4` \> `b2`
-  and the following state of `ColorPolicy` (`p`) policies, where `pX[spec]` \-\> `yX` denotes a policy `pX` attached to (“targeting”) a resource `yX`, `y` ∈ {`g`, `r`}, intending to augment with `spec` the behavior of `Backend` resources when activated via `yX`:
+* `g1` > `r1` > `b1`
+* `g1` > `r2` > `b1`
+* `g2` > `r3` > `b1`
+* `g2` > `r4` > `b2`
+  and the following state of `ColorPolicy` (`p`) policies, where `pX[spec]` → `yX` denotes a policy `pX` attached to (“targeting”) a resource `yX`, `y` ∈ {`g`, `r`}, intending to augment with `spec` the behavior of `Backend` resources when activated via `yX`:
 
-* `p1[colors:{dark:brown,light:red},strategy:atomic]` \-\> `g1`
-* `p2[colors:{light:blue}]` \-\> `r1`
-* `p3[overrides:{colors:{light:yellow},strategy:patch}]` \-\> `g2`
-* `p4[colors:{dark:olive,light:green}]` \-\> `r4`
+* `p1[colors:{dark:brown,light:red},strategy:atomic]` → `g1`
+* `p2[colors:{light:blue}]` → `r1`
+* `p3[overrides:{colors:{light:yellow},strategy:patch}]` → `g2`
+* `p4[colors:{dark:olive,light:green}]` → `r4`
 
 The expected outcome to be implemented by the controller is:
 
-1. Traffic directed to `g1` \> `r1` \> `b1` must be colored `dark:UNDEFINED,light:blue` (more specific `p2` spec beats less specific atomic defaults from `p1`.
-2. Traffic directed to `g1` \> `r2` \> `b1` must be colored `dark:brown,light:red` (implicit atomic defaults specified at `p1` not replaced by any other policy).
-3. Traffic directed to `g2` \> `r3` \> `b1` must be colored `dark:UNDEFINED,light:yellow` (patch overrides specified at `p3` not replaced, nor extended by any other policy).
-4. Traffic directed to `g2` \> `r4` \> `b2` must be colored `dark:olive,light:yellow` (patch overrides specified by `p3` beats more specific policy `p4`, which still extends the spec with a specific value for `dark`.
+1. Traffic directed to `g1` > `r1` > `b1` must be colored `dark:UNDEFINED,light:blue` (more specific `p2` spec beats less specific atomic defaults from `p1`.
+2. Traffic directed to `g1` > `r2` > `b1` must be colored `dark:brown,light:red` (implicit atomic defaults specified at `p1` not replaced by any other policy).
+3. Traffic directed to `g2` > `r3` > `b1` must be colored `dark:UNDEFINED,light:yellow` (patch overrides specified at `p3` not replaced, nor extended by any other policy).
+4. Traffic directed to `g2` > `r4` > `b2` must be colored `dark:olive,light:yellow` (patch overrides specified by `p3` beats more specific policy `p4`, which still extends the spec with a specific value for `dark`.
 5. Status of `Backend` `b1` should be reported as affected by the `ColorPolicy` resources `p1`, `p2` and `p3`.
 6. Status of `Backend` `b2` should be reported as affected by the `ColorPolicy` resource `p3` and `p4`.
 7. Status of `ColorPolicy` `p1` must be reported as partially enforced, due to in some cases atomically beaten by `p2`.
