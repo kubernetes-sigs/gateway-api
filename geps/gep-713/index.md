@@ -9,7 +9,7 @@
 
 This GEP aims to standardize terminology and processes around using one Kubernetes object to modify the functions of one or more other objects.
 
-It lays out guidelines for Gateway API implementations and other stakeholders for the design and/or handling of custom “metaresources” definitions in compliance with a standard known as Policy Attachment.
+It lays out guidelines for Gateway API implementations and other stakeholders for the design and/or handling of custom “metaresource” definitions in compliance with a standard known as Policy Attachment.
 
 This GEP specifies a _pattern_, not an API field or new object. It defines some terms, including _Metaresource_, _Policies_ and _Policy Attachment_, and their related concepts.
 
@@ -35,7 +35,7 @@ When designing Gateway API, it was found a frequent need to change the behavior 
 
 To put this another way, sometimes we need ways to be able to affect how an object is interpreted in the API, without representing the description of those effects inside the spec of the object. This document describes the ways to design objects to meet use cases like these.
 
-A new concept of “metaresource” has been introduced, a term used to describe the class of objects that _only_ augment the behavior of another Kubernetes object, regardless of what they are targeting.
+This document introduces the concept of a “metaresource”, a term used to describe the class of objects that _only_ augment the behavior of another Kubernetes object, regardless of what they are targeting.
 
 “Meta” here is used in its Greek sense of “more comprehensive” or “transcending”, and “resource” rather than “object” because “metaresource” is more pronounceable than “meta object”.
 
@@ -81,7 +81,7 @@ Metaresources specify one or more target resources or specific sections of resou
 
 Targeting a resource (or section of a resource) must be interpreted within a given semantics that is proper to the metaresource kind.
 
-Two different metaresource kinds that allow targeting resources of a same a given kind X may have very different semantics, not only because the purpose of the two metaresource kinds differ, but because the mechanics of calculating and applying the augment behavior for X can as well be very different between metaresource kinds.
+Two different metaresource kinds that allow targeting resources of a same a given kind X may have very different semantics, not only because the purpose of the two metaresource kinds differ, but because the mechanics of calculating and applying the augmented behavior for X can as well be very different between metaresource kinds.
 
 Often, the semantics of a metaresource is tightly coupled to the relationships and connections a target has with other kinds of objects, typically organized in a hierarchy of nested contexts. In this sense, targeting a given resource kind may have the semantics of spanning effect across yet other objects to which the target is related.
 
@@ -128,7 +128,9 @@ The objects targeted by a metaresource define a *context* where the *intent* tha
 
 #### Ways of targeting objects
 
-Metaresources can be designed to allow targeting objects by name (“reference by name”), using label selectors, and with or without cross-namespace references allowed. In all cases, the targets shall be declared within a `targetRefs` field within the spec of the metaresource instance.
+Metaresources MAY be designed using different targeting strategies, such as targeting objects by name (“reference by name”), using label selectors, and targeting with or without cross-namespace references allowed. In all cases, in order to fit within the framework described in this document, the targets MUST be declared within a `targetRefs` field within the spec of the metaresource instance.
+
+All kinds of references SHOULD also specify Group, Version and Kind (GVK) information alongside the selector (unless the API ensures no more than one kind of object can be targeted).
 
 ##### Reference by name
 
@@ -182,7 +184,7 @@ E.g. – a metaresource that targets a Namespace may declare intent that affects
 
 To avoid any ambiguity in the interpretation of the targets, metaresources MUST clearly define the extent of their effects respectively to the object kinds they target (semantics of attaching a metaresource). This is usually defined in terms of a known hierarchy of resource kinds.
 
-See also: [Declared targets versus Effective targets](#declared-targets-versus-effective-targets) and [Hierarchy of target kinds and mechanics for calculating Effective metaresources](#hierarchy-of-target-kinds-and-mechanics-for-calculating-effective-meta-resources).
+See also: [Declared targets versus Effective targets](#declared-targets-versus-effective-targets) and [Hierarchy of target kinds and Effective metaresources](#hierarchy-of-target-kinds-and-effective-meta-resources).
 
 #### Narrowing the target to sections of an object
 
@@ -226,15 +228,23 @@ E.g., in Gateway API’s hierarchy of network resources for the ingress use case
 
 A kind specified in the target reference of a metaresource can be the actual kind of object whose behavior the metaresource intends to augment or an indirection to targeting other kinds the object is hierarchically related to.
 
-E.g. targeting a Gateway API `Gateway` object with a metaresource can be a way to augment the behavior of the `Gateway` object itself (e.g. reconcile cloud infrastructure provider settings from the spec declared by the `Gateway` according the rules specified by the metaresource attached to the `Gateway`) or a means to augment the behavior of all `HTTPRoute` objects attached to the `Gateway` (in a way that every new `HTTPRoute` that gets created or modified so it enters the context of the `Gateway` is automatically put in the scope of the metaresource.)
+E.g. targeting a Gateway API `Gateway` object with a metaresource can be:
+* a way to augment the behavior of the `Gateway` object itself (e.g. reconcile cloud infrastructure provider settings from the spec declared by the `Gateway` according the rules specified by the metaresource attached to the `Gateway`) or
+* a means to augment the behavior of all `HTTPRoute` objects attached to the `Gateway` (in a way that every new `HTTPRoute` that gets created or modified so it enters the context of the `Gateway` is automatically put in the scope of the metaresource.)
 
-The target kinds specified in the target references of a metaresource are referred to as *Declared target* kinds. When declared targets are not equal to the actual targets augmented by the metaresource, but rather they serve as a means for reaching other levels (typically lower level) of related object kinds, these other kinds of target objects whose behavior are actually augmented by the metaresource are referred to as *Effective target* kinds.
+The target kinds specified in the target references of a metaresource are referred to as *Declared target* kinds.
 
-### Hierarchy of target kinds and mechanics for calculating Effective metaresources
+These are distinct from *Effective target* kinds, which are the kinds of target objects whose behaviors are actually augmented by the metaresource. That occurs when declared targets are not equal to the actual targets augmented by the metaresource, but rather serve as a means for reaching other levels (typically lower level) of related object kinds.
 
-Target kinds MUST be organized in a well-known hierarchy of target kinds, from the least specific declared target kinds to the most specific effective ones. This hierarchy shall thus induce a logical representation of the relationships between instances of target objects, in the form of a Directed Acyclic Graph (DAG) whose roots are the least specific objects and the leaves are the most specific ones (and ultimately the effective targets of the metaresources).
+### Hierarchy of target kinds and Effective metaresources
 
-The hierarchy of target kinds, as well as the logical representation of hierarchical relationships between instances of target objects, serve as a map for orderly resolving metaresource specs for each combinatorial context that is ultimately affected by the metaresources (i.e. for each Effective target). This process corresponds to resolving the intended augmented behavior that is collectively described by the set of metaresource specs in the context. The spec that summarizes the intended augmented behavior for a given context is referred to as the *Effective metaresource* (or *Effective policy*).
+Target kinds MUST be arranged in a well-known _hierarchy of target kinds_, from the least specific target kinds to the most specific ones, across both declared and effective target kinds.
+
+The best way to visualize this hierarchy－and therefore the instances of objects organized by the hierarchy－is in the form of a Directed Acyclic Graph (DAG) whose roots are the least specific objects and the leaves are the most specific ones (and ultimately the effective targets of the metaresources).
+
+Using a DAG to represent the hierarchy of effective targets ensures that all the relevant objects (all contexts) are represented, and makes the calculation of corresponding combinatorial specs much easier.
+
+The DAG works as a map to orderly resolve, for each effective target, a combinatorial spec that is collectively defined by the set of metaresources affecting the target. This combinatorial spec of each effective target is referred to as the *Effective metaresource* (or *Effective policy*).
 
 The process of calculating Effective metaresources (Effective policies) consists of walking the hierarchy of target objects, from most specific to least specific (i.e., bottom-up, from the leaves towards the roots of the DAG of target objects) or from least specific to most specific (top-down), map reducing to a single metaresource spec each pair of metaresources adjacent to each other in the hierarchy, applying at each step one of the supported merge strategies described below, until no more than one spec remains for each effective target.
 
@@ -242,15 +252,16 @@ Metaresource kinds that implement more than one merge strategy MUST provide fiel
 
 #### Conflict resolution
 
-If multiple metaresources target the same context, this is considered to be a conflict.
+If multiple metaresources target the same context (that is, multiple instances of the same metaresource kind acting on the same hierarchy have the same effective target), this is considered to be a conflict.
 
-Conflicts must be resolved by applying a defined *merge strategy* (see further definition in the next section), where the metaresource considered higher between two conflicting specs dictates the merge strategy according to which the conflict must be resolved, defaulting to the lower spec (more specific) beating the higher one if not specified otherwise.
+Conflicts must be resolved by applying a defined *merge strategy* (see further definition in the next section).
 
-The following criteria MUST be applied to determine which metaresources are higher or lower and thus infer which merge strategy to apply to calculate the effective spec, continuing on ties:
+When resolving conflicts, the metaresource higher in the relevant hierarchy dictates the merge strategy. After that, the merge strategy's conflict resolution rules apply. If no merge strategy is specified, then implementations should use more-specific-wins merge strategy by default.
 
-1. Between two metaresources at different levels of the hierarchy, the one attached higher in the hierarchy MUST be considered higher than the one attached lower in the hierarchy.
-2. Between two metaresources at the same level of the hierarchy, the older metaresource based on creation timestamp MUST be considered higher than the newer one.
-3. Between two metaresources at the same level of the hierarchy and identical creation timestamps, the metaresource appearing first in alphabetical order by `{namespace}/{name}` MUST be considered higher than the other.
+To determine which metaresources attached to objects in a hierarchy are higher or lower, use the following rules, continuing on ties:
+1. Between two metaresources at different levels of the hierarchy, the one attached higher wins (i.e. dictates the merge strategy to use to resolve the conflict).
+2. Between two metaresources at the same level of the hierarchy, the older metaresource based on creation timestamp wins.
+3. Between two metaresources at the same level of the hierarchy and identical creation timestamps, the metaresource appearing first in alphabetical order by `{namespace}/{name}` wins.
 
 #### Abstract process for calculating Effective metaresources
 
