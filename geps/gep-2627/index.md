@@ -15,7 +15,6 @@ For gateway infrastructure to be valuable we need to be able to connect clients 
 
 ## Non-Goals
 
-* Anything to do with configuring in-cluster DNS. This support is for configuration outside the cluster only.
 * Providing any upstream hostname validation mechanisms. We can provide status for validation failure, but implementations are responsible for validation.
 * Multi-cluster DNS for multi-cluster ingress solutions
 
