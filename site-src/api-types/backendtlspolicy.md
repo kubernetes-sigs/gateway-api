@@ -28,6 +28,12 @@ to prevent the complications involved with sharing trust across namespace bounda
 
 All Gateway API Routes that point to a referenced Service should respect a configured BackendTLSPolicy.
 
+## Gateway Backend TLS Configuration
+The Gateway specification now includes a new backendTLS field that allows configuration of TLS settings when the Gateway connects to backends. This enables specification of client certificates that the Gateway should use when establishing TLS connections with backends. The configuration includes:
+
+- [BackendTLS][backendTLS] - Defines the TLS configuration for Gateway-to-backend connections
+- [ClientCertificateRef][clientCertificateRef] - References an object containing a Client Certificate and its associated private key
+
 ## Spec
 
 The specification of a [BackendTLSPolicy][backendtlspolicy] consists of:
@@ -36,19 +42,21 @@ The specification of a [BackendTLSPolicy][backendtlspolicy] consists of:
 - [Validation][validation] - Defines the configuration for TLS, including hostname, CACertificateRefs, and
 WellKnownCACertificates.
 - [Hostname][hostname] - Defines the Server Name Indication (SNI) that the Gateway uses to connect to the backend.
+- [SubjectAltNames][subjectAltNames] - Specifies one or more Subject Alternative Names that the backend certificate must match. When specified, the certificate must have at least one matching SAN. This field enables separation between SNI (hostname) and certificate identity validation.
 - [CACertificateRefs][caCertificateRefs] - Defines one or more references to objects that contain PEM-encoded TLS certificates,
 which are used to establish a TLS handshake between the Gateway and backend Pod.  Either CACertficateRefs or
 WellKnownCACertificates may be specified, but not both.
 - [WellKnownCACertificates][wellKnownCACertificates] - Specifies whether system CA certificates may be used in the TLS
 handshake between the Gateway and backend Pod.  Either CACertficateRefs or WellKnownCACertificates may be specified, but not both.
+- [Options][options] - A map of key/value pairs enabling extended TLS configuration for each implementation, similar to the TLS options field on Gateway Listeners.
 
 The following chart outlines the object definitions and relationship:
 ```mermaid
 flowchart LR
     backendTLSPolicy[["<b>backendTLSPolicy</b> <hr><align=left>BackendTLSPolicySpec: spec<br>PolicyStatus: status</align>"]]
-    spec[["<b>spec</b><hr>PolicyTargetReferenceWithSectionName: targetRefs <br> BackendTLSPolicyValidation: tls"]]
+    spec[["<b>spec</b><hr>PolicyTargetReferenceWithSectionName: targetRefs <br> BackendTLSPolicyValidation: tls<br>map[string]string: options"]]
     status[["<b>status</b><hr>[ ]PolicyAncestorStatus: ancestors"]]
-    validation[["<b>tls</b><hr>LocalObjectReference: caCertificateRefs<br>wellKnownCACertificatesType: wellKnownCACertificates/<br>PreciseHostname: hostname"]]
+    validation[["<b>tls</b><hr>LocalObjectReference: caCertificateRefs<br>wellKnownCACertificatesType: wellKnownCACertificates/<br>PreciseHostname: hostname<br>[]SubjectAltName: subjectAltNames"]]
     ancestorStatus[["<b>ancestors</b><hr>AncestorRef: parentReference<br>GatewayController: controllerName<br>[]Condition: conditions"]]
     targetRefs[[<b>targetRefs</b><hr>]]
     service["<b>service</>"]
@@ -111,6 +119,22 @@ Also note:
 
     - Wildcard hostnames are not allowed.
 
+#### Subject Alternative Names
+The subjectAltNames field enables separation between the SNI (specified by hostname) and certificate identity validation. When specified, the certificate served by the backend must have at least one Subject Alternative Name matching one of the specified values. This is particularly useful for SPIFFE implementations where URI-based SANs may not be valid SNIs.
+Subject Alternative Names can be of two types:
+
+- Hostname: DNS name format
+- URI: URI format (e.g., SPIFFE ID)
+
+#### TLS Options
+The options field allows specification of implementation-specific TLS configurations, similar to the TLS options field on Gateway Listeners. This can include:
+
+- Vendor-specific mTLS automation configuration
+- Minimum supported TLS version restrictions
+- Supported cipher suite configurations
+
+Implementation-specific definitions must use domain-prefixed names (e.g., example.com/my-custom-option) to avoid ambiguity. Un-prefixed names are reserved for key names defined by Gateway API.
+
 #### Certificates
 
 The BackendTLSPolicyValidation must contain a certificate reference of some kind, and contains two ways to configure the
@@ -146,3 +170,5 @@ uses `PolicyAncestorStatus` to allow you to know which parentReference set that 
 [hostname]: /references/spec/#gateway.networking.k8s.io/v1.PreciseHostname
 [rfc-3986]: https://tools.ietf.org/html/rfc3986
 [targetRefs]: /references/spec/#gateway.networking.k8s.io/v1alpha2.PolicyTargetReference
+[subjectAltNames]: /references/spec/#gateway.networking.k8s.io/v1alpha3.BackendTLSPolicyValidation 
+[options]: /references/spec/#gateway.networking.k8s.io/v1alpha3.GatewayTLSConfig
