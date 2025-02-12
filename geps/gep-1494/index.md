@@ -89,7 +89,7 @@ JWT is defined in [RFC-75199](https://datatracker.ietf.org/doc/html/rfc7519).
 
 Oauth2 is an _authorization framework_, which allows clients and servers to define ways to perform authentication and authorization in as secure a way as possible. It extensively uses TLS for encryption, and involves a third-party handling the authorization handshake with a client, which the third-party then provides to the server.
 
-Open ID Conect (OIDC) is a protocol based on the OAuth 2 framework, that allows Users to talk to Identity Providers (IDPs), on behalf of a Relying Party (RP), and have the IDP give the user an Identity Token (which the User's browser can then provide as Authentication to the Relying Party), and also allows the RP to request Claims about the User, which can be used for Authorization.
+Open ID Connect (OIDC) is a protocol based on the OAuth 2 framework, that allows Users to talk to Identity Providers (IDPs), on behalf of a Relying Party (RP), and have the IDP give the user an Identity Token (which the User's browser can then provide as Authentication to the Relying Party), and also allows the RP to request Claims about the User, which can be used for Authorization.
 
 Usually, the Identity Token is delivered using JWT, although that is not required.
 
