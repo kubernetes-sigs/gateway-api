@@ -3,7 +3,7 @@
 * Issue: [#2648](https://github.com/kubernetes-sigs/gateway-api/issues/2648)
 * Status: Provisional
 
-(See status definitions [here](../overview.md#gep-states)
+(See [status definitions](../overview.md#gep-states).)
 
 ## TLDR
 
