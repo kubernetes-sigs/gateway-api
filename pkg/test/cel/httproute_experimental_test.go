@@ -444,7 +444,7 @@ func TestHTTPRequestMirrorFilterExperimental(t *testing.T) {
 		rules      []gatewayv1.HTTPRouteRule
 	}{
 		{
-			name: "HTTPRoute - Invalid because both percent and fraction are specified",
+			name:       "HTTPRoute - Invalid because both percent and fraction are specified",
 			wantErrors: []string{"Only one of percent or fraction may be specified in HTTPRequestMirrorFilter"},
 			rules: []gatewayv1.HTTPRouteRule{{
 				Filters: []gatewayv1.HTTPRouteFilter{{
@@ -456,7 +456,7 @@ func TestHTTPRequestMirrorFilterExperimental(t *testing.T) {
 						},
 						Percent: &percent,
 						Fraction: &gatewayv1.Fraction{
-							Numerator: 83,
+							Numerator:   83,
 							Denominator: &denominator,
 						},
 					},
@@ -464,7 +464,7 @@ func TestHTTPRequestMirrorFilterExperimental(t *testing.T) {
 			}},
 		},
 		{
-			name: "HTTPRoute - Invalid fraction - numerator greater than denominator",
+			name:       "HTTPRoute - Invalid fraction - numerator greater than denominator",
 			wantErrors: []string{"numerator must be less than or equal to denominator"},
 			rules: []gatewayv1.HTTPRouteRule{{
 				Filters: []gatewayv1.HTTPRouteFilter{{
@@ -475,7 +475,7 @@ func TestHTTPRequestMirrorFilterExperimental(t *testing.T) {
 							Port: ptrTo(gatewayv1.PortNumber(8081)),
 						},
 						Fraction: &gatewayv1.Fraction{
-							Numerator: 1001,
+							Numerator:   1001,
 							Denominator: &denominator,
 						},
 					},
@@ -483,7 +483,7 @@ func TestHTTPRequestMirrorFilterExperimental(t *testing.T) {
 			}},
 		},
 		{
-			name: "HTTPRoute - Invalid fraction - denominator is 0",
+			name:       "HTTPRoute - Invalid fraction - denominator is 0",
 			wantErrors: []string{"spec.rules[0].filters[0].requestMirror.fraction.denominator in body should be greater than or equal to 1"},
 			rules: []gatewayv1.HTTPRouteRule{{
 				Filters: []gatewayv1.HTTPRouteFilter{{
@@ -494,7 +494,7 @@ func TestHTTPRequestMirrorFilterExperimental(t *testing.T) {
 							Port: ptrTo(gatewayv1.PortNumber(8081)),
 						},
 						Fraction: &gatewayv1.Fraction{
-							Numerator: 0,
+							Numerator:   0,
 							Denominator: &bad_denominator,
 						},
 					},
@@ -502,7 +502,7 @@ func TestHTTPRequestMirrorFilterExperimental(t *testing.T) {
 			}},
 		},
 		{
-			name: "HTTPRoute - Invalid fraction - numerator is negative",
+			name:       "HTTPRoute - Invalid fraction - numerator is negative",
 			wantErrors: []string{"spec.rules[0].filters[0].requestMirror.fraction.numerator in body should be greater than or equal to 0"},
 			rules: []gatewayv1.HTTPRouteRule{{
 				Filters: []gatewayv1.HTTPRouteFilter{{
@@ -513,7 +513,7 @@ func TestHTTPRequestMirrorFilterExperimental(t *testing.T) {
 							Port: ptrTo(gatewayv1.PortNumber(8081)),
 						},
 						Fraction: &gatewayv1.Fraction{
-							Numerator: -1,
+							Numerator:   -1,
 							Denominator: &denominator,
 						},
 					},
@@ -546,7 +546,7 @@ func TestHTTPRequestMirrorFilterExperimental(t *testing.T) {
 							Port: ptrTo(gatewayv1.PortNumber(8081)),
 						},
 						Fraction: &gatewayv1.Fraction{
-							Numerator: 83,
+							Numerator:   83,
 							Denominator: &denominator,
 						},
 					},
