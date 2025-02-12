@@ -1,7 +1,7 @@
 # GEP-2648: Direct Policy Attachment
 
 * Issue: [#2648](https://github.com/kubernetes-sigs/gateway-api/issues/2648)
-* Status: Memorandum
+* Status: Declined
 
 (See [status definitions](../overview.md#gep-states).)
 
@@ -9,7 +9,7 @@
 
 !!! warning
     This GEP has been merged back into [GEP-713](https://gateway-api.sigs.k8s.io/geps/gep-713/)
-    and now it's a Memoradum. Please see the original specification of Metaresources
+    and now it's now obsolete. Please refer the original specification of Metaresources
     and Policy Attachment for the current state of the pattern.
 
 Describe and specify a design pattern for a class of metaresource that can
