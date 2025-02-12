@@ -5,7 +5,7 @@
 
 ## TLDR
 
-For gateway infrastructure to be valuable we need to be able to connect clients to these gateways. A common way to achieve this is to use domain names/hostnames and DNS. Gateways define listeners that can have assigned hostnames or wildcards.  The guidelines for DNS configuration are a critical piece of service networking, but this is currently not expressible as part of Gateway API.   Instead of leaving this as an exercise for the user to figure out, this proposal attempts to provide options to ease Gateway API operations.
+For gateway infrastructure to be valuable we need to be able to connect clients to these gateways. A common way to achieve this is to use domain names/hostnames and DNS. Gateways define listeners that can have assigned hostnames or wildcards. The guidelines for DNS configuration are a critical piece of service networking, but this is currently not expressible as part of Gateway API. Instead of leaving this unspecified and having implementations do this in potentially wildly different ways, the purpose of this proposal is to provide a standard way to specify DNS for Gateways.
 
 ## Goals
 * Provide a way for Gateway API resource owners to mark their resources as relevant for external DNS provisioning
