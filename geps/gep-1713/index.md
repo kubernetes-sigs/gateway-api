@@ -573,7 +573,7 @@ The main downside of this approach is that users still require `Gateway` write a
 
 ### New 'GatewayGroup' Resource
 
-This was proposed in the Gateway Hiearchy Brainstorming document (see references below). The idea is to introduce a central resource that will coalease Gateways together and offer forms of delegation.
+This was proposed in the Gateway Hiearchy Brainstorming document (see references below). The idea is to introduce a central resource that will coalesce Gateways together and offer forms of delegation.
 
 Issues with this is complexity with status propagation, cluster vs. namespace scoping etc. It also lacks a migration path for existing Gateways to help shard listeners.
 
