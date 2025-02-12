@@ -37,8 +37,6 @@ type BackendTrafficPolicy struct {
 	//
 	// +optional
 	// <gateway:experimental>
-	//
-	// Note: there is no Override or Default policy configuration.
 
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
@@ -58,11 +56,14 @@ type BackendTrafficPolicyList struct {
 	Items           []BackendTrafficPolicy `json:"items"`
 }
 
+// BackendTrafficPolicySpec define the desired state of BackendTrafficPolicy
+// Note: there is no Override or Default policy configuration.
 type BackendTrafficPolicySpec struct {
 	// TargetRef identifies an API object to apply policy to.
 	// Currently, Backends (i.e. Service, ServiceImport, or any
 	// implementation-specific backendRef) are the only valid API
 	// target references.
+	//
 	// +listType=map
 	// +listMapKey=group
 	// +listMapKey=kind
@@ -71,13 +72,31 @@ type BackendTrafficPolicySpec struct {
 	// +kubebuilder:validation:MaxItems=16
 	TargetRefs []LocalPolicyTargetReference `json:"targetRefs"`
 
-	// RetryConstraint defines the configuration for when to allow or prevent retries to a
-	// target backend.
+	// RetryConstraint defines the configuration for when to allow or prevent
+	// further retries to a target backend by dynamically calculating a 'retry
+	// budget'. This budget is calculated based on the percentage of incoming
+	// traffic composed of retries over a given time interval. Once the budget
+	// is exceeded, additional retries will be rejected by the backend.
 	//
-	// While the static number of retries performed by the client are
-	// configured within HTTPRoute Retry stanzas, configuring the
-	// RetryConstraint allows you to constrain further retries after a
-	// dynamic budget for retries has been exceeded.
+	// For example, if the retry budget interval is 10 seconds, there have been
+	// 1000 active requests in the past 10 seconds, and the allowed percentage
+	// of requests that can be retried is 20% (the default), then 200 of those
+	// requests may be composed of retries. Active requests will only be
+	// considered for the duration of the interval when calculating the retry
+	// budget.
+	//
+	// Configuring a RetryConstraint in BackendTrafficPolicy is compatible with
+	// HTTPRoute Retry settings for each HTTPRouteRule that targets the same
+	// backend. While the HTTPRouteRule Retry stanza can specify whether a
+	// request should be retried and the number of retry attempts each client
+	// may perform, RetryConstraint helps prevent cascading failures, such as
+	// retry storms, during periods of consistent failures.
+	//
+	// After the retry budget has been exceeded, additional retries to the
+	// backend must return a 503 response to the client.
+	//
+	// Additional configurations for defining a constraint on retries MAY be
+	// defined in the future.
 	//
 	// Support: Extended
 	//
