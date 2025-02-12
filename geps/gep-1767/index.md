@@ -983,7 +983,7 @@ If a filter logically as a
 fn run_filter(req: HTTPRequest) -> FilterResponse;
 enum FilterResponse {
   Request(HTTPRequest),
-  Response(HTTPResonse)
+  Response(HTTPResponse)
 ```
 
 A `Timeouts` doesn't really meet that, but `CORS` does:
