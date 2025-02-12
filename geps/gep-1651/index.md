@@ -408,7 +408,7 @@ Let's say we want to enforce address types to just IP then our `gatewayClassName
 This may not be as flexible for end-users compared to configuring `routability` when creating
 a Gateway.
 
-As howardjohn mentioned [here](https://github.com/kubernetes-sigs/gateway-api/pull/1653#issuecomment-1429992160):
+As mentioned in [howardjohn's comment on GEP-1651: Gateway Routability](https://github.com/kubernetes-sigs/gateway-api/pull/1653#issuecomment-1429992160):
 > having the ability to configure things at a higher level seems nice for Gateway, but being able to configure them on a per-Gateway basis remains important.
 
 ## References
