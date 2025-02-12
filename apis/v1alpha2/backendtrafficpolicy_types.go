@@ -20,10 +20,19 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+// +genclient
+// +kubebuilder:object:root=true
+// +kubebuilder:subresource:status
+// +kubebuilder:storageversion
+// +kubebuilder:resource:categories=gateway-api,shortName=btrafficpolicy
+// +kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
+//
+// BackendTrafficPolicy is a Direct Attached Policy.
+// +kubebuilder:metadata:labels="gateway.networking.k8s.io/policy=Direct"
+
+// BackendTrafficPolicy defines the configuration for how traffic to a
+// target backend should be handled.
 type BackendTrafficPolicy struct {
-	// BackendTrafficPolicy defines the configuration for how traffic to a
-	// target backend should be handled.
-	//
 	// Support: Extended
 	//
 	// +optional
@@ -39,6 +48,14 @@ type BackendTrafficPolicy struct {
 
 	// Status defines the current state of BackendTrafficPolicy.
 	Status PolicyStatus `json:"status,omitempty"`
+}
+
+// BackendTrafficPolicyList contains a list of BackendTrafficPolicies
+// +kubebuilder:object:root=true
+type BackendTrafficPolicyList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []BackendTrafficPolicy `json:"items"`
 }
 
 type BackendTrafficPolicySpec struct {

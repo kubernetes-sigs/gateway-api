@@ -150,8 +150,8 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"sigs.k8s.io/gateway-api/apis/v1alpha2.BackendLBPolicyList":                       schema_sigsk8sio_gateway_api_apis_v1alpha2_BackendLBPolicyList(ref),
 		"sigs.k8s.io/gateway-api/apis/v1alpha2.BackendLBPolicySpec":                       schema_sigsk8sio_gateway_api_apis_v1alpha2_BackendLBPolicySpec(ref),
 		"sigs.k8s.io/gateway-api/apis/v1alpha2.BackendTrafficPolicy":                      schema_sigsk8sio_gateway_api_apis_v1alpha2_BackendTrafficPolicy(ref),
+		"sigs.k8s.io/gateway-api/apis/v1alpha2.BackendTrafficPolicyList":                  schema_sigsk8sio_gateway_api_apis_v1alpha2_BackendTrafficPolicyList(ref),
 		"sigs.k8s.io/gateway-api/apis/v1alpha2.BackendTrafficPolicySpec":                  schema_sigsk8sio_gateway_api_apis_v1alpha2_BackendTrafficPolicySpec(ref),
-		"sigs.k8s.io/gateway-api/apis/v1alpha2.CommonRetryPolicy":                         schema_sigsk8sio_gateway_api_apis_v1alpha2_CommonRetryPolicy(ref),
 		"sigs.k8s.io/gateway-api/apis/v1alpha2.GRPCRoute":                                 schema_sigsk8sio_gateway_api_apis_v1alpha2_GRPCRoute(ref),
 		"sigs.k8s.io/gateway-api/apis/v1alpha2.GRPCRouteList":                             schema_sigsk8sio_gateway_api_apis_v1alpha2_GRPCRouteList(ref),
 		"sigs.k8s.io/gateway-api/apis/v1alpha2.LocalPolicyTargetReference":                schema_sigsk8sio_gateway_api_apis_v1alpha2_LocalPolicyTargetReference(ref),
@@ -162,6 +162,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"sigs.k8s.io/gateway-api/apis/v1alpha2.ReferenceGrant":                            schema_sigsk8sio_gateway_api_apis_v1alpha2_ReferenceGrant(ref),
 		"sigs.k8s.io/gateway-api/apis/v1alpha2.ReferenceGrantList":                        schema_sigsk8sio_gateway_api_apis_v1alpha2_ReferenceGrantList(ref),
 		"sigs.k8s.io/gateway-api/apis/v1alpha2.RequestRate":                               schema_sigsk8sio_gateway_api_apis_v1alpha2_RequestRate(ref),
+		"sigs.k8s.io/gateway-api/apis/v1alpha2.RetryConstraint":                           schema_sigsk8sio_gateway_api_apis_v1alpha2_RetryConstraint(ref),
 		"sigs.k8s.io/gateway-api/apis/v1alpha2.TCPRoute":                                  schema_sigsk8sio_gateway_api_apis_v1alpha2_TCPRoute(ref),
 		"sigs.k8s.io/gateway-api/apis/v1alpha2.TCPRouteList":                              schema_sigsk8sio_gateway_api_apis_v1alpha2_TCPRouteList(ref),
 		"sigs.k8s.io/gateway-api/apis/v1alpha2.TCPRouteRule":                              schema_sigsk8sio_gateway_api_apis_v1alpha2_TCPRouteRule(ref),
@@ -5824,7 +5825,8 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_BackendTrafficPolicy(ref common.
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
+				Description: "BackendTrafficPolicy defines the configuration for how traffic to a target backend should be handled.",
+				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
@@ -5869,6 +5871,55 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_BackendTrafficPolicy(ref common.
 	}
 }
 
+func schema_sigsk8sio_gateway_api_apis_v1alpha2_BackendTrafficPolicyList(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "BackendTrafficPolicyList contains a list of BackendTrafficPolicies",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
+						},
+					},
+					"items": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1alpha2.BackendTrafficPolicy"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"items"},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta", "sigs.k8s.io/gateway-api/apis/v1alpha2.BackendTrafficPolicy"},
+	}
+}
+
 func schema_sigsk8sio_gateway_api_apis_v1alpha2_BackendTrafficPolicySpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -5901,8 +5952,8 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_BackendTrafficPolicySpec(ref com
 					},
 					"retry": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Retry defines the configuration for when to allow or prevent retries to a target backend.\n\nWhile the static number of retries performed by the client are configured within HTTPRoute Retry stanzas, configuring the CommonRetryPolicy allows you to constrain further retries after a dynamic budget for retries has been exceeded.\n\nSupport: Extended\n\n<gateway:experimental>",
-							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1alpha2.CommonRetryPolicy"),
+							Description: "RetryConstraint defines the configuration for when to allow or prevent retries to a target backend.\n\nWhile the static number of retries performed by the client are configured within HTTPRoute Retry stanzas, configuring the RetryConstraint allows you to constrain further retries after a dynamic budget for retries has been exceeded.\n\nSupport: Extended\n\n<gateway:experimental>",
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1alpha2.RetryConstraint"),
 						},
 					},
 					"sessionPersistence": {
@@ -5916,42 +5967,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_BackendTrafficPolicySpec(ref com
 			},
 		},
 		Dependencies: []string{
-			"sigs.k8s.io/gateway-api/apis/v1.SessionPersistence", "sigs.k8s.io/gateway-api/apis/v1alpha2.CommonRetryPolicy", "sigs.k8s.io/gateway-api/apis/v1alpha2.LocalPolicyTargetReference"},
-	}
-}
-
-func schema_sigsk8sio_gateway_api_apis_v1alpha2_CommonRetryPolicy(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "CommonRetryPolicy defines the configuration for when to retry a request.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"budgetPercent": {
-						SchemaProps: spec.SchemaProps{
-							Description: "BudgetPercent defines the maximum percentage of active requests that may be made up of retries.\n\nSupport: Extended",
-							Type:        []string{"integer"},
-							Format:      "int32",
-						},
-					},
-					"budgetInterval": {
-						SchemaProps: spec.SchemaProps{
-							Description: "BudgetInterval defines the duration in which requests will be considered for calculating the budget for retries.\n\nSupport: Extended",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"minRetryRate": {
-						SchemaProps: spec.SchemaProps{
-							Description: "MinRetryRate defines the minimum rate of retries that will be allowable over a specified duration of time.\n\nThis ensures that requests can still be retried during periods of low traffic, where the budget for retries may be calculated as a very low value.\n\nSupport: Extended",
-							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1alpha2.RequestRate"),
-						},
-					},
-				},
-			},
-		},
-		Dependencies: []string{
-			"sigs.k8s.io/gateway-api/apis/v1alpha2.RequestRate"},
+			"sigs.k8s.io/gateway-api/apis/v1.SessionPersistence", "sigs.k8s.io/gateway-api/apis/v1alpha2.LocalPolicyTargetReference", "sigs.k8s.io/gateway-api/apis/v1alpha2.RetryConstraint"},
 	}
 }
 
@@ -6377,6 +6393,41 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_RequestRate(ref common.Reference
 				},
 			},
 		},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apis_v1alpha2_RetryConstraint(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "RetryConstraint defines the configuration for when to retry a request.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"budgetPercent": {
+						SchemaProps: spec.SchemaProps{
+							Description: "BudgetPercent defines the maximum percentage of active requests that may be made up of retries.\n\nSupport: Extended",
+							Type:        []string{"integer"},
+							Format:      "int32",
+						},
+					},
+					"budgetInterval": {
+						SchemaProps: spec.SchemaProps{
+							Description: "BudgetInterval defines the duration in which requests will be considered for calculating the budget for retries.\n\nSupport: Extended",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"minRetryRate": {
+						SchemaProps: spec.SchemaProps{
+							Description: "MinRetryRate defines the minimum rate of retries that will be allowable over a specified duration of time.\n\nThis ensures that requests can still be retried during periods of low traffic, where the budget for retries may be calculated as a very low value.\n\nSupport: Extended",
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1alpha2.RequestRate"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"sigs.k8s.io/gateway-api/apis/v1alpha2.RequestRate"},
 	}
 }
 

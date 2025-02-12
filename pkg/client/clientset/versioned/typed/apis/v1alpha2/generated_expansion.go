@@ -20,6 +20,8 @@ package v1alpha2
 
 type BackendLBPolicyExpansion interface{}
 
+type BackendTrafficPolicyExpansion interface{}
+
 type GRPCRouteExpansion interface{}
 
 type ReferenceGrantExpansion interface{}

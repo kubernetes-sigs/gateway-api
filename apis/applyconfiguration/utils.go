@@ -162,6 +162,10 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1alpha2.BackendLBPolicyApplyConfiguration{}
 	case v1alpha2.SchemeGroupVersion.WithKind("BackendLBPolicySpec"):
 		return &apisv1alpha2.BackendLBPolicySpecApplyConfiguration{}
+	case v1alpha2.SchemeGroupVersion.WithKind("BackendTrafficPolicy"):
+		return &apisv1alpha2.BackendTrafficPolicyApplyConfiguration{}
+	case v1alpha2.SchemeGroupVersion.WithKind("BackendTrafficPolicySpec"):
+		return &apisv1alpha2.BackendTrafficPolicySpecApplyConfiguration{}
 	case v1alpha2.SchemeGroupVersion.WithKind("GRPCRoute"):
 		return &apisv1alpha2.GRPCRouteApplyConfiguration{}
 	case v1alpha2.SchemeGroupVersion.WithKind("LocalPolicyTargetReference"):
@@ -174,6 +178,10 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1alpha2.PolicyStatusApplyConfiguration{}
 	case v1alpha2.SchemeGroupVersion.WithKind("ReferenceGrant"):
 		return &apisv1alpha2.ReferenceGrantApplyConfiguration{}
+	case v1alpha2.SchemeGroupVersion.WithKind("RequestRate"):
+		return &apisv1alpha2.RequestRateApplyConfiguration{}
+	case v1alpha2.SchemeGroupVersion.WithKind("RetryConstraint"):
+		return &apisv1alpha2.RetryConstraintApplyConfiguration{}
 	case v1alpha2.SchemeGroupVersion.WithKind("TCPRoute"):
 		return &apisv1alpha2.TCPRouteApplyConfiguration{}
 	case v1alpha2.SchemeGroupVersion.WithKind("TCPRouteRule"):
