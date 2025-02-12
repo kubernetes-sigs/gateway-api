@@ -27,7 +27,7 @@ the content into the GEP as online documents are easier to lose
 (... details, can point to PR with changes)
 
 ### Gateway for Ingress (North/South)
-(Include API details for North/South usecases)
+(Include API details for North/South use cases)
 
 ### Gateway For Mesh (East/West)
 (Include East/West API considerations, examples, and if different - APIs)
