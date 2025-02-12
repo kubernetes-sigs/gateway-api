@@ -607,14 +607,16 @@ In other words, the discoverability problem exists and must be addressed in ligh
 
 #### Metaresource status
 
-Metaresource CRDs should define a status stanza that allows for reporting the status of the metaresource with respect to each context the resource may apply.
+Metaresource CRDs MUST define a status stanza that allows for reporting the status of the metaresource with respect to each context the resource may apply.
 
 The basic status conditions are:
 
 * **Accepted**: the metaresource passed both syntactic validation by the API server and semantic validation enforced by the controller, such as whether the target objects exist.
 * **Enforced**: the metaresource’s spec is guaranteed to be fully enforced, to the extent of what the controller can ensure.
-* **Partially enforced**: parts of the metaresource’s spec is guaranteed to be enforced, while other parts are known to have been superseded by other specs, to the extent of what the controller can ensure. The status should include details highlighting which parts of the metaresource are enforced and which parts have been superseded, with the references to all other related metaresources.
+* **PartiallyEnforced**: parts of the metaresource’s spec is guaranteed to be enforced, while other parts are known to have been superseded by other specs, to the extent of what the controller can ensure. The status should include details highlighting which parts of the metaresource are enforced and which parts have been superseded, with the references to all other related metaresources.
 * **Overridden**: the metaresource’s spec is known to have been fully overridden by other specs. The status should include the references to the other related metaresources.
+
+Metaresource implementations SHOULD support these basic status conditions.
 
 #### Target object status
 
@@ -623,6 +625,10 @@ Implementations of metaresources MUST put a condition into `status.Conditions` o
 That condition MUST be named according to the pattern `<meta-resource-kind>Affected` (e.g. `colors.controller.k8s.io/ColorPolicyAffected`), and have the optional `observedGeneration` field kept up to date when the spec of the target object changes.
 
 Implementations should use their own unique domain prefix for this condition type. Gateway API implementations, for instance, should use the same domain as in the `controllerName` field on `GatewayClass` (or some other implementation-unique domain for implementations that do not use `GatewayClass`.)
+
+E.g. – given a `Gateway` object that is targeted by a hypothetical `ColorPolicy` metaresource named `policy-namespace/my-policy`, which is owned by a `colors.controller.k8s.io` controller and with status `Enforced` or `PartiallyEnforced`. The controller SHOULD add to the status of the `Gateway` object a condition `colors.controller.k8s.io/ColorPolicyAffected: true`, and reason ideally referring to the `policy-namespace/my-policy` by name.
+
+Similarly, for a hypothetical `ColorPolicy` metaresource that targets a specific named section of the `Gateway` object (e.g., `http-listener`), the controller SHOULD add to the status of the listener section within the `Gateway` object a condition `colors.controller.k8s.io/ColorPolicyAffected: true`.
 
 For objects that do not have a `status.Conditions` field available (`Secret` is a good example), that object SHOULD instead have an annotation of `colors.controller.k8s.io/ColorPolicyAffected: true` added instead.
 
