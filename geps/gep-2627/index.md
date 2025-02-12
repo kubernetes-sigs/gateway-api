@@ -17,7 +17,7 @@ For gateway infrastructure to be valuable we need to be able to connect clients 
 
 * Anything to do with configuring in-cluster DNS. This support is for configuration outside the cluster only.
 * Providing any upstream hostname validation mechanisms. We can provide status for validation failure, but implementations are responsible for validation.
-* Cover more complex DNS routing strategies that come into play for multi-cluster topologies such as round robin, failover, health checks, weighted and geo location with this first pass. Supporting these types of use cases for distributed gateways (e.g., in different regions or multiple gateways for resilience within a region) and offering a form of global load balancing leveraging DNS is a potential future goal.
+* Multi-cluster DNS for multi-cluster ingress solutions
 
 ## Use Cases
 
