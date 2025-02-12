@@ -97,9 +97,7 @@ kubectl get crds
 ### Test Manually
 
 Install a [gateway API implementation](../implementations.md) and test out the change. Take a look at some
-examples [here](../guides/index.md).
-Install a [gateway API implementation](../implementations.md) and test out the change. Take a look at some
-examples [here](../guides/index.md).
+[examples](../guides/index.md).
 
 ### Verify
 
