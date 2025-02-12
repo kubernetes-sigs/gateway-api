@@ -54,19 +54,19 @@ type BackendTrafficPolicySpec struct {
 	// +kubebuilder:validation:MaxItems=16
 	TargetRefs []LocalPolicyTargetReference `json:"targetRefs"`
 
-	// Retry defines the configuration for when to allow or prevent retries to a
+	// RetryConstraint defines the configuration for when to allow or prevent retries to a
 	// target backend.
 	//
 	// While the static number of retries performed by the client are
 	// configured within HTTPRoute Retry stanzas, configuring the
-	// CommonRetryPolicy allows you to constrain further retries after a
+	// RetryConstraint allows you to constrain further retries after a
 	// dynamic budget for retries has been exceeded.
 	//
 	// Support: Extended
 	//
 	// +optional
 	// <gateway:experimental>
-	Retry *CommonRetryPolicy `json:"retry,omitempty"`
+	RetryConstraint *RetryConstraint `json:"retry,omitempty"`
 
 	// SessionPersistence defines and configures session persistence
 	// for the backend.
@@ -77,8 +77,8 @@ type BackendTrafficPolicySpec struct {
 	SessionPersistence *SessionPersistence `json:"sessionPersistence,omitempty"`
 }
 
-// CommonRetryPolicy defines the configuration for when to retry a request.
-type CommonRetryPolicy struct {
+// RetryConstraint defines the configuration for when to retry a request.
+type RetryConstraint struct {
 	// BudgetPercent defines the maximum percentage of active requests that may
 	// be made up of retries.
 	//
@@ -111,18 +111,4 @@ type CommonRetryPolicy struct {
 	// +optional
 	// +kubebuilder:default={count: 10, interval: 1s}
 	MinRetryRate *RequestRate `json:"minRetryRate,omitempty"`
-}
-
-// RequestRate expresses a rate of requests over a given period of time.
-type RequestRate struct {
-	// Count specifies the number of requests per time interval.
-	//
-	// Support: Extended
-	Count *int `json:"count,omitempty"`
-
-	// Interval specifies the divisor of the rate of requests, the amount of
-	// time during which the given count of requests occur.
-	//
-	// Support: Extended
-	Interval *Duration `json:"interval,omitempty"`
 }
