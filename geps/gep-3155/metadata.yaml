@@ -6,6 +6,8 @@ status: Experimental
 authors:
   - mkosieradzki
   - robscott
+featureNames:
+  - BackendTLSPolicySANs
 relationships:
   seeAlso:
     - number: 2907
