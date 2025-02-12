@@ -20,4 +20,4 @@ Get started [here](https://github.com/kubernetes-sigs/gwctl?tab=readme-ov-file#i
 
 Machinery for implementing Gateway API policies and policy controllers.
 
-Get started [here](https://github.com/Kuadrant/policy-machinery/tree/main)
+Get started with [Kuadrant/policy-machinery](https://github.com/Kuadrant/policy-machinery/tree/main)
