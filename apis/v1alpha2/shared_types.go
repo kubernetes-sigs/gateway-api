@@ -389,18 +389,3 @@ const (
 // SessionPersistence.
 // +k8s:deepcopy-gen=false
 type SessionPersistence = v1.SessionPersistence
-
-// RequestRate expresses a rate of requests over a given period of time.
-type RequestRate struct {
-	// Count specifies the number of requests per time interval.
-	//
-	// Support: Extended
-	// +kubebuilder:validation:Minimum=0
-	Count *int `json:"count,omitempty"`
-
-	// Interval specifies the divisor of the rate of requests, the amount of
-	// time during which the given count of requests occur.
-	//
-	// Support: Extended
-	Interval *Duration `json:"interval,omitempty"`
-}

@@ -18,14 +18,4 @@ limitations under the License.
 
 package v1alpha2
 
-type BackendLBPolicyExpansion interface{}
-
-type GRPCRouteExpansion interface{}
-
-type ReferenceGrantExpansion interface{}
-
-type TCPRouteExpansion interface{}
-
-type TLSRouteExpansion interface{}
-
-type UDPRouteExpansion interface{}
+type BackendTrafficPolicyExpansion interface{}

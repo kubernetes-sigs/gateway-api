@@ -28,7 +28,7 @@ import (
 )
 
 // GroupName specifies the group name used to register the objects.
-const GroupName = "gateway.networking.k8s.io"
+const GroupName = "gateway.networking.k8s-x.io"
 
 // GroupVersion specifies the group and the version used to register the objects.
 var GroupVersion = v1.GroupVersion{Group: GroupName, Version: "v1alpha2"}
@@ -61,18 +61,8 @@ func init() {
 // Adds the list of known types to Scheme.
 func addKnownTypes(scheme *runtime.Scheme) error {
 	scheme.AddKnownTypes(SchemeGroupVersion,
-		&BackendLBPolicy{},
-		&BackendLBPolicyList{},
-		&GRPCRoute{},
-		&GRPCRouteList{},
-		&ReferenceGrant{},
-		&ReferenceGrantList{},
-		&TCPRoute{},
-		&TCPRouteList{},
-		&TLSRoute{},
-		&TLSRouteList{},
-		&UDPRoute{},
-		&UDPRouteList{},
+		&BackendTrafficPolicy{},
+		&BackendTrafficPolicyList{},
 	)
 	// AddToGroupVersion allows the serialization of client types like ListOptions.
 	v1.AddToGroupVersion(scheme, SchemeGroupVersion)

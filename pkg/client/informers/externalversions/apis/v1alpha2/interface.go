@@ -26,8 +26,6 @@ import (
 type Interface interface {
 	// BackendLBPolicies returns a BackendLBPolicyInformer.
 	BackendLBPolicies() BackendLBPolicyInformer
-	// BackendTrafficPolicies returns a BackendTrafficPolicyInformer.
-	BackendTrafficPolicies() BackendTrafficPolicyInformer
 	// GRPCRoutes returns a GRPCRouteInformer.
 	GRPCRoutes() GRPCRouteInformer
 	// ReferenceGrants returns a ReferenceGrantInformer.
@@ -54,11 +52,6 @@ func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakList
 // BackendLBPolicies returns a BackendLBPolicyInformer.
 func (v *version) BackendLBPolicies() BackendLBPolicyInformer {
 	return &backendLBPolicyInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
-}
-
-// BackendTrafficPolicies returns a BackendTrafficPolicyInformer.
-func (v *version) BackendTrafficPolicies() BackendTrafficPolicyInformer {
-	return &backendTrafficPolicyInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // GRPCRoutes returns a GRPCRouteInformer.

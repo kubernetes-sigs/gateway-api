@@ -22,47 +22,22 @@ import (
 	"net/http"
 
 	rest "k8s.io/client-go/rest"
-	v1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
-	"sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/scheme"
+	v1alpha2 "sigs.k8s.io/gateway-api/apisx/v1alpha2"
+	"sigs.k8s.io/gateway-api/pkg/clientx/clientset/versioned/scheme"
 )
 
 type GatewayV1alpha2Interface interface {
 	RESTClient() rest.Interface
-	BackendLBPoliciesGetter
-	GRPCRoutesGetter
-	ReferenceGrantsGetter
-	TCPRoutesGetter
-	TLSRoutesGetter
-	UDPRoutesGetter
+	BackendTrafficPoliciesGetter
 }
 
-// GatewayV1alpha2Client is used to interact with features provided by the gateway.networking.k8s.io group.
+// GatewayV1alpha2Client is used to interact with features provided by the gateway.networking.k8s-x.io group.
 type GatewayV1alpha2Client struct {
 	restClient rest.Interface
 }
 
-func (c *GatewayV1alpha2Client) BackendLBPolicies(namespace string) BackendLBPolicyInterface {
-	return newBackendLBPolicies(c, namespace)
-}
-
-func (c *GatewayV1alpha2Client) GRPCRoutes(namespace string) GRPCRouteInterface {
-	return newGRPCRoutes(c, namespace)
-}
-
-func (c *GatewayV1alpha2Client) ReferenceGrants(namespace string) ReferenceGrantInterface {
-	return newReferenceGrants(c, namespace)
-}
-
-func (c *GatewayV1alpha2Client) TCPRoutes(namespace string) TCPRouteInterface {
-	return newTCPRoutes(c, namespace)
-}
-
-func (c *GatewayV1alpha2Client) TLSRoutes(namespace string) TLSRouteInterface {
-	return newTLSRoutes(c, namespace)
-}
-
-func (c *GatewayV1alpha2Client) UDPRoutes(namespace string) UDPRouteInterface {
-	return newUDPRoutes(c, namespace)
+func (c *GatewayV1alpha2Client) BackendTrafficPolicies(namespace string) BackendTrafficPolicyInterface {
+	return newBackendTrafficPolicies(c, namespace)
 }
 
 // NewForConfig creates a new GatewayV1alpha2Client for the given config.

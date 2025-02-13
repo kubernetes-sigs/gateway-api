@@ -21,35 +21,15 @@ package fake
 import (
 	rest "k8s.io/client-go/rest"
 	testing "k8s.io/client-go/testing"
-	v1alpha2 "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/typed/apis/v1alpha2"
+	v1alpha2 "sigs.k8s.io/gateway-api/pkg/clientx/clientset/versioned/typed/apisx/v1alpha2"
 )
 
 type FakeGatewayV1alpha2 struct {
 	*testing.Fake
 }
 
-func (c *FakeGatewayV1alpha2) BackendLBPolicies(namespace string) v1alpha2.BackendLBPolicyInterface {
-	return &FakeBackendLBPolicies{c, namespace}
-}
-
-func (c *FakeGatewayV1alpha2) GRPCRoutes(namespace string) v1alpha2.GRPCRouteInterface {
-	return &FakeGRPCRoutes{c, namespace}
-}
-
-func (c *FakeGatewayV1alpha2) ReferenceGrants(namespace string) v1alpha2.ReferenceGrantInterface {
-	return &FakeReferenceGrants{c, namespace}
-}
-
-func (c *FakeGatewayV1alpha2) TCPRoutes(namespace string) v1alpha2.TCPRouteInterface {
-	return &FakeTCPRoutes{c, namespace}
-}
-
-func (c *FakeGatewayV1alpha2) TLSRoutes(namespace string) v1alpha2.TLSRouteInterface {
-	return &FakeTLSRoutes{c, namespace}
-}
-
-func (c *FakeGatewayV1alpha2) UDPRoutes(namespace string) v1alpha2.UDPRouteInterface {
-	return &FakeUDPRoutes{c, namespace}
+func (c *FakeGatewayV1alpha2) BackendTrafficPolicies(namespace string) v1alpha2.BackendTrafficPolicyInterface {
+	return &FakeBackendTrafficPolicies{c, namespace}
 }
 
 // RESTClient returns a RESTClient that is used to communicate
