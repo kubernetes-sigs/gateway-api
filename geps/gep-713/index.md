@@ -134,7 +134,7 @@ All kinds of references SHOULD also specify Group, Version and Kind (GVK) inform
 
 ##### Reference by name
 
-The target reference includes the exact name of an object whose behavior to augment:
+The target reference includes the exact name of an object whose behavior to augment. E.g.:
 
 ```yaml
 apiVersion: policies.controller.io/v1
@@ -150,9 +150,49 @@ spec:
     color: blue
 ```
 
+<details>
+  <summary>Implementation tip</summary>
+
+  This targeting method can be implemented in Golang by using a type such as Gateway API's [`LocalPolicyTargetReference`](https://pkg.go.dev/sigs.k8s.io/gateway-api/apis/v1alpha2#LocalPolicyTargetReference) type. E.g.:
+
+  ```go
+  package color
+
+  import (
+    metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+    gatewayapiv1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
+  )
+
+  type ColorPolicy struct {
+    metav1.TypeMeta   `json:",inline"`
+    metav1.ObjectMeta `json:"metadata,omitempty"`
+
+    // Spec defines the desired state of the policy.
+    Spec ColorPolicySpec `json:"spec"`
+
+    // Status defines the current state of the policy.
+    Status ColorPolicyStatus `json:"status,omitempty"`
+  }
+
+  type ColorPolicySpec struct {
+    // TargetRefs specify the targets of the policy by name.
+    // The following kinds are supported: …
+    // +listType=map
+    // +listMapKey=group
+    // +listMapKey=kind
+    // +listMapKey=name
+    // +kubebuilder:validation:MinItems=1
+    // +kubebuilder:validation:MaxItems=16
+    TargetRefs []gatewayapiv1alpha2.LocalPolicyTargetReference `json:"targetRefs"`
+
+    // rest of the spec ("spec proper")…
+  }
+  ```
+</details>
+
 ##### Label selectors
 
-The target reference includes the label selectors used to select a set of objects whose behavior to augment:
+The target reference includes the label selectors used to select a set of objects whose behavior to augment. E.g.:
 
 ```yaml
 apiVersion: policies.controller.io/v1
@@ -170,11 +210,99 @@ spec:
     color: blue
 ```
 
+<details>
+  <summary>Implementation tip</summary>
+
+  This targeting method can be implemented in Golang by using a type such as apimachinery's [`LabelSelector`](https://pkg.go.dev/k8s.io/apimachinery/pkg/apis/meta/v1#LabelSelector) type. E.g.:
+
+  ```go
+  package color
+
+  import (
+    metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+  )
+
+  type ColorPolicy struct {
+    metav1.TypeMeta   `json:",inline"`
+    metav1.ObjectMeta `json:"metadata,omitempty"`
+
+    // Spec defines the desired state of the policy.
+    Spec ColorPolicySpec `json:"spec"`
+
+    // Status defines the current state of the policy.
+    Status ColorPolicyStatus `json:"status,omitempty"`
+  }
+
+  type ColorPolicySpec struct {
+    // TargetRefs specify the targets of the policy by label.
+    // The following kinds are supported: …
+    // +kubebuilder:validation:MinItems=1
+    // +kubebuilder:validation:MaxItems=16
+    TargetRefs []TargetRef `json:"targetRefs"`
+
+    // rest of the spec ("spec proper")…
+  }
+
+  type TargetRef struct {
+    // Group is the group of the target object.
+    Group Group `json:"group"`
+
+    // Kind is the kind of the target object.
+    Kind Kind `json:"kind"`
+
+    // Selector is the label selector of target objects of the specified kind.
+    Selector *metav1.LabelSelector `json:"selector"`
+  }
+  ```
+</details>
+
+
 ##### Cross namespace references
 
 Metaresources can opt for allowing instances to target objects across Kubernetes namespaces, in which case an optional `namespace` field MUST be defined with the target reference.
 
 Although not strictly forbidden, this is in general discouraged due to [discoverability](#the-discoverability-problem) issues and security implications. Implementations that opt for designing metaresources that allow for cross namespace references should consider supporting [ReferenceGrants](https://gateway-api.sigs.k8s.io/api-types/referencegrant/?h=referencegrant) to address the security concern.
+
+<details>
+  <summary>Implementation tip</summary>
+
+  This targeting method can be implemented in Golang by using a type such as Gateway API's [`NamespacedPolicyTargetReference`](https://pkg.go.dev/sigs.k8s.io/gateway-api/apis/v1alpha2#NamespacedPolicyTargetReference) type. E.g.:
+
+  ```go
+  package color
+
+  import (
+    metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+    gatewayapiv1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
+  )
+
+  type ColorPolicy struct {
+    metav1.TypeMeta   `json:",inline"`
+    metav1.ObjectMeta `json:"metadata,omitempty"`
+
+    // Spec defines the desired state of the policy.
+    Spec ColorPolicySpec `json:"spec"`
+
+    // Status defines the current state of the policy.
+    Status ColorPolicyStatus `json:"status,omitempty"`
+  }
+
+  type ColorPolicySpec struct {
+    // TargetRefs specify the targets of the policy by name.
+    // The following kinds are supported: …
+    // +listType=map
+    // +listMapKey=group
+    // +listMapKey=kind
+    // +listMapKey=namespace
+    // +listMapKey=name
+    // +kubebuilder:validation:MinItems=1
+    // +kubebuilder:validation:MaxItems=16
+    TargetRefs []gatewayapiv1alpha2.NamespacedPolicyTargetReference `json:"targetRefs"`
+
+    // rest of the spec ("spec proper")…
+  }
+  ```
+</details>
 
 #### Spanning behavior across relationships of a target
 
@@ -191,6 +319,48 @@ See also: [Declared targets versus Effective targets](#declared-targets-versus-e
 Metaresource CRDs can offer the option to target a section of an object whose spec defines sections uniquely identifiable by name. These metaresources typically include a field `spec.targetRefs.sectionName` that can be used along with compatible kinds.
 
 E.g. – a metaresource that specifies additional behaviour for a given listener of a Gateway API Gateway object, though not for all listeners of the Gateway, MUST (i) require the Gateway listener to be uniquely named and (ii) provide the `sectionName` field of target reference with the name of the targeted listener.
+
+<details>
+  <summary>Implementation tip</summary>
+
+  This targeting method can be implemented in Golang by using a type such as Gateway API's [`LocalPolicyTargetReferenceWithSectionName`](https://pkg.go.dev/sigs.k8s.io/gateway-api/apis/v1alpha2#LocalPolicyTargetReferenceWithSectionName) type. E.g.:
+
+  ```go
+  package color
+
+  import (
+    metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+    gatewayapiv1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
+  )
+
+  type ColorPolicy struct {
+    metav1.TypeMeta   `json:",inline"`
+    metav1.ObjectMeta `json:"metadata,omitempty"`
+
+    // Spec defines the desired state of the policy.
+    Spec ColorPolicySpec `json:"spec"`
+
+    // Status defines the current state of the policy.
+    Status ColorPolicyStatus `json:"status,omitempty"`
+  }
+
+  type ColorPolicySpec struct {
+    // TargetRefs specify the targets of the policy by name.
+    // The following kinds are supported: …
+    // +listType=map
+    // +listMapKey=group
+    // +listMapKey=kind
+    // +listMapKey=name
+    // +listMapKey=sectionName
+    // +kubebuilder:validation:MinItems=1
+    // +kubebuilder:validation:MaxItems=16
+    TargetRefs []gatewayapiv1alpha2.LocalPolicyTargetReferenceWithSectionName `json:"targetRefs"`
+
+    // rest of the spec ("spec proper")…
+  }
+  ```
+</details>
+
 
 #### Targeting virtual types
 
