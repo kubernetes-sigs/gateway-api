@@ -21,10 +21,12 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"maps"
 	"os"
 	"strings"
 
-	openapi "sigs.k8s.io/gateway-api/pkg/generated/openapi"
+	stable "sigs.k8s.io/gateway-api/apis/openapi"
+	experimental "sigs.k8s.io/gateway-api/apisx/openapi"
 
 	"k8s.io/kube-openapi/pkg/common"
 	"k8s.io/kube-openapi/pkg/validation/spec"
@@ -43,7 +45,9 @@ func output() error {
 	refFunc := func(name string) spec.Ref {
 		return spec.MustCreateRef(fmt.Sprintf("#/definitions/%s", friendlyName(name)))
 	}
-	defs := openapi.GetOpenAPIDefinitions(refFunc)
+	defs := stable.GetOpenAPIDefinitions(refFunc)
+	maps.Copy(defs, experimental.GetOpenAPIDefinitions(refFunc))
+
 	schemaDefs := make(map[string]spec.Schema, len(defs))
 	for k, v := range defs {
 		// Replace top-level schema with v2 if a v2 schema is embedded
