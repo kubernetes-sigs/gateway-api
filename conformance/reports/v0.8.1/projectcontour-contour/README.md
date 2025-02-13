@@ -7,7 +7,7 @@
 |experimental|[v1.27.0](https://github.com/projectcontour/contour/releases/tag/v1.27.0)|x|[v1.27.0 report](./v1.27.0-report.yaml)|
 |experimental|[v1.27.1](https://github.com/projectcontour/contour/releases/tag/v1.27.1)|x|[v1.27.1 report](./v1.27.1-report.yaml)|
 |experimental|[v1.27.2](https://github.com/projectcontour/contour/releases/tag/v1.27.2)|x|[v1.27.2 report](./v1.27.2-report.yaml)|
-|experimental|[v1.27.3](https://github.com/projectcontour/contour/releases/tag/v1.27.3)|x|[link](./v1.27.3-report.yaml)|
+|experimental|[v1.27.3](https://github.com/projectcontour/contour/releases/tag/v1.27.3)|x|[v1.27.3 report](./v1.27.3-report.yaml)|
 |experimental|[v1.27.4](https://github.com/projectcontour/contour/releases/tag/v1.27.4)|x|[link](./experimental-v1.27.4-default-report.yaml)|
 
 ## Reproduce
