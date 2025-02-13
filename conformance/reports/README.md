@@ -62,7 +62,7 @@ is structured as follows:
   needs to add information in the "reproduce" section (see below) on how to configure
   such a mode.
 - **Report**: the link to the related report. It MUST be in the form of
-  `[link](./report.yaml)`. The reports must be named according to the following
+  `[_version_ report](./report.yaml)`. The reports must be named according to the following
   pattern: `<API Channel>-<Implementation version>-<mode>-report.yaml`.
 
 ### Reproduce
