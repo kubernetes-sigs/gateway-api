@@ -39,7 +39,7 @@ This document introduces the concept of a “metaresource”, a term used to des
 
 “Meta” here is used in its Greek sense of “more comprehensive” or “transcending”, and “resource” rather than “object” because “metaresource” is more pronounceable than “meta object”.
 
-After a few iterations of Gateway API experimenting with this pattern－both, with its own common kinds of metaresources such as the `BackendTLSPolicy`, as well as via multiple implementation-specific kinds of metaresources (see examples of [current use of metaresources](#current-use-of-meta-resources))－ and rounds of discussion such as the one at [kubernetes-sigs/gateway-api/discussions#2927](https://github.com/kubernetes-sigs/gateway-api/discussions/2927), the pattern has been enhanced to its current form.
+After a few iterations of Gateway API experimenting with this pattern－both, with its own common kinds of metaresources such as the `BackendTLSPolicy`, as well as via multiple implementation-specific kinds of metaresources (see examples of [current use of metaresources](#current-use-of-metaresources))－ and rounds of discussion such as the one at [kubernetes-sigs/gateway-api/discussions#2927](https://github.com/kubernetes-sigs/gateway-api/discussions/2927), the pattern has been enhanced to its current form.
 
 ## Definition
 
@@ -312,7 +312,7 @@ E.g. – a metaresource that targets a Namespace may declare intent that affects
 
 To avoid any ambiguity in the interpretation of the targets, metaresources MUST clearly define the extent of their effects respectively to the object kinds they target (semantics of attaching a metaresource). This is usually defined in terms of a known hierarchy of resource kinds.
 
-See also: [Declared targets versus Effective targets](#declared-targets-versus-effective-targets) and [Hierarchy of target kinds and Effective metaresources](#hierarchy-of-target-kinds-and-effective-meta-resources).
+See also: [Declared targets versus Effective targets](#declared-targets-versus-effective-targets) and [Hierarchy of target kinds and Effective metaresources](#hierarchy-of-target-kinds-and-effective-metaresources).
 
 #### Narrowing the target to sections of an object
 
