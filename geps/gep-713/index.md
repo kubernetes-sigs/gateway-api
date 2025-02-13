@@ -274,19 +274,70 @@ Given:
 * the tree of targetable resources `a1` > (`b1` > `c1`, `b2` > (`c1`, `c2`)), where `x` > `Y` represents all the directed relationships from targetable resource `x` of kind `X` and its children, and recursively for `Y`, without loss of generality for any other set of instances of target resources;
 * the instances of metaresource `m1` → `a1` and `m2` → `b2`, where `m` → `y` represents the attachment of metaresource `m` of kind `M` to the target resource `y` of kind `A`, `B` or `C`, without loss of generality for any other set of instances of metaresources.
 
-For each expanded context that is induced by the instances of targetable resource of kind `C` and its relationships given by the hierarchy, i.e. for each of: `a1` > `b1` > `c1`, `a1` > `b2` > `c1`, and `a1` > `b2` > `c2`, stack the metaresources targeting the context at any level, ordered from the most specific level (i.e. `C`) to the least specific one (i.e. `A`)－i.e. `A` is on top of the stack:
+Depicted in the following Directed Acyclic Graph (DAG):
 
-1. Pop two metaresources from the stack and combine them into one effective metaresource applying the conflict resolution rules (described in the previous subsection).
-2. Push the effective metaresource back into the stack.
+```mermaid
+---
+config:
+  look: handDrawn
+  theme: neutral
+---
+graph
+    a1@{ shape: rect }
+    b1@{ shape: rect }
+    b2@{ shape: rect }
+    c1@{ shape: rect }
+    c2@{ shape: rect }
+    m1@{ shape: stadium }
+    m2@{ shape: stadium }
+
+    a1 --> b1
+    a1 --> b2
+    b1 --> c1
+    b2 --> c1
+    b2 --> c2
+
+    m1 -.-> a1
+    m2 -.-> b2
+```
+
+For each expanded context that is induced by the instances of targetable resource of kind `C` and its relationships given by the hierarchy, i.e. for each of: `a1` > `b1` > `c1`, `a1` > `b2` > `c1`, and `a1` > `b2` > `c2`, stack the metaresources targeting the context at any level, ordered from the most specific level (i.e. `C`) to the least specific one (i.e. `A`), applying the conflict resolution rules described in the previous subsection if necessary:
+
+1. Pop two metaresources from the stack and combine them into one effective metaresource.
+2. Push the calculated effective metaresource back into the stack.
 3. Repeat until there is no more than one metaresource in the stack.
 
 The last metaresource in each stack (if any) specifies the intended augmented behavior for the effective target resource of kind `C` within that corresponding context.
 
-For the exemplified instances, the expected outcome of the described process is:
+The following diagram generalizes the described process for calculating Effective metaresources:
+
+```mermaid
+---
+config:
+  look: handDrawn
+  theme: neutral
+---
+graph
+  A[Start: Given a DAG of target objects and set of metaresources] --> sub
+  sub --> L["Output result: mapping of each leaf of the DAG to its corresponding Effective metaresource (if any)"]
+
+  subgraph sub["For each path of target objects in the DAG"]
+    C["Order metaresources affecting the objects in the path from most specific to least specific, applying conflict resolution if necessary"] --> D["Push ordered metaresources to stack (least specific metaresource on top of the stack)"]
+    D --> E{More than one metaresource in stack?}
+    E -- Yes --> F[Pop two metaresources _mA_ and _mB_]
+    F --> G[Combine _mA_ and _mB_ into metaresource _mX_ applying the merge strategy dictated by _mA_]
+    G --> H[Make the merge strategy specified by _mB_ the merge strategy of _mX_]
+    H --> I[Push _mX_ back into the stack]
+    I --> E
+    E -- No --> J[Map the end of the path to a single metaresource remaining in the stack or none]
+  end
+```
+
+For the exemplified instances, the expected outcome of the process is:
 
 * `c1` is augmented by `m1`, whenever activated in the context of `b1`;
-* `c1` is augmented by the combination of `m1` \+ `m2`, whenever activated in the context of `b2`;
-* `c2` is augmented by the combination of `m1` \+ `m2`.
+* `c1` is augmented by the combination of `m1` + `m2`, whenever activated in the context of `b2`;
+* `c2` is augmented by the combination of `m1` + `m2`.
 
 The next section describes the different ways to combine metaresource instances (known as *merge strategiesI*), including a trivial merge strategy of not merging specs at all.
 
