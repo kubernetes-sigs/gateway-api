@@ -4,7 +4,7 @@
 
 |API channel|Implementation version|Mode|Report|
 |-----------|----------------------|----|------|
-|experimental|[v1.30.0](https://github.com/projectcontour/contour/releases/tag/v1.30.0)|x|[link](./experimental-v1.30.0-default-report.yaml)|
+|experimental|[v1.30.0](https://github.com/projectcontour/contour/releases/tag/v1.30.0)|x|[v1.30.0 report](./experimental-v1.30.0-default-report.yaml)|
 
 ## Reproduce
 

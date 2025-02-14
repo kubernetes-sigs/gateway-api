@@ -195,7 +195,7 @@ other signal that makes the failure sufficiently clear to the requester without 
 based on established security requirements.
 
 All policy resources must include `TargetRefs` with the fields specified
-[here](https://github.com/kubernetes-sigs/gateway-api/blob/a33a934af9ec6997b34fd9b00d2ecd13d143e48b/apis/v1alpha2/policy_types.go#L24-L41).
+in [PolicyTargetReference](https://github.com/kubernetes-sigs/gateway-api/blob/a33a934af9ec6997b34fd9b00d2ecd13d143e48b/apis/v1alpha2/policy_types.go#L24-L41).
 In an upcoming [extension](https://github.com/kubernetes-sigs/gateway-api/issues/2147) to TargetRefs, policy resources
 _may_ also choose to include `SectionName` and/or `Port` in the target reference following the same mechanics as `ParentRef`.
 

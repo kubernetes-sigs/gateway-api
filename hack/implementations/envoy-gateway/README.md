@@ -1,6 +1,6 @@
 # Running Conformance Tests for Envoy Gateway
 
-## Prerequisities
+## Prerequisites
 
 Make sure you have these tools installed
 

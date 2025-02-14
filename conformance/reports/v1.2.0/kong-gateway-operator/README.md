@@ -4,7 +4,7 @@
 
 | API channel  | Implementation version                                                              | Mode        | Report                                                |
 |--------------|-------------------------------------------------------------------------------------|-------------|-------------------------------------------------------|
-| standard | [v1.4.0](https://github.com/Kong/gateway-operator/releases/tag/v1.4.0) | expressions | [link](./standard-v1.4.0-expressions-report.yaml) |
+| standard | [v1.4.0](https://github.com/Kong/gateway-operator/releases/tag/v1.4.0) | expressions | [v1.4.0 expressions report](./standard-v1.4.0-expressions-report.yaml) |
 
 ## Reproduce
 

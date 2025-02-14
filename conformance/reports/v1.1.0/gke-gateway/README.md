@@ -4,9 +4,9 @@
 
 |API channel|Implementation version|Mode|Report|
 |-----------|----------------------|----|------|
-|standard|1.30.3-gke.1211000|gke-l7-global-external-managed|[link](./standard-1.30.3-gxlb-report.yaml)|
-|standard|1.30.3-gke.1211000|gke-l7-regional-external-managed|[link](./standard-1.30.3-rxlb-report.yaml)|
-|standard|1.30.3-gke.1211000|gke-l7-rilb|[link](./standard-1.30.3-rilb-report.yaml)|
+|standard|1.30.3-gke.1211000|gke-l7-global-external-managed|[v1.30.3 gxlb report](./standard-1.30.3-gxlb-report.yaml)|
+|standard|1.30.3-gke.1211000|gke-l7-regional-external-managed|[v1.30.3 rxlb report](./standard-1.30.3-rxlb-report.yaml)|
+|standard|1.30.3-gke.1211000|gke-l7-rilb|[v1.30.3 rilb report](./standard-1.30.3-rilb-report.yaml)|
 
 ## Reproduce
 
