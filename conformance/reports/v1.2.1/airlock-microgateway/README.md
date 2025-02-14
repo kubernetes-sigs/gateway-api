@@ -4,8 +4,7 @@
 
 | API channel  | Implementation version                                               | Mode    | Report                                           |
 |--------------|----------------------------------------------------------------------|---------|--------------------------------------------------|
-| experimental | [v4.4.0](https://github.com/airlock/microgateway/releases/tag/4.4.0) | default | [link](./experimental-4.4.0-default-report.yaml) |
-| standard     | [v4.5.0](https://github.com/airlock/microgateway/releases/tag/4.5.0) | default | [link](./standard-4.5.0-default-report.yaml)     |
+| experimental | [v4.5.0](https://github.com/airlock/microgateway/releases/tag/4.5.0) | default | [link](./experimental-4.5.0-default-report.yaml) |
 
 ## Reproduce
 
