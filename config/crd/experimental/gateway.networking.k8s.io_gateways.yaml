@@ -116,8 +116,6 @@ spec:
                       maxLength: 253
                       minLength: 1
                       type: string
-                  required:
-                  - value
                   type: object
                   x-kubernetes-validations:
                   - message: Hostname value must only contain valid characters (matching
@@ -1455,8 +1453,6 @@ spec:
                       maxLength: 253
                       minLength: 1
                       type: string
-                  required:
-                  - value
                   type: object
                   x-kubernetes-validations:
                   - message: Hostname value must only contain valid characters (matching

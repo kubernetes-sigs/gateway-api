@@ -3621,7 +3621,6 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewayAddress(ref common.ReferenceCal
 						},
 					},
 				},
-				Required: []string{"value"},
 			},
 		},
 	}
