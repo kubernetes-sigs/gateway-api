@@ -129,11 +129,6 @@ func (c *Clientset) GatewayV1() gatewayv1.GatewayV1Interface {
 	return &fakegatewayv1.FakeGatewayV1{Fake: &c.Fake}
 }
 
-// GatewayV1alpha2 retrieves the GatewayV1alpha2Client
-func (c *Clientset) GatewayV1alpha2() gatewayv1alpha2.GatewayV1alpha2Interface {
-	return &fakegatewayv1alpha2.FakeGatewayV1alpha2{Fake: &c.Fake}
-}
-
 // GatewayV1alpha3 retrieves the GatewayV1alpha3Client
 func (c *Clientset) GatewayV1alpha3() gatewayv1alpha3.GatewayV1alpha3Interface {
 	return &fakegatewayv1alpha3.FakeGatewayV1alpha3{Fake: &c.Fake}
@@ -142,6 +137,11 @@ func (c *Clientset) GatewayV1alpha3() gatewayv1alpha3.GatewayV1alpha3Interface {
 // GatewayV1beta1 retrieves the GatewayV1beta1Client
 func (c *Clientset) GatewayV1beta1() gatewayv1beta1.GatewayV1beta1Interface {
 	return &fakegatewayv1beta1.FakeGatewayV1beta1{Fake: &c.Fake}
+}
+
+// GatewayV1alpha2 retrieves the GatewayV1alpha2Client
+func (c *Clientset) GatewayV1alpha2() gatewayv1alpha2.GatewayV1alpha2Interface {
+	return &fakegatewayv1alpha2.FakeGatewayV1alpha2{Fake: &c.Fake}
 }
 
 // ExperimentalV1alpha1 retrieves the ExperimentalV1alpha1Client
