@@ -357,9 +357,9 @@ sequenceDiagram
     P->>U: Finishes Headers
     U->>P: Starts Response
     U->>P: Finishes Headers
-    note right of P: timeouts.backendRequest end time
     note left of P: timeouts.request end time
     U->>P: Finishes Response
+    note right of P: timeouts.backendRequest end time
     note right of P: Repeat if retry
     P->>C: Starts Response
     P->>C: Finishes Headers

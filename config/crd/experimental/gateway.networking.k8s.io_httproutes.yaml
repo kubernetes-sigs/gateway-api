@@ -2674,7 +2674,7 @@ spec:
                           description: |-
                             BackendRequest specifies a timeout for an individual request from the gateway
                             to a backend. This covers the time from when the request first starts being
-                            sent from the gateway to when the response headers have been received from the backend.
+                            sent from the gateway to when the full response has been received from the backend.
 
                             Setting a timeout to the zero duration (e.g. "0s") SHOULD disable the timeout
                             completely. Implementations that cannot completely disable the timeout MUST
@@ -5722,7 +5722,7 @@ spec:
                           description: |-
                             BackendRequest specifies a timeout for an individual request from the gateway
                             to a backend. This covers the time from when the request first starts being
-                            sent from the gateway to when the response headers have been received from the backend.
+                            sent from the gateway to when the full response has been received from the backend.
 
                             Setting a timeout to the zero duration (e.g. "0s") SHOULD disable the timeout
                             completely. Implementations that cannot completely disable the timeout MUST
