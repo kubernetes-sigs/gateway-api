@@ -503,7 +503,7 @@ graph
   end
 ```
 
-For the exemplified instances, the expected outcome of the process is:
+In the example above, the expected outcome of the process is:
 
 * `c1` is augmented by `m1`, whenever activated in the context of `b1`;
 * `c1` is augmented by the combination of `m1` + `m2`, whenever activated in the context of `b2`;
@@ -583,10 +583,33 @@ the following state of targetable resources:
 
 * `g1` > `r1` > `b1`
 * `g1` > `r2` > `b2`
-  and the following state of `ColorPolicy` (`p`) policies, where `pX[spec]` → `bX` denotes a policy `pX` attached to (“targeting”) a `Backend` resource `bX`, intending to augment `bX`‘s behavior with `spec`:
+
+and the following state of `ColorPolicy` (`p`) policies, where `pX[spec]` → `bX` denotes a policy `pX` attached to (“targeting”) a `Backend` resource `bX`, intending to augment `bX`‘s behavior with `spec`:
 
 * `p1[color:red]` → `b1`
 * `p2[color:blue]` → `b1` (conflicting policy, `p2.creationTimestamp` > `p1.creationTimestamp`)
+
+Depicted in the following Directed Acyclic Graph (DAG):
+
+```mermaid
+---
+config:
+  look: handDrawn
+  theme: neutral
+---
+graph
+  g1@{ shape: rect }
+  r1@{ shape: rect }
+  b1@{ shape: rect }
+  p1@{ shape: stadium, label: "**p1**\ncolor:red\ncreationTimestamp:t" }
+  p2@{ shape: stadium, label: "**p2**\ncolor:blue\ncreationTimestamp:t+Δ" }
+
+  g1 --> r1
+  r1 --> b1
+
+  p1 -.-> b1
+  p2 -.-> b1
+```
 
 The expected outcome to be implemented by the controller is:
 
@@ -608,12 +631,49 @@ the following state of targetable resources:
 * `g1` > `r2` > `b1`
 * `g2` > `r3` > `b1`
 * `g2` > `r4` > `b2`
-  and the following state of `ColorPolicy` (`p`) policies, where `pX[spec]` → `yX` denotes a policy `pX` attached to (“targeting”) a resource `yX`, `y` ∈ {`g`, `r`}, intending to augment with `spec` the behavior of `Backend` resources when activated via `yX`:
+
+and the following state of `ColorPolicy` (`p`) policies, where `pX[spec]` → `yX` denotes a policy `pX` attached to (“targeting”) a resource `yX`, `y` ∈ {`g`, `r`}, intending to augment with `spec` the behavior of `Backend` resources when activated via `yX`:
 
 * `p1[color:red]` → `g1`
 * `p2[color:blue]` → `r1`
 * `p3[overrides:{color:yellow}]` → `g2`
 * `p4[color:green]` → `r4`
+
+Depicted in the following Directed Acyclic Graph (DAG):
+
+```mermaid
+---
+config:
+  look: handDrawn
+  theme: neutral
+---
+graph
+  g1@{ shape: rect }
+  r1@{ shape: rect }
+  r2@{ shape: rect }
+  r3@{ shape: rect }
+  r4@{ shape: rect }
+  b1@{ shape: rect }
+  b2@{ shape: rect }
+  p1@{ shape: stadium, label: "**p1**\ncolor:red" }
+  p2@{ shape: stadium, label: "**p2**\ncolor:blue" }
+  p3@{ shape: stadium, label: "**p3**\noverrides:{color:yellow}" }
+  p4@{ shape: stadium, label: "**p4**\ncolor:green" }
+
+  g1 --> r1
+  r1 --> b1
+  g1 --> r2
+  r2 --> b1
+  g2 --> r3
+  r3 --> b1
+  g2 --> r4
+  r4 --> b2
+
+  p1 -.-> g1
+  p2 -.-> r1
+  p3 -.-> g2
+  p4 -.-> r4
+```
 
 The expected outcome to be implemented by the controller is:
 
@@ -640,12 +700,49 @@ the following state of targetable resources:
 * `g1` > `r2` > `b1`
 * `g2` > `r3` > `b1`
 * `g2` > `r4` > `b2`
-  and the following state of `ColorPolicy` (`p`) policies, where `pX[spec]` → `yX` denotes a policy `pX` attached to (“targeting”) a resource `yX`, `y` ∈ {`g`, `r`}, intending to augment with `spec` the behavior of `Backend` resources when activated via `yX`:
+
+and the following state of `ColorPolicy` (`p`) policies, where `pX[spec]` → `yX` denotes a policy `pX` attached to (“targeting”) a resource `yX`, `y` ∈ {`g`, `r`}, intending to augment with `spec` the behavior of `Backend` resources when activated via `yX`:
 
 * `p1[colors:{dark:brown,light:red},strategy:atomic]` → `g1`
 * `p2[colors:{light:blue}]` → `r1`
 * `p3[overrides:{colors:{light:yellow},strategy:patch}]` → `g2`
 * `p4[colors:{dark:olive,light:green}]` → `r4`
+
+Depicted in the following Directed Acyclic Graph (DAG):
+
+```mermaid
+---
+config:
+  look: handDrawn
+  theme: neutral
+---
+graph
+  g1@{ shape: rect }
+  r1@{ shape: rect }
+  r2@{ shape: rect }
+  r3@{ shape: rect }
+  r4@{ shape: rect }
+  b1@{ shape: rect }
+  b2@{ shape: rect }
+  p1@{ shape: stadium, label: "**p1**\ncolors:{dark:brown light:red}\nstrategy:atomic" }
+  p2@{ shape: stadium, label: "**p2**\ncolors:{light:blue}" }
+  p3@{ shape: stadium, label: "**p3**\noverrides:{\ncolors:{light:yellow}\nstrategy:patch}" }
+  p4@{ shape: stadium, label: "**p4**\ncolors:{dark:olive light:green}" }
+
+  g1 --> r1
+  r1 --> b1
+  g1 --> r2
+  r2 --> b1
+  g2 --> r3
+  r3 --> b1
+  g2 --> r4
+  r4 --> b2
+
+  p1 -.-> g1
+  p2 -.-> r1
+  p3 -.-> g2
+  p4 -.-> r4
+```
 
 The expected outcome to be implemented by the controller is:
 
