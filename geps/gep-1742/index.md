@@ -348,13 +348,13 @@ sequenceDiagram
     note left of P: timeouts.request start time (min)
     C->>P: Starts sending Request
     C->>P: Finishes Headers
-    C->>P: Finishes request
+    C->>P: Finishes Request
     note left of P: timeouts.request start time (max)
     P->>U: Connection Started
     note right of P: timeouts.backendRequest start time
     P->>U: Starts sending Request
-    P->>U: Finishes request
     P->>U: Finishes Headers
+    P->>U: Finishes Request
     U->>P: Starts Response
     U->>P: Finishes Headers
     note left of P: timeouts.request end time
@@ -418,7 +418,7 @@ type HTTPRouteTimeouts struct {
 
 	// BackendRequest specifies a timeout for an individual request from the gateway
 	// to a backend. This covers the time from when the request first starts being
-	// sent from the gateway to when the response headers have been received from the backend.
+	// sent from the gateway to when the full response has been received from the backend.
 	//
 	// An entire client HTTP transaction with a gateway, covered by the Request timeout,
 	// may result in more than one call from the gateway to the destination backend,
