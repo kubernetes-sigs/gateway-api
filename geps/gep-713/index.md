@@ -31,7 +31,7 @@ This GEP specifies a _pattern_, not an API field or new object. It defines some 
 
 ## Background
 
-When designing Gateway API, it was found a frequent need to change the behavior of objects without being able to make changes to the spec of those objects. Sometimes, this is because changing the spec of the object to hold the new piece of information is not possible (e.g., `ReferenceGrant`, from [GEP-709](../gep-709/index.md), when affecting Secrets and Services), and sometimes it’s because the behavior change is intended to flow across multiple objects (see [Semantics](#semantics-why) of metaresources and [Inherited](#inherited) class of metaresources).
+When designing Gateway API, a recurring challenge became apparent. There was often a need to change the behavior of objects without modifying their specs. Sometimes, this is because changing the spec of the object to hold the new piece of information is not possible (e.g., `ReferenceGrant`, from [GEP-709](../gep-709/index.md), when affecting Secrets and Services), and sometimes it’s because the behavior change is intended to flow across multiple objects (see [Semantics](#semantics-why) of metaresources and [Inherited](#inherited) class of metaresources).
 
 To put this another way, sometimes we need ways to be able to affect how an object is interpreted in the API, without representing the description of those effects inside the spec of the object. This document describes the ways to design objects to meet use cases like these.
 
