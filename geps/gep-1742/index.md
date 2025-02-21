@@ -270,15 +270,15 @@ sequenceDiagram
     Note right of P: respondingTimeouts<br/>readTimeout
     C->>P: Finishes request
     deactivate P
-    P->>U: Connection Started
     activate U
+    P->>U: Connection Started
     Note right of U: forwardingTimeouts<br/>dialTimeout
     deactivate U
+    activate U
     P->>U: Starts sending Request
     P->>U: Finishes request
     P->>U: Finishes Headers
     U->>P: Starts Response
-    activate U
     note right of U: forwardingTimeouts<br/>responseHeaderTimeout
     U->>P: Finishes Headers
     deactivate U
@@ -348,18 +348,18 @@ sequenceDiagram
     note left of P: timeouts.request start time (min)
     C->>P: Starts sending Request
     C->>P: Finishes Headers
-    C->>P: Finishes request
+    C->>P: Finishes Request
     note left of P: timeouts.request start time (max)
     P->>U: Connection Started
     note right of P: timeouts.backendRequest start time
     P->>U: Starts sending Request
-    P->>U: Finishes request
     P->>U: Finishes Headers
+    P->>U: Finishes Request
     U->>P: Starts Response
     U->>P: Finishes Headers
-    note right of P: timeouts.backendRequest end time
     note left of P: timeouts.request end time
     U->>P: Finishes Response
+    note right of P: timeouts.backendRequest end time
     note right of P: Repeat if retry
     P->>C: Starts Response
     P->>C: Finishes Headers
