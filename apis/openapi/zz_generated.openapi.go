@@ -7038,7 +7038,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha3_BackendTLSPolicyValidation(ref c
 					},
 					"hostname": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Hostname is used for two purposes in the connection between Gateways and backends:\n\n1. Hostname MUST be used as the SNI to connect to the backend (RFC 6066). 2. If SubjectAltNames is not specified, Hostname MUST be used for\n   authentication and MUST match the certificate served by the matching\n   backend.\n\nSupport: Core",
+							Description: "Hostname is used for two purposes in the connection between Gateways and backends:\n\n1. Hostname MUST be used as the SNI to connect to the backend (RFC 6066). 2. Hostname MUST be used for authentication and MUST match the certificate served by the matching backend, unless SubjectAltNames is specified.\n   authentication and MUST match the certificate served by the matching\n   backend.\n\nSupport: Core",
 							Default:     "",
 							Type:        []string{"string"},
 							Format:      "",
@@ -7046,7 +7046,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha3_BackendTLSPolicyValidation(ref c
 					},
 					"subjectAltNames": {
 						SchemaProps: spec.SchemaProps{
-							Description: "SubjectAltNames contains one or more Subject Alternative Names. When specified, the certificate served from the backend MUST have at least one Subject Alternate Name matching one of the specified SubjectAltNames.\n\nSupport: Core",
+							Description: "SubjectAltNames contains one or more Subject Alternative Names. When specified the certificate served from the backend MUST have at least one Subject Alternate Name matching one of the specified SubjectAltNames.\n\nSupport: Extended",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
