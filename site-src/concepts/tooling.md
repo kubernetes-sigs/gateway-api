@@ -6,13 +6,13 @@ Gateway API has tooling to facilitate interacting with the resources.
 
 Interested in seeing what your ingress resources will look like in Gateway API? `ingress2gateway` provides an easy manner to translate provider-specific resources to Gateway API resources. Managed by the Gateway API SIG-Network subproject.
 
-Get started [here](https://github.com/kubernetes-sigs/ingress2gateway?tab=readme-ov-file#installation)!
+Get started with [kubernetes-sigs/ingress2gateway: installation](https://github.com/kubernetes-sigs/ingress2gateway?tab=readme-ov-file#installation)!
 
 ## `gwctl`
 
-A command line tool for managing your Gateway API resouces. Explore your policies, xRoutes, and interact with your resources.
+A command line tool for managing your Gateway API resources. Explore your policies, xRoutes, and interact with your resources.
 
-Get started [here](https://github.com/kubernetes-sigs/gwctl?tab=readme-ov-file#installation)!
+Get started with [kubernetes-sigs/gwctl: installation](https://github.com/kubernetes-sigs/gwctl?tab=readme-ov-file#installation)!
 
 ## Third-Party Tooling
 
@@ -20,4 +20,4 @@ Get started [here](https://github.com/kubernetes-sigs/gwctl?tab=readme-ov-file#i
 
 Machinery for implementing Gateway API policies and policy controllers.
 
-Get started [here](https://github.com/Kuadrant/policy-machinery/tree/main)
+Get started with [Kuadrant/policy-machinery](https://github.com/Kuadrant/policy-machinery/tree/main)
