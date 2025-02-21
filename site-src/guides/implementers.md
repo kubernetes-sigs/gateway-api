@@ -355,3 +355,13 @@ or both.
 Implementations that support cross-namespace references MUST watch ReferenceGrant
 and reconcile any ReferenceGrant that points to an object that's referred to by
 an in-scope Gateway API object.
+
+## Backend Protocol
+
+Not all implementations of Gateway API support automatic protocol selection. In some cases protocols are disabled without an explicit opt-in.
+
+When a Route's backend references a Kubernetes Service, application developers can specify the protocol using ServicePort appProtocol field.
+
+References: 
+[Backend Protocol Selection](https://gateway-api.sigs.k8s.io/guides/backend-protocol/) within the user guide.
+[GEP-1911: Backend Protocol Selection](https://gateway-api.sigs.k8s.io/geps/gep-1911/#supporting-protocols)
