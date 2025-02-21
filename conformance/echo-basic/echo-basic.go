@@ -84,15 +84,6 @@ func main() {
 		return
 	}
 
-	httpPort := os.Getenv("HTTP_PORT")
-	if httpPort == "" {
-		httpPort = "3000"
-	}
-	h2cPort := os.Getenv("H2C_PORT")
-	if h2cPort == "" {
-		h2cPort = "3001"
-	}
-
 	httpsPort := os.Getenv("HTTPS_PORT")
 	if httpsPort == "" {
 		httpsPort = "8443"
@@ -114,15 +105,19 @@ func main() {
 
 	errchan := make(chan error)
 
-	go func() {
-		fmt.Printf("Starting server, listening on port %s (http)\n", httpPort)
-		err := http.ListenAndServe(fmt.Sprintf(":%s", httpPort), httpHandler) //nolint:gosec
-		if err != nil {
-			errchan <- err
-		}
-	}()
+	if httpPort := os.Getenv("HTTP_PORT"); httpPort != "" {
+		go func() {
+			fmt.Printf("Starting server, listening on port %s (http)\n", httpPort)
+			err := http.ListenAndServe(fmt.Sprintf(":%s", httpPort), httpHandler) //nolint:gosec
+			if err != nil {
+				errchan <- err
+			}
+		}()
+	}
 
-	go runH2CServer(h2cPort, errchan)
+	if h2cPort := os.Getenv("H2C_PORT"); h2cPort != "" {
+		go runH2CServer(h2cPort, errchan)
+	}
 
 	// Enable HTTPS if certificate and private key are given.
 	if os.Getenv("TLS_SERVER_CERT") != "" && os.Getenv("TLS_SERVER_PRIVKEY") != "" {
