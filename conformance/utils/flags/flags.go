@@ -49,4 +49,5 @@ var (
 	ConformanceProfiles        = flag.String("conformance-profiles", "", "Comma-separated list of the conformance profiles to run")
 	ReportOutput               = flag.String("report-output", "", "The file where to write the conformance report")
 	SkipProvisionalTests       = flag.Bool("skip-provisional-tests", false, "Whether to skip provisional tests")
+	AddressType                = flag.String("address-type", "IPAddress", "Type of address in the gateway spec")
 )

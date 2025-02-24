@@ -8,7 +8,8 @@ spec:
   gatewayClassName: "{GATEWAY_CLASS_NAME}"
   addresses:
   # How should we inject a valid type here?
-  - type: "VALID_ADDRESS_TYPE_PLACEHOLDER"
+  - type: "PLACEHOLDER_ADDRESS_TYPE"
+
   listeners:
   - name: http
     port: 8080
