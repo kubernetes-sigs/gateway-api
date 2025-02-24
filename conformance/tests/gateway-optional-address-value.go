@@ -68,6 +68,5 @@ var GatewayOptionalAddressValue = suite.ConformanceTest{
 			Type:   string(v1.GatewayConditionAccepted),
 			Status: metav1.ConditionTrue,
 		})
-
 	},
 }

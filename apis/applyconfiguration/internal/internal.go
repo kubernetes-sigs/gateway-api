@@ -487,16 +487,6 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         namedType: io.k8s.sigs.gateway-api.apis.v1.GatewayStatus
       default: {}
-- name: io.k8s.sigs.gateway-api.apis.v1.GatewayAddress
-  map:
-    fields:
-    - name: type
-      type:
-        scalar: string
-    - name: value
-      type:
-        scalar: string
-      default: ""
 - name: io.k8s.sigs.gateway-api.apis.v1.GatewayBackendTLS
   map:
     fields:
@@ -579,7 +569,7 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         list:
           elementType:
-            namedType: io.k8s.sigs.gateway-api.apis.v1.GatewayAddress
+            namedType: io.k8s.sigs.gateway-api.apis.v1.GatewaySpecAddress
           elementRelationship: atomic
     - name: backendTLS
       type:
@@ -599,6 +589,16 @@ var schemaYAML = typed.YAMLObject(`types:
           elementRelationship: associative
           keys:
           - name
+- name: io.k8s.sigs.gateway-api.apis.v1.GatewaySpecAddress
+  map:
+    fields:
+    - name: type
+      type:
+        scalar: string
+    - name: value
+      type:
+        scalar: string
+      default: ""
 - name: io.k8s.sigs.gateway-api.apis.v1.GatewayStatus
   map:
     fields:
