@@ -39,21 +39,7 @@ import (
 // apply configuration type exists for the given GroupVersionKind.
 func ForKind(kind schema.GroupVersionKind) interface{} {
 	switch kind {
-	// Group=gateway.networking.k8s-x.io, Version=v1alpha1
-	case v1alpha1.SchemeGroupVersion.WithKind("ListenerEntry"):
-		return &apisxv1alpha1.ListenerEntryApplyConfiguration{}
-	case v1alpha1.SchemeGroupVersion.WithKind("ListenerEntryStatus"):
-		return &apisxv1alpha1.ListenerEntryStatusApplyConfiguration{}
-	case v1alpha1.SchemeGroupVersion.WithKind("ListenerSet"):
-		return &apisxv1alpha1.ListenerSetApplyConfiguration{}
-	case v1alpha1.SchemeGroupVersion.WithKind("ListenerSetSpec"):
-		return &apisxv1alpha1.ListenerSetSpecApplyConfiguration{}
-	case v1alpha1.SchemeGroupVersion.WithKind("ListenerSetStatus"):
-		return &apisxv1alpha1.ListenerSetStatusApplyConfiguration{}
-	case v1alpha1.SchemeGroupVersion.WithKind("ParentGatewayReference"):
-		return &apisxv1alpha1.ParentGatewayReferenceApplyConfiguration{}
-
-		// Group=gateway.networking.k8s.io, Version=v1
+	// Group=gateway.networking.k8s.io, Version=v1
 	case v1.SchemeGroupVersion.WithKind("AllowedListeners"):
 		return &apisv1.AllowedListenersApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("AllowedRoutes"):
@@ -244,6 +230,20 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1beta1.ReferenceGrantSpecApplyConfiguration{}
 	case v1beta1.SchemeGroupVersion.WithKind("ReferenceGrantTo"):
 		return &apisv1beta1.ReferenceGrantToApplyConfiguration{}
+
+		// Group=gateway.networking.x-k8s.io, Version=v1alpha1
+	case v1alpha1.SchemeGroupVersion.WithKind("ListenerEntry"):
+		return &apisxv1alpha1.ListenerEntryApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("ListenerEntryStatus"):
+		return &apisxv1alpha1.ListenerEntryStatusApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("ListenerSet"):
+		return &apisxv1alpha1.ListenerSetApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("ListenerSetSpec"):
+		return &apisxv1alpha1.ListenerSetSpecApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("ListenerSetStatus"):
+		return &apisxv1alpha1.ListenerSetStatusApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("ParentGatewayReference"):
+		return &apisxv1alpha1.ParentGatewayReferenceApplyConfiguration{}
 
 	}
 	return nil

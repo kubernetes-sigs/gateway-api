@@ -43,7 +43,7 @@ func ListenerSet(name, namespace string) *ListenerSetApplyConfiguration {
 	b.WithName(name)
 	b.WithNamespace(namespace)
 	b.WithKind("ListenerSet")
-	b.WithAPIVersion("gateway.networking.k8s-x.io/v1alpha1")
+	b.WithAPIVersion("gateway.networking.x-k8s.io/v1alpha1")
 	return b
 }
 
@@ -79,7 +79,7 @@ func extractListenerSet(listenerSet *apisxv1alpha1.ListenerSet, fieldManager str
 	b.WithNamespace(listenerSet.Namespace)
 
 	b.WithKind("ListenerSet")
-	b.WithAPIVersion("gateway.networking.k8s-x.io/v1alpha1")
+	b.WithAPIVersion("gateway.networking.x-k8s.io/v1alpha1")
 	return b, nil
 }
 

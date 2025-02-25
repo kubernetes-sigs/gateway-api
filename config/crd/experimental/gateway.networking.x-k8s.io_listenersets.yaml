@@ -6,9 +6,9 @@ metadata:
     gateway.networking.k8s.io/bundle-version: v1.2.1
     gateway.networking.k8s.io/channel: experimental
   creationTimestamp: null
-  name: listenersets.gateway.networking.k8s-x.io
+  name: listenersets.gateway.networking.x-k8s.io
 spec:
-  group: gateway.networking.k8s-x.io
+  group: gateway.networking.x-k8s.io
   names:
     categories:
     - gateway-api

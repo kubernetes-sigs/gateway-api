@@ -19,6 +19,6 @@ limitations under the License.
 //
 // +k8s:openapi-gen=true
 // +kubebuilder:object:generate=true
-// +groupName=gateway.networking.k8s-x.io
+// +groupName=gateway.networking.x-k8s.io
 // +groupGoName=Experimental
 package v1alpha1

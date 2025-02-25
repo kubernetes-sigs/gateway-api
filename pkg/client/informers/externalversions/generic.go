@@ -56,11 +56,7 @@ func (f *genericInformer) Lister() cache.GenericLister {
 // TODO extend this to unknown resources with a client pool
 func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource) (GenericInformer, error) {
 	switch resource {
-	// Group=gateway.networking.k8s-x.io, Version=v1alpha1
-	case v1alpha1.SchemeGroupVersion.WithResource("listenersets"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Experimental().V1alpha1().ListenerSets().Informer()}, nil
-
-		// Group=gateway.networking.k8s.io, Version=v1
+	// Group=gateway.networking.k8s.io, Version=v1
 	case v1.SchemeGroupVersion.WithResource("grpcroutes"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Gateway().V1().GRPCRoutes().Informer()}, nil
 	case v1.SchemeGroupVersion.WithResource("gateways"):
@@ -97,6 +93,10 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Gateway().V1beta1().HTTPRoutes().Informer()}, nil
 	case v1beta1.SchemeGroupVersion.WithResource("referencegrants"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Gateway().V1beta1().ReferenceGrants().Informer()}, nil
+
+		// Group=gateway.networking.x-k8s.io, Version=v1alpha1
+	case v1alpha1.SchemeGroupVersion.WithResource("listenersets"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Experimental().V1alpha1().ListenerSets().Informer()}, nil
 
 	}
 

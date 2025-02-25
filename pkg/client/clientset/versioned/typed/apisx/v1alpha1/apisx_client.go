@@ -31,7 +31,7 @@ type ExperimentalV1alpha1Interface interface {
 	ListenerSetsGetter
 }
 
-// ExperimentalV1alpha1Client is used to interact with features provided by the gateway.networking.k8s-x.io group.
+// ExperimentalV1alpha1Client is used to interact with features provided by the gateway.networking.x-k8s.io group.
 type ExperimentalV1alpha1Client struct {
 	restClient rest.Interface
 }
