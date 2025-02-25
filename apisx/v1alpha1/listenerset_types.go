@@ -53,7 +53,9 @@ type ListenerSetSpec struct {
 	// logical endpoints that are bound on this referenced parent Gateway's addresses.
 	//
 	// Listeners in a `Gateway` and their attached `ListenerSets` are concatenated
-	// as a list when programming the underlying infrastructure.
+	// as a list when programming the underlying infrastructure. Each listener
+	// name does not need to be unique across the Gateway and ListenerSets.
+	// See ListenerEntry.Name for more details.
 	//
 	// Implementations MUST treat the parent Gateway as having the merged
 	// list of all listeners from itself and attached ListenerSets using
@@ -89,6 +91,10 @@ type ListenerSetSpec struct {
 type ListenerEntry struct {
 	// Name is the name of the Listener. This name MUST be unique within a
 	// ListenerSet.
+	//
+	// Name is not required to be unique across a Gateway and ListenerSets.
+	// Routes can attach to a Listener by having a ListenerSet as a parentRef
+	// and setting the SectionName
 	//
 	// Support: Core
 	Name SectionName `json:"name"`
