@@ -5157,7 +5157,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_ListenerNamespaces(ref common.Referenc
 					},
 					"selector": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Selector must be specified when From is set to \"Selector\". In that case, only Routes in Namespaces matching this Selector will be selected by this Gateway. This field is ignored for other values of \"From\".\n\nSupport: Core",
+							Description: "Selector must be specified when From is set to \"Selector\". In that case, only ListenerSets in Namespaces matching this Selector will be selected by this Gateway. This field is ignored for other values of \"From\".",
 							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelector"),
 						},
 					},
@@ -7679,7 +7679,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerEntry(ref common.Refere
 				Properties: map[string]spec.Schema{
 					"name": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Name is the name of the Listener. This name MUST be unique within a ListenerSet.\n\nName is not required to be unique across a Gateway and ListenerSets. Routes can attach to a Listener by having a ListenerSet as a parentRef and setting the SectionName\n\nSupport: Core",
+							Description: "Name is the name of the Listener. This name MUST be unique within a ListenerSet.\n\nName is not required to be unique across a Gateway and ListenerSets. Routes can attach to a Listener by having a ListenerSet as a parentRef and setting the SectionName",
 							Default:     "",
 							Type:        []string{"string"},
 							Format:      "",
@@ -7687,21 +7687,21 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerEntry(ref common.Refere
 					},
 					"hostname": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Hostname specifies the virtual hostname to match for protocol types that define this concept. When unspecified, all hostnames are matched. This field is ignored for protocols that don't require hostname based matching.\n\nImplementations MUST apply Hostname matching appropriately for each of the following protocols:\n\n* TLS: The Listener Hostname MUST match the SNI. * HTTP: The Listener Hostname MUST match the Host header of the request. * HTTPS: The Listener Hostname SHOULD match at both the TLS and HTTP\n  protocol layers as described above. If an implementation does not\n  ensure that both the SNI and Host header match the Listener hostname,\n  it MUST clearly document that.\n\nFor HTTPRoute and TLSRoute resources, there is an interaction with the `spec.hostnames` array. When both listener and route specify hostnames, there MUST be an intersection between the values for a Route to be accepted. For more information, refer to the Route specific Hostnames documentation.\n\nHostnames that are prefixed with a wildcard label (`*.`) are interpreted as a suffix match. That means that a match for `*.example.com` would match both `test.example.com`, and `foo.test.example.com`, but not `example.com`.\n\nSupport: Core",
+							Description: "Hostname specifies the virtual hostname to match for protocol types that define this concept. When unspecified, all hostnames are matched. This field is ignored for protocols that don't require hostname based matching.\n\nImplementations MUST apply Hostname matching appropriately for each of the following protocols:\n\n* TLS: The Listener Hostname MUST match the SNI. * HTTP: The Listener Hostname MUST match the Host header of the request. * HTTPS: The Listener Hostname SHOULD match at both the TLS and HTTP\n  protocol layers as described above. If an implementation does not\n  ensure that both the SNI and Host header match the Listener hostname,\n  it MUST clearly document that.\n\nFor HTTPRoute and TLSRoute resources, there is an interaction with the `spec.hostnames` array. When both listener and route specify hostnames, there MUST be an intersection between the values for a Route to be accepted. For more information, refer to the Route specific Hostnames documentation.\n\nHostnames that are prefixed with a wildcard label (`*.`) are interpreted as a suffix match. That means that a match for `*.example.com` would match both `test.example.com`, and `foo.test.example.com`, but not `example.com`.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
 					"port": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Port is the network port. Multiple listeners may use the same port, subject to the Listener compatibility rules.\n\nSupport: Core",
+							Description: "Port is the network port. Multiple listeners may use the same port, subject to the Listener compatibility rules.",
 							Type:        []string{"integer"},
 							Format:      "int32",
 						},
 					},
 					"protocol": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Protocol specifies the network protocol this listener expects to receive.\n\nSupport: Core",
+							Description: "Protocol specifies the network protocol this listener expects to receive.",
 							Default:     "",
 							Type:        []string{"string"},
 							Format:      "",
@@ -7709,13 +7709,13 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerEntry(ref common.Refere
 					},
 					"tls": {
 						SchemaProps: spec.SchemaProps{
-							Description: "TLS is the TLS configuration for the Listener. This field is required if the Protocol field is \"HTTPS\" or \"TLS\". It is invalid to set this field if the Protocol field is \"HTTP\", \"TCP\", or \"UDP\".\n\nThe association of SNIs to Certificate defined in GatewayTLSConfig is defined based on the Hostname field for this listener.\n\nThe GatewayClass MUST use the longest matching SNI out of all available certificates for any TLS handshake.\n\nSupport: Core",
+							Description: "TLS is the TLS configuration for the Listener. This field is required if the Protocol field is \"HTTPS\" or \"TLS\". It is invalid to set this field if the Protocol field is \"HTTP\", \"TCP\", or \"UDP\".\n\nThe association of SNIs to Certificate defined in GatewayTLSConfig is defined based on the Hostname field for this listener.\n\nThe GatewayClass MUST use the longest matching SNI out of all available certificates for any TLS handshake.",
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.GatewayTLSConfig"),
 						},
 					},
 					"allowedRoutes": {
 						SchemaProps: spec.SchemaProps{
-							Description: "AllowedRoutes defines the types of routes that MAY be attached to a Listener and the trusted namespaces where those Route resources MAY be present.\n\nAlthough a client request may match multiple route rules, only one rule may ultimately receive the request. Matching precedence MUST be determined in order of the following criteria:\n\n* The most specific match as defined by the Route type. * The oldest Route based on creation timestamp. For example, a Route with\n  a creation timestamp of \"2020-09-08 01:02:03\" is given precedence over\n  a Route with a creation timestamp of \"2020-09-08 01:02:04\".\n* If everything else is equivalent, the Route appearing first in\n  alphabetical order (namespace/name) should be given precedence. For\n  example, foo/bar is given precedence over foo/baz.\n\nAll valid rules within a Route attached to this Listener should be implemented. Invalid Route rules can be ignored (sometimes that will mean the full Route). If a Route rule transitions from valid to invalid, support for that Route rule should be dropped to ensure consistency. For example, even if a filter specified by a Route rule is invalid, the rest of the rules within that Route should still be supported.\n\nSupport: Core",
+							Description: "AllowedRoutes defines the types of routes that MAY be attached to a Listener and the trusted namespaces where those Route resources MAY be present.\n\nAlthough a client request may match multiple route rules, only one rule may ultimately receive the request. Matching precedence MUST be determined in order of the following criteria:\n\n* The most specific match as defined by the Route type. * The oldest Route based on creation timestamp. For example, a Route with\n  a creation timestamp of \"2020-09-08 01:02:03\" is given precedence over\n  a Route with a creation timestamp of \"2020-09-08 01:02:04\".\n* If everything else is equivalent, the Route appearing first in\n  alphabetical order (namespace/name) should be given precedence. For\n  example, foo/bar is given precedence over foo/baz.\n\nAll valid rules within a Route attached to this Listener should be implemented. Invalid Route rules can be ignored (sometimes that will mean the full Route). If a Route rule transitions from valid to invalid, support for that Route rule should be dropped to ensure consistency. For example, even if a filter specified by a Route rule is invalid, the rest of the rules within that Route should still be supported.",
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.AllowedRoutes"),
 						},
 					},
