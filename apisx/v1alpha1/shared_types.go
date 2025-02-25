@@ -39,6 +39,8 @@ type (
 	RouteGroupKind = v1.RouteGroupKind
 	// +k8s:deepcopy-gen=false
 	SectionName = v1.SectionName
+	// +k8s:deepcopy-gen=false
+	Namespace = v1.Namespace
 )
 
 // ParentGatewayReference identifies an API object including its namespace,
@@ -58,4 +60,11 @@ type ParentGatewayReference struct {
 
 	// Name is the name of the referent.
 	Name ObjectName `json:"name"`
+
+	// Namespace is the namespace of the referent.  If not present,
+	// the namespace of the referent is assumed to be the same as
+	// the namespace of the referring object.
+	//
+	// +optional
+	Namespace *Namespace `json:"namespace,omitempty"`
 }

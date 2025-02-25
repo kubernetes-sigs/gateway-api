@@ -25,9 +25,10 @@ import (
 // ParentGatewayReferenceApplyConfiguration represents a declarative configuration of the ParentGatewayReference type for use
 // with apply.
 type ParentGatewayReferenceApplyConfiguration struct {
-	Group *v1.Group      `json:"group,omitempty"`
-	Kind  *v1.Kind       `json:"kind,omitempty"`
-	Name  *v1.ObjectName `json:"name,omitempty"`
+	Group     *v1.Group      `json:"group,omitempty"`
+	Kind      *v1.Kind       `json:"kind,omitempty"`
+	Name      *v1.ObjectName `json:"name,omitempty"`
+	Namespace *v1.Namespace  `json:"namespace,omitempty"`
 }
 
 // ParentGatewayReferenceApplyConfiguration constructs a declarative configuration of the ParentGatewayReference type for use with
@@ -57,5 +58,13 @@ func (b *ParentGatewayReferenceApplyConfiguration) WithKind(value v1.Kind) *Pare
 // If called multiple times, the Name field is set to the value of the last call.
 func (b *ParentGatewayReferenceApplyConfiguration) WithName(value v1.ObjectName) *ParentGatewayReferenceApplyConfiguration {
 	b.Name = &value
+	return b
+}
+
+// WithNamespace sets the Namespace field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the Namespace field is set to the value of the last call.
+func (b *ParentGatewayReferenceApplyConfiguration) WithNamespace(value v1.Namespace) *ParentGatewayReferenceApplyConfiguration {
+	b.Namespace = &value
 	return b
 }
