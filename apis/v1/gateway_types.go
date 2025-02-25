@@ -223,6 +223,8 @@ type GatewaySpec struct {
 	// Implementations MAY merge separate Gateways onto a single set of
 	// Addresses if all Listeners across all Gateways are compatible.
 	//
+	// In a future release the MinItems=1 requirement MAY be dropped.
+	//
 	// Support: Core
 	//
 	// +listType=map
