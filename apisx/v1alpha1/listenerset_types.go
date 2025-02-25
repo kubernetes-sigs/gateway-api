@@ -47,7 +47,7 @@ type ListenerSet struct {
 // ListenerSetSpec defines the desired state of a ListenerSet.
 type ListenerSetSpec struct {
 	// ParentRef references the Gateway that the listeners are attached to.
-	ParentRef ParentGatewayReference `json:"parentRef,omitempty"`
+	ParentRef ParentGatewayReference `json:"parentRef"`
 
 	// Listeners associated with this ListenerSet. Listeners define
 	// logical endpoints that are bound on this referenced parent Gateway's addresses.

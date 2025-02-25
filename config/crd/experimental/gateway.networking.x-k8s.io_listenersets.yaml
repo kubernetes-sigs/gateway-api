@@ -581,6 +581,7 @@ spec:
                 type: object
             required:
             - listeners
+            - parentRef
             type: object
           status:
             default:

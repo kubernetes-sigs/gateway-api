@@ -7939,7 +7939,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerSetSpec(ref common.Refe
 						},
 					},
 				},
-				Required: []string{"listeners"},
+				Required: []string{"parentRef", "listeners"},
 			},
 		},
 		Dependencies: []string{
