@@ -291,6 +291,7 @@ const (
 	// Possible reasons for this condition to be False are:
 	//
 	// * "Invalid"
+	// * "ParentNotProgrammed"
 	//
 	// Additional reasons for this condition to be False are influenced by
 	// child ListenerEntry conditions:
