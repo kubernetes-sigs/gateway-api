@@ -1,7 +1,7 @@
 # GEP-3567: Gateway TLS Updates for HTTP/2 Connection Coalescing
 
 * Issue: [#3567](https://github.com/kubernetes-sigs/gateway-api/issues/3567)
-* Status: Implementable
+* Status: Experimental
 
 ## TLDR
 
@@ -40,7 +40,9 @@ the client sends.
 
 Gateway API deals with this situation imprecisely, stating:
 
-    The Listener Hostname SHOULD match at both the TLS and HTTP protocol layers as described above. If an implementation does not ensure that both the SNI and Host header match the Listener hostname, it MUST clearly document that.
+    The Listener Hostname SHOULD match at both the TLS and HTTP protocol layers
+    as described above. If an implementation does not ensure that both the SNI
+    and Host header match the Listener hostname, it MUST clearly document that.
 
 In practice we can end up with an implementation that misroutes requests when a
 Gateway is configured using certificates that use multiple or wildcard SANs.
@@ -119,7 +121,7 @@ A new condition will be added to Gateways: `OverlappingTLSConfig`.
 Implementations MUST add this condition to status when a Gateway is configured
 with TLS configuration across multiple Listeners. Implementations MAY add this
 condition to status when a Gateway is configured with overlapping TLS
-certifications. Note that since this is a negative polarity condition, it would
+certificates. Note that since this is a negative polarity condition, it would
 only be populated when it is true.
 
 ### B) Modify API Spec to recommend sending 421s
