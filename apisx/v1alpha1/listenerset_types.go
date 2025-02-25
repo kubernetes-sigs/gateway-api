@@ -59,7 +59,7 @@ type ListenerSetSpec struct {
 	//
 	// Implementations MUST treat the parent Gateway as having the merged
 	// list of all listeners from itself and attached ListenerSets using
-	// the following precendence:
+	// the following precedence:
 	//
 	// 1. "parent" Gateway
 	// 2. ListenerSet ordered by creation time (oldest first)
