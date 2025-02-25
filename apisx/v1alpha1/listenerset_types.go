@@ -189,8 +189,8 @@ type ListenerEntry struct {
 type ListenerSetStatus struct {
 	// Conditions describe the current conditions of the ListenerSet.
 	//
-	// Implementations should prefer to express ListenerSet conditions
-	// using the `ListenerSetConditionType` and `ListenerSetConditionReason`
+	// Implementations MUST express ListenerSet conditions using the
+	// `ListenerSetConditionType` and `ListenerSetConditionReason`
 	// constants so that operators and tools can converge on a common
 	// vocabulary to describe ListenerSet state.
 	//

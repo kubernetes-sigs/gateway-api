@@ -7963,7 +7963,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerSetStatus(ref common.Re
 							},
 						},
 						SchemaProps: spec.SchemaProps{
-							Description: "Conditions describe the current conditions of the ListenerSet.\n\nImplementations should prefer to express ListenerSet conditions using the `ListenerSetConditionType` and `ListenerSetConditionReason` constants so that operators and tools can converge on a common vocabulary to describe ListenerSet state.\n\nKnown condition types are:\n\n* \"Accepted\" * \"Programmed\"",
+							Description: "Conditions describe the current conditions of the ListenerSet.\n\nImplementations MUST express ListenerSet conditions using the `ListenerSetConditionType` and `ListenerSetConditionReason` constants so that operators and tools can converge on a common vocabulary to describe ListenerSet state.\n\nKnown condition types are:\n\n* \"Accepted\" * \"Programmed\"",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
