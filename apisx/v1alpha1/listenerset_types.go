@@ -95,8 +95,6 @@ type ListenerEntry struct {
 	// Name is not required to be unique across a Gateway and ListenerSets.
 	// Routes can attach to a Listener by having a ListenerSet as a parentRef
 	// and setting the SectionName
-	//
-	// Support: Core
 	Name SectionName `json:"name"`
 
 	// Hostname specifies the virtual hostname to match for protocol types that
@@ -124,22 +122,16 @@ type ListenerEntry struct {
 	// as a suffix match. That means that a match for `*.example.com` would match
 	// both `test.example.com`, and `foo.test.example.com`, but not `example.com`.
 	//
-	// Support: Core
-	//
 	// +optional
 	Hostname *Hostname `json:"hostname,omitempty"`
 
 	// Port is the network port. Multiple listeners may use the
 	// same port, subject to the Listener compatibility rules.
 	//
-	// Support: Core
-	//
 	// +optional
 	Port PortNumber `json:"port,omitempty"`
 
 	// Protocol specifies the network protocol this listener expects to receive.
-	//
-	// Support: Core
 	Protocol ProtocolType `json:"protocol"`
 
 	// TLS is the TLS configuration for the Listener. This field is required if
@@ -151,8 +143,6 @@ type ListenerEntry struct {
 	//
 	// The GatewayClass MUST use the longest matching SNI out of all
 	// available certificates for any TLS handshake.
-	//
-	// Support: Core
 	//
 	// +optional
 	TLS *GatewayTLSConfig `json:"tls,omitempty"`
@@ -180,7 +170,6 @@ type ListenerEntry struct {
 	// example, even if a filter specified by a Route rule is invalid, the rest
 	// of the rules within that Route should still be supported.
 	//
-	// Support: Core
 	// +kubebuilder:default={namespaces:{from: Same}}
 	// +optional
 	AllowedRoutes *AllowedRoutes `json:"allowedRoutes,omitempty"`

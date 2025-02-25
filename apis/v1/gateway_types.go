@@ -318,10 +318,8 @@ type ListenerNamespaces struct {
 	From *FromNamespaces `json:"from,omitempty"`
 
 	// Selector must be specified when From is set to "Selector". In that case,
-	// only Routes in Namespaces matching this Selector will be selected by this
+	// only ListenerSets in Namespaces matching this Selector will be selected by this
 	// Gateway. This field is ignored for other values of "From".
-	//
-	// Support: Core
 	//
 	// +optional
 	Selector *metav1.LabelSelector `json:"selector,omitempty"`

@@ -114,8 +114,6 @@ spec:
                         support for that Route rule should be dropped to ensure consistency. For
                         example, even if a filter specified by a Route rule is invalid, the rest
                         of the rules within that Route should still be supported.
-
-                        Support: Core
                       properties:
                         kinds:
                           description: |-
@@ -257,8 +255,6 @@ spec:
                         Hostnames that are prefixed with a wildcard label (`*.`) are interpreted
                         as a suffix match. That means that a match for `*.example.com` would match
                         both `test.example.com`, and `foo.test.example.com`, but not `example.com`.
-
-                        Support: Core
                       maxLength: 253
                       minLength: 1
                       pattern: ^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
@@ -271,8 +267,6 @@ spec:
                         Name is not required to be unique across a Gateway and ListenerSets.
                         Routes can attach to a Listener by having a ListenerSet as a parentRef
                         and setting the SectionName
-
-                        Support: Core
                       maxLength: 253
                       minLength: 1
                       pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
@@ -281,17 +275,13 @@ spec:
                       description: |-
                         Port is the network port. Multiple listeners may use the
                         same port, subject to the Listener compatibility rules.
-
-                        Support: Core
                       format: int32
                       maximum: 65535
                       minimum: 1
                       type: integer
                     protocol:
-                      description: |-
-                        Protocol specifies the network protocol this listener expects to receive.
-
-                        Support: Core
+                      description: Protocol specifies the network protocol this listener
+                        expects to receive.
                       maxLength: 255
                       minLength: 1
                       pattern: ^[a-zA-Z0-9]([-a-zA-Z0-9]*[a-zA-Z0-9])?$|[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/[A-Za-z0-9]+$
@@ -307,8 +297,6 @@ spec:
 
                         The GatewayClass MUST use the longest matching SNI out of all
                         available certificates for any TLS handshake.
-
-                        Support: Core
                       properties:
                         certificateRefs:
                           description: |-
