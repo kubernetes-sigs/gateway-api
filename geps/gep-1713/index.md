@@ -1,7 +1,7 @@
 # GEP-1713: ListenerSets - Standard Mechanism to Merge Multiple Gateways
 
 * Issue: [#1713](/kubernetes-sigs/gateway-api/issues/1713)
-* Status: Provisional
+* Status: Experimental
 
 ((See status definitions [here](/geps/overview/#gep-states).)
 
