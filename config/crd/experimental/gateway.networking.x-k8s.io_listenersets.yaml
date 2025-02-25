@@ -576,6 +576,15 @@ spec:
                     maxLength: 253
                     minLength: 1
                     type: string
+                  namespace:
+                    description: |-
+                      Namespace is the namespace of the referent.  If not present,
+                      the namespace of the referent is assumed to be the same as
+                      the namespace of the referring object.
+                    maxLength: 63
+                    minLength: 1
+                    pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                    type: string
                 required:
                 - name
                 type: object
