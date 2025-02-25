@@ -54,94 +54,12 @@ spec:
             description: Spec defines the desired state of BackendLBPolicy.
             properties:
               sessionPersistence:
+                $ref: '#/definitions/sigs.k8s.io~1gateway-api~1apis~1v1~0SessionPersistence'
                 description: |-
                   SessionPersistence defines and configures session persistence
                   for the backend.
 
                   Support: Extended
-                properties:
-                  absoluteTimeout:
-                    description: |-
-                      AbsoluteTimeout defines the absolute timeout of the persistent
-                      session. Once the AbsoluteTimeout duration has elapsed, the
-                      session becomes invalid.
-
-                      Support: Extended
-                    pattern: ^([0-9]{1,5}(h|m|s|ms)){1,4}$
-                    type: string
-                  cookieConfig:
-                    description: |-
-                      CookieConfig provides configuration settings that are specific
-                      to cookie-based session persistence.
-
-                      Support: Core
-                    properties:
-                      lifetimeType:
-                        default: Session
-                        description: |-
-                          LifetimeType specifies whether the cookie has a permanent or
-                          session-based lifetime. A permanent cookie persists until its
-                          specified expiry time, defined by the Expires or Max-Age cookie
-                          attributes, while a session cookie is deleted when the current
-                          session ends.
-
-                          When set to "Permanent", AbsoluteTimeout indicates the
-                          cookie's lifetime via the Expires or Max-Age cookie attributes
-                          and is required.
-
-                          When set to "Session", AbsoluteTimeout indicates the
-                          absolute lifetime of the cookie tracked by the gateway and
-                          is optional.
-
-                          Defaults to "Session".
-
-                          Support: Core for "Session" type
-
-                          Support: Extended for "Permanent" type
-                        enum:
-                        - Permanent
-                        - Session
-                        type: string
-                    type: object
-                  idleTimeout:
-                    description: |-
-                      IdleTimeout defines the idle timeout of the persistent session.
-                      Once the session has been idle for more than the specified
-                      IdleTimeout duration, the session becomes invalid.
-
-                      Support: Extended
-                    pattern: ^([0-9]{1,5}(h|m|s|ms)){1,4}$
-                    type: string
-                  sessionName:
-                    description: |-
-                      SessionName defines the name of the persistent session token
-                      which may be reflected in the cookie or the header. Users
-                      should avoid reusing session names to prevent unintended
-                      consequences, such as rejection or unpredictable behavior.
-
-                      Support: Implementation-specific
-                    maxLength: 128
-                    type: string
-                  type:
-                    default: Cookie
-                    description: |-
-                      Type defines the type of session persistence such as through
-                      the use a header or cookie. Defaults to cookie based session
-                      persistence.
-
-                      Support: Core for "Cookie" type
-
-                      Support: Extended for "Header" type
-                    enum:
-                    - Cookie
-                    - Header
-                    type: string
-                type: object
-                x-kubernetes-validations:
-                - message: AbsoluteTimeout must be specified when cookie lifetimeType
-                    is Permanent
-                  rule: '!has(self.cookieConfig) || !has(self.cookieConfig.lifetimeType)
-                    || self.cookieConfig.lifetimeType != ''Permanent'' || has(self.absoluteTimeout)'
               targetRefs:
                 description: |-
                   TargetRef identifies an API object to apply policy to.
@@ -157,21 +75,14 @@ spec:
                     the policy attachment documentation for Gateway API.
                   properties:
                     group:
+                      $ref: '#/definitions/sigs.k8s.io~1gateway-api~1apis~1v1~0Group'
                       description: Group is the group of the target resource.
-                      maxLength: 253
-                      pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
-                      type: string
                     kind:
+                      $ref: '#/definitions/sigs.k8s.io~1gateway-api~1apis~1v1~0Kind'
                       description: Kind is kind of the target resource.
-                      maxLength: 63
-                      minLength: 1
-                      pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
-                      type: string
                     name:
+                      $ref: '#/definitions/sigs.k8s.io~1gateway-api~1apis~1v1~0ObjectName'
                       description: Name is the name of the target resource.
-                      maxLength: 253
-                      minLength: 1
-                      type: string
                   required:
                   - group
                   - kind
@@ -256,142 +167,10 @@ spec:
                     with a composite key made up of the AncestorRef and the ControllerName.
                   properties:
                     ancestorRef:
+                      $ref: '#/definitions/sigs.k8s.io~1gateway-api~1apis~1v1~0ParentReference'
                       description: |-
                         AncestorRef corresponds with a ParentRef in the spec that this
                         PolicyAncestorStatus struct describes the status of.
-                      properties:
-                        group:
-                          default: gateway.networking.k8s.io
-                          description: |-
-                            Group is the group of the referent.
-                            When unspecified, "gateway.networking.k8s.io" is inferred.
-                            To set the core API group (such as for a "Service" kind referent),
-                            Group must be explicitly set to "" (empty string).
-
-                            Support: Core
-                          maxLength: 253
-                          pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
-                          type: string
-                        kind:
-                          default: Gateway
-                          description: |-
-                            Kind is kind of the referent.
-
-                            There are two kinds of parent resources with "Core" support:
-
-                            * Gateway (Gateway conformance profile)
-                            * Service (Mesh conformance profile, ClusterIP Services only)
-
-                            Support for other resources is Implementation-Specific.
-                          maxLength: 63
-                          minLength: 1
-                          pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
-                          type: string
-                        name:
-                          description: |-
-                            Name is the name of the referent.
-
-                            Support: Core
-                          maxLength: 253
-                          minLength: 1
-                          type: string
-                        namespace:
-                          description: |-
-                            Namespace is the namespace of the referent. When unspecified, this refers
-                            to the local namespace of the Route.
-
-                            Note that there are specific rules for ParentRefs which cross namespace
-                            boundaries. Cross-namespace references are only valid if they are explicitly
-                            allowed by something in the namespace they are referring to. For example:
-                            Gateway has the AllowedRoutes field, and ReferenceGrant provides a
-                            generic way to enable any other kind of cross-namespace reference.
-
-
-                            ParentRefs from a Route to a Service in the same namespace are "producer"
-                            routes, which apply default routing rules to inbound connections from
-                            any namespace to the Service.
-
-                            ParentRefs from a Route to a Service in a different namespace are
-                            "consumer" routes, and these routing rules are only applied to outbound
-                            connections originating from the same namespace as the Route, for which
-                            the intended destination of the connections are a Service targeted as a
-                            ParentRef of the Route.
-
-
-                            Support: Core
-                          maxLength: 63
-                          minLength: 1
-                          pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
-                          type: string
-                        port:
-                          description: |-
-                            Port is the network port this Route targets. It can be interpreted
-                            differently based on the type of parent resource.
-
-                            When the parent resource is a Gateway, this targets all listeners
-                            listening on the specified port that also support this kind of Route(and
-                            select this Route). It's not recommended to set `Port` unless the
-                            networking behaviors specified in a Route must apply to a specific port
-                            as opposed to a listener(s) whose port(s) may be changed. When both Port
-                            and SectionName are specified, the name and port of the selected listener
-                            must match both specified values.
-
-
-                            When the parent resource is a Service, this targets a specific port in the
-                            Service spec. When both Port (experimental) and SectionName are specified,
-                            the name and port of the selected port must match both specified values.
-
-
-                            Implementations MAY choose to support other parent resources.
-                            Implementations supporting other types of parent resources MUST clearly
-                            document how/if Port is interpreted.
-
-                            For the purpose of status, an attachment is considered successful as
-                            long as the parent resource accepts it partially. For example, Gateway
-                            listeners can restrict which Routes can attach to them by Route kind,
-                            namespace, or hostname. If 1 of 2 Gateway listeners accept attachment
-                            from the referencing Route, the Route MUST be considered successfully
-                            attached. If no Gateway listeners accept attachment from this Route,
-                            the Route MUST be considered detached from the Gateway.
-
-                            Support: Extended
-                          format: int32
-                          maximum: 65535
-                          minimum: 1
-                          type: integer
-                        sectionName:
-                          description: |-
-                            SectionName is the name of a section within the target resource. In the
-                            following resources, SectionName is interpreted as the following:
-
-                            * Gateway: Listener name. When both Port (experimental) and SectionName
-                            are specified, the name and port of the selected listener must match
-                            both specified values.
-                            * Service: Port name. When both Port (experimental) and SectionName
-                            are specified, the name and port of the selected listener must match
-                            both specified values.
-
-                            Implementations MAY choose to support attaching Routes to other resources.
-                            If that is the case, they MUST clearly document how SectionName is
-                            interpreted.
-
-                            When unspecified (empty string), this will reference the entire resource.
-                            For the purpose of status, an attachment is considered successful if at
-                            least one section in the parent resource accepts it. For example, Gateway
-                            listeners can restrict which Routes can attach to them by Route kind,
-                            namespace, or hostname. If 1 of 2 Gateway listeners accept attachment from
-                            the referencing Route, the Route MUST be considered successfully
-                            attached. If no Gateway listeners accept attachment from this Route, the
-                            Route MUST be considered detached from the Gateway.
-
-                            Support: Core
-                          maxLength: 253
-                          minLength: 1
-                          pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
-                          type: string
-                      required:
-                      - name
-                      type: object
                     conditions:
                       description: Conditions describes the status of the Policy with
                         respect to the given Ancestor.
@@ -457,6 +236,7 @@ spec:
                       - type
                       x-kubernetes-list-type: map
                     controllerName:
+                      $ref: '#/definitions/sigs.k8s.io~1gateway-api~1apis~1v1~0GatewayController'
                       description: |-
                         ControllerName is a domain/path string that indicates the name of the
                         controller that wrote this status. This corresponds with the
@@ -471,10 +251,6 @@ spec:
                         Controllers MUST populate this field when writing status. Controllers should ensure that
                         entries to status populated with their ControllerName are cleaned up when they are no
                         longer necessary.
-                      maxLength: 253
-                      minLength: 1
-                      pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/[A-Za-z0-9\/\-._~%!$&'()*+,;=:]+$
-                      type: string
                   required:
                   - ancestorRef
                   - controllerName
