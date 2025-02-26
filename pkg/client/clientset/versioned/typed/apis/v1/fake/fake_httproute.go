@@ -28,8 +28,8 @@ import (
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
 	testing "k8s.io/client-go/testing"
-	apisv1 "sigs.k8s.io/gateway-api/apis/applyconfiguration/apis/v1"
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
+	apisv1 "sigs.k8s.io/gateway-api/applyconfiguration/apis/v1"
 )
 
 // FakeHTTPRoutes implements HTTPRouteInterface

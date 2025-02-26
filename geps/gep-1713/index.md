@@ -1,7 +1,7 @@
 # GEP-1713: ListenerSets - Standard Mechanism to Merge Multiple Gateways
 
 * Issue: [#1713](/kubernetes-sigs/gateway-api/issues/1713)
-* Status: Provisional
+* Status: Experimental
 
 ((See status definitions [here](/geps/overview/#gep-states).)
 
@@ -60,8 +60,7 @@ type GatewaySpec struct {
 }
 
 type AllowedListeners struct {
-	// TODO - discuss changing this to Same in the future
-	// +kubebuilder:default={from: None}
+	// +kubebuilder:default={from:Same}
 	Namespaces *ListenerNamespaces `json:"namespaces,omitempty"`
 }
 
@@ -71,12 +70,21 @@ type ListenerNamespaces struct {
 	// values are:
 	//
 	// * Same: Only ListenerSets in the same namespace may be attached to this Gateway.
+	// * Selector: ListenerSets in namespaces selected by the selector may be attached to this Gateway.:w
+	// * All: ListenerSets in all namespaces may be attached to this Gateway.
 	// * None: Only listeners defined in the Gateway's spec are allowed
 	//
 	// +optional
-	// +kubebuilder:default=Same
-	// +kubebuilder:validation:Enum=Same;None
+	// +kubebuilder:default=None
+	// +kubebuilder:validation:Enum=Same;None;Selector;All
 	From *FromNamespaces `json:"from,omitempty"`
+
+	// Selector must be specified when From is set to "Selector". In that case,
+	// only ListenerSets in Namespaces matching this Selector will be selected by this
+	// Gateway. This field is ignored for other values of "From".
+	//
+	// +optional
+	Selector *metav1.LabelSelector `json:"selector,omitempty"`
 }
 
 // ListenerSet defines a set of additional listeners to attach to an existing Gateway.
@@ -94,7 +102,7 @@ type ListenerSet struct {
 // ListenerSetSpec defines the desired state of a ListenerSet.
 type ListenerSetSpec struct {
 	// ParentRef references the Gateway that the listeners are attached to.
-	ParentRef ParentGatewayReference `json:"parentRef,omitempty"`
+	ParentRef ParentGatewayReference `json:"parentRef"`
 
 	// Listeners associated with this ListenerSet. Listeners define
 	// logical endpoints that are bound on this referenced parent Gateway's addresses.
@@ -119,9 +127,11 @@ type ListenerSetSpec struct {
 // network connections.
 type ListenerEntry struct {
 	// Name is the name of the Listener. This name MUST be unique within a
-	// Gateway.
+	// ListenerSet.
 	//
-	// Support: Core
+	// Name is not required to be unique across a Gateway and ListenerSets.
+	// Routes can attach to a Listener by having a ListenerSet as a parentRef
+	// and setting the SectionName
 	Name SectionName `json:"name"`
 
 	// Hostname specifies the virtual hostname to match for protocol types that
@@ -148,8 +158,6 @@ type ListenerEntry struct {
 	// Hostnames that are prefixed with a wildcard label (`*.`) are interpreted
 	// as a suffix match. That means that a match for `*.example.com` would match
 	// both `test.example.com`, and `foo.test.example.com`, but not `example.com`.
-	//
-	// Support: Core
 	//
 	// +optional
 	Hostname *Hostname `json:"hostname,omitempty"`
@@ -310,6 +318,10 @@ type ParentGatewayReference struct {
 
 	// Name is the name of the referent.
 	Name ObjectName `json:"name"`
+
+	// Namespace is the name of the referent.
+	// +optional
+	Name *ObjectName `json:"namespace"`
 }
 ```
 
@@ -527,14 +539,14 @@ Valid reasons for `Accepted` being `False` are:
 
 - `NotAllowed` - the `parentRef` doesn't allow attachment
 - `ParentNotAccepted` - the `parentRef` isn't accepted (eg. invalid address)
-- `UnsupportedValue` - a listener in the set is using an unsupported feature/value
+- `ListenersNotValid` - one or more listeners in the set are invalid (or using an unsupported feature)
 
 The `Programmed` condition MUST be set on every `ListenerSet` and have a similar meaning to the Gateway `Programmed` condition but only reflect the listeners in this `ListenerSet`.
 
-`Accepted` and `Programmed` conditions when surfacing details about listeners, MUST only summarize the `status.parents.listeners` conditions that are exclusive to the `ListenerSet`.
+`Accepted` and `Programmed` conditions when surfacing details about listeners, MUST only summarize the `status.listeners` conditions that are exclusive to the `ListenerSet`.
 An exception to this is when the parent `Gateway`'s `Accepted` or `Programmed` conditions transition to `False`
 
-`ListenerSets` MUST NOT have their parent `Gateway`'s' listeners in the associated `status.parents.listeners` conditions list.
+`ListenerSets` MUST NOT have their parent `Gateway`'s' listeners in the associated `status.listeners` conditions list.
 
 ### ListenerConditions within a ListenerSet
 
