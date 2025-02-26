@@ -6,10 +6,13 @@
 ## TLDR
 
 Gateway API enables advanced traffic routing and can be used to expose a 
-logical set of pods on a single IP address within a cluster. It can be seen 
-as the next generation ClusterIP providing more flexibility and composability 
-than Service API. This comes at the expense of some additional configuration 
-and manageability burden.
+logical set of pods on a single IP address within a cluster. With some changes,
+it could be used as a next generation ClusterIP Service replacement,
+providing more flexibility and composability than the existing Service API.
+
+This comes at the expense of some additional configuration 
+and manageability burden, but we believe that the additional value
+gained is worth the cost.
 
 ## Goals
 
