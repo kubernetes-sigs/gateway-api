@@ -5,6 +5,7 @@ name: Percentage-based Request Mirroring
 status: Standard
 authors:
   - jakebennert
+  - LiorLieberman
 references:
   - https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io%2fv1.HTTPRequestMirrorFilter
   - https://github.com/kubernetes-sigs/gateway-api/pull/3199
