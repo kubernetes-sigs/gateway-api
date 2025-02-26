@@ -485,7 +485,7 @@ func TestValidateGateway(t *testing.T) {
 		{
 			desc: "ip address and hostname in addresses are valid",
 			mutate: func(gw *gatewayv1.Gateway) {
-				gw.Spec.Addresses = []gatewayv1.GatewayAddress{
+				gw.Spec.Addresses = []gatewayv1.GatewaySpecAddress{
 					{
 						Type:  ptrTo(gatewayv1.IPAddressType),
 						Value: "1.2.3.4",
@@ -504,7 +504,7 @@ func TestValidateGateway(t *testing.T) {
 		{
 			desc: "ip address and hostname in addresses are invalid",
 			mutate: func(gw *gatewayv1.Gateway) {
-				gw.Spec.Addresses = []gatewayv1.GatewayAddress{
+				gw.Spec.Addresses = []gatewayv1.GatewaySpecAddress{
 					{
 						Type:  ptrTo(gatewayv1.IPAddressType),
 						Value: "1.2.3.4:8080",
@@ -563,7 +563,7 @@ func TestValidateGateway(t *testing.T) {
 		{
 			desc: "duplicate ip address or hostname",
 			mutate: func(gw *gatewayv1.Gateway) {
-				gw.Spec.Addresses = []gatewayv1.GatewayAddress{
+				gw.Spec.Addresses = []gatewayv1.GatewaySpecAddress{
 					{
 						Type:  ptrTo(gatewayv1.IPAddressType),
 						Value: "1.2.3.4",
