@@ -140,7 +140,6 @@ nav:
       - geps/gep-2162/index.md
       - geps/gep-2649/index.md
       - geps/gep-3155/index.md
-      - geps/gep-3171/index.md
     - Standard:
       - geps/gep-709/index.md
       - geps/gep-718/index.md
@@ -161,6 +160,7 @@ nav:
       - geps/gep-1867/index.md
       - geps/gep-1911/index.md
       - geps/gep-2257/index.md
+      - geps/gep-3171/index.md
     - Memorandum:
       - geps/gep-713/index.md
       - geps/gep-917/index.md
