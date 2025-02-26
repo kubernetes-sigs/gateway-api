@@ -3,7 +3,7 @@
 * Issue: [#3388](https://github.com/kubernetes-sigs/gateway-api/issues/3388)
 * Status: Implementable
 
-(See status definitions [here](/geps/overview/#gep-states).)
+(See [status definitions](/geps/overview/#gep-states).)
 
 ## TLDR
 

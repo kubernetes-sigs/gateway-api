@@ -3,7 +3,7 @@
 * Issue: [#1713](/kubernetes-sigs/gateway-api/issues/1713)
 * Status: Provisional
 
-((See status definitions [here](/geps/overview/#gep-states).)
+(See [status definitions](/geps/overview/#gep-states).)
 
 ## Introduction
 
@@ -14,7 +14,7 @@ The `Gateway` Resource is a point of contention since it is the only place to at
 
 ## Future Potential Goals (Beyond the GEP)
 
-From [Gateway Hiearchy Brainstorming](https://docs.google.com/document/d/1qj7Xog2t2fWRuzOeTsWkabUaVeOF7_2t_7appe8EXwA/edit#heading=h.w311n4l5qmwk):
+From [Gateway Hierarchy Brainstorming](https://docs.google.com/document/d/1qj7Xog2t2fWRuzOeTsWkabUaVeOF7_2t_7appe8EXwA/edit#heading=h.w311n4l5qmwk):
 
 - Attaching listeners to `Gateways` in different namespaces
 - Standardize merging multiple lists of Listeners together ([\#1863](https://github.com/kubernetes-sigs/gateway-api/pull/1863))
@@ -562,7 +562,7 @@ The main downside of this approach is that users still require `Gateway` write a
 
 ### New 'GatewayGroup' Resource
 
-This was proposed in the Gateway Hiearchy Brainstorming document (see references below). The idea is to introduce a central resource that will coalease Gateways together and offer forms of delegation.
+This was proposed in the Gateway Hierarchy Brainstorming document (see references below). The idea is to introduce a central resource that will coalesce Gateways together and offer forms of delegation.
 
 Issues with this is complexity with status propagation, cluster vs. namespace scoping etc. It also lacks a migration path for existing Gateways to help shard listeners.
 
@@ -579,7 +579,7 @@ For workloads like Knative we can have O(1000) Services on the cluster with uniq
 
 For workloads with many certificates one option would be to introduce a `tls` stanza somewhere in the Route types. These Routes would then attach to a single Gateway. Then application operators can provide their own certificates. This probably would require some ability to have a handshake agreement with the Gateway.
 
-Sorta related there was a Route Delegation GEP (https://github.com/kubernetes-sigs/gateway-api/issues/1058) that was abandoned
+Somewhat related, there was a Route Delegation GEP (https://github.com/kubernetes-sigs/gateway-api/issues/1058) that was abandoned
 
 ## References
 
