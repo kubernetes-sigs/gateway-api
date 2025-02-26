@@ -78,14 +78,15 @@ spec:
                     kinds.
                   properties:
                     group:
-                      $ref: '#/definitions/sigs.k8s.io~1gateway-api~1apis~1v1~0Group'
                       description: |-
                         Group is the group of the referent.
                         When empty, the Kubernetes core API group is inferred.
 
                         Support: Core
+                      maxLength: 253
+                      pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+                      type: string
                     kind:
-                      $ref: '#/definitions/sigs.k8s.io~1gateway-api~1apis~1v1~0Kind'
                       description: |-
                         Kind is the kind of the referent. Although implementations may support
                         additional resources, the following types are part of the "Core"
@@ -102,12 +103,19 @@ spec:
                         * TCPRoute
                         * TLSRoute
                         * UDPRoute
+                      maxLength: 63
+                      minLength: 1
+                      pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
+                      type: string
                     namespace:
-                      $ref: '#/definitions/sigs.k8s.io~1gateway-api~1apis~1v1~0Namespace'
                       description: |-
                         Namespace is the namespace of the referent.
 
                         Support: Core
+                      maxLength: 63
+                      minLength: 1
+                      pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                      type: string
                   required:
                   - group
                   - kind
@@ -130,14 +138,15 @@ spec:
                     references.
                   properties:
                     group:
-                      $ref: '#/definitions/sigs.k8s.io~1gateway-api~1apis~1v1~0Group'
                       description: |-
                         Group is the group of the referent.
                         When empty, the Kubernetes core API group is inferred.
 
                         Support: Core
+                      maxLength: 253
+                      pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+                      type: string
                     kind:
-                      $ref: '#/definitions/sigs.k8s.io~1gateway-api~1apis~1v1~0Kind'
                       description: |-
                         Kind is the kind of the referent. Although implementations may support
                         additional resources, the following types are part of the "Core"
@@ -145,12 +154,18 @@ spec:
 
                         * Secret when used to permit a SecretObjectReference
                         * Service when used to permit a BackendObjectReference
+                      maxLength: 63
+                      minLength: 1
+                      pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
+                      type: string
                     name:
-                      $ref: '#/definitions/sigs.k8s.io~1gateway-api~1apis~1v1~0ObjectName'
                       description: |-
                         Name is the name of the referent. When unspecified, this policy
                         refers to all resources of the specified Group and Kind in the local
                         namespace.
+                      maxLength: 253
+                      minLength: 1
+                      type: string
                   required:
                   - group
                   - kind

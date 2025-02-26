@@ -55,7 +55,14 @@ spec:
             properties:
               options:
                 additionalProperties:
-                  $ref: '#/definitions/sigs.k8s.io~1gateway-api~1apis~1v1~0AnnotationValue'
+                  description: |-
+                    AnnotationValue is the value of an annotation in Gateway API. This is used
+                    for validation of maps such as TLS options. This roughly matches Kubernetes
+                    annotation validation, although the length validation in that case is based
+                    on the entire size of the annotations struct.
+                  maxLength: 4096
+                  minLength: 0
+                  type: string
                 description: |-
                   Options are a list of key/value pairs to enable extended TLS
                   configuration for each implementation. For example, configuring the
@@ -102,16 +109,22 @@ spec:
                     LocalPolicyTargetReference should be used.
                   properties:
                     group:
-                      $ref: '#/definitions/sigs.k8s.io~1gateway-api~1apis~1v1~0Group'
                       description: Group is the group of the target resource.
+                      maxLength: 253
+                      pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+                      type: string
                     kind:
-                      $ref: '#/definitions/sigs.k8s.io~1gateway-api~1apis~1v1~0Kind'
                       description: Kind is kind of the target resource.
+                      maxLength: 63
+                      minLength: 1
+                      pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
+                      type: string
                     name:
-                      $ref: '#/definitions/sigs.k8s.io~1gateway-api~1apis~1v1~0ObjectName'
                       description: Name is the name of the target resource.
+                      maxLength: 253
+                      minLength: 1
+                      type: string
                     sectionName:
-                      $ref: '#/definitions/sigs.k8s.io~1gateway-api~1apis~1v1~0SectionName'
                       description: |-
                         SectionName is the name of a section within the target resource. When
                         unspecified, this targetRef targets the entire resource. In the following
@@ -124,6 +137,10 @@ spec:
                         If a SectionName is specified, but does not exist on the targeted object,
                         the Policy must fail to attach, and the policy implementation should record
                         a `ResolvedRefs` or similar Condition in the Policy's status.
+                      maxLength: 253
+                      minLength: 1
+                      pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+                      type: string
                   required:
                   - group
                   - kind
@@ -173,11 +190,43 @@ spec:
                       Support: Implementation-specific (More than one reference, or other kinds
                       of resources).
                     items:
-                      $ref: '#/definitions/sigs.k8s.io~1gateway-api~1apis~1v1~0LocalObjectReference'
+                      description: |-
+                        LocalObjectReference identifies an API object within the namespace of the
+                        referrer.
+                        The API object must be valid in the cluster; the Group and Kind must
+                        be registered in the cluster for this reference to be valid.
+
+                        References to objects with invalid Group and Kind are not valid, and must
+                        be rejected by the implementation, with appropriate Conditions set
+                        on the containing object.
+                      properties:
+                        group:
+                          description: |-
+                            Group is the group of the referent. For example, "gateway.networking.k8s.io".
+                            When unspecified or empty string, core API group is inferred.
+                          maxLength: 253
+                          pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+                          type: string
+                        kind:
+                          description: Kind is kind of the referent. For example "HTTPRoute"
+                            or "Service".
+                          maxLength: 63
+                          minLength: 1
+                          pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
+                          type: string
+                        name:
+                          description: Name is the name of the referent.
+                          maxLength: 253
+                          minLength: 1
+                          type: string
+                      required:
+                      - group
+                      - kind
+                      - name
+                      type: object
                     maxItems: 8
                     type: array
                   hostname:
-                    $ref: '#/definitions/sigs.k8s.io~1gateway-api~1apis~1v1~0PreciseHostname'
                     description: |-
                       Hostname is used for two purposes in the connection between Gateways and
                       backends:
@@ -188,6 +237,10 @@ spec:
                          backend.
 
                       Support: Core
+                    maxLength: 253
+                    minLength: 1
+                    pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+                    type: string
                   subjectAltNames:
                     description: |-
                       SubjectAltNames contains one or more Subject Alternative Names.
@@ -199,12 +252,15 @@ spec:
                       description: SubjectAltName represents Subject Alternative Name.
                       properties:
                         hostname:
-                          $ref: '#/definitions/sigs.k8s.io~1gateway-api~1apis~1v1~0Hostname'
                           description: |-
                             Hostname contains Subject Alternative Name specified in DNS name format.
                             Required when Type is set to Hostname, ignored otherwise.
 
                             Support: Core
+                          maxLength: 253
+                          minLength: 1
+                          pattern: ^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+                          type: string
                         type:
                           description: |-
                             Type determines the format of the Subject Alternative Name. Always required.
@@ -215,7 +271,6 @@ spec:
                           - URI
                           type: string
                         uri:
-                          $ref: '#/definitions/sigs.k8s.io~1gateway-api~1apis~1v1~0AbsoluteURI'
                           description: |-
                             URI contains Subject Alternative Name specified in a full URI format.
                             It MUST include both a scheme (e.g., "http" or "ftp") and a scheme-specific-part.
@@ -223,6 +278,10 @@ spec:
                             Required when Type is set to URI, ignored otherwise.
 
                             Support: Core
+                          maxLength: 253
+                          minLength: 1
+                          pattern: ^(([^:/?#]+):)(//([^/?#]*))([^?#]*)(\?([^#]*))?(#(.*))?
+                          type: string
                       required:
                       - type
                       type: object
@@ -345,10 +404,142 @@ spec:
                     with a composite key made up of the AncestorRef and the ControllerName.
                   properties:
                     ancestorRef:
-                      $ref: '#/definitions/sigs.k8s.io~1gateway-api~1apis~1v1~0ParentReference'
                       description: |-
                         AncestorRef corresponds with a ParentRef in the spec that this
                         PolicyAncestorStatus struct describes the status of.
+                      properties:
+                        group:
+                          default: gateway.networking.k8s.io
+                          description: |-
+                            Group is the group of the referent.
+                            When unspecified, "gateway.networking.k8s.io" is inferred.
+                            To set the core API group (such as for a "Service" kind referent),
+                            Group must be explicitly set to "" (empty string).
+
+                            Support: Core
+                          maxLength: 253
+                          pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+                          type: string
+                        kind:
+                          default: Gateway
+                          description: |-
+                            Kind is kind of the referent.
+
+                            There are two kinds of parent resources with "Core" support:
+
+                            * Gateway (Gateway conformance profile)
+                            * Service (Mesh conformance profile, ClusterIP Services only)
+
+                            Support for other resources is Implementation-Specific.
+                          maxLength: 63
+                          minLength: 1
+                          pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
+                          type: string
+                        name:
+                          description: |-
+                            Name is the name of the referent.
+
+                            Support: Core
+                          maxLength: 253
+                          minLength: 1
+                          type: string
+                        namespace:
+                          description: |-
+                            Namespace is the namespace of the referent. When unspecified, this refers
+                            to the local namespace of the Route.
+
+                            Note that there are specific rules for ParentRefs which cross namespace
+                            boundaries. Cross-namespace references are only valid if they are explicitly
+                            allowed by something in the namespace they are referring to. For example:
+                            Gateway has the AllowedRoutes field, and ReferenceGrant provides a
+                            generic way to enable any other kind of cross-namespace reference.
+
+
+                            ParentRefs from a Route to a Service in the same namespace are "producer"
+                            routes, which apply default routing rules to inbound connections from
+                            any namespace to the Service.
+
+                            ParentRefs from a Route to a Service in a different namespace are
+                            "consumer" routes, and these routing rules are only applied to outbound
+                            connections originating from the same namespace as the Route, for which
+                            the intended destination of the connections are a Service targeted as a
+                            ParentRef of the Route.
+
+
+                            Support: Core
+                          maxLength: 63
+                          minLength: 1
+                          pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                          type: string
+                        port:
+                          description: |-
+                            Port is the network port this Route targets. It can be interpreted
+                            differently based on the type of parent resource.
+
+                            When the parent resource is a Gateway, this targets all listeners
+                            listening on the specified port that also support this kind of Route(and
+                            select this Route). It's not recommended to set `Port` unless the
+                            networking behaviors specified in a Route must apply to a specific port
+                            as opposed to a listener(s) whose port(s) may be changed. When both Port
+                            and SectionName are specified, the name and port of the selected listener
+                            must match both specified values.
+
+
+                            When the parent resource is a Service, this targets a specific port in the
+                            Service spec. When both Port (experimental) and SectionName are specified,
+                            the name and port of the selected port must match both specified values.
+
+
+                            Implementations MAY choose to support other parent resources.
+                            Implementations supporting other types of parent resources MUST clearly
+                            document how/if Port is interpreted.
+
+                            For the purpose of status, an attachment is considered successful as
+                            long as the parent resource accepts it partially. For example, Gateway
+                            listeners can restrict which Routes can attach to them by Route kind,
+                            namespace, or hostname. If 1 of 2 Gateway listeners accept attachment
+                            from the referencing Route, the Route MUST be considered successfully
+                            attached. If no Gateway listeners accept attachment from this Route,
+                            the Route MUST be considered detached from the Gateway.
+
+                            Support: Extended
+                          format: int32
+                          maximum: 65535
+                          minimum: 1
+                          type: integer
+                        sectionName:
+                          description: |-
+                            SectionName is the name of a section within the target resource. In the
+                            following resources, SectionName is interpreted as the following:
+
+                            * Gateway: Listener name. When both Port (experimental) and SectionName
+                            are specified, the name and port of the selected listener must match
+                            both specified values.
+                            * Service: Port name. When both Port (experimental) and SectionName
+                            are specified, the name and port of the selected listener must match
+                            both specified values.
+
+                            Implementations MAY choose to support attaching Routes to other resources.
+                            If that is the case, they MUST clearly document how SectionName is
+                            interpreted.
+
+                            When unspecified (empty string), this will reference the entire resource.
+                            For the purpose of status, an attachment is considered successful if at
+                            least one section in the parent resource accepts it. For example, Gateway
+                            listeners can restrict which Routes can attach to them by Route kind,
+                            namespace, or hostname. If 1 of 2 Gateway listeners accept attachment from
+                            the referencing Route, the Route MUST be considered successfully
+                            attached. If no Gateway listeners accept attachment from this Route, the
+                            Route MUST be considered detached from the Gateway.
+
+                            Support: Core
+                          maxLength: 253
+                          minLength: 1
+                          pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+                          type: string
+                      required:
+                      - name
+                      type: object
                     conditions:
                       description: Conditions describes the status of the Policy with
                         respect to the given Ancestor.
@@ -414,7 +605,6 @@ spec:
                       - type
                       x-kubernetes-list-type: map
                     controllerName:
-                      $ref: '#/definitions/sigs.k8s.io~1gateway-api~1apis~1v1~0GatewayController'
                       description: |-
                         ControllerName is a domain/path string that indicates the name of the
                         controller that wrote this status. This corresponds with the
@@ -429,6 +619,10 @@ spec:
                         Controllers MUST populate this field when writing status. Controllers should ensure that
                         entries to status populated with their ControllerName are cleaned up when they are no
                         longer necessary.
+                      maxLength: 253
+                      minLength: 1
+                      pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/[A-Za-z0-9\/\-._~%!$&'()*+,;=:]+$
+                      type: string
                   required:
                   - ancestorRef
                   - controllerName

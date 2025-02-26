@@ -855,7 +855,7 @@ type HTTPRouteFilter struct {
 	//
 	// +optional
 	//
-	// +kubebuilder:validation:XValidation:message="Only one of percent or fraction may be specified in HTTPRequestMirrorFilter",rule="!(has(self.percent) && has(self.fraction))">
+	// +kubebuilder:validation:XValidation:message="Only one of percent or fraction may be specified in HTTPRequestMirrorFilter",rule="!(has(self.percent) && has(self.fraction))"
 	RequestMirror *HTTPRequestMirrorFilter `json:"requestMirror,omitempty"`
 
 	// RequestRedirect defines a schema for a filter that responds to the
