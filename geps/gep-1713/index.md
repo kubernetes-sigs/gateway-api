@@ -54,8 +54,7 @@ This proposal introduces a new `ListenerSet` resource that has the ability to at
 ```go
 type GatewaySpec struct {
 	...
-	// Note: this is a list to allow future potential features
-	AllowedListeners []*AllowedListeners `json:"allowedListeners"`
+	AllowedListeners *AllowedListeners `json:"allowedListeners"`
 	...
 }
 

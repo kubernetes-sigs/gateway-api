@@ -589,10 +589,7 @@ var schemaYAML = typed.YAMLObject(`types:
           elementRelationship: atomic
     - name: allowedListeners
       type:
-        list:
-          elementType:
-            namedType: io.k8s.sigs.gateway-api.apis.v1.AllowedListeners
-          elementRelationship: atomic
+        namedType: io.k8s.sigs.gateway-api.apis.v1.AllowedListeners
     - name: backendTLS
       type:
         namedType: io.k8s.sigs.gateway-api.apis.v1.GatewayBackendTLS

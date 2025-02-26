@@ -288,7 +288,7 @@ type GatewaySpec struct {
 	// <gateway:experimental>
 	//
 	// +optional
-	AllowedListeners *[]AllowedListeners `json:"allowedListeners,omitempty"`
+	AllowedListeners *AllowedListeners `json:"allowedListeners,omitempty"`
 }
 
 // AllowedListeners defines which ListenerSets can be attached to this Gateway.

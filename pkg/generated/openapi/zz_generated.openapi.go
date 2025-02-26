@@ -4009,15 +4009,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewaySpec(ref common.ReferenceCallba
 					"allowedListeners": {
 						SchemaProps: spec.SchemaProps{
 							Description: "AllowedListeners defines which ListenerSets can be attached to this Gateway. While this feature is experimental, the default value is to allow no ListenerSets.\n\n<gateway:experimental>",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.AllowedListeners"),
-									},
-								},
-							},
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.AllowedListeners"),
 						},
 					},
 				},

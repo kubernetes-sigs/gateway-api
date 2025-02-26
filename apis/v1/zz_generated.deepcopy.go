@@ -769,14 +769,8 @@ func (in *GatewaySpec) DeepCopyInto(out *GatewaySpec) {
 	}
 	if in.AllowedListeners != nil {
 		in, out := &in.AllowedListeners, &out.AllowedListeners
-		*out = new([]AllowedListeners)
-		if **in != nil {
-			in, out := *in, *out
-			*out = make([]AllowedListeners, len(*in))
-			for i := range *in {
-				(*in)[i].DeepCopyInto(&(*out)[i])
-			}
-		}
+		*out = new(AllowedListeners)
+		(*in).DeepCopyInto(*out)
 	}
 }
 
