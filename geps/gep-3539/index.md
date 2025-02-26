@@ -27,7 +27,7 @@ gained is worth the cost.
 * Provide path for existing ClusterIP Services in a cluster to migrate to 
   Gateway API model
 
-## API Changes
+## API Changes Summary
 
 * EndpointSelector is recognized as a backend
 * DNS record format for ClusterIP Gateways 
