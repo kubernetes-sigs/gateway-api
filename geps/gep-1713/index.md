@@ -11,14 +11,14 @@ The `Gateway` Resource is a point of contention since it is the only place to at
 
 ## Goals
 - Define a mechanism to merge listeners into a single `Gateway`
+- Attaching listeners to `Gateways` in different namespaces
+- Standardize merging multiple lists of Listeners together ([\#1863](https://github.com/kubernetes-sigs/gateway-api/pull/1863))
+- Increase the number of Gateway Listeners that are supported ([\#2869](https://github.com/kubernetes-sigs/gateway-api/issues/2869))
 
 ## Future Potential Goals (Beyond the GEP)
 
 From [Gateway Hiearchy Brainstorming](https://docs.google.com/document/d/1qj7Xog2t2fWRuzOeTsWkabUaVeOF7_2t_7appe8EXwA/edit#heading=h.w311n4l5qmwk):
 
-- Attaching listeners to `Gateways` in different namespaces
-- Standardize merging multiple lists of Listeners together ([\#1863](https://github.com/kubernetes-sigs/gateway-api/pull/1863))
-- Increase the number of Gateway Listeners that are supported ([\#2869](https://github.com/kubernetes-sigs/gateway-api/issues/2869))
 - Provide a mechanism for third party components to generate listeners and attach them to a Gateway ([\#1863](https://github.com/kubernetes-sigs/gateway-api/pull/1863))
 - Delegate TLS certificate management to App Owners and/or different namespaces ([\#102](https://github.com/kubernetes-sigs/gateway-api/issues/102), [\#103](https://github.com/kubernetes-sigs/gateway-api/issues/103))
 - Delegate domains to different namespaces, but allow those namespace to define TLS and routing configuration within those namespaces with Gateway-like resources ([\#102](https://github.com/kubernetes-sigs/gateway-api/issues/102), [\#103](https://github.com/kubernetes-sigs/gateway-api/issues/103))
