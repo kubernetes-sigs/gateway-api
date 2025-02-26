@@ -341,7 +341,7 @@ type Listener struct {
 	//   The semantics of this are described in more detail below.
 	//
 	// To ensure security, Section 11.1 of RFC-6066 emphasizes that server
-	// implementations that rely on SNI hostnames matching must also verify
+	// implementations that rely on SNI hostname matching MUST also verify
 	// hostnames within the application protocol.
 	//
 	// Section 9.1.2 of RFC-7540 provides a mechanism for servers to reject the
@@ -351,12 +351,16 @@ type Listener struct {
 	//
 	// To detect misdirected requests, Gateways SHOULD match the authority of
 	// the requests with all the SNI hostname(s) configured across all the
-	// Gateway Listeners on the same port:
+	// Gateway Listeners on the same port and protocol:
 	//
 	// * If another Listener has an exact match or more specific wildcard entry,
-	//   the Gateway should return a 421.
-	// * If the current Listener doesn’t match the SNI or Host, the reverse
-	//   proxy should return a 421.
+	//   the Gateway SHOULD return a 421.
+	// * If the current Listener (selected by SNI matching during ClientHello)
+	//   does not match the Host:
+	//     * If another Listener does match the Host the Gateway SHOULD return a
+	//       421.
+	//     * If no other Listener matches the Host, the Gateway MUST return a
+	//       404.
 	//
 	// For HTTPRoute and TLSRoute resources, there is an interaction with the
 	// `spec.hostnames` array. When both listener and route specify hostnames,
@@ -1297,11 +1301,11 @@ const (
 	//    SAN for foo.example.com.
 	//
 	// This overlapping TLS configuration can be particularly problematic when
-	// combined with connection coalescing. When client reuse connections using
-	// this technique, it can have confusing interactions with Gateway API, such
-	// as TLS configuration for one Listener getting used for a request reusing
-	// an existing connection that would not be used for the request using a new
-	// connection.
+	// combined with HTTP connection coalescing. When clients reuse connections
+	// using this technique, it can have confusing interactions with Gateway
+	// API, such as TLS configuration for one Listener getting used for a
+	// request reusing an existing connection that would not be used if the same
+	// request was initiating a new connection.
 	//
 	// Controllers MUST detect the presence of overlapping hostnames and MAY
 	// detect the presence of overlapping certificates.
@@ -1321,6 +1325,9 @@ const (
 	//
 	// * "OverlappingHostnames"
 	// * "OverlappingCertificates"
+	//
+	// If a controller supports checking for both possible reasons and finds
+	// that both are true, it SHOULD set the "OverlappingCertificates" Reason.
 	//
 	// This is a negative polarity condition and MUST NOT be set when it is
 	// False.

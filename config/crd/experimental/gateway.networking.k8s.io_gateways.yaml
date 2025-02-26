@@ -683,7 +683,7 @@ spec:
                           The semantics of this are described in more detail below.
 
                         To ensure security, Section 11.1 of RFC-6066 emphasizes that server
-                        implementations that rely on SNI hostnames matching must also verify
+                        implementations that rely on SNI hostname matching MUST also verify
                         hostnames within the application protocol.
 
                         Section 9.1.2 of RFC-7540 provides a mechanism for servers to reject the
@@ -693,12 +693,16 @@ spec:
 
                         To detect misdirected requests, Gateways SHOULD match the authority of
                         the requests with all the SNI hostname(s) configured across all the
-                        Gateway Listeners on the same port:
+                        Gateway Listeners on the same port and protocol:
 
                         * If another Listener has an exact match or more specific wildcard entry,
-                          the Gateway should return a 421.
-                        * If the current Listener doesn’t match the SNI or Host, the reverse
-                          proxy should return a 421.
+                          the Gateway SHOULD return a 421.
+                        * If the current Listener (selected by SNI matching during ClientHello)
+                          does not match the Host:
+                            * If another Listener does match the Host the Gateway SHOULD return a
+                              421.
+                            * If no other Listener matches the Host, the Gateway MUST return a
+                              404.
 
                         For HTTPRoute and TLSRoute resources, there is an interaction with the
                         `spec.hostnames` array. When both listener and route specify hostnames,
@@ -1971,7 +1975,7 @@ spec:
                           The semantics of this are described in more detail below.
 
                         To ensure security, Section 11.1 of RFC-6066 emphasizes that server
-                        implementations that rely on SNI hostnames matching must also verify
+                        implementations that rely on SNI hostname matching MUST also verify
                         hostnames within the application protocol.
 
                         Section 9.1.2 of RFC-7540 provides a mechanism for servers to reject the
@@ -1981,12 +1985,16 @@ spec:
 
                         To detect misdirected requests, Gateways SHOULD match the authority of
                         the requests with all the SNI hostname(s) configured across all the
-                        Gateway Listeners on the same port:
+                        Gateway Listeners on the same port and protocol:
 
                         * If another Listener has an exact match or more specific wildcard entry,
-                          the Gateway should return a 421.
-                        * If the current Listener doesn’t match the SNI or Host, the reverse
-                          proxy should return a 421.
+                          the Gateway SHOULD return a 421.
+                        * If the current Listener (selected by SNI matching during ClientHello)
+                          does not match the Host:
+                            * If another Listener does match the Host the Gateway SHOULD return a
+                              421.
+                            * If no other Listener matches the Host, the Gateway MUST return a
+                              404.
 
                         For HTTPRoute and TLSRoute resources, there is an interaction with the
                         `spec.hostnames` array. When both listener and route specify hostnames,
