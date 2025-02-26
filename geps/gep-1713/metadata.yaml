@@ -2,6 +2,6 @@ apiVersion: internal.gateway.networking.k8s.io/v1alpha1
 kind: GEPDetails
 number: 1713
 name: Gateway Merging - ListenerSet
-status: Provisional
+status: Experimental
 authors:
   - dprotaso

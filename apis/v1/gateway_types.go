@@ -223,6 +223,8 @@ type GatewaySpec struct {
 	// Implementations MAY merge separate Gateways onto a single set of
 	// Addresses if all Listeners across all Gateways are compatible.
 	//
+	// In a future release the MinItems=1 requirement MAY be dropped.
+	//
 	// Support: Core
 	//
 	// +listType=map
@@ -279,6 +281,40 @@ type GatewaySpec struct {
 	// +optional
 	// <gateway:experimental>
 	BackendTLS *GatewayBackendTLS `json:"backendTLS,omitempty"`
+
+	// AllowedListeners defines which ListenerSets can be attached to this Gateway.
+	// While this feature is experimental, the default value is to allow no ListenerSets.
+	//
+	// <gateway:experimental>
+	//
+	// +optional
+	AllowedListeners *AllowedListeners `json:"allowedListeners,omitempty"`
+}
+
+// AllowedListeners defines which ListenerSets can be attached to this Gateway.
+type AllowedListeners struct {
+	// Namespaces defines which namespaces ListenerSets can be attached to this Gateway.
+	// While this feature is experimental, the default value is to allow no ListenerSets.
+	//
+	// +optional
+	// +kubebuilder:default={from: None}
+	Namespaces *ListenerNamespaces `json:"namespaces,omitempty"`
+}
+
+// ListenerNamespaces indicate which namespaces ListenerSets should be selected from.
+type ListenerNamespaces struct {
+	// From indicates where ListenerSets can attach to this Gateway. Possible
+	// values are:
+	//
+	// * Same: Only ListenerSets in the same namespace may be attached to this Gateway.
+	// * None: Only listeners defined in the Gateway's spec are allowed
+	//
+	// While this feature is experimental, the default value None
+	//
+	// +optional
+	// +kubebuilder:default=None
+	// +kubebuilder:validation:Enum=Same;None
+	From *FromNamespaces `json:"from,omitempty"`
 }
 
 // Listener embodies the concept of a logical endpoint where a Gateway accepts
@@ -602,21 +638,23 @@ type AllowedRoutes struct {
 	Kinds []RouteGroupKind `json:"kinds,omitempty"`
 }
 
-// FromNamespaces specifies namespace from which Routes may be attached to a
+// FromNamespaces specifies namespace from which Routes/ListenerSets may be attached to a
 // Gateway.
 //
-// +kubebuilder:validation:Enum=All;Selector;Same
+// +kubebuilder:validation:Enum=All;Selector;Same;None
 type FromNamespaces string
 
 const (
-	// Routes in all namespaces may be attached to this Gateway.
+	// Routes/ListenerSets in all namespaces may be attached to this Gateway.
 	NamespacesFromAll FromNamespaces = "All"
-	// Only Routes in namespaces selected by the selector may be attached to
+	// Only Routes/ListenerSets in namespaces selected by the selector may be attached to
 	// this Gateway.
 	NamespacesFromSelector FromNamespaces = "Selector"
-	// Only Routes in the same namespace as the Gateway may be attached to this
+	// Only Routes/ListenerSets in the same namespace as the Gateway may be attached to this
 	// Gateway.
 	NamespacesFromSame FromNamespaces = "Same"
+	// No Routes/ListenerSets may be attached to this Gateway.
+	NamespacesFromNone FromNamespaces = "None"
 )
 
 // RouteNamespaces indicate which namespaces Routes should be selected from.

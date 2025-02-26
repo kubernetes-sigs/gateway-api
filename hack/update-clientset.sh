@@ -24,12 +24,6 @@ set -o nounset
 set -o pipefail
 
 
-if [[ "${1:-stable}" == "experimental" ]]; then
-  readonly API_PATH="apisx"
-else
-  readonly API_PATH="apis"
-fi
-
 readonly SCRIPT_ROOT="$(cd "$(dirname "${BASH_SOURCE}")"/.. && pwd)"
 
 if [[ "${VERIFY_CODEGEN:-}" == "true" ]]; then
@@ -42,22 +36,19 @@ readonly COMMON_FLAGS="${VERIFY_FLAG:-} --go-header-file ${SCRIPT_ROOT}/hack/boi
 readonly APIS_PKG=sigs.k8s.io/gateway-api
 readonly CLIENTSET_NAME=versioned
 readonly CLIENTSET_PKG_NAME=clientset
-readonly VERSIONS=($(find ./${API_PATH} -maxdepth 1 -name "v*" -exec bash -c 'basename {}' \; | xargs))
-
-if [[ "${1:-stable}" == "experimental" ]]; then
-    readonly OUTPUT_DIR=pkg/clientx
-    readonly OUTPUT_PKG=sigs.k8s.io/gateway-api/pkg/clientx
-else
-    readonly OUTPUT_DIR=pkg/client
-    readonly OUTPUT_PKG=sigs.k8s.io/gateway-api/pkg/client
-fi
+readonly OUTPUT_DIR=pkg/client
+readonly OUTPUT_PKG=sigs.k8s.io/gateway-api/pkg/client
+readonly API_PATHS=(apis apisx)
 
 GATEWAY_INPUT_DIRS_SPACE=""
 GATEWAY_INPUT_DIRS_COMMA=""
-for VERSION in "${VERSIONS[@]}"
-do
-  GATEWAY_INPUT_DIRS_SPACE+="${APIS_PKG}/${API_PATH}/${VERSION} "
-  GATEWAY_INPUT_DIRS_COMMA+="${APIS_PKG}/${API_PATH}/${VERSION},"
+
+for API_PATH in "${API_PATHS[@]}"; do
+  VERSIONS=($(find ./${API_PATH} -maxdepth 1 -name "v*" -exec bash -c 'basename {}' \; | xargs))
+  for VERSION in "${VERSIONS[@]}"; do
+    GATEWAY_INPUT_DIRS_SPACE+="${APIS_PKG}/${API_PATH}/${VERSION} "
+    GATEWAY_INPUT_DIRS_COMMA+="${APIS_PKG}/${API_PATH}/${VERSION},"
+  done
 done
 GATEWAY_INPUT_DIRS_SPACE="${GATEWAY_INPUT_DIRS_SPACE%,}" # drop trailing space
 GATEWAY_INPUT_DIRS_COMMA="${GATEWAY_INPUT_DIRS_COMMA%,}" # drop trailing comma
@@ -69,8 +60,8 @@ echo "Generating openapi schema"
 go run k8s.io/kube-openapi/cmd/openapi-gen \
   --output-file zz_generated.openapi.go \
   --report-filename "${new_report}" \
-  --output-dir "${API_PATH}/openapi" \
-  --output-pkg "sigs.k8s.io/gateway-api/${API_PATH}/openapi" \
+  --output-dir "pkg/generated/openapi" \
+  --output-pkg "sigs.k8s.io/gateway-api/pkg/generated/openapi" \
   ${COMMON_FLAGS} \
   $GATEWAY_INPUT_DIRS_SPACE \
   k8s.io/apimachinery/pkg/apis/meta/v1 \
@@ -81,8 +72,8 @@ go run k8s.io/kube-openapi/cmd/openapi-gen \
 echo "Generating apply configuration"
 go run k8s.io/code-generator/cmd/applyconfiguration-gen \
   --openapi-schema <(go run ${SCRIPT_ROOT}/cmd/modelschema) \
-  --output-dir "${API_PATH}/applyconfiguration" \
-  --output-pkg "${APIS_PKG}/${API_PATH}/applyconfiguration" \
+  --output-dir "applyconfiguration" \
+  --output-pkg "${APIS_PKG}/applyconfiguration" \
   ${COMMON_FLAGS} \
   ${GATEWAY_INPUT_DIRS_SPACE}
 
@@ -93,7 +84,7 @@ go run k8s.io/code-generator/cmd/client-gen \
   --input "${GATEWAY_INPUT_DIRS_COMMA//${APIS_PKG}/}" \
   --output-dir "${OUTPUT_DIR}/${CLIENTSET_PKG_NAME}" \
   --output-pkg "${OUTPUT_PKG}/${CLIENTSET_PKG_NAME}" \
-  --apply-configuration-package "${APIS_PKG}/${API_PATH}/applyconfiguration" \
+  --apply-configuration-package "${APIS_PKG}/applyconfiguration" \
   ${COMMON_FLAGS}
 
 echo "Generating listers at ${OUTPUT_PKG}/listers"
@@ -103,7 +94,7 @@ go run k8s.io/code-generator/cmd/lister-gen \
   ${COMMON_FLAGS} \
   ${GATEWAY_INPUT_DIRS_SPACE}
 
-echo "Generating informers at ${OUTPUT_PKG}/informers"
+echo "Generating informers"
 go run k8s.io/code-generator/cmd/informer-gen \
   --versioned-clientset-package "${OUTPUT_PKG}/${CLIENTSET_PKG_NAME}/${CLIENTSET_NAME}" \
   --listers-package "${OUTPUT_PKG}/listers" \
@@ -112,16 +103,14 @@ go run k8s.io/code-generator/cmd/informer-gen \
   ${COMMON_FLAGS} \
   ${GATEWAY_INPUT_DIRS_SPACE}
 
-echo "Generating ${VERSION} register at ${APIS_PKG}/${API_PATH}/${VERSION}"
+echo "Generating register helpers"
 go run k8s.io/code-generator/cmd/register-gen \
   --output-file zz_generated.register.go \
   ${COMMON_FLAGS} \
   ${GATEWAY_INPUT_DIRS_SPACE}
 
-for VERSION in "${VERSIONS[@]}"
-do
-  echo "Generating ${VERSION} deepcopy at ${APIS_PKG}/${API_PATH}/${VERSION}"
-  go run sigs.k8s.io/controller-tools/cmd/controller-gen \
-    object:headerFile=${SCRIPT_ROOT}/hack/boilerplate/boilerplate.generatego.txt \
-    paths="${APIS_PKG}/${API_PATH}/${VERSION}"
-done
+echo "Generating deepcopy"
+go run sigs.k8s.io/controller-tools/cmd/controller-gen \
+  object:headerFile=${SCRIPT_ROOT}/hack/boilerplate/boilerplate.generatego.txt \
+  paths="./apis/..." \
+  paths="./apisx/..."

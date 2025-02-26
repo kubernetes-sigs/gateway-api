@@ -1,7 +1,7 @@
 # GEP-1713: ListenerSets - Standard Mechanism to Merge Multiple Gateways
 
 * Issue: [#1713](/kubernetes-sigs/gateway-api/issues/1713)
-* Status: Provisional
+* Status: Experimental
 
 ((See status definitions [here](/geps/overview/#gep-states).)
 
@@ -54,8 +54,7 @@ This proposal introduces a new `ListenerSet` resource that has the ability to at
 ```go
 type GatewaySpec struct {
 	...
-	// Note: this is a list to allow future potential features
-	AllowedListeners []*AllowedListeners `json:"allowedListeners"`
+	AllowedListeners *AllowedListeners `json:"allowedListeners"`
 	...
 }
 
@@ -74,7 +73,7 @@ type ListenerNamespaces struct {
 	// * None: Only listeners defined in the Gateway's spec are allowed
 	//
 	// +optional
-	// +kubebuilder:default=Same
+	// +kubebuilder:default=None
 	// +kubebuilder:validation:Enum=Same;None
 	From *FromNamespaces `json:"from,omitempty"`
 }
@@ -527,14 +526,14 @@ Valid reasons for `Accepted` being `False` are:
 
 - `NotAllowed` - the `parentRef` doesn't allow attachment
 - `ParentNotAccepted` - the `parentRef` isn't accepted (eg. invalid address)
-- `UnsupportedValue` - a listener in the set is using an unsupported feature/value
+- `ListenersNotValid` - one or more listeners in the set are invalid (or using an unsupported feature)
 
 The `Programmed` condition MUST be set on every `ListenerSet` and have a similar meaning to the Gateway `Programmed` condition but only reflect the listeners in this `ListenerSet`.
 
-`Accepted` and `Programmed` conditions when surfacing details about listeners, MUST only summarize the `status.parents.listeners` conditions that are exclusive to the `ListenerSet`.
+`Accepted` and `Programmed` conditions when surfacing details about listeners, MUST only summarize the `status.listeners` conditions that are exclusive to the `ListenerSet`.
 An exception to this is when the parent `Gateway`'s `Accepted` or `Programmed` conditions transition to `False`
 
-`ListenerSets` MUST NOT have their parent `Gateway`'s' listeners in the associated `status.parents.listeners` conditions list.
+`ListenerSets` MUST NOT have their parent `Gateway`'s' listeners in the associated `status.listeners` conditions list.
 
 ### ListenerConditions within a ListenerSet
 
