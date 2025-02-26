@@ -307,7 +307,7 @@ type ListenerNamespaces struct {
 	// values are:
 	//
 	// * Same: Only ListenerSets in the same namespace may be attached to this Gateway.
-	// * Selector: ListenerSets in namespaces selected by the selector may be attached to this Gateway.:w
+	// * Selector: ListenerSets in namespaces selected by the selector may be attached to this Gateway.
 	// * All: ListenerSets in all namespaces may be attached to this Gateway.
 	// * None: Only listeners defined in the Gateway's spec are allowed
 	//
