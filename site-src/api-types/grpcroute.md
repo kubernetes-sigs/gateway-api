@@ -280,3 +280,4 @@ resolution applies to merging, refer to the [API specification][grpcrouterule].
 [filters]: /reference/spec/#gateway.networking.k8s.io/v1.GRPCRouteFilter
 [backendRef]: /reference/spec/#gateway.networking.k8s.io/v1.GRPCBackendRef
 [parentRef]: /reference/spec/#gateway.networking.k8s.io/v1.ParentRef
+[name]: /reference/spec/#gateway.networking.k8s.io/v1.SectionName
