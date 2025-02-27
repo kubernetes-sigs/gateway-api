@@ -1005,6 +1005,9 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: from
       type:
         scalar: string
+    - name: selector
+      type:
+        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelector
 - name: io.k8s.sigs.gateway-api.apis.v1.ListenerStatus
   map:
     fields:
@@ -1828,6 +1831,9 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         scalar: string
       default: ""
+    - name: namespace
+      type:
+        scalar: string
 - name: io.k8s.sigs.gateway-api.apisx.v1alpha2.BackendTrafficPolicy
   map:
     fields:

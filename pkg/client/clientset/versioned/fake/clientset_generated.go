@@ -146,12 +146,12 @@ func (c *Clientset) GatewayV1beta1() gatewayv1beta1.GatewayV1beta1Interface {
 	return &fakegatewayv1beta1.FakeGatewayV1beta1{Fake: &c.Fake}
 }
 
-// ExperimentalV1alpha2 retrieves the ExperimentalV1alpha2Client
-func (c *Clientset) ExperimentalV1alpha2() experimentalv1alpha2.ExperimentalV1alpha2Interface {
-	return &fakeexperimentalv1alpha2.FakeExperimentalV1alpha2{Fake: &c.Fake}
-}
-
 // ExperimentalV1alpha1 retrieves the ExperimentalV1alpha1Client
 func (c *Clientset) ExperimentalV1alpha1() experimentalv1alpha1.ExperimentalV1alpha1Interface {
 	return &fakeexperimentalv1alpha1.FakeExperimentalV1alpha1{Fake: &c.Fake}
+}
+
+// ExperimentalV1alpha2 retrieves the ExperimentalV1alpha2Client
+func (c *Clientset) ExperimentalV1alpha2() experimentalv1alpha2.ExperimentalV1alpha2Interface {
+	return &fakeexperimentalv1alpha2.FakeExperimentalV1alpha2{Fake: &c.Fake}
 }

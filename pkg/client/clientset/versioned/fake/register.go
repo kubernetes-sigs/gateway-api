@@ -40,8 +40,8 @@ var localSchemeBuilder = runtime.SchemeBuilder{
 	gatewayv1alpha2.AddToScheme,
 	gatewayv1alpha3.AddToScheme,
 	gatewayv1beta1.AddToScheme,
-	experimentalv1alpha2.AddToScheme,
 	experimentalv1alpha1.AddToScheme,
+	experimentalv1alpha2.AddToScheme,
 }
 
 // AddToScheme adds all types of this clientset into the given scheme. This allows composition
