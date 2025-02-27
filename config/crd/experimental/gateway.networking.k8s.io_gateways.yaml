@@ -140,7 +140,7 @@ spec:
                 properties:
                   namespaces:
                     default:
-                      from: Same
+                      from: None
                     description: |-
                       Namespaces defines which namespaces ListenerSets can be attached to this Gateway.
                       While this feature is experimental, the default value is to allow no ListenerSets.
@@ -152,7 +152,7 @@ spec:
                           values are:
 
                           * Same: Only ListenerSets in the same namespace may be attached to this Gateway.
-                          * Selector: ListenerSets in namespaces selected by the selector may be attached to this Gateway.:w
+                          * Selector: ListenerSets in namespaces selected by the selector may be attached to this Gateway.
                           * All: ListenerSets in all namespaces may be attached to this Gateway.
                           * None: Only listeners defined in the Gateway's spec are allowed
 
@@ -1458,7 +1458,7 @@ spec:
                 properties:
                   namespaces:
                     default:
-                      from: Same
+                      from: None
                     description: |-
                       Namespaces defines which namespaces ListenerSets can be attached to this Gateway.
                       While this feature is experimental, the default value is to allow no ListenerSets.
@@ -1470,7 +1470,7 @@ spec:
                           values are:
 
                           * Same: Only ListenerSets in the same namespace may be attached to this Gateway.
-                          * Selector: ListenerSets in namespaces selected by the selector may be attached to this Gateway.:w
+                          * Selector: ListenerSets in namespaces selected by the selector may be attached to this Gateway.
                           * All: ListenerSets in all namespaces may be attached to this Gateway.
                           * None: Only listeners defined in the Gateway's spec are allowed
 

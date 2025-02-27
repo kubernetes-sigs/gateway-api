@@ -297,7 +297,7 @@ type AllowedListeners struct {
 	// While this feature is experimental, the default value is to allow no ListenerSets.
 	//
 	// +optional
-	// +kubebuilder:default={from: Same}
+	// +kubebuilder:default={from: None}
 	Namespaces *ListenerNamespaces `json:"namespaces,omitempty"`
 }
 
