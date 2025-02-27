@@ -307,14 +307,22 @@ type ListenerNamespaces struct {
 	// values are:
 	//
 	// * Same: Only ListenerSets in the same namespace may be attached to this Gateway.
+	// * Selector: ListenerSets in namespaces selected by the selector may be attached to this Gateway.
+	// * All: ListenerSets in all namespaces may be attached to this Gateway.
 	// * None: Only listeners defined in the Gateway's spec are allowed
 	//
 	// While this feature is experimental, the default value None
 	//
 	// +optional
 	// +kubebuilder:default=None
-	// +kubebuilder:validation:Enum=Same;None
 	From *FromNamespaces `json:"from,omitempty"`
+
+	// Selector must be specified when From is set to "Selector". In that case,
+	// only ListenerSets in Namespaces matching this Selector will be selected by this
+	// Gateway. This field is ignored for other values of "From".
+	//
+	// +optional
+	Selector *metav1.LabelSelector `json:"selector,omitempty"`
 }
 
 // Listener embodies the concept of a logical endpoint where a Gateway accepts

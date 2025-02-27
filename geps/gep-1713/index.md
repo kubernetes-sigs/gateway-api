@@ -11,14 +11,14 @@ The `Gateway` Resource is a point of contention since it is the only place to at
 
 ## Goals
 - Define a mechanism to merge listeners into a single `Gateway`
+- Attaching listeners to `Gateways` in different namespaces
+- Standardize merging multiple lists of Listeners together ([\#1863](https://github.com/kubernetes-sigs/gateway-api/pull/1863))
+- Increase the number of Gateway Listeners that are supported ([\#2869](https://github.com/kubernetes-sigs/gateway-api/issues/2869))
 
 ## Future Potential Goals (Beyond the GEP)
 
 From [Gateway Hiearchy Brainstorming](https://docs.google.com/document/d/1qj7Xog2t2fWRuzOeTsWkabUaVeOF7_2t_7appe8EXwA/edit#heading=h.w311n4l5qmwk):
 
-- Attaching listeners to `Gateways` in different namespaces
-- Standardize merging multiple lists of Listeners together ([\#1863](https://github.com/kubernetes-sigs/gateway-api/pull/1863))
-- Increase the number of Gateway Listeners that are supported ([\#2869](https://github.com/kubernetes-sigs/gateway-api/issues/2869))
 - Provide a mechanism for third party components to generate listeners and attach them to a Gateway ([\#1863](https://github.com/kubernetes-sigs/gateway-api/pull/1863))
 - Delegate TLS certificate management to App Owners and/or different namespaces ([\#102](https://github.com/kubernetes-sigs/gateway-api/issues/102), [\#103](https://github.com/kubernetes-sigs/gateway-api/issues/103))
 - Delegate domains to different namespaces, but allow those namespace to define TLS and routing configuration within those namespaces with Gateway-like resources ([\#102](https://github.com/kubernetes-sigs/gateway-api/issues/102), [\#103](https://github.com/kubernetes-sigs/gateway-api/issues/103))
@@ -59,8 +59,7 @@ type GatewaySpec struct {
 }
 
 type AllowedListeners struct {
-	// TODO - discuss changing this to Same in the future
-	// +kubebuilder:default={from: None}
+	// +kubebuilder:default={from:Same}
 	Namespaces *ListenerNamespaces `json:"namespaces,omitempty"`
 }
 
@@ -70,12 +69,21 @@ type ListenerNamespaces struct {
 	// values are:
 	//
 	// * Same: Only ListenerSets in the same namespace may be attached to this Gateway.
+	// * Selector: ListenerSets in namespaces selected by the selector may be attached to this Gateway.:w
+	// * All: ListenerSets in all namespaces may be attached to this Gateway.
 	// * None: Only listeners defined in the Gateway's spec are allowed
 	//
 	// +optional
 	// +kubebuilder:default=None
-	// +kubebuilder:validation:Enum=Same;None
+	// +kubebuilder:validation:Enum=Same;None;Selector;All
 	From *FromNamespaces `json:"from,omitempty"`
+
+	// Selector must be specified when From is set to "Selector". In that case,
+	// only ListenerSets in Namespaces matching this Selector will be selected by this
+	// Gateway. This field is ignored for other values of "From".
+	//
+	// +optional
+	Selector *metav1.LabelSelector `json:"selector,omitempty"`
 }
 
 // ListenerSet defines a set of additional listeners to attach to an existing Gateway.
@@ -93,7 +101,7 @@ type ListenerSet struct {
 // ListenerSetSpec defines the desired state of a ListenerSet.
 type ListenerSetSpec struct {
 	// ParentRef references the Gateway that the listeners are attached to.
-	ParentRef ParentGatewayReference `json:"parentRef,omitempty"`
+	ParentRef ParentGatewayReference `json:"parentRef"`
 
 	// Listeners associated with this ListenerSet. Listeners define
 	// logical endpoints that are bound on this referenced parent Gateway's addresses.
@@ -118,9 +126,11 @@ type ListenerSetSpec struct {
 // network connections.
 type ListenerEntry struct {
 	// Name is the name of the Listener. This name MUST be unique within a
-	// Gateway.
+	// ListenerSet.
 	//
-	// Support: Core
+	// Name is not required to be unique across a Gateway and ListenerSets.
+	// Routes can attach to a Listener by having a ListenerSet as a parentRef
+	// and setting the SectionName
 	Name SectionName `json:"name"`
 
 	// Hostname specifies the virtual hostname to match for protocol types that
@@ -147,8 +157,6 @@ type ListenerEntry struct {
 	// Hostnames that are prefixed with a wildcard label (`*.`) are interpreted
 	// as a suffix match. That means that a match for `*.example.com` would match
 	// both `test.example.com`, and `foo.test.example.com`, but not `example.com`.
-	//
-	// Support: Core
 	//
 	// +optional
 	Hostname *Hostname `json:"hostname,omitempty"`
@@ -309,6 +317,10 @@ type ParentGatewayReference struct {
 
 	// Name is the name of the referent.
 	Name ObjectName `json:"name"`
+
+	// Namespace is the name of the referent.
+	// +optional
+	Name *ObjectName `json:"namespace"`
 }
 ```
 
