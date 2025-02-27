@@ -35,10 +35,10 @@ var scheme = runtime.NewScheme()
 var codecs = serializer.NewCodecFactory(scheme)
 
 var localSchemeBuilder = runtime.SchemeBuilder{
-	gatewayv1.AddToScheme,
-	gatewayv1alpha2.AddToScheme,
-	gatewayv1alpha3.AddToScheme,
 	gatewayv1beta1.AddToScheme,
+	gatewayv1alpha2.AddToScheme,
+	gatewayv1.AddToScheme,
+	gatewayv1alpha3.AddToScheme,
 	experimentalv1alpha1.AddToScheme,
 }
 
