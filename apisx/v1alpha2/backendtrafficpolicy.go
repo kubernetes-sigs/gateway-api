@@ -88,12 +88,12 @@ type BackendTrafficPolicySpec struct {
 	// Configuring a RetryConstraint in BackendTrafficPolicy is compatible with
 	// HTTPRoute Retry settings for each HTTPRouteRule that targets the same
 	// backend. While the HTTPRouteRule Retry stanza can specify whether a
-	// request should be retried and the number of retry attempts each client
-	// may perform, RetryConstraint helps prevent cascading failures, such as
-	// retry storms, during periods of consistent failures.
+	// request will be retried, and the number of retry attempts each client
+	// may perform, RetryConstraint helps prevent cascading failures such as
+	// retry storms during periods of consistent failures.
 	//
 	// After the retry budget has been exceeded, additional retries to the
-	// backend must return a 503 response to the client.
+	// backend MUST return a 503 response to the client.
 	//
 	// Additional configurations for defining a constraint on retries MAY be
 	// defined in the future.
