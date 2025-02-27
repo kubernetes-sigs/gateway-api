@@ -503,15 +503,17 @@ type RouteStatus struct {
 }
 
 // Hostname is the fully qualified domain name of a network host. This matches
-// the RFC 1123 definition of a hostname with 2 notable exceptions:
+// the RFC 1123 definition of a hostname with 3 notable exceptions:
 //
 //  1. IPs are not allowed.
 //  2. A hostname may be prefixed with a wildcard label (`*.`). The wildcard
 //     label must appear by itself as the first label.
+//  3. A hostname may be suffixed with a wildcard label ( `.*`). The wildcard
+//     label must appear by itself as the last label.
 //
 // Hostname can be "precise" which is a domain name without the terminating
 // dot of a network host (e.g. "foo.example.com") or "wildcard", which is a
-// domain name prefixed with a single wildcard label (e.g. `*.example.com`).
+// domain name prefixed or suffixed with a single wildcard label (e.g. `*.example.com` or `example.*`).
 //
 // Note that as per RFC1035 and RFC1123, a *label* must consist of lower case
 // alphanumeric characters or '-', and must start and end with an alphanumeric
@@ -519,7 +521,7 @@ type RouteStatus struct {
 //
 // +kubebuilder:validation:MinLength=1
 // +kubebuilder:validation:MaxLength=253
-// +kubebuilder:validation:Pattern=`^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$`
+// +kubebuilder:validation:Pattern=`^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*(\.\*)?$`
 type Hostname string
 
 // PreciseHostname is the fully qualified domain name of a network host. This
