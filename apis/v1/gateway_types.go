@@ -742,7 +742,7 @@ type GatewaySpecAddress struct {
 	// +optional
 	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=253
-	Value string `json:"value"`
+	Value string `json:"value,omitempty"`
 }
 
 // GatewayStatusAddress describes a network address that is bound to a Gateway.

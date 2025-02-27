@@ -4010,7 +4010,6 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewaySpecAddress(ref common.Referenc
 					"value": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Value of the address. The validity of the values will depend on the type and support by the controller.\n\nExamples: `1.2.3.4`, `128::1`, `my-ip-address`.",
-							Default:     "",
 							Type:        []string{"string"},
 							Format:      "",
 						},

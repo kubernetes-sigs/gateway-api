@@ -607,7 +607,6 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: value
       type:
         scalar: string
-      default: ""
 - name: io.k8s.sigs.gateway-api.apis.v1.GatewayStatus
   map:
     fields:
