@@ -49,6 +49,7 @@ func main() {
 		"sigs.k8s.io/gateway-api/apis/v1alpha2",
 		"sigs.k8s.io/gateway-api/apis/v1beta1",
 		"sigs.k8s.io/gateway-api/apis/v1",
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1",
 	)
 	if err != nil {
 		log.Fatalf("failed to load package roots: %s", err)

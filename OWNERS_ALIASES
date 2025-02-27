@@ -4,6 +4,7 @@
 aliases:
   # Reference: https://github.com/kubernetes/org/blob/main/OWNERS_ALIASES
   sig-network-leads:
+    - aojea
     - danwinship
     - shaneutt
     - thockin

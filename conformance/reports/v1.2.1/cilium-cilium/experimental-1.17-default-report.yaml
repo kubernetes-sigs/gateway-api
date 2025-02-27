@@ -1,17 +1,36 @@
 apiVersion: gateway.networking.k8s.io/v1
-date: "2025-01-31T10:07:12Z"
+date: "2025-02-17T10:07:02Z"
 gatewayAPIChannel: experimental
 gatewayAPIVersion: v1.2.1
 implementation:
   contact:
-  - https://github.com/cilium/community/blob/v1.17/roles/Maintainers.md
+  - https://github.com/cilium/community/blob/main/roles/Maintainers.md
   organization: cilium
   project: cilium
   url: github.com/cilium/cilium
-  version: main
+  version: v1.17
 kind: ConformanceReport
 mode: default
 profiles:
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 11
+      Skipped: 0
+  extended:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 2
+      Skipped: 0
+    supportedFeatures:
+    - GatewayHTTPListenerIsolation
+    - GatewayInfrastructurePropagation
+    - GatewayPort8080
+    - GatewayStaticAddresses
+  name: GATEWAY-TLS
+  summary: Core tests succeeded. Extended tests succeeded.
 - core:
     result: success
     statistics:
@@ -110,25 +129,6 @@ profiles:
     unsupportedFeatures:
     - HTTPRouteParentRefPort
   name: GATEWAY-HTTP
-  summary: Core tests succeeded. Extended tests succeeded.
-- core:
-    result: success
-    statistics:
-      Failed: 0
-      Passed: 11
-      Skipped: 0
-  extended:
-    result: success
-    statistics:
-      Failed: 0
-      Passed: 2
-      Skipped: 0
-    supportedFeatures:
-    - GatewayHTTPListenerIsolation
-    - GatewayInfrastructurePropagation
-    - GatewayPort8080
-    - GatewayStaticAddresses
-  name: GATEWAY-TLS
   summary: Core tests succeeded. Extended tests succeeded.
 succeededProvisionalTests:
 - GatewayInfrastructure

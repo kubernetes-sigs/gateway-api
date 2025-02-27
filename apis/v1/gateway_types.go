@@ -223,6 +223,8 @@ type GatewaySpec struct {
 	// Implementations MAY merge separate Gateways onto a single set of
 	// Addresses if all Listeners across all Gateways are compatible.
 	//
+	// In a future release the MinItems=1 requirement MAY be dropped.
+	//
 	// Support: Core
 	//
 	// +listType=map
@@ -279,6 +281,40 @@ type GatewaySpec struct {
 	// +optional
 	// <gateway:experimental>
 	BackendTLS *GatewayBackendTLS `json:"backendTLS,omitempty"`
+
+	// AllowedListeners defines which ListenerSets can be attached to this Gateway.
+	// While this feature is experimental, the default value is to allow no ListenerSets.
+	//
+	// <gateway:experimental>
+	//
+	// +optional
+	AllowedListeners *AllowedListeners `json:"allowedListeners,omitempty"`
+}
+
+// AllowedListeners defines which ListenerSets can be attached to this Gateway.
+type AllowedListeners struct {
+	// Namespaces defines which namespaces ListenerSets can be attached to this Gateway.
+	// While this feature is experimental, the default value is to allow no ListenerSets.
+	//
+	// +optional
+	// +kubebuilder:default={from: None}
+	Namespaces *ListenerNamespaces `json:"namespaces,omitempty"`
+}
+
+// ListenerNamespaces indicate which namespaces ListenerSets should be selected from.
+type ListenerNamespaces struct {
+	// From indicates where ListenerSets can attach to this Gateway. Possible
+	// values are:
+	//
+	// * Same: Only ListenerSets in the same namespace may be attached to this Gateway.
+	// * None: Only listeners defined in the Gateway's spec are allowed
+	//
+	// While this feature is experimental, the default value None
+	//
+	// +optional
+	// +kubebuilder:default=None
+	// +kubebuilder:validation:Enum=Same;None
+	From *FromNamespaces `json:"from,omitempty"`
 }
 
 // Listener embodies the concept of a logical endpoint where a Gateway accepts
@@ -300,10 +336,31 @@ type Listener struct {
 	//
 	// * TLS: The Listener Hostname MUST match the SNI.
 	// * HTTP: The Listener Hostname MUST match the Host header of the request.
-	// * HTTPS: The Listener Hostname SHOULD match at both the TLS and HTTP
-	//   protocol layers as described above. If an implementation does not
-	//   ensure that both the SNI and Host header match the Listener hostname,
-	//   it MUST clearly document that.
+	// * HTTPS: The Listener Hostname SHOULD match both the SNI and Host header.
+	//   Note that this does not require the SNI and Host header to be the same.
+	//   The semantics of this are described in more detail below.
+	//
+	// To ensure security, Section 11.1 of RFC-6066 emphasizes that server
+	// implementations that rely on SNI hostname matching MUST also verify
+	// hostnames within the application protocol.
+	//
+	// Section 9.1.2 of RFC-7540 provides a mechanism for servers to reject the
+	// reuse of a connection by responding with the HTTP 421 Misdirected Request
+	// status code. This indicates that the origin server has rejected the
+	// request because it appears to have been misdirected.
+	//
+	// To detect misdirected requests, Gateways SHOULD match the authority of
+	// the requests with all the SNI hostname(s) configured across all the
+	// Gateway Listeners on the same port and protocol:
+	//
+	// * If another Listener has an exact match or more specific wildcard entry,
+	//   the Gateway SHOULD return a 421.
+	// * If the current Listener (selected by SNI matching during ClientHello)
+	//   does not match the Host:
+	//     * If another Listener does match the Host the Gateway SHOULD return a
+	//       421.
+	//     * If no other Listener matches the Host, the Gateway MUST return a
+	//       404.
 	//
 	// For HTTPRoute and TLSRoute resources, there is an interaction with the
 	// `spec.hostnames` array. When both listener and route specify hostnames,
@@ -602,21 +659,23 @@ type AllowedRoutes struct {
 	Kinds []RouteGroupKind `json:"kinds,omitempty"`
 }
 
-// FromNamespaces specifies namespace from which Routes may be attached to a
+// FromNamespaces specifies namespace from which Routes/ListenerSets may be attached to a
 // Gateway.
 //
-// +kubebuilder:validation:Enum=All;Selector;Same
+// +kubebuilder:validation:Enum=All;Selector;Same;None
 type FromNamespaces string
 
 const (
-	// Routes in all namespaces may be attached to this Gateway.
+	// Routes/ListenerSets in all namespaces may be attached to this Gateway.
 	NamespacesFromAll FromNamespaces = "All"
-	// Only Routes in namespaces selected by the selector may be attached to
+	// Only Routes/ListenerSets in namespaces selected by the selector may be attached to
 	// this Gateway.
 	NamespacesFromSelector FromNamespaces = "Selector"
-	// Only Routes in the same namespace as the Gateway may be attached to this
+	// Only Routes/ListenerSets in the same namespace as the Gateway may be attached to this
 	// Gateway.
 	NamespacesFromSame FromNamespaces = "Same"
+	// No Routes/ListenerSets may be attached to this Gateway.
+	NamespacesFromNone FromNamespaces = "None"
 )
 
 // RouteNamespaces indicate which namespaces Routes should be selected from.
@@ -1228,6 +1287,62 @@ const (
 	// conditions when the Listener is either not yet reconciled or not yet not
 	// online and ready to accept client traffic.
 	ListenerReasonPending ListenerConditionReason = "Pending"
+)
+
+const (
+	// This condition indicates that TLS configuration within this Listener
+	// conflicts with TLS configuration in another Listener on the same port.
+	// This could happen for two reasons:
+	//
+	// 1) Overlapping Hostnames: Listener A matches *.example.com while Listener
+	//    B matches foo.example.com.
+	// B) Overlapping Certificates: Listener A contains a certificate with a
+	//    SAN for *.example.com, while Listener B contains a certificate with a
+	//    SAN for foo.example.com.
+	//
+	// This overlapping TLS configuration can be particularly problematic when
+	// combined with HTTP connection coalescing. When clients reuse connections
+	// using this technique, it can have confusing interactions with Gateway
+	// API, such as TLS configuration for one Listener getting used for a
+	// request reusing an existing connection that would not be used if the same
+	// request was initiating a new connection.
+	//
+	// Controllers MUST detect the presence of overlapping hostnames and MAY
+	// detect the presence of overlapping certificates.
+	//
+	// This condition MUST be set on all Listeners with overlapping TLS config.
+	// For example, consider the following listener - hostname mapping:
+	//
+	// A: foo.example.com
+	// B: foo.example.org
+	// C: *.example.com
+	//
+	// In the above example, Listeners A and C would have overlapping hostnames
+	// and therefore this condition should be set for Listeners A and C, but not
+	// B.
+	//
+	// Possible reasons for this condition to be True are:
+	//
+	// * "OverlappingHostnames"
+	// * "OverlappingCertificates"
+	//
+	// If a controller supports checking for both possible reasons and finds
+	// that both are true, it SHOULD set the "OverlappingCertificates" Reason.
+	//
+	// This is a negative polarity condition and MUST NOT be set when it is
+	// False.
+	//
+	// Controllers may raise this condition with other reasons, but should
+	// prefer to use the reasons listed above to improve interoperability.
+	ListenerConditionOverlappingTLSConfig ListenerConditionType = "OverlappingTLSConfig"
+
+	// This reason is used with the "OverlappingTLSConfig" condition when the
+	// condition is true.
+	ListenerReasonOverlappingHostnames ListenerConditionReason = "OverlappingHostnames"
+
+	// This reason is used with the "OverlappingTLSConfig" condition when the
+	// condition is true.
+	ListenerReasonOverlappingCertificates ListenerConditionReason = "OverlappingCertificates"
 )
 
 const (
