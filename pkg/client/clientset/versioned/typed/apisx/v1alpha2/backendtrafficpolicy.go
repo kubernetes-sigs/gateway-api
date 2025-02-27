@@ -60,7 +60,7 @@ type backendTrafficPolicies struct {
 }
 
 // newBackendTrafficPolicies returns a BackendTrafficPolicies
-func newBackendTrafficPolicies(c *GatewayV1alpha2Client, namespace string) *backendTrafficPolicies {
+func newBackendTrafficPolicies(c *ExperimentalV1alpha2Client, namespace string) *backendTrafficPolicies {
 	return &backendTrafficPolicies{
 		gentype.NewClientWithListAndApply[*v1alpha2.BackendTrafficPolicy, *v1alpha2.BackendTrafficPolicyList, *apisxv1alpha2.BackendTrafficPolicyApplyConfiguration](
 			"backendtrafficpolicies",

@@ -30,7 +30,7 @@ import (
 	gatewayv1alpha3 "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/typed/apis/v1alpha3"
 	gatewayv1beta1 "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/typed/apis/v1beta1"
 	experimentalv1alpha1 "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/typed/apisx/v1alpha1"
-	gatewayv1alpha2 "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/typed/apisx/v1alpha2"
+	experimentalv1alpha2 "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/typed/apisx/v1alpha2"
 )
 
 type Interface interface {
@@ -39,7 +39,7 @@ type Interface interface {
 	GatewayV1alpha2() gatewayv1alpha2.GatewayV1alpha2Interface
 	GatewayV1alpha3() gatewayv1alpha3.GatewayV1alpha3Interface
 	GatewayV1beta1() gatewayv1beta1.GatewayV1beta1Interface
-	GatewayV1alpha2() gatewayv1alpha2.GatewayV1alpha2Interface
+	ExperimentalV1alpha2() experimentalv1alpha2.ExperimentalV1alpha2Interface
 	ExperimentalV1alpha1() experimentalv1alpha1.ExperimentalV1alpha1Interface
 }
 
@@ -50,7 +50,7 @@ type Clientset struct {
 	gatewayV1alpha2      *gatewayv1alpha2.GatewayV1alpha2Client
 	gatewayV1alpha3      *gatewayv1alpha3.GatewayV1alpha3Client
 	gatewayV1beta1       *gatewayv1beta1.GatewayV1beta1Client
-	gatewayV1alpha2      *gatewayv1alpha2.GatewayV1alpha2Client
+	experimentalV1alpha2 *experimentalv1alpha2.ExperimentalV1alpha2Client
 	experimentalV1alpha1 *experimentalv1alpha1.ExperimentalV1alpha1Client
 }
 
@@ -74,9 +74,9 @@ func (c *Clientset) GatewayV1beta1() gatewayv1beta1.GatewayV1beta1Interface {
 	return c.gatewayV1beta1
 }
 
-// GatewayV1alpha2 retrieves the GatewayV1alpha2Client
-func (c *Clientset) GatewayV1alpha2() gatewayv1alpha2.GatewayV1alpha2Interface {
-	return c.gatewayV1alpha2
+// ExperimentalV1alpha2 retrieves the ExperimentalV1alpha2Client
+func (c *Clientset) ExperimentalV1alpha2() experimentalv1alpha2.ExperimentalV1alpha2Interface {
+	return c.experimentalV1alpha2
 }
 
 // ExperimentalV1alpha1 retrieves the ExperimentalV1alpha1Client
@@ -144,7 +144,7 @@ func NewForConfigAndClient(c *rest.Config, httpClient *http.Client) (*Clientset,
 	if err != nil {
 		return nil, err
 	}
-	cs.gatewayV1alpha2, err = gatewayv1alpha2.NewForConfigAndClient(&configShallowCopy, httpClient)
+	cs.experimentalV1alpha2, err = experimentalv1alpha2.NewForConfigAndClient(&configShallowCopy, httpClient)
 	if err != nil {
 		return nil, err
 	}
@@ -177,7 +177,7 @@ func New(c rest.Interface) *Clientset {
 	cs.gatewayV1alpha2 = gatewayv1alpha2.New(c)
 	cs.gatewayV1alpha3 = gatewayv1alpha3.New(c)
 	cs.gatewayV1beta1 = gatewayv1beta1.New(c)
-	cs.gatewayV1alpha2 = gatewayv1alpha2.New(c)
+	cs.experimentalV1alpha2 = experimentalv1alpha2.New(c)
 	cs.experimentalV1alpha1 = experimentalv1alpha1.New(c)
 
 	cs.DiscoveryClient = discovery.NewDiscoveryClient(c)

@@ -62,13 +62,13 @@ func NewFilteredBackendTrafficPolicyInformer(client versioned.Interface, namespa
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.GatewayV1alpha2().BackendTrafficPolicies(namespace).List(context.TODO(), options)
+				return client.ExperimentalV1alpha2().BackendTrafficPolicies(namespace).List(context.TODO(), options)
 			},
 			WatchFunc: func(options v1.ListOptions) (watch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.GatewayV1alpha2().BackendTrafficPolicies(namespace).Watch(context.TODO(), options)
+				return client.ExperimentalV1alpha2().BackendTrafficPolicies(namespace).Watch(context.TODO(), options)
 			},
 		},
 		&apisxv1alpha2.BackendTrafficPolicy{},

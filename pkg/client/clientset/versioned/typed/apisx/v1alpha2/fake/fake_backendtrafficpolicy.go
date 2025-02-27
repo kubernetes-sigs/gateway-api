@@ -34,7 +34,7 @@ import (
 
 // FakeBackendTrafficPolicies implements BackendTrafficPolicyInterface
 type FakeBackendTrafficPolicies struct {
-	Fake *FakeGatewayV1alpha2
+	Fake *FakeExperimentalV1alpha2
 	ns   string
 }
 

@@ -24,17 +24,17 @@ import (
 	v1alpha2 "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/typed/apisx/v1alpha2"
 )
 
-type FakeGatewayV1alpha2 struct {
+type FakeExperimentalV1alpha2 struct {
 	*testing.Fake
 }
 
-func (c *FakeGatewayV1alpha2) BackendTrafficPolicies(namespace string) v1alpha2.BackendTrafficPolicyInterface {
+func (c *FakeExperimentalV1alpha2) BackendTrafficPolicies(namespace string) v1alpha2.BackendTrafficPolicyInterface {
 	return &FakeBackendTrafficPolicies{c, namespace}
 }
 
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
-func (c *FakeGatewayV1alpha2) RESTClient() rest.Interface {
+func (c *FakeExperimentalV1alpha2) RESTClient() rest.Interface {
 	var ret *rest.RESTClient
 	return ret
 }

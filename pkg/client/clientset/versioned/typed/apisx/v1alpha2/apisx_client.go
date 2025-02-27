@@ -26,24 +26,24 @@ import (
 	"sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/scheme"
 )
 
-type GatewayV1alpha2Interface interface {
+type ExperimentalV1alpha2Interface interface {
 	RESTClient() rest.Interface
 	BackendTrafficPoliciesGetter
 }
 
-// GatewayV1alpha2Client is used to interact with features provided by the gateway.networking.k8s-x.io group.
-type GatewayV1alpha2Client struct {
+// ExperimentalV1alpha2Client is used to interact with features provided by the gateway.networking.k8s-x.io group.
+type ExperimentalV1alpha2Client struct {
 	restClient rest.Interface
 }
 
-func (c *GatewayV1alpha2Client) BackendTrafficPolicies(namespace string) BackendTrafficPolicyInterface {
+func (c *ExperimentalV1alpha2Client) BackendTrafficPolicies(namespace string) BackendTrafficPolicyInterface {
 	return newBackendTrafficPolicies(c, namespace)
 }
 
-// NewForConfig creates a new GatewayV1alpha2Client for the given config.
+// NewForConfig creates a new ExperimentalV1alpha2Client for the given config.
 // NewForConfig is equivalent to NewForConfigAndClient(c, httpClient),
 // where httpClient was generated with rest.HTTPClientFor(c).
-func NewForConfig(c *rest.Config) (*GatewayV1alpha2Client, error) {
+func NewForConfig(c *rest.Config) (*ExperimentalV1alpha2Client, error) {
 	config := *c
 	if err := setConfigDefaults(&config); err != nil {
 		return nil, err
@@ -55,9 +55,9 @@ func NewForConfig(c *rest.Config) (*GatewayV1alpha2Client, error) {
 	return NewForConfigAndClient(&config, httpClient)
 }
 
-// NewForConfigAndClient creates a new GatewayV1alpha2Client for the given config and http client.
+// NewForConfigAndClient creates a new ExperimentalV1alpha2Client for the given config and http client.
 // Note the http client provided takes precedence over the configured transport values.
-func NewForConfigAndClient(c *rest.Config, h *http.Client) (*GatewayV1alpha2Client, error) {
+func NewForConfigAndClient(c *rest.Config, h *http.Client) (*ExperimentalV1alpha2Client, error) {
 	config := *c
 	if err := setConfigDefaults(&config); err != nil {
 		return nil, err
@@ -66,12 +66,12 @@ func NewForConfigAndClient(c *rest.Config, h *http.Client) (*GatewayV1alpha2Clie
 	if err != nil {
 		return nil, err
 	}
-	return &GatewayV1alpha2Client{client}, nil
+	return &ExperimentalV1alpha2Client{client}, nil
 }
 
-// NewForConfigOrDie creates a new GatewayV1alpha2Client for the given config and
+// NewForConfigOrDie creates a new ExperimentalV1alpha2Client for the given config and
 // panics if there is an error in the config.
-func NewForConfigOrDie(c *rest.Config) *GatewayV1alpha2Client {
+func NewForConfigOrDie(c *rest.Config) *ExperimentalV1alpha2Client {
 	client, err := NewForConfig(c)
 	if err != nil {
 		panic(err)
@@ -79,9 +79,9 @@ func NewForConfigOrDie(c *rest.Config) *GatewayV1alpha2Client {
 	return client
 }
 
-// New creates a new GatewayV1alpha2Client for the given RESTClient.
-func New(c rest.Interface) *GatewayV1alpha2Client {
-	return &GatewayV1alpha2Client{c}
+// New creates a new ExperimentalV1alpha2Client for the given RESTClient.
+func New(c rest.Interface) *ExperimentalV1alpha2Client {
+	return &ExperimentalV1alpha2Client{c}
 }
 
 func setConfigDefaults(config *rest.Config) error {
@@ -99,7 +99,7 @@ func setConfigDefaults(config *rest.Config) error {
 
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
-func (c *GatewayV1alpha2Client) RESTClient() rest.Interface {
+func (c *ExperimentalV1alpha2Client) RESTClient() rest.Interface {
 	if c == nil {
 		return nil
 	}
