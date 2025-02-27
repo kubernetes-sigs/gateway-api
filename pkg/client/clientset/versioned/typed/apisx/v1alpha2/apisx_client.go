@@ -31,7 +31,7 @@ type ExperimentalV1alpha2Interface interface {
 	BackendTrafficPoliciesGetter
 }
 
-// ExperimentalV1alpha2Client is used to interact with features provided by the gateway.networking.k8s-x.io group.
+// ExperimentalV1alpha2Client is used to interact with features provided by the gateway.networking.x-k8s.io group.
 type ExperimentalV1alpha2Client struct {
 	restClient rest.Interface
 }

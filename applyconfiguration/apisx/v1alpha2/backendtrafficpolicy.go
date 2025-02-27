@@ -44,7 +44,7 @@ func BackendTrafficPolicy(name, namespace string) *BackendTrafficPolicyApplyConf
 	b.WithName(name)
 	b.WithNamespace(namespace)
 	b.WithKind("BackendTrafficPolicy")
-	b.WithAPIVersion("gateway.networking.k8s-x.io/v1alpha2")
+	b.WithAPIVersion("gateway.networking.x-k8s.io/v1alpha2")
 	return b
 }
 
@@ -80,7 +80,7 @@ func extractBackendTrafficPolicy(backendTrafficPolicy *apisxv1alpha2.BackendTraf
 	b.WithNamespace(backendTrafficPolicy.Namespace)
 
 	b.WithKind("BackendTrafficPolicy")
-	b.WithAPIVersion("gateway.networking.k8s-x.io/v1alpha2")
+	b.WithAPIVersion("gateway.networking.x-k8s.io/v1alpha2")
 	return b, nil
 }
 

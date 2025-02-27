@@ -23,17 +23,17 @@ import (
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	testing "k8s.io/client-go/testing"
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
-	apisv1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
+	v1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
 	v1alpha3 "sigs.k8s.io/gateway-api/apis/v1alpha3"
 	v1beta1 "sigs.k8s.io/gateway-api/apis/v1beta1"
 	v1alpha1 "sigs.k8s.io/gateway-api/apisx/v1alpha1"
-	v1alpha2 "sigs.k8s.io/gateway-api/apisx/v1alpha2"
+	apisxv1alpha2 "sigs.k8s.io/gateway-api/apisx/v1alpha2"
 	apisv1 "sigs.k8s.io/gateway-api/applyconfiguration/apis/v1"
-	applyconfigurationapisv1alpha2 "sigs.k8s.io/gateway-api/applyconfiguration/apis/v1alpha2"
+	apisv1alpha2 "sigs.k8s.io/gateway-api/applyconfiguration/apis/v1alpha2"
 	apisv1alpha3 "sigs.k8s.io/gateway-api/applyconfiguration/apis/v1alpha3"
 	apisv1beta1 "sigs.k8s.io/gateway-api/applyconfiguration/apis/v1beta1"
 	apisxv1alpha1 "sigs.k8s.io/gateway-api/applyconfiguration/apisx/v1alpha1"
-	apisxv1alpha2 "sigs.k8s.io/gateway-api/applyconfiguration/apisx/v1alpha2"
+	applyconfigurationapisxv1alpha2 "sigs.k8s.io/gateway-api/applyconfiguration/apisx/v1alpha2"
 	internal "sigs.k8s.io/gateway-api/applyconfiguration/internal"
 )
 
@@ -41,17 +41,7 @@ import (
 // apply configuration type exists for the given GroupVersionKind.
 func ForKind(kind schema.GroupVersionKind) interface{} {
 	switch kind {
-	// Group=gateway.networking.k8s-x.io, Version=v1alpha2
-	case v1alpha2.SchemeGroupVersion.WithKind("BackendTrafficPolicy"):
-		return &apisxv1alpha2.BackendTrafficPolicyApplyConfiguration{}
-	case v1alpha2.SchemeGroupVersion.WithKind("BackendTrafficPolicySpec"):
-		return &apisxv1alpha2.BackendTrafficPolicySpecApplyConfiguration{}
-	case v1alpha2.SchemeGroupVersion.WithKind("RequestRate"):
-		return &apisxv1alpha2.RequestRateApplyConfiguration{}
-	case v1alpha2.SchemeGroupVersion.WithKind("RetryConstraint"):
-		return &apisxv1alpha2.RetryConstraintApplyConfiguration{}
-
-		// Group=gateway.networking.k8s.io, Version=v1
+	// Group=gateway.networking.k8s.io, Version=v1
 	case v1.SchemeGroupVersion.WithKind("AllowedListeners"):
 		return &apisv1.AllowedListenersApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("AllowedRoutes"):
@@ -176,46 +166,46 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1.SupportedFeatureApplyConfiguration{}
 
 		// Group=gateway.networking.k8s.io, Version=v1alpha2
-	case apisv1alpha2.SchemeGroupVersion.WithKind("BackendLBPolicy"):
-		return &applyconfigurationapisv1alpha2.BackendLBPolicyApplyConfiguration{}
-	case apisv1alpha2.SchemeGroupVersion.WithKind("BackendLBPolicySpec"):
-		return &applyconfigurationapisv1alpha2.BackendLBPolicySpecApplyConfiguration{}
-	case apisv1alpha2.SchemeGroupVersion.WithKind("GRPCRoute"):
-		return &applyconfigurationapisv1alpha2.GRPCRouteApplyConfiguration{}
-	case apisv1alpha2.SchemeGroupVersion.WithKind("LocalPolicyTargetReference"):
-		return &applyconfigurationapisv1alpha2.LocalPolicyTargetReferenceApplyConfiguration{}
-	case apisv1alpha2.SchemeGroupVersion.WithKind("LocalPolicyTargetReferenceWithSectionName"):
-		return &applyconfigurationapisv1alpha2.LocalPolicyTargetReferenceWithSectionNameApplyConfiguration{}
-	case apisv1alpha2.SchemeGroupVersion.WithKind("PolicyAncestorStatus"):
-		return &applyconfigurationapisv1alpha2.PolicyAncestorStatusApplyConfiguration{}
-	case apisv1alpha2.SchemeGroupVersion.WithKind("PolicyStatus"):
-		return &applyconfigurationapisv1alpha2.PolicyStatusApplyConfiguration{}
-	case apisv1alpha2.SchemeGroupVersion.WithKind("ReferenceGrant"):
-		return &applyconfigurationapisv1alpha2.ReferenceGrantApplyConfiguration{}
-	case apisv1alpha2.SchemeGroupVersion.WithKind("TCPRoute"):
-		return &applyconfigurationapisv1alpha2.TCPRouteApplyConfiguration{}
-	case apisv1alpha2.SchemeGroupVersion.WithKind("TCPRouteRule"):
-		return &applyconfigurationapisv1alpha2.TCPRouteRuleApplyConfiguration{}
-	case apisv1alpha2.SchemeGroupVersion.WithKind("TCPRouteSpec"):
-		return &applyconfigurationapisv1alpha2.TCPRouteSpecApplyConfiguration{}
-	case apisv1alpha2.SchemeGroupVersion.WithKind("TCPRouteStatus"):
-		return &applyconfigurationapisv1alpha2.TCPRouteStatusApplyConfiguration{}
-	case apisv1alpha2.SchemeGroupVersion.WithKind("TLSRoute"):
-		return &applyconfigurationapisv1alpha2.TLSRouteApplyConfiguration{}
-	case apisv1alpha2.SchemeGroupVersion.WithKind("TLSRouteRule"):
-		return &applyconfigurationapisv1alpha2.TLSRouteRuleApplyConfiguration{}
-	case apisv1alpha2.SchemeGroupVersion.WithKind("TLSRouteSpec"):
-		return &applyconfigurationapisv1alpha2.TLSRouteSpecApplyConfiguration{}
-	case apisv1alpha2.SchemeGroupVersion.WithKind("TLSRouteStatus"):
-		return &applyconfigurationapisv1alpha2.TLSRouteStatusApplyConfiguration{}
-	case apisv1alpha2.SchemeGroupVersion.WithKind("UDPRoute"):
-		return &applyconfigurationapisv1alpha2.UDPRouteApplyConfiguration{}
-	case apisv1alpha2.SchemeGroupVersion.WithKind("UDPRouteRule"):
-		return &applyconfigurationapisv1alpha2.UDPRouteRuleApplyConfiguration{}
-	case apisv1alpha2.SchemeGroupVersion.WithKind("UDPRouteSpec"):
-		return &applyconfigurationapisv1alpha2.UDPRouteSpecApplyConfiguration{}
-	case apisv1alpha2.SchemeGroupVersion.WithKind("UDPRouteStatus"):
-		return &applyconfigurationapisv1alpha2.UDPRouteStatusApplyConfiguration{}
+	case v1alpha2.SchemeGroupVersion.WithKind("BackendLBPolicy"):
+		return &apisv1alpha2.BackendLBPolicyApplyConfiguration{}
+	case v1alpha2.SchemeGroupVersion.WithKind("BackendLBPolicySpec"):
+		return &apisv1alpha2.BackendLBPolicySpecApplyConfiguration{}
+	case v1alpha2.SchemeGroupVersion.WithKind("GRPCRoute"):
+		return &apisv1alpha2.GRPCRouteApplyConfiguration{}
+	case v1alpha2.SchemeGroupVersion.WithKind("LocalPolicyTargetReference"):
+		return &apisv1alpha2.LocalPolicyTargetReferenceApplyConfiguration{}
+	case v1alpha2.SchemeGroupVersion.WithKind("LocalPolicyTargetReferenceWithSectionName"):
+		return &apisv1alpha2.LocalPolicyTargetReferenceWithSectionNameApplyConfiguration{}
+	case v1alpha2.SchemeGroupVersion.WithKind("PolicyAncestorStatus"):
+		return &apisv1alpha2.PolicyAncestorStatusApplyConfiguration{}
+	case v1alpha2.SchemeGroupVersion.WithKind("PolicyStatus"):
+		return &apisv1alpha2.PolicyStatusApplyConfiguration{}
+	case v1alpha2.SchemeGroupVersion.WithKind("ReferenceGrant"):
+		return &apisv1alpha2.ReferenceGrantApplyConfiguration{}
+	case v1alpha2.SchemeGroupVersion.WithKind("TCPRoute"):
+		return &apisv1alpha2.TCPRouteApplyConfiguration{}
+	case v1alpha2.SchemeGroupVersion.WithKind("TCPRouteRule"):
+		return &apisv1alpha2.TCPRouteRuleApplyConfiguration{}
+	case v1alpha2.SchemeGroupVersion.WithKind("TCPRouteSpec"):
+		return &apisv1alpha2.TCPRouteSpecApplyConfiguration{}
+	case v1alpha2.SchemeGroupVersion.WithKind("TCPRouteStatus"):
+		return &apisv1alpha2.TCPRouteStatusApplyConfiguration{}
+	case v1alpha2.SchemeGroupVersion.WithKind("TLSRoute"):
+		return &apisv1alpha2.TLSRouteApplyConfiguration{}
+	case v1alpha2.SchemeGroupVersion.WithKind("TLSRouteRule"):
+		return &apisv1alpha2.TLSRouteRuleApplyConfiguration{}
+	case v1alpha2.SchemeGroupVersion.WithKind("TLSRouteSpec"):
+		return &apisv1alpha2.TLSRouteSpecApplyConfiguration{}
+	case v1alpha2.SchemeGroupVersion.WithKind("TLSRouteStatus"):
+		return &apisv1alpha2.TLSRouteStatusApplyConfiguration{}
+	case v1alpha2.SchemeGroupVersion.WithKind("UDPRoute"):
+		return &apisv1alpha2.UDPRouteApplyConfiguration{}
+	case v1alpha2.SchemeGroupVersion.WithKind("UDPRouteRule"):
+		return &apisv1alpha2.UDPRouteRuleApplyConfiguration{}
+	case v1alpha2.SchemeGroupVersion.WithKind("UDPRouteSpec"):
+		return &apisv1alpha2.UDPRouteSpecApplyConfiguration{}
+	case v1alpha2.SchemeGroupVersion.WithKind("UDPRouteStatus"):
+		return &apisv1alpha2.UDPRouteStatusApplyConfiguration{}
 
 		// Group=gateway.networking.k8s.io, Version=v1alpha3
 	case v1alpha3.SchemeGroupVersion.WithKind("BackendTLSPolicy"):
@@ -256,6 +246,16 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisxv1alpha1.ListenerSetStatusApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("ParentGatewayReference"):
 		return &apisxv1alpha1.ParentGatewayReferenceApplyConfiguration{}
+
+		// Group=gateway.networking.x-k8s.io, Version=v1alpha2
+	case apisxv1alpha2.SchemeGroupVersion.WithKind("BackendTrafficPolicy"):
+		return &applyconfigurationapisxv1alpha2.BackendTrafficPolicyApplyConfiguration{}
+	case apisxv1alpha2.SchemeGroupVersion.WithKind("BackendTrafficPolicySpec"):
+		return &applyconfigurationapisxv1alpha2.BackendTrafficPolicySpecApplyConfiguration{}
+	case apisxv1alpha2.SchemeGroupVersion.WithKind("RequestRate"):
+		return &applyconfigurationapisxv1alpha2.RequestRateApplyConfiguration{}
+	case apisxv1alpha2.SchemeGroupVersion.WithKind("RetryConstraint"):
+		return &applyconfigurationapisxv1alpha2.RetryConstraintApplyConfiguration{}
 
 	}
 	return nil

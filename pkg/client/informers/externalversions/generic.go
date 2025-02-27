@@ -28,6 +28,7 @@ import (
 	v1alpha3 "sigs.k8s.io/gateway-api/apis/v1alpha3"
 	v1beta1 "sigs.k8s.io/gateway-api/apis/v1beta1"
 	v1alpha1 "sigs.k8s.io/gateway-api/apisx/v1alpha1"
+	apisxv1alpha2 "sigs.k8s.io/gateway-api/apisx/v1alpha2"
 )
 
 // GenericInformer is type of SharedIndexInformer which will locate and delegate to other
@@ -97,6 +98,10 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		// Group=gateway.networking.x-k8s.io, Version=v1alpha1
 	case v1alpha1.SchemeGroupVersion.WithResource("listenersets"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Experimental().V1alpha1().ListenerSets().Informer()}, nil
+
+		// Group=gateway.networking.x-k8s.io, Version=v1alpha2
+	case apisxv1alpha2.SchemeGroupVersion.WithResource("backendtrafficpolicies"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Experimental().V1alpha2().BackendTrafficPolicies().Informer()}, nil
 
 	}
 
