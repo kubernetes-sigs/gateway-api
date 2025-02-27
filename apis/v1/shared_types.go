@@ -764,6 +764,12 @@ type HeaderName string
 // +kubebuilder:validation:Pattern=`^([0-9]{1,5}(h|m|s|ms)){1,4}$`
 type Duration string
 
+// LowercaseTrue is a string value that can only be set to "true" (case
+// sensitive).
+//
+// +kubebuilder:validation:Enum=true
+type LowercaseTrue string
+
 const (
 	// A textual representation of a numeric IP address. IPv4
 	// addresses must be in dotted-decimal form. IPv6 addresses

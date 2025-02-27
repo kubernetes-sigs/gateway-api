@@ -691,6 +691,39 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: weight
       type:
         scalar: numeric
+- name: io.k8s.sigs.gateway-api.apis.v1.HTTPCORSFilter
+  map:
+    fields:
+    - name: allowCredentials
+      type:
+        scalar: string
+    - name: allowHeaders
+      type:
+        list:
+          elementType:
+            scalar: string
+          elementRelationship: associative
+    - name: allowMethods
+      type:
+        list:
+          elementType:
+            scalar: string
+          elementRelationship: associative
+    - name: allowOrigins
+      type:
+        list:
+          elementType:
+            scalar: string
+          elementRelationship: associative
+    - name: exposeHeaders
+      type:
+        list:
+          elementType:
+            scalar: string
+          elementRelationship: associative
+    - name: maxAge
+      type:
+        scalar: numeric
 - name: io.k8s.sigs.gateway-api.apis.v1.HTTPHeader
   map:
     fields:
@@ -832,6 +865,9 @@ var schemaYAML = typed.YAMLObject(`types:
 - name: io.k8s.sigs.gateway-api.apis.v1.HTTPRouteFilter
   map:
     fields:
+    - name: cors
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1.HTTPCORSFilter
     - name: extensionRef
       type:
         namedType: io.k8s.sigs.gateway-api.apis.v1.LocalObjectReference
