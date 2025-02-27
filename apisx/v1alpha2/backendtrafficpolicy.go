@@ -64,6 +64,9 @@ type BackendTrafficPolicySpec struct {
 	// implementation-specific backendRef) are the only valid API
 	// target references.
 	//
+	// Currently, a TargetRef can not be scoped to a specific port on a
+	// Service.
+	//
 	// +listType=map
 	// +listMapKey=group
 	// +listMapKey=kind
@@ -73,17 +76,19 @@ type BackendTrafficPolicySpec struct {
 	TargetRefs []LocalPolicyTargetReference `json:"targetRefs"`
 
 	// RetryConstraint defines the configuration for when to allow or prevent
-	// further retries to a target backend by dynamically calculating a 'retry
+	// further retries to a target backend, by dynamically calculating a 'retry
 	// budget'. This budget is calculated based on the percentage of incoming
 	// traffic composed of retries over a given time interval. Once the budget
-	// is exceeded, additional retries will be rejected by the backend.
+	// is exceeded, additional retries will be rejected.
 	//
 	// For example, if the retry budget interval is 10 seconds, there have been
 	// 1000 active requests in the past 10 seconds, and the allowed percentage
 	// of requests that can be retried is 20% (the default), then 200 of those
 	// requests may be composed of retries. Active requests will only be
 	// considered for the duration of the interval when calculating the retry
-	// budget.
+	// budget. Retrying the same original request multiple times within the
+	// retry budget interval will lead to each retry being counted towards
+	// calculating the budget.
 	//
 	// Configuring a RetryConstraint in BackendTrafficPolicy is compatible with
 	// HTTPRoute Retry settings for each HTTPRouteRule that targets the same
