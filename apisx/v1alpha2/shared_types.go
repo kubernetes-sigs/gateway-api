@@ -16,8 +16,10 @@ limitations under the License.
 
 package v1alpha2
 
-import v1 "sigs.k8s.io/gateway-api/apis/v1"
-import v1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
+import (
+	v1 "sigs.k8s.io/gateway-api/apis/v1"
+	v1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
+)
 
 type (
 	// +k8s:deepcopy-gen=false
