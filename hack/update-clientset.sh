@@ -44,7 +44,7 @@ GATEWAY_INPUT_DIRS_SPACE=""
 GATEWAY_INPUT_DIRS_COMMA=""
 
 for API_PATH in "${API_PATHS[@]}"; do
-  VERSIONS=($(find ./${API_PATH} -maxdepth 1 -name "v*" -exec bash -c 'basename {}' \; | xargs))
+  VERSIONS=($(find ./${API_PATH} -maxdepth 1 -name "v*" -exec bash -c 'basename {}' \; | LC_ALL=C sort -u))
   for VERSION in "${VERSIONS[@]}"; do
     GATEWAY_INPUT_DIRS_SPACE+="${APIS_PKG}/${API_PATH}/${VERSION} "
     GATEWAY_INPUT_DIRS_COMMA+="${APIS_PKG}/${API_PATH}/${VERSION},"
