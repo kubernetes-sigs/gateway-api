@@ -4,7 +4,7 @@
 
 | API channel  | Implementation version                                           | Mode    | Report                                            |
 |--------------|------------------------------------------------------------------|---------|---------------------------------------------------|
-| experimental | [v3.2.2](https://github.com/traefik/traefik/releases/tag/v3.2.2) | default | [link](./experimental-v3.2.2-default-report.yaml) |
+| experimental | [v3.2.2](https://github.com/traefik/traefik/releases/tag/v3.2.2) | default | [v3.2.2 report](./experimental-v3.2.2-default-report.yaml) |
 
 ## Reproduce
 

@@ -4,7 +4,7 @@
 
 |API channel|Implementation version|Mode|Report|
 |-----------|----------------------|----|------|
-| experimental |[v1.2.0-rc.1](https://github.com/envoyproxy/gateway/releases/tag/v1.2.0-rc.1)| default |[link](./experimental-v1.2.0-default-report.yaml)|
+| experimental |[v1.2.0-rc.1](https://github.com/envoyproxy/gateway/releases/tag/v1.2.0-rc.1)| default |[v1.2.0 report](./experimental-v1.2.0-default-report.yaml)|
 
 ## Reproduce
 
