@@ -1870,6 +1870,67 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: namespace
       type:
         scalar: string
+- name: io.k8s.sigs.gateway-api.apisx.v1alpha2.BackendTrafficPolicy
+  map:
+    fields:
+    - name: apiVersion
+      type:
+        scalar: string
+    - name: kind
+      type:
+        scalar: string
+    - name: metadata
+      type:
+        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+      default: {}
+    - name: spec
+      type:
+        namedType: io.k8s.sigs.gateway-api.apisx.v1alpha2.BackendTrafficPolicySpec
+      default: {}
+    - name: status
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1alpha2.PolicyStatus
+      default: {}
+- name: io.k8s.sigs.gateway-api.apisx.v1alpha2.BackendTrafficPolicySpec
+  map:
+    fields:
+    - name: retry
+      type:
+        namedType: io.k8s.sigs.gateway-api.apisx.v1alpha2.RetryConstraint
+    - name: sessionPersistence
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1.SessionPersistence
+    - name: targetRefs
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v1alpha2.LocalPolicyTargetReference
+          elementRelationship: associative
+          keys:
+          - group
+          - kind
+          - name
+- name: io.k8s.sigs.gateway-api.apisx.v1alpha2.RequestRate
+  map:
+    fields:
+    - name: count
+      type:
+        scalar: numeric
+    - name: interval
+      type:
+        scalar: string
+- name: io.k8s.sigs.gateway-api.apisx.v1alpha2.RetryConstraint
+  map:
+    fields:
+    - name: budgetInterval
+      type:
+        scalar: string
+    - name: budgetPercent
+      type:
+        scalar: numeric
+    - name: minRetryRate
+      type:
+        namedType: io.k8s.sigs.gateway-api.apisx.v1alpha2.RequestRate
 - name: __untyped_atomic_
   scalar: untyped
   list:
