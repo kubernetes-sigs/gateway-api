@@ -113,13 +113,13 @@ In this section you will find specific links to blog posts, documentation and ot
 [epicsource]:https://github.com/epic-gateway
 
 ### Airlock Microgateway
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.1.0-Airlock%20Microgateway-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.1.0/airlock-microgateway)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.2.1-Airlock%20Microgateway-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.2.1/airlock-microgateway)
 
 [Airlock Microgateway][airlock-microgateway] is a Kubernetes native WAAP (Web Application and API Protection) solution to protect microservices.
 Modern application security is embedded in the development workflow and follows DevSecOps paradigms.
 Airlock Microgateway protects your applications and microservices with the tried-and-tested Airlock security features against attacks, while also providing a high degree of scalability.
 
-With [Airlock Microgateway 4.4][airlock-microgateway-v4.4], Airlock Microgateway introduces a sidecarless data plane mode
+With [Airlock Microgateway 4.4][airlock-microgateway-gwapi-arch], Airlock Microgateway introduces a sidecarless data plane mode
 based on Gateway API to avoid the operational complexity of sidecars.
 
 #### Features
@@ -135,9 +135,9 @@ based on Gateway API to avoid the operational complexity of sidecars.
 - Check our [Airlock community forum][airlock-microgateway-community-support] and [support process][airlock-microgateway-premium-support] for support.
 
 [airlock-microgateway]:https://www.airlock.com/en/secure-access-hub/components/microgateway
-[airlock-microgateway-v4.4]:https://docs.airlock.com/microgateway/4.4/#data/1725073468781.html
+[airlock-microgateway-gwapi-arch]:https://docs.airlock.com/microgateway/latest/?topic=MGW-00000141
 [airlock-microgateway-documentation]:https://docs.airlock.com/microgateway/latest
-[airlock-microgateway-guide]:https://docs.airlock.com/microgateway/4.4/#data/1726159368351.html
+[airlock-microgateway-guide]:https://docs.airlock.com/microgateway/latest/?topic=MGW-00000142
 [airlock-microgateway-community-support]:https://forum.airlock.com/
 [airlock-microgateway-premium-support]:https://techzone.ergon.ch/support-process
 

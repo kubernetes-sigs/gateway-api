@@ -1,0 +1,53 @@
+apiVersion: gateway.networking.k8s.io/v1
+date: "2025-02-03T15:51:50Z"
+gatewayAPIChannel: standard
+gatewayAPIVersion: v1.2.0
+implementation:
+  contact:
+    - https://www.airlock.com/en/contact
+  organization: airlock
+  project: microgateway
+  url: https://github.com/airlock/microgateway
+  version: 4.5.0
+kind: ConformanceReport
+mode: default
+profiles:
+  - core:
+      result: success
+      statistics:
+        Failed: 0
+        Passed: 33
+        Skipped: 0
+    extended:
+      result: success
+      statistics:
+        Failed: 0
+        Passed: 16
+        Skipped: 0
+      supportedFeatures:
+        - GatewayInfrastructurePropagation
+        - GatewayPort8080
+        - HTTPRouteBackendProtocolH2C
+        - HTTPRouteBackendProtocolWebSocket
+        - HTTPRouteBackendTimeout
+        - HTTPRouteDestinationPortMatching
+        - HTTPRouteHostRewrite
+        - HTTPRouteMethodMatching
+        - HTTPRouteParentRefPort
+        - HTTPRoutePathRewrite
+        - HTTPRoutePortRedirect
+        - HTTPRouteQueryParamMatching
+        - HTTPRouteRequestTimeout
+        - HTTPRouteSchemeRedirect
+      unsupportedFeatures:
+        - GatewayHTTPListenerIsolation
+        - GatewayStaticAddresses
+        - HTTPRouteBackendRequestHeaderModification
+        - HTTPRoutePathRedirect
+        - HTTPRouteRequestMirror
+        - HTTPRouteRequestMultipleMirrors
+        - HTTPRouteResponseHeaderModification
+    name: GATEWAY-HTTP
+    summary: Core tests succeeded. Extended tests succeeded.
+succeededProvisionalTests:
+  - GatewayInfrastructure
