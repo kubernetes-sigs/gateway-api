@@ -860,7 +860,7 @@ type HTTPRouteFilter struct {
 	//
 	// +optional
 	//
-	// <gateway:experimental:validation:XValidation:message="Only one of percent or fraction may be specified in HTTPRequestMirrorFilter",rule="!(has(self.percent) && has(self.fraction))">
+	// +kubebuilder:validation:XValidation:message="Only one of percent or fraction may be specified in HTTPRequestMirrorFilter",rule="!(has(self.percent) && has(self.fraction))"
 	RequestMirror *HTTPRequestMirrorFilter `json:"requestMirror,omitempty"`
 
 	// RequestRedirect defines a schema for a filter that responds to the
@@ -1286,7 +1286,6 @@ type HTTPRequestMirrorFilter struct {
 	// +optional
 	// +kubebuilder:validation:Minimum=0
 	// +kubebuilder:validation:Maximum=100
-	// <gateway:experimental>
 	Percent *int32 `json:"percent,omitempty"`
 
 	// Fraction represents the fraction of requests that should be
@@ -1296,7 +1295,6 @@ type HTTPRequestMirrorFilter struct {
 	// is specified, 100% of requests will be mirrored.
 	//
 	// +optional
-	// <gateway:experimental>
 	Fraction *Fraction `json:"fraction,omitempty"`
 }
 

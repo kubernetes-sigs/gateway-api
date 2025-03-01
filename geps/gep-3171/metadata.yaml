@@ -2,7 +2,7 @@ apiVersion: internal.gateway.networking.k8s.io/v1alpha2
 kind: GEPDetails
 number: 3171
 name: Percentage-based Request Mirroring
-status: Experimental
+status: Standard
 authors:
   - jakebennert
 references:
