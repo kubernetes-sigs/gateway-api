@@ -105,7 +105,6 @@ spec:
                       description: Type of the address.
                       maxLength: 253
                       minLength: 1
-                      pattern: ^Hostname|IPAddress|NamedAddress|[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/[A-Za-z0-9\/\-._~%!$&'()*+,;=:]+$
                       type: string
                     value:
                       description: |-
@@ -116,8 +115,6 @@ spec:
                       maxLength: 253
                       minLength: 1
                       type: string
-                  required:
-                  - value
                   type: object
                   x-kubernetes-validations:
                   - message: Hostname value must only contain valid characters (matching
@@ -874,7 +871,6 @@ spec:
                       description: Type of the address.
                       maxLength: 253
                       minLength: 1
-                      pattern: ^Hostname|IPAddress|NamedAddress|[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/[A-Za-z0-9\/\-._~%!$&'()*+,;=:]+$
                       type: string
                     value:
                       description: |-
@@ -1212,7 +1208,6 @@ spec:
                       description: Type of the address.
                       maxLength: 253
                       minLength: 1
-                      pattern: ^Hostname|IPAddress|NamedAddress|[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/[A-Za-z0-9\/\-._~%!$&'()*+,;=:]+$
                       type: string
                     value:
                       description: |-
@@ -1223,8 +1218,6 @@ spec:
                       maxLength: 253
                       minLength: 1
                       type: string
-                  required:
-                  - value
                   type: object
                   x-kubernetes-validations:
                   - message: Hostname value must only contain valid characters (matching
@@ -1981,7 +1974,6 @@ spec:
                       description: Type of the address.
                       maxLength: 253
                       minLength: 1
-                      pattern: ^Hostname|IPAddress|NamedAddress|[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/[A-Za-z0-9\/\-._~%!$&'()*+,;=:]+$
                       type: string
                     value:
                       description: |-
