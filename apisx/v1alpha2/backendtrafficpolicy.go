@@ -60,9 +60,9 @@ type BackendTrafficPolicyList struct {
 // Note: there is no Override or Default policy configuration.
 type BackendTrafficPolicySpec struct {
 	// TargetRef identifies an API object to apply policy to.
-	// Currently, Backends (i.e. Service, ServiceImport, or any
-	// implementation-specific backendRef) are the only valid API
-	// target references.
+	// Currently, Backends (A grouping of like endpoints such as Service,
+	// ServiceImport, or any implementation-specific backendRef) are the only
+	// valid API target references.
 	//
 	// Currently, a TargetRef can not be scoped to a specific port on a
 	// Service.
@@ -138,10 +138,15 @@ type RetryConstraint struct {
 	//
 	// +optional
 	// +kubebuilder:default=10s
+	// +kubebuilder:validation:XValidation:message="budgetInterval can not be greater than one hour or less than one second",rule="!(duration(self.budgetInterval) < duration('1s') || duration(self.budgetInterval) > duration('1h'))"
 	BudgetInterval *Duration `json:"budgetInterval,omitempty"`
 
 	// MinRetryRate defines the minimum rate of retries that will be allowable
 	// over a specified duration of time.
+	//
+	// The effective overall minimum rate of retries targeting the backend
+	// service may be much higher, as there can be any number of clients which
+	// are applying this setting locally.
 	//
 	// This ensures that requests can still be retried during periods of low
 	// traffic, where the budget for retries may be calculated as a very low

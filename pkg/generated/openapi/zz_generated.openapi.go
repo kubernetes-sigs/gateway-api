@@ -8168,7 +8168,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha2_BackendTrafficPolicySpec(ref co
 							},
 						},
 						SchemaProps: spec.SchemaProps{
-							Description: "TargetRef identifies an API object to apply policy to. Currently, Backends (i.e. Service, ServiceImport, or any implementation-specific backendRef) are the only valid API target references.\n\nCurrently, a TargetRef can not be scoped to a specific port on a Service.",
+							Description: "TargetRef identifies an API object to apply policy to. Currently, Backends (A grouping of like endpoints such as Service, ServiceImport, or any implementation-specific backendRef) are the only valid API target references.\n\nCurrently, a TargetRef can not be scoped to a specific port on a Service.",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -8251,7 +8251,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha2_RetryConstraint(ref common.Refe
 					},
 					"minRetryRate": {
 						SchemaProps: spec.SchemaProps{
-							Description: "MinRetryRate defines the minimum rate of retries that will be allowable over a specified duration of time.\n\nThis ensures that requests can still be retried during periods of low traffic, where the budget for retries may be calculated as a very low value.\n\nSupport: Extended",
+							Description: "MinRetryRate defines the minimum rate of retries that will be allowable over a specified duration of time.\n\nThe effective overall minimum rate of retries targeting the backend service may be much higher, as there can be any number of clients which are applying this setting locally.\n\nThis ensures that requests can still be retried during periods of low traffic, where the budget for retries may be calculated as a very low value.\n\nSupport: Extended",
 							Ref:         ref("sigs.k8s.io/gateway-api/apisx/v1alpha2.RequestRate"),
 						},
 					},

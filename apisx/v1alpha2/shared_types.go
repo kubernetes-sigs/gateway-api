@@ -33,11 +33,14 @@ type (
 )
 
 // RequestRate expresses a rate of requests over a given period of time.
+//
+// +kubebuilder:validation:XValidation:message="interval can not be greater than one hour",rule="!(duration(self.interval) == duration('0s') || duration(self.interval) > duration('1h'))"
 type RequestRate struct {
 	// Count specifies the number of requests per time interval.
 	//
 	// Support: Extended
-	// +kubebuilder:validation:Minimum=0
+	// +kubebuilder:validation:Minimum=1
+	// +kubebuilder:validation:Maximum=1000000
 	Count *int `json:"count,omitempty"`
 
 	// Interval specifies the divisor of the rate of requests, the amount of
