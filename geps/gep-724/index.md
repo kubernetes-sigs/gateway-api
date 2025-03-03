@@ -16,7 +16,7 @@ for the future addition of Route inclusion (Routes including other Routes).
 Refactor cross-namespace Route-Gateway binding to:
 
 * Be more consistent with [cross-namespace references from
-Routes](../gep-709/index.md)
+  Routes](../gep-709/index.md)
 * Provide a clear path to enable Route inclusion (Routes including Routes).
 * Simplify user experience based on initial feedback.
 * Enable other kinds of Route parents in addition to Gateway, this could include:

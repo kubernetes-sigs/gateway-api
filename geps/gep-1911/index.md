@@ -26,7 +26,7 @@ Not all implementations support automatic protocol selection. Even in some cases
 Since Kubernetes 1.20 the [`core/v1.Service`][k8s-service] and [`core/v1.EndpointSlice`][k8s-endpointslices] resource has a stable `appProtocol` field. It's purpose is to allow end-users to specify an application protocol (L7) for each service port.
 
 Originally the use of this field in the Gateway API was rejected in [GEP-1282](../gep-1282/index.md#non-goals):
-> v1.Service’s appProtocol field is not fit for purpose, because it is defined as accepting values either from the IANA Service Name registry, or domain-prefixed values and we need more flexibility than that. 
+> v1.Service’s appProtocol field is not fit for purpose, because it is defined as accepting values either from the IANA Service Name registry, or domain-prefixed values and we need more flexibility than that.
 
 Since then a Kubernetes enhancement proposal was created [KEP-3726][kep-3726] to repurpose `appProtocol` to include a convention for protocols that are not IANA service names. This would involve prefixing protocol names with `kubernetes.io/*`.
 
@@ -104,7 +104,7 @@ Should we upstream new constants for websocket over [HTTP/2](https://www.rfc-edi
 
 ## Alternatives
 
-### Single Meta-resource 
+### Single Meta-resource
 
 The first pass of this GEP proposed a new meta-resource [GEP-713](../gep-713/index.md) called `BackendProtocol`.
 
@@ -154,8 +154,8 @@ From [GEP-1282](../gep-1282/index.md#non-goals):
 Special values refers to using special strings in existing Kubernetes Resources.
 For example Istio allows for protocol to be specified by prefixing the Kubernetes
 Service's port name with the protocol (ie. `http-`, `grpc-`). This approach is
-limiting as it doesn't allow for multiple protocols on the same port and future 
-configuration per protocol. One protocol per port may be relaxed in the future see 
+limiting as it doesn't allow for multiple protocols on the same port and future
+configuration per protocol. One protocol per port may be relaxed in the future see
 [KEP 1435][kep-1435]
 
 Additionally, annotations are not self-documenting unlike CRD fields which can display
@@ -165,7 +165,7 @@ documentation via `kubectl explain`
 
 - [GitHub Discussion](https://github.com/kubernetes-sigs/gateway-api/discussions/1244)
 - GEP-1282 - Describing Backend Properties
-- [GEP](../gep-1282/index.md)
+    - [GEP](../gep-1282/index.md)
     - [Issue](https://github.com/kubernetes-sigs/gateway-api/issues/1911)
 - [GEP-713 - Metaresources](../gep-713/index.md)
 - [Linkerd Protocol Detection](https://linkerd.io/2.12/features/protocol-detection/)

@@ -20,11 +20,12 @@ separately.)
 
 ## The Use Cases
 
-- [Basic north/south use case](#basic-northsouth-use-case)
-- [Multiple applications behind a single
-  Gateway](#multiple-applications-behind-a-single-gateway)
-- [Basic east/west use case](#basic-eastwest-use-case) -- **experimental**
-- [Gateway and mesh use case](#gateway-and-mesh-use-case) -- **experimental**
+- [Use Cases](#use-cases)
+  - [The Use Cases](#the-use-cases)
+  - [Basic north/south use case](#basic-northsouth-use-case)
+  - [Multiple applications behind a single Gateway](#multiple-applications-behind-a-single-gateway)
+  - [Basic east/west use case](#basic-eastwest-use-case)
+  - [Gateway and mesh use case](#gateway-and-mesh-use-case)
 
 [role and personas]:roles-and-personas.md
 
@@ -34,7 +35,7 @@ separately.)
 
     The [north/south] use case is fully supported by the Standard Channel
     since `v0.8.0`. For more information on release
-channels, refer to our [versioning guide](versioning.md).
+    channels, refer to our [versioning guide](versioning.md).
 
 Ana has created a microservice application which she wants to run in
 Kubernetes. Her application will be used by clients outside the cluster, and
@@ -93,7 +94,7 @@ rollouts](../guides/traffic-splitting.md)).
 
     The [north/south] use case is fully supported by the Standard Channel
     since `v0.8.0`. For more information on release
-channels, refer to our [versioning guide](versioning.md).
+    channels, refer to our [versioning guide](versioning.md).
 
 This is remarkably similar to the [basic north/south use
 case](#basic-northsouth-use-case), but there are multiple application teams:

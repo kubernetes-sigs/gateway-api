@@ -14,12 +14,12 @@ TLDR: This GEP proposes `gwctl`, a new command line tool designed to streamline
 
 ## Motivations
 
-* Limited kubectl customizability for CRDs: 
+* Limited kubectl customizability for CRDs:
     * kubectl's customization capabilities for CRDs (through
       `additionalPrinterColumns`) is constrained, limiting the ability to create
-      optimal views for Gateway API resources. 
-* Complex policy attachment management: 
-* As described in [GEP-713](../gep-713/index.md),
+      optimal views for Gateway API resources.
+* Complex policy attachment management:
+    * As described in [GEP-713](../gep-713/index.md),
       policies present a valuable mechanism for expanding the capabilities of
       Gateway API resources. However, discoverability poses a challenge due to
       the absence of a clear connection between resources and their associated
@@ -27,7 +27,7 @@ TLDR: This GEP proposes `gwctl`, a new command line tool designed to streamline
       as a means to provide extensions.
 * Challenging multi-resource model navigation:
     * Comprehending the relationships between multiple Gateway API resources can
-      be challenging within kubectl. 
+      be challenging within kubectl.
 
 ## Goals
 
@@ -47,7 +47,7 @@ TLDR: This GEP proposes `gwctl`, a new command line tool designed to streamline
       issue identification and resolution. This would complement the ability of
       users to readily pinpoint configuration problems themselves.
 * Provide incentive for policy implementations that are consistent across cloud
-  providers: 
+  providers:
     * Encourage the adoption of consistent policy implementations across
       different Gateway API providers, promoting interoperability and
       predictability.
@@ -103,7 +103,7 @@ TLDR: This GEP proposes `gwctl`, a new command line tool designed to streamline
       format.
     * Wide format (-o wide): Includes additional columns beyond those displayed in
       the one-line format.
-  
+
   <details>
     <summary>Output columns while using get</summary>
     <table>
@@ -392,7 +392,7 @@ distribution mechanisms will be provided:
 ## References
 
 * [GEP-713: Metaresources and Policy
-Attachment](../gep-713/index.md)
+  Attachment](../gep-713/index.md)
 
 ## Sample outputs
 

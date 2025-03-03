@@ -35,7 +35,7 @@ the cluster.
 
     The `GatewayClass` resource is GA and has been part of the Standard Channel since
     `v0.5.0`. For more information on release channels, refer to our [versioning
-guide](versioning.md).
+    guide](versioning.md).
 
 GatewayClass defines a set of Gateways that share a common configuration and
 behaviour. Each GatewayClass will be handled by a single controller, although
@@ -60,7 +60,7 @@ IngressClass object.
 
     The `Gateway` resource is GA and has been part of the Standard Channel since
     `v0.5.0`. For more information on release channels, refer to our [versioning
-guide](versioning.md).
+    guide](versioning.md).
 
 A Gateway describes how traffic can be translated to Services within the
 cluster. That is, it defines a request for a way to translate traffic from
@@ -100,7 +100,7 @@ types may be added to the API in future.
 
     The `HTTPRoute` resource is GA and has been part of the Standard Channel since
     `v0.5.0`. For more information on release channels, refer to our [versioning
-guide](versioning.md).
+    guide](versioning.md).
 
 HTTPRoute is for multiplexing HTTP or terminated HTTPS connections. It's intended
 for use in cases where you want to inspect the HTTP stream and use HTTP request data
@@ -113,7 +113,7 @@ modifying them in-flight.
 
     The `TLSRoute` resource is Alpha and has been part of the Experimental
     Channel since `v0.3.0`. For more information on release channels, refer to
-our [versioning guide](versioning.md).
+    our [versioning guide](versioning.md).
 
 TLSRoute is for multiplexing TLS connections, discriminated via SNI. It's intended
 for where you want to use the SNI as the main routing method, and are not interested
@@ -126,7 +126,7 @@ connection is proxied without any inspection to the backend.
 
     The `TCPRoute` and `UDPRoute` resources are Alpha and have been part of the
     Experimental Channel since `v0.3.0`. For more information on release
-channels, refer to our [versioning guide](versioning.md).
+    channels, refer to our [versioning guide](versioning.md).
 
 TCPRoute (and UDPRoute) are intended for use for mapping one or more ports
 to a single backend. In this case, there is no discriminator you can
@@ -142,7 +142,7 @@ is passed through to the backend.
 
     The `GRPCRoute` resource is GA and has been part of the Standard Channel since
     `v1.1.0`. For more information on release channels, refer to our [versioning
-guide](versioning.md).
+    guide](versioning.md).
 
 GRPCRoute is for idiomatically routing gRPC traffic. Gateways supporting
 GRPCRoute are required to support HTTP/2 without an initial upgrade from HTTP/1,
@@ -219,7 +219,7 @@ The following is required for a Route to be attached to a Gateway:
 
     The `Port` field described below is currently only included in the
     "Experimental" channel of Gateway API. For more information on release
-channels, refer to the [related documentation](versioning.md#adding-experimental-fields).
+    channels, refer to the [related documentation](versioning.md#adding-experimental-fields).
 
 A Route can reference a Gateway by specifying the namespace (optional if the
 Route and the Gateway are in the same namespace) and name of the Gateway in

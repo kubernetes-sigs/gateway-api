@@ -656,7 +656,7 @@ the spec. In other words, opting for a higher-level API provides better interope
 
 However, this API spec does allow specifying specific forms or types of session persistence through the `Type` field in
 the `SessionPersistence` struct, including options for cookie-based or header-based session persistence. This API field
-accommodates implementations that offer multiple methods of session persistence, while also allowing users to specify 
+accommodates implementations that offer multiple methods of session persistence, while also allowing users to specify
 their preferred form of session persistence if desired.
 
 ### Target Persona
@@ -1090,7 +1090,7 @@ predicable way.
 - We need to clean up the [Implementations](#implementations) table to make it more organized and readable.
 - We need to revisit how to indicate to a user that a `BackendLBPolicy` configuration is being overridden by a route
 configuration via a warning status or log.
-- This might require addressing as part of an update to [GEP-2648](../gep-2648/index.md).
+    - This might require addressing as part of an update to [GEP-2648](../gep-2648/index.md).
 
 ## Alternatives
 

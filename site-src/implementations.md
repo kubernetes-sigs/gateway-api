@@ -10,7 +10,7 @@ cover, and documentation to help users get started.
 
 !!! info "Compare extended supported features across implementations"
 
-[View a table to quickly compare supported features of projects](implementations/v1.1.md). These outline Gateway controller implementations that have passed core conformance tests, and focus on extended conformance features that they have implemented.
+    [View a table to quickly compare supported features of projects](implementations/v1.1.md). These outline Gateway controller implementations that have passed core conformance tests, and focus on extended conformance features that they have implemented.
 
 ## Gateway Controller Implementation Status <a name="gateways"></a>
 
@@ -282,7 +282,7 @@ FSM support of Gateway API is built on top [Flomesh Gateway API](fgw) and it cur
 [Gloo Gateway][gloogateway] by [Solo.io][solo] is a feature-rich, Kubernetes-native ingress controller and next-generation API gateway.
 Gloo Gateway brings the full power and community support of Gateway API to its existing control-plane implementation.
 
-The Gloo Gateway ingress controller passes all the core Gateway API conformance tests in the v1.1.0 release for the GATEWAY_HTTP conformance 
+The Gloo Gateway ingress controller passes all the core Gateway API conformance tests in the v1.1.0 release for the GATEWAY_HTTP conformance
 profile except `HTTPRouteServiceTypes`.
 
 [gloogateway]:https://docs.solo.io/gateway/latest/
@@ -427,7 +427,7 @@ The [LiteSpeed Ingress Controller](https://litespeedtech.com/products/litespeed-
 
 ### LoxiLB
 
-[kube-loxilb][kube-loxilb-gh] is [LoxiLB's][loxilb-org] implementation of Gateway API and kubernetes service load-balancer spec which includes support for load-balancer class, advanced IPAM (shared or exclusive) etc. kube-loxilb manages Gateway API resources with [LoxiLB][loxilb-gh] as L4 service LB and [loxilb-ingress][loxilb-ingress-gh] for Ingress(L7) resources.  
+[kube-loxilb][kube-loxilb-gh] is [LoxiLB's][loxilb-org] implementation of Gateway API and kubernetes service load-balancer spec which includes support for load-balancer class, advanced IPAM (shared or exclusive) etc. kube-loxilb manages Gateway API resources with [LoxiLB][loxilb-gh] as L4 service LB and [loxilb-ingress][loxilb-ingress-gh] for Ingress(L7) resources.
 
 Follow the [quickstart guide][loxigw-guide] to get LoxiLB running with Gateway API in a few simple steps.
 

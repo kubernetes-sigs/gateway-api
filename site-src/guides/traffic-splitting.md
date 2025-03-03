@@ -1,12 +1,12 @@
 # HTTP traffic splitting
 
 The [HTTPRoute resource](../api-types/httproute.md) allows you to specify
-weights to shift traffic between different backends. This is useful for 
-splitting traffic during rollouts, canarying changes, or for emergencies. 
-The HTTPRoute`spec.rules.backendRefs` accepts a list of backends that a route 
-rule will send traffic to. The relative weights of these backends define 
-the split of traffic between them. The following YAML snippet shows how two 
-Services are listed as backends for a single route rule. This route rule 
+weights to shift traffic between different backends. This is useful for
+splitting traffic during rollouts, canarying changes, or for emergencies.
+The HTTPRoute`spec.rules.backendRefs` accepts a list of backends that a route
+rule will send traffic to. The relative weights of these backends define
+the split of traffic between them. The following YAML snippet shows how two
+Services are listed as backends for a single route rule. This route rule
 will split traffic 90% to `foo-v1` and 10% to `foo-v2`.
 
 ![Traffic splitting](../images/simple-split.png)
@@ -29,7 +29,7 @@ is used to manage the gradual splitting of traffic from v1 to v2.
 
 This example assumes that the following Gateway is deployed:
 
-```yaml 
+```yaml
 {% include 'standard/simple-gateway/gateway.yaml' %}
 ```
 
@@ -42,7 +42,7 @@ receive 100% of the traffic matched by each of their route rules. A canary
 route rule is used (matching the header `traffic=test`) to send synthetic test
 traffic before splitting any production user traffic to `foo-v2`.
 [Routing precedence](../reference/spec.md#gateway.networking.k8s.io/v1.HTTPRouteRule)
-ensures that all traffic with the matching host and header 
+ensures that all traffic with the matching host and header
 (the most specific match) will be sent to `foo-v2`.
 
 ![Traffic splitting](../images/traffic-splitting-1.png)
@@ -72,7 +72,7 @@ as a backend along with weights. The weights add up to a total of 100 so
 
 Finally, if all signals are positive, it is time to fully shift traffic to
 `foo-v2` and complete the rollout. The weight for `foo-v1` is set to
-`0` so that it is configured to accept zero traffic. 
+`0` so that it is configured to accept zero traffic.
 
 ![Traffic splitting](../images/traffic-splitting-3.png)
 

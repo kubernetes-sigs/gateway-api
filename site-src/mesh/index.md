@@ -3,9 +3,9 @@
 
 ??? success "Standard Channel since v1.1.0"
 
-The [GAMMA initiative](gamma.md) work for supporting service mesh use
+    The [GAMMA initiative](gamma.md) work for supporting service mesh use
     cases has been part of the Standard Channel since v1.1.0 and is considered
-GA. For more information refer to our [versioning guide](../concepts/versioning.md).
+    GA. For more information refer to our [versioning guide](../concepts/versioning.md).
 
 The "[GAMMA initiative](gamma.md)" refers to the group that is defining how
 Gateway API can be used for Service Mesh. To date, this group has been able to

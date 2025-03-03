@@ -85,7 +85,7 @@ type HTTPRequestMirrorFilter struct {
         //
         // Support: Implementation-specific for any other resource
         BackendRef BackendObjectReference `json:"backendRef"`
-      
+
         // Percent represents the percentage of requests that should be
         // mirrored to BackendRef. Its minimum value is 0 (indicating 0% of
         // requests) and its maximum value is 100 (indicating 100% of requests).
@@ -146,7 +146,7 @@ spec:
         percent: 42
 ```
 
-This would result in 42% of requests going to `foo-v1` to be mirrored to `foo-v2`.    
+This would result in 42% of requests going to `foo-v1` to be mirrored to `foo-v2`.
 
 An example with Fraction:
 

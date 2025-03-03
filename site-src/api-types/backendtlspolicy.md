@@ -4,7 +4,7 @@
 
     The `BackendTLSPolicy` resource is Alpha and has been part of
     the Experimental Channel since `v1.0.0`. For more information on release
-channels, refer to our [versioning guide](../concepts/versioning.md).
+    channels, refer to our [versioning guide](../concepts/versioning.md).
 
 [BackendTLSPolicy][backendtlspolicy] is a Gateway API type for specifying the TLS configuration
 of the connection from the Gateway to a backend pod/s via the Service API object.
@@ -13,7 +13,7 @@ of the connection from the Gateway to a backend pod/s via the Service API object
 
 `BackendTLSPolicy` specifically addresses the configuration of TLS in order to convey HTTPS from the Gateway
 dataplane to the backend.  This is referred to as "backend TLS termination" and enables the Gateway to know
-how to connect to a backend pod that has its own certificate.  
+how to connect to a backend pod that has its own certificate.
 
 While there are other API objects provided for TLS to be configured for **passthrough** and **edge** termination,
 this API object allows users to specifically configure **backend** TLS termination.  For more information on TLS
@@ -24,7 +24,7 @@ configuration in Gateway API, see [TLS Configuration](../guides/tls.md).
 BackendTLSPolicy is a Direct [PolicyAttachment](../reference/policy-attachment.md) without defaults or overrides,
 applied to a Service that accesses a backend, where the BackendTLSPolicy resides in the same namespace as the
 Service to which it is applied. The BackendTLSPolicy and the Service must reside in the same namespace in order
-to prevent the complications involved with sharing trust across namespace boundaries.  
+to prevent the complications involved with sharing trust across namespace boundaries.
 
 All Gateway API Routes that point to a referenced Service should respect a configured BackendTLSPolicy.
 

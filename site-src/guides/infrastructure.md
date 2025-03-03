@@ -4,7 +4,7 @@
 
     The `infrastructure` field is GA and has been part of the Standard Channel since
     `v1.2.0`. For more information on release channels, refer to our [versioning
-guide](../concepts/versioning.md).
+    guide](../concepts/versioning.md).
 
 Gateway API implementations are responsible for creating the backing
 infrastructure needed to make each Gateway work. For example, implementations

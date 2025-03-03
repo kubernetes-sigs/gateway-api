@@ -98,6 +98,8 @@ kubectl get crds
 
 Install a [gateway API implementation](../implementations.md) and test out the change. Take a look at some
 examples [here](../guides/index.md).
+Install a [gateway API implementation](../implementations.md) and test out the change. Take a look at some
+examples [here](../guides/index.md).
 
 ### Verify
 

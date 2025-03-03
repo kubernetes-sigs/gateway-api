@@ -2,6 +2,8 @@
 
 [HTTPRoute resources](../api-types/httproute.md) can modify the headers of HTTP requests and the HTTP responses from clients.
 There are two types of [filters](../api-types/httproute.md#filters-optional) available to meet these requirements: `RequestHeaderModifier` and `ResponseHeaderModifier`.
+[HTTPRoute resources](../api-types/httproute.md) can modify the headers of HTTP requests and the HTTP responses from clients.
+There are two types of [filters](../api-types/httproute.md#filters-optional) available to meet these requirements: `RequestHeaderModifier` and `ResponseHeaderModifier`.
 
 This guide shows how to use these features.
 
@@ -9,7 +11,7 @@ Note that these features are compatible. HTTP headers of the incoming requests a
 
 ## HTTP Request Header Modifier
 
-HTTP header modification is the process of adding, removing, or modifying HTTP headers in incoming requests. 
+HTTP header modification is the process of adding, removing, or modifying HTTP headers in incoming requests.
 
 To configure HTTP header modification, define a Gateway object with one or more HTTP filters. Each filter specifies a specific modification to make to incoming requests, such as adding a custom header or modifying an existing header.
 
@@ -25,12 +27,12 @@ To edit an existing header, use the `set` action and specify the value of the he
     filters:
     - type: RequestHeaderModifier
       requestHeaderModifier:
-        set: 
+        set:
           - name: my-header-name
             value: my-new-header-value
 ```
 
-Headers can also be removed, by using the `remove` keyword and a list of header names. 
+Headers can also be removed, by using the `remove` keyword and a list of header names.
 
 ```yaml
     filters:

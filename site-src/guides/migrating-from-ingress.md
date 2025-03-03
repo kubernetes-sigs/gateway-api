@@ -147,24 +147,24 @@ Gateway API has the following primary extension points:
 * *External references.* A feature (field) of a Gateway API resource can
   reference a custom resource specific to the Gateway implementation that
   configures that feature. For example:
-* [HTTPRouteFilter](../reference/spec.md#gateway.networking.k8s.io/v1.HTTPRouteFilter)
+    * [HTTPRouteFilter](../reference/spec.md#gateway.networking.k8s.io/v1.HTTPRouteFilter)
       can reference an external resource via the `extensionRef` field, thus
       configuring an implementation-specific filter.
-* [BackendObjectReference](../reference/spec.md#gateway.networking.k8s.io/v1.BackendObjectReference)
+    * [BackendObjectReference](../reference/spec.md#gateway.networking.k8s.io/v1.BackendObjectReference)
       supports resources other than Services.
-* [SecretObjectReference](../reference/spec.md#gateway.networking.k8s.io/v1.SecretObjectReference)
+    * [SecretObjectReference](../reference/spec.md#gateway.networking.k8s.io/v1.SecretObjectReference)
       supports resources other than Secrets.
 * *Custom implementations*. For some features, it is left up to an
   implementation to define how to support them. Those features correspond to the
   implementation-specific
-(custom) [conformance level](../concepts/conformance.md#2-support-levels). For
+  (custom)  [conformance level](../concepts/conformance.md#2-support-levels). For
   example:
     * The `RegularExpression` type of
-the [HTTPPathMatch](../reference/spec.md#gateway.networking.k8s.io/v1.HTTPPathMatch).
+      the [HTTPPathMatch](../reference/spec.md#gateway.networking.k8s.io/v1.HTTPPathMatch).
 * *Policies.* A Gateway implementation can define custom resources called
   Policies for exposing data plane features like authentication. Gateway API
   does not prescribe the details of those resources. However, it prescribes a
-standard UX. See the [Policy attachment guide](../reference/policy-attachment.md)
+  standard UX. See the [Policy attachment guide](../reference/policy-attachment.md)
   for more details. In contrast with the *external references* above, a Gateway
   API resource does not reference a Policy. Instead, a Policy must reference a
   Gateway API resource.
