@@ -107,7 +107,7 @@ type BackendTrafficPolicySpec struct {
 	//
 	// +optional
 	// <gateway:experimental>
-	RetryConstraint *RetryConstraint `json:"retry,omitempty"`
+	RetryConstraint *RetryConstraint `json:"retryConstraint,omitempty"`
 
 	// SessionPersistence defines and configures session persistence
 	// for the backend.

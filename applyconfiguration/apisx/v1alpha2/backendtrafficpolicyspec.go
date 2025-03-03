@@ -27,7 +27,7 @@ import (
 // with apply.
 type BackendTrafficPolicySpecApplyConfiguration struct {
 	TargetRefs         []v1alpha2.LocalPolicyTargetReferenceApplyConfiguration `json:"targetRefs,omitempty"`
-	RetryConstraint    *RetryConstraintApplyConfiguration                      `json:"retry,omitempty"`
+	RetryConstraint    *RetryConstraintApplyConfiguration                      `json:"retryConstraint,omitempty"`
 	SessionPersistence *v1.SessionPersistenceApplyConfiguration                `json:"sessionPersistence,omitempty"`
 }
 

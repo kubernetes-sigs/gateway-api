@@ -1858,7 +1858,7 @@ var schemaYAML = typed.YAMLObject(`types:
 - name: io.k8s.sigs.gateway-api.apisx.v1alpha2.BackendTrafficPolicySpec
   map:
     fields:
-    - name: retry
+    - name: retryConstraint
       type:
         namedType: io.k8s.sigs.gateway-api.apisx.v1alpha2.RetryConstraint
     - name: sessionPersistence

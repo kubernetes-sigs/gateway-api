@@ -8168,7 +8168,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha2_BackendTrafficPolicySpec(ref co
 							},
 						},
 						SchemaProps: spec.SchemaProps{
-							Description: "TargetRef identifies an API object to apply policy to. Currently, Backends (A grouping of like endpoints such as Service, ServiceImport, or any implementation-specific backendRef) are the only valid API target references.\n\nCurrently, a TargetRef can not be scoped to a specific port on a Service.",
+							Description: "TargetRefs identifies API object(s) to apply this policy to. Currently, Backends (A grouping of like endpoints such as Service, ServiceImport, or any implementation-specific backendRef) are the only valid API target references.\n\nCurrently, a TargetRef can not be scoped to a specific port on a Service.",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -8180,7 +8180,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha2_BackendTrafficPolicySpec(ref co
 							},
 						},
 					},
-					"retry": {
+					"retryConstraint": {
 						SchemaProps: spec.SchemaProps{
 							Description: "RetryConstraint defines the configuration for when to allow or prevent further retries to a target backend, by dynamically calculating a 'retry budget'. This budget is calculated based on the percentage of incoming traffic composed of retries over a given time interval. Once the budget is exceeded, additional retries will be rejected.\n\nFor example, if the retry budget interval is 10 seconds, there have been 1000 active requests in the past 10 seconds, and the allowed percentage of requests that can be retried is 20% (the default), then 200 of those requests may be composed of retries. Active requests will only be considered for the duration of the interval when calculating the retry budget. Retrying the same original request multiple times within the retry budget interval will lead to each retry being counted towards calculating the budget.\n\nConfiguring a RetryConstraint in BackendTrafficPolicy is compatible with HTTPRoute Retry settings for each HTTPRouteRule that targets the same backend. While the HTTPRouteRule Retry stanza can specify whether a request will be retried, and the number of retry attempts each client may perform, RetryConstraint helps prevent cascading failures such as retry storms during periods of consistent failures.\n\nAfter the retry budget has been exceeded, additional retries to the backend MUST return a 503 response to the client.\n\nAdditional configurations for defining a constraint on retries MAY be defined in the future.\n\nSupport: Extended\n\n<gateway:experimental>",
 							Ref:         ref("sigs.k8s.io/gateway-api/apisx/v1alpha2.RetryConstraint"),
