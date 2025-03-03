@@ -35,6 +35,7 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 		name               string
 		wantErrors         []string
 		sessionPersistence gatewayv1a2.SessionPersistence
+		retryConstraint    gatewayv1a2.RetryConstraint
 	}{
 		{
 			name: "valid BackendTrafficPolicyConfig no retryConstraint budgetPercent",
@@ -80,6 +81,57 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 				BudgetInterval: toDuration("10s"),
 			},
 			wantErrors: []string{},
+		},
+		{
+			name: "invalid BackendTrafficPolicyConfig budgetInterval too long",
+			sessionPersistence: gatewayv1a2.SessionPersistence{
+				SessionName:     ptrTo("foo"),
+				AbsoluteTimeout: toDuration("1h"),
+				Type:            ptrTo(gatewayv1.CookieBasedSessionPersistence),
+			},
+			retryConstraint: gatewayv1a2.RetryConstraint{
+				BudgetPercent:  ptrTo(20),
+				BudgetInterval: toDuration("2h"),
+				MinRetryRate: ptrTo(gatewayv1a2.RequestRate{
+					Count:    ptrTo(10),
+					Interval: toDuration("10s"),
+				}),
+			},
+			wantErrors: []string{"budgetInterval can not be greater than one hour or less than one second"},
+		},
+		{
+			name: "invalid BackendTrafficPolicyConfig budgetInterval too short",
+			sessionPersistence: gatewayv1a2.SessionPersistence{
+				SessionName:     ptrTo("foo"),
+				AbsoluteTimeout: toDuration("1h"),
+				Type:            ptrTo(gatewayv1.CookieBasedSessionPersistence),
+			},
+			retryConstraint: gatewayv1a2.RetryConstraint{
+				BudgetPercent:  ptrTo(20),
+				BudgetInterval: toDuration("1ms"),
+				MinRetryRate: ptrTo(gatewayv1a2.RequestRate{
+					Count:    ptrTo(10),
+					Interval: toDuration("10s"),
+				}),
+			},
+			wantErrors: []string{"budgetInterval can not be greater than one hour or less than one second"},
+		},
+		{
+			name: "invalid BackendTrafficPolicyConfig minRetryRate interval",
+			sessionPersistence: gatewayv1a2.SessionPersistence{
+				SessionName:     ptrTo("foo"),
+				AbsoluteTimeout: toDuration("1h"),
+				Type:            ptrTo(gatewayv1.CookieBasedSessionPersistence),
+			},
+			retryConstraint: gatewayv1a2.RetryConstraint{
+				BudgetPercent:  ptrTo(20),
+				BudgetInterval: toDuration("10s"),
+				MinRetryRate: ptrTo(gatewayv1a2.RequestRate{
+					Count:    ptrTo(10),
+					Interval: toDuration("2h"),
+				}),
+			},
+			wantErrors: []string{"interval can not be greater than one hour"},
 		},
 		{
 			name: "valid BackendTrafficPolicyConfig no cookie lifetimeType",
