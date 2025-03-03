@@ -59,7 +59,7 @@ type BackendTrafficPolicyList struct {
 // BackendTrafficPolicySpec define the desired state of BackendTrafficPolicy
 // Note: there is no Override or Default policy configuration.
 type BackendTrafficPolicySpec struct {
-	// TargetRef identifies an API object to apply policy to.
+	// TargetRefs identifies API object(s) to apply this policy to.
 	// Currently, Backends (A grouping of like endpoints such as Service,
 	// ServiceImport, or any implementation-specific backendRef) are the only
 	// valid API target references.
