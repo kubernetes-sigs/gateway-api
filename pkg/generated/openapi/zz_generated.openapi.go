@@ -191,6 +191,9 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"sigs.k8s.io/gateway-api/apis/v1beta1.ReferenceGrantList":                         schema_sigsk8sio_gateway_api_apis_v1beta1_ReferenceGrantList(ref),
 		"sigs.k8s.io/gateway-api/apis/v1beta1.ReferenceGrantSpec":                         schema_sigsk8sio_gateway_api_apis_v1beta1_ReferenceGrantSpec(ref),
 		"sigs.k8s.io/gateway-api/apis/v1beta1.ReferenceGrantTo":                           schema_sigsk8sio_gateway_api_apis_v1beta1_ReferenceGrantTo(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendTrafficPolicy":                     schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendTrafficPolicy(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendTrafficPolicyList":                 schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendTrafficPolicyList(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendTrafficPolicySpec":                 schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendTrafficPolicySpec(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.ListenerEntry":                            schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerEntry(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.ListenerEntryStatus":                      schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerEntryStatus(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.ListenerSet":                              schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerSet(ref),
@@ -198,11 +201,8 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.ListenerSetSpec":                          schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerSetSpec(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.ListenerSetStatus":                        schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerSetStatus(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.ParentGatewayReference":                   schema_sigsk8sio_gateway_api_apisx_v1alpha1_ParentGatewayReference(ref),
-		"sigs.k8s.io/gateway-api/apisx/v1alpha2.BackendTrafficPolicy":                     schema_sigsk8sio_gateway_api_apisx_v1alpha2_BackendTrafficPolicy(ref),
-		"sigs.k8s.io/gateway-api/apisx/v1alpha2.BackendTrafficPolicyList":                 schema_sigsk8sio_gateway_api_apisx_v1alpha2_BackendTrafficPolicyList(ref),
-		"sigs.k8s.io/gateway-api/apisx/v1alpha2.BackendTrafficPolicySpec":                 schema_sigsk8sio_gateway_api_apisx_v1alpha2_BackendTrafficPolicySpec(ref),
-		"sigs.k8s.io/gateway-api/apisx/v1alpha2.RequestRate":                              schema_sigsk8sio_gateway_api_apisx_v1alpha2_RequestRate(ref),
-		"sigs.k8s.io/gateway-api/apisx/v1alpha2.RetryConstraint":                          schema_sigsk8sio_gateway_api_apisx_v1alpha2_RetryConstraint(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.RequestRate":                              schema_sigsk8sio_gateway_api_apisx_v1alpha1_RequestRate(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.RetryConstraint":                          schema_sigsk8sio_gateway_api_apisx_v1alpha1_RetryConstraint(ref),
 	}
 }
 
@@ -7673,6 +7673,157 @@ func schema_sigsk8sio_gateway_api_apis_v1beta1_ReferenceGrantTo(ref common.Refer
 	}
 }
 
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendTrafficPolicy(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "BackendTrafficPolicy defines the configuration for how traffic to a target backend should be handled.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+						},
+					},
+					"spec": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Spec defines the desired state of BackendTrafficPolicy.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendTrafficPolicySpec"),
+						},
+					},
+					"status": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Status defines the current state of BackendTrafficPolicy.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1alpha2.PolicyStatus"),
+						},
+					},
+				},
+				Required: []string{"spec"},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta", "sigs.k8s.io/gateway-api/apis/v1alpha2.PolicyStatus", "sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendTrafficPolicySpec"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendTrafficPolicyList(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "BackendTrafficPolicyList contains a list of BackendTrafficPolicies",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
+						},
+					},
+					"items": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendTrafficPolicy"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"items"},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta", "sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendTrafficPolicy"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendTrafficPolicySpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "BackendTrafficPolicySpec define the desired state of BackendTrafficPolicy Note: there is no Override or Default policy configuration.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"targetRefs": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-map-keys": []interface{}{
+									"group",
+									"kind",
+									"name",
+								},
+								"x-kubernetes-list-type": "map",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "TargetRefs identifies API object(s) to apply this policy to. Currently, Backends (A grouping of like endpoints such as Service, ServiceImport, or any implementation-specific backendRef) are the only valid API target references.\n\nCurrently, a TargetRef can not be scoped to a specific port on a Service.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1alpha2.LocalPolicyTargetReference"),
+									},
+								},
+							},
+						},
+					},
+					"retryConstraint": {
+						SchemaProps: spec.SchemaProps{
+							Description: "RetryConstraint defines the configuration for when to allow or prevent further retries to a target backend, by dynamically calculating a 'retry budget'. This budget is calculated based on the percentage of incoming traffic composed of retries over a given time interval. Once the budget is exceeded, additional retries will be rejected.\n\nFor example, if the retry budget interval is 10 seconds, there have been 1000 active requests in the past 10 seconds, and the allowed percentage of requests that can be retried is 20% (the default), then 200 of those requests may be composed of retries. Active requests will only be considered for the duration of the interval when calculating the retry budget. Retrying the same original request multiple times within the retry budget interval will lead to each retry being counted towards calculating the budget.\n\nConfiguring a RetryConstraint in BackendTrafficPolicy is compatible with HTTPRoute Retry settings for each HTTPRouteRule that targets the same backend. While the HTTPRouteRule Retry stanza can specify whether a request will be retried, and the number of retry attempts each client may perform, RetryConstraint helps prevent cascading failures such as retry storms during periods of consistent failures.\n\nAfter the retry budget has been exceeded, additional retries to the backend MUST return a 503 response to the client.\n\nAdditional configurations for defining a constraint on retries MAY be defined in the future.\n\nSupport: Extended\n\n<gateway:experimental>",
+							Ref:         ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.RetryConstraint"),
+						},
+					},
+					"sessionPersistence": {
+						SchemaProps: spec.SchemaProps{
+							Description: "SessionPersistence defines and configures session persistence for the backend.\n\nSupport: Extended",
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.SessionPersistence"),
+						},
+					},
+				},
+				Required: []string{"targetRefs"},
+			},
+		},
+		Dependencies: []string{
+			"sigs.k8s.io/gateway-api/apis/v1.SessionPersistence", "sigs.k8s.io/gateway-api/apis/v1alpha2.LocalPolicyTargetReference", "sigs.k8s.io/gateway-api/apisx/v1alpha1.RetryConstraint"},
+	}
+}
+
 func schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerEntry(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -8050,158 +8201,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_ParentGatewayReference(ref comm
 	}
 }
 
-func schema_sigsk8sio_gateway_api_apisx_v1alpha2_BackendTrafficPolicy(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "BackendTrafficPolicy defines the configuration for how traffic to a target backend should be handled.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
-						},
-					},
-					"spec": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Spec defines the desired state of BackendTrafficPolicy.",
-							Default:     map[string]interface{}{},
-							Ref:         ref("sigs.k8s.io/gateway-api/apisx/v1alpha2.BackendTrafficPolicySpec"),
-						},
-					},
-					"status": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Status defines the current state of BackendTrafficPolicy.",
-							Default:     map[string]interface{}{},
-							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1alpha2.PolicyStatus"),
-						},
-					},
-				},
-				Required: []string{"spec"},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta", "sigs.k8s.io/gateway-api/apis/v1alpha2.PolicyStatus", "sigs.k8s.io/gateway-api/apisx/v1alpha2.BackendTrafficPolicySpec"},
-	}
-}
-
-func schema_sigsk8sio_gateway_api_apisx_v1alpha2_BackendTrafficPolicyList(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "BackendTrafficPolicyList contains a list of BackendTrafficPolicies",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
-						},
-					},
-					"items": {
-						SchemaProps: spec.SchemaProps{
-							Type: []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apisx/v1alpha2.BackendTrafficPolicy"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"items"},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta", "sigs.k8s.io/gateway-api/apisx/v1alpha2.BackendTrafficPolicy"},
-	}
-}
-
-func schema_sigsk8sio_gateway_api_apisx_v1alpha2_BackendTrafficPolicySpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "BackendTrafficPolicySpec define the desired state of BackendTrafficPolicy Note: there is no Override or Default policy configuration.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"targetRefs": {
-						VendorExtensible: spec.VendorExtensible{
-							Extensions: spec.Extensions{
-								"x-kubernetes-list-map-keys": []interface{}{
-									"group",
-									"kind",
-									"name",
-								},
-								"x-kubernetes-list-type": "map",
-							},
-						},
-						SchemaProps: spec.SchemaProps{
-							Description: "TargetRefs identifies API object(s) to apply this policy to. Currently, Backends (A grouping of like endpoints such as Service, ServiceImport, or any implementation-specific backendRef) are the only valid API target references.\n\nCurrently, a TargetRef can not be scoped to a specific port on a Service.",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1alpha2.LocalPolicyTargetReference"),
-									},
-								},
-							},
-						},
-					},
-					"retryConstraint": {
-						SchemaProps: spec.SchemaProps{
-							Description: "RetryConstraint defines the configuration for when to allow or prevent further retries to a target backend, by dynamically calculating a 'retry budget'. This budget is calculated based on the percentage of incoming traffic composed of retries over a given time interval. Once the budget is exceeded, additional retries will be rejected.\n\nFor example, if the retry budget interval is 10 seconds, there have been 1000 active requests in the past 10 seconds, and the allowed percentage of requests that can be retried is 20% (the default), then 200 of those requests may be composed of retries. Active requests will only be considered for the duration of the interval when calculating the retry budget. Retrying the same original request multiple times within the retry budget interval will lead to each retry being counted towards calculating the budget.\n\nConfiguring a RetryConstraint in BackendTrafficPolicy is compatible with HTTPRoute Retry settings for each HTTPRouteRule that targets the same backend. While the HTTPRouteRule Retry stanza can specify whether a request will be retried, and the number of retry attempts each client may perform, RetryConstraint helps prevent cascading failures such as retry storms during periods of consistent failures.\n\nAfter the retry budget has been exceeded, additional retries to the backend MUST return a 503 response to the client.\n\nAdditional configurations for defining a constraint on retries MAY be defined in the future.\n\nSupport: Extended\n\n<gateway:experimental>",
-							Ref:         ref("sigs.k8s.io/gateway-api/apisx/v1alpha2.RetryConstraint"),
-						},
-					},
-					"sessionPersistence": {
-						SchemaProps: spec.SchemaProps{
-							Description: "SessionPersistence defines and configures session persistence for the backend.\n\nSupport: Extended",
-							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.SessionPersistence"),
-						},
-					},
-				},
-				Required: []string{"targetRefs"},
-			},
-		},
-		Dependencies: []string{
-			"sigs.k8s.io/gateway-api/apis/v1.SessionPersistence", "sigs.k8s.io/gateway-api/apis/v1alpha2.LocalPolicyTargetReference", "sigs.k8s.io/gateway-api/apisx/v1alpha2.RetryConstraint"},
-	}
-}
-
-func schema_sigsk8sio_gateway_api_apisx_v1alpha2_RequestRate(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_RequestRate(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
@@ -8228,7 +8228,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha2_RequestRate(ref common.Referenc
 	}
 }
 
-func schema_sigsk8sio_gateway_api_apisx_v1alpha2_RetryConstraint(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_RetryConstraint(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
@@ -8252,13 +8252,13 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha2_RetryConstraint(ref common.Refe
 					"minRetryRate": {
 						SchemaProps: spec.SchemaProps{
 							Description: "MinRetryRate defines the minimum rate of retries that will be allowable over a specified duration of time.\n\nThe effective overall minimum rate of retries targeting the backend service may be much higher, as there can be any number of clients which are applying this setting locally.\n\nThis ensures that requests can still be retried during periods of low traffic, where the budget for retries may be calculated as a very low value.\n\nSupport: Extended",
-							Ref:         ref("sigs.k8s.io/gateway-api/apisx/v1alpha2.RequestRate"),
+							Ref:         ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.RequestRate"),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"sigs.k8s.io/gateway-api/apisx/v1alpha2.RequestRate"},
+			"sigs.k8s.io/gateway-api/apisx/v1alpha1.RequestRate"},
 	}
 }

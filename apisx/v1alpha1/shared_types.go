@@ -16,7 +16,10 @@ limitations under the License.
 
 package v1alpha1
 
-import v1 "sigs.k8s.io/gateway-api/apis/v1"
+import (
+	v1 "sigs.k8s.io/gateway-api/apis/v1"
+	v1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
+)
 
 type (
 	// +k8s:deepcopy-gen=false
@@ -41,6 +44,14 @@ type (
 	SectionName = v1.SectionName
 	// +k8s:deepcopy-gen=false
 	Namespace = v1.Namespace
+	// +k8s:deepcopy-gen=false
+	Duration = v1.Duration
+	// +k8s:deepcopy-gen=false
+	PolicyStatus = v1alpha2.PolicyStatus
+	// +k8s:deepcopy-gen=false
+	LocalPolicyTargetReference = v1alpha2.LocalPolicyTargetReference
+	// +k8s:deepcopy-gen=false
+	SessionPersistence = v1.SessionPersistence
 )
 
 // ParentGatewayReference identifies an API object including its namespace,
@@ -67,4 +78,22 @@ type ParentGatewayReference struct {
 	//
 	// +optional
 	Namespace *Namespace `json:"namespace,omitempty"`
+}
+
+// RequestRate expresses a rate of requests over a given period of time.
+//
+// +kubebuilder:validation:XValidation:message="interval can not be greater than one hour",rule="!(duration(self.interval) == duration('0s') || duration(self.interval) > duration('1h'))"
+type RequestRate struct {
+	// Count specifies the number of requests per time interval.
+	//
+	// Support: Extended
+	// +kubebuilder:validation:Minimum=1
+	// +kubebuilder:validation:Maximum=1000000
+	Count *int `json:"count,omitempty"`
+
+	// Interval specifies the divisor of the rate of requests, the amount of
+	// time during which the given count of requests occur.
+	//
+	// Support: Extended
+	Interval *Duration `json:"interval,omitempty"`
 }

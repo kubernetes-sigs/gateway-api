@@ -28,6 +28,10 @@ type FakeExperimentalV1alpha1 struct {
 	*testing.Fake
 }
 
+func (c *FakeExperimentalV1alpha1) BackendTrafficPolicies(namespace string) v1alpha1.BackendTrafficPolicyInterface {
+	return &FakeBackendTrafficPolicies{c, namespace}
+}
+
 func (c *FakeExperimentalV1alpha1) ListenerSets(namespace string) v1alpha1.ListenerSetInterface {
 	return &FakeListenerSets{c, namespace}
 }

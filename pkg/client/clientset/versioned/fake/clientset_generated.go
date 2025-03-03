@@ -36,8 +36,6 @@ import (
 	fakegatewayv1beta1 "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/typed/apis/v1beta1/fake"
 	experimentalv1alpha1 "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/typed/apisx/v1alpha1"
 	fakeexperimentalv1alpha1 "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/typed/apisx/v1alpha1/fake"
-	experimentalv1alpha2 "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/typed/apisx/v1alpha2"
-	fakeexperimentalv1alpha2 "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/typed/apisx/v1alpha2/fake"
 )
 
 // NewSimpleClientset returns a clientset that will respond with the provided objects.
@@ -149,9 +147,4 @@ func (c *Clientset) GatewayV1beta1() gatewayv1beta1.GatewayV1beta1Interface {
 // ExperimentalV1alpha1 retrieves the ExperimentalV1alpha1Client
 func (c *Clientset) ExperimentalV1alpha1() experimentalv1alpha1.ExperimentalV1alpha1Interface {
 	return &fakeexperimentalv1alpha1.FakeExperimentalV1alpha1{Fake: &c.Fake}
-}
-
-// ExperimentalV1alpha2 retrieves the ExperimentalV1alpha2Client
-func (c *Clientset) ExperimentalV1alpha2() experimentalv1alpha2.ExperimentalV1alpha2Interface {
-	return &fakeexperimentalv1alpha2.FakeExperimentalV1alpha2{Fake: &c.Fake}
 }

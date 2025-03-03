@@ -20,7 +20,6 @@ package apisx
 
 import (
 	v1alpha1 "sigs.k8s.io/gateway-api/pkg/client/informers/externalversions/apisx/v1alpha1"
-	v1alpha2 "sigs.k8s.io/gateway-api/pkg/client/informers/externalversions/apisx/v1alpha2"
 	internalinterfaces "sigs.k8s.io/gateway-api/pkg/client/informers/externalversions/internalinterfaces"
 )
 
@@ -28,8 +27,6 @@ import (
 type Interface interface {
 	// V1alpha1 provides access to shared informers for resources in V1alpha1.
 	V1alpha1() v1alpha1.Interface
-	// V1alpha2 provides access to shared informers for resources in V1alpha2.
-	V1alpha2() v1alpha2.Interface
 }
 
 type group struct {
@@ -46,9 +43,4 @@ func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakList
 // V1alpha1 returns a new v1alpha1.Interface.
 func (g *group) V1alpha1() v1alpha1.Interface {
 	return v1alpha1.New(g.factory, g.namespace, g.tweakListOptions)
-}
-
-// V1alpha2 returns a new v1alpha2.Interface.
-func (g *group) V1alpha2() v1alpha2.Interface {
-	return v1alpha2.New(g.factory, g.namespace, g.tweakListOptions)
 }

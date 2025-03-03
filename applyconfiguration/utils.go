@@ -27,13 +27,11 @@ import (
 	v1alpha3 "sigs.k8s.io/gateway-api/apis/v1alpha3"
 	v1beta1 "sigs.k8s.io/gateway-api/apis/v1beta1"
 	v1alpha1 "sigs.k8s.io/gateway-api/apisx/v1alpha1"
-	apisxv1alpha2 "sigs.k8s.io/gateway-api/apisx/v1alpha2"
 	apisv1 "sigs.k8s.io/gateway-api/applyconfiguration/apis/v1"
 	apisv1alpha2 "sigs.k8s.io/gateway-api/applyconfiguration/apis/v1alpha2"
 	apisv1alpha3 "sigs.k8s.io/gateway-api/applyconfiguration/apis/v1alpha3"
 	apisv1beta1 "sigs.k8s.io/gateway-api/applyconfiguration/apis/v1beta1"
 	apisxv1alpha1 "sigs.k8s.io/gateway-api/applyconfiguration/apisx/v1alpha1"
-	applyconfigurationapisxv1alpha2 "sigs.k8s.io/gateway-api/applyconfiguration/apisx/v1alpha2"
 	internal "sigs.k8s.io/gateway-api/applyconfiguration/internal"
 )
 
@@ -234,6 +232,10 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1beta1.ReferenceGrantToApplyConfiguration{}
 
 		// Group=gateway.networking.x-k8s.io, Version=v1alpha1
+	case v1alpha1.SchemeGroupVersion.WithKind("BackendTrafficPolicy"):
+		return &apisxv1alpha1.BackendTrafficPolicyApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("BackendTrafficPolicySpec"):
+		return &apisxv1alpha1.BackendTrafficPolicySpecApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("ListenerEntry"):
 		return &apisxv1alpha1.ListenerEntryApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("ListenerEntryStatus"):
@@ -246,16 +248,10 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisxv1alpha1.ListenerSetStatusApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("ParentGatewayReference"):
 		return &apisxv1alpha1.ParentGatewayReferenceApplyConfiguration{}
-
-		// Group=gateway.networking.x-k8s.io, Version=v1alpha2
-	case apisxv1alpha2.SchemeGroupVersion.WithKind("BackendTrafficPolicy"):
-		return &applyconfigurationapisxv1alpha2.BackendTrafficPolicyApplyConfiguration{}
-	case apisxv1alpha2.SchemeGroupVersion.WithKind("BackendTrafficPolicySpec"):
-		return &applyconfigurationapisxv1alpha2.BackendTrafficPolicySpecApplyConfiguration{}
-	case apisxv1alpha2.SchemeGroupVersion.WithKind("RequestRate"):
-		return &applyconfigurationapisxv1alpha2.RequestRateApplyConfiguration{}
-	case apisxv1alpha2.SchemeGroupVersion.WithKind("RetryConstraint"):
-		return &applyconfigurationapisxv1alpha2.RetryConstraintApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("RequestRate"):
+		return &apisxv1alpha1.RequestRateApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("RetryConstraint"):
+		return &apisxv1alpha1.RetryConstraintApplyConfiguration{}
 
 	}
 	return nil

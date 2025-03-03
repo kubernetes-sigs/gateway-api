@@ -18,6 +18,14 @@ limitations under the License.
 
 package v1alpha1
 
+// BackendTrafficPolicyListerExpansion allows custom methods to be added to
+// BackendTrafficPolicyLister.
+type BackendTrafficPolicyListerExpansion interface{}
+
+// BackendTrafficPolicyNamespaceListerExpansion allows custom methods to be added to
+// BackendTrafficPolicyNamespaceLister.
+type BackendTrafficPolicyNamespaceListerExpansion interface{}
+
 // ListenerSetListerExpansion allows custom methods to be added to
 // ListenerSetLister.
 type ListenerSetListerExpansion interface{}

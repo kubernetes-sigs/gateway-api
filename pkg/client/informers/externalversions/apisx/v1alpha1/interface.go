@@ -24,6 +24,8 @@ import (
 
 // Interface provides access to all the informers in this group version.
 type Interface interface {
+	// BackendTrafficPolicies returns a BackendTrafficPolicyInformer.
+	BackendTrafficPolicies() BackendTrafficPolicyInformer
 	// ListenerSets returns a ListenerSetInformer.
 	ListenerSets() ListenerSetInformer
 }
@@ -37,6 +39,11 @@ type version struct {
 // New returns a new Interface.
 func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakListOptions internalinterfaces.TweakListOptionsFunc) Interface {
 	return &version{factory: f, namespace: namespace, tweakListOptions: tweakListOptions}
+}
+
+// BackendTrafficPolicies returns a BackendTrafficPolicyInformer.
+func (v *version) BackendTrafficPolicies() BackendTrafficPolicyInformer {
+	return &backendTrafficPolicyInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // ListenerSets returns a ListenerSetInformer.

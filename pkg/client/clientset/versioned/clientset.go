@@ -30,7 +30,6 @@ import (
 	gatewayv1alpha3 "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/typed/apis/v1alpha3"
 	gatewayv1beta1 "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/typed/apis/v1beta1"
 	experimentalv1alpha1 "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/typed/apisx/v1alpha1"
-	experimentalv1alpha2 "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/typed/apisx/v1alpha2"
 )
 
 type Interface interface {
@@ -40,7 +39,6 @@ type Interface interface {
 	GatewayV1alpha3() gatewayv1alpha3.GatewayV1alpha3Interface
 	GatewayV1beta1() gatewayv1beta1.GatewayV1beta1Interface
 	ExperimentalV1alpha1() experimentalv1alpha1.ExperimentalV1alpha1Interface
-	ExperimentalV1alpha2() experimentalv1alpha2.ExperimentalV1alpha2Interface
 }
 
 // Clientset contains the clients for groups.
@@ -51,7 +49,6 @@ type Clientset struct {
 	gatewayV1alpha3      *gatewayv1alpha3.GatewayV1alpha3Client
 	gatewayV1beta1       *gatewayv1beta1.GatewayV1beta1Client
 	experimentalV1alpha1 *experimentalv1alpha1.ExperimentalV1alpha1Client
-	experimentalV1alpha2 *experimentalv1alpha2.ExperimentalV1alpha2Client
 }
 
 // GatewayV1 retrieves the GatewayV1Client
@@ -77,11 +74,6 @@ func (c *Clientset) GatewayV1beta1() gatewayv1beta1.GatewayV1beta1Interface {
 // ExperimentalV1alpha1 retrieves the ExperimentalV1alpha1Client
 func (c *Clientset) ExperimentalV1alpha1() experimentalv1alpha1.ExperimentalV1alpha1Interface {
 	return c.experimentalV1alpha1
-}
-
-// ExperimentalV1alpha2 retrieves the ExperimentalV1alpha2Client
-func (c *Clientset) ExperimentalV1alpha2() experimentalv1alpha2.ExperimentalV1alpha2Interface {
-	return c.experimentalV1alpha2
 }
 
 // Discovery retrieves the DiscoveryClient
@@ -148,10 +140,6 @@ func NewForConfigAndClient(c *rest.Config, httpClient *http.Client) (*Clientset,
 	if err != nil {
 		return nil, err
 	}
-	cs.experimentalV1alpha2, err = experimentalv1alpha2.NewForConfigAndClient(&configShallowCopy, httpClient)
-	if err != nil {
-		return nil, err
-	}
 
 	cs.DiscoveryClient, err = discovery.NewDiscoveryClientForConfigAndClient(&configShallowCopy, httpClient)
 	if err != nil {
@@ -178,7 +166,6 @@ func New(c rest.Interface) *Clientset {
 	cs.gatewayV1alpha3 = gatewayv1alpha3.New(c)
 	cs.gatewayV1beta1 = gatewayv1beta1.New(c)
 	cs.experimentalV1alpha1 = experimentalv1alpha1.New(c)
-	cs.experimentalV1alpha2 = experimentalv1alpha2.New(c)
 
 	cs.DiscoveryClient = discovery.NewDiscoveryClient(c)
 	return &cs
