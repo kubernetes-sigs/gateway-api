@@ -35,8 +35,8 @@ and CA certificates.
 These are worthy goals, but deserve a different GEP for proper attention.  This GEP is concerned entirely with the
 controlplane, i.e. the hop between gateway and backend.
 
-1. [TCPRoute](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1alpha2.TCPRoute) and
-[GRPCRoute](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1alpha2.GRPCRoute) use cases
+1. [TCPRoute](../../reference/spec.md#gateway.networking.k8s.io/v1alpha2.TCPRoute) and
+[GRPCRoute](../../reference/spec.md#gateway.networking.k8s.io/v1alpha2.GRPCRoute) use cases
 are not addressed here, because at this point in time these two route types are not graduated to beta.
 2. Mutual TLS (mTLS) use cases are intentionally out of scope for this GEP for two reasons.  First, the design of Gateway
 API is backend-attached and does not currently support mutual authentication, and also because this GEP does not
@@ -145,7 +145,7 @@ This GEP is the outcome of the TLS use case #4 in
 To allow the gateway client to know how to connect to the backend pod, when the backend pod has its own
 certificate, we implement a metaresource named `BackendTLSPolicy`, that was previously introduced with the name
 `TLSConnectionPolicy` as a hypothetical Direct Policy Attachment example in
-[GEP-713: Metaresources and PolicyAttachment](https://gateway-api.sigs.k8s.io/geps/gep-713/).
+[GEP-713: Metaresources and PolicyAttachment](../gep-713/index.md).
 Because naming is hard, a new name may be
 substituted without blocking acceptance of the content of the API change.
 
@@ -185,7 +185,7 @@ sharing to BackendTLSPolicy, even if they don't for other cross-namespace sharin
 
 One of the areas of concern for this API is that we need to indicate how and when the API implementations should use the
 backend destination certificate authority.  This solution proposes, as introduced in
-[GEP-713](https://gateway-api.sigs.k8s.io/geps/gep-713/), that the implementation
+[GEP-713](../gep-713/index.md), that the implementation
 should watch the connections to the specified TargetRefs (Services), and if a Service matches a BackendTLSPolicy, then
 assume the connection is TLS, and verify that the TargetRef’s certificate can be validated by the client (Gateway) using
 the provided certificates and hostname before the connection is made. On the question of how to signal
@@ -403,11 +403,11 @@ the implementation would be required to fully implement the policy or mark the b
 
 [Gateway API TLS Use Cases](https://docs.google.com/document/d/17sctu2uMJtHmJTGtBi_awGB0YzoCLodtR6rUNmKMCs8/edit#heading=h.cxuq8vo8pcxm)
 
-[GEP-713: Metaresources and PolicyAttachment](https://gateway-api.sigs.k8s.io/geps/gep-713/)
+[GEP-713: Metaresources and PolicyAttachment](../gep-713/index.md)
 
-[Policy Attachment](https://gateway-api.sigs.k8s.io/reference/policy-attachment/#direct-policy-attachment)
+[Policy Attachment](../../reference/policy-attachment.md#direct-policy-attachment)
 
-[Gateway API TLS](https://gateway-api.sigs.k8s.io/guides/tls/)
+[Gateway API TLS](../../guides/tls.md)
 
 [SIG-NET Gateway API: TLS to the K8s.Service/Backend](https://docs.google.com/document/d/1RTYh2brg_vLX9o3pTcrWxtZSsf8Y5NQvIG52lpFcZlo)
 

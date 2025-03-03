@@ -7,7 +7,7 @@
 > of our GEP overview as it existed before those rules did, and so it has been
 > explicitly grandfathered in.
 
-[expprob]:https://gateway-api.sigs.k8s.io/geps/overview/#probationary-period
+[expprob]:../overview.md#probationary-period
 
 ## Overview
 
@@ -33,7 +33,7 @@ Gateway API represents the next generation of traffic routing APIs in Kubernetes
 
 ## Versioning
 
-Features or other modifications to the Gateway API spec that fall under this GEP will be subject to the same [versioning guidelines](https://gateway-api.sigs.k8s.io/concepts/versioning/#graduation-criteria) as the rest of the Gateway API. For example, to move changes concerning a beta feature (e.g. HTTPRoute) from experimental to standard, all of the [beta criteria](https://gateway-api.sigs.k8s.io/concepts/versioning/#experimental-standard) must be met (e.g. implemented by several implementations).
+Features or other modifications to the Gateway API spec that fall under this GEP will be subject to the same [versioning guidelines](../../concepts/versioning.md#graduation-criteria) as the rest of the Gateway API. For example, to move changes concerning a beta feature (e.g. HTTPRoute) from experimental to standard, all of the [beta criteria](../../concepts/versioning.md#experimental-standard) must be met (e.g. implemented by several implementations).
 
 ## Use-Cases
 
@@ -81,7 +81,7 @@ For the purposes of this feature, targeted service mesh functionality is limited
 
 ### **Policy**
 
-Policy is a broad term for any resource that can attach to another resource to configure it. This is defined in the [Policy Attachment GEP](https://gateway-api.sigs.k8s.io/geps/gep-713). Examples of (hypothetical) policies could be resources like `TimeoutPolicy` or `AuthorizationPolicy`.
+Policy is a broad term for any resource that can attach to another resource to configure it. This is defined in the [Policy Attachment GEP](../gep-713/index.md). Examples of (hypothetical) policies could be resources like `TimeoutPolicy` or `AuthorizationPolicy`.
 
 ### **Routes**
 

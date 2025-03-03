@@ -77,4 +77,4 @@ system and will define resource model responsibility and separation.
 
 RBAC is discussed further in the [Security Model] description.
 
-[Security Model]: /concepts/security-model#rbac
+[Security Model]: security-model.md#rbac

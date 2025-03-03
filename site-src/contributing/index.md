@@ -3,7 +3,7 @@
 This page contains links to all of the meeting notes, design docs and related
 discussions around the APIs. If you're interested in working towards a formal
 role in the project, refer to the [Contributor
-Ladder](/contributing/contributor-ladder).
+Ladder](contributor-ladder.md).
 
 ## Feedback and Questions
 
@@ -22,7 +22,7 @@ Gateway API and not the API specification itself, please check our
 you can get help with your specific implementation.
 
 [gh-issues]: https://github.com/kubernetes-sigs/gateway-api/issues/new/choose
-[implementations]:/implementations/
+[implementations]:../implementations.md
 
 ## Communications
 
@@ -85,7 +85,7 @@ service mesh use cases can be found in a separate
 
 [early-yt-playlist]: https://www.youtube.com/playlist?list=PL7KjrPTDcs4Xe6SZj-51WvBfufKf-la1O
 [sig-net-yt-playlist]: https://www.youtube.com/playlist?list=PL69nYSiGNLP2E8vmnqo5MwPOY25sDWIxb
-[gamma]: /mesh/gamma/
+[gamma]: ../mesh/gamma.md
 [gamma-meeting-notes]: https://docs.google.com/document/d/1s5hQU0CB9ehjFukRmRHQ41f1FA8GX5_1Rv6nHW6NWAA/edit#
 
 #### Initial Design Discussions

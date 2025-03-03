@@ -1,6 +1,6 @@
 # gRPC routing
 
-The [GRPCRoute resource](/api-types/grpcroute) allows you to match on gRPC traffic and
+The [GRPCRoute resource](../api-types/grpcroute.md) allows you to match on gRPC traffic and
 direct it to Kubernetes backends. This guide shows how the GRPCRoute matches
 traffic on host, header, and service, and method fields and forwards it to different
 Kubernetes Services.
@@ -15,14 +15,14 @@ to `bar-svc-canary` for all services and methods
   all services and methods
 
 <!--- Editable source available at site-src/images/grpc-routing.png -->
-![gRPC Routing](/images/grpc-routing.png)
+![gRPC Routing](../images/grpc-routing.png)
 
 The dotted lines show the `Gateway` resources deployed to configure this routing
 behavior. There are two `GRPCRoute` resources that create routing rules on the
 same `prod` Gateway. This illustrates how more than one Route can bind to a
 Gateway which allows Routes to merge on a `Gateway` as long as they don't
 conflict. `GRPCRoute` follows the same Route merging semantics. For more
-information on that, refer to the [documentation](/api-types/httproute#merging).
+information on that, refer to the [documentation](../api-types/httproute.md#merging).
 
 In order to receive traffic from a [Gateway][gateway], a `GRPCRoute` resource
 must be configured with `ParentRefs` which reference the parent gateway(s) that it
@@ -74,6 +74,6 @@ been considered.
 {% include 'standard/grpc-routing/reflection-grpcroute.yaml' %}
 ```
 
-[gateway]: /reference/spec/#gateway.networking.k8s.io/v1.Gateway
-[spec]: /reference/spec/#gateway.networking.k8s.io%2fv1alpha2.GRPCRouteSpec
+[gateway]: ../reference/spec.md#gateway.networking.k8s.io/v1.Gateway
+[spec]: ../reference/spec.md#gateway.networking.k8s.io%2fv1alpha2.GRPCRouteSpec
 [svc]:https://kubernetes.io/docs/concepts/services-networking/service/

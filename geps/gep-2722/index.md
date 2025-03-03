@@ -19,7 +19,7 @@ TLDR: This GEP proposes `gwctl`, a new command line tool designed to streamline
       `additionalPrinterColumns`) is constrained, limiting the ability to create
       optimal views for Gateway API resources. 
 * Complex policy attachment management: 
-    * As described in [GEP-713](https://gateway-api.sigs.k8s.io/geps/gep-713/),
+* As described in [GEP-713](../gep-713/index.md),
       policies present a valuable mechanism for expanding the capabilities of
       Gateway API resources. However, discoverability poses a challenge due to
       the absence of a clear connection between resources and their associated
@@ -387,12 +387,12 @@ distribution mechanisms will be provided:
   for visualizing data and presenting information in a visually appealing
   manner.
 * Evaluate how gwctl can be extended to support [Mesh use
-  cases](https://gateway-api.sigs.k8s.io/concepts/gamma/#how-the-gateway-api-works-for-service-mesh)
+  cases](/concepts/gamma/#how-the-gateway-api-works-for-service-mesh)
 
 ## References
 
 * [GEP-713: Metaresources and Policy
-  Attachment](https://gateway-api.sigs.k8s.io/geps/gep-713)
+Attachment](../gep-713/index.md)
 
 ## Sample outputs
 

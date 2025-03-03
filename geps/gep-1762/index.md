@@ -214,7 +214,7 @@ Note: there is [discussion](https://github.com/kubernetes-sigs/gateway-api/discu
 
 ## API
 
-This GEP extends the `infrastructure` API introduced in [GEP-1867](https://gateway-api.sigs.k8s.io/geps/gep-1867).
+This GEP extends the `infrastructure` API introduced in [GEP-1867](../gep-1867/index.md).
 
 ```go
 type GatewayInfrastructure struct {

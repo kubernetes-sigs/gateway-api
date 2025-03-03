@@ -3,11 +3,11 @@
 * Issue: [#3171](https://github.com/kubernetes-sigs/gateway-api/issues/3171)
 * Status: Standard
 
-(See status definitions [here](/geps/overview/#gep-states).)
+(See status definitions [here](../overview.md#gep-states).)
 
 ## TLDR
 
-Enhance the existing [Request Mirroring](https://gateway-api.sigs.k8s.io/guides/http-request-mirroring/) feature by allowing users to specify a percentage of requests they'd like mirrored.
+Enhance the existing [Request Mirroring](../../guides/http-request-mirroring.md) feature by allowing users to specify a percentage of requests they'd like mirrored.
 
 ## Goals
 
@@ -20,7 +20,7 @@ The scope of this GEP is to add support for this feature in both HTTPRoute and G
 
 ## Introduction
 
-[Request Mirroring](https://gateway-api.sigs.k8s.io/guides/http-request-mirroring/) is a feature that allows a user to mirror requests going to some backend A along to some other specified backend B. Right now Request Mirroring is an all or nothing feature – either 100% of request are mirrored, or 0% are. Percentage-based Request Mirroring will allow users to specify a percentage of requests they'd like mirrored as opposed to every single request.   
+[Request Mirroring](../../guides/http-request-mirroring.md) is a feature that allows a user to mirror requests going to some backend A along to some other specified backend B. Right now Request Mirroring is an all or nothing feature – either 100% of request are mirrored, or 0% are. Percentage-based Request Mirroring will allow users to specify a percentage of requests they'd like mirrored as opposed to every single request.
 
 This feature is already [supported by Envoy](https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/route/v3/route_components.proto#envoy-v3-api-msg-config-route-v3-routeaction-requestmirrorpolicy), so adding it for the Gateway API would enable better integration between the two products. There's also an existing user desire for this feature on the [HAProxy side](https://www.haproxy.com/blog/haproxy-traffic-mirroring-for-real-world-testing) and [NGINX side](https://alex.dzyoba.com/blog/nginx-mirror/). Since Request Mirroring is already supported by the Gateway API, Percentage-based Request Mirroring would a clear improvement on this preexisting feature.
 

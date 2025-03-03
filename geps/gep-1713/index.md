@@ -3,7 +3,7 @@
 * Issue: [#1713](/kubernetes-sigs/gateway-api/issues/1713)
 * Status: Experimental
 
-((See status definitions [here](/geps/overview/#gep-states).)
+((See status definitions [here](../overview.md#gep-states).)
 
 ## Introduction
 

@@ -3,11 +3,11 @@
 
 ??? success "Standard Channel since v1.1.0"
 
-    The [GAMMA initiative](/mesh/gamma) work for supporting service mesh use
+The [GAMMA initiative](gamma.md) work for supporting service mesh use
     cases has been part of the Standard Channel since v1.1.0 and is considered
-    GA. For more information refer to our [versioning guide](/concepts/versioning).
+GA. For more information refer to our [versioning guide](../concepts/versioning.md).
 
-The "[GAMMA initiative](/mesh/gamma)" refers to the group that is defining how
+The "[GAMMA initiative](gamma.md)" refers to the group that is defining how
 Gateway API can be used for Service Mesh. To date, this group has been able to
 define service mesh support in the Gateway API with relatively small changes.
 The most significant change that GAMMA has introduced to date is that, when
@@ -30,12 +30,12 @@ This distinction helps the Gateway API to be exact about how routing within a
 mesh functions, without requiring new resources that largely duplicate the
 Service.
 
-[GatewayClass]: /api-types/gatewayclass
-[Gateway]: /api-types/gateway
-[HTTPRoute]: /api-types/httproute
-[TCPRoute]: /concepts/api-overview/#tcproute-and-udproute
+[GatewayClass]: ../api-types/gatewayclass.md
+[Gateway]: ../api-types/gateway.md
+[HTTPRoute]: ../api-types/httproute.md
+[TCPRoute]: ../concepts/api-overview.md#tcproute-and-udproute
 [Service]: https://kubernetes.io/docs/concepts/services-networking/service/
-[service-mesh]:/concepts/glossary#service-mesh
+[service-mesh]:../concepts/glossary.md#service-mesh
 [service-facets]:/concepts/service-facets
 
 ## Connecting routes and services <a name="gateway-api-for-mesh">
@@ -128,11 +128,11 @@ it is not currently possible for `blender` and `mixer` to use HTTPRoutes to set
 different timeouts for their calls to the `oven` workload. `blender` and `mixer`
 would need to be moved into separate Namespaces to allow this.
 
-[Ana]:/concepts/roles-and-personas#ana
-[producer route]:/concepts/glossary#producer-route
-[consumer route]:/concepts/glossary#consumer-route
-[service mesh]:/concepts/glossary#service-mesh
-[Route merging rules]:/api-types/httproute#merging
+[Ana]:../concepts/roles-and-personas.md#ana
+[producer route]:../concepts/glossary.md#producer-route
+[consumer route]:../concepts/glossary.md#consumer-route
+[service mesh]:../concepts/glossary.md#service-mesh
+[Route merging rules]:../api-types/httproute.md#merging
 
 ## Request Flow
 
@@ -157,6 +157,6 @@ looks like:
 6. The data plane routes the request on to the destination workload (most likely
    using [endpoint routing], but it is allowed to use [Service routing]).
 
-[east/west]:/concepts/glossary#eastwest-traffic
-[endpoint routing]:/concepts/glossary#endpoint-routing
-[Service routing]:/concepts/glossary#service-routing
+[east/west]:../concepts/glossary.md#eastwest-traffic
+[endpoint routing]:../concepts/glossary.md#endpoint-routing
+[Service routing]:../concepts/glossary.md#service-routing

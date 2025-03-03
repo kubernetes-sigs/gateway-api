@@ -1,11 +1,11 @@
 # HTTP Header Modifiers
 
-[HTTPRoute resources](/api-types/httproute) can modify the headers of HTTP requests and the HTTP responses from clients. 
-There are two types of [filters](/api-types/httproute#filters-optional) available to meet these requirements: `RequestHeaderModifier` and `ResponseHeaderModifier`.
+[HTTPRoute resources](../api-types/httproute.md) can modify the headers of HTTP requests and the HTTP responses from clients.
+There are two types of [filters](../api-types/httproute.md#filters-optional) available to meet these requirements: `RequestHeaderModifier` and `ResponseHeaderModifier`.
 
 This guide shows how to use these features.
 
-Note that these features are compatible. HTTP headers of the incoming requests and the headers of their responses can both be modified using a single [HTTPRoute resource](/api-types/httproute).
+Note that these features are compatible. HTTP headers of the incoming requests and the headers of their responses can both be modified using a single [HTTPRoute resource](../api-types/httproute.md).
 
 ## HTTP Request Header Modifier
 

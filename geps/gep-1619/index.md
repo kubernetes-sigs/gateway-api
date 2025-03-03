@@ -3,7 +3,7 @@
 * Issue: [#1619](https://github.com/kubernetes-sigs/gateway-api/issues/1619)
 * Status: Experimental
 
-(See status definitions [here](/geps/overview/#gep-states).)
+(See status definitions [here](../overview.md#gep-states).)
 
 ## Graduation Criteria
 
@@ -428,9 +428,9 @@ We will present two distinct patterns for configuring session persistence:
 
 ### BackendLBPolicy API
 
-In order to apply session persistence configuration to a backend, we will implement it as a [Policy Attachment](/reference/policy-attachment/).
+In order to apply session persistence configuration to a backend, we will implement it as a [Policy Attachment](../../reference/policy-attachment.md).
 The new metaresource is named `BackendLBPolicy` and is responsible for configuring load balancing-related configuration
-for traffic intended for a backend after routing has occurred. It is defined as a [Direct Policy Attachment](/geps/gep-713/#direct-policy-attachment)
+for traffic intended for a backend after routing has occurred. It is defined as a [Direct Policy Attachment](../gep-713/index.md#direct-policy-attachment)
 without defaults or overrides, applied to the targeted backend.
 
 Instead of utilizing a specific, session persistence-only policy object, we introduce a more generic API object named
@@ -661,7 +661,7 @@ their preferred form of session persistence if desired.
 
 ### Target Persona
 
-Referring to the [Gateway API Security Model](/concepts/security-model/#roles-and-personas),
+Referring to the [Gateway API Security Model](../../concepts/security-model.md#roles-and-personas),
 the target kubernetes role/persona for session persistence are application developers, as mentioned in the [When does an application require session persistence?](#when-does-an-application-require-session-persistence)
 section. It is the responsibility of the application developers to adjust the persistence configuration to ensure the
 functionality of their applications.
@@ -677,10 +677,10 @@ route in any given implementation.
 ### API Attachment Points
 
 The new `BackendLBPolicy` metaresource only supports attaching to a backend. A backend can be a Service,
-ServiceImport (see [GEP-1748](/geps/gep-1748)), or any implementation-specific backends that are a valid
-[`BackendObjectReference`](/reference/spec/#gateway.networking.k8s.io%2fv1.BackendObjectReference). Enabling session
+ServiceImport (see [GEP-1748](../gep-1748/index.md)), or any implementation-specific backends that are a valid
+[`BackendObjectReference`](../../reference/spec.md#gateway.networking.k8s.io%2fv1.BackendObjectReference). Enabling session
 persistence for a backend enables subsequently enables it for any route directing traffic to this backend. To learn more
-about the process of attaching a policy to a backend, please refer to [GEP-713](/geps/gep-713).
+about the process of attaching a policy to a backend, please refer to [GEP-713](../gep-713/index.md).
 
 On the other hand, configuring the `sessionPersistence` field in the route rule enables session persistence exclusively
 for the traffic directed to the `backendRefs` in this route rule. This means applying session persistence configuration
@@ -689,8 +689,8 @@ route rule section rather than the route entirely, allows users to configure ses
 fashion. This approach avoids the need to decompose routes if the configuration is specific to a route path.
 
 Session persistence configuration specified in a route rule SHALL override equivalent configuration in `BackendLBPolicy`.
-In this situation, implementations MAY want to indicate a warning via a log or status. Refer to [GEP-713](/geps/gep-713)
-and/or [GEP-2648](/geps/gep-2648) for more specific details on how to handle override scenarios.
+In this situation, implementations MAY want to indicate a warning via a log or status. Refer to [GEP-713](../gep-713/index.md)
+and/or [GEP-2648](../gep-2648/index.md) for more specific details on how to handle override scenarios.
 
 Edge cases will arise when implementing session persistence support for both backends and route rules through
 `BackendLBPolicy` and the route rule's `sessionPersistence` field. For guidance on addressing conflicting
@@ -811,9 +811,9 @@ might not function as expected. In such cases, it's acceptable to make appropria
 
 ### Session Persistence API with GAMMA
 
-The object of the [GAMMA (Gateway API for Mesh Management and Administration)](/mesh/gamma)
+The object of the [GAMMA (Gateway API for Mesh Management and Administration)](../../mesh/gamma.md)
 initiative is to provide support for service mesh and mesh-adjacent use-cases with Gateway API. GAMMA is focused on
-defining how Gateway API could also be used for inter-service or [east/west](/concepts/glossary/#eastwest-traffic)
+defining how Gateway API could also be used for inter-service or [east/west](../../concepts/glossary.md#eastwest-traffic)
 traffic within the same cluster.
 
 Given that service meshes commonly have session persistence requirements, this API design should take into consideration
@@ -1090,7 +1090,7 @@ predicable way.
 - We need to clean up the [Implementations](#implementations) table to make it more organized and readable.
 - We need to revisit how to indicate to a user that a `BackendLBPolicy` configuration is being overridden by a route
 configuration via a warning status or log.
-    - This might require addressing as part of an update to [GEP-2648](/geps/gep-2648).
+- This might require addressing as part of an update to [GEP-2648](../gep-2648/index.md).
 
 ## Alternatives
 
@@ -1227,8 +1227,8 @@ Though session persistence is a ubiquitous name, session affinity is more incons
 - [LBPolicy](https://static.sched.com/hosted_files/kccnceu2023/c4/Autoscaling%20Elastic%20Kubernetes%20Infrastructure%20for%20Stateful%20Applications%20using%20Proxyless%20gRPC%20and%20Istio.pdf#page=25) (proposed extension for session persistence API)
 - [gRPC Stateful Session Affinity Proposal](https://github.com/grpc/proposal/blob/master/A55-xds-stateful-session-affinity.md) (info on session draining and session persistence in gRPC)
 - [Kube-Proxy Session Affinity](https://kubernetes.io/docs/reference/networking/virtual-ips/#session-affinity)
-- [GEP-713: Metaresources and PolicyAttachment](/geps/gep-713/)
+- [GEP-713: Metaresources and PolicyAttachment](../gep-713/index.md)
 - [RFC6265](https://www.rfc-editor.org/rfc/rfc6265)
-- [Policy Attachment](/reference/policy-attachment)
+- [Policy Attachment](../../reference/policy-attachment.md)
 - [Envoy Session Persistence Design Doc](https://docs.google.com/document/d/1IU4b76AgOXijNa4sew1gfBfSiOMbZNiEt5Dhis8QpYg/edit#heading=h.sobqsca7i45e)
 - [Envoy Session Persistence Issue](https://github.com/envoyproxy/envoy/issues/16698)

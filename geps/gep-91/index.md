@@ -160,7 +160,7 @@ This section highlights use cases that may be covered in a future iteration of t
 
 [TLS Handshake Protocol]: https://www.rfc-editor.org/rfc/rfc5246#section-7.4
 [Certificate Path Validation]: https://www.rfc-editor.org/rfc/rfc5280#section-6
-[GatewayTLSConfig]: https://gateway-api.sigs.k8s.io/references/spec/#gateway.networking.k8s.io/v1.GatewayTLSConfig
-[BackendTLSPolicy]: https://gateway-api.sigs.k8s.io/api-types/backendtlspolicy/
-[TLS Configuration GEP]: https://gateway-api.sigs.k8s.io/geps/gep-2907/
+[GatewayTLSConfig]: /references/spec/#gateway.networking.k8s.io/v1.GatewayTLSConfig
+[BackendTLSPolicy]: ../../api-types/backendtlspolicy.md
+[TLS Configuration GEP]: ../gep-2907/index.md
 [Gateway API TLS Use Cases]: https://docs.google.com/document/d/17sctu2uMJtHmJTGtBi_awGB0YzoCLodtR6rUNmKMCs8/edit?pli=1#heading=h.cxuq8vo8pcxm

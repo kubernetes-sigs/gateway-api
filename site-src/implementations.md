@@ -10,7 +10,7 @@ cover, and documentation to help users get started.
 
 !!! info "Compare extended supported features across implementations"
 
-    [View a table to quickly compare supported features of projects](/implementations/v1.1). These outline Gateway controller implementations that have passed core conformance tests, and focus on extended conformance features that they have implemented.
+[View a table to quickly compare supported features of projects](implementations/v1.1.md). These outline Gateway controller implementations that have passed core conformance tests, and focus on extended conformance features that they have implemented.
 
 ## Gateway Controller Implementation Status <a name="gateways"></a>
 
@@ -221,7 +221,7 @@ For help and support with Contour's implementation, [create an issue][contour-is
 
 [contour]:https://projectcontour.io
 [contour-release]:https://github.com/projectcontour/contour/releases/tag/v1.30.0
-[contour-standard]:https://gateway-api.sigs.k8s.io/concepts/versioning/#release-channels-eg-experimental-standard
+[contour-standard]:concepts/versioning.md#release-channels-eg-experimental-standard
 [contour-guide]:https://projectcontour.io/docs/1.30/guides/gateway-api/
 [contour-issue-new]:https://github.com/projectcontour/contour/issues/new/choose
 [contour-slack]:https://kubernetes.slack.com/archives/C8XRH2R4J

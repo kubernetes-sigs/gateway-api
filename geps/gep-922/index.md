@@ -7,7 +7,7 @@
     Although this GEP serves as a reference for how we developed the Gateway API
     versioning model, it is not meant to be the current source of truth.
     Instead, please refer to our [official Versioning
-    Policy](/concepts/versioning) for the most up-to-date guidelines.
+Policy](../../concepts/versioning.md) for the most up-to-date guidelines.
 
 ## TLDR
 Each Gateway API release will be represented by a bundle version that represents
