@@ -27,6 +27,7 @@ import (
 	"sigs.k8s.io/gateway-api/apis/v1alpha2"
 	"sigs.k8s.io/gateway-api/apis/v1alpha3"
 	"sigs.k8s.io/gateway-api/apis/v1beta1"
+	apisxv1alpha1 "sigs.k8s.io/gateway-api/apisx/v1alpha1"
 
 	"k8s.io/client-go/tools/clientcmd"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -53,6 +54,7 @@ func TestMain(m *testing.M) {
 	v1alpha2.Install(k8sClient.Scheme())
 	v1beta1.Install(k8sClient.Scheme())
 	v1.Install(k8sClient.Scheme())
+	apisxv1alpha1.Install(k8sClient.Scheme())
 
 	os.Exit(m.Run())
 }
