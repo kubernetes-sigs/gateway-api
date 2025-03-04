@@ -143,11 +143,11 @@ spec:
                           Support: Extended
                         pattern: ^([0-9]{1,5}(h|m|s|ms)){1,4}$
                         type: string
+                        x-kubernetes-validations:
+                        - message: interval can not be greater than one hour
+                          rule: '!(duration(self) == duration(''0s'') || duration(self)
+                            > duration(''1h''))'
                     type: object
-                    x-kubernetes-validations:
-                    - message: interval can not be greater than one hour
-                      rule: '!(duration(self.interval) == duration(''0s'') || duration(self.interval)
-                        > duration(''1h''))'
                 type: object
               sessionPersistence:
                 description: |-

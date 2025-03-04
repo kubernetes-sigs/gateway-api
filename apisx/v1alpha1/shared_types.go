@@ -81,8 +81,6 @@ type ParentGatewayReference struct {
 }
 
 // RequestRate expresses a rate of requests over a given period of time.
-//
-// +kubebuilder:validation:XValidation:message="interval can not be greater than one hour",rule="!(duration(self.interval) == duration('0s') || duration(self.interval) > duration('1h'))"
 type RequestRate struct {
 	// Count specifies the number of requests per time interval.
 	//
@@ -95,5 +93,6 @@ type RequestRate struct {
 	// time during which the given count of requests occur.
 	//
 	// Support: Extended
+	// +kubebuilder:validation:XValidation:message="interval can not be greater than one hour",rule="!(duration(self) == duration('0s') || duration(self) > duration('1h'))"
 	Interval *Duration `json:"interval,omitempty"`
 }
