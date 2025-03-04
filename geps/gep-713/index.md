@@ -1003,7 +1003,7 @@ const (
 
 #### On targeted resources
 
-(copied from [Standard Status Condition][#standard-status-condition])
+(copied from [Standard status Condition on Policy-affected objects](#standard-status-condition-on-policy-affected-objects))
 
 This solution requires definition in a GEP of its own to become binding.
 
