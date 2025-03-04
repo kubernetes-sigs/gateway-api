@@ -7,9 +7,9 @@
 
 ## TLDR
 
-This GEP aims to standardize terminology and processes around using one Kubernetes object to modify the functions of one or more other objects.
+This GEP aims to standardize terminology and processes around "metaresources", e.g. using one Kubernetes object to modify the functions of one or more other objects.
 
-It lays out guidelines for Gateway API implementations and other stakeholders for the design and/or handling of custom “metaresource” definitions in compliance with a standard known as Policy Attachment.
+It lays out guidelines for Gateway API implementations and other stakeholders for the design and/or handling of custom “metaresource” definitions in compliance with a pattern known as Policy Attachment.
 
 This GEP specifies a _pattern_, not an API field or new object. It defines some terms, including _Metaresource_, _Policies_ and _Policy Attachment_, and their related concepts.
 
@@ -22,7 +22,7 @@ This GEP specifies a _pattern_, not an API field or new object. It defines some 
 * Enable Policy Attachment at all relevant scopes in Gateway API, including Gateways, Routes, Backends, along with how values should flow across a hierarchy if necessary.
 * Ensure the Policy Attachment specification is generic and forward thinking enough that it could be easily adapted to other grouping mechanisms like Namespaces in the future.
 * Provide a means of attachment that works for both ingress and mesh implementations of Gateway API.
-* Provide a consistent specification that will ensure familiarity between both included and implementation-specific metaresources so they can both be interpreted the same way.
+* Provide a consistent specification that will ensure familiarity between both API-defined and implementation-specific metaresources so they can both be interpreted the same way.
 * Provide a reference pattern to other implementations of metaresource and policy APIs outside of Gateway API, that are based on similar concepts (i.e., augmenting the behavior of other Kubernetes objects, attachment points, nested contexts and inheritance, Defaults & Overrides, etc.)
 
 ## Out of scope
@@ -31,7 +31,14 @@ This GEP specifies a _pattern_, not an API field or new object. It defines some 
 
 ## Background
 
-When designing Gateway API, a recurring challenge became apparent. There was often a need to change the behavior of objects without modifying their specs. Sometimes, this is because changing the spec of the object to hold the new piece of information is not possible (e.g., `ReferenceGrant`, from [GEP-709](../gep-709/index.md), when affecting Secrets and Services), and sometimes it’s because the behavior change is intended to flow across multiple objects (see [Semantics](#semantics-why) of metaresources and [Inherited](#inherited) class of metaresources).
+When designing Gateway API, a recurring challenge became apparent. There was often a need to change ("augment") the behavior of objects without modifying their specs.
+
+There are several cases where this happens, such as:
+- when changing the spec of the object to hold the new piece of information is not possible (e.g., `ReferenceGrant`, from [GEP-709](../gep-709/index.md), when affecting Secrets and Services);
+- when the new specification applies at different scopes (different object kinds), making it more maintainable if the declaration is extracted to a separate object, rather than adding new fields representing the same functionality across multiple objects;
+- when the augmented behavior is intended to span across relationships of an object other than the the object that is directly refered in the declaration (see [Semantics](#semantics-why) of metaresources and [Inherited](#inherited) class of metaresources);
+- when the augmented behavior is subject to different RBAC rules than the object it refers to;
+- to circumvent having to enforce hard changes to established implementations.
 
 To put this another way, sometimes we need ways to be able to affect how an object is interpreted in the API, without representing the description of those effects inside the spec of the object. This document describes the ways to design objects to meet use cases like these.
 
@@ -39,7 +46,7 @@ This document introduces the concept of a “metaresource”, a term used to des
 
 “Meta” here is used in its Greek sense of “more comprehensive” or “transcending”, and “resource” rather than “object” because “metaresource” is more pronounceable than “meta object”.
 
-After a few iterations of Gateway API experimenting with this pattern－both, with its own common kinds of metaresources such as the `BackendTLSPolicy`, as well as via multiple implementation-specific kinds of metaresources (see examples of [current use of metaresources](#current-use-of-metaresources))－ and rounds of discussion such as the one at [kubernetes-sigs/gateway-api/discussions#2927](https://github.com/kubernetes-sigs/gateway-api/discussions/2927), the pattern has been enhanced to its current form.
+After a few iterations of Gateway API experimenting with this pattern－both, with its own common kinds of metaresources such as the `BackendTLSPolicy` and `BackendLBPolicy`, as well as via multiple implementation-specific kinds of metaresources (see examples of [current use of metaresources](#current-use-of-metaresources))－ and rounds of discussion such as the one at [kubernetes-sigs/gateway-api/discussions#2927](https://github.com/kubernetes-sigs/gateway-api/discussions/2927), the pattern has been enhanced to its current form.
 
 ## Definition
 
@@ -81,13 +88,13 @@ Metaresources specify one or more target resources or specific sections of resou
 
 Targeting a resource (or section of a resource) must be interpreted within a given semantics that is proper to the metaresource kind.
 
-Two different metaresource kinds that allow targeting resources of a same a given kind X may have very different semantics, not only because the purpose of the two metaresource kinds differ, but because the mechanics of calculating and applying the augmented behavior for X can as well be very different between metaresource kinds.
+Two different metaresource kinds that allow targeting resources of the same given kind X may have very different semantics, not only because the purpose of the two metaresource kinds differ, but also because the mechanics of calculating and applying the augmented behavior differ.
 
 Often, the semantics of a metaresource is tightly coupled to the relationships and connections a target has with other kinds of objects, typically organized in a hierarchy of nested contexts. In this sense, targeting a given resource kind may have the semantics of spanning effect across yet other objects to which the target is related.
 
 ##### Mergeability (“how”)
 
-Metaresources specify so-called *merge strategies* that dictate how multiple instances of the metaresource affecting a same resource (or section of a resource) should be dealt with in terms of calculating and enforcing a single set of rules specified by the metaresources.
+Metaresources define so-called *merge strategies* that dictate how multiple instances of the metaresource affecting the same resource (or section of a resource) should be handled.
 
 The merge strategies typically include strategies for dealing with conflicting and/or missing specs, such as for applying default and/or override values on the target resources.
 
@@ -111,7 +118,7 @@ These are a few reasons for using metaresources and policies over another (possi
 * Defining implementation-specific functionalities for otherwise common APIs－e.g. to specify implementation-specific behavior for Gateway API HTTPRoute objects.
 * Decoupling concerns for targeting personas with specific functionality and configuration－ delegation of responsibilities, fine-grained RBAC.
 * Decoupling responsibility over the management and implementation of the metaresources themselves.
-* Avoid alternatives based on annotations which are often non-standardized, poorly documented, and generally hard to maintain.
+* Avoid alternatives based on annotations which are often non-standardized, poorly documented, and generally hard to maintain, in favor of proper, expressive APIs (self-documenting intents) instead.
 
 ### Examples of applications of metaresources and policies
 
@@ -130,7 +137,7 @@ The objects targeted by a metaresource define a *context* where the *intent* tha
 
 Metaresources MAY be designed using different targeting methods, such as targeting objects by name (“reference by name”), using label selectors, and targeting with or without cross-namespace references allowed. In all cases, in order to fit within the framework described in this document, the targets MUST be declared within a `targetRefs` field within the spec of the metaresource instance.
 
-All kinds of references SHOULD also specify Group, Version and Kind (GVK) information alongside the selector (unless the API ensures no more than one kind of object can be targeted).
+All kinds of references SHOULD also specify Group, Version and Kind (GVK) information as part of the target (unless the API ensures no more than one kind of object can be targeted).
 
 ##### Reference by name
 
@@ -261,7 +268,12 @@ spec:
 
 Metaresources can opt for allowing instances to target objects across Kubernetes namespaces, in which case an optional `namespace` field MUST be defined with the target reference.
 
-Although not strictly forbidden, this is in general discouraged due to [discoverability](#the-discoverability-problem) issues and security implications. Implementations that opt for designing metaresources that allow for cross namespace references should consider supporting [ReferenceGrants](https://gateway-api.sigs.k8s.io/api-types/referencegrant/?h=referencegrant) to address the security concern.
+!!! warning
+    Although not strictly forbidden, this is in general discouraged due to [discoverability](#the-discoverability-problem) issues and security implications. Cross namespace references can often lead to escalation of privileges associated with the [Confused deputy problem](https://en.wikipedia.org/wiki/Confused_deputy_problem).
+
+Implementations that opt for designing metaresources that allow for cross namespace references MUST support one of the following combined approaches, to address the security concern:
+- The metaresource is paired with [ReferenceGrants](https://gateway-api.sigs.k8s.io/api-types/referencegrant/?h=referencegrant) or some other form of equivalent handshake that ensures that the target is accepting the metaresource.
+- The metaresource applied client-side and does not grant the client any additional access or permissions than it would otherwise have.
 
 <details>
   <summary>Implementation tip</summary>
