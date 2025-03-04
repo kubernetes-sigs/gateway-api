@@ -36,7 +36,6 @@ type BackendTrafficPolicy struct {
 	// Support: Extended
 	//
 	// +optional
-	// <gateway:experimental>
 
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
