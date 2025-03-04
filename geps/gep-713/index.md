@@ -36,7 +36,7 @@ When designing Gateway API, a recurring challenge became apparent. There was oft
 There are several cases where this happens, such as:
 - when changing the spec of the object to hold the new piece of information is not possible (e.g., `ReferenceGrant`, from [GEP-709](../gep-709/index.md), when affecting Secrets and Services);
 - when the new specification applies at different scopes (different object kinds), making it more maintainable if the declaration is extracted to a separate object, rather than adding new fields representing the same functionality across multiple objects;
-- when the augmented behavior is intended to span across relationships of an object other than the the object that is directly refered in the declaration (see [Semantics](#semantics-why) of metaresources and [Inherited](#inherited) class of metaresources);
+- when the augmented behavior is intended to span across relationships of an object other than the the object that is directly referred in the declaration (see [Semantics](#semantics-why) of metaresources and [Inherited](#inherited) class of metaresources);
 - when the augmented behavior is subject to different RBAC rules than the object it refers to;
 - to circumvent having to enforce hard changes to established implementations.
 
@@ -106,7 +106,7 @@ The semantics of *applying rules to a target* characterizes these particular ins
 
 Policies are therefore a strict subset of metaresources which distinguish itself subtly from the whole on the fact that the augmented behavior described by policies resemble *conditional rules*, while the mechanism of targeting an object or set of objects (“attaching to objects”) is nonetheless exactly the same as in the general definition of metaresources.
 
-Without loss of generality, the very activation of the context (targets) of metaresources can be understood as the _conditions_ for the enforcement of the intended augment behavior (rules) that are specified in the metaresources, and therefore these can often be refered to as policies interchangeably.
+Without loss of generality, the very activation of the context (targets) of metaresources can be understood as the _conditions_ for the enforcement of the intended augment behavior (rules) that are specified in the metaresources, and therefore metaresources can often be referred to as policies interchangeably.
 
 ## Applications
 
@@ -521,7 +521,7 @@ In the example above, the expected outcome of the process is:
 * `c1` is augmented by the combination of `m1` + `m2`, whenever activated in the context of `b2`;
 * `c2` is augmented by the combination of `m1` + `m2`.
 
-The next section describes the different ways to combine metaresource instances (known as *merge strategiesI*), including a trivial merge strategy of not merging specs at all.
+The next section describes the different ways to combine metaresource instances (known as *merge strategies*), including a trivial merge strategy of not merging specs at all.
 
 In the most trivial case where metaresources can only directly target the objects whose behavior they intend to augment (i.e. instances of `C` without any indirections) and no metaresource specs are merged at all, the outcome of the process of calculating effective metaresources is simplified to a 1:1 mapping between metaresource and target object at most, where the declared metaresource equals the effective one, with no combinatorial specs nor contextual variations.
 
