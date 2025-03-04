@@ -24,13 +24,13 @@ channel. To accomplish that, we use admonitions that look like this:
 
     The `HTTPRoute` resource is GA and has been part of the Standard Channel
     since `v0.5.0`. For more information on release channels, refer to our
-    [versioning guide](/concepts/versioning).
+    [versioning guide](../concepts/versioning.md).
 
 ??? example "Experimental Channel since v0.3.0"
 
     The `TLSRoute` resource is Alpha and has been part of the Experimental
     Channel since `v0.3.0`. For more information on release channels, refer to
-    our [versioning guide](/concepts/versioning).
+    our [versioning guide](../concepts/versioning.md).
 
 ## Diagrams
 In many cases, diagrams are the best way to explain a concept. Unfortunately

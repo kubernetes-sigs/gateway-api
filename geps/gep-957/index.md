@@ -127,7 +127,7 @@ to differentiate between a listener name and a port number.
 
 ### 2. Update TrafficMatches to support port matching
 TrafficMatches was proposed in
-[gep-735](https://gateway-api.sigs.k8s.io/geps/gep-735/) to support TCP and UDP
+[gep-735](../gep-735/index.md) to support TCP and UDP
 address matching. TrafficMatches can be extended to support port matching.
 TrafficMatches will need to be added to HTTPRoute/TLSRoute if the feature is
 desired there.

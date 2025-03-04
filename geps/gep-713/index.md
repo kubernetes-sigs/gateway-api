@@ -106,7 +106,7 @@ When designing Gateway API, one of the things we’ve found is that we often nee
 able change the behavior of objects without being able to make changes to the spec
 of those objects. Sometimes, this is because we can’t change the spec of the object
 to hold the information we need ( ReferenceGrant, from
-[GEP-709](https://gateway-api.sigs.k8s.io/geps/gep-709/), affecting Secrets
+[GEP-709](../gep-709/index.md), affecting Secrets
 and Services is an example, as is Direct Policy Attachment), and sometimes it’s
 because we want the behavior change to flow across multiple objects
 (this is what Inherited Policy Attachment is for).
@@ -156,12 +156,12 @@ Avoid annotation hell
 ### Direct Policy Attachment
 
 For more description of the details of Direct Policy Attachment,
-see [GEP-2648](https://gateway-api.sigs.k8s.io/geps/gep-2648/).
+see [GEP-2648](../gep-2648/index.md).
 
 ### Inherited Policy Attachment
 
 For more description of the details of Inherited Policy Attachment,
-see [GEP-2649](https://gateway-api.sigs.k8s.io/geps/gep-2649/).
+see [GEP-2649](../gep-2649/index.md).
 
 ### How to determine if a Policy is a Direct or Inherited one
 
@@ -628,7 +628,7 @@ combination of the `AncestorRef` and the `ControllerName` fields as a key.
 
 See [GEP-1897][gep-1897] for the exact details.
 
-[gep-1897]: /geps/gep-1897
+[gep-1897]: ../gep-1897/index.md
 
 ```go
 // PolicyAncestorStatus describes the status of a route with respect to an
@@ -940,7 +940,7 @@ will be capable of describing the computed sum of policy that applies to a given
 resource, including policies applied to parent resources.
 
 Each Policy CRD that wants to be supported by this plugin will need to follow
-the API structure defined above and add the [corresponding label](https://gateway-api.sigs.k8s.io/geps/gep-713/#standard-label-on-crd-objects)
+the API structure defined above and add the [corresponding label](index.md#standard-label-on-crd-objects)
 to the CRD.
 
 ### Conditions

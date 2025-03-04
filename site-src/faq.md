@@ -15,10 +15,10 @@ more protocols than just HTTP, and models more infrastructure components to
 provide better deployment and management options for cluster operators.
 
 For more information, see the [Migrating from
-Ingress](/guides/migrating-from-ingress/) guide.
+Ingress](guides/migrating-from-ingress.md) guide.
 
 #### Will there be a default controller implementation?
-No. There are already many great [implementations](/implementations) to choose
+No. There are already many great [implementations](implementations.md) to choose
 from. The scope of this project is to define the API, conformance tests, and
 overall documentation.
 
@@ -26,7 +26,7 @@ overall documentation.
 There are a few mechanisms available for extending the API with
 implementation-specific capabilities:
 
-* The [Policy Attachment](/reference/policy-attachment/) model allows you to
+* The [Policy Attachment](reference/policy-attachment.md) model allows you to
 decorate Gateway API objects with implementation-specific CRDs. A policy or
 configuration object could match the Gateway API object either by name or by
 using an explicit object reference.
@@ -37,7 +37,7 @@ using an explicit object reference.
   objects.
 
 * Use API-defined extension points. Some Gateway API objects have explicit
-[extension points](/concepts/api-overview#extension-points) for implementations
+[extension points](concepts/api-overview.md#extension-points) for implementations
 to use.
 
 #### Where can I find Gateway API releases?
@@ -51,18 +51,18 @@ Similar to upstream Kubernetes, alpha API versions indicate that resources are
 still experimental in nature and may either be removed or changed in breaking
 ways in future releases of Gateway API.
 
-See the [Versioning](/concepts/versioning/) documentation for more info.
+See the [Versioning](concepts/versioning.md) documentation for more info.
 
 #### Which Kubernetes versions are supported?
 See our policy on [supported
-versions](/concepts/versioning/#supported-versions).
+versions](concepts/versioning.md#supported-versions).
 
 #### Is SSL Passthrough supported?
 SSL Passthrough (wherein a Gateway routes traffic with the [Transport Layer
 Security (TLS)](https://en.wikipedia.org/wiki/Transport_Layer_Security)
 encryption _intact_ to a backend service instead of terminating it) is supported
-by [TLSRoutes](/concepts/api-overview#tlsroute). See the [TLS
-Guide](/guides/tls) for more details about passthrough and other TLS
+by [TLSRoutes](concepts/api-overview.md#tlsroute). See the [TLS
+Guide](guides/tls.md) for more details about passthrough and other TLS
 configurations.
 
 #### What's the difference between Gateway API and an API Gateway?

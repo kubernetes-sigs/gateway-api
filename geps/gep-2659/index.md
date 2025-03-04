@@ -4,7 +4,7 @@
 * Type: Memorandum
 * Status: Accepted
 
-((See status definitions [here](/geps/overview/#gep-states).)
+((See status definitions [here](../overview.md#gep-states).)
 
 ## TLDR
 
@@ -26,7 +26,7 @@ As part of preparing for work to split up GEP-713, we (the Gateway API and GAMMA
 maintainers) have noticed a few shortcomings in our GEP process.
 
 In particular, we have some GEPs that are very different to other GEPs.
-[GEP-1324](https://gateway-api.sigs.k8s.io/geps/gep-1324/) is a good example,
+[GEP-1324](../gep-1324/index.md) is a good example,
 as it lays out the general agreement and use cases for the GAMMA initiative, but
 has no firm deliverables of its own. In fact, its main purpose was to ensure
 that the community was in agreement on the language around and scope of the
@@ -36,10 +36,10 @@ work (in the form of subsequent GEPs). However, our current GEP system of checkl
 for graduating levels fits this type of GEP poorly.
 
 Additionally, we've had two GEPs moved to Declined ([GEP-735: TCP and UDP address
-matching](https://gateway-api.sigs.k8s.io/geps/gep-735/) and
-[GEP-1282: Describing Backend Properties](https://gateway-api.sigs.k8s.io/geps/gep-1282/)).
+matching](../gep-735/index.md) and
+[GEP-1282: Describing Backend Properties](../gep-1282/index.md)).
 In the case of GEP-1282, we now have a replacement GEP,
-[GEP-1897: BackendTLSPolicy](https://gateway-api.sigs.k8s.io/geps/gep-1897/)
+[GEP-1897: BackendTLSPolicy](../gep-1897/index.md)
 which obsoletes the older GEP. But we have no way of representing this
 relationship (or any other, in fact) between GEPs at the moment.
 

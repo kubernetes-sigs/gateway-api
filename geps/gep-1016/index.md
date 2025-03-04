@@ -7,7 +7,7 @@
 > our GEP overview as it existed before those rules did, and so it has been
 > explicitly grandfathered in.
 
-[expprob]:https://gateway-api.sigs.k8s.io/geps/overview/#probationary-period
+[expprob]:../overview.md#probationary-period
 
 ## Goal
 

@@ -2,9 +2,9 @@
 
 ??? success "Standard Channel since v0.6.0"
 
-    The `ReferenceGrant` resource is Beta and part of the 
+    The `ReferenceGrant` resource is Beta and part of the
     Standard Channel since `v0.6.0`. For more information on release
-    channels, refer to our [versioning guide](/concepts/versioning).
+    channels, refer to our [versioning guide](../concepts/versioning.md).
 
 !!! note
     This resource was originally named "ReferencePolicy". It was renamed
@@ -14,7 +14,7 @@ A ReferenceGrant can be used to enable cross namespace references within
 Gateway API. In particular, Routes may forward traffic to backends in other
 namespaces, or Gateways may refer to Secrets in another namespace.
 
-![Reference Grant](/images/referencegrant-simple.svg)
+![Reference Grant](../images/referencegrant-simple.svg)
 <!-- Source: https://docs.google.com/presentation/d/11HEYCgFi-aya7FS91JvAfllHiIlvfgcp7qpi_Azjk4E/edit#slide=id.g13c18e3a7ab_0_171 -->
 
 In the past, we've seen that forwarding traffic across namespace boundaries is a
@@ -90,7 +90,7 @@ While the API is simplistic in nature, it comes with a few notable decisions:
    other. This makes it impossible for them to conflict with each other.
 
 Please see the [API
-Specification](/reference/spec#gateway.networking.k8s.io/v1alpha2.ReferenceGrant)
+Specification](../reference/spec.md#gateway.networking.k8s.io/v1alpha2.ReferenceGrant)
 for more details on how specific ReferenceGrant fields are interpreted.
 
 ## Implementation Guidelines
@@ -110,7 +110,7 @@ No hints should be provided about whether or not the referenced resource exists.
 Cross namespace Route -> Gateway binding follows a slightly different pattern
 where the handshake mechanism is built into the Gateway resource. For more
 information on that approach, refer to the relevant [Security Model
-documentation](/concepts/security-model). Although conceptually similar to
+documentation](../concepts/security-model.md). Although conceptually similar to
 ReferenceGrant, this configuration is built directly into Gateway Listeners,
 and allows for fine-grained per Listener configuration that would not be
 possible with ReferenceGrant.

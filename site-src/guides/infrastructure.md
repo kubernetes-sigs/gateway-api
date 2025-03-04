@@ -4,7 +4,7 @@
 
     The `infrastructure` field is GA and has been part of the Standard Channel since
     `v1.2.0`. For more information on release channels, refer to our [versioning
-    guide](/concepts/versioning).
+    guide](../concepts/versioning.md).
 
 Gateway API implementations are responsible for creating the backing
 infrastructure needed to make each Gateway work. For example, implementations
@@ -40,6 +40,6 @@ spec:
       linkerd.io/inject: enabled
 ```
 
-[infrastructure]: /reference/spec/#gateway.networking.k8s.io/v1.GatewayInfrastructure
+[infrastructure]: ../reference/spec.md#gateway.networking.k8s.io/v1.GatewayInfrastructure
 [service]: https://kubernetes.io/docs/concepts/services-networking/service/
 [deployment]: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/

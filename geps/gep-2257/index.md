@@ -9,7 +9,7 @@ As we extend the Gateway API to have more functionality, we need a standard
 way to represent duration values. The first instance is the [HTTPRoute
 Timeouts GEP][GEP-1742]; doubtless others will arise.
 
-[GEP-1742]:/geps/gep-1742
+[GEP-1742]:../gep-1742/index.md
 
 ## Gateway API Duration Format
 

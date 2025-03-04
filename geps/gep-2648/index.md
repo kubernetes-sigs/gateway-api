@@ -3,7 +3,7 @@
 * Issue: [#2648](https://github.com/kubernetes-sigs/gateway-api/issues/2648)
 * Status: Provisional
 
-(See status definitions [here](/geps/overview/#gep-states)
+(See status definitions [here](../overview.md#gep-states)
 
 ## TLDR
 
@@ -73,7 +73,7 @@ A Direct Policy Attachment is tightly bound to one instance of a particular
 Kind within a single namespace (or to an instance of a single Kind at cluster scope),
 and only modifies the behavior of the object that matches its binding.
 
-As an example, the BackendTLSPolicy is specified in [GEP-1897](https://gateway-api.sigs.k8s.io/geps/gep-1897/),
+As an example, the BackendTLSPolicy is specified in [GEP-1897](../gep-1897/index.md),
 BackendTLSPolicy - Explicit Backend TLS Connection Configuration. This Policy
 attaches to the Service object and tells Gateway API implementations what TLS
 settings should be used to connect to that Service when it is used as a backend
@@ -162,7 +162,7 @@ of other resources, for example:
 
 * Service.Ports.Name
 * Gateway.Listeners.Name
-* HTTPRoute.Rules.Name (once they are added in [GEP-995](https://gateway-api.sigs.k8s.io/geps/gep-995), implementation tracked by [#2985](https://github.com/kubernetes-sigs/gateway-api/pull/2985))
+* HTTPRoute.Rules.Name (once they are added in [GEP-995](../gep-995/index.md), implementation tracked by [#2985](https://github.com/kubernetes-sigs/gateway-api/pull/2985))
 
 Implementations SHOULD NOT use the name of a `backendRef` for applying Policy,
 since the `backendRef` both is not guaranteed to be unique across a Route's rules,
@@ -370,7 +370,7 @@ See [GEP-1897][gep-1897] for the exact details. A snapshot of the Go code is
 included here for reference, but the canonical representation is in the code
 itself (at the time of writing, this is in `apis/v1alpha2/policy_types.go`).
 
-[gep-1897]: /geps/gep-1897
+[gep-1897]: ../gep-1897/index.md
 
 ```go
 // PolicyAncestorStatus describes the status of a route with respect to an
@@ -485,7 +485,7 @@ to that Gateway.
 
 ### BackendTLSPolicy
 
-BackendTLSPolicy, introduced in [GEP-1897](https://gateway-api.sigs.k8s.io/geps/gep-1897/)
+BackendTLSPolicy, introduced in [GEP-1897](../gep-1897/index.md)
 allows backends to set the TLS details that a Gateway implementation must use
 to connect to that backend.
 

@@ -601,7 +601,7 @@ Maintainers will provide [badges][bdg] to implementations at the end of the proc
 which link to the implementations page for that specific implementation and can
 be easily added via markdown to Git repositories.
 
-[impl]:https://gateway-api.sigs.k8s.io/implementations/
+[impl]:../../implementations.md
 [bdg]:https://shields.io
 
 ## Alternatives Considered

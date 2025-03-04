@@ -15,7 +15,7 @@ point, these may graduate to the Standard release channel or be dropped from the
 API entirely.
 
 The following diagram provides a high level overview of the lifecycle of a
-feature or resource proposed by a new [GEP](/geps/overview/) (enhancement
+feature or resource proposed by a new [GEP](../geps/overview.md) (enhancement
 proposal) in Gateway API:
 
 ```mermaid
@@ -45,7 +45,7 @@ channel, plus:
 * Resources with Alpha API Versions
 * All new fields before they graduate to Standard Channel
 
-![Release Channel Overlap](/images/release-channel-overlap.svg)
+![Release Channel Overlap](../images/release-channel-overlap.svg)
 <!-- Source: https://docs.google.com/presentation/d/1sfZTV-vlisDUIie_iK_B2HqKia_querT6m6T2_vbAk0/edit -->
 
 We recommend using the Standard Channel by default as it will provide a stable
@@ -168,7 +168,7 @@ consistent upgrade experiences across versions. To accomplish that, we commit to
 
 ## CRD Management
 For information on how to manage Gateway API CRDs in your clusters, refer to our
-[CRD Management Guide](/guides/crd-management).
+[CRD Management Guide](../guides/crd-management.md).
 
 ## Out of Scope
 ### Unreleased APIs

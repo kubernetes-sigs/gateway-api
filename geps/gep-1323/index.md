@@ -7,7 +7,7 @@
 > our GEP overview as it existed before those rules did, and so it has been
 > explicitly grandfathered in.
 
-[expprob]:https://gateway-api.sigs.k8s.io/geps/overview/#probationary-period
+[expprob]:../overview.md#probationary-period
 
 ## TLDR
 Similar to how we have `RequestHeaderModifier` in `HTTPRouteFilter`, which lets users modify request headers before the request is forwarded to a backend (or a group of backends), it’d be helpful to have a `ResponseHeaderModifier` field which would let users modify response headers before they are returned to the client.

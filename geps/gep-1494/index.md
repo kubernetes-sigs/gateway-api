@@ -3,7 +3,7 @@
 * Issue: [#1494](https://github.com/kubernetes-sigs/gateway-api/issues/1494)
 * Status: Provisional
 
-(See status definitions [here](/geps/overview/#gep-states).)
+(See status definitions [here](../overview.md#gep-states).)
 
 
 ## TLDR
@@ -13,7 +13,7 @@ Provide a method for configuring **Gateway API implementations** to add HTTP Aut
 
 ## Goals
 
-(Using the [Gateway API Personas](https://gateway-api.sigs.k8s.io/concepts/roles-and-personas/))
+(Using the [Gateway API Personas](../../concepts/roles-and-personas.md))
 
 * A way for Ana the Application Developer to configure a Gateway API implementation to perform Authentication (at least), with optional Authorization.
 
@@ -70,7 +70,7 @@ In this case, the server also authenticates the client, based on the certificate
 
 TLS v1.3 is defined in [RFC-8446](https://datatracker.ietf.org/doc/html/rfc8446), with v1.2 defined in [RFC-5246](https://datatracker.ietf.org/doc/html/rfc5246). Earlier versions of TLS (v1.1 and v1.0) were deprecated in [RFC-8996](https://datatracker.ietf.org/doc/html/rfc8996) and should no longer be used.
 
-Gateway API already has some work in progress to handle this for straightforward use cases, in [GEP-91](https://gateway-api.sigs.k8s.io/geps/gep-91/).
+Gateway API already has some work in progress to handle this for straightforward use cases, in [GEP-91](../gep-91/index.md).
 
 #### JWT
 

@@ -21,7 +21,7 @@ There are 3 primary roles in Gateway API, as described in [roles and personas]:
 - **Chihiro** (they/them): Cluster Operator
 - **Ana** (she/her): Application Developer
 
-[roles and personas]:/concepts/roles-and-personas
+[roles and personas]:roles-and-personas.md
 
 ### RBAC
 
@@ -98,7 +98,7 @@ the ReferenceGrant.
 ```
 
 For more information on ReferenceGrant, refer to our [detailed documentation
-for this resource](/api-types/referencegrant).
+for this resource](../api-types/referencegrant.md).
 
 ## Advanced Concept: Limiting Namespaces Where a GatewayClass Can Be Used
 Some infrastructure providers or cluster operators may wish to limit the

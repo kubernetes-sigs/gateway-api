@@ -105,7 +105,7 @@ several places this may be done:
 
 - A [new GitHub Discussion](https://github.com/kubernetes-sigs/gateway-api/discussions/new)
 - On our [Slack Channel](https://kubernetes.slack.com/archives/CR0H13KGA)
-- On one of our [community meetings](https://gateway-api.sigs.k8s.io/contributing/?h=meetings#meetings)
+- On one of our [community meetings](../contributing/index.md?h=meetings#meetings)
 
 Please default to GitHub discussions: they work a lot like GitHub issues which
 makes them easy to search.
@@ -188,7 +188,7 @@ maintainers.
 
 ### 5. Graduate the GEP to "Standard"
 
-Once this feature has met the [graduation criteria](/concepts/versioning/#graduation-criteria), it is
+Once this feature has met the [graduation criteria](../concepts/versioning.md#graduation-criteria), it is
 time to graduate it to the "Standard" channel of the API. Depending on the feature, this may include
 any of the following:
 
@@ -208,7 +208,7 @@ that means for that GEP).
 
 ## Format
 
-GEPs should match the format of the template found in [GEP-696](/geps/gep-696).
+GEPs should match the format of the template found in [GEP-696](gep-696/index.md).
 
 ## Out of scope
 

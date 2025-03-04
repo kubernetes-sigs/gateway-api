@@ -191,6 +191,6 @@ This GEP does not cover per-service overrides for client certificate. This is mo
 ## References
 
 This is a natural continuation of
-[GEP-2907](https://gateway-api.sigs.k8s.io/geps/gep-2907/), the memorandum GEP
+[GEP-2907](../gep-2907/index.md), the memorandum GEP
 that provided the overall vision for where TLS configuration should fit
 throughout Gateway API.

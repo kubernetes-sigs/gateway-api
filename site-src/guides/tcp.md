@@ -2,7 +2,7 @@
 
     The `TCPRoute` resource described below is currently only included in the
     "Experimental" channel of Gateway API. For more information on release
-    channels, refer to our [versioning guide](/concepts/versioning).
+    channels, refer to our [versioning guide](../concepts/versioning.md).
 
 Gateway API is designed to work with multiple protocols and [TCPRoute][tcproute]
 is one such route which allows for managing [TCP][tcp] traffic.
@@ -64,9 +64,9 @@ downside of more tightly coupling the relationship between the Gateway and
 its associated Routes. Refer to [Attaching to Gateways][attaching] for more
 details.
 
-[tcproute]:/reference/spec/#gateway.networking.k8s.io/v1alpha2.TCPRoute
+[tcproute]:../reference/spec.md#gateway.networking.k8s.io/v1alpha2.TCPRoute
 [tcp]:https://datatracker.ietf.org/doc/html/rfc793
-[httproute]:/reference/spec/#gateway.networking.k8s.io/v1alpha2.HTTPRoute
-[gateway]:/reference/spec/#gateway.networking.k8s.io/v1alpha2.Gateway
+[httproute]:../reference/spec.md#gateway.networking.k8s.io/v1alpha2.HTTPRoute
+[gateway]:../reference/spec.md#gateway.networking.k8s.io/v1alpha2.Gateway
 [svc]:https://kubernetes.io/docs/concepts/services-networking/service/
-[attaching]:/api-types/httproute/#attaching-to-gateways
+[attaching]:../api-types/httproute.md#attaching-to-gateways
