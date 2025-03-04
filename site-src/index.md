@@ -181,7 +181,7 @@ it must fit the uses to which each of Ana, Chihiro, and Ian will put it.
 
 [use-cases]:/concepts/use-cases
 
-#### What's the difference between Gateway API and an API Gateway?
+## What's the difference between Gateway API and an API Gateway?
 
 An [API gateway](https://glossary.cncf.io/api-gateway/) is a tool that
 aggregates unique application APIs, making them all available in one place.
