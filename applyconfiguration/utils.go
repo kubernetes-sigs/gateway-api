@@ -234,6 +234,10 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1beta1.ReferenceGrantToApplyConfiguration{}
 
 		// Group=gateway.networking.x-k8s.io, Version=v1alpha1
+	case v1alpha1.SchemeGroupVersion.WithKind("BackendTrafficPolicy"):
+		return &apisxv1alpha1.BackendTrafficPolicyApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("BackendTrafficPolicySpec"):
+		return &apisxv1alpha1.BackendTrafficPolicySpecApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("ListenerEntry"):
 		return &apisxv1alpha1.ListenerEntryApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("ListenerEntryStatus"):
@@ -246,6 +250,10 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisxv1alpha1.ListenerSetStatusApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("ParentGatewayReference"):
 		return &apisxv1alpha1.ParentGatewayReferenceApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("RequestRate"):
+		return &apisxv1alpha1.RequestRateApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("RetryConstraint"):
+		return &apisxv1alpha1.RetryConstraintApplyConfiguration{}
 
 	}
 	return nil
