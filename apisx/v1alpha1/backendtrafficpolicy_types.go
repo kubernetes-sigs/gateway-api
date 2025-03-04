@@ -136,7 +136,7 @@ type RetryConstraint struct {
 	// Support: Extended
 	//
 	// +optional
-	// +kubebuilder:default=10s
+	// +kubebuilder:default="10s"
 	// +kubebuilder:validation:XValidation:message="budgetInterval can not be greater than one hour or less than one second",rule="!(duration(self.budgetInterval) < duration('1s') || duration(self.budgetInterval) > duration('1h'))"
 	BudgetInterval *Duration `json:"budgetInterval,omitempty"`
 
@@ -154,6 +154,6 @@ type RetryConstraint struct {
 	// Support: Extended
 	//
 	// +optional
-	// +kubebuilder:default={count: 10, interval: 1s}
+	// +kubebuilder:default={count: 10, interval: "1s"}
 	MinRetryRate *RequestRate `json:"minRetryRate,omitempty"`
 }
