@@ -183,20 +183,19 @@ it must fit the uses to which each of Ana, Chihiro, and Ian will put it.
 
 ## What's the difference between Gateway API and an API Gateway?
 
-An API Gateway is a general concept that describes anything that exposes
-capabilities of a backend service, while providing extra capabilities for
-traffic routing and manipulation, such as load balancing, request and response
-transformation, and sometimes more advanced features like authentication and
-authorization, rate limiting, and circuit breaking.
+An [API gateway](https://glossary.cncf.io/api-gateway/) is a tool that
+aggregates unique application APIs, making them all available in one place.
+It allows organizations to move key functions, such as authentication and
+authorization or limiting the number of requests between applications, to a
+centrally managed location. An API gateway functions as a common interface to (often external) API consumers.
 
-Gateway API is an interface, or set of resources, that model service
-networking in Kubernetes. One of the main resources is a `Gateway`, which
-declares the Gateway type (or class) to instantiate and its configuration. As
-a Gateway Provider, you can implement Gateway API to model Kubernetes
-service networking in an expressive, extensible, and role-oriented way.
+Gateway API is an interface, defined as a set of Kubernetes resources, that 
+models service networking in Kubernetes. One of the main resources is a `Gateway`,
+which declares the Gateway type (or class) to instantiate and its configuration.
+As a Gateway provider, you can implement Gateway API to model Kubernetes service
+networking in an expressive, extensible, and role-oriented way.
 
-Most Gateway API implementations are API Gateways to some extent, but not all
-API Gateways are Gateway API implementations.
+Some API gateways can be programmed using the Gateway API.
 
 ## Who is working on Gateway API?
 
