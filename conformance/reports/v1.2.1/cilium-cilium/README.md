@@ -4,7 +4,7 @@
 
 | API channel  | Implementation version                                          | Mode    | Report                                          |
 |--------------|-----------------------------------------------------------------|---------|-------------------------------------------------|
-| experimental | [1.17.0](https://github.com/cilium/cilium/releases/tag/v1.17.0) | default | [link](./experimental-1.17-default-report.yaml) |
+| experimental | [1.17.0](https://github.com/cilium/cilium/releases/tag/v1.17.0) | default | [v1.17 report](./experimental-1.17-default-report.yaml) |
 
 ## Reproduce
 

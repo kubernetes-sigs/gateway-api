@@ -4,15 +4,15 @@
 
 |API channel|Implementation version|Mode|Report|
 |-----------|----------------------|----|------|
-|experimental|[v1.28.1](https://github.com/projectcontour/contour/releases/tag/v1.28.1)|x|[link](./v1.28.1-report.yaml)|
-|experimental|[v1.28.2](https://github.com/projectcontour/contour/releases/tag/v1.28.2)|x|[link](./v1.28.2-report.yaml)|
-|experimental|[v1.28.3](https://github.com/projectcontour/contour/releases/tag/v1.28.3)|x|[link](./v1.28.3-report.yaml)|
-|experimental|[v1.28.4](https://github.com/projectcontour/contour/releases/tag/v1.28.4)|x|[link](./v1.28.4-report.yaml)|
-|experimental|[v1.28.5](https://github.com/projectcontour/contour/releases/tag/v1.28.5)|x|[link](./experimental-v1.28.5-default-report.yaml)|
-|experimental|[v1.28.6](https://github.com/projectcontour/contour/releases/tag/v1.28.6)|x|[link](./experimental-v1.28.6-default-report.yaml)|
-|experimental|[v1.29.0](https://github.com/projectcontour/contour/releases/tag/v1.29.0)|x|[link](./v1.29.0-report.yaml)|
-|experimental|[v1.29.1](https://github.com/projectcontour/contour/releases/tag/v1.29.1)|x|[link](./experimental-v1.29.1-default-report.yaml)|
-|experimental|[v1.29.2](https://github.com/projectcontour/contour/releases/tag/v1.29.2)|x|[link](./experimental-v1.29.2-default-report.yaml)|
+|experimental|[v1.28.1](https://github.com/projectcontour/contour/releases/tag/v1.28.1)|x|[v1.28.1 report](./v1.28.1-report.yaml)|
+|experimental|[v1.28.2](https://github.com/projectcontour/contour/releases/tag/v1.28.2)|x|[v1.28.2 report](./v1.28.2-report.yaml)|
+|experimental|[v1.28.3](https://github.com/projectcontour/contour/releases/tag/v1.28.3)|x|[v1.28.3 report](./v1.28.3-report.yaml)|
+|experimental|[v1.28.4](https://github.com/projectcontour/contour/releases/tag/v1.28.4)|x|[v1.28.4 report](./v1.28.4-report.yaml)|
+|experimental|[v1.28.5](https://github.com/projectcontour/contour/releases/tag/v1.28.5)|x|[v1.28.5 report](./experimental-v1.28.5-default-report.yaml)|
+|experimental|[v1.28.6](https://github.com/projectcontour/contour/releases/tag/v1.28.6)|x|[v1.28.6 report](./experimental-v1.28.6-default-report.yaml)|
+|experimental|[v1.29.0](https://github.com/projectcontour/contour/releases/tag/v1.29.0)|x|[v1.29.0 report](./v1.29.0-report.yaml)|
+|experimental|[v1.29.1](https://github.com/projectcontour/contour/releases/tag/v1.29.1)|x|[v1.29.1 report](./experimental-v1.29.1-default-report.yaml)|
+|experimental|[v1.29.2](https://github.com/projectcontour/contour/releases/tag/v1.29.2)|x|[v1.29.2 report](./experimental-v1.29.2-default-report.yaml)|
 
 ## Reproduce
 

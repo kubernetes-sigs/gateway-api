@@ -4,7 +4,7 @@
 
 |API channel|Implementation version|Mode|Report|
 |-----------|----------------------|----|------|
-|x|[1.24](https://github.com/istio/istio/releases/tag/1.24.2)|x|[link](./experimental-1.24-default-report.yaml)|
+|x|[1.24](https://github.com/istio/istio/releases/tag/1.24.2)|x|[v1.2.4 report](./experimental-1.24-default-report.yaml)|
 
 ## Reproduce
 

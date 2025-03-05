@@ -4,7 +4,7 @@
 
 |API channel|Implementation version|Mode|Report|
 |-----------|----------------------|----|------|
-|x|[v1.17.4](https://github.com/solo-io/gloo/releases/tag/v1.17.4)|x|[link](./v1.17.4-report.yaml)|
+|x|[v1.17.4](https://github.com/solo-io/gloo/releases/tag/v1.17.4)|x|[v1.17.4 report](./v1.17.4-report.yaml)|
 
 ## Reproduce
 

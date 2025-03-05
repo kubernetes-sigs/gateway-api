@@ -4,7 +4,7 @@
 
 | API channel  | Implementation version                                                              | Mode        | Report                                                |
 |--------------|-------------------------------------------------------------------------------------|-------------|-------------------------------------------------------|
-| experimental | [v3.2.0-244-gea4944bb0](https://github.com/Kong/kubernetes-ingress-controller/commit/b5c61d20e325055cd4665b4c29aeea5288c20d2a) | expressions | [link](./experimental-v3.2.0-244-gea4944bb0-expressions-report.yaml) |
+| experimental | [v3.2.0-244-gea4944bb0](https://github.com/Kong/kubernetes-ingress-controller/commit/b5c61d20e325055cd4665b4c29aeea5288c20d2a) | expressions | [v3.2.0-244-gea4944bb0 expressions report](./experimental-v3.2.0-244-gea4944bb0-expressions-report.yaml) |
 
 ## Reproduce
 

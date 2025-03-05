@@ -3,7 +3,7 @@
 * Issue: [#696](https://github.com/kubernetes-sigs/gateway-api/issues/696)
 * Status: Provisional|Implementable|Experimental|Standard|Deferred|Rejected|Withdrawn|Replaced
 
-(See status definitions [here](../overview.md#gep-states).)
+(See [status definitions](../overview.md#gep-states).)
 
 ## TLDR
 
@@ -27,7 +27,7 @@ the content into the GEP as online documents are easier to lose
 (... details, can point to PR with changes)
 
 ### Gateway for Ingress (North/South)
-(Include API details for North/South usecases)
+(Include API details for North/South use cases)
 
 ### Gateway For Mesh (East/West)
 (Include East/West API considerations, examples, and if different - APIs)
@@ -49,7 +49,7 @@ Every feature should:
 
 ### Conformance tests 
 
-Conformance tests file names should try to follow the the `pascal-case-name.go` format.
+Conformance tests file names should try to follow the `pascal-case-name.go` format.
 For example for `HTTPRoutePortRedirect` - the test file would be `httproute-port-redirect.go`.
 
 Treat this guidance as "best effort" because we might have test files that check the combination of several features and can't follow the same format.
