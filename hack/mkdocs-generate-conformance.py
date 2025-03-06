@@ -13,18 +13,20 @@
 # limitations under the License.
 
 import logging
+from io import StringIO
 from mkdocs import plugins
+from mkdocs.structure.files import File
 import yaml
 import pandas
 from fnmatch import fnmatch
 import glob
 import os
 
-log = logging.getLogger('mkdocs')
+log = logging.getLogger(f'mkdocs.plugins.{__name__}')
 
 
 @plugins.event_priority(100)
-def on_pre_build(config, **kwargs):
+def on_files(files, config, **kwargs):
     log.info("generating conformance")
 
     vers = getConformancePaths()
@@ -32,7 +34,19 @@ def on_pre_build(config, **kwargs):
 
         confYamls = getYaml(v)
         releaseVersion = v.split(os.sep)[-2]
-        generate_conformance_tables(confYamls, releaseVersion)
+        file = generate_conformance_tables(confYamls, releaseVersion, config)
+
+        if file:
+          existing_file = files.get_file_from_path(file.src_uri)
+          if existing_file:
+              # Remove the existing file that is likely present in the
+              # repository
+              files.remove(existing_file)
+
+          # Add the generated file to the site
+          files.append(file)
+
+    return files
 
 
 desc = """
@@ -51,7 +65,10 @@ warning_text = """
 
 
 
-def generate_conformance_tables(reports, currVersion):
+def generate_conformance_tables(reports, currVersion, mkdocsConfig):
+
+    # Enable Pandas copy-on-write
+    pandas.options.mode.copy_on_write = True
 
     gateway_tls_table = pandas.DataFrame()
     gateway_grpc_table = pandas.DataFrame()
@@ -79,7 +96,8 @@ def generate_conformance_tables(reports, currVersion):
     if entries.Project < 3:
         return
 
-    with open('site-src/implementations/'+versionFile+'.md', 'w') as f:
+    try:
+        f = StringIO()
 
         f.write(desc)
         f.write("\n\n")
@@ -90,7 +108,7 @@ def generate_conformance_tables(reports, currVersion):
         f.write("## Gateway Profile\n\n")
         f.write("### HTTPRoute\n\n")
         f.write(gateway_http_table.to_markdown()+'\n\n')
-        if currVersion != 'v1.0.0': 
+        if currVersion != 'v1.0.0':
             f.write('### GRPCRoute\n\n')
             f.write(gateway_grpc_table.to_markdown()+'\n\n')
             f.write('### TLSRoute\n\n')
@@ -100,6 +118,20 @@ def generate_conformance_tables(reports, currVersion):
         f.write("### HTTPRoute\n\n")
         f.write(mesh_http_table.to_markdown())
 
+        file_contents = f.getvalue()
+    finally:
+        f.close()
+
+    new_file = File(
+      src_dir=None,
+      dest_dir=mkdocsConfig['site_dir'],
+      path=f'implementations/{versionFile}.md',
+      use_directory_urls=mkdocsConfig['use_directory_urls'],
+    )
+    new_file.content_string = file_contents
+    new_file.generated_by = f'{__name__}'
+
+    return new_file
 
 def generate_profiles_report(reports, route,version):
 
@@ -114,7 +146,7 @@ def generate_profiles_report(reports, route,version):
                                'version','mode', 'extended.supportedFeatures']].T
     http_table.columns = http_table.iloc[0]
     http_table = http_table[1:].T
-    
+
     for row in http_table.itertuples():
         if type(row._4) is list:
             for feat in row._4:
@@ -130,8 +162,8 @@ def generate_profiles_report(reports, route,version):
 
 
 pathTemp = "conformance/reports/*/"
-allVersions = []
-reportedImplementationsPath = []
+allVersions = set()
+reportedImplementationsPath = set()
 
 # returns v1.0.0 and greater, since that's when reports started being generated in the comparison table
 
@@ -141,9 +173,10 @@ def getConformancePaths():
     report_path = versions[-1]+"**"
     for v in versions:
         vers = v.split(os.sep)[-2]
-        allVersions.append(vers)
-        reportedImplementationsPath.append(v+"**")
-    return reportedImplementationsPath
+        allVersions.add(vers)
+        reportedImplementationsPath.add(v+"**")
+
+    return list(reportedImplementationsPath)
 
 
 def getYaml(conf_path):
@@ -154,11 +187,12 @@ def getYaml(conf_path):
         if fnmatch(p, "*.yaml"):
 
             x = load_yaml(p)
-            profiles = pandas.json_normalize(
-                x, record_path=['profiles'], meta=["mode","implementation"], errors='ignore')
+            if 'profiles' in x:
+              profiles = pandas.json_normalize(
+                  x, record_path=['profiles'], meta=["mode","implementation"], errors='ignore')
 
-            implementation = pandas.json_normalize(profiles.implementation)
-            yamls.append(pandas.concat([implementation, profiles], axis=1))
+              implementation = pandas.json_normalize(profiles.implementation)
+              yamls.append(pandas.concat([implementation, profiles], axis=1))
 
     yamls = pandas.concat(yamls)
     return yamls
