@@ -36,7 +36,7 @@ This has been previously discussed in [this issue](https://github.com/kubernetes
 
 As a cluster scoped resource, `GatewayClass` does not meet this requirement.
 This restricts customization use cases to either a few pre-provisioned classes by the admin, or running in an environment where the "Infrastructure Provider" and "Cluster Operator" are the same roles.
-The distinction between these roles is explicitly called out on the [homepage](../../index.md#what-is-the-gateway-api).
+The distinction between these roles is explicitly called out on the [homepage](../../index.md#personas).
 
 ### Custom Resource
 

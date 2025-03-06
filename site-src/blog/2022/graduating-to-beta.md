@@ -70,12 +70,12 @@ page][community] which includes links to the Slack channel and community meeting
 
 [crd]:https://kubernetes.io/docs/tasks/extend-kubernetes/custom-resources/custom-resource-definitions/
 [concepts]:../../concepts/api-overview.md
-[guides]:/guides/getting-started/
+[guides]:../../guides/index.md
 [impl]:../../implementations.md
-[install-crds]:/guides/getting-started/#install-the-crds
+[install-crds]:../../guides/index.md#installing-gateway-api
 [issue]:https://github.com/kubernetes-sigs/gateway-api/issues/new/choose
 [disc]:https://github.com/kubernetes-sigs/gateway-api/discussions
-[community]:/contributing/community/
+[community]:../../contributing/index.md
 
 ## Release highlights
 
@@ -128,7 +128,7 @@ For this release we've added the following experimental features:
 - [Routes can attach to Gateways by specifying port numbers](../../geps/gep-957/index.md)
 - [URL rewrites and path redirects](../../geps/gep-726/index.md)
 
-[ch]:../../concepts/versioning.md#release-channels-eg-experimental-standard
+[ch]:../../concepts/versioning.md#release-channels
 
 ### Other improvements
 
@@ -146,12 +146,12 @@ possible integration.
 We are pleased to announce that the service mesh community, including
 representatives from Cilium Service Mesh, Consul, Istio, Kuma, Linkerd, NGINX
 Service Mesh and Open Service Mesh, is coming together to form the [GAMMA
-Initiative](/concepts/gamma/), a dedicated
+Initiative](../../mesh/index.md), a dedicated
 workstream within the Gateway API subproject focused on Gateway API for Mesh
 Management and Administration.
 
 This group will deliver [enhancement
-proposals](/v1beta1/contributing/gep/) consisting
+proposals](../../contributing/enhancement-requests.md) consisting
 of resources, additions, and modifications to the Gateway API specification for
 mesh and mesh-adjacent use-cases.
 
@@ -169,11 +169,11 @@ As we continue to mature the API for production use cases, here are some of the 
 - [Route delegation][pr1085]
 - Layer 4 API maturity: Graduating [TCPRoute][tcpr], [UDPRoute][udpr] and
   [TLSRoute][tlsr] to beta
-- [GAMMA Initiative](/concepts/gamma/) - Gateway API for Service Mesh
+- [GAMMA Initiative](../../mesh/index.md) - Gateway API for Service Mesh
 
 If there's something on this list you want to get involved in, or there's
 something not on this list that you want to advocate for to get on the roadmap
-please join us in the #sig-network-gateway-api channel on Kubernetes Slack or our weekly [community calls](/contributing/community/#meetings).
+please join us in the #sig-network-gateway-api channel on Kubernetes Slack or our weekly [community calls](../../contributing/index.md#meetings).
 
 [gep1016]:https://github.com/kubernetes-sigs/gateway-api/blob/master/geps/gep-1016.md
 [grpc]:https://grpc.io/
@@ -181,4 +181,4 @@ please join us in the #sig-network-gateway-api channel on Kubernetes Slack or ou
 [tcpr]:https://github.com/kubernetes-sigs/gateway-api/blob/main/apis/v1alpha2/tcproute_types.go
 [udpr]:https://github.com/kubernetes-sigs/gateway-api/blob/main/apis/v1alpha2/udproute_types.go
 [tlsr]:https://github.com/kubernetes-sigs/gateway-api/blob/main/apis/v1alpha2/tlsroute_types.go
-[community]:/contributing/community/
+[community]:../../contributing/index.md

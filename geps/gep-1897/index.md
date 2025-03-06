@@ -405,8 +405,6 @@ the implementation would be required to fully implement the policy or mark the b
 
 [GEP-713: Metaresources and PolicyAttachment](../gep-713/index.md)
 
-[Policy Attachment](../../reference/policy-attachment.md#direct-policy-attachment)
-
 [Gateway API TLS](../../guides/tls.md)
 
 [SIG-NET Gateway API: TLS to the K8s.Service/Backend](https://docs.google.com/document/d/1RTYh2brg_vLX9o3pTcrWxtZSsf8Y5NQvIG52lpFcZlo)

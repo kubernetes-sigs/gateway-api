@@ -69,7 +69,7 @@ type GatewayTLSConfig struct {
     ......
     // FrontendValidation holds configuration information for validating the frontend (client).
     // Setting this field will require clients to send a client certificate
-    // required for validation during the TLS handshake. In browsers this may result in a dialog appearing 
+    // required for validation during the TLS handshake. In browsers this may result in a dialog appearing
     // that requests a user to specify the client certificate.
     // The maximum depth of a certificate chain accepted in verification is Implementation specific.
     FrontendValidation *FrontendTLSValidation `json:"frontendValidation,omitempty"`
@@ -187,7 +187,7 @@ This GEP aims to standardize this behavior as an official part of the upstream s
 
 [TLS Handshake Protocol]: https://www.rfc-editor.org/rfc/rfc5246#section-7.4
 [Certificate Path Validation]: https://www.rfc-editor.org/rfc/rfc5280#section-6
-[GatewayTLSConfig]: /references/spec/#gateway.networking.k8s.io/v1.GatewayTLSConfig
+[GatewayTLSConfig]: ../../reference/spec.md#gateway.networking.k8s.io/v1.GatewayTLSConfig
 [BackendTLSPolicy]: ../../api-types/backendtlspolicy.md
 [TLS Configuration GEP]: ../gep-2907/index.md
 [Gateway API TLS Use Cases]: https://docs.google.com/document/d/17sctu2uMJtHmJTGtBi_awGB0YzoCLodtR6rUNmKMCs8/edit?pli=1#heading=h.cxuq8vo8pcxm
