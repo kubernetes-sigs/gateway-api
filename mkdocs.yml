@@ -181,3 +181,6 @@ nav:
     - Enhancement Requests: contributing/enhancement-requests.md
     - Release Cycle: contributing/release-cycle.md
     - Contributor Ladder: contributing/contributor-ladder.md
+not_in_nav: |
+  /blog/*
+  /geps/gep-696/*
