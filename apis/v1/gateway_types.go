@@ -740,7 +740,6 @@ type GatewaySpecAddress struct {
 	// Examples: `1.2.3.4`, `128::1`, `my-ip-address`.
 	//
 	// +optional
-	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=253
 	Value string `json:"value,omitempty"`
 }

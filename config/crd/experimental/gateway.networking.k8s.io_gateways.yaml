@@ -105,6 +105,7 @@ spec:
                       description: Type of the address.
                       maxLength: 253
                       minLength: 1
+                      pattern: ^Hostname|IPAddress|NamedAddress|[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/[A-Za-z0-9\/\-._~%!$&'()*+,;=:]+$
                       type: string
                     value:
                       description: |-
@@ -113,7 +114,6 @@ spec:
 
                         Examples: `1.2.3.4`, `128::1`, `my-ip-address`.
                       maxLength: 253
-                      minLength: 1
                       type: string
                   type: object
                   x-kubernetes-validations:
@@ -1103,6 +1103,7 @@ spec:
                       description: Type of the address.
                       maxLength: 253
                       minLength: 1
+                      pattern: ^Hostname|IPAddress|NamedAddress|[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/[A-Za-z0-9\/\-._~%!$&'()*+,;=:]+$
                       type: string
                     value:
                       description: |-
@@ -1440,6 +1441,7 @@ spec:
                       description: Type of the address.
                       maxLength: 253
                       minLength: 1
+                      pattern: ^Hostname|IPAddress|NamedAddress|[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/[A-Za-z0-9\/\-._~%!$&'()*+,;=:]+$
                       type: string
                     value:
                       description: |-
@@ -1448,7 +1450,6 @@ spec:
 
                         Examples: `1.2.3.4`, `128::1`, `my-ip-address`.
                       maxLength: 253
-                      minLength: 1
                       type: string
                   type: object
                   x-kubernetes-validations:
@@ -2438,6 +2439,7 @@ spec:
                       description: Type of the address.
                       maxLength: 253
                       minLength: 1
+                      pattern: ^Hostname|IPAddress|NamedAddress|[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/[A-Za-z0-9\/\-._~%!$&'()*+,;=:]+$
                       type: string
                     value:
                       description: |-
