@@ -83,8 +83,8 @@ spec:
 
                   Support: Extended
                 items:
-                  description: GatewayAddress describes an address that can be bound
-                    to a Gateway.
+                  description: GatewaySpecAddress describes an address that can be
+                    bound to a Gateway.
                   oneOf:
                   - properties:
                       type:
@@ -1419,8 +1419,8 @@ spec:
 
                   Support: Extended
                 items:
-                  description: GatewayAddress describes an address that can be bound
-                    to a Gateway.
+                  description: GatewaySpecAddress describes an address that can be
+                    bound to a Gateway.
                   oneOf:
                   - properties:
                       type:
