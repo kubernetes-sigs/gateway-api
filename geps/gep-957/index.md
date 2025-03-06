@@ -120,14 +120,14 @@ spec:
 Port matching can be supported if SectionName accepts port numbers in addition
 to listener names. This approach results in a less explicit API when a ParentRef
 points to a resource that is not `Gateway`. For example, an implementation may
-attach a route to an `Mesh` CRD. In this case, it's less inituitive to set
+attach a route to an `Mesh` CRD. In this case, it's less intuitive to set
 `ParentRef.SectionName` to `443` to express `route all traffic whose destination
 port is 443 to ...`. It also complicates the validation on SectionName in order
 to differentiate between a listener name and a port number.
 
 ### 2. Update TrafficMatches to support port matching
 TrafficMatches was proposed in
-[gep-735](https://gateway-api.sigs.k8s.io/geps/gep-735/) to support TCP and UDP
+[gep-735](../gep-735/index.md) to support TCP and UDP
 address matching. TrafficMatches can be extended to support port matching.
 TrafficMatches will need to be added to HTTPRoute/TLSRoute if the feature is
 desired there.

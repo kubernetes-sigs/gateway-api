@@ -25,7 +25,7 @@ as comprising two separate _facets_:
   associated with the endpoint IPs.)
 
 The distinction between the facets is critical because the
-[gateway](/api-types/gateway/) and the [mesh](/mesh) each need to decide whether
+[gateway](../api-types/gateway.md) and the [mesh](index.md) each need to decide whether
 a request that mentions a given Service should be directed to the Service's
 frontend or its backend:
 
@@ -44,7 +44,7 @@ endpoint routing can be more predictable when using Gateway API for both
 formalize guidance for this use case.
 
 [Service]: https://kubernetes.io/docs/concepts/services-networking/service/
-[north/south]:/concepts/glossary#northsouth-traffic
-[east/west traffic]:/concepts/glossary#eastwest-traffic
+[north/south]:../concepts/glossary.md#northsouth-traffic
+[east/west traffic]:../concepts/glossary.md#eastwest-traffic
 [gamma]:/concepts/gamma/
-[Ana]:/concepts/roles-and-personas#ana
+[Ana]:../concepts/roles-and-personas.md#ana

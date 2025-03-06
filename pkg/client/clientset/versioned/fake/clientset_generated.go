@@ -24,7 +24,7 @@ import (
 	"k8s.io/client-go/discovery"
 	fakediscovery "k8s.io/client-go/discovery/fake"
 	"k8s.io/client-go/testing"
-	applyconfiguration "sigs.k8s.io/gateway-api/apis/applyconfiguration"
+	applyconfiguration "sigs.k8s.io/gateway-api/applyconfiguration"
 	clientset "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned"
 	gatewayv1 "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/typed/apis/v1"
 	fakegatewayv1 "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/typed/apis/v1/fake"
@@ -34,6 +34,8 @@ import (
 	fakegatewayv1alpha3 "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/typed/apis/v1alpha3/fake"
 	gatewayv1beta1 "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/typed/apis/v1beta1"
 	fakegatewayv1beta1 "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/typed/apis/v1beta1/fake"
+	experimentalv1alpha1 "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/typed/apisx/v1alpha1"
+	fakeexperimentalv1alpha1 "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/typed/apisx/v1alpha1/fake"
 )
 
 // NewSimpleClientset returns a clientset that will respond with the provided objects.
@@ -122,6 +124,11 @@ var (
 	_ testing.FakeClient  = &Clientset{}
 )
 
+// GatewayV1 retrieves the GatewayV1Client
+func (c *Clientset) GatewayV1() gatewayv1.GatewayV1Interface {
+	return &fakegatewayv1.FakeGatewayV1{Fake: &c.Fake}
+}
+
 // GatewayV1alpha2 retrieves the GatewayV1alpha2Client
 func (c *Clientset) GatewayV1alpha2() gatewayv1alpha2.GatewayV1alpha2Interface {
 	return &fakegatewayv1alpha2.FakeGatewayV1alpha2{Fake: &c.Fake}
@@ -137,7 +144,7 @@ func (c *Clientset) GatewayV1beta1() gatewayv1beta1.GatewayV1beta1Interface {
 	return &fakegatewayv1beta1.FakeGatewayV1beta1{Fake: &c.Fake}
 }
 
-// GatewayV1 retrieves the GatewayV1Client
-func (c *Clientset) GatewayV1() gatewayv1.GatewayV1Interface {
-	return &fakegatewayv1.FakeGatewayV1{Fake: &c.Fake}
+// ExperimentalV1alpha1 retrieves the ExperimentalV1alpha1Client
+func (c *Clientset) ExperimentalV1alpha1() experimentalv1alpha1.ExperimentalV1alpha1Interface {
+	return &fakeexperimentalv1alpha1.FakeExperimentalV1alpha1{Fake: &c.Fake}
 }

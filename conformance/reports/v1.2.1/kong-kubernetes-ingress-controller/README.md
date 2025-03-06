@@ -4,8 +4,8 @@
 
 | API channel  | Implementation version                                                              | Mode        | Report                                                |
 |--------------|-------------------------------------------------------------------------------------|-------------|-------------------------------------------------------|
-| experimental | [v3.4.0](https://github.com/Kong/kubernetes-ingress-controller/releases/tag/v3.4.0) | expressions | [link](./experimental-v3.4.0-expressions-report.yaml) |
-| experimental | [v3.4.0](https://github.com/Kong/kubernetes-ingress-controller/releases/tag/v3.4.0) | traditional_compatible | [link](./experimental-v3.4.0-traditional_compatible-report.yaml) |
+| experimental | [v3.4.0](https://github.com/Kong/kubernetes-ingress-controller/releases/tag/v3.4.0) | expressions | [v3.4.0 expressions report](./experimental-v3.4.0-expressions-report.yaml) |
+| experimental | [v3.4.0](https://github.com/Kong/kubernetes-ingress-controller/releases/tag/v3.4.0) | traditional_compatible | [v3.4.0 traditional compatible report](./experimental-v3.4.0-traditional_compatible-report.yaml) |
 
 ## Reproduce
 

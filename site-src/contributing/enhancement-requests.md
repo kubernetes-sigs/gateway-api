@@ -41,23 +41,23 @@ request for enhancement if that enhancement is non-trivial (which we will define
 as either: _implicates changes to the API specification_
 OR _has some kind of end-user impact_).
 
-Please use our [Github Discussions][discussion] forum as the initial place to
+Please use our [GitHub Discussions][discussion] forum as the initial place to
 start, and feel free to bring that discussion up for synchronous conversation in
 one of our [community meetings][meetings]. If the created request doesn't
 include reference to a discussion and/or recordings of discussion in our
 community meetings, please note that it _may_ get closed with a request to
 create an initial discussion first.
 
-[gep]: /geps/overview
+[gep]: ../geps/overview.md
 [discussion]: https://github.com/kubernetes-sigs/gateway-api/discussions/new/choose
-[meetings]: /contributing/#meetings
+[meetings]: index.md#meetings
 
 ## When are Enhancements Accepted?
 
 Gateway API has a predictable release cycle that includes multiple phases. New
 enhancements are only considered in the early phases of that release cycle while
 the scope of a release is being determined. For more information, refer to our
-[release cycle documentation](/contributing/release-cycle).
+[release cycle documentation](release-cycle.md).
 
 ## Why are Enhancements Tracked
 

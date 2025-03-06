@@ -54,7 +54,7 @@ more resources, and are consequently harder to understand and require a more
 complex status design.
 
 Splitting these two design patterns apart into separate GEPs is intended to
-allow proceeding with stablizing the simpler (Direct) case while we work on
+allow proceeding with stabilizing the simpler (Direct) case while we work on
 solving the status problem for the more complex (Inherited) case.
 
 Direct Attached Policies are further specified in the addendum GEP GEP-2648,
@@ -106,7 +106,7 @@ When designing Gateway API, one of the things we’ve found is that we often nee
 able change the behavior of objects without being able to make changes to the spec
 of those objects. Sometimes, this is because we can’t change the spec of the object
 to hold the information we need ( ReferenceGrant, from
-[GEP-709](https://gateway-api.sigs.k8s.io/geps/gep-709/), affecting Secrets
+[GEP-709](../gep-709/index.md), affecting Secrets
 and Services is an example, as is Direct Policy Attachment), and sometimes it’s
 because we want the behavior change to flow across multiple objects
 (this is what Inherited Policy Attachment is for).
@@ -156,12 +156,12 @@ Avoid annotation hell
 ### Direct Policy Attachment
 
 For more description of the details of Direct Policy Attachment,
-see [GEP-2648](https://gateway-api.sigs.k8s.io/geps/gep-2648/).
+see [GEP-2648](../gep-2648/index.md).
 
 ### Inherited Policy Attachment
 
 For more description of the details of Inherited Policy Attachment,
-see [GEP-2649](https://gateway-api.sigs.k8s.io/geps/gep-2649/).
+see [GEP-2649](../gep-2649/index.md).
 
 ### How to determine if a Policy is a Direct or Inherited one
 
@@ -555,7 +555,7 @@ that _every_ Policy update does not require a status update.
 
 Because Policy Attachment is a pattern for APIs, not an API, and needs to address
 all the problems above, the strategy this GEP proposes is to define a range of
-options for increasing the discoverabilty of Policy resources, and provide
+options for increasing the discoverability of Policy resources, and provide
 guidelines for when they should be used.
 
 It's likely that at some stage, the Gateway API CRDs will include some Policy
@@ -588,7 +588,7 @@ plugin.
 
 ##### Design considerations
 
-This is already part of the API pattern, but is being lifted to more prominience
+This is already part of the API pattern, but is being lifted to more prominence
 here.
 
 #### Standard status struct
@@ -628,7 +628,7 @@ combination of the `AncestorRef` and the `ControllerName` fields as a key.
 
 See [GEP-1897][gep-1897] for the exact details.
 
-[gep-1897]: /geps/gep-1897
+[gep-1897]: ../gep-1897/index.md
 
 ```go
 // PolicyAncestorStatus describes the status of a route with respect to an
@@ -789,7 +789,7 @@ This solution:
 - is low cost in terms of apiserver updates (because it's only on the GatewayClass,
   and only on implementation startup)
 - provides a standard place for all users to look for relevant objects
-- ties in to the Conformance Profiles design and other efforts about GatewayClass 
+- ties into the Conformance Profiles design and other efforts about GatewayClass 
   status
 
 #### Standard status stanza
@@ -871,7 +871,7 @@ contains `status` information.
 
 ```yaml
 kind: EffectivePolicy
-apiVersion: gateway.networkking.k8s.io/v1alpha2
+apiVersion: gateway.networking.k8s.io/v1alpha2
 metadata:
   name: targeted-object
   namespace: targeted-object-namespace
@@ -940,7 +940,7 @@ will be capable of describing the computed sum of policy that applies to a given
 resource, including policies applied to parent resources.
 
 Each Policy CRD that wants to be supported by this plugin will need to follow
-the API structure defined above and add the [corresponding label](https://gateway-api.sigs.k8s.io/geps/gep-713/#standard-label-on-crd-objects)
+the API structure defined above and add the [corresponding label](index.md#standard-label-on-crd-objects)
 to the CRD.
 
 ### Conditions
@@ -1003,7 +1003,7 @@ const (
 
 #### On targeted resources
 
-(copied from [Standard Status Condition][#standard-status-condition])
+(copied from [Standard status Condition on Policy-affected objects](#standard-status-condition-on-policy-affected-objects))
 
 This solution requires definition in a GEP of its own to become binding.
 

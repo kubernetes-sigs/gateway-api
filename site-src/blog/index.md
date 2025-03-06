@@ -17,8 +17,8 @@ your feedback!
 
 [:octicons-arrow-right-24: Continue reading][Gateway API: Introducing Service Mesh Support!]
 
-[status]:/geps/overview/#status
-[Gateway API: Introducing Service Mesh Support!]:/blog/2023/0829-mesh-support
+[status]:../geps/overview.md#status
+[Gateway API: Introducing Service Mesh Support!]:2023/0829-mesh-support.md
 
 ## [Gateway API Graduates to Beta]
 
@@ -35,7 +35,7 @@ rewrites.
 
 [:octicons-arrow-right-24: Continue reading][Gateway API Graduates to Beta]
 
-[Gateway API Graduates to Beta]:/blog/2022/graduating-to-beta
+[Gateway API Graduates to Beta]:2022/graduating-to-beta.md
 
 ## [Introducing Gateway API v1alpha2]
 
@@ -50,4 +50,4 @@ the highlights.
 
 [:octicons-arrow-right-24: Continue reading][Introducing Gateway API v1alpha2]
 
-[Introducing Gateway API v1alpha2]: /blog/2021/introducing-v1alpha2
+[Introducing Gateway API v1alpha2]: 2021/introducing-v1alpha2.md

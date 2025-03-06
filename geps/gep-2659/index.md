@@ -4,7 +4,7 @@
 * Type: Memorandum
 * Status: Accepted
 
-(See status definitions [here](overview.md#status).)
+(See [status definitions](../overview.md#gep-states).)
 
 ## TLDR
 
@@ -26,7 +26,7 @@ As part of preparing for work to split up GEP-713, we (the Gateway API and GAMMA
 maintainers) have noticed a few shortcomings in our GEP process.
 
 In particular, we have some GEPs that are very different to other GEPs.
-[GEP-1324](https://gateway-api.sigs.k8s.io/geps/gep-1324/) is a good example,
+[GEP-1324](../gep-1324/index.md) is a good example,
 as it lays out the general agreement and use cases for the GAMMA initiative, but
 has no firm deliverables of its own. In fact, its main purpose was to ensure
 that the community was in agreement on the language around and scope of the
@@ -36,10 +36,10 @@ work (in the form of subsequent GEPs). However, our current GEP system of checkl
 for graduating levels fits this type of GEP poorly.
 
 Additionally, we've had two GEPs moved to Declined ([GEP-735: TCP and UDP address
-matching](https://gateway-api.sigs.k8s.io/geps/gep-735/) and
-[GEP-1282: Describing Backend Properties](https://gateway-api.sigs.k8s.io/geps/gep-1282/)).
+matching](../gep-735/index.md) and
+[GEP-1282: Describing Backend Properties](../gep-1282/index.md)).
 In the case of GEP-1282, we now have a replacement GEP,
-[GEP-1897: BackendTLSPolicy](https://gateway-api.sigs.k8s.io/geps/gep-1897/)
+[GEP-1897: BackendTLSPolicy](../gep-1897/index.md)
 which obsoletes the older GEP. But we have no way of representing this
 relationship (or any other, in fact) between GEPs at the moment.
 
@@ -87,7 +87,7 @@ Memorandum GEPs after this GEP is merged.
 
 ### Addition of YAML metadata file
 
-The core Gateway API mainatainers were hoping not to need metadata YAMLs for a
+The core Gateway API maintainers were hoping not to need metadata YAMLs for a
 while, but the addition of relationships has turbocharged the need for machine
 parseable GEP metadata.
 
@@ -118,7 +118,7 @@ relationships:
   # set back to this GEP, and MUST be moved to Declined.
   obsoletes: {}
   obsoletedBy: {}
-  # extends indicates that a GEP extends the linkned GEP, adding more detail
+  # extends indicates that a GEP extends the linked GEP, adding more detail
   # or additional implementation. The extended GEP MUST have its extendedBy
   # field set back to this GEP.
   extends: {}
@@ -127,7 +127,7 @@ relationships:
   # covered by an existing relationship.
   seeAlso: {}
 # references is a list of hyperlinks to relevant external references.
-# It's intended to be used for storing Github discussions, Google docs, etc.
+# It's intended to be used for storing GitHub discussions, Google docs, etc.
 references: {}
 # featureNames is a list of the feature names introduced by the GEP, if there
 # are any. This will allow us to track which feature was introduced by which GEP.

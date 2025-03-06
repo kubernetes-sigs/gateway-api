@@ -35,8 +35,8 @@ and CA certificates.
 These are worthy goals, but deserve a different GEP for proper attention.  This GEP is concerned entirely with the
 controlplane, i.e. the hop between gateway and backend.
 
-1. [TCPRoute](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1alpha2.TCPRoute) and
-[GRPCRoute](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1alpha2.GRPCRoute) use cases
+1. [TCPRoute](../../reference/spec.md#gateway.networking.k8s.io/v1alpha2.TCPRoute) and
+[GRPCRoute](../../reference/spec.md#gateway.networking.k8s.io/v1alpha2.GRPCRoute) use cases
 are not addressed here, because at this point in time these two route types are not graduated to beta.
 2. Mutual TLS (mTLS) use cases are intentionally out of scope for this GEP for two reasons.  First, the design of Gateway
 API is backend-attached and does not currently support mutual authentication, and also because this GEP does not
@@ -145,7 +145,7 @@ This GEP is the outcome of the TLS use case #4 in
 To allow the gateway client to know how to connect to the backend pod, when the backend pod has its own
 certificate, we implement a metaresource named `BackendTLSPolicy`, that was previously introduced with the name
 `TLSConnectionPolicy` as a hypothetical Direct Policy Attachment example in
-[GEP-713: Metaresources and PolicyAttachment](https://gateway-api.sigs.k8s.io/geps/gep-713/).
+[GEP-713: Metaresources and PolicyAttachment](../gep-713/index.md).
 Because naming is hard, a new name may be
 substituted without blocking acceptance of the content of the API change.
 
@@ -185,7 +185,7 @@ sharing to BackendTLSPolicy, even if they don't for other cross-namespace sharin
 
 One of the areas of concern for this API is that we need to indicate how and when the API implementations should use the
 backend destination certificate authority.  This solution proposes, as introduced in
-[GEP-713](https://gateway-api.sigs.k8s.io/geps/gep-713/), that the implementation
+[GEP-713](../gep-713/index.md), that the implementation
 should watch the connections to the specified TargetRefs (Services), and if a Service matches a BackendTLSPolicy, then
 assume the connection is TLS, and verify that the TargetRef’s certificate can be validated by the client (Gateway) using
 the provided certificates and hostname before the connection is made. On the question of how to signal
@@ -195,7 +195,7 @@ other signal that makes the failure sufficiently clear to the requester without 
 based on established security requirements.
 
 All policy resources must include `TargetRefs` with the fields specified
-[here](https://github.com/kubernetes-sigs/gateway-api/blob/a33a934af9ec6997b34fd9b00d2ecd13d143e48b/apis/v1alpha2/policy_types.go#L24-L41).
+in [PolicyTargetReference](https://github.com/kubernetes-sigs/gateway-api/blob/a33a934af9ec6997b34fd9b00d2ecd13d143e48b/apis/v1alpha2/policy_types.go#L24-L41).
 In an upcoming [extension](https://github.com/kubernetes-sigs/gateway-api/issues/2147) to TargetRefs, policy resources
 _may_ also choose to include `SectionName` and/or `Port` in the target reference following the same mechanics as `ParentRef`.
 
@@ -216,9 +216,9 @@ specified as "").  The use and definition of system certificates is implementati
 these certificates are obtained from the underlying operating system. CACertificateRefs contains one or more
 references to Kubernetes objects that contain PEM-encoded TLS certificates, which are used to establish a TLS handshake
 between the gateway and backend pod. References to a resource in a different namespace are invalid.
-If ClientCertifcateRefs is unspecified, then WellKnownCACertificates must be set to "System" for a valid configuration.
+If ClientCertificateRefs is unspecified, then WellKnownCACertificates must be set to "System" for a valid configuration.
 If WellKnownCACertificates is unspecified, then CACertificateRefs must be specified with at least one entry for a valid configuration.
-If WellKnownCACertficates is set to "System" and there are no system trusted certificates or the implementation doesn't define system
+If WellKnownCACertificates is set to "System" and there are no system trusted certificates or the implementation doesn't define system
 trusted certificates, then the associated TLS connection must fail.
 
 The `Hostname` field is required and is to be used to configure the SNI the Gateway should use to connect to the backend.
@@ -342,7 +342,7 @@ Ref: [TLS Origination](https://www.getambassador.io/docs/emissary/latest/topics/
 ### NGINX implementation through CRDs (Comparable to Route or Policy of Gateway API) supports both TLS and mTLS
 
 * In the Upstream section of a VirtualServer or VirtualServerRoute (equivalent to HTTPRoute) there is a simple toggle to enable TLS.  This does not validate the certificate of the backend and implicitly trusts the backend in order to form the SSL tunnel.  This is not about validating the certificate but obfuscating the traffic with TLS/SSL.
-* A Policy attachment can be provided when certification validation is required that is called egressMTLS (egress from the proxy to the upstream).  This can be tuned to perform various certificate validation tests.  It was created as a Policy becuase it implies some type of AuthN/AuthZ due to the additional checks.  This was also compatible with Open Service Mesh and NGINX Service Mesh and removed the need for a sidecar at the ingress controller.
+* A Policy attachment can be provided when certification validation is required that is called egressMTLS (egress from the proxy to the upstream).  This can be tuned to perform various certificate validation tests.  It was created as a Policy because it implies some type of AuthN/AuthZ due to the additional checks.  This was also compatible with Open Service Mesh and NGINX Service Mesh and removed the need for a sidecar at the ingress controller.
 * A corresponding 'IngressMTLS' policy also exists for mTLS verification of client connections to the proxy.  The Policy object is used for anything that implies AuthN/AuthZ.
 
 Ref: [Upstream.TLS](https://docs.nginx.com/nginx-ingress-controller/configuration/virtualserver-and-virtualserverroute-resources/#upstreamtls)
@@ -403,11 +403,11 @@ the implementation would be required to fully implement the policy or mark the b
 
 [Gateway API TLS Use Cases](https://docs.google.com/document/d/17sctu2uMJtHmJTGtBi_awGB0YzoCLodtR6rUNmKMCs8/edit#heading=h.cxuq8vo8pcxm)
 
-[GEP-713: Metaresources and PolicyAttachment](https://gateway-api.sigs.k8s.io/geps/gep-713/)
+[GEP-713: Metaresources and PolicyAttachment](../gep-713/index.md)
 
-[Policy Attachment](https://gateway-api.sigs.k8s.io/reference/policy-attachment/#direct-policy-attachment)
+[Policy Attachment](../../reference/policy-attachment.md#direct-policy-attachment)
 
-[Gateway API TLS](https://gateway-api.sigs.k8s.io/guides/tls/)
+[Gateway API TLS](../../guides/tls.md)
 
 [SIG-NET Gateway API: TLS to the K8s.Service/Backend](https://docs.google.com/document/d/1RTYh2brg_vLX9o3pTcrWxtZSsf8Y5NQvIG52lpFcZlo)
 

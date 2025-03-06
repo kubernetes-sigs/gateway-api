@@ -95,7 +95,7 @@ const (
 	// This option indicates support for HTTPRoute with a backendref with an appProtocol 'kubernetes.io/h2c' (extended conformance)
 	SupportHTTPRouteBackendProtocolH2C FeatureName = "HTTPRouteBackendProtocolH2C"
 
-	// This option indicates support for HTTPRoute with a backendref with an appProtoocol 'kubernetes.io/ws' (extended conformance)
+	// This option indicates support for HTTPRoute with a backendref with an appProtocol 'kubernetes.io/ws' (extended conformance)
 	SupportHTTPRouteBackendProtocolWebSocket FeatureName = "HTTPRouteBackendProtocolWebSocket"
 )
 

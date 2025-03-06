@@ -25,7 +25,7 @@ an experimental API group (`networking.x-k8s.io`) to the new
 is concerned, this version is wholly distinct from v1alpha1, and automatic
 conversion is not possible.
 
-![New API group for v1alpha2](/images/v1alpha2-group.png)
+![New API group for v1alpha2](../../images/v1alpha2-group.png)
 
 ### Simpler Route-Gateway Binding
 In v1alpha1 we provided many ways to connect Gateways and Routes. This was a bit
@@ -55,7 +55,7 @@ spec:
       port: 8080
 ```
 
-This is covered in more detail in [GEP 724](/geps/gep-709/).
+This is covered in more detail in [GEP 724](../../geps/gep-709/index.md).
 
 ### Safe Cross Namespace References
 
@@ -63,7 +63,7 @@ This is covered in more detail in [GEP 724](/geps/gep-709/).
 
     The `ReferenceGrant` resource described below is currently only included in the
     "Experimental" channel of Gateway API. For more information on release
-    channels, refer to our [versioning guide](/concepts/versioning).
+    channels, refer to our [versioning guide](../../concepts/versioning.md).
 
 It is quite challenging to cross namespace boundaries in a safe manner. With
 Gateway API, we had several key feature requests that required this capability.
@@ -97,7 +97,7 @@ spec:
     kind: Service
 ```
 
-This is covered in more detail in [GEP 709](/geps/gep-709/).
+This is covered in more detail in [GEP 709](../../geps/gep-709/index.md).
 
 ### Policy Attachment
 One of the key goals of this API is to provide meaningful and consistent
@@ -125,16 +125,16 @@ This is intended to allow things like:
 As a simple example, a TimeoutPolicy may be attached to a Gateway. The effects
 of that policy would cascade down to Routes attached to that policy:
 
-![Simple Ingress Example](/images/policy/ingress-simple.png)
+![Simple Ingress Example](../../images/policy/ingress-simple.png)
 
-This is covered in more detail in [GEP 713](/geps/gep-713/).
+This is covered in more detail in [GEP 713](../../geps/gep-713/index.md).
 
 ## Next Steps
 There are a lot of changes in v1alpha2 that we haven't covered here. For the
 full changelog, refer to our [v0.4.0 release
 notes](https://github.com/kubernetes-sigs/gateway-api/releases/tag/v0.4.0).
 
-Many of our [implementations](/implementations) are planning to release support
+Many of our [implementations](../../implementations.md) are planning to release support
 for the v1alpha2 API in the coming weeks. We'll update our documentation as
 v1alpha2 implementations become available.
 

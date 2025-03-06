@@ -7,7 +7,7 @@
 > our GEP overview as it existed before those rules did, and so it has been
 > explicitly grandfathered in.
 
-[expprob]:https://gateway-api.sigs.k8s.io/geps/overview/#probationary-period
+[expprob]:../overview.md#probationary-period
 
 ## Goal
 
@@ -50,7 +50,7 @@ lower layer protocol already exists. We propose the following criteria for such
 an addition.
 
 - Users of the encapsulated protocol would miss out on significant conventional features from their ecosystem if forced to route at a lower layer.
-- Users of the enapsulated protocol would experience a degraded user experience if forced to route at a lower layer.
+- Users of the encapsulated protocol would experience a degraded user experience if forced to route at a lower layer.
 - The encapsulated protocol has a significant user base, particularly in the Kubernetes community.
 
 gRPC meets _all_ of these criteria and is therefore, we contend, a strong
@@ -424,7 +424,7 @@ type GRPCRouteRule struct {
 	// BackendRefs defines the backend(s) where matching requests should be
 	// sent.
 
-	// If unspecified or invalid (refers to a non-existent resource or a Service
+	// If unspecified or invalid (refers to a nonexistent resource or a Service
 	// with no endpoints), the rule performs no forwarding. If there are also no
 	// filters specified that would result in a response being sent, a gRPC `UNAVAILABLE`
 	// status is returned. `UNAVAILABLE` responses must be sent so that the overall

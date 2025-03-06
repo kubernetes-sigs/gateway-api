@@ -12,7 +12,7 @@ relationships:
       number: 713
       description: Split out Inherited Policy Attachment
 # references is a list of hyperlinks to relevant external references.
-# It's intended to be used for storing Github discussions, Google docs, etc.
+# It's intended to be used for storing GitHub discussions, Google docs, etc.
 references:
   - "https://github.com/kubernetes-sigs/gateway-api/discussions/2927"
 # changelog is a list of hyperlinks to PRs that make changes to the GEP, in

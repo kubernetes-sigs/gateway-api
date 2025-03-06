@@ -7,19 +7,19 @@ _THEN_
 
 **2.**   **Try out one of the available guides:**
 
-- [Simple Gateway](/guides/simple-gateway) (a good one to start out with)
-- [HTTP routing](/guides/http-routing)
-- [HTTP redirects and rewrites](/guides/http-redirect-rewrite)
-- [HTTP traffic splitting](/guides/traffic-splitting)
-- [Routing across Namespaces](/guides/multiple-ns)
-- [Configuring TLS](/guides/tls)
-- [TCP routing](/guides/tcp)
-- [gRPC routing](/guides/grpc-routing)
-- [Migrating from Ingress](/guides/migrating-from-ingress)
+- [Simple Gateway](simple-gateway.md) (a good one to start out with)
+- [HTTP routing](http-routing.md)
+- [HTTP redirects and rewrites](http-redirect-rewrite.md)
+- [HTTP traffic splitting](traffic-splitting.md)
+- [Routing across Namespaces](multiple-ns.md)
+- [Configuring TLS](tls.md)
+- [TCP routing](tcp.md)
+- [gRPC routing](grpc-routing.md)
+- [Migrating from Ingress](migrating-from-ingress.md)
 
 ## Installing a Gateway controller
 
-There are [multiple projects](/implementations) that support Gateway API. By
+There are [multiple projects](../implementations.md) that support Gateway API. By
 installing a Gateway controller in your Kubernetes cluster, you can try out the
 guides above. This will demonstrate that the desired routing configuration is
 actually being implemented by your Gateway resources (and the network
@@ -52,13 +52,13 @@ kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/downloa
 
 The experimental release channel includes everything in the standard release
 channel plus some experimental resources and fields. This includes
-TCPRoute, TLSRoute, UDPRoute and GRPCRoute.
+TCPRoute, TLSRoute, and UDPRoute.
 
 Note that future releases of the API could include breaking changes to
 experimental resources and fields. For example, any experimental resource or
 field could be removed in a future release. For more information on the
 experimental channel, refer to our [versioning
-documentation](/concepts/versioning/).
+documentation](../concepts/versioning.md).
 
 To install the experimental channel, run the following kubectl command:
 
@@ -190,4 +190,4 @@ break anything using these resources.
 ### More on CRD Management
 This guide only provides a high level overview of how to get started with
 Gateway API. For more on the topic of managing Gateway API CRDs, refer to our
-[CRD Management Guide](/guides/crd-management).
+[CRD Management Guide](crd-management.md).

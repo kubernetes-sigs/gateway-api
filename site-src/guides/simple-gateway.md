@@ -6,7 +6,7 @@ deployed together by the same owner. This represents a similar kind of model
 used for Ingress. In this guide, a Gateway and HTTPRoute are deployed which
 match all HTTP traffic and directs it to a single Service named `foo-svc`. 
 
-![Simple Gateway](/images/single-service-gateway.png)
+![Simple Gateway](../images/single-service-gateway.png)
 
 ```yaml  
 {% include 'standard/simple-gateway/gateway.yaml' %}
@@ -15,9 +15,9 @@ match all HTTP traffic and directs it to a single Service named `foo-svc`.
 The Gateway represents the instantiation of a logical load balancer and the
 GatewayClass defines the load balancer template when users create a Gateway.
 The example Gateway is templated from a hypothetical `example`
-GatewayClass, which is meant to be a placeholder and substitued by users. Here
+GatewayClass, which is meant to be a placeholder and substituted by users. Here
 is a list of available
-[Gateway Implementation](https://gateway-api.sigs.k8s.io/implementations/) that
+[Gateway Implementation](../implementations.md) that
 can be used to determine the correct GatewayClass based on the specific
 infrastructure provider.
 

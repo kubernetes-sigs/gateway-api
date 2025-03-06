@@ -3,7 +3,7 @@
 * Issue: [#91](https://github.com/kubernetes-sigs/gateway-api/issues/91)
 * Status: Implementable
 
-(See definitions in [GEP Status][/contributing/gep#status].)
+(See definitions in [GEP States](../overview.md#gep-states).)
 
 ## TLDR
 
@@ -151,7 +151,7 @@ spec:
 This section highlights use cases that may be covered in a future iteration of this GEP
 
 * Using system CA certificates as the trust anchor to validate the certificates presented by the frontend client.
-* Supporting a mode where validating client certficates is optional, useful for debugging and migrating to strict TLS.
+* Supporting a mode where validating client certificates is optional, useful for debugging and migrating to strict TLS.
 * Supporting an optional `subjectAltNames` field within `FrontendTLSValidation` that can be used to specify one or more alternate names to verify the subject identity in the certificate presented by the client. This field falls under Authorization, the initial focus here is on Client Authentication and will be revisited when Authorization is tackled as a whole in the project.
 * Specifying the verification depth in the client certificate chain. This is being deferred because the default verification depth differs across implementations.
 
@@ -160,7 +160,7 @@ This section highlights use cases that may be covered in a future iteration of t
 
 [TLS Handshake Protocol]: https://www.rfc-editor.org/rfc/rfc5246#section-7.4
 [Certificate Path Validation]: https://www.rfc-editor.org/rfc/rfc5280#section-6
-[GatewayTLSConfig]: https://gateway-api.sigs.k8s.io/references/spec/#gateway.networking.k8s.io/v1.GatewayTLSConfig
-[BackendTLSPolicy]: https://gateway-api.sigs.k8s.io/api-types/backendtlspolicy/
-[TLS Configuration GEP]: https://gateway-api.sigs.k8s.io/geps/gep-2907/
+[GatewayTLSConfig]: /references/spec/#gateway.networking.k8s.io/v1.GatewayTLSConfig
+[BackendTLSPolicy]: ../../api-types/backendtlspolicy.md
+[TLS Configuration GEP]: ../gep-2907/index.md
 [Gateway API TLS Use Cases]: https://docs.google.com/document/d/17sctu2uMJtHmJTGtBi_awGB0YzoCLodtR6rUNmKMCs8/edit?pli=1#heading=h.cxuq8vo8pcxm

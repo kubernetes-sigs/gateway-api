@@ -12,7 +12,7 @@
     This GEP is also exempt from the [Probationary Period][expprob] rules as it
     predated them.
 
-[expprob]:https://gateway-api.sigs.k8s.io/geps/overview/#probationary-period
+[expprob]:../overview.md#probationary-period
 
 ## TLDR
 

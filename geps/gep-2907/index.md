@@ -7,8 +7,8 @@
 This GEP aims to define high level TLS terminology and structure within Gateway
 API to ensure that all our independent proposals related to TLS result in a
 coherent set of APIs. This will result in some adjustments to provisional and
-experimental TLS-related GEPs, specifically [BackendTLSPolicy](/geps/gep-1897)
-and [Client Certificate Verification](/geps/gep-91).
+experimental TLS-related GEPs, specifically [BackendTLSPolicy](../gep-1897/index.md)
+and [Client Certificate Verification](../gep-91/index.md).
 
 ## Goals
 * Define high-level terminology for how we refer to TLS in Gateway API.
@@ -43,7 +43,7 @@ such as a virtual IP.
 Each Gateway contains multiple “Listeners”. Each HTTPS Listener in a Gateway
 must have a unique combination of protocol, port, and SNI (Server Name
 Indication). TLS configuration attached at this layer should be [isolated via
-SNI](/guides/implementers/#listener-isolation).
+SNI](../../guides/implementers.md#listener-isolation).
 
 #### C. BackendTLSPolicy
 This policy allows us to attach unique TLS configuration per Backend. Depending

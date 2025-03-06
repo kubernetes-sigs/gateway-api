@@ -4,8 +4,8 @@
 
 |API channel|Implementation version|Mode|Report|
 |-----------|----------------------|----|------|
-|x|[v1.1.0](https://github.com/nginx/nginx-gateway-fabric/releases/tag/v1.1.0)|x|[link](./v1.1.0-report.yaml)|
-|x|[v1.2.0](https://github.com/nginx/nginx-gateway-fabric/releases/tag/v1.2.0)|x|[link](./v1.2.0-report.yaml)|
+|x|[v1.1.0](https://github.com/nginx/nginx-gateway-fabric/releases/tag/v1.1.0)|x|[v1.1.0 report](./v1.1.0-report.yaml)|
+|x|[v1.2.0](https://github.com/nginx/nginx-gateway-fabric/releases/tag/v1.2.0)|x|[v1.2.0 report](./v1.2.0-report.yaml)|
 
 ## Reproduce
 

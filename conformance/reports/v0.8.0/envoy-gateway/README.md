@@ -4,6 +4,6 @@
 
 |API channel|Implementation version|Mode|Report|
 |-----------|----------------------|----|------|
-|x|latest|x|[link](./latest-report.yaml)|
+|x|latest|x|[latest report](./latest-report.yaml)|
 
 ## Reproduce

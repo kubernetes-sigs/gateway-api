@@ -1,7 +1,7 @@
 # GEP-3567: Gateway TLS Updates for HTTP/2 Connection Coalescing
 
 * Issue: [#3567](https://github.com/kubernetes-sigs/gateway-api/issues/3567)
-* Status: Implementable
+* Status: Experimental
 
 ## TLDR
 
@@ -40,7 +40,9 @@ the client sends.
 
 Gateway API deals with this situation imprecisely, stating:
 
-    The Listener Hostname SHOULD match at both the TLS and HTTP protocol layers as described above. If an implementation does not ensure that both the SNI and Host header match the Listener hostname, it MUST clearly document that.
+    The Listener Hostname SHOULD match at both the TLS and HTTP protocol layers
+    as described above. If an implementation does not ensure that both the SNI
+    and Host header match the Listener hostname, it MUST clearly document that.
 
 In practice we can end up with an implementation that misroutes requests when a
 Gateway is configured using certificates that use multiple or wildcard SANs.
@@ -48,7 +50,7 @@ Gateway is configured using certificates that use multiple or wildcard SANs.
 ### Example
 
 The following configuration ([from the Gateway API
-documentation](https://gateway-api.sigs.k8s.io/guides/tls/#wildcard-tls-listeners))
+documentation](../../guides/tls.md#wildcard-tls-listeners))
 illustrates the problem:
 
 
@@ -97,16 +99,16 @@ negotiated with the other Listener’s certificate.
 
 Mapping a request to a Listener matters if the Gateway configuration has
 different
-[HTTPRoutes](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.HTTPRoute)
+[HTTPRoutes](../../reference/spec.md#gateway.networking.k8s.io/v1.HTTPRoute)
 bound to the different Listeners. It also matters if the Listeners have
 different
-[GatewayTlsConfigs](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.GatewayTLSConfig)
+[GatewayTlsConfigs](../../reference/spec.md#gateway.networking.k8s.io/v1.GatewayTLSConfig)
 attached, for example if one Listener uses mutual TLS and the other does not.
 
 
 ### Interaction with Client Cert Validation
 
-[GEP-91](https://gateway-api.sigs.k8s.io/geps/gep-91/) introduced Client
+[GEP-91](../gep-91/index.md) introduced Client
 Certificate Validation to Gateway Listeners as a new experimental concept. If an
 implementation is unable to properly isolate HTTPS listeners, this could result
 in this Client Cert Validation being bypassed. Before this feature can graduate
@@ -119,7 +121,7 @@ A new condition will be added to Gateways: `OverlappingTLSConfig`.
 Implementations MUST add this condition to status when a Gateway is configured
 with TLS configuration across multiple Listeners. Implementations MAY add this
 condition to status when a Gateway is configured with overlapping TLS
-certifications. Note that since this is a negative polarity condition, it would
+certificates. Note that since this is a negative polarity condition, it would
 only be populated when it is true.
 
 ### B) Modify API Spec to recommend sending 421s

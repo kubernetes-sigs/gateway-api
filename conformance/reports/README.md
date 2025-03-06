@@ -62,7 +62,7 @@ is structured as follows:
   needs to add information in the "reproduce" section (see below) on how to configure
   such a mode.
 - **Report**: the link to the related report. It MUST be in the form of
-  `[link](./report.yaml)`. The reports must be named according to the following
+  `[_version_ report](./report.yaml)`. The reports must be named according to the following
   pattern: `<API Channel>-<Implementation version>-<mode>-report.yaml`.
 
 ### Reproduce
@@ -110,7 +110,7 @@ comply with the following rules:
   - `contact`: it indicates the GitHub usernames of those who are responsible for
     maintaining this file, so they can be easily contacted when needed (e.g. for
     relevant release announcements regarding conformance, etc.). Optionally, it
-    can be an email address or a support URL (e.g. Github new issue page).
+    can be an email address or a support URL (e.g. GitHub new issue page).
   - `url`: it must be a valid url for a GitHub repository, or any other website with
     information related to the project.
   - `version`: it must be a snapshot of the project, which means it can be a commit,

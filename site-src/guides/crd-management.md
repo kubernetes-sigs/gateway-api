@@ -33,7 +33,7 @@ explores one possible approach implementations could use to accomplish this.
 ## Upgrading to a new version
 
 Gateway API releases CRDs in two [release
-channels](/concepts/versioning/#release-channels-eg-experimental-standard).
+channels](../concepts/versioning.md#release-channels-eg-experimental-standard).
 Sticking with standard channel CRDs will ensure CRD upgrades are both simpler
 and safer.
 
@@ -44,7 +44,7 @@ and safer.
    that configuration.
 1. Read the release notes before upgrading. In some cases, they may contain some
    guidelines you need to follow before upgrading.
-1. Understand the [Gateway API versioning policy](/concepts/versioning) so you
+1. Understand the [Gateway API versioning policy](../concepts/versioning.md) so you
    know what can change.
 1. Although it is usually safe to upgrade across multiple Gateway API minor
    versions at once, the safest and most widely tested path will involve

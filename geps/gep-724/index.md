@@ -16,7 +16,7 @@ for the future addition of Route inclusion (Routes including other Routes).
 Refactor cross-namespace Route-Gateway binding to:
 
 * Be more consistent with [cross-namespace references from
-  Routes](/geps/gep-709)
+  Routes](../gep-709/index.md)
 * Provide a clear path to enable Route inclusion (Routes including Routes).
 * Simplify user experience based on initial feedback.
 * Enable other kinds of Route parents in addition to Gateway, this could include:
@@ -57,7 +57,7 @@ directly reference the Gateways they wanted to attach to. This pattern was
 already possible with the existing API, but not clearly documented.
 
 One of the key concepts in the [cross-namespace references from Routes
-GEP](/geps/gep-709) was that of a handshake for
+GEP](../gep-709/index.md) was that of a handshake for
 references that cross namespace boundaries. A key part of that handshake was
 that one direction included a direct reference, while the other direction
 provided a way to denote trust for a set of Namespaces and kind of resources.
@@ -618,7 +618,7 @@ bar namespace. Unfortunately that would be very difficult to recreate with
 ReferenceGrant.
 
 ReferenceGrant is fundamentally about trusting references from resource of kind
-Foo in to resources of kind Bar. Names and section names are intentionally
+Foo in resources of kind Bar. Names and section names are intentionally
 excluded. If we added both of those concepts to ReferenceGrant, this would be
 possible, but quite complex and verbose. This is what the example from above
 would look like with this approach:
@@ -686,7 +686,7 @@ spec:
 
 **GEPs**
 
-* [GEP 709: ReferenceGrant + Cross Namespace References from Routes](/geps/gep-709)
+* [GEP 709: ReferenceGrant + Cross Namespace References from Routes](../gep-709/index.md)
 
 **Docs:**
 

@@ -82,6 +82,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"k8s.io/apimachinery/pkg/runtime.TypeMeta":                                        schema_k8sio_apimachinery_pkg_runtime_TypeMeta(ref),
 		"k8s.io/apimachinery/pkg/runtime.Unknown":                                         schema_k8sio_apimachinery_pkg_runtime_Unknown(ref),
 		"k8s.io/apimachinery/pkg/version.Info":                                            schema_k8sio_apimachinery_pkg_version_Info(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.AllowedListeners":                                schema_sigsk8sio_gateway_api_apis_v1_AllowedListeners(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.AllowedRoutes":                                   schema_sigsk8sio_gateway_api_apis_v1_AllowedRoutes(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.BackendObjectReference":                          schema_sigsk8sio_gateway_api_apis_v1_BackendObjectReference(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.BackendRef":                                      schema_sigsk8sio_gateway_api_apis_v1_BackendRef(ref),
@@ -113,6 +114,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"sigs.k8s.io/gateway-api/apis/v1.GatewayStatusAddress":                            schema_sigsk8sio_gateway_api_apis_v1_GatewayStatusAddress(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.GatewayTLSConfig":                                schema_sigsk8sio_gateway_api_apis_v1_GatewayTLSConfig(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.HTTPBackendRef":                                  schema_sigsk8sio_gateway_api_apis_v1_HTTPBackendRef(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.HTTPCORSFilter":                                  schema_sigsk8sio_gateway_api_apis_v1_HTTPCORSFilter(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.HTTPHeader":                                      schema_sigsk8sio_gateway_api_apis_v1_HTTPHeader(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.HTTPHeaderFilter":                                schema_sigsk8sio_gateway_api_apis_v1_HTTPHeaderFilter(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.HTTPHeaderMatch":                                 schema_sigsk8sio_gateway_api_apis_v1_HTTPHeaderMatch(ref),
@@ -132,6 +134,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"sigs.k8s.io/gateway-api/apis/v1.HTTPRouteTimeouts":                               schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteTimeouts(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.HTTPURLRewriteFilter":                            schema_sigsk8sio_gateway_api_apis_v1_HTTPURLRewriteFilter(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.Listener":                                        schema_sigsk8sio_gateway_api_apis_v1_Listener(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.ListenerNamespaces":                              schema_sigsk8sio_gateway_api_apis_v1_ListenerNamespaces(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.ListenerStatus":                                  schema_sigsk8sio_gateway_api_apis_v1_ListenerStatus(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.LocalObjectReference":                            schema_sigsk8sio_gateway_api_apis_v1_LocalObjectReference(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.LocalParametersReference":                        schema_sigsk8sio_gateway_api_apis_v1_LocalParametersReference(ref),
@@ -189,6 +192,18 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"sigs.k8s.io/gateway-api/apis/v1beta1.ReferenceGrantList":                         schema_sigsk8sio_gateway_api_apis_v1beta1_ReferenceGrantList(ref),
 		"sigs.k8s.io/gateway-api/apis/v1beta1.ReferenceGrantSpec":                         schema_sigsk8sio_gateway_api_apis_v1beta1_ReferenceGrantSpec(ref),
 		"sigs.k8s.io/gateway-api/apis/v1beta1.ReferenceGrantTo":                           schema_sigsk8sio_gateway_api_apis_v1beta1_ReferenceGrantTo(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendTrafficPolicy":                     schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendTrafficPolicy(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendTrafficPolicyList":                 schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendTrafficPolicyList(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendTrafficPolicySpec":                 schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendTrafficPolicySpec(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.ListenerEntry":                            schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerEntry(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.ListenerEntryStatus":                      schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerEntryStatus(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.ListenerSet":                              schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerSet(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.ListenerSetList":                          schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerSetList(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.ListenerSetSpec":                          schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerSetSpec(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.ListenerSetStatus":                        schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerSetStatus(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.ParentGatewayReference":                   schema_sigsk8sio_gateway_api_apisx_v1alpha1_ParentGatewayReference(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.RequestRate":                              schema_sigsk8sio_gateway_api_apisx_v1alpha1_RequestRate(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.RetryConstraint":                          schema_sigsk8sio_gateway_api_apisx_v1alpha1_RetryConstraint(ref),
 	}
 }
 
@@ -2781,12 +2796,32 @@ func schema_k8sio_apimachinery_pkg_version_Info(ref common.ReferenceCallback) co
 	}
 }
 
+func schema_sigsk8sio_gateway_api_apis_v1_AllowedListeners(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "AllowedListeners defines which ListenerSets can be attached to this Gateway.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"namespaces": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Namespaces defines which namespaces ListenerSets can be attached to this Gateway. While this feature is experimental, the default value is to allow no ListenerSets.",
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.ListenerNamespaces"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"sigs.k8s.io/gateway-api/apis/v1.ListenerNamespaces"},
+	}
+}
+
 func schema_sigsk8sio_gateway_api_apis_v1_AllowedRoutes(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "AllowedRoutes defines which Routes may be attached to this Listener.",
-				Type:        []string{"object"},
+				Type: []string{"object"},
 				Properties: map[string]spec.Schema{
 					"namespaces": {
 						SchemaProps: spec.SchemaProps{
@@ -3249,7 +3284,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GRPCRouteFilter(ref common.ReferenceCa
 					},
 					"requestMirror": {
 						SchemaProps: spec.SchemaProps{
-							Description: "RequestMirror defines a schema for a filter that mirrors requests. Requests are sent to the specified destination, but responses from that destination are ignored.\n\nThis filter can be used multiple times within the same rule. Note that not all implementations will be able to support mirroring to multiple backends.\n\nSupport: Extended\n\n\n<gateway:experimental:validation:XValidation:message=\"Only one of percent or fraction may be specified in HTTPRequestMirrorFilter\",rule=\"!(has(self.percent) && has(self.fraction))\">",
+							Description: "RequestMirror defines a schema for a filter that mirrors requests. Requests are sent to the specified destination, but responses from that destination are ignored.\n\nThis filter can be used multiple times within the same rule. Note that not all implementations will be able to support mirroring to multiple backends.\n\nSupport: Extended",
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.HTTPRequestMirrorFilter"),
 						},
 					},
@@ -3390,7 +3425,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GRPCRouteRule(ref common.ReferenceCall
 					},
 					"filters": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Filters define the filters that are applied to requests that match this rule.\n\nThe effects of ordering of multiple behaviors are currently unspecified. This can change in the future based on feedback during the alpha stage.\n\nConformance-levels at this level are defined based on the type of filter:\n\n- ALL core filters MUST be supported by all implementations that support\n  GRPCRoute.\n- Implementers are encouraged to support extended filters. - Implementation-specific custom filters have no API guarantees across\n  implementations.\n\nSpecifying the same filter multiple times is not supported unless explicitly indicated in the filter.\n\nIf an implementation can not support a combination of filters, it must clearly document that limitation. In cases where incompatible or unsupported filters are specified and cause the `Accepted` condition to be set to status `False`, implementations may use the `IncompatibleFilters` reason to specify this configuration error.\n\nSupport: Core",
+							Description: "Filters define the filters that are applied to requests that match this rule.\n\nThe effects of ordering of multiple behaviors are currently unspecified. This can change in the future based on feedback during the alpha stage.\n\nConformance-levels at this level are defined based on the type of filter:\n\n- ALL core filters MUST be supported by all implementations that support\n  GRPCRoute.\n- Implementers are encouraged to support extended filters. - Implementation-specific custom filters have no API guarantees across\n  implementations.\n\nSpecifying the same filter multiple times is not supported unless explicitly indicated in the filter.\n\nIf an implementation cannot support a combination of filters, it must clearly document that limitation. In cases where incompatible or unsupported filters are specified and cause the `Accepted` condition to be set to status `False`, implementations may use the `IncompatibleFilters` reason to specify this configuration error.\n\nSupport: Core",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -3939,7 +3974,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewaySpec(ref common.ReferenceCallba
 							},
 						},
 						SchemaProps: spec.SchemaProps{
-							Description: "Listeners associated with this Gateway. Listeners define logical endpoints that are bound on this Gateway's addresses. At least one Listener MUST be specified.\n\n## Distinct Listeners\n\nEach Listener in a set of Listeners (for example, in a single Gateway) MUST be _distinct_, in that a traffic flow MUST be able to be assigned to exactly one listener. (This section uses \"set of Listeners\" rather than \"Listeners in a single Gateway\" because implementations MAY merge configuration from multiple Gateways onto a single data plane, and these rules _also_ apply in that case).\n\nPractically, this means that each listener in a set MUST have a unique combination of Port, Protocol, and, if supported by the protocol, Hostname.\n\nSome combinations of port, protocol, and TLS settings are considered Core support and MUST be supported by implementations based on the objects they support:\n\nHTTPRoute\n\n1. HTTPRoute, Port: 80, Protocol: HTTP 2. HTTPRoute, Port: 443, Protocol: HTTPS, TLS Mode: Terminate, TLS keypair provided\n\nTLSRoute\n\n1. TLSRoute, Port: 443, Protocol: TLS, TLS Mode: Passthrough\n\n\"Distinct\" Listeners have the following property:\n\n**The implementation can match inbound requests to a single distinct Listener**.\n\nWhen multiple Listeners share values for fields (for example, two Listeners with the same Port value), the implementation can match requests to only one of the Listeners using other Listener fields.\n\nWhen multiple listeners have the same value for the Protocol field, then each of the Listeners with matching Protocol values MUST have different values for other fields.\n\nThe set of fields that MUST be different for a Listener differs per protocol. The following rules define the rules for what fields MUST be considered for Listeners to be distinct with each protocol currently defined in the Gateway API spec.\n\nThe set of listeners that all share a protocol value MUST have _different_ values for _at least one_ of these fields to be distinct:\n\n* **HTTP, HTTPS, TLS**: Port, Hostname * **TCP, UDP**: Port\n\nOne **very** important rule to call out involves what happens when an implementation:\n\n* Supports TCP protocol Listeners, as well as HTTP, HTTPS, or TLS protocol\n  Listeners, and\n* sees HTTP, HTTPS, or TLS protocols with the same `port` as one with TCP\n  Protocol.\n\nIn this case all the Listeners that share a port with the TCP Listener are not distinct and so MUST NOT be accepted.\n\nIf an implementation does not support TCP Protocol Listeners, then the previous rule does not apply, and the TCP Listeners SHOULD NOT be accepted.\n\nNote that the `tls` field is not used for determining if a listener is distinct, because Listeners that _only_ differ on TLS config will still conflict in all cases.\n\n### Listeners that are distinct only by Hostname\n\nWhen the Listeners are distinct based only on Hostname, inbound request hostnames MUST match from the most specific to least specific Hostname values to choose the correct Listener and its associated set of Routes.\n\nExact matches MUST be processed before wildcard matches, and wildcard matches MUST be processed before fallback (empty Hostname value) matches. For example, `\"foo.example.com\"` takes precedence over `\"*.example.com\"`, and `\"*.example.com\"` takes precedence over `\"\"`.\n\nAdditionally, if there are multiple wildcard entries, more specific wildcard entries must be processed before less specific wildcard entries. For example, `\"*.foo.example.com\"` takes precedence over `\"*.example.com\"`.\n\nThe precise definition here is that the higher the number of dots in the hostname to the right of the wildcard character, the higher the precedence.\n\nThe wildcard character will match any number of characters _and dots_ to the left, however, so `\"*.example.com\"` will match both `\"foo.bar.example.com\"` _and_ `\"bar.example.com\"`.\n\n## Handling indistinct Listeners\n\nIf a set of Listeners contains Listeners that are not distinct, then those Listeners are _Conflicted_, and the implementation MUST set the \"Conflicted\" condition in the Listener Status to \"True\".\n\nThe words \"indistinct\" and \"conflicted\" are considered equivalent for the purpose of this documentation.\n\nImplementations MAY choose to accept a Gateway with some Conflicted Listeners only if they only accept the partial Listener set that contains no Conflicted Listeners.\n\nSpecifically, an implementation MAY accept a partial Listener set subject to the following rules:\n\n* The implementation MUST NOT pick one conflicting Listener as the winner.\n  ALL indistinct Listeners must not be accepted for processing.\n* At least one distinct Listener MUST be present, or else the Gateway effectively\n  contains _no_ Listeners, and must be rejected from processing as a whole.\n\nThe implementation MUST set a \"ListenersNotValid\" condition on the Gateway Status when the Gateway contains Conflicted Listeners whether or not they accept the Gateway. That Condition SHOULD clearly indicate in the Message which Listeners are conflicted, and which are Accepted. Additionally, the Listener status for those listeners SHOULD indicate which Listeners are conflicted and not Accepted.\n\n## General Listener behavior\n\nNote that, for all distinct Listeners, requests SHOULD match at most one Listener. For example, if Listeners are defined for \"foo.example.com\" and \"*.example.com\", a request to \"foo.example.com\" SHOULD only be routed using routes attached to the \"foo.example.com\" Listener (and not the \"*.example.com\" Listener).\n\nThis concept is known as \"Listener Isolation\", and it is an Extended feature of Gateway API. Implementations that do not support Listener Isolation MUST clearly document this, and MUST NOT claim support for the `GatewayHTTPListenerIsolation` feature.\n\nImplementations that _do_ support Listener Isolation SHOULD claim support for the Extended `GatewayHTTPListenerIsolation` feature and pass the associated conformance tests.\n\n## Compatible Listeners\n\nA Gateway's Listeners are considered _compatible_ if:\n\n1. They are distinct. 2. The implementation can serve them in compliance with the Addresses\n   requirement that all Listeners are available on all assigned\n   addresses.\n\nCompatible combinations in Extended support are expected to vary across implementations. A combination that is compatible for one implementation may not be compatible for another.\n\nFor example, an implementation that cannot serve both TCP and UDP listeners on the same address, or cannot mix HTTPS and generic TLS listens on the same port would not consider those cases compatible, even though they are distinct.\n\nImplementations MAY merge separate Gateways onto a single set of Addresses if all Listeners across all Gateways are compatible.\n\nSupport: Core",
+							Description: "Listeners associated with this Gateway. Listeners define logical endpoints that are bound on this Gateway's addresses. At least one Listener MUST be specified.\n\n## Distinct Listeners\n\nEach Listener in a set of Listeners (for example, in a single Gateway) MUST be _distinct_, in that a traffic flow MUST be able to be assigned to exactly one listener. (This section uses \"set of Listeners\" rather than \"Listeners in a single Gateway\" because implementations MAY merge configuration from multiple Gateways onto a single data plane, and these rules _also_ apply in that case).\n\nPractically, this means that each listener in a set MUST have a unique combination of Port, Protocol, and, if supported by the protocol, Hostname.\n\nSome combinations of port, protocol, and TLS settings are considered Core support and MUST be supported by implementations based on the objects they support:\n\nHTTPRoute\n\n1. HTTPRoute, Port: 80, Protocol: HTTP 2. HTTPRoute, Port: 443, Protocol: HTTPS, TLS Mode: Terminate, TLS keypair provided\n\nTLSRoute\n\n1. TLSRoute, Port: 443, Protocol: TLS, TLS Mode: Passthrough\n\n\"Distinct\" Listeners have the following property:\n\n**The implementation can match inbound requests to a single distinct Listener**.\n\nWhen multiple Listeners share values for fields (for example, two Listeners with the same Port value), the implementation can match requests to only one of the Listeners using other Listener fields.\n\nWhen multiple listeners have the same value for the Protocol field, then each of the Listeners with matching Protocol values MUST have different values for other fields.\n\nThe set of fields that MUST be different for a Listener differs per protocol. The following rules define the rules for what fields MUST be considered for Listeners to be distinct with each protocol currently defined in the Gateway API spec.\n\nThe set of listeners that all share a protocol value MUST have _different_ values for _at least one_ of these fields to be distinct:\n\n* **HTTP, HTTPS, TLS**: Port, Hostname * **TCP, UDP**: Port\n\nOne **very** important rule to call out involves what happens when an implementation:\n\n* Supports TCP protocol Listeners, as well as HTTP, HTTPS, or TLS protocol\n  Listeners, and\n* sees HTTP, HTTPS, or TLS protocols with the same `port` as one with TCP\n  Protocol.\n\nIn this case all the Listeners that share a port with the TCP Listener are not distinct and so MUST NOT be accepted.\n\nIf an implementation does not support TCP Protocol Listeners, then the previous rule does not apply, and the TCP Listeners SHOULD NOT be accepted.\n\nNote that the `tls` field is not used for determining if a listener is distinct, because Listeners that _only_ differ on TLS config will still conflict in all cases.\n\n### Listeners that are distinct only by Hostname\n\nWhen the Listeners are distinct based only on Hostname, inbound request hostnames MUST match from the most specific to least specific Hostname values to choose the correct Listener and its associated set of Routes.\n\nExact matches MUST be processed before wildcard matches, and wildcard matches MUST be processed before fallback (empty Hostname value) matches. For example, `\"foo.example.com\"` takes precedence over `\"*.example.com\"`, and `\"*.example.com\"` takes precedence over `\"\"`.\n\nAdditionally, if there are multiple wildcard entries, more specific wildcard entries must be processed before less specific wildcard entries. For example, `\"*.foo.example.com\"` takes precedence over `\"*.example.com\"`.\n\nThe precise definition here is that the higher the number of dots in the hostname to the right of the wildcard character, the higher the precedence.\n\nThe wildcard character will match any number of characters _and dots_ to the left, however, so `\"*.example.com\"` will match both `\"foo.bar.example.com\"` _and_ `\"bar.example.com\"`.\n\n## Handling indistinct Listeners\n\nIf a set of Listeners contains Listeners that are not distinct, then those Listeners are _Conflicted_, and the implementation MUST set the \"Conflicted\" condition in the Listener Status to \"True\".\n\nThe words \"indistinct\" and \"conflicted\" are considered equivalent for the purpose of this documentation.\n\nImplementations MAY choose to accept a Gateway with some Conflicted Listeners only if they only accept the partial Listener set that contains no Conflicted Listeners.\n\nSpecifically, an implementation MAY accept a partial Listener set subject to the following rules:\n\n* The implementation MUST NOT pick one conflicting Listener as the winner.\n  ALL indistinct Listeners must not be accepted for processing.\n* At least one distinct Listener MUST be present, or else the Gateway effectively\n  contains _no_ Listeners, and must be rejected from processing as a whole.\n\nThe implementation MUST set a \"ListenersNotValid\" condition on the Gateway Status when the Gateway contains Conflicted Listeners whether or not they accept the Gateway. That Condition SHOULD clearly indicate in the Message which Listeners are conflicted, and which are Accepted. Additionally, the Listener status for those listeners SHOULD indicate which Listeners are conflicted and not Accepted.\n\n## General Listener behavior\n\nNote that, for all distinct Listeners, requests SHOULD match at most one Listener. For example, if Listeners are defined for \"foo.example.com\" and \"*.example.com\", a request to \"foo.example.com\" SHOULD only be routed using routes attached to the \"foo.example.com\" Listener (and not the \"*.example.com\" Listener).\n\nThis concept is known as \"Listener Isolation\", and it is an Extended feature of Gateway API. Implementations that do not support Listener Isolation MUST clearly document this, and MUST NOT claim support for the `GatewayHTTPListenerIsolation` feature.\n\nImplementations that _do_ support Listener Isolation SHOULD claim support for the Extended `GatewayHTTPListenerIsolation` feature and pass the associated conformance tests.\n\n## Compatible Listeners\n\nA Gateway's Listeners are considered _compatible_ if:\n\n1. They are distinct. 2. The implementation can serve them in compliance with the Addresses\n   requirement that all Listeners are available on all assigned\n   addresses.\n\nCompatible combinations in Extended support are expected to vary across implementations. A combination that is compatible for one implementation may not be compatible for another.\n\nFor example, an implementation that cannot serve both TCP and UDP listeners on the same address, or cannot mix HTTPS and generic TLS listens on the same port would not consider those cases compatible, even though they are distinct.\n\nImplementations MAY merge separate Gateways onto a single set of Addresses if all Listeners across all Gateways are compatible.\n\nIn a future release the MinItems=1 requirement MAY be dropped.\n\nSupport: Core",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -3977,12 +4012,18 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewaySpec(ref common.ReferenceCallba
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.GatewayBackendTLS"),
 						},
 					},
+					"allowedListeners": {
+						SchemaProps: spec.SchemaProps{
+							Description: "AllowedListeners defines which ListenerSets can be attached to this Gateway. While this feature is experimental, the default value is to allow no ListenerSets.\n\n<gateway:experimental>",
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.AllowedListeners"),
+						},
+					},
 				},
 				Required: []string{"gatewayClassName", "listeners"},
 			},
 		},
 		Dependencies: []string{
-			"sigs.k8s.io/gateway-api/apis/v1.GatewayAddress", "sigs.k8s.io/gateway-api/apis/v1.GatewayBackendTLS", "sigs.k8s.io/gateway-api/apis/v1.GatewayInfrastructure", "sigs.k8s.io/gateway-api/apis/v1.Listener"},
+			"sigs.k8s.io/gateway-api/apis/v1.AllowedListeners", "sigs.k8s.io/gateway-api/apis/v1.GatewayAddress", "sigs.k8s.io/gateway-api/apis/v1.GatewayBackendTLS", "sigs.k8s.io/gateway-api/apis/v1.GatewayInfrastructure", "sigs.k8s.io/gateway-api/apis/v1.Listener"},
 	}
 }
 
@@ -4092,8 +4133,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewayTLSConfig(ref common.ReferenceC
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "GatewayTLSConfig describes a TLS configuration.",
-				Type:        []string{"object"},
+				Type: []string{"object"},
 				Properties: map[string]spec.Schema{
 					"mode": {
 						SchemaProps: spec.SchemaProps{
@@ -4219,6 +4259,113 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPBackendRef(ref common.ReferenceCal
 	}
 }
 
+func schema_sigsk8sio_gateway_api_apis_v1_HTTPCORSFilter(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "HTTPCORSFilter defines a filter that that configures Cross-Origin Request Sharing (CORS).",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"allowOrigins": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-type": "set",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "AllowOrigins indicates whether the response can be shared with requested resource from the given `Origin`.\n\nThe `Origin` consists of a scheme and a host, with an optional port, and takes the form `<scheme>://<host>(:<port>)`.\n\nValid values for scheme are: `http` and `https`.\n\nValid values for port are any integer between 1 and 65535 (the list of available TCP/UDP ports). Note that, if not included, port `80` is assumed for `http` scheme origins, and port `443` is assumed for `https` origins. This may affect origin matching.\n\nThe host part of the origin may contain the wildcard character `*`. These wildcard characters behave as follows:\n\n* `*` is a greedy match to the _left_, including any number of\n  DNS labels to the left of its position. This also means that\n  `*` will include any number of period `.` characters to the\n  left of its position.\n* A wildcard by itself matches all hosts.\n\nAn origin value that includes _only_ the `*` character indicates requests from all `Origin`s are allowed.\n\nWhen the `AllowOrigins` field is configured with multiple origins, it means the server supports clients from multiple origins. If the request `Origin` matches the configured allowed origins, the gateway must return the given `Origin` and sets value of the header `Access-Control-Allow-Origin` same as the `Origin` header provided by the client.\n\nThe status code of a successful response to a \"preflight\" request is always an OK status (i.e., 204 or 200).\n\nIf the request `Origin` does not match the configured allowed origins, the gateway returns 204/200 response but doesn't set the relevant cross-origin response headers. Alternatively, the gateway responds with 403 status to the \"preflight\" request is denied, coupled with omitting the CORS headers. The cross-origin request fails on the client side. Therefore, the client doesn't attempt the actual cross-origin request.\n\nThe `Access-Control-Allow-Origin` response header can only use `*` wildcard as value when the `AllowCredentials` field is unspecified.\n\nWhen the `AllowCredentials` field is specified and `AllowOrigins` field specified with the `*` wildcard, the gateway must return a single origin in the value of the `Access-Control-Allow-Origin` response header, instead of specifying the `*` wildcard. The value of the header `Access-Control-Allow-Origin` is same as the `Origin` header provided by the client.\n\nSupport: Extended",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: "",
+										Type:    []string{"string"},
+										Format:  "",
+									},
+								},
+							},
+						},
+					},
+					"allowCredentials": {
+						SchemaProps: spec.SchemaProps{
+							Description: "AllowCredentials indicates whether the actual cross-origin request allows to include credentials.\n\nThe only valid value for the `Access-Control-Allow-Credentials` response header is true (case-sensitive).\n\nIf the credentials are not allowed in cross-origin requests, the gateway will omit the header `Access-Control-Allow-Credentials` entirely rather than setting its value to false.\n\nSupport: Extended",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"allowMethods": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-type": "set",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "AllowMethods indicates which HTTP methods are supported for accessing the requested resource.\n\nValid values are any method defined by RFC9110, along with the special value `*`, which represents all HTTP methods are allowed.\n\nMethod names are case sensitive, so these values are also case-sensitive. (See https://www.rfc-editor.org/rfc/rfc2616#section-5.1.1)\n\nMultiple method names in the value of the `Access-Control-Allow-Methods` response header are separated by a comma (\",\").\n\nA CORS-safelisted method is a method that is `GET`, `HEAD`, or `POST`. (See https://fetch.spec.whatwg.org/#cors-safelisted-method) The CORS-safelisted methods are always allowed, regardless of whether they are specified in the `AllowMethods` field.\n\nWhen the `AllowMethods` field is configured with one or more methods, the gateway must return the `Access-Control-Allow-Methods` response header which value is present in the `AllowMethods` field.\n\nIf the HTTP method of the `Access-Control-Request-Method` request header is not included in the list of methods specified by the response header `Access-Control-Allow-Methods`, it will present an error on the client side.\n\nThe `Access-Control-Allow-Methods` response header can only use `*` wildcard as value when the `AllowCredentials` field is unspecified.\n\nWhen the `AllowCredentials` field is specified and `AllowMethods` field specified with the `*` wildcard, the gateway must specify one HTTP method in the value of the Access-Control-Allow-Methods response header. The value of the header `Access-Control-Allow-Methods` is same as the `Access-Control-Request-Method` header provided by the client. If the header `Access-Control-Request-Method` is not included in the request, the gateway will omit the `Access-Control-Allow-Methods` response header, instead of specifying the `*` wildcard. A Gateway implementation may choose to add implementation-specific default methods.\n\nSupport: Extended",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: "",
+										Type:    []string{"string"},
+										Format:  "",
+									},
+								},
+							},
+						},
+					},
+					"allowHeaders": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-type": "set",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "AllowHeaders indicates which HTTP request headers are supported for accessing the requested resource.\n\nHeader names are not case sensitive.\n\nMultiple header names in the value of the `Access-Control-Allow-Headers` response header are separated by a comma (\",\").\n\nWhen the `AllowHeaders` field is configured with one or more headers, the gateway must return the `Access-Control-Allow-Headers` response header which value is present in the `AllowHeaders` field.\n\nIf any header name in the `Access-Control-Request-Headers` request header is not included in the list of header names specified by the response header `Access-Control-Allow-Headers`, it will present an error on the client side.\n\nIf any header name in the `Access-Control-Allow-Headers` response header does not recognize by the client, it will also occur an error on the client side.\n\nA wildcard indicates that the requests with all HTTP headers are allowed. The `Access-Control-Allow-Headers` response header can only use `*` wildcard as value when the `AllowCredentials` field is unspecified.\n\nWhen the `AllowCredentials` field is specified and `AllowHeaders` field specified with the `*` wildcard, the gateway must specify one or more HTTP headers in the value of the `Access-Control-Allow-Headers` response header. The value of the header `Access-Control-Allow-Headers` is same as the `Access-Control-Request-Headers` header provided by the client. If the header `Access-Control-Request-Headers` is not included in the request, the gateway will omit the `Access-Control-Allow-Headers` response header, instead of specifying the `*` wildcard. A Gateway implementation may choose to add implementation-specific default headers.\n\nSupport: Extended",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: "",
+										Type:    []string{"string"},
+										Format:  "",
+									},
+								},
+							},
+						},
+					},
+					"exposeHeaders": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-type": "set",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "ExposeHeaders indicates which HTTP response headers can be exposed to client-side scripts in response to a cross-origin request.\n\nA CORS-safelisted response header is an HTTP header in a CORS response that it is considered safe to expose to the client scripts. The CORS-safelisted response headers include the following headers: `Cache-Control` `Content-Language` `Content-Length` `Content-Type` `Expires` `Last-Modified` `Pragma` (See https://fetch.spec.whatwg.org/#cors-safelisted-response-header-name) The CORS-safelisted response headers are exposed to client by default.\n\nWhen an HTTP header name is specified using the `ExposeHeaders` field, this additional header will be exposed as part of the response to the client.\n\nHeader names are not case sensitive.\n\nMultiple header names in the value of the `Access-Control-Expose-Headers` response header are separated by a comma (\",\").\n\nA wildcard indicates that the responses with all HTTP headers are exposed to clients. The `Access-Control-Expose-Headers` response header can only use `*` wildcard as value when the `AllowCredentials` field is unspecified.\n\nSupport: Extended",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: "",
+										Type:    []string{"string"},
+										Format:  "",
+									},
+								},
+							},
+						},
+					},
+					"maxAge": {
+						SchemaProps: spec.SchemaProps{
+							Description: "MaxAge indicates the duration (in seconds) for the client to cache the results of a \"preflight\" request.\n\nThe information provided by the `Access-Control-Allow-Methods` and `Access-Control-Allow-Headers` response headers can be cached by the client until the time specified by `Access-Control-Max-Age` elapses.\n\nThe default value of `Access-Control-Max-Age` response header is 5 (seconds).",
+							Type:        []string{"integer"},
+							Format:      "int32",
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
 func schema_sigsk8sio_gateway_api_apis_v1_HTTPHeader(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -4228,7 +4375,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPHeader(ref common.ReferenceCallbac
 				Properties: map[string]spec.Schema{
 					"name": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Name is the name of the HTTP Header to be matched. Name matching MUST be case insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).\n\nIf multiple entries specify equivalent header names, the first entry with an equivalent name MUST be considered for a match. Subsequent entries with an equivalent header name MUST be ignored. Due to the case-insensitivity of header names, \"foo\" and \"Foo\" are considered equivalent.",
+							Description: "Name is the name of the HTTP Header to be matched. Name matching MUST be case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).\n\nIf multiple entries specify equivalent header names, the first entry with an equivalent name MUST be considered for a match. Subsequent entries with an equivalent header name MUST be ignored. Due to the case-insensitivity of header names, \"foo\" and \"Foo\" are considered equivalent.",
 							Default:     "",
 							Type:        []string{"string"},
 							Format:      "",
@@ -4344,7 +4491,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPHeaderMatch(ref common.ReferenceCa
 					},
 					"name": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Name is the name of the HTTP Header to be matched. Name matching MUST be case insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).\n\nIf multiple entries specify equivalent header names, only the first entry with an equivalent name MUST be considered for a match. Subsequent entries with an equivalent header name MUST be ignored. Due to the case-insensitivity of header names, \"foo\" and \"Foo\" are considered equivalent.\n\nWhen a header is repeated in an HTTP request, it is implementation-specific behavior as to how this is represented. Generally, proxies should follow the guidance from the RFC: https://www.rfc-editor.org/rfc/rfc7230.html#section-3.2.2 regarding processing a repeated header, with special handling for \"Set-Cookie\".",
+							Description: "Name is the name of the HTTP Header to be matched. Name matching MUST be case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).\n\nIf multiple entries specify equivalent header names, only the first entry with an equivalent name MUST be considered for a match. Subsequent entries with an equivalent header name MUST be ignored. Due to the case-insensitivity of header names, \"foo\" and \"Foo\" are considered equivalent.\n\nWhen a header is repeated in an HTTP request, it is implementation-specific behavior as to how this is represented. Generally, proxies should follow the guidance from the RFC: https://www.rfc-editor.org/rfc/rfc7230.html#section-3.2.2 regarding processing a repeated header, with special handling for \"Set-Cookie\".",
 							Default:     "",
 							Type:        []string{"string"},
 							Format:      "",
@@ -4481,14 +4628,14 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRequestMirrorFilter(ref common.Ref
 					},
 					"percent": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Percent represents the percentage of requests that should be mirrored to BackendRef. Its minimum value is 0 (indicating 0% of requests) and its maximum value is 100 (indicating 100% of requests).\n\nOnly one of Fraction or Percent may be specified. If neither field is specified, 100% of requests will be mirrored.\n\n<gateway:experimental>",
+							Description: "Percent represents the percentage of requests that should be mirrored to BackendRef. Its minimum value is 0 (indicating 0% of requests) and its maximum value is 100 (indicating 100% of requests).\n\nOnly one of Fraction or Percent may be specified. If neither field is specified, 100% of requests will be mirrored.",
 							Type:        []string{"integer"},
 							Format:      "int32",
 						},
 					},
 					"fraction": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Fraction represents the fraction of requests that should be mirrored to BackendRef.\n\nOnly one of Fraction or Percent may be specified. If neither field is specified, 100% of requests will be mirrored.\n\n<gateway:experimental>",
+							Description: "Fraction represents the fraction of requests that should be mirrored to BackendRef.\n\nOnly one of Fraction or Percent may be specified. If neither field is specified, 100% of requests will be mirrored.",
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.Fraction"),
 						},
 					},
@@ -4629,7 +4776,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteFilter(ref common.ReferenceCa
 					},
 					"requestMirror": {
 						SchemaProps: spec.SchemaProps{
-							Description: "RequestMirror defines a schema for a filter that mirrors requests. Requests are sent to the specified destination, but responses from that destination are ignored.\n\nThis filter can be used multiple times within the same rule. Note that not all implementations will be able to support mirroring to multiple backends.\n\nSupport: Extended\n\n\n<gateway:experimental:validation:XValidation:message=\"Only one of percent or fraction may be specified in HTTPRequestMirrorFilter\",rule=\"!(has(self.percent) && has(self.fraction))\">",
+							Description: "RequestMirror defines a schema for a filter that mirrors requests. Requests are sent to the specified destination, but responses from that destination are ignored.\n\nThis filter can be used multiple times within the same rule. Note that not all implementations will be able to support mirroring to multiple backends.\n\nSupport: Extended",
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.HTTPRequestMirrorFilter"),
 						},
 					},
@@ -4645,6 +4792,12 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteFilter(ref common.ReferenceCa
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.HTTPURLRewriteFilter"),
 						},
 					},
+					"cors": {
+						SchemaProps: spec.SchemaProps{
+							Description: "CORS defines a schema for a filter that responds to the cross-origin request based on HTTP response header.\n\nSupport: Extended\n\n<gateway:experimental>",
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.HTTPCORSFilter"),
+						},
+					},
 					"extensionRef": {
 						SchemaProps: spec.SchemaProps{
 							Description: "ExtensionRef is an optional, implementation-specific extension to the \"filter\" behavior.  For example, resource \"myroutefilter\" in group \"networking.example.net\"). ExtensionRef MUST NOT be used for core and extended filters.\n\nThis filter can be used multiple times within the same rule.\n\nSupport: Implementation-specific",
@@ -4656,7 +4809,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteFilter(ref common.ReferenceCa
 			},
 		},
 		Dependencies: []string{
-			"sigs.k8s.io/gateway-api/apis/v1.HTTPHeaderFilter", "sigs.k8s.io/gateway-api/apis/v1.HTTPRequestMirrorFilter", "sigs.k8s.io/gateway-api/apis/v1.HTTPRequestRedirectFilter", "sigs.k8s.io/gateway-api/apis/v1.HTTPURLRewriteFilter", "sigs.k8s.io/gateway-api/apis/v1.LocalObjectReference"},
+			"sigs.k8s.io/gateway-api/apis/v1.HTTPCORSFilter", "sigs.k8s.io/gateway-api/apis/v1.HTTPHeaderFilter", "sigs.k8s.io/gateway-api/apis/v1.HTTPRequestMirrorFilter", "sigs.k8s.io/gateway-api/apis/v1.HTTPRequestRedirectFilter", "sigs.k8s.io/gateway-api/apis/v1.HTTPURLRewriteFilter", "sigs.k8s.io/gateway-api/apis/v1.LocalObjectReference"},
 	}
 }
 
@@ -4853,7 +5006,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteRule(ref common.ReferenceCall
 					},
 					"filters": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Filters define the filters that are applied to requests that match this rule.\n\nWherever possible, implementations SHOULD implement filters in the order they are specified.\n\nImplementations MAY choose to implement this ordering strictly, rejecting any combination or order of filters that can not be supported. If implementations choose a strict interpretation of filter ordering, they MUST clearly document that behavior.\n\nTo reject an invalid combination or order of filters, implementations SHOULD consider the Route Rules with this configuration invalid. If all Route Rules in a Route are invalid, the entire Route would be considered invalid. If only a portion of Route Rules are invalid, implementations MUST set the \"PartiallyInvalid\" condition for the Route.\n\nConformance-levels at this level are defined based on the type of filter:\n\n- ALL core filters MUST be supported by all implementations. - Implementers are encouraged to support extended filters. - Implementation-specific custom filters have no API guarantees across\n  implementations.\n\nSpecifying the same filter multiple times is not supported unless explicitly indicated in the filter.\n\nAll filters are expected to be compatible with each other except for the URLRewrite and RequestRedirect filters, which may not be combined. If an implementation can not support other combinations of filters, they must clearly document that limitation. In cases where incompatible or unsupported filters are specified and cause the `Accepted` condition to be set to status `False`, implementations may use the `IncompatibleFilters` reason to specify this configuration error.\n\nSupport: Core",
+							Description: "Filters define the filters that are applied to requests that match this rule.\n\nWherever possible, implementations SHOULD implement filters in the order they are specified.\n\nImplementations MAY choose to implement this ordering strictly, rejecting any combination or order of filters that cannot be supported. If implementations choose a strict interpretation of filter ordering, they MUST clearly document that behavior.\n\nTo reject an invalid combination or order of filters, implementations SHOULD consider the Route Rules with this configuration invalid. If all Route Rules in a Route are invalid, the entire Route would be considered invalid. If only a portion of Route Rules are invalid, implementations MUST set the \"PartiallyInvalid\" condition for the Route.\n\nConformance-levels at this level are defined based on the type of filter:\n\n- ALL core filters MUST be supported by all implementations. - Implementers are encouraged to support extended filters. - Implementation-specific custom filters have no API guarantees across\n  implementations.\n\nSpecifying the same filter multiple times is not supported unless explicitly indicated in the filter.\n\nAll filters are expected to be compatible with each other except for the URLRewrite and RequestRedirect filters, which may not be combined. If an implementation cannot support other combinations of filters, they must clearly document that limitation. In cases where incompatible or unsupported filters are specified and cause the `Accepted` condition to be set to status `False`, implementations may use the `IncompatibleFilters` reason to specify this configuration error.\n\nSupport: Core",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -5065,7 +5218,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_Listener(ref common.ReferenceCallback)
 					},
 					"hostname": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Hostname specifies the virtual hostname to match for protocol types that define this concept. When unspecified, all hostnames are matched. This field is ignored for protocols that don't require hostname based matching.\n\nImplementations MUST apply Hostname matching appropriately for each of the following protocols:\n\n* TLS: The Listener Hostname MUST match the SNI. * HTTP: The Listener Hostname MUST match the Host header of the request. * HTTPS: The Listener Hostname SHOULD match at both the TLS and HTTP\n  protocol layers as described above. If an implementation does not\n  ensure that both the SNI and Host header match the Listener hostname,\n  it MUST clearly document that.\n\nFor HTTPRoute and TLSRoute resources, there is an interaction with the `spec.hostnames` array. When both listener and route specify hostnames, there MUST be an intersection between the values for a Route to be accepted. For more information, refer to the Route specific Hostnames documentation.\n\nHostnames that are prefixed with a wildcard label (`*.`) are interpreted as a suffix match. That means that a match for `*.example.com` would match both `test.example.com`, and `foo.test.example.com`, but not `example.com`.\n\nSupport: Core",
+							Description: "Hostname specifies the virtual hostname to match for protocol types that define this concept. When unspecified, all hostnames are matched. This field is ignored for protocols that don't require hostname based matching.\n\nImplementations MUST apply Hostname matching appropriately for each of the following protocols:\n\n* TLS: The Listener Hostname MUST match the SNI. * HTTP: The Listener Hostname MUST match the Host header of the request. * HTTPS: The Listener Hostname SHOULD match both the SNI and Host header.\n  Note that this does not require the SNI and Host header to be the same.\n  The semantics of this are described in more detail below.\n\nTo ensure security, Section 11.1 of RFC-6066 emphasizes that server implementations that rely on SNI hostname matching MUST also verify hostnames within the application protocol.\n\nSection 9.1.2 of RFC-7540 provides a mechanism for servers to reject the reuse of a connection by responding with the HTTP 421 Misdirected Request status code. This indicates that the origin server has rejected the request because it appears to have been misdirected.\n\nTo detect misdirected requests, Gateways SHOULD match the authority of the requests with all the SNI hostname(s) configured across all the Gateway Listeners on the same port and protocol:\n\n* If another Listener has an exact match or more specific wildcard entry,\n  the Gateway SHOULD return a 421.\n* If the current Listener (selected by SNI matching during ClientHello)\n  does not match the Host:\n    * If another Listener does match the Host the Gateway SHOULD return a\n      421.\n    * If no other Listener matches the Host, the Gateway MUST return a\n      404.\n\nFor HTTPRoute and TLSRoute resources, there is an interaction with the `spec.hostnames` array. When both listener and route specify hostnames, there MUST be an intersection between the values for a Route to be accepted. For more information, refer to the Route specific Hostnames documentation.\n\nHostnames that are prefixed with a wildcard label (`*.`) are interpreted as a suffix match. That means that a match for `*.example.com` would match both `test.example.com`, and `foo.test.example.com`, but not `example.com`.\n\nSupport: Core",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -5104,6 +5257,34 @@ func schema_sigsk8sio_gateway_api_apis_v1_Listener(ref common.ReferenceCallback)
 		},
 		Dependencies: []string{
 			"sigs.k8s.io/gateway-api/apis/v1.AllowedRoutes", "sigs.k8s.io/gateway-api/apis/v1.GatewayTLSConfig"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apis_v1_ListenerNamespaces(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ListenerNamespaces indicate which namespaces ListenerSets should be selected from.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"from": {
+						SchemaProps: spec.SchemaProps{
+							Description: "From indicates where ListenerSets can attach to this Gateway. Possible values are:\n\n* Same: Only ListenerSets in the same namespace may be attached to this Gateway. * Selector: ListenerSets in namespaces selected by the selector may be attached to this Gateway. * All: ListenerSets in all namespaces may be attached to this Gateway. * None: Only listeners defined in the Gateway's spec are allowed\n\nWhile this feature is experimental, the default value None",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"selector": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Selector must be specified when From is set to \"Selector\". In that case, only ListenerSets in Namespaces matching this Selector will be selected by this Gateway. This field is ignored for other values of \"From\".",
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelector"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelector"},
 	}
 }
 
@@ -5260,7 +5441,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_ObjectReference(ref common.ReferenceCa
 				Properties: map[string]spec.Schema{
 					"group": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Group is the group of the referent. For example, \"gateway.networking.k8s.io\". When unspecified or empty string, core API group is inferred.",
+							Description: "Group is the group of the referent. For example, \"gateway.networking.k8s.io\". When set to the empty string, core API group is inferred.",
 							Default:     "",
 							Type:        []string{"string"},
 							Format:      "",
@@ -5402,8 +5583,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_RouteGroupKind(ref common.ReferenceCal
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "RouteGroupKind indicates the group and kind of a Route resource.",
-				Type:        []string{"object"},
+				Type: []string{"object"},
 				Properties: map[string]spec.Schema{
 					"group": {
 						SchemaProps: spec.SchemaProps{
@@ -5487,7 +5667,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_RouteParentStatus(ref common.Reference
 							},
 						},
 						SchemaProps: spec.SchemaProps{
-							Description: "Conditions describes the status of the route with respect to the Gateway. Note that the route's availability is also subject to the Gateway's own status conditions and listener status.\n\nIf the Route's ParentRef specifies an existing Gateway that supports Routes of this kind AND that Gateway's controller has sufficient access, then that Gateway's controller MUST set the \"Accepted\" condition on the Route, to indicate whether the route has been accepted or rejected by the Gateway, and why.\n\nA Route MUST be considered \"Accepted\" if at least one of the Route's rules is implemented by the Gateway.\n\nThere are a number of cases where the \"Accepted\" condition may not be set due to lack of controller visibility, that includes when:\n\n* The Route refers to a non-existent parent. * The Route is of a type that the controller does not support. * The Route is in a namespace the controller does not have access to.",
+							Description: "Conditions describes the status of the route with respect to the Gateway. Note that the route's availability is also subject to the Gateway's own status conditions and listener status.\n\nIf the Route's ParentRef specifies an existing Gateway that supports Routes of this kind AND that Gateway's controller has sufficient access, then that Gateway's controller MUST set the \"Accepted\" condition on the Route, to indicate whether the route has been accepted or rejected by the Gateway, and why.\n\nA Route MUST be considered \"Accepted\" if at least one of the Route's rules is implemented by the Gateway.\n\nThere are a number of cases where the \"Accepted\" condition may not be set due to lack of controller visibility, that includes when:\n\n* The Route refers to a nonexistent parent. * The Route is of a type that the controller does not support. * The Route is in a namespace the controller does not have access to.",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -5585,8 +5765,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_SessionPersistence(ref common.Referenc
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "SessionPersistence defines the desired state of SessionPersistence.",
-				Type:        []string{"object"},
+				Type: []string{"object"},
 				Properties: map[string]spec.Schema{
 					"sessionName": {
 						SchemaProps: spec.SchemaProps{
@@ -5916,8 +6095,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_LocalPolicyTargetReference(ref c
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "LocalPolicyTargetReference identifies an API object to apply a direct or inherited policy to. This should be used as part of Policy resources that can target Gateway API resources. For more information on how this policy attachment model works, and a sample Policy resource, refer to the policy attachment documentation for Gateway API.",
-				Type:        []string{"object"},
+				Type: []string{"object"},
 				Properties: map[string]spec.Schema{
 					"group": {
 						SchemaProps: spec.SchemaProps{
@@ -6097,8 +6275,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_PolicyStatus(ref common.Referenc
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "PolicyStatus defines the common attributes that all Policies should include within their status.",
-				Type:        []string{"object"},
+				Type: []string{"object"},
 				Properties: map[string]spec.Schema{
 					"ancestors": {
 						SchemaProps: spec.SchemaProps{
@@ -6329,7 +6506,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_TCPRouteRule(ref common.Referenc
 					},
 					"backendRefs": {
 						SchemaProps: spec.SchemaProps{
-							Description: "BackendRefs defines the backend(s) where matching requests should be sent. If unspecified or invalid (refers to a non-existent resource or a Service with no endpoints), the underlying implementation MUST actively reject connection attempts to this backend. Connection rejections must respect weight; if an invalid backend is requested to have 80% of connections, then 80% of connections must be rejected instead.\n\nSupport: Core for Kubernetes Service\n\nSupport: Extended for Kubernetes ServiceImport\n\nSupport: Implementation-specific for any other resource\n\nSupport for weight: Extended",
+							Description: "BackendRefs defines the backend(s) where matching requests should be sent. If unspecified or invalid (refers to a nonexistent resource or a Service with no endpoints), the underlying implementation MUST actively reject connection attempts to this backend. Connection rejections must respect weight; if an invalid backend is requested to have 80% of connections, then 80% of connections must be rejected instead.\n\nSupport: Core for Kubernetes Service\n\nSupport: Extended for Kubernetes ServiceImport\n\nSupport: Implementation-specific for any other resource\n\nSupport for weight: Extended",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -6538,7 +6715,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_TLSRouteRule(ref common.Referenc
 					},
 					"backendRefs": {
 						SchemaProps: spec.SchemaProps{
-							Description: "BackendRefs defines the backend(s) where matching requests should be sent. If unspecified or invalid (refers to a non-existent resource or a Service with no endpoints), the rule performs no forwarding; if no filters are specified that would result in a response being sent, the underlying implementation must actively reject request attempts to this backend, by rejecting the connection or returning a 500 status code. Request rejections must respect weight; if an invalid backend is requested to have 80% of requests, then 80% of requests must be rejected instead.\n\nSupport: Core for Kubernetes Service\n\nSupport: Extended for Kubernetes ServiceImport\n\nSupport: Implementation-specific for any other resource\n\nSupport for weight: Extended",
+							Description: "BackendRefs defines the backend(s) where matching requests should be sent. If unspecified or invalid (refers to a nonexistent resource or a Service with no endpoints), the rule performs no forwarding; if no filters are specified that would result in a response being sent, the underlying implementation must actively reject request attempts to this backend, by rejecting the connection or returning a 500 status code. Request rejections must respect weight; if an invalid backend is requested to have 80% of requests, then 80% of requests must be rejected instead.\n\nSupport: Core for Kubernetes Service\n\nSupport: Extended for Kubernetes ServiceImport\n\nSupport: Implementation-specific for any other resource\n\nSupport for weight: Extended",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -6762,7 +6939,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_UDPRouteRule(ref common.Referenc
 					},
 					"backendRefs": {
 						SchemaProps: spec.SchemaProps{
-							Description: "BackendRefs defines the backend(s) where matching requests should be sent. If unspecified or invalid (refers to a non-existent resource or a Service with no endpoints), the underlying implementation MUST actively reject connection attempts to this backend. Packet drops must respect weight; if an invalid backend is requested to have 80% of the packets, then 80% of packets must be dropped instead.\n\nSupport: Core for Kubernetes Service\n\nSupport: Extended for Kubernetes ServiceImport\n\nSupport: Implementation-specific for any other resource\n\nSupport for weight: Extended",
+							Description: "BackendRefs defines the backend(s) where matching requests should be sent. If unspecified or invalid (refers to a nonexistent resource or a Service with no endpoints), the underlying implementation MUST actively reject connection attempts to this backend. Packet drops must respect weight; if an invalid backend is requested to have 80% of the packets, then 80% of packets must be dropped instead.\n\nSupport: Core for Kubernetes Service\n\nSupport: Extended for Kubernetes ServiceImport\n\nSupport: Implementation-specific for any other resource\n\nSupport for weight: Extended",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -7017,7 +7194,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha3_BackendTLSPolicyValidation(ref c
 				Properties: map[string]spec.Schema{
 					"caCertificateRefs": {
 						SchemaProps: spec.SchemaProps{
-							Description: "CACertificateRefs contains one or more references to Kubernetes objects that contain a PEM-encoded TLS CA certificate bundle, which is used to validate a TLS handshake between the Gateway and backend Pod.\n\nIf CACertificateRefs is empty or unspecified, then WellKnownCACertificates must be specified. Only one of CACertificateRefs or WellKnownCACertificates may be specified, not both. If CACertifcateRefs is empty or unspecified, the configuration for WellKnownCACertificates MUST be honored instead if supported by the implementation.\n\nReferences to a resource in a different namespace are invalid for the moment, although we will revisit this in the future.\n\nA single CACertificateRef to a Kubernetes ConfigMap kind has \"Core\" support. Implementations MAY choose to support attaching multiple certificates to a backend, but this behavior is implementation-specific.\n\nSupport: Core - An optional single reference to a Kubernetes ConfigMap, with the CA certificate in a key named `ca.crt`.\n\nSupport: Implementation-specific (More than one reference, or other kinds of resources).",
+							Description: "CACertificateRefs contains one or more references to Kubernetes objects that contain a PEM-encoded TLS CA certificate bundle, which is used to validate a TLS handshake between the Gateway and backend Pod.\n\nIf CACertificateRefs is empty or unspecified, then WellKnownCACertificates must be specified. Only one of CACertificateRefs or WellKnownCACertificates may be specified, not both. If CACertificateRefs is empty or unspecified, the configuration for WellKnownCACertificates MUST be honored instead if supported by the implementation.\n\nReferences to a resource in a different namespace are invalid for the moment, although we will revisit this in the future.\n\nA single CACertificateRef to a Kubernetes ConfigMap kind has \"Core\" support. Implementations MAY choose to support attaching multiple certificates to a backend, but this behavior is implementation-specific.\n\nSupport: Core - An optional single reference to a Kubernetes ConfigMap, with the CA certificate in a key named `ca.crt`.\n\nSupport: Implementation-specific (More than one reference, or other kinds of resources).",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -7038,7 +7215,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha3_BackendTLSPolicyValidation(ref c
 					},
 					"hostname": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Hostname is used for two purposes in the connection between Gateways and backends:\n\n1. Hostname MUST be used as the SNI to connect to the backend (RFC 6066). 2. If SubjectAltNames is not specified, Hostname MUST be used for\n   authentication and MUST match the certificate served by the matching\n   backend.\n\nSupport: Core",
+							Description: "Hostname is used for two purposes in the connection between Gateways and backends:\n\n1. Hostname MUST be used as the SNI to connect to the backend (RFC 6066). 2. Hostname MUST be used for authentication and MUST match the certificate served by the matching backend, unless SubjectAltNames is specified.\n   authentication and MUST match the certificate served by the matching\n   backend.\n\nSupport: Core",
 							Default:     "",
 							Type:        []string{"string"},
 							Format:      "",
@@ -7046,7 +7223,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha3_BackendTLSPolicyValidation(ref c
 					},
 					"subjectAltNames": {
 						SchemaProps: spec.SchemaProps{
-							Description: "SubjectAltNames contains one or more Subject Alternative Names. When specified, the certificate served from the backend MUST have at least one Subject Alternate Name matching one of the specified SubjectAltNames.\n\nSupport: Core",
+							Description: "SubjectAltNames contains one or more Subject Alternative Names. When specified the certificate served from the backend MUST have at least one Subject Alternate Name matching one of the specified SubjectAltNames.\n\nSupport: Extended",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -7607,5 +7784,595 @@ func schema_sigsk8sio_gateway_api_apis_v1beta1_ReferenceGrantTo(ref common.Refer
 				Required: []string{"group", "kind"},
 			},
 		},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendTrafficPolicy(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "BackendTrafficPolicy defines the configuration for how traffic to a target backend should be handled.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+						},
+					},
+					"spec": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Spec defines the desired state of BackendTrafficPolicy.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendTrafficPolicySpec"),
+						},
+					},
+					"status": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Status defines the current state of BackendTrafficPolicy.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1alpha2.PolicyStatus"),
+						},
+					},
+				},
+				Required: []string{"spec"},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta", "sigs.k8s.io/gateway-api/apis/v1alpha2.PolicyStatus", "sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendTrafficPolicySpec"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendTrafficPolicyList(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "BackendTrafficPolicyList contains a list of BackendTrafficPolicies",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
+						},
+					},
+					"items": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendTrafficPolicy"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"items"},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta", "sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendTrafficPolicy"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendTrafficPolicySpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "BackendTrafficPolicySpec define the desired state of BackendTrafficPolicy Note: there is no Override or Default policy configuration.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"targetRefs": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-map-keys": []interface{}{
+									"group",
+									"kind",
+									"name",
+								},
+								"x-kubernetes-list-type": "map",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "TargetRefs identifies API object(s) to apply this policy to. Currently, Backends (A grouping of like endpoints such as Service, ServiceImport, or any implementation-specific backendRef) are the only valid API target references.\n\nCurrently, a TargetRef can not be scoped to a specific port on a Service.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1alpha2.LocalPolicyTargetReference"),
+									},
+								},
+							},
+						},
+					},
+					"retryConstraint": {
+						SchemaProps: spec.SchemaProps{
+							Description: "RetryConstraint defines the configuration for when to allow or prevent further retries to a target backend, by dynamically calculating a 'retry budget'. This budget is calculated based on the percentage of incoming traffic composed of retries over a given time interval. Once the budget is exceeded, additional retries will be rejected.\n\nFor example, if the retry budget interval is 10 seconds, there have been 1000 active requests in the past 10 seconds, and the allowed percentage of requests that can be retried is 20% (the default), then 200 of those requests may be composed of retries. Active requests will only be considered for the duration of the interval when calculating the retry budget. Retrying the same original request multiple times within the retry budget interval will lead to each retry being counted towards calculating the budget.\n\nConfiguring a RetryConstraint in BackendTrafficPolicy is compatible with HTTPRoute Retry settings for each HTTPRouteRule that targets the same backend. While the HTTPRouteRule Retry stanza can specify whether a request will be retried, and the number of retry attempts each client may perform, RetryConstraint helps prevent cascading failures such as retry storms during periods of consistent failures.\n\nAfter the retry budget has been exceeded, additional retries to the backend MUST return a 503 response to the client.\n\nAdditional configurations for defining a constraint on retries MAY be defined in the future.\n\nSupport: Extended\n\n<gateway:experimental>",
+							Ref:         ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.RetryConstraint"),
+						},
+					},
+					"sessionPersistence": {
+						SchemaProps: spec.SchemaProps{
+							Description: "SessionPersistence defines and configures session persistence for the backend.\n\nSupport: Extended",
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.SessionPersistence"),
+						},
+					},
+				},
+				Required: []string{"targetRefs"},
+			},
+		},
+		Dependencies: []string{
+			"sigs.k8s.io/gateway-api/apis/v1.SessionPersistence", "sigs.k8s.io/gateway-api/apis/v1alpha2.LocalPolicyTargetReference", "sigs.k8s.io/gateway-api/apisx/v1alpha1.RetryConstraint"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerEntry(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Type: []string{"object"},
+				Properties: map[string]spec.Schema{
+					"name": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Name is the name of the Listener. This name MUST be unique within a ListenerSet.\n\nName is not required to be unique across a Gateway and ListenerSets. Routes can attach to a Listener by having a ListenerSet as a parentRef and setting the SectionName",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"hostname": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Hostname specifies the virtual hostname to match for protocol types that define this concept. When unspecified, all hostnames are matched. This field is ignored for protocols that don't require hostname based matching.\n\nImplementations MUST apply Hostname matching appropriately for each of the following protocols:\n\n* TLS: The Listener Hostname MUST match the SNI. * HTTP: The Listener Hostname MUST match the Host header of the request. * HTTPS: The Listener Hostname SHOULD match at both the TLS and HTTP\n  protocol layers as described above. If an implementation does not\n  ensure that both the SNI and Host header match the Listener hostname,\n  it MUST clearly document that.\n\nFor HTTPRoute and TLSRoute resources, there is an interaction with the `spec.hostnames` array. When both listener and route specify hostnames, there MUST be an intersection between the values for a Route to be accepted. For more information, refer to the Route specific Hostnames documentation.\n\nHostnames that are prefixed with a wildcard label (`*.`) are interpreted as a suffix match. That means that a match for `*.example.com` would match both `test.example.com`, and `foo.test.example.com`, but not `example.com`.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"port": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Port is the network port. Multiple listeners may use the same port, subject to the Listener compatibility rules.",
+							Type:        []string{"integer"},
+							Format:      "int32",
+						},
+					},
+					"protocol": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Protocol specifies the network protocol this listener expects to receive.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"tls": {
+						SchemaProps: spec.SchemaProps{
+							Description: "TLS is the TLS configuration for the Listener. This field is required if the Protocol field is \"HTTPS\" or \"TLS\". It is invalid to set this field if the Protocol field is \"HTTP\", \"TCP\", or \"UDP\".\n\nThe association of SNIs to Certificate defined in GatewayTLSConfig is defined based on the Hostname field for this listener.\n\nThe GatewayClass MUST use the longest matching SNI out of all available certificates for any TLS handshake.",
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.GatewayTLSConfig"),
+						},
+					},
+					"allowedRoutes": {
+						SchemaProps: spec.SchemaProps{
+							Description: "AllowedRoutes defines the types of routes that MAY be attached to a Listener and the trusted namespaces where those Route resources MAY be present.\n\nAlthough a client request may match multiple route rules, only one rule may ultimately receive the request. Matching precedence MUST be determined in order of the following criteria:\n\n* The most specific match as defined by the Route type. * The oldest Route based on creation timestamp. For example, a Route with\n  a creation timestamp of \"2020-09-08 01:02:03\" is given precedence over\n  a Route with a creation timestamp of \"2020-09-08 01:02:04\".\n* If everything else is equivalent, the Route appearing first in\n  alphabetical order (namespace/name) should be given precedence. For\n  example, foo/bar is given precedence over foo/baz.\n\nAll valid rules within a Route attached to this Listener should be implemented. Invalid Route rules can be ignored (sometimes that will mean the full Route). If a Route rule transitions from valid to invalid, support for that Route rule should be dropped to ensure consistency. For example, even if a filter specified by a Route rule is invalid, the rest of the rules within that Route should still be supported.",
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.AllowedRoutes"),
+						},
+					},
+				},
+				Required: []string{"name", "protocol"},
+			},
+		},
+		Dependencies: []string{
+			"sigs.k8s.io/gateway-api/apis/v1.AllowedRoutes", "sigs.k8s.io/gateway-api/apis/v1.GatewayTLSConfig"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerEntryStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ListenerStatus is the status associated with a Listener.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"name": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Name is the name of the Listener that this status corresponds to.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"port": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Port is the network port the listener is configured to listen on.",
+							Default:     0,
+							Type:        []string{"integer"},
+							Format:      "int32",
+						},
+					},
+					"supportedKinds": {
+						SchemaProps: spec.SchemaProps{
+							Description: "SupportedKinds is the list indicating the Kinds supported by this listener. This MUST represent the kinds an implementation supports for that Listener configuration.\n\nIf kinds are specified in Spec that are not supported, they MUST NOT appear in this list and an implementation MUST set the \"ResolvedRefs\" condition to \"False\" with the \"InvalidRouteKinds\" reason. If both valid and invalid Route kinds are specified, the implementation MUST reference the valid Route kinds that have been specified.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.RouteGroupKind"),
+									},
+								},
+							},
+						},
+					},
+					"attachedRoutes": {
+						SchemaProps: spec.SchemaProps{
+							Description: "AttachedRoutes represents the total number of Routes that have been successfully attached to this Listener.\n\nSuccessful attachment of a Route to a Listener is based solely on the combination of the AllowedRoutes field on the corresponding Listener and the Route's ParentRefs field. A Route is successfully attached to a Listener when it is selected by the Listener's AllowedRoutes field AND the Route has a valid ParentRef selecting the whole Gateway resource or a specific Listener as a parent resource (more detail on attachment semantics can be found in the documentation on the various Route kinds ParentRefs fields). Listener or Route status does not impact successful attachment, i.e. the AttachedRoutes field count MUST be set for Listeners with condition Accepted: false and MUST count successfully attached Routes that may themselves have Accepted: false conditions.\n\nUses for this field include troubleshooting Route attachment and measuring blast radius/impact of changes to a Listener.",
+							Default:     0,
+							Type:        []string{"integer"},
+							Format:      "int32",
+						},
+					},
+					"conditions": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-map-keys": []interface{}{
+									"type",
+								},
+								"x-kubernetes-list-type": "map",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "Conditions describe the current condition of this listener.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.Condition"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"name", "port", "supportedKinds", "attachedRoutes", "conditions"},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/apis/meta/v1.Condition", "sigs.k8s.io/gateway-api/apis/v1.RouteGroupKind"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerSet(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ListenerSet defines a set of additional listeners to attach to an existing Gateway.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+						},
+					},
+					"spec": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Spec defines the desired state of ListenerSet.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.ListenerSetSpec"),
+						},
+					},
+					"status": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Status defines the current state of ListenerSet.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.ListenerSetStatus"),
+						},
+					},
+				},
+				Required: []string{"spec"},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta", "sigs.k8s.io/gateway-api/apisx/v1alpha1.ListenerSetSpec", "sigs.k8s.io/gateway-api/apisx/v1alpha1.ListenerSetStatus"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerSetList(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Type: []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
+						},
+					},
+					"items": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.ListenerSet"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"items"},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta", "sigs.k8s.io/gateway-api/apisx/v1alpha1.ListenerSet"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerSetSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ListenerSetSpec defines the desired state of a ListenerSet.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"parentRef": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ParentRef references the Gateway that the listeners are attached to.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.ParentGatewayReference"),
+						},
+					},
+					"listeners": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-map-keys": []interface{}{
+									"name",
+								},
+								"x-kubernetes-list-type": "map",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "Listeners associated with this ListenerSet. Listeners define logical endpoints that are bound on this referenced parent Gateway's addresses.\n\nListeners in a `Gateway` and their attached `ListenerSets` are concatenated as a list when programming the underlying infrastructure. Each listener name does not need to be unique across the Gateway and ListenerSets. See ListenerEntry.Name for more details.\n\nImplementations MUST treat the parent Gateway as having the merged list of all listeners from itself and attached ListenerSets using the following precedence:\n\n1. \"parent\" Gateway 2. ListenerSet ordered by creation time (oldest first) 3. ListenerSet ordered alphabetically by “{namespace}/{name}”.\n\nAn implementation MAY reject listeners by setting the ListenerEntryStatus `Accepted`` condition to False with the Reason `TooManyListeners`\n\nIf a listener has a conflict, this will be reported in the Status.ListenerEntryStatus setting the `Conflicted` condition to True.\n\nImplementations SHOULD be cautious about what information from the parent or siblings are reported to avoid accidentally leaking sensitive information that the child would not otherwise have access to. This can include contents of secrets etc.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.ListenerEntry"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"parentRef", "listeners"},
+			},
+		},
+		Dependencies: []string{
+			"sigs.k8s.io/gateway-api/apisx/v1alpha1.ListenerEntry", "sigs.k8s.io/gateway-api/apisx/v1alpha1.ParentGatewayReference"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerSetStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Type: []string{"object"},
+				Properties: map[string]spec.Schema{
+					"conditions": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-map-keys": []interface{}{
+									"type",
+								},
+								"x-kubernetes-list-type": "map",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "Conditions describe the current conditions of the ListenerSet.\n\nImplementations MUST express ListenerSet conditions using the `ListenerSetConditionType` and `ListenerSetConditionReason` constants so that operators and tools can converge on a common vocabulary to describe ListenerSet state.\n\nKnown condition types are:\n\n* \"Accepted\" * \"Programmed\"",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.Condition"),
+									},
+								},
+							},
+						},
+					},
+					"listeners": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-map-keys": []interface{}{
+									"name",
+								},
+								"x-kubernetes-list-type": "map",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "Listeners provide status for each unique listener port defined in the Spec.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.ListenerEntryStatus"),
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/apis/meta/v1.Condition", "sigs.k8s.io/gateway-api/apisx/v1alpha1.ListenerEntryStatus"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_ParentGatewayReference(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ParentGatewayReference identifies an API object including its namespace, defaulting to Gateway.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"group": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Group is the group of the referent.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is kind of the referent. For example \"Gateway\".",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"name": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Name is the name of the referent.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"namespace": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Namespace is the namespace of the referent.  If not present, the namespace of the referent is assumed to be the same as the namespace of the referring object.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"name"},
+			},
+		},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_RequestRate(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "RequestRate expresses a rate of requests over a given period of time.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"count": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Count specifies the number of requests per time interval.\n\nSupport: Extended",
+							Type:        []string{"integer"},
+							Format:      "int32",
+						},
+					},
+					"interval": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Interval specifies the divisor of the rate of requests, the amount of time during which the given count of requests occur.\n\nSupport: Extended",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_RetryConstraint(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "RetryConstraint defines the configuration for when to retry a request.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"budgetPercent": {
+						SchemaProps: spec.SchemaProps{
+							Description: "BudgetPercent defines the maximum percentage of active requests that may be made up of retries.\n\nSupport: Extended",
+							Type:        []string{"integer"},
+							Format:      "int32",
+						},
+					},
+					"budgetInterval": {
+						SchemaProps: spec.SchemaProps{
+							Description: "BudgetInterval defines the duration in which requests will be considered for calculating the budget for retries.\n\nSupport: Extended",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"minRetryRate": {
+						SchemaProps: spec.SchemaProps{
+							Description: "MinRetryRate defines the minimum rate of retries that will be allowable over a specified duration of time.\n\nThe effective overall minimum rate of retries targeting the backend service may be much higher, as there can be any number of clients which are applying this setting locally.\n\nThis ensures that requests can still be retried during periods of low traffic, where the budget for retries may be calculated as a very low value.\n\nSupport: Extended",
+							Ref:         ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.RequestRate"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"sigs.k8s.io/gateway-api/apisx/v1alpha1.RequestRate"},
 	}
 }

@@ -52,7 +52,7 @@ The following fields and all associated documentation will be removed:
 - HTTPRouteMatch.ExtensionRef
 - TCPRouteMatch.ExtensionRef will be removed. This results in a struct without
   any members: TCPRouteMatch. The struct will be kept as it is expected that
-  more match criterias might be added to L4 routes.
+  more match criteria might be added to L4 routes.
 
   - Do the same to UDPRoute and TLSRoute
 

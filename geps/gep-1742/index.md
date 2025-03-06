@@ -3,7 +3,7 @@
 * Issue: [#1742](https://github.com/kubernetes-sigs/gateway-api/issues/1742)
 * Status: Standard
 
-(See status definitions [here](overview.md#status).)
+(See [status definitions](../overview.md#gep-states).)
 
 ## TLDR
 
@@ -372,7 +372,7 @@ Both timeout fields are [GEP-2257 Duration] values. A zero-valued timeout
 ("0s") MUST be interpreted as disabling the timeout; a non-zero-valued timeout
 MUST be >= 1ms.
 
-[GEP-2257 Duration]:/geps/gep-2257/
+[GEP-2257 Duration]:../gep-2257/index.md
 
 ### GO
 
@@ -476,7 +476,7 @@ Timeouts could be configured using policy attachments or in objects other than `
 
 Instead of configuring timeouts directly on an API object, they could be configured using policy
 attachments. The advantage to this approach would be that timeout policies can be not only
-configured for an `HTTPRouteRule`, but can also be added/overriden at a more fine
+configured for an `HTTPRouteRule`, but can also be added/overridden at a more fine
 (e.g., `HTTPBackendRef`) or coarse (e.g. `HTTPRoute`) level of granularity.
 
 The downside, however, is complexity introduced for the most common use case, adding a simple
@@ -506,4 +506,4 @@ previous section, is likely a better way to handle timeout configuration above t
 
 ## References
 
-[GEP-2257]:/geps/gep-2257/
+[GEP-2257]:../gep-2257/index.md

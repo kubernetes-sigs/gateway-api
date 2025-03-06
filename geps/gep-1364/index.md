@@ -42,7 +42,7 @@ these changes.
 
 The constants that mark the deprecated types will be also marked as deprecated,
 and will no longer be tested as part of conformance. They'll still be present,
-and will work, but they won't be part of the spec any more. This should give
+and will work, but they won't be part of the spec anymore. This should give
 implementations and users a release to transition to the new design (in UX terms).
 This grace period should be one release (so, the constants will be removed in
 v0.7.0.)
@@ -323,13 +323,13 @@ Note that some classes of inter-resource reference failure do _not_ cause a reso
 to become unattached and stop being accepted (that is, to have the `Accepted`
 condition set to `status: false`).
 
-* Non-existent Service backends - if the backend does not exist on a HTTPRoute that
+* Nonexistent Service backends - if the backend does not exist on a HTTPRoute that
 is otherwise okay, then the data plane must generate 500s for traffic that matches
 that HTTPRoute. In this case, the `Accepted` Condition must be true, and the
 `ResolvedRefs` Condition must be false, with reasons and messages indicating that
 the backend services do not exist.
 * HTTPRoutes with *all* backends in other namespaces, but not permitted by ReferenceGrants.
-In this case, the "non-existent service backends" rules apply, and 500s must be
+In this case, the "nonexistent service backends" rules apply, and 500s must be
 generated. In this case, again, the `Accepted` condition is true, and the
 `ResolvedRefs` Condition is false, with reasons and messages indicating that the
 backend services are not reachable.
@@ -359,21 +359,21 @@ Examples of Conditions:
 
 * HTTPRoute with one match with one backend that is valid. `Accepted` is true,
 `ResolvedRefs` is true.
-* HTTPRoute with one match with one backend that is a non-existent Service backend.
+* HTTPRoute with one match with one backend that is a nonexistent Service backend.
 The `Accepted` Condition is true, the `ResolvedRefs` condition is false, with
 a reason of `BackendNotFound`. `Accepted` is true in this case because the data
 path must respond to requests that would be sent to that backend with a 500 response.
-* HTTPRoute with one match with two backends, one of which is a non-existent Service
+* HTTPRoute with one match with two backends, one of which is a nonexistent Service
 backend. The `Accepted` Condition is true, the `ResolvedRefs` condition is false.
 `Accepted` is true in this case because the data path must respond to a percentage
-of the requests matching the rule corresponding to the weighting of the non-existent
+of the requests matching the rule corresponding to the weighting of the nonexistent
 backend (which would be fifty percent unless weights are applied).
 * HTTPRoute with one match with one backend that is in a different namespace, and
 does _not_ have a ReferenceGrant permitting that access. The `Accepted` condition
 is true, and the `ResolvedRefs` Condition is false, with a reason of `RefNotPermitted`.
 As before, `Accepted` is true because in this case, the data path must be
 programmed with 500s for the match.
-* TCPRoute with one match with a backend that is a non-existent Service. `Accepted`
+* TCPRoute with one match with a backend that is a nonexistent Service. `Accepted`
 is false, and `ResolvedRefs` is false. `Accepted` is false in this case because
 there is not enough information to program any rules to handle the traffic in the
 underlying data plane - TCP doesn't have a way to say "this is a valid destination
@@ -418,7 +418,7 @@ For many implementations (certainly for Envoy-based ones), getting this informat
 correctly and avoiding races on applying it is surprisingly difficult. 
 
 For this reason, this GEP proposes that we exclude the `Ready` condition from Core
-conformance, and make it a feature that implementations may opt in to - making it
+conformance, and make it a feature that implementations may opt into - making it
 an Extended condition.
 
 It will have the following behavior:
@@ -456,4 +456,4 @@ needs updating.)
 [1362]: https://github.com/kubernetes-sigs/gateway-api/issues/1362
 
 [typstatus]: https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#typical-status-properties
-[httpreqredirect]: https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io%2fv1beta1.HTTPRequestRedirectFilter
+[httpreqredirect]: ../../reference/spec.md#gateway.networking.k8s.io%2fv1beta1.HTTPRequestRedirectFilter

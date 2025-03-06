@@ -7,7 +7,7 @@
     Although this GEP serves as a reference for how we developed the Gateway API
     versioning model, it is not meant to be the current source of truth.
     Instead, please refer to our [official Versioning
-    Policy](/concepts/versioning) for the most up-to-date guidelines.
+    Policy](../../concepts/versioning.md) for the most up-to-date guidelines.
 
 ## TLDR
 Each Gateway API release will be represented by a bundle version that represents
@@ -51,7 +51,7 @@ and/or removing old ones as part of a new bundle.
 ## Limitations of Webhook and CRD Validation
 CRD and webhook validation is not the final validation i.e. webhook is “nice UX”
 but not schema enforcement. This validation is intended to provide immediate
-feedback to users when they provide an invalid configuration, but can not
+feedback to users when they provide an invalid configuration, but cannot
 completely be relied on because it:
 
 * Is not guaranteed to be present or up to date in all clusters.

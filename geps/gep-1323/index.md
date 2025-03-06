@@ -7,7 +7,7 @@
 > our GEP overview as it existed before those rules did, and so it has been
 > explicitly grandfathered in.
 
-[expprob]:https://gateway-api.sigs.k8s.io/geps/overview/#probationary-period
+[expprob]:../overview.md#probationary-period
 
 ## TLDR
 Similar to how we have `RequestHeaderModifier` in `HTTPRouteFilter`, which lets users modify request headers before the request is forwarded to a backend (or a group of backends), it’d be helpful to have a `ResponseHeaderModifier` field which would let users modify response headers before they are returned to the client.
@@ -60,7 +60,7 @@ type HTTPHeaderModifier struct {
 
 Given the fact that this functionality is offered by only a few projects that currently implement Gateway API when using their own traffic routing CRDs, it’s better to support `ResponseHeaderModifier` as an _Extended_ feature, unlike `RequestHeaderModifier` which is a _Core_ feature. This will also not increase the difficulty of implementing Gateway API for any future ingress or service mesh.
 
-This feature can be further extended via [Policy Attachment](../reference/policy-attachment.md). The mechanism and use cases of this may be explored in a future GEP.
+This feature can be further extended via [Policy Attachment](../../reference/policy-attachment.md). The mechanism and use cases of this may be explored in a future GEP.
 
 ## Usage
 Adding support for this unlocks a lot of real world use cases. Let’s review a couple of them:

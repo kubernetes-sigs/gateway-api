@@ -38,11 +38,11 @@ non-technical.
 The simplest way to get started is to attend one of the regular Gateway API
 [meetings].
 
-[north/south traffic]:/concepts/glossary#northsouth-traffic
-[service mesh]:/concepts/glossary#service-mesh
-[east/west traffic]:/concepts/glossary#eastwest-traffic
-[role-oriented]:/concepts/roles-and-personas
-[geps]:/geps/overview
-[contributor-ladder]:/contributing/contributor-ladder
+[north/south traffic]:../concepts/glossary.md#northsouth-traffic
+[service mesh]:../concepts/glossary.md#service-mesh
+[east/west traffic]:../concepts/glossary.md#eastwest-traffic
+[role-oriented]:../concepts/roles-and-personas.md
+[geps]:../geps/overview.md
+[contributor-ladder]:../contributing/contributor-ladder.md
 [meetings]:/contributing/community/#meetings
 [GAMMA leads]:https://github.com/kubernetes-sigs/gateway-api/blob/main/OWNERS_ALIASES#L23

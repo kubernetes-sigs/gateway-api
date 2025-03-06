@@ -3,7 +3,7 @@
 * Issue: [#1731](https://github.com/kubernetes-sigs/gateway-api/issues/1731)
 * Status: Experimental
 
-(See status definitions [here](/geps/overview/#gep-states).)
+(See [status definitions](../overview.md#gep-states).)
 
 ## TLDR
 
@@ -14,7 +14,7 @@ To allow configuration of a Gateway to retry unsuccessful requests to backends b
 * To allow specification of [HTTP status codes](https://www.rfc-editor.org/rfc/rfc9110#name-overview-of-status-codes) for which a request should be retried.
 * To allow specification of the maximum number of times to retry a request.
 * To allow specification of the minimum backoff interval between retry attempts.
-* To define any interaction with configured HTTPRoute [timeouts](/geps/gep-1742/).
+* To define any interaction with configured HTTPRoute [timeouts](../gep-1742/index.md).
 * Retry configuration must be applicable to most known Gateway API implementations.
 
 ## Future Goals
@@ -272,7 +272,7 @@ type HTTPRouteRetry struct {
     // <gateway:experimental>
     Codes []HTTPRouteRetryStatusCode `json:"codes,omitempty"`
 
-    // Attempts specifies the maxmimum number of times an individual request
+    // Attempts specifies the maximum number of times an individual request
     // from the gateway to a backend should be retried.
     //
     // If the maximum number of retries has been attempted without a successful
@@ -354,7 +354,7 @@ type HTTPRouteRetry struct {
 // +kubebuilder:validation:Maximum:=999
 type HTTPRouteRetryStatusCode int
 
-// Duration is a string value representing a duration in time. The foramat is
+// Duration is a string value representing a duration in time. The format is
 // as specified in GEP-2257, a strict subset of the syntax parsed by Golang
 // time.ParseDuration.
 //
@@ -391,21 +391,21 @@ Basic support for configuring retries in HTTPRoute up to a specified maximum cou
 
 Retrying requests based on HTTP status codes will be gated under the following features:
 
-* `SupportHTTPRRouteRetryBackendTimeout`
+* `SupportHTTPRouteRetryBackendTimeout`
 
   * Will test that backend requests that exceed a BackendRequest timeout duration are retried if a `retry` stanza is configured.
 
-* `SupportHTTPRRouteRetryBackoff`
+* `SupportHTTPRouteRetryBackoff`
 
   * Backoff will only be tested that a retry does not start before the duration specified for conformance, not that the backoff duration is precise.
   * Not currently supportable by NGINX or HAProxy.
 
-* `SupportHTTPRRouteRetryCodes`
+* `SupportHTTPRouteRetryCodes`
 
   * Only 500, 502, 503 and 504 will be tested for conformance.
   * Traefik does not seem to support specifying error codes, and will only retry on backend timeouts.
 
-* `SupportHTTPRRouteRetryConnectionError`
+* `SupportHTTPRouteRetryConnectionError`
 
   * Will test that connections interrupted by a TCP failure, disconnect or reset are retried if a `retry` stanza is configured.
 
@@ -417,9 +417,9 @@ This may be a reasonable approach for configuring broad default retry policies, 
 
 ### HTTPRoute filter
 
-Implementing a `requestRetryPolicy` [HTTPRouteFilter](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.HTTPRouteFilter) type is likely a reasonable alternative implementation (with the downside of slightly deeping nesting and more complex structural configuration) that was not fully explored.
+Implementing a `requestRetryPolicy` [HTTPRouteFilter](../../reference/spec.md#gateway.networking.k8s.io/v1.HTTPRouteFilter) type is likely a reasonable alternative implementation (with the downside of slightly deeping nesting and more complex structural configuration) that was not fully explored.
 
-Adding a new field to HTTPRouteRule instead is proposed for parity with the similar and intersecting configuration of [HTTPRouteTimeouts](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.HTTPRouteTimeouts).
+Adding a new field to HTTPRouteRule instead is proposed for parity with the similar and intersecting configuration of [HTTPRouteTimeouts](../../reference/spec.md#gateway.networking.k8s.io/v1.HTTPRouteTimeouts).
 
 ## Other considerations
 
@@ -433,7 +433,7 @@ Retrying on connection errors (disconnect, reset, timeout, TCP failure) is typic
 
 ### Should whether to retry on a backend timeout be configurable?
 
-On Kubernetes, retrying should _typically_ route a backend request to a different pod if the original destination has become unhealthy and therefore should generally be safe. Even if a [BackendLBPolicy](https://gateway-api.sigs.k8s.io/geps/gep-1619/) is configured, most dataplane implementations implement "soft" affinity rather than strict session routing. The warnings against this practice in NGINX and HAProxy documentation seem to reference risks with legacy deployment models using a small number of statically-defined servers. We could consider adding something like a `excludeRetryOnTimeout` boolean field (implementable by NGINX and HAProxy, not by Envoy) in the future if this behavior is desirable, while still retaining the retry-on-timeout behavior as a default.
+On Kubernetes, retrying should _typically_ route a backend request to a different pod if the original destination has become unhealthy and therefore should generally be safe. Even if a [BackendLBPolicy](../gep-1619/index.md) is configured, most dataplane implementations implement "soft" affinity rather than strict session routing. The warnings against this practice in NGINX and HAProxy documentation seem to reference risks with legacy deployment models using a small number of statically-defined servers. We could consider adding something like a `excludeRetryOnTimeout` boolean field (implementable by NGINX and HAProxy, not by Envoy) in the future if this behavior is desirable, while still retaining the retry-on-timeout behavior as a default.
 
 ## References
 

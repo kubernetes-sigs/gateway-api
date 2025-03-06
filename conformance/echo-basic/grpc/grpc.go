@@ -55,7 +55,7 @@ type serverConfig struct {
 	// Controlled by TLS_SERVER_PRIVKEY env var
 	TLSServerPrivKey string
 
-	// Controlled by HTPPS_PORT env var
+	// Controlled by HTTPS_PORT env var
 	HTTPSPort int
 }
 

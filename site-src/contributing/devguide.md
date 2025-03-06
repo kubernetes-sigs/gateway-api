@@ -82,7 +82,7 @@ ensuring the field name will not be reused.
 
 ### Deploy the Code
 
-Use the following command to deploy CRDs to the pre-existing `Kind` cluster.
+Use the following command to deploy CRDs to the preexisting `Kind` cluster.
 
 ```shell
 make crd
@@ -96,8 +96,8 @@ kubectl get crds
 
 ### Test Manually
 
-Install a [gateway API implementation](https://gateway-api.sigs.k8s.io/implementations/) and test out the change. Take a look at some 
-examples [here](https://gateway-api.sigs.k8s.io/guides/).
+Install a [gateway API implementation](../implementations.md) and test out the change. Take a look at some
+[examples](../guides/index.md).
 
 ### Verify
 
@@ -132,7 +132,7 @@ The site documentation is written in Markdown and compiled with
 [mkdocs](https://www.mkdocs.org/). Each PR will automatically include a
 [Netlify](https://netlify.com/) deploy preview. When new code merges, it will
 automatically be deployed with Netlify to
-[gateway-api.sigs.k8s.io](https://gateway-api.sigs.k8s.io). If you want to
+[gateway-api.sigs.k8s.io](). If you want to
 manually preview docs changes locally, you can install mkdocs and run:
 
 ```shell
@@ -155,9 +155,9 @@ INFO    -  Building documentation...
 ```
 
 For more information on how documentation should be written, refer to our
-[Documentation Style Guide](/contributing/style-guide).
+[Documentation Style Guide](style-guide.md).
 
 ### Conformance Tests
 
 To develop or run conformance tests, refer to the [Conformance Test
-Documentation](/concepts/conformance/#running-tests).
+Documentation](../concepts/conformance.md#running-tests).

@@ -15,21 +15,21 @@ This testing plan specifies a new set of tests to define a "Mesh" [conformance p
 
 ## Focus
 
-Currently the GAMMA spec consists of two Gateway API GEPs [defining terminology and goals of Gateway API for service meshes](https://gateway-api.sigs.k8s.io/geps/gep-1324/)
-and specifically [how route resources work in a service mesh context](https://gateway-api.sigs.k8s.io/geps/gep-1426/).
+Currently the GAMMA spec consists of two Gateway API GEPs [defining terminology and goals of Gateway API for service meshes](../gep-1324/index.md)
+and specifically [how route resources work in a service mesh context](/geps/gep-1426/).
 The goal of the initial conformance testing is to check the essential behavior as defined by GEP-1426, as it differs from the wider Gateway API spec. This GEP focuses on using a `Service` object as an `xRoute` `parentRef` to control how the GAMMA implementation directs traffic to the endpoints specified by the `Services` in `backendRefs` and how the traffic is filtered and modified.
 
 ## Conformance Profile
 
-GAMMA intends to introduce a "Mesh" [conformance profile](https://gateway-api.sigs.k8s.io/geps/gep-1709/) to isolate tests specific to East/West functionality from both existing tests focused on North/South functionality and common Gateway API functionality shared by N/S and E/W implementations. A conformance profile is a set of tests that implementations can run to check their conformance to some subset of the Gateway API spec.
+GAMMA intends to introduce a "Mesh" [conformance profile](../gep-1709/index.md) to isolate tests specific to East/West functionality from both existing tests focused on North/South functionality and common Gateway API functionality shared by N/S and E/W implementations. A conformance profile is a set of tests that implementations can run to check their conformance to some subset of the Gateway API spec.
 
-This appropach will enable service meshes to certify that an implementation follows the GAMMA spec without requiring a North/South implementation, and importantly avoid any expectation that North/South Gateway API implementations expand their scope to understand GAMMA and E/W traffic flows.
+This approach will enable service meshes to certify that an implementation follows the GAMMA spec without requiring a North/South implementation, and importantly avoid any expectation that North/South Gateway API implementations expand their scope to understand GAMMA and E/W traffic flows.
 
-Leveraging existing tests for common functionality between N/S and E/W implementations will both ensure consistency across Gateway API implementations and help limit the maintence burden for the conformance testing suite.
+Leveraging existing tests for common functionality between N/S and E/W implementations will both ensure consistency across Gateway API implementations and help limit the maintenance burden for the conformance testing suite.
 
 ### Support Levels
 
-Using a conformance profile will enable granular conformance definitions for GAMMA, splitting functionality along the existing Gateway API [support levels](https://gateway-api.sigs.k8s.io/concepts/conformance/?h=conformance+levels#2-support-levels), with required functionality as Core, standardized but optional functionality as Extended, and Implementation-specific for things beyond the current or intended scope of GAMMA configuration. It is expected that some capabilities will begin as Implementation-specific and eventually migrate to Extended or Core conformance as GAMMA matures.
+Using a conformance profile will enable granular conformance definitions for GAMMA, splitting functionality along the existing Gateway API [support levels](../../concepts/conformance.md?h=conformance+levels#2-support-levels), with required functionality as Core, standardized but optional functionality as Extended, and Implementation-specific for things beyond the current or intended scope of GAMMA configuration. It is expected that some capabilities will begin as Implementation-specific and eventually migrate to Extended or Core conformance as GAMMA matures.
 
 ## Tests
 
@@ -80,7 +80,7 @@ producer).
   - Assert that traffic from a client in a different `Namespace` is routed by the
     `HTTPRoute`
 
-A consumer `HTTPRoute` is in the same `Namespace` as the the request sender (the
+A consumer `HTTPRoute` is in the same `Namespace` as the request sender (the
 consumer), a different `Namespace` as the `parentRef` `Service`.
 
 - Given a consumer `HTTPRoute`

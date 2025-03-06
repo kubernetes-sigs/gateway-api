@@ -13,5 +13,5 @@ A "Policy Attachment" is a specific type of _metaresource_ that can affect speci
 settings across either one object (this is "Direct Policy Attachment"), or objects
 in a hierarchy (this is "Inherited Policy Attachment").
 
-This pattern is EXPERIMENTAL, and is described in [GEP-713](/geps/gep-713/).
+This pattern is EXPERIMENTAL, and is described in [GEP-713](../geps/gep-713/index.md).
 Please see that document for technical details.

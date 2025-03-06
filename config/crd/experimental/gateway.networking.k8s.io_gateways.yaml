@@ -133,6 +133,87 @@ spec:
                 - message: Hostname values must be unique
                   rule: 'self.all(a1, a1.type == ''Hostname'' ? self.exists_one(a2,
                     a2.type == a1.type && a2.value == a1.value) : true )'
+              allowedListeners:
+                description: |-
+                  AllowedListeners defines which ListenerSets can be attached to this Gateway.
+                  While this feature is experimental, the default value is to allow no ListenerSets.
+                properties:
+                  namespaces:
+                    default:
+                      from: None
+                    description: |-
+                      Namespaces defines which namespaces ListenerSets can be attached to this Gateway.
+                      While this feature is experimental, the default value is to allow no ListenerSets.
+                    properties:
+                      from:
+                        default: None
+                        description: |-
+                          From indicates where ListenerSets can attach to this Gateway. Possible
+                          values are:
+
+                          * Same: Only ListenerSets in the same namespace may be attached to this Gateway.
+                          * Selector: ListenerSets in namespaces selected by the selector may be attached to this Gateway.
+                          * All: ListenerSets in all namespaces may be attached to this Gateway.
+                          * None: Only listeners defined in the Gateway's spec are allowed
+
+                          While this feature is experimental, the default value None
+                        enum:
+                        - All
+                        - Selector
+                        - Same
+                        - None
+                        type: string
+                      selector:
+                        description: |-
+                          Selector must be specified when From is set to "Selector". In that case,
+                          only ListenerSets in Namespaces matching this Selector will be selected by this
+                          Gateway. This field is ignored for other values of "From".
+                        properties:
+                          matchExpressions:
+                            description: matchExpressions is a list of label selector
+                              requirements. The requirements are ANDed.
+                            items:
+                              description: |-
+                                A label selector requirement is a selector that contains values, a key, and an operator that
+                                relates the key and values.
+                              properties:
+                                key:
+                                  description: key is the label key that the selector
+                                    applies to.
+                                  type: string
+                                operator:
+                                  description: |-
+                                    operator represents a key's relationship to a set of values.
+                                    Valid operators are In, NotIn, Exists and DoesNotExist.
+                                  type: string
+                                values:
+                                  description: |-
+                                    values is an array of string values. If the operator is In or NotIn,
+                                    the values array must be non-empty. If the operator is Exists or DoesNotExist,
+                                    the values array must be empty. This array is replaced during a strategic
+                                    merge patch.
+                                  items:
+                                    type: string
+                                  type: array
+                                  x-kubernetes-list-type: atomic
+                              required:
+                              - key
+                              - operator
+                              type: object
+                            type: array
+                            x-kubernetes-list-type: atomic
+                          matchLabels:
+                            additionalProperties:
+                              type: string
+                            description: |-
+                              matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+                              map is equivalent to an element of matchExpressions, whose key field is "key", the
+                              operator is "In", and the values array contains only "value". The requirements are ANDed.
+                            type: object
+                        type: object
+                        x-kubernetes-map-type: atomic
+                    type: object
+                type: object
               backendTLS:
                 description: |-
                   BackendTLS configures TLS settings for when this Gateway is connecting to
@@ -480,6 +561,8 @@ spec:
                   Implementations MAY merge separate Gateways onto a single set of
                   Addresses if all Listeners across all Gateways are compatible.
 
+                  In a future release the MinItems=1 requirement MAY be dropped.
+
                   Support: Core
                 items:
                   description: |-
@@ -575,6 +658,7 @@ spec:
                               - All
                               - Selector
                               - Same
+                              - None
                               type: string
                             selector:
                               description: |-
@@ -641,10 +725,31 @@ spec:
 
                         * TLS: The Listener Hostname MUST match the SNI.
                         * HTTP: The Listener Hostname MUST match the Host header of the request.
-                        * HTTPS: The Listener Hostname SHOULD match at both the TLS and HTTP
-                          protocol layers as described above. If an implementation does not
-                          ensure that both the SNI and Host header match the Listener hostname,
-                          it MUST clearly document that.
+                        * HTTPS: The Listener Hostname SHOULD match both the SNI and Host header.
+                          Note that this does not require the SNI and Host header to be the same.
+                          The semantics of this are described in more detail below.
+
+                        To ensure security, Section 11.1 of RFC-6066 emphasizes that server
+                        implementations that rely on SNI hostname matching MUST also verify
+                        hostnames within the application protocol.
+
+                        Section 9.1.2 of RFC-7540 provides a mechanism for servers to reject the
+                        reuse of a connection by responding with the HTTP 421 Misdirected Request
+                        status code. This indicates that the origin server has rejected the
+                        request because it appears to have been misdirected.
+
+                        To detect misdirected requests, Gateways SHOULD match the authority of
+                        the requests with all the SNI hostname(s) configured across all the
+                        Gateway Listeners on the same port and protocol:
+
+                        * If another Listener has an exact match or more specific wildcard entry,
+                          the Gateway SHOULD return a 421.
+                        * If the current Listener (selected by SNI matching during ClientHello)
+                          does not match the Host:
+                            * If another Listener does match the Host the Gateway SHOULD return a
+                              421.
+                            * If no other Listener matches the Host, the Gateway MUST return a
+                              404.
 
                         For HTTPRoute and TLSRoute resources, there is an interaction with the
                         `spec.hostnames` array. When both listener and route specify hostnames,
@@ -830,7 +935,7 @@ spec:
                                   group:
                                     description: |-
                                       Group is the group of the referent. For example, "gateway.networking.k8s.io".
-                                      When unspecified or empty string, core API group is inferred.
+                                      When set to the empty string, core API group is inferred.
                                     maxLength: 253
                                     pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                                     type: string
@@ -1367,6 +1472,87 @@ spec:
                 - message: Hostname values must be unique
                   rule: 'self.all(a1, a1.type == ''Hostname'' ? self.exists_one(a2,
                     a2.type == a1.type && a2.value == a1.value) : true )'
+              allowedListeners:
+                description: |-
+                  AllowedListeners defines which ListenerSets can be attached to this Gateway.
+                  While this feature is experimental, the default value is to allow no ListenerSets.
+                properties:
+                  namespaces:
+                    default:
+                      from: None
+                    description: |-
+                      Namespaces defines which namespaces ListenerSets can be attached to this Gateway.
+                      While this feature is experimental, the default value is to allow no ListenerSets.
+                    properties:
+                      from:
+                        default: None
+                        description: |-
+                          From indicates where ListenerSets can attach to this Gateway. Possible
+                          values are:
+
+                          * Same: Only ListenerSets in the same namespace may be attached to this Gateway.
+                          * Selector: ListenerSets in namespaces selected by the selector may be attached to this Gateway.
+                          * All: ListenerSets in all namespaces may be attached to this Gateway.
+                          * None: Only listeners defined in the Gateway's spec are allowed
+
+                          While this feature is experimental, the default value None
+                        enum:
+                        - All
+                        - Selector
+                        - Same
+                        - None
+                        type: string
+                      selector:
+                        description: |-
+                          Selector must be specified when From is set to "Selector". In that case,
+                          only ListenerSets in Namespaces matching this Selector will be selected by this
+                          Gateway. This field is ignored for other values of "From".
+                        properties:
+                          matchExpressions:
+                            description: matchExpressions is a list of label selector
+                              requirements. The requirements are ANDed.
+                            items:
+                              description: |-
+                                A label selector requirement is a selector that contains values, a key, and an operator that
+                                relates the key and values.
+                              properties:
+                                key:
+                                  description: key is the label key that the selector
+                                    applies to.
+                                  type: string
+                                operator:
+                                  description: |-
+                                    operator represents a key's relationship to a set of values.
+                                    Valid operators are In, NotIn, Exists and DoesNotExist.
+                                  type: string
+                                values:
+                                  description: |-
+                                    values is an array of string values. If the operator is In or NotIn,
+                                    the values array must be non-empty. If the operator is Exists or DoesNotExist,
+                                    the values array must be empty. This array is replaced during a strategic
+                                    merge patch.
+                                  items:
+                                    type: string
+                                  type: array
+                                  x-kubernetes-list-type: atomic
+                              required:
+                              - key
+                              - operator
+                              type: object
+                            type: array
+                            x-kubernetes-list-type: atomic
+                          matchLabels:
+                            additionalProperties:
+                              type: string
+                            description: |-
+                              matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+                              map is equivalent to an element of matchExpressions, whose key field is "key", the
+                              operator is "In", and the values array contains only "value". The requirements are ANDed.
+                            type: object
+                        type: object
+                        x-kubernetes-map-type: atomic
+                    type: object
+                type: object
               backendTLS:
                 description: |-
                   BackendTLS configures TLS settings for when this Gateway is connecting to
@@ -1714,6 +1900,8 @@ spec:
                   Implementations MAY merge separate Gateways onto a single set of
                   Addresses if all Listeners across all Gateways are compatible.
 
+                  In a future release the MinItems=1 requirement MAY be dropped.
+
                   Support: Core
                 items:
                   description: |-
@@ -1809,6 +1997,7 @@ spec:
                               - All
                               - Selector
                               - Same
+                              - None
                               type: string
                             selector:
                               description: |-
@@ -1875,10 +2064,31 @@ spec:
 
                         * TLS: The Listener Hostname MUST match the SNI.
                         * HTTP: The Listener Hostname MUST match the Host header of the request.
-                        * HTTPS: The Listener Hostname SHOULD match at both the TLS and HTTP
-                          protocol layers as described above. If an implementation does not
-                          ensure that both the SNI and Host header match the Listener hostname,
-                          it MUST clearly document that.
+                        * HTTPS: The Listener Hostname SHOULD match both the SNI and Host header.
+                          Note that this does not require the SNI and Host header to be the same.
+                          The semantics of this are described in more detail below.
+
+                        To ensure security, Section 11.1 of RFC-6066 emphasizes that server
+                        implementations that rely on SNI hostname matching MUST also verify
+                        hostnames within the application protocol.
+
+                        Section 9.1.2 of RFC-7540 provides a mechanism for servers to reject the
+                        reuse of a connection by responding with the HTTP 421 Misdirected Request
+                        status code. This indicates that the origin server has rejected the
+                        request because it appears to have been misdirected.
+
+                        To detect misdirected requests, Gateways SHOULD match the authority of
+                        the requests with all the SNI hostname(s) configured across all the
+                        Gateway Listeners on the same port and protocol:
+
+                        * If another Listener has an exact match or more specific wildcard entry,
+                          the Gateway SHOULD return a 421.
+                        * If the current Listener (selected by SNI matching during ClientHello)
+                          does not match the Host:
+                            * If another Listener does match the Host the Gateway SHOULD return a
+                              421.
+                            * If no other Listener matches the Host, the Gateway MUST return a
+                              404.
 
                         For HTTPRoute and TLSRoute resources, there is an interaction with the
                         `spec.hostnames` array. When both listener and route specify hostnames,
@@ -2064,7 +2274,7 @@ spec:
                                   group:
                                     description: |-
                                       Group is the group of the referent. For example, "gateway.networking.k8s.io".
-                                      When unspecified or empty string, core API group is inferred.
+                                      When set to the empty string, core API group is inferred.
                                     maxLength: 253
                                     pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                                     type: string

@@ -3,7 +3,7 @@
 * Issue: [#1494](https://github.com/kubernetes-sigs/gateway-api/issues/1494)
 * Status: Provisional
 
-(See status definitions [here](/geps/overview/#gep-states).)
+(See [status definitions](../overview.md#gep-states).)
 
 
 ## TLDR
@@ -13,7 +13,7 @@ Provide a method for configuring **Gateway API implementations** to add HTTP Aut
 
 ## Goals
 
-(Using the [Gateway API Personas](https://gateway-api.sigs.k8s.io/concepts/roles-and-personas/))
+(Using the [Gateway API Personas](../../concepts/roles-and-personas.md))
 
 * A way for Ana the Application Developer to configure a Gateway API implementation to perform Authentication (at least), with optional Authorization.
 
@@ -21,7 +21,7 @@ Provide a method for configuring **Gateway API implementations** to add HTTP Aut
 
 ## Stretch Goals
 
-* Optionally, a way for Ana to have the ability to disable Authentication and/or Authorization for specific routes when needed, allowing certain routes to not be protected. This would probably need to work something like a default enabling at Gateway level, that can be specifically set at lower levels, but further design is TBD. This goal comes from the relatively-common desire for Chihiro to be able to set reasonably-secure defaults, and for Ana or others to be able to _disable_ for specific paths for purposes of healthchecking. The fact that this is relatively undefined is why this goal is _optional_.
+* Optionally, a way for Ana to have the ability to disable Authentication and/or Authorization for specific routes when needed, allowing certain routes to not be protected. This would probably need to work something like a default enabling at Gateway level, that can be specifically set at lower levels, but further design is TBD. This goal comes from the relatively-common desire for Chihiro to be able to set reasonably-secure defaults, and for Ana or others to be able to _disable_ for specific paths for purposes of health checks. The fact that this is relatively undefined is why this goal is _optional_.
 
 
 ## Non-Goals
@@ -70,7 +70,7 @@ In this case, the server also authenticates the client, based on the certificate
 
 TLS v1.3 is defined in [RFC-8446](https://datatracker.ietf.org/doc/html/rfc8446), with v1.2 defined in [RFC-5246](https://datatracker.ietf.org/doc/html/rfc5246). Earlier versions of TLS (v1.1 and v1.0) were deprecated in [RFC-8996](https://datatracker.ietf.org/doc/html/rfc8996) and should no longer be used.
 
-Gateway API already has some work in progress to handle this for straightforward use cases, in [GEP-91](https://gateway-api.sigs.k8s.io/geps/gep-91/).
+Gateway API already has some work in progress to handle this for straightforward use cases, in [GEP-91](../gep-91/index.md).
 
 #### JWT
 
@@ -89,7 +89,7 @@ JWT is defined in [RFC-75199](https://datatracker.ietf.org/doc/html/rfc7519).
 
 Oauth2 is an _authorization framework_, which allows clients and servers to define ways to perform authentication and authorization in as secure a way as possible. It extensively uses TLS for encryption, and involves a third-party handling the authorization handshake with a client, which the third-party then provides to the server.
 
-Open ID Conect (OIDC) is a protocol based on the OAuth 2 framework, that allows Users to talk to Identity Providers (IDPs), on behalf of a Relying Party (RP), and have the IDP give the user an Identity Token (which the User's browser can then provide as Authentication to the Relying Party), and also allows the RP to request Claims about the User, which can be used for Authorization.
+Open ID Connect (OIDC) is a protocol based on the OAuth 2 framework, that allows Users to talk to Identity Providers (IDPs), on behalf of a Relying Party (RP), and have the IDP give the user an Identity Token (which the User's browser can then provide as Authentication to the Relying Party), and also allows the RP to request Claims about the User, which can be used for Authorization.
 
 Usually, the Identity Token is delivered using JWT, although that is not required.
 
@@ -147,7 +147,7 @@ Every feature should:
 
 ### Conformance tests 
 
-Conformance tests file names should try to follow the the `pascal-case-name.go` format.
+Conformance tests file names should try to follow the `pascal-case-name.go` format.
 For example for `HTTPRoutePortRedirect` - the test file would be `httproute-port-redirect.go`.
 Treat this guidance as "best effort" because we might have test files that check the combination of several features and can't follow the same format.
 In any case, the conformance tests file names should be meaningful and easy to understand.

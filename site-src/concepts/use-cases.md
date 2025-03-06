@@ -13,20 +13,21 @@ these roles might be filled by the same person, especially in smaller
 organizations, they all have distinct concerns that we need to consider
 separately.)
 
-[roles and personas]:/concepts/roles-and-personas
-[Ana]:/concepts/roles-and-personas#ana
-[Chihiro]:/concepts/roles-and-personas#chihiro
-[Ian]:/concepts/roles-and-personas#ian
+[roles and personas]:roles-and-personas.md
+[Ana]:roles-and-personas.md#ana
+[Chihiro]:roles-and-personas.md#chihiro
+[Ian]:roles-and-personas.md#ian
 
 ## The Use Cases
 
-- [Basic north/south use case](#basic-northsouth-use-case)
-- [Multiple applications behind a single
-  Gateway](#multiple-applications-behind-a-single-gateway)
-- [Basic east/west use case](#basic-eastwest-use-case) -- **experimental**
-- [Gateway and mesh use case](#gateway-and-mesh-use-case) -- **experimental**
+- [Use Cases](#use-cases)
+  - [The Use Cases](#the-use-cases)
+  - [Basic north/south use case](#basic-northsouth-use-case)
+  - [Multiple applications behind a single Gateway](#multiple-applications-behind-a-single-gateway)
+  - [Basic east/west use case](#basic-eastwest-use-case)
+  - [Gateway and mesh use case](#gateway-and-mesh-use-case)
 
-[role and personas]:/concepts/roles-and-personas
+[role and personas]:roles-and-personas.md
 
 ## Basic [north/south] use case
 
@@ -34,7 +35,7 @@ separately.)
 
     The [north/south] use case is fully supported by the Standard Channel
     since `v0.8.0`. For more information on release
-    channels, refer to our [versioning guide](/concepts/versioning).
+    channels, refer to our [versioning guide](versioning.md).
 
 Ana has created a microservice application which she wants to run in
 Kubernetes. Her application will be used by clients outside the cluster, and
@@ -80,12 +81,12 @@ wheelhouse.
     to Ana's application according to her routing specification.
 
 This allows Chihiro to enforce centralized policies [such as
-TLS](/guides/tls#downstream-tls) at the Gateway, while simultaneously allowing
+TLS](../guides/tls.md#downstream-tls) at the Gateway, while simultaneously allowing
 Ana and her colleagues control over the application's [routing
-logic](/guides/http-routing) and rollout plans (e.g. [traffic splitting
-rollouts](/guides/traffic-splitting)).
+logic](../guides/http-routing.md) and rollout plans (e.g. [traffic splitting
+rollouts](../guides/traffic-splitting.md)).
 
-[north/south]:/concepts/glossary#northsouth-traffic
+[north/south]:glossary.md#northsouth-traffic
 
 ## Multiple applications behind a single Gateway
 
@@ -93,7 +94,7 @@ rollouts](/guides/traffic-splitting)).
 
     The [north/south] use case is fully supported by the Standard Channel
     since `v0.8.0`. For more information on release
-    channels, refer to our [versioning guide](/concepts/versioning).
+    channels, refer to our [versioning guide](versioning.md).
 
 This is remarkably similar to the [basic north/south use
 case](#basic-northsouth-use-case), but there are multiple application teams:
@@ -108,20 +109,20 @@ Namespace.
   same `Gateway` resource.
 
 Again, this separation of concerns allows Chihiro to enforce centralized
-policies [such as TLS](/guides/tls#downstream-tls) can be enforced at the
+policies [such as TLS](../guides/tls.md#downstream-tls) can be enforced at the
 Gateway. Meanwhile, Ana and Allison run their applications [in their own
-Namespaces](/guides/multiple-ns), but attach their Routes to the same shared
+Namespaces](../guides/multiple-ns.md), but attach their Routes to the same shared
 Gateway, allowing them to independently control their [routing
-logic](/guides/http-routing), [traffic splitting
-rollout](/guides/traffic-splitting), etc., while not worrying about the things
+logic](../guides/http-routing.md), [traffic splitting
+rollout](../guides/traffic-splitting.md), etc., while not worrying about the things
 that Chihiro and Ian are handling.
 
-[HTTPRoute]:/api-types/httproute
-[GatewayClass]:/api-types/gatewayclass
-[Gateway]:/api-types/gateway
-[Route Attachment Process]:/concepts/api-overview#attaching-routes-to-gateways
+[HTTPRoute]:../api-types/httproute.md
+[GatewayClass]:../api-types/gatewayclass.md
+[Gateway]:../api-types/gateway.md
+[Route Attachment Process]:api-overview.md#attaching-routes-to-gateways
 
-![Gateway API Roles](/images/gateway-roles.png)
+![Gateway API Roles](../images/gateway-roles.png)
 
 ## Basic [east/west] use case
 
@@ -146,9 +147,9 @@ In this case, the separation of concerns across roles allows Ana to take
 advantage of the service mesh, with custom routing logic, without any
 bottlenecks in requests to Chihiro or Ian.
 
-[east/west]:/concepts/glossary#eastwest-traffic
+[east/west]:glossary.md#eastwest-traffic
 [GAMMA]:/concepts/gamma/
-[service mesh]:/concepts/glossary#service-mesh
+[service mesh]:glossary.md#service-mesh
 
 ## Gateway and mesh use case
 
@@ -178,15 +179,15 @@ involved:
 
 As always, the ultimate point of separating concerns in this way is that it
 permits Chihiro to enforce centralized policies [such as
-TLS](/guides/tls#downstream-tls) at the Gateway, while allowing Ana and
+TLS](../guides/tls.md#downstream-tls) at the Gateway, while allowing Ana and
 Allison to retain independent control of [routing
-logic](/guides/http-routing), [traffic splitting
-rollout](/guides/traffic-splitting), etc., both for [north/south] and for
+logic](../guides/http-routing.md), [traffic splitting
+rollout](../guides/traffic-splitting.md), etc., both for [north/south] and for
 [east/west] routing.
 
 
 
 
-[gateway controller]:/concepts/glossary#gateway-controller
-[Service routing]:/concepts/glossary#service-routing
-[endpoint routing]:/concepts/glossary#endpoint-routing
+[gateway controller]:glossary.md#gateway-controller
+[Service routing]:glossary.md#service-routing
+[endpoint routing]:glossary.md#endpoint-routing
