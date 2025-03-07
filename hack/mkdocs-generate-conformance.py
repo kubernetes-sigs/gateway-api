@@ -30,6 +30,7 @@ def on_files(files, config, **kwargs):
     log.info("generating conformance")
 
     vers = getConformancePaths()
+    # Iterate over the list of versions. Exclude the pre 1.0 versions.
     for v in vers[3:]:
 
         confYamls = getYaml(v)
@@ -176,7 +177,7 @@ def getConformancePaths():
         allVersions.add(vers)
         reportedImplementationsPath.add(v+"**")
 
-    return list(reportedImplementationsPath)
+    return sorted(list(reportedImplementationsPath))
 
 
 def getYaml(conf_path):
