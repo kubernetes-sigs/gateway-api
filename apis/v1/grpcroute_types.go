@@ -210,7 +210,7 @@ type GRPCRouteRule struct {
 	// the above criteria.
 	//
 	// +optional
-	// +kubebuilder:validation:MaxItems=8
+	// +kubebuilder:validation:MaxItems=64
 	Matches []GRPCRouteMatch `json:"matches,omitempty"`
 
 	// Filters define the filters that are applied to requests that match
