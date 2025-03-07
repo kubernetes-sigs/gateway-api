@@ -1,0 +1,67 @@
+apiVersion: gateway.networking.k8s.io/v1
+date: "2025-03-05T13:37:19Z"
+gatewayAPIChannel: experimental
+gatewayAPIVersion: v1.2.1
+implementation:
+  contact:
+  - https://github.com/envoyproxy/gateway/blob/main/GOVERNANCE.md
+  organization: envoyproxy
+  project: envoy-gateway
+  url: https://github.com/envoyproxy/gateway
+  version: latest
+kind: ConformanceReport
+mode: default
+profiles:
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 11
+      Skipped: 0
+  name: GATEWAY-TLS
+  summary: Core tests succeeded.
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 12
+      Skipped: 0
+  name: GATEWAY-GRPC
+  summary: Core tests succeeded.
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 33
+      Skipped: 0
+  extended:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 21
+      Skipped: 0
+    supportedFeatures:
+    - GatewayHTTPListenerIsolation
+    - GatewayPort8080
+    - HTTPRouteBackendProtocolH2C
+    - HTTPRouteBackendProtocolWebSocket
+    - HTTPRouteBackendRequestHeaderModification
+    - HTTPRouteBackendTimeout
+    - HTTPRouteDestinationPortMatching
+    - HTTPRouteHostRewrite
+    - HTTPRouteMethodMatching
+    - HTTPRouteParentRefPort
+    - HTTPRoutePathRedirect
+    - HTTPRoutePathRewrite
+    - HTTPRoutePortRedirect
+    - HTTPRouteQueryParamMatching
+    - HTTPRouteRequestMirror
+    - HTTPRouteRequestMultipleMirrors
+    - HTTPRouteRequestTimeout
+    - HTTPRouteResponseHeaderModification
+    - HTTPRouteSchemeRedirect
+    unsupportedFeatures:
+    - GatewayInfrastructurePropagation
+    - GatewayStaticAddresses
+  name: GATEWAY-HTTP
+  summary: Core tests succeeded. Extended tests succeeded.
