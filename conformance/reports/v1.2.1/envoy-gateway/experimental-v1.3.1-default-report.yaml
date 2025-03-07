@@ -1,5 +1,5 @@
 apiVersion: gateway.networking.k8s.io/v1
-date: "2025-01-31T03:14:06Z"
+date: "2025-03-05T13:37:19Z"
 gatewayAPIChannel: experimental
 gatewayAPIVersion: v1.2.1
 implementation:
@@ -18,44 +18,16 @@ profiles:
       Failed: 0
       Passed: 11
       Skipped: 0
-  extended:
-    result: partial
-    skippedTests:
-    - GatewayInfrastructure
-    - GatewayStaticAddresses
-    statistics:
-      Failed: 0
-      Passed: 0
-      Skipped: 2
-    supportedFeatures:
-    - GatewayHTTPListenerIsolation
-    - GatewayInfrastructurePropagation
-    - GatewayPort8080
-    - GatewayStaticAddresses
   name: GATEWAY-TLS
-  summary: Core tests succeeded. Extended tests partially succeeded with 2 test skips.
+  summary: Core tests succeeded.
 - core:
     result: success
     statistics:
       Failed: 0
       Passed: 12
       Skipped: 0
-  extended:
-    result: partial
-    skippedTests:
-    - GatewayInfrastructure
-    - GatewayStaticAddresses
-    statistics:
-      Failed: 0
-      Passed: 0
-      Skipped: 2
-    supportedFeatures:
-    - GatewayHTTPListenerIsolation
-    - GatewayInfrastructurePropagation
-    - GatewayPort8080
-    - GatewayStaticAddresses
   name: GATEWAY-GRPC
-  summary: Core tests succeeded. Extended tests partially succeeded with 2 test skips.
+  summary: Core tests succeeded.
 - core:
     result: success
     statistics:
@@ -63,19 +35,14 @@ profiles:
       Passed: 33
       Skipped: 0
   extended:
-    result: partial
-    skippedTests:
-    - GatewayInfrastructure
-    - GatewayStaticAddresses
+    result: success
     statistics:
       Failed: 0
       Passed: 21
-      Skipped: 2
+      Skipped: 0
     supportedFeatures:
     - GatewayHTTPListenerIsolation
-    - GatewayInfrastructurePropagation
     - GatewayPort8080
-    - GatewayStaticAddresses
     - HTTPRouteBackendProtocolH2C
     - HTTPRouteBackendProtocolWebSocket
     - HTTPRouteBackendRequestHeaderModification
@@ -93,5 +60,8 @@ profiles:
     - HTTPRouteRequestTimeout
     - HTTPRouteResponseHeaderModification
     - HTTPRouteSchemeRedirect
+    unsupportedFeatures:
+    - GatewayInfrastructurePropagation
+    - GatewayStaticAddresses
   name: GATEWAY-HTTP
-  summary: Core tests succeeded. Extended tests partially succeeded with 2 test skips.
+  summary: Core tests succeeded. Extended tests succeeded.
