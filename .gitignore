@@ -56,4 +56,3 @@ go.work.sum
 /cache
 .venv/
 release/
-site-src/geps
