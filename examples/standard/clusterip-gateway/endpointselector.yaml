@@ -1,0 +1,10 @@
+apiVersion: networking.gke.io/v1alpha1
+kind: EndpointSelector
+metadata:
+  name: front-end-pods
+spec:
+  kind: Pod
+  selector:
+  - key: app
+    value: frontend
+    operator: In 
