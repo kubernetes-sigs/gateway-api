@@ -26,7 +26,7 @@ import (
 // with apply.
 type HTTPCORSFilterApplyConfiguration struct {
 	AllowOrigins     []v1.AbsoluteURI            `json:"allowOrigins,omitempty"`
-	AllowCredentials *v1.LowercaseTrue           `json:"allowCredentials,omitempty"`
+	AllowCredentials *v1.TrueField               `json:"allowCredentials,omitempty"`
 	AllowMethods     []v1.HTTPMethodWithWildcard `json:"allowMethods,omitempty"`
 	AllowHeaders     []v1.HTTPHeaderName         `json:"allowHeaders,omitempty"`
 	ExposeHeaders    []v1.HTTPHeaderName         `json:"exposeHeaders,omitempty"`
@@ -52,7 +52,7 @@ func (b *HTTPCORSFilterApplyConfiguration) WithAllowOrigins(values ...v1.Absolut
 // WithAllowCredentials sets the AllowCredentials field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the AllowCredentials field is set to the value of the last call.
-func (b *HTTPCORSFilterApplyConfiguration) WithAllowCredentials(value v1.LowercaseTrue) *HTTPCORSFilterApplyConfiguration {
+func (b *HTTPCORSFilterApplyConfiguration) WithAllowCredentials(value v1.TrueField) *HTTPCORSFilterApplyConfiguration {
 	b.AllowCredentials = &value
 	return b
 }

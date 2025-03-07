@@ -478,7 +478,7 @@ spec:
                                         Support: Extended
                                       enum:
                                       - true
-                                      type: string
+                                      type: boolean
                                     allowHeaders:
                                       description: |-
                                         AllowHeaders indicates which HTTP request headers are supported for
@@ -1700,7 +1700,7 @@ spec:
                                   Support: Extended
                                 enum:
                                 - true
-                                type: string
+                                type: boolean
                               allowHeaders:
                                 description: |-
                                   AllowHeaders indicates which HTTP request headers are supported for
@@ -4094,7 +4094,7 @@ spec:
                                         Support: Extended
                                       enum:
                                       - true
-                                      type: string
+                                      type: boolean
                                     allowHeaders:
                                       description: |-
                                         AllowHeaders indicates which HTTP request headers are supported for
@@ -5316,7 +5316,7 @@ spec:
                                   Support: Extended
                                 enum:
                                 - true
-                                type: string
+                                type: boolean
                               allowHeaders:
                                 description: |-
                                   AllowHeaders indicates which HTTP request headers are supported for

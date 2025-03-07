@@ -696,7 +696,7 @@ var schemaYAML = typed.YAMLObject(`types:
     fields:
     - name: allowCredentials
       type:
-        scalar: string
+        scalar: boolean
     - name: allowHeaders
       type:
         list:

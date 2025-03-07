@@ -4289,7 +4289,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPCORSFilter(ref common.ReferenceCal
 					"allowCredentials": {
 						SchemaProps: spec.SchemaProps{
 							Description: "AllowCredentials indicates whether the actual cross-origin request allows to include credentials.\n\nThe only valid value for the `Access-Control-Allow-Credentials` response header is true (case-sensitive).\n\nIf the credentials are not allowed in cross-origin requests, the gateway will omit the header `Access-Control-Allow-Credentials` entirely rather than setting its value to false.\n\nSupport: Extended",
-							Type:        []string{"string"},
+							Type:        []string{"boolean"},
 							Format:      "",
 						},
 					},

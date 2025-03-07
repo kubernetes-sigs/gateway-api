@@ -764,11 +764,10 @@ type HeaderName string
 // +kubebuilder:validation:Pattern=`^([0-9]{1,5}(h|m|s|ms)){1,4}$`
 type Duration string
 
-// LowercaseTrue is a string value that can only be set to "true" (case
-// sensitive).
+// TrueField is a boolean value that can only be set to true
 //
 // +kubebuilder:validation:Enum=true
-type LowercaseTrue string
+type TrueField bool
 
 const (
 	// A textual representation of a numeric IP address. IPv4
