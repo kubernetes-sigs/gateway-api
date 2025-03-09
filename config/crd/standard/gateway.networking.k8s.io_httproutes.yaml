@@ -1056,6 +1056,7 @@ spec:
                                   - RequestRedirect
                                   - URLRewrite
                                   - ExtensionRef
+                                  - CORS
                                   type: string
                                 urlRewrite:
                                   description: |-
@@ -1990,6 +1991,7 @@ spec:
                             - RequestRedirect
                             - URLRewrite
                             - ExtensionRef
+                            - CORS
                             type: string
                           urlRewrite:
                             description: |-
@@ -3851,6 +3853,7 @@ spec:
                                   - RequestRedirect
                                   - URLRewrite
                                   - ExtensionRef
+                                  - CORS
                                   type: string
                                 urlRewrite:
                                   description: |-
@@ -4785,6 +4788,7 @@ spec:
                             - RequestRedirect
                             - URLRewrite
                             - ExtensionRef
+                            - CORS
                             type: string
                           urlRewrite:
                             description: |-
