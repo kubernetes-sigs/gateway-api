@@ -1,13 +1,14 @@
 module sigs.k8s.io/gateway-api
 
 go 1.22.0
+toolchain go1.23.7
 
 require (
 	github.com/ahmetb/gen-crd-api-reference-docs v0.3.0
 	github.com/miekg/dns v1.1.63
 	github.com/stretchr/testify v1.10.0
 	golang.org/x/net v0.35.0
-	golang.org/x/sync v0.11.0
+	golang.org/x/sync v0.12.0
 	google.golang.org/grpc v1.71.0
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.5.1
 	google.golang.org/protobuf v1.36.5
