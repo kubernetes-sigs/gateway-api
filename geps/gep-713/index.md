@@ -1,7 +1,7 @@
 # GEP-713: Metaresources and Policy Attachment
 
 * Issue: [#713](https://github.com/kubernetes-sigs/gateway-api/issues/713)
-* Status: Standard
+* Status: Memorandum
 
 (See status definitions [here](/geps/overview/#gep-states))
 
