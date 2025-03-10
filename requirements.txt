@@ -1,6 +1,6 @@
 Click==8.1.8
 htmlmin==0.1.12
-Jinja2==3.1.5
+Jinja2==3.1.6
 jsmin==3.0.1
 livereload==2.7.1
 # mkdocs 2.4.1 requires Markdown < 3.4.0
