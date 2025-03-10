@@ -83,8 +83,8 @@ spec:
 
                   Support: Extended
                 items:
-                  description: GatewayAddress describes an address that can be bound
-                    to a Gateway.
+                  description: GatewaySpecAddress describes an address that can be
+                    bound to a Gateway.
                   oneOf:
                   - properties:
                       type:
@@ -114,10 +114,7 @@ spec:
 
                         Examples: `1.2.3.4`, `128::1`, `my-ip-address`.
                       maxLength: 253
-                      minLength: 1
                       type: string
-                  required:
-                  - value
                   type: object
                   x-kubernetes-validations:
                   - message: Hostname value must only contain valid characters (matching
@@ -1422,8 +1419,8 @@ spec:
 
                   Support: Extended
                 items:
-                  description: GatewayAddress describes an address that can be bound
-                    to a Gateway.
+                  description: GatewaySpecAddress describes an address that can be
+                    bound to a Gateway.
                   oneOf:
                   - properties:
                       type:
@@ -1453,10 +1450,7 @@ spec:
 
                         Examples: `1.2.3.4`, `128::1`, `my-ip-address`.
                       maxLength: 253
-                      minLength: 1
                       type: string
-                  required:
-                  - value
                   type: object
                   x-kubernetes-validations:
                   - message: Hostname value must only contain valid characters (matching
