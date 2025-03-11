@@ -7,29 +7,23 @@
 
 ## TLDR
 
-This GEP aims to standardize terminology and processes around "metaresources", e.g. using one Kubernetes object to modify the functions of one or more other objects.
+This GEP aims to standardize terminology and processes around "metaresources", i.e., using one Kubernetes object to modify the functions of one or more other objects.
 
 It lays out guidelines for Gateway API implementations and other stakeholders for the design and/or handling of custom “metaresource” definitions in compliance with a pattern known as Policy Attachment.
 
-This GEP specifies a _pattern_, not an API field or new object. It defines some terms, including _Metaresource_, _Policies_ and _Policy Attachment_, and their related concepts.
+!!! warning
+    This GEP specifies a _pattern_, not an API field or new object. It defines some terms, including _Metaresource_, _Policies_ and _Policy Attachment_, and their related concepts.
 
-## Goals
+!!! danger
+    This pattern is so far agreed upon only by Gateway API implementers who were in need of an immediate solution and didn't want all their solutions to be completely different and disparate, but does not have wide agreement or review from the rest of Kubernetes (particularly API Machinery).
+    It is then conceivable that this problem domain gets a different solution in core in the future at which time this pattern might be considered obsoleted by that one.
+    When implementations have need of something that is not in the spec and free from the [requisites](#user-stories) for which this pattern has been primarily thought, they are encouraged to explore other means (e.g. trying to work their feature into the upstream spec) before considering introducing their own custom metaresources.
+    Examples of challenges associated with this pattern include the [Discoverability problem](#the-discoverability-problem) and the [Fanout status update problem](#fanout-status-update-problems).
+    Ultimately, any implementation that is considering using this guidance are strongly advised to check in with the community and share their use case before making a decision, so that they can better understand the potential implications of their decision.
 
-* Establish a pattern for metaresources which will be used for any metaresources and policies included in the Gateway API spec.
-* Establish a pattern that must be adopted for any implementation-specific metaresources and policies used with Gateway API resources.
-* Discuss the problems with communicating status for metaresource objects, and suggest mechanisms that APIs can use to mitigate some of them.
-* Provide a way to distinguish between required and default values for all metaresource API implementations.
-* Enable Policy Attachment at all relevant scopes in Gateway API, including Gateways, Routes, Backends, along with how values should flow across a hierarchy if necessary.
-* Ensure the Policy Attachment specification is generic and forward thinking enough that it could be easily adapted to other grouping mechanisms like Namespaces in the future.
-* Provide a means of attachment that works for both ingress and mesh implementations of Gateway API.
-* Provide a consistent specification that will ensure familiarity between both API-defined and implementation-specific metaresources so they can both be interpreted the same way.
-* Provide a reference pattern to other implementations of metaresource and policy APIs outside of Gateway API, that are based on similar concepts (i.e., augmenting the behavior of other Kubernetes objects, attachment points, nested contexts and inheritance, Defaults & Overrides, etc.)
+## Overview and Concepts
 
-## Out of scope
-
-* Define all potential metaresource and policy kinds that may be attached to resources.
-
-## Background
+### Background
 
 When designing Gateway API, a recurring challenge became apparent. There was often a need to change ("augment") the behavior of objects without modifying their specs.
 
@@ -48,15 +42,62 @@ This document introduces the concept of a “metaresource”, a term used to des
 
 After a few iterations of Gateway API experimenting with this pattern－both, with its own common kinds of metaresources such as the `BackendTLSPolicy` and `BackendLBPolicy`, as well as via multiple implementation-specific kinds of metaresources (see examples of [current use of metaresources](#current-use-of-metaresources))－ and rounds of discussion such as the one at [kubernetes-sigs/gateway-api/discussions#2927](https://github.com/kubernetes-sigs/gateway-api/discussions/2927), the pattern has been enhanced to its current form.
 
-## Definition
+### User stories
 
-### Metaresources
+- [Ana](../../concepts/roles-and-personas.md#ana) or [Chihiro](../../concepts/roles-and-personas.md#chiriro) would like to specify some new behavior for a standard Kubernetes resource, but that resource doesn't have a way to specify the behavior and neither Ana nor Chihiro can modify it.
+  - For example, Ana may want to add a rate limit to a Kubernetes Service. The Service object itself doesn't have a field for rate limiting, and Ana can't modify the Service object's definition.
+- A Gateway API implementer would like to define some implementation-specific behaviors for Gateway API objects that are already standard.
+  - For example, an implementer might want to provide a way for Chiriro to plug in a WebAssembly module to a particular Gateway listener, including all the configuration required by the module. Support to WebAssembly modules is a specific feature of this implementation and the Gateway listener spec does not contain fields to declare WebAssembly configuration.
+- Chihiro would like a way to allow Ana to specify certain behaviors, but not others, in a very fine-grained way.
+  - For example, Chihiro might want to allow Ana to specify rate limits for a Service, but not to specify the Service's ports.
+- A Gateway API implementer would like to define a way to specify a behavior that applies to a whole hierarchy of objects.
+  - For example, an implementer might want to define a way to specify a behavior that applies to all the HTTPRoutes that are attached to a Gateway.
+- A Gateway API implementer would like to define a way to specify a behavior that applies to multiple kinds of objects with a single declaration.
+  - For example, an implementer might want to define a way to specify a behavior that applies to selected HTTPRoutes and selected TCPRoutes. Even though the HTTPRoute object can be extended via an implementation-specific filter, the TCPRoute object cannot.
+- A third-party provider would like to offer a way to extend the behavior of Gateways controlled by one or more Gateway API implementers.
+  - For example, a provider that knows how to configure Gateways controlled by one or more Gateway API implementers to send data passing thourhg those gateways to a service of the provider might want to define a way for Gateway API users to declare the intent to activate this feature in standard way across the supported implementations though without direct involvement of the implementers.
 
-*Metaresources* are objects that augment the behavior of other objects (*targets*) in a clean and standard way, by declaring additional specification for these targets “from the outside”－i.e., without directly modifying the objects whose behavior the metaresource intends to affect, nor requiring any reference from the objects to the metaresources that affect them.
+All [risks and caveats](#tldr) considered, these are in general a few reasons for using metaresources over another (possibly more direct) way to modify the spec (“augment the behavior”) of an object:
 
-Metaresources follow a well-known structure that declares clearly a *target* and an *intent*.
+* Extending otherwise stable APIs – e.g. to specify additional network settings for the Kubernetes Service object.
+* Defining implementation-specific functionalities for otherwise common APIs－e.g. to specify implementation-specific behavior for Gateway API HTTPRoute objects.
+* Decoupling concerns for targeting personas with specific functionality and configuration－delegation of responsibilities, fine-grained RBAC, etc.
+* Decoupling responsibility over the management and implementation of the metaresources themselves.
+* Avoid alternatives based on annotations which are often non-standardized, poorly documented, and generally hard to maintain, in favor of proper, expressive APIs (self-documenting intents) instead.
 
-#### Metaresources are well-structured CRDs
+### Definitions
+
+- _**Metaresource**_: a resource that augments the behavior of another resource without modifying the definition of the resource. Metaresources MUST clearly define a _target_ and an _intent_ as defined in this GEP, and MUST clearly communicate status about whether the augmentation is happening or not.
+  - The target of a metaresource specifies the resource or resources whose behavior the metaresource will augment.
+  - The intent of a metaresource specifies what augmentation the metaresource will apply.
+  Metaresources are Custom Resource Definitions (CRDs) that comply with a particular structure. This structure includes standardized fields for specifying the target(s), metaresource-specific fields to describe the intended augmentation, and standardized status fields to communicate whether the augmentation is happening or not. (See [Metaresources are well-structured CRDs](#metaresources-are-well-structured-crds))
+- _**Policy**_: a specific example of a metaresource whose intent is to specify rules that control the behavior of the target resource.
+
+### Goals
+
+* Establish a pattern for metaresources which will be used for any metaresources and policies included in the Gateway API spec.
+* Establish a pattern that must be adopted for any implementation-specific metaresources and policies used with Gateway API resources.
+* Discuss the problems with communicating status for metaresource objects, and suggest mechanisms that APIs can use to mitigate some of them.
+* Provide a way to distinguish between required and default values for all metaresource API implementations.
+* Enable Policy Attachment at all relevant scopes in Gateway API, including Gateways, Routes, Backends, along with how values should flow across a hierarchy if necessary.
+* Ensure the Policy Attachment specification is generic and forward thinking enough that it could be easily adapted to other grouping mechanisms like Namespaces in the future.
+* Provide a means of attachment that works for both ingress and mesh implementations of Gateway API.
+* Provide a consistent specification that will ensure familiarity between both API-defined and implementation-specific metaresources so they can both be interpreted the same way.
+* Provide a reference pattern to other implementations of metaresource and policy APIs outside of Gateway API, that are based on similar concepts (i.e., augmenting the behavior of other Kubernetes objects, attachment points, nested contexts and inheritance, Defaults & Overrides, etc.)
+
+### Out of scope
+
+* Define all potential metaresource and policy kinds that may be attached to resources.
+
+## Guide-level explanation
+
+This section describes concepts and aspects for designing and using metaresource objects.
+
+It defines important concepts such as the concepts of [Hierarchy of target kinds](#hierarchy-of-target-kinds-and-effective-metaresources), [Merge strategy](#merge-strategies), and [Effective metaresources](#hierarchy-of-target-kinds-and-effective-metaresources). It also describes an [Abstract process for calculating effective specs](#abstract-process-for-calculating-effective-metaresources) out of a set of metaresources objects.
+
+Designers of new metaresource kinds are encouraged to read this section top-to-bottom while users of metaresources may refer to it to further understand about the design decisions and thus infer about specific behavior and alternatives for a given metaresource kind.
+
+### Metaresources are well-structured CRDs
 
 Metaresources are typically implemented as Custom Resource Definitions (CRDs) that comply with a particular structure. This structure includes fields for specifying references to one or more other objects－called “targets“－whose behavior the instances of the metaresource intend to augment (i.e. declare additional specification), along with resource-specific fields－the “spec proper”－to describe the intended augmented behavior.
 
@@ -78,56 +119,14 @@ spec:
     color: blue
 ```
 
-#### Properties of metaresources
+### Properties of metaresources
 
-##### Targetability (“where”)
-
-Metaresources specify one or more target resources or specific sections of resources, whose behavior the metaresource intends to augment.
-
-##### Semantics (“why”)
-
-Targeting a resource (or section of a resource) must be interpreted within a given semantics that is proper to the metaresource kind.
-
-Two different metaresource kinds that allow targeting resources of the same given kind X may have very different semantics, not only because the purpose of the two metaresource kinds differ, but also because the mechanics of calculating and applying the augmented behavior differ.
-
-Often, the semantics of a metaresource is tightly coupled to the relationships and connections a target has with other kinds of objects, typically organized in a hierarchy of nested contexts. In this sense, targeting a given resource kind may have the semantics of spanning effect across yet other objects to which the target is related.
-
-##### Mergeability (“how”)
-
-Metaresources define so-called *merge strategies* that dictate how multiple instances of the metaresource affecting the same resource (or section of a resource) should be handled.
-
-The merge strategies typically include strategies for dealing with conflicting and/or missing specs, such as for applying default and/or override values on the target resources.
-
-### Policies and Policy Attachment
-
-Often when applying a metaresource, the intent has to do with specifying *rules* that control the behavior of the targets in action. E.g., for networking resources, the augmented behavior specified by a metaresource targeting an object can relate to conditions to let traffic flow or to block traffic at particular points of the network; in a different scenario, it can describe rules to mutate the traffic while it flows through the network at the point represented by the target object.
-
-The semantics of *applying rules to a target* characterizes these particular instances of metaresources as *policies*, thus here emerging in relation to this pattern the concept of *Policy Attachment*.
-
-Policies are therefore a strict subset of metaresources which distinguish itself subtly from the whole on the fact that the augmented behavior described by policies resemble *conditional rules*, while the mechanism of targeting an object or set of objects (“attaching to objects”) is nonetheless exactly the same as in the general definition of metaresources.
-
-Without loss of generality, the very activation of the context (targets) of metaresources can be understood as the _conditions_ for the enforcement of the intended augment behavior (rules) that are specified in the metaresources, and therefore metaresources can often be referred to as policies interchangeably.
-
-## Applications
-
-### Reasons for using metaresources and policies
-
-These are a few reasons for using metaresources and policies over another (possibly more direct) way to modify the spec (“augment the behavior”) of an object:
-
-* Extending otherwise stable APIs – e.g. to specify additional network settings for the Kubernetes Service object.
-* Defining implementation-specific functionalities for otherwise common APIs－e.g. to specify implementation-specific behavior for Gateway API HTTPRoute objects.
-* Decoupling concerns for targeting personas with specific functionality and configuration－ delegation of responsibilities, fine-grained RBAC.
-* Decoupling responsibility over the management and implementation of the metaresources themselves.
-* Avoid alternatives based on annotations which are often non-standardized, poorly documented, and generally hard to maintain, in favor of proper, expressive APIs (self-documenting intents) instead.
-
-### Examples of applications of metaresources and policies
-
-* Specifying traffic rules for Kubernetes Services
-* Configuring implementation-specific authentication features on ingress Gateways
-* Delegating responsibility over parts of the configuration (e.g. auth) to other users
-* Inspecting and auditing focused aspects of a resource (e.g. auth policies)
-
-## Guide-level explanation
+- _**Targetability (“where”)**_: Metaresources specify one or more target resources or specific sections of resources, whose behavior the metaresource intends to augment.
+- _**Semantics (“why”)**_: Targeting a resource (or section of a resource) must be interpreted within a given semantics that is proper to the metaresource kind.
+  Two different metaresource kinds that allow targeting resources of the same given kind X may have very different semantics, not only because the purpose of the two metaresource kinds differ, but also because the mechanics of calculating and applying the augmented behavior differ.
+  Often, the semantics of a metaresource is tightly coupled to the relationships and connections a target has with other kinds of objects, typically organized in a hierarchy of nested contexts. In this sense, targeting a given resource kind may have the semantics of spanning effect across yet other objects to which the target is related.
+- _**Mergeability (“how”)**_: Metaresources define so-called *merge strategies* that dictate how multiple instances of the metaresource affecting the same resource (or section of a resource) should be handled.
+  The merge strategies typically include strategies for dealing with conflicting and/or missing specs, such as for applying default and/or override values on the target resources.
 
 ### Defining context: scoping intent in relation to targets
 
@@ -263,7 +262,6 @@ spec:
   ```
 </details>
 
-
 ##### Cross namespace references
 
 Metaresources can opt for allowing instances to target objects across Kubernetes namespaces, in which case an optional `namespace` field MUST be defined with the target reference.
@@ -372,7 +370,6 @@ E.g. – a metaresource that specifies additional behaviour for a given listener
   }
   ```
 </details>
-
 
 #### Targeting virtual types
 
