@@ -446,7 +446,7 @@ Follow the [quickstart guide][loxigw-guide] to get LoxiLB running with Gateway A
 
 For a list of supported Gateway API resources and features, see the [Gateway API Compatibility][nginx-compat] doc.
 
-If you have any suggestions or experience issues with NGINX Gateway Fabric, please [create an issue][nginx-issue-new] or a [discussion][nginx-disc-new] on GitHub. You can also ask for help in the [#nginx-gateway-fabric channel on NGINX slack][nginx-slack].
+If you have any suggestions or experience issues with NGINX Gateway Fabric, please [create an issue][nginx-issue-new] or a [discussion][nginx-disc-new] on GitHub. You can also ask for help in the [NGINX Community Forum][nginx-forum].
 
 [nginx-gateway-fabric]:https://github.com/nginx/nginx-gateway-fabric
 [nginx]:https://nginx.org/
@@ -454,7 +454,7 @@ If you have any suggestions or experience issues with NGINX Gateway Fabric, plea
 [nginx-compat]:https://docs.nginx.com/nginx-gateway-fabric/overview/gateway-api-compatibility/
 [nginx-issue-new]:https://github.com/nginx/nginx-gateway-fabric/issues/new
 [nginx-disc-new]:https://github.com/nginx/nginx-gateway-fabric/discussions/new
-[nginx-slack]:https://nginxcommunity.slack.com/channels/nginx-gateway-fabric
+[nginx-forum]:https://community.nginx.org/
 
 
 ### ngrok Kubernetes Operator
