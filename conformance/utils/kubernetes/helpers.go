@@ -72,6 +72,38 @@ func NewGatewayRef(nn types.NamespacedName, listenerNames ...string) GatewayRef 
 	}
 }
 
+// RequestAssertions contains information about the request and the Ingress.
+type RequestAssertions struct {
+	Path    string              `json:"path"`
+	Host    string              `json:"host"`
+	Method  string              `json:"method"`
+	Proto   string              `json:"proto"`
+	Headers map[string][]string `json:"headers"`
+
+	Context `json:",inline"`
+
+	TLS *TLSAssertions `json:"tls,omitempty"`
+	SNI string         `json:"sni"`
+}
+
+// TLSAssertions contains information about the TLS connection.
+type TLSAssertions struct {
+	Version          string   `json:"version"`
+	PeerCertificates []string `json:"peerCertificates,omitempty"`
+	// ServerName is the name sent from the peer using SNI.
+	ServerName         string `json:"serverName"`
+	NegotiatedProtocol string `json:"negotiatedProtocol,omitempty"`
+	CipherSuite        string `json:"cipherSuite"`
+}
+
+// Context contains information about the context where the echoserver is running.
+type Context struct {
+	Namespace string `json:"namespace"`
+	Ingress   string `json:"ingress"`
+	Service   string `json:"service"`
+	Pod       string `json:"pod"`
+}
+
 // GWCMustHaveAcceptedConditionTrue waits until the specified GatewayClass has an Accepted condition set with a status value equal to True.
 func GWCMustHaveAcceptedConditionTrue(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, gwcName string) string {
 	return gwcMustBeAccepted(t, c, timeoutConfig, gwcName, string(metav1.ConditionTrue))

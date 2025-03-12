@@ -3,7 +3,6 @@ module sigs.k8s.io/gateway-api/conformance/echo-basic
 go 1.21
 
 require (
-	github.com/paultag/sniff v0.0.0-20200207005214-cf7e4d167732
 	golang.org/x/net v0.21.0
 	google.golang.org/grpc v1.53.0
 	google.golang.org/protobuf v1.28.1

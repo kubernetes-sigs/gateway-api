@@ -67,12 +67,17 @@ func Test_generateCACert(t *testing.T) {
 			serverKey.Reset()
 			// Test the function generateCACert.  We can only test normative function
 			// and hostnames, everything else is hardcoded.
-			caBytes, err := generateCACert(tc.hosts)
+			caBytes, caPrivKey, err := generateCACert(tc.hosts)
 			require.NoError(t, err, "unexpected error generating RSA certificate")
 
 			var certData bytes.Buffer
 			if err := pem.Encode(&certData, &pem.Block{Type: "CERTIFICATE", Bytes: caBytes}); err != nil {
 				require.NoError(t, err, "failed to create certificater")
+			}
+
+			var keyData bytes.Buffer
+			if err := pem.Encode(&keyData, &pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(caPrivKey)}); err != nil {
+				require.NoError(t, err, "failed to create key")
 			}
 
 			// Test that the CA certificate is decodable, parseable, and has the configured hostname/s.
