@@ -18,12 +18,10 @@ package main
 
 import (
 	"crypto/tls"
-	"crypto/x509"
 	"encoding/json"
 	"encoding/pem"
 	"fmt"
 	"io"
-	"net"
 	"net/http"
 	"os"
 	"regexp"
@@ -31,7 +29,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/paultag/sniff/parser"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 	"golang.org/x/net/websocket"
@@ -39,7 +36,18 @@ import (
 	g "sigs.k8s.io/gateway-api/conformance/echo-basic/grpc"
 )
 
-// RequestAssertions contains information about the request and the Ingress
+type preserveSlashes struct {
+	mux http.Handler
+}
+
+func (s *preserveSlashes) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	r.URL.Path = strings.ReplaceAll(r.URL.Path, "//", "/")
+	s.mux.ServeHTTP(w, r)
+}
+
+var context Context
+
+// RequestAssertions contains information about the request and the Ingress.
 type RequestAssertions struct {
 	Path    string              `json:"path"`
 	Host    string              `json:"host"`
@@ -63,24 +71,13 @@ type TLSAssertions struct {
 	CipherSuite        string `json:"cipherSuite"`
 }
 
-type preserveSlashes struct {
-	mux http.Handler
-}
-
-func (s *preserveSlashes) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	r.URL.Path = strings.ReplaceAll(r.URL.Path, "//", "/")
-	s.mux.ServeHTTP(w, r)
-}
-
-// Context contains information about the context where the echoserver is running
+// Context contains information about the context where the echoserver is running.
 type Context struct {
 	Namespace string `json:"namespace"`
 	Ingress   string `json:"ingress"`
 	Service   string `json:"service"`
 	Pod       string `json:"pod"`
 }
-
-var context Context
 
 func main() {
 	if os.Getenv("GRPC_ECHO_SERVER") != "" {
@@ -92,6 +89,7 @@ func main() {
 	if httpPort == "" {
 		httpPort = "3000"
 	}
+
 	h2cPort := os.Getenv("H2C_PORT")
 	if h2cPort == "" {
 		h2cPort = "3001"
@@ -113,7 +111,6 @@ func main() {
 	httpMux.HandleFunc("/health", healthHandler)
 	httpMux.HandleFunc("/status/", statusHandler)
 	httpMux.HandleFunc("/", echoHandler)
-	httpMux.HandleFunc("/backendTLS", echoHandler)
 	httpMux.Handle("/ws", websocket.Handler(wsHandler))
 	httpHandler := &preserveSlashes{httpMux}
 
@@ -130,16 +127,20 @@ func main() {
 	go runH2CServer(h2cPort, errchan)
 
 	// Enable HTTPS if server certificate and private key are given. (TLS_SERVER_CERT, TLS_SERVER_PRIVKEY)
-	// Enable secure backend if CA certificate and key are given. (CA_CERT, CA_CERT_KEY)
-	if os.Getenv("TLS_SERVER_CERT") != "" && os.Getenv("TLS_SERVER_PRIVKEY") != "" ||
-		os.Getenv("CA_CERT") != "" && os.Getenv("CA_CERT_KEY") != "" {
+	if os.Getenv("TLS_SERVER_CERT") != "" && os.Getenv("TLS_SERVER_PRIVKEY") != "" {
 		go func() {
 			fmt.Printf("Starting server, listening on port %s (https)\n", httpsPort)
-			err := listenAndServeTLS(fmt.Sprintf(":%s", httpsPort), os.Getenv("TLS_SERVER_CERT"), os.Getenv("TLS_SERVER_PRIVKEY"), os.Getenv("CA_CERT"), httpHandler)
+			err := listenAndServeTLS(fmt.Sprintf(":%s", httpsPort), os.Getenv("TLS_SERVER_CERT"), os.Getenv("TLS_SERVER_PRIVKEY"), httpHandler)
 			if err != nil {
 				errchan <- err
 			}
 		}()
+	}
+
+	// Enable secure backend if CA certificate is given. (CA_CERT)
+	if os.Getenv("CA_CERT") != "" {
+		// Start the backend server and listen on port 9443.
+		go runBackendTLSServer("9443", errchan)
 	}
 
 	if err := <-errchan; err != nil {
@@ -207,28 +208,97 @@ func runH2CServer(h2cPort string, errchan chan<- error) {
 	}
 }
 
-func echoHandler(w http.ResponseWriter, r *http.Request) {
-	var sni string
+// Global variable to store the SNI retrieved at a different level.
+var globalsni string
 
+func runBackendTLSServer(port string, errchan chan<- error) {
+	// This handler function runs within the backend server to find the SNI
+	// and return it in the RequestAssertions.
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if strings.Contains(r.RequestURI, "backendTLS") {
+			// Find the sni in the global (or if needed, a channel/mutex?).
+			if globalsni == "" {
+				err := fmt.Errorf("error finding SNI: SNI is empty")
+				// If there are some test cases without SNI, then they must handle this error properly.
+				processError(w, err, http.StatusBadRequest)
+			}
+			requestAssertions := RequestAssertions{
+				r.RequestURI,
+				r.Host,
+				r.Method,
+				r.Proto,
+				r.Header,
+
+				context,
+
+				tlsStateToAssertions(r.TLS),
+				globalsni,
+			}
+			processRequestAssertions(requestAssertions, w, r)
+		} else {
+			// This should never happen, but just in case.
+			processError(w, fmt.Errorf("backend server called without correct uri"), http.StatusBadRequest)
+		}
+	})
+
+	config, err := makeTLSConfig(os.Getenv("CA_CERT"))
+	if err != nil {
+		errchan <- err
+	}
+	btlsServer := &http.Server{
+		Addr:              fmt.Sprintf(":%s", port),
+		Handler:           handler,
+		ReadHeaderTimeout: time.Second,
+		TLSConfig:         config,
+	}
+	fmt.Printf("Starting server, listening on port %s (btls)\n", port)
+	err = btlsServer.ListenAndServeTLS(os.Getenv("CA_CERT"), os.Getenv("CA_CERT_KEY"))
+	if err != nil {
+		fmt.Printf("Failed to start server: %v\n", err)
+		errchan <- err
+	}
+}
+
+func makeTLSConfig(cacert string) (*tls.Config, error) {
+	var config tls.Config
+
+	if cacert == "" {
+		return &config, fmt.Errorf("empty CA cert specified")
+	}
+	cert, err := tls.LoadX509KeyPair(cacert, os.Getenv("CA_CERT_KEY"))
+	if err != nil {
+		return &config, fmt.Errorf("failed to load key pair: %v", err)
+	}
+	certs := []tls.Certificate{cert}
+
+	// Verify certificate against given CA but also allow unauthenticated connections.
+	config.ClientAuth = tls.VerifyClientCertIfGiven
+	config.Certificates = certs
+	config.GetConfigForClient = func(info *tls.ClientHelloInfo) (*tls.Config, error) {
+		if info != nil {
+			// Store the SNI from the ClientHello into a global variable.
+			globalsni = info.ServerName
+			if globalsni == "" {
+				return nil, fmt.Errorf("no SNI specified")
+			}
+			return nil, nil
+		}
+		return nil, fmt.Errorf("no client hello available")
+	}
+
+	return &config, nil
+}
+
+func echoHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("Echoing back request made to %s to client (%s)\n", r.RequestURI, r.RemoteAddr)
 
 	// If the request has form ?delay=[:duration] wait for duration
 	// For example, ?delay=10s will cause the response to wait 10s before responding
 	err := delayResponse(r)
 	if err != nil {
+		fmt.Printf("error : %v\n", err)
 		processError(w, err, http.StatusInternalServerError)
 		return
-	}
-
-	// If the request was made to URI backendTLS, then get the server name indication and
-	// add it to the RequestAssertions.  It will be echoed back later.
-	if strings.Contains(r.RequestURI, "backendTLS") {
-		sni, err = sniffForSNI(r.RemoteAddr)
-		if err != nil {
-			// TODO: research if for some test cases there won't be SNI available.
-			processError(w, err, http.StatusBadGateway)
-			return
-		}
 	}
 
 	requestAssertions := RequestAssertions{
@@ -241,9 +311,12 @@ func echoHandler(w http.ResponseWriter, r *http.Request) {
 		context,
 
 		tlsStateToAssertions(r.TLS),
-		sni,
+		"",
 	}
+	processRequestAssertions(requestAssertions, w, r)
+}
 
+func processRequestAssertions(requestAssertions RequestAssertions, w http.ResponseWriter, r *http.Request) {
 	js, err := json.MarshalIndent(requestAssertions, "", " ")
 	if err != nil {
 		processError(w, err, http.StatusInternalServerError)
@@ -289,68 +362,13 @@ func processError(w http.ResponseWriter, err error, code int) { //nolint:unparam
 	_, _ = w.Write(body)
 }
 
-func listenAndServeTLS(addr string, serverCert string, serverPrivKey string, clientCA string, handler http.Handler) error {
-	var config tls.Config
-
-	// Optionally enable client certificate validation when client CA certificates are given.
-	if clientCA != "" {
-		ca, err := os.ReadFile(clientCA)
-		if err != nil {
-			return err
-		}
-
-		certPool := x509.NewCertPool()
-		if ok := certPool.AppendCertsFromPEM(ca); !ok {
-			return fmt.Errorf("unable to append certificate in %q to CA pool", clientCA)
-		}
-
-		// Verify certificate against given CA but also allow unauthenticated connections.
-		config.ClientAuth = tls.VerifyClientCertIfGiven
-		config.ClientCAs = certPool
-	}
-
+func listenAndServeTLS(addr string, serverCert, serverPrivKey string, handler http.Handler) error {
 	srv := &http.Server{ //nolint:gosec
-		Addr:      addr,
-		Handler:   handler,
-		TLSConfig: &config,
+		Addr:    addr,
+		Handler: handler,
 	}
 
 	return srv.ListenAndServeTLS(serverCert, serverPrivKey)
-}
-
-// sniffForSNI uses the request address to listen for the incoming TLS connection,
-// and tries to find the server name indication from that connection.
-func sniffForSNI(addr string) (string, error) {
-	var sni string
-
-	// Listen to get the SNI, and store in config.
-	listener, err := net.Listen("tcp", addr)
-	if err != nil {
-		return "", err
-	}
-	defer listener.Close()
-
-	for {
-		conn, err := listener.Accept()
-		if err != nil {
-			return "", err
-		}
-		data := make([]byte, 4096)
-		_, err = conn.Read(data)
-		if err != nil {
-			return "", fmt.Errorf("could not read socket: %v", err)
-		}
-		// Take an incoming TLS Client Hello and return the SNI name.
-		sni, err = parser.GetHostname(data)
-		if err != nil {
-			return "", fmt.Errorf("error getting SNI: %v", err)
-		}
-		if sni == "" {
-			return "", fmt.Errorf("no server name indication found")
-		} else { //nolint:revive
-			return sni, nil
-		}
-	}
 }
 
 func tlsStateToAssertions(connectionState *tls.ConnectionState) *TLSAssertions {

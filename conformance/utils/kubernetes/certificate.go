@@ -125,15 +125,21 @@ func generateRSACert(hosts []string, keyOut, certOut io.Writer) error {
 func MustCreateCASignedCertConfigMap(t *testing.T, namespace, configMapName string, hosts []string) *corev1.ConfigMap {
 	require.NotEmpty(t, hosts, "require a non-empty hosts for Subject Alternate Name values")
 
-	caBytes, err := generateCACert(hosts)
+	caBytes, caPrivKey, err := generateCACert(hosts)
 	if err != nil {
-		t.Errorf("failed to generate CA certificate: %v", err)
+		t.Errorf("failed to generate CA certificate and key: %v", err)
 		return nil
 	}
 
 	var certData bytes.Buffer
 	if err := pem.Encode(&certData, &pem.Block{Type: "CERTIFICATE", Bytes: caBytes}); err != nil {
 		t.Errorf("failed creating cert: %v", err)
+		return nil
+	}
+
+	var keyData bytes.Buffer
+	if err := pem.Encode(&keyData, &pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(caPrivKey)}); err != nil {
+		t.Errorf("failed creating key: %v", err)
 		return nil
 	}
 
@@ -144,26 +150,29 @@ func MustCreateCASignedCertConfigMap(t *testing.T, namespace, configMapName stri
 			Name:      configMapName,
 		},
 		Data: map[string]string{
-			"ca.crt": certData.String(),
+			"ca.crt":  certData.String(),
+			"key.crt": keyData.String(),
 		},
 	}
 	return caConfigMap
 }
 
 // generateCACert generates a ConfigMap containing a CA Certificate signed certificate valid for a year.
-func generateCACert(hosts []string) ([]byte, error) {
+func generateCACert(hosts []string) ([]byte, *rsa.PrivateKey, error) {
 	var caBytes []byte
 
 	// Create the CA certificate template.
 	ca := &x509.Certificate{
 		SerialNumber: big.NewInt(2024),
 		Subject: pkix.Name{
-			Organization:  []string{"Kubernetes Gateway API"},
-			Country:       []string{"US"},
-			Province:      []string{""},
-			Locality:      []string{"Boston"},
-			StreetAddress: []string{"Melnea Cass Blvd"},
-			PostalCode:    []string{"02120"},
+			Organization: []string{"Kubernetes Gateway API"},
+			Country:      []string{"US"},
+			CommonName:   "gatewayapi",
+		},
+		Issuer: pkix.Name{
+			Organization: []string{"Kubernetes Gateway API"},
+			Country:      []string{"US"},
+			CommonName:   "kubernetes",
 		},
 		NotBefore:             time.Now(),
 		NotAfter:              time.Now().AddDate(1, 0, 0),
@@ -185,16 +194,16 @@ func generateCACert(hosts []string) ([]byte, error) {
 	// Generate the private key to sign certificates.
 	caPrivKey, err := rsa.GenerateKey(rand.Reader, rsaBits)
 	if err != nil {
-		return caBytes, fmt.Errorf("error generating key for CA: %v", err)
+		return caBytes, caPrivKey, fmt.Errorf("error generating key for CA: %v", err)
 	}
 
 	// Create the self-signed certificate using the CA certificate.
 	caBytes, err = x509.CreateCertificate(rand.Reader, ca, ca, &caPrivKey.PublicKey, caPrivKey)
 	if err != nil {
-		return caBytes, fmt.Errorf("error creating CA: %v", err)
+		return caBytes, caPrivKey, fmt.Errorf("error creating CA: %v", err)
 	}
 
-	return caBytes, nil
+	return caBytes, caPrivKey, nil
 }
 
 // validateHost ensures that the host name length is no more than 253 characters.

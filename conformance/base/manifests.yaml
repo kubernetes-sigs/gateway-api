@@ -277,7 +277,7 @@ spec:
     spec:
       containers:
       - name: tls-backend
-        image: gcr.io/k8s-staging-gateway-api/echo-basic:v20241007-v1.2.0-6-g9f820af9
+        image: echo-basic:2.7
         volumeMounts:
         - name: secret-volume
           mountPath: /etc/secret-volume
@@ -346,7 +346,7 @@ spec:
     spec:
       containers:
       - name: tls-backend
-        image: gcr.io/k8s-staging-gateway-api/echo-basic:v20241007-v1.2.0-6-g9f820af9
+        image: echo-basic:2.7
         volumeMounts:
         - name: secret-volume
           mountPath: /etc/secret-volume
