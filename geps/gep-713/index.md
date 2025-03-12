@@ -17,9 +17,8 @@ It lays out guidelines for Gateway API implementations and other stakeholders fo
 !!! danger
     This pattern is so far agreed upon only by Gateway API implementers who were in need of an immediate solution and didn't want all their solutions to be completely different and disparate, but does not have wide agreement or review from the rest of Kubernetes (particularly API Machinery).
     It is then conceivable that this problem domain gets a different solution in core in the future at which time this pattern might be considered obsoleted by that one.
-    When implementations have need of something that is not in the spec and free from the [requisites](#user-stories) for which this pattern has been primarily thought, they are encouraged to explore other means (e.g. trying to work their feature into the upstream spec) before considering introducing their own custom metaresources.
+    When implementations have need of something that is not in the spec and free from the [user stories](#user-stories) for which this pattern has been primarily thought, they are encouraged to explore other means (e.g. trying to work their feature into the upstream spec) before considering introducing their own custom metaresources.
     Examples of challenges associated with this pattern include the [Discoverability problem](#the-discoverability-problem) and the [Fanout status update problem](#fanout-status-update-problems).
-    Ultimately, any implementation that is considering using this guidance are strongly advised to check in with the community and share their use case before making a decision, so that they can better understand the potential implications of their decision.
 
 ## Overview and Concepts
 
@@ -30,7 +29,7 @@ When designing Gateway API, a recurring challenge became apparent. There was oft
 There are several cases where this happens, such as:
 - when changing the spec of the object to hold the new piece of information is not possible (e.g., `ReferenceGrant`, from [GEP-709](../gep-709/index.md), when affecting Secrets and Services);
 - when the new specification applies at different scopes (different object kinds), making it more maintainable if the declaration is extracted to a separate object, rather than adding new fields representing the same functionality across multiple objects;
-- when the augmented behavior is intended to span across relationships of an object other than the the object that is directly referred in the declaration (see [Semantics](#semantics-why) of metaresources and [Inherited](#inherited) class of metaresources);
+- when the augmented behavior is intended to [span across relationships of an object](#spanning-behavior-across-relationships-of-a-target) other than the the object that is directly referred in the declaration;
 - when the augmented behavior is subject to different RBAC rules than the object it refers to;
 - to circumvent having to enforce hard changes to established implementations.
 
@@ -53,9 +52,9 @@ After a few iterations of Gateway API experimenting with this pattern－both, wi
 - A Gateway API implementer would like to define a way to specify a behavior that applies to a whole hierarchy of objects.
   - For example, an implementer might want to define a way to specify a behavior that applies to all the HTTPRoutes that are attached to a Gateway.
 - A Gateway API implementer would like to define a way to specify a behavior that applies to multiple kinds of objects with a single declaration.
-  - For example, an implementer might want to define a way to specify a behavior that applies to selected HTTPRoutes and selected TCPRoutes. Even though the HTTPRoute object can be extended via an implementation-specific filter, the TCPRoute object cannot.
-- A third-party provider would like to offer a way to extend the behavior of Gateways controlled by one or more Gateway API implementers.
-  - For example, a provider that knows how to configure Gateways controlled by one or more Gateway API implementers to send data passing thourhg those gateways to a service of the provider might want to define a way for Gateway API users to declare the intent to activate this feature in standard way across the supported implementations though without direct involvement of the implementers.
+  - For example, an implementer might want to define a way to specify a behavior that applies to selected HTTPRoutes and selected TCPRoutes. Even though the HTTPRoute object could otherwise be extended via an implementation-specific filter, the TCPRoute object cannot.
+- A third-party provider would like to offer a way to independently extend the behavior of Gateways controlled by one or more Gateway API implementers.
+  - For example, a provider that knows how to configure Gateways controlled by one or more Gateway API implementers to send data passing through those gateways to a service of the provider might want to define a way for Gateway API users to activate this feature in standard way across the supported implementations though without direct involvement of the implementers.
 
 All [risks and caveats](#tldr) considered, these are in general a few reasons for using metaresources over another (possibly more direct) way to modify the spec (“augment the behavior”) of an object:
 
@@ -70,7 +69,7 @@ All [risks and caveats](#tldr) considered, these are in general a few reasons fo
 - _**Metaresource**_: a resource that augments the behavior of another resource without modifying the definition of the resource. Metaresources MUST clearly define a _target_ and an _intent_ as defined in this GEP, and MUST clearly communicate status about whether the augmentation is happening or not.
   - The target of a metaresource specifies the resource or resources whose behavior the metaresource will augment.
   - The intent of a metaresource specifies what augmentation the metaresource will apply.
-  Metaresources are Custom Resource Definitions (CRDs) that comply with a particular structure. This structure includes standardized fields for specifying the target(s), metaresource-specific fields to describe the intended augmentation, and standardized status fields to communicate whether the augmentation is happening or not. (See [Metaresources are well-structured CRDs](#metaresources-are-well-structured-crds))
+  Metaresources are Custom Resource Definitions (CRDs) that comply with a particular [structure](#metaresource-structure). This structure includes standardized fields for specifying the target(s), metaresource-specific fields to describe the intended augmentation, and standardized status fields to communicate whether the augmentation is happening or not.
 - _**Policy**_: a specific example of a metaresource whose intent is to specify rules that control the behavior of the target resource.
 
 ### Goals
@@ -93,17 +92,24 @@ All [risks and caveats](#tldr) considered, these are in general a few reasons fo
 
 This section describes concepts and aspects for designing and using metaresource objects.
 
-It defines important concepts such as the concepts of [Hierarchy of target kinds](#hierarchy-of-target-kinds-and-effective-metaresources), [Merge strategy](#merge-strategies), and [Effective metaresources](#hierarchy-of-target-kinds-and-effective-metaresources). It also describes an [Abstract process for calculating effective specs](#abstract-process-for-calculating-effective-metaresources) out of a set of metaresources objects.
+It reinforces previously defined concepts and defines other important ones such as the concepts of [Hierarchy of target kinds](#hierarchy-of-target-kinds), [Merge strategy](#merge-strategies), and [Effective metaresources](#effective-metaresources). It also describes an [Abstract process for calculating effective specs](#abstract-process-for-calculating-effective-metaresources) out of a set of metaresources objects.
 
 Designers of new metaresource kinds are encouraged to read this section top-to-bottom while users of metaresources may refer to it to further understand about the design decisions and thus infer about specific behavior and alternatives for a given metaresource kind.
 
-### Metaresources are well-structured CRDs
+### Metaresources
 
-Metaresources are typically implemented as Custom Resource Definitions (CRDs) that comply with a particular structure. This structure includes fields for specifying references to one or more other objects－called “targets“－whose behavior the instances of the metaresource intend to augment (i.e. declare additional specification), along with resource-specific fields－the “spec proper”－to describe the intended augmented behavior.
+As defined above, a metaresource is a CRD whose purpose is to augment the behavior of some other resource. At its most basic level, the metaresource pattern consists of:
+- A user defines a metaresource describing both the target resource(s) they want to augment, and the intent of the augmentation.
+- The metaresource controller notices the metaresource and applies the intent to the target resource(s).
+- The metaresource controller reports the status of the metaresource, indicating whether the intent is being applied or not.
 
-While the targets of a metaresource give the metaresource a *context*, the spec proper declares the *intent* within that context.
+In the real world, of course, things can be much more complex. There may be multiple conflicting metaresources, or the user might attempt to apply a metaresource that they aren't allowed to, or there may be errors in the metaresources. The metaersource controller MUST be able to handle all of these cases, and MUST communicate status correctly in all situations.
 
-A typical metaresource looks like the following – example provided based on a hypothetical `ColorPolicy` kind of metaresource:
+Additionally, since this GEP defines a pattern rather than an API field or resource, it is not possible to enumerate all possible metaresources in this GEP. This means that metaresources MUST follow a well-known structure so that Gateway API users and implementations can work with them in a consistent way, and this GEP focuses on that well-known structure.
+
+#### Metaresource structure
+
+A typical metaresource might look like the following:
 
 ```yaml
 apiVersion: policies.controller.io/v1
@@ -115,26 +121,20 @@ spec:
   - group: gateway.networking.k8s.io/v1
     kind: Gateway
     name: my-gateway
-  rules:      ## the "spec proper" describing the intent, i.e. color the traffic blue
-    color: blue
+  color: blue ## the "spec proper", i.e., one or more fields that specify the intent – e.g. to color the traffic flowing through the my-gateway Gateway blue
 ```
 
-### Properties of metaresources
+_(This is a hypothetical example: no ColorPolicy resource is defined in Gateway API.)_
 
-- _**Targetability (“where”)**_: Metaresources specify one or more target resources or specific sections of resources, whose behavior the metaresource intends to augment.
-- _**Semantics (“why”)**_: Targeting a resource (or section of a resource) must be interpreted within a given semantics that is proper to the metaresource kind.
-  Two different metaresource kinds that allow targeting resources of the same given kind X may have very different semantics, not only because the purpose of the two metaresource kinds differ, but also because the mechanics of calculating and applying the augmented behavior differ.
-  Often, the semantics of a metaresource is tightly coupled to the relationships and connections a target has with other kinds of objects, typically organized in a hierarchy of nested contexts. In this sense, targeting a given resource kind may have the semantics of spanning effect across yet other objects to which the target is related.
-- _**Mergeability (“how”)**_: Metaresources define so-called *merge strategies* that dictate how multiple instances of the metaresource affecting the same resource (or section of a resource) should be handled.
-  The merge strategies typically include strategies for dealing with conflicting and/or missing specs, such as for applying default and/or override values on the target resources.
+- Every metaresource MUST include a `targetRefs` stanza specifying which resource(s) the metaresource intends to augment.
+- Every metaresource MUST include a implementation-specific fields specifying how the metaresource will augment the behavior of the target resource(s). This is informally referred to as the "spec proper."
+- A metaresource MAY include a additional fields specifying a so-called _merge strategy_, i.e., how the metaresource should be combined with other metaresources that affect the same target resource(s). This typically include directives for dealing with conflicting and/or missing specs, such as for applying default and/or override values on the target resources.
 
-### Defining context: scoping intent in relation to targets
+#### The `targetRefs` stanza
 
-The objects targeted by a metaresource define a *context* where the *intent* that is specified in the metaresource itself is expected to be honored. This context exists in the form of other Kubernetes objects (or parts of objects) and referenced in the metaresources directly or indirectly by name or other referencing mechanisms.
+The targets of a metaresource are other Kubernetes objects (or parts of objects), including virtual kinds. They are referenced in the metaresources by name or using other referencing mechanisms.
 
-#### Ways of targeting objects
-
-Metaresources MAY be designed using different targeting methods, such as targeting objects by name (“reference by name”), using label selectors, and targeting with or without cross-namespace references allowed. In all cases, in order to fit within the framework described in this document, the targets MUST be declared within a `targetRefs` field within the spec of the metaresource instance.
+In order to fit within the framework described in this document, the targets MUST be declared within a `targetRefs` field within the spec of the metaresource instance.
 
 All kinds of references SHOULD also specify Group, Version and Kind (GVK) information as part of the target (unless the API ensures no more than one kind of object can be targeted).
 
@@ -152,8 +152,7 @@ spec:
   - group: gateway.networking.k8s.io/v1
     kind: Gateway
     name: my-gateway ## name of the target object of Gateway kind
-  rules:
-    color: blue
+  color: blue
 ```
 
 <details>
@@ -212,8 +211,7 @@ spec:
     selector: ## label selectors to a set of objects of the Gateway kind
       matchLabels:
         env: production
-  rules:
-    color: blue
+  color: blue
 ```
 
 <details>
@@ -314,21 +312,25 @@ Implementations that opt for designing metaresources that allow for cross namesp
   ```
 </details>
 
-#### Spanning behavior across relationships of a target
-
-Because the target objects that give a metaresource context sometimes are themselves inserted into a broader context of their own, composed of other interrelated objects, the effects of a metaresource can be limited to a target object itself or span across the links between this object and other objects that the object is related to.
-
-E.g. – a metaresource that targets a Namespace may declare intent that affects the behavior of the namespace itself (for what concerns to the implementation of Namespaces in Kubernetes) or alternatively it can act as a means to affect the behavior of other objects that exist in the referred namespace (e.g. ConfigMaps). While in the former case, the (direct) target object is the Namespace itself, in the latter the (indirect) target is a set of objects of a different kind (e.g. ConfigMaps.)
-
-To avoid any ambiguity in the interpretation of the targets, metaresources MUST clearly define the extent of their effects respectively to the object kinds they target (semantics of attaching a metaresource). This is usually defined in terms of a known hierarchy of resource kinds.
-
-See also: [Declared targets versus Effective targets](#declared-targets-versus-effective-targets) and [Hierarchy of target kinds and Effective metaresources](#hierarchy-of-target-kinds-and-effective-metaresources).
-
-#### Narrowing the target to sections of an object
+##### Targeting sections of an object
 
 Metaresource CRDs can offer the option to target a section of an object whose spec defines sections uniquely identifiable by name. These metaresources typically include a field `spec.targetRefs.sectionName` that can be used along with compatible kinds.
 
 E.g. – a metaresource that specifies additional behaviour for a given listener of a Gateway API Gateway object, though not for all listeners of the Gateway, MUST (i) require the Gateway listener to be uniquely named and (ii) provide the `sectionName` field of target reference with the name of the targeted listener.
+
+```yaml
+apiVersion: policies.controller.io/v1
+kind: ColorPolicy
+metadata:
+  name: my-color-policy
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io/v1
+    kind: Gateway
+    name: my-gateway
+    sectionname: https ## unique name of a listener specified in the object of Gateway kind
+  color: blue
+```
 
 <details>
   <summary>Implementation tip</summary>
@@ -371,9 +373,11 @@ E.g. – a metaresource that specifies additional behaviour for a given listener
   ```
 </details>
 
-#### Targeting virtual types
+##### Targeting virtual types
 
-In some cases, one may want to apply metaresources to objects that are not actual Kubernetes kinds. An example of such, from Gateway API mesh case, would be a hypothetical need for defining a policy to "color" requests to external services. To accomplish this, implementations MAY choose to support a reference to a _virtual resource type_. E.g.:
+_Virtual types_ are defined as those with a group unkown by the Kubernetes API server. They can be used to apply metaresources to objects that are not actual Kubernetes resources nor Kubernetes custom resources. rather, virtual types have a meaning for the metaresource controller responsible for implementing the metaresource.
+
+An example of such, from Gateway API mesh case, would be a hypothetical need for defining a policy to "color requests" to external services. To accomplish this, implementations MAY choose to support a reference to a virtual resource type `ExternalService`, unknown by the Kuberentes API server but known by the metaresource controller. E.g.:
 
 ```yaml
 apiVersion: policies.controller.io/v1
@@ -385,62 +389,112 @@ spec:
     group: networking.acme.io
     kind: ExternalService
     name: foo.com
-  rules:
-    color: blue
+  color: blue
 ```
 
 As a pattern, targeting virtual types has prior art in Kubernetes with the Role Based Access Control (RBAC), where Roles and ClusterRoles can used to specify permissions regarding any kind of resource including non-Kubernetes resources.
 
-### Conflicting specs and Inheritance
+### Scoping the intent
 
-Declaring additional specifications to objects from the outside can yield conflicts that need to be addressed in the implementation of metaresources. Multiple instances of a metaresource kind may affect an object (directly or indirectly), thus posing a possible conflict to resolve regarding which intent among the multiple metaresource specs a controller shall honor.
+The targets of a metaresource must be interpreted within a given semantics that is proper to the metaresource kind. Sometimes the declared targets define the direct scope of application of the metaresource. Inversily, depending on the metaresource kind, the targets can also represent indirections to the actual scope of application of the metaresource.
 
-In some cases, the most recent between two conflicting specs may be desired to win, whereas in other cases it might be the oldest; often the winning spec is determined by the hierarchical level (implicit or explicit) of the context which the metaresource applies, and sometimes other criteria must be adopted to resolve conflicts between metaresources ultimately affecting a same target or section of a target.
+Two different metaresource kinds that allow targeting resources of the same given kind X may have very different semantics. This happens not only because the purpose of the two metaresource kinds differ, but also because the scopes induced by specifying instances of X as targets differ, with consequences to entire the mechanics of calculating and applying the augmented behavior in each case.
 
-The hierarchical relationships of the object that are targeted by metaresources – whether corresponding to their parent contexts or in relation to their inner sections – may yield indirect conflicts of specs (conflicting intents). Metaresource kinds that allow for their instances to target at multiple levels of a hierarchy of resource kinds (e.g. Gateway API `Gateway` and `HTTPRoute` kinds), entire resources as well as sections of a resource, or resources and filtered contexts of these resource kind (e.g. with `gatewayClassName`) will often generate cases where the behavior specified by the metaresource either is fully enforced or partially enforced, either honored or overridden by another.
+#### Spanning behavior across relationships of a target
 
-Metaresource CRDs MUST clearly define the hierarchy of target resources they have effects upon, as well as the semantics of targeting each kind of resource in the hierarchy. Moreover, lower levels in the hierarchy *inherit* the definitions applied at the higher levels, in such a way that higher level rules may be understood as having an “umbrella effect” over everything under that level.
+Often, the semantics of scoping a metaresource is tightly related to the connections the target kind has with other kinds of objects. In this scenario, targeting a given resource kind may have the semantics of spanning effect across other these objects to which the target is related.
 
-E.g., in Gateway API’s hierarchy of network resources for the ingress use case `GatewayClass` > `Gateway` > `HTTPRoute` > `Backend`, a metaresource that attaches to a `GatewayClass` object, if defined as a metaresource kind ultimately to augment the behavior of `HTTPRoute` objects, affects all `Gateways` under the `GatewayClass`, as well as all `HTTPRoutes` under those `Gateways`. Any other instance of this metaresource kind targeting a lower level than the `GatewayClass` (e.g. `Gateway` or `HTTPRoute`) should be be treated as a conflict against the higher level metaresource spec, for the specific scope (“context”) of the subset of the hierarchy it attaches to. This conflict MUST be resolved according to some defined *merge strategy*.
+Typically, the relationships between direct and indirect target kinds are organized in a _hierarchy of nested contexts_.
 
-### Declared targets versus Effective targets
+An example of such is a metaresource that targets a Namespace. Depending on design of the metaresource kind, the metaresource object may declare intent to affect the behavior of the namespace itself (for what concerns to the implementation of Namespaces in Kubernetes) or alternatively it can act as a means to affect the behavior of other objects that exist in the referred namespace (e.g. ConfigMaps). While in the former case, the (direct) target object is the Namespace itself, in the latter the (indirect) target is a set of objects of a different kind (e.g. ConfigMaps.)
 
-A kind specified in the target reference of a metaresource can be the actual kind of object whose behavior the metaresource intends to augment or an indirection to targeting other kinds the object is hierarchically related to.
-
-E.g. targeting a Gateway API `Gateway` object with a metaresource can be:
+Another example of this semantic difference in the context of Gateway API objects is a metaresource that targets the `Gateway` kind, which can be:
 * a way to augment the behavior of the `Gateway` object itself (e.g. reconcile cloud infrastructure provider settings from the spec declared by the `Gateway` according the rules specified by the metaresource attached to the `Gateway`) or
 * a means to augment the behavior of all `HTTPRoute` objects attached to the `Gateway` (in a way that every new `HTTPRoute` that gets created or modified so it enters the context of the `Gateway` is automatically put in the scope of the metaresource.)
 
-The target kinds specified in the target references of a metaresource are referred to as *Declared target* kinds.
+#### Declared targets versus Effective targets
 
-These are distinct from *Effective target* kinds, which are the kinds of target objects whose behaviors are actually augmented by the metaresource. That occurs when declared targets are not equal to the actual targets augmented by the metaresource, but rather serve as a means for reaching other levels (typically lower level) of related object kinds.
+The target kinds specified in the `targetRefs` stanza of a metaresource are referred to as *Declared target* kinds.
 
-### Hierarchy of target kinds and Effective metaresources
+These are distinct from *Effective target* kinds, which are the kinds of target objects whose behaviors are actually augmented by the metaresource. That occurs when declared targets are not equal to the actual targets augmented by the metaresource, but rather serve as a means for reaching other levels (typically lower level) of a hierarchy related object kinds ("hierarchy of nested contexts").
 
-Target kinds MUST be arranged in a well-known _hierarchy of target kinds_, from the least specific target kinds to the most specific ones, across both declared and effective target kinds.
+To avoid ambiguity in the interpretation of the targets, metaresource designs MUST clearly define the extent of the effects of the metaresource respectively to the object kinds they can target (semantics of scoping a metaresource). This can be done via documentation and it typically refers to a known hierarchy of resource kinds.
 
-The best way to visualize this hierarchy－and therefore the instances of objects organized by the hierarchy－is in the form of a Directed Acyclic Graph (DAG) whose roots are the least specific objects and the leaves are the most specific ones (and ultimately the effective targets of the metaresources).
+### Conflicting specs, Inheritance, Merge strategies, and Effective metaresources
 
-Using a DAG to represent the hierarchy of effective targets ensures that all the relevant objects (all contexts) are represented, and makes the calculation of corresponding combinatorial specs much easier.
+Declaring additional specifications to objects from the outside can yield conflicts that need to be addressed in the implementation of metaresources. Multiple instances of a metaresource kind may affect an object (directly or indirectly), thus posing a possible conflict to resolve regarding which intent among the multiple metaresource specs a controller shall honor.
 
-The DAG works as a map to orderly resolve, for each effective target, a combinatorial spec that is collectively defined by the set of metaresources affecting the target. This combinatorial spec of each effective target is referred to as the *Effective metaresource* (or *Effective policy*).
+In some cases, the most recent between two conflicting specs may be desired to win, whereas in other cases it might be the oldest. Often, the winning spec is determined by the hierarchical level within the scope the metaresource applies, and sometimes other criteria must be adopted to resolve conflicts between metaresources ultimately affecting a same target or section of a target.
 
-The process of calculating Effective metaresources (Effective policies) consists of walking the hierarchy of target objects, from most specific to least specific (i.e., bottom-up, from the leaves towards the roots of the DAG of target objects) or from least specific to most specific (top-down), map reducing to a single metaresource spec each pair of metaresources adjacent to each other in the hierarchy, applying at each step one of the supported merge strategies described below, until no more than one spec remains for each effective target.
+The hierarchical relationships of the objects that are targeted by metaresources – whether associated to their parent/child relationship or between specs and their inner sections – may also yield conflicts of specs (conflicting intents). Metaresource kinds that allow for their instances to target at multiple levels of a hierarchy of resource kinds (e.g. Gateway API `Gateway` and `HTTPRoute` kinds), or alternatively entire resources as well as sections of a resource, will often generate cases where the behavior specified by the metaresource either is fully enforced or partially enforced, either honored or overridden by another.
 
-Metaresource kinds that implement more than one merge strategy MUST provide fields for the instances of the metaresource to specify a chosen strategy (described in the next section). The least specific metaresource of the pair of metaresources whose specs are merged into one dictates the merge strategy to apply in such cases.
+#### Hierarchy of target kinds
 
-#### Conflict resolution
+Metaresource CRDs MUST clearly define the hierarchy of target resources they have effects upon, as well as the [semantics](#scoping-the-intent) of targeting each kind in this hierarchy.
 
-If multiple metaresources target the same context (that is, multiple instances of the same metaresource kind acting on the same hierarchy have the same effective target), this is considered to be a conflict.
+The best way to visualize this hierarchy－and therefore the instances of objects organized by the hierarchy－is in the form of a Directed Acyclic Graph (DAG) whose roots are the least specific objects and the leaves are the most specific ones (and ultimately the effective targets of the metaresources). Using a DAG to represent the hierarchy of effective targets ensures that all the relevant objects are represented, and makes the calculation of corresponding combinatorial specs much easier.
 
-Conflicts must be resolved by applying a defined *merge strategy* (see further definition in the next section).
+Lower levels in the hierarchy (e.g., more specific kinds) *inherit* the definitions applied at the higher levels (e.g. less specific kinds), in such a way that higher level rules may be understood as having an “umbrella effect” over everything under that level.
 
-When resolving conflicts, the metaresource higher in the relevant hierarchy dictates the merge strategy. After that, the merge strategy's conflict resolution rules apply. If no merge strategy is specified, then implementations should use more-specific-wins merge strategy by default.
+E.g., given the Gateway API’s hierarchy of network resources for the ingress use case `GatewayClass` > `Gateway` > `HTTPRoute` > `Backend`. A metaresource that attaches to a `GatewayClass` object, if defined as a metaresource kind ultimately to augment the behavior of `HTTPRoute` objects, affects all `Gateways` under the `GatewayClass`, as well as all `HTTPRoutes` under those `Gateways`. Any other instance of this metaresource kind targeting a lower level than the `GatewayClass` (e.g. `Gateway` or `HTTPRoute`, assuming it's supported) should be be treated as a conflict against the higher level metaresource spec for the specific scope of the subset of the hierarchy rooted at the lower level target.
+
+Conflicts between metaresources ultimately affecting the same scope MUST be resolved according to some defined [*merge strategies*](#merge-strategies), into so-called *Effective metaresources*.
+
+#### Effective metaresources
+
+The DAG that represents the hierarchy of targetable objects works as a map to orderly resolve, for each [effective target](#declared-targets-versus-effective-targets), a combinatorial spec that is collectively defined by the set of metaresources affecting the target. This combinatorial spec of each effective target is referred to as the *Effective metaresource* (or *Effective policy*).
+
+The process of calculating Effective metaresources (Effective policies) consists of walking the hierarchy of target objects, from most specific to least specific (i.e., bottom-up, from the leaves towards the roots of the DAG of target objects) or from least specific to most specific (top-down), map reducing to a single metaresource spec each pair of metaresources adjacent to each other in the hierarchy, applying at each step one of the supported [*merge strategies*](#merge-strategies) (described below), until no more than one spec remains for each effective target.
+
+Between two metaresources in conflict and therefore whose specs are to be merged into one according to a given merge strategy, the least specific metaresource of the pair dictates the merge strategy to apply.
+
+Metaresource kinds that implement more than one merge strategy MUST provide a way in the spec for the instances of the metaresource to specify the chosen strategy that the metaresource controller must use to calculate an effective metaresource out of two instances. If no merge strategy is specified, then implementations should use more-specific-wins merge strategy by default.
+
+The following subsections define a set of rules to arrange metaresources for conflict resolution, as well as the abstract process to calculate effective metaresources.
+
+#### Conflict resolution rules
+
+If multiple metaresources have the same scope (that is, multiple instances of the same metaresource kind affect the same effective target), this is considered to be a conflict.
 
 To determine which metaresources attached to objects in a hierarchy are higher or lower, use the following rules, continuing on ties:
 1. Between two metaresources at different levels of the hierarchy, the one attached higher wins (i.e. dictates the merge strategy to use to resolve the conflict).
 2. Between two metaresources at the same level of the hierarchy, the older metaresource based on creation timestamp wins.
 3. Between two metaresources at the same level of the hierarchy and identical creation timestamps, the metaresource appearing first in alphabetical order by `{namespace}/{name}` wins.
+
+A metaresource winning over another means this metaresource dictates the merge strategy to apply.
+
+#### Merge strategies
+
+There are 3 *basic merge strategies*:
+* **None:** the metaresource with the oldest creation timestamp that is attached to a target wins, while all the other metaresources attached to the same target are rejected (`Accepted` status condition set to false).
+* **Defaults:** more specific specs beats less specific ones.
+* **Overrides:** less specific specs beats more specific ones.
+
+Metaresource kinds that implement specifically the Defaults or the Overrides base merge strategies SHOULD specify one or more *atomicity levels* to dictate how these base merge strategies must be applied. These are:
+* **Atomic spec:** the spec of the metaresource is treated as atomic, i.e., either one spec wins or another, but 2 specs are never mixed into a composition of specs. This is the default atomicity applied if not specified otherwise.
+* **Scalar values (“Patch”):** the specs of 2 metaresources are merged into one by applying the winning spec (according to semantics dictated by the base merge strategy, i.e., the more specific if Defaults or the less specific one if Overrides) over the other spec, in a JSON patch operation.
+* **\<Custom>:** the spec of 2 metaresources are mixed into a composition of both specs, following a custom merge algorithm specified by the metaresource or policy kind.
+
+The final set of *merge strategies* therefore supported by a metaresource CRD (base merge strategy \+ atomicity level) is any subset of the following, where \<Custom> is implementation-specific:
+* None
+* Atomic Defaults
+* Atomic Overrides
+* Patch Defaults
+* Patch Overrides
+* \<Custom> Defaults
+* \<Custom> Overrides
+
+Metaresource kinds MAY opt to implement any of these strategies, including multiple strategies.
+
+Metaresource kinds that do not specify any merge strategy and only support targeting a single kind (with Declared target = Effective target), by default MUST implement the **None** merge strategy. (See the definition of [Direct](#direct) class of metarsources.)
+
+Metaresource kinds that do not specify any merge strategy and support targeting multiple effective kinds, by default MUST implement the **Atomic Defaults** merge strategy.
+
+Metaresource kinds that implement more than one merge strategy MUST define a clear structure for the instances of metaresource to specify which of the supported strategies to apply. Instances of these metaresources MUST NOT be allowed to declare more than one merge strategy at a time, but only one of the supported strategies. If no merge strategy is specified by a given instance of the metaresource, the **Atomic Defaults** merge strategy MUST be assumed.
+
+A pattern known to be adopted by metaresource CRDs that support multiple merge strategies is the definition of a `strategy` field in the metaresource spec for the instances to specify the exact strategy to apply.
+
+Metaresource implementations SHOULD reflect in the `status` stanza of the metaresources somehow the applied merge strategies altering the effectiveness of the metaresource spec, if possible considering all the different scopes targeted by the metaresource－i.e., if metaresources is being enforced or overridden, partially or completely. (See [Metaresource status](#metaresource-status) section for details.)
 
 #### Abstract process for calculating Effective metaresources
 
@@ -518,45 +572,7 @@ In the example above, the expected outcome of the process is:
 * `c1` is augmented by the combination of `m1` + `m2`, whenever activated in the context of `b2`;
 * `c2` is augmented by the combination of `m1` + `m2`.
 
-The next section describes the different ways to combine metaresource instances (known as *merge strategies*), including a trivial merge strategy of not merging specs at all.
-
 In the most trivial case where metaresources can only directly target the objects whose behavior they intend to augment (i.e. instances of `C` without any indirections) and no metaresource specs are merged at all, the outcome of the process of calculating effective metaresources is simplified to a 1:1 mapping between metaresource and target object at most, where the declared metaresource equals the effective one, with no combinatorial specs nor contextual variations.
-
-### Merge strategies
-
-#### Basic merge strategies
-
-There are 3 *basic merge strategies*:
-
-* **None:** the metaresource with the oldest creation timestamp that is attached to a target wins, while all the other metaresources attached to the same target are rejected (`Accepted` status condition set to false).
-* **Defaults:** more specific specs beats less specific ones.
-* **Overrides:** less specific specs beats more specific ones.
-
-Metaresource CRDs may opt to implement any of these strategies, including multiple strategies.
-
-Metaresource CRDs that implement more than one merge strategy MUST define a clear structure for the instances of metaresource to specify which of the supported strategies to apply. Instances of these metaresources MUST NOT be allowed to declare more than one merge strategy, but only one of the supported strategies at a time.
-
-#### Atomicity of merging specs
-
-Metaresource CRDs that implement specifically the Defaults or the Overrides base merge strategies SHOULD specify one or more *atomicity levels* to dictate how these base merge strategies must be applied:
-
-* **Atomic spec:** the spec of the metaresource is treated as atomic, i.e., either one spec wins or another, but 2 specs are never mixed into a composition of specs. This is the default atomicity applied if not specified otherwise.
-* **Scalar values (“Patch”):** the specs of 2 metaresources are merged into one by applying the winning spec (according to semantics dictated by the base merge strategy, i.e., the more specific if Defaults or the less specific one if Overrides) over the other spec, in a JSON patch operation.
-* **\<Custom>:** the spec of 2 metaresources are mixed into a composition of both specs, following a custom merge algorithm specified by the metaresource or policy kind.
-
-#### Combined merge strategies
-
-The final set of *merge strategies* therefore supported by a metaresource CRD (base \+ atomicity) is any subset of the following, where \<Custom> is implementation-specific:
-
-* None
-* Atomic Defaults
-* Atomic Overrides
-* Patch Defaults
-* Patch Overrides
-* \<Custom> Defaults
-* \<Custom> Overrides
-
-Metaresource CRDs that support combined merged strategies are encouraged to define a `strategy` field for the instances to specify the exact strategy to apply.
 
 ### Classes of metaresources
 
@@ -928,13 +944,13 @@ In the context of traffic networking, for example, often the question asked by u
 
 With that in mind, a possible solution for the discoverability problem may involve designing tools (e.g. CLI tools/plugins), new CRDs, etc that let users ask questions in terms of the real life problems they have to deal with on a daily basis, rather than shaped by the underlying technologies used in the process. For instance, a simple Kubernetes object that is used to declare the rules to process a HTTP request cannot have its status reported simply as Ready/Not ready. By being a complex object composed of multiple routing rules, potentially affected by specifications declared from other objects as well, its status MUST account for that complexity and be structured in such a way that informs the owner with respect to each possible case, whether the ones induced by the internal specification declared by the object itself or its external relationships.
 
-In other words, the discoverability problem exists and must be addressed in light of the complexity associated with the topology of contexts induced by a set of hierarchically related resources. One should always have that topology in mind while asking questions regarding the behavior of a given resource, because just like a routing object (e.g. HTTPRoute) does not exist independently from its parent contexts (e.g. Gateways) or its children (e.g. Backends), any resource in focus may be just a part of a whole.
+In other words, the discoverability problem exists and must be addressed in light of the complexity associated with the topology of nested contexts induced by a set of hierarchically related resources. One should always have that topology in mind while asking questions regarding the behavior of a given resource, because just like a routing object (e.g. HTTPRoute) does not exist independently from its parent contexts (e.g. Gateways) or its children (e.g. Backends), any resource in focus may be just a part of a whole.
 
 ### Status reporting
 
 #### Metaresource status
 
-Metaresource CRDs MUST define a status stanza that allows for reporting the status of the metaresource with respect to each context the resource may apply.
+Metaresource CRDs MUST define a status stanza that allows for reporting the status of the metaresource with respect to each scope the resource may apply.
 
 The basic status conditions are:
 
