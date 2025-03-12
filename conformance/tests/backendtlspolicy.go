@@ -17,12 +17,19 @@ limitations under the License.
 package tests
 
 import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
 	"testing"
+	"time"
 
 	"k8s.io/apimachinery/pkg/types"
 
-	"sigs.k8s.io/gateway-api/conformance/utils/http"
+	h "sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
+	"sigs.k8s.io/gateway-api/conformance/utils/roundtripper"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
 	"sigs.k8s.io/gateway-api/pkg/features"
 )
@@ -45,8 +52,8 @@ var BackendTLSPolicy = suite.ConformanceTest{
 		gwNN := types.NamespacedName{Name: "gateway-backendtlspolicy", Namespace: ns}
 
 		kubernetes.NamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, []string{ns})
-
 		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
+		kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN)
 
 		serverStr := "abc.example.com"
 		headers := make(map[string]string)
@@ -54,17 +61,64 @@ var BackendTLSPolicy = suite.ConformanceTest{
 
 		// Verify that the response to a call to /backendTLS will return the matching SNI.
 		t.Run("Simple request targeting BackendTLSPolicy should reach infra-backend", func(t *testing.T) {
-			http.MakeHTTPSRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr,
-				http.ExpectedResponse{
-					Request: http.Request{
-						Headers: headers,
-						Host:    serverStr,
-						Path:    "/backendTLS",
-					},
-					Response:   http.Response{StatusCode: 200},
-					Namespace:  "gateway-conformance-infra",
-					ServerName: serverStr,
-				})
+			expected := h.ExpectedResponse{
+				Request: h.Request{
+					Headers: headers,
+					Host:    serverStr,
+					Path:    "/backendTLS",
+				},
+				Response: h.Response{StatusCode: 200},
+			}
+			req := h.MakeRequest(t, &expected, gwAddr, "HTTPS", "https")
+
+			if found, err := sameSNI(req, serverStr); err != nil || !found {
+				t.Errorf("no SNI found for request: %v", err)
+			}
 		})
 	},
+}
+
+func sameSNI(request roundtripper.Request, sni string) (bool, error) {
+	client := &http.Client{}
+	assertions := &kubernetes.RequestAssertions{}
+
+	method := "GET"
+	if request.Method != "" {
+		method = request.Method
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+	defer cancel()
+	req, err := http.NewRequestWithContext(ctx, method, request.URL.String(), nil)
+	if err != nil {
+		return false, fmt.Errorf("error creating request: %v", err)
+	}
+
+	if request.Host != "" {
+		req.Host = request.Host
+	}
+
+	if request.Headers != nil {
+		for name, value := range request.Headers {
+			req.Header.Set(name, value[0])
+		}
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return false, fmt.Errorf("request %v caused an error %v", req, err)
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return false, fmt.Errorf("failed to read response body: %v", err)
+	}
+
+	err = json.Unmarshal(body, assertions)
+	if err != nil {
+		return false, fmt.Errorf("unexpected error reading response: %w", err)
+	}
+
+	return assertions.SNI == sni, nil
 }
