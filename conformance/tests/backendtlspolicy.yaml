@@ -32,6 +32,7 @@ spec:
   - group: ""
     kind: Service
     name: "backendtlspolicy-test"
+    sectionName: "btls"
   validation:
     caCertificateRefs:
     - group: ""
@@ -71,9 +72,10 @@ spec:
   selector:
     app: backendtlspolicy-test
   ports:
-  - protocol: TCP
+  - name: "btls"
+    protocol: TCP
     port: 443
-    targetPort: 8443
+    targetPort: 9443
 ---
 # Deployment must not be applied until after the secret is generated.
 apiVersion: apps/v1
@@ -95,7 +97,7 @@ spec:
     spec:
       containers:
       - name: backendtlspolicy-test
-        image: gcr.io/k8s-staging-gateway-api/echo-basic:v20241007-v1.2.0-6-g9f820af9
+        image: echo-basic:2.7
         volumeMounts:
         - name: ca-volume
           mountPath: /etc/ca-volume
@@ -112,6 +114,8 @@ spec:
               fieldPath: metadata.namespace
         - name: CA_CERT
           value: /etc/ca-volume/crt
+        - name: CA_CERT_KEY
+          value: /etc/ca-volume/key
         - name: TLS_SERVER_CERT
           value: /etc/secret-volume/crt
         - name: TLS_SERVER_PRIVKEY
@@ -127,6 +131,8 @@ spec:
           items:
           - key: ca.crt
             path: crt
+          - key: key.crt
+            path: key
       - name: secret-volume
         secret:
           # This secret is generated dynamically by the test suite.

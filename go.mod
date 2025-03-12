@@ -7,7 +7,6 @@ toolchain go1.24.0
 require (
 	github.com/elastic/crd-ref-docs v0.1.0
 	github.com/miekg/dns v1.1.65
-	github.com/paultag/sniff v0.0.0-20200207005214-cf7e4d167732
 	github.com/stretchr/testify v1.10.0
 	golang.org/x/net v0.39.0
 	golang.org/x/sync v0.13.0
