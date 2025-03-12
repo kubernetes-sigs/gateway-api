@@ -119,7 +119,7 @@ func MakeHTTPSRequestAndExpectEventuallyConsistentResponse(t *testing.T, r round
 	t.Helper()
 
 	req := MakeRequest(t, &expected, gwAddr, "HTTPS", "https")
-
+	//fmt.Printf("DEBUG req: %v\n", req)
 	WaitForConsistentResponse(t, r, req, expected, timeoutConfig.RequiredConsecutiveSuccesses, timeoutConfig.MaxTimeToConsistency)
 }
 
@@ -250,6 +250,7 @@ func WaitForConsistentResponse(t *testing.T, r roundtripper.RoundTripper, req ro
 		cReq, cRes, err := r.CaptureRoundTrip(req)
 		if err != nil {
 			tlog.Logf(t, "Request failed, not ready yet: %v (after %v)", err.Error(), elapsed)
+			//tlog.Logf(t, "Debug: Request: %v, Response: %v", cReq, cRes)
 			return false
 		}
 
