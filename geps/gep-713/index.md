@@ -376,7 +376,7 @@ spec:
 
 ##### Targeting virtual types
 
-_Virtual types_ are defined as those with a group unkown by the Kubernetes API server. They can be used to apply metaresources to objects that are not actual Kubernetes resources nor Kubernetes custom resources. rather, virtual types have a meaning for the metaresource controller responsible for implementing the metaresource.
+_Virtual types_ are defined as those with a group unkown by the Kubernetes API server. They can be used to apply metaresources to objects that are not actual Kubernetes resources nor Kubernetes custom resources. Rather, virtual types have a meaning for the metaresource controller responsible for implementing the metaresource.
 
 An example of such, from Gateway API mesh case, would be a hypothetical need for defining a policy to "color requests" to external services. To accomplish this, implementations MAY choose to support a reference to a virtual resource type `ExternalService`, unknown by the Kuberentes API server but known by the metaresource controller. E.g.:
 
@@ -399,15 +399,15 @@ As a pattern, targeting virtual types has prior art in Kubernetes with the Role 
 
 The targets of a metaresource must be interpreted within a given semantics that is proper to the metaresource kind. Sometimes the declared targets define the direct scope of application of the metaresource. Inversily, depending on the metaresource kind, the targets can also represent indirections to the actual scope of application of the metaresource.
 
-Two different metaresource kinds that allow targeting resources of the same given kind X may have very different semantics. This happens not only because the purpose of the two metaresource kinds differ, but also because the scopes induced by specifying instances of X as targets differ, with consequences to entire the mechanics of calculating and applying the augmented behavior in each case.
+Two different metaresource kinds that allow targeting resources of the same given kind X may have very different semantics. This happens not only because the purpose of the two metaresource kinds differ, but also because the scopes induced by specifying instances of X as targets differ, with consequences to the entire mechanics of calculating and applying the augmented behavior in each case.
 
 #### Spanning behavior across relationships of a target
 
-Often, the semantics of scoping a metaresource is tightly related to the connections the target kind has with other kinds of objects. In this scenario, targeting a given resource kind may have the semantics of spanning effect across other these objects to which the target is related.
+Often, the semantics of scoping a metaresource is tightly related to the connections the target kind has with other kinds of objects. In this scenario, targeting a given resource kind may have the semantics of spanning effect across these other objects to which the target is related.
 
 Typically, the relationships between direct and indirect target kinds are organized in a _hierarchy of nested contexts_.
 
-An example of such is a metaresource that targets a Namespace. Depending on design of the metaresource kind, the metaresource object may declare intent to affect the behavior of the namespace itself (for what concerns to the implementation of Namespaces in Kubernetes) or alternatively it can act as a means to affect the behavior of other objects that exist in the referred namespace (e.g. ConfigMaps). While in the former case, the (direct) target object is the Namespace itself, in the latter the (indirect) target is a set of objects of a different kind (e.g. ConfigMaps.)
+An example of such is a metaresource that targets a Namespace. Depending on the design of the metaresource kind, the metaresource object may declare intent to affect the behavior of the namespace itself (for what concerns to the implementation of Namespaces in Kubernetes) or alternatively it can act as a means to affect the behavior of other objects that exist in the referred namespace (e.g. ConfigMaps). While in the former case, the (direct) target object is the Namespace itself, in the latter the (indirect) target is a set of objects of a different kind (e.g. ConfigMaps.)
 
 Another example of this semantic difference in the context of Gateway API objects is a metaresource that targets the `Gateway` kind, which can be:
 * a way to augment the behavior of the `Gateway` object itself (e.g. reconcile cloud infrastructure provider settings from the spec declared by the `Gateway` according the rules specified by the metaresource attached to the `Gateway`) or
@@ -417,7 +417,7 @@ Another example of this semantic difference in the context of Gateway API object
 
 The target kinds specified in the `targetRefs` stanza of a metaresource are referred to as *Declared target* kinds.
 
-These are distinct from *Effective target* kinds, which are the kinds of target objects whose behaviors are actually augmented by the metaresource. That occurs when declared targets are not equal to the actual targets augmented by the metaresource, but rather serve as a means for reaching other levels (typically lower level) of a hierarchy related object kinds ("hierarchy of nested contexts").
+These are distinct from *Effective target* kinds, which are the kinds of target objects whose behaviors are actually augmented by the metaresource. That occurs when declared targets are not equal to the actual targets augmented by the metaresource, but rather serve as a means for reaching other levels (typically lower level) of a hierarchy of related object kinds ("hierarchy of nested contexts").
 
 To avoid ambiguity in the interpretation of the targets, metaresource designs MUST clearly define the extent of the effects of the metaresource respectively to the object kinds they can target (semantics of scoping a metaresource). This can be done via documentation and it typically refers to a known hierarchy of resource kinds.
 
@@ -425,7 +425,7 @@ To avoid ambiguity in the interpretation of the targets, metaresource designs MU
 
 Declaring additional specifications to objects from the outside can yield conflicts that need to be addressed in the implementation of metaresources. Multiple instances of a metaresource kind may affect an object (directly or indirectly), thus posing a possible conflict to resolve regarding which intent among the multiple metaresource specs a controller shall honor.
 
-In some cases, the most recent between two conflicting specs may be desired to win, whereas in other cases it might be the oldest. Often, the winning spec is determined by the hierarchical level within the scope the metaresource applies, and sometimes other criteria must be adopted to resolve conflicts between metaresources ultimately affecting a same target or section of a target.
+In some cases, the most recent between two conflicting specs may be desired to win, whereas in other cases it might be the oldest. Often, the winning spec is determined by the hierarchical level within the scope the metaresource applies, and sometimes other criteria must be adopted to resolve conflicts between metaresources ultimately affecting a same target.
 
 The hierarchical relationships of the objects that are targeted by metaresources – whether associated to their parent/child relationship or between specs and their inner sections – may also yield conflicts of specs (conflicting intents). Metaresource kinds that allow for their instances to target at multiple levels of a hierarchy of resource kinds (e.g. Gateway API `Gateway` and `HTTPRoute` kinds), or alternatively entire resources as well as sections of a resource, will often generate cases where the behavior specified by the metaresource either is fully enforced or partially enforced, either honored or overridden by another.
 
@@ -437,9 +437,9 @@ The best way to visualize this hierarchy－and therefore the instances of object
 
 Lower levels in the hierarchy (e.g., more specific kinds) *inherit* the definitions applied at the higher levels (e.g. less specific kinds), in such a way that higher level rules may be understood as having an “umbrella effect” over everything under that level.
 
-E.g., given the Gateway API’s hierarchy of network resources for the ingress use case `GatewayClass` > `Gateway` > `HTTPRoute` > `Backend`. A metaresource that attaches to a `GatewayClass` object, if defined as a metaresource kind ultimately to augment the behavior of `HTTPRoute` objects, affects all `Gateways` under the `GatewayClass`, as well as all `HTTPRoutes` under those `Gateways`. Any other instance of this metaresource kind targeting a lower level than the `GatewayClass` (e.g. `Gateway` or `HTTPRoute`, assuming it's supported) should be be treated as a conflict against the higher level metaresource spec for the specific scope of the subset of the hierarchy rooted at the lower level target.
+E.g., given the Gateway API’s hierarchy of network resources for the ingress use case `GatewayClass` > `Gateway` > `HTTPRoute` > `Backend`. A metaresource that attaches to a `GatewayClass` object, if defined as a metaresource kind ultimately to augment the behavior of `HTTPRoute` objects, affects all `Gateways` under the `GatewayClass`, as well as all `HTTPRoutes` under those `Gateways`. Any other instance of this metaresource kind targeting a lower level than the `GatewayClass` (e.g. `Gateway` or `HTTPRoute`, assuming it's supported) should be be treated as a conflict against the higher level metaresource spec in the specific scope that is rooted at the lower level target, i.e., for the subset of the topology that is afftected by both metaresources.
 
-Conflicts between metaresources ultimately affecting the same scope MUST be resolved according to some defined [*merge strategies*](#merge-strategies), into so-called *Effective metaresources*.
+Conflicts between metaresources ultimately affecting the same scope MUST be resolved into so-called *Effective metaresources*, according to some defined [*merge strategies*](#merge-strategies).
 
 #### Effective metaresources
 
@@ -449,9 +449,9 @@ The process of calculating Effective metaresources (Effective policies) consists
 
 Between two metaresources in conflict and therefore whose specs are to be merged into one according to a given merge strategy, the least specific metaresource of the pair dictates the merge strategy to apply.
 
-Metaresource kinds that implement more than one merge strategy MUST provide a way in the spec for the instances of the metaresource to specify the chosen strategy that the metaresource controller must use to calculate an effective metaresource out of two instances. If no merge strategy is specified, then implementations should use more-specific-wins merge strategy by default.
+Metaresource kinds that implement more than one merge strategy MUST provide a way in the spec for the instances of the metaresource to specify the chosen strategy that the metaresource controller must use to calculate an effective metaresource out of two instances. If no merge strategy is specified, then implementations SHOULD use more-specific-wins merge strategy by default.
 
-The following subsections define a set of rules to arrange metaresources for conflict resolution, as well as the abstract process to calculate effective metaresources.
+The following subsections define a set of rules to arrange metaresources for conflict resolution, as well as an abstract process to calculate effective metaresources.
 
 #### Conflict resolution rules
 
@@ -466,13 +466,15 @@ A metaresource winning over another means this metaresource dictates the merge s
 
 #### Merge strategies
 
+A _merge strategy_ is a function that receives two conflicting specs and returns one.
+
 There are 3 *basic merge strategies*:
 * **None:** the metaresource with the oldest creation timestamp that is attached to a target wins, while all the other metaresources attached to the same target are rejected (`Accepted` status condition set to false).
 * **Defaults:** more specific specs beats less specific ones.
 * **Overrides:** less specific specs beats more specific ones.
 
 Metaresource kinds that implement specifically the Defaults or the Overrides base merge strategies SHOULD specify one or more *atomicity levels* to dictate how these base merge strategies must be applied. These are:
-* **Atomic spec:** the spec of the metaresource is treated as atomic, i.e., either one spec wins or another, but 2 specs are never mixed into a composition of specs. This is the default atomicity applied if not specified otherwise.
+* **Atomic spec:** the spec of the metaresource is treated as atomic, i.e., either one spec wins or another, but 2 specs are never mixed into a composition of specs. This MUST be the default atomicity applied if not specified otherwise.
 * **Scalar values (“Patch”):** the specs of 2 metaresources are merged into one by applying the winning spec (according to semantics dictated by the base merge strategy, i.e., the more specific if Defaults or the less specific one if Overrides) over the other spec, in a JSON patch operation.
 * **\<Custom>:** the spec of 2 metaresources are mixed into a composition of both specs, following a custom merge algorithm specified by the metaresource or policy kind.
 
@@ -535,7 +537,7 @@ graph
     m2 -.-> b2
 ```
 
-For each expanded context that is induced by the instances of targetable resource of kind `C` and its relationships given by the hierarchy, i.e. for each of: `a1` > `b1` > `c1`, `a1` > `b2` > `c1`, and `a1` > `b2` > `c2`, stack the metaresources targeting the context at any level, ordered from the most specific level (i.e. `C`) to the least specific one (i.e. `A`), applying the conflict resolution rules described in the previous subsection if necessary:
+For each expanded context that is induced by the instances of targetable resource of kind `C` and its relationships given by the hierarchy, i.e. for each of: `a1` > `b1` > `c1`, `a1` > `b2` > `c1`, and `a1` > `b2` > `c2`, stack the metaresources targeting the context at any level, ordered from the most specific level (i.e. `C`) to the least specific one (i.e. `A`), applying the [conflict resolution rules](#conflict-resolution-rules) described before if necessary:
 
 1. Pop two metaresources from the stack and combine them into one effective metaresource.
 2. Push the calculated effective metaresource back into the stack.
@@ -626,12 +628,16 @@ config:
 graph
   g1@{ shape: rect }
   r1@{ shape: rect }
+  r2@{ shape: rect }
   b1@{ shape: rect }
+  b2@{ shape: rect }
   p1@{ shape: stadium, label: "**p1**\ncolor:red\ncreationTimestamp:t" }
   p2@{ shape: stadium, label: "**p2**\ncolor:blue\ncreationTimestamp:t+Δ" }
 
   g1 --> r1
+  g1 --> r2
   r1 --> b1
+  r2 --> b2
 
   p1 -.-> b1
   p2 -.-> b1
@@ -941,7 +947,7 @@ For any given metaresource object, how do they know how many places it's being u
 
 Querying the status of objects stored in the cluster may be the Kubernetes way of knowing the state of the system, in a world where objects are declarative and there are only so many links between objects to jump in between. However, this is still a proxy used to model a real life problem that often has otherwise different ways to be thought about as well.
 
-In the context of traffic networking, for example, often the question asked by users is *“What happens when a network request X comes in?”*, stated in terms of a concrete “X”. There is an implicit expectation that a set of Kubernetes resources suffices to represent all the rules for a given workload to be activated and thus process request X, and often that is the case. For more complex cases however (multiple personas, application concerns separated into dedicated resource kinds, interaction between groups of users, etc), real life can get more complicated than a simple `kubectl get x`, or at least additional steps must be automated to encompass complexity into what can be achieved with a single declarative object.
+In the context of traffic networking, for example, often the question asked by users is *“What happens when a network request X comes in?”*. There is an implicit expectation that a set of Kubernetes resources suffices to represent all the rules for a given workload to be activated and thus process request X, and often that is the case. For more complex cases however (multiple personas, application concerns separated into dedicated resource kinds, interaction between groups of users, etc), real life can get more complicated than a simple `kubectl get x`, or at least additional steps must be automated to encompass complexity into what can be achieved with a single declarative object.
 
 With that in mind, a possible solution for the discoverability problem may involve designing tools (e.g. CLI tools/plugins), new CRDs, etc that let users ask questions in terms of the real life problems they have to deal with on a daily basis, rather than shaped by the underlying technologies used in the process. For instance, a simple Kubernetes object that is used to declare the rules to process a HTTP request cannot have its status reported simply as Ready/Not ready. By being a complex object composed of multiple routing rules, potentially affected by specifications declared from other objects as well, its status MUST account for that complexity and be structured in such a way that informs the owner with respect to each possible case, whether the ones induced by the internal specification declared by the object itself or its external relationships.
 
@@ -966,9 +972,9 @@ Metaresource implementations SHOULD support these basic status conditions.
 
 Implementations of metaresources SHOULD put a condition into `status.Conditions` of any objects affected by the metaresource.
 
-That condition, if added, MUST be named according to the pattern `<meta-resource-kind>Affected` (e.g. `colors.controller.k8s.io/ColorPolicyAffected`), and have the optional `observedGeneration` field kept up to date when the spec of the target object changes.
+That condition, if added, MUST be named according to the pattern `<meta-resource-kind>Affected` (e.g. `colors.controller.k8s.io/ColorPolicyAffected`), and SHOULD include `observedGeneration` field kept up to date when the spec of the target object changes.
 
-Implementations SHOULD use their own unique domain prefix for this condition type. Gateway API implementations, for instance, should use the same domain as in the `controllerName` field on `GatewayClass` (or some other implementation-unique domain for implementations that do not use `GatewayClass`.)
+Implementations SHOULD use their own unique domain prefix for this condition type. Gateway API implementations, for instance, SHOULD use the same domain as in the `controllerName` field on `GatewayClass` (or some other implementation-unique domain for implementations that do not use `GatewayClass`.)
 
 E.g. – given a `Gateway` object that is targeted by a hypothetical `ColorPolicy` metaresource named `policy-namespace/my-policy`, which is owned by a `colors.controller.k8s.io` controller and with status `Enforced` or `PartiallyEnforced`. The controller SHOULD add to the status of the `Gateway` object a condition `colors.controller.k8s.io/ColorPolicyAffected: true`, and reason ideally referring to the `policy-namespace/my-policy` by name.
 
@@ -998,7 +1004,7 @@ Therefore, a string representation of the rest of the file is likely the best th
 
 #### Fanout status update problems
 
-The fanout problem is that, when an update takes place in a single object (a metaresource, or an object with a metaresource attached), an implementation may need to update _many_ objects if it needs to place details of what metaresource applies, or what the resultant set of policy is on _every_ object.
+The fanout problem is that, when an update takes place in a single object (a metaresource, or an object with a metaresource attached), an implementation may need to update _many_ objects if it needs to place details of what metaresource applies, or what the resultant set of metaresources is on _every_ object.
 
 Historically, this is a risky strategy and needs to be carefully applied, as it's an excellent way to create apiserver load problems, which can produce a large range of bad effects for cluster stability.
 
@@ -1008,7 +1014,7 @@ This does not mean that nothing at all that affects multiple objects can be done
 
 ### Implementations
 
-These are a few known implementations of metaresources in compliance with this standard:
+These are a few known implementations of metaresources in compliance with this GEP:
 
 #### Gateway API (core)
 
