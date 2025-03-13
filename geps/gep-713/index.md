@@ -29,7 +29,7 @@ When designing Gateway API, a recurring challenge became apparent. There was oft
 There are several cases where this happens, such as:
 - when changing the spec of the object to hold the new piece of information is not possible (e.g., `ReferenceGrant`, from [GEP-709](../gep-709/index.md), when affecting Secrets and Services);
 - when the new specification applies at different scopes (different object kinds), making it more maintainable if the declaration is extracted to a separate object, rather than adding new fields representing the same functionality across multiple objects;
-- when the augmented behavior is intended to [span across relationships of an object](#spanning-behavior-across-relationships-of-a-target) other than the the object that is directly referred in the declaration;
+- when the augmented behavior is intended to [span across relationships of an object](#spanning-behavior-across-relationships-of-a-target) other than the object that is directly referred in the declaration;
 - when the augmented behavior is subject to different RBAC rules than the object it refers to;
 - to circumvent having to enforce hard changes to established implementations.
 
@@ -54,7 +54,7 @@ After a few iterations of Gateway API experimenting with this pattern－both, wi
 - A Gateway API implementer would like to define a way to specify a behavior that applies to multiple kinds of objects with a single declaration.
   - For example, an implementer might want to define a way to specify a behavior that applies to selected HTTPRoutes and selected TCPRoutes. Even though the HTTPRoute object could otherwise be extended via an implementation-specific filter, the TCPRoute object cannot.
 - A third-party provider would like to offer a way to independently extend the behavior of Gateways controlled by one or more Gateway API implementers.
-  - For example, a provider that knows how to configure Gateways controlled by one or more Gateway API implementers to send data passing through those gateways to a service of the provider might want to define a way for Gateway API users to activate this feature in standard way across the supported implementations though without direct involvement of the implementers.
+  - For example, a provider that knows how to configure Gateways controlled by one or more Gateway API implementers, aiming to send data passing through those gateways to a service of the provider, might want to define a way for Gateway API users to activate this feature in a standard way across the supported implementations, without direct involvement of the implementers.
 
 All [risks and caveats](#tldr) considered, these are in general a few reasons for using metaresources over another (possibly more direct) way to modify the spec (“augment the behavior”) of an object:
 
@@ -67,8 +67,9 @@ All [risks and caveats](#tldr) considered, these are in general a few reasons fo
 ### Definitions
 
 - _**Metaresource**_: a resource that augments the behavior of another resource without modifying the definition of the resource. Metaresources MUST clearly define a _target_ and an _intent_ as defined in this GEP, and MUST clearly communicate status about whether the augmentation is happening or not.
-  - The target of a metaresource specifies the resource or resources whose behavior the metaresource will augment.
+  - The target of a metaresource specifies the resource or resources whose behavior the metaresource intend to augment.
   - The intent of a metaresource specifies what augmentation the metaresource will apply.
+
   Metaresources are Custom Resource Definitions (CRDs) that comply with a particular [structure](#metaresource-structure). This structure includes standardized fields for specifying the target(s), metaresource-specific fields to describe the intended augmentation, and standardized status fields to communicate whether the augmentation is happening or not.
 - _**Policy**_: a specific example of a metaresource whose intent is to specify rules that control the behavior of the target resource.
 
@@ -92,9 +93,9 @@ All [risks and caveats](#tldr) considered, these are in general a few reasons fo
 
 This section describes concepts and aspects for designing and using metaresource objects.
 
-It reinforces previously defined concepts and defines other important ones such as the concepts of [Hierarchy of target kinds](#hierarchy-of-target-kinds), [Merge strategy](#merge-strategies), and [Effective metaresources](#effective-metaresources). It also describes an [Abstract process for calculating effective specs](#abstract-process-for-calculating-effective-metaresources) out of a set of metaresources objects.
+It reinforces previously defined concepts and defines other important ones such as the concepts of [Hierarchy of target kinds](#hierarchy-of-target-kinds), [Merge strategy](#merge-strategies), and [Effective metaresources](#effective-metaresources). It also describes an [Abstract process for calculating effective specs](#abstract-process-for-calculating-effective-metaresources) out of a set of metaresource objects.
 
-Designers of new metaresource kinds are encouraged to read this section top-to-bottom while users of metaresources may refer to it to further understand about the design decisions and thus infer about specific behavior and alternatives for a given metaresource kind.
+Designers of new metaresource kinds are encouraged to read this section top-to-bottom while users of metaresources may refer to it more specifically, to further understand about the design decisions and thus make inferences about the behavior and alternatives for a given metaresource kind.
 
 ### Metaresources
 
@@ -127,8 +128,8 @@ spec:
 _(This is a hypothetical example: no ColorPolicy resource is defined in Gateway API.)_
 
 - Every metaresource MUST include a `targetRefs` stanza specifying which resource(s) the metaresource intends to augment.
-- Every metaresource MUST include a implementation-specific fields specifying how the metaresource will augment the behavior of the target resource(s). This is informally referred to as the "spec proper."
-- A metaresource MAY include a additional fields specifying a so-called _merge strategy_, i.e., how the metaresource should be combined with other metaresources that affect the same target resource(s). This typically include directives for dealing with conflicting and/or missing specs, such as for applying default and/or override values on the target resources.
+- Every metaresource MUST include one or more implementation-specific fields specifying how the metaresource will augment the behavior of the target resource(s). This is informally referred to as the "spec proper."
+- A metaresource MAY include additional fields specifying a so-called _merge strategy_, i.e., how the metaresource should be combined with other metaresources that affect the same target resource(s). This typically include directives for dealing with conflicting and/or missing specs, such as for applying default and/or override values on the target resources.
 
 #### The `targetRefs` stanza
 
