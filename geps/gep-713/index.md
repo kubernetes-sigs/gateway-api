@@ -329,7 +329,7 @@ spec:
   - group: gateway.networking.k8s.io/v1
     kind: Gateway
     name: my-gateway
-    sectionname: https ## unique name of a listener specified in the object of Gateway kind
+    sectionName: https ## unique name of a listener specified in the object of Gateway kind
   color: blue
 ```
 
