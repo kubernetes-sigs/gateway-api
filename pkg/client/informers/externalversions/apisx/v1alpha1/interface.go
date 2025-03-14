@@ -24,10 +24,10 @@ import (
 
 // Interface provides access to all the informers in this group version.
 type Interface interface {
-	// BackendTrafficPolicies returns a BackendTrafficPolicyInformer.
-	BackendTrafficPolicies() BackendTrafficPolicyInformer
-	// ListenerSets returns a ListenerSetInformer.
-	ListenerSets() ListenerSetInformer
+	// XBackendTrafficPolicies returns a XBackendTrafficPolicyInformer.
+	XBackendTrafficPolicies() XBackendTrafficPolicyInformer
+	// XListenerSets returns a XListenerSetInformer.
+	XListenerSets() XListenerSetInformer
 }
 
 type version struct {
@@ -41,12 +41,12 @@ func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakList
 	return &version{factory: f, namespace: namespace, tweakListOptions: tweakListOptions}
 }
 
-// BackendTrafficPolicies returns a BackendTrafficPolicyInformer.
-func (v *version) BackendTrafficPolicies() BackendTrafficPolicyInformer {
-	return &backendTrafficPolicyInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+// XBackendTrafficPolicies returns a XBackendTrafficPolicyInformer.
+func (v *version) XBackendTrafficPolicies() XBackendTrafficPolicyInformer {
+	return &xBackendTrafficPolicyInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
-// ListenerSets returns a ListenerSetInformer.
-func (v *version) ListenerSets() ListenerSetInformer {
-	return &listenerSetInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+// XListenerSets returns a XListenerSetInformer.
+func (v *version) XListenerSets() XListenerSetInformer {
+	return &xListenerSetInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }

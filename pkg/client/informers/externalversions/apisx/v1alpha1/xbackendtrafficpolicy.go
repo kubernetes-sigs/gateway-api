@@ -32,59 +32,59 @@ import (
 	v1alpha1 "sigs.k8s.io/gateway-api/pkg/client/listers/apisx/v1alpha1"
 )
 
-// BackendTrafficPolicyInformer provides access to a shared informer and lister for
-// BackendTrafficPolicies.
-type BackendTrafficPolicyInformer interface {
+// XBackendTrafficPolicyInformer provides access to a shared informer and lister for
+// XBackendTrafficPolicies.
+type XBackendTrafficPolicyInformer interface {
 	Informer() cache.SharedIndexInformer
-	Lister() v1alpha1.BackendTrafficPolicyLister
+	Lister() v1alpha1.XBackendTrafficPolicyLister
 }
 
-type backendTrafficPolicyInformer struct {
+type xBackendTrafficPolicyInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
 	tweakListOptions internalinterfaces.TweakListOptionsFunc
 	namespace        string
 }
 
-// NewBackendTrafficPolicyInformer constructs a new informer for BackendTrafficPolicy type.
+// NewXBackendTrafficPolicyInformer constructs a new informer for XBackendTrafficPolicy type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewBackendTrafficPolicyInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
-	return NewFilteredBackendTrafficPolicyInformer(client, namespace, resyncPeriod, indexers, nil)
+func NewXBackendTrafficPolicyInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
+	return NewFilteredXBackendTrafficPolicyInformer(client, namespace, resyncPeriod, indexers, nil)
 }
 
-// NewFilteredBackendTrafficPolicyInformer constructs a new informer for BackendTrafficPolicy type.
+// NewFilteredXBackendTrafficPolicyInformer constructs a new informer for XBackendTrafficPolicy type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewFilteredBackendTrafficPolicyInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
+func NewFilteredXBackendTrafficPolicyInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
 	return cache.NewSharedIndexInformer(
 		&cache.ListWatch{
 			ListFunc: func(options v1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.ExperimentalV1alpha1().BackendTrafficPolicies(namespace).List(context.TODO(), options)
+				return client.ExperimentalV1alpha1().XBackendTrafficPolicies(namespace).List(context.TODO(), options)
 			},
 			WatchFunc: func(options v1.ListOptions) (watch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.ExperimentalV1alpha1().BackendTrafficPolicies(namespace).Watch(context.TODO(), options)
+				return client.ExperimentalV1alpha1().XBackendTrafficPolicies(namespace).Watch(context.TODO(), options)
 			},
 		},
-		&apisxv1alpha1.BackendTrafficPolicy{},
+		&apisxv1alpha1.XBackendTrafficPolicy{},
 		resyncPeriod,
 		indexers,
 	)
 }
 
-func (f *backendTrafficPolicyInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewFilteredBackendTrafficPolicyInformer(client, f.namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
+func (f *xBackendTrafficPolicyInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
+	return NewFilteredXBackendTrafficPolicyInformer(client, f.namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
 }
 
-func (f *backendTrafficPolicyInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&apisxv1alpha1.BackendTrafficPolicy{}, f.defaultInformer)
+func (f *xBackendTrafficPolicyInformer) Informer() cache.SharedIndexInformer {
+	return f.factory.InformerFor(&apisxv1alpha1.XBackendTrafficPolicy{}, f.defaultInformer)
 }
 
-func (f *backendTrafficPolicyInformer) Lister() v1alpha1.BackendTrafficPolicyLister {
-	return v1alpha1.NewBackendTrafficPolicyLister(f.Informer().GetIndexer())
+func (f *xBackendTrafficPolicyInformer) Lister() v1alpha1.XBackendTrafficPolicyLister {
+	return v1alpha1.NewXBackendTrafficPolicyLister(f.Informer().GetIndexer())
 }

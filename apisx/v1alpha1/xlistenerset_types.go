@@ -29,9 +29,9 @@ import (
 // +kubebuilder:printcolumn:name="Programmed",type=string,JSONPath=`.status.conditions[?(@.type=="Programmed")].status`
 // +kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 
-// ListenerSet defines a set of additional listeners
+// XListenerSet defines a set of additional listeners
 // to attach to an existing Gateway.
-type ListenerSet struct {
+type XListenerSet struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
@@ -582,8 +582,8 @@ const (
 )
 
 // +kubebuilder:object:root=true
-type ListenerSetList struct {
+type XListenerSetList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []ListenerSet `json:"items"`
+	Items           []XListenerSet `json:"items"`
 }
