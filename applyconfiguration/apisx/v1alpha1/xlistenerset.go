@@ -27,58 +27,58 @@ import (
 	internal "sigs.k8s.io/gateway-api/applyconfiguration/internal"
 )
 
-// ListenerSetApplyConfiguration represents a declarative configuration of the ListenerSet type for use
+// XListenerSetApplyConfiguration represents a declarative configuration of the XListenerSet type for use
 // with apply.
-type ListenerSetApplyConfiguration struct {
+type XListenerSetApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	Spec                             *ListenerSetSpecApplyConfiguration   `json:"spec,omitempty"`
 	Status                           *ListenerSetStatusApplyConfiguration `json:"status,omitempty"`
 }
 
-// ListenerSet constructs a declarative configuration of the ListenerSet type for use with
+// XListenerSet constructs a declarative configuration of the XListenerSet type for use with
 // apply.
-func ListenerSet(name, namespace string) *ListenerSetApplyConfiguration {
-	b := &ListenerSetApplyConfiguration{}
+func XListenerSet(name, namespace string) *XListenerSetApplyConfiguration {
+	b := &XListenerSetApplyConfiguration{}
 	b.WithName(name)
 	b.WithNamespace(namespace)
-	b.WithKind("ListenerSet")
+	b.WithKind("XListenerSet")
 	b.WithAPIVersion("gateway.networking.x-k8s.io/v1alpha1")
 	return b
 }
 
-// ExtractListenerSet extracts the applied configuration owned by fieldManager from
-// listenerSet. If no managedFields are found in listenerSet for fieldManager, a
-// ListenerSetApplyConfiguration is returned with only the Name, Namespace (if applicable),
+// ExtractXListenerSet extracts the applied configuration owned by fieldManager from
+// xListenerSet. If no managedFields are found in xListenerSet for fieldManager, a
+// XListenerSetApplyConfiguration is returned with only the Name, Namespace (if applicable),
 // APIVersion and Kind populated. It is possible that no managed fields were found for because other
 // field managers have taken ownership of all the fields previously owned by fieldManager, or because
 // the fieldManager never owned fields any fields.
-// listenerSet must be a unmodified ListenerSet API object that was retrieved from the Kubernetes API.
-// ExtractListenerSet provides a way to perform a extract/modify-in-place/apply workflow.
+// xListenerSet must be a unmodified XListenerSet API object that was retrieved from the Kubernetes API.
+// ExtractXListenerSet provides a way to perform a extract/modify-in-place/apply workflow.
 // Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
 // applied if another fieldManager has updated or force applied any of the previously applied fields.
 // Experimental!
-func ExtractListenerSet(listenerSet *apisxv1alpha1.ListenerSet, fieldManager string) (*ListenerSetApplyConfiguration, error) {
-	return extractListenerSet(listenerSet, fieldManager, "")
+func ExtractXListenerSet(xListenerSet *apisxv1alpha1.XListenerSet, fieldManager string) (*XListenerSetApplyConfiguration, error) {
+	return extractXListenerSet(xListenerSet, fieldManager, "")
 }
 
-// ExtractListenerSetStatus is the same as ExtractListenerSet except
+// ExtractXListenerSetStatus is the same as ExtractXListenerSet except
 // that it extracts the status subresource applied configuration.
 // Experimental!
-func ExtractListenerSetStatus(listenerSet *apisxv1alpha1.ListenerSet, fieldManager string) (*ListenerSetApplyConfiguration, error) {
-	return extractListenerSet(listenerSet, fieldManager, "status")
+func ExtractXListenerSetStatus(xListenerSet *apisxv1alpha1.XListenerSet, fieldManager string) (*XListenerSetApplyConfiguration, error) {
+	return extractXListenerSet(xListenerSet, fieldManager, "status")
 }
 
-func extractListenerSet(listenerSet *apisxv1alpha1.ListenerSet, fieldManager string, subresource string) (*ListenerSetApplyConfiguration, error) {
-	b := &ListenerSetApplyConfiguration{}
-	err := managedfields.ExtractInto(listenerSet, internal.Parser().Type("io.k8s.sigs.gateway-api.apisx.v1alpha1.ListenerSet"), fieldManager, b, subresource)
+func extractXListenerSet(xListenerSet *apisxv1alpha1.XListenerSet, fieldManager string, subresource string) (*XListenerSetApplyConfiguration, error) {
+	b := &XListenerSetApplyConfiguration{}
+	err := managedfields.ExtractInto(xListenerSet, internal.Parser().Type("io.k8s.sigs.gateway-api.apisx.v1alpha1.XListenerSet"), fieldManager, b, subresource)
 	if err != nil {
 		return nil, err
 	}
-	b.WithName(listenerSet.Name)
-	b.WithNamespace(listenerSet.Namespace)
+	b.WithName(xListenerSet.Name)
+	b.WithNamespace(xListenerSet.Namespace)
 
-	b.WithKind("ListenerSet")
+	b.WithKind("XListenerSet")
 	b.WithAPIVersion("gateway.networking.x-k8s.io/v1alpha1")
 	return b, nil
 }
@@ -86,7 +86,7 @@ func extractListenerSet(listenerSet *apisxv1alpha1.ListenerSet, fieldManager str
 // WithKind sets the Kind field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Kind field is set to the value of the last call.
-func (b *ListenerSetApplyConfiguration) WithKind(value string) *ListenerSetApplyConfiguration {
+func (b *XListenerSetApplyConfiguration) WithKind(value string) *XListenerSetApplyConfiguration {
 	b.Kind = &value
 	return b
 }
@@ -94,7 +94,7 @@ func (b *ListenerSetApplyConfiguration) WithKind(value string) *ListenerSetApply
 // WithAPIVersion sets the APIVersion field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the APIVersion field is set to the value of the last call.
-func (b *ListenerSetApplyConfiguration) WithAPIVersion(value string) *ListenerSetApplyConfiguration {
+func (b *XListenerSetApplyConfiguration) WithAPIVersion(value string) *XListenerSetApplyConfiguration {
 	b.APIVersion = &value
 	return b
 }
@@ -102,7 +102,7 @@ func (b *ListenerSetApplyConfiguration) WithAPIVersion(value string) *ListenerSe
 // WithName sets the Name field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Name field is set to the value of the last call.
-func (b *ListenerSetApplyConfiguration) WithName(value string) *ListenerSetApplyConfiguration {
+func (b *XListenerSetApplyConfiguration) WithName(value string) *XListenerSetApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
 	b.Name = &value
 	return b
@@ -111,7 +111,7 @@ func (b *ListenerSetApplyConfiguration) WithName(value string) *ListenerSetApply
 // WithGenerateName sets the GenerateName field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the GenerateName field is set to the value of the last call.
-func (b *ListenerSetApplyConfiguration) WithGenerateName(value string) *ListenerSetApplyConfiguration {
+func (b *XListenerSetApplyConfiguration) WithGenerateName(value string) *XListenerSetApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
 	b.GenerateName = &value
 	return b
@@ -120,7 +120,7 @@ func (b *ListenerSetApplyConfiguration) WithGenerateName(value string) *Listener
 // WithNamespace sets the Namespace field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Namespace field is set to the value of the last call.
-func (b *ListenerSetApplyConfiguration) WithNamespace(value string) *ListenerSetApplyConfiguration {
+func (b *XListenerSetApplyConfiguration) WithNamespace(value string) *XListenerSetApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
 	b.Namespace = &value
 	return b
@@ -129,7 +129,7 @@ func (b *ListenerSetApplyConfiguration) WithNamespace(value string) *ListenerSet
 // WithUID sets the UID field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the UID field is set to the value of the last call.
-func (b *ListenerSetApplyConfiguration) WithUID(value types.UID) *ListenerSetApplyConfiguration {
+func (b *XListenerSetApplyConfiguration) WithUID(value types.UID) *XListenerSetApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
 	b.UID = &value
 	return b
@@ -138,7 +138,7 @@ func (b *ListenerSetApplyConfiguration) WithUID(value types.UID) *ListenerSetApp
 // WithResourceVersion sets the ResourceVersion field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the ResourceVersion field is set to the value of the last call.
-func (b *ListenerSetApplyConfiguration) WithResourceVersion(value string) *ListenerSetApplyConfiguration {
+func (b *XListenerSetApplyConfiguration) WithResourceVersion(value string) *XListenerSetApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
 	b.ResourceVersion = &value
 	return b
@@ -147,7 +147,7 @@ func (b *ListenerSetApplyConfiguration) WithResourceVersion(value string) *Liste
 // WithGeneration sets the Generation field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Generation field is set to the value of the last call.
-func (b *ListenerSetApplyConfiguration) WithGeneration(value int64) *ListenerSetApplyConfiguration {
+func (b *XListenerSetApplyConfiguration) WithGeneration(value int64) *XListenerSetApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
 	b.Generation = &value
 	return b
@@ -156,7 +156,7 @@ func (b *ListenerSetApplyConfiguration) WithGeneration(value int64) *ListenerSet
 // WithCreationTimestamp sets the CreationTimestamp field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the CreationTimestamp field is set to the value of the last call.
-func (b *ListenerSetApplyConfiguration) WithCreationTimestamp(value metav1.Time) *ListenerSetApplyConfiguration {
+func (b *XListenerSetApplyConfiguration) WithCreationTimestamp(value metav1.Time) *XListenerSetApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
 	b.CreationTimestamp = &value
 	return b
@@ -165,7 +165,7 @@ func (b *ListenerSetApplyConfiguration) WithCreationTimestamp(value metav1.Time)
 // WithDeletionTimestamp sets the DeletionTimestamp field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the DeletionTimestamp field is set to the value of the last call.
-func (b *ListenerSetApplyConfiguration) WithDeletionTimestamp(value metav1.Time) *ListenerSetApplyConfiguration {
+func (b *XListenerSetApplyConfiguration) WithDeletionTimestamp(value metav1.Time) *XListenerSetApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
 	b.DeletionTimestamp = &value
 	return b
@@ -174,7 +174,7 @@ func (b *ListenerSetApplyConfiguration) WithDeletionTimestamp(value metav1.Time)
 // WithDeletionGracePeriodSeconds sets the DeletionGracePeriodSeconds field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the DeletionGracePeriodSeconds field is set to the value of the last call.
-func (b *ListenerSetApplyConfiguration) WithDeletionGracePeriodSeconds(value int64) *ListenerSetApplyConfiguration {
+func (b *XListenerSetApplyConfiguration) WithDeletionGracePeriodSeconds(value int64) *XListenerSetApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
 	b.DeletionGracePeriodSeconds = &value
 	return b
@@ -184,7 +184,7 @@ func (b *ListenerSetApplyConfiguration) WithDeletionGracePeriodSeconds(value int
 // and returns the receiver, so that objects can be build by chaining "With" function invocations.
 // If called multiple times, the entries provided by each call will be put on the Labels field,
 // overwriting an existing map entries in Labels field with the same key.
-func (b *ListenerSetApplyConfiguration) WithLabels(entries map[string]string) *ListenerSetApplyConfiguration {
+func (b *XListenerSetApplyConfiguration) WithLabels(entries map[string]string) *XListenerSetApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
 	if b.Labels == nil && len(entries) > 0 {
 		b.Labels = make(map[string]string, len(entries))
@@ -199,7 +199,7 @@ func (b *ListenerSetApplyConfiguration) WithLabels(entries map[string]string) *L
 // and returns the receiver, so that objects can be build by chaining "With" function invocations.
 // If called multiple times, the entries provided by each call will be put on the Annotations field,
 // overwriting an existing map entries in Annotations field with the same key.
-func (b *ListenerSetApplyConfiguration) WithAnnotations(entries map[string]string) *ListenerSetApplyConfiguration {
+func (b *XListenerSetApplyConfiguration) WithAnnotations(entries map[string]string) *XListenerSetApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
 	if b.Annotations == nil && len(entries) > 0 {
 		b.Annotations = make(map[string]string, len(entries))
@@ -213,7 +213,7 @@ func (b *ListenerSetApplyConfiguration) WithAnnotations(entries map[string]strin
 // WithOwnerReferences adds the given value to the OwnerReferences field in the declarative configuration
 // and returns the receiver, so that objects can be build by chaining "With" function invocations.
 // If called multiple times, values provided by each call will be appended to the OwnerReferences field.
-func (b *ListenerSetApplyConfiguration) WithOwnerReferences(values ...*v1.OwnerReferenceApplyConfiguration) *ListenerSetApplyConfiguration {
+func (b *XListenerSetApplyConfiguration) WithOwnerReferences(values ...*v1.OwnerReferenceApplyConfiguration) *XListenerSetApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
 	for i := range values {
 		if values[i] == nil {
@@ -227,7 +227,7 @@ func (b *ListenerSetApplyConfiguration) WithOwnerReferences(values ...*v1.OwnerR
 // WithFinalizers adds the given value to the Finalizers field in the declarative configuration
 // and returns the receiver, so that objects can be build by chaining "With" function invocations.
 // If called multiple times, values provided by each call will be appended to the Finalizers field.
-func (b *ListenerSetApplyConfiguration) WithFinalizers(values ...string) *ListenerSetApplyConfiguration {
+func (b *XListenerSetApplyConfiguration) WithFinalizers(values ...string) *XListenerSetApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
 	for i := range values {
 		b.Finalizers = append(b.Finalizers, values[i])
@@ -235,7 +235,7 @@ func (b *ListenerSetApplyConfiguration) WithFinalizers(values ...string) *Listen
 	return b
 }
 
-func (b *ListenerSetApplyConfiguration) ensureObjectMetaApplyConfigurationExists() {
+func (b *XListenerSetApplyConfiguration) ensureObjectMetaApplyConfigurationExists() {
 	if b.ObjectMetaApplyConfiguration == nil {
 		b.ObjectMetaApplyConfiguration = &v1.ObjectMetaApplyConfiguration{}
 	}
@@ -244,7 +244,7 @@ func (b *ListenerSetApplyConfiguration) ensureObjectMetaApplyConfigurationExists
 // WithSpec sets the Spec field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Spec field is set to the value of the last call.
-func (b *ListenerSetApplyConfiguration) WithSpec(value *ListenerSetSpecApplyConfiguration) *ListenerSetApplyConfiguration {
+func (b *XListenerSetApplyConfiguration) WithSpec(value *ListenerSetSpecApplyConfiguration) *XListenerSetApplyConfiguration {
 	b.Spec = value
 	return b
 }
@@ -252,13 +252,13 @@ func (b *ListenerSetApplyConfiguration) WithSpec(value *ListenerSetSpecApplyConf
 // WithStatus sets the Status field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Status field is set to the value of the last call.
-func (b *ListenerSetApplyConfiguration) WithStatus(value *ListenerSetStatusApplyConfiguration) *ListenerSetApplyConfiguration {
+func (b *XListenerSetApplyConfiguration) WithStatus(value *ListenerSetStatusApplyConfiguration) *XListenerSetApplyConfiguration {
 	b.Status = value
 	return b
 }
 
 // GetName retrieves the value of the Name field in the declarative configuration.
-func (b *ListenerSetApplyConfiguration) GetName() *string {
+func (b *XListenerSetApplyConfiguration) GetName() *string {
 	b.ensureObjectMetaApplyConfigurationExists()
 	return b.Name
 }
