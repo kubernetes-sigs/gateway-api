@@ -1805,7 +1805,7 @@ spec:
                                 has(self.method) ? self.method.matches(r"""^[A-Za-z_][A-Za-z_0-9]*$"""):
                                 true'
                         type: object
-                      maxItems: 8
+                      maxItems: 64
                       type: array
                     name:
                       description: |-
