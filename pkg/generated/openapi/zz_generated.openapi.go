@@ -4009,7 +4009,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewaySpecAddress(ref common.Referenc
 					},
 					"value": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Value of the address. The validity of the values will depend on the type and support by the controller.\n\nExamples: `1.2.3.4`, `128::1`, `my-ip-address`.",
+							Description: "When a value is unspecified, an implementation SHOULD automatically assign an address matching the requested type if possible.\n\nIf an implementation does not support an empty value, they MUST set the \"Programmed\" condition in status to False with a reason of \"AddressNotAssigned\".\n\nExamples: `1.2.3.4`, `128::1`, `my-ip-address`.",
 							Type:        []string{"string"},
 							Format:      "",
 						},

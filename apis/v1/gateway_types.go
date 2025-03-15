@@ -734,13 +734,11 @@ type GatewaySpecAddress struct {
 	// +kubebuilder:default=IPAddress
 	Type *AddressType `json:"type,omitempty"`
 
-	
-	// If the implementation supports the `SupportGatewayAddressEmpty` feature, 
-	// this value can be omitted, and an address will be assigned based on the `Type` of the address (Given that the
-	// implementation supports it for the given `Type`).
+	// When a value is unspecified, an implementation SHOULD automatically
+	// assign an address matching the requested type if possible.
 	//
-	// If the value is provided, its validity will depend
-	// on the type and support by the controller.
+	// If an implementation does not support an empty value, they MUST set the
+	// "Programmed" condition in status to False with a reason of "AddressNotAssigned".
 	//
 	// Examples: `1.2.3.4`, `128::1`, `my-ip-address`.
 	//

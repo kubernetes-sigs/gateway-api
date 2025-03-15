@@ -109,8 +109,11 @@ spec:
                       type: string
                     value:
                       description: |-
-                        Value of the address. The validity of the values will depend
-                        on the type and support by the controller.
+                        When a value is unspecified, an implementation SHOULD automatically
+                        assign an address matching the requested type if possible.
+
+                        If an implementation does not support an empty value, they MUST set the
+                        "Programmed" condition in status to False with a reason of "AddressNotAssigned".
 
                         Examples: `1.2.3.4`, `128::1`, `my-ip-address`.
                       maxLength: 253
@@ -1213,8 +1216,11 @@ spec:
                       type: string
                     value:
                       description: |-
-                        Value of the address. The validity of the values will depend
-                        on the type and support by the controller.
+                        When a value is unspecified, an implementation SHOULD automatically
+                        assign an address matching the requested type if possible.
+
+                        If an implementation does not support an empty value, they MUST set the
+                        "Programmed" condition in status to False with a reason of "AddressNotAssigned".
 
                         Examples: `1.2.3.4`, `128::1`, `my-ip-address`.
                       maxLength: 253
