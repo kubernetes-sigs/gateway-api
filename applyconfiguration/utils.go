@@ -58,8 +58,6 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1.FrontendTLSValidationApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("Gateway"):
 		return &apisv1.GatewayApplyConfiguration{}
-	case v1.SchemeGroupVersion.WithKind("GatewayAddress"):
-		return &apisv1.GatewayAddressApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("GatewayBackendTLS"):
 		return &apisv1.GatewayBackendTLSApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("GatewayClass"):
@@ -72,6 +70,8 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1.GatewayInfrastructureApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("GatewaySpec"):
 		return &apisv1.GatewaySpecApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("GatewaySpecAddress"):
+		return &apisv1.GatewaySpecAddressApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("GatewayStatus"):
 		return &apisv1.GatewayStatusApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("GatewayStatusAddress"):

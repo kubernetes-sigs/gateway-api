@@ -101,7 +101,6 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"sigs.k8s.io/gateway-api/apis/v1.GRPCRouteSpec":                                   schema_sigsk8sio_gateway_api_apis_v1_GRPCRouteSpec(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.GRPCRouteStatus":                                 schema_sigsk8sio_gateway_api_apis_v1_GRPCRouteStatus(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.Gateway":                                         schema_sigsk8sio_gateway_api_apis_v1_Gateway(ref),
-		"sigs.k8s.io/gateway-api/apis/v1.GatewayAddress":                                  schema_sigsk8sio_gateway_api_apis_v1_GatewayAddress(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.GatewayBackendTLS":                               schema_sigsk8sio_gateway_api_apis_v1_GatewayBackendTLS(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.GatewayClass":                                    schema_sigsk8sio_gateway_api_apis_v1_GatewayClass(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.GatewayClassList":                                schema_sigsk8sio_gateway_api_apis_v1_GatewayClassList(ref),
@@ -110,6 +109,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"sigs.k8s.io/gateway-api/apis/v1.GatewayInfrastructure":                           schema_sigsk8sio_gateway_api_apis_v1_GatewayInfrastructure(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.GatewayList":                                     schema_sigsk8sio_gateway_api_apis_v1_GatewayList(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.GatewaySpec":                                     schema_sigsk8sio_gateway_api_apis_v1_GatewaySpec(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.GatewaySpecAddress":                              schema_sigsk8sio_gateway_api_apis_v1_GatewaySpecAddress(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.GatewayStatus":                                   schema_sigsk8sio_gateway_api_apis_v1_GatewayStatus(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.GatewayStatusAddress":                            schema_sigsk8sio_gateway_api_apis_v1_GatewayStatusAddress(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.GatewayTLSConfig":                                schema_sigsk8sio_gateway_api_apis_v1_GatewayTLSConfig(ref),
@@ -3603,35 +3603,6 @@ func schema_sigsk8sio_gateway_api_apis_v1_Gateway(ref common.ReferenceCallback) 
 	}
 }
 
-func schema_sigsk8sio_gateway_api_apis_v1_GatewayAddress(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "GatewayAddress describes an address that can be bound to a Gateway.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"type": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Type of the address.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"value": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Value of the address. The validity of the values will depend on the type and support by the controller.\n\nExamples: `1.2.3.4`, `128::1`, `my-ip-address`.",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-				},
-				Required: []string{"value"},
-			},
-		},
-	}
-}
-
 func schema_sigsk8sio_gateway_api_apis_v1_GatewayBackendTLS(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -3994,7 +3965,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewaySpec(ref common.ReferenceCallba
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.GatewayAddress"),
+										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.GatewaySpecAddress"),
 									},
 								},
 							},
@@ -4023,7 +3994,34 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewaySpec(ref common.ReferenceCallba
 			},
 		},
 		Dependencies: []string{
-			"sigs.k8s.io/gateway-api/apis/v1.AllowedListeners", "sigs.k8s.io/gateway-api/apis/v1.GatewayAddress", "sigs.k8s.io/gateway-api/apis/v1.GatewayBackendTLS", "sigs.k8s.io/gateway-api/apis/v1.GatewayInfrastructure", "sigs.k8s.io/gateway-api/apis/v1.Listener"},
+			"sigs.k8s.io/gateway-api/apis/v1.AllowedListeners", "sigs.k8s.io/gateway-api/apis/v1.GatewayBackendTLS", "sigs.k8s.io/gateway-api/apis/v1.GatewayInfrastructure", "sigs.k8s.io/gateway-api/apis/v1.GatewaySpecAddress", "sigs.k8s.io/gateway-api/apis/v1.Listener"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apis_v1_GatewaySpecAddress(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "GatewayAddress describes an address that can be bound to a Gateway.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"type": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Type of the address.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"value": {
+						SchemaProps: spec.SchemaProps{
+							Description: "When a value is unspecified, an implementation SHOULD automatically assign an address matching the requested type if possible.\n\nIf an implementation does not support an empty value, they MUST set the \"Programmed\" condition in status to False with a reason of \"AddressNotAssigned\".\n\nExamples: `1.2.3.4`, `128::1`, `my-ip-address`.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+			},
+		},
 	}
 }
 
