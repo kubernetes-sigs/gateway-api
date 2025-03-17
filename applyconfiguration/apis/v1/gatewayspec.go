@@ -27,7 +27,7 @@ import (
 type GatewaySpecApplyConfiguration struct {
 	GatewayClassName *v1.ObjectName                           `json:"gatewayClassName,omitempty"`
 	Listeners        []ListenerApplyConfiguration             `json:"listeners,omitempty"`
-	Addresses        []GatewayAddressApplyConfiguration       `json:"addresses,omitempty"`
+	Addresses        []GatewaySpecAddressApplyConfiguration   `json:"addresses,omitempty"`
 	Infrastructure   *GatewayInfrastructureApplyConfiguration `json:"infrastructure,omitempty"`
 	BackendTLS       *GatewayBackendTLSApplyConfiguration     `json:"backendTLS,omitempty"`
 	AllowedListeners *AllowedListenersApplyConfiguration      `json:"allowedListeners,omitempty"`
@@ -63,7 +63,7 @@ func (b *GatewaySpecApplyConfiguration) WithListeners(values ...*ListenerApplyCo
 // WithAddresses adds the given value to the Addresses field in the declarative configuration
 // and returns the receiver, so that objects can be build by chaining "With" function invocations.
 // If called multiple times, values provided by each call will be appended to the Addresses field.
-func (b *GatewaySpecApplyConfiguration) WithAddresses(values ...*GatewayAddressApplyConfiguration) *GatewaySpecApplyConfiguration {
+func (b *GatewaySpecApplyConfiguration) WithAddresses(values ...*GatewaySpecAddressApplyConfiguration) *GatewaySpecApplyConfiguration {
 	for i := range values {
 		if values[i] == nil {
 			panic("nil value passed to WithAddresses")

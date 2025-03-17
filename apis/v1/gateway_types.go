@@ -264,7 +264,7 @@ type GatewaySpec struct {
 	// +kubebuilder:validation:MaxItems=16
 	// +kubebuilder:validation:XValidation:message="IPAddress values must be unique",rule="self.all(a1, a1.type == 'IPAddress' ? self.exists_one(a2, a2.type == a1.type && a2.value == a1.value) : true )"
 	// +kubebuilder:validation:XValidation:message="Hostname values must be unique",rule="self.all(a1, a1.type == 'Hostname' ? self.exists_one(a2, a2.type == a1.type && a2.value == a1.value) : true )"
-	Addresses []GatewayAddress `json:"addresses,omitempty"`
+	Addresses []GatewaySpecAddress `json:"addresses,omitempty"`
 
 	// Infrastructure defines infrastructure level attributes about this Gateway instance.
 	//
@@ -724,24 +724,27 @@ type RouteGroupKind struct {
 	Kind Kind `json:"kind"`
 }
 
-// GatewayAddress describes an address that can be bound to a Gateway.
+// GatewaySpecAddress describes an address that can be bound to a Gateway.
 //
 // +kubebuilder:validation:XValidation:message="Hostname value must only contain valid characters (matching ^(\\*\\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$)",rule="self.type == 'Hostname' ? self.value.matches(r\"\"\"^(\\*\\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$\"\"\"): true"
-type GatewayAddress struct {
+type GatewaySpecAddress struct {
 	// Type of the address.
 	//
 	// +optional
 	// +kubebuilder:default=IPAddress
 	Type *AddressType `json:"type,omitempty"`
 
-	// Value of the address. The validity of the values will depend
-	// on the type and support by the controller.
+	// When a value is unspecified, an implementation SHOULD automatically
+	// assign an address matching the requested type if possible.
+	//
+	// If an implementation does not support an empty value, they MUST set the
+	// "Programmed" condition in status to False with a reason of "AddressNotAssigned".
 	//
 	// Examples: `1.2.3.4`, `128::1`, `my-ip-address`.
 	//
-	// +kubebuilder:validation:MinLength=1
+	// +optional
 	// +kubebuilder:validation:MaxLength=253
-	Value string `json:"value"`
+	Value string `json:"value,omitempty"`
 }
 
 // GatewayStatusAddress describes a network address that is bound to a Gateway.
