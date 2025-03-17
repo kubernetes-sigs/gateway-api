@@ -20,13 +20,13 @@ package v1
 
 import (
 	metav1 "k8s.io/client-go/applyconfigurations/meta/v1"
-	v1 "sigs.k8s.io/gateway-api/apis/v1"
+	apisv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
 // ListenerNamespacesApplyConfiguration represents a declarative configuration of the ListenerNamespaces type for use
 // with apply.
 type ListenerNamespacesApplyConfiguration struct {
-	From     *v1.FromNamespaces                      `json:"from,omitempty"`
+	From     *apisv1.FromNamespaces                  `json:"from,omitempty"`
 	Selector *metav1.LabelSelectorApplyConfiguration `json:"selector,omitempty"`
 }
 
@@ -39,7 +39,7 @@ func ListenerNamespaces() *ListenerNamespacesApplyConfiguration {
 // WithFrom sets the From field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the From field is set to the value of the last call.
-func (b *ListenerNamespacesApplyConfiguration) WithFrom(value v1.FromNamespaces) *ListenerNamespacesApplyConfiguration {
+func (b *ListenerNamespacesApplyConfiguration) WithFrom(value apisv1.FromNamespaces) *ListenerNamespacesApplyConfiguration {
 	b.From = &value
 	return b
 }

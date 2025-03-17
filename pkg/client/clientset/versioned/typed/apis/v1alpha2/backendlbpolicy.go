@@ -19,14 +19,14 @@ limitations under the License.
 package v1alpha2
 
 import (
-	"context"
+	context "context"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
 	gentype "k8s.io/client-go/gentype"
-	v1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
-	apisv1alpha2 "sigs.k8s.io/gateway-api/applyconfiguration/apis/v1alpha2"
+	apisv1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
+	applyconfigurationapisv1alpha2 "sigs.k8s.io/gateway-api/applyconfiguration/apis/v1alpha2"
 	scheme "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/scheme"
 )
 
@@ -38,36 +38,37 @@ type BackendLBPoliciesGetter interface {
 
 // BackendLBPolicyInterface has methods to work with BackendLBPolicy resources.
 type BackendLBPolicyInterface interface {
-	Create(ctx context.Context, backendLBPolicy *v1alpha2.BackendLBPolicy, opts v1.CreateOptions) (*v1alpha2.BackendLBPolicy, error)
-	Update(ctx context.Context, backendLBPolicy *v1alpha2.BackendLBPolicy, opts v1.UpdateOptions) (*v1alpha2.BackendLBPolicy, error)
+	Create(ctx context.Context, backendLBPolicy *apisv1alpha2.BackendLBPolicy, opts v1.CreateOptions) (*apisv1alpha2.BackendLBPolicy, error)
+	Update(ctx context.Context, backendLBPolicy *apisv1alpha2.BackendLBPolicy, opts v1.UpdateOptions) (*apisv1alpha2.BackendLBPolicy, error)
 	// Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-	UpdateStatus(ctx context.Context, backendLBPolicy *v1alpha2.BackendLBPolicy, opts v1.UpdateOptions) (*v1alpha2.BackendLBPolicy, error)
+	UpdateStatus(ctx context.Context, backendLBPolicy *apisv1alpha2.BackendLBPolicy, opts v1.UpdateOptions) (*apisv1alpha2.BackendLBPolicy, error)
 	Delete(ctx context.Context, name string, opts v1.DeleteOptions) error
 	DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error
-	Get(ctx context.Context, name string, opts v1.GetOptions) (*v1alpha2.BackendLBPolicy, error)
-	List(ctx context.Context, opts v1.ListOptions) (*v1alpha2.BackendLBPolicyList, error)
+	Get(ctx context.Context, name string, opts v1.GetOptions) (*apisv1alpha2.BackendLBPolicy, error)
+	List(ctx context.Context, opts v1.ListOptions) (*apisv1alpha2.BackendLBPolicyList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
-	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha2.BackendLBPolicy, err error)
-	Apply(ctx context.Context, backendLBPolicy *apisv1alpha2.BackendLBPolicyApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha2.BackendLBPolicy, err error)
+	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *apisv1alpha2.BackendLBPolicy, err error)
+	Apply(ctx context.Context, backendLBPolicy *applyconfigurationapisv1alpha2.BackendLBPolicyApplyConfiguration, opts v1.ApplyOptions) (result *apisv1alpha2.BackendLBPolicy, err error)
 	// Add a +genclient:noStatus comment above the type to avoid generating ApplyStatus().
-	ApplyStatus(ctx context.Context, backendLBPolicy *apisv1alpha2.BackendLBPolicyApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha2.BackendLBPolicy, err error)
+	ApplyStatus(ctx context.Context, backendLBPolicy *applyconfigurationapisv1alpha2.BackendLBPolicyApplyConfiguration, opts v1.ApplyOptions) (result *apisv1alpha2.BackendLBPolicy, err error)
 	BackendLBPolicyExpansion
 }
 
 // backendLBPolicies implements BackendLBPolicyInterface
 type backendLBPolicies struct {
-	*gentype.ClientWithListAndApply[*v1alpha2.BackendLBPolicy, *v1alpha2.BackendLBPolicyList, *apisv1alpha2.BackendLBPolicyApplyConfiguration]
+	*gentype.ClientWithListAndApply[*apisv1alpha2.BackendLBPolicy, *apisv1alpha2.BackendLBPolicyList, *applyconfigurationapisv1alpha2.BackendLBPolicyApplyConfiguration]
 }
 
 // newBackendLBPolicies returns a BackendLBPolicies
 func newBackendLBPolicies(c *GatewayV1alpha2Client, namespace string) *backendLBPolicies {
 	return &backendLBPolicies{
-		gentype.NewClientWithListAndApply[*v1alpha2.BackendLBPolicy, *v1alpha2.BackendLBPolicyList, *apisv1alpha2.BackendLBPolicyApplyConfiguration](
+		gentype.NewClientWithListAndApply[*apisv1alpha2.BackendLBPolicy, *apisv1alpha2.BackendLBPolicyList, *applyconfigurationapisv1alpha2.BackendLBPolicyApplyConfiguration](
 			"backendlbpolicies",
 			c.RESTClient(),
 			scheme.ParameterCodec,
 			namespace,
-			func() *v1alpha2.BackendLBPolicy { return &v1alpha2.BackendLBPolicy{} },
-			func() *v1alpha2.BackendLBPolicyList { return &v1alpha2.BackendLBPolicyList{} }),
+			func() *apisv1alpha2.BackendLBPolicy { return &apisv1alpha2.BackendLBPolicy{} },
+			func() *apisv1alpha2.BackendLBPolicyList { return &apisv1alpha2.BackendLBPolicyList{} },
+		),
 	}
 }

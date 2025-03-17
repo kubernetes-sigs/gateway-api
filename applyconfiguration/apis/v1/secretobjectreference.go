@@ -19,16 +19,16 @@ limitations under the License.
 package v1
 
 import (
-	v1 "sigs.k8s.io/gateway-api/apis/v1"
+	apisv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
 // SecretObjectReferenceApplyConfiguration represents a declarative configuration of the SecretObjectReference type for use
 // with apply.
 type SecretObjectReferenceApplyConfiguration struct {
-	Group     *v1.Group      `json:"group,omitempty"`
-	Kind      *v1.Kind       `json:"kind,omitempty"`
-	Name      *v1.ObjectName `json:"name,omitempty"`
-	Namespace *v1.Namespace  `json:"namespace,omitempty"`
+	Group     *apisv1.Group      `json:"group,omitempty"`
+	Kind      *apisv1.Kind       `json:"kind,omitempty"`
+	Name      *apisv1.ObjectName `json:"name,omitempty"`
+	Namespace *apisv1.Namespace  `json:"namespace,omitempty"`
 }
 
 // SecretObjectReferenceApplyConfiguration constructs a declarative configuration of the SecretObjectReference type for use with
@@ -40,7 +40,7 @@ func SecretObjectReference() *SecretObjectReferenceApplyConfiguration {
 // WithGroup sets the Group field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Group field is set to the value of the last call.
-func (b *SecretObjectReferenceApplyConfiguration) WithGroup(value v1.Group) *SecretObjectReferenceApplyConfiguration {
+func (b *SecretObjectReferenceApplyConfiguration) WithGroup(value apisv1.Group) *SecretObjectReferenceApplyConfiguration {
 	b.Group = &value
 	return b
 }
@@ -48,7 +48,7 @@ func (b *SecretObjectReferenceApplyConfiguration) WithGroup(value v1.Group) *Sec
 // WithKind sets the Kind field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Kind field is set to the value of the last call.
-func (b *SecretObjectReferenceApplyConfiguration) WithKind(value v1.Kind) *SecretObjectReferenceApplyConfiguration {
+func (b *SecretObjectReferenceApplyConfiguration) WithKind(value apisv1.Kind) *SecretObjectReferenceApplyConfiguration {
 	b.Kind = &value
 	return b
 }
@@ -56,7 +56,7 @@ func (b *SecretObjectReferenceApplyConfiguration) WithKind(value v1.Kind) *Secre
 // WithName sets the Name field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Name field is set to the value of the last call.
-func (b *SecretObjectReferenceApplyConfiguration) WithName(value v1.ObjectName) *SecretObjectReferenceApplyConfiguration {
+func (b *SecretObjectReferenceApplyConfiguration) WithName(value apisv1.ObjectName) *SecretObjectReferenceApplyConfiguration {
 	b.Name = &value
 	return b
 }
@@ -64,7 +64,7 @@ func (b *SecretObjectReferenceApplyConfiguration) WithName(value v1.ObjectName) 
 // WithNamespace sets the Namespace field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Namespace field is set to the value of the last call.
-func (b *SecretObjectReferenceApplyConfiguration) WithNamespace(value v1.Namespace) *SecretObjectReferenceApplyConfiguration {
+func (b *SecretObjectReferenceApplyConfiguration) WithNamespace(value apisv1.Namespace) *SecretObjectReferenceApplyConfiguration {
 	b.Namespace = &value
 	return b
 }

@@ -29,19 +29,19 @@ type FakeGatewayV1beta1 struct {
 }
 
 func (c *FakeGatewayV1beta1) Gateways(namespace string) v1beta1.GatewayInterface {
-	return &FakeGateways{c, namespace}
+	return newFakeGateways(c, namespace)
 }
 
 func (c *FakeGatewayV1beta1) GatewayClasses() v1beta1.GatewayClassInterface {
-	return &FakeGatewayClasses{c}
+	return newFakeGatewayClasses(c)
 }
 
 func (c *FakeGatewayV1beta1) HTTPRoutes(namespace string) v1beta1.HTTPRouteInterface {
-	return &FakeHTTPRoutes{c, namespace}
+	return newFakeHTTPRoutes(c, namespace)
 }
 
 func (c *FakeGatewayV1beta1) ReferenceGrants(namespace string) v1beta1.ReferenceGrantInterface {
-	return &FakeReferenceGrants{c, namespace}
+	return newFakeReferenceGrants(c, namespace)
 }
 
 // RESTClient returns a RESTClient that is used to communicate

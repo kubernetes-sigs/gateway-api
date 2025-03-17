@@ -19,13 +19,13 @@ limitations under the License.
 package v1
 
 import (
-	v1 "sigs.k8s.io/gateway-api/apis/v1"
+	apisv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
 // CookieConfigApplyConfiguration represents a declarative configuration of the CookieConfig type for use
 // with apply.
 type CookieConfigApplyConfiguration struct {
-	LifetimeType *v1.CookieLifetimeType `json:"lifetimeType,omitempty"`
+	LifetimeType *apisv1.CookieLifetimeType `json:"lifetimeType,omitempty"`
 }
 
 // CookieConfigApplyConfiguration constructs a declarative configuration of the CookieConfig type for use with
@@ -37,7 +37,7 @@ func CookieConfig() *CookieConfigApplyConfiguration {
 // WithLifetimeType sets the LifetimeType field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the LifetimeType field is set to the value of the last call.
-func (b *CookieConfigApplyConfiguration) WithLifetimeType(value v1.CookieLifetimeType) *CookieConfigApplyConfiguration {
+func (b *CookieConfigApplyConfiguration) WithLifetimeType(value apisv1.CookieLifetimeType) *CookieConfigApplyConfiguration {
 	b.LifetimeType = &value
 	return b
 }

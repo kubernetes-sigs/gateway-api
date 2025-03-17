@@ -19,18 +19,18 @@ limitations under the License.
 package v1
 
 import (
-	v1 "sigs.k8s.io/gateway-api/apis/v1"
+	apisv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
 // HTTPCORSFilterApplyConfiguration represents a declarative configuration of the HTTPCORSFilter type for use
 // with apply.
 type HTTPCORSFilterApplyConfiguration struct {
-	AllowOrigins     []v1.AbsoluteURI            `json:"allowOrigins,omitempty"`
-	AllowCredentials *v1.TrueField               `json:"allowCredentials,omitempty"`
-	AllowMethods     []v1.HTTPMethodWithWildcard `json:"allowMethods,omitempty"`
-	AllowHeaders     []v1.HTTPHeaderName         `json:"allowHeaders,omitempty"`
-	ExposeHeaders    []v1.HTTPHeaderName         `json:"exposeHeaders,omitempty"`
-	MaxAge           *int32                      `json:"maxAge,omitempty"`
+	AllowOrigins     []apisv1.AbsoluteURI            `json:"allowOrigins,omitempty"`
+	AllowCredentials *apisv1.TrueField               `json:"allowCredentials,omitempty"`
+	AllowMethods     []apisv1.HTTPMethodWithWildcard `json:"allowMethods,omitempty"`
+	AllowHeaders     []apisv1.HTTPHeaderName         `json:"allowHeaders,omitempty"`
+	ExposeHeaders    []apisv1.HTTPHeaderName         `json:"exposeHeaders,omitempty"`
+	MaxAge           *int32                          `json:"maxAge,omitempty"`
 }
 
 // HTTPCORSFilterApplyConfiguration constructs a declarative configuration of the HTTPCORSFilter type for use with
@@ -42,7 +42,7 @@ func HTTPCORSFilter() *HTTPCORSFilterApplyConfiguration {
 // WithAllowOrigins adds the given value to the AllowOrigins field in the declarative configuration
 // and returns the receiver, so that objects can be build by chaining "With" function invocations.
 // If called multiple times, values provided by each call will be appended to the AllowOrigins field.
-func (b *HTTPCORSFilterApplyConfiguration) WithAllowOrigins(values ...v1.AbsoluteURI) *HTTPCORSFilterApplyConfiguration {
+func (b *HTTPCORSFilterApplyConfiguration) WithAllowOrigins(values ...apisv1.AbsoluteURI) *HTTPCORSFilterApplyConfiguration {
 	for i := range values {
 		b.AllowOrigins = append(b.AllowOrigins, values[i])
 	}
@@ -52,7 +52,7 @@ func (b *HTTPCORSFilterApplyConfiguration) WithAllowOrigins(values ...v1.Absolut
 // WithAllowCredentials sets the AllowCredentials field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the AllowCredentials field is set to the value of the last call.
-func (b *HTTPCORSFilterApplyConfiguration) WithAllowCredentials(value v1.TrueField) *HTTPCORSFilterApplyConfiguration {
+func (b *HTTPCORSFilterApplyConfiguration) WithAllowCredentials(value apisv1.TrueField) *HTTPCORSFilterApplyConfiguration {
 	b.AllowCredentials = &value
 	return b
 }
@@ -60,7 +60,7 @@ func (b *HTTPCORSFilterApplyConfiguration) WithAllowCredentials(value v1.TrueFie
 // WithAllowMethods adds the given value to the AllowMethods field in the declarative configuration
 // and returns the receiver, so that objects can be build by chaining "With" function invocations.
 // If called multiple times, values provided by each call will be appended to the AllowMethods field.
-func (b *HTTPCORSFilterApplyConfiguration) WithAllowMethods(values ...v1.HTTPMethodWithWildcard) *HTTPCORSFilterApplyConfiguration {
+func (b *HTTPCORSFilterApplyConfiguration) WithAllowMethods(values ...apisv1.HTTPMethodWithWildcard) *HTTPCORSFilterApplyConfiguration {
 	for i := range values {
 		b.AllowMethods = append(b.AllowMethods, values[i])
 	}
@@ -70,7 +70,7 @@ func (b *HTTPCORSFilterApplyConfiguration) WithAllowMethods(values ...v1.HTTPMet
 // WithAllowHeaders adds the given value to the AllowHeaders field in the declarative configuration
 // and returns the receiver, so that objects can be build by chaining "With" function invocations.
 // If called multiple times, values provided by each call will be appended to the AllowHeaders field.
-func (b *HTTPCORSFilterApplyConfiguration) WithAllowHeaders(values ...v1.HTTPHeaderName) *HTTPCORSFilterApplyConfiguration {
+func (b *HTTPCORSFilterApplyConfiguration) WithAllowHeaders(values ...apisv1.HTTPHeaderName) *HTTPCORSFilterApplyConfiguration {
 	for i := range values {
 		b.AllowHeaders = append(b.AllowHeaders, values[i])
 	}
@@ -80,7 +80,7 @@ func (b *HTTPCORSFilterApplyConfiguration) WithAllowHeaders(values ...v1.HTTPHea
 // WithExposeHeaders adds the given value to the ExposeHeaders field in the declarative configuration
 // and returns the receiver, so that objects can be build by chaining "With" function invocations.
 // If called multiple times, values provided by each call will be appended to the ExposeHeaders field.
-func (b *HTTPCORSFilterApplyConfiguration) WithExposeHeaders(values ...v1.HTTPHeaderName) *HTTPCORSFilterApplyConfiguration {
+func (b *HTTPCORSFilterApplyConfiguration) WithExposeHeaders(values ...apisv1.HTTPHeaderName) *HTTPCORSFilterApplyConfiguration {
 	for i := range values {
 		b.ExposeHeaders = append(b.ExposeHeaders, values[i])
 	}

@@ -19,10 +19,10 @@ limitations under the License.
 package v1alpha2
 
 import (
-	"k8s.io/apimachinery/pkg/labels"
-	"k8s.io/client-go/listers"
-	"k8s.io/client-go/tools/cache"
-	v1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
+	labels "k8s.io/apimachinery/pkg/labels"
+	listers "k8s.io/client-go/listers"
+	cache "k8s.io/client-go/tools/cache"
+	apisv1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
 )
 
 // TLSRouteLister helps list TLSRoutes.
@@ -30,7 +30,7 @@ import (
 type TLSRouteLister interface {
 	// List lists all TLSRoutes in the indexer.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1alpha2.TLSRoute, err error)
+	List(selector labels.Selector) (ret []*apisv1alpha2.TLSRoute, err error)
 	// TLSRoutes returns an object that can list and get TLSRoutes.
 	TLSRoutes(namespace string) TLSRouteNamespaceLister
 	TLSRouteListerExpansion
@@ -38,17 +38,17 @@ type TLSRouteLister interface {
 
 // tLSRouteLister implements the TLSRouteLister interface.
 type tLSRouteLister struct {
-	listers.ResourceIndexer[*v1alpha2.TLSRoute]
+	listers.ResourceIndexer[*apisv1alpha2.TLSRoute]
 }
 
 // NewTLSRouteLister returns a new TLSRouteLister.
 func NewTLSRouteLister(indexer cache.Indexer) TLSRouteLister {
-	return &tLSRouteLister{listers.New[*v1alpha2.TLSRoute](indexer, v1alpha2.Resource("tlsroute"))}
+	return &tLSRouteLister{listers.New[*apisv1alpha2.TLSRoute](indexer, apisv1alpha2.Resource("tlsroute"))}
 }
 
 // TLSRoutes returns an object that can list and get TLSRoutes.
 func (s *tLSRouteLister) TLSRoutes(namespace string) TLSRouteNamespaceLister {
-	return tLSRouteNamespaceLister{listers.NewNamespaced[*v1alpha2.TLSRoute](s.ResourceIndexer, namespace)}
+	return tLSRouteNamespaceLister{listers.NewNamespaced[*apisv1alpha2.TLSRoute](s.ResourceIndexer, namespace)}
 }
 
 // TLSRouteNamespaceLister helps list and get TLSRoutes.
@@ -56,15 +56,15 @@ func (s *tLSRouteLister) TLSRoutes(namespace string) TLSRouteNamespaceLister {
 type TLSRouteNamespaceLister interface {
 	// List lists all TLSRoutes in the indexer for a given namespace.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1alpha2.TLSRoute, err error)
+	List(selector labels.Selector) (ret []*apisv1alpha2.TLSRoute, err error)
 	// Get retrieves the TLSRoute from the indexer for a given namespace and name.
 	// Objects returned here must be treated as read-only.
-	Get(name string) (*v1alpha2.TLSRoute, error)
+	Get(name string) (*apisv1alpha2.TLSRoute, error)
 	TLSRouteNamespaceListerExpansion
 }
 
 // tLSRouteNamespaceLister implements the TLSRouteNamespaceLister
 // interface.
 type tLSRouteNamespaceLister struct {
-	listers.ResourceIndexer[*v1alpha2.TLSRoute]
+	listers.ResourceIndexer[*apisv1alpha2.TLSRoute]
 }

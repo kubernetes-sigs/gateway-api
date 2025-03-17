@@ -19,13 +19,13 @@ limitations under the License.
 package v1
 
 import (
-	v1 "sigs.k8s.io/gateway-api/apis/v1"
+	apisv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
 // GRPCRouteFilterApplyConfiguration represents a declarative configuration of the GRPCRouteFilter type for use
 // with apply.
 type GRPCRouteFilterApplyConfiguration struct {
-	Type                   *v1.GRPCRouteFilterType                    `json:"type,omitempty"`
+	Type                   *apisv1.GRPCRouteFilterType                `json:"type,omitempty"`
 	RequestHeaderModifier  *HTTPHeaderFilterApplyConfiguration        `json:"requestHeaderModifier,omitempty"`
 	ResponseHeaderModifier *HTTPHeaderFilterApplyConfiguration        `json:"responseHeaderModifier,omitempty"`
 	RequestMirror          *HTTPRequestMirrorFilterApplyConfiguration `json:"requestMirror,omitempty"`
@@ -41,7 +41,7 @@ func GRPCRouteFilter() *GRPCRouteFilterApplyConfiguration {
 // WithType sets the Type field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Type field is set to the value of the last call.
-func (b *GRPCRouteFilterApplyConfiguration) WithType(value v1.GRPCRouteFilterType) *GRPCRouteFilterApplyConfiguration {
+func (b *GRPCRouteFilterApplyConfiguration) WithType(value apisv1.GRPCRouteFilterType) *GRPCRouteFilterApplyConfiguration {
 	b.Type = &value
 	return b
 }

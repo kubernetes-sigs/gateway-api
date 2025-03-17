@@ -19,10 +19,10 @@ limitations under the License.
 package v1alpha2
 
 import (
-	"k8s.io/apimachinery/pkg/labels"
-	"k8s.io/client-go/listers"
-	"k8s.io/client-go/tools/cache"
-	v1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
+	labels "k8s.io/apimachinery/pkg/labels"
+	listers "k8s.io/client-go/listers"
+	cache "k8s.io/client-go/tools/cache"
+	apisv1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
 )
 
 // BackendLBPolicyLister helps list BackendLBPolicies.
@@ -30,7 +30,7 @@ import (
 type BackendLBPolicyLister interface {
 	// List lists all BackendLBPolicies in the indexer.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1alpha2.BackendLBPolicy, err error)
+	List(selector labels.Selector) (ret []*apisv1alpha2.BackendLBPolicy, err error)
 	// BackendLBPolicies returns an object that can list and get BackendLBPolicies.
 	BackendLBPolicies(namespace string) BackendLBPolicyNamespaceLister
 	BackendLBPolicyListerExpansion
@@ -38,17 +38,17 @@ type BackendLBPolicyLister interface {
 
 // backendLBPolicyLister implements the BackendLBPolicyLister interface.
 type backendLBPolicyLister struct {
-	listers.ResourceIndexer[*v1alpha2.BackendLBPolicy]
+	listers.ResourceIndexer[*apisv1alpha2.BackendLBPolicy]
 }
 
 // NewBackendLBPolicyLister returns a new BackendLBPolicyLister.
 func NewBackendLBPolicyLister(indexer cache.Indexer) BackendLBPolicyLister {
-	return &backendLBPolicyLister{listers.New[*v1alpha2.BackendLBPolicy](indexer, v1alpha2.Resource("backendlbpolicy"))}
+	return &backendLBPolicyLister{listers.New[*apisv1alpha2.BackendLBPolicy](indexer, apisv1alpha2.Resource("backendlbpolicy"))}
 }
 
 // BackendLBPolicies returns an object that can list and get BackendLBPolicies.
 func (s *backendLBPolicyLister) BackendLBPolicies(namespace string) BackendLBPolicyNamespaceLister {
-	return backendLBPolicyNamespaceLister{listers.NewNamespaced[*v1alpha2.BackendLBPolicy](s.ResourceIndexer, namespace)}
+	return backendLBPolicyNamespaceLister{listers.NewNamespaced[*apisv1alpha2.BackendLBPolicy](s.ResourceIndexer, namespace)}
 }
 
 // BackendLBPolicyNamespaceLister helps list and get BackendLBPolicies.
@@ -56,15 +56,15 @@ func (s *backendLBPolicyLister) BackendLBPolicies(namespace string) BackendLBPol
 type BackendLBPolicyNamespaceLister interface {
 	// List lists all BackendLBPolicies in the indexer for a given namespace.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1alpha2.BackendLBPolicy, err error)
+	List(selector labels.Selector) (ret []*apisv1alpha2.BackendLBPolicy, err error)
 	// Get retrieves the BackendLBPolicy from the indexer for a given namespace and name.
 	// Objects returned here must be treated as read-only.
-	Get(name string) (*v1alpha2.BackendLBPolicy, error)
+	Get(name string) (*apisv1alpha2.BackendLBPolicy, error)
 	BackendLBPolicyNamespaceListerExpansion
 }
 
 // backendLBPolicyNamespaceLister implements the BackendLBPolicyNamespaceLister
 // interface.
 type backendLBPolicyNamespaceLister struct {
-	listers.ResourceIndexer[*v1alpha2.BackendLBPolicy]
+	listers.ResourceIndexer[*apisv1alpha2.BackendLBPolicy]
 }

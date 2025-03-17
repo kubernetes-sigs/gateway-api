@@ -19,15 +19,15 @@ limitations under the License.
 package v1
 
 import (
-	v1 "sigs.k8s.io/gateway-api/apis/v1"
+	apisv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
 // GatewayInfrastructureApplyConfiguration represents a declarative configuration of the GatewayInfrastructure type for use
 // with apply.
 type GatewayInfrastructureApplyConfiguration struct {
-	Labels        map[v1.LabelKey]v1.LabelValue               `json:"labels,omitempty"`
-	Annotations   map[v1.AnnotationKey]v1.AnnotationValue     `json:"annotations,omitempty"`
-	ParametersRef *LocalParametersReferenceApplyConfiguration `json:"parametersRef,omitempty"`
+	Labels        map[apisv1.LabelKey]apisv1.LabelValue           `json:"labels,omitempty"`
+	Annotations   map[apisv1.AnnotationKey]apisv1.AnnotationValue `json:"annotations,omitempty"`
+	ParametersRef *LocalParametersReferenceApplyConfiguration     `json:"parametersRef,omitempty"`
 }
 
 // GatewayInfrastructureApplyConfiguration constructs a declarative configuration of the GatewayInfrastructure type for use with
@@ -40,9 +40,9 @@ func GatewayInfrastructure() *GatewayInfrastructureApplyConfiguration {
 // and returns the receiver, so that objects can be build by chaining "With" function invocations.
 // If called multiple times, the entries provided by each call will be put on the Labels field,
 // overwriting an existing map entries in Labels field with the same key.
-func (b *GatewayInfrastructureApplyConfiguration) WithLabels(entries map[v1.LabelKey]v1.LabelValue) *GatewayInfrastructureApplyConfiguration {
+func (b *GatewayInfrastructureApplyConfiguration) WithLabels(entries map[apisv1.LabelKey]apisv1.LabelValue) *GatewayInfrastructureApplyConfiguration {
 	if b.Labels == nil && len(entries) > 0 {
-		b.Labels = make(map[v1.LabelKey]v1.LabelValue, len(entries))
+		b.Labels = make(map[apisv1.LabelKey]apisv1.LabelValue, len(entries))
 	}
 	for k, v := range entries {
 		b.Labels[k] = v
@@ -54,9 +54,9 @@ func (b *GatewayInfrastructureApplyConfiguration) WithLabels(entries map[v1.Labe
 // and returns the receiver, so that objects can be build by chaining "With" function invocations.
 // If called multiple times, the entries provided by each call will be put on the Annotations field,
 // overwriting an existing map entries in Annotations field with the same key.
-func (b *GatewayInfrastructureApplyConfiguration) WithAnnotations(entries map[v1.AnnotationKey]v1.AnnotationValue) *GatewayInfrastructureApplyConfiguration {
+func (b *GatewayInfrastructureApplyConfiguration) WithAnnotations(entries map[apisv1.AnnotationKey]apisv1.AnnotationValue) *GatewayInfrastructureApplyConfiguration {
 	if b.Annotations == nil && len(entries) > 0 {
-		b.Annotations = make(map[v1.AnnotationKey]v1.AnnotationValue, len(entries))
+		b.Annotations = make(map[apisv1.AnnotationKey]apisv1.AnnotationValue, len(entries))
 	}
 	for k, v := range entries {
 		b.Annotations[k] = v

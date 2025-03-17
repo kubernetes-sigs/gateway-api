@@ -19,10 +19,10 @@ limitations under the License.
 package v1beta1
 
 import (
-	"k8s.io/apimachinery/pkg/labels"
-	"k8s.io/client-go/listers"
-	"k8s.io/client-go/tools/cache"
-	v1beta1 "sigs.k8s.io/gateway-api/apis/v1beta1"
+	labels "k8s.io/apimachinery/pkg/labels"
+	listers "k8s.io/client-go/listers"
+	cache "k8s.io/client-go/tools/cache"
+	apisv1beta1 "sigs.k8s.io/gateway-api/apis/v1beta1"
 )
 
 // ReferenceGrantLister helps list ReferenceGrants.
@@ -30,7 +30,7 @@ import (
 type ReferenceGrantLister interface {
 	// List lists all ReferenceGrants in the indexer.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1beta1.ReferenceGrant, err error)
+	List(selector labels.Selector) (ret []*apisv1beta1.ReferenceGrant, err error)
 	// ReferenceGrants returns an object that can list and get ReferenceGrants.
 	ReferenceGrants(namespace string) ReferenceGrantNamespaceLister
 	ReferenceGrantListerExpansion
@@ -38,17 +38,17 @@ type ReferenceGrantLister interface {
 
 // referenceGrantLister implements the ReferenceGrantLister interface.
 type referenceGrantLister struct {
-	listers.ResourceIndexer[*v1beta1.ReferenceGrant]
+	listers.ResourceIndexer[*apisv1beta1.ReferenceGrant]
 }
 
 // NewReferenceGrantLister returns a new ReferenceGrantLister.
 func NewReferenceGrantLister(indexer cache.Indexer) ReferenceGrantLister {
-	return &referenceGrantLister{listers.New[*v1beta1.ReferenceGrant](indexer, v1beta1.Resource("referencegrant"))}
+	return &referenceGrantLister{listers.New[*apisv1beta1.ReferenceGrant](indexer, apisv1beta1.Resource("referencegrant"))}
 }
 
 // ReferenceGrants returns an object that can list and get ReferenceGrants.
 func (s *referenceGrantLister) ReferenceGrants(namespace string) ReferenceGrantNamespaceLister {
-	return referenceGrantNamespaceLister{listers.NewNamespaced[*v1beta1.ReferenceGrant](s.ResourceIndexer, namespace)}
+	return referenceGrantNamespaceLister{listers.NewNamespaced[*apisv1beta1.ReferenceGrant](s.ResourceIndexer, namespace)}
 }
 
 // ReferenceGrantNamespaceLister helps list and get ReferenceGrants.
@@ -56,15 +56,15 @@ func (s *referenceGrantLister) ReferenceGrants(namespace string) ReferenceGrantN
 type ReferenceGrantNamespaceLister interface {
 	// List lists all ReferenceGrants in the indexer for a given namespace.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1beta1.ReferenceGrant, err error)
+	List(selector labels.Selector) (ret []*apisv1beta1.ReferenceGrant, err error)
 	// Get retrieves the ReferenceGrant from the indexer for a given namespace and name.
 	// Objects returned here must be treated as read-only.
-	Get(name string) (*v1beta1.ReferenceGrant, error)
+	Get(name string) (*apisv1beta1.ReferenceGrant, error)
 	ReferenceGrantNamespaceListerExpansion
 }
 
 // referenceGrantNamespaceLister implements the ReferenceGrantNamespaceLister
 // interface.
 type referenceGrantNamespaceLister struct {
-	listers.ResourceIndexer[*v1beta1.ReferenceGrant]
+	listers.ResourceIndexer[*apisv1beta1.ReferenceGrant]
 }

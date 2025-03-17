@@ -19,24 +19,24 @@ limitations under the License.
 package v1beta1
 
 import (
-	"context"
+	context "context"
 	time "time"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	watch "k8s.io/apimachinery/pkg/watch"
 	cache "k8s.io/client-go/tools/cache"
-	apisv1beta1 "sigs.k8s.io/gateway-api/apis/v1beta1"
+	gatewayapiapisv1beta1 "sigs.k8s.io/gateway-api/apis/v1beta1"
 	versioned "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned"
 	internalinterfaces "sigs.k8s.io/gateway-api/pkg/client/informers/externalversions/internalinterfaces"
-	v1beta1 "sigs.k8s.io/gateway-api/pkg/client/listers/apis/v1beta1"
+	apisv1beta1 "sigs.k8s.io/gateway-api/pkg/client/listers/apis/v1beta1"
 )
 
 // ReferenceGrantInformer provides access to a shared informer and lister for
 // ReferenceGrants.
 type ReferenceGrantInformer interface {
 	Informer() cache.SharedIndexInformer
-	Lister() v1beta1.ReferenceGrantLister
+	Lister() apisv1beta1.ReferenceGrantLister
 }
 
 type referenceGrantInformer struct {
@@ -71,7 +71,7 @@ func NewFilteredReferenceGrantInformer(client versioned.Interface, namespace str
 				return client.GatewayV1beta1().ReferenceGrants(namespace).Watch(context.TODO(), options)
 			},
 		},
-		&apisv1beta1.ReferenceGrant{},
+		&gatewayapiapisv1beta1.ReferenceGrant{},
 		resyncPeriod,
 		indexers,
 	)
@@ -82,9 +82,9 @@ func (f *referenceGrantInformer) defaultInformer(client versioned.Interface, res
 }
 
 func (f *referenceGrantInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&apisv1beta1.ReferenceGrant{}, f.defaultInformer)
+	return f.factory.InformerFor(&gatewayapiapisv1beta1.ReferenceGrant{}, f.defaultInformer)
 }
 
-func (f *referenceGrantInformer) Lister() v1beta1.ReferenceGrantLister {
-	return v1beta1.NewReferenceGrantLister(f.Informer().GetIndexer())
+func (f *referenceGrantInformer) Lister() apisv1beta1.ReferenceGrantLister {
+	return apisv1beta1.NewReferenceGrantLister(f.Informer().GetIndexer())
 }

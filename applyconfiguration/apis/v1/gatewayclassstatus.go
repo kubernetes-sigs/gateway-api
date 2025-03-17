@@ -19,13 +19,13 @@ limitations under the License.
 package v1
 
 import (
-	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
+	metav1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
 // GatewayClassStatusApplyConfiguration represents a declarative configuration of the GatewayClassStatus type for use
 // with apply.
 type GatewayClassStatusApplyConfiguration struct {
-	Conditions        []v1.ConditionApplyConfiguration     `json:"conditions,omitempty"`
+	Conditions        []metav1.ConditionApplyConfiguration `json:"conditions,omitempty"`
 	SupportedFeatures []SupportedFeatureApplyConfiguration `json:"supportedFeatures,omitempty"`
 }
 
@@ -38,7 +38,7 @@ func GatewayClassStatus() *GatewayClassStatusApplyConfiguration {
 // WithConditions adds the given value to the Conditions field in the declarative configuration
 // and returns the receiver, so that objects can be build by chaining "With" function invocations.
 // If called multiple times, values provided by each call will be appended to the Conditions field.
-func (b *GatewayClassStatusApplyConfiguration) WithConditions(values ...*v1.ConditionApplyConfiguration) *GatewayClassStatusApplyConfiguration {
+func (b *GatewayClassStatusApplyConfiguration) WithConditions(values ...*metav1.ConditionApplyConfiguration) *GatewayClassStatusApplyConfiguration {
 	for i := range values {
 		if values[i] == nil {
 			panic("nil value passed to WithConditions")

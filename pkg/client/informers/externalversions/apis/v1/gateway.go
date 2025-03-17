@@ -19,24 +19,24 @@ limitations under the License.
 package v1
 
 import (
-	"context"
+	context "context"
 	time "time"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	watch "k8s.io/apimachinery/pkg/watch"
 	cache "k8s.io/client-go/tools/cache"
-	apisv1 "sigs.k8s.io/gateway-api/apis/v1"
+	gatewayapiapisv1 "sigs.k8s.io/gateway-api/apis/v1"
 	versioned "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned"
 	internalinterfaces "sigs.k8s.io/gateway-api/pkg/client/informers/externalversions/internalinterfaces"
-	v1 "sigs.k8s.io/gateway-api/pkg/client/listers/apis/v1"
+	apisv1 "sigs.k8s.io/gateway-api/pkg/client/listers/apis/v1"
 )
 
 // GatewayInformer provides access to a shared informer and lister for
 // Gateways.
 type GatewayInformer interface {
 	Informer() cache.SharedIndexInformer
-	Lister() v1.GatewayLister
+	Lister() apisv1.GatewayLister
 }
 
 type gatewayInformer struct {
@@ -71,7 +71,7 @@ func NewFilteredGatewayInformer(client versioned.Interface, namespace string, re
 				return client.GatewayV1().Gateways(namespace).Watch(context.TODO(), options)
 			},
 		},
-		&apisv1.Gateway{},
+		&gatewayapiapisv1.Gateway{},
 		resyncPeriod,
 		indexers,
 	)
@@ -82,9 +82,9 @@ func (f *gatewayInformer) defaultInformer(client versioned.Interface, resyncPeri
 }
 
 func (f *gatewayInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&apisv1.Gateway{}, f.defaultInformer)
+	return f.factory.InformerFor(&gatewayapiapisv1.Gateway{}, f.defaultInformer)
 }
 
-func (f *gatewayInformer) Lister() v1.GatewayLister {
-	return v1.NewGatewayLister(f.Informer().GetIndexer())
+func (f *gatewayInformer) Lister() apisv1.GatewayLister {
+	return apisv1.NewGatewayLister(f.Informer().GetIndexer())
 }

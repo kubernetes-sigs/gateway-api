@@ -19,24 +19,24 @@ limitations under the License.
 package v1alpha2
 
 import (
-	"context"
+	context "context"
 	time "time"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	watch "k8s.io/apimachinery/pkg/watch"
 	cache "k8s.io/client-go/tools/cache"
-	apisv1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
+	gatewayapiapisv1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
 	versioned "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned"
 	internalinterfaces "sigs.k8s.io/gateway-api/pkg/client/informers/externalversions/internalinterfaces"
-	v1alpha2 "sigs.k8s.io/gateway-api/pkg/client/listers/apis/v1alpha2"
+	apisv1alpha2 "sigs.k8s.io/gateway-api/pkg/client/listers/apis/v1alpha2"
 )
 
 // BackendLBPolicyInformer provides access to a shared informer and lister for
 // BackendLBPolicies.
 type BackendLBPolicyInformer interface {
 	Informer() cache.SharedIndexInformer
-	Lister() v1alpha2.BackendLBPolicyLister
+	Lister() apisv1alpha2.BackendLBPolicyLister
 }
 
 type backendLBPolicyInformer struct {
@@ -71,7 +71,7 @@ func NewFilteredBackendLBPolicyInformer(client versioned.Interface, namespace st
 				return client.GatewayV1alpha2().BackendLBPolicies(namespace).Watch(context.TODO(), options)
 			},
 		},
-		&apisv1alpha2.BackendLBPolicy{},
+		&gatewayapiapisv1alpha2.BackendLBPolicy{},
 		resyncPeriod,
 		indexers,
 	)
@@ -82,9 +82,9 @@ func (f *backendLBPolicyInformer) defaultInformer(client versioned.Interface, re
 }
 
 func (f *backendLBPolicyInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&apisv1alpha2.BackendLBPolicy{}, f.defaultInformer)
+	return f.factory.InformerFor(&gatewayapiapisv1alpha2.BackendLBPolicy{}, f.defaultInformer)
 }
 
-func (f *backendLBPolicyInformer) Lister() v1alpha2.BackendLBPolicyLister {
-	return v1alpha2.NewBackendLBPolicyLister(f.Informer().GetIndexer())
+func (f *backendLBPolicyInformer) Lister() apisv1alpha2.BackendLBPolicyLister {
+	return apisv1alpha2.NewBackendLBPolicyLister(f.Informer().GetIndexer())
 }

@@ -19,16 +19,16 @@ limitations under the License.
 package v1
 
 import (
-	v1 "sigs.k8s.io/gateway-api/apis/v1"
+	apisv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
 // ListenerApplyConfiguration represents a declarative configuration of the Listener type for use
 // with apply.
 type ListenerApplyConfiguration struct {
-	Name          *v1.SectionName                     `json:"name,omitempty"`
-	Hostname      *v1.Hostname                        `json:"hostname,omitempty"`
-	Port          *v1.PortNumber                      `json:"port,omitempty"`
-	Protocol      *v1.ProtocolType                    `json:"protocol,omitempty"`
+	Name          *apisv1.SectionName                 `json:"name,omitempty"`
+	Hostname      *apisv1.Hostname                    `json:"hostname,omitempty"`
+	Port          *apisv1.PortNumber                  `json:"port,omitempty"`
+	Protocol      *apisv1.ProtocolType                `json:"protocol,omitempty"`
 	TLS           *GatewayTLSConfigApplyConfiguration `json:"tls,omitempty"`
 	AllowedRoutes *AllowedRoutesApplyConfiguration    `json:"allowedRoutes,omitempty"`
 }
@@ -42,7 +42,7 @@ func Listener() *ListenerApplyConfiguration {
 // WithName sets the Name field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Name field is set to the value of the last call.
-func (b *ListenerApplyConfiguration) WithName(value v1.SectionName) *ListenerApplyConfiguration {
+func (b *ListenerApplyConfiguration) WithName(value apisv1.SectionName) *ListenerApplyConfiguration {
 	b.Name = &value
 	return b
 }
@@ -50,7 +50,7 @@ func (b *ListenerApplyConfiguration) WithName(value v1.SectionName) *ListenerApp
 // WithHostname sets the Hostname field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Hostname field is set to the value of the last call.
-func (b *ListenerApplyConfiguration) WithHostname(value v1.Hostname) *ListenerApplyConfiguration {
+func (b *ListenerApplyConfiguration) WithHostname(value apisv1.Hostname) *ListenerApplyConfiguration {
 	b.Hostname = &value
 	return b
 }
@@ -58,7 +58,7 @@ func (b *ListenerApplyConfiguration) WithHostname(value v1.Hostname) *ListenerAp
 // WithPort sets the Port field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Port field is set to the value of the last call.
-func (b *ListenerApplyConfiguration) WithPort(value v1.PortNumber) *ListenerApplyConfiguration {
+func (b *ListenerApplyConfiguration) WithPort(value apisv1.PortNumber) *ListenerApplyConfiguration {
 	b.Port = &value
 	return b
 }
@@ -66,7 +66,7 @@ func (b *ListenerApplyConfiguration) WithPort(value v1.PortNumber) *ListenerAppl
 // WithProtocol sets the Protocol field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Protocol field is set to the value of the last call.
-func (b *ListenerApplyConfiguration) WithProtocol(value v1.ProtocolType) *ListenerApplyConfiguration {
+func (b *ListenerApplyConfiguration) WithProtocol(value apisv1.ProtocolType) *ListenerApplyConfiguration {
 	b.Protocol = &value
 	return b
 }

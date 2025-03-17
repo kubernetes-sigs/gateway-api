@@ -23,7 +23,7 @@ import (
 	types "k8s.io/apimachinery/pkg/types"
 	managedfields "k8s.io/apimachinery/pkg/util/managedfields"
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
-	v1beta1 "sigs.k8s.io/gateway-api/apis/v1beta1"
+	apisv1beta1 "sigs.k8s.io/gateway-api/apis/v1beta1"
 	apisv1 "sigs.k8s.io/gateway-api/applyconfiguration/apis/v1"
 	internal "sigs.k8s.io/gateway-api/applyconfiguration/internal"
 )
@@ -59,18 +59,18 @@ func HTTPRoute(name, namespace string) *HTTPRouteApplyConfiguration {
 // Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
 // applied if another fieldManager has updated or force applied any of the previously applied fields.
 // Experimental!
-func ExtractHTTPRoute(hTTPRoute *v1beta1.HTTPRoute, fieldManager string) (*HTTPRouteApplyConfiguration, error) {
+func ExtractHTTPRoute(hTTPRoute *apisv1beta1.HTTPRoute, fieldManager string) (*HTTPRouteApplyConfiguration, error) {
 	return extractHTTPRoute(hTTPRoute, fieldManager, "")
 }
 
 // ExtractHTTPRouteStatus is the same as ExtractHTTPRoute except
 // that it extracts the status subresource applied configuration.
 // Experimental!
-func ExtractHTTPRouteStatus(hTTPRoute *v1beta1.HTTPRoute, fieldManager string) (*HTTPRouteApplyConfiguration, error) {
+func ExtractHTTPRouteStatus(hTTPRoute *apisv1beta1.HTTPRoute, fieldManager string) (*HTTPRouteApplyConfiguration, error) {
 	return extractHTTPRoute(hTTPRoute, fieldManager, "status")
 }
 
-func extractHTTPRoute(hTTPRoute *v1beta1.HTTPRoute, fieldManager string, subresource string) (*HTTPRouteApplyConfiguration, error) {
+func extractHTTPRoute(hTTPRoute *apisv1beta1.HTTPRoute, fieldManager string, subresource string) (*HTTPRouteApplyConfiguration, error) {
 	b := &HTTPRouteApplyConfiguration{}
 	err := managedfields.ExtractInto(hTTPRoute, internal.Parser().Type("io.k8s.sigs.gateway-api.apis.v1beta1.HTTPRoute"), fieldManager, b, subresource)
 	if err != nil {
@@ -88,7 +88,7 @@ func extractHTTPRoute(hTTPRoute *v1beta1.HTTPRoute, fieldManager string, subreso
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Kind field is set to the value of the last call.
 func (b *HTTPRouteApplyConfiguration) WithKind(value string) *HTTPRouteApplyConfiguration {
-	b.Kind = &value
+	b.TypeMetaApplyConfiguration.Kind = &value
 	return b
 }
 
@@ -96,7 +96,7 @@ func (b *HTTPRouteApplyConfiguration) WithKind(value string) *HTTPRouteApplyConf
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the APIVersion field is set to the value of the last call.
 func (b *HTTPRouteApplyConfiguration) WithAPIVersion(value string) *HTTPRouteApplyConfiguration {
-	b.APIVersion = &value
+	b.TypeMetaApplyConfiguration.APIVersion = &value
 	return b
 }
 
@@ -105,7 +105,7 @@ func (b *HTTPRouteApplyConfiguration) WithAPIVersion(value string) *HTTPRouteApp
 // If called multiple times, the Name field is set to the value of the last call.
 func (b *HTTPRouteApplyConfiguration) WithName(value string) *HTTPRouteApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.Name = &value
+	b.ObjectMetaApplyConfiguration.Name = &value
 	return b
 }
 
@@ -114,7 +114,7 @@ func (b *HTTPRouteApplyConfiguration) WithName(value string) *HTTPRouteApplyConf
 // If called multiple times, the GenerateName field is set to the value of the last call.
 func (b *HTTPRouteApplyConfiguration) WithGenerateName(value string) *HTTPRouteApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.GenerateName = &value
+	b.ObjectMetaApplyConfiguration.GenerateName = &value
 	return b
 }
 
@@ -123,7 +123,7 @@ func (b *HTTPRouteApplyConfiguration) WithGenerateName(value string) *HTTPRouteA
 // If called multiple times, the Namespace field is set to the value of the last call.
 func (b *HTTPRouteApplyConfiguration) WithNamespace(value string) *HTTPRouteApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.Namespace = &value
+	b.ObjectMetaApplyConfiguration.Namespace = &value
 	return b
 }
 
@@ -132,7 +132,7 @@ func (b *HTTPRouteApplyConfiguration) WithNamespace(value string) *HTTPRouteAppl
 // If called multiple times, the UID field is set to the value of the last call.
 func (b *HTTPRouteApplyConfiguration) WithUID(value types.UID) *HTTPRouteApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.UID = &value
+	b.ObjectMetaApplyConfiguration.UID = &value
 	return b
 }
 
@@ -141,7 +141,7 @@ func (b *HTTPRouteApplyConfiguration) WithUID(value types.UID) *HTTPRouteApplyCo
 // If called multiple times, the ResourceVersion field is set to the value of the last call.
 func (b *HTTPRouteApplyConfiguration) WithResourceVersion(value string) *HTTPRouteApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.ResourceVersion = &value
+	b.ObjectMetaApplyConfiguration.ResourceVersion = &value
 	return b
 }
 
@@ -150,7 +150,7 @@ func (b *HTTPRouteApplyConfiguration) WithResourceVersion(value string) *HTTPRou
 // If called multiple times, the Generation field is set to the value of the last call.
 func (b *HTTPRouteApplyConfiguration) WithGeneration(value int64) *HTTPRouteApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.Generation = &value
+	b.ObjectMetaApplyConfiguration.Generation = &value
 	return b
 }
 
@@ -159,7 +159,7 @@ func (b *HTTPRouteApplyConfiguration) WithGeneration(value int64) *HTTPRouteAppl
 // If called multiple times, the CreationTimestamp field is set to the value of the last call.
 func (b *HTTPRouteApplyConfiguration) WithCreationTimestamp(value metav1.Time) *HTTPRouteApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.CreationTimestamp = &value
+	b.ObjectMetaApplyConfiguration.CreationTimestamp = &value
 	return b
 }
 
@@ -168,7 +168,7 @@ func (b *HTTPRouteApplyConfiguration) WithCreationTimestamp(value metav1.Time) *
 // If called multiple times, the DeletionTimestamp field is set to the value of the last call.
 func (b *HTTPRouteApplyConfiguration) WithDeletionTimestamp(value metav1.Time) *HTTPRouteApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.DeletionTimestamp = &value
+	b.ObjectMetaApplyConfiguration.DeletionTimestamp = &value
 	return b
 }
 
@@ -177,7 +177,7 @@ func (b *HTTPRouteApplyConfiguration) WithDeletionTimestamp(value metav1.Time) *
 // If called multiple times, the DeletionGracePeriodSeconds field is set to the value of the last call.
 func (b *HTTPRouteApplyConfiguration) WithDeletionGracePeriodSeconds(value int64) *HTTPRouteApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.DeletionGracePeriodSeconds = &value
+	b.ObjectMetaApplyConfiguration.DeletionGracePeriodSeconds = &value
 	return b
 }
 
@@ -187,11 +187,11 @@ func (b *HTTPRouteApplyConfiguration) WithDeletionGracePeriodSeconds(value int64
 // overwriting an existing map entries in Labels field with the same key.
 func (b *HTTPRouteApplyConfiguration) WithLabels(entries map[string]string) *HTTPRouteApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	if b.Labels == nil && len(entries) > 0 {
-		b.Labels = make(map[string]string, len(entries))
+	if b.ObjectMetaApplyConfiguration.Labels == nil && len(entries) > 0 {
+		b.ObjectMetaApplyConfiguration.Labels = make(map[string]string, len(entries))
 	}
 	for k, v := range entries {
-		b.Labels[k] = v
+		b.ObjectMetaApplyConfiguration.Labels[k] = v
 	}
 	return b
 }
@@ -202,11 +202,11 @@ func (b *HTTPRouteApplyConfiguration) WithLabels(entries map[string]string) *HTT
 // overwriting an existing map entries in Annotations field with the same key.
 func (b *HTTPRouteApplyConfiguration) WithAnnotations(entries map[string]string) *HTTPRouteApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	if b.Annotations == nil && len(entries) > 0 {
-		b.Annotations = make(map[string]string, len(entries))
+	if b.ObjectMetaApplyConfiguration.Annotations == nil && len(entries) > 0 {
+		b.ObjectMetaApplyConfiguration.Annotations = make(map[string]string, len(entries))
 	}
 	for k, v := range entries {
-		b.Annotations[k] = v
+		b.ObjectMetaApplyConfiguration.Annotations[k] = v
 	}
 	return b
 }
@@ -220,7 +220,7 @@ func (b *HTTPRouteApplyConfiguration) WithOwnerReferences(values ...*v1.OwnerRef
 		if values[i] == nil {
 			panic("nil value passed to WithOwnerReferences")
 		}
-		b.OwnerReferences = append(b.OwnerReferences, *values[i])
+		b.ObjectMetaApplyConfiguration.OwnerReferences = append(b.ObjectMetaApplyConfiguration.OwnerReferences, *values[i])
 	}
 	return b
 }
@@ -231,7 +231,7 @@ func (b *HTTPRouteApplyConfiguration) WithOwnerReferences(values ...*v1.OwnerRef
 func (b *HTTPRouteApplyConfiguration) WithFinalizers(values ...string) *HTTPRouteApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
 	for i := range values {
-		b.Finalizers = append(b.Finalizers, values[i])
+		b.ObjectMetaApplyConfiguration.Finalizers = append(b.ObjectMetaApplyConfiguration.Finalizers, values[i])
 	}
 	return b
 }
@@ -261,5 +261,5 @@ func (b *HTTPRouteApplyConfiguration) WithStatus(value *apisv1.HTTPRouteStatusAp
 // GetName retrieves the value of the Name field in the declarative configuration.
 func (b *HTTPRouteApplyConfiguration) GetName() *string {
 	b.ensureObjectMetaApplyConfigurationExists()
-	return b.Name
+	return b.ObjectMetaApplyConfiguration.Name
 }
