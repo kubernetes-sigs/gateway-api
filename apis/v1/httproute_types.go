@@ -1417,6 +1417,7 @@ type HTTPCORSFilter struct {
 	//
 	// +listType=set
 	// +kubebuilder:validation:MaxItems=9
+	// +kubebuilder:validation:XValidation:message="AllowMethods cannot contain '*' alongside other methods",rule="!('*' in self && self.size() > 1)"
 	AllowMethods []HTTPMethodWithWildcard `json:"allowMethods,omitempty"`
 
 	// AllowHeaders indicates which HTTP request headers are supported for
