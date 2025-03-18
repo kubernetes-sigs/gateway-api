@@ -599,8 +599,7 @@ spec:
                                       x-kubernetes-validations:
                                       - message: AllowMethods cannot contain '*' alongside
                                           other methods
-                                        rule: (self.contains('*') && self.size() >
-                                          1)
+                                        rule: '!(''*'' in self && self.size() > 1)'
                                     allowOrigins:
                                       description: |-
                                         AllowOrigins indicates whether the response can be shared with requested
@@ -1827,7 +1826,7 @@ spec:
                                 x-kubernetes-validations:
                                 - message: AllowMethods cannot contain '*' alongside
                                     other methods
-                                  rule: (self.contains('*') && self.size() > 1)
+                                  rule: '!(''*'' in self && self.size() > 1)'
                               allowOrigins:
                                 description: |-
                                   AllowOrigins indicates whether the response can be shared with requested
@@ -4226,8 +4225,7 @@ spec:
                                       x-kubernetes-validations:
                                       - message: AllowMethods cannot contain '*' alongside
                                           other methods
-                                        rule: (self.contains('*') && self.size() >
-                                          1)
+                                        rule: '!(''*'' in self && self.size() > 1)'
                                     allowOrigins:
                                       description: |-
                                         AllowOrigins indicates whether the response can be shared with requested
@@ -5454,7 +5452,7 @@ spec:
                                 x-kubernetes-validations:
                                 - message: AllowMethods cannot contain '*' alongside
                                     other methods
-                                  rule: (self.contains('*') && self.size() > 1)
+                                  rule: '!(''*'' in self && self.size() > 1)'
                               allowOrigins:
                                 description: |-
                                   AllowOrigins indicates whether the response can be shared with requested
