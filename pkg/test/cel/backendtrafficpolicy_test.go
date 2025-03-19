@@ -254,7 +254,7 @@ func validateBackendTrafficPolicy(t *testing.T, trafficPolicy *xgatewayv1alpha1.
 	err := k8sClient.Create(ctx, trafficPolicy)
 
 	if (len(wantErrors) != 0) != (err != nil) {
-		t.Fatalf("Unexpected response while creating BackendTrafficPolicy %q; got err=\n%v\n;want error=%v", fmt.Sprintf("%v/%v", trafficPolicy.Namespace, trafficPolicy.Name), err, wantErrors)
+		t.Fatalf("Unexpected response while creating XBackendTrafficPolicy %q; got err=\n%v\n;want error=%v", fmt.Sprintf("%v/%v", trafficPolicy.Namespace, trafficPolicy.Name), err, wantErrors)
 	}
 
 	var missingErrorStrings []string
@@ -264,6 +264,6 @@ func validateBackendTrafficPolicy(t *testing.T, trafficPolicy *xgatewayv1alpha1.
 		}
 	}
 	if len(missingErrorStrings) != 0 {
-		t.Errorf("Unexpected response while creating BackendTrafficPolicy %q; got err=\n%v\n;missing strings within error=%q", fmt.Sprintf("%v/%v", trafficPolicy.Namespace, trafficPolicy.Name), err, missingErrorStrings)
+		t.Errorf("Unexpected response while creating XBackendTrafficPolicy %q; got err=\n%v\n;missing strings within error=%q", fmt.Sprintf("%v/%v", trafficPolicy.Namespace, trafficPolicy.Name), err, missingErrorStrings)
 	}
 }

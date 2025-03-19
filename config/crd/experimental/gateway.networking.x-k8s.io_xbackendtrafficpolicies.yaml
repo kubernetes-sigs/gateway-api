@@ -18,7 +18,7 @@ spec:
     listKind: XBackendTrafficPolicyList
     plural: xbackendtrafficpolicies
     shortNames:
-    - btrafficpolicy
+    - xbtrafficpolicy
     singular: xbackendtrafficpolicy
   scope: Namespaced
   versions:

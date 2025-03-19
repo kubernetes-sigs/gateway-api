@@ -24,7 +24,7 @@ import (
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
 // +kubebuilder:storageversion
-// +kubebuilder:resource:categories=gateway-api,shortName=btrafficpolicy
+// +kubebuilder:resource:categories=gateway-api,shortName=xbtrafficpolicy
 // +kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 //
 // BackendTrafficPolicy is a Direct Attached Policy.
