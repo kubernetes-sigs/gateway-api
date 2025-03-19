@@ -28,7 +28,6 @@ import (
 
 type GatewayV1alpha2Interface interface {
 	RESTClient() rest.Interface
-	BackendLBPoliciesGetter
 	GRPCRoutesGetter
 	ReferenceGrantsGetter
 	TCPRoutesGetter
@@ -39,10 +38,6 @@ type GatewayV1alpha2Interface interface {
 // GatewayV1alpha2Client is used to interact with features provided by the gateway.networking.k8s.io group.
 type GatewayV1alpha2Client struct {
 	restClient rest.Interface
-}
-
-func (c *GatewayV1alpha2Client) BackendLBPolicies(namespace string) BackendLBPolicyInterface {
-	return newBackendLBPolicies(c, namespace)
 }
 
 func (c *GatewayV1alpha2Client) GRPCRoutes(namespace string) GRPCRouteInterface {

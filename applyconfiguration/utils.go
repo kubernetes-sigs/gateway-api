@@ -166,10 +166,6 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1.SupportedFeatureApplyConfiguration{}
 
 		// Group=gateway.networking.k8s.io, Version=v1alpha2
-	case v1alpha2.SchemeGroupVersion.WithKind("BackendLBPolicy"):
-		return &apisv1alpha2.BackendLBPolicyApplyConfiguration{}
-	case v1alpha2.SchemeGroupVersion.WithKind("BackendLBPolicySpec"):
-		return &apisv1alpha2.BackendLBPolicySpecApplyConfiguration{}
 	case v1alpha2.SchemeGroupVersion.WithKind("GRPCRoute"):
 		return &apisv1alpha2.GRPCRouteApplyConfiguration{}
 	case v1alpha2.SchemeGroupVersion.WithKind("LocalPolicyTargetReference"):
