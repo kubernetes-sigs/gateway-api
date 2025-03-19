@@ -27,26 +27,26 @@ import (
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
-	gatewayv1a2 "sigs.k8s.io/gateway-api/apisx/v1alpha1"
+	xgatewayv1alpha1 "sigs.k8s.io/gateway-api/apisx/v1alpha1"
 )
 
 func TestBackendTrafficPolicyConfig(t *testing.T) {
 	tests := []struct {
 		name               string
 		wantErrors         []string
-		sessionPersistence gatewayv1a2.SessionPersistence
-		retryConstraint    gatewayv1a2.RetryConstraint
+		sessionPersistence xgatewayv1alpha1.SessionPersistence
+		retryConstraint    xgatewayv1alpha1.RetryConstraint
 	}{
 		{
 			name: "valid BackendTrafficPolicyConfig no retryConstraint budgetPercent",
-			sessionPersistence: gatewayv1a2.SessionPersistence{
+			sessionPersistence: xgatewayv1alpha1.SessionPersistence{
 				SessionName:     ptrTo("foo"),
 				AbsoluteTimeout: toDuration("1h"),
 				Type:            ptrTo(gatewayv1.CookieBasedSessionPersistence),
 			},
-			retryConstraint: gatewayv1a2.RetryConstraint{
+			retryConstraint: xgatewayv1alpha1.RetryConstraint{
 				BudgetInterval: toDuration("10s"),
-				MinRetryRate: ptrTo(gatewayv1a2.RequestRate{
+				MinRetryRate: ptrTo(xgatewayv1alpha1.RequestRate{
 					Count:    ptrTo(10),
 					Interval: toDuration("1s"),
 				}),
@@ -55,14 +55,14 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 		},
 		{
 			name: "valid BackendTrafficPolicyConfig no retryConstraint budgetInterval",
-			sessionPersistence: gatewayv1a2.SessionPersistence{
+			sessionPersistence: xgatewayv1alpha1.SessionPersistence{
 				SessionName:     ptrTo("foo"),
 				AbsoluteTimeout: toDuration("1h"),
 				Type:            ptrTo(gatewayv1.CookieBasedSessionPersistence),
 			},
-			retryConstraint: gatewayv1a2.RetryConstraint{
+			retryConstraint: xgatewayv1alpha1.RetryConstraint{
 				BudgetPercent: ptrTo(20),
-				MinRetryRate: ptrTo(gatewayv1a2.RequestRate{
+				MinRetryRate: ptrTo(xgatewayv1alpha1.RequestRate{
 					Count:    ptrTo(10),
 					Interval: toDuration("1s"),
 				}),
@@ -71,12 +71,12 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 		},
 		{
 			name: "valid BackendTrafficPolicyConfig no retryConstraint minRetryRate",
-			sessionPersistence: gatewayv1a2.SessionPersistence{
+			sessionPersistence: xgatewayv1alpha1.SessionPersistence{
 				SessionName:     ptrTo("foo"),
 				AbsoluteTimeout: toDuration("1h"),
 				Type:            ptrTo(gatewayv1.CookieBasedSessionPersistence),
 			},
-			retryConstraint: gatewayv1a2.RetryConstraint{
+			retryConstraint: xgatewayv1alpha1.RetryConstraint{
 				BudgetPercent:  ptrTo(20),
 				BudgetInterval: toDuration("10s"),
 			},
@@ -84,15 +84,15 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 		},
 		{
 			name: "invalid BackendTrafficPolicyConfig budgetInterval too long",
-			sessionPersistence: gatewayv1a2.SessionPersistence{
+			sessionPersistence: xgatewayv1alpha1.SessionPersistence{
 				SessionName:     ptrTo("foo"),
 				AbsoluteTimeout: toDuration("1h"),
 				Type:            ptrTo(gatewayv1.CookieBasedSessionPersistence),
 			},
-			retryConstraint: gatewayv1a2.RetryConstraint{
+			retryConstraint: xgatewayv1alpha1.RetryConstraint{
 				BudgetPercent:  ptrTo(20),
 				BudgetInterval: toDuration("2h"),
-				MinRetryRate: ptrTo(gatewayv1a2.RequestRate{
+				MinRetryRate: ptrTo(xgatewayv1alpha1.RequestRate{
 					Count:    ptrTo(10),
 					Interval: toDuration("10s"),
 				}),
@@ -101,15 +101,15 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 		},
 		{
 			name: "invalid BackendTrafficPolicyConfig budgetInterval too short",
-			sessionPersistence: gatewayv1a2.SessionPersistence{
+			sessionPersistence: xgatewayv1alpha1.SessionPersistence{
 				SessionName:     ptrTo("foo"),
 				AbsoluteTimeout: toDuration("1h"),
 				Type:            ptrTo(gatewayv1.CookieBasedSessionPersistence),
 			},
-			retryConstraint: gatewayv1a2.RetryConstraint{
+			retryConstraint: xgatewayv1alpha1.RetryConstraint{
 				BudgetPercent:  ptrTo(20),
 				BudgetInterval: toDuration("1ms"),
-				MinRetryRate: ptrTo(gatewayv1a2.RequestRate{
+				MinRetryRate: ptrTo(xgatewayv1alpha1.RequestRate{
 					Count:    ptrTo(10),
 					Interval: toDuration("10s"),
 				}),
@@ -118,15 +118,15 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 		},
 		{
 			name: "invalid BackendTrafficPolicyConfig minRetryRate interval",
-			sessionPersistence: gatewayv1a2.SessionPersistence{
+			sessionPersistence: xgatewayv1alpha1.SessionPersistence{
 				SessionName:     ptrTo("foo"),
 				AbsoluteTimeout: toDuration("1h"),
 				Type:            ptrTo(gatewayv1.CookieBasedSessionPersistence),
 			},
-			retryConstraint: gatewayv1a2.RetryConstraint{
+			retryConstraint: xgatewayv1alpha1.RetryConstraint{
 				BudgetPercent:  ptrTo(20),
 				BudgetInterval: toDuration("10s"),
-				MinRetryRate: ptrTo(gatewayv1a2.RequestRate{
+				MinRetryRate: ptrTo(xgatewayv1alpha1.RequestRate{
 					Count:    ptrTo(10),
 					Interval: toDuration("2h"),
 				}),
@@ -135,15 +135,15 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 		},
 		{
 			name: "valid BackendTrafficPolicyConfig no cookie lifetimeType",
-			sessionPersistence: gatewayv1a2.SessionPersistence{
+			sessionPersistence: xgatewayv1alpha1.SessionPersistence{
 				SessionName:     ptrTo("foo"),
 				AbsoluteTimeout: toDuration("1h"),
 				Type:            ptrTo(gatewayv1.CookieBasedSessionPersistence),
 			},
-			retryConstraint: gatewayv1a2.RetryConstraint{
+			retryConstraint: xgatewayv1alpha1.RetryConstraint{
 				BudgetPercent:  ptrTo(20),
 				BudgetInterval: toDuration("10s"),
-				MinRetryRate: ptrTo(gatewayv1a2.RequestRate{
+				MinRetryRate: ptrTo(xgatewayv1alpha1.RequestRate{
 					Count:    ptrTo(10),
 					Interval: toDuration("1s"),
 				}),
@@ -152,17 +152,17 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 		},
 		{
 			name: "valid BackendTrafficPolicyConfig session cookie",
-			sessionPersistence: gatewayv1a2.SessionPersistence{
+			sessionPersistence: xgatewayv1alpha1.SessionPersistence{
 				SessionName: ptrTo("foo"),
 				Type:        ptrTo(gatewayv1.CookieBasedSessionPersistence),
 				CookieConfig: &gatewayv1.CookieConfig{
 					LifetimeType: ptrTo(gatewayv1.SessionCookieLifetimeType),
 				},
 			},
-			retryConstraint: gatewayv1a2.RetryConstraint{
+			retryConstraint: xgatewayv1alpha1.RetryConstraint{
 				BudgetPercent:  ptrTo(20),
 				BudgetInterval: toDuration("10s"),
-				MinRetryRate: ptrTo(gatewayv1a2.RequestRate{
+				MinRetryRate: ptrTo(xgatewayv1alpha1.RequestRate{
 					Count:    ptrTo(10),
 					Interval: toDuration("1s"),
 				}),
@@ -171,17 +171,17 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 		},
 		{
 			name: "invalid BackendTrafficPolicyConfig permanent cookie",
-			sessionPersistence: gatewayv1a2.SessionPersistence{
+			sessionPersistence: xgatewayv1alpha1.SessionPersistence{
 				SessionName: ptrTo("foo"),
 				Type:        ptrTo(gatewayv1.CookieBasedSessionPersistence),
 				CookieConfig: &gatewayv1.CookieConfig{
 					LifetimeType: ptrTo(gatewayv1.PermanentCookieLifetimeType),
 				},
 			},
-			retryConstraint: gatewayv1a2.RetryConstraint{
+			retryConstraint: xgatewayv1alpha1.RetryConstraint{
 				BudgetPercent:  ptrTo(20),
 				BudgetInterval: toDuration("10s"),
-				MinRetryRate: ptrTo(gatewayv1a2.RequestRate{
+				MinRetryRate: ptrTo(xgatewayv1alpha1.RequestRate{
 					Count:    ptrTo(10),
 					Interval: toDuration("1s"),
 				}),
@@ -190,7 +190,7 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 		},
 		{
 			name: "valid BackendTrafficPolicyConfig permanent cookie",
-			sessionPersistence: gatewayv1a2.SessionPersistence{
+			sessionPersistence: xgatewayv1alpha1.SessionPersistence{
 				SessionName:     ptrTo("foo"),
 				AbsoluteTimeout: toDuration("1h"),
 				Type:            ptrTo(gatewayv1.CookieBasedSessionPersistence),
@@ -198,10 +198,10 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 					LifetimeType: ptrTo(gatewayv1.PermanentCookieLifetimeType),
 				},
 			},
-			retryConstraint: gatewayv1a2.RetryConstraint{
+			retryConstraint: xgatewayv1alpha1.RetryConstraint{
 				BudgetPercent:  ptrTo(20),
 				BudgetInterval: toDuration("10s"),
-				MinRetryRate: ptrTo(gatewayv1a2.RequestRate{
+				MinRetryRate: ptrTo(xgatewayv1alpha1.RequestRate{
 					Count:    ptrTo(10),
 					Interval: toDuration("1s"),
 				}),
@@ -210,14 +210,14 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 		},
 		{
 			name: "valid BackendTrafficPolicyConfig header-based session persistence",
-			sessionPersistence: gatewayv1a2.SessionPersistence{
+			sessionPersistence: xgatewayv1alpha1.SessionPersistence{
 				SessionName: ptrTo("foo"),
 				Type:        ptrTo(gatewayv1.HeaderBasedSessionPersistence),
 			},
-			retryConstraint: gatewayv1a2.RetryConstraint{
+			retryConstraint: xgatewayv1alpha1.RetryConstraint{
 				BudgetPercent:  ptrTo(20),
 				BudgetInterval: toDuration("10s"),
-				MinRetryRate: ptrTo(gatewayv1a2.RequestRate{
+				MinRetryRate: ptrTo(xgatewayv1alpha1.RequestRate{
 					Count:    ptrTo(10),
 					Interval: toDuration("1s"),
 				}),
@@ -227,13 +227,13 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			trafficPolicy := &gatewayv1a2.BackendTrafficPolicy{
+			trafficPolicy := &xgatewayv1alpha1.XBackendTrafficPolicy{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      fmt.Sprintf("foo-%v", time.Now().UnixNano()),
 					Namespace: metav1.NamespaceDefault,
 				},
-				Spec: gatewayv1a2.BackendTrafficPolicySpec{
-					TargetRefs: []gatewayv1a2.LocalPolicyTargetReference{{
+				Spec: xgatewayv1alpha1.BackendTrafficPolicySpec{
+					TargetRefs: []xgatewayv1alpha1.LocalPolicyTargetReference{{
 						Group: "group",
 						Kind:  "kind",
 						Name:  "name",
@@ -247,14 +247,14 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 	}
 }
 
-func validateBackendTrafficPolicy(t *testing.T, trafficPolicy *gatewayv1a2.BackendTrafficPolicy, wantErrors []string) {
+func validateBackendTrafficPolicy(t *testing.T, trafficPolicy *xgatewayv1alpha1.XBackendTrafficPolicy, wantErrors []string) {
 	t.Helper()
 
 	ctx := context.Background()
 	err := k8sClient.Create(ctx, trafficPolicy)
 
 	if (len(wantErrors) != 0) != (err != nil) {
-		t.Fatalf("Unexpected response while creating BackendTrafficPolicy %q; got err=\n%v\n;want error=%v", fmt.Sprintf("%v/%v", trafficPolicy.Namespace, trafficPolicy.Name), err, wantErrors)
+		t.Fatalf("Unexpected response while creating XBackendTrafficPolicy %q; got err=\n%v\n;want error=%v", fmt.Sprintf("%v/%v", trafficPolicy.Namespace, trafficPolicy.Name), err, wantErrors)
 	}
 
 	var missingErrorStrings []string
@@ -264,6 +264,6 @@ func validateBackendTrafficPolicy(t *testing.T, trafficPolicy *gatewayv1a2.Backe
 		}
 	}
 	if len(missingErrorStrings) != 0 {
-		t.Errorf("Unexpected response while creating BackendTrafficPolicy %q; got err=\n%v\n;missing strings within error=%q", fmt.Sprintf("%v/%v", trafficPolicy.Namespace, trafficPolicy.Name), err, missingErrorStrings)
+		t.Errorf("Unexpected response while creating XBackendTrafficPolicy %q; got err=\n%v\n;missing strings within error=%q", fmt.Sprintf("%v/%v", trafficPolicy.Namespace, trafficPolicy.Name), err, missingErrorStrings)
 	}
 }

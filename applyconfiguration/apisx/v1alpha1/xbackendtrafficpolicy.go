@@ -28,58 +28,58 @@ import (
 	internal "sigs.k8s.io/gateway-api/applyconfiguration/internal"
 )
 
-// BackendTrafficPolicyApplyConfiguration represents a declarative configuration of the BackendTrafficPolicy type for use
+// XBackendTrafficPolicyApplyConfiguration represents a declarative configuration of the XBackendTrafficPolicy type for use
 // with apply.
-type BackendTrafficPolicyApplyConfiguration struct {
+type XBackendTrafficPolicyApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	Spec                             *BackendTrafficPolicySpecApplyConfiguration `json:"spec,omitempty"`
 	Status                           *v1alpha2.PolicyStatusApplyConfiguration    `json:"status,omitempty"`
 }
 
-// BackendTrafficPolicy constructs a declarative configuration of the BackendTrafficPolicy type for use with
+// XBackendTrafficPolicy constructs a declarative configuration of the XBackendTrafficPolicy type for use with
 // apply.
-func BackendTrafficPolicy(name, namespace string) *BackendTrafficPolicyApplyConfiguration {
-	b := &BackendTrafficPolicyApplyConfiguration{}
+func XBackendTrafficPolicy(name, namespace string) *XBackendTrafficPolicyApplyConfiguration {
+	b := &XBackendTrafficPolicyApplyConfiguration{}
 	b.WithName(name)
 	b.WithNamespace(namespace)
-	b.WithKind("BackendTrafficPolicy")
+	b.WithKind("XBackendTrafficPolicy")
 	b.WithAPIVersion("gateway.networking.x-k8s.io/v1alpha1")
 	return b
 }
 
-// ExtractBackendTrafficPolicy extracts the applied configuration owned by fieldManager from
-// backendTrafficPolicy. If no managedFields are found in backendTrafficPolicy for fieldManager, a
-// BackendTrafficPolicyApplyConfiguration is returned with only the Name, Namespace (if applicable),
+// ExtractXBackendTrafficPolicy extracts the applied configuration owned by fieldManager from
+// xBackendTrafficPolicy. If no managedFields are found in xBackendTrafficPolicy for fieldManager, a
+// XBackendTrafficPolicyApplyConfiguration is returned with only the Name, Namespace (if applicable),
 // APIVersion and Kind populated. It is possible that no managed fields were found for because other
 // field managers have taken ownership of all the fields previously owned by fieldManager, or because
 // the fieldManager never owned fields any fields.
-// backendTrafficPolicy must be a unmodified BackendTrafficPolicy API object that was retrieved from the Kubernetes API.
-// ExtractBackendTrafficPolicy provides a way to perform a extract/modify-in-place/apply workflow.
+// xBackendTrafficPolicy must be a unmodified XBackendTrafficPolicy API object that was retrieved from the Kubernetes API.
+// ExtractXBackendTrafficPolicy provides a way to perform a extract/modify-in-place/apply workflow.
 // Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
 // applied if another fieldManager has updated or force applied any of the previously applied fields.
 // Experimental!
-func ExtractBackendTrafficPolicy(backendTrafficPolicy *apisxv1alpha1.BackendTrafficPolicy, fieldManager string) (*BackendTrafficPolicyApplyConfiguration, error) {
-	return extractBackendTrafficPolicy(backendTrafficPolicy, fieldManager, "")
+func ExtractXBackendTrafficPolicy(xBackendTrafficPolicy *apisxv1alpha1.XBackendTrafficPolicy, fieldManager string) (*XBackendTrafficPolicyApplyConfiguration, error) {
+	return extractXBackendTrafficPolicy(xBackendTrafficPolicy, fieldManager, "")
 }
 
-// ExtractBackendTrafficPolicyStatus is the same as ExtractBackendTrafficPolicy except
+// ExtractXBackendTrafficPolicyStatus is the same as ExtractXBackendTrafficPolicy except
 // that it extracts the status subresource applied configuration.
 // Experimental!
-func ExtractBackendTrafficPolicyStatus(backendTrafficPolicy *apisxv1alpha1.BackendTrafficPolicy, fieldManager string) (*BackendTrafficPolicyApplyConfiguration, error) {
-	return extractBackendTrafficPolicy(backendTrafficPolicy, fieldManager, "status")
+func ExtractXBackendTrafficPolicyStatus(xBackendTrafficPolicy *apisxv1alpha1.XBackendTrafficPolicy, fieldManager string) (*XBackendTrafficPolicyApplyConfiguration, error) {
+	return extractXBackendTrafficPolicy(xBackendTrafficPolicy, fieldManager, "status")
 }
 
-func extractBackendTrafficPolicy(backendTrafficPolicy *apisxv1alpha1.BackendTrafficPolicy, fieldManager string, subresource string) (*BackendTrafficPolicyApplyConfiguration, error) {
-	b := &BackendTrafficPolicyApplyConfiguration{}
-	err := managedfields.ExtractInto(backendTrafficPolicy, internal.Parser().Type("io.k8s.sigs.gateway-api.apisx.v1alpha1.BackendTrafficPolicy"), fieldManager, b, subresource)
+func extractXBackendTrafficPolicy(xBackendTrafficPolicy *apisxv1alpha1.XBackendTrafficPolicy, fieldManager string, subresource string) (*XBackendTrafficPolicyApplyConfiguration, error) {
+	b := &XBackendTrafficPolicyApplyConfiguration{}
+	err := managedfields.ExtractInto(xBackendTrafficPolicy, internal.Parser().Type("io.k8s.sigs.gateway-api.apisx.v1alpha1.XBackendTrafficPolicy"), fieldManager, b, subresource)
 	if err != nil {
 		return nil, err
 	}
-	b.WithName(backendTrafficPolicy.Name)
-	b.WithNamespace(backendTrafficPolicy.Namespace)
+	b.WithName(xBackendTrafficPolicy.Name)
+	b.WithNamespace(xBackendTrafficPolicy.Namespace)
 
-	b.WithKind("BackendTrafficPolicy")
+	b.WithKind("XBackendTrafficPolicy")
 	b.WithAPIVersion("gateway.networking.x-k8s.io/v1alpha1")
 	return b, nil
 }
@@ -87,7 +87,7 @@ func extractBackendTrafficPolicy(backendTrafficPolicy *apisxv1alpha1.BackendTraf
 // WithKind sets the Kind field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Kind field is set to the value of the last call.
-func (b *BackendTrafficPolicyApplyConfiguration) WithKind(value string) *BackendTrafficPolicyApplyConfiguration {
+func (b *XBackendTrafficPolicyApplyConfiguration) WithKind(value string) *XBackendTrafficPolicyApplyConfiguration {
 	b.Kind = &value
 	return b
 }
@@ -95,7 +95,7 @@ func (b *BackendTrafficPolicyApplyConfiguration) WithKind(value string) *Backend
 // WithAPIVersion sets the APIVersion field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the APIVersion field is set to the value of the last call.
-func (b *BackendTrafficPolicyApplyConfiguration) WithAPIVersion(value string) *BackendTrafficPolicyApplyConfiguration {
+func (b *XBackendTrafficPolicyApplyConfiguration) WithAPIVersion(value string) *XBackendTrafficPolicyApplyConfiguration {
 	b.APIVersion = &value
 	return b
 }
@@ -103,7 +103,7 @@ func (b *BackendTrafficPolicyApplyConfiguration) WithAPIVersion(value string) *B
 // WithName sets the Name field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Name field is set to the value of the last call.
-func (b *BackendTrafficPolicyApplyConfiguration) WithName(value string) *BackendTrafficPolicyApplyConfiguration {
+func (b *XBackendTrafficPolicyApplyConfiguration) WithName(value string) *XBackendTrafficPolicyApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
 	b.Name = &value
 	return b
@@ -112,7 +112,7 @@ func (b *BackendTrafficPolicyApplyConfiguration) WithName(value string) *Backend
 // WithGenerateName sets the GenerateName field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the GenerateName field is set to the value of the last call.
-func (b *BackendTrafficPolicyApplyConfiguration) WithGenerateName(value string) *BackendTrafficPolicyApplyConfiguration {
+func (b *XBackendTrafficPolicyApplyConfiguration) WithGenerateName(value string) *XBackendTrafficPolicyApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
 	b.GenerateName = &value
 	return b
@@ -121,7 +121,7 @@ func (b *BackendTrafficPolicyApplyConfiguration) WithGenerateName(value string) 
 // WithNamespace sets the Namespace field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Namespace field is set to the value of the last call.
-func (b *BackendTrafficPolicyApplyConfiguration) WithNamespace(value string) *BackendTrafficPolicyApplyConfiguration {
+func (b *XBackendTrafficPolicyApplyConfiguration) WithNamespace(value string) *XBackendTrafficPolicyApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
 	b.Namespace = &value
 	return b
@@ -130,7 +130,7 @@ func (b *BackendTrafficPolicyApplyConfiguration) WithNamespace(value string) *Ba
 // WithUID sets the UID field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the UID field is set to the value of the last call.
-func (b *BackendTrafficPolicyApplyConfiguration) WithUID(value types.UID) *BackendTrafficPolicyApplyConfiguration {
+func (b *XBackendTrafficPolicyApplyConfiguration) WithUID(value types.UID) *XBackendTrafficPolicyApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
 	b.UID = &value
 	return b
@@ -139,7 +139,7 @@ func (b *BackendTrafficPolicyApplyConfiguration) WithUID(value types.UID) *Backe
 // WithResourceVersion sets the ResourceVersion field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the ResourceVersion field is set to the value of the last call.
-func (b *BackendTrafficPolicyApplyConfiguration) WithResourceVersion(value string) *BackendTrafficPolicyApplyConfiguration {
+func (b *XBackendTrafficPolicyApplyConfiguration) WithResourceVersion(value string) *XBackendTrafficPolicyApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
 	b.ResourceVersion = &value
 	return b
@@ -148,7 +148,7 @@ func (b *BackendTrafficPolicyApplyConfiguration) WithResourceVersion(value strin
 // WithGeneration sets the Generation field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Generation field is set to the value of the last call.
-func (b *BackendTrafficPolicyApplyConfiguration) WithGeneration(value int64) *BackendTrafficPolicyApplyConfiguration {
+func (b *XBackendTrafficPolicyApplyConfiguration) WithGeneration(value int64) *XBackendTrafficPolicyApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
 	b.Generation = &value
 	return b
@@ -157,7 +157,7 @@ func (b *BackendTrafficPolicyApplyConfiguration) WithGeneration(value int64) *Ba
 // WithCreationTimestamp sets the CreationTimestamp field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the CreationTimestamp field is set to the value of the last call.
-func (b *BackendTrafficPolicyApplyConfiguration) WithCreationTimestamp(value metav1.Time) *BackendTrafficPolicyApplyConfiguration {
+func (b *XBackendTrafficPolicyApplyConfiguration) WithCreationTimestamp(value metav1.Time) *XBackendTrafficPolicyApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
 	b.CreationTimestamp = &value
 	return b
@@ -166,7 +166,7 @@ func (b *BackendTrafficPolicyApplyConfiguration) WithCreationTimestamp(value met
 // WithDeletionTimestamp sets the DeletionTimestamp field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the DeletionTimestamp field is set to the value of the last call.
-func (b *BackendTrafficPolicyApplyConfiguration) WithDeletionTimestamp(value metav1.Time) *BackendTrafficPolicyApplyConfiguration {
+func (b *XBackendTrafficPolicyApplyConfiguration) WithDeletionTimestamp(value metav1.Time) *XBackendTrafficPolicyApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
 	b.DeletionTimestamp = &value
 	return b
@@ -175,7 +175,7 @@ func (b *BackendTrafficPolicyApplyConfiguration) WithDeletionTimestamp(value met
 // WithDeletionGracePeriodSeconds sets the DeletionGracePeriodSeconds field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the DeletionGracePeriodSeconds field is set to the value of the last call.
-func (b *BackendTrafficPolicyApplyConfiguration) WithDeletionGracePeriodSeconds(value int64) *BackendTrafficPolicyApplyConfiguration {
+func (b *XBackendTrafficPolicyApplyConfiguration) WithDeletionGracePeriodSeconds(value int64) *XBackendTrafficPolicyApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
 	b.DeletionGracePeriodSeconds = &value
 	return b
@@ -185,7 +185,7 @@ func (b *BackendTrafficPolicyApplyConfiguration) WithDeletionGracePeriodSeconds(
 // and returns the receiver, so that objects can be build by chaining "With" function invocations.
 // If called multiple times, the entries provided by each call will be put on the Labels field,
 // overwriting an existing map entries in Labels field with the same key.
-func (b *BackendTrafficPolicyApplyConfiguration) WithLabels(entries map[string]string) *BackendTrafficPolicyApplyConfiguration {
+func (b *XBackendTrafficPolicyApplyConfiguration) WithLabels(entries map[string]string) *XBackendTrafficPolicyApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
 	if b.Labels == nil && len(entries) > 0 {
 		b.Labels = make(map[string]string, len(entries))
@@ -200,7 +200,7 @@ func (b *BackendTrafficPolicyApplyConfiguration) WithLabels(entries map[string]s
 // and returns the receiver, so that objects can be build by chaining "With" function invocations.
 // If called multiple times, the entries provided by each call will be put on the Annotations field,
 // overwriting an existing map entries in Annotations field with the same key.
-func (b *BackendTrafficPolicyApplyConfiguration) WithAnnotations(entries map[string]string) *BackendTrafficPolicyApplyConfiguration {
+func (b *XBackendTrafficPolicyApplyConfiguration) WithAnnotations(entries map[string]string) *XBackendTrafficPolicyApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
 	if b.Annotations == nil && len(entries) > 0 {
 		b.Annotations = make(map[string]string, len(entries))
@@ -214,7 +214,7 @@ func (b *BackendTrafficPolicyApplyConfiguration) WithAnnotations(entries map[str
 // WithOwnerReferences adds the given value to the OwnerReferences field in the declarative configuration
 // and returns the receiver, so that objects can be build by chaining "With" function invocations.
 // If called multiple times, values provided by each call will be appended to the OwnerReferences field.
-func (b *BackendTrafficPolicyApplyConfiguration) WithOwnerReferences(values ...*v1.OwnerReferenceApplyConfiguration) *BackendTrafficPolicyApplyConfiguration {
+func (b *XBackendTrafficPolicyApplyConfiguration) WithOwnerReferences(values ...*v1.OwnerReferenceApplyConfiguration) *XBackendTrafficPolicyApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
 	for i := range values {
 		if values[i] == nil {
@@ -228,7 +228,7 @@ func (b *BackendTrafficPolicyApplyConfiguration) WithOwnerReferences(values ...*
 // WithFinalizers adds the given value to the Finalizers field in the declarative configuration
 // and returns the receiver, so that objects can be build by chaining "With" function invocations.
 // If called multiple times, values provided by each call will be appended to the Finalizers field.
-func (b *BackendTrafficPolicyApplyConfiguration) WithFinalizers(values ...string) *BackendTrafficPolicyApplyConfiguration {
+func (b *XBackendTrafficPolicyApplyConfiguration) WithFinalizers(values ...string) *XBackendTrafficPolicyApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
 	for i := range values {
 		b.Finalizers = append(b.Finalizers, values[i])
@@ -236,7 +236,7 @@ func (b *BackendTrafficPolicyApplyConfiguration) WithFinalizers(values ...string
 	return b
 }
 
-func (b *BackendTrafficPolicyApplyConfiguration) ensureObjectMetaApplyConfigurationExists() {
+func (b *XBackendTrafficPolicyApplyConfiguration) ensureObjectMetaApplyConfigurationExists() {
 	if b.ObjectMetaApplyConfiguration == nil {
 		b.ObjectMetaApplyConfiguration = &v1.ObjectMetaApplyConfiguration{}
 	}
@@ -245,7 +245,7 @@ func (b *BackendTrafficPolicyApplyConfiguration) ensureObjectMetaApplyConfigurat
 // WithSpec sets the Spec field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Spec field is set to the value of the last call.
-func (b *BackendTrafficPolicyApplyConfiguration) WithSpec(value *BackendTrafficPolicySpecApplyConfiguration) *BackendTrafficPolicyApplyConfiguration {
+func (b *XBackendTrafficPolicyApplyConfiguration) WithSpec(value *BackendTrafficPolicySpecApplyConfiguration) *XBackendTrafficPolicyApplyConfiguration {
 	b.Spec = value
 	return b
 }
@@ -253,13 +253,13 @@ func (b *BackendTrafficPolicyApplyConfiguration) WithSpec(value *BackendTrafficP
 // WithStatus sets the Status field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Status field is set to the value of the last call.
-func (b *BackendTrafficPolicyApplyConfiguration) WithStatus(value *v1alpha2.PolicyStatusApplyConfiguration) *BackendTrafficPolicyApplyConfiguration {
+func (b *XBackendTrafficPolicyApplyConfiguration) WithStatus(value *v1alpha2.PolicyStatusApplyConfiguration) *XBackendTrafficPolicyApplyConfiguration {
 	b.Status = value
 	return b
 }
 
 // GetName retrieves the value of the Name field in the declarative configuration.
-func (b *BackendTrafficPolicyApplyConfiguration) GetName() *string {
+func (b *XBackendTrafficPolicyApplyConfiguration) GetName() *string {
 	b.ensureObjectMetaApplyConfigurationExists()
 	return b.Name
 }

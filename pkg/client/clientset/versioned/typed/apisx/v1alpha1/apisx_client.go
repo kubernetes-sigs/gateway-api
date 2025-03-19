@@ -28,8 +28,8 @@ import (
 
 type ExperimentalV1alpha1Interface interface {
 	RESTClient() rest.Interface
-	BackendTrafficPoliciesGetter
-	ListenerSetsGetter
+	XBackendTrafficPoliciesGetter
+	XListenerSetsGetter
 }
 
 // ExperimentalV1alpha1Client is used to interact with features provided by the gateway.networking.x-k8s.io group.
@@ -37,12 +37,12 @@ type ExperimentalV1alpha1Client struct {
 	restClient rest.Interface
 }
 
-func (c *ExperimentalV1alpha1Client) BackendTrafficPolicies(namespace string) BackendTrafficPolicyInterface {
-	return newBackendTrafficPolicies(c, namespace)
+func (c *ExperimentalV1alpha1Client) XBackendTrafficPolicies(namespace string) XBackendTrafficPolicyInterface {
+	return newXBackendTrafficPolicies(c, namespace)
 }
 
-func (c *ExperimentalV1alpha1Client) ListenerSets(namespace string) ListenerSetInterface {
-	return newListenerSets(c, namespace)
+func (c *ExperimentalV1alpha1Client) XListenerSets(namespace string) XListenerSetInterface {
+	return newXListenerSets(c, namespace)
 }
 
 // NewForConfig creates a new ExperimentalV1alpha1Client for the given config.

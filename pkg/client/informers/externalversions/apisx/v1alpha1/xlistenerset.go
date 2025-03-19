@@ -32,59 +32,59 @@ import (
 	v1alpha1 "sigs.k8s.io/gateway-api/pkg/client/listers/apisx/v1alpha1"
 )
 
-// ListenerSetInformer provides access to a shared informer and lister for
-// ListenerSets.
-type ListenerSetInformer interface {
+// XListenerSetInformer provides access to a shared informer and lister for
+// XListenerSets.
+type XListenerSetInformer interface {
 	Informer() cache.SharedIndexInformer
-	Lister() v1alpha1.ListenerSetLister
+	Lister() v1alpha1.XListenerSetLister
 }
 
-type listenerSetInformer struct {
+type xListenerSetInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
 	tweakListOptions internalinterfaces.TweakListOptionsFunc
 	namespace        string
 }
 
-// NewListenerSetInformer constructs a new informer for ListenerSet type.
+// NewXListenerSetInformer constructs a new informer for XListenerSet type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewListenerSetInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
-	return NewFilteredListenerSetInformer(client, namespace, resyncPeriod, indexers, nil)
+func NewXListenerSetInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
+	return NewFilteredXListenerSetInformer(client, namespace, resyncPeriod, indexers, nil)
 }
 
-// NewFilteredListenerSetInformer constructs a new informer for ListenerSet type.
+// NewFilteredXListenerSetInformer constructs a new informer for XListenerSet type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewFilteredListenerSetInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
+func NewFilteredXListenerSetInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
 	return cache.NewSharedIndexInformer(
 		&cache.ListWatch{
 			ListFunc: func(options v1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.ExperimentalV1alpha1().ListenerSets(namespace).List(context.TODO(), options)
+				return client.ExperimentalV1alpha1().XListenerSets(namespace).List(context.TODO(), options)
 			},
 			WatchFunc: func(options v1.ListOptions) (watch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.ExperimentalV1alpha1().ListenerSets(namespace).Watch(context.TODO(), options)
+				return client.ExperimentalV1alpha1().XListenerSets(namespace).Watch(context.TODO(), options)
 			},
 		},
-		&apisxv1alpha1.ListenerSet{},
+		&apisxv1alpha1.XListenerSet{},
 		resyncPeriod,
 		indexers,
 	)
 }
 
-func (f *listenerSetInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewFilteredListenerSetInformer(client, f.namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
+func (f *xListenerSetInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
+	return NewFilteredXListenerSetInformer(client, f.namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
 }
 
-func (f *listenerSetInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&apisxv1alpha1.ListenerSet{}, f.defaultInformer)
+func (f *xListenerSetInformer) Informer() cache.SharedIndexInformer {
+	return f.factory.InformerFor(&apisxv1alpha1.XListenerSet{}, f.defaultInformer)
 }
 
-func (f *listenerSetInformer) Lister() v1alpha1.ListenerSetLister {
-	return v1alpha1.NewListenerSetLister(f.Informer().GetIndexer())
+func (f *xListenerSetInformer) Lister() v1alpha1.XListenerSetLister {
+	return v1alpha1.NewXListenerSetLister(f.Informer().GetIndexer())
 }

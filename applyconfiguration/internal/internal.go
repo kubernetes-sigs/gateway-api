@@ -1746,27 +1746,6 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: name
       type:
         scalar: string
-- name: io.k8s.sigs.gateway-api.apisx.v1alpha1.BackendTrafficPolicy
-  map:
-    fields:
-    - name: apiVersion
-      type:
-        scalar: string
-    - name: kind
-      type:
-        scalar: string
-    - name: metadata
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
-      default: {}
-    - name: spec
-      type:
-        namedType: io.k8s.sigs.gateway-api.apisx.v1alpha1.BackendTrafficPolicySpec
-      default: {}
-    - name: status
-      type:
-        namedType: io.k8s.sigs.gateway-api.apis.v1alpha2.PolicyStatus
-      default: {}
 - name: io.k8s.sigs.gateway-api.apisx.v1alpha1.BackendTrafficPolicySpec
   map:
     fields:
@@ -1838,27 +1817,6 @@ var schemaYAML = typed.YAMLObject(`types:
           elementType:
             namedType: io.k8s.sigs.gateway-api.apis.v1.RouteGroupKind
           elementRelationship: atomic
-- name: io.k8s.sigs.gateway-api.apisx.v1alpha1.ListenerSet
-  map:
-    fields:
-    - name: apiVersion
-      type:
-        scalar: string
-    - name: kind
-      type:
-        scalar: string
-    - name: metadata
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
-      default: {}
-    - name: spec
-      type:
-        namedType: io.k8s.sigs.gateway-api.apisx.v1alpha1.ListenerSetSpec
-      default: {}
-    - name: status
-      type:
-        namedType: io.k8s.sigs.gateway-api.apisx.v1alpha1.ListenerSetStatus
-      default: {}
 - name: io.k8s.sigs.gateway-api.apisx.v1alpha1.ListenerSetSpec
   map:
     fields:
@@ -1930,6 +1888,48 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: minRetryRate
       type:
         namedType: io.k8s.sigs.gateway-api.apisx.v1alpha1.RequestRate
+- name: io.k8s.sigs.gateway-api.apisx.v1alpha1.XBackendTrafficPolicy
+  map:
+    fields:
+    - name: apiVersion
+      type:
+        scalar: string
+    - name: kind
+      type:
+        scalar: string
+    - name: metadata
+      type:
+        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+      default: {}
+    - name: spec
+      type:
+        namedType: io.k8s.sigs.gateway-api.apisx.v1alpha1.BackendTrafficPolicySpec
+      default: {}
+    - name: status
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1alpha2.PolicyStatus
+      default: {}
+- name: io.k8s.sigs.gateway-api.apisx.v1alpha1.XListenerSet
+  map:
+    fields:
+    - name: apiVersion
+      type:
+        scalar: string
+    - name: kind
+      type:
+        scalar: string
+    - name: metadata
+      type:
+        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+      default: {}
+    - name: spec
+      type:
+        namedType: io.k8s.sigs.gateway-api.apisx.v1alpha1.ListenerSetSpec
+      default: {}
+    - name: status
+      type:
+        namedType: io.k8s.sigs.gateway-api.apisx.v1alpha1.ListenerSetStatus
+      default: {}
 - name: __untyped_atomic_
   scalar: untyped
   list:

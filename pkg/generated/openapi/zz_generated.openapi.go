@@ -192,18 +192,18 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"sigs.k8s.io/gateway-api/apis/v1beta1.ReferenceGrantList":                         schema_sigsk8sio_gateway_api_apis_v1beta1_ReferenceGrantList(ref),
 		"sigs.k8s.io/gateway-api/apis/v1beta1.ReferenceGrantSpec":                         schema_sigsk8sio_gateway_api_apis_v1beta1_ReferenceGrantSpec(ref),
 		"sigs.k8s.io/gateway-api/apis/v1beta1.ReferenceGrantTo":                           schema_sigsk8sio_gateway_api_apis_v1beta1_ReferenceGrantTo(ref),
-		"sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendTrafficPolicy":                     schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendTrafficPolicy(ref),
-		"sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendTrafficPolicyList":                 schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendTrafficPolicyList(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendTrafficPolicySpec":                 schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendTrafficPolicySpec(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.ListenerEntry":                            schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerEntry(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.ListenerEntryStatus":                      schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerEntryStatus(ref),
-		"sigs.k8s.io/gateway-api/apisx/v1alpha1.ListenerSet":                              schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerSet(ref),
-		"sigs.k8s.io/gateway-api/apisx/v1alpha1.ListenerSetList":                          schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerSetList(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.ListenerSetSpec":                          schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerSetSpec(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.ListenerSetStatus":                        schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerSetStatus(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.ParentGatewayReference":                   schema_sigsk8sio_gateway_api_apisx_v1alpha1_ParentGatewayReference(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.RequestRate":                              schema_sigsk8sio_gateway_api_apisx_v1alpha1_RequestRate(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.RetryConstraint":                          schema_sigsk8sio_gateway_api_apisx_v1alpha1_RetryConstraint(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.XBackendTrafficPolicy":                    schema_sigsk8sio_gateway_api_apisx_v1alpha1_XBackendTrafficPolicy(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.XBackendTrafficPolicyList":                schema_sigsk8sio_gateway_api_apisx_v1alpha1_XBackendTrafficPolicyList(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.XListenerSet":                             schema_sigsk8sio_gateway_api_apisx_v1alpha1_XListenerSet(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.XListenerSetList":                         schema_sigsk8sio_gateway_api_apisx_v1alpha1_XListenerSetList(ref),
 	}
 }
 
@@ -7785,105 +7785,6 @@ func schema_sigsk8sio_gateway_api_apis_v1beta1_ReferenceGrantTo(ref common.Refer
 	}
 }
 
-func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendTrafficPolicy(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "BackendTrafficPolicy defines the configuration for how traffic to a target backend should be handled.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
-						},
-					},
-					"spec": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Spec defines the desired state of BackendTrafficPolicy.",
-							Default:     map[string]interface{}{},
-							Ref:         ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendTrafficPolicySpec"),
-						},
-					},
-					"status": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Status defines the current state of BackendTrafficPolicy.",
-							Default:     map[string]interface{}{},
-							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1alpha2.PolicyStatus"),
-						},
-					},
-				},
-				Required: []string{"spec"},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta", "sigs.k8s.io/gateway-api/apis/v1alpha2.PolicyStatus", "sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendTrafficPolicySpec"},
-	}
-}
-
-func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendTrafficPolicyList(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "BackendTrafficPolicyList contains a list of BackendTrafficPolicies",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
-						},
-					},
-					"items": {
-						SchemaProps: spec.SchemaProps{
-							Type: []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendTrafficPolicy"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"items"},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta", "sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendTrafficPolicy"},
-	}
-}
-
 func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendTrafficPolicySpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -8066,104 +7967,6 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerEntryStatus(ref common.
 		},
 		Dependencies: []string{
 			"k8s.io/apimachinery/pkg/apis/meta/v1.Condition", "sigs.k8s.io/gateway-api/apis/v1.RouteGroupKind"},
-	}
-}
-
-func schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerSet(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "ListenerSet defines a set of additional listeners to attach to an existing Gateway.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
-						},
-					},
-					"spec": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Spec defines the desired state of ListenerSet.",
-							Default:     map[string]interface{}{},
-							Ref:         ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.ListenerSetSpec"),
-						},
-					},
-					"status": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Status defines the current state of ListenerSet.",
-							Default:     map[string]interface{}{},
-							Ref:         ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.ListenerSetStatus"),
-						},
-					},
-				},
-				Required: []string{"spec"},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta", "sigs.k8s.io/gateway-api/apisx/v1alpha1.ListenerSetSpec", "sigs.k8s.io/gateway-api/apisx/v1alpha1.ListenerSetStatus"},
-	}
-}
-
-func schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerSetList(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
-						},
-					},
-					"items": {
-						SchemaProps: spec.SchemaProps{
-							Type: []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.ListenerSet"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"items"},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta", "sigs.k8s.io/gateway-api/apisx/v1alpha1.ListenerSet"},
 	}
 }
 
@@ -8372,5 +8175,202 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_RetryConstraint(ref common.Refe
 		},
 		Dependencies: []string{
 			"sigs.k8s.io/gateway-api/apisx/v1alpha1.RequestRate"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_XBackendTrafficPolicy(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "XBackendTrafficPolicy defines the configuration for how traffic to a target backend should be handled.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+						},
+					},
+					"spec": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Spec defines the desired state of BackendTrafficPolicy.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendTrafficPolicySpec"),
+						},
+					},
+					"status": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Status defines the current state of BackendTrafficPolicy.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1alpha2.PolicyStatus"),
+						},
+					},
+				},
+				Required: []string{"spec"},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta", "sigs.k8s.io/gateway-api/apis/v1alpha2.PolicyStatus", "sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendTrafficPolicySpec"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_XBackendTrafficPolicyList(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "XBackendTrafficPolicyList contains a list of BackendTrafficPolicies",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
+						},
+					},
+					"items": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.XBackendTrafficPolicy"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"items"},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta", "sigs.k8s.io/gateway-api/apisx/v1alpha1.XBackendTrafficPolicy"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_XListenerSet(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "XListenerSet defines a set of additional listeners to attach to an existing Gateway.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+						},
+					},
+					"spec": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Spec defines the desired state of ListenerSet.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.ListenerSetSpec"),
+						},
+					},
+					"status": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Status defines the current state of ListenerSet.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.ListenerSetStatus"),
+						},
+					},
+				},
+				Required: []string{"spec"},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta", "sigs.k8s.io/gateway-api/apisx/v1alpha1.ListenerSetSpec", "sigs.k8s.io/gateway-api/apisx/v1alpha1.ListenerSetStatus"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_XListenerSetList(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Type: []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
+						},
+					},
+					"items": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.XListenerSet"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"items"},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta", "sigs.k8s.io/gateway-api/apisx/v1alpha1.XListenerSet"},
 	}
 }
