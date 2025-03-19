@@ -52,7 +52,7 @@ def on_files(files, config, **kwargs):
 
 desc = """
 The following tables are populated from the conformance reports [uploaded by project implementations](https://github.com/kubernetes-sigs/gateway-api/tree/main/conformance/reports). They are separated into the extended features that each project supports listed in their reports.
-Implementations only appear in this page if they pass Core conformance for the resource type, and the features listed should be Extended features.
+Implementations only appear in this page if they pass Core conformance for the resource type, and the features listed should be Extended features. Implementations that submit conformance reports with skipped tests won't appear in the tables.
 """
 
 warning_text = """
