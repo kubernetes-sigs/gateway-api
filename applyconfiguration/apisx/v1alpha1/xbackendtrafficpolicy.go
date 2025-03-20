@@ -88,7 +88,7 @@ func extractXBackendTrafficPolicy(xBackendTrafficPolicy *apisxv1alpha1.XBackendT
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Kind field is set to the value of the last call.
 func (b *XBackendTrafficPolicyApplyConfiguration) WithKind(value string) *XBackendTrafficPolicyApplyConfiguration {
-	b.Kind = &value
+	b.TypeMetaApplyConfiguration.Kind = &value
 	return b
 }
 
@@ -96,7 +96,7 @@ func (b *XBackendTrafficPolicyApplyConfiguration) WithKind(value string) *XBacke
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the APIVersion field is set to the value of the last call.
 func (b *XBackendTrafficPolicyApplyConfiguration) WithAPIVersion(value string) *XBackendTrafficPolicyApplyConfiguration {
-	b.APIVersion = &value
+	b.TypeMetaApplyConfiguration.APIVersion = &value
 	return b
 }
 
@@ -105,7 +105,7 @@ func (b *XBackendTrafficPolicyApplyConfiguration) WithAPIVersion(value string) *
 // If called multiple times, the Name field is set to the value of the last call.
 func (b *XBackendTrafficPolicyApplyConfiguration) WithName(value string) *XBackendTrafficPolicyApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.Name = &value
+	b.ObjectMetaApplyConfiguration.Name = &value
 	return b
 }
 
@@ -114,7 +114,7 @@ func (b *XBackendTrafficPolicyApplyConfiguration) WithName(value string) *XBacke
 // If called multiple times, the GenerateName field is set to the value of the last call.
 func (b *XBackendTrafficPolicyApplyConfiguration) WithGenerateName(value string) *XBackendTrafficPolicyApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.GenerateName = &value
+	b.ObjectMetaApplyConfiguration.GenerateName = &value
 	return b
 }
 
@@ -123,7 +123,7 @@ func (b *XBackendTrafficPolicyApplyConfiguration) WithGenerateName(value string)
 // If called multiple times, the Namespace field is set to the value of the last call.
 func (b *XBackendTrafficPolicyApplyConfiguration) WithNamespace(value string) *XBackendTrafficPolicyApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.Namespace = &value
+	b.ObjectMetaApplyConfiguration.Namespace = &value
 	return b
 }
 
@@ -132,7 +132,7 @@ func (b *XBackendTrafficPolicyApplyConfiguration) WithNamespace(value string) *X
 // If called multiple times, the UID field is set to the value of the last call.
 func (b *XBackendTrafficPolicyApplyConfiguration) WithUID(value types.UID) *XBackendTrafficPolicyApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.UID = &value
+	b.ObjectMetaApplyConfiguration.UID = &value
 	return b
 }
 
@@ -141,7 +141,7 @@ func (b *XBackendTrafficPolicyApplyConfiguration) WithUID(value types.UID) *XBac
 // If called multiple times, the ResourceVersion field is set to the value of the last call.
 func (b *XBackendTrafficPolicyApplyConfiguration) WithResourceVersion(value string) *XBackendTrafficPolicyApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.ResourceVersion = &value
+	b.ObjectMetaApplyConfiguration.ResourceVersion = &value
 	return b
 }
 
@@ -150,7 +150,7 @@ func (b *XBackendTrafficPolicyApplyConfiguration) WithResourceVersion(value stri
 // If called multiple times, the Generation field is set to the value of the last call.
 func (b *XBackendTrafficPolicyApplyConfiguration) WithGeneration(value int64) *XBackendTrafficPolicyApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.Generation = &value
+	b.ObjectMetaApplyConfiguration.Generation = &value
 	return b
 }
 
@@ -159,7 +159,7 @@ func (b *XBackendTrafficPolicyApplyConfiguration) WithGeneration(value int64) *X
 // If called multiple times, the CreationTimestamp field is set to the value of the last call.
 func (b *XBackendTrafficPolicyApplyConfiguration) WithCreationTimestamp(value metav1.Time) *XBackendTrafficPolicyApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.CreationTimestamp = &value
+	b.ObjectMetaApplyConfiguration.CreationTimestamp = &value
 	return b
 }
 
@@ -168,7 +168,7 @@ func (b *XBackendTrafficPolicyApplyConfiguration) WithCreationTimestamp(value me
 // If called multiple times, the DeletionTimestamp field is set to the value of the last call.
 func (b *XBackendTrafficPolicyApplyConfiguration) WithDeletionTimestamp(value metav1.Time) *XBackendTrafficPolicyApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.DeletionTimestamp = &value
+	b.ObjectMetaApplyConfiguration.DeletionTimestamp = &value
 	return b
 }
 
@@ -177,7 +177,7 @@ func (b *XBackendTrafficPolicyApplyConfiguration) WithDeletionTimestamp(value me
 // If called multiple times, the DeletionGracePeriodSeconds field is set to the value of the last call.
 func (b *XBackendTrafficPolicyApplyConfiguration) WithDeletionGracePeriodSeconds(value int64) *XBackendTrafficPolicyApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.DeletionGracePeriodSeconds = &value
+	b.ObjectMetaApplyConfiguration.DeletionGracePeriodSeconds = &value
 	return b
 }
 
@@ -187,11 +187,11 @@ func (b *XBackendTrafficPolicyApplyConfiguration) WithDeletionGracePeriodSeconds
 // overwriting an existing map entries in Labels field with the same key.
 func (b *XBackendTrafficPolicyApplyConfiguration) WithLabels(entries map[string]string) *XBackendTrafficPolicyApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	if b.Labels == nil && len(entries) > 0 {
-		b.Labels = make(map[string]string, len(entries))
+	if b.ObjectMetaApplyConfiguration.Labels == nil && len(entries) > 0 {
+		b.ObjectMetaApplyConfiguration.Labels = make(map[string]string, len(entries))
 	}
 	for k, v := range entries {
-		b.Labels[k] = v
+		b.ObjectMetaApplyConfiguration.Labels[k] = v
 	}
 	return b
 }
@@ -202,11 +202,11 @@ func (b *XBackendTrafficPolicyApplyConfiguration) WithLabels(entries map[string]
 // overwriting an existing map entries in Annotations field with the same key.
 func (b *XBackendTrafficPolicyApplyConfiguration) WithAnnotations(entries map[string]string) *XBackendTrafficPolicyApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	if b.Annotations == nil && len(entries) > 0 {
-		b.Annotations = make(map[string]string, len(entries))
+	if b.ObjectMetaApplyConfiguration.Annotations == nil && len(entries) > 0 {
+		b.ObjectMetaApplyConfiguration.Annotations = make(map[string]string, len(entries))
 	}
 	for k, v := range entries {
-		b.Annotations[k] = v
+		b.ObjectMetaApplyConfiguration.Annotations[k] = v
 	}
 	return b
 }
@@ -220,7 +220,7 @@ func (b *XBackendTrafficPolicyApplyConfiguration) WithOwnerReferences(values ...
 		if values[i] == nil {
 			panic("nil value passed to WithOwnerReferences")
 		}
-		b.OwnerReferences = append(b.OwnerReferences, *values[i])
+		b.ObjectMetaApplyConfiguration.OwnerReferences = append(b.ObjectMetaApplyConfiguration.OwnerReferences, *values[i])
 	}
 	return b
 }
@@ -231,7 +231,7 @@ func (b *XBackendTrafficPolicyApplyConfiguration) WithOwnerReferences(values ...
 func (b *XBackendTrafficPolicyApplyConfiguration) WithFinalizers(values ...string) *XBackendTrafficPolicyApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
 	for i := range values {
-		b.Finalizers = append(b.Finalizers, values[i])
+		b.ObjectMetaApplyConfiguration.Finalizers = append(b.ObjectMetaApplyConfiguration.Finalizers, values[i])
 	}
 	return b
 }
@@ -261,5 +261,5 @@ func (b *XBackendTrafficPolicyApplyConfiguration) WithStatus(value *v1alpha2.Pol
 // GetName retrieves the value of the Name field in the declarative configuration.
 func (b *XBackendTrafficPolicyApplyConfiguration) GetName() *string {
 	b.ensureObjectMetaApplyConfigurationExists()
-	return b.Name
+	return b.ObjectMetaApplyConfiguration.Name
 }

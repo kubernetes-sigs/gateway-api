@@ -19,24 +19,24 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"context"
+	context "context"
 	time "time"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	watch "k8s.io/apimachinery/pkg/watch"
 	cache "k8s.io/client-go/tools/cache"
-	apisxv1alpha1 "sigs.k8s.io/gateway-api/apisx/v1alpha1"
+	gatewayapiapisxv1alpha1 "sigs.k8s.io/gateway-api/apisx/v1alpha1"
 	versioned "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned"
 	internalinterfaces "sigs.k8s.io/gateway-api/pkg/client/informers/externalversions/internalinterfaces"
-	v1alpha1 "sigs.k8s.io/gateway-api/pkg/client/listers/apisx/v1alpha1"
+	apisxv1alpha1 "sigs.k8s.io/gateway-api/pkg/client/listers/apisx/v1alpha1"
 )
 
 // XBackendTrafficPolicyInformer provides access to a shared informer and lister for
 // XBackendTrafficPolicies.
 type XBackendTrafficPolicyInformer interface {
 	Informer() cache.SharedIndexInformer
-	Lister() v1alpha1.XBackendTrafficPolicyLister
+	Lister() apisxv1alpha1.XBackendTrafficPolicyLister
 }
 
 type xBackendTrafficPolicyInformer struct {
@@ -71,7 +71,7 @@ func NewFilteredXBackendTrafficPolicyInformer(client versioned.Interface, namesp
 				return client.ExperimentalV1alpha1().XBackendTrafficPolicies(namespace).Watch(context.TODO(), options)
 			},
 		},
-		&apisxv1alpha1.XBackendTrafficPolicy{},
+		&gatewayapiapisxv1alpha1.XBackendTrafficPolicy{},
 		resyncPeriod,
 		indexers,
 	)
@@ -82,9 +82,9 @@ func (f *xBackendTrafficPolicyInformer) defaultInformer(client versioned.Interfa
 }
 
 func (f *xBackendTrafficPolicyInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&apisxv1alpha1.XBackendTrafficPolicy{}, f.defaultInformer)
+	return f.factory.InformerFor(&gatewayapiapisxv1alpha1.XBackendTrafficPolicy{}, f.defaultInformer)
 }
 
-func (f *xBackendTrafficPolicyInformer) Lister() v1alpha1.XBackendTrafficPolicyLister {
-	return v1alpha1.NewXBackendTrafficPolicyLister(f.Informer().GetIndexer())
+func (f *xBackendTrafficPolicyInformer) Lister() apisxv1alpha1.XBackendTrafficPolicyLister {
+	return apisxv1alpha1.NewXBackendTrafficPolicyLister(f.Informer().GetIndexer())
 }

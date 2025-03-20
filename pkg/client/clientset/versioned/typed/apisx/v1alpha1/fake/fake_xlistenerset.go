@@ -19,179 +19,35 @@ limitations under the License.
 package fake
 
 import (
-	"context"
-	json "encoding/json"
-	"fmt"
-
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	labels "k8s.io/apimachinery/pkg/labels"
-	types "k8s.io/apimachinery/pkg/types"
-	watch "k8s.io/apimachinery/pkg/watch"
-	testing "k8s.io/client-go/testing"
+	gentype "k8s.io/client-go/gentype"
 	v1alpha1 "sigs.k8s.io/gateway-api/apisx/v1alpha1"
 	apisxv1alpha1 "sigs.k8s.io/gateway-api/applyconfiguration/apisx/v1alpha1"
+	typedapisxv1alpha1 "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/typed/apisx/v1alpha1"
 )
 
-// FakeXListenerSets implements XListenerSetInterface
-type FakeXListenerSets struct {
+// fakeXListenerSets implements XListenerSetInterface
+type fakeXListenerSets struct {
+	*gentype.FakeClientWithListAndApply[*v1alpha1.XListenerSet, *v1alpha1.XListenerSetList, *apisxv1alpha1.XListenerSetApplyConfiguration]
 	Fake *FakeExperimentalV1alpha1
-	ns   string
 }
 
-var xlistenersetsResource = v1alpha1.SchemeGroupVersion.WithResource("xlistenersets")
-
-var xlistenersetsKind = v1alpha1.SchemeGroupVersion.WithKind("XListenerSet")
-
-// Get takes name of the xListenerSet, and returns the corresponding xListenerSet object, and an error if there is any.
-func (c *FakeXListenerSets) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.XListenerSet, err error) {
-	emptyResult := &v1alpha1.XListenerSet{}
-	obj, err := c.Fake.
-		Invokes(testing.NewGetActionWithOptions(xlistenersetsResource, c.ns, name, options), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
+func newFakeXListenerSets(fake *FakeExperimentalV1alpha1, namespace string) typedapisxv1alpha1.XListenerSetInterface {
+	return &fakeXListenerSets{
+		gentype.NewFakeClientWithListAndApply[*v1alpha1.XListenerSet, *v1alpha1.XListenerSetList, *apisxv1alpha1.XListenerSetApplyConfiguration](
+			fake.Fake,
+			namespace,
+			v1alpha1.SchemeGroupVersion.WithResource("xlistenersets"),
+			v1alpha1.SchemeGroupVersion.WithKind("XListenerSet"),
+			func() *v1alpha1.XListenerSet { return &v1alpha1.XListenerSet{} },
+			func() *v1alpha1.XListenerSetList { return &v1alpha1.XListenerSetList{} },
+			func(dst, src *v1alpha1.XListenerSetList) { dst.ListMeta = src.ListMeta },
+			func(list *v1alpha1.XListenerSetList) []*v1alpha1.XListenerSet {
+				return gentype.ToPointerSlice(list.Items)
+			},
+			func(list *v1alpha1.XListenerSetList, items []*v1alpha1.XListenerSet) {
+				list.Items = gentype.FromPointerSlice(items)
+			},
+		),
+		fake,
 	}
-	return obj.(*v1alpha1.XListenerSet), err
-}
-
-// List takes label and field selectors, and returns the list of XListenerSets that match those selectors.
-func (c *FakeXListenerSets) List(ctx context.Context, opts v1.ListOptions) (result *v1alpha1.XListenerSetList, err error) {
-	emptyResult := &v1alpha1.XListenerSetList{}
-	obj, err := c.Fake.
-		Invokes(testing.NewListActionWithOptions(xlistenersetsResource, xlistenersetsKind, c.ns, opts), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
-	}
-
-	label, _, _ := testing.ExtractFromListOptions(opts)
-	if label == nil {
-		label = labels.Everything()
-	}
-	list := &v1alpha1.XListenerSetList{ListMeta: obj.(*v1alpha1.XListenerSetList).ListMeta}
-	for _, item := range obj.(*v1alpha1.XListenerSetList).Items {
-		if label.Matches(labels.Set(item.Labels)) {
-			list.Items = append(list.Items, item)
-		}
-	}
-	return list, err
-}
-
-// Watch returns a watch.Interface that watches the requested xListenerSets.
-func (c *FakeXListenerSets) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
-	return c.Fake.
-		InvokesWatch(testing.NewWatchActionWithOptions(xlistenersetsResource, c.ns, opts))
-
-}
-
-// Create takes the representation of a xListenerSet and creates it.  Returns the server's representation of the xListenerSet, and an error, if there is any.
-func (c *FakeXListenerSets) Create(ctx context.Context, xListenerSet *v1alpha1.XListenerSet, opts v1.CreateOptions) (result *v1alpha1.XListenerSet, err error) {
-	emptyResult := &v1alpha1.XListenerSet{}
-	obj, err := c.Fake.
-		Invokes(testing.NewCreateActionWithOptions(xlistenersetsResource, c.ns, xListenerSet, opts), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha1.XListenerSet), err
-}
-
-// Update takes the representation of a xListenerSet and updates it. Returns the server's representation of the xListenerSet, and an error, if there is any.
-func (c *FakeXListenerSets) Update(ctx context.Context, xListenerSet *v1alpha1.XListenerSet, opts v1.UpdateOptions) (result *v1alpha1.XListenerSet, err error) {
-	emptyResult := &v1alpha1.XListenerSet{}
-	obj, err := c.Fake.
-		Invokes(testing.NewUpdateActionWithOptions(xlistenersetsResource, c.ns, xListenerSet, opts), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha1.XListenerSet), err
-}
-
-// UpdateStatus was generated because the type contains a Status member.
-// Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-func (c *FakeXListenerSets) UpdateStatus(ctx context.Context, xListenerSet *v1alpha1.XListenerSet, opts v1.UpdateOptions) (result *v1alpha1.XListenerSet, err error) {
-	emptyResult := &v1alpha1.XListenerSet{}
-	obj, err := c.Fake.
-		Invokes(testing.NewUpdateSubresourceActionWithOptions(xlistenersetsResource, "status", c.ns, xListenerSet, opts), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha1.XListenerSet), err
-}
-
-// Delete takes name of the xListenerSet and deletes it. Returns an error if one occurs.
-func (c *FakeXListenerSets) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
-	_, err := c.Fake.
-		Invokes(testing.NewDeleteActionWithOptions(xlistenersetsResource, c.ns, name, opts), &v1alpha1.XListenerSet{})
-
-	return err
-}
-
-// DeleteCollection deletes a collection of objects.
-func (c *FakeXListenerSets) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
-	action := testing.NewDeleteCollectionActionWithOptions(xlistenersetsResource, c.ns, opts, listOpts)
-
-	_, err := c.Fake.Invokes(action, &v1alpha1.XListenerSetList{})
-	return err
-}
-
-// Patch applies the patch and returns the patched xListenerSet.
-func (c *FakeXListenerSets) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.XListenerSet, err error) {
-	emptyResult := &v1alpha1.XListenerSet{}
-	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceActionWithOptions(xlistenersetsResource, c.ns, name, pt, data, opts, subresources...), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha1.XListenerSet), err
-}
-
-// Apply takes the given apply declarative configuration, applies it and returns the applied xListenerSet.
-func (c *FakeXListenerSets) Apply(ctx context.Context, xListenerSet *apisxv1alpha1.XListenerSetApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.XListenerSet, err error) {
-	if xListenerSet == nil {
-		return nil, fmt.Errorf("xListenerSet provided to Apply must not be nil")
-	}
-	data, err := json.Marshal(xListenerSet)
-	if err != nil {
-		return nil, err
-	}
-	name := xListenerSet.Name
-	if name == nil {
-		return nil, fmt.Errorf("xListenerSet.Name must be provided to Apply")
-	}
-	emptyResult := &v1alpha1.XListenerSet{}
-	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceActionWithOptions(xlistenersetsResource, c.ns, *name, types.ApplyPatchType, data, opts.ToPatchOptions()), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha1.XListenerSet), err
-}
-
-// ApplyStatus was generated because the type contains a Status member.
-// Add a +genclient:noStatus comment above the type to avoid generating ApplyStatus().
-func (c *FakeXListenerSets) ApplyStatus(ctx context.Context, xListenerSet *apisxv1alpha1.XListenerSetApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.XListenerSet, err error) {
-	if xListenerSet == nil {
-		return nil, fmt.Errorf("xListenerSet provided to Apply must not be nil")
-	}
-	data, err := json.Marshal(xListenerSet)
-	if err != nil {
-		return nil, err
-	}
-	name := xListenerSet.Name
-	if name == nil {
-		return nil, fmt.Errorf("xListenerSet.Name must be provided to Apply")
-	}
-	emptyResult := &v1alpha1.XListenerSet{}
-	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceActionWithOptions(xlistenersetsResource, c.ns, *name, types.ApplyPatchType, data, opts.ToPatchOptions(), "status"), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha1.XListenerSet), err
 }

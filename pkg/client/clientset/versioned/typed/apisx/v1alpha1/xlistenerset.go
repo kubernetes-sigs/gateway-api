@@ -19,14 +19,14 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"context"
+	context "context"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
 	gentype "k8s.io/client-go/gentype"
-	v1alpha1 "sigs.k8s.io/gateway-api/apisx/v1alpha1"
-	apisxv1alpha1 "sigs.k8s.io/gateway-api/applyconfiguration/apisx/v1alpha1"
+	apisxv1alpha1 "sigs.k8s.io/gateway-api/apisx/v1alpha1"
+	applyconfigurationapisxv1alpha1 "sigs.k8s.io/gateway-api/applyconfiguration/apisx/v1alpha1"
 	scheme "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/scheme"
 )
 
@@ -38,36 +38,37 @@ type XListenerSetsGetter interface {
 
 // XListenerSetInterface has methods to work with XListenerSet resources.
 type XListenerSetInterface interface {
-	Create(ctx context.Context, xListenerSet *v1alpha1.XListenerSet, opts v1.CreateOptions) (*v1alpha1.XListenerSet, error)
-	Update(ctx context.Context, xListenerSet *v1alpha1.XListenerSet, opts v1.UpdateOptions) (*v1alpha1.XListenerSet, error)
+	Create(ctx context.Context, xListenerSet *apisxv1alpha1.XListenerSet, opts v1.CreateOptions) (*apisxv1alpha1.XListenerSet, error)
+	Update(ctx context.Context, xListenerSet *apisxv1alpha1.XListenerSet, opts v1.UpdateOptions) (*apisxv1alpha1.XListenerSet, error)
 	// Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-	UpdateStatus(ctx context.Context, xListenerSet *v1alpha1.XListenerSet, opts v1.UpdateOptions) (*v1alpha1.XListenerSet, error)
+	UpdateStatus(ctx context.Context, xListenerSet *apisxv1alpha1.XListenerSet, opts v1.UpdateOptions) (*apisxv1alpha1.XListenerSet, error)
 	Delete(ctx context.Context, name string, opts v1.DeleteOptions) error
 	DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error
-	Get(ctx context.Context, name string, opts v1.GetOptions) (*v1alpha1.XListenerSet, error)
-	List(ctx context.Context, opts v1.ListOptions) (*v1alpha1.XListenerSetList, error)
+	Get(ctx context.Context, name string, opts v1.GetOptions) (*apisxv1alpha1.XListenerSet, error)
+	List(ctx context.Context, opts v1.ListOptions) (*apisxv1alpha1.XListenerSetList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
-	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.XListenerSet, err error)
-	Apply(ctx context.Context, xListenerSet *apisxv1alpha1.XListenerSetApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.XListenerSet, err error)
+	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *apisxv1alpha1.XListenerSet, err error)
+	Apply(ctx context.Context, xListenerSet *applyconfigurationapisxv1alpha1.XListenerSetApplyConfiguration, opts v1.ApplyOptions) (result *apisxv1alpha1.XListenerSet, err error)
 	// Add a +genclient:noStatus comment above the type to avoid generating ApplyStatus().
-	ApplyStatus(ctx context.Context, xListenerSet *apisxv1alpha1.XListenerSetApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.XListenerSet, err error)
+	ApplyStatus(ctx context.Context, xListenerSet *applyconfigurationapisxv1alpha1.XListenerSetApplyConfiguration, opts v1.ApplyOptions) (result *apisxv1alpha1.XListenerSet, err error)
 	XListenerSetExpansion
 }
 
 // xListenerSets implements XListenerSetInterface
 type xListenerSets struct {
-	*gentype.ClientWithListAndApply[*v1alpha1.XListenerSet, *v1alpha1.XListenerSetList, *apisxv1alpha1.XListenerSetApplyConfiguration]
+	*gentype.ClientWithListAndApply[*apisxv1alpha1.XListenerSet, *apisxv1alpha1.XListenerSetList, *applyconfigurationapisxv1alpha1.XListenerSetApplyConfiguration]
 }
 
 // newXListenerSets returns a XListenerSets
 func newXListenerSets(c *ExperimentalV1alpha1Client, namespace string) *xListenerSets {
 	return &xListenerSets{
-		gentype.NewClientWithListAndApply[*v1alpha1.XListenerSet, *v1alpha1.XListenerSetList, *apisxv1alpha1.XListenerSetApplyConfiguration](
+		gentype.NewClientWithListAndApply[*apisxv1alpha1.XListenerSet, *apisxv1alpha1.XListenerSetList, *applyconfigurationapisxv1alpha1.XListenerSetApplyConfiguration](
 			"xlistenersets",
 			c.RESTClient(),
 			scheme.ParameterCodec,
 			namespace,
-			func() *v1alpha1.XListenerSet { return &v1alpha1.XListenerSet{} },
-			func() *v1alpha1.XListenerSetList { return &v1alpha1.XListenerSetList{} }),
+			func() *apisxv1alpha1.XListenerSet { return &apisxv1alpha1.XListenerSet{} },
+			func() *apisxv1alpha1.XListenerSetList { return &apisxv1alpha1.XListenerSetList{} },
+		),
 	}
 }
