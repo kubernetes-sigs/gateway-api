@@ -119,26 +119,11 @@ type BackendTrafficPolicySpec struct {
 
 // RetryConstraint defines the configuration for when to retry a request.
 type RetryConstraint struct {
-	// BudgetPercent defines the maximum percentage of active requests that may
-	// be made up of retries.
-	//
-	// Support: Extended
+	// Budget holds the details of the retry budget configuration.
 	//
 	// +optional
-	// +kubebuilder:default=20
-	// +kubebuilder:validation:Minimum=0
-	// +kubebuilder:validation:Maximum=100
-	BudgetPercent *int `json:"budgetPercent,omitempty"`
-
-	// BudgetInterval defines the duration in which requests will be considered
-	// for calculating the budget for retries.
-	//
-	// Support: Extended
-	//
-	// +optional
-	// +kubebuilder:default="10s"
-	// +kubebuilder:validation:XValidation:message="budgetInterval can not be greater than one hour or less than one second",rule="!(duration(self) < duration('1s') || duration(self) > duration('1h'))"
-	BudgetInterval *Duration `json:"budgetInterval,omitempty"`
+	// +kubebuilder:default={percent: 20, interval: "10s"}
+	Budget *BudgetDetails `json:"budget,omitempty"`
 
 	// MinRetryRate defines the minimum rate of retries that will be allowable
 	// over a specified duration of time.
@@ -156,4 +141,30 @@ type RetryConstraint struct {
 	// +optional
 	// +kubebuilder:default={count: 10, interval: "1s"}
 	MinRetryRate *RequestRate `json:"minRetryRate,omitempty"`
+}
+
+// BudgetDetails specifies the details of the budget configuration, like
+// the percentage of requests in the budget, and the interval between
+// checks.
+type BudgetDetails struct {
+	// BudgetPercent defines the maximum percentage of active requests that may
+	// be made up of retries.
+	//
+	// Support: Extended
+	//
+	// +optional
+	// +kubebuilder:default=20
+	// +kubebuilder:validation:Minimum=0
+	// +kubebuilder:validation:Maximum=100
+	Percent *int `json:"percent,omitempty"`
+
+	// BudgetInterval defines the duration in which requests will be considered
+	// for calculating the budget for retries.
+	//
+	// Support: Extended
+	//
+	// +optional
+	// +kubebuilder:default="10s"
+	// +kubebuilder:validation:XValidation:message="budgetInterval can not be greater than one hour or less than one second",rule="!(duration(self) < duration('1s') || duration(self) > duration('1h'))"
+	Interval *Duration `json:"interval,omitempty"`
 }

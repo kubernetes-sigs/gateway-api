@@ -18,16 +18,11 @@ limitations under the License.
 
 package v1alpha1
 
-import (
-	v1 "sigs.k8s.io/gateway-api/apis/v1"
-)
-
 // RetryConstraintApplyConfiguration represents a declarative configuration of the RetryConstraint type for use
 // with apply.
 type RetryConstraintApplyConfiguration struct {
-	BudgetPercent  *int                           `json:"budgetPercent,omitempty"`
-	BudgetInterval *v1.Duration                   `json:"budgetInterval,omitempty"`
-	MinRetryRate   *RequestRateApplyConfiguration `json:"minRetryRate,omitempty"`
+	Budget       *BudgetDetailsApplyConfiguration `json:"budget,omitempty"`
+	MinRetryRate *RequestRateApplyConfiguration   `json:"minRetryRate,omitempty"`
 }
 
 // RetryConstraintApplyConfiguration constructs a declarative configuration of the RetryConstraint type for use with
@@ -36,19 +31,11 @@ func RetryConstraint() *RetryConstraintApplyConfiguration {
 	return &RetryConstraintApplyConfiguration{}
 }
 
-// WithBudgetPercent sets the BudgetPercent field in the declarative configuration to the given value
+// WithBudget sets the Budget field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
-// If called multiple times, the BudgetPercent field is set to the value of the last call.
-func (b *RetryConstraintApplyConfiguration) WithBudgetPercent(value int) *RetryConstraintApplyConfiguration {
-	b.BudgetPercent = &value
-	return b
-}
-
-// WithBudgetInterval sets the BudgetInterval field in the declarative configuration to the given value
-// and returns the receiver, so that objects can be built by chaining "With" function invocations.
-// If called multiple times, the BudgetInterval field is set to the value of the last call.
-func (b *RetryConstraintApplyConfiguration) WithBudgetInterval(value v1.Duration) *RetryConstraintApplyConfiguration {
-	b.BudgetInterval = &value
+// If called multiple times, the Budget field is set to the value of the last call.
+func (b *RetryConstraintApplyConfiguration) WithBudget(value *BudgetDetailsApplyConfiguration) *RetryConstraintApplyConfiguration {
+	b.Budget = value
 	return b
 }
 
