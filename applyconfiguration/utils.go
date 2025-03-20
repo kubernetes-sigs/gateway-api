@@ -236,6 +236,8 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		// Group=gateway.networking.x-k8s.io, Version=v1alpha1
 	case v1alpha1.SchemeGroupVersion.WithKind("BackendTrafficPolicySpec"):
 		return &apisxv1alpha1.BackendTrafficPolicySpecApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("BudgetDetails"):
+		return &apisxv1alpha1.BudgetDetailsApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("ListenerEntry"):
 		return &apisxv1alpha1.ListenerEntryApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("ListenerEntryStatus"):

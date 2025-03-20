@@ -85,30 +85,37 @@ spec:
 
                   Support: Extended
                 properties:
-                  budgetInterval:
-                    default: 10s
-                    description: |-
-                      BudgetInterval defines the duration in which requests will be considered
-                      for calculating the budget for retries.
+                  budget:
+                    default:
+                      interval: 10s
+                      percent: 20
+                    description: Budget holds the details of the retry budget configuration.
+                    properties:
+                      interval:
+                        default: 10s
+                        description: |-
+                          BudgetInterval defines the duration in which requests will be considered
+                          for calculating the budget for retries.
 
-                      Support: Extended
-                    pattern: ^([0-9]{1,5}(h|m|s|ms)){1,4}$
-                    type: string
-                    x-kubernetes-validations:
-                    - message: budgetInterval can not be greater than one hour or
-                        less than one second
-                      rule: '!(duration(self) < duration(''1s'') || duration(self)
-                        > duration(''1h''))'
-                  budgetPercent:
-                    default: 20
-                    description: |-
-                      BudgetPercent defines the maximum percentage of active requests that may
-                      be made up of retries.
+                          Support: Extended
+                        pattern: ^([0-9]{1,5}(h|m|s|ms)){1,4}$
+                        type: string
+                        x-kubernetes-validations:
+                        - message: budgetInterval can not be greater than one hour
+                            or less than one second
+                          rule: '!(duration(self) < duration(''1s'') || duration(self)
+                            > duration(''1h''))'
+                      percent:
+                        default: 20
+                        description: |-
+                          BudgetPercent defines the maximum percentage of active requests that may
+                          be made up of retries.
 
-                      Support: Extended
-                    maximum: 100
-                    minimum: 0
-                    type: integer
+                          Support: Extended
+                        maximum: 100
+                        minimum: 0
+                        type: integer
+                    type: object
                   minRetryRate:
                     default:
                       count: 10

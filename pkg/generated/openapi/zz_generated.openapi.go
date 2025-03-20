@@ -193,6 +193,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"sigs.k8s.io/gateway-api/apis/v1beta1.ReferenceGrantSpec":                         schema_sigsk8sio_gateway_api_apis_v1beta1_ReferenceGrantSpec(ref),
 		"sigs.k8s.io/gateway-api/apis/v1beta1.ReferenceGrantTo":                           schema_sigsk8sio_gateway_api_apis_v1beta1_ReferenceGrantTo(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendTrafficPolicySpec":                 schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendTrafficPolicySpec(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.BudgetDetails":                            schema_sigsk8sio_gateway_api_apisx_v1alpha1_BudgetDetails(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.ListenerEntry":                            schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerEntry(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.ListenerEntryStatus":                      schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerEntryStatus(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.ListenerSetSpec":                          schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerSetSpec(ref),
@@ -7837,6 +7838,33 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendTrafficPolicySpec(ref co
 	}
 }
 
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BudgetDetails(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "BudgetDetails specifies the details of the budget configuration, like the percentage of requests in the budget, and the interval between checks.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"percent": {
+						SchemaProps: spec.SchemaProps{
+							Description: "BudgetPercent defines the maximum percentage of active requests that may be made up of retries.\n\nSupport: Extended",
+							Type:        []string{"integer"},
+							Format:      "int32",
+						},
+					},
+					"interval": {
+						SchemaProps: spec.SchemaProps{
+							Description: "BudgetInterval defines the duration in which requests will be considered for calculating the budget for retries.\n\nSupport: Extended",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
 func schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerEntry(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -8150,18 +8178,10 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_RetryConstraint(ref common.Refe
 				Description: "RetryConstraint defines the configuration for when to retry a request.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
-					"budgetPercent": {
+					"budget": {
 						SchemaProps: spec.SchemaProps{
-							Description: "BudgetPercent defines the maximum percentage of active requests that may be made up of retries.\n\nSupport: Extended",
-							Type:        []string{"integer"},
-							Format:      "int32",
-						},
-					},
-					"budgetInterval": {
-						SchemaProps: spec.SchemaProps{
-							Description: "BudgetInterval defines the duration in which requests will be considered for calculating the budget for retries.\n\nSupport: Extended",
-							Type:        []string{"string"},
-							Format:      "",
+							Description: "Budget holds the details of the retry budget configuration.",
+							Ref:         ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.BudgetDetails"),
 						},
 					},
 					"minRetryRate": {
@@ -8174,7 +8194,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_RetryConstraint(ref common.Refe
 			},
 		},
 		Dependencies: []string{
-			"sigs.k8s.io/gateway-api/apisx/v1alpha1.RequestRate"},
+			"sigs.k8s.io/gateway-api/apisx/v1alpha1.BudgetDetails", "sigs.k8s.io/gateway-api/apisx/v1alpha1.RequestRate"},
 	}
 }
 

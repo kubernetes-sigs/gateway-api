@@ -45,7 +45,9 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 				Type:            ptrTo(gatewayv1.CookieBasedSessionPersistence),
 			},
 			retryConstraint: xgatewayv1alpha1.RetryConstraint{
-				BudgetInterval: toDuration("10s"),
+				Budget: ptrTo(xgatewayv1alpha1.BudgetDetails{
+					Interval: toDuration("10s"),
+				}),
 				MinRetryRate: ptrTo(xgatewayv1alpha1.RequestRate{
 					Count:    ptrTo(10),
 					Interval: toDuration("1s"),
@@ -61,7 +63,9 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 				Type:            ptrTo(gatewayv1.CookieBasedSessionPersistence),
 			},
 			retryConstraint: xgatewayv1alpha1.RetryConstraint{
-				BudgetPercent: ptrTo(20),
+				Budget: ptrTo(xgatewayv1alpha1.BudgetDetails{
+					Percent: ptrTo(20),
+				}),
 				MinRetryRate: ptrTo(xgatewayv1alpha1.RequestRate{
 					Count:    ptrTo(10),
 					Interval: toDuration("1s"),
@@ -77,8 +81,10 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 				Type:            ptrTo(gatewayv1.CookieBasedSessionPersistence),
 			},
 			retryConstraint: xgatewayv1alpha1.RetryConstraint{
-				BudgetPercent:  ptrTo(20),
-				BudgetInterval: toDuration("10s"),
+				Budget: ptrTo(xgatewayv1alpha1.BudgetDetails{
+					Percent:  ptrTo(20),
+					Interval: toDuration("10s"),
+				}),
 			},
 			wantErrors: []string{},
 		},
@@ -90,8 +96,10 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 				Type:            ptrTo(gatewayv1.CookieBasedSessionPersistence),
 			},
 			retryConstraint: xgatewayv1alpha1.RetryConstraint{
-				BudgetPercent:  ptrTo(20),
-				BudgetInterval: toDuration("2h"),
+				Budget: ptrTo(xgatewayv1alpha1.BudgetDetails{
+					Percent:  ptrTo(20),
+					Interval: toDuration("2h"),
+				}),
 				MinRetryRate: ptrTo(xgatewayv1alpha1.RequestRate{
 					Count:    ptrTo(10),
 					Interval: toDuration("10s"),
@@ -107,8 +115,10 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 				Type:            ptrTo(gatewayv1.CookieBasedSessionPersistence),
 			},
 			retryConstraint: xgatewayv1alpha1.RetryConstraint{
-				BudgetPercent:  ptrTo(20),
-				BudgetInterval: toDuration("1ms"),
+				Budget: ptrTo(xgatewayv1alpha1.BudgetDetails{
+					Percent:  ptrTo(20),
+					Interval: toDuration("1ms"),
+				}),
 				MinRetryRate: ptrTo(xgatewayv1alpha1.RequestRate{
 					Count:    ptrTo(10),
 					Interval: toDuration("10s"),
@@ -124,8 +134,10 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 				Type:            ptrTo(gatewayv1.CookieBasedSessionPersistence),
 			},
 			retryConstraint: xgatewayv1alpha1.RetryConstraint{
-				BudgetPercent:  ptrTo(20),
-				BudgetInterval: toDuration("10s"),
+				Budget: ptrTo(xgatewayv1alpha1.BudgetDetails{
+					Percent:  ptrTo(20),
+					Interval: toDuration("10s"),
+				}),
 				MinRetryRate: ptrTo(xgatewayv1alpha1.RequestRate{
 					Count:    ptrTo(10),
 					Interval: toDuration("2h"),
@@ -141,8 +153,10 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 				Type:            ptrTo(gatewayv1.CookieBasedSessionPersistence),
 			},
 			retryConstraint: xgatewayv1alpha1.RetryConstraint{
-				BudgetPercent:  ptrTo(20),
-				BudgetInterval: toDuration("10s"),
+				Budget: ptrTo(xgatewayv1alpha1.BudgetDetails{
+					Percent:  ptrTo(20),
+					Interval: toDuration("10s"),
+				}),
 				MinRetryRate: ptrTo(xgatewayv1alpha1.RequestRate{
 					Count:    ptrTo(10),
 					Interval: toDuration("1s"),
@@ -160,8 +174,10 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 				},
 			},
 			retryConstraint: xgatewayv1alpha1.RetryConstraint{
-				BudgetPercent:  ptrTo(20),
-				BudgetInterval: toDuration("10s"),
+				Budget: ptrTo(xgatewayv1alpha1.BudgetDetails{
+					Percent:  ptrTo(20),
+					Interval: toDuration("10s"),
+				}),
 				MinRetryRate: ptrTo(xgatewayv1alpha1.RequestRate{
 					Count:    ptrTo(10),
 					Interval: toDuration("1s"),
@@ -179,8 +195,10 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 				},
 			},
 			retryConstraint: xgatewayv1alpha1.RetryConstraint{
-				BudgetPercent:  ptrTo(20),
-				BudgetInterval: toDuration("10s"),
+				Budget: ptrTo(xgatewayv1alpha1.BudgetDetails{
+					Percent:  ptrTo(20),
+					Interval: toDuration("10s"),
+				}),
 				MinRetryRate: ptrTo(xgatewayv1alpha1.RequestRate{
 					Count:    ptrTo(10),
 					Interval: toDuration("1s"),
@@ -199,8 +217,10 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 				},
 			},
 			retryConstraint: xgatewayv1alpha1.RetryConstraint{
-				BudgetPercent:  ptrTo(20),
-				BudgetInterval: toDuration("10s"),
+				Budget: ptrTo(xgatewayv1alpha1.BudgetDetails{
+					Percent:  ptrTo(20),
+					Interval: toDuration("10s"),
+				}),
 				MinRetryRate: ptrTo(xgatewayv1alpha1.RequestRate{
 					Count:    ptrTo(10),
 					Interval: toDuration("1s"),
@@ -215,8 +235,10 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 				Type:        ptrTo(gatewayv1.HeaderBasedSessionPersistence),
 			},
 			retryConstraint: xgatewayv1alpha1.RetryConstraint{
-				BudgetPercent:  ptrTo(20),
-				BudgetInterval: toDuration("10s"),
+				Budget: ptrTo(xgatewayv1alpha1.BudgetDetails{
+					Percent:  ptrTo(20),
+					Interval: toDuration("10s"),
+				}),
 				MinRetryRate: ptrTo(xgatewayv1alpha1.RequestRate{
 					Count:    ptrTo(10),
 					Interval: toDuration("1s"),

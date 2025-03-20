@@ -1765,6 +1765,15 @@ var schemaYAML = typed.YAMLObject(`types:
           - group
           - kind
           - name
+- name: io.k8s.sigs.gateway-api.apisx.v1alpha1.BudgetDetails
+  map:
+    fields:
+    - name: interval
+      type:
+        scalar: string
+    - name: percent
+      type:
+        scalar: numeric
 - name: io.k8s.sigs.gateway-api.apisx.v1alpha1.ListenerEntry
   map:
     fields:
@@ -1879,12 +1888,9 @@ var schemaYAML = typed.YAMLObject(`types:
 - name: io.k8s.sigs.gateway-api.apisx.v1alpha1.RetryConstraint
   map:
     fields:
-    - name: budgetInterval
+    - name: budget
       type:
-        scalar: string
-    - name: budgetPercent
-      type:
-        scalar: numeric
+        namedType: io.k8s.sigs.gateway-api.apisx.v1alpha1.BudgetDetails
     - name: minRetryRate
       type:
         namedType: io.k8s.sigs.gateway-api.apisx.v1alpha1.RequestRate
