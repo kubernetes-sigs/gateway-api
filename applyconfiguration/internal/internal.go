@@ -1235,43 +1235,6 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         scalar: string
       default: ""
-- name: io.k8s.sigs.gateway-api.apis.v1alpha2.BackendLBPolicy
-  map:
-    fields:
-    - name: apiVersion
-      type:
-        scalar: string
-    - name: kind
-      type:
-        scalar: string
-    - name: metadata
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
-      default: {}
-    - name: spec
-      type:
-        namedType: io.k8s.sigs.gateway-api.apis.v1alpha2.BackendLBPolicySpec
-      default: {}
-    - name: status
-      type:
-        namedType: io.k8s.sigs.gateway-api.apis.v1alpha2.PolicyStatus
-      default: {}
-- name: io.k8s.sigs.gateway-api.apis.v1alpha2.BackendLBPolicySpec
-  map:
-    fields:
-    - name: sessionPersistence
-      type:
-        namedType: io.k8s.sigs.gateway-api.apis.v1.SessionPersistence
-    - name: targetRefs
-      type:
-        list:
-          elementType:
-            namedType: io.k8s.sigs.gateway-api.apis.v1alpha2.LocalPolicyTargetReference
-          elementRelationship: associative
-          keys:
-          - group
-          - kind
-          - name
 - name: io.k8s.sigs.gateway-api.apis.v1alpha2.GRPCRoute
   map:
     fields:
