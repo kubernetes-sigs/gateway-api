@@ -1,6 +1,6 @@
 # Netlify build instructions
 [build]
-    command = "make docs"
+    command = "make build-docs-netlify"
     publish = "site"
 [build.environment]
     PYTHON_VERSION = "3.12"

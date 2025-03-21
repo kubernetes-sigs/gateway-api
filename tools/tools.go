@@ -23,7 +23,7 @@ limitations under the License.
 package tools
 
 import (
-	_ "github.com/ahmetb/gen-crd-api-reference-docs"
+	_ "github.com/elastic/crd-ref-docs"
 	_ "google.golang.org/grpc/cmd/protoc-gen-go-grpc"
 	_ "google.golang.org/protobuf/cmd/protoc-gen-go"
 	_ "k8s.io/code-generator/cmd/client-gen"
