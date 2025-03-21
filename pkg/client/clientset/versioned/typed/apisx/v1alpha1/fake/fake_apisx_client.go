@@ -29,11 +29,11 @@ type FakeExperimentalV1alpha1 struct {
 }
 
 func (c *FakeExperimentalV1alpha1) XBackendTrafficPolicies(namespace string) v1alpha1.XBackendTrafficPolicyInterface {
-	return &FakeXBackendTrafficPolicies{c, namespace}
+	return newFakeXBackendTrafficPolicies(c, namespace)
 }
 
 func (c *FakeExperimentalV1alpha1) XListenerSets(namespace string) v1alpha1.XListenerSetInterface {
-	return &FakeXListenerSets{c, namespace}
+	return newFakeXListenerSets(c, namespace)
 }
 
 // RESTClient returns a RESTClient that is used to communicate

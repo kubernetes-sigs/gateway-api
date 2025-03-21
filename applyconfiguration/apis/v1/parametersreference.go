@@ -19,16 +19,16 @@ limitations under the License.
 package v1
 
 import (
-	v1 "sigs.k8s.io/gateway-api/apis/v1"
+	apisv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
 // ParametersReferenceApplyConfiguration represents a declarative configuration of the ParametersReference type for use
 // with apply.
 type ParametersReferenceApplyConfiguration struct {
-	Group     *v1.Group     `json:"group,omitempty"`
-	Kind      *v1.Kind      `json:"kind,omitempty"`
-	Name      *string       `json:"name,omitempty"`
-	Namespace *v1.Namespace `json:"namespace,omitempty"`
+	Group     *apisv1.Group     `json:"group,omitempty"`
+	Kind      *apisv1.Kind      `json:"kind,omitempty"`
+	Name      *string           `json:"name,omitempty"`
+	Namespace *apisv1.Namespace `json:"namespace,omitempty"`
 }
 
 // ParametersReferenceApplyConfiguration constructs a declarative configuration of the ParametersReference type for use with
@@ -40,7 +40,7 @@ func ParametersReference() *ParametersReferenceApplyConfiguration {
 // WithGroup sets the Group field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Group field is set to the value of the last call.
-func (b *ParametersReferenceApplyConfiguration) WithGroup(value v1.Group) *ParametersReferenceApplyConfiguration {
+func (b *ParametersReferenceApplyConfiguration) WithGroup(value apisv1.Group) *ParametersReferenceApplyConfiguration {
 	b.Group = &value
 	return b
 }
@@ -48,7 +48,7 @@ func (b *ParametersReferenceApplyConfiguration) WithGroup(value v1.Group) *Param
 // WithKind sets the Kind field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Kind field is set to the value of the last call.
-func (b *ParametersReferenceApplyConfiguration) WithKind(value v1.Kind) *ParametersReferenceApplyConfiguration {
+func (b *ParametersReferenceApplyConfiguration) WithKind(value apisv1.Kind) *ParametersReferenceApplyConfiguration {
 	b.Kind = &value
 	return b
 }
@@ -64,7 +64,7 @@ func (b *ParametersReferenceApplyConfiguration) WithName(value string) *Paramete
 // WithNamespace sets the Namespace field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Namespace field is set to the value of the last call.
-func (b *ParametersReferenceApplyConfiguration) WithNamespace(value v1.Namespace) *ParametersReferenceApplyConfiguration {
+func (b *ParametersReferenceApplyConfiguration) WithNamespace(value apisv1.Namespace) *ParametersReferenceApplyConfiguration {
 	b.Namespace = &value
 	return b
 }

@@ -19,15 +19,15 @@ limitations under the License.
 package v1
 
 import (
-	v1 "sigs.k8s.io/gateway-api/apis/v1"
+	apisv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
 // LocalObjectReferenceApplyConfiguration represents a declarative configuration of the LocalObjectReference type for use
 // with apply.
 type LocalObjectReferenceApplyConfiguration struct {
-	Group *v1.Group      `json:"group,omitempty"`
-	Kind  *v1.Kind       `json:"kind,omitempty"`
-	Name  *v1.ObjectName `json:"name,omitempty"`
+	Group *apisv1.Group      `json:"group,omitempty"`
+	Kind  *apisv1.Kind       `json:"kind,omitempty"`
+	Name  *apisv1.ObjectName `json:"name,omitempty"`
 }
 
 // LocalObjectReferenceApplyConfiguration constructs a declarative configuration of the LocalObjectReference type for use with
@@ -39,7 +39,7 @@ func LocalObjectReference() *LocalObjectReferenceApplyConfiguration {
 // WithGroup sets the Group field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Group field is set to the value of the last call.
-func (b *LocalObjectReferenceApplyConfiguration) WithGroup(value v1.Group) *LocalObjectReferenceApplyConfiguration {
+func (b *LocalObjectReferenceApplyConfiguration) WithGroup(value apisv1.Group) *LocalObjectReferenceApplyConfiguration {
 	b.Group = &value
 	return b
 }
@@ -47,7 +47,7 @@ func (b *LocalObjectReferenceApplyConfiguration) WithGroup(value v1.Group) *Loca
 // WithKind sets the Kind field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Kind field is set to the value of the last call.
-func (b *LocalObjectReferenceApplyConfiguration) WithKind(value v1.Kind) *LocalObjectReferenceApplyConfiguration {
+func (b *LocalObjectReferenceApplyConfiguration) WithKind(value apisv1.Kind) *LocalObjectReferenceApplyConfiguration {
 	b.Kind = &value
 	return b
 }
@@ -55,7 +55,7 @@ func (b *LocalObjectReferenceApplyConfiguration) WithKind(value v1.Kind) *LocalO
 // WithName sets the Name field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Name field is set to the value of the last call.
-func (b *LocalObjectReferenceApplyConfiguration) WithName(value v1.ObjectName) *LocalObjectReferenceApplyConfiguration {
+func (b *LocalObjectReferenceApplyConfiguration) WithName(value apisv1.ObjectName) *LocalObjectReferenceApplyConfiguration {
 	b.Name = &value
 	return b
 }

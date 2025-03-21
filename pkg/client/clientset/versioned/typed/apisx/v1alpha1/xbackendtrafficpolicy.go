@@ -19,14 +19,14 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"context"
+	context "context"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
 	gentype "k8s.io/client-go/gentype"
-	v1alpha1 "sigs.k8s.io/gateway-api/apisx/v1alpha1"
-	apisxv1alpha1 "sigs.k8s.io/gateway-api/applyconfiguration/apisx/v1alpha1"
+	apisxv1alpha1 "sigs.k8s.io/gateway-api/apisx/v1alpha1"
+	applyconfigurationapisxv1alpha1 "sigs.k8s.io/gateway-api/applyconfiguration/apisx/v1alpha1"
 	scheme "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/scheme"
 )
 
@@ -38,36 +38,37 @@ type XBackendTrafficPoliciesGetter interface {
 
 // XBackendTrafficPolicyInterface has methods to work with XBackendTrafficPolicy resources.
 type XBackendTrafficPolicyInterface interface {
-	Create(ctx context.Context, xBackendTrafficPolicy *v1alpha1.XBackendTrafficPolicy, opts v1.CreateOptions) (*v1alpha1.XBackendTrafficPolicy, error)
-	Update(ctx context.Context, xBackendTrafficPolicy *v1alpha1.XBackendTrafficPolicy, opts v1.UpdateOptions) (*v1alpha1.XBackendTrafficPolicy, error)
+	Create(ctx context.Context, xBackendTrafficPolicy *apisxv1alpha1.XBackendTrafficPolicy, opts v1.CreateOptions) (*apisxv1alpha1.XBackendTrafficPolicy, error)
+	Update(ctx context.Context, xBackendTrafficPolicy *apisxv1alpha1.XBackendTrafficPolicy, opts v1.UpdateOptions) (*apisxv1alpha1.XBackendTrafficPolicy, error)
 	// Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-	UpdateStatus(ctx context.Context, xBackendTrafficPolicy *v1alpha1.XBackendTrafficPolicy, opts v1.UpdateOptions) (*v1alpha1.XBackendTrafficPolicy, error)
+	UpdateStatus(ctx context.Context, xBackendTrafficPolicy *apisxv1alpha1.XBackendTrafficPolicy, opts v1.UpdateOptions) (*apisxv1alpha1.XBackendTrafficPolicy, error)
 	Delete(ctx context.Context, name string, opts v1.DeleteOptions) error
 	DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error
-	Get(ctx context.Context, name string, opts v1.GetOptions) (*v1alpha1.XBackendTrafficPolicy, error)
-	List(ctx context.Context, opts v1.ListOptions) (*v1alpha1.XBackendTrafficPolicyList, error)
+	Get(ctx context.Context, name string, opts v1.GetOptions) (*apisxv1alpha1.XBackendTrafficPolicy, error)
+	List(ctx context.Context, opts v1.ListOptions) (*apisxv1alpha1.XBackendTrafficPolicyList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
-	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.XBackendTrafficPolicy, err error)
-	Apply(ctx context.Context, xBackendTrafficPolicy *apisxv1alpha1.XBackendTrafficPolicyApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.XBackendTrafficPolicy, err error)
+	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *apisxv1alpha1.XBackendTrafficPolicy, err error)
+	Apply(ctx context.Context, xBackendTrafficPolicy *applyconfigurationapisxv1alpha1.XBackendTrafficPolicyApplyConfiguration, opts v1.ApplyOptions) (result *apisxv1alpha1.XBackendTrafficPolicy, err error)
 	// Add a +genclient:noStatus comment above the type to avoid generating ApplyStatus().
-	ApplyStatus(ctx context.Context, xBackendTrafficPolicy *apisxv1alpha1.XBackendTrafficPolicyApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.XBackendTrafficPolicy, err error)
+	ApplyStatus(ctx context.Context, xBackendTrafficPolicy *applyconfigurationapisxv1alpha1.XBackendTrafficPolicyApplyConfiguration, opts v1.ApplyOptions) (result *apisxv1alpha1.XBackendTrafficPolicy, err error)
 	XBackendTrafficPolicyExpansion
 }
 
 // xBackendTrafficPolicies implements XBackendTrafficPolicyInterface
 type xBackendTrafficPolicies struct {
-	*gentype.ClientWithListAndApply[*v1alpha1.XBackendTrafficPolicy, *v1alpha1.XBackendTrafficPolicyList, *apisxv1alpha1.XBackendTrafficPolicyApplyConfiguration]
+	*gentype.ClientWithListAndApply[*apisxv1alpha1.XBackendTrafficPolicy, *apisxv1alpha1.XBackendTrafficPolicyList, *applyconfigurationapisxv1alpha1.XBackendTrafficPolicyApplyConfiguration]
 }
 
 // newXBackendTrafficPolicies returns a XBackendTrafficPolicies
 func newXBackendTrafficPolicies(c *ExperimentalV1alpha1Client, namespace string) *xBackendTrafficPolicies {
 	return &xBackendTrafficPolicies{
-		gentype.NewClientWithListAndApply[*v1alpha1.XBackendTrafficPolicy, *v1alpha1.XBackendTrafficPolicyList, *apisxv1alpha1.XBackendTrafficPolicyApplyConfiguration](
+		gentype.NewClientWithListAndApply[*apisxv1alpha1.XBackendTrafficPolicy, *apisxv1alpha1.XBackendTrafficPolicyList, *applyconfigurationapisxv1alpha1.XBackendTrafficPolicyApplyConfiguration](
 			"xbackendtrafficpolicies",
 			c.RESTClient(),
 			scheme.ParameterCodec,
 			namespace,
-			func() *v1alpha1.XBackendTrafficPolicy { return &v1alpha1.XBackendTrafficPolicy{} },
-			func() *v1alpha1.XBackendTrafficPolicyList { return &v1alpha1.XBackendTrafficPolicyList{} }),
+			func() *apisxv1alpha1.XBackendTrafficPolicy { return &apisxv1alpha1.XBackendTrafficPolicy{} },
+			func() *apisxv1alpha1.XBackendTrafficPolicyList { return &apisxv1alpha1.XBackendTrafficPolicyList{} },
+		),
 	}
 }

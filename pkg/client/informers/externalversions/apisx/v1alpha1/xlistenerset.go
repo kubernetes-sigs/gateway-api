@@ -19,24 +19,24 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"context"
+	context "context"
 	time "time"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	watch "k8s.io/apimachinery/pkg/watch"
 	cache "k8s.io/client-go/tools/cache"
-	apisxv1alpha1 "sigs.k8s.io/gateway-api/apisx/v1alpha1"
+	gatewayapiapisxv1alpha1 "sigs.k8s.io/gateway-api/apisx/v1alpha1"
 	versioned "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned"
 	internalinterfaces "sigs.k8s.io/gateway-api/pkg/client/informers/externalversions/internalinterfaces"
-	v1alpha1 "sigs.k8s.io/gateway-api/pkg/client/listers/apisx/v1alpha1"
+	apisxv1alpha1 "sigs.k8s.io/gateway-api/pkg/client/listers/apisx/v1alpha1"
 )
 
 // XListenerSetInformer provides access to a shared informer and lister for
 // XListenerSets.
 type XListenerSetInformer interface {
 	Informer() cache.SharedIndexInformer
-	Lister() v1alpha1.XListenerSetLister
+	Lister() apisxv1alpha1.XListenerSetLister
 }
 
 type xListenerSetInformer struct {
@@ -71,7 +71,7 @@ func NewFilteredXListenerSetInformer(client versioned.Interface, namespace strin
 				return client.ExperimentalV1alpha1().XListenerSets(namespace).Watch(context.TODO(), options)
 			},
 		},
-		&apisxv1alpha1.XListenerSet{},
+		&gatewayapiapisxv1alpha1.XListenerSet{},
 		resyncPeriod,
 		indexers,
 	)
@@ -82,9 +82,9 @@ func (f *xListenerSetInformer) defaultInformer(client versioned.Interface, resyn
 }
 
 func (f *xListenerSetInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&apisxv1alpha1.XListenerSet{}, f.defaultInformer)
+	return f.factory.InformerFor(&gatewayapiapisxv1alpha1.XListenerSet{}, f.defaultInformer)
 }
 
-func (f *xListenerSetInformer) Lister() v1alpha1.XListenerSetLister {
-	return v1alpha1.NewXListenerSetLister(f.Informer().GetIndexer())
+func (f *xListenerSetInformer) Lister() apisxv1alpha1.XListenerSetLister {
+	return apisxv1alpha1.NewXListenerSetLister(f.Informer().GetIndexer())
 }

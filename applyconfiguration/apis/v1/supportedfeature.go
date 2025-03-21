@@ -19,13 +19,13 @@ limitations under the License.
 package v1
 
 import (
-	v1 "sigs.k8s.io/gateway-api/apis/v1"
+	apisv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
 // SupportedFeatureApplyConfiguration represents a declarative configuration of the SupportedFeature type for use
 // with apply.
 type SupportedFeatureApplyConfiguration struct {
-	Name *v1.FeatureName `json:"name,omitempty"`
+	Name *apisv1.FeatureName `json:"name,omitempty"`
 }
 
 // SupportedFeatureApplyConfiguration constructs a declarative configuration of the SupportedFeature type for use with
@@ -37,7 +37,7 @@ func SupportedFeature() *SupportedFeatureApplyConfiguration {
 // WithName sets the Name field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Name field is set to the value of the last call.
-func (b *SupportedFeatureApplyConfiguration) WithName(value v1.FeatureName) *SupportedFeatureApplyConfiguration {
+func (b *SupportedFeatureApplyConfiguration) WithName(value apisv1.FeatureName) *SupportedFeatureApplyConfiguration {
 	b.Name = &value
 	return b
 }

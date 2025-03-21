@@ -19,13 +19,13 @@ limitations under the License.
 package v1
 
 import (
-	v1 "sigs.k8s.io/gateway-api/apis/v1"
+	apisv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
 // GatewaySpecApplyConfiguration represents a declarative configuration of the GatewaySpec type for use
 // with apply.
 type GatewaySpecApplyConfiguration struct {
-	GatewayClassName *v1.ObjectName                           `json:"gatewayClassName,omitempty"`
+	GatewayClassName *apisv1.ObjectName                       `json:"gatewayClassName,omitempty"`
 	Listeners        []ListenerApplyConfiguration             `json:"listeners,omitempty"`
 	Addresses        []GatewaySpecAddressApplyConfiguration   `json:"addresses,omitempty"`
 	Infrastructure   *GatewayInfrastructureApplyConfiguration `json:"infrastructure,omitempty"`
@@ -42,7 +42,7 @@ func GatewaySpec() *GatewaySpecApplyConfiguration {
 // WithGatewayClassName sets the GatewayClassName field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the GatewayClassName field is set to the value of the last call.
-func (b *GatewaySpecApplyConfiguration) WithGatewayClassName(value v1.ObjectName) *GatewaySpecApplyConfiguration {
+func (b *GatewaySpecApplyConfiguration) WithGatewayClassName(value apisv1.ObjectName) *GatewaySpecApplyConfiguration {
 	b.GatewayClassName = &value
 	return b
 }

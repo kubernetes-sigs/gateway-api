@@ -19,179 +19,35 @@ limitations under the License.
 package fake
 
 import (
-	"context"
-	json "encoding/json"
-	"fmt"
-
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	labels "k8s.io/apimachinery/pkg/labels"
-	types "k8s.io/apimachinery/pkg/types"
-	watch "k8s.io/apimachinery/pkg/watch"
-	testing "k8s.io/client-go/testing"
+	gentype "k8s.io/client-go/gentype"
 	v1alpha1 "sigs.k8s.io/gateway-api/apisx/v1alpha1"
 	apisxv1alpha1 "sigs.k8s.io/gateway-api/applyconfiguration/apisx/v1alpha1"
+	typedapisxv1alpha1 "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/typed/apisx/v1alpha1"
 )
 
-// FakeXBackendTrafficPolicies implements XBackendTrafficPolicyInterface
-type FakeXBackendTrafficPolicies struct {
+// fakeXBackendTrafficPolicies implements XBackendTrafficPolicyInterface
+type fakeXBackendTrafficPolicies struct {
+	*gentype.FakeClientWithListAndApply[*v1alpha1.XBackendTrafficPolicy, *v1alpha1.XBackendTrafficPolicyList, *apisxv1alpha1.XBackendTrafficPolicyApplyConfiguration]
 	Fake *FakeExperimentalV1alpha1
-	ns   string
 }
 
-var xbackendtrafficpoliciesResource = v1alpha1.SchemeGroupVersion.WithResource("xbackendtrafficpolicies")
-
-var xbackendtrafficpoliciesKind = v1alpha1.SchemeGroupVersion.WithKind("XBackendTrafficPolicy")
-
-// Get takes name of the xBackendTrafficPolicy, and returns the corresponding xBackendTrafficPolicy object, and an error if there is any.
-func (c *FakeXBackendTrafficPolicies) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.XBackendTrafficPolicy, err error) {
-	emptyResult := &v1alpha1.XBackendTrafficPolicy{}
-	obj, err := c.Fake.
-		Invokes(testing.NewGetActionWithOptions(xbackendtrafficpoliciesResource, c.ns, name, options), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
+func newFakeXBackendTrafficPolicies(fake *FakeExperimentalV1alpha1, namespace string) typedapisxv1alpha1.XBackendTrafficPolicyInterface {
+	return &fakeXBackendTrafficPolicies{
+		gentype.NewFakeClientWithListAndApply[*v1alpha1.XBackendTrafficPolicy, *v1alpha1.XBackendTrafficPolicyList, *apisxv1alpha1.XBackendTrafficPolicyApplyConfiguration](
+			fake.Fake,
+			namespace,
+			v1alpha1.SchemeGroupVersion.WithResource("xbackendtrafficpolicies"),
+			v1alpha1.SchemeGroupVersion.WithKind("XBackendTrafficPolicy"),
+			func() *v1alpha1.XBackendTrafficPolicy { return &v1alpha1.XBackendTrafficPolicy{} },
+			func() *v1alpha1.XBackendTrafficPolicyList { return &v1alpha1.XBackendTrafficPolicyList{} },
+			func(dst, src *v1alpha1.XBackendTrafficPolicyList) { dst.ListMeta = src.ListMeta },
+			func(list *v1alpha1.XBackendTrafficPolicyList) []*v1alpha1.XBackendTrafficPolicy {
+				return gentype.ToPointerSlice(list.Items)
+			},
+			func(list *v1alpha1.XBackendTrafficPolicyList, items []*v1alpha1.XBackendTrafficPolicy) {
+				list.Items = gentype.FromPointerSlice(items)
+			},
+		),
+		fake,
 	}
-	return obj.(*v1alpha1.XBackendTrafficPolicy), err
-}
-
-// List takes label and field selectors, and returns the list of XBackendTrafficPolicies that match those selectors.
-func (c *FakeXBackendTrafficPolicies) List(ctx context.Context, opts v1.ListOptions) (result *v1alpha1.XBackendTrafficPolicyList, err error) {
-	emptyResult := &v1alpha1.XBackendTrafficPolicyList{}
-	obj, err := c.Fake.
-		Invokes(testing.NewListActionWithOptions(xbackendtrafficpoliciesResource, xbackendtrafficpoliciesKind, c.ns, opts), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
-	}
-
-	label, _, _ := testing.ExtractFromListOptions(opts)
-	if label == nil {
-		label = labels.Everything()
-	}
-	list := &v1alpha1.XBackendTrafficPolicyList{ListMeta: obj.(*v1alpha1.XBackendTrafficPolicyList).ListMeta}
-	for _, item := range obj.(*v1alpha1.XBackendTrafficPolicyList).Items {
-		if label.Matches(labels.Set(item.Labels)) {
-			list.Items = append(list.Items, item)
-		}
-	}
-	return list, err
-}
-
-// Watch returns a watch.Interface that watches the requested xBackendTrafficPolicies.
-func (c *FakeXBackendTrafficPolicies) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
-	return c.Fake.
-		InvokesWatch(testing.NewWatchActionWithOptions(xbackendtrafficpoliciesResource, c.ns, opts))
-
-}
-
-// Create takes the representation of a xBackendTrafficPolicy and creates it.  Returns the server's representation of the xBackendTrafficPolicy, and an error, if there is any.
-func (c *FakeXBackendTrafficPolicies) Create(ctx context.Context, xBackendTrafficPolicy *v1alpha1.XBackendTrafficPolicy, opts v1.CreateOptions) (result *v1alpha1.XBackendTrafficPolicy, err error) {
-	emptyResult := &v1alpha1.XBackendTrafficPolicy{}
-	obj, err := c.Fake.
-		Invokes(testing.NewCreateActionWithOptions(xbackendtrafficpoliciesResource, c.ns, xBackendTrafficPolicy, opts), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha1.XBackendTrafficPolicy), err
-}
-
-// Update takes the representation of a xBackendTrafficPolicy and updates it. Returns the server's representation of the xBackendTrafficPolicy, and an error, if there is any.
-func (c *FakeXBackendTrafficPolicies) Update(ctx context.Context, xBackendTrafficPolicy *v1alpha1.XBackendTrafficPolicy, opts v1.UpdateOptions) (result *v1alpha1.XBackendTrafficPolicy, err error) {
-	emptyResult := &v1alpha1.XBackendTrafficPolicy{}
-	obj, err := c.Fake.
-		Invokes(testing.NewUpdateActionWithOptions(xbackendtrafficpoliciesResource, c.ns, xBackendTrafficPolicy, opts), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha1.XBackendTrafficPolicy), err
-}
-
-// UpdateStatus was generated because the type contains a Status member.
-// Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-func (c *FakeXBackendTrafficPolicies) UpdateStatus(ctx context.Context, xBackendTrafficPolicy *v1alpha1.XBackendTrafficPolicy, opts v1.UpdateOptions) (result *v1alpha1.XBackendTrafficPolicy, err error) {
-	emptyResult := &v1alpha1.XBackendTrafficPolicy{}
-	obj, err := c.Fake.
-		Invokes(testing.NewUpdateSubresourceActionWithOptions(xbackendtrafficpoliciesResource, "status", c.ns, xBackendTrafficPolicy, opts), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha1.XBackendTrafficPolicy), err
-}
-
-// Delete takes name of the xBackendTrafficPolicy and deletes it. Returns an error if one occurs.
-func (c *FakeXBackendTrafficPolicies) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
-	_, err := c.Fake.
-		Invokes(testing.NewDeleteActionWithOptions(xbackendtrafficpoliciesResource, c.ns, name, opts), &v1alpha1.XBackendTrafficPolicy{})
-
-	return err
-}
-
-// DeleteCollection deletes a collection of objects.
-func (c *FakeXBackendTrafficPolicies) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
-	action := testing.NewDeleteCollectionActionWithOptions(xbackendtrafficpoliciesResource, c.ns, opts, listOpts)
-
-	_, err := c.Fake.Invokes(action, &v1alpha1.XBackendTrafficPolicyList{})
-	return err
-}
-
-// Patch applies the patch and returns the patched xBackendTrafficPolicy.
-func (c *FakeXBackendTrafficPolicies) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.XBackendTrafficPolicy, err error) {
-	emptyResult := &v1alpha1.XBackendTrafficPolicy{}
-	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceActionWithOptions(xbackendtrafficpoliciesResource, c.ns, name, pt, data, opts, subresources...), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha1.XBackendTrafficPolicy), err
-}
-
-// Apply takes the given apply declarative configuration, applies it and returns the applied xBackendTrafficPolicy.
-func (c *FakeXBackendTrafficPolicies) Apply(ctx context.Context, xBackendTrafficPolicy *apisxv1alpha1.XBackendTrafficPolicyApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.XBackendTrafficPolicy, err error) {
-	if xBackendTrafficPolicy == nil {
-		return nil, fmt.Errorf("xBackendTrafficPolicy provided to Apply must not be nil")
-	}
-	data, err := json.Marshal(xBackendTrafficPolicy)
-	if err != nil {
-		return nil, err
-	}
-	name := xBackendTrafficPolicy.Name
-	if name == nil {
-		return nil, fmt.Errorf("xBackendTrafficPolicy.Name must be provided to Apply")
-	}
-	emptyResult := &v1alpha1.XBackendTrafficPolicy{}
-	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceActionWithOptions(xbackendtrafficpoliciesResource, c.ns, *name, types.ApplyPatchType, data, opts.ToPatchOptions()), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha1.XBackendTrafficPolicy), err
-}
-
-// ApplyStatus was generated because the type contains a Status member.
-// Add a +genclient:noStatus comment above the type to avoid generating ApplyStatus().
-func (c *FakeXBackendTrafficPolicies) ApplyStatus(ctx context.Context, xBackendTrafficPolicy *apisxv1alpha1.XBackendTrafficPolicyApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.XBackendTrafficPolicy, err error) {
-	if xBackendTrafficPolicy == nil {
-		return nil, fmt.Errorf("xBackendTrafficPolicy provided to Apply must not be nil")
-	}
-	data, err := json.Marshal(xBackendTrafficPolicy)
-	if err != nil {
-		return nil, err
-	}
-	name := xBackendTrafficPolicy.Name
-	if name == nil {
-		return nil, fmt.Errorf("xBackendTrafficPolicy.Name must be provided to Apply")
-	}
-	emptyResult := &v1alpha1.XBackendTrafficPolicy{}
-	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceActionWithOptions(xbackendtrafficpoliciesResource, c.ns, *name, types.ApplyPatchType, data, opts.ToPatchOptions(), "status"), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha1.XBackendTrafficPolicy), err
 }

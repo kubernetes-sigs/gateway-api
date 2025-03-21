@@ -19,14 +19,14 @@ limitations under the License.
 package v1
 
 import (
-	v1 "sigs.k8s.io/gateway-api/apis/v1"
+	apisv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
 // HTTPRouteTimeoutsApplyConfiguration represents a declarative configuration of the HTTPRouteTimeouts type for use
 // with apply.
 type HTTPRouteTimeoutsApplyConfiguration struct {
-	Request        *v1.Duration `json:"request,omitempty"`
-	BackendRequest *v1.Duration `json:"backendRequest,omitempty"`
+	Request        *apisv1.Duration `json:"request,omitempty"`
+	BackendRequest *apisv1.Duration `json:"backendRequest,omitempty"`
 }
 
 // HTTPRouteTimeoutsApplyConfiguration constructs a declarative configuration of the HTTPRouteTimeouts type for use with
@@ -38,7 +38,7 @@ func HTTPRouteTimeouts() *HTTPRouteTimeoutsApplyConfiguration {
 // WithRequest sets the Request field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Request field is set to the value of the last call.
-func (b *HTTPRouteTimeoutsApplyConfiguration) WithRequest(value v1.Duration) *HTTPRouteTimeoutsApplyConfiguration {
+func (b *HTTPRouteTimeoutsApplyConfiguration) WithRequest(value apisv1.Duration) *HTTPRouteTimeoutsApplyConfiguration {
 	b.Request = &value
 	return b
 }
@@ -46,7 +46,7 @@ func (b *HTTPRouteTimeoutsApplyConfiguration) WithRequest(value v1.Duration) *HT
 // WithBackendRequest sets the BackendRequest field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the BackendRequest field is set to the value of the last call.
-func (b *HTTPRouteTimeoutsApplyConfiguration) WithBackendRequest(value v1.Duration) *HTTPRouteTimeoutsApplyConfiguration {
+func (b *HTTPRouteTimeoutsApplyConfiguration) WithBackendRequest(value apisv1.Duration) *HTTPRouteTimeoutsApplyConfiguration {
 	b.BackendRequest = &value
 	return b
 }

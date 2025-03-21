@@ -20,7 +20,7 @@ package v1alpha3
 
 import (
 	apisv1 "sigs.k8s.io/gateway-api/apis/v1"
-	v1alpha3 "sigs.k8s.io/gateway-api/apis/v1alpha3"
+	apisv1alpha3 "sigs.k8s.io/gateway-api/apis/v1alpha3"
 	v1 "sigs.k8s.io/gateway-api/applyconfiguration/apis/v1"
 )
 
@@ -28,7 +28,7 @@ import (
 // with apply.
 type BackendTLSPolicyValidationApplyConfiguration struct {
 	CACertificateRefs       []v1.LocalObjectReferenceApplyConfiguration `json:"caCertificateRefs,omitempty"`
-	WellKnownCACertificates *v1alpha3.WellKnownCACertificatesType       `json:"wellKnownCACertificates,omitempty"`
+	WellKnownCACertificates *apisv1alpha3.WellKnownCACertificatesType   `json:"wellKnownCACertificates,omitempty"`
 	Hostname                *apisv1.PreciseHostname                     `json:"hostname,omitempty"`
 	SubjectAltNames         []SubjectAltNameApplyConfiguration          `json:"subjectAltNames,omitempty"`
 }
@@ -55,7 +55,7 @@ func (b *BackendTLSPolicyValidationApplyConfiguration) WithCACertificateRefs(val
 // WithWellKnownCACertificates sets the WellKnownCACertificates field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the WellKnownCACertificates field is set to the value of the last call.
-func (b *BackendTLSPolicyValidationApplyConfiguration) WithWellKnownCACertificates(value v1alpha3.WellKnownCACertificatesType) *BackendTLSPolicyValidationApplyConfiguration {
+func (b *BackendTLSPolicyValidationApplyConfiguration) WithWellKnownCACertificates(value apisv1alpha3.WellKnownCACertificatesType) *BackendTLSPolicyValidationApplyConfiguration {
 	b.WellKnownCACertificates = &value
 	return b
 }

@@ -39,7 +39,7 @@ func GRPCBackendRef() *GRPCBackendRefApplyConfiguration {
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Group field is set to the value of the last call.
 func (b *GRPCBackendRefApplyConfiguration) WithGroup(value apisv1.Group) *GRPCBackendRefApplyConfiguration {
-	b.Group = &value
+	b.BackendObjectReferenceApplyConfiguration.Group = &value
 	return b
 }
 
@@ -47,7 +47,7 @@ func (b *GRPCBackendRefApplyConfiguration) WithGroup(value apisv1.Group) *GRPCBa
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Kind field is set to the value of the last call.
 func (b *GRPCBackendRefApplyConfiguration) WithKind(value apisv1.Kind) *GRPCBackendRefApplyConfiguration {
-	b.Kind = &value
+	b.BackendObjectReferenceApplyConfiguration.Kind = &value
 	return b
 }
 
@@ -55,7 +55,7 @@ func (b *GRPCBackendRefApplyConfiguration) WithKind(value apisv1.Kind) *GRPCBack
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Name field is set to the value of the last call.
 func (b *GRPCBackendRefApplyConfiguration) WithName(value apisv1.ObjectName) *GRPCBackendRefApplyConfiguration {
-	b.Name = &value
+	b.BackendObjectReferenceApplyConfiguration.Name = &value
 	return b
 }
 
@@ -63,7 +63,7 @@ func (b *GRPCBackendRefApplyConfiguration) WithName(value apisv1.ObjectName) *GR
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Namespace field is set to the value of the last call.
 func (b *GRPCBackendRefApplyConfiguration) WithNamespace(value apisv1.Namespace) *GRPCBackendRefApplyConfiguration {
-	b.Namespace = &value
+	b.BackendObjectReferenceApplyConfiguration.Namespace = &value
 	return b
 }
 
@@ -71,7 +71,7 @@ func (b *GRPCBackendRefApplyConfiguration) WithNamespace(value apisv1.Namespace)
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Port field is set to the value of the last call.
 func (b *GRPCBackendRefApplyConfiguration) WithPort(value apisv1.PortNumber) *GRPCBackendRefApplyConfiguration {
-	b.Port = &value
+	b.BackendObjectReferenceApplyConfiguration.Port = &value
 	return b
 }
 
@@ -79,7 +79,7 @@ func (b *GRPCBackendRefApplyConfiguration) WithPort(value apisv1.PortNumber) *GR
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Weight field is set to the value of the last call.
 func (b *GRPCBackendRefApplyConfiguration) WithWeight(value int32) *GRPCBackendRefApplyConfiguration {
-	b.Weight = &value
+	b.BackendRefApplyConfiguration.Weight = &value
 	return b
 }
 

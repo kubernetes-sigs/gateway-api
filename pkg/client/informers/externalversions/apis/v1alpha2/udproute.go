@@ -19,24 +19,24 @@ limitations under the License.
 package v1alpha2
 
 import (
-	"context"
+	context "context"
 	time "time"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	watch "k8s.io/apimachinery/pkg/watch"
 	cache "k8s.io/client-go/tools/cache"
-	apisv1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
+	gatewayapiapisv1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
 	versioned "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned"
 	internalinterfaces "sigs.k8s.io/gateway-api/pkg/client/informers/externalversions/internalinterfaces"
-	v1alpha2 "sigs.k8s.io/gateway-api/pkg/client/listers/apis/v1alpha2"
+	apisv1alpha2 "sigs.k8s.io/gateway-api/pkg/client/listers/apis/v1alpha2"
 )
 
 // UDPRouteInformer provides access to a shared informer and lister for
 // UDPRoutes.
 type UDPRouteInformer interface {
 	Informer() cache.SharedIndexInformer
-	Lister() v1alpha2.UDPRouteLister
+	Lister() apisv1alpha2.UDPRouteLister
 }
 
 type uDPRouteInformer struct {
@@ -71,7 +71,7 @@ func NewFilteredUDPRouteInformer(client versioned.Interface, namespace string, r
 				return client.GatewayV1alpha2().UDPRoutes(namespace).Watch(context.TODO(), options)
 			},
 		},
-		&apisv1alpha2.UDPRoute{},
+		&gatewayapiapisv1alpha2.UDPRoute{},
 		resyncPeriod,
 		indexers,
 	)
@@ -82,9 +82,9 @@ func (f *uDPRouteInformer) defaultInformer(client versioned.Interface, resyncPer
 }
 
 func (f *uDPRouteInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&apisv1alpha2.UDPRoute{}, f.defaultInformer)
+	return f.factory.InformerFor(&gatewayapiapisv1alpha2.UDPRoute{}, f.defaultInformer)
 }
 
-func (f *uDPRouteInformer) Lister() v1alpha2.UDPRouteLister {
-	return v1alpha2.NewUDPRouteLister(f.Informer().GetIndexer())
+func (f *uDPRouteInformer) Lister() apisv1alpha2.UDPRouteLister {
+	return apisv1alpha2.NewUDPRouteLister(f.Informer().GetIndexer())
 }

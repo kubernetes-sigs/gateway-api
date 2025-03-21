@@ -19,17 +19,17 @@ limitations under the License.
 package v1
 
 import (
-	v1 "sigs.k8s.io/gateway-api/apis/v1"
+	apisv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
 // BackendObjectReferenceApplyConfiguration represents a declarative configuration of the BackendObjectReference type for use
 // with apply.
 type BackendObjectReferenceApplyConfiguration struct {
-	Group     *v1.Group      `json:"group,omitempty"`
-	Kind      *v1.Kind       `json:"kind,omitempty"`
-	Name      *v1.ObjectName `json:"name,omitempty"`
-	Namespace *v1.Namespace  `json:"namespace,omitempty"`
-	Port      *v1.PortNumber `json:"port,omitempty"`
+	Group     *apisv1.Group      `json:"group,omitempty"`
+	Kind      *apisv1.Kind       `json:"kind,omitempty"`
+	Name      *apisv1.ObjectName `json:"name,omitempty"`
+	Namespace *apisv1.Namespace  `json:"namespace,omitempty"`
+	Port      *apisv1.PortNumber `json:"port,omitempty"`
 }
 
 // BackendObjectReferenceApplyConfiguration constructs a declarative configuration of the BackendObjectReference type for use with
@@ -41,7 +41,7 @@ func BackendObjectReference() *BackendObjectReferenceApplyConfiguration {
 // WithGroup sets the Group field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Group field is set to the value of the last call.
-func (b *BackendObjectReferenceApplyConfiguration) WithGroup(value v1.Group) *BackendObjectReferenceApplyConfiguration {
+func (b *BackendObjectReferenceApplyConfiguration) WithGroup(value apisv1.Group) *BackendObjectReferenceApplyConfiguration {
 	b.Group = &value
 	return b
 }
@@ -49,7 +49,7 @@ func (b *BackendObjectReferenceApplyConfiguration) WithGroup(value v1.Group) *Ba
 // WithKind sets the Kind field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Kind field is set to the value of the last call.
-func (b *BackendObjectReferenceApplyConfiguration) WithKind(value v1.Kind) *BackendObjectReferenceApplyConfiguration {
+func (b *BackendObjectReferenceApplyConfiguration) WithKind(value apisv1.Kind) *BackendObjectReferenceApplyConfiguration {
 	b.Kind = &value
 	return b
 }
@@ -57,7 +57,7 @@ func (b *BackendObjectReferenceApplyConfiguration) WithKind(value v1.Kind) *Back
 // WithName sets the Name field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Name field is set to the value of the last call.
-func (b *BackendObjectReferenceApplyConfiguration) WithName(value v1.ObjectName) *BackendObjectReferenceApplyConfiguration {
+func (b *BackendObjectReferenceApplyConfiguration) WithName(value apisv1.ObjectName) *BackendObjectReferenceApplyConfiguration {
 	b.Name = &value
 	return b
 }
@@ -65,7 +65,7 @@ func (b *BackendObjectReferenceApplyConfiguration) WithName(value v1.ObjectName)
 // WithNamespace sets the Namespace field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Namespace field is set to the value of the last call.
-func (b *BackendObjectReferenceApplyConfiguration) WithNamespace(value v1.Namespace) *BackendObjectReferenceApplyConfiguration {
+func (b *BackendObjectReferenceApplyConfiguration) WithNamespace(value apisv1.Namespace) *BackendObjectReferenceApplyConfiguration {
 	b.Namespace = &value
 	return b
 }
@@ -73,7 +73,7 @@ func (b *BackendObjectReferenceApplyConfiguration) WithNamespace(value v1.Namesp
 // WithPort sets the Port field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Port field is set to the value of the last call.
-func (b *BackendObjectReferenceApplyConfiguration) WithPort(value v1.PortNumber) *BackendObjectReferenceApplyConfiguration {
+func (b *BackendObjectReferenceApplyConfiguration) WithPort(value apisv1.PortNumber) *BackendObjectReferenceApplyConfiguration {
 	b.Port = &value
 	return b
 }

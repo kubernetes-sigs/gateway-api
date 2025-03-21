@@ -56,3 +56,4 @@ go.work.sum
 /cache
 .venv/
 release/
+site-src/reference/spec.md

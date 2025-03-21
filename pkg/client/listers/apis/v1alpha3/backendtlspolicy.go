@@ -19,10 +19,10 @@ limitations under the License.
 package v1alpha3
 
 import (
-	"k8s.io/apimachinery/pkg/labels"
-	"k8s.io/client-go/listers"
-	"k8s.io/client-go/tools/cache"
-	v1alpha3 "sigs.k8s.io/gateway-api/apis/v1alpha3"
+	labels "k8s.io/apimachinery/pkg/labels"
+	listers "k8s.io/client-go/listers"
+	cache "k8s.io/client-go/tools/cache"
+	apisv1alpha3 "sigs.k8s.io/gateway-api/apis/v1alpha3"
 )
 
 // BackendTLSPolicyLister helps list BackendTLSPolicies.
@@ -30,7 +30,7 @@ import (
 type BackendTLSPolicyLister interface {
 	// List lists all BackendTLSPolicies in the indexer.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1alpha3.BackendTLSPolicy, err error)
+	List(selector labels.Selector) (ret []*apisv1alpha3.BackendTLSPolicy, err error)
 	// BackendTLSPolicies returns an object that can list and get BackendTLSPolicies.
 	BackendTLSPolicies(namespace string) BackendTLSPolicyNamespaceLister
 	BackendTLSPolicyListerExpansion
@@ -38,17 +38,17 @@ type BackendTLSPolicyLister interface {
 
 // backendTLSPolicyLister implements the BackendTLSPolicyLister interface.
 type backendTLSPolicyLister struct {
-	listers.ResourceIndexer[*v1alpha3.BackendTLSPolicy]
+	listers.ResourceIndexer[*apisv1alpha3.BackendTLSPolicy]
 }
 
 // NewBackendTLSPolicyLister returns a new BackendTLSPolicyLister.
 func NewBackendTLSPolicyLister(indexer cache.Indexer) BackendTLSPolicyLister {
-	return &backendTLSPolicyLister{listers.New[*v1alpha3.BackendTLSPolicy](indexer, v1alpha3.Resource("backendtlspolicy"))}
+	return &backendTLSPolicyLister{listers.New[*apisv1alpha3.BackendTLSPolicy](indexer, apisv1alpha3.Resource("backendtlspolicy"))}
 }
 
 // BackendTLSPolicies returns an object that can list and get BackendTLSPolicies.
 func (s *backendTLSPolicyLister) BackendTLSPolicies(namespace string) BackendTLSPolicyNamespaceLister {
-	return backendTLSPolicyNamespaceLister{listers.NewNamespaced[*v1alpha3.BackendTLSPolicy](s.ResourceIndexer, namespace)}
+	return backendTLSPolicyNamespaceLister{listers.NewNamespaced[*apisv1alpha3.BackendTLSPolicy](s.ResourceIndexer, namespace)}
 }
 
 // BackendTLSPolicyNamespaceLister helps list and get BackendTLSPolicies.
@@ -56,15 +56,15 @@ func (s *backendTLSPolicyLister) BackendTLSPolicies(namespace string) BackendTLS
 type BackendTLSPolicyNamespaceLister interface {
 	// List lists all BackendTLSPolicies in the indexer for a given namespace.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1alpha3.BackendTLSPolicy, err error)
+	List(selector labels.Selector) (ret []*apisv1alpha3.BackendTLSPolicy, err error)
 	// Get retrieves the BackendTLSPolicy from the indexer for a given namespace and name.
 	// Objects returned here must be treated as read-only.
-	Get(name string) (*v1alpha3.BackendTLSPolicy, error)
+	Get(name string) (*apisv1alpha3.BackendTLSPolicy, error)
 	BackendTLSPolicyNamespaceListerExpansion
 }
 
 // backendTLSPolicyNamespaceLister implements the BackendTLSPolicyNamespaceLister
 // interface.
 type backendTLSPolicyNamespaceLister struct {
-	listers.ResourceIndexer[*v1alpha3.BackendTLSPolicy]
+	listers.ResourceIndexer[*apisv1alpha3.BackendTLSPolicy]
 }

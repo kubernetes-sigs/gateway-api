@@ -19,18 +19,18 @@ limitations under the License.
 package v1
 
 import (
-	v1 "sigs.k8s.io/gateway-api/apis/v1"
+	apisv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
 // ParentReferenceApplyConfiguration represents a declarative configuration of the ParentReference type for use
 // with apply.
 type ParentReferenceApplyConfiguration struct {
-	Group       *v1.Group       `json:"group,omitempty"`
-	Kind        *v1.Kind        `json:"kind,omitempty"`
-	Namespace   *v1.Namespace   `json:"namespace,omitempty"`
-	Name        *v1.ObjectName  `json:"name,omitempty"`
-	SectionName *v1.SectionName `json:"sectionName,omitempty"`
-	Port        *v1.PortNumber  `json:"port,omitempty"`
+	Group       *apisv1.Group       `json:"group,omitempty"`
+	Kind        *apisv1.Kind        `json:"kind,omitempty"`
+	Namespace   *apisv1.Namespace   `json:"namespace,omitempty"`
+	Name        *apisv1.ObjectName  `json:"name,omitempty"`
+	SectionName *apisv1.SectionName `json:"sectionName,omitempty"`
+	Port        *apisv1.PortNumber  `json:"port,omitempty"`
 }
 
 // ParentReferenceApplyConfiguration constructs a declarative configuration of the ParentReference type for use with
@@ -42,7 +42,7 @@ func ParentReference() *ParentReferenceApplyConfiguration {
 // WithGroup sets the Group field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Group field is set to the value of the last call.
-func (b *ParentReferenceApplyConfiguration) WithGroup(value v1.Group) *ParentReferenceApplyConfiguration {
+func (b *ParentReferenceApplyConfiguration) WithGroup(value apisv1.Group) *ParentReferenceApplyConfiguration {
 	b.Group = &value
 	return b
 }
@@ -50,7 +50,7 @@ func (b *ParentReferenceApplyConfiguration) WithGroup(value v1.Group) *ParentRef
 // WithKind sets the Kind field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Kind field is set to the value of the last call.
-func (b *ParentReferenceApplyConfiguration) WithKind(value v1.Kind) *ParentReferenceApplyConfiguration {
+func (b *ParentReferenceApplyConfiguration) WithKind(value apisv1.Kind) *ParentReferenceApplyConfiguration {
 	b.Kind = &value
 	return b
 }
@@ -58,7 +58,7 @@ func (b *ParentReferenceApplyConfiguration) WithKind(value v1.Kind) *ParentRefer
 // WithNamespace sets the Namespace field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Namespace field is set to the value of the last call.
-func (b *ParentReferenceApplyConfiguration) WithNamespace(value v1.Namespace) *ParentReferenceApplyConfiguration {
+func (b *ParentReferenceApplyConfiguration) WithNamespace(value apisv1.Namespace) *ParentReferenceApplyConfiguration {
 	b.Namespace = &value
 	return b
 }
@@ -66,7 +66,7 @@ func (b *ParentReferenceApplyConfiguration) WithNamespace(value v1.Namespace) *P
 // WithName sets the Name field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Name field is set to the value of the last call.
-func (b *ParentReferenceApplyConfiguration) WithName(value v1.ObjectName) *ParentReferenceApplyConfiguration {
+func (b *ParentReferenceApplyConfiguration) WithName(value apisv1.ObjectName) *ParentReferenceApplyConfiguration {
 	b.Name = &value
 	return b
 }
@@ -74,7 +74,7 @@ func (b *ParentReferenceApplyConfiguration) WithName(value v1.ObjectName) *Paren
 // WithSectionName sets the SectionName field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the SectionName field is set to the value of the last call.
-func (b *ParentReferenceApplyConfiguration) WithSectionName(value v1.SectionName) *ParentReferenceApplyConfiguration {
+func (b *ParentReferenceApplyConfiguration) WithSectionName(value apisv1.SectionName) *ParentReferenceApplyConfiguration {
 	b.SectionName = &value
 	return b
 }
@@ -82,7 +82,7 @@ func (b *ParentReferenceApplyConfiguration) WithSectionName(value v1.SectionName
 // WithPort sets the Port field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Port field is set to the value of the last call.
-func (b *ParentReferenceApplyConfiguration) WithPort(value v1.PortNumber) *ParentReferenceApplyConfiguration {
+func (b *ParentReferenceApplyConfiguration) WithPort(value apisv1.PortNumber) *ParentReferenceApplyConfiguration {
 	b.Port = &value
 	return b
 }

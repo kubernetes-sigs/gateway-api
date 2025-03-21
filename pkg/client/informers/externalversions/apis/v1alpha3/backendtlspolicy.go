@@ -19,24 +19,24 @@ limitations under the License.
 package v1alpha3
 
 import (
-	"context"
+	context "context"
 	time "time"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	watch "k8s.io/apimachinery/pkg/watch"
 	cache "k8s.io/client-go/tools/cache"
-	apisv1alpha3 "sigs.k8s.io/gateway-api/apis/v1alpha3"
+	gatewayapiapisv1alpha3 "sigs.k8s.io/gateway-api/apis/v1alpha3"
 	versioned "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned"
 	internalinterfaces "sigs.k8s.io/gateway-api/pkg/client/informers/externalversions/internalinterfaces"
-	v1alpha3 "sigs.k8s.io/gateway-api/pkg/client/listers/apis/v1alpha3"
+	apisv1alpha3 "sigs.k8s.io/gateway-api/pkg/client/listers/apis/v1alpha3"
 )
 
 // BackendTLSPolicyInformer provides access to a shared informer and lister for
 // BackendTLSPolicies.
 type BackendTLSPolicyInformer interface {
 	Informer() cache.SharedIndexInformer
-	Lister() v1alpha3.BackendTLSPolicyLister
+	Lister() apisv1alpha3.BackendTLSPolicyLister
 }
 
 type backendTLSPolicyInformer struct {
@@ -71,7 +71,7 @@ func NewFilteredBackendTLSPolicyInformer(client versioned.Interface, namespace s
 				return client.GatewayV1alpha3().BackendTLSPolicies(namespace).Watch(context.TODO(), options)
 			},
 		},
-		&apisv1alpha3.BackendTLSPolicy{},
+		&gatewayapiapisv1alpha3.BackendTLSPolicy{},
 		resyncPeriod,
 		indexers,
 	)
@@ -82,9 +82,9 @@ func (f *backendTLSPolicyInformer) defaultInformer(client versioned.Interface, r
 }
 
 func (f *backendTLSPolicyInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&apisv1alpha3.BackendTLSPolicy{}, f.defaultInformer)
+	return f.factory.InformerFor(&gatewayapiapisv1alpha3.BackendTLSPolicy{}, f.defaultInformer)
 }
 
-func (f *backendTLSPolicyInformer) Lister() v1alpha3.BackendTLSPolicyLister {
-	return v1alpha3.NewBackendTLSPolicyLister(f.Informer().GetIndexer())
+func (f *backendTLSPolicyInformer) Lister() apisv1alpha3.BackendTLSPolicyLister {
+	return apisv1alpha3.NewBackendTLSPolicyLister(f.Informer().GetIndexer())
 }

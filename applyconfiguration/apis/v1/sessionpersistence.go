@@ -19,16 +19,16 @@ limitations under the License.
 package v1
 
 import (
-	v1 "sigs.k8s.io/gateway-api/apis/v1"
+	apisv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
 // SessionPersistenceApplyConfiguration represents a declarative configuration of the SessionPersistence type for use
 // with apply.
 type SessionPersistenceApplyConfiguration struct {
 	SessionName     *string                         `json:"sessionName,omitempty"`
-	AbsoluteTimeout *v1.Duration                    `json:"absoluteTimeout,omitempty"`
-	IdleTimeout     *v1.Duration                    `json:"idleTimeout,omitempty"`
-	Type            *v1.SessionPersistenceType      `json:"type,omitempty"`
+	AbsoluteTimeout *apisv1.Duration                `json:"absoluteTimeout,omitempty"`
+	IdleTimeout     *apisv1.Duration                `json:"idleTimeout,omitempty"`
+	Type            *apisv1.SessionPersistenceType  `json:"type,omitempty"`
 	CookieConfig    *CookieConfigApplyConfiguration `json:"cookieConfig,omitempty"`
 }
 
@@ -49,7 +49,7 @@ func (b *SessionPersistenceApplyConfiguration) WithSessionName(value string) *Se
 // WithAbsoluteTimeout sets the AbsoluteTimeout field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the AbsoluteTimeout field is set to the value of the last call.
-func (b *SessionPersistenceApplyConfiguration) WithAbsoluteTimeout(value v1.Duration) *SessionPersistenceApplyConfiguration {
+func (b *SessionPersistenceApplyConfiguration) WithAbsoluteTimeout(value apisv1.Duration) *SessionPersistenceApplyConfiguration {
 	b.AbsoluteTimeout = &value
 	return b
 }
@@ -57,7 +57,7 @@ func (b *SessionPersistenceApplyConfiguration) WithAbsoluteTimeout(value v1.Dura
 // WithIdleTimeout sets the IdleTimeout field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the IdleTimeout field is set to the value of the last call.
-func (b *SessionPersistenceApplyConfiguration) WithIdleTimeout(value v1.Duration) *SessionPersistenceApplyConfiguration {
+func (b *SessionPersistenceApplyConfiguration) WithIdleTimeout(value apisv1.Duration) *SessionPersistenceApplyConfiguration {
 	b.IdleTimeout = &value
 	return b
 }
@@ -65,7 +65,7 @@ func (b *SessionPersistenceApplyConfiguration) WithIdleTimeout(value v1.Duration
 // WithType sets the Type field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Type field is set to the value of the last call.
-func (b *SessionPersistenceApplyConfiguration) WithType(value v1.SessionPersistenceType) *SessionPersistenceApplyConfiguration {
+func (b *SessionPersistenceApplyConfiguration) WithType(value apisv1.SessionPersistenceType) *SessionPersistenceApplyConfiguration {
 	b.Type = &value
 	return b
 }

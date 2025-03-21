@@ -20,13 +20,13 @@ package v1
 
 import (
 	metav1 "k8s.io/client-go/applyconfigurations/meta/v1"
-	v1 "sigs.k8s.io/gateway-api/apis/v1"
+	apisv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
 // ListenerStatusApplyConfiguration represents a declarative configuration of the ListenerStatus type for use
 // with apply.
 type ListenerStatusApplyConfiguration struct {
-	Name           *v1.SectionName                      `json:"name,omitempty"`
+	Name           *apisv1.SectionName                  `json:"name,omitempty"`
 	SupportedKinds []RouteGroupKindApplyConfiguration   `json:"supportedKinds,omitempty"`
 	AttachedRoutes *int32                               `json:"attachedRoutes,omitempty"`
 	Conditions     []metav1.ConditionApplyConfiguration `json:"conditions,omitempty"`
@@ -41,7 +41,7 @@ func ListenerStatus() *ListenerStatusApplyConfiguration {
 // WithName sets the Name field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Name field is set to the value of the last call.
-func (b *ListenerStatusApplyConfiguration) WithName(value v1.SectionName) *ListenerStatusApplyConfiguration {
+func (b *ListenerStatusApplyConfiguration) WithName(value apisv1.SectionName) *ListenerStatusApplyConfiguration {
 	b.Name = &value
 	return b
 }

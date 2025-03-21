@@ -19,15 +19,15 @@ limitations under the License.
 package v1
 
 import (
-	v1 "sigs.k8s.io/gateway-api/apis/v1"
+	apisv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
 // HTTPPathModifierApplyConfiguration represents a declarative configuration of the HTTPPathModifier type for use
 // with apply.
 type HTTPPathModifierApplyConfiguration struct {
-	Type               *v1.HTTPPathModifierType `json:"type,omitempty"`
-	ReplaceFullPath    *string                  `json:"replaceFullPath,omitempty"`
-	ReplacePrefixMatch *string                  `json:"replacePrefixMatch,omitempty"`
+	Type               *apisv1.HTTPPathModifierType `json:"type,omitempty"`
+	ReplaceFullPath    *string                      `json:"replaceFullPath,omitempty"`
+	ReplacePrefixMatch *string                      `json:"replacePrefixMatch,omitempty"`
 }
 
 // HTTPPathModifierApplyConfiguration constructs a declarative configuration of the HTTPPathModifier type for use with
@@ -39,7 +39,7 @@ func HTTPPathModifier() *HTTPPathModifierApplyConfiguration {
 // WithType sets the Type field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Type field is set to the value of the last call.
-func (b *HTTPPathModifierApplyConfiguration) WithType(value v1.HTTPPathModifierType) *HTTPPathModifierApplyConfiguration {
+func (b *HTTPPathModifierApplyConfiguration) WithType(value apisv1.HTTPPathModifierType) *HTTPPathModifierApplyConfiguration {
 	b.Type = &value
 	return b
 }

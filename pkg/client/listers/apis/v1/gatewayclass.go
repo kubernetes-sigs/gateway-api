@@ -19,10 +19,10 @@ limitations under the License.
 package v1
 
 import (
-	"k8s.io/apimachinery/pkg/labels"
-	"k8s.io/client-go/listers"
-	"k8s.io/client-go/tools/cache"
-	v1 "sigs.k8s.io/gateway-api/apis/v1"
+	labels "k8s.io/apimachinery/pkg/labels"
+	listers "k8s.io/client-go/listers"
+	cache "k8s.io/client-go/tools/cache"
+	apisv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
 // GatewayClassLister helps list GatewayClasses.
@@ -30,19 +30,19 @@ import (
 type GatewayClassLister interface {
 	// List lists all GatewayClasses in the indexer.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1.GatewayClass, err error)
+	List(selector labels.Selector) (ret []*apisv1.GatewayClass, err error)
 	// Get retrieves the GatewayClass from the index for a given name.
 	// Objects returned here must be treated as read-only.
-	Get(name string) (*v1.GatewayClass, error)
+	Get(name string) (*apisv1.GatewayClass, error)
 	GatewayClassListerExpansion
 }
 
 // gatewayClassLister implements the GatewayClassLister interface.
 type gatewayClassLister struct {
-	listers.ResourceIndexer[*v1.GatewayClass]
+	listers.ResourceIndexer[*apisv1.GatewayClass]
 }
 
 // NewGatewayClassLister returns a new GatewayClassLister.
 func NewGatewayClassLister(indexer cache.Indexer) GatewayClassLister {
-	return &gatewayClassLister{listers.New[*v1.GatewayClass](indexer, v1.Resource("gatewayclass"))}
+	return &gatewayClassLister{listers.New[*apisv1.GatewayClass](indexer, apisv1.Resource("gatewayclass"))}
 }

@@ -19,10 +19,10 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"k8s.io/apimachinery/pkg/labels"
-	"k8s.io/client-go/listers"
-	"k8s.io/client-go/tools/cache"
-	v1alpha1 "sigs.k8s.io/gateway-api/apisx/v1alpha1"
+	labels "k8s.io/apimachinery/pkg/labels"
+	listers "k8s.io/client-go/listers"
+	cache "k8s.io/client-go/tools/cache"
+	apisxv1alpha1 "sigs.k8s.io/gateway-api/apisx/v1alpha1"
 )
 
 // XBackendTrafficPolicyLister helps list XBackendTrafficPolicies.
@@ -30,7 +30,7 @@ import (
 type XBackendTrafficPolicyLister interface {
 	// List lists all XBackendTrafficPolicies in the indexer.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1alpha1.XBackendTrafficPolicy, err error)
+	List(selector labels.Selector) (ret []*apisxv1alpha1.XBackendTrafficPolicy, err error)
 	// XBackendTrafficPolicies returns an object that can list and get XBackendTrafficPolicies.
 	XBackendTrafficPolicies(namespace string) XBackendTrafficPolicyNamespaceLister
 	XBackendTrafficPolicyListerExpansion
@@ -38,17 +38,17 @@ type XBackendTrafficPolicyLister interface {
 
 // xBackendTrafficPolicyLister implements the XBackendTrafficPolicyLister interface.
 type xBackendTrafficPolicyLister struct {
-	listers.ResourceIndexer[*v1alpha1.XBackendTrafficPolicy]
+	listers.ResourceIndexer[*apisxv1alpha1.XBackendTrafficPolicy]
 }
 
 // NewXBackendTrafficPolicyLister returns a new XBackendTrafficPolicyLister.
 func NewXBackendTrafficPolicyLister(indexer cache.Indexer) XBackendTrafficPolicyLister {
-	return &xBackendTrafficPolicyLister{listers.New[*v1alpha1.XBackendTrafficPolicy](indexer, v1alpha1.Resource("xbackendtrafficpolicy"))}
+	return &xBackendTrafficPolicyLister{listers.New[*apisxv1alpha1.XBackendTrafficPolicy](indexer, apisxv1alpha1.Resource("xbackendtrafficpolicy"))}
 }
 
 // XBackendTrafficPolicies returns an object that can list and get XBackendTrafficPolicies.
 func (s *xBackendTrafficPolicyLister) XBackendTrafficPolicies(namespace string) XBackendTrafficPolicyNamespaceLister {
-	return xBackendTrafficPolicyNamespaceLister{listers.NewNamespaced[*v1alpha1.XBackendTrafficPolicy](s.ResourceIndexer, namespace)}
+	return xBackendTrafficPolicyNamespaceLister{listers.NewNamespaced[*apisxv1alpha1.XBackendTrafficPolicy](s.ResourceIndexer, namespace)}
 }
 
 // XBackendTrafficPolicyNamespaceLister helps list and get XBackendTrafficPolicies.
@@ -56,15 +56,15 @@ func (s *xBackendTrafficPolicyLister) XBackendTrafficPolicies(namespace string) 
 type XBackendTrafficPolicyNamespaceLister interface {
 	// List lists all XBackendTrafficPolicies in the indexer for a given namespace.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1alpha1.XBackendTrafficPolicy, err error)
+	List(selector labels.Selector) (ret []*apisxv1alpha1.XBackendTrafficPolicy, err error)
 	// Get retrieves the XBackendTrafficPolicy from the indexer for a given namespace and name.
 	// Objects returned here must be treated as read-only.
-	Get(name string) (*v1alpha1.XBackendTrafficPolicy, error)
+	Get(name string) (*apisxv1alpha1.XBackendTrafficPolicy, error)
 	XBackendTrafficPolicyNamespaceListerExpansion
 }
 
 // xBackendTrafficPolicyNamespaceLister implements the XBackendTrafficPolicyNamespaceLister
 // interface.
 type xBackendTrafficPolicyNamespaceLister struct {
-	listers.ResourceIndexer[*v1alpha1.XBackendTrafficPolicy]
+	listers.ResourceIndexer[*apisxv1alpha1.XBackendTrafficPolicy]
 }

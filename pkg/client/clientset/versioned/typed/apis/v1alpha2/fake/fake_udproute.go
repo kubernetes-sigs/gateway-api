@@ -19,179 +19,33 @@ limitations under the License.
 package fake
 
 import (
-	"context"
-	json "encoding/json"
-	"fmt"
-
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	labels "k8s.io/apimachinery/pkg/labels"
-	types "k8s.io/apimachinery/pkg/types"
-	watch "k8s.io/apimachinery/pkg/watch"
-	testing "k8s.io/client-go/testing"
+	gentype "k8s.io/client-go/gentype"
 	v1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
 	apisv1alpha2 "sigs.k8s.io/gateway-api/applyconfiguration/apis/v1alpha2"
+	typedapisv1alpha2 "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/typed/apis/v1alpha2"
 )
 
-// FakeUDPRoutes implements UDPRouteInterface
-type FakeUDPRoutes struct {
+// fakeUDPRoutes implements UDPRouteInterface
+type fakeUDPRoutes struct {
+	*gentype.FakeClientWithListAndApply[*v1alpha2.UDPRoute, *v1alpha2.UDPRouteList, *apisv1alpha2.UDPRouteApplyConfiguration]
 	Fake *FakeGatewayV1alpha2
-	ns   string
 }
 
-var udproutesResource = v1alpha2.SchemeGroupVersion.WithResource("udproutes")
-
-var udproutesKind = v1alpha2.SchemeGroupVersion.WithKind("UDPRoute")
-
-// Get takes name of the uDPRoute, and returns the corresponding uDPRoute object, and an error if there is any.
-func (c *FakeUDPRoutes) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha2.UDPRoute, err error) {
-	emptyResult := &v1alpha2.UDPRoute{}
-	obj, err := c.Fake.
-		Invokes(testing.NewGetActionWithOptions(udproutesResource, c.ns, name, options), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
+func newFakeUDPRoutes(fake *FakeGatewayV1alpha2, namespace string) typedapisv1alpha2.UDPRouteInterface {
+	return &fakeUDPRoutes{
+		gentype.NewFakeClientWithListAndApply[*v1alpha2.UDPRoute, *v1alpha2.UDPRouteList, *apisv1alpha2.UDPRouteApplyConfiguration](
+			fake.Fake,
+			namespace,
+			v1alpha2.SchemeGroupVersion.WithResource("udproutes"),
+			v1alpha2.SchemeGroupVersion.WithKind("UDPRoute"),
+			func() *v1alpha2.UDPRoute { return &v1alpha2.UDPRoute{} },
+			func() *v1alpha2.UDPRouteList { return &v1alpha2.UDPRouteList{} },
+			func(dst, src *v1alpha2.UDPRouteList) { dst.ListMeta = src.ListMeta },
+			func(list *v1alpha2.UDPRouteList) []*v1alpha2.UDPRoute { return gentype.ToPointerSlice(list.Items) },
+			func(list *v1alpha2.UDPRouteList, items []*v1alpha2.UDPRoute) {
+				list.Items = gentype.FromPointerSlice(items)
+			},
+		),
+		fake,
 	}
-	return obj.(*v1alpha2.UDPRoute), err
-}
-
-// List takes label and field selectors, and returns the list of UDPRoutes that match those selectors.
-func (c *FakeUDPRoutes) List(ctx context.Context, opts v1.ListOptions) (result *v1alpha2.UDPRouteList, err error) {
-	emptyResult := &v1alpha2.UDPRouteList{}
-	obj, err := c.Fake.
-		Invokes(testing.NewListActionWithOptions(udproutesResource, udproutesKind, c.ns, opts), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
-	}
-
-	label, _, _ := testing.ExtractFromListOptions(opts)
-	if label == nil {
-		label = labels.Everything()
-	}
-	list := &v1alpha2.UDPRouteList{ListMeta: obj.(*v1alpha2.UDPRouteList).ListMeta}
-	for _, item := range obj.(*v1alpha2.UDPRouteList).Items {
-		if label.Matches(labels.Set(item.Labels)) {
-			list.Items = append(list.Items, item)
-		}
-	}
-	return list, err
-}
-
-// Watch returns a watch.Interface that watches the requested uDPRoutes.
-func (c *FakeUDPRoutes) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
-	return c.Fake.
-		InvokesWatch(testing.NewWatchActionWithOptions(udproutesResource, c.ns, opts))
-
-}
-
-// Create takes the representation of a uDPRoute and creates it.  Returns the server's representation of the uDPRoute, and an error, if there is any.
-func (c *FakeUDPRoutes) Create(ctx context.Context, uDPRoute *v1alpha2.UDPRoute, opts v1.CreateOptions) (result *v1alpha2.UDPRoute, err error) {
-	emptyResult := &v1alpha2.UDPRoute{}
-	obj, err := c.Fake.
-		Invokes(testing.NewCreateActionWithOptions(udproutesResource, c.ns, uDPRoute, opts), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha2.UDPRoute), err
-}
-
-// Update takes the representation of a uDPRoute and updates it. Returns the server's representation of the uDPRoute, and an error, if there is any.
-func (c *FakeUDPRoutes) Update(ctx context.Context, uDPRoute *v1alpha2.UDPRoute, opts v1.UpdateOptions) (result *v1alpha2.UDPRoute, err error) {
-	emptyResult := &v1alpha2.UDPRoute{}
-	obj, err := c.Fake.
-		Invokes(testing.NewUpdateActionWithOptions(udproutesResource, c.ns, uDPRoute, opts), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha2.UDPRoute), err
-}
-
-// UpdateStatus was generated because the type contains a Status member.
-// Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-func (c *FakeUDPRoutes) UpdateStatus(ctx context.Context, uDPRoute *v1alpha2.UDPRoute, opts v1.UpdateOptions) (result *v1alpha2.UDPRoute, err error) {
-	emptyResult := &v1alpha2.UDPRoute{}
-	obj, err := c.Fake.
-		Invokes(testing.NewUpdateSubresourceActionWithOptions(udproutesResource, "status", c.ns, uDPRoute, opts), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha2.UDPRoute), err
-}
-
-// Delete takes name of the uDPRoute and deletes it. Returns an error if one occurs.
-func (c *FakeUDPRoutes) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
-	_, err := c.Fake.
-		Invokes(testing.NewDeleteActionWithOptions(udproutesResource, c.ns, name, opts), &v1alpha2.UDPRoute{})
-
-	return err
-}
-
-// DeleteCollection deletes a collection of objects.
-func (c *FakeUDPRoutes) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
-	action := testing.NewDeleteCollectionActionWithOptions(udproutesResource, c.ns, opts, listOpts)
-
-	_, err := c.Fake.Invokes(action, &v1alpha2.UDPRouteList{})
-	return err
-}
-
-// Patch applies the patch and returns the patched uDPRoute.
-func (c *FakeUDPRoutes) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha2.UDPRoute, err error) {
-	emptyResult := &v1alpha2.UDPRoute{}
-	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceActionWithOptions(udproutesResource, c.ns, name, pt, data, opts, subresources...), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha2.UDPRoute), err
-}
-
-// Apply takes the given apply declarative configuration, applies it and returns the applied uDPRoute.
-func (c *FakeUDPRoutes) Apply(ctx context.Context, uDPRoute *apisv1alpha2.UDPRouteApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha2.UDPRoute, err error) {
-	if uDPRoute == nil {
-		return nil, fmt.Errorf("uDPRoute provided to Apply must not be nil")
-	}
-	data, err := json.Marshal(uDPRoute)
-	if err != nil {
-		return nil, err
-	}
-	name := uDPRoute.Name
-	if name == nil {
-		return nil, fmt.Errorf("uDPRoute.Name must be provided to Apply")
-	}
-	emptyResult := &v1alpha2.UDPRoute{}
-	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceActionWithOptions(udproutesResource, c.ns, *name, types.ApplyPatchType, data, opts.ToPatchOptions()), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha2.UDPRoute), err
-}
-
-// ApplyStatus was generated because the type contains a Status member.
-// Add a +genclient:noStatus comment above the type to avoid generating ApplyStatus().
-func (c *FakeUDPRoutes) ApplyStatus(ctx context.Context, uDPRoute *apisv1alpha2.UDPRouteApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha2.UDPRoute, err error) {
-	if uDPRoute == nil {
-		return nil, fmt.Errorf("uDPRoute provided to Apply must not be nil")
-	}
-	data, err := json.Marshal(uDPRoute)
-	if err != nil {
-		return nil, err
-	}
-	name := uDPRoute.Name
-	if name == nil {
-		return nil, fmt.Errorf("uDPRoute.Name must be provided to Apply")
-	}
-	emptyResult := &v1alpha2.UDPRoute{}
-	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceActionWithOptions(udproutesResource, c.ns, *name, types.ApplyPatchType, data, opts.ToPatchOptions(), "status"), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha2.UDPRoute), err
 }

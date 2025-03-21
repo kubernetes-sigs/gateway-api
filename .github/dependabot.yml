@@ -54,7 +54,7 @@ updates:
 
   # Dependencies listed in requirements.txt
   - package-ecosystem: "pip"
-    directory: "/"
+    directory: "/hack/mkdocs/image"
     schedule:
       interval: "weekly"
     labels:

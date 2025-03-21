@@ -19,13 +19,13 @@ limitations under the License.
 package v1
 
 import (
-	v1 "sigs.k8s.io/gateway-api/apis/v1"
+	apisv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
 // HTTPRouteFilterApplyConfiguration represents a declarative configuration of the HTTPRouteFilter type for use
 // with apply.
 type HTTPRouteFilterApplyConfiguration struct {
-	Type                   *v1.HTTPRouteFilterType                      `json:"type,omitempty"`
+	Type                   *apisv1.HTTPRouteFilterType                  `json:"type,omitempty"`
 	RequestHeaderModifier  *HTTPHeaderFilterApplyConfiguration          `json:"requestHeaderModifier,omitempty"`
 	ResponseHeaderModifier *HTTPHeaderFilterApplyConfiguration          `json:"responseHeaderModifier,omitempty"`
 	RequestMirror          *HTTPRequestMirrorFilterApplyConfiguration   `json:"requestMirror,omitempty"`
@@ -44,7 +44,7 @@ func HTTPRouteFilter() *HTTPRouteFilterApplyConfiguration {
 // WithType sets the Type field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Type field is set to the value of the last call.
-func (b *HTTPRouteFilterApplyConfiguration) WithType(value v1.HTTPRouteFilterType) *HTTPRouteFilterApplyConfiguration {
+func (b *HTTPRouteFilterApplyConfiguration) WithType(value apisv1.HTTPRouteFilterType) *HTTPRouteFilterApplyConfiguration {
 	b.Type = &value
 	return b
 }

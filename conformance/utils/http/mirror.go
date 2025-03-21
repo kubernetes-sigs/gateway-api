@@ -62,7 +62,7 @@ func ExpectMirroredRequest(t *testing.T, client client.Client, clientset clients
 					}
 				}
 				return false
-			}, 60*time.Second, time.Millisecond*100, fmt.Sprintf(`Couldn't find mirrored request in "%s/%s" logs`, mirrorPod.Namespace, mirrorPod.Name))
+			}, 60*time.Second, time.Millisecond*100, `Couldn't find mirrored request in "%s/%s" logs`, mirrorPod.Namespace, mirrorPod.Name)
 		}(mirrorPod)
 	}
 

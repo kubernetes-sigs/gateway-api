@@ -19,15 +19,15 @@ limitations under the License.
 package v1
 
 import (
-	v1 "sigs.k8s.io/gateway-api/apis/v1"
+	apisv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
 // HTTPQueryParamMatchApplyConfiguration represents a declarative configuration of the HTTPQueryParamMatch type for use
 // with apply.
 type HTTPQueryParamMatchApplyConfiguration struct {
-	Type  *v1.QueryParamMatchType `json:"type,omitempty"`
-	Name  *v1.HTTPHeaderName      `json:"name,omitempty"`
-	Value *string                 `json:"value,omitempty"`
+	Type  *apisv1.QueryParamMatchType `json:"type,omitempty"`
+	Name  *apisv1.HTTPHeaderName      `json:"name,omitempty"`
+	Value *string                     `json:"value,omitempty"`
 }
 
 // HTTPQueryParamMatchApplyConfiguration constructs a declarative configuration of the HTTPQueryParamMatch type for use with
@@ -39,7 +39,7 @@ func HTTPQueryParamMatch() *HTTPQueryParamMatchApplyConfiguration {
 // WithType sets the Type field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Type field is set to the value of the last call.
-func (b *HTTPQueryParamMatchApplyConfiguration) WithType(value v1.QueryParamMatchType) *HTTPQueryParamMatchApplyConfiguration {
+func (b *HTTPQueryParamMatchApplyConfiguration) WithType(value apisv1.QueryParamMatchType) *HTTPQueryParamMatchApplyConfiguration {
 	b.Type = &value
 	return b
 }
@@ -47,7 +47,7 @@ func (b *HTTPQueryParamMatchApplyConfiguration) WithType(value v1.QueryParamMatc
 // WithName sets the Name field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Name field is set to the value of the last call.
-func (b *HTTPQueryParamMatchApplyConfiguration) WithName(value v1.HTTPHeaderName) *HTTPQueryParamMatchApplyConfiguration {
+func (b *HTTPQueryParamMatchApplyConfiguration) WithName(value apisv1.HTTPHeaderName) *HTTPQueryParamMatchApplyConfiguration {
 	b.Name = &value
 	return b
 }

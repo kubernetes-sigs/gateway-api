@@ -19,14 +19,14 @@ limitations under the License.
 package v1
 
 import (
-	v1 "sigs.k8s.io/gateway-api/apis/v1"
+	apisv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
 // RouteGroupKindApplyConfiguration represents a declarative configuration of the RouteGroupKind type for use
 // with apply.
 type RouteGroupKindApplyConfiguration struct {
-	Group *v1.Group `json:"group,omitempty"`
-	Kind  *v1.Kind  `json:"kind,omitempty"`
+	Group *apisv1.Group `json:"group,omitempty"`
+	Kind  *apisv1.Kind  `json:"kind,omitempty"`
 }
 
 // RouteGroupKindApplyConfiguration constructs a declarative configuration of the RouteGroupKind type for use with
@@ -38,7 +38,7 @@ func RouteGroupKind() *RouteGroupKindApplyConfiguration {
 // WithGroup sets the Group field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Group field is set to the value of the last call.
-func (b *RouteGroupKindApplyConfiguration) WithGroup(value v1.Group) *RouteGroupKindApplyConfiguration {
+func (b *RouteGroupKindApplyConfiguration) WithGroup(value apisv1.Group) *RouteGroupKindApplyConfiguration {
 	b.Group = &value
 	return b
 }
@@ -46,7 +46,7 @@ func (b *RouteGroupKindApplyConfiguration) WithGroup(value v1.Group) *RouteGroup
 // WithKind sets the Kind field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Kind field is set to the value of the last call.
-func (b *RouteGroupKindApplyConfiguration) WithKind(value v1.Kind) *RouteGroupKindApplyConfiguration {
+func (b *RouteGroupKindApplyConfiguration) WithKind(value apisv1.Kind) *RouteGroupKindApplyConfiguration {
 	b.Kind = &value
 	return b
 }

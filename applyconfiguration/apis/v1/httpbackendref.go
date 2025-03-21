@@ -39,7 +39,7 @@ func HTTPBackendRef() *HTTPBackendRefApplyConfiguration {
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Group field is set to the value of the last call.
 func (b *HTTPBackendRefApplyConfiguration) WithGroup(value apisv1.Group) *HTTPBackendRefApplyConfiguration {
-	b.Group = &value
+	b.BackendObjectReferenceApplyConfiguration.Group = &value
 	return b
 }
 
@@ -47,7 +47,7 @@ func (b *HTTPBackendRefApplyConfiguration) WithGroup(value apisv1.Group) *HTTPBa
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Kind field is set to the value of the last call.
 func (b *HTTPBackendRefApplyConfiguration) WithKind(value apisv1.Kind) *HTTPBackendRefApplyConfiguration {
-	b.Kind = &value
+	b.BackendObjectReferenceApplyConfiguration.Kind = &value
 	return b
 }
 
@@ -55,7 +55,7 @@ func (b *HTTPBackendRefApplyConfiguration) WithKind(value apisv1.Kind) *HTTPBack
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Name field is set to the value of the last call.
 func (b *HTTPBackendRefApplyConfiguration) WithName(value apisv1.ObjectName) *HTTPBackendRefApplyConfiguration {
-	b.Name = &value
+	b.BackendObjectReferenceApplyConfiguration.Name = &value
 	return b
 }
 
@@ -63,7 +63,7 @@ func (b *HTTPBackendRefApplyConfiguration) WithName(value apisv1.ObjectName) *HT
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Namespace field is set to the value of the last call.
 func (b *HTTPBackendRefApplyConfiguration) WithNamespace(value apisv1.Namespace) *HTTPBackendRefApplyConfiguration {
-	b.Namespace = &value
+	b.BackendObjectReferenceApplyConfiguration.Namespace = &value
 	return b
 }
 
@@ -71,7 +71,7 @@ func (b *HTTPBackendRefApplyConfiguration) WithNamespace(value apisv1.Namespace)
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Port field is set to the value of the last call.
 func (b *HTTPBackendRefApplyConfiguration) WithPort(value apisv1.PortNumber) *HTTPBackendRefApplyConfiguration {
-	b.Port = &value
+	b.BackendObjectReferenceApplyConfiguration.Port = &value
 	return b
 }
 
@@ -79,7 +79,7 @@ func (b *HTTPBackendRefApplyConfiguration) WithPort(value apisv1.PortNumber) *HT
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Weight field is set to the value of the last call.
 func (b *HTTPBackendRefApplyConfiguration) WithWeight(value int32) *HTTPBackendRefApplyConfiguration {
-	b.Weight = &value
+	b.BackendRefApplyConfiguration.Weight = &value
 	return b
 }
 
