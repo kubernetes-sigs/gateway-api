@@ -42,16 +42,20 @@ readonly API_PATHS=(apis apisx)
 
 GATEWAY_INPUT_DIRS_SPACE=""
 GATEWAY_INPUT_DIRS_COMMA=""
+GATEWAY_API_DIRS_COMMA=""
 
 for API_PATH in "${API_PATHS[@]}"; do
   VERSIONS=($(find ./${API_PATH} -maxdepth 1 -name "v*" -exec bash -c 'basename {}' \; | LC_ALL=C sort -u))
   for VERSION in "${VERSIONS[@]}"; do
     GATEWAY_INPUT_DIRS_SPACE+="${APIS_PKG}/${API_PATH}/${VERSION} "
     GATEWAY_INPUT_DIRS_COMMA+="${APIS_PKG}/${API_PATH}/${VERSION},"
+    GATEWAY_API_DIRS_COMMA+="${API_PATH}/${VERSION},"
   done
 done
+
 GATEWAY_INPUT_DIRS_SPACE="${GATEWAY_INPUT_DIRS_SPACE%,}" # drop trailing space
 GATEWAY_INPUT_DIRS_COMMA="${GATEWAY_INPUT_DIRS_COMMA%,}" # drop trailing comma
+GATEWAY_API_DIRS_COMMA="${GATEWAY_API_DIRS_COMMA%,}" # drop trailing comma
 
 # throw away
 new_report="$(mktemp -t "$(basename "$0").api_violations.XXXXXX")"
@@ -108,6 +112,12 @@ go run k8s.io/code-generator/cmd/register-gen \
   --output-file zz_generated.register.go \
   ${COMMON_FLAGS} \
   ${GATEWAY_INPUT_DIRS_SPACE}
+
+# This is an awful hack to make up for a deficiency in register-gen in k8s v1.32
+for input_dir in ${GATEWAY_API_DIRS_COMMA//,/ }
+do
+  sed -z -i 's|v1 "k8s.io/apimachinery/pkg/apis/meta/v1"\n|v1 "k8s.io/apimachinery/pkg/apis/meta/v1"\n\t"k8s.io/apimachinery/pkg/runtime"\n\t"k8s.io/apimachinery/pkg/runtime/schema"\n|' ${input_dir}/zz_generated.register.go
+done
 
 echo "Generating deepcopy"
 go run sigs.k8s.io/controller-tools/cmd/controller-gen \
