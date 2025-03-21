@@ -19,16 +19,16 @@ limitations under the License.
 package v1
 
 import (
-	v1 "sigs.k8s.io/gateway-api/apis/v1"
+	apisv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
 // HTTPRequestRedirectFilterApplyConfiguration represents a declarative configuration of the HTTPRequestRedirectFilter type for use
 // with apply.
 type HTTPRequestRedirectFilterApplyConfiguration struct {
 	Scheme     *string                             `json:"scheme,omitempty"`
-	Hostname   *v1.PreciseHostname                 `json:"hostname,omitempty"`
+	Hostname   *apisv1.PreciseHostname             `json:"hostname,omitempty"`
 	Path       *HTTPPathModifierApplyConfiguration `json:"path,omitempty"`
-	Port       *v1.PortNumber                      `json:"port,omitempty"`
+	Port       *apisv1.PortNumber                  `json:"port,omitempty"`
 	StatusCode *int                                `json:"statusCode,omitempty"`
 }
 
@@ -49,7 +49,7 @@ func (b *HTTPRequestRedirectFilterApplyConfiguration) WithScheme(value string) *
 // WithHostname sets the Hostname field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Hostname field is set to the value of the last call.
-func (b *HTTPRequestRedirectFilterApplyConfiguration) WithHostname(value v1.PreciseHostname) *HTTPRequestRedirectFilterApplyConfiguration {
+func (b *HTTPRequestRedirectFilterApplyConfiguration) WithHostname(value apisv1.PreciseHostname) *HTTPRequestRedirectFilterApplyConfiguration {
 	b.Hostname = &value
 	return b
 }
@@ -65,7 +65,7 @@ func (b *HTTPRequestRedirectFilterApplyConfiguration) WithPath(value *HTTPPathMo
 // WithPort sets the Port field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Port field is set to the value of the last call.
-func (b *HTTPRequestRedirectFilterApplyConfiguration) WithPort(value v1.PortNumber) *HTTPRequestRedirectFilterApplyConfiguration {
+func (b *HTTPRequestRedirectFilterApplyConfiguration) WithPort(value apisv1.PortNumber) *HTTPRequestRedirectFilterApplyConfiguration {
 	b.Port = &value
 	return b
 }

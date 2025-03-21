@@ -29,7 +29,7 @@ type FakeGatewayV1alpha3 struct {
 }
 
 func (c *FakeGatewayV1alpha3) BackendTLSPolicies(namespace string) v1alpha3.BackendTLSPolicyInterface {
-	return &FakeBackendTLSPolicies{c, namespace}
+	return newFakeBackendTLSPolicies(c, namespace)
 }
 
 // RESTClient returns a RESTClient that is used to communicate

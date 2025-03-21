@@ -44,7 +44,7 @@ func (b *HTTPRouteSpecApplyConfiguration) WithParentRefs(values ...*ParentRefere
 		if values[i] == nil {
 			panic("nil value passed to WithParentRefs")
 		}
-		b.ParentRefs = append(b.ParentRefs, *values[i])
+		b.CommonRouteSpecApplyConfiguration.ParentRefs = append(b.CommonRouteSpecApplyConfiguration.ParentRefs, *values[i])
 	}
 	return b
 }

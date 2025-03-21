@@ -29,23 +29,23 @@ type FakeGatewayV1alpha2 struct {
 }
 
 func (c *FakeGatewayV1alpha2) GRPCRoutes(namespace string) v1alpha2.GRPCRouteInterface {
-	return &FakeGRPCRoutes{c, namespace}
+	return newFakeGRPCRoutes(c, namespace)
 }
 
 func (c *FakeGatewayV1alpha2) ReferenceGrants(namespace string) v1alpha2.ReferenceGrantInterface {
-	return &FakeReferenceGrants{c, namespace}
+	return newFakeReferenceGrants(c, namespace)
 }
 
 func (c *FakeGatewayV1alpha2) TCPRoutes(namespace string) v1alpha2.TCPRouteInterface {
-	return &FakeTCPRoutes{c, namespace}
+	return newFakeTCPRoutes(c, namespace)
 }
 
 func (c *FakeGatewayV1alpha2) TLSRoutes(namespace string) v1alpha2.TLSRouteInterface {
-	return &FakeTLSRoutes{c, namespace}
+	return newFakeTLSRoutes(c, namespace)
 }
 
 func (c *FakeGatewayV1alpha2) UDPRoutes(namespace string) v1alpha2.UDPRouteInterface {
-	return &FakeUDPRoutes{c, namespace}
+	return newFakeUDPRoutes(c, namespace)
 }
 
 // RESTClient returns a RESTClient that is used to communicate

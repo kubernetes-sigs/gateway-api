@@ -39,7 +39,7 @@ func LocalPolicyTargetReferenceWithSectionName() *LocalPolicyTargetReferenceWith
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Group field is set to the value of the last call.
 func (b *LocalPolicyTargetReferenceWithSectionNameApplyConfiguration) WithGroup(value v1.Group) *LocalPolicyTargetReferenceWithSectionNameApplyConfiguration {
-	b.Group = &value
+	b.LocalPolicyTargetReferenceApplyConfiguration.Group = &value
 	return b
 }
 
@@ -47,7 +47,7 @@ func (b *LocalPolicyTargetReferenceWithSectionNameApplyConfiguration) WithGroup(
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Kind field is set to the value of the last call.
 func (b *LocalPolicyTargetReferenceWithSectionNameApplyConfiguration) WithKind(value v1.Kind) *LocalPolicyTargetReferenceWithSectionNameApplyConfiguration {
-	b.Kind = &value
+	b.LocalPolicyTargetReferenceApplyConfiguration.Kind = &value
 	return b
 }
 
@@ -55,7 +55,7 @@ func (b *LocalPolicyTargetReferenceWithSectionNameApplyConfiguration) WithKind(v
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Name field is set to the value of the last call.
 func (b *LocalPolicyTargetReferenceWithSectionNameApplyConfiguration) WithName(value v1.ObjectName) *LocalPolicyTargetReferenceWithSectionNameApplyConfiguration {
-	b.Name = &value
+	b.LocalPolicyTargetReferenceApplyConfiguration.Name = &value
 	return b
 }
 

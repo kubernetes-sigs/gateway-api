@@ -19,10 +19,10 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"k8s.io/apimachinery/pkg/labels"
-	"k8s.io/client-go/listers"
-	"k8s.io/client-go/tools/cache"
-	v1alpha1 "sigs.k8s.io/gateway-api/apisx/v1alpha1"
+	labels "k8s.io/apimachinery/pkg/labels"
+	listers "k8s.io/client-go/listers"
+	cache "k8s.io/client-go/tools/cache"
+	apisxv1alpha1 "sigs.k8s.io/gateway-api/apisx/v1alpha1"
 )
 
 // XListenerSetLister helps list XListenerSets.
@@ -30,7 +30,7 @@ import (
 type XListenerSetLister interface {
 	// List lists all XListenerSets in the indexer.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1alpha1.XListenerSet, err error)
+	List(selector labels.Selector) (ret []*apisxv1alpha1.XListenerSet, err error)
 	// XListenerSets returns an object that can list and get XListenerSets.
 	XListenerSets(namespace string) XListenerSetNamespaceLister
 	XListenerSetListerExpansion
@@ -38,17 +38,17 @@ type XListenerSetLister interface {
 
 // xListenerSetLister implements the XListenerSetLister interface.
 type xListenerSetLister struct {
-	listers.ResourceIndexer[*v1alpha1.XListenerSet]
+	listers.ResourceIndexer[*apisxv1alpha1.XListenerSet]
 }
 
 // NewXListenerSetLister returns a new XListenerSetLister.
 func NewXListenerSetLister(indexer cache.Indexer) XListenerSetLister {
-	return &xListenerSetLister{listers.New[*v1alpha1.XListenerSet](indexer, v1alpha1.Resource("xlistenerset"))}
+	return &xListenerSetLister{listers.New[*apisxv1alpha1.XListenerSet](indexer, apisxv1alpha1.Resource("xlistenerset"))}
 }
 
 // XListenerSets returns an object that can list and get XListenerSets.
 func (s *xListenerSetLister) XListenerSets(namespace string) XListenerSetNamespaceLister {
-	return xListenerSetNamespaceLister{listers.NewNamespaced[*v1alpha1.XListenerSet](s.ResourceIndexer, namespace)}
+	return xListenerSetNamespaceLister{listers.NewNamespaced[*apisxv1alpha1.XListenerSet](s.ResourceIndexer, namespace)}
 }
 
 // XListenerSetNamespaceLister helps list and get XListenerSets.
@@ -56,15 +56,15 @@ func (s *xListenerSetLister) XListenerSets(namespace string) XListenerSetNamespa
 type XListenerSetNamespaceLister interface {
 	// List lists all XListenerSets in the indexer for a given namespace.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1alpha1.XListenerSet, err error)
+	List(selector labels.Selector) (ret []*apisxv1alpha1.XListenerSet, err error)
 	// Get retrieves the XListenerSet from the indexer for a given namespace and name.
 	// Objects returned here must be treated as read-only.
-	Get(name string) (*v1alpha1.XListenerSet, error)
+	Get(name string) (*apisxv1alpha1.XListenerSet, error)
 	XListenerSetNamespaceListerExpansion
 }
 
 // xListenerSetNamespaceLister implements the XListenerSetNamespaceLister
 // interface.
 type xListenerSetNamespaceLister struct {
-	listers.ResourceIndexer[*v1alpha1.XListenerSet]
+	listers.ResourceIndexer[*apisxv1alpha1.XListenerSet]
 }

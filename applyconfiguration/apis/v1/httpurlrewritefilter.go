@@ -19,13 +19,13 @@ limitations under the License.
 package v1
 
 import (
-	v1 "sigs.k8s.io/gateway-api/apis/v1"
+	apisv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
 // HTTPURLRewriteFilterApplyConfiguration represents a declarative configuration of the HTTPURLRewriteFilter type for use
 // with apply.
 type HTTPURLRewriteFilterApplyConfiguration struct {
-	Hostname *v1.PreciseHostname                 `json:"hostname,omitempty"`
+	Hostname *apisv1.PreciseHostname             `json:"hostname,omitempty"`
 	Path     *HTTPPathModifierApplyConfiguration `json:"path,omitempty"`
 }
 
@@ -38,7 +38,7 @@ func HTTPURLRewriteFilter() *HTTPURLRewriteFilterApplyConfiguration {
 // WithHostname sets the Hostname field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Hostname field is set to the value of the last call.
-func (b *HTTPURLRewriteFilterApplyConfiguration) WithHostname(value v1.PreciseHostname) *HTTPURLRewriteFilterApplyConfiguration {
+func (b *HTTPURLRewriteFilterApplyConfiguration) WithHostname(value apisv1.PreciseHostname) *HTTPURLRewriteFilterApplyConfiguration {
 	b.Hostname = &value
 	return b
 }

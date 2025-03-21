@@ -19,15 +19,15 @@ limitations under the License.
 package v1
 
 import (
-	v1 "sigs.k8s.io/gateway-api/apis/v1"
+	apisv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
 // HTTPRouteRetryApplyConfiguration represents a declarative configuration of the HTTPRouteRetry type for use
 // with apply.
 type HTTPRouteRetryApplyConfiguration struct {
-	Codes    []v1.HTTPRouteRetryStatusCode `json:"codes,omitempty"`
-	Attempts *int                          `json:"attempts,omitempty"`
-	Backoff  *v1.Duration                  `json:"backoff,omitempty"`
+	Codes    []apisv1.HTTPRouteRetryStatusCode `json:"codes,omitempty"`
+	Attempts *int                              `json:"attempts,omitempty"`
+	Backoff  *apisv1.Duration                  `json:"backoff,omitempty"`
 }
 
 // HTTPRouteRetryApplyConfiguration constructs a declarative configuration of the HTTPRouteRetry type for use with
@@ -39,7 +39,7 @@ func HTTPRouteRetry() *HTTPRouteRetryApplyConfiguration {
 // WithCodes adds the given value to the Codes field in the declarative configuration
 // and returns the receiver, so that objects can be build by chaining "With" function invocations.
 // If called multiple times, values provided by each call will be appended to the Codes field.
-func (b *HTTPRouteRetryApplyConfiguration) WithCodes(values ...v1.HTTPRouteRetryStatusCode) *HTTPRouteRetryApplyConfiguration {
+func (b *HTTPRouteRetryApplyConfiguration) WithCodes(values ...apisv1.HTTPRouteRetryStatusCode) *HTTPRouteRetryApplyConfiguration {
 	for i := range values {
 		b.Codes = append(b.Codes, values[i])
 	}
@@ -57,7 +57,7 @@ func (b *HTTPRouteRetryApplyConfiguration) WithAttempts(value int) *HTTPRouteRet
 // WithBackoff sets the Backoff field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Backoff field is set to the value of the last call.
-func (b *HTTPRouteRetryApplyConfiguration) WithBackoff(value v1.Duration) *HTTPRouteRetryApplyConfiguration {
+func (b *HTTPRouteRetryApplyConfiguration) WithBackoff(value apisv1.Duration) *HTTPRouteRetryApplyConfiguration {
 	b.Backoff = &value
 	return b
 }

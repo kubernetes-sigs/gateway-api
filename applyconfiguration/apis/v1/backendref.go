@@ -39,7 +39,7 @@ func BackendRef() *BackendRefApplyConfiguration {
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Group field is set to the value of the last call.
 func (b *BackendRefApplyConfiguration) WithGroup(value apisv1.Group) *BackendRefApplyConfiguration {
-	b.Group = &value
+	b.BackendObjectReferenceApplyConfiguration.Group = &value
 	return b
 }
 
@@ -47,7 +47,7 @@ func (b *BackendRefApplyConfiguration) WithGroup(value apisv1.Group) *BackendRef
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Kind field is set to the value of the last call.
 func (b *BackendRefApplyConfiguration) WithKind(value apisv1.Kind) *BackendRefApplyConfiguration {
-	b.Kind = &value
+	b.BackendObjectReferenceApplyConfiguration.Kind = &value
 	return b
 }
 
@@ -55,7 +55,7 @@ func (b *BackendRefApplyConfiguration) WithKind(value apisv1.Kind) *BackendRefAp
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Name field is set to the value of the last call.
 func (b *BackendRefApplyConfiguration) WithName(value apisv1.ObjectName) *BackendRefApplyConfiguration {
-	b.Name = &value
+	b.BackendObjectReferenceApplyConfiguration.Name = &value
 	return b
 }
 
@@ -63,7 +63,7 @@ func (b *BackendRefApplyConfiguration) WithName(value apisv1.ObjectName) *Backen
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Namespace field is set to the value of the last call.
 func (b *BackendRefApplyConfiguration) WithNamespace(value apisv1.Namespace) *BackendRefApplyConfiguration {
-	b.Namespace = &value
+	b.BackendObjectReferenceApplyConfiguration.Namespace = &value
 	return b
 }
 
@@ -71,7 +71,7 @@ func (b *BackendRefApplyConfiguration) WithNamespace(value apisv1.Namespace) *Ba
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Port field is set to the value of the last call.
 func (b *BackendRefApplyConfiguration) WithPort(value apisv1.PortNumber) *BackendRefApplyConfiguration {
-	b.Port = &value
+	b.BackendObjectReferenceApplyConfiguration.Port = &value
 	return b
 }
 

@@ -19,14 +19,14 @@ limitations under the License.
 package v1
 
 import (
-	v1 "sigs.k8s.io/gateway-api/apis/v1"
+	apisv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
 // GatewayStatusAddressApplyConfiguration represents a declarative configuration of the GatewayStatusAddress type for use
 // with apply.
 type GatewayStatusAddressApplyConfiguration struct {
-	Type  *v1.AddressType `json:"type,omitempty"`
-	Value *string         `json:"value,omitempty"`
+	Type  *apisv1.AddressType `json:"type,omitempty"`
+	Value *string             `json:"value,omitempty"`
 }
 
 // GatewayStatusAddressApplyConfiguration constructs a declarative configuration of the GatewayStatusAddress type for use with
@@ -38,7 +38,7 @@ func GatewayStatusAddress() *GatewayStatusAddressApplyConfiguration {
 // WithType sets the Type field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Type field is set to the value of the last call.
-func (b *GatewayStatusAddressApplyConfiguration) WithType(value v1.AddressType) *GatewayStatusAddressApplyConfiguration {
+func (b *GatewayStatusAddressApplyConfiguration) WithType(value apisv1.AddressType) *GatewayStatusAddressApplyConfiguration {
 	b.Type = &value
 	return b
 }

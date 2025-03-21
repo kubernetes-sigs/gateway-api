@@ -42,7 +42,7 @@ func (b *TLSRouteStatusApplyConfiguration) WithParents(values ...*v1.RouteParent
 		if values[i] == nil {
 			panic("nil value passed to WithParents")
 		}
-		b.Parents = append(b.Parents, *values[i])
+		b.RouteStatusApplyConfiguration.Parents = append(b.RouteStatusApplyConfiguration.Parents, *values[i])
 	}
 	return b
 }

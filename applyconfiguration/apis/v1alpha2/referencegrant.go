@@ -23,7 +23,7 @@ import (
 	types "k8s.io/apimachinery/pkg/types"
 	managedfields "k8s.io/apimachinery/pkg/util/managedfields"
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
-	v1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
+	apisv1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
 	v1beta1 "sigs.k8s.io/gateway-api/applyconfiguration/apis/v1beta1"
 	internal "sigs.k8s.io/gateway-api/applyconfiguration/internal"
 )
@@ -58,18 +58,18 @@ func ReferenceGrant(name, namespace string) *ReferenceGrantApplyConfiguration {
 // Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
 // applied if another fieldManager has updated or force applied any of the previously applied fields.
 // Experimental!
-func ExtractReferenceGrant(referenceGrant *v1alpha2.ReferenceGrant, fieldManager string) (*ReferenceGrantApplyConfiguration, error) {
+func ExtractReferenceGrant(referenceGrant *apisv1alpha2.ReferenceGrant, fieldManager string) (*ReferenceGrantApplyConfiguration, error) {
 	return extractReferenceGrant(referenceGrant, fieldManager, "")
 }
 
 // ExtractReferenceGrantStatus is the same as ExtractReferenceGrant except
 // that it extracts the status subresource applied configuration.
 // Experimental!
-func ExtractReferenceGrantStatus(referenceGrant *v1alpha2.ReferenceGrant, fieldManager string) (*ReferenceGrantApplyConfiguration, error) {
+func ExtractReferenceGrantStatus(referenceGrant *apisv1alpha2.ReferenceGrant, fieldManager string) (*ReferenceGrantApplyConfiguration, error) {
 	return extractReferenceGrant(referenceGrant, fieldManager, "status")
 }
 
-func extractReferenceGrant(referenceGrant *v1alpha2.ReferenceGrant, fieldManager string, subresource string) (*ReferenceGrantApplyConfiguration, error) {
+func extractReferenceGrant(referenceGrant *apisv1alpha2.ReferenceGrant, fieldManager string, subresource string) (*ReferenceGrantApplyConfiguration, error) {
 	b := &ReferenceGrantApplyConfiguration{}
 	err := managedfields.ExtractInto(referenceGrant, internal.Parser().Type("io.k8s.sigs.gateway-api.apis.v1alpha2.ReferenceGrant"), fieldManager, b, subresource)
 	if err != nil {
@@ -87,7 +87,7 @@ func extractReferenceGrant(referenceGrant *v1alpha2.ReferenceGrant, fieldManager
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Kind field is set to the value of the last call.
 func (b *ReferenceGrantApplyConfiguration) WithKind(value string) *ReferenceGrantApplyConfiguration {
-	b.Kind = &value
+	b.TypeMetaApplyConfiguration.Kind = &value
 	return b
 }
 
@@ -95,7 +95,7 @@ func (b *ReferenceGrantApplyConfiguration) WithKind(value string) *ReferenceGran
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the APIVersion field is set to the value of the last call.
 func (b *ReferenceGrantApplyConfiguration) WithAPIVersion(value string) *ReferenceGrantApplyConfiguration {
-	b.APIVersion = &value
+	b.TypeMetaApplyConfiguration.APIVersion = &value
 	return b
 }
 
@@ -104,7 +104,7 @@ func (b *ReferenceGrantApplyConfiguration) WithAPIVersion(value string) *Referen
 // If called multiple times, the Name field is set to the value of the last call.
 func (b *ReferenceGrantApplyConfiguration) WithName(value string) *ReferenceGrantApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.Name = &value
+	b.ObjectMetaApplyConfiguration.Name = &value
 	return b
 }
 
@@ -113,7 +113,7 @@ func (b *ReferenceGrantApplyConfiguration) WithName(value string) *ReferenceGran
 // If called multiple times, the GenerateName field is set to the value of the last call.
 func (b *ReferenceGrantApplyConfiguration) WithGenerateName(value string) *ReferenceGrantApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.GenerateName = &value
+	b.ObjectMetaApplyConfiguration.GenerateName = &value
 	return b
 }
 
@@ -122,7 +122,7 @@ func (b *ReferenceGrantApplyConfiguration) WithGenerateName(value string) *Refer
 // If called multiple times, the Namespace field is set to the value of the last call.
 func (b *ReferenceGrantApplyConfiguration) WithNamespace(value string) *ReferenceGrantApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.Namespace = &value
+	b.ObjectMetaApplyConfiguration.Namespace = &value
 	return b
 }
 
@@ -131,7 +131,7 @@ func (b *ReferenceGrantApplyConfiguration) WithNamespace(value string) *Referenc
 // If called multiple times, the UID field is set to the value of the last call.
 func (b *ReferenceGrantApplyConfiguration) WithUID(value types.UID) *ReferenceGrantApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.UID = &value
+	b.ObjectMetaApplyConfiguration.UID = &value
 	return b
 }
 
@@ -140,7 +140,7 @@ func (b *ReferenceGrantApplyConfiguration) WithUID(value types.UID) *ReferenceGr
 // If called multiple times, the ResourceVersion field is set to the value of the last call.
 func (b *ReferenceGrantApplyConfiguration) WithResourceVersion(value string) *ReferenceGrantApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.ResourceVersion = &value
+	b.ObjectMetaApplyConfiguration.ResourceVersion = &value
 	return b
 }
 
@@ -149,7 +149,7 @@ func (b *ReferenceGrantApplyConfiguration) WithResourceVersion(value string) *Re
 // If called multiple times, the Generation field is set to the value of the last call.
 func (b *ReferenceGrantApplyConfiguration) WithGeneration(value int64) *ReferenceGrantApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.Generation = &value
+	b.ObjectMetaApplyConfiguration.Generation = &value
 	return b
 }
 
@@ -158,7 +158,7 @@ func (b *ReferenceGrantApplyConfiguration) WithGeneration(value int64) *Referenc
 // If called multiple times, the CreationTimestamp field is set to the value of the last call.
 func (b *ReferenceGrantApplyConfiguration) WithCreationTimestamp(value metav1.Time) *ReferenceGrantApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.CreationTimestamp = &value
+	b.ObjectMetaApplyConfiguration.CreationTimestamp = &value
 	return b
 }
 
@@ -167,7 +167,7 @@ func (b *ReferenceGrantApplyConfiguration) WithCreationTimestamp(value metav1.Ti
 // If called multiple times, the DeletionTimestamp field is set to the value of the last call.
 func (b *ReferenceGrantApplyConfiguration) WithDeletionTimestamp(value metav1.Time) *ReferenceGrantApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.DeletionTimestamp = &value
+	b.ObjectMetaApplyConfiguration.DeletionTimestamp = &value
 	return b
 }
 
@@ -176,7 +176,7 @@ func (b *ReferenceGrantApplyConfiguration) WithDeletionTimestamp(value metav1.Ti
 // If called multiple times, the DeletionGracePeriodSeconds field is set to the value of the last call.
 func (b *ReferenceGrantApplyConfiguration) WithDeletionGracePeriodSeconds(value int64) *ReferenceGrantApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.DeletionGracePeriodSeconds = &value
+	b.ObjectMetaApplyConfiguration.DeletionGracePeriodSeconds = &value
 	return b
 }
 
@@ -186,11 +186,11 @@ func (b *ReferenceGrantApplyConfiguration) WithDeletionGracePeriodSeconds(value 
 // overwriting an existing map entries in Labels field with the same key.
 func (b *ReferenceGrantApplyConfiguration) WithLabels(entries map[string]string) *ReferenceGrantApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	if b.Labels == nil && len(entries) > 0 {
-		b.Labels = make(map[string]string, len(entries))
+	if b.ObjectMetaApplyConfiguration.Labels == nil && len(entries) > 0 {
+		b.ObjectMetaApplyConfiguration.Labels = make(map[string]string, len(entries))
 	}
 	for k, v := range entries {
-		b.Labels[k] = v
+		b.ObjectMetaApplyConfiguration.Labels[k] = v
 	}
 	return b
 }
@@ -201,11 +201,11 @@ func (b *ReferenceGrantApplyConfiguration) WithLabels(entries map[string]string)
 // overwriting an existing map entries in Annotations field with the same key.
 func (b *ReferenceGrantApplyConfiguration) WithAnnotations(entries map[string]string) *ReferenceGrantApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	if b.Annotations == nil && len(entries) > 0 {
-		b.Annotations = make(map[string]string, len(entries))
+	if b.ObjectMetaApplyConfiguration.Annotations == nil && len(entries) > 0 {
+		b.ObjectMetaApplyConfiguration.Annotations = make(map[string]string, len(entries))
 	}
 	for k, v := range entries {
-		b.Annotations[k] = v
+		b.ObjectMetaApplyConfiguration.Annotations[k] = v
 	}
 	return b
 }
@@ -219,7 +219,7 @@ func (b *ReferenceGrantApplyConfiguration) WithOwnerReferences(values ...*v1.Own
 		if values[i] == nil {
 			panic("nil value passed to WithOwnerReferences")
 		}
-		b.OwnerReferences = append(b.OwnerReferences, *values[i])
+		b.ObjectMetaApplyConfiguration.OwnerReferences = append(b.ObjectMetaApplyConfiguration.OwnerReferences, *values[i])
 	}
 	return b
 }
@@ -230,7 +230,7 @@ func (b *ReferenceGrantApplyConfiguration) WithOwnerReferences(values ...*v1.Own
 func (b *ReferenceGrantApplyConfiguration) WithFinalizers(values ...string) *ReferenceGrantApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
 	for i := range values {
-		b.Finalizers = append(b.Finalizers, values[i])
+		b.ObjectMetaApplyConfiguration.Finalizers = append(b.ObjectMetaApplyConfiguration.Finalizers, values[i])
 	}
 	return b
 }
@@ -252,5 +252,5 @@ func (b *ReferenceGrantApplyConfiguration) WithSpec(value *v1beta1.ReferenceGran
 // GetName retrieves the value of the Name field in the declarative configuration.
 func (b *ReferenceGrantApplyConfiguration) GetName() *string {
 	b.ensureObjectMetaApplyConfigurationExists()
-	return b.Name
+	return b.ObjectMetaApplyConfiguration.Name
 }

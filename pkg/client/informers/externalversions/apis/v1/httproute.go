@@ -19,24 +19,24 @@ limitations under the License.
 package v1
 
 import (
-	"context"
+	context "context"
 	time "time"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	watch "k8s.io/apimachinery/pkg/watch"
 	cache "k8s.io/client-go/tools/cache"
-	apisv1 "sigs.k8s.io/gateway-api/apis/v1"
+	gatewayapiapisv1 "sigs.k8s.io/gateway-api/apis/v1"
 	versioned "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned"
 	internalinterfaces "sigs.k8s.io/gateway-api/pkg/client/informers/externalversions/internalinterfaces"
-	v1 "sigs.k8s.io/gateway-api/pkg/client/listers/apis/v1"
+	apisv1 "sigs.k8s.io/gateway-api/pkg/client/listers/apis/v1"
 )
 
 // HTTPRouteInformer provides access to a shared informer and lister for
 // HTTPRoutes.
 type HTTPRouteInformer interface {
 	Informer() cache.SharedIndexInformer
-	Lister() v1.HTTPRouteLister
+	Lister() apisv1.HTTPRouteLister
 }
 
 type hTTPRouteInformer struct {
@@ -71,7 +71,7 @@ func NewFilteredHTTPRouteInformer(client versioned.Interface, namespace string, 
 				return client.GatewayV1().HTTPRoutes(namespace).Watch(context.TODO(), options)
 			},
 		},
-		&apisv1.HTTPRoute{},
+		&gatewayapiapisv1.HTTPRoute{},
 		resyncPeriod,
 		indexers,
 	)
@@ -82,9 +82,9 @@ func (f *hTTPRouteInformer) defaultInformer(client versioned.Interface, resyncPe
 }
 
 func (f *hTTPRouteInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&apisv1.HTTPRoute{}, f.defaultInformer)
+	return f.factory.InformerFor(&gatewayapiapisv1.HTTPRoute{}, f.defaultInformer)
 }
 
-func (f *hTTPRouteInformer) Lister() v1.HTTPRouteLister {
-	return v1.NewHTTPRouteLister(f.Informer().GetIndexer())
+func (f *hTTPRouteInformer) Lister() apisv1.HTTPRouteLister {
+	return apisv1.NewHTTPRouteLister(f.Informer().GetIndexer())
 }

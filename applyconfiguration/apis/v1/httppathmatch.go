@@ -19,14 +19,14 @@ limitations under the License.
 package v1
 
 import (
-	v1 "sigs.k8s.io/gateway-api/apis/v1"
+	apisv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
 // HTTPPathMatchApplyConfiguration represents a declarative configuration of the HTTPPathMatch type for use
 // with apply.
 type HTTPPathMatchApplyConfiguration struct {
-	Type  *v1.PathMatchType `json:"type,omitempty"`
-	Value *string           `json:"value,omitempty"`
+	Type  *apisv1.PathMatchType `json:"type,omitempty"`
+	Value *string               `json:"value,omitempty"`
 }
 
 // HTTPPathMatchApplyConfiguration constructs a declarative configuration of the HTTPPathMatch type for use with
@@ -38,7 +38,7 @@ func HTTPPathMatch() *HTTPPathMatchApplyConfiguration {
 // WithType sets the Type field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Type field is set to the value of the last call.
-func (b *HTTPPathMatchApplyConfiguration) WithType(value v1.PathMatchType) *HTTPPathMatchApplyConfiguration {
+func (b *HTTPPathMatchApplyConfiguration) WithType(value apisv1.PathMatchType) *HTTPPathMatchApplyConfiguration {
 	b.Type = &value
 	return b
 }

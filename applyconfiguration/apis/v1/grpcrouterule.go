@@ -19,13 +19,13 @@ limitations under the License.
 package v1
 
 import (
-	v1 "sigs.k8s.io/gateway-api/apis/v1"
+	apisv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
 // GRPCRouteRuleApplyConfiguration represents a declarative configuration of the GRPCRouteRule type for use
 // with apply.
 type GRPCRouteRuleApplyConfiguration struct {
-	Name               *v1.SectionName                       `json:"name,omitempty"`
+	Name               *apisv1.SectionName                   `json:"name,omitempty"`
 	Matches            []GRPCRouteMatchApplyConfiguration    `json:"matches,omitempty"`
 	Filters            []GRPCRouteFilterApplyConfiguration   `json:"filters,omitempty"`
 	BackendRefs        []GRPCBackendRefApplyConfiguration    `json:"backendRefs,omitempty"`
@@ -41,7 +41,7 @@ func GRPCRouteRule() *GRPCRouteRuleApplyConfiguration {
 // WithName sets the Name field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Name field is set to the value of the last call.
-func (b *GRPCRouteRuleApplyConfiguration) WithName(value v1.SectionName) *GRPCRouteRuleApplyConfiguration {
+func (b *GRPCRouteRuleApplyConfiguration) WithName(value apisv1.SectionName) *GRPCRouteRuleApplyConfiguration {
 	b.Name = &value
 	return b
 }
