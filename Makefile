@@ -167,7 +167,8 @@ build-docs:
 	docker run --rm -v ${PWD}:/docs gaie/mkdocs build
 
 .PHONY: build-docs-netlify
-build-docs-netlify: api-ref-docs
+build-docs-netlify:
+	hack/mkdocs/generate.sh
 	pip install -r hack/mkdocs/image/requirements.txt
 	python -m mkdocs build
 
