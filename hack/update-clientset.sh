@@ -113,12 +113,6 @@ go run k8s.io/code-generator/cmd/register-gen \
   ${COMMON_FLAGS} \
   ${GATEWAY_INPUT_DIRS_SPACE}
 
-# This is an awful hack to make up for a deficiency in register-gen in k8s v1.32
-for input_dir in ${GATEWAY_API_DIRS_COMMA//,/ }
-do
-  sed -z -i 's|v1 "k8s.io/apimachinery/pkg/apis/meta/v1"\n|v1 "k8s.io/apimachinery/pkg/apis/meta/v1"\n\t"k8s.io/apimachinery/pkg/runtime"\n\t"k8s.io/apimachinery/pkg/runtime/schema"\n|' ${input_dir}/zz_generated.register.go
-done
-
 echo "Generating deepcopy"
 go run sigs.k8s.io/controller-tools/cmd/controller-gen \
   object:headerFile=${SCRIPT_ROOT}/hack/boilerplate/boilerplate.generatego.txt \
