@@ -184,3 +184,8 @@ api-ref-docs:
 		--config=crd-ref-docs.yaml \
 		--renderer=markdown \
 		--output-path=${PWD}/site-src/reference/spec.md
+	crd-ref-docs \
+		--source-path=${PWD}/apisx \
+		--config=crd-ref-docs.yaml \
+		--renderer=markdown \
+		--output-path=${PWD}/site-src/reference/specx.md
