@@ -87,11 +87,10 @@ var (
 		Name:    SupportGatewayInfrastructurePropagation,
 		Channel: FeatureChannelStandard,
 	}
-
 	// GatewayAddressEmptyFeature contains metadata for the SupportGatewayAddressEmpty feature.
 	GatewayEmptyAddressFeature = Feature{
 		Name:    SupportGatewayAddressEmpty,
-		Channel: FeatureChannelExperimental,
+		Channel: FeatureChannelStandard,
 	}
 )
 
