@@ -85,7 +85,7 @@ var (
 	// GatewayInfrastructurePropagationFeature contains metadata for the GatewayInfrastructurePropagation feature.
 	GatewayInfrastructurePropagationFeature = Feature{
 		Name:    SupportGatewayInfrastructurePropagation,
-		Channel: FeatureChannelExperimental,
+		Channel: FeatureChannelStandard,
 	}
 
 	// GatewayAddressEmptyFeature contains metadata for the SupportGatewayAddressEmpty feature.
