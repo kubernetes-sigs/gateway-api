@@ -25,7 +25,8 @@ The following repositories are covered by this doc:
 
 * [kubernetes-sigs/gateway-api](https://github.com/kubernetes-sigs/gateway-api)
 * [kubernetes-sigs/ingress2gateway](https://github.com/kubernetes-sigs/ingress2gateway)
-* kubernetes-sigs/blixt (once migration is complete)
+* [kubernetes-sigs/gwctl](https://github.com/kubernetes-sigs/gwctl)
+* [kubernetes-sigs/blixt](https://github.com/kubernetes-sigs/blixt)
 
 Within each of these projects, there are opportunities to become an approver or
 reviewer for either the entire project, or a subset of that project. For
