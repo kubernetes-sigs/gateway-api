@@ -72,13 +72,14 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 	namespaceAnnotations := suite.ParseKeyValuePairs(*flags.NamespaceAnnotations)
 	conformanceProfiles := suite.ParseConformanceProfiles(*flags.ConformanceProfiles)
 
-	implementation := suite.ParseImplementation(
+	implementation, err := suite.ParseImplementation(
 		*flags.ImplementationOrganization,
 		*flags.ImplementationProject,
 		*flags.ImplementationURL,
 		*flags.ImplementationVersion,
 		*flags.ImplementationContact,
 	)
+	require.NoError(t, err, "error parsing implementation details")
 
 	return suite.ConformanceOptions{
 		AllowCRDsMismatch:          *flags.AllowCRDsMismatch,
@@ -92,7 +93,7 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 		ExemptFeatures:             exemptFeatures,
 		ManifestFS:                 []fs.FS{&Manifests},
 		GatewayClassName:           *flags.GatewayClassName,
-		Implementation:             implementation,
+		Implementation:             *implementation,
 		Mode:                       *flags.Mode,
 		NamespaceAnnotations:       namespaceAnnotations,
 		NamespaceLabels:            namespaceLabels,
