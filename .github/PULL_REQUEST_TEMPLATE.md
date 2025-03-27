@@ -35,7 +35,8 @@ Optionally add one or more of the following kinds if applicable:
 /kind failing-test
 /kind flake
 /kind regression
-/area conformance
+/area conformance-test
+/area conformance-machinery
 -->
 
 **What this PR does / why we need it**:
