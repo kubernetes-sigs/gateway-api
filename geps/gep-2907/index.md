@@ -21,14 +21,12 @@ and [Client Certificate Verification](../gep-91/index.md).
   is merely to provide space for future configuration, not a commitment that we
   will add it to the API.)
 
-## Out of Initial Scope
+## Out of Scope
 There are a variety of related TLS concepts in Gateway API that are not currently
 in scope for this GEP. In the future, this GEP may be expanded to include:
 
 1. Automatic mTLS (often associated with Service mesh)
-1. TLS Passthrough
-1. TLSRoute
-
+2. TLSRoute
 
 ## Introduction
 
@@ -74,6 +72,17 @@ flowchart LR
 ```
 
 The above diagram depicts these four segments as edges in a graph.
+
+### TLS mode
+
+TLS can be configured with two distinct modes:
+
+* **Terminate**: the TLS connection is instantiated between the frontend and the
+  Gateway. The connection between the Gateway and the backend is left unencrypted
+ unless a new TLS connection between the two entities is configured via BackendTLSPolicy.
+* **Passthrough**: the TLS connection is instantiated between the frontend and the
+  backend. The traffic flows through the Gateway encrypted, and the Gateway is not
+  able to decrypt or inspect the encrypted portions of the TLS stream.
 
 ## Proposed Segments
 Note that this does not represent any form of commitment that any of these
@@ -125,7 +134,6 @@ for a Gateway is not sufficiently different than the persona that would be
 responsible for frontend TLS, so the current proposal is likely the best option
 available to us.
 
-
 ### 2. Configure TLS Termination, including Server Certificate
 
 | Proposed Placement | Name | Status |
@@ -136,7 +144,6 @@ available to us.
 This is already finalized in the API and so we're stuck with this name. In
 hindsight a name that was more clearly tied to frontend TLS would have been
 ideal here.
-
 
 ### 3. Configure Client Certificate that Gateway should use to connect to Backend
 
@@ -159,7 +166,6 @@ connection). On the other hand, when determining the identity a Gateway should
 use when connecting to a backend, it should likely either be tied directly to
 the Gateway or Backend, but the Listener is not particularly relevant in this
 context.
-
 
 ### 4. Validate Server Certificate that is provided by Backend
 | Proposed Placement | Name | Status |
@@ -207,3 +213,64 @@ would be to introduce a Listener like resource for BackendTLS, resulting in a
 more consistent naming scheme within Gateway TLS configuration. Although it's
 not yet clear if we need this additional layer, we should reconsider it as we're
 further developing Backend TLS.
+
+### 5. Configure TLS mode
+
+| Proposed Placement | Name | Status |
+|-|-|-|
+| Gateway Listener | `Listener.TLS.Mode` | GA |
+
+#### Rationale
+
+Similarly to the broader [TLS termination](#2-configure-tls-termination-including-server-certificate)
+segment, this field is already finalized in the API. In hindsight, along with a
+different naming of `Listener.TLS`, we could have moved this field out of the broader
+frontend TLS configuration, as it is not bound to it.
+
+#### How the TLS configuration is affected
+
+The TLS mode affects how the frontend TLS should be configured. In case `Terminate`
+is set, the `Listener.TLS.CertificateRefs` field has to be populated, as the connection
+is intended to be terminated at the Gateway level, while for `Passthrough`, the Certificate
+does not need to be provided, as the TLS termination is handled by the backend.
+
+## Routes and TLS
+
+Multiple routes can be attached to listeners specifying TLS configuration. This section
+intends to clearly state how and when Routes can attach to listeners with TLS configuration.
+
+### Context
+
+The `*Route` objects refer the Gateway (or a specific Listener of the Gateway) they
+want to be attached to. A successful attachment can be granted by one of the two
+following conditions:
+
+* the `Listener.AllowedRoutes` field allows that specific Route `GroupKind` to be
+  attached to it, or
+* the `Listener.Protocol` field allows that specific Route to be attached to the
+  Listener. This applies only in case the Gateway's AllowedRoutes field is not set.
+
+In case the First condition is not satisfied (the Route references a Gateway that
+does not explicitly allow such an attachment), the Route `Accepted` condition
+is set to False with reason `NotAllowedByListeners`. In case the Route references
+a Gateway with no Listener matching the protocol needed by the Route, the Route
+`ResolvedRefs` condition is set to False with reason `UnsupportedProtocol`.
+
+### What Routes are allowed by Listeners with TLS
+
+The following is a summary of all the Routes and the TLS termination mode they support, along
+with the compatible protocol.
+
+| Protocol  |  Routes | TLS Terminate | TLS Passthough |
+|-----------|---------|---------------|----------------|
+| HTTP      | `HTTPRoute`/`GRPCRoute` | no  | no  |
+| HTTPS     | `HTTPRoute`/`GRPCRoute` | yes | no  |
+| TLS       | `TLSRoute`  | yes | yes | 
+| TCP       | `TCPRoute`  | yes | no  |
+| UDP       | `UDPRoute`  | no  | no  |
+
+> [!NOTE]
+> When the traffic is routed to the backend via a listener configured with TLS `Passthrough`
+> and a compatible route, the packets are left untouched by the gateway. In order to
+> terminate the TLS connection to the gateway and forward the traffic unencrypted to the backend,
+> a listener configured with TLS `Terminate` and a compatible route must be used.
