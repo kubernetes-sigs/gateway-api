@@ -1,7 +1,7 @@
 ---
 name: Conformance Test
 about: Suggest a new Conformance Test
-labels: area/conformance
+labels: area/conformance-test
 
 ---
 <!-- Please only use this template for submitting conformance test requests -->
