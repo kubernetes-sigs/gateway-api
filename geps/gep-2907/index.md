@@ -263,12 +263,11 @@ with the compatible protocol.
 
 | Protocol  |  Routes | TLS Terminate | TLS Passthough |
 |-----------|---------|---------------|----------------|
-| HTTP  | `HTTPRoute` | no  | no  |
-| HTTPS | `HTTPRoute` | yes | no  |
-| GRPC  | `GRPCRoute` | yes | no  |
-| TLS   | `TLSRoute`  | yes | yes | 
-| TCP   | `TCPRoute`  | yes | no  |
-| UDP   | `UDPRoute`  | no  | no  |
+| HTTP      | `HTTPRoute`/`GRPCRoute` | no  | no  |
+| HTTPS     | `HTTPRoute`/`GRPCRoute` | yes | no  |
+| TLS       | `TLSRoute`  | yes | yes | 
+| TCP       | `TCPRoute`  | yes | no  |
+| UDP       | `UDPRoute`  | no  | no  |
 
 > [!NOTE]
 > When the traffic is routed to the backend via a listener configured with TLS `Passthrough`
