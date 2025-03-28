@@ -407,6 +407,7 @@ func TestSuiteReport(t *testing.T) {
 		})
 	}
 }
+
 func TestParseImplementation(t *testing.T) {
 	testCases := []struct {
 		name        string
