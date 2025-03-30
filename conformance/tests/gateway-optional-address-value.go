@@ -41,6 +41,7 @@ var GatewayOptionalAddressValue = suite.ConformanceTest{
 		features.SupportGateway,
 		features.SupportGatewayAddressEmpty,
 	},
+	Provisional: true,
 	Manifests: []string{
 		"tests/gateway-optional-address-value.yaml",
 	},
@@ -63,7 +64,7 @@ var GatewayOptionalAddressValue = suite.ConformanceTest{
 		currentGW := &v1.Gateway{}
 		err := s.Client.Get(ctx, gwNN, currentGW)
 		require.NoError(t, err, "error getting Gateway: %v", err)
-		t.Logf("verifying that the Gateway %s/%s is accepted without address value field", gwNN.Namespace, gwNN.Name)
+		t.Logf("verifying that the Gateway %s/%s is accepted", gwNN.Namespace, gwNN.Name)
 		kubernetes.GatewayMustHaveCondition(t, s.Client, s.TimeoutConfig, gwNN, metav1.Condition{
 			Type:   string(v1.GatewayConditionAccepted),
 			Status: metav1.ConditionTrue,
