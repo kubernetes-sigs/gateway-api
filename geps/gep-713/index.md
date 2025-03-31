@@ -435,6 +435,8 @@ Metaresource CRDs MUST clearly define the hierarchy of target resources they hav
 
 The best way to visualize this hierarchy－and therefore the instances of objects organized by the hierarchy－is in the form of a Directed Acyclic Graph (DAG) whose roots are the least specific objects and the leaves are the most specific ones (and ultimately the effective targets of the metaresources). Using a DAG to represent the hierarchy of effective targets ensures that all the relevant objects are represented, and makes the calculation of corresponding combinatorial specs much easier.
 
+For any given path within the DAG, nodes closer to a root are considered "higher" in the hierarchy, while nodes closer to a leaf are "lower." Higher nodes define broader, less specific configurations, whereas lower nodes define more specific ones.
+
 Lower levels in the hierarchy (e.g., more specific kinds) *inherit* the definitions applied at the higher levels (e.g. less specific kinds), in such a way that higher level rules may be understood as having an “umbrella effect” over everything under that level.
 
 E.g., given the Gateway API’s hierarchy of network resources for the ingress use case `GatewayClass` > `Gateway` > `HTTPRoute` > `Backend`. A metaresource that attaches to a `GatewayClass` object, if defined as a metaresource kind ultimately to augment the behavior of `HTTPRoute` objects, affects all `Gateways` under the `GatewayClass`, as well as all `HTTPRoutes` under those `Gateways`. Any other instance of this metaresource kind targeting a lower level than the `GatewayClass` (e.g. `Gateway` or `HTTPRoute`, assuming it's supported) should be treated as a conflict against the higher level metaresource spec in the specific scope that is rooted at the lower level target, i.e., for the subset of the topology that is afftected by both metaresources.
@@ -457,12 +459,12 @@ The following subsections define a set of rules to arrange metaresources for con
 
 If multiple metaresources have the same scope (that is, multiple instances of the same metaresource kind affect the same effective target), this is considered to be a conflict.
 
+A metaresource winning over another means this metaresource dictates the merge strategy to apply.
+
 To determine which metaresources attached to objects in a hierarchy are higher or lower, use the following rules, continuing on ties:
 1. Between two metaresources at different levels of the hierarchy, the one attached higher wins (i.e. dictates the merge strategy to use to resolve the conflict).
 2. Between two metaresources at the same level of the hierarchy, the older metaresource based on creation timestamp wins.
 3. Between two metaresources at the same level of the hierarchy and identical creation timestamps, the metaresource appearing first in alphabetical order by `{namespace}/{name}` wins.
-
-A metaresource winning over another means this metaresource dictates the merge strategy to apply.
 
 #### Merge strategies
 
