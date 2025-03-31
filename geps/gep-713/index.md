@@ -43,10 +43,10 @@ After a few iterations of Gateway API experimenting with this pattern－both, wi
 
 ### User stories
 
-- [Ana](../../concepts/roles-and-personas.md#ana) or [Chihiro](../../concepts/roles-and-personas.md#chiriro) would like to specify some new behavior for a standard Kubernetes resource, but that resource doesn't have a way to specify the behavior and neither Ana nor Chihiro can modify it.
+- [Ana](../../concepts/roles-and-personas.md#ana) or [Chihiro](../../concepts/roles-and-personas.md#Chihiro) would like to specify some new behavior for a standard Kubernetes resource, but that resource doesn't have a way to specify the behavior and neither Ana nor Chihiro can modify it.
   - For example, Ana may want to add a rate limit to a Kubernetes Service. The Service object itself doesn't have a field for rate limiting, and Ana can't modify the Service object's definition.
 - A Gateway API implementer would like to define some implementation-specific behaviors for Gateway API objects that are already standard.
-  - For example, an implementer might want to provide a way for Chiriro to plug in a WebAssembly module to a particular Gateway listener, including all the configuration required by the module. Support to WebAssembly modules is a specific feature of this implementation and the Gateway listener spec does not contain fields to declare WebAssembly configuration.
+  - For example, an implementer might want to provide a way for Chihiro to plug in a WebAssembly module to a particular Gateway listener, including all the configuration required by the module. Support to WebAssembly modules is a specific feature of this implementation and the Gateway listener spec does not contain fields to declare WebAssembly configuration.
 - Chihiro would like a way to allow Ana to specify certain behaviors, but not others, in a very fine-grained way.
   - For example, Chihiro might want to allow Ana to specify rate limits for a Service, but not to specify the Service's ports.
 - A Gateway API implementer would like to define a way to specify a behavior that applies to a whole hierarchy of objects.
@@ -67,7 +67,7 @@ All [risks and caveats](#tldr) considered, these are in general a few reasons fo
 ### Definitions
 
 - _**Metaresource**_: a resource that augments the behavior of another resource without modifying the definition of the resource. Metaresources MUST clearly define a _target_ and an _intent_ as defined in this GEP, and MUST clearly communicate status about whether the augmentation is happening or not.
-  - The target of a metaresource specifies the resource or resources whose behavior the metaresource intend to augment.
+  - The target of a metaresource specifies the resource or resources whose behavior the metaresource intends to augment.
   - The intent of a metaresource specifies what augmentation the metaresource will apply.
 
   Metaresources are Custom Resource Definitions (CRDs) that comply with a particular [structure](#metaresource-structure). This structure includes standardized fields for specifying the target(s), metaresource-specific fields to describe the intended augmentation, and standardized status fields to communicate whether the augmentation is happening or not.
@@ -393,11 +393,11 @@ spec:
   color: blue
 ```
 
-As a pattern, targeting virtual types has prior art in Kubernetes with the Role Based Access Control (RBAC), where Roles and ClusterRoles can used to specify permissions regarding any kind of resource including non-Kubernetes resources.
+As a pattern, targeting virtual types has prior art in Kubernetes with the Role Based Access Control (RBAC), where Roles and ClusterRoles can be used to specify permissions regarding any kind of resource including non-Kubernetes resources.
 
 ### Scoping the intent
 
-The targets of a metaresource must be interpreted within a given semantics that is proper to the metaresource kind. Sometimes the declared targets define the direct scope of application of the metaresource. Inversily, depending on the metaresource kind, the targets can also represent indirections to the actual scope of application of the metaresource.
+The targets of a metaresource must be interpreted within a given semantics that is proper to the metaresource kind. Sometimes the declared targets define the direct scope of application of the metaresource. Inversely, depending on the metaresource kind, the targets can also represent indirections to the actual scope of application of the metaresource.
 
 Two different metaresource kinds that allow targeting resources of the same given kind X may have very different semantics. This happens not only because the purpose of the two metaresource kinds differ, but also because the scopes induced by specifying instances of X as targets differ, with consequences to the entire mechanics of calculating and applying the augmented behavior in each case.
 
@@ -410,7 +410,7 @@ Typically, the relationships between direct and indirect target kinds are organi
 An example of such is a metaresource that targets a Namespace. Depending on the design of the metaresource kind, the metaresource object may declare intent to affect the behavior of the namespace itself (for what concerns to the implementation of Namespaces in Kubernetes) or alternatively it can act as a means to affect the behavior of other objects that exist in the referred namespace (e.g. ConfigMaps). While in the former case, the (direct) target object is the Namespace itself, in the latter the (indirect) target is a set of objects of a different kind (e.g. ConfigMaps.)
 
 Another example of this semantic difference in the context of Gateway API objects is a metaresource that targets the `Gateway` kind, which can be:
-* a way to augment the behavior of the `Gateway` object itself (e.g. reconcile cloud infrastructure provider settings from the spec declared by the `Gateway` according the rules specified by the metaresource attached to the `Gateway`) or
+* a way to augment the behavior of the `Gateway` object itself (e.g. reconcile cloud infrastructure provider settings from the spec declared by the `Gateway` according to the rules specified by the metaresource attached to the `Gateway`) or
 * a means to augment the behavior of all `HTTPRoute` objects attached to the `Gateway` (in a way that every new `HTTPRoute` that gets created or modified so it enters the context of the `Gateway` is automatically put in the scope of the metaresource.)
 
 #### Declared targets versus Effective targets
@@ -425,7 +425,7 @@ To avoid ambiguity in the interpretation of the targets, metaresource designs MU
 
 Declaring additional specifications to objects from the outside can yield conflicts that need to be addressed in the implementation of metaresources. Multiple instances of a metaresource kind may affect an object (directly or indirectly), thus posing a possible conflict to resolve regarding which intent among the multiple metaresource specs a controller shall honor.
 
-In some cases, the most recent between two conflicting specs may be desired to win, whereas in other cases it might be the oldest. Often, the winning spec is determined by the hierarchical level within the scope the metaresource applies, and sometimes other criteria must be adopted to resolve conflicts between metaresources ultimately affecting a same target.
+In some cases, the most recent between two conflicting specs may be desired to win, whereas in other cases it might be the oldest. Often, the winning spec is determined by the hierarchical level within the scope the metaresource applies, and sometimes other criteria must be adopted to resolve conflicts between metaresources ultimately affecting the same target.
 
 The hierarchical relationships of the objects that are targeted by metaresources – whether associated to their parent/child relationship or between specs and their inner sections – may also yield conflicts of specs (conflicting intents). Metaresource kinds that allow for their instances to target at multiple levels of a hierarchy of resource kinds (e.g. Gateway API `Gateway` and `HTTPRoute` kinds), or alternatively entire resources as well as sections of a resource, will often generate cases where the behavior specified by the metaresource either is fully enforced or partially enforced, either honored or overridden by another.
 
@@ -437,7 +437,7 @@ The best way to visualize this hierarchy－and therefore the instances of object
 
 Lower levels in the hierarchy (e.g., more specific kinds) *inherit* the definitions applied at the higher levels (e.g. less specific kinds), in such a way that higher level rules may be understood as having an “umbrella effect” over everything under that level.
 
-E.g., given the Gateway API’s hierarchy of network resources for the ingress use case `GatewayClass` > `Gateway` > `HTTPRoute` > `Backend`. A metaresource that attaches to a `GatewayClass` object, if defined as a metaresource kind ultimately to augment the behavior of `HTTPRoute` objects, affects all `Gateways` under the `GatewayClass`, as well as all `HTTPRoutes` under those `Gateways`. Any other instance of this metaresource kind targeting a lower level than the `GatewayClass` (e.g. `Gateway` or `HTTPRoute`, assuming it's supported) should be be treated as a conflict against the higher level metaresource spec in the specific scope that is rooted at the lower level target, i.e., for the subset of the topology that is afftected by both metaresources.
+E.g., given the Gateway API’s hierarchy of network resources for the ingress use case `GatewayClass` > `Gateway` > `HTTPRoute` > `Backend`. A metaresource that attaches to a `GatewayClass` object, if defined as a metaresource kind ultimately to augment the behavior of `HTTPRoute` objects, affects all `Gateways` under the `GatewayClass`, as well as all `HTTPRoutes` under those `Gateways`. Any other instance of this metaresource kind targeting a lower level than the `GatewayClass` (e.g. `Gateway` or `HTTPRoute`, assuming it's supported) should be treated as a conflict against the higher level metaresource spec in the specific scope that is rooted at the lower level target, i.e., for the subset of the topology that is afftected by both metaresources.
 
 Conflicts between metaresources ultimately affecting the same scope MUST be resolved into so-called *Effective metaresources*, according to some defined [*merge strategies*](#merge-strategies).
 
@@ -489,7 +489,7 @@ The final set of *merge strategies* therefore supported by a metaresource CRD (b
 
 Metaresource kinds MAY opt to implement any of these strategies, including multiple strategies.
 
-Metaresource kinds that do not specify any merge strategy and only support targeting a single kind (with Declared target = Effective target), by default MUST implement the **None** merge strategy. (See the definition of [Direct](#direct) class of metarsources.)
+Metaresource kinds that do not specify any merge strategy and only support targeting a single kind (with Declared target = Effective target), by default MUST implement the **None** merge strategy. (See the definition of [Direct](#direct) class of metaresources.)
 
 Metaresource kinds that do not specify any merge strategy and support targeting multiple effective kinds, by default MUST implement the **Atomic Defaults** merge strategy.
 
@@ -497,7 +497,7 @@ Metaresource kinds that implement more than one merge strategy MUST define a cle
 
 A pattern known to be adopted by metaresource CRDs that support multiple merge strategies is the definition of a `strategy` field in the metaresource spec for the instances to specify the exact strategy to apply.
 
-Metaresource implementations SHOULD reflect in the `status` stanza of the metaresources somehow the applied merge strategies altering the effectiveness of the metaresource spec, if possible considering all the different scopes targeted by the metaresource－i.e., if metaresources is being enforced or overridden, partially or completely. (See [Metaresource status](#metaresource-status) section for details.)
+Metaresource implementations SHOULD reflect in the `status` stanza of the metaresources how the applied merge strategies are altering the effectiveness of the metaresource spec, if possible considering all the different scopes targeted by the metaresource－i.e., if metaresources are being enforced or overridden, partially or completely. (See [Metaresource status](#metaresource-status) section for details.)
 
 #### Abstract process for calculating Effective metaresources
 
