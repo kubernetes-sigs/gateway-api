@@ -399,7 +399,7 @@ As a pattern, targeting virtual types has prior art in Kubernetes with the Role 
 
 The targets of a metaresource must be interpreted within a given semantics that is proper to the metaresource kind. Sometimes the declared targets define the direct scope of application of the metaresource. Inversely, depending on the metaresource kind, the targets can also represent indirections to the actual scope of application of the metaresource.
 
-Two different metaresource kinds that allow targeting resources of the same given kind X may have very different semantics. This happens not only because the purpose of the two metaresource kinds differ, but also because the scopes induced by specifying instances of X as targets differ, with consequences to the entire mechanics of calculating and applying the augmented behavior in each case.
+Two different metaresource kinds that support targeting the same kind X may have very different semantics. This is not only because the metaresource kinds' purposes differ, but also because the scopes induced by specifying instances of X as targets differ, with consequences to the entire mechanics of calculating and applying the augmented behavior in each case.
 
 #### Spanning behavior across relationships of a target
 
