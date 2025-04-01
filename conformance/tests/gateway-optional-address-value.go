@@ -21,7 +21,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
@@ -65,9 +64,7 @@ var GatewayOptionalAddressValue = suite.ConformanceTest{
 		err := s.Client.Get(ctx, gwNN, currentGW)
 		require.NoError(t, err, "error getting Gateway: %v", err)
 		t.Logf("verifying that the Gateway %s/%s is accepted", gwNN.Namespace, gwNN.Name)
-		kubernetes.GatewayMustHaveCondition(t, s.Client, s.TimeoutConfig, gwNN, metav1.Condition{
-			Type:   string(v1.GatewayConditionAccepted),
-			Status: metav1.ConditionTrue,
-		})
+		_, err = kubernetes.WaitForGatewayAddress(t, s.Client, s.TimeoutConfig, kubernetes.NewGatewayRef(gwNN, "http"))
+		require.NoError(t, err, "timed out waiting for Gateway address to be assigned")
 	},
 }
