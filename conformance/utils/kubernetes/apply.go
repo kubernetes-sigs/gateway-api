@@ -153,9 +153,11 @@ func (a Applier) prepareGateway(t *testing.T, uObj *unstructured.Unstructured) {
 			addresses = append(addresses, add)
 		}
 	}
-	err = unstructured.SetNestedSlice(uObj.Object, addresses, "spec", "addresses")
-	fmt.Println(uObj.Object)
-	require.NoError(t, err, "could not overlay address type on Gateway %s/%s", ns, name)
+
+	if len(addresses) > 0 {
+		err = unstructured.SetNestedSlice(uObj.Object, addresses, "spec", "addresses")
+		require.NoError(t, err, "could not overlay address type on Gateway %s/%s", ns, name)
+	}
 }
 
 // prepareGatewayClass adjust the spec.controllerName on the resource
