@@ -23,7 +23,7 @@ run the conformance tests.
 
    ```sh
    git clone https://github.com/kgateway-dev/kgateway.git
-   cd gloo
+   cd kgateway
    export VERSION="v2.0.0"
    git checkout tags/$VERSION -b $VERSION
    ```
