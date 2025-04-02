@@ -1,4 +1,4 @@
-# Gloo Gateway
+# kgateway
 
 ## Table of contents
 
@@ -19,7 +19,7 @@ run the conformance tests.
 
 ### Steps
 
-1. Clone the Gloo Gateway repository and checkout the release:
+1. Clone the kgateway repository and checkout the release:
 
    ```sh
    git clone https://github.com/kgateway-dev/kgateway.git
