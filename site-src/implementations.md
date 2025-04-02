@@ -364,12 +364,11 @@ Check out the [Gateway API task][istio-2] for more information about the Gateway
 ### kgateway
 [![Conformance](https://img.shields.io/badge/Gateway%20API%20Partial%20Conformance%20v1.2.1-kgateway-orange)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.2.1/kgateway)
 
-[kgateway]
-[kgateway][kgatewaydocs] is a feature-rich, Kubernetes-native ingress controller and next-generation API gateway.
+[kgateway] is a feature-rich, Kubernetes-native ingress controller and next-generation API gateway.
 It is focused on maintaining an great HTTP experience, a wealth of features and great interoperability with service mesh such as Istio.
 This focus means that you can easily configure a set of Envoy instances that are reasonably distributed in a performant way.
 
-[kgatewaydocs]:https://kgateway.dev/docs/
+[kgateway]:https://kgateway.dev/docs
 
 
 ### Kong Kubernetes Ingress Controller
