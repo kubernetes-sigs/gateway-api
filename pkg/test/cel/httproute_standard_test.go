@@ -188,3 +188,87 @@ func TestHTTPRouteParentRefStandard(t *testing.T) {
 		})
 	}
 }
+
+func TestHTTPRouteRulePathMatchTypeStandard(t *testing.T) {
+	tests := []struct {
+		name       string
+		wantErrors []string
+		pathMatch  *gatewayv1.HTTPPathMatch
+	}{
+		{
+			name:       "valid because type is 'Exact'",
+			wantErrors: []string{},
+			pathMatch: &gatewayv1.HTTPPathMatch{
+				Type:  ptrTo(gatewayv1.PathMatchExact),
+				Value: ptrTo("/exact"),
+			},
+		},
+		{
+			name:       "valid because type is 'PathPrefix'",
+			wantErrors: []string{},
+			pathMatch: &gatewayv1.HTTPPathMatch{
+				Type:  ptrTo(gatewayv1.PathMatchPathPrefix),
+				Value: ptrTo("/prefix"),
+			},
+		},
+		{
+			name:       "valid because type is 'RegularExpression'",
+			wantErrors: []string{},
+			pathMatch: &gatewayv1.HTTPPathMatch{
+				Type:  ptrTo(gatewayv1.PathMatchRegularExpression),
+				Value: ptrTo("^/regex.*"),
+			},
+		},
+		{
+			name:       "valid because type is a domain-prefixed custom value",
+			wantErrors: []string{},
+			pathMatch: &gatewayv1.HTTPPathMatch{
+				Type:  ptrTo(gatewayv1.PathMatchType("example.com/CustomType")),
+				Value: ptrTo("/custom"),
+			},
+		},
+		{
+			name:       "invalid because type is a custom value without domain prefix",
+			wantErrors: []string{},
+			pathMatch: &gatewayv1.HTTPPathMatch{
+				Type:  ptrTo(gatewayv1.PathMatchType("/InvalidType")),
+				Value: ptrTo("/custom"),
+			},
+		},
+		{
+			name:       "invalid because type is not in allowed values",
+			wantErrors: []string{"type must be one of ['Exact', 'PathPrefix', 'RegularExpression'] or domain-prefixed custom value"},
+			pathMatch: &gatewayv1.HTTPPathMatch{
+				Type:  ptrTo(gatewayv1.PathMatchType("InvalidType")),
+				Value: ptrTo("/invalid"),
+			},
+		},
+		{
+			name:       "invalid because type is empty",
+			wantErrors: []string{"type must be one of ['Exact', 'PathPrefix', 'RegularExpression'] or domain-prefixed custom value"},
+			pathMatch: &gatewayv1.HTTPPathMatch{
+				Type:  nil,
+				Value: ptrTo("/empty"),
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			route := &gatewayv1.HTTPRoute{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      fmt.Sprintf("foo-%v", time.Now().UnixNano()),
+					Namespace: metav1.NamespaceDefault,
+				},
+				Spec: gatewayv1.HTTPRouteSpec{
+					Rules: []gatewayv1.HTTPRouteRule{{
+						Matches: []gatewayv1.HTTPRouteMatch{{
+							Path: tc.pathMatch,
+						}},
+					}},
+				},
+			}
+			validateHTTPRoute(t, route, tc.wantErrors)
+		})
+	}
+}

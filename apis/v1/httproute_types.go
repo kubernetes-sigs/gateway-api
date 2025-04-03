@@ -520,14 +520,14 @@ const (
 // +kubebuilder:validation:XValidation:message="must not contain '#' when type one of ['Exact', 'PathPrefix']",rule="(self.type in ['Exact','PathPrefix']) ? !self.value.contains('#') : true"
 // +kubebuilder:validation:XValidation:message="must not end with '/..' when type one of ['Exact', 'PathPrefix']",rule="(self.type in ['Exact','PathPrefix']) ? !self.value.endsWith('/..') : true"
 // +kubebuilder:validation:XValidation:message="must not end with '/.' when type one of ['Exact', 'PathPrefix']",rule="(self.type in ['Exact','PathPrefix']) ? !self.value.endsWith('/.') : true"
-// +kubebuilder:validation:XValidation:message="type must be one of ['Exact', 'PathPrefix', 'RegularExpression']",rule="self.type in ['Exact','PathPrefix'] || self.type == 'RegularExpression'"
+// +kubebuilder:validation:XValidation:message="type must be one of ['Exact', 'PathPrefix', 'RegularExpression'] or domain-prefixed custom value",rule="self.type in ['Exact','PathPrefix'] || self.type == 'RegularExpression' || self.type.matches('^([^/]+)/(.+)$')"
 // +kubebuilder:validation:XValidation:message="must only contain valid characters (matching ^(?:[-A-Za-z0-9/._~!$&'()*+,;=:@]|[%][0-9a-fA-F]{2})+$) for types ['Exact', 'PathPrefix']",rule="(self.type in ['Exact','PathPrefix']) ? self.value.matches(r\"\"\"^(?:[-A-Za-z0-9/._~!$&'()*+,;=:@]|[%][0-9a-fA-F]{2})+$\"\"\") : true"
 type HTTPPathMatch struct {
 	// Type specifies how to match against the path Value.
 	//
 	// Support: Core (Exact, PathPrefix)
 	//
-	// Support: Implementation-specific (RegularExpression)
+	// Support: Implementation-specific (RegularExpression, any value domain-prefixed)
 	//
 	// +optional
 	// +kubebuilder:default=PathPrefix

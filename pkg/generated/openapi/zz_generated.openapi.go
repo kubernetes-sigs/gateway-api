@@ -4524,7 +4524,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPPathMatch(ref common.ReferenceCall
 				Properties: map[string]spec.Schema{
 					"type": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Type specifies how to match against the path Value.\n\nSupport: Core (Exact, PathPrefix)\n\nSupport: Implementation-specific (RegularExpression)",
+							Description: "Type specifies how to match against the path Value.\n\nSupport: Core (Exact, PathPrefix)\n\nSupport: Implementation-specific (RegularExpression, any value domain-prefixed)",
 							Type:        []string{"string"},
 							Format:      "",
 						},
