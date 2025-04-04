@@ -1,0 +1,51 @@
+apiVersion: gateway.networking.k8s.io/v1
+date: "2025-04-02T15:58:12Z"
+gatewayAPIChannel: experimental
+gatewayAPIVersion: v1.2.1
+implementation:
+  contact:
+  - github.com/kgateway-dev/kgateway/issues/new/choose
+  organization: kgateway-dev
+  project: kgateway
+  url: github.com/kgateway-dev/kgateway
+  version: v2.0.0
+kind: ConformanceReport
+mode: default
+profiles:
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 33
+      Skipped: 0
+  extended:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 10
+      Skipped: 0
+    supportedFeatures:
+    - HTTPRouteBackendProtocolH2C
+    - HTTPRouteHostRewrite
+    - HTTPRouteMethodMatching
+    - HTTPRoutePathRedirect
+    - HTTPRoutePathRewrite
+    - HTTPRoutePortRedirect
+    - HTTPRouteQueryParamMatching
+    - HTTPRouteRequestMirror
+    - HTTPRouteResponseHeaderModification
+    - HTTPRouteSchemeRedirect
+    unsupportedFeatures:
+    - GatewayHTTPListenerIsolation
+    - GatewayInfrastructurePropagation
+    - GatewayPort8080
+    - GatewayStaticAddresses
+    - HTTPRouteBackendProtocolWebSocket
+    - HTTPRouteBackendRequestHeaderModification
+    - HTTPRouteBackendTimeout
+    - HTTPRouteDestinationPortMatching
+    - HTTPRouteParentRefPort
+    - HTTPRouteRequestMultipleMirrors
+    - HTTPRouteRequestTimeout
+  name: GATEWAY-HTTP
+  summary: Core tests succeeded. Extended tests succeeded.

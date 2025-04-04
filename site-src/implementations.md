@@ -32,6 +32,7 @@ cover, and documentation to help users get started.
 - [HAProxy Kubernetes Ingress Controller][32] (GA)
 - [HashiCorp Consul][8]
 - [Istio][9] (GA)
+- [kgateway][37]
 - [Kong Ingress Controller][10] (GA)
 - [Kong Gateway Operator][35] (GA)
 - [Kuma][11] (GA)
@@ -93,6 +94,7 @@ cover, and documentation to help users get started.
 [34]:#airlock-microgateway
 [35]:#kong-gateway-operator
 [36]:#loxilb
+[37]:#kgateway
 
 
 [gamma]:/concepts/gamma/
@@ -358,6 +360,16 @@ Check out the [Gateway API task][istio-2] for more information about the Gateway
 [istio-mesh]:https://istio.io/latest/docs/concepts/what-is-istio/#what-is-a-service-mesh
 [istio-1]:https://istio.io/latest/docs/tasks/traffic-management/ingress/
 [istio-2]:https://istio.io/latest/docs/tasks/traffic-management/ingress/gateway-api/
+
+### kgateway
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Partial%20Conformance%20v1.2.1-kgateway-orange)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.2.1/kgateway)
+
+[kgateway] is a feature-rich, Kubernetes-native ingress controller and next-generation API gateway.
+It is focused on maintaining an great HTTP experience, a wealth of features and great interoperability with service mesh such as Istio.
+This focus means that you can easily configure a set of Envoy instances that are reasonably distributed in a performant way.
+
+[kgateway]:https://kgateway.dev/docs
+
 
 ### Kong Kubernetes Ingress Controller
 
