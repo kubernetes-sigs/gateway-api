@@ -58,6 +58,10 @@ type ExpectedResponse struct {
 
 	// User Given TestCase name
 	TestCaseName string
+
+	// ServerName indicates the hostname to which the client attempts to connect,
+	// and which is seen by the backend.
+	ServerName string
 }
 
 // Request can be used as both the request to make and a means to verify
@@ -111,6 +115,19 @@ func MakeRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtripp
 	WaitForConsistentResponse(t, r, req, expected, timeoutConfig.RequiredConsecutiveSuccesses, timeoutConfig.MaxTimeToConsistency)
 }
 
+// MakeHTTPSRequestAndExpectEventuallyConsistentResponse makes a request with the given parameters,
+// understanding that the request may fail for some amount of time.
+//
+// Once the request succeeds consistently with the response having the expected status code, make
+// additional assertions on the response body using the provided ExpectedResponse.
+func MakeHTTPSRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtripper.RoundTripper, timeoutConfig config.TimeoutConfig, gwAddr string, expected ExpectedResponse) {
+	t.Helper()
+
+	req := MakeRequest(t, &expected, gwAddr, "HTTPS", "https")
+	// fmt.Printf("DEBUG req: %v\n", req)
+	WaitForConsistentResponse(t, r, req, expected, timeoutConfig.RequiredConsecutiveSuccesses, timeoutConfig.MaxTimeToConsistency)
+}
+
 func MakeRequest(t *testing.T, expected *ExpectedResponse, gwAddr, protocol, scheme string) roundtripper.Request {
 	t.Helper()
 
@@ -129,7 +146,7 @@ func MakeRequest(t *testing.T, expected *ExpectedResponse, gwAddr, protocol, sch
 	path, query, _ := strings.Cut(expected.Request.Path, "?")
 	reqURL := url.URL{Scheme: scheme, Host: CalculateHost(t, gwAddr, scheme), Path: path, RawQuery: query}
 
-	tlog.Logf(t, "Making %s request to %s", expected.Request.Method, reqURL.String())
+	tlog.Logf(t, "Making %s request to host %s via %s", expected.Request.Method, expected.Request.Host, reqURL.String())
 
 	req := roundtripper.Request{
 		T:                t,
@@ -238,6 +255,7 @@ func WaitForConsistentResponse(t *testing.T, r roundtripper.RoundTripper, req ro
 		cReq, cRes, err := r.CaptureRoundTrip(req)
 		if err != nil {
 			tlog.Logf(t, "Request failed, not ready yet: %v (after %v)", err.Error(), elapsed)
+			// tlog.Logf(t, "Debug: Request: %v, Response: %v", cReq, cRes)
 			return false
 		}
 
