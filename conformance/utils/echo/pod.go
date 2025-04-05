@@ -57,6 +57,14 @@ const (
 func (m *MeshPod) MakeRequestAndExpectEventuallyConsistentResponse(t *testing.T, exp http.ExpectedResponse, timeoutConfig config.TimeoutConfig) {
 	t.Helper()
 
+	if exp.Request.Method == "" {
+		exp.Request.Method = "GET"
+	}
+
+	if exp.Response.StatusCode == 0 {
+		exp.Response.StatusCode = 200
+	}
+
 	http.AwaitConvergence(t, timeoutConfig.RequiredConsecutiveSuccesses, timeoutConfig.MaxTimeToConsistency, func(elapsed time.Duration) bool {
 		req := makeRequest(t, exp.Request)
 
