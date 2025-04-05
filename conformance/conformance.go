@@ -126,8 +126,8 @@ func RunConformanceWithOptions(t *testing.T, opts suite.ConformanceOptions) {
 	cSuite, err := suite.NewConformanceTestSuite(opts)
 	require.NoError(t, err, "error initializing conformance suite")
 
-	cSuite.Setup(t, tests.ConformanceTests)
-	err = cSuite.Run(t, tests.ConformanceTests)
+	cSuite.Setup(t, tests.GatewayAndMeshConformanceTests)
+	err = cSuite.Run(t, tests.GatewayAndMeshConformanceTests)
 	require.NoError(t, err)
 
 	if opts.ReportOutputPath != "" {
