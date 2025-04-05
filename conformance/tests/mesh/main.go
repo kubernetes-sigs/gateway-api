@@ -1,5 +1,5 @@
 /*
-Copyright 2022 The Kubernetes Authors.
+Copyright 2025 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,19 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package tests
+package meshtests
 
-import (
-	meshtests "sigs.k8s.io/gateway-api/conformance/tests/mesh"
-	"sigs.k8s.io/gateway-api/conformance/utils/suite"
-)
+import "sigs.k8s.io/gateway-api/conformance/utils/suite"
 
-var ConformanceTests []suite.ConformanceTest
-
-func getGatewayAndMeshTests() []suite.ConformanceTest {
-	// tests := []suite.ConformanceTest{}
-	ConformanceTests = append(ConformanceTests, meshtests.MeshConformanceTests...)
-	return ConformanceTests
-}
-
-var GatewayAndMeshConformanceTests = getGatewayAndMeshTests()
+var MeshConformanceTests []suite.ConformanceTest
