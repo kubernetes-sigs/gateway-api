@@ -8,7 +8,7 @@ require (
 	github.com/stretchr/testify v1.10.0
 	golang.org/x/net v0.38.0
 	golang.org/x/sync v0.12.0
-	google.golang.org/grpc v1.71.0
+	google.golang.org/grpc v1.71.1
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.5.1
 	google.golang.org/protobuf v1.36.6
 	k8s.io/api v0.32.3
