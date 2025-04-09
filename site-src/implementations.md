@@ -32,7 +32,7 @@ cover, and documentation to help users get started.
 - [HAProxy Kubernetes Ingress Controller][32] (GA)
 - [HashiCorp Consul][8]
 - [Istio][9] (GA)
-- [kgateway][37]
+- [kgateway][37] (GA)
 - [Kong Ingress Controller][10] (GA)
 - [Kong Gateway Operator][35] (GA)
 - [Kuma][11] (GA)
