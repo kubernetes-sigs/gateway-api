@@ -213,7 +213,7 @@ is returned.
 
 The following example forwards HTTP requests for prefix `/bar` to service
 "my-service1" on port `8080` and HTTP requests for prefix `/some/thing` with
-header `magic: foo` to service "my-service2" on port `8080`:
+header `magic: foo` **AND** query param `great: example` to service "my-service2" on port `8080`:
 ```yaml
 {% include 'standard/basic-http.yaml' %}
 ```
