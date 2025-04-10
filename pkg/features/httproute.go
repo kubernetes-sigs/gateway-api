@@ -97,6 +97,9 @@ const (
 
 	// This option indicates support for HTTPRoute with a backendref with an appProtocol 'kubernetes.io/ws' (extended conformance)
 	SupportHTTPRouteBackendProtocolWebSocket FeatureName = "HTTPRouteBackendProtocolWebSocket"
+
+	// This option indicates support for HTTPRoute CORS (extended conformance)
+	SupportHTTPRouteCORS FeatureName = "HTTPRouteCORS"
 )
 
 var (
