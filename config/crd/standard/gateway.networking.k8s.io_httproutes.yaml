@@ -2149,7 +2149,6 @@ spec:
 
                         For example, take the following matches configuration:
 
-                        ```
                         matches:
                         - path:
                             value: "/foo"
@@ -2158,7 +2157,6 @@ spec:
                             value: "v2"
                         - path:
                             value: "/v2/foo"
-                        ```
 
                         For a request to match against this rule, a request must satisfy
                         EITHER of the two conditions:
@@ -4944,7 +4942,6 @@ spec:
 
                         For example, take the following matches configuration:
 
-                        ```
                         matches:
                         - path:
                             value: "/foo"
@@ -4953,7 +4950,6 @@ spec:
                             value: "v2"
                         - path:
                             value: "/v2/foo"
-                        ```
 
                         For a request to match against this rule, a request must satisfy
                         EITHER of the two conditions:
