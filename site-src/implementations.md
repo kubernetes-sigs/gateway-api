@@ -32,7 +32,7 @@ cover, and documentation to help users get started.
 - [HAProxy Kubernetes Ingress Controller][32] (GA)
 - [HashiCorp Consul][8]
 - [Istio][9] (GA)
-- [kgateway][37]
+- [kgateway][37] (GA)
 - [Kong Ingress Controller][10] (GA)
 - [Kong Gateway Operator][35] (GA)
 - [Kuma][11] (GA)
@@ -362,11 +362,13 @@ Check out the [Gateway API task][istio-2] for more information about the Gateway
 [istio-2]:https://istio.io/latest/docs/tasks/traffic-management/ingress/gateway-api/
 
 ### kgateway
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Partial%20Conformance%20v1.2.1-kgateway-orange)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.2.1/kgateway)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.2.1-kgateway-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.2.1/kgateway)
 
-[kgateway] is a feature-rich, Kubernetes-native ingress controller and next-generation API gateway.
-It is focused on maintaining an great HTTP experience, a wealth of features and great interoperability with service mesh such as Istio.
-This focus means that you can easily configure a set of Envoy instances that are reasonably distributed in a performant way.
+The [kgateway] project is a feature-rich, Kubernetes-native ingress controller and next-generation API gateway.
+It is focused on maintaining a great HTTP experience, extending features for advanced routing in scenarios such as AI and MCP gateways, and interoperating with a service mesh such as Istio in both ambient and sidecar modes.
+This focus means that you can easily configure a set of Envoy instances that are reasonably distributed in a performant way across many north-south and east-west use cases.
+
+Kgateway is generally available with its 2.0 release.
 
 [kgateway]:https://kgateway.dev/docs
 
