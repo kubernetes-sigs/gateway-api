@@ -464,6 +464,27 @@ spec:
     sectionName: foo
 ```
 
+#### Optional Section Name
+
+If a `sectionName` in a Route's `parentRef` is not set then the Route MUST attach to only the listeners in the referenced parent. As an example given a `Gateway` and it's child `ListenerSets` a route attaching to the `Gateway` with an empty `sectionName` shall only attach to the listeners in the `Gateways` immediate `spec.listeners` list. In other words, the Route will not attach to any listeners in the `ListenerSets`.
+
+### Policy Attachment
+
+Policy attachment is [under discussion] in https://github.com/kubernetes-sigs/gateway-api/discussions/2927
+
+Similar to Routes, `ListenerSet` can inherit policy from a Gateway.
+Policies that attach to a `ListenerSet` apply to all listeners defined in that resource, but do not impact listeners in the parent `Gateway`. This allows `ListenerSets` attached to the same `Gateway` to have different policies.
+If the implementation cannot apply the policy to only specific listeners, it should reject the policy.
+
+### ReferenceGrant Semantics
+
+When a `ReferenceGrant` is applied to a `Gateway` it MUST NOT be inherited by child `ListenerSets`. Thus a `ListenerSet` listener MUST NOT access secrets granted to the `Gateway` listeners.
+
+When a `ReferenceGrant` is applied to a `ListenerSet` it MUST NOT grant permission to the parent `Gateway`'s listeners. Thus a `Gateway` listener MUST NOT access secrets granted to the `ListenerSet` listeners.
+
+A `ListenerSet` must be able to reference a secret/backend in the same namespace as itself without a `ReferenceGrant`.
+
+
 ### Listener Validation
 
 Within a single resource such as a `Gateway` or `ListenerSet` the list of listeners MUST have unique names. Implementations MUST allow listeners from a child `ListenerSet` to be merged into a parent `Gateway` when listeners have the same name. Likewise implementations MUST allow sibling `ListenerSets` listeners with matching names to be merged into a parent `Gateway`. This allows for authors of Routes to simply attach to their desired parentRef and listener without having to worry about naming conflicts across resources.
@@ -560,14 +581,6 @@ An implementation MAY reject listeners by setting the `ListenerEntryStatus` `Acc
 If a listener has a conflict, this should be reported in the `ListenerEntryStatus` of the conflicted `ListenerSet` by setting the `Conflicted` condition to `True`.
 
 Implementations SHOULD be cautious about what information from the parent or siblings are reported to avoid accidentally leaking sensitive information that the child would not otherwise have access to. This can include contents of secrets etc.
-
-### Policy Attachment
-
-Policy attachment is [under discussion] in https://github.com/kubernetes-sigs/gateway-api/discussions/2927
-
-Similar to Routes, `ListenerSet` can inherit policy from a Gateway.
-Policies that attach to a `ListenerSet` apply to all listeners defined in that resource, but do not impact listeners in the parent `Gateway`. This allows `ListenerSets` attached to the same `Gateway` to have different policies.
-If the implementation cannot apply the policy to only specific listeners, it should reject the policy.
 
 ## Alternatives
 
