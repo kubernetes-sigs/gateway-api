@@ -466,8 +466,11 @@ spec:
 
 ### Listener Validation
 
-Implementations MUST treat the parent `Gateway`s as having the merged list of all listeners from itself and attached `ListenerSets`. See 'Listener Precedence' for more details on ordering.
-Validation of this list of listeners MUST behave the same as if the list were part of a single `Gateway`.
+Within a single resource such as a `Gateway` or `ListenerSet` the list of listeners MUST have unique names. Implementations MUST allow listeners from a child `ListenerSet` to be merged into a parent `Gateway` when listeners have the same name. Likewise implementations MUST allow sibling `ListenerSets` listeners with matching names to be merged into a parent `Gateway`. This allows for authors of Routes to simply attach to their desired parentRef and listener without having to worry about naming conflicts across resources.
+
+Implementations MUST treat the parent `Gateway`s as having the merged list of all listeners from itself and attached `ListenerSets` and validation of this list of listeners MUST behave the same as if the list were part of a single `Gateway` with the relaxed listener name constraints.
+
+Ordering will follow the semantics defined in [Listener Precedence](#listener-precedence).
 
 From the earlier example the above resources would be equivalent to a single `Gateway` where the listeners are collapsed into a single list.
 
