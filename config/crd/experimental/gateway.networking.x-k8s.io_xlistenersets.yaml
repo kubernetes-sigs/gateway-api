@@ -277,7 +277,7 @@ spec:
                         same port, subject to the Listener compatibility rules.
                       format: int32
                       maximum: 65535
-                      minimum: 1
+                      minimum: 0
                       type: integer
                     protocol:
                       description: Protocol specifies the network protocol this listener
