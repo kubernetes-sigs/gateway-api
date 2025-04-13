@@ -164,7 +164,7 @@ type ListenerEntry struct {
 	// Port is the network port. Multiple listeners may use the
 	// same port, subject to the Listener compatibility rules.
 	//
-	// If the port is specified as zero, the implementation will assign
+	// If the port is not set or specified as zero, the implementation will assign
 	// a unique port. If the implementation does not support dynamic port
 	// assignment, it MUST set `Accepted` condition to `False` with the
 	// `UnsupportedPort` reason.
@@ -385,8 +385,11 @@ spec:
 ```
 ### ListenerEntry
 
-`ListenerEntry` is currently a copy of the `Listener` struct with some changes
-1. `Port` is now a pointer to allow for dynamic port assignment.
+`ListenerEntry` is currently a copy of the `Listener` struct with some changes noted in the below sections
+
+#### Port
+
+`Port` is now a pointer to allow for dynamic port assignment.  If the port is unspecified or set to zero, the implementation will assign a unique port. If the implementation does not support dynamic port assignment, it MUST set `Accepted` condition to `False` with the `UnsupportedPort` reason.
 
 ## Semantics
 
