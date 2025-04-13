@@ -30,14 +30,14 @@ From [Gateway Hierarchy Brainstorming](https://docs.google.com/document/d/1qj7Xo
 ## Use Cases & Motivation
 
 Knative generates on demand per-service certificates using HTTP-01 challenges.
-There can be O(1000) Knative `Services` in the cluster which means we have O(1000) distinct certificates.
+There can be `O(1000) Knative `Services` in the cluster which means we have O(1000) distinct certificates.
 Thus updating a single `Gateway` resource with this many certificates is a contention point and inhibits horizontal scaling of our controllers.
 [Istio Ambient](https://istio.io/v1.15/blog/2022/introducing-ambient-mesh/), similarly, creates a listener per Kubernetes service.
 
 More broadly, large scale gateway users often expose `O(1000)` domains, but are currently limited by the maximum of 64 `listeners`.
 
-The spec currently has language to indicate implementations `MAY` merge `Gateways` resources but does not define any specific requirements for how that should work.
-https://github.com/kubernetes-sigs/gateway-api/blob/541e9fc2b3c2f62915cb58dc0ee5e43e4096b3e2/apis/v1beta1/gateway_types.go#L76-L78
+The [spec currently has language](https://github.com/kubernetes-sigs/gateway-api/blob/541e9fc2b3c2f62915cb58dc0ee5e43e4096b3e2/apis/v1beta1/gateway_types.go#L76-L78) to indicate implementations `MAY` merge `Gateways` resources but does not define any specific requirements for how that should work.
+
 
 ## Feature Details
 
@@ -399,7 +399,7 @@ When there are no listeners the `Gateway`'s `status.listeners` should be empty o
 
 Implementations, when creating a `Gateway`, may provision underlying infrastructure when there are no listeners present. The status conditions `Accepted` and `Programmed` conditions should reflect state of this provisioning.
 
-### Gateway <> ListenerSet Handshake
+### Gateway & ListenerSet Handshake
 
 By default a `Gateway` MUST NOT allow `ListenerSets` to be attached. Users can enable this behaviour by configuring their `Gateway` to allow `ListenerSet` attachment:
 
@@ -413,7 +413,7 @@ spec:
   - from: Same
 ```
 
-### Route Attaching
+### Route Attachment
 
 Routes MUST be able to specify a `ListenerSet` as a `parentRef`. Routes can use `sectionName`/`port` fields in `ParentReference` to help target a specific listener. If no listener is targeted (`sectionName`/`port` are unset) then the Route attaches to all the listeners in the `ListenerSet`.
 
@@ -514,7 +514,7 @@ Listeners should be merged using the following precedence:
 
 Conflicts are covered in the section 'ListenerConditions within a ListenerSet'
 
-###  Gateway Conditions
+### Gateway Conditions
 
 `Gateway`'s `Accepted` and `Programmed` top-level conditions remain unchanged and reflect the status of the local configuration.
 
