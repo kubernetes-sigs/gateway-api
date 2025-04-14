@@ -2,6 +2,6 @@ apiVersion: internal.gateway.networking.k8s.io/v1alpha1
 kind: GEPDetails
 number: 3539
 name: ClusterIP Gateway - Gateway API to Expose Pods on Cluster-Internal IP Address
-status: Experimental
+status: Provisional
 authors:
   - ptrivedi
