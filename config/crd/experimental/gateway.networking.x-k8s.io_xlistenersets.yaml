@@ -174,7 +174,6 @@ spec:
                               - All
                               - Selector
                               - Same
-                              - None
                               type: string
                             selector:
                               description: |-
