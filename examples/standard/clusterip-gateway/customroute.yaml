@@ -1,16 +1,16 @@
-kind: TCPRoute/CustomRoute
+kind: [TCPRoute|CustomRoute]
 metadata:
   name: service-route
 spec:
+  config:
+    sessionAffinity: false
   parentRefs:
   - name: example-cluster-ip-gateway
   rules:
-    config:
-	sessionAffinity: false
     backendRefs:
     - kind: EndpointSelector
-port: 8080
-name: exampleapp-app-pods
+      port: 8080
+      name: exampleapp-app-pods
 ---
 apiVersion: gateway.networking.k8s.io/v1alpha1
 kind: EndpointSelector

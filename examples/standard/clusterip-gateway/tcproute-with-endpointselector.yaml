@@ -6,7 +6,7 @@ spec:
   - name: example-cluster-ip-gateway
   rules:
     config:
-	sessionAffinity: false
+      sessionAffinity: false
     backendRefs:
     - kind: EndpointSelector
       port: 8080
