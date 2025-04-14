@@ -213,6 +213,9 @@ type ListenerEntryStatus struct {
 	Name SectionName `json:"name"`
 
 	// Port is the network port the listener is configured to listen on.
+	//
+	// +kubebuilder:validation:Minimum=1
+	// +kubebuilder:validation:Maximum=65535
 	Port PortNumber `json:"port"`
 
 	// SupportedKinds is the list indicating the Kinds supported by this
