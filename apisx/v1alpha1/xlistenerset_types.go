@@ -129,10 +129,7 @@ type ListenerEntry struct {
 	// same port, subject to the Listener compatibility rules.
 	//
 	// +optional
-	//
-	// +kubebuilder:validation:Minimum=0
-	// +kubebuilder:validation:Maximum=65535
-	Port int32 `json:"port,omitempty"`
+	Port PortNumber `json:"port,omitempty"`
 
 	// Protocol specifies the network protocol this listener expects to receive.
 	Protocol ProtocolType `json:"protocol"`
