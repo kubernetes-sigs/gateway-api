@@ -639,7 +639,7 @@ In the most trivial case where metaresources can only directly target the object
 
 ### Classes of metaresources
 
-The following two classes of metaresource kinds are defined: *Direct* and *Inherited*.
+While the notion of classes of metaresource kinds was more central in previous iterations of this GEP (see [GEP-2648](../gep-2648/index.md) and [GEP-2649](../gep-2649/index.md)), it here serves primarily as a communicative and organizational aid. The classification reflects patterns that emerge from the properties and behaviors described in earlier sections, but it does not impose any prescriptive or normative requirements on the implementations. These classes—namely _Direct_ and _Inherited_—remain in the specification to support clarity and shared understanding, especially for implementations and users familiar with earlier versions.
 
 #### Direct
 
