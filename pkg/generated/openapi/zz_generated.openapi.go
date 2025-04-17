@@ -7748,6 +7748,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerEntry(ref common.Refere
 					"port": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Port is the network port. Multiple listeners may use the same port, subject to the Listener compatibility rules.",
+							Default:     0,
 							Type:        []string{"integer"},
 							Format:      "int32",
 						},
@@ -7773,7 +7774,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerEntry(ref common.Refere
 						},
 					},
 				},
-				Required: []string{"name", "protocol"},
+				Required: []string{"name", "port", "protocol"},
 			},
 		},
 		Dependencies: []string{

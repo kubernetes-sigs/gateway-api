@@ -127,9 +127,7 @@ type ListenerEntry struct {
 
 	// Port is the network port. Multiple listeners may use the
 	// same port, subject to the Listener compatibility rules.
-	//
-	// +optional
-	Port PortNumber `json:"port,omitempty"`
+	Port PortNumber `json:"port"`
 
 	// Protocol specifies the network protocol this listener expects to receive.
 	Protocol ProtocolType `json:"protocol"`

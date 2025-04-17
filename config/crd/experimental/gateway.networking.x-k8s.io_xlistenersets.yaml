@@ -514,6 +514,7 @@ spec:
                           > 0 || size(self.options) > 0 : true'
                   required:
                   - name
+                  - port
                   - protocol
                   type: object
                 maxItems: 64
