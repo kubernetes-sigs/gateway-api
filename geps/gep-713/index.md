@@ -58,7 +58,7 @@ After a few iterations of Gateway API experimenting with this pattern－both, wi
 
 All [risks and caveats](#tldr) considered, these are in general a few reasons for using metaresources over another (possibly more direct) way to modify the spec (“augment the behavior”) of an object:
 
-* Extending otherwise stable APIs – e.g. to specify additional network settings for the Kubernetes Service object.
+* Extending otherwise stable APIs－e.g. to specify additional network settings for the Kubernetes Service object.
 * Defining implementation-specific functionalities for otherwise common APIs－e.g. to specify implementation-specific behavior for Gateway API HTTPRoute objects.
 * Decoupling concerns for targeting personas with specific functionality and configuration－delegation of responsibilities, fine-grained RBAC, etc.
 * Decoupling responsibility over the management and implementation of the metaresources themselves.
@@ -129,7 +129,7 @@ _(This is a hypothetical example: no ColorPolicy resource is defined in Gateway 
 
 - Every metaresource MUST include a `targetRefs` stanza specifying which resource(s) the metaresource intends to augment.
 - Every metaresource MUST include one or more implementation-specific fields specifying how the metaresource will augment the behavior of the target resource(s). This is informally referred to as the "spec proper."
-- A metaresource MAY include additional fields specifying a so-called _merge strategy_, i.e., how the metaresource should be combined with other metaresources that affect the same target resource(s). This typically include directives for dealing with conflicting and/or missing specs, such as for applying default and/or override values on the target resources.
+- A metaresource MAY include additional fields specifying a so-called [_merge strategy_](#merge-strategies), i.e., how the metaresource should be combined with other metaresources that affect the same target resource(s). This typically include directives for dealing with conflicting and/or missing specs.
 
 #### The `targetRefs` stanza
 
@@ -376,7 +376,7 @@ spec:
 
 ##### Targeting virtual types
 
-_Virtual types_ are defined as those with a group unkown by the Kubernetes API server. They can be used to apply metaresources to objects that are not actual Kubernetes resources nor Kubernetes custom resources. Rather, virtual types have a meaning for the metaresource controller responsible for implementing the metaresource.
+_Virtual types_ are defined as those with a group unknown by the Kubernetes API server. They can be used to apply metaresources to objects that are not actual Kubernetes resources nor Kubernetes custom resources. Rather, virtual types have a meaning for the metaresource controller responsible for implementing the metaresource.
 
 An example of such, from Gateway API mesh case, would be a hypothetical need for defining a policy to "color requests" to external services. To accomplish this, implementations MAY choose to support a reference to a virtual resource type `ExternalService`, unknown by the Kuberentes API server but known by the metaresource controller. E.g.:
 
@@ -423,11 +423,17 @@ To avoid ambiguity in the interpretation of the targets, metaresource designs MU
 
 ### Conflicting specs, Inheritance, Merge strategies, and Effective metaresources
 
-Declaring additional specifications to objects from the outside can yield conflicts that need to be addressed in the implementation of metaresources. Multiple instances of a metaresource kind may affect an object (directly or indirectly), thus posing a possible conflict to resolve regarding which intent among the multiple metaresource specs a controller shall honor.
+With metaresources, declaring additional specifications to objects from the outside will often yield conflicts that need to be addressed.
 
-In some cases, the most recent between two conflicting specs may be desired to win, whereas in other cases it might be the oldest. Often, the winning spec is determined by the hierarchical level within the scope the metaresource applies, and sometimes other criteria must be adopted to resolve conflicts between metaresources ultimately affecting the same target.
+Multiple metaresources may (directly or indirectly) affect the same object (same effective target), thus posing a conflict to be resolved regarding which amongst the two declared intents the controller shall honor, i.e. which spec to use to augment the behavior of the object.
 
-The hierarchical relationships of the objects that are targeted by metaresources – whether associated to their parent/child relationship or between specs and their inner sections – may also yield conflicts of specs (conflicting intents). Metaresource kinds that allow for their instances to target at multiple levels of a hierarchy of resource kinds (e.g. Gateway API `Gateway` and `HTTPRoute` kinds), or alternatively entire resources as well as sections of a resource, will often generate cases where the behavior specified by the metaresource either is fully enforced or partially enforced, either honored or overridden by another.
+Another way that conflicts may arise is by allowing metaresources to target different levels of the same hierarchy, including the hierarchy between objects and sections of these objects.
+
+There are multiple ways to resolve these conflicts.
+
+In some cases, for example, the most recent spec between two conflicting metaresources may be desired to win, whereas in other cases it might be the oldest. In a different scenario, the winning spec may not based on creation timestamp but rather determined by the hierarchical level that the metaresource applies (e.g. specs defined higher in the hierarchy wins over specs defined lower, or the other way around). And sometimes other criteria must be adopted to resolve conflicts between metaresources that are ultimately affecting the same target.
+
+This section describes the concepts and rules for dealing with conflicting specs, including the concept of [hierarchy and the semantics of inheritance](#hierarchy-of-target-kinds), and how to calculate so-called [_Effective metaresources_](#effective-metaresources) by applying [_Merge strategies_](#merge-strategies).
 
 #### Hierarchy of target kinds
 
@@ -435,69 +441,121 @@ Metaresource CRDs MUST clearly define the hierarchy of target resources they hav
 
 The best way to visualize this hierarchy－and therefore the instances of objects organized by the hierarchy－is in the form of a Directed Acyclic Graph (DAG) whose roots are the least specific objects and the leaves are the most specific ones (and ultimately the effective targets of the metaresources). Using a DAG to represent the hierarchy of effective targets ensures that all the relevant objects are represented, and makes the calculation of corresponding combinatorial specs much easier.
 
+Example of a DAG for Gateway API resources:
+
+```mermaid
+---
+config:
+  look: handDrawn
+  theme: neutral
+---
+graph
+    gc@{ shape: rect, label: "GatewayClass 1" }
+    g@{ shape: rect, label: "Gateway 1" }
+    r1@{ shape: rect, label: "Route 1" }
+    r2@{ shape: rect, label: "Route 2" }
+    b@{ shape: rect, label: "Backend 1" }
+
+    gc --> g
+    g --> r1
+    g --> r2
+    r1 --> b
+    r2 --> b
+```
+
 For any given path within the DAG, nodes closer to a root are considered "higher" in the hierarchy, while nodes closer to a leaf are "lower." Higher nodes define broader, less specific configurations, whereas lower nodes define more specific ones.
 
 Lower levels in the hierarchy (e.g., more specific kinds) *inherit* the definitions applied at the higher levels (e.g. less specific kinds), in such a way that higher level rules may be understood as having an “umbrella effect” over everything under that level.
 
 E.g., given the Gateway API’s hierarchy of network resources for the ingress use case `GatewayClass` > `Gateway` > `HTTPRoute` > `Backend`. A metaresource that attaches to a `GatewayClass` object, if defined as a metaresource kind ultimately to augment the behavior of `HTTPRoute` objects, affects all `Gateways` under the `GatewayClass`, as well as all `HTTPRoutes` under those `Gateways`. Any other instance of this metaresource kind targeting a lower level than the `GatewayClass` (e.g. `Gateway` or `HTTPRoute`, assuming it's supported) should be treated as a conflict against the higher level metaresource spec in the specific scope that is rooted at the lower level target, i.e., for the subset of the topology that is afftected by both metaresources.
 
-Conflicts between metaresources ultimately affecting the same scope MUST be resolved into so-called *Effective metaresources*, according to some defined [*merge strategies*](#merge-strategies).
+Conflicts between metaresources ultimately affecting the same scope MUST be resolved into so-called [*Effective metaresources*](#effective-metaresources), according to some defined [*merge strategies*](#merge-strategies).
 
 #### Effective metaresources
 
 The DAG that represents the hierarchy of targetable objects works as a map to orderly resolve, for each [effective target](#declared-targets-versus-effective-targets), a combinatorial spec that is collectively defined by the set of metaresources affecting the target. This combinatorial spec of each effective target is referred to as the *Effective metaresource* (or *Effective policy*).
 
-The process of calculating Effective metaresources (Effective policies) consists of walking the hierarchy of target objects, from most specific to least specific (i.e., bottom-up, from the leaves towards the roots of the DAG of target objects) or from least specific to most specific (top-down), map reducing to a single metaresource spec each pair of metaresources adjacent to each other in the hierarchy, applying at each step one of the supported [*merge strategies*](#merge-strategies) (described below), until no more than one spec remains for each effective target.
+The process of calculating Effective metaresources (Effective policies) consists of walking the hierarchy of target objects, from least specific to most specific (i.e., "top-down" or, equivalently, from the roots towards the leaves of the DAG of target objects) or from most specific to least specific ("bottom-up"), map reducing to a single metaresource spec each pair of metaresources adjacent to each other in the hierarchy, by applying at each step one of the supported [*merge strategies*](#merge-strategies) (described below), until no more than one spec remains for each effective target.
 
-Between two metaresources in conflict and therefore whose specs are to be merged into one according to a given merge strategy, the least specific metaresource of the pair dictates the merge strategy to apply.
+Example of Effective metaresources based on a hierarchy of Gateway API resources:
 
-Metaresource kinds that implement more than one merge strategy MUST provide a way in the spec for the instances of the metaresource to specify the chosen strategy that the metaresource controller must use to calculate an effective metaresource out of two instances. If no merge strategy is specified, then implementations SHOULD use more-specific-wins merge strategy by default.
+```mermaid
+---
+config:
+  look: handDrawn
+  theme: neutral
+---
+graph
+    gc@{ shape: rect, label: "GatewayClass 1" }
+    g@{ shape: rect, label: "Gateway 1" }
+    r1@{ shape: rect, label: "Route 1" }
+    r2@{ shape: rect, label: "Route 2" }
+    b@{ shape: rect, label: "Backend 1" }
+    m1@{ shape: stadium, label: "Metaresource 1" }
+    m2@{ shape: stadium, label: "Metaresource 2" }
 
-The following subsections define a set of rules to arrange metaresources for conflict resolution, as well as an abstract process to calculate effective metaresources.
+    gc --> g
+    g --> r1
+    g --> r2
+    r1 --> b
+    r2 --> b
 
-#### Conflict resolution rules
+    m1 -.-> g
+    m2 -.-> r1
+```
 
-If multiple metaresources have the same scope (that is, multiple instances of the same metaresource kind affect the same effective target), this is considered to be a conflict.
-
-A metaresource winning over another means this metaresource dictates the merge strategy to apply.
-
-To determine which metaresources attached to objects in a hierarchy are higher or lower, use the following rules, continuing on ties:
-1. Between two metaresources at different levels of the hierarchy, the one attached higher wins (i.e. dictates the merge strategy to use to resolve the conflict).
-2. Between two metaresources at the same level of the hierarchy, the older metaresource based on creation timestamp wins.
-3. Between two metaresources at the same level of the hierarchy and identical creation timestamps, the metaresource appearing first in alphabetical order by `{namespace}/{name}` wins.
+The above yields 2 Effective metaresources:
+- For `Route 1`: a combination of `Metaresource 1` and `Metaresource 2`
+- For `Route 2`: equal to `Metaresource 1`
 
 #### Merge strategies
 
-A _merge strategy_ is a function that receives two conflicting specs and returns one.
+If multiple metaresources have the same scope (that is, multiple CRs based on the same metaresource kind affect the same effective target), this is considered to be a _conflict_.
 
-There are 3 *basic merge strategies*:
-* **None:** the metaresource with the oldest creation timestamp that is attached to a target wins, while all the other metaresources attached to the same target are rejected (`Accepted` status condition set to false).
-* **Defaults:** more specific specs beats less specific ones.
-* **Overrides:** less specific specs beats more specific ones.
+Conflicts MUST be resolved according to some _merge strategy_. A merge strategy is a function that receives two conflicting specs and returns a new spec without conflict.
 
-Metaresource kinds that implement specifically the Defaults or the Overrides base merge strategies SHOULD specify one or more *atomicity levels* to dictate how these base merge strategies must be applied. These are:
-* **Atomic spec:** the spec of the metaresource is treated as atomic, i.e., either one spec wins or another, but 2 specs are never mixed into a composition of specs. This MUST be the default atomicity applied if not specified otherwise.
-* **Scalar values (“Patch”):** the specs of 2 metaresources are merged into one by applying the winning spec (according to semantics dictated by the base merge strategy, i.e., the more specific if Defaults or the less specific one if Overrides) over the other spec, in a JSON patch operation.
-* **\<Custom>:** the spec of 2 metaresources are mixed into a composition of both specs, following a custom merge algorithm specified by the metaresource or policy kind.
+##### Basic merge strategies
 
-The final set of *merge strategies* therefore supported by a metaresource CRD (base merge strategy \+ atomicity level) is any subset of the following, where \<Custom> is implementation-specific:
+3 *basic merge strategies* are defined:
+* **None:** the spec (metaresource) with the oldest creation timestamp wins, while all the other specs (metaresources) MUST be rejected (i.e., the `Accepted` status condition of the metaresource SHOULD be set to false).
+* **Defaults:** more specific specs (lower in the hiearchy) beats less specific ones (higher in the hierarchy).
+* **Overrides:** less specific specs (higher in the hierarchy) beats more specific ones (lower in the hiearchy).
+
+##### Atomicity level of merging specs
+
+By default, the basic merge strategies treat the conflicting specs as atomic units. I.e., one spec is fully picked over another, and the disregarded spec is fully discarded. Differently put, the [effective metaresource](#effective-metaresources) calculated out of the two specs is equal to one spec or the other, but never to a combination of both.
+
+In some cases, treating specs as atomic units is not good enough. Metaresource kinds that implement the **Defaults** and/or the **Overrides** basic merge strategies MAY require additional specification for more fine-grained atomicity levels on top of the supported basic merge strategies. One additional _atomicity level_ is defined for patch-like operations, therefore resulting in 2 standard atomicity levels for merging specs:
+* **Atomic specs:** the spec of the metaresource is treated as atomic, i.e., either one spec wins or the other, but 2 specs are never mixed into a composition of specs. This MUST be the default atomicity applied if not specified otherwise.
+* **Scalar values ("Patch"):** the specs of 2 metaresources are merged into one by applying the winning spec over the other spec, in a JSON patch operation. The winning spec is defined according to the basic merge strategy－i.e., more specific merged into less specific for **Defaults** and less specific merged into more specific for **Overrides**.
+
+##### Well-known and custom merge strategies
+
+Given the basic merge strategies and atomicity levels defined, metaresource CRDs can support any subset of the following well-known merge strategies:
 * None
 * Atomic Defaults
 * Atomic Overrides
 * Patch Defaults
 * Patch Overrides
-* \<Custom> Defaults
-* \<Custom> Overrides
 
-Metaresource kinds MAY opt to implement any of these strategies, including multiple strategies.
+Additionally, implementations MAY specify _custom_ merge strategies. These are implementation-specific strategies where the specs of 2 metaresources are mixed into a composition of both, following a custom merge algorithm specified by the metaresource kind.
+
+##### Rules for implementing merge strategies
+
+Metaresource kinds MAY opt to implement any of the well-known or custom merge strategies, including multiple strategies by the same metaresource kind.
 
 Metaresource kinds that do not specify any merge strategy and only support targeting a single kind (with Declared target = Effective target), by default MUST implement the **None** merge strategy. (See the definition of [Direct](#direct) class of metaresources.)
 
 Metaresource kinds that do not specify any merge strategy and support targeting multiple effective kinds, by default MUST implement the **Atomic Defaults** merge strategy.
 
-Metaresource kinds that implement more than one merge strategy MUST define a clear structure for the instances of metaresource to specify which of the supported strategies to apply. Instances of these metaresources MUST NOT be allowed to declare more than one merge strategy at a time, but only one of the supported strategies. If no merge strategy is specified by a given instance of the metaresource, the **Atomic Defaults** merge strategy MUST be assumed.
+Metaresource kinds that implement more than one merge strategy MUST define a clear structure for the metaresource CRs to specify which one of the supported strategies to apply. Metaresource CRs MUST NOT be allowed to declare more than one merge strategy at a time, but only one of the supported strategies. If no merge strategy is specified by a given metaresource CR, the **Atomic Defaults** merge strategy SHOULD be assumed, provided it's one of the supported merge strategies implemented by the metaresource kind.
 
-A pattern known to be adopted by metaresource CRDs that support multiple merge strategies is the definition of a `strategy` field in the metaresource spec for the instances to specify the exact strategy to apply.
+For metaresource kinds that support merge strategy specified by the user at the CR, the following rules, continuing on ties, MUST be implemented to determine which merge strategy to apply between two metaresources in conflict:
+1. Between two metaresources targeting at different levels of the hierarchy, the one attached higher (less specific) dictates the merge strategy to use to resolve the conflict.
+2. Between two metaresources targeting at the same level of the hierarchy, the older metaresource based on creation timestamp dictates the merge strategy.
+3. Between two metaresources targeting at the same level of the hierarchy and identical creation timestamps, the metaresource appearing first in alphabetical order by `{namespace}/{name}` dictates the merge strategy.
+
+A known pattern adopted by metaresource CRDs that support multiple merge strategies is the definition of a `strategy` field in the metaresource spec for the instances to specify the merge strategy.
 
 Metaresource implementations SHOULD reflect in the `status` stanza of the metaresources how the applied merge strategies are altering the effectiveness of the metaresource spec, if possible considering all the different scopes targeted by the metaresource－i.e., if metaresources are being enforced or overridden, partially or completely. (See [Metaresource status](#metaresource-status) section for details.)
 
