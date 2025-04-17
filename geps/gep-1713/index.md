@@ -392,7 +392,7 @@ spec:
 
 #### Port
 
-`Port` is now a pointer to allow for dynamic port assignment.  If the port is unspecified or set to zero, the implementation will assign a unique port. If the implementation does not support dynamic port assignment, it MUST set `Accepted` condition to `False` with the `UnsupportedPort` reason.
+`Port` is now optional to allow for dynamic port assignment.  If the port is unspecified or set to zero, the implementation will assign a unique port. If the implementation does not support dynamic port assignment, it MUST set `Accepted` condition to `False` with the `UnsupportedPort` reason.
 
 ## Semantics
 
