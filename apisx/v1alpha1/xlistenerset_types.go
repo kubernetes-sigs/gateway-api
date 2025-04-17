@@ -130,7 +130,7 @@ type ListenerEntry struct {
 	//
 	// +optional
 	//
-	// +kubebuilder:validation:Default=0
+	// +kubebuilder:default=0
 	// +kubebuilder:validation:Minimum=0
 	// +kubebuilder:validation:Maximum=65535
 	Port PortNumber `json:"port,omitempty"`

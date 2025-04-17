@@ -271,6 +271,7 @@ spec:
                       pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                       type: string
                     port:
+                      default: 0
                       description: |-
                         Port is the network port. Multiple listeners may use the
                         same port, subject to the Listener compatibility rules.
