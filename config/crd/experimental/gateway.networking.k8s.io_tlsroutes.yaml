@@ -284,6 +284,8 @@ spec:
 
                         Support: Extended
                       format: int32
+                      maximum: 65535
+                      minimum: 1
                       type: integer
                     sectionName:
                       description: |-
@@ -731,6 +733,8 @@ spec:
 
                             Support: Extended
                           format: int32
+                          maximum: 65535
+                          minimum: 1
                           type: integer
                         sectionName:
                           description: |-
