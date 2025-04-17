@@ -469,7 +469,7 @@ spec:
 
 #### Optional Section Name
 
-If a `sectionName` in a Route's `parentRef` is not set then the Route MUST attach to only the listeners in the referenced parent. As an example given a `Gateway` and it's child `ListenerSets` a route attaching to the `Gateway` with an empty `sectionName` shall only attach to the listeners in the `Gateways` immediate `spec.listeners` list. In other words, the Route will not attach to any listeners in the `ListenerSets`.
+If a `sectionName` in a Route's `parentRef` is not set then the Route MUST attach to only the listeners in the referenced parent. As an example given a `Gateway` and it's child `ListenerSets` a route attaching to the `Gateway` with an empty `sectionName` shall only attach to the listeners in the `Gateways` immediate `spec.listeners` list. In other words, the Route will not attach to any listeners in the `ListenerSets`. This is necessary because, for UX reasons, the `name` field does not have to be unique across all Listeners merged into a Gateway (see the section below for details).
 
 ### Policy Attachment
 
@@ -491,6 +491,8 @@ A `ListenerSet` must be able to reference a secret/backend in the same namespace
 ### Listener Validation
 
 Within a single resource such as a `Gateway` or `ListenerSet` the list of listeners MUST have unique names. Implementations MUST allow listeners from a child `ListenerSet` to be merged into a parent `Gateway` when listeners have the same name. Likewise implementations MUST allow sibling `ListenerSets` listeners with matching names to be merged into a parent `Gateway`. This allows for authors of Routes to simply attach to their desired parentRef and listener without having to worry about naming conflicts across resources.
+
+It is up to the implementations how unique names are generated internally. One example would be to hash the `ListenerSet` name+namespace and prepend it to the listener entry `name`.
 
 Implementations MUST treat the parent `Gateway`s as having the merged list of all listeners from itself and attached `ListenerSets` and validation of this list of listeners MUST behave the same as if the list were part of a single `Gateway` with the relaxed listener name constraints.
 
