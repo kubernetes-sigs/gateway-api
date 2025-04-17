@@ -172,10 +172,7 @@ type ListenerEntry struct {
 	// Support: Core
 	//
 	// +optional
-	//
-	// +kubebuilder:validation:Minimum=0
-	// +kubebuilder:validation:Maximum=65535
-	Port int32 `json:"port,omitempty"`
+	Port *PortNumber `json:"port,omitempty"`
 
 	// Protocol specifies the network protocol this listener expects to receive.
 	//
