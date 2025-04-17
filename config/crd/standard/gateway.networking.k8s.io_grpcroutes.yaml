@@ -296,8 +296,6 @@ spec:
 
                         Support: Extended
                       format: int32
-                      maximum: 65535
-                      minimum: 1
                       type: integer
                     sectionName:
                       description: |-
@@ -682,8 +680,6 @@ spec:
                                             For other resources, destination port might be derived from the referent
                                             resource or this field.
                                           format: int32
-                                          maximum: 65535
-                                          minimum: 1
                                           type: integer
                                       required:
                                       - name
@@ -1001,8 +997,6 @@ spec:
                               For other resources, destination port might be derived from the referent
                               resource or this field.
                             format: int32
-                            maximum: 65535
-                            minimum: 1
                             type: integer
                           weight:
                             default: 1
@@ -1331,8 +1325,6 @@ spec:
                                       For other resources, destination port might be derived from the referent
                                       resource or this field.
                                     format: int32
-                                    maximum: 65535
-                                    minimum: 1
                                     type: integer
                                 required:
                                 - name
@@ -1993,8 +1985,6 @@ spec:
 
                             Support: Extended
                           format: int32
-                          maximum: 65535
-                          minimum: 1
                           type: integer
                         sectionName:
                           description: |-

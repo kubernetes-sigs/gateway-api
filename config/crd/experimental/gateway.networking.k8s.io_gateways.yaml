@@ -782,8 +782,6 @@ spec:
 
                         Support: Core
                       format: int32
-                      maximum: 65535
-                      minimum: 1
                       type: integer
                     protocol:
                       description: |-
@@ -2120,8 +2118,6 @@ spec:
 
                         Support: Core
                       format: int32
-                      maximum: 65535
-                      minimum: 1
                       type: integer
                     protocol:
                       description: |-
