@@ -20,15 +20,6 @@ import (
 	"slices"
 
 	meshtests "sigs.k8s.io/gateway-api/conformance/tests/mesh"
-	"sigs.k8s.io/gateway-api/conformance/utils/suite"
 )
 
 var ConformanceTests = slices.Clone(meshtests.MeshConformanceTests)
-
-func getGatewayAndMeshTests() []suite.ConformanceTest {
-	// tests := []suite.ConformanceTest{}
-	ConformanceTests = append(ConformanceTests, meshtests.MeshConformanceTests...)
-	return ConformanceTests
-}
-
-var GatewayAndMeshConformanceTests = getGatewayAndMeshTests()

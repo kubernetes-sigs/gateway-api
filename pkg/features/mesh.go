@@ -48,7 +48,7 @@ const (
 	SupportMeshClusterIPMatching FeatureName = "MeshClusterIPMatching"
 	// This option indicates support for "consumer" routes, where a namespace creates a route for a service in another namespace.
 	SupportMeshConsumerRoute FeatureName = "MeshConsumerRoute"
-	// This option indicates support for HTTPRoute path rewrite (extended conformance)
+	// This option indicates mesh support for HTTPRoute path rewrite (extended conformance)
 	SupportMeshHTTPRouteRewritePath FeatureName = "MeshHTTPRouteRewritePath"
 )
 
@@ -64,7 +64,7 @@ var (
 		Channel: FeatureChannelStandard,
 	}
 
-	// MeshConsumerRouteFeature contains metadata for the MeshConsumerRoute feature.
+	// MeshHTTPRouteRewritePath contains metadata for the MeshHTTPRouteRewritePath feature.
 	MeshHTTPRouteRewritePath = Feature{
 		Name:    SupportMeshHTTPRouteRewritePath,
 		Channel: FeatureChannelStandard,

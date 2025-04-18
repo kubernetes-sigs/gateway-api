@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package tests
+package meshtests
 
 import (
 	"testing"
@@ -26,7 +26,7 @@ import (
 )
 
 func init() {
-	ConformanceTests = append(ConformanceTests, MeshConsumerRoute)
+	MeshConformanceTests = append(MeshConformanceTests, MeshConsumerRoute)
 }
 
 var MeshConsumerRoute = suite.ConformanceTest{
@@ -38,7 +38,7 @@ var MeshConsumerRoute = suite.ConformanceTest{
 		features.SupportHTTPRoute,
 		features.SupportHTTPRouteResponseHeaderModification,
 	},
-	Manifests: []string{"tests/mesh-consumer-route.yaml"},
+	Manifests: []string{"tests/mesh/mesh-consumer-route.yaml"},
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
 		consumerClient := echo.ConnectToAppInNamespace(t, s, echo.MeshAppEchoV1, "gateway-conformance-mesh-consumer")
 		consumerCases := []http.ExpectedResponse{
