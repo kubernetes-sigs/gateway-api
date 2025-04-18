@@ -341,7 +341,8 @@ func TestGRPCRouteRule(t *testing.T) {
 				}
 				return rules
 			}(),
-		}}
+		},
+	}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
