@@ -1,5 +1,8 @@
 # Release Process
 
+This details how releases of Gateway API are delivered. This process is
+exercised by a [Release Manager](/RELEASE_MANAGEMENT.md).
+
 ## Overview
 
 The Gateway API project is an API project that has the following two components:
