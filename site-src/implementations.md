@@ -47,6 +47,7 @@ cover, and documentation to help users get started.
 
 ## Service Mesh Implementation Status <a name="meshes"></a>
 
+- [Google Cloud Service Mesh][38] (GA)
 - [Istio][9] (GA)
 - [Kuma][11] (GA)
 - [Linkerd][28] (experimental)
@@ -95,6 +96,7 @@ cover, and documentation to help users get started.
 [35]:#kong-gateway-operator
 [36]:#loxilb
 [37]:#kgateway
+[38]:#google-cloud-service-mesh
 
 
 [gamma]:/concepts/gamma/
@@ -289,6 +291,20 @@ profile except `HTTPRouteServiceTypes`.
 
 [gloogateway]:https://docs.solo.io/gateway/latest/
 [solo]:https://www.solo.io
+
+### Google Cloud Service Mesh
+
+
+[Google Kubernetes Engine (GKE)][gke] is a managed Kubernetes platform offered
+by Google Cloud. GKE's implementation of the Gateway For Mesh is through the [Cloud Service Mesh][cloud-service-mesh].
+
+Google Cloud Service Mesh supports [Envoy-based sidecar mesh][envoy-sidecar-mesh] and [Proxyless-GRPC][proxyless-grpc-mesh].
+
+
+[gke]:https://cloud.google.com/kubernetes-engine
+[cloud-service-mesh]:https://cloud.google.com/service-mesh/docs/gateway/prepare-gateway
+[envoy-sidecar-mesh]:https://cloud.google.com/service-mesh/docs/gateway/set-up-envoy-mesh
+[proxyless-grpc-mesh]:https://cloud.google.com/service-mesh/docs/gateway/proxyless-grpc-mesh
 
 ### Google Kubernetes Engine
 
