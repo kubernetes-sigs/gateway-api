@@ -296,13 +296,16 @@ profile except `HTTPRouteServiceTypes`.
 
 
 [Google Kubernetes Engine (GKE)][gke] is a managed Kubernetes platform offered
-by Google Cloud. GKE's implementation of the Gateway For Mesh is through the [Cloud Service Mesh][cloud-service-mesh].
+by Google Cloud.
+
+GKE's implementation of the Gateway For Mesh (GAMMA) is through the [Cloud Service Mesh][cloud-service-mesh], a fully managed service mesh based on Envoy.
+
 
 Google Cloud Service Mesh supports [Envoy-based sidecar mesh][envoy-sidecar-mesh] and [Proxyless-GRPC][proxyless-grpc-mesh].
 
 
 [gke]:https://cloud.google.com/kubernetes-engine
-[cloud-service-mesh]:https://cloud.google.com/service-mesh/docs/gateway/prepare-gateway
+[cloud-service-mesh]:https://cloud.google.com/products/service-mesh
 [envoy-sidecar-mesh]:https://cloud.google.com/service-mesh/docs/gateway/set-up-envoy-mesh
 [proxyless-grpc-mesh]:https://cloud.google.com/service-mesh/docs/gateway/proxyless-grpc-mesh
 
