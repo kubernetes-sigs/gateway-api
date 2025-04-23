@@ -105,7 +105,7 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 					Interval: toDuration("10s"),
 				}),
 			},
-			wantErrors: []string{"budgetInterval can not be greater than one hour or less than one second"},
+			wantErrors: []string{"interval can not be greater than one hour or less than one second"},
 		},
 		{
 			name: "invalid BackendTrafficPolicyConfig budgetInterval too short",
@@ -124,7 +124,7 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 					Interval: toDuration("10s"),
 				}),
 			},
-			wantErrors: []string{"budgetInterval can not be greater than one hour or less than one second"},
+			wantErrors: []string{"interval can not be greater than one hour or less than one second"},
 		},
 		{
 			name: "invalid BackendTrafficPolicyConfig minRetryRate interval",
