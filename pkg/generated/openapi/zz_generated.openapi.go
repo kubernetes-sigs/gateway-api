@@ -7706,14 +7706,14 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BudgetDetails(ref common.Refere
 				Properties: map[string]spec.Schema{
 					"percent": {
 						SchemaProps: spec.SchemaProps{
-							Description: "BudgetPercent defines the maximum percentage of active requests that may be made up of retries.\n\nSupport: Extended",
+							Description: "Percent defines the maximum percentage of active requests that may be made up of retries.\n\nSupport: Extended",
 							Type:        []string{"integer"},
 							Format:      "int32",
 						},
 					},
 					"interval": {
 						SchemaProps: spec.SchemaProps{
-							Description: "BudgetInterval defines the duration in which requests will be considered for calculating the budget for retries.\n\nSupport: Extended",
+							Description: "Interval defines the duration in which requests will be considered for calculating the budget for retries.\n\nSupport: Extended",
 							Type:        []string{"string"},
 							Format:      "",
 						},
