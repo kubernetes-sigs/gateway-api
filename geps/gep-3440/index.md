@@ -117,6 +117,11 @@ gRPC-specific error codes, limiting its alignment with the GEP’s requirement f
 Traefik does not offer per-try timeout controls specific to each retry attempt. Instead, it typically relies on a
 global request timeout, limiting the flexibility needed for more precise gRPC retry management (like Envoy’s `per_try_timeout`).
 
+### Linkerd
+1. **Retry Conditions**: Linkerd supports retries already using annotations on the GRPCRoute and one of these annotations
+is `retry.linkerd.io/grpc` which allows you to specify the gRPC status codes that should trigger a retry.
+2. **Retry Limits**: Linkerd allows you to set a maximum number of retries using the `retry.linkerd.io/limit` annotation.
+
 ## API
 Having a dedicated API for gRPC retry conditions is necessary because gRPC uses
 unique error codes (e.g., `UNAVAILABLE`, `DEADLINE_EXCEEDED`) that represent transient issues specific to its protocol,
