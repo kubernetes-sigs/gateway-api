@@ -12,14 +12,12 @@ spec:
       cors:
         allowOrigins:
         - "https://www.foo.com"
-        - "https://www.bar.com"
-        - "https://*.foobar.com"
+        - "https://*.bar.com"
         allowMethods:
         - GET
         - POST
         - PUT
         - PATCH
-        - DELETE
         - OPTIONS
         allowHeaders:
         - "x-header-1"
@@ -28,7 +26,7 @@ spec:
         - "x-header-3"
         - "x-header-4"
         allowCredentials: true
-        maxAge: 1000
+        maxAge: 3600
     backendRefs:
     - name: infra-backend-v1
       port: 8080

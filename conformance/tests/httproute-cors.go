@@ -33,7 +33,7 @@ func init() {
 
 var HTTPRouteCORS = suite.ConformanceTest{
 	ShortName:   "HTTPRouteCORS",
-	Description: "An HTTPRoute with CORS filter",
+	Description: "An HTTPRoute with CORS filter should allow CORS requests from specified origins",
 	Manifests:   []string{"tests/httproute-cors.yaml"},
 	Features: []features.FeatureName{
 		features.SupportGateway,
@@ -49,6 +49,7 @@ var HTTPRouteCORS = suite.ConformanceTest{
 
 		testCases := []http.ExpectedResponse{
 			{
+				TestCaseName: "CORS preflight request from an exact mactching origin should be allowed",
 				Request: http.Request{
 					Path:   "/",
 					Method: "OPTIONS",
@@ -74,10 +75,132 @@ var HTTPRouteCORS = suite.ConformanceTest{
 				Response: http.Response{
 					StatusCode: 200,
 					Headers: map[string]string{
-						"access-control-allow-origin":   "https://www.foo.com",
-						"access-control-allow-methods":  "GET, POST, PUT, PATCH, DELETE, OPTIONS",
-						"access-control-allow-headers":  "x-header-1, x-header-2",
-						"access-control-expose-headers": "x-header-3, x-header-4",
+						"access-control-allow-origin":      "https://www.foo.com",
+						"access-control-allow-methods":     "GET, POST, PUT, PATCH, OPTIONS",
+						"access-control-allow-headers":     "x-header-1, x-header-2",
+						"access-control-expose-headers":    "x-header-3, x-header-4",
+						"access-control-max-age":           "3600",
+						"access-control-allow-credentials": "true",
+					},
+				},
+			},
+			{
+				TestCaseName: "CORS preflight request from a wildcard matching origin should be allowed",
+				Request: http.Request{
+					Path:   "/",
+					Method: "OPTIONS",
+					Headers: map[string]string{
+						"Origin":                         "https://www.bar.com",
+						"access-control-request-method":  "GET",
+						"access-control-request-headers": "x-header-1, x-header-2",
+					},
+				},
+				// Set the expected request properties and namespace to empty strings.
+				// This is a workaround to avoid the test failure.
+				// The response body is empty because the request is a preflight request,
+				// so we can't get the request properties from the echoserver.
+				ExpectedRequest: &http.ExpectedRequest{
+					Request: http.Request{
+						Host:    "",
+						Method:  "OPTIONS",
+						Path:    "",
+						Headers: nil,
+					},
+				},
+				Namespace: "",
+				Response: http.Response{
+					StatusCode: 200,
+					Headers: map[string]string{
+						"access-control-allow-origin":      "https://www.bar.com",
+						"access-control-allow-methods":     "GET, POST, PUT, PATCH, OPTIONS",
+						"access-control-allow-headers":     "x-header-1, x-header-2",
+						"access-control-expose-headers":    "x-header-3, x-header-4",
+						"access-control-max-age":           "3600",
+						"access-control-allow-credentials": "true",
+					},
+				},
+			},
+			{
+				TestCaseName: "CORS preflight request from a non-matching origin should not be allowed",
+				Request: http.Request{
+					Path:   "/",
+					Method: "OPTIONS",
+					Headers: map[string]string{
+						"Origin":                        "https://foobar.com",
+						"access-control-request-method": "GET",
+					},
+				},
+				// Set the expected request properties and namespace to empty strings.
+				// This is a workaround to avoid the test failure.
+				// The response body is empty because the request is a preflight request,
+				// so we can't get the request properties from the echoserver.
+				ExpectedRequest: &http.ExpectedRequest{
+					Request: http.Request{
+						Host:    "",
+						Method:  "OPTIONS",
+						Path:    "",
+						Headers: nil,
+					},
+				},
+				Namespace: "",
+				Response: http.Response{
+					AbsentHeaders: []string{
+						"access-control-allow-origin",
+					},
+				},
+			},
+			{
+				TestCaseName: "Simple request from an exact mactching origin should be allowed",
+				Namespace: ns,
+				Request: http.Request{
+					Path:   "/",
+					Method: "GET",
+					Headers: map[string]string{
+						"Origin":                         "https://www.foo.com",
+						"access-control-request-method":  "GET",
+						"access-control-request-headers": "x-header-1, x-header-2",
+					},
+				},
+				Response: http.Response{
+					StatusCode: 200,
+					Headers: map[string]string{
+						"access-control-allow-origin":      "https://www.foo.com",
+					},
+				},
+			},
+			{
+				TestCaseName: "Simple request from a wildcard matching origin should be allowed",
+				Namespace: ns,
+				Request: http.Request{
+					Path:   "/",
+					Method: "GET",
+					Headers: map[string]string{
+						"Origin":                         "https://www.bar.com",
+						"access-control-request-method":  "GET",
+						"access-control-request-headers": "x-header-1, x-header-2",
+					},
+				},
+				Response: http.Response{
+					StatusCode: 200,
+					Headers: map[string]string{
+						"access-control-allow-origin":      "https://www.bar.com",
+					},
+				},
+			},
+			{
+				TestCaseName: "Simple request from a non-matching origin should not be allowed",
+				Namespace: ns,
+				Request: http.Request{
+					Path:   "/",
+					Method: "GET",
+					Headers: map[string]string{
+						"Origin":                        "https://foobar.com",
+						"access-control-request-method": "GET",
+					},
+				},
+				Response: http.Response{
+					AbsentHeaders: []string{
+						"access-control-allow-origin",
 					},
 				},
 			},
