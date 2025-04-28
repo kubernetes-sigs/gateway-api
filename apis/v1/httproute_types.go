@@ -619,7 +619,7 @@ type HTTPHeaderMatch struct {
 	//
 	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=4096
-	// <gateway:experimental:validation:XValidation:message="must only contain printable ASCII characters, optionally separated by single tabs or spaces",rule="self.matches('^[!-~]+([\\t ]?[!-~]+)*$')">
+	// <gateway:experimental:validation:Pattern=`^[!-~]+([\t ]?[!-~]+)*$`>
 	Value string `json:"value"`
 }
 
@@ -993,7 +993,7 @@ type HTTPHeader struct {
 	//
 	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=4096
-	// <gateway:experimental:validation:XValidation:message="must only contain printable ASCII characters, optionally separated by single tabs or spaces",rule="self.matches('^[!-~]+([\\t ]?[!-~]+)*$')">
+	// <gateway:experimental:validation:Pattern=`^[!-~]+([\t ]?[!-~]+)*$`>
 	Value string `json:"value"`
 }
 
