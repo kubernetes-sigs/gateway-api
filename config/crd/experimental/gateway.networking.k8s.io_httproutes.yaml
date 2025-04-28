@@ -1078,12 +1078,8 @@ spec:
                                               by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
                                             maxLength: 4096
                                             minLength: 1
+                                            pattern: ^[!-~]+([\t ]?[!-~]+)*$
                                             type: string
-                                            x-kubernetes-validations:
-                                            - message: must only contain printable
-                                                ASCII characters, optionally separated
-                                                by single tabs or spaces
-                                              rule: self.matches('^[!-~]+([\\t ]?[!-~]+)*$')
                                         required:
                                         - name
                                         - value
@@ -1161,12 +1157,8 @@ spec:
                                               by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
                                             maxLength: 4096
                                             minLength: 1
+                                            pattern: ^[!-~]+([\t ]?[!-~]+)*$
                                             type: string
-                                            x-kubernetes-validations:
-                                            - message: must only contain printable
-                                                ASCII characters, optionally separated
-                                                by single tabs or spaces
-                                              rule: self.matches('^[!-~]+([\\t ]?[!-~]+)*$')
                                         required:
                                         - name
                                         - value
@@ -1530,12 +1522,8 @@ spec:
                                               by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
                                             maxLength: 4096
                                             minLength: 1
+                                            pattern: ^[!-~]+([\t ]?[!-~]+)*$
                                             type: string
-                                            x-kubernetes-validations:
-                                            - message: must only contain printable
-                                                ASCII characters, optionally separated
-                                                by single tabs or spaces
-                                              rule: self.matches('^[!-~]+([\\t ]?[!-~]+)*$')
                                         required:
                                         - name
                                         - value
@@ -1613,12 +1601,8 @@ spec:
                                               by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
                                             maxLength: 4096
                                             minLength: 1
+                                            pattern: ^[!-~]+([\t ]?[!-~]+)*$
                                             type: string
-                                            x-kubernetes-validations:
-                                            - message: must only contain printable
-                                                ASCII characters, optionally separated
-                                                by single tabs or spaces
-                                              rule: self.matches('^[!-~]+([\\t ]?[!-~]+)*$')
                                         required:
                                         - name
                                         - value
@@ -2589,12 +2573,8 @@ spec:
                                         by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
                                       maxLength: 4096
                                       minLength: 1
+                                      pattern: ^[!-~]+([\t ]?[!-~]+)*$
                                       type: string
-                                      x-kubernetes-validations:
-                                      - message: must only contain printable ASCII
-                                          characters, optionally separated by single
-                                          tabs or spaces
-                                        rule: self.matches('^[!-~]+([\\t ]?[!-~]+)*$')
                                   required:
                                   - name
                                   - value
@@ -2671,12 +2651,8 @@ spec:
                                         by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
                                       maxLength: 4096
                                       minLength: 1
+                                      pattern: ^[!-~]+([\t ]?[!-~]+)*$
                                       type: string
-                                      x-kubernetes-validations:
-                                      - message: must only contain printable ASCII
-                                          characters, optionally separated by single
-                                          tabs or spaces
-                                        rule: self.matches('^[!-~]+([\\t ]?[!-~]+)*$')
                                   required:
                                   - name
                                   - value
@@ -3039,12 +3015,8 @@ spec:
                                         by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
                                       maxLength: 4096
                                       minLength: 1
+                                      pattern: ^[!-~]+([\t ]?[!-~]+)*$
                                       type: string
-                                      x-kubernetes-validations:
-                                      - message: must only contain printable ASCII
-                                          characters, optionally separated by single
-                                          tabs or spaces
-                                        rule: self.matches('^[!-~]+([\\t ]?[!-~]+)*$')
                                   required:
                                   - name
                                   - value
@@ -3121,12 +3093,8 @@ spec:
                                         by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
                                       maxLength: 4096
                                       minLength: 1
+                                      pattern: ^[!-~]+([\t ]?[!-~]+)*$
                                       type: string
-                                      x-kubernetes-validations:
-                                      - message: must only contain printable ASCII
-                                          characters, optionally separated by single
-                                          tabs or spaces
-                                        rule: self.matches('^[!-~]+([\\t ]?[!-~]+)*$')
                                   required:
                                   - name
                                   - value
@@ -3466,11 +3434,8 @@ spec:
                                     by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
                                   maxLength: 4096
                                   minLength: 1
+                                  pattern: ^[!-~]+([\t ]?[!-~]+)*$
                                   type: string
-                                  x-kubernetes-validations:
-                                  - message: must only contain printable ASCII characters,
-                                      optionally separated by single tabs or spaces
-                                    rule: self.matches('^[!-~]+([\\t ]?[!-~]+)*$')
                               required:
                               - name
                               - value
@@ -5293,12 +5258,8 @@ spec:
                                               by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
                                             maxLength: 4096
                                             minLength: 1
+                                            pattern: ^[!-~]+([\t ]?[!-~]+)*$
                                             type: string
-                                            x-kubernetes-validations:
-                                            - message: must only contain printable
-                                                ASCII characters, optionally separated
-                                                by single tabs or spaces
-                                              rule: self.matches('^[!-~]+([\\t ]?[!-~]+)*$')
                                         required:
                                         - name
                                         - value
@@ -5376,12 +5337,8 @@ spec:
                                               by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
                                             maxLength: 4096
                                             minLength: 1
+                                            pattern: ^[!-~]+([\t ]?[!-~]+)*$
                                             type: string
-                                            x-kubernetes-validations:
-                                            - message: must only contain printable
-                                                ASCII characters, optionally separated
-                                                by single tabs or spaces
-                                              rule: self.matches('^[!-~]+([\\t ]?[!-~]+)*$')
                                         required:
                                         - name
                                         - value
@@ -5745,12 +5702,8 @@ spec:
                                               by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
                                             maxLength: 4096
                                             minLength: 1
+                                            pattern: ^[!-~]+([\t ]?[!-~]+)*$
                                             type: string
-                                            x-kubernetes-validations:
-                                            - message: must only contain printable
-                                                ASCII characters, optionally separated
-                                                by single tabs or spaces
-                                              rule: self.matches('^[!-~]+([\\t ]?[!-~]+)*$')
                                         required:
                                         - name
                                         - value
@@ -5828,12 +5781,8 @@ spec:
                                               by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
                                             maxLength: 4096
                                             minLength: 1
+                                            pattern: ^[!-~]+([\t ]?[!-~]+)*$
                                             type: string
-                                            x-kubernetes-validations:
-                                            - message: must only contain printable
-                                                ASCII characters, optionally separated
-                                                by single tabs or spaces
-                                              rule: self.matches('^[!-~]+([\\t ]?[!-~]+)*$')
                                         required:
                                         - name
                                         - value
@@ -6804,12 +6753,8 @@ spec:
                                         by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
                                       maxLength: 4096
                                       minLength: 1
+                                      pattern: ^[!-~]+([\t ]?[!-~]+)*$
                                       type: string
-                                      x-kubernetes-validations:
-                                      - message: must only contain printable ASCII
-                                          characters, optionally separated by single
-                                          tabs or spaces
-                                        rule: self.matches('^[!-~]+([\\t ]?[!-~]+)*$')
                                   required:
                                   - name
                                   - value
@@ -6886,12 +6831,8 @@ spec:
                                         by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
                                       maxLength: 4096
                                       minLength: 1
+                                      pattern: ^[!-~]+([\t ]?[!-~]+)*$
                                       type: string
-                                      x-kubernetes-validations:
-                                      - message: must only contain printable ASCII
-                                          characters, optionally separated by single
-                                          tabs or spaces
-                                        rule: self.matches('^[!-~]+([\\t ]?[!-~]+)*$')
                                   required:
                                   - name
                                   - value
@@ -7254,12 +7195,8 @@ spec:
                                         by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
                                       maxLength: 4096
                                       minLength: 1
+                                      pattern: ^[!-~]+([\t ]?[!-~]+)*$
                                       type: string
-                                      x-kubernetes-validations:
-                                      - message: must only contain printable ASCII
-                                          characters, optionally separated by single
-                                          tabs or spaces
-                                        rule: self.matches('^[!-~]+([\\t ]?[!-~]+)*$')
                                   required:
                                   - name
                                   - value
@@ -7336,12 +7273,8 @@ spec:
                                         by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
                                       maxLength: 4096
                                       minLength: 1
+                                      pattern: ^[!-~]+([\t ]?[!-~]+)*$
                                       type: string
-                                      x-kubernetes-validations:
-                                      - message: must only contain printable ASCII
-                                          characters, optionally separated by single
-                                          tabs or spaces
-                                        rule: self.matches('^[!-~]+([\\t ]?[!-~]+)*$')
                                   required:
                                   - name
                                   - value
@@ -7681,11 +7614,8 @@ spec:
                                     by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
                                   maxLength: 4096
                                   minLength: 1
+                                  pattern: ^[!-~]+([\t ]?[!-~]+)*$
                                   type: string
-                                  x-kubernetes-validations:
-                                  - message: must only contain printable ASCII characters,
-                                      optionally separated by single tabs or spaces
-                                    rule: self.matches('^[!-~]+([\\t ]?[!-~]+)*$')
                               required:
                               - name
                               - value
