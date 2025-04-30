@@ -79,14 +79,32 @@ suggested as an example of a custom resource that implementations could have to 
 potentially other resource kinds) directly to a Route via backendRef. 
 
 ```yaml
-{% include 'standard/clusterip-gateway/tcproute-with-endpointselector.yaml' %}
+apiVersion: networking.gke.io/v1alpha1
+kind: EndpointSelector
+metadata:
+  name: front-end-pods
+spec:
+  kind: Pod
+  selector:
+  - key: app
+    value: frontend
+    operator: In 
 ```
 
 The EndpointSelector object is defined as follows. It allows the user to specify which endpoints 
 should be targeted for the Route.
 
 ```yaml
-{% include 'standard/clusterip-gateway/endpointselector.yaml' %}
+apiVersion: networking.gke.io/v1alpha1
+kind: EndpointSelector
+metadata:
+  name: front-end-pods
+spec:
+  kind: Pod
+  selector:
+  - key: app
+    value: frontend
+    operator: In 
 ```
 
 To allow more granular control over traffic routing, there have been discussions around adding 
@@ -117,7 +135,29 @@ specify an IP address range for Gateway IP allocation.
 Finally the specific Route and EndpointSelector resources must be created in order to set up the backend 
 pods for the configured ClusterIP.
 ```yaml
-{% include 'standard/clusterip-gateway/customroute.yaml' %}
+kind: [TCPRoute|CustomRoute]
+metadata:
+  name: service-route
+spec:
+  config:
+    sessionAffinity: false
+  parentRefs:
+  - name: example-cluster-ip-gateway
+  rules:
+    backendRefs:
+    - kind: EndpointSelector
+      port: 8080
+      name: exampleapp-app-pods
+---
+apiVersion: gateway.networking.k8s.io/v1alpha1
+kind: EndpointSelector
+metadata:
+  name: exampleapp-app-pods
+spec:
+  selector:
+  - key: app
+    value: exampleapp
+    operator: In  
 ```
 
 ### Backends on Listeners

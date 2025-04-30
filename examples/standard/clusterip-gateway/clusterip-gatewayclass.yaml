@@ -3,4 +3,4 @@ kind: GatewayClass
 metadata:
   name: cluster-ip
 spec:
-  controllerName: "cluster-ip-controller"
+  controllerName: "networking.k8s.io/cluster-ip-controller"

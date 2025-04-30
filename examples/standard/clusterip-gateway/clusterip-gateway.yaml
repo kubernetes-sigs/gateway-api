@@ -4,12 +4,15 @@ metadata:
   name: example-cluster-ip-gateway
 spec:
   addresses:
-  - 10.12.0.15
+  - value: 10.12.0.15
   gatewayClassName: cluster-ip
   listeners:
   - name: example-service
     protocol: TCP
     port: 8080
     allowedRoutes:
+      namespaces:
+        from: Same
       kinds:
-      - kind: TCPRoute/CustomRoute
+      - kind: TCPRoute
+      - kind: CustomRoute
