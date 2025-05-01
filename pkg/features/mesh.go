@@ -54,6 +54,8 @@ const (
 	SupportMeshHTTPRouteSchemeRedirect FeatureName = "MeshHTTPRouteSchemeRedirect"
 	// This option indicates mesh support for HTTPRoute port redirect (extended conformance)
 	SupportMeshHTTPRouteRedirectPort FeatureName = "MeshHTTPRouteRedirectPort"
+	// This option indicates mesh support for HTTPRoute path redirect (extended conformance)
+	SupportMeshHTTPRouteRedirectPath FeatureName = "MeshHTTPRouteRedirectPath"
 )
 
 var (
@@ -85,6 +87,12 @@ var (
 		Name:    SupportMeshHTTPRouteRedirectPort,
 		Channel: FeatureChannelStandard,
 	}
+
+	// MeshHTTPRouteRedirectPath contains metadata for the MeshHTTPRouteRedirectPath feature.
+	MeshHTTPRouteRedirectPath = Feature{
+		Name:    SupportMeshHTTPRouteRedirectPath,
+		Channel: FeatureChannelStandard,
+	}
 )
 
 // MeshExtendedFeatures includes all the supported features for the service mesh at
@@ -94,4 +102,5 @@ var MeshExtendedFeatures = sets.New(
 	MeshConsumerRouteFeature,
 	MeshHTTPRouteRewritePath,
 	MeshHTTPRouteSchemeRedirect,
+	MeshHTTPRouteRedirectPath,
 )
