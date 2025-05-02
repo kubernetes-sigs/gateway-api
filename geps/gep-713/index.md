@@ -458,50 +458,97 @@ If multiple policies have the same scope (that is, multiple CRs based on the sam
 
 Conflicts MUST be resolved according to some _merge strategy_. A merge strategy is a function that receives two conflicting specs and returns a new spec without conflict.
 
-##### Basic merge strategies
-
-3 *basic merge strategies* are defined:
-* **None:** the spec (policy resource) with the oldest creation timestamp wins, while all the other specs (policy resources) MUST be rejected (i.e., the `Accepted` status condition of the policy SHOULD be set to false).
-* **Defaults:** more specific specs (lower in the hiearchy) beats less specific ones (higher in the hierarchy).
-* **Overrides:** less specific specs (higher in the hierarchy) beats more specific ones (lower in the hiearchy).
-
-##### Atomicity level of merging specs
-
-By default, the basic merge strategies treat the conflicting specs as atomic units. I.e., one spec is fully picked over another, and the disregarded spec is fully discarded. Differently put, the [effective policy](#effective-policies) calculated out of the two specs is equal to one spec or the other, but never to a combination of both.
-
-In some cases, treating specs as atomic units is not good enough. Policy kinds that implement the **Defaults** and/or the **Overrides** basic merge strategies MAY require additional specification for more fine-grained atomicity levels on top of the supported basic merge strategies. One additional _atomicity level_ is defined for patch-like operations, therefore resulting in 2 standard atomicity levels for merging specs:
-* **Atomic specs:** the spec of the policy is treated as atomic, i.e., either one spec wins or the other, but 2 specs are never mixed into a composition of specs. This MUST be the default atomicity applied if not specified otherwise.
-* **Scalar values ("Patch"):** the specs of 2 policies are merged into one by applying the winning spec over the other spec, in a JSON patch operation. The winning spec is defined according to the basic merge strategy－i.e., more specific merged into less specific for **Defaults** and less specific merged into more specific for **Overrides**.
-
-##### Well-known and custom merge strategies
-
-Given the basic merge strategies and atomicity levels defined, xPolicy CRDs can support any subset of the following well-known merge strategies:
+This GEP defines the following merge strategies that are further specified in the subsections below:
 * None
-* Atomic Defaults
-* Atomic Overrides
-* Patch Defaults
-* Patch Overrides
+* Atomic defaults
+* Atomic overrides
+* Patch defaults
+* Patch overrides
+* Custom
 
-Additionally, implementations MAY specify _custom_ merge strategies. These are implementation-specific strategies where the specs of 2 policies are mixed into a composition of both, following a custom merge algorithm specified by the policy kind.
+Policy CRDs MAY opt to implement one or multiple merge strategies, including designs where:
+- a policy CRD implies one and only one merge strategy;
+- the policy CRD allows specifying a merge strategy at each individual policy CRs;
+- the controller implementing the policy has its own predefined way to determine a merge strategy for the policy CRs.
 
-##### Rules for implementing merge strategies
+##### Conflict resolution rules
 
-Policy kinds MAY opt to implement any of the well-known or custom merge strategies, including multiple strategies by the same policy kind.
+In a conflict resolution scenario between two specs (two policies), one spec MUST be assigned as the _established spec_ and the other one as the _challenger spec_.
+
+Knowing the distinction between _established_ and _challenger_ is useful to determine how a particular merge strategy will be applied but also, in cases where the Policy CRD supports users specifying a merge strategy at each individual policy CR, to determine which policy CR dictates the merge strategy to apply. In the latter case (i.e., merge strategy specified in the CR), the spec assigned as _established_ MUST dictate the merge strategy to apply to resolve the conflict between two specs (two policies).
+
+In other words:
+- When a merge strategy `𝑓` is known (e.g., because it's implied by the policy CRD), then `𝑓(established, challenger) ?= 𝑓(challenger, established)` or even `𝑓(established, challenger) ≠ 𝑓(challenger, established)`.
+- When the policy CRD allows specifying the merge strategy at individual CRs, then `established ⇒ 𝑓`.
+
+With the exception of the **None** merge strategy, the following rules, continuing on ties, MUST be followed to assign which spec (which policy object) is the _established_ and which one is the _challenger_:
+- ① Between two policies targeting at different levels of the hierarchy, the one attached higher (less specific) MUST be assigned as the _established_ one.
+- ② Between two policies targeting at the same level of the hierarchy, the older policy based on creation timestamp MUST be assigned as the _established_ one.
+- ③ Between two policies targeting at the same level of the hierarchy and identical creation timestamps, the policy appearing first in alphabetical order by `{namespace}/{name}` MUST be assigned as the _established_ one.
+
+##### Merge strategy: None
+
+The spec (policy resource) with the oldest creation timestamp MUST be considered the _established spec_ and that spec beats all _challenger specs_ (policy resources with newer creation timestamps). In short: `𝑓(established = oldest, challenger) → established`.
+
+In case the conflicting policy resources have identical creation timestamps, the one appearing first in alphabetical order by `{namespace}/{name}` MUST be considered as the _established_ one and that spec beats all others (i.e., beats all _challenger_ specs).
+
+In other words, for the **None** merge strategy, rules ② → ③ of the [Conflict resolution rules](#conflict-resolution-rules) MUST be used to assign the _established_ and _challenger_ specs, and the _established_ spec (policy resource) always wins. All _challenger_ specs (policy resources) MUST be rejected.
+
+For all policies rejected due the application of the **None** merge estrategy, the [`Accepted`](#policy-status) status condition of the policy SHOULD be set to false.
+
+The **None** merge strategy MUST NOT be implemented in combination with any other merge strategy. I.e., if the Policy CRD implements the **None** merge strategy, then no other merge strategy can be supported by the policy CRD.
 
 Policy kinds that do not specify any merge strategy and only support targeting a single kind, with [Declared target equal to Effective target](#declared-targets-versus-effective-targets), by default MUST implement the **None** merge strategy. (See the definition of [Direct](#direct) class of policies below.)
 
+##### Merge strategy: Atomic defaults
+
+Between two specs (two policy resources) in conflict, the _challenger_ spec beats the _established_ one. The conflicting specs MUST be treated as atomic units (indivisible), therefore the effective policy's spec proper MUST be set to equal to the winning spec in its entirety (rather than parts ot it.) In short: `𝑓(established, challenger) → challenger`.
+
+For example, if two specs are attached at different levels of the hierarchy (e.g. `Gateway` and `HTTPRoute`), by application of the [Conflict resolution rules](#conflict-resolution-rules), the spec attached higher (less specific level, e.g. `Gateway`) will be considered the _established_ spec, whereas the spec attached lower (more specific level, e.g. `HTTPRoute`) will be considered the _challenger_ spec. By applying the **Atomic defaults** merge strategy, the spec attached lower (`HTTPRoute`) becomes the effective policy, and the spec attached higher (`Gateway`) MUST NOT be enforced in the scope of the lower level that is targeted by the winning spec.
+
 Policy kinds that do not specify any merge strategy and support targeting multiple effective kinds, by default MUST implement the **Atomic Defaults** merge strategy.
 
-Policy kinds that implement more than one merge strategy MUST define a clear structure for the policy CRs to specify which one of the supported strategies to apply. Policy CRs MUST NOT be allowed to declare more than one merge strategy at a time, but only one of the supported strategies. If no merge strategy is specified by a given policy CR, the **Atomic Defaults** merge strategy SHOULD be assumed, provided it's one of the supported merge strategies implemented by the policy kind.
+##### Merge strategy: Atomic overrides
 
-For policy kinds that support merge strategy specified by the user at the CR, the following rules, continuing on ties, MUST be implemented to determine which merge strategy to apply between two policies in conflict:
-1. Between two policies targeting at different levels of the hierarchy, the one attached higher (less specific) dictates the merge strategy to use to resolve the conflict.
-2. Between two policies targeting at the same level of the hierarchy, the older policy based on creation timestamp dictates the merge strategy.
-3. Between two policies targeting at the same level of the hierarchy and identical creation timestamps, the policy appearing first in alphabetical order by `{namespace}/{name}` dictates the merge strategy.
+Between two specs (two policy resources) in conflict, the _established_ spec beats the _challenger_ one. The conflicting specs MUST be treated as atomic units (indivisible), therefore the effective policy's spec proper MUST be set to equal to the winning spec in its entirety (rather than parts ot it.) In short: `𝑓(established, challenger) → established`.
 
-A known pattern adopted by policy CRDs that support multiple merge strategies is the definition of a `strategy` field in the policy spec for the instances to specify the merge strategy.
+For example, if two specs are attached at different levels of the hierarchy (e.g. `Gateway` and `HTTPRoute`), by application of the [Conflict resolution rules](#conflict-resolution-rules), the spec attached higher (less specific level, e.g. `Gateway`) will be considered the _established_ spec, whereas the spec attached lower (more specific level, e.g. `HTTPRoute`) will be considered the _challenger_ spec. By applying the **Atomic overrides** merge strategy, the spec attached higher (`Gateway`) becomes the effective policy, and the spec attached lower (`HTTPRoute`) MUST NOT be enforced in the scope of the higher level that is targeted by the winning spec.
 
-Policy implementations SHOULD reflect in the `status` stanza of the policies how the applied merge strategies are altering the effectiveness of the policy spec, if possible considering all the different scopes targeted by the policy－i.e., if policies are being enforced or overridden, partially or completely. (See [Policy status](#policy-status) section for details.)
+Policy kinds that do not specify any merge strategy and support targeting multiple effective kinds, by default MUST implement the **Atomic Defaults** merge strategy.
+
+##### Merge strategy: Patch defaults
+
+Between two specs (two policy resources) in conflict, the _challenger_ spec is applied onto the _established_ one in a [JSON Merge Patch (RFC 7386)](https://datatracker.ietf.org/doc/html/rfc7386) operation. Therefore, the effective policy's spec proper MUST be set to a combination of both specs where the _challenger_ spec beats the _established_ one only for conflicting fields, at the scalar level, with non-conflicting fields from both specs occasionally remaining. In short: `𝑓(established, challenger) → rfc7386(target = established, patch = challenger)`.
+
+For example, if two specs are attached at different levels of the hierarchy (e.g. `Gateway` and `HTTPRoute`), by application of the [Conflict resolution rules](#conflict-resolution-rules), the spec attached higher (less specific level, e.g. `Gateway`) will be considered the _established_ spec, whereas the spec attached lower (more specific level, e.g. `HTTPRoute`) will be considered the _challenger_ spec. By applying the **Patch defaults** merge strategy, the effective policy's spec proper MUST consist of the spec attached higher (`Gateway`) patched using the spec attached lower (`HTTPRoute`), with conflicting fields at the scalar level set to their values as specified in the spec attached lower (`HTTPRoute`).
+
+##### Merge strategy: Patch overrides
+
+Between two specs (two policy resources) in conflict, the _established_ spec is applied onto the _challenger_ one in a [JSON Merge Patch (RFC 7386)](https://datatracker.ietf.org/doc/html/rfc7386) operation. Therefore, the effective policy's spec proper MUST be set to a combination of both specs where the _established_ spec beats the _challenger_ one only for conflicting fields, at the scalar level, with non-conflicting fields from both specs occasionally remaining. In short: `𝑓(established, challenger) → rfc7386(target = challenger, patch = established)`.
+
+For example, if two specs are attached at different levels of the hierarchy (e.g. `Gateway` and `HTTPRoute`), by application of the [Conflict resolution rules](#conflict-resolution-rules), the spec attached higher (less specific level, e.g. `Gateway`) will be considered the _established_ spec, whereas the spec attached lower (more specific level, e.g. `HTTPRoute`) will be considered the _challenger_ spec. By applying the **Patch overrides** merge strategy, the effective policy's spec proper MUST consist of the spec attached lower (`HTTPRoute`) patched using the spec attached higher (`Gateway`), with conflicting fields at the scalar level set to their values as specified in the spec attached higher (`Gateway`).
+
+##### Custom merge strategies
+
+Implementations MAY specify _custom_ merge strategies. These are implementation-specific strategies where the specs of two policies in conflict are resolved into one, following a custom merge algorithm specified by the policy kind.
+
+##### Specifying a merge strategy at individual policy CRs
+
+Policy kinds that support multiple merge strategies allowing the users to specify a merge strategy at individual policy CRs MUST define a clear structure for the users to do so.
+
+Policy CRs MUST NOT be allowed to declare more than one merge strategy at a time, but only one of the supported strategies.
+
+If no merge strategy is specified by a given policy CR, the **Atomic Defaults** merge strategy SHOULD be assumed (provided it's one of the supported merge strategies implemented by the policy kind.)
+
+Two known patterns adopted by policy CRDs that support specifying one of multiple merge strategies in the policy CRs are:
+- the definition of `defaults` and/or `overrides` fields (usually with identically typed) in the `spec` stanza of the policy
+- the definition of a `strategy` field in the `spec` stanza of the policy
+
+##### Reflecting the applied merge strategy in the status stanza of the policy
+
+Policy implementations SHOULD reflect in the `status` stanza of the policies how the applied merge strategies are altering the effectiveness of the policy spec, if possible considering all the different scopes targeted by the policy－i.e., if policies are being enforced or overridden, partially or completely.
+
+See the [Policy status](#policy-status) section for details.
 
 #### Abstract process for calculating Effective policies
 
@@ -565,8 +612,8 @@ graph
     C["Order policies affecting the objects in the path from most specific to least specific, applying conflict resolution if necessary"] --> D["Push ordered policies to stack (least specific policy on top of the stack)"]
     D --> E{More than one policy in stack?}
     E -- Yes --> F[Pop two policies _pA_ and _pB_]
-    F --> G[Combine _pA_ and _pB_ into policy _pX_ applying the merge strategy dictated by _pA_]
-    G --> H[Make the merge strategy specified by _pB_ the merge strategy of _pX_]
+    F --> G["Combine _pA_ and _pB_ into policy _pX_ by applying the merge strategy (predefined or dictated by _pA_ if more than one is supported)"]
+    G --> H[If more than one merge strategy is supported, make the merge strategy specified by _pB_ the merge strategy of _pX_]
     H --> I[Push _pX_ back into the stack]
     I --> E
     E -- No --> J[Map the end of the path to a single policy remaining in the stack or none]
