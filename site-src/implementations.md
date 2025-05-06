@@ -209,13 +209,13 @@ effort, check out the #development channel or join our [weekly developer meeting
 
 ### Contour
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.1.0-Contour-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.1.0/projectcontour-contour)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.2.1-Contour-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.2.1/projectcontour-contour)
 
 [Contour][contour] is a CNCF open source Envoy-based ingress controller for Kubernetes.
 
-Contour [v1.30.0][contour-release] implements Gateway API v1.1.0.
+Contour [v1.31.0][contour-release] implements Gateway API v1.2.1.
 All [Standard channel][contour-standard] v1 API group resources (GatewayClass, Gateway, HTTPRoute, ReferenceGrant), plus most v1alpha2 API group resources (TLSRoute, TCPRoute, GRPCRoute, ReferenceGrant, and BackendTLSPolicy) are supported.
-Contour's implementation passes all core and most extended Gateway API conformance tests included in the v1.1.0 release.
+Contour's implementation passes most core extended Gateway API conformance tests included in the v1.2.1 release.
 
 See the [Contour Gateway API Guide][contour-guide] for information on how to deploy and use Contour's Gateway API implementation.
 
