@@ -322,7 +322,7 @@ metadata:
 ...
 status:
   parents:
-  - parentRefs:
+  - parentRef:
       name: gw-example
       namespace: gw-example-ns
     conditions:
