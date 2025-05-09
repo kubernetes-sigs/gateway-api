@@ -1209,6 +1209,9 @@ type HTTPRequestRedirectFilter struct {
 	// Support: Extended
 	//
 	// +optional
+	//
+	// +kubebuilder:validation:Minimum=1
+	// +kubebuilder:validation:Maximum=65535
 	Port *PortNumber `json:"port,omitempty"`
 
 	// StatusCode is the HTTP status code to be used in response.
