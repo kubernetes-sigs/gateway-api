@@ -34,8 +34,8 @@ var MeshHTTPRouteRewritePath = suite.ConformanceTest{
 	Description: "An HTTPRoute with path rewrite filter",
 	Features: []features.FeatureName{
 		features.SupportMesh,
-		features.SupportMeshHTTPRouteRewritePath,
 		features.SupportHTTPRoute,
+		features.SupportMeshHTTPRouteRewritePath,
 	},
 	Manifests: []string{"tests/mesh/httproute-rewrite-path.yaml"},
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
