@@ -30,7 +30,7 @@ From [Gateway Hierarchy Brainstorming](https://docs.google.com/document/d/1qj7Xo
 ## Use Cases & Motivation
 
 Knative generates on demand per-service certificates using HTTP-01 challenges.
-There can be `O(1000) Knative `Services` in the cluster which means we have O(1000) distinct certificates.
+There can be O(1000) Knative `Services` in the cluster which means we have O(1000) distinct certificates.
 Thus updating a single `Gateway` resource with this many certificates is a contention point and inhibits horizontal scaling of our controllers.
 [Istio Ambient](https://istio.io/v1.15/blog/2022/introducing-ambient-mesh/), similarly, creates a listener per Kubernetes service.
 
