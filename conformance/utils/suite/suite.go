@@ -74,6 +74,7 @@ type ConformanceTestSuite struct {
 	SkipTests                sets.Set[string]
 	SkipProvisionalTests     bool
 	RunTest                  string
+	Hook                     func(t *testing.T, test ConformanceTest, suite *ConformanceTestSuite)
 	ManifestFS               []fs.FS
 	UsableNetworkAddresses   []v1beta1.GatewaySpecAddress
 	UnusableNetworkAddresses []v1beta1.GatewaySpecAddress
@@ -469,6 +470,13 @@ func (suite *ConformanceTestSuite) Run(t *testing.T, tests []ConformanceTest) er
 		}
 		if res == testSucceeded || res == testFailed {
 			sleepForTestIsolation = true
+		}
+
+		// call the hook function if it was provided,
+		// this's useful for running custom logic after each test,
+		// such as collecting current state of the cluster for debugging.
+		if suite.Hook != nil {
+			suite.Hook(t, test, suite)
 		}
 	}
 
