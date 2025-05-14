@@ -193,6 +193,11 @@ var (
 		Name:    SupportHTTPRouteBackendProtocolWebSocket,
 		Channel: FeatureChannelStandard,
 	}
+	// HTTPRouteCORSFeature contains metadata for the HTTPRouteCORS feature.
+	HTTPRouteCORSFeature = Feature{
+		Name:    SupportHTTPRouteCORS,
+		Channel: FeatureChannelExperimental,
+	}
 )
 
 // HTTPRouteExtendedFeatures includes all extended features for HTTPRoute
@@ -217,4 +222,5 @@ var HTTPRouteExtendedFeatures = sets.New(
 	HTTPRouteParentRefPortFeature,
 	HTTPRouteBackendProtocolH2CFeature,
 	HTTPRouteBackendProtocolWebSocketFeature,
+	HTTPRouteCORSFeature,
 )

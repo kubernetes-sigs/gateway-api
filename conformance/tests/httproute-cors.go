@@ -42,16 +42,18 @@ var HTTPRouteCORS = suite.ConformanceTest{
 	},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
-		routeNN := types.NamespacedName{Name: "cors", Namespace: ns}
+		routeNN1 := types.NamespacedName{Name: "cors-1", Namespace: ns}
+		routeNN2 := types.NamespacedName{Name: "cors-2", Namespace: ns}
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: ns}
-		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
-		kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN)
+		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN1, routeNN2)
+		kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN1, gwNN)
+		kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN2, gwNN)
 
 		testCases := []http.ExpectedResponse{
 			{
 				TestCaseName: "CORS preflight request from an exact mactching origin should be allowed",
 				Request: http.Request{
-					Path:   "/",
+					Path:   "/cors-1",
 					Method: "OPTIONS",
 					Headers: map[string]string{
 						"Origin":                         "https://www.foo.com",
@@ -76,7 +78,7 @@ var HTTPRouteCORS = suite.ConformanceTest{
 					StatusCode: 200,
 					Headers: map[string]string{
 						"access-control-allow-origin":      "https://www.foo.com",
-						"access-control-allow-methods":     "GET, POST, PUT, PATCH, OPTIONS",
+						"access-control-allow-methods":     "GET, OPTIONS",
 						"access-control-allow-headers":     "x-header-1, x-header-2",
 						"access-control-expose-headers":    "x-header-3, x-header-4",
 						"access-control-max-age":           "3600",
@@ -87,7 +89,7 @@ var HTTPRouteCORS = suite.ConformanceTest{
 			{
 				TestCaseName: "CORS preflight request from a wildcard matching origin should be allowed",
 				Request: http.Request{
-					Path:   "/",
+					Path:   "/cors-1",
 					Method: "OPTIONS",
 					Headers: map[string]string{
 						"Origin":                         "https://www.bar.com",
@@ -112,7 +114,7 @@ var HTTPRouteCORS = suite.ConformanceTest{
 					StatusCode: 200,
 					Headers: map[string]string{
 						"access-control-allow-origin":      "https://www.bar.com",
-						"access-control-allow-methods":     "GET, POST, PUT, PATCH, OPTIONS",
+						"access-control-allow-methods":     "GET, OPTIONS",
 						"access-control-allow-headers":     "x-header-1, x-header-2",
 						"access-control-expose-headers":    "x-header-3, x-header-4",
 						"access-control-max-age":           "3600",
@@ -123,7 +125,7 @@ var HTTPRouteCORS = suite.ConformanceTest{
 			{
 				TestCaseName: "CORS preflight request from a non-matching origin should not be allowed",
 				Request: http.Request{
-					Path:   "/",
+					Path:   "/cors-1",
 					Method: "OPTIONS",
 					Headers: map[string]string{
 						"Origin":                        "https://foobar.com",
@@ -151,9 +153,9 @@ var HTTPRouteCORS = suite.ConformanceTest{
 			},
 			{
 				TestCaseName: "Simple request from an exact mactching origin should be allowed",
-				Namespace: ns,
+				Namespace:    ns,
 				Request: http.Request{
-					Path:   "/",
+					Path:   "/cors-1",
 					Method: "GET",
 					Headers: map[string]string{
 						"Origin":                         "https://www.foo.com",
@@ -164,15 +166,15 @@ var HTTPRouteCORS = suite.ConformanceTest{
 				Response: http.Response{
 					StatusCode: 200,
 					Headers: map[string]string{
-						"access-control-allow-origin":      "https://www.foo.com",
+						"access-control-allow-origin": "https://www.foo.com",
 					},
 				},
 			},
 			{
 				TestCaseName: "Simple request from a wildcard matching origin should be allowed",
-				Namespace: ns,
+				Namespace:    ns,
 				Request: http.Request{
-					Path:   "/",
+					Path:   "/cors-1",
 					Method: "GET",
 					Headers: map[string]string{
 						"Origin":                         "https://www.bar.com",
@@ -183,15 +185,15 @@ var HTTPRouteCORS = suite.ConformanceTest{
 				Response: http.Response{
 					StatusCode: 200,
 					Headers: map[string]string{
-						"access-control-allow-origin":      "https://www.bar.com",
+						"access-control-allow-origin": "https://www.bar.com",
 					},
 				},
 			},
 			{
 				TestCaseName: "Simple request from a non-matching origin should not be allowed",
-				Namespace: ns,
+				Namespace:    ns,
 				Request: http.Request{
-					Path:   "/",
+					Path:   "/cors-1",
 					Method: "GET",
 					Headers: map[string]string{
 						"Origin":                        "https://foobar.com",
@@ -201,6 +203,66 @@ var HTTPRouteCORS = suite.ConformanceTest{
 				Response: http.Response{
 					AbsentHeaders: []string{
 						"access-control-allow-origin",
+					},
+				},
+			},
+			{
+				TestCaseName: "CORS preflight request with POST method should be allowed by allowMethods with wildcard",
+				Request: http.Request{
+					Path:   "/cors-2",
+					Method: "OPTIONS",
+					Headers: map[string]string{
+						"Origin":                        "https://www.foo.com",
+						"access-control-request-method": "POST",
+					},
+				},
+				// Set the expected request properties and namespace to empty strings.
+				// This is a workaround to avoid the test failure.
+				// The response body is empty because the request is a preflight request,
+				// so we can't get the request properties from the echoserver.
+				ExpectedRequest: &http.ExpectedRequest{
+					Request: http.Request{
+						Host:    "",
+						Method:  "OPTIONS",
+						Path:    "",
+						Headers: nil,
+					},
+				},
+				Namespace: "",
+				Response: http.Response{
+					StatusCode: 200,
+					Headers: map[string]string{
+						"access-control-allow-origin":  "https://www.foo.com",
+						"access-control-allow-methods": "POST",
+					},
+				},
+			},
+			{
+				TestCaseName: "CORS preflight request should not receive access-control-allow-credentials header without access-control-allow-credentials set to true",
+				Request: http.Request{
+					Path:   "/cors-2",
+					Method: "OPTIONS",
+					Headers: map[string]string{
+						"Origin":                        "https://www.foo.com",
+						"access-control-request-method": "POST",
+					},
+				},
+				// Set the expected request properties and namespace to empty strings.
+				// This is a workaround to avoid the test failure.
+				// The response body is empty because the request is a preflight request,
+				// so we can't get the request properties from the echoserver.
+				ExpectedRequest: &http.ExpectedRequest{
+					Request: http.Request{
+						Host:    "",
+						Method:  "OPTIONS",
+						Path:    "",
+						Headers: nil,
+					},
+				},
+				Namespace: "",
+				Response: http.Response{
+					AbsentHeaders: []string{
+						"access-control-allow-credentials",
 					},
 				},
 			},
