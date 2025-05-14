@@ -298,7 +298,7 @@ profile except `HTTPRouteServiceTypes`.
 [Google Kubernetes Engine (GKE)][gke] is a managed Kubernetes platform offered
 by Google Cloud.
 
-GKE's implementation of the Gateway For Mesh (GAMMA) is through the [Cloud Service Mesh][cloud-service-mesh].
+GKE's implementation of Gateway For Mesh (GAMMA) is through the [Cloud Service Mesh][cloud-service-mesh].
 
 
 Google Cloud Service Mesh supports [Envoy-based sidecar mesh][envoy-sidecar-mesh] and [Proxyless-GRPC][proxyless-grpc-mesh] (using GRPCRoute).
