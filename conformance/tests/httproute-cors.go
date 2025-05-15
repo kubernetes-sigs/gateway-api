@@ -84,6 +84,9 @@ var HTTPRouteCORS = suite.ConformanceTest{
 						"access-control-max-age":           "3600",
 						"access-control-allow-credentials": "true",
 					},
+					// Ignore whitespace when comparing the response headers. This is because some
+					// implementations add a space after each comma, and some don't. Both are valid.
+					IgnoreWhitespace: true,
 				},
 			},
 			{
@@ -120,6 +123,9 @@ var HTTPRouteCORS = suite.ConformanceTest{
 						"access-control-max-age":           "3600",
 						"access-control-allow-credentials": "true",
 					},
+					// Ignore whitespace when comparing the response headers. This is because some
+					// implementations add a space after each comma, and some don't. Both are valid.
+					IgnoreWhitespace: true,
 				},
 			},
 			{
