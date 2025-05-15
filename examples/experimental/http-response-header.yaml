@@ -20,6 +20,8 @@ spec:
           value: header-add-2
         - name: X-Header-Add-3
           value: header-add-3
+        - name: Content-Disposition
+          value: "attachment; filename=\"example_file.txt\""
     backendRefs:
     - name: echo
       port: 8080

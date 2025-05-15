@@ -233,7 +233,7 @@ func gatewayTweaks(channel string, name string, jsonProps apiext.JSONSchemaProps
 			if len(patternMatch) != 2 {
 				log.Fatalf("Invalid %s Pattern tag for %s", validationPrefix, name)
 			}
-			
+
 			numValid++
 			jsonProps.Pattern = patternMatch[1]
 		}
