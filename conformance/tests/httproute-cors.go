@@ -51,7 +51,7 @@ var HTTPRouteCORS = suite.ConformanceTest{
 
 		testCases := []http.ExpectedResponse{
 			{
-				TestCaseName: "CORS preflight request from an exact mactching origin should be allowed",
+				TestCaseName: "CORS preflight request from an exact matching origin should be allowed",
 				Request: http.Request{
 					Path:   "/cors-1",
 					Method: "OPTIONS",
