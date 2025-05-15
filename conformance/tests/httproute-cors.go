@@ -152,7 +152,7 @@ var HTTPRouteCORS = suite.ConformanceTest{
 				},
 			},
 			{
-				TestCaseName: "Simple request from an exact mactching origin should be allowed",
+				TestCaseName: "Simple request from an exact matching origin should be allowed",
 				Namespace:    ns,
 				Request: http.Request{
 					Path:   "/cors-1",
