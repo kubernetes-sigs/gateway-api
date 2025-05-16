@@ -330,8 +330,8 @@ kind: ColorPolicy
 metadata:
   name: my-color-policy
 spec:
-  targetRef:
-    group: networking.acme.io
+  targetRefs:
+  - group: networking.acme.io
     kind: ExternalService
     name: foo.com
   color: blue
