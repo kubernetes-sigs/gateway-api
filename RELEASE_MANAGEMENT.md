@@ -107,5 +107,9 @@ volunteers the release may simply end being a smaller **maintenance release**.
 Release candidates--and the eventual final release--must utilize the [Release
 Process](/RELEASE.md) for delivery.
 
+As the release nears completion, the release-manager should proactively reach
+out to implementations to get them ready to send conformance reports for the
+final release when it is cut.
+
 [Release Cycle]:https://gateway-api.sigs.k8s.io/contributing/release-cycle/
 [Milestone]:#github-milestone
