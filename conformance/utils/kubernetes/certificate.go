@@ -27,12 +27,14 @@ import (
 	"io"
 	"math/big"
 	"net"
+	"strings"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/require"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	kvalidation "k8s.io/apimachinery/pkg/util/validation"
 )
 
 const (
@@ -97,7 +99,7 @@ func generateRSACert(hosts []string, keyOut, certOut io.Writer) error {
 	for _, h := range hosts {
 		if ip := net.ParseIP(h); ip != nil {
 			template.IPAddresses = append(template.IPAddresses, ip)
-		} else {
+		} else if err = validateHost(h); err == nil {
 			template.DNSNames = append(template.DNSNames, h)
 		}
 	}
@@ -115,5 +117,118 @@ func generateRSACert(hosts []string, keyOut, certOut io.Writer) error {
 		return fmt.Errorf("failed creating key: %w", err)
 	}
 
+	return nil
+}
+
+// MustCreateCASignedCertConfigMap will create a ConfigMap containing a CA Certificate, given a TLS Secret
+// for that CA certificate.
+func MustCreateCASignedCertConfigMap(t *testing.T, namespace, configMapName string, hosts []string) *corev1.ConfigMap {
+	require.NotEmpty(t, hosts, "require a non-empty hosts for Subject Alternate Name values")
+
+	caBytes, caPrivKey, err := generateCACert(hosts)
+	if err != nil {
+		t.Errorf("failed to generate CA certificate and key: %v", err)
+		return nil
+	}
+
+	var certData bytes.Buffer
+	if err := pem.Encode(&certData, &pem.Block{Type: "CERTIFICATE", Bytes: caBytes}); err != nil {
+		t.Errorf("failed creating cert: %v", err)
+		return nil
+	}
+
+	var keyData bytes.Buffer
+	if err := pem.Encode(&keyData, &pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(caPrivKey)}); err != nil {
+		t.Errorf("failed creating key: %v", err)
+		return nil
+	}
+
+	// Store the certificate in a ConfigMap.
+	caConfigMap := &corev1.ConfigMap{
+		ObjectMeta: metav1.ObjectMeta{
+			Namespace: namespace,
+			Name:      configMapName,
+		},
+		Data: map[string]string{
+			"ca.crt":  certData.String(),
+			"key.crt": keyData.String(),
+		},
+	}
+	return caConfigMap
+}
+
+// generateCACert generates a ConfigMap containing a CA Certificate signed certificate valid for a year.
+func generateCACert(hosts []string) ([]byte, *rsa.PrivateKey, error) {
+	var caBytes []byte
+
+	// Create the CA certificate template.
+	ca := &x509.Certificate{
+		SerialNumber: big.NewInt(2024),
+		Subject: pkix.Name{
+			Organization: []string{"Kubernetes Gateway API"},
+			Country:      []string{"US"},
+			CommonName:   "gatewayapi",
+		},
+		Issuer: pkix.Name{
+			Organization: []string{"Kubernetes Gateway API"},
+			Country:      []string{"US"},
+			CommonName:   "kubernetes",
+		},
+		NotBefore:             time.Now(),
+		NotAfter:              time.Now().AddDate(1, 0, 0),
+		IsCA:                  true, // Indicates this is a CA Certificate.
+		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth},
+		KeyUsage:              x509.KeyUsageDigitalSignature | x509.KeyUsageCertSign | x509.KeyUsageKeyEncipherment,
+		BasicConstraintsValid: true,
+	}
+
+	// Ensure only valid hosts make it into the CA cert.
+	for _, h := range hosts {
+		if ip := net.ParseIP(h); ip != nil {
+			ca.IPAddresses = append(ca.IPAddresses, ip)
+		} else if err := validateHost(h); err == nil {
+			ca.DNSNames = append(ca.DNSNames, h)
+		}
+	}
+
+	// Generate the private key to sign certificates.
+	caPrivKey, err := rsa.GenerateKey(rand.Reader, rsaBits)
+	if err != nil {
+		return caBytes, caPrivKey, fmt.Errorf("error generating key for CA: %v", err)
+	}
+
+	// Create the self-signed certificate using the CA certificate.
+	caBytes, err = x509.CreateCertificate(rand.Reader, ca, ca, &caPrivKey.PublicKey, caPrivKey)
+	if err != nil {
+		return caBytes, caPrivKey, fmt.Errorf("error creating CA: %v", err)
+	}
+
+	return caBytes, caPrivKey, nil
+}
+
+// validateHost ensures that the host name length is no more than 253 characters.
+// The only characters allowed in host name are alphanumeric characters, '-' or '.',
+// and it must start and end with an alphanumeric character. A trailing dot is NOT allowed.
+// The host name must in addition consist of one or more labels, with each label no more
+// than 63 characters from the character set described above, and each label must start and
+// end with an alphanumeric character.  Wildcards are handled specially.
+// DO NOT USE for general validation purposes, this is just for the hostnames set up for
+// conformance testing.
+func validateHost(host string) error {
+	// Remove wildcard if present.
+	host, _ = strings.CutPrefix(host, "*.")
+
+	errs := kvalidation.IsDNS1123Subdomain(host)
+	if len(errs) != 0 {
+		return fmt.Errorf("host %s must conform to DNS naming conventions: %v", host, errs)
+	}
+
+	labels := strings.Split(host, ".")
+	for _, l := range labels {
+		errs := kvalidation.IsDNS1123Label(l)
+		if len(errs) != 0 {
+			return fmt.Errorf("label %s in host %s must conform to DNS naming conventions: %v", l, host, errs)
+		}
+	}
 	return nil
 }
