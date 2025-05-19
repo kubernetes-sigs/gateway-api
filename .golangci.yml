@@ -1,5 +1,6 @@
 version: "2"
 run:
+  timeout: 10m
   modules-download-mode: readonly
   issues-exit-code: 1
   tests: true
