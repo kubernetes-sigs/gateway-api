@@ -43,7 +43,7 @@ Moreover, this document defines a particular class of metaresource, called "poli
 
 From policies emerges the concept of Policy Attachment, which consists of augmenting the behavior of other Kubernetes resources by attaching policies to them.
 
-After multiple iterations of Gateway API experimenting with policies—whether through common kinds of policies like `BackendTLSPolicy` and `BackendLBPolicy`, or various implementation-specific ones (see [Current use of policies](#current-use-of-policies))—and after rounds of discussion (such as [kubernetes-sigs/gateway-api/discussions#2927](https://github.com/kubernetes-sigs/gateway-api/discussions/2927)), the pattern has evolved into its current form.
+After multiple iterations of Gateway API experimenting with policies—whether through common kinds of policies like `BackendTLSPolicy` and `XBackendTrafficPolicy`, or various implementation-specific ones (see [Current use of policies](#current-use-of-policies))—and after rounds of discussion (such as [kubernetes-sigs/gateway-api/discussions#2927](https://github.com/kubernetes-sigs/gateway-api/discussions/2927)), the pattern has evolved into its current form.
 
 ### User stories
 
@@ -1079,14 +1079,18 @@ This does not mean that nothing at all that affects multiple objects can be done
 
 ### Implementations
 
-These are a few known implementations of policies in compliance with this GEP:
+These are a few known implementations of policies in compliance with this GEP.
+
+Users should refer to the official documentation from each implementation for for more up to date information.
 
 #### Gateway API (core)
 
 Gateway API defines two kinds of Direct policies, both for augmenting the behavior of Kubernetes `Service` resources:
 
-* **BackendTLSPolicy:** Direct policy type for specifying the TLS configuration of the connection from the Gateway to a backend pod (set of pods) via the Service API object.
-* **BackendLBPolicy:** Direct policy for Session Persistence (Experimental).
+| Policy kind               | Description                                                                                                     | Target kinds    | Merge strategies | Policy class |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------- |---------------- | ---------------- | ------------ |
+| **BackendTLSPolicy**      | TLS configuration of the connection from the Gateway to a backend pod (set of pods) via the Service API object. | Service, _Port_ | None             | Direct       |
+| **XBackendTrafficPolicy** | Configuration for how traffic to a target backend should be handled (retries and session persistence)           | _Port_          | None             | Direct       |
 
 #### Envoy Gateway
 
@@ -1094,11 +1098,13 @@ Gateway API defines two kinds of Direct policies, both for augmenting the behavi
 
 Gateway API implementation that defines the following kinds of policies:
 
-* **ClientTrafficPolicy:** to configure the behavior of the connection between the downstream client and Envoy Proxy listener.
-* **BackendTrafficPolicy:** to configure the behavior of the connection between the Envoy Proxy listener and the backend service.
-* **EnvoyExtensionPolicy:** to configure various envoy extensibility options for the Gateway.
-* **EnvoyPatchPolicy:** to modify the generated Envoy xDS resources by Envoy Gateway using this patch API.
-* **SecurityPolicy:** to configure various security settings for a Gateway.
+| Policy kind              | Description                                                                                        | Target kinds                                                | Merge strategies        | Policy class |
+| ------------------------ | -------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- | ----------------------- | ------------ |
+| **ClientTrafficPolicy**  | Configure the behavior of the connection between the downstream client and Envoy Proxy listener.   | Gateway, _Listener_                                         | Atomic defaults         | Inherited    |
+| **BackendTrafficPolicy** | Configure the behavior of the connection between the Envoy Proxy listener and the backend service. | Gateway, HTTPRoute, GRPCRoute, UDPRoute, TCPRoute, TLSRoute | Patch defaults, Custom  | Inherited    |
+| **EnvoyExtensionPolicy** | Configure various envoy extensibility options for the Gateway.                                     | Gateway, HTTPRoute, GRPCRoute, UDPRoute, TCPRoute, TLSRoute | Atomic defaults, Custom | Inherited    |
+| **EnvoyPatchPolicy**     | Modify the generated Envoy xDS resources by Envoy Gateway using this patch API.                    | GatewayClass, Gateway                                       | Custom                  | Inherited    |
+| **SecurityPolicy**       | Configure various security settings for a Gateway.                                                 | Gateway, HTTPRoute, GRPCRoute                               | Patch defaults          | Inherited    |
 
 #### Istio
 
@@ -1106,20 +1112,25 @@ Gateway API implementation that defines the following kinds of policies:
 
 Gateway API implementation that defines the following kinds of policies:
 
-* **EnvoyFilter:** to customize the Envoy configuration generated by istiod, e.g. modify values for certain fields, add specific filters, or even add entirely new listeners, clusters.
-* **RequestAuthentication:** to define request authentication methods supported by a workload.
-* **AuthorizationPolicy:** to enable access control on workloads in the mesh.
-* **WasmPlugin:** to extend the functionality provided by the Istio proxy through WebAssembly filters.
-* **Telemetry:** defines how telemetry (metrics, logs and traces) is generated for workloads within a mesh.
+| Policy kind                | Description                                                                                                                                                       | Target kinds                                 | Merge strategies | Policy class  |
+| -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- | ---------------- | ------------- |
+| **EnvoyFilter**            | Customize the Envoy configuration generated by istiod, e.g. modify values for certain fields, add specific filters, or even add entirely new listeners, clusters. | GatewayClass, Gateway, Service, ServiceEntry | Custom           | Inherited     |
+| **RequestAuthentication**  | Define request authentication methods supported by a workload.                                                                                                    | GatewayClass, Gateway, Service, ServiceEntry | Custom           | Inherited     |
+| **AuthorizationPolicy**    | Enable access control on workloads in the mesh.                                                                                                                   | GatewayClass, Gateway, Service, ServiceEntry | Custom           | Inherited     |
+| **WasmPlugin**             | Extend the functionality provided by the Istio proxy through WebAssembly filters.                                                                                 | GatewayClass, Gateway, Service, ServiceEntry | Custom           | Inherited     |
+| **Telemetry**              | Defines how telemetry (metrics, logs and traces) is generated for workloads within a mesh.                                                                        | GatewayClass, Gateway, Service, ServiceEntry | Custom           | Inherited     |
 
 #### NGINX Gateway Fabric
 
-<small>https://docs.nginx.com/nginx-gateway-fabric/overview/gateway-api-compatibility</small>
+<small>https://docs.nginx.com/nginx-gateway-fabric/overview/custom-policies/</small>
 
 Gateway API implementation that supports Gateway API’s `BackendTLSPolicy` as well as the following kinds of policies:
 
-* **ClientSettingsPolicy:** Inherited policy to configure connection behavior between client and NGINX.
-* **ObservabilityPolicy:** Direct policy to define settings related to tracing, metrics, or logging.
+| Policy kind                | Description                                              | Target kinds                  | Merge strategies   | Policy class |
+| -------------------------- | -------------------------------------------------------- | ----------------------------- | ------------------ | ------------ |
+| **ClientSettingsPolicy**   | Define settings related to tracing, metrics, or logging. | Gateway, HTTPRoute, GRPCRoute | Patch defaults     | Inherited    |
+| **ObservabilityPolicy**    | Configure connection behavior between client and NGINX.  | HTTPRoute, GRPCRoute          | None               | Direct       |
+| **UpstreamSettingsPolicy** | Configure connection behavior between NGINX and backend. | Service                       | None               | Direct       |
 
 #### Gloo Gateway
 
@@ -1127,10 +1138,12 @@ Gateway API implementation that supports Gateway API’s `BackendTLSPolicy` as w
 
 Gateway API implementation that defines the following kinds of policies:
 
-* **ListenerOption:** to augment behavior of one, multiple, or all gateway listeners.
-* **HTTPListenerOption:** to augment behavior of one, multiple, or all HTTP and HTTPS listeners.
-* **RouteOption:** to augment behavior of one, multiple, or all routes in an HTTPRoute resource.
-* **VirtualHostOption:** to augment behavior of the hosts on one, multiple, or all gateway listeners.
+| Policy kind            | Description                                                                | Target kinds        | Merge strategies    | Policy class |
+| ---------------------- | -------------------------------------------------------------------------- | ------------------- | ------------------- | ------------ |
+| **ListenerOption**     | Augment behavior of one, multiple, or all gateway listeners.               | Gateway, _Listener_ | None                | Direct       |
+| **HTTPListenerOption** | Augment behavior of one, multiple, or all HTTP and HTTPS listeners.        | Gateway, _Listener_ | None                | Direct       |
+| **RouteOption**        | Augment behavior of one, multiple, or all routes in an HTTPRoute resource. | HTTPRoute           | None                | Direct       |
+| **VirtualHostOption**  | Augment behavior of the hosts on one, multiple, or all gateway listeners.  | Gateway, _Listener_ | Atomic defaults     | Inherited    |
 
 #### Kuadrant
 
@@ -1138,10 +1151,12 @@ Gateway API implementation that defines the following kinds of policies:
 
 First Gateway API integration entirely based on the Metaresources and Policy Attachment pattern. Defines the following kinds of policies:
 
-* **DNSPolicy:** to manage the lifecycle of DNS records in external DNS providers such as AWS Route53, Google DNS, and Azure DNS.
-* **TLSPolicy:** to manage the lifecycle of TLS certificate configuration on gateways using CertManager.
-* **AuthPolicy:** Inherited policy with full support of Defaults & Overrides and merge strategies that can be attached to gateways and routes to specify authentication and authorization rules.
-* **RateLimitPolicy:** Inherited policy with full support of Defaults & Overrides and merge strategies that can be attached to gateways and routes to specify rate limiting rules.
+| Policy kind          | Description                                                                                                   | Target kinds                                  | Merge strategies        | Policy class |
+| -------------------- | ------------------------------------------------------------------------------------------------------------- | --------------------------------------------- | ----------------------- | ------------ |
+| **DNSPolicy**        | Manage the lifecycle of DNS records in external DNS providers such as AWS Route53, Google DNS, and Azure DNS. | Gateway, _Listener_                           | Atomic defaults         | Inherited    |
+| **TLSPolicy**        | Manage the lifecycle of TLS certificate configuration on gateways using CertManager.                          | Gateway, _Listener_                           | Atomic defaults         | Inherited    |
+| **AuthPolicy**       | Specify authentication and authorization rules for Gateways and Routes                                        | Gateway, _Listener_, HTTPRoute, HTTPRouteRule | Atomic defaults, Custom | Inherited    |
+| **RateLimitPolicy**  | Specify rate limiting rules for Gateways and Routes                                                           | Gateway, _Listener_, HTTPRoute, HTTPRouteRule | Atomic defaults, Custom | Inherited    |
 
 ### Other metaresource and policy-like implementations
 
