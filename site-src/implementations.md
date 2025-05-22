@@ -117,21 +117,17 @@ In this section you will find specific links to blog posts, documentation and ot
 [epicsource]:https://github.com/epic-gateway
 
 ### Airlock Microgateway
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.2.1-Airlock%20Microgateway-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.2.1/airlock-microgateway)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.3.0-Airlock%20Microgateway-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.3.0/airlock-microgateway)
 
-[Airlock Microgateway][airlock-microgateway] is a Kubernetes native WAAP (Web Application and API Protection) solution to protect microservices.
+[Airlock Microgateway][airlock-microgateway] is a Kubernetes native WAAP (Web Application and API Protection, formerly known as WAF) solution optimized for Kubernetes environments and certified for RedHat OpenShift.
 Modern application security is embedded in the development workflow and follows DevSecOps paradigms.
 Airlock Microgateway protects your applications and microservices with the tried-and-tested Airlock security features against attacks, while also providing a high degree of scalability.
 
-With [Airlock Microgateway 4.4][airlock-microgateway-gwapi-arch], Airlock Microgateway introduces a sidecarless data plane mode
-based on Gateway API to avoid the operational complexity of sidecars.
-
 #### Features
-- Kubernetes native integration with sidecar injection and Gateway API support
+- Comprehensive WAAP (formerly known as WAF) with security features like Deny Rules to protect against known attacks (OWASP Top 10), header filtering, JSON parsing, OpenAPI specification enforcement, and GraphQL schema validation
+- Identity aware proxy which makes it possible to enforce authentication using JWT authentication or OIDC
 - Reverse proxy functionality with request routing rules, TLS termination and remote IP extraction
-- Using native Envoy HTTP filters like Lua scripting, RBAC, ext_authz, JWT authentication
-- Content security filters for protecting against known attacks (OWASP Top 10)
-- API security features like JSON parsing, OpenAPI specification enforcement or GraphQL schema validation
+- Easy-to-use Grafana dashboards which provide valuable insights in allowed and blocked traffic and other metrics
 
 #### Documentation and links
 - [Product documentation][airlock-microgateway-documentation]
@@ -139,7 +135,6 @@ based on Gateway API to avoid the operational complexity of sidecars.
 - Check our [Airlock community forum][airlock-microgateway-community-support] and [support process][airlock-microgateway-premium-support] for support.
 
 [airlock-microgateway]:https://www.airlock.com/en/secure-access-hub/components/microgateway
-[airlock-microgateway-gwapi-arch]:https://docs.airlock.com/microgateway/latest/?topic=MGW-00000141
 [airlock-microgateway-documentation]:https://docs.airlock.com/microgateway/latest
 [airlock-microgateway-guide]:https://docs.airlock.com/microgateway/latest/?topic=MGW-00000142
 [airlock-microgateway-community-support]:https://forum.airlock.com/
