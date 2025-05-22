@@ -1104,7 +1104,7 @@ Gateway API implementation that defines the following kinds of policies:
 | **BackendTrafficPolicy** | Configure the behavior of the connection between the Envoy Proxy listener and the backend service. | Gateway, HTTPRoute, GRPCRoute, UDPRoute, TCPRoute, TLSRoute | Patch defaults, Custom  | Inherited    |
 | **EnvoyExtensionPolicy** | Configure various envoy extensibility options for the Gateway.                                     | Gateway, HTTPRoute, GRPCRoute, UDPRoute, TCPRoute, TLSRoute | Atomic defaults, Custom | Inherited    |
 | **EnvoyPatchPolicy**     | Modify the generated Envoy xDS resources by Envoy Gateway using this patch API.                    | GatewayClass, Gateway                                       | Custom                  | Inherited    |
-| **SecurityPolicy**       | Configure various security settings for a Gateway.                                                 | Gateway, HTTPRoute, GRPCRoute                               | Patch defaults          | Inherited    |
+| **SecurityPolicy**       | Configure various security settings for a Gateway.                                                 | Gateway, HTTPRoute, GRPCRoute                               | Atomic defaults         | Inherited    |
 
 #### Istio
 
