@@ -67,9 +67,9 @@ func (p profileReportsMap) addTestResults(conformanceProfile ConformanceProfile,
 			if report.Extended == nil {
 				report.Extended = &confv1.ExtendedStatus{}
 			}
-			report.Extended.Statistics.Passed++
+			report.Extended.Passed++
 		} else {
-			report.Core.Statistics.Passed++
+			report.Core.Passed++
 		}
 	case testFailed:
 		if testIsExtended {
@@ -77,9 +77,9 @@ func (p profileReportsMap) addTestResults(conformanceProfile ConformanceProfile,
 				report.Extended = &confv1.ExtendedStatus{}
 			}
 			report.Extended.FailedTests = append(report.Extended.FailedTests, result.test.ShortName)
-			report.Extended.Statistics.Failed++
+			report.Extended.Failed++
 		} else {
-			report.Core.Statistics.Failed++
+			report.Core.Failed++
 			if report.Core.FailedTests == nil {
 				report.Core.FailedTests = []string{}
 			}
@@ -90,10 +90,10 @@ func (p profileReportsMap) addTestResults(conformanceProfile ConformanceProfile,
 			if report.Extended == nil {
 				report.Extended = &confv1.ExtendedStatus{}
 			}
-			report.Extended.Statistics.Skipped++
+			report.Extended.Skipped++
 			report.Extended.SkippedTests = append(report.Extended.SkippedTests, result.test.ShortName)
 		} else {
-			report.Core.Statistics.Skipped++
+			report.Core.Skipped++
 			report.Core.SkippedTests = append(report.Core.SkippedTests, result.test.ShortName)
 		}
 	}
@@ -196,9 +196,9 @@ func buildReportSummary(status confv1.Status) string {
 	case confv1.Success:
 		message = "succeeded"
 	case confv1.Partial:
-		message = fmt.Sprintf("partially succeeded with %d test skips", status.Statistics.Skipped)
+		message = fmt.Sprintf("partially succeeded with %d test skips", status.Skipped)
 	case confv1.Failure:
-		message = fmt.Sprintf("failed with %d test failures", status.Statistics.Failed)
+		message = fmt.Sprintf("failed with %d test failures", status.Failed)
 	}
 	return message
 }
