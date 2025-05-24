@@ -1,5 +1,5 @@
 apiVersion: gateway.networking.k8s.io/v1
-date: "2025-05-19T14:33:38Z"
+date: "2025-05-19T14:36:18Z"
 gatewayAPIChannel: standard
 gatewayAPIVersion: v1.2.1
 implementation:
@@ -8,7 +8,7 @@ implementation:
   organization: airlock
   project: microgateway
   url: https://github.com/airlock/microgateway
-  version: 4.6.0-ci-4
+  version: 4.6.0
 kind: ConformanceReport
 mode: default
 profiles:
