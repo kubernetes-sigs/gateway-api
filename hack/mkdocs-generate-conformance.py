@@ -89,21 +89,16 @@ def generate_conformance_tables(reports, currVersion, mkdocsConfig):
     gateway_tls_table = pandas.DataFrame()
     gateway_grpc_table = pandas.DataFrame()
 
-    if currVersion != 'v1.0.0':
-        gateway_http_table = generate_profiles_report(reports, 'GATEWAY-HTTP',currVersion)
-
-        gateway_grpc_table = generate_profiles_report(reports, 'GATEWAY-GRPC',currVersion)
-        gateway_grpc_table = gateway_grpc_table.rename_axis('Organization')
-
-        gateway_tls_table = generate_profiles_report(reports, 'GATEWAY-TLS',currVersion)
-        gateway_tls_table = gateway_tls_table.rename_axis('Organization')
-
-        mesh_http_table = generate_profiles_report(reports, 'MESH-HTTP',currVersion)
-    else:
-        gateway_http_table = generate_profiles_report(reports, "HTTP",currVersion)
-        mesh_http_table = generate_profiles_report(reports, "MESH",currVersion)
-
+    gateway_http_table = generate_profiles_report(reports, 'GATEWAY-HTTP',currVersion)
     gateway_http_table = gateway_http_table.rename_axis('Organization')
+
+    gateway_grpc_table = generate_profiles_report(reports, 'GATEWAY-GRPC',currVersion)
+    gateway_grpc_table = gateway_grpc_table.rename_axis('Organization')
+
+    gateway_tls_table = generate_profiles_report(reports, 'GATEWAY-TLS',currVersion)
+    gateway_tls_table = gateway_tls_table.rename_axis('Organization')
+
+    mesh_http_table = generate_profiles_report(reports, 'MESH-HTTP',currVersion)
     mesh_http_table = mesh_http_table.rename_axis('Organization')
 
     versionFile = ".".join(currVersion.split(".")[:2])
