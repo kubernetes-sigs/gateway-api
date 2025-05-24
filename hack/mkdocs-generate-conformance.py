@@ -41,8 +41,8 @@ def on_files(files, config, **kwargs):
     log.info("generating conformance")
 
     vers = getConformancePaths()
-    # Iterate over the list of versions. Exclude the pre 1.0 versions.
-    for v in vers[3:]:
+    # Iterate over the list of versions. Exclude the pre 1.1 versions.
+    for v in vers[4:]:
 
         confYamls = getYaml(v)
         releaseVersion = v.split(os.sep)[-2]
