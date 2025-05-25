@@ -473,7 +473,7 @@ func (suite *ConformanceTestSuite) Run(t *testing.T, tests []ConformanceTest) er
 		}
 
 		// call the hook function if it was provided,
-		// this's useful for running custom logic after each test,
+		// this's useful for running custom logic after each test at suite level,
 		// such as collecting current state of the cluster for debugging.
 		if suite.Hook != nil {
 			suite.Hook(t, test, suite)
