@@ -122,7 +122,7 @@ type ConformanceTestSuite struct {
 	lock sync.RWMutex
 }
 
-// Options can be used to initialize a ConformanceTestSuite.
+// ConformanceOptions can be used to initialize a ConformanceTestSuite.
 type ConformanceOptions struct {
 	Client               client.Client
 	ClientOptions        client.Options
@@ -153,7 +153,8 @@ type ConformanceOptions struct {
 	SkipProvisionalTests bool
 	// RunTest is a single test to run, mostly for development/debugging convenience.
 	RunTest string
-
+	// Hook is an optional function that can be used to run custom logic after each test at suite level.
+	Hook       func(t *testing.T, test ConformanceTest, suite *ConformanceTestSuite)
 	ManifestFS []fs.FS
 
 	// UsableNetworkAddresses is an optional pool of usable addresses for
@@ -269,6 +270,7 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 		mode:                        mode,
 		apiVersion:                  apiVersion,
 		apiChannel:                  apiChannel,
+		Hook:                        options.Hook,
 	}
 
 	for _, conformanceProfileName := range options.ConformanceProfiles.UnsortedList() {
