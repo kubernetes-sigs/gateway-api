@@ -72,6 +72,30 @@ var HTTPRouteRedirectHostAndStatus = suite.ConformanceTest{
 					Host: "example.org",
 				},
 				Namespace: ns,
+			}, {
+				Request: http.Request{
+					Path:             "/host-and-temporary",
+					UnfollowRedirect: true,
+				},
+				Response: http.Response{
+					StatusCode: 307,
+				},
+				RedirectRequest: &roundtripper.RedirectRequest{
+					Host: "example.org",
+				},
+				Namespace: ns,
+			}, {
+				Request: http.Request{
+					Path:             "/host-and-permanent",
+					UnfollowRedirect: true,
+				},
+				Response: http.Response{
+					StatusCode: 308,
+				},
+				RedirectRequest: &roundtripper.RedirectRequest{
+					Host: "example.org",
+				},
+				Namespace: ns,
 			},
 		}
 		for i := range testCases {

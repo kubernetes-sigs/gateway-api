@@ -99,6 +99,32 @@ var HTTPRouteRedirectPort = suite.ConformanceTest{
 					Host: "example.org",
 				},
 				Namespace: ns,
+			}, {
+				Request: http.Request{
+					Path:             "/port-and-temporary",
+					UnfollowRedirect: true,
+				},
+				Response: http.Response{
+					StatusCode: 307,
+				},
+				RedirectRequest: &roundtripper.RedirectRequest{
+					Port: "8083",
+					Host: "example.org",
+				},
+				Namespace: ns,
+			}, {
+				Request: http.Request{
+					Path:             "/port-and-permanent",
+					UnfollowRedirect: true,
+				},
+				Response: http.Response{
+					StatusCode: 308,
+				},
+				RedirectRequest: &roundtripper.RedirectRequest{
+					Port: "8083",
+					Host: "example.org",
+				},
+				Namespace: ns,
 			},
 		}
 		for i := range testCases {

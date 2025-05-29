@@ -99,6 +99,27 @@ var HTTPRouteRedirectScheme = suite.ConformanceTest{
 					Host:   "example.org",
 				},
 				Namespace: ns,
+			}, {
+				Request: http.Request{
+					Path:             "/scheme-and-temporary",
+					UnfollowRedirect: true,
+				},
+				Response: http.Response{
+					StatusCode: 307,
+				},
+				RedirectRequest: &roundtripper.RedirectRequest{
+					Scheme: "https",
+					Host:   "example.org",
+				},
+				Namespace: ns,
+			}, {
+				Request: http.Request{
+					Path:             "/scheme-and-permanent",
+					UnfollowRedirect: true,
+				},
+				Response: http.Response{
+					StatusCode: 308,
+				},
 			},
 		}
 		for i := range testCases {
