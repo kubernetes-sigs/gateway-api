@@ -10,6 +10,8 @@
 
 To reproduce a Buoyant Enterprise for Linkerd conformance test report:
 
+0. `cd` to the top level of this repository.
+
 1. Create an empty cluster.
 
 2. Install the Linkerd CLI:
