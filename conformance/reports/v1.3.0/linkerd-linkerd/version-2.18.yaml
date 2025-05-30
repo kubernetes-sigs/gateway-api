@@ -1,0 +1,30 @@
+apiVersion: gateway.networking.k8s.io/v1
+date: "2025-05-30T16:30:13-04:00"
+gatewayAPIChannel: standard
+gatewayAPIVersion: v1.3.0
+implementation:
+  contact:
+  - https://github.com/linkerd/linkerd2/blob/main/MAINTAINERS.md
+  organization: Linkerd
+  project: Linkerd
+  url: https://github.com/linkerd/linkerd2
+  version: version-2.18
+kind: ConformanceReport
+mode: default
+profiles:
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 1
+      Skipped: 0
+  name: MESH-GRPC
+  summary: Core tests succeeded.
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 3
+      Skipped: 0
+  name: MESH-HTTP
+  summary: Core tests succeeded.
