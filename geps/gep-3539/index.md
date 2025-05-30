@@ -54,7 +54,7 @@ and complexity concerns, see: https://www.youtube.com/watch?v=Oslwx3hj2Eg, we ra
 additional practical concerns that rendered Service API insufficient for the needs at hand.
 
 Service IPs can only be assigned out of the ServiceCIDR range configured for the API server. 
-While Kubernetes 1.31 added a Beta feature that allows for the Extension of Service IP Ranges, 
+While Kubernetes 1.31 added a Beta feature (GA 1.33) that allows for the Extension of Service IP Ranges, 
 there have been use cases where multi-NIC pods (pods with multiple network interfaces) require 
 the flexibility of specifying different ServiceCIDR ranges to be used for ClusterIP services 
 corresponding to the multiple different networks. There are strict traffic splitting and network 
