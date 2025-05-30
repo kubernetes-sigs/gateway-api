@@ -121,7 +121,8 @@ func compareRequest(exp http.ExpectedResponse, resp Response) error {
 			actualVal, ok := resp.RequestHeaders[strings.ToLower(name)]
 			if !ok {
 				return fmt.Errorf("expected %s header to be set, actual headers: %v", name, resp.RequestHeaders)
-			} else if strings.Join(actualVal, ",") != expectedVal {
+			}
+			if strings.Join(actualVal, ",") != expectedVal {
 				return fmt.Errorf("expected %s header to be set to %s, got %s", name, expectedVal, strings.Join(actualVal, ","))
 			}
 		}

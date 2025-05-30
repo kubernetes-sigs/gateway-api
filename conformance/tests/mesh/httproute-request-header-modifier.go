@@ -1,5 +1,5 @@
 /*
-Copyright 2022 The Kubernetes Authors.
+Copyright 2025 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -27,13 +27,13 @@ import (
 
 func init() {
 	MeshConformanceTests = append(MeshConformanceTests,
-		MeshHHTTPRouteRequestHeaderModifier,
-		MeshHHTTPRouteBackendRequestHeaderModifier,
+		MeshHTTPRouteRequestHeaderModifier,
+		MeshHTTPRouteBackendRequestHeaderModifier,
 	)
 }
 
-var MeshHHTTPRouteBackendRequestHeaderModifier = suite.ConformanceTest{
-	ShortName:   "MeshHHTTPRouteBackendRequestHeaderModifier",
+var MeshHTTPRouteBackendRequestHeaderModifier = suite.ConformanceTest{
+	ShortName:   "MeshHTTPRouteBackendRequestHeaderModifier",
 	Description: "An HTTPRoute backend has request header modifier filters applied correctly",
 	Features: []features.FeatureName{
 		features.SupportMesh,
@@ -41,11 +41,11 @@ var MeshHHTTPRouteBackendRequestHeaderModifier = suite.ConformanceTest{
 		features.SupportMeshHTTPRouteBackendRequestHeaderModification,
 	},
 	Manifests: []string{"tests/mesh/httproute-request-header-modifier-backend.yaml"},
-	Test:      MeshHHTTPRouteRequestHeaderModifier.Test,
+	Test:      MeshHTTPRouteRequestHeaderModifier.Test,
 }
 
-var MeshHHTTPRouteRequestHeaderModifier = suite.ConformanceTest{
-	ShortName:   "MeshHHTTPRouteRequestHeaderModifier",
+var MeshHTTPRouteRequestHeaderModifier = suite.ConformanceTest{
+	ShortName:   "MeshHTTPRouteRequestHeaderModifier",
 	Description: "An HTTPRoute has request header modifier filters applied correctly",
 	Features: []features.FeatureName{
 		features.SupportMesh,
