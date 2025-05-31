@@ -74,6 +74,7 @@ type Request struct {
 	Headers          map[string]string
 	UnfollowRedirect bool
 	Protocol         string
+	SNI              string
 }
 
 // ExpectedRequest defines expected properties of a request that reaches a backend.
@@ -112,19 +113,6 @@ func MakeRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtripp
 
 	req := MakeRequest(t, &expected, gwAddr, "HTTP", "http")
 
-	WaitForConsistentResponse(t, r, req, expected, timeoutConfig.RequiredConsecutiveSuccesses, timeoutConfig.MaxTimeToConsistency)
-}
-
-// MakeHTTPSRequestAndExpectEventuallyConsistentResponse makes a request with the given parameters,
-// understanding that the request may fail for some amount of time.
-//
-// Once the request succeeds consistently with the response having the expected status code, make
-// additional assertions on the response body using the provided ExpectedResponse.
-func MakeHTTPSRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtripper.RoundTripper, timeoutConfig config.TimeoutConfig, gwAddr string, expected ExpectedResponse) {
-	t.Helper()
-
-	req := MakeRequest(t, &expected, gwAddr, "HTTPS", "https")
-	// fmt.Printf("DEBUG req: %v\n", req)
 	WaitForConsistentResponse(t, r, req, expected, timeoutConfig.RequiredConsecutiveSuccesses, timeoutConfig.MaxTimeToConsistency)
 }
 
@@ -368,6 +356,10 @@ func CompareRequest(t *testing.T, req *roundtripper.Request, cReq *roundtripper.
 
 		if !strings.HasPrefix(cReq.Pod, expected.Backend) {
 			return fmt.Errorf("expected pod name to start with %s, got %s", expected.Backend, cReq.Pod)
+		}
+
+		if expected.ExpectedRequest.SNI != cReq.SNI {
+			return fmt.Errorf("expected SNI %q to be equal to %q", cReq.SNI, expected.ExpectedRequest.SNI)
 		}
 	} else if roundtripper.IsRedirect(cRes.StatusCode) {
 		if expected.RedirectRequest == nil {
