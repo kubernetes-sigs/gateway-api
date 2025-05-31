@@ -39,6 +39,30 @@ func MakeTLSRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtr
 	WaitForConsistentTLSResponse(t, r, req, expected, timeoutConfig.RequiredConsecutiveSuccesses, timeoutConfig.MaxTimeToConsistency, cPem, keyPem, server)
 }
 
+// MakeTLSRequestAndExpectFailure makes a request with the given parameters,
+// expecting that the request will fail but match the expectedResponse.
+func MakeTLSRequestAndExpectFailure(t *testing.T, r roundtripper.RoundTripper, gwAddr string, cPem, keyPem []byte, server string, expected http.ExpectedResponse) {
+	t.Helper()
+
+	req := http.MakeRequest(t, &expected, gwAddr, "HTTPS", "https")
+
+	req.KeyPem = keyPem
+	req.CertPem = cPem
+	req.Server = server
+
+	cReq, cRes, err := r.CaptureRoundTrip(req)
+	if err != nil {
+		tlog.Logf(t, "Request failed, not ready yet: %v", err.Error())
+		return
+	}
+
+	if err := http.CompareRequest(t, &req, cReq, cRes, expected); err != nil {
+		tlog.Log(t, "Response expectation failed as expected")
+	} else {
+		tlog.Errorf(t, "Response did not fail, but was expected to.  Full response: %+v", cReq)
+	}
+}
+
 // WaitForConsistentTLSResponse - repeats the provided request until it completes with a response having
 // the expected response consistently. The provided threshold determines how many times in
 // a row this must occur to be considered "consistent".
@@ -56,6 +80,7 @@ func WaitForConsistentTLSResponse(t *testing.T, r roundtripper.RoundTripper, req
 
 		if err := http.CompareRequest(t, &req, cReq, cRes, expected); err != nil {
 			tlog.Logf(t, "Response expectation failed for request: %+v  not ready yet: %v (after %v)", req, err, elapsed)
+			tlog.Logf(t, "Full response: %+v", cReq)
 			return false
 		}
 

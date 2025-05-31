@@ -88,6 +88,7 @@ type CapturedRequest struct {
 
 	Namespace string `json:"namespace"`
 	Pod       string `json:"pod"`
+	SNI       string `json:"sni"`
 }
 
 // RedirectRequest contains a follow up request metadata captured from a redirect
