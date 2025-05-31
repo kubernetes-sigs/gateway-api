@@ -271,12 +271,13 @@ spec:
                       pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                       type: string
                     port:
+                      default: 0
                       description: |-
                         Port is the network port. Multiple listeners may use the
                         same port, subject to the Listener compatibility rules.
                       format: int32
                       maximum: 65535
-                      minimum: 1
+                      minimum: 0
                       type: integer
                     protocol:
                       description: Protocol specifies the network protocol this listener
@@ -514,7 +515,6 @@ spec:
                           > 0 || size(self.options) > 0 : true'
                   required:
                   - name
-                  - port
                   - protocol
                   type: object
                 maxItems: 64
