@@ -102,6 +102,36 @@ var MeshHTTPRouteSchemeRedirect = suite.ConformanceTest{
 				},
 				Namespace: ns,
 			},
+			{
+				Request: http.Request{
+					Host:             "echo",
+					Path:             "/scheme-and-temporary",
+					UnfollowRedirect: true,
+				},
+				Response: http.Response{
+					StatusCode: 307,
+				},
+				RedirectRequest: &roundtripper.RedirectRequest{
+					Scheme: "https",
+					Host:   "example.org",
+				},
+				Namespace: ns,
+			},
+			{
+				Request: http.Request{
+					Host:             "echo",
+					Path:             "/scheme-and-permanent",
+					UnfollowRedirect: true,
+				},
+				Response: http.Response{
+					StatusCode: 308,
+				},
+				RedirectRequest: &roundtripper.RedirectRequest{
+					Scheme: "https",
+					Host:   "example.org",
+				},
+				Namespace: ns,
+			},
 		}
 		for i := range testCases {
 			// Declare tc here to avoid loop variable

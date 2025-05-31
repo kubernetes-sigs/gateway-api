@@ -27,4 +27,22 @@ spec:
       requestRedirect:
         statusCode: 301
         hostname: example.org
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /host-and-temporary
+    filters:
+    - type: RequestRedirect
+      requestRedirect:
+        statusCode: 307
+        hostname: example.org
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /host-and-permanent
+    filters:
+    - type: RequestRedirect
+      requestRedirect:
+        statusCode: 308
+        hostname: example.org
 

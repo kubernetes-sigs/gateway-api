@@ -56,7 +56,8 @@ var MeshHTTPRouteRedirectHostAndStatus = suite.ConformanceTest{
 					Host: "example.org",
 				},
 				Namespace: ns,
-			}, {
+			},
+			{
 				Request: http.Request{
 					Host:             "echo",
 					Path:             "/host-and-status",
@@ -64,6 +65,34 @@ var MeshHTTPRouteRedirectHostAndStatus = suite.ConformanceTest{
 				},
 				Response: http.Response{
 					StatusCode: 301,
+				},
+				RedirectRequest: &roundtripper.RedirectRequest{
+					Host: "example.org",
+				},
+				Namespace: ns,
+			},
+			{
+				Request: http.Request{
+					Host:             "echo",
+					Path:             "/host-and-temporary",
+					UnfollowRedirect: true,
+				},
+				Response: http.Response{
+					StatusCode: 307,
+				},
+				RedirectRequest: &roundtripper.RedirectRequest{
+					Host: "example.org",
+				},
+				Namespace: ns,
+			},
+			{
+				Request: http.Request{
+					Host:             "echo",
+					Path:             "/host-and-permanent",
+					UnfollowRedirect: true,
+				},
+				Response: http.Response{
+					StatusCode: 308,
 				},
 				RedirectRequest: &roundtripper.RedirectRequest{
 					Host: "example.org",

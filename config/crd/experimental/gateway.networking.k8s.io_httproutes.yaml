@@ -1208,6 +1208,8 @@ spec:
                                       enum:
                                       - 301
                                       - 302
+                                      - 307
+                                      - 308
                                       type: integer
                                   type: object
                                 responseHeaderModifier:
@@ -2433,6 +2435,8 @@ spec:
                                 enum:
                                 - 301
                                 - 302
+                                - 307
+                                - 308
                                 type: integer
                             type: object
                           responseHeaderModifier:
@@ -4834,6 +4838,8 @@ spec:
                                       enum:
                                       - 301
                                       - 302
+                                      - 307
+                                      - 308
                                       type: integer
                                   type: object
                                 responseHeaderModifier:
@@ -6059,6 +6065,8 @@ spec:
                                 enum:
                                 - 301
                                 - 302
+                                - 307
+                                - 308
                                 type: integer
                             type: object
                           responseHeaderModifier:
