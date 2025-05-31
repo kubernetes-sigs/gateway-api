@@ -6,44 +6,27 @@ and provides status and resource references for them.
 Implementors and integrators of Gateway API are encouraged to update this
 document with status information about their implementations, the versions they
 cover, and documentation to help users get started.
-
+Any implementation that has a recent conformance report (regardless of the result) may be added to the list.
 
 !!! info "Compare extended supported features across implementations"
 
-    [View a table to quickly compare supported features of projects](implementations/v1.1.md). These outline Gateway controller implementations that have passed core conformance tests, and focus on extended conformance features that they have implemented.
+    [View a table to quickly compare supported features of projects](implementations/v1.2.md). These outline Gateway controller implementations that have passed core conformance tests, and focus on extended conformance features that they have implemented.
 
 ## Gateway Controller Implementation Status <a name="gateways"></a>
 
-- [Acnodal EPIC][1]
 - [Airlock Microgateway][34]
-- [Amazon Elastic Kubernetes Service][23] (GA)
-- [Apache APISIX][2] (beta)
-- [Avi Kubernetes Operator][31]
 - [Azure Application Gateway for Containers][27] (GA)
 - [Cilium][16] (beta)
 - [Contour][3] (GA)
-- [Easegress][30] (GA)
-- [Emissary-Ingress (Ambassador API Gateway)][4] (alpha)
 - [Envoy Gateway][18] (GA)
-- [Flomesh Service Mesh][17] (beta)
 - [Gloo Gateway][5] (GA)
 - [Google Kubernetes Engine][6] (GA)
-- [HAProxy Ingress][7] (alpha)
-- [HAProxy Kubernetes Ingress Controller][32] (GA)
-- [HashiCorp Consul][8]
 - [Istio][9] (GA)
 - [kgateway][37] (GA)
 - [Kong Ingress Controller][10] (GA)
-- [Kong Gateway Operator][35] (GA)
 - [Kuma][11] (GA)
-- [LiteSpeed Ingress Controller][19]
-- [LoxiLB][36] (beta)
 - [NGINX Gateway Fabric][12] (GA)
-- [ngrok][33] (preview)
-- [STUNner][21] (beta)
 - [Traefik Proxy][13] (GA)
-- [Tyk][29] (work in progress)
-- [WSO2 APK][25] (GA)
 
 ## Service Mesh Implementation Status <a name="meshes"></a>
 
