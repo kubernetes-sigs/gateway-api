@@ -83,9 +83,9 @@ type ExpectedRequest struct {
 
 // Response defines expected properties of a response from a backend.
 type Response struct {
-	StatusCode       int
-	Headers          map[string]string
-	AbsentHeaders    []string
+	StatusCode    int
+	Headers       map[string]string
+	AbsentHeaders []string
 
 	// IgnoreWhitespace will cause whitespace to be ignored when comparing the respond
 	// header values.
