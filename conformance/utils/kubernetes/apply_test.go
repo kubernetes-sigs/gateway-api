@@ -179,7 +179,7 @@ spec:
 			resources, err := tc.applier.prepareResources(t, decoder)
 
 			require.NoError(t, err, "unexpected error preparing resources")
-			require.EqualValues(t, tc.expected, resources)
+			require.Equal(t, tc.expected, resources)
 		})
 	}
 }
