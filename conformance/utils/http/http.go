@@ -86,6 +86,10 @@ type Response struct {
 	StatusCode    int
 	Headers       map[string]string
 	AbsentHeaders []string
+
+	// IgnoreWhitespace will cause whitespace to be ignored when comparing the respond
+	// header values.
+	IgnoreWhitespace bool
 }
 
 type BackendRef struct {
@@ -314,8 +318,14 @@ func CompareRequest(t *testing.T, req *roundtripper.Request, cReq *roundtripper.
 				actualVal, ok := cRes.Headers[strings.ToLower(name)]
 				if !ok {
 					return fmt.Errorf("expected %s header to be set, actual headers: %v", name, cRes.Headers)
-				} else if strings.Join(actualVal, ",") != expectedVal {
-					return fmt.Errorf("expected %s header to be set to %s, got %s", name, expectedVal, strings.Join(actualVal, ","))
+				}
+				actualValStr := strings.Join(actualVal, ",")
+				if expected.Response.IgnoreWhitespace {
+					actualValStr = strings.ReplaceAll(actualValStr, " ", "")
+					expectedVal = strings.ReplaceAll(expectedVal, " ", "")
+				}
+				if actualValStr != expectedVal {
+					return fmt.Errorf("expected %s header to be set to %s, got %s", name, expectedVal, actualValStr)
 				}
 			}
 		}
