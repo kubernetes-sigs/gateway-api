@@ -208,16 +208,17 @@ func runH2CServer(h2cPort string, errchan chan<- error) {
 	}
 }
 
-// Global variable to store the SNI retrieved at a different level.
-var globalsni string
+// Channel variable to store the SNI retrieved in runBackendTLS handler func.
+var sniChannel = make(chan string)
 
 func runBackendTLSServer(port string, errchan chan<- error) {
 	// This handler function runs within the backend server to find the SNI
 	// and return it in the RequestAssertions.
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if strings.Contains(r.RequestURI, "backendTLS") {
-			// Find the sni in the global (or if needed, a channel/mutex?).
-			if globalsni == "" {
+			// Find the sni stored in the channel.
+			sni := <-sniChannel
+			if sni == "" {
 				err := fmt.Errorf("error finding SNI: SNI is empty")
 				// If there are some test cases without SNI, then they must handle this error properly.
 				processError(w, err, http.StatusBadRequest)
@@ -232,7 +233,7 @@ func runBackendTLSServer(port string, errchan chan<- error) {
 				context,
 
 				tlsStateToAssertions(r.TLS),
-				globalsni,
+				sni,
 			}
 			processRequestAssertions(requestAssertions, w, r)
 		} else {
@@ -276,11 +277,11 @@ func makeTLSConfig(cacert string) (*tls.Config, error) {
 	config.Certificates = certs
 	config.GetConfigForClient = func(info *tls.ClientHelloInfo) (*tls.Config, error) {
 		if info != nil {
-			// Store the SNI from the ClientHello into a global variable.
-			globalsni = info.ServerName
-			if globalsni == "" {
+			// Store the SNI from the ClientHello in the sniChannel.
+			if info.ServerName == "" {
 				return nil, fmt.Errorf("no SNI specified")
 			}
+			sniChannel <- info.ServerName
 			return nil, nil
 		}
 		return nil, fmt.Errorf("no client hello available")
