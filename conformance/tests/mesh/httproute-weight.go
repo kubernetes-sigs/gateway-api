@@ -60,7 +60,7 @@ var MeshHTTPRouteWeight = suite.ConformanceTest{
 			// Assert request succeeds before doing our distribution check
 			client.MakeRequestAndExpectEventuallyConsistentResponse(t, expected, s.TimeoutConfig)
 			for i := 0; i < 10; i++ {
-				if err := testDistribution(t, client, s, host, expected); err != nil {
+				if err := testDistribution(t, client, expected); err != nil {
 					t.Logf("Traffic distribution test failed (%d/10): %s", i+1, err)
 				} else {
 					return
@@ -71,7 +71,7 @@ var MeshHTTPRouteWeight = suite.ConformanceTest{
 	},
 }
 
-func testDistribution(t *testing.T, client echo.MeshPod, suite *suite.ConformanceTestSuite, host string, expected http.ExpectedResponse) error {
+func testDistribution(t *testing.T, client echo.MeshPod, expected http.ExpectedResponse) error {
 	const (
 		concurrentRequests  = 10
 		tolerancePercentage = 0.05
@@ -89,7 +89,6 @@ func testDistribution(t *testing.T, client echo.MeshPod, suite *suite.Conformanc
 	g.SetLimit(concurrentRequests)
 	for i := 0.0; i < totalRequests; i++ {
 		g.Go(func() error {
-
 			_, cRes, err := client.CaptureRequestResponseAndCompare(t, expected)
 			if err != nil {
 				return fmt.Errorf("failed: %w", err)
