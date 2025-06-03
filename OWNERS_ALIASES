@@ -32,9 +32,7 @@ aliases:
 
   gateway-api-conformance-reviewers:
     - candita
-    - michaelbeaumont
     - sunjayBhatia
-    - xunzhuo
 
   gateway-api-conformance-approvers:
     - arkodg
