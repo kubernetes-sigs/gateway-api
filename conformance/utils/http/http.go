@@ -248,7 +248,7 @@ func WaitForConsistentResponse(t *testing.T, r roundtripper.RoundTripper, req ro
 			return false
 		}
 
-		if err := CompareRequest(t, &req, cReq, cRes, expected); err != nil {
+		if err := CompareRoundTrip(t, &req, cReq, cRes, expected); err != nil {
 			tlog.Logf(t, "Response expectation failed for request: %+v  not ready yet: %v (after %v)", req, err, elapsed)
 			return false
 		}
@@ -258,7 +258,7 @@ func WaitForConsistentResponse(t *testing.T, r roundtripper.RoundTripper, req ro
 	tlog.Logf(t, "Request passed")
 }
 
-func CompareRequest(t *testing.T, req *roundtripper.Request, cReq *roundtripper.CapturedRequest, cRes *roundtripper.CapturedResponse, expected ExpectedResponse) error {
+func CompareRoundTrip(t *testing.T, req *roundtripper.Request, cReq *roundtripper.CapturedRequest, cRes *roundtripper.CapturedResponse, expected ExpectedResponse) error {
 	if roundtripper.IsTimeoutError(cRes.StatusCode) {
 		if roundtripper.IsTimeoutError(expected.Response.StatusCode) {
 			return nil
