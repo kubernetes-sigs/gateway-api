@@ -105,6 +105,9 @@ func makeRequest(t *testing.T, exp *http.ExpectedResponse) []string {
 }
 
 func compareRequest(exp http.ExpectedResponse, resp Response) error {
+	if exp.ExpectedRequest == nil {
+		exp.ExpectedRequest = &http.ExpectedRequest{}
+	}
 	wantReq := exp.ExpectedRequest
 	wantResp := exp.Response
 	if fmt.Sprint(wantResp.StatusCode) != resp.Code {
@@ -219,4 +222,20 @@ func ConnectToAppInNamespace(t *testing.T, s *suite.ConformanceTestSuite, app Me
 		rc:        s.Clientset.CoreV1().RESTClient(),
 		rcfg:      s.RestConfig,
 	}
+}
+
+func (m *MeshPod) CaptureRequestResponseAndCompare(t *testing.T, exp http.ExpectedResponse) ([]string, Response, error) {
+	req := makeRequest(t, &exp)
+
+	resp, err := m.request(req)
+	if err != nil {
+		tlog.Logf(t, "Request %v failed, not ready yet: %v", req, err.Error())
+		return []string{}, Response{}, err
+	}
+	tlog.Logf(t, "Got resp %v", resp)
+	if err := compareRequest(exp, resp); err != nil {
+		tlog.Logf(t, "Response expectation failed for request: %v  not ready yet: %v", req, err)
+		return []string{}, Response{}, err
+	}
+	return req, resp, nil
 }
