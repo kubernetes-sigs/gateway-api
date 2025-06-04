@@ -38,9 +38,9 @@ non-technical.
 The simplest way to get started is to attend one of the regular Gateway API
 [meetings].
 
-[north/south traffic]:../concepts/glossary.md#northsouth-traffic
-[service mesh]:../concepts/glossary.md#service-mesh
-[east/west traffic]:../concepts/glossary.md#eastwest-traffic
+[north/south traffic]:../mesh/gamma-glossary.md#northsouth-traffic
+[service mesh]:../mesh/gamma-glossary.md#service-mesh
+[east/west traffic]:../mesh/gamma-glossary.md#eastwest-traffic
 [role-oriented]:../concepts/roles-and-personas.md
 [geps]:../geps/overview.md
 [contributor-ladder]:../contributing/contributor-ladder.md

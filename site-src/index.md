@@ -47,9 +47,9 @@ by GatewayClass resources), each with multiple instances (represented by Gateway
 resources), in the same cluster.
 
 [Ingress API]:https://kubernetes.io/docs/concepts/services-networking/ingress/
-[north/south traffic]:concepts/glossary.md#northsouth-traffic
-[east/west traffic]:concepts/glossary.md#eastwest-traffic
-[gateway controller]:concepts/glossary.md#gateway-controller
+[north/south traffic]:mesh/gamma-glossary.md#northsouth-traffic
+[east/west traffic]:mesh/gamma-glossary.md#eastwest-traffic
+[gateway controller]:mesh/gamma-glossary.md#gateway-controller
 [gateway-attachment]:concepts/api-overview.md#attaching-routes-to-gateways
 
 ## Gateway API for Service Mesh (the [GAMMA initiative](mesh/gamma.md)) <a name="for-service-mesh"></a>
@@ -75,7 +75,7 @@ rapidly become critical for GAMMA, though, is the definition of the different
 [facets of the Service resource][service-facets].
 
 [gamma]:/concepts/gamma/
-[service-mesh]:concepts/glossary.md#service-mesh
+[service-mesh]:mesh/gamma-glossary.md#service-mesh
 [service-facets]:/concepts/service-facets
 [mesh-attachment]:/concepts/gamma#gateway-api-for-mesh
 
