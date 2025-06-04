@@ -207,11 +207,11 @@ spec:
 
 #### Cilium
 
-Beyond what's explained in the table above, Cilium also automatically labels each pod with its associated service account using the label io.cilium.k8s.policy.serviceaccount. This label can be used in CiliumNetworkPolicy to enforce identity-based access controls
+For the full spec and sematics of CiliumNetworkPolicy: https://docs.cilium.io/en/stable/network/kubernetes/policy/#ciliumnetworkpolicy & https://docs.cilium.io/en/stable/network/servicemesh/gateway-api/gateway-api/#cilium-s-ingress-config-and-ciliumnetworkpolicy
 
-[ServiceAccounts Based Identities](https://docs.cilium.io/en/latest/security/policy/kubernetes/#serviceaccounts)
+Beyond what's explained in the table above, Cilium also automatically labels each pod with its associated service account using the label io.cilium.k8s.policy.serviceaccount. This label can be used in CiliumNetworkPolicy to enforce identity-based access controls using [ServiceAccounts Based Identities](https://docs.cilium.io/en/latest/security/policy/kubernetes/#serviceaccounts) within CiliumNetworkPolicy;
 
-Following the CiliumNetworkPolicy for client identities.
+See below for example.
 
 ```
 apiVersion: "cilium.io/v2"
