@@ -59,12 +59,12 @@ An identity-based authorization API is essential because it provides a structure
 | **Default policies and admin policies** | If **no** ALLOW policy matches, traffic is **allowed** by default. You can deploy an overridable - default deny by default by deploying an **allow-nothing** policy in either the namespace or istio-system <br/><br/>AuthorizationPolicies in the `istio-system` namespace apply to the whole mesh and take precedence. These are not overridable by namespace-level policies.  | Default inbound policy can be set at install time using `proxy.defaultInboundPolicy`. Supported values are: <ul><li>`all-unauthenticated:` allow all traffic. This is the default.</li>  <li>`all-authenticated:` allow traffic from meshed clients in the same or from a different cluster (with multi-cluster).</li>  <li>`cluster-authenticated:` allow traffic from meshed clients in the same cluster.</li>  <li>`cluster-unauthenticated:` allow traffic from both meshed and non-meshed clients in the same cluster.</li>  <li>`deny:` all traffic are denied. </li> <li>`audit:` Same as all-unauthenticated but requests get flagged in logs and metrics.</li> </ul> <br/>Users can override the default policies for namespaces/pods or by setting the [config.linkerd.io/default-inbound-policy](http://config.linkerd.io/default-inbound-policy) annotation There is no support for admin, non overridable policies. | Follows Kubernetes NetworkPolicy semantics by default: if no `CiliumNetworkPolicy` allows the traffic, it is allowed (no implicit deny). Operators must apply explicit deny rules or “default-deny” policies to block traffic. <br/><br/> `CiliumClusterwideNetworkPolicy` exists for admin enforcement.)|
 
 
-Every mesh vendor has their own API of such authorization. Below we describe the UX for different implementations:
+Every mesh vendor has their own API of such authorization. Below we describe brief UX for different implementations:
 
 #### Istio
-Link: [Istio authorization policy docs](https://istio.io/latest/docs/reference/config/security/authorization-policy/)
+For the full spec and sematics of Istio AuthorizationPolicy: [Istio authorization policy docs](https://istio.io/latest/docs/reference/config/security/authorization-policy/)
 
-Istio's AuthorizationPolicy can enforce access control by specifying allowed identities using the `source.principals` field, which matches authenticated service account identities via mTLS.
+Istio's AuthorizationPolicy can enforce access control by specifying allowed istio-formatted identities using the `source.principals` field, which matches authenticated service account identities via mTLS. You can also use other source constructs which are described in the table above and in https://istio.io/latest/docs/reference/config/security/authorization-policy/#Source.
 
 ```
 apiVersion: security.istio.io/v1beta1
@@ -83,11 +83,30 @@ spec:
         principals: ["cluster.local/ns/default/sa/sleep"]
 ```
 
+OR targeting a gateway for example.
+
+```
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-sleep
+  namespace: default
+spec:
+  targetRefs:
+  - name: waypoint
+    kind: Gateway # note: supported target Refs are Gateway, GatewayClass, Service, and ServiceEntry
+    group: gateway.networking.k8s.io
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        principals: ["cluster.local/ns/default/sa/sleep"]
+```
 #### Linkerd
 
-Link: [Linkerd authorization policy docs](https://linkerd.io/2-edge/reference/authorization-policy/)
+For the full spec and sematics of Linkerd AuthorizationPolicy: [Linkerd authorization policy docs](https://linkerd.io/2-edge/reference/authorization-policy/)
 
-In Linkerd, identity-based authorization is enforced using AuthorizationPolicy and MeshTLSAuthentication, where MeshTLSAuthentication specifies allowed mTLS identities (e.g., sleep.default.serviceaccount.identity.linkerd.cluster.local), ensuring that only authenticated workloads can access a resource.
+In Linkerd, identity-based authorization is enforced using AuthorizationPolicy and MeshTLSAuthentication, where MeshTLSAuthentication specifies allowed ServiceAccounts or mTLS identities (e.g., sleep.default.serviceaccount.identity.linkerd.cluster.local), ensuring that only authenticated workloads can access a resource.
 
 Linkerd Policy can by applied to two different targets.
 
@@ -188,12 +207,7 @@ spec:
 
 #### Cilium
 
-##### CiliumIdentity
-Cilium has the concept of CiliumIdentity. Pods are assigned identities derived from their Kubernetes labels (namespace, app labels, etc.). Cilium’s policy matches based on these label-derived identities. The CiliumIdentity implementation maps an integer to a group of IP addresses (the pod IPs associated with a group of pods). This “integer” and its mapping to pod IP addresses represents the core identity primitive in Cilium.  
-
-More on https://docs.cilium.io/en/stable/internals/security-identities/ & https://docs.cilium.io/en/stable/security/network/identity/
-
-Cilium also automatically labels each pod with its associated service account using the label io.cilium.k8s.policy.serviceaccount. This label can be used in CiliumNetworkPolicy to enforce identity-based access controls
+Beyond what's explained in the table above, Cilium also automatically labels each pod with its associated service account using the label io.cilium.k8s.policy.serviceaccount. This label can be used in CiliumNetworkPolicy to enforce identity-based access controls
 
 [ServiceAccounts Based Identities](https://docs.cilium.io/en/latest/security/policy/kubernetes/#serviceaccounts)
 
@@ -221,6 +235,13 @@ spec:
         - method: GET
           path: "/"
 ```
+
+
+##### CiliumIdentity
+Cilium has the concept of CiliumIdentity. Pods are assigned identities derived from their Kubernetes labels (namespace, app labels, etc.). Cilium’s policy matches based on these label-derived identities. The CiliumIdentity implementation maps an integer to a group of IP addresses (the pod IPs associated with a group of pods). This “integer” and its mapping to pod IP addresses represents the core identity primitive in Cilium.  
+
+More on https://docs.cilium.io/en/stable/internals/security-identities/ & https://docs.cilium.io/en/stable/security/network/identity/
+
 
 
 ## API
