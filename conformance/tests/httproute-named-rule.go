@@ -38,6 +38,7 @@ var HTTPRouteNamedRule = suite.ConformanceTest{
 	Features: []features.FeatureName{
 		features.SupportGateway,
 		features.SupportHTTPRoute,
+		features.SupportHTTPRouteNamedRouteRule,
 	},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
