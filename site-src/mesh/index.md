@@ -131,7 +131,7 @@ would need to be moved into separate Namespaces to allow this.
 [Ana]:../concepts/roles-and-personas.md#ana
 [producer route]:../concepts/glossary.md#producer-route
 [consumer route]:../concepts/glossary.md#consumer-route
-[service mesh]:../concepts/glossary.md#service-mesh
+[service mesh]:gamma-glossary.md#service-mesh
 [Route merging rules]:../api-types/httproute.md#merging
 
 ## Request Flow
