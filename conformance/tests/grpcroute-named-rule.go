@@ -40,6 +40,7 @@ var GRPCRouteNamedRule = suite.ConformanceTest{
 	Features: []features.FeatureName{
 		features.SupportGateway,
 		features.SupportGRPCRoute,
+		features.SupportGRPCRouteNamedRouteRule,
 	},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
