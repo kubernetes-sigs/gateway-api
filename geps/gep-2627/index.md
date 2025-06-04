@@ -5,7 +5,7 @@
 
 ## TLDR
 
-For gateway infrastructure to be valuable we need to be able to connect clients to these gateways. A common way to achieve this is to use domain names/hostnames and DNS. Gateways define listeners that can have assigned hostnames or wildcards. The guidelines for DNS configuration are a critical piece of service networking, but this is currently not expressible as part of Gateway API. Instead of leaving this unspecified and having implementations do this in potentially wildly different ways, the purpose of this proposal is to provide a standard way to specify DNS for Gateways.
+For gateway infrastructure to be valuable we need to be able to connect clients to these gateways. A common way to achieve this is to use domain names/hostnames and DNS. The guidelines for DNS configuration are a critical piece of service networking, but this is currently not expressible as part of Gateway API. Instead of leaving this unspecified and having implementations likely to do this in different ways, the purpose of this proposal is to provide a standard way to specify DNS for Gateways.
 
 ## Goals
 * Provide DNS specification for Gateway resources
@@ -16,7 +16,7 @@ For gateway infrastructure to be valuable we need to be able to connect clients 
 ## Non-Goals
 
 * Providing any upstream hostname validation mechanisms. We can provide status for validation failure, but implementations are responsible for validation.
-* Multi-cluster DNS for multi-cluster ingress solutions
+* Multi-cluster DNS for multi-cluster ingress solutions (at least not as part of the initial API)
 
 ## Use Cases
 
@@ -27,7 +27,9 @@ As a cluster administrator, I would like to have the DNS names automatically pop
 As a cluster administrator I would have the status of the DNS records reported back to me, so that I can leverage existing kube based monitoring tools to know the status of the integration.
 
 As a cluster administrator, I would like the DNS records to be updated automatically if the `spec` of assigned gateways changes, whether those changes are for IP address or hostname. 
+
 As a DNS administrator, I should be able to ensure that only approved External DNS controllers can make changes to DNS zone configuration. (This should in general be taken care of by DNS system <-> External DNS controller interactions like user credentials and operation status responses, but it is important to remember that it needs to happen).
+
 ## API
 
 Initial draft will not offer an API yet until the use cases are agreed. Some thoughts worth thinking about: 
@@ -42,6 +44,8 @@ TBD
 ## Alternatives
 
 it is possible to use `external-dns` to manage dns based on HTTPRoutes and Gateways https://github.com/kubernetes-sigs/external-dns/blob/7f3c10d65297ec1c4bcc8dd6f88c189b7f3e80d0/docs/tutorials/gateway-api.md. The aim of this GEP is not remove this as an option, but instead provide a common API that could then be leveraged by something like external-dns. 
+
+The Kuadrant project (full disclosure I work on this project), offers a [DNSPolicy API](https://docs.kuadrant.io/1.2.x/kuadrant-operator/doc/reference/dnspolicy/#dnspolicy) which in part was the basis and inspiration for opening this GEP. The DNSPolicy offered by Kuadrant goes beyond what is outlined here as it also handles multi-cluster ingress and offers common routing options such as GEO and Weighted responses. 
 
 ## References
 
