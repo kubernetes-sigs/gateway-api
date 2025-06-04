@@ -35,7 +35,6 @@ var MeshHTTPRouteNamedRule = suite.ConformanceTest{
 	Manifests:   []string{"tests/mesh/httproute-named-rule.yaml"},
 	Features: []features.FeatureName{
 		features.SupportMesh,
-		features.SupportGateway,
 		features.SupportHTTPRoute,
 		features.SupportHTTPRouteNamedRouteRule,
 	},
