@@ -45,8 +45,7 @@ TBD
 
 it is possible to use `external-dns` to manage dns based on HTTPRoutes and Gateways https://github.com/kubernetes-sigs/external-dns/blob/7f3c10d65297ec1c4bcc8dd6f88c189b7f3e80d0/docs/tutorials/gateway-api.md. The aim of this GEP is not remove this as an option, but instead provide a common API that could then be leveraged by something like external-dns. 
 
-The Kuadrant project (full disclosure I work on this project), offers a [DNSPolicy API](https://docs.kuadrant.io/1.2.x/kuadrant-operator/doc/reference/dnspolicy/#dnspolicy) which in part was the basis and inspiration for opening this GEP. The DNSPolicy offered by Kuadrant goes beyond what is outlined here as it also handles multi-cluster ingress and offers common routing options such as GEO and Weighted responses. 
 
 ## References
 
-TBD
+The Kuadrant project, offers a [DNSPolicy API](https://docs.kuadrant.io/1.2.x/kuadrant-operator/doc/reference/dnspolicy/#dnspolicy) which in part was the basis and inspiration for opening this GEP. The DNSPolicy offered by Kuadrant goes beyond what is outlined here as it also handles multi-cluster ingress and offers common routing options such as GEO and Weighted responses. 
