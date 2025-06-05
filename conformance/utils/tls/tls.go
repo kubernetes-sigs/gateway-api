@@ -52,8 +52,7 @@ func MakeTLSRequestAndExpectFailure(t *testing.T, r roundtripper.RoundTripper, g
 
 	cReq, cRes, err := r.CaptureRoundTrip(req)
 	if err != nil {
-		tlog.Logf(t, "Request failed, not ready yet: %v", err.Error())
-		return
+		tlog.Fatalf(t, "Request failed, not ready yet: %v", err.Error())
 	}
 
 	if err := http.CompareRoundTrip(t, &req, cReq, cRes, expected); err != nil {

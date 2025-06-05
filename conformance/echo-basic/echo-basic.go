@@ -217,25 +217,26 @@ func runBackendTLSServer(port string, errchan chan<- error) {
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if strings.Contains(r.RequestURI, "backendTLS") {
 			// Find the sni stored in the channel.
-			sni := <-sniChannel
-			if sni == "" {
+			select {
+			case sni := <-sniChannel:
+				requestAssertions := RequestAssertions{
+					r.RequestURI,
+					r.Host,
+					r.Method,
+					r.Proto,
+					r.Header,
+
+					context,
+
+					tlsStateToAssertions(r.TLS),
+					sni,
+				}
+				processRequestAssertions(requestAssertions, w, r)
+			default:
 				err := fmt.Errorf("error finding SNI: SNI is empty")
 				// If there are some test cases without SNI, then they must handle this error properly.
 				processError(w, err, http.StatusBadRequest)
 			}
-			requestAssertions := RequestAssertions{
-				r.RequestURI,
-				r.Host,
-				r.Method,
-				r.Proto,
-				r.Header,
-
-				context,
-
-				tlsStateToAssertions(r.TLS),
-				sni,
-			}
-			processRequestAssertions(requestAssertions, w, r)
 		} else {
 			// This should never happen, but just in case.
 			processError(w, fmt.Errorf("backend server called without correct uri"), http.StatusBadRequest)
@@ -245,6 +246,7 @@ func runBackendTLSServer(port string, errchan chan<- error) {
 	config, err := makeTLSConfig(os.Getenv("CA_CERT"))
 	if err != nil {
 		errchan <- err
+		return
 	}
 	btlsServer := &http.Server{
 		Addr:              fmt.Sprintf(":%s", port),
@@ -281,8 +283,12 @@ func makeTLSConfig(cacert string) (*tls.Config, error) {
 			if info.ServerName == "" {
 				return nil, fmt.Errorf("no SNI specified")
 			}
-			sniChannel <- info.ServerName
-			return nil, nil
+			select {
+			case sniChannel <- info.ServerName:
+				return nil, nil
+			default:
+				return nil, fmt.Errorf("channel is full")
+			}
 		}
 		return nil, fmt.Errorf("no client hello available")
 	}
