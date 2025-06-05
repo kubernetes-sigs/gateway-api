@@ -1,8 +1,6 @@
 module sigs.k8s.io/gateway-api
 
-go 1.23.0
-
-toolchain go1.24.0
+go 1.24.0
 
 require (
 	github.com/elastic/crd-ref-docs v0.1.0
