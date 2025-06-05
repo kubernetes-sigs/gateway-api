@@ -4,7 +4,7 @@
 
 | API channel  | Implementation version                    | Mode    | Report                                                 |
 |--------------|-------------------------------------------|---------|--------------------------------------------------------|
-| experimental | [enterprise-2.18](https://docs.buoyant.io/buoyant-enterprise-linkerd/latest/overview//) | default | [enterprise-2.18 report](./enterprise-2.18.yaml) |
+| standard     | [enterprise-2.18](https://docs.buoyant.io/buoyant-enterprise-linkerd/latest/overview//) | default | [enterprise-2.18 report](./enterprise-2.18.yaml) |
 
 ## Reproduce
 

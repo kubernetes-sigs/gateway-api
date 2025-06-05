@@ -4,7 +4,7 @@
 
 | API channel  | Implementation version                    | Mode    | Report                                                 |
 |--------------|-------------------------------------------|---------|--------------------------------------------------------|
-| experimental | [version-2.18](https://github.com/linkerd/linkerd2/releases/tag/version-2.18/) | default | [version-2.18 report](./version-2.18.yaml) |
+| standard     | [version-2.18](https://github.com/linkerd/linkerd2/releases/tag/version-2.18/) | default | [version-2.18 report](./version-2.18.yaml) |
 
 ### A note on Linkerd Versioning
 
