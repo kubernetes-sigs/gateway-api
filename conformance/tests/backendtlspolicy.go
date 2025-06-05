@@ -37,6 +37,7 @@ var BackendTLSPolicy = suite.ConformanceTest{
 	Description: "A single service that is targeted by a BackendTLSPolicy must successfully complete TLS termination",
 	Features: []features.FeatureName{
 		features.SupportGateway,
+		features.SupportHTTPRoute,
 		features.SupportBackendTLSPolicy,
 	},
 	Manifests: []string{"tests/backendtlspolicy.yaml"},
