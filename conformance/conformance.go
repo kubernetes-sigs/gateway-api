@@ -17,6 +17,7 @@ limitations under the License.
 package conformance
 
 import (
+	"context"
 	"io/fs"
 	"os"
 	"testing"
@@ -30,13 +31,19 @@ import (
 	conformanceconfig "sigs.k8s.io/gateway-api/conformance/utils/config"
 	"sigs.k8s.io/gateway-api/conformance/utils/flags"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
+	"sigs.k8s.io/gateway-api/pkg/client/clientset/versioned"
+	"sigs.k8s.io/gateway-api/pkg/features"
 
 	"github.com/stretchr/testify/require"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
+	"k8s.io/apimachinery/pkg/util/sets"
 	clientset "k8s.io/client-go/kubernetes"
+
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
 	"sigs.k8s.io/yaml"
+
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // DefaultOptions will parse command line flags to populate a
@@ -54,6 +61,14 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 	// (https://github.com/kubernetes-sigs/controller-runtime/issues/452).
 	clientset, err := clientset.NewForConfig(cfg)
 	require.NoError(t, err, "error initializing Kubernetes clientset")
+
+	// TODO(bexxmodd) --------------------------
+	c, err := versioned.NewForConfig(cfg)
+	require.NoError(t, err, "error initializing Clientset for Gateway API")
+	ctx := context.Background()
+	supFeatures := fetchSupportedFeatures(t, ctx, c, *flags.GatewayClassName)
+	t.Log(">>> Supported Features: %s <<<", supFeatures)
+	/// -----------------------------------------
 
 	require.NoError(t, v1alpha3.Install(client.Scheme()))
 	require.NoError(t, v1alpha2.Install(client.Scheme()))
@@ -135,6 +150,21 @@ func RunConformanceWithOptions(t *testing.T, opts suite.ConformanceOptions) {
 		require.NoError(t, err, "error generating conformance profile report")
 		require.NoError(t, writeReport(t.Logf, *report, opts.ReportOutputPath), "error writing report")
 	}
+}
+
+func fetchSupportedFeatures(t *testing.T, ctx context.Context, gatewayClients *versioned.Clientset, gatewayClassName string) sets.Set[features.FeatureName] {
+	t.Helper()
+	if gatewayClassName == "" {
+		return nil
+	}
+	gw, err := gatewayClients.GatewayV1().GatewayClasses().Get(ctx, gatewayClassName, metav1.GetOptions{})
+	require.NoError(t, err, "error fetching GatewayClass %s", gatewayClassName)
+
+	fs := sets.New[features.FeatureName]()
+	for _, feature := range gw.Status.SupportedFeatures {
+		fs.Insert(features.FeatureName(feature.Name))
+	}
+	return fs
 }
 
 func logOptions(t *testing.T, opts suite.ConformanceOptions) {
