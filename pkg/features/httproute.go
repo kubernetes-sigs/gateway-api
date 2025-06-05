@@ -193,7 +193,7 @@ var (
 		Name:    SupportHTTPRouteBackendProtocolWebSocket,
 		Channel: FeatureChannelStandard,
 	}
-	// HTTPRouteBackendProtocolWebSocketFeature contains metadata for the SupportHTTPRouteNamedRouteRule feature.
+	// HTTPRouteNamedRouteRule contains metadata for the SupportHTTPRouteNamedRouteRule feature.
 	HTTPRouteNamedRouteRule = Feature{
 		Name:    SupportHTTPRouteNamedRouteRule,
 		Channel: FeatureChannelStandard,
