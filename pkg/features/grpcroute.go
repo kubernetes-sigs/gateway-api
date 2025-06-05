@@ -48,13 +48,11 @@ const (
 	SupportGRPCRouteNamedRouteRule FeatureName = "GRPCRouteNamedRouteRule"
 )
 
-var (
-	// GRPCRouteBackendProtocolWebSocketFeature contains metadata for the SupportGRPCRouteNamedRouteRule feature.
-	GRPCRouteNamedRouteRule = Feature{
-		Name:    SupportGRPCRouteNamedRouteRule,
-		Channel: FeatureChannelStandard,
-	}
-)
+// GRPCRouteNamedRouteRule contains metadata for the SupportGRPCRouteNamedRouteRule feature.
+var GRPCRouteNamedRouteRule = Feature{
+	Name:    SupportGRPCRouteNamedRouteRule,
+	Channel: FeatureChannelStandard,
+}
 
 // GRPCRouteExtendedFeatures includes all extended features for GRPCRoute
 // conformance and can be used to opt-in to run all GRPCRoute extended features tests.
