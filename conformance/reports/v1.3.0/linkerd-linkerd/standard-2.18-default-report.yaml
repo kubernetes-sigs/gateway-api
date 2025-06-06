@@ -1,5 +1,5 @@
 apiVersion: gateway.networking.k8s.io/v1
-date: "2025-06-05T14:57:45-04:00"
+date: "2025-06-06T15:28:42-04:00"
 gatewayAPIChannel: standard
 gatewayAPIVersion: v1.3.0
 implementation:
@@ -27,12 +27,9 @@ profiles:
       Passed: 7
       Skipped: 0
   extended:
-    failedTests:
-    - MeshHTTPRouteRedirectPath
-    - MeshHTTPRouteRewritePath
-    result: failure
+    result: success
     statistics:
-      Failed: 2
+      Failed: 0
       Passed: 5
       Skipped: 0
     supportedFeatures:
@@ -57,7 +54,8 @@ profiles:
     - MeshClusterIPMatching
     - MeshConsumerRoute
     - MeshHTTPRouteBackendRequestHeaderModification
+    unsupportedFeatures:
     - MeshHTTPRouteRedirectPath
     - MeshHTTPRouteRewritePath
   name: MESH-HTTP
-  summary: Core tests succeeded. Extended tests failed with 2 test failures.
+  summary: Core tests succeeded. Extended tests succeeded.
