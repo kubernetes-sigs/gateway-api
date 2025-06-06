@@ -35,6 +35,7 @@ cover, and documentation to help users get started.
 - [kgateway][37] (GA)
 - [Kong Ingress Controller][10] (GA)
 - [Kong Gateway Operator][35] (GA)
+* [Kubvernor][39](work in progress)
 - [Kuma][11] (GA)
 - [LiteSpeed Ingress Controller][19]
 - [LoxiLB][36] (beta)
@@ -97,6 +98,7 @@ cover, and documentation to help users get started.
 [36]:#loxilb
 [37]:#kgateway
 [38]:#google-cloud-service-mesh
+[39]:#kubvernor
 
 
 [gamma]:/concepts/gamma/
@@ -418,6 +420,12 @@ For help and support with Kong Gateway operator please feel free to [create an i
 [kgo-issue-new]:https://github.com/Kong/gateway-operator/issues/new
 [kgo-disc-new]:https://github.com/Kong/gateway-operator/discussions/new
 
+
+### Kubvernor
+[Kubvernor][kubvernor] is an open-source, highly experimental implementation of API controller in Rust programming language. Currently, Kubernor supports Envoy Proxy. The project aims to be as generic as possible so Kubvernor can be used to manage/deploy different gateways (Envoy, Nginx, HAProxy, etc.).
+
+[kubvernor]:https://github.com/kubvernor/kubvernor
+
 ### Kuma
 
 [![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.0.0-Kuma-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.0.0/kumahq-kuma)
@@ -599,3 +607,4 @@ For help and support with Kuadrant's implementation please feel free to [create 
 [kuadrant]:https://kuadrant.io/
 [kuadrant-issue-new]:https://github.com/Kuadrant/kuadrant-operator/issues/new
 [kuadrant-slack]:https://kubernetes.slack.com/archives/C05J0D0V525
+
