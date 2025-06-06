@@ -20,6 +20,8 @@ LINKERD_EDGE_VERSION=${LINKERD_EDGE_VERSION:-edge-25.4.4}
 GATEWAY_API_CHANNEL=${GATEWAY_API_CHANNEL:-standard}
 GATEWAY_API_VERSION=${GATEWAY_API_VERSION:-v1.3.0}
 
+UNSUPPORTED_FEATURES="MeshHTTPRouteRedirectPath,MeshHTTPRouteRewritePath"
+
 CONFORMANCE_PRODUCT=linkerd-linkerd
 CONFORMANCE_VERSION=$(echo $LINKERD_VERSION | cut -d- -f2-)
 GATEWAY_API_BASE_URL=https://github.com/kubernetes-sigs/gateway-api/releases/download
@@ -30,6 +32,8 @@ echo "Using Gateway API $GATEWAY_API_VERSION $GATEWAY_API_CHANNEL"
 # Install the Linkerd CLI.
 curl --proto '=https' --tlsv1.2 -sSfL https://run.linkerd.io/install-edge \
   | env LINKERD2_VERSION=${LINKERD_EDGE_VERSION} sh
+
+export PATH=$HOME/.linkerd2/bin:$PATH
 
 # Install the Gateway API CRDs.
 
@@ -45,8 +49,6 @@ linkerd check
 REPORT_NAME=${GATEWAY_API_CHANNEL}-${CONFORMANCE_VERSION}-default-report.yaml
 REPORT_PATH=reports/${GATEWAY_API_VERSION}/${CONFORMANCE_PRODUCT}/${REPORT_NAME}
 
-        # --supported-features=Mesh,HTTPRoute,GRPCRoute \
-
 go test \
     -p 4 \
     ./conformance \
@@ -60,6 +62,5 @@ go test \
         --report-output ${REPORT_PATH} \
         --conformance-profiles=MESH-HTTP,MESH-GRPC \
         --all-features \
-        --exempt-features=Gateway,ReferenceGrant \
+        --exempt-features=Gateway,ReferenceGrant,${UNSUPPORTED_FEATURES} \
         --namespace-annotations=linkerd.io/inject=enabled
-
