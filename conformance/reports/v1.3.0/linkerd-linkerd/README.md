@@ -9,7 +9,7 @@
 ### A note on Linkerd Versioning
 
 The Linkerd project publishes and announces _versions_ that correspond to
-specific project milestones and sets of new features. The current version is
+specific project milestones and sets of new features. This report is for
 Linkerd 2.18.
 
 Linkerd versions are available in different types of _release artifacts_:
@@ -34,7 +34,8 @@ Versions] documentation.
 Since Gateway API conformance tests _require_ semantic versioning for the
 implementation version, the Linkerd project reports conformance using the
 `version` tags. However, the reproduction instructions below reference the
-corresponding `edge` tag to match the way the Linkerd CLI is published.
+corresponding `edge` tag, because the Linkerd CLI is actually published using
+the `edge` tag.
 
 [Releases and Versions]: https://linkerd.io/releases/
 
@@ -46,43 +47,12 @@ To reproduce a Linkerd conformance test report:
 
 1. Create an empty cluster.
 
-2. Install the Linkerd CLI:
+2. Run `bash conformance/reports/v1.3.0/linkerd-linkerd/run-conformance.sh`.
 
-    ```bash
-    curl --proto '=https' --tlsv1.2 -sSfL \
-         https://run.linkerd.io/install-edge \
-         | env LINKERD2_VERSION=edge-25.4.4 sh
-    ```
+   You can set `LINKERD_VERSION`, `LINKERD_EDGE_VERSION`,
+   `GATEWAY_API_CHANNEL`, and `GATEWAY_API_VERSION` if you want to try
+   different versions of things. (Note that if you set `GATEWAY_API_VERSION`,
+   you'll need to be on a matching Gateway API branch.)
 
-3. Install the Gateway API CRDs:
-
-    ```bash
-    kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.3.0/standard-install.yaml
-    ```
-
-4. Install the Linkerd control plane:
-
-    ```bash
-    linkerd install --crds | kubectl apply -f -
-    linkerd install | kubectl apply -f -
-    linkerd check
-    ```
-
-5. Run the conformance tests:
-
-    ```bash
-    go test \
-       -p 4 \
-       ./conformance \
-       -run TestConformance \
-       -args \
-         --conformance-profiles MESH-HTTP,MESH-GRPC \
-         --namespace-annotations=linkerd.io/inject=enabled \
-         --exempt-features=Gateway,ReferenceGrant \
-         --organization Linkerd \
-         --project Linkerd \
-         --url https://github.com/linkerd/linkerd2 \
-         --version version-2.18 \
-         --contact https://github.com/linkerd/linkerd2/blob/main/MAINTAINERS.md \
-         --report-output version-2.18.yaml
-    ```
+3. The conformance report will be written to the
+   `conformance/reports/v1.3.0/linkerd-linkerd/` directory.
