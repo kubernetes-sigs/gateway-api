@@ -30,12 +30,15 @@ import (
 	"sigs.k8s.io/gateway-api/conformance/tests"
 	conformanceconfig "sigs.k8s.io/gateway-api/conformance/utils/config"
 	"sigs.k8s.io/gateway-api/conformance/utils/flags"
+
+	// "sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
 	"sigs.k8s.io/gateway-api/pkg/client/clientset/versioned"
 	"sigs.k8s.io/gateway-api/pkg/features"
 
 	"github.com/stretchr/testify/require"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
+	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/sets"
 	clientset "k8s.io/client-go/kubernetes"
 
@@ -55,19 +58,23 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 	clientOptions := client.Options{}
 	client, err := client.New(cfg, clientOptions)
 	require.NoError(t, err, "error initializing Kubernetes client")
+	gwcName := *flags.GatewayClassName
 
 	// This clientset is needed in addition to the client only because
 	// controller-runtime client doesn't support non CRUD sub-resources yet
 	// (https://github.com/kubernetes-sigs/controller-runtime/issues/452).
 	clientset, err := clientset.NewForConfig(cfg)
 	require.NoError(t, err, "error initializing Kubernetes clientset")
+	// kubernetes.GWCMustHaveAcceptedConditionTrue(t, client, conformanceconfig.DefaultTimeoutConfig(), gwcName)
 
 	// TODO(bexxmodd) --------------------------
 	c, err := versioned.NewForConfig(cfg)
 	require.NoError(t, err, "error initializing Clientset for Gateway API")
-	ctx := context.Background()
-	supFeatures := fetchSupportedFeatures(t, ctx, c, *flags.GatewayClassName)
-	t.Log(">>> Supported Features: %s <<<", supFeatures)
+	ctx := context.TODO()
+	e := client.Get(ctx, types.NamespacedName{Name: "konghq.com/gateway-operator"}, &v1.GatewayClass{})
+	t.Logf(">>> GatewayClass %s exists: %v <<<", gwcName, e)
+	supFeatures := fetchSupportedFeatures(t, ctx, c, gwcName)
+	t.Logf(">>> Supported Features: %v <<<", supFeatures)
 	/// -----------------------------------------
 
 	require.NoError(t, v1alpha3.Install(client.Scheme()))
@@ -76,7 +83,8 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 	require.NoError(t, v1.Install(client.Scheme()))
 	require.NoError(t, apiextensionsv1.AddToScheme(client.Scheme()))
 
-	supportedFeatures := suite.ParseSupportedFeatures(*flags.SupportedFeatures)
+	sf := suite.ParseSupportedFeatures(*flags.SupportedFeatures)
+	supportedFeatures := suite.SupportedFeatures{Inferred: false, Set: sf}
 	exemptFeatures := suite.ParseSupportedFeatures(*flags.ExemptFeatures)
 	skipTests := suite.ParseSkipTests(*flags.SkipTests)
 	namespaceLabels := suite.ParseKeyValuePairs(*flags.NamespaceLabels)
@@ -102,7 +110,7 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 		EnableAllSupportedFeatures: *flags.EnableAllSupportedFeatures,
 		ExemptFeatures:             exemptFeatures,
 		ManifestFS:                 []fs.FS{&Manifests},
-		GatewayClassName:           *flags.GatewayClassName,
+		GatewayClassName:           gwcName,
 		Implementation:             implementation,
 		Mode:                       *flags.Mode,
 		NamespaceAnnotations:       namespaceAnnotations,
@@ -164,6 +172,7 @@ func fetchSupportedFeatures(t *testing.T, ctx context.Context, gatewayClients *v
 	for _, feature := range gw.Status.SupportedFeatures {
 		fs.Insert(features.FeatureName(feature.Name))
 	}
+	t.Logf("=== STATUS: %v", gw.Status)
 	return fs
 }
 

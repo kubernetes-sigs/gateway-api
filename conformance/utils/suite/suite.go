@@ -69,7 +69,7 @@ type ConformanceTestSuite struct {
 	BaseManifests            string
 	MeshManifests            string
 	Applier                  kubernetes.Applier
-	SupportedFeatures        sets.Set[features.FeatureName]
+	SupportedFeatures        SupportedFeatures
 	TimeoutConfig            config.TimeoutConfig
 	SkipTests                sets.Set[string]
 	SkipProvisionalTests     bool
@@ -141,7 +141,7 @@ type ConformanceOptions struct {
 	// CleanupBaseResources indicates whether or not the base test
 	// resources such as Gateways should be cleaned up after the run.
 	CleanupBaseResources       bool
-	SupportedFeatures          sets.Set[features.FeatureName]
+	SupportedFeatures          SupportedFeatures
 	ExemptFeatures             sets.Set[features.FeatureName]
 	EnableAllSupportedFeatures bool
 	TimeoutConfig              config.TimeoutConfig
@@ -168,6 +168,11 @@ type ConformanceOptions struct {
 	AllowCRDsMismatch   bool
 	Implementation      confv1.Implementation
 	ConformanceProfiles sets.Set[ConformanceProfileName]
+}
+
+type SupportedFeatures struct {
+	Inferred bool
+	sets.Set[features.FeatureName]
 }
 
 const (
@@ -226,9 +231,15 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 	// cover all features, if they don't they'll need to have provided a
 	// conformance profile or at least some specific features they support.
 	if options.EnableAllSupportedFeatures {
-		options.SupportedFeatures = features.SetsToNamesSet(features.AllFeatures)
-	} else if options.SupportedFeatures == nil {
-		options.SupportedFeatures = sets.New[features.FeatureName]()
+		options.SupportedFeatures = SupportedFeatures{
+			Inferred: true,
+			Set:      features.SetsToNamesSet(features.AllFeatures),
+		}
+	} else if options.SupportedFeatures.Len() == 0 {
+		options.SupportedFeatures = SupportedFeatures{
+			Inferred: false,
+			Set:      sets.New[features.FeatureName](),
+		}
 	}
 
 	for feature := range options.ExemptFeatures {
@@ -534,6 +545,7 @@ func (suite *ConformanceTestSuite) Report() (*confv1.ConformanceReport, error) {
 		GatewayAPIChannel:         suite.apiChannel,
 		ProfileReports:            profileReports.list(),
 		SucceededProvisionalTests: succeededProvisionalTests,
+		InferredSupportedFeatures: suite.SupportedFeatures.Inferred,
 	}, nil
 }
 

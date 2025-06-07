@@ -51,9 +51,9 @@ type ConformanceReport struct {
 	// have been successfully run.
 	SucceededProvisionalTests []string `json:"succeededProvisionalTests,omitempty"`
 
-	// AutoDetectedSupportedFeatures indicates whether the supported features were
+	// InferredSupportedFeatures indicates whether the supported features were
 	// automatically detected by the conformance suite.
-	AutoDetectedSupportedFeatures bool `json:"autoDetectedSupportedFeatures"`
+	InferredSupportedFeatures bool `json:"autoDetectedSupportedFeatures"`
 }
 
 // Implementation provides metadata information on the downstream
