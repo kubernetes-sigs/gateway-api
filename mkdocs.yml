@@ -82,6 +82,7 @@ nav:
       - Overview: mesh/index.md
       - GAMMA Initiative: mesh/gamma.md
       - Service Facets: mesh/service-facets.md
+      - GAMMA Glossary: mesh/gamma-glossary.md
     - Implementations:
         - List: implementations.md
         - Comparisons:
@@ -90,7 +91,6 @@ nav:
           - v1.1: implementations/v1.1.md
           - v1.0: implementations/v1.0.md
     - FAQ: faq.md
-    - Glossary: concepts/glossary.md
   - Guides:
     - User Guides:
       - Getting started: guides/index.md
