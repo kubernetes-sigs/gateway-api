@@ -105,7 +105,7 @@ func testDistribution(t *testing.T, suite *suite.ConformanceTestSuite, gwAddr st
 			if err != nil {
 				return fmt.Errorf("failed to roundtrip request: %w", err)
 			}
-			if err := http.CompareRequest(t, &req, cReq, cRes, expected); err != nil {
+			if err := http.CompareRoundTrip(t, &req, cReq, cRes, expected); err != nil {
 				return fmt.Errorf("response expectation failed for request: %w", err)
 			}
 
