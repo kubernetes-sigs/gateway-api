@@ -51,7 +51,7 @@ cover, and documentation to help users get started.
 - [Google Cloud Service Mesh][38] (GA)
 - [Istio][9] (GA)
 - [Kuma][11] (GA)
-- [Linkerd][28] (experimental)
+- [Linkerd][28] (GA)
 
 ## Integrations <a name="integrations"></a>
 
