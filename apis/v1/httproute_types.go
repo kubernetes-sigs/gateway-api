@@ -138,7 +138,6 @@ type HTTPRouteRule struct {
 	//
 	// Support: Extended
 	// +optional
-	// <gateway:experimental>
 	Name *SectionName `json:"name,omitempty"`
 
 	// Matches define conditions used for matching the rule against incoming
