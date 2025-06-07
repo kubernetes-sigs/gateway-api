@@ -89,7 +89,6 @@ func GWCMustHaveAcceptedConditionAny(t *testing.T, c client.Client, timeoutConfi
 func gwcMustBeAccepted(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, gwcName, expectedStatus string) string {
 	t.Helper()
 
-	t.Logf(">>> Waiting for GatewayClass %s to have Accepted condition with status %s", gwcName, expectedStatus)
 	var controllerName string
 	waitErr := wait.PollUntilContextTimeout(context.Background(), 1*time.Second, timeoutConfig.GWCMustBeAccepted, true, func(ctx context.Context) (bool, error) {
 		gwc := &gatewayv1.GatewayClass{}
