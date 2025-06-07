@@ -39,6 +39,24 @@ spec:
   - matches:
     - path:
         type: PathPrefix
+        value: /scheme-and-temporary
+    filters:
+    - type: RequestRedirect
+      requestRedirect:
+        scheme: "https"
+        statusCode: 307
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /scheme-and-permanent
+    filters:
+    - type: RequestRedirect
+      requestRedirect:
+        scheme: "https"
+        statusCode: 308
+  - matches:
+    - path:
+        type: PathPrefix
         value: /scheme-and-host-and-status
     filters:
     - type: RequestRedirect

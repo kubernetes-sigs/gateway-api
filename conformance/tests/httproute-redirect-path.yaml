@@ -52,6 +52,28 @@ spec:
   - matches:
     - path:
         type: PathPrefix
+        value: /path-and-temporary
+    filters:
+    - type: RequestRedirect
+      requestRedirect:
+        path:
+          type: ReplacePrefixMatch
+          replacePrefixMatch: /replacement-prefix
+        statusCode: 307
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /path-and-permanent
+    filters:
+    - type: RequestRedirect
+      requestRedirect:
+        path:
+          type: ReplacePrefixMatch
+          replacePrefixMatch: /replacement-prefix
+        statusCode: 308
+  - matches:
+    - path:
+        type: PathPrefix
         value: /full-path-and-host
     filters:
     - type: RequestRedirect
@@ -71,3 +93,25 @@ spec:
           type: ReplaceFullPath
           replaceFullPath: /replacement-full
         statusCode: 301
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /full-path-and-temporary
+    filters:
+    - type: RequestRedirect
+      requestRedirect:
+        path:
+          type: ReplaceFullPath
+          replaceFullPath: /replacement-full
+        statusCode: 307
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /full-path-and-permanent
+    filters:
+    - type: RequestRedirect
+      requestRedirect:
+        path:
+          type: ReplaceFullPath
+          replaceFullPath: /replacement-full
+        statusCode: 308

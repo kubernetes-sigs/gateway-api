@@ -39,6 +39,24 @@ spec:
   - matches:
     - path:
         type: PathPrefix
+        value: /port-and-temporary
+    filters:
+    - type: RequestRedirect
+      requestRedirect:
+        port: 8083
+        statusCode: 307
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /port-and-permanent
+    filters:
+    - type: RequestRedirect
+      requestRedirect:
+        port: 8083
+        statusCode: 308
+  - matches:
+    - path:
+        type: PathPrefix
         value: /port-and-host-and-status
     filters:
     - type: RequestRedirect
