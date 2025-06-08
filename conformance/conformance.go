@@ -18,9 +18,11 @@ package conformance
 
 import (
 	"context"
+	"fmt"
 	"io/fs"
 	"os"
 	"testing"
+	"time"
 
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/gateway-api/apis/v1alpha2"
@@ -30,16 +32,16 @@ import (
 	"sigs.k8s.io/gateway-api/conformance/tests"
 	conformanceconfig "sigs.k8s.io/gateway-api/conformance/utils/config"
 	"sigs.k8s.io/gateway-api/conformance/utils/flags"
+	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 
-	// "sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
 	"sigs.k8s.io/gateway-api/pkg/client/clientset/versioned"
 	"sigs.k8s.io/gateway-api/pkg/features"
 
 	"github.com/stretchr/testify/require"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
-	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/sets"
+	"k8s.io/apimachinery/pkg/util/wait"
 	clientset "k8s.io/client-go/kubernetes"
 
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -65,17 +67,13 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 	// (https://github.com/kubernetes-sigs/controller-runtime/issues/452).
 	clientset, err := clientset.NewForConfig(cfg)
 	require.NoError(t, err, "error initializing Kubernetes clientset")
-	// kubernetes.GWCMustHaveAcceptedConditionTrue(t, client, conformanceconfig.DefaultTimeoutConfig(), gwcName)
 
-	// TODO(bexxmodd) --------------------------
 	c, err := versioned.NewForConfig(cfg)
 	require.NoError(t, err, "error initializing Clientset for Gateway API")
-	ctx := context.TODO()
-	e := client.Get(ctx, types.NamespacedName{Name: "konghq.com/gateway-operator"}, &v1.GatewayClass{})
-	t.Logf(">>> GatewayClass %s exists: %v <<<", gwcName, e)
-	supFeatures := fetchSupportedFeatures(t, ctx, c, gwcName)
-	t.Logf(">>> Supported Features: %v <<<", supFeatures)
-	/// -----------------------------------------
+	ctx := context.Background()
+	timeoutConfig := conformanceconfig.DefaultTimeoutConfig()
+	inferredFeatures := fetchSupportedFeatures(t, ctx, client, c, gwcName, timeoutConfig)
+	parsedFeatures := suite.ParseSupportedFeatures(*flags.SupportedFeatures)
 
 	require.NoError(t, v1alpha3.Install(client.Scheme()))
 	require.NoError(t, v1alpha2.Install(client.Scheme()))
@@ -83,8 +81,7 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 	require.NoError(t, v1.Install(client.Scheme()))
 	require.NoError(t, apiextensionsv1.AddToScheme(client.Scheme()))
 
-	sf := suite.ParseSupportedFeatures(*flags.SupportedFeatures)
-	supportedFeatures := suite.SupportedFeatures{Inferred: false, Set: sf}
+	supportedFeatures := suite.InitSupportedFeatures(inferredFeatures, parsedFeatures)
 	exemptFeatures := suite.ParseSupportedFeatures(*flags.ExemptFeatures)
 	skipTests := suite.ParseSkipTests(*flags.SkipTests)
 	namespaceLabels := suite.ParseKeyValuePairs(*flags.NamespaceLabels)
@@ -120,7 +117,7 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 		RunTest:                    *flags.RunTest,
 		SkipTests:                  skipTests,
 		SupportedFeatures:          supportedFeatures,
-		TimeoutConfig:              conformanceconfig.DefaultTimeoutConfig(),
+		TimeoutConfig:              timeoutConfig,
 		SkipProvisionalTests:       *flags.SkipProvisionalTests,
 	}
 }
@@ -160,20 +157,55 @@ func RunConformanceWithOptions(t *testing.T, opts suite.ConformanceOptions) {
 	}
 }
 
-func fetchSupportedFeatures(t *testing.T, ctx context.Context, gatewayClients *versioned.Clientset, gatewayClassName string) sets.Set[features.FeatureName] {
+func fetchSupportedFeatures(
+	t *testing.T, ctx context.Context,
+	client client.Client, gatewayClients *versioned.Clientset,
+	gatewayClassName string, timeoutConfig conformanceconfig.TimeoutConfig,
+) suite.FeaturesSet {
 	t.Helper()
 	if gatewayClassName == "" {
-		return nil
+		t.Fatal("GatewayClass name must be provided")
 	}
-	gw, err := gatewayClients.GatewayV1().GatewayClasses().Get(ctx, gatewayClassName, metav1.GetOptions{})
-	require.NoError(t, err, "error fetching GatewayClass %s", gatewayClassName)
 
 	fs := sets.New[features.FeatureName]()
-	for _, feature := range gw.Status.SupportedFeatures {
-		fs.Insert(features.FeatureName(feature.Name))
-	}
-	t.Logf("=== STATUS: %v", gw.Status)
+	waitErr := wait.PollUntilContextTimeout(context.Background(), 1*time.Second, timeoutConfig.GWCMustBeAccepted, true, func(ctx context.Context) (bool, error) {
+		gwc, err := gatewayClients.GatewayV1().GatewayClasses().Get(ctx, gatewayClassName, metav1.GetOptions{})
+		if err != nil {
+			return false, fmt.Errorf("error fetching Gateway: %w", err)
+		}
+
+		if err := kubernetes.ConditionsHaveLatestObservedGeneration(gwc, gwc.Status.Conditions); err != nil {
+			return false, nil
+		}
+
+		if !gatewayClassMustBeAccepted(t, gwc.Status.Conditions) {
+			return false, fmt.Errorf("GatewayClass %s must be Accepted", gatewayClassName)
+		}
+
+		for _, feature := range gwc.Status.SupportedFeatures {
+			fs.Insert(features.FeatureName(feature.Name))
+		}
+		return true, nil
+	})
+	require.NoError(t, waitErr, "error waiting for GatewayClass %s to be Accepted", gatewayClassName)
+	t.Logf("Inferred SupportedFeatures from GatewayClass %s: %v", gatewayClassName, fs.UnsortedList())
 	return fs
+}
+
+func gatewayClassMustBeAccepted(t *testing.T, conditions []metav1.Condition) bool {
+	t.Helper()
+	name := "Accepted"
+	status := "True"
+
+	for _, cond := range conditions {
+		if cond.Type == name {
+			// an empty Status string means "Match any status".
+			if status == "" || cond.Status == metav1.ConditionStatus(status) {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 func logOptions(t *testing.T, opts suite.ConformanceOptions) {

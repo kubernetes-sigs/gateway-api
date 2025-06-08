@@ -170,9 +170,11 @@ type ConformanceOptions struct {
 	ConformanceProfiles sets.Set[ConformanceProfileName]
 }
 
+type FeaturesSet = sets.Set[features.FeatureName]
+
 type SupportedFeatures struct {
 	Inferred bool
-	sets.Set[features.FeatureName]
+	FeaturesSet
 }
 
 const (
@@ -181,6 +183,18 @@ const (
 	// values in the cluster, due to multiple versions of CRDs installed.
 	undefinedKeyword = "UNDEFINED"
 )
+
+func InitSupportedFeatures(gwcStatusFeatures FeaturesSet, parsedFeatures FeaturesSet) SupportedFeatures {
+	equal := gwcStatusFeatures.Equal(parsedFeatures)
+	if !equal {
+		if gwcStatusFeatures.Len() > parsedFeatures.Len() {
+			return SupportedFeatures{true, gwcStatusFeatures}
+		} else {
+			return SupportedFeatures{false, parsedFeatures}
+		}
+	}
+	return SupportedFeatures{equal, gwcStatusFeatures}
+}
 
 // NewConformanceTestSuite is a helper to use for creating a new ConformanceTestSuite.
 func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite, error) {
@@ -232,13 +246,13 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 	// conformance profile or at least some specific features they support.
 	if options.EnableAllSupportedFeatures {
 		options.SupportedFeatures = SupportedFeatures{
-			Inferred: true,
-			Set:      features.SetsToNamesSet(features.AllFeatures),
+			Inferred:    true,
+			FeaturesSet: features.SetsToNamesSet(features.AllFeatures),
 		}
 	} else if options.SupportedFeatures.Len() == 0 {
 		options.SupportedFeatures = SupportedFeatures{
-			Inferred: false,
-			Set:      sets.New[features.FeatureName](),
+			Inferred:    false,
+			FeaturesSet: sets.New[features.FeatureName](),
 		}
 	}
 
