@@ -96,6 +96,7 @@ func gwcMustBeAccepted(t *testing.T, c client.Client, timeoutConfig config.Timeo
 		if err != nil {
 			return false, fmt.Errorf("error fetching GatewayClass: %w", err)
 		}
+		t.Logf("<<< GatewayClass Status: %v", gwc.Status)
 
 		controllerName = string(gwc.Spec.ControllerName)
 
