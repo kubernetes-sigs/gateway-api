@@ -1062,6 +1062,37 @@ const (
 	GatewayReasonListenersNotReady GatewayConditionReason = "ListenersNotReady"
 )
 
+const (
+	// AttachedListenerSets is a condition that is true when the Gateway has
+	// at least one ListenerSet attached to it.
+	//
+	// Possible reasons for this condition to be True are:
+	//
+	// * "ListenerSetsAttached"
+	//
+	// Possible reasons for this condition to be False are:
+	//
+	// * "NoListenerSetsAttached"
+	// * "ListenerSetsNotAllowed"
+	//
+	// Controllers may raise this condition with other reasons,
+	// but should prefer to use the reasons listed above to improve
+	// interoperability.
+	GatewayConditionAttachedListenerSets GatewayConditionType = "AttachedListenerSets"
+
+	// This reason is used with the "AttachedListenerSets" condition when the
+	// Gateway has at least one ListenerSet attached to it.
+	GatewayReasonListenerSetsAttached GatewayConditionReason = "ListenerSetsAttached"
+
+	// This reason is used with the "AttachedListenerSets" condition when the
+	// Gateway has no ListenerSets attached to it.
+	GatewayReasonNoListenerSetsAttached GatewayConditionReason = "NoListenerSetsAttached"
+
+	// This reason is used with the "AttachedListenerSets" condition when the
+	// Gateway has ListenerSets attached to it, but the ListenerSets are not allowed.
+	GatewayReasonListenerSetsNotAllowed GatewayConditionReason = "ListenerSetsNotAllowed"
+)
+
 // ListenerStatus is the status associated with a Listener.
 type ListenerStatus struct {
 	// Name is the name of the Listener that this status corresponds to.
