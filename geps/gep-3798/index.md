@@ -8,8 +8,7 @@
 ## TLDR
 
 ### What
- This GEP proposes the addition of Client IP-based session persistence to the Gateway API. This feature will allow Gateway API implementations to ensure that requests originating from a specific client IP address (or a subnet defined by an IP mask) are consistently routed to the same backend endpoint for a configurable duration. This aims to provide a standardized and centralized mechanism for client IP persistence across various Gateway API implementations. As per the nomenclature established in [#1619](https://gateway-api.sigs.k8s.io/geps/gep-1619), this feature is being referred as Session Affinity . 
-
+ This GEP proposes the addition of Client IP-based session persistence to the Gateway API. This feature will allow Gateway API implementations to ensure that requests originating from a specific client IP address (or a subnet defined by an IP mask) are consistently routed to the same backend endpoint for a configurable duration. This aims to provide a standardized and centralized mechanism for client IP persistence across various Gateway API implementations.
 
 ## Goals
 
@@ -49,7 +48,7 @@ This GEP addresses these issues by providing a first-class API mechanism for cli
 
 * Gateway API Implementers: Receive a clear specification for implementing client IP-based session persistence, fostering interoperability and reducing divergent approaches.
 
-* Users with Stateful Applications: Applications that rely on client IP affinity (e.g., certain legacy applications, gaming servers, or applications with in-memory session stores) will directly benefit from a reliable and configurable persistence mechanism.
+* Users with Stateful Applications: Applications that rely on client IP Persistence (e.g., certain legacy applications, gaming servers, or applications with in-memory session stores) will directly benefit from a reliable and configurable persistence mechanism.
 
 ## API
 
@@ -127,7 +126,5 @@ Yet to do
 Below are references showing how ClientIP persistence is currently supported across some implementations:
 
 * [AVI](https://techdocs.broadcom.com/us/en/vmware-security-load-balancing/avi-load-balancer/avi-load-balancer/30-2/load-balancing-overview/persistence.html)
-* [Envoy](https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/route/v3/route_components.proto#envoy-v3-api-msg-config-route-v3-routeaction-hashpolicy-connectionproperties) (the connection property hash policy can be used with Ring Hash load balancing to ensure session persistence for a particular source IP)
-* [Nginx](https://nginx.org/en/docs/http/ngx_http_upstream_module.html#ip_hash)
 * [Native k8s](https://kubernetes.io/docs/reference/networking/virtual-ips/#session-affinity)
 

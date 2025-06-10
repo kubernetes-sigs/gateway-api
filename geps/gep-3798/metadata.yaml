@@ -21,9 +21,9 @@ relationships:
   # seeAlso indicates other GEPs that are relevant in some way without being
   # covered by an existing relationship.
   seeAlso:
-  - number: 1619
-    name: Session Persistence
-    description: Session Persistence via BackendLBPolicy
+    - number: 1619
+      name: Session Persistence
+      description: Session Persistence via BackendLBPolicy
   
 # references is a list of hyperlinks to relevant external references.
 # It's intended to be used for storing GitHub discussions, Google docs, etc.
