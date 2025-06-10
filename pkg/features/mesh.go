@@ -117,6 +117,7 @@ var MeshExtendedFeatures = sets.New(
 	MeshConsumerRouteFeature,
 	MeshHTTPRouteRewritePath,
 	MeshHTTPRouteSchemeRedirect,
+	MeshHTTPRouteRedirectPort,
 	MeshHTTPRouteRedirectPath,
 	MeshHTTPRouteBackendRequestHeaderModification,
 	MeshHTTPRouteQueryParamMatching,
