@@ -256,11 +256,9 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 	// conformance profile or at least some specific features they support.
 	if options.EnableAllSupportedFeatures {
 		options.SupportedFeatures = SupportedFeatures{
-			Inferred:    true,
+			Inferred:    false,
 			FeaturesSet: features.SetsToNamesSet(features.AllFeatures),
 		}
-	} else if options.SupportedFeatures.Len() == 0 {
-		options.SupportedFeatures = SupportedFeatures{}
 	}
 
 	suite := &ConformanceTestSuite{

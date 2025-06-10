@@ -82,6 +82,10 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 	namespaceLabels := suite.ParseKeyValuePairs(*flags.NamespaceLabels)
 	namespaceAnnotations := suite.ParseKeyValuePairs(*flags.NamespaceAnnotations)
 	conformanceProfiles := suite.ParseConformanceProfiles(*flags.ConformanceProfiles)
+	enableAllSupportedFeatures := *flags.EnableAllSupportedFeatures
+	if conformanceProfiles.Len() == 0 || enableAllSupportedFeatures {
+		supportedFeatures.Inferred = false
+	}
 
 	implementation := suite.ParseImplementation(
 		*flags.ImplementationOrganization,
@@ -99,7 +103,7 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 		Clientset:                  clientset,
 		ConformanceProfiles:        conformanceProfiles,
 		Debug:                      *flags.ShowDebug,
-		EnableAllSupportedFeatures: *flags.EnableAllSupportedFeatures,
+		EnableAllSupportedFeatures: enableAllSupportedFeatures,
 		ExemptFeatures:             exempt,
 		ManifestFS:                 []fs.FS{&Manifests},
 		GatewayClassName:           gwcName,
@@ -163,6 +167,7 @@ func fetchSupportedFeatures(t *testing.T, ctx context.Context, client client.Cli
 	gwc := &gatewayv1.GatewayClass{}
 	err := client.Get(ctx, types.NamespacedName{Name: gatewayClassName}, gwc)
 	require.NoError(t, err, "error fetching GatewayClass %s", gatewayClassName)
+
 	fs := suite.FeaturesSet{}
 	for _, feature := range gwc.Status.SupportedFeatures {
 		fs.Insert(features.FeatureName(feature.Name))
