@@ -73,7 +73,7 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 	require.NoError(t, apiextensionsv1.AddToScheme(client.Scheme()))
 
 	timeoutConfig := conformanceconfig.DefaultTimeoutConfig()
-	inferred := fetchSupportedFeatures(t, ctx, client, gwcName, timeoutConfig)
+	inferred := fetchSupportedFeatures(ctx, t, client, gwcName, timeoutConfig)
 	parsed := suite.ParseSupportedFeatures(*flags.SupportedFeatures)
 	exempt := suite.ParseSupportedFeatures(*flags.ExemptFeatures)
 	supportedFeatures := suite.InitSupportedFeatures(inferred, parsed, exempt)
@@ -156,7 +156,7 @@ func RunConformanceWithOptions(t *testing.T, opts suite.ConformanceOptions) {
 	}
 }
 
-func fetchSupportedFeatures(t *testing.T, ctx context.Context, client client.Client, gatewayClassName string, timeoutConfig conformanceconfig.TimeoutConfig) suite.FeaturesSet {
+func fetchSupportedFeatures(ctx context.Context, t *testing.T, client client.Client, gatewayClassName string, timeoutConfig conformanceconfig.TimeoutConfig) suite.FeaturesSet {
 	t.Helper()
 	if gatewayClassName == "" {
 		t.Fatal("GatewayClass name must be provided")
