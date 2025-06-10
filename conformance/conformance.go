@@ -52,7 +52,6 @@ import (
 // ConformanceOptions struct. It will also initialize the various clients
 // required by the tests.
 func DefaultOptions(t *testing.T) suite.ConformanceOptions {
-	ctx := context.Background()
 	cfg, err := config.GetConfig()
 	require.NoError(t, err, "error loading Kubernetes config")
 	clientOptions := client.Options{}
@@ -73,7 +72,7 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 	require.NoError(t, apiextensionsv1.AddToScheme(client.Scheme()))
 
 	timeoutConfig := conformanceconfig.DefaultTimeoutConfig()
-	inferred := fetchSupportedFeatures(ctx, t, client, gwcName, timeoutConfig)
+	inferred := fetchSupportedFeatures(t, client, gwcName, timeoutConfig)
 	parsed := suite.ParseSupportedFeatures(*flags.SupportedFeatures)
 	exempt := suite.ParseSupportedFeatures(*flags.ExemptFeatures)
 	supportedFeatures := suite.InitSupportedFeatures(inferred, parsed, exempt)
@@ -156,7 +155,7 @@ func RunConformanceWithOptions(t *testing.T, opts suite.ConformanceOptions) {
 	}
 }
 
-func fetchSupportedFeatures(ctx context.Context, t *testing.T, client client.Client, gatewayClassName string, timeoutConfig conformanceconfig.TimeoutConfig) suite.FeaturesSet {
+func fetchSupportedFeatures(t *testing.T, client client.Client, gatewayClassName string, timeoutConfig conformanceconfig.TimeoutConfig) suite.FeaturesSet {
 	t.Helper()
 	if gatewayClassName == "" {
 		t.Fatal("GatewayClass name must be provided")
@@ -165,7 +164,7 @@ func fetchSupportedFeatures(ctx context.Context, t *testing.T, client client.Cli
 	// GWC instead of ControllerName to avoid repetitive calls.
 	kubernetes.GWCMustHaveAcceptedConditionTrue(t, client, timeoutConfig, gatewayClassName)
 	gwc := &gatewayv1.GatewayClass{}
-	err := client.Get(ctx, types.NamespacedName{Name: gatewayClassName}, gwc)
+	err := client.Get(context.TODO(), types.NamespacedName{Name: gatewayClassName}, gwc)
 	require.NoError(t, err, "error fetching GatewayClass %s", gatewayClassName)
 
 	fs := suite.FeaturesSet{}
