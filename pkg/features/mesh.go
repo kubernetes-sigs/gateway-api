@@ -82,7 +82,7 @@ var (
 
 	// MeshHTTPRouteSchemeRedirect contains metadata for the MeshHTTPRouteSchemeRedirect feature.
 	MeshHTTPRouteSchemeRedirect = Feature{
-		Name:    SupportMeshHTTPRouteRewritePath,
+		Name:    SupportMeshHTTPRouteSchemeRedirect,
 		Channel: FeatureChannelStandard,
 	}
 
