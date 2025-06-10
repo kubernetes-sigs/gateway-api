@@ -172,8 +172,6 @@ func fetchSupportedFeatures(t *testing.T, ctx context.Context, client client.Cli
 	for _, feature := range gwc.Status.SupportedFeatures {
 		fs.Insert(features.FeatureName(feature.Name))
 	}
-
-	t.Logf("Inferred SupportedFeatures from GatewayClass %s: %v", gatewayClassName, fs.UnsortedList())
 	return fs
 }
 
