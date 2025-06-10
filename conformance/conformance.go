@@ -83,7 +83,7 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 	namespaceAnnotations := suite.ParseKeyValuePairs(*flags.NamespaceAnnotations)
 	conformanceProfiles := suite.ParseConformanceProfiles(*flags.ConformanceProfiles)
 	enableAllSupportedFeatures := *flags.EnableAllSupportedFeatures
-	if conformanceProfiles.Len() == 0 || enableAllSupportedFeatures {
+	if conformanceProfiles.Len() > 0 || enableAllSupportedFeatures {
 		supportedFeatures.Inferred = false
 	}
 
