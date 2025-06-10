@@ -142,7 +142,7 @@ type ConformanceOptions struct {
 	// resources such as Gateways should be cleaned up after the run.
 	CleanupBaseResources       bool
 	SupportedFeatures          SupportedFeatures
-	ExemptFeatures             sets.Set[features.FeatureName]
+	ExemptFeatures             FeaturesSet
 	EnableAllSupportedFeatures bool
 	TimeoutConfig              config.TimeoutConfig
 	// SkipTests contains all the tests not to be run and can be used to opt out
@@ -184,16 +184,26 @@ const (
 	undefinedKeyword = "UNDEFINED"
 )
 
-func InitSupportedFeatures(gwcStatusFeatures FeaturesSet, parsedFeatures FeaturesSet) SupportedFeatures {
-	equal := gwcStatusFeatures.Equal(parsedFeatures)
-	if !equal {
-		if gwcStatusFeatures.Len() > parsedFeatures.Len() {
-			return SupportedFeatures{true, gwcStatusFeatures}
-		} else {
-			return SupportedFeatures{false, parsedFeatures}
+// InitSupportedFeatures initializes the SupportedFeatures struct based on the
+// provided, exempt, and inferred features.
+//
+// > WARNING: Order of sets is crucial for determining the status of the report.
+func InitSupportedFeatures(inferred, parsed, exempt FeaturesSet) SupportedFeatures {
+	if parsed.Len() > 0 {
+		for feature := range exempt {
+			parsed.Delete(feature)
 		}
+		return SupportedFeatures{false, parsed}
 	}
-	return SupportedFeatures{equal, gwcStatusFeatures}
+
+	if exempt.Len() > 0 {
+		for feature := range exempt {
+			inferred.Delete(feature)
+		}
+		return SupportedFeatures{false, inferred}
+	}
+
+	return SupportedFeatures{true, inferred}
 }
 
 // NewConformanceTestSuite is a helper to use for creating a new ConformanceTestSuite.
@@ -250,14 +260,7 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 			FeaturesSet: features.SetsToNamesSet(features.AllFeatures),
 		}
 	} else if options.SupportedFeatures.Len() == 0 {
-		options.SupportedFeatures = SupportedFeatures{
-			Inferred:    false,
-			FeaturesSet: sets.New[features.FeatureName](),
-		}
-	}
-
-	for feature := range options.ExemptFeatures {
-		options.SupportedFeatures.Delete(feature)
+		options.SupportedFeatures = SupportedFeatures{}
 	}
 
 	suite := &ConformanceTestSuite{
@@ -310,12 +313,12 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 		for _, f := range conformanceProfile.ExtendedFeatures.UnsortedList() {
 			if options.SupportedFeatures.Has(f) {
 				if suite.extendedSupportedFeatures[conformanceProfileName] == nil {
-					suite.extendedSupportedFeatures[conformanceProfileName] = sets.New[features.FeatureName]()
+					suite.extendedSupportedFeatures[conformanceProfileName] = FeaturesSet{}
 				}
 				suite.extendedSupportedFeatures[conformanceProfileName].Insert(f)
 			} else {
 				if suite.extendedUnsupportedFeatures[conformanceProfileName] == nil {
-					suite.extendedUnsupportedFeatures[conformanceProfileName] = sets.New[features.FeatureName]()
+					suite.extendedUnsupportedFeatures[conformanceProfileName] = FeaturesSet{}
 				}
 				suite.extendedUnsupportedFeatures[conformanceProfileName].Insert(f)
 			}

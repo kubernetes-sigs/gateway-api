@@ -18,11 +18,9 @@ package conformance
 
 import (
 	"context"
-	"fmt"
 	"io/fs"
 	"os"
 	"testing"
-	"time"
 
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/gateway-api/apis/v1alpha2"
@@ -41,7 +39,6 @@ import (
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 
 	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/apimachinery/pkg/util/wait"
 	clientset "k8s.io/client-go/kubernetes"
 
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
@@ -49,8 +46,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
 	"sigs.k8s.io/yaml"
-
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // DefaultOptions will parse command line flags to populate a
@@ -78,11 +73,12 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 	require.NoError(t, apiextensionsv1.AddToScheme(client.Scheme()))
 
 	timeoutConfig := conformanceconfig.DefaultTimeoutConfig()
-	inferredFeatures := fetchSupportedFeatures(t, ctx, client, gwcName, timeoutConfig)
-	parsedFeatures := suite.ParseSupportedFeatures(*flags.SupportedFeatures)
-	supportedFeatures := suite.InitSupportedFeatures(inferredFeatures, parsedFeatures)
+	enableAllSupportedFeatures := *flags.EnableAllSupportedFeatures
+	inferred := fetchSupportedFeatures(t, ctx, client, gwcName, timeoutConfig)
+	parsed := suite.ParseSupportedFeatures(*flags.SupportedFeatures)
+	exempt := suite.ParseSupportedFeatures(*flags.ExemptFeatures)
+	supportedFeatures := suite.InitSupportedFeatures(inferred, parsed, exempt)
 
-	exemptFeatures := suite.ParseSupportedFeatures(*flags.ExemptFeatures)
 	skipTests := suite.ParseSkipTests(*flags.SkipTests)
 	namespaceLabels := suite.ParseKeyValuePairs(*flags.NamespaceLabels)
 	namespaceAnnotations := suite.ParseKeyValuePairs(*flags.NamespaceAnnotations)
@@ -104,8 +100,8 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 		Clientset:                  clientset,
 		ConformanceProfiles:        conformanceProfiles,
 		Debug:                      *flags.ShowDebug,
-		EnableAllSupportedFeatures: *flags.EnableAllSupportedFeatures,
-		ExemptFeatures:             exemptFeatures,
+		EnableAllSupportedFeatures: enableAllSupportedFeatures,
+		ExemptFeatures:             exempt,
 		ManifestFS:                 []fs.FS{&Manifests},
 		GatewayClassName:           gwcName,
 		Implementation:             implementation,
@@ -157,55 +153,22 @@ func RunConformanceWithOptions(t *testing.T, opts suite.ConformanceOptions) {
 	}
 }
 
-func fetchSupportedFeatures(
-	t *testing.T, ctx context.Context,
-	client client.Client, gatewayClassName string, timeoutConfig conformanceconfig.TimeoutConfig,
-) suite.FeaturesSet {
+func fetchSupportedFeatures(t *testing.T, ctx context.Context, client client.Client, gatewayClassName string, timeoutConfig conformanceconfig.TimeoutConfig) suite.FeaturesSet {
 	t.Helper()
 	if gatewayClassName == "" {
 		t.Fatal("GatewayClass name must be provided")
 	}
-
+	kubernetes.GWCMustHaveAcceptedConditionTrue(t, client, timeoutConfig, gatewayClassName)
+	gwc := &gatewayv1.GatewayClass{}
+	err := client.Get(ctx, types.NamespacedName{Name: gatewayClassName}, gwc)
+	require.NoError(t, err, "error fetching GatewayClass %s", gatewayClassName)
 	fs := suite.FeaturesSet{}
-	waitErr := wait.PollUntilContextTimeout(context.Background(), 1*time.Second, timeoutConfig.GWCMustBeAccepted, true, func(ctx context.Context) (bool, error) {
-		gwc := &gatewayv1.GatewayClass{}
-		err := client.Get(ctx, types.NamespacedName{Name: gatewayClassName}, gwc)
-		if err != nil {
-			return false, fmt.Errorf("error fetching Gateway: %w", err)
-		}
+	for _, feature := range gwc.Status.SupportedFeatures {
+		fs.Insert(features.FeatureName(feature.Name))
+	}
 
-		if !gatewayClassMustBeAccepted(t, gwc, gwc.Status.Conditions) {
-			return false, fmt.Errorf("GatewayClass %s must be Accepted", gatewayClassName)
-		}
-
-		for _, feature := range gwc.Status.SupportedFeatures {
-			fs.Insert(features.FeatureName(feature.Name))
-		}
-		return true, nil
-	})
-	require.NoError(t, waitErr, "error waiting for GatewayClass %s to be Accepted", gatewayClassName)
 	t.Logf("Inferred SupportedFeatures from GatewayClass %s: %v", gatewayClassName, fs.UnsortedList())
 	return fs
-}
-
-func gatewayClassMustBeAccepted(t *testing.T, gwc *gatewayv1.GatewayClass, conditions []metav1.Condition) bool {
-	t.Helper()
-
-	if err := kubernetes.ConditionsHaveLatestObservedGeneration(gwc, gwc.Status.Conditions); err != nil {
-		return false
-	}
-	name := "Accepted"
-	status := "True"
-
-	for _, cond := range conditions {
-		if cond.Type == name {
-			// an empty Status string means "Match any status".
-			if status == "" || cond.Status == metav1.ConditionStatus(status) {
-				return true
-			}
-		}
-	}
-	return false
 }
 
 func logOptions(t *testing.T, opts suite.ConformanceOptions) {
@@ -213,7 +176,7 @@ func logOptions(t *testing.T, opts suite.ConformanceOptions) {
 	t.Logf("  Cleanup Resources: %t", opts.CleanupBaseResources)
 	t.Logf("  Debug: %t", opts.Debug)
 	t.Logf("  Enable All Features: %t", opts.EnableAllSupportedFeatures)
-	t.Logf("  Supported Features: %v", opts.SupportedFeatures.UnsortedList())
+	t.Logf("  Supported Features: %v", opts.SupportedFeatures)
 	t.Logf("  ExemptFeatures: %v", opts.ExemptFeatures.UnsortedList())
 }
 

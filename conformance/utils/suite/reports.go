@@ -162,7 +162,8 @@ func (p profileReportsMap) compileResults(supportedFeaturesMap map[ConformancePr
 // isTestExtended determines if a provided test is considered to be supported
 // at an extended level of support given the provided conformance profile.
 //
-// TODO: right now the tests themselves don't indicate the conformance
+// TODO(bexxmodd): Update this method to be based on Features inferred.
+// Right now the tests themselves don't indicate the conformance
 // support level associated with them. The only way we have right now
 // in this prototype to know whether a test belongs to any particular
 // conformance level is to compare the features needed for the test to
