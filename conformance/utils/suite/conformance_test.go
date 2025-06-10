@@ -25,10 +25,6 @@ import (
 	"sigs.k8s.io/gateway-api/pkg/features"
 )
 
-func TestFetchSupportedFeatures(t *testing.T) {
-	// TODO(bexxl): This test is a placeholder for now.
-}
-
 func TestParseSupportedFeatures(t *testing.T) {
 	flags := []string{
 		"",

@@ -73,7 +73,6 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 	require.NoError(t, apiextensionsv1.AddToScheme(client.Scheme()))
 
 	timeoutConfig := conformanceconfig.DefaultTimeoutConfig()
-	enableAllSupportedFeatures := *flags.EnableAllSupportedFeatures
 	inferred := fetchSupportedFeatures(t, ctx, client, gwcName, timeoutConfig)
 	parsed := suite.ParseSupportedFeatures(*flags.SupportedFeatures)
 	exempt := suite.ParseSupportedFeatures(*flags.ExemptFeatures)
@@ -100,7 +99,7 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 		Clientset:                  clientset,
 		ConformanceProfiles:        conformanceProfiles,
 		Debug:                      *flags.ShowDebug,
-		EnableAllSupportedFeatures: enableAllSupportedFeatures,
+		EnableAllSupportedFeatures: *flags.EnableAllSupportedFeatures,
 		ExemptFeatures:             exempt,
 		ManifestFS:                 []fs.FS{&Manifests},
 		GatewayClassName:           gwcName,
@@ -158,6 +157,8 @@ func fetchSupportedFeatures(t *testing.T, ctx context.Context, client client.Cli
 	if gatewayClassName == "" {
 		t.Fatal("GatewayClass name must be provided")
 	}
+	// TODO(bexxmodd): This method already retrieves GWC. Override it to return
+	// GWC instead of ControllerName to avoid repetitive calls.
 	kubernetes.GWCMustHaveAcceptedConditionTrue(t, client, timeoutConfig, gatewayClassName)
 	gwc := &gatewayv1.GatewayClass{}
 	err := client.Get(ctx, types.NamespacedName{Name: gatewayClassName}, gwc)
