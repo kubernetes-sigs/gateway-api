@@ -4007,7 +4007,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewaySpecAddress(ref common.Referenc
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "GatewayAddress describes an address that can be bound to a Gateway.",
+				Description: "GatewaySpecAddress describes an address that can be bound to a Gateway.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"type": {

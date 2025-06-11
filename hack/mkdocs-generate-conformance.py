@@ -58,6 +58,10 @@ def on_files(files, config, **kwargs):
           # Add the generated file to the site
           files.append(file)
 
+          # Write the generated file to the site-src directory
+          with open(os.path.join("site-src", file.src_uri), "w") as f:
+            f.write(file.content_string)
+
     return files
 
 

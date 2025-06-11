@@ -1,0 +1,131 @@
+apiVersion: gateway.networking.k8s.io/v1
+date: "2025-05-27T17:51:14Z"
+gatewayAPIChannel: experimental
+gatewayAPIVersion: v1.3.0
+implementation:
+  contact:
+  - '@istio/maintainers'
+  organization: istio
+  project: istio
+  url: https://istio.io/
+  version: "1.26.1"
+kind: ConformanceReport
+mode: default
+profiles:
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 2
+      Skipped: 0
+  extended:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 3
+      Skipped: 0
+    supportedFeatures:
+    - HTTPRouteBackendProtocolH2C
+    - HTTPRouteBackendProtocolWebSocket
+    - HTTPRouteBackendRequestHeaderModification
+    - HTTPRouteBackendTimeout
+    - HTTPRouteDestinationPortMatching
+    - HTTPRouteHostRewrite
+    - HTTPRouteMethodMatching
+    - HTTPRouteParentRefPort
+    - HTTPRoutePathRedirect
+    - HTTPRoutePathRewrite
+    - HTTPRoutePortRedirect
+    - HTTPRouteQueryParamMatching
+    - HTTPRouteRequestMirror
+    - HTTPRouteRequestMultipleMirrors
+    - HTTPRouteRequestPercentageMirror
+    - HTTPRouteRequestTimeout
+    - HTTPRouteResponseHeaderModification
+    - HTTPRouteSchemeRedirect
+    - MeshConsumerRoute
+    unsupportedFeatures:
+    - MeshClusterIPMatching
+  name: MESH-HTTP
+  summary: Core tests succeeded. Extended tests succeeded.
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 12
+      Skipped: 0
+  extended:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 2
+      Skipped: 0
+    supportedFeatures:
+    - GatewayAddressEmpty
+    - GatewayHTTPListenerIsolation
+    - GatewayInfrastructurePropagation
+    - GatewayPort8080
+    - GatewayStaticAddresses
+  name: GATEWAY-GRPC
+  summary: Core tests succeeded. Extended tests succeeded.
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 33
+      Skipped: 0
+  extended:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 25
+      Skipped: 0
+    supportedFeatures:
+    - GatewayAddressEmpty
+    - GatewayHTTPListenerIsolation
+    - GatewayInfrastructurePropagation
+    - GatewayPort8080
+    - GatewayStaticAddresses
+    - HTTPRouteBackendProtocolH2C
+    - HTTPRouteBackendProtocolWebSocket
+    - HTTPRouteBackendRequestHeaderModification
+    - HTTPRouteBackendTimeout
+    - HTTPRouteDestinationPortMatching
+    - HTTPRouteHostRewrite
+    - HTTPRouteMethodMatching
+    - HTTPRouteParentRefPort
+    - HTTPRoutePathRedirect
+    - HTTPRoutePathRewrite
+    - HTTPRoutePortRedirect
+    - HTTPRouteQueryParamMatching
+    - HTTPRouteRequestMirror
+    - HTTPRouteRequestMultipleMirrors
+    - HTTPRouteRequestPercentageMirror
+    - HTTPRouteRequestTimeout
+    - HTTPRouteResponseHeaderModification
+    - HTTPRouteSchemeRedirect
+  name: GATEWAY-HTTP
+  summary: Core tests succeeded. Extended tests succeeded.
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 11
+      Skipped: 0
+  extended:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 2
+      Skipped: 0
+    supportedFeatures:
+    - GatewayAddressEmpty
+    - GatewayHTTPListenerIsolation
+    - GatewayInfrastructurePropagation
+    - GatewayPort8080
+    - GatewayStaticAddresses
+  name: GATEWAY-TLS
+  summary: Core tests succeeded. Extended tests succeeded.
+succeededProvisionalTests:
+- GatewayInfrastructure
+- HTTPRouteRequestPercentageMirror

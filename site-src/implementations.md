@@ -10,7 +10,7 @@ cover, and documentation to help users get started.
 
 !!! info "Compare extended supported features across implementations"
 
-    [View a table to quickly compare supported features of projects](implementations/v1.1.md). These outline Gateway controller implementations that have passed core conformance tests, and focus on extended conformance features that they have implemented.
+    [View a table to quickly compare supported features of projects](implementations/v1.2.md). These outline Gateway controller implementations that have passed core conformance tests, and focus on extended conformance features that they have implemented.
 
 ## Gateway Controller Implementation Status <a name="gateways"></a>
 
@@ -35,6 +35,7 @@ cover, and documentation to help users get started.
 - [kgateway][37] (GA)
 - [Kong Ingress Controller][10] (GA)
 - [Kong Gateway Operator][35] (GA)
+* [Kubvernor][39](work in progress)
 - [Kuma][11] (GA)
 - [LiteSpeed Ingress Controller][19]
 - [LoxiLB][36] (beta)
@@ -97,6 +98,7 @@ cover, and documentation to help users get started.
 [36]:#loxilb
 [37]:#kgateway
 [38]:#google-cloud-service-mesh
+[39]:#kubvernor
 
 
 [gamma]:/concepts/gamma/
@@ -117,21 +119,17 @@ In this section you will find specific links to blog posts, documentation and ot
 [epicsource]:https://github.com/epic-gateway
 
 ### Airlock Microgateway
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.2.1-Airlock%20Microgateway-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.2.1/airlock-microgateway)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.3.0-Airlock%20Microgateway-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.3.0/airlock-microgateway)
 
-[Airlock Microgateway][airlock-microgateway] is a Kubernetes native WAAP (Web Application and API Protection) solution to protect microservices.
+[Airlock Microgateway][airlock-microgateway] is a Kubernetes native WAAP (Web Application and API Protection, formerly known as WAF) solution optimized for Kubernetes environments and certified for RedHat OpenShift.
 Modern application security is embedded in the development workflow and follows DevSecOps paradigms.
 Airlock Microgateway protects your applications and microservices with the tried-and-tested Airlock security features against attacks, while also providing a high degree of scalability.
 
-With [Airlock Microgateway 4.4][airlock-microgateway-gwapi-arch], Airlock Microgateway introduces a sidecarless data plane mode
-based on Gateway API to avoid the operational complexity of sidecars.
-
 #### Features
-- Kubernetes native integration with sidecar injection and Gateway API support
+- Comprehensive WAAP (formerly known as WAF) with security features like Deny Rules to protect against known attacks (OWASP Top 10), header filtering, JSON parsing, OpenAPI specification enforcement, and GraphQL schema validation
+- Identity aware proxy which makes it possible to enforce authentication using JWT authentication or OIDC
 - Reverse proxy functionality with request routing rules, TLS termination and remote IP extraction
-- Using native Envoy HTTP filters like Lua scripting, RBAC, ext_authz, JWT authentication
-- Content security filters for protecting against known attacks (OWASP Top 10)
-- API security features like JSON parsing, OpenAPI specification enforcement or GraphQL schema validation
+- Easy-to-use Grafana dashboards which provide valuable insights in allowed and blocked traffic and other metrics
 
 #### Documentation and links
 - [Product documentation][airlock-microgateway-documentation]
@@ -139,7 +137,6 @@ based on Gateway API to avoid the operational complexity of sidecars.
 - Check our [Airlock community forum][airlock-microgateway-community-support] and [support process][airlock-microgateway-premium-support] for support.
 
 [airlock-microgateway]:https://www.airlock.com/en/secure-access-hub/components/microgateway
-[airlock-microgateway-gwapi-arch]:https://docs.airlock.com/microgateway/latest/?topic=MGW-00000141
 [airlock-microgateway-documentation]:https://docs.airlock.com/microgateway/latest
 [airlock-microgateway-guide]:https://docs.airlock.com/microgateway/latest/?topic=MGW-00000142
 [airlock-microgateway-community-support]:https://forum.airlock.com/
@@ -423,6 +420,12 @@ For help and support with Kong Gateway operator please feel free to [create an i
 [kgo-issue-new]:https://github.com/Kong/gateway-operator/issues/new
 [kgo-disc-new]:https://github.com/Kong/gateway-operator/discussions/new
 
+
+### Kubvernor
+[Kubvernor][kubvernor] is an open-source, highly experimental implementation of API controller in Rust programming language. Currently, Kubernor supports Envoy Proxy. The project aims to be as generic as possible so Kubvernor can be used to manage/deploy different gateways (Envoy, Nginx, HAProxy, etc.).
+
+[kubvernor]:https://github.com/kubvernor/kubvernor
+
 ### Kuma
 
 [![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.0.0-Kuma-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.0.0/kumahq-kuma)
@@ -492,7 +495,12 @@ If you have any suggestions or experience issues with NGINX Gateway Fabric, plea
 
 ### ngrok Kubernetes Operator
 
-[ngrok Kubernetes Operator][ngrok-k8s-operator] provides an implementation of the Gateway API that uses [ngrok's ingress-as-a-service][ngrok]. This project uses the Gateway API to support routing traffic from ngrok's global network to applications running on Kubernetes clusters. This easily adds the benefits of ngrok, like security, network policy, and a global presence with the simplicity of cloud service. The operator contains both a Gateway API implementation as well as a controller using Kubernetes Ingress. The Gateway API implementation is currently under development and supports only the Gateway, GatewayClass and HTTPRoute. As the TLSRoute and TCPRoute move from experimental to stable, they will also be implemented.
+[ngrok Kubernetes Operator][ngrok-k8s-operator] After adding preliminary support last year, the [ngrok Kubernetes Operator][ngrok-k8s-operator] supports the entire core Gateway API. This includes:
+-Routes (HTTPRoute, TCPRoute, TLSRoute) + RouteMatches (Header, Path, +more)
+-Filters: Header, Redirect, Rewrite + more
+-Backends: Backend Filters + Weighted balancing
+-ReferenceGrant: RBAC for multi-tenant clusters handling
+-Traffic Policy as an extensionRef or annotation when the Gateway API isn’t flexible enough
 
 You can read our [docs][ngrok-k8s-gwapi-docs] for more information. If you have any feature requests or bug reports, please [create an issue][ngrok-issue-new]. You can also reach out for help on [Slack][ngrok-slack]
 
@@ -500,7 +508,7 @@ You can read our [docs][ngrok-k8s-gwapi-docs] for more information. If you have 
 [ngrok]:https://ngrok.com
 [ngrok-k8s-gwapi-docs]:https://ngrok.com/docs/k8s/
 [ngrok-issue-new]: https://github.com/ngrok/ngrok-operator/issues/new/choose
-[ngrok-slack]:https://ngrokcommunity.slack.com/channels/general
+
 
 ### STUNner
 
@@ -599,3 +607,4 @@ For help and support with Kuadrant's implementation please feel free to [create 
 [kuadrant]:https://kuadrant.io/
 [kuadrant-issue-new]:https://github.com/Kuadrant/kuadrant-operator/issues/new
 [kuadrant-slack]:https://kubernetes.slack.com/archives/C05J0D0V525
+
