@@ -69,7 +69,7 @@ type ConformanceTestSuite struct {
 	BaseManifests            string
 	MeshManifests            string
 	Applier                  kubernetes.Applier
-	SupportedFeatures        SupportedFeatures
+	SupportedFeatures        FeaturesSet
 	TimeoutConfig            config.TimeoutConfig
 	SkipTests                sets.Set[string]
 	SkipProvisionalTests     bool
@@ -77,6 +77,9 @@ type ConformanceTestSuite struct {
 	ManifestFS               []fs.FS
 	UsableNetworkAddresses   []v1beta1.GatewaySpecAddress
 	UnusableNetworkAddresses []v1beta1.GatewaySpecAddress
+
+	// If SupportedFeatures are automatically determined from GWC Status.
+	isInferredSupportedFeatures bool
 
 	// mode is the operating mode of the implementation.
 	// The default value for it is "default".
@@ -141,7 +144,7 @@ type ConformanceOptions struct {
 	// CleanupBaseResources indicates whether or not the base test
 	// resources such as Gateways should be cleaned up after the run.
 	CleanupBaseResources       bool
-	SupportedFeatures          SupportedFeatures
+	SupportedFeatures          FeaturesSet
 	ExemptFeatures             FeaturesSet
 	EnableAllSupportedFeatures bool
 	TimeoutConfig              config.TimeoutConfig
@@ -164,18 +167,14 @@ type ConformanceOptions struct {
 	// address assignment.
 	UnusableNetworkAddresses []v1beta1.GatewaySpecAddress
 
-	Mode                string
-	AllowCRDsMismatch   bool
-	Implementation      confv1.Implementation
-	ConformanceProfiles sets.Set[ConformanceProfileName]
+	Mode                        string
+	AllowCRDsMismatch           bool
+	Implementation              confv1.Implementation
+	ConformanceProfiles         sets.Set[ConformanceProfileName]
+	isInferredSupportedFeatures bool
 }
 
 type FeaturesSet = sets.Set[features.FeatureName]
-
-type SupportedFeatures struct {
-	Inferred bool
-	FeaturesSet
-}
 
 const (
 	// undefinedKeyword is set in the ConformanceReport "GatewayAPIVersion" and
@@ -183,28 +182,6 @@ const (
 	// values in the cluster, due to multiple versions of CRDs installed.
 	undefinedKeyword = "UNDEFINED"
 )
-
-// InitSupportedFeatures initializes the SupportedFeatures struct based on the
-// provided, exempt, and inferred features.
-//
-// > WARNING: Order of sets is crucial for determining the status of the report.
-func InitSupportedFeatures(inferred, parsed, exempt FeaturesSet) SupportedFeatures {
-	if parsed.Len() > 0 {
-		for feature := range exempt {
-			parsed.Delete(feature)
-		}
-		return SupportedFeatures{false, parsed}
-	}
-
-	if exempt.Len() > 0 {
-		for feature := range exempt {
-			inferred.Delete(feature)
-		}
-		return SupportedFeatures{false, inferred}
-	}
-
-	return SupportedFeatures{true, inferred}
-}
 
 // NewConformanceTestSuite is a helper to use for creating a new ConformanceTestSuite.
 func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite, error) {
@@ -255,10 +232,7 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 	// cover all features, if they don't they'll need to have provided a
 	// conformance profile or at least some specific features they support.
 	if options.EnableAllSupportedFeatures {
-		options.SupportedFeatures = SupportedFeatures{
-			Inferred:    false,
-			FeaturesSet: features.SetsToNamesSet(features.AllFeatures),
-		}
+		options.SupportedFeatures = features.SetsToNamesSet(features.AllFeatures)
 	}
 
 	suite := &ConformanceTestSuite{
@@ -346,6 +320,10 @@ const (
 	testSuiteUserAgentPrefix = "gateway-api-conformance.test"
 )
 
+func (opt *ConformanceOptions) GetIsInferredSupportedFeatures() bool {
+	return opt.isInferredSupportedFeatures
+}
+
 // Setup ensures the base resources required for conformance tests are installed
 // in the cluster. It also ensures that all relevant resources are ready.
 func (suite *ConformanceTestSuite) Setup(t *testing.T, tests []ConformanceTest) {
@@ -411,6 +389,10 @@ func (suite *ConformanceTestSuite) Setup(t *testing.T, tests []ConformanceTest) 
 		}
 		kubernetes.MeshNamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, namespaces)
 	}
+}
+
+func (suite *ConformanceTestSuite) IsInferredSupportedFeatures() bool {
+	return suite.isInferredSupportedFeatures
 }
 
 func (suite *ConformanceTestSuite) setClientsetForTest(test ConformanceTest) error {
