@@ -217,7 +217,7 @@ var (
 func TestSuiteReport(t *testing.T) {
 	testCases := []struct {
 		name                      string
-		features                  SupportedFeatures
+		features                  FeaturesSet
 		extendedSupportedFeatures map[ConformanceProfileName]sets.Set[features.FeatureName]
 		profiles                  sets.Set[ConformanceProfileName]
 		skipProvisionalTests      bool
@@ -227,7 +227,7 @@ func TestSuiteReport(t *testing.T) {
 	}{
 		{
 			name:     "all tests succeeded",
-			features: SupportedFeatures{true, sets.New(coreFeature, extendedFeature)},
+			features: sets.New(coreFeature, extendedFeature),
 			extendedSupportedFeatures: map[ConformanceProfileName]sets.Set[features.FeatureName]{
 				testProfileName: sets.New(extendedFeature),
 			},
@@ -281,7 +281,7 @@ func TestSuiteReport(t *testing.T) {
 		},
 		{
 			name:     "mixed results",
-			features: SupportedFeatures{false, sets.New(coreFeature, extendedFeature)},
+			features: sets.New(coreFeature, extendedFeature),
 			extendedSupportedFeatures: map[ConformanceProfileName]sets.Set[features.FeatureName]{
 				testProfileName: sets.New(extendedFeature),
 			},
@@ -340,7 +340,7 @@ func TestSuiteReport(t *testing.T) {
 		},
 		{
 			name:     "skip provisional tests",
-			features: SupportedFeatures{true, sets.New(coreFeature, extendedFeature)},
+			features: sets.New(coreFeature, extendedFeature),
 			extendedSupportedFeatures: map[ConformanceProfileName]sets.Set[features.FeatureName]{
 				testProfileName: sets.New(extendedFeature),
 			},
