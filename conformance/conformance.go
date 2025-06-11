@@ -51,7 +51,6 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 	clientOptions := client.Options{}
 	client, err := client.New(cfg, clientOptions)
 	require.NoError(t, err, "error initializing Kubernetes client")
-	gwcName := *flags.GatewayClassName
 
 	// This clientset is needed in addition to the client only because
 	// controller-runtime client doesn't support non CRUD sub-resources yet
@@ -66,13 +65,12 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 	require.NoError(t, apiextensionsv1.AddToScheme(client.Scheme()))
 
 	supportedFeatures := suite.ParseSupportedFeatures(*flags.SupportedFeatures)
-	exempt := suite.ParseSupportedFeatures(*flags.ExemptFeatures)
+	exemptFeatures := suite.ParseSupportedFeatures(*flags.ExemptFeatures)
 
 	skipTests := suite.ParseSkipTests(*flags.SkipTests)
 	namespaceLabels := suite.ParseKeyValuePairs(*flags.NamespaceLabels)
 	namespaceAnnotations := suite.ParseKeyValuePairs(*flags.NamespaceAnnotations)
 	conformanceProfiles := suite.ParseConformanceProfiles(*flags.ConformanceProfiles)
-	enableAllSupportedFeatures := *flags.EnableAllSupportedFeatures
 
 	implementation := suite.ParseImplementation(
 		*flags.ImplementationOrganization,
@@ -90,10 +88,10 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 		Clientset:                  clientset,
 		ConformanceProfiles:        conformanceProfiles,
 		Debug:                      *flags.ShowDebug,
-		EnableAllSupportedFeatures: enableAllSupportedFeatures,
-		ExemptFeatures:             exempt,
+		EnableAllSupportedFeatures: *flags.EnableAllSupportedFeatures,
+		ExemptFeatures:             exemptFeatures,
 		ManifestFS:                 []fs.FS{&Manifests},
-		GatewayClassName:           gwcName,
+		GatewayClassName:           *flags.GatewayClassName,
 		Implementation:             implementation,
 		Mode:                       *flags.Mode,
 		NamespaceAnnotations:       namespaceAnnotations,
