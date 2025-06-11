@@ -129,7 +129,7 @@ func RunConformanceWithOptions(t *testing.T, opts suite.ConformanceOptions) {
 
 	cSuite, err := suite.NewConformanceTestSuite(opts)
 	require.NoError(t, err, "error initializing conformance suite")
-	t.Logf("Running tests for following Supported Features: %v", cSuite.SupportedFeatures)
+	t.Logf("Running tests for following Supported Features: %v", cSuite.SupportedFeatures.UnsortedList())
 
 	cSuite.Setup(t, tests.ConformanceTests)
 	err = cSuite.Run(t, tests.ConformanceTests)
@@ -147,8 +147,9 @@ func logOptions(t *testing.T, opts suite.ConformanceOptions) {
 	t.Logf("  Cleanup Resources: %t", opts.CleanupBaseResources)
 	t.Logf("  Debug: %t", opts.Debug)
 	t.Logf("  Enable All Features: %t", opts.EnableAllSupportedFeatures)
-	t.Logf("  Supported Features: %v", opts.SupportedFeatures)
+	t.Logf("  Supported Features: %v", opts.SupportedFeatures.UnsortedList())
 	t.Logf("  ExemptFeatures: %v", opts.ExemptFeatures.UnsortedList())
+	t.Logf("  ConformanceProfiles: %v", opts.ConformanceProfiles.UnsortedList())
 }
 
 func writeReport(logf func(string, ...any), report confv1.ConformanceReport, output string) error {
