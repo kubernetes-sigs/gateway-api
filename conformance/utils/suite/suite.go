@@ -31,11 +31,13 @@ import (
 	"github.com/stretchr/testify/require"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/sets"
 	clientset "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/gateway-api/apis/v1beta1"
 	confv1 "sigs.k8s.io/gateway-api/conformance/apis/v1"
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
@@ -167,11 +169,10 @@ type ConformanceOptions struct {
 	// address assignment.
 	UnusableNetworkAddresses []v1beta1.GatewaySpecAddress
 
-	Mode                        string
-	AllowCRDsMismatch           bool
-	Implementation              confv1.Implementation
-	ConformanceProfiles         sets.Set[ConformanceProfileName]
-	isInferredSupportedFeatures bool
+	Mode                string
+	AllowCRDsMismatch   bool
+	Implementation      confv1.Implementation
+	ConformanceProfiles sets.Set[ConformanceProfileName]
 }
 
 type FeaturesSet = sets.Set[features.FeatureName]
@@ -185,16 +186,19 @@ const (
 
 // NewConformanceTestSuite is a helper to use for creating a new ConformanceTestSuite.
 func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite, error) {
-	// test suite callers are required to provide either:
-	// - one conformance profile via the flag '-conformance-profiles'
-	// - a list of supported features via the flag '-supported-features'
-	// - an explicit test to run via the flag '-run-test'
-	// - all features are being tested via the flag '-all-features'
-	if options.SupportedFeatures.Len() == 0 &&
-		options.ConformanceProfiles.Len() == 0 &&
-		!options.EnableAllSupportedFeatures &&
-		options.RunTest == "" {
-		return nil, fmt.Errorf("no conformance profile, supported features, explicit tests were provided so no tests could be selected")
+	supportedFeatures := options.SupportedFeatures.Difference(options.ExemptFeatures)
+	isInferred := false
+	switch {
+	case options.EnableAllSupportedFeatures:
+		supportedFeatures = features.SetsToNamesSet(features.AllFeatures)
+	case shouldInferSupportedFeatures(&options):
+		supportedFeatures = fetchSupportedFeatures(options.Client, options.GatewayClassName)
+		isInferred = true
+	}
+
+	// If features were not inferred from Status, it's a GWC issue.
+	if isInferred && supportedFeatures.Len() == 0 {
+		return nil, fmt.Errorf("no supported features were determined for test suite")
 	}
 
 	config.SetupTimeoutConfig(&options.TimeoutConfig)
@@ -228,13 +232,6 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 		mode = options.Mode
 	}
 
-	// test suite callers can potentially just run all tests by saying they
-	// cover all features, if they don't they'll need to have provided a
-	// conformance profile or at least some specific features they support.
-	if options.EnableAllSupportedFeatures {
-		options.SupportedFeatures = features.SetsToNamesSet(features.AllFeatures)
-	}
-
 	suite := &ConformanceTestSuite{
 		Client:           options.Client,
 		ClientOptions:    options.ClientOptions,
@@ -252,7 +249,7 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 			NamespaceAnnotations: options.NamespaceAnnotations,
 			AddressType:          options.AddressType,
 		},
-		SupportedFeatures:           options.SupportedFeatures,
+		SupportedFeatures:           supportedFeatures,
 		TimeoutConfig:               options.TimeoutConfig,
 		SkipTests:                   sets.New(options.SkipTests...),
 		RunTest:                     options.RunTest,
@@ -268,6 +265,7 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 		mode:                        mode,
 		apiVersion:                  apiVersion,
 		apiChannel:                  apiChannel,
+		isInferredSupportedFeatures: isInferred,
 	}
 
 	for _, conformanceProfileName := range options.ConformanceProfiles.UnsortedList() {
@@ -319,10 +317,6 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 const (
 	testSuiteUserAgentPrefix = "gateway-api-conformance.test"
 )
-
-func (opt *ConformanceOptions) GetIsInferredSupportedFeatures() bool {
-	return opt.isInferredSupportedFeatures
-}
 
 // Setup ensures the base resources required for conformance tests are installed
 // in the cluster. It also ensures that all relevant resources are ready.
@@ -542,7 +536,7 @@ func (suite *ConformanceTestSuite) Report() (*confv1.ConformanceReport, error) {
 		GatewayAPIChannel:         suite.apiChannel,
 		ProfileReports:            profileReports.list(),
 		SucceededProvisionalTests: succeededProvisionalTests,
-		InferredSupportedFeatures: suite.SupportedFeatures.Inferred,
+		InferredSupportedFeatures: suite.IsInferredSupportedFeatures(),
 	}, nil
 }
 
@@ -570,6 +564,36 @@ func ParseConformanceProfiles(p string) sets.Set[ConformanceProfileName] {
 		res.Insert(ConformanceProfileName(value))
 	}
 	return res
+}
+
+func fetchSupportedFeatures(client client.Client, gatewayClassName string) FeaturesSet {
+	if gatewayClassName == "" {
+		return nil
+	}
+	gwc := &gatewayv1.GatewayClass{}
+	err := client.Get(context.TODO(), types.NamespacedName{Name: gatewayClassName}, gwc)
+	if err != nil {
+		return nil
+	}
+
+	fs := FeaturesSet{}
+	for _, feature := range gwc.Status.SupportedFeatures {
+		fs.Insert(features.FeatureName(feature.Name))
+	}
+	fmt.Printf("Supported features for GatewayClass %s: %v\n", gatewayClassName, fs.UnsortedList())
+	return fs
+}
+
+func shouldInferSupportedFeatures(opts *ConformanceOptions) bool {
+	if opts == nil {
+		return false
+	}
+	return !opts.EnableAllSupportedFeatures &&
+		opts.SupportedFeatures.Len() == 0 &&
+		opts.ExemptFeatures.Len() == 0 &&
+		opts.ConformanceProfiles.Len() == 0 &&
+		len(opts.SkipTests) == 0 &&
+		opts.RunTest == ""
 }
 
 // getAPIVersionAndChannel iterates over all the crds installed in the cluster and check the version and channel annotations.

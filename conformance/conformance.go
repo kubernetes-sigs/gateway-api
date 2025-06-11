@@ -17,7 +17,6 @@ limitations under the License.
 package conformance
 
 import (
-	"context"
 	"io/fs"
 	"os"
 	"testing"
@@ -32,15 +31,11 @@ import (
 	"sigs.k8s.io/gateway-api/conformance/utils/flags"
 
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
-	"sigs.k8s.io/gateway-api/pkg/features"
 
 	"github.com/stretchr/testify/require"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 
-	"k8s.io/apimachinery/pkg/types"
 	clientset "k8s.io/client-go/kubernetes"
-
-	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
@@ -70,7 +65,7 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 	require.NoError(t, v1.Install(client.Scheme()))
 	require.NoError(t, apiextensionsv1.AddToScheme(client.Scheme()))
 
-	parsed := suite.ParseSupportedFeatures(*flags.SupportedFeatures)
+	supportedFeatures := suite.ParseSupportedFeatures(*flags.SupportedFeatures)
 	exempt := suite.ParseSupportedFeatures(*flags.ExemptFeatures)
 
 	skipTests := suite.ParseSkipTests(*flags.SkipTests)
@@ -78,18 +73,6 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 	namespaceAnnotations := suite.ParseKeyValuePairs(*flags.NamespaceAnnotations)
 	conformanceProfiles := suite.ParseConformanceProfiles(*flags.ConformanceProfiles)
 	enableAllSupportedFeatures := *flags.EnableAllSupportedFeatures
-
-	supportedFeatures := suite.FeaturesSet{}
-	isInferred := false
-	if enableAllSupportedFeatures {
-		supportedFeatures = features.SetsToNamesSet(features.AllFeatures)
-	} else if parsed.Len() == 0 &&
-		exempt.Len() == 0 &&
-		conformanceProfiles.Len() == 0 &&
-		len(skipTests) == 0 {
-		supportedFeatures = fetchSupportedFeatures(t, client, gwcName)
-		isInferred = true
-	}
 
 	implementation := suite.ParseImplementation(
 		*flags.ImplementationOrganization,
@@ -100,29 +83,28 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 	)
 
 	return suite.ConformanceOptions{
-		AllowCRDsMismatch:           *flags.AllowCRDsMismatch,
-		CleanupBaseResources:        *flags.CleanupBaseResources,
-		Client:                      client,
-		ClientOptions:               clientOptions,
-		Clientset:                   clientset,
-		ConformanceProfiles:         conformanceProfiles,
-		Debug:                       *flags.ShowDebug,
-		EnableAllSupportedFeatures:  enableAllSupportedFeatures,
-		ExemptFeatures:              exempt,
-		ManifestFS:                  []fs.FS{&Manifests},
-		GatewayClassName:            gwcName,
-		Implementation:              implementation,
-		Mode:                        *flags.Mode,
-		NamespaceAnnotations:        namespaceAnnotations,
-		NamespaceLabels:             namespaceLabels,
-		ReportOutputPath:            *flags.ReportOutput,
-		RestConfig:                  cfg,
-		RunTest:                     *flags.RunTest,
-		SkipTests:                   skipTests,
-		SupportedFeatures:           supportedFeatures,
-		TimeoutConfig:               conformanceconfig.DefaultTimeoutConfig(),
-		SkipProvisionalTests:        *flags.SkipProvisionalTests,
-		isInferredSupportedFeatures: isInferred,
+		AllowCRDsMismatch:          *flags.AllowCRDsMismatch,
+		CleanupBaseResources:       *flags.CleanupBaseResources,
+		Client:                     client,
+		ClientOptions:              clientOptions,
+		Clientset:                  clientset,
+		ConformanceProfiles:        conformanceProfiles,
+		Debug:                      *flags.ShowDebug,
+		EnableAllSupportedFeatures: enableAllSupportedFeatures,
+		ExemptFeatures:             exempt,
+		ManifestFS:                 []fs.FS{&Manifests},
+		GatewayClassName:           gwcName,
+		Implementation:             implementation,
+		Mode:                       *flags.Mode,
+		NamespaceAnnotations:       namespaceAnnotations,
+		NamespaceLabels:            namespaceLabels,
+		ReportOutputPath:           *flags.ReportOutput,
+		RestConfig:                 cfg,
+		RunTest:                    *flags.RunTest,
+		SkipTests:                  skipTests,
+		SupportedFeatures:          supportedFeatures,
+		TimeoutConfig:              conformanceconfig.DefaultTimeoutConfig(),
+		SkipProvisionalTests:       *flags.SkipProvisionalTests,
 	}
 }
 
@@ -149,6 +131,7 @@ func RunConformanceWithOptions(t *testing.T, opts suite.ConformanceOptions) {
 
 	cSuite, err := suite.NewConformanceTestSuite(opts)
 	require.NoError(t, err, "error initializing conformance suite")
+	t.Logf("Running tests for following Supported Features: %v", cSuite.SupportedFeatures)
 
 	cSuite.Setup(t, tests.ConformanceTests)
 	err = cSuite.Run(t, tests.ConformanceTests)
@@ -159,22 +142,6 @@ func RunConformanceWithOptions(t *testing.T, opts suite.ConformanceOptions) {
 		require.NoError(t, err, "error generating conformance profile report")
 		require.NoError(t, writeReport(t.Logf, *report, opts.ReportOutputPath), "error writing report")
 	}
-}
-
-func fetchSupportedFeatures(t *testing.T, client client.Client, gatewayClassName string) suite.FeaturesSet {
-	t.Helper()
-	if gatewayClassName == "" {
-		t.Fatal("GatewayClass name must be provided")
-	}
-	gwc := &gatewayv1.GatewayClass{}
-	err := client.Get(context.TODO(), types.NamespacedName{Name: gatewayClassName}, gwc)
-	require.NoError(t, err, "error fetching GatewayClass %s", gatewayClassName)
-
-	fs := suite.FeaturesSet{}
-	for _, feature := range gwc.Status.SupportedFeatures {
-		fs.Insert(features.FeatureName(feature.Name))
-	}
-	return fs
 }
 
 func logOptions(t *testing.T, opts suite.ConformanceOptions) {
