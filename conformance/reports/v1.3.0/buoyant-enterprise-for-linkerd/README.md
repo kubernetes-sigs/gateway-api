@@ -6,6 +6,13 @@
 |--------------|-------------------------------------------|---------|--------------------------------------------------------|
 | standard     | [enterprise-2.18](https://docs.buoyant.io/buoyant-enterprise-linkerd/latest/overview//) | default | [enterprise-2.18 report](./standard-2.18-default-report.yaml) |
 
+## Notes
+
+This report uses the v1.3.0 Gateway API CRDs, but was run using the tests on
+the `main` branch at commit `6cd1558a9e`, in order to take advantage more
+effective tests for the `MESH` conformance profile that landed after v1.3.0
+was cut.
+
 ## Reproduce
 
 To reproduce a Buoyant Enterprise for Linkerd conformance test report:

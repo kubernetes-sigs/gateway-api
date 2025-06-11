@@ -6,7 +6,14 @@
 |--------------|-------------------------------------------|---------|--------------------------------------------------------|
 | standard     | [version-2.18](https://github.com/linkerd/linkerd2/releases/tag/version-2.18/) | default | [version-2.18 report](./standard-2.18-default-report.yaml) |
 
-### A note on Linkerd Versioning
+## Notes
+
+This report uses the v1.3.0 Gateway API CRDs, but was run using the tests on
+the `main` branch at commit `6cd1558a9e`, in order to take advantage of more
+effective tests for the `MESH` conformance profile that landed after v1.3.0
+was cut.
+
+### Linkerd Versioning
 
 The Linkerd project publishes and announces _versions_ that correspond to
 specific project milestones and sets of new features. This report is for
@@ -21,9 +28,9 @@ Linkerd versions are available in different types of _release artifacts_:
   of 2025).
 
   Each major version of Linkerd has a corresponding edge release, indicated by
-  a `version-2.X` tag -- for example, Linkerd 2.18 corresponds to
-  `edge-25.4.4`, and therefore the `version-2.18` tag and the `edge-25.4.4`
-  tag are on the same commit.
+  a `version-2.X` tag. For example, Linkerd 2.18 corresponds to `edge-25.4.4`,
+  and therefore the `version-2.18` tag and the `edge-25.4.4` tag are on the
+  same commit.
 
 - _Stable releases_ of Linkerd follow semantic versioning, and are published
   by the vendor community around Linkerd.
@@ -31,11 +38,11 @@ Linkerd versions are available in different types of _release artifacts_:
 For more information on Linkerd versioning, see the Linkerd [Releases and
 Versions] documentation.
 
-Since Gateway API conformance tests _require_ semantic versioning for the
+Since Gateway API conformance tests require semantic versioning for the
 implementation version, the Linkerd project reports conformance using the
-`version` tags. However, the reproduction instructions below reference the
-corresponding `edge` tag, because the Linkerd CLI is actually published using
-the `edge` tag.
+`version` tags. However, the `run_conformance.sh` script referenced below
+installs the corresponding `edge` tag, because the Linkerd CLI is actually
+published using the `edge` tag.
 
 [Releases and Versions]: https://linkerd.io/releases/
 
