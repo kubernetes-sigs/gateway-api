@@ -58,6 +58,10 @@ type ExpectedResponse struct {
 
 	// User Given TestCase name
 	TestCaseName string
+
+	// ServerName indicates the hostname to which the client attempts to connect,
+	// and which is seen by the backend.
+	ServerName string
 }
 
 // Request can be used as both the request to make and a means to verify
@@ -70,6 +74,7 @@ type Request struct {
 	Headers          map[string]string
 	UnfollowRedirect bool
 	Protocol         string
+	SNI              string
 }
 
 // ExpectedRequest defines expected properties of a request that reaches a backend.
@@ -129,7 +134,7 @@ func MakeRequest(t *testing.T, expected *ExpectedResponse, gwAddr, protocol, sch
 	path, query, _ := strings.Cut(expected.Request.Path, "?")
 	reqURL := url.URL{Scheme: scheme, Host: CalculateHost(t, gwAddr, scheme), Path: path, RawQuery: query}
 
-	tlog.Logf(t, "Making %s request to %s", expected.Request.Method, reqURL.String())
+	tlog.Logf(t, "Making %s request to host %s via %s", expected.Request.Method, expected.Request.Host, reqURL.String())
 
 	req := roundtripper.Request{
 		T:                t,
@@ -241,7 +246,7 @@ func WaitForConsistentResponse(t *testing.T, r roundtripper.RoundTripper, req ro
 			return false
 		}
 
-		if err := CompareRequest(t, &req, cReq, cRes, expected); err != nil {
+		if err := CompareRoundTrip(t, &req, cReq, cRes, expected); err != nil {
 			tlog.Logf(t, "Response expectation failed for request: %+v  not ready yet: %v (after %v)", req, err, elapsed)
 			return false
 		}
@@ -251,7 +256,7 @@ func WaitForConsistentResponse(t *testing.T, r roundtripper.RoundTripper, req ro
 	tlog.Logf(t, "Request passed")
 }
 
-func CompareRequest(t *testing.T, req *roundtripper.Request, cReq *roundtripper.CapturedRequest, cRes *roundtripper.CapturedResponse, expected ExpectedResponse) error {
+func CompareRoundTrip(t *testing.T, req *roundtripper.Request, cReq *roundtripper.CapturedRequest, cRes *roundtripper.CapturedResponse, expected ExpectedResponse) error {
 	if roundtripper.IsTimeoutError(cRes.StatusCode) {
 		if roundtripper.IsTimeoutError(expected.Response.StatusCode) {
 			return nil
@@ -350,6 +355,10 @@ func CompareRequest(t *testing.T, req *roundtripper.Request, cReq *roundtripper.
 
 		if !strings.HasPrefix(cReq.Pod, expected.Backend) {
 			return fmt.Errorf("expected pod name to start with %s, got %s", expected.Backend, cReq.Pod)
+		}
+
+		if expected.ExpectedRequest.SNI != cReq.SNI {
+			return fmt.Errorf("expected SNI %q to be equal to %q", cReq.SNI, expected.ExpectedRequest.SNI)
 		}
 	} else if roundtripper.IsRedirect(cRes.StatusCode) {
 		if expected.RedirectRequest == nil {
