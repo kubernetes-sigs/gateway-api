@@ -180,9 +180,8 @@ or Mesh resources.
 
 #### Feature Names
 
-This is actually a lovely question. It makes sense for this to have a feature,
-but it's not clear what to call it. At present, the most likely candidate
-seems to be `MeshOffClusterGateway`,
+This GEP will use the feature name `MeshOffClusterGateway`, under the
+assumption that we will indeed need a Mesh resource.
 
 ### Conformance tests
 
