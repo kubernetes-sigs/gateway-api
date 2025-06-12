@@ -79,6 +79,12 @@ There are two main contrasting sets of conformance tests:
 * Gateway related tests (can also be thought of as ingress tests)
 * Service Mesh related tests
 
+Running conformance tests without any features-related flags will allow to
+automatically infer supported features defined in the GatewayClass Status and
+run tests against them. This is the way if you want to generate passing report,
+otherwise, explicitly providing any flags like `-supported-features`,
+`-exempt-features`, etc should be used for development only.
+
 For `Gateway` tests you must enable the `Gateway` test feature, and then
 opt-in to any other specific tests you want to run (e.g. `HTTPRoute`). For
 Mesh related tests you must enable `Mesh`.
