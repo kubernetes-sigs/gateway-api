@@ -53,7 +53,7 @@ type ConformanceReport struct {
 
 	// InferredSupportedFeatures indicates whether the supported features were
 	// automatically detected by the conformance suite.
-	InferredSupportedFeatures bool `json:"autoDetectedSupportedFeatures"`
+	InferredSupportedFeatures bool `json:"inferredSupportedFeatures"`
 }
 
 // Implementation provides metadata information on the downstream

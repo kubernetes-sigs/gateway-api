@@ -129,7 +129,6 @@ func RunConformanceWithOptions(t *testing.T, opts suite.ConformanceOptions) {
 
 	cSuite, err := suite.NewConformanceTestSuite(opts)
 	require.NoError(t, err, "error initializing conformance suite")
-	t.Logf("Running tests for following Supported Features: %v", cSuite.SupportedFeatures.UnsortedList())
 
 	cSuite.Setup(t, tests.ConformanceTests)
 	err = cSuite.Run(t, tests.ConformanceTests)

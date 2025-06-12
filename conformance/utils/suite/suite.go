@@ -82,6 +82,8 @@ type ConformanceTestSuite struct {
 	UnusableNetworkAddresses []v1beta1.GatewaySpecAddress
 
 	// If SupportedFeatures are automatically determined from GWC Status.
+	// This will be required to report in future iterations as the passing
+	// will be determined based on this.
 	isInferredSupportedFeatures bool
 
 	// mode is the operating mode of the implementation.
@@ -194,7 +196,11 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 	case options.EnableAllSupportedFeatures:
 		supportedFeatures = features.SetsToNamesSet(features.AllFeatures)
 	case shouldInferSupportedFeatures(&options):
-		supportedFeatures = fetchSupportedFeatures(options.Client, options.GatewayClassName)
+		var err error
+		supportedFeatures, err = fetchSupportedFeatures(options.Client, options.GatewayClassName)
+		if err != nil {
+			return nil, fmt.Errorf("Cannot infer supported features: %w", err)
+		}
 		isInferred = true
 	}
 
@@ -576,14 +582,14 @@ func ParseConformanceProfiles(p string) sets.Set[ConformanceProfileName] {
 	return res
 }
 
-func fetchSupportedFeatures(client client.Client, gatewayClassName string) FeaturesSet {
+func fetchSupportedFeatures(client client.Client, gatewayClassName string) (FeaturesSet, error) {
 	if gatewayClassName == "" {
-		return nil
+		return nil, fmt.Errorf("GatewayClass name must be provided to fetch supported features")
 	}
 	gwc := &gatewayv1.GatewayClass{}
 	err := client.Get(context.TODO(), types.NamespacedName{Name: gatewayClassName}, gwc)
 	if err != nil {
-		return nil
+		return nil, fmt.Errorf("fetchSupportedFeatures(): %w", err)
 	}
 
 	fs := FeaturesSet{}
@@ -591,9 +597,12 @@ func fetchSupportedFeatures(client client.Client, gatewayClassName string) Featu
 		fs.Insert(features.FeatureName(feature.Name))
 	}
 	fmt.Printf("Supported features for GatewayClass %s: %v\n", gatewayClassName, fs.UnsortedList())
-	return fs
+	return fs, nil
 }
 
+// shouldInferSupportedFeatures checks if any flags were supplied for manually
+// picking what to test. Inferred supported features are only used when no flags
+// are set.
 func shouldInferSupportedFeatures(opts *ConformanceOptions) bool {
 	if opts == nil {
 		return false
