@@ -73,6 +73,7 @@ has its own certificate and the gateway client needs to know how to connect to t
 ![image depicting TLS termination types](images/1897-TLStermtypes.png "TLS termination types")
 
 This includes the intent to originate TLS on the connection to the backend, as well as various properties of the TLS connection:
+
 * If using mutual TLS, the client certificate to use during the TLS handshake
 * How to verify the peer certificate (trusted certificates, trusted subject names, etc).
 * Server Name indication
@@ -109,6 +110,7 @@ Fortunately, these two scenarios can co-exist.
 `BackendTLSPolicy` will allow an application developer to present a *default* for clients that have not configured their own, but also allow clients to explicitly configure their own settings.
 
 This serves a variety of use cases:
+
 * A service producer may be unaware or unwilling to provide a `BackendTLSPolicy` for clients, despite serving TLS. In this case, a client can provide their own settings to connect
   * Alternatively, a service producer may be unsure of how clients are connecting to them. `BackendTLSPolicy` implies *originating* TLS from the implementation, but the implementation could already be handling passthrough TLS.
 * A service producer may provide TLS settings that are unacceptable to the client. For example, an `insecureSkipVerify` option. The client can override this with their own more secure settings.
@@ -122,7 +124,8 @@ as a TLS Client:
 - How to verify the peer certificate, including signing certificate verification and other properties of the certificate (subject alt names).
   - Support for referencing a CA certificate, as well as a help to use the default trusted system certificates.
 
-Two serve these dual roles, `BackendTLSPolicy` is usable as a Direct Policy Attachment that can be *cross namespace*.
+To serve these dual roles, `BackendTLSPolicy` is usable as a Direct Policy Attachment that can be *cross namespace*.
+
 * `BackendTLSPolicy` can be applied to a Service in the same namespace to provide defaults to clients.
 * `BackendTLSPolicy` can be applied to a Service in a different namespace to provide explicit configuration for clients in that namespace.
 

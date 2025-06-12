@@ -57,7 +57,6 @@ type BackendTLSPolicyList struct {
 // BackendTLSPolicySpec defines the desired state of BackendTLSPolicy.
 //
 // Support: Extended
-// +kubebuilder:validation:XValidation:message="mode 'None' may not be used with targetRefs",rule="!(has(self.targetRef) && has(self.mode) && self.mode == 'None'"
 type BackendTLSPolicySpec struct {
 	// TargetRefs identifies an API object to apply the policy to.
 	// Only Services have Extended support. Implementations MAY support
@@ -74,25 +73,15 @@ type BackendTLSPolicySpec struct {
 	//   be unique across all targetRef entries in the BackendTLSPolicy.
 	// * They select different sectionNames in the same target.
 	//
-	// This may be left unset for reference from a Route filter.
-	//
 	// Support: Extended for Kubernetes Service
 	//
 	// Support: Implementation-specific for any other resource
 	//
-	// +optional
-	// +kubebuilder:validation:MinItems=0
+	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:MaxItems=16
 	// +kubebuilder:validation:XValidation:message="sectionName must be specified when targetRefs includes 2 or more references to the same target",rule="self.all(p1, self.all(p2, p1.group == p2.group && p1.kind == p2.kind && p1.name == p2.name ? ((!has(p1.sectionName) || p1.sectionName == '') == (!has(p2.sectionName) || p2.sectionName == '')) : true))"
 	// +kubebuilder:validation:XValidation:message="sectionName must be unique when targetRefs includes 2 or more references to the same target",rule="self.all(p1, self.exists_one(p2, p1.group == p2.group && p1.kind == p2.kind && p1.name == p2.name && (((!has(p1.sectionName) || p1.sectionName == '') && (!has(p2.sectionName) || p2.sectionName == '')) || (has(p1.sectionName) && has(p2.sectionName) && p1.sectionName == p2.sectionName))))"
-	TargetRefs []v1alpha2.LocalPolicyTargetReferenceWithSectionName `json:"targetRefs"`
-
-	// Mode specifies the TLS mode for this policy.
-	//
-	// 'None' may only be used in a Route filter. To not use TLS for a Service, do not create a BackendTLSPolicy.
-	//
-	// +kubebuilder:default=TLS
-	Mode BackendTLSMode
+	TargetRefs []v1alpha2.PolicyTargetReferenceWithSectionName `json:"targetRefs"`
 
 	// Validation contains backend TLS validation configuration.
 	Validation BackendTLSPolicyValidation `json:"validation"`
@@ -112,18 +101,6 @@ type BackendTLSPolicySpec struct {
 	// +kubebuilder:validation:MaxProperties=16
 	Options map[v1.AnnotationKey]v1.AnnotationValue `json:"options,omitempty"`
 }
-
-// BackendTLSMode specifies the TLS mode.
-//
-// +kubebuilder:validation:Enum=None;TLS
-type BackendTLSMode string
-
-const (
-	// TLSModeNone indicates TLS should not be originated for the request.
-	TLSModeNone BackendTLSMode = "None"
-	// TLSModeTLS indicates TLS should be originated for the request.
-	TLSModeTLS BackendTLSMode = "TLS"
-)
 
 // BackendTLSPolicyValidation contains backend TLS validation configuration.
 // +kubebuilder:validation:XValidation:message="must not contain both CACertificateRefs and WellKnownCACertificates",rule="!(has(self.caCertificateRefs) && size(self.caCertificateRefs) > 0 && has(self.wellKnownCACertificates) && self.wellKnownCACertificates != \"\")"
