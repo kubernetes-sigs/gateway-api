@@ -21,10 +21,12 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"math/rand"
 	"slices"
 	"strings"
 	"sync"
 	"testing"
+	"time"
 
 	"golang.org/x/sync/errgroup"
 
@@ -52,7 +54,7 @@ var MeshHTTPRouteWeight = suite.ConformanceTest{
 		t.Run("Requests should have a distribution that matches the weight", func(t *testing.T) {
 			host := "echo"
 			expected := http.ExpectedResponse{
-				Request:   http.Request{Path: "/", Host: host},
+				Request:   http.Request{Path: "/", Host: host, Headers: make(map[string]string)},
 				Response:  http.Response{StatusCode: 200},
 				Namespace: "gateway-conformance-mesh",
 			}
@@ -89,7 +91,9 @@ func testDistribution(t *testing.T, client echo.MeshPod, expected http.ExpectedR
 	g.SetLimit(concurrentRequests)
 	for i := 0.0; i < totalRequests; i++ {
 		g.Go(func() error {
-			_, cRes, err := client.CaptureRequestResponseAndCompare(t, expected)
+			uniqueExpected := expected
+			addEntropy(&uniqueExpected)
+			_, cRes, err := client.CaptureRequestResponseAndCompare(t, uniqueExpected)
 			if err != nil {
 				return fmt.Errorf("failed: %w", err)
 			}
@@ -140,4 +144,19 @@ func testDistribution(t *testing.T, client echo.MeshPod, expected http.ExpectedR
 		return cmp.Compare(a.Error(), b.Error())
 	})
 	return errors.Join(errs...)
+}
+
+// addEntropy adds jitter to the request by adding either a delay up to 1 second, or a random header value, or both.
+func addEntropy(exp *http.ExpectedResponse) {
+	delay := func() { time.Sleep(time.Duration(rand.Intn(1000)) * time.Millisecond) }
+	randomHeader := func() { exp.Request.Headers["X-Jitter"] = fmt.Sprintf("%d", rand.Intn(9999)) }
+	switch rand.Intn(3) {
+	case 0:
+		delay()
+	case 1:
+		randomHeader()
+	case 2:
+		delay()
+		randomHeader()
+	}
 }
