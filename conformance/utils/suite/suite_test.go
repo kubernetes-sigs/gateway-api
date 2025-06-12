@@ -22,9 +22,13 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/util/sets"
 
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/util/sets"
+	"sigs.k8s.io/controller-runtime/pkg/client/fake"
+
+	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	confv1 "sigs.k8s.io/gateway-api/conformance/apis/v1"
 	"sigs.k8s.io/gateway-api/pkg/consts"
 	"sigs.k8s.io/gateway-api/pkg/features"
@@ -217,7 +221,7 @@ var (
 func TestSuiteReport(t *testing.T) {
 	testCases := []struct {
 		name                      string
-		features                  sets.Set[features.FeatureName]
+		features                  FeaturesSet
 		extendedSupportedFeatures map[ConformanceProfileName]sets.Set[features.FeatureName]
 		profiles                  sets.Set[ConformanceProfileName]
 		skipProvisionalTests      bool
@@ -276,6 +280,7 @@ func TestSuiteReport(t *testing.T) {
 					coreProvisionalTest.ShortName,
 					extendedProvisionalTest.ShortName,
 				},
+				InferredSupportedFeatures: true,
 			},
 		},
 		{
@@ -385,6 +390,7 @@ func TestSuiteReport(t *testing.T) {
 						},
 					},
 				},
+				InferredSupportedFeatures: true,
 			},
 		},
 	}
@@ -406,4 +412,129 @@ func TestSuiteReport(t *testing.T) {
 			assert.Equal(t, tc.expectedError, err)
 		})
 	}
+}
+
+var statusFeatureNames = []string{
+	"Gateway",
+	"GatewayPort8080",
+	"HTTPRoute",
+	"HTTPRouteHostRewrite",
+	"HTTPRouteMethodMatching",
+	"HTTPRoutePathRewrite",
+	"TTPRouteQueryParamMatching",
+	"HTTPRouteResponseHeaderModification",
+	"ReferenceGrant",
+}
+
+func TestInferSupportedFeatures(t *testing.T) {
+	testCases := []struct {
+		name               string
+		allowAllFeatures   bool
+		supportedFeatures  FeaturesSet
+		exemptFeatures     FeaturesSet
+		ConformanceProfile sets.Set[ConformanceProfileName]
+		expectedFeatures   FeaturesSet
+		expectedIsInferred bool
+	}{
+		{
+			name:               "properly infer supported features",
+			expectedFeatures:   namesToFeatureSet(statusFeatureNames),
+			expectedIsInferred: true,
+		},
+		{
+			name:              "no features",
+			supportedFeatures: sets.New[features.FeatureName]("Gateway"),
+			expectedFeatures:  sets.New[features.FeatureName]("Gateway"),
+		},
+		{
+			name:              "remove exempt features",
+			supportedFeatures: sets.New[features.FeatureName]("Gateway", "HTTPRoute"),
+			exemptFeatures:    sets.New[features.FeatureName]("HTTPRoute"),
+			expectedFeatures:  sets.New[features.FeatureName]("Gateway"),
+		},
+		{
+			name:             "allow all features",
+			allowAllFeatures: true,
+			expectedFeatures: features.SetsToNamesSet(features.AllFeatures),
+		},
+		{
+			name:               "supports conformance profile - core",
+			ConformanceProfile: sets.New(GatewayHTTPConformanceProfileName),
+			expectedFeatures:   namesToFeatureSet([]string{"Gateway", "HTTPRoute", "ReferenceGrant"}),
+		},
+	}
+
+	gwcName := "ochopintre"
+	gwc := &gatewayv1.GatewayClass{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: gwcName,
+		},
+		Spec: gatewayv1.GatewayClassSpec{
+			ControllerName: "example.com/gateway-controller",
+		},
+		Status: gatewayv1.GatewayClassStatus{
+			Conditions: []metav1.Condition{
+				{
+					Type:    string(gatewayv1.GatewayConditionAccepted),
+					Status:  metav1.ConditionTrue,
+					Reason:  "Accepted",
+					Message: "GatewayClass is accepted and ready for use",
+				},
+			},
+			SupportedFeatures: featureNamesToSet(statusFeatureNames),
+		},
+	}
+	scheme := runtime.NewScheme()
+	scheme.AddKnownTypes(gatewayv1.SchemeGroupVersion, &gatewayv1.GatewayClass{})
+	fakeClient := fake.NewClientBuilder().
+		WithScheme(scheme).
+		WithObjects(gwc).
+		WithLists(&apiextensionsv1.CustomResourceDefinitionList{}).
+		Build()
+
+	gatewayv1.Install(fakeClient.Scheme())
+	apiextensionsv1.AddToScheme(fakeClient.Scheme())
+
+	for _, tc := range testCases {
+		options := ConformanceOptions{
+			AllowCRDsMismatch:          true,
+			GatewayClassName:           gwcName,
+			EnableAllSupportedFeatures: tc.allowAllFeatures,
+			SupportedFeatures:          tc.supportedFeatures,
+			ExemptFeatures:             tc.exemptFeatures,
+			ConformanceProfiles:        tc.ConformanceProfile,
+			Client:                     fakeClient,
+		}
+
+		t.Run(tc.name, func(t *testing.T) {
+			cSuite, err := NewConformanceTestSuite(options)
+			if err != nil {
+				t.Fatalf("error initializing conformance suite: %v", err)
+			}
+
+			if cSuite.IsInferredSupportedFeatures() != tc.expectedIsInferred {
+				t.Errorf("InferredSupportedFeatures mismatch: got %v, want %v", cSuite.IsInferredSupportedFeatures(), tc.expectedIsInferred)
+			}
+
+			if equal := cSuite.SupportedFeatures.Equal(tc.expectedFeatures); !equal {
+				t.Errorf("SupportedFeatures mismatch: got %v, want %v", cSuite.SupportedFeatures.UnsortedList(), tc.expectedFeatures.UnsortedList())
+			}
+		})
+	}
+}
+
+func featureNamesToSet(set []string) []gatewayv1.SupportedFeature {
+	var features []gatewayv1.SupportedFeature
+	for _, feature := range set {
+		features = append(features, gatewayv1.SupportedFeature{Name: gatewayv1.FeatureName(feature)})
+	}
+	return features
+}
+
+func namesToFeatureSet(names []string) FeaturesSet {
+	featureSet := FeaturesSet{}
+	for _, name := range names {
+		featureSet.Insert(features.FeatureName(name))
+	}
+	return featureSet
 }
