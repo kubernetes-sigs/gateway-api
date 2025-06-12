@@ -100,6 +100,56 @@ type LocalPolicyTargetReferenceWithSectionName struct {
 	SectionName *SectionName `json:"sectionName,omitempty"`
 }
 
+// PolicyTargetReferenceWithSectionName identifies an API object to apply a
+// direct policy to. This should be used as part of Policy resources that can
+// target single resources. For more information on how this policy attachment
+// mode works, and a sample Policy resource, refer to the policy attachment
+// documentation for Gateway API.
+//
+// If the specified object namespace is in a different namespace from the policy itself,
+// this has a higher precedence for usage within that namespace. That is:
+// * For Gateways, the Gateway namespace will be consulted first, then the Target namespace.
+// * For mesh, the consumer namespace will be consulted first, then the Target namespace.
+// The namespace of the ListenerSet, Route, or other intermediate types are not considered.
+// This means that, for a given target, a gateway instance will have exactly 1 policy per target.
+//
+// Note: This should only be used for direct policy attachment when references
+// to SectionName and cross-namespace references are actually needed. In all other cases,
+// LocalPolicyTargetReference should be used.
+type PolicyTargetReferenceWithSectionName struct {
+	LocalPolicyTargetReference `json:",inline"`
+
+	// SectionName is the name of a section within the target resource. When
+	// unspecified, this targetRef targets the entire resource. In the following
+	// resources, SectionName is interpreted as the following:
+	//
+	// * Gateway: Listener name
+	// * HTTPRoute: HTTPRouteRule name
+	// * Service: Port name
+	//
+	// If a SectionName is specified, but does not exist on the targeted object,
+	// the Policy must fail to attach, and the policy implementation should record
+	// a `ResolvedRefs` or similar Condition in the Policy's status.
+	//
+	// +optional
+	SectionName *SectionName `json:"sectionName,omitempty"`
+
+	// Namespace is the name of a section within the target resource. When
+	// unspecified, this targetRef targets the entire resource. In the following
+	// resources, SectionName is interpreted as the following:
+	//
+	// * Gateway: Listener name
+	// * HTTPRoute: HTTPRouteRule name
+	// * Service: Port name
+	//
+	// If a SectionName is specified, but does not exist on the targeted object,
+	// the Policy must fail to attach, and the policy implementation should record
+	// a `ResolvedRefs` or similar Condition in the Policy's status.
+	//
+	// +optional
+	Namespace *Namespace `json:"namespace,omitempty"`
+}
+
 // PolicyConditionType is a type of condition for a policy. This type should be
 // used with a Policy resource Status.Conditions field.
 type PolicyConditionType string
