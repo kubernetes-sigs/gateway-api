@@ -162,6 +162,18 @@ This mirrors the [producer and consumer route](/concepts/glossary#consumer-route
 
 This will be implemented by a new API type, `PolicyTargetReferenceWithSectionName`, as there is no existing policy that utilizes a cross-namespace reference.
 
+Namespace level granularity may not be sufficient enough.
+If additional constraints are needed, it is recommended that an additional `from` is added to the `targetRef` that declares the context for which the policy applies to. For example:
+```yaml
+targetRef:
+  name: svc
+  namespace: app
+  from:
+    kind: HTTPRoute
+    name: my-route
+```
+However, this will be deferred to further enhancements and details of the behavior of `from`, or inclusion of it, will be left ot future GEPs.
+
 Failures during the TLS handshake may be handled with implementation-specific error codes, such as 500 or 503, or
 other signal that makes the failure sufficiently clear to the requester without revealing too much about the transaction,
 based on established security requirements.
