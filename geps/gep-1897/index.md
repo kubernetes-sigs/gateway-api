@@ -35,10 +35,10 @@ A major non-goal for this proposal is for configuration of the service mesh tran
 It is very common for service mesh implementations to implement some form of transparent transport security, whether that is WireGuard, mTLS, or others.
 This is completely orthogonal to the use cases being tackled by this GEP.
 
-* The "mesh transport security" is something invisible to the users application, and is simply used to secure communication between components in the mesh.
-* This proposal, instead, explicitly calls for sending TLS **to the users application**.
+* The "mesh transport security" is something invisible to the user's application, and is simply used to secure communication between components in the mesh.
+* This proposal, instead, explicitly calls for sending TLS **to the user's application**.
 
-Whether the service mesh implementation uses mTLS for it's implementation is not relevant to this proposal.
+Whether the service mesh implementation uses mTLS or not, the mesh transport security is not relevant to this proposal.
 A service mesh using mTLS can *additionally* originate TLS that is terminated by the users application (that is, two layers of TLS!).
 
 ![](images/mesh.png "Mesh transport")
@@ -100,7 +100,7 @@ The Gateway API cannot control the server behavior;
 This is a choice the application developer makes in their code, whether or not (and how) they serve TLS.
 The application developer may not even be aware of the Gateway API at all.
 
-Therefor, the goal of this API is to tell the client *whether or not* and *how* to originate TLS to the backend.
+Therefore, the goal of this API is to tell the client *whether or not* and *how* to originate TLS to the backend.
 
 However, in many common cases these roles are actually inverted.
 While it is ultimately the client that must decide how to connect, commonly they are unaware of the details of the destination.
@@ -181,12 +181,10 @@ Failures during the TLS handshake may be handled with implementation-specific er
 other signal that makes the failure sufficiently clear to the requester without revealing too much about the transaction,
 based on established security requirements.
 
-BackendTLSPolicySpec contains the `Mode`, `TargetRefs` and `Validation` fields.
+BackendTLSPolicySpec contains the `TargetRefs` and `Validation` fields.
 
 * The `Validation` field is a `BackendTLSPolicyValidation` and contains `CACertificateRefs`, `WellKnownCACertificates`, and `Hostname`.
 * The `TargetRefs` is optional. It must be set when providing defaults for a Service, and must not be set when providing route level overrides.
-* The `Mode` field allows configuring the TLS mode. To start with, this will include `None` and `TLS`, though future versions will likely include a `MutualTLS` option. The `None` mode is useful when overriding on the route level; it is rejected if `TargetRefs` is ste.
-
 
 The `CACertificateRefs` and `WellKnownCACertificates` fields are both optional, but one of them must be set for a valid TLS
 configuration. CACertificateRefs is an implementation-specific slice of
