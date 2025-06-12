@@ -23,9 +23,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/sets"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
@@ -458,9 +458,9 @@ func TestInferSupportedFeatures(t *testing.T) {
 			expectedFeatures: features.SetsToNamesSet(features.AllFeatures),
 		},
 		{
-			name: "supports conformance profile - core",
+			name:               "supports conformance profile - core",
 			ConformanceProfile: sets.New(GatewayHTTPConformanceProfileName),
-			expectedFeatures: namesToFeatureSet([]string{"Gateway", "HTTPRoute", "ReferenceGrant"}),
+			expectedFeatures:   namesToFeatureSet([]string{"Gateway", "HTTPRoute", "ReferenceGrant"}),
 		},
 	}
 
@@ -518,7 +518,6 @@ func TestInferSupportedFeatures(t *testing.T) {
 
 			if equal := cSuite.SupportedFeatures.Equal(tc.expectedFeatures); !equal {
 				t.Errorf("SupportedFeatures mismatch: got %v, want %v", cSuite.SupportedFeatures.UnsortedList(), tc.expectedFeatures.UnsortedList())
-
 			}
 		})
 	}
@@ -539,4 +538,3 @@ func namesToFeatureSet(names []string) FeaturesSet {
 	}
 	return featureSet
 }
-
