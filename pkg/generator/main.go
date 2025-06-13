@@ -69,6 +69,8 @@ func main() {
 		log.Fatalf("failed to register markers: %s", err)
 	}
 
+	registerMarkerOverrides(parser.Collector.Registry)
+
 	crd.AddKnownTypes(parser)
 	for _, r := range roots {
 		parser.NeedPackage(r)
