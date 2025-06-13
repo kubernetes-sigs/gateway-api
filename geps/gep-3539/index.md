@@ -238,3 +238,16 @@ implementations.
 ## References
 
 * [Original Doc](https://docs.google.com/document/d/1N-C-dBHfyfwkKufknwKTDLAw4AP2BnJlnmx0dB-cC4U/edit)
+
+## Open Questions and Followups
+
+1. How do we take this forward?
+
+    - "Gateway as new-and-improved Service" -- A parallel, orthogonally-extensible API for cleaner and more advanced Service funtionality.
+
+    - "Gateway as backend for Service" -- An underlying implementation for Service functionality allowing the simpler UX provided by Service API to be unchanged for end users while allowing advanced users to deal with Gateway API resources directly.
+
+2. Decouple DNS from this topic -- Headless, externalName, and other DNS functionality may be discussed in context of having a separate API/Object that represents DNS concepts
+3. Should there be GatewayClasses with official, reserved names (e.g. clusterip) such that all agents, CNIs, providers will know to have standard implementation for it?
+4. Standardization of an EndpointSelector type of resource
+5. Discuss topology aware routing feature as a generic feature. Features like internal/externalTrafficPolicy can then be appropriately morphed and provided as a part of topology aware routing
