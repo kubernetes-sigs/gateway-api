@@ -100,6 +100,30 @@ var HTTPRouteRedirectPath = suite.ConformanceTest{
 				Namespace: ns,
 			}, {
 				Request: http.Request{
+					Path:             "/path-and-temporary",
+					UnfollowRedirect: true,
+				},
+				Response: http.Response{
+					StatusCode: 307,
+				},
+				RedirectRequest: &roundtripper.RedirectRequest{
+					Path: "/replacement-prefix",
+				},
+				Namespace: ns,
+			}, {
+				Request: http.Request{
+					Path:             "/path-and-permanent",
+					UnfollowRedirect: true,
+				},
+				Response: http.Response{
+					StatusCode: 308,
+				},
+				RedirectRequest: &roundtripper.RedirectRequest{
+					Path: "/replacement-prefix",
+				},
+				Namespace: ns,
+			}, {
+				Request: http.Request{
 					Path:             "/full-path-and-host",
 					UnfollowRedirect: true,
 				},
@@ -118,6 +142,30 @@ var HTTPRouteRedirectPath = suite.ConformanceTest{
 				},
 				Response: http.Response{
 					StatusCode: 301,
+				},
+				RedirectRequest: &roundtripper.RedirectRequest{
+					Path: "/replacement-full",
+				},
+				Namespace: ns,
+			}, {
+				Request: http.Request{
+					Path:             "/full-path-and-temporary",
+					UnfollowRedirect: true,
+				},
+				Response: http.Response{
+					StatusCode: 307,
+				},
+				RedirectRequest: &roundtripper.RedirectRequest{
+					Path: "/replacement-full",
+				},
+				Namespace: ns,
+			}, {
+				Request: http.Request{
+					Path:             "/full-path-and-permanent",
+					UnfollowRedirect: true,
+				},
+				Response: http.Response{
+					StatusCode: 308,
 				},
 				RedirectRequest: &roundtripper.RedirectRequest{
 					Path: "/replacement-full",

@@ -1,7 +1,7 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-  name: mesh-redirect-host-and-status
+  name: mesh-additional-redirect-host-and-status
   namespace: gateway-conformance-mesh
 spec:
   parentRefs:
@@ -13,24 +13,7 @@ spec:
   - matches:
     - path:
         type: PathPrefix
-        value: /hostname-redirect
-    filters:
-    - type: RequestRedirect
-      requestRedirect:
-        hostname: example.org
-  - matches:
-    - path:
-        type: PathPrefix
-        value: /host-and-status
-    filters:
-    - type: RequestRedirect
-      requestRedirect:
-        statusCode: 301
-        hostname: example.org
-  - matches:
-    - path:
-        type: PathPrefix
-        value: /host-and-temporary
+        value: /host-and-status-temporary
     filters:
     - type: RequestRedirect
       requestRedirect:
@@ -39,7 +22,7 @@ spec:
   - matches:
     - path:
         type: PathPrefix
-        value: /host-and-permanent
+        value: /host-and-status-permanent
     filters:
     - type: RequestRedirect
       requestRedirect:

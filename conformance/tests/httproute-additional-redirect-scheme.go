@@ -29,17 +29,18 @@ import (
 )
 
 func init() {
-	ConformanceTests = append(ConformanceTests, HTTPRouteRedirectScheme)
+	ConformanceTests = append(ConformanceTests, HTTPRouteAdditionalRedirectScheme)
 }
 
-var HTTPRouteRedirectScheme = suite.ConformanceTest{
-	ShortName:   "HTTPRouteRedirectScheme",
-	Description: "An HTTPRoute with a scheme redirect filter",
-	Manifests:   []string{"tests/httproute-redirect-scheme.yaml"},
+var HTTPRouteAdditionalRedirectScheme = suite.ConformanceTest{
+	ShortName:   "HTTPRouteAdditionalRedirectScheme",
+	Description: "An HTTPRoute with a additional scheme redirect filter",
+	Manifests:   []string{"tests/httproute-additional-redirect-scheme.yaml"},
 	Features: []features.FeatureName{
 		features.SupportGateway,
 		features.SupportHTTPRoute,
 		features.SupportHTTPRouteSchemeRedirect,
+		features.SupportHTTPRouteAdditionalRedirectStatusCodes,
 	},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
@@ -51,56 +52,6 @@ var HTTPRouteRedirectScheme = suite.ConformanceTest{
 		testCases := []http.ExpectedResponse{
 			{
 				Request: http.Request{
-					Path:             "/scheme",
-					UnfollowRedirect: true,
-				},
-				Response: http.Response{
-					StatusCode: 302,
-				},
-				RedirectRequest: &roundtripper.RedirectRequest{
-					Scheme: "https",
-				},
-				Namespace: ns,
-			}, {
-				Request: http.Request{
-					Path:             "/scheme-and-host",
-					UnfollowRedirect: true,
-				},
-				Response: http.Response{
-					StatusCode: 302,
-				},
-				RedirectRequest: &roundtripper.RedirectRequest{
-					Host:   "example.org",
-					Scheme: "https",
-				},
-				Namespace: ns,
-			}, {
-				Request: http.Request{
-					Path:             "/scheme-and-status",
-					UnfollowRedirect: true,
-				},
-				Response: http.Response{
-					StatusCode: 301,
-				},
-				RedirectRequest: &roundtripper.RedirectRequest{
-					Scheme: "https",
-				},
-				Namespace: ns,
-			}, {
-				Request: http.Request{
-					Path:             "/scheme-and-host-and-status",
-					UnfollowRedirect: true,
-				},
-				Response: http.Response{
-					StatusCode: 302,
-				},
-				RedirectRequest: &roundtripper.RedirectRequest{
-					Scheme: "https",
-					Host:   "example.org",
-				},
-				Namespace: ns,
-			}, {
-				Request: http.Request{
 					Path:             "/scheme-and-temporary",
 					UnfollowRedirect: true,
 				},
@@ -109,7 +60,6 @@ var HTTPRouteRedirectScheme = suite.ConformanceTest{
 				},
 				RedirectRequest: &roundtripper.RedirectRequest{
 					Scheme: "https",
-					Host:   "example.org",
 				},
 				Namespace: ns,
 			}, {
@@ -120,6 +70,10 @@ var HTTPRouteRedirectScheme = suite.ConformanceTest{
 				Response: http.Response{
 					StatusCode: 308,
 				},
+				RedirectRequest: &roundtripper.RedirectRequest{
+					Scheme: "https",
+				},
+				Namespace: ns,
 			},
 		}
 		for i := range testCases {

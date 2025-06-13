@@ -27,18 +27,18 @@ import (
 )
 
 func init() {
-	MeshConformanceTests = append(MeshConformanceTests, MeshHTTPRouteSchemeRedirect)
+	MeshConformanceTests = append(MeshConformanceTests, MeshHTTPRouteAdditionalRedirectHostAndStatus)
 }
 
-var MeshHTTPRouteSchemeRedirect = suite.ConformanceTest{
-	ShortName:   "MeshHTTPRouteSchemeRedirect",
-	Description: "An HTTPRoute with a scheme redirect filter",
-	Manifests:   []string{"tests/mesh/httproute-redirect-scheme.yaml"},
+var MeshHTTPRouteAdditionalRedirectHostAndStatus = suite.ConformanceTest{
+	ShortName:   "MeshHTTPRouteRedirectHostAndStatus",
+	Description: "An HTTPRoute with hostname and statusCode redirect filters",
 	Features: []features.FeatureName{
 		features.SupportMesh,
 		features.SupportHTTPRoute,
-		features.SupportMeshHTTPRouteSchemeRedirect,
+		features.SupportHTTPRouteAdditionalRedirectStatusCodes,
 	},
+	Manifests: []string{"tests/mesh/httproute-additional-redirect-host-and-status.yaml"},
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-mesh"
 		client := echo.ConnectToApp(t, s, echo.MeshAppEchoV1)
@@ -47,88 +47,28 @@ var MeshHTTPRouteSchemeRedirect = suite.ConformanceTest{
 			{
 				Request: http.Request{
 					Host:             "echo",
-					Path:             "/scheme",
-					UnfollowRedirect: true,
-				},
-				Response: http.Response{
-					StatusCode: 302,
-				},
-				RedirectRequest: &roundtripper.RedirectRequest{
-					Scheme: "https",
-				},
-				Namespace: ns,
-			},
-			{
-				Request: http.Request{
-					Host:             "echo",
-					Path:             "/scheme-and-host",
-					UnfollowRedirect: true,
-				},
-				Response: http.Response{
-					StatusCode: 302,
-				},
-				RedirectRequest: &roundtripper.RedirectRequest{
-					Host:   "example.org",
-					Scheme: "https",
-				},
-				Namespace: ns,
-			},
-			{
-				Request: http.Request{
-					Host:             "echo",
-					Path:             "/scheme-and-status",
-					UnfollowRedirect: true,
-				},
-				Response: http.Response{
-					StatusCode: 301,
-				},
-				RedirectRequest: &roundtripper.RedirectRequest{
-					Scheme: "https",
-				},
-				Namespace: ns,
-			},
-			{
-				Request: http.Request{
-					Host:             "echo",
-					Path:             "/scheme-and-host-and-status",
-					UnfollowRedirect: true,
-				},
-				Response: http.Response{
-					StatusCode: 302,
-				},
-				RedirectRequest: &roundtripper.RedirectRequest{
-					Scheme: "https",
-					Host:   "example.org",
-				},
-				Namespace: ns,
-			},
-			{
-				Request: http.Request{
-					Host:             "echo",
-					Path:             "/scheme-and-temporary",
+					Path:             "/host-and-status-temporary",
 					UnfollowRedirect: true,
 				},
 				Response: http.Response{
 					StatusCode: 307,
 				},
 				RedirectRequest: &roundtripper.RedirectRequest{
-					Scheme: "https",
-					Host:   "example.org",
+					Host: "example.org",
 				},
 				Namespace: ns,
 			},
 			{
 				Request: http.Request{
 					Host:             "echo",
-					Path:             "/scheme-and-permanent",
+					Path:             "/host-and-status-permanent",
 					UnfollowRedirect: true,
 				},
 				Response: http.Response{
 					StatusCode: 308,
 				},
 				RedirectRequest: &roundtripper.RedirectRequest{
-					Scheme: "https",
-					Host:   "example.org",
+					Host: "example.org",
 				},
 				Namespace: ns,
 			},

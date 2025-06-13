@@ -43,3 +43,23 @@ spec:
         port: 8083
         hostname: example.org
         statusCode: 302
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /port-and-temporary
+    filters:
+    - type: RequestRedirect
+      requestRedirect:
+        port: 8083
+        hostname: example.org
+        statusCode: 307
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /port-and-permanent
+    filters:
+    - type: RequestRedirect
+      requestRedirect:
+        port: 8083
+        hostname: example.org
+        statusCode: 308
