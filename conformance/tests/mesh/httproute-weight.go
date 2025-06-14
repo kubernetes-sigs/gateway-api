@@ -54,7 +54,7 @@ var MeshHTTPRouteWeight = suite.ConformanceTest{
 		t.Run("Requests should have a distribution that matches the weight", func(t *testing.T) {
 			host := "echo"
 			expected := http.ExpectedResponse{
-				Request:   http.Request{Path: "/", Host: host, Headers: make(map[string]string)},
+				Request:   http.Request{Path: "/", Host: host},
 				Response:  http.Response{StatusCode: 200},
 				Namespace: "gateway-conformance-mesh",
 			}
@@ -148,9 +148,12 @@ func testDistribution(t *testing.T, client echo.MeshPod, expected http.ExpectedR
 
 // addEntropy adds jitter to the request by adding either a delay up to 1 second, or a random header value, or both.
 func addEntropy(exp *http.ExpectedResponse) {
-	delay := func() { time.Sleep(time.Duration(rand.Intn(1000)) * time.Millisecond) }               //nolint:gosec // This is test code to get random value.
-	randomHeader := func() { exp.Request.Headers["X-Jitter"] = fmt.Sprintf("%d", rand.Intn(9999)) } //nolint:gosec // This is test code to get random value.
-	switch rand.Intn(3) {                                                                           //nolint:gosec // This is test code to get random value
+	delay := func() { time.Sleep(time.Duration(rand.Intn(1000)) * time.Millisecond) } //nolint:gosec // This is test code to get random value.
+	randomHeader := func() {
+		exp.Request.Headers = make(map[string]string)
+		exp.Request.Headers["X-Jitter"] = fmt.Sprintf("%d", rand.Intn(9999)) //nolint:gosec // This is test code to get random value.
+	}
+	switch rand.Intn(3) { //nolint:gosec // This is test code to get random value
 	case 0:
 		delay()
 	case 1:
