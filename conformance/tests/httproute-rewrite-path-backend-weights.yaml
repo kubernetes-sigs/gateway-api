@@ -1,0 +1,51 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: rewrite-weights-backend
+  namespace: gateway-conformance-infra
+spec:
+  parentRefs:
+  - name: same-namespace
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /prefix
+    backendRefs:
+    - name: infra-backend-v1
+      port: 8080
+      weight: 50 
+      filters:
+      - type: URLRewrite
+        urlRewrite:
+          path:
+            type: ReplacePrefixMatch
+            replacePrefixMatch: /infra-backed-v1
+    - name: infra-backend-v2
+      port: 8080
+      weight: 50
+      filters:
+      - type: URLRewrite
+        urlRewrite:
+          path:
+            type: ReplacePrefixMatch
+            replacePrefixMatch: /infra-backed-v2
+  - backendRefs:
+    - name: infra-backend-v1
+      port: 8080
+      weight: 50 
+      filters:
+      - type: URLRewrite
+        urlRewrite:
+          path:
+            type: ReplaceFullPath
+            replaceFullPath: /infra-backed-v1
+    - name: infra-backend-v2
+      port: 8080
+      weight: 50
+      filters:
+      - type: URLRewrite
+        urlRewrite:
+          path:
+            type: ReplaceFullPath
+            replaceFullPath:  /infra-backed-v2

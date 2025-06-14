@@ -20,10 +20,7 @@ import (
 	"strings"
 	"testing"
 
-	"k8s.io/apimachinery/pkg/types"
-
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
-	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
 	"sigs.k8s.io/gateway-api/pkg/features"
 )
@@ -34,26 +31,22 @@ func init() {
 	)
 }
 
-var HTTPRouteRequestHeaderModifierBackendWeights = suite.ConformanceTest{
-	ShortName:   "HTTPRouteRequestHeaderModifierBackendWeights",
-	Description: "An HTTPRoute with backend request header modifier filter sends traffic to the correct backends",
+var HTTPRouteRewritePathBackendWeights = suite.ConformanceTest{
+	ShortName:   "HTTPRouteRewritePathBackendWeights",
+	Description: "An HTTPRoute with backend URL filter filter sends traffic to the correct backends.",
 	Features: []features.FeatureName{
 		features.SupportGateway,
-		features.SupportHTTPRouteBackendRequestHeaderModification,
 		features.SupportHTTPRoute,
 	},
-	Manifests: []string{"tests/httproute-request-header-modifier-backend-weights.yaml"},
+	Manifests: []string{"tests/httproute-rewrite-path-backend-weights.yaml"},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
-		routeNN := types.NamespacedName{Name: "request-header-modifier-backend-weights", Namespace: ns}
-		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: ns}
-		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
-		kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN)
+		gwAddr := defaultConformanceTestBoilerplate(t, suite, ns, "httproute-rewrite-path-backend-weights", "same-namespace")
 
 		roundTripper := suite.RoundTripper
 
 		expected := http.ExpectedResponse{
-			Request:   http.Request{Path: "/"},
+			Request:   http.Request{Path: "/prefix/test"},
 			Response:  http.Response{StatusCode: 200},
 			Namespace: "gateway-conformance-infra",
 		}
@@ -69,17 +62,45 @@ var HTTPRouteRequestHeaderModifierBackendWeights = suite.ConformanceTest{
 				t.Fatalf("failed to roundtrip request: %v", err)
 			}
 
-			expectedBackends := cReq.Headers["Backend"]
-
-			if len(expectedBackends) != 1 {
-				t.Fatalf("expected a single 'Backend' header to have been set, got %d", len(expectedBackends))
+			if !strings.HasSuffix(cReq.Path, "/test") {
+				t.Fatalf("expected to have sufix \"/test\": %v", cReq.Path)
 			}
 
-			if !strings.HasPrefix(cReq.Pod, expectedBackends[0]) {
+			if !strings.Contains(cReq.Path, cReq.Pod) {
 				t.Fatalf(
-					"expected the backendRef to have set the correct headers and sent the request to the correct pod, got %q, want %q",
+					"expected the backendRef to be subset of path and sent the request to the correct pod, path %q, backendRef %q",
+					cReq.Path,
 					cReq.Pod,
-					expectedBackends[0],
+				)
+			}
+		}
+
+		expected = http.ExpectedResponse{
+			Request:   http.Request{Path: "/"},
+			Response:  http.Response{StatusCode: 200},
+			Namespace: "gateway-conformance-infra",
+		}
+
+		req = http.MakeRequest(t, &expected, gwAddr, "HTTP", "http")
+
+		// Assert request succeeds before checking traffic
+		http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, expected)
+
+		for range 100 {
+			cReq, _, err := roundTripper.CaptureRoundTrip(req)
+			if err != nil {
+				t.Fatalf("failed to roundtrip request: %v", err)
+			}
+
+			if !strings.HasPrefix(cReq.Path, "/infra-backend") {
+				t.Fatalf("expected to have prefix \"/infra-backend\": %v", cReq.Path)
+			}
+
+			if !strings.Contains(cReq.Path, cReq.Pod) {
+				t.Fatalf(
+					"expected the backendRef to be subset of path and sent the request to the correct pod, path %q, backendRef %q",
+					cReq.Path,
+					cReq.Pod,
 				)
 			}
 		}
