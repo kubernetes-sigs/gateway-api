@@ -18,10 +18,11 @@ package meshtests
 
 import (
 	"cmp"
+	"crypto/rand"
 	"errors"
 	"fmt"
 	"math"
-	"math/rand"
+	"math/big"
 	"slices"
 	"strings"
 	"sync"
@@ -92,7 +93,9 @@ func testDistribution(t *testing.T, client echo.MeshPod, expected http.ExpectedR
 	for i := 0.0; i < totalRequests; i++ {
 		g.Go(func() error {
 			uniqueExpected := expected
-			addEntropy(&uniqueExpected)
+			if err := addEntropy(&uniqueExpected); err != nil {
+				return fmt.Errorf("error adding entropy: %w", err)
+			}
 			_, cRes, err := client.CaptureRequestResponseAndCompare(t, uniqueExpected)
 			if err != nil {
 				return fmt.Errorf("failed: %w", err)
@@ -147,19 +150,49 @@ func testDistribution(t *testing.T, client echo.MeshPod, expected http.ExpectedR
 }
 
 // addEntropy adds jitter to the request by adding either a delay up to 1 second, or a random header value, or both.
-func addEntropy(exp *http.ExpectedResponse) {
-	delay := func() { time.Sleep(time.Duration(rand.Intn(1000)) * time.Millisecond) } //nolint:gosec // This is test code to get random value.
-	randomHeader := func() {
+func addEntropy(exp *http.ExpectedResponse) error {
+	randomNumber := func(limit int64) (*int64, error) {
+		number, err := rand.Int(rand.Reader, big.NewInt(limit))
+		if err != nil {
+			return nil, err
+		}
+		n := number.Int64()
+		return &n, nil
+	}
+
+	// adds a delay
+	delay := func(limit int64) error {
+		randomSleepDuration, err := randomNumber(limit)
+		if err != nil {
+			return err
+		}
+		time.Sleep(time.Duration(*randomSleepDuration) * time.Millisecond)
+		return nil
+	}
+	// adds random header value
+	randomHeader := func(limit int64) error {
+		randomHeaderValue, err := randomNumber(limit)
+		if err != nil {
+			return err
+		}
 		exp.Request.Headers = make(map[string]string)
-		exp.Request.Headers["X-Jitter"] = fmt.Sprintf("%d", rand.Intn(9999)) //nolint:gosec // This is test code to get random value.
+		exp.Request.Headers["X-Jitter"] = fmt.Sprintf("%d", *randomHeaderValue)
+		return nil
 	}
-	switch rand.Intn(3) { //nolint:gosec // This is test code to get random value
-	case 0:
-		delay()
+
+	random, err := randomNumber(3)
+	if err != nil {
+		return err
+	}
+
+	switch *random {
+	case int64(0):
+		delay(1000)
 	case 1:
-		randomHeader()
+		randomHeader(10000)
 	case 2:
-		delay()
-		randomHeader()
+		delay(1000)
+		randomHeader(10000)
 	}
+	return nil
 }
