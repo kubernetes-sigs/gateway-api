@@ -186,13 +186,16 @@ func addEntropy(exp *http.ExpectedResponse) error {
 	}
 
 	switch *random {
-	case int64(0):
-		delay(1000)
+	case 0:
+		return delay(1000)
 	case 1:
-		randomHeader(10000)
+		return randomHeader(10000)
 	case 2:
-		delay(1000)
-		randomHeader(10000)
+		if err := delay(1000); err != nil {
+			return err
+		}
+		return randomHeader(10000)
+	default:
+		return nil
 	}
-	return nil
 }
