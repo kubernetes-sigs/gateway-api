@@ -18,13 +18,16 @@ package meshtests
 
 import (
 	"cmp"
+	"crypto/rand"
 	"errors"
 	"fmt"
 	"math"
+	"math/big"
 	"slices"
 	"strings"
 	"sync"
 	"testing"
+	"time"
 
 	"golang.org/x/sync/errgroup"
 
@@ -89,7 +92,11 @@ func testDistribution(t *testing.T, client echo.MeshPod, expected http.ExpectedR
 	g.SetLimit(concurrentRequests)
 	for i := 0.0; i < totalRequests; i++ {
 		g.Go(func() error {
-			_, cRes, err := client.CaptureRequestResponseAndCompare(t, expected)
+			uniqueExpected := expected
+			if err := addEntropy(&uniqueExpected); err != nil {
+				return fmt.Errorf("error adding entropy: %w", err)
+			}
+			_, cRes, err := client.CaptureRequestResponseAndCompare(t, uniqueExpected)
 			if err != nil {
 				return fmt.Errorf("failed: %w", err)
 			}
@@ -140,4 +147,55 @@ func testDistribution(t *testing.T, client echo.MeshPod, expected http.ExpectedR
 		return cmp.Compare(a.Error(), b.Error())
 	})
 	return errors.Join(errs...)
+}
+
+// addEntropy adds jitter to the request by adding either a delay up to 1 second, or a random header value, or both.
+func addEntropy(exp *http.ExpectedResponse) error {
+	randomNumber := func(limit int64) (*int64, error) {
+		number, err := rand.Int(rand.Reader, big.NewInt(limit))
+		if err != nil {
+			return nil, err
+		}
+		n := number.Int64()
+		return &n, nil
+	}
+
+	// adds a delay
+	delay := func(limit int64) error {
+		randomSleepDuration, err := randomNumber(limit)
+		if err != nil {
+			return err
+		}
+		time.Sleep(time.Duration(*randomSleepDuration) * time.Millisecond)
+		return nil
+	}
+	// adds random header value
+	randomHeader := func(limit int64) error {
+		randomHeaderValue, err := randomNumber(limit)
+		if err != nil {
+			return err
+		}
+		exp.Request.Headers = make(map[string]string)
+		exp.Request.Headers["X-Jitter"] = fmt.Sprintf("%d", *randomHeaderValue)
+		return nil
+	}
+
+	random, err := randomNumber(3)
+	if err != nil {
+		return err
+	}
+
+	switch *random {
+	case 0:
+		return delay(1000)
+	case 1:
+		return randomHeader(10000)
+	case 2:
+		if err := delay(1000); err != nil {
+			return err
+		}
+		return randomHeader(10000)
+	default:
+		return fmt.Errorf("invalid random value: %d", *random)
+	}
 }
