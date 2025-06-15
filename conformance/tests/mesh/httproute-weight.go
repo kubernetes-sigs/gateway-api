@@ -196,6 +196,6 @@ func addEntropy(exp *http.ExpectedResponse) error {
 		}
 		return randomHeader(10000)
 	default:
-		return nil
+		return fmt.Errorf("invalid random value: %d", *random)
 	}
 }
