@@ -5,8 +5,100 @@ and provides status and resource references for them.
 
 Implementors and integrators of Gateway API are encouraged to update this
 document with status information about their implementations, the versions they
-cover, and documentation to help users get started.
+cover, and documentation to help users get started. This status information should
+be no longer than a few paragraphs. 
 
+There are three main classes of implementation:
+
+* **Conformant** implementations - these implementations have submitted at least
+  one conformance report passing all claimed features for one of the two (2) most
+  recent Gateway API releases.
+* **Partially Conformant** implementations - these implementations have submitted
+  at least one conformance report passing some tests for one of the three (3)
+  most recent Gateway API releases. Note that the requirements to be considered
+  "partially conformant" may be tightened in a future release of Gateway API.
+* **Stale** implementations - these implementations may not be being actively
+  developed and will be removed from this page on the next page review unless
+  they submit a conformance report moving them to one of the other categories.
+  Page reviews are performed at least one month after every Gateway API release,
+  with the first being performed after the release of Gateway API v1.4, due in
+  October 2025. This category will also be removed in the Gateway API v1.5
+  review process, due in mid-2026.
+
+Implementations also generally fall into two categories:
+
+* **Gateway** controllers reconcile the Gateway resource and are intended to
+handle north-south traffic, mainly concerned with coming from outside the
+cluster to inside.
+* **Mesh** controllers reconcile Service resources with HTTPRoutes attached
+and are intended to handle east-west traffic, within the same cluster or
+set of clusters.
+
+Also listed on this page are **integrations**, which are other software
+projects that are able to make use of Gateway API resources to perform
+other functions (like managing DNS or creating certificates).
+
+!!! note
+    This page contains links to third party projects that provide functionality
+    required for Gateway API to work. The Gateway API project authors aren't
+    responsible for these projects, which are listed alphabetically within their
+    class.
+
+## Adding new entries
+
+Implementations are free to make a PR to add their entry to this page; however,
+in order to meet the requirements for being Partially Conformant or Conformant,
+the implementation must have had a conformance report submission PR merged.
+
+Part of the review process for new additions to this page is that a maintainer
+will check the conformance level and verify the state.
+
+## Page Review Policy
+
+This page is intended to showcase actively developed and conformant implementations
+of Gateway API, and so is subject to regular reviews.
+
+These reviews are performed at least one month after every Gateway API release
+(starting with the Gateway API v1.3 release).
+
+As part of the review, a maintainer will check:
+
+* which implementations are **Conformant** - that is, they have submitted at
+  least one passing conformance report for one of the last two (2) versions of
+  Gateway API (where "passing conformance report" means a conformance report
+  that passes all claimed features for each supported Gateway API conformanc profile).
+* which implementations are **Partially Conformant**, that is, they have
+  submitted at least one conformance report that passes at least some conformance
+  tests, for a Gateway API version that is one of the last three (3) released
+  versions of Gateway API.
+
+If the maintainer performing the review finds that there are implementations
+that no longer satisfy the criteria for  Partially Conformant or Conformant, or
+finds implementations that are in the "Stale" state, then that maintainer will:
+
+* Inform the other maintainers and get their agreement on the list of stale and
+to-be-removed implementations
+* Post on the #sig-network-gateway-api channel informing implementations that
+as far as they can see, they are no longer conformant or partially conformant, and should
+request contact the maintainers to discuss the implementations status within a lazy
+consensus period. This lazy consensus period is called the "**right-of-reply**"
+period.
+* Any implementations that do not respond within the lazy consensus will be
+downgraded in status, either by being moved to "Stale", or being removed
+from this page if they are already "Stale".
+
+Page review timeline, starting with the v1.3 Page Review:
+
+* Gateway API v1.3 release Page Review: a maintainer will move anyone who hasn't
+  submitted a conformance report using the rules above to "Stale". They will also
+  contact anyone who moves to Stale to inform them about this rule change.
+* Gateway API v1.4 release Page Review (at least one month after the actual
+  release): A maintainer will perform the Page Review process again, removing
+  any implementations that are are still Stale (after a right-of-reply period).
+* Gateway API v1.5 release Page Review (at least one month after the actual
+  release: The Stale category will be removed, and implementation maintainers
+  will need to submit at least partial conformance reports during the
+  right-of-reply period, or be removed.
 
 !!! info "Compare extended supported features across implementations"
 
