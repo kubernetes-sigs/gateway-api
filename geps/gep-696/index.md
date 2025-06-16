@@ -47,6 +47,8 @@ Every feature should:
 3. Not exceed 128 characters.
 4. Contain only letters and numbers
 
+GEPs cannot move to Experimental without a Feature Name.
+
 ### Conformance tests 
 
 Conformance tests file names should try to follow the `pascal-case-name.go` format.
