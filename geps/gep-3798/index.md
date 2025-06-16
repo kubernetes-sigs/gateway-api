@@ -10,6 +10,8 @@
 ### What
  This GEP proposes the addition of Client IP-based session persistence to the Gateway API. This feature will allow Gateway API implementations to ensure that requests originating from a specific client IP address (or a subnet defined by an IP mask) are consistently routed to the same backend endpoint for a configurable duration. This aims to provide a standardized and centralized mechanism for client IP persistence across various Gateway API implementations.
 
+ As mentioned in the [GEP-1619](https://gateway-api.sigs.k8s.io/geps/gep-1619/#api), `SessionPersistence` can be applied via `BackendLBPolicy` and `RouteRule` API. Similar [edge case behaviour](https://gateway-api.sigs.k8s.io/geps/gep-1619/#edge-case-behavior) and [API Granularity](https://gateway-api.sigs.k8s.io/geps/gep-1619/#api-granularity) for ClientIP Persistence type should be applicable as well.  
+
 ## Goals
 
 * Define an API extension within Gateway API to enable client IP-based session persistence.
@@ -52,66 +54,7 @@ This GEP addresses these issues by providing a first-class API mechanism for cli
 
 ## API
 
-As mentioned in the [GEP-1619](https://gateway-api.sigs.k8s.io/geps/gep-1619/#api), `SessionPersistence` can be applied via `BackendLBPolicy` and `RouteRule` API .Similar [edge case behaviour](https://gateway-api.sigs.k8s.io/geps/gep-1619/#edge-case-behavior) and [API Granularity](https://gateway-api.sigs.k8s.io/geps/gep-1619/#api-granularity) for ClientIP Persistence type should be applicable as well.  
-
-Requirement is to introduce a new `SessionPersistenceType` called `ClientIP`
-
-Example (illustrative, exact field names and structure are subject to review):
-
-```
-# Existing SessionPersistence (simplified for example)
-# apiVersion: gateway.networking.k8s.io/v1beta1
-# kind: HTTPRoute
-
-spec:
-  rules:
-  - backendRefs:
-    - name: my-service
-      port: 80
-    sessionPersistence:
-      # New field for client IP based persistence
-      type: "ClientIP"
-      absoluteTimeout: "5m"
-      ipMask: 24 # Optional: IP mask for subnet persistence (e.g., "24" for /24 subnet)
-```
-```
-type SessionPersistence struct {
-	...
-
-    // IPMask defines the IP mask to be applied on client this may be
-	// used to persist clients from a same subnet to stick to same session
-	//
-	// Support: Implementation-specific
-	//
-	// +optional
-	// +kubebuilder:validation:Minimum=0
-	// +kubebuilder:validation:Maximum=128
-	IPMask *uint32 `json:"ipMask,omitempty"`
-
-}
-
-type SessionPersistenceType string
-
-const (
-    // CookieBasedSessionPersistence specifies cookie-based session
-    // persistence.
-    //
-    // Support: Core
-    CookieBasedSessionPersistence   SessionPersistenceType = "Cookie"
-
-    // HeaderBasedSessionPersistence specifies header-based session
-    // persistence.
-    //
-    // Support: Extended
-    HeaderBasedSessionPersistence   SessionPersistenceType = "Header"
-
-    // ClientIPBasedSessionPersistence specifies Client IP based session
-    // persistence.
-    //
-    // Support: Implementation-specific
-    ClientIPBasedSessionPersistence   SessionPersistenceType = "ClientIP"
-)
-```
+TBD
 
 ### Conformance tests 
 
@@ -128,3 +71,10 @@ Below are references showing how ClientIP persistence is currently supported acr
 * [AVI](https://techdocs.broadcom.com/us/en/vmware-security-load-balancing/avi-load-balancer/avi-load-balancer/30-2/load-balancing-overview/persistence.html)
 * [Native k8s](https://kubernetes.io/docs/reference/networking/virtual-ips/#session-affinity)
 
+Below are some implementations of ClientIP persistence which allows configuring subnet Mask 
+
+* [F5](https://techdocs.f5.com/content/kb/en-us/products/big-ip_ltm/manuals/product/ltm-concepts-11-5-1/11.html#:~:text=is%20persisted%20properly.-,Source%20address%20affinity%20persistence,-Source%20address%20affinity)
+* [Fortinet](https://help.fortinet.com/fadc/4-8-0/olh/Content/FortiADC/handbook/slb_persistence.htm)
+* [Huwaei](https://info.support.huawei.com/hedex/api/pages/EDOC1100149308/AEJ0713J/18/resources/cli/session_persistence.html)
+* [NetScaler](https://docs.netscaler.com/en-us/citrix-adc/current-release/load-balancing/load-balancing-persistence/no-rule-persistence#:~:text=For%20IP%2Dbased%20persistence%2C%20you%20can%20also%20set%20the%20persistMask%20parameter)
+* [AVI](https://techdocs.broadcom.com/us/en/vmware-security-load-balancing/avi-load-balancer/avi-load-balancer/30-2/load-balancing-overview/persistence/client-ip-persistence.html)
