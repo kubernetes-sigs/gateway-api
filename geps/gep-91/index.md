@@ -143,8 +143,9 @@ This section highlights use cases that may be covered in a future iteration of t
 
 ## Existing support in Implementations
 
-This feature is widely supported in implementations that support Gateway API.
-This table highlights the support. Please feel free to add any missing implementations not mentioned below.
+This feature is already widely supported by implementations that conform to the Gateway API. 
+The table below summarizes current support. Please feel free to add any implementations that are missing.
+This GEP aims to standardize this behavior as an official part of the upstream specification.
 
 | Implementation                      | Support                                                                                                                                                     | Granularity                  | Inline vs Policy |
 |------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------|------------------|
