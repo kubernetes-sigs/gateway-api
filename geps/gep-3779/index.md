@@ -15,13 +15,13 @@ Provide a method for configuring Gateway API Mesh implementations to enforce eas
 
 (Using the [Gateway API Personas](../../concepts/roles-and-personas.md))
 
-* A way for Ana the Application Developer to configure a Gateway API for Mesh implementation to enforce authorization policy that **allows** or **denies** identity or multiple identities to talk with some set of the workloads she controls.
-
-* A way for Chihiro, the Cluster Admin, to configure a Gateway API for Mesh implementation to enforce non-overridable cluster-wide, authorization policies that **allows** or **denies** identity or multiple identities to talk with some set of the workloads in the cluster.
+* A way for Ana the Application Developer to configure a Gateway API for Mesh implementation to enforce authorization policy that **allows** or **denies** identity or multiple identities to talk with some set (could be namespace or more granualr) of the workloads she controls.
 
 * A way for both Ana and Chihiro to restrict the scope of the policies they deploy to specific ports.
 
 ## Stretch Goals
+
+* A way for Chihiro, the Cluster Admin, to configure a Gateway API for Mesh implementation to enforce non-overridable cluster-wide, authorization policies that **allows** or **denies** identity or multiple identities to talk with some set of the workloads in the cluster.
 
 * A way for Chihiro, the Cluster Admin, to configure a Gateway API for Mesh implementation to enforce default, overridable, cluster-wide, authorization policies that **allows** or **denies** identity or multiple identities to talk with some set of the workloads in the cluster.
 
@@ -32,6 +32,7 @@ Provide a method for configuring Gateway API Mesh implementations to enforce eas
 ## Deferred Goals
 
 * (Potentially) Support enforcement on attributes beyond identities and ports.
+
 
 ## Introduction
 
