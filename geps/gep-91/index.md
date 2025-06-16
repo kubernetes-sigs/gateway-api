@@ -20,48 +20,6 @@ This use case has been highlighted in the [TLS Configuration GEP][] under segmen
 ## Non-Goals
 * Define other fields that can be used to verify the client certificate such as the Certificate Hash.
 
-## Existing support in Implementations
-
-This feature is widely supported in implementations that support Gateway API.
-This table highlights the support. Please feel free to add any missing implementations not mentioned below.
-
-| Implementation                      | Support                                                                                                                                                     | Granularity                  | Inline vs Policy |
-|------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------|------------------|
-| Acnodal EPIC                       |                                                                                                                                                             |                              |                  |
-| Airlock Microgateway               | [SidecarGateway.spec.applications[].downstream.tls.clientCertificate](https://docs.airlock.com/microgateway/latest/index/api/crds/sidecar-gateway/v1alpha1/index.html#sidecargatewayspecapplicationsdownstreamtls) | Per Listener                 | Inline           |
-| Amazon Elastic Kubernetes Service  |                                                                                                                                                             |                              |                  |
-| Apache APISIX                      | [ApisixTls.Client.CASecret](https://apisix.apache.org/docs/ingress-controller/tutorials/mtls/#mutual-authentication)                                       | Per SNI                      |                  |
-| Avi Kubernetes Operator            |                                                                                                                                                             |                              |                  |
-| Azure Application Gateway for Containers | [FrontendTLSPolicy](https://learn.microsoft.com/en-us/azure/application-gateway/for-containers/api-specification-kubernetes#alb.networking.azure.io/v1.FrontendTLSPolicy) | Per Gateway & Per Listener  | Policy           |
-| Cilium                             |                                                                                                                                                             |                              |                  |
-| Contour                            | [HTTPProxy.Spec.VirtualHost.Tls.ClientValidation.CASecret](https://projectcontour.io/docs/v1.17.1/config/tls-termination/)                                 | Per SNI                      | Inline           |
-| Easegress                          |                                                                                                                                                             |                              |                  |
-| Emissary Ingress                   | [TlSContext.Spec.CASecret](https://www.getambassador.io/docs/emissary/latest/howtos/client-cert-validation)                                                | Per SNI                      | Policy           |
-| Envoy Gateway                      | [ClientTrafficPolicy.Spec.TLS.ClientValidation](https://gateway.envoyproxy.io/docs/api/extension_types/#clientvalidationcontext)                           | Per Gateway & Per Listener  | Policy           |
-| Flomesh Service Mesh               |                                                                                                                                                             |                              |                  |
-| Gloo Gateway                       | [VirtualService.Spec.SSLConfig.SecretRef](https://docs.solo.io/gloo-edge/latest/guides/security/tls/server_tls/#configuring-downstream-mtls-in-a-virtual-service) | Per SNI                      | Inline           |
-| Google Cloud Service Mesh          |                                                                                                                                                             |                              |                  |
-| Google Kubernetes Engine           |                                                                                                                                                             |                              |                  |
-| HAProxy Ingress                    |                                                                                                                                                             |                              |                  |
-| HAProxy Kubernetes Ingress Controller | [ca-file](https://www.haproxy.com/documentation/haproxy-configuration-tutorials/security/authentication/client-certificate-authentication/#sidebar)      | Per SNI                      | Inline           |
-| HashiCorp Consul                   | [file-system-certificate](https://developer.hashicorp.com/consul/docs/north-south/api-gateway/secure-traffic/encrypt)                                      | Per Listener                 | Policy           |
-| Istio                              | [Gateway.Spec.Servers.TLS.Mode](https://istio.io/latest/docs/tasks/traffic-management/ingress/secure-ingress/#configure-a-mutual-tls-ingress-gateway)      | Per Server                  | Inline           |
-| kgateway                           |                                                                                                                                                             |                              |                  |
-| Kong Kubernetes Ingress Controller | [mTLS Plugin](https://docs.konghq.com/hub/kong-inc/mtls-auth/)                                                                                              | Per HTTP Proxy (Host/Port)   | Policy           |
-| Kong Gateway Operator              | [mTLS Plugin](https://docs.konghq.com/hub/kong-inc/mtls-auth/)                                                                                              | Per HTTP Proxy (Host/Port)   | Policy           |
-| Kuma                               |                                                                                                                                                             |                              |                  |
-| Linkerd                            |                                                                                                                                                             |                              |                  |
-| LiteSpeed Ingress Controller       |                                                                                                                                                             |                              |                  |
-| LoxiLB                             |                                                                                                                                                             |                              |                  |
-| NGINX Gateway Fabric               | [ingressMTLS](https://docs.nginx.com/nginx-ingress-controller/configuration/policy-resource/#ingressmtls)                                                  | Per Listener                 | Policy           |
-| ngrok Kubernetes Operator          | [TrafficPolicy.Terminate-TLS.Config.MutualTLSCertificateAuthorities](https://ngrok.com/docs/traffic-policy/actions/terminate-tls/#configuration-reference) | Per Endpoint (Host:Port)     | Policy           |
-| STUNner                            |                                                                                                                                                             |                              |                  |
-| Traefik Proxy                      | [TLSOption.Spec.ClientAuth](https://doc.traefik.io/traefik/https/tls/#client-authentication-mtls)                                                          | Per EntryPoint               | Inline           |
-| Tyk                                | [Enable Client Certificate](https://tyk.io/docs/basic-config-and-security/security/mutual-tls/client-mtls/#why-use-mutual-tls)                             | Per Gateway                  | Policy           |
-| WSO2 APK                           | [Authentication.Spec.Default.AuthTypes.MTLS](https://apk.docs.wso2.com/en/latest/catalogs/crds/authentication_types/#dp.wso2.com/v1alpha2.MutualSSLConfig) | Per API                      | Policy           |
-| Ingress-NGINX                      | [nginx.ingress.kubernetes.io/auth-tls-verify-client](https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/#client-certificate-authentication) | Per Ingress                  | Inline           |
-
-
 ### API
 
 * Introduce a `FrontendValidation` field of type `FrontendTLSValidation` within [GatewayTLSConfig][] that can be used to validate the peer (frontend) with which the TLS connection is being made.
@@ -183,6 +141,46 @@ This section highlights use cases that may be covered in a future iteration of t
 * Supporting an optional `subjectAltNames` field within `FrontendTLSValidation` that can be used to specify one or more alternate names to verify the subject identity in the certificate presented by the client. This field falls under Authorization, the initial focus here is on Client Authentication and will be revisited when Authorization is tackled as a whole in the project.
 * Specifying the verification depth in the client certificate chain. This is being deferred because the default verification depth differs across implementations.
 
+## Existing support in Implementations
+
+This feature is widely supported in implementations that support Gateway API.
+This table highlights the support. Please feel free to add any missing implementations not mentioned below.
+
+| Implementation                      | Support                                                                                                                                                     | Granularity                  | Inline vs Policy |
+|------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------|------------------|
+| Acnodal EPIC                       |                                                                                                                                                             |                              |                  |
+| Airlock Microgateway               | [SidecarGateway.spec.applications[].downstream.tls.clientCertificate](https://docs.airlock.com/microgateway/latest/index/api/crds/sidecar-gateway/v1alpha1/index.html#sidecargatewayspecapplicationsdownstreamtls) | Per Listener                 | Inline           |
+| Amazon Elastic Kubernetes Service  |                                                                                                                                                             |                              |                  |
+| Apache APISIX                      | [ApisixTls.Client.CASecret](https://apisix.apache.org/docs/ingress-controller/tutorials/mtls/#mutual-authentication)                                       | Per SNI                      |                  |
+| Avi Kubernetes Operator            |                                                                                                                                                             |                              |                  |
+| Azure Application Gateway for Containers | [FrontendTLSPolicy](https://learn.microsoft.com/en-us/azure/application-gateway/for-containers/api-specification-kubernetes#alb.networking.azure.io/v1.FrontendTLSPolicy) | Per Gateway & Per Listener  | Policy           |
+| Cilium                             |                                                                                                                                                             |                              |                  |
+| Contour                            | [HTTPProxy.Spec.VirtualHost.Tls.ClientValidation.CASecret](https://projectcontour.io/docs/v1.17.1/config/tls-termination/)                                 | Per SNI                      | Inline           |
+| Easegress                          |                                                                                                                                                             |                              |                  |
+| Emissary Ingress                   | [TlSContext.Spec.CASecret](https://www.getambassador.io/docs/emissary/latest/howtos/client-cert-validation)                                                | Per SNI                      | Policy           |
+| Envoy Gateway                      | [ClientTrafficPolicy.Spec.TLS.ClientValidation](https://gateway.envoyproxy.io/docs/api/extension_types/#clientvalidationcontext)                           | Per Gateway & Per Listener  | Policy           |
+| Flomesh Service Mesh               |                                                                                                                                                             |                              |                  |
+| Gloo Gateway                       | [VirtualService.Spec.SSLConfig.SecretRef](https://docs.solo.io/gloo-edge/latest/guides/security/tls/server_tls/#configuring-downstream-mtls-in-a-virtual-service) | Per SNI                      | Inline           |
+| Google Cloud Service Mesh          |                                                                                                                                                             |                              |                  |
+| Google Kubernetes Engine           |                                                                                                                                                             |                              |                  |
+| HAProxy Ingress                    |                                                                                                                                                             |                              |                  |
+| HAProxy Kubernetes Ingress Controller | [ca-file](https://www.haproxy.com/documentation/haproxy-configuration-tutorials/security/authentication/client-certificate-authentication/#sidebar)      | Per SNI                      | Inline           |
+| HashiCorp Consul                   | [file-system-certificate](https://developer.hashicorp.com/consul/docs/north-south/api-gateway/secure-traffic/encrypt)                                      | Per Listener                 | Policy           |
+| Istio                              | [Gateway.Spec.Servers.TLS.Mode](https://istio.io/latest/docs/tasks/traffic-management/ingress/secure-ingress/#configure-a-mutual-tls-ingress-gateway)      | Per Server                  | Inline           |
+| kgateway                           |                                                                                                                                                             |                              |                  |
+| Kong Kubernetes Ingress Controller | [mTLS Plugin](https://docs.konghq.com/hub/kong-inc/mtls-auth/)                                                                                              | Per HTTP Proxy (Host/Port)   | Policy           |
+| Kong Gateway Operator              | [mTLS Plugin](https://docs.konghq.com/hub/kong-inc/mtls-auth/)                                                                                              | Per HTTP Proxy (Host/Port)   | Policy           |
+| Kuma                               |                                                                                                                                                             |                              |                  |
+| Linkerd                            |                                                                                                                                                             |                              |                  |
+| LiteSpeed Ingress Controller       |                                                                                                                                                             |                              |                  |
+| LoxiLB                             |                                                                                                                                                             |                              |                  |
+| NGINX Gateway Fabric               | [ingressMTLS](https://docs.nginx.com/nginx-ingress-controller/configuration/policy-resource/#ingressmtls)                                                  | Per Listener                 | Policy           |
+| ngrok Kubernetes Operator          | [TrafficPolicy.Terminate-TLS.Config.MutualTLSCertificateAuthorities](https://ngrok.com/docs/traffic-policy/actions/terminate-tls/#configuration-reference) | Per Endpoint (Host:Port)     | Policy           |
+| STUNner                            |                                                                                                                                                             |                              |                  |
+| Traefik Proxy                      | [TLSOption.Spec.ClientAuth](https://doc.traefik.io/traefik/https/tls/#client-authentication-mtls)                                                          | Per EntryPoint               | Inline           |
+| Tyk                                | [Enable Client Certificate](https://tyk.io/docs/basic-config-and-security/security/mutual-tls/client-mtls/#why-use-mutual-tls)                             | Per Gateway                  | Policy           |
+| WSO2 APK                           | [Authentication.Spec.Default.AuthTypes.MTLS](https://apk.docs.wso2.com/en/latest/catalogs/crds/authentication_types/#dp.wso2.com/v1alpha2.MutualSSLConfig) | Per API                      | Policy           |
+| Ingress-NGINX                      | [nginx.ingress.kubernetes.io/auth-tls-verify-client](https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/#client-certificate-authentication) | Per Ingress                  | Inline           |
 
 ## References
 
