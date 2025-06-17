@@ -10,7 +10,9 @@
 ### What
  This GEP proposes the addition of Client IP-based session persistence to the Gateway API. This feature will allow Gateway API implementations to ensure that requests originating from a specific client IP address (or a subnet defined by an IP mask) are consistently routed to the same backend endpoint for a configurable duration. This aims to provide a standardized and centralized mechanism for client IP persistence across various Gateway API implementations.
 
- As mentioned in the [GEP-1619](https://gateway-api.sigs.k8s.io/geps/gep-1619/#api), `SessionPersistence` can be applied via `BackendLBPolicy` and `RouteRule` API. Similar [edge case behaviour](https://gateway-api.sigs.k8s.io/geps/gep-1619/#edge-case-behavior) and [API Granularity](https://gateway-api.sigs.k8s.io/geps/gep-1619/#api-granularity) for ClientIP Persistence type should be applicable as well.  
+ As mentioned in the [GEP-1619](https://gateway-api.sigs.k8s.io/geps/gep-1619/#api), `SessionPersistence` can be applied via `BackendLBPolicy` and `RouteRule` API. Similar [edge case behaviour](https://gateway-api.sigs.k8s.io/geps/gep-1619/#edge-case-behavior) and [API Granularity](https://gateway-api.sigs.k8s.io/geps/gep-1619/#api-granularity) for ClientIP Persistence type should be applicable as well.
+
+ An important addition/difference compared to [GEP-1619](https://gateway-api.sigs.k8s.io/geps/gep-1619) is that the identity of the backend assigned to a client (or a group of clients in the same subnet) is stored on the server (load balancer / gateway) side as opposed to the client side.
 
 ## Goals
 
@@ -33,11 +35,7 @@ This GEP does not dictate the specific algorithm or implementation details for h
 ### Why: The Problem This Solves
 Currently, achieving client IP-based session persistence within Kubernetes Gateway API environments often requires vendor-specific annotations or out-of-band configurations on the underlying load balancer or ingress controller. This approach has several drawbacks:
 
-* Lack of Portability: Configurations are not easily transferable between different Gateway API implementations, leading to vendor lock-in and increased operational overhead when migrating or using multiple controllers.
-
-* Inconsistent User Experience: Users have to learn different methods for configuring the same logical feature depending on their chosen Gateway API implementation.
-
-* Limited API Expressiveness: Important traffic management capabilities are not directly exposed or controlled through the Gateway API, making it less comprehensive for certain application requirements.
+* Inconsistent User Experience: Users have to learn different methods for configuring the same logical feature depending on their chosen Gateway API implementation. Configurations are not easily transferable between different Gateway API implementations, leading to vendor lock-in and increased operational overhead when migrating or using multiple controllers.
 
 * Reduced Visibility: The desired session persistence behavior is not explicitly declared within the Gateway API resources, making it harder to audit, manage, and understand the routing logic from a single source of truth.
 
@@ -50,7 +48,7 @@ This GEP addresses these issues by providing a first-class API mechanism for cli
 
 * Gateway API Implementers: Receive a clear specification for implementing client IP-based session persistence, fostering interoperability and reducing divergent approaches.
 
-* Users with Stateful Applications: Applications that rely on client IP Persistence (e.g., certain legacy applications, gaming servers, or applications with in-memory session stores) will directly benefit from a reliable and configurable persistence mechanism.
+* Users with Stateful/Legacy Applications: Applications that rely on client IP Persistence (e.g., certain legacy applications, gaming servers, or applications with in-memory session stores) will directly benefit from a reliable and configurable persistence mechanism.
 
 ## API
 
