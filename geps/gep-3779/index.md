@@ -19,7 +19,7 @@ Provide a method for configuring Gateway API Mesh implementations to enforce eas
 
 * A way for both Ana and Chihiro to restrict the scope of the policies they deploy to specific ports.
 
-## Stretch Goals
+## TBD Goals
 
 * A way for Chihiro, the Cluster Admin, to configure a Gateway API for Mesh implementation to enforce non-overridable cluster-wide, authorization policies that **allows** or **denies** identity or multiple identities to talk with some set of the workloads in the cluster.
 
@@ -47,6 +47,7 @@ Kubernetes core provides NetworkPolicies as one way to do it. Network Policies h
 * Scale. Network Policies are enforced using IPs (different selectors in the APIs get translated to IPs). This does not scale well with large clusters or beyond a single cluster
 
 An identity-based authorization API is essential because it provides a structured way to control authorization between identities within the cluster.
+
 
 ### State of the World
 
