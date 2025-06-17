@@ -22,8 +22,6 @@
 
 * Provide an optional mechanism to specify an IP mask for subnet-based persistence, allowing multiple clients from the same subnet to be routed to the same backend.
 
-* Ensure the solution is generic enough to be implemented by various Gateway API controllers.
-
 * Improve portability of applications requiring client IP persistence across different Gateway API implementations.
 
 ## Non-Goals
@@ -52,7 +50,7 @@ This GEP addresses these issues by providing a first-class API mechanism for cli
 
 ## API
 
-TBD
+TODO: when we get to the implementation iterations, we need to consider whether we can implement this using functionality established in [GEP-1619](https://gateway-api.sigs.k8s.io/geps/gep-1619).
 
 ### Conformance tests 
 
