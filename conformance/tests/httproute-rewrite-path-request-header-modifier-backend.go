@@ -44,7 +44,7 @@ var HTTPRouteRewritePathRequestHeaderModifierBackend = suite.ConformanceTest{
 		testCases := []http.ExpectedResponse{
 			{
 				Request: http.Request{
-					Path: "/full/rewrite-path-and-modify-headers/test",
+					Path: "/full/test",
 					Headers: map[string]string{
 						"X-Header-Remove":     "remove-val",
 						"X-Header-Add-Append": "append-val-1",
@@ -67,7 +67,7 @@ var HTTPRouteRewritePathRequestHeaderModifierBackend = suite.ConformanceTest{
 			},
 			{
 				Request: http.Request{
-					Path: "/prefix/rewrite-path-and-modify-headers/one",
+					Path: "/prefix/one",
 					Headers: map[string]string{
 						"X-Header-Remove":     "remove-val",
 						"X-Header-Add-Append": "append-val-1",
@@ -76,7 +76,7 @@ var HTTPRouteRewritePathRequestHeaderModifierBackend = suite.ConformanceTest{
 				},
 				ExpectedRequest: &http.ExpectedRequest{
 					Request: http.Request{
-						Path: "/prefix/one",
+						Path: "/test/one",
 						Headers: map[string]string{
 							"X-Header-Add":        "header-val-1",
 							"X-Header-Add-Append": "append-val-1,header-val-2",
