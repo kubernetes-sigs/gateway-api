@@ -25,47 +25,67 @@ import (
 )
 
 func init() {
-	ConformanceTests = append(ConformanceTests, HTTPRouteRewriteHostBackend)
+	ConformanceTests = append(ConformanceTests, HTTPRouteRewritePathRequestHeaderModifierBackend)
 }
 
-var HTTPRouteRewriteHostBackend = suite.ConformanceTest{
-	ShortName:   "HTTPRouteRewriteHostBackend",
-	Description: "An HTTPRoute with host rewrite filter on the backend ref",
-	Manifests:   []string{"tests/httproute-rewrite-host-backend.yaml"},
+var HTTPRouteRewriteHostRequestHeaderModifierBackend = suite.ConformanceTest{
+	ShortName:   "HTTPRouteRewriteHostRequestHeaderModifierBackend",
+	Description: "An HTTPRoute with host rewrite filter and a request header modifier on the backend ref",
+	Manifests:   []string{"tests/httproute-rewrite-host-request-header-modifier-backend.yaml"},
 	Features: []features.FeatureName{
 		features.SupportGateway,
 		features.SupportHTTPRoute,
-		features.SupportHTTPRouteHostRewrite,
+		features.SupportHTTPRoutePathRewrite,
+		features.SupportHTTPRouteBackendRequestHeaderModification,
 	},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
-		gwAddr := defaultConformanceTestBoilerplate(t, suite, ns, "rewrite-host-backend", "same-namespace")
+		gwAddr := defaultConformanceTestBoilerplate(t, suite, ns, "rewrite-host-request-header-modifier-backend", "same-namespace")
 		testCases := []http.ExpectedResponse{
 			{
 				Request: http.Request{
-					Path: "/one",
-					Host: "rewrite.example",
+					Path: "/full/one",
+					Headers: map[string]string{
+						"X-Header-Remove":     "remove-val",
+						"X-Header-Add-Append": "append-val-1",
+						"X-Header-Set":        "set-val",
+					},
 				},
 				ExpectedRequest: &http.ExpectedRequest{
 					Request: http.Request{
-						Path: "/two",
-						Host: "one.example.org",
+						Path: "/test",
+						Headers: map[string]string{
+							"X-Header-Add":        "header-val-1",
+							"X-Header-Add-Append": "append-val-1,header-val-2",
+							"X-Header-Set":        "set-overwrites-values",
+						},
 					},
+					AbsentHeaders: []string{"X-Header-Remove"},
 				},
 				Backend:   "infra-backend-v1",
 				Namespace: ns,
-			}, {
+			},
+			{
 				Request: http.Request{
-					Path: "/three",
-					Host: "rewrite.example",
+					Path: "/prefix/one",
+					Headers: map[string]string{
+						"X-Header-Remove":     "remove-val",
+						"X-Header-Add-Append": "append-val-1",
+						"X-Header-Set":        "set-val",
+					},
 				},
 				ExpectedRequest: &http.ExpectedRequest{
 					Request: http.Request{
-						Path: "/three",
-						Host: "example.org",
+						Path: "/test/one",
+						Headers: map[string]string{
+							"X-Header-Add":        "header-val-1",
+							"X-Header-Add-Append": "append-val-1,header-val-2",
+							"X-Header-Set":        "set-overwrites-values",
+						},
 					},
+					AbsentHeaders: []string{"X-Header-Remove"},
 				},
-				Backend:   "infra-backend-v2",
+				Backend:   "infra-backend-v1",
 				Namespace: ns,
 			},
 		}

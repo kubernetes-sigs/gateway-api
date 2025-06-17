@@ -31,17 +31,17 @@ func init() {
 	)
 }
 
-var HTTPRouteRewritePathBackendWeights = suite.ConformanceTest{
-	ShortName:   "HTTPRouteRewritePathBackendWeights",
+var HTTPRouteRewriteHostBackendWeights = suite.ConformanceTest{
+	ShortName:   "HTTPRouteRewriteHostBackendWeights",
 	Description: "An HTTPRoute with backend URL filter filter sends traffic to the correct backends.",
 	Features: []features.FeatureName{
 		features.SupportGateway,
 		features.SupportHTTPRoute,
 	},
-	Manifests: []string{"tests/httproute-rewrite-path-backend-weights.yaml"},
+	Manifests: []string{"tests/httproute-rewrite-host-backend-weights.yaml"},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
-		gwAddr := defaultConformanceTestBoilerplate(t, suite, ns, "rewrite-path-backend-weights", "same-namespace")
+		gwAddr := defaultConformanceTestBoilerplate(t, suite, ns, "httproute-rewrite-host-backend-weights", "same-namespace")
 
 		roundTripper := suite.RoundTripper
 
@@ -62,13 +62,9 @@ var HTTPRouteRewritePathBackendWeights = suite.ConformanceTest{
 				t.Fatalf("failed to roundtrip request: %v", err)
 			}
 
-			backend, found := strings.CutSuffix(cReq.Path, "/test")
+			backend, found := strings.CutSuffix(cReq.Host, ".one")
 			if !found {
-				t.Fatalf("expected to have sufix \"/test\": %v", cReq.Path)
-			}
-			backend, found = strings.CutPrefix(backend, "/")
-			if !found {
-				t.Fatalf("expected to have prefix \"/\": %v", backend)
+				t.Fatalf("expected to have sufix \".one\": %v", backend)
 			}
 
 			if !strings.Contains(cReq.Pod, backend) {
@@ -97,20 +93,18 @@ var HTTPRouteRewritePathBackendWeights = suite.ConformanceTest{
 				t.Fatalf("failed to roundtrip request: %v", err)
 			}
 
-			if !strings.HasPrefix(cReq.Path, "/infra-backend") {
-				t.Fatalf("expected to have prefix \"/infra-backend\": %v", cReq.Path)
+			backend, found := strings.CutSuffix(cReq.Host, ".two")
+			if !found {
+				t.Fatalf("expected to have sufix \".two\": %v", backend)
 			}
-
-			backend, _ := strings.CutPrefix(cReq.Path, "/")
 
 			if !strings.Contains(cReq.Pod, backend) {
 				t.Fatalf(
 					"expected %q to be subset of %q and sent the request to the correct pod",
-					backend,
 					cReq.Pod,
+					backend,
 				)
 			}
-
 		}
 	},
 }

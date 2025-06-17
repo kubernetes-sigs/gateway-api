@@ -20,11 +20,6 @@ spec:
             - type: URLRewrite
               urlRewrite:
                 hostname: one.example.org
-            - type: URLRewrite
-              urlRewrite:
-                path:
-                  type: ReplaceFullPath
-                  replaceFullPath: /two
     - backendRefs:
         - name: infra-backend-v2
           port: 8080
