@@ -25,7 +25,7 @@ import (
 )
 
 func init() {
-	ConformanceTests = append(ConformanceTests, HTTPRouteRewritePathRequestHeaderModifierBackend)
+	ConformanceTests = append(ConformanceTests, HTTPRouteRewriteHostRequestHeaderModifierBackend)
 }
 
 var HTTPRouteRewriteHostRequestHeaderModifierBackend = suite.ConformanceTest{
