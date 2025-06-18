@@ -5,6 +5,10 @@
 
 (See [status definitions](../overview.md#gep-states).)
 
+## Notes and Disclaimers
+
+* This is currently targeting release as `Experimental` in [v1.4.0](https://github.com/kubernetes-sigs/gateway-api/milestone/22). However there was notable concern in [PR#3844](https://github.com/kubernetes-sigs/gateway-api/pull/3844) that it may be difficult to get multiple implementations who will be ready to implement this and move it forward. As such, the primary focus at this point should be finding representatives of implementations who may be interested in implementing this. Otherwise, this GEP may need to be `Deferred` and revisited as part of a later release.
+
 ## TLDR
 
 ### What
