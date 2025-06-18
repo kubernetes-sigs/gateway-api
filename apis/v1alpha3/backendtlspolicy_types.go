@@ -33,7 +33,7 @@ import (
 // BackendTLSPolicy is a Direct Attached Policy.
 // +kubebuilder:metadata:labels="gateway.networking.k8s.io/policy=Direct"
 
-// BackendTLSPolicy provides a way to configure how a Gateway implementation
+// BackendTLSPolicy provides a way to configure how a Gateway
 // connects to a Backend via TLS.
 type BackendTLSPolicy struct {
 	metav1.TypeMeta   `json:",inline"`
@@ -81,7 +81,7 @@ type BackendTLSPolicySpec struct {
 	// +kubebuilder:validation:MaxItems=16
 	// +kubebuilder:validation:XValidation:message="sectionName must be specified when targetRefs includes 2 or more references to the same target",rule="self.all(p1, self.all(p2, p1.group == p2.group && p1.kind == p2.kind && p1.name == p2.name ? ((!has(p1.sectionName) || p1.sectionName == '') == (!has(p2.sectionName) || p2.sectionName == '')) : true))"
 	// +kubebuilder:validation:XValidation:message="sectionName must be unique when targetRefs includes 2 or more references to the same target",rule="self.all(p1, self.exists_one(p2, p1.group == p2.group && p1.kind == p2.kind && p1.name == p2.name && (((!has(p1.sectionName) || p1.sectionName == '') && (!has(p2.sectionName) || p2.sectionName == '')) || (has(p1.sectionName) && has(p2.sectionName) && p1.sectionName == p2.sectionName))))"
-	TargetRefs []v1alpha2.PolicyTargetReferenceWithSectionName `json:"targetRefs"`
+	TargetRefs []v1alpha2.LocalPolicyTargetReferenceWithSectionName `json:"targetRefs"`
 
 	// Validation contains backend TLS validation configuration.
 	Validation BackendTLSPolicyValidation `json:"validation"`
