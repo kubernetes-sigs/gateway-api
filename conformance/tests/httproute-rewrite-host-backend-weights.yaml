@@ -7,7 +7,7 @@ spec:
   parentRefs:
   - name: same-namespace
   hostnames:
-    - "rewrite.example"
+  - "rewrite.example"
   rules:
   - matches:
     - path:
