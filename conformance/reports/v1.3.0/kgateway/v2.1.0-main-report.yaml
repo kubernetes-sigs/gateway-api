@@ -1,5 +1,5 @@
 apiVersion: gateway.networking.k8s.io/v1
-date: "2025-06-18T13:02:08-04:00"
+date: "2025-06-18T15:07:19-04:00"
 gatewayAPIChannel: experimental
 gatewayAPIVersion: v1.3.0
 implementation:
@@ -8,7 +8,7 @@ implementation:
   organization: kgateway-dev
   project: kgateway
   url: github.com/kgateway-dev/kgateway
-  version: 1.0.1-dev
+  version: v2.1.0-main
 kind: ConformanceReport
 mode: default
 profiles:
