@@ -24,26 +24,53 @@ safely, though they recognize that this may require additional configuration.
 
 ### Nomenclature and Background
 
-In this GEP, we will use _out-of-cluster Gateway_ (OCG) to refer to a
-conformant implementation of Gateway API's `GATEWAY` profile that's running
-outside of the cluster. This would most commonly be a managed implementation
-from a cloud provider, but of course there are many other possibilities.
+In this GEP:
 
-We'll also distinguish between _mTLS meshes_, which rely on standard mTLS for
-secure communications including workload authentication, and _non-mTLS
-meshes_, which do anything else. We'll focus on mTLS meshes in this GEP; this
-isn't because of a desire to exclude non-mTLS meshes, but because we'll have
-enough trouble just wrangling the mTLS meshes! Supporting non-mTLS meshes will
-be a separate GEP.
+1. We will use _out-of-cluster Gateway_ (OCG) to refer to a conformant
+   implementation of Gateway API's `GATEWAY` profile that's running outside of
+   the cluster. This would most commonly be a managed implementation from a
+   cloud provider, but of course there are many other possibilities -- and in
+   fact it's worth noting that anything we define here to support OCGs could
+   also be used by workloads that run in-cluster but which, for whatever
+   reason, can't be brought into the mesh in the mesh's usual way.
 
-Finally, _authentication_ is the act of verifying the identity of some
-_principal_; what the principal actually is depends on context. For this GEP
-we will primarily be concerned with _workload authentication_ (also known as
-_east/west auth_), in which the principal is a workload. (For completeness'
-sake, in _user authentication_ AKA _N/S auth_, the principal is the human on
-whose behalf a piece of technology is acting. We're only concerned with it
-here in that meshed workloads can't trust what the OCG says about user
-authentication without successful workload auth of the OCG itself.)
+2. We'll also distinguish between _mTLS meshes_, which rely on standard mTLS
+   for secure communication (authentication, encryption, and integrity
+   checking) between workloads, and _non-mTLS meshes_, which do anything else.
+   We'll focus on mTLS meshes in this GEP; this isn't because of a desire to
+   exclude non-mTLS meshes, but because we'll have enough trouble just
+   wrangling the mTLS meshes! Supporting non-mTLS meshes will be a separate
+   GEP.
+
+   **Note:** It's important to separate mTLS and HTTPS here. Saying that the
+   mTLS meshes use mTLS for secure communication does not preclude them from
+   using custom protocols on top of mTLS, and certainly does not mean that
+   they must use only HTTPS.
+
+3. _Authentication_ is the act of verifying the identity of some _principal_;
+   what the principal actually is depends on context. For this GEP we will
+   primarily be concerned with _workload authentication_, in which the
+   principal is a workload, as opposed to _user authentication_, in which the
+   principal is the human on whose behalf a piece of technology is acting. We
+   expect that the OCG will handle user auth, but of course meshed workloads
+   can't trust what the OCG says about the user unless the OCG successfully
+   authenticates itself as a workload.
+
+   **Note:** A single workload will have only one identity, but in practice we
+   often see a single identity being used for multiple workloads (both because
+   multiple replicas of a single workload need to share the same identity, and
+   because some low-security workloads may be grouped together under a single
+   identity).
+
+4. Finally, we'll distinguish between _inbound_ and _outbound_ behaviors.
+
+   Inbound behaviors are those that are applied to a request _arriving_ at a
+   given workload. Authorization and rate limiting are canonical examples
+   of inbound behaviors.
+
+   Outbound behaviors are those that are applied to a request _leaving_ a
+   given workload. Load balancing, retries, and circuit breakers are canonical
+   examples of outbound behaviors.
 
 ## Goals
 
@@ -61,14 +88,26 @@ authentication without successful workload auth of the OCG itself.)
       must be able to be properly maintained over time (for example, if they
       use mTLS, certificates will need rotation over time).
 
+    - The OCG must be able to distinguish meshed workloads from non-meshed
+      workloads, so that it can communicate appropriately with each.
+
 - Allow Ana to develop and operate meshed applications without needing to know
-  whether the Gateway they're using is an OCG or an in-cluster Gateway.
+  whether the Gateway she's using is an OCG or an in-cluster Gateway.
 
 - Define a basic set of requirements for OCGs and meshes that want to
   interoperate with each other (for example, the OCG and the mesh will likely
   need to agree on how workload authentication principals are represented).
 
+- Define how responsibility is shared between the OCG and the mesh for
+  outbound behaviors applied to requests leaving the OCG. (Note that "the OCG
+  has complete responsibility and authority over outbound behaviors for
+  requests leaving the OCG" is very much a valid definition.)
+
 ## Non-Goals
+
+- Support multicluster operations. It may be the case that functional
+  multicluster (with, e.g., a single OCG fronting multiple clusters) ends up
+  falling out of this GEP, but it is not a goal.
 
 - Support meshes interoperating with each other. It's possible that this GEP
   will lay a lot of groundwork in that direction, but it is not a goal.
@@ -86,8 +125,14 @@ authentication without successful workload auth of the OCG itself.)
 
 - Solve the problem of how to support an OCG doing mTLS directly to a
   _non_-meshed workload (AKA the _backend TLS problem_). Backend TLS to
-  non-meshed workloads is also adjacent to the OCG situation, but it
-  introduces a huge amount of additional configuration complexity.
+  non-meshed workloads is also adjacent to the OCG situation, but its
+  configuration has different needs: backends terminating TLS on their own are
+  likely to need per-workload configuration of certificates, cipher suites,
+  etc., where the mesh as a whole should share a single configuration.
+
+- Prevent the OCG API from being used by an in-cluster workload. We're not
+  going to make in-cluster workloads a primary use case for this GEP, but
+  neither are we disallowing them.
 
 ## Overview
 
@@ -116,7 +161,7 @@ configuration.
 ### The Problems
 
 To allow the OCG to _usefully_ participate in the mesh, we need to solve at
-least three significant problems. Thankfully, these are mostly problems for
+least four significant problems. Thankfully, these are mostly problems for
 Chihiro -- if we do our jobs correctly, Ana will never need to know.
 
 #### 1. The Trust Problem
@@ -143,17 +188,38 @@ then either the OCG will need to speak that protocol, or the mesh will need to
 relax its requirements (perhaps on a separate port?) to accept requests
 directly from the OCG.
 
-#### 3. The Service Identity Problem
+For example, Linkerd and Istio Legacy both use standard mTLS for
+proxy-to-proxy communication -- however, both also use ALPN to negotiate
+custom (and distinct!) "application" protocols during mTLS negotiation, and
+depending on the negotiated protocol, both can require the sending proxy to
+send additional information after mTLS is established, before any client data
+is sent. (For example, Linkerd requires the originating proxy to send
+transport metadata right after the TLS handshake, and it will reject a
+connection which doesn't do that correctly.)
+
+#### 4. The Discovery Problem
+
+When using a mesh, not every workload in the cluster is required to be meshed
+(for example, it's fairly common to have some namespaces meshed and other
+namespaces not meshed, especially during migrations). The _discovery problem_
+here is that the OCG needs to be know which workloads are meshed, so that it
+can choose appropriate communication methods for them.
+
+#### 4. The Outbound Behavior Problem
 
 The OCG will need to speak directly to endpoints in the cluster, as described
 above. This will prevent most meshes from being able to tell which service was
-originally requested, which in turn means that those meshes will likely lose
-any ability to properly perform retries, timeouts, etc. because they won't be
-able to find the configuration to apply to the request.
+originally requested, which makes it impossible for the mesh to apply outbound
+behaviors. This is the _outbound behavior problem_: it implies that either the
+OCG must be responsible for outbound behaviors for requests leaving the OCG
+for a meshed workload, or that the OCG must supply the mesh with enough
+information about the targeted service to allow the mesh to apply those
+outbound behaviors (if that's even possible: sidecar meshes may very well
+simply not be able to do this.)
 
-A conformant OCG should be able to supply this functionality on its own, so
-this isn't likely to be a functional problem. It does create a rough spot in
-terms of configuration, though: if a given endpoint will be used by both the
+This is listed last because it shouldn't be a functional problem to simply
+declare the OCG solely responsible for outbound behaviors for requests leaving
+the OCG. It is a UX problem: if a given workload needs to be used by both the
 OCG or other meshed workloads, you'll need to either provide two Routes with
 the same configuration, or you'll need to provide a single Route with multiple
 `parentRef`s.
@@ -171,6 +237,14 @@ Second, since the API should affect only Gateway API resources, it is not a
 good candidate for policy attachment. It is likely to be much more reasonable
 to simply provide whatever extra configuration we need inline in the Gateway
 or Mesh resources.
+
+## Graduation Criteria
+
+In addition to the [general graduation
+criteria](../concepts/versioning.md#graduation-criteria), this GEP must also
+guarantee that **all four** of the problems listed above need resolutions, and
+must have implementation from at least two different Gateways and two
+different meshes.
 
 ### Gateway for Ingress (North/South)
 
