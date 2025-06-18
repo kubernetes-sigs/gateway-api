@@ -13,20 +13,15 @@ This API solves the question "As an implementation, when I establish a connectio
 ## Goals
 
 This API aims to solve use cases around connecting to services that serve HTTPS/TLS traffic.
-These could be in-cluster applications (typically a `Service`) or external services (such as `https://google.com`).
 In many cases, communication going through gateway implementations is not TLS encrypted, so we expect the implementation itself to *originate* the TLS directly.
 This is in contrast with the TLS Passthrough cases, which remain supported.
-
-Some common examples that would utilize this API:
-* A Gateway terminates HTTPS, does routing based on the HTTP traffic, then originates HTTPS to the backend.
-* A service mesh accepts plaintext traffic (`http://google.com:80`) from a client, then originates HTTPS to that destination (`https://google.com:443`).
 
 Letting the gateway implementation handle TLS ensures it has visibility into the traffic (for observability and traffic manipulation) and offloads the concerns of TLS from the clients.
 
 1. The solution must satisfy the following use case: the backend pod has its own
 certificate and the gateway implementation client needs to know how to connect to the
 backend pod. (Use case #4 in [Gateway API TLS Use Cases](#references))
-2. The gateway implementation (`Gateway` instance or service mesh client proxy) must have final control over security properties
+2. The gateway implementation (`Gateway` instance or service mesh client proxy) must have **final** control over security properties
 3. The application developer may provide *hints* or *defaults* to consumers on how to connect to their application.
 
 ## Non-Goals
@@ -59,8 +54,8 @@ These are worthy goals that are already solved and thus will not be modified by 
 2. HTTPS passthrough use cases (#2 in [Gateway API TLS Use Cases](#references))
 3. Termination of TLS for non-HTTP TCP streams (#3 in [Gateway API TLS Use Cases](#references))
 
-These existing use cases all relate to how a Gateway implementation should handle a downstream connection.
-This GEP, instead, focuses on the handling of upstream connections.
+These existing use cases relate to how a Gateway implementation should handle a [frontend connection](https://gateway-api.sigs.k8s.io/geps/gep-2907/#frontend-and-backend).
+This GEP, instead, focuses on the handling of [backend connections](https://gateway-api.sigs.k8s.io/geps/gep-2907/#frontend-and-backend).
 
 ## Overview - what do we want to do?
 
@@ -74,7 +69,6 @@ has its own certificate and the gateway client needs to know how to connect to t
 
 This includes the intent to originate TLS on the connection to the backend, as well as various properties of the TLS connection:
 
-* If using mutual TLS, the client certificate to use during the TLS handshake
 * How to verify the peer certificate (trusted certificates, trusted subject names, etc).
 * Server Name indication
 
@@ -127,9 +121,9 @@ as a TLS Client:
 To serve these dual roles, `BackendTLSPolicy` is usable as a Direct Policy Attachment that can be *cross namespace*.
 
 * `BackendTLSPolicy` can be applied to a Service in the same namespace to provide defaults to clients.
-* `BackendTLSPolicy` can be applied to a Service in a different namespace to provide explicit configuration for clients in that namespace.
+* `BackendTLSPolicy` can be applied to a Service in a different namespace to provide explicit configuration for clients in the origin namespace, be it Gateway or in-cluster workload in a mesh.
 
-Policies in the consumer namespace will be preferred over the producer namespace.
+Policies in the consumer namespace will be preferred over the producer namespace ([glossary](https://gateway-api.sigs.k8s.io/concepts/glossary/?h=gloss#producer-route)).
 For Gateways, this is the Gateway namespace (and **not** the ListenerSet or Route namespace).
 For mesh, this is the calling client namespace.
 
@@ -175,16 +169,14 @@ targetRef:
     kind: HTTPRoute
     name: my-route
 ```
-However, this will be deferred to further enhancements and details of the behavior of `from`, or inclusion of it, will be left ot future GEPs.
+However, this will be deferred to further enhancements and details of the behavior of `from`, or inclusion of it, will be left ot future GEPs ([issue](https://github.com/kubernetes-sigs/gateway-api/issues/3856)).
 
 Failures during the TLS handshake may be handled with implementation-specific error codes, such as 500 or 503, or
 other signal that makes the failure sufficiently clear to the requester without revealing too much about the transaction,
 based on established security requirements.
 
 BackendTLSPolicySpec contains the `TargetRefs` and `Validation` fields.
-
-* The `Validation` field is a `BackendTLSPolicyValidation` and contains `CACertificateRefs`, `WellKnownCACertificates`, and `Hostname`.
-* The `TargetRefs` is optional. It must be set when providing defaults for a Service, and must not be set when providing route level overrides.
+The `Validation` field is a `BackendTLSPolicyValidation` and contains `CACertificateRefs`, `WellKnownCACertificates`, and `Hostname`.
 
 The `CACertificateRefs` and `WellKnownCACertificates` fields are both optional, but one of them must be set for a valid TLS
 configuration. CACertificateRefs is an implementation-specific slice of
