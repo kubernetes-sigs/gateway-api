@@ -159,8 +159,6 @@ Gateways.
 [Chihiro]: https://https//gateway-api.sigs.k8s.io/concepts/roles-and-personas/#chihiro
 [Ian]: https://https//gateway-api.sigs.k8s.io/concepts/roles-and-personas/#ian
 
-### The Problems
-
 ## API
 
 Most of the API work for this GEP is TBD at this point. The challenge is to
@@ -207,5 +205,13 @@ not seem like a good choice.
 ### Conformance tests
 
 ## Alternatives
+
+A possible alternative API design is to modify the behavior of Listeners or
+ListenerSets; rather than having a "default Gateway", perhaps we would have
+"[default Listeners]". One challenge here is that the Route `status` doesn't
+currently expose information about which Listener is being used, though it
+does show which Gateway is being used.
+
+[default Listeners]: https://github.com/kubernetes-sigs/gateway-api/pull/3852#discussion_r2149056246
 
 ## References
