@@ -6,6 +6,15 @@ metadata:
 spec:
   gatewayClassName: "{GATEWAY_CLASS_NAME}"
   listeners:
+  - name: http
+    port: 80
+    protocol: HTTP
+    hostname: "abc.example.com"
+    allowedRoutes:
+      namespaces:
+        from: Same
+      kinds:
+      - kind: HTTPRoute
   - name: https
     port: 443
     protocol: HTTPS
@@ -75,7 +84,7 @@ spec:
   - name: "btls"
     protocol: TCP
     port: 443
-    targetPort: 9443
+    targetPort: 8443
 ---
 # Deployment must not be applied until after the secret is generated.
 apiVersion: apps/v1
@@ -97,7 +106,7 @@ spec:
     spec:
       containers:
       - name: backendtlspolicy-test
-        image: echo-basic:2.7
+        image: gcr.io/k8s-staging-gateway-api/echo-basic:v20240412-v1.0.0-394-g40c666fd
         volumeMounts:
         - name: ca-volume
           mountPath: /etc/ca-volume

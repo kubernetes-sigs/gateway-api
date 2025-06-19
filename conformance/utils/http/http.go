@@ -75,6 +75,7 @@ type Request struct {
 	UnfollowRedirect bool
 	Protocol         string
 	Body             string
+	SNI              string
 }
 
 // ExpectedRequest defines expected properties of a request that reaches a backend.
@@ -176,7 +177,10 @@ func CalculateHost(t *testing.T, gwAddr, scheme string) string {
 		host, port, err = net.SplitHostPort(gwAddr)
 	}
 	if err != nil {
-		tlog.Logf(t, "Failed to parse host %q: %v", gwAddr, err)
+		// An address without a port causes an error, but it's fine for some cases.
+		if !strings.Contains(err.Error(), "missing port in address") {
+			tlog.Logf(t, "Failed to parse host %q: %v", gwAddr, err)
+		}
 		return gwAddr
 	}
 	if strings.ToLower(scheme) == "http" && port == "80" {
@@ -264,7 +268,7 @@ func CompareRoundTrip(t *testing.T, req *roundtripper.Request, cReq *roundtrippe
 		}
 	}
 	if expected.Response.StatusCode != cRes.StatusCode {
-		return fmt.Errorf("expected status code to be %d, got %d", expected.Response.StatusCode, cRes.StatusCode)
+		return fmt.Errorf("expected status code to be %d, got %d. CRes: %v", expected.Response.StatusCode, cRes.StatusCode, cRes)
 	}
 	if cRes.StatusCode == 200 {
 		// The request expected to arrive at the backend is
@@ -356,6 +360,10 @@ func CompareRoundTrip(t *testing.T, req *roundtripper.Request, cReq *roundtrippe
 
 		if !strings.HasPrefix(cReq.Pod, expected.Backend) {
 			return fmt.Errorf("expected pod name to start with %s, got %s", expected.Backend, cReq.Pod)
+		}
+
+		if expected.ExpectedRequest.SNI != "" && expected.ExpectedRequest.SNI != cReq.TLS.ServerName {
+			return fmt.Errorf("expected SNI %q to be equal to %q", cReq.TLS.ServerName, expected.ExpectedRequest.SNI)
 		}
 	} else if roundtripper.IsRedirect(cRes.StatusCode) {
 		if expected.RedirectRequest == nil {
