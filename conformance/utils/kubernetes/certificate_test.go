@@ -67,7 +67,7 @@ func Test_generateCACert(t *testing.T) {
 			serverKey.Reset()
 			// Test the function generateCACert.  We can only test normative function
 			// and hostnames, everything else is hardcoded.
-			caBytes, caPrivKey, err := generateCACert(tc.hosts)
+			_, caBytes, caPrivKey, err := generateCACert(tc.hosts)
 			require.NoError(t, err, "unexpected error generating RSA certificate")
 
 			var certData bytes.Buffer

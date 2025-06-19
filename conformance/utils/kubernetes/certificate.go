@@ -48,8 +48,25 @@ func MustCreateSelfSignedCertSecret(t *testing.T, namespace, secretName string, 
 
 	var serverKey, serverCert bytes.Buffer
 
-	require.NoError(t, generateRSACert(hosts, &serverKey, &serverCert), "failed to generate RSA certificate")
+	require.NoError(t, generateRSACert(hosts, &serverKey, &serverCert, nil, nil), "failed to generate RSA certificate")
 
+	return formatSecret(serverCert, serverKey, namespace, secretName)
+}
+
+// MustCreateCASignedCertSecret creates a CA-signed SSL certificate and stores it in a secret
+func MustCreateCASignedCertSecret(t *testing.T, namespace, secretName string, hosts []string, ca *x509.Certificate, caPrivKey *rsa.PrivateKey) *corev1.Secret {
+	require.NotEmpty(t, hosts, "require a non-empty hosts for Subject Alternate Name values")
+
+	var serverCert, serverKey bytes.Buffer
+
+	require.NoError(t, generateRSACert(hosts, &serverKey, &serverCert, ca, caPrivKey), "failed to generate CA signed RSA certificate")
+
+	return formatSecret(serverCert, serverKey, namespace, secretName)
+}
+
+// formatSecret formats the server certificate, key, namespace, and secretName
+// and converts it to a Kubernetes Secret object.
+func formatSecret(serverCert bytes.Buffer, serverKey bytes.Buffer, namespace string, secretName string) *corev1.Secret {
 	data := map[string][]byte{
 		corev1.TLSCertKey:       serverCert.Bytes(),
 		corev1.TLSPrivateKeyKey: serverKey.Bytes(),
@@ -67,8 +84,9 @@ func MustCreateSelfSignedCertSecret(t *testing.T, namespace, secretName string, 
 	return newSecret
 }
 
-// generateRSACert generates a basic self-signed certificate valid for a year
-func generateRSACert(hosts []string, keyOut, certOut io.Writer) error {
+// generateRSACert generates a basic self-signed certificate if ca and caPrivKey are nil,
+// otherwise it creates CA-signed cert with ca and caPrivkey input. Certs are valid for a year.
+func generateRSACert(hosts []string, keyOut, certOut io.Writer, ca *x509.Certificate, caPrivKey *rsa.PrivateKey) error {
 	priv, err := rsa.GenerateKey(rand.Reader, rsaBits)
 	if err != nil {
 		return fmt.Errorf("failed to generate key: %w", err)
@@ -104,7 +122,15 @@ func generateRSACert(hosts []string, keyOut, certOut io.Writer) error {
 		}
 	}
 
-	derBytes, err := x509.CreateCertificate(rand.Reader, &template, &template, &priv.PublicKey, priv)
+	if caPrivKey == nil {
+		caPrivKey = priv
+	}
+	// If ca is nil, we create a self-signed certificate, e.g. template is the parent.
+	if ca == nil {
+		ca = &template
+	}
+
+	derBytes, err := x509.CreateCertificate(rand.Reader, &template, ca, &priv.PublicKey, caPrivKey)
 	if err != nil {
 		return fmt.Errorf("failed to create certificate: %w", err)
 	}
@@ -121,26 +147,26 @@ func generateRSACert(hosts []string, keyOut, certOut io.Writer) error {
 }
 
 // MustCreateCASignedCertConfigMap will create a ConfigMap containing a CA Certificate, given a TLS Secret
-// for that CA certificate.
-func MustCreateCASignedCertConfigMap(t *testing.T, namespace, configMapName string, hosts []string) *corev1.ConfigMap {
+// for that CA certificate.  Also returns the CA certificate.
+func MustCreateCASignedCertConfigMap(t *testing.T, namespace, configMapName string, hosts []string) (*corev1.ConfigMap, *x509.Certificate, *rsa.PrivateKey) {
 	require.NotEmpty(t, hosts, "require a non-empty hosts for Subject Alternate Name values")
 
-	caBytes, caPrivKey, err := generateCACert(hosts)
+	var certData, keyData bytes.Buffer
+
+	ca, caBytes, caPrivKey, err := generateCACert(hosts)
 	if err != nil {
 		t.Errorf("failed to generate CA certificate and key: %v", err)
-		return nil
+		return nil, nil, nil
 	}
 
-	var certData bytes.Buffer
 	if err := pem.Encode(&certData, &pem.Block{Type: "CERTIFICATE", Bytes: caBytes}); err != nil {
 		t.Errorf("failed creating cert: %v", err)
-		return nil
+		return nil, nil, nil
 	}
 
-	var keyData bytes.Buffer
 	if err := pem.Encode(&keyData, &pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(caPrivKey)}); err != nil {
 		t.Errorf("failed creating key: %v", err)
-		return nil
+		return nil, nil, nil
 	}
 
 	// Store the certificate in a ConfigMap.
@@ -154,11 +180,11 @@ func MustCreateCASignedCertConfigMap(t *testing.T, namespace, configMapName stri
 			"key.crt": keyData.String(),
 		},
 	}
-	return caConfigMap
+	return caConfigMap, ca, caPrivKey
 }
 
-// generateCACert generates a ConfigMap containing a CA Certificate signed certificate valid for a year.
-func generateCACert(hosts []string) ([]byte, *rsa.PrivateKey, error) {
+// generateCACert generates a CA and a CA-signed certificate valid for a year.
+func generateCACert(hosts []string) (*x509.Certificate, []byte, *rsa.PrivateKey, error) {
 	var caBytes []byte
 
 	// Create the CA certificate template.
@@ -178,7 +204,7 @@ func generateCACert(hosts []string) ([]byte, *rsa.PrivateKey, error) {
 		NotAfter:              time.Now().AddDate(1, 0, 0),
 		IsCA:                  true, // Indicates this is a CA Certificate.
 		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth},
-		KeyUsage:              x509.KeyUsageDigitalSignature | x509.KeyUsageCertSign | x509.KeyUsageKeyEncipherment,
+		KeyUsage:              x509.KeyUsageDigitalSignature | x509.KeyUsageCertSign,
 		BasicConstraintsValid: true,
 	}
 
@@ -194,16 +220,16 @@ func generateCACert(hosts []string) ([]byte, *rsa.PrivateKey, error) {
 	// Generate the private key to sign certificates.
 	caPrivKey, err := rsa.GenerateKey(rand.Reader, rsaBits)
 	if err != nil {
-		return caBytes, caPrivKey, fmt.Errorf("error generating key for CA: %v", err)
+		return nil, caBytes, caPrivKey, fmt.Errorf("error generating key for CA: %v", err)
 	}
 
 	// Create the self-signed certificate using the CA certificate.
 	caBytes, err = x509.CreateCertificate(rand.Reader, ca, ca, &caPrivKey.PublicKey, caPrivKey)
 	if err != nil {
-		return caBytes, caPrivKey, fmt.Errorf("error creating CA: %v", err)
+		return nil, caBytes, caPrivKey, fmt.Errorf("error creating CA: %v", err)
 	}
 
-	return caBytes, caPrivKey, nil
+	return ca, caBytes, caPrivKey, nil
 }
 
 // validateHost ensures that the host name length is no more than 253 characters.
