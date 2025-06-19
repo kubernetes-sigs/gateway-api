@@ -118,7 +118,8 @@ func ParseSkipTests(t string) []string {
 	return strings.Split(t, ",")
 }
 
-// default boilerplate for suite test functions and returns the gwAddr. Not sure where to put this function
+// DefaultConformanceTestBoilerplate supplies default boilerplate
+// for suite test functions and returns the gwAddr.
 func DefaultConformanceTestBoilerplate(t *testing.T, suite *ConformanceTestSuite, ns string, routeName string, gwName string) string {
 	t.Helper()
 	routeNN := types.NamespacedName{Name: routeName, Namespace: ns}
