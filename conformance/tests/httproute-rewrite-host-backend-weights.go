@@ -39,11 +39,11 @@ var HTTPRouteRewriteHostBackendWeights = suite.ConformanceTest{
 		features.SupportHTTPRoute,
 	},
 	Manifests: []string{"tests/httproute-rewrite-host-backend-weights.yaml"},
-	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
+	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
-		gwAddr := defaultConformanceTestBoilerplate(t, suite, ns, "httproute-rewrite-host-backend-weights", "same-namespace")
+		gwAddr := suite.DefaultConformanceTestBoilerplate(t, s, ns, "httproute-rewrite-host-backend-weights", "same-namespace")
 
-		roundTripper := suite.RoundTripper
+		roundTripper := s.RoundTripper
 
 		expected := http.ExpectedResponse{
 			Request:   http.Request{Path: "/prefix/test"},
@@ -54,7 +54,7 @@ var HTTPRouteRewriteHostBackendWeights = suite.ConformanceTest{
 		req := http.MakeRequest(t, &expected, gwAddr, "HTTP", "http")
 
 		// Assert request succeeds before checking traffic
-		http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, expected)
+		http.MakeRequestAndExpectEventuallyConsistentResponse(t, s.RoundTripper, s.TimeoutConfig, gwAddr, expected)
 
 		for range 100 {
 			cReq, _, err := roundTripper.CaptureRoundTrip(req)
@@ -85,7 +85,7 @@ var HTTPRouteRewriteHostBackendWeights = suite.ConformanceTest{
 		req = http.MakeRequest(t, &expected, gwAddr, "HTTP", "http")
 
 		// Assert request succeeds before checking traffic
-		http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, expected)
+		http.MakeRequestAndExpectEventuallyConsistentResponse(t, s.RoundTripper, s.TimeoutConfig, gwAddr, expected)
 
 		for range 100 {
 			cReq, _, err := roundTripper.CaptureRoundTrip(req)

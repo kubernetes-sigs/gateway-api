@@ -38,9 +38,9 @@ var HTTPRouteRewriteHostRequestHeaderModifierBackend = suite.ConformanceTest{
 		features.SupportHTTPRoutePathRewrite,
 		features.SupportHTTPRouteBackendRequestHeaderModification,
 	},
-	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
+	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
-		gwAddr := defaultConformanceTestBoilerplate(t, suite, ns, "rewrite-host-request-header-modifier-backend", "same-namespace")
+		gwAddr := suite.DefaultConformanceTestBoilerplate(t, s, ns, "rewrite-host-request-header-modifier-backend", "same-namespace")
 		testCases := []http.ExpectedResponse{
 			{
 				Request: http.Request{
@@ -95,7 +95,7 @@ var HTTPRouteRewriteHostRequestHeaderModifierBackend = suite.ConformanceTest{
 			tc := testCases[i]
 			t.Run(tc.GetTestCaseName(i), func(t *testing.T) {
 				t.Parallel()
-				http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, tc)
+				http.MakeRequestAndExpectEventuallyConsistentResponse(t, s.RoundTripper, s.TimeoutConfig, gwAddr, tc)
 			})
 		}
 	},
