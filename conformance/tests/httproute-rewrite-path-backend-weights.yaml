@@ -48,4 +48,4 @@ spec:
         urlRewrite:
           path:
             type: ReplaceFullPath
-            replaceFullPath:  /infra-backed-v2
+            replaceFullPath: /infra-backed-v2
