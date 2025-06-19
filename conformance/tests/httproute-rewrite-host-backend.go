@@ -37,9 +37,9 @@ var HTTPRouteRewriteHostBackend = suite.ConformanceTest{
 		features.SupportHTTPRoute,
 		features.SupportHTTPRouteHostRewrite,
 	},
-	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
+	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
-		gwAddr := defaultConformanceTestBoilerplate(t, suite, ns, "rewrite-host-backend", "same-namespace")
+		gwAddr := suite.DefaultConformanceTestBoilerplate(t, s, ns, "rewrite-host-backend", "same-namespace")
 		testCases := []http.ExpectedResponse{
 			{
 				Request: http.Request{
@@ -75,7 +75,7 @@ var HTTPRouteRewriteHostBackend = suite.ConformanceTest{
 			tc := testCases[i]
 			t.Run(tc.GetTestCaseName(i), func(t *testing.T) {
 				t.Parallel()
-				http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, tc)
+				http.MakeRequestAndExpectEventuallyConsistentResponse(t, s.RoundTripper, s.TimeoutConfig, gwAddr, tc)
 			})
 		}
 	},

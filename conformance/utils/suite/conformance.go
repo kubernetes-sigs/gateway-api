@@ -21,8 +21,10 @@ import (
 	"strings"
 	"testing"
 
+	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/sets"
 
+	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/tlog"
 	"sigs.k8s.io/gateway-api/pkg/features"
 )
@@ -115,4 +117,14 @@ func ParseSkipTests(t string) []string {
 		return nil
 	}
 	return strings.Split(t, ",")
+}
+
+// default boilerplate for suite test functions and returns the gwAddr. Not sure where to put this function
+func DefaultConformanceTestBoilerplate(t *testing.T, suite *ConformanceTestSuite, ns string, routeName string, gwName string) string {
+	t.Helper()
+	routeNN := types.NamespacedName{Name: routeName, Namespace: ns}
+	gwNN := types.NamespacedName{Name: gwName, Namespace: ns}
+	gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
+	kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN)
+	return gwAddr
 }
