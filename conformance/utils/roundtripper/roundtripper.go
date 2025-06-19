@@ -88,7 +88,14 @@ type CapturedRequest struct {
 
 	Namespace string `json:"namespace"`
 	Pod       string `json:"pod"`
-	SNI       string `json:"sni"`
+	TLS       TLS    `json:"tls"`
+}
+
+type TLS struct {
+	Version            string `json:"version"`
+	ServerName         string `json:"serverName"`
+	NegotiatedProtocol string `json:"negotiatedProtocol"`
+	CipherSuite        string `json:"cipherSuite"`
 }
 
 // RedirectRequest contains a follow up request metadata captured from a redirect
