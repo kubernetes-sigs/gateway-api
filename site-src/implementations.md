@@ -101,7 +101,7 @@ cover, and documentation to help users get started.
 [39]:#kubvernor
 
 
-[gamma]:/concepts/gamma/
+[gamma]:mesh/index.md
 
 
 
@@ -222,7 +222,7 @@ For help and support with Contour's implementation, [create an issue][contour-is
 
 [contour]:https://projectcontour.io
 [contour-release]:https://github.com/projectcontour/contour/releases/tag/v1.30.0
-[contour-standard]:concepts/versioning.md#release-channels-eg-experimental-standard
+[contour-standard]:concepts/versioning.md#release-channels
 [contour-guide]:https://projectcontour.io/docs/1.30/guides/gateway-api/
 [contour-issue-new]:https://github.com/projectcontour/contour/issues/new/choose
 [contour-slack]:https://kubernetes.slack.com/archives/C8XRH2R4J

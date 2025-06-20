@@ -219,7 +219,7 @@ The following is required for a Route to be attached to a Gateway:
 
     The `Port` field described below is currently only included in the
     "Experimental" channel of Gateway API. For more information on release
-    channels, refer to the [related documentation](versioning.md#adding-experimental-fields).
+    channels, refer to the [related documentation](versioning.md#release-channels).
 
 A Route can reference a Gateway by specifying the namespace (optional if the
 Route and the Gateway are in the same namespace) and name of the Gateway in
@@ -326,8 +326,8 @@ to any traffic directed to the Service. How and which Routes attach to a given
 Service is controlled by the Routes themselves (working with Kubernetes RBAC),
 as covered in the [GAMMA routing documentation].
 
-[GAMMA]:/concepts/gamma
-[GAMMA routing documentation]:/concepts/gamma#gateway-api-for-mesh
+[GAMMA]:../mesh/index.md
+[GAMMA routing documentation]:../mesh/index.md#connecting-routes-and-services
 [service mesh]:glossary.md#service-mesh
 
 ## Extension points
