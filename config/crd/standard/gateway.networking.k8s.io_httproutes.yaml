@@ -2304,7 +2304,7 @@ spec:
 
                                   Support: Core (Exact, PathPrefix)
 
-                                  Support: Implementation-specific (RegularExpression)
+                                  Support: Implementation-specific (RegularExpression, any value domain-prefixed)
                                 enum:
                                 - Exact
                                 - PathPrefix
@@ -2354,9 +2354,9 @@ spec:
                               rule: '(self.type in [''Exact'',''PathPrefix'']) ? !self.value.endsWith(''/.'')
                                 : true'
                             - message: type must be one of ['Exact', 'PathPrefix',
-                                'RegularExpression']
+                                'RegularExpression'] or domain-prefixed custom value
                               rule: self.type in ['Exact','PathPrefix'] || self.type
-                                == 'RegularExpression'
+                                == 'RegularExpression' || self.type.matches('^([^/]+)/(.+)$')
                             - message: must only contain valid characters (matching
                                 ^(?:[-A-Za-z0-9/._~!$&'()*+,;=:@]|[%][0-9a-fA-F]{2})+$)
                                 for types ['Exact', 'PathPrefix']
@@ -5099,7 +5099,7 @@ spec:
 
                                   Support: Core (Exact, PathPrefix)
 
-                                  Support: Implementation-specific (RegularExpression)
+                                  Support: Implementation-specific (RegularExpression, any value domain-prefixed)
                                 enum:
                                 - Exact
                                 - PathPrefix
@@ -5149,9 +5149,9 @@ spec:
                               rule: '(self.type in [''Exact'',''PathPrefix'']) ? !self.value.endsWith(''/.'')
                                 : true'
                             - message: type must be one of ['Exact', 'PathPrefix',
-                                'RegularExpression']
+                                'RegularExpression'] or domain-prefixed custom value
                               rule: self.type in ['Exact','PathPrefix'] || self.type
-                                == 'RegularExpression'
+                                == 'RegularExpression' || self.type.matches('^([^/]+)/(.+)$')
                             - message: must only contain valid characters (matching
                                 ^(?:[-A-Za-z0-9/._~!$&'()*+,;=:@]|[%][0-9a-fA-F]{2})+$)
                                 for types ['Exact', 'PathPrefix']
