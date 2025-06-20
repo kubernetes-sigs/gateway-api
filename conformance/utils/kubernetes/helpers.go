@@ -651,6 +651,30 @@ func TLSRouteMustHaveParents(t *testing.T, client client.Client, timeoutConfig c
 	return route
 }
 
+// TCPRouteMustHaveParents waits for the specified TCPRoute to have parents
+// in status that match the expected parents, and also returns the TCPRoute.
+// This will cause the test to halt if the specified timeout is exceeded.
+func TCPRouteMustHaveParents(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeName types.NamespacedName, parents []v1alpha2.RouteParentStatus, namespaceRequired bool) v1alpha2.TCPRoute {
+	t.Helper()
+
+	var actual []gatewayv1.RouteParentStatus
+	var route v1alpha2.TCPRoute
+
+	waitErr := wait.PollUntilContextTimeout(context.Background(), 1*time.Second, timeoutConfig.RouteMustHaveParents, true, func(ctx context.Context) (bool, error) {
+		err := client.Get(ctx, routeName, &route)
+		if err != nil {
+			return false, fmt.Errorf("error fetching TCPRoute: %w", err)
+		}
+		actual = route.Status.Parents
+		match := parentsForRouteMatch(t, routeName, parents, actual, namespaceRequired)
+
+		return match, nil
+	})
+	require.NoErrorf(t, waitErr, "error waiting for TCPRoute to have parents matching expectations")
+
+	return route
+}
+
 func parentsForRouteMatch(t *testing.T, routeName types.NamespacedName, expected, actual []gatewayv1.RouteParentStatus, namespaceRequired bool) bool {
 	t.Helper()
 
@@ -851,6 +875,86 @@ func TLSRouteMustHaveCondition(t *testing.T, client client.Client, timeoutConfig
 	})
 
 	require.NoErrorf(t, waitErr, "error waiting for TLSRoute status to have a Condition matching expectations")
+}
+
+// GatewayAndTCPRoutesMustBeAccepted waits until the specified Gateway has an IP
+// address assigned to it and the TCPRoute has a ParentRef referring to the
+// Gateway. The test will fail if these conditions are not met before the
+// timeouts.
+func GatewayAndTCPRoutesMustBeAccepted(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, controllerName string, gw GatewayRef, routeNNs ...types.NamespacedName) string {
+	t.Helper()
+
+	gwAddr, err := WaitForGatewayAddress(t, c, timeoutConfig, gw)
+	require.NoErrorf(t, err, "timed out waiting for Gateway address to be assigned")
+
+	ns := gatewayv1.Namespace(gw.Namespace)
+	kind := gatewayv1.Kind("Gateway")
+
+	for _, routeNN := range routeNNs {
+		namespaceRequired := true
+		if routeNN.Namespace == gw.Namespace {
+			namespaceRequired = false
+		}
+
+		var parents []gatewayv1.RouteParentStatus
+		for _, listener := range gw.listenerNames {
+			parents = append(parents, gatewayv1.RouteParentStatus{
+				ParentRef: gatewayv1.ParentReference{
+					Group:       (*gatewayv1.Group)(&gatewayv1.GroupVersion.Group),
+					Kind:        &kind,
+					Name:        gatewayv1.ObjectName(gw.Name),
+					Namespace:   &ns,
+					SectionName: listener,
+				},
+				ControllerName: gatewayv1.GatewayController(controllerName),
+				Conditions: []metav1.Condition{
+					{
+						Type:   string(gatewayv1.RouteConditionAccepted),
+						Status: metav1.ConditionTrue,
+						Reason: string(gatewayv1.RouteReasonAccepted),
+					},
+				},
+			})
+		}
+		_ = TCPRouteMustHaveParents(t, c, timeoutConfig, routeNN, parents, namespaceRequired)
+	}
+
+	return gwAddr
+}
+
+// TCPRouteMustHaveCondition checks that the supplied TCPRoute has the supplied Condition,
+// halting after the specified timeout is exceeded.
+func TCPRouteMustHaveCondition(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeNN types.NamespacedName, gwNN types.NamespacedName, condition metav1.Condition) {
+	t.Helper()
+
+	waitErr := wait.PollUntilContextTimeout(context.Background(), 1*time.Second, timeoutConfig.TCPRouteMustHaveCondition, true, func(ctx context.Context) (bool, error) {
+		route := &v1alpha2.TCPRoute{}
+		err := client.Get(ctx, routeNN, route)
+		if err != nil {
+			return false, fmt.Errorf("error fetching TCPRoute: %w", err)
+		}
+
+		parents := route.Status.Parents
+		var conditionFound bool
+		for _, parent := range parents {
+			if err := ConditionsHaveLatestObservedGeneration(route, parent.Conditions); err != nil {
+				tlog.Logf(t, "TCPRoute %s (parentRef=%v) %v",
+					routeNN, parentRefToString(parent.ParentRef), err,
+				)
+				return false, nil
+			}
+
+			if parent.ParentRef.Name == gatewayv1.ObjectName(gwNN.Name) && (parent.ParentRef.Namespace == nil || string(*parent.ParentRef.Namespace) == gwNN.Namespace) {
+				if findConditionInList(t, parent.Conditions, condition.Type, string(condition.Status), condition.Reason) {
+					conditionFound = true
+				}
+			}
+		}
+
+		return conditionFound, nil
+	})
+
+	require.NoErrorf(t, waitErr, "error waiting for TCPRoute status to have a Condition matching expectations")
 }
 
 // TODO(mikemorris): this and parentsMatch could possibly be rewritten as a generic function?
