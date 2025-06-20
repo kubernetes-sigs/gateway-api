@@ -496,11 +496,12 @@ If you have any suggestions or experience issues with NGINX Gateway Fabric, plea
 ### ngrok Kubernetes Operator
 
 [ngrok Kubernetes Operator][ngrok-k8s-operator] After adding preliminary support last year, the [ngrok Kubernetes Operator][ngrok-k8s-operator] supports the entire core Gateway API. This includes:
--Routes (HTTPRoute, TCPRoute, TLSRoute) + RouteMatches (Header, Path, +more)
--Filters: Header, Redirect, Rewrite + more
--Backends: Backend Filters + Weighted balancing
--ReferenceGrant: RBAC for multi-tenant clusters handling
--Traffic Policy as an extensionRef or annotation when the Gateway API isn’t flexible enough
+
+- Routes (HTTPRoute, TCPRoute, TLSRoute) + RouteMatches (Header, Path, +more)
+- Filters: Header, Redirect, Rewrite + more
+- Backends: Backend Filters + Weighted balancing
+- ReferenceGrant: RBAC for multi-tenant clusters handling
+- Traffic Policy as an extensionRef or annotation when the Gateway API isn’t flexible enough
 
 You can read our [docs][ngrok-k8s-gwapi-docs] for more information. If you have any feature requests or bug reports, please [create an issue][ngrok-issue-new]. You can also reach out for help on [Slack][ngrok-slack]
 
@@ -508,7 +509,7 @@ You can read our [docs][ngrok-k8s-gwapi-docs] for more information. If you have 
 [ngrok]:https://ngrok.com
 [ngrok-k8s-gwapi-docs]:https://ngrok.com/docs/k8s/
 [ngrok-issue-new]: https://github.com/ngrok/ngrok-operator/issues/new/choose
-
+[ngrok-slack]:https://ngrokcommunity.slack.com/channels/general
 
 ### STUNner
 
