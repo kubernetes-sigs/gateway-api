@@ -1,4 +1,4 @@
-# Gateway API Glossary
+# GAMMA Glossary
 
 ### Consumer Route
 

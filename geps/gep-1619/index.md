@@ -813,7 +813,7 @@ might not function as expected. In such cases, it's acceptable to make appropria
 
 The object of the [GAMMA (Gateway API for Mesh Management and Administration)](../../mesh/gamma.md)
 initiative is to provide support for service mesh and mesh-adjacent use-cases with Gateway API. GAMMA is focused on
-defining how Gateway API could also be used for inter-service or [east/west](../../concepts/glossary.md#eastwest-traffic)
+defining how Gateway API could also be used for inter-service or [east/west](../../mesh/gamma-glossary.md#eastwest-traffic)
 traffic within the same cluster.
 
 Given that service meshes commonly have session persistence requirements, this API design should take into consideration

@@ -35,7 +35,7 @@ Service.
 [HTTPRoute]: ../api-types/httproute.md
 [TCPRoute]: ../concepts/api-overview.md#tcproute-and-udproute
 [Service]: https://kubernetes.io/docs/concepts/services-networking/service/
-[service-mesh]:../concepts/glossary.md#service-mesh
+[service-mesh]:gamma-glossary.md#service-mesh
 [service-facets]:/concepts/service-facets
 
 ## Connecting routes and services <a name="gateway-api-for-mesh">
@@ -129,9 +129,9 @@ different timeouts for their calls to the `oven` workload. `blender` and `mixer`
 would need to be moved into separate Namespaces to allow this.
 
 [Ana]:../concepts/roles-and-personas.md#ana
-[producer route]:../concepts/glossary.md#producer-route
-[consumer route]:../concepts/glossary.md#consumer-route
-[service mesh]:../concepts/glossary.md#service-mesh
+[producer route]:gamma-glossary.md#producer-route
+[consumer route]:gamma-glossary.md#consumer-route
+[service mesh]:gamma-glossary.md#service-mesh
 [Route merging rules]:../api-types/httproute.md#merging
 
 ## Request Flow
@@ -157,6 +157,6 @@ looks like:
 6. The data plane routes the request on to the destination workload (most likely
    using [endpoint routing], but it is allowed to use [Service routing]).
 
-[east/west]:../concepts/glossary.md#eastwest-traffic
-[endpoint routing]:../concepts/glossary.md#endpoint-routing
-[Service routing]:../concepts/glossary.md#service-routing
+[east/west]:gamma-glossary.md#eastwest-traffic
+[endpoint routing]:gamma-glossary.md#endpoint-routing
+[Service routing]:gamma-glossary.md#service-routing
