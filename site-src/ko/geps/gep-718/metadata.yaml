@@ -1,0 +1,8 @@
+apiVersion: internal.gateway.networking.k8s.io/v1alpha1
+kind: GEPDetails
+number: 718
+name: Rework forwardTo segment in routes
+status: Standard
+authors:
+  - hbagdi
+  - robscott

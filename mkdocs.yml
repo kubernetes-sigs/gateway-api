@@ -5,11 +5,19 @@ site_dir: site
 docs_dir: site-src
 extra:
   trademark: https://www.linuxfoundation.org/legal/trademark-usage
+  alternate:
+    - name: English
+      link: /
+      lang: en
+    - name: 한국어 (Korean)
+      link: /ko/
+      lang: ko
 extra_css:
   - stylesheets/extra.css
 extra_javascript:
   - https://unpkg.com/tablesort@5.3.0/dist/tablesort.min.js
   - js/implementations.js
+  - js/language-switch.js
 hooks:
 - hack/mkdocs-copy-geps.py
 - hack/mkdocs-generate-conformance.py
@@ -28,6 +36,7 @@ theme:
     - navigation.expand
   palette:
     primary: custom
+  language: en
   custom_dir: site-src/overrides
 edit_uri: edit/main/site-src/
 plugins:
@@ -188,6 +197,128 @@ nav:
     - Enhancement Requests: contributing/enhancement-requests.md
     - Release Cycle: contributing/release-cycle.md
     - Contributor Ladder: contributing/contributor-ladder.md
+  - 개요:
+    - 소개: ko/index.md
+    - 개념:
+      - API 개요: ko/concepts/api-overview.md
+      - 호환성: ko/concepts/conformance.md
+      - 역할과 페르소나: ko/concepts/roles-and-personas.md
+      - 보안 모델: ko/concepts/security-model.md
+      - 도구: ko/concepts/tooling.md
+      - 사용 사례: ko/concepts/use-cases.md
+      - 버전 관리: ko/concepts/versioning.md
+    - 서비스 메시:
+      - 개요: ko/mesh/index.md
+      - GAMMA 이니셔티브: ko/mesh/gamma.md
+      - 서비스 측면: ko/mesh/service-facets.md
+    - 구현:
+        - 목록: ko/implementations.md
+        - 비교:
+          - v1.3: ko/implementations/v1.3.md
+          - v1.2: ko/implementations/v1.2.md
+          - v1.1: ko/implementations/v1.1.md
+          - v1.0: ko/implementations/v1.0.md
+    - FAQ: ko/faq.md
+    - 용어집: ko/concepts/glossary.md
+  - 가이드:
+    - 사용자 가이드:
+      - 시작하기: ko/guides/index.md
+      - 간단한 게이트웨이: ko/guides/simple-gateway.md
+      - HTTP 라우팅: ko/guides/http-routing.md
+      - HTTP 리디렉션 및 재작성: ko/guides/http-redirect-rewrite.md
+      - HTTP 헤더 수정자: ko/guides/http-header-modifier.md
+      - HTTP 트래픽 분할: ko/guides/traffic-splitting.md
+      - HTTP 요청 미러링: ko/guides/http-request-mirroring.md
+      - 네임스페이스 간 라우팅: ko/guides/multiple-ns.md
+      - TLS: ko/guides/tls.md
+      - TCP 라우팅: ko/guides/tcp.md
+      - gRPC 라우팅: ko/guides/grpc-routing.md
+      - Ingress에서 마이그레이션: ko/guides/migrating-from-ingress.md
+      - 백엔드 프로토콜 선택: ko/guides/backend-protocol.md
+      - 인프라 속성: ko/guides/infrastructure.md
+    - API 설계: ko/guides/api-design.md
+    - CRD 관리: ko/guides/crd-management.md
+    - 구현자 가이드: ko/guides/implementers.md
+  - 참조:
+    - API 타입:
+      - Gateway: ko/api-types/gateway.md
+      - GatewayClass: ko/api-types/gatewayclass.md
+      - GRPCRoute: ko/api-types/grpcroute.md
+      - HTTPRoute: ko/api-types/httproute.md
+      - 정책:
+        - BackendTLSPolicy: ko/api-types/backendtlspolicy.md
+        - BackendTrafficPolicy: ko/api-types/backendtrafficpolicy.md
+      - ReferenceGrant: ko/api-types/referencegrant.md
+    - API 명세:
+      - 표준: ko/reference/spec.md
+      - 실험적: ko/reference/specx.md
+    - 정책 연결: ko/reference/policy-attachment.md
+  - 개선 사항:
+    - 개요: ko/geps/overview.md
+    - 임시:
+      - ko/geps/gep-1494/index.md
+      - ko/geps/gep-1651/index.md
+      - ko/geps/gep-2648/index.md
+      - ko/geps/gep-3379/index.md
+      - ko/geps/gep-3792/index.md
+      - ko/geps/gep-3793/index.md
+    - 구현 가능:
+      - ko/geps/gep-91/index.md
+      - ko/geps/gep-3567/index.md
+    - 실험적:
+      - ko/geps/gep-995/index.md
+      - ko/geps/gep-1619/index.md
+      - ko/geps/gep-1713/index.md
+      - ko/geps/gep-1731/index.md
+      - ko/geps/gep-1748/index.md
+      - ko/geps/gep-1767/index.md
+      - ko/geps/gep-1897/index.md
+      - ko/geps/gep-2162/index.md
+      - ko/geps/gep-2649/index.md
+      - ko/geps/gep-3155/index.md
+      - ko/geps/gep-3388/index.md
+      - ko/geps/gep-3567/index.md
+    - 표준:
+      - ko/geps/gep-709/index.md
+      - ko/geps/gep-718/index.md
+      - ko/geps/gep-724/index.md
+      - ko/geps/gep-726/index.md
+      - ko/geps/gep-746/index.md
+      - ko/geps/gep-820/index.md
+      - ko/geps/gep-851/index.md
+      - ko/geps/gep-957/index.md
+      - ko/geps/gep-1016/index.md
+      - ko/geps/gep-1294/index.md
+      - ko/geps/gep-1323/index.md
+      - ko/geps/gep-1364/index.md
+      - ko/geps/gep-1686/index.md
+      - ko/geps/gep-1709/index.md
+      - ko/geps/gep-1742/index.md
+      - ko/geps/gep-1762/index.md
+      - ko/geps/gep-1867/index.md
+      - ko/geps/gep-1911/index.md
+      - ko/geps/gep-2257/index.md
+      - ko/geps/gep-3171/index.md
+    - 메모:
+      - ko/geps/gep-713/index.md
+      - ko/geps/gep-917/index.md
+      - ko/geps/gep-922/index.md
+      - ko/geps/gep-1324/index.md
+      - ko/geps/gep-2659/index.md
+      - ko/geps/gep-2722/index.md
+      - ko/geps/gep-2907/index.md
+    - 거부됨:
+      - ko/geps/gep-735/index.md
+      - ko/geps/gep-1282/index.md
+  - 기여:
+    - 참여 방법: ko/contributing/index.md
+    - 개발자 가이드: ko/contributing/devguide.md
+    - 문서 스타일 가이드: ko/contributing/style-guide.md
+    - 개선 요청: ko/contributing/enhancement-requests.md
+    - 릴리스 주기: ko/contributing/release-cycle.md
+    - 기여자 사다리: ko/contributing/contributor-ladder.md
 not_in_nav: |
   /blog/*
   /geps/gep-696/*
+  /ko/blog/*
+  /ko/geps/gep-696/*

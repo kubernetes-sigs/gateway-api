@@ -1,0 +1,23 @@
+apiVersion: internal.gateway.networking.k8s.io/v1alpha1
+kind: GEPDetails
+number: 1619
+name: Session Persistence
+status: Provisional
+authors:
+  - gcs278
+  - sjberman
+  - robscott
+relationships:
+  seeAlso:
+    - number: 713
+      name: Metaresources and Policy Attachment
+      description: Defines metaresource and policy attachment API
+    - number: 2257
+      name: Gateway API Duration Format
+      description: Defines the Duration API field
+changelog:
+  - "https://github.com/kubernetes-sigs/gateway-api/pull/1643"
+  - "https://github.com/kubernetes-sigs/gateway-api/pull/1889"
+  - "https://github.com/kubernetes-sigs/gateway-api/pull/1935"
+  - "https://github.com/kubernetes-sigs/gateway-api/pull/2159"
+  - "https://github.com/kubernetes-sigs/gateway-api/pull/2634"

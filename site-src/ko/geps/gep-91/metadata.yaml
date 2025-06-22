@@ -1,0 +1,7 @@
+apiVersion: internal.gateway.networking.k8s.io/v1alpha1
+kind: GEPDetails
+number: 91
+name: Client Certificate Validation for TLS terminating at the Gateway Listener
+status: Provisional
+authors:
+  - arkodg

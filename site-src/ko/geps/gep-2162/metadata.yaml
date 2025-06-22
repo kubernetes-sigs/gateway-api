@@ -1,0 +1,10 @@
+apiVersion: internal.gateway.networking.k8s.io/v1alpha1
+kind: GEPDetails
+number: 2162
+name: Supported features in GatewayClass Status
+status: Experimental
+authors:
+  - LiorLieberman
+  - robscott
+  - spacewander
+  - shaneutt

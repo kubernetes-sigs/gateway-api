@@ -1,0 +1,24 @@
+apiVersion: internal.gateway.networking.k8s.io/v1alpha1
+kind: GEPDetails
+number: 1742
+name: HTTPRoute Timeouts
+status: Standard
+authors:
+  - youngnick
+  - spacewander
+  - frankbu
+  - shaneutt
+  - candita
+  - robscott
+  - sjberman
+relationships:
+  seeAlso:
+    - number: 2257
+      name: Gateway API Duration Format
+      description: Defines the duration format used by HTTPRoute timeouts.
+references:
+  - https://datatracker.ietf.org/doc/html/rfc8174
+  - https://datatracker.ietf.org/doc/html/rfc2119
+changelog:
+  - https://github.com/kubernetes-sigs/gateway-api/pull/3210
+

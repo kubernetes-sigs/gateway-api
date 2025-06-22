@@ -1,0 +1,7 @@
+apiVersion: internal.gateway.networking.k8s.io/v1alpha1
+kind: GEPDetails
+number: 746
+name: Replace Cert Refs on HTTPRoute with Cross Namespace Refs from Gateway
+status: Standard
+authors:
+  - robscott

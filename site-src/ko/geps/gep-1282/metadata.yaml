@@ -1,0 +1,15 @@
+apiVersion: internal.gateway.networking.k8s.io/v1alpha1
+kind: GEPDetails
+number: 1282
+name: Describing Backend Properties
+status: Declined
+authors:
+  - youngnick
+relationships:
+  obsoletedBy:
+    - number: 1897
+      name: BackendTLSPolicy - Explicit Backend TLS Connection Configuration
+      description: Implements just part of the Backend Properties GEP.
+    - number: 1911
+      name: Backend Protocol Selection
+      description: Protocol selection was one of the Backend Properties.

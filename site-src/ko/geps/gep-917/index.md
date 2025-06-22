@@ -1,0 +1,211 @@
+# GEP-917: Gateway API Conformance Testing
+
+* Issue: [#917](https://github.com/kubernetes-sigs/gateway-api/issues/917)
+* Status: Memorandum
+
+## TLDR
+
+This GEP outlines the principles and overarching structure that Gateway API
+conformance tests will be built with.
+
+## Goals
+
+- Record why we are doing conformance and what we hope to achieve with it
+- Record the success criteria for the conformance process and associated artifacts
+- Provide a set of guidelines for conformance test structure
+
+## Non-Goals
+
+- Designing the conformance testing framework or implementation
+- Designing the process for implementations to prove they are conformant
+
+## Introduction
+
+### What is Conformance
+
+Conformance is the creation of a process that allows everyone, implementors and
+users alike, to check that an implementation conforms to the defined spec.
+
+For core Kubernetes, this also allows for the use of specific badges and branding.
+
+It usually includes some form of test harness that can produce a standard output,
+which can be submitted somewhere for validation. The place where the validations
+are held is then the canonical source of information about what implementations
+are conformant.
+
+### Why do it for Gateway API?
+The Gateway API is a large, complex API with many use cases and implementations.
+Not all implementations support the same features, and some features have
+different required support levels.
+
+One of the primary goals of the Gateway API project is to make it safer and
+easier for end users to move their traffic configuration between implementations.
+Without some form of conformance to guarantee the same behavior between
+implementations, this is simply not achievable.
+
+Possibly a better way to say this is that we are looking to have Route resources
+portable between Gateways with a minimum of spec change.
+
+By creating a standard set of conformance tests and information, we can:
+
+- Make it easier for API consumers to understand what a particular API does
+- Make it possible for tooling to be constructed to check for portability
+between implementations
+
+Additionally, as the first project to develop an "official" set of CRDs, we have
+a responsibility to the community to build out a set of best practices for
+similar efforts in the future. Ensuring that whatever we build is reusable for
+other projects will help to lift everyone who works with CRDs.
+
+### What do we need out of conformance for Gateway API?
+Must have:
+
+- Support for only implementing some of the Gateway API CRD resources. Some resources,
+like Gateway itself, are required for all implementations, but implementations
+may choose what Route resources they support. There will probably be some common
+sets of Route resources supported across similar implementations, but this proposal
+expects that we will make calls about what to call that common experience at a
+later date.
+- Support for fields or features that have Core, Extended, and
+ImplementationSpecific support. In particular, it must be possible for
+implementations to only support some subset of Extended fields, and to be able
+to use the framework for their own ImplementationSpecific features if required.
+- A testing suite that can validate that an implementation meets the conformance
+profiles it claims.
+- A way to retrieve conformance information in a machine-parseable way.
+
+## Proposal
+
+### Conformance Profiles
+
+The Gateway API project defines conformance purely in terms of what resources an
+implementation supports.
+To support a resource, an implementation must support all "Core" functionality
+defined by the resource. Support for "Extended" functionality will be indicated
+separately.
+
+All implementations must support all the Core functions on the following resources:
+
+- GatewayClass
+- Gateway
+- ReferenceGrant
+
+The following resources are optional to support, but have defined behavior if you
+do:
+
+- HTTPRoute
+- TLSRoute
+- TCPRoute
+- UDPRoute
+
+For all of these resources, we should aim to have the usual range of tests for
+both the happy and unhappy paths for various types of operations.
+
+The conformance is versioned - it tracks the required features for a specific
+version of the API, and must be included in and updated by a version bump in the
+bundle version of the Gateway API. (The _bundle version_ is the thing that we
+mark as a "release", that looks like `v0.4.0`, not `v1alpha2`). 
+
+This will enable an implementation to say that it supports a specific version
+of the Gateway API. This is again similar to upstream in that implementations need
+to submit conformance test results for each version of Kubernetes they support.
+
+Because the support is defined in terms of the resources that an implementation
+supports, the conformance is composable, and orthogonal for each object type.
+For example, it's valid to only support HTTPRoute and not TCPRoute, or TLSRoute
+and not HTTPRoute.
+
+### Interaction with existing support levels
+
+Conformance definitions will ensure that an implementation can provide all the
+features currently marked as "Core" support in the API documentation.
+
+Fields marked "Extended" support will eventually have conformance tests that
+lock in the behavior of that feature, and there will be a mechanism for implementations
+to tell the testing framework what extended fields they support.
+
+## Testing framework
+
+Conformance tests will initially be structured as a CLI that runs on existing
+Kubernetes clusters. This may be expanded to include a testing library that can
+be imported by implementations. This tool will output test results in a
+structured format that can be used to generate reports. Where possible it will
+share code with the existing ingress-controller-conformance test suite.
+
+### Test Definitions
+
+Each set of tests will be built around a set of YAML manifests representing
+Gateway API resources. The tests will focus on how they expect a given
+controller to process those resources, configured via GatewayClass name. For
+example, tests may check to ensure that a controller correctly populates status,
+or that a request is appropriately routed to the desired backend with any
+relevant modifications.
+
+Each test definition will include the following:
+
+* Name
+* Description
+* Support Level
+
+In the future, this will be expanded to include:
+
+* Docs URL
+* Function to determine feature enablement
+
+### Prepopulated Gateways
+
+Some implementations of Gateway API support prepopulated or unmanaged `Gateway`
+resources that refer to an underlying server that was created by other means
+(e.g. `Helm`) rather than provisioning and managing the server according to the
+`Gateway` resource. To ensure that our conformance tests can adequately cover
+these implementations, Gateways and any accompanying infrastructure may be
+preloaded into the cluster in which conformance tests will run. Importantly,
+Routes, ReferencePolicies, Services, or other resources used by the test MUST
+NOT be prepopulated. This approach will require a `--prepopulated-gateways` flag
+to be set, this will also be represented in the resulting conformance report.
+
+## Certification process
+
+The Gateway API project will provide a process by which an implementation may
+submit the results of a run of the conformance test suite to a centralized,
+open repository, and once verified, these results will be used to maintain a
+canonical list of certified conformant implementations.
+
+Ideally, this process should be handled using similar methods to upstream
+Kubernetes, while also learning what we can from what the upstream conformance
+efforts wish they could improve.
+
+## Alternatives Considered
+
+### Tests Derived from Gateways
+
+It could be possible to write a testing framework that could derive the tests
+to run from Gateways that were present in a given cluster. For example, if a
+Gateway was present with an HTTP listener, it would run all tests that were
+possible with that type of listener.
+
+This approach could be especially helpful for implementations that do not yet
+support provisioning arbitrary Gateways. With the current proposal, these
+implementations would have to prepopulate a predefined set of Gateways for
+testing.
+
+Unfortunately, this approach also comes with some significant downsides:
+
+1. Implementations would still have to prepopulate Gateways.
+1. There are many possible inputs and outputs.
+1. We would need to test the testing framework to ensure that the correct tests
+   were being run with a given input.
+1. The testing framework logic could become complicated if we wanted to avoid
+   repeating tests that had already been run with other listeners.
+1. It may be more difficult to debug these tests if anything went wrong.
+1. Tests would need to be smart enough to recognize the side effects of any
+   tests that had previously run. For example, multiple tests using the same
+   Gateway could result in different status conditions depending on the order
+   and/or combination that ran.
+
+
+## References
+
+* [Gateway API Conformance Ideas](https://docs.google.com/document/d/18iECeKMp1OewSGISskv6Chfmjo9u2U0_iUH0jhPdKOk/edit#)
+* [Gateway API Conformance Requirements](https://docs.google.com/document/d/1QL-MpIVzqxe32Y2BZ_dYOB8zNsF9c4pnKEIB9ZLt118/edit)
+* [Gateway API Conformance Details](https://docs.google.com/document/d/1QL-MpIVzqxe32Y2BZ_dYOB8zNsF9c4pnKEIB9ZLt118/edit)
