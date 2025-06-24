@@ -280,7 +280,7 @@ func TestSuiteReport(t *testing.T) {
 					coreProvisionalTest.ShortName,
 					extendedProvisionalTest.ShortName,
 				},
-				InferredSupportedFeatures: true,
+				InferredSupportedFeatures: confv1.InferredSupportedFeaturesTrue,
 			},
 		},
 		{
@@ -390,7 +390,7 @@ func TestSuiteReport(t *testing.T) {
 						},
 					},
 				},
-				InferredSupportedFeatures: true,
+				InferredSupportedFeatures: confv1.InferredSupportedFeaturesTrue,
 			},
 		},
 	}
@@ -434,33 +434,37 @@ func TestInferSupportedFeatures(t *testing.T) {
 		exemptFeatures     FeaturesSet
 		ConformanceProfile sets.Set[ConformanceProfileName]
 		expectedFeatures   FeaturesSet
-		expectedIsInferred bool
+		expectedIsInferred confv1.InferredSupportedFeatures 
 	}{
 		{
 			name:               "properly infer supported features",
 			expectedFeatures:   namesToFeatureSet(statusFeatureNames),
-			expectedIsInferred: true,
+			expectedIsInferred: confv1.InferredSupportedFeaturesTrue,
 		},
 		{
 			name:              "no features",
 			supportedFeatures: sets.New[features.FeatureName]("Gateway"),
 			expectedFeatures:  sets.New[features.FeatureName]("Gateway"),
+			expectedIsInferred: confv1.InferredSupportedFeaturesFalse,
 		},
 		{
 			name:              "remove exempt features",
 			supportedFeatures: sets.New[features.FeatureName]("Gateway", "HTTPRoute"),
 			exemptFeatures:    sets.New[features.FeatureName]("HTTPRoute"),
 			expectedFeatures:  sets.New[features.FeatureName]("Gateway"),
+			expectedIsInferred: confv1.InferredSupportedFeaturesFalse,
 		},
 		{
 			name:             "allow all features",
 			allowAllFeatures: true,
 			expectedFeatures: features.SetsToNamesSet(features.AllFeatures),
+			expectedIsInferred: confv1.InferredSupportedFeaturesFalse,
 		},
 		{
 			name:               "supports conformance profile - core",
 			ConformanceProfile: sets.New(GatewayHTTPConformanceProfileName),
 			expectedFeatures:   namesToFeatureSet([]string{"Gateway", "HTTPRoute", "ReferenceGrant"}),
+			expectedIsInferred: confv1.InferredSupportedFeaturesFalse,
 		},
 	}
 

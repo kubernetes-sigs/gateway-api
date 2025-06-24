@@ -84,7 +84,7 @@ type ConformanceTestSuite struct {
 	// If SupportedFeatures are automatically determined from GWC Status.
 	// This will be required to report in future iterations as the passing
 	// will be determined based on this.
-	isInferredSupportedFeatures bool
+	isInferredSupportedFeatures confv1.InferredSupportedFeatures
 
 	// mode is the operating mode of the implementation.
 	// The default value for it is "default".
@@ -179,6 +179,14 @@ type ConformanceOptions struct {
 	ConformanceProfiles sets.Set[ConformanceProfileName]
 }
 
+type FeatureDetectionStatus int
+
+const (
+	FeatureDetectionStatusUnknown FeatureDetectionStatus = iota
+	FeatureDetectionStatusPass
+	FeatureDetectionStatusFail
+)
+
 type FeaturesSet = sets.Set[features.FeatureName]
 
 const (
@@ -191,21 +199,24 @@ const (
 // NewConformanceTestSuite is a helper to use for creating a new ConformanceTestSuite.
 func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite, error) {
 	supportedFeatures := options.SupportedFeatures.Difference(options.ExemptFeatures)
-	isInferred := false
+	isInferred := confv1.InferredSupportedFeaturesFalse
 	switch {
 	case options.EnableAllSupportedFeatures:
 		supportedFeatures = features.SetsToNamesSet(features.AllFeatures)
+		isInferred = confv1.InferredSupportedFeaturesFalse
 	case shouldInferSupportedFeatures(&options):
 		var err error
 		supportedFeatures, err = fetchSupportedFeatures(options.Client, options.GatewayClassName)
 		if err != nil {
 			return nil, fmt.Errorf("Cannot infer supported features: %w", err)
 		}
-		isInferred = true
+		isInferred = confv1.InferredSupportedFeaturesTrue
+	case isOnlyMeshProfile():
+		isInferred = confv1.InferredSupportedFeaturesUnsupported
 	}
 
 	// If features were not inferred from Status, it's a GWC issue.
-	if isInferred && supportedFeatures.Len() == 0 {
+	if isInferred == confv1.InferredSupportedFeaturesTrue && supportedFeatures.Len() == 0 {
 		return nil, fmt.Errorf("no supported features were determined for test suite")
 	}
 
@@ -394,7 +405,7 @@ func (suite *ConformanceTestSuite) Setup(t *testing.T, tests []ConformanceTest) 
 	}
 }
 
-func (suite *ConformanceTestSuite) IsInferredSupportedFeatures() bool {
+func (suite *ConformanceTestSuite) IsInferredSupportedFeatures() confv1.InferredSupportedFeatures {
 	return suite.isInferredSupportedFeatures
 }
 
@@ -644,4 +655,9 @@ func getAPIVersionAndChannel(crds []apiextensionsv1.CustomResourceDefinition) (v
 	}
 
 	return version, channel, nil
+}
+
+// TODO(bexxmodd) - Add logic to determine if it's only Mesh profile.
+func isOnlyMeshProfile() bool {
+	return false
 }

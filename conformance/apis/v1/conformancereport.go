@@ -53,8 +53,16 @@ type ConformanceReport struct {
 
 	// InferredSupportedFeatures indicates whether the supported features were
 	// automatically detected by the conformance suite.
-	InferredSupportedFeatures bool `json:"inferredSupportedFeatures"`
+	InferredSupportedFeatures InferredSupportedFeatures `json:"inferredSupportedFeatures"`
 }
+
+type InferredSupportedFeatures int
+
+const (
+	InferredSupportedFeaturesFalse InferredSupportedFeatures = iota
+	InferredSupportedFeaturesTrue
+	InferredSupportedFeaturesUnsupported
+)
 
 // Implementation provides metadata information on the downstream
 // implementation of Gateway API which ran conformance tests.
