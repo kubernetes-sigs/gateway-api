@@ -37,6 +37,7 @@ var HTTPRouteRewritePathBackend = suite.ConformanceTest{
 		features.SupportHTTPRoute,
 		features.SupportHTTPRoutePathRewrite,
 	},
+	Provisional: true,
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
 		gwAddr := suite.DefaultConformanceTestBoilerplate(t, s, ns, "rewrite-path-backend", "same-namespace")

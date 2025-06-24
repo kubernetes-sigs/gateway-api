@@ -24,6 +24,7 @@ import (
 
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
+	"sigs.k8s.io/gateway-api/conformance/utils/roundtripper"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
 	"sigs.k8s.io/gateway-api/pkg/features"
 )
@@ -62,8 +63,7 @@ var HTTPRouteRequestHeaderModifierBackendWeights = suite.ConformanceTest{
 
 		// Assert request succeeds before checking traffic
 		http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, expected)
-
-		for range 100 {
+		for range roundtripper.DefaultTripCount {
 			cReq, _, err := roundTripper.CaptureRoundTrip(req)
 			if err != nil {
 				t.Fatalf("failed to roundtrip request: %v", err)

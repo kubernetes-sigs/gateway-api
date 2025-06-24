@@ -21,6 +21,7 @@ import (
 	"testing"
 
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
+	"sigs.k8s.io/gateway-api/conformance/utils/roundtripper"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
 	"sigs.k8s.io/gateway-api/pkg/features"
 )
@@ -37,13 +38,13 @@ var HTTPRouteRewritePathBackendWeights = suite.ConformanceTest{
 	Features: []features.FeatureName{
 		features.SupportGateway,
 		features.SupportHTTPRoute,
+		features.SupportHTTPRoutePathRewrite,
 	},
-	Manifests: []string{"tests/httproute-rewrite-path-backend-weights.yaml"},
+	Provisional: true,
+	Manifests:   []string{"tests/httproute-rewrite-path-backend-weights.yaml"},
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
 		gwAddr := suite.DefaultConformanceTestBoilerplate(t, s, ns, "rewrite-path-backend-weights", "same-namespace")
-
-		roundTripper := s.RoundTripper
 
 		expected := http.ExpectedResponse{
 			Request:   http.Request{Path: "/prefix/test"},
@@ -56,8 +57,8 @@ var HTTPRouteRewritePathBackendWeights = suite.ConformanceTest{
 		// Assert request succeeds before checking traffic
 		http.MakeRequestAndExpectEventuallyConsistentResponse(t, s.RoundTripper, s.TimeoutConfig, gwAddr, expected)
 
-		for range 100 {
-			cReq, _, err := roundTripper.CaptureRoundTrip(req)
+		for range roundtripper.DefaultTripCount {
+			cReq, _, err := s.RoundTripper.CaptureRoundTrip(req)
 			if err != nil {
 				t.Fatalf("failed to roundtrip request: %v", err)
 			}
@@ -91,8 +92,8 @@ var HTTPRouteRewritePathBackendWeights = suite.ConformanceTest{
 		// Assert request succeeds before checking traffic
 		http.MakeRequestAndExpectEventuallyConsistentResponse(t, s.RoundTripper, s.TimeoutConfig, gwAddr, expected)
 
-		for range 100 {
-			cReq, _, err := roundTripper.CaptureRoundTrip(req)
+		for range roundtripper.DefaultTripCount {
+			cReq, _, err := s.RoundTripper.CaptureRoundTrip(req)
 			if err != nil {
 				t.Fatalf("failed to roundtrip request: %v", err)
 			}
