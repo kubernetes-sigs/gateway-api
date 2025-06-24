@@ -40,7 +40,7 @@ import (
 
 const (
 	H2CPriorKnowledgeProtocol = "H2C_PRIOR_KNOWLEDGE"
-	DefaultTripCount          = 100//default iteration count when using RoundTripper in conformance tests
+	DefaultTripCount          = 100 // default iteration count when using RoundTripper in conformance tests
 )
 
 // RoundTripper is an interface used to make requests within conformance tests.
