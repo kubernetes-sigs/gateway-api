@@ -50,12 +50,14 @@ These are worthy goals, but will not be covered by this GEP.
 
 1. Changes to the existing mechanisms for edge or passthrough TLS termination
 2. Providing a mechanism to decorate multiple route instances
-3. UDPRoute use cases
-4. Controlling TLS versions or cipher suites used in TLS handshakes. (Use case #5 in [Gateway API TLS Use Cases](#references))
-5. Controlling certificates used by more than one workload (#6 in [Gateway API TLS Use Cases](#references))
-6. Client certificate settings used in TLS **from external clients to the
+3. TLSRoute use cases
+4. UDPRoute use cases
+5. Controlling TLS versions or cipher suites used in TLS handshakes. (Use case #5 in [Gateway API TLS Use Cases](#references))
+6. Controlling certificates used by more than one workload (#6 in [Gateway API TLS Use Cases](#references))
+7. Client certificate settings used in TLS **from external clients to the
 Listener** (#7 in [Gateway API TLS Use Cases](#references))
-7. Service Mesh "mesh transport security".
+8. Service Mesh "mesh transport security".
+9. Providing a mechanism for the cluster operator to override gateway to backend TLS settings.
 
 > It is very common for service mesh implementations to implement some form of transparent transport security, whether that is WireGuard, mTLS, or others.
 > This is completely orthogonal to the use cases being tackled by this GEP.
@@ -194,7 +196,7 @@ that is appropriate, such as one of the HTTP error codes: 400 (Bad Request), 401
 other signal that makes the failure sufficiently clear to the requester without revealing too much about the transaction,
 based on established security requirements.
 
-BackendTLSPolicy applies only to TCP traffic. If a policy explicitly attaches to a UDP port of a Service (that is, the `targetRef` has a `sectionName` specifying a single port or the service has only 1 port), the `Accepted: False` Condition with `Reason: Invalid` MUST be set. If the policy attaches to a mix of TCP and UDP ports, implementations SHOULD include a warning in the `Accepted` condition message; the policy will only be effective for the TCP ports.
+BackendTLSPolicy applies only to TCP traffic. If a policy explicitly attaches to a UDP port of a Service (that is, the `targetRef` has a `sectionName` specifying a single port or the service has only 1 port), the `Accepted: False` Condition with `Reason: Invalid` MUST be set. If the policy attaches to a mix of TCP and UDP ports, implementations SHOULD include a warning in the `Accepted` condition message (`ancestors.conditions`); the policy will only be effective for the TCP ports.
 
 All policy resources must include `TargetRefs` with the fields specified
 in [PolicyTargetReference](https://github.com/kubernetes-sigs/gateway-api/blob/a33a934af9ec6997b34fd9b00d2ecd13d143e48b/apis/v1alpha2/policy_types.go#L24-L41).
@@ -242,7 +244,7 @@ Thus, the following additions would be made to the Gateway API:
 
 The `BackendTLSPolicy` tells a client "Connect to this service using TLS".
 This is unconditional to the type of traffic the gateway client is forwarding.
-For instance, the following will all have the gateway client add TLS:
+For instance, the following will all have the gateway client add TLS if the backend is targeted by a BackendTLSPolicy:
 
 * A Gateway accepts traffic on an HTTP listener
 * A Gateway accepts and terminates TLS on an HTTPS listener
