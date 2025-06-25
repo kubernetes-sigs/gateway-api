@@ -176,7 +176,7 @@ as a TLS Client:
 
 - An explicit signal that TLS should be used by this connection.
 - A hostname the Gateway should use to connect to the backend.
-- A reference to one or more CA certificates to validate the server's TLS certificates.
+- A reference to one or more CA certificates (which could include "system certificates") to validate the server's TLS certificates.
 
 BackendTLSPolicy is defined as a Direct Policy Attachment without defaults or overrides, applied to a Service that
 accesses the backend in question, where the BackendTLSPolicy resides in the same namespace as the Service it is
