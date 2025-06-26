@@ -40,7 +40,7 @@ var GRPCRouteCoreFeatures = sets.New(
 )
 
 // -----------------------------------------------------------------------------
-// Features - GRPCRoute Conformance (Externded)
+// Features - GRPCRoute Conformance (Extended)
 // -----------------------------------------------------------------------------
 
 const (
