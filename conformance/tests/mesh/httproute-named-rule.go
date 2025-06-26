@@ -38,6 +38,7 @@ var MeshHTTPRouteNamedRule = suite.ConformanceTest{
 		features.SupportHTTPRoute,
 		features.SupportMeshHTTPRouteNamedRouteRule,
 	},
+	Provisional: true,
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-mesh"
 		client := echo.ConnectToApp(t, suite, echo.MeshAppEchoV1)
