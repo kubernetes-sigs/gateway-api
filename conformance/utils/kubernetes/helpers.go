@@ -331,12 +331,24 @@ func MeshNamespacesMustBeReady(t *testing.T, c client.Client, timeoutConfig conf
 //     - ListenerConditionProgrammed
 //
 // The test will fail if these conditions are not met before the timeouts.
-func GatewayAndRoutesMustBeAccepted(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, controllerName string, gw GatewayRef, routeType any, routeNNs ...types.NamespacedName) string {
+// Note that this also returns a Gateway address to use, but it takes the port
+// from the first listener it finds. Therefore, if the Gateway has multiple listeners,
+// don't use this function unless you can ignore the port and allow the url
+// scheme to determine the default port to use in a URL. Set parameter `usePort` to
+// false if there are multiple listeners, and true if there is only one listener.
+func GatewayAndRoutesMustBeAccepted(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, controllerName string, gw GatewayRef, routeType any, usePort bool, routeNNs ...types.NamespacedName) string {
 	t.Helper()
 
-	RouteTypeMustHaveParentsField(t, routeType)
-	gwAddr, err := WaitForGatewayAddress(t, c, timeoutConfig, gw)
+	var err error
+	var gwAddr string
 
+	RouteTypeMustHaveParentsField(t, routeType)
+	// If the Gateway has multiple listeners, get a portless gwAddr.
+	if !usePort {
+		gwAddr, err = WaitForGatewayAddressMultipleListeners(t, c, timeoutConfig, gw)
+	} else {
+		gwAddr, err = WaitForGatewayAddress(t, c, timeoutConfig, gw)
+	}
 	require.NoErrorf(t, err, "timed out waiting for Gateway address to be assigned")
 
 	ns := gatewayv1.Namespace(gw.Namespace)
@@ -401,7 +413,13 @@ func GatewayAndRoutesMustBeAccepted(t *testing.T, c client.Client, timeoutConfig
 //
 // The test will fail if these conditions are not met before the timeouts.
 func GatewayAndHTTPRoutesMustBeAccepted(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, controllerName string, gw GatewayRef, routeNNs ...types.NamespacedName) string {
-	return GatewayAndRoutesMustBeAccepted(t, c, timeoutConfig, controllerName, gw, &gatewayv1.HTTPRoute{}, routeNNs...)
+	return GatewayAndRoutesMustBeAccepted(t, c, timeoutConfig, controllerName, gw, &gatewayv1.HTTPRoute{}, true, routeNNs...)
+}
+
+// GatewayAndHTTPRoutesMustBeAcceptedMultipleListeners is the same as GatewayAndHTTPRoutesMustBeAccepted except it does not
+// return the port in the gateway string.  With multiple listeners, port varies and some tests can't succeed using the returned port.
+func GatewayAndHTTPRoutesMustBeAcceptedMultipleListeners(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, controllerName string, gw GatewayRef, routeNNs ...types.NamespacedName) string {
+	return GatewayAndRoutesMustBeAccepted(t, c, timeoutConfig, controllerName, gw, &gatewayv1.HTTPRoute{}, false, routeNNs...)
 }
 
 // GatewayAndUDPRoutesMustBeAccepted waits until the specified Gateway has an IP
@@ -409,26 +427,21 @@ func GatewayAndHTTPRoutesMustBeAccepted(t *testing.T, c client.Client, timeoutCo
 // Gateway. The test will fail if these conditions are not met before the
 // timeouts.
 func GatewayAndUDPRoutesMustBeAccepted(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, controllerName string, gw GatewayRef, routeNNs ...types.NamespacedName) string {
-	return GatewayAndRoutesMustBeAccepted(t, c, timeoutConfig, controllerName, gw, &v1alpha2.UDPRoute{}, routeNNs...)
+	return GatewayAndRoutesMustBeAccepted(t, c, timeoutConfig, controllerName, gw, &v1alpha2.UDPRoute{}, true, routeNNs...)
 }
 
 // WaitForGatewayAddress waits until at least one IP Address has been set in the
-// status of the specified Gateway.
+// status of the specified Gateway.  Use when there is only one listener in the
+// Gateway.
 func WaitForGatewayAddress(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, gwRef GatewayRef) (string, error) {
 	t.Helper()
 
 	var ipAddr, port string
 	waitErr := wait.PollUntilContextTimeout(context.Background(), 1*time.Second, timeoutConfig.GatewayMustHaveAddress, true, func(ctx context.Context) (bool, error) {
-		gw := &gatewayv1.Gateway{}
-		err := client.Get(ctx, gwRef.NamespacedName, gw)
-		if err != nil {
-			tlog.Logf(t, "error fetching Gateway: %v", err)
-			return false, fmt.Errorf("error fetching Gateway: %w", err)
-		}
-
-		if err := ConditionsHaveLatestObservedGeneration(gw, gw.Status.Conditions); err != nil {
-			tlog.Log(t, "Gateway", err)
-			return false, nil
+		gw, err := getGatewayStatus(t, ctx, client, gwRef)
+		if gw == nil {
+			// The returned error is nil if the Gateway conditions don't have the latest observed generation.
+			return false, err
 		}
 
 		listener := gw.Spec.Listeners[0]
@@ -442,6 +455,33 @@ func WaitForGatewayAddress(t *testing.T, client client.Client, timeoutConfig con
 			}
 		}
 		port = strconv.FormatInt(int64(listener.Port), 10)
+		for _, address := range gw.Status.Addresses {
+			if address.Type != nil && (*address.Type == gatewayv1.IPAddressType || *address.Type == v1alpha2.HostnameAddressType) {
+				ipAddr = address.Value
+				return true, nil
+			}
+		}
+		return false, nil
+	})
+	require.NoErrorf(t, waitErr, "error waiting for Gateway to have at least one IP address in status")
+	return net.JoinHostPort(ipAddr, port), waitErr
+}
+
+// WaitForGatewayAddressMultipleListeners waits until at least one IP Address has been set in the
+// status of the specified Gateway and returns it without a port. A port interferes when
+// there are multiple listeners, e.g if the first listener is HTTP/80 but we want to be using another
+// listener with HTTPS/443, we can't send a request to https://gwaddr:80.  But we can send a request
+// to https://gwaddr and expect it to succeed by using the default port for HTTPS.
+func WaitForGatewayAddressMultipleListeners(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, gwRef GatewayRef) (string, error) {
+	t.Helper()
+
+	var ipAddr string
+	waitErr := wait.PollUntilContextTimeout(context.Background(), 1*time.Second, timeoutConfig.GatewayMustHaveAddress, true, func(ctx context.Context) (bool, error) {
+		gw, err := getGatewayStatus(t, ctx, client, gwRef)
+		if gw == nil {
+			// The returned error is nil if the Gateway conditions don't have the latest observed generation.
+			return false, err
+		}
 
 		for _, address := range gw.Status.Addresses {
 			if address.Type != nil && (*address.Type == gatewayv1.IPAddressType || *address.Type == v1alpha2.HostnameAddressType) {
@@ -449,11 +489,26 @@ func WaitForGatewayAddress(t *testing.T, client client.Client, timeoutConfig con
 				return true, nil
 			}
 		}
-
 		return false, nil
 	})
 	require.NoErrorf(t, waitErr, "error waiting for Gateway to have at least one IP address in status")
-	return net.JoinHostPort(ipAddr, port), waitErr
+	return ipAddr, waitErr
+}
+
+func getGatewayStatus(t *testing.T, ctx context.Context, client client.Client, gwRef GatewayRef) (*gatewayv1.Gateway, error) {
+	gw := &gatewayv1.Gateway{}
+	err := client.Get(ctx, gwRef.NamespacedName, gw)
+	if err != nil {
+		tlog.Logf(t, "error fetching Gateway: %v", err)
+		return nil, fmt.Errorf("error fetching Gateway: %w", err)
+	}
+
+	if err := ConditionsHaveLatestObservedGeneration(gw, gw.Status.Conditions); err != nil {
+		tlog.Log(t, "Gateway", err)
+		return nil, nil
+	}
+
+	return gw, nil
 }
 
 // GatewayListenersMustHaveConditions checks if every listener of the specified gateway has all

@@ -88,6 +88,14 @@ type CapturedRequest struct {
 
 	Namespace string `json:"namespace"`
 	Pod       string `json:"pod"`
+	TLS       TLS    `json:"tls"`
+}
+
+type TLS struct {
+	Version            string `json:"version"`
+	ServerName         string `json:"serverName"`
+	NegotiatedProtocol string `json:"negotiatedProtocol"`
+	CipherSuite        string `json:"cipherSuite"`
 }
 
 // RedirectRequest contains a follow up request metadata captured from a redirect
@@ -228,6 +236,18 @@ func (d *DefaultRoundTripper) defaultRoundTrip(request Request, transport http.R
 
 	resp, err := client.Do(req)
 	if err != nil {
+		if d.Debug {
+			var dump []byte
+			if resp != nil {
+				dump, err = httputil.DumpResponse(resp, true)
+				if err != nil {
+					return nil, nil, err
+				}
+				tlog.Logf(request.T, "Error sending request:\n%s\n\n", formatDump(dump, "< "))
+			} else {
+				tlog.Logf(request.T, "Error sending request: %v (no response)\n", err)
+			}
+		}
 		return nil, nil, err
 	}
 	defer resp.Body.Close()

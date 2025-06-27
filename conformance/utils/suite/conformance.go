@@ -68,7 +68,7 @@ func (test *ConformanceTest) Run(t *testing.T, suite *ConformanceTestSuite) {
 
 	for _, manifestLocation := range test.Manifests {
 		tlog.Logf(t, "Applying %s", manifestLocation)
-		suite.Applier.MustApplyWithCleanup(t, suite.Client, suite.TimeoutConfig, manifestLocation, true)
+		suite.Applier.MustApplyWithCleanup(t, suite.Client, suite.TimeoutConfig, manifestLocation, suite.Cleanup)
 	}
 
 	if featuresInfo != "" {
