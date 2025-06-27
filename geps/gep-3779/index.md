@@ -246,10 +246,261 @@ Cilium has the concept of CiliumIdentity. Pods are assigned identities derived f
 More on https://docs.cilium.io/en/stable/internals/security-identities/ & https://docs.cilium.io/en/stable/security/network/identity/
 
 
-
 ## API
 
+This GEP introduces a new policy resource, `AuthorizationPolicy`, for **identity-based** authorization. The policy defines a target, a single action (`ALLOW` or `DENY`), and a set of rules that include sources (the “who”) and an optional port attribute.
 
+### **Policy Rules**
+
+Each `AuthorizationPolicy` resource contains a list of rules. A request matches the policy if it matches **any** rule in the list (logical OR). Each rule defines multiple matching criteria; a request matches a rule only if it matches **all** criteria within that rule (logical AND).
+
+A rule may specify:
+
+* **Sources:** The source identities to which the rule applies. A request’s identity must match one of the listed sources. Supported source kinds are:  
+  * **SPIFFE ID**
+  * **Kubernetes ServiceAccount**  
+  * **Kubernetes Namespace**  
+* **Attributes:** Conditions on the target workload, at the time of writing this, only port is supported. If no attributes are specified, the rule applies to all traffic toward the target.
+
+### **ALLOW Policies**
+
+* An **ALLOW** policy is permissive.  
+* A request is allowed if:  
+  * It matches at least one rule in any ALLOW policy targeting the workload **and**  
+  * It is not explicitly denied by any DENY policy.  
+* If no ALLOW policy exists for a workload, traffic is permitted by default, unless any DENY policy applies.
+
+### **DENY Policies**
+
+* A **DENY** policy is restrictive and takes precedence over ALLOW.  
+* If a request matches any rule in a DENY policy, it is immediately rejected, regardless of matching ALLOW rules elsewhere.  
+* DENY policies enable to define global blocks or exceptions (for example: “block all traffic from Namespace X”).
+
+### **ALLOW vs. DENY Semantics**
+
+* **DENY always wins.** If both an ALLOW and a DENY policy match a request, the DENY policy blocks it.  
+* The presence of any authorization policy causes the system to default to **deny-by-default** for matching workloads.
+* Another bullet to re-clarify the one above - the default behavior when no policies select a target workload is to allow all traffic. However, **as soon as at least one `AuthorizationPolicy` targets a workload, the model becomes implicitly deny-if-not-allowed**.
+
+### **Target of Authorization**
+
+The `targetRef` of the policy specifies the workload(s) to which the policy applies. Two options are available for `targetRef`:
+
+#### **Option 1: Targeting a Service**
+
+The `targetRef` can point to a Kubernetes `Service`.
+
+**Benefits:**
+
+* **No API Extension Required:** Works with the current PolicyAttachment model in Gateway API without modification.  
+* **Simplicity:** Intuitive for users familiar with Kubernetes networking concepts.
+
+**Downsides and Open Questions:**
+
+However, targeting a `Service` introduces several challenges:
+
+1. Authorization cannot be enforced on workloads not exposed via a `Service` - excluding use cases of pods/jobs without a Service.  
+2. If a Pod belongs to multiple Services targeted by different authorization policies, precedence rules, may become unclear, leading to unpredictable or insecure outcomes. Even if such rules are explicitly defined, UX could potentially be confusing for users.
+3. UX and implementation challenges - are implementations expected to enforce the policy only if the traffic arrived through the specific Service? Or just to take the service selectors and enforce the policy regardless of how the traffic got to the destination?
+
+#### **Option 2: Targeting Pods via Label Selectors**
+
+Alternatively, the `targetRef` can specify a set of pods using a `LabelSelector` for a more flexible and direct approach.
+
+**Benefits:**
+
+* Aligns with established practices. Mesh implementations (Istio, Linkerd, Cilium) already use label selectors as the primary mechanism for targeting workloads in their native authorization policies, creating a consistent user experience.  
+* Directly applies policy to pods, avoiding ambiguity present when targeting services. Ensures policies are enforced exactly where intended, regardless of how many services a pod might belong to.  
+* Policies can apply to any workload, including pods not exposed via a `Service`, providing a comprehensive authorization solution.
+
+**Downsides and Open Questions:**
+
+The main downside of `LabelSelector` is the huge increase to the complexity of policy discoverability. See below for more info.
+
+**Requirement: Enhancing Policy Attachment:**
+
+This option depends on enhancements to Gateway API’s policy attachment model to support `LabelSelector` as a valid `targetRef`. This capability was discussed and received consensus at KubeCon North America 2024 and was originally in scope for GEP-713 but deferred for a future PR to keep GEP-713 focused on stabilizing what we already have (See [https://github.com/kubernetes-sigs/gateway-api/pull/3609#discussion_r2053376938](https://github.com/kubernetes-sigs/gateway-api/pull/3609#discussion_r2053376938)).
+
+##### **Experimental Pattern**
+
+To mitigate some of the concerns, `LabelSelector` support in policy attachment is designated as an **experimental pattern**.
+
+* **Gateway API Community First:** Allows experimentation within Gateway API policies (like the one in this GEP).  
+* Implementations **should not** adopt `LabelSelector` targeting in their own custom policies attached to Gateway API resources until the pattern is sufficiently battle-tested and promoted to a standard feature. This staged approach mitigates risks of ecosystem fragmentation.
+
+Here is how it is going to look like:
+
+```go
+
+// PolicyTargetReferenceWithLabelSelectors specifies a reference to a set of Kubernetes
+// objects by Group and Kind, with an optional label selector to narrow down the matching
+// objects.
+//
+// Currently, we only support label selectors when targeting Pods.
+// This restriction is intentional to limit the complexity and potential
+// ambiguity of supporting label selectors for arbitrary Kubernetes kinds.
+// Unless there is a very strong justification in the future, we plan to keep this
+// functionality limited to selecting Pods only.
+//
+// This is currently experimental in the Gateway API and should only be used
+// for policies implemented within Gateway API. It is currently not intended for general-purpose
+// use outside of Gateway API resources.
+// +kubebuilder:validation:XValidation:rule="!(has(self.selector)) || (self.kind == 'Pod' && (self.group == '' || self.group == 'core'))",message="Selector may only be set when targeting Pods."
+type PolicyTargetReferenceWithLabelSelectors struct {
+  // Group is the group of the target object.
+  Group Group `json:"group"`
+
+  // Kind is the kind of the target object.
+  Kind Kind `json:"kind"`
+
+  // Selector is the label selector of target objects of the specified kind.
+  Selector *metav1.LabelSelector `json:"selector"`
+}
+
+```
+
+##### **Enhanced Discoverability with `gwctl`**
+
+A key challenge with `LabelSelector` is the loss of discoverability. It’s easier to see which policies target a `Service` but difficult to determine which policies might affect a specific pod.
+
+To address this, **investment in tooling is required.** Specifically, the `gwctl` CLI tool should be enhanced to provide insights such as:
+
+```sh
+TODO: complete gwctl commands
+```
+
+Without dedicated tooling, the `LabelSelector` approach could significantly degrade the user experience and observability.
+
+### API Design
+
+```go
+
+type AuthorizationPolicy struct {
+    metav1.TypeMeta   `json:",inline"`
+    metav1.ObjectMeta `json:"metadata,omitempty"`
+
+    // Spec defines the desired state of AuthorizationPolicy.
+    Spec AuthorizationPolicySpec `json:"spec,omitempty"`
+
+    // Status defines the current state of AuthorizationPolicy.
+    Status PolicyStatus `json:"status,omitempty"`
+}
+
+// AuthorizationPolicyAction specifies the action to take.
+// +kubebuilder:validation:Enum=ALLOW;DENY
+type AuthorizationPolicyAction string
+
+const (
+    // ActionAllow allows requests that match the policy rules.
+    ActionAllow AuthorizationPolicyAction = "ALLOW"
+    // ActionDeny denies requests that match the policy rules.
+    ActionDeny AuthorizationPolicyAction = "DENY"
+)
+
+// AuthorizationPolicySpec defines the desired state of AuthorizationPolicy.
+type AuthorizationPolicySpec struct {
+    // TargetRef identifies the resource this policy is attached to.
+    // +kubebuilder:validation:Required
+    TargetRefs gatewayv1.PolicyTargetReferenceWithLabelSelectors `json:"targetRefs"`
+
+    // Action specifies the action to take when a request matches the rules.
+    // +kubebuilder:validation:Required
+    Action AuthorizationPolicyAction `json:"action"`
+
+    // TCPRules defines the list of matching criteria. A request is considered to
+    // match the policy if it matches any of the rules.
+    // +optional
+    TCPRules []AuthorizationTCPRule `json:"tcpRules,omitempty"`
+}
+
+// AuthorizationTCPRule defines a set of criteria for matching a TCP request.
+// A request must match all specified criteria.
+type AuthorizationTCPRule struct {
+    // Sources specifies a list of identities that are matched by this rule.
+    // If this field is empty, this rule matches all sources.
+    // A request matches if its identity is present in this list.
+    // +optional
+    Sources []AuthorizationSource `json:"sources,omitempty"`
+
+    // Attributes specifies a list of properties that are matched by this rule.
+    // If this field is empty, this rule matches all attributes.
+    // A request matches if its attributes are present in this list.
+    //
+    // +optional
+    Attributes []AuthorizationTCPAttributes `json:"attributes,omitempty"`
+}
+
+
+// AuthorizationSource specifies the source of a request.
+// Only one of its fields may be set.
+// +kubebuilder:validation:XValidation:rule="(size(self.identities) > 0 ? 1 : 0) + (size(self.serviceAccounts) > 0 ? 1 : 0) + (size(self.namespaces) > 0 ? 1 : 0) == 1",message="Exactly one of identities, serviceAccounts, or namespaces must be specified."
+type AuthorizationSource struct {
+
+    // Identities specifies a list of identities that are matched by this rule.
+    // A request's identity must be present in this list to match the rule.
+    //
+    // Identities must be specified as SPIFFE-formatted URIs following the pattern:
+    //   spiffe://<trust_domain>/<workload-identifier>
+    //
+    // While the exact workload identifier structure is implementation-specific,
+    // implementations are encouraged to follow the convention of
+    // `spiffe://<trust_domain>/ns/<namespace>/sa/<serviceaccount>`
+    // when representing Kubernetes workload identities.
+    //
+    // Identities for authorization can be derived in various ways by the underlying
+    // implementation. Common methods include:
+    // - From peer mTLS certificates: The identity is extracted from the client's
+    //   mTLS certificate presented during connection establishment.
+    // - From IP-to-identity mappings: The implementation might maintain a dynamic
+    //   mapping between source IP addresses (pod IPs) and their associated
+    //   identities (e.g., Service Account, SPIFFE IDs).
+    // - From JWTs or other request-level authentication tokens. 
+    // 
+    // Note for reviewers: While this GEP primarily focuses on identity-based 
+    // authorization where identity is often established at the transport layer,
+    // some implementations might derive identity from authenticated tokens or sources
+    // within the request itself.
+    //
+    // +optional
+    Identities []string `json:"identities,omitempty"`
+
+    // ServiceAccounts specifies a list of Kubernetes Service Accounts that are
+    // matched by this rule. Each service account must be specified in the format
+    // "<namespace>/<service-account-name>". A request originating from a pod
+    // associated with one of these service accounts will match the rule.
+    //
+    // The ServiceAccounts listed here are expected to exist within the same
+    // trust domain as the targeted workload, which in many environments means
+    // the same Kubernetes cluster. Cross-cluster or cross-trust-domain should
+    // be expressed with Identities field.
+    // +optional
+    ServiceAccounts []string `json:"serviceAccounts,omitempty"`
+
+    // Namespaces specifies a list of Kubernetes Namespaces that are matched
+    // by this rule. A request originating from any pod within one of these
+    // namespaces will match the rule, regardless of its specific Service Account.
+    // This provides a broader scope for authorization.
+
+    // The Namespaces listed here are expected to exist within the same
+    // trust domain as the targeted workload, which in many environments means
+    // the same Kubernetes cluster. Cross-cluster or cross-trust-domain should
+    // be expressed with Identities field.
+    // +optional
+    Namespaces []string `json:"namespaces,omitempty"`
+}
+
+// AuthorizationAttribute defines L4 properties of a request destination.
+type AuthorizationTCPAttributes struct {
+    // Ports specifies a list of destination ports to match on.
+    // Traffic is matched if it is going to any of these ports.
+    // If not specified, the rule applies to all ports.
+    // +optional
+    Ports []gatewayv1.PortNumber `json:"ports,omitempty"`
+}
+
+```
+
+Note: Existing AuthorizationAPIs recognized the need to support negation fields like `not{field}`. To avoid duplicating fields with negation, we plan to support richer match expressions for fields in `AuthorizationSource` such as `matchExpressions: { operator: In|NotIn, values: []}`.
 
 ## Conformance Details
 
