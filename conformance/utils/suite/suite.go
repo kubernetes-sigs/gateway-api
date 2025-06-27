@@ -191,7 +191,7 @@ const (
 // NewConformanceTestSuite is a helper to use for creating a new ConformanceTestSuite.
 func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite, error) {
 	supportedFeatures := options.SupportedFeatures.Difference(options.ExemptFeatures)
-	status := confv1.SupportedFeaturesSourceManual
+	source := confv1.SupportedFeaturesSourceManual
 	switch {
 	case options.EnableAllSupportedFeatures:
 		supportedFeatures = features.SetsToNamesSet(features.AllFeatures)
@@ -201,13 +201,13 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 		if err != nil {
 			return nil, fmt.Errorf("Cannot infer supported features: %w", err)
 		}
-		status = confv1.SupportedFeaturesSourceInferred
+		source = confv1.SupportedFeaturesSourceInferred
 	case isOnlyMeshProfile(&options):
-		status = confv1.SupportedFeaturesSourceUndefined
+		source = confv1.SupportedFeaturesSourceUndefined
 	}
 
 	// If features were not inferred from Status, it's a GWC issue.
-	if status == confv1.SupportedFeaturesSourceInferred && supportedFeatures.Len() == 0 {
+	if source == confv1.SupportedFeaturesSourceInferred && supportedFeatures.Len() == 0 {
 		return nil, fmt.Errorf("no supported features were determined for test suite")
 	}
 
@@ -275,7 +275,7 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 		mode:                        mode,
 		apiVersion:                  apiVersion,
 		apiChannel:                  apiChannel,
-		supportedFeaturesSource:     status,
+		supportedFeaturesSource:     source,
 		Hook:                        options.Hook,
 	}
 
