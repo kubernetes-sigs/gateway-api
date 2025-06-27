@@ -48,11 +48,11 @@ type TLSRoute struct {
 type TLSRouteSpec struct {
 	CommonRouteSpec `json:",inline"`
 
-	// Hostnames defines a set of SNI names that should match against the
+	// Hostnames defines a set of SNI hostnames that should match against the
 	// SNI attribute of TLS ClientHello message in TLS handshake. This matches
 	// the RFC 1123 definition of a hostname with 2 notable exceptions:
 	//
-	// 1. IPs are not allowed in SNI names per RFC 6066.
+	// 1. IPs are not allowed in SNI hostnames per RFC 6066.
 	// 2. A hostname may be prefixed with a wildcard label (`*.`). The wildcard
 	//    label must appear by itself as the first label.
 	//
