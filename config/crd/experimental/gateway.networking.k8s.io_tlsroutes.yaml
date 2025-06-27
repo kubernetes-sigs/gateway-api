@@ -22,7 +22,7 @@ spec:
     - jsonPath: .metadata.creationTimestamp
       name: Age
       type: date
-    name: v1alpha2
+    name: v1alpha3
     schema:
       openAPIV3Schema:
         description: |-
@@ -55,7 +55,7 @@ spec:
             properties:
               hostnames:
                 description: |-
-                  Hostnames defines a set of SNI names that should match against the
+                  Hostnames defines a set of SNI hostnames that should match against the
                   SNI attribute of TLS ClientHello message in TLS handshake. This matches
                   the RFC 1123 definition of a hostname with 2 notable exceptions:
 
@@ -507,6 +507,7 @@ spec:
                   rule: self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name)
                     && l1.name == l2.name))
             required:
+            - hostnames
             - rules
             type: object
           status:
