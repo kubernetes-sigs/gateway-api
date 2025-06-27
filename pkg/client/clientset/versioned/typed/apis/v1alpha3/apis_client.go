@@ -29,6 +29,7 @@ import (
 type GatewayV1alpha3Interface interface {
 	RESTClient() rest.Interface
 	BackendTLSPoliciesGetter
+	TLSRoutesGetter
 }
 
 // GatewayV1alpha3Client is used to interact with features provided by the gateway.networking.k8s.io group.
@@ -38,6 +39,10 @@ type GatewayV1alpha3Client struct {
 
 func (c *GatewayV1alpha3Client) BackendTLSPolicies(namespace string) BackendTLSPolicyInterface {
 	return newBackendTLSPolicies(c, namespace)
+}
+
+func (c *GatewayV1alpha3Client) TLSRoutes(namespace string) TLSRouteInterface {
+	return newTLSRoutes(c, namespace)
 }
 
 // NewForConfig creates a new GatewayV1alpha3Client for the given config.

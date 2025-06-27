@@ -186,14 +186,6 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1alpha2.TCPRouteSpecApplyConfiguration{}
 	case v1alpha2.SchemeGroupVersion.WithKind("TCPRouteStatus"):
 		return &apisv1alpha2.TCPRouteStatusApplyConfiguration{}
-	case v1alpha2.SchemeGroupVersion.WithKind("TLSRoute"):
-		return &apisv1alpha2.TLSRouteApplyConfiguration{}
-	case v1alpha2.SchemeGroupVersion.WithKind("TLSRouteRule"):
-		return &apisv1alpha2.TLSRouteRuleApplyConfiguration{}
-	case v1alpha2.SchemeGroupVersion.WithKind("TLSRouteSpec"):
-		return &apisv1alpha2.TLSRouteSpecApplyConfiguration{}
-	case v1alpha2.SchemeGroupVersion.WithKind("TLSRouteStatus"):
-		return &apisv1alpha2.TLSRouteStatusApplyConfiguration{}
 	case v1alpha2.SchemeGroupVersion.WithKind("UDPRoute"):
 		return &apisv1alpha2.UDPRouteApplyConfiguration{}
 	case v1alpha2.SchemeGroupVersion.WithKind("UDPRouteRule"):
@@ -212,6 +204,14 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1alpha3.BackendTLSPolicyValidationApplyConfiguration{}
 	case v1alpha3.SchemeGroupVersion.WithKind("SubjectAltName"):
 		return &apisv1alpha3.SubjectAltNameApplyConfiguration{}
+	case v1alpha3.SchemeGroupVersion.WithKind("TLSRoute"):
+		return &apisv1alpha3.TLSRouteApplyConfiguration{}
+	case v1alpha3.SchemeGroupVersion.WithKind("TLSRouteRule"):
+		return &apisv1alpha3.TLSRouteRuleApplyConfiguration{}
+	case v1alpha3.SchemeGroupVersion.WithKind("TLSRouteSpec"):
+		return &apisv1alpha3.TLSRouteSpecApplyConfiguration{}
+	case v1alpha3.SchemeGroupVersion.WithKind("TLSRouteStatus"):
+		return &apisv1alpha3.TLSRouteStatusApplyConfiguration{}
 
 		// Group=gateway.networking.k8s.io, Version=v1beta1
 	case v1beta1.SchemeGroupVersion.WithKind("Gateway"):

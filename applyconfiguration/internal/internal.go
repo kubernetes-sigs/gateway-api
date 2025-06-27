@@ -1391,69 +1391,6 @@ var schemaYAML = typed.YAMLObject(`types:
           elementType:
             namedType: io.k8s.sigs.gateway-api.apis.v1.RouteParentStatus
           elementRelationship: atomic
-- name: io.k8s.sigs.gateway-api.apis.v1alpha2.TLSRoute
-  map:
-    fields:
-    - name: apiVersion
-      type:
-        scalar: string
-    - name: kind
-      type:
-        scalar: string
-    - name: metadata
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
-      default: {}
-    - name: spec
-      type:
-        namedType: io.k8s.sigs.gateway-api.apis.v1alpha2.TLSRouteSpec
-      default: {}
-    - name: status
-      type:
-        namedType: io.k8s.sigs.gateway-api.apis.v1alpha2.TLSRouteStatus
-      default: {}
-- name: io.k8s.sigs.gateway-api.apis.v1alpha2.TLSRouteRule
-  map:
-    fields:
-    - name: backendRefs
-      type:
-        list:
-          elementType:
-            namedType: io.k8s.sigs.gateway-api.apis.v1.BackendRef
-          elementRelationship: atomic
-    - name: name
-      type:
-        scalar: string
-- name: io.k8s.sigs.gateway-api.apis.v1alpha2.TLSRouteSpec
-  map:
-    fields:
-    - name: hostnames
-      type:
-        list:
-          elementType:
-            scalar: string
-          elementRelationship: atomic
-    - name: parentRefs
-      type:
-        list:
-          elementType:
-            namedType: io.k8s.sigs.gateway-api.apis.v1.ParentReference
-          elementRelationship: atomic
-    - name: rules
-      type:
-        list:
-          elementType:
-            namedType: io.k8s.sigs.gateway-api.apis.v1alpha2.TLSRouteRule
-          elementRelationship: atomic
-- name: io.k8s.sigs.gateway-api.apis.v1alpha2.TLSRouteStatus
-  map:
-    fields:
-    - name: parents
-      type:
-        list:
-          elementType:
-            namedType: io.k8s.sigs.gateway-api.apis.v1.RouteParentStatus
-          elementRelationship: atomic
 - name: io.k8s.sigs.gateway-api.apis.v1alpha2.UDPRoute
   map:
     fields:
@@ -1585,6 +1522,69 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: uri
       type:
         scalar: string
+- name: io.k8s.sigs.gateway-api.apis.v1alpha3.TLSRoute
+  map:
+    fields:
+    - name: apiVersion
+      type:
+        scalar: string
+    - name: kind
+      type:
+        scalar: string
+    - name: metadata
+      type:
+        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+      default: {}
+    - name: spec
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1alpha3.TLSRouteSpec
+      default: {}
+    - name: status
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1alpha3.TLSRouteStatus
+      default: {}
+- name: io.k8s.sigs.gateway-api.apis.v1alpha3.TLSRouteRule
+  map:
+    fields:
+    - name: backendRefs
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v1.BackendRef
+          elementRelationship: atomic
+    - name: name
+      type:
+        scalar: string
+- name: io.k8s.sigs.gateway-api.apis.v1alpha3.TLSRouteSpec
+  map:
+    fields:
+    - name: hostnames
+      type:
+        list:
+          elementType:
+            scalar: string
+          elementRelationship: atomic
+    - name: parentRefs
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v1.ParentReference
+          elementRelationship: atomic
+    - name: rules
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v1alpha3.TLSRouteRule
+          elementRelationship: atomic
+- name: io.k8s.sigs.gateway-api.apis.v1alpha3.TLSRouteStatus
+  map:
+    fields:
+    - name: parents
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v1.RouteParentStatus
+          elementRelationship: atomic
 - name: io.k8s.sigs.gateway-api.apis.v1beta1.Gateway
   map:
     fields:
