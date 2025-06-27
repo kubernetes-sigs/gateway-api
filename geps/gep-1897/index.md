@@ -22,7 +22,7 @@ the service or backend owner wants to validate the clients connecting to it, two
 1. The solution must satisfy the following use case: the backend pod has its own
 certificate and the gateway implementation client needs to know how to connect to the
 backend pod. (Use case #4 in [Gateway API TLS Use Cases](#references))
-2. Both the application developer persona, and gateway operator persona will have control over TLS settings.
+2. In this GEP, only the application developer persona will have control over TLS settings. This does not preclude adding other personas in future GEPs.
 3. The solution should consider client TLS settings used in the TLS handshake **from
 Gateway to backend**, such as server name indication and trusted CA certificates.
 4. Both Gateway and Mesh use cases may be supported, depending on the implementation, and will be covered by features in each case.
