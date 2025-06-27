@@ -51,17 +51,17 @@ type ConformanceReport struct {
 	// have been successfully run.
 	SucceededProvisionalTests []string `json:"succeededProvisionalTests,omitempty"`
 
-	// InferredSupportedFeatures indicates whether the supported features were
+	// SupportedFeaturesSource indicates whether the supported features were
 	// automatically detected by the conformance suite.
-	InferredSupportedFeatures InferredSupportedFeatures `json:"inferredSupportedFeatures"`
+	SupportedFeaturesSource SupportedFeaturesSource `json:"SupportedFeaturesSource"`
 }
 
-type InferredSupportedFeatures int
+type SupportedFeaturesSource int
 
 const (
-	InferredSupportedFeaturesFalse InferredSupportedFeatures = iota
-	InferredSupportedFeaturesTrue
-	InferredSupportedFeaturesUnsupported
+	SupportedFeaturesSourceUndefined SupportedFeaturesSource = iota
+	SupportedFeaturesSourceManual
+	SupportedFeaturesSourceInferred
 )
 
 // Implementation provides metadata information on the downstream
