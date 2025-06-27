@@ -25,7 +25,7 @@ backend pod. (Use case #4 in [Gateway API TLS Use Cases](#references))
 2. Both the application developer persona, and gateway operator persona will have control over TLS settings.
 3. The solution should consider client TLS settings used in the TLS handshake **from
 Gateway to backend**, such as server name indication and trusted CA certificates.
-4. Both Gateway and Mesh use cases will be supported.
+4. Both Gateway and Mesh use cases may be supported, depending on the implementation, and will be covered by features in each case.
 
 ## Longer Term Goals
 
@@ -244,15 +244,14 @@ Thus, the following additions would be made to the Gateway API:
 
 The `BackendTLSPolicy` tells a client "Connect to this service using TLS".
 This is unconditional to the type of traffic the gateway client is forwarding.
+
 For instance, the following will all have the gateway client add TLS if the backend is targeted by a BackendTLSPolicy:
 
 * A Gateway accepts traffic on an HTTP listener
 * A Gateway accepts and terminates TLS on an HTTPS listener
 * A Gateway accepts traffic on a TCP listener
-* A Gateway accepts traffic with `Mode: Passthrough` on a TLS listener
-* A service mesh client accepts HTTP traffic
-* A service mesh client accepts TLS traffic
-* A service mesh client accepts TCP traffic
+
+There is no need for a Gateway that accepts traffic with `Mode: Passthrough` to do anything differently here, but implementations MAY choose to treat TLS passthrough as a special case. Implementations that do this SHOULD clearly document their approach if BackendTLSPolicy is treated differently for TLS passthrough.
 
 Note that there are cases where these patterns may result in multiple layers of TLS on a single connection.
 There may be even cases where the gateway implementation is unaware of this; for example, processing TCPRoute traffic -- the traffic may or may not be TLS, and the gateway would be unaware.
