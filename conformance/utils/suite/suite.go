@@ -648,8 +648,8 @@ func getAPIVersionAndChannel(crds []apiextensionsv1.CustomResourceDefinition) (v
 	return version, channel, nil
 }
 
-func isOnlyMeshProfile(options *ConformanceOptions) bool {
-	// TODO(bexxmodd): Currently a placeholder to add logic that determines if 
+func isOnlyMeshProfile(_ *ConformanceOptions) bool {
+	// TODO(bexxmodd): Currently a placeholder to add logic that determines if
 	// it's only Mesh profile without GWC.
 	return false
 }

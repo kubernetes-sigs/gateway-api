@@ -56,6 +56,9 @@ type ConformanceReport struct {
 	SupportedFeaturesSource SupportedFeaturesSource `json:"SupportedFeaturesSource"`
 }
 
+// SupportedFeaturesSource represents the source from which supported features are derived.
+// It is used to distinguish between them being inferred from GWC Status or manually
+// supplied for the conformance report.
 type SupportedFeaturesSource int
 
 const (
