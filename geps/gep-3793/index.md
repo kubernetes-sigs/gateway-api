@@ -285,7 +285,7 @@ Gateways are in play; `gwctl` or something similar SHOULD be able to show her
 which Routes are bound to which Gateways in every case, not just with default
 Gateways.
 
-**Open Questions:**
+##### Open Questions
 
 Should the Gateway also add a `condition` explicitly expressing that the Route
 has been claimed by the default Gateway, perhaps with `type: DefaultGateway`?
@@ -308,9 +308,9 @@ type GatewaySpec struct {
 
 If `spec.isDefault` is set to `true`, the Gateway MUST claim Routes that have
 specified no `parentRefs` (subject to the usual Gateway API rules about which
-Routes may be bound to a Gateway), and it MUST update its own `status` to with
-a `condition` of type `DefaultGateway` and `status` true to indicate that it
-is the default Gateway, for example:
+Routes may be bound to a Gateway), and it MUST update its own `status` with a
+`condition` of type `DefaultGateway` and `status` true to indicate that it is
+the default Gateway, for example:
 
 ```yaml
 status:
@@ -362,44 +362,44 @@ possible options here.
 
 1. Don't bother with any enforcement logic.
 
-   In this case, a Route with no `parentRefs` specified will be bound to _all_
-   Gateways that have `spec.isDefault` set to `true`. Since Gateway API
-   already allows a Route to be bound to multiple Gateways, and the Route
-   `status` is already designed for it, this should function without
-   difficulty.
+    In this case, a Route with no `parentRefs` specified will be bound to _all_
+    Gateways that have `spec.isDefault` set to `true`. Since Gateway API
+    already allows a Route to be bound to multiple Gateways, and the Route
+    `status` is already designed for it, this should function without
+    difficulty.
 
 2. Treat multiple Gateways with `spec.isDefault` set to `true` as if no
    Gateway has `spec.isDefault` set to `true`.
 
-   If we assume that all Gateway controllers in a cluster can see all the
-   Gateways in the cluster, then detecting that multiple Gateways have
-   `spec.isDefault` set to `true` is relatively straightforward.
+    If we assume that all Gateway controllers in a cluster can see all the
+    Gateways in the cluster, then detecting that multiple Gateways have
+    `spec.isDefault` set to `true` is relatively straightforward.
 
-   For option 2, every Gateway with `spec.isDefault` set to `true` can simply
-   refuse to accept Routes with no `parentRefs` specified, behaving as if no
-   Gateway has been chosen as the default. Each Gateway would also update its
-   `status` with a `condition` of type `DefaultGateway` and `status` false to
-   indicate that it is not the default Gateway, for example:
+    For option 2, every Gateway with `spec.isDefault` set to `true` can simply
+    refuse to accept Routes with no `parentRefs` specified, behaving as if no
+    Gateway has been chosen as the default. Each Gateway would also update its
+    `status` with a `condition` of type `DefaultGateway` and `status` false to
+    indicate that it is not the default Gateway, for example:
 
-   ```yaml
-   status:
-     conditions:
-     - type: DefaultGateway
-       status: "False"
-       lastTransitionTime: "2025-10-01T12:00:00Z"
-       message: "Multiple Gateways are marked as default"
-   ```
+    ```yaml
+    status:
+      conditions:
+      - type: DefaultGateway
+        status: "False"
+        lastTransitionTime: "2025-10-01T12:00:00Z"
+        message: "Multiple Gateways are marked as default"
+    ```
 
 3. Perform conflict resolution as with Routes.
 
-   In this case, the oldest Gateway with `spec.isDefault` set to `true` will
-   be considered the only default Gateway. That oldest Gateway will accept all
-   Routes with no `parentRefs` specified, while all other Gateways with
-   `spec.isDefault` set to `true` will ignore those Routes.
+    In this case, the oldest Gateway with `spec.isDefault` set to `true` will
+    be considered the only default Gateway. That oldest Gateway will accept all
+    Routes with no `parentRefs` specified, while all other Gateways with
+    `spec.isDefault` set to `true` will ignore those Routes.
 
-   The oldest default Gateway will update its `status` to reflect that it the
-   default Gateway; all other Gateways with `spec.isDefault` set to `true`
-   will update their `status` as in Option 2.
+    The oldest default Gateway will update its `status` to reflect that it the
+    default Gateway; all other Gateways with `spec.isDefault` set to `true`
+    will update their `status` as in Option 2.
 
 Unfortunately, option 2 will almost certainly cause downtime in any case where
 Chihiro wants to change the default Gateway:
