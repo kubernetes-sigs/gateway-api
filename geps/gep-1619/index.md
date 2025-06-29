@@ -21,7 +21,7 @@ Before this GEP graduates to Implementable, we must fulfill the following criter
     - **Answer**: Yes. We adjusted the API to use `BackendLBPolicy`. See [API](#api) for more details.
  2. Should we leave room for configuring different forms of Session Persistence?
     If so, what would that look like?
-    - **Answer**: Yes. See the [BackendLBPolicy API](#BackendLBPolicy-api) and [API Granularity](#api-granularity)
+    - **Answer**: Yes. See the [BackendLBPolicy API](#backendlbpolicy-api) and [API Granularity](#api-granularity)
       sections for more details.
  3. What name appropriately describe the API responsible for configuring load-balancing options for backend traffic?
     - **Answer**: We decided on `BackendLBPolicy` since it is aligned with `BackendTLSPolicy`, describes configuration
@@ -668,7 +668,7 @@ functionality of their applications.
 
 ### Prior Art
 
-Referring to our [Implementations](#Implementations) table on session persistence, the majority of Gateway API
+Referring to our [Implementations](#implementations) table on session persistence, the majority of Gateway API
 implementations designed session persistence in their APIs to be attached to a service or backends. This should be
 considered cautiously, as making associations to Gateway API's notion of Gateway, Route, and Service to other
 implementation's objects is hard to directly translate. The idea of a route in Gateway API is often not the same as a

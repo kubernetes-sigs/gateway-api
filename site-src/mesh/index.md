@@ -36,7 +36,7 @@ Service.
 [TCPRoute]: ../concepts/api-overview.md#tcproute-and-udproute
 [Service]: https://kubernetes.io/docs/concepts/services-networking/service/
 [service-mesh]:../concepts/glossary.md#service-mesh
-[service-facets]:/concepts/service-facets
+[service-facets]:service-facets.md
 
 ## Connecting routes and services <a name="gateway-api-for-mesh">
 
