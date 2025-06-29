@@ -73,6 +73,11 @@ she doesn't have to explicitly name, and can simply trust to exist.
   not in scope for this GEP, in order to have a fighting chance of getting
   functionality into Gateway API 1.4.
 
+  Additionally, note that providing support for Chihiro to swap the default
+  Gateway without downtime may very well require supporting multiple default
+  Gateways at the same time, since Kubernetes does not support atomic swaps of
+  resources.
+
 - Allow Ana to override Chihiro's choice for the default Gateway for a given
   Route without explicitly specifying the Gateway.
 
@@ -161,10 +166,10 @@ Gateways.
 
 ## API
 
-Most of the API work for this GEP is TBD at this point. The challenge is to
-find a way to allow Ana to use Routes without requiring her to specify the
-Gateway explicitly, while still allowing Chihiro and Ian to retain control
-over the Gateway and its configuration.
+The main challenge in the API design is to find a way to allow Ana to use
+Routes without requiring her to specify the Gateway explicitly, while still
+allowing Chihiro and Ian to retain control over the Gateway and its
+configuration.
 
 An additional concern is CD tools and GitOps workflows. In very broad terms,
 these tools function by applying manifests from a Git repository to a
@@ -189,9 +194,273 @@ will need resolution before this GEP can graduate.
 
 [discussion]: https://github.com/kubernetes-sigs/gateway-api/pull/3852#discussion_r2140117567
 
+Finally, although support for multiple default Gateways is a non-goal for this
+GEP, it's worth noting that allowing Chihiro full control over the default
+Gateway is very much a goal, which includes giving Chihiro a clean way to swap
+one default Gateway for another. This is important because a zero-downtime
+swap implies having two default Gateways running at the same time, since
+Kubernetes does not support any sort of atomic swap operation.
+
 ### Gateway for Ingress (North/South)
 
+There are two main aspects to the API design for default Gateways:
+
+1. Giving Ana a way to bind Routes to the default Gateway.
+
+2. Giving Chihiro a way to control which Gateway is the default, and to
+   enumerate which Routes are bound to it.
+
+#### 1. Binding a Route to the Default Gateway
+
+For Ana to indicate that a Route should use the default Gateway, she MUST
+leave `parentRefs` empty in the `spec` of the Route, for example:
+
+```yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: my-route
+spec:
+  rules:
+  - backendRefs:
+    - name: my-service
+      port: 80
+```
+
+would route _all_ HTTP traffic arriving at the default Gateway to `my-service`
+on port 80.
+
+Note that Ana MUST omit `parentRefs` entirely: specifying an empty array for
+`parentRefs` MUST fail validation. If a Route with an empty array for
+`parentRefs` somehow exists in the cluster, all Gateways in the cluster MUST
+refuse to accept it. (Omitting `parentRefs` entirely will work much more
+cleanly with GitOps tools than specifying an empty array.)
+
+Note also that if Ana specifies _any_ `parentRefs`, the default Gateway MUST
+NOT claim the Route unless of the `parentRefs` explicitly names the default
+Gateway. To do otherwise makes it impossible for Ana to define mesh-only
+Routes, or to specify a Route that is meant to use only a specific Gateway
+that is not the default. This implies that for Ana to specify a Route intended
+to serve both north/south and east/west roles, she MUST explicitly specify the
+Gateway in `parentRefs`, even if that Gateway happens to be the default
+Gateway.
+
+All other characteristics of a Route using the default Gateway MUST behave the
+same as if the default Gateway were explicitly specified in `parentRefs`.
+
+The default Gateway MUST use `status.parents` to announce that it has bound
+the Route, for example:
+
+```yaml
+status:
+  parents:
+  - name: my-default-gateway
+    namespace: default
+    controllerName: gateway.networking.k8s.io/some-gateway-controller
+    conditions:
+    - type: Accepted
+      status: "True"
+      lastTransitionTime: "2025-10-01T12:00:00Z"
+      message: "Route is bound to default Gateway"
+```
+
+The default Gateway MUST NOT rewrite the `parentRefs` of a Route using the
+default Gateway; it MUST leave `parentRefs` empty. This becomes important if
+the default Gateway changes, or (in some situations) if GitOps tools are in
+play.
+
+##### Enumerating Routes Bound to the Default Gateway
+
+To enumerate Routes bound to the default Gateway, Ana can look for Routes with
+no `parentRefs` specified, and then check the `status.parents` of those Routes
+to see if the Route has been claimed. This will also tell Ana which Gateway is
+the default, even if she doesn't have RBAC to query Gateway resources
+directly.
+
+While this is possible with `kubectl get -o yaml`, it's not exactly a friendly
+user experience, so adding this functionality to a tool like `gwctl` would be
+a dramatic improvement. In fact, looking at the `status` of a Route is very
+much something that we should expect Ana to do often, whether or not default
+Gateways are in play; `gwctl` or something similar SHOULD be able to show her
+which Routes are bound to which Gateways in every case, not just with default
+Gateways.
+
+**Open Questions:**
+
+Should the Gateway also add a `condition` explicitly expressing that the Route
+has been claimed by the default Gateway, perhaps with `type: DefaultGateway`?
+This could help tooling like `gwctl` more easily enumerate Routes bound to the
+default Gateway.
+
+#### 2. Controlling which Gateway is the Default
+
+Since Chihiro must be able to control which Gateway is the default, selecting
+the default Gateway must be an active configuration step taken by Chihiro,
+rather than any kind of implicit behavior. To that end, the Gateway resource
+will gain a new field, `spec.isDefault`:
+
+```go
+type GatewaySpec struct {
+    // ... other fields ...
+    IsDefault *bool `json:"isDefault,omitempty"`
+}
+```
+
+If `spec.isDefault` is set to `true`, the Gateway MUST claim Routes that have
+specified no `parentRefs` (subject to the usual Gateway API rules about which
+Routes may be bound to a Gateway), and it MUST update its own `status` to with
+a `condition` of type `DefaultGateway` and `status` true to indicate that it
+is the default Gateway, for example:
+
+```yaml
+status:
+  conditions:
+  - type: DefaultGateway
+    status: "True"
+    lastTransitionTime: "2025-10-01T12:00:00Z"
+    message: "Gateway is the default Gateway"
+```
+
+If `spec.isDefault` is not present or is set to `false`, the Gateway MUST NOT
+claim those Routes and MUST NOT set the `DefaultGateway` condition in its
+`status`.
+
+##### Access to the Default Gateway
+
+The rules for which Routes may bind to a Gateway do not change for the default
+Gateway. In particular, if a default Gateway should accept Routes from other
+namespaces, then it MUST include the appropriate `AllowedRoutes` definition,
+and without such an `AllowedRoutes`, a default Gateway MUST accept only Routes
+from its own namespace.
+
+##### Behavior with No Default Gateway
+
+If no Gateway has `spec.isDefault` set to `true`, then the behavior is exactly
+the same as for Gateway API 1.3: all Routes MUST specify `parentRefs` in order
+to function, and no Gateway will claim Routes that do not specify
+`parentRefs`.
+
+##### Deleting the Default Gateway
+
+Deleting the default Gateway MUST behave the same as deleting any other
+Gateway: all Routes that were bound to the default Gateway MUST be unbound,
+and the `Accepted` conditions in the `status` of those Routes SHOULD be
+removed.
+
+##### Multiple Default Gateways
+
+Support for multiple default Gateways in a cluster is not one of the original
+goals of this GEP. However, allowing Chihiro to control which Gateway is the
+default - including being able to switch which Gateway is the default at
+runtime, without requiring downtime - is a goal.
+
+Kubernetes itself will not prevent setting `spec.isDefault` to `true` on
+multiple Gateways in a cluster, and it also doesn't support any atomic swap
+mechanisms. If we want to enforce only a single default Gateway, the Gateway
+controllers will have to implement that enforcement logic. There are three
+possible options here.
+
+1. Don't bother with any enforcement logic.
+
+   In this case, a Route with no `parentRefs` specified will be bound to _all_
+   Gateways that have `spec.isDefault` set to `true`. Since Gateway API
+   already allows a Route to be bound to multiple Gateways, and the Route
+   `status` is already designed for it, this should function without
+   difficulty.
+
+2. Treat multiple Gateways with `spec.isDefault` set to `true` as if no
+   Gateway has `spec.isDefault` set to `true`.
+
+   If we assume that all Gateway controllers in a cluster can see all the
+   Gateways in the cluster, then detecting that multiple Gateways have
+   `spec.isDefault` set to `true` is relatively straightforward.
+
+   For option 2, every Gateway with `spec.isDefault` set to `true` can simply
+   refuse to accept Routes with no `parentRefs` specified, behaving as if no
+   Gateway has been chosen as the default. Each Gateway would also update its
+   `status` with a `condition` of type `DefaultGateway` and `status` false to
+   indicate that it is not the default Gateway, for example:
+
+   ```yaml
+   status:
+     conditions:
+     - type: DefaultGateway
+       status: "False"
+       lastTransitionTime: "2025-10-01T12:00:00Z"
+       message: "Multiple Gateways are marked as default"
+   ```
+
+3. Perform conflict resolution as with Routes.
+
+   In this case, the oldest Gateway with `spec.isDefault` set to `true` will
+   be considered the only default Gateway. That oldest Gateway will accept all
+   Routes with no `parentRefs` specified, while all other Gateways with
+   `spec.isDefault` set to `true` will ignore those Routes.
+
+   The oldest default Gateway will update its `status` to reflect that it the
+   default Gateway; all other Gateways with `spec.isDefault` set to `true`
+   will update their `status` as in Option 2.
+
+Unfortunately, option 2 will almost certainly cause downtime in any case where
+Chihiro wants to change the default Gateway:
+
+- If Chihiro deletes the default Gateway before creating the new one, then all
+  routes using the default Gateway will be unbound during the time that
+  there's no default Gateway, resulting in errors for any requests using those
+  Routes.
+
+- If Chihiro creates the new default Gateway before deleting the old one, then
+  all Routes using the default Gateway are still unbound during the time that
+  both Gateways exist.
+
+Option 3 gives Chihiro a way to change the default Gateway without downtime:
+when they create the new default Gateway, it will not take effect until the
+old default Gateway is deleted. However, it doesn't give Chihiro any way to
+test the Routes through the new default Gateway before deleting the old
+Gateway.
+
+Reluctantly, we must therefore conclude that option 1 is the only viable
+choice. Therefore: Gateways MUST NOT attempt to enforce a single default
+Gateway, and MUST allow Routes with no `parentRefs` to bind to _all_ Gateways
+that have `spec.isDefault` set to `true`. This is simplest to implement, it
+permits zero-downtime changes to the default Gateway, and it allows for
+testing of the new default Gateway before the old one is deleted.
+
+##### Changes in Functionality
+
+If Chihiro changes the default Gateway to a different implementation that does
+not support all the functionality of the previous default Gateway, then the
+Routes that were bound to the previous default Gateway will no longer function
+as expected. This is not a new problem: it already exists when Ana changes a
+Route's `parentRefs`, or when Chihiro changes the implementation of a Gateway
+that is explicitly specified in a Route's `parentRefs`.
+
+At present, we do not propose any solution to this problem, other than to note
+that `gwctl` or similar tools SHOULD be able to show Ana not just the Gateways
+to which a Route is bound, but also the features supported by those Gateways,
+to at least help Ana understand if she is trying to use Gateways that don't
+support a feature that she needs. This is a definitely an area for future
+work, and it is complicated by the fact that Ana may not have access to read
+Gateway resources in the cluster at all.
+
+##### Listeners, ListenerSets, and Merging
+
+Setting `spec.isDefault` on a Gateway affects which Routes will bind to the
+Gateway, not where the Gateway listens for traffic. As such, setting
+`spec.isDefault` MUST NOT alter a Gateway's behavior with respect to
+Listeners, ListenerSets, or merging.
+
+In the future, we may want to consider allowing a default ListenerSet rather
+than only a default Gateway, but that is not in scope for this GEP. Even if it
+is considered later, the guiding principle SHOULD be that `spec.isDefault`
+SHOULD NOT affect where a Gateway listens for traffic or whether it can be
+merged with other Gateways.
+
 ### Gateway For Mesh (East/West)
+
+Mesh traffic is defined by using a Service as a `parentRef` rather than a
+Gateway. As such, there is no case where a default Gateway would be used for
+mesh traffic.
 
 ## Conformance Details
 
@@ -204,14 +473,34 @@ not seem like a good choice.
 
 ### Conformance tests
 
+TBD.
+
 ## Alternatives
 
-A possible alternative API design is to modify the behavior of Listeners or
-ListenerSets; rather than having a "default Gateway", perhaps we would have
-"[default Listeners]". One challenge here is that the Route `status` doesn't
-currently expose information about which Listener is being used, though it
-does show which Gateway is being used.
+- A possible alternative API design is to modify the behavior of Listeners or
+  ListenerSets; rather than having a "default Gateway", perhaps we would have
+  "[default Listeners]". One challenge here is that the Route `status` doesn't
+  currently expose information about which Listener is being used, though it
+  does show which Gateway is being used.
 
 [default Listeners]: https://github.com/kubernetes-sigs/gateway-api/pull/3852#discussion_r2149056246
 
+- We could define the default Gateway as a Gateway with a magic name, e.g.
+  "default". This doesn't actually make things that much simpler for Ana
+  (she'd still have to specify `parentRefs`), and it raises questions about
+  Chihiro's ability to control which Routes can bind to the default Gateway,
+  as well as how namespacing would work -- it's especially unhelpful for Ana
+  if she has to know the namespace of the default Gateway in order to use it.
+
+- A default Gateway could overwrite a Route's empty `parentRefs` with a
+  non-empty `parentRefs` pointing to the default Gateway. The main challenge
+  with this approach is that once the `parentRefs` are overwritten, it's no
+  longer possible to know that the Route was originally intended to use the
+  default Gateway. Using the `status` to indicate that the Route is bound to
+  the default Gateway instead both preserves Ana's original intent and also
+  makes it possible to change the default Gateway without requiring Ana to
+  recreate all her Routes.
+
 ## References
+
+TBD.
