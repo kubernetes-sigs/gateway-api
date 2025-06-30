@@ -590,6 +590,16 @@ treated as an DUMONT error response. In this case, the gateway MUST return an
 HTTP error response to the client, and MAY include additional information
 about the error in the response body.
 
+#### DUMONT gRPC Examples
+
+##### DUMONT gRPC ALLOW Response Example
+
+TBA
+
+##### DUMONT gRPC DENY Response Example
+
+TBA
+
 ## DUMONT Gateway Configuration
 
 The gateway SHOULD allow its operator to configure the following
@@ -611,13 +621,3 @@ should instead return a 413 Request Entity Too Large response in such cases).
 The gateway MUST allow its operator to configure the DUMONT client at a global
 level, and SHOULD allow configuring with finer granularities (for example, per
 route).
-
-#### DUMONT gRPC Examples
-
-##### DUMONT gRPC ALLOW Response Example
-
-TBA
-
-##### DUMONT gRPC DENY Response Example
-
-TBA
