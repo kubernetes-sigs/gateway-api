@@ -434,37 +434,37 @@ func TestInferSupportedFeatures(t *testing.T) {
 		exemptFeatures     FeaturesSet
 		ConformanceProfile sets.Set[ConformanceProfileName]
 		expectedFeatures   FeaturesSet
-		expectedIsInferred confv1.SupportedFeaturesSource
+		expectedSource     confv1.SupportedFeaturesSource
 	}{
 		{
-			name:               "properly infer supported features",
-			expectedFeatures:   namesToFeatureSet(statusFeatureNames),
-			expectedIsInferred: confv1.SupportedFeaturesSourceInferred,
+			name:             "properly infer supported features",
+			expectedFeatures: namesToFeatureSet(statusFeatureNames),
+			expectedSource:   confv1.SupportedFeaturesSourceInferred,
 		},
 		{
-			name:               "no features",
-			supportedFeatures:  sets.New[features.FeatureName]("Gateway"),
-			expectedFeatures:   sets.New[features.FeatureName]("Gateway"),
-			expectedIsInferred: confv1.SupportedFeaturesSourceManual,
+			name:              "no features",
+			supportedFeatures: sets.New[features.FeatureName]("Gateway"),
+			expectedFeatures:  sets.New[features.FeatureName]("Gateway"),
+			expectedSource:    confv1.SupportedFeaturesSourceManual,
 		},
 		{
-			name:               "remove exempt features",
-			supportedFeatures:  sets.New[features.FeatureName]("Gateway", "HTTPRoute"),
-			exemptFeatures:     sets.New[features.FeatureName]("HTTPRoute"),
-			expectedFeatures:   sets.New[features.FeatureName]("Gateway"),
-			expectedIsInferred: confv1.SupportedFeaturesSourceManual,
+			name:              "remove exempt features",
+			supportedFeatures: sets.New[features.FeatureName]("Gateway", "HTTPRoute"),
+			exemptFeatures:    sets.New[features.FeatureName]("HTTPRoute"),
+			expectedFeatures:  sets.New[features.FeatureName]("Gateway"),
+			expectedSource:    confv1.SupportedFeaturesSourceManual,
 		},
 		{
-			name:               "allow all features",
-			allowAllFeatures:   true,
-			expectedFeatures:   features.SetsToNamesSet(features.AllFeatures),
-			expectedIsInferred: confv1.SupportedFeaturesSourceManual,
+			name:             "allow all features",
+			allowAllFeatures: true,
+			expectedFeatures: features.SetsToNamesSet(features.AllFeatures),
+			expectedSource:   confv1.SupportedFeaturesSourceManual,
 		},
 		{
 			name:               "supports conformance profile - core",
 			ConformanceProfile: sets.New(GatewayHTTPConformanceProfileName),
-			expectedFeatures:   namesToFeatureSet([]string{"Gateway", "HTTPRoute", "ReferenceGrant"}),
-			expectedIsInferred: confv1.SupportedFeaturesSourceManual,
+			expectedFeatures:   namesToFeatureSet(statusFeatureNames),
+			expectedSource:     confv1.SupportedFeaturesSourceManual,
 		},
 	}
 
@@ -516,8 +516,8 @@ func TestInferSupportedFeatures(t *testing.T) {
 				t.Fatalf("error initializing conformance suite: %v", err)
 			}
 
-			if cSuite.SupportedFeaturesSource() != tc.expectedIsInferred {
-				t.Errorf("InferredSupportedFeatures mismatch: got %v, want %v", cSuite.SupportedFeaturesSource(), tc.expectedIsInferred)
+			if cSuite.SupportedFeaturesSource() != tc.expectedSource {
+				t.Errorf("InferredSupportedFeatures mismatch: got %v, want %v", cSuite.SupportedFeaturesSource(), tc.expectedSource)
 			}
 
 			if equal := cSuite.SupportedFeatures.Equal(tc.expectedFeatures); !equal {
