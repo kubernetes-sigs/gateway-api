@@ -430,7 +430,7 @@ MAY include additional information about the error in the response body.
 
 TBA
 
-##### DUMONT HTTP ALLOW Response Example
+##### DUMONT HTTP DENY Response Example
 
 TBA
 
@@ -459,7 +459,7 @@ repository. This service defines a single `Check` RPC method, which takes a
 Both of these messages are also defined in
 [api/envoy/service/auth/v3/external_auth.proto].
 
-[api/envoy/service/auth/v3/external_auth.proto]: (https://raw.githubusercontent.com/envoyproxy/envoy/refs/heads/main/api/envoy/service/auth/v3/external_auth.proto)
+[api/envoy/service/auth/v3/external_auth.proto]: https://raw.githubusercontent.com/envoyproxy/envoy/refs/heads/main/api/envoy/service/auth/v3/external_auth.proto
 
 
 #### DUMONT gRPC `CheckReqest`
@@ -484,7 +484,7 @@ standardized:
 - `context_extensions`, `metadata_context`, and `route_metadata_context`:
   Envoy-specific metadata at several different levels
 
-[api/envoy/service/auth/v3/attribute_context.proto]: (https://github.com/envoyproxy/envoy/blob/main/api/envoy/service/auth/v3/attribute_context.proto)
+[api/envoy/service/auth/v3/attribute_context.proto]: https://github.com/envoyproxy/envoy/blob/main/api/envoy/service/auth/v3/attribute_context.proto
 
 #### DUMONT gRPC `CheckResponse`
 
@@ -611,3 +611,13 @@ should instead return a 413 Request Entity Too Large response in such cases).
 The gateway MUST allow its operator to configure the DUMONT client at a global
 level, and SHOULD allow configuring with finer granularities (for example, per
 route).
+
+#### DUMONT gRPC Examples
+
+##### DUMONT gRPC ALLOW Response Example
+
+TBA
+
+##### DUMONT gRPC DENY Response Example
+
+TBA
