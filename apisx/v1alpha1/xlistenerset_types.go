@@ -152,7 +152,18 @@ type ListenerEntry struct {
 
 	// Port is the network port. Multiple listeners may use the
 	// same port, subject to the Listener compatibility rules.
-	Port PortNumber `json:"port"`
+	//
+	// If the port is not set or specified as zero, the implementation will assign
+	// a unique port. If the implementation does not support dynamic port
+	// assignment, it MUST set `Accepted` condition to `False` with the
+	// `UnsupportedPort` reason.
+	//
+	// +optional
+	//
+	// +kubebuilder:default=0
+	// +kubebuilder:validation:Minimum=0
+	// +kubebuilder:validation:Maximum=65535
+	Port PortNumber `json:"port,omitempty"`
 
 	// Protocol specifies the network protocol this listener expects to receive.
 	Protocol ProtocolType `json:"protocol"`
@@ -233,6 +244,9 @@ type ListenerEntryStatus struct {
 	Name SectionName `json:"name"`
 
 	// Port is the network port the listener is configured to listen on.
+	//
+	// +kubebuilder:validation:Minimum=1
+	// +kubebuilder:validation:Maximum=65535
 	Port PortNumber `json:"port"`
 
 	// SupportedKinds is the list indicating the Kinds supported by this
