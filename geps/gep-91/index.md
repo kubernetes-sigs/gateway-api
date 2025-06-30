@@ -27,7 +27,9 @@ This use case has been highlighted in the [TLS Configuration GEP][] under segmen
 * This new field is separate from the existing [BackendTLSPolicy][] configuration. [BackendTLSPolicy][] controls TLS certificate validation for connections *from* the
   Gateway to the backend service.  This proposal adds the ability to validate the TLS certificate presented by the *client* connecting to the Gateway (the
   frontend). These two validation mechanisms operate independently and can be used simultaneously.
-* Also introduce a `ObjectReference` structure that can be used to specify `caCertificateRefs` references.
+* Introduce a `ObjectReference` structure that can be used to specify `caCertificateRefs` references.
+* Add `frontendValidation` to 
+* Introduce a `tls` field within the Gateway Spec to allow for a common TLS configuration to apply across all listeners.
 
 #### GO
 
