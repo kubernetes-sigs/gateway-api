@@ -84,7 +84,7 @@ type ConformanceTestSuite struct {
 	// If SupportedFeatures are automatically determined from GWC Status.
 	// This will be required to report in future iterations as the passing
 	// will be determined based on this.
-	isInferredSupportedFeatures bool
+	supportedFeaturesSource confv1.SupportedFeaturesSource
 
 	// mode is the operating mode of the implementation.
 	// The default value for it is "default".
@@ -191,7 +191,7 @@ const (
 // NewConformanceTestSuite is a helper to use for creating a new ConformanceTestSuite.
 func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite, error) {
 	supportedFeatures := options.SupportedFeatures.Difference(options.ExemptFeatures)
-	isInferred := false
+	source := confv1.SupportedFeaturesSourceManual
 	switch {
 	case options.EnableAllSupportedFeatures:
 		supportedFeatures = features.SetsToNamesSet(features.AllFeatures)
@@ -201,11 +201,13 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 		if err != nil {
 			return nil, fmt.Errorf("Cannot infer supported features: %w", err)
 		}
-		isInferred = true
+		source = confv1.SupportedFeaturesSourceInferred
+	case isOnlyMeshProfile(&options):
+		source = confv1.SupportedFeaturesSourceUndefined
 	}
 
 	// If features were not inferred from Status, it's a GWC issue.
-	if isInferred && supportedFeatures.Len() == 0 {
+	if source == confv1.SupportedFeaturesSourceInferred && supportedFeatures.Len() == 0 {
 		return nil, fmt.Errorf("no supported features were determined for test suite")
 	}
 
@@ -273,7 +275,7 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 		mode:                        mode,
 		apiVersion:                  apiVersion,
 		apiChannel:                  apiChannel,
-		isInferredSupportedFeatures: isInferred,
+		supportedFeaturesSource:     source,
 		Hook:                        options.Hook,
 	}
 
@@ -287,6 +289,7 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 		for _, f := range conformanceProfile.CoreFeatures.UnsortedList() {
 			if !options.SupportedFeatures.Has(f) {
 				suite.SupportedFeatures.Insert(f)
+				suite.supportedFeaturesSource = confv1.SupportedFeaturesSourceManual
 			}
 		}
 		for _, f := range conformanceProfile.ExtendedFeatures.UnsortedList() {
@@ -394,8 +397,8 @@ func (suite *ConformanceTestSuite) Setup(t *testing.T, tests []ConformanceTest) 
 	}
 }
 
-func (suite *ConformanceTestSuite) IsInferredSupportedFeatures() bool {
-	return suite.isInferredSupportedFeatures
+func (suite *ConformanceTestSuite) SupportedFeaturesSource() confv1.SupportedFeaturesSource {
+	return suite.supportedFeaturesSource
 }
 
 func (suite *ConformanceTestSuite) setClientsetForTest(test ConformanceTest) error {
@@ -552,7 +555,7 @@ func (suite *ConformanceTestSuite) Report() (*confv1.ConformanceReport, error) {
 		GatewayAPIChannel:         suite.apiChannel,
 		ProfileReports:            profileReports.list(),
 		SucceededProvisionalTests: succeededProvisionalTests,
-		InferredSupportedFeatures: suite.IsInferredSupportedFeatures(),
+		SupportedFeaturesSource:   suite.SupportedFeaturesSource(),
 	}, nil
 }
 
@@ -610,7 +613,6 @@ func shouldInferSupportedFeatures(opts *ConformanceOptions) bool {
 	return !opts.EnableAllSupportedFeatures &&
 		opts.SupportedFeatures.Len() == 0 &&
 		opts.ExemptFeatures.Len() == 0 &&
-		opts.ConformanceProfiles.Len() == 0 &&
 		len(opts.SkipTests) == 0 &&
 		opts.RunTest == ""
 }
@@ -644,4 +646,10 @@ func getAPIVersionAndChannel(crds []apiextensionsv1.CustomResourceDefinition) (v
 	}
 
 	return version, channel, nil
+}
+
+func isOnlyMeshProfile(_ *ConformanceOptions) bool {
+	// TODO(bexxmodd): Currently a placeholder to add logic that determines if
+	// it's only Mesh profile without GWC.
+	return false
 }
