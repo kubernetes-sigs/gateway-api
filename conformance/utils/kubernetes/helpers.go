@@ -31,12 +31,14 @@ import (
 
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/gateway-api/apis/v1alpha2"
+	gatewayxv1a1 "sigs.k8s.io/gateway-api/apisx/v1alpha1"
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
 	"sigs.k8s.io/gateway-api/conformance/utils/tlog"
 )
@@ -69,6 +71,33 @@ func NewGatewayRef(nn types.NamespacedName, listenerNames ...string) GatewayRef 
 	return GatewayRef{
 		NamespacedName: nn,
 		listenerNames:  listeners,
+	}
+}
+
+// ResourceRef is a tiny type for specifying an HTTP Route ParentRef without
+// relying on a specific api version.
+type ResourceRef struct {
+	types.NamespacedName
+	ListenerNames []*gatewayv1.SectionName
+	GroupKind     schema.GroupKind
+}
+
+// NewResourceRef creates a ResourceRef resource. ListenerNames are optional.
+func NewResourceRef(gk schema.GroupKind, nn types.NamespacedName, listenerNames ...string) ResourceRef {
+	var listeners []*gatewayv1.SectionName
+
+	if len(listenerNames) == 0 {
+		listenerNames = append(listenerNames, "")
+	}
+
+	for _, listener := range listenerNames {
+		sectionName := gatewayv1.SectionName(listener)
+		listeners = append(listeners, &sectionName)
+	}
+	return ResourceRef{
+		NamespacedName: nn,
+		GroupKind:      gk,
+		ListenerNames:  listeners,
 	}
 }
 
@@ -334,60 +363,19 @@ func MeshNamespacesMustBeReady(t *testing.T, c client.Client, timeoutConfig conf
 func GatewayAndRoutesMustBeAccepted(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, controllerName string, gw GatewayRef, routeType any, routeNNs ...types.NamespacedName) string {
 	t.Helper()
 
-	RouteTypeMustHaveParentsField(t, routeType)
 	gwAddr, err := WaitForGatewayAddress(t, c, timeoutConfig, gw)
 
 	require.NoErrorf(t, err, "timed out waiting for Gateway address to be assigned")
 
-	ns := gatewayv1.Namespace(gw.Namespace)
-	kind := gatewayv1.Kind("Gateway")
-
-	for _, routeNN := range routeNNs {
-		namespaceRequired := true
-		if routeNN.Namespace == gw.Namespace {
-			namespaceRequired = false
-		}
-
-		var parents []gatewayv1.RouteParentStatus
-		for _, listener := range gw.listenerNames {
-			parents = append(parents, gatewayv1.RouteParentStatus{
-				ParentRef: gatewayv1.ParentReference{
-					Group:       (*gatewayv1.Group)(&gatewayv1.GroupVersion.Group),
-					Kind:        &kind,
-					Name:        gatewayv1.ObjectName(gw.Name),
-					Namespace:   &ns,
-					SectionName: listener,
-				},
-				ControllerName: gatewayv1.GatewayController(controllerName),
-				Conditions: []metav1.Condition{{
-					Type:   string(gatewayv1.RouteConditionAccepted),
-					Status: metav1.ConditionTrue,
-					Reason: string(gatewayv1.RouteReasonAccepted),
-				}},
-			})
-		}
-		RouteMustHaveParents(t, c, timeoutConfig, routeNN, parents, namespaceRequired, routeType)
+	resourceRef := ResourceRef{
+		GroupKind: schema.GroupKind{
+			Group: gatewayv1.GroupVersion.Group,
+			Kind:  "Gateway",
+		},
+		NamespacedName: gw.NamespacedName,
+		ListenerNames:  gw.listenerNames,
 	}
-
-	requiredListenerConditions := []metav1.Condition{
-		{
-			Type:   string(gatewayv1.ListenerConditionResolvedRefs),
-			Status: metav1.ConditionTrue,
-			Reason: "", // any reason
-		},
-		{
-			Type:   string(gatewayv1.ListenerConditionAccepted),
-			Status: metav1.ConditionTrue,
-			Reason: "", // any reason
-		},
-		{
-			Type:   string(gatewayv1.ListenerConditionProgrammed),
-			Status: metav1.ConditionTrue,
-			Reason: "", // any reason
-		},
-	}
-	GatewayListenersMustHaveConditions(t, c, timeoutConfig, gw.NamespacedName, requiredListenerConditions)
-
+	RoutesAndParentMustBeAccepted(t, c, timeoutConfig, controllerName, resourceRef, routeType, routeNNs...)
 	return gwAddr
 }
 
@@ -667,14 +655,15 @@ func parentsForRouteMatch(t *testing.T, routeName types.NamespacedName, expected
 			return false
 		}
 		if !reflect.DeepEqual(aParent.ParentRef.Group, eParent.ParentRef.Group) {
-			tlog.Logf(t, "Route %s expected ParentReference.Group to be %v, got %v", routeName, eParent.ParentRef.Group, aParent.ParentRef.Group)
+			tlog.Logf(t, "Route %s expected ParentReference.Group to be %v, got %v", routeName, *eParent.ParentRef.Group, *aParent.ParentRef.Group)
 			return false
 		}
 		if !reflect.DeepEqual(aParent.ParentRef.Kind, eParent.ParentRef.Kind) {
-			tlog.Logf(t, "Route %s expected ParentReference.Kind to be %v, got %v", routeName, eParent.ParentRef.Kind, aParent.ParentRef.Kind)
+			tlog.Logf(t, "Route %s expected ParentReference.Kind to be %v, got %v", routeName, *eParent.ParentRef.Kind, *aParent.ParentRef.Kind)
 			return false
 		}
 		if aParent.ParentRef.Name != eParent.ParentRef.Name {
+			tlog.Logf(t, "Route %s ParentReference.Name doesn't match", routeName)
 			tlog.Logf(t, "Route %s ParentReference.Name doesn't match", routeName)
 			return false
 		}
@@ -851,6 +840,110 @@ func TLSRouteMustHaveCondition(t *testing.T, client client.Client, timeoutConfig
 	})
 
 	require.NoErrorf(t, waitErr, "error waiting for TLSRoute status to have a Condition matching expectations")
+}
+
+// RoutesAndParentMustBeAccepted waits until:
+//  1. The route has a ParentRef referring to the parent.
+//  2. All the parent's listeners have the following conditions set to true:
+//     - ListenerConditionResolvedRefs
+//     - ListenerConditionAccepted
+//     - ListenerConditionProgrammed
+//
+// The test will fail if these conditions are not met before the timeouts.
+func RoutesAndParentMustBeAccepted(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, controllerName string, resource ResourceRef, routeType any, routeNNs ...types.NamespacedName) {
+	t.Helper()
+
+	RouteTypeMustHaveParentsField(t, routeType)
+
+	ns := gatewayv1.Namespace(resource.Namespace)
+
+	for _, routeNN := range routeNNs {
+		namespaceRequired := true
+		if routeNN.Namespace == resource.Namespace {
+			namespaceRequired = false
+		}
+
+		var parents []gatewayv1.RouteParentStatus
+		for _, listener := range resource.ListenerNames {
+			parents = append(parents, gatewayv1.RouteParentStatus{
+				ParentRef: gatewayv1.ParentReference{
+					Group:       (*gatewayv1.Group)(&resource.GroupKind.Group),
+					Kind:        (*gatewayv1.Kind)(&resource.GroupKind.Kind),
+					Name:        gatewayv1.ObjectName(resource.Name),
+					Namespace:   &ns,
+					SectionName: listener,
+				},
+				ControllerName: gatewayv1.GatewayController(controllerName),
+				Conditions: []metav1.Condition{{
+					Type:   string(gatewayv1.RouteConditionAccepted),
+					Status: metav1.ConditionTrue,
+					Reason: string(gatewayv1.RouteReasonAccepted),
+				}},
+			})
+		}
+		RouteMustHaveParents(t, c, timeoutConfig, routeNN, parents, namespaceRequired, routeType)
+	}
+
+	requiredListenerConditions := []metav1.Condition{
+		{
+			Type:   string(gatewayv1.ListenerConditionResolvedRefs),
+			Status: metav1.ConditionTrue,
+			Reason: "", // any reason
+		},
+		{
+			Type:   string(gatewayv1.ListenerConditionAccepted),
+			Status: metav1.ConditionTrue,
+			Reason: "", // any reason
+		},
+		{
+			Type:   string(gatewayv1.ListenerConditionProgrammed),
+			Status: metav1.ConditionTrue,
+			Reason: "", // any reason
+		},
+	}
+	ResourceListenersMustHaveConditions(t, c, timeoutConfig, resource, requiredListenerConditions)
+}
+
+// ResourceListenersMustHaveConditions checks if every listener of the specified resource has all
+// the specified conditions.
+func ResourceListenersMustHaveConditions(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, resource ResourceRef, conditions []metav1.Condition) {
+	t.Helper()
+
+	switch resource.GroupKind.Kind {
+	case "Gateway":
+		GatewayListenersMustHaveConditions(t, client, timeoutConfig, resource.NamespacedName, conditions)
+	case "XListenerSet":
+		ListenerSetListenersMustHaveConditions(t, client, timeoutConfig, resource.NamespacedName, conditions)
+	default:
+		tlog.Errorf(t, "received unsupported resource kind %s. Supported kinds are `Gateway` and `XListenerSet`", resource.GroupKind.Kind)
+
+	}
+}
+
+// ListenerSetListenersMustHaveConditions checks if every listener of the specified listener set has all
+// the specified conditions.
+func ListenerSetListenersMustHaveConditions(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, lsName types.NamespacedName, conditions []metav1.Condition) {
+	t.Helper()
+
+	waitErr := wait.PollUntilContextTimeout(context.Background(), 1*time.Second, timeoutConfig.GatewayListenersMustHaveConditions, true, func(ctx context.Context) (bool, error) {
+		var parent gatewayxv1a1.XListenerSet
+		if err := client.Get(ctx, lsName, &parent); err != nil {
+			return false, fmt.Errorf("error fetching Gateway: %w", err)
+		}
+
+		for _, condition := range conditions {
+			for _, listener := range parent.Status.Listeners {
+				if !findConditionInList(t, listener.Conditions, condition.Type, string(condition.Status), condition.Reason) {
+					tlog.Logf(t, "listener set %s doesn't have %s condition set to %s on %s listener", lsName.Name, condition.Type, condition.Status, listener.Name)
+					return false, nil
+				}
+			}
+		}
+
+		return true, nil
+	})
+
+	require.NoErrorf(t, waitErr, "error waiting for Gateway status to have conditions matching expectations on all listeners")
 }
 
 // TODO(mikemorris): this and parentsMatch could possibly be rewritten as a generic function?
