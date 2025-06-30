@@ -53,18 +53,18 @@ type ConformanceReport struct {
 
 	// SupportedFeaturesSource indicates whether the supported features were
 	// automatically detected by the conformance suite.
-	SupportedFeaturesSource SupportedFeaturesSource `json:"SupportedFeaturesSource"`
+	SupportedFeaturesSource SupportedFeaturesSource `json:"supportedFeaturesSource"`
 }
 
 // SupportedFeaturesSource represents the source from which supported features are derived.
 // It is used to distinguish between them being inferred from GWC Status or manually
 // supplied for the conformance report.
-type SupportedFeaturesSource int
+type SupportedFeaturesSource string 
 
 const (
-	SupportedFeaturesSourceUndefined SupportedFeaturesSource = iota
-	SupportedFeaturesSourceManual
-	SupportedFeaturesSourceInferred
+	SupportedFeaturesSourceUndefined SupportedFeaturesSource = "Undefined"
+	SupportedFeaturesSourceManual SupportedFeaturesSource = "Manual"
+	SupportedFeaturesSourceInferred SupportedFeaturesSource = "Inferred"
 )
 
 // Implementation provides metadata information on the downstream
