@@ -147,7 +147,6 @@ type HTTPRouteRule struct {
 	//
 	// For example, take the following matches configuration:
 	//
-	// ```
 	// matches:
 	// - path:
 	//     value: "/foo"
@@ -156,7 +155,6 @@ type HTTPRouteRule struct {
 	//     value: "v2"
 	// - path:
 	//     value: "/v2/foo"
-	// ```
 	//
 	// For a request to match against this rule, a request must satisfy
 	// EITHER of the two conditions:
