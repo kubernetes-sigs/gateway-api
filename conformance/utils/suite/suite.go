@@ -613,7 +613,6 @@ func shouldInferSupportedFeatures(opts *ConformanceOptions) bool {
 	return !opts.EnableAllSupportedFeatures &&
 		opts.SupportedFeatures.Len() == 0 &&
 		opts.ExemptFeatures.Len() == 0 &&
-		len(opts.SkipTests) == 0 &&
 		opts.RunTest == ""
 }
 
