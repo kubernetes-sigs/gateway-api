@@ -97,6 +97,9 @@ const (
 
 	// This option indicates support for HTTPRoute with a backendref with an appProtocol 'kubernetes.io/ws' (extended conformance)
 	SupportHTTPRouteBackendProtocolWebSocket FeatureName = "HTTPRouteBackendProtocolWebSocket"
+
+	// This option indicates support for HTTPRoute additional redirect status codes 307/308 (extended conformance)
+	SupportHTTPRouteAdditionalRedirectStatusCodes FeatureName = "HTTPRouteAdditionalRedirectStatusCodes"
 )
 
 var (
@@ -190,6 +193,11 @@ var (
 		Name:    SupportHTTPRouteBackendProtocolWebSocket,
 		Channel: FeatureChannelStandard,
 	}
+	// HTTPRouteAdditionalRedirectStatusCodesFeature contains metadata for the HTTPRouteAdditionalRedirectStatusCodes feature.
+	HTTPRouteAdditionalRedirectStatusCodesFeature = Feature{
+		Name:    SupportHTTPRouteAdditionalRedirectStatusCodes,
+		Channel: FeatureChannelStandard,
+	}
 )
 
 // HTTPRouteExtendedFeatures includes all extended features for HTTPRoute
@@ -214,4 +222,5 @@ var HTTPRouteExtendedFeatures = sets.New(
 	HTTPRouteParentRefPortFeature,
 	HTTPRouteBackendProtocolH2CFeature,
 	HTTPRouteBackendProtocolWebSocketFeature,
+	HTTPRouteAdditionalRedirectStatusCodesFeature,
 )

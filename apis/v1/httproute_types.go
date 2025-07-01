@@ -1224,7 +1224,7 @@ type HTTPRequestRedirectFilter struct {
 	//
 	// +optional
 	// +kubebuilder:default=302
-	// +kubebuilder:validation:Enum=301;302
+	// +kubebuilder:validation:Enum=301;302;307;308
 	StatusCode *int `json:"statusCode,omitempty"`
 }
 
