@@ -916,7 +916,6 @@ func ResourceListenersMustHaveConditions(t *testing.T, client client.Client, tim
 		ListenerSetListenersMustHaveConditions(t, client, timeoutConfig, resource.NamespacedName, conditions)
 	default:
 		tlog.Errorf(t, "received unsupported resource kind %s. Supported kinds are `Gateway` and `XListenerSet`", resource.GroupKind.Kind)
-
 	}
 }
 
