@@ -15,12 +15,13 @@ using a Service of type LoadBalancer fronting a Kubernetes pod running a
 proxy. This is simple to reason about, easy to manage for sidecar meshes, and
 will presumably be an important implementation mechanism for the foreseeable
 future. Some cloud providers, though, are moving the proxy outside of the
-cluster, for various reasons which are out of the scope of this GEP. Chihiro
-and Ian want to be able to use these out-of-cluster proxies effectively and
+cluster, for various reasons which are out of the scope of this GEP. [Chihiro]
+and [Ian] want to be able to use these out-of-cluster proxies effectively and
 safely, though they recognize that this may require additional configuration.
 
 [Chihiro]: https://gateway-api.sigs.k8s.io/concepts/roles-and-personas/#chihiro
 [Ian]: https://gateway-api.sigs.k8s.io/concepts/roles-and-personas/#ian
+[Ana]: https//gateway-api.sigs.k8s.io/concepts/roles-and-personas/#ana
 
 ### Nomenclature and Background
 
@@ -74,8 +75,8 @@ In this GEP:
 
 ## Goals
 
-- Allow Chihiro and Ian to configure an OCG and a mesh such that the OCG can
-  usefully participate in the mesh, including:
+- Allow [Chihiro] and [Ian] to configure an OCG and a mesh such that the OCG
+  can usefully participate in the mesh, including:
 
     - The OCG must be able to securely communicate with meshed workloads in
       the cluster, where "securely communicate" includes encryption,
@@ -91,8 +92,8 @@ In this GEP:
     - The OCG must be able to distinguish meshed workloads from non-meshed
       workloads, so that it can communicate appropriately with each.
 
-- Allow Ana to develop and operate meshed applications without needing to know
-  whether the Gateway she's using is an OCG or an in-cluster Gateway.
+- Allow [Ana] to develop and operate meshed applications without needing to
+  know whether the Gateway she's using is an OCG or an in-cluster Gateway.
 
 - Define a basic set of requirements for OCGs and meshes that want to
   interoperate with each other (for example, the OCG and the mesh will likely
@@ -162,7 +163,7 @@ configuration.
 
 To allow the OCG to _usefully_ participate in the mesh, we need to solve at
 least four significant problems. Thankfully, these are mostly problems for
-Chihiro -- if we do our jobs correctly, Ana will never need to know.
+[Chihiro] -- if we do our jobs correctly, [Ana] will never need to know.
 
 #### 1. The Trust Problem
 
@@ -224,20 +225,6 @@ OCG or other meshed workloads, you'll need to either provide two Routes with
 the same configuration, or you'll need to provide a single Route with multiple
 `parentRef`s.
 
-## API
-
-Most of the API work for this GEP is TBD at this point, but there are two
-important points to note:
-
-First, Gateway API has never defined a Mesh resource because, to date, it's
-never been clear what would go into it. This may be the first configuration
-item that causes us to need a Mesh resource.
-
-Second, since the API should affect only Gateway API resources, it is not a
-good candidate for policy attachment. It is likely to be much more reasonable
-to simply provide whatever extra configuration we need inline in the Gateway
-or Mesh resources.
-
 ## Graduation Criteria
 
 In addition to the [general graduation
@@ -246,16 +233,254 @@ guarantee that **all four** of the problems listed above need resolutions, and
 must have implementation from at least two different Gateways and two
 different meshes.
 
-### Gateway for Ingress (North/South)
+## API
 
-### Gateway For Mesh (East/West)
+There are three important aspects to the OCG API:
+
+1. The API must allow the OCG to be configured to securely communicate with
+   meshed workloads in the cluster, including providing the OCG with the
+   information it needs to authenticate itself as a workload.
+
+2. The API must allow the mesh to be configured to accept requests from the
+   OCG, including providing the mesh with the information it needs to
+   authenticate the OCG as a workload.
+
+3. Since the API should affect only Gateway API resources, it is not a good
+   candidate for policy attachment. It is likely to be much more reasonable to
+   simply provide whatever extra configuration we need inline in the Gateway
+   or Mesh resources.
+
+The API must also solve all four of the problems listed above, so we'll start
+with an overview of the solutions before diving into the API details.
+
+### Solving the Trust Problem
+
+The trust problem is that the OCG and the mesh need to be able to trust each
+other. The simplest solution to this problem is to add a _trust bundle_ the
+Gateway resource, and to create a Mesh resource which will also have a trust
+bundle:
+
+- The trust bundle in the Gateway resource will define the CA certificate(s)
+  that the OCG should trust when communicating with meshed workloads in the
+  cluster.
+
+- The trust bundle in the Mesh resource will define the CA certificate(s)
+  that the mesh should trust when communicating with the OCG.
+
+This is a straightforward way to permit each component to verify the identity
+of the other, which will provide sufficient basis for verifying identity when
+mTLS meshes are involved.
+
+- An alternative would be to define a single trust bundle, requiring the OCG
+  and the mesh to each use the same CA certificate. This adds considerable
+  operational complexity (especially in the world of enterprise PKI) without
+  any real benefit.
+
+### Solving the Protocol Problem
+
+The protocol problem is that the OCG needs a way to indicate to the mesh that
+it intends to participate in the mesh for a given connection, and the mesh
+needs to accept the OCG's participation.
+
+As a starting point for OCG/mTLS mesh interaction:
+
+- The OCG MUST use an mTLS connection to communicate with meshed workloads.
+
+- The OCG MUST use an mTLS certificate ultimately signed by a certificate in
+  the trust bundle provided to the mesh.
+
+- The mesh MUST use an mTLS certificate ultimately signed by a certificate in
+  the trust bundle provided to the OCG.
+
+- The OCG MUST send the `ocg.gateway.networking.k8s.io/v1` ALPN protocol
+  during mTLS negotiation. The mesh MUST interpret this ALPN selection as a
+  signal that the OCG intends to participate in the mesh.
+
+- The OCG MUST NOT send any additional information in the data stream before
+  client data. (This is a contrast from e.g. Linkerd's default behavior, and
+  has implications for the outbound behavior problem.)
+
+This will (obviously) require implementation work on the part of both the OCG
+implementations and the mesh implementations, so it's worth looking at some
+alternatives.
+
+- The OCG could be required to exactly mimic the ALPN/transport metadata
+  combination used by an existing mesh. However, the existing meshes don't
+  share a single common mechanism, so this would require a lot of work on the
+  OCG's part, and it wouldn't be portable between meshes.
+
+- The OCG could simply skip ALPN, and hand a "bare" mTLS connection to the
+  mesh. In general, existing meshes don't support this in the way that we
+  want: depending on the destination of the connection, they may interpret it
+  as application-level mTLS that they should treat as an opaque data stream,
+  or they may simply refuse it. This alternative, therefore, both shifts the
+  entire burden of implementation to the meshes, and probably makes it
+  impossible to correctly handle application-level mTLS.
+
+  (Whether meshes _should_ support application-level mTLS in this way is a
+  separate discussion, and is out of scope for this GEP.)
+
+- We could perhaps abuse the [PROXY protocol] for this, or define something
+  similar. This would appear to increase the implementation burden on both
+  sides without providing appreciable benefit.
+
+[PROXY protocol]: https://github.com/haproxy/haproxy/blob/master/doc/proxy-protocol.txt
+
+None of these alternatives would appear to be better than using ALPN in a
+similar way to how (some) existing meshes already use it.
+
+### Solving the Discovery Problem
+
+The discovery problem is that not every workload in the cluster is required to
+be meshed, which means that the OCG needs a way to know whether a given
+connection must participate in the mesh or not. In practice, this isn't
+actually a question of _workloads_ but of _Routes_: the point of interface
+between a Gateway and a workload in the cluster is not a Pod or a Service, but
+rather a Route.
+
+We could approach this in a few different ways:
+
+1. Assume that _all_ Routes in the cluster are meshed. This is obviously a
+   nonstarter.
+
+2. Assume that _all_ Routes bound to the OCG are meshed. This is also a
+   nonstarter.
+
+3. Add a field to the Route resource that indicates whether the Route is
+   meshed. This feels like quite a bit of an imposition on [Ana] (and, again,
+   if we do our jobs correctly, [Ana] shouldn't need to think about this).
+
+4. Add a field to the Gateway resource that enumerates Routes that are meshed.
+   This would be a lot of work for [Chihiro] and [Ian] to maintain; while
+   that's better than putting the burden on [Ana], it still isn't good.
+
+5. Add a field to the Gateway resource that enumerates namespaces that are
+   meshed. This isn't quite as bad as option 4, but it's still a lot of work
+   for [Chihiro] and [Ian], _and_ it limits us to only having entire
+   namespaces meshed.
+
+6. Add a label selector to the Gateway resource and declare that Routes with
+   the label, and Routes in namespaces with the label, are meshed.
+
+Overall, option 6 is probably the least imposition on everyone:
+
+- It's still an active choice, rather than assuming things about the whole
+  cluster.
+
+- It allows operating at the namespace level or at the Route level.
+
+- It takes advantage of the case where a mesh already uses a label to indicate
+  which resources are meshed.
+
+- It uses a reasonably Kubernetes-native mechanism for selection.
+
+Therefore, we'll add a label selector to the Gateway resource, and OCG MUST
+assume that any Route that either matches this selector, or is in a namespace
+that matches this selector, is meshed.
+
+### Solving the Outbound Behavior Problem
+
+The outbound behavior problem is that the OCG will need to speak directly to
+endpoints in the cluster, which will prevent most meshes from being able to
+apply outbound behaviors directly.
+
+As a starting point, we will explicitly declare that the OCG is responsible
+for all outbound behaviors for meshed requests, and that it is OK for the mesh
+to not be able to apply these behaviors. This leaves the UX problem that a
+Route meant to apply equally to N/S traffic and E/W traffic will involve some
+duplication of configuration, but all the alternatives create operational
+problems.
+
+- If the mesh is responsible for all outbound behaviors, what happens if the
+  OCG needs to speak to a non-meshed Route? Would we require [Ana] to
+  duplicate the Route, or (arguably worse) require the OCG to interpret GAMMA
+  Routes?
+
+- If the OCG and the mesh share responsibility in some way, how do we describe
+  the split?
+
+Overall, the alternatives to the OCG being responsible for all outbound
+behaviors for requests leaving the OCG would all seem to create much worse
+problems than the UX problem of having to duplicate configuration for a Route
+that applies equally to N/S and E/W traffic.
+
+### API Details (North/South)
+
+Since the OCG itself is assumed to be a conformant Gateway API implementation,
+we can extend the Gateway resource to include the necessary configuration for
+the OCG to securely communicate with meshed workloads in the cluster. We'll
+add a new `mesh` field to the Gateway resource, which will currently allow
+specifying two things:
+
+1. A trust bundle that contains the CA certificate(s) that the OCG should use
+   to verify workloads in the mesh.
+
+2. A label selector that allows the OCG to find namespaces that are meshed.
+
+For example:
+
+```yaml
+apiVersion: networking.x-k8s.io/v1
+kind: Gateway
+metadata:
+  name: ocg-gateway
+spec:
+  gatewayClassName: ocg-gateway-class
+  ...
+  mesh:   # All mesh-related configuration goes here
+    trustBundle:
+      # List of SecretObjectReference; at least one is required
+      - name: ocg-mesh-root-ca          # mandatory
+        namespace: ocg-mesh-namespace   # defaults to the Gateway's namespace
+      - ...
+    selector:
+      matchLabels:
+        linkerd.io/inject: "true"       # or whatever label is appropriate
+```
+
+### API Details (East/West)
+
+We'll define a new Mesh resource to allow the mesh to be configured to accept
+requests from the OCG. The Mesh resource will allow specifying a trust bundle
+that contains the CA certificate(s) that the mesh should use to verify
+requests from the OCG.
+
+(The Mesh resource should clearly also have a way for the mesh implementation
+to indicate supported features, in parallel to the GatewayClass resource, but
+that will be a separate GEP.)
+
+Note that the Mesh resource doesn't need a selector for meshed workloads: the
+mesh implementation will already understand this.
+
+For example:
+
+```yaml
+apiVersion: networking.x-k8s.io/v1
+kind: Mesh
+metadata:
+  name: ocg-mesh
+spec:
+  ocg:    # All OCG-related configuration goes here
+    trustBundle:
+      # List of SecretObjectReference; at least one is required
+      - name: ocg-mesh-root-ca          # mandatory
+        namespace: ocg-mesh-namespace   # defaults to the Mesh's namespace
+      - ...
+```
+
+### API Type Definitions
+
+TBA.
 
 ## Conformance Details
 
+TBA.
+
 #### Feature Names
 
-This GEP will use the feature name `MeshOffClusterGateway`, under the
-assumption that we will indeed need a Mesh resource.
+This GEP will use the feature name `OffClusterGateway`, and MUST be listed in
+both the `Gateway` and `Mesh` resources, so that [Chihiro] can know that
+they're choosing a combination of OCG and mesh that will work together.
 
 ### Conformance tests
 
