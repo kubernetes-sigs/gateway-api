@@ -256,7 +256,7 @@ with an overview of the solutions before diving into the API details.
 ### Solving the Trust Problem
 
 The trust problem is that the OCG and the mesh need to be able to trust each
-other. The simplest solution to this problem is to add a _trust bundle_ the
+other. The simplest solution to this problem is to add a _trust bundle_ to the
 Gateway resource, and to create a Mesh resource which will also have a trust
 bundle:
 
