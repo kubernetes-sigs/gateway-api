@@ -40,6 +40,10 @@ func (c *FakeGatewayV1alpha2) TCPRoutes(namespace string) v1alpha2.TCPRouteInter
 	return newFakeTCPRoutes(c, namespace)
 }
 
+func (c *FakeGatewayV1alpha2) TLSRoutes(namespace string) v1alpha2.TLSRouteInterface {
+	return newFakeTLSRoutes(c, namespace)
+}
+
 func (c *FakeGatewayV1alpha2) UDPRoutes(namespace string) v1alpha2.UDPRouteInterface {
 	return newFakeUDPRoutes(c, namespace)
 }

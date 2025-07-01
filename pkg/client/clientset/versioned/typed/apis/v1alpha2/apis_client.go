@@ -31,6 +31,7 @@ type GatewayV1alpha2Interface interface {
 	GRPCRoutesGetter
 	ReferenceGrantsGetter
 	TCPRoutesGetter
+	TLSRoutesGetter
 	UDPRoutesGetter
 }
 
@@ -49,6 +50,10 @@ func (c *GatewayV1alpha2Client) ReferenceGrants(namespace string) ReferenceGrant
 
 func (c *GatewayV1alpha2Client) TCPRoutes(namespace string) TCPRouteInterface {
 	return newTCPRoutes(c, namespace)
+}
+
+func (c *GatewayV1alpha2Client) TLSRoutes(namespace string) TLSRouteInterface {
+	return newTLSRoutes(c, namespace)
 }
 
 func (c *GatewayV1alpha2Client) UDPRoutes(namespace string) UDPRouteInterface {
