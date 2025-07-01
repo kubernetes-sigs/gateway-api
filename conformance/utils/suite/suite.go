@@ -289,7 +289,6 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 		for _, f := range conformanceProfile.CoreFeatures.UnsortedList() {
 			if !options.SupportedFeatures.Has(f) {
 				suite.SupportedFeatures.Insert(f)
-				suite.supportedFeaturesSource = confv1.SupportedFeaturesSourceManual
 			}
 		}
 		for _, f := range conformanceProfile.ExtendedFeatures.UnsortedList() {
