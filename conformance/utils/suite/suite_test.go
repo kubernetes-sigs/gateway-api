@@ -464,7 +464,7 @@ func TestInferSupportedFeatures(t *testing.T) {
 			name:               "supports conformance profile - core",
 			ConformanceProfile: sets.New(GatewayHTTPConformanceProfileName),
 			expectedFeatures:   namesToFeatureSet(statusFeatureNames),
-			expectedSource:     confv1.SupportedFeaturesSourceManual,
+			expectedSource:     confv1.SupportedFeaturesSourceInferred,
 		},
 	}
 
