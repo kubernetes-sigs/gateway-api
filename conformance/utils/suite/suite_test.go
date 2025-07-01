@@ -538,3 +538,89 @@ func namesToFeatureSet(names []string) FeaturesSet {
 	}
 	return featureSet
 }
+
+func TestParseImplementation(t *testing.T) {
+	testCases := []struct {
+		name        string
+		org         string
+		project     string
+		url         string
+		version     string
+		contact     string
+		expected    *confv1.Implementation
+		expectedErr error
+	}{
+		{
+			name:        "missing organization",
+			project:     "test-project",
+			url:         "https://example.com",
+			version:     "v1.0.0",
+			contact:     "test@example.com",
+			expectedErr: errors.New("organization must be set"),
+		},
+		{
+			name:        "missing project",
+			org:         "test-org",
+			url:         "https://example.com",
+			version:     "v1.0.0",
+			contact:     "test@example.com",
+			expectedErr: errors.New("project must be set"),
+		},
+		{
+			name:        "missing url",
+			org:         "test-org",
+			project:     "test-project",
+			version:     "v1.0.0",
+			contact:     "test@example.com",
+			expectedErr: errors.New("url must be set"),
+		},
+		{
+			name:        "missing version",
+			org:         "test-org",
+			project:     "test-project",
+			url:         "https://example.com",
+			contact:     "test@example.com",
+			expectedErr: errors.New("version must be set"),
+		},
+		{
+			name:        "missing contact",
+			org:         "test-org",
+			project:     "test-project",
+			url:         "https://example.com",
+			version:     "v1.0.0",
+			expectedErr: errors.New("contact must be set"),
+		},
+		{
+			name:        "malformed url",
+			org:         "test-org",
+			project:     "test-project",
+			url:         "invalid-url",
+			version:     "v1.0.0",
+			contact:     "test@example.com",
+			expectedErr: errors.New("url is malformed"),
+		},
+		{
+			name:    "valid input",
+			org:     "test-org",
+			project: "test-project",
+			url:     "https://example.com",
+			version: "v1.0.0",
+			contact: "test@example.com,test2@example.com",
+			expected: &confv1.Implementation{
+				Organization: "test-org",
+				Project:      "test-project",
+				URL:          "https://example.com",
+				Version:      "v1.0.0",
+				Contact:      []string{"test@example.com", "test2@example.com"},
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			result, err := ParseImplementation(tc.org, tc.project, tc.url, tc.version, tc.contact)
+			assert.Equal(t, tc.expected, result)
+			assert.Equal(t, tc.expectedErr, err)
+		})
+	}
+}
