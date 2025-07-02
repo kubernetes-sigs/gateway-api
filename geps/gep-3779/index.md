@@ -241,7 +241,7 @@ spec:
 
 
 ##### CiliumIdentity
-Cilium has the concept of CiliumIdentity. Pods are assigned identities derived from their Kubernetes labels (namespace, app labels, etc.). Cilium’s policy matches based on these label-derived identities. The CiliumIdentity implementation maps an integer to a group of IP addresses (the pod IPs associated with a group of pods). This “integer” and its mapping to pod IP addresses represents the core identity primitive in Cilium.  
+Cilium has the concept of CiliumIdentity. Pods are assigned identities derived from their Kubernetes labels (namespace, app labels, etc.). Cilium’s policy matches based on these label-derived identities. The CiliumIdentity implementation maps an integer to a group of IP addresses (the pod IPs associated with a group of pods). This “integer” and its mapping to pod IP addresses represents the core identity primitive in Cilium.
 
 More on https://docs.cilium.io/en/stable/internals/security-identities/ & https://docs.cilium.io/en/stable/security/network/identity/
 
@@ -256,29 +256,31 @@ Each `AuthorizationPolicy` resource contains a list of rules. A request matches 
 
 A rule may specify:
 
-* **Sources:** The source identities to which the rule applies. A request’s identity must match one of the listed sources. Supported source kinds are:  
-  * **SPIFFE ID**
-  * **Kubernetes ServiceAccount**  
-  * **Kubernetes Namespace**  
-* **Attributes:** Conditions on the target workload, at the time of writing this, only port is supported. If no attributes are specified, the rule applies to all traffic toward the target.
+  * **Sources:** The source identities to which the rule applies. A request’s identity must match one of the listed sources. Supported source kinds are:
+    * **SPIFFE ID**
+    * **Kubernetes ServiceAccount**
+    * **Kubernetes Namespace**
+
+  * **Attributes:** Conditions on the target workload, at the time of writing this, only port is supported. If no attributes are specified, the rule applies to all traffic toward the target.
 
 ### **ALLOW Policies**
 
-* An **ALLOW** policy is permissive.  
-* A request is allowed if:  
-  * It matches at least one rule in any ALLOW policy targeting the workload **and**  
-  * It is not explicitly denied by any DENY policy.  
-* If no ALLOW policy exists for a workload, traffic is permitted by default, unless any DENY policy applies.
+  * An **ALLOW** policy is permissive.
+  * A request is allowed if:
+    * It matches at least one rule in any ALLOW policy targeting the workload **and**
+    * It is not explicitly denied by any DENY policy.
+
+  * If no ALLOW policy exists for a workload, traffic is permitted by default, unless any DENY policy applies.
 
 ### **DENY Policies**
 
-* A **DENY** policy is restrictive and takes precedence over ALLOW.  
-* If a request matches any rule in a DENY policy, it is immediately rejected, regardless of matching ALLOW rules elsewhere.  
+* A **DENY** policy is restrictive and takes precedence over ALLOW.
+* If a request matches any rule in a DENY policy, it is immediately rejected, regardless of matching ALLOW rules elsewhere.
 * DENY policies enable to define global blocks or exceptions (for example: “block all traffic from Namespace X”).
 
 ### **ALLOW vs. DENY Semantics**
 
-* **DENY always wins.** If both an ALLOW and a DENY policy match a request, the DENY policy blocks it.  
+* **DENY always wins.** If both an ALLOW and a DENY policy match a request, the DENY policy blocks it.
 * The presence of any authorization policy causes the system to default to **deny-by-default** for matching workloads.
 * Another bullet to re-clarify the one above - the default behavior when no policies select a target workload is to allow all traffic. However, **as soon as at least one `AuthorizationPolicy` targets a workload, the model becomes implicitly deny-if-not-allowed**.
 
@@ -292,14 +294,14 @@ The `targetRef` can point to a Kubernetes `Service`.
 
 **Benefits:**
 
-* **No API Extension Required:** Works with the current PolicyAttachment model in Gateway API without modification.  
+* **No API Extension Required:** Works with the current PolicyAttachment model in Gateway API without modification.
 * **Simplicity:** Intuitive for users familiar with Kubernetes networking concepts.
 
 **Downsides and Open Questions:**
 
 However, targeting a `Service` introduces several challenges:
 
-1. Authorization cannot be enforced on workloads not exposed via a `Service` - excluding use cases of pods/jobs without a Service.  
+1. Authorization cannot be enforced on workloads not exposed via a `Service` - excluding use cases of pods/jobs without a Service.
 2. If a Pod belongs to multiple Services targeted by different authorization policies, precedence rules, may become unclear, leading to unpredictable or insecure outcomes. Even if such rules are explicitly defined, UX could potentially be confusing for users.
 3. UX and implementation challenges - are implementations expected to enforce the policy only if the traffic arrived through the specific Service? Or just to take the service selectors and enforce the policy regardless of how the traffic got to the destination?
 
@@ -309,8 +311,8 @@ Alternatively, the `targetRef` can specify a set of pods using a `LabelSelector`
 
 **Benefits:**
 
-* Aligns with established practices. Mesh implementations (Istio, Linkerd, Cilium) already use label selectors as the primary mechanism for targeting workloads in their native authorization policies, creating a consistent user experience.  
-* Directly applies policy to pods, avoiding ambiguity present when targeting services. Ensures policies are enforced exactly where intended, regardless of how many services a pod might belong to.  
+* Aligns with established practices. Mesh implementations (Istio, Linkerd, Cilium) already use label selectors as the primary mechanism for targeting workloads in their native authorization policies, creating a consistent user experience.
+* Directly applies policy to pods, avoiding ambiguity present when targeting services. Ensures policies are enforced exactly where intended, regardless of how many services a pod might belong to.
 * Policies can apply to any workload, including pods not exposed via a `Service`, providing a comprehensive authorization solution.
 
 **Downsides and Open Questions:**
@@ -325,7 +327,7 @@ This option depends on enhancements to Gateway API’s policy attachment model t
 
 To mitigate some of the concerns, `LabelSelector` support in policy attachment is designated as an **experimental pattern**.
 
-* **Gateway API Community First:** Allows experimentation within Gateway API policies (like the one in this GEP).  
+* **Gateway API Community First:** Allows experimentation within Gateway API policies (like the one in this GEP).
 * Implementations **should not** adopt `LabelSelector` targeting in their own custom policies attached to Gateway API resources until the pattern is sufficiently battle-tested and promoted to a standard feature. This staged approach mitigates risks of ecosystem fragmentation.
 
 Here is how it is going to look like:
@@ -454,9 +456,9 @@ type AuthorizationSource struct {
     // - From IP-to-identity mappings: The implementation might maintain a dynamic
     //   mapping between source IP addresses (pod IPs) and their associated
     //   identities (e.g., Service Account, SPIFFE IDs).
-    // - From JWTs or other request-level authentication tokens. 
-    // 
-    // Note for reviewers: While this GEP primarily focuses on identity-based 
+    // - From JWTs or other request-level authentication tokens.
+    //
+    // Note for reviewers: While this GEP primarily focuses on identity-based
     // authorization where identity is often established at the transport layer,
     // some implementations might derive identity from authenticated tokens or sources
     // within the request itself.
@@ -508,7 +510,7 @@ Note: Existing AuthorizationAPIs recognized the need to support negation fields 
 #### Feature Names
 
 
-### Conformance tests 
+### Conformance tests
 
 
 ## Alternatives
