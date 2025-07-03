@@ -2,7 +2,7 @@ apiVersion: internal.gateway.networking.k8s.io/v1alpha1
 kind: GEPDetails
 number: 995
 name: Named route rules
-status: Experimental
+status: Standard
 authors:
   - guicassolato
 changelog:
