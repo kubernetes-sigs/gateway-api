@@ -514,8 +514,8 @@ func TestInferSupportedFeatures(t *testing.T) {
 				t.Fatalf("error initializing conformance suite: %v", err)
 			}
 
-			if cSuite.SupportedFeaturesSource() != tc.expectedSource {
-				t.Errorf("InferredSupportedFeatures mismatch: got %v, want %v", cSuite.SupportedFeaturesSource(), tc.expectedSource)
+			if cSuite.supportedFeaturesSource != tc.expectedSource {
+				t.Errorf("InferredSupportedFeatures mismatch: got %v, want %v", cSuite.supportedFeaturesSource, tc.expectedSource)
 			}
 
 			if equal := cSuite.SupportedFeatures.Equal(tc.expectedFeatures); !equal {

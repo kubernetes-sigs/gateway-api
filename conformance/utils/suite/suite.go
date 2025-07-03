@@ -407,10 +407,6 @@ func (suite *ConformanceTestSuite) Setup(t *testing.T, tests []ConformanceTest) 
 	}
 }
 
-func (suite *ConformanceTestSuite) SupportedFeaturesSource() supportedFeaturesSource {
-	return suite.supportedFeaturesSource
-}
-
 func (suite *ConformanceTestSuite) setClientsetForTest(test ConformanceTest) error {
 	featureNames := []string{}
 	for _, v := range test.Features {
