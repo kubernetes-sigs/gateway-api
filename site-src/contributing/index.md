@@ -106,14 +106,14 @@ service mesh use cases can be found in a separate
 | Mar, 2024      | Kubecon 2024 Paris: Gateway API: Beyond GA | [video][2024-kubecon-video-2]|
 | Mar, 2024      | Kubecon 2024 Paris: Tutorial: Configuring Your Service Mesh with Gateway API  | [video][2024-kubecon-video-3]|
 | Oct, 2023      | Kubecon 2023 Chicago: Gateway API: The Most Collaborative API in Kubernetes History Is GA | [video][2023-kubecon-video-3]|
-| May, 2023      | Kubecon 2023 Amsterdam: Emissary-Ingress: Self-Service APIs and the Kubernetes Gateway API | [slides][2023-kubecon-slides-1], [video][2023-kubecon-video-1]|
+| May, 2023      | Kubecon 2023 Amsterdam: Emissary-Ingress: Self-Service APIs and the Kubernetes Gateway API | [video][2023-kubecon-video-1]|
 | May, 2023      | Kubecon 2023 Amsterdam: Exiting Ingress 201: A Primer on Extension Mechanisms in Gateway API | [video][2023-kubecon-video-2]|
 | Oct, 2022      | Kubecon 2022 Detroit: One API To Rule Them All? What the Gateway API Means For Service Meshes | [video][2022-kubecon-video-4]|
-| Oct, 2022      | Kubecon 2022 Detroit: Exiting Ingress With the Gateway API | [slides][2022-kubecon-slide-3], [video][2022-kubecon-video-3]|
-| Oct, 2022      | Kubecon 2022 Detroit: Flagger, Linkerd, And Gateway API: Oh My! | [slides][2022-kubecon-slide-2], [video][2022-kubecon-video-2]|
+| Oct, 2022      | Kubecon 2022 Detroit: Exiting Ingress With the Gateway API | [video][2022-kubecon-video-3]|
+| Oct, 2022      | Kubecon 2022 Detroit: Flagger, Linkerd, And Gateway API: Oh My! | [video][2022-kubecon-video-2]|
 | May, 2022      | Kubecon 2022 Valencia: Gateway API: Beta to GA | [video][2022-kubecon-video-1]|
 | May, 2021      | Kubecon 2021 Virtual: Google Cloud - Multi-cluster, Blue-green Traffic Splitting with the Gateway API | [video][2021-kubecon-video-2]|
-| May, 2021      | Kubecon 2021 Virtual: Gateway API: A New Set of Kubernetes APIs for Advanced Traffic Routing | [slides][2021-kubecon-slide-1], [video][2021-kubecon-video-1]|
+| May, 2021      | Kubecon 2021 Virtual: Gateway API: A New Set of Kubernetes APIs for Advanced Traffic Routing | [video][2021-kubecon-video-1]|
 | November, 2019 | Kubecon 2019 San Diego: Evolving the Kubernetes Ingress APIs to GA and Beyond | [video][2019-kubecon-na-video]|
 | November, 2019 | Kubecon 2019 San Diego: SIG-NETWORK Service/Ingress Evolution Discussion | [slides][2019-kubecon-na-community-slides] |
 | May, 2019      | [Kubecon 2019 Barcelona: Ingress V2 and Multicluster Services][2019-kubecon-eu] | [slides][2019-kubecon-eu-slides], [video][2019-kubecon-eu-video]|
@@ -123,18 +123,14 @@ service mesh use cases can be found in a separate
 [2024-kubecon-video-2]: https://www.youtube.com/watch?v=LITg6TvctjM
 [2024-kubecon-video-3]: https://www.youtube.com/watch?v=UMGRp0fGk3o
 [2023-kubecon-video-3]: https://www.youtube.com/watch?v=V3Vu_FWb4l4
-[2023-kubecon-slides-1]: https://github.com/cloudyuga/kubecon-talks/blob/main/slides_EU-23/emissary-ingress-self-service-apis-and-the-kubernetes-gateway-api-lance-austin-ambassador-labs-flynn-buoyant.pdf
 [2023-kubecon-video-1]: https://www.youtube.com/watch?v=piDYmZObh_M
 [2023-kubecon-video-2]: https://www.youtube.com/watch?v=7P55G8GsYRs:
 [2022-kubecon-video-4]: https://www.youtube.com/watch?v=vYGP5XdP2TA
 [2022-kubecon-video-3]: https://www.youtube.com/watch?v=sTQv4QOC-TI
-[2022-kubecon-slide-3]: https://github.com/cloudyuga/kubecon-talks/blob/main/slides_NA-22/exiting-ingress-with-the-gateway-api-rob-scott-google-shane-utt-kong-inc.pdf
 [2022-kubecon-video-2]: https://www.youtube.com/watch?v=9Ag45POgnKw
-[2022-kubecon-slide-2]: https://github.com/cloudyuga/kubecon-talks/blob/main/slides_NA-22/flagger-linkerd-and-gateway-api-oh-my-jason-morgan-buoyant-sanskar-jaiswal-weaveworks.pdf
 [2022-kubecon-video-1]: https://www.youtube.com/watch?v=YPiuicxC8UU
 [2021-kubecon-video-2]: https://www.youtube.com/watch?v=vs8YrjdRJJU
 [2021-kubecon-video-1]: https://www.youtube.com/watch?v=lCRuzWFJBO0
-[2021-kubecon-slide-1]: https://github.com/cloudyuga/kubecon-talks/blob/main/slides_EU-21/gateway-api-a-new-set-of-kubernetes-apis-for-advanced-traffic-routing-harry-bagdi-kong-inc-rob-scott-google.pdf
 [2019-kubecon-na-video]: https://www.youtube.com/watch?v=cduG0FrjdJA
 [2019-kubecon-eu]: https://kccnceu19.sched.com/event/MPb6/ingress-v2-and-multicluster-services-rohit-ramkumar-bowei-du-google
 [2019-kubecon-eu-slides]: https://static.sched.com/hosted_files/kccnceu19/97/%5Bwith%20speaker%20notes%5D%20Kubecon%20EU%202019_%20Ingress%20V2%20%26%20Multi-Cluster%20Services.pdf
