@@ -104,7 +104,7 @@ service mesh use cases can be found in a separate
 |----------------|-------|----|
 | Mar, 2024      | Kubecon 2024 Paris: Configuring Your Service Mesh with Gateway API | [video][2024-kubecon-video-1]|
 | Mar, 2024      | Kubecon 2024 Paris: Gateway API: Beyond GA | [video][2024-kubecon-video-2]|
-| Mar, 2024      | Kubecon 2024 Paris: Gateway API: Beyond GA | [video][2024-kubecon-video-3]|
+| Mar, 2024      | Kubecon 2024 Paris: Tutorial: Configuring Your Service Mesh with Gateway API  | [video][2024-kubecon-video-3]|
 | Oct, 2023      | Kubecon 2023 Chicago: Gateway API: The Most Collaborative API in Kubernetes History Is GA | [video][2023-kubecon-video-3]|
 | May, 2023      | Kubecon 2023 Amsterdam: Emissary-Ingress: Self-Service APIs and the Kubernetes Gateway API | [slides][2023-kubecon-slides-1], [video][2023-kubecon-video-1]|
 | May, 2023      | Kubecon 2023 Amsterdam: Exiting Ingress 201: A Primer on Extension Mechanisms in Gateway API | [video][2023-kubecon-video-2]|
