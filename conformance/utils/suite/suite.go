@@ -210,7 +210,7 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 		var err error
 		supportedFeatures, err = fetchSupportedFeatures(options.Client, options.GatewayClassName)
 		if err != nil {
-			return nil, fmt.Errorf("Cannot infer supported features: %w", err)
+			return nil, fmt.Errorf("cannot infer supported features: %w", err)
 		}
 		source = supportedFeaturesSourceInferred
 	case isOnlyMeshProfile(&options):
