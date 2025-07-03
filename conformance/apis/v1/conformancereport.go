@@ -50,22 +50,7 @@ type ConformanceReport struct {
 	// SucceededProvisionalTests is a list of the names of the provisional tests that
 	// have been successfully run.
 	SucceededProvisionalTests []string `json:"succeededProvisionalTests,omitempty"`
-
-	// SupportedFeaturesSource indicates whether the supported features were
-	// automatically detected by the conformance suite.
-	SupportedFeaturesSource SupportedFeaturesSource `json:"supportedFeaturesSource"`
 }
-
-// SupportedFeaturesSource represents the source from which supported features are derived.
-// It is used to distinguish between them being inferred from GWC Status or manually
-// supplied for the conformance report.
-type SupportedFeaturesSource string
-
-const (
-	SupportedFeaturesSourceUndefined SupportedFeaturesSource = "Undefined"
-	SupportedFeaturesSourceManual    SupportedFeaturesSource = "Manual"
-	SupportedFeaturesSourceInferred  SupportedFeaturesSource = "Inferred"
-)
 
 // Implementation provides metadata information on the downstream
 // implementation of Gateway API which ran conformance tests.

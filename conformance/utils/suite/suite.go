@@ -84,7 +84,7 @@ type ConformanceTestSuite struct {
 	// If SupportedFeatures are automatically determined from GWC Status.
 	// This will be required to report in future iterations as the passing
 	// will be determined based on this.
-	supportedFeaturesSource confv1.SupportedFeaturesSource
+	supportedFeaturesSource supportedFeaturesSource
 
 	// mode is the operating mode of the implementation.
 	// The default value for it is "default".
@@ -188,10 +188,21 @@ const (
 	undefinedKeyword = "UNDEFINED"
 )
 
+// SupportedFeaturesSource represents the source from which supported features are derived.
+// It is used to distinguish between them being inferred from GWC Status or manually
+// supplied for the conformance report.
+type supportedFeaturesSource string
+
+const (
+	supportedFeaturesSourceUndefined supportedFeaturesSource = "Undefined"
+	supportedFeaturesSourceManual    supportedFeaturesSource = "Manual"
+	supportedFeaturesSourceInferred  supportedFeaturesSource = "Inferred"
+)
+
 // NewConformanceTestSuite is a helper to use for creating a new ConformanceTestSuite.
 func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite, error) {
 	supportedFeatures := options.SupportedFeatures.Difference(options.ExemptFeatures)
-	source := confv1.SupportedFeaturesSourceManual
+	source := supportedFeaturesSourceManual
 	switch {
 	case options.EnableAllSupportedFeatures:
 		supportedFeatures = features.SetsToNamesSet(features.AllFeatures)
@@ -201,13 +212,13 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 		if err != nil {
 			return nil, fmt.Errorf("Cannot infer supported features: %w", err)
 		}
-		source = confv1.SupportedFeaturesSourceInferred
+		source = supportedFeaturesSourceInferred
 	case isOnlyMeshProfile(&options):
-		source = confv1.SupportedFeaturesSourceUndefined
+		source = supportedFeaturesSourceUndefined
 	}
 
 	// If features were not inferred from Status, it's a GWC issue.
-	if source == confv1.SupportedFeaturesSourceInferred && supportedFeatures.Len() == 0 {
+	if source == supportedFeaturesSourceInferred && supportedFeatures.Len() == 0 {
 		return nil, fmt.Errorf("no supported features were determined for test suite")
 	}
 
@@ -396,7 +407,7 @@ func (suite *ConformanceTestSuite) Setup(t *testing.T, tests []ConformanceTest) 
 	}
 }
 
-func (suite *ConformanceTestSuite) SupportedFeaturesSource() confv1.SupportedFeaturesSource {
+func (suite *ConformanceTestSuite) SupportedFeaturesSource() supportedFeaturesSource {
 	return suite.supportedFeaturesSource
 }
 
@@ -554,7 +565,6 @@ func (suite *ConformanceTestSuite) Report() (*confv1.ConformanceReport, error) {
 		GatewayAPIChannel:         suite.apiChannel,
 		ProfileReports:            profileReports.list(),
 		SucceededProvisionalTests: succeededProvisionalTests,
-		SupportedFeaturesSource:   suite.SupportedFeaturesSource(),
 	}, nil
 }
 

@@ -280,7 +280,6 @@ func TestSuiteReport(t *testing.T) {
 					coreProvisionalTest.ShortName,
 					extendedProvisionalTest.ShortName,
 				},
-				SupportedFeaturesSource: confv1.SupportedFeaturesSourceInferred,
 			},
 		},
 		{
@@ -390,7 +389,6 @@ func TestSuiteReport(t *testing.T) {
 						},
 					},
 				},
-				SupportedFeaturesSource: confv1.SupportedFeaturesSourceInferred,
 			},
 		},
 	}
@@ -434,37 +432,37 @@ func TestInferSupportedFeatures(t *testing.T) {
 		exemptFeatures     FeaturesSet
 		ConformanceProfile sets.Set[ConformanceProfileName]
 		expectedFeatures   FeaturesSet
-		expectedSource     confv1.SupportedFeaturesSource
+		expectedSource     supportedFeaturesSource
 	}{
 		{
 			name:             "properly infer supported features",
 			expectedFeatures: namesToFeatureSet(statusFeatureNames),
-			expectedSource:   confv1.SupportedFeaturesSourceInferred,
+			expectedSource:   supportedFeaturesSourceInferred,
 		},
 		{
 			name:              "no features",
 			supportedFeatures: sets.New[features.FeatureName]("Gateway"),
 			expectedFeatures:  sets.New[features.FeatureName]("Gateway"),
-			expectedSource:    confv1.SupportedFeaturesSourceManual,
+			expectedSource:    supportedFeaturesSourceManual,
 		},
 		{
 			name:              "remove exempt features",
 			supportedFeatures: sets.New[features.FeatureName]("Gateway", "HTTPRoute"),
 			exemptFeatures:    sets.New[features.FeatureName]("HTTPRoute"),
 			expectedFeatures:  sets.New[features.FeatureName]("Gateway"),
-			expectedSource:    confv1.SupportedFeaturesSourceManual,
+			expectedSource:    supportedFeaturesSourceManual,
 		},
 		{
 			name:             "allow all features",
 			allowAllFeatures: true,
 			expectedFeatures: features.SetsToNamesSet(features.AllFeatures),
-			expectedSource:   confv1.SupportedFeaturesSourceManual,
+			expectedSource:   supportedFeaturesSourceManual,
 		},
 		{
 			name:               "supports conformance profile - core",
 			ConformanceProfile: sets.New(GatewayHTTPConformanceProfileName),
 			expectedFeatures:   namesToFeatureSet(statusFeatureNames),
-			expectedSource:     confv1.SupportedFeaturesSourceInferred,
+			expectedSource:     supportedFeaturesSourceInferred,
 		},
 	}
 
