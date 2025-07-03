@@ -14,8 +14,8 @@ This GEP proposes a way to validate the TLS certificate presented by the fronten
 
 * Define an API field to specify the CA Certificate within the Gateway configuration that can be used as a trust anchor to validate the certificates presented by the client.
 This use case has been highlighted in the [TLS Configuration GEP][] under segment 1 and in the [Gateway API TLS Use Cases][] document under point 7.
+* Introduce explicit client certificate validation modes that reflect common TLS behaviors (e.g., optional vs. required client certs)
 * Ensure the configuration mitigates the authentication bypass risks associated with HTTP/2 connection coalesing as described in [GEP-3567](https://gateway-api.sigs.k8s.io/geps/gep-3567/#interaction-with-client-cert-validation).
-* Supporting a mode where validating client certificates is optional, useful for debugging and migrating to strict TLS.
 
 ## Non-Goals
 * Define other fields that can be used to verify the client certificate such as the Certificate Hash.
@@ -23,12 +23,16 @@ This use case has been highlighted in the [TLS Configuration GEP][] under segmen
 ### API
 
 * Introduce a `FrontendValidation` field of type `FrontendTLSValidation` within [GatewayTLSConfig][] that can be used to validate the peer (frontend) with which the TLS connection is being made.
+* This new field is separate from the existing [BackendTLSPolicy][] configuration. [BackendTLSPolicy][] controls TLS certificate validation for connections *from* the Gateway to the backend service.  
+This proposal adds the ability to validate the TLS certificate presented by the *client* connecting to the Gateway (the frontend). 
+These two validation mechanisms operate independently and can be used simultaneously.
 * Introduce a `caCertificateRefs` field within `FrontendTLSValidation` that can be used to specify a list of CA Certificates that can be used as a trust anchor to validate the certificates presented by the client.
-* This new field is separate from the existing [BackendTLSPolicy][] configuration. [BackendTLSPolicy][] controls TLS certificate validation for connections *from* the
-  Gateway to the backend service.  This proposal adds the ability to validate the TLS certificate presented by the *client* connecting to the Gateway (the
-  frontend). These two validation mechanisms operate independently and can be used simultaneously.
+* Add a new `FrontendValidationModeType` enum within `FrontendTLSValidation` with the following values:
+  * `Request`
+  * `RequireAny`
+  * `VerifyIfGiven`
+  * `RequireAndVerify`
 * Introduce a `ObjectReference` structure that can be used to specify `caCertificateRefs` references.
-* Add `frontendValidation` to 
 * Introduce a `tls` field within the Gateway Spec to allow for a common TLS configuration to apply across all listeners.
 
 #### GO
@@ -67,49 +71,131 @@ type ObjectReference struct {
 	Namespace *Namespace `json:"namespace,omitempty"`
 }
 
+// GatewayTLSConfig describes a TLS configuration that can be applied to a Gateway.
 type GatewayTLSConfig struct {
-    ......
-    // FrontendValidation holds configuration information for validating the frontend (client).
-    // Setting this field will require clients to send a client certificate
-    // required for validation during the TLS handshake. In browsers this may result in a dialog appearing
-    // that requests a user to specify the client certificate.
-    // The maximum depth of a certificate chain accepted in verification is Implementation specific.
-    FrontendValidation *FrontendTLSValidation `json:"frontendValidation,omitempty"`
+	// FrontendValidation holds configuration information for validating the frontend (client).
+	// Setting this field will require clients to send a client certificate
+	// required for validation during the TLS handshake. In browsers this may result in a dialog appearing
+	// that requests a user to specify the client certificate.
+	// The maximum depth of a certificate chain accepted in verification is Implementation specific.
+	//
+	// Each field may be overidden by an equivalent setting applied at the Listener level.
+	//
+	// Support: Extended
+	//
+	// +optional
+	// <gateway:experimental>
+	FrontendValidation *FrontendTLSValidation `json:"frontendValidation,omitempty"`
 }
 
 // FrontendTLSValidation holds configuration information that can be used to validate
 // the frontend initiating the TLS connection
 type FrontendTLSValidation struct {
-    // CACertificateRefs contains one or more references to
-    // Kubernetes objects that contain TLS certificates of
-    // the Certificate Authorities that can be used
-    // as a trust anchor to validate the certificates presented by the client.
-    //
-    // A single CA certificate reference to a Kubernetes ConfigMap
-    // has "Core" support.
-    // Implementations MAY choose to support attaching multiple CA certificates to
-    // a Listener, but this behavior is implementation-specific.
-    //
-    // Support: Core - A single reference to a Kubernetes ConfigMap
-    // with the CA certificate in a key named `ca.crt`.
-    //
-    // Support: Implementation-specific (More than one reference, or other kinds
-    // of resources).
-    //
-    // References to a resource in a different namespace are invalid UNLESS there
-    // is a ReferenceGrant in the target namespace that allows the certificate
-    // to be attached. If a ReferenceGrant does not allow this reference, the
-    // "ResolvedRefs" condition MUST be set to False for this listener with the
-    // "RefNotPermitted" reason.
-    //
-    // +kubebuilder:validation:MaxItems=8
-    // +kubebuilder:validation:MinItems=1
-    CACertificateRefs []ObjectReference `json:"caCertificateRefs,omitempty"`
+	// CACertificateRefs contains one or more references to
+	// Kubernetes objects that contain TLS certificates of
+	// the Certificate Authorities that can be used
+	// as a trust anchor to validate the certificates presented by the client.
+	//
+	// A single CA certificate reference to a Kubernetes ConfigMap
+	// has "Core" support.
+	// Implementations MAY choose to support attaching multiple CA certificates to
+	// a Listener, but this behavior is implementation-specific.
+	//
+	// Support: Core - A single reference to a Kubernetes ConfigMap
+	// with the CA certificate in a key named `ca.crt`.
+	//
+	// Support: Implementation-specific (More than one reference, or other kinds
+	// of resources).
+	//
+	// References to a resource in a different namespace are invalid UNLESS there
+	// is a ReferenceGrant in the target namespace that allows the certificate
+	// to be attached. If a ReferenceGrant does not allow this reference, the
+	// "ResolvedRefs" condition MUST be set to False for this listener with the
+	// "RefNotPermitted" reason.
+	//
+	// +kubebuilder:validation:MaxItems=8
+	// +kubebuilder:validation:MinItems=0
+	CACertificateRefs []ObjectReference `json:"caCertificateRefs,omitempty"`
+
+	// FrontendValidationMode defines the mode for validating the client certificate.
+	// There are four possible modes:
+	//
+	// - Request: In this mode, a client certificate is requested
+	//   during the TLS handshake but does not require one.
+	// - RequireAny: In this mode, a client certificate is required during
+	//   the handshake, but the connection is permitted even when the
+	//   client certificate verification fails.
+	// - VerifyIfGiven: In this mode, a client certificate is requested
+	//   but not required. If presented, the certificate must be valid.
+	// - RequireAndVerify: In this mode, a valid client certificate must be
+	//   presented during the handshake and validated
+	//   using CA certificates defined in CACertificateRefs.
+	//
+	// Defaults to RequireAndVerify.
+	//
+	// Support: Core
+	//
+	// +optional
+	// +kubebuilder:default=RequireAndVerify
+	Mode *FrontendValidationModeType `json:"mode,omitempty"`
 }
 
+// FrontendValidationModeType type defines how a Gateway or Listener validates client certificates.
+//
+// +kubebuilder:validation:Enum=Request;RequireAny;VerifyIfGiven;RequireAndVerify
+type FrontendValidationModeType string
+
+const (
+	// Request indicates that a client certificate is requested
+	// during the TLS handshake but does not require one.
+	Request FrontendValidationModeType = "Request"
+
+	// RequireAny indicates that a client certificate is required during
+	// the handshake, but the connection is permitted even when the
+	// client certificate verification fails.
+	RequireAny FrontendValidationModeType = "RequireAny"
+
+	// VerifyIfGiven indicates that a client certificate is requested
+	// but not required. If presented, the certificate must be valid.
+	VerifyIfGiven FrontendValidationModeType = "VerifyIfGiven"
+
+	// RequireAndVerify indicates that a valid client certificate must be
+	// presented during the handshake and validated
+	// using CA certificates defined in CACertificateRefs.
+	RequireAndVerify FrontendValidationModeType = "RequireAndVerify"
+)
 ```
 
 #### YAML
+
+1. Setting `frontendValidation` at the Gateway level
+
+```yaml
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: Gateway
+metadata:
+  name: client-validation-basic
+spec:
+  gatewayClassName: acme-lb
+  tls:
+    frontendValidation:
+      caCertificateRefs:
+      - kind: ConfigMap
+        group: ""
+        name: foo-example-com-ca-cert
+  listeners:
+  - name: foo-https
+    protocol: HTTPS
+    port: 443
+    hostname: foo.example.com
+    tls:
+      certificateRefs:
+      - kind: Secret
+        group: ""
+        name: foo-example-com-cert
+```
+
+2. Setting `frontendValidation` at the Listener level
 
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1beta1
@@ -129,10 +215,53 @@ spec:
         group: ""
         name: foo-example-com-cert
       frontendValidation:
+        mode: VerifyIfGiven
         caCertificateRefs:
         - kind: ConfigMap
           group: ""
           name: foo-example-com-ca-cert
+```
+
+3. Setting `frontendValidation.caCertificateRefs` at the Gateway level
+and `frontendValidation.mode` at the Listener level so client connections
+for `foo-https` would be subject to the `RequireAndVerify` mode and
+client connections for `bar-https` would be subject to the `VerifyIfGiven` mode.
+
+```yaml
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: Gateway
+metadata:
+  name: client-validation-basic
+spec:
+  gatewayClassName: acme-lb
+  tls:
+    frontendValidation:
+      caCertificateRefs:
+      - kind: ConfigMap
+        group: ""
+        name: example-com-ca-cert
+  listeners:
+  - name: foo-https
+    protocol: HTTPS
+    port: 443
+    hostname: foo.example.com
+    tls:
+      certificateRefs:
+      - kind: Secret
+        group: ""
+        name: foo-example-com-cert
+  - name: bar-https
+    protocol: HTTPS
+    port: 443
+    hostname: bar.example.com
+    tls:
+      certificateRefs:
+      - kind: Secret
+        group: ""
+        name: bar-example-com-cert
+      frontendValidation:
+        mode: VerifyIfGiven
+
 ```
 
 ## Deferred

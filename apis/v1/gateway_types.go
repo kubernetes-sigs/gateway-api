@@ -291,6 +291,9 @@ type GatewaySpec struct {
 	AllowedListeners *AllowedListeners `json:"allowedListeners,omitempty"`
 
 	// TLS is the TLS configuration for the Gateway.
+	// This configuration currently supports only
+	// client certificate validation.
+	// Future releases may include extended functionalities.
 	//
 	// Support: Core
 	//
@@ -666,41 +669,51 @@ type FrontendTLSValidation struct {
 	CACertificateRefs []ObjectReference `json:"caCertificateRefs,omitempty"`
 
 	// FrontendValidationMode defines the mode for validating the client certificate.
-	// There are two possible modes:
+	// There are four possible modes:
 	//
-	// - ValidateTrustChain: This requires the client certificate chain must be validated
-	//   using CA certificates defined in CACertificateRefs.
-	// - AcceptUntrusted: In this mode, client connections are permitted even when the
+	// - Request: In this mode, a client certificate is requested
+	//   during the TLS handshake but does not require one.
+	// - RequireAny: In this mode, a client certificate is required during
+	//   the handshake, but the connection is permitted even when the
 	//   client certificate verification fails.
+	// - VerifyIfGiven: In this mode, a client certificate is requested
+	//   but not required. If presented, the certificate must be valid.
+	// - RequireAndVerify: In this mode, a valid client certificate must be
+	//   presented during the handshake and validated
+	//   using CA certificates defined in CACertificateRefs.
+	//
+	// Defaults to RequireAndVerify.
 	//
 	// Support: Core
 	//
 	// +optional
-	// +kubebuilder:default=ValidateTrustChain
+	// +kubebuilder:default=RequireAndVerify
 	Mode *FrontendValidationModeType `json:"mode,omitempty"`
-
-	// ClientCertificateOptional can be used to accept client connection
-	// even if the client does not present a certificate.
-	//
-	// Support: Core
-	//
-	// +optional
-	ClientCertificateOptional *bool `json:"clientCertificateOptional,omitempty"`
 }
 
 // FrontendValidationModeType type defines how a Gateway or Listener validates client certificates.
 //
-// +kubebuilder:validation:Enum=ValidateTrustChain;AcceptedUntrusted
+// +kubebuilder:validation:Enum=Request;RequireAny;VerifyIfGiven;RequireAndVerify
 type FrontendValidationModeType string
 
 const (
-	// In this mode, the client certificate chain must be validated
-	// using CA certificates defined in CACertificateRefs.
-	FrontendValidationModeValidateTrustChain FrontendValidationModeType = "ValidateTrustChain"
+	// Request indicates that a client certificate is requested
+	// during the TLS handshake but does not require one.
+	Request FrontendValidationModeType = "Request"
 
-	// In this mode, client connections are permitted even when the
+	// RequireAny indicates that a client certificate is required during
+	// the handshake, but the connection is permitted even when the
 	// client certificate verification fails.
-	FrontendValidationModeAcceptUntrusted FrontendValidationModeType = "AcceptUntrusted"
+	RequireAny FrontendValidationModeType = "RequireAny"
+
+	// VerifyIfGiven indicates that a client certificate is requested
+	// but not required. If presented, the certificate must be valid.
+	VerifyIfGiven FrontendValidationModeType = "VerifyIfGiven"
+
+	// RequireAndVerify indicates that a valid client certificate must be
+	// presented during the handshake and validated
+	// using CA certificates defined in CACertificateRefs.
+	RequireAndVerify FrontendValidationModeType = "RequireAndVerify"
 )
 
 // AllowedRoutes defines which Routes may be attached to this Listener.
