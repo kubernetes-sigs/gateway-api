@@ -1,11 +1,11 @@
 # GEP-2162: Supported features in GatewayClass Status
 
 * Issue: [#2162](https://github.com/kubernetes-sigs/gateway-api/issues/2162)
-* Status: Experimental
+* Status: Standard
 
 ## TLDR
 
-This GEP proposes to enhance the [GatewayClassStatus](https://github.com/kubernetes-sigs/gateway-api/blob/f2cd9bb92b4ff392416c40d6148ff7f76b30e649/apis/v1beta1/gatewayclass_types.go#L185) to include a list of Gateway API features supported by the installed GatewayClass. 
+This GEP proposes to enhance the [GatewayClassStatus](https://github.com/kubernetes-sigs/gateway-api/blob/f2cd9bb92b4ff392416c40d6148ff7f76b30e649/apis/v1beta1/gatewayclass_types.go#L185) to include a list of Gateway API features supported by the installed GatewayClass.
 
 ## Goals
 
@@ -17,15 +17,14 @@ This GEP proposes to enhance the [GatewayClassStatus](https://github.com/kuberne
 
 * Provide foundation for tools to block or warn when unsupported features are used.
 
-
 ## Non-Goals
 
 * Validate correctness of supported features published by the implementation.
     Meaning we don't intend to verify whether the supported features reported by
     the implementation are indeed supported.
 
-    However, the supported features in the status of the GatewayClass should
-    make it very easy for any individual to run conformance tests against the
+    However, the supported features in the status of the `GatewayClass should
+    make it easy for any individual to run conformance tests against the
     GatewayClass using our conformance tooling.
 
 ## Introduction
@@ -45,14 +44,13 @@ Implementations **must** publish the supported features before Accepting the Gat
 
 Implementations are free to decide how they manage this information. A common approach could be to maintain static lists of supported features or using predefined sets.
 
-Note: implementations must keep the published list sorted in ascending alphabetical order.
+> Note: implementations must keep the published list sorted in ascending alphabetical order.
 
 ## API
 
 This GEP proposes API changes describes as follow:
 
 * Update the `GatewayClassStatus` struct to include a string-represented list of `SupportedFeatures`.
-
 
 ```go
 // GatewayClassStatus is the current status for the GatewayClass.
@@ -106,6 +104,7 @@ status:
     - HTTPRouteQueryParamMatching
 
 ```
+
 ## Standardize features and conformance tests names
 
 Before we add the supported features into our API, it is necessary to establish standardized naming and formatting conventions.
@@ -130,6 +129,12 @@ We should treat this guidance as "best effort" because we might have test files 
 
 In any case, the conformance tests file names should be meaningful and easy to understand.
 
+#### Conformance report
+
+In order for to verify that the list of features reported are indeed supported
+by GatewayClass tests will be run based on the inferred features from the
+GatewayClassStatus. If the source of features are not inferred (manually
+provided, or undefined) this will block report from being generating.
 
 ## Followups
 
@@ -137,14 +142,13 @@ Before we make the changes we need to;
 
 1. Change the names of the supported features and conformance tests that don't conform with the formatting rules.
 
-
 ## Alternatives
 
 ### Re-using ConformanceProfiles structs
 
 We could use the same structs as we do in conformance profile object, more specifically, the [ProfileReport](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/apis/v1alpha1/profilereport.go#LL24C6-L24C19) struct.
 
-Though it would be nice to have only one place to update, these structs seems to include much more data relevant to the conformance report but not for our use case. 
+Though it would be nice to have only one place to update, these structs seems to include much more data relevant to the conformance report but not for our use case.
 
 That said, conformance profiles are still at experimental stage, we could explore the option to create a shared struct that will be used both for the conformance reports and for the GatewayClass status.
 
@@ -158,8 +162,7 @@ However, having the supported features published in the GatewayClass Status adds
 * We could build a mechanism or a tool to block or warn when unsupported features are used.
 * Users will be able to select the GatewayClass that suits their needs without having to refer to documentation or conformance reports.
 
-This does not cover a future piece of work we want to implement which is to warn/block users from applying a Gateway API object if the installed GWC doesn't support it. (originally suggested in [#1804](https://github.com/kubernetes-sigs/gateway-api/issues/1804)). 
-
+This does not cover a future piece of work we want to implement which is to warn/block users from applying a Gateway API object if the installed GWC doesn't support it. (originally suggested in [#1804](https://github.com/kubernetes-sigs/gateway-api/issues/1804)).
 
 ## References
 
@@ -169,6 +172,7 @@ This does not cover a future piece of work we want to implement which is to warn
 ## Future Work
 
 ### Research the development of an unsupported feature warning/blocking mechanism
+
 Once the GatewayClass features support are is published into the status we could look into;
 
 1. Using the supported features in the webhook to validate or block attempts to apply manifests with unsupported features.
@@ -181,7 +185,7 @@ Once the GatewayClass features support are is published into the status we could
 
 We got some feedback that it will be useful to indicate which Gateway API version the implementation supports. So when we have supported features published in the GatewayClass Status, users will also be able to understand that those are the supported features for a specific Gateway API version.
 
-This work is likely to require its own small GEP but ideally what this field would mean is that an implementation supports Max(vX.X). 
+This work is likely to require its own small GEP but ideally what this field would mean is that an implementation supports Max(vX.X).
 
 The value of it is to provide a better user experience and also more foundation for tools to be able to warn for example when a GatewayClass and CRDs have mismatched versions.
 
