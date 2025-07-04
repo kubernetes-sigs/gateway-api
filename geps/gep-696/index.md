@@ -1,7 +1,7 @@
 # GEP-696: GEP template
 
 * Issue: [#696](https://github.com/kubernetes-sigs/gateway-api/issues/696)
-* Status: Provisional|Implementable|Experimental|Standard|Deferred|Rejected|Withdrawn|Replaced
+* Status: Provisional|Prototyping|Implementable|Experimental|Standard|Completed|Memorandum|Deferred|Declined|Withdrawn
 
 (See [status definitions](../overview.md#gep-states).)
 
