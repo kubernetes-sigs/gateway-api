@@ -50,10 +50,6 @@ type ConformanceReport struct {
 	// SucceededProvisionalTests is a list of the names of the provisional tests that
 	// have been successfully run.
 	SucceededProvisionalTests []string `json:"succeededProvisionalTests,omitempty"`
-
-	// InferredSupportedFeatures indicates whether the supported features were
-	// automatically detected by the conformance suite.
-	InferredSupportedFeatures bool `json:"inferredSupportedFeatures"`
 }
 
 // Implementation provides metadata information on the downstream
