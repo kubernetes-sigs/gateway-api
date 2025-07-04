@@ -7,6 +7,7 @@ authors:
   - lianglli
   - robscott
   - EyalPazz
+  - shaneutt
 references:
   - https://github.com/kubernetes-sigs/gateway-api/pull/3435
   - https://github.com/kubernetes-sigs/gateway-api/pull/3637
