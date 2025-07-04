@@ -171,8 +171,8 @@ func TestEchoHandler(t *testing.T) {
 
 	// Test RequestAssertions struct contains expected context namespace
 	expectedNamespace := context.Namespace
-	if responseAssertions.Context.Namespace != expectedNamespace {
-		t.Errorf("Expected X-Content-Type-Options header %s, but got %s", expectedNamespace, responseAssertions.Context.Namespace)
+	if responseAssertions.Namespace != expectedNamespace {
+		t.Errorf("Expected X-Content-Type-Options header %s, but got %s", expectedNamespace, responseAssertions.Namespace)
 	}
 }
 
