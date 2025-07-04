@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block site_meta %}
+  {{ super() }}
+  {# Add language metadata to HTML for language detection #}
+  {# This enables language-switch.js to detect the current language #}
+  {% if page and page.meta and page.meta.lang %}
+    <meta name="lang:current" content="{{ page.meta.lang }}">
+  {% else %}
+    <meta name="lang:current" content="en">
+  {% endif %}
+{% endblock %} 
