@@ -289,6 +289,16 @@ type GatewaySpec struct {
 	//
 	// +optional
 	AllowedListeners *AllowedListeners `json:"allowedListeners,omitempty"`
+
+	// TLS is the TLS configuration for the Gateway.
+	// This configuration currently supports only
+	// client certificate validation.
+	// Future releases may include extended functionalities.
+	//
+	// Support: Core
+	//
+	// +optional
+	TLS *GatewayTLSConfig `json:"tls,omitempty"`
 }
 
 // AllowedListeners defines which ListenerSets can be attached to this Gateway.
@@ -401,7 +411,7 @@ type Listener struct {
 	// the Protocol field is "HTTPS" or "TLS". It is invalid to set this field
 	// if the Protocol field is "HTTP", "TCP", or "UDP".
 	//
-	// The association of SNIs to Certificate defined in GatewayTLSConfig is
+	// The association of SNIs to Certificate defined in ListenerTLSConfig is
 	// defined based on the Hostname field for this listener.
 	//
 	// The GatewayClass MUST use the longest matching SNI out of all
@@ -410,7 +420,7 @@ type Listener struct {
 	// Support: Core
 	//
 	// +optional
-	TLS *GatewayTLSConfig `json:"tls,omitempty"`
+	TLS *ListenerTLSConfig `json:"tls,omitempty"`
 
 	// AllowedRoutes defines the types of routes that MAY be attached to a
 	// Listener and the trusted namespaces where those Route resources MAY be
@@ -513,10 +523,10 @@ type GatewayBackendTLS struct {
 	ClientCertificateRef *SecretObjectReference `json:"clientCertificateRef,omitempty"`
 }
 
-// GatewayTLSConfig describes a TLS configuration.
+// ListenerTLSConfig describes a TLS configuration that can be applied to a Listener.
 //
 // +kubebuilder:validation:XValidation:message="certificateRefs or options must be specified when mode is Terminate",rule="self.mode == 'Terminate' ? size(self.certificateRefs) > 0 || size(self.options) > 0 : true"
-type GatewayTLSConfig struct {
+type ListenerTLSConfig struct {
 	// Mode defines the TLS behavior for the TLS session initiated by the client.
 	// There are two possible modes:
 	//
@@ -570,6 +580,8 @@ type GatewayTLSConfig struct {
 	// that requests a user to specify the client certificate.
 	// The maximum depth of a certificate chain accepted in verification is Implementation specific.
 	//
+	// Setting any field will override the equivalent field setting that was applied at the Gateway level.
+	//
 	// Support: Extended
 	//
 	// +optional
@@ -610,6 +622,23 @@ const (
 	TLSModePassthrough TLSModeType = "Passthrough"
 )
 
+// GatewayTLSConfig describes a TLS configuration that can be applied to a Gateway.
+type GatewayTLSConfig struct {
+	// FrontendValidation holds configuration information for validating the frontend (client).
+	// Setting this field will require clients to send a client certificate
+	// required for validation during the TLS handshake. In browsers this may result in a dialog appearing
+	// that requests a user to specify the client certificate.
+	// The maximum depth of a certificate chain accepted in verification is Implementation specific.
+	//
+	// Each field may be overidden by an equivalent setting applied at the Listener level.
+	//
+	// Support: Extended
+	//
+	// +optional
+	// <gateway:experimental>
+	FrontendValidation *FrontendTLSValidation `json:"frontendValidation,omitempty"`
+}
+
 // FrontendTLSValidation holds configuration information that can be used to validate
 // the frontend initiating the TLS connection
 type FrontendTLSValidation struct {
@@ -636,9 +665,56 @@ type FrontendTLSValidation struct {
 	// "RefNotPermitted" reason.
 	//
 	// +kubebuilder:validation:MaxItems=8
-	// +kubebuilder:validation:MinItems=1
+	// +kubebuilder:validation:MinItems=0
 	CACertificateRefs []ObjectReference `json:"caCertificateRefs,omitempty"`
+
+	// FrontendValidationMode defines the mode for validating the client certificate.
+	// There are four possible modes:
+	//
+	// - Request: In this mode, a client certificate is requested
+	//   during the TLS handshake but does not require one.
+	// - RequireAny: In this mode, a client certificate is required during
+	//   the handshake, but the connection is permitted even when the
+	//   client certificate verification fails.
+	// - VerifyIfGiven: In this mode, a client certificate is requested
+	//   but not required. If presented, the certificate must be valid.
+	// - RequireAndVerify: In this mode, a valid client certificate must be
+	//   presented during the handshake and validated
+	//   using CA certificates defined in CACertificateRefs.
+	//
+	// Defaults to RequireAndVerify.
+	//
+	// Support: Core
+	//
+	// +optional
+	// +kubebuilder:default=RequireAndVerify
+	Mode *FrontendValidationModeType `json:"mode,omitempty"`
 }
+
+// FrontendValidationModeType type defines how a Gateway or Listener validates client certificates.
+//
+// +kubebuilder:validation:Enum=Request;RequireAny;VerifyIfGiven;RequireAndVerify
+type FrontendValidationModeType string
+
+const (
+	// Request indicates that a client certificate is requested
+	// during the TLS handshake but does not require one.
+	Request FrontendValidationModeType = "Request"
+
+	// RequireAny indicates that a client certificate is required during
+	// the handshake, but the connection is permitted even when the
+	// client certificate verification fails.
+	RequireAny FrontendValidationModeType = "RequireAny"
+
+	// VerifyIfGiven indicates that a client certificate is requested
+	// but not required. If presented, the certificate must be valid.
+	VerifyIfGiven FrontendValidationModeType = "VerifyIfGiven"
+
+	// RequireAndVerify indicates that a valid client certificate must be
+	// presented during the handshake and validated
+	// using CA certificates defined in CACertificateRefs.
+	RequireAndVerify FrontendValidationModeType = "RequireAndVerify"
+)
 
 // AllowedRoutes defines which Routes may be attached to this Listener.
 type AllowedRoutes struct {
