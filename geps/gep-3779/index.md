@@ -353,9 +353,15 @@ The UX gets weird becuase even though you target a service, you essentially get 
 
 > Note: with Service as a targetRef, of course we are going to need a Service in order to enforce Authorization -- meaning pods/jobs without a serivce are completely out of scope.
 
-#### **Option 3: Targeting xRoutes**
+#### **Option 2: Targeting xRoutes**
 
-We can target xRoutes. However we are back to 
+The main benefit of this option is that we can more easily scope the authorization enforcement only for "GAMMA" traffic. Whether its more or less confusing is still unclear.
+
+We can target xRoutes (TCPRoute, HTTPRoute, GRPCRoute). However we are back to [Loss Of Service Context](#loss-of-service-context). In sidecar mode, same as we don't have the context of which service was dialed, we don't have the route information that was responsible for the routing.
+
+> Note: Linkerd solved this with [Reusing HTTPRoute Schema](https://linkerd.io/2.15/features/httproute/) to distinguish between Inbound and Outbound HTTPRoute. However, I doubt we want that as a community feature. (sorry @kflynn)
+
+Another (perhaps, easier-to-address) concern is that if we target xRoutes, it is likely that users would expect this Authorization to work for N/S traffic. Documentation and guidance are nice, but I think this still ends up more confusing for no real value.
 
 #### **Option 3: Targeting Pods via Label Selectors**
 
