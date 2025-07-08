@@ -107,8 +107,9 @@ status:
 
 ### SupportedFeatures Guidance in GatewayClass
 
-TODO(bexxmodd@): Guidance regarding what features should be published under
-SupportedFeatures in GatewayClass (only gateway features - option 1 from #3885)
+GatewayClassStatus should only populated Gateway related features. The rest,
+e.i Mesh features should be populated when Mesh resource gets introduced.
+Please see *Reporting Mesh Features* section for conformance reporting.
 
 ## Standardize features and conformance tests names
 
