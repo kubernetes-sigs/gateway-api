@@ -143,8 +143,7 @@ provided) the conformance suite will block the report from being submitted.
 
 #### Reporting Mesh features
 
-As Mesh doesn't have functionality (yet) to populate SupportedFeatures in the
-Status, its features can be tested for compliance by using Conformance Profiles,
+As Mesh doesn't have a good place (yet) to populate SupportedFeatures, its features can be tested for compliance by using Conformance Profiles,
 or manually, providing features for test using `--supported-features` flag.
 Conformance suite will determine if the implementation doesn't support
 GatewayClass and validate that report is run for the Mesh features and NOT block
