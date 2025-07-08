@@ -25,11 +25,11 @@ profiles:
       Passed: 1
       Skipped: 0
     supportedFeatures:
+    - GatewayAddressEmpty
     - GatewayHTTPListenerIsolation
     - GatewayInfrastructurePropagation
     - GatewayPort8080
     unsupportedFeatures:
-    - GatewayAddressEmpty
     - GatewayStaticAddresses
   name: GATEWAY-GRPC
   summary: Core tests succeeded. Extended tests succeeded.
@@ -43,9 +43,10 @@ profiles:
     result: success
     statistics:
       Failed: 0
-      Passed: 14
+      Passed: 15
       Skipped: 0
     supportedFeatures:
+    - GatewayAddressEmpty
     - GatewayHTTPListenerIsolation
     - GatewayInfrastructurePropagation
     - GatewayPort8080
@@ -60,7 +61,6 @@ profiles:
     - HTTPRouteResponseHeaderModification
     - HTTPRouteSchemeRedirect
     unsupportedFeatures:
-    - GatewayAddressEmpty
     - GatewayStaticAddresses
     - HTTPRouteBackendProtocolH2C
     - HTTPRouteBackendProtocolWebSocket
@@ -85,11 +85,11 @@ profiles:
       Passed: 1
       Skipped: 0
     supportedFeatures:
+    - GatewayAddressEmpty
     - GatewayHTTPListenerIsolation
     - GatewayInfrastructurePropagation
     - GatewayPort8080
     unsupportedFeatures:
-    - GatewayAddressEmpty
     - GatewayStaticAddresses
   name: GATEWAY-TLS
   summary: Core tests succeeded. Extended tests succeeded.
