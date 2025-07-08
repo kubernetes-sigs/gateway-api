@@ -161,9 +161,7 @@ implemented.
 
 Grace period is till 1.5 release. After that, we'll flip flag for
 Conformance tests that will block all the reports for implementations that do
-not populate SupportedFeatures in GatewayClassStatus. So, if you want your
-implementation to remain compliant, SupportedFeatures should be implemented
-before 1.5 release.
+not use SupportedFeatures in their GatewayClassStatus as a source of truth for their tests.
 
 ## Followups
 
