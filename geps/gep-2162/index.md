@@ -107,9 +107,8 @@ status:
 
 ### SupportedFeatures Guidance in GatewayClass
 
-GatewayClassStatus should only populated Gateway related features. The rest,
-e.i Mesh features should be populated when Mesh resource gets introduced.
-Please see *Reporting Mesh Features* section for conformance reporting.
+Only Gateway related features should be published on GatewayClass. The rest,
+i.e Mesh features should not be published on Gateway Class, and will likely to be published on a Mesh resource if an when it is introduced (xRef: https://github.com/kubernetes-sigs/gateway-api/pull/3887).
 
 ## Standardize features and conformance tests names
 
