@@ -35,7 +35,7 @@ var HTTPRouteRewriteHostBackend = suite.ConformanceTest{
 	Features: []features.FeatureName{
 		features.SupportGateway,
 		features.SupportHTTPRoute,
-		features.SupportHTTPRouteHostRewrite,
+		features.SupportHTTPRouteHostRewriteBackend,
 	},
 	Provisional: true,
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {

@@ -38,7 +38,7 @@ var HTTPRouteRewritePathBackendWeights = suite.ConformanceTest{
 	Features: []features.FeatureName{
 		features.SupportGateway,
 		features.SupportHTTPRoute,
-		features.SupportHTTPRoutePathRewrite,
+		features.SupportHTTPRoutePathRewriteBackend,
 	},
 	Provisional: true,
 	Manifests:   []string{"tests/httproute-rewrite-path-backend-weights.yaml"},

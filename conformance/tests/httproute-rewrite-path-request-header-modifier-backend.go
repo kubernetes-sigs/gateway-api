@@ -35,7 +35,7 @@ var HTTPRouteRewritePathRequestHeaderModifierBackend = suite.ConformanceTest{
 	Features: []features.FeatureName{
 		features.SupportGateway,
 		features.SupportHTTPRoute,
-		features.SupportHTTPRoutePathRewrite,
+		features.SupportHTTPRoutePathRewriteBackend,
 		features.SupportHTTPRouteBackendRequestHeaderModification,
 	},
 	Provisional: true,
