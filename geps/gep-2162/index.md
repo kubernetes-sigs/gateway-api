@@ -136,6 +136,30 @@ by GatewayClass tests will be run based on the inferred features from the
 GatewayClassStatus. If the source of features are not inferred (manually
 provided, or undefined) the conformance suite will block the report from being submitted.
 
+#### Reporting Mesh features
+
+As Mesh doesn't have functionality (yet) to populate SupportedFeatures in the
+Status, they can be tested for compliance by using Conformance Profiles, or
+manually providing features for test using `--supported-features` flag.
+Conformance suite will determine if the implementation doesn't support
+GatewayClass and validate that report is run for the Mesh features and NOT block
+the report.
+
+#### Staying Compliant
+
+SupportedFeatures will become available starting 1.4 release as a standard
+feature, which means that all implementors will be expected to define and
+populate SupportedFeatures in the GatewayClass' Status. Conformance test suite
+will be based on inferring supported features from GatewayClassStatus, meaning
+if you want to generate passing report, above mentioned feature should be
+implemented.
+
+Grace period is till 1.5 release. After that, we'll flip flag for
+Conformance tests that will block all the reports for implementations that do
+not populate SupportedFeatures in GatewayClassStatus. So, if you want your
+implementation to remain compliant, SupportedFeatures should be implemented
+before 1.5 release.
+
 ## Followups
 
 Before we make the changes we need to;
