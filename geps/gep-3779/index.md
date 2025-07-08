@@ -292,20 +292,72 @@ The `targetRef` of the policy specifies the workload(s) to which the policy appl
 
 The `targetRef` can point to a Kubernetes `Service`.
 
+Two implementation options when targeting a service:
+
+1. Apply authorization policy to all traffic addressed to this Service.
+
+1. Apply authorization policy to all workloads (pods) selected by the Service.
+
 **Benefits:**
 
 * **No API Extension Required:** Works with the current PolicyAttachment model in Gateway API without modification.
 * **Simplicity:** Intuitive for users familiar with Kubernetes networking concepts.
 
 **Downsides and Open Questions:**
+However, targeting a `Service` introduces several challenges;
 
-However, targeting a `Service` introduces several challenges:
+##### Loss Of Service Context
 
-1. Authorization cannot be enforced on workloads not exposed via a `Service` - excluding use cases of pods/jobs without a Service.
-2. If a Pod belongs to multiple Services targeted by different authorization policies, precedence rules, may become unclear, leading to unpredictable or insecure outcomes. Even if such rules are explicitly defined, UX could potentially be confusing for users.
-3. UX and implementation challenges - are implementations expected to enforce the policy only if the traffic arrived through the specific Service? Or just to take the service selectors and enforce the policy regardless of how the traffic got to the destination?
+I we go with option 1, apply authorization policy to all traffic addressed to a service;
+  This option is very tricky to implement for sidecar-based meshes where the destination sidecar has no knowledge of which Service the request came through.
+  Here is the very high-level tarffic flow for sidecar-based meshes:
 
-#### **Option 2: Targeting Pods via Label Selectors**
+  ```sh
+  Client → Request to backend-service:8080
+      → Source sidecar resolves service → backend-pod-1 (<ip>>:8080)
+      → Destination sidecar receives traffic on pod IP
+      → Destination sidecar has NO context that this came via "backend-service"
+  ```
+
+Solving this problem either introduces security concern (e.g adding request metadata to indicate which service was dialed), or unnecessarily complex or in-efficient to solve.
+
+#### A Workload is Part of Multiple Services
+
+Assuming we go with option 2, apply authorization policy to all workloads (pods) selected by the Service.
+
+If a Pod belongs to multiple Services targeted by different authorization policies, precedence rules, may become unclear, leading to unpredictable or insecure outcomes. Even if such rules are explicitly defined, UX could potentially be confusing for users. For example we _could_ apply the following algorithm:
+
+```sh
+## Algorithm
+For traffic to workload W:
+1. Collect all Service-targeted AuthorizationPolicies where Service.selector matches W.labels
+2. If no policies collected → Allow (default behavior)
+3. If policies collected → Evaluate using union semantics
+
+
+## Union semantics:
+1. For each DENY policy: if request matches → DENY immediately
+2. For each ALLOW policy: collect matching rules  
+3. If any ALLOW rule matches → ALLOW
+4. Otherwise → DENY
+```
+
+#### Enforcement & Consistency
+
+Assuming we go with option 2, apply authorization policy to all workloads (pods) selected by the Service.
+
+The UX becomes very confusing. Are we going to enforce only if the traffic arrived through the specific Service? Probably not, cause then we are back to the first problem of Service context.
+
+The UX gets weird becuase even though you target a service, you essentially get a **workload** policy, thats enforced regardless. 
+
+
+> Note: with Service as a targetRef, of course we are going to need a Service in order to enforce Authorization -- meaning pods/jobs without a serivce are completely out of scope.
+
+#### **Option 3: Targeting xRoutes**
+
+We can target xRoutes. However we are back to 
+
+#### **Option 3: Targeting Pods via Label Selectors**
 
 Alternatively, the `targetRef` can specify a set of pods using a `LabelSelector` for a more flexible and direct approach.
 
@@ -403,7 +455,7 @@ const (
 type AuthorizationPolicySpec struct {
     // TargetRef identifies the resource this policy is attached to.
     // +kubebuilder:validation:Required
-    TargetRefs gatewayv1.PolicyTargetReferenceWithLabelSelectors `json:"targetRefs"`
+    TargetRefs []gatewayv1.PolicyTargetReferenceWithLabelSelectors `json:"targetRefs"`
 
     // Action specifies the action to take when a request matches the rules.
     // +kubebuilder:validation:Required
