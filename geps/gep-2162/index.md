@@ -139,7 +139,7 @@ In any case, the conformance tests file names should be meaningful and easy to u
 In order for to verify that the list of features reported are indeed supported
 by GatewayClass tests will be run based on the features from the
 GatewayClassStatus. If the source of features are not inferred (manually
-provided, or undefined) the conformance suite will block the report from being submitted.
+provided) the conformance suite will block the report from being submitted.
 
 #### Reporting Mesh features
 
