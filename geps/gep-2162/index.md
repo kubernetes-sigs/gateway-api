@@ -105,6 +105,11 @@ status:
 
 ```
 
+### SupportedFeatures Guidance in GatewayClass
+
+TODO(bexxmodd@): Guidance regarding what features should be published under
+SupportedFeatures in GatewayClass (only gateway features - option 1 from #3885)
+
 ## Standardize features and conformance tests names
 
 Before we add the supported features into our API, it is necessary to establish standardized naming and formatting conventions.
