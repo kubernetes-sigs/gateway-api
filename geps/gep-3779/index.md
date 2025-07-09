@@ -419,6 +419,50 @@ type PolicyTargetReferenceWithLabelSelectors struct {
 
 ```
 
+##### Namespace-Wide Policies
+
+A common case for authorization is to target a whole namespace. We can achieve the above with a few patterns:
+
+###### Option 1
+
+Target a namespace, name MUST be empty (as this is already namespaced policy)
+
+```yaml
+targetRefs:
+- Kind: Namespace
+```
+
+This however gives the (confusing) impression that Gateways (whether in-cluster or off-cluster gateways) are targeted as well. Beyond the question of "does it really make sense for an E/W policy to be applicable to a N/S Gateway?" it leaves no way for users to do a namespace wide policy that excludes Gateways (no way to exclude Off-cluster Gateways with labels -- see option 3 for alternative).
+
+###### Option 2
+
+Leaving an empty targetRefs. While this is theoretically possible without a breaking change, this would be another fundamental change to policy attachment (to allow policies without a targetRef). 
+Additionally, this is also suffer from the same problem of being perceived as an applicable scope for both Gateways and Workloads in the namespace.
+
+This option is also inconsistent with other API fields where an empty field or absence of a it does not mean select all. See [recent comment](https://github.com/kubernetes-sigs/gateway-api/pull/3887#discussion_r2176125600) on the proposal for empty ParentRef field.
+
+###### Option 3
+
+An empty pod selector. Kubernetes official docs clarify that the semantics of empty selectors are the decision of the API owner. In fact, many Kubernetes APIs (I know Service API does the opposite :/) using empty selectors as a select-all mechanism. See [NetworkPolicy podSelector](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/#networkpolicy-v1-networking-k8s-io), PodDisruptionBudget, ResourceQuota, and more.
+
+```yaml
+targetRefs:
+- Kind: Pod
+  Selector: {}
+```
+
+This provides a clearer separation between workloads and gateways. Gateways that happen to be Pods in the cluster, will also get selected. However they can be excluded with the right `matchExpression` if desired.
+
+Below is a pseudo example:
+
+```yaml
+targetRefs:
+- Kind: Pod
+  Selector:
+    matchExpression:
+    - { key: "purpose", operator: NotIn, values: ["gateway"] }
+```
+
 ##### **Enhanced Discoverability with `gwctl`**
 
 A key challenge with `LabelSelector` is the loss of discoverability. It’s easier to see which policies target a `Service` but difficult to determine which policies might affect a specific pod.
@@ -564,9 +608,11 @@ Note: Existing AuthorizationAPIs recognized the need to support negation fields 
 
 ## Conformance Details
 
+### Feature Names
 
-#### Feature Names
+Two new feature sets will be added - AuthorizationPolicyCoreFeatures, and later, AuthorizationPolicyExtendedFeatures.
 
+TBD exact FeatureNames.
 
 ### Conformance tests
 
