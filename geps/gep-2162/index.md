@@ -156,9 +156,8 @@ feature, which means that all implementors will be expected to define and
 populate SupportedFeatures in the GatewayClass' Status. Conformance test suite
 will be based on inferring supported features from GatewayClassStatus, meaning
 if you want to generate passing report, above mentioned feature should be
-implemented. Grace period is till 1.5 release. After that, we'll flip flag for
-Conformance tests that will block all the reports for implementations that do
-not use SupportedFeatures in their GatewayClassStatus as a source of truth for their tests.
+implemented. There will be a grace period until the 1.5 release, after which all Gateway Conformance Reports 
+will need to be generated based on the SupportedFeatures field in GatewayClass status.
 
 The core purpose of conformance tests for GatewayClass is to verify that
 reported features are truly supported. While the community currently operates on
