@@ -2733,16 +2733,46 @@ func schema_k8sio_apimachinery_pkg_version_Info(ref common.ReferenceCallback) co
 				Properties: map[string]spec.Schema{
 					"major": {
 						SchemaProps: spec.SchemaProps{
-							Default: "",
-							Type:    []string{"string"},
-							Format:  "",
+							Description: "Major is the major version of the binary version",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
 						},
 					},
 					"minor": {
 						SchemaProps: spec.SchemaProps{
-							Default: "",
-							Type:    []string{"string"},
-							Format:  "",
+							Description: "Minor is the minor version of the binary version",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"emulationMajor": {
+						SchemaProps: spec.SchemaProps{
+							Description: "EmulationMajor is the major version of the emulation version",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"emulationMinor": {
+						SchemaProps: spec.SchemaProps{
+							Description: "EmulationMinor is the minor version of the emulation version",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"minCompatibilityMajor": {
+						SchemaProps: spec.SchemaProps{
+							Description: "MinCompatibilityMajor is the major version of the minimum compatibility version",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"minCompatibilityMinor": {
+						SchemaProps: spec.SchemaProps{
+							Description: "MinCompatibilityMinor is the minor version of the minimum compatibility version",
+							Type:        []string{"string"},
+							Format:      "",
 						},
 					},
 					"gitVersion": {
@@ -3409,7 +3439,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GRPCRouteRule(ref common.ReferenceCall
 				Properties: map[string]spec.Schema{
 					"name": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Name is the name of the route rule. This name MUST be unique within a Route if it is set.\n\nSupport: Extended <gateway:experimental>",
+							Description: "Name is the name of the route rule. This name MUST be unique within a Route if it is set.\n\nSupport: Extended",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -4007,7 +4037,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewaySpecAddress(ref common.Referenc
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "GatewayAddress describes an address that can be bound to a Gateway.",
+				Description: "GatewaySpecAddress describes an address that can be bound to a Gateway.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"type": {
@@ -4988,7 +5018,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteRule(ref common.ReferenceCall
 				Properties: map[string]spec.Schema{
 					"name": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Name is the name of the route rule. This name MUST be unique within a Route if it is set.\n\nSupport: Extended <gateway:experimental>",
+							Description: "Name is the name of the route rule. This name MUST be unique within a Route if it is set.\n\nSupport: Extended",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -7706,14 +7736,14 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BudgetDetails(ref common.Refere
 				Properties: map[string]spec.Schema{
 					"percent": {
 						SchemaProps: spec.SchemaProps{
-							Description: "BudgetPercent defines the maximum percentage of active requests that may be made up of retries.\n\nSupport: Extended",
+							Description: "Percent defines the maximum percentage of active requests that may be made up of retries.\n\nSupport: Extended",
 							Type:        []string{"integer"},
 							Format:      "int32",
 						},
 					},
 					"interval": {
 						SchemaProps: spec.SchemaProps{
-							Description: "BudgetInterval defines the duration in which requests will be considered for calculating the budget for retries.\n\nSupport: Extended",
+							Description: "Interval defines the duration in which requests will be considered for calculating the budget for retries.\n\nSupport: Extended",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -7748,6 +7778,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerEntry(ref common.Refere
 					"port": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Port is the network port. Multiple listeners may use the same port, subject to the Listener compatibility rules.",
+							Default:     0,
 							Type:        []string{"integer"},
 							Format:      "int32",
 						},
@@ -7773,7 +7804,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerEntry(ref common.Refere
 						},
 					},
 				},
-				Required: []string{"name", "protocol"},
+				Required: []string{"name", "port", "protocol"},
 			},
 		},
 		Dependencies: []string{
@@ -7881,7 +7912,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerSetSpec(ref common.Refe
 							},
 						},
 						SchemaProps: spec.SchemaProps{
-							Description: "Listeners associated with this ListenerSet. Listeners define logical endpoints that are bound on this referenced parent Gateway's addresses.\n\nListeners in a `Gateway` and their attached `ListenerSets` are concatenated as a list when programming the underlying infrastructure. Each listener name does not need to be unique across the Gateway and ListenerSets. See ListenerEntry.Name for more details.\n\nImplementations MUST treat the parent Gateway as having the merged list of all listeners from itself and attached ListenerSets using the following precedence:\n\n1. \"parent\" Gateway 2. ListenerSet ordered by creation time (oldest first) 3. ListenerSet ordered alphabetically by “{namespace}/{name}”.\n\nAn implementation MAY reject listeners by setting the ListenerEntryStatus `Accepted`` condition to False with the Reason `TooManyListeners`\n\nIf a listener has a conflict, this will be reported in the Status.ListenerEntryStatus setting the `Conflicted` condition to True.\n\nImplementations SHOULD be cautious about what information from the parent or siblings are reported to avoid accidentally leaking sensitive information that the child would not otherwise have access to. This can include contents of secrets etc.",
+							Description: "Listeners associated with this ListenerSet. Listeners define logical endpoints that are bound on this referenced parent Gateway's addresses.\n\nListeners in a `Gateway` and their attached `ListenerSets` are concatenated as a list when programming the underlying infrastructure. Each listener name does not need to be unique across the Gateway and ListenerSets. See ListenerEntry.Name for more details.\n\nImplementations MUST treat the parent Gateway as having the merged list of all listeners from itself and attached ListenerSets using the following precedence:\n\n1. \"parent\" Gateway 2. ListenerSet ordered by creation time (oldest first) 3. ListenerSet ordered alphabetically by \"{namespace}/{name}\".\n\nAn implementation MAY reject listeners by setting the ListenerEntryStatus `Accepted` condition to False with the Reason `TooManyListeners`\n\nIf a listener has a conflict, this will be reported in the Status.ListenerEntryStatus setting the `Conflicted` condition to True.\n\nImplementations SHOULD be cautious about what information from the parent or siblings are reported to avoid accidentally leaking sensitive information that the child would not otherwise have access to. This can include contents of secrets etc.",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -8160,7 +8191,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_XListenerSet(ref common.Referen
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "XListenerSet defines a set of additional listeners to attach to an existing Gateway.",
+				Description: "XListenerSet defines a set of additional listeners to attach to an existing Gateway. This resource provides a mechanism to merge multiple listeners into a single Gateway.\n\nThe parent Gateway must explicitly allow ListenerSet attachment through its AllowedListeners configuration. By default, Gateways do not allow ListenerSet attachment.\n\nRoutes can attach to a ListenerSet by specifying it as a parentRef, and can optionally target specific listeners using the sectionName field.\n\nPolicy Attachment: - Policies that attach to a ListenerSet apply to all listeners defined in that resource - Policies do not impact listeners in the parent Gateway - Different ListenerSets attached to the same Gateway can have different policies - If an implementation cannot apply a policy to specific listeners, it should reject the policy\n\nReferenceGrant Semantics: - ReferenceGrants applied to a Gateway are not inherited by child ListenerSets - ReferenceGrants applied to a ListenerSet do not grant permission to the parent Gateway's listeners - A ListenerSet can reference secrets/backends in its own namespace without a ReferenceGrant\n\nGateway Integration: - The parent Gateway's status will include an \"AttachedListenerSets\" condition - This condition will be:\n  - True: when AllowedListeners is set and at least one child ListenerSet is attached\n  - False: when AllowedListeners is set but no valid listeners are attached, or when AllowedListeners is not set or false\n  - Unknown: when no AllowedListeners config is present",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {

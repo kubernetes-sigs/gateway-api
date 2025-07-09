@@ -1,0 +1,64 @@
+apiVersion: gateway.networking.k8s.io/v1
+date: "2025-06-11T14:21:05-04:00"
+gatewayAPIChannel: standard
+gatewayAPIVersion: v1.3.0
+implementation:
+  contact:
+  - https://github.com/linkerd/linkerd2/blob/main/MAINTAINERS.md
+  organization: Linkerd
+  project: Linkerd
+  url: https://github.com/linkerd/linkerd2
+  version: version-2.18
+kind: ConformanceReport
+mode: default
+profiles:
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 1
+      Skipped: 0
+  name: MESH-GRPC
+  summary: Core tests succeeded.
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 7
+      Skipped: 0
+  extended:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 8
+      Skipped: 0
+    supportedFeatures:
+    - HTTPRouteBackendProtocolH2C
+    - HTTPRouteBackendProtocolWebSocket
+    - HTTPRouteBackendRequestHeaderModification
+    - HTTPRouteBackendTimeout
+    - HTTPRouteDestinationPortMatching
+    - HTTPRouteHostRewrite
+    - HTTPRouteMethodMatching
+    - HTTPRouteParentRefPort
+    - HTTPRoutePathRedirect
+    - HTTPRoutePathRewrite
+    - HTTPRoutePortRedirect
+    - HTTPRouteQueryParamMatching
+    - HTTPRouteRequestMirror
+    - HTTPRouteRequestMultipleMirrors
+    - HTTPRouteRequestPercentageMirror
+    - HTTPRouteRequestTimeout
+    - HTTPRouteResponseHeaderModification
+    - HTTPRouteSchemeRedirect
+    - MeshClusterIPMatching
+    - MeshConsumerRoute
+    - MeshHTTPRouteBackendRequestHeaderModification
+    - MeshHTTPRouteQueryParamMatching
+    - MeshHTTPRouteRedirectPort
+    - MeshHTTPRouteSchemeRedirect
+    unsupportedFeatures:
+    - MeshHTTPRouteRedirectPath
+    - MeshHTTPRouteRewritePath
+  name: MESH-HTTP
+  summary: Core tests succeeded. Extended tests succeeded.

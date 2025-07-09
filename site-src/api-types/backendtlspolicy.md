@@ -139,10 +139,10 @@ Status defines the observed state of the BackendTLSPolicy and is not user-config
 way you do for other Gateway API objects to verify correct operation.  Note that the status in BackendTLSPolicy
 uses `PolicyAncestorStatus` to allow you to know which parentReference set that particular status.
 
-[backendtlspolicy]: /references/spec/#gateway.networking.k8s.io/v1alpha3.BackendTLSPolicy
-[validation]: /references/spec/#gateway.networking.k8s.io/v1alpha3.BackendTLSPolicy.Validation
-[caCertificateRefs]: /references/spec/#gateway.networking.k8s.io/v1alpha3.BackendTLSPolicyValidation.CACertificateRefs
-[wellKnownCACertificates]: /references/spec/#gateway.networking.k8s.io/v1alpha3.BackendTLSPolicyValidation.WellKnownCACertificates
-[hostname]: /references/spec/#gateway.networking.k8s.io/v1.PreciseHostname
+[backendtlspolicy]: ../reference/spec.md#gateway.networking.k8s.io/v1alpha3.BackendTLSPolicy
+[validation]: ../reference/spec.md#gateway.networking.k8s.io/v1alpha3.BackendTLSPolicy.Validation
+[caCertificateRefs]: ../reference/spec.md#gateway.networking.k8s.io/v1alpha3.BackendTLSPolicyValidation.CACertificateRefs
+[wellKnownCACertificates]: ../reference/spec.md#gateway.networking.k8s.io/v1alpha3.BackendTLSPolicyValidation.WellKnownCACertificates
+[hostname]: ../reference/spec.md#gateway.networking.k8s.io/v1.PreciseHostname
 [rfc-3986]: https://tools.ietf.org/html/rfc3986
-[targetRefs]: /references/spec/#gateway.networking.k8s.io/v1alpha2.PolicyTargetReference
+[targetRefs]: ../reference/spec.md#gateway.networking.k8s.io/v1alpha2.PolicyTargetReference

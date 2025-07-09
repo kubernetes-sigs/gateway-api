@@ -26,15 +26,14 @@ aliases:
     - howardjohn
     - mikemorris
     - kflynn
+    - LiorLieberman
 
   emeritus-gateway-api-mesh-leads:
     - keithmattix
 
   gateway-api-conformance-reviewers:
     - candita
-    - michaelbeaumont
     - sunjayBhatia
-    - xunzhuo
 
   gateway-api-conformance-approvers:
     - arkodg

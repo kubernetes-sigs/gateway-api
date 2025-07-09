@@ -70,6 +70,7 @@ type Request struct {
 	Headers          map[string]string
 	UnfollowRedirect bool
 	Protocol         string
+	Body             string
 }
 
 // ExpectedRequest defines expected properties of a request that reaches a backend.
@@ -139,6 +140,7 @@ func MakeRequest(t *testing.T, expected *ExpectedResponse, gwAddr, protocol, sch
 		Protocol:         expected.Request.Protocol,
 		Headers:          map[string][]string{},
 		UnfollowRedirect: expected.Request.UnfollowRedirect,
+		Body:             expected.Request.Body,
 	}
 
 	if expected.Request.Headers != nil {

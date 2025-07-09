@@ -21,6 +21,7 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
+	neturl "net/url"
 	"slices"
 	"sort"
 	"strings"
@@ -31,11 +32,13 @@ import (
 	"github.com/stretchr/testify/require"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/sets"
 	clientset "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/gateway-api/apis/v1beta1"
 	confv1 "sigs.k8s.io/gateway-api/conformance/apis/v1"
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
@@ -69,14 +72,20 @@ type ConformanceTestSuite struct {
 	BaseManifests            string
 	MeshManifests            string
 	Applier                  kubernetes.Applier
-	SupportedFeatures        sets.Set[features.FeatureName]
+	SupportedFeatures        FeaturesSet
 	TimeoutConfig            config.TimeoutConfig
 	SkipTests                sets.Set[string]
 	SkipProvisionalTests     bool
 	RunTest                  string
+	Hook                     func(t *testing.T, test ConformanceTest, suite *ConformanceTestSuite)
 	ManifestFS               []fs.FS
 	UsableNetworkAddresses   []v1beta1.GatewaySpecAddress
 	UnusableNetworkAddresses []v1beta1.GatewaySpecAddress
+
+	// If SupportedFeatures are automatically determined from GWC Status.
+	// This will be required to report in future iterations as the passing
+	// will be determined based on this.
+	isInferredSupportedFeatures bool
 
 	// mode is the operating mode of the implementation.
 	// The default value for it is "default".
@@ -121,7 +130,7 @@ type ConformanceTestSuite struct {
 	lock sync.RWMutex
 }
 
-// Options can be used to initialize a ConformanceTestSuite.
+// ConformanceOptions can be used to initialize a ConformanceTestSuite.
 type ConformanceOptions struct {
 	Client               client.Client
 	ClientOptions        client.Options
@@ -141,8 +150,8 @@ type ConformanceOptions struct {
 	// CleanupBaseResources indicates whether or not the base test
 	// resources such as Gateways should be cleaned up after the run.
 	CleanupBaseResources       bool
-	SupportedFeatures          sets.Set[features.FeatureName]
-	ExemptFeatures             sets.Set[features.FeatureName]
+	SupportedFeatures          FeaturesSet
+	ExemptFeatures             FeaturesSet
 	EnableAllSupportedFeatures bool
 	TimeoutConfig              config.TimeoutConfig
 	// SkipTests contains all the tests not to be run and can be used to opt out
@@ -152,7 +161,8 @@ type ConformanceOptions struct {
 	SkipProvisionalTests bool
 	// RunTest is a single test to run, mostly for development/debugging convenience.
 	RunTest string
-
+	// Hook is an optional function that can be used to run custom logic after each test at suite level.
+	Hook       func(t *testing.T, test ConformanceTest, suite *ConformanceTestSuite)
 	ManifestFS []fs.FS
 
 	// UsableNetworkAddresses is an optional pool of usable addresses for
@@ -170,6 +180,8 @@ type ConformanceOptions struct {
 	ConformanceProfiles sets.Set[ConformanceProfileName]
 }
 
+type FeaturesSet = sets.Set[features.FeatureName]
+
 const (
 	// undefinedKeyword is set in the ConformanceReport "GatewayAPIVersion" and
 	// "GatewayAPIChannel" fields in case it's not possible to figure out the actual
@@ -179,16 +191,23 @@ const (
 
 // NewConformanceTestSuite is a helper to use for creating a new ConformanceTestSuite.
 func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite, error) {
-	// test suite callers are required to provide either:
-	// - one conformance profile via the flag '-conformance-profiles'
-	// - a list of supported features via the flag '-supported-features'
-	// - an explicit test to run via the flag '-run-test'
-	// - all features are being tested via the flag '-all-features'
-	if options.SupportedFeatures.Len() == 0 &&
-		options.ConformanceProfiles.Len() == 0 &&
-		!options.EnableAllSupportedFeatures &&
-		options.RunTest == "" {
-		return nil, fmt.Errorf("no conformance profile, supported features, explicit tests were provided so no tests could be selected")
+	supportedFeatures := options.SupportedFeatures.Difference(options.ExemptFeatures)
+	isInferred := false
+	switch {
+	case options.EnableAllSupportedFeatures:
+		supportedFeatures = features.SetsToNamesSet(features.AllFeatures)
+	case shouldInferSupportedFeatures(&options):
+		var err error
+		supportedFeatures, err = fetchSupportedFeatures(options.Client, options.GatewayClassName)
+		if err != nil {
+			return nil, fmt.Errorf("Cannot infer supported features: %w", err)
+		}
+		isInferred = true
+	}
+
+	// If features were not inferred from Status, it's a GWC issue.
+	if isInferred && supportedFeatures.Len() == 0 {
+		return nil, fmt.Errorf("no supported features were determined for test suite")
 	}
 
 	config.SetupTimeoutConfig(&options.TimeoutConfig)
@@ -222,19 +241,6 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 		mode = options.Mode
 	}
 
-	// test suite callers can potentially just run all tests by saying they
-	// cover all features, if they don't they'll need to have provided a
-	// conformance profile or at least some specific features they support.
-	if options.EnableAllSupportedFeatures {
-		options.SupportedFeatures = features.SetsToNamesSet(features.AllFeatures)
-	} else if options.SupportedFeatures == nil {
-		options.SupportedFeatures = sets.New[features.FeatureName]()
-	}
-
-	for feature := range options.ExemptFeatures {
-		options.SupportedFeatures.Delete(feature)
-	}
-
 	suite := &ConformanceTestSuite{
 		Client:           options.Client,
 		ClientOptions:    options.ClientOptions,
@@ -252,7 +258,7 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 			NamespaceAnnotations: options.NamespaceAnnotations,
 			AddressType:          options.AddressType,
 		},
-		SupportedFeatures:           options.SupportedFeatures,
+		SupportedFeatures:           supportedFeatures,
 		TimeoutConfig:               options.TimeoutConfig,
 		SkipTests:                   sets.New(options.SkipTests...),
 		RunTest:                     options.RunTest,
@@ -268,6 +274,8 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 		mode:                        mode,
 		apiVersion:                  apiVersion,
 		apiChannel:                  apiChannel,
+		isInferredSupportedFeatures: isInferred,
+		Hook:                        options.Hook,
 	}
 
 	for _, conformanceProfileName := range options.ConformanceProfiles.UnsortedList() {
@@ -285,12 +293,12 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 		for _, f := range conformanceProfile.ExtendedFeatures.UnsortedList() {
 			if options.SupportedFeatures.Has(f) {
 				if suite.extendedSupportedFeatures[conformanceProfileName] == nil {
-					suite.extendedSupportedFeatures[conformanceProfileName] = sets.New[features.FeatureName]()
+					suite.extendedSupportedFeatures[conformanceProfileName] = FeaturesSet{}
 				}
 				suite.extendedSupportedFeatures[conformanceProfileName].Insert(f)
 			} else {
 				if suite.extendedUnsupportedFeatures[conformanceProfileName] == nil {
-					suite.extendedUnsupportedFeatures[conformanceProfileName] = sets.New[features.FeatureName]()
+					suite.extendedUnsupportedFeatures[conformanceProfileName] = FeaturesSet{}
 				}
 				suite.extendedUnsupportedFeatures[conformanceProfileName].Insert(f)
 			}
@@ -387,6 +395,10 @@ func (suite *ConformanceTestSuite) Setup(t *testing.T, tests []ConformanceTest) 
 	}
 }
 
+func (suite *ConformanceTestSuite) IsInferredSupportedFeatures() bool {
+	return suite.isInferredSupportedFeatures
+}
+
 func (suite *ConformanceTestSuite) setClientsetForTest(test ConformanceTest) error {
 	featureNames := []string{}
 	for _, v := range test.Features {
@@ -449,7 +461,7 @@ func (suite *ConformanceTestSuite) Run(t *testing.T, tests []ConformanceTest) er
 
 		// TODO(wstcliyu): need a better long term solution for test isolation
 		// https://github.com/kubernetes-sigs/gateway-api/issues/3233
-		if res != testSkipped && res != testNotSupported && sleepForTestIsolation {
+		if res != testSkipped && res != testNotSupported && sleepForTestIsolation && suite.TimeoutConfig.TestIsolation > 0 {
 			tlog.Logf(t, "Sleeping %v for test isolation", suite.TimeoutConfig.TestIsolation)
 			time.Sleep(suite.TimeoutConfig.TestIsolation)
 		}
@@ -469,6 +481,13 @@ func (suite *ConformanceTestSuite) Run(t *testing.T, tests []ConformanceTest) er
 		}
 		if res == testSucceeded || res == testFailed {
 			sleepForTestIsolation = true
+		}
+
+		// call the hook function if it was provided,
+		// this's useful for running custom logic after each test at suite level,
+		// such as collecting current state of the cluster for debugging.
+		if suite.Hook != nil {
+			suite.Hook(t, test, suite)
 		}
 	}
 
@@ -534,19 +553,39 @@ func (suite *ConformanceTestSuite) Report() (*confv1.ConformanceReport, error) {
 		GatewayAPIChannel:         suite.apiChannel,
 		ProfileReports:            profileReports.list(),
 		SucceededProvisionalTests: succeededProvisionalTests,
+		InferredSupportedFeatures: suite.IsInferredSupportedFeatures(),
 	}, nil
 }
 
 // ParseImplementation parses implementation-specific flag arguments and
 // creates a *confv1a1.Implementation.
-func ParseImplementation(org, project, url, version, contact string) confv1.Implementation {
-	return confv1.Implementation{
+func ParseImplementation(org, project, url, version, contact string) (*confv1.Implementation, error) {
+	if org == "" {
+		return nil, errors.New("organization must be set")
+	}
+	if project == "" {
+		return nil, errors.New("project must be set")
+	}
+	if url == "" {
+		return nil, errors.New("url must be set")
+	}
+	if version == "" {
+		return nil, errors.New("version must be set")
+	}
+	if contact == "" {
+		return nil, errors.New("contact must be set")
+	}
+	if _, err := neturl.ParseRequestURI(url); err != nil {
+		return nil, errors.New("url is malformed")
+	}
+
+	return &confv1.Implementation{
 		Organization: org,
 		Project:      project,
 		URL:          url,
 		Version:      version,
 		Contact:      strings.Split(contact, ","),
-	}
+	}, nil
 }
 
 // ParseConformanceProfiles parses flag arguments and converts the string to
@@ -561,6 +600,39 @@ func ParseConformanceProfiles(p string) sets.Set[ConformanceProfileName] {
 		res.Insert(ConformanceProfileName(value))
 	}
 	return res
+}
+
+func fetchSupportedFeatures(client client.Client, gatewayClassName string) (FeaturesSet, error) {
+	if gatewayClassName == "" {
+		return nil, fmt.Errorf("GatewayClass name must be provided to fetch supported features")
+	}
+	gwc := &gatewayv1.GatewayClass{}
+	err := client.Get(context.TODO(), types.NamespacedName{Name: gatewayClassName}, gwc)
+	if err != nil {
+		return nil, fmt.Errorf("fetchSupportedFeatures(): %w", err)
+	}
+
+	fs := FeaturesSet{}
+	for _, feature := range gwc.Status.SupportedFeatures {
+		fs.Insert(features.FeatureName(feature.Name))
+	}
+	fmt.Printf("Supported features for GatewayClass %s: %v\n", gatewayClassName, fs.UnsortedList())
+	return fs, nil
+}
+
+// shouldInferSupportedFeatures checks if any flags were supplied for manually
+// picking what to test. Inferred supported features are only used when no flags
+// are set.
+func shouldInferSupportedFeatures(opts *ConformanceOptions) bool {
+	if opts == nil {
+		return false
+	}
+	return !opts.EnableAllSupportedFeatures &&
+		opts.SupportedFeatures.Len() == 0 &&
+		opts.ExemptFeatures.Len() == 0 &&
+		opts.ConformanceProfiles.Len() == 0 &&
+		len(opts.SkipTests) == 0 &&
+		opts.RunTest == ""
 }
 
 // getAPIVersionAndChannel iterates over all the crds installed in the cluster and check the version and channel annotations.

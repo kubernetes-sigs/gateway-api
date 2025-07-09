@@ -1,0 +1,7 @@
+apiVersion: internal.gateway.networking.k8s.io/v1alpha1
+kind: GEPDetails
+number: 2627
+name: DNS configuration for Gateway API
+status: Provisional
+authors:
+  - maleck13
