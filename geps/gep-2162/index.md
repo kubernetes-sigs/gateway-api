@@ -152,7 +152,7 @@ the report.
 #### Staying Compliant
 
 SupportedFeatures will become available starting 1.4 release as a standard
-feature, which means that all implementors will be expected to define and
+feature, which means that all Gateway implementations will be expected to define and
 populate SupportedFeatures in the GatewayClass' Status. Conformance test suite
 will be based on inferring supported features from GatewayClassStatus, meaning
 if you want to generate passing report, above mentioned feature should be
