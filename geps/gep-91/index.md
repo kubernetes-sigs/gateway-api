@@ -264,6 +264,119 @@ spec:
 
 ```
 
+3. Setting `frontendValidation.caCertificateRefs` at the listener level
+when connection coalescing is detected between two listeners should
+reject the overlapping listeners.
+
+```yaml
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: Gateway
+metadata:
+  name: client-validation-basic
+spec:
+  gatewayClassName: acme-lb
+  listeners:
+  - name: acme-https
+    protocol: HTTPS
+    port: 443
+    hostname: acme.com
+    tls:
+      certificateRefs:
+      - kind: Secret
+        group: ""
+        name: acme-com-cert
+  - name: foo-https
+    protocol: HTTPS
+    port: 443
+    hostname: foo.example.com
+    tls:
+      certificateRefs:
+      - kind: Secret
+        group: ""
+        name: foo-example-com-cert
+  - name: example-https
+    protocol: HTTPS
+    port: 443
+    hostname: *.example.com
+    tls:
+      certificateRefs:
+      - kind: Secret
+        group: ""
+        name: example-com-cert
+      frontendValidation:
+        caCertificateRefs:
+        - kind: ConfigMap
+          group: ""
+          name: example-com-ca-cert
+status:
+  listeners:
+  - attachedRoutes: 0
+    conditions:
+    - lastTransitionTime: null
+      message: Sending translated listener configuration to the data plane
+      reason: Programmed
+      status: "True"
+      type: Programmed
+    - lastTransitionTime: null
+      message: Listener has been successfully translated
+      reason: Accepted
+      status: "True"
+      type: Accepted
+    - lastTransitionTime: null
+      message: Listener references have been resolved
+      reason: ResolvedRefs
+      status: "True"
+      type: ResolvedRefs    
+    name: acme-https
+    supportedKinds:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+    - group: gateway.networking.k8s.io
+      kind: GRPCRoute
+  - attachedRoutes: 0
+    conditions:
+    - lastTransitionTime: null
+      message: Frontend TLS Validation has been bypassed due to the detection of connection coalescing. 
+      reason: FrontendTLSValidationBypassed
+      status: "False"
+      type: Accepted
+    - lastTransitionTime: null
+      message: Listener references have been resolved
+      reason: ResolvedRefs
+      status: "True"
+      type: ResolvedRefs
+    - lastTransitionTime: null
+      message: The certificate SAN *.example.com overlaps with the certificate SAN
+        foo.example.com in listener example-https.
+      reason: OverlappingCertificates
+      status: "True"
+      type: OverlappingTLSConfig
+    name: foo-https
+    supportedKinds:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+    - group: gateway.networking.k8s.io
+      kind: GRPCRoute
+  - attachedRoutes: 0
+    conditions:
+      message: Frontend TLS Validation has been bypassed due to the detection of connection coalescing.
+      reason: FrontendTLSValidationBypassed
+      status: "False"
+      type: Accepted
+    - lastTransitionTime: null
+      message: Listener references have been resolved
+      reason: ResolvedRefs
+      status: "True"
+      type: ResolvedRefs
+    - lastTransitionTime: null
+      message: The certificate SAN foo.example.com overlaps with the certificate
+        SAN *.example.com in listener foo-https. 
+      reason: OverlappingCertificates
+      status: "True"
+      type: OverlappingTLSConfig
+    name: example-https 
+```
+
 ## Deferred
 
 This section highlights use cases that may be covered in a future iteration of this GEP
