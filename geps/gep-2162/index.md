@@ -20,12 +20,9 @@ This GEP proposes to enhance the [GatewayClassStatus](https://github.com/kuberne
 ## Non-Goals
 
 * Validate correctness of supported features published by the implementation.
-    Meaning we don't intend to verify whether the supported features reported by
-    the implementation are indeed supported.
+    Meaning we don't intend to verify whether the supported features reported by the implementation are indeed supported.
 
-    However, the supported features in the status of the `GatewayClass should
-    make it easy for any individual to run conformance tests against the
-    GatewayClass using our conformance tooling.
+    However, the supported features in the status of the GatewayClass should make it easy for any individual to run conformance tests against the GatewayClass using our conformance tooling.
 
 ## Introduction
 
@@ -107,8 +104,7 @@ status:
 
 ### SupportedFeatures Guidance in GatewayClass
 
-Only Gateway related features should be published on GatewayClass. The rest,
-i.e Mesh features should not be published on Gateway Class, and will likely to be published on a Mesh resource if an when it is introduced (xRef: https://github.com/kubernetes-sigs/gateway-api/pull/3887).
+Only Gateway related features should be published on GatewayClass. The rest, i.e Mesh features should not be published on Gateway Class, and will likely to be published on a Mesh resource if an when it is [introduced](https://github.com/kubernetes-sigs/gateway-api/pull/3887).
 
 ## Standardize features and conformance tests names
 
@@ -120,7 +116,7 @@ Before we add the supported features into our API, it is necessary to establish 
 
 Every feature should:
 
-1. Start with the resource name. i.e HTTPRouteXXX
+1. Start with the resource name. i.e HTTPRouteXXX.
 2. Follow the PascalCase convention. Note that the resource name in the string should come as is and not be converted to PascalCase, i.e HTTPRoutePortRedirect and not HttpRoutePortRedirect.
 3. Not exceed 128 characters.
 4. Contain only letters and numbers
@@ -136,39 +132,25 @@ In any case, the conformance tests file names should be meaningful and easy to u
 
 #### Conformance report
 
-In order for to verify that the list of features reported are indeed supported
-by GatewayClass tests will be run based on the features from the
-GatewayClassStatus. If the source of features are not inferred (manually
-provided) the conformance suite will block the report from being submitted.
+In order for to verify that the list of features reported are indeed supported by GatewayClass tests will be run based on the features from the GatewayClassStatus.
+If the source of features are not inferred (manually provided) the conformance suite will block the report from being submitted.
 
 #### Reporting Mesh features
 
-As Mesh doesn't have a good place (yet) to populate SupportedFeatures, its features can be tested for compliance by using Conformance Profiles,
-or manually, providing features for test using `--supported-features` flag.
-Conformance suite will determine if the implementation doesn't support
-GatewayClass and validate that report is run for the Mesh features and NOT block
-the report.
+As Mesh doesn't have a good place (yet) to populate SupportedFeatures, its features can be tested for compliance by using Conformance Profiles, or manually, providing features for test using `--supported-features` flag.
+Conformance suite will determine if the implementation doesn't support GatewayClass and validate that report is run for the Mesh features and NOT block the report.
 
 #### Staying Compliant
 
-SupportedFeatures will become available starting 1.4 release as a standard
-feature, which means that all Gateway implementations will be expected to define and
-populate SupportedFeatures in the GatewayClass' Status. Conformance test suite
-will be based on inferring supported features from GatewayClassStatus, meaning
-if you want to generate passing report, above mentioned feature should be
-implemented. There will be a grace period until the 1.5 release, after which all Gateway Conformance Reports 
-will need to be generated based on the SupportedFeatures field in GatewayClass status.
+SupportedFeatures will become available starting 1.4 release as a standard feature, which means that all Gateway implementations will be expected to define and populate SupportedFeatures in the GatewayClass' Status.
+Conformance test suite will be based on inferring supported features from GatewayClassStatus,
+meaning if you want to generate passing report, above mentioned feature should be implemented.
+There will be a grace period until the 1.5 release, after which all Gateway Conformance Reports will need to be generated based on the SupportedFeatures field in GatewayClass status.
 
-The core purpose of conformance tests for GatewayClass is to verify that
-reported features are truly supported. While the community currently operates on
-a trust-based system for conformance reports, programmatically inferring
-features from the GatewayClass status field creates a strong, verifiable link
-between an implementation's claims and the test results. This not only provides
-crucial context in conformance reports but also encourages accurate reporting
-and helps differentiate between trustworthy and less reliable feature sources,
-making it easier to identify discrepancies. Although implementations can still
-manually create reports, the reputational cost of faking results acts as a
-significant deterrent.
+The core purpose of conformance tests for GatewayClass is to verify that reported features are truly supported.
+While the community currently operates on a trust-based system for conformance reports, programmatically inferring features from the GatewayClass status field creates a strong, verifiable link between an implementation's claims and the test results.
+This not only provides crucial context in conformance reports but also encourages accurate reporting and helps differentiate between trustworthy and less reliable feature sources, making it easier to identify discrepancies.
+Although implementations can still manually create reports, the reputational cost of faking results acts as a significant deterrent.
 
 ## Followups
 
