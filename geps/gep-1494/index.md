@@ -1,7 +1,7 @@
 # GEP-1494: HTTP Auth in Gateway API
 
 * Issue: [#1494](https://github.com/kubernetes-sigs/gateway-api/issues/1494)
-* Status: Provisional
+* Status: Implementable
 
 (See [status definitions](../overview.md#gep-states).)
 
@@ -115,7 +115,7 @@ This section lays out some examples (updates with extra examples we've missed ar
 |[traefik](https://doc.traefik.io/traefik/middlewares/http/forwardauth/)|[Custom(ForwardAuth middleware)](https://doc.traefik.io/traefik/middlewares/http/forwardauth/)|[Basic](https://doc.traefik.io/traefik/middlewares/http/basicauth/), [Digest Auth](https://doc.traefik.io/traefik/middlewares/http/digestauth/)|
 |[Ambassador](https://www.getambassador.io/docs/edge-stack/latest/howtos/ext-filters)|[Envoy](https://github.com/emissary-ingress/emissary) ([Basic](https://www.getambassador.io/docs/edge-stack/latest/howtos/ext-filters#2-configure-aesambassador-edge-stack-authentication))|[SSO(OAuth, OIDC)](https://www.getambassador.io/docs/edge-stack/latest/howtos/oauth-oidc-auth) |
 |[ingress-nginx](https://kubernetes.github.io/ingress-nginx/examples/customization/external-auth-headers/)|[httpbin](https://httpbin.org) ([Basic](https://kubernetes.github.io/ingress-nginx/examples/auth/external-auth/), [OAuth](https://kubernetes.github.io/ingress-nginx/examples/auth/oauth-external-auth/))|[Basic](https://kubernetes.github.io/ingress-nginx/examples/auth/basic/), [Client Certificate](https://kubernetes.github.io/ingress-nginx/examples/auth/client-certs/)|
-|[Envoy](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/http/ext_authz/v3/ext_authz.proto)|[External Authorization server (ext_authz filter)](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/http/ext_authz/v3/ext_authz.proto) |[JWT](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/http/jwt_authn/v3/config.proto)|
+|[Envoy](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/http/ext_authzz/v3/ext_authzz.proto)|[External Authorization server (ext_authzz filter)](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/http/ext_authzz/v3/ext_authzz.proto) |[JWT](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/http/jwt_authn/v3/config.proto)|
 |[Contour](https://projectcontour.io/docs/1.24/config/client-authorization/)|[Envoy](https://projectcontour.io/docs/1.24/config/client-authorization/)|[Envoy(JWT)](https://projectcontour.io/docs/1.24/config/jwt-verification/)|
 |[Istio](https://istio.io/latest/docs/tasks/security/authorization/)|[mutual TLS ingress gateway](https://istio.io/latest/docs/tasks/traffic-management/ingress/secure-ingress/#configure-a-mutual-tls-ingress-gateway), [External Authorization](https://istio.io/latest/docs/tasks/security/authorization/authz-custom/)|[JWT (RequestAuthentication)](https://istio.io/latest/docs/reference/config/security/request_authentication/)|
 |[Envoy Gateway](https://gateway.envoyproxy.io/docs/tasks/security/ext-auth/)| [Envoy](https://gateway.envoyproxy.io/docs/tasks/security/ext-auth/#http-external-authorization-service) | [Envoy(JWT)](https://gateway.envoyproxy.io/docs/tasks/security/jwt-authentication/), [Basic](https://gateway.envoyproxy.io/docs/tasks/security/basic-auth/) |
@@ -130,7 +130,363 @@ From @ongy, some additional goals to keep in mind:
 
 ## API
 
-(... details, can point to PR with changes)
+This GEP proposes a two-part solution to this problem:
+
+* We introduce a new HTTPRoute Filter, `ExternalAuth`, that allows the
+  specification of an external source to connect to using Envoy's `ext_authz` protocol.
+* We introduce a new Policy object that can be targeted at either the
+  Gateway or HTTPRoute levels. In either of these cases, it _defaults_ the settings
+  for the HTTPRoute Filter across all HTTPRoute matches that roll up to the object.
+
+These two parts will be done in two separate changes - Filter first, then
+Policy after.
+
+Both of these additions use the same underlying struct for the config, so that
+changes or additions in one place add them in the other as well.
+
+This plan has some big things that need explaining before we get to the API details:
+
+* Why a Filter plus Policy approach?
+* Why two changes?
+* Why Envoy's `ext_authz`?
+
+### Why a Filter plus Policy approach?
+
+We have two main requirements: Ana needs to be able to configure auth at least at
+the smallest possible scope, and Ana, Ian and Chihiro need to be able to configure
+defaults at larger scopes.
+
+The smallest possible scope for this config is the HTTPRoute Rule level, where
+you can match a single set of matchers - like a path, or a path and header
+combination.
+
+At this level, the inline tool we have available to perform changes is the HTTPRoute
+Filter, which also has the property that it's designed to _filter_ requests. This
+matches the overall pattern here, which is to _filter_ some requests, allowing
+or denying them based on the presence of Authentication and the passing of
+Authorization checks.
+
+A Policy _can_ be targeted at this level, using the Route rule as a `sectionName`,
+but that leaves aside that Filters are exactly designed to handle this use case.
+
+Policy attachment includes defaulting fields like Filters in its scope already,
+so we are allowed to use a combination in this way. 
+
+Using a Filter also has the advantage that, at the tightest possible scope (the
+object being defaulted) you can _explicitly_ override any configured defaults.
+
+Using a Filter also includes ordering (because Filters are an ordered list),
+although this exact behavior is currently underspecified. This change will also
+need to clarify. Ordering is particularly important for Auth use cases, because
+sometimes Auth will expect certain properties that may need to be introduced
+by things like header modification.
+
+Lastly, using a Filter means that, for the simplest possible case, where Ana
+wants to enable Auth* for a single path, then there is only a single object to
+edit, and a single place to configure.
+
+Using a Policy for the simplest case immediately brings in all the discovery
+problems that Policy entails.
+
+There are two important caveats here that must be addressed, however:
+* Firstly, whatever is in the filter either must be accepted, or the rule
+  is not accepted. Overrides from anywhere else, including if we add an Override
+  Policy later, must not override explicit config - that would
+  violate one of the key declarative principles, that what is requested in the
+  spec is either what ends up in the state, or that config is rejected.
+* Secondly, filter ordering is particularly important for Auth use cases, so we
+  must ensure that when we add Policy defaulting we have a way to indicate at
+  what position in a filter list the Auth policy should fit.
+
+### Why two phases?
+
+In short: In the interest of getting something, even if incomplete, into our
+user's hands as quickly as possible.
+
+Policy design is complex, and needs to be done carefully. Doing a first
+pass using only a Filter to get the basic config correct while we discuss
+how to make the Policy handling work means that we can get some work out to the
+community without needing to complete the whole design.
+
+In particular, the design for the Filter plus Policy will need to answer at
+least the following questions:
+
+* How to set where in a list of Filters a defaulted Auth filter sits;
+  and what happens if no Filters are specified in a HTTPRoute? Does it go first,
+  last, or should there be a way to specify the order?
+* What Policy types are possible? Defaults? (Definitely useful for setting a
+  baseline expectation for a cluster, which is desirable for security constructs
+  like Auth) Overrides? (Also very useful for ensuring that exceptions meet
+  certain requirements - like only allowing the disabling of Auth on `/healthz`
+  endpoints or similar use cases.)
+* Should Policy have a way to describe rules around when it should take effect?
+  That's in addition to the usual hierarchical rules, should the Policy have ways
+  to include or exclude specific matches? This would require agreement in the
+  Policy Attachment spec as well.
+
+All of these changes have costs in complexity and troubleshooting difficulty, so
+it's important to ensure that the design consciously makes these tradeoffs.
+
+In particular, the last two items in the above list seem likely to require a fair
+amount of discussion, and including a Policy in the initial release of this
+seems likely to make this change miss its current release window.
+
+
+### Why Envoy's ext_authz?
+
+#### What is ext_authz?
+
+Envoy's External Authorization filter is a filter that calls out to an authorization
+service to check if the incoming request is authorized or not. Note that, in
+order to check _authorization_, it must also be able to determine _authentication_ - 
+this is one of the reasons why we've chosen this approach.
+
+Envoy's implementation of this filter allows both a
+[gRPC, protobuf API](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/http/ext_authzz/v3/ext_authzz.proto)
+and configuration of a HTTP based API (which, as it's not defined using a
+specification like protobuf, requires more configuration).
+
+The important thing to remember here is that the actual authorization process
+is delegated to the authorization service, and the authentication process _may
+optionally_ also be delegated there - which is why the ext_authz approach allows
+handling many Auth methods - most of the work is performed by external services
+which implement various methods (like Basic Auth, OAuth, JWT validation, etc).
+
+#### Why use it over other options?
+
+The community discussed Auth extensively in-person at Kubecon London in early 2025,
+and got broad agreement from multiple dataplanes that:
+
+* something like ext_authz was a good idea, because it's flexible and allows the
+  implementation of many types of Auth without specific protocol implementation
+  in upstream
+* Envoy's ext_authz protocol has no major problems that would stop us using it
+* Envoy-based implementations mostly already have support for it
+
+At that meeting, those present agreed that ext_authz was a good place to start.
+
+Most non-Envoy dataplanes also already have similar methods, so the maintainers
+of projects using other dataplanes were okay with this idea.
+
+The alternative here would be to add a Filter type _per auth method_, which, given
+the large number of options, could quickly become very complex.
+
+This GEP is, however, explicitly _not_ ruling out the possibility of adding
+specific Filters for specific Auth methods in the future, if users of this API
+find the overhead of running a compatible implementation to be too much.
+
+### API Design
+
+#### Phase 1: Adding a Filter
+
+This config mainly takes inspiration from Envoy's ext_authz filter config, while
+also trying to maintain compatibility with other HTTP methods.
+
+This design is also trying to start with a minimum feature set, and add things
+as required, rather than adding everything configurable in all implementations
+immediately.
+
+There is some difference between data planes, based on the links above, but
+these fields should be broadly supportable across all the listed implementations.
+
+Some design comments are included inline.
+
+The intent for Phase 2 is that this struct will be included in an eventual Policy
+so that additions only need to be made in one place.
+
+Additionally, as per other added Filters, the config is included in HTTPRoute,
+and is not an additional CRD.
+
+##### Go Structs
+
+```go
+
+// HTTPRouteExtAuthProtcol specifies what protocol should be used
+// for communicating with an external authorization server.
+//
+// Valid values are supplied as constants below.
+type HTTPRouteExtAuthProtocol string
+
+const (
+	HTTPRouteExtAuthGRPCProtocol HTTPRouteExtAuthProtocol = "GRPC"
+	HTTPRouteExtAuthHTTPProtocol HTTPRouteExtAuthProtocol = "HTTP"
+)
+// HTTPExtAuthFilter defines a filter that modifies requests by sending
+// request details to an external authorization server.
+//
+// Support: Extended
+// Feature Name: HTTPRouteExtAuth
+type HTTPExtAuthFilter struct {
+
+	// ExtAuthProtocol describes which protocol to use when communicating with an
+	// ext_authz authorization server.
+	//
+	// When this is set to GRPC, each backend must use the Envoy ext_authz protocol
+	// on the port specified in `backendRefs`. Requests and responses are defined
+	// in the protobufs explained at:
+	// https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/external_auth.proto
+	//
+	// When this is set to HTTP, each backend must respond with a `200` status
+    // code in on a successful authorization. Any other code is considered
+	// an authorization failure.
+	//
+	// Feature Names:
+	// GRPC Support - HTTPRouteExtAuthGRPC
+	// HTTP Support - HTTPRouteExtAuthHTTP
+	//
+	// +unionDiscriminator
+	// +kubebuilder:validation:Enum=HTTP;GRPC
+	ExtAuthProtocol HTTPRouteExtAuthProtocol `json:"protocol"`
+
+	// BackendRefs is a reference to a backend to send authorization
+	// requests to.
+	//
+	// The backend must speak the selected protocol (GRPC or HTTP) on the
+	// referenced port.
+	//
+	// If the backend service requires TLS, use BackendTLSPolicy to tell the
+	// implementation to supply the TLS details to be used to connect to that
+	// backend.
+	//
+	BackendRef BackendObjectReference `json:"backendRef"`
+
+	// GRPCAuthConfig contains configuration for communication with ext_authz
+	// protocol-speaking backends.
+	//
+	// If unset, implementations must assume the default behavior for each
+	// included field is intended.
+	//
+	// +optional
+	GRPCAuthConfig *GRPCAuthConfig `json:"grpc,omitempty"`
+
+	// HTTPAuthConfig contains configuration for communication with HTTP-speaking
+	// backends.
+	//
+	// If unset, implementations must assume the default behavior for each
+	// included field is intended.
+	//
+	// +optional
+	HTTPAuthConfig *HTTPAuthConfig `json:"http,omitempty"`
+
+	// ForwardBody controls if requests to the authorization server should include
+	// the body of the client request; and if so, how big that body is allowed
+	// to be.
+	//
+	// It is expected that implementations will buffer the request body up to
+	// `forwardBody.maxSize` bytes. Bodies over that size must be rejected with a
+	// 4xx series error (413 or 403 are common examples), and fail processing
+	// of the filter.
+	//
+	// If unset, or `forwardBody.maxSize` is set to `0`, then the body will not
+	// be forwarded.
+	//
+	// Feature Name: HTTPRouteExtAuthForwardBody
+	//
+	// GEP Review Notes:
+	// Both Envoy and Traefik show support for this feature, but HAProxy and
+	// ingress-nginx do not. So this has a separate feature flag for it.
+	//
+	// +optional
+	ForwardBody *ForwardBodyConfig `json:"forwardBody,omitempty"`
+}
+
+// GRPCAuthConfig contains configuration for communication with ext_authz
+// protocol-speaking backends.
+type GRPCAuthConfig struct {
+
+	// AllowedRequestHeaders specifies what headers from the client request
+	// will be sent to the authorization server.
+	//
+	// If this list is empty, then the following headers must be sent:
+	//
+	// - `Authorization`
+	// - `Location`
+	// - `Proxy-Authenticate`
+	// - `Set-Cookie`
+	// - `WWW-Authenticate`
+	//
+	// If the list has entries, only those entries must be sent.
+	//
+	// +optional
+	// +kubebuilder:validation:MaxLength=64
+	AllowedRequestHeaders []string `json:"allowedHeaders,omitempty"`
+}
+
+// HTTPAuthConfig contains configuration for communication with HTTP-speaking
+// backends.
+type HTTPAuthConfig struct {
+	// Path sets the prefix that paths from the client request will have added
+	// when forwarded to the authorization server.
+	//
+	// When empty or unspecified, no prefix is added.
+	// +optional
+	Path string `json:"path,omitempty"`
+
+	// AllowedRequestHeaders specifies what additional headers from the client request
+	// will be sent to the authorization server.
+	//
+	// The following headers must always be sent to the authorization server,
+	// regardless of this setting:
+	// 
+	// * `Host`
+	// * `Method`
+	// * `Path`
+	// * `Content-Length`
+	// * `Authorization`
+	//
+	// If this list is empty, then only those headers must be sent.
+    // 
+    // Note that `Content-Length` has a special behavior, in that the length
+    // sent must be correct for the actual request to the external authorization
+    // server - that is, it must reflect the actual number of bytes sent in the
+    // body of the request to the authorization server.
+    //
+    // So if the `forwardBody` stanza is unset, or `forwardBody.maxSize` is set
+    // to `0`, then `Content-Length` must be `0`. If `forwardBody.maxSize` is set
+    // to anything other than `0`, then the `Content-Length` of the authorization
+    // request must be set to the actual number of bytes forwarded.
+	//
+	// +optional
+	// +kubebuilder:validation:MaxLength=64
+	AllowedRequestHeaders []string `json:"allowedHeaders,omitempty"`
+
+	// AllowedResponseHeaders specifies what headers from the authorization response
+	// will be copied into the request to the backend.
+	//
+	// If this list is empty, then all headers from the authorization server
+	// except Authority or Host must be copied.
+	//
+	// +optional
+	// +kubebuilder:validation:MaxLength=64
+	AllowedResponseHeaders []string `json:"allowedResponseHeaders,omitempty"`
+
+}
+
+// ForwardBody configures if requests to the authorization server should include
+// the body of the client request; and if so, how big that body is allowed
+// to be.
+//
+// If empty or unset, do not forward the body.
+type ForwardBodyConfig struct {
+
+	// MaxSize specifies how large in bytes the largest body that will be buffered
+    // and sent to the authorization server. If the body size is larger than
+    // `maxSize`, then the body sent to the authorization server must be
+    // truncated to `maxSize` bytes.
+	//
+	// If 0, the body will not be sent to the authorization server.
+	MaxSize uint16 `json:"maxSize,omitempty"`
+}
+
+```
+#### YAML Examples
+
+Coming soon.
+
+#### Phase 2: Adding more complex configuration with Policy
+
+This phase is currently undefined until we reach agreement on the Filter + Policy
+approach.
 
 ## Conformance Details
 
@@ -138,12 +494,22 @@ From @ongy, some additional goals to keep in mind:
 
 #### Feature Names
 
-Every feature should:
+For this feature as a base:
 
-1. Start with the resource name. i.e HTTPRouteXXX
-2. Follow the PascalCase convention. Note that the resource name in the string should come as is and not be converted to PascalCase, i.e HTTPRoutePortRedirect and not HttpRoutePortRedirect.
-3. Not exceed 128 characters.
-4. Contain only letters and numbers
+`HTTPRouteExtAuth`
+
+For supporting talking to ext_authz servers using the gRPC ext_authz protocol:
+
+`HTTPRouteExtAuthGRPC`
+
+For supporting talking to ext_authz servers using HTTP:
+
+`HTTPRouteExtAuthHTTP`
+
+For forwarding the body of the client request to the authorization server
+
+`HTTPRouteExtAuthForwardBody`
+
 
 ### Conformance tests 
 
