@@ -3,7 +3,7 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     api-approved.kubernetes.io: https://github.com/kubernetes-sigs/gateway-api/pull/3328
-    gateway.networking.k8s.io/bundle-version: v1.3.0-rc.1
+    gateway.networking.k8s.io/bundle-version: v1.3.0
     gateway.networking.k8s.io/channel: experimental
   creationTimestamp: null
   labels:
@@ -94,21 +94,21 @@ spec:
                       interval:
                         default: 10s
                         description: |-
-                          BudgetInterval defines the duration in which requests will be considered
+                          Interval defines the duration in which requests will be considered
                           for calculating the budget for retries.
 
                           Support: Extended
                         pattern: ^([0-9]{1,5}(h|m|s|ms)){1,4}$
                         type: string
                         x-kubernetes-validations:
-                        - message: budgetInterval can not be greater than one hour
-                            or less than one second
+                        - message: interval can not be greater than one hour or less
+                            than one second
                           rule: '!(duration(self) < duration(''1s'') || duration(self)
                             > duration(''1h''))'
                       percent:
                         default: 20
                         description: |-
-                          BudgetPercent defines the maximum percentage of active requests that may
+                          Percent defines the maximum percentage of active requests that may
                           be made up of retries.
 
                           Support: Extended

@@ -33,7 +33,7 @@ explores one possible approach implementations could use to accomplish this.
 ## Upgrading to a new version
 
 Gateway API releases CRDs in two [release
-channels](../concepts/versioning.md#release-channels-eg-experimental-standard).
+channels](../concepts/versioning.md#release-channels).
 Sticking with standard channel CRDs will ensure CRD upgrades are both simpler
 and safer.
 

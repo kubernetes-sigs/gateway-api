@@ -79,6 +79,21 @@ candidates. These release candidates will enable implementations to test against
 our release, work out any bugs, and gather early feedback on the viability of
 the release.
 
+## What happens when GEPs are unable to meet a timeline?
+
+There will be situations where the above phases and timelines can't be met by
+a GEP for one reason or another. In special circumstances (particularly, when it
+is is anticipated that only a little bit more time is needed to meet the goal) a
+time extension _might_ be granted if requested by the GEP authors, at the
+discretion of the maintainers.
+
+In the normal case however, when a GEP misses the timeline for a phase it will
+be pulled out of the release to maximize bandwidth and reduce disruptions to the
+overall release timeline. In such a case the Gateway API maintainers will stop
+progression and set the status of the GEP to a halted status (such as `Deferred`
+or `Declined`) with a note on the GEP explaining why it reached this status and
+what it would take to get it re-approved for work in a later iteration.
+
 ## Contributions Welcome in Each Phase
 
 The following table illustrates when different kinds of contributions will be

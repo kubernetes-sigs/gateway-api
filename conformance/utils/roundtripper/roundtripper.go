@@ -29,6 +29,7 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"regexp"
+	"strings"
 	"testing"
 
 	"golang.org/x/net/http2"
@@ -59,6 +60,7 @@ type Request struct {
 	CertPem          []byte
 	KeyPem           []byte
 	Server           string
+	Body             string
 }
 
 // String returns a printable version of Request for logging. Note that the
@@ -194,7 +196,12 @@ func (d *DefaultRoundTripper) defaultRoundTrip(request Request, transport http.R
 	ctx, cancel := context.WithTimeout(context.Background(), d.TimeoutConfig.RequestTimeout)
 	defer cancel()
 	ctx = withT(ctx, request.T)
-	req, err := http.NewRequestWithContext(ctx, method, request.URL.String(), nil)
+
+	var reqBody io.Reader
+	if request.Body != "" {
+		reqBody = strings.NewReader(request.Body)
+	}
+	req, err := http.NewRequestWithContext(ctx, method, request.URL.String(), reqBody)
 	if err != nil {
 		return nil, nil, err
 	}

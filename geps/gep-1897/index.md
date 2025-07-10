@@ -22,18 +22,15 @@ the service or backend owner wants to validate the clients connecting to it, two
 1. The solution must satisfy the following use case: the backend pod has its own
 certificate and the gateway implementation client needs to know how to connect to the
 backend pod. (Use case #4 in [Gateway API TLS Use Cases](#references))
-2. In terms of the Gateway API personas, only the application developer persona applies in this
-solution. The application developer should control the gateway to backend TLS settings,
-not the cluster operator, as requiring a cluster operator to manage certificate renewals
-and revocations would be extremely cumbersome.
-3. The solution should consider client certificate settings used in the TLS handshake **from
-Gateway to backend**, such as server name indication, trusted certificates,
-and CA certificates.
+2. In this GEP, only the application developer persona will have control over TLS settings. This does not preclude adding other personas in future GEPs.
+3. The solution should consider client TLS settings used in the TLS handshake **from
+Gateway to backend**, such as server name indication and trusted CA certificates.
+4. Both Gateway and Mesh use cases may be supported, depending on the implementation, and will be covered by features in each case.
 
 ## Longer Term Goals
 
 These are worthy goals, but deserve a different GEP for proper attention.  This GEP is concerned entirely with the
-controlplane, i.e. the hop between gateway and backend.
+the hop between gateway client and backend.
 
 1. [TCPRoute](../../reference/spec.md#gateway.networking.k8s.io/v1alpha2.TCPRoute) and
 [GRPCRoute](../../reference/spec.md#gateway.networking.k8s.io/v1alpha2.GRPCRoute) use cases
@@ -59,7 +56,16 @@ These are worthy goals, but will not be covered by this GEP.
 6. Controlling certificates used by more than one workload (#6 in [Gateway API TLS Use Cases](#references))
 7. Client certificate settings used in TLS **from external clients to the
 Listener** (#7 in [Gateway API TLS Use Cases](#references))
-8. Providing a mechanism for the cluster operator to override gateway to backend TLS settings.
+8. Service Mesh "mesh transport security".
+9. Providing a mechanism for the cluster operator to override gateway to backend TLS settings.
+
+> It is very common for service mesh implementations to implement some form of transparent transport security, whether that is WireGuard, mTLS, or others.
+> This is completely orthogonal to the use cases being tackled by this GEP.
+> * The "mesh transport security" is something invisible to the user's application, and is simply used to secure communication between components in the mesh.
+> * This proposal, instead, explicitly calls for sending TLS **to the user's application**.
+> However, this does not mean service meshes are outside of scope for this proposal, merely that only the application-level TLS configuration is in scope.
+
+![](images/mesh.png "Mesh transport")
 
 ## Already Solved TLS Use Cases
 
@@ -83,16 +89,16 @@ Gateway API is missing a mechanism for separately providing the details for the 
 including (but not limited to):
 
 * intent to use TLS on the backend hop
-* client certificate of the gateway
-* system certificates to use in the absence of client certificates
+* CA certificates to trust
+* other properties of the TLS handshake, such as SNI and SAN validation
+* client certificate of the gateway (outside of scope for this GEP)
 
 ## Purpose - why do we want to do this?
 
 This proposal is _very_ tightly scoped because we have tried and failed to address this well-known
 gap in the API specification. The lack of support for this fundamental concept is holding back
-Gateway API adoption by users that require a solution to the use case. One of the recurring themes
-that has held up the prior art has been interest related to service mesh, and as such this proposal
-focuses explicitly on the ingress use case in the initial round.  Another reason for the tight scope
+Gateway API adoption by users that require a solution to the use case. 
+Another reason for the tight scope
 is that we have been too focused on a generic representation of everything that TLS can do, which
 covers too much ground to address in a single GEP.
 
@@ -150,10 +156,10 @@ Because naming is hard, a new name may be
 substituted without blocking acceptance of the content of the API change.
 
 The selection of the applicable Gateway API persona is important in the design of BackendTLSPolicy, because it provides
-a way to explicitly describe the _expectations_ of the connection to the application.  BackendTLSPolicy is configured
-by the application developer Gateway API persona to signal what the application developer _expects_ in connections to
-the application, from a TLS perspective.  Only the application developer can know what the application expects, so it is
-important that this configuration be managed by that persona.
+a way to explicitly describe the _expectations_ of the connection to the application.
+In this GEP, BackendTLSPolicy will be configured only by the application developer Gateway API persona to tell gateway clients how to connect to
+the application, from a TLS perspective.
+Future iterations *may* expand this to additionally allow consumer overrides; see [Future plans](#future-plans).
 
 During the course of discussion of this proposal, we did consider allowing the cluster operator persona to have some access
 to Gateway cert validation, but as mentioned, BackendTLSPolicy is used primarily to signal what the application
@@ -170,18 +176,14 @@ as a TLS Client:
 
 - An explicit signal that TLS should be used by this connection.
 - A hostname the Gateway should use to connect to the backend.
-- A reference to one or more certificates to use in the TLS handshake, signed by a CA or self-signed.
-- An indication that system certificates may be used.
+- A reference to one or more CA certificates (which could include "system certificates") to validate the server's TLS certificates.
 
 BackendTLSPolicy is defined as a Direct Policy Attachment without defaults or overrides, applied to a Service that
 accesses the backend in question, where the BackendTLSPolicy resides in the same namespace as the Service it is
-applied to.  The BackendTLSPolicy and the Service must reside in the same namespace in order to prevent the
-complications involved with sharing trust across namespace boundaries.  We chose the Service resource as a target,
+applied to.  For now, the BackendTLSPolicy and the Service must reside in the same namespace in order to prevent the
+complications involved with sharing trust across namespace boundaries (see [Future plans](#future-plans)).  We chose the Service resource as a target,
 rather than the Route resource, so that we can reuse the same BackendTLSPolicy for all the different Routes that
 might point to this Service.
-For the use case where certificates are stored in their own namespace, users may create Secrets and use ReferenceGrants
-for a BackendTLSPolicy-to-Secret binding.  Implementations must respect a ReferenceGrant for cross-namespace Secret
-sharing to BackendTLSPolicy, even if they don't for other cross-namespace sharing.
 
 One of the areas of concern for this API is that we need to indicate how and when the API implementations should use the
 backend destination certificate authority.  This solution proposes, as introduced in
@@ -193,6 +195,8 @@ that there was a failure in the certificate validation, this is left up to the i
 that is appropriate, such as one of the HTTP error codes: 400 (Bad Request), 401 (Unauthorized), 403 (Forbidden), or
 other signal that makes the failure sufficiently clear to the requester without revealing too much about the transaction,
 based on established security requirements.
+
+BackendTLSPolicy applies only to TCP traffic. If a policy explicitly attaches to a UDP port of a Service (that is, the `targetRef` has a `sectionName` specifying a single port or the service has only 1 port), the `Accepted: False` Condition with `Reason: Invalid` MUST be set. If the policy attaches to a mix of TCP and UDP ports, implementations SHOULD include a warning in the `Accepted` condition message (`ancestors.conditions`); the policy will only be effective for the TCP ports.
 
 All policy resources must include `TargetRefs` with the fields specified
 in [PolicyTargetReference](https://github.com/kubernetes-sigs/gateway-api/blob/a33a934af9ec6997b34fd9b00d2ecd13d143e48b/apis/v1alpha2/policy_types.go#L24-L41).
@@ -238,35 +242,22 @@ Thus, the following additions would be made to the Gateway API:
 
 ## How a client behaves
 
-This table describes the effect that a BackendTLSPolicy has on a Route.  There are only two cases where the
-BackendTLSPolicy will signal a Route to connect to a backend using TLS, an HTTPRoute with a backend that is targeted
-by a BackendTLSPolicy, either with or without listener TLS configured.  (There are a few other cases where it may be
-possible, but is implementation dependent.)
+The `BackendTLSPolicy` tells a client "Connect to this service using TLS".
+This is unconditional to the type of traffic the gateway client is forwarding.
 
-Every implementation that claims supports for BackendTLSPolicy should document for which Routes it is being implemented.
+For instance, the following will all have the gateway client add TLS if the backend is targeted by a BackendTLSPolicy:
 
-| Route Type | Gateway Config             | Backend is targeted by a BackendTLSPolicy? | Connect to backend  with TLS? |
-|------------|----------------------------|-----------------------------------------------|-------------------------------|
-| HTTPRoute  | Listener tls               | Yes                                           | **Yes**                       |
-| HTTPRoute  | No listener tls            | Yes                                           | **Yes**                       |
-| HTTPRoute  | Listener tls               | No                                            | No                            |
-| HTTPRoute  | No listener tls            | No                                            | No                            |
-| TLSRoute   | Listener Mode: Passthrough | Yes                                           | No                            |
-| TLSRoute   | Listener Mode: Terminate   | Yes                                           | Implementation-dependent      |
-| TLSRoute   | Listener Mode: Passthrough | No                                            | No                            |
-| TLSRoute   | Listener Mode: Terminate   | No                                            | No                            |
-| TCPRoute   | Listener TLS               | Yes                                           | Implementation-dependent      |
-| TCPRoute   | No listener TLS            | Yes                                           | Implementation-dependent      |
-| TCPRoute   | Listener TLS               | No                                            | No                            |
-| TCPRoute   | No listener TLS            | No                                            | No                            |
-| UDPRoute   | Listener TLS               | Yes                                           | No                            |
-| UDPRoute   | No listener TLS            | Yes                                           | No                            |
-| UDPRoute   | Listener TLS               | No                                            | No                            |
-| UDPRoute   | No listener TLS            | No                                            | No                            |
-| GRPCRoute  | Listener TLS               | Yes                                           | Implementation-dependent      |
-| GRPCRoute  | No Listener TLS            | Yes                                           | Implementation-dependent      |
-| GRPCRoute  | Listener TLS               | No                                            | No                            |
-| GRPCRoute  | No Listener TLS            | No                                            | No                            |
+* A Gateway accepts traffic on an HTTP listener
+* A Gateway accepts and terminates TLS on an HTTPS listener
+* A Gateway accepts traffic on a TCP listener
+
+There is no need for a Gateway that accepts traffic with `Mode: Passthrough` to do anything differently here, but implementations MAY choose to treat TLS passthrough as a special case. Implementations that do this SHOULD clearly document their approach if BackendTLSPolicy is treated differently for TLS passthrough.
+
+Note that there are cases where these patterns may result in multiple layers of TLS on a single connection.
+There may be even cases where the gateway implementation is unaware of this; for example, processing TCPRoute traffic -- the traffic may or may not be TLS, and the gateway would be unaware.
+This is intentional to allow full fidelity of the API, as this is commonly desired for tunneling scenarios.
+When users do not want this, they should ensure that the BackendTLSPolicy is not incorrectly applied to traffic that is already TLS.
+The [Future Plans](#future-plans) include more controls over the API to make this easier to manage.
 
 ## Request Flow
 
@@ -280,6 +271,23 @@ reverse proxy. This is shown as **bolded** additions in step 6 below.
 5. Optionally, the reverse proxy can modify the request, i.e. add/remove headers, based on filter rules of the HTTPRoute.
 6. Lastly, the reverse proxy **optionally performs a TLS handshake** and forwards the request to one or more objects,
 i.e. Service, in the cluster based on backendRefs rules of the HTTPRoute **and the TargetRefs of the BackendTLSPolicy**.
+
+## Future plans
+
+In order to scope this GEP, some some changes are deferred to a near-future GEP.
+This GEP intends to add the ability for additional control by gateway clients to override TLS settings, following previously established patterns of [consumer and producer policies]([glossary](https://gateway-api.sigs.k8s.io/concepts/glossary/?h=gloss#producer-route)).
+Additionally, more contextual control over when to apply the policies will be explored, to enable use cases like "apply TLS only from this route" ([issue](https://github.com/kubernetes-sigs/gateway-api/issues/3856)).
+
+While the details of these plans are out of scope for this GEP it is important to be aware of the future plans for the API to ensure the immediate-term plans are future-proofed against the proposed plans.
+
+Implementations should plan for the existence of future fields that may be added that will control where the TLS policy applies.
+These may include, but are not limited to:
+
+* `spec.targetRefs.namespace`
+* `spec.targetRefs.from`
+* `spec.mode`
+
+While in some cases adding new fields may be seen as a backwards compatibility risk, due to older implementations not knowing to respect the fields, these fields (or similar, should future GEPs decide on new names) are pre-approved to be added in a future release, should the GEPs to add them are approved in the first place.
 
 ## Alternatives
 Most alternatives are enumerated in the section "The history of backend TLS".  A couple of additional
@@ -404,8 +412,6 @@ the implementation would be required to fully implement the policy or mark the b
 [Gateway API TLS Use Cases](https://docs.google.com/document/d/17sctu2uMJtHmJTGtBi_awGB0YzoCLodtR6rUNmKMCs8/edit#heading=h.cxuq8vo8pcxm)
 
 [GEP-713: Metaresources and PolicyAttachment](../gep-713/index.md)
-
-[Policy Attachment](../../reference/policy-attachment.md#direct-policy-attachment)
 
 [Gateway API TLS](../../guides/tls.md)
 

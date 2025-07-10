@@ -146,4 +146,4 @@ We still have lots more to work on. Some of our next items to discuss include:
 * L4 Route matching
 
 If these kinds of topics interest you, we'd love to have your input. Refer to
-our [community page](/contributing/community) to see how you can get involved.
+our [community page](../../contributing/index.md) to see how you can get involved.

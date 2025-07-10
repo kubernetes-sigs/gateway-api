@@ -387,7 +387,7 @@ distribution mechanisms will be provided:
   for visualizing data and presenting information in a visually appealing
   manner.
 * Evaluate how gwctl can be extended to support [Mesh use
-  cases](/concepts/gamma/#how-the-gateway-api-works-for-service-mesh)
+  cases](../../mesh/index.md)
 
 ## References
 

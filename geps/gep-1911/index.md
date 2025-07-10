@@ -85,7 +85,6 @@ Implementations MAY support the following combinations below:
 
 ServicePort Protocol | ServicePort AppProtocol | Route Type | Supported
 -|-|-|-
-ServicePort Protocol | ServicePort AppProtocol | Route Type | Supported
 `TCP`  | `kubernetes.io/wss` | `HTTPRoute` | Conditional [1]
 
 1. Only if there is a corresponding `BackendTLSPolicy` - see [GEP-1897](../gep-1897/index.md)

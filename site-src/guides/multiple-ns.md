@@ -158,7 +158,7 @@ After these three Routes are deployed, they will all be attached to the
 list of routing rules. [Routing precedence](../reference/spec.md#gateway.networking.k8s.io/v1.HTTPRouteRule)
 between these routing rules is determined by most specific match and
 conflicts are handled according to [conflict
-resolution](/concepts/guidelines#conflicts). This provides predictable and
+resolution](api-design.md#conflicts). This provides predictable and
 deterministic merging of routing rules between independent users.
 
 Thanks to cross-Namespace routing, the Foobar Corporation can distribute

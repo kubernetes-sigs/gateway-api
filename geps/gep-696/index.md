@@ -1,7 +1,7 @@
 # GEP-696: GEP template
 
 * Issue: [#696](https://github.com/kubernetes-sigs/gateway-api/issues/696)
-* Status: Provisional|Implementable|Experimental|Standard|Deferred|Rejected|Withdrawn|Replaced
+* Status: Provisional|Prototyping|Implementable|Experimental|Standard|Completed|Memorandum|Deferred|Declined|Withdrawn
 
 (See [status definitions](../overview.md#gep-states).)
 
@@ -46,6 +46,8 @@ Every feature should:
 2. Follow the PascalCase convention. Note that the resource name in the string should come as is and not be converted to PascalCase, i.e HTTPRoutePortRedirect and not HttpRoutePortRedirect.
 3. Not exceed 128 characters.
 4. Contain only letters and numbers
+
+GEPs cannot move to Experimental without a Feature Name.
 
 ### Conformance tests 
 

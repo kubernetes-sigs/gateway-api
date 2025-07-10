@@ -14,9 +14,9 @@ organizations, they all have distinct concerns that we need to consider
 separately.)
 
 [roles and personas]:roles-and-personas.md
-[Ana]:roles-and-personas.md#ana
-[Chihiro]:roles-and-personas.md#chihiro
-[Ian]:roles-and-personas.md#ian
+[Ana]:roles-and-personas.md#key-roles-and-personas
+[Chihiro]:roles-and-personas.md#key-roles-and-personas
+[Ian]:roles-and-personas.md#key-roles-and-personas
 
 ## The Use Cases
 
@@ -148,7 +148,7 @@ advantage of the service mesh, with custom routing logic, without any
 bottlenecks in requests to Chihiro or Ian.
 
 [east/west]:glossary.md#eastwest-traffic
-[GAMMA]:/concepts/gamma/
+[GAMMA]:../mesh/index.md
 [service mesh]:glossary.md#service-mesh
 
 ## Gateway and mesh use case

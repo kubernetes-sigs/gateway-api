@@ -30,17 +30,6 @@ updates:
       - ok-to-test
       - release-note-none
 
-  # Dependencies listed in .github/workflows/*.yml
-  - package-ecosystem: "github-actions"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-    labels:
-      - github_actions
-      - dependencies
-      - ok-to-test
-      - release-note-none
-
   # Dependencies listed in Dockerfile
   - package-ecosystem: "docker"
     directory: "/"

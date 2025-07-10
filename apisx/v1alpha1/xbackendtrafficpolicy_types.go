@@ -147,7 +147,7 @@ type RetryConstraint struct {
 // the percentage of requests in the budget, and the interval between
 // checks.
 type BudgetDetails struct {
-	// BudgetPercent defines the maximum percentage of active requests that may
+	// Percent defines the maximum percentage of active requests that may
 	// be made up of retries.
 	//
 	// Support: Extended
@@ -158,13 +158,13 @@ type BudgetDetails struct {
 	// +kubebuilder:validation:Maximum=100
 	Percent *int `json:"percent,omitempty"`
 
-	// BudgetInterval defines the duration in which requests will be considered
+	// Interval defines the duration in which requests will be considered
 	// for calculating the budget for retries.
 	//
 	// Support: Extended
 	//
 	// +optional
 	// +kubebuilder:default="10s"
-	// +kubebuilder:validation:XValidation:message="budgetInterval can not be greater than one hour or less than one second",rule="!(duration(self) < duration('1s') || duration(self) > duration('1h'))"
+	// +kubebuilder:validation:XValidation:message="interval can not be greater than one hour or less than one second",rule="!(duration(self) < duration('1s') || duration(self) > duration('1h'))"
 	Interval *Duration `json:"interval,omitempty"`
 }

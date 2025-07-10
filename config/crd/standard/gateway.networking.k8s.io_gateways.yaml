@@ -3,7 +3,7 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     api-approved.kubernetes.io: https://github.com/kubernetes-sigs/gateway-api/pull/3328
-    gateway.networking.k8s.io/bundle-version: v1.3.0-rc.1
+    gateway.networking.k8s.io/bundle-version: v1.3.0
     gateway.networking.k8s.io/channel: standard
   creationTimestamp: null
   name: gateways.gateway.networking.k8s.io
@@ -513,7 +513,6 @@ spec:
                               - All
                               - Selector
                               - Same
-                              - None
                               type: string
                             selector:
                               description: |-
@@ -1620,7 +1619,6 @@ spec:
                               - All
                               - Selector
                               - Same
-                              - None
                               type: string
                             selector:
                               description: |-

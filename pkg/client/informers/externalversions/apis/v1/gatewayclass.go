@@ -61,13 +61,25 @@ func NewFilteredGatewayClassInformer(client versioned.Interface, resyncPeriod ti
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.GatewayV1().GatewayClasses().List(context.TODO(), options)
+				return client.GatewayV1().GatewayClasses().List(context.Background(), options)
 			},
 			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.GatewayV1().GatewayClasses().Watch(context.TODO(), options)
+				return client.GatewayV1().GatewayClasses().Watch(context.Background(), options)
+			},
+			ListWithContextFunc: func(ctx context.Context, options metav1.ListOptions) (runtime.Object, error) {
+				if tweakListOptions != nil {
+					tweakListOptions(&options)
+				}
+				return client.GatewayV1().GatewayClasses().List(ctx, options)
+			},
+			WatchFuncWithContext: func(ctx context.Context, options metav1.ListOptions) (watch.Interface, error) {
+				if tweakListOptions != nil {
+					tweakListOptions(&options)
+				}
+				return client.GatewayV1().GatewayClasses().Watch(ctx, options)
 			},
 		},
 		&gatewayapiapisv1.GatewayClass{},
