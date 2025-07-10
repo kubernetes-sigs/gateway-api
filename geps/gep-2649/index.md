@@ -1,23 +1,21 @@
 # GEP-2649: Inherited Policy Attachment
 
 * Issue: [#2649](https://github.com/kubernetes-sigs/gateway-api/issues/2649)
-* Status: Experimental
+* Status: Declined
 
 (See [status definitions](../overview.md#gep-states).)
 
 ## TLDR
 
+!!! warning
+    This GEP has been merged back into [GEP-713](https://gateway-api.sigs.k8s.io/geps/gep-713/)
+    and now it's now obsolete. Please refer the original specification of Metaresources
+    and Policy Attachment for the current state of the pattern.
+
 Describe and specify a design pattern for a class of metaresource that can
 affect specific settings across a multiple target objects.
 
 This is a design for a _pattern_, not an API field or new object.
-
-!!! danger
-    This GEP is in the process of being updated.
-    Please see the discussion at https://github.com/kubernetes-sigs/gateway-api/discussions/2927
-    and expect further changes.
-    Some options under discussion there may make the distinction between Direct
-    and Inherited Policies moot, which would require a rework.
 
 ## Goals
 
@@ -224,7 +222,7 @@ proposal](https://github.com/kubernetes-sigs/gateway-api/issues/611).
 
 ### Policy Attachment for Ingress
 When talking about Direct Attached Policy attaching to Gateway resources for
-ingress use cases (as discussed in GEP-2648), the flow is relatively 
+ingress use cases (as discussed in GEP-2648), the flow is relatively
 straightforward. A policy can reference the resource it wants to apply to, and
 only affects that resource.
 
@@ -245,7 +243,7 @@ namespaces.
 ![Complex Ingress Example](images/2649-ingress-complex.png)
 
 In this example, the Gateway has a TimeoutPolicy attached, which affects the
-HTTPRoute in the App namespace. That HTTPRoute also has the Direct Attached 
+HTTPRoute in the App namespace. That HTTPRoute also has the Direct Attached
 RetryPolicy attached, which affects the HTTPRoute itself, and one of the backends
 has a HealthCheckPolicy attached to the Service, which is also a Direct Attached
 Policy.

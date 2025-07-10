@@ -129,7 +129,6 @@ nav:
     - Provisional:
       - geps/gep-1494/index.md
       - geps/gep-1651/index.md
-      - geps/gep-2648/index.md
       - geps/gep-3779/index.md
       - geps/gep-3792/index.md
       - geps/gep-3793/index.md
@@ -181,6 +180,8 @@ nav:
     - Declined:
       - geps/gep-735/index.md
       - geps/gep-1282/index.md
+      - geps/gep-2648/index.md
+      - geps/gep-2649/index.md
   - Contributing:
     - How to Get Involved: contributing/index.md
     - Developer Guide: contributing/devguide.md
