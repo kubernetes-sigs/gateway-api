@@ -332,43 +332,72 @@ func CompareRoundTrip(t *testing.T, req *roundtripper.Request, cReq *roundtrippe
 			expected.ExpectedRequest = &ExpectedRequest{Request: expected.Request}
 		}
 
-		if expected.ExpectedRequest.Method == "" {
-			expected.ExpectedRequest.Method = "GET"
-		}
-
-		if expected.ExpectedRequest.Host != "" && expected.ExpectedRequest.Host != cReq.Host {
-			return fmt.Errorf("expected host to be %s, got %s", expected.ExpectedRequest.Host, cReq.Host)
-		}
-
-		if expected.ExpectedRequest.Path != cReq.Path {
-			return fmt.Errorf("expected path to be %s, got %s", expected.ExpectedRequest.Path, cReq.Path)
-		}
-		if expected.ExpectedRequest.Method != cReq.Method {
-			return fmt.Errorf("expected method to be %s, got %s", expected.ExpectedRequest.Method, cReq.Method)
-		}
-		if expected.Namespace != cReq.Namespace {
-			return fmt.Errorf("expected namespace to be %s, got %s", expected.Namespace, cReq.Namespace)
-		}
-		if expected.ExpectedRequest.Headers != nil {
-			if cReq.Headers == nil {
-				return fmt.Errorf("no headers captured, expected %v", len(expected.ExpectedRequest.Headers))
+	if cRes.StatusCode == 200 || cRes.StatusCode == 204 {
+		if cRes.StatusCode == 200 {
+			// The request expected to arrive at the backend is
+			// the same as the request made, unless otherwise
+			// specified.
+			if expected.ExpectedRequest == nil {
+				expected.ExpectedRequest = &ExpectedRequest{Request: expected.Request}
 			}
-			for name, val := range cReq.Headers {
-				cReq.Headers[strings.ToLower(name)] = val
+
+			if expected.ExpectedRequest.Method == "" {
+				expected.ExpectedRequest.Method = "GET"
 			}
-			for name, expectedVal := range expected.ExpectedRequest.Headers {
-				actualVal, ok := cReq.Headers[strings.ToLower(name)]
-				if !ok {
-					return fmt.Errorf("expected %s header to be set, actual headers: %v", name, cReq.Headers)
-				} else if strings.Join(actualVal, ",") != expectedVal {
-					return fmt.Errorf("expected %s header to be set to %s, got %s", name, expectedVal, strings.Join(actualVal, ","))
+
+			if expected.ExpectedRequest.Host != "" && expected.ExpectedRequest.Host != cReq.Host {
+				return fmt.Errorf("expected host to be %s, got %s", expected.ExpectedRequest.Host, cReq.Host)
+			}
+
+			if expected.ExpectedRequest.Path != cReq.Path {
+				return fmt.Errorf("expected path to be %s, got %s", expected.ExpectedRequest.Path, cReq.Path)
+			}
+			if expected.ExpectedRequest.Method != cReq.Method {
+				return fmt.Errorf("expected method to be %s, got %s", expected.ExpectedRequest.Method, cReq.Method)
+			}
+			if expected.Namespace != cReq.Namespace {
+				return fmt.Errorf("expected namespace to be %s, got %s", expected.Namespace, cReq.Namespace)
+			}
+			if expected.ExpectedRequest.Headers != nil {
+				if cReq.Headers == nil {
+					return fmt.Errorf("no headers captured, expected %v", len(expected.ExpectedRequest.Headers))
 				}
+				for name, val := range cReq.Headers {
+					cReq.Headers[strings.ToLower(name)] = val
+				}
+				for name, expectedVal := range expected.ExpectedRequest.Headers {
+					actualVal, ok := cReq.Headers[strings.ToLower(name)]
+					if !ok {
+						return fmt.Errorf("expected %s header to be set, actual headers: %v", name, cReq.Headers)
+					} else if strings.Join(actualVal, ",") != expectedVal {
+						return fmt.Errorf("expected %s header to be set to %s, got %s", name, expectedVal, strings.Join(actualVal, ","))
+					}
+				}
+			}
+
+			// Verify that headers expected *not* to be present on the
+			// request are actually not present.
+			if len(expected.ExpectedRequest.AbsentHeaders) > 0 {
+				for name, val := range cReq.Headers {
+					cReq.Headers[strings.ToLower(name)] = val
+				}
+
+				for _, name := range expected.ExpectedRequest.AbsentHeaders {
+					val, ok := cReq.Headers[strings.ToLower(name)]
+					if ok {
+						return fmt.Errorf("expected %s header to not be set, got %s", name, val)
+					}
+				}
+			}
+
+			if !strings.HasPrefix(cReq.Pod, expected.Backend) {
+				return fmt.Errorf("expected pod name to start with %s, got %s", expected.Backend, cReq.Pod)
 			}
 		}
 
 		if expected.Response.Headers != nil {
 			if cRes.Headers == nil {
-				return fmt.Errorf("no headers captured, expected %v", len(expected.ExpectedRequest.Headers))
+				return fmt.Errorf("no headers captured, expected %v", len(expected.Response.Headers))
 			}
 			for name, val := range cRes.Headers {
 				cRes.Headers[strings.ToLower(name)] = val
