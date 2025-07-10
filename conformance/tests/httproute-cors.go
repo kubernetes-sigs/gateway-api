@@ -76,13 +76,22 @@ var HTTPRouteCORS = suite.ConformanceTest{
 				Namespace: "",
 				Response: http.Response{
 					StatusCodes: []int{200, 204},
-					Headers: map[string]string{
-						"access-control-allow-origin":      "https://www.foo.com",
-						"access-control-allow-methods":     "GET, OPTIONS",
-						"access-control-allow-headers":     "x-header-1, x-header-2",
-						"access-control-expose-headers":    "x-header-3, x-header-4",
-						"access-control-max-age":           "3600",
-						"access-control-allow-credentials": "true",
+					HeadersWithMultipleValues: map[string][]string{
+						"access-control-allow-origin": {"https://www.foo.com"},
+						"access-control-allow-methods": {
+							"GET, OPTIONS",
+							"OPTIONS, GET",
+						},
+						"access-control-allow-headers": {
+							"x-header-1, x-header-2",
+							"x-header-2, x-header-1",
+						},
+						"access-control-expose-headers": {
+							"x-header-3, x-header-4",
+							"x-header-4, x-header-3",
+						},
+						"access-control-max-age":           {"3600"},
+						"access-control-allow-credentials": {"true"},
 					},
 					// Ignore whitespace when comparing the response headers. This is because some
 					// implementations add a space after each comma, and some don't. Both are valid.
@@ -114,14 +123,22 @@ var HTTPRouteCORS = suite.ConformanceTest{
 				},
 				Namespace: "",
 				Response: http.Response{
-					StatusCodes: []int{200, 204},
-					Headers: map[string]string{
-						"access-control-allow-origin":      "https://www.bar.com",
-						"access-control-allow-methods":     "GET, OPTIONS",
-						"access-control-allow-headers":     "x-header-1, x-header-2",
-						"access-control-expose-headers":    "x-header-3, x-header-4",
-						"access-control-max-age":           "3600",
-						"access-control-allow-credentials": "true",
+					StatusCode: 200,
+					HeadersWithMultipleValues: map[string][]string{
+						"access-control-allow-origin": {"https://www.bar.com"},
+						"access-control-allow-methods": {
+							"GET, OPTIONS",
+							"OPTIONS, GET"},
+						"access-control-allow-headers": {
+							"x-header-1, x-header-2",
+							"x-header-2, x-header-1",
+						},
+						"access-control-expose-headers": {
+							"x-header-3, x-header-4",
+							"x-header-4, x-header-3",
+						},
+						"access-control-max-age":           {"3600"},
+						"access-control-allow-credentials": {"true"},
 					},
 					// Ignore whitespace when comparing the response headers. This is because some
 					// implementations add a space after each comma, and some don't. Both are valid.

@@ -84,10 +84,11 @@ type ExpectedRequest struct {
 
 // Response defines expected properties of a response from a backend.
 type Response struct {
-	StatusCode    int
-	StatusCodes   []int // alternative to StatusCode, allows multiple acceptable codes
-	Headers       map[string]string
-	AbsentHeaders []string
+	StatusCode                int
+	StatusCodes               []int // alternative to StatusCode, allows multiple acceptable codes
+	Headers                   map[string]string
+	HeadersWithMultipleValues map[string][]string // allows multiple values for a header
+	AbsentHeaders             []string
 
 	// IgnoreWhitespace will cause whitespace to be ignored when comparing the respond
 	// header values.
@@ -343,7 +344,7 @@ func CompareRequest(t *testing.T, req *roundtripper.Request, cReq *roundtripper.
 			}
 		}
 
-		if expected.Response.Headers != nil {
+		if expected.Response.Headers != nil || expected.Response.HeadersWithMultipleValues != nil {
 			if cRes.Headers == nil {
 				return fmt.Errorf("no headers captured, expected %v", len(expected.Response.Headers))
 			}
@@ -351,18 +352,44 @@ func CompareRequest(t *testing.T, req *roundtripper.Request, cReq *roundtripper.
 				cRes.Headers[strings.ToLower(name)] = val
 			}
 
-			for name, expectedVal := range expected.Response.Headers {
-				actualVal, ok := cRes.Headers[strings.ToLower(name)]
-				if !ok {
-					return fmt.Errorf("expected %s header to be set, actual headers: %v", name, cRes.Headers)
+			if expected.Response.HeadersWithMultipleValues != nil {
+				for name, expectedVals := range expected.Response.HeadersWithMultipleValues {
+					actualVal, ok := cRes.Headers[strings.ToLower(name)]
+					if !ok {
+						return fmt.Errorf("expected %s header to be set, actual headers: %v", name, cRes.Headers)
+					}
+					actualValStr := strings.Join(actualVal, ",")
+					if expected.Response.IgnoreWhitespace {
+						actualValStr = strings.ReplaceAll(actualValStr, " ", "")
+						for i := range expectedVals {
+							expectedVals[i] = strings.ReplaceAll(expectedVals[i], " ", "")
+						}
+					}
+					matched := false
+					for _, expectedVal := range expectedVals {
+						if actualValStr == expectedVal {
+							matched = true
+							break
+						}
+					}
+					if !matched {
+						return fmt.Errorf("expected %s header to be set to one of %v, got %s", name, expectedVals, actualValStr)
+					}
 				}
-				actualValStr := strings.Join(actualVal, ",")
-				if expected.Response.IgnoreWhitespace {
-					actualValStr = strings.ReplaceAll(actualValStr, " ", "")
-					expectedVal = strings.ReplaceAll(expectedVal, " ", "")
-				}
-				if actualValStr != expectedVal {
-					return fmt.Errorf("expected %s header to be set to %s, got %s", name, expectedVal, actualValStr)
+			} else {
+				for name, expectedVal := range expected.Response.Headers {
+					actualVal, ok := cRes.Headers[strings.ToLower(name)]
+					if !ok {
+						return fmt.Errorf("expected %s header to be set, actual headers: %v", name, cRes.Headers)
+					}
+					actualValStr := strings.Join(actualVal, ",")
+					if expected.Response.IgnoreWhitespace {
+						actualValStr = strings.ReplaceAll(actualValStr, " ", "")
+						expectedVal = strings.ReplaceAll(expectedVal, " ", "")
+					}
+					if actualValStr != expectedVal {
+						return fmt.Errorf("expected %s header to be set to %s, got %s", name, expectedVal, actualValStr)
+					}
 				}
 			}
 		}
