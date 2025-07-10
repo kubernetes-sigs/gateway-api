@@ -75,7 +75,7 @@ var HTTPRouteCORS = suite.ConformanceTest{
 				},
 				Namespace: "",
 				Response: http.Response{
-					StatusCode: 200,
+					StatusCodes: []int{200, 204},
 					Headers: map[string]string{
 						"access-control-allow-origin":      "https://www.foo.com",
 						"access-control-allow-methods":     "GET, OPTIONS",
@@ -114,7 +114,7 @@ var HTTPRouteCORS = suite.ConformanceTest{
 				},
 				Namespace: "",
 				Response: http.Response{
-					StatusCode: 200,
+					StatusCodes: []int{200, 204},
 					Headers: map[string]string{
 						"access-control-allow-origin":      "https://www.bar.com",
 						"access-control-allow-methods":     "GET, OPTIONS",
@@ -170,7 +170,7 @@ var HTTPRouteCORS = suite.ConformanceTest{
 					},
 				},
 				Response: http.Response{
-					StatusCode: 200,
+					StatusCodes: []int{200, 204},
 					Headers: map[string]string{
 						"access-control-allow-origin": "https://www.foo.com",
 					},
@@ -189,7 +189,7 @@ var HTTPRouteCORS = suite.ConformanceTest{
 					},
 				},
 				Response: http.Response{
-					StatusCode: 200,
+					StatusCodes: []int{200, 204},
 					Headers: map[string]string{
 						"access-control-allow-origin": "https://www.bar.com",
 					},
@@ -236,7 +236,7 @@ var HTTPRouteCORS = suite.ConformanceTest{
 				},
 				Namespace: "",
 				Response: http.Response{
-					StatusCode: 200,
+					StatusCodes: []int{200, 204},
 					Headers: map[string]string{
 						"access-control-allow-origin":  "https://www.foo.com",
 						"access-control-allow-methods": "POST",
