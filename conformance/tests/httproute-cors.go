@@ -169,6 +169,7 @@ var HTTPRouteCORS = suite.ConformanceTest{
 				},
 				Namespace: "",
 				Response: http.Response{
+					StatusCodes: []int{200, 204, 403},
 					AbsentHeaders: []string{
 						"access-control-allow-origin",
 					},
