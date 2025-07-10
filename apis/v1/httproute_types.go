@@ -1371,7 +1371,7 @@ type HTTPCORSFilter struct {
 	// Support: Extended
 	//
 	// +optional
-	AllowCredentials TrueField `json:"allowCredentials,omitempty"`
+	AllowCredentials *bool `json:"allowCredentials,omitempty"`
 
 	// AllowMethods indicates which HTTP methods are supported for accessing the
 	// requested resource.
