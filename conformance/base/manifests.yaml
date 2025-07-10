@@ -705,6 +705,7 @@ spec:
         - -conf
         - /root/Corefile
         image: coredns/coredns
+        imagePullPolicy: IfNotPresent
         name: coredns
         securityContext:
           allowPrivilegeEscalation: false
