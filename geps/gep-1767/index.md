@@ -129,16 +129,6 @@ If `HTTPCORSFilter` is set, then the gateway will generate the response of the "
 For the actual cross-origin request, the gateway will add CORS headers to the response before it is sent to the client.
 
 ```golang
-// AllowCredentialsType describes valid value of config `AllowCredentials`.
-//
-// +kubebuilder:validation:Enum=true
-type AllowCredentialsType string
-
-const (
-    // The actual cross-origin request allows to include credentials.
-    AllowCredentials AllowCredentialsType = "true"
-)
-
 const (
     // HTTPRouteFilterCORS can be used to add CORS headers to an 
     // HTTP response before it is sent to the client.
@@ -222,7 +212,7 @@ type HTTPCORSFilter struct {
     // Output:
     //
     // The `Access-Control-Allow-Origin` response header can only use `*` 
-    // wildcard as value when the `AllowCredentials` field is unspecified.
+    // wildcard as value when the `AllowCredentials` field is false.
     //
     // Input:
     //   Origin: https://foo.example
@@ -233,7 +223,7 @@ type HTTPCORSFilter struct {
     // Output:
     //   Access-Control-Allow-Origin: *
     //
-    // When the `AllowCredentials` field is specified and `AllowOrigins` 
+    // When the `AllowCredentials` field is true and `AllowOrigins`
     // field specified with the `*` wildcard, the gateway must return a 
     // single origin in the value of the `Access-Control-Allow-Origin` 
     // response header, instead of specifying the `*` wildcard. The value 
@@ -259,8 +249,8 @@ type HTTPCORSFilter struct {
     // AllowCredentials indicates whether the actual cross-origin request 
     // allows to include credentials.
     //
-    // The only valid value for the `Access-Control-Allow-Credentials` 
-    // response header is true (case-sensitive).
+    // When set to true, the gateway will include the `Access-Control-Allow-Credentials`
+    // response header with value true (case-sensitive).
     //
     // Input:
     //   Origin: https://foo.example
@@ -272,14 +262,12 @@ type HTTPCORSFilter struct {
     //   Access-Control-Allow-Origin: https://foo.example
     //   Access-Control-Allow-Credentials: true
     //
-    // If the credentials are not allowed in cross-origin requests, 
-    // the gateway will omit the header `Access-Control-Allow-Credentials` 
-    // entirely rather than setting its value to false.
+    // When set to false, the gateway will omit the header
+    // `Access-Control-Allow-Credentials` entirely (this is the standard CORS
+    // behavior).
     //
     // Support: Extended
-    //
-    // +optional
-    AllowCredentials AllowCredentialsType `json:"allowCredentials,omitempty"`
+    AllowCredentials *bool `json:"allowCredentials,omitempty"`
 
     // AllowMethods indicates which HTTP methods are supported 
     // for accessing the requested resource.
@@ -317,7 +305,7 @@ type HTTPCORSFilter struct {
     //   Access-Control-Allow-Methods: GET, POST, DELETE, PATCH, OPTIONS
     //
     // The `Access-Control-Allow-Methods` response header can only use `*` 
-    // wildcard as value when the `AllowCredentials` field is unspecified.
+    // wildcard as value when the `AllowCredentials` field is false.
     //
     // Input:
     //   Access-Control-Request-Method: PUT
@@ -328,7 +316,7 @@ type HTTPCORSFilter struct {
     // Output:
     //   Access-Control-Allow-Methods: *
     //
-    // When the `AllowCredentials` field is specified and `AllowMethods` 
+    // When the `AllowCredentials` field is true and the `AllowMethods`
     // field specified with the `*` wildcard, the gateway must specify one 
     // HTTP method in the value of the Access-Control-Allow-Methods response 
     // header. The value of the header `Access-Control-Allow-Methods` is same 
@@ -386,7 +374,7 @@ type HTTPCORSFilter struct {
     //
     // A wildcard indicates that the requests with all HTTP headers are allowed.
     // The `Access-Control-Allow-Headers` response header can only use `*` wildcard 
-    // as value when the `AllowCredentials` field is unspecified.
+    // as value when the `AllowCredentials` field is false.
     //
     // Input:
     //   Access-Control-Request-Headers: Content-Type, Cache-Control
@@ -397,8 +385,8 @@ type HTTPCORSFilter struct {
     // Output:
     //   Access-Control-Allow-Headers: *
     //
-    // When the `AllowCredentials` field is specified and `AllowHeaders` field 
-    // specified with the `*` wildcard, the gateway must specify one or more 
+    // When the `AllowCredentials` field is true and the `AllowHeaders` field
+    // is specified with the `*` wildcard, the gateway must specify one or more
     // HTTP headers in the value of the `Access-Control-Allow-Headers` response 
     // header. The value of the header `Access-Control-Allow-Headers` is same as 
     // the `Access-Control-Request-Headers` header provided by the client. If 
@@ -456,7 +444,7 @@ type HTTPCORSFilter struct {
     //
     // A wildcard indicates that the responses with all HTTP headers are exposed 
     // to clients. The `Access-Control-Expose-Headers` response header can only use 
-    // `*` wildcard as value when the `AllowCredentials` field is unspecified.
+    // `*` wildcard as value when the `AllowCredentials` field is false.
     //
     // Config:
     //   exposeHeaders: ["*"]
@@ -590,7 +578,7 @@ spec:
       - allowOrigins:
         - https://foo.example
         - http://foo.example
-        allowCredentials: "true"
+        allowCredentials: true
         allowMethods: 
         - GET
         - PUT
@@ -655,6 +643,48 @@ Access-Control-Allow-Methods: GET, PUT, POST, DELETE, PATCH, OPTIONS
 Access-Control-Allow-Headers: DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization
 Access-Control-Expose-Headers: Content-Security-Policy
 ```
+
+###  Disabling credentials
+
+To disable credentials for cross-origin requests, simply don't set the
+`allowCredentials` field at all. If you prefer to be explicit, you can
+set it to `false`, although this will generally not be necessary:
+
+```yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: http-route-cors-no-credentials
+spec:
+  hostnames:
+  - http.route.cors.com
+  parentRefs:
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: http-gateway
+  rules:
+  - backendRefs:
+    - kind: Service
+      name: http-route-cors
+      port: 80
+    matches:
+    - path:
+        type: PathPrefix
+        value: /resource/bar
+    filters:
+    - cors:
+        allowOrigins:
+        - https://foo.example
+        allowCredentials: false
+        allowMethods: 
+        - GET
+        - POST
+      type: CORS
+```
+
+Omitting the field, and setting it to `false` both mean `false`. In this
+configuration the gateway will _not_ include the
+`Access-Control-Allow-Credentials` header in responses.
 
 ## Prior Art
 Some implementations already support CORS.
