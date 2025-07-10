@@ -128,7 +128,8 @@ var HTTPRouteCORS = suite.ConformanceTest{
 						"access-control-allow-origin": {"https://www.bar.com"},
 						"access-control-allow-methods": {
 							"GET, OPTIONS",
-							"OPTIONS, GET"},
+							"OPTIONS, GET",
+						},
 						"access-control-allow-headers": {
 							"x-header-1, x-header-2",
 							"x-header-2, x-header-1",
