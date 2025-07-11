@@ -1,5 +1,5 @@
 /*
-Copyright 2022 The Kubernetes Authors.
+Copyright 2025 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -29,18 +29,19 @@ import (
 )
 
 func init() {
-	ConformanceTests = append(ConformanceTests, HTTPRouteAdditionalRedirectScheme)
+	ConformanceTests = append(ConformanceTests, HTTPRoute307RedirectScheme)
 }
 
-var HTTPRouteAdditionalRedirectScheme = suite.ConformanceTest{
-	ShortName:   "HTTPRouteAdditionalRedirectScheme",
-	Description: "An HTTPRoute with a additional scheme redirect filter",
-	Manifests:   []string{"tests/httproute-additional-redirect-scheme.yaml"},
+var HTTPRoute307RedirectScheme = suite.ConformanceTest{
+	ShortName:   "HTTPRoute307RedirectScheme",
+	Description: "An HTTPRoute with a 307 scheme redirect filter",
+	Manifests:   []string{"tests/httproute-307-redirect-scheme.yaml"},
+	Provisional: true,
 	Features: []features.FeatureName{
 		features.SupportGateway,
 		features.SupportHTTPRoute,
 		features.SupportHTTPRouteSchemeRedirect,
-		features.SupportHTTPRouteAdditionalRedirectStatusCodes,
+		features.SupportHTTPRoute307RedirectStatusCode,
 	},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
@@ -57,18 +58,6 @@ var HTTPRouteAdditionalRedirectScheme = suite.ConformanceTest{
 				},
 				Response: http.Response{
 					StatusCode: 307,
-				},
-				RedirectRequest: &roundtripper.RedirectRequest{
-					Scheme: "https",
-				},
-				Namespace: ns,
-			}, {
-				Request: http.Request{
-					Path:             "/scheme-and-permanent",
-					UnfollowRedirect: true,
-				},
-				Response: http.Response{
-					StatusCode: 308,
 				},
 				RedirectRequest: &roundtripper.RedirectRequest{
 					Scheme: "https",

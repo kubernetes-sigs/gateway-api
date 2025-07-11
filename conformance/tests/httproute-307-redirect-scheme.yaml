@@ -1,7 +1,7 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-  name: additional-redirect-scheme
+  name: 307-redirect-scheme
   namespace: gateway-conformance-infra
 spec:
   parentRefs:
@@ -16,13 +16,4 @@ spec:
       requestRedirect:
         scheme: "https"
         statusCode: 307
-  - matches:
-    - path:
-        type: PathPrefix
-        value: /scheme-and-permanent
-    filters:
-    - type: RequestRedirect
-      requestRedirect:
-        scheme: "https"
-        statusCode: 308
 
