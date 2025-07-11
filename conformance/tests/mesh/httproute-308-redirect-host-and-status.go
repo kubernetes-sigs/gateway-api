@@ -27,18 +27,19 @@ import (
 )
 
 func init() {
-	MeshConformanceTests = append(MeshConformanceTests, MeshHTTPRouteAdditionalRedirectHostAndStatus)
+	MeshConformanceTests = append(MeshConformanceTests, MeshHTTPRoute308RedirectHostAndStatus)
 }
 
-var MeshHTTPRouteAdditionalRedirectHostAndStatus = suite.ConformanceTest{
-	ShortName:   "MeshHTTPRouteRedirectHostAndStatus",
-	Description: "An HTTPRoute with hostname and statusCode redirect filters",
+var MeshHTTPRoute308RedirectHostAndStatus = suite.ConformanceTest{
+	ShortName:   "MeshHTTPRoute308RedirectHostAndStatus",
+	Description: "An HTTPRoute with hostname and statusCode 308 redirect filter",
+	Provisional: true,
 	Features: []features.FeatureName{
 		features.SupportMesh,
 		features.SupportHTTPRoute,
-		features.SupportHTTPRouteAdditionalRedirectStatusCodes,
+		features.SupportHTTPRoute308RedirectStatusCode,
 	},
-	Manifests: []string{"tests/mesh/httproute-additional-redirect-host-and-status.yaml"},
+	Manifests: []string{"tests/mesh/httproute-303-redirect-host-and-status.yaml"},
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-mesh"
 		client := echo.ConnectToApp(t, s, echo.MeshAppEchoV1)
@@ -48,20 +49,6 @@ var MeshHTTPRouteAdditionalRedirectHostAndStatus = suite.ConformanceTest{
 				Request: http.Request{
 					Host:             "echo",
 					Path:             "/host-and-status-temporary",
-					UnfollowRedirect: true,
-				},
-				Response: http.Response{
-					StatusCode: 307,
-				},
-				RedirectRequest: &roundtripper.RedirectRequest{
-					Host: "example.org",
-				},
-				Namespace: ns,
-			},
-			{
-				Request: http.Request{
-					Host:             "echo",
-					Path:             "/host-and-status-permanent",
 					UnfollowRedirect: true,
 				},
 				Response: http.Response{
