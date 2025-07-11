@@ -308,7 +308,7 @@ However, targeting a `Service` introduces several challenges;
 
 ##### Loss Of Service Context
 
-I we go with option 1, apply authorization policy to all traffic addressed to a service;
+If we go with option 1, apply authorization policy to all traffic addressed to a service;
   This option is very tricky to implement for sidecar-based meshes where the destination sidecar has no knowledge of which Service the request came through.
   Here is the very high-level tarffic flow for sidecar-based meshes:
 
@@ -350,8 +350,7 @@ The UX becomes very confusing. Are we going to enforce only if the traffic arriv
 
 The UX gets weird becuase even though you target a service, you essentially get a **workload** policy, thats enforced regardless. 
 
-
-> Note: with Service as a targetRef, of course we are going to need a Service in order to enforce Authorization -- meaning pods/jobs without a serivce are completely out of scope.
+> Note: with Service as a targetRef, of course we are going to need a Service in order to enforce Authorization -- meaning pods/jobs without a Serivce are completely out of scope.
 
 #### **Option 2: Targeting xRoutes**
 
@@ -475,6 +474,79 @@ TODO: complete gwctl commands
 
 Without dedicated tooling, the `LabelSelector` approach could significantly degrade the user experience and observability.
 
+#### Recommended Option - Hybrid TargetRef and VAP
+
+Adding only the recommendation below, please see [https://docs.google.com/document/d/1CeagBnHDPbzpYAxBmtJqTshxAW8l-aRPwvwgAGbnv2I/edit?tab=t.0](https://docs.google.com/document/d/1CeagBnHDPbzpYAxBmtJqTshxAW8l-aRPwvwgAGbnv2I/edit?tab=t.0) for a comprehensive comparison for design options for TargetRef.
+
+Create one unified authorization policy API with implementation-specific validation using Validating Admission Policies (VAP). Additionally introducing a new `enforcementLevel` enum to simplify validation and enable the user to clarify intent
+
+```
+# Network-scoped policy (L4 enforcement points)
+kind: AuthorizationPolicy
+metadata:
+  name: network-authz
+spec:
+  enforcementLevel: "network"  # Enforced at L4 proxies
+  targetRef: 
+    kind: Pod
+    selector: {}
+  rules:
+    - authorizationSource:
+        serviceAccount: ["default/productpage"]
+      tcpAttributes:
+        ports: [9080]
+
+# Application-scoped policy (L7-only enforcement points and sidecars)
+kind: AuthorizationPolicy  
+metadata:
+  name: app-authz
+spec:
+  enforcementLevel: "application"  # Enforced at L7 proxies
+  targetRef: # Service for Ambient implementations, label-selector for sidecar implementations.
+  rules:
+    - authorizationSource:
+        serviceAccount: ["default/productpage"]
+      tcpAttributes:
+        ports: [9080]
+      httpAttributes: 
+        paths: ["/api/*"]
+        methods: ["GET", "POST"]
+
+
+```
+
+### Mesh Implementation Behavior
+
+Sidecar Meshes
+
+* **Network Level**: Sidecar enforces policy but only uses L4 attributes  
+* **Application Level**: Sidecar enforces policy with full L4+L7 capabilities
+
+Ambient Meshes
+
+* **Network Level**: Node-L4-proxy enforces policy using labelSelector targeting  
+* **Application Level**: Waypoint proxy enforces policy using service targetRef targeting
+
+**VAP Validation**: 
+
+* **Sidecar mesh**: Ensures application-level policies don't use targetRef: Service (since sidecars use labelSelector)  
+  * **Ambient**: Ensures application-level policies don't use label-selectors.  
+  * **Both sidecar and ambient:** ensures network level policies **do** use label selectors
+
+Advantages
+
+* **Clear Intent**: Users explicitly state where they want enforcement  
+* **Flexible Targeting**: Different targetRef types for different enforcement points  
+* **Migration Path**: Users can start with network-level and upgrade to application-level easily  
+* **Implementation Alignment**: supporting different meshes architectures  
+* **Single API**: No duplication of schemas or concepts  
+* **Validation Clarity**: Clear rules about what's allowed at each level
+
+Disadvantages
+
+* **Complexity**: Users must understand enforcement levels  
+* **VAP Dependency**: Requires validation rules
+
 ### API Design
 
 ```go
@@ -511,33 +583,55 @@ type AuthorizationPolicySpec struct {
     // +kubebuilder:validation:Required
     Action AuthorizationPolicyAction `json:"action"`
 
-    // TCPRules defines the list of matching criteria. A request is considered to
-    // match the policy if it matches any of the rules.
+    // Rules defines the list of authorization rules.
+    // A request matches the policy if it matches any of these rules.
     // +optional
-    TCPRules []AuthorizationTCPRule `json:"tcpRules,omitempty"`
+    Rules []AuthorizationRule `json:"rules,omitempty"`
 }
 
-// AuthorizationTCPRule defines a set of criteria for matching a TCP request.
-// A request must match all specified criteria.
-type AuthorizationTCPRule struct {
-    // Sources specifies a list of identities that are matched by this rule.
-    // If this field is empty, this rule matches all sources.
-    // A request matches if its identity is present in this list.
+// AuthorizationRule defines a single authorization rule.
+// A request matches the rule if it matches ALL fields specified.
+type AuthorizationRule struct {
+    // AuthorizationSource specifies who is making the request.
+    // If omitted, matches any source.
     // +optional
-    Sources []AuthorizationSource `json:"sources,omitempty"`
+    AuthorizationSource *AuthorizationSource `json:"authorizationSource,omitempty"`
 
-    // Attributes specifies a list of properties that are matched by this rule.
-    // If this field is empty, this rule matches all attributes.
-    // A request matches if its attributes are present in this list.
-    //
+    // TCPAttributes specifies TCP-level matching criteria.
+    // If omitted, matches any TCP traffic.
     // +optional
-    Attributes []AuthorizationTCPAttributes `json:"attributes,omitempty"`
+    TCPAttributes *AuthorizationTCPAttributes `json:"tcpAttributes,omitempty"`
+
+    
+    // FOR FUTURE ENHANCEMENT!
+
+    // HTTPAttributes specifies HTTP-level matching criteria.
+    // If omitted, matches any HTTP traffic.
+    // +optional
+    HTTPAttributes *AuthorizationHTTPAttributes `json:"httpAttributes,omitempty"`
 }
+
 
 
 // AuthorizationSource specifies the source of a request.
-// Only one of its fields may be set.
-// +kubebuilder:validation:XValidation:rule="(size(self.identities) > 0 ? 1 : 0) + (size(self.serviceAccounts) > 0 ? 1 : 0) + (size(self.namespaces) > 0 ? 1 : 0) == 1",message="Exactly one of identities, serviceAccounts, or namespaces must be specified."
+//
+// At least one field may be set. If multiple fields are set,
+// a request matches this AuthorizationSource if it matches
+// **any** of the specified criteria (logical OR across fields).
+//
+// For example, if both `Identities` and `Namespaces` are provided,
+// the rule matches a request if either:
+// - the request's identity is in `Identities`
+// - OR the request originates from one of the `Namespaces`.
+//
+// Each list within the fields (e.g. `Identities`) is itself an OR list.
+//
+// If this struct is omitted in a rule, it matches any source.
+//
+// NOTE: In the future, if there’s a need to express more complex
+// logical conditions (e.g. requiring a request to match multiple
+// criteria simultaneously—logical AND), we may evolve this API
+// to support richer match expressions or logical operators.
 type AuthorizationSource struct {
 
     // Identities specifies a list of identities that are matched by this rule.
