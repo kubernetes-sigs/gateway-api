@@ -525,6 +525,82 @@ func TestInferSupportedFeatures(t *testing.T) {
 	}
 }
 
+func TestGWCStatusPublishedMeshFeatures(t *testing.T) {
+	testCases := []struct {
+		name               string
+		supportedFeatures  FeaturesSet
+		ConformanceProfile sets.Set[ConformanceProfileName]
+		expectedSource     supportedFeaturesSource
+	}{
+		{
+			name:           "GWC Status published Mesh features",
+			expectedSource: supportedFeaturesSourceManual,
+		},
+		{
+			name:               "supports conformance Mesh profile",
+			ConformanceProfile: sets.New(MeshGRPCConformanceProfileName),
+			expectedSource:     supportedFeaturesSourceManual,
+		},
+	}
+
+	gwcName := "ochopintre"
+	gwc := &gatewayv1.GatewayClass{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: gwcName,
+		},
+		Spec: gatewayv1.GatewayClassSpec{
+			ControllerName: "example.com/gateway-controller",
+		},
+		Status: gatewayv1.GatewayClassStatus{
+			Conditions: []metav1.Condition{
+				{
+					Type:    string(gatewayv1.GatewayConditionAccepted),
+					Status:  metav1.ConditionTrue,
+					Reason:  "Accepted",
+					Message: "GatewayClass is accepted and ready for use",
+				},
+			},
+			SupportedFeatures: featureNamesToSet([]string{
+				string(features.SupportGateway),
+				string(features.SupportGatewayStaticAddresses),
+				string(features.SupportMeshClusterIPMatching),
+				string(features.SupportMeshConsumerRoute),
+			}),
+		},
+	}
+	scheme := runtime.NewScheme()
+	scheme.AddKnownTypes(gatewayv1.SchemeGroupVersion, &gatewayv1.GatewayClass{})
+	fakeClient := fake.NewClientBuilder().
+		WithScheme(scheme).
+		WithObjects(gwc).
+		WithLists(&apiextensionsv1.CustomResourceDefinitionList{}).
+		Build()
+
+	gatewayv1.Install(fakeClient.Scheme())
+	apiextensionsv1.AddToScheme(fakeClient.Scheme())
+
+	for _, tc := range testCases {
+		options := ConformanceOptions{
+			AllowCRDsMismatch:   true,
+			GatewayClassName:    gwcName,
+			SupportedFeatures:   tc.supportedFeatures,
+			ConformanceProfiles: tc.ConformanceProfile,
+			Client:              fakeClient,
+		}
+
+		t.Run(tc.name, func(t *testing.T) {
+			cSuite, err := NewConformanceTestSuite(options)
+			if err != nil {
+				t.Fatalf("error initializing conformance suite: %v", err)
+			}
+
+			if cSuite.supportedFeaturesSource != tc.expectedSource {
+				t.Errorf("InferredSupportedFeatures mismatch: got %v, want %v", cSuite.supportedFeaturesSource, tc.expectedSource)
+			}
+		})
+	}
+}
+
 func featureNamesToSet(set []string) []gatewayv1.SupportedFeature {
 	var features []gatewayv1.SupportedFeature
 	for _, feature := range set {

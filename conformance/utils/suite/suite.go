@@ -194,27 +194,28 @@ const (
 type supportedFeaturesSource string
 
 const (
-	supportedFeaturesSourceUndefined supportedFeaturesSource = "Undefined"
-	supportedFeaturesSourceManual    supportedFeaturesSource = "Manual"
-	supportedFeaturesSourceInferred  supportedFeaturesSource = "Inferred"
+	supportedFeaturesSourceManual   supportedFeaturesSource = "Manual"
+	supportedFeaturesSourceInferred supportedFeaturesSource = "Inferred"
 )
 
 // NewConformanceTestSuite is a helper to use for creating a new ConformanceTestSuite.
 func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite, error) {
 	supportedFeatures := options.SupportedFeatures.Difference(options.ExemptFeatures)
 	source := supportedFeaturesSourceManual
-	switch {
-	case options.EnableAllSupportedFeatures:
+	if options.EnableAllSupportedFeatures {
 		supportedFeatures = features.SetsToNamesSet(features.AllFeatures)
-	case shouldInferSupportedFeatures(&options):
+	} else if shouldInferSupportedFeatures(&options) {
 		var err error
 		supportedFeatures, err = fetchSupportedFeatures(options.Client, options.GatewayClassName)
 		if err != nil {
 			return nil, fmt.Errorf("cannot infer supported features: %w", err)
 		}
-		source = supportedFeaturesSourceInferred
-	case isOnlyMeshProfile(&options):
-		source = supportedFeaturesSourceUndefined
+
+		if hasMeshFeatures(supportedFeatures, &options) {
+			source = supportedFeaturesSourceManual
+		} else {
+			source = supportedFeaturesSourceInferred
+		}
 	}
 
 	// If features were not inferred from Status, it's a GWC issue.
@@ -652,8 +653,7 @@ func getAPIVersionAndChannel(crds []apiextensionsv1.CustomResourceDefinition) (v
 	return version, channel, nil
 }
 
-func isOnlyMeshProfile(_ *ConformanceOptions) bool {
-	// TODO(bexxmodd): Currently a placeholder to add logic that determines if
-	// it's only Mesh profile without GWC.
-	return false
+func hasMeshFeatures(f FeaturesSet, opt *ConformanceOptions) bool {
+	return f.HasAny(features.SetsToNamesSet(features.MeshCoreFeatures, features.MeshExtendedFeatures).UnsortedList()...) ||
+		opt.ConformanceProfiles.HasAny(MeshGRPCConformanceProfileName, MeshHTTPConformanceProfileName)
 }
