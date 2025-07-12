@@ -146,9 +146,9 @@ func generateRSACert(hosts []string, keyOut, certOut io.Writer, ca *x509.Certifi
 	return nil
 }
 
-// MustCreateCASignedCertConfigMap will create a ConfigMap containing a CA Certificate, given a TLS Secret
+// MustCreateCACertConfigMap will create a ConfigMap containing a CA Certificate, given a TLS Secret
 // for that CA certificate.  Also returns the CA certificate.
-func MustCreateCASignedCertConfigMap(t *testing.T, namespace, configMapName string, hosts []string) (*corev1.ConfigMap, *x509.Certificate, *rsa.PrivateKey) {
+func MustCreateCACertConfigMap(t *testing.T, namespace, configMapName string, hosts []string) (*corev1.ConfigMap, *x509.Certificate, *rsa.PrivateKey) {
 	require.NotEmpty(t, hosts, "require a non-empty hosts for Subject Alternate Name values")
 
 	var certData, keyData bytes.Buffer
@@ -176,7 +176,8 @@ func MustCreateCASignedCertConfigMap(t *testing.T, namespace, configMapName stri
 			Name:      configMapName,
 		},
 		Data: map[string]string{
-			"ca.crt":  certData.String(),
+			"ca.crt": certData.String(),
+			// Don't do this in production, this is just for conformance testing.
 			"key.crt": keyData.String(),
 		},
 	}
