@@ -29,14 +29,11 @@ import (
 	"sigs.k8s.io/gateway-api/conformance/tests"
 	conformanceconfig "sigs.k8s.io/gateway-api/conformance/utils/config"
 	"sigs.k8s.io/gateway-api/conformance/utils/flags"
-
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
 
 	"github.com/stretchr/testify/require"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
-
 	clientset "k8s.io/client-go/kubernetes"
-
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
 	"sigs.k8s.io/yaml"
@@ -66,7 +63,6 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 
 	supportedFeatures := suite.ParseSupportedFeatures(*flags.SupportedFeatures)
 	exemptFeatures := suite.ParseSupportedFeatures(*flags.ExemptFeatures)
-
 	skipTests := suite.ParseSkipTests(*flags.SkipTests)
 	namespaceLabels := suite.ParseKeyValuePairs(*flags.NamespaceLabels)
 	namespaceAnnotations := suite.ParseKeyValuePairs(*flags.NamespaceAnnotations)
