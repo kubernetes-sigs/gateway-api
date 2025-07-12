@@ -21,6 +21,7 @@ import (
 
 	"k8s.io/apimachinery/pkg/types"
 
+	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	h "sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
@@ -47,7 +48,7 @@ var BackendTLSPolicy = suite.ConformanceTest{
 		gwNN := types.NamespacedName{Name: "gateway-backendtlspolicy", Namespace: ns}
 
 		kubernetes.NamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, []string{ns})
-		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAcceptedMultipleListeners(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
+		gwAddr := kubernetes.GatewayAndRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), &gatewayv1.HTTPRoute{}, false, routeNN)
 		kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN)
 
 		serverStr := "abc.example.com"
@@ -66,7 +67,7 @@ var BackendTLSPolicy = suite.ConformanceTest{
 				})
 		})
 
-		// For the re-encrypt case, we  need to use the cert for the frontend tls listener.
+		// For the re-encrypt case, we need to use the cert for the frontend tls listener.
 		certNN := types.NamespacedName{Name: "tls-checks-certificate", Namespace: ns}
 		cPem, keyPem, err := GetTLSSecret(suite.Client, certNN)
 		if err != nil {
@@ -85,6 +86,5 @@ var BackendTLSPolicy = suite.ConformanceTest{
 					Response: h.Response{StatusCode: 200},
 				})
 		})
-
 	},
 }
