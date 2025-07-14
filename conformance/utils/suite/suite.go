@@ -213,9 +213,8 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 
 		if hasMeshFeatures(supportedFeatures, &options) {
 			return nil, fmt.Errorf("mesh features should not be populated in GatewayClass")
-		} else {
-			source = supportedFeaturesSourceInferred
 		}
+		source = supportedFeaturesSourceInferred
 	}
 
 	// If features were not inferred from Status, it's a GWC issue.
