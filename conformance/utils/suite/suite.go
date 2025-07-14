@@ -212,7 +212,7 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 		}
 
 		if hasMeshFeatures(supportedFeatures, &options) {
-			source = supportedFeaturesSourceManual
+			return nil, fmt.Errorf("mesh features should not be populated in GatewayClass")
 		} else {
 			source = supportedFeaturesSourceInferred
 		}
