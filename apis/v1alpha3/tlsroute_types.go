@@ -14,16 +14,19 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package v1alpha2
+package v1alpha3
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"sigs.k8s.io/gateway-api/apis/v1alpha2"
 )
 
 // +genclient
 // +kubebuilder:object:root=true
 // +kubebuilder:resource:categories=gateway-api
 // +kubebuilder:subresource:status
+// +kubebuilder:storageversion
 // +kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 
 // The TLSRoute resource is similar to TCPRoute, but can be configured
@@ -40,18 +43,18 @@ type TLSRoute struct {
 	Spec TLSRouteSpec `json:"spec"`
 
 	// Status defines the current state of TLSRoute.
-	Status TLSRouteStatus `json:"status,omitempty"`
+	Status v1alpha2.TLSRouteStatus `json:"status,omitempty"`
 }
 
 // TLSRouteSpec defines the desired state of a TLSRoute resource.
 type TLSRouteSpec struct {
 	CommonRouteSpec `json:",inline"`
 
-	// Hostnames defines a set of SNI names that should match against the
+	// Hostnames defines a set of SNI hostnames that should match against the
 	// SNI attribute of TLS ClientHello message in TLS handshake. This matches
 	// the RFC 1123 definition of a hostname with 2 notable exceptions:
 	//
-	// 1. IPs are not allowed in SNI names per RFC 6066.
+	// 1. IPs are not allowed in SNI hostnames per RFC 6066.
 	// 2. A hostname may be prefixed with a wildcard label (`*.`). The wildcard
 	//    label must appear by itself as the first label.
 	//
@@ -81,7 +84,7 @@ type TLSRouteSpec struct {
 	//
 	// Support: Core
 	//
-	// +optional
+	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:MaxItems=16
 	Hostnames []Hostname `json:"hostnames,omitempty"`
 
@@ -90,43 +93,7 @@ type TLSRouteSpec struct {
 	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:MaxItems=16
 	// <gateway:experimental:validation:XValidation:message="Rule name must be unique within the route",rule="self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name) && l1.name == l2.name))">
-	Rules []TLSRouteRule `json:"rules"`
-}
-
-// TLSRouteStatus defines the observed state of TLSRoute
-type TLSRouteStatus struct {
-	RouteStatus `json:",inline"`
-}
-
-// TLSRouteRule is the configuration for a given rule.
-type TLSRouteRule struct {
-	// Name is the name of the route rule. This name MUST be unique within a Route if it is set.
-	//
-	// Support: Extended
-	// +optional
-	Name *SectionName `json:"name,omitempty"`
-
-	// BackendRefs defines the backend(s) where matching requests should be
-	// sent. If unspecified or invalid (refers to a nonexistent resource or
-	// a Service with no endpoints), the rule performs no forwarding; if no
-	// filters are specified that would result in a response being sent, the
-	// underlying implementation must actively reject request attempts to this
-	// backend, by rejecting the connection or returning a 500 status code.
-	// Request rejections must respect weight; if an invalid backend is
-	// requested to have 80% of requests, then 80% of requests must be rejected
-	// instead.
-	//
-	// Support: Core for Kubernetes Service
-	//
-	// Support: Extended for Kubernetes ServiceImport
-	//
-	// Support: Implementation-specific for any other resource
-	//
-	// Support for weight: Extended
-	//
-	// +kubebuilder:validation:MinItems=1
-	// +kubebuilder:validation:MaxItems=16
-	BackendRefs []BackendRef `json:"backendRefs,omitempty"`
+	Rules []v1alpha2.TLSRouteRule `json:"rules"`
 }
 
 // +kubebuilder:object:root=true
