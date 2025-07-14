@@ -10,6 +10,8 @@ linters:
         description: Kube API LInter lints Kube like APIs based on API conventions and best practices.
         settings:
           linters:
+            enable:
+            - "duplicatemarkers" # Ensure there are no exact duplicate markers. for types and fields.
             disable:
             - "*"
           lintersConfig: {}
