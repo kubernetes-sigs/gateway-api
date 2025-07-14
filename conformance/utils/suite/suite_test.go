@@ -530,16 +530,13 @@ func TestGWCStatusPublishedMeshFeatures(t *testing.T) {
 		name               string
 		supportedFeatures  FeaturesSet
 		ConformanceProfile sets.Set[ConformanceProfileName]
-		expectedSource     supportedFeaturesSource
 	}{
 		{
-			name:           "GWC Status published Mesh features",
-			expectedSource: supportedFeaturesSourceManual,
+			name: "GWC Status published Mesh features",
 		},
 		{
 			name:               "supports conformance Mesh profile",
 			ConformanceProfile: sets.New(MeshGRPCConformanceProfileName),
-			expectedSource:     supportedFeaturesSourceManual,
 		},
 	}
 
@@ -589,13 +586,9 @@ func TestGWCStatusPublishedMeshFeatures(t *testing.T) {
 		}
 
 		t.Run(tc.name, func(t *testing.T) {
-			cSuite, err := NewConformanceTestSuite(options)
-			if err != nil {
-				t.Fatalf("error initializing conformance suite: %v", err)
-			}
-
-			if cSuite.supportedFeaturesSource != tc.expectedSource {
-				t.Errorf("InferredSupportedFeatures mismatch: got %v, want %v", cSuite.supportedFeaturesSource, tc.expectedSource)
+			_, err := NewConformanceTestSuite(options)
+			if err == nil {
+				t.Fatalf("expected an error but got none")
 			}
 		})
 	}
