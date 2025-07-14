@@ -15,6 +15,7 @@ linters:
             - "jsontags" # Ensure every field has a json tag.
             - "nofloats" # Ensure floats are not used.
             - "nomaps" # Ensure maps are not used.
+            - "nophase" # Phase fields are discouraged by the Kube API conventions, use conditions instead.
             disable:
             - "*"
           lintersConfig: {}
