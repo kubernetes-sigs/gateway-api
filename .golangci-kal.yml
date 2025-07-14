@@ -13,6 +13,7 @@ linters:
             enable:
             - "duplicatemarkers" # Ensure there are no exact duplicate markers. for types and fields.
             - "jsontags" # Ensure every field has a json tag.
+            - "nofloats" # Ensure floats are not used.
             disable:
             - "*"
           lintersConfig: {}
