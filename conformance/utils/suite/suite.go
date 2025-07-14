@@ -211,7 +211,7 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 			return nil, fmt.Errorf("cannot infer supported features: %w", err)
 		}
 
-		if hasMeshFeatures(supportedFeatures, &options) {
+		if hasMeshFeatures(supportedFeatures) {
 			return nil, fmt.Errorf("mesh features should not be populated in GatewayClass")
 		}
 		source = supportedFeaturesSourceInferred
