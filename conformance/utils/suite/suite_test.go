@@ -525,21 +525,7 @@ func TestInferSupportedFeatures(t *testing.T) {
 	}
 }
 
-func TestGWCStatusPublishedMeshFeatures(t *testing.T) {
-	testCases := []struct {
-		name               string
-		supportedFeatures  FeaturesSet
-		ConformanceProfile sets.Set[ConformanceProfileName]
-	}{
-		{
-			name: "GWC Status published Mesh features",
-		},
-		{
-			name:               "supports conformance Mesh profile",
-			ConformanceProfile: sets.New(MeshGRPCConformanceProfileName),
-		},
-	}
-
+func TestGWCPublishedMeshFeatures(t *testing.T) {
 	gwcName := "ochopintre"
 	gwc := &gatewayv1.GatewayClass{
 		ObjectMeta: metav1.ObjectMeta{
@@ -576,21 +562,15 @@ func TestGWCStatusPublishedMeshFeatures(t *testing.T) {
 	gatewayv1.Install(fakeClient.Scheme())
 	apiextensionsv1.AddToScheme(fakeClient.Scheme())
 
-	for _, tc := range testCases {
-		options := ConformanceOptions{
-			AllowCRDsMismatch:   true,
-			GatewayClassName:    gwcName,
-			SupportedFeatures:   tc.supportedFeatures,
-			ConformanceProfiles: tc.ConformanceProfile,
-			Client:              fakeClient,
-		}
+	options := ConformanceOptions{
+		AllowCRDsMismatch: true,
+		GatewayClassName:  gwcName,
+		Client:            fakeClient,
+	}
 
-		t.Run(tc.name, func(t *testing.T) {
-			_, err := NewConformanceTestSuite(options)
-			if err == nil {
-				t.Fatalf("expected an error but got none")
-			}
-		})
+	_, err := NewConformanceTestSuite(options)
+	if err == nil {
+		t.Fatalf("expected an error but got nil")
 	}
 }
 
