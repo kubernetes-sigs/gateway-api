@@ -652,6 +652,6 @@ func getAPIVersionAndChannel(crds []apiextensionsv1.CustomResourceDefinition) (v
 	return version, channel, nil
 }
 
-func hasMeshFeatures(f FeaturesSet, opt *ConformanceOptions) bool {
+func hasMeshFeatures(f FeaturesSet) bool {
 	return f.HasAny(features.SetsToNamesSet(features.MeshCoreFeatures, features.MeshExtendedFeatures).UnsortedList()...)
 }
