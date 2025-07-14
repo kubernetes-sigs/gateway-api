@@ -16,6 +16,7 @@ linters:
             - "nofloats" # Ensure floats are not used.
             - "nomaps" # Ensure maps are not used.
             - "nophase" # Phase fields are discouraged by the Kube API conventions, use conditions instead.
+            - "requiredfields" # Required fields should not be pointers, and should not have `omitempty`.
             disable:
             - "*"
           lintersConfig: {}
