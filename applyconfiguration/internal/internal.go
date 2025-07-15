@@ -1709,6 +1709,981 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: name
       type:
         scalar: string
+- name: io.k8s.sigs.gateway-api.apis.v2alpha1.AllowedListeners
+  map:
+    fields:
+    - name: namespaces
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.ListenerNamespaces
+- name: io.k8s.sigs.gateway-api.apis.v2alpha1.AllowedRoutes
+  map:
+    fields:
+    - name: kinds
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.RouteGroupKind
+          elementRelationship: atomic
+    - name: namespaces
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.RouteNamespaces
+- name: io.k8s.sigs.gateway-api.apis.v2alpha1.BackendObjectReference
+  map:
+    fields:
+    - name: group
+      type:
+        scalar: string
+    - name: kind
+      type:
+        scalar: string
+    - name: name
+      type:
+        scalar: string
+      default: ""
+    - name: namespace
+      type:
+        scalar: string
+    - name: port
+      type:
+        scalar: numeric
+- name: io.k8s.sigs.gateway-api.apis.v2alpha1.CookieConfig
+  map:
+    fields:
+    - name: lifetimeType
+      type:
+        scalar: string
+- name: io.k8s.sigs.gateway-api.apis.v2alpha1.Fraction
+  map:
+    fields:
+    - name: denominator
+      type:
+        scalar: numeric
+    - name: numerator
+      type:
+        scalar: numeric
+      default: 0
+- name: io.k8s.sigs.gateway-api.apis.v2alpha1.FrontendTLSValidation
+  map:
+    fields:
+    - name: caCertificateRefs
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.ObjectReference
+          elementRelationship: atomic
+- name: io.k8s.sigs.gateway-api.apis.v2alpha1.GRPCBackendRef
+  map:
+    fields:
+    - name: filters
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.GRPCRouteFilter
+          elementRelationship: atomic
+    - name: group
+      type:
+        scalar: string
+    - name: kind
+      type:
+        scalar: string
+    - name: name
+      type:
+        scalar: string
+      default: ""
+    - name: namespace
+      type:
+        scalar: string
+    - name: port
+      type:
+        scalar: numeric
+    - name: weight
+      type:
+        scalar: numeric
+- name: io.k8s.sigs.gateway-api.apis.v2alpha1.GRPCHeaderMatch
+  map:
+    fields:
+    - name: name
+      type:
+        scalar: string
+      default: ""
+    - name: type
+      type:
+        scalar: string
+    - name: value
+      type:
+        scalar: string
+      default: ""
+- name: io.k8s.sigs.gateway-api.apis.v2alpha1.GRPCMethodMatch
+  map:
+    fields:
+    - name: method
+      type:
+        scalar: string
+    - name: service
+      type:
+        scalar: string
+    - name: type
+      type:
+        scalar: string
+- name: io.k8s.sigs.gateway-api.apis.v2alpha1.GRPCRoute
+  map:
+    fields:
+    - name: apiVersion
+      type:
+        scalar: string
+    - name: kind
+      type:
+        scalar: string
+    - name: metadata
+      type:
+        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+      default: {}
+    - name: spec
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.GRPCRouteSpec
+      default: {}
+    - name: status
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.GRPCRouteStatus
+      default: {}
+- name: io.k8s.sigs.gateway-api.apis.v2alpha1.GRPCRouteFilter
+  map:
+    fields:
+    - name: extensionRef
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.ObjectReference
+    - name: requestHeaderModifier
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.HTTPHeaderFilter
+    - name: requestMirror
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.HTTPRequestMirrorFilter
+    - name: responseHeaderModifier
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.HTTPHeaderFilter
+    - name: type
+      type:
+        scalar: string
+      default: ""
+- name: io.k8s.sigs.gateway-api.apis.v2alpha1.GRPCRouteMatch
+  map:
+    fields:
+    - name: headers
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.GRPCHeaderMatch
+          elementRelationship: associative
+          keys:
+          - name
+    - name: method
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.GRPCMethodMatch
+- name: io.k8s.sigs.gateway-api.apis.v2alpha1.GRPCRouteRule
+  map:
+    fields:
+    - name: backendRefs
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.GRPCBackendRef
+          elementRelationship: atomic
+    - name: filters
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.GRPCRouteFilter
+          elementRelationship: atomic
+    - name: matches
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.GRPCRouteMatch
+          elementRelationship: atomic
+    - name: name
+      type:
+        scalar: string
+    - name: sessionPersistence
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.SessionPersistence
+- name: io.k8s.sigs.gateway-api.apis.v2alpha1.GRPCRouteSpec
+  map:
+    fields:
+    - name: hostnames
+      type:
+        list:
+          elementType:
+            scalar: string
+          elementRelationship: atomic
+    - name: parentRefs
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.ParentReference
+          elementRelationship: atomic
+    - name: rules
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.GRPCRouteRule
+          elementRelationship: atomic
+- name: io.k8s.sigs.gateway-api.apis.v2alpha1.GRPCRouteStatus
+  map:
+    fields:
+    - name: parents
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.RouteParentStatus
+          elementRelationship: atomic
+- name: io.k8s.sigs.gateway-api.apis.v2alpha1.Gateway
+  map:
+    fields:
+    - name: apiVersion
+      type:
+        scalar: string
+    - name: kind
+      type:
+        scalar: string
+    - name: metadata
+      type:
+        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+      default: {}
+    - name: spec
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.GatewaySpec
+      default: {}
+    - name: status
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.GatewayStatus
+      default: {}
+- name: io.k8s.sigs.gateway-api.apis.v2alpha1.GatewayBackendTLS
+  map:
+    fields:
+    - name: clientCertificateRef
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.SecretObjectReference
+- name: io.k8s.sigs.gateway-api.apis.v2alpha1.GatewayClass
+  map:
+    fields:
+    - name: apiVersion
+      type:
+        scalar: string
+    - name: kind
+      type:
+        scalar: string
+    - name: metadata
+      type:
+        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+      default: {}
+    - name: spec
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.GatewayClassSpec
+      default: {}
+    - name: status
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.GatewayClassStatus
+      default: {}
+- name: io.k8s.sigs.gateway-api.apis.v2alpha1.GatewayClassSpec
+  map:
+    fields:
+    - name: controllerName
+      type:
+        scalar: string
+      default: ""
+    - name: description
+      type:
+        scalar: string
+    - name: parametersRef
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.ParametersReference
+- name: io.k8s.sigs.gateway-api.apis.v2alpha1.GatewayClassStatus
+  map:
+    fields:
+    - name: conditions
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Condition
+          elementRelationship: associative
+          keys:
+          - type
+    - name: supportedFeatures
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.SupportedFeature
+          elementRelationship: associative
+          keys:
+          - name
+- name: io.k8s.sigs.gateway-api.apis.v2alpha1.GatewayInfrastructure
+  map:
+    fields:
+    - name: annotations
+      type:
+        map:
+          elementType:
+            scalar: string
+    - name: labels
+      type:
+        map:
+          elementType:
+            scalar: string
+    - name: parametersRef
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.LocalParametersReference
+- name: io.k8s.sigs.gateway-api.apis.v2alpha1.GatewaySpec
+  map:
+    fields:
+    - name: addresses
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.GatewaySpecAddress
+          elementRelationship: atomic
+    - name: allowedListeners
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.AllowedListeners
+    - name: backendTLS
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.GatewayBackendTLS
+    - name: gatewayClassName
+      type:
+        scalar: string
+      default: ""
+    - name: infrastructure
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.GatewayInfrastructure
+    - name: listeners
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.Listener
+          elementRelationship: associative
+          keys:
+          - name
+- name: io.k8s.sigs.gateway-api.apis.v2alpha1.GatewaySpecAddress
+  map:
+    fields:
+    - name: type
+      type:
+        scalar: string
+    - name: value
+      type:
+        scalar: string
+- name: io.k8s.sigs.gateway-api.apis.v2alpha1.GatewayStatus
+  map:
+    fields:
+    - name: addresses
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.GatewayStatusAddress
+          elementRelationship: atomic
+    - name: conditions
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Condition
+          elementRelationship: associative
+          keys:
+          - type
+    - name: listeners
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.ListenerStatus
+          elementRelationship: associative
+          keys:
+          - name
+- name: io.k8s.sigs.gateway-api.apis.v2alpha1.GatewayStatusAddress
+  map:
+    fields:
+    - name: type
+      type:
+        scalar: string
+    - name: value
+      type:
+        scalar: string
+      default: ""
+- name: io.k8s.sigs.gateway-api.apis.v2alpha1.GatewayTLSConfig
+  map:
+    fields:
+    - name: certificateRefs
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.SecretObjectReference
+          elementRelationship: atomic
+    - name: frontendValidation
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.FrontendTLSValidation
+    - name: mode
+      type:
+        scalar: string
+    - name: options
+      type:
+        map:
+          elementType:
+            scalar: string
+- name: io.k8s.sigs.gateway-api.apis.v2alpha1.HTTPBackendRef
+  map:
+    fields:
+    - name: filters
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.HTTPRouteFilter
+          elementRelationship: atomic
+    - name: group
+      type:
+        scalar: string
+    - name: kind
+      type:
+        scalar: string
+    - name: name
+      type:
+        scalar: string
+      default: ""
+    - name: namespace
+      type:
+        scalar: string
+    - name: port
+      type:
+        scalar: numeric
+    - name: weight
+      type:
+        scalar: numeric
+- name: io.k8s.sigs.gateway-api.apis.v2alpha1.HTTPCORSFilter
+  map:
+    fields:
+    - name: allowCredentials
+      type:
+        scalar: boolean
+    - name: allowHeaders
+      type:
+        list:
+          elementType:
+            scalar: string
+          elementRelationship: associative
+    - name: allowMethods
+      type:
+        list:
+          elementType:
+            scalar: string
+          elementRelationship: associative
+    - name: allowOrigins
+      type:
+        list:
+          elementType:
+            scalar: string
+          elementRelationship: associative
+    - name: exposeHeaders
+      type:
+        list:
+          elementType:
+            scalar: string
+          elementRelationship: associative
+    - name: maxAge
+      type:
+        scalar: numeric
+- name: io.k8s.sigs.gateway-api.apis.v2alpha1.HTTPHeader
+  map:
+    fields:
+    - name: name
+      type:
+        scalar: string
+      default: ""
+    - name: value
+      type:
+        scalar: string
+      default: ""
+- name: io.k8s.sigs.gateway-api.apis.v2alpha1.HTTPHeaderFilter
+  map:
+    fields:
+    - name: add
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.HTTPHeader
+          elementRelationship: associative
+          keys:
+          - name
+    - name: remove
+      type:
+        list:
+          elementType:
+            scalar: string
+          elementRelationship: associative
+    - name: set
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.HTTPHeader
+          elementRelationship: associative
+          keys:
+          - name
+- name: io.k8s.sigs.gateway-api.apis.v2alpha1.HTTPHeaderMatch
+  map:
+    fields:
+    - name: name
+      type:
+        scalar: string
+      default: ""
+    - name: type
+      type:
+        scalar: string
+    - name: value
+      type:
+        scalar: string
+      default: ""
+- name: io.k8s.sigs.gateway-api.apis.v2alpha1.HTTPPathMatch
+  map:
+    fields:
+    - name: type
+      type:
+        scalar: string
+    - name: value
+      type:
+        scalar: string
+- name: io.k8s.sigs.gateway-api.apis.v2alpha1.HTTPPathModifier
+  map:
+    fields:
+    - name: replaceFullPath
+      type:
+        scalar: string
+    - name: replacePrefixMatch
+      type:
+        scalar: string
+    - name: type
+      type:
+        scalar: string
+      default: ""
+- name: io.k8s.sigs.gateway-api.apis.v2alpha1.HTTPQueryParamMatch
+  map:
+    fields:
+    - name: name
+      type:
+        scalar: string
+      default: ""
+    - name: type
+      type:
+        scalar: string
+    - name: value
+      type:
+        scalar: string
+      default: ""
+- name: io.k8s.sigs.gateway-api.apis.v2alpha1.HTTPRequestMirrorFilter
+  map:
+    fields:
+    - name: backendRef
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.BackendObjectReference
+      default: {}
+    - name: fraction
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.Fraction
+    - name: percent
+      type:
+        scalar: numeric
+- name: io.k8s.sigs.gateway-api.apis.v2alpha1.HTTPRequestRedirectFilter
+  map:
+    fields:
+    - name: hostname
+      type:
+        scalar: string
+    - name: path
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.HTTPPathModifier
+    - name: port
+      type:
+        scalar: numeric
+    - name: scheme
+      type:
+        scalar: string
+    - name: statusCode
+      type:
+        scalar: numeric
+- name: io.k8s.sigs.gateway-api.apis.v2alpha1.HTTPRoute
+  map:
+    fields:
+    - name: apiVersion
+      type:
+        scalar: string
+    - name: kind
+      type:
+        scalar: string
+    - name: metadata
+      type:
+        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+      default: {}
+    - name: spec
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.HTTPRouteSpec
+      default: {}
+    - name: status
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.HTTPRouteStatus
+      default: {}
+- name: io.k8s.sigs.gateway-api.apis.v2alpha1.HTTPRouteFilter
+  map:
+    fields:
+    - name: cors
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.HTTPCORSFilter
+    - name: extensionRef
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.ObjectReference
+    - name: requestHeaderModifier
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.HTTPHeaderFilter
+    - name: requestMirror
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.HTTPRequestMirrorFilter
+    - name: requestRedirect
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.HTTPRequestRedirectFilter
+    - name: responseHeaderModifier
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.HTTPHeaderFilter
+    - name: type
+      type:
+        scalar: string
+      default: ""
+    - name: urlRewrite
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.HTTPURLRewriteFilter
+- name: io.k8s.sigs.gateway-api.apis.v2alpha1.HTTPRouteMatch
+  map:
+    fields:
+    - name: headers
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.HTTPHeaderMatch
+          elementRelationship: associative
+          keys:
+          - name
+    - name: method
+      type:
+        scalar: string
+    - name: path
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.HTTPPathMatch
+    - name: queryParams
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.HTTPQueryParamMatch
+          elementRelationship: associative
+          keys:
+          - name
+- name: io.k8s.sigs.gateway-api.apis.v2alpha1.HTTPRouteRetry
+  map:
+    fields:
+    - name: attempts
+      type:
+        scalar: numeric
+    - name: backoff
+      type:
+        scalar: string
+    - name: codes
+      type:
+        list:
+          elementType:
+            scalar: numeric
+          elementRelationship: atomic
+- name: io.k8s.sigs.gateway-api.apis.v2alpha1.HTTPRouteRule
+  map:
+    fields:
+    - name: backendRefs
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.HTTPBackendRef
+          elementRelationship: atomic
+    - name: filters
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.HTTPRouteFilter
+          elementRelationship: atomic
+    - name: matches
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.HTTPRouteMatch
+          elementRelationship: atomic
+    - name: name
+      type:
+        scalar: string
+    - name: retry
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.HTTPRouteRetry
+    - name: sessionPersistence
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.SessionPersistence
+    - name: timeouts
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.HTTPRouteTimeouts
+- name: io.k8s.sigs.gateway-api.apis.v2alpha1.HTTPRouteSpec
+  map:
+    fields:
+    - name: hostnames
+      type:
+        list:
+          elementType:
+            scalar: string
+          elementRelationship: atomic
+    - name: parentRefs
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.ParentReference
+          elementRelationship: atomic
+    - name: rules
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.HTTPRouteRule
+          elementRelationship: atomic
+- name: io.k8s.sigs.gateway-api.apis.v2alpha1.HTTPRouteStatus
+  map:
+    fields:
+    - name: parents
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.RouteParentStatus
+          elementRelationship: atomic
+- name: io.k8s.sigs.gateway-api.apis.v2alpha1.HTTPRouteTimeouts
+  map:
+    fields:
+    - name: backendRequest
+      type:
+        scalar: string
+    - name: request
+      type:
+        scalar: string
+- name: io.k8s.sigs.gateway-api.apis.v2alpha1.HTTPURLRewriteFilter
+  map:
+    fields:
+    - name: hostname
+      type:
+        scalar: string
+    - name: path
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.HTTPPathModifier
+- name: io.k8s.sigs.gateway-api.apis.v2alpha1.Listener
+  map:
+    fields:
+    - name: allowedRoutes
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.AllowedRoutes
+    - name: hostname
+      type:
+        scalar: string
+    - name: name
+      type:
+        scalar: string
+      default: ""
+    - name: port
+      type:
+        scalar: numeric
+      default: 0
+    - name: protocol
+      type:
+        scalar: string
+      default: ""
+    - name: tls
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.GatewayTLSConfig
+- name: io.k8s.sigs.gateway-api.apis.v2alpha1.ListenerNamespaces
+  map:
+    fields:
+    - name: from
+      type:
+        scalar: string
+    - name: selector
+      type:
+        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelector
+- name: io.k8s.sigs.gateway-api.apis.v2alpha1.ListenerStatus
+  map:
+    fields:
+    - name: attachedRoutes
+      type:
+        scalar: numeric
+      default: 0
+    - name: conditions
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Condition
+          elementRelationship: associative
+          keys:
+          - type
+    - name: name
+      type:
+        scalar: string
+      default: ""
+    - name: supportedKinds
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.RouteGroupKind
+          elementRelationship: atomic
+- name: io.k8s.sigs.gateway-api.apis.v2alpha1.LocalParametersReference
+  map:
+    fields:
+    - name: group
+      type:
+        scalar: string
+      default: ""
+    - name: kind
+      type:
+        scalar: string
+      default: ""
+    - name: name
+      type:
+        scalar: string
+      default: ""
+- name: io.k8s.sigs.gateway-api.apis.v2alpha1.ObjectReference
+  map:
+    fields:
+    - name: group
+      type:
+        scalar: string
+      default: ""
+    - name: kind
+      type:
+        scalar: string
+      default: ""
+    - name: name
+      type:
+        scalar: string
+      default: ""
+    - name: namespace
+      type:
+        scalar: string
+- name: io.k8s.sigs.gateway-api.apis.v2alpha1.ParametersReference
+  map:
+    fields:
+    - name: group
+      type:
+        scalar: string
+      default: ""
+    - name: kind
+      type:
+        scalar: string
+      default: ""
+    - name: name
+      type:
+        scalar: string
+      default: ""
+    - name: namespace
+      type:
+        scalar: string
+- name: io.k8s.sigs.gateway-api.apis.v2alpha1.ParentReference
+  map:
+    fields:
+    - name: group
+      type:
+        scalar: string
+    - name: kind
+      type:
+        scalar: string
+    - name: name
+      type:
+        scalar: string
+      default: ""
+    - name: namespace
+      type:
+        scalar: string
+    - name: port
+      type:
+        scalar: numeric
+    - name: sectionName
+      type:
+        scalar: string
+- name: io.k8s.sigs.gateway-api.apis.v2alpha1.RouteGroupKind
+  map:
+    fields:
+    - name: group
+      type:
+        scalar: string
+    - name: kind
+      type:
+        scalar: string
+      default: ""
+- name: io.k8s.sigs.gateway-api.apis.v2alpha1.RouteNamespaces
+  map:
+    fields:
+    - name: from
+      type:
+        scalar: string
+    - name: selector
+      type:
+        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelector
+- name: io.k8s.sigs.gateway-api.apis.v2alpha1.RouteParentStatus
+  map:
+    fields:
+    - name: conditions
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Condition
+          elementRelationship: associative
+          keys:
+          - type
+    - name: controllerName
+      type:
+        scalar: string
+      default: ""
+    - name: parentRef
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.ParentReference
+      default: {}
+- name: io.k8s.sigs.gateway-api.apis.v2alpha1.SecretObjectReference
+  map:
+    fields:
+    - name: group
+      type:
+        scalar: string
+    - name: kind
+      type:
+        scalar: string
+    - name: name
+      type:
+        scalar: string
+      default: ""
+    - name: namespace
+      type:
+        scalar: string
+- name: io.k8s.sigs.gateway-api.apis.v2alpha1.SessionPersistence
+  map:
+    fields:
+    - name: absoluteTimeout
+      type:
+        scalar: string
+    - name: cookieConfig
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v2alpha1.CookieConfig
+    - name: idleTimeout
+      type:
+        scalar: string
+    - name: sessionName
+      type:
+        scalar: string
+    - name: type
+      type:
+        scalar: string
+- name: io.k8s.sigs.gateway-api.apis.v2alpha1.SupportedFeature
+  map:
+    fields:
+    - name: name
+      type:
+        scalar: string
+      default: ""
 - name: io.k8s.sigs.gateway-api.apisx.v1alpha1.BackendTrafficPolicySpec
   map:
     fields:

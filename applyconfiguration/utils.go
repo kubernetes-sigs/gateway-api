@@ -26,11 +26,13 @@ import (
 	v1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
 	v1alpha3 "sigs.k8s.io/gateway-api/apis/v1alpha3"
 	v1beta1 "sigs.k8s.io/gateway-api/apis/v1beta1"
+	v2alpha1 "sigs.k8s.io/gateway-api/apis/v2alpha1"
 	v1alpha1 "sigs.k8s.io/gateway-api/apisx/v1alpha1"
 	apisv1 "sigs.k8s.io/gateway-api/applyconfiguration/apis/v1"
 	apisv1alpha2 "sigs.k8s.io/gateway-api/applyconfiguration/apis/v1alpha2"
 	apisv1alpha3 "sigs.k8s.io/gateway-api/applyconfiguration/apis/v1alpha3"
 	apisv1beta1 "sigs.k8s.io/gateway-api/applyconfiguration/apis/v1beta1"
+	apisv2alpha1 "sigs.k8s.io/gateway-api/applyconfiguration/apis/v2alpha1"
 	apisxv1alpha1 "sigs.k8s.io/gateway-api/applyconfiguration/apisx/v1alpha1"
 	internal "sigs.k8s.io/gateway-api/applyconfiguration/internal"
 )
@@ -228,6 +230,130 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1beta1.ReferenceGrantSpecApplyConfiguration{}
 	case v1beta1.SchemeGroupVersion.WithKind("ReferenceGrantTo"):
 		return &apisv1beta1.ReferenceGrantToApplyConfiguration{}
+
+		// Group=gateway.networking.k8s.io, Version=v2alpha1
+	case v2alpha1.SchemeGroupVersion.WithKind("AllowedListeners"):
+		return &apisv2alpha1.AllowedListenersApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("AllowedRoutes"):
+		return &apisv2alpha1.AllowedRoutesApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("BackendObjectReference"):
+		return &apisv2alpha1.BackendObjectReferenceApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("BackendRef"):
+		return &apisv2alpha1.BackendRefApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("CommonRouteSpec"):
+		return &apisv2alpha1.CommonRouteSpecApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("CookieConfig"):
+		return &apisv2alpha1.CookieConfigApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("Fraction"):
+		return &apisv2alpha1.FractionApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("FrontendTLSValidation"):
+		return &apisv2alpha1.FrontendTLSValidationApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("Gateway"):
+		return &apisv2alpha1.GatewayApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("GatewayBackendTLS"):
+		return &apisv2alpha1.GatewayBackendTLSApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("GatewayClass"):
+		return &apisv2alpha1.GatewayClassApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("GatewayClassSpec"):
+		return &apisv2alpha1.GatewayClassSpecApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("GatewayClassStatus"):
+		return &apisv2alpha1.GatewayClassStatusApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("GatewayInfrastructure"):
+		return &apisv2alpha1.GatewayInfrastructureApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("GatewaySpec"):
+		return &apisv2alpha1.GatewaySpecApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("GatewaySpecAddress"):
+		return &apisv2alpha1.GatewaySpecAddressApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("GatewayStatus"):
+		return &apisv2alpha1.GatewayStatusApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("GatewayStatusAddress"):
+		return &apisv2alpha1.GatewayStatusAddressApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("GatewayTLSConfig"):
+		return &apisv2alpha1.GatewayTLSConfigApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("GRPCBackendRef"):
+		return &apisv2alpha1.GRPCBackendRefApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("GRPCHeaderMatch"):
+		return &apisv2alpha1.GRPCHeaderMatchApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("GRPCMethodMatch"):
+		return &apisv2alpha1.GRPCMethodMatchApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("GRPCRoute"):
+		return &apisv2alpha1.GRPCRouteApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("GRPCRouteFilter"):
+		return &apisv2alpha1.GRPCRouteFilterApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("GRPCRouteMatch"):
+		return &apisv2alpha1.GRPCRouteMatchApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("GRPCRouteRule"):
+		return &apisv2alpha1.GRPCRouteRuleApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("GRPCRouteSpec"):
+		return &apisv2alpha1.GRPCRouteSpecApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("GRPCRouteStatus"):
+		return &apisv2alpha1.GRPCRouteStatusApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("HTTPBackendRef"):
+		return &apisv2alpha1.HTTPBackendRefApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("HTTPCORSFilter"):
+		return &apisv2alpha1.HTTPCORSFilterApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("HTTPHeader"):
+		return &apisv2alpha1.HTTPHeaderApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("HTTPHeaderFilter"):
+		return &apisv2alpha1.HTTPHeaderFilterApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("HTTPHeaderMatch"):
+		return &apisv2alpha1.HTTPHeaderMatchApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("HTTPPathMatch"):
+		return &apisv2alpha1.HTTPPathMatchApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("HTTPPathModifier"):
+		return &apisv2alpha1.HTTPPathModifierApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("HTTPQueryParamMatch"):
+		return &apisv2alpha1.HTTPQueryParamMatchApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("HTTPRequestMirrorFilter"):
+		return &apisv2alpha1.HTTPRequestMirrorFilterApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("HTTPRequestRedirectFilter"):
+		return &apisv2alpha1.HTTPRequestRedirectFilterApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("HTTPRoute"):
+		return &apisv2alpha1.HTTPRouteApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("HTTPRouteFilter"):
+		return &apisv2alpha1.HTTPRouteFilterApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("HTTPRouteMatch"):
+		return &apisv2alpha1.HTTPRouteMatchApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("HTTPRouteRetry"):
+		return &apisv2alpha1.HTTPRouteRetryApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("HTTPRouteRule"):
+		return &apisv2alpha1.HTTPRouteRuleApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("HTTPRouteSpec"):
+		return &apisv2alpha1.HTTPRouteSpecApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("HTTPRouteStatus"):
+		return &apisv2alpha1.HTTPRouteStatusApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("HTTPRouteTimeouts"):
+		return &apisv2alpha1.HTTPRouteTimeoutsApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("HTTPURLRewriteFilter"):
+		return &apisv2alpha1.HTTPURLRewriteFilterApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("Listener"):
+		return &apisv2alpha1.ListenerApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("ListenerNamespaces"):
+		return &apisv2alpha1.ListenerNamespacesApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("ListenerStatus"):
+		return &apisv2alpha1.ListenerStatusApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("LocalParametersReference"):
+		return &apisv2alpha1.LocalParametersReferenceApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("ObjectReference"):
+		return &apisv2alpha1.ObjectReferenceApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("ParametersReference"):
+		return &apisv2alpha1.ParametersReferenceApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("ParentReference"):
+		return &apisv2alpha1.ParentReferenceApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("RouteGroupKind"):
+		return &apisv2alpha1.RouteGroupKindApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("RouteNamespaces"):
+		return &apisv2alpha1.RouteNamespacesApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("RouteParentStatus"):
+		return &apisv2alpha1.RouteParentStatusApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("RouteStatus"):
+		return &apisv2alpha1.RouteStatusApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("SecretObjectReference"):
+		return &apisv2alpha1.SecretObjectReferenceApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("SessionPersistence"):
+		return &apisv2alpha1.SessionPersistenceApplyConfiguration{}
+	case v2alpha1.SchemeGroupVersion.WithKind("SupportedFeature"):
+		return &apisv2alpha1.SupportedFeatureApplyConfiguration{}
 
 		// Group=gateway.networking.x-k8s.io, Version=v1alpha1
 	case v1alpha1.SchemeGroupVersion.WithKind("BackendTrafficPolicySpec"):

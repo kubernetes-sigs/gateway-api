@@ -28,6 +28,7 @@ import (
 	gatewayv1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
 	gatewayv1alpha3 "sigs.k8s.io/gateway-api/apis/v1alpha3"
 	gatewayv1beta1 "sigs.k8s.io/gateway-api/apis/v1beta1"
+	gatewayv2alpha1 "sigs.k8s.io/gateway-api/apis/v2alpha1"
 	experimentalv1alpha1 "sigs.k8s.io/gateway-api/apisx/v1alpha1"
 )
 
@@ -39,6 +40,7 @@ var localSchemeBuilder = runtime.SchemeBuilder{
 	gatewayv1alpha2.AddToScheme,
 	gatewayv1alpha3.AddToScheme,
 	gatewayv1beta1.AddToScheme,
+	gatewayv2alpha1.AddToScheme,
 	experimentalv1alpha1.AddToScheme,
 }
 

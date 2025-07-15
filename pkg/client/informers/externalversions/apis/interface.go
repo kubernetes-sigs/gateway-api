@@ -23,6 +23,7 @@ import (
 	v1alpha2 "sigs.k8s.io/gateway-api/pkg/client/informers/externalversions/apis/v1alpha2"
 	v1alpha3 "sigs.k8s.io/gateway-api/pkg/client/informers/externalversions/apis/v1alpha3"
 	v1beta1 "sigs.k8s.io/gateway-api/pkg/client/informers/externalversions/apis/v1beta1"
+	v2alpha1 "sigs.k8s.io/gateway-api/pkg/client/informers/externalversions/apis/v2alpha1"
 	internalinterfaces "sigs.k8s.io/gateway-api/pkg/client/informers/externalversions/internalinterfaces"
 )
 
@@ -36,6 +37,8 @@ type Interface interface {
 	V1alpha3() v1alpha3.Interface
 	// V1beta1 provides access to shared informers for resources in V1beta1.
 	V1beta1() v1beta1.Interface
+	// V2alpha1 provides access to shared informers for resources in V2alpha1.
+	V2alpha1() v2alpha1.Interface
 }
 
 type group struct {
@@ -67,4 +70,9 @@ func (g *group) V1alpha3() v1alpha3.Interface {
 // V1beta1 returns a new v1beta1.Interface.
 func (g *group) V1beta1() v1beta1.Interface {
 	return v1beta1.New(g.factory, g.namespace, g.tweakListOptions)
+}
+
+// V2alpha1 returns a new v2alpha1.Interface.
+func (g *group) V2alpha1() v2alpha1.Interface {
+	return v2alpha1.New(g.factory, g.namespace, g.tweakListOptions)
 }
