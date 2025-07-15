@@ -1,9 +1,16 @@
 # GEP-3792: Out-of-Cluster Gateways
 
 * Issue: [#3792](https://github.com/kubernetes-sigs/gateway-api/issues/3792)
-* Status: Provisional
+* Status: Deferred
 
 (See [status definitions](../overview.md#gep-states).)
+
+## CURRENT STATE: DEFERRED
+
+This GEP is _deferred_ solely due to bandwidth for the current Gateway API
+release. Ongoing conversation and development is still very much welcome, as
+this GEP is expected to return to active status in the next Gateway API
+release cycle.
 
 ## User Story
 
