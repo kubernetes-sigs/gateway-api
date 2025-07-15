@@ -1277,6 +1277,7 @@ spec:
                   rule: self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name)
                     && l1.name == l2.name))
             required:
+            - hostnames
             - rules
             type: object
           status:
