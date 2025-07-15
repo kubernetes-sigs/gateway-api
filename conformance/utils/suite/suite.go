@@ -21,7 +21,6 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
-	neturl "net/url"
 	"slices"
 	"sort"
 	"strings"
@@ -559,33 +558,14 @@ func (suite *ConformanceTestSuite) Report() (*confv1.ConformanceReport, error) {
 
 // ParseImplementation parses implementation-specific flag arguments and
 // creates a *confv1a1.Implementation.
-func ParseImplementation(org, project, url, version, contact string) (*confv1.Implementation, error) {
-	if org == "" {
-		return nil, errors.New("organization must be set")
-	}
-	if project == "" {
-		return nil, errors.New("project must be set")
-	}
-	if url == "" {
-		return nil, errors.New("url must be set")
-	}
-	if version == "" {
-		return nil, errors.New("version must be set")
-	}
-	if contact == "" {
-		return nil, errors.New("contact must be set")
-	}
-	if _, err := neturl.ParseRequestURI(url); err != nil {
-		return nil, errors.New("url is malformed")
-	}
-
-	return &confv1.Implementation{
+func ParseImplementation(org, project, url, version, contact string) confv1.Implementation {
+	return confv1.Implementation{
 		Organization: org,
 		Project:      project,
 		URL:          url,
 		Version:      version,
 		Contact:      strings.Split(contact, ","),
-	}, nil
+	}
 }
 
 // ParseConformanceProfiles parses flag arguments and converts the string to
