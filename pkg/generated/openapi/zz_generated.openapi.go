@@ -7321,7 +7321,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha3_TLSRouteSpec(ref common.Referenc
 						},
 					},
 				},
-				Required: []string{"rules"},
+				Required: []string{"hostnames", "rules"},
 			},
 		},
 		Dependencies: []string{
