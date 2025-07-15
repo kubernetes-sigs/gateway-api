@@ -86,7 +86,8 @@ type TLSRouteSpec struct {
 	//
 	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:MaxItems=16
-	Hostnames []Hostname `json:"hostnames"`
+	// +required
+	Hostnames []Hostname `json:"hostnames,omitempty"`
 
 	// Rules are a list of TLS matchers and actions.
 	//
