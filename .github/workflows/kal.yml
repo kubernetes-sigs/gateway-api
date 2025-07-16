@@ -9,7 +9,7 @@ permissions: {}
 
 jobs:
   golangci:
-    name: lint
+    name: kube-api-lint
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
