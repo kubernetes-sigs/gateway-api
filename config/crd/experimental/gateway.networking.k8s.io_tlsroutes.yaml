@@ -837,13 +837,13 @@ spec:
                   attached to the Listener. For example:
 
                   * A Listener with `test.example.com` as the hostname matches TLSRoutes
-                    that have either not specified any hostnames, or have specified at
-                    least one of `test.example.com` or `*.example.com`.
+                    that have specified at least one of `test.example.com` or
+                    `*.example.com`.
                   * A Listener with `*.example.com` as the hostname matches TLSRoutes
-                    that have either not specified any hostnames or have specified at least
-                    one hostname that matches the Listener hostname. For example,
-                    `test.example.com` and `*.example.com` would both match. On the other
-                    hand, `example.com` and `test.example.net` would not match.
+                    that have specified at least one hostname that matches the Listener
+                    hostname. For example, `test.example.com` and `*.example.com` would both
+                    match. On the other hand, `example.com` and `test.example.net` would not
+                    match.
 
                   If both the Listener and TLSRoute have specified hostnames, any
                   TLSRoute hostnames that do not match the Listener hostname MUST be
