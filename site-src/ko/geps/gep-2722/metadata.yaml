@@ -1,0 +1,15 @@
+apiVersion: internal.gateway.networking.k8s.io/v1alpha1
+kind: GEPDetails
+number: 2722
+name: Goals and UX for gwctl
+status: Memorandum
+authors:
+  - gauravkghildiyal
+  - robscott
+relationships:
+  seeAlso:
+    - number: 713
+      name: Metaresources and Policy Attachment
+      description: Explains the meaning of a Policy and calls out the idea of building a kubectl plugin or command-line tool.
+changelog:
+  - https://github.com/kubernetes-sigs/gateway-api/pull/2723
