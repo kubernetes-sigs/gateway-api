@@ -19,8 +19,8 @@ cluster, for various reasons which are out of the scope of this GEP. Chihiro
 and Ian want to be able to use these out-of-cluster proxies effectively and
 safely, though they recognize that this may require additional configuration.
 
-[Chihiro]: https://https//gateway-api.sigs.k8s.io/concepts/roles-and-personas/#chihiro
-[Ian]: https://https//gateway-api.sigs.k8s.io/concepts/roles-and-personas/#ian
+[Chihiro]: https://gateway-api.sigs.k8s.io/concepts/roles-and-personas/#chihiro
+[Ian]: https://gateway-api.sigs.k8s.io/concepts/roles-and-personas/#ian
 
 ### Nomenclature and Background
 

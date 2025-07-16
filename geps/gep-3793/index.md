@@ -19,7 +19,7 @@ really doesn't care what the Gateway is called.
 Therefore, Ana would like a way to be able to rely on a default Gateway that
 she doesn't have to explicitly name, and can simply trust to exist.
 
-[Ana]: https://https//gateway-api.sigs.k8s.io/concepts/roles-and-personas/#ana
+[Ana]: https://gateway-api.sigs.k8s.io/concepts/roles-and-personas/#ana
 
 ## Goals
 
@@ -156,8 +156,8 @@ Ana has easy access to this information, and that it's clear enough for her to
 understand, is clearly important for many more reasons than just default
 Gateways.
 
-[Chihiro]: https://https//gateway-api.sigs.k8s.io/concepts/roles-and-personas/#chihiro
-[Ian]: https://https//gateway-api.sigs.k8s.io/concepts/roles-and-personas/#ian
+[Chihiro]: https://gateway-api.sigs.k8s.io/concepts/roles-and-personas/#chihiro
+[Ian]: https://gateway-api.sigs.k8s.io/concepts/roles-and-personas/#ian
 
 ## API
 
