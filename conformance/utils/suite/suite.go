@@ -522,7 +522,7 @@ func (suite *ConformanceTestSuite) Report() (*confv1.ConformanceReport, error) {
 	if suite.supportedFeaturesSource == supportedFeaturesSourceManual &&
 		!hasMeshFeatures(suite.SupportedFeatures) &&
 		!suite.conformanceProfiles.HasAny(MeshHTTPConformanceProfileName, MeshGRPCConformanceProfileName) {
-		return nil, fmt.Errorf("can't generate report for Gateway's manually supplied features")
+		return nil, fmt.Errorf("can't generate report: Gateway's supported features should be read from Status and not supplied through flags")
 	}
 
 	testNames := make([]string, 0, len(suite.results))
