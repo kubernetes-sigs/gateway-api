@@ -104,7 +104,8 @@ status:
 
 ### SupportedFeatures Guidance in GatewayClass
 
-Only Gateway related features should be published on GatewayClass. The rest, i.e Mesh features should not be published on Gateway Class, and will likely to be published on a Mesh resource if an when it is [introduced](https://github.com/kubernetes-sigs/gateway-api/pull/3887).
+Only Gateway related features should be published on GatewayClass. The rest, i.e Mesh features should not be published under GatewayClass, and will likely to be published on a Mesh resource if and when it is [introduced](https://github.com/kubernetes-sigs/gateway-api/pull/3887).
+If the Mesh features are added to the GatewayClassStatus conformance test suite will error out.
 
 ## Standardize features and conformance tests names
 
@@ -133,7 +134,7 @@ In any case, the conformance tests file names should be meaningful and easy to u
 #### Conformance report
 
 In order for to verify that the list of features reported are indeed supported by GatewayClass tests will be run based on the features from the GatewayClassStatus.
-If the source of features are not inferred (manually provided) the conformance suite will block the report from being submitted.
+If the source of Gateway features are not inferred and manually provided the conformance suite will block the report from being submitted.
 
 #### Reporting Mesh features
 
