@@ -280,7 +280,6 @@ func TestSuiteReport(t *testing.T) {
 					coreProvisionalTest.ShortName,
 					extendedProvisionalTest.ShortName,
 				},
-				InferredSupportedFeatures: true,
 			},
 		},
 		{
@@ -390,7 +389,6 @@ func TestSuiteReport(t *testing.T) {
 						},
 					},
 				},
-				InferredSupportedFeatures: true,
 			},
 		},
 	}
@@ -434,33 +432,37 @@ func TestInferSupportedFeatures(t *testing.T) {
 		exemptFeatures     FeaturesSet
 		ConformanceProfile sets.Set[ConformanceProfileName]
 		expectedFeatures   FeaturesSet
-		expectedIsInferred bool
+		expectedSource     supportedFeaturesSource
 	}{
 		{
-			name:               "properly infer supported features",
-			expectedFeatures:   namesToFeatureSet(statusFeatureNames),
-			expectedIsInferred: true,
+			name:             "properly infer supported features",
+			expectedFeatures: namesToFeatureSet(statusFeatureNames),
+			expectedSource:   supportedFeaturesSourceInferred,
 		},
 		{
 			name:              "no features",
 			supportedFeatures: sets.New[features.FeatureName]("Gateway"),
 			expectedFeatures:  sets.New[features.FeatureName]("Gateway"),
+			expectedSource:    supportedFeaturesSourceManual,
 		},
 		{
 			name:              "remove exempt features",
 			supportedFeatures: sets.New[features.FeatureName]("Gateway", "HTTPRoute"),
 			exemptFeatures:    sets.New[features.FeatureName]("HTTPRoute"),
 			expectedFeatures:  sets.New[features.FeatureName]("Gateway"),
+			expectedSource:    supportedFeaturesSourceManual,
 		},
 		{
 			name:             "allow all features",
 			allowAllFeatures: true,
 			expectedFeatures: features.SetsToNamesSet(features.AllFeatures),
+			expectedSource:   supportedFeaturesSourceManual,
 		},
 		{
 			name:               "supports conformance profile - core",
 			ConformanceProfile: sets.New(GatewayHTTPConformanceProfileName),
-			expectedFeatures:   namesToFeatureSet([]string{"Gateway", "HTTPRoute", "ReferenceGrant"}),
+			expectedFeatures:   namesToFeatureSet(statusFeatureNames),
+			expectedSource:     supportedFeaturesSourceInferred,
 		},
 	}
 
@@ -512,14 +514,63 @@ func TestInferSupportedFeatures(t *testing.T) {
 				t.Fatalf("error initializing conformance suite: %v", err)
 			}
 
-			if cSuite.IsInferredSupportedFeatures() != tc.expectedIsInferred {
-				t.Errorf("InferredSupportedFeatures mismatch: got %v, want %v", cSuite.IsInferredSupportedFeatures(), tc.expectedIsInferred)
+			if cSuite.supportedFeaturesSource != tc.expectedSource {
+				t.Errorf("InferredSupportedFeatures mismatch: got %v, want %v", cSuite.supportedFeaturesSource, tc.expectedSource)
 			}
 
 			if equal := cSuite.SupportedFeatures.Equal(tc.expectedFeatures); !equal {
 				t.Errorf("SupportedFeatures mismatch: got %v, want %v", cSuite.SupportedFeatures.UnsortedList(), tc.expectedFeatures.UnsortedList())
 			}
 		})
+	}
+}
+
+func TestGWCPublishedMeshFeatures(t *testing.T) {
+	gwcName := "ochopintre"
+	gwc := &gatewayv1.GatewayClass{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: gwcName,
+		},
+		Spec: gatewayv1.GatewayClassSpec{
+			ControllerName: "example.com/gateway-controller",
+		},
+		Status: gatewayv1.GatewayClassStatus{
+			Conditions: []metav1.Condition{
+				{
+					Type:    string(gatewayv1.GatewayConditionAccepted),
+					Status:  metav1.ConditionTrue,
+					Reason:  "Accepted",
+					Message: "GatewayClass is accepted and ready for use",
+				},
+			},
+			SupportedFeatures: featureNamesToSet([]string{
+				string(features.SupportGateway),
+				string(features.SupportGatewayStaticAddresses),
+				string(features.SupportMeshClusterIPMatching),
+				string(features.SupportMeshConsumerRoute),
+			}),
+		},
+	}
+	scheme := runtime.NewScheme()
+	scheme.AddKnownTypes(gatewayv1.SchemeGroupVersion, &gatewayv1.GatewayClass{})
+	fakeClient := fake.NewClientBuilder().
+		WithScheme(scheme).
+		WithObjects(gwc).
+		WithLists(&apiextensionsv1.CustomResourceDefinitionList{}).
+		Build()
+
+	gatewayv1.Install(fakeClient.Scheme())
+	apiextensionsv1.AddToScheme(fakeClient.Scheme())
+
+	options := ConformanceOptions{
+		AllowCRDsMismatch: true,
+		GatewayClassName:  gwcName,
+		Client:            fakeClient,
+	}
+
+	_, err := NewConformanceTestSuite(options)
+	if err == nil {
+		t.Fatalf("expected an error but got nil")
 	}
 }
 
