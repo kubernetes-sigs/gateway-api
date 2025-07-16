@@ -8,7 +8,7 @@ the specification and Custom Resource Definitions (CRDs).
 The latest supported version is `v1` as released by
 the [v1.3.0 release][gh_release] of this project.
 
-This version of the API is has GA level support for the following resources:
+This version of the API has GA level support for the following resources:
 
 - `v1.GatewayClass`
 - `v1.Gateway`
