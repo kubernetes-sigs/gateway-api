@@ -519,6 +519,12 @@ func (suite *ConformanceTestSuite) Report() (*confv1.ConformanceReport, error) {
 	}
 	defer suite.lock.RUnlock()
 
+	if suite.supportedFeaturesSource == supportedFeaturesSourceManual &&
+		!hasMeshFeatures(suite.SupportedFeatures) &&
+		!suite.conformanceProfiles.HasAny(MeshHTTPConformanceProfileName, MeshGRPCConformanceProfileName) {
+		return nil, fmt.Errorf("can't generate report for Gateway's manually supplied features")
+	}
+
 	testNames := make([]string, 0, len(suite.results))
 	for tN := range suite.results {
 		testNames = append(testNames, tN)
