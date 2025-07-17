@@ -5722,7 +5722,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_RouteParentStatus(ref common.Reference
 						},
 					},
 				},
-				Required: []string{"parentRef", "controllerName"},
+				Required: []string{"parentRef", "controllerName", "conditions"},
 			},
 		},
 		Dependencies: []string{
