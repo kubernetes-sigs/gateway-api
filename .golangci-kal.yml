@@ -16,6 +16,7 @@ linters:
               - "nofloats" # Ensure floats are not used.
               - "nomaps" # Ensure maps are not used.
               - "nophase" # Phase fields are discouraged by the Kube API conventions, use conditions instead.
+              - "optionalorrequired" # Every field should be marked as `+optional` or `+required`.
               - "statussubresource" # All root objects that have a `status` field should have a status subresource.
               - "uniquemarkers" # Ensure that types and fields do not contain more than a single definition of a marker that should only be present once.
             disable:
