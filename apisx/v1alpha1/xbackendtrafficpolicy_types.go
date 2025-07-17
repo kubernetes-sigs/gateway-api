@@ -37,13 +37,18 @@ type XBackendTrafficPolicy struct {
 	//
 	// +optional
 
-	metav1.TypeMeta   `json:",inline"`
+	metav1.TypeMeta `json:",inline"`
+	// metadata is the standard object's metadata.
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+	// +optional
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	// Spec defines the desired state of BackendTrafficPolicy.
+	// +required
 	Spec BackendTrafficPolicySpec `json:"spec"`
 
 	// Status defines the current state of BackendTrafficPolicy.
+	// +optional
 	Status PolicyStatus `json:"status,omitempty"`
 }
 
@@ -72,6 +77,7 @@ type BackendTrafficPolicySpec struct {
 	// +listMapKey=name
 	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:MaxItems=16
+	// +required
 	TargetRefs []LocalPolicyTargetReference `json:"targetRefs"`
 
 	// RetryConstraint defines the configuration for when to allow or prevent
