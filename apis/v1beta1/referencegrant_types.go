@@ -41,10 +41,14 @@ import metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 // no grant, and MUST respond to the removal of a grant by revoking the access
 // that the grant allowed.
 type ReferenceGrant struct {
-	metav1.TypeMeta   `json:",inline"`
+	metav1.TypeMeta `json:",inline"`
+	// metadata is the standard object's metadata.
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+	// +optional
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	// Spec defines the desired state of ReferenceGrant.
+	// +optional
 	Spec ReferenceGrantSpec `json:"spec,omitempty"`
 
 	// Note that `Status` sub-resource has been excluded at the
@@ -72,6 +76,7 @@ type ReferenceGrantSpec struct {
 	//
 	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:MaxItems=16
+	// +required
 	From []ReferenceGrantFrom `json:"from"`
 
 	// To describes the resources that may be referenced by the resources
@@ -83,6 +88,7 @@ type ReferenceGrantSpec struct {
 	//
 	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:MaxItems=16
+	// +required
 	To []ReferenceGrantTo `json:"to"`
 }
 
@@ -92,6 +98,8 @@ type ReferenceGrantFrom struct {
 	// When empty, the Kubernetes core API group is inferred.
 	//
 	// Support: Core
+	//
+	// +required
 	Group Group `json:"group"`
 
 	// Kind is the kind of the referent. Although implementations may support
@@ -109,11 +117,14 @@ type ReferenceGrantFrom struct {
 	// * TCPRoute
 	// * TLSRoute
 	// * UDPRoute
+	// +required
 	Kind Kind `json:"kind"`
 
 	// Namespace is the namespace of the referent.
 	//
 	// Support: Core
+	//
+	// +required
 	Namespace Namespace `json:"namespace"`
 }
 
@@ -124,6 +135,8 @@ type ReferenceGrantTo struct {
 	// When empty, the Kubernetes core API group is inferred.
 	//
 	// Support: Core
+	//
+	// +required
 	Group Group `json:"group"`
 
 	// Kind is the kind of the referent. Although implementations may support
@@ -132,6 +145,8 @@ type ReferenceGrantTo struct {
 	//
 	// * Secret when used to permit a SecretObjectReference
 	// * Service when used to permit a BackendObjectReference
+	//
+	// +required
 	Kind Kind `json:"kind"`
 
 	// Name is the name of the referent. When unspecified, this policy
