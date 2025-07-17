@@ -27,12 +27,15 @@ package v1
 type LocalObjectReference struct {
 	// Group is the group of the referent. For example, "gateway.networking.k8s.io".
 	// When unspecified or empty string, core API group is inferred.
+	// +required
 	Group Group `json:"group"`
 
 	// Kind is kind of the referent. For example "HTTPRoute" or "Service".
+	// +required
 	Kind Kind `json:"kind"`
 
 	// Name is the name of the referent.
+	// +required
 	Name ObjectName `json:"name"`
 }
 
@@ -60,6 +63,7 @@ type SecretObjectReference struct {
 	Kind *Kind `json:"kind"`
 
 	// Name is the name of the referent.
+	// +required
 	Name ObjectName `json:"name"`
 
 	// Namespace is the namespace of the referenced object. When unspecified, the local
@@ -121,6 +125,7 @@ type BackendObjectReference struct {
 	Kind *Kind `json:"kind,omitempty"`
 
 	// Name is the name of the referent.
+	// +required
 	Name ObjectName `json:"name"`
 
 	// Namespace is the namespace of the backend. When unspecified, the local
@@ -157,12 +162,15 @@ type BackendObjectReference struct {
 type ObjectReference struct {
 	// Group is the group of the referent. For example, "gateway.networking.k8s.io".
 	// When set to the empty string, core API group is inferred.
+	// +required
 	Group Group `json:"group"`
 
 	// Kind is kind of the referent. For example "ConfigMap" or "Service".
+	// +required
 	Kind Kind `json:"kind"`
 
 	// Name is the name of the referent.
+	// +required
 	Name ObjectName `json:"name"`
 
 	// Namespace is the namespace of the referenced object. When unspecified, the local
