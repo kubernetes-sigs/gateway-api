@@ -214,6 +214,8 @@ configuration. CACertificateRefs is an implementation-specific slice of
 named object references, each containing a single cert. We originally proposed to follow the convention established by the
 [CertificateRefs field on Gateway](https://github.com/kubernetes-sigs/gateway-api/blob/18e79909f7310aafc625ba7c862dfcc67b385250/apis/v1beta1/gateway_types.go#L340)
 , but the CertificateRef requires both a tls.key and tls.crt and a certificate reference only requires the tls.crt.
+If the CertificateRef cannot be resolved or does not include a certificate (tls.crt), the BackendTLSPolicy is considered invalid.
+
 WellKnownCACertificates is an optional enum that allows users to specify whether to use the set of CA certificates trusted by the
 Gateway (WellKnownCACertificates specified as "System"), or to use the existing CACertificateRefs (WellKnownCACertificates
 specified as "").  The use and definition of system certificates is implementation-dependent, and the intent is that
@@ -223,7 +225,11 @@ between the gateway and backend pod. References to a resource in a different nam
 If ClientCertificateRefs is unspecified, then WellKnownCACertificates must be set to "System" for a valid configuration.
 If WellKnownCACertificates is unspecified, then CACertificateRefs must be specified with at least one entry for a valid configuration.
 If WellKnownCACertificates is set to "System" and there are no system trusted certificates or the implementation doesn't define system
-trusted certificates, then the associated TLS connection must fail.
+trusted certificates, the BackendTLSPolicy is considered invalid.
+
+For an invalid BackendTLSPolicy, implementations MUST NOT fall back to unencrypted (plaintext) connections. 
+Instead, the corresponding TLS connection MUST fail, and the client MUST receive an HTTP error response.
+Additionally, the `Accepted` status condition of the BackendTLSPolicy MUST be set to `False` with the reason `Invalid`.
 
 The `Hostname` field is required and is to be used to configure the SNI the Gateway should use to connect to the backend.
 Implementations must validate that at least one name in the certificate served by the backend matches this field.
