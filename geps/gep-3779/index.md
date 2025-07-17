@@ -469,7 +469,18 @@ A key challenge with `LabelSelector` is the loss of discoverability. It’s easi
 To address this, **investment in tooling is required.** Specifically, the `gwctl` CLI tool should be enhanced to provide insights such as:
 
 ```sh
-TODO: complete gwctl commands
+gwctl describe pods pod1 
+
+...
+InheritedPolicies:
+  Type                   Name                                 Target Kind   Target Name/Expression
+  ----                   ----                                 -----------   -----------
+  AuthorizationPolicy  demo-authz-policy-on-payment-pods      Pod           Selector={foo: a, bar: 2}
+...
+
+# List all AuthorizationPolicy resources in json format in the active namespace
+gwctl get authorizationPolicy -o json
+
 ```
 
 Without dedicated tooling, the `LabelSelector` approach could significantly degrade the user experience and observability.
@@ -478,7 +489,30 @@ Without dedicated tooling, the `LabelSelector` approach could significantly degr
 
 Adding only the recommendation below, please see [https://docs.google.com/document/d/1CeagBnHDPbzpYAxBmtJqTshxAW8l-aRPwvwgAGbnv2I/edit?tab=t.0](https://docs.google.com/document/d/1CeagBnHDPbzpYAxBmtJqTshxAW8l-aRPwvwgAGbnv2I/edit?tab=t.0) for a comprehensive comparison for design options for TargetRef.
 
-Create one unified authorization policy API with implementation-specific validation using Validating Admission Policies (VAP). Additionally introducing a new `enforcementLevel` enum to simplify validation and enable the user to clarify intent
+Create one unified authorization policy API with implementation-specific validation using Validating Admission Policies (VAP). Additionally introducing a new `enforcementLevel` enum to simplify validation and enable the user to clarify intent.
+
+```go
+
+// EnforcementLevel defines the scope at which an AuthorizationPolicy is enforced.
+//
+// There are two enforcement levels:
+//
+//   - NETWORK: Enforces the policy at the network layer (L4), typically at
+//     network proxies or gateway dataplanes. Only supports attributes available
+//     at connection time (e.g., source identity, port). Recommended for broad,
+//     coarse-grained access controls.
+//
+//   - APPLICATION: Enforces the policy at the application layer (L7), typically at
+//     HTTP/gRPC-aware sidecars or L7 proxies. Enables fine-grained authorization
+//     using protocol-specific attributes (e.g., HTTP paths, methods).
+//
+// This field clarifies policy intent and informs where enforcement is expected
+// to happen. It also enables implementation-specific validation and behavior.
+//
+// +kubebuilder:validation:Enum=NETWORK;APPLICATION
+type EnforcementLevel string
+
+```
 
 ```
 # Network-scoped policy (L4 enforcement points)
@@ -493,7 +527,7 @@ spec:
   rules:
     - authorizationSource:
         serviceAccount: ["default/productpage"]
-      tcpAttributes:
+      networkAttributes:
         ports: [9080]
 
 # Application-scoped policy (L7-only enforcement points and sidecars)
@@ -506,9 +540,9 @@ spec:
   rules:
     - authorizationSource:
         serviceAccount: ["default/productpage"]
-      tcpAttributes:
+      networkAttributes:
         ports: [9080]
-      httpAttributes: 
+      applicationAttributes: 
         paths: ["/api/*"]
         methods: ["GET", "POST"]
 
@@ -597,18 +631,27 @@ type AuthorizationRule struct {
     // +optional
     AuthorizationSource *AuthorizationSource `json:"authorizationSource,omitempty"`
 
-    // TCPAttributes specifies TCP-level matching criteria.
+    // NetworkAttributes specifies TCP-level matching criteria.
     // If omitted, matches any TCP traffic.
     // +optional
-    TCPAttributes *AuthorizationTCPAttributes `json:"tcpAttributes,omitempty"`
+    NetworkAttributes *AuthorizationNetworkAttributes `json:"networkAttributes,omitempty"`
 
-    
-    // FOR FUTURE ENHANCEMENT!
+    // FOR FUTURE ENHANCEMENT!!
 
-    // HTTPAttributes specifies HTTP-level matching criteria.
-    // If omitted, matches any HTTP traffic.
+    // ApplicationAttributes defines optional application-layer (L7) matching criteria
+    // used to authorize requests when enforcement is at the APPLICATION level.
+    //
+    // All specified fields must match for the rule to apply (logical AND). If omitted,
+    // the rule matches all application-layer traffic.
+    //
+    // Typical use cases include protocol-aware authorization for HTTP, gRPC, or other L7 traffic.
+    // Fields may vary in applicability based on the protocol and implementation support.
+    //
+    // NOTE: ApplicationAttributes are only meaningful when `enforcementLevel` is set to
+    // APPLICATION. Implementations MUST ignore or reject these fields if used at NETWORK level.
+
     // +optional
-    HTTPAttributes *AuthorizationHTTPAttributes `json:"httpAttributes,omitempty"`
+    ApplicationAttributes *AuthorizationApplicationAttributes `json:"applicationAttributes,omitempty"`
 }
 
 
@@ -619,10 +662,10 @@ type AuthorizationRule struct {
 // a request matches this AuthorizationSource if it matches
 // **any** of the specified criteria (logical OR across fields).
 //
-// For example, if both `Identities` and `Namespaces` are provided,
+// For example, if both `Identities` and `ServiceAccounts` are provided,
 // the rule matches a request if either:
 // - the request's identity is in `Identities`
-// - OR the request originates from one of the `Namespaces`.
+// - OR the request's service account matches an entry in `ServiceAccounts`.
 //
 // Each list within the fields (e.g. `Identities`) is itself an OR list.
 //
@@ -663,32 +706,33 @@ type AuthorizationSource struct {
     Identities []string `json:"identities,omitempty"`
 
     // ServiceAccounts specifies a list of Kubernetes Service Accounts that are
-    // matched by this rule. Each service account must be specified in the format
-    // "<namespace>/<service-account-name>". A request originating from a pod
-    // associated with one of these service accounts will match the rule.
+    // matched by this rule. A request originating from a pod associated with
+    // one of these service accounts will match the rule.
+    //
+    // Values must be in one of the following formats:
+    //   - "<namespace>/<serviceaccount-name>": A specific service account in a namespace.
+    //   - "<namespace>/*": All service accounts in the given namespace.
+    //   - "<serviceaccount-name>": A service account in the same namespace as the policy.
+    //
+    // Use of "*" alone (i.e., all service accounts in all namespaces) is not allowed.
+    // To select all service accounts in the current namespace, use "<namespace>/*" explicitly.
+    //
+    // Example:
+    //   - "default/bookstore" → Matches service account "bookstore" in namespace "default"
+    //   - "payments/*" → Matches any service account in namespace "payments"
+    //   - "frontend" → Matches "frontend" service account in the same namespace as the policy
     //
     // The ServiceAccounts listed here are expected to exist within the same
     // trust domain as the targeted workload, which in many environments means
-    // the same Kubernetes cluster. Cross-cluster or cross-trust-domain should
-    // be expressed with Identities field.
-    // +optional
+    // the same Kubernetes cluster. Cross-cluster or cross-trust-domain access
+    // should instead be expressed using the `Identities` field.
+    // 
+    // +optional 
     ServiceAccounts []string `json:"serviceAccounts,omitempty"`
-
-    // Namespaces specifies a list of Kubernetes Namespaces that are matched
-    // by this rule. A request originating from any pod within one of these
-    // namespaces will match the rule, regardless of its specific Service Account.
-    // This provides a broader scope for authorization.
-
-    // The Namespaces listed here are expected to exist within the same
-    // trust domain as the targeted workload, which in many environments means
-    // the same Kubernetes cluster. Cross-cluster or cross-trust-domain should
-    // be expressed with Identities field.
-    // +optional
-    Namespaces []string `json:"namespaces,omitempty"`
 }
 
 // AuthorizationAttribute defines L4 properties of a request destination.
-type AuthorizationTCPAttributes struct {
+type AuthorizationNetworkAttributes struct {
     // Ports specifies a list of destination ports to match on.
     // Traffic is matched if it is going to any of these ports.
     // If not specified, the rule applies to all ports.
