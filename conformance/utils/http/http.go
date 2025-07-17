@@ -117,6 +117,17 @@ func MakeRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtripp
 	WaitForConsistentResponse(t, r, req, expected, timeoutConfig.RequiredConsecutiveSuccesses, timeoutConfig.MaxTimeToConsistency)
 }
 
+// MakeRequestAndExpectFailure makes a request with the given parameters.
+// This function needs to ensure that after the system is stable the Request is
+// not returning http 200 StatusCode.
+func MakeRequestAndExpectFailure(t *testing.T, r roundtripper.RoundTripper, timeoutConfig config.TimeoutConfig, gwAddr string, expected ExpectedResponse) {
+	t.Helper()
+
+	req := MakeRequest(t, &expected, gwAddr, "HTTP", "http")
+
+	WaitForConsistentFailureResponse(t, r, req, expected, timeoutConfig.RequiredConsecutiveSuccesses, timeoutConfig.MaxTimeToConsistency)
+}
+
 func MakeRequest(t *testing.T, expected *ExpectedResponse, gwAddr, protocol, scheme string) roundtripper.Request {
 	t.Helper()
 
@@ -259,6 +270,31 @@ func WaitForConsistentResponse(t *testing.T, r roundtripper.RoundTripper, req ro
 		return true
 	})
 	tlog.Logf(t, "Request passed")
+}
+
+// WaitForConsistentFailureResponse repeats the provided request for some period
+// of time checking thatthe error was returned. This function fails when http
+// Status OK (200) was returned.
+func WaitForConsistentFailureResponse(t *testing.T, r roundtripper.RoundTripper, req roundtripper.Request, expected ExpectedResponse, threshold int, maxTimeToConsistency time.Duration) {
+	AwaitConvergence(t, threshold, maxTimeToConsistency, func(elapsed time.Duration) bool {
+		_, cRes, err := r.CaptureRoundTrip(req)
+		if err != nil {
+			tlog.Logf(t, "Request failed, not ready yet: %v (after %v)", err.Error(), elapsed)
+			return false
+		}
+		if roundtripper.IsTimeoutError(cRes.StatusCode) {
+			tlog.Logf(t, "Response expectation failed for request: %+v  not ready yet: %v (after %v)", req, cRes.StatusCode, elapsed)
+			return false
+		}
+		if cRes.StatusCode == 200 { // http:StatusCode OK
+		    tlog.Logf(t, "Request %+v returned http Status OK (200) should not happened", req, err, elapsed)
+			t.Fatalf("Request %+v should failed, returned HTTP Status OK (200) instead", req)
+			return false
+	    }
+
+		return true
+	})
+	tlog.Logf(t, "Expectation for failing Request are met")
 }
 
 func CompareRoundTrip(t *testing.T, req *roundtripper.Request, cReq *roundtripper.CapturedRequest, cRes *roundtripper.CapturedResponse, expected ExpectedResponse) error {
