@@ -143,6 +143,8 @@ type BackendObjectReference struct {
 	// resource or this field.
 	//
 	// +optional
+	// +kubebuilder:validation:Minimum=1
+	// +kubebuilder:validation:Maximum=65535
 	Port *PortNumber `json:"port,omitempty"`
 }
 
