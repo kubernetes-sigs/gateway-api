@@ -39,6 +39,17 @@ func MakeTLSRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtr
 	WaitForConsistentTLSResponse(t, r, req, expected, timeoutConfig.RequiredConsecutiveSuccesses, timeoutConfig.MaxTimeToConsistency, cPem, keyPem, server)
 }
 
+// MakeTLSRequestAndExpectFailure makes a request with the given parameters.
+// This function ensures that after the system is stable the Request is not
+// returning http 200 StatusCode.
+func MakeTLSRequestAndExpectFailure(t *testing.T, r roundtripper.RoundTripper, timeoutConfig config.TimeoutConfig, gwAddr string, cPem, keyPem []byte, server string, expected http.ExpectedResponse) {
+	t.Helper()
+
+	req := http.MakeRequest(t, &expected, gwAddr, "HTTPS", "https")
+
+	WaitForConsistentTLSFailureResponse(t, r, req, expected, timeoutConfig.RequiredConsecutiveSuccesses, timeoutConfig.MaxTimeToConsistency, cPem, keyPem, server)
+}
+
 // WaitForConsistentTLSResponse - repeats the provided request until it completes with a response having
 // the expected response consistently. The provided threshold determines how many times in
 // a row this must occur to be considered "consistent".
@@ -54,12 +65,21 @@ func WaitForConsistentTLSResponse(t *testing.T, r roundtripper.RoundTripper, req
 			return false
 		}
 
-		if err := http.CompareRequest(t, &req, cReq, cRes, expected); err != nil {
+		if err := http.CompareRoundTrip(t, &req, cReq, cRes, expected); err != nil {
 			tlog.Logf(t, "Response expectation failed for request: %+v  not ready yet: %v (after %v)", req, err, elapsed)
+			tlog.Logf(t, "Full response: %+v", cReq)
 			return false
 		}
 
 		return true
 	})
 	tlog.Logf(t, "Request passed")
+}
+// WaitForConsistentTLSFailureResponse - repeats the provided request and validate
+// that after maxTimeToCondsistency the response doesn't returns http Status OK (200)
+func WaitForConsistentTLSFailureResponse(t *testing.T, r roundtripper.RoundTripper, req roundtripper.Request, expected http.ExpectedResponse, threshold int, maxTimeToConsistency time.Duration, cPem, keyPem []byte, server string) {
+	req.KeyPem = keyPem
+	req.CertPem = cPem
+	req.Server = server
+	http.WaitForConsistentFailureResponse(t, r, req, expected, threshold, maxTimeToConsistency)
 }
