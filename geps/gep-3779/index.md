@@ -1,7 +1,7 @@
 # GEP-3779: Identity Based Authz for East-West Traffic
 
 * Issue: [#3779](https://github.com/kubernetes-sigs/gateway-api/issues/3779)
-* Status: Provisional
+* Status: Implementable
 
 (See [status definitions](../overview.md#gep-states).)
 
@@ -55,7 +55,7 @@ An identity-based authorization API is essential because it provides a structure
 | Aspect | Istio | Linkerd | Cilium |
 | ----- | ----- | ----- | ----- |
 | **Policy CRDs** | `AuthorizationPolicy` (APIs `security.istio.io/v1`) | `AuthorizationPolicy` (CRD `policy.linkerd.io/v1alpha1`), plus supporting CRDs (`Server`, `HTTPRoute`, `MeshTLSAuthentication`) | `CiliumNetworkPolicy` and `CiliumClusterwideNetworkPolicy` (superset of K8s NetworkPolicy) |
-| **Identity model** | Identities derived from mTLS peer certificates (bound to SA): <ul><li>SPIFFE-like principal `<trust-domain>/ns/<namespace>/sa/<serviceaccount>`. </li> <li>ServiceAccount name </li> <li>Namespaces</li></ul></br> identity within JWT derived from `request.auth.principal`<br/><br/>IPBlocks and x-forwarded-for ipBlocks | Identities derived from mTLS peer certificates (bound to SA trust domain `identity.linkerd.cluster.local`. Policies reference service accounts or explicit mesh identities (e.g. `webapp.identity.linkerd.cluster.local`). <br/><br/>Policies use `requiredAuthenticationRefs` to reference the entities who get authorization. This is a list of targetRefs and it can include: <ul><li>ServiceAccounts</li> <li>`MeshTLSAuthentication` - which represents a set of mesh identities either with a mesh identities strings or reference to serviceAccounts</li> <li>`NetworkAuthentication` - represents sets of IPs or subnets.</li></ul>  |Cilium service mesh can leverage SPIFFE identities in certs that are used for handshake. These SPIFFEE identities are mapped to CiliumIdentities. You can read more about cilium identities in [CiliumIdentity](#CiliumIdentity). <br/><br/>Policies target abstractions like service accounts in the form of labels, pod labels, namespace label, node selectors, CIDR blocks and Cilium predefined [entities](https://docs.cilium.io/en/stable/security/policy/language/#entities-based). All policy targeting is coalesced by Cilium into one or more Cilium Identities for translation into the BPF datapath|
+| **Identity model** | Identities derived from mTLS peer certificates (bound to SA): <ul><li>SPIFFE-like principal `<trust-domain>/ns/<namespace>/sa/<serviceaccount>`. </li> <li>ServiceAccount name </li> <li>Namespaces</li></ul></br> identity within JWT derived from `request.auth.principal`<br/><br/>IPBlocks and x-forwarded-for ipBlocks | Identities derived from mTLS peer certificates (bound to SA trust domain `identity.linkerd.cluster.local`. Policies reference Serviceaccounts or explicit mesh identities (e.g. `webapp.identity.linkerd.cluster.local`). <br/><br/>Policies use `requiredAuthenticationRefs` to reference the entities who get authorization. This is a list of targetRefs and it can include: <ul><li>ServiceAccounts</li> <li>`MeshTLSAuthentication` - which represents a set of mesh identities either with a mesh identities strings or reference to serviceAccounts</li> <li>`NetworkAuthentication` - represents sets of IPs or subnets.</li></ul>  |Cilium service mesh can leverage SPIFFE identities in certs that are used for handshake. These SPIFFEE identities are mapped to CiliumIdentities. You can read more about cilium identities in [CiliumIdentity](#CiliumIdentity). <br/><br/>Policies target abstractions like Serviceaccounts in the form of labels, pod labels, namespace label, node selectors, CIDR blocks and Cilium predefined [entities](https://docs.cilium.io/en/stable/security/policy/language/#entities-based). All policy targeting is coalesced by Cilium into one or more Cilium Identities for translation into the BPF datapath|
 | **Enforcement** | For Istio with sidecars - a proxy on each pod. For ambient, ztunnel node agent enforces mTLS based L4 authorization, L7 authorization is being enforced in waypoints if any. <br/><br/> Istio supports ALLOW, DENY, CUSTOM (often used for external authorization), and AUDIT. DENY policies in istio's context are used to enforce higher priority deny policies. The allow semantics is that whatever is not allowed explicitly (and assuming there is any policy for the same match) is implicitly denied  | Linkerd data-plane proxy (injected into each pod). The proxy enforces policies via mTLS identity checks. <br/><br/> Linkerd supports AUDIT and ALLOW. There is not DENY policies, whats not allowed (and assuming there is any policy for the same match) is implicitly denied. | For L3/4 Ingress Rules, CiliumNetworkPolicy enforcement - an eBPF-based datapath in the Linux kernel on the destination node. If L7 http rules are specified, the packet is redirected for a node-local envoy for further enforcement.<br/><br/>Cilium supports ALLOW and DENY semantics - all policies generate audit logs. <br/><br/>Cilium service mesh also offers a kind of AuthN where a Cilium agent on the src node validates a workloads SPIFFE identity by talking to another agent on the destination node, performing the initial TLS handshake to do authentication.|
 | **Request Match criteria** | Policies can target a group of pods using label selector, a Gateway/Service (this means targeting a waypoint proxy) or a GatewayClass - meaning all the gateways created from this class.  Policies without a label selector in a namespace implies the whole namespace is targeted. <br/><br/> Fine-grained L7 and L4 matching: HTTP/gRPC methods, paths, headers, ports, SNI, etc.Policies use logical OR over rules. <br/><br/>All match criterias are inline in the policy. See https://istio.io/latest/docs/reference/config/security/authorization-policy/#Rule-To and https://istio.io/latest/docs/reference/config/security/authorization-policy/#Rule-when | Policies can target: <ul><li>A `Server` which describes a set of pods (using fancy label match expressions), and a single port on those pods.</li> <li>A user can optionally restrict the authorization to a smaller subset of the traffic by targeting an HTTPRoute. (TODO: any plans to support sectionNames?)</li> <li> A namespace - this indicates that the policy applies to all traffic to all Servers and HTTPRoutes defined in the namespace.</li></ul> Note: We leave `ServerAuthorization` outside the scope as it planned to be deprecated (per linkerd website)  | Policies can target groups of pods using label selector (`endpointSelector`), or by node-labels (`nodeSelector`). Cilium supports L7 via built-in HTTP parsing: rules can match HTTP methods, paths, etc. For example, a CiliumNetworkPolicy can allow only specific HTTP methods/paths on a port. |
 | **Default policies and admin policies** | If **no** ALLOW policy matches, traffic is **allowed** by default. You can deploy an overridable - default deny by default by deploying an **allow-nothing** policy in either the namespace or istio-system <br/><br/>AuthorizationPolicies in the `istio-system` namespace apply to the whole mesh and take precedence. These are not overridable by namespace-level policies.  | Default inbound policy can be set at install time using `proxy.defaultInboundPolicy`. Supported values are: <ul><li>`all-unauthenticated:` allow all traffic. This is the default.</li>  <li>`all-authenticated:` allow traffic from meshed clients in the same or from a different cluster (with multi-cluster).</li>  <li>`cluster-authenticated:` allow traffic from meshed clients in the same cluster.</li>  <li>`cluster-unauthenticated:` allow traffic from both meshed and non-meshed clients in the same cluster.</li>  <li>`deny:` all traffic are denied. </li> <li>`audit:` Same as all-unauthenticated but requests get flagged in logs and metrics.</li> </ul> <br/>Users can override the default policies for namespaces/pods or by setting the [config.linkerd.io/default-inbound-policy](http://config.linkerd.io/default-inbound-policy) annotation There is no support for admin, non overridable policies. | Follows Kubernetes NetworkPolicy semantics by default: if no `CiliumNetworkPolicy` allows the traffic, it is allowed (no implicit deny). Once at least one `CiliumNetworkPolicy` or `CiliumClusterwideNetworkPolicy` allows some traffic, all other traffic is implicitly denied.
@@ -67,7 +67,7 @@ Every mesh vendor has their own API of such authorization. Below we describe bri
 #### Istio
 For the full spec and sematics of Istio AuthorizationPolicy: [Istio authorization policy docs](https://istio.io/latest/docs/reference/config/security/authorization-policy/)
 
-Istio's AuthorizationPolicy can enforce access control by specifying allowed istio-formatted identities using the `source.principals` field, which matches authenticated service account identities via mTLS. You can also use other source constructs which are described in the table above and in https://istio.io/latest/docs/reference/config/security/authorization-policy/#Source.
+Istio's AuthorizationPolicy can enforce access control by specifying allowed istio-formatted identities using the `source.principals` field, which matches authenticated Serviceaccount identities via mTLS. You can also use other source constructs which are described in the table above and in https://istio.io/latest/docs/reference/config/security/authorization-policy/#Source.
 
 ```
 apiVersion: security.istio.io/v1beta1
@@ -212,7 +212,7 @@ spec:
 
 For the full spec and sematics of CiliumNetworkPolicy: https://docs.cilium.io/en/stable/network/kubernetes/policy/#ciliumnetworkpolicy & https://docs.cilium.io/en/stable/network/servicemesh/gateway-api/gateway-api/#cilium-s-ingress-config-and-ciliumnetworkpolicy
 
-Beyond what's explained in the table above, Cilium also automatically labels each pod with its associated service account using the label io.cilium.k8s.policy.serviceaccount. This label can be used in CiliumNetworkPolicy to enforce identity-based access controls using [ServiceAccounts Based Identities](https://docs.cilium.io/en/latest/security/policy/kubernetes/#serviceaccounts) within CiliumNetworkPolicy;
+Beyond what's explained in the table above, Cilium also automatically labels each pod with its associated Serviceaccount using the label io.cilium.k8s.policy.serviceaccount. This label can be used in CiliumNetworkPolicy to enforce identity-based access controls using [ServiceAccounts Based Identities](https://docs.cilium.io/en/latest/security/policy/kubernetes/#serviceaccounts) within CiliumNetworkPolicy;
 
 See below for example.
 
@@ -292,25 +292,27 @@ The `targetRef` of the policy specifies the workload(s) to which the policy appl
 
 The `targetRef` can point to a Kubernetes `Service`.
 
-Two implementation options when targeting a service:
+Two implementation options when targeting a Service:
 
 1. Apply authorization policy to all traffic addressed to this Service.
 
 1. Apply authorization policy to all workloads (pods) selected by the Service.
 
-**Benefits:**
+#### Benefits
 
 * **No API Extension Required:** Works with the current PolicyAttachment model in Gateway API without modification.
 * **Simplicity:** Intuitive for users familiar with Kubernetes networking concepts.
 
-**Downsides and Open Questions:**
+#### Downsides and Open Questions
 However, targeting a `Service` introduces several challenges;
 
 ##### Loss Of Service Context
 
-If we go with option 1, apply authorization policy to all traffic addressed to a service;
-  This option is very tricky to implement for sidecar-based meshes where the destination sidecar has no knowledge of which Service the request came through.
-  Here is the very high-level tarffic flow for sidecar-based meshes:
+If we go with option 1, apply authorization policy to all traffic addressed to a Service;
+
+This option is very tricky to implement for sidecar-based meshes where the destination sidecar has no knowledge of which Service the request came through.
+
+Here is the very high-level tarffic flow for sidecar-based meshes:
 
   ```sh
   Client → Request to backend-service:8080
@@ -319,7 +321,7 @@ If we go with option 1, apply authorization policy to all traffic addressed to a
       → Destination sidecar has NO context that this came via "backend-service"
   ```
 
-Solving this problem either introduces security concern (e.g adding request metadata to indicate which service was dialed), or unnecessarily complex or in-efficient to solve.
+Solving this problem either introduces security concern (e.g adding request metadata to indicate which Service was dialed), or unnecessarily complex or in-efficient to solve.
 
 #### A Workload is Part of Multiple Services
 
@@ -348,7 +350,7 @@ Assuming we go with option 2, apply authorization policy to all workloads (pods)
 
 The UX becomes very confusing. Are we going to enforce only if the traffic arrived through the specific Service? Probably not, cause then we are back to the first problem of Service context.
 
-The UX gets weird becuase even though you target a service, you essentially get a **workload** policy, thats enforced regardless. 
+The UX gets weird becuase even though you target a Service, you essentially get a **workload** policy, thats enforced regardless. 
 
 > Note: with Service as a targetRef, of course we are going to need a Service in order to enforce Authorization -- meaning pods/jobs without a Serivce are completely out of scope.
 
@@ -356,7 +358,7 @@ The UX gets weird becuase even though you target a service, you essentially get 
 
 The main benefit of this option is that we can more easily scope the authorization enforcement only for "GAMMA" traffic. Whether its more or less confusing is still unclear.
 
-We can target xRoutes (TCPRoute, HTTPRoute, GRPCRoute). However we are back to [Loss Of Service Context](#loss-of-service-context). In sidecar mode, same as we don't have the context of which service was dialed, we don't have the route information that was responsible for the routing.
+We can target xRoutes (TCPRoute, HTTPRoute, GRPCRoute). However we are back to [Loss Of Service Context](#loss-of-service-context). In sidecar mode, same as we don't have the context of which Service was dialed, we don't have the route information that was responsible for the routing.
 
 > Note: Linkerd solved this with [Reusing HTTPRoute Schema](https://linkerd.io/2.15/features/httproute/) to distinguish between Inbound and Outbound HTTPRoute. However, I doubt we want that as a community feature. (sorry @kflynn)
 
@@ -369,7 +371,7 @@ Alternatively, the `targetRef` can specify a set of pods using a `LabelSelector`
 **Benefits:**
 
 * Aligns with established practices. Mesh implementations (Istio, Linkerd, Cilium) already use label selectors as the primary mechanism for targeting workloads in their native authorization policies, creating a consistent user experience.
-* Directly applies policy to pods, avoiding ambiguity present when targeting services. Ensures policies are enforced exactly where intended, regardless of how many services a pod might belong to.
+* Directly applies policy to pods, avoiding ambiguity present when targeting Services. Ensures policies are enforced exactly where intended, regardless of how many Services a pod might belong to.
 * Policies can apply to any workload, including pods not exposed via a `Service`, providing a comprehensive authorization solution.
 
 **Downsides and Open Questions:**
@@ -559,7 +561,7 @@ Sidecar Meshes
 Ambient Meshes
 
 * **Network Level**: Node-L4-proxy enforces policy using labelSelector targeting  
-* **Application Level**: Waypoint proxy enforces policy using service targetRef targeting
+* **Application Level**: Waypoint proxy enforces policy using Service targetRef targeting
 
 **VAP Validation**: 
 
@@ -665,7 +667,7 @@ type AuthorizationRule struct {
 // For example, if both `Identities` and `ServiceAccounts` are provided,
 // the rule matches a request if either:
 // - the request's identity is in `Identities`
-// - OR the request's service account matches an entry in `ServiceAccounts`.
+// - OR the request's Serviceaccount matches an entry in `ServiceAccounts`.
 //
 // Each list within the fields (e.g. `Identities`) is itself an OR list.
 //
@@ -707,20 +709,20 @@ type AuthorizationSource struct {
 
     // ServiceAccounts specifies a list of Kubernetes Service Accounts that are
     // matched by this rule. A request originating from a pod associated with
-    // one of these service accounts will match the rule.
+    // one of these Serviceaccounts will match the rule.
     //
     // Values must be in one of the following formats:
-    //   - "<namespace>/<serviceaccount-name>": A specific service account in a namespace.
-    //   - "<namespace>/*": All service accounts in the given namespace.
-    //   - "<serviceaccount-name>": A service account in the same namespace as the policy.
+    //   - "<namespace>/<serviceaccount-name>": A specific Serviceaccount in a namespace.
+    //   - "<namespace>/*": All Serviceaccounts in the given namespace.
+    //   - "<serviceaccount-name>": a Serviceaccount in the same namespace as the policy.
     //
-    // Use of "*" alone (i.e., all service accounts in all namespaces) is not allowed.
-    // To select all service accounts in the current namespace, use "<namespace>/*" explicitly.
+    // Use of "*" alone (i.e., all Serviceaccounts in all namespaces) is not allowed.
+    // To select all Serviceaccounts in the current namespace, use "<namespace>/*" explicitly.
     //
     // Example:
-    //   - "default/bookstore" → Matches service account "bookstore" in namespace "default"
-    //   - "payments/*" → Matches any service account in namespace "payments"
-    //   - "frontend" → Matches "frontend" service account in the same namespace as the policy
+    //   - "default/bookstore" → Matches Serviceaccount "bookstore" in namespace "default"
+    //   - "payments/*" → Matches any Serviceaccount in namespace "payments"
+    //   - "frontend" → Matches "frontend" Serviceaccount in the same namespace as the policy
     //
     // The ServiceAccounts listed here are expected to exist within the same
     // trust domain as the targeted workload, which in many environments means
