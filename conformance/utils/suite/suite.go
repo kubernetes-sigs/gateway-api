@@ -211,8 +211,12 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 			return nil, fmt.Errorf("cannot infer supported features: %w", err)
 		}
 
-		if hasMeshFeatures(supportedFeatures) {
-			return nil, fmt.Errorf("mesh features should not be populated in GatewayClass")
+		meshFeatureNames := features.SetsToNamesSet(features.MeshCoreFeatures, features.MeshExtendedFeatures)
+		for _, f := range supportedFeatures.UnsortedList() {
+			if meshFeatureNames.Has(f) {
+				supportedFeatures.Delete(f)
+				fmt.Printf("WARNING: Mesh feature %q should not be populated in GatewayClass, skipping...", f)
+			}
 		}
 		source = supportedFeaturesSourceInferred
 	}
@@ -650,8 +654,4 @@ func getAPIVersionAndChannel(crds []apiextensionsv1.CustomResourceDefinition) (v
 	}
 
 	return version, channel, nil
-}
-
-func hasMeshFeatures(f FeaturesSet) bool {
-	return f.HasAny(features.SetsToNamesSet(features.MeshCoreFeatures, features.MeshExtendedFeatures).UnsortedList()...)
 }
