@@ -507,8 +507,11 @@ Reluctantly, we must therefore conclude that option 1 is the only viable
 choice. Therefore: Gateways MUST NOT attempt to enforce a single default
 Gateway, and MUST allow Routes that set `spec.defaultOK` to `true` to bind to
 _all_ Gateways that have `spec.isDefault` set to `true`. This is simplest to
-implement, it permits zero-downtime changes to the default Gateway, and it
-allows for testing of the new default Gateway before the old one is deleted.
+implement, it permits zero-downtime changes to the default Gateway, it allows
+for testing of the new default Gateway before the old one is deleted, and it
+doesn't cause trouble with respect to security posture (since Ana already
+accepts that she's giving up some control over how her Routes are handled when
+she's using default Gateways).
 
 ##### Changes in Functionality
 
@@ -602,12 +605,11 @@ TBD.
   (Also, this is a breaking change if Chihiro has already created a
   non-default Gateway with whatever name we choose to use for the convention.)
 
-- A default Gateway could overwrite a Route's empty `parentRefs` with a
-  non-empty `parentRefs` pointing to the default Gateway. The main challenge
-  with this approach is that once the `parentRefs` are overwritten, it's no
-  longer possible to know that the Route was originally intended to use the
-  default Gateway. Using the `status` to indicate that the Route is bound to
-  the default Gateway instead both preserves Ana's original intent and also
+- A default Gateway could overwrite a defaulted Route's `parentRefs` to point
+  to the default Gateway. The main challenge with this approach is that once
+  the `parentRefs` are overwritten, it's no longer possible to know what Ana
+  originally intended. Using the `status` to indicate that the Route is bound
+  to the default Gateway instead both preserves Ana's original intent and also
   makes it possible to change the default Gateway without requiring Ana to
   recreate all her Routes.
 
