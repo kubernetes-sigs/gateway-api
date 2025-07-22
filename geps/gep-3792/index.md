@@ -113,6 +113,9 @@ In this GEP:
 - Support meshes interoperating with each other. It's possible that this GEP
   will lay a lot of groundwork in that direction, but it is not a goal.
 
+- Support multiple meshes running in the same cluster. This GEP assumes a
+  single mesh per cluster.
+
 - Support non-mTLS meshes in Gateway API 1.4. We'll make every effort not to
   rule out non-mTLS meshes, but since starting with the mTLS meshes should
   tackle a large chunk of the industry with a single solution, that will be
@@ -180,6 +183,7 @@ but we shouldn't rely on that.)
 In the case of non-mTLS meshes, the trust problem is more complex; this is the
 major reason that this GEP is focused on mTLS meshes.
 
+
 #### 2. The Protocol Problem
 
 The _protocol problem_ is that the data-plane elements of the mesh may assume
@@ -237,9 +241,10 @@ different meshes.
 
 There are three important aspects to the OCG API:
 
-1. The API must allow the OCG to be configured to securely communicate with
-   meshed workloads in the cluster, including providing the OCG with the
-   information it needs to authenticate itself as a workload.
+1. The API must allow for mutually authenticated communication between the OCG
+   and meshed workloads. This includes providing the OCG with the information
+   it needs to both authenticate itself to workloads, and to authenticate the
+   workloads it communicates with.
 
 2. The API must allow the mesh to be configured to accept requests from the
    OCG, including providing the mesh with the information it needs to
@@ -258,23 +263,229 @@ with an overview of the solutions before diving into the API details.
 The trust problem is that the OCG and the mesh need to be able to trust each
 other. The simplest solution to this problem is to add a _trust bundle_ to the
 Gateway resource, and to create a Mesh resource which will also have a trust
-bundle:
-
-- The trust bundle in the Gateway resource will define the CA certificate(s)
-  that the OCG should trust when communicating with meshed workloads in the
-  cluster.
-
-- The trust bundle in the Mesh resource will define the CA certificate(s)
-  that the mesh should trust when communicating with the OCG.
+bundle.
 
 This is a straightforward way to permit each component to verify the identity
 of the other, which will provide sufficient basis for verifying identity when
 mTLS meshes are involved.
 
-- An alternative would be to define a single trust bundle, requiring the OCG
-  and the mesh to each use the same CA certificate. This adds considerable
-  operational complexity (especially in the world of enterprise PKI) without
-  any real benefit.
+
+This leads to a critical architectural decision: What is the most secure and
+reliable method for the Gateway and the Mesh to obtain each other's trust
+bundles?
+
+Two primary models were considered to answer this question:
+
+#### Proposal 1: Configuration Model (Recommended)
+
+This model is an explicit grant of trust, where an administrator directly
+configures the relationship.
+
+How it works:
+
+* The Gateway resource is configured with a reference to the Mesh's trust bundle
+  Secret.
+
+* The Mesh resource is configured with a reference to the Gateway's trust bundle
+  Secret.
+
+Pro: Highly Secure. An administrator's explicit action prevents impersonation
+attacks. There is no ambiguity about who to trust.
+
+Pro: Simple & Clear. The configuration is direct and easy to understand, even in
+complex clusters with multiple gateways.
+
+
+```yaml
+# 1. The Mesh's Trust Bundle Secret
+# This Secret contains the mesh's CA certificate, which the Gateway will be configured to trust.
+# The certificate data must be base64-encoded.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mesh-ca-secret
+  # This should be in a namespace the Gateway's controller can access.
+  namespace: mesh-system
+type: Opaque
+data:
+  # The key can be anything, but 'ca.crt' is a common convention.
+  ca.crt: |
+    # Paste the base64-encoded CA certificate for the
+    # in-cluster service mesh here. For example:
+    # LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUN...
+---
+# 2. The Gateway's Trust Bundle Secret
+# This Secret contains the OCG's CA certificate, which the Mesh will be configured to trust.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: ocg-ca-secret
+  # This should be in a namespace the mesh's controller can access.
+  namespace: gateway-system
+type: Opaque
+data:
+  ca.crt: |
+    # Paste the base64-encoded CA certificate for the
+    # Out-of-Cluster Gateway (OCG) here.
+    # LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUN...
+---
+# 3. The Gateway Resource (Trusting the Mesh)
+# The OCG controller reads this and learns to trust the mesh by
+# fetching the 'mesh-ca-secret'.
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: ocg-gateway
+spec:
+  gatewayClassName: my-ocg-class
+  # ... other gateway spec fields ...
+  mesh:
+    trustBundle:
+      # Reference to the Secret containing the mesh's CA.
+      # Note: The 'kind' defaults to Secret if not specified,
+      # but it is shown here for clarity.
+      kind: Secret
+      name: mesh-ca-secret
+      namespace: mesh-system # Namespace of the Secret
+---
+# 4. The Mesh Resource (Trusting the Gateway)
+# The mesh controller reads this and learns to trust the OCG by
+# fetching the 'ocg-ca-secret'.
+apiVersion: networking.x-k8s.io/v1alpha1 # Hypothetical API version for Mesh resource
+kind: Mesh
+metadata:
+  name: in-cluster-mesh
+spec:
+  ocg:
+    trustBundle:
+      # Reference to the Secret containing the OCG's CA.
+      kind: Secret
+      name: ocg-ca-secret
+      namespace: gateway-system # Namespace of the Secret
+```
+
+#### Proposal 2: Discovery Model (Alternative)
+
+This model relies on publication of identity, where each component announces itself and the other must find it.
+
+How it works:
+
+* The Gateway resource points to a Secret containing its own identity.
+
+* The Mesh resource points to a Secret containing its own identity.
+
+* Each controller must then find the other's resource to learn which identity to trust.
+
+Con: Security Risk. An attacker can create a fake Mesh or Gateway resource. The discovery process could mistakenly trust this malicious identity, leading to a security breach.
+
+Con: Operationally Complex. It's unclear how the system should behave when multiple gateways exist. This ambiguity makes the system more fragile.
+
+
+
+#### Proposal 3: Single Trust Bundle for OCG and Mesh
+
+This proposal defines a single trust bundle, requiring the OCG and
+the mesh to each use the same CA certificate. This adds considerable operational
+complexity (especially in the world of enterprise PKI) without any real benefit.
+
+#### Proposal 4: Symmetrical Model with ClusterTrustBundle (Recommended, Forward-Looking)
+
+This model represents the ideal state, assuming a modern environment where both
+the cluster and the OCG implementation can leverage the ClusterTrustBundle
+resource.
+
+How it works:
+
+* The Mesh's CA is placed into a ClusterTrustBundle (e.g.,
+mesh-identity-bundle). The Gateway resource is configured to trust this bundle
+by name. The OCG controller reads this bundle to establish trust.
+
+* The Gateway's CA is placed into a separate ClusterTrustBundle (e.g.,
+gateway-identity-bundle). The Mesh resource is configured to trust this bundle
+by name. The in-cluster mesh proxies mount this bundle to establish trust.
+
+Pro: Architecturally Elegant & Symmetrical. This is the cleanest approach. It
+uses the same modern, purpose-built Kubernetes primitive (ClusterTrustBundle)
+for both sides of the trust exchange.
+
+Pro: Centralized Trust Management. It allows administrators to manage all major
+cluster trust anchors in one place as ClusterTrustBundle resources. These
+bundles can then be easily reused by other applications in the cluster, not just
+the mesh or gateway.
+
+Pro: Highly Secure. It is still an explicit configuration model, inheriting all
+the security benefits of Proposal 1 and completely avoiding the risks of the
+discovery model.
+
+Con: Strongest Requirement on Environment. This is the most forward-looking
+approach and requires two conditions: a modern Kubernetes cluster (v1.29+ for
+Beta support) and an OCG implementation that explicitly supports reading
+ClusterTrustBundle resources via the API.
+
+```yaml
+# 1. The Mesh's Trust Bundle
+# This bundle represents the mesh's identity. It will be referenced by the Gateway.
+apiVersion: certificates.k8s.io/v1beta1
+kind: ClusterTrustBundle
+metadata:
+  name: mesh-identity-bundle
+spec:
+  signerName: my-mesh.io/identity
+  trustBundle: |
+    # -----BEGIN CERTIFICATE-----
+    #
+    #   The public PEM-encoded CA certificate for the
+    #   in-cluster service mesh goes here.
+    #
+    # -----END CERTIFICATE-----
+---
+# 2. The Gateway's Trust Bundle
+# This bundle represents the OCG's identity. It will be referenced by the Mesh.
+apiVersion: certificates.k8s.io/v1beta1
+kind: ClusterTrustBundle
+metadata:
+  name: ocg-identity-bundle
+spec:
+  signerName: my-cloud-provider.com/ocg
+  trustBundle: |
+    # -----BEGIN CERTIFICATE-----
+    #
+    #   The public PEM-encoded CA certificate for the
+    #   Out-of-Cluster Gateway (OCG) goes here.
+    #
+    # -----END CERTIFICATE-----
+---
+# 3. The Gateway Resource (Trusting the Mesh)
+# The OCG controller reads this and learns to trust the mesh by
+# fetching the 'mesh-identity-bundle'.
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: ocg-gateway
+spec:
+  gatewayClassName: my-ocg-class
+  # ... other gateway spec fields ...
+  mesh:
+    trustBundle:
+      # Reference to the mesh's identity bundle.
+      kind: ClusterTrustBundle
+      name: mesh-identity-bundle
+---
+# 4. The Mesh Resource (Trusting the Gateway)
+# The mesh controller reads this and learns to trust the OCG by
+# configuring its sidecars to use the 'ocg-identity-bundle'.
+apiVersion: networking.x-k8s.io/v1alpha1 # Hypothetical API version for Mesh resource
+kind: Mesh
+metadata:
+  name: in-cluster-mesh
+spec:
+  ocg:
+    trustBundle:
+      # Reference to the OCG's identity bundle.
+      kind: ClusterTrustBundle
+      name: ocg-identity-bundle
+```
+
 
 ### Solving the Protocol Problem
 
@@ -302,32 +513,89 @@ As a starting point for OCG/mTLS mesh interaction:
 
 This will (obviously) require implementation work on the part of both the OCG
 implementations and the mesh implementations, so it's worth looking at some
-alternatives.
+alternatives:
 
-- The OCG could be required to exactly mimic the ALPN/transport metadata
-  combination used by an existing mesh. However, the existing meshes don't
-  share a single common mechanism, so this would require a lot of work on the
-  OCG's part, and it wouldn't be portable between meshes.
+* The OCG could be required to exactly mimic the ALPN/transport metadata
+combination used by an existing mesh. However, the existing meshes don't share a
+single common mechanism, so this would require a lot of work on the OCG's part,
+and it wouldn't be portable between meshes.
 
-- The OCG could simply skip ALPN, and hand a "bare" mTLS connection to the
-  mesh. In general, existing meshes don't support this in the way that we
-  want: depending on the destination of the connection, they may interpret it
-  as application-level mTLS that they should treat as an opaque data stream,
-  or they may simply refuse it. This alternative, therefore, both shifts the
-  entire burden of implementation to the meshes, and probably makes it
-  impossible to correctly handle application-level mTLS.
+* The OCG could simply skip ALPN, and hand a "bare" mTLS connection to the
+mesh. In general, existing meshes don't support this in the way that we want:
+depending on the destination of the connection, they may interpret it as
+application-level mTLS that they should treat as an opaque data stream, or they
+may simply refuse it. This alternative, therefore, both shifts the entire burden
+of implementation to the meshes, and probably makes it impossible to correctly
+handle application-level mTLS. Whether meshes should support application-level
+mTLS in this way is a separate discussion, and is out of scope for this GEP.
 
-  (Whether meshes _should_ support application-level mTLS in this way is a
-  separate discussion, and is out of scope for this GEP.)
+* We could perhaps abuse the [PROXY protocol] for this, or define something
+similar. This would appear to increase the implementation burden on both sides
+without providing appreciable benefit.
 
-- We could perhaps abuse the [PROXY protocol] for this, or define something
-  similar. This would appear to increase the implementation burden on both
-  sides without providing appreciable benefit.
+* A configuration knob could be added to the Gateway resource, allowing an
+administrator to specify a custom ALPN or protocol variant. For example, a user
+running Istio could configure their OCG to use the istio-http/1.1 ALPN. While
+this provides a path to interoperability with unmodified, existing meshes, it
+comes with significant downsides. It places a large implementation burden on OCG
+providers, who would need to support the distinct transport protocols of
+multiple meshes. Furthermore, it would make the Gateway configuration
+non-portable across different service meshes and would require the user to be
+aware of low-level implementation details of their mesh.
 
-[PROXY protocol]: https://github.com/haproxy/haproxy/blob/master/doc/proxy-protocol.txt
+#### Initial Approach
 
-None of these alternatives would appear to be better than using ALPN in a
-similar way to how (some) existing meshes already use it.
+The protocol problem addresses how an Out-of-Cluster Gateway (OCG) and an
+in-cluster mesh proxy should communicate at the application protocol
+level. While a future release may introduce a standardized protocol for richer
+metadata exchange, the initial goal is to establish a functional baseline that
+is simple for both OCG and mesh implementers.
+
+To lower the barrier to entry, the full solution to this problem, which may or
+may not include the definition of a standard `ocg.gateway.networking.k8s.io/v1`
+ALPN, will be deferred to a future GEP, targeting Gateway API v1.5.
+
+For the initial release, the requirements are simplified to rely on standard
+mTLS without a custom protocol.
+
+##### Protocol Requirements
+
+* The OCG MUST use a standard mTLS connection to communicate with meshed
+workloads. The OCG's identity is established by the client certificate it
+presents, which the mesh proxy validates against its configured trust bundle.
+
+* The OCG MUST NOT be required to use a mesh-specific ALPN (Application-Layer
+Protocol Negotiation) value (e.g., istio-http/1.1, linkerd-proxy) or send any
+proprietary transport-level metadata after the TLS handshake.
+
+* The mesh proxy, after successfully authenticating the OCG via its client
+certificate, MUST treat the connection as a standard application data stream
+(e.g., HTTP/1.1, HTTP/2). Routing and policy decisions will be based on the
+content of this stream, such as the HTTP Host or :authority header, which aligns
+with standard GAMMA routing behavior.
+
+##### Justification for Deferral
+
+This simplified approach provides several key benefits for an initial release:
+
+* Lowers Implementation Burden: OCG implementers are not required to support a
+variety of mesh-specific protocols. Mesh implementers are only required to
+handle a standard mTLS connection from a trusted peer, which is a common
+interoperability requirement.
+
+* Provides Immediate Value: This baseline solves the core security and routing
+problems, allowing the OCG to securely participate in the mesh for standard HTTP
+traffic.
+
+* Allows for Future Enhancement: Deferring the decision allows the community to
+gain practical experience with OCG-mesh interactions before standardizing on a
+more advanced protocol that could support richer features, like forwarding
+proxy-protocol data or other out-of-band metadata.
+
+* Future Work (Post-Initial Release) A subsequent GEP will revisit the Protocol
+Problem to define a standard mechanism. This will enable more advanced use cases
+that require passing metadata between the OCG and the mesh proxy outside of the
+primary application stream (e.g., original client IP, custom trace headers).
 
 ### Solving the Discovery Problem
 
@@ -359,24 +627,81 @@ We could approach this in a few different ways:
    for [Chihiro] and [Ian], _and_ it limits us to only having entire
    namespaces meshed.
 
-6. Add a label selector to the Gateway resource and declare that Routes with
-   the label, and Routes in namespaces with the label, are meshed.
+6. Chihiro adds a label selector to the Gateway resource, which declares that
+   Routes with the label, and Routes in namespaces with the label, are meshed.
 
-Overall, option 6 is probably the least imposition on everyone:
+7. Chihiro defines a label selector for Meshed Namespaces on the Mesh Resource.
 
-- It's still an active choice, rather than assuming things about the whole
-  cluster.
 
-- It allows operating at the namespace level or at the Route level.
+Let's explore options 6 and 7 in more detail:
 
-- It takes advantage of the case where a mesh already uses a label to indicate
-  which resources are meshed.
+#### Option 6: Selector on the Gateway (GEP Recommended)
 
-- It uses a reasonably Kubernetes-native mechanism for selection.
+In this model, Chihiro adds a selector field to the Gateway resource. The
+Out-of-Cluster Gateway (OCG) uses this selector to determine if a Route is
+meshed by checking the labels on the Route itself or its containing Namespace.
 
-Therefore, we'll add a label selector to the Gateway resource, and OCG MUST
-assume that any Route that either matches this selector, or is in a namespace
-that matches this selector, is meshed.
+This approach is considered the least imposition on everyone involved for
+several reasons:
+
+* It's an active, explicit choice by the operator, rather than relying on risky
+assumptions about the cluster state.
+
+* It allows for flexible operation at both the namespace level (for broad policy)
+and the Route level (for fine-grained exceptions).
+
+* It efficiently reuses existing configurations, as it can leverage the same
+labels a service mesh already uses for sidecar injection.
+
+* It employs a standard, Kubernetes-native mechanism (LabelSelector) for
+selection, which is familiar to all cluster operators.
+
+Overall, option 6 is probably the least imposition on everyone.
+
+#### Option 7: Namespace Selector on the Mesh (Alternative)
+
+In this alternative model, Chihiro configures a selector on the Mesh resource to
+specify which namespaces are part of the mesh. The OCG controller would then
+need to find and read this resource to make its routing decisions. When routing
+to a backend Route, the OCG would check if the Route's namespace is in the list
+it discovered from the Mesh resource. If it is, the Route is considered meshed.
+
+##### Tradeoffs and Justification for the GEP's Approach
+
+While this alternative has the benefit of centralizing the mesh's definition in
+one place, the GEP's proposed solution of using a selector on the Gateway
+resource was chosen for several key reasons:
+
+1. Controller Coupling - This is the most significant drawback. For this model
+to work, the OCG controller must discover, watch, and interpret the Mesh
+resource, which is managed by a completely different controller. This creates a
+tight coupling between the two systems.
+
+The GEP's Approach (Decoupled): The OCG controller only needs to look at its own
+Gateway resource. All the information it needs to function is self-contained.
+
+The Alternative (Coupled): The OCG's functionality becomes dependent on the Mesh
+resource's API. A change to the Mesh resource could break the OCG. This makes
+the overall system more brittle.
+
+2. Reduced Granularity - This proposal limits the definition of "meshed" to the
+namespace level. The GEP's solution of using a label selector on the Gateway is
+more flexible because it can target either Namespaces or individual Route
+resources. This allows an operator to, for example, have a mostly meshed
+namespace but exclude one specific Route within it from mesh communication.
+
+3. Duplication of Configuration - The service mesh already knows which
+namespaces are part of the mesh—this is fundamental to its operation (e.g., for
+sidecar injection). The GEP's label selector approach allows the Gateway to
+reuse this existing source of truth (the labels). The alternative would require
+an administrator to define this list of namespaces a second time in the Mesh
+resource, which is less efficient and prone to configuration drift.
+
+In summary, while placing the namespace list on the Mesh resource is
+conceptually clean, the GEP's approach was chosen because it results in a more
+decoupled, flexible, and robust system that avoids unnecessary controller
+dependencies and configuration duplication.
+
 
 ### Solving the Outbound Behavior Problem
 
@@ -403,6 +728,47 @@ Overall, the alternatives to the OCG being responsible for all outbound
 behaviors for requests leaving the OCG would all seem to create much worse
 problems than the UX problem of having to duplicate configuration for a Route
 that applies equally to N/S and E/W traffic.
+
+
+### Open Questions
+
+While this GEP provides a strong foundation for Out-of-Cluster Gateway (OCG) and
+mesh interoperability, several questions remain open for discussion and
+potential standardization in future revisions.
+
+1. How to configure the Gateway's identity certificate and private key?
+
+This GEP defines how the OCG and the mesh should be configured to trust each
+other by exchanging CA bundles. However, it does not standardize how an
+administrator configures the specific client certificate and private key that
+the OCG uses to identify itself to the mesh.
+
+Currently, this is left as an implementation detail, likely handled via a
+provider-specific CRD referenced from the GatewayClass or through an out-of-band
+mechanism. The open question is: Should a future version of this GEP standardize
+this configuration to ensure a consistent user experience? This could involve
+adding a new identityCertificateRef field to the Gateway spec.
+
+2. Should use cases where mesh workloads disable mTLS be supported?
+
+This GEP focuses on meshes where mTLS is strictly enforced for
+communication. However, some service meshes support a "DISABLE" mode where mTLS
+can be disabled for certain workloads. This raises the question: How should an
+OCG behave when a target workload is discovered as "meshed" but does not require
+or accept an mTLS connection?
+
+3. What are the graduation requirements for the initial release?
+
+The original graduation criteria required resolving all four major problems,
+including the "Protocol Problem." Now that the standardization of a custom ALPN
+protocol has been deferred to a future release (targeting v1.5), the graduation
+criteria for this GEP should be re-evaluated.
+
+The open question is: Should the graduation requirements be adjusted to reflect
+the reduced scope? For example, should graduation now require successful
+interoperability from at least two Gateway and two Mesh implementations using
+only the standard "bare" mTLS approach, proving the core value of the trust and
+discovery mechanisms without waiting for the advanced protocol work?
 
 ### API Details (North/South)
 
@@ -468,9 +834,194 @@ spec:
       - ...
 ```
 
+#### Mesh Resource Lifecycle and Management
+
+A key operational question for the Mesh resource is who is responsible for its
+creation and management. The lifecycle of this resource directly impacts the
+user experience for [Chihiro], the cluster operator. We considered two primary
+approaches.
+
+##### Option 1: User-Created Resource
+
+In this model, [Chihiro] would be fully
+responsible for authoring a Mesh resource manifest from scratch and applying it
+to the cluster. The resource would include a controllerName field to associate
+it with the specific mesh implementation installed.
+
+While this approach is explicit and requires clear intent from the user, it
+presents a notable barrier to entry. The user must consult documentation to find
+the correct API group, version, and fields, increasing the initial effort and
+potential for error.
+
+##### Option 2: Controller-Created, User-Configured Resource (Recommended)
+
+A second, more user-friendly approach is a controller-managed lifecycle. In this
+model, the service mesh controller, upon its installation, automatically creates
+a single, default Mesh resource within the cluster. This resource would
+initially be configured with sensible defaults, but with advanced features like
+OCG integration disabled.
+
+[Chihiro]'s workflow then shifts from creation to configuration. To enable OCG
+integration, they would simply retrieve the existing Mesh resource (e.g., via
+kubectl get mesh) and modify it to add the necessary trustBundle and other
+OCG-related settings.
+
+
 ### API Type Definitions
 
-TBA.
+
+This spec incorporates the flexibility to reference either a Secret or a ClusterTrustBundle, accommodating the different proposals we discussed.
+
+#### Shared Types
+
+First, we define a flexible reference type that can point to either a Secret or a ClusterTrustBundle. This will be used by both the Gateway and Mesh resources.
+
+```Go
+
+package v1alpha1 // or a relevant API version
+
+import (
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	gwv1 "sigs.k8s.io/gateway-api/apis/v1"
+)
+
+
+// TrustBundleReference is a reference to a resource containing a trust bundle.
+// It can reference either a Secret or a ClusterTrustBundle. Only one of these
+// fields should be set.
+type TrustBundleReference struct {
+	// Group is the group of the referent.
+	// When empty, the core API group is assumed.
+	// For ClusterTrustBundle, this would be "certificates.k8s.io".
+	//
+	// +optional
+	Group *gwv1.Group `json:"group,omitempty"`
+
+	// Kind is the kind of the referent.
+	// Valid values are "Secret" and "ClusterTrustBundle".
+	//
+	// +required
+	Kind *gwv1.Kind `json:"kind"`
+
+	// Name is the name of the referent.
+	//
+	// +required
+	Name gwv1.ObjectName `json:"name"`
+
+	// Namespace is the namespace of the Secret referent.
+	// This field is ignored for cluster-scoped resources like ClusterTrustBundle.
+	//
+	// +optional
+	Namespace *gwv1.Namespace `json:"namespace,omitempty"`
+}
+```
+
+#### Gateway API Spec Additions
+
+The following shows the proposed mesh field to be added to the existing GatewaySpec.
+
+```Go
+
+// GatewaySpec defines the desired state of Gateway.
+// This is an EXTENSION of the existing GatewaySpec.
+type GatewaySpec struct {
+    // ... existing fields like gatewayClassName, listeners, addresses ...
+
+	// Mesh defines the configuration for Gateway participation in a service mesh.
+	// If this field is unspecified, the Gateway does not participate in a mesh.
+	//
+	// +optional
+	Mesh *GatewayMeshConfig `json:"mesh,omitempty"`
+}
+
+// GatewayMeshConfig defines the configuration for a Gateway's service mesh integration.
+type GatewayMeshConfig struct {
+	// TrustBundle defines the trust anchor(s) that this Gateway will use to
+	// verify the identity of in-cluster mesh workloads.
+	// This references the mesh's CA.
+	//
+	// +required
+	TrustBundle TrustBundleReference `json:"trustBundle"`
+
+	// Selector defines the criteria for determining which Routes are part of the mesh.
+	// A Route is considered meshed if it or its parent Namespace matches this selector.
+	// If unspecified, all Routes attached to this Gateway are considered meshed.
+	//
+	// +optional
+	Selector *metav1.LabelSelector `json:"selector,omitempty"`
+}
+```
+
+#### New Mesh API Resource Spec
+
+This defines the new, cluster-scoped Mesh resource.
+
+```Go
+
+// +genclient
+// +kubebuilder:object:root=true
+// +kubebuilder:resource:scope=Cluster,shortName=mesh
+// +kubebuilder:storageversion
+
+// Mesh is a cluster-scoped resource that provides configuration for a service mesh
+// to integrate with other components, like an Out-of-Cluster Gateway.
+type Mesh struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+
+	// Spec defines the desired state of the Mesh.
+	Spec MeshSpec `json:"spec,omitempty"`
+
+	// Status defines the current state of the Mesh.
+	// +optional
+	Status MeshStatus `json:"status,omitempty"`
+}
+
+// +kubebuilder:object:root=true
+
+// MeshList contains a list of Mesh resources.
+type MeshList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []Mesh `json:"items"`
+}
+
+// MeshSpec defines the desired state of Mesh.
+type MeshSpec struct {
+	// ControllerName is the name of the controller that is managing this Mesh.
+	// This field must be set.
+	// For example: "my-mesh.io/controller".
+	//
+	// +required
+	ControllerName gwv1.GatewayController `json:"controllerName"`
+
+	// OCG defines the configuration for allowing an Out-of-Cluster Gateway
+	// to securely participate in the mesh.
+	//
+	// +optional
+	OCG *OCGConfig `json:"ocg,omitempty"`
+}
+
+// OCGConfig defines the configuration for Out-of-Cluster Gateway integration.
+type OCGConfig struct {
+	// TrustBundle defines the trust anchor(s) that the mesh will use to
+	// verify the identity of the Out-of-Cluster Gateway.
+	// This references the OCG's CA.
+	//
+	// +required
+	TrustBundle TrustBundleReference `json:"trustBundle"`
+}
+
+// MeshStatus defines the observed state of Mesh.
+type MeshStatus struct {
+	// Conditions describe the current conditions of the Mesh.
+	//
+	// +optional
+	// +listType=map
+	// +listMapKey=type
+	Conditions []metav1.Condition `json:"conditions,omitempty"`
+}
+```
 
 ## Conformance Details
 
