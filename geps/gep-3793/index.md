@@ -235,7 +235,7 @@ without mutating `parentRefs`, we will rely on `status` instead of mutating
 
 ### Gateway for Ingress (North/South)
 
-There are two main aspects to the API design for default Gateways:
+There are three main aspects to the API design for default Gateways:
 
 1. Giving Ana a way to indicate that a Route should be defaulted.
 
