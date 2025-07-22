@@ -128,7 +128,7 @@ Additionally, since this GEP defines a pattern rather than an API field or resou
 A typical Policy resource might look like the following:
 
 ```yaml
-apiVersion: policies.controller.io/v1
+apiVersion: policies.example.com/v1
 kind: ColorPolicy
 metadata:
   name: my-color-policy
@@ -161,7 +161,7 @@ All kinds of references SHOULD also specify Group, Version and Kind (GVK) inform
 The target reference includes the exact name of an object whose behavior to augment. E.g.:
 
 ```yaml
-apiVersion: policies.controller.io/v1
+apiVersion: policies.example.com/v1
 kind: ColorPolicy
 metadata:
   name: my-color-policy
@@ -272,7 +272,7 @@ Policy CRDs can offer the option to target a section of an object whose spec def
 E.g. – a policy that specifies additional behaviour for a given listener of a Gateway API Gateway object, though not for all listeners of the Gateway, MUST (i) require the Gateway listener to be uniquely named and (ii) provide the `sectionName` field of target reference with the name of the targeted listener.
 
 ```yaml
-apiVersion: policies.controller.io/v1
+apiVersion: policies.example.com/v1
 kind: ColorPolicy
 metadata:
   name: my-color-policy
@@ -333,7 +333,7 @@ _Virtual types_ are defined as those with a group unknown by the Kubernetes API 
 An example of such, from Gateway API mesh case, would be a hypothetical need for defining a policy to "color requests" to external services. To accomplish this, implementations MAY choose to support a reference to a virtual resource type `ExternalService`, unknown by the Kuberentes API server but known by the controller. E.g.:
 
 ```yaml
-apiVersion: policies.controller.io/v1
+apiVersion: policies.example.com/v1
 kind: ColorPolicy
 metadata:
   name: my-color-policy
