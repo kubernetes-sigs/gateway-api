@@ -1,7 +1,7 @@
 # GEP-3793: Default Gateways
 
 * Issue: [#3793](https://github.com/kubernetes-sigs/gateway-api/issues/3793)
-* Status: Provisional
+* Status: Implementable
 
 (See [status definitions](../overview.md#gep-states).)
 
