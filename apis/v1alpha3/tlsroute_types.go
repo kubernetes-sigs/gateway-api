@@ -37,8 +37,6 @@ import (
 // could choose to use a TCPRoute with a TLS listener.
 type TLSRoute struct {
 	metav1.TypeMeta `json:",inline"`
-	// metadata is the standard object's metadata.
-	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 

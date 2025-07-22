@@ -42,8 +42,6 @@ import metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 // that the grant allowed.
 type ReferenceGrant struct {
 	metav1.TypeMeta `json:",inline"`
-	// metadata is the standard object's metadata.
-	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
