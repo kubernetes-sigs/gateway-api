@@ -119,37 +119,70 @@ Ian, the Gateway is a first-class thing that they think about regularly, while
 to Ana, it's an implementation detail that she doesn't care about. Neither
 point of view is wrong, but they are in tension with each other.
 
+In practice, the trick is to find a usable balance between explicitness and
+simplicity, while managing ambiguity. A good example is the humble URL, where
+the port number is not always explicit, but it _is_ always unambiguous.
+Requiring everyone to type `:80` or `:443` at the end of the host portion of
+every URL wouldn't actually help anyone, though allowing it to be specified
+explicitly when needed definitely does help people.
+
 ### Prior Art
 
-This is very much not a new problem: there are many other systems out there
-where being unambiguous is crucial, but where being completely explicit is a
-burden. One of the simplest examples is the humble URL, where the port number
-is not always explicit, but it _is_ always unambiguous. Requiring everyone to
-type `:80` or `:443` at the end of the host portion of every URL wouldn't
-actually help anyone, though allowing it to be specified explicitly when
-needed definitely does help people.
+- **Ingress**
 
-The Ingress resource, of course, is another example of prior art: it permitted
-specifying a default IngressClass, allowing users to create Ingress resources
-that didn't specify the IngressClass explicitly. As with a great many things
-in the Ingress API, this caused problems:
+   The Ingress resource is the most obvious example of prior art: it permitted
+   specifying a default IngressClass, allowing users to create Ingress
+   resources that didn't specify the IngressClass explicitly. As with a great
+   many things in the Ingress API, this caused problems:
 
-1. Ingress never defined how conflicts between multiple Ingress resources
-   should be handled. Many (most?) implementations merged conflicting
-   resources, which is arguably the worst possible choice.
+   1. Ingress never defined how conflicts between multiple Ingress resources
+      should be handled. Many (most?) implementations merged conflicting
+      resources, which is arguably the worst possible choice.
 
-2. Ingress also never defined a way to allow users to see which IngressClass
-   was being used by a given Ingress resource, which made it difficult for
-   users to understand what was going on if they were using the default
-   IngressClass.
+   2. Ingress also never defined a way to allow users to see which IngressClass
+      was being used by a given Ingress resource, which made it difficult for
+      users to understand what was going on if they were using the default
+      IngressClass.
 
-(Oddly enough, Ingress' general lack of attention to separation of concerns
-wasn't really one of the problems here, since IngressClass was a separate
-resource.)
+   (Oddly enough, Ingress' general lack of attention to separation of concerns
+   wasn't really one of the problems here, since IngressClass was a separate
+   resource.)
 
-It's rare to find systems that are completely explicit or completely implicit:
-in practice, the trick is to find a usable balance between explicitness and
-simplicity, while managing ambiguity.
+- **Emissary Mapping**
+
+  Emissary-ingress turns this idea on its head: it assumes that app developers
+  will almost never care about which specific Emissary they're using, and will
+  instead only care about the hostnames and ports involved.
+
+  In Emissary:
+
+  - a Listener resource defines which ports and protocols are in play;
+  - a Host resource defines hostnames, TLS certificates, etc.;
+  - a Mapping resource is roughly analogous to a Route.
+
+  The Listener resource has selectors to control which Hosts it will claim;
+  Mappings, though, are claimed by Hosts based on the hostname that the
+  Mapping specifies. In other words, Mappings are not bound to a Listener
+  explicitly, but rather are bound to a Listener implicitly based on the
+  hostname that the Mapping specifies. There is no way to _explicitly_ specify
+  which Listener a Mapping wants to be claimed by.
+
+  This is obviously a very different model from Gateway API, shifting almost
+  all the work of controlling route binding away from the application
+  developer onto the cluster operator.
+
+- **Service**
+
+   We could also consider a Service of `type: LoadBalancer` as a kind of prior
+   art: in many cases, Ana can directly create these Services and use them to
+   provide direct, completely unmediated access to a workload, without
+   worrying about the specifics of how her cluster provider implements them.
+
+   Service's major disadvantages here are that it doesn't support Layer 7
+   functionality, and that each Service of type `LoadBalancer` has direct
+   costs in many cases. In other words, Service allows Ana to rely on the
+   cluster provider to create the load balancer, while forcing Ana to shoulder
+   the burden of basically everything else.
 
 ### Debugging and Visibility
 
