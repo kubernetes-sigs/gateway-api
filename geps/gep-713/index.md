@@ -68,22 +68,29 @@ All [risks and caveats](#tldr) considered, these are in general a few reasons fo
 
 ### Definitions
 
-- _**Metaresource**_: a resource that augments the behavior of another resource without modifying the definition of the augmented resource. Metaresources typically specify a _target_ and an _intent_:
-  - The _target_ of a metaresource is the resource or resources whose behavior the metaresource intends to augment.
-  - The _intent_ of a metaresource is what augmentation the metaresource will apply.
+#### Metaresource
 
-- _**Policy**_: an instance of a subclass of metaresources ("policies") whose intent is to specify _rules that control the behavior_ of the target resources.
+A resource that augments the behavior of another resource without modifying the definition of the augmented resource. Metaresources typically specify a _target_ and an _intent_:
 
-  Policies are Custom Resource Definitions (CRDs) that MUST comply with a particular [structure](#policy-structure). This structure includes standardized fields for specifying the target(s), policy-specific fields to describe the intended augmentation, and standardized status fields to communicate whether the augmentation is happening or not.
+- The _target_ of a metaresource is the resource or resources whose behavior the metaresource intends to augment.
+- The _intent_ of a metaresource is what augmentation the metaresource will apply.
 
-  Policy kinds are typically named _xPolicy_, such as `BackendTLSPolicy` (a policy kind implemented by Gateway API to augment Backends with TLS configuration.)
+#### Policy
 
-- _**Policy Attachment**_: the application of policies, implemented by a controller, to augment the behavior of other Kubernetes objects.
+An instance of a subclass of metaresources ("policies") whose intent is to specify _rules that control the behavior_ of the target resources.
+
+Policies are Custom Resource Definitions (CRDs) that MUST comply with a particular [structure](#policy-structure). This structure includes standardized fields for specifying the target(s), policy-specific fields to describe the intended augmentation, and standardized status fields to communicate whether the augmentation is happening or not.
+
+Policy kinds are typically named _xPolicy_, such as `BackendTLSPolicy` (a policy kind implemented by Gateway API to augment Backends with TLS configuration.)
+
+#### Policy Attachment
+
+The application of policies, implemented by a controller, to augment the behavior of other Kubernetes objects.
 
 ### Goals
 
 * Establish a pattern which will be used for any Policy resources included in the Gateway API spec.
-* Establish a pattern that must be adopted for any implementation-specific Policy resources used with Gateway API resources.
+* Establish a pattern that should be adopted for any implementation-specific Policy resources used with Gateway API resources.
 * Discuss the problems with communicating status for metaresource and policy objects, and suggest mechanisms that APIs can use to mitigate some of them.
 * Provide a way to distinguish between required and default values for all policy API implementations.
 * Enable Policy Attachment at all relevant scopes in Gateway API, including Gateways, Routes, Backends, along with how values should flow across a hierarchy if necessary.
@@ -91,6 +98,7 @@ All [risks and caveats](#tldr) considered, these are in general a few reasons fo
 * Provide a means of attachment that works for both ingress and mesh implementations of Gateway API.
 * Provide a consistent specification that will ensure familiarity between both API-defined and implementation-specific Policy resources so they can both be interpreted the same way.
 * Provide a reference pattern to other implementations of metaresource and policy APIs outside of Gateway API, that are based on similar concepts (i.e., augmenting the behavior of other Kubernetes objects, attachment points, nested contexts and inheritance, Defaults & Overrides, etc.)
+* Facilitate the development of tooling that help circumvent known challenges of Policy Attachment such as the [Discoverability problem](#the-discoverability-problem) without requiring any predefined understanding or awareness of the implementation-specific policies.
 
 ### Out of scope
 
