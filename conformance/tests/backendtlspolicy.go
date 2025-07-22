@@ -1,5 +1,5 @@
 /*
-Copyright 2024 The Kubernetes Authors.
+Copyright 2025 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -19,9 +19,12 @@ package tests
 import (
 	"testing"
 
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
 	"k8s.io/apimachinery/pkg/types"
 
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
+	"sigs.k8s.io/gateway-api/apis/v1alpha2"
 	h "sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
@@ -35,7 +38,7 @@ func init() {
 
 var BackendTLSPolicy = suite.ConformanceTest{
 	ShortName:   "BackendTLSPolicy",
-	Description: "A single service that is targeted by a BackendTLSPolicy must successfully complete TLS termination",
+	Description: "BackendTLSPolicy must be used to configure TLS connection between gateway and backend",
 	Features: []features.FeatureName{
 		features.SupportGateway,
 		features.SupportHTTPRoute,
@@ -51,10 +54,25 @@ var BackendTLSPolicy = suite.ConformanceTest{
 		gwAddr := kubernetes.GatewayAndRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), &gatewayv1.HTTPRoute{}, false, routeNN)
 		kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN)
 
+		policyCond := metav1.Condition{
+			Type:   string(v1alpha2.PolicyConditionAccepted),
+			Status: metav1.ConditionTrue,
+			Reason: string(v1alpha2.PolicyReasonAccepted),
+		}
+
+		validPolicyNN := types.NamespacedName{Name: "normative-test-backendtlspolicy", Namespace: ns}
+		kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, validPolicyNN, gwNN, policyCond)
+
+		invalidPolicyNN := types.NamespacedName{Name: "backendtlspolicy-host-mismatch", Namespace: ns}
+		kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, invalidPolicyNN, gwNN, policyCond)
+
+		invalidCertPolicyNN := types.NamespacedName{Name: "backendtlspolicy-cert-mismatch", Namespace: ns}
+		kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, invalidCertPolicyNN, gwNN, policyCond)
+
 		serverStr := "abc.example.com"
 
-		// Verify that the response to a backend-tls-only call to /backendTLS will return the matching SNI.
-		t.Run("Simple HTTP request targeting BackendTLSPolicy should reach infra-backend", func(t *testing.T) {
+		// Verify that the request sent to Service with valid BackendTLSPolicy should succeed.
+		t.Run("HTTP request sent to Service with valid BackendTLSPolicy should succeed", func(t *testing.T) {
 			h.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr,
 				h.ExpectedResponse{
 					Namespace: ns,
@@ -73,8 +91,8 @@ var BackendTLSPolicy = suite.ConformanceTest{
 		if err != nil {
 			t.Fatalf("unexpected error finding TLS secret: %v", err)
 		}
-		// Verify that the response to a re-encrypted call to /backendTLS will return the matching SNI.
-		t.Run("Re-encrypt HTTPS request targeting BackendTLSPolicy should reach infra-backend", func(t *testing.T) {
+		// Verify that the request to a re-encrypted call to /backendTLS should succeed.
+		t.Run("Re-encrypt HTTPS request sent to Service with valid BackendTLSPolicy should succeed", func(t *testing.T) {
 			tls.MakeTLSRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, cPem, keyPem, serverStr,
 				h.ExpectedResponse{
 					Namespace: ns,
@@ -84,6 +102,32 @@ var BackendTLSPolicy = suite.ConformanceTest{
 						SNI:  serverStr,
 					},
 					Response: h.Response{StatusCode: 200},
+				})
+		})
+
+		// Verify that the request sent to a Service targeted by a BackendTLSPolicy with mismatched host will fail.
+		t.Run("HTTP request sent to Service targeted by BackendTLSPolicy with mismatched hostname should return an HTTP error", func(t *testing.T) {
+			h.MakeRequestAndExpectFailure(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr,
+				h.ExpectedResponse{
+					Namespace: ns,
+					Request: h.Request{
+						Host: serverStr,
+						Path: "/backendTLSHostMismatch",
+						SNI:  serverStr,
+					},
+				})
+		})
+
+		// Verify that request sent to Service targeted by BackendTLSPolicy with mismatched cert should failed.
+		t.Run("HTTP request send to Service targeted by BackendTLSPolicy with mismatched cert should return HTTP error", func(t *testing.T) {
+			h.MakeRequestAndExpectFailure(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr,
+				h.ExpectedResponse{
+					Namespace: ns,
+					Request: h.Request{
+						Host: serverStr,
+						Path: "/backendTLSCertMismatch",
+						SNI:  serverStr,
+					},
 				})
 		})
 	},
