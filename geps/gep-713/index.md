@@ -150,7 +150,9 @@ _(This is a hypothetical example: no ColorPolicy resource is defined in Gateway 
 
 The targets of a Policy object are other Kubernetes objects (or parts of objects), including virtual kinds. They are referenced in the policies by name or using other referencing mechanisms.
 
-In order to fit within the framework described in this document, the targets MUST be declared within a `targetRefs` field within the spec of the Policy object.
+To conform with this specification, targets MUST be declared in a `targetRefs` field within the spec of the Policy object.
+
+Alternatively, a singular `targetRef` field MAY be used in Policy objects that are not intended to support multiple targets. However, relying on the singular form can lead to duplication of Policy objects when users want to repeatedly apply policy specs across multiple targets, increasing the risk of inconsistency and maintenance burden. Additionally, transitioning from `targetRef` to `targetRefs` at a later stage may introduce compatibility and migration challenges.
 
 All kinds of references SHOULD also specify Group, Version and Kind (GVK) information as part of the target (unless the API ensures no more than one kind of object can be targeted).
 
