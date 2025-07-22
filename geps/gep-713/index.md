@@ -269,7 +269,9 @@ Implementations that opt for designing policies that allow for cross namespace r
 
 Policy CRDs can offer the option to target a section of an object whose spec defines sections uniquely identifiable by name. These policies typically include a field `spec.targetRefs.sectionName` that can be used along with compatible kinds.
 
-E.g. – a policy that specifies additional behaviour for a given listener of a Gateway API Gateway object, though not for all listeners of the Gateway, MUST (i) require the Gateway listener to be uniquely named and (ii) provide the `sectionName` field of target reference with the name of the targeted listener.
+This pattern is known to work better with target kinds that specify exactly one list of named subobjects annotated as <code>listType=map</code>. The meaning of <code>sectionName</code> beyond those kinds of resources is implementation-specific.
+
+E.g. – a policy that specifies additional behaviour for a given listener of a Gateway object, though not for all listeners of the Gateway, MUST (i) require the Gateway listener to be uniquely named and (ii) provide the `sectionName` field of target reference with the name of the targeted listener.
 
 ```yaml
 apiVersion: policies.example.com/v1
