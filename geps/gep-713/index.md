@@ -25,6 +25,7 @@ In many cases, it will be better to work to include configuration directly insid
 When designing Gateway API, a recurring challenge became apparent. There was often a need to change or augment the behavior of objects without modifying their specs.
 
 There are several cases where this happens, such as:
+
 - when changing the spec of the object to hold the new piece of information is not possible (e.g., `ReferenceGrant`, from [GEP-709](../gep-709/index.md), when affecting Secrets and Services);
 - when the new specification applies at different scopes (different object kinds), making it more maintainable if the declaration is extracted to a separate object, rather than adding new fields representing the same functionality across multiple objects;
 - when the augmented behavior is intended to [span across relationships of an object](#spanning-behavior-across-relationships-of-a-target) other than the object that is directly referred in the declaration;
@@ -46,17 +47,22 @@ After multiple iterations of Gateway API experimenting with policies—whether t
 ### User stories
 
 - [Ana](../../concepts/roles-and-personas.md#ana) or [Chihiro](../../concepts/roles-and-personas.md#Chihiro) would like to specify some new behavior for a standard Kubernetes resource, but that resource doesn't have a way to specify the behavior and neither Ana nor Chihiro can modify it.
-  - For example, Ana may want to add a rate limit to a Kubernetes Service. The Service object itself doesn't have a field for rate limiting, and Ana can't modify the Service object's definition.
+  E.g., Ana may want to add a rate limit to a Kubernetes Service. The Service object itself doesn't have a field for rate limiting, and Ana can't modify the Service object's definition.
+
 - A Gateway API implementer would like to define some implementation-specific behaviors for Gateway API objects that are already standard.
-  - For example, an implementer might want to provide a way for Chihiro to plug in a WebAssembly module to a particular Gateway listener, including all the configuration required by the module. Support for WebAssembly modules is a feature of this implementation specifically and the Gateway listener spec does not contain fields to declare WebAssembly configuration.
+  E.g., an implementer might want to provide a way for Chihiro to plug in a WebAssembly module to a particular Gateway listener, including all the configuration required by the module. Support for WebAssembly modules is a feature of this implementation specifically and the Gateway listener spec does not contain fields to declare WebAssembly configuration.
+
 - Chihiro would like a way to allow Ana to specify certain behaviors, but not others, in a very fine-grained way.
-  - For example, Chihiro might want to allow Ana to specify rate limits for a Service, but not to specify the Service's ports.
+  E.g., Chihiro might want to allow Ana to specify rate limits for a Service, but not to specify the Service's ports.
+
 - A Gateway API implementer would like to define a way to specify a behavior that applies to a whole hierarchy of objects.
-  - For example, an implementer might want to define a way to specify a behavior that applies to all HTTPRoutes that are attached to a Gateway.
+  E.g., an implementer might want to define a way to specify a behavior that applies to all HTTPRoutes that are attached to a Gateway.
+
 - A Gateway API implementer would like to define a way to specify a behavior that applies to multiple kinds of objects with a single declaration.
-  - For example, an implementer might want to define a way to specify a behavior that applies to selected HTTPRoutes and selected TCPRoutes. Even though the HTTPRoute object could otherwise be extended via an implementation-specific filter, the TCPRoute object cannot.
+  E.g., an implementer might want to define a way to specify a behavior that applies to selected HTTPRoutes and selected TCPRoutes. Even though the HTTPRoute object could otherwise be extended via an implementation-specific filter, the TCPRoute object cannot.
+
 - A third-party provider would like to offer a way to independently extend the behavior of Gateways controlled by one or more Gateway API implementers.
-  - For example, a provider that knows how to configure Gateways controlled by one or more Gateway API implementers might want to define a way for Gateway API users to activate this feature in a standard way across the supported implementations, without direct involvement of the implementers.
+  E.g., a provider that knows how to configure Gateways controlled by one or more Gateway API implementers might want to define a way for Gateway API users to activate this feature in a standard way across the supported implementations, without direct involvement of the implementers.
 
 All [risks and caveats](#tldr) considered, these are in general a few reasons for using metaresources and policies over another (possibly more direct) way to modify the spec ("augment the behavior") of an object:
 
@@ -115,6 +121,7 @@ Designers of new policy kinds are encouraged to read this section top-to-bottom 
 ### Metaresources
 
 As defined above, a metaresource is a resource whose purpose is to augment the behavior of some other resource. At its most basic level, the metaresource pattern consists of:
+
 - A user defines a metaresource describing both the target resource(s) they want to augment, and the intent of the augmentation.
 - The controller(s) implementing the metaresource notices the metaresource and applies the intent to the target resource(s).
 - The controller(s) implementing the metaresource reports the status of the metaresource, indicating whether the intent is being applied or not.
@@ -176,7 +183,7 @@ spec:
 <details>
   <summary>Implementation tip</summary>
 
-  This targeting method can be implemented in Golang by using a type such as Gateway API's [`LocalPolicyTargetReference`](https://pkg.go.dev/sigs.k8s.io/gateway-api/apis/v1alpha2#LocalPolicyTargetReference) type. E.g.:
+  This targeting method can be implemented in Golang by using a type such as Gateway API's <a href="https://pkg.go.dev/sigs.k8s.io/gateway-api/apis/v1alpha2#LocalPolicyTargetReference"><code>LocalPolicyTargetReference</code></a> type. E.g.:
 
   ```go
   package color
@@ -221,13 +228,14 @@ Policies can opt for allowing instances to target objects across Kubernetes name
     Although not strictly forbidden, this is in general discouraged due to [discoverability](#the-discoverability-problem) issues and security implications. Cross namespace references can often lead to escalation of privileges associated with the [Confused deputy problem](https://en.wikipedia.org/wiki/Confused_deputy_problem).
 
 Implementations that opt for designing policies that allow for cross namespace references MUST support one of the following combined approaches, to address the security concern:
+
 - The policy is paired with [ReferenceGrants](https://gateway-api.sigs.k8s.io/api-types/referencegrant/?h=referencegrant) or some other form of equivalent handshake that ensures that the target is accepting the policy.
-- The policy applied client-side and does not grant the client any additional access or permissions than it would otherwise have.
+- The policy applied is client-side and does not grant the client any additional access or permissions than it would otherwise have.
 
 <details>
   <summary>Implementation tip</summary>
 
-  This targeting method can be implemented in Golang by using a type such as Gateway API's [`NamespacedPolicyTargetReference`](https://pkg.go.dev/sigs.k8s.io/gateway-api/apis/v1alpha2#NamespacedPolicyTargetReference) type. E.g.:
+  This targeting method can be implemented in Golang by using a type such as Gateway API's <a href="https://pkg.go.dev/sigs.k8s.io/gateway-api/apis/v1alpha2#NamespacedPolicyTargetReference"><code>NamespacedPolicyTargetReference</code></a> type. E.g.:
 
   ```go
   package color
@@ -290,7 +298,7 @@ spec:
 <details>
   <summary>Implementation tip</summary>
 
-  This targeting method can be implemented in Golang by using a type such as Gateway API's [`LocalPolicyTargetReferenceWithSectionName`](https://pkg.go.dev/sigs.k8s.io/gateway-api/apis/v1alpha2#LocalPolicyTargetReferenceWithSectionName) type. E.g.:
+  This targeting method can be implemented in Golang by using a type such as Gateway API's <a href="https://pkg.go.dev/sigs.k8s.io/gateway-api/apis/v1alpha2#LocalPolicyTargetReferenceWithSectionName"><code>LocalPolicyTargetReferenceWithSectionName</code></a> type. E.g.:
 
   ```go
   package color
@@ -364,6 +372,7 @@ Typically, the relationships between direct and indirect target kinds are organi
 An example of such is a policy that targets a Namespace. Depending on the design of the policy kind, the policy object may declare intent to affect the behavior of the namespace itself (for what concerns the implementation of Namespaces in Kubernetes) or alternatively it can act as a means to affect the behavior of other objects that exist in the referred namespace (e.g. ConfigMaps). While in the former case, the (direct) target object is the Namespace itself, in the latter the (indirect) target is a set of objects of a different kind (e.g. ConfigMaps.)
 
 Another example of this semantic difference in the context of Gateway API objects is a policy that targets the `Gateway` kind, which can be:
+
 * a way to augment the behavior of the `Gateway` object itself (e.g. reconcile cloud infrastructure provider settings from the spec declared by the `Gateway` according to the rules specified by the policy attached to the `Gateway`), or
 * a means to augment the behavior of all `HTTPRoute` objects attached to the `Gateway` (in a way that every new `HTTPRoute` that gets created or modified so it enters the context of the `Gateway` is automatically put in the scope of the policy.)
 
@@ -459,6 +468,7 @@ graph
 ```
 
 The above yields 2 Effective policies:
+
 - For `Route 1`: some combination of `Policy 1` and `Policy 2`
 - For `Route 2`: equal to `Policy 1`
 
@@ -469,6 +479,7 @@ If multiple policies have the same scope (that is, multiple CRs based on the sam
 Conflicts MUST be resolved according to a defined _merge strategy_. A merge strategy is a function that receives two conflicting specs and returns a new spec with the conflict resolved. I.e., `𝑓(spec, spec) → spec`
 
 This GEP defines the following merge strategies, specified in the subsections below:
+
 * None
 * Atomic defaults
 * Atomic overrides
@@ -487,6 +498,7 @@ In a conflict resolution scenario between two specs (two policies), one spec MUS
 Knowing the distinction between _established_ and _challenger_ is useful to determine which and how a particular merge strategy will be applied.
 
 With the exception of the **None** merge strategy, the following rules, continuing on ties, MUST be followed to assign which spec (which policy object) is the _established_ and which one is the _challenger_:
+
 1. Between two policies targeting at different levels of the hierarchy, the one attached higher (less specific) MUST be assigned as the _established_ one.
 2. Between two policies targeting at the same level of the hierarchy, the older policy based on creation timestamp MUST be assigned as the _established_ one.
 3. Between two policies targeting at the same level of the hierarchy and identical creation timestamps, the policy appearing first in alphabetical order by `{namespace}/{name}` MUST be assigned as the _established_ one.
@@ -540,6 +552,7 @@ Implementations MAY specify _custom_ merge strategies. These are implementation-
 ##### Selecting a merge strategy at runtime
 
 Implementations that support multiple merge strategies associated with a particular Policy kind MUST define how a particular merge strategy can be selected at runtime. I.e., how users can specify their preferred merge strategy to use to resolve the conflicts between Policy CRs of that kind. One of the following approaches SHOULD be adopted for this:
+
 - The Policy CRD allows specifying, at any individual Policy CR, one and only one of the merge strategies associated with the Policy CRD, and that specified merged strategy MUST be used to resolve conflicts involving this Policy CR according to the [Conflict resolution rules](#conflict-resolution-rules) specified in this GEP.
 - The controller implementing the policy has its own predefined way to determine among multiple implemented merge strategies which merge strategy to apply to resolve the conflicts between the Policy CRs according to the [Conflict resolution rules](#conflict-resolution-rules) specified in this GEP. This approach MAY include configurations of the controller implementing the Policy kind or any other way other than specifying the merge strategy at individual Policy CRs.
 
@@ -548,14 +561,16 @@ Policy CRDs that let users specify at any individual Policy CR one of multiple i
 User MUST NOT be allowed to specify at any individual Policy CR more than one merge strategy at a time.
 
 Two known patterns adopted by Policy implementations that support specifying one of multiple merge strategies in the Policy CRs are:
+
 - The definition of a `strategy` field in the `spec` stanza of the Policy, or equivalentely a `mergeType` field.
 - The definition of `defaults` and/or `overrides` fields in the `spec` stanza of the policy wrapping the "spec proper" fields.
 
-Policy CRDs that define a `defaults` field to specify the merge strategy at individual Policy CRs, in the lack further discrimination of a more specific strategy, SHOULD assume the **Atomic Defaults** merge strategy whenever this field is used to determine the merge strategy.
+Policy CRDs that define a `defaults` field to specify the merge strategy at individual Policy CRs, in the lack of further discrimination of a more specific strategy, SHOULD assume the **Atomic Defaults** merge strategy whenever this field is used to determine the merge strategy.
 
-Policy CRDs that define an `overrides` field to specify the merge strategy at individual Policy CRs, in the lack further discrimination of a more specific strategy, SHOULD assume the **Atomic Overrides** merge strategy whenever this field is used to determine the merge strategy.
+Policy CRDs that define an `overrides` field to specify the merge strategy at individual Policy CRs, in the lack of further discrimination of a more specific strategy, SHOULD assume the **Atomic Overrides** merge strategy whenever this field is used to determine the merge strategy.
 
 For Policy kinds that implement multiple merge strategies, whenever the merge strategy is not specified, the first of the following merge strategies associated with the Policy kind, in order, SHOULD be assumed:
+
 - Atomic Defaults
 - Patch Defaults
 - Atomic Overrides
@@ -1102,7 +1117,7 @@ Gateway API defines two kinds of Direct policies, both for augmenting the behavi
 
 #### Envoy Gateway
 
-<small>https://gateway.envoyproxy.io/docs/api/extension_types/</small>
+https://gateway.envoyproxy.io/docs/api/extension_types/
 
 Gateway API implementation that defines the following kinds of policies:
 
@@ -1116,7 +1131,7 @@ Gateway API implementation that defines the following kinds of policies:
 
 #### Istio
 
-<small>https://istio.io/latest/docs/reference/config/</small>
+https://istio.io/latest/docs/reference/config/
 
 Gateway API implementation that defines the following kinds of policies:
 
@@ -1130,7 +1145,7 @@ Gateway API implementation that defines the following kinds of policies:
 
 #### NGINX Gateway Fabric
 
-<small>https://docs.nginx.com/nginx-gateway-fabric/overview/custom-policies/</small>
+https://docs.nginx.com/nginx-gateway-fabric/overview/custom-policies/
 
 Gateway API implementation that supports Gateway API’s `BackendTLSPolicy` as well as the following kinds of policies:
 
@@ -1142,7 +1157,7 @@ Gateway API implementation that supports Gateway API’s `BackendTLSPolicy` as w
 
 #### Gloo Gateway
 
-<small>https://docs.solo.io/gateway/latest/about/custom-resources/#policies</small>
+https://docs.solo.io/gateway/latest/about/custom-resources/#policies
 
 Gateway API implementation that defines the following kinds of policies:
 
@@ -1155,7 +1170,7 @@ Gateway API implementation that defines the following kinds of policies:
 
 #### Kuadrant
 
-<small>https://docs.kuadrant.io</small>
+https://docs.kuadrant.io
 
 First Gateway API integration entirely based on the Metaresources and Policy Attachment pattern. Defines the following kinds of policies:
 
@@ -1170,7 +1185,7 @@ First Gateway API integration entirely based on the Metaresources and Policy Att
 
 #### Network Policy API (Working Group, SIG-NETWORK)
 
-<small>https://network-policy-api.sigs.k8s.io/</small>
+https://network-policy-api.sigs.k8s.io/
 
 Defines two kinds of metaresources respectively for specifying *default* and *override* of networking policy rules: **AdminNetworkPolicy** and **BaselineAdminNetworkPolicy**. Builds on top of Kubernetes core `NetworkPolicy` kind.
 
@@ -1178,7 +1193,7 @@ Although the Network Policy API custom resources do not strictly implement the M
 
 #### Open Cluster Management
 
-<small>https://open-cluster-management.io/docs/getting-started/integration/policy-controllers/policy-framework/</small>
+https://open-cluster-management.io/docs/getting-started/integration/policy-controllers/policy-framework/
 
 Does not implement Metaresources and Policy Attachment. However, defines a virtual policy kind (**ConfigurationPolicy**) and supports distributing other third-party kinds of policies such as Gatekeeper's **ConstraintTemplate** kind, via a **Policy** resource whose targets are nonetheless controlled by a separate set of resource (**Placement** and **PlacementBinding**).
 
@@ -1188,20 +1203,22 @@ The following tools can be useful for implementing and supporting policies and p
 
 #### gwctl
 
-<small>https://github.com/kubernetes-sigs/gwctl</small>
+https://github.com/kubernetes-sigs/gwctl
 
 CLI tool for visualizing and managing Gateway API resources in a Kubernetes cluster. Includes commands to visualize effective policies affecting the resources in compliance with the Metaresources and Policy Attachment pattern.
 
 #### policy-machinery
 
-<small>https://github.com/Kuadrant/policy-machinery</small>
+https://github.com/Kuadrant/policy-machinery
 
 Golang library for implementing policy controllers. Defines types and functions to build Directed Acyclic Graphs (DAG) to represent hierarchies of targetable resources and attached policies, calculate effective policies based on standard and custom merge strategies, etc. Includes helpers for applications based on Gateway API.
 
 ## References
 
 **Issues**
+
 * [Extensible Service Policy and Configuration](https://github.com/kubernetes-sigs/gateway-api/issues/611)
 
 **Docs**
+
 * [Policy Attachment and Binding](https://docs.google.com/document/d/13fyptUtO9NV_ZAgkoJlfukcBf2PVGhsKWG37yLkppJo/edit?resourcekey=0-Urhtj9gBkGBkSL1gHgbWKw)
