@@ -14,11 +14,9 @@ It lays out guidelines for Gateway API implementations and other stakeholders fo
 !!! warning
     This GEP specifies a _pattern_, not an API field or new object. It defines some terms, including _Metaresource_, _Policies_ and _Policy Attachment_, and their related concepts.
 
-!!! danger
-    This pattern is so far agreed upon only by Gateway API implementers who were in need of an immediate solution and didn't want all their solutions to be completely different and disparate, but does not have wide agreement or review from the rest of Kubernetes (particularly API Machinery).
-    It is then conceivable that this problem domain gets a different solution in core in the future at which time this pattern might be considered obsoleted by that one.
-    When implementations have need of something that is not in the spec and free from the [user stories](#user-stories) for which this pattern has been primarily thought, they are encouraged to explore other means (e.g. trying to work their feature into the upstream spec) before considering introducing their own custom metaresources.
-    Examples of challenges associated with this pattern include the [Discoverability problem](#the-discoverability-problem) and the [Fanout status update problem](#fanout-status-update-problems).
+This pattern is currently unique to the Gateway API community. It's possible that in the future a better and broader form of extending Kubernetes APIs will emerge that could make this one obsolete.
+Policy attachment is the best way we've found to extend Gateway API resources so far, but it does come with meaningful challenges, such as the [Discoverability problem](#the-discoverability-problem) and the [Fanout status update problem](#fanout-status-update-problems).
+In many cases, it will be better to work to include configuration directly inside upstream APIs instead of resorting to policy attachment.
 
 ## Overview and Concepts
 
