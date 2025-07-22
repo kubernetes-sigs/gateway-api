@@ -31,6 +31,7 @@ type GatewaySpecApplyConfiguration struct {
 	Infrastructure   *GatewayInfrastructureApplyConfiguration `json:"infrastructure,omitempty"`
 	BackendTLS       *GatewayBackendTLSApplyConfiguration     `json:"backendTLS,omitempty"`
 	AllowedListeners *AllowedListenersApplyConfiguration      `json:"allowedListeners,omitempty"`
+	TLSConfigs       *apisv1.GatewayTLSConfigs                `json:"tlsConfigs,omitempty"`
 }
 
 // GatewaySpecApplyConfiguration constructs a declarative configuration of the GatewaySpec type for use with
@@ -94,5 +95,13 @@ func (b *GatewaySpecApplyConfiguration) WithBackendTLS(value *GatewayBackendTLSA
 // If called multiple times, the AllowedListeners field is set to the value of the last call.
 func (b *GatewaySpecApplyConfiguration) WithAllowedListeners(value *AllowedListenersApplyConfiguration) *GatewaySpecApplyConfiguration {
 	b.AllowedListeners = value
+	return b
+}
+
+// WithTLSConfigs sets the TLSConfigs field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the TLSConfigs field is set to the value of the last call.
+func (b *GatewaySpecApplyConfiguration) WithTLSConfigs(value apisv1.GatewayTLSConfigs) *GatewaySpecApplyConfiguration {
+	b.TLSConfigs = &value
 	return b
 }

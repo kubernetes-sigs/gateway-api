@@ -164,6 +164,8 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1.SessionPersistenceApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("SupportedFeature"):
 		return &apisv1.SupportedFeatureApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("TLSConfig"):
+		return &apisv1.TLSConfigApplyConfiguration{}
 
 		// Group=gateway.networking.k8s.io, Version=v1alpha2
 	case v1alpha2.SchemeGroupVersion.WithKind("GRPCRoute"):

@@ -102,13 +102,11 @@ type TLSConfig struct {
 	//
 	// +optional
 	// <gateway:experimental>
-	Port *PortNumber
+	Port *PortNumber `json:"port,omitempty"`
 	// FrontendValidation holds configuration information for validating the frontend (client).
 	// Setting this field will result in mutual authentication when connecting to the gateway. In browsers this may result in a dialog appearing
 	// that requests a user to specify the client certificate.
 	// The maximum depth of a certificate chain accepted in verification is Implementation specific.
-	//
-	// Each field may be overidden by an equivalent setting applied at the Listener level.
 	//
 	// Support: Extended
 	//
@@ -156,14 +154,14 @@ type FrontendTLSValidation struct {
 	//
 	// Defaults to AllowValidOnly.
 	//
-	// Support: Extended
+	// Support: Core
 	//
 	// +optional
 	// +kubebuilder:default=AllowValidOnly
-	Mode *FrontendValidationModeType `json:"mode,omitempty"`
+	Mode FrontendValidationModeType `json:"mode,omitempty"`
 }
 
-// FrontendValidationModeType type defines how a Gateway or Listener validates client certificates.
+// FrontendValidationModeType type defines how a Gateway validates client certificates.
 //
 // +kubebuilder:validation:Enum=AllowValidOnly;AllowInvalidOrMissingCert
 type FrontendValidationModeType string

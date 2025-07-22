@@ -412,8 +412,7 @@ spec:
                         frontendValidation:
                           description: |-
                             FrontendValidation holds configuration information for validating the frontend (client).
-                            Setting this field will require clients to send a client certificate
-                            required for validation during the TLS handshake. In browsers this may result in a dialog appearing
+                            Setting this field will result in mutual authentication when connecting to the gateway. In browsers this may result in a dialog appearing
                             that requests a user to specify the client certificate.
                             The maximum depth of a certificate chain accepted in verification is Implementation specific.
 
@@ -434,8 +433,8 @@ spec:
                                 Support: Core - A single reference to a Kubernetes ConfigMap
                                 with the CA certificate in a key named `ca.crt`.
 
-                                Support: Implementation-specific (More than one reference, or other kinds
-                                of resources).
+                                Support: Implementation-specific (More than one certificate in a ConfigMap
+                                with different keys or more than one reference, or other kinds of resources).
 
                                 References to a resource in a different namespace are invalid UNLESS there
                                 is a ReferenceGrant in the target namespace that allows the certificate
@@ -496,6 +495,25 @@ spec:
                               minItems: 1
                               type: array
                               x-kubernetes-list-type: atomic
+                            mode:
+                              default: AllowValidOnly
+                              description: |-
+                                FrontendValidationMode defines the mode for validating the client certificate.
+                                There are two possible modes:
+
+                                - AllowValidOnly: In this mode, the gateway will accept connections only if
+                                  the client presents a valid certificate. This certificate must successfully
+                                  pass validation against the CA certificates specified in `CACertificateRefs`.
+                                - AllowInvalidOrMissingCert: In this mode, the gateway will accept
+                                  connections even if the client certificate is not presented or fails verification.
+
+                                Defaults to AllowValidOnly.
+
+                                Support: Core
+                              enum:
+                              - AllowValidOnly
+                              - AllowInvalidOrMissingCert
+                              type: string
                           required:
                           - caCertificateRefs
                           type: object
