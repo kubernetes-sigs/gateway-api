@@ -10,9 +10,9 @@
 This GEP proposes a way to validate the TLS certificate presented by the frontend client to the server
 (Gateway in this case) during a [TLS Handshake Protocol][].
 
-## Connection coalescing seccurity issue
+## Connection coalescing security issue
 
-Gateway API standard defines a `Listener` as "the concept of a logical endpoint where a Gateway accepts network connections." This statement is incorrect because once the connection is established (this applies to both HTTP and TLS traffic) it can be reused across multiple listeners sharing the same port. This might lead to bypassing client certificate validation configuration for a given `Listener`. To provide the best experience for gateway users and secure their applications, client certificate configuration needs to be introduced with finer granularity per-port (binding to TCP connection).
+Gateway API standard defines a `Listener` as "the concept of a logical endpoint where a Gateway accepts network connections." This statement is incorrect because once the connection is established (this applies to both HTTP and TLS traffic) it can be reused across multiple listeners sharing the same port. This might lead to bypassing client certificate validation configuration for a given `Listener`. Those concerns were raised in [GEP-3567](). To provide the best experience for gateway users and secure their applications, client certificate configuration needs to be introduced with finer granularity per-port (binding to TCP connection).
 
 ## Goals
 
@@ -31,9 +31,9 @@ This use case has been highlighted in the [TLS Configuration GEP][] under segmen
 This proposal adds the ability to validate the TLS certificate presented by the *client* connecting to the Gateway (the frontend).
 These two validation mechanisms operate independently and can be used simultaneously.
 * Introduce a `caCertificateRefs` field within `FrontendTLSValidation` that can be used to specify a list of CA Certificates that can be used as a trust anchor to validate the certificates presented by the client.
-* Add a new `FrontendValidationModeType` enum within `FrontendTLSValidation` with the following values:
-  * `AllowValidOnly`
-  * `AllowInvalidOrMissingCert`
+* Add a new `FrontendValidationModeType` enum within `FrontendTLSValidation` indicating how gateway should validate client certificates. As for now we support following values but it might change in the future:
+  1) `AllowValidOnly`
+  2) `AllowInvalidOrMissingCert`
 * Introduce a `ObjectReference` structure that can be used to specify `caCertificateRefs` references.
 * Introduce a `tls` field within the Gateway Spec to allow for a common TLS configuration to apply across all listeners.
 
@@ -133,7 +133,7 @@ type FrontendTLSValidation struct {
 	// Support: Core - A single reference to a Kubernetes ConfigMap
 	// with the CA certificate in a key named `ca.crt`.
 	//
-	// Support: Implementation-specific (More than one certificat in a ConfigMap with different keys or more than one reference, or other kinds of resources).
+	// Support: Implementation-specific (More than one certificate in a ConfigMap with different keys or more than one reference, or other kinds of resources).
 	//
 	// References to a resource in a different namespace are invalid UNLESS there
 	// is a ReferenceGrant in the target namespace that allows the certificate
@@ -142,7 +142,7 @@ type FrontendTLSValidation struct {
 	// "RefNotPermitted" reason.
 	//
 	// +kubebuilder:validation:MaxItems=8
-	// +kubebuilder:validation:MinItems=0
+	// +kubebuilder:validation:MinItems=1
 	CACertificateRefs []ObjectReference `json:"caCertificateRefs,omitempty"`
 
 	// FrontendValidationMode defines the mode for validating the client certificate.
@@ -177,6 +177,13 @@ const (
 	// presented during the handshake or the validation against CA certificates may fail.
 	AllowInvalidOrMissingCert FrontendValidationModeType = "AllowInvalidOrMissingCert"
 )
+
+type GatewaySpec struct {
+    ...
+    // TLSConfigs stores TLS configurations for a Gateway.
+    TLSConfigs GatewayTLSConfigs
+}
+
 ```
 
 #### YAML
@@ -318,3 +325,4 @@ This GEP aims to standardize this behavior as an official part of the upstream s
 [BackendTLSPolicy]: ../../api-types/backendtlspolicy.md
 [TLS Configuration GEP]: ../gep-2907/index.md
 [Gateway API TLS Use Cases]: https://docs.google.com/document/d/17sctu2uMJtHmJTGtBi_awGB0YzoCLodtR6rUNmKMCs8/edit?pli=1#heading=h.cxuq8vo8pcxm
+[GEP-3567]: https://gateway-api.sigs.k8s.io/geps/gep-3567/

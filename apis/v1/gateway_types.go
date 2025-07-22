@@ -289,18 +289,6 @@ type GatewaySpec struct {
 	//
 	// +optional
 	AllowedListeners *AllowedListeners `json:"allowedListeners,omitempty"`
-
-	// TLS is the TLS configurations for the Gateway.
-	// This configuration currently supports only
-	// client certificate validation.
-	// Future releases may include extended functionalities.
-	//
-	// GatewayTLSConfigs will impact all existing and newly added Listeners.
-	//
-	// Support: Core
-	//
-	// +optional
-	TLS GatewayTLSConfigs `json:"tls,omitempty"`
 }
 
 // AllowedListeners defines which ListenerSets can be attached to this Gateway.
@@ -413,7 +401,7 @@ type Listener struct {
 	// the Protocol field is "HTTPS" or "TLS". It is invalid to set this field
 	// if the Protocol field is "HTTP", "TCP", or "UDP".
 	//
-	// The association of SNIs to Certificate defined in ListenerTLSConfig is
+	// The association of SNIs to Certificate defined in GatewayTLSConfig is
 	// defined based on the Hostname field for this listener.
 	//
 	// The GatewayClass MUST use the longest matching SNI out of all
@@ -422,7 +410,7 @@ type Listener struct {
 	// Support: Core
 	//
 	// +optional
-	TLS *ListenerTLSConfig `json:"tls,omitempty"`
+	TLS *GatewayTLSConfig `json:"tls,omitempty"`
 
 	// AllowedRoutes defines the types of routes that MAY be attached to a
 	// Listener and the trusted namespaces where those Route resources MAY be
@@ -525,10 +513,10 @@ type GatewayBackendTLS struct {
 	ClientCertificateRef *SecretObjectReference `json:"clientCertificateRef,omitempty"`
 }
 
-// ListenerTLSConfig describes a TLS configuration that can be applied to a Listener.
+// GatewayTLSConfig describes a TLS configuration.
 //
 // +kubebuilder:validation:XValidation:message="certificateRefs or options must be specified when mode is Terminate",rule="self.mode == 'Terminate' ? size(self.certificateRefs) > 0 || size(self.options) > 0 : true"
-type ListenerTLSConfig struct {
+type GatewayTLSConfig struct {
 	// Mode defines the TLS behavior for the TLS session initiated by the client.
 	// There are two possible modes:
 	//
@@ -576,6 +564,18 @@ type ListenerTLSConfig struct {
 	// +kubebuilder:validation:MaxItems=64
 	CertificateRefs []SecretObjectReference `json:"certificateRefs,omitempty"`
 
+	// FrontendValidation holds configuration information for validating the frontend (client).
+	// Setting this field will require clients to send a client certificate
+	// required for validation during the TLS handshake. In browsers this may result in a dialog appearing
+	// that requests a user to specify the client certificate.
+	// The maximum depth of a certificate chain accepted in verification is Implementation specific.
+	//
+	// Support: Extended
+	//
+	// +optional
+	// <gateway:experimental>
+	FrontendValidation *FrontendTLSValidation `json:"frontendValidation,omitempty"`
+
 	// Options are a list of key/value pairs to enable extended TLS
 	// configuration for each implementation. For example, configuring the
 	// minimum TLS version or supported cipher suites.
@@ -610,33 +610,6 @@ const (
 	TLSModePassthrough TLSModeType = "Passthrough"
 )
 
-// TLSConfig describes a TLS configuration that can be applied to all Gateway
-// Listeners or to all Listeners matching the Port if set.
-type TLSConfig struct {
-	// The Port indicates the Port Number to which the TLS configuration will be
-	// applied. If the field is not set the TLS Configuration will be applied to
-	// all Listeners.
-	//
-	// Support: Extended
-	//
-	// +optional
-	// <gateway:experimental>
-	Port *PortNumber
-	// FrontendValidation holds configuration information for validating the frontend (client).
-	// Setting this field will result in mutual authentication when connecting to the gateway.
-	// In browsers this may result in a dialog appearing
-	// that requests a user to specify the client certificate.
-	// The maximum depth of a certificate chain accepted in verification is Implementation specific.
-	//
-	// Each field may be overidden by an equivalent setting applied at the Listener level.
-	//
-	// Support: Extended
-	//
-	// +optional
-	// <gateway:experimental>
-	FrontendValidation *FrontendTLSValidation `json:"frontendValidation,omitempty"`
-}
-
 // FrontendTLSValidation holds configuration information that can be used to validate
 // the frontend initiating the TLS connection
 type FrontendTLSValidation struct {
@@ -653,8 +626,8 @@ type FrontendTLSValidation struct {
 	// Support: Core - A single reference to a Kubernetes ConfigMap
 	// with the CA certificate in a key named `ca.crt`.
 	//
-	// Support: Implementation-specific (More than one certificat in a ConfigMap
-	// with different keys or more than one reference, or other kinds of resources)
+	// Support: Implementation-specific (More than one reference, or other kinds
+	// of resources).
 	//
 	// References to a resource in a different namespace are invalid UNLESS there
 	// is a ReferenceGrant in the target namespace that allows the certificate
@@ -663,54 +636,9 @@ type FrontendTLSValidation struct {
 	// "RefNotPermitted" reason.
 	//
 	// +kubebuilder:validation:MaxItems=8
-	// +kubebuilder:validation:MinItems=0
+	// +kubebuilder:validation:MinItems=1
 	CACertificateRefs []ObjectReference `json:"caCertificateRefs,omitempty"`
-
-	// FrontendValidationMode defines the mode for validating the client certificate.
-	// There are two possible modes:
-	//
-	// - AllowValidOnly: In this mode, the gateway will accept connections only if
-	//   the client presents a valid certificate. This certificate must successfully
-	//   pass validation against the CA certificates specified in `CACertificateRefs`.
-	// - AllowInvalidOrMissingCert: In this mode, the gateway will accept
-	//   connections even if the client certificate is not presented or fails verification.
-	//
-	// Defaults to AllowValidOnly.
-	//
-	// Support: Extended
-	//
-	// +optional
-	// +kubebuilder:default=AllowValidOnly
-	Mode *FrontendValidationModeType `json:"mode,omitempty"`
 }
-
-// GatewayTLSConfigs stores TLS configurations for a Gateway.
-//
-//   - If the `port` field in `TLSConfig` is not set, the TLS configuration applies
-//     to all listeners in the gateway. We call this `default` configuration.
-//   - If the `port` field in `TLSConfig` is set, the TLS configuration applies
-//     only to listeners with a matching port. Each port requires a unique TLS configuration.
-//   - Per-port configurations can override the `default` configuration.
-//   - The `default` configuration is optional. Clients can apply TLS configuration
-//     to a subset of listeners by creating only per-port configurations then Listeners
-//     with a port that does not match any TLS configuration will not have
-//     `frontendValidation` set.
-type GatewayTLSConfigs = []TLSConfig
-
-// FrontendValidationModeType type defines how a Gateway or Listener validates client certificates.
-//
-// +kubebuilder:validation:Enum=AllowValidOnly;AllowInvalidOrMissingCert
-type FrontendValidationModeType string
-
-const (
-	// AllowValidOnly indicates that a client certificate is required
-	// during the TLS handshake and MUST pass validation.
-	AllowValidOnly FrontendValidationModeType = "AllowValidOnly"
-
-	// AllowInvalidOrMissingCert indicates that a client certificate may not be
-	// presented during the handshake or the validation against CA certificates may fail.
-	AllowInvalidOrMissingCert FrontendValidationModeType = "AllowInvalidOrMissingCert"
-)
 
 // AllowedRoutes defines which Routes may be attached to this Listener.
 type AllowedRoutes struct {
