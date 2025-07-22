@@ -456,7 +456,7 @@ The above yields 2 Effective policies:
 
 If multiple policies have the same scope (that is, multiple CRs based on the same Policy kind affect the same [effective target](#declared-targets-versus-effective-targets)), this is considered to be a _conflict_.
 
-Conflicts MUST be resolved according to a defined _merge strategy_. A merge strategy is a function that receives two conflicting specs and returns a new spec with the conflict resolved.
+Conflicts MUST be resolved according to a defined _merge strategy_. A merge strategy is a function that receives two conflicting specs and returns a new spec with the conflict resolved. I.e., `𝑓(spec, spec) → spec`
 
 This GEP defines the following merge strategies, specified in the subsections below:
 * None
@@ -472,18 +472,16 @@ Policy CRD that implement more than one merge strategy MUST provide a way for us
 
 ##### Conflict resolution rules
 
-In a conflict resolution scenario between two specs (two policies), one spec MUST be assigned as the _established_ spec and the other one as the _challenger_ spec, according to rules specified in this GEP.
+In a conflict resolution scenario between two specs (two policies), one spec MUST be assigned as the _established_ spec and the other one as the _challenger_ spec.
 
-Knowing the distinction between _established_ and _challenger_ is useful to determine which and how a particular merge strategy will be applied. For Policy CRDs that let users specify merge strategies at individual Policy CRs, the spec assigned as _established_ MUST dictate the merge strategy to apply to resolve a conflict.
-
-In other words:
-- When the Policy CRD allows specifying the merge strategy at individual CRs, then `established ⇒ 𝑓`.
-- When a merge strategy `𝑓` is known (e.g., due to dictated by _established_ or, implicitly, due to only supported strategy associated with the Policy CRD), then `𝑓(established, challenger) ?= 𝑓(challenger, established)`, including occasionally `𝑓(established, challenger) ≠ 𝑓(challenger, established)`.
+Knowing the distinction between _established_ and _challenger_ is useful to determine which and how a particular merge strategy will be applied.
 
 With the exception of the **None** merge strategy, the following rules, continuing on ties, MUST be followed to assign which spec (which policy object) is the _established_ and which one is the _challenger_:
 1. Between two policies targeting at different levels of the hierarchy, the one attached higher (less specific) MUST be assigned as the _established_ one.
 2. Between two policies targeting at the same level of the hierarchy, the older policy based on creation timestamp MUST be assigned as the _established_ one.
 3. Between two policies targeting at the same level of the hierarchy and identical creation timestamps, the policy appearing first in alphabetical order by `{namespace}/{name}` MUST be assigned as the _established_ one.
+
+For Policy CRDs that let users specify merge strategies at individual Policy CRs, the spec assigned as _established_ MUST dictate the merge strategy to apply to resolve a conflict. I.e., `established ⇒ 𝑓`.
 
 ##### Merge strategy: None
 
