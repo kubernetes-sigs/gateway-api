@@ -54,6 +54,10 @@ ROOT := $(abspath $(TOP))
 CONFORMANCE_FLAGS ?=
 GO_TEST_FLAGS ?=
 
+# Flags for CRD validation tests
+CEL_TEST_K8S_VERSION ?= 
+CEL_TEST_CRD_CHANNEL ?= standard
+
 all: generate vet fmt verify test
 
 # Run generators for protos, Deepcopy funcs, CRDs, and docs.
@@ -85,7 +89,7 @@ test:
 # Run tests for CRDs validation
 .PHONY: test.crds-validation
 test.crds-validation:
-	./hack/test-crds-validation.sh $(VERSION)
+	K8S_VERSION=$(CEL_TEST_K8S_VERSION) CRD_CHANNEL=$(CEL_TEST_CRD_CHANNEL) go test ${GO_TEST_FLAGS} -count=1 -timeout=120s --tags=$(CEL_TEST_CRD_CHANNEL) -v ./pkg/test/cel 
 
 # Run conformance tests against controller implementation
 .PHONY: conformance
