@@ -22,7 +22,7 @@ In many cases, it will be better to work to include configuration directly insid
 
 ### Background
 
-When designing Gateway API, a recurring challenge became apparent. There was often a need to change ("augment") the behavior of objects without modifying their specs.
+When designing Gateway API, a recurring challenge became apparent. There was often a need to change or augment the behavior of objects without modifying their specs.
 
 There are several cases where this happens, such as:
 - when changing the spec of the object to hold the new piece of information is not possible (e.g., `ReferenceGrant`, from [GEP-709](../gep-709/index.md), when affecting Secrets and Services);
