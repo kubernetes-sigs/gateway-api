@@ -37,9 +37,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
 )
 
-var (
-	k8sClient client.Client
-)
+var k8sClient client.Client
 
 func TestMain(m *testing.M) {
 	scheme := runtime.NewScheme()

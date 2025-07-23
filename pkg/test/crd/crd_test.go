@@ -1,11 +1,11 @@
 /*
-Copyright 2023 The Kubernetes Authors.
+Copyright 2025 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-	http://www.apache.org/licenses/LICENSE-2.0
+    http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,6 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+
 package crd_test
 
 import (
@@ -69,7 +70,7 @@ func TestCRDValidation(t *testing.T) {
 		crdChannel = requestedCRDChannel
 	}
 
-	t.Run("should be able to start test environment", func(t *testing.T) {
+	t.Run("should be able to start test environment", func(_ *testing.T) {
 		testEnv = &envtest.Environment{
 			Scheme:                      scheme,
 			ErrorIfCRDPathMissing:       true,
@@ -98,7 +99,7 @@ func TestCRDValidation(t *testing.T) {
 		require.NotEmpty(t, kubectlLocation)
 
 		kubeconfigLocation = fmt.Sprintf("%s/kubeconfig", filepath.Dir(kubectlLocation))
-		require.NoError(t, os.WriteFile(kubeconfigLocation, testEnv.KubeConfig, 0600))
+		require.NoError(t, os.WriteFile(kubeconfigLocation, testEnv.KubeConfig, 0o600))
 
 		apiResources, err := executeKubectlCommand(t, kubectlLocation, kubeconfigLocation, []string{"api-resources"})
 		require.NoError(t, err)
@@ -125,12 +126,11 @@ func TestCRDValidation(t *testing.T) {
 		for _, example := range files {
 			t.Run(fmt.Sprintf("validate example %s", example), func(t *testing.T) {
 				output, err := executeKubectlCommand(t, kubectlLocation, kubeconfigLocation, []string{"apply", "-f", example})
-				assert.Error(t, err)
+				require.Error(t, err)
 				assert.True(t, expectedValidationError(output), "output does not contain the expected error", output)
 			})
 		}
 	})
-
 }
 
 func expectedValidationError(cmdoutput string) bool {
