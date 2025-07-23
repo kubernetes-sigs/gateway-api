@@ -28,7 +28,8 @@ safely, though they recognize that this may require additional configuration.
 
 This GEP defines the problems that need to be solved to allow out-of-cluster
 Gateways (OCGs) to usefully participate in a GAMMA-compliant in-cluster mesh.
-The API to actually solve these problems will be defined in a future GEP.
+The API to actually solve these problems will be defined in one or more future
+GEPs.
 
 [Chihiro]: https://gateway-api.sigs.k8s.io/concepts/roles-and-personas/#chihiro
 [Ian]: https://gateway-api.sigs.k8s.io/concepts/roles-and-personas/#ian
