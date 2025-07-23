@@ -99,8 +99,8 @@ the Mesh resource
 is currently pretty simple:
 
 ```yaml
-apiVersion: networking.x-k8s.io/v1alpha1
-kind: Mesh
+apiVersion: gateway.networking.x-k8s.io/v1alpha1
+kind: XMesh
 metadata:
   name: one-mesh-to-mesh-them-all
 spec:
@@ -110,6 +110,15 @@ spec:
     # optional ParametersReference
     ...
 ```
+
+- Although we call this the Mesh resource,
+  as an experimental API
+  it must be named XMesh
+  in the `gateway.networking.x-k8s.io` API group.
+
+   When the API graduates to standard,
+   it will be renamed to `Mesh`
+   in the `gateway.networking.k8s.io` API group.
 
 - The `controllerName` field
   is analogous to
@@ -171,8 +180,8 @@ what features
 the mesh supports.
 
 ```yaml
-apiVersion: networking.x-k8s.io/v1
-kind: Mesh
+apiVersion: gateway.networking.x-k8s.io/v1
+kind: XMesh
 metadata:
   name: one-mesh-to-mesh-them-all
   namespace: mesh-namespace
