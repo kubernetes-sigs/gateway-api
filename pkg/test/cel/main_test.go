@@ -42,7 +42,6 @@ var (
 )
 
 func TestMain(m *testing.M) {
-
 	scheme := runtime.NewScheme()
 	var restConfig *rest.Config
 	var testEnv *envtest.Environment
