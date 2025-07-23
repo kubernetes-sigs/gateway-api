@@ -20,10 +20,14 @@ relationships:
   extendedBy: {}
   # seeAlso indicates other GEPs that are relevant in some way without being
   # covered by an existing relationship.
-  seeAlso: {}
+  seeAlso:
+  - number: 3949
+    name: Mesh Resource
+    description: Defines the Mesh resource for managing service mesh configurations.
 # references is a list of hyperlinks to relevant external references.
 # It's intended to be used for storing GitHub discussions, Google docs, etc.
-references: {}
+references:
+  - https://www.rfc-editor.org/rfc/rfc8174
 # featureNames is a list of the feature names introduced by the GEP, if there
 # are any. This will allow us to track which feature was introduced by which GEP.
 # This is the value added to supportedFeatures and the conformance tests, in string form.
