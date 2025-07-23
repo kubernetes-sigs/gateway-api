@@ -180,7 +180,7 @@ what features
 the mesh supports.
 
 ```yaml
-apiVersion: gateway.networking.x-k8s.io/v1
+apiVersion: gateway.networking.x-k8s.io/v1alpha1
 kind: XMesh
 metadata:
   name: one-mesh-to-mesh-them-all
