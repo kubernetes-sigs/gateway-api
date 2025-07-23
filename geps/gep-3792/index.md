@@ -15,12 +15,13 @@ using a Service of type LoadBalancer fronting a Kubernetes pod running a
 proxy. This is simple to reason about, easy to manage for sidecar meshes, and
 will presumably be an important implementation mechanism for the foreseeable
 future. Some cloud providers, though, are moving the proxy outside of the
-cluster, for various reasons which are out of the scope of this GEP. Chihiro
-and Ian want to be able to use these out-of-cluster proxies effectively and
+cluster, for various reasons which are out of the scope of this GEP. [Chihiro]
+and [Ian] want to be able to use these out-of-cluster proxies effectively and
 safely, though they recognize that this may require additional configuration.
 
 [Chihiro]: https://gateway-api.sigs.k8s.io/concepts/roles-and-personas/#chihiro
 [Ian]: https://gateway-api.sigs.k8s.io/concepts/roles-and-personas/#ian
+[Ana]: https://gateway-api.sigs.k8s.io/concepts/roles-and-personas/#ana
 
 ### Nomenclature and Background
 
@@ -74,7 +75,7 @@ In this GEP:
 
 ## Goals
 
-- Allow Chihiro and Ian to configure an OCG and a mesh such that the OCG can
+- Allow [Chihiro] and [Ian] to configure an OCG and a mesh such that the OCG can
   usefully participate in the mesh, including:
 
     - The OCG must be able to securely communicate with meshed workloads in
@@ -91,7 +92,7 @@ In this GEP:
     - The OCG must be able to distinguish meshed workloads from non-meshed
       workloads, so that it can communicate appropriately with each.
 
-- Allow Ana to develop and operate meshed applications without needing to know
+- Allow [Ana] to develop and operate meshed applications without needing to know
   whether the Gateway she's using is an OCG or an in-cluster Gateway.
 
 - Define a basic set of requirements for OCGs and meshes that want to
@@ -162,7 +163,7 @@ configuration.
 
 To allow the OCG to _usefully_ participate in the mesh, we need to solve at
 least four significant problems. Thankfully, these are mostly problems for
-Chihiro -- if we do our jobs correctly, Ana will never need to know.
+[Chihiro] -- if we do our jobs correctly, [Ana] will never need to know.
 
 #### 1. The Trust Problem
 
