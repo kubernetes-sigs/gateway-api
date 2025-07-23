@@ -113,3 +113,19 @@ final release when it is cut.
 
 [Release Cycle]:https://gateway-api.sigs.k8s.io/contributing/release-cycle/
 [Milestone]:#github-milestone
+
+## Time Extensions
+
+Extensions to timelines may be requested by contributors. Our guidelines for
+this are based on the Kubernetes process:
+
+* Extensions can be granted on a per-GEP basis
+  * The owners of the GEP have to ask and provide a timeline (measured in
+    days) as to when they believe the GEP will be ready for merge.
+* The request and approval for a GEP extension needs to be in public.
+* Extensions can only be granted with a majority agreement by maintainers
+  / release-managers
+
+For our purposes we use GitHub discussions as the public place for
+requesting/approving extensions. Contributors should use an existing
+discussion for the release when feasible, otherwise create a discussion.
