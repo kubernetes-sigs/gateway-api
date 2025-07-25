@@ -5,11 +5,9 @@
 
 (See [status definitions](../overview.md#gep-states).)
 
-
 ## TLDR
 
 Provide a method for configuring Gateway API Mesh implementations to enforce east-west identity-based Authorization controls. At the time of writing this we leave Authentication for specific implementation and outside of this proposal scope.
-
 
 ## Goals
 
@@ -33,7 +31,6 @@ Provide a method for configuring Gateway API Mesh implementations to enforce eas
 
 * (Potentially) Support enforcement on attributes beyond identities and ports.
 
-
 ## Introduction
 
 Authorization is positioned as one of core mesh values. Every mesh supports some kind of east/west authorization between the workloads it controls.
@@ -48,9 +45,7 @@ Kubernetes core provides NetworkPolicies as one way to do it. Network Policies h
 
 An identity-based authorization API is essential because it provides a structured way to control authorization between identities within the cluster.
 
-
 ### State of the World
-
 
 | Aspect | Istio | Linkerd | Cilium |
 | ----- | ----- | ----- | ----- |
@@ -248,9 +243,9 @@ More on https://docs.cilium.io/en/stable/internals/security-identities/ & https:
 
 ## API
 
-This GEP introduces a new policy resource, `AuthorizationPolicy`, for **identity-based** authorization. The policy defines a target, a single action (`ALLOW` or `DENY`), and a set of rules that include sources (the “who”) and an optional port attribute.
+This GEP introduces a new policy resource, `AuthorizationPolicy`, for **identity-based** authorization. The policy defines a target, a single action (to begin with - `ALLOW`, and will likely add `DENY` in future iterations), and a set of rules that include sources (the “who”) and an optional port attribute.
 
-### **Policy Rules**
+### Policy Rules
 
 Each `AuthorizationPolicy` resource contains a list of rules. A request matches the policy if it matches **any** rule in the list (logical OR). Each rule defines multiple matching criteria; a request matches a rule only if it matches **all** criteria within that rule (logical AND).
 
@@ -263,32 +258,162 @@ A rule may specify:
 
   * **Attributes:** Conditions on the target workload, at the time of writing this, only port is supported. If no attributes are specified, the rule applies to all traffic toward the target.
 
-### **ALLOW Policies**
+Note: This GEP is written as if DENY is also in scope, however, the GAMMA leads met on 24th July 2025, and agreed that DENY is likely going to be pushed to 1.5 and will _potentially_ be "extended" conformance.
+
+### ALLOW Policies
 
   * An **ALLOW** policy is permissive.
   * A request is allowed if:
     * It matches at least one rule in any ALLOW policy targeting the workload **and**
     * It is not explicitly denied by any DENY policy.
 
-  * If no ALLOW policy exists for a workload, traffic is permitted by default, unless any DENY policy applies.
+  * If no ALLOW policy exists for a workload, traffic is permitted by default.
 
-### **DENY Policies**
+### DENY Policies
 
 * A **DENY** policy is restrictive and takes precedence over ALLOW.
 * If a request matches any rule in a DENY policy, it is immediately rejected, regardless of matching ALLOW rules elsewhere.
 * DENY policies enable to define global blocks or exceptions (for example: “block all traffic from Namespace X”).
 
-### **ALLOW vs. DENY Semantics**
+### ALLOW vs. DENY Semantics
 
 * **DENY always wins.** If both an ALLOW and a DENY policy match a request, the DENY policy blocks it.
 * The presence of any authorization policy causes the system to default to **deny-by-default** for matching workloads.
 * Another bullet to re-clarify the one above - the default behavior when no policies select a target workload is to allow all traffic. However, **as soon as at least one `AuthorizationPolicy` targets a workload, the model becomes implicitly deny-if-not-allowed**.
 
-### **Target of Authorization**
+### Target of Authorization
 
-The `targetRef` of the policy specifies the workload(s) to which the policy applies. Two options are available for `targetRef`:
+The `targetRef` of the policy specifies the workload(s) to which the policy applies
 
-#### **Option 1: Targeting a Service**
+> Note: in sidecar mode, it happens to also be the policy enforcement point, in ambient however, this is not true.
+
+Before we are jumping into the options, lets start with some background.
+
+#### Mesh Implementation Types
+
+#### Sidecar-Based Meshes
+
+* **Architecture**: Sidecar proxy deployed alongside every pod  
+* **Capabilities**: Can enforce all request attributes (L4 and L7)  
+* **Targeting**: Uses label selectors to target sidecars for policy enforcement points (and destination)
+* **Enforcement Point**: Single enforcement point (the destination sidecar)
+
+#### Ambient Meshes
+
+* **Architecture**: Two-tier proxy system  
+  * Node-L4-proxy: Handles identity-based policies and port enforcement  
+  * L7 enforcement point (waypoint proxy): Handles advanced L7 features  
+* **Targeting**:  
+  * Label selectors for node proxy distribution  
+  * Service targetRef for L7 enforcement at waypoints  
+  * **Constraint**: Selectors and targetRef cannot be used together
+
+### Key Challenges
+
+1. **Architectural Differences**: Ambient meshes separate L4 and L7 enforcement, while sidecars handle both  
+2. **Targeting Mechanisms**:  
+   * Ambient struggles with label selectors for L7 enforcement on waypoints ([#label-selectors-aren't-good-for-ambient-l7](#label-selectors-arent-good-for-ambient-l7))
+   * Sidecars have difficulty supporting Service targeting for L7 enforcement ([#loss-of-service-context](#loss-of-service-context))
+3. **API Consistency**: Need a unified approach that works across all implementations
+
+There a few options are available for `targetRef`. This GEP starts by specifying the recommendation, but you will **highly** benefit from going over the alternatives a few times and the detailed comparison at [https://docs.google.com/document/d/1CeagBnHDPbzpYAxBmtJqTshxAW8l-aRPwvwgAGbnv2I/edit?tab=t.0](https://docs.google.com/document/d/1CeagBnHDPbzpYAxBmtJqTshxAW8l-aRPwvwgAGbnv2I/edit?tab=t.0) to understand how we got to this recommendation.
+
+#### Recommended Option - Hybrid TargetRef and VAP
+
+One unified authorization policy API with implementation-specific validation using Validating Admission Policies (VAP). Additionally introducing a new `enforcementLevel` enum to simplify validation and enable the user to clarify intent.
+
+```go
+
+// EnforcementLevel defines the scope at which an AuthorizationPolicy is enforced.
+//
+// There are two enforcement levels:
+//
+//   - NETWORK: Enforces the policy at the network layer (L4), typically at
+//     network proxies or gateway dataplanes. Only supports attributes available
+//     at connection time (e.g., source identity, port). Recommended for broad,
+//     coarse-grained access controls.
+//
+//   - APPLICATION: Enforces the policy at the application layer (L7), typically at
+//     HTTP/gRPC-aware sidecars or L7 proxies. Enables fine-grained authorization
+//     using protocol-specific attributes (e.g., HTTP paths, methods).
+//
+// This field clarifies policy intent and informs where enforcement is expected
+// to happen. It also enables implementation-specific validation and behavior.
+//
+// +kubebuilder:validation:Enum=NETWORK;APPLICATION
+type EnforcementLevel string
+
+```
+
+```yaml
+# Network-scoped policy (L4 enforcement points)
+kind: AuthorizationPolicy
+metadata:
+  name: network-authz
+spec:
+  enforcementLevel: "network"  # Enforced at L4 proxies
+  targetRef: 
+    kind: Pod
+    selector: {}
+  rules:
+    - authorizationSource:
+        serviceAccount: ["default/productpage"]
+      networkAttributes:
+        ports: [9080]
+
+# Application-scoped policy (L7-only enforcement points and sidecars)
+kind: AuthorizationPolicy  
+metadata:
+  name: app-authz
+spec:
+  enforcementLevel: "application"  # Enforced at L7 proxies
+  targetRef: # Service for Ambient implementations, label-selector for sidecar implementations.
+  rules:
+    - authorizationSource:
+        serviceAccount: ["default/productpage"]
+      networkAttributes:
+        ports: [9080]
+      applicationAttributes: 
+        paths: ["/api/*"]
+        methods: ["GET", "POST"]
+
+
+```
+
+##### Mesh Implementation Behavior
+
+Sidecar Meshes
+
+* **Network Level**: Sidecar enforces policy but only uses L4 attributes  
+* **Application Level**: Sidecar enforces policy with full L4+L7 capabilities
+
+Ambient Meshes
+
+* **Network Level**: Node-L4-proxy enforces policy using labelSelector targeting  
+* **Application Level**: Waypoint proxy enforces policy using Service targetRef targeting
+
+**VAP Validation**:
+
+* **Sidecar mesh**: Ensures application-level policies don't use targetRef: Service (since sidecars use labelSelector)  
+  * **Ambient**: Ensures application-level policies don't use label-selectors.  
+  * **Both sidecar and ambient:** ensures network level policies **do** use label selectors
+
+Advantages
+
+* **Clear Intent**: Users explicitly state where they want enforcement  
+* **Flexible Targeting**: Different targetRef types for different enforcement points  
+* **Migration Path**: Users can start with network-level and upgrade to application-level easily  
+* **Implementation Alignment**: supporting different meshes architectures  
+* **Single API**: No duplication of schemas or concepts  
+* **Validation Clarity**: Clear rules about what's allowed at each level
+
+Disadvantages
+
+* **Complexity**: Users must understand enforcement levels  
+* **VAP Dependency**: Requires validation rules
+
+
+#### Alternative 1: Targeting a Service
 
 The `targetRef` can point to a Kubernetes `Service`.
 
@@ -298,21 +423,22 @@ Two implementation options when targeting a Service:
 
 1. Apply authorization policy to all workloads (pods) selected by the Service.
 
-#### Benefits
+##### Benefits
 
 * **No API Extension Required:** Works with the current PolicyAttachment model in Gateway API without modification.
 * **Simplicity:** Intuitive for users familiar with Kubernetes networking concepts.
 
-#### Downsides and Open Questions
+##### Downsides and Open Questions
+
 However, targeting a `Service` introduces several challenges;
 
-##### Loss Of Service Context
+###### Loss Of Service Context
 
 If we go with option 1, apply authorization policy to all traffic addressed to a Service;
 
 This option is very tricky to implement for sidecar-based meshes where the destination sidecar has no knowledge of which Service the request came through.
 
-Here is the very high-level tarffic flow for sidecar-based meshes:
+Here is the very high-level traffic flow for sidecar-based meshes:
 
   ```sh
   Client → Request to backend-service:8080
@@ -323,7 +449,7 @@ Here is the very high-level tarffic flow for sidecar-based meshes:
 
 Solving this problem either introduces security concern (e.g adding request metadata to indicate which Service was dialed), or unnecessarily complex or in-efficient to solve.
 
-#### A Workload is Part of Multiple Services
+##### A Workload is Part of Multiple Services
 
 Assuming we go with option 2, apply authorization policy to all workloads (pods) selected by the Service.
 
@@ -344,17 +470,17 @@ For traffic to workload W:
 4. Otherwise → DENY
 ```
 
-#### Enforcement & Consistency
+##### Enforcement & Consistency
 
 Assuming we go with option 2, apply authorization policy to all workloads (pods) selected by the Service.
 
 The UX becomes very confusing. Are we going to enforce only if the traffic arrived through the specific Service? Probably not, cause then we are back to the first problem of Service context.
 
-The UX gets weird becuase even though you target a Service, you essentially get a **workload** policy, thats enforced regardless. 
+The UX gets weird because even though you target a Service, you essentially get a **workload** policy, thats enforced regardless.
 
-> Note: with Service as a targetRef, of course we are going to need a Service in order to enforce Authorization -- meaning pods/jobs without a Serivce are completely out of scope.
+> Note: with Service as a targetRef, of course we are going to need a Service in order to enforce Authorization -- meaning pods/jobs without a Service are completely out of scope.
 
-#### **Option 2: Targeting xRoutes**
+#### Alternative 2: Targeting xRoutes
 
 The main benefit of this option is that we can more easily scope the authorization enforcement only for "GAMMA" traffic. Whether its more or less confusing is still unclear.
 
@@ -364,7 +490,7 @@ We can target xRoutes (TCPRoute, HTTPRoute, GRPCRoute). However we are back to [
 
 Another (perhaps, easier-to-address) concern is that if we target xRoutes, it is likely that users would expect this Authorization to work for N/S traffic. Documentation and guidance are nice, but I think this still ends up more confusing for no real value.
 
-#### **Option 3: Targeting Pods via Label Selectors**
+#### Alternative 3: Targeting Pods via Label Selectors
 
 Alternatively, the `targetRef` can specify a set of pods using a `LabelSelector` for a more flexible and direct approach.
 
@@ -376,13 +502,23 @@ Alternatively, the `targetRef` can specify a set of pods using a `LabelSelector`
 
 **Downsides and Open Questions:**
 
-The main downside of `LabelSelector` is the huge increase to the complexity of policy discoverability. See below for more info.
+##### Label-Selectors aren't Good for Ambient L7
+
+In L7 Ambient, AuthorizationPolicy targets a Service. This Service has to have a waypoint proxy. The policy enforcement point is the waypoint, but it is also the point where the Service VIP resolution happens.
+
+If we were to target Label Selectors, the waypoint proxy would get the request, do VIP resolution and select an endpoint, and then it would require round-tripping to itself for doing policy enforcement.
+
+@howardjohn has actually added that this was actually the first way ambient had implemented authorization, but it has proved to be much less performant.
+
+##### Discoverability Challenge
+
+The additional (and main) downside of `LabelSelector` is the huge increase to the complexity of policy discoverability. See below for more info.
 
 **Requirement: Enhancing Policy Attachment:**
 
 This option depends on enhancements to Gateway API’s policy attachment model to support `LabelSelector` as a valid `targetRef`. This capability was discussed and received consensus at KubeCon North America 2024 and was originally in scope for GEP-713 but deferred for a future PR to keep GEP-713 focused on stabilizing what we already have (See [https://github.com/kubernetes-sigs/gateway-api/pull/3609#discussion_r2053376938](https://github.com/kubernetes-sigs/gateway-api/pull/3609#discussion_r2053376938)).
 
-##### **Experimental Pattern**
+##### Experimental Pattern
 
 To mitigate some of the concerns, `LabelSelector` support in policy attachment is designated as an **experimental pattern**.
 
@@ -437,12 +573,12 @@ This however gives the (confusing) impression that Gateways (whether in-cluster 
 
 ###### Option 2
 
-Leaving an empty targetRefs. While this is theoretically possible without a breaking change, this would be another fundamental change to policy attachment (to allow policies without a targetRef). 
+Leaving an empty targetRefs. While this is theoretically possible without a breaking change, this would be another fundamental change to policy attachment (to allow policies without a targetRef).
 Additionally, this is also suffer from the same problem of being perceived as an applicable scope for both Gateways and Workloads in the namespace.
 
 This option is also inconsistent with other API fields where an empty field or absence of a it does not mean select all. See [recent comment](https://github.com/kubernetes-sigs/gateway-api/pull/3887#discussion_r2176125600) on the proposal for empty ParentRef field.
 
-###### Option 3
+###### Option 3 (Recommended)
 
 An empty pod selector. Kubernetes official docs clarify that the semantics of empty selectors are the decision of the API owner. In fact, many Kubernetes APIs (I know Service API does the opposite :/) using empty selectors as a select-all mechanism. See [NetworkPolicy podSelector](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/#networkpolicy-v1-networking-k8s-io), PodDisruptionBudget, ResourceQuota, and more.
 
@@ -464,7 +600,7 @@ targetRefs:
     - { key: "purpose", operator: NotIn, values: ["gateway"] }
 ```
 
-##### **Enhanced Discoverability with `gwctl`**
+##### Enhanced Discoverability with `gwctl`
 
 A key challenge with `LabelSelector` is the loss of discoverability. It’s easier to see which policies target a `Service` but difficult to determine which policies might affect a specific pod.
 
@@ -486,102 +622,6 @@ gwctl get authorizationPolicy -o json
 ```
 
 Without dedicated tooling, the `LabelSelector` approach could significantly degrade the user experience and observability.
-
-#### Recommended Option - Hybrid TargetRef and VAP
-
-Adding only the recommendation below, please see [https://docs.google.com/document/d/1CeagBnHDPbzpYAxBmtJqTshxAW8l-aRPwvwgAGbnv2I/edit?tab=t.0](https://docs.google.com/document/d/1CeagBnHDPbzpYAxBmtJqTshxAW8l-aRPwvwgAGbnv2I/edit?tab=t.0) for a comprehensive comparison for design options for TargetRef.
-
-Create one unified authorization policy API with implementation-specific validation using Validating Admission Policies (VAP). Additionally introducing a new `enforcementLevel` enum to simplify validation and enable the user to clarify intent.
-
-```go
-
-// EnforcementLevel defines the scope at which an AuthorizationPolicy is enforced.
-//
-// There are two enforcement levels:
-//
-//   - NETWORK: Enforces the policy at the network layer (L4), typically at
-//     network proxies or gateway dataplanes. Only supports attributes available
-//     at connection time (e.g., source identity, port). Recommended for broad,
-//     coarse-grained access controls.
-//
-//   - APPLICATION: Enforces the policy at the application layer (L7), typically at
-//     HTTP/gRPC-aware sidecars or L7 proxies. Enables fine-grained authorization
-//     using protocol-specific attributes (e.g., HTTP paths, methods).
-//
-// This field clarifies policy intent and informs where enforcement is expected
-// to happen. It also enables implementation-specific validation and behavior.
-//
-// +kubebuilder:validation:Enum=NETWORK;APPLICATION
-type EnforcementLevel string
-
-```
-
-```
-# Network-scoped policy (L4 enforcement points)
-kind: AuthorizationPolicy
-metadata:
-  name: network-authz
-spec:
-  enforcementLevel: "network"  # Enforced at L4 proxies
-  targetRef: 
-    kind: Pod
-    selector: {}
-  rules:
-    - authorizationSource:
-        serviceAccount: ["default/productpage"]
-      networkAttributes:
-        ports: [9080]
-
-# Application-scoped policy (L7-only enforcement points and sidecars)
-kind: AuthorizationPolicy  
-metadata:
-  name: app-authz
-spec:
-  enforcementLevel: "application"  # Enforced at L7 proxies
-  targetRef: # Service for Ambient implementations, label-selector for sidecar implementations.
-  rules:
-    - authorizationSource:
-        serviceAccount: ["default/productpage"]
-      networkAttributes:
-        ports: [9080]
-      applicationAttributes: 
-        paths: ["/api/*"]
-        methods: ["GET", "POST"]
-
-
-```
-
-### Mesh Implementation Behavior
-
-Sidecar Meshes
-
-* **Network Level**: Sidecar enforces policy but only uses L4 attributes  
-* **Application Level**: Sidecar enforces policy with full L4+L7 capabilities
-
-Ambient Meshes
-
-* **Network Level**: Node-L4-proxy enforces policy using labelSelector targeting  
-* **Application Level**: Waypoint proxy enforces policy using Service targetRef targeting
-
-**VAP Validation**: 
-
-* **Sidecar mesh**: Ensures application-level policies don't use targetRef: Service (since sidecars use labelSelector)  
-  * **Ambient**: Ensures application-level policies don't use label-selectors.  
-  * **Both sidecar and ambient:** ensures network level policies **do** use label selectors
-
-Advantages
-
-* **Clear Intent**: Users explicitly state where they want enforcement  
-* **Flexible Targeting**: Different targetRef types for different enforcement points  
-* **Migration Path**: Users can start with network-level and upgrade to application-level easily  
-* **Implementation Alignment**: supporting different meshes architectures  
-* **Single API**: No duplication of schemas or concepts  
-* **Validation Clarity**: Clear rules about what's allowed at each level
-
-Disadvantages
-
-* **Complexity**: Users must understand enforcement levels  
-* **VAP Dependency**: Requires validation rules
 
 ### API Design
 
@@ -605,6 +645,9 @@ type AuthorizationPolicyAction string
 const (
     // ActionAllow allows requests that match the policy rules.
     ActionAllow AuthorizationPolicyAction = "ALLOW"
+    
+    // NOTE FOR REVIEWERS AGAIN: GAMMA leads met on 24th July and DENY action is likely going to be pushed to 1.5 and will potentially be extended conformance. 
+
     // ActionDeny denies requests that match the policy rules.
     ActionDeny AuthorizationPolicyAction = "DENY"
 )
@@ -612,6 +655,9 @@ const (
 // AuthorizationPolicySpec defines the desired state of AuthorizationPolicy.
 type AuthorizationPolicySpec struct {
     // TargetRef identifies the resource this policy is attached to.
+    // (will be translated to CEL later):
+    //   - When Kind is Pod, Name MUST be Empty, Selector MUST be set, Max targetRef length is 1. 
+    //   - Otherwise multiple refs as long as Kind isn't Pod, selector MUST NOT be set
     // +kubebuilder:validation:Required
     TargetRefs []gatewayv1.PolicyTargetReferenceWithLabelSelectors `json:"targetRefs"`
 
