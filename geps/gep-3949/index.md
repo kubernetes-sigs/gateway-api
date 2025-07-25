@@ -202,7 +202,7 @@ spec:
   controllerName: one-mesh.example.com/one-mesh
 status:
   conditions:
-    # MUST include Accepted and Ready conditions if the Mesh resource is active.
+    # MUST include Accepted condition if the Mesh resource is active.
     - type: Accepted  # Becomes true when the controller accepts the Mesh resource
       status: "True"
       reason: Accepted
