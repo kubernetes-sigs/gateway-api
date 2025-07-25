@@ -290,52 +290,52 @@ is a significant barrier to mesh adoption.
 ```go
 // Mesh is a Cluster level resource.
 type Mesh struct {
-	metav1.TypeMeta   `json:",inline"`
-	metav1.ObjectMeta `json:"metadata,omitempty"`
+  metav1.TypeMeta   `json:",inline"`
+  metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	// Spec defines the desired state of Mesh.
-	Spec MeshSpec `json:"spec"`
+  // Spec defines the desired state of Mesh.
+  Spec MeshSpec `json:"spec"`
 
-	// Status defines the current state of Mesh.
-	//
-	// Implementations MUST populate status on all Mesh resources which
-	// specify their controller name.
-	//
-	// Defaults to Accepted condition with status Unknown and reason Pending.
-	Status MeshStatus `json:"status,omitempty"`
+  // Status defines the current state of Mesh.
+  //
+  // Implementations MUST populate status on all Mesh resources which
+  // specify their controller name.
+  //
+  // Defaults to Accepted condition with status Unknown and reason Pending.
+  Status MeshStatus `json:"status,omitempty"`
 }
 
 // MeshSpec defines the desired state of a Mesh.
 type MeshSpec struct {
-	// ControllerName is the name of the controller that is managing this
-	// Mesh. The value of this field MUST be a domain prefixed path.
-	//
-	// Example: "example.com/awesome-mesh".
-	//
-	// This field is not mutable and cannot be empty.
-	//
-	// Support: Core
-	//
-	// +kubebuilder:validation:XValidation:message="Value is immutable",rule="self == oldSelf"
-	ControllerName string `json:"controllerName"`
+  // ControllerName is the name of the controller that is managing this
+  // Mesh. The value of this field MUST be a domain prefixed path.
+  //
+  // Example: "example.com/awesome-mesh".
+  //
+  // This field is not mutable and cannot be empty.
+  //
+  // Support: Core
+  //
+  // +kubebuilder:validation:XValidation:message="Value is immutable",rule="self == oldSelf"
+  ControllerName string `json:"controllerName"`
 
-	// ParametersRef is an optional reference to a resource that contains
+  // ParametersRef is an optional reference to a resource that contains
   // implementation-specific for this Mesh. If no implementation-specific
   // parameters are needed, this field MUST be omitted.
-	//
-	// ParametersRef can reference a standard Kubernetes resource, i.e.
+  //
+  // ParametersRef can reference a standard Kubernetes resource, i.e.
   // ConfigMap, or an implementation-specific custom resource. The resource
   // can be cluster-scoped or namespace-scoped.
-	//
-	// If the referent cannot be found, refers to an unsupported kind, or when
-	// the data within that resource is malformed, the Mesh MUST be rejected
+  //
+  // If the referent cannot be found, refers to an unsupported kind, or when
+  // the data within that resource is malformed, the Mesh MUST be rejected
   // with the "Accepted" status condition set to "False" and an
-	// "InvalidParameters" reason.
-	//
-	// Support: Implementation-specific
-	//
-	// +optional
-	ParametersRef *ParametersReference `json:"parametersRef,omitempty"`
+  // "InvalidParameters" reason.
+  //
+  // Support: Implementation-specific
+  //
+  // +optional
+  ParametersRef *ParametersReference `json:"parametersRef,omitempty"`
 }
 
 // MeshConditionType is the type for status conditions on Mesh resources.
@@ -347,79 +347,79 @@ type MeshConditionType string
 type MeshConditionReason string
 
 const (
-	// This condition indicates whether the Mesh has been accepted by the
-	// controller requested in the `spec.controller` field.
-	//
-	// This condition defaults to Unknown, and MUST be set by a controller
+  // This condition indicates whether the Mesh has been accepted by the
+  // controller requested in the `spec.controller` field.
+  //
+  // This condition defaults to Unknown, and MUST be set by a controller
   // when it sees a Mesh using its controller string. The status of this
-	// condition MUST be set to True if the controller will accept the Mesh
+  // condition MUST be set to True if the controller will accept the Mesh
   // resource. Otherwise, this status MUST be set to False. If the status
   // is set to False, the controller MUST set a Message and Reason as an
   // explanation.
-	//
-	// Possible reasons for this condition to be true are:
-	//
-	// * "Accepted"
-	//
-	// Possible reasons for this condition to be False are:
-	//
-	// * "InvalidParameters"
-	//
-	// Controllers should prefer to use the values of MeshConditionReason
-	// for the corresponding Reason, where appropriate.
-	MeshConditionStatusAccepted MeshConditionType = "Accepted"
+  //
+  // Possible reasons for this condition to be true are:
+  //
+  // * "Accepted"
+  //
+  // Possible reasons for this condition to be False are:
+  //
+  // * "InvalidParameters"
+  //
+  // Controllers should prefer to use the values of MeshConditionReason
+  // for the corresponding Reason, where appropriate.
+  MeshConditionStatusAccepted MeshConditionType = "Accepted"
 
-	// This reason is used with the "Accepted" condition when the condition is
-	// true.
-	MeshConditionReasonAccepted MeshConditionReason = "Accepted"
+  // This reason is used with the "Accepted" condition when the condition is
+  // true.
+  MeshConditionReasonAccepted MeshConditionReason = "Accepted"
 
-	// This reason is used with the "Accepted" condition when the Mesh
-	// was not accepted because the parametersRef field refers to
-	// * a namespaced resource but the Namespace field is not set, or
-	// * a cluster-scoped resource but the Namespace field is set, or
-	// * a nonexistent object, or
-	// * an unsupported resource or kind, or
-	// * an existing resource but the data within that resource is malformed.
-	MeshConditionReasonInvalidParameters MeshConditionReason = "InvalidParameters"
+  // This reason is used with the "Accepted" condition when the Mesh
+  // was not accepted because the parametersRef field refers to
+  // * a namespaced resource but the Namespace field is not set, or
+  // * a cluster-scoped resource but the Namespace field is set, or
+  // * a nonexistent object, or
+  // * an unsupported resource or kind, or
+  // * an existing resource but the data within that resource is malformed.
+  MeshConditionReasonInvalidParameters MeshConditionReason = "InvalidParameters"
 
-	// This reason is used with the "Accepted" condition when the
-	// requested controller has not yet made a decision about whether
-	// to accept the Mesh. It is the default Reason on a new Mesh.
-	MeshConditionReasonPending MeshConditionReason = "Pending"
+  // This reason is used with the "Accepted" condition when the
+  // requested controller has not yet made a decision about whether
+  // to accept the Mesh. It is the default Reason on a new Mesh.
+  MeshConditionReasonPending MeshConditionReason = "Pending"
 )
 
 // MeshStatus is the current status for the Mesh.
 type MeshStatus struct {
-	// Conditions is the current status from the controller for
-	// this Mesh.
-	//
-	// Controllers should prefer to publish conditions using values
-	// of MeshConditionType for the type of each Condition.
-	//
-	// +optional
-	// +listType=map
-	// +listMapKey=type
-	// +kubebuilder:validation:MaxItems=8
-	// +kubebuilder:default={{type: "Accepted", status: "Unknown", message: "Waiting for controller", reason: "Pending", lastTransitionTime: "1970-01-01T00:00:00Z"}}
-	Conditions []metav1.Condition `json:"conditions,omitempty"`
+  // Conditions is the current status from the controller for
+  // this Mesh.
+  //
+  // Controllers should prefer to publish conditions using values
+  // of MeshConditionType for the type of each Condition.
+  //
+  // +optional
+  // +listType=map
+  // +listMapKey=type
+  // +kubebuilder:validation:MaxItems=8
+  // +kubebuilder:default={{type: "Accepted", status: "Unknown", message: "Waiting for controller", reason: "Pending", lastTransitionTime: "1970-01-01T00:00:00Z"}}
+  Conditions []metav1.Condition `json:"conditions,omitempty"`
 
-	// SupportedFeatures is the set of features the Mesh support.
-	// It MUST be sorted in ascending alphabetical order by the Name key.
-	// +optional
-	// +listType=map
-	// +listMapKey=name
-	// <gateway:experimental>
-	// +kubebuilder:validation:MaxItems=64
-	SupportedFeatures []SupportedFeature `json:"supportedFeatures,omitempty"`
+  // SupportedFeatures is the set of features the Mesh support.
+  // It MUST be sorted in ascending alphabetical order by the Name key.
+  // +optional
+  // +listType=map
+  // +listMapKey=name
+  // <gateway:experimental>
+  // +kubebuilder:validation:MaxItems=64
+  SupportedFeatures []SupportedFeature `json:"supportedFeatures,omitempty"`
 }
 
 // +kubebuilder:object:root=true
 
 // MeshList contains a list of Mesh
 type MeshList struct {
-	metav1.TypeMeta `json:",inline"`
-	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []Mesh `json:"items"`
+  metav1.TypeMeta `json:",inline"`
+  metav1.ListMeta `json:"metadata,omitempty"`
+  Items           []Mesh `json:"items"`
 }
 ```
 
