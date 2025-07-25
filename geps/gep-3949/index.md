@@ -64,33 +64,33 @@ instead, we will simply define a Mesh resource.
 - Support multiple instances of a mesh
   in a single cluster at the same time.
 
-   At some point, we may choose to
-   change this goal,
-   but it is definitely out of scope
-   for this GEP.
+    At some point, we may choose to
+    change this goal,
+    but it is definitely out of scope
+    for this GEP.
 
 - Support meshes interoperating with each other.
 
-   As always,
-   we will not rule out future work
-   in this area,
-   but it is out of scope
-   for this GEP.
+    As always,
+    we will not rule out future work
+    in this area,
+    but it is out of scope
+    for this GEP.
 
 - Support off-cluster gateways.
 
-   This is covered in a separate GEP
-   and will not be discussed here.
+    This is covered in a separate GEP
+    and will not be discussed here.
 
 - Change GAMMA's position on
   multiple meshes running simultaneously
   in a single cluster.
 
-   GAMMA has always taken the position
-   that multiple meshes running simultaneously
-   in a single cluster
-   is not a goal, but neither is it forbidden.
-   This GEP does not change that position.
+    GAMMA has always taken the position
+    that multiple meshes running simultaneously
+    in a single cluster
+    is not a goal, but neither is it forbidden.
+    This GEP does not change that position.
 
 ## API
 
@@ -129,9 +129,9 @@ spec:
   it must be named XMesh
   in the `gateway.networking.x-k8s.io` API group.
 
-   When the API graduates to standard,
-   it will be renamed to `Mesh`
-   in the `gateway.networking.k8s.io` API group.
+    When the API graduates to standard,
+    it will be renamed to `Mesh`
+    in the `gateway.networking.k8s.io` API group.
 
 - The `controllerName` field
   is analogous to
@@ -142,31 +142,31 @@ spec:
   that is responsible for
   this Mesh resource.
 
-   Although we expect
-   that there will be
-   only one mesh
-   in a given cluster, the
-   `controllerName` field
-   MUST be supplied,
-   and a given mesh implementation
-   MUST ignore
-   a Mesh resource
-   that does not have
-   a `controllerName` field
-   that matches its own name.
+    Although we expect
+    that there will be
+    only one mesh
+    in a given cluster, the
+    `controllerName` field
+    MUST be supplied,
+    and a given mesh implementation
+    MUST ignore
+    a Mesh resource
+    that does not have
+    a `controllerName` field
+    that matches its own name.
 
-   If a MeshClass resource
-   is later defined,
-   the Mesh resource
-   will gain a
-   `meshClassName` field,
-   the `controllerName` field
-   will be deprecated,
-   and a
-   Mesh resource
-   that includes
-   both `controllerName` and `meshClassName`
-   will be invalid.
+    If a MeshClass resource
+    is later defined,
+    the Mesh resource
+    will gain a
+    `meshClassName` field,
+    the `controllerName` field
+    will be deprecated,
+    and a
+    Mesh resource
+    that includes
+    both `controllerName` and `meshClassName`
+    will be invalid.
 
 - The `parametersRef` field
   is analogous to
