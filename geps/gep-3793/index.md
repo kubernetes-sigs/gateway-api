@@ -5,6 +5,13 @@
 
 (See [status definitions](../overview.md#gep-states).)
 
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
+"SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this
+document are to be interpreted as described in BCP 14 ([RFC8174]) when, and
+only when, they appear in all capitals, as shown here.
+
+[RFC8174]: https://www.rfc-editor.org/rfc/rfc8174
+
 ## User Story
 
 **[Ana] wants a concept of a default Gateway.**
