@@ -301,7 +301,7 @@ type Mesh struct {
 	// Implementations MUST populate status on all Mesh resources which
 	// specify their controller name.
 	//
-	// +kubebuilder:default={conditions: {{type: "Accepted", status: "Unknown", message: "Waiting for controller", reason: "Pending", lastTransitionTime: "1970-01-01T00:00:00Z"}}}
+	// Defaults to Accepted condition with status Unknown and reason Pending.
 	Status MeshStatus `json:"status,omitempty"`
 }
 
