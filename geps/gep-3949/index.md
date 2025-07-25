@@ -121,6 +121,9 @@ spec:
     ...
 ```
 
+- The Mesh resource is cluster-scoped,
+  so there is no `metadata.namespace` field.
+
 - Although we call this the Mesh resource,
   as an experimental API
   it must be named XMesh
@@ -241,6 +244,51 @@ The mesh implementation
 MUST set `status.SupportedFeatures`
 to indicate which features
 the mesh supports.
+
+### Life Cycle
+
+A mesh implementation MUST NOT create a Mesh resource
+if one does not already exist.
+
+If a mesh implementation does not find a Mesh resource
+with a matching `controllerName` at startup:
+
+- It SHOULD warn the user
+  (in whatever way is appropriate for the mesh)
+  that the Mesh resource is missing.
+
+- It MUST act as if a Mesh resource was found
+  with an empty `spec`
+  (other than the `controllerName` field).
+  Optional configuration MUST remain in its default state,
+  and features that require a Mesh resource
+  (such as OCG support)
+  MUST NOT be enabled.
+
+Obviously, if no matching Mesh resource exists,
+the mesh will not be able to publish support features,
+which may lead to assumptions
+that the mesh does not support any features.
+
+Meshes SHOULD provide a default Mesh resource
+when the mesh is installed,
+so that neither [Chihiro] or [Ian] need to know
+the `controllerName`
+before installing the mesh.
+(For example,
+a mesh's Helm chart might include
+a default Mesh resource
+with only the `controllerName` field set,
+with the assumption
+that [Chihiro] or [Ian] will later edit the resource.)
+
+This is in contrast to the GatewayClass resource,
+which must be explicitly created by [Ian]
+when the Gateway controller is installed.
+This is primarily because GAMMA meshes
+have historically not had a Mesh resource,
+so requiring [Chihiro] or [Ian] to create one by hand
+is a significant barrier to mesh adoption.
 
 ### API Type Definitions
 
