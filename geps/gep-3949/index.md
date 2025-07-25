@@ -205,14 +205,9 @@ status:
     # MUST include Accepted and Ready conditions if the Mesh resource is active.
     - type: Accepted  # Becomes true when the controller accepts the Mesh resource
       status: "True"
-      reason: MeshAccepted
+      reason: Accepted
       lastTransitionTime: "2023-10-01T12:00:00Z"
       message: Mesh resource accepted by one-mesh v1.2.3 in namespace one-mesh
-    - type: Ready     # Becomes true when the mesh is actually running
-      status: "True"
-      reason: MeshReady
-      lastTransitionTime: "2023-10-01T12:00:15Z"
-      message: one-mesh v1.2.3 is running
     ...
   supportedFeatures:
     # List of SupportedFeature
