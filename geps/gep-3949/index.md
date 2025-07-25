@@ -400,7 +400,7 @@ type MeshStatus struct {
   // +listType=map
   // +listMapKey=type
   // +kubebuilder:validation:MaxItems=8
-  // +kubebuilder:default={{type: "Accepted", status: "Unknown", message: "Waiting for controller", reason: "Pending", lastTransitionTime: "1970-01-01T00:00:00Z"}}
+  // Defaults to Accepted condition with status Unknown and reason Pending.
   Conditions []metav1.Condition `json:"conditions,omitempty"`
 
   // SupportedFeatures is the set of features the Mesh support.
