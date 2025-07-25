@@ -132,15 +132,15 @@ spec:
    Although we expect
    that there will be
    only one mesh
-  in a given cluster, the
-  `controllerName` field
-  MUST be supplied,
-  and a given mesh implementation
-  MUST ignore
-  a Mesh resource
-  that does not have
-  a `controllerName` field
-  that matches its own name.
+   in a given cluster, the
+   `controllerName` field
+   MUST be supplied,
+   and a given mesh implementation
+   MUST ignore
+   a Mesh resource
+   that does not have
+   a `controllerName` field
+   that matches its own name.
 
    If a MeshClass resource
    is later defined,
