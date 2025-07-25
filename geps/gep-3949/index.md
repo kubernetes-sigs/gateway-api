@@ -82,6 +82,16 @@ instead, we will simply define a Mesh resource.
    This is covered in a separate GEP
    and will not be discussed here.
 
+- Change GAMMA's position on
+  multiple meshes running simultaneously
+  in a single cluster.
+
+   GAMMA has always taken the position
+   that multiple meshes running simultaneously
+   in a single cluster
+   is not a goal, but neither is it forbidden.
+   This GEP does not change that position.
+
 ## API
 
 The purpose
