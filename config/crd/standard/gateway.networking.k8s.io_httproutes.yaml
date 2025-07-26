@@ -2803,6 +2803,7 @@ spec:
                       - name
                       type: object
                   required:
+                  - conditions
                   - controllerName
                   - parentRef
                   type: object
@@ -5603,6 +5604,7 @@ spec:
                       - name
                       type: object
                   required:
+                  - conditions
                   - controllerName
                   - parentRef
                   type: object

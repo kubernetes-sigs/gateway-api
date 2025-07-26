@@ -33,13 +33,16 @@ import (
 // If you need to forward traffic to a single target for a TLS listener, you
 // could choose to use a TCPRoute with a TLS listener.
 type TLSRoute struct {
-	metav1.TypeMeta   `json:",inline"`
+	metav1.TypeMeta `json:",inline"`
+	// +optional
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	// Spec defines the desired state of TLSRoute.
+	// +required
 	Spec TLSRouteSpec `json:"spec"`
 
 	// Status defines the current state of TLSRoute.
+	// +optional
 	Status TLSRouteStatus `json:"status,omitempty"`
 }
 
@@ -87,6 +90,7 @@ type TLSRouteSpec struct {
 
 	// Rules are a list of TLS matchers and actions.
 	//
+	// +required
 	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:MaxItems=16
 	// <gateway:experimental:validation:XValidation:message="Rule name must be unique within the route",rule="self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name) && l1.name == l2.name))">
@@ -124,6 +128,7 @@ type TLSRouteRule struct {
 	//
 	// Support for weight: Extended
 	//
+	// +required
 	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:MaxItems=16
 	BackendRefs []BackendRef `json:"backendRefs,omitempty"`

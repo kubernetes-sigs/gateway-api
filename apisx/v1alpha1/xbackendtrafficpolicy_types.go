@@ -37,13 +37,16 @@ type XBackendTrafficPolicy struct {
 	//
 	// +optional
 
-	metav1.TypeMeta   `json:",inline"`
+	metav1.TypeMeta `json:",inline"`
+	// +optional
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	// Spec defines the desired state of BackendTrafficPolicy.
+	// +required
 	Spec BackendTrafficPolicySpec `json:"spec"`
 
 	// Status defines the current state of BackendTrafficPolicy.
+	// +optional
 	Status PolicyStatus `json:"status,omitempty"`
 }
 
@@ -72,6 +75,7 @@ type BackendTrafficPolicySpec struct {
 	// +listMapKey=name
 	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:MaxItems=16
+	// +required
 	TargetRefs []LocalPolicyTargetReference `json:"targetRefs"`
 
 	// RetryConstraint defines the configuration for when to allow or prevent

@@ -33,13 +33,16 @@ import (
 // used to specify additional processing steps. Backends specify where matching
 // requests should be routed.
 type HTTPRoute struct {
-	metav1.TypeMeta   `json:",inline"`
+	metav1.TypeMeta `json:",inline"`
+	// +optional
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	// Spec defines the desired state of HTTPRoute.
+	// +required
 	Spec HTTPRouteSpec `json:"spec"`
 
 	// Status defines the current state of HTTPRoute.
+	// +optional
 	Status HTTPRouteStatus `json:"status,omitempty"`
 }
 
@@ -608,12 +611,14 @@ type HTTPHeaderMatch struct {
 	// Generally, proxies should follow the guidance from the RFC:
 	// https://www.rfc-editor.org/rfc/rfc7230.html#section-3.2.2 regarding
 	// processing a repeated header, with special handling for "Set-Cookie".
+	// +required
 	Name HTTPHeaderName `json:"name"`
 
 	// Value is the value of HTTP Header to be matched.
 	//
 	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=4096
+	// +required
 	Value string `json:"value"`
 }
 
@@ -675,12 +680,14 @@ type HTTPQueryParamMatch struct {
 	//
 	// Users SHOULD NOT route traffic based on repeated query params to guard
 	// themselves against potential differences in the implementations.
+	// +required
 	Name HTTPHeaderName `json:"name"`
 
 	// Value is the value of HTTP query param to be matched.
 	//
 	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=1024
+	// +required
 	Value string `json:"value"`
 }
 
@@ -830,6 +837,7 @@ type HTTPRouteFilter struct {
 	// +unionDiscriminator
 	// +kubebuilder:validation:Enum=RequestHeaderModifier;ResponseHeaderModifier;RequestMirror;RequestRedirect;URLRewrite;ExtensionRef
 	// <gateway:experimental:validation:Enum=RequestHeaderModifier;ResponseHeaderModifier;RequestMirror;RequestRedirect;URLRewrite;ExtensionRef;CORS>
+	// +required
 	Type HTTPRouteFilterType `json:"type"`
 
 	// RequestHeaderModifier defines a schema for a filter that modifies request
@@ -977,12 +985,14 @@ type HTTPHeader struct {
 	// with an equivalent header name MUST be ignored. Due to the
 	// case-insensitivity of header names, "foo" and "Foo" are considered
 	// equivalent.
+	// +required
 	Name HTTPHeaderName `json:"name"`
 
 	// Value is the value of HTTP Header to be matched.
 	//
 	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=4096
+	// +required
 	Value string `json:"value"`
 }
 
@@ -1101,6 +1111,7 @@ type HTTPPathModifier struct {
 	// Reason of `UnsupportedValue`.
 	//
 	// +kubebuilder:validation:Enum=ReplaceFullPath;ReplacePrefixMatch
+	// +required
 	Type HTTPPathModifierType `json:"type"`
 
 	// ReplaceFullPath specifies the value with which to replace the full path
@@ -1274,6 +1285,7 @@ type HTTPRequestMirrorFilter struct {
 	// Support: Extended for Kubernetes Service
 	//
 	// Support: Implementation-specific for any other resource
+	// +required
 	BackendRef BackendObjectReference `json:"backendRef"`
 
 	// Percent represents the percentage of requests that should be
@@ -1356,6 +1368,7 @@ type HTTPCORSFilter struct {
 	// Support: Extended
 	// +listType=set
 	// +kubebuilder:validation:MaxItems=64
+	// +optional
 	AllowOrigins []AbsoluteURI `json:"allowOrigins,omitempty"`
 
 	// AllowCredentials indicates whether the actual cross-origin request allows
@@ -1417,6 +1430,7 @@ type HTTPCORSFilter struct {
 	// +listType=set
 	// +kubebuilder:validation:MaxItems=9
 	// +kubebuilder:validation:XValidation:message="AllowMethods cannot contain '*' alongside other methods",rule="!('*' in self && self.size() > 1)"
+	// +optional
 	AllowMethods []HTTPMethodWithWildcard `json:"allowMethods,omitempty"`
 
 	// AllowHeaders indicates which HTTP request headers are supported for
@@ -1458,6 +1472,7 @@ type HTTPCORSFilter struct {
 	//
 	// +listType=set
 	// +kubebuilder:validation:MaxItems=64
+	// +optional
 	AllowHeaders []HTTPHeaderName `json:"allowHeaders,omitempty"`
 
 	// ExposeHeaders indicates which HTTP response headers can be exposed
