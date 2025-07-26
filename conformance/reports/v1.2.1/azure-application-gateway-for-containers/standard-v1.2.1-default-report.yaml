@@ -1,0 +1,59 @@
+apiVersion: gateway.networking.k8s.io/v1
+date: "2025-07-18T23:02:29Z"
+gatewayAPIChannel: standard
+gatewayAPIVersion: v1.2.1
+implementation:
+  organization: Microsoft Azure
+  project: Application Gateway for Containers
+  url: https://aka.ms/appgwcontainers/docs
+  version: "1.7.9"
+  contact:
+  - agcfeedback@microsoft.com
+kind: ConformanceReport
+mode: default
+profiles:
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 12
+      Skipped: 0
+  name: GATEWAY-GRPC
+  summary: Core tests succeeded.
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 33
+      Skipped: 0
+  extended:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 9
+      Skipped: 0
+    supportedFeatures:
+    - HTTPRouteDestinationPortMatching
+    - HTTPRouteHostRewrite
+    - HTTPRouteMethodMatching
+    - HTTPRoutePathRedirect
+    - HTTPRoutePathRewrite
+    - HTTPRoutePortRedirect
+    - HTTPRouteQueryParamMatching
+    - HTTPRouteResponseHeaderModification
+    - HTTPRouteSchemeRedirect
+    unsupportedFeatures:
+    - GatewayHTTPListenerIsolation
+    - GatewayInfrastructurePropagation
+    - GatewayPort8080
+    - GatewayStaticAddresses
+    - HTTPRouteBackendProtocolH2C
+    - HTTPRouteBackendProtocolWebSocket
+    - HTTPRouteBackendRequestHeaderModification
+    - HTTPRouteBackendTimeout
+    - HTTPRouteParentRefPort
+    - HTTPRouteRequestMirror
+    - HTTPRouteRequestMultipleMirrors
+    - HTTPRouteRequestTimeout
+  name: GATEWAY-HTTP
+  summary: Core tests succeeded. Extended tests succeeded.
