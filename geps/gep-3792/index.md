@@ -42,10 +42,10 @@ In this GEP:
    wrangling the mTLS meshes! Supporting non-mTLS meshes will be a separate
    GEP.
 
-   **Note:** It's important to separate mTLS and HTTPS here. Saying that the
-   mTLS meshes use mTLS for secure communication does not preclude them from
-   using custom protocols on top of mTLS, and certainly does not mean that
-   they must use only HTTPS.
+    **Note:** It's important to separate mTLS and HTTPS here. Saying that the
+    mTLS meshes use mTLS for secure communication does not preclude them from
+    using custom protocols on top of mTLS, and certainly does not mean that
+    they must use only HTTPS.
 
 3. _Authentication_ is the act of verifying the identity of some _principal_;
    what the principal actually is depends on context. For this GEP we will
@@ -56,21 +56,21 @@ In this GEP:
    can't trust what the OCG says about the user unless the OCG successfully
    authenticates itself as a workload.
 
-   **Note:** A single workload will have only one identity, but in practice we
-   often see a single identity being used for multiple workloads (both because
-   multiple replicas of a single workload need to share the same identity, and
-   because some low-security workloads may be grouped together under a single
-   identity).
+    **Note:** A single workload will have only one identity, but in practice we
+    often see a single identity being used for multiple workloads (both because
+    multiple replicas of a single workload need to share the same identity, and
+    because some low-security workloads may be grouped together under a single
+    identity).
 
 4. Finally, we'll distinguish between _inbound_ and _outbound_ behaviors.
 
-   Inbound behaviors are those that are applied to a request _arriving_ at a
-   given workload. Authorization and rate limiting are canonical examples
-   of inbound behaviors.
+    Inbound behaviors are those that are applied to a request _arriving_ at a
+    given workload. Authorization and rate limiting are canonical examples
+    of inbound behaviors.
 
-   Outbound behaviors are those that are applied to a request _leaving_ a
-   given workload. Load balancing, retries, and circuit breakers are canonical
-   examples of outbound behaviors.
+    Outbound behaviors are those that are applied to a request _leaving_ a
+    given workload. Load balancing, retries, and circuit breakers are canonical
+    examples of outbound behaviors.
 
 ## Goals
 
@@ -197,7 +197,7 @@ is sent. (For example, Linkerd requires the originating proxy to send
 transport metadata right after the TLS handshake, and it will reject a
 connection which doesn't do that correctly.)
 
-#### 4. The Discovery Problem
+#### 3. The Discovery Problem
 
 When using a mesh, not every workload in the cluster is required to be meshed
 (for example, it's fairly common to have some namespaces meshed and other
