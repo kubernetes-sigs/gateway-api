@@ -545,9 +545,7 @@ func TestGWCPublishedMeshFeatures(t *testing.T) {
 			},
 			SupportedFeatures: featureNamesToSet([]string{
 				string(features.SupportGateway),
-				string(features.SupportGatewayStaticAddresses),
-				string(features.SupportMeshClusterIPMatching),
-				string(features.SupportMeshConsumerRoute),
+				string(features.SupportMesh),
 			}),
 		},
 	}
@@ -568,9 +566,12 @@ func TestGWCPublishedMeshFeatures(t *testing.T) {
 		Client:            fakeClient,
 	}
 
-	_, err := NewConformanceTestSuite(options)
-	if err == nil {
-		t.Fatalf("expected an error but got nil")
+	suite, err := NewConformanceTestSuite(options)
+	if err != nil {
+		t.Fatalf("error initializing conformance suite: %v", err)
+	}
+	if suite.SupportedFeatures.HasAny(features.SetsToNamesSet(features.MeshCoreFeatures, features.MeshExtendedFeatures).UnsortedList()...) {
+		t.Errorf("Mesh features should be skipped, got: %v", suite.SupportedFeatures.UnsortedList())
 	}
 }
 
