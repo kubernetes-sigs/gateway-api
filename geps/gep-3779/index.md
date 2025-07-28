@@ -13,7 +13,7 @@ Provide a method for configuring Gateway API Mesh implementations to enforce eas
 
 (Using the [Gateway API Personas](../../concepts/roles-and-personas.md))
 
-* A way for Ana the Application Developer to configure a Gateway API for Mesh implementation to enforce authorization policy that **allows** or **denies** identity or multiple identities to talk with some set (could be namespace or more granualr) of the workloads she controls.
+* A way for Ana the Application Developer to configure a Gateway API for Mesh implementation to enforce authorization policy that **allows** identity or multiple identities to talk with some set (could be namespace or more granualr) of the workloads she controls.
 
 * A way for both Ana and Chihiro to restrict the scope of the policies they deploy to specific ports.
 
@@ -29,7 +29,7 @@ Provide a method for configuring Gateway API Mesh implementations to enforce eas
 
 ## Deferred Goals
 
-* (Potentially) Support enforcement on attributes beyond identities and ports.
+* Support enforcement on attributes beyond identities and ports.
 
 ## Introduction
 
@@ -39,7 +39,7 @@ Kubernetes core provides NetworkPolicies as one way to do it. Network Policies h
 
 * Network policies leverage labels as identities.
   * Labels are mutable at runtime. This opens a path for escalating privileges
-  * Most implementations of network policies translate labels to IPs, this involves an eventual consistency nature which can and has lea to over permissiveness in the past.
+  * Most implementations of network policies translate labels to IPs, this involves an eventual consistency nature which can and has led to over permissiveness in the past.
 
 * Scale. Network Policies are enforced using IPs (different selectors in the APIs get translated to IPs). This does not scale well with large clusters or beyond a single cluster
 
@@ -60,11 +60,12 @@ An identity-based authorization API is essential because it provides a structure
 Every mesh vendor has their own API of such authorization. Below we describe brief UX for different implementations:
 
 #### Istio
+
 For the full spec and sematics of Istio AuthorizationPolicy: [Istio authorization policy docs](https://istio.io/latest/docs/reference/config/security/authorization-policy/)
 
 Istio's AuthorizationPolicy can enforce access control by specifying allowed istio-formatted identities using the `source.principals` field, which matches authenticated Serviceaccount identities via mTLS. You can also use other source constructs which are described in the table above and in https://istio.io/latest/docs/reference/config/security/authorization-policy/#Source.
 
-```
+```yaml
 apiVersion: security.istio.io/v1beta1
 kind: AuthorizationPolicy
 metadata:
@@ -83,7 +84,7 @@ spec:
 
 OR targeting a gateway for example.
 
-```
+```yaml
 apiVersion: security.istio.io/v1beta1
 kind: AuthorizationPolicy
 metadata:
@@ -100,6 +101,7 @@ spec:
     - source:
         principals: ["cluster.local/ns/default/sa/sleep"]
 ```
+
 #### Linkerd
 
 For the full spec and sematics of Linkerd AuthorizationPolicy: [Linkerd authorization policy docs](https://linkerd.io/2-edge/reference/authorization-policy/)
@@ -110,7 +112,7 @@ Linkerd Policy can by applied to two different targets.
 
 ##### Pod Labels with Server Resource
 
-```
+```yaml
 apiVersion: policy.linkerd.io/v1beta1
 kind: Server
 metadata:
@@ -154,7 +156,7 @@ spec:
 
 ##### HTTPRoutes
 
-```
+```yaml
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
@@ -173,7 +175,7 @@ spec:
         - name: httpbin
           port: 80
 
------
+---
 
 apiVersion: policy.linkerd.io/v1beta1
 kind: MeshTLSAuthentication
@@ -183,7 +185,7 @@ metadata:
 spec:
   identities:
     - sleep.default.serviceaccount.identity.linkerd.cluster.local
------
+---
 
 apiVersion: policy.linkerd.io/v1beta1
 kind: AuthorizationPolicy
@@ -202,7 +204,6 @@ spec:
 ---
 ```
 
-
 #### Cilium
 
 For the full spec and sematics of CiliumNetworkPolicy: https://docs.cilium.io/en/stable/network/kubernetes/policy/#ciliumnetworkpolicy & https://docs.cilium.io/en/stable/network/servicemesh/gateway-api/gateway-api/#cilium-s-ingress-config-and-ciliumnetworkpolicy
@@ -211,7 +212,7 @@ Beyond what's explained in the table above, Cilium also automatically labels eac
 
 See below for example.
 
-```
+```yaml
 apiVersion: "cilium.io/v2"
 kind: CiliumNetworkPolicy
 metadata:
@@ -234,12 +235,10 @@ spec:
           path: "/"
 ```
 
-
 ##### CiliumIdentity
 Cilium has the concept of CiliumIdentity. Pods are assigned identities derived from their Kubernetes labels (namespace, app labels, etc.). Cilium’s policy matches based on these label-derived identities. The CiliumIdentity implementation maps an integer to a group of IP addresses (the pod IPs associated with a group of pods). This “integer” and its mapping to pod IP addresses represents the core identity primitive in Cilium.
 
 More on https://docs.cilium.io/en/stable/internals/security-identities/ & https://docs.cilium.io/en/stable/security/network/identity/
-
 
 ## API
 
@@ -258,7 +257,7 @@ A rule may specify:
 
   * **Attributes:** Conditions on the target workload, at the time of writing this, only port is supported. If no attributes are specified, the rule applies to all traffic toward the target.
 
-Note: This GEP is written as if DENY is also in scope, however, the GAMMA leads met on 24th July 2025, and agreed that DENY is likely going to be pushed to 1.5 and will _potentially_ be "extended" conformance.
+Note: This GEP is written as if DENY is also in scope, however, GAMMA leads met on 24th July 2025, and agreed that DENY is likely going to be pushed to 1.5 and will _potentially_ be "extended" conformance.
 
 ### ALLOW Policies
 
@@ -300,21 +299,25 @@ Before we are jumping into the options, lets start with some background.
 
 #### Ambient Meshes
 
-* **Architecture**: Two-tier proxy system  
-  * Node-L4-proxy: Handles identity-based policies and port enforcement  
-  * L7 enforcement point (waypoint proxy): Handles advanced L7 features  
-* **Targeting**:  
-  * Label selectors for node proxy distribution  
-  * Service targetRef for L7 enforcement at waypoints  
-  * **Constraint**: Selectors and targetRef cannot be used together
+  * **Architecture**: Two-tier proxy system
+    * Node-L4-proxy: Handles identity-based policies and port enforcement  
+    * L7 enforcement point (waypoint proxy): Handles advanced L7 features  
+
+  * **Targeting**:  
+    * Label selectors for node proxy distribution
+    * Service targetRef for L7 enforcement at waypoints
+    * **Constraint**: Selectors and targetRefs cannot be used together
+
+  * **Enforcement Point**: When using label selectors, enforcement at the node-proxy, when targeting a Service, enforcement happens at the Waypoint delegate for that service.
 
 ### Key Challenges
 
-1. **Architectural Differences**: Ambient meshes separate L4 and L7 enforcement, while sidecars handle both  
-2. **Targeting Mechanisms**:  
-   * Ambient struggles with label selectors for L7 enforcement on waypoints ([#label-selectors-aren't-good-for-ambient-l7](#label-selectors-arent-good-for-ambient-l7))
-   * Sidecars have difficulty supporting Service targeting for L7 enforcement ([#loss-of-service-context](#loss-of-service-context))
-3. **API Consistency**: Need a unified approach that works across all implementations
+  1. **Architectural Differences**: Ambient meshes separate L4 and L7 enforcement, while sidecars handle both  
+  2. **Targeting Mechanisms**:
+    * Ambient struggles with label selectors for L7 enforcement on waypoints ([#label-selectors-aren't-good-for-ambient-l7](#label-selectors-arent-good-for-ambient-l7))
+    * Sidecars have difficulty supporting Service targeting for L7 enforcement ([#loss-of-service-context](#loss-of-service-context))
+
+  3. **API Consistency**: Need a unified approach that works across all implementations
 
 There a few options are available for `targetRef`. This GEP starts by specifying the recommendation, but you will **highly** benefit from going over the alternatives a few times and the detailed comparison at [https://docs.google.com/document/d/1CeagBnHDPbzpYAxBmtJqTshxAW8l-aRPwvwgAGbnv2I/edit?tab=t.0](https://docs.google.com/document/d/1CeagBnHDPbzpYAxBmtJqTshxAW8l-aRPwvwgAGbnv2I/edit?tab=t.0) to understand how we got to this recommendation.
 
@@ -328,19 +331,19 @@ One unified authorization policy API with implementation-specific validation usi
 //
 // There are two enforcement levels:
 //
-//   - NETWORK: Enforces the policy at the network layer (L4), typically at
+//   - Network: Enforces the policy at the network layer (L4), typically at
 //     network proxies or gateway dataplanes. Only supports attributes available
 //     at connection time (e.g., source identity, port). Recommended for broad,
 //     coarse-grained access controls.
 //
-//   - APPLICATION: Enforces the policy at the application layer (L7), typically at
+//   - Application: Enforces the policy at the application layer (L7), typically at
 //     HTTP/gRPC-aware sidecars or L7 proxies. Enables fine-grained authorization
 //     using protocol-specific attributes (e.g., HTTP paths, methods).
 //
 // This field clarifies policy intent and informs where enforcement is expected
 // to happen. It also enables implementation-specific validation and behavior.
 //
-// +kubebuilder:validation:Enum=NETWORK;APPLICATION
+// +kubebuilder:validation:Enum=Network;Application
 type EnforcementLevel string
 
 ```
@@ -351,7 +354,7 @@ kind: AuthorizationPolicy
 metadata:
   name: network-authz
 spec:
-  enforcementLevel: "network"  # Enforced at L4 proxies
+  enforcementLevel: "Network"  # Enforced at L4 proxies
   targetRef: 
     kind: Pod
     selector: {}
@@ -366,7 +369,7 @@ kind: AuthorizationPolicy
 metadata:
   name: app-authz
 spec:
-  enforcementLevel: "application"  # Enforced at L7 proxies
+  enforcementLevel: "Application"  # Enforced at L7 proxies
   targetRef: # Service for Ambient implementations, label-selector for sidecar implementations.
   rules:
     - authorizationSource:
@@ -696,7 +699,7 @@ type AuthorizationRule struct {
     // Fields may vary in applicability based on the protocol and implementation support.
     //
     // NOTE: ApplicationAttributes are only meaningful when `enforcementLevel` is set to
-    // APPLICATION. Implementations MUST ignore or reject these fields if used at NETWORK level.
+    // Application. Implementations MUST ignore or reject these fields if used at Network level.
 
     // +optional
     ApplicationAttributes *AuthorizationApplicationAttributes `json:"applicationAttributes,omitempty"`
