@@ -795,18 +795,26 @@ type AuthorizationNetworkAttributes struct {
 
 Note: Existing AuthorizationAPIs recognized the need to support negation fields like `not{field}`. To avoid duplicating fields with negation, we plan to support richer match expressions for fields in `AuthorizationSource` such as `matchExpressions: { operator: In|NotIn, values: []}`.
 
+## Graduation Criteria and Guardrails
+
+This GEP is starting as Experimental with X-prefix. We would like to define some guardrails to avoid being stuck with experimental api in the project forever.
+
+GEP is removed after 3 releases unless:
+
+  1. There is more than 1 implementation (implementations that are nearing completion can count here)
+  2. There are conformance tests in place
+
+GEP is removed after 6 releases if it hasn't graduated to GA.
+
 ## Conformance Details
 
 ### Feature Names
 
 Two new feature sets will be added - AuthorizationPolicyCoreFeatures, and later, AuthorizationPolicyExtendedFeatures.
 
+AuthorizationPolicyExtendedFeatures features, if and when introduced, would likely have individual granularity, like AuthorizationPolicyDeny, AuthorizationPolicyHTTP, AuthorizationPolicyGRPC, etc.
+
 TBD exact FeatureNames.
 
 ### Conformance tests
 
-
-## Alternatives
-
-
-## References
