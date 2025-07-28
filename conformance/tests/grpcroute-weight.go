@@ -87,7 +87,6 @@ func testGRPCDistribution(t *testing.T, suite *suite.ConformanceTestSuite, gwAdd
 		totalRequests       = 500.0
 	)
 	var (
-		grpcClient      = suite.GRPCClient
 		g               errgroup.Group
 		seenMutex       sync.Mutex
 		seen            = make(map[string]float64, 3 /* number of backends */)
@@ -96,6 +95,7 @@ func testGRPCDistribution(t *testing.T, suite *suite.ConformanceTestSuite, gwAdd
 			"grpc-infra-backend-v2": 0.3,
 			"grpc-infra-backend-v3": 0.0,
 		}
+		grpcClient = &grpc.DefaultClient{}
 	)
 	g.SetLimit(concurrentRequests)
 	for i := 0.0; i < totalRequests; i++ {
