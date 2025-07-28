@@ -28,24 +28,24 @@ import (
 )
 
 func init() {
-	MeshConformanceTests = append(MeshConformanceTests, MeshHTTPRouteWeight)
+	MeshConformanceTests = append(MeshConformanceTests, MeshGRPCRouteWeight)
 }
 
-var MeshHTTPRouteWeight = suite.ConformanceTest{
-	ShortName:   "MeshHTTPRouteWeight",
-	Description: "An HTTPRoute with weighted backends",
-	Manifests:   []string{"tests/mesh/httproute-weight.yaml"},
+var MeshGRPCRouteWeight = suite.ConformanceTest{
+	ShortName:   "MeshGRPCRouteWeight",
+	Description: "A GRPCRoute with weighted backends in mesh mode",
+	Manifests:   []string{"tests/mesh/grpcroute-weight.yaml"},
 	Features: []features.FeatureName{
 		features.SupportMesh,
-		features.SupportHTTPRoute,
+		features.SupportGRPCRoute,
 	},
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
 		client := echo.ConnectToApp(t, s, echo.MeshAppEchoV1)
 
 		t.Run("Requests should have a distribution that matches the weight", func(t *testing.T) {
-			host := "echo"
+			// Create a gRPC request using the mesh client framework
 			expected := http.ExpectedResponse{
-				Request:   http.Request{Path: "/", Host: host},
+				Request:   http.Request{Protocol: "grpc", Path: "", Host: "echo:7070"},
 				Response:  http.Response{StatusCode: 200},
 				Namespace: "gateway-conformance-mesh",
 			}
@@ -65,7 +65,7 @@ var MeshHTTPRouteWeight = suite.ConformanceTest{
 				}
 				_, cRes, err := client.CaptureRequestResponseAndCompare(t, uniqueExpected)
 				if err != nil {
-					return "", fmt.Errorf("failed mesh request: %w", err)
+					return "", fmt.Errorf("failed gRPC mesh request: %w", err)
 				}
 				return cRes.Hostname, nil
 			})
