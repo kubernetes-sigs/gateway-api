@@ -265,9 +265,10 @@ the mesh will not be able to publish support features,
 which may lead to assumptions
 that the mesh does not support any features.
 
-Meshes SHOULD provide a default Mesh resource
+Meshes SHOULD provide an easy way
+for [Chihiro] or [Ian] to obtain a default Mesh resource
 when the mesh is installed,
-so that neither [Chihiro] or [Ian] need to know
+so that they do not need to know
 the `controllerName`
 before installing the mesh.
 (For example,
@@ -276,14 +277,8 @@ a default Mesh resource
 with only the `controllerName` field set,
 with the assumption
 that [Chihiro] or [Ian] will later edit the resource.)
-
-This is in contrast to the GatewayClass resource,
-which must be explicitly created by [Ian]
-when the Gateway controller is installed.
-This is primarily because GAMMA meshes
-have historically not had a Mesh resource,
-so requiring [Chihiro] or [Ian] to create one by hand
-is a significant barrier to mesh adoption.
+Any such mechanism for obtaining a default Mesh resource
+MUST NOT unconditionally overwrite an existing Mesh resource, though.
 
 ### API Type Definitions
 
