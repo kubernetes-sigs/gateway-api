@@ -242,7 +242,8 @@ type PolicyStatus struct {
 	// additional Gateways would be able to reference the Service targeted by
 	// the BackendTLSPolicy.
 	//
-	// +kubebuilder:validation:MaxItems=16
 	// +required
+	// +listType=atomic
+	// +kubebuilder:validation:MaxItems=16
 	Ancestors []PolicyAncestorStatus `json:"ancestors"`
 }
