@@ -126,6 +126,7 @@ spec:
                       true'
                 maxItems: 16
                 type: array
+                x-kubernetes-list-type: atomic
                 x-kubernetes-validations:
                 - message: IPAddress values must be unique
                   rule: 'self.all(a1, a1.type == ''IPAddress'' ? self.exists_one(a2,
@@ -633,6 +634,7 @@ spec:
                             type: object
                           maxItems: 8
                           type: array
+                          x-kubernetes-list-type: atomic
                         namespaces:
                           default:
                             from: Same
@@ -887,6 +889,7 @@ spec:
                             type: object
                           maxItems: 64
                           type: array
+                          x-kubernetes-list-type: atomic
                         frontendValidation:
                           description: |-
                             FrontendValidation holds configuration information for validating the frontend (client).
@@ -973,6 +976,7 @@ spec:
                               maxItems: 8
                               minItems: 1
                               type: array
+                              x-kubernetes-list-type: atomic
                           required:
                           - caCertificateRefs
                           type: object
@@ -1128,6 +1132,7 @@ spec:
                       true'
                 maxItems: 16
                 type: array
+                x-kubernetes-list-type: atomic
               conditions:
                 default:
                 - lastTransitionTime: "1970-01-01T00:00:00Z"
@@ -1341,6 +1346,7 @@ spec:
                         type: object
                       maxItems: 8
                       type: array
+                      x-kubernetes-list-type: atomic
                   required:
                   - attachedRoutes
                   - conditions
@@ -1466,6 +1472,7 @@ spec:
                       true'
                 maxItems: 16
                 type: array
+                x-kubernetes-list-type: atomic
                 x-kubernetes-validations:
                 - message: IPAddress values must be unique
                   rule: 'self.all(a1, a1.type == ''IPAddress'' ? self.exists_one(a2,
@@ -1973,6 +1980,7 @@ spec:
                             type: object
                           maxItems: 8
                           type: array
+                          x-kubernetes-list-type: atomic
                         namespaces:
                           default:
                             from: Same
@@ -2227,6 +2235,7 @@ spec:
                             type: object
                           maxItems: 64
                           type: array
+                          x-kubernetes-list-type: atomic
                         frontendValidation:
                           description: |-
                             FrontendValidation holds configuration information for validating the frontend (client).
@@ -2313,6 +2322,7 @@ spec:
                               maxItems: 8
                               minItems: 1
                               type: array
+                              x-kubernetes-list-type: atomic
                           required:
                           - caCertificateRefs
                           type: object
@@ -2468,6 +2478,7 @@ spec:
                       true'
                 maxItems: 16
                 type: array
+                x-kubernetes-list-type: atomic
               conditions:
                 default:
                 - lastTransitionTime: "1970-01-01T00:00:00Z"
@@ -2681,6 +2692,7 @@ spec:
                         type: object
                       maxItems: 8
                       type: array
+                      x-kubernetes-list-type: atomic
                   required:
                   - attachedRoutes
                   - conditions

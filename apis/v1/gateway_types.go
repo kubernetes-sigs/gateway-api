@@ -265,6 +265,7 @@ type GatewaySpec struct {
 	// Support: Extended
 	//
 	// +optional
+	// +listType=atomic
 	// <gateway:validateIPAddress>
 	// +kubebuilder:validation:MaxItems=16
 	// +kubebuilder:validation:XValidation:message="IPAddress values must be unique",rule="self.all(a1, a1.type == 'IPAddress' ? self.exists_one(a2, a2.type == a1.type && a2.value == a1.value) : true )"
@@ -569,6 +570,7 @@ type GatewayTLSConfig struct {
 	// Support: Implementation-specific (More than one reference or other resource types)
 	//
 	// +optional
+	// +listType=atomic
 	// +kubebuilder:validation:MaxItems=64
 	CertificateRefs []SecretObjectReference `json:"certificateRefs,omitempty"`
 
@@ -643,9 +645,10 @@ type FrontendTLSValidation struct {
 	// "ResolvedRefs" condition MUST be set to False for this listener with the
 	// "RefNotPermitted" reason.
 	//
+	// +required
+	// +listType=atomic
 	// +kubebuilder:validation:MaxItems=8
 	// +kubebuilder:validation:MinItems=1
-	// +required
 	CACertificateRefs []ObjectReference `json:"caCertificateRefs,omitempty"`
 }
 
@@ -657,6 +660,7 @@ type AllowedRoutes struct {
 	// Support: Core
 	//
 	// +optional
+	// +listType=atomic
 	// +kubebuilder:default={from: Same}
 	Namespaces *RouteNamespaces `json:"namespaces,omitempty"`
 
@@ -673,6 +677,7 @@ type AllowedRoutes struct {
 	// Support: Core
 	//
 	// +optional
+	// +listType=atomic
 	// +kubebuilder:validation:MaxItems=8
 	Kinds []RouteGroupKind `json:"kinds,omitempty"`
 }
@@ -791,6 +796,7 @@ type GatewayStatus struct {
 	//   * a specified address was unusable (e.g. already in use)
 	//
 	// +optional
+	// +listType=atomic
 	// <gateway:validateIPAddress>
 	// +kubebuilder:validation:MaxItems=16
 	Addresses []GatewayStatusAddress `json:"addresses,omitempty"`
@@ -1123,8 +1129,9 @@ type ListenerStatus struct {
 	// and invalid Route kinds are specified, the implementation MUST
 	// reference the valid Route kinds that have been specified.
 	//
-	// +kubebuilder:validation:MaxItems=8
 	// +required
+	// +listType=atomic
+	// +kubebuilder:validation:MaxItems=8
 	SupportedKinds []RouteGroupKind `json:"supportedKinds"`
 
 	// AttachedRoutes represents the total number of Routes that have been

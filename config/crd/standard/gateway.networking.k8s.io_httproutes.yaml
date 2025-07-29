@@ -131,6 +131,7 @@ spec:
                   type: string
                 maxItems: 16
                 type: array
+                x-kubernetes-list-type: atomic
               parentRefs:
                 description: |-
                   ParentRefs references the resources (usually Gateways) that a Route wants
@@ -314,6 +315,7 @@ spec:
                   type: object
                 maxItems: 32
                 type: array
+                x-kubernetes-list-type: atomic
                 x-kubernetes-validations:
                 - message: sectionName must be specified when parentRefs includes
                     2 or more references to the same parent
@@ -1190,6 +1192,7 @@ spec:
                                 rule: '!(!has(self.extensionRef) && self.type == ''ExtensionRef'')'
                             maxItems: 16
                             type: array
+                            x-kubernetes-list-type: atomic
                             x-kubernetes-validations:
                             - message: May specify either httpRouteFilterRequestRedirect
                                 or httpRouteFilterRequestRewrite, but not both
@@ -1296,6 +1299,7 @@ spec:
                             ? has(self.port) : true'
                       maxItems: 16
                       type: array
+                      x-kubernetes-list-type: atomic
                     filters:
                       description: |-
                         Filters define the filters that are applied to requests that match
@@ -2117,6 +2121,7 @@ spec:
                           rule: '!(!has(self.extensionRef) && self.type == ''ExtensionRef'')'
                       maxItems: 16
                       type: array
+                      x-kubernetes-list-type: atomic
                       x-kubernetes-validations:
                       - message: May specify either httpRouteFilterRequestRedirect
                           or httpRouteFilterRequestRewrite, but not both
@@ -2428,6 +2433,7 @@ spec:
                         type: object
                       maxItems: 64
                       type: array
+                      x-kubernetes-list-type: atomic
                     name:
                       description: |-
                         Name is the name of the route rule. This name MUST be unique within a Route if it is set.
@@ -2542,6 +2548,7 @@ spec:
                       != ''PathPrefix'') ? false : true) : true'
                 maxItems: 16
                 type: array
+                x-kubernetes-list-type: atomic
                 x-kubernetes-validations:
                 - message: While 16 rules and 64 matches per rule are allowed, the
                     total number of matches across all rules in a route must be less
@@ -2809,6 +2816,7 @@ spec:
                   type: object
                 maxItems: 32
                 type: array
+                x-kubernetes-list-type: atomic
             required:
             - parents
             type: object
@@ -2932,6 +2940,7 @@ spec:
                   type: string
                 maxItems: 16
                 type: array
+                x-kubernetes-list-type: atomic
               parentRefs:
                 description: |-
                   ParentRefs references the resources (usually Gateways) that a Route wants
@@ -3115,6 +3124,7 @@ spec:
                   type: object
                 maxItems: 32
                 type: array
+                x-kubernetes-list-type: atomic
                 x-kubernetes-validations:
                 - message: sectionName must be specified when parentRefs includes
                     2 or more references to the same parent
@@ -3991,6 +4001,7 @@ spec:
                                 rule: '!(!has(self.extensionRef) && self.type == ''ExtensionRef'')'
                             maxItems: 16
                             type: array
+                            x-kubernetes-list-type: atomic
                             x-kubernetes-validations:
                             - message: May specify either httpRouteFilterRequestRedirect
                                 or httpRouteFilterRequestRewrite, but not both
@@ -4097,6 +4108,7 @@ spec:
                             ? has(self.port) : true'
                       maxItems: 16
                       type: array
+                      x-kubernetes-list-type: atomic
                     filters:
                       description: |-
                         Filters define the filters that are applied to requests that match
@@ -4918,6 +4930,7 @@ spec:
                           rule: '!(!has(self.extensionRef) && self.type == ''ExtensionRef'')'
                       maxItems: 16
                       type: array
+                      x-kubernetes-list-type: atomic
                       x-kubernetes-validations:
                       - message: May specify either httpRouteFilterRequestRedirect
                           or httpRouteFilterRequestRewrite, but not both
@@ -5229,6 +5242,7 @@ spec:
                         type: object
                       maxItems: 64
                       type: array
+                      x-kubernetes-list-type: atomic
                     name:
                       description: |-
                         Name is the name of the route rule. This name MUST be unique within a Route if it is set.
@@ -5343,6 +5357,7 @@ spec:
                       != ''PathPrefix'') ? false : true) : true'
                 maxItems: 16
                 type: array
+                x-kubernetes-list-type: atomic
                 x-kubernetes-validations:
                 - message: While 16 rules and 64 matches per rule are allowed, the
                     total number of matches across all rules in a route must be less
@@ -5610,6 +5625,7 @@ spec:
                   type: object
                 maxItems: 32
                 type: array
+                x-kubernetes-list-type: atomic
             required:
             - parents
             type: object
