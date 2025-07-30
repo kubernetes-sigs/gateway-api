@@ -89,7 +89,7 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 		ManifestFS:                 []fs.FS{&Manifests},
 		GatewayClassName:           *flags.GatewayClassName,
 		AddressType:                *flags.AddressType,
-		Implementation:             *implementation,
+		Implementation:             implementation,
 		Mode:                       *flags.Mode,
 		NamespaceAnnotations:       namespaceAnnotations,
 		NamespaceLabels:            namespaceLabels,
