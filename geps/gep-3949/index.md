@@ -195,7 +195,6 @@ apiVersion: gateway.networking.x-k8s.io/v1alpha1
 kind: XMesh
 metadata:
   name: one-mesh-to-mesh-them-all
-  namespace: mesh-namespace
 spec:
   controllerName: one-mesh.example.com/one-mesh
 status:
