@@ -2,7 +2,7 @@ apiVersion: internal.gateway.networking.k8s.io/v1alpha1
 kind: GEPDetails
 number: 1494
 name: HTTP Auth in Gateway API
-status: Provisional
+status: Implementable
 # Any authors who contribute to the GEP in any way should be listed here using
 # their GitHub handle.
 authors:
@@ -13,7 +13,13 @@ authors:
 references: {}
 # featureNames is a list of the feature names introduced by the GEP, if there
 # are any. This will allow us to track which feature was introduced by which GEP.
-featureNames: {}
+featureNames:
+  - HTTPRouteExtAuth
+  - HTTPRouteExtAuthGRPC
+  - HTTPRouteExtAuthHTTP
+  - HTTPRouteExtAuthForwardBody
 # changelog is a list of hyperlinks to PRs that make changes to the GEP, in
 # ascending date order.
-changelog: {}
+changelog:
+  - https://github.com/kubernetes-sigs/gateway-api/pull/3500
+  - https://github.com/kubernetes-sigs/gateway-api/pull/3884

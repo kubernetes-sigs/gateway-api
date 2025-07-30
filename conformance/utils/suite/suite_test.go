@@ -280,7 +280,6 @@ func TestSuiteReport(t *testing.T) {
 					coreProvisionalTest.ShortName,
 					extendedProvisionalTest.ShortName,
 				},
-				InferredSupportedFeatures: true,
 			},
 		},
 		{
@@ -390,7 +389,6 @@ func TestSuiteReport(t *testing.T) {
 						},
 					},
 				},
-				InferredSupportedFeatures: true,
 			},
 		},
 	}
@@ -434,33 +432,37 @@ func TestInferSupportedFeatures(t *testing.T) {
 		exemptFeatures     FeaturesSet
 		ConformanceProfile sets.Set[ConformanceProfileName]
 		expectedFeatures   FeaturesSet
-		expectedIsInferred bool
+		expectedSource     supportedFeaturesSource
 	}{
 		{
-			name:               "properly infer supported features",
-			expectedFeatures:   namesToFeatureSet(statusFeatureNames),
-			expectedIsInferred: true,
+			name:             "properly infer supported features",
+			expectedFeatures: namesToFeatureSet(statusFeatureNames),
+			expectedSource:   supportedFeaturesSourceInferred,
 		},
 		{
 			name:              "no features",
 			supportedFeatures: sets.New[features.FeatureName]("Gateway"),
 			expectedFeatures:  sets.New[features.FeatureName]("Gateway"),
+			expectedSource:    supportedFeaturesSourceManual,
 		},
 		{
 			name:              "remove exempt features",
 			supportedFeatures: sets.New[features.FeatureName]("Gateway", "HTTPRoute"),
 			exemptFeatures:    sets.New[features.FeatureName]("HTTPRoute"),
 			expectedFeatures:  sets.New[features.FeatureName]("Gateway"),
+			expectedSource:    supportedFeaturesSourceManual,
 		},
 		{
 			name:             "allow all features",
 			allowAllFeatures: true,
 			expectedFeatures: features.SetsToNamesSet(features.AllFeatures),
+			expectedSource:   supportedFeaturesSourceManual,
 		},
 		{
 			name:               "supports conformance profile - core",
 			ConformanceProfile: sets.New(GatewayHTTPConformanceProfileName),
-			expectedFeatures:   namesToFeatureSet([]string{"Gateway", "HTTPRoute", "ReferenceGrant"}),
+			expectedFeatures:   namesToFeatureSet(statusFeatureNames),
+			expectedSource:     supportedFeaturesSourceInferred,
 		},
 	}
 
@@ -512,14 +514,63 @@ func TestInferSupportedFeatures(t *testing.T) {
 				t.Fatalf("error initializing conformance suite: %v", err)
 			}
 
-			if cSuite.IsInferredSupportedFeatures() != tc.expectedIsInferred {
-				t.Errorf("InferredSupportedFeatures mismatch: got %v, want %v", cSuite.IsInferredSupportedFeatures(), tc.expectedIsInferred)
+			if cSuite.supportedFeaturesSource != tc.expectedSource {
+				t.Errorf("InferredSupportedFeatures mismatch: got %v, want %v", cSuite.supportedFeaturesSource, tc.expectedSource)
 			}
 
 			if equal := cSuite.SupportedFeatures.Equal(tc.expectedFeatures); !equal {
 				t.Errorf("SupportedFeatures mismatch: got %v, want %v", cSuite.SupportedFeatures.UnsortedList(), tc.expectedFeatures.UnsortedList())
 			}
 		})
+	}
+}
+
+func TestGWCPublishedMeshFeatures(t *testing.T) {
+	gwcName := "ochopintre"
+	gwc := &gatewayv1.GatewayClass{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: gwcName,
+		},
+		Spec: gatewayv1.GatewayClassSpec{
+			ControllerName: "example.com/gateway-controller",
+		},
+		Status: gatewayv1.GatewayClassStatus{
+			Conditions: []metav1.Condition{
+				{
+					Type:    string(gatewayv1.GatewayConditionAccepted),
+					Status:  metav1.ConditionTrue,
+					Reason:  "Accepted",
+					Message: "GatewayClass is accepted and ready for use",
+				},
+			},
+			SupportedFeatures: featureNamesToSet([]string{
+				string(features.SupportGateway),
+				string(features.SupportGatewayStaticAddresses),
+				string(features.SupportMeshClusterIPMatching),
+				string(features.SupportMeshConsumerRoute),
+			}),
+		},
+	}
+	scheme := runtime.NewScheme()
+	scheme.AddKnownTypes(gatewayv1.SchemeGroupVersion, &gatewayv1.GatewayClass{})
+	fakeClient := fake.NewClientBuilder().
+		WithScheme(scheme).
+		WithObjects(gwc).
+		WithLists(&apiextensionsv1.CustomResourceDefinitionList{}).
+		Build()
+
+	gatewayv1.Install(fakeClient.Scheme())
+	apiextensionsv1.AddToScheme(fakeClient.Scheme())
+
+	options := ConformanceOptions{
+		AllowCRDsMismatch: true,
+		GatewayClassName:  gwcName,
+		Client:            fakeClient,
+	}
+
+	_, err := NewConformanceTestSuite(options)
+	if err == nil {
+		t.Fatalf("expected an error but got nil")
 	}
 }
 
@@ -537,90 +588,4 @@ func namesToFeatureSet(names []string) FeaturesSet {
 		featureSet.Insert(features.FeatureName(name))
 	}
 	return featureSet
-}
-
-func TestParseImplementation(t *testing.T) {
-	testCases := []struct {
-		name        string
-		org         string
-		project     string
-		url         string
-		version     string
-		contact     string
-		expected    *confv1.Implementation
-		expectedErr error
-	}{
-		{
-			name:        "missing organization",
-			project:     "test-project",
-			url:         "https://example.com",
-			version:     "v1.0.0",
-			contact:     "test@example.com",
-			expectedErr: errors.New("organization must be set"),
-		},
-		{
-			name:        "missing project",
-			org:         "test-org",
-			url:         "https://example.com",
-			version:     "v1.0.0",
-			contact:     "test@example.com",
-			expectedErr: errors.New("project must be set"),
-		},
-		{
-			name:        "missing url",
-			org:         "test-org",
-			project:     "test-project",
-			version:     "v1.0.0",
-			contact:     "test@example.com",
-			expectedErr: errors.New("url must be set"),
-		},
-		{
-			name:        "missing version",
-			org:         "test-org",
-			project:     "test-project",
-			url:         "https://example.com",
-			contact:     "test@example.com",
-			expectedErr: errors.New("version must be set"),
-		},
-		{
-			name:        "missing contact",
-			org:         "test-org",
-			project:     "test-project",
-			url:         "https://example.com",
-			version:     "v1.0.0",
-			expectedErr: errors.New("contact must be set"),
-		},
-		{
-			name:        "malformed url",
-			org:         "test-org",
-			project:     "test-project",
-			url:         "invalid-url",
-			version:     "v1.0.0",
-			contact:     "test@example.com",
-			expectedErr: errors.New("url is malformed"),
-		},
-		{
-			name:    "valid input",
-			org:     "test-org",
-			project: "test-project",
-			url:     "https://example.com",
-			version: "v1.0.0",
-			contact: "test@example.com,test2@example.com",
-			expected: &confv1.Implementation{
-				Organization: "test-org",
-				Project:      "test-project",
-				URL:          "https://example.com",
-				Version:      "v1.0.0",
-				Contact:      []string{"test@example.com", "test2@example.com"},
-			},
-		},
-	}
-
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			result, err := ParseImplementation(tc.org, tc.project, tc.url, tc.version, tc.contact)
-			assert.Equal(t, tc.expected, result)
-			assert.Equal(t, tc.expectedErr, err)
-		})
-	}
 }

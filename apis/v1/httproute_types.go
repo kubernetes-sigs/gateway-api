@@ -1344,9 +1344,9 @@ type HTTPCORSFilter struct {
 	// Therefore, the client doesn't attempt the actual cross-origin request.
 	//
 	// The `Access-Control-Allow-Origin` response header can only use `*`
-	// wildcard as value when the `AllowCredentials` field is unspecified.
+	// wildcard as value when the `AllowCredentials` field is false or omitted.
 	//
-	// When the `AllowCredentials` field is specified and `AllowOrigins` field
+	// When the `AllowCredentials` field is true and `AllowOrigins` field
 	// specified with the `*` wildcard, the gateway must return a single origin
 	// in the value of the `Access-Control-Allow-Origin` response header,
 	// instead of specifying the `*` wildcard. The value of the header
@@ -1361,17 +1361,17 @@ type HTTPCORSFilter struct {
 	// AllowCredentials indicates whether the actual cross-origin request allows
 	// to include credentials.
 	//
-	// The only valid value for the `Access-Control-Allow-Credentials` response
-	// header is true (case-sensitive).
+	// When set to true, the gateway will include the `Access-Control-Allow-Credentials`
+	// response header with value true (case-sensitive).
 	//
-	// If the credentials are not allowed in cross-origin requests, the gateway
-	// will omit the header `Access-Control-Allow-Credentials` entirely rather
-	// than setting its value to false.
+	// When set to false or omitted the gateway will omit the header
+	// `Access-Control-Allow-Credentials` entirely (this is the standard CORS
+	// behavior).
 	//
 	// Support: Extended
 	//
 	// +optional
-	AllowCredentials TrueField `json:"allowCredentials,omitempty"`
+	AllowCredentials *bool `json:"allowCredentials,omitempty"`
 
 	// AllowMethods indicates which HTTP methods are supported for accessing the
 	// requested resource.
@@ -1400,9 +1400,9 @@ type HTTPCORSFilter struct {
 	// side.
 	//
 	// The `Access-Control-Allow-Methods` response header can only use `*`
-	// wildcard as value when the `AllowCredentials` field is unspecified.
+	// wildcard as value when the `AllowCredentials` field is false or omitted.
 	//
-	// When the `AllowCredentials` field is specified and `AllowMethods` field
+	// When the `AllowCredentials` field is true and `AllowMethods` field
 	// specified with the `*` wildcard, the gateway must specify one HTTP method
 	// in the value of the Access-Control-Allow-Methods response header. The
 	// value of the header `Access-Control-Allow-Methods` is same as the
@@ -1442,9 +1442,9 @@ type HTTPCORSFilter struct {
 	//
 	// A wildcard indicates that the requests with all HTTP headers are allowed.
 	// The `Access-Control-Allow-Headers` response header can only use `*`
-	// wildcard as value when the `AllowCredentials` field is unspecified.
+	// wildcard as value when the `AllowCredentials` field is false or omitted.
 	//
-	// When the `AllowCredentials` field is specified and `AllowHeaders` field
+	// When the `AllowCredentials` field is true and `AllowHeaders` field
 	// specified with the `*` wildcard, the gateway must specify one or more
 	// HTTP headers in the value of the `Access-Control-Allow-Headers` response
 	// header. The value of the header `Access-Control-Allow-Headers` is same as
@@ -1487,8 +1487,7 @@ type HTTPCORSFilter struct {
 	//
 	// A wildcard indicates that the responses with all HTTP headers are exposed
 	// to clients. The `Access-Control-Expose-Headers` response header can only
-	// use `*` wildcard as value when the `AllowCredentials` field is
-	// unspecified.
+	// use `*` wildcard as value when the `AllowCredentials` field is false or omitted.
 	//
 	// Support: Extended
 	//
@@ -1590,7 +1589,6 @@ type HTTPBackendRef struct {
 	//
 	// +optional
 	// +kubebuilder:validation:MaxItems=16
-	// +kubebuilder:validation:XValidation:message="May specify either httpRouteFilterRequestRedirect or httpRouteFilterRequestRewrite, but not both",rule="!(self.exists(f, f.type == 'RequestRedirect') && self.exists(f, f.type == 'URLRewrite'))"
 	// +kubebuilder:validation:XValidation:message="May specify either httpRouteFilterRequestRedirect or httpRouteFilterRequestRewrite, but not both",rule="!(self.exists(f, f.type == 'RequestRedirect') && self.exists(f, f.type == 'URLRewrite'))"
 	// +kubebuilder:validation:XValidation:message="RequestHeaderModifier filter cannot be repeated",rule="self.filter(f, f.type == 'RequestHeaderModifier').size() <= 1"
 	// +kubebuilder:validation:XValidation:message="ResponseHeaderModifier filter cannot be repeated",rule="self.filter(f, f.type == 'ResponseHeaderModifier').size() <= 1"

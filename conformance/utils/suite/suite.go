@@ -21,7 +21,6 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
-	neturl "net/url"
 	"slices"
 	"sort"
 	"strings"
@@ -85,7 +84,7 @@ type ConformanceTestSuite struct {
 	// If SupportedFeatures are automatically determined from GWC Status.
 	// This will be required to report in future iterations as the passing
 	// will be determined based on this.
-	isInferredSupportedFeatures bool
+	supportedFeaturesSource supportedFeaturesSource
 
 	// mode is the operating mode of the implementation.
 	// The default value for it is "default".
@@ -189,24 +188,37 @@ const (
 	undefinedKeyword = "UNDEFINED"
 )
 
+// SupportedFeaturesSource represents the source from which supported features are derived.
+// It is used to distinguish between them being inferred from GWC Status or manually
+// supplied for the conformance report.
+type supportedFeaturesSource string
+
+const (
+	supportedFeaturesSourceManual   supportedFeaturesSource = "Manual"
+	supportedFeaturesSourceInferred supportedFeaturesSource = "Inferred"
+)
+
 // NewConformanceTestSuite is a helper to use for creating a new ConformanceTestSuite.
 func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite, error) {
 	supportedFeatures := options.SupportedFeatures.Difference(options.ExemptFeatures)
-	isInferred := false
-	switch {
-	case options.EnableAllSupportedFeatures:
+	source := supportedFeaturesSourceManual
+	if options.EnableAllSupportedFeatures {
 		supportedFeatures = features.SetsToNamesSet(features.AllFeatures)
-	case shouldInferSupportedFeatures(&options):
+	} else if shouldInferSupportedFeatures(&options) {
 		var err error
 		supportedFeatures, err = fetchSupportedFeatures(options.Client, options.GatewayClassName)
 		if err != nil {
-			return nil, fmt.Errorf("Cannot infer supported features: %w", err)
+			return nil, fmt.Errorf("cannot infer supported features: %w", err)
 		}
-		isInferred = true
+
+		if hasMeshFeatures(supportedFeatures) {
+			return nil, fmt.Errorf("mesh features should not be populated in GatewayClass")
+		}
+		source = supportedFeaturesSourceInferred
 	}
 
 	// If features were not inferred from Status, it's a GWC issue.
-	if isInferred && supportedFeatures.Len() == 0 {
+	if source == supportedFeaturesSourceInferred && supportedFeatures.Len() == 0 {
 		return nil, fmt.Errorf("no supported features were determined for test suite")
 	}
 
@@ -274,7 +286,7 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 		mode:                        mode,
 		apiVersion:                  apiVersion,
 		apiChannel:                  apiChannel,
-		isInferredSupportedFeatures: isInferred,
+		supportedFeaturesSource:     source,
 		Hook:                        options.Hook,
 	}
 
@@ -371,6 +383,10 @@ func (suite *ConformanceTestSuite) Setup(t *testing.T, tests []ConformanceTest) 
 		suite.Applier.MustApplyObjectsWithCleanup(t, suite.Client, suite.TimeoutConfig, []client.Object{secret}, suite.Cleanup)
 		secret = kubernetes.MustCreateSelfSignedCertSecret(t, "gateway-conformance-app-backend", "tls-passthrough-checks-certificate", []string{"abc.example.com"})
 		suite.Applier.MustApplyObjectsWithCleanup(t, suite.Client, suite.TimeoutConfig, []client.Object{secret}, suite.Cleanup)
+		caConfigMap, ca, caPrivKey := kubernetes.MustCreateCACertConfigMap(t, "gateway-conformance-infra", "backend-tls-checks-certificate", []string{"abc.example.com"})
+		suite.Applier.MustApplyObjectsWithCleanup(t, suite.Client, suite.TimeoutConfig, []client.Object{caConfigMap}, suite.Cleanup)
+		secret = kubernetes.MustCreateCASignedCertSecret(t, "gateway-conformance-infra", "tls-checks-certificate", []string{"abc.example.com"}, ca, caPrivKey)
+		suite.Applier.MustApplyObjectsWithCleanup(t, suite.Client, suite.TimeoutConfig, []client.Object{secret}, suite.Cleanup)
 
 		tlog.Logf(t, "Test Setup: Ensuring Gateways and Pods from base manifests are ready")
 		namespaces := []string{
@@ -393,10 +409,6 @@ func (suite *ConformanceTestSuite) Setup(t *testing.T, tests []ConformanceTest) 
 		}
 		kubernetes.MeshNamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, namespaces)
 	}
-}
-
-func (suite *ConformanceTestSuite) IsInferredSupportedFeatures() bool {
-	return suite.isInferredSupportedFeatures
 }
 
 func (suite *ConformanceTestSuite) setClientsetForTest(test ConformanceTest) error {
@@ -553,39 +565,19 @@ func (suite *ConformanceTestSuite) Report() (*confv1.ConformanceReport, error) {
 		GatewayAPIChannel:         suite.apiChannel,
 		ProfileReports:            profileReports.list(),
 		SucceededProvisionalTests: succeededProvisionalTests,
-		InferredSupportedFeatures: suite.IsInferredSupportedFeatures(),
 	}, nil
 }
 
 // ParseImplementation parses implementation-specific flag arguments and
 // creates a *confv1a1.Implementation.
-func ParseImplementation(org, project, url, version, contact string) (*confv1.Implementation, error) {
-	if org == "" {
-		return nil, errors.New("organization must be set")
-	}
-	if project == "" {
-		return nil, errors.New("project must be set")
-	}
-	if url == "" {
-		return nil, errors.New("url must be set")
-	}
-	if version == "" {
-		return nil, errors.New("version must be set")
-	}
-	if contact == "" {
-		return nil, errors.New("contact must be set")
-	}
-	if _, err := neturl.ParseRequestURI(url); err != nil {
-		return nil, errors.New("url is malformed")
-	}
-
-	return &confv1.Implementation{
+func ParseImplementation(org, project, url, version, contact string) confv1.Implementation {
+	return confv1.Implementation{
 		Organization: org,
 		Project:      project,
 		URL:          url,
 		Version:      version,
 		Contact:      strings.Split(contact, ","),
-	}, nil
+	}
 }
 
 // ParseConformanceProfiles parses flag arguments and converts the string to
@@ -630,8 +622,6 @@ func shouldInferSupportedFeatures(opts *ConformanceOptions) bool {
 	return !opts.EnableAllSupportedFeatures &&
 		opts.SupportedFeatures.Len() == 0 &&
 		opts.ExemptFeatures.Len() == 0 &&
-		opts.ConformanceProfiles.Len() == 0 &&
-		len(opts.SkipTests) == 0 &&
 		opts.RunTest == ""
 }
 
@@ -664,4 +654,8 @@ func getAPIVersionAndChannel(crds []apiextensionsv1.CustomResourceDefinition) (v
 	}
 
 	return version, channel, nil
+}
+
+func hasMeshFeatures(f FeaturesSet) bool {
+	return f.HasAny(features.SetsToNamesSet(features.MeshCoreFeatures, features.MeshExtendedFeatures).UnsortedList()...)
 }

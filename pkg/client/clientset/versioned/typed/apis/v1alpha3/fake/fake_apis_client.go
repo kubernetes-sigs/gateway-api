@@ -32,6 +32,10 @@ func (c *FakeGatewayV1alpha3) BackendTLSPolicies(namespace string) v1alpha3.Back
 	return newFakeBackendTLSPolicies(c, namespace)
 }
 
+func (c *FakeGatewayV1alpha3) TLSRoutes(namespace string) v1alpha3.TLSRouteInterface {
+	return newFakeTLSRoutes(c, namespace)
+}
+
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
 func (c *FakeGatewayV1alpha3) RESTClient() rest.Interface {
