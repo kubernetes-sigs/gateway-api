@@ -130,6 +130,7 @@ other functions (like managing DNS or creating certificates).
 - [argo-rollouts][22] (alpha)
 - [Knative][24] (alpha)
 - [Kuadrant][26] (GA)
+- [kruise-rollouts][41] (alpha)
 
 [1]:#acnodal-epic
 [2]:#apisix
@@ -170,6 +171,7 @@ other functions (like managing DNS or creating certificates).
 [38]:#google-cloud-service-mesh
 [39]:#kubvernor
 [40]:#agentgateway-with-kgateway
+[41]:#kruise-rollouts
 
 
 [gamma]:mesh/index.md
@@ -685,6 +687,10 @@ For help and support with Kuadrant's implementation please feel free to [create 
 [kuadrant-issue-new]:https://github.com/Kuadrant/kuadrant-operator/issues/new
 [kuadrant-slack]:https://kubernetes.slack.com/archives/C05J0D0V525
 
+### OpenKruise Rollouts
+[OpenKruise Rollouts][kruise-rollouts] is a plugin-n-play progressive delivery controller for Kubernetes. It supports several advanced deployment methods such as blue/green and canaries. OpenKruise Rollouts has built-in support for the Gateway API.
+
+[kruise-rollouts]:https://openkruise.io/rollouts/introduction
 
 ## Adding new entries
 
