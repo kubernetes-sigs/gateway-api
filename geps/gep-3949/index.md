@@ -46,6 +46,13 @@ we will need ways to
 show what features a given mesh implementation supports
 and represent mesh-wide configuration.
 
+This GEP therefore defines a Mesh resource
+which represents a running instance of a service mesh,
+allowing [Chihiro] and [Ian] to
+supply mesh-wide configuration,
+and allowing the mesh implementation
+to indicate what features it supports.
+
 Unlike Gateways, we do not expect
 multiple instances of meshes to be instantiated
 in a single cluster.
@@ -59,15 +66,11 @@ instead, we will simply define a Mesh resource.
   mesh-wide configuration
   and feature discovery.
 
+- Avoid making it more difficult for [Chihiro] and [Ian]
+  to adopt a mesh
+  (or to experiment with adopting a mesh).
+
 ## Non-Goals
-
-- Support multiple instances of a mesh
-  in a single cluster at the same time.
-
-    At some point, we may choose to
-    change this goal,
-    but it is definitely out of scope
-    for this GEP.
 
 - Support meshes interoperating with each other.
 
@@ -89,7 +92,7 @@ instead, we will simply define a Mesh resource.
     GAMMA has always taken the position
     that multiple meshes running simultaneously
     in a single cluster
-    is not a goal, but neither is it forbidden.
+    is not an explicit goal, but neither is it forbidden.
     This GEP does not change that position.
 
 ## API
@@ -142,6 +145,14 @@ spec:
   that is responsible for
   this Mesh resource.
 
+    A given mesh implementation will define its controller name
+    at build time.
+    It MUST be a domain-prefixed path,
+    for example `linkerd.io/linkerd` or `istio.io/istio`.
+    It MUST NOT be empty.
+    It MAY be configurable at runtime,
+    although this is not expected to be common.
+
     Although we expect
     that there will be
     only one mesh
@@ -154,19 +165,6 @@ spec:
     that does not have
     a `controllerName` field
     that matches its own name.
-
-    If a MeshClass resource
-    is later defined,
-    the Mesh resource
-    will gain a
-    `meshClassName` field,
-    the `controllerName` field
-    will be deprecated,
-    and a
-    Mesh resource
-    that includes
-    both `controllerName` and `meshClassName`
-    will be invalid.
 
 - The `parametersRef` field
   is analogous to
@@ -217,23 +215,23 @@ status:
     ...
 ```
 
-Although it is
-explicitly
-not a goal of this GEP
-to support multiple meshes
+Although GAMMA does not fully support multiple meshes
 running in the same cluster at the same time,
 meshes still MUST provide
 human-readable information
 in the `Accepted` condition
 about which mesh instance
-has claimed a given Mesh resource,
-and SHOULD provide human-readable
-information in the `Ready` condition,
-in support of future expansion work.
+has claimed a given Mesh resource.
 This information is meant to be used
 by [Chihiro] and [Ian] as confirmation
 that the mesh instance
 is doing what they expect it to do.
+
+Mesh implementations MUST
+reject Mesh resources in which `spec.parametersRef`
+references a resource that does not exist
+or is not supported by the mesh implementation,
+setting the `Reason` to `InvalidParameters`.
 
 The mesh implementation
 MUST set `status.SupportedFeatures`
@@ -242,43 +240,121 @@ the mesh supports.
 
 ### Life Cycle
 
-A mesh implementation MUST NOT create a Mesh resource
-if one does not already exist.
+One of the explicit goals of this GEP
+is to avoid making it more difficult for [Chihiro] and [Ian]
+to adopt a mesh.
+In turn, this implies that we MUST NOT require [Chihiro] or [Ian]
+to manually create a Mesh resource in order to use a mesh.
 
-If a mesh implementation does not find a Mesh resource
-with a matching `controllerName` at startup:
+The simplest way to achieve this is
+for the mesh implementation to create a Mesh resource
+when it starts up,
+if one does not already exist
+with a matching `controllerName` field.
+This raises questions around
+what the Mesh resource should be named,
+and how the mesh implementation can avoid overwriting
+any modifications [Chihiro] or [Ian] make
+to the Mesh resource after it is created.
 
-- It SHOULD warn the user
-  (in whatever way is appropriate for the mesh)
-  that the Mesh resource is missing.
+To manage these concerns
+while still minimizing added friction,
+mesh implementations MUST define a default `metadata.name`
+for the Mesh resource they will look for,
+and SHOULD allow overriding this name at install time.
+This default name SHOULD be
+an obvious derivative of the mesh implementation name,
+such as "linkerd" or "istio";
+its purpose is to make it easy for [Chihiro] and [Ian]
+to find the Mesh resource
+while also allowing for the possibility
+that there will need to be more than one
+Mesh resource in a cluster.
 
-- It MUST act as if a Mesh resource was found
-  with an empty `spec`
-  (other than the `controllerName` field).
-  Optional configuration MUST remain in its default state,
-  and features that require a Mesh resource
-  (such as OCG support)
-  MUST NOT be enabled.
+At startup, then:
+
+- The mesh implementation MUST look for a Mesh resource
+  with the expected `metadata.name` field.
+
+- If no Mesh resource exists with the expected `metadata.name`,
+  the implementation MUST create a Mesh resource
+  with the expected `metadata.name`
+  and `spec.controllerName` fields.
+
+  - The mesh MUST NOT set any other fields
+    in the `spec` of the Mesh resource
+    that it creates.
+
+    In particular, the mesh MUST NOT set `parametersRef`
+    when it creates the Mesh resource.
+
+- Otherwise
+  (a Mesh resource already exists with the expected `metadata.name`),
+  the implementation MUST NOT modify the `spec`
+  of that Mesh resource
+  in **any way**.
+  Instead, it MUST check the `spec.controllerName` field:
+
+  - If the Mesh resource has a matching `spec.controllerName` field:
+
+      - The implementation MUST set the `status` stanza
+        of the Mesh resource
+        to indicate whether or not it has accepted the Mesh resource
+        and, if accepted, what features the mesh supports.
+
+  - Otherwise
+    (the Mesh resource does not have
+    a matching `spec.controllerName` field):
+
+      - The implementation MUST NOT modify the Mesh resource
+        in any way,
+        and it SHOULD warn the user
+        (in whatever way is appropriate for the mesh)
+        that there is a mismatch in the Mesh resource
+
+```mermaid
+flowchart TD
+  Start{Does a Mesh resource with a matching name exist?}
+  Start -->|Yes| Match
+  Start -->|No| NoMatch
+  Match{Does the controllerName also match?}
+  Match -->|No| WarnNoModify
+  Match -->|Yes| UpdateStat
+  NoMatch[Create a new Mesh resource] --> CheckCreate
+  CheckCreate{Did creation succeed?}
+  CheckCreate -->|Yes| UpdateStat
+  CheckCreate -->|No| Warn
+  UpdateStat[Update status]
+  Warn[Warn]
+  WarnNoModify[Warn and don't modify]
+```
+
+If, at the end of this process,
+there is no Mesh resource with both
+a matching `metadata.name` and
+a matching `spec.controllerName`,
+the implementation MUST act as if
+a Mesh resource was found with a empty `spec`
+(other than the `controllerName` field).
+Optional configuration MUST remain in its default state,
+and features that require a Mesh resource
+(such as OCG support)
+MUST NOT be enabled.
 
 Obviously, if no matching Mesh resource exists,
 the mesh will not be able to publish support features,
 which may lead to assumptions
 that the mesh does not support any features.
 
-Meshes SHOULD provide an easy way
-for [Chihiro] or [Ian] to obtain a default Mesh resource
-when the mesh is installed,
-so that they do not need to know
-the `controllerName`
-before installing the mesh.
-(For example,
-a mesh's Helm chart might include
-a default Mesh resource
-with only the `controllerName` field set,
-with the assumption
-that [Chihiro] or [Ian] will later edit the resource.)
-Any such mechanism for obtaining a default Mesh resource
-MUST NOT unconditionally overwrite an existing Mesh resource, though.
+The mesh implementation MUST NOT,
+under any circumstances,
+modify the `spec` of a Mesh resource
+other than by creating a new Mesh resource
+when one does not exist.
+
+Mesh implementations SHOULD
+respond to changes in the Mesh resource
+without requiring the mesh to be restarted.
 
 ### API Type Definitions
 
@@ -448,6 +524,16 @@ but decided that
 there was no clear need for both,
 and that a Mesh resource
 better served the use cases.
+
+If a MeshClass resource
+is later defined,
+the Mesh resource
+will need to be updated.
+One potential approach to such an update might be:
+
+- Add a `meshClassName` field to the Mesh resource;
+- Deprecate the `controllerName` field; and
+- Define that a Mesh resource with both fields set is invalid.
 
 ## References
 
