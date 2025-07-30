@@ -224,24 +224,24 @@ Airlock Microgateway protects your applications and microservices with the tried
 ### Alibaba Cloud Container Service for Kubernetes
 [Alibaba Cloud Container Service for Kubernetes (ACK)][ack] is a managed Kubernetes platform
 offered by Alibaba Cloud. The implementation of the Gateway API in ACK is through the
-[ACK Gateway with Inference Extension][ack-gie] component or ALB Controller[ack-alb], which provides rich traffic management features such as load balancing, dynamic upstream, canary release, circuit breaking, authentication, observability, and more.
+[ACK Gateway with Inference Extension][ack-gie] component or [ALB Controller][ack-alb], which provides rich traffic management features such as load balancing, dynamic upstream, canary release, circuit breaking, authentication, observability, and more.
 
 The ACK Gateway implements weighted traffic splitting, mirroring, advanced routing and more. See the docs for the [usage][ack-gie-usage].
 
 Progress towards supporting Gateway API Inference Extension is being tracked
 by [this Issue](https://github.com/AliyunContainerService/ack-gateway-api/issues/1).
 
-[ack]:https://www.alibabacloud.com/help/en/ack
-[ack-gie]:https://www.alibabacloud.com/help/en/ack/product-overview/ack-gateway-with-inference-extension
+[ack]:https://www.alibabacloud.com/help/ack
+[ack-gie]:https://www.alibabacloud.com/help/ack/product-overview/ack-gateway-with-inference-extension
 [ack-alb]:https://www.alibabacloud.com/help/ack/ack-managed-and-ack-dedicated/user-guide/use-the-gateway-api-to-expose-services-through-alb
-[ack-gie-usage]:https://www.alibabacloud.com/help/en/ack/ack-managed-and-ack-dedicated/user-guide/intelligent-routing-and-traffic-management-with-ack-gateway-inference-extension
+[ack-gie-usage]:https://www.alibabacloud.com/help/ack/ack-managed-and-ack-dedicated/user-guide/intelligent-routing-and-traffic-management-with-ack-gateway-inference-extension
 
 ### Alibaba Cloud Service Mesh
 [Alibaba Cloud Service Mesh (ASM)][asm] is a fully managed service mesh platform offered by Alibaba Cloud, which provides a unified service mesh solution for Kubernetes clusters. ASM is fully compatible with Istio, and refer to [Alibaba Cloud Service Mesh](asm) for details and instructions.
 Using ASM, you can use Gateway API to define routing rules for accessing applications in a cluster.  See the docs for the [usage][asm-usage].
 
 [asm]:https://www.alibabacloud.com/help/doc-detail/147513.htm
-[asm-usage]:https://www.alibabacloud.com/help/en/asm/sidecar/use-gateway-api-to-define-routing-rules
+[asm-usage]:https://www.alibabacloud.com/help/asm/sidecar/use-gateway-api-to-define-routing-rules
 
 ### Amazon Elastic Kubernetes Service
 
