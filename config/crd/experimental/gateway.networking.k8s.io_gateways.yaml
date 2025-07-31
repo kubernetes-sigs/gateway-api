@@ -1298,7 +1298,6 @@ spec:
                         - type
                         type: object
                       maxItems: 8
-                      minItems: 1
                       type: array
                       x-kubernetes-list-map-keys:
                       - type
@@ -1341,7 +1340,6 @@ spec:
                         - kind
                         type: object
                       maxItems: 8
-                      minItems: 1
                       type: array
                   required:
                   - attachedRoutes
@@ -2640,7 +2638,6 @@ spec:
                         - type
                         type: object
                       maxItems: 8
-                      minItems: 1
                       type: array
                       x-kubernetes-list-map-keys:
                       - type
@@ -2683,7 +2680,6 @@ spec:
                         - kind
                         type: object
                       maxItems: 8
-                      minItems: 1
                       type: array
                   required:
                   - attachedRoutes

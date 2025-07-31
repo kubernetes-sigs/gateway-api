@@ -1124,7 +1124,6 @@ type ListenerStatus struct {
 	// reference the valid Route kinds that have been specified.
 	//
 	// +kubebuilder:validation:MaxItems=8
-	// +kubebuilder:validation:MinItems=1
 	// +required
 	SupportedKinds []RouteGroupKind `json:"supportedKinds"`
 
@@ -1153,7 +1152,6 @@ type ListenerStatus struct {
 	// +listType=map
 	// +listMapKey=type
 	// +kubebuilder:validation:MaxItems=8
-	// +kubebuilder:validation:MinItems=1
 	// +required
 	Conditions []metav1.Condition `json:"conditions"`
 }
