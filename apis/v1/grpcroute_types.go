@@ -56,7 +56,8 @@ import (
 // Implementations MAY also accept HTTP/2 connections with an upgrade from
 // HTTP/1, i.e. without prior knowledge.
 type GRPCRoute struct {
-	metav1.TypeMeta   `json:",inline"`
+	metav1.TypeMeta `json:",inline"`
+	// +optional
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	// Spec defines the desired state of GRPCRoute.
@@ -64,6 +65,7 @@ type GRPCRoute struct {
 	Spec GRPCRouteSpec `json:"spec,omitempty"`
 
 	// Status defines the current state of GRPCRoute.
+	// +optional
 	Status GRPCRouteStatus `json:"status,omitempty"`
 }
 
@@ -405,12 +407,14 @@ type GRPCHeaderMatch struct {
 	// entries with an equivalent header name MUST be ignored. Due to the
 	// case-insensitivity of header names, "foo" and "Foo" are considered
 	// equivalent.
+	// +required
 	Name GRPCHeaderName `json:"name"`
 
 	// Value is the value of the gRPC Header to be matched.
 	//
 	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=4096
+	// +required
 	Value string `json:"value"`
 }
 
@@ -521,6 +525,7 @@ type GRPCRouteFilter struct {
 	// +unionDiscriminator
 	// +kubebuilder:validation:Enum=ResponseHeaderModifier;RequestHeaderModifier;RequestMirror;ExtensionRef
 	// <gateway:experimental:validation:Enum=ResponseHeaderModifier;RequestHeaderModifier;RequestMirror;ExtensionRef>
+	// +required
 	Type GRPCRouteFilterType `json:"type"`
 
 	// RequestHeaderModifier defines a schema for a filter that modifies request

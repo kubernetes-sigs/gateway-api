@@ -33,15 +33,18 @@ import (
 // Gateway represents an instance of a service-traffic handling infrastructure
 // by binding Listeners to a set of IP addresses.
 type Gateway struct {
-	metav1.TypeMeta   `json:",inline"`
+	metav1.TypeMeta `json:",inline"`
+	// +optional
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	// Spec defines the desired state of Gateway.
+	// +required
 	Spec GatewaySpec `json:"spec"`
 
 	// Status defines the current state of Gateway.
 	//
 	// +kubebuilder:default={conditions: {{type: "Accepted", status: "Unknown", reason:"Pending", message:"Waiting for controller", lastTransitionTime: "1970-01-01T00:00:00Z"},{type: "Programmed", status: "Unknown", reason:"Pending", message:"Waiting for controller", lastTransitionTime: "1970-01-01T00:00:00Z"}}}
+	// +optional
 	Status GatewayStatus `json:"status,omitempty"`
 }
 
@@ -63,6 +66,7 @@ type GatewayList struct {
 type GatewaySpec struct {
 	// GatewayClassName used for this Gateway. This is the name of a
 	// GatewayClass resource.
+	// +required
 	GatewayClassName ObjectName `json:"gatewayClassName"`
 
 	// Listeners associated with this Gateway. Listeners define
@@ -236,6 +240,7 @@ type GatewaySpec struct {
 	// +kubebuilder:validation:XValidation:message="hostname must not be specified for protocols ['TCP', 'UDP']",rule="self.all(l, l.protocol in ['TCP', 'UDP']  ? (!has(l.hostname) || l.hostname == '') : true)"
 	// +kubebuilder:validation:XValidation:message="Listener name must be unique within the Gateway",rule="self.all(l1, self.exists_one(l2, l1.name == l2.name))"
 	// +kubebuilder:validation:XValidation:message="Combination of port, protocol and hostname must be unique for each listener",rule="self.all(l1, self.exists_one(l2, l1.port == l2.port && l1.protocol == l2.protocol && (has(l1.hostname) && has(l2.hostname) ? l1.hostname == l2.hostname : !has(l1.hostname) && !has(l2.hostname))))"
+	// +required
 	Listeners []Listener `json:"listeners"`
 
 	// Addresses requested for this Gateway. This is optional and behavior can
@@ -333,6 +338,7 @@ type Listener struct {
 	// Gateway.
 	//
 	// Support: Core
+	// +required
 	Name SectionName `json:"name"`
 
 	// Hostname specifies the virtual hostname to match for protocol types that
@@ -390,11 +396,13 @@ type Listener struct {
 	// same port, subject to the Listener compatibility rules.
 	//
 	// Support: Core
+	// +required
 	Port PortNumber `json:"port"`
 
 	// Protocol specifies the network protocol this listener expects to receive.
 	//
 	// Support: Core
+	// +required
 	Protocol ProtocolType `json:"protocol"`
 
 	// TLS is the TLS configuration for the Listener. This field is required if
@@ -637,6 +645,7 @@ type FrontendTLSValidation struct {
 	//
 	// +kubebuilder:validation:MaxItems=8
 	// +kubebuilder:validation:MinItems=1
+	// +required
 	CACertificateRefs []ObjectReference `json:"caCertificateRefs,omitempty"`
 }
 
@@ -721,6 +730,7 @@ type RouteGroupKind struct {
 	Group *Group `json:"group,omitempty"`
 
 	// Kind is the kind of the Route.
+	// +required
 	Kind Kind `json:"kind"`
 }
 
@@ -764,6 +774,7 @@ type GatewayStatusAddress struct {
 	//
 	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=253
+	// +required
 	Value string `json:"value"`
 }
 
@@ -873,15 +884,18 @@ type GatewayInfrastructure struct {
 // configuration resource within the namespace.
 type LocalParametersReference struct {
 	// Group is the group of the referent.
+	// +required
 	Group Group `json:"group"`
 
 	// Kind is kind of the referent.
+	// +required
 	Kind Kind `json:"kind"`
 
 	// Name is the name of the referent.
 	//
 	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=253
+	// +required
 	Name string `json:"name"`
 }
 
@@ -1096,6 +1110,7 @@ const (
 // ListenerStatus is the status associated with a Listener.
 type ListenerStatus struct {
 	// Name is the name of the Listener that this status corresponds to.
+	// +required
 	Name SectionName `json:"name"`
 
 	// SupportedKinds is the list indicating the Kinds supported by this
@@ -1109,6 +1124,7 @@ type ListenerStatus struct {
 	// reference the valid Route kinds that have been specified.
 	//
 	// +kubebuilder:validation:MaxItems=8
+	// +required
 	SupportedKinds []RouteGroupKind `json:"supportedKinds"`
 
 	// AttachedRoutes represents the total number of Routes that have been
@@ -1128,6 +1144,7 @@ type ListenerStatus struct {
 	//
 	// Uses for this field include troubleshooting Route attachment and
 	// measuring blast radius/impact of changes to a Listener.
+	// +required
 	AttachedRoutes int32 `json:"attachedRoutes"`
 
 	// Conditions describe the current condition of this listener.
@@ -1135,6 +1152,7 @@ type ListenerStatus struct {
 	// +listType=map
 	// +listMapKey=type
 	// +kubebuilder:validation:MaxItems=8
+	// +required
 	Conditions []metav1.Condition `json:"conditions"`
 }
 
