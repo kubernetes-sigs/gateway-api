@@ -96,7 +96,7 @@ type TLSRouteSpec struct {
 	//
 	// +required
 	// +kubebuilder:validation:MinItems=1
-	// +kubebuilder:validation:MaxItems=16
+	// +kubebuilder:validation:MaxItems=1
 	// <gateway:experimental:validation:XValidation:message="Rule name must be unique within the route",rule="self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name) && l1.name == l2.name))">
 	Rules []v1alpha2.TLSRouteRule `json:"rules"`
 }
