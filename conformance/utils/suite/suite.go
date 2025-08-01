@@ -461,6 +461,9 @@ func (suite *ConformanceTestSuite) Run(t *testing.T, tests []ConformanceTest) er
 	sleepForTestIsolation := false
 	for _, test := range tests {
 		res := testSucceeded
+		if suite.RunTest != "" && test.ShortName != suite.RunTest {
+			res = testSkipped
+		}
 		if suite.SkipTests.Has(test.ShortName) {
 			res = testSkipped
 		}
