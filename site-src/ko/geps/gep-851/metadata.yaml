@@ -1,0 +1,7 @@
+apiVersion: internal.gateway.networking.k8s.io/v1alpha1
+kind: GEPDetails
+number: 851
+name: Allow Multiple Certificate Refs per Gateway Listener
+status: Standard
+authors:
+  - robscott

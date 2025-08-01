@@ -1,0 +1,337 @@
+# GEP-718: Rework forwardTo segment in routes
+
+* Issue: [#718](https://github.com/kubernetes-sigs/gateway-api/issues/718)
+* Status: Standard
+
+## Motivation
+
+### Complications due to the `serviceName` shortcut
+
+Within `RouteForwardTo` (and `HTTPRouteForwardTo` by extension) there exists
+two mechanisms to specify the upstream network endpoint where the traffic should
+be forwarded to:
+- `ServiceName`: the name of the Kubernetes Service
+- `BackendRef`: a LocalObjectReference to a resource, this is an extension point in the API
+
+While working on [#685](https://github.com/kubernetes-sigs/gateway-api/pull/685),
+it came to light that:
+1. `BackendRef` itself could be used to point to a Kubernetes Service
+2. With [GEP-709](https://github.com/kubernetes-sigs/gateway-api/pull/711),
+there will be a need to introduce a new `namespace` field which will enable use-cases to forward
+traffic to a services and backends located in different namespaces
+
+While (1) can be fixed with more validation and documentation, it only solves for
+the specific case. (2) requires adding two fields: `serviceNamespace`
+and `BackendRef.Namespace` - something we would like to avoid since the `serviceName`
+field was introduced only as a shortcut and adding more service-specific fields
+defeats the original purpose.
+
+These problems are in addition to the original problem that
+[#685](https://github.com/kubernetes-sigs/gateway-api/pull/685) attempts to solve:
+clarifying port requirements when a port is required or not.
+We have been updating documentation to tackle such corner-cases but that
+continues to result in more and more elaborations. Some excerpts from our
+existing documentation:
+```
+	// ServiceName refers to the name of the Service to mirror matched requests
+	// to. When specified, this takes the place of BackendRef. If both
+	// BackendRef and ServiceName are specified, ServiceName will be given
+	// precedence.
+
+	// BackendRef is a local object reference to mirror matched requests to. If
+	// both BackendRef and ServiceName are specified, ServiceName will be given
+	// precedence.
+
+	// Weight specifies the proportion of HTTP requests forwarded to the backend
+	// referenced by the ServiceName or BackendRef field. This is computed as
+
+	// Port specifies the destination port number to use for the
+	// backend referenced by the ServiceName or BackendRef field.
+	// If unspecified, the destination port in the request is used
+	// when forwarding to a backendRef or serviceName.
+```
+
+### Simplifying `RouteForwardTo`
+
+RouteForwardTo is not the best of the names. Using a noun instead of a verb
+would help with in-person communication and documentation.
+Since we are already considering dropping the special case of `service` as a
+backend, we have an opportunity to further simplify `RouteForwardTo` for better
+UX.
+
+## Proposal
+
+- Remove the `ServiceName` field from `RouteForwardTo`
+- Introduce `Service` as a default for `BackendRef.Kind`
+- Pull fields from `RouteForwardTo.BackendRef` into `RouteForwardTo` itself
+- Rename `RouteForwardTo` to `BackendRef`
+- Rename `Route.Spec.Rules[].ForwardTo[]` to `Route.Spec.Rules[].BackendRefs[]` in
+  all routes
+- Apply the same to HTTP types and filters
+
+## API
+
+The updated `BackendRef` (formerly `RouteForwardTo`) struct will be:
+(HTTP version has been omitted for brevity)
+
+```go
+// BackendRef defines how and where a request should be forwarded from the Gateway.
+type BackendRef struct {
+	// Group is the group of the backend resource.
+	//
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=253
+	Group string `json:"group"`
+
+	// Kind is kind of the backend resource.
+	//
+	// Support: Core (Kubernetes Service)
+	// Support: Implementation-specific (any other resource)
+	//
+	// +optional
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=253
+	// +kubebuilder:default="service"
+	Kind *string `json:"kind"`
+
+	// Name is the name of the backend resource to forward matched requests to.
+	//
+	// If the referent cannot be found, the rule is not included in the route.
+	// The controller should raise the "ResolvedRefs" condition on the Gateway
+	// with the "DegradedRoutes" reason. The gateway status for this route should
+	// be updated with a condition that describes the error more specifically.
+	//
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=253
+	Name string `json:"name"`
+
+	// Port specifies the destination port number to use for the
+	// backend resource.
+	// This field is required when the backend is a Kubernetes Service.
+	//
+	// Support: Core
+	//
+	// +optional
+	Port *PortNumber `json:"port,omitempty"`
+
+	// Weight specifies the proportion of HTTP requests forwarded to the backend
+	// This is computed as weight/(sum of all weights in this Backends list).
+	// For non-zero values, there may be some epsilon from the exact proportion
+	// defined here depending on the precision an implementation supports. Weight
+	// is not a percentage and the sum of weights does not need to equal 100.
+	//
+	// If only one backend is specified and it has a weight greater than 0, 100%
+	// of the traffic is forwarded to that backend. If weight is set to 0, no
+	// traffic should be forwarded for this entry. If unspecified, weight
+	// defaults to 1.
+	//
+	// Support: Extended
+	//
+	// +optional
+	// +kubebuilder:default=1
+	// +kubebuilder:validation:Minimum=0
+	// +kubebuilder:validation:Maximum=1000000
+	Weight *int32 `json:"weight,omitempty"`
+}
+```
+
+A summarized diff for the changes being proposed:
+
+```patch
+diff --git a/apis/v1alpha1/shared_types.go b/apis/v1alpha1/shared_types.go
+index 458145f..de720cd 100644
+--- a/apis/v1alpha1/shared_types.go
++++ b/apis/v1alpha1/shared_types.go
+@@ -94,51 +94,39 @@ type GatewayReference struct {
+ 	Namespace string `json:"namespace"`
+ }
+ 
+-// RouteForwardTo defines how a Route should forward a request.
+-type RouteForwardTo struct {
+-	// ServiceName refers to the name of the Service to forward matched requests
+-	// to. When specified, this takes the place of BackendRef. If both
+-	// BackendRef and ServiceName are specified, ServiceName will be given
+-	// precedence.
++// BackendRef defines how and where a request should be forwarded from the Gateway.
++type BackendRef struct {
++	// Name is the name of the backend resource to forward matched requests to.
+ 	//
+ 	// If the referent cannot be found, the rule is not included in the route.
+ 	// The controller should raise the "ResolvedRefs" condition on the Gateway
+ 	// with the "DegradedRoutes" reason. The gateway status for this route should
+ 	// be updated with a condition that describes the error more specifically.
+ 	//
+-	// The protocol to use is defined using AppProtocol field (introduced in
+-	// Kubernetes 1.18) in the Service resource. In the absence of the
+-	// AppProtocol field a `networking.x-k8s.io/app-protocol` annotation on the
+-	// BackendPolicy resource may be used to define the protocol. If the
+-	// AppProtocol field is available, this annotation should not be used. The
+-	// AppProtocol field, when populated, takes precedence over the annotation
+-	// in the BackendPolicy resource. For custom backends, it is encouraged to
+-	// add a semantically-equivalent field in the Custom Resource Definition.
++	// +kubebuilder:validation:MinLength=1
++	// +kubebuilder:validation:MaxLength=253
++	Name string `json:"name"`
++
++	// Kind is kind of the backend resource.
+ 	//
+-	// Support: Core
++	// Support: Core (Kubernetes Service)
++	// Support: Custom (any other resource)
+ 	//
+ 	// +optional
++	// +kubebuilder:validation:MinLength=1
+ 	// +kubebuilder:validation:MaxLength=253
+-	ServiceName *string `json:"serviceName,omitempty"`
++	// +kubebuilder:default="service"
++	Kind *string `json:"kind"`
+ 
+-	// BackendRef is a reference to a backend to forward matched requests to. If
+-	// both BackendRef and ServiceName are specified, ServiceName will be given
+-	// precedence.
+-	//
+-	// If the referent cannot be found, the rule is not included in the route.
+-	// The controller should raise the "ResolvedRefs" condition on the Gateway
+-	// with the "DegradedRoutes" reason. The gateway status for this route should
+-	// be updated with a condition that describes the error more specifically.
++	// Group is the group of the backend resource.
+ 	//
+-	// Support: Custom
+-	//
+-	// +optional
+-	BackendRef *LocalObjectReference `json:"backendRef,omitempty"`
++	// +kubebuilder:validation:MinLength=1
++	// +kubebuilder:validation:MaxLength=253
++	Group string `json:"group"`
+ 
+ 	// Port specifies the destination port number to use for the
+-	// backend referenced by the ServiceName or BackendRef field.
+-	// If unspecified, the destination port in the request is used
+-	// when forwarding to a backendRef or serviceName.
++	// backend resource.
++	// This field is required when the backend is a Kubernetes Service.
+ 	//
+ 	// Support: Core
+ 	//
+@@ -146,11 +134,10 @@ type RouteForwardTo struct {
+ 	Port *PortNumber `json:"port,omitempty"`
+ 
+ 	// Weight specifies the proportion of HTTP requests forwarded to the backend
+-	// referenced by the ServiceName or BackendRef field. This is computed as
+-	// weight/(sum of all weights in this ForwardTo list). For non-zero values,
+-	// there may be some epsilon from the exact proportion defined here
+-	// depending on the precision an implementation supports. Weight is not a
+-	// percentage and the sum of weights does not need to equal 100.
++	// This is computed as weight/(sum of all weights in this Backends list).
++	// For non-zero values, there may be some epsilon from the exact proportion
++	// defined here depending on the precision an implementation supports. Weight
++	// is not a percentage and the sum of weights does not need to equal 100.
+ 	//
+ 	// If only one backend is specified and it has a weight greater than 0, 100%
+ 	// of the traffic is forwarded to that backend. If weight is set to 0, no
+```
+
+## Examples
+
+
+For Kubernetes Services, an updated `forwardTo` section will read as follows:
+
+```yaml
+...
+backendRefs:
+- name: foo-service-v1
+  port: 80
+  weight: 80
+- name: foo-service-canary
+  port: 80
+  weight: 20
+...
+```
+
+Here, the `kind` field is omitted as it will be injected as a default.
+
+For custom backends, the API will look like the following:
+
+```yaml
+...
+backendRefs:
+- name: foo-v1
+  kind: server
+  group: networking.acme.io
+  port: 80
+  weight: 80
+- name: foo-v1-canary
+  kind: server
+  group: networking.acme.io
+  port: 80
+  weight: 20
+...
+```
+
+For completeness, here is an example of HTTPRoute:
+
+```yaml
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: HTTPRoute
+metadata:
+  name: bar-route
+  labels:
+    gateway: prod-web-gw
+spec:
+  hostnames:
+  - "bar.example.com"
+  rules:
+  - matches:
+    - headers:
+        type: Exact
+        values:
+          env: canary
+    backendRefs:
+    - name: foo-service-v1
+      port: 80
+      weight: 80
+    - name: foo-service-canary
+      port: 80
+      weight: 20
+```
+
+## Alternatives considered
+
+### Rename serviceName to backendName
+
+As suggested in [this comment](https://github.com/kubernetes-sigs/gateway-api/pull/685#discussion_r667285837),
+we could buy the best of both the worlds by introducing `backendName`:
+
+```yaml
+forwardTo:
+- backendName: foo
+  port: 80
+    kind: <defaults to Service>
+```
+
+While this saves one line of YAML (`backendRef:`), it could be potentially
+violating the `Naming of the reference field`
+[API convention][api-conventions].
+Most of our object references are of the form `XRef`.
+
+## Concerns resolved
+
+A concern was raised around flattening of object reference fields i.e. including
+port and weight field alongside object reference is by k8s API conventions or not.
+This is not a problem and has been confirmed with API maintainers
+([comment](https://github.com/kubernetes-sigs/gateway-api/pull/719#discussion_r678555744)).
+
+## Out of scope
+
+N/A
+
+## References
+
+Existing documentation:
+- [RouteForwardTo](https://github.com/kubernetes-sigs/gateway-api/blob/a9d45b51c396fbed022204af0185b00a4ac7e282/apis/v1alpha2/shared_types.go#L97-L167)
+- [HTTPRouteForwardTo](https://github.com/kubernetes-sigs/gateway-api/blob/a9d45b51c396fbed022204af0185b00a4ac7e282/apis/v1alpha2/httproute_types.go#L731-L813)
+- [#685](https://github.com/kubernetes-sigs/gateway-api/pull/685)
+  - [Comment thread that spawned this GEP](https://github.com/kubernetes-sigs/gateway-api/pull/685#discussion_r640204333)
+- [#578](https://github.com/kubernetes-sigs/gateway-api/issues/578)
+
+[api-conventions]: https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#naming-of-the-reference-field
