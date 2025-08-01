@@ -1119,7 +1119,7 @@ spec:
                     || p2.port == 0)) || (has(p1.port) && has(p2.port) && p1.port
                     == p2.port))))
               rules:
-                description: Rules are a list of TLS matchers and actions.
+                description: Rules are a list of actions.
                 items:
                   description: TLSRouteRule is the configuration for a given rule.
                   properties:

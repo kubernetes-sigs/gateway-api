@@ -92,7 +92,7 @@ type TLSRouteSpec struct {
 	// +required
 	Hostnames []Hostname `json:"hostnames,omitempty"`
 
-	// Rules are a list of TLS matchers and actions.
+	// Rules are a list of actions.
 	//
 	// +required
 	// +kubebuilder:validation:MinItems=1
