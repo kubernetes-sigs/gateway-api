@@ -57,13 +57,10 @@ GATEWAY_INPUT_DIRS_SPACE="${GATEWAY_INPUT_DIRS_SPACE%,}" # drop trailing space
 GATEWAY_INPUT_DIRS_COMMA="${GATEWAY_INPUT_DIRS_COMMA%,}" # drop trailing comma
 GATEWAY_API_DIRS_COMMA="${GATEWAY_API_DIRS_COMMA%,}" # drop trailing comma
 
-# throw away
-new_report="$(mktemp -t "$(basename "$0").api_violations.XXXXXX")"
-
 echo "Generating openapi schema"
 go run k8s.io/kube-openapi/cmd/openapi-gen \
   --output-file zz_generated.openapi.go \
-  --report-filename "${new_report}" \
+  --report-filename "hack/openapi-reports/api-violations.list" \
   --output-dir "pkg/generated/openapi" \
   --output-pkg "sigs.k8s.io/gateway-api/pkg/generated/openapi" \
   ${COMMON_FLAGS} \

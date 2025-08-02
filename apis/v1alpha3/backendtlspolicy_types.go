@@ -80,9 +80,10 @@ type BackendTLSPolicySpec struct {
 	//
 	// Support: Implementation-specific for any other resource
 	//
+	// +required
+	// +listType=atomic
 	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:MaxItems=16
-	// +required
 	// +kubebuilder:validation:XValidation:message="sectionName must be specified when targetRefs includes 2 or more references to the same target",rule="self.all(p1, self.all(p2, p1.group == p2.group && p1.kind == p2.kind && p1.name == p2.name ? ((!has(p1.sectionName) || p1.sectionName == '') == (!has(p2.sectionName) || p2.sectionName == '')) : true))"
 	// +kubebuilder:validation:XValidation:message="sectionName must be unique when targetRefs includes 2 or more references to the same target",rule="self.all(p1, self.exists_one(p2, p1.group == p2.group && p1.kind == p2.kind && p1.name == p2.name && (((!has(p1.sectionName) || p1.sectionName == '') && (!has(p2.sectionName) || p2.sectionName == '')) || (has(p1.sectionName) && has(p2.sectionName) && p1.sectionName == p2.sectionName))))"
 	TargetRefs []v1alpha2.LocalPolicyTargetReferenceWithSectionName `json:"targetRefs"`
@@ -133,8 +134,9 @@ type BackendTLSPolicyValidation struct {
 	// Support: Implementation-specific (More than one reference, or other kinds
 	// of resources).
 	//
-	// +kubebuilder:validation:MaxItems=8
 	// +optional
+	// +listType=atomic
+	// +kubebuilder:validation:MaxItems=8
 	CACertificateRefs []v1.LocalObjectReference `json:"caCertificateRefs,omitempty"`
 
 	// WellKnownCACertificates specifies whether system CA certificates may be used in
@@ -150,6 +152,7 @@ type BackendTLSPolicyValidation struct {
 	// Support: Implementation-specific
 	//
 	// +optional
+	// +listType=atomic
 	WellKnownCACertificates *WellKnownCACertificatesType `json:"wellKnownCACertificates,omitempty"`
 
 	// Hostname is used for two purposes in the connection between Gateways and
@@ -170,6 +173,7 @@ type BackendTLSPolicyValidation struct {
 	// Support: Extended
 	//
 	// +optional
+	// +listType=atomic
 	// +kubebuilder:validation:MaxItems=5
 	SubjectAltNames []SubjectAltName `json:"subjectAltNames,omitempty"`
 }
