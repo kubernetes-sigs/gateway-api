@@ -72,6 +72,7 @@ type ReferenceGrantSpec struct {
 	//
 	// Support: Core
 	//
+	// +listType=atomic
 	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:MaxItems=16
 	// +required
@@ -84,6 +85,7 @@ type ReferenceGrantSpec struct {
 	//
 	// Support: Core
 	//
+	// +listType=atomic
 	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:MaxItems=16
 	// +required
