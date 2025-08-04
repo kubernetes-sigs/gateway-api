@@ -1,0 +1,32 @@
+name: CRD Validation
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+# Remove all permissions from GITHUB_TOKEN except metadata.
+permissions: {}
+
+jobs:
+  crd-validation:
+    name: CEL
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # Available versions at https://raw.githubusercontent.com/kubernetes-sigs/controller-tools/HEAD/envtest-releases.yaml
+        k8s_version: [v1.33.0, v1.32.0, v1.31.0, v1.30.3, v1.29.5]
+        crd_channel: [standard, experimental]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # tag=v4.2.2
+        with:
+          persist-credentials: false
+      - name: Set up Go
+        uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # tag=v5.5.0
+      - name: Run CRD Validation tests
+        env:
+          K8S_VERSION: ${{ matrix.k8s_version }}
+          CRD_CHANNEL: ${{ matrix.crd_channel }}
+        run: |
+          make CEL_TEST_K8S_VERSION="${K8S_VERSION}" CEL_TEST_CRD_CHANNEL="${CRD_CHANNEL}" test.crds-validation

@@ -493,6 +493,8 @@ spec:
                               maxItems: 8
                               minItems: 1
                               type: array
+                          required:
+                          - caCertificateRefs
                           type: object
                         mode:
                           default: Terminate

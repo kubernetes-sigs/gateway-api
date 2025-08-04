@@ -86,6 +86,7 @@ type ParentReference struct {
 	// Name is the name of the referent.
 	//
 	// Support: Core
+	// +required
 	Name ObjectName `json:"name"`
 
 	// SectionName is the name of a section within the target resource. In the
@@ -436,6 +437,7 @@ const (
 type RouteParentStatus struct {
 	// ParentRef corresponds with a ParentRef in the spec that this
 	// RouteParentStatus struct describes the status of.
+	// +required
 	ParentRef ParentReference `json:"parentRef"`
 
 	// ControllerName is a domain/path string that indicates the name of the
@@ -451,6 +453,7 @@ type RouteParentStatus struct {
 	// Controllers MUST populate this field when writing status. Controllers should ensure that
 	// entries to status populated with their ControllerName are cleaned up when they are no
 	// longer necessary.
+	// +required
 	ControllerName GatewayController `json:"controllerName"`
 
 	// Conditions describes the status of the route with respect to the Gateway.
@@ -477,6 +480,7 @@ type RouteParentStatus struct {
 	// +listMapKey=type
 	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:MaxItems=8
+	// +required
 	Conditions []metav1.Condition `json:"conditions,omitempty"`
 }
 
@@ -499,6 +503,7 @@ type RouteStatus struct {
 	// means the route has not been attached to any Gateway.
 	//
 	// +kubebuilder:validation:MaxItems=32
+	// +required
 	Parents []RouteParentStatus `json:"parents"`
 }
 
@@ -764,11 +769,6 @@ type HeaderName string
 // +kubebuilder:validation:Pattern=`^([0-9]{1,5}(h|m|s|ms)){1,4}$`
 type Duration string
 
-// TrueField is a boolean value that can only be set to true
-//
-// +kubebuilder:validation:Enum=true
-type TrueField bool
-
 const (
 	// A textual representation of a numeric IP address. IPv4
 	// addresses must be in dotted-decimal form. IPv6 addresses
@@ -918,6 +918,7 @@ const (
 // +kubebuilder:validation:XValidation:message="numerator must be less than or equal to denominator",rule="self.numerator <= self.denominator"
 type Fraction struct {
 	// +kubebuilder:validation:Minimum=0
+	// +required
 	Numerator int32 `json:"numerator"`
 
 	// +optional

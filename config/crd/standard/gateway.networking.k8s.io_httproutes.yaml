@@ -1195,10 +1195,6 @@ spec:
                                 or httpRouteFilterRequestRewrite, but not both
                               rule: '!(self.exists(f, f.type == ''RequestRedirect'')
                                 && self.exists(f, f.type == ''URLRewrite''))'
-                            - message: May specify either httpRouteFilterRequestRedirect
-                                or httpRouteFilterRequestRewrite, but not both
-                              rule: '!(self.exists(f, f.type == ''RequestRedirect'')
-                                && self.exists(f, f.type == ''URLRewrite''))'
                             - message: RequestHeaderModifier filter cannot be repeated
                               rule: self.filter(f, f.type == 'RequestHeaderModifier').size()
                                 <= 1
@@ -2432,6 +2428,15 @@ spec:
                         type: object
                       maxItems: 64
                       type: array
+                    name:
+                      description: |-
+                        Name is the name of the route rule. This name MUST be unique within a Route if it is set.
+
+                        Support: Extended
+                      maxLength: 253
+                      minLength: 1
+                      pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+                      type: string
                     timeouts:
                       description: |-
                         Timeouts defines the timeouts that can be configured for an HTTP request.
@@ -2798,6 +2803,7 @@ spec:
                       - name
                       type: object
                   required:
+                  - conditions
                   - controllerName
                   - parentRef
                   type: object
@@ -3990,10 +3996,6 @@ spec:
                                 or httpRouteFilterRequestRewrite, but not both
                               rule: '!(self.exists(f, f.type == ''RequestRedirect'')
                                 && self.exists(f, f.type == ''URLRewrite''))'
-                            - message: May specify either httpRouteFilterRequestRedirect
-                                or httpRouteFilterRequestRewrite, but not both
-                              rule: '!(self.exists(f, f.type == ''RequestRedirect'')
-                                && self.exists(f, f.type == ''URLRewrite''))'
                             - message: RequestHeaderModifier filter cannot be repeated
                               rule: self.filter(f, f.type == 'RequestHeaderModifier').size()
                                 <= 1
@@ -5227,6 +5229,15 @@ spec:
                         type: object
                       maxItems: 64
                       type: array
+                    name:
+                      description: |-
+                        Name is the name of the route rule. This name MUST be unique within a Route if it is set.
+
+                        Support: Extended
+                      maxLength: 253
+                      minLength: 1
+                      pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+                      type: string
                     timeouts:
                       description: |-
                         Timeouts defines the timeouts that can be configured for an HTTP request.
@@ -5593,6 +5604,7 @@ spec:
                       - name
                       type: object
                   required:
+                  - conditions
                   - controllerName
                   - parentRef
                   type: object

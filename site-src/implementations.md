@@ -5,8 +5,77 @@ and provides status and resource references for them.
 
 Implementors and integrators of Gateway API are encouraged to update this
 document with status information about their implementations, the versions they
-cover, and documentation to help users get started.
+cover, and documentation to help users get started. This status information should
+be no longer than a few paragraphs. 
 
+## Conformance levels
+
+There are three levels of Gateway API conformance:
+
+### Conformant implementations
+
+These implementations have submitted at least one conformance report that has passes for:
+
+  * All core conformance tests for at least one combination of Route type and
+    Profile
+  * All claimed Extended features
+  
+for one of the two (2) most recent Gateway API releases.
+
+So, it's conformant to support Mesh + HTTPRoute, or Gateway + HTTPRoute, or
+Gateway + TLSRoute, or Gateway + Mesh + HTTPRoute, plus any extended features
+the implementation claims. But implementaions _must_ support at least one
+Profile and one Route type in that profile, and must pass all Core conformance
+tests for that Profile and Route type in addition to all claimed Extended
+features.
+
+### Partially Conformant implementations
+
+These implementations are aiming for full conformance but are not currently
+achieving it. They have submitted at least one conformance report passing some
+of the tests to be Conformant (as above) for one of the three (3) most recent
+Gateway API releases. Note that the requirements to be considered "partially
+conformant" may be tightened in a future release of Gateway API.
+
+### Stale implementations
+
+These implementations may not be being actively developed and will be removed
+from this page on the next page review unless they submit a conformance report
+moving them to one of the other categories.
+
+Page reviews are performed at least one month after every Gateway API release,
+with the first being performed after the release of Gateway API v1.3, in late
+June 2025. Following the Gateway API v1.5 review process, due in mid-2026,
+stale implementations will no longer be listed.
+
+## Implementation profiles
+
+Implementations also generally fall into two categories, which are called
+_profiles_:
+
+* **Gateway** controllers reconcile the Gateway resource and are intended to
+handle north-south traffic, mainly concerned with coming from outside the
+cluster to inside.
+* **Mesh** controllers reconcile Service resources with HTTPRoutes attached
+and are intended to handle east-west traffic, within the same cluster or
+set of clusters.
+
+Each profile has a set of conformance tests associated with it, that lay out
+the expected behavior for implementations to be conformant (as above).
+
+Implementations may also fit both profiles.
+
+## Integrations
+
+Also listed on this page are **integrations**, which are other software
+projects that are able to make use of Gateway API resources to perform
+other functions (like managing DNS or creating certificates).
+
+!!! note
+    This page contains links to third party projects that provide functionality
+    required for Gateway API to work. The Gateway API project authors aren't
+    responsible for these projects, which are listed alphabetically within their
+    class.
 
 !!! info "Compare extended supported features across implementations"
 
@@ -15,6 +84,7 @@ cover, and documentation to help users get started.
 ## Gateway Controller Implementation Status <a name="gateways"></a>
 
 - [Acnodal EPIC][1]
+- [Agent Gateway][40]
 - [Airlock Microgateway][34]
 - [Amazon Elastic Kubernetes Service][23] (GA)
 - [Apache APISIX][2] (beta)
@@ -60,6 +130,7 @@ cover, and documentation to help users get started.
 - [argo-rollouts][22] (alpha)
 - [Knative][24] (alpha)
 - [Kuadrant][26] (GA)
+- [kruise-rollouts][41] (alpha)
 
 [1]:#acnodal-epic
 [2]:#apisix
@@ -99,9 +170,11 @@ cover, and documentation to help users get started.
 [37]:#kgateway
 [38]:#google-cloud-service-mesh
 [39]:#kubvernor
+[40]:#agentgateway-with-kgateway
+[41]:#kruise-rollouts
 
 
-[gamma]:/concepts/gamma/
+[gamma]:mesh/index.md
 
 
 
@@ -117,6 +190,11 @@ In this section you will find specific links to blog posts, documentation and ot
 
 [epicdocs]:https://www.epic-gateway.org/
 [epicsource]:https://github.com/epic-gateway
+
+### Agent Gateway (with Kgateway)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.3.0-Agentgateway-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.3.0/airlock-microgateway)
+
+[Agent Gateway](https://agentgateway.dev/) is an open source Gateway API implementation focusing on AI use cases, including LLM consumption, LLM serving, agent-to-agent ([A2A](https://a2aproject.github.io/A2A/latest/)), and agent-to-tool ([MCP](https://modelcontextprotocol.io/introduction)). It is the first and only proxy designed specifically for the Kubernetes Gateway API, powered by a high performance and scalable Rust dataplane implementation.
 
 ### Airlock Microgateway
 [![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.3.0-Airlock%20Microgateway-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.3.0/airlock-microgateway)
@@ -222,7 +300,7 @@ For help and support with Contour's implementation, [create an issue][contour-is
 
 [contour]:https://projectcontour.io
 [contour-release]:https://github.com/projectcontour/contour/releases/tag/v1.30.0
-[contour-standard]:concepts/versioning.md#release-channels-eg-experimental-standard
+[contour-standard]:concepts/versioning.md#release-channels
 [contour-guide]:https://projectcontour.io/docs/1.30/guides/gateway-api/
 [contour-issue-new]:https://github.com/projectcontour/contour/issues/new/choose
 [contour-slack]:https://kubernetes.slack.com/archives/C8XRH2R4J
@@ -496,11 +574,12 @@ If you have any suggestions or experience issues with NGINX Gateway Fabric, plea
 ### ngrok Kubernetes Operator
 
 [ngrok Kubernetes Operator][ngrok-k8s-operator] After adding preliminary support last year, the [ngrok Kubernetes Operator][ngrok-k8s-operator] supports the entire core Gateway API. This includes:
--Routes (HTTPRoute, TCPRoute, TLSRoute) + RouteMatches (Header, Path, +more)
--Filters: Header, Redirect, Rewrite + more
--Backends: Backend Filters + Weighted balancing
--ReferenceGrant: RBAC for multi-tenant clusters handling
--Traffic Policy as an extensionRef or annotation when the Gateway API isn’t flexible enough
+
+- Routes (HTTPRoute, TCPRoute, TLSRoute) + RouteMatches (Header, Path, +more)
+- Filters: Header, Redirect, Rewrite + more
+- Backends: Backend Filters + Weighted balancing
+- ReferenceGrant: RBAC for multi-tenant clusters handling
+- Traffic Policy as an extensionRef or annotation when the Gateway API isn’t flexible enough
 
 You can read our [docs][ngrok-k8s-gwapi-docs] for more information. If you have any feature requests or bug reports, please [create an issue][ngrok-issue-new]. You can also reach out for help on [Slack][ngrok-slack]
 
@@ -508,7 +587,7 @@ You can read our [docs][ngrok-k8s-gwapi-docs] for more information. If you have 
 [ngrok]:https://ngrok.com
 [ngrok-k8s-gwapi-docs]:https://ngrok.com/docs/k8s/
 [ngrok-issue-new]: https://github.com/ngrok/ngrok-operator/issues/new/choose
-
+[ngrok-slack]:https://ngrokcommunity.slack.com/channels/general
 
 ### STUNner
 
@@ -608,3 +687,62 @@ For help and support with Kuadrant's implementation please feel free to [create 
 [kuadrant-issue-new]:https://github.com/Kuadrant/kuadrant-operator/issues/new
 [kuadrant-slack]:https://kubernetes.slack.com/archives/C05J0D0V525
 
+### OpenKruise Rollouts
+[OpenKruise Rollouts][kruise-rollouts] is a plugin-n-play progressive delivery controller for Kubernetes. It supports several advanced deployment methods such as blue/green and canaries. OpenKruise Rollouts has built-in support for the Gateway API.
+
+[kruise-rollouts]:https://openkruise.io/rollouts/introduction
+
+## Adding new entries
+
+Implementations are free to make a PR to add their entry to this page; however,
+in order to meet the requirements for being Partially Conformant or Conformant,
+the implementation must have had a conformance report submission PR merged.
+
+Part of the review process for new additions to this page is that a maintainer
+will check the conformance level and verify the state.
+
+## Page Review Policy
+
+This page is intended to showcase actively developed and conformant implementations
+of Gateway API, and so is subject to regular reviews.
+
+These reviews are performed at least one month after every Gateway API release
+(starting with the Gateway API v1.3 release).
+
+As part of the review, a maintainer will check:
+
+* which implementations are **Conformant** - as defined above in this document.
+* which implementations are **Partially Conformant**, as defined above in this
+  document.
+
+If the maintainer performing the review finds that there are implementations
+that no longer satisfy the criteria for Partially Conformant or Conformant, or
+finds implementations that are in the "Stale" state, then that maintainer will:
+
+* Inform the other maintainers and get their agreement on the list of stale and
+to-be-removed implementations
+* Post on the #sig-network-gateway-api channel informing the maintainers of
+implementations that are no longer at least partially conformant should contact
+the Gateway API maintainers to discuss the implementation's status. This period
+is called the "**right-of-reply**" period, is at least two weeks long, and functions
+as a lazy consensus period.
+* Any implementations that do not respond within the right-of-reply period will be
+downgraded in status, either by being moved to "Stale", or being removed
+from this page if they are already "Stale".
+
+Page review timeline, starting with the v1.3 Page Review:
+
+* Gateway API v1.3 release Page Review: a maintainer will move anyone who hasn't
+  submitted a conformance report using the rules above to "Stale". They will also
+  contact anyone who moves to Stale to inform them about this rule change.
+* Gateway API v1.4 release Page Review (at least one month after the actual
+  release): A maintainer will perform the Page Review process again, removing
+  any implementations that are are still Stale (after a right-of-reply period).
+* Gateway API v1.5 release Page Review (at least one month after the actual
+  release): We will remove the Stale category, and implementation maintainers
+  will need to be at least partially conformant on each review, or during the 
+  right-of-reply period, or be removed from the implementations page.
+
+This means that, after the Gateway API v1.5 release, implementations cannot be
+added to this page unless they have submitted at least a Partially Conformant
+conformance report.

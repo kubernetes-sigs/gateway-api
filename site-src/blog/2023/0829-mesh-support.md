@@ -185,21 +185,21 @@ Although these are [Experimental][status] patterns, note that they are
 available in the [`standard` release channel][ch], since the GAMMA initiative
 has not needed to introduce new resources or fields to date.
 
-[gamma]:/concepts/gamma/
-[status]:../../geps/overview.md#status
-[ch]:../../concepts/versioning.md#release-channels-eg-experimental-standard
+[gamma]:../../mesh/index.md
+[status]:../../geps/overview.md#gep-states
+[ch]:../../concepts/versioning.md#release-channels
 [cel]:https://kubernetes.io/docs/reference/using-api/cel/
 [crd]:https://kubernetes.io/docs/tasks/extend-kubernetes/custom-resources/custom-resource-definitions/
 [concepts]:../../concepts/api-overview.md
 [geps]:../../contributing/enhancement-requests.md
-[guides]:/guides/getting-started/
+[guides]:../../guides/index.md
 [impl]:../../implementations.md
-[install-crds]:/guides/getting-started/#install-the-crds
+[install-crds]:../../guides/index.md#installing-gateway-api
 [issue]:https://github.com/kubernetes-sigs/gateway-api/issues/new/choose
 [disc]:https://github.com/kubernetes-sigs/gateway-api/discussions
-[community]:/contributing/community/
-[mesh-routing]:/concepts/gamma/#how-the-gateway-api-works-for-service-mesh
-[GEP-1426]:/geps/gep-1426/
+[community]:../../contributing/index.md
+[mesh-routing]:../../mesh/index.md
+[GEP-1426]:../../geps/gep-1294/index.md
 [GEP-1324]:../../geps/gep-1324/index.md
 [GEP-1686]:../../geps/gep-1686/index.md
 [GEP-1709]:../../geps/gep-1709/index.md
