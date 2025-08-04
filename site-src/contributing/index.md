@@ -37,10 +37,9 @@ questions, discussions.
 
 ## Meetings
 
-Gateway API community meetings happen on the first Tuesday of each month at
-8am Pacific Time (15:00 UTC, [convert to your timezone][8am-pst-convert]) and
-weekly on all subsequent weeks each month on Mondays at 3pm Pacific Time
-(23:00 UTC, [convert to your timezone][3pm-pst-convert]):
+Gateway API community meetings happen on alternating weeks:
+- **Week A**: Mondays at 3pm Pacific Time (23:00 UTC, [convert to your timezone][3pm-pst-convert])
+- **Week B**: Tuesdays at 8am Pacific Time (16:00 UTC, [convert to your timezone][8am-pst-convert])
 
 Being the main meeting for Gateway API, the topics can vary here and often this
 is where new topics and ideas are discussed, including both ingress and service
