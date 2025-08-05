@@ -149,6 +149,9 @@ type ParentReference struct {
 	// Support: Extended
 	//
 	// +optional
+	//
+	// +kubebuilder:validation:Minimum=1
+	// +kubebuilder:validation:Maximum=65535
 	Port *PortNumber `json:"port,omitempty"`
 }
 
@@ -228,9 +231,6 @@ type CommonRouteSpec struct {
 }
 
 // PortNumber defines a network port.
-//
-// +kubebuilder:validation:Minimum=1
-// +kubebuilder:validation:Maximum=65535
 type PortNumber int32
 
 // BackendRef defines how a Route should forward a request to a Kubernetes
