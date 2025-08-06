@@ -72,9 +72,10 @@ type ReferenceGrantSpec struct {
 	//
 	// Support: Core
 	//
+	// +required
+	// +listType=atomic
 	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:MaxItems=16
-	// +required
 	From []ReferenceGrantFrom `json:"from"`
 
 	// To describes the resources that may be referenced by the resources
@@ -84,9 +85,10 @@ type ReferenceGrantSpec struct {
 	//
 	// Support: Core
 	//
+	// +required
+	// +listType=atomic
 	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:MaxItems=16
-	// +required
 	To []ReferenceGrantTo `json:"to"`
 }
 

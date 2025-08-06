@@ -110,6 +110,7 @@ spec:
                   type: string
                 maxItems: 16
                 type: array
+                x-kubernetes-list-type: atomic
               parentRefs:
                 description: |-
                   ParentRefs references the resources (usually Gateways) that a Route wants
@@ -322,6 +323,7 @@ spec:
                   type: object
                 maxItems: 32
                 type: array
+                x-kubernetes-list-type: atomic
                 x-kubernetes-validations:
                 - message: sectionName or port must be specified when parentRefs includes
                     2 or more references to the same parent
@@ -489,6 +491,7 @@ spec:
                       maxItems: 16
                       minItems: 1
                       type: array
+                      x-kubernetes-list-type: atomic
                     name:
                       description: |-
                         Name is the name of the route rule. This name MUST be unique within a Route if it is set.
@@ -504,6 +507,7 @@ spec:
                 maxItems: 16
                 minItems: 1
                 type: array
+                x-kubernetes-list-type: atomic
                 x-kubernetes-validations:
                 - message: Rule name must be unique within the route
                   rule: self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name)
@@ -780,6 +784,7 @@ spec:
                   type: object
                 maxItems: 32
                 type: array
+                x-kubernetes-list-type: atomic
             required:
             - parents
             type: object
@@ -883,6 +888,7 @@ spec:
                 maxItems: 16
                 minItems: 1
                 type: array
+                x-kubernetes-list-type: atomic
               parentRefs:
                 description: |-
                   ParentRefs references the resources (usually Gateways) that a Route wants
@@ -1095,6 +1101,7 @@ spec:
                   type: object
                 maxItems: 32
                 type: array
+                x-kubernetes-list-type: atomic
                 x-kubernetes-validations:
                 - message: sectionName or port must be specified when parentRefs includes
                     2 or more references to the same parent
@@ -1262,6 +1269,7 @@ spec:
                       maxItems: 16
                       minItems: 1
                       type: array
+                      x-kubernetes-list-type: atomic
                     name:
                       description: |-
                         Name is the name of the route rule. This name MUST be unique within a Route if it is set.
@@ -1277,6 +1285,7 @@ spec:
                 maxItems: 1
                 minItems: 1
                 type: array
+                x-kubernetes-list-type: atomic
                 x-kubernetes-validations:
                 - message: Rule name must be unique within the route
                   rule: self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name)
@@ -1554,6 +1563,7 @@ spec:
                   type: object
                 maxItems: 32
                 type: array
+                x-kubernetes-list-type: atomic
             required:
             - parents
             type: object
