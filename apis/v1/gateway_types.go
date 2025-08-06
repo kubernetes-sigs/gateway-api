@@ -298,12 +298,21 @@ type GatewaySpec struct {
 
 	// TLSConfigs stores TLS configurations for a Gateway.
 	//
-	// GatewayTLSConfigs will impact all existing and newly added Listeners.
+	//   - If the `port` field in `TLSConfig` is not set, the TLS configuration applies
+	//     to all listeners in the gateway. We call this `default` configuration.
+	//   - If the `port` field in `TLSConfig` is set, the TLS configuration applies
+	//     only to listeners with a matching port. Each port requires a unique TLS configuration.
+	//   - Per-port configurations can override the `default` configuration.
+	//   - The `default` configuration is optional. Clients can apply TLS configuration
+	//     to a subset of listeners by creating only per-port configurations.
+	//     Listeners with a port that does not match any TLS configuration will
+	//     not have `frontendValidation` set.
 	//
 	// Support: Core
-	//
 	// +optional
-	TLSConfigs GatewayTLSConfigs `json:"tlsConfigs,omitempty"`
+	//
+	// <gateway:experimental>
+	TLSConfigs []TLSConfig `json:"tlsConfigs,omitempty"`
 }
 
 // AllowedListeners defines which ListenerSets can be attached to this Gateway.
@@ -423,7 +432,7 @@ type Listener struct {
 	// the Protocol field is "HTTPS" or "TLS". It is invalid to set this field
 	// if the Protocol field is "HTTP", "TCP", or "UDP".
 	//
-	// The association of SNIs to Certificate defined in GatewayTLSConfig is
+	// The association of SNIs to Certificate defined in ListenerTLSConfig is
 	// defined based on the Hostname field for this listener.
 	//
 	// The GatewayClass MUST use the longest matching SNI out of all
@@ -432,7 +441,7 @@ type Listener struct {
 	// Support: Core
 	//
 	// +optional
-	TLS *GatewayTLSConfig `json:"tls,omitempty"`
+	TLS *ListenerTLSConfig `json:"tls,omitempty"`
 
 	// AllowedRoutes defines the types of routes that MAY be attached to a
 	// Listener and the trusted namespaces where those Route resources MAY be
@@ -535,10 +544,10 @@ type GatewayBackendTLS struct {
 	ClientCertificateRef *SecretObjectReference `json:"clientCertificateRef,omitempty"`
 }
 
-// GatewayTLSConfig describes a TLS configuration.
+// ListenerTLSConfig describes a TLS configuration for a listener.
 //
 // +kubebuilder:validation:XValidation:message="certificateRefs or options must be specified when mode is Terminate",rule="self.mode == 'Terminate' ? size(self.certificateRefs) > 0 || size(self.options) > 0 : true"
-type GatewayTLSConfig struct {
+type ListenerTLSConfig struct {
 	// Mode defines the TLS behavior for the TLS session initiated by the client.
 	// There are two possible modes:
 	//
@@ -587,17 +596,6 @@ type GatewayTLSConfig struct {
 	// +kubebuilder:validation:MaxItems=64
 	CertificateRefs []SecretObjectReference `json:"certificateRefs,omitempty"`
 
-	// FrontendValidation holds configuration information for validating the frontend (client).
-	// Setting this field will result in mutual authentication when connecting to the gateway. In browsers this may result in a dialog appearing
-	// that requests a user to specify the client certificate.
-	// The maximum depth of a certificate chain accepted in verification is Implementation specific.
-	//
-	// Support: Extended
-	//
-	// +optional
-	// <gateway:experimental>
-	FrontendValidation *FrontendTLSValidation `json:"frontendValidation,omitempty"`
-
 	// Options are a list of key/value pairs to enable extended TLS
 	// configuration for each implementation. For example, configuring the
 	// minimum TLS version or supported cipher suites.
@@ -644,6 +642,7 @@ type TLSConfig struct {
 	// +optional
 	// <gateway:experimental>
 	Port *PortNumber `json:"port,omitempty"`
+	//
 	// FrontendValidation holds configuration information for validating the frontend (client).
 	// Setting this field will result in mutual authentication when connecting to the gateway.
 	// In browsers this may result in a dialog appearing
@@ -705,19 +704,6 @@ type FrontendTLSValidation struct {
 	// +kubebuilder:default=AllowValidOnly
 	Mode FrontendValidationModeType `json:"mode,omitempty"`
 }
-
-// GatewayTLSConfigs stores TLS configurations for a Gateway.
-//
-//   - If the `port` field in `TLSConfig` is not set, the TLS configuration applies
-//     to all listeners in the gateway. We call this `default` configuration.
-//   - If the `port` field in `TLSConfig` is set, the TLS configuration applies
-//     only to listeners with a matching port. Each port requires a unique TLS configuration.
-//   - Per-port configurations can override the `default` configuration.
-//   - The `default` configuration is optional. Clients can apply TLS configuration
-//     to a subset of listeners by creating only per-port configurations.
-//     Listeners with a port that does not match any TLS configuration will
-//     not have `frontendValidation` set.
-type GatewayTLSConfigs []TLSConfig
 
 // FrontendValidationModeType type defines how a Gateway validates client certificates.
 //

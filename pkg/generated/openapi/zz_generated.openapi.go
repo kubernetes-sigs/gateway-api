@@ -4104,7 +4104,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewaySpec(ref common.ReferenceCallba
 					},
 					"tlsConfigs": {
 						SchemaProps: spec.SchemaProps{
-							Description: "TLSConfigs stores TLS configurations for a Gateway.\n\nGatewayTLSConfigs will impact all existing and newly added Listeners.\n\nSupport: Core",
+							Description: "TLSConfigs stores TLS configurations for a Gateway.\n\n  - If the `port` field in `TLSConfig` is not set, the TLS configuration applies\n    to all listeners in the gateway. We call this `default` configuration.\n  - If the `port` field in `TLSConfig` is set, the TLS configuration applies\n    only to listeners with a matching port. Each port requires a unique TLS configuration.\n  - Per-port configurations can override the `default` configuration.\n  - The `default` configuration is optional. Clients can apply TLS configuration\n    to a subset of listeners by creating only per-port configurations.\n    Listeners with a port that does not match any TLS configuration will\n    not have `frontendValidation` set.\n\nSupport: Core\n\n<gateway:experimental>",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{

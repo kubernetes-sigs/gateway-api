@@ -78,19 +78,6 @@ type ObjectReference struct {
 	Namespace *Namespace `json:"namespace,omitempty"`
 }
 
-// GatewayTLSConfigs stores TLS configurations for a Gateway.
-//
-// * If the `port` field in `TLSConfig` is not set, the TLS configuration applies
-//   to all listeners in the gateway. We call this `default` configuration.
-// * If the `port` field in `TLSConfig` is set, the TLS configuration applies
-//   only to listeners with a matching port. Each port requires a unique TLS configuration.
-// * Per-port configurations can override the `default` configuration.
-// * The `default` configuration is optional. Clients can apply TLS configuration
-//   to a subset of listeners by creating only per-port configurations. Listeners
-//   with a port that does not match any TLS configuration will not have
-//   `frontendValidation` set.
-type GatewayTLSConfigs = []TLSConfig
-
 // TLSConfig describes a TLS configuration that can be applied to all Gateway
 // Listeners or to all Listeners matching the Port if set.
 type TLSConfig struct {
@@ -179,7 +166,22 @@ const (
 type GatewaySpec struct {
     ...
     // TLSConfigs stores TLS configurations for a Gateway.
-    TLSConfigs GatewayTLSConfigs
+	//
+	//   - If the `port` field in `TLSConfig` is not set, the TLS configuration applies
+	//     to all listeners in the gateway. We call this `default` configuration.
+	//   - If the `port` field in `TLSConfig` is set, the TLS configuration applies
+	//     only to listeners with a matching port. Each port requires a unique TLS configuration.
+	//   - Per-port configurations can override the `default` configuration.
+	//   - The `default` configuration is optional. Clients can apply TLS configuration
+	//     to a subset of listeners by creating only per-port configurations.
+	//     Listeners with a port that does not match any TLS configuration will
+	//     not have `frontendValidation` set.
+	//
+	// Support: Core
+	// +optional
+	//
+	// <gateway:experimental>
+	TLSConfigs []TLSConfig `json:"tlsConfigs,omitempty"`
 }
 
 ```
@@ -319,7 +321,6 @@ This GEP aims to standardize this behavior as an official part of the upstream s
 
 [TLS Handshake Protocol]: https://www.rfc-editor.org/rfc/rfc5246#section-7.4
 [Certificate Path Validation]: https://www.rfc-editor.org/rfc/rfc5280#section-6
-[GatewayTLSConfig]: ../../reference/spec.md#gateway.networking.k8s.io/v1.GatewayTLSConfig
 [BackendTLSPolicy]: ../../api-types/backendtlspolicy.md
 [TLS Configuration GEP]: ../gep-2907/index.md
 [Gateway API TLS Use Cases]: https://docs.google.com/document/d/17sctu2uMJtHmJTGtBi_awGB0YzoCLodtR6rUNmKMCs8/edit?pli=1#heading=h.cxuq8vo8pcxm

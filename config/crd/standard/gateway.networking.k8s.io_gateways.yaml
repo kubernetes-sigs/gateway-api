@@ -657,7 +657,7 @@ spec:
                         the Protocol field is "HTTPS" or "TLS". It is invalid to set this field
                         if the Protocol field is "HTTP", "TCP", or "UDP".
 
-                        The association of SNIs to Certificate defined in GatewayTLSConfig is
+                        The association of SNIs to Certificate defined in ListenerTLSConfig is
                         defined based on the Hostname field for this listener.
 
                         The GatewayClass MUST use the longest matching SNI out of all
@@ -823,19 +823,6 @@ spec:
                   rule: 'self.all(l1, self.exists_one(l2, l1.port == l2.port && l1.protocol
                     == l2.protocol && (has(l1.hostname) && has(l2.hostname) ? l1.hostname
                     == l2.hostname : !has(l1.hostname) && !has(l2.hostname))))'
-              tlsConfigs:
-                description: |-
-                  TLSConfigs stores TLS configurations for a Gateway.
-
-                  GatewayTLSConfigs will impact all existing and newly added Listeners.
-
-                  Support: Core
-                items:
-                  description: |-
-                    TLSConfig describes a TLS configuration that can be applied to all Gateway
-                    Listeners or to all Listeners matching the Port if set.
-                  type: object
-                type: array
             required:
             - gatewayClassName
             - listeners
@@ -1781,7 +1768,7 @@ spec:
                         the Protocol field is "HTTPS" or "TLS". It is invalid to set this field
                         if the Protocol field is "HTTP", "TCP", or "UDP".
 
-                        The association of SNIs to Certificate defined in GatewayTLSConfig is
+                        The association of SNIs to Certificate defined in ListenerTLSConfig is
                         defined based on the Hostname field for this listener.
 
                         The GatewayClass MUST use the longest matching SNI out of all
@@ -1947,19 +1934,6 @@ spec:
                   rule: 'self.all(l1, self.exists_one(l2, l1.port == l2.port && l1.protocol
                     == l2.protocol && (has(l1.hostname) && has(l2.hostname) ? l1.hostname
                     == l2.hostname : !has(l1.hostname) && !has(l2.hostname))))'
-              tlsConfigs:
-                description: |-
-                  TLSConfigs stores TLS configurations for a Gateway.
-
-                  GatewayTLSConfigs will impact all existing and newly added Listeners.
-
-                  Support: Core
-                items:
-                  description: |-
-                    TLSConfig describes a TLS configuration that can be applied to all Gateway
-                    Listeners or to all Listeners matching the Port if set.
-                  type: object
-                type: array
             required:
             - gatewayClassName
             - listeners
