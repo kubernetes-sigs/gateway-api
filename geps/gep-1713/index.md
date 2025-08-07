@@ -59,7 +59,7 @@ type GatewaySpec struct {
 }
 
 type AllowedListeners struct {
-	// +kubebuilder:default={from:Same}
+	// +kubebuilder:default={from: None}
 	Namespaces *ListenerNamespaces `json:"namespaces,omitempty"`
 }
 
@@ -69,7 +69,7 @@ type ListenerNamespaces struct {
 	// values are:
 	//
 	// * Same: Only ListenerSets in the same namespace may be attached to this Gateway.
-	// * Selector: ListenerSets in namespaces selected by the selector may be attached to this Gateway.:w
+	// * Selector: ListenerSets in namespaces selected by the selector may be attached to this Gateway.
 	// * All: ListenerSets in all namespaces may be attached to this Gateway.
 	// * None: Only listeners defined in the Gateway's spec are allowed
 	//
@@ -332,6 +332,10 @@ type ParentGatewayReference struct {
 
 The following example shows a `Gateway` with an HTTP listener and two child HTTPS `ListenerSets` with unique hostnames and certificates.
 
+Only `ListenerSets` from the same namespace of the `Gateway` will be accepted:
+
+
+
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
@@ -339,6 +343,9 @@ metadata:
   name: parent-gateway
 spec:
   gatewayClassName: example
+  allowedListeners:
+    namespaces:
+      from: Same
   listeners:
   - name: foo
     hostname: foo.com
@@ -417,7 +424,8 @@ metadata:
   name: parent-gateway
 spec:
   allowedListeners:
-  - from: Same
+    namespaces:
+      from: Same
 ```
 
 ### Route Attachment
@@ -438,20 +446,6 @@ spec:
     sectionName: second
 ```
 
-For instance, the following `HTTPRoute` attempts to attach to a listener defined in the parent `Gateway` using the sectionName `foo`. This is not valid and the route's status `Accepted` condition should be set to `False`
-
-```yaml
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
-metadata:
-  name: httproute-example
-spec:
-  parentRefs:
-  - name: some-workload-listeners
-    kind: ListenerSet
-    sectionName: foo
-```
-
 To attach to listeners in both a `Gateway` and `ListenerSet` the route MUST have two `parentRefs`:
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
@@ -467,6 +461,23 @@ spec:
     kind: Gateway
     sectionName: foo
 ```
+
+For instance, the following `HTTPRoute` attempts to attach to a listener defined in the parent `Gateway` using the sectionName `foo`. This is not valid and the route's status `Accepted` condition should be set to `False`
+
+```yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: httproute-example
+spec:
+  parentRefs:
+  - name: some-workload-listeners
+    kind: Gateway
+    sectionName: foo
+```
+>--- Ricardo - above is a bit confusing, maybe ask Dave some clarification
+
+
 
 #### Optional Section Name
 
