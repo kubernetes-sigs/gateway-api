@@ -33,7 +33,7 @@ These two validation mechanisms operate independently and can be used simultaneo
 * Introduce a `caCertificateRefs` field within `FrontendTLSValidation` that can be used to specify a list of CA Certificates that can be used as a trust anchor to validate the certificates presented by the client.
 * Add a new `FrontendValidationModeType` enum within `FrontendTLSValidation` indicating how gateway should validate client certificates. As for now we support following values but it might change in the future:
   1) `AllowValidOnly`
-  2) `AllowInvalidOrMissingCert`
+  2) `AllowInsecureFallback`
 * Introduce a `ObjectReference` structure that can be used to specify `caCertificateRefs` references.
 * Introduce a `tls` field within the Gateway Spec to allow for a common TLS configuration to apply across all listeners.
 
@@ -136,8 +136,12 @@ type FrontendTLSValidation struct {
 	// - AllowValidOnly: In this mode, the gateway will accept connections only if
 	//   the client presents a valid certificate. This certificate must successfully
 	//   pass validation against the CA certificates specified in `CACertificateRefs`.
-	// - AllowInvalidOrMissingCert: In this mode, the gateway will accept
-	//   connections even if the client certificate is not presented or fails verification.
+	// - AllowInsecureFallback: In this mode, the gateway will accept connections
+	//   even if the client certificate is not presented or fails verification.
+	//
+	//   This approach delegates client authorization to the backend and introduce
+	//   a significant security risk. It should be used in testing environments or
+	//   on a temporary basis in non-testing environments.
 	//
 	// Defaults to AllowValidOnly.
 	//
@@ -150,7 +154,7 @@ type FrontendTLSValidation struct {
 
 // FrontendValidationModeType type defines how a Gateway validates client certificates.
 //
-// +kubebuilder:validation:Enum=AllowValidOnly;AllowInvalidOrMissingCert
+// +kubebuilder:validation:Enum=AllowValidOnly;AllowInsecureFallback
 type FrontendValidationModeType string
 
 const (
@@ -158,9 +162,9 @@ const (
 	// during the TLS handshake and MUST pass validation.
 	AllowValidOnly FrontendValidationModeType = "AllowValidOnly"
 
-	// AllowInvalidOrMissingCert indicates that a client certificate may not be
+	// AllowInsecureFallback indicates that a client certificate may not be
 	// presented during the handshake or the validation against CA certificates may fail.
-	AllowInvalidOrMissingCert FrontendValidationModeType = "AllowInvalidOrMissingCert"
+	AllowInsecureFallback FrontendValidationModeType = "AllowInsecureFallback"
 )
 
 type GatewaySpec struct {
@@ -245,7 +249,7 @@ spec:
         - kind: ConfigMap
           group: ""
           name: default-cert
-        mode: AllowInvalidOrMissingCert
+        mode: AllowInsecureFallback
   listeners:
   - name: foo-https
     protocol: HTTPS

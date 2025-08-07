@@ -693,8 +693,12 @@ type FrontendTLSValidation struct {
 	// - AllowValidOnly: In this mode, the gateway will accept connections only if
 	//   the client presents a valid certificate. This certificate must successfully
 	//   pass validation against the CA certificates specified in `CACertificateRefs`.
-	// - AllowInvalidOrMissingCert: In this mode, the gateway will accept
-	//   connections even if the client certificate is not presented or fails verification.
+	// - AllowInsecureFallback: In this mode, the gateway will accept connections
+	//   even if the client certificate is not presented or fails verification.
+	//
+	//   This approach delegates client authorization to the backend and introduce
+	//   a significant security risk. It should be used in testing environments or
+	//   on a temporary basis in non-testing environments.
 	//
 	// Defaults to AllowValidOnly.
 	//
@@ -707,7 +711,7 @@ type FrontendTLSValidation struct {
 
 // FrontendValidationModeType type defines how a Gateway validates client certificates.
 //
-// +kubebuilder:validation:Enum=AllowValidOnly;AllowInvalidOrMissingCert
+// +kubebuilder:validation:Enum=AllowValidOnly;AllowInsecureFallback
 type FrontendValidationModeType string
 
 const (
@@ -715,9 +719,9 @@ const (
 	// during the TLS handshake and MUST pass validation.
 	AllowValidOnly FrontendValidationModeType = "AllowValidOnly"
 
-	// AllowInvalidOrMissingCert indicates that a client certificate may not be
+	// AllowInsecureFallback indicates that a client certificate may not be
 	// presented during the handshake or the validation against CA certificates may fail.
-	AllowInvalidOrMissingCert FrontendValidationModeType = "AllowInvalidOrMissingCert"
+	AllowInsecureFallback FrontendValidationModeType = "AllowInsecureFallback"
 )
 
 // AllowedRoutes defines which Routes may be attached to this Listener.

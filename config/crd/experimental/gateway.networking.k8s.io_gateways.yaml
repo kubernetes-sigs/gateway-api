@@ -1084,15 +1084,19 @@ spec:
                             - AllowValidOnly: In this mode, the gateway will accept connections only if
                               the client presents a valid certificate. This certificate must successfully
                               pass validation against the CA certificates specified in `CACertificateRefs`.
-                            - AllowInvalidOrMissingCert: In this mode, the gateway will accept
-                              connections even if the client certificate is not presented or fails verification.
+                            - AllowInsecureFallback: In this mode, the gateway will accept connections
+                              even if the client certificate is not presented or fails verification.
+
+                              This approach delegates client authorization to the backend and introduce
+                              a significant security risk. It should be used in testing environments or
+                              on a temporary basis in non-testing environments.
 
                             Defaults to AllowValidOnly.
 
                             Support: Core
                           enum:
                           - AllowValidOnly
-                          - AllowInvalidOrMissingCert
+                          - AllowInsecureFallback
                           type: string
                       required:
                       - caCertificateRefs
@@ -2480,15 +2484,19 @@ spec:
                             - AllowValidOnly: In this mode, the gateway will accept connections only if
                               the client presents a valid certificate. This certificate must successfully
                               pass validation against the CA certificates specified in `CACertificateRefs`.
-                            - AllowInvalidOrMissingCert: In this mode, the gateway will accept
-                              connections even if the client certificate is not presented or fails verification.
+                            - AllowInsecureFallback: In this mode, the gateway will accept connections
+                              even if the client certificate is not presented or fails verification.
+
+                              This approach delegates client authorization to the backend and introduce
+                              a significant security risk. It should be used in testing environments or
+                              on a temporary basis in non-testing environments.
 
                             Defaults to AllowValidOnly.
 
                             Support: Core
                           enum:
                           - AllowValidOnly
-                          - AllowInvalidOrMissingCert
+                          - AllowInsecureFallback
                           type: string
                       required:
                       - caCertificateRefs
