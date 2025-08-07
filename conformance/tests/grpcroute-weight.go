@@ -1,5 +1,5 @@
 /*
-Copyright 2024 The Kubernetes Authors.
+Copyright 2025 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,16 +17,8 @@ limitations under the License.
 package tests
 
 import (
-	"cmp"
-	"errors"
-	"fmt"
-	"math"
-	"slices"
-	"strings"
-	"sync"
 	"testing"
 
-	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc/codes"
 	"k8s.io/apimachinery/pkg/types"
 
@@ -65,11 +57,19 @@ var GRPCRouteWeight = suite.ConformanceTest{
 				Namespace:   "gateway-conformance-infra",
 			}
 
-			// Assert request succeeds before doing 	our distribution check
+			// Assert request succeeds before doing our distribution check
 			grpc.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.GRPCClient, suite.TimeoutConfig, gwAddr, expected)
 
+			expectedWeights := map[string]float64{
+				"grpc-infra-backend-v1": 0.7,
+				"grpc-infra-backend-v2": 0.3,
+				"grpc-infra-backend-v3": 0.0,
+			}
+
+			sender := newGRPCRequestSender(t, suite, gwAddr, expected)
+
 			for i := 0; i < 10; i++ {
-				if err := testGRPCDistribution(t, suite, gwAddr, expected); err != nil {
+				if err := testWeightedDistribution(sender, expectedWeights); err != nil {
 					t.Logf("Traffic distribution test failed (%d/10): %s", i+1, err)
 				} else {
 					return
@@ -78,81 +78,4 @@ var GRPCRouteWeight = suite.ConformanceTest{
 			t.Fatal("Weighted distribution tests failed")
 		})
 	},
-}
-
-func testGRPCDistribution(t *testing.T, suite *suite.ConformanceTestSuite, gwAddr string, expected grpc.ExpectedResponse) error {
-	const (
-		concurrentRequests  = 10
-		tolerancePercentage = 0.05
-		totalRequests       = 500.0
-	)
-	var (
-		g               errgroup.Group
-		seenMutex       sync.Mutex
-		seen            = make(map[string]float64, 3 /* number of backends */)
-		expectedWeights = map[string]float64{
-			"grpc-infra-backend-v1": 0.7,
-			"grpc-infra-backend-v2": 0.3,
-			"grpc-infra-backend-v3": 0.0,
-		}
-		grpcClient = &grpc.DefaultClient{}
-	)
-	g.SetLimit(concurrentRequests)
-	for i := 0.0; i < totalRequests; i++ {
-		g.Go(func() error {
-			resp, err := grpcClient.SendRPC(t, gwAddr, expected, suite.TimeoutConfig.MaxTimeToConsistency)
-			if err != nil {
-				return fmt.Errorf("failed to send gRPC request: %w", err)
-			}
-			if resp.Code != codes.OK {
-				return fmt.Errorf("expected OK response, got %v", resp.Code)
-			}
-
-			seenMutex.Lock()
-			defer seenMutex.Unlock()
-
-			podName := resp.Response.GetAssertions().GetContext().GetPod()
-			for expectedBackend := range expectedWeights {
-				if strings.HasPrefix(podName, expectedBackend) {
-					seen[expectedBackend]++
-					return nil
-				}
-			}
-
-			return fmt.Errorf("request was handled by an unexpected pod %q", podName)
-		})
-	}
-
-	if err := g.Wait(); err != nil {
-		return fmt.Errorf("error while sending requests: %w", err)
-	}
-
-	var errs []error
-	if len(seen) != 2 {
-		errs = append(errs, fmt.Errorf("expected only two backends to receive traffic"))
-	}
-
-	for wantBackend, wantPercent := range expectedWeights {
-		gotCount, ok := seen[wantBackend]
-
-		if !ok && wantPercent != 0.0 {
-			errs = append(errs, fmt.Errorf("expect traffic to hit backend %q - but none was received", wantBackend))
-			continue
-		}
-
-		gotPercent := gotCount / totalRequests
-
-		if math.Abs(gotPercent-wantPercent) > tolerancePercentage {
-			errs = append(errs, fmt.Errorf("backend %q weighted traffic of %v not within tolerance %v (+/-%f)",
-				wantBackend,
-				gotPercent,
-				wantPercent,
-				tolerancePercentage,
-			))
-		}
-	}
-	slices.SortFunc(errs, func(a, b error) int {
-		return cmp.Compare(a.Error(), b.Error())
-	})
-	return errors.Join(errs...)
 }

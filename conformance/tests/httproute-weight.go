@@ -17,16 +17,8 @@ limitations under the License.
 package tests
 
 import (
-	"cmp"
-	"errors"
-	"fmt"
-	"math"
-	"slices"
-	"strings"
-	"sync"
 	"testing"
 
-	"golang.org/x/sync/errgroup"
 	"k8s.io/apimachinery/pkg/types"
 
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
@@ -67,8 +59,16 @@ var HTTPRouteWeight = suite.ConformanceTest{
 			// Assert request succeeds before doing our distribution check
 			http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, expected)
 
+			expectedWeights := map[string]float64{
+				"infra-backend-v1": 0.7,
+				"infra-backend-v2": 0.3,
+				"infra-backend-v3": 0.0,
+			}
+
+			sender := newHTTPRequestSender(t, suite, gwAddr, expected)
+
 			for i := 0; i < 10; i++ {
-				if err := testDistribution(t, suite, gwAddr, expected); err != nil {
+				if err := testWeightedDistribution(sender, expectedWeights); err != nil {
 					t.Logf("Traffic distribution test failed (%d/10): %s", i+1, err)
 				} else {
 					return
@@ -79,80 +79,3 @@ var HTTPRouteWeight = suite.ConformanceTest{
 	},
 }
 
-func testDistribution(t *testing.T, suite *suite.ConformanceTestSuite, gwAddr string, expected http.ExpectedResponse) error {
-	const (
-		concurrentRequests  = 10
-		tolerancePercentage = 0.05
-		totalRequests       = 500.0
-	)
-	var (
-		roundTripper = suite.RoundTripper
-
-		g               errgroup.Group
-		seenMutex       sync.Mutex
-		seen            = make(map[string]float64, 3 /* number of backends */)
-		req             = http.MakeRequest(t, &expected, gwAddr, "HTTP", "http")
-		expectedWeights = map[string]float64{
-			"infra-backend-v1": 0.7,
-			"infra-backend-v2": 0.3,
-			"infra-backend-v3": 0.0,
-		}
-	)
-	g.SetLimit(concurrentRequests)
-	for i := 0.0; i < totalRequests; i++ {
-		g.Go(func() error {
-			cReq, cRes, err := roundTripper.CaptureRoundTrip(req)
-			if err != nil {
-				return fmt.Errorf("failed to roundtrip request: %w", err)
-			}
-			if err := http.CompareRoundTrip(t, &req, cReq, cRes, expected); err != nil {
-				return fmt.Errorf("response expectation failed for request: %w", err)
-			}
-
-			seenMutex.Lock()
-			defer seenMutex.Unlock()
-
-			for expectedBackend := range expectedWeights {
-				if strings.HasPrefix(cReq.Pod, expectedBackend) {
-					seen[expectedBackend]++
-					return nil
-				}
-			}
-
-			return fmt.Errorf("request was handled by an unexpected pod %q", cReq.Pod)
-		})
-	}
-
-	if err := g.Wait(); err != nil {
-		return fmt.Errorf("error while sending requests: %w", err)
-	}
-
-	var errs []error
-	if len(seen) != 2 {
-		errs = append(errs, fmt.Errorf("expected only two backends to receive traffic"))
-	}
-
-	for wantBackend, wantPercent := range expectedWeights {
-		gotCount, ok := seen[wantBackend]
-
-		if !ok && wantPercent != 0.0 {
-			errs = append(errs, fmt.Errorf("expect traffic to hit backend %q - but none was received", wantBackend))
-			continue
-		}
-
-		gotPercent := gotCount / totalRequests
-
-		if math.Abs(gotPercent-wantPercent) > tolerancePercentage {
-			errs = append(errs, fmt.Errorf("backend %q weighted traffic of %v not within tolerance %v (+/-%f)",
-				wantBackend,
-				gotPercent,
-				wantPercent,
-				tolerancePercentage,
-			))
-		}
-	}
-	slices.SortFunc(errs, func(a, b error) int {
-		return cmp.Compare(a.Error(), b.Error())
-	})
-	return errors.Join(errs...)
-}
