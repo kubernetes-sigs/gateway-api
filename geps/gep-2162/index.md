@@ -139,7 +139,7 @@ If the source of Gateway features are not inferred and manually provided the con
 #### Reporting Mesh features
 
 As Mesh doesn't have a good place (yet) to populate SupportedFeatures, its features can be tested for compliance by using Conformance Profiles, or manually, providing features for test using `--supported-features` flag.
-Conformance suite will determine if the implementation doesn't support GatewayClass and validate that report is run for the Mesh features and NOT block the report.
+Until mesh features are posted on the Mesh resource CRD, the conformance suite will determine if conformance run is for Mesh features and will NOT block the report if provided manually.
 
 #### Staying Compliant
 
