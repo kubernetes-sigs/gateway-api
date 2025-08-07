@@ -211,7 +211,7 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 			return nil, fmt.Errorf("cannot infer supported features: %w", err)
 		}
 
-		// If Mesh features are populated in the GatewayClass we remove them from the supported features set,
+		// If Mesh features are populated in the GatewayClass we remove them from the supported features set.
 		meshFeatureNames := features.SetsToNamesSet(features.MeshCoreFeatures, features.MeshExtendedFeatures)
 		for _, f := range supportedFeatures.UnsortedList() {
 			if meshFeatureNames.Has(f) {
