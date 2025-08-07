@@ -37,6 +37,7 @@ import (
 
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/gateway-api/apis/v1alpha2"
+	"sigs.k8s.io/gateway-api/apis/v1alpha3"
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
 	"sigs.k8s.io/gateway-api/conformance/utils/tlog"
 )
@@ -992,4 +993,36 @@ func findPodConditionInList(t *testing.T, conditions []v1.PodCondition, condName
 
 	tlog.Logf(t, "%s was not in conditions list", condName)
 	return false
+}
+
+// BackendTLSPolicyMustHaveCondition checks that the created BackentTLSPolicy has the Condition,
+// halting after the specified timeout is exceeded.
+func BackendTLSPolicyMustHaveCondition(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, policyNN, gwNN types.NamespacedName, condition metav1.Condition) {
+	t.Helper()
+	waitErr := wait.PollUntilContextTimeout(context.Background(), 1*time.Second, timeoutConfig.HTTPRouteMustHaveCondition, true, func(ctx context.Context) (bool, error) {
+		policy := &v1alpha3.BackendTLSPolicy{}
+		err := client.Get(ctx, policyNN, policy)
+		if err != nil {
+			return false, fmt.Errorf("error fetching BackendTLSPolicy: %w", err)
+		}
+
+		for _, parent := range policy.Status.Ancestors {
+			if err := ConditionsHaveLatestObservedGeneration(policy, parent.Conditions); err != nil {
+				tlog.Logf(t, "BackendTLSPolicy %s (parentRef=%v) %v",
+					policyNN, parentRefToString(parent.AncestorRef), err,
+				)
+				return false, nil
+			}
+
+			if parent.AncestorRef.Name == gatewayv1.ObjectName(gwNN.Name) && (parent.AncestorRef.Namespace == nil || string(*parent.AncestorRef.Namespace) == gwNN.Namespace) {
+				if findConditionInList(t, parent.Conditions, condition.Type, string(condition.Status), condition.Reason) {
+					return true, nil
+				}
+			}
+		}
+
+		return false, nil
+	})
+
+	require.NoErrorf(t, waitErr, "error waiting for BackendTLSPolicy status to have a Condition %v", condition)
 }
