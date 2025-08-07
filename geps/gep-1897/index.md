@@ -214,7 +214,8 @@ configuration. CACertificateRefs is an implementation-specific slice of
 named object references, each containing a single cert. We originally proposed to follow the convention established by the
 [CertificateRefs field on Gateway](https://github.com/kubernetes-sigs/gateway-api/blob/18e79909f7310aafc625ba7c862dfcc67b385250/apis/v1beta1/gateway_types.go#L340)
 , but the CertificateRef requires both a tls.key and tls.crt and a certificate reference only requires the tls.crt.
-If any of the CACertificateRefs cannot be resolved or is misconfigured, the BackendTLSPolicy is considered invalid.
+If any of the CACertificateRefs cannot be resolved (e.g., the referenced resource does not exist) or is misconfigured (e.g., ConfigMap does not contain a key named `ca.crt`), the BackendTLSPolicy is considered invalid.
+Any further validation of the certificate content (i.e., checking expiry or enforcing specific formats) is implementation-specific.
 
 WellKnownCACertificates is an optional enum that allows users to specify whether to use the set of CA certificates trusted by the
 Gateway (WellKnownCACertificates specified as "System"), or to use the existing CACertificateRefs (WellKnownCACertificates
@@ -227,8 +228,10 @@ If WellKnownCACertificates is unspecified, then CACertificateRefs must be specif
 If an implementation does not support the WellKnownCACertificates, or the provided value is unsupported,the BackendTLSPolicy is considered invalid.
 
 For an invalid BackendTLSPolicy, implementations MUST NOT fall back to unencrypted (plaintext) connections. 
-Instead, the corresponding TLS connection MUST fail, and the client MUST receive an HTTP error response.
-Additionally, the `Accepted` status condition of the BackendTLSPolicy MUST be set to `False` with the reason `Invalid`.
+Instead, the corresponding TLS connection MUST fail, and the client MUST receive an HTTP 5xx error response.
+Additionally, the `Accepted` status condition of the BackendTLSPolicy MUST be set to `False` with `Reason: Invalid`.
+
+Implementations MUST NOT modify any status other than their own. Ownership of a status is determined by the `controllerName`, which identifies the responsible controller.
 
 The `Hostname` field is required and is to be used to configure the SNI the Gateway should use to connect to the backend.
 Implementations must validate that at least one name in the certificate served by the backend matches this field.
