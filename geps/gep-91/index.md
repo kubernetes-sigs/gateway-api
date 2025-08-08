@@ -32,8 +32,13 @@ This proposal adds the ability to validate the TLS certificate presented by the 
 These two validation mechanisms operate independently and can be used simultaneously.
 * Introduce a `caCertificateRefs` field within `FrontendTLSValidation` that can be used to specify a list of CA Certificates that can be used as a trust anchor to validate the certificates presented by the client.
 * Add a new `FrontendValidationModeType` enum within `FrontendTLSValidation` indicating how gateway should validate client certificates. As for now we support following values but it might change in the future:
-  1) `AllowValidOnly`
-  2) `AllowInvalidOrMissingCert`
+  1) `AllowValidOnly` (Core Support)
+  2) `AllowInsecureFallback` (Extended Support)
+
+    AllowInsecureFallback mode indicates the gateway will accept connections even if the client certificate is not presented or fails verification.
+	This approach delegates client authorization to the backend and introduce a significant security risk. It should be used in testing environments or
+	on a temporary basis in non-testing environments.
+    When `FrontendValidationModeType` is changed from `AllowValidOnly` to `AllowInsecureFallback` the `InsecureFrontendValidationMode` condition MUST be set to True with Reason `ConfigurationChanged` on gateway.
 * Introduce a `ObjectReference` structure that can be used to specify `caCertificateRefs` references.
 * Introduce a `tls` field within the Gateway Spec to allow for a common TLS configuration to apply across all listeners.
 
@@ -78,19 +83,6 @@ type ObjectReference struct {
 	Namespace *Namespace `json:"namespace,omitempty"`
 }
 
-// GatewayTLSConfigs stores TLS configurations for a Gateway.
-//
-// * If the `port` field in `TLSConfig` is not set, the TLS configuration applies
-//   to all listeners in the gateway. We call this `default` configuration.
-// * If the `port` field in `TLSConfig` is set, the TLS configuration applies
-//   only to listeners with a matching port. Each port requires a unique TLS configuration.
-// * Per-port configurations can override the `default` configuration.
-// * The `default` configuration is optional. Clients can apply TLS configuration
-//   to a subset of listeners by creating only per-port configurations. Listeners
-//   with a port that does not match any TLS configuration will not have
-//   `frontendValidation` set.
-type GatewayTLSConfigs = []TLSConfig
-
 // TLSConfig describes a TLS configuration that can be applied to all Gateway
 // Listeners or to all Listeners matching the Port if set.
 type TLSConfig struct {
@@ -102,13 +94,11 @@ type TLSConfig struct {
 	//
 	// +optional
 	// <gateway:experimental>
-	Port *PortNumber
+	Port *PortNumber `json:"port,omitempty"`
 	// FrontendValidation holds configuration information for validating the frontend (client).
 	// Setting this field will result in mutual authentication when connecting to the gateway. In browsers this may result in a dialog appearing
 	// that requests a user to specify the client certificate.
 	// The maximum depth of a certificate chain accepted in verification is Implementation specific.
-	//
-	// Each field may be overidden by an equivalent setting applied at the Listener level.
 	//
 	// Support: Extended
 	//
@@ -151,21 +141,25 @@ type FrontendTLSValidation struct {
 	// - AllowValidOnly: In this mode, the gateway will accept connections only if
 	//   the client presents a valid certificate. This certificate must successfully
 	//   pass validation against the CA certificates specified in `CACertificateRefs`.
-	// - AllowInvalidOrMissingCert: In this mode, the gateway will accept
-	//   connections even if the client certificate is not presented or fails verification.
+	// - AllowInsecureFallback: In this mode, the gateway will accept connections
+	//   even if the client certificate is not presented or fails verification.
+	//
+	//   This approach delegates client authorization to the backend and introduce
+	//   a significant security risk. It should be used in testing environments or
+	//   on a temporary basis in non-testing environments.
 	//
 	// Defaults to AllowValidOnly.
 	//
-	// Support: Extended
+	// Support: Core
 	//
 	// +optional
 	// +kubebuilder:default=AllowValidOnly
-	Mode *FrontendValidationModeType `json:"mode,omitempty"`
+	Mode FrontendValidationModeType `json:"mode,omitempty"`
 }
 
-// FrontendValidationModeType type defines how a Gateway or Listener validates client certificates.
+// FrontendValidationModeType type defines how a Gateway validates client certificates.
 //
-// +kubebuilder:validation:Enum=AllowValidOnly;AllowInvalidOrMissingCert
+// +kubebuilder:validation:Enum=AllowValidOnly;AllowInsecureFallback
 type FrontendValidationModeType string
 
 const (
@@ -173,15 +167,30 @@ const (
 	// during the TLS handshake and MUST pass validation.
 	AllowValidOnly FrontendValidationModeType = "AllowValidOnly"
 
-	// AllowInvalidOrMissingCert indicates that a client certificate may not be
+	// AllowInsecureFallback indicates that a client certificate may not be
 	// presented during the handshake or the validation against CA certificates may fail.
-	AllowInvalidOrMissingCert FrontendValidationModeType = "AllowInvalidOrMissingCert"
+	AllowInsecureFallback FrontendValidationModeType = "AllowInsecureFallback"
 )
 
 type GatewaySpec struct {
     ...
     // TLSConfigs stores TLS configurations for a Gateway.
-    TLSConfigs GatewayTLSConfigs
+	//
+	//   - If the `port` field in `TLSConfig` is not set, the TLS configuration applies
+	//     to all listeners in the gateway. We call this `default` configuration.
+	//   - If the `port` field in `TLSConfig` is set, the TLS configuration applies
+	//     only to listeners with a matching port. Each port requires a unique TLS configuration.
+	//   - Per-port configurations can override the `default` configuration.
+	//   - The `default` configuration is optional. Clients can apply TLS configuration
+	//     to a subset of listeners by creating only per-port configurations.
+	//     Listeners with a port that does not match any TLS configuration will
+	//     not have `frontendValidation` set.
+	//
+	// Support: Core
+	// +optional
+	//
+	// <gateway:experimental>
+	TLSConfigs []TLSConfig `json:"tlsConfigs,omitempty"`
 }
 
 ```
@@ -245,7 +254,7 @@ spec:
         - kind: ConfigMap
           group: ""
           name: default-cert
-        mode: AllowInvalidOrMissingCert
+        mode: AllowInsecureFallback
   listeners:
   - name: foo-https
     protocol: HTTPS
@@ -321,7 +330,6 @@ This GEP aims to standardize this behavior as an official part of the upstream s
 
 [TLS Handshake Protocol]: https://www.rfc-editor.org/rfc/rfc5246#section-7.4
 [Certificate Path Validation]: https://www.rfc-editor.org/rfc/rfc5280#section-6
-[GatewayTLSConfig]: ../../reference/spec.md#gateway.networking.k8s.io/v1.GatewayTLSConfig
 [BackendTLSPolicy]: ../../api-types/backendtlspolicy.md
 [TLS Configuration GEP]: ../gep-2907/index.md
 [Gateway API TLS Use Cases]: https://docs.google.com/document/d/17sctu2uMJtHmJTGtBi_awGB0YzoCLodtR6rUNmKMCs8/edit?pli=1#heading=h.cxuq8vo8pcxm

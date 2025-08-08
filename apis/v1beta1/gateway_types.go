@@ -88,9 +88,9 @@ type Listener = v1.Listener
 // +k8s:deepcopy-gen=false
 type ProtocolType = v1.ProtocolType
 
-// GatewayTLSConfig describes a TLS configuration.
+// ListenerTLSConfig describes a TLS configuration.
 // +k8s:deepcopy-gen=false
-type GatewayTLSConfig = v1.GatewayTLSConfig
+type ListenerTLSConfig = v1.ListenerTLSConfig
 
 // TLSModeType type defines how a Gateway handles TLS sessions.
 //
