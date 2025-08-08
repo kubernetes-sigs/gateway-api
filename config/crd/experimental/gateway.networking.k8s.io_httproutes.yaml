@@ -131,7 +131,7 @@ spec:
                   type: string
                 maxItems: 16
                 type: array
-                x-kubernetes-list-type: atomic
+                x-kubernetes-list-type: set
               parentRefs:
                 description: |-
                   ParentRefs references the resources (usually Gateways) that a Route wants
@@ -3148,7 +3148,7 @@ spec:
                             minimum: 400
                             type: integer
                           type: array
-                          x-kubernetes-list-type: atomic
+                          x-kubernetes-list-type: set
                       type: object
                     sessionPersistence:
                       description: |-
@@ -3757,7 +3757,7 @@ spec:
                   type: string
                 maxItems: 16
                 type: array
-                x-kubernetes-list-type: atomic
+                x-kubernetes-list-type: set
               parentRefs:
                 description: |-
                   ParentRefs references the resources (usually Gateways) that a Route wants
@@ -6774,7 +6774,7 @@ spec:
                             minimum: 400
                             type: integer
                           type: array
-                          x-kubernetes-list-type: atomic
+                          x-kubernetes-list-type: set
                       type: object
                     sessionPersistence:
                       description: |-

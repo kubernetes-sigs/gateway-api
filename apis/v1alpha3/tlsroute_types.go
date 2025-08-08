@@ -88,7 +88,7 @@ type TLSRouteSpec struct {
 	// Support: Core
 	//
 	// +required
-	// +listType=atomic
+	// +listType=set
 	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:MaxItems=16
 	Hostnames []Hostname `json:"hostnames,omitempty"`

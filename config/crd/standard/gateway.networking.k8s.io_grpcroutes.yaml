@@ -151,7 +151,7 @@ spec:
                   type: string
                 maxItems: 16
                 type: array
-                x-kubernetes-list-type: atomic
+                x-kubernetes-list-type: set
               parentRefs:
                 description: |-
                   ParentRefs references the resources (usually Gateways) that a Route wants
