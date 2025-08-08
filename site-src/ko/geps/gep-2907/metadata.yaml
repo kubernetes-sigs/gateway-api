@@ -1,0 +1,15 @@
+apiVersion: internal.gateway.networking.k8s.io/v1alpha1
+kind: GEPDetails
+number: 2907
+name: TLS Configuration Placement and Terminology
+status: Memorandum
+authors:
+  - robscott
+relationships:
+  seeAlso:
+    - number: 91
+      name: Client Certificate Verification for Gateway Listeners
+      description: Will use some of the terminology defined by this GEP.
+    - number: 1897
+      name: TLS from Gateway to Backend
+      description: Will use some of the terminology defined by this GEP.
