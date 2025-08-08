@@ -214,8 +214,10 @@ configuration. CACertificateRefs is an implementation-specific slice of
 named object references, each containing a single cert. We originally proposed to follow the convention established by the
 [CertificateRefs field on Gateway](https://github.com/kubernetes-sigs/gateway-api/blob/18e79909f7310aafc625ba7c862dfcc67b385250/apis/v1beta1/gateway_types.go#L340)
 , but the CertificateRef requires both a tls.key and tls.crt and a certificate reference only requires the tls.crt.
-If any of the CACertificateRefs cannot be resolved (e.g., the referenced resource does not exist) or is misconfigured (e.g., ConfigMap does not contain a key named `ca.crt`), the BackendTLSPolicy is considered invalid.
+If any of the CACertificateRefs cannot be resolved (e.g., the referenced resource does not exist) or is misconfigured (e.g., ConfigMap does not contain a key named `ca.crt`), the `ResolvedRefs` status condition MUST be set to `False` with `Reason: InvalidCACertificateRef` and a connection using that CACertificateRef MUST fail, and the client MUST receive an HTTP 5xx error response.
 Any further validation of the certificate content (i.e., checking expiry or enforcing specific formats) is implementation-specific.
+
+If all CertificateRefs cannot be resolved, the BackendTLSPolicy is considered invalid.
 
 WellKnownCACertificates is an optional enum that allows users to specify whether to use the set of CA certificates trusted by the
 Gateway (WellKnownCACertificates specified as "System"), or to use the existing CACertificateRefs (WellKnownCACertificates
