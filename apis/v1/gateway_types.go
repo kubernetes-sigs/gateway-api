@@ -717,10 +717,14 @@ type FrontendValidationModeType string
 const (
 	// AllowValidOnly indicates that a client certificate is required
 	// during the TLS handshake and MUST pass validation.
+	//
+	// Support: Core
 	AllowValidOnly FrontendValidationModeType = "AllowValidOnly"
 
 	// AllowInsecureFallback indicates that a client certificate may not be
 	// presented during the handshake or the validation against CA certificates may fail.
+	//
+	// Support: Extended
 	AllowInsecureFallback FrontendValidationModeType = "AllowInsecureFallback"
 )
 
@@ -1061,6 +1065,13 @@ const (
 	// information on which address is causing the problem and how to resolve it
 	// in the condition message.
 	GatewayReasonAddressNotUsable GatewayConditionReason = "AddressNotUsable"
+	// This condition indicates `FrontendValidationModeType` changed from
+	// `AllowValidOnly` to `AllowInsecureFallback`.
+	GatewayConditionInsecureFrontendValidationMode GatewayConditionReason = "InsecureFrontendValidationMode"
+	// This reason MUST be set for GatewayConditionInsecureFrontendValidationMode
+	// when client change FrontendValidationModeType for a Gateway or per port override
+	// to `AllowInsecureFallback`.
+	GatewayReasonConfigurationChanged GatewayConditionReason = "ConfigurationChanged"
 )
 
 const (

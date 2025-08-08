@@ -32,8 +32,13 @@ This proposal adds the ability to validate the TLS certificate presented by the 
 These two validation mechanisms operate independently and can be used simultaneously.
 * Introduce a `caCertificateRefs` field within `FrontendTLSValidation` that can be used to specify a list of CA Certificates that can be used as a trust anchor to validate the certificates presented by the client.
 * Add a new `FrontendValidationModeType` enum within `FrontendTLSValidation` indicating how gateway should validate client certificates. As for now we support following values but it might change in the future:
-  1) `AllowValidOnly`
-  2) `AllowInsecureFallback`
+  1) `AllowValidOnly` (Core Support)
+  2) `AllowInsecureFallback` (Extended Support)
+
+    AllowInsecureFallback mode indicates the gateway will accept connections even if the client certificate is not presented or fails verification.
+	This approach delegates client authorization to the backend and introduce a significant security risk. It should be used in testing environments or
+	on a temporary basis in non-testing environments.
+    When `FrontendValidationModeType` is changed from `AllowValidOnly` to `AllowInsecureFallback` the `InsecureFrontendValidationMode` condition MUST be set to True with Reason `ConfigurationChanged` on gateway.
 * Introduce a `ObjectReference` structure that can be used to specify `caCertificateRefs` references.
 * Introduce a `tls` field within the Gateway Spec to allow for a common TLS configuration to apply across all listeners.
 
