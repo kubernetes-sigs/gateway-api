@@ -17,7 +17,9 @@ limitations under the License.
 package http
 
 import (
+	"crypto/rand"
 	"fmt"
+	"math/big"
 	"net"
 	"net/url"
 	"strings"
@@ -476,5 +478,56 @@ func setRedirectRequestDefaults(req *roundtripper.Request, cRes *roundtripper.Ca
 
 	if expected.RedirectRequest.Path == "" {
 		expected.RedirectRequest.Path = req.URL.Path
+	}
+}
+
+// addEntropy adds jitter to the request by adding either a delay up to 1 second, or a random header value, or both.
+func AddEntropy(exp *ExpectedResponse) error {
+	randomNumber := func(limit int64) (*int64, error) {
+		number, err := rand.Int(rand.Reader, big.NewInt(limit))
+		if err != nil {
+			return nil, err
+		}
+		n := number.Int64()
+		return &n, nil
+	}
+
+	// adds a delay
+	delay := func(limit int64) error {
+		randomSleepDuration, err := randomNumber(limit)
+		if err != nil {
+			return err
+		}
+		time.Sleep(time.Duration(*randomSleepDuration) * time.Millisecond)
+		return nil
+	}
+	// adds random header value
+	randomHeader := func(limit int64) error {
+		randomHeaderValue, err := randomNumber(limit)
+		if err != nil {
+			return err
+		}
+		exp.Request.Headers = make(map[string]string)
+		exp.Request.Headers["X-Jitter"] = fmt.Sprintf("%d", *randomHeaderValue)
+		return nil
+	}
+
+	random, err := randomNumber(3)
+	if err != nil {
+		return err
+	}
+
+	switch *random {
+	case 0:
+		return delay(1000)
+	case 1:
+		return randomHeader(10000)
+	case 2:
+		if err := delay(1000); err != nil {
+			return err
+		}
+		return randomHeader(10000)
+	default:
+		return fmt.Errorf("invalid random value: %d", *random)
 	}
 }
