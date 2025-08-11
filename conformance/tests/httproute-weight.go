@@ -65,10 +65,10 @@ var HTTPRouteWeight = suite.ConformanceTest{
 				"infra-backend-v3": 0.0,
 			}
 
-			sender := newHTTPRequestSender(t, suite, gwAddr, expected)
+			sender := NewHTTPRequestSender(t, suite, gwAddr, expected)
 
 			for i := 0; i < 10; i++ {
-				if err := testWeightedDistribution(sender, expectedWeights); err != nil {
+				if err := TestWeightedDistribution(sender, expectedWeights); err != nil {
 					t.Logf("Traffic distribution test failed (%d/10): %s", i+1, err)
 				} else {
 					return

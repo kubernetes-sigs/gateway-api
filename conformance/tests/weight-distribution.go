@@ -30,6 +30,7 @@ import (
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc/codes"
 
+	"sigs.k8s.io/gateway-api/conformance/utils/echo"
 	"sigs.k8s.io/gateway-api/conformance/utils/grpc"
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/roundtripper"
@@ -89,8 +90,27 @@ func (s *GRPCRequestSender) SendRequest() (string, error) {
 	return resp.Response.GetAssertions().GetContext().GetPod(), nil
 }
 
-// testWeightedDistribution tests that requests are distributed according to expected weights
-func testWeightedDistribution(sender RequestSender, expectedWeights map[string]float64) error {
+// MeshRequestSender implements RequestSender for mesh HTTP requests
+type MeshRequestSender struct {
+	t        *testing.T
+	client   echo.MeshPod
+	expected http.ExpectedResponse
+}
+
+func (s *MeshRequestSender) SendRequest() (string, error) {
+	uniqueExpected := s.expected
+	if err := http.AddEntropy(&uniqueExpected); err != nil {
+		return "", fmt.Errorf("error adding entropy: %w", err)
+	}
+	_, cRes, err := s.client.CaptureRequestResponseAndCompare(s.t, uniqueExpected)
+	if err != nil {
+		return "", fmt.Errorf("failed mesh request: %w", err)
+	}
+	return cRes.Hostname, nil
+}
+
+// TestWeightedDistribution tests that requests are distributed according to expected weights
+func TestWeightedDistribution(sender RequestSender, expectedWeights map[string]float64) error {
 	const (
 		concurrentRequests  = 10
 		tolerancePercentage = 0.05
@@ -168,8 +188,8 @@ func testWeightedDistribution(sender RequestSender, expectedWeights map[string]f
 	return errors.Join(errs...)
 }
 
-// newHTTPRequestSender creates a new HTTPRequestSender
-func newHTTPRequestSender(t *testing.T, suite *suite.ConformanceTestSuite, gwAddr string, expected http.ExpectedResponse) *HTTPRequestSender {
+// NewHTTPRequestSender creates a new HTTPRequestSender
+func NewHTTPRequestSender(t *testing.T, suite *suite.ConformanceTestSuite, gwAddr string, expected http.ExpectedResponse) *HTTPRequestSender {
 	return &HTTPRequestSender{
 		t:            t,
 		roundTripper: suite.RoundTripper,
@@ -178,13 +198,22 @@ func newHTTPRequestSender(t *testing.T, suite *suite.ConformanceTestSuite, gwAdd
 	}
 }
 
-// newGRPCRequestSender creates a new GRPCRequestSender
-func newGRPCRequestSender(t *testing.T, suite *suite.ConformanceTestSuite, gwAddr string, expected grpc.ExpectedResponse) *GRPCRequestSender {
+// NewGRPCRequestSender creates a new GRPCRequestSender
+func NewGRPCRequestSender(t *testing.T, suite *suite.ConformanceTestSuite, gwAddr string, expected grpc.ExpectedResponse) *GRPCRequestSender {
 	return &GRPCRequestSender{
 		t:        t,
 		client:   &grpc.DefaultClient{},
 		gwAddr:   gwAddr,
 		expected: expected,
 		timeout:  suite.TimeoutConfig.MaxTimeToConsistency,
+	}
+}
+
+// NewMeshRequestSender creates a new MeshRequestSender
+func NewMeshRequestSender(t *testing.T, client echo.MeshPod, expected http.ExpectedResponse) *MeshRequestSender {
+	return &MeshRequestSender{
+		t:        t,
+		client:   client,
+		expected: expected,
 	}
 }
