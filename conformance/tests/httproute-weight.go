@@ -78,4 +78,3 @@ var HTTPRouteWeight = suite.ConformanceTest{
 		})
 	},
 }
-
