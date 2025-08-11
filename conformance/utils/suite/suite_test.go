@@ -22,7 +22,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
-
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -545,9 +544,8 @@ func TestGWCPublishedMeshFeatures(t *testing.T) {
 			},
 			SupportedFeatures: featureNamesToSet([]string{
 				string(features.SupportGateway),
-				string(features.SupportGatewayStaticAddresses),
+				string(features.SupportMesh),
 				string(features.SupportMeshClusterIPMatching),
-				string(features.SupportMeshConsumerRoute),
 			}),
 		},
 	}
@@ -568,9 +566,12 @@ func TestGWCPublishedMeshFeatures(t *testing.T) {
 		Client:            fakeClient,
 	}
 
-	_, err := NewConformanceTestSuite(options)
-	if err == nil {
-		t.Fatalf("expected an error but got nil")
+	suite, err := NewConformanceTestSuite(options)
+	if err != nil {
+		t.Fatalf("error initializing conformance suite: %v", err)
+	}
+	if suite.SupportedFeatures.HasAny(features.SetsToNamesSet(features.MeshCoreFeatures, features.MeshExtendedFeatures).UnsortedList()...) {
+		t.Errorf("Mesh features should be skipped, got: %v", suite.SupportedFeatures.UnsortedList())
 	}
 }
 
