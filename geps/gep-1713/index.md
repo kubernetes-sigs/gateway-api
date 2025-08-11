@@ -115,6 +115,16 @@ type ListenerSetSpec struct {
 	// 2. ListenerSet ordered by creation time (oldest first)
 	// 3. ListenerSet ordered alphabetically by “{namespace}/{name}”.
 	//
+	// Regarding Conflict Management, Listeners in a ListenerSet follow the same
+	// rules of Listeners on a Gateway resource.
+	// 
+	// This validation should happen within all of the ListenerSets attached to a 
+	// Gateway, and the precedence of "parent Gateway" -> "oldest first" -> 
+	// "alphabetically ordered" should be respected.
+	// 
+	// ListenerSets containing conflicting Listeners MUST set the Conflicted 
+	// Condition to true and clearly indicate which Listeners are conflicted.
+	// 
 	// +listType=map
 	// +listMapKey=name
 	// +kubebuilder:validation:MinItems=1
@@ -333,9 +343,6 @@ type ParentGatewayReference struct {
 The following example shows a `Gateway` with an HTTP listener and two child HTTPS `ListenerSets` with unique hostnames and certificates.
 
 Only `ListenerSets` from the same namespace of the `Gateway` will be accepted:
-
-
-
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
@@ -556,7 +563,195 @@ Listeners should be merged using the following precedence:
 2. ListenerSet ordered by creation time (oldest first)
 3. ListenerSet ordered alphabetically by “{namespace}/{name}”.
 
-Conflicts are covered in the section 'ListenerConditions within a ListenerSet'
+Conflicts are covered in the section [Listener and ListenerSet conflicts](#listener-and-listenerset-conflicts)
+
+### Listener and ListenerSet conflicts
+
+ListenerSet conflicts should be managed similarly to [Gateway resource conflict](https://github.com/kubernetes-sigs/gateway-api/blob/372a5b06624cff12117f41dcd26c08cb1def22e7/apis/v1/gateway_types.go#L76)
+management.
+
+With ListenerSet this validation should happen within the same ListenerSet resource, 
+but MUST be validated also within a Gateway scope and all of the attached Listeners/ListenerSets.
+
+This means that the validation should happen now between distinct ListenerSets 
+attached to the same Gateway, and in case of a conflict, the [Listener Precedence](#listener-precedence) 
+should be respected, and the conflicting listener MUST have a `Conflicted` condition 
+set to True and with an explicit reason on its message.
+
+Following are some examples of a conflict situation:
+
+#### Conflict between ListenerSet and parent Gateway
+
+Given the following resource definitions:
+
+```yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: parent-gateway
+  namespace: infra
+spec:
+  allowedListeners:
+    namespaces:
+      from: All
+  listeners:
+  - name: foo
+    hostname: www.something.tld
+    protocol: HTTPS
+    port: 443
+	tls:
+      mode: Terminate
+      certificateRefs:
+      - kind: Secret
+        group: ""
+        name: default-cert
+---
+apiVersion: gateway.networking.x-k8s.io/v1alpha1
+kind: ListenerSet
+metadata:
+  name: user-listenerset
+  namespace: user01
+spec:
+  parentRef:
+    name: parent-gateway
+    kind: Gateway
+    group: gateway.networking.k8s.io
+  listeners:
+  - name: myapp
+    hostname: www.something.tld
+    protocol: HTTPS
+    port: 443
+    tls:
+      mode: Terminate
+      certificateRefs:
+      - kind: Secret
+        group: ""
+        name: app-cert
+```
+
+The ListenerSet `user-listenerset` should be marked as Conflicted, as the `parent-gateway`
+have a listener definition called `foo` that conflicts with the ListenetSet definition
+called `myapp`, as the following:
+
+```yaml
+apiVersion: gateway.networking.x-k8s.io/v1alpha1
+kind: ListenerSet
+metadata:
+  name: user-listenerset
+  namespace: user01
+....
+status:
+  listeners:
+  - name: myapp
+    hostname: www.something.tld
+    protocol: HTTPS
+    port: 443
+	conditions:
+    - message: ListenerSet has conflicts with Gateway 'infra/parent-gateway'
+      reason: Conflicted
+      status: "True"
+      type: Conflicted
+```
+
+#### Conflict between two ListenerSets
+
+The following example represents a conflict between two ListenerSets on distinct
+namespaces. The controller should avoid setting any Condition that exposes information
+from other users, but still provide meaningful information of why a ListenerSet 
+was not accepted
+
+
+```yaml
+apiVersion: gateway.networking.x-k8s.io/v1alpha1
+kind: ListenerSet
+metadata:
+  creationTimestamp: "2025-08-11T15:44:05Z"
+  name: listenerset1
+  namespace: user01
+spec:
+  parentRef:
+    name: parent-gateway
+    kind: Gateway
+    group: gateway.networking.k8s.io
+  listeners:
+  - name: myapp
+    hostname: www.something.tld
+    protocol: HTTPS
+    port: 443
+    tls:
+      mode: Terminate
+      certificateRefs:
+      - kind: Secret
+        group: ""
+        name: app-cert
+---
+apiVersion: gateway.networking.x-k8s.io/v1alpha1
+kind: ListenerSet
+metadata:
+  creationTimestamp: "2025-08-11T13:44:05Z"
+  name: listenerset2
+  namespace: user02
+spec:
+  parentRef:
+    name: parent-gateway
+    kind: Gateway
+    group: gateway.networking.k8s.io
+  listeners:
+  - name: myapp
+    hostname: www.something.tld
+    protocol: HTTPS
+    port: 443
+    tls:
+      mode: Terminate
+      certificateRefs:
+      - kind: Secret
+        group: ""
+        name: other-app-cert
+```
+
+In this case, there's a conflict as both users are setting the same hostname and 
+port on distinct Listeners. In this case, because the ListenerSet `user02/listenerset2` 
+is older, it will be accepted while `user01/listenerset1` should not be accepted, 
+and receive a `Conflicted=True` condition.
+
+The status of ListenerSets can be defined as the following:
+
+```yaml
+apiVersion: gateway.networking.x-k8s.io/v1alpha1
+kind: ListenerSet
+metadata:
+  creationTimestamp: "2025-08-11T15:44:05Z"
+  name: listenerset1
+  namespace: user01
+status:
+  listeners:
+  - name: myapp
+    hostname: www.something.tld
+    protocol: HTTPS
+    port: 443
+	conditions:
+	- message: ListenerSet has conflicts with other listeners attached to the same Gateway
+      reason: Conflicted
+      status: "True"
+      type: Conflicted
+---
+apiVersion: gateway.networking.x-k8s.io/v1alpha1
+kind: ListenerSet
+metadata:
+  creationTimestamp: "2025-08-11T13:44:05Z"
+  name: listenerset2
+  namespace: user02
+status:
+  listeners:
+  - name: myapp
+    hostname: www.something.tld
+    protocol: HTTPS
+    port: 443
+	conditions:
+    - reason: Accepted
+      status: "True"
+      type: Accepted
+```
 
 ### Gateway Conditions
 
