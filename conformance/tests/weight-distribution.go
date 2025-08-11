@@ -75,7 +75,11 @@ type GRPCRequestSender struct {
 }
 
 func (s *GRPCRequestSender) SendRequest() (string, error) {
-	resp, err := s.client.SendRPC(s.t, s.gwAddr, s.expected, s.timeout)
+	uniqueExpected := s.expected
+	if err := grpc.AddEntropy(&uniqueExpected); err != nil {
+		return "", fmt.Errorf("error adding entropy: %w", err)
+	}
+	resp, err := s.client.SendRPC(s.t, s.gwAddr, uniqueExpected, s.timeout)
 	if err != nil {
 		return "", fmt.Errorf("failed to send gRPC request: %w", err)
 	}
