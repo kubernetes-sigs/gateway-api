@@ -25,9 +25,9 @@ import (
 	"time"
 
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
-	"sigs.k8s.io/gateway-api/conformance/utils/entropy"
 	"sigs.k8s.io/gateway-api/conformance/utils/roundtripper"
 	"sigs.k8s.io/gateway-api/conformance/utils/tlog"
+	"sigs.k8s.io/gateway-api/conformance/utils/weight"
 )
 
 // ExpectedResponse defines the response expected for a given request.
@@ -480,7 +480,7 @@ func setRedirectRequestDefaults(req *roundtripper.Request, cRes *roundtripper.Ca
 	}
 }
 
-// addEntropy adds jitter to the request by adding either a delay up to 1 second, or a random header value, or both.
+// AddEntropy adds jitter to the request by adding either a delay up to 1 second, or a random header value, or both.
 func AddEntropy(exp *ExpectedResponse) error {
 	addRandomHeader := func(randomValue string) error {
 		exp.Request.Headers = make(map[string]string)
@@ -488,5 +488,6 @@ func AddEntropy(exp *ExpectedResponse) error {
 		return nil
 	}
 
-	return entropy.AddRandomEntropy(addRandomHeader)
+	return weight.AddRandomEntropy(addRandomHeader)
 }
+

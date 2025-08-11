@@ -17,6 +17,7 @@ limitations under the License.
 package tests
 
 import (
+	"fmt"
 	"testing"
 
 	"google.golang.org/grpc/codes"
@@ -27,6 +28,7 @@ import (
 	"sigs.k8s.io/gateway-api/conformance/utils/grpc"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
+	"sigs.k8s.io/gateway-api/conformance/utils/weight"
 	"sigs.k8s.io/gateway-api/pkg/features"
 )
 
@@ -66,10 +68,25 @@ var GRPCRouteWeight = suite.ConformanceTest{
 				"grpc-infra-backend-v3": 0.0,
 			}
 
-			sender := NewGRPCRequestSender(t, suite, gwAddr, expected)
+			sender := weight.NewFunctionBasedSender(func() (string, error) {
+				uniqueExpected := expected
+				if err := grpc.AddEntropy(&uniqueExpected); err != nil {
+					return "", fmt.Errorf("error adding entropy: %w", err)
+				}
+				client := &grpc.DefaultClient{}
+				defer client.Close()
+				resp, err := client.SendRPC(t, gwAddr, uniqueExpected, suite.TimeoutConfig.MaxTimeToConsistency)
+				if err != nil {
+					return "", fmt.Errorf("failed to send gRPC request: %w", err)
+				}
+				if resp.Code != codes.OK {
+					return "", fmt.Errorf("expected OK response, got %v", resp.Code)
+				}
+				return resp.Response.GetAssertions().GetContext().GetPod(), nil
+			})
 
 			for i := 0; i < 10; i++ {
-				if err := TestWeightedDistribution(sender, expectedWeights); err != nil {
+				if err := weight.TestWeightedDistribution(sender, expectedWeights); err != nil {
 					t.Logf("Traffic distribution test failed (%d/10): %s", i+1, err)
 				} else {
 					return

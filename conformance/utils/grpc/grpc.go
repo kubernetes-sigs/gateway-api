@@ -33,9 +33,9 @@ import (
 
 	pb "sigs.k8s.io/gateway-api/conformance/echo-basic/grpcechoserver"
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
-	"sigs.k8s.io/gateway-api/conformance/utils/entropy"
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/tlog"
+	"sigs.k8s.io/gateway-api/conformance/utils/weight"
 )
 
 const (
@@ -305,5 +305,6 @@ func AddEntropy(exp *ExpectedResponse) error {
 		return nil
 	}
 
-	return entropy.AddRandomEntropy(addRandomMetadata)
+	return weight.AddRandomEntropy(addRandomMetadata)
 }
+

@@ -17,6 +17,7 @@ limitations under the License.
 package tests
 
 import (
+	"fmt"
 	"testing"
 
 	"k8s.io/apimachinery/pkg/types"
@@ -24,6 +25,7 @@ import (
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
+	"sigs.k8s.io/gateway-api/conformance/utils/weight"
 	"sigs.k8s.io/gateway-api/pkg/features"
 )
 
@@ -65,10 +67,24 @@ var HTTPRouteWeight = suite.ConformanceTest{
 				"infra-backend-v3": 0.0,
 			}
 
-			sender := NewHTTPRequestSender(t, suite, gwAddr, expected)
+			sender := weight.NewFunctionBasedSender(func() (string, error) {
+				uniqueExpected := expected
+				if err := http.AddEntropy(&uniqueExpected); err != nil {
+					return "", fmt.Errorf("error adding entropy: %w", err)
+				}
+				req := http.MakeRequest(t, &uniqueExpected, gwAddr, "HTTP", "http")
+				cReq, cRes, err := suite.RoundTripper.CaptureRoundTrip(req)
+				if err != nil {
+					return "", fmt.Errorf("failed to roundtrip request: %w", err)
+				}
+				if err := http.CompareRoundTrip(t, &req, cReq, cRes, expected); err != nil {
+					return "", fmt.Errorf("response expectation failed for request: %w", err)
+				}
+				return cReq.Pod, nil
+			})
 
 			for i := 0; i < 10; i++ {
-				if err := TestWeightedDistribution(sender, expectedWeights); err != nil {
+				if err := weight.TestWeightedDistribution(sender, expectedWeights); err != nil {
 					t.Logf("Traffic distribution test failed (%d/10): %s", i+1, err)
 				} else {
 					return

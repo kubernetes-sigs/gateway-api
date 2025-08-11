@@ -239,3 +239,4 @@ func (m *MeshPod) CaptureRequestResponseAndCompare(t *testing.T, exp http.Expect
 	}
 	return req, resp, nil
 }
+

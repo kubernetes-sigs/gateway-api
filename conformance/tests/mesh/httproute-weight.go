@@ -17,12 +17,13 @@ limitations under the License.
 package meshtests
 
 import (
+	"fmt"
 	"testing"
 
-	"sigs.k8s.io/gateway-api/conformance/tests"
 	"sigs.k8s.io/gateway-api/conformance/utils/echo"
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
+	"sigs.k8s.io/gateway-api/conformance/utils/weight"
 	"sigs.k8s.io/gateway-api/pkg/features"
 )
 
@@ -57,10 +58,20 @@ var MeshHTTPRouteWeight = suite.ConformanceTest{
 				"echo-v2": 0.3,
 			}
 
-			sender := tests.NewMeshRequestSender(t, client, expected)
+			sender := weight.NewFunctionBasedSender(func() (string, error) {
+				uniqueExpected := expected
+				if err := http.AddEntropy(&uniqueExpected); err != nil {
+					return "", fmt.Errorf("error adding entropy: %w", err)
+				}
+				_, cRes, err := client.CaptureRequestResponseAndCompare(t, uniqueExpected)
+				if err != nil {
+					return "", fmt.Errorf("failed mesh request: %w", err)
+				}
+				return cRes.Hostname, nil
+			})
 
 			for i := 0; i < 10; i++ {
-				if err := tests.TestWeightedDistribution(sender, expectedWeights); err != nil {
+				if err := weight.TestWeightedDistribution(sender, expectedWeights); err != nil {
 					t.Logf("Traffic distribution test failed (%d/10): %s", i+1, err)
 				} else {
 					return
