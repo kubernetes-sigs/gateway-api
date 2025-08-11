@@ -22,7 +22,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
-
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -546,6 +545,7 @@ func TestGWCPublishedMeshFeatures(t *testing.T) {
 			SupportedFeatures: featureNamesToSet([]string{
 				string(features.SupportGateway),
 				string(features.SupportMesh),
+				string(features.SupportMeshClusterIPMatching),
 			}),
 		},
 	}
