@@ -102,6 +102,7 @@ other functions (like managing DNS or creating certificates).
 - [HAProxy Kubernetes Ingress Controller][32] (GA)
 - [HashiCorp Consul][8]
 - [Istio][9] (GA)
+- [IBM API Connect][42] (work in progress)
 - [kgateway][37] (GA)
 - [Kong Ingress Controller][10] (GA)
 - [Kong Gateway Operator][35] (GA)
@@ -172,6 +173,7 @@ other functions (like managing DNS or creating certificates).
 [39]:#kubvernor
 [40]:#agentgateway-with-kgateway
 [41]:#kruise-rollouts
+[42]:#ibm-api-connect
 
 
 [gamma]:mesh/index.md
@@ -433,6 +435,12 @@ Please see the [Consul API Gateway documentation][consul-api-gw-docs] for curren
 [consul]:https://consul.io
 [consul-api-gw-docs]:https://www.consul.io/docs/api-gateway
 [hashicorp]:https://www.hashicorp.com
+
+### IBM API Connect
+
+[IBM API Connect](https://www.ibm.com/products/api-connect) is a market-leading full lifecycle solution to create, test, manage, secure, analyze, and socialize APIs.
+
+IBM API Connect is working toward an implementation of Gateway API, utilizing a new highly performant and lightweight gateway. This implementation will utilize Gateway API resources to manage ingress traffic (routing of HTTP-based API requests to Services within the cluster). A technology preview is [available](https://www.ibm.com/docs/en/api-connect/saas?topic=technology-preview-using-lightweight-gateway-secure-application-domain).
 
 ### Istio
 
