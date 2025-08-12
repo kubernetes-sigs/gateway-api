@@ -601,12 +601,9 @@ var schemaYAML = typed.YAMLObject(`types:
           elementRelationship: associative
           keys:
           - name
-    - name: tlsConfigs
+    - name: tls
       type:
-        list:
-          elementType:
-            namedType: io.k8s.sigs.gateway-api.apis.v1.TLSConfig
-          elementRelationship: atomic
+        namedType: io.k8s.sigs.gateway-api.apis.v1.GatewayTLSConfig
 - name: io.k8s.sigs.gateway-api.apis.v1.GatewaySpecAddress
   map:
     fields:
@@ -651,6 +648,19 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         scalar: string
       default: ""
+- name: io.k8s.sigs.gateway-api.apis.v1.GatewayTLSConfig
+  map:
+    fields:
+    - name: default
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1.TLSConfig
+      default: {}
+    - name: perport
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v1.TLSPortConfig
+          elementRelationship: atomic
 - name: io.k8s.sigs.gateway-api.apis.v1.HTTPBackendRef
   map:
     fields:
@@ -1247,9 +1257,18 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: frontendValidation
       type:
         namedType: io.k8s.sigs.gateway-api.apis.v1.FrontendTLSValidation
+      default: {}
+- name: io.k8s.sigs.gateway-api.apis.v1.TLSPortConfig
+  map:
+    fields:
     - name: port
       type:
         scalar: numeric
+      default: 0
+    - name: tls
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1.TLSConfig
+      default: {}
 - name: io.k8s.sigs.gateway-api.apis.v1alpha2.GRPCRoute
   map:
     fields:

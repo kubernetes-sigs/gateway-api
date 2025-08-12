@@ -76,6 +76,8 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1.GatewayStatusApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("GatewayStatusAddress"):
 		return &apisv1.GatewayStatusAddressApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("GatewayTLSConfig"):
+		return &apisv1.GatewayTLSConfigApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("GRPCBackendRef"):
 		return &apisv1.GRPCBackendRefApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("GRPCHeaderMatch"):
@@ -166,6 +168,8 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1.SupportedFeatureApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("TLSConfig"):
 		return &apisv1.TLSConfigApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("TLSPortConfig"):
+		return &apisv1.TLSPortConfigApplyConfiguration{}
 
 		// Group=gateway.networking.k8s.io, Version=v1alpha2
 	case v1alpha2.SchemeGroupVersion.WithKind("GRPCRoute"):

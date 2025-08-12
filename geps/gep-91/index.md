@@ -26,7 +26,10 @@ This use case has been highlighted in the [TLS Configuration GEP][] under segmen
 
 ### API
 
-* Introduce two new structs `TLSConfig` and `FrontendTLSValidation` allowing for the definition of certificate validation used to authenticate the peer (frontend) in a TLS connection. A new `tls` field, storing an array of `TLSConfigs`, will be added to the gateway object.
+* Introduce new structs: `GatewayTLSConfig`, `TLSConfig`, `TLSPortConfig`, `FrontendTLSValidation` allowing for the definition of certificate validation used to authenticate the peer (frontend) in a TLS connection. A new `tls` field with gateway tls configuration will be added to the gateway object.
+* `TLSConfig` will allow defining client certificate validation per port which will be applied to all Listeners matching this port. We might want to extend this struct with other tls configurations.
+* `TLSPortConfig` will allow defining client certificate validation per port which will be applied to all Listeners matching this port.
+* `GatewayTLSConfig` struct contains default and (optional) per port configuration. Default configuration will apply to all Listeners which are not matching per port override.
 * This new field is separate from the existing [BackendTLSPolicy][] configuration. [BackendTLSPolicy][] controls TLS certificate validation for connections *from* the Gateway to the backend service.
 This proposal adds the ability to validate the TLS certificate presented by the *client* connecting to the Gateway (the frontend).
 These two validation mechanisms operate independently and can be used simultaneously.
@@ -35,17 +38,16 @@ These two validation mechanisms operate independently and can be used simultaneo
   1) `AllowValidOnly` (Core Support)
   2) `AllowInsecureFallback` (Extended Support)
 
-    AllowInsecureFallback mode indicates the gateway will accept connections even if the client certificate is not presented or fails verification.
+    `AllowInsecureFallback` mode indicates the gateway will accept connections even if the client certificate is not presented or fails verification.
 	This approach delegates client authorization to the backend and introduce a significant security risk. It should be used in testing environments or
 	on a temporary basis in non-testing environments.
-    When `FrontendValidationModeType` is changed from `AllowValidOnly` to `AllowInsecureFallback` the `InsecureFrontendValidationMode` condition MUST be set to True with Reason `ConfigurationChanged` on gateway.
+    When `FrontendValidationModeType` is changed from `AllowValidOnly` to `AllowInsecureFallback` the `InsecureFrontendValidationMode` condition MUST be set to `True` with Reason `ConfigurationChanged` on gateway.
 * Introduce a `ObjectReference` structure that can be used to specify `caCertificateRefs` references.
-* Introduce a `tls` field within the Gateway Spec to allow for a common TLS configuration to apply across all listeners.
 
 ### Impact on listeners
 
 This proposal removes frontendTLSValidation from Listener's TLS configuration and introduces gateways level per port configuration. This is a breaking change for exisitng implementation which uses this feature from Experimental API.
- Once gateway level TLS is configured (either by default or for a specific port), the TLS settings will apply to all existing and newly created Listeners that match the configuration.
+ Once gateway level TLS is configured (either by default or for a specific port), the TLS settings will apply to all existing and newly created Listeners serving HTTPS that match the configuration.
 
 #### GO
 
@@ -83,28 +85,58 @@ type ObjectReference struct {
 	Namespace *Namespace `json:"namespace,omitempty"`
 }
 
-// TLSConfig describes a TLS configuration that can be applied to all Gateway
-// Listeners or to all Listeners matching the Port if set.
+// GatewayTLSConfig specifies frontend tls configuration for gateway.
+type GatewayTLSConfig struct {
+    // default specifies the default client certificate validation configuration
+    // for all Listeners handling HTTPS traffic, unless a per-port configuration
+    // is defined.
+    //
+    // support: Core
+    //
+    // +required
+    // <gateway:experimental>
+    Default FrontendTLSValidation `json:"default"`
+
+    // PerPort specifies tls configuration assigned per port.
+    // Per port configuration is optional. Once set this configuration overrides
+    // the default configuration for all Listeners handling HTTPS traffic
+    // that match this port.
+    // Each override port requires a unique TLS configuration.
+    //
+    // support: Core
+    //
+    PerPort []TLSConfig `json:"PerPort,omitempty"`
+}
+
+// TLSConfig describes a TLS configuration. Currently, it stores only the client
+// certificate validation configuration, but this may be extended in the future.
 type TLSConfig struct {
-	// The Port indicates the Port Number to which the TLS configuration will be
-	// applied. If the field is not set the TLS Configuration will be applied to
-	// all Listeners.
-	//
-	// Support: Extended
-	//
-	// +optional
-	// <gateway:experimental>
-	Port *PortNumber `json:"port,omitempty"`
 	// FrontendValidation holds configuration information for validating the frontend (client).
-	// Setting this field will result in mutual authentication when connecting to the gateway. In browsers this may result in a dialog appearing
+	// Setting this field will result in mutual authentication when connecting to the gateway.
+	// In browsers this may result in a dialog appearing
 	// that requests a user to specify the client certificate.
 	// The maximum depth of a certificate chain accepted in verification is Implementation specific.
 	//
 	// Support: Extended
 	//
-	// +optional
+	// +required
 	// <gateway:experimental>
-	FrontendValidation *FrontendTLSValidation `json:"frontendValidation,omitempty"`
+	FrontendValidation FrontendTLSValidation `json:"frontendValidation"`
+}
+
+type TLSPortConfig struct {
+	// The Port indicates the Port Number to which the TLS configuration will be
+	// applied. This configuration will be applied to all Listeners handling HTTPS
+	// traffic that match this port.
+	//
+	// Support: Core
+	//
+	// +required
+	// <gateway:experimental>
+	Port PortNumber `json:"port"`
+	// TLS store the configuration that will be applied to all Listeners handling
+	// HTTPS traffic and matching given port.
+	TLS TLSConfig `json:"tls"`
 }
 
 // FrontendTLSValidation holds configuration information that can be used to validate
@@ -174,23 +206,13 @@ const (
 
 type GatewaySpec struct {
     ...
-    // TLSConfigs stores TLS configurations for a Gateway.
-	//
-	//   - If the `port` field in `TLSConfig` is not set, the TLS configuration applies
-	//     to all listeners in the gateway. We call this `default` configuration.
-	//   - If the `port` field in `TLSConfig` is set, the TLS configuration applies
-	//     only to listeners with a matching port. Each port requires a unique TLS configuration.
-	//   - Per-port configurations can override the `default` configuration.
-	//   - The `default` configuration is optional. Clients can apply TLS configuration
-	//     to a subset of listeners by creating only per-port configurations.
-	//     Listeners with a port that does not match any TLS configuration will
-	//     not have `frontendValidation` set.
+    // GatewayTLSConfig specifies frontend tls configuration for gateway.
 	//
 	// Support: Core
-	// +optional
 	//
+	// +optional
 	// <gateway:experimental>
-	TLSConfigs []TLSConfig `json:"tlsConfigs,omitempty"`
+	TLS *GatewayTLSConfig `json:"tls,omitempty"`
 }
 
 ```
@@ -207,11 +229,12 @@ metadata:
 spec:
   gatewayClassName: acme-lb
   tls:
-    - frontendValidation:
-        caCertificateRefs:
-        - kind: ConfigMap
-          group: ""
-          name: default-cert
+    default:
+    frontendValidation:
+      caCertificateRefs:
+      - kind: ConfigMap
+        group: ""
+        name: default-cert
   listeners:
   - name: foo-https
     protocol: HTTPS
@@ -243,18 +266,20 @@ metadata:
 spec:
   gatewayClassName: acme-lb
   tls:
-    - port: 443
+    default:
       frontendValidation:
         caCertificateRefs:
-        - kind: ConfigMap
-          group: ""
-          name: foo-example-com-ca-cert
-    - frontendValidation:
-        caCertificateRefs:
-        - kind: ConfigMap
-          group: ""
-          name: default-cert
+          - kind: ConfigMap
+            group: ""
+            name: default-cert
         mode: AllowInsecureFallback
+    perPort:
+      - port: 443
+        frontendValidation:
+          caCertificateRefs:
+          - kind: ConfigMap
+            group: ""
+            name: foo-example-com-ca-cert
   listeners:
   - name: foo-https
     protocol: HTTPS

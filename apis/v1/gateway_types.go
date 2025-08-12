@@ -295,24 +295,13 @@ type GatewaySpec struct {
 	//
 	// +optional
 	AllowedListeners *AllowedListeners `json:"allowedListeners,omitempty"`
-
-	// TLSConfigs stores TLS configurations for a Gateway.
+	// GatewayTLSConfig specifies frontend tls configuration for gateway.
 	//
-	//   - If the `port` field in `TLSConfig` is not set, the TLS configuration applies
-	//     to all listeners in the gateway. We call this `default` configuration.
-	//   - If the `port` field in `TLSConfig` is set, the TLS configuration applies
-	//     only to listeners with a matching port. Each port requires a unique TLS configuration.
-	//   - Per-port configurations can override the `default` configuration.
-	//   - The `default` configuration is optional. Clients can apply TLS configuration
-	//     to a subset of listeners by creating only per-port configurations.
-	//     Listeners with a port that does not match any TLS configuration will
-	//     not have `frontendValidation` set.
+	// Support: Extended
 	//
-	// Support: Core
 	// +optional
-	//
 	// <gateway:experimental>
-	TLSConfigs []TLSConfig `json:"tlsConfigs,omitempty"`
+	TLS *GatewayTLSConfig `json:"tls,omitempty"`
 }
 
 // AllowedListeners defines which ListenerSets can be attached to this Gateway.
@@ -612,6 +601,31 @@ type ListenerTLSConfig struct {
 	Options map[AnnotationKey]AnnotationValue `json:"options,omitempty"`
 }
 
+// GatewayTLSConfig specifies frontend tls configuration for gateway.
+type GatewayTLSConfig struct {
+	// default specifies the default client certificate validation configuration
+	// for all Listeners handling HTTPS traffic, unless a per-port configuration
+	// is defined.
+	//
+	// support: Core
+	//
+	// +required
+	// <gateway:experimental>
+	Default TLSConfig `json:"default"`
+
+	// PerPort specifies tls configuration assigned per port.
+	// Per port configuration is optional. Once set this configuration overrides
+	// the default configuration for all Listeners handling HTTPS traffic
+	// that match this port.
+	// Each override port requires a unique TLS configuration.
+	//
+	// support: Core
+	//
+	// +optional
+	// <gateway:experimental>
+	PerPort []TLSPortConfig `json:"perport,omitempty"`
+}
+
 // TLSModeType type defines how a Gateway handles TLS sessions.
 //
 // +kubebuilder:validation:Enum=Terminate;Passthrough
@@ -630,30 +644,40 @@ const (
 	TLSModePassthrough TLSModeType = "Passthrough"
 )
 
-// TLSConfig describes a TLS configuration that can be applied to all Gateway
-// Listeners or to all Listeners matching the Port if set.
+// TLSConfig describes a TLS configuration. Currently, it stores only the client
+// certificate validation configuration, but this may be extended in the future.
 type TLSConfig struct {
-	// The Port indicates the Port Number to which the TLS configuration will be
-	// applied. If the field is not set the TLS Configuration will be applied to
-	// all Listeners.
-	//
-	// Support: Extended
-	//
-	// +optional
-	// <gateway:experimental>
-	Port *PortNumber `json:"port,omitempty"`
-	//
 	// FrontendValidation holds configuration information for validating the frontend (client).
 	// Setting this field will result in mutual authentication when connecting to the gateway.
 	// In browsers this may result in a dialog appearing
 	// that requests a user to specify the client certificate.
 	// The maximum depth of a certificate chain accepted in verification is Implementation specific.
 	//
-	// Support: Extended
+	// Support: Core
 	//
-	// +optional
+	// +required
 	// <gateway:experimental>
-	FrontendValidation *FrontendTLSValidation `json:"frontendValidation,omitempty"`
+	FrontendValidation FrontendTLSValidation `json:"frontendValidation"`
+}
+
+type TLSPortConfig struct {
+	// The Port indicates the Port Number to which the TLS configuration will be
+	// applied. This configuration will be applied to all Listeners handling HTTPS
+	// traffic that match this port.
+	//
+	// Support: Core
+	//
+	// +required
+	// <gateway:experimental>
+	Port PortNumber `json:"port"`
+	// TLS store the configuration that will be applied to all Listeners handling
+	// HTTPS traffic and matching given port.
+	//
+	// Support: Core
+	//
+	// +required
+	// <gateway:experimental>
+	TLS TLSConfig `json:"tls"`
 }
 
 // FrontendTLSValidation holds configuration information that can be used to validate
@@ -685,7 +709,7 @@ type FrontendTLSValidation struct {
 	// +listType=atomic
 	// +kubebuilder:validation:MaxItems=8
 	// +kubebuilder:validation:MinItems=1
-	CACertificateRefs []ObjectReference `json:"caCertificateRefs,omitempty"`
+	CACertificateRefs []ObjectReference `json:"caCertificateRefs"`
 
 	// FrontendValidationMode defines the mode for validating the client certificate.
 	// There are two possible modes:

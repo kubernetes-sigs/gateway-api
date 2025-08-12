@@ -112,6 +112,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"sigs.k8s.io/gateway-api/apis/v1.GatewaySpecAddress":                              schema_sigsk8sio_gateway_api_apis_v1_GatewaySpecAddress(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.GatewayStatus":                                   schema_sigsk8sio_gateway_api_apis_v1_GatewayStatus(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.GatewayStatusAddress":                            schema_sigsk8sio_gateway_api_apis_v1_GatewayStatusAddress(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.GatewayTLSConfig":                                schema_sigsk8sio_gateway_api_apis_v1_GatewayTLSConfig(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.HTTPBackendRef":                                  schema_sigsk8sio_gateway_api_apis_v1_HTTPBackendRef(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.HTTPCORSFilter":                                  schema_sigsk8sio_gateway_api_apis_v1_HTTPCORSFilter(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.HTTPHeader":                                      schema_sigsk8sio_gateway_api_apis_v1_HTTPHeader(ref),
@@ -149,6 +150,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"sigs.k8s.io/gateway-api/apis/v1.SessionPersistence":                              schema_sigsk8sio_gateway_api_apis_v1_SessionPersistence(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.SupportedFeature":                                schema_sigsk8sio_gateway_api_apis_v1_SupportedFeature(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.TLSConfig":                                       schema_sigsk8sio_gateway_api_apis_v1_TLSConfig(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.TLSPortConfig":                                   schema_sigsk8sio_gateway_api_apis_v1_TLSPortConfig(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.supportedFeatureInternal":                        schema_sigsk8sio_gateway_api_apis_v1_supportedFeatureInternal(ref),
 		"sigs.k8s.io/gateway-api/apis/v1alpha2.GRPCRoute":                                 schema_sigsk8sio_gateway_api_apis_v1alpha2_GRPCRoute(ref),
 		"sigs.k8s.io/gateway-api/apis/v1alpha2.GRPCRouteList":                             schema_sigsk8sio_gateway_api_apis_v1alpha2_GRPCRouteList(ref),
@@ -4102,18 +4104,10 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewaySpec(ref common.ReferenceCallba
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.AllowedListeners"),
 						},
 					},
-					"tlsConfigs": {
+					"tls": {
 						SchemaProps: spec.SchemaProps{
-							Description: "TLSConfigs stores TLS configurations for a Gateway.\n\n  - If the `port` field in `TLSConfig` is not set, the TLS configuration applies\n    to all listeners in the gateway. We call this `default` configuration.\n  - If the `port` field in `TLSConfig` is set, the TLS configuration applies\n    only to listeners with a matching port. Each port requires a unique TLS configuration.\n  - Per-port configurations can override the `default` configuration.\n  - The `default` configuration is optional. Clients can apply TLS configuration\n    to a subset of listeners by creating only per-port configurations.\n    Listeners with a port that does not match any TLS configuration will\n    not have `frontendValidation` set.\n\nSupport: Core\n\n<gateway:experimental>",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.TLSConfig"),
-									},
-								},
-							},
+							Description: "GatewayTLSConfig specifies frontend tls configuration for gateway.\n\nSupport: Extended\n\n<gateway:experimental>",
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.GatewayTLSConfig"),
 						},
 					},
 				},
@@ -4121,7 +4115,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewaySpec(ref common.ReferenceCallba
 			},
 		},
 		Dependencies: []string{
-			"sigs.k8s.io/gateway-api/apis/v1.AllowedListeners", "sigs.k8s.io/gateway-api/apis/v1.GatewayBackendTLS", "sigs.k8s.io/gateway-api/apis/v1.GatewayInfrastructure", "sigs.k8s.io/gateway-api/apis/v1.GatewaySpecAddress", "sigs.k8s.io/gateway-api/apis/v1.Listener", "sigs.k8s.io/gateway-api/apis/v1.TLSConfig"},
+			"sigs.k8s.io/gateway-api/apis/v1.AllowedListeners", "sigs.k8s.io/gateway-api/apis/v1.GatewayBackendTLS", "sigs.k8s.io/gateway-api/apis/v1.GatewayInfrastructure", "sigs.k8s.io/gateway-api/apis/v1.GatewaySpecAddress", "sigs.k8s.io/gateway-api/apis/v1.GatewayTLSConfig", "sigs.k8s.io/gateway-api/apis/v1.Listener"},
 	}
 }
 
@@ -4256,6 +4250,43 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewayStatusAddress(ref common.Refere
 				Required: []string{"value"},
 			},
 		},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apis_v1_GatewayTLSConfig(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "GatewayTLSConfig specifies frontend tls configuration for gateway.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"default": {
+						SchemaProps: spec.SchemaProps{
+							Description: "default specifies the default client certificate validation configuration for all Listeners handling HTTPS traffic, unless a per-port configuration is defined.\n\nsupport: Core\n\n<gateway:experimental>",
+							Default:     map[string]interface{}{},
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.TLSConfig"),
+						},
+					},
+					"perport": {
+						SchemaProps: spec.SchemaProps{
+							Description: "PerPort specifies tls configuration assigned per port. Per port configuration is optional. Once set this configuration overrides the default configuration for all Listeners handling HTTPS traffic that match this port. Each override port requires a unique TLS configuration.\n\nsupport: Core\n\n<gateway:experimental>",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.TLSPortConfig"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"default"},
+			},
+		},
+		Dependencies: []string{
+			"sigs.k8s.io/gateway-api/apis/v1.TLSConfig", "sigs.k8s.io/gateway-api/apis/v1.TLSPortConfig"},
 	}
 }
 
@@ -6017,27 +6048,52 @@ func schema_sigsk8sio_gateway_api_apis_v1_TLSConfig(ref common.ReferenceCallback
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "TLSConfig describes a TLS configuration that can be applied to all Gateway Listeners or to all Listeners matching the Port if set.",
+				Description: "TLSConfig describes a TLS configuration. Currently, it stores only the client certificate validation configuration, but this may be extended in the future.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
-					"port": {
-						SchemaProps: spec.SchemaProps{
-							Description: "The Port indicates the Port Number to which the TLS configuration will be applied. If the field is not set the TLS Configuration will be applied to all Listeners.\n\nSupport: Extended\n\n<gateway:experimental>",
-							Type:        []string{"integer"},
-							Format:      "int32",
-						},
-					},
 					"frontendValidation": {
 						SchemaProps: spec.SchemaProps{
-							Description: "FrontendValidation holds configuration information for validating the frontend (client). Setting this field will result in mutual authentication when connecting to the gateway. In browsers this may result in a dialog appearing that requests a user to specify the client certificate. The maximum depth of a certificate chain accepted in verification is Implementation specific.\n\nSupport: Extended\n\n<gateway:experimental>",
+							Description: "FrontendValidation holds configuration information for validating the frontend (client). Setting this field will result in mutual authentication when connecting to the gateway. In browsers this may result in a dialog appearing that requests a user to specify the client certificate. The maximum depth of a certificate chain accepted in verification is Implementation specific.\n\nSupport: Core\n\n<gateway:experimental>",
+							Default:     map[string]interface{}{},
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.FrontendTLSValidation"),
 						},
 					},
 				},
+				Required: []string{"frontendValidation"},
 			},
 		},
 		Dependencies: []string{
 			"sigs.k8s.io/gateway-api/apis/v1.FrontendTLSValidation"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apis_v1_TLSPortConfig(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Type: []string{"object"},
+				Properties: map[string]spec.Schema{
+					"port": {
+						SchemaProps: spec.SchemaProps{
+							Description: "The Port indicates the Port Number to which the TLS configuration will be applied. This configuration will be applied to all Listeners handling HTTPS traffic that match this port.\n\nSupport: Core\n\n<gateway:experimental>",
+							Default:     0,
+							Type:        []string{"integer"},
+							Format:      "int32",
+						},
+					},
+					"tls": {
+						SchemaProps: spec.SchemaProps{
+							Description: "TLS store the configuration that will be applied to all Listeners handling HTTPS traffic and matching given port.\n\nSupport: Core\n\n<gateway:experimental>",
+							Default:     map[string]interface{}{},
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.TLSConfig"),
+						},
+					},
+				},
+				Required: []string{"port", "tls"},
+			},
+		},
+		Dependencies: []string{
+			"sigs.k8s.io/gateway-api/apis/v1.TLSConfig"},
 	}
 }
 
