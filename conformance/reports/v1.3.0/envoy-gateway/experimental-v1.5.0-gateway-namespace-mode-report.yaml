@@ -10,7 +10,7 @@ implementation:
   url: https://github.com/envoyproxy/gateway
   version: latest
 kind: ConformanceReport
-mode: default
+mode: GatewayNamespace
 profiles:
 - core:
     result: success
