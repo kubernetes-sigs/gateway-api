@@ -80,7 +80,15 @@ func makeRequest(t *testing.T, exp *http.ExpectedResponse) []string {
 	if exp.Request.Host == "" {
 		exp.Request.Host = "echo"
 	}
-	if exp.Request.Method == "" {
+
+	r := exp.Request
+	protocol := strings.ToLower(r.Protocol)
+	if protocol == "" {
+		protocol = "http"
+	}
+
+	// Only set default method for HTTP protocols, not for gRPC
+	if exp.Request.Method == "" && protocol != "grpc" {
 		exp.Request.Method = "GET"
 	}
 
@@ -88,14 +96,9 @@ func makeRequest(t *testing.T, exp *http.ExpectedResponse) []string {
 		exp.Response.StatusCode = 200
 	}
 
-	r := exp.Request
-	protocol := strings.ToLower(r.Protocol)
-	if protocol == "" {
-		protocol = "http"
-	}
 	host := http.CalculateHost(t, r.Host, protocol)
 	args := []string{"client", fmt.Sprintf("%s://%s%s", protocol, host, r.Path)}
-	if r.Method != "" {
+	if r.Method != "" && protocol != "grpc" {
 		args = append(args, "--method="+r.Method)
 	}
 	for k, v := range r.Headers {
@@ -239,4 +242,3 @@ func (m *MeshPod) CaptureRequestResponseAndCompare(t *testing.T, exp http.Expect
 	}
 	return req, resp, nil
 }
-

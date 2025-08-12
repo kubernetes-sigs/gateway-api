@@ -16,7 +16,6 @@ limitations under the License.
 
 package weight
 
-
 // FunctionBasedSender implements RequestSender using a function
 type FunctionBasedSender struct {
 	sendFunc func() (string, error)

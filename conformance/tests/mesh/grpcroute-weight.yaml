@@ -8,12 +8,13 @@ spec:
   - group: ""
     kind: Service
     name: echo
-    port: 9000
+    port: 7070
   rules:
   - backendRefs:
     - name: echo-v1
-      port: 9000
+      port: 7070
       weight: 70
     - name: echo-v2
-      port: 9000
+      port: 7070
       weight: 30
+      

@@ -36,7 +36,6 @@ type RequestSender interface {
 	SendRequest() (podName string, err error)
 }
 
-
 // TestWeightedDistribution tests that requests are distributed according to expected weights
 func TestWeightedDistribution(sender RequestSender, expectedWeights map[string]float64) error {
 	const (
@@ -116,7 +115,6 @@ func TestWeightedDistribution(sender RequestSender, expectedWeights map[string]f
 	return errors.Join(errs...)
 }
 
-
 // Entropy utilities
 
 // randomNumber generates a random number between 0 and limit-1
@@ -179,4 +177,3 @@ func AddRandomEntropy(addRandomValue func(string) error) error {
 		return fmt.Errorf("invalid random value: %d", *random)
 	}
 }
-

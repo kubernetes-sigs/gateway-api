@@ -490,4 +490,3 @@ func AddEntropy(exp *ExpectedResponse) error {
 
 	return weight.AddRandomEntropy(addRandomHeader)
 }
-

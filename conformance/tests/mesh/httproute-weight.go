@@ -81,4 +81,3 @@ var MeshHTTPRouteWeight = suite.ConformanceTest{
 		})
 	},
 }
-

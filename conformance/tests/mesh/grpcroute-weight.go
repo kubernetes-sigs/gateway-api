@@ -20,11 +20,8 @@ import (
 	"fmt"
 	"testing"
 
-	"google.golang.org/grpc/codes"
-
-	pb "sigs.k8s.io/gateway-api/conformance/echo-basic/grpcechoserver"
 	"sigs.k8s.io/gateway-api/conformance/utils/echo"
-	"sigs.k8s.io/gateway-api/conformance/utils/grpc"
+	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
 	"sigs.k8s.io/gateway-api/conformance/utils/weight"
 	"sigs.k8s.io/gateway-api/pkg/features"
@@ -43,26 +40,18 @@ var MeshGRPCRouteWeight = suite.ConformanceTest{
 		features.SupportGRPCRoute,
 	},
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
-		// Connect to mesh app to get the service address
 		client := echo.ConnectToApp(t, s, echo.MeshAppEchoV1)
-		
+
 		t.Run("Requests should have a distribution that matches the weight", func(t *testing.T) {
-			expected := grpc.ExpectedResponse{
-				EchoRequest: &pb.EchoRequest{},
-				Response:    grpc.Response{Code: codes.OK},
-				Namespace:   "gateway-conformance-mesh",
+			// Create a gRPC request using the mesh client framework
+			expected := http.ExpectedResponse{
+				Request:   http.Request{Protocol: "grpc", Path: "", Host: "echo:7070"},
+				Response:  http.Response{StatusCode: 200},
+				Namespace: "gateway-conformance-mesh",
 			}
 
 			// Assert request succeeds before doing our distribution check
-			grpcClient := &grpc.DefaultClient{}
-			defer grpcClient.Close()
-			resp, err := grpcClient.SendRPC(t, client.Address+":9000", expected, s.TimeoutConfig.MaxTimeToConsistency)
-			if err != nil {
-				t.Skipf("gRPC mesh test requires gRPC support on mesh services: %v", err)
-			}
-			if resp.Code != codes.OK {
-				t.Skipf("gRPC mesh test requires working gRPC endpoints: got %v", resp.Code)
-			}
+			client.MakeRequestAndExpectEventuallyConsistentResponse(t, expected, s.TimeoutConfig)
 
 			expectedWeights := map[string]float64{
 				"echo-v1": 0.7,
@@ -71,20 +60,14 @@ var MeshGRPCRouteWeight = suite.ConformanceTest{
 
 			sender := weight.NewFunctionBasedSender(func() (string, error) {
 				uniqueExpected := expected
-				if err := grpc.AddEntropy(&uniqueExpected); err != nil {
+				if err := http.AddEntropy(&uniqueExpected); err != nil {
 					return "", fmt.Errorf("error adding entropy: %w", err)
 				}
-				
-				grpcClient := &grpc.DefaultClient{}
-				defer grpcClient.Close()
-				resp, err := grpcClient.SendRPC(t, client.Address+":9000", uniqueExpected, s.TimeoutConfig.MaxTimeToConsistency)
+				_, cRes, err := client.CaptureRequestResponseAndCompare(t, uniqueExpected)
 				if err != nil {
-					return "", fmt.Errorf("failed to send gRPC mesh request: %w", err)
+					return "", fmt.Errorf("failed gRPC mesh request: %w", err)
 				}
-				if resp.Code != codes.OK {
-					return "", fmt.Errorf("expected OK response, got %v", resp.Code)
-				}
-				return resp.Response.GetAssertions().GetContext().GetPod(), nil
+				return cRes.Hostname, nil
 			})
 
 			for i := 0; i < 10; i++ {
