@@ -216,8 +216,8 @@ named object references, each containing a single cert. We originally proposed t
 , but the CertificateRef requires both a tls.key and tls.crt and a certificate reference only requires the tls.crt.
 If any of the CACertificateRefs cannot be resolved (e.g., the referenced resource does not exist) or is misconfigured (e.g., ConfigMap does not contain a key named `ca.crt`), the `ResolvedRefs` status condition MUST be set to `False` with `Reason: InvalidCACertificateRef`. Connections using that CACertificateRef MUST fail, and the client MUST receive an HTTP 5xx error response.
 References to objects with an unsupported Group and Kind are not valid, and MUST be rejected by the implementation with the `ResolvedRefs` status condition set to `False` and `Reason: UnsupportedFeature`.
-Implemenmtations MAY perform further validation of the certificate content (i.e., checking expiry or enforcing specific formats). If they do, they MUST ensure that the `ResolvedRefs` Condition is `False` and use an implementation-specific `Reason`, like `ExpiredCertificate` or similar.
-If `ResolvedRefs` Condtion is `False` implmentations SHOULD include a message specifying which references are invalid and explaining why.
+Implementations MAY perform further validation of the certificate content (i.e., checking expiry or enforcing specific formats). If they do, they MUST ensure that the `ResolvedRefs` Condition is `False` and use an implementation-specific `Reason`, like `ExpiredCertificate` or similar.
+If `ResolvedRefs` Condition is `False` implementations SHOULD include a message specifying which references are invalid and explaining why.
 
 If all CertificateRefs cannot be resolved, the BackendTLSPolicy is considered invalid and the implementation MUST set the `Accepted` Condition to `False`, with a reason of `NoCACertificates` and a message explaining this.
 
