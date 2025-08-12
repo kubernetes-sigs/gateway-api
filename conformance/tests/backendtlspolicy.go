@@ -20,7 +20,6 @@ import (
 	"testing"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
 	"k8s.io/apimachinery/pkg/types"
 
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
@@ -74,6 +73,9 @@ var BackendTLSPolicy = suite.ConformanceTest{
 
 		validSanPolicyNN := types.NamespacedName{Name: "backendtlspolicy-san", Namespace: ns}
 		kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, validSanPolicyNN, gwNN, policyCond)
+
+		validMultiSanPolicyNN := types.NamespacedName{Name: "backendtlspolicy-multiple-sans", Namespace: ns}
+		kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, validMultiSanPolicyNN, gwNN, policyCond)
 
 		serverStr := "abc.example.com"
 
@@ -145,7 +147,19 @@ var BackendTLSPolicy = suite.ConformanceTest{
 					Request: h.Request{
 						Host: serverStr,
 						Path: "/backendTLSSan",
-						SNI:  serverStr,
+					},
+					Response: h.Response{StatusCode: 200},
+				})
+		})
+
+		// Verify that the request sent to Service with BackendTLSPolicy configured with multiple SANs should succeed.
+		t.Run("HTTP request sent to Service with BackendTLSPolicy configured with multiple SANs should succeed", func(t *testing.T) {
+			h.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr,
+				h.ExpectedResponse{
+					Namespace: ns,
+					Request: h.Request{
+						Host: serverStr,
+						Path: "/backendTLSMultiSans",
 					},
 					Response: h.Response{StatusCode: 200},
 				})
@@ -159,7 +173,6 @@ var BackendTLSPolicy = suite.ConformanceTest{
 					Request: h.Request{
 						Host: serverStr,
 						Path: "/backendTLSSanMismatch",
-						SNI:  serverStr,
 					},
 				})
 		})
