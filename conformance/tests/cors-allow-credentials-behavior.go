@@ -33,7 +33,7 @@ func init() {
 
 var CORSAllowCredentialsBehavior = suite.ConformanceTest{
 	ShortName:   "CORSAllowCredentialsBehavior",
-	Description: "Check that CORS headers behave the expected way",
+	Description: "Validate ACA-Credentials responses",
 	Manifests:   []string{"tests/cors-allow-credentials-behavior.yaml"},
 	Features: []features.FeatureName{
 		features.SupportGateway,
