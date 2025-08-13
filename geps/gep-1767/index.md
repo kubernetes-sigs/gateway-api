@@ -516,7 +516,7 @@ spec:
         value: /resource/foo
     filters:
     - cors:
-      - allowOrigins:
+        allowOrigins:
         - *
         allowMethods: 
         - GET
@@ -575,7 +575,7 @@ spec:
         value: /resource/foo
     filters:
     - cors:
-      - allowOrigins:
+        allowOrigins:
         - https://foo.example
         - http://foo.example
         allowCredentials: true
