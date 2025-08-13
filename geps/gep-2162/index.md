@@ -144,8 +144,8 @@ Until mesh features are posted on the Mesh resource CRD, the conformance suite w
 #### Staying Compliant
 
 SupportedFeatures will become available starting 1.4 release as a standard feature, which means that all Gateway implementations will be expected to define and populate SupportedFeatures in the GatewayClass' Status.
-Conformance test suite will be based on inferring supported features from GatewayClassStatus,
-meaning if you want to generate passing report, above mentioned feature should be implemented.
+The conformance test suite will be based on inferring supported features from GatewayClassStatus,
+meaning if you want to generate passing report, features should be populated there.
 There will be a grace period until the 1.5 release, after which all Gateway Conformance Reports will need to be generated based on the SupportedFeatures field in GatewayClass status.
 
 The core purpose of conformance tests for GatewayClass is to verify that reported features are truly supported.
