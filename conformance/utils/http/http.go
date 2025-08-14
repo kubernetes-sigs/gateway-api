@@ -94,6 +94,7 @@ type Response struct {
 	StatusCode    int
 	Headers       map[string]string
 	AbsentHeaders []string
+	Protocol      string
 }
 
 type BackendRef struct {
@@ -306,6 +307,10 @@ func CompareRoundTrip(t *testing.T, req *roundtripper.Request, cReq *roundtrippe
 	if expected.Response.StatusCode != cRes.StatusCode {
 		return fmt.Errorf("expected status code to be %d, got %d. CRes: %v", expected.Response.StatusCode, cRes.StatusCode, cRes)
 	}
+	if expected.Response.Protocol != "" && expected.Response.Protocol != cRes.Protocol {
+		return fmt.Errorf("expected protocol to be %s, got %s", expected.Response.Protocol, cRes.Protocol)
+	}
+
 	if cRes.StatusCode == 200 {
 		// The request expected to arrive at the backend is
 		// the same as the request made, unless otherwise
