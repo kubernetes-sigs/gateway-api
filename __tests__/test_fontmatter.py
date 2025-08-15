@@ -142,5 +142,6 @@ tags: ["日本語", "español", "français"]
         redirect_map = json.loads(linking.REDIRECT_MAP_FILE.read_text())
         self.assertEqual(redirect_map["unicode-test"], "unicode.md")
 
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

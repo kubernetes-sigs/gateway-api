@@ -281,64 +281,81 @@ def _update_mkdocs_yml_redirects(redirect_updates: Dict[str, str]) -> bool:
         - If the 'redirect_maps' section is missing, it is created.
         - The function prints informative messages about its actions and any issues encountered.
     """
-    # Step 1: Check if mkdocs.yml exists.
     mkdocs_yml_path = Path("mkdocs.yml")
     if not mkdocs_yml_path.exists():
         print("  Warning: mkdocs.yml not found. Cannot update redirects.")
         return False
 
     try:
-        # Step 2: Load the YAML content from mkdocs.yml.
         with open(mkdocs_yml_path, "r", encoding="utf-8") as f:
             config = yaml.safe_load(f)
 
-        # Step 3: Validate the YAML structure.
         if not isinstance(config, dict):
             print("  Warning: mkdocs.yml is not a valid YAML dictionary.")
             return False
 
-        # Step 4: Ensure plugins section exists.
-        if "plugins" not in config:
-            config["plugins"] = []
+        # Step 1: Ensure 'plugins' section exists
+        plugins = config.setdefault("plugins", [])
 
-        # Step 5: Find or create the redirects plugin configuration.
-        redirects_plugin = None
-        plugins_list = config["plugins"]
-
-        # Step 6: Handle different plugin configuration formats.
-        for i, plugin in enumerate(plugins_list):
-            if isinstance(plugin, str) and plugin == "redirects":
-                # Convert string format to dict format
-                plugins_list[i] = {"redirects": {"redirect_maps": {}}}
-                redirects_plugin = plugins_list[i]["redirects"]
+        # Step 2: Find the first redirects plugin configuration
+        redirects_plugin_entry = None
+        for plugin in plugins:
+            if isinstance(plugin, dict) and "redirects" in plugin:
+                redirects_plugin_entry = plugin
                 break
-            elif isinstance(plugin, dict) and "redirects" in plugin:
-                redirects_plugin = plugin["redirects"]
+            elif isinstance(plugin, str) and plugin == "redirects":
+                # Found a string entry, which we will replace with a dict
+                redirects_plugin_entry = plugin
                 break
 
-        # Step 7: If redirects plugin not found, add it.
-        if redirects_plugin is None:
-            plugins_list.append({"redirects": {"redirect_maps": {}}})
-            redirects_plugin = plugins_list[-1]["redirects"]
+        # Step 3: If no entry exists, create a new one
+        if redirects_plugin_entry is None:
+            redirects_plugin_entry = {"redirects": {"redirect_maps": {}}}
+            plugins.append(redirects_plugin_entry)
 
-        # Step 8: Ensure redirect_maps exists.
-        if "redirect_maps" not in redirects_plugin:
-            redirects_plugin["redirect_maps"] = {}
+        # Step 4: If the entry was a string, replace it with a proper dict structure
+        if isinstance(redirects_plugin_entry, str):
+            plugins[plugins.index(redirects_plugin_entry)] = {
+                "redirects": {"redirect_maps": {}}
+            }
+            redirects_plugin_entry = plugins[
+                plugins.index({"redirects": {"redirect_maps": {}}})
+            ]
 
-        # Step 9: Add the new redirects (merge with existing ones).
-        redirects_plugin["redirect_maps"].update(redirect_updates)
+        # Step 5: Get the config dict for the redirects plugin
+        redirects_plugin_config = redirects_plugin_entry.setdefault("redirects", {})
 
-        # Step 10: Write the updated YAML back to file.
+        # Step 6: Handle case where config is `redirects: null`
+        if redirects_plugin_config is None:
+            redirects_plugin_config = {}
+            redirects_plugin_entry["redirects"] = redirects_plugin_config
+
+        # Step 7: Ensure 'redirect_maps' exists
+        redirect_maps = redirects_plugin_config.setdefault("redirect_maps", {})
+
+        # Step 8: Handle case where `redirect_maps:` is present but empty (evaluates to None)
+        if redirect_maps is None:
+            redirect_maps = {}
+            redirects_plugin_config["redirect_maps"] = redirect_maps
+
+        # Step 9: Check if there are actual changes to be made before writing the file
+        if not any(
+            redirect_updates.get(k) != redirect_maps.get(k) for k in redirect_updates
+        ):
+            print("  No new redirect updates needed in mkdocs.yml.")
+            return True
+
+        # Step 10: Update redirect_maps with new redirects
+        redirect_maps.update(redirect_updates)
+
+        # Step 11: Write the updated config back to mkdocs.yml
         with open(mkdocs_yml_path, "w", encoding="utf-8") as f:
             yaml.dump(config, f, default_flow_style=False, sort_keys=False, indent=2)
 
         print(f"  Updated mkdocs.yml with {len(redirect_updates)} redirect rules.")
         return True
 
-    except yaml.YAMLError as e:
-        print(f"  Error parsing mkdocs.yml: {e}")
-        return False
-    except Exception as e:
+    except (yaml.YAMLError, IOError) as e:
         print(f"  Error updating mkdocs.yml: {e}")
         return False
 

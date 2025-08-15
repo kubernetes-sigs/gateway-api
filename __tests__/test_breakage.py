@@ -10,6 +10,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 import linking
 from linking import on_config, prepare_docs
 
+
 class TestLinkBreakageScenarios(unittest.TestCase):
     """Tests focused on how links break and how to prevent/handle breakage."""
 
@@ -393,6 +394,7 @@ title: API Reference
                         self.fail(
                             f"Unexpected exception for input {invalid_input}: {e}"
                         )
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

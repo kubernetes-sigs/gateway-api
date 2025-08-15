@@ -10,6 +10,7 @@ import linking
 
 class TestConvertFromRelativeLinks(unittest.TestCase):
     """Tests for the convert_internal_links function."""
+
     test_dir: Path
     docs_path: Path
     redirect_map_file: Path
@@ -31,10 +32,8 @@ class TestConvertFromRelativeLinks(unittest.TestCase):
             "DOCS_DIR": self.linking_module.DOCS_DIR,
             "REDIRECT_MAP_FILE": self.linking_module.REDIRECT_MAP_FILE,
         }
-        self.linking_module.DOCS_DIR = self.docs_path # type: ignore
-        self.linking_module.REDIRECT_MAP_FILE = self.redirect_map_file # type: ignore
-
-
+        self.linking_module.DOCS_DIR = self.docs_path  # type: ignore
+        self.linking_module.REDIRECT_MAP_FILE = self.redirect_map_file  # type: ignore
 
     def test_basic_link_conversion(self) -> None:
         """Test that a simple relative link is converted to a macro."""
@@ -63,7 +62,7 @@ class TestConvertFromRelativeLinks(unittest.TestCase):
 
         # Assert
         final_content = (self.docs_path / "no-links.md").read_text()
-        expected_content = '---\nid: no-links\n---\n' + original_content
+        expected_content = "---\nid: no-links\n---\n" + original_content
         self.assertEqual(final_content, expected_content)
 
     def test_handles_complex_relative_paths(self) -> None:
@@ -71,7 +70,7 @@ class TestConvertFromRelativeLinks(unittest.TestCase):
         # Arrange
         (self.docs_path / "guides" / "advanced").mkdir(parents=True)
         (self.docs_path / "api" / "v1").mkdir(parents=True)
-        
+
         (self.docs_path / "guides" / "advanced" / "config.md").write_text(
             "See the [Auth API](../../api/v1/auth.md) for details."
         )
@@ -80,7 +79,7 @@ class TestConvertFromRelativeLinks(unittest.TestCase):
 
         # Act
         linking.convert_internal_links(str(self.docs_path))
-        
+
         # Assert
         content = (self.docs_path / "guides" / "advanced" / "config.md").read_text()
         expected = '---\nid: guides-advanced-config\n---\nSee the [Auth API]({{ internal_link("api-v1-auth") }}) for details.'
@@ -96,14 +95,18 @@ class TestConvertFromRelativeLinks(unittest.TestCase):
         # Act
         linking.convert_internal_links(str(self.docs_path))  # First run
         content_after_first_run = (self.docs_path / "index.md").read_text()
-        
+
         linking.convert_internal_links(str(self.docs_path))  # Second run
         content_after_second_run = (self.docs_path / "index.md").read_text()
 
         # Assert
         expected = '---\nid: index\n---\nLink to [About]({{ internal_link("about") }}).'
         self.assertEqual(content_after_first_run, expected)
-        self.assertEqual(content_after_second_run, expected, "Content should not change on the second run.")
+        self.assertEqual(
+            content_after_second_run,
+            expected,
+            "Content should not change on the second run.",
+        )
 
     def test_leaves_broken_links_unchanged(self) -> None:
         """Test that a link to a non-existent .md file is not converted."""
@@ -111,14 +114,17 @@ class TestConvertFromRelativeLinks(unittest.TestCase):
         original_content = "This is a [Broken Link](./nonexistent.md)."
         (self.docs_path / "index.md").write_text(original_content)
         linking.prepare_docs(str(self.docs_path))
-        
+
         # Act
         linking.convert_internal_links(str(self.docs_path))
-        
+
         # Assert
         final_content = (self.docs_path / "index.md").read_text()
-        expected_content = '---\nid: index\n---\n' + original_content
-        self.assertEqual(final_content, expected_content, "Broken link should not be modified.")
+        expected_content = "---\nid: index\n---\n" + original_content
+        self.assertEqual(
+            final_content, expected_content, "Broken link should not be modified."
+        )
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

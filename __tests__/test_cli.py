@@ -8,8 +8,10 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 import linking
 
+
 class TestCommandLineInterface(unittest.TestCase):
     docs_path: Path
+
     def setUp(self) -> None:
         """Set up a temporary directory structure for each test."""
         self.test_dir = Path("./temp_test_convert_links")
@@ -25,35 +27,35 @@ class TestCommandLineInterface(unittest.TestCase):
             "DOCS_DIR": self.linking_module.DOCS_DIR,
             "REDIRECT_MAP_FILE": self.linking_module.REDIRECT_MAP_FILE,
         }
-        self.linking_module.DOCS_DIR = self.docs_path # type: ignore
-        self.linking_module.REDIRECT_MAP_FILE = self.redirect_map_file # type: ignore
+        self.linking_module.DOCS_DIR = self.docs_path  # type: ignore
+        self.linking_module.REDIRECT_MAP_FILE = self.redirect_map_file  # type: ignore
 
     def test_main_handles_prepare_docs_exceptions(self) -> None:
-            """Test main() handles exceptions from prepare_docs gracefully."""
-            # Arrange: Mock prepare_docs to raise an exception
-            original_prepare_docs = linking.prepare_docs
+        """Test main() handles exceptions from prepare_docs gracefully."""
+        # Arrange: Mock prepare_docs to raise an exception
+        original_prepare_docs = linking.prepare_docs
 
-            def failing_prepare_docs(docs_dir_path=None):
-                raise Exception("Test exception from prepare_docs")
+        def failing_prepare_docs(docs_dir_path=None):
+            raise Exception("Test exception from prepare_docs")
 
-            linking.prepare_docs = failing_prepare_docs
+        linking.prepare_docs = failing_prepare_docs
 
-            import sys
+        import sys
 
-            original_argv = sys.argv
-            sys.argv = ["linking.py", "--prepare"]
+        original_argv = sys.argv
+        sys.argv = ["linking.py", "--prepare"]
 
-            try:
-                # Act & Assert: Exception should propagate (this is expected behavior)
-                with self.assertRaises(Exception) as context:
-                    linking.main()
+        try:
+            # Act & Assert: Exception should propagate (this is expected behavior)
+            with self.assertRaises(Exception) as context:
+                linking.main()
 
-                self.assertIn("Test exception from prepare_docs", str(context.exception))
+            self.assertIn("Test exception from prepare_docs", str(context.exception))
 
-            finally:
-                # Restore everything
-                linking.prepare_docs = original_prepare_docs
-                sys.argv = original_argv
+        finally:
+            # Restore everything
+            linking.prepare_docs = original_prepare_docs
+            sys.argv = original_argv
 
     def test_main_with_prepare_argument(self) -> None:
         """Test main() function when called with --prepare argument."""
@@ -117,6 +119,7 @@ class TestCommandLineInterface(unittest.TestCase):
             # Restore everything
             linking.prepare_docs = original_prepare_docs
             sys.argv = original_argv
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
