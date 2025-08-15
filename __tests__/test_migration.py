@@ -11,6 +11,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 import linking
 from linking import on_config, prepare_docs
 
+
 class TestMigration(unittest.TestCase):
     """Tests the migration script's prepare and on_config functions."""
 
@@ -32,8 +33,8 @@ class TestMigration(unittest.TestCase):
             "DOCS_DIR": self.linking_module.DOCS_DIR,
             "REDIRECT_MAP_FILE": self.linking_module.REDIRECT_MAP_FILE,
         }
-        self.linking_module.DOCS_DIR = self.docs_path # type: ignore
-        self.linking_module.REDIRECT_MAP_FILE = self.redirect_map_file # type: ignore
+        self.linking_module.DOCS_DIR = self.docs_path  # type: ignore
+        self.linking_module.REDIRECT_MAP_FILE = self.redirect_map_file  # type: ignore
 
     def tearDown(self) -> None:
         """Clean up the temporary directory after each test."""
