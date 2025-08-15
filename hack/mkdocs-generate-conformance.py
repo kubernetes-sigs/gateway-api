@@ -162,8 +162,14 @@ def generate_profiles_report(reports, route, version):
                                'version', 'mode', 'core.result', 'extended.supportedFeatures']].T
     http_table.columns = http_table.iloc[0]
     http_table = http_table[1:].T
-    # add column named Core to http_table
+    # change core.result value
+
     for row in http_table.itertuples():
+        if row._4 == "success":
+            http_table.loc[(row.Index, 'core.result')] = ':white_check_mark:'
+        else:
+            http_table.loc[(row.Index, 'core.result')] = ':x:'
+
         if type(row._5) is list:
             for feat in row._5:
                 # Process feature name before using it as a column
