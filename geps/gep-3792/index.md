@@ -1,9 +1,16 @@
 # GEP-3792: Out-of-Cluster Gateways
 
 * Issue: [#3792](https://github.com/kubernetes-sigs/gateway-api/issues/3792)
-* Status: Provisional
+* Status: Memorandum
 
 (See [status definitions](../overview.md#gep-states).)
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
+"SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this
+document are to be interpreted as described in BCP 14 ([RFC8174]) when, and
+only when, they appear in all capitals, as shown here.
+
+[RFC8174]: https://www.rfc-editor.org/rfc/rfc8174
 
 ## User Story
 
@@ -15,12 +22,18 @@ using a Service of type LoadBalancer fronting a Kubernetes pod running a
 proxy. This is simple to reason about, easy to manage for sidecar meshes, and
 will presumably be an important implementation mechanism for the foreseeable
 future. Some cloud providers, though, are moving the proxy outside of the
-cluster, for various reasons which are out of the scope of this GEP. Chihiro
-and Ian want to be able to use these out-of-cluster proxies effectively and
+cluster, for various reasons which are out of the scope of this GEP. [Chihiro]
+and [Ian] want to be able to use these out-of-cluster proxies effectively and
 safely, though they recognize that this may require additional configuration.
+
+This GEP defines the problems that need to be solved to allow out-of-cluster
+Gateways (OCGs) to usefully participate in a GAMMA-compliant in-cluster mesh.
+The API to actually solve these problems will be defined in one or more future
+GEPs.
 
 [Chihiro]: https://gateway-api.sigs.k8s.io/concepts/roles-and-personas/#chihiro
 [Ian]: https://gateway-api.sigs.k8s.io/concepts/roles-and-personas/#ian
+[Ana]: https://gateway-api.sigs.k8s.io/concepts/roles-and-personas/#ana
 
 ### Nomenclature and Background
 
@@ -74,7 +87,7 @@ In this GEP:
 
 ## Goals
 
-- Allow Chihiro and Ian to configure an OCG and a mesh such that the OCG can
+- Allow [Chihiro] and [Ian] to configure an OCG and a mesh such that the OCG can
   usefully participate in the mesh, including:
 
     - The OCG must be able to securely communicate with meshed workloads in
@@ -91,7 +104,7 @@ In this GEP:
     - The OCG must be able to distinguish meshed workloads from non-meshed
       workloads, so that it can communicate appropriately with each.
 
-- Allow Ana to develop and operate meshed applications without needing to know
+- Allow [Ana] to develop and operate meshed applications without needing to know
   whether the Gateway she's using is an OCG or an in-cluster Gateway.
 
 - Define a basic set of requirements for OCGs and meshes that want to
@@ -162,7 +175,7 @@ configuration.
 
 To allow the OCG to _usefully_ participate in the mesh, we need to solve at
 least four significant problems. Thankfully, these are mostly problems for
-Chihiro -- if we do our jobs correctly, Ana will never need to know.
+[Chihiro] -- if we do our jobs correctly, [Ana] will never need to know.
 
 #### 1. The Trust Problem
 
@@ -226,39 +239,23 @@ the same configuration, or you'll need to provide a single Route with multiple
 
 ## API
 
-Most of the API work for this GEP is TBD at this point, but there are two
+The API for OCG support will be defined in future GEPs, but there are a two
 important points to note:
 
-First, Gateway API has never defined a Mesh resource because, to date, it's
-never been clear what would go into it. This may be the first configuration
-item that causes us to need a Mesh resource.
+1. Gateway API has never defined a Mesh resource because, to date, it's never
+   been clear what would go into it. With the conformance work in progress and
+   with OCG support desired, we clearly will need a Mesh resource. The Mesh
+   resource is defined in [GEP-3949](../gep-3949/index.md).
 
-Second, since the API should affect only Gateway API resources, it is not a
-good candidate for policy attachment. It is likely to be much more reasonable
-to simply provide whatever extra configuration we need inline in the Gateway
-or Mesh resources.
+2. Since the API should affect only Gateway API resources, it is not a good
+   candidate for policy attachment. It is likely to be much more reasonable to
+   simply provide whatever extra configuration we need inline in the Gateway
+   or Mesh resources.
 
 ## Graduation Criteria
 
 In addition to the [general graduation
-criteria](../concepts/versioning.md#graduation-criteria), this GEP must also
-guarantee that **all four** of the problems listed above need resolutions, and
-must have implementation from at least two different Gateways and two
-different meshes.
-
-### Gateway for Ingress (North/South)
-
-### Gateway For Mesh (East/West)
-
-## Conformance Details
-
-#### Feature Names
-
-This GEP will use the feature name `MeshOffClusterGateway`, under the
-assumption that we will indeed need a Mesh resource.
-
-### Conformance tests
-
-## Alternatives
-
-## References
+criteria](../concepts/versioning.md#graduation-criteria), before any GEP
+defining an API for OCG support graduates to Standard it MUST also demonstrate
+a resolution to **all four** of the problems listed, and it MUST have
+implementation from at least two different Gateways and two different meshes.
