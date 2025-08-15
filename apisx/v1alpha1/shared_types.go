@@ -70,6 +70,7 @@ type ParentGatewayReference struct {
 	Kind *Kind `json:"kind"`
 
 	// Name is the name of the referent.
+	// +required
 	Name ObjectName `json:"name"`
 
 	// Namespace is the namespace of the referent.  If not present,
@@ -87,6 +88,7 @@ type RequestRate struct {
 	// Support: Extended
 	// +kubebuilder:validation:Minimum=1
 	// +kubebuilder:validation:Maximum=1000000
+	// +optional
 	Count *int `json:"count,omitempty"`
 
 	// Interval specifies the divisor of the rate of requests, the amount of
@@ -94,5 +96,6 @@ type RequestRate struct {
 	//
 	// Support: Extended
 	// +kubebuilder:validation:XValidation:message="interval can not be greater than one hour",rule="!(duration(self) == duration('0s') || duration(self) > duration('1h'))"
+	// +optional
 	Interval *Duration `json:"interval,omitempty"`
 }

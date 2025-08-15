@@ -174,6 +174,7 @@ spec:
                             type: object
                           maxItems: 8
                           type: array
+                          x-kubernetes-list-type: atomic
                         namespaces:
                           default:
                             from: Same
@@ -296,12 +297,18 @@ spec:
                       pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                       type: string
                     port:
+                      default: 0
                       description: |-
                         Port is the network port. Multiple listeners may use the
                         same port, subject to the Listener compatibility rules.
+
+                        If the port is not set or specified as zero, the implementation will assign
+                        a unique port. If the implementation does not support dynamic port
+                        assignment, it MUST set `Accepted` condition to `False` with the
+                        `UnsupportedPort` reason.
                       format: int32
                       maximum: 65535
-                      minimum: 1
+                      minimum: 0
                       type: integer
                     protocol:
                       description: Protocol specifies the network protocol this listener
@@ -401,6 +408,7 @@ spec:
                             type: object
                           maxItems: 64
                           type: array
+                          x-kubernetes-list-type: atomic
                         frontendValidation:
                           description: |-
                             FrontendValidation holds configuration information for validating the frontend (client).
@@ -487,6 +495,9 @@ spec:
                               maxItems: 8
                               minItems: 1
                               type: array
+                              x-kubernetes-list-type: atomic
+                          required:
+                          - caCertificateRefs
                           type: object
                         mode:
                           default: Terminate
@@ -539,7 +550,6 @@ spec:
                           > 0 || size(self.options) > 0 : true'
                   required:
                   - name
-                  - port
                   - protocol
                   type: object
                 maxItems: 64
@@ -839,6 +849,7 @@ spec:
                         type: object
                       maxItems: 8
                       type: array
+                      x-kubernetes-list-type: atomic
                   required:
                   - attachedRoutes
                   - conditions

@@ -149,6 +149,7 @@ spec:
                 maxItems: 16
                 minItems: 1
                 type: array
+                x-kubernetes-list-type: atomic
                 x-kubernetes-validations:
                 - message: sectionName must be specified when targetRefs includes
                     2 or more references to the same target
@@ -226,6 +227,7 @@ spec:
                       type: object
                     maxItems: 8
                     type: array
+                    x-kubernetes-list-type: atomic
                   hostname:
                     description: |-
                       Hostname is used for two purposes in the connection between Gateways and
@@ -233,8 +235,6 @@ spec:
 
                       1. Hostname MUST be used as the SNI to connect to the backend (RFC 6066).
                       2. Hostname MUST be used for authentication and MUST match the certificate served by the matching backend, unless SubjectAltNames is specified.
-                         authentication and MUST match the certificate served by the matching
-                         backend.
 
                       Support: Core
                     maxLength: 253
@@ -304,6 +304,7 @@ spec:
                           "")'
                     maxItems: 5
                     type: array
+                    x-kubernetes-list-type: atomic
                   wellKnownCACertificates:
                     description: |-
                       WellKnownCACertificates specifies whether system CA certificates may be used in
@@ -625,10 +626,12 @@ spec:
                       type: string
                   required:
                   - ancestorRef
+                  - conditions
                   - controllerName
                   type: object
                 maxItems: 16
                 type: array
+                x-kubernetes-list-type: atomic
             required:
             - ancestors
             type: object

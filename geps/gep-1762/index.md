@@ -59,6 +59,7 @@ With this configuration, an implementation:
 
 * MUST mark the Gateway as `Programmed` and provide an address in `Status.Addresses` where the Gateway can be reached on each configured port.
 * MUST label all generated resources (Service, Deployment, etc) with `gateway.networking.k8s.io/gateway-name: my-gateway` (where `my-gateway` is the name of the Gateway resource).
+* SHOULD label all generated resources (Service, Deployment, etc) with `gateway.networking.k8s.io/gateway-class-name: my-gateway-class` (where `my-gateway-class` is the name of the GatewayClass resource).
 * MUST provision generated resources in the same namespace as the Gateway if they are namespace scoped resources.
   * Cluster scoped resources are not recommended.
 * SHOULD name all generated resources `my-gateway-example` (`<NAME>-<GATEWAY CLASS>`).

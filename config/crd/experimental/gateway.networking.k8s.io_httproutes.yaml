@@ -131,6 +131,7 @@ spec:
                   type: string
                 maxItems: 16
                 type: array
+                x-kubernetes-list-type: atomic
               parentRefs:
                 description: |-
                   ParentRefs references the resources (usually Gateways) that a Route wants
@@ -343,6 +344,7 @@ spec:
                   type: object
                 maxItems: 32
                 type: array
+                x-kubernetes-list-type: atomic
                 x-kubernetes-validations:
                 - message: sectionName or port must be specified when parentRefs includes
                     2 or more references to the same parent
@@ -468,16 +470,14 @@ spec:
                                         AllowCredentials indicates whether the actual cross-origin request allows
                                         to include credentials.
 
-                                        The only valid value for the `Access-Control-Allow-Credentials` response
-                                        header is true (case-sensitive).
+                                        When set to true, the gateway will include the `Access-Control-Allow-Credentials`
+                                        response header with value true (case-sensitive).
 
-                                        If the credentials are not allowed in cross-origin requests, the gateway
-                                        will omit the header `Access-Control-Allow-Credentials` entirely rather
-                                        than setting its value to false.
+                                        When set to false or omitted the gateway will omit the header
+                                        `Access-Control-Allow-Credentials` entirely (this is the standard CORS
+                                        behavior).
 
                                         Support: Extended
-                                      enum:
-                                      - true
                                       type: boolean
                                     allowHeaders:
                                       description: |-
@@ -504,9 +504,9 @@ spec:
 
                                         A wildcard indicates that the requests with all HTTP headers are allowed.
                                         The `Access-Control-Allow-Headers` response header can only use `*`
-                                        wildcard as value when the `AllowCredentials` field is unspecified.
+                                        wildcard as value when the `AllowCredentials` field is false or omitted.
 
-                                        When the `AllowCredentials` field is specified and `AllowHeaders` field
+                                        When the `AllowCredentials` field is true and `AllowHeaders` field
                                         specified with the `*` wildcard, the gateway must specify one or more
                                         HTTP headers in the value of the `Access-Control-Allow-Headers` response
                                         header. The value of the header `Access-Control-Allow-Headers` is same as
@@ -567,9 +567,9 @@ spec:
                                         side.
 
                                         The `Access-Control-Allow-Methods` response header can only use `*`
-                                        wildcard as value when the `AllowCredentials` field is unspecified.
+                                        wildcard as value when the `AllowCredentials` field is false or omitted.
 
-                                        When the `AllowCredentials` field is specified and `AllowMethods` field
+                                        When the `AllowCredentials` field is true and `AllowMethods` field
                                         specified with the `*` wildcard, the gateway must specify one HTTP method
                                         in the value of the Access-Control-Allow-Methods response header. The
                                         value of the header `Access-Control-Allow-Methods` is same as the
@@ -645,9 +645,9 @@ spec:
                                         Therefore, the client doesn't attempt the actual cross-origin request.
 
                                         The `Access-Control-Allow-Origin` response header can only use `*`
-                                        wildcard as value when the `AllowCredentials` field is unspecified.
+                                        wildcard as value when the `AllowCredentials` field is false or omitted.
 
-                                        When the `AllowCredentials` field is specified and `AllowOrigins` field
+                                        When the `AllowCredentials` field is true and `AllowOrigins` field
                                         specified with the `*` wildcard, the gateway must return a single origin
                                         in the value of the `Access-Control-Allow-Origin` response header,
                                         instead of specifying the `*` wildcard. The value of the header
@@ -698,8 +698,7 @@ spec:
 
                                         A wildcard indicates that the responses with all HTTP headers are exposed
                                         to clients. The `Access-Control-Expose-Headers` response header can only
-                                        use `*` wildcard as value when the `AllowCredentials` field is
-                                        unspecified.
+                                        use `*` wildcard as value when the `AllowCredentials` field is false or omitted.
 
                                         Support: Extended
                                       items:
@@ -1526,11 +1525,8 @@ spec:
                                 rule: '!(!has(self.cors) && self.type == ''CORS'')'
                             maxItems: 16
                             type: array
+                            x-kubernetes-list-type: atomic
                             x-kubernetes-validations:
-                            - message: May specify either httpRouteFilterRequestRedirect
-                                or httpRouteFilterRequestRewrite, but not both
-                              rule: '!(self.exists(f, f.type == ''RequestRedirect'')
-                                && self.exists(f, f.type == ''URLRewrite''))'
                             - message: May specify either httpRouteFilterRequestRedirect
                                 or httpRouteFilterRequestRewrite, but not both
                               rule: '!(self.exists(f, f.type == ''RequestRedirect'')
@@ -1636,6 +1632,7 @@ spec:
                             ? has(self.port) : true'
                       maxItems: 16
                       type: array
+                      x-kubernetes-list-type: atomic
                     filters:
                       description: |-
                         Filters define the filters that are applied to requests that match
@@ -1695,16 +1692,14 @@ spec:
                                   AllowCredentials indicates whether the actual cross-origin request allows
                                   to include credentials.
 
-                                  The only valid value for the `Access-Control-Allow-Credentials` response
-                                  header is true (case-sensitive).
+                                  When set to true, the gateway will include the `Access-Control-Allow-Credentials`
+                                  response header with value true (case-sensitive).
 
-                                  If the credentials are not allowed in cross-origin requests, the gateway
-                                  will omit the header `Access-Control-Allow-Credentials` entirely rather
-                                  than setting its value to false.
+                                  When set to false or omitted the gateway will omit the header
+                                  `Access-Control-Allow-Credentials` entirely (this is the standard CORS
+                                  behavior).
 
                                   Support: Extended
-                                enum:
-                                - true
                                 type: boolean
                               allowHeaders:
                                 description: |-
@@ -1731,9 +1726,9 @@ spec:
 
                                   A wildcard indicates that the requests with all HTTP headers are allowed.
                                   The `Access-Control-Allow-Headers` response header can only use `*`
-                                  wildcard as value when the `AllowCredentials` field is unspecified.
+                                  wildcard as value when the `AllowCredentials` field is false or omitted.
 
-                                  When the `AllowCredentials` field is specified and `AllowHeaders` field
+                                  When the `AllowCredentials` field is true and `AllowHeaders` field
                                   specified with the `*` wildcard, the gateway must specify one or more
                                   HTTP headers in the value of the `Access-Control-Allow-Headers` response
                                   header. The value of the header `Access-Control-Allow-Headers` is same as
@@ -1794,9 +1789,9 @@ spec:
                                   side.
 
                                   The `Access-Control-Allow-Methods` response header can only use `*`
-                                  wildcard as value when the `AllowCredentials` field is unspecified.
+                                  wildcard as value when the `AllowCredentials` field is false or omitted.
 
-                                  When the `AllowCredentials` field is specified and `AllowMethods` field
+                                  When the `AllowCredentials` field is true and `AllowMethods` field
                                   specified with the `*` wildcard, the gateway must specify one HTTP method
                                   in the value of the Access-Control-Allow-Methods response header. The
                                   value of the header `Access-Control-Allow-Methods` is same as the
@@ -1872,9 +1867,9 @@ spec:
                                   Therefore, the client doesn't attempt the actual cross-origin request.
 
                                   The `Access-Control-Allow-Origin` response header can only use `*`
-                                  wildcard as value when the `AllowCredentials` field is unspecified.
+                                  wildcard as value when the `AllowCredentials` field is false or omitted.
 
-                                  When the `AllowCredentials` field is specified and `AllowOrigins` field
+                                  When the `AllowCredentials` field is true and `AllowOrigins` field
                                   specified with the `*` wildcard, the gateway must return a single origin
                                   in the value of the `Access-Control-Allow-Origin` response header,
                                   instead of specifying the `*` wildcard. The value of the header
@@ -1925,8 +1920,7 @@ spec:
 
                                   A wildcard indicates that the responses with all HTTP headers are exposed
                                   to clients. The `Access-Control-Expose-Headers` response header can only
-                                  use `*` wildcard as value when the `AllowCredentials` field is
-                                  unspecified.
+                                  use `*` wildcard as value when the `AllowCredentials` field is false or omitted.
 
                                   Support: Extended
                                 items:
@@ -2746,6 +2740,7 @@ spec:
                           rule: '!(!has(self.cors) && self.type == ''CORS'')'
                       maxItems: 16
                       type: array
+                      x-kubernetes-list-type: atomic
                       x-kubernetes-validations:
                       - message: May specify either httpRouteFilterRequestRedirect
                           or httpRouteFilterRequestRewrite, but not both
@@ -3057,6 +3052,7 @@ spec:
                         type: object
                       maxItems: 64
                       type: array
+                      x-kubernetes-list-type: atomic
                     name:
                       description: |-
                         Name is the name of the route rule. This name MUST be unique within a Route if it is set.
@@ -3152,6 +3148,7 @@ spec:
                             minimum: 400
                             type: integer
                           type: array
+                          x-kubernetes-list-type: atomic
                       type: object
                     sessionPersistence:
                       description: |-
@@ -3347,6 +3344,7 @@ spec:
                       != ''PathPrefix'') ? false : true) : true'
                 maxItems: 16
                 type: array
+                x-kubernetes-list-type: atomic
                 x-kubernetes-validations:
                 - message: While 16 rules and 64 matches per rule are allowed, the
                     total number of matches across all rules in a route must be less
@@ -3629,11 +3627,13 @@ spec:
                       - name
                       type: object
                   required:
+                  - conditions
                   - controllerName
                   - parentRef
                   type: object
                 maxItems: 32
                 type: array
+                x-kubernetes-list-type: atomic
             required:
             - parents
             type: object
@@ -3757,6 +3757,7 @@ spec:
                   type: string
                 maxItems: 16
                 type: array
+                x-kubernetes-list-type: atomic
               parentRefs:
                 description: |-
                   ParentRefs references the resources (usually Gateways) that a Route wants
@@ -3969,6 +3970,7 @@ spec:
                   type: object
                 maxItems: 32
                 type: array
+                x-kubernetes-list-type: atomic
                 x-kubernetes-validations:
                 - message: sectionName or port must be specified when parentRefs includes
                     2 or more references to the same parent
@@ -4094,16 +4096,14 @@ spec:
                                         AllowCredentials indicates whether the actual cross-origin request allows
                                         to include credentials.
 
-                                        The only valid value for the `Access-Control-Allow-Credentials` response
-                                        header is true (case-sensitive).
+                                        When set to true, the gateway will include the `Access-Control-Allow-Credentials`
+                                        response header with value true (case-sensitive).
 
-                                        If the credentials are not allowed in cross-origin requests, the gateway
-                                        will omit the header `Access-Control-Allow-Credentials` entirely rather
-                                        than setting its value to false.
+                                        When set to false or omitted the gateway will omit the header
+                                        `Access-Control-Allow-Credentials` entirely (this is the standard CORS
+                                        behavior).
 
                                         Support: Extended
-                                      enum:
-                                      - true
                                       type: boolean
                                     allowHeaders:
                                       description: |-
@@ -4130,9 +4130,9 @@ spec:
 
                                         A wildcard indicates that the requests with all HTTP headers are allowed.
                                         The `Access-Control-Allow-Headers` response header can only use `*`
-                                        wildcard as value when the `AllowCredentials` field is unspecified.
+                                        wildcard as value when the `AllowCredentials` field is false or omitted.
 
-                                        When the `AllowCredentials` field is specified and `AllowHeaders` field
+                                        When the `AllowCredentials` field is true and `AllowHeaders` field
                                         specified with the `*` wildcard, the gateway must specify one or more
                                         HTTP headers in the value of the `Access-Control-Allow-Headers` response
                                         header. The value of the header `Access-Control-Allow-Headers` is same as
@@ -4193,9 +4193,9 @@ spec:
                                         side.
 
                                         The `Access-Control-Allow-Methods` response header can only use `*`
-                                        wildcard as value when the `AllowCredentials` field is unspecified.
+                                        wildcard as value when the `AllowCredentials` field is false or omitted.
 
-                                        When the `AllowCredentials` field is specified and `AllowMethods` field
+                                        When the `AllowCredentials` field is true and `AllowMethods` field
                                         specified with the `*` wildcard, the gateway must specify one HTTP method
                                         in the value of the Access-Control-Allow-Methods response header. The
                                         value of the header `Access-Control-Allow-Methods` is same as the
@@ -4271,9 +4271,9 @@ spec:
                                         Therefore, the client doesn't attempt the actual cross-origin request.
 
                                         The `Access-Control-Allow-Origin` response header can only use `*`
-                                        wildcard as value when the `AllowCredentials` field is unspecified.
+                                        wildcard as value when the `AllowCredentials` field is false or omitted.
 
-                                        When the `AllowCredentials` field is specified and `AllowOrigins` field
+                                        When the `AllowCredentials` field is true and `AllowOrigins` field
                                         specified with the `*` wildcard, the gateway must return a single origin
                                         in the value of the `Access-Control-Allow-Origin` response header,
                                         instead of specifying the `*` wildcard. The value of the header
@@ -4324,8 +4324,7 @@ spec:
 
                                         A wildcard indicates that the responses with all HTTP headers are exposed
                                         to clients. The `Access-Control-Expose-Headers` response header can only
-                                        use `*` wildcard as value when the `AllowCredentials` field is
-                                        unspecified.
+                                        use `*` wildcard as value when the `AllowCredentials` field is false or omitted.
 
                                         Support: Extended
                                       items:
@@ -5152,11 +5151,8 @@ spec:
                                 rule: '!(!has(self.cors) && self.type == ''CORS'')'
                             maxItems: 16
                             type: array
+                            x-kubernetes-list-type: atomic
                             x-kubernetes-validations:
-                            - message: May specify either httpRouteFilterRequestRedirect
-                                or httpRouteFilterRequestRewrite, but not both
-                              rule: '!(self.exists(f, f.type == ''RequestRedirect'')
-                                && self.exists(f, f.type == ''URLRewrite''))'
                             - message: May specify either httpRouteFilterRequestRedirect
                                 or httpRouteFilterRequestRewrite, but not both
                               rule: '!(self.exists(f, f.type == ''RequestRedirect'')
@@ -5262,6 +5258,7 @@ spec:
                             ? has(self.port) : true'
                       maxItems: 16
                       type: array
+                      x-kubernetes-list-type: atomic
                     filters:
                       description: |-
                         Filters define the filters that are applied to requests that match
@@ -5321,16 +5318,14 @@ spec:
                                   AllowCredentials indicates whether the actual cross-origin request allows
                                   to include credentials.
 
-                                  The only valid value for the `Access-Control-Allow-Credentials` response
-                                  header is true (case-sensitive).
+                                  When set to true, the gateway will include the `Access-Control-Allow-Credentials`
+                                  response header with value true (case-sensitive).
 
-                                  If the credentials are not allowed in cross-origin requests, the gateway
-                                  will omit the header `Access-Control-Allow-Credentials` entirely rather
-                                  than setting its value to false.
+                                  When set to false or omitted the gateway will omit the header
+                                  `Access-Control-Allow-Credentials` entirely (this is the standard CORS
+                                  behavior).
 
                                   Support: Extended
-                                enum:
-                                - true
                                 type: boolean
                               allowHeaders:
                                 description: |-
@@ -5357,9 +5352,9 @@ spec:
 
                                   A wildcard indicates that the requests with all HTTP headers are allowed.
                                   The `Access-Control-Allow-Headers` response header can only use `*`
-                                  wildcard as value when the `AllowCredentials` field is unspecified.
+                                  wildcard as value when the `AllowCredentials` field is false or omitted.
 
-                                  When the `AllowCredentials` field is specified and `AllowHeaders` field
+                                  When the `AllowCredentials` field is true and `AllowHeaders` field
                                   specified with the `*` wildcard, the gateway must specify one or more
                                   HTTP headers in the value of the `Access-Control-Allow-Headers` response
                                   header. The value of the header `Access-Control-Allow-Headers` is same as
@@ -5420,9 +5415,9 @@ spec:
                                   side.
 
                                   The `Access-Control-Allow-Methods` response header can only use `*`
-                                  wildcard as value when the `AllowCredentials` field is unspecified.
+                                  wildcard as value when the `AllowCredentials` field is false or omitted.
 
-                                  When the `AllowCredentials` field is specified and `AllowMethods` field
+                                  When the `AllowCredentials` field is true and `AllowMethods` field
                                   specified with the `*` wildcard, the gateway must specify one HTTP method
                                   in the value of the Access-Control-Allow-Methods response header. The
                                   value of the header `Access-Control-Allow-Methods` is same as the
@@ -5498,9 +5493,9 @@ spec:
                                   Therefore, the client doesn't attempt the actual cross-origin request.
 
                                   The `Access-Control-Allow-Origin` response header can only use `*`
-                                  wildcard as value when the `AllowCredentials` field is unspecified.
+                                  wildcard as value when the `AllowCredentials` field is false or omitted.
 
-                                  When the `AllowCredentials` field is specified and `AllowOrigins` field
+                                  When the `AllowCredentials` field is true and `AllowOrigins` field
                                   specified with the `*` wildcard, the gateway must return a single origin
                                   in the value of the `Access-Control-Allow-Origin` response header,
                                   instead of specifying the `*` wildcard. The value of the header
@@ -5551,8 +5546,7 @@ spec:
 
                                   A wildcard indicates that the responses with all HTTP headers are exposed
                                   to clients. The `Access-Control-Expose-Headers` response header can only
-                                  use `*` wildcard as value when the `AllowCredentials` field is
-                                  unspecified.
+                                  use `*` wildcard as value when the `AllowCredentials` field is false or omitted.
 
                                   Support: Extended
                                 items:
@@ -6372,6 +6366,7 @@ spec:
                           rule: '!(!has(self.cors) && self.type == ''CORS'')'
                       maxItems: 16
                       type: array
+                      x-kubernetes-list-type: atomic
                       x-kubernetes-validations:
                       - message: May specify either httpRouteFilterRequestRedirect
                           or httpRouteFilterRequestRewrite, but not both
@@ -6683,6 +6678,7 @@ spec:
                         type: object
                       maxItems: 64
                       type: array
+                      x-kubernetes-list-type: atomic
                     name:
                       description: |-
                         Name is the name of the route rule. This name MUST be unique within a Route if it is set.
@@ -6778,6 +6774,7 @@ spec:
                             minimum: 400
                             type: integer
                           type: array
+                          x-kubernetes-list-type: atomic
                       type: object
                     sessionPersistence:
                       description: |-
@@ -6973,6 +6970,7 @@ spec:
                       != ''PathPrefix'') ? false : true) : true'
                 maxItems: 16
                 type: array
+                x-kubernetes-list-type: atomic
                 x-kubernetes-validations:
                 - message: While 16 rules and 64 matches per rule are allowed, the
                     total number of matches across all rules in a route must be less
@@ -7255,11 +7253,13 @@ spec:
                       - name
                       type: object
                   required:
+                  - conditions
                   - controllerName
                   - parentRef
                   type: object
                 maxItems: 32
                 type: array
+                x-kubernetes-list-type: atomic
             required:
             - parents
             type: object

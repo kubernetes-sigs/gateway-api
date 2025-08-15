@@ -84,7 +84,7 @@ type ConformanceTestSuite struct {
 	// If SupportedFeatures are automatically determined from GWC Status.
 	// This will be required to report in future iterations as the passing
 	// will be determined based on this.
-	isInferredSupportedFeatures bool
+	supportedFeaturesSource supportedFeaturesSource
 
 	// mode is the operating mode of the implementation.
 	// The default value for it is "default".
@@ -188,24 +188,42 @@ const (
 	undefinedKeyword = "UNDEFINED"
 )
 
+// SupportedFeaturesSource represents the source from which supported features are derived.
+// It is used to distinguish between them being inferred from GWC Status or manually
+// supplied for the conformance report.
+type supportedFeaturesSource string
+
+const (
+	supportedFeaturesSourceManual   supportedFeaturesSource = "Manual"
+	supportedFeaturesSourceInferred supportedFeaturesSource = "Inferred"
+)
+
 // NewConformanceTestSuite is a helper to use for creating a new ConformanceTestSuite.
 func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite, error) {
 	supportedFeatures := options.SupportedFeatures.Difference(options.ExemptFeatures)
-	isInferred := false
-	switch {
-	case options.EnableAllSupportedFeatures:
+	source := supportedFeaturesSourceManual
+	if options.EnableAllSupportedFeatures {
 		supportedFeatures = features.SetsToNamesSet(features.AllFeatures)
-	case shouldInferSupportedFeatures(&options):
+	} else if shouldInferSupportedFeatures(&options) {
 		var err error
 		supportedFeatures, err = fetchSupportedFeatures(options.Client, options.GatewayClassName)
 		if err != nil {
-			return nil, fmt.Errorf("Cannot infer supported features: %w", err)
+			return nil, fmt.Errorf("cannot infer supported features: %w", err)
 		}
-		isInferred = true
+
+		// If Mesh features are populated in the GatewayClass we remove them from the supported features set.
+		meshFeatureNames := features.SetsToNamesSet(features.MeshCoreFeatures, features.MeshExtendedFeatures)
+		for _, f := range supportedFeatures.UnsortedList() {
+			if meshFeatureNames.Has(f) {
+				supportedFeatures.Delete(f)
+				fmt.Printf("WARNING: Mesh feature %q should not be populated in GatewayClass, skipping...", f)
+			}
+		}
+		source = supportedFeaturesSourceInferred
 	}
 
 	// If features were not inferred from Status, it's a GWC issue.
-	if isInferred && supportedFeatures.Len() == 0 {
+	if source == supportedFeaturesSourceInferred && supportedFeatures.Len() == 0 {
 		return nil, fmt.Errorf("no supported features were determined for test suite")
 	}
 
@@ -273,7 +291,7 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 		mode:                        mode,
 		apiVersion:                  apiVersion,
 		apiChannel:                  apiChannel,
-		isInferredSupportedFeatures: isInferred,
+		supportedFeaturesSource:     source,
 		Hook:                        options.Hook,
 	}
 
@@ -370,6 +388,12 @@ func (suite *ConformanceTestSuite) Setup(t *testing.T, tests []ConformanceTest) 
 		suite.Applier.MustApplyObjectsWithCleanup(t, suite.Client, suite.TimeoutConfig, []client.Object{secret}, suite.Cleanup)
 		secret = kubernetes.MustCreateSelfSignedCertSecret(t, "gateway-conformance-app-backend", "tls-passthrough-checks-certificate", []string{"abc.example.com"})
 		suite.Applier.MustApplyObjectsWithCleanup(t, suite.Client, suite.TimeoutConfig, []client.Object{secret}, suite.Cleanup)
+		caConfigMapBST, _, _ := kubernetes.MustCreateCACertConfigMap(t, "gateway-conformance-infra", "backend-tls-mismatch-certificate", []string{"nex.example.com"})
+		suite.Applier.MustApplyObjectsWithCleanup(t, suite.Client, suite.TimeoutConfig, []client.Object{caConfigMapBST}, suite.Cleanup)
+		caConfigMap, ca, caPrivKey := kubernetes.MustCreateCACertConfigMap(t, "gateway-conformance-infra", "backend-tls-checks-certificate", []string{"abc.example.com"})
+		suite.Applier.MustApplyObjectsWithCleanup(t, suite.Client, suite.TimeoutConfig, []client.Object{caConfigMap}, suite.Cleanup)
+		secret = kubernetes.MustCreateCASignedCertSecret(t, "gateway-conformance-infra", "tls-checks-certificate", []string{"abc.example.com"}, ca, caPrivKey)
+		suite.Applier.MustApplyObjectsWithCleanup(t, suite.Client, suite.TimeoutConfig, []client.Object{secret}, suite.Cleanup)
 
 		tlog.Logf(t, "Test Setup: Ensuring Gateways and Pods from base manifests are ready")
 		namespaces := []string{
@@ -392,10 +416,6 @@ func (suite *ConformanceTestSuite) Setup(t *testing.T, tests []ConformanceTest) 
 		}
 		kubernetes.MeshNamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, namespaces)
 	}
-}
-
-func (suite *ConformanceTestSuite) IsInferredSupportedFeatures() bool {
-	return suite.isInferredSupportedFeatures
 }
 
 func (suite *ConformanceTestSuite) setClientsetForTest(test ConformanceTest) error {
@@ -448,6 +468,9 @@ func (suite *ConformanceTestSuite) Run(t *testing.T, tests []ConformanceTest) er
 	sleepForTestIsolation := false
 	for _, test := range tests {
 		res := testSucceeded
+		if suite.RunTest != "" && test.ShortName != suite.RunTest {
+			res = testSkipped
+		}
 		if suite.SkipTests.Has(test.ShortName) {
 			res = testSkipped
 		}
@@ -552,7 +575,6 @@ func (suite *ConformanceTestSuite) Report() (*confv1.ConformanceReport, error) {
 		GatewayAPIChannel:         suite.apiChannel,
 		ProfileReports:            profileReports.list(),
 		SucceededProvisionalTests: succeededProvisionalTests,
-		InferredSupportedFeatures: suite.IsInferredSupportedFeatures(),
 	}, nil
 }
 
@@ -610,8 +632,6 @@ func shouldInferSupportedFeatures(opts *ConformanceOptions) bool {
 	return !opts.EnableAllSupportedFeatures &&
 		opts.SupportedFeatures.Len() == 0 &&
 		opts.ExemptFeatures.Len() == 0 &&
-		opts.ConformanceProfiles.Len() == 0 &&
-		len(opts.SkipTests) == 0 &&
 		opts.RunTest == ""
 }
 
