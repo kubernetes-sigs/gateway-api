@@ -164,7 +164,6 @@ def generate_profiles_report(reports, route, version):
     http_table = http_table[1:].T
 
     for row in http_table.itertuples():
-        print(row)
         if type(row._4) is list:
             for feat in row._4:
                 # Process feature name before using it as a column
