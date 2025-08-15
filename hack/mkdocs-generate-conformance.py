@@ -149,7 +149,7 @@ def generate_conformance_tables(reports, currVersion, mkdocsConfig):
 
     return new_file
 
-def generate_profiles_report(reports, route,version):
+def generate_profiles_report(reports, route, version):
 
     http_reports = reports.loc[reports["name"] == route]
     http_reports.set_index('organization')
@@ -159,16 +159,20 @@ def generate_profiles_report(reports, route,version):
         columns=http_reports['organization'])
 
     http_table = http_reports[['organization', 'project',
-                               'version','mode', 'extended.supportedFeatures']].T
+                               'version', 'mode', 'extended.supportedFeatures']].T
     http_table.columns = http_table.iloc[0]
     http_table = http_table[1:].T
 
     for row in http_table.itertuples():
+        print(row)
         if type(row._4) is list:
             for feat in row._4:
                 # Process feature name before using it as a column
                 processed_feat = process_feature_name(feat)
-                http_table.loc[row.Index, processed_feat] = ':white_check_mark:'
+                http_table.loc[(http_table.index == row.Index) & \
+                               (http_table['project'] == row.project) & \
+                               (http_table['version'] == row.version) & \
+                               (http_table['mode'] == row.mode), processed_feat] = ':white_check_mark:'
     http_table = http_table.fillna(':x:')
     http_table = http_table.drop(['extended.supportedFeatures'], axis=1)
 
