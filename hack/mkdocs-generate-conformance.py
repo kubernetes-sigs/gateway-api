@@ -159,13 +159,13 @@ def generate_profiles_report(reports, route, version):
         columns=http_reports['organization'])
 
     http_table = http_reports[['organization', 'project',
-                               'version', 'mode', 'extended.supportedFeatures']].T
+                               'version', 'mode', 'core.result', 'extended.supportedFeatures']].T
     http_table.columns = http_table.iloc[0]
     http_table = http_table[1:].T
-
+    # add column named Core to http_table
     for row in http_table.itertuples():
-        if type(row._4) is list:
-            for feat in row._4:
+        if type(row._5) is list:
+            for feat in row._5:
                 # Process feature name before using it as a column
                 processed_feat = process_feature_name(feat)
                 http_table.loc[(http_table.index == row.Index) & \
@@ -176,7 +176,9 @@ def generate_profiles_report(reports, route, version):
     http_table = http_table.drop(['extended.supportedFeatures'], axis=1)
 
     http_table = http_table.rename(
-        columns={"project": "Project", "version": "Version", "mode":"Mode"})
+        columns={"project": "Project", "version": "Version", "mode": "Mode", "core.result": "Core"})
+    if version != 'v1.3.0':
+        http_table = http_table.drop(columns=["Core"])
     if version == 'v1.0.0':
         http_table = http_table.drop(columns=["Mode"])
     return http_table
