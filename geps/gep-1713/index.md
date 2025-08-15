@@ -340,9 +340,9 @@ type ParentGatewayReference struct {
 
 ### YAML
 
-The following example shows a `Gateway` with an HTTP listener and two child HTTPS `ListenerSets` with unique hostnames and certificates.
-
+The following example shows a `Gateway` with an HTTP listener and two child HTTPS `ListenerSets` with unique hostnames and certificates. 
 Only `ListenerSets` from the same namespace of the `Gateway` will be accepted:
+
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
@@ -439,8 +439,6 @@ spec:
 
 Routes MUST be able to specify a `ListenerSet` as a `parentRef`. Routes can use `sectionName`/`port` fields in `ParentReference` to help target a specific listener. If no listener is targeted (`sectionName`/`port` are unset) then the Route attaches to all the listeners in the `ListenerSet`.
 
-Routes MUST be able to attach to a `ListenerSet` and it's parent `Gateway` by having multiple `parentRefs` eg:
-
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
@@ -453,7 +451,8 @@ spec:
     sectionName: second
 ```
 
-To attach to listeners in both a `Gateway` and `ListenerSet` the route MUST have two `parentRefs`:
+Routes MUST be able to attach to a `ListenerSet` and it's parent `Gateway` by having multiple `parentRefs` eg:
+
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
@@ -599,7 +598,7 @@ spec:
     hostname: www.something.tld
     protocol: HTTPS
     port: 443
-	tls:
+    tls:
       mode: Terminate
       certificateRefs:
       - kind: Secret
@@ -630,8 +629,9 @@ spec:
 ```
 
 The ListenerSet `user-listenerset` should be marked as Conflicted, as the `parent-gateway`
-have a listener definition called `foo` that conflicts with the ListenetSet definition
-called `myapp`, as the following:
+has a listener definition called `foo` that conflicts with the ListenetSet definition
+called `myapp`. The conflict happens because hostname is the same on both `ListenerSet` 
+but they use different termination TLS certificates:
 
 ```yaml
 apiVersion: gateway.networking.x-k8s.io/v1alpha1
@@ -646,7 +646,7 @@ status:
     hostname: www.something.tld
     protocol: HTTPS
     port: 443
-	conditions:
+    conditions:
     - message: ListenerSet has conflicts with Gateway 'infra/parent-gateway'
       reason: Conflicted
       status: "True"
@@ -729,8 +729,8 @@ status:
     hostname: www.something.tld
     protocol: HTTPS
     port: 443
-	conditions:
-	- message: ListenerSet has conflicts with other listeners attached to the same Gateway
+    conditions:
+    - message: ListenerSet has conflicts with other listeners attached to the same Gateway
       reason: Conflicted
       status: "True"
       type: Conflicted
@@ -747,7 +747,7 @@ status:
     hostname: www.something.tld
     protocol: HTTPS
     port: 443
-	conditions:
+    conditions:
     - reason: Accepted
       status: "True"
       type: Accepted
