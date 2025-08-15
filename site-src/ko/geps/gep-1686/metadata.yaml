@@ -1,0 +1,15 @@
+apiVersion: internal.gateway.networking.k8s.io/v1alpha1
+kind: GEPDetails
+number: 1686
+name: Mesh conformance testing plan
+status: Standard
+authors:
+  - michaelbeaumont
+  - mikemorris
+  - howardjohn
+  - kflynn
+relationships:
+  extends:
+    - number: 1324
+      name: Service Mesh in Gateway API
+      description: Adds initial Mesh conformance testing plan
