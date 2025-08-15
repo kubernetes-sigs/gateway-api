@@ -140,6 +140,8 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1.ListenerNamespacesApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("ListenerStatus"):
 		return &apisv1.ListenerStatusApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("ListenerTLSConfig"):
+		return &apisv1.ListenerTLSConfigApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("LocalObjectReference"):
 		return &apisv1.LocalObjectReferenceApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("LocalParametersReference"):
@@ -164,6 +166,10 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1.SessionPersistenceApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("SupportedFeature"):
 		return &apisv1.SupportedFeatureApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("TLSConfig"):
+		return &apisv1.TLSConfigApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("TLSPortConfig"):
+		return &apisv1.TLSPortConfigApplyConfiguration{}
 
 		// Group=gateway.networking.k8s.io, Version=v1alpha2
 	case v1alpha2.SchemeGroupVersion.WithKind("GRPCRoute"):
