@@ -530,6 +530,40 @@ func GatewayListenersMustHaveConditions(t *testing.T, client client.Client, time
 	require.NoErrorf(t, waitErr, "error waiting for Gateway status to have conditions matching expectations on all listeners")
 }
 
+// GatewayListenerMustHaveConditions checks if the given listener of the specified gateway has all
+// the specified conditions.
+func GatewayListenerMustHaveConditions(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, gwName types.NamespacedName, listenerName string, conditions []metav1.Condition) {
+	t.Helper()
+
+	waitErr := wait.PollUntilContextTimeout(context.Background(), 1*time.Second, timeoutConfig.GatewayListenersMustHaveConditions, true, func(ctx context.Context) (bool, error) {
+		var listenerFound bool
+		var gw gatewayv1.Gateway
+		if err := client.Get(ctx, gwName, &gw); err != nil {
+			return false, fmt.Errorf("error fetching Gateway: %w", err)
+		}
+
+		for _, condition := range conditions {
+			for _, listener := range gw.Status.Listeners {
+				if listener.Name != gatewayv1.SectionName(listenerName) {
+					continue
+				}
+				listenerFound = true
+				if !findConditionInList(t, listener.Conditions, condition.Type, string(condition.Status), condition.Reason) {
+					tlog.Logf(t, "gateway %s doesn't have %s condition set to %s on %s listener", gwName, condition.Type, condition.Status, listener.Name)
+					return false, nil
+				}
+			}
+		}
+
+		if listenerFound {
+			return true, nil
+		}
+		return false, nil
+	})
+
+	require.NoErrorf(t, waitErr, "error waiting for Gateway status to have conditions matching expectations on the given listener")
+}
+
 // GatewayMustHaveZeroRoutes validates that the gateway has zero routes attached.  The status
 // may indicate a single listener with zero attached routes or no listeners.
 func GatewayMustHaveZeroRoutes(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, gwName types.NamespacedName) {
@@ -1003,6 +1037,40 @@ func ListenerSetListenersMustHaveConditions(t *testing.T, client client.Client, 
 	})
 
 	require.NoErrorf(t, waitErr, "error waiting for Gateway status to have conditions matching expectations on all listeners")
+}
+
+// ListenerSetListenerMustHaveConditions checks if the given listener of the specified gateway has all
+// the specified conditions.
+func ListenerSetListenerMustHaveConditions(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, lsName types.NamespacedName, listenerName string, conditions []metav1.Condition) {
+	t.Helper()
+
+	waitErr := wait.PollUntilContextTimeout(context.Background(), 1*time.Second, timeoutConfig.GatewayListenersMustHaveConditions, true, func(ctx context.Context) (bool, error) {
+		var listenerFound bool
+		var ls gatewayxv1a1.XListenerSet
+		if err := client.Get(ctx, lsName, &ls); err != nil {
+			return false, fmt.Errorf("error fetching ListenerSet: %w", err)
+		}
+
+		for _, condition := range conditions {
+			for _, listener := range ls.Status.Listeners {
+				if listener.Name != gatewayv1.SectionName(listenerName) {
+					continue
+				}
+				listenerFound = true
+				if !findConditionInList(t, listener.Conditions, condition.Type, string(condition.Status), condition.Reason) {
+					tlog.Logf(t, "listenerset %s doesn't have %s condition set to %s on %s listener", lsName, condition.Type, condition.Status, listener.Name)
+					return false, nil
+				}
+			}
+		}
+
+		if listenerFound {
+			return true, nil
+		}
+		return false, nil
+	})
+
+	require.NoErrorf(t, waitErr, "error waiting for listenerset status to have conditions matching expectations on the given listener")
 }
 
 // TODO(mikemorris): this and parentsMatch could possibly be rewritten as a generic function?
