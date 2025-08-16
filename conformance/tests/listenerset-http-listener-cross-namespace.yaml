@@ -6,9 +6,10 @@ metadata:
 spec:
   gatewayClassName: "{GATEWAY_CLASS_NAME}"
   listeners:
-  - name: empty-hostname
+  - name: gateway-com
     port: 80
     protocol: HTTP
+    hostname: "gateway.com"
     allowedRoutes:
       namespaces:
         from: All
@@ -21,13 +22,23 @@ spec:
         from: All
   allowedListeners:
     namespaces:
-      from: All
+      from: Selector
+      selector:
+        matchLabels:
+          allowed: ns
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: gateway-api-example-ns1
+  labels:
+    allowed: ns
 ---
 apiVersion: gateway.networking.x-k8s.io/v1alpha1
 kind: XListenerSet
 metadata:
   name: listenerset-with-http-listener
-  namespace: gateway-conformance-infra
+  namespace: gateway-api-example-ns1
 spec:
   parentRef:
     kind: Gateway
@@ -50,11 +61,16 @@ spec:
       namespaces:
         from: All
 ---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: gateway-api-example-ns2
+---
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
   name: attaches-to-all-listeners
-  namespace: gateway-conformance-infra
+  namespace: gateway-api-example-ns2
 spec:
   parentRefs:
   - name: gateway-with-listenerset-http-listener
@@ -66,13 +82,19 @@ spec:
         value: /gateway-route
     backendRefs:
     - name: infra-backend-v1
+      namespace: gateway-conformance-infra
       port: 8080
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: gateway-api-example-ns3
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
   name: attaches-to-example-com-on-gateway
-  namespace: gateway-conformance-infra
+  namespace: gateway-api-example-ns3
 spec:
   parentRefs:
   - name: gateway-with-listenerset-http-listener
@@ -87,19 +109,48 @@ spec:
         value: /example-com
     backendRefs:
     - name: infra-backend-v1
+      namespace: gateway-conformance-infra
       port: 8080
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: gateway-api-example-ns4
+---
+kind: ReferenceGrant
+apiVersion: gateway.networking.k8s.io/v1beta1
+metadata:
+  name: reference-grant
+  namespace: gateway-conformance-infra
+spec:
+  from:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    namespace: gateway-api-example-ns2
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    namespace: gateway-api-example-ns3
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    namespace: gateway-api-example-ns4
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    namespace: gateway-api-example-ns5
+  to:
+  - group: ""
+    kind: "Service"
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
   name: attaches-to-all-listeners-on-listenerset
-  namespace: gateway-conformance-infra
+  namespace: gateway-api-example-ns4
 spec:
   parentRefs:
   - kind: XListenerSet
     group: gateway.networking.x-k8s.io
     name: listenerset-with-http-listener
-    namespace: gateway-conformance-infra
+    namespace: gateway-api-example-ns1
   rules:
   - matches:
     - path:
@@ -107,19 +158,25 @@ spec:
         value: /listenerset-route
     backendRefs:
     - name: infra-backend-v1
+      namespace: gateway-conformance-infra
       port: 8080
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: gateway-api-example-ns5
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
   name: attaches-to-bar-com-on-listenerset
-  namespace: gateway-conformance-infra
+  namespace: gateway-api-example-ns5
 spec:
   parentRefs:
   - kind: XListenerSet
     group: gateway.networking.x-k8s.io
     name: listenerset-with-http-listener
-    namespace: gateway-conformance-infra
+    namespace: gateway-api-example-ns1
     sectionName: bar-com
   rules:
   - matches:
@@ -128,4 +185,31 @@ spec:
         value: /bar-com
     backendRefs:
     - name: infra-backend-v1
+      namespace: gateway-conformance-infra
       port: 8080
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: gateway-api-example-ns6
+---
+apiVersion: gateway.networking.x-k8s.io/v1alpha1
+kind: XListenerSet
+metadata:
+  name: disallowed-listenerset-with-http-listener
+  namespace: gateway-api-example-ns6
+spec:
+  parentRef:
+    kind: Gateway
+    group: gateway.networking.k8s.io
+    name: gateway-with-listenerset-http-listener
+    namespace: gateway-conformance-infra
+  listeners:
+  - name: baz-com
+    port: 80
+    protocol: HTTP
+    hostname: "baz.com"
+    allowedRoutes:
+      namespaces:
+        from: All
+---

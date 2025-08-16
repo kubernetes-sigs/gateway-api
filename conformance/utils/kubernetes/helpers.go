@@ -324,6 +324,49 @@ func GatewayMustHaveCondition(
 	require.NoErrorf(t, waitErr, "error waiting for Gateway status to have a Condition matching expectations")
 }
 
+// ListenerSetMustHaveCondition checks that the supplied ListenerSet has the supplied Condition,
+// halting after the specified timeout is exceeded.
+func ListenerSetMustHaveCondition(
+	t *testing.T,
+	client client.Client,
+	timeoutConfig config.TimeoutConfig,
+	lsNN types.NamespacedName,
+	expectedCondition metav1.Condition,
+) {
+	t.Helper()
+
+	waitErr := wait.PollUntilContextTimeout(
+		context.Background(),
+		1*time.Second,
+		timeoutConfig.GatewayMustHaveCondition,
+		true,
+		func(ctx context.Context) (bool, error) {
+			ls := &gatewayxv1a1.XListenerSet{}
+			err := client.Get(ctx, lsNN, ls)
+			if err != nil {
+				return false, fmt.Errorf("error fetching ListenerSet: %w", err)
+			}
+
+			if err := ConditionsHaveLatestObservedGeneration(ls, ls.Status.Conditions); err != nil {
+				return false, err
+			}
+
+			if findConditionInList(t,
+				ls.Status.Conditions,
+				expectedCondition.Type,
+				string(expectedCondition.Status),
+				expectedCondition.Reason,
+			) {
+				return true, nil
+			}
+
+			return false, nil
+		},
+	)
+
+	require.NoErrorf(t, waitErr, "error waiting for Gateway status to have a Condition matching expectations")
+}
+
 // MeshNamespacesMustBeReady waits until all Pods are marked Ready. This is
 // intended to be used for mesh tests and does not require any Gateways to
 // exist. This will cause the test to halt if the specified timeout is exceeded.
@@ -872,22 +915,21 @@ func RoutesAndParentMustBeAccepted(t *testing.T, c client.Client, timeoutConfig 
 
 	RouteTypeMustHaveParentsField(t, routeType)
 
-	ns := gatewayv1.Namespace(gw.Namespace)
-	kind := gatewayv1.Kind("Gateway")
+	ns := gatewayv1.Namespace(resource.Namespace)
 
 	for _, routeNN := range routeNNs {
 		namespaceRequired := true
-		if routeNN.Namespace == gw.Namespace {
+		if routeNN.Namespace == resource.Namespace {
 			namespaceRequired = false
 		}
 
 		var parents []gatewayv1.RouteParentStatus
-		for _, listener := range gw.listenerNames {
+		for _, listener := range resource.ListenerNames {
 			parents = append(parents, gatewayv1.RouteParentStatus{
 				ParentRef: gatewayv1.ParentReference{
-					Group:       (*gatewayv1.Group)(&gatewayv1.GroupVersion.Group),
-					Kind:        &kind,
-					Name:        gatewayv1.ObjectName(gw.Name),
+					Group:       (*gatewayv1.Group)(&resource.GroupKind.Group),
+					Kind:        (*gatewayv1.Kind)(&resource.GroupKind.Kind),
+					Name:        gatewayv1.ObjectName(resource.Name),
 					Namespace:   &ns,
 					SectionName: listener,
 				},
@@ -919,7 +961,7 @@ func RoutesAndParentMustBeAccepted(t *testing.T, c client.Client, timeoutConfig 
 			Reason: "", // any reason
 		},
 	}
-	GatewayListenersMustHaveConditions(t, c, timeoutConfig, gw.NamespacedName, requiredListenerConditions)
+	ResourceListenersMustHaveConditions(t, c, timeoutConfig, resource, requiredListenerConditions)
 }
 
 // ResourceListenersMustHaveConditions checks if every listener of the specified resource has all
