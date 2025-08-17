@@ -59,7 +59,7 @@ var BackendTLSPolicyObservedGenerationBump = suite.ConformanceTest{
 
 			original := &v1alpha3.BackendTLSPolicy{}
 			err := suite.Client.Get(ctx, policyNN, original)
-			require.NoErrorf(t, err, "error getting HTTPRoute: %v", err)
+			require.NoError(t, err, "error getting HTTPRoute")
 
 			// Sanity check
 			kubernetes.BackendTLSPolicyMustHaveLatestConditions(t, original)
@@ -67,7 +67,7 @@ var BackendTLSPolicyObservedGenerationBump = suite.ConformanceTest{
 			mutate := original.DeepCopy()
 			mutate.Spec.Validation.Hostname = "foo.example.com"
 			err = suite.Client.Patch(ctx, mutate, client.MergeFrom(original))
-			require.NoErrorf(t, err, "error patching the BackendTLSPolicy: %v", err)
+			require.NoError(t, err, "error patching the BackendTLSPolicy")
 
 			kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, policyNN, gwNN, metav1.Condition{
 				Type:   string(v1alpha2.PolicyConditionAccepted),
@@ -77,7 +77,7 @@ var BackendTLSPolicyObservedGenerationBump = suite.ConformanceTest{
 
 			updated := &v1alpha3.BackendTLSPolicy{}
 			err = suite.Client.Get(ctx, policyNN, updated)
-			require.NoErrorf(t, err, "error getting BackendTLSPolicy: %v", err)
+			require.NoError(t, err, "error getting BackendTLSPolicy")
 
 			// Sanity check
 			kubernetes.BackendTLSPolicyMustHaveLatestConditions(t, updated)

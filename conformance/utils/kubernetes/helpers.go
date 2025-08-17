@@ -1034,7 +1034,7 @@ func BackendTLSPolicyMustHaveLatestConditions(t *testing.T, r *v1alpha3.BackendT
 
 	for _, ancestor := range r.Status.Ancestors {
 		if err := ConditionsHaveLatestObservedGeneration(r, ancestor.Conditions); err != nil {
-			tlog.Fatalf(t, "BackendTLSPolicy(controller=%v, ancestorRef=%#v) %v", ancestor.ControllerName, ancestor.AncestorRef, err)
+			tlog.Fatalf(t, "BackendTLSPolicy(controller=%v, ancestorRef=%#v) %v", ancestor.ControllerName, parentRefToString(ancestor.AncestorRef), err)
 		}
 	}
 }
