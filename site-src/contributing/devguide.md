@@ -105,6 +105,8 @@ Make sure you run the static analysis over the repo before submitting your
 changes. The [Prow presubmit][prow-setup] will not let your change merge if
 verification fails.
 
+Additionally, we recommend installing [Docker](https://docs.docker.com/engine/install/) as it is frequently used as a pre-check tool.
+
 ```shell
 make verify
 ```
