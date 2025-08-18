@@ -1026,3 +1026,15 @@ func BackendTLSPolicyMustHaveCondition(t *testing.T, client client.Client, timeo
 
 	require.NoErrorf(t, waitErr, "error waiting for BackendTLSPolicy status to have a Condition %v", condition)
 }
+
+// BackendTLSPolicyMustHaveLatestConditions will fail the test if there are
+// conditions that were not updated
+func BackendTLSPolicyMustHaveLatestConditions(t *testing.T, r *v1alpha3.BackendTLSPolicy) {
+	t.Helper()
+
+	for _, ancestor := range r.Status.Ancestors {
+		if err := ConditionsHaveLatestObservedGeneration(r, ancestor.Conditions); err != nil {
+			tlog.Fatalf(t, "BackendTLSPolicy(controller=%v, ancestorRef=%#v) %v", ancestor.ControllerName, parentRefToString(ancestor.AncestorRef), err)
+		}
+	}
+}
