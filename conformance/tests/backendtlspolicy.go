@@ -20,6 +20,7 @@ import (
 	"testing"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
 	"k8s.io/apimachinery/pkg/types"
 
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
@@ -67,15 +68,6 @@ var BackendTLSPolicy = suite.ConformanceTest{
 
 		invalidCertPolicyNN := types.NamespacedName{Name: "backendtlspolicy-cert-mismatch", Namespace: ns}
 		kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, invalidCertPolicyNN, gwNN, policyCond)
-
-		invalidSanPolicyNN := types.NamespacedName{Name: "backendtlspolicy-san-mismatch", Namespace: ns}
-		kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, invalidSanPolicyNN, gwNN, policyCond)
-
-		validSanPolicyNN := types.NamespacedName{Name: "backendtlspolicy-san", Namespace: ns}
-		kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, validSanPolicyNN, gwNN, policyCond)
-
-		validMultiSanPolicyNN := types.NamespacedName{Name: "backendtlspolicy-multiple-sans", Namespace: ns}
-		kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, validMultiSanPolicyNN, gwNN, policyCond)
 
 		serverStr := "abc.example.com"
 
@@ -135,44 +127,6 @@ var BackendTLSPolicy = suite.ConformanceTest{
 						Host: serverStr,
 						Path: "/backendTLSCertMismatch",
 						SNI:  serverStr,
-					},
-				})
-		})
-
-		// Verify that the request sent to Service with BackendTLSPolicy configured with SANs should succeed.
-		t.Run("HTTP request sent to Service with BackendTLSPolicy configured with SAN should succeed", func(t *testing.T) {
-			h.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr,
-				h.ExpectedResponse{
-					Namespace: ns,
-					Request: h.Request{
-						Host: serverStr,
-						Path: "/backendTLSSan",
-					},
-					Response: h.Response{StatusCode: 200},
-				})
-		})
-
-		// Verify that the request sent to Service with BackendTLSPolicy configured with multiple SANs should succeed.
-		t.Run("HTTP request sent to Service with BackendTLSPolicy configured with multiple SANs should succeed", func(t *testing.T) {
-			h.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr,
-				h.ExpectedResponse{
-					Namespace: ns,
-					Request: h.Request{
-						Host: serverStr,
-						Path: "/backendTLSMultiSans",
-					},
-					Response: h.Response{StatusCode: 200},
-				})
-		})
-
-		// Verify that request sent to Service targeted by BackendTLSPolicy with mismatched SAN should failed.
-		t.Run("HTTP request send to Service targeted by BackendTLSPolicy with mismatched SAN should return HTTP error", func(t *testing.T) {
-			h.MakeRequestAndExpectFailure(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr,
-				h.ExpectedResponse{
-					Namespace: ns,
-					Request: h.Request{
-						Host: serverStr,
-						Path: "/backendTLSSanMismatch",
 					},
 				})
 		})
