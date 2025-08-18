@@ -262,8 +262,9 @@ const (
 )
 
 const (
-	// This reason is used with the "Accepted" condition when all
-	// CACertificateRefs of the BackendTLSPolicy are invalid.
+	// This reason is used with the "Accepted" condition when it is
+	// set to false because all CACertificateRefs of the
+	// BackendTLSPolicy are invalid.
 	BackendTLSPolicyReasonNoCACertificates v1alpha2.PolicyConditionReason = "NoCACertificates"
 )
 
