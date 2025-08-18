@@ -25,7 +25,7 @@ type (
 	// +k8s:deepcopy-gen=false
 	AllowedRoutes = v1.AllowedRoutes
 	// +k8s:deepcopy-gen=false
-	GatewayTLSConfig = v1.GatewayTLSConfig
+	ListenerTLSConfig = v1.ListenerTLSConfig
 	// +k8s:deepcopy-gen=false
 	Group = v1.Group
 	// +k8s:deepcopy-gen=false

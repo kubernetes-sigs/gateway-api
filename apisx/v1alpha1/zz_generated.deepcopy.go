@@ -92,7 +92,7 @@ func (in *ListenerEntry) DeepCopyInto(out *ListenerEntry) {
 	}
 	if in.TLS != nil {
 		in, out := &in.TLS, &out.TLS
-		*out = new(GatewayTLSConfig)
+		*out = new(ListenerTLSConfig)
 		(*in).DeepCopyInto(*out)
 	}
 	if in.AllowedRoutes != nil {

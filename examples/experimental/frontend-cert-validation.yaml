@@ -4,6 +4,13 @@ metadata:
   name: client-validation-basic
 spec:
   gatewayClassName: acme-lb
+  tls:
+    default:
+      frontendValidation:
+        caCertificateRefs:
+        - kind: ConfigMap
+          group: ""
+          name: foo-example-com-ca-cert
   listeners:
   - name: foo-https
     protocol: HTTPS
@@ -14,10 +21,5 @@ spec:
       - kind: Secret
         group: ""
         name: foo-example-com-cert
-      frontendValidation:
-        caCertificateRefs:
-        - kind: ConfigMap
-          group: ""
-          name: foo-example-com-ca-cert
 ---
 
