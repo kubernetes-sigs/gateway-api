@@ -41,3 +41,94 @@ img.center {
     margin: 20px auto;
     width: 550px;
 }
+
+/* Language selector */
+.md-select.md-header__option {
+    position: relative;
+    margin-right: 0;
+}
+
+.md-select .md-header__button {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.85);
+    padding: 0.5rem 1rem;
+    border-radius: 0;
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: none;
+    display: flex;
+    align-items: center;
+    transition: color 0.125s;
+    text-decoration: none;
+    height: 100%;
+    min-height: 2.4rem;
+}
+
+.md-select .md-header__button:hover {
+    color: white;
+}
+
+.md-select .md-header__button:focus {
+    outline: none;
+}
+
+
+
+.md-select__inner {
+    background-color: white;
+    border-radius: 0.2rem;
+    min-width: 140px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    margin-top: 0.5rem;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.md-select__list {
+    padding: 0.25rem 0;
+}
+
+.md-select__item {
+    margin: 0;
+}
+
+.md-select__link {
+    color: rgba(0, 0, 0, 0.87);
+    padding: 0.5rem 1rem;
+    text-decoration: none;
+    display: block;
+    font-size: 0.75rem;
+    transition: background-color 0.125s;
+}
+
+.md-select__link:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    color: rgba(0, 0, 0, 0.87);
+}
+
+.md-select__link.current {
+    background-color: rgba(50, 108, 229, 0.1);
+    color: #326ce5;
+    font-weight: 500;
+}
+
+/* Center align navigation tabs text */
+.md-tabs__link {
+    text-align: center;
+}
+
+.md-tabs__item {
+    display: flex;
+    justify-content: center;
+}
+
+/* Language specific display */
+body.is-korean .md-tabs__item:nth-child(-n+5) {
+    display: none !important;
+}
+
+body.is-english .md-tabs__item:nth-child(n+6):nth-child(-n+10) {
+    display: none !important;
+}
