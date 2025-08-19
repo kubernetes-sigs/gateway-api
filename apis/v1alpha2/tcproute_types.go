@@ -33,7 +33,7 @@ import (
 type TCPRoute struct {
 	metav1.TypeMeta `json:",inline"`
 	// +optional
-	metav1.ObjectMeta `json:"metadata,omitempty"`
+	metav1.ObjectMeta `json:"metadata,omitzero"`
 
 	// Spec defines the desired state of TCPRoute.
 	// +required
@@ -41,7 +41,7 @@ type TCPRoute struct {
 
 	// Status defines the current state of TCPRoute.
 	// +optional
-	Status TCPRouteStatus `json:"status,omitempty"`
+	Status TCPRouteStatus `json:"status,omitzero"`
 }
 
 // TCPRouteSpec defines the desired state of TCPRoute
@@ -98,6 +98,7 @@ type TCPRouteRule struct {
 // TCPRouteList contains a list of TCPRoute
 type TCPRouteList struct {
 	metav1.TypeMeta `json:",inline"`
-	metav1.ListMeta `json:"metadata,omitempty"`
+	// +optional
+	metav1.ListMeta `json:"metadata,omitzero"`
 	Items           []TCPRoute `json:"items"`
 }

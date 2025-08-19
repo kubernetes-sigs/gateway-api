@@ -59,7 +59,7 @@ import (
 type XListenerSet struct {
 	metav1.TypeMeta `json:",inline"`
 	// +optional
-	metav1.ObjectMeta `json:"metadata,omitempty"`
+	metav1.ObjectMeta `json:"metadata,omitzero"`
 
 	// Spec defines the desired state of ListenerSet.
 	// +required
@@ -69,7 +69,7 @@ type XListenerSet struct {
 	//
 	// +kubebuilder:default={conditions: {{type: "Accepted", status: "Unknown", reason:"Pending", message:"Waiting for controller", lastTransitionTime: "1970-01-01T00:00:00Z"},{type: "Programmed", status: "Unknown", reason:"Pending", message:"Waiting for controller", lastTransitionTime: "1970-01-01T00:00:00Z"}}}
 	// +optional
-	Status ListenerSetStatus `json:"status,omitempty"`
+	Status ListenerSetStatus `json:"status,omitzero"`
 }
 
 // ListenerSetSpec defines the desired state of a ListenerSet.
@@ -635,6 +635,7 @@ const (
 // +kubebuilder:object:root=true
 type XListenerSetList struct {
 	metav1.TypeMeta `json:",inline"`
-	metav1.ListMeta `json:"metadata,omitempty"`
+	// +optional
+	metav1.ListMeta `json:"metadata,omitzero"`
 	Items           []XListenerSet `json:"items"`
 }

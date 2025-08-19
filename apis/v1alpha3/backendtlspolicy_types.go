@@ -38,7 +38,7 @@ import (
 type BackendTLSPolicy struct {
 	metav1.TypeMeta `json:",inline"`
 	// +optional
-	metav1.ObjectMeta `json:"metadata,omitempty"`
+	metav1.ObjectMeta `json:"metadata,omitzero"`
 
 	// Spec defines the desired state of BackendTLSPolicy.
 	// +required
@@ -46,14 +46,15 @@ type BackendTLSPolicy struct {
 
 	// Status defines the current state of BackendTLSPolicy.
 	// +optional
-	Status v1alpha2.PolicyStatus `json:"status,omitempty"`
+	Status v1alpha2.PolicyStatus `json:"status,omitzero"`
 }
 
 // BackendTLSPolicyList contains a list of BackendTLSPolicies
 // +kubebuilder:object:root=true
 type BackendTLSPolicyList struct {
 	metav1.TypeMeta `json:",inline"`
-	metav1.ListMeta `json:"metadata,omitempty"`
+	// +optional
+	metav1.ListMeta `json:"metadata,omitzero"`
 	Items           []BackendTLSPolicy `json:"items"`
 }
 

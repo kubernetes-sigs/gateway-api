@@ -39,7 +39,7 @@ type XBackendTrafficPolicy struct {
 
 	metav1.TypeMeta `json:",inline"`
 	// +optional
-	metav1.ObjectMeta `json:"metadata,omitempty"`
+	metav1.ObjectMeta `json:"metadata,omitzero"`
 
 	// Spec defines the desired state of BackendTrafficPolicy.
 	// +required
@@ -47,14 +47,15 @@ type XBackendTrafficPolicy struct {
 
 	// Status defines the current state of BackendTrafficPolicy.
 	// +optional
-	Status PolicyStatus `json:"status,omitempty"`
+	Status PolicyStatus `json:"status,omitzero"`
 }
 
 // XBackendTrafficPolicyList contains a list of BackendTrafficPolicies
 // +kubebuilder:object:root=true
 type XBackendTrafficPolicyList struct {
 	metav1.TypeMeta `json:",inline"`
-	metav1.ListMeta `json:"metadata,omitempty"`
+	// +optional
+	metav1.ListMeta `json:"metadata,omitzero"`
 	Items           []XBackendTrafficPolicy `json:"items"`
 }
 

@@ -55,7 +55,8 @@ type ReferenceGrant v1beta1.ReferenceGrant
 // ReferenceGrantList contains a list of ReferenceGrant.
 type ReferenceGrantList struct {
 	metav1.TypeMeta `json:",inline"`
-	metav1.ListMeta `json:"metadata,omitempty"`
+	// +optional
+	metav1.ListMeta `json:"metadata,omitzero"`
 	Items           []ReferenceGrant `json:"items"`
 }
 

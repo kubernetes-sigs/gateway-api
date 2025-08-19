@@ -40,7 +40,8 @@ type Gateway v1.Gateway
 // GatewayList contains a list of Gateways.
 type GatewayList struct {
 	metav1.TypeMeta `json:",inline"`
-	metav1.ListMeta `json:"metadata,omitempty"`
+	// +optional
+	metav1.ListMeta `json:"metadata,omitzero"`
 	Items           []Gateway `json:"items"`
 }
 

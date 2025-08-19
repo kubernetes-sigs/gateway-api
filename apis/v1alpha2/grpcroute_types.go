@@ -31,6 +31,7 @@ type GRPCRoute v1.GRPCRoute
 // +kubebuilder:object:root=true
 type GRPCRouteList struct {
 	metav1.TypeMeta `json:",inline"`
-	metav1.ListMeta `json:"metadata,omitempty"`
+	// +optional
+	metav1.ListMeta `json:"metadata,omitzero"`
 	Items           []GRPCRoute `json:"items"`
 }

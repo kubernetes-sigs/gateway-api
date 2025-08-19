@@ -51,7 +51,7 @@ import (
 type GatewayClass struct {
 	metav1.TypeMeta `json:",inline"`
 	// +optional
-	metav1.ObjectMeta `json:"metadata,omitempty"`
+	metav1.ObjectMeta `json:"metadata,omitzero"`
 
 	// Spec defines the desired state of GatewayClass.
 	// +required
@@ -64,7 +64,7 @@ type GatewayClass struct {
 	//
 	// +kubebuilder:default={conditions: {{type: "Accepted", status: "Unknown", message: "Waiting for controller", reason: "Pending", lastTransitionTime: "1970-01-01T00:00:00Z"}}}
 	// +optional
-	Status GatewayClassStatus `json:"status,omitempty"`
+	Status GatewayClassStatus `json:"status,omitzero"`
 }
 
 const (
@@ -285,7 +285,8 @@ type GatewayClassStatus struct {
 // GatewayClassList contains a list of GatewayClass
 type GatewayClassList struct {
 	metav1.TypeMeta `json:",inline"`
-	metav1.ListMeta `json:"metadata,omitempty"`
+	// +optional
+	metav1.ListMeta `json:"metadata,omitzero"`
 	Items           []GatewayClass `json:"items"`
 }
 

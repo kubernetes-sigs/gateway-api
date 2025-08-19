@@ -56,7 +56,8 @@ type GatewayClass v1.GatewayClass
 // GatewayClassList contains a list of GatewayClass
 type GatewayClassList struct {
 	metav1.TypeMeta `json:",inline"`
-	metav1.ListMeta `json:"metadata,omitempty"`
+	// +optional
+	metav1.ListMeta `json:"metadata,omitzero"`
 	Items           []GatewayClass `json:"items"`
 }
 
