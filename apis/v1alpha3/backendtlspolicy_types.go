@@ -156,7 +156,7 @@ type BackendTLSPolicyValidation struct {
 	// with the CA certificate in a key named `ca.crt`.
 	//
 	// Support: Implementation-specific - More than one reference, or other kinds
-	// of resources.
+	// of resources. A single reference might also include multiple certificates.
 	//
 	// +optional
 	// +listType=atomic
