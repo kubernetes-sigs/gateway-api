@@ -18,11 +18,10 @@ package weight
 
 import (
 	"cmp"
-	"crypto/rand"
 	"errors"
 	"fmt"
 	"math"
-	"math/big"
+	"math/rand/v2"
 	"slices"
 	"strconv"
 	"strings"
@@ -118,51 +117,28 @@ func TestWeightedDistribution(sender RequestSender, expectedWeights map[string]f
 
 // Entropy utilities
 
-// randomNumber generates a random number between 0 and limit-1
-func randomNumber(limit int) (int, error) {
-	number, err := rand.Int(rand.Reader, big.NewInt(int64(limit)))
-	if err != nil {
-		return 0, err
-	}
-	return int(number.Int64()), nil
-}
-
 // AddDelay adds a random delay up to the specified limit in milliseconds
-func AddDelay(limit int) error {
-	randomSleepDuration, err := randomNumber(limit)
-	if err != nil {
-		return err
-	}
+func AddDelay(limit int) {
+	randomSleepDuration := rand.IntN(limit)
 	time.Sleep(time.Duration(randomSleepDuration) * time.Millisecond)
-	return nil
 }
 
 // AddRandomEntropy randomly chooses to add delay, random value, or both
 // The addRandomValue function should be provided by the caller to handle
 // protocol-specific ways of adding the random value (HTTP headers, gRPC metadata, etc.)
 func AddRandomEntropy(addRandomValue func(string) error) error {
-	random, err := randomNumber(3)
-	if err != nil {
-		return err
-	}
+	random := rand.IntN(3)
 
 	switch random {
 	case 0:
-		return AddDelay(1000)
+		AddDelay(1000)
+		return nil
 	case 1:
-		randomValue, err := randomNumber(10000)
-		if err != nil {
-			return err
-		}
+		randomValue := rand.IntN(10000)
 		return addRandomValue(strconv.Itoa(randomValue))
 	case 2:
-		if err := AddDelay(1000); err != nil {
-			return err
-		}
-		randomValue, err := randomNumber(10000)
-		if err != nil {
-			return err
-		}
+		AddDelay(1000)
+		randomValue := rand.IntN(10000)
 		return addRandomValue(strconv.Itoa(randomValue))
 	default:
 		return fmt.Errorf("invalid random value: %d", random)
