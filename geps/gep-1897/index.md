@@ -219,7 +219,7 @@ References to objects with an unsupported Group and Kind are not valid, and MUST
 Implementations MAY perform further validation of the certificate content (i.e., checking expiry or enforcing specific formats). If they do, they MUST ensure that the `ResolvedRefs` Condition is `False` and use an implementation-specific `Reason`, like `ExpiredCertificate` or similar.
 If `ResolvedRefs` Condition is `False` implementations SHOULD include a message specifying which references are invalid and explaining why.
 
-If all CertificateRefs cannot be resolved, the BackendTLSPolicy is considered invalid and the implementation MUST set the `Accepted` Condition to `False`, with a reason of `NoCACertificates` and a message explaining this.
+If all CertificateRefs cannot be resolved, the BackendTLSPolicy is considered invalid and the implementation MUST set the `Accepted` Condition to `False`, with a reason of `NoValidCACertificate` and a message explaining this.
 
 WellKnownCACertificates is an optional enum that allows users to specify whether to use the set of CA certificates trusted by the
 Gateway (WellKnownCACertificates specified as "System"), or to use the existing CACertificateRefs (WellKnownCACertificates

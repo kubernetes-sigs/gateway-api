@@ -121,14 +121,6 @@ type BackendTLSPolicyValidation struct {
 	// not both. If CACertificateRefs is empty or unspecified, the configuration for
 	// WellKnownCACertificates MUST be honored instead if supported by the implementation.
 	//
-	// A CACertificateRef can be invalid for the following reasons. In all cases, the
-	// implementation MUST ensure the `ResolvedRefs` Condition on the BackendTLSPolicy
-	// is set to `status: False`, with a Reason and Message that indicate the cause
-	// of the error. Connections using an invalid CACertificateRef MUST fail, and the
-	// client MUST receive an HTTP 5xx error response. If all CACertificateRefs are
-	// invalid, the implementation MUST also ensure the `Accepted` Condition on the
-	// BackendTLSPolicy is set to `status: False`, with a Reason `NoCACertificates`.
-	//
 	// A CACertificateRef is invalid if:
 	//
 	// * It refers to a resource that cannot be resolved (e.g., the referenced resource
@@ -140,12 +132,20 @@ type BackendTLSPolicyValidation struct {
 	//   must be set to `InvalidKind` and the Message of the Condition must explain which
 	//   kind of resource is unknown or unsupported.
 	//
-	// * It refers to a resource in another namespace, although we will revisit this in
-	//   the future.
+	// * It refers to a resource in another namespace. This may change in future
+	//   spec updates.
 	//
-	// Implementations might perform further validation of the certificate content
-	// (e.g., checking expiry or enforcing specific formats). In such cases, an
-	// implementation-specific Reason and Message will be set.
+	// Implementations MAY choose to perform further validation of the certificate
+	// content (e.g., checking expiry or enforcing specific formats). In such cases,
+	// an implementation-specific Reason and Message must be set for the invalid reference.
+	//
+	// In all cases, the implementation MUST ensure the `ResolvedRefs` Condition on
+	// the BackendTLSPolicy is set to `status: False`, with a Reason and Message
+	// that indicate the cause of the error. Connections using an invalid
+	// CACertificateRef MUST fail, and the client MUST receive an HTTP 5xx error
+	// response. If ALL CACertificateRefs are invalid, the implementation MUST also
+	// ensure the `Accepted` Condition on the BackendTLSPolicy is set to
+	// `status: False`, with a Reason `NoValidCACertificate`.
 	//
 	//
 	// A single CACertificateRef to a Kubernetes ConfigMap kind has "Core" support.
@@ -155,8 +155,8 @@ type BackendTLSPolicyValidation struct {
 	// Support: Core - An optional single reference to a Kubernetes ConfigMap,
 	// with the CA certificate in a key named `ca.crt`.
 	//
-	// Support: Implementation-specific - More than one reference, or other kinds
-	// of resources. A single reference might also include multiple certificates.
+	// Support: Implementation-specific - More than one reference, other kinds
+	// of resources, or a single reference that includes multiple certificates.
 	//
 	// +optional
 	// +listType=atomic
@@ -265,7 +265,7 @@ const (
 	// This reason is used with the "Accepted" condition when it is
 	// set to false because all CACertificateRefs of the
 	// BackendTLSPolicy are invalid.
-	BackendTLSPolicyReasonNoCACertificates v1alpha2.PolicyConditionReason = "NoCACertificates"
+	BackendTLSPolicyReasonNoValidCACertificate v1alpha2.PolicyConditionReason = "NoValidCACertificate"
 )
 
 const (
