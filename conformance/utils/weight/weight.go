@@ -36,6 +36,18 @@ type RequestSender interface {
 	SendRequest() (podName string, err error)
 }
 
+// extractBackendName extracts the backend name from a pod name by removing deployment and pod hash suffixes
+func extractBackendName(podName string) string {
+	// Pod names follow the pattern: {backend-name}-{deployment-hash}-{pod-hash}
+	// We need to remove the last two dash-separated components
+	parts := strings.Split(podName, "-")
+	if len(parts) < 3 {
+		return podName // fallback to original name if pattern doesn't match
+	}
+	// Remove last two components (deployment hash and pod hash)
+	return strings.Join(parts[:len(parts)-2], "-")
+}
+
 // TestWeightedDistribution tests that requests are distributed according to expected weights
 func TestWeightedDistribution(sender RequestSender, expectedWeights map[string]float64) error {
 	const (
@@ -58,17 +70,18 @@ func TestWeightedDistribution(sender RequestSender, expectedWeights map[string]f
 				return err
 			}
 
+			// Extract the backend name from the pod name
+			backendName := extractBackendName(podName)
+	
 			seenMutex.Lock()
 			defer seenMutex.Unlock()
 
-			for expectedBackend := range expectedWeights {
-				if strings.HasPrefix(podName, expectedBackend) {
-					seen[expectedBackend]++
-					return nil
-				}
+			if _, exists := expectedWeights[backendName]; exists {
+				seen[backendName]++
+				return nil
 			}
 
-			return fmt.Errorf("request was handled by an unexpected pod %q", podName)
+			return fmt.Errorf("request was handled by an unexpected pod %q (extracted backend: %q)", podName, backendName)
 		})
 	}
 
