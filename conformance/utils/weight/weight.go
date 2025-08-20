@@ -41,7 +41,7 @@ func TestWeightedDistribution(sender RequestSender, expectedWeights map[string]f
 	const (
 		concurrentRequests  = 10
 		tolerancePercentage = 0.05
-		totalRequests       = 500.0
+		totalRequests       = 500
 	)
 
 	var (
@@ -51,7 +51,7 @@ func TestWeightedDistribution(sender RequestSender, expectedWeights map[string]f
 	)
 
 	g.SetLimit(concurrentRequests)
-	for i := 0.0; i < totalRequests; i++ {
+	for i := 0; i < totalRequests; i++ {
 		g.Go(func() error {
 			podName, err := sender.SendRequest()
 			if err != nil {
@@ -97,7 +97,7 @@ func TestWeightedDistribution(sender RequestSender, expectedWeights map[string]f
 			continue
 		}
 
-		gotPercent := gotCount / totalRequests
+		gotPercent := gotCount / float64(totalRequests)
 
 		if math.Abs(gotPercent-wantPercent) > tolerancePercentage {
 			errs = append(errs, fmt.Errorf("backend %q weighted traffic of %v not within tolerance %v (+/-%f)",
