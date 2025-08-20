@@ -88,7 +88,7 @@ func makeRequest(t *testing.T, exp *http.ExpectedResponse) []string {
 	}
 
 	// Only set default method for HTTP protocols, not for gRPC
-	if exp.Request.Method == "" && protocol != "grpc" {
+	if protocol != "grpc" && exp.Request.Method == "" {
 		exp.Request.Method = "GET"
 	}
 
