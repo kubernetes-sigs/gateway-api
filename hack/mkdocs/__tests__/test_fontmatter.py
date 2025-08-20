@@ -20,8 +20,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 
-import linking
-from linking import prepare_docs
+import hack.mkdocs_linking as linking
+from hack.mkdocs_linking import prepare_docs
 
 
 class TestYAMLFrontmatterEdgeCases(unittest.TestCase):

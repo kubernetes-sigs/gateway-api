@@ -21,8 +21,8 @@ from types import SimpleNamespace
 
 sys.path.insert(0, str(Path(__file__).parent))
 
-import linking
-from linking import on_config, prepare_docs
+import hack.mkdocs_linking as linking
+from hack.mkdocs_linking import on_config, prepare_docs
 
 
 class TestLinkBreakageScenarios(unittest.TestCase):

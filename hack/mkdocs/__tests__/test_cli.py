@@ -20,7 +20,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 
-import linking
+import hack.mkdocs_linking as linking
 
 
 class TestCommandLineInterface(unittest.TestCase):
