@@ -295,6 +295,14 @@ type GatewaySpec struct {
 	//
 	// +optional
 	AllowedListeners *AllowedListeners `json:"allowedListeners,omitempty"`
+	//
+	// GatewayTLSConfig specifies frontend tls configuration for gateway.
+	//
+	// Support: Extended
+	//
+	// +optional
+	// <gateway:experimental>
+	TLS *GatewayTLSConfig `json:"tls,omitempty"`
 }
 
 // AllowedListeners defines which ListenerSets can be attached to this Gateway.
@@ -414,7 +422,7 @@ type Listener struct {
 	// the Protocol field is "HTTPS" or "TLS". It is invalid to set this field
 	// if the Protocol field is "HTTP", "TCP", or "UDP".
 	//
-	// The association of SNIs to Certificate defined in GatewayTLSConfig is
+	// The association of SNIs to Certificate defined in ListenerTLSConfig is
 	// defined based on the Hostname field for this listener.
 	//
 	// The GatewayClass MUST use the longest matching SNI out of all
@@ -423,7 +431,7 @@ type Listener struct {
 	// Support: Core
 	//
 	// +optional
-	TLS *GatewayTLSConfig `json:"tls,omitempty"`
+	TLS *ListenerTLSConfig `json:"tls,omitempty"`
 
 	// AllowedRoutes defines the types of routes that MAY be attached to a
 	// Listener and the trusted namespaces where those Route resources MAY be
@@ -526,10 +534,10 @@ type GatewayBackendTLS struct {
 	ClientCertificateRef *SecretObjectReference `json:"clientCertificateRef,omitempty"`
 }
 
-// GatewayTLSConfig describes a TLS configuration.
+// ListenerTLSConfig describes a TLS configuration for a listener.
 //
 // +kubebuilder:validation:XValidation:message="certificateRefs or options must be specified when mode is Terminate",rule="self.mode == 'Terminate' ? size(self.certificateRefs) > 0 || size(self.options) > 0 : true"
-type GatewayTLSConfig struct {
+type ListenerTLSConfig struct {
 	// Mode defines the TLS behavior for the TLS session initiated by the client.
 	// There are two possible modes:
 	//
@@ -578,18 +586,6 @@ type GatewayTLSConfig struct {
 	// +kubebuilder:validation:MaxItems=64
 	CertificateRefs []SecretObjectReference `json:"certificateRefs,omitempty"`
 
-	// FrontendValidation holds configuration information for validating the frontend (client).
-	// Setting this field will require clients to send a client certificate
-	// required for validation during the TLS handshake. In browsers this may result in a dialog appearing
-	// that requests a user to specify the client certificate.
-	// The maximum depth of a certificate chain accepted in verification is Implementation specific.
-	//
-	// Support: Extended
-	//
-	// +optional
-	// <gateway:experimental>
-	FrontendValidation *FrontendTLSValidation `json:"frontendValidation,omitempty"`
-
 	// Options are a list of key/value pairs to enable extended TLS
 	// configuration for each implementation. For example, configuring the
 	// minimum TLS version or supported cipher suites.
@@ -604,6 +600,35 @@ type GatewayTLSConfig struct {
 	// +optional
 	// +kubebuilder:validation:MaxProperties=16
 	Options map[AnnotationKey]AnnotationValue `json:"options,omitempty"`
+}
+
+// GatewayTLSConfig specifies frontend tls configuration for gateway.
+type GatewayTLSConfig struct {
+	// Default specifies the default client certificate validation configuration
+	// for all Listeners handling HTTPS traffic, unless a per-port configuration
+	// is defined.
+	//
+	// support: Core
+	//
+	// +required
+	// <gateway:experimental>
+	Default TLSConfig `json:"default"`
+
+	// PerPort specifies tls configuration assigned per port.
+	// Per port configuration is optional. Once set this configuration overrides
+	// the default configuration for all Listeners handling HTTPS traffic
+	// that match this port.
+	// Each override port requires a unique TLS configuration.
+	//
+	// support: Core
+	//
+	// +optional
+	// +listType=map
+	// +listMapKey=port
+	// +kubebuilder:validation:MaxItems=64
+	// +kubebuilder:validation:XValidation:message="Port for TLS configuration must be unique within the Gateway",rule="self.all(t1, self.exists_one(t2, t1.port == t2.port))"
+	// <gateway:experimental>
+	PerPort []TLSPortConfig `json:"perPort,omitempty"`
 }
 
 // TLSModeType type defines how a Gateway handles TLS sessions.
@@ -624,6 +649,46 @@ const (
 	TLSModePassthrough TLSModeType = "Passthrough"
 )
 
+// TLSConfig describes TLS configuration that can apply to multiple Listeners
+// within this Gateway. Currently, it stores only the client certificate validation
+// configuration, but this may be extended in the future.
+type TLSConfig struct {
+	// FrontendValidation holds configuration information for validating the frontend (client).
+	// Setting this field will result in mutual authentication when connecting to the gateway.
+	// In browsers this may result in a dialog appearing
+	// that requests a user to specify the client certificate.
+	// The maximum depth of a certificate chain accepted in verification is Implementation specific.
+	//
+	// Support: Core
+	//
+	// +required
+	// <gateway:experimental>
+	FrontendValidation FrontendTLSValidation `json:"frontendValidation"`
+}
+
+type TLSPortConfig struct {
+	// The Port indicates the Port Number to which the TLS configuration will be
+	// applied. This configuration will be applied to all Listeners handling HTTPS
+	// traffic that match this port.
+	//
+	// Support: Core
+	//
+	// +required
+	// +kubebuilder:validation:Minimum=1
+	// +kubebuilder:validation:Maximum=65535
+	// <gateway:experimental>
+	Port PortNumber `json:"port"`
+
+	// TLS store the configuration that will be applied to all Listeners handling
+	// HTTPS traffic and matching given port.
+	//
+	// Support: Core
+	//
+	// +required
+	// <gateway:experimental>
+	TLS TLSConfig `json:"tls"`
+}
+
 // FrontendTLSValidation holds configuration information that can be used to validate
 // the frontend initiating the TLS connection
 type FrontendTLSValidation struct {
@@ -640,8 +705,8 @@ type FrontendTLSValidation struct {
 	// Support: Core - A single reference to a Kubernetes ConfigMap
 	// with the CA certificate in a key named `ca.crt`.
 	//
-	// Support: Implementation-specific (More than one reference, or other kinds
-	// of resources).
+	// Support: Implementation-specific (More than one certificate in a ConfigMap
+	// with different keys or more than one reference, or other kinds of resources).
 	//
 	// References to a resource in a different namespace are invalid UNLESS there
 	// is a ReferenceGrant in the target namespace that allows the certificate
@@ -653,8 +718,48 @@ type FrontendTLSValidation struct {
 	// +listType=atomic
 	// +kubebuilder:validation:MaxItems=8
 	// +kubebuilder:validation:MinItems=1
-	CACertificateRefs []ObjectReference `json:"caCertificateRefs,omitempty"`
+	CACertificateRefs []ObjectReference `json:"caCertificateRefs"`
+
+	// FrontendValidationMode defines the mode for validating the client certificate.
+	// There are two possible modes:
+	//
+	// - AllowValidOnly: In this mode, the gateway will accept connections only if
+	//   the client presents a valid certificate. This certificate must successfully
+	//   pass validation against the CA certificates specified in `CACertificateRefs`.
+	// - AllowInsecureFallback: In this mode, the gateway will accept connections
+	//   even if the client certificate is not presented or fails verification.
+	//
+	//   This approach delegates client authorization to the backend and introduce
+	//   a significant security risk. It should be used in testing environments or
+	//   on a temporary basis in non-testing environments.
+	//
+	// Defaults to AllowValidOnly.
+	//
+	// Support: Core
+	//
+	// +optional
+	// +kubebuilder:default=AllowValidOnly
+	Mode FrontendValidationModeType `json:"mode,omitempty"`
 }
+
+// FrontendValidationModeType type defines how a Gateway validates client certificates.
+//
+// +kubebuilder:validation:Enum=AllowValidOnly;AllowInsecureFallback
+type FrontendValidationModeType string
+
+const (
+	// AllowValidOnly indicates that a client certificate is required
+	// during the TLS handshake and MUST pass validation.
+	//
+	// Support: Core
+	AllowValidOnly FrontendValidationModeType = "AllowValidOnly"
+
+	// AllowInsecureFallback indicates that a client certificate may not be
+	// presented during the handshake or the validation against CA certificates may fail.
+	//
+	// Support: Extended
+	AllowInsecureFallback FrontendValidationModeType = "AllowInsecureFallback"
+)
 
 // AllowedRoutes defines which Routes may be attached to this Listener.
 type AllowedRoutes struct {
@@ -993,6 +1098,13 @@ const (
 	// information on which address is causing the problem and how to resolve it
 	// in the condition message.
 	GatewayReasonAddressNotUsable GatewayConditionReason = "AddressNotUsable"
+	// This condition indicates `FrontendValidationModeType` changed from
+	// `AllowValidOnly` to `AllowInsecureFallback`.
+	GatewayConditionInsecureFrontendValidationMode GatewayConditionReason = "InsecureFrontendValidationMode"
+	// This reason MUST be set for GatewayConditionInsecureFrontendValidationMode
+	// when client change FrontendValidationModeType for a Gateway or per port override
+	// to `AllowInsecureFallback`.
+	GatewayReasonConfigurationChanged GatewayConditionReason = "ConfigurationChanged"
 )
 
 const (
