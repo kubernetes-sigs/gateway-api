@@ -117,8 +117,8 @@ func TestWeightedDistribution(sender RequestSender, expectedWeights map[string]f
 
 // Entropy utilities
 
-// AddDelay adds a random delay up to the specified limit in milliseconds
-func AddDelay(limit int) {
+// addRandomDelay adds a random delay up to the specified limit in milliseconds
+func addRandomDelay(limit int) {
 	randomSleepDuration := rand.IntN(limit)
 	time.Sleep(time.Duration(randomSleepDuration) * time.Millisecond)
 }
@@ -131,13 +131,13 @@ func AddRandomEntropy(addRandomValue func(string) error) error {
 
 	switch random {
 	case 0:
-		AddDelay(1000)
+		addRandomDelay(1000)
 		return nil
 	case 1:
 		randomValue := rand.IntN(10000)
 		return addRandomValue(strconv.Itoa(randomValue))
 	case 2:
-		AddDelay(1000)
+		addRandomDelay(1000)
 		randomValue := rand.IntN(10000)
 		return addRandomValue(strconv.Itoa(randomValue))
 	default:
