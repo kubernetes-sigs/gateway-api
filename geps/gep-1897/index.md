@@ -215,11 +215,11 @@ named object references, each containing a single cert. We originally proposed t
 [CertificateRefs field on Gateway](https://github.com/kubernetes-sigs/gateway-api/blob/18e79909f7310aafc625ba7c862dfcc67b385250/apis/v1beta1/gateway_types.go#L340)
 , but the CertificateRef requires both a tls.key and tls.crt and a certificate reference only requires the tls.crt.
 If any of the CACertificateRefs cannot be resolved (e.g., the referenced resource does not exist) or is misconfigured (e.g., ConfigMap does not contain a key named `ca.crt`), the `ResolvedRefs` status condition MUST be set to `False` with `Reason: InvalidCACertificateRef`. Connections using that CACertificateRef MUST fail, and the client MUST receive an HTTP 5xx error response.
-References to objects with an unsupported Group and Kind are not valid, and MUST be rejected by the implementation with the `ResolvedRefs` status condition set to `False` and `Reason: UnsupportedFeature`.
+References to objects with an unsupported Group and Kind are not valid, and MUST be rejected by the implementation with the `ResolvedRefs` status condition set to `False` and `Reason: InvalidKind`.
 Implementations MAY perform further validation of the certificate content (i.e., checking expiry or enforcing specific formats). If they do, they MUST ensure that the `ResolvedRefs` Condition is `False` and use an implementation-specific `Reason`, like `ExpiredCertificate` or similar.
 If `ResolvedRefs` Condition is `False` implementations SHOULD include a message specifying which references are invalid and explaining why.
 
-If all CertificateRefs cannot be resolved, the BackendTLSPolicy is considered invalid and the implementation MUST set the `Accepted` Condition to `False`, with a reason of `NoCACertificates` and a message explaining this.
+If all CertificateRefs cannot be resolved, the BackendTLSPolicy is considered invalid and the implementation MUST set the `Accepted` Condition to `False`, with a reason of `NoValidCACertificate` and a message explaining this.
 
 WellKnownCACertificates is an optional enum that allows users to specify whether to use the set of CA certificates trusted by the
 Gateway (WellKnownCACertificates specified as "System"), or to use the existing CACertificateRefs (WellKnownCACertificates
@@ -229,7 +229,7 @@ references to Kubernetes objects that contain PEM-encoded TLS certificates, whic
 between the gateway and backend pod. References to a resource in a different namespace are invalid.
 If ClientCertificateRefs is unspecified, then WellKnownCACertificates must be set to "System" for a valid configuration.
 If WellKnownCACertificates is unspecified, then CACertificateRefs must be specified with at least one entry for a valid configuration.
-If an implementation does not support the WellKnownCACertificates, or the provided value is unsupported,the BackendTLSPolicy is considered invalid, and the implementation MUST set the `Accepted` Condition to `False`, with a reason of `UnsupportedFeature` and a message explaining this.
+If an implementation does not support the WellKnownCACertificates, or the provided value is unsupported,the BackendTLSPolicy is considered invalid, and the implementation MUST set the `Accepted` Condition to `False`, with a reason of `Invalid` and a message explaining this.
 
 For an invalid BackendTLSPolicy, implementations MUST NOT fall back to unencrypted (plaintext) connections. 
 Instead, the corresponding TLS connection MUST fail, and the client MUST receive an HTTP 5xx error response.
