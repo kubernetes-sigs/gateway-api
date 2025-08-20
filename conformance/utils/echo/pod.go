@@ -98,7 +98,7 @@ func makeRequest(t *testing.T, exp *http.ExpectedResponse) []string {
 
 	host := http.CalculateHost(t, r.Host, protocol)
 	args := []string{"client", fmt.Sprintf("%s://%s%s", protocol, host, r.Path)}
-	if r.Method != "" && protocol != "grpc" {
+	if protocol != "grpc" && r.Method != "" {
 		args = append(args, "--method="+r.Method)
 	}
 	for k, v := range r.Headers {
