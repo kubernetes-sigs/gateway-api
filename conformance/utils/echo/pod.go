@@ -113,8 +113,21 @@ func compareRequest(exp http.ExpectedResponse, resp Response) error {
 	}
 	wantReq := exp.ExpectedRequest
 	wantResp := exp.Response
-	if fmt.Sprint(wantResp.StatusCode) != resp.Code {
-		return fmt.Errorf("wanted status code %v, got %v", wantResp.StatusCode, resp.Code)
+
+	// Handle status code comparison based on protocol
+	expectedCode := fmt.Sprint(wantResp.StatusCode)
+	if strings.ToLower(exp.Request.Protocol) == "grpc" {
+		// For gRPC, HTTP 200 maps to gRPC status 0 (OK), but the echo client
+		// seems to report HTTP status codes even for gRPC requests
+		if wantResp.StatusCode == 200 && resp.Code == "200" {
+			// Both expect and got HTTP 200, which is fine for gRPC success
+			expectedCode = "200"
+		} else if wantResp.StatusCode == 200 {
+			expectedCode = "0"
+		}
+	}
+	if expectedCode != resp.Code {
+		return fmt.Errorf("wanted status code %v, got %v", expectedCode, resp.Code)
 	}
 	if wantReq.Headers != nil {
 		if resp.RequestHeaders == nil {

@@ -24,6 +24,7 @@ import (
 	"math"
 	"math/big"
 	"slices"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -118,32 +119,22 @@ func TestWeightedDistribution(sender RequestSender, expectedWeights map[string]f
 // Entropy utilities
 
 // randomNumber generates a random number between 0 and limit-1
-func randomNumber(limit int64) (*int64, error) {
-	number, err := rand.Int(rand.Reader, big.NewInt(limit))
+func randomNumber(limit int) (int, error) {
+	number, err := rand.Int(rand.Reader, big.NewInt(int64(limit)))
 	if err != nil {
-		return nil, err
+		return 0, err
 	}
-	n := number.Int64()
-	return &n, nil
+	return int(number.Int64()), nil
 }
 
 // AddDelay adds a random delay up to the specified limit in milliseconds
-func AddDelay(limit int64) error {
+func AddDelay(limit int) error {
 	randomSleepDuration, err := randomNumber(limit)
 	if err != nil {
 		return err
 	}
-	time.Sleep(time.Duration(*randomSleepDuration) * time.Millisecond)
+	time.Sleep(time.Duration(randomSleepDuration) * time.Millisecond)
 	return nil
-}
-
-// GenerateRandomValue generates a random value as a string for use in headers/metadata
-func GenerateRandomValue(limit int64) (string, error) {
-	randomVal, err := randomNumber(limit)
-	if err != nil {
-		return "", err
-	}
-	return fmt.Sprintf("%d", *randomVal), nil
 }
 
 // AddRandomEntropy randomly chooses to add delay, random value, or both
@@ -155,25 +146,25 @@ func AddRandomEntropy(addRandomValue func(string) error) error {
 		return err
 	}
 
-	switch *random {
+	switch random {
 	case 0:
 		return AddDelay(1000)
 	case 1:
-		randomValue, err := GenerateRandomValue(10000)
+		randomValue, err := randomNumber(10000)
 		if err != nil {
 			return err
 		}
-		return addRandomValue(randomValue)
+		return addRandomValue(strconv.Itoa(randomValue))
 	case 2:
 		if err := AddDelay(1000); err != nil {
 			return err
 		}
-		randomValue, err := GenerateRandomValue(10000)
+		randomValue, err := randomNumber(10000)
 		if err != nil {
 			return err
 		}
-		return addRandomValue(randomValue)
+		return addRandomValue(strconv.Itoa(randomValue))
 	default:
-		return fmt.Errorf("invalid random value: %d", *random)
+		return fmt.Errorf("invalid random value: %d", random)
 	}
 }
