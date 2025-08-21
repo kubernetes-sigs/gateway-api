@@ -477,6 +477,36 @@ type RouteParentStatus struct {
 	// * The Route is of a type that the controller does not support.
 	// * The Route is in a namespace the controller does not have access to.
 	//
+	// <gateway:util:excludeFromCRD>
+	//
+	// Notes for implementors:
+	//
+	// Conditions are a listType `map`, which means that they function like a
+	// map with a key of the `type` field _in the k8s apiserver_.
+	//
+	// This means that implementations must obey some rules when updating this
+	// section.
+	//
+	// * Implementations MUST perform a read-modify-write cycle on this field
+	//   before modifying it. That is, when modifying this field, implementations
+	//   must be confident they have fetched the most recent version of this field,
+	//   and ensure that changes they make are on that recent version.
+	// * Implementations MUST NOT remove or reorder Conditions that they are not
+	//   directly responsible for. For example, if an implementation sees a Condition
+	//   with type `special.io/SomeField`, it MUST NOT remove, change or update that
+	//   Condition.
+	// * Implementations MUST always _merge_ changes into Conditions of the same Type,
+	//   rather than creating more than one Condition of the same Type.
+	// * Implementations MUST always update the `observedGeneration` field of the
+	//   Condition to the `metadata.generation` of the Gateway at the time of update creation.
+	// * If the `observedGeneration` of a Condition is _greater than_ the value the
+	//   implementation knows about, then it MUST NOT perform the update on that Condition,
+	//   but must wait for a future reconciliation and status update. (The assumption is that
+	//   the implementation's copy of the object is stale and an update will be re-triggered
+	//   if relevant.)
+	//
+	// </gateway:util:excludeFromCRD>
+	//
 	// +listType=map
 	// +listMapKey=type
 	// +kubebuilder:validation:MinItems=1
@@ -502,6 +532,29 @@ type RouteStatus struct {
 	//
 	// A maximum of 32 Gateways will be represented in this list. An empty list
 	// means the route has not been attached to any Gateway.
+	//
+	// <gateway:util:excludeFromCRD>
+	// Notes for implementors:
+	//
+	// While parents is not a listType `map`, this is due to the fact that the
+	// list key is not scalar, and Kubernetes is unable to represent this.
+	//
+	// Parent status MUST be considered to be namespaced by the combination of
+	// the parentRef and controllerName fields, and implementations should keep
+	// the following rules in mind when updating this status:
+	//
+	// * Implementations MUST update only entries that have a matching value of
+	//   `controllerName` for that implementation.
+	// * Implementations MUST NOT update entries with non-matching `controllerName`
+	//   fields.
+	// * Implementations MUST treat each `parentRef`` in the Route separately and
+	//   update its status based on the relationship with that parent.
+	// * Implementations MUST perform a read-modify-write cycle on this field
+	//   before modifying it. That is, when modifying this field, implementations
+	//   must be confident they have fetched the most recent version of this field,
+	//   and ensure that changes they make are on that recent version.
+	//
+	// </gateway:util:excludeFromCRD>
 	//
 	// +required
 	// +listType=atomic
