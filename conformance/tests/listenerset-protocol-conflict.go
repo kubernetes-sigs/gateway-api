@@ -116,8 +116,8 @@ var ListenerSetProtocolConflict = suite.ConformanceTest{
 			Status: metav1.ConditionTrue,
 			Reason: string(gatewayv1.GatewayReasonListenerSetsAttached),
 		})
-		kubernetes.GatewayListenerMustHaveConditions(t, suite.Client, suite.TimeoutConfig, gwNN, "gateway-com", acceptedListenerConditions)
-		kubernetes.GatewayListenerMustHaveConditions(t, suite.Client, suite.TimeoutConfig, gwNN, "protocol-conflict", conflictedListenerConditions)
+		kubernetes.GatewayListenersMustHaveConditions(t, suite.Client, suite.TimeoutConfig, gwNN, acceptedListenerConditions, "gateway-com")
+		kubernetes.GatewayListenersMustHaveConditions(t, suite.Client, suite.TimeoutConfig, gwNN, conflictedListenerConditions, "protocol-conflict")
 
 		lsNN := types.NamespacedName{Name: "listenerset-with-http-listener", Namespace: ns}
 		kubernetes.ListenerSetMustHaveCondition(t, suite.Client, suite.TimeoutConfig, lsNN, metav1.Condition{
@@ -130,8 +130,8 @@ var ListenerSetProtocolConflict = suite.ConformanceTest{
 			Status: metav1.ConditionTrue,
 			Reason: string(gatewayxv1a1.ListenerSetReasonListenersNotValid),
 		})
-		kubernetes.ListenerSetListenerMustHaveConditions(t, suite.Client, suite.TimeoutConfig, lsNN, "listenerset-com", acceptedListenerConditions)
-		kubernetes.ListenerSetListenerMustHaveConditions(t, suite.Client, suite.TimeoutConfig, lsNN, "protocol-conflict", conflictedListenerConditions)
+		kubernetes.ListenerSetListenersMustHaveConditions(t, suite.Client, suite.TimeoutConfig, lsNN, acceptedListenerConditions, "listenerset-com")
+		kubernetes.ListenerSetListenersMustHaveConditions(t, suite.Client, suite.TimeoutConfig, lsNN, conflictedListenerConditions, "protocol-conflict")
 
 		for i := range testCases {
 			// Declare tc here to avoid loop variable

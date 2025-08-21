@@ -42,6 +42,7 @@ var ListenerSetCrossNamespace = suite.ConformanceTest{
 		features.SupportGateway,
 		features.SupportGatewayListenerSet,
 		features.SupportHTTPRoute,
+		features.SupportReferenceGrant,
 	},
 	Manifests: []string{
 		"tests/listenerset-http-listener-cross-namespace.yaml",
