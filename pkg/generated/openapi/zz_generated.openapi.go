@@ -4149,12 +4149,6 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewaySpec(ref common.ReferenceCallba
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.GatewayInfrastructure"),
 						},
 					},
-					"backendTLS": {
-						SchemaProps: spec.SchemaProps{
-							Description: "BackendTLS configures TLS settings for when this Gateway is connecting to backends with TLS.\n\nSupport: Core\n\n<gateway:experimental>",
-							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.GatewayBackendTLS"),
-						},
-					},
 					"allowedListeners": {
 						SchemaProps: spec.SchemaProps{
 							Description: "AllowedListeners defines which ListenerSets can be attached to this Gateway. While this feature is experimental, the default value is to allow no ListenerSets.\n\n<gateway:experimental>",
@@ -4163,7 +4157,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewaySpec(ref common.ReferenceCallba
 					},
 					"tls": {
 						SchemaProps: spec.SchemaProps{
-							Description: "GatewayTLSConfig specifies frontend tls configuration for gateway.\n\nSupport: Extended\n\n<gateway:experimental>",
+							Description: "GatewayTLSConfig specifies frontend and backend tls configuration for gateway.\n\nSupport: Extended\n\n<gateway:experimental>",
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.GatewayTLSConfig"),
 						},
 					},
@@ -4172,7 +4166,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewaySpec(ref common.ReferenceCallba
 			},
 		},
 		Dependencies: []string{
-			"sigs.k8s.io/gateway-api/apis/v1.AllowedListeners", "sigs.k8s.io/gateway-api/apis/v1.GatewayBackendTLS", "sigs.k8s.io/gateway-api/apis/v1.GatewayInfrastructure", "sigs.k8s.io/gateway-api/apis/v1.GatewaySpecAddress", "sigs.k8s.io/gateway-api/apis/v1.GatewayTLSConfig", "sigs.k8s.io/gateway-api/apis/v1.Listener"},
+			"sigs.k8s.io/gateway-api/apis/v1.AllowedListeners", "sigs.k8s.io/gateway-api/apis/v1.GatewayInfrastructure", "sigs.k8s.io/gateway-api/apis/v1.GatewaySpecAddress", "sigs.k8s.io/gateway-api/apis/v1.GatewayTLSConfig", "sigs.k8s.io/gateway-api/apis/v1.Listener"},
 	}
 }
 
@@ -4314,12 +4308,12 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewayTLSConfig(ref common.ReferenceC
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "GatewayTLSConfig specifies frontend tls configuration for gateway.",
+				Description: "GatewayTLSConfig specifies frontend and backend tls configuration for gateway.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"default": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Default specifies the default client certificate validation configuration for all Listeners handling HTTPS traffic, unless a per-port configuration is defined.\n\nsupport: Core\n\n<gateway:experimental>",
+							Description: "Default specifies the default TLS configuration for the Gateway handling HTTPS traffic. Default FrontendTLS can be override with per-port configuration.\n\nsupport: Core\n\n<gateway:experimental>",
 							Default:     map[string]interface{}{},
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.TLSConfig"),
 						},
@@ -6227,22 +6221,26 @@ func schema_sigsk8sio_gateway_api_apis_v1_TLSConfig(ref common.ReferenceCallback
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "TLSConfig describes TLS configuration that can apply to multiple Listeners within this Gateway. Currently, it stores only the client certificate validation configuration, but this may be extended in the future.",
+				Description: "TLSConfig describes TLS configuration that can apply to multiple Listeners within this Gateway.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"frontendValidation": {
 						SchemaProps: spec.SchemaProps{
 							Description: "FrontendValidation holds configuration information for validating the frontend (client). Setting this field will result in mutual authentication when connecting to the gateway. In browsers this may result in a dialog appearing that requests a user to specify the client certificate. The maximum depth of a certificate chain accepted in verification is Implementation specific.\n\nSupport: Core\n\n<gateway:experimental>",
-							Default:     map[string]interface{}{},
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.FrontendTLSValidation"),
 						},
 					},
+					"backendValidation": {
+						SchemaProps: spec.SchemaProps{
+							Description: "GatewayBackendTLS describes TLS configuration for gateway when connecting to backends. Support: Core\n\n<gateway:experimental>",
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.GatewayBackendTLS"),
+						},
+					},
 				},
-				Required: []string{"frontendValidation"},
 			},
 		},
 		Dependencies: []string{
-			"sigs.k8s.io/gateway-api/apis/v1.FrontendTLSValidation"},
+			"sigs.k8s.io/gateway-api/apis/v1.FrontendTLSValidation", "sigs.k8s.io/gateway-api/apis/v1.GatewayBackendTLS"},
 	}
 }
 

@@ -22,6 +22,7 @@ package v1
 // with apply.
 type TLSConfigApplyConfiguration struct {
 	FrontendValidation *FrontendTLSValidationApplyConfiguration `json:"frontendValidation,omitempty"`
+	BackendValidation  *GatewayBackendTLSApplyConfiguration     `json:"backendValidation,omitempty"`
 }
 
 // TLSConfigApplyConfiguration constructs a declarative configuration of the TLSConfig type for use with
@@ -35,5 +36,13 @@ func TLSConfig() *TLSConfigApplyConfiguration {
 // If called multiple times, the FrontendValidation field is set to the value of the last call.
 func (b *TLSConfigApplyConfiguration) WithFrontendValidation(value *FrontendTLSValidationApplyConfiguration) *TLSConfigApplyConfiguration {
 	b.FrontendValidation = value
+	return b
+}
+
+// WithBackendValidation sets the BackendValidation field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the BackendValidation field is set to the value of the last call.
+func (b *TLSConfigApplyConfiguration) WithBackendValidation(value *GatewayBackendTLSApplyConfiguration) *TLSConfigApplyConfiguration {
+	b.BackendValidation = value
 	return b
 }
