@@ -109,6 +109,7 @@ type ListenerSetSpec struct {
 	// Listeners in a `Gateway` and their attached `ListenerSets` are concatenated
 	// as a list when programming the underlying infrastructure.
 	//
+	// <gateway:util:excludeFromCRD>
 	// Listeners should be merged using the following precedence:
 	//
 	// 1. "parent" Gateway
@@ -118,12 +119,13 @@ type ListenerSetSpec struct {
 	// Regarding Conflict Management, Listeners in a ListenerSet follow the same
 	// rules of Listeners on a Gateway resource.
 	// 
-	// This validation should happen within all of the ListenerSets attached to a 
+	// Listener validation should happen within all of the ListenerSets attached to a 
 	// Gateway, and the precedence of "parent Gateway" -> "oldest first" -> 
 	// "alphabetically ordered" should be respected.
 	// 
 	// ListenerSets containing conflicting Listeners MUST set the Conflicted 
 	// Condition to true and clearly indicate which Listeners are conflicted.
+	// </gateway:util:excludeFromCRD>
 	// 
 	// +listType=map
 	// +listMapKey=name
@@ -468,9 +470,40 @@ spec:
     sectionName: foo
 ```
 
-For instance, the following `HTTPRoute` attempts to attach to a listener defined in the parent `Gateway` using the sectionName `foo`. This is not valid and the route's status `Accepted` condition should be set to `False`
+For instance, the following `HTTPRoute` attempts to attach to a listener defined in the parent `Gateway` using the sectionName `foo`, which also exists on a ListenerSet.
+This is not valid and the route's status `Accepted` condition should be set to `False`
 
 ```yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: parent-gateway
+spec:
+  gatewayClassName: example
+  allowedListeners:
+    namespaces:
+      from: Same
+  listeners:
+  - name: foo
+    hostname: foo.com
+    protocol: HTTP
+    port: 80
+---
+apiVersion: gateway.networking.x-k8s.io/v1alpha1
+kind: ListenerSet
+metadata:
+  name: first-workload-listeners
+spec:
+  parentRef:
+    name: parent-gateway
+    kind: Gateway
+    group: gateway.networking.k8s.io
+  listeners:
+  - name: foo
+    hostname: first.foo.com
+    protocol: HTTP
+    port: 80
+---
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
@@ -481,9 +514,6 @@ spec:
     kind: Gateway
     sectionName: foo
 ```
->--- Ricardo - above is a bit confusing, maybe ask Dave some clarification
-
-
 
 #### Optional Section Name
 
@@ -570,12 +600,15 @@ ListenerSet conflicts should be managed similarly to [Gateway resource conflict]
 management.
 
 With ListenerSet this validation should happen within the same ListenerSet resource, 
-but MUST be validated also within a Gateway scope and all of the attached Listeners/ListenerSets.
+but MUST be validated also within a Gateway scope and all of the attached Listeners/ListenerSets. The SectionName field is an exception for this validation, and while 
+it should not conflict within the same ListenerSet, it can be duplicated between 
+different ListenerSets.
 
 This means that the validation should happen now between distinct ListenerSets 
 attached to the same Gateway, and in case of a conflict, the [Listener Precedence](#listener-precedence) 
-should be respected, and the conflicting listener MUST have a `Conflicted` condition 
-set to True and with an explicit reason on its message.
+should be respected, so the first Listener on the precedence list MUST be accepted, 
+and should not have a `Conflicted` condition, while the conflicting listeners 
+MUST have a `Conflicted` condition set to True and with an explicit reason on its message.
 
 Following are some examples of a conflict situation:
 
@@ -793,6 +826,8 @@ An implementation MAY reject listeners by setting the `ListenerEntryStatus` `Acc
 If a listener has a conflict, this should be reported in the `ListenerEntryStatus` of the conflicted `ListenerSet` by setting the `Conflicted` condition to `True`.
 
 Implementations SHOULD be cautious about what information from the parent or siblings are reported to avoid accidentally leaking sensitive information that the child would not otherwise have access to. This can include contents of secrets etc.
+
+Conflicts are covered in the section [Listener and ListenerSet conflicts](#listener-and-listenerset-conflicts)
 
 ## Alternatives
 
