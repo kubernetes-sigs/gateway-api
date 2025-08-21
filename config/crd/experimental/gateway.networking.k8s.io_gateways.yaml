@@ -215,70 +215,6 @@ spec:
                         x-kubernetes-map-type: atomic
                     type: object
                 type: object
-              backendTLS:
-                description: |-
-                  BackendTLS configures TLS settings for when this Gateway is connecting to
-                  backends with TLS.
-
-                  Support: Core
-                properties:
-                  clientCertificateRef:
-                    description: |-
-                      ClientCertificateRef is a reference to an object that contains a Client
-                      Certificate and the associated private key.
-
-                      References to a resource in different namespace are invalid UNLESS there
-                      is a ReferenceGrant in the target namespace that allows the certificate
-                      to be attached. If a ReferenceGrant does not allow this reference, the
-                      "ResolvedRefs" condition MUST be set to False for this listener with the
-                      "RefNotPermitted" reason.
-
-                      ClientCertificateRef can reference to standard Kubernetes resources, i.e.
-                      Secret, or implementation-specific custom resources.
-
-                      This setting can be overridden on the service level by use of BackendTLSPolicy.
-
-                      Support: Core
-                    properties:
-                      group:
-                        default: ""
-                        description: |-
-                          Group is the group of the referent. For example, "gateway.networking.k8s.io".
-                          When unspecified or empty string, core API group is inferred.
-                        maxLength: 253
-                        pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
-                        type: string
-                      kind:
-                        default: Secret
-                        description: Kind is kind of the referent. For example "Secret".
-                        maxLength: 63
-                        minLength: 1
-                        pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
-                        type: string
-                      name:
-                        description: Name is the name of the referent.
-                        maxLength: 253
-                        minLength: 1
-                        type: string
-                      namespace:
-                        description: |-
-                          Namespace is the namespace of the referenced object. When unspecified, the local
-                          namespace is inferred.
-
-                          Note that when a namespace different than the local namespace is specified,
-                          a ReferenceGrant object is required in the referent namespace to allow that
-                          namespace's owner to accept the reference. See the ReferenceGrant
-                          documentation for details.
-
-                          Support: Core
-                        maxLength: 63
-                        minLength: 1
-                        pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
-                        type: string
-                    required:
-                    - name
-                    type: object
-                type: object
               gatewayClassName:
                 description: |-
                   GatewayClassName used for this Gateway. This is the name of a
@@ -970,18 +906,82 @@ spec:
                     == l2.hostname : !has(l1.hostname) && !has(l2.hostname))))'
               tls:
                 description: |-
-                  GatewayTLSConfig specifies frontend tls configuration for gateway.
+                  GatewayTLSConfig specifies frontend and backend tls configuration for gateway.
 
                   Support: Extended
                 properties:
                   default:
                     description: |-
-                      Default specifies the default client certificate validation configuration
-                      for all Listeners handling HTTPS traffic, unless a per-port configuration
-                      is defined.
+                      Default specifies the default TLS configuration for the Gateway handling
+                      HTTPS traffic.
+                      Default FrontendTLS can be override with per-port configuration.
 
                       support: Core
                     properties:
+                      backendValidation:
+                        description: |-
+                          GatewayBackendTLS describes TLS configuration for gateway when connecting
+                          to backends.
+                          Support: Core
+                        properties:
+                          clientCertificateRef:
+                            description: |-
+                              ClientCertificateRef is a reference to an object that contains a Client
+                              Certificate and the associated private key.
+
+                              References to a resource in different namespace are invalid UNLESS there
+                              is a ReferenceGrant in the target namespace that allows the certificate
+                              to be attached. If a ReferenceGrant does not allow this reference, the
+                              "ResolvedRefs" condition MUST be set to False for this listener with the
+                              "RefNotPermitted" reason.
+
+                              ClientCertificateRef can reference to standard Kubernetes resources, i.e.
+                              Secret, or implementation-specific custom resources.
+
+                              This setting can be overridden on the service level by use of BackendTLSPolicy.
+
+                              Support: Core
+                            properties:
+                              group:
+                                default: ""
+                                description: |-
+                                  Group is the group of the referent. For example, "gateway.networking.k8s.io".
+                                  When unspecified or empty string, core API group is inferred.
+                                maxLength: 253
+                                pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+                                type: string
+                              kind:
+                                default: Secret
+                                description: Kind is kind of the referent. For example
+                                  "Secret".
+                                maxLength: 63
+                                minLength: 1
+                                pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
+                                type: string
+                              name:
+                                description: Name is the name of the referent.
+                                maxLength: 253
+                                minLength: 1
+                                type: string
+                              namespace:
+                                description: |-
+                                  Namespace is the namespace of the referenced object. When unspecified, the local
+                                  namespace is inferred.
+
+                                  Note that when a namespace different than the local namespace is specified,
+                                  a ReferenceGrant object is required in the referent namespace to allow that
+                                  namespace's owner to accept the reference. See the ReferenceGrant
+                                  documentation for details.
+
+                                  Support: Core
+                                maxLength: 63
+                                minLength: 1
+                                pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                                type: string
+                            required:
+                            - name
+                            type: object
+                        type: object
                       frontendValidation:
                         description: |-
                           FrontendValidation holds configuration information for validating the frontend (client).
@@ -1095,8 +1095,6 @@ spec:
                         required:
                         - caCertificateRefs
                         type: object
-                    required:
-                    - frontendValidation
                     type: object
                   perPort:
                     description: |-
@@ -1127,6 +1125,70 @@ spec:
 
                             Support: Core
                           properties:
+                            backendValidation:
+                              description: |-
+                                GatewayBackendTLS describes TLS configuration for gateway when connecting
+                                to backends.
+                                Support: Core
+                              properties:
+                                clientCertificateRef:
+                                  description: |-
+                                    ClientCertificateRef is a reference to an object that contains a Client
+                                    Certificate and the associated private key.
+
+                                    References to a resource in different namespace are invalid UNLESS there
+                                    is a ReferenceGrant in the target namespace that allows the certificate
+                                    to be attached. If a ReferenceGrant does not allow this reference, the
+                                    "ResolvedRefs" condition MUST be set to False for this listener with the
+                                    "RefNotPermitted" reason.
+
+                                    ClientCertificateRef can reference to standard Kubernetes resources, i.e.
+                                    Secret, or implementation-specific custom resources.
+
+                                    This setting can be overridden on the service level by use of BackendTLSPolicy.
+
+                                    Support: Core
+                                  properties:
+                                    group:
+                                      default: ""
+                                      description: |-
+                                        Group is the group of the referent. For example, "gateway.networking.k8s.io".
+                                        When unspecified or empty string, core API group is inferred.
+                                      maxLength: 253
+                                      pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+                                      type: string
+                                    kind:
+                                      default: Secret
+                                      description: Kind is kind of the referent. For
+                                        example "Secret".
+                                      maxLength: 63
+                                      minLength: 1
+                                      pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
+                                      type: string
+                                    name:
+                                      description: Name is the name of the referent.
+                                      maxLength: 253
+                                      minLength: 1
+                                      type: string
+                                    namespace:
+                                      description: |-
+                                        Namespace is the namespace of the referenced object. When unspecified, the local
+                                        namespace is inferred.
+
+                                        Note that when a namespace different than the local namespace is specified,
+                                        a ReferenceGrant object is required in the referent namespace to allow that
+                                        namespace's owner to accept the reference. See the ReferenceGrant
+                                        documentation for details.
+
+                                        Support: Core
+                                      maxLength: 63
+                                      minLength: 1
+                                      pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                                      type: string
+                                  required:
+                                  - name
+                                  type: object
+                              type: object
                             frontendValidation:
                               description: |-
                                 FrontendValidation holds configuration information for validating the frontend (client).
@@ -1240,8 +1302,6 @@ spec:
                               required:
                               - caCertificateRefs
                               type: object
-                          required:
-                          - frontendValidation
                           type: object
                       required:
                       - port
@@ -1762,70 +1822,6 @@ spec:
                         x-kubernetes-map-type: atomic
                     type: object
                 type: object
-              backendTLS:
-                description: |-
-                  BackendTLS configures TLS settings for when this Gateway is connecting to
-                  backends with TLS.
-
-                  Support: Core
-                properties:
-                  clientCertificateRef:
-                    description: |-
-                      ClientCertificateRef is a reference to an object that contains a Client
-                      Certificate and the associated private key.
-
-                      References to a resource in different namespace are invalid UNLESS there
-                      is a ReferenceGrant in the target namespace that allows the certificate
-                      to be attached. If a ReferenceGrant does not allow this reference, the
-                      "ResolvedRefs" condition MUST be set to False for this listener with the
-                      "RefNotPermitted" reason.
-
-                      ClientCertificateRef can reference to standard Kubernetes resources, i.e.
-                      Secret, or implementation-specific custom resources.
-
-                      This setting can be overridden on the service level by use of BackendTLSPolicy.
-
-                      Support: Core
-                    properties:
-                      group:
-                        default: ""
-                        description: |-
-                          Group is the group of the referent. For example, "gateway.networking.k8s.io".
-                          When unspecified or empty string, core API group is inferred.
-                        maxLength: 253
-                        pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
-                        type: string
-                      kind:
-                        default: Secret
-                        description: Kind is kind of the referent. For example "Secret".
-                        maxLength: 63
-                        minLength: 1
-                        pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
-                        type: string
-                      name:
-                        description: Name is the name of the referent.
-                        maxLength: 253
-                        minLength: 1
-                        type: string
-                      namespace:
-                        description: |-
-                          Namespace is the namespace of the referenced object. When unspecified, the local
-                          namespace is inferred.
-
-                          Note that when a namespace different than the local namespace is specified,
-                          a ReferenceGrant object is required in the referent namespace to allow that
-                          namespace's owner to accept the reference. See the ReferenceGrant
-                          documentation for details.
-
-                          Support: Core
-                        maxLength: 63
-                        minLength: 1
-                        pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
-                        type: string
-                    required:
-                    - name
-                    type: object
-                type: object
               gatewayClassName:
                 description: |-
                   GatewayClassName used for this Gateway. This is the name of a
@@ -2517,18 +2513,82 @@ spec:
                     == l2.hostname : !has(l1.hostname) && !has(l2.hostname))))'
               tls:
                 description: |-
-                  GatewayTLSConfig specifies frontend tls configuration for gateway.
+                  GatewayTLSConfig specifies frontend and backend tls configuration for gateway.
 
                   Support: Extended
                 properties:
                   default:
                     description: |-
-                      Default specifies the default client certificate validation configuration
-                      for all Listeners handling HTTPS traffic, unless a per-port configuration
-                      is defined.
+                      Default specifies the default TLS configuration for the Gateway handling
+                      HTTPS traffic.
+                      Default FrontendTLS can be override with per-port configuration.
 
                       support: Core
                     properties:
+                      backendValidation:
+                        description: |-
+                          GatewayBackendTLS describes TLS configuration for gateway when connecting
+                          to backends.
+                          Support: Core
+                        properties:
+                          clientCertificateRef:
+                            description: |-
+                              ClientCertificateRef is a reference to an object that contains a Client
+                              Certificate and the associated private key.
+
+                              References to a resource in different namespace are invalid UNLESS there
+                              is a ReferenceGrant in the target namespace that allows the certificate
+                              to be attached. If a ReferenceGrant does not allow this reference, the
+                              "ResolvedRefs" condition MUST be set to False for this listener with the
+                              "RefNotPermitted" reason.
+
+                              ClientCertificateRef can reference to standard Kubernetes resources, i.e.
+                              Secret, or implementation-specific custom resources.
+
+                              This setting can be overridden on the service level by use of BackendTLSPolicy.
+
+                              Support: Core
+                            properties:
+                              group:
+                                default: ""
+                                description: |-
+                                  Group is the group of the referent. For example, "gateway.networking.k8s.io".
+                                  When unspecified or empty string, core API group is inferred.
+                                maxLength: 253
+                                pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+                                type: string
+                              kind:
+                                default: Secret
+                                description: Kind is kind of the referent. For example
+                                  "Secret".
+                                maxLength: 63
+                                minLength: 1
+                                pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
+                                type: string
+                              name:
+                                description: Name is the name of the referent.
+                                maxLength: 253
+                                minLength: 1
+                                type: string
+                              namespace:
+                                description: |-
+                                  Namespace is the namespace of the referenced object. When unspecified, the local
+                                  namespace is inferred.
+
+                                  Note that when a namespace different than the local namespace is specified,
+                                  a ReferenceGrant object is required in the referent namespace to allow that
+                                  namespace's owner to accept the reference. See the ReferenceGrant
+                                  documentation for details.
+
+                                  Support: Core
+                                maxLength: 63
+                                minLength: 1
+                                pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                                type: string
+                            required:
+                            - name
+                            type: object
+                        type: object
                       frontendValidation:
                         description: |-
                           FrontendValidation holds configuration information for validating the frontend (client).
@@ -2642,8 +2702,6 @@ spec:
                         required:
                         - caCertificateRefs
                         type: object
-                    required:
-                    - frontendValidation
                     type: object
                   perPort:
                     description: |-
@@ -2674,6 +2732,70 @@ spec:
 
                             Support: Core
                           properties:
+                            backendValidation:
+                              description: |-
+                                GatewayBackendTLS describes TLS configuration for gateway when connecting
+                                to backends.
+                                Support: Core
+                              properties:
+                                clientCertificateRef:
+                                  description: |-
+                                    ClientCertificateRef is a reference to an object that contains a Client
+                                    Certificate and the associated private key.
+
+                                    References to a resource in different namespace are invalid UNLESS there
+                                    is a ReferenceGrant in the target namespace that allows the certificate
+                                    to be attached. If a ReferenceGrant does not allow this reference, the
+                                    "ResolvedRefs" condition MUST be set to False for this listener with the
+                                    "RefNotPermitted" reason.
+
+                                    ClientCertificateRef can reference to standard Kubernetes resources, i.e.
+                                    Secret, or implementation-specific custom resources.
+
+                                    This setting can be overridden on the service level by use of BackendTLSPolicy.
+
+                                    Support: Core
+                                  properties:
+                                    group:
+                                      default: ""
+                                      description: |-
+                                        Group is the group of the referent. For example, "gateway.networking.k8s.io".
+                                        When unspecified or empty string, core API group is inferred.
+                                      maxLength: 253
+                                      pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+                                      type: string
+                                    kind:
+                                      default: Secret
+                                      description: Kind is kind of the referent. For
+                                        example "Secret".
+                                      maxLength: 63
+                                      minLength: 1
+                                      pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
+                                      type: string
+                                    name:
+                                      description: Name is the name of the referent.
+                                      maxLength: 253
+                                      minLength: 1
+                                      type: string
+                                    namespace:
+                                      description: |-
+                                        Namespace is the namespace of the referenced object. When unspecified, the local
+                                        namespace is inferred.
+
+                                        Note that when a namespace different than the local namespace is specified,
+                                        a ReferenceGrant object is required in the referent namespace to allow that
+                                        namespace's owner to accept the reference. See the ReferenceGrant
+                                        documentation for details.
+
+                                        Support: Core
+                                      maxLength: 63
+                                      minLength: 1
+                                      pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                                      type: string
+                                  required:
+                                  - name
+                                  type: object
+                              type: object
                             frontendValidation:
                               description: |-
                                 FrontendValidation holds configuration information for validating the frontend (client).
@@ -2787,8 +2909,6 @@ spec:
                               required:
                               - caCertificateRefs
                               type: object
-                          required:
-                          - frontendValidation
                           type: object
                       required:
                       - port

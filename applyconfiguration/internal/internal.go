@@ -583,9 +583,6 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: allowedListeners
       type:
         namedType: io.k8s.sigs.gateway-api.apis.v1.AllowedListeners
-    - name: backendTLS
-      type:
-        namedType: io.k8s.sigs.gateway-api.apis.v1.GatewayBackendTLS
     - name: gatewayClassName
       type:
         scalar: string
@@ -1256,10 +1253,12 @@ var schemaYAML = typed.YAMLObject(`types:
 - name: io.k8s.sigs.gateway-api.apis.v1.TLSConfig
   map:
     fields:
+    - name: backendValidation
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1.GatewayBackendTLS
     - name: frontendValidation
       type:
         namedType: io.k8s.sigs.gateway-api.apis.v1.FrontendTLSValidation
-      default: {}
 - name: io.k8s.sigs.gateway-api.apis.v1.TLSPortConfig
   map:
     fields:
