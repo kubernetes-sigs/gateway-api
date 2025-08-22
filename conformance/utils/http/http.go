@@ -92,6 +92,7 @@ type ExpectedRequest struct {
 // Response defines expected properties of a response from a backend.
 type Response struct {
 	StatusCode    int
+	StatusCodes   []int // alternative to StatusCode, allows multiple acceptable codes
 	Headers       map[string]string
 	AbsentHeaders []string
 	Protocol      string
@@ -304,7 +305,18 @@ func CompareRoundTrip(t *testing.T, req *roundtripper.Request, cReq *roundtrippe
 			return nil
 		}
 	}
-	if expected.Response.StatusCode != cRes.StatusCode {
+	if len(expected.Response.StatusCodes) > 0 {
+		matched := false
+		for _, code := range expected.Response.StatusCodes {
+			if code == cRes.StatusCode {
+				matched = true
+				break
+			}
+		}
+		if !matched {
+			return fmt.Errorf("expected status code to be one of %v, got %d", expected.Response.StatusCodes, cRes.StatusCode)
+		}
+	} else if expected.Response.StatusCode != cRes.StatusCode {
 		return fmt.Errorf("expected status code to be %d, got %d. CRes: %v", expected.Response.StatusCode, cRes.StatusCode, cRes)
 	}
 	if expected.Response.Protocol != "" && expected.Response.Protocol != cRes.Protocol {
@@ -466,6 +478,9 @@ func (er *ExpectedResponse) GetTestCaseName(i int) string {
 
 	if er.Backend != "" {
 		return fmt.Sprintf("%s should go to %s", reqStr, er.Backend)
+	}
+	if len(er.Response.StatusCodes) > 0 {
+		return fmt.Sprintf("%s should receive one of %v", reqStr, er.Response.StatusCodes)
 	}
 	return fmt.Sprintf("%s should receive a %d", reqStr, er.Response.StatusCode)
 }

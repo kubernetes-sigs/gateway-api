@@ -32,11 +32,11 @@ import (
 )
 
 func init() {
-	ConformanceTests = append(ConformanceTests, BackendTLSPolicyCACertificateRefInvalidCACertificateRef)
+	ConformanceTests = append(ConformanceTests, BackendTLSPolicyInvalidCACertificateRef)
 }
 
-var BackendTLSPolicyCACertificateRefInvalidCACertificateRef = suite.ConformanceTest{
-	ShortName:   "BackendTLSPolicyCACertificateRefInvalidCACertificateRef",
+var BackendTLSPolicyInvalidCACertificateRef = suite.ConformanceTest{
+	ShortName:   "BackendTLSPolicyInvalidCACertificateRef",
 	Description: "A BackendTLSPolicy that specifies a single invalid CACertificateRef should have the Accepted and ResolvedRefs status condition set False with appropriate reasons, and HTTP requests to a backend targeted by this policy should fail with a 5xx response.",
 	Features: []features.FeatureName{
 		features.SupportGateway,
@@ -81,12 +81,15 @@ var BackendTLSPolicyCACertificateRefInvalidCACertificateRef = suite.ConformanceT
 				})
 
 				t.Run("HTTP Request to backend targeted by an invalid BackendTLSPolicy receive a 5xx", func(t *testing.T) {
-					h.MakeRequestAndExpectFailure(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr,
+					h.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr,
 						h.ExpectedResponse{
 							Namespace: ns,
 							Request: h.Request{
 								Host: serverStr,
 								Path: "/backendtlspolicy-" + policyNN.Name,
+							},
+							Response: h.Response{
+								StatusCodes: []int{500, 502, 503},
 							},
 						})
 				})
