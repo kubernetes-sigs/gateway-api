@@ -17,3 +17,6 @@ spec:
     - name: echo-v2
       port: 7070
       weight: 30
+    - name: echo-v3
+      port: 7070
+      weight: 0

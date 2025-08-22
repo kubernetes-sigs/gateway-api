@@ -18,10 +18,11 @@ package weight
 
 import (
 	"cmp"
+	"crypto/rand"
 	"errors"
 	"fmt"
 	"math"
-	"math/rand/v2"
+	"math/big"
 	"slices"
 	"strconv"
 	"strings"
@@ -29,6 +30,12 @@ import (
 	"time"
 
 	"golang.org/x/sync/errgroup"
+)
+
+const (
+	// MaxTestRetries is the maximum number of times to retry the weight distribution test
+	// if it fails due to statistical variance before considering it a real failure
+	MaxTestRetries = 10
 )
 
 // RequestSender defines an interface for sending requests (HTTP, gRPC, or mesh)
@@ -132,7 +139,12 @@ func TestWeightedDistribution(sender RequestSender, expectedWeights map[string]f
 
 // addRandomDelay adds a random delay up to the specified limit in milliseconds
 func addRandomDelay(limit int) {
-	randomSleepDuration := rand.IntN(limit)
+	n, err := rand.Int(rand.Reader, big.NewInt(int64(limit)))
+	if err != nil {
+		// Fallback to no delay if crypto/rand fails
+		return
+	}
+	randomSleepDuration := n.Int64()
 	time.Sleep(time.Duration(randomSleepDuration) * time.Millisecond)
 }
 
@@ -140,19 +152,33 @@ func addRandomDelay(limit int) {
 // The addRandomValue function should be provided by the caller to handle
 // protocol-specific ways of adding the random value (HTTP headers, gRPC metadata, etc.)
 func AddRandomEntropy(addRandomValue func(string) error) error {
-	random := rand.IntN(3)
+	n, err := rand.Int(rand.Reader, big.NewInt(3))
+	if err != nil {
+		// Fallback to case 0 if crypto/rand fails
+		addRandomDelay(1000)
+		return nil
+	}
+	random := n.Int64()
 
 	switch random {
 	case 0:
 		addRandomDelay(1000)
 		return nil
 	case 1:
-		randomValue := rand.IntN(10000)
-		return addRandomValue(strconv.Itoa(randomValue))
+		valueN, err := rand.Int(rand.Reader, big.NewInt(10000))
+		if err != nil {
+			return fmt.Errorf("failed to generate random value: %w", err)
+		}
+		randomValue := valueN.Int64()
+		return addRandomValue(strconv.FormatInt(randomValue, 10))
 	case 2:
 		addRandomDelay(1000)
-		randomValue := rand.IntN(10000)
-		return addRandomValue(strconv.Itoa(randomValue))
+		valueN, err := rand.Int(rand.Reader, big.NewInt(10000))
+		if err != nil {
+			return fmt.Errorf("failed to generate random value: %w", err)
+		}
+		randomValue := valueN.Int64()
+		return addRandomValue(strconv.FormatInt(randomValue, 10))
 	default:
 		return fmt.Errorf("invalid random value: %d", random)
 	}

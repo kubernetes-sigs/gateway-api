@@ -70,9 +70,9 @@ var MeshGRPCRouteWeight = suite.ConformanceTest{
 				return cRes.Hostname, nil
 			})
 
-			for i := 0; i < 10; i++ {
+			for i := 0; i < weight.MaxTestRetries; i++ {
 				if err := weight.TestWeightedDistribution(sender, expectedWeights); err != nil {
-					t.Logf("Traffic distribution test failed (%d/10): %s", i+1, err)
+					t.Logf("Traffic distribution test failed (%d/%d): %s", i+1, weight.MaxTestRetries, err)
 				} else {
 					return
 				}
