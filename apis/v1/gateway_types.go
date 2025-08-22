@@ -595,9 +595,28 @@ type ListenerTLSConfig struct {
 
 // GatewayTLSConfig specifies frontend and backend tls configuration for gateway.
 type GatewayTLSConfig struct {
-	// Default specifies the default TLS configuration for the Gateway handling
-	// HTTPS traffic.
-	// Default FrontendTLS can be override with per-port configuration.
+
+	// Backend describes TLS configuration for gateway when connecting
+	// to backends.
+	// Support: Core
+	//
+	// +optional
+	// <gateway:experimental>
+	Backend *GatewayBackendTLS `json:"backend,omitempty"`
+
+	// Frontend describes TLS config when client connects to Gateway.
+	// Support: Core
+	//
+	// +optional
+	// <gateway:experimental>
+	Frontend *FrontendTLSConfig `json:"frontend,omitempty"`
+}
+
+// FrontendTLSConfig specifies frontend tls configuration for gateway.
+type FrontendTLSConfig struct {
+	// Default specifies the default client certificate validation configuration
+	// for all Listeners handling HTTPS traffic, unless a per-port configuration
+	// is defined.
 	//
 	// support: Core
 	//
@@ -641,9 +660,10 @@ const (
 )
 
 // TLSConfig describes TLS configuration that can apply to multiple Listeners
-// within this Gateway.
+// within this Gateway. Currently, it stores only the client certificate validation
+// configuration, but this may be extended in the future.
 type TLSConfig struct {
-	// FrontendValidation holds configuration information for validating the frontend (client).
+	// Validation holds configuration information for validating the frontend (client).
 	// Setting this field will result in mutual authentication when connecting to the gateway.
 	// In browsers this may result in a dialog appearing
 	// that requests a user to specify the client certificate.
@@ -653,15 +673,7 @@ type TLSConfig struct {
 	//
 	// +optional
 	// <gateway:experimental>
-	FrontendValidation *FrontendTLSValidation `json:"frontendValidation,omitempty"`
-
-	// GatewayBackendTLS describes TLS configuration for gateway when connecting
-	// to backends.
-	// Support: Core
-	//
-	// +optional
-	// <gateway:experimental>
-	BackendValidation *GatewayBackendTLS `json:"backendValidation,omitempty"`
+	Validation *FrontendTLSValidation `json:"validation,omitempty"`
 }
 
 type TLSPortConfig struct {
