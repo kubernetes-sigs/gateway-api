@@ -21,8 +21,8 @@ package v1
 // GatewayTLSConfigApplyConfiguration represents a declarative configuration of the GatewayTLSConfig type for use
 // with apply.
 type GatewayTLSConfigApplyConfiguration struct {
-	Default *TLSConfigApplyConfiguration      `json:"default,omitempty"`
-	PerPort []TLSPortConfigApplyConfiguration `json:"perPort,omitempty"`
+	Backend  *GatewayBackendTLSApplyConfiguration `json:"backend,omitempty"`
+	Frontend *FrontendTLSConfigApplyConfiguration `json:"frontend,omitempty"`
 }
 
 // GatewayTLSConfigApplyConfiguration constructs a declarative configuration of the GatewayTLSConfig type for use with
@@ -31,23 +31,18 @@ func GatewayTLSConfig() *GatewayTLSConfigApplyConfiguration {
 	return &GatewayTLSConfigApplyConfiguration{}
 }
 
-// WithDefault sets the Default field in the declarative configuration to the given value
+// WithBackend sets the Backend field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
-// If called multiple times, the Default field is set to the value of the last call.
-func (b *GatewayTLSConfigApplyConfiguration) WithDefault(value *TLSConfigApplyConfiguration) *GatewayTLSConfigApplyConfiguration {
-	b.Default = value
+// If called multiple times, the Backend field is set to the value of the last call.
+func (b *GatewayTLSConfigApplyConfiguration) WithBackend(value *GatewayBackendTLSApplyConfiguration) *GatewayTLSConfigApplyConfiguration {
+	b.Backend = value
 	return b
 }
 
-// WithPerPort adds the given value to the PerPort field in the declarative configuration
-// and returns the receiver, so that objects can be build by chaining "With" function invocations.
-// If called multiple times, values provided by each call will be appended to the PerPort field.
-func (b *GatewayTLSConfigApplyConfiguration) WithPerPort(values ...*TLSPortConfigApplyConfiguration) *GatewayTLSConfigApplyConfiguration {
-	for i := range values {
-		if values[i] == nil {
-			panic("nil value passed to WithPerPort")
-		}
-		b.PerPort = append(b.PerPort, *values[i])
-	}
+// WithFrontend sets the Frontend field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the Frontend field is set to the value of the last call.
+func (b *GatewayTLSConfigApplyConfiguration) WithFrontend(value *FrontendTLSConfigApplyConfiguration) *GatewayTLSConfigApplyConfiguration {
+	b.Frontend = value
 	return b
 }

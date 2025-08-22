@@ -56,6 +56,8 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1.ForwardBodyConfigApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("Fraction"):
 		return &apisv1.FractionApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("FrontendTLSConfig"):
+		return &apisv1.FrontendTLSConfigApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("FrontendTLSValidation"):
 		return &apisv1.FrontendTLSValidationApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("Gateway"):
