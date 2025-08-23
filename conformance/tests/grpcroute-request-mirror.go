@@ -104,7 +104,7 @@ var GRPCRouteRequestMirror = suite.ConformanceTest{
 			t.Run(tc.GetTestCaseName(i), func(t *testing.T) {
 				t.Parallel()
 				grpc.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.GRPCClient, suite.TimeoutConfig, gwAddr, tc)
-				grpc.ExpectMirroredRequest(t, suite.Client, suite.Clientset, tc.MirroredTo, "Echo")
+				grpc.ExpectMirroredRequest(t, suite.Client, suite.Clientset, tc.MirroredTo)
 			})
 		}
 	},
