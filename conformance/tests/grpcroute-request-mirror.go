@@ -86,11 +86,16 @@ var GRPCRouteRequestMirror = suite.ConformanceTest{
 				},
 				Response: grpc.Response{
 					Code: codes.OK,
-					Headers: &metadata.MD{
-						"x-header-set":        []string{"set-overwrites-values"},
-						"x-header-add":        []string{"header-val-1"},
-						"x-header-add-append": []string{"append-val-1", "header-val-2"},
-					},
+					Headers: func() *metadata.MD {
+						md := metadata.Pairs(
+							"x-header-set", "set-overwrites-values",
+							"x-header-add", "header-val-1",
+							"x-header-add-append", "append-val-1",
+							"x-header-add-append", "header-val-2",
+						)
+						return &md
+					}(),
+					AbsentHeaders: []string{"X-Header-Remove"},
 				},
 			},
 		}

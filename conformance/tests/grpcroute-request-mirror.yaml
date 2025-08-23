@@ -12,12 +12,12 @@ spec:
         service: gateway_api_conformance.echo_basic.grpcecho.GrpcEcho
         method: Echo
     filters:
-    - type: RequestMirror
-      requestMirror:
-        backendRef:
-          name: grpc-infra-backend-v2
-          namespace: gateway-conformance-infra
-          port: 8080
+    # - type: RequestMirror
+    #   requestMirror:
+    #     backendRef:
+    #       name: grpc-infra-backend-v2
+    #       namespace: gateway-conformance-infra
+    #       port: 8080
     backendRefs:
     - name: grpc-infra-backend-v1
       port: 8080
@@ -39,12 +39,12 @@ spec:
           value: header-val-2
         remove:
         - X-Header-Remove
-    - type: RequestMirror
-      requestMirror:
-        backendRef:
-          name: grpc-infra-backend-v2
-          namespace: gateway-conformance-infra
-          port: 8080
+    # - type: RequestMirror
+    #   requestMirror:
+    #     backendRef:
+    #       name: grpc-infra-backend-v2
+    #       namespace: gateway-conformance-infra
+    #       port: 8080
     backendRefs:
     - name: grpc-infra-backend-v1
       port: 8080

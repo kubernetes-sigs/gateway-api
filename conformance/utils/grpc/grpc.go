@@ -19,6 +19,7 @@ package grpc
 import (
 	"context"
 	"fmt"
+	"slices"
 	"sort"
 	"strings"
 	"testing"
@@ -56,10 +57,11 @@ type DefaultClient struct {
 }
 
 type Response struct {
-	Code     codes.Code
-	Headers  *metadata.MD
-	Trailers *metadata.MD
-	Response *pb.EchoResponse
+	Code          codes.Code
+	Headers       *metadata.MD
+	Trailers      *metadata.MD
+	Response      *pb.EchoResponse
+	AbsentHeaders []string
 }
 
 type RequestMetadata struct {
@@ -262,6 +264,51 @@ func compareResponse(expected *ExpectedResponse, response *Response) error {
 		if !strings.HasPrefix(response.Response.GetAssertions().GetContext().GetPod(), expected.Backend) {
 			return fmt.Errorf("expected pod name to start with %s, got %s", expected.Backend, response.Response.GetAssertions().GetContext().GetPod())
 		}
+
+		// Check if the correct headers were received by the backend
+		receivedMap := make(map[string][]string)
+		receivedHeaders := response.Response.GetAssertions().GetHeaders()
+		for _, receivedHeader := range receivedHeaders {
+			receivedKey := strings.ToLower(receivedHeader.GetKey())
+			receivedValue := receivedHeader.GetValue()
+			receivedMap[receivedKey] = append(receivedMap[receivedKey], receivedValue)
+		}
+
+		expectedHeaders := expected.Response.Headers
+		if expectedHeaders != nil {
+
+			if receivedHeaders == nil {
+				return fmt.Errorf("No headers captured: expected %v headers", len(*expectedHeaders))
+			}
+
+			for expectedHeader, expectedValues := range *expectedHeaders {
+				expectedHeader = strings.ToLower(expectedHeader)
+				receivedValues, ok := receivedMap[expectedHeader]
+				if !ok {
+					return fmt.Errorf("expected header %s not found", expectedHeader)
+				}
+				sortedExpectedValues := slices.Clone(expectedValues)
+				sortedReceivedValues := slices.Clone(receivedValues)
+
+				slices.Sort(sortedExpectedValues)
+				slices.Sort(sortedReceivedValues)
+
+				if !slices.Equal(sortedExpectedValues, sortedReceivedValues) {
+					return fmt.Errorf("Header: %s, Expected values %v not equal to received values %v", expectedHeader, sortedExpectedValues, sortedReceivedValues)
+				}
+			}
+		}
+
+		// Check if the headers that were supposed to be removed by the Gateway are removed
+		if len(expected.Response.AbsentHeaders) > 0 {
+			for _, absentHeader := range expected.Response.AbsentHeaders {
+				val, ok := receivedMap[strings.ToLower(absentHeader)]
+				if ok {
+					return fmt.Errorf("Header: %s, should not be present, got %s", absentHeader, val)
+				}
+			}
+		}
+
 	}
 	return nil
 }
