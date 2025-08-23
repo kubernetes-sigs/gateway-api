@@ -22,6 +22,7 @@ import (
 	"math/big"
 	"net"
 	"net/url"
+	"slices"
 	"strings"
 	"testing"
 	"time"
@@ -91,8 +92,9 @@ type ExpectedRequest struct {
 
 // Response defines expected properties of a response from a backend.
 type Response struct {
+	// Deprecated: Use StatusCodes instead, which supports matching against multiple status codes.
 	StatusCode    int
-	StatusCodes   []int // alternative to StatusCode, allows multiple acceptable codes
+	StatusCodes   []int
 	Headers       map[string]string
 	AbsentHeaders []string
 	Protocol      string
@@ -139,8 +141,13 @@ func MakeRequest(t *testing.T, expected *ExpectedResponse, gwAddr, protocol, sch
 		expected.Request.Method = "GET"
 	}
 
-	if expected.Response.StatusCode == 0 {
-		expected.Response.StatusCode = 200
+	// if the deprecated field StatusCode is set, append it to StatusCodes for backwards compatibility
+	if expected.Response.StatusCode != 0 {
+		expected.Response.StatusCodes = append(expected.Response.StatusCodes, expected.Response.StatusCode)
+	}
+
+	if len(expected.Response.StatusCodes) == 0 {
+		expected.Response.StatusCodes = []int{200}
 	}
 
 	if expected.Request.Protocol == "" {
@@ -301,23 +308,14 @@ func WaitForConsistentFailureResponse(t *testing.T, r roundtripper.RoundTripper,
 
 func CompareRoundTrip(t *testing.T, req *roundtripper.Request, cReq *roundtripper.CapturedRequest, cRes *roundtripper.CapturedResponse, expected ExpectedResponse) error {
 	if roundtripper.IsTimeoutError(cRes.StatusCode) {
-		if roundtripper.IsTimeoutError(expected.Response.StatusCode) {
-			return nil
-		}
-	}
-	if len(expected.Response.StatusCodes) > 0 {
-		matched := false
-		for _, code := range expected.Response.StatusCodes {
-			if code == cRes.StatusCode {
-				matched = true
-				break
+		for _, statusCode := range expected.Response.StatusCodes {
+			if roundtripper.IsTimeoutError(statusCode) {
+				return nil
 			}
 		}
-		if !matched {
-			return fmt.Errorf("expected status code to be one of %v, got %d", expected.Response.StatusCodes, cRes.StatusCode)
-		}
-	} else if expected.Response.StatusCode != cRes.StatusCode {
-		return fmt.Errorf("expected status code to be %d, got %d. CRes: %v", expected.Response.StatusCode, cRes.StatusCode, cRes)
+	}
+	if !slices.Contains(expected.Response.StatusCodes, cRes.StatusCode) {
+		return fmt.Errorf("expected status code to be one of %v, got %d. CRes: %v", expected.Response.StatusCodes, cRes.StatusCode, cRes)
 	}
 	if expected.Response.Protocol != "" && expected.Response.Protocol != cRes.Protocol {
 		return fmt.Errorf("expected protocol to be %s, got %s", expected.Response.Protocol, cRes.Protocol)
@@ -479,10 +477,8 @@ func (er *ExpectedResponse) GetTestCaseName(i int) string {
 	if er.Backend != "" {
 		return fmt.Sprintf("%s should go to %s", reqStr, er.Backend)
 	}
-	if len(er.Response.StatusCodes) > 0 {
-		return fmt.Sprintf("%s should receive one of %v", reqStr, er.Response.StatusCodes)
-	}
-	return fmt.Sprintf("%s should receive a %d", reqStr, er.Response.StatusCode)
+
+	return fmt.Sprintf("%s should receive one of %v", reqStr, er.Response.StatusCodes)
 }
 
 func setRedirectRequestDefaults(req *roundtripper.Request, cRes *roundtripper.CapturedResponse, expected *ExpectedResponse) {

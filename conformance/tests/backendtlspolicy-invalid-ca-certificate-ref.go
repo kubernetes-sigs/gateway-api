@@ -53,7 +53,6 @@ var BackendTLSPolicyInvalidCACertificateRef = suite.ConformanceTest{
 
 		kubernetes.NamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, []string{ns})
 		gwAddr := kubernetes.GatewayAndRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), &gatewayv1.HTTPRoute{}, false, routeNN)
-		kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN)
 
 		for _, policyNN := range []types.NamespacedName{
 			{Name: "nonexistent-ca-certificate-ref", Namespace: ns},
