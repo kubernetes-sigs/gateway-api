@@ -266,12 +266,12 @@ func compareResponse(expected *ExpectedResponse, response *Response) error {
 		}
 
 		// Check if the correct headers were received by the backend
-		receivedMap := make(map[string][]string)
+		receivedHeadersMap := make(map[string][]string)
 		receivedHeaders := response.Response.GetAssertions().GetHeaders()
 		for _, receivedHeader := range receivedHeaders {
 			receivedKey := strings.ToLower(receivedHeader.GetKey())
 			receivedValue := receivedHeader.GetValue()
-			receivedMap[receivedKey] = append(receivedMap[receivedKey], receivedValue)
+			receivedHeadersMap[receivedKey] = append(receivedHeadersMap[receivedKey], receivedValue)
 		}
 
 		expectedHeaders := expected.Response.Headers
@@ -283,7 +283,7 @@ func compareResponse(expected *ExpectedResponse, response *Response) error {
 
 			for expectedHeader, expectedValues := range *expectedHeaders {
 				expectedHeader = strings.ToLower(expectedHeader)
-				receivedValues, ok := receivedMap[expectedHeader]
+				receivedValues, ok := receivedHeadersMap[expectedHeader]
 				if !ok {
 					return fmt.Errorf("expected header %s not found", expectedHeader)
 				}
@@ -302,7 +302,7 @@ func compareResponse(expected *ExpectedResponse, response *Response) error {
 		// Check if the headers that were supposed to be removed by the Gateway are removed
 		if len(expected.Response.AbsentHeaders) > 0 {
 			for _, absentHeader := range expected.Response.AbsentHeaders {
-				val, ok := receivedMap[strings.ToLower(absentHeader)]
+				val, ok := receivedHeadersMap[strings.ToLower(absentHeader)]
 				if ok {
 					return fmt.Errorf("Header: %s, should not be present, got %s", absentHeader, val)
 				}
