@@ -34,8 +34,8 @@ spec:
     - type: ResponseHeaderModifier
       responseHeaderModifier:
         add:
-          - name: test
-            value: "true"
+        - name: test
+          value: "true"
     backendRefs:
     - name: infra-backend-v1
       port: 8080
