@@ -1,4 +1,3 @@
----
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
@@ -7,10 +6,7 @@ metadata:
 spec:
   gatewayClassName: "{GATEWAY_CLASS_NAME}"
   addresses:
-  # This indicates an address type that will be substituted within the test suite
-  # It's currently inputted via the `address-type` flag
-  - type: "PLACEHOLDER_ADDRESS_TYPE"
-
+  - type: "IPAddress"
   listeners:
   - name: http
     port: 8080

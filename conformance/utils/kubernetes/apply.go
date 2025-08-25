@@ -139,25 +139,6 @@ func (a Applier) prepareGateway(t *testing.T, uObj *unstructured.Unstructured) {
 		err = unstructured.SetNestedSlice(uObj.Object, primOverlayAddrs, "spec", "addresses")
 		require.NoError(t, err, "could not overlay static addresses on Gateway %s/%s", ns, name)
 	}
-
-	//  This is being done in order to support the injection of implementation-specific address types
-	// into the test suite
-	var addresses []interface{}
-	for _, add := range gwspec.Addresses {
-		if *add.Type == "PLACEHOLDER_ADDRESS_TYPE" {
-			addresses = append(addresses, map[string]interface{}{
-				"type": a.AddressType,
-			},
-			)
-		} else {
-			addresses = append(addresses, add)
-		}
-	}
-
-	if len(addresses) > 0 {
-		err = unstructured.SetNestedSlice(uObj.Object, addresses, "spec", "addresses")
-		require.NoError(t, err, "could not overlay address type on Gateway %s/%s", ns, name)
-	}
 }
 
 // prepareGatewayClass adjust the spec.controllerName on the resource

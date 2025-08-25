@@ -56,7 +56,7 @@ var GatewayOptionalAddressValue = suite.ConformanceTest{
 		ctx, cancel := context.WithTimeout(context.Background(), s.TimeoutConfig.DefaultTestTimeout)
 		defer cancel()
 
-		t.Logf("waiting for namespace %s and Gateway %s to be ready for testing", gwNN.Namespace, gwNN.Name)
+		t.Logf("waiting for Gateway %s to be ready for testing", gwNN.Name)
 		kubernetes.GatewayMustHaveLatestConditions(t, s.Client, s.TimeoutConfig, gwNN)
 
 		t.Logf("retrieving Gateway %s/%s", gwNN.Namespace, gwNN.Name)
