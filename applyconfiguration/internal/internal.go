@@ -298,6 +298,21 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         scalar: numeric
       default: 0
+- name: io.k8s.sigs.gateway-api.apis.v1.FrontendTLSConfig
+  map:
+    fields:
+    - name: default
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1.TLSConfig
+      default: {}
+    - name: perPort
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v1.TLSPortConfig
+          elementRelationship: associative
+          keys:
+          - port
 - name: io.k8s.sigs.gateway-api.apis.v1.FrontendTLSValidation
   map:
     fields:
@@ -583,9 +598,6 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: allowedListeners
       type:
         namedType: io.k8s.sigs.gateway-api.apis.v1.AllowedListeners
-    - name: backendTLS
-      type:
-        namedType: io.k8s.sigs.gateway-api.apis.v1.GatewayBackendTLS
     - name: gatewayClassName
       type:
         scalar: string
@@ -651,18 +663,12 @@ var schemaYAML = typed.YAMLObject(`types:
 - name: io.k8s.sigs.gateway-api.apis.v1.GatewayTLSConfig
   map:
     fields:
-    - name: default
+    - name: backend
       type:
-        namedType: io.k8s.sigs.gateway-api.apis.v1.TLSConfig
-      default: {}
-    - name: perPort
+        namedType: io.k8s.sigs.gateway-api.apis.v1.GatewayBackendTLS
+    - name: frontend
       type:
-        list:
-          elementType:
-            namedType: io.k8s.sigs.gateway-api.apis.v1.TLSPortConfig
-          elementRelationship: associative
-          keys:
-          - port
+        namedType: io.k8s.sigs.gateway-api.apis.v1.FrontendTLSConfig
 - name: io.k8s.sigs.gateway-api.apis.v1.HTTPBackendRef
   map:
     fields:
@@ -1256,10 +1262,9 @@ var schemaYAML = typed.YAMLObject(`types:
 - name: io.k8s.sigs.gateway-api.apis.v1.TLSConfig
   map:
     fields:
-    - name: frontendValidation
+    - name: validation
       type:
         namedType: io.k8s.sigs.gateway-api.apis.v1.FrontendTLSValidation
-      default: {}
 - name: io.k8s.sigs.gateway-api.apis.v1.TLSPortConfig
   map:
     fields:

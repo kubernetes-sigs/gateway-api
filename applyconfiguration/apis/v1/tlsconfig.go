@@ -21,7 +21,7 @@ package v1
 // TLSConfigApplyConfiguration represents a declarative configuration of the TLSConfig type for use
 // with apply.
 type TLSConfigApplyConfiguration struct {
-	FrontendValidation *FrontendTLSValidationApplyConfiguration `json:"frontendValidation,omitempty"`
+	Validation *FrontendTLSValidationApplyConfiguration `json:"validation,omitempty"`
 }
 
 // TLSConfigApplyConfiguration constructs a declarative configuration of the TLSConfig type for use with
@@ -30,10 +30,10 @@ func TLSConfig() *TLSConfigApplyConfiguration {
 	return &TLSConfigApplyConfiguration{}
 }
 
-// WithFrontendValidation sets the FrontendValidation field in the declarative configuration to the given value
+// WithValidation sets the Validation field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
-// If called multiple times, the FrontendValidation field is set to the value of the last call.
-func (b *TLSConfigApplyConfiguration) WithFrontendValidation(value *FrontendTLSValidationApplyConfiguration) *TLSConfigApplyConfiguration {
-	b.FrontendValidation = value
+// If called multiple times, the Validation field is set to the value of the last call.
+func (b *TLSConfigApplyConfiguration) WithValidation(value *FrontendTLSValidationApplyConfiguration) *TLSConfigApplyConfiguration {
+	b.Validation = value
 	return b
 }
