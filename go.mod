@@ -5,7 +5,7 @@ go 1.24.0
 require (
 	github.com/elastic/crd-ref-docs v0.2.0
 	github.com/miekg/dns v1.1.68
-	github.com/stretchr/testify v1.10.0
+	github.com/stretchr/testify v1.11.0
 	golang.org/x/net v0.43.0
 	golang.org/x/sync v0.16.0
 	google.golang.org/grpc v1.74.2
