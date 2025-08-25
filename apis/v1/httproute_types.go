@@ -35,7 +35,7 @@ import (
 type HTTPRoute struct {
 	metav1.TypeMeta `json:",inline"`
 	// +optional
-	metav1.ObjectMeta `json:"metadata,omitempty"`
+	metav1.ObjectMeta `json:"metadata,omitzero"`
 
 	// Spec defines the desired state of HTTPRoute.
 	// +required
@@ -43,7 +43,7 @@ type HTTPRoute struct {
 
 	// Status defines the current state of HTTPRoute.
 	// +optional
-	Status HTTPRouteStatus `json:"status,omitempty"`
+	Status HTTPRouteStatus `json:"status,omitzero"`
 }
 
 // +kubebuilder:object:root=true
@@ -51,7 +51,8 @@ type HTTPRoute struct {
 // HTTPRouteList contains a list of HTTPRoute.
 type HTTPRouteList struct {
 	metav1.TypeMeta `json:",inline"`
-	metav1.ListMeta `json:"metadata,omitempty"`
+	// +optional
+	metav1.ListMeta `json:"metadata,omitzero"`
 	Items           []HTTPRoute `json:"items"`
 }
 
