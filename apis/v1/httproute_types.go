@@ -114,7 +114,7 @@ type HTTPRouteSpec struct {
 	// Support: Core
 	//
 	// +optional
-	// +listType=atomic
+	// +listType=set
 	// +kubebuilder:validation:MaxItems=16
 	Hostnames []Hostname `json:"hostnames,omitempty"`
 
@@ -387,7 +387,7 @@ type HTTPRouteRetry struct {
 	// Support: Extended
 	//
 	// +optional
-	// +listType=atomic
+	// +listType=set
 	Codes []HTTPRouteRetryStatusCode `json:"codes,omitempty"`
 
 	// Attempts specifies the maximum number of times an individual request
