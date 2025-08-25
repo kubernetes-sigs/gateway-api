@@ -52,6 +52,8 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1.CommonRouteSpecApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("CookieConfig"):
 		return &apisv1.CookieConfigApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("ForwardBodyConfig"):
+		return &apisv1.ForwardBodyConfigApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("Fraction"):
 		return &apisv1.FractionApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("FrontendTLSValidation"):
@@ -78,6 +80,8 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1.GatewayStatusAddressApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("GatewayTLSConfig"):
 		return &apisv1.GatewayTLSConfigApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("GRPCAuthConfig"):
+		return &apisv1.GRPCAuthConfigApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("GRPCBackendRef"):
 		return &apisv1.GRPCBackendRefApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("GRPCHeaderMatch"):
@@ -96,10 +100,14 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1.GRPCRouteSpecApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("GRPCRouteStatus"):
 		return &apisv1.GRPCRouteStatusApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("HTTPAuthConfig"):
+		return &apisv1.HTTPAuthConfigApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("HTTPBackendRef"):
 		return &apisv1.HTTPBackendRefApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("HTTPCORSFilter"):
 		return &apisv1.HTTPCORSFilterApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("HTTPExternalAuthFilter"):
+		return &apisv1.HTTPExternalAuthFilterApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("HTTPHeader"):
 		return &apisv1.HTTPHeaderApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("HTTPHeaderFilter"):

@@ -288,6 +288,12 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: lifetimeType
       type:
         scalar: string
+- name: io.k8s.sigs.gateway-api.apis.v1.ForwardBodyConfig
+  map:
+    fields:
+    - name: maxSize
+      type:
+        scalar: numeric
 - name: io.k8s.sigs.gateway-api.apis.v1.Fraction
   map:
     fields:
@@ -310,6 +316,15 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: mode
       type:
         scalar: string
+- name: io.k8s.sigs.gateway-api.apis.v1.GRPCAuthConfig
+  map:
+    fields:
+    - name: allowedHeaders
+      type:
+        list:
+          elementType:
+            scalar: string
+          elementRelationship: associative
 - name: io.k8s.sigs.gateway-api.apis.v1.GRPCBackendRef
   map:
     fields:
@@ -663,6 +678,24 @@ var schemaYAML = typed.YAMLObject(`types:
           elementRelationship: associative
           keys:
           - port
+- name: io.k8s.sigs.gateway-api.apis.v1.HTTPAuthConfig
+  map:
+    fields:
+    - name: allowedHeaders
+      type:
+        list:
+          elementType:
+            scalar: string
+          elementRelationship: associative
+    - name: allowedResponseHeaders
+      type:
+        list:
+          elementType:
+            scalar: string
+          elementRelationship: associative
+    - name: path
+      type:
+        scalar: string
 - name: io.k8s.sigs.gateway-api.apis.v1.HTTPBackendRef
   map:
     fields:
@@ -724,6 +757,25 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: maxAge
       type:
         scalar: numeric
+- name: io.k8s.sigs.gateway-api.apis.v1.HTTPExternalAuthFilter
+  map:
+    fields:
+    - name: backendRef
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1.BackendObjectReference
+      default: {}
+    - name: forwardBody
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1.ForwardBodyConfig
+    - name: grpc
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1.GRPCAuthConfig
+    - name: http
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1.HTTPAuthConfig
+    - name: protocol
+      type:
+        scalar: string
 - name: io.k8s.sigs.gateway-api.apis.v1.HTTPHeader
   map:
     fields:
@@ -871,6 +923,9 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: extensionRef
       type:
         namedType: io.k8s.sigs.gateway-api.apis.v1.LocalObjectReference
+    - name: externalAuth
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1.HTTPExternalAuthFilter
     - name: requestHeaderModifier
       type:
         namedType: io.k8s.sigs.gateway-api.apis.v1.HTTPHeaderFilter

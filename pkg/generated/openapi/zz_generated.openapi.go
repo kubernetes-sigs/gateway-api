@@ -88,8 +88,10 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"sigs.k8s.io/gateway-api/apis/v1.BackendRef":                                      schema_sigsk8sio_gateway_api_apis_v1_BackendRef(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.CommonRouteSpec":                                 schema_sigsk8sio_gateway_api_apis_v1_CommonRouteSpec(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.CookieConfig":                                    schema_sigsk8sio_gateway_api_apis_v1_CookieConfig(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.ForwardBodyConfig":                               schema_sigsk8sio_gateway_api_apis_v1_ForwardBodyConfig(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.Fraction":                                        schema_sigsk8sio_gateway_api_apis_v1_Fraction(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.FrontendTLSValidation":                           schema_sigsk8sio_gateway_api_apis_v1_FrontendTLSValidation(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.GRPCAuthConfig":                                  schema_sigsk8sio_gateway_api_apis_v1_GRPCAuthConfig(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.GRPCBackendRef":                                  schema_sigsk8sio_gateway_api_apis_v1_GRPCBackendRef(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.GRPCHeaderMatch":                                 schema_sigsk8sio_gateway_api_apis_v1_GRPCHeaderMatch(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.GRPCMethodMatch":                                 schema_sigsk8sio_gateway_api_apis_v1_GRPCMethodMatch(ref),
@@ -113,8 +115,10 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"sigs.k8s.io/gateway-api/apis/v1.GatewayStatus":                                   schema_sigsk8sio_gateway_api_apis_v1_GatewayStatus(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.GatewayStatusAddress":                            schema_sigsk8sio_gateway_api_apis_v1_GatewayStatusAddress(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.GatewayTLSConfig":                                schema_sigsk8sio_gateway_api_apis_v1_GatewayTLSConfig(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.HTTPAuthConfig":                                  schema_sigsk8sio_gateway_api_apis_v1_HTTPAuthConfig(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.HTTPBackendRef":                                  schema_sigsk8sio_gateway_api_apis_v1_HTTPBackendRef(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.HTTPCORSFilter":                                  schema_sigsk8sio_gateway_api_apis_v1_HTTPCORSFilter(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.HTTPExternalAuthFilter":                          schema_sigsk8sio_gateway_api_apis_v1_HTTPExternalAuthFilter(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.HTTPHeader":                                      schema_sigsk8sio_gateway_api_apis_v1_HTTPHeader(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.HTTPHeaderFilter":                                schema_sigsk8sio_gateway_api_apis_v1_HTTPHeaderFilter(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.HTTPHeaderMatch":                                 schema_sigsk8sio_gateway_api_apis_v1_HTTPHeaderMatch(ref),
@@ -3063,6 +3067,26 @@ func schema_sigsk8sio_gateway_api_apis_v1_CookieConfig(ref common.ReferenceCallb
 	}
 }
 
+func schema_sigsk8sio_gateway_api_apis_v1_ForwardBodyConfig(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ForwardBody configures if requests to the authorization server should include the body of the client request; and if so, how big that body is allowed to be.\n\nIf empty or unset, do not forward the body.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"maxSize": {
+						SchemaProps: spec.SchemaProps{
+							Description: "MaxSize specifies how large in bytes the largest body that will be buffered and sent to the authorization server. If the body size is larger than `maxSize`, then the body sent to the authorization server must be truncated to `maxSize` bytes.\n\nExperimental note: This behavior needs to be checked against various dataplanes; it may need to be changed. See https://github.com/kubernetes-sigs/gateway-api/pull/4001#discussion_r2291405746 for more.\n\nIf 0, the body will not be sent to the authorization server.",
+							Type:        []string{"integer"},
+							Format:      "int32",
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
 func schema_sigsk8sio_gateway_api_apis_v1_Fraction(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -3128,6 +3152,39 @@ func schema_sigsk8sio_gateway_api_apis_v1_FrontendTLSValidation(ref common.Refer
 		},
 		Dependencies: []string{
 			"sigs.k8s.io/gateway-api/apis/v1.ObjectReference"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apis_v1_GRPCAuthConfig(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "GRPCAuthConfig contains configuration for communication with Auth server backends that speak Envoy's ext_authz gRPC protocol.\n\nRequests and responses are defined in the protobufs explained at: https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/external_auth.proto",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"allowedHeaders": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-type": "set",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "AllowedRequestHeaders specifies what headers from the client request will be sent to the authorization server.\n\nIf this list is empty, then the following headers must be sent:\n\n- `Authorization` - `Location` - `Proxy-Authenticate` - `Set-Cookie` - `WWW-Authenticate`\n\nIf the list has entries, only those entries must be sent.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: "",
+										Type:    []string{"string"},
+										Format:  "",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 }
 
@@ -4298,6 +4355,66 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewayTLSConfig(ref common.ReferenceC
 	}
 }
 
+func schema_sigsk8sio_gateway_api_apis_v1_HTTPAuthConfig(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "HTTPAuthConfig contains configuration for communication with HTTP-speaking backends.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"path": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Path sets the prefix that paths from the client request will have added when forwarded to the authorization server.\n\nWhen empty or unspecified, no prefix is added.\n\nValid values are the same as the \"value\" regex for path values in the `match` stanza, and the validation regex will screen out invalid paths in the same way. Even with the validation, implementations MUST sanitize this input before using it directly.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"allowedHeaders": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-type": "set",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "AllowedRequestHeaders specifies what additional headers from the client request will be sent to the authorization server.\n\nThe following headers must always be sent to the authorization server, regardless of this setting:\n\n* `Host` * `Method` * `Path` * `Content-Length` * `Authorization`\n\nIf this list is empty, then only those headers must be sent.\n\nNote that `Content-Length` has a special behavior, in that the length sent must be correct for the actual request to the external authorization server - that is, it must reflect the actual number of bytes sent in the body of the request to the authorization server.\n\nSo if the `forwardBody` stanza is unset, or `forwardBody.maxSize` is set to `0`, then `Content-Length` must be `0`. If `forwardBody.maxSize` is set to anything other than `0`, then the `Content-Length` of the authorization request must be set to the actual number of bytes forwarded.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: "",
+										Type:    []string{"string"},
+										Format:  "",
+									},
+								},
+							},
+						},
+					},
+					"allowedResponseHeaders": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-type": "set",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "AllowedResponseHeaders specifies what headers from the authorization response will be copied into the request to the backend.\n\nIf this list is empty, then all headers from the authorization server except Authority or Host must be copied.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: "",
+										Type:    []string{"string"},
+										Format:  "",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
 func schema_sigsk8sio_gateway_api_apis_v1_HTTPBackendRef(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -4480,6 +4597,54 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPCORSFilter(ref common.ReferenceCal
 				},
 			},
 		},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apis_v1_HTTPExternalAuthFilter(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "HTTPExternalAuthFilter defines a filter that modifies requests by sending request details to an external authorization server.\n\nSupport: Extended Feature Name: HTTPRouteExternalAuth",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"protocol": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ExternalAuthProtocol describes which protocol to use when communicating with an ext_authz authorization server.\n\nWhen this is set to GRPC, each backend must use the Envoy ext_authz protocol on the port specified in `backendRefs`. Requests and responses are defined in the protobufs explained at: https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/external_auth.proto\n\nWhen this is set to HTTP, each backend must respond with a `200` status code in on a successful authorization. Any other code is considered an authorization failure.\n\nFeature Names: GRPC Support - HTTPRouteExternalAuthGRPC HTTP Support - HTTPRouteExternalAuthHTTP",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"backendRef": {
+						SchemaProps: spec.SchemaProps{
+							Description: "BackendRef is a reference to a backend to send authorization requests to.\n\nThe backend must speak the selected protocol (GRPC or HTTP) on the referenced port.\n\nIf the backend service requires TLS, use BackendTLSPolicy to tell the implementation to supply the TLS details to be used to connect to that backend.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.BackendObjectReference"),
+						},
+					},
+					"grpc": {
+						SchemaProps: spec.SchemaProps{
+							Description: "GRPCAuthConfig contains configuration for communication with ext_authz protocol-speaking backends.\n\nIf unset, implementations must assume the default behavior for each included field is intended.",
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.GRPCAuthConfig"),
+						},
+					},
+					"http": {
+						SchemaProps: spec.SchemaProps{
+							Description: "HTTPAuthConfig contains configuration for communication with HTTP-speaking backends.\n\nIf unset, implementations must assume the default behavior for each included field is intended.",
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.HTTPAuthConfig"),
+						},
+					},
+					"forwardBody": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ForwardBody controls if requests to the authorization server should include the body of the client request; and if so, how big that body is allowed to be.\n\nIt is expected that implementations will buffer the request body up to `forwardBody.maxSize` bytes. Bodies over that size must be rejected with a 4xx series error (413 or 403 are common examples), and fail processing of the filter.\n\nIf unset, or `forwardBody.maxSize` is set to `0`, then the body will not be forwarded.\n\nFeature Name: HTTPRouteExternalAuthForwardBody",
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.ForwardBodyConfig"),
+						},
+					},
+				},
+				Required: []string{"protocol", "backendRef"},
+			},
+		},
+		Dependencies: []string{
+			"sigs.k8s.io/gateway-api/apis/v1.BackendObjectReference", "sigs.k8s.io/gateway-api/apis/v1.ForwardBodyConfig", "sigs.k8s.io/gateway-api/apis/v1.GRPCAuthConfig", "sigs.k8s.io/gateway-api/apis/v1.HTTPAuthConfig"},
 	}
 }
 
@@ -4873,7 +5038,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteFilter(ref common.ReferenceCa
 				Properties: map[string]spec.Schema{
 					"type": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Type identifies the type of filter to apply. As with other API fields, types are classified into three conformance levels:\n\n- Core: Filter types and their corresponding configuration defined by\n  \"Support: Core\" in this package, e.g. \"RequestHeaderModifier\". All\n  implementations must support core filters.\n\n- Extended: Filter types and their corresponding configuration defined by\n  \"Support: Extended\" in this package, e.g. \"RequestMirror\". Implementers\n  are encouraged to support extended filters.\n\n- Implementation-specific: Filters that are defined and supported by\n  specific vendors.\n  In the future, filters showing convergence in behavior across multiple\n  implementations will be considered for inclusion in extended or core\n  conformance levels. Filter-specific configuration for such filters\n  is specified using the ExtensionRef field. `Type` should be set to\n  \"ExtensionRef\" for custom filters.\n\nImplementers are encouraged to define custom implementation types to extend the core API with implementation-specific behavior.\n\nIf a reference to a custom filter type cannot be resolved, the filter MUST NOT be skipped. Instead, requests that would have been processed by that filter MUST receive a HTTP error response.\n\nNote that values may be added to this enum, implementations must ensure that unknown values will not cause a crash.\n\nUnknown values here must result in the implementation setting the Accepted Condition for the Route to `status: False`, with a Reason of `UnsupportedValue`.\n\n<gateway:experimental:validation:Enum=RequestHeaderModifier;ResponseHeaderModifier;RequestMirror;RequestRedirect;URLRewrite;ExtensionRef;CORS>",
+							Description: "Type identifies the type of filter to apply. As with other API fields, types are classified into three conformance levels:\n\n- Core: Filter types and their corresponding configuration defined by\n  \"Support: Core\" in this package, e.g. \"RequestHeaderModifier\". All\n  implementations must support core filters.\n\n- Extended: Filter types and their corresponding configuration defined by\n  \"Support: Extended\" in this package, e.g. \"RequestMirror\". Implementers\n  are encouraged to support extended filters.\n\n- Implementation-specific: Filters that are defined and supported by\n  specific vendors.\n  In the future, filters showing convergence in behavior across multiple\n  implementations will be considered for inclusion in extended or core\n  conformance levels. Filter-specific configuration for such filters\n  is specified using the ExtensionRef field. `Type` should be set to\n  \"ExtensionRef\" for custom filters.\n\nImplementers are encouraged to define custom implementation types to extend the core API with implementation-specific behavior.\n\nIf a reference to a custom filter type cannot be resolved, the filter MUST NOT be skipped. Instead, requests that would have been processed by that filter MUST receive a HTTP error response.\n\nNote that values may be added to this enum, implementations must ensure that unknown values will not cause a crash.\n\nUnknown values here must result in the implementation setting the Accepted Condition for the Route to `status: False`, with a Reason of `UnsupportedValue`.\n\n<gateway:experimental:validation:Enum=RequestHeaderModifier;ResponseHeaderModifier;RequestMirror;RequestRedirect;URLRewrite;ExtensionRef;CORS;ExternalAuth>",
 							Default:     "",
 							Type:        []string{"string"},
 							Format:      "",
@@ -4915,6 +5080,12 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteFilter(ref common.ReferenceCa
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.HTTPCORSFilter"),
 						},
 					},
+					"externalAuth": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ExternalAuth configures settings related to sending request details to an external auth service. The external service MUST authenticate the request, and MAY authorize the request as well.\n\nIf there is any problem communicating with the external service, this filter MUST fail closed.\n\nSupport: Extended\n\n<gateway:experimental>",
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.HTTPExternalAuthFilter"),
+						},
+					},
 					"extensionRef": {
 						SchemaProps: spec.SchemaProps{
 							Description: "ExtensionRef is an optional, implementation-specific extension to the \"filter\" behavior.  For example, resource \"myroutefilter\" in group \"networking.example.net\"). ExtensionRef MUST NOT be used for core and extended filters.\n\nThis filter can be used multiple times within the same rule.\n\nSupport: Implementation-specific",
@@ -4926,7 +5097,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteFilter(ref common.ReferenceCa
 			},
 		},
 		Dependencies: []string{
-			"sigs.k8s.io/gateway-api/apis/v1.HTTPCORSFilter", "sigs.k8s.io/gateway-api/apis/v1.HTTPHeaderFilter", "sigs.k8s.io/gateway-api/apis/v1.HTTPRequestMirrorFilter", "sigs.k8s.io/gateway-api/apis/v1.HTTPRequestRedirectFilter", "sigs.k8s.io/gateway-api/apis/v1.HTTPURLRewriteFilter", "sigs.k8s.io/gateway-api/apis/v1.LocalObjectReference"},
+			"sigs.k8s.io/gateway-api/apis/v1.HTTPCORSFilter", "sigs.k8s.io/gateway-api/apis/v1.HTTPExternalAuthFilter", "sigs.k8s.io/gateway-api/apis/v1.HTTPHeaderFilter", "sigs.k8s.io/gateway-api/apis/v1.HTTPRequestMirrorFilter", "sigs.k8s.io/gateway-api/apis/v1.HTTPRequestRedirectFilter", "sigs.k8s.io/gateway-api/apis/v1.HTTPURLRewriteFilter", "sigs.k8s.io/gateway-api/apis/v1.LocalObjectReference"},
 	}
 }
 

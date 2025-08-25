@@ -568,3 +568,49 @@ func TestHTTPRequestMirrorFilterExperimental(t *testing.T) {
 		})
 	}
 }
+
+func TestHTTPExternalAuthFilterExperimental(t *testing.T) {
+	tests := []struct {
+		name       string
+		wantErrors []string
+		rules      []gatewayv1.HTTPRouteRule
+	}{
+		{
+			name:       "HTTPRoute - Invalid because protocol is GRPC without GRPC config",
+			wantErrors: []string{"grpc must be specified when protocol is set to 'GRPC'"},
+			rules: []gatewayv1.HTTPRouteRule{{
+				Filters: []gatewayv1.HTTPRouteFilter{{
+					Type: gatewayv1.HTTPRouteFilterExternalAuth,
+					ExternalAuth: &gatewayv1.HTTPExternalAuthFilter{
+						ExternalAuthProtocol: gatewayv1.HTTPRouteExternalAuthGRPCProtocol,
+					},
+				}},
+			}},
+		},
+		{
+			name:       "HTTPRoute - Invalid because protocol is HTTP without HTTP config",
+			wantErrors: []string{"http must be specified when protocol is set to 'HTTP'"},
+			rules: []gatewayv1.HTTPRouteRule{{
+				Filters: []gatewayv1.HTTPRouteFilter{{
+					Type: gatewayv1.HTTPRouteFilterExternalAuth,
+					ExternalAuth: &gatewayv1.HTTPExternalAuthFilter{
+						ExternalAuthProtocol: gatewayv1.HTTPRouteExternalAuthHTTPProtocol,
+					},
+				}},
+			}},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			route := &gatewayv1.HTTPRoute{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      fmt.Sprintf("foo-%v", time.Now().UnixNano()),
+					Namespace: metav1.NamespaceDefault,
+				},
+				Spec: gatewayv1.HTTPRouteSpec{Rules: tc.rules},
+			}
+			validateHTTPRoute(t, route, tc.wantErrors)
+		})
+	}
+
+}

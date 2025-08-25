@@ -804,6 +804,8 @@ type HTTPRouteMatch struct {
 // +kubebuilder:validation:XValidation:message="filter.urlRewrite must be specified for URLRewrite filter.type",rule="!(!has(self.urlRewrite) && self.type == 'URLRewrite')"
 // <gateway:experimental:validation:XValidation:message="filter.cors must be nil if the filter.type is not CORS",rule="!(has(self.cors) && self.type != 'CORS')">
 // <gateway:experimental:validation:XValidation:message="filter.cors must be specified for CORS filter.type",rule="!(!has(self.cors) && self.type == 'CORS')">
+// <gateway:experimental:validation:XValidation:message="filter.externalAuth must be nil if the filter.type is not ExternalAuth",rule="!(has(self.externalAuth) && self.type != 'ExternalAuth')">
+// <gateway:experimental:validation:XValidation:message="filter.externalAuth must be specified for ExternalAuth filter.type",rule="!(!has(self.externalAuth) && self.type == 'ExternalAuth')">
 // +kubebuilder:validation:XValidation:message="filter.extensionRef must be nil if the filter.type is not ExtensionRef",rule="!(has(self.extensionRef) && self.type != 'ExtensionRef')"
 // +kubebuilder:validation:XValidation:message="filter.extensionRef must be specified for ExtensionRef filter.type",rule="!(!has(self.extensionRef) && self.type == 'ExtensionRef')"
 type HTTPRouteFilter struct {
@@ -842,7 +844,7 @@ type HTTPRouteFilter struct {
 	//
 	// +unionDiscriminator
 	// +kubebuilder:validation:Enum=RequestHeaderModifier;ResponseHeaderModifier;RequestMirror;RequestRedirect;URLRewrite;ExtensionRef
-	// <gateway:experimental:validation:Enum=RequestHeaderModifier;ResponseHeaderModifier;RequestMirror;RequestRedirect;URLRewrite;ExtensionRef;CORS>
+	// <gateway:experimental:validation:Enum=RequestHeaderModifier;ResponseHeaderModifier;RequestMirror;RequestRedirect;URLRewrite;ExtensionRef;CORS;ExternalAuth>
 	// +required
 	Type HTTPRouteFilterType `json:"type"`
 
@@ -900,6 +902,19 @@ type HTTPRouteFilter struct {
 	// +optional
 	// <gateway:experimental>
 	CORS *HTTPCORSFilter `json:"cors,omitempty"`
+
+	// ExternalAuth configures settings related to sending request details
+	// to an external auth service. The external service MUST authenticate
+	// the request, and MAY authorize the request as well.
+	//
+	// If there is any problem communicating with the external service,
+	// this filter MUST fail closed.
+	//
+	// Support: Extended
+	//
+	// +optional
+	// <gateway:experimental>
+	ExternalAuth *HTTPExternalAuthFilter `json:"externalAuth,omitempty"`
 
 	// ExtensionRef is an optional, implementation-specific extension to the
 	// "filter" behavior.  For example, resource "myroutefilter" in group
@@ -971,6 +986,18 @@ const (
 	// Support in HTTPBackendRef: Extended
 	// <gateway:experimental>
 	HTTPRouteFilterCORS HTTPRouteFilterType = "CORS"
+
+	// HTTPRouteFilterExternalAuth can be used to configure a Gateway implementation
+	// to call out to an external Auth server, which MUST perform Authentication
+	// and MAY perform Authorization on the matched request before the request
+	// is forwarded to the backend.
+	//
+	// Support in HTTPRouteRule: Extended
+	//
+	// Feature Name: HTTPRouteExternalAuth
+	//
+	// <gateway:experimental>
+	HTTPRouteFilterExternalAuth HTTPRouteFilterType = "ExternalAuth"
 
 	// HTTPRouteFilterExtensionRef should be used for configuring custom
 	// HTTP filters.
@@ -1534,6 +1561,203 @@ type HTTPCORSFilter struct {
 	// +kubebuilder:default=5
 	// +kubebuilder:validation:Minimum=1
 	MaxAge int32 `json:"maxAge,omitempty"`
+}
+
+// HTTPRouteExternalAuthProtcol specifies what protocol should be used
+// for communicating with an external authorization server.
+//
+// Valid values are supplied as constants below.
+type HTTPRouteExternalAuthProtocol string
+
+const (
+	HTTPRouteExternalAuthGRPCProtocol HTTPRouteExternalAuthProtocol = "GRPC"
+	HTTPRouteExternalAuthHTTPProtocol HTTPRouteExternalAuthProtocol = "HTTP"
+)
+
+// HTTPExternalAuthFilter defines a filter that modifies requests by sending
+// request details to an external authorization server.
+//
+// Support: Extended
+// Feature Name: HTTPRouteExternalAuth
+// +kubebuilder:validation:XValidation:message="grpc must be specified when protocol is set to 'GRPC'",rule="self.protocol == 'GRPC' ? has(self.grpc) : true"
+// +kubebuilder:validation:XValidation:message="protocol must be 'GRPC' when grpc is set",rule="has(self.grpc) ? self.protocol == 'GRPC' : true"
+// +kubebuilder:validation:XValidation:message="http must be specified when protocol is set to 'HTTP'",rule="self.protocol == 'HTTP' ? has(self.http) : true"
+// +kubebuilder:validation:XValidation:message="protocol must be 'HTTP' when http is set",rule="has(self.http) ? self.protocol == 'HTTP' : true"
+type HTTPExternalAuthFilter struct {
+	// ExternalAuthProtocol describes which protocol to use when communicating with an
+	// ext_authz authorization server.
+	//
+	// When this is set to GRPC, each backend must use the Envoy ext_authz protocol
+	// on the port specified in `backendRefs`. Requests and responses are defined
+	// in the protobufs explained at:
+	// https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/external_auth.proto
+	//
+	// When this is set to HTTP, each backend must respond with a `200` status
+	// code in on a successful authorization. Any other code is considered
+	// an authorization failure.
+	//
+	// Feature Names:
+	// GRPC Support - HTTPRouteExternalAuthGRPC
+	// HTTP Support - HTTPRouteExternalAuthHTTP
+	//
+	// +unionDiscriminator
+	// +required
+	// +kubebuilder:validation:Enum=HTTP;GRPC
+	ExternalAuthProtocol HTTPRouteExternalAuthProtocol `json:"protocol,omitempty"`
+
+	// BackendRef is a reference to a backend to send authorization
+	// requests to.
+	//
+	// The backend must speak the selected protocol (GRPC or HTTP) on the
+	// referenced port.
+	//
+	// If the backend service requires TLS, use BackendTLSPolicy to tell the
+	// implementation to supply the TLS details to be used to connect to that
+	// backend.
+	//
+	// +required
+	BackendRef BackendObjectReference `json:"backendRef,omitempty"`
+
+	// GRPCAuthConfig contains configuration for communication with ext_authz
+	// protocol-speaking backends.
+	//
+	// If unset, implementations must assume the default behavior for each
+	// included field is intended.
+	//
+	// +optional
+	GRPCAuthConfig *GRPCAuthConfig `json:"grpc,omitempty"`
+
+	// HTTPAuthConfig contains configuration for communication with HTTP-speaking
+	// backends.
+	//
+	// If unset, implementations must assume the default behavior for each
+	// included field is intended.
+	//
+	// +optional
+	HTTPAuthConfig *HTTPAuthConfig `json:"http,omitempty"`
+
+	// ForwardBody controls if requests to the authorization server should include
+	// the body of the client request; and if so, how big that body is allowed
+	// to be.
+	//
+	// It is expected that implementations will buffer the request body up to
+	// `forwardBody.maxSize` bytes. Bodies over that size must be rejected with a
+	// 4xx series error (413 or 403 are common examples), and fail processing
+	// of the filter.
+	//
+	// If unset, or `forwardBody.maxSize` is set to `0`, then the body will not
+	// be forwarded.
+	//
+	// Feature Name: HTTPRouteExternalAuthForwardBody
+	//
+	//
+	// +optional
+	ForwardBody *ForwardBodyConfig `json:"forwardBody,omitempty"`
+}
+
+// GRPCAuthConfig contains configuration for communication with Auth server
+// backends that speak Envoy's ext_authz gRPC protocol.
+//
+// Requests and responses are defined in the protobufs explained at:
+// https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/external_auth.proto
+type GRPCAuthConfig struct {
+	// AllowedRequestHeaders specifies what headers from the client request
+	// will be sent to the authorization server.
+	//
+	// If this list is empty, then the following headers must be sent:
+	//
+	// - `Authorization`
+	// - `Location`
+	// - `Proxy-Authenticate`
+	// - `Set-Cookie`
+	// - `WWW-Authenticate`
+	//
+	// If the list has entries, only those entries must be sent.
+	//
+	// +optional
+	// +listType=set
+	// +kubebuilder:validation:MaxLength=64
+	AllowedRequestHeaders []string `json:"allowedHeaders,omitempty"`
+}
+
+// HTTPAuthConfig contains configuration for communication with HTTP-speaking
+// backends.
+type HTTPAuthConfig struct {
+	// Path sets the prefix that paths from the client request will have added
+	// when forwarded to the authorization server.
+	//
+	// When empty or unspecified, no prefix is added.
+	//
+	// Valid values are the same as the "value" regex for path values in the `match`
+	// stanza, and the validation regex will screen out invalid paths in the same way.
+	// Even with the validation, implementations MUST sanitize this input before using it
+	// directly.
+	//
+	// +optional
+	// +kubebuilder:validation:MaxLength=1024
+	// +kubebuilder:validation:Pattern="^(?:[-A-Za-z0-9/._~!$&'()*+,;=:@]|[%][0-9a-fA-F]{2})+$"
+	Path string `json:"path,omitempty"`
+
+	// AllowedRequestHeaders specifies what additional headers from the client request
+	// will be sent to the authorization server.
+	//
+	// The following headers must always be sent to the authorization server,
+	// regardless of this setting:
+	//
+	// * `Host`
+	// * `Method`
+	// * `Path`
+	// * `Content-Length`
+	// * `Authorization`
+	//
+	// If this list is empty, then only those headers must be sent.
+	//
+	// Note that `Content-Length` has a special behavior, in that the length
+	// sent must be correct for the actual request to the external authorization
+	// server - that is, it must reflect the actual number of bytes sent in the
+	// body of the request to the authorization server.
+	//
+	// So if the `forwardBody` stanza is unset, or `forwardBody.maxSize` is set
+	// to `0`, then `Content-Length` must be `0`. If `forwardBody.maxSize` is set
+	// to anything other than `0`, then the `Content-Length` of the authorization
+	// request must be set to the actual number of bytes forwarded.
+	//
+	// +optional
+	// +listType=set
+	// +kubebuilder:validation:MaxLength=64
+	AllowedRequestHeaders []string `json:"allowedHeaders,omitempty"`
+
+	// AllowedResponseHeaders specifies what headers from the authorization response
+	// will be copied into the request to the backend.
+	//
+	// If this list is empty, then all headers from the authorization server
+	// except Authority or Host must be copied.
+	//
+	// +optional
+	// +listType=set
+	// +kubebuilder:validation:MaxLength=64
+	AllowedResponseHeaders []string `json:"allowedResponseHeaders,omitempty"`
+}
+
+// ForwardBody configures if requests to the authorization server should include
+// the body of the client request; and if so, how big that body is allowed
+// to be.
+//
+// If empty or unset, do not forward the body.
+type ForwardBodyConfig struct {
+	// MaxSize specifies how large in bytes the largest body that will be buffered
+	// and sent to the authorization server. If the body size is larger than
+	// `maxSize`, then the body sent to the authorization server must be
+	// truncated to `maxSize` bytes.
+	//
+	// Experimental note: This behavior needs to be checked against
+	// various dataplanes; it may need to be changed.
+	// See https://github.com/kubernetes-sigs/gateway-api/pull/4001#discussion_r2291405746
+	// for more.
+	//
+	// If 0, the body will not be sent to the authorization server.
+	// +optional
+	MaxSize uint16 `json:"maxSize,omitempty"`
 }
 
 // HTTPBackendRef defines how a HTTPRoute forwards a HTTP request.
