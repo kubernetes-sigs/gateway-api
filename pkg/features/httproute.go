@@ -102,7 +102,7 @@ const (
 	SupportHTTPRouteNamedRouteRule FeatureName = "HTTPRouteNamedRouteRule"
 
 	// This option indicates support for the cors filter in the HTTPRouteFilter (extended conformance)
-	SupportHTTPRouteCORS FeatureName = "HTTPRouteNamedRouteRule"
+	SupportHTTPRouteCORS FeatureName = "HTTPRouteCORS"
 )
 
 var (
