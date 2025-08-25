@@ -20,11 +20,11 @@ import (
 	"testing"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
 	"k8s.io/apimachinery/pkg/types"
 
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/gateway-api/apis/v1alpha2"
+	"sigs.k8s.io/gateway-api/apis/v1alpha3"
 	h "sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
@@ -54,20 +54,20 @@ var BackendTLSPolicy = suite.ConformanceTest{
 		gwAddr := kubernetes.GatewayAndRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), &gatewayv1.HTTPRoute{}, false, routeNN)
 		kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN)
 
-		policyCond := metav1.Condition{
+		acceptedCond := metav1.Condition{
 			Type:   string(v1alpha2.PolicyConditionAccepted),
 			Status: metav1.ConditionTrue,
 			Reason: string(v1alpha2.PolicyReasonAccepted),
 		}
+		resolvedRefsCond := metav1.Condition{
+			Type:   string(v1alpha3.BackendTLSPolicyConditionResolvedRefs),
+			Status: metav1.ConditionTrue,
+			Reason: string(v1alpha3.BackendTLSPolicyReasonResolvedRefs),
+		}
 
 		validPolicyNN := types.NamespacedName{Name: "normative-test-backendtlspolicy", Namespace: ns}
-		kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, validPolicyNN, gwNN, policyCond)
-
-		invalidPolicyNN := types.NamespacedName{Name: "backendtlspolicy-host-mismatch", Namespace: ns}
-		kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, invalidPolicyNN, gwNN, policyCond)
-
-		invalidCertPolicyNN := types.NamespacedName{Name: "backendtlspolicy-cert-mismatch", Namespace: ns}
-		kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, invalidCertPolicyNN, gwNN, policyCond)
+		kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, validPolicyNN, gwNN, acceptedCond)
+		kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, validPolicyNN, gwNN, resolvedRefsCond)
 
 		serverStr := "abc.example.com"
 
@@ -107,6 +107,10 @@ var BackendTLSPolicy = suite.ConformanceTest{
 
 		// Verify that the request sent to a Service targeted by a BackendTLSPolicy with mismatched host will fail.
 		t.Run("HTTP request sent to Service targeted by BackendTLSPolicy with mismatched hostname should return an HTTP error", func(t *testing.T) {
+			invalidPolicyNN := types.NamespacedName{Name: "backendtlspolicy-host-mismatch", Namespace: ns}
+			kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, invalidPolicyNN, gwNN, acceptedCond)
+			kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, invalidPolicyNN, gwNN, resolvedRefsCond)
+
 			h.MakeRequestAndExpectFailure(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr,
 				h.ExpectedResponse{
 					Namespace: ns,
@@ -120,6 +124,10 @@ var BackendTLSPolicy = suite.ConformanceTest{
 
 		// Verify that request sent to Service targeted by BackendTLSPolicy with mismatched cert should failed.
 		t.Run("HTTP request send to Service targeted by BackendTLSPolicy with mismatched cert should return HTTP error", func(t *testing.T) {
+			invalidCertPolicyNN := types.NamespacedName{Name: "backendtlspolicy-cert-mismatch", Namespace: ns}
+			kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, invalidCertPolicyNN, gwNN, acceptedCond)
+			kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, invalidCertPolicyNN, gwNN, resolvedRefsCond)
+
 			h.MakeRequestAndExpectFailure(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr,
 				h.ExpectedResponse{
 					Namespace: ns,
