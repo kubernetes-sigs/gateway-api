@@ -1003,7 +1003,7 @@ func BackendTLSPolicyMustHaveCondition(t *testing.T, client client.Client, timeo
 		policy := &v1alpha3.BackendTLSPolicy{}
 		err := client.Get(ctx, policyNN, policy)
 		if err != nil {
-			return false, fmt.Errorf("error fetching BackendTLSPolicy: %w", err)
+			return false, fmt.Errorf("error fetching BackendTLSPolicy %v err: %w", policyNN, err)
 		}
 
 		for _, parent := range policy.Status.Ancestors {
@@ -1024,7 +1024,7 @@ func BackendTLSPolicyMustHaveCondition(t *testing.T, client client.Client, timeo
 		return false, nil
 	})
 
-	require.NoErrorf(t, waitErr, "error waiting for BackendTLSPolicy status to have a Condition %v", condition)
+	require.NoErrorf(t, waitErr, "error waiting for BackendTLSPolicy %v status to have a Condition %v", policyNN, condition)
 }
 
 // BackendTLSPolicyMustHaveLatestConditions will fail the test if there are

@@ -27,6 +27,7 @@ import (
 	"io"
 	"math/big"
 	"net"
+	"net/url"
 	"strings"
 	"testing"
 	"time"
@@ -119,6 +120,8 @@ func generateRSACert(hosts []string, keyOut, certOut io.Writer, ca *x509.Certifi
 			template.IPAddresses = append(template.IPAddresses, ip)
 		} else if err = validateHost(h); err == nil {
 			template.DNSNames = append(template.DNSNames, h)
+		} else if u, parseErr := url.Parse(h); parseErr == nil {
+			template.URIs = append(template.URIs, u)
 		}
 	}
 
@@ -215,6 +218,8 @@ func generateCACert(hosts []string) (*x509.Certificate, []byte, *rsa.PrivateKey,
 			ca.IPAddresses = append(ca.IPAddresses, ip)
 		} else if err := validateHost(h); err == nil {
 			ca.DNSNames = append(ca.DNSNames, h)
+		} else if u, err := url.Parse(h); err == nil {
+			ca.URIs = append(ca.URIs, u)
 		}
 	}
 
