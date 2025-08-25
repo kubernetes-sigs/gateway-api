@@ -261,15 +261,15 @@ Documentation to deploy and use AKO Gateway API can be found at [Avi Kubernetes 
 
 ### Cilium
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.0.0-Cilium-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.0.0/cilium)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.3.0-Cilium-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.3.0/cilium-cilium)
 
 [Cilium][cilium] is an eBPF-based networking, observability and security
 solution for Kubernetes and other networking environments. It includes [Cilium
 Service Mesh][cilium-service-mesh], a highly efficient mesh data plane that can
 be run in [sidecarless mode][cilium-sidecarless] to dramatically improve
 performance, and avoid the operational complexity of sidecars. Cilium also
-supports the sidecar proxy model, offering choice to users. As of [Cilium 1.14][cilium114blog],
-Cilium supports Gateway API, passing conformance for v0.7.1.
+supports the sidecar proxy model, offering choice to users.
+Cilium supports Gateway API, passing conformance for v1.3.0 as of [Cilium 1.18][cilium118blog].
 
 Cilium is open source and is a CNCF Graduated project.
 
@@ -280,7 +280,7 @@ effort, check out the #development channel or join our [weekly developer meeting
 [cilium]:https://cilium.io
 [cilium-service-mesh]:https://docs.cilium.io/en/stable/gettingstarted/#service-mesh
 [cilium-sidecarless]:https://isovalent.com/blog/post/cilium-service-mesh/
-[cilium114blog]:https://isovalent.com/blog/post/cilium-release-114/
+[cilium118blog]:https://isovalent.com/blog/post/cilium-1-18/#service-mesh-gateway-api
 [cilium-slack]:https://cilium.io/slack
 [cilium-meeting]:https://github.com/cilium/cilium#weekly-developer-meeting
 
