@@ -49,9 +49,9 @@ Istio, Linkerd, and Cilium all support identity-aware authorization via vendored
 
 ## API
 
-This GEP introduces a new policy resource, `AuthorizationPolicy`, for **identity-based** authorization. The policy defines a target, a single action (to begin with - `ALLOW`, and will likely add `DENY` in future iterations), and a set of rules that include sources (the “who”) and an optional port attribute.
+This GEP introduces a new policy resource, `AuthorizationPolicy`, for **identity-based** authorization. The policy defines a target, a single `ALLOW`, and a set of rules that include sources (the “who”) and an optional port attribute.
 
-This GEP has also a comprehensive Future Enhancement section to discuss L7 support within this policy.
+This GEP does not define support for L7 authorization policy (see the [Future Enhancement](#future-enhancements) section to for more information).
 
 ### Policy Rules
 
@@ -68,15 +68,9 @@ A rule may specify:
 
 ### Policy Actions
 
-Note: GAMMA leads met on 24th July 2025, and agreed that DENY is not going to be in scope for the initial iteration and will _potentially_ be added later.
+The only currently-defined policy action is `ALLOW`. A request is allowed if and only if it matches at least one rule in any ALLOW policy targeting the workload.
 
-  * An **ALLOW** policy is permissive.
-  * A request is allowed if:
-    * It matches at least one rule in any ALLOW policy targeting the workload
-
-  * If no ALLOW policy exists for a workload, traffic is permitted by default.
-
-See [#ALLOW and DENY](#allow-and-deny-policies) for interaction with DENY and how above semantics is slightly changed with the presence of DENY policies.
+If no authorization policies exist for a workload, traffic is permitted by default.
 
 ### Target of Authorization
 
@@ -117,10 +111,10 @@ Before we are jumping into the options, lets start with some background.
 
 #### Label Selectors
 
-<!-- TOOD add a link to future l7 enhancement -->
-This GEP is focused on L4 only, for which LabelSelectors is widely supported, across all implementations. The future l7 enhancement gets into more background, complications, and recommended solution for incorporating L7 support to this policy.
+Given these challenges, this GEP focuses on L4 only, leaving L7 authorization policy is for potential future work.
+Since Label selectors are widely supported by all implementations for L4 authorization, we will begin with a `LabelSelector` inside targetRef to allow targeting a set of pods.
 
-We add support for `LabelSelector` inside targetRef to allow targeting set of pods.
+The [Future-Enhancements](#future-enhancements) section of this GEP gets into more background, complications, and recommended solution for incorporating L7 support to this policy.
 
 **Benefits:**
 
@@ -269,7 +263,7 @@ Note: The whole point of this Enum is to encourage explicitness, we **do not** w
 // This field clarifies policy intent and informs where enforcement is expected
 // to happen. It also enables implementation-specific validation and behavior.
 //
-// +kubebuilder:validation:Enum=Network;Application
+// +kubebuilder:validation:Enum=Network;
 type EnforcementLevel string
 ```
 
@@ -347,10 +341,10 @@ type AuthorizationRule struct {
 //
 // If this struct is omitted in a rule, it matches any source.
 //
-// NOTE: In the future, if there’s a need to express more complex
+// <gateway:util:excludeFromCRD> NOTE: In the future, if there’s a need to express more complex
 // logical conditions (e.g. requiring a request to match multiple
 // criteria simultaneously—logical AND), we may evolve this API
-// to support richer match expressions or logical operators.
+// to support richer match expressions or logical operators. </gateway:util:excludeFromCRD>
 type Source struct {
 
     // Identities specifies a list of identities that are matched by this rule.
@@ -418,8 +412,7 @@ type AuthorizationNetworkAttributes struct {
 
 ```
 
-Note: Existing AuthorizationAPIs recognized the need to support negation fields like `not{field}`. To avoid duplicating fields with negation, we plan to support richer match expressions for fields in `AuthorizationSource` such as `matchExpressions: { operator: In|NotIn, values: []}`.
-
+Note: More advanced logic like negation or explicit Boolean operations is left for potential future work.
 
 ## Future Enhancements
 
@@ -456,13 +449,12 @@ TBD exact FeatureNames.
 
 ## Appendix
 
-
 ### State of the World
 
 | Aspect | Istio | Linkerd | Cilium |
 | ----- | ----- | ----- | ----- |
 | **Policy CRDs** | `AuthorizationPolicy` (APIs `security.istio.io/v1`) | `AuthorizationPolicy` (CRD `policy.linkerd.io/v1alpha1`), plus supporting CRDs (`Server`, `HTTPRoute`, `MeshTLSAuthentication`) | `CiliumNetworkPolicy` and `CiliumClusterwideNetworkPolicy` (superset of K8s NetworkPolicy) |
-| **Identity model** | Identities derived from mTLS peer certificates (bound to SA): <ul><li>SPIFFE-like principal `<trust-domain>/ns/<namespace>/sa/<serviceaccount>`. </li> <li>ServiceAccount name </li> <li>Namespaces</li></ul></br> identity within JWT derived from `request.auth.principal`<br/><br/>IPBlocks and x-forwarded-for ipBlocks | Identities derived from mTLS peer certificates (bound to SA trust domain `identity.linkerd.cluster.local`. Policies reference Serviceaccounts or explicit mesh identities (e.g. `webapp.identity.linkerd.cluster.local`). <br/><br/>Policies use `requiredAuthenticationRefs` to reference the entities who get authorization. This is a list of targetRefs and it can include: <ul><li>ServiceAccounts</li> <li>`MeshTLSAuthentication` - which represents a set of mesh identities either with a mesh identities strings or reference to serviceAccounts</li> <li>`NetworkAuthentication` - represents sets of IPs or subnets.</li></ul>  |Cilium service mesh can leverage SPIFFE identities in certs that are used for handshake. These SPIFFEE identities are mapped to CiliumIdentities. You can read more about cilium identities in [CiliumIdentity](#CiliumIdentity). <br/><br/>Policies target abstractions like Serviceaccounts in the form of labels, pod labels, namespace label, node selectors, CIDR blocks and Cilium predefined [entities](https://docs.cilium.io/en/stable/security/policy/language/#entities-based). All policy targeting is coalesced by Cilium into one or more Cilium Identities for translation into the BPF datapath|
+| **Identity model** | Identities derived from mTLS peer certificates (bound to SA): <ul><li>SPIFFE-like principal `<trust-domain>/ns/<namespace>/sa/<serviceaccount>`. </li> <li>ServiceAccount name </li> <li>Namespaces</li></ul></br> identity within JWT derived from `request.auth.principal`<br/><br/>IPBlocks and x-forwarded-for ipBlocks | Identities derived from mTLS peer certificates (bound to SA trust domain `identity.linkerd.cluster.local`. Policies reference Serviceaccounts or explicit mesh identities (e.g. `webapp.identity.linkerd.cluster.local`). <br/><br/>Policies use `requiredAuthenticationRefs` to reference the entities who get authorization. This is a list of targetRefs and it can include: <ul><li>ServiceAccounts</li> <li>`MeshTLSAuthentication` - which represents a set of mesh identities either with a mesh identities strings or reference to serviceAccounts</li> <li>`NetworkAuthentication` - represents sets of IPs or subnets.</li></ul>  |Cilium service mesh can leverage SPIFFE identities in certs that are used for handshake. These SPIFFEE identities are mapped to CiliumIdentities. You can read more about cilium identities in [CiliumIdentity](#ciliumidentity). <br/><br/>Policies target abstractions like Serviceaccounts in the form of labels, pod labels, namespace label, node selectors, CIDR blocks and Cilium predefined [entities](https://docs.cilium.io/en/stable/security/policy/language/#entities-based). All policy targeting is coalesced by Cilium into one or more Cilium Identities for translation into the BPF datapath|
 | **Enforcement** | For Istio with sidecars - a proxy on each pod. For ambient, ztunnel node agent enforces mTLS based L4 authorization, L7 authorization is being enforced in waypoints if any. <br/><br/> Istio supports ALLOW, DENY, CUSTOM (often used for external authorization), and AUDIT. DENY policies in istio's context are used to enforce higher priority deny policies. The allow semantics is that whatever is not allowed explicitly (and assuming there is any policy for the same match) is implicitly denied  | Linkerd data-plane proxy (injected into each pod). The proxy enforces policies via mTLS identity checks. <br/><br/> Linkerd supports AUDIT and ALLOW. There is not DENY policies, whats not allowed (and assuming there is any policy for the same match) is implicitly denied. | For L3/4 Ingress Rules, CiliumNetworkPolicy enforcement - an eBPF-based datapath in the Linux kernel on the destination node. If L7 http rules are specified, the packet is redirected for a node-local envoy for further enforcement.<br/><br/>Cilium supports ALLOW and DENY semantics - all policies generate audit logs. <br/><br/>Cilium service mesh also offers a kind of AuthN where a Cilium agent on the src node validates a workloads SPIFFE identity by talking to another agent on the destination node, performing the initial TLS handshake to do authentication.|
 | **Request Match criteria** | Policies can target a group of pods using label selector, a Gateway/Service (this means targeting a waypoint proxy) or a GatewayClass - meaning all the gateways created from this class.  Policies without a label selector in a namespace implies the whole namespace is targeted. <br/><br/> Fine-grained L7 and L4 matching: HTTP/gRPC methods, paths, headers, ports, SNI, etc.Policies use logical OR over rules. <br/><br/>All match criterias are inline in the policy. See https://istio.io/latest/docs/reference/config/security/authorization-policy/#Rule-To and https://istio.io/latest/docs/reference/config/security/authorization-policy/#Rule-when | Policies can target: <ul><li>A `Server` which describes a set of pods (using fancy label match expressions), and a single port on those pods.</li> <li>A user can optionally restrict the authorization to a smaller subset of the traffic by targeting an HTTPRoute. (TODO: any plans to support sectionNames?)</li> <li> A namespace - this indicates that the policy applies to all traffic to all Servers and HTTPRoutes defined in the namespace.</li></ul> Note: We leave `ServerAuthorization` outside the scope as it planned to be deprecated (per linkerd website)  | Policies can target groups of pods using label selector (`endpointSelector`), or by node-labels (`nodeSelector`). Cilium supports L7 via built-in HTTP parsing: rules can match HTTP methods, paths, etc. For example, a CiliumNetworkPolicy can allow only specific HTTP methods/paths on a port. |
 | **Default policies and admin policies** | If **no** ALLOW policy matches, traffic is **allowed** by default. You can deploy an overridable - default deny by default by deploying an **allow-nothing** policy in either the namespace or istio-system <br/><br/>AuthorizationPolicies in the `istio-system` namespace apply to the whole mesh and take precedence. These are not overridable by namespace-level policies.  | Default inbound policy can be set at install time using `proxy.defaultInboundPolicy`. Supported values are: <ul><li>`all-unauthenticated:` allow all traffic. This is the default.</li>  <li>`all-authenticated:` allow traffic from meshed clients in the same or from a different cluster (with multi-cluster).</li>  <li>`cluster-authenticated:` allow traffic from meshed clients in the same cluster.</li>  <li>`cluster-unauthenticated:` allow traffic from both meshed and non-meshed clients in the same cluster.</li>  <li>`deny:` all traffic are denied. </li> <li>`audit:` Same as all-unauthenticated but requests get flagged in logs and metrics.</li> </ul> <br/>Users can override the default policies for namespaces/pods or by setting the [config.linkerd.io/default-inbound-policy](http://config.linkerd.io/default-inbound-policy) annotation There is no support for admin, non overridable policies. | Follows Kubernetes NetworkPolicy semantics by default: if no `CiliumNetworkPolicy` allows the traffic, it is allowed (no implicit deny). Once at least one `CiliumNetworkPolicy` or `CiliumClusterwideNetworkPolicy` allows some traffic, all other traffic is implicitly denied.
