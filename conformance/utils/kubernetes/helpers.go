@@ -446,7 +446,7 @@ func WaitForGatewayAddress(t *testing.T, client client.Client, timeoutConfig con
 		}
 		port = strconv.FormatInt(int64(listener.Port), 10)
 		for _, address := range gw.Status.Addresses {
-			if address.Type != nil && (*address.Type == gatewayv1.IPAddressType || *address.Type == v1alpha2.HostnameAddressType) {
+			if address.Type != nil {
 				ipAddr = address.Value
 				return true, nil
 			}
