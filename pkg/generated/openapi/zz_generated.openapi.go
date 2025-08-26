@@ -8725,7 +8725,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_MeshSpec(ref common.ReferenceCa
 				Properties: map[string]spec.Schema{
 					"controllerName": {
 						SchemaProps: spec.SchemaProps{
-							Description: "ControllerName is the name of the controller that is managing Gateways of this class. The value of this field MUST be a domain prefixed path.\n\nExample: \"example.com/awesome-mesh\".\n\nThis field is not mutable and cannot be empty.\n\nSupport: Core",
+							Description: "ControllerName is the name of a controller that is managing Gateway API resources for mesh traffic management. The value of this field MUST be a domain prefixed path.\n\nExample: \"example.com/awesome-mesh\".\n\nThis field is not mutable and cannot be empty.\n\nSupport: Core",
 							Default:     "",
 							Type:        []string{"string"},
 							Format:      "",
@@ -8733,7 +8733,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_MeshSpec(ref common.ReferenceCa
 					},
 					"parametersRef": {
 						SchemaProps: spec.SchemaProps{
-							Description: "ParametersRef is an optional reference to a resource that contains implementation-specific for this Mesh. If no implementation-specific parameters are needed, this field MUST be omitted.\n\nParametersRef can reference a standard Kubernetes resource, i.e. ConfigMap, or an implementation-specific custom resource. The resource can be cluster-scoped or namespace-scoped.\n\nIf the referent cannot be found, refers to an unsupported kind, or when the data within that resource is malformed, the Mesh MUST be rejected with the \"Accepted\" status condition set to \"False\" and an \"InvalidParameters\" reason.\n\nSupport: Implementation-specific",
+							Description: "ParametersRef is an optional reference to a resource that contains implementation-specific configuration for this Mesh. If no implementation-specific parameters are needed, this field MUST be omitted.\n\nParametersRef can reference a standard Kubernetes resource, i.e. ConfigMap, or an implementation-specific custom resource. The resource can be cluster-scoped or namespace-scoped.\n\nIf the referent cannot be found, refers to an unsupported kind, or when the data within that resource is malformed, the Mesh MUST be rejected with the \"Accepted\" status condition set to \"False\" and an \"InvalidParameters\" reason.\n\nSupport: Implementation-specific",
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.ParametersReference"),
 						},
 					},
