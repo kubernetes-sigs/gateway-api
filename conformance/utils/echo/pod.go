@@ -20,6 +20,8 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"slices"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -84,8 +86,14 @@ func makeRequest(t *testing.T, exp *http.ExpectedResponse) []string {
 		exp.Request.Method = "GET"
 	}
 
-	if exp.Response.StatusCode == 0 {
-		exp.Response.StatusCode = 200
+	// if the deprecated field StatusCode is set, append it to StatusCodes for backwards compatibility
+	//nolint:staticcheck
+	if exp.Response.StatusCode != 0 {
+		exp.Response.StatusCodes = append(exp.Response.StatusCodes, exp.Response.StatusCode)
+	}
+
+	if len(exp.Response.StatusCodes) == 0 {
+		exp.Response.StatusCodes = []int{200}
 	}
 
 	r := exp.Request
@@ -110,8 +118,12 @@ func compareRequest(exp http.ExpectedResponse, resp Response) error {
 	}
 	wantReq := exp.ExpectedRequest
 	wantResp := exp.Response
-	if fmt.Sprint(wantResp.StatusCode) != resp.Code {
-		return fmt.Errorf("wanted status code %v, got %v", wantResp.StatusCode, resp.Code)
+	statusCode, err := strconv.Atoi(resp.Code)
+	if err != nil {
+		return fmt.Errorf("invalid status code '%v': %v", resp.Code, err)
+	}
+	if !slices.Contains(wantResp.StatusCodes, statusCode) {
+		return fmt.Errorf("wanted status code to be one of %v, got %d", wantResp.StatusCodes, statusCode)
 	}
 	if wantReq.Headers != nil {
 		if resp.RequestHeaders == nil {
