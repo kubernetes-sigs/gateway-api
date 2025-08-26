@@ -214,6 +214,14 @@ spec:
                         x-kubernetes-map-type: atomic
                     type: object
                 type: object
+              defaultScope:
+                description: |-
+                  DefaultScope defines the default scope for this Gateway. If unset (the
+                  default), the Gateway will not act as a default Gateway; if set, the
+                  Gateway will claim any Route with a matching scope set in its
+                  UseDefaultGateway field, subject to the usual rules about which routes
+                  the Gateway can attach to.
+                type: string
               gatewayClassName:
                 description: |-
                   GatewayClassName used for this Gateway. This is the name of a
@@ -1766,6 +1774,14 @@ spec:
                         x-kubernetes-map-type: atomic
                     type: object
                 type: object
+              defaultScope:
+                description: |-
+                  DefaultScope defines the default scope for this Gateway. If unset (the
+                  default), the Gateway will not act as a default Gateway; if set, the
+                  Gateway will claim any Route with a matching scope set in its
+                  UseDefaultGateway field, subject to the usual rules about which routes
+                  the Gateway can attach to.
+                type: string
               gatewayClassName:
                 description: |-
                   GatewayClassName used for this Gateway. This is the name of a

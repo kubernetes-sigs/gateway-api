@@ -3041,6 +3041,13 @@ func schema_sigsk8sio_gateway_api_apis_v1_CommonRouteSpec(ref common.ReferenceCa
 							},
 						},
 					},
+					"useDefaultGateway": {
+						SchemaProps: spec.SchemaProps{
+							Description: "useDefaultGateway indicates the default Gateway scope to use for this Route. If unset (the default), the Route will not be attached to any default Gateway; if set, it will be attached to any default Gateway supporting the named scope, subject to the usual rules about which Routes a Gateway is allowed to claim.\n\n<gateway:experimental>",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
 				},
 			},
 		},
@@ -3685,6 +3692,13 @@ func schema_sigsk8sio_gateway_api_apis_v1_GRPCRouteSpec(ref common.ReferenceCall
 							},
 						},
 					},
+					"useDefaultGateway": {
+						SchemaProps: spec.SchemaProps{
+							Description: "useDefaultGateway indicates the default Gateway scope to use for this Route. If unset (the default), the Route will not be attached to any default Gateway; if set, it will be attached to any default Gateway supporting the named scope, subject to the usual rules about which Routes a Gateway is allowed to claim.\n\n<gateway:experimental>",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
 					"hostnames": {
 						VendorExtensible: spec.VendorExtensible{
 							Extensions: spec.Extensions{
@@ -4206,6 +4220,13 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewaySpec(ref common.ReferenceCallba
 						SchemaProps: spec.SchemaProps{
 							Description: "TLS specifies frontend and backend tls configuration for entire gateway.\n\nSupport: Extended\n\n<gateway:experimental>",
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.GatewayTLSConfig"),
+						},
+					},
+					"defaultScope": {
+						SchemaProps: spec.SchemaProps{
+							Description: "DefaultScope defines the default scope for this Gateway. If unset (the default), the Gateway will not act as a default Gateway; if set, the Gateway will claim any Route with a matching scope set in its UseDefaultGateway field, subject to the usual rules about which routes the Gateway can attach to.\n\n<gateway:experimental>",
+							Type:        []string{"string"},
+							Format:      "",
 						},
 					},
 				},
@@ -5413,6 +5434,13 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteSpec(ref common.ReferenceCall
 									},
 								},
 							},
+						},
+					},
+					"useDefaultGateway": {
+						SchemaProps: spec.SchemaProps{
+							Description: "useDefaultGateway indicates the default Gateway scope to use for this Route. If unset (the default), the Route will not be attached to any default Gateway; if set, it will be attached to any default Gateway supporting the named scope, subject to the usual rules about which Routes a Gateway is allowed to claim.\n\n<gateway:experimental>",
+							Type:        []string{"string"},
+							Format:      "",
 						},
 					},
 					"hostnames": {
@@ -6892,6 +6920,13 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_TCPRouteSpec(ref common.Referenc
 							},
 						},
 					},
+					"useDefaultGateway": {
+						SchemaProps: spec.SchemaProps{
+							Description: "useDefaultGateway indicates the default Gateway scope to use for this Route. If unset (the default), the Route will not be attached to any default Gateway; if set, it will be attached to any default Gateway supporting the named scope, subject to the usual rules about which Routes a Gateway is allowed to claim.\n\n<gateway:experimental>",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
 					"rules": {
 						VendorExtensible: spec.VendorExtensible{
 							Extensions: spec.Extensions{
@@ -7120,6 +7155,13 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_TLSRouteSpec(ref common.Referenc
 									},
 								},
 							},
+						},
+					},
+					"useDefaultGateway": {
+						SchemaProps: spec.SchemaProps{
+							Description: "useDefaultGateway indicates the default Gateway scope to use for this Route. If unset (the default), the Route will not be attached to any default Gateway; if set, it will be attached to any default Gateway supporting the named scope, subject to the usual rules about which Routes a Gateway is allowed to claim.\n\n<gateway:experimental>",
+							Type:        []string{"string"},
+							Format:      "",
 						},
 					},
 					"hostnames": {
@@ -7370,6 +7412,13 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_UDPRouteSpec(ref common.Referenc
 									},
 								},
 							},
+						},
+					},
+					"useDefaultGateway": {
+						SchemaProps: spec.SchemaProps{
+							Description: "useDefaultGateway indicates the default Gateway scope to use for this Route. If unset (the default), the Route will not be attached to any default Gateway; if set, it will be attached to any default Gateway supporting the named scope, subject to the usual rules about which Routes a Gateway is allowed to claim.\n\n<gateway:experimental>",
+							Type:        []string{"string"},
+							Format:      "",
 						},
 					},
 					"rules": {
@@ -7825,6 +7874,13 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha3_TLSRouteSpec(ref common.Referenc
 									},
 								},
 							},
+						},
+					},
+					"useDefaultGateway": {
+						SchemaProps: spec.SchemaProps{
+							Description: "useDefaultGateway indicates the default Gateway scope to use for this Route. If unset (the default), the Route will not be attached to any default Gateway; if set, it will be attached to any default Gateway supporting the named scope, subject to the usual rules about which Routes a Gateway is allowed to claim.\n\n<gateway:experimental>",
+							Type:        []string{"string"},
+							Format:      "",
 						},
 					},
 					"hostnames": {
