@@ -33,7 +33,7 @@ func init() {
 
 var HTTPRouteHostnamePrecedence = suite.ConformanceTest{
 	ShortName:   "HTTPRouteHostnamePrecedence",
-	Description: "An HTTPRoute with a specified hostname, and a non-specified one",
+	Description: "When a Gateway has both an HTTPRoute with a specified hostname and another without a hostname, the route with the specified hostname should take precedence",
 	Manifests:   []string{"tests/httproute-hostname-precedence.yaml"},
 	Features: []features.FeatureName{
 		features.SupportGateway,
