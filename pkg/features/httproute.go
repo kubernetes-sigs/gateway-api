@@ -100,6 +100,9 @@ const (
 
 	// This option indicates support for the name field in the HTTPRouteRule (extended conformance)
 	SupportHTTPRouteNamedRouteRule FeatureName = "HTTPRouteNamedRouteRule"
+
+	// This option indicates support for the cors filter in the HTTPRouteFilter (extended conformance)
+	SupportHTTPRouteCORS FeatureName = "HTTPRouteCORS"
 )
 
 var (
@@ -198,6 +201,11 @@ var (
 		Name:    SupportHTTPRouteNamedRouteRule,
 		Channel: FeatureChannelStandard,
 	}
+	// HTTPRouteCORS contains metadata for the SupportHTTPRouteCORS feature.
+	HTTPRouteCORS = Feature{
+		Name:    SupportHTTPRouteCORS,
+		Channel: FeatureChannelExperimental,
+	}
 )
 
 // HTTPRouteExtendedFeatures includes all extended features for HTTPRoute
@@ -223,4 +231,5 @@ var HTTPRouteExtendedFeatures = sets.New(
 	HTTPRouteBackendProtocolH2CFeature,
 	HTTPRouteBackendProtocolWebSocketFeature,
 	HTTPRouteNamedRouteRule,
+	HTTPRouteCORS,
 )
