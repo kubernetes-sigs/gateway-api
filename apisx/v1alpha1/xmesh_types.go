@@ -55,8 +55,9 @@ type XMesh struct {
 
 // MeshSpec defines the desired state of an XMesh.
 type MeshSpec struct {
-	// ControllerName is the name of the controller that is managing Gateways of
-	// this class. The value of this field MUST be a domain prefixed path.
+	// ControllerName is the name of a controller that is managing Gateway API
+	// resources for mesh traffic management. The value of this field MUST be a
+	// domain prefixed path.
 	//
 	// Example: "example.com/awesome-mesh".
 	//
