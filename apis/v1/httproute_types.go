@@ -1404,8 +1404,9 @@ type HTTPCORSFilter struct {
 	// Support: Extended
 	// +listType=set
 	// +kubebuilder:validation:MaxItems=64
+	// +kubebuilder:validation:XValidation:message="AllowOrigins cannot contain '*' alongside other origins",rule="!('*' in self && self.size() > 1)"
 	// +optional
-	AllowOrigins []AbsoluteURI `json:"allowOrigins,omitempty"`
+	AllowOrigins []CORSOrigin `json:"allowOrigins,omitempty"`
 
 	// AllowCredentials indicates whether the actual cross-origin request allows
 	// to include credentials.
