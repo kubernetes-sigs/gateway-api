@@ -155,9 +155,9 @@ type ParentReference struct {
 	Port *PortNumber `json:"port,omitempty"`
 }
 
-// GatewayDefaultScope defines the set of default scopes that a Gateway
-// can claim, for use in any Route type. At present the only supported
-// scope is "All".
+// GatewayDefaultScope defines the set of default scopes that a Gateway can
+// claim, for configuring default Gateways and selecting default Gateways in
+// any Route type. At present the only supported scope is "All".
 type GatewayDefaultScope string
 
 const (
