@@ -1961,6 +1961,38 @@ var schemaYAML = typed.YAMLObject(`types:
           elementRelationship: associative
           keys:
           - name
+- name: io.k8s.sigs.gateway-api.apisx.v1alpha1.MeshSpec
+  map:
+    fields:
+    - name: controllerName
+      type:
+        scalar: string
+      default: ""
+    - name: description
+      type:
+        scalar: string
+    - name: parametersRef
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1.ParametersReference
+- name: io.k8s.sigs.gateway-api.apisx.v1alpha1.MeshStatus
+  map:
+    fields:
+    - name: conditions
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Condition
+          elementRelationship: associative
+          keys:
+          - type
+    - name: supportedFeatures
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v1.SupportedFeature
+          elementRelationship: associative
+          keys:
+          - name
 - name: io.k8s.sigs.gateway-api.apisx.v1alpha1.ParentGatewayReference
   map:
     fields:
@@ -2036,6 +2068,27 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: status
       type:
         namedType: io.k8s.sigs.gateway-api.apisx.v1alpha1.ListenerSetStatus
+      default: {}
+- name: io.k8s.sigs.gateway-api.apisx.v1alpha1.XMesh
+  map:
+    fields:
+    - name: apiVersion
+      type:
+        scalar: string
+    - name: kind
+      type:
+        scalar: string
+    - name: metadata
+      type:
+        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+      default: {}
+    - name: spec
+      type:
+        namedType: io.k8s.sigs.gateway-api.apisx.v1alpha1.MeshSpec
+      default: {}
+    - name: status
+      type:
+        namedType: io.k8s.sigs.gateway-api.apisx.v1alpha1.MeshStatus
       default: {}
 - name: __untyped_atomic_
   scalar: untyped
