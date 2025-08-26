@@ -49,6 +49,14 @@ func (b *GRPCRouteSpecApplyConfiguration) WithParentRefs(values ...*ParentRefere
 	return b
 }
 
+// WithUseDefaultGateway sets the UseDefaultGateway field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the UseDefaultGateway field is set to the value of the last call.
+func (b *GRPCRouteSpecApplyConfiguration) WithUseDefaultGateway(value apisv1.GatewayDefaultScope) *GRPCRouteSpecApplyConfiguration {
+	b.CommonRouteSpecApplyConfiguration.UseDefaultGateway = &value
+	return b
+}
+
 // WithHostnames adds the given value to the Hostnames field in the declarative configuration
 // and returns the receiver, so that objects can be build by chaining "With" function invocations.
 // If called multiple times, values provided by each call will be appended to the Hostnames field.

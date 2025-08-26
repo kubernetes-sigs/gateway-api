@@ -275,12 +275,13 @@ GEP covers **all** intended changes to Gateway API behavior.
 Since Ana must be able to choose whether a Route is defaulted or not, marking
 a Route as defaulted must be an active configuration step she takes, rather
 than any kind of implicit behavior. To that end, the `CommonRouteSpec`
-resource will gain a new field, `useDefaultGateway`, which defines the
+resource will gain a new field, `UseDefaultGateway`, which defines the
 _scope_ for the defaulted Route:
 
 ```go
 // GatewayDefaultScope defines the set of default scopes that a Gateway
-// can claim. At present the only supported scope is "All".
+// can claim, for use in any Route type. At present the only supported
+// scope is "All".
 type GatewayDefaultScope string
 
 const (
@@ -290,8 +291,16 @@ const (
 )
 
 type CommonRouteSpec struct {
-    // ... other fields ...
-    useDefaultGateway GatewayDefaultScope `json:"useDefaultGateway,omitempty"`
+  // ... other fields ...
+  // useDefaultGateway indicates the default Gateway scope to use for this
+  // Route. If unset (the default), the Route will not be attached to any
+  // default Gateway; if set, it will be attached to any default Gateway
+  // supporting the named scope, subject to the usual rules about which
+  // Routes a Gateway is allowed to claim.
+  //
+  // +optional
+  // <gateway:experimental>
+  UseDefaultGateway GatewayDefaultScope `json:"useDefaultGateway,omitempty"`
 }
 ```
 
@@ -418,8 +427,16 @@ behavior. To that end, the Gateway resource will gain a new field,
 
 ```go
 type GatewaySpec struct {
-    // ... other fields ...
-    DefaultScope GatewayDefaultScope `json:"defaultScope,omitempty"`
+  // ... other fields ...
+	// DefaultScope defines the default scope for this Gateway. If unset (the
+	// default), the Gateway will not act as a default Gateway; if set, the
+	// Gateway will claim any Route with a matching scope set in its
+	// UseDefaultGateway field, subject to the usual rules about which routes
+	// the Gateway can attach to.
+	//
+	// +optional
+	// <gateway:experimental>
+  DefaultScope GatewayDefaultScope `json:"defaultScope,omitempty"`
 }
 ```
 
