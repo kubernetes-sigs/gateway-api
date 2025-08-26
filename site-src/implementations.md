@@ -205,7 +205,7 @@ Airlock Microgateway protects your applications and microservices with the tried
 
 #### Features
 - Comprehensive WAAP (formerly known as WAF) with security features like Deny Rules to protect against known attacks (OWASP Top 10), header filtering, JSON parsing, OpenAPI specification enforcement, and GraphQL schema validation
-- Identity aware proxy which makes it possible to enforce authentication using JWT authentication or OIDC
+- Identity aware proxy which makes it possible to enforce authentication using JWT authentication or OIDC, with OAuth 2.0 Token Introspection and Token Exchange for continuous validation and secure delegation across services
 - Reverse proxy functionality with request routing rules, TLS termination and remote IP extraction
 - Easy-to-use Grafana dashboards which provide valuable insights in allowed and blocked traffic and other metrics
 
