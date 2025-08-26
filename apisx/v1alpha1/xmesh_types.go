@@ -69,8 +69,9 @@ type MeshSpec struct {
 	ControllerName gatewayapiv1.GatewayController `json:"controllerName"`
 
 	// ParametersRef is an optional reference to a resource that contains
-	// implementation-specific for this Mesh. If no implementation-specific
-	// parameters are needed, this field MUST be omitted.
+	// implementation-specific configuration for this Mesh. If no
+	// implementation-specific parameters are needed, this field MUST be
+	// omitted.
 	//
 	// ParametersRef can reference a standard Kubernetes resource, i.e.
 	// ConfigMap, or an implementation-specific custom resource. The resource
