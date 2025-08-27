@@ -39,7 +39,7 @@ var GRPCRouteRequestMirror = suite.ConformanceTest{
 	Features: []features.FeatureName{
 		features.SupportGateway,
 		features.SupportGRPCRoute,
-		features.SupportGRPCRouteNamedRouteRule,
+		features.SupportGRPCRouteRequestMirror,
 	},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
