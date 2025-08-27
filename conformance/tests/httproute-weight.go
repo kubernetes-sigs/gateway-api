@@ -59,8 +59,10 @@ var HTTPRouteWeight = suite.ConformanceTest{
 
 		t.Run("Requests should have a distribution that matches the weight", func(t *testing.T) {
 			expected := http.ExpectedResponse{
-				Request:   http.Request{Path: "/"},
-				Response:  http.Response{StatusCode: 200},
+				Request: http.Request{Path: "/"},
+				Response: http.Response{
+					StatusCodes: []int{200},
+				},
 				Namespace: "gateway-conformance-infra",
 			}
 
