@@ -295,8 +295,9 @@ type GatewaySpec struct {
 	// <gateway:experimental>
 	TLS *GatewayTLSConfig `json:"tls,omitempty"`
 
-	// DefaultScope defines the default scope for this Gateway. If unset (the
-	// default), the Gateway will not act as a default Gateway; if set, the
+	// DefaultScope defines the default scope for this Gateway. If unset or
+	// set to the empty string `""` (the default), the Gateway will not
+	// act as a default Gateway; if set, the
 	// Gateway will claim any Route with a matching scope set in its
 	// UseDefaultGateway field, subject to the usual rules about which routes
 	// the Gateway can attach to.

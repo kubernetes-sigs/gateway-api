@@ -247,8 +247,14 @@ type CommonRouteSpec struct {
 	// supporting the named scope, subject to the usual rules about which
 	// Routes a Gateway is allowed to claim.
 	//
-	// +optional
-	// <gateway:experimental>
+	// Think carefully before using this functionality! The set of default
+	// Gateways supporting the requested scope can change over time without
+	// any notice to the Route author, and in many situations it will not be
+	// appropriate to request a default Gateway for a given Route -- for
+	// example, a Route with specific security needs should almost certainly
+	// not use a default Gateway.
+	//
+	// +optional <gateway:experimental>
 	UseDefaultGateway GatewayDefaultScope `json:"useDefaultGateway,omitempty"`
 }
 
