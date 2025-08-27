@@ -50,11 +50,15 @@ spec:
   parentRefs:
   - name: gateway-does-not-allow-listenerset
     namespace: gateway-conformance-infra
+  - kind: XListenerSet
+    group: gateway.networking.x-k8s.io
+    name: listenerset-not-allowed
+    namespace: gateway-conformance-infra
   rules:
   - matches:
     - path:
         type: PathPrefix
-        value: /gateway-route
+        value: /route
     backendRefs:
     - name: infra-backend-v1
       port: 8080

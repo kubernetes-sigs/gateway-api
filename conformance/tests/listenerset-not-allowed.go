@@ -53,17 +53,17 @@ var ListenerSetNotAllowed = suite.ConformanceTest{
 		testCases := []http.ExpectedResponse{
 			// Requests to the listener defined on the gateway should work
 			{
-				Request:   http.Request{Host: "example.com", Path: "/gateway-route"},
+				Request:   http.Request{Host: "example.com", Path: "/route"},
 				Backend:   "infra-backend-v1",
 				Namespace: ns,
 			},
 			// Requests to the listenerset listeners should fail
 			{
-				Request:  http.Request{Host: "foo.com", Path: "/gateway-route"},
+				Request:  http.Request{Host: "foo.com", Path: "/route"},
 				Response: http.Response{StatusCode: 404},
 			},
 			{
-				Request:  http.Request{Host: "bar.com", Path: "/gateway-route"},
+				Request:  http.Request{Host: "bar.com", Path: "/route"},
 				Response: http.Response{StatusCode: 404},
 			},
 		}

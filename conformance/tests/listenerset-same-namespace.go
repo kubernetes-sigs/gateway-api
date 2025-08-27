@@ -52,93 +52,91 @@ var ListenerSetSameNamespace = suite.ConformanceTest{
 		kubernetes.NamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, []string{ns})
 
 		testCases := []http.ExpectedResponse{
-			// Requests to the route defined on the gateway (should match all listeners)
+			// Requests to the route defined on the gateway (should only match routes attached to the gateway)
 			{
-				Request:   http.Request{Host: "gateway.com", Path: "/gateway-route"},
+				Request:   http.Request{Host: "gateway-listener-1.com", Path: "/gateway-route"},
 				Backend:   "infra-backend-v1",
 				Namespace: ns,
 			},
 			{
-				Request:   http.Request{Host: "example.com", Path: "/gateway-route"},
+				Request:   http.Request{Host: "gateway-listener-2.com", Path: "/gateway-route"},
 				Backend:   "infra-backend-v1",
 				Namespace: ns,
 			},
 			{
-				Request:   http.Request{Host: "foo.com", Path: "/gateway-route"},
-				Backend:   "infra-backend-v1",
-				Namespace: ns,
-			},
-			{
-				Request:   http.Request{Host: "bar.com", Path: "/gateway-route"},
-				Backend:   "infra-backend-v1",
-				Namespace: ns,
-			},
-			// Requests to the route defined on the gateway that targets the example-com listener
-			{
-				Request:  http.Request{Host: "gateway.com", Path: "/example-com"},
+				Request:  http.Request{Host: "listenerset-1-listener-1.com", Path: "/gateway-route"},
 				Response: http.Response{StatusCode: 404},
 			},
 			{
-				Request:   http.Request{Host: "example.com", Path: "/example-com"},
+				Request:  http.Request{Host: "listenerset-1-listener-2.com", Path: "/gateway-route"},
+				Response: http.Response{StatusCode: 404},
+			},
+			// Requests to the route defined on the gateway that targets gateway-listener-2-listener
+			{
+				Request:  http.Request{Host: "gateway-listener-1.com", Path: "/gateway-listener-2-listener-route"},
+				Response: http.Response{StatusCode: 404},
+			},
+			{
+				Request:   http.Request{Host: "gateway-listener-2.com", Path: "/gateway-listener-2-listener-route"},
 				Backend:   "infra-backend-v1",
 				Namespace: ns,
 			},
 			{
-				Request:  http.Request{Host: "foo.com", Path: "/example-com"},
+				Request:  http.Request{Host: "listenerset-1-listener-1.com", Path: "/gateway-listener-2-listener-route"},
 				Response: http.Response{StatusCode: 404},
 			},
 			{
-				Request:  http.Request{Host: "bar.com", Path: "/example-com"},
+				Request:  http.Request{Host: "listenerset-1-listener-2.com", Path: "/gateway-listener-2-listener-route"},
 				Response: http.Response{StatusCode: 404},
 			},
 			// Requests to the route defined on the listener set (should only match listeners defined on the listenerset)
 			{
-				Request:  http.Request{Host: "gateway.com", Path: "/listenerset-route"},
+				Request:  http.Request{Host: "gateway-listener-1.com", Path: "/listenerset-1-route"},
 				Response: http.Response{StatusCode: 404},
 			},
 			{
-				Request:  http.Request{Host: "example.com", Path: "/listenerset-route"},
+				Request:  http.Request{Host: "gateway-listener-2.com", Path: "/listenerset-1-route"},
 				Response: http.Response{StatusCode: 404},
 			},
 			{
-				Request:   http.Request{Host: "foo.com", Path: "/listenerset-route"},
+				Request:   http.Request{Host: "listenerset-1-listener-1.com", Path: "/listenerset-1-route"},
 				Backend:   "infra-backend-v1",
 				Namespace: ns,
 			},
 			{
-				Request:   http.Request{Host: "bar.com", Path: "/listenerset-route"},
+				Request:   http.Request{Host: "listenerset-1-listener-2.com", Path: "/listenerset-1-route"},
 				Backend:   "infra-backend-v1",
 				Namespace: ns,
 			},
-			// Requests to the route defined on the listenerset that targets the bar-com listener
+			// Requests to the route defined on the listenerset that targets listenerset-1-listener-2-listener
 			{
-				Request:  http.Request{Host: "gateway.com", Path: "/bar-com"},
+				Request:  http.Request{Host: "gateway-listener-1.com", Path: "/listenerset-1-listener-2-listener-route"},
 				Response: http.Response{StatusCode: 404},
 			},
 			{
-				Request:  http.Request{Host: "example.com", Path: "/bar-com"},
+				Request:  http.Request{Host: "gateway-listener-2.com", Path: "/listenerset-1-listener-2-listener-route"},
 				Response: http.Response{StatusCode: 404},
 			},
 			{
-				Request:  http.Request{Host: "foo.com", Path: "/bar-com"},
+				Request:  http.Request{Host: "listenerset-1-listener-1.com", Path: "/listenerset-1-listener-2-listener-route"},
 				Response: http.Response{StatusCode: 404},
 			},
 			{
-				Request:   http.Request{Host: "bar.com", Path: "/bar-com"},
+				Request:   http.Request{Host: "listenerset-1-listener-2.com", Path: "/listenerset-1-listener-2-listener-route"},
 				Backend:   "infra-backend-v1",
 				Namespace: ns,
 			},
-			// Requests to the baz-com listener on the listener set in a different namespace should not work
+			// Requests to listenerset-2-listener-1-listener on the listener set in a different namespace should not work
 			{
-				Request:  http.Request{Host: "baz.com", Path: "/gateway-com"},
+				Request:  http.Request{Host: "listenerset-2-listener-1.com", Path: "/listenerset-2-route"},
 				Response: http.Response{StatusCode: 404},
 			},
 		}
 
 		gwNN := types.NamespacedName{Name: "gateway-with-listenerset-http-listener", Namespace: ns}
 		gwRoutes := []types.NamespacedName{
-			{Namespace: ns, Name: "attaches-to-all-listeners"},
-			{Namespace: ns, Name: "attaches-to-example-com-on-gateway"},
+			{Namespace: ns, Name: "gateway-route"},
+			{Namespace: ns, Name: "gateway-listener-2-route"},
 		}
 
 		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), gwRoutes...)
@@ -148,8 +146,8 @@ var ListenerSetSameNamespace = suite.ConformanceTest{
 
 		lsNN := types.NamespacedName{Name: "listenerset-with-http-listener", Namespace: ns}
 		lsRoutes := []types.NamespacedName{
-			{Namespace: ns, Name: "attaches-to-all-listeners-on-listenerset"},
-			{Namespace: ns, Name: "attaches-to-bar-com-on-listenerset"},
+			{Namespace: ns, Name: "listenerset-1-route"},
+			{Namespace: ns, Name: "listenerset-1-listener-2-listener-route"},
 		}
 		listenerSetGK := schema.GroupKind{
 			Group: gatewayxv1a1.GroupVersion.Group,
