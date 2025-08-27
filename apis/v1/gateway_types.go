@@ -279,15 +279,6 @@ type GatewaySpec struct {
 	// +optional
 	Infrastructure *GatewayInfrastructure `json:"infrastructure,omitempty"`
 
-	// BackendTLS configures TLS settings for when this Gateway is connecting to
-	// backends with TLS.
-	//
-	// Support: Core
-	//
-	// +optional
-	// <gateway:experimental>
-	BackendTLS *GatewayBackendTLS `json:"backendTLS,omitempty"`
-
 	// AllowedListeners defines which ListenerSets can be attached to this Gateway.
 	// While this feature is experimental, the default value is to allow no ListenerSets.
 	//
@@ -296,7 +287,7 @@ type GatewaySpec struct {
 	// +optional
 	AllowedListeners *AllowedListeners `json:"allowedListeners,omitempty"`
 	//
-	// GatewayTLSConfig specifies frontend tls configuration for gateway.
+	// TLS specifies frontend and backend tls configuration for entire gateway.
 	//
 	// Support: Extended
 	//
@@ -525,8 +516,6 @@ type GatewayBackendTLS struct {
 	// ClientCertificateRef can reference to standard Kubernetes resources, i.e.
 	// Secret, or implementation-specific custom resources.
 	//
-	// This setting can be overridden on the service level by use of BackendTLSPolicy.
-	//
 	// Support: Core
 	//
 	// +optional
@@ -602,8 +591,31 @@ type ListenerTLSConfig struct {
 	Options map[AnnotationKey]AnnotationValue `json:"options,omitempty"`
 }
 
-// GatewayTLSConfig specifies frontend tls configuration for gateway.
+// GatewayTLSConfig specifies frontend and backend tls configuration for gateway.
 type GatewayTLSConfig struct {
+	// Backend describes TLS configuration for gateway when connecting
+	// to backends.
+	//
+	// Note that this contains only details for the Gateway as a TLS client,
+	// and does _not_ imply behavior about how to choose which backend should
+	// get a TLS connection. That is determined by the presence of a BackendTLSPolicy.
+	//
+	// Support: Core
+	//
+	// +optional
+	// <gateway:experimental>
+	Backend *GatewayBackendTLS `json:"backend,omitempty"`
+
+	// Frontend describes TLS config when client connects to Gateway.
+	// Support: Core
+	//
+	// +optional
+	// <gateway:experimental>
+	Frontend *FrontendTLSConfig `json:"frontend,omitempty"`
+}
+
+// FrontendTLSConfig specifies frontend tls configuration for gateway.
+type FrontendTLSConfig struct {
 	// Default specifies the default client certificate validation configuration
 	// for all Listeners handling HTTPS traffic, unless a per-port configuration
 	// is defined.
@@ -653,7 +665,7 @@ const (
 // within this Gateway. Currently, it stores only the client certificate validation
 // configuration, but this may be extended in the future.
 type TLSConfig struct {
-	// FrontendValidation holds configuration information for validating the frontend (client).
+	// Validation holds configuration information for validating the frontend (client).
 	// Setting this field will result in mutual authentication when connecting to the gateway.
 	// In browsers this may result in a dialog appearing
 	// that requests a user to specify the client certificate.
@@ -661,9 +673,9 @@ type TLSConfig struct {
 	//
 	// Support: Core
 	//
-	// +required
+	// +optional
 	// <gateway:experimental>
-	FrontendValidation FrontendTLSValidation `json:"frontendValidation"`
+	Validation *FrontendTLSValidation `json:"validation,omitempty"`
 }
 
 type TLSPortConfig struct {

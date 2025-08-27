@@ -5,12 +5,22 @@ metadata:
 spec:
   gatewayClassName: acme-lb
   tls:
-    default:
-      frontendValidation:
-        caCertificateRefs:
-        - kind: ConfigMap
-          group: ""
-          name: foo-example-com-ca-cert
+    frontend:
+      default:
+        validation:
+          caCertificateRefs:
+          - kind: ConfigMap
+            group: ""
+            name: foo-example-com-ca-cert
+      perPort:
+      - port: 8443
+        tls:
+          validation:
+            caCertificateRefs:
+            - kind: ConfigMap
+              group: ""
+              name: foo-example-com-ca-cert
+            mode: "AllowInsecureFallback"
   listeners:
   - name: foo-https
     protocol: HTTPS
@@ -21,5 +31,14 @@ spec:
       - kind: Secret
         group: ""
         name: foo-example-com-cert
+  - name: bar-https
+    protocol: HTTPS
+    port: 8443
+    hostname: bar.example.com
+    tls:
+      certificateRefs:
+      - kind: Secret
+        group: ""
+        name: bar-example-com-cert
 ---
 
