@@ -515,9 +515,79 @@ spec:
     sectionName: foo
 ```
 
-#### Optional Section Name
+#### Gateway parents and sectionName
 
-If a `sectionName` in a Route's `parentRef` is not set then the Route MUST attach to only the listeners in the referenced parent. As an example given a `Gateway` and it's child `ListenerSets` a route attaching to the `Gateway` with an empty `sectionName` shall only attach to the listeners in the `Gateways` immediate `spec.listeners` list. In other words, the Route will not attach to any listeners in the `ListenerSets`. This is necessary because, for UX reasons, the `name` field does not have to be unique across all Listeners merged into a Gateway (see the section below for details).
+If a `sectionName` in a Route's `parentRef` is not set then the Route MUST attach to only the listeners in the referenced parent. As an example given a `Gateway` and it's child `ListenerSets` a route attaching to the `Gateway` with an empty `sectionName` shall only attach to the listeners in the `Gateways` immediate `spec.listeners` list. 
+
+In other words, the Route MUST attach just to the Gateway listeners specified on `.spec.listeners` and MUST NOT not attach to any listeners in the child `ListenerSets` 
+of the `Gateway`.
+
+This is necessary because, for UX reasons, the `name` field does not have to be unique across all Listeners merged into a Gateway (see the section below for details).
+
+The following manifest exemplifies this situation:
+
+```yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: parent-gateway
+spec:
+  gatewayClassName: example
+  allowedListeners:
+    namespaces:
+      from: Same
+  listeners:
+  - name: foo2
+    hostname: foo.com
+    protocol: HTTP
+    port: 80
+  - name: foo3
+    hostname: foo1.com
+    protocol: HTTP
+    port: 80
+---
+apiVersion: gateway.networking.x-k8s.io/v1alpha1
+kind: ListenerSet
+metadata:
+  name: first-workload-listeners
+spec:
+  parentRef:
+    name: parent-gateway
+    kind: Gateway
+    group: gateway.networking.k8s.io
+  listeners:
+  - name: foo
+    hostname: first.foo.com
+    protocol: HTTP
+    port: 80
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: httproute-example
+spec:
+  parentRefs:
+  # No SectionName is set on this parentRef
+  - name: some-workload-listeners 
+    kind: Gateway
+```
+
+The example above SHOULD be attached only to the following listeners:
+```yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+.....
+spec:
+  listeners:
+  - name: foo
+    hostname: foo.com
+    protocol: HTTP
+    port: 80
+  - name: foo1
+    hostname: foo1.com
+    protocol: HTTP
+    port: 80
+```
 
 ### Policy Attachment
 
