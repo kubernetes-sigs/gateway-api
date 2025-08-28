@@ -145,11 +145,9 @@ func compareRequest(exp http.ExpectedResponse, resp Response) error {
 		if !slices.Contains(expectedStatusCodes, statusCode) {
 			return fmt.Errorf("wanted gRPC status code to be one of %v (mapped to HTTP), got %d", wantResp.StatusCodes, statusCode)
 		}
-	} else {
+	} else if !slices.Contains(wantResp.StatusCodes, statusCode) {
 		// For HTTP, use the status codes directly
-		if !slices.Contains(wantResp.StatusCodes, statusCode) {
-			return fmt.Errorf("wanted status code to be one of %v, got %d", wantResp.StatusCodes, statusCode)
-		}
+		return fmt.Errorf("wanted status code to be one of %v, got %d", wantResp.StatusCodes, statusCode)
 	}
 	if wantReq.Headers != nil {
 		if resp.RequestHeaders == nil {
