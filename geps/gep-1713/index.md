@@ -453,7 +453,7 @@ spec:
     sectionName: second
 ```
 
-Routes MUST be able to attach to a `ListenerSet` and it's parent `Gateway` by having multiple `parentRefs` eg:
+If routes MUST attach to a `ListenerSet` and its parent `Gateway`, it MUST have multiple `parentRefs` eg:
 
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
@@ -510,7 +510,7 @@ metadata:
   name: httproute-example
 spec:
   parentRefs:
-  - name: some-workload-listeners
+  - name: parent-gateway
     kind: Gateway
     sectionName: foo
 ```
@@ -579,11 +579,11 @@ kind: Gateway
 .....
 spec:
   listeners:
-  - name: foo
+  - name: foo2
     hostname: foo.com
     protocol: HTTP
     port: 80
-  - name: foo1
+  - name: foo3
     hostname: foo1.com
     protocol: HTTP
     port: 80
@@ -750,8 +750,12 @@ status:
     protocol: HTTPS
     port: 443
     conditions:
+	- message: ListenerSet has conflicts with Gateway 'infra/parent-gateway'
+      reason: ParentNotAccepted
+      status: "False"
+      type: Accepted
     - message: ListenerSet has conflicts with Gateway 'infra/parent-gateway'
-      reason: Conflicted
+      reason: ListenerConflict
       status: "True"
       type: Conflicted
 ```
@@ -834,7 +838,7 @@ status:
     port: 443
     conditions:
     - message: ListenerSet has conflicts with other listeners attached to the same Gateway
-      reason: Conflicted
+      reason: ListenerConflict
       status: "True"
       type: Conflicted
 ---
