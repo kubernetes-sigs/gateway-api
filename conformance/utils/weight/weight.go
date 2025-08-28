@@ -79,7 +79,7 @@ func TestWeightedDistribution(sender RequestSender, expectedWeights map[string]f
 
 			// Extract the backend name from the pod name
 			backendName := extractBackendName(podName)
-	
+
 			seenMutex.Lock()
 			defer seenMutex.Unlock()
 
@@ -156,7 +156,7 @@ func AddRandomEntropy(addRandomValue func(string) error) error {
 	if err != nil {
 		// Fallback to case 0 if crypto/rand fails
 		addRandomDelay(1000)
-		return nil
+		return err
 	}
 	random := n.Int64()
 

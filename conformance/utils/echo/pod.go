@@ -134,14 +134,14 @@ func compareRequest(exp http.ExpectedResponse, resp Response) error {
 		// The Istio echo client reports HTTP status codes even for gRPC requests
 		expectedStatusCodes := make([]int, len(wantResp.StatusCodes))
 		copy(expectedStatusCodes, wantResp.StatusCodes)
-		
+
 		// Map gRPC status 0 (OK) to HTTP 200 if needed
 		for i, code := range expectedStatusCodes {
 			if code == 0 {
 				expectedStatusCodes[i] = 200
 			}
 		}
-		
+
 		if !slices.Contains(expectedStatusCodes, statusCode) {
 			return fmt.Errorf("wanted gRPC status code to be one of %v (mapped to HTTP), got %d", wantResp.StatusCodes, statusCode)
 		}
