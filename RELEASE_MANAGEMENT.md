@@ -1,13 +1,8 @@
 # Release Management
 
 Major and minor releases for Gateway API are managed by a "Release Manager".
-The responsibilities of the release manager include:
-
-* Creating and managing a GitHub Milestone for the release.
-* Creating and managing a GitHub Project board for the release.
-* Creating and managing a GitHub Discussion Boards announcement for the release.
-  * This includes discussions to handle scoping for each release _channel_ as well.
-* Working through the [Release Cycle](#release-phases) for the release.
+The responsibilities of the release manager are defined in the [Release Manager]
+role definition doc.
 
 This management process ultimately results in the manager of the release
 shipping the release as per the [Release Process]. We will go into more detail
@@ -19,6 +14,7 @@ about this in the sections that follow.
 
 [Release Cycle]:https://gateway-api.sigs.k8s.io/contributing/release-cycle/
 [Release Process]:/RELEASE.md
+[Release Manager]:/roles/RELEASE_MANAGER.md
 
 ## Assigning a Release Manager
 
@@ -91,18 +87,25 @@ cycle is outlined in the [Release Cycle] documentation and should be followed
 according to that.
 
 The release manager is responsible for communicating with the community and
-seeking volunteers for features to be included in the release, and thus the
-release will be considered a **feature release**. If there are few or no
-volunteers the release may simply end being a smaller **maintenance release**.
+seeking volunteers for features to be included in the release.
 
-> **Note**: Updates on the community sync and discussion boards about the
-> release process should be communicated regularly. We recommend bi-weekly
-> unless there's a clear reason to do more, or less.
+Each enhancement included in the release must have at least two people
+responsible for it:
 
-> **Note**: Communicating whether a release is expected to be a **feature
-> release** or a **maintenance release** is largely done via the [Milestone].
-> However, the final GitHub release should also make note of this in the
-> release description.
+* **Owner**: This is the person who asks for the GEP to be included in the
+  release, and who is primarily responsible for doing the work to make the feature
+  happen.
+* **Shepherd**: This is the person who agrees to be the primary reviewer, and
+  to assist the feature through the GEP review process. Ideally, this person has
+  been a feature owner in the past and has experience with the GEP review process,
+  and can help smooth out any rough patches.
+
+The Release Manager is expected to communicate regularly with Owners and Shepherds
+about the progress of their feature.
+
+Additionally, the Release Manager MUST keep the broader community updated on the
+release, including what is currently in scope for the release, and any changes
+or updates. This MUST be done at least weekly.
 
 Release candidates--and the eventual final release--must utilize the [Release
 Process](/RELEASE.md) for delivery.
@@ -116,7 +119,7 @@ final release when it is cut.
 
 ## Time Extensions
 
-Extensions to timelines may be requested by contributors. Our guidelines for
+Extensions to deadlines may be requested by contributors. Our guidelines for
 this are based on the Kubernetes process:
 
 * Extensions can be granted on a per-GEP basis
