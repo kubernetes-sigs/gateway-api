@@ -18,12 +18,14 @@ package v1alpha2
 
 import v1 "sigs.k8s.io/gateway-api/apis/v1"
 
-type ParentReference = v1.ParentReference
-type CommonRouteSpec = v1.CommonRouteSpec
-type PortNumber = v1.PortNumber
-type BackendRef = v1.BackendRef
-type RouteConditionType = v1.RouteConditionType
-type RouteConditionReason = v1.RouteConditionReason
+type (
+	ParentReference      = v1.ParentReference
+	CommonRouteSpec      = v1.CommonRouteSpec
+	PortNumber           = v1.PortNumber
+	BackendRef           = v1.BackendRef
+	RouteConditionType   = v1.RouteConditionType
+	RouteConditionReason = v1.RouteConditionReason
+)
 
 const (
 	// This condition indicates whether the route has been accepted or rejected
@@ -107,20 +109,22 @@ const (
 	RouteReasonBackendNotFound RouteConditionReason = "BackendNotFound"
 )
 
-type RouteParentStatus = v1.RouteParentStatus
-type RouteStatus = v1.RouteStatus
-type Hostname = v1.Hostname
-type PreciseHostname = v1.PreciseHostname
-type Group = v1.Group
-type Kind = v1.Kind
-type ObjectName = v1.ObjectName
-type Namespace = v1.Namespace
-type SectionName = v1.SectionName
-type GatewayController = v1.GatewayController
-type AnnotationKey = v1.AnnotationKey
-type AnnotationValue = v1.AnnotationValue
-type AddressType = v1.AddressType
-type Duration = v1.Duration
+type (
+	RouteParentStatus = v1.RouteParentStatus
+	RouteStatus       = v1.RouteStatus
+	Hostname          = v1.Hostname
+	PreciseHostname   = v1.PreciseHostname
+	Group             = v1.Group
+	Kind              = v1.Kind
+	ObjectName        = v1.ObjectName
+	Namespace         = v1.Namespace
+	SectionName       = v1.SectionName
+	GatewayController = v1.GatewayController
+	AnnotationKey     = v1.AnnotationKey
+	AnnotationValue   = v1.AnnotationValue
+	AddressType       = v1.AddressType
+	Duration          = v1.Duration
+)
 
 const (
 	// A textual representation of a numeric IP address. IPv4
