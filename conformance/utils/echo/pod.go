@@ -82,7 +82,15 @@ func makeRequest(t *testing.T, exp *http.ExpectedResponse) []string {
 	if exp.Request.Host == "" {
 		exp.Request.Host = "echo"
 	}
-	if exp.Request.Method == "" {
+
+	r := exp.Request
+	protocol := strings.ToLower(r.Protocol)
+	if protocol == "" {
+		protocol = "http"
+	}
+
+	// Only set default method for HTTP protocols, not for gRPC
+	if protocol != "grpc" && exp.Request.Method == "" {
 		exp.Request.Method = "GET"
 	}
 
@@ -96,14 +104,9 @@ func makeRequest(t *testing.T, exp *http.ExpectedResponse) []string {
 		exp.Response.StatusCodes = []int{200}
 	}
 
-	r := exp.Request
-	protocol := strings.ToLower(r.Protocol)
-	if protocol == "" {
-		protocol = "http"
-	}
 	host := http.CalculateHost(t, r.Host, protocol)
 	args := []string{"client", fmt.Sprintf("%s://%s%s", protocol, host, r.Path)}
-	if r.Method != "" {
+	if protocol != "grpc" && r.Method != "" {
 		args = append(args, "--method="+r.Method)
 	}
 	for k, v := range r.Headers {
@@ -118,11 +121,32 @@ func compareRequest(exp http.ExpectedResponse, resp Response) error {
 	}
 	wantReq := exp.ExpectedRequest
 	wantResp := exp.Response
+
+	// Parse the response status code
 	statusCode, err := strconv.Atoi(resp.Code)
 	if err != nil {
 		return fmt.Errorf("invalid status code '%v': %v", resp.Code, err)
 	}
-	if !slices.Contains(wantResp.StatusCodes, statusCode) {
+
+	// Handle gRPC protocol special case for status code mapping
+	if strings.ToLower(exp.Request.Protocol) == "grpc" {
+		// For gRPC, we need to handle the status code mapping
+		// The Istio echo client reports HTTP status codes even for gRPC requests
+		expectedStatusCodes := make([]int, len(wantResp.StatusCodes))
+		copy(expectedStatusCodes, wantResp.StatusCodes)
+
+		// Map gRPC status 0 (OK) to HTTP 200 if needed
+		for i, code := range expectedStatusCodes {
+			if code == 0 {
+				expectedStatusCodes[i] = 200
+			}
+		}
+
+		if !slices.Contains(expectedStatusCodes, statusCode) {
+			return fmt.Errorf("wanted gRPC status code to be one of %v (mapped to HTTP), got %d", wantResp.StatusCodes, statusCode)
+		}
+	} else if !slices.Contains(wantResp.StatusCodes, statusCode) {
+		// For HTTP, use the status codes directly
 		return fmt.Errorf("wanted status code to be one of %v, got %d", wantResp.StatusCodes, statusCode)
 	}
 	if wantReq.Headers != nil {
