@@ -25,12 +25,12 @@ import (
 // ListenerApplyConfiguration represents a declarative configuration of the Listener type for use
 // with apply.
 type ListenerApplyConfiguration struct {
-	Name          *apisv1.SectionName                 `json:"name,omitempty"`
-	Hostname      *apisv1.Hostname                    `json:"hostname,omitempty"`
-	Port          *apisv1.PortNumber                  `json:"port,omitempty"`
-	Protocol      *apisv1.ProtocolType                `json:"protocol,omitempty"`
-	TLS           *GatewayTLSConfigApplyConfiguration `json:"tls,omitempty"`
-	AllowedRoutes *AllowedRoutesApplyConfiguration    `json:"allowedRoutes,omitempty"`
+	Name          *apisv1.SectionName                  `json:"name,omitempty"`
+	Hostname      *apisv1.Hostname                     `json:"hostname,omitempty"`
+	Port          *apisv1.PortNumber                   `json:"port,omitempty"`
+	Protocol      *apisv1.ProtocolType                 `json:"protocol,omitempty"`
+	TLS           *ListenerTLSConfigApplyConfiguration `json:"tls,omitempty"`
+	AllowedRoutes *AllowedRoutesApplyConfiguration     `json:"allowedRoutes,omitempty"`
 }
 
 // ListenerApplyConfiguration constructs a declarative configuration of the Listener type for use with
@@ -74,7 +74,7 @@ func (b *ListenerApplyConfiguration) WithProtocol(value apisv1.ProtocolType) *Li
 // WithTLS sets the TLS field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the TLS field is set to the value of the last call.
-func (b *ListenerApplyConfiguration) WithTLS(value *GatewayTLSConfigApplyConfiguration) *ListenerApplyConfiguration {
+func (b *ListenerApplyConfiguration) WithTLS(value *ListenerTLSConfigApplyConfiguration) *ListenerApplyConfiguration {
 	b.TLS = value
 	return b
 }

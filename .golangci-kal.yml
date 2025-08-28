@@ -1,0 +1,38 @@
+version: "2"
+linters:
+  default: none
+  enable:
+    - kubeapilinter
+  settings:
+    custom:
+      kubeapilinter:
+        type: module
+        description: Kube API LInter lints Kube like APIs based on API conventions and best practices.
+        settings:
+          linters:
+            enable:
+              - "duplicatemarkers" # Ensure there are no exact duplicate markers. for types and fields.
+              - "jsontags" # Ensure every field has a json tag.
+              - "nofloats" # Ensure floats are not used.
+              - "nomaps" # Ensure maps are not used.
+              - "nophase" # Phase fields are discouraged by the Kube API conventions, use conditions instead.
+              - "optionalorrequired" # Every field should be marked as `+optional` or `+required`.
+              - "ssatags" # Ensure proper Server-Side Apply (SSA) tags on array fields.
+              - "statussubresource" # All root objects that have a `status` field should have a status subresource.
+              - "uniquemarkers" # Ensure that types and fields do not contain more than a single definition of a marker that should only be present once.
+            disable:
+              - "*"
+          lintersConfig: {}
+  exclusions:
+    generated: strict
+    paths:
+      - conformance/
+    paths-except:
+      - apis/
+      - apisx/
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0
+run:
+  timeout: 5m
+  tests: false

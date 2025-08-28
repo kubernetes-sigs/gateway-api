@@ -18,10 +18,15 @@ limitations under the License.
 
 package v1
 
+import (
+	apisv1 "sigs.k8s.io/gateway-api/apis/v1"
+)
+
 // FrontendTLSValidationApplyConfiguration represents a declarative configuration of the FrontendTLSValidation type for use
 // with apply.
 type FrontendTLSValidationApplyConfiguration struct {
 	CACertificateRefs []ObjectReferenceApplyConfiguration `json:"caCertificateRefs,omitempty"`
+	Mode              *apisv1.FrontendValidationModeType  `json:"mode,omitempty"`
 }
 
 // FrontendTLSValidationApplyConfiguration constructs a declarative configuration of the FrontendTLSValidation type for use with
@@ -40,5 +45,13 @@ func (b *FrontendTLSValidationApplyConfiguration) WithCACertificateRefs(values .
 		}
 		b.CACertificateRefs = append(b.CACertificateRefs, *values[i])
 	}
+	return b
+}
+
+// WithMode sets the Mode field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the Mode field is set to the value of the last call.
+func (b *FrontendTLSValidationApplyConfiguration) WithMode(value apisv1.FrontendValidationModeType) *FrontendTLSValidationApplyConfiguration {
+	b.Mode = &value
 	return b
 }

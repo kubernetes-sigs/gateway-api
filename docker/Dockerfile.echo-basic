@@ -13,7 +13,7 @@
 # limitations under the License.
 
 # Build
-FROM golang:1.22.2 as builder
+FROM golang:1.22.2 AS builder
 
 ENV CGO_ENABLED=0
 
@@ -23,9 +23,10 @@ COPY ./conformance/echo-basic ./
 
 # If left as go.mod and go.sum in the external repo, these files would
 # interfere with the ability to use reuse the protobuf/gRPC generated code
-# for the test client in the conformance tests.
-RUN mv .go.mod go.mod
-RUN mv .go.sum go.sum
+# for the test client in the conformance tests.  Add -f in case previous run
+# is aborted and not cleaned up.
+RUN mv -f .go.mod go.mod
+RUN mv -f .go.sum go.sum
 
 RUN go build -trimpath -ldflags="-buildid= -s -w" -o echo-basic .
 

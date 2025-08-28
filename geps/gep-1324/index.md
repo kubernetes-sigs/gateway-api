@@ -33,7 +33,7 @@ Gateway API represents the next generation of traffic routing APIs in Kubernetes
 
 ## Versioning
 
-Features or other modifications to the Gateway API spec that fall under this GEP will be subject to the same [versioning guidelines](../../concepts/versioning.md#graduation-criteria) as the rest of the Gateway API. For example, to move changes concerning a beta feature (e.g. HTTPRoute) from experimental to standard, all of the [beta criteria](../../concepts/versioning.md#experimental-standard) must be met (e.g. implemented by several implementations).
+Features or other modifications to the Gateway API spec that fall under this GEP will be subject to the same [versioning guidelines](../../concepts/versioning.md#graduation-criteria) as the rest of the Gateway API. For example, to move changes concerning a beta feature (e.g. HTTPRoute) from experimental to standard, all of the [graduation criteria](../../concepts/versioning.md#graduation-criteria) must be met (e.g. implemented by several implementations).
 
 ## Use-Cases
 

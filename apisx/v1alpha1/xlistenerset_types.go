@@ -29,24 +29,53 @@ import (
 // +kubebuilder:printcolumn:name="Programmed",type=string,JSONPath=`.status.conditions[?(@.type=="Programmed")].status`
 // +kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 
-// XListenerSet defines a set of additional listeners
-// to attach to an existing Gateway.
+// XListenerSet defines a set of additional listeners to attach to an existing Gateway.
+// This resource provides a mechanism to merge multiple listeners into a single Gateway.
+//
+// The parent Gateway must explicitly allow ListenerSet attachment through its
+// AllowedListeners configuration. By default, Gateways do not allow ListenerSet
+// attachment.
+//
+// Routes can attach to a ListenerSet by specifying it as a parentRef, and can
+// optionally target specific listeners using the sectionName field.
+//
+// Policy Attachment:
+// - Policies that attach to a ListenerSet apply to all listeners defined in that resource
+// - Policies do not impact listeners in the parent Gateway
+// - Different ListenerSets attached to the same Gateway can have different policies
+// - If an implementation cannot apply a policy to specific listeners, it should reject the policy
+//
+// ReferenceGrant Semantics:
+// - ReferenceGrants applied to a Gateway are not inherited by child ListenerSets
+// - ReferenceGrants applied to a ListenerSet do not grant permission to the parent Gateway's listeners
+// - A ListenerSet can reference secrets/backends in its own namespace without a ReferenceGrant
+//
+// Gateway Integration:
+// - The parent Gateway's status will include an "AttachedListenerSets" condition
+// - This condition will be:
+//   - True: when AllowedListeners is set and at least one child ListenerSet is attached
+//   - False: when AllowedListeners is set but no valid listeners are attached, or when AllowedListeners is not set or false
+//   - Unknown: when no AllowedListeners config is present
 type XListenerSet struct {
-	metav1.TypeMeta   `json:",inline"`
+	metav1.TypeMeta `json:",inline"`
+	// +optional
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	// Spec defines the desired state of ListenerSet.
+	// +required
 	Spec ListenerSetSpec `json:"spec"`
 
 	// Status defines the current state of ListenerSet.
 	//
 	// +kubebuilder:default={conditions: {{type: "Accepted", status: "Unknown", reason:"Pending", message:"Waiting for controller", lastTransitionTime: "1970-01-01T00:00:00Z"},{type: "Programmed", status: "Unknown", reason:"Pending", message:"Waiting for controller", lastTransitionTime: "1970-01-01T00:00:00Z"}}}
+	// +optional
 	Status ListenerSetStatus `json:"status,omitempty"`
 }
 
 // ListenerSetSpec defines the desired state of a ListenerSet.
 type ListenerSetSpec struct {
 	// ParentRef references the Gateway that the listeners are attached to.
+	// +required
 	ParentRef ParentGatewayReference `json:"parentRef"`
 
 	// Listeners associated with this ListenerSet. Listeners define
@@ -63,10 +92,10 @@ type ListenerSetSpec struct {
 	//
 	// 1. "parent" Gateway
 	// 2. ListenerSet ordered by creation time (oldest first)
-	// 3. ListenerSet ordered alphabetically by “{namespace}/{name}”.
+	// 3. ListenerSet ordered alphabetically by "{namespace}/{name}".
 	//
 	// An implementation MAY reject listeners by setting the ListenerEntryStatus
-	// `Accepted`` condition to False with the Reason `TooManyListeners`
+	// `Accepted` condition to False with the Reason `TooManyListeners`
 	//
 	// If a listener has a conflict, this will be reported in the
 	// Status.ListenerEntryStatus setting the `Conflicted` condition to True.
@@ -85,6 +114,7 @@ type ListenerSetSpec struct {
 	// +kubebuilder:validation:XValidation:message="hostname must not be specified for protocols ['TCP', 'UDP']",rule="self.all(l, l.protocol in ['TCP', 'UDP']  ? (!has(l.hostname) || l.hostname == '') : true)"
 	// +kubebuilder:validation:XValidation:message="Listener name must be unique within the Gateway",rule="self.all(l1, self.exists_one(l2, l1.name == l2.name))"
 	// +kubebuilder:validation:XValidation:message="Combination of port, protocol and hostname must be unique for each listener",rule="self.all(l1, !has(l1.port) || self.exists_one(l2, has(l2.port) && l1.port == l2.port && l1.protocol == l2.protocol && (has(l1.hostname) && has(l2.hostname) ? l1.hostname == l2.hostname : !has(l1.hostname) && !has(l2.hostname))))"
+	// +required
 	Listeners []ListenerEntry `json:"listeners"`
 }
 
@@ -95,6 +125,7 @@ type ListenerEntry struct {
 	// Name is not required to be unique across a Gateway and ListenerSets.
 	// Routes can attach to a Listener by having a ListenerSet as a parentRef
 	// and setting the SectionName
+	// +required
 	Name SectionName `json:"name"`
 
 	// Hostname specifies the virtual hostname to match for protocol types that
@@ -127,23 +158,35 @@ type ListenerEntry struct {
 
 	// Port is the network port. Multiple listeners may use the
 	// same port, subject to the Listener compatibility rules.
-	Port PortNumber `json:"port"`
+	//
+	// If the port is not set or specified as zero, the implementation will assign
+	// a unique port. If the implementation does not support dynamic port
+	// assignment, it MUST set `Accepted` condition to `False` with the
+	// `UnsupportedPort` reason.
+	//
+	// +optional
+	//
+	// +kubebuilder:default=0
+	// +kubebuilder:validation:Minimum=0
+	// +kubebuilder:validation:Maximum=65535
+	Port PortNumber `json:"port,omitempty"`
 
 	// Protocol specifies the network protocol this listener expects to receive.
+	// +required
 	Protocol ProtocolType `json:"protocol"`
 
 	// TLS is the TLS configuration for the Listener. This field is required if
 	// the Protocol field is "HTTPS" or "TLS". It is invalid to set this field
 	// if the Protocol field is "HTTP", "TCP", or "UDP".
 	//
-	// The association of SNIs to Certificate defined in GatewayTLSConfig is
+	// The association of SNIs to Certificate defined in ListenerTLSConfig is
 	// defined based on the Hostname field for this listener.
 	//
 	// The GatewayClass MUST use the longest matching SNI out of all
 	// available certificates for any TLS handshake.
 	//
 	// +optional
-	TLS *GatewayTLSConfig `json:"tls,omitempty"`
+	TLS *ListenerTLSConfig `json:"tls,omitempty"`
 
 	// AllowedRoutes defines the types of routes that MAY be attached to a
 	// Listener and the trusted namespaces where those Route resources MAY be
@@ -205,9 +248,15 @@ type ListenerSetStatus struct {
 // ListenerStatus is the status associated with a Listener.
 type ListenerEntryStatus struct {
 	// Name is the name of the Listener that this status corresponds to.
+	// +required
 	Name SectionName `json:"name"`
 
 	// Port is the network port the listener is configured to listen on.
+	//
+	// +kubebuilder:validation:Minimum=1
+	// +kubebuilder:validation:Maximum=65535
+	//
+	// +required
 	Port PortNumber `json:"port"`
 
 	// SupportedKinds is the list indicating the Kinds supported by this
@@ -220,6 +269,8 @@ type ListenerEntryStatus struct {
 	// and invalid Route kinds are specified, the implementation MUST
 	// reference the valid Route kinds that have been specified.
 	//
+	// +required
+	// +listType=atomic
 	// +kubebuilder:validation:MaxItems=8
 	SupportedKinds []RouteGroupKind `json:"supportedKinds"`
 
@@ -240,6 +291,7 @@ type ListenerEntryStatus struct {
 	//
 	// Uses for this field include troubleshooting Route attachment and
 	// measuring blast radius/impact of changes to a Listener.
+	// +required
 	AttachedRoutes int32 `json:"attachedRoutes"`
 
 	// Conditions describe the current condition of this listener.
@@ -247,6 +299,7 @@ type ListenerEntryStatus struct {
 	// +listType=map
 	// +listMapKey=type
 	// +kubebuilder:validation:MaxItems=8
+	// +required
 	Conditions []metav1.Condition `json:"conditions"`
 }
 

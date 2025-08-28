@@ -62,13 +62,25 @@ func NewFilteredXBackendTrafficPolicyInformer(client versioned.Interface, namesp
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.ExperimentalV1alpha1().XBackendTrafficPolicies(namespace).List(context.TODO(), options)
+				return client.ExperimentalV1alpha1().XBackendTrafficPolicies(namespace).List(context.Background(), options)
 			},
 			WatchFunc: func(options v1.ListOptions) (watch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.ExperimentalV1alpha1().XBackendTrafficPolicies(namespace).Watch(context.TODO(), options)
+				return client.ExperimentalV1alpha1().XBackendTrafficPolicies(namespace).Watch(context.Background(), options)
+			},
+			ListWithContextFunc: func(ctx context.Context, options v1.ListOptions) (runtime.Object, error) {
+				if tweakListOptions != nil {
+					tweakListOptions(&options)
+				}
+				return client.ExperimentalV1alpha1().XBackendTrafficPolicies(namespace).List(ctx, options)
+			},
+			WatchFuncWithContext: func(ctx context.Context, options v1.ListOptions) (watch.Interface, error) {
+				if tweakListOptions != nil {
+					tweakListOptions(&options)
+				}
+				return client.ExperimentalV1alpha1().XBackendTrafficPolicies(namespace).Watch(ctx, options)
 			},
 		},
 		&gatewayapiapisxv1alpha1.XBackendTrafficPolicy{},

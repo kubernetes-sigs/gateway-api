@@ -95,6 +95,39 @@ spec:
           matchLabels:
             gateway-conformance: backend
 ---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: gateway-backendtlspolicy
+  namespace: gateway-conformance-infra
+spec:
+  gatewayClassName: "{GATEWAY_CLASS_NAME}"
+  listeners:
+  - name: http
+    port: 80
+    protocol: HTTP
+    hostname: "abc.example.com"
+    allowedRoutes:
+      namespaces:
+        from: Same
+      kinds:
+      - kind: HTTPRoute
+  - name: https
+    port: 443
+    protocol: HTTPS
+    tls:
+      mode: Terminate
+      certificateRefs:
+      - group: ""
+        kind: Secret
+        name: tls-checks-certificate
+    hostname: "abc.example.com"
+    allowedRoutes:
+      namespaces:
+        from: Same
+      kinds:
+      - kind: HTTPRoute
+---
 apiVersion: v1
 kind: Service
 metadata:
@@ -138,7 +171,7 @@ spec:
     spec:
       containers:
       - name: infra-backend-v1
-        # From https://github.com/kubernetes-sigs/ingress-controller-conformance/tree/master/images/echoserver
+        # Originally from https://github.com/kubernetes-sigs/ingress-controller-conformance/tree/master/images/echoserver
         image: gcr.io/k8s-staging-gateway-api/echo-basic:v20240412-v1.0.0-394-g40c666fd
         env:
         - name: POD_NAME
@@ -300,7 +333,7 @@ spec:
       volumes:
       - name: secret-volume
         secret:
-          secretName: tls-passthrough-checks-certificate
+          secretName: tls-checks-certificate
           items:
           - key: tls.crt
             path: crt

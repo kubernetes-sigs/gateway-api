@@ -38,12 +38,15 @@ const (
 // the policy attachment documentation for Gateway API.
 type LocalPolicyTargetReference struct {
 	// Group is the group of the target resource.
+	// +required
 	Group Group `json:"group"`
 
 	// Kind is kind of the target resource.
+	// +required
 	Kind Kind `json:"kind"`
 
 	// Name is the name of the target resource.
+	// +required
 	Name ObjectName `json:"name"`
 }
 
@@ -55,12 +58,15 @@ type LocalPolicyTargetReference struct {
 // documentation for Gateway API.
 type NamespacedPolicyTargetReference struct {
 	// Group is the group of the target resource.
+	// +required
 	Group Group `json:"group"`
 
 	// Kind is kind of the target resource.
+	// +required
 	Kind Kind `json:"kind"`
 
 	// Name is the name of the target resource.
+	// +required
 	Name ObjectName `json:"name"`
 
 	// Namespace is the namespace of the referent. When unspecified, the local
@@ -174,6 +180,7 @@ const (
 type PolicyAncestorStatus struct {
 	// AncestorRef corresponds with a ParentRef in the spec that this
 	// PolicyAncestorStatus struct describes the status of.
+	// +required
 	AncestorRef ParentReference `json:"ancestorRef"`
 
 	// ControllerName is a domain/path string that indicates the name of the
@@ -189,10 +196,42 @@ type PolicyAncestorStatus struct {
 	// Controllers MUST populate this field when writing status. Controllers should ensure that
 	// entries to status populated with their ControllerName are cleaned up when they are no
 	// longer necessary.
+	// +required
 	ControllerName GatewayController `json:"controllerName"`
 
 	// Conditions describes the status of the Policy with respect to the given Ancestor.
 	//
+	// <gateway:util:excludeFromCRD>
+	//
+	// Notes for implementors:
+	//
+	// Conditions are a listType `map`, which means that they function like a
+	// map with a key of the `type` field _in the k8s apiserver_.
+	//
+	// This means that implementations must obey some rules when updating this
+	// section.
+	//
+	// * Implementations MUST perform a read-modify-write cycle on this field
+	//   before modifying it. That is, when modifying this field, implementations
+	//   must be confident they have fetched the most recent version of this field,
+	//   and ensure that changes they make are on that recent version.
+	// * Implementations MUST NOT remove or reorder Conditions that they are not
+	//   directly responsible for. For example, if an implementation sees a Condition
+	//   with type `special.io/SomeField`, it MUST NOT remove, change or update that
+	//   Condition.
+	// * Implementations MUST always _merge_ changes into Conditions of the same Type,
+	//   rather than creating more than one Condition of the same Type.
+	// * Implementations MUST always update the `observedGeneration` field of the
+	//   Condition to the `metadata.generation` of the Gateway at the time of update creation.
+	// * If the `observedGeneration` of a Condition is _greater than_ the value the
+	//   implementation knows about, then it MUST NOT perform the update on that Condition,
+	//   but must wait for a future reconciliation and status update. (The assumption is that
+	//   the implementation's copy of the object is stale and an update will be re-triggered
+	//   if relevant.)
+	//
+	// </gateway:util:excludeFromCRD>
+	//
+	// +required
 	// +listType=map
 	// +listMapKey=type
 	// +kubebuilder:validation:MinItems=1
@@ -233,6 +272,8 @@ type PolicyStatus struct {
 	// additional Gateways would be able to reference the Service targeted by
 	// the BackendTLSPolicy.
 	//
+	// +required
+	// +listType=atomic
 	// +kubebuilder:validation:MaxItems=16
 	Ancestors []PolicyAncestorStatus `json:"ancestors"`
 }

@@ -126,6 +126,7 @@ spec:
                       true'
                 maxItems: 16
                 type: array
+                x-kubernetes-list-type: atomic
                 x-kubernetes-validations:
                 - message: IPAddress values must be unique
                   rule: 'self.all(a1, a1.type == ''IPAddress'' ? self.exists_one(a2,
@@ -488,6 +489,7 @@ spec:
                             type: object
                           maxItems: 8
                           type: array
+                          x-kubernetes-list-type: atomic
                         namespaces:
                           default:
                             from: Same
@@ -655,7 +657,7 @@ spec:
                         the Protocol field is "HTTPS" or "TLS". It is invalid to set this field
                         if the Protocol field is "HTTP", "TCP", or "UDP".
 
-                        The association of SNIs to Certificate defined in GatewayTLSConfig is
+                        The association of SNIs to Certificate defined in ListenerTLSConfig is
                         defined based on the Hostname field for this listener.
 
                         The GatewayClass MUST use the longest matching SNI out of all
@@ -742,6 +744,7 @@ spec:
                             type: object
                           maxItems: 64
                           type: array
+                          x-kubernetes-list-type: atomic
                         mode:
                           default: Terminate
                           description: |-
@@ -894,6 +897,7 @@ spec:
                       true'
                 maxItems: 16
                 type: array
+                x-kubernetes-list-type: atomic
               conditions:
                 default:
                 - lastTransitionTime: "1970-01-01T00:00:00Z"
@@ -1107,6 +1111,7 @@ spec:
                         type: object
                       maxItems: 8
                       type: array
+                      x-kubernetes-list-type: atomic
                   required:
                   - attachedRoutes
                   - conditions
@@ -1232,6 +1237,7 @@ spec:
                       true'
                 maxItems: 16
                 type: array
+                x-kubernetes-list-type: atomic
                 x-kubernetes-validations:
                 - message: IPAddress values must be unique
                   rule: 'self.all(a1, a1.type == ''IPAddress'' ? self.exists_one(a2,
@@ -1594,6 +1600,7 @@ spec:
                             type: object
                           maxItems: 8
                           type: array
+                          x-kubernetes-list-type: atomic
                         namespaces:
                           default:
                             from: Same
@@ -1761,7 +1768,7 @@ spec:
                         the Protocol field is "HTTPS" or "TLS". It is invalid to set this field
                         if the Protocol field is "HTTP", "TCP", or "UDP".
 
-                        The association of SNIs to Certificate defined in GatewayTLSConfig is
+                        The association of SNIs to Certificate defined in ListenerTLSConfig is
                         defined based on the Hostname field for this listener.
 
                         The GatewayClass MUST use the longest matching SNI out of all
@@ -1848,6 +1855,7 @@ spec:
                             type: object
                           maxItems: 64
                           type: array
+                          x-kubernetes-list-type: atomic
                         mode:
                           default: Terminate
                           description: |-
@@ -2000,6 +2008,7 @@ spec:
                       true'
                 maxItems: 16
                 type: array
+                x-kubernetes-list-type: atomic
               conditions:
                 default:
                 - lastTransitionTime: "1970-01-01T00:00:00Z"
@@ -2213,6 +2222,7 @@ spec:
                         type: object
                       maxItems: 8
                       type: array
+                      x-kubernetes-list-type: atomic
                   required:
                   - attachedRoutes
                   - conditions
