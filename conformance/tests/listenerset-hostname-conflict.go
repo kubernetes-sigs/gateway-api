@@ -31,19 +31,19 @@ import (
 )
 
 func init() {
-	ConformanceTests = append(ConformanceTests, ListenerSetDomainNameConflict)
+	ConformanceTests = append(ConformanceTests, ListenerSetHostnameConflict)
 }
 
-var ListenerSetDomainNameConflict = suite.ConformanceTest{
-	ShortName:   "ListenerSetDomainNameConflict",
-	Description: "Listener Set listener with domain name conflicts to validate Listener Precedence",
+var ListenerSetHostnameConflict = suite.ConformanceTest{
+	ShortName:   "ListenerSetHostnameConflict",
+	Description: "Listener Set listener with hostname conflicts to validate Listener Precedence",
 	Features: []features.FeatureName{
 		features.SupportGateway,
 		features.SupportGatewayListenerSet,
 		features.SupportHTTPRoute,
 	},
 	Manifests: []string{
-		"tests/listenerset-domain-name-conflict.yaml",
+		"tests/listenerset-hostname-conflict.yaml",
 	},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
@@ -69,26 +69,26 @@ var ListenerSetDomainNameConflict = suite.ConformanceTest{
 			},
 			// Requests to the listener with domain name conflict should work on the first listener (based on listener precedence - gateway listener)
 			{
-				Request:   http.Request{Host: "domain-name-conflict-listener-1.com", Path: "/gateway-route"},
+				Request:   http.Request{Host: "hostname-conflict-listener-1.com", Path: "/gateway-route"},
 				Backend:   "infra-backend-v1",
 				Namespace: ns,
 			},
 			{
-				Request:  http.Request{Host: "domain-name-conflict-listener-1.com", Path: "/listenerset-1-route"},
+				Request:  http.Request{Host: "hostname-conflict-listener-1.com", Path: "/listenerset-1-route"},
 				Response: http.Response{StatusCode: 404},
 			},
 			{
-				Request:  http.Request{Host: "domain-name-conflict-listener-1.com", Path: "/listenerset-2-route"},
+				Request:  http.Request{Host: "hostname-conflict-listener-1.com", Path: "/listenerset-2-route"},
 				Response: http.Response{StatusCode: 404},
 			},
 			// Requests to the listener with domain name conflict should work on the first listener (based on listener precedence - alphabetic / creation time)
 			{
-				Request:   http.Request{Host: "domain-name-conflict-listener-2.com", Path: "/listenerset-1-route"},
+				Request:   http.Request{Host: "hostname-conflict-listener-2.com", Path: "/listenerset-1-route"},
 				Backend:   "infra-backend-v2",
 				Namespace: ns,
 			},
 			{
-				Request:  http.Request{Host: "domain-name-conflict-listener-2.com", Path: "/listenerset-2-route"},
+				Request:  http.Request{Host: "hostname-conflict-listener-2.com", Path: "/listenerset-2-route"},
 				Response: http.Response{StatusCode: 404},
 			},
 		}
@@ -141,7 +141,7 @@ var ListenerSetDomainNameConflict = suite.ConformanceTest{
 		})
 		kubernetes.GatewayListenersMustHaveConditions(t, suite.Client, suite.TimeoutConfig, gwNN, acceptedListenerConditions, "gateway-listener")
 		// The first conflicted listener is accepted based on Listener precedence
-		kubernetes.GatewayListenersMustHaveConditions(t, suite.Client, suite.TimeoutConfig, gwNN, acceptedListenerConditions, "domain-name-conflict-listener-1")
+		kubernetes.GatewayListenersMustHaveConditions(t, suite.Client, suite.TimeoutConfig, gwNN, acceptedListenerConditions, "hostname-conflict-listener-1")
 
 		// ListenerSet1, route and conditions
 		ls1NN := types.NamespacedName{Name: "listenerset-with-conflict-1", Namespace: ns}
@@ -163,9 +163,9 @@ var ListenerSetDomainNameConflict = suite.ConformanceTest{
 		})
 		kubernetes.ListenerSetListenersMustHaveConditions(t, suite.Client, suite.TimeoutConfig, ls1NN, acceptedListenerConditions, "listenerset-1-listener")
 		// The conflicted listener should not be accepted
-		kubernetes.ListenerSetListenersMustHaveConditions(t, suite.Client, suite.TimeoutConfig, ls1NN, hostnameConflictedListenerConditions, "domain-name-conflict-listener-1")
+		kubernetes.ListenerSetListenersMustHaveConditions(t, suite.Client, suite.TimeoutConfig, ls1NN, hostnameConflictedListenerConditions, "hostname-conflict-listener-1")
 		// The first conflicted listener is accepted based on Listener precedence
-		kubernetes.ListenerSetListenersMustHaveConditions(t, suite.Client, suite.TimeoutConfig, ls1NN, acceptedListenerConditions, "domain-name-conflict-listener-2")
+		kubernetes.ListenerSetListenersMustHaveConditions(t, suite.Client, suite.TimeoutConfig, ls1NN, acceptedListenerConditions, "hostname-conflict-listener-2")
 
 		// ListenerSet2, route and conditions
 		ls2NN := types.NamespacedName{Name: "listenerset-with-conflict-2", Namespace: ns}
@@ -187,8 +187,8 @@ var ListenerSetDomainNameConflict = suite.ConformanceTest{
 		})
 		kubernetes.ListenerSetListenersMustHaveConditions(t, suite.Client, suite.TimeoutConfig, ls2NN, acceptedListenerConditions, "listenerset-2-listener")
 		// The conflicted listeners should not be accepted
-		kubernetes.ListenerSetListenersMustHaveConditions(t, suite.Client, suite.TimeoutConfig, ls2NN, hostnameConflictedListenerConditions, "domain-name-conflict-listener-1")
-		kubernetes.ListenerSetListenersMustHaveConditions(t, suite.Client, suite.TimeoutConfig, ls2NN, hostnameConflictedListenerConditions, "domain-name-conflict-listener-2")
+		kubernetes.ListenerSetListenersMustHaveConditions(t, suite.Client, suite.TimeoutConfig, ls2NN, hostnameConflictedListenerConditions, "hostname-conflict-listener-1")
+		kubernetes.ListenerSetListenersMustHaveConditions(t, suite.Client, suite.TimeoutConfig, ls2NN, hostnameConflictedListenerConditions, "hostname-conflict-listener-2")
 
 		for i := range testCases {
 			// Declare tc here to avoid loop variable

@@ -16,10 +16,10 @@ spec:
     allowedRoutes:
       namespaces:
         from: All
-  - name: domain-name-conflict-listener-1
+  - name: hostname-conflict-listener-1
     port: 80
     protocol: HTTP
-    hostname: "domain-name-conflict-listener-1.com"
+    hostname: "hostname-conflict-listener-1.com"
     allowedRoutes:
       namespaces:
         from: All
@@ -61,17 +61,17 @@ spec:
     allowedRoutes:
       namespaces:
         from: All
-  - name: domain-name-conflict-listener-1
+  - name: hostname-conflict-listener-1
     port: 80
     protocol: HTTP
-    hostname: "domain-name-conflict-listener-1.com"
+    hostname: "hostname-conflict-listener-1.com"
     allowedRoutes:
       namespaces:
         from: All
-  - name: domain-name-conflict-listener-2
+  - name: hostname-conflict-listener-2
     port: 80
     protocol: HTTP
-    hostname: "domain-name-conflict-listener-2.com"
+    hostname: "hostname-conflict-listener-2.com"
     allowedRoutes:
       namespaces:
         from: All
@@ -115,17 +115,17 @@ spec:
     allowedRoutes:
       namespaces:
         from: All
-  - name: domain-name-conflict-listener-1
+  - name: hostname-conflict-listener-1
     port: 80
     protocol: HTTP
-    hostname: "domain-name-conflict-listener-1.com"
+    hostname: "hostname-conflict-listener-1.com"
     allowedRoutes:
       namespaces:
         from: All
-  - name: domain-name-conflict-listener-2
+  - name: hostname-conflict-listener-2
     port: 80
     protocol: HTTP
-    hostname: "domain-name-conflict-listener-2.com"
+    hostname: "hostname-conflict-listener-2.com"
     allowedRoutes:
       namespaces:
         from: All
