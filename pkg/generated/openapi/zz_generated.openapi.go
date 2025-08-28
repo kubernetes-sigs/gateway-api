@@ -2867,7 +2867,8 @@ func schema_sigsk8sio_gateway_api_apis_v1_AllowedRoutes(ref common.ReferenceCall
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
+				Description: "AllowedRoutes defines which Routes may be attached to this Listener.",
+				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"namespaces": {
 						VendorExtensible: spec.VendorExtensible{
@@ -2961,7 +2962,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_BackendRef(ref common.ReferenceCallbac
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "BackendRef defines how a Route should forward a request to a Kubernetes resource.\n\nNote that when a namespace different than the local namespace is specified, a ReferenceGrant object is required in the referent namespace to allow that namespace's owner to accept the reference. See the ReferenceGrant documentation for details.",
+				Description: "BackendRef defines how a Route should forward a request to a Kubernetes resource.\n\nNote that when a namespace different than the local namespace is specified, a ReferenceGrant object is required in the referent namespace to allow that namespace's owner to accept the reference. See the ReferenceGrant documentation for details.\n\n<gateway:experimental:description>\n\nWhen the BackendRef points to a Kubernetes Service, implementations SHOULD honor the appProtocol field if it is set for the target Service Port.\n\nImplementations supporting appProtocol SHOULD recognize the Kubernetes Standard Application Protocols defined in KEP-3726.\n\nIf a Service appProtocol isn't specified, an implementation MAY infer the backend protocol through its own means. Implementations MAY infer the protocol from the Route type referring to the backend Service.\n\nIf a Route is not able to send traffic to the backend using the specified protocol then the backend is considered invalid. Implementations MUST set the \"ResolvedRefs\" condition to \"False\" with the \"UnsupportedProtocol\" reason.\n\n</gateway:experimental:description>\n\nNote that when the BackendTLSPolicy object is enabled by the implementation, there are some extra rules about validity to consider here. See the fields where this struct is used for more information about the exact behavior.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"group": {
@@ -4441,7 +4442,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPBackendRef(ref common.ReferenceCal
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "HTTPBackendRef defines how a HTTPRoute should forward an HTTP request.",
+				Description: "HTTPBackendRef defines how a HTTPRoute forwards a HTTP request.\n\nNote that when a namespace different than the local namespace is specified, a ReferenceGrant object is required in the referent namespace to allow that namespace's owner to accept the reference. See the ReferenceGrant documentation for details.\n\n<gateway:experimental:description>\n\nWhen the BackendRef points to a Kubernetes Service, implementations SHOULD honor the appProtocol field if it is set for the target Service Port.\n\nImplementations supporting appProtocol SHOULD recognize the Kubernetes Standard Application Protocols defined in KEP-3726.\n\nIf a Service appProtocol isn't specified, an implementation MAY infer the backend protocol through its own means. Implementations MAY infer the protocol from the Route type referring to the backend Service.\n\nIf a Route is not able to send traffic to the backend using the specified protocol then the backend is considered invalid. Implementations MUST set the \"ResolvedRefs\" condition to \"False\" with the \"UnsupportedProtocol\" reason.\n\n</gateway:experimental:description>",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"group": {
@@ -4704,7 +4705,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPHeaderFilter(ref common.ReferenceC
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "HTTPHeaderFilter defines a filter that modifies the headers of an HTTP request or response.",
+				Description: "HTTPHeaderFilter defines a filter that modifies the headers of an HTTP request or response. Only one action for a given header name is permitted. Filters specifying multiple actions of the same or different type for any one header name are invalid. Configuration to set or add multiple values for a header must use RFC 7230 header value formatting, separating each value with a comma.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"set": {
@@ -4847,7 +4848,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPPathModifier(ref common.ReferenceC
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "HTTPPathModifier defines configuration for path modifiers. <gateway:experimental>",
+				Description: "HTTPPathModifier defines configuration for path modifiers.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"type": {
@@ -5055,7 +5056,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteFilter(ref common.ReferenceCa
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "HTTPRouteFilter defines processing steps that must be completed during the request or response lifecycle. HTTPRouteFilters are meant as an extension point to express processing that may be done in Gateway implementations. Some examples include request or response modification, implementing authentication strategies, rate-limiting, and traffic shaping. API guarantee/conformance is defined based on the type of the filter.",
+				Description: "HTTPRouteFilter defines processing steps that must be completed during the request or response lifecycle. HTTPRouteFilters are meant as an extension point to express processing that may be done in Gateway implementations. Some examples include request or response modification, implementing authentication strategies, rate-limiting, and traffic shaping. API guarantee/conformance is defined based on the type of the filter.\n\n<gateway:experimental:validation:XValidation:message=\"filter.cors must be nil if the filter.type is not CORS\",rule=\"!(has(self.cors) && self.type != 'CORS')\"> <gateway:experimental:validation:XValidation:message=\"filter.cors must be specified for CORS filter.type\",rule=\"!(!has(self.cors) && self.type == 'CORS')\"> <gateway:experimental:validation:XValidation:message=\"filter.externalAuth must be nil if the filter.type is not ExternalAuth\",rule=\"!(has(self.externalAuth) && self.type != 'ExternalAuth')\"> <gateway:experimental:validation:XValidation:message=\"filter.externalAuth must be specified for ExternalAuth filter.type\",rule=\"!(!has(self.externalAuth) && self.type == 'ExternalAuth')\">",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"type": {
@@ -5500,7 +5501,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteTimeouts(ref common.Reference
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "HTTPRouteTimeouts defines timeouts that can be configured for an HTTPRoute.",
+				Description: "HTTPRouteTimeouts defines timeouts that can be configured for an HTTPRoute. Timeout values are represented with Gateway API Duration formatting.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"request": {
@@ -5527,7 +5528,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPURLRewriteFilter(ref common.Refere
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "HTTPURLRewriteFilter defines a filter that modifies a request during forwarding. At most one of these filters may be used on a Route rule. This MUST NOT be used on the same Route rule as a HTTPRequestRedirect filter.\n\nSupport: Extended\n\n<gateway:experimental>",
+				Description: "HTTPURLRewriteFilter defines a filter that modifies a request during forwarding. At most one of these filters may be used on a Route rule. This MUST NOT be used on the same Route rule as a HTTPRequestRedirect filter.\n\nSupport: Extended",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"hostname": {
@@ -5715,7 +5716,8 @@ func schema_sigsk8sio_gateway_api_apis_v1_ListenerTLSConfig(ref common.Reference
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
+				Description: "ListenerTLSConfig describes a TLS configuration for a listener.",
+				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"mode": {
 						SchemaProps: spec.SchemaProps{
@@ -5937,7 +5939,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_ParentReference(ref common.ReferenceCa
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "ParentReference identifies an API object (usually a Gateway) that can be considered a parent of this resource (usually a route). The only kind of parent resource with \"Core\" support is Gateway. This API may be extended in the future to support additional kinds of parent resources, such as HTTPRoute.\n\nNote that there are specific rules for ParentRefs which cross namespace boundaries. Cross-namespace references are only valid if they are explicitly allowed by something in the namespace they are referring to. For example: Gateway has the AllowedRoutes field, and ReferenceGrant provides a generic way to enable any other kind of cross-namespace reference.\n\nThe API object must be valid in the cluster; the Group and Kind must be registered in the cluster for this reference to be valid.",
+				Description: "ParentReference identifies an API object (usually a Gateway) that can be considered a parent of this resource (usually a route). There are two kinds of parent resources with \"Core\" support:\n\n* Gateway (Gateway conformance profile) * Service (Mesh conformance profile, ClusterIP Services only)\n\nThis API may be extended in the future to support additional kinds of parent resources.\n\nThe API object must be valid in the cluster; the Group and Kind must be registered in the cluster for this reference to be valid.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"group": {
@@ -5994,7 +5996,8 @@ func schema_sigsk8sio_gateway_api_apis_v1_RouteGroupKind(ref common.ReferenceCal
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
+				Description: "RouteGroupKind indicates the group and kind of a Route resource.",
+				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"group": {
 						SchemaProps: spec.SchemaProps{
@@ -6181,7 +6184,8 @@ func schema_sigsk8sio_gateway_api_apis_v1_SessionPersistence(ref common.Referenc
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
+				Description: "SessionPersistence defines the desired state of SessionPersistence.",
+				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"sessionName": {
 						SchemaProps: spec.SchemaProps{
@@ -6418,7 +6422,8 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_LocalPolicyTargetReference(ref c
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
+				Description: "LocalPolicyTargetReference identifies an API object to apply a direct or inherited policy to. This should be used as part of Policy resources that can target Gateway API resources. For more information on how this policy attachment model works, and a sample Policy resource, refer to the policy attachment documentation for Gateway API.",
+				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"group": {
 						SchemaProps: spec.SchemaProps{
@@ -6598,7 +6603,8 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_PolicyStatus(ref common.Referenc
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
+				Description: "PolicyStatus defines the common attributes that all Policies should include within their status.",
+				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"ancestors": {
 						VendorExtensible: spec.VendorExtensible{

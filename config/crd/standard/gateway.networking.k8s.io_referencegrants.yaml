@@ -5,7 +5,6 @@ metadata:
     api-approved.kubernetes.io: https://github.com/kubernetes-sigs/gateway-api/pull/3328
     gateway.networking.k8s.io/bundle-version: v1.3.0
     gateway.networking.k8s.io/channel: standard
-  creationTimestamp: null
   name: referencegrants.gateway.networking.k8s.io
 spec:
   group: gateway.networking.k8s.io

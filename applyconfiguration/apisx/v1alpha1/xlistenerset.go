@@ -82,6 +82,7 @@ func extractXListenerSet(xListenerSet *apisxv1alpha1.XListenerSet, fieldManager 
 	b.WithAPIVersion("gateway.networking.x-k8s.io/v1alpha1")
 	return b, nil
 }
+func (b XListenerSetApplyConfiguration) IsApplyConfiguration() {}
 
 // WithKind sets the Kind field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
@@ -257,8 +258,24 @@ func (b *XListenerSetApplyConfiguration) WithStatus(value *ListenerSetStatusAppl
 	return b
 }
 
+// GetKind retrieves the value of the Kind field in the declarative configuration.
+func (b *XListenerSetApplyConfiguration) GetKind() *string {
+	return b.TypeMetaApplyConfiguration.Kind
+}
+
+// GetAPIVersion retrieves the value of the APIVersion field in the declarative configuration.
+func (b *XListenerSetApplyConfiguration) GetAPIVersion() *string {
+	return b.TypeMetaApplyConfiguration.APIVersion
+}
+
 // GetName retrieves the value of the Name field in the declarative configuration.
 func (b *XListenerSetApplyConfiguration) GetName() *string {
 	b.ensureObjectMetaApplyConfigurationExists()
 	return b.ObjectMetaApplyConfiguration.Name
+}
+
+// GetNamespace retrieves the value of the Namespace field in the declarative configuration.
+func (b *XListenerSetApplyConfiguration) GetNamespace() *string {
+	b.ensureObjectMetaApplyConfigurationExists()
+	return b.ObjectMetaApplyConfiguration.Namespace
 }
