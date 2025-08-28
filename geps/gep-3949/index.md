@@ -424,8 +424,8 @@ type MeshConditionType string
 type MeshConditionReason string
 
 const (
-  // This condition indicates whether the Mesh has been accepted by the
-  // controller requested in the `spec.controllerName` field.
+  // The "Accepted" condition indicates whether the Mesh has been accepted
+  // by the controller requested in the `spec.controllerName` field.
   //
   // This condition defaults to Unknown, and MUST be set by a controller
   // when it sees a Mesh using its controller string. The status of this
@@ -448,31 +448,27 @@ const (
   //
   // Controllers should prefer to use the values of MeshConditionReason
   // for the corresponding Reason, where appropriate.
-  MeshConditionStatusAccepted MeshConditionType = "Accepted"
-  MeshConditionStatusUnknown  MeshConditionType = "Unknown"
+  MeshConditionAccepted MeshConditionType = "Accepted"
 
   // This reason is used with the "Accepted" condition when the condition is
   // true.
-  MeshConditionReasonAccepted MeshConditionReason = "Accepted"
+  MeshReasonAccepted MeshConditionReason = "Accepted"
 
   // This reason is used with the "Accepted" condition when the Mesh
   // was not accepted because the parametersRef field refers to
+  //
   // * a namespaced resource but the Namespace field is not set, or
   // * a cluster-scoped resource but the Namespace field is set, or
   // * a nonexistent object, or
   // * an unsupported resource or kind, or
   // * an existing resource but the data within that resource is malformed.
-  MeshConditionReasonInvalidParameters MeshConditionReason = "InvalidParameters"
+  MeshReasonInvalidParameters MeshConditionReason = "InvalidParameters"
 
-  // This reason is used with the "Accepted" condition when the
-  // requested controller has not yet made a decision about whether
-  // to accept the Mesh. It is the default Reason on a new Mesh.
-  MeshConditionReasonPending MeshConditionReason = "Pending"
-
-  // This reason is used with the "Unknown" condition when the
-  // requested controller has not yet made a decision about whether
-  // to accept the Mesh. It is the default Reason on a new Mesh.
-  MeshConditionReasonPending MeshConditionReason = "Pending"
+  // This reason is used with the "Accepted" condition when the status is
+  // "Unknown" and the requested controller has not yet made a decision
+  // about whether to accept the Mesh. It is the default Reason on a new
+  // Mesh.
+  MeshReasonPending MeshConditionReason = "Pending"
 )
 
 // MeshStatus is the current status for the Mesh.
