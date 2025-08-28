@@ -36,13 +36,16 @@ import (
 // BackendTLSPolicy provides a way to configure how a Gateway
 // connects to a Backend via TLS.
 type BackendTLSPolicy struct {
-	metav1.TypeMeta   `json:",inline"`
+	metav1.TypeMeta `json:",inline"`
+	// +optional
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	// Spec defines the desired state of BackendTLSPolicy.
+	// +required
 	Spec BackendTLSPolicySpec `json:"spec"`
 
 	// Status defines the current state of BackendTLSPolicy.
+	// +optional
 	Status v1alpha2.PolicyStatus `json:"status,omitempty"`
 }
 
@@ -77,6 +80,8 @@ type BackendTLSPolicySpec struct {
 	//
 	// Support: Implementation-specific for any other resource
 	//
+	// +required
+	// +listType=atomic
 	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:MaxItems=16
 	// +kubebuilder:validation:XValidation:message="sectionName must be specified when targetRefs includes 2 or more references to the same target",rule="self.all(p1, self.all(p2, p1.group == p2.group && p1.kind == p2.kind && p1.name == p2.name ? ((!has(p1.sectionName) || p1.sectionName == '') == (!has(p2.sectionName) || p2.sectionName == '')) : true))"
@@ -84,6 +89,7 @@ type BackendTLSPolicySpec struct {
 	TargetRefs []v1alpha2.LocalPolicyTargetReferenceWithSectionName `json:"targetRefs"`
 
 	// Validation contains backend TLS validation configuration.
+	// +required
 	Validation BackendTLSPolicyValidation `json:"validation"`
 
 	// Options are a list of key/value pairs to enable extended TLS
@@ -115,8 +121,32 @@ type BackendTLSPolicyValidation struct {
 	// not both. If CACertificateRefs is empty or unspecified, the configuration for
 	// WellKnownCACertificates MUST be honored instead if supported by the implementation.
 	//
-	// References to a resource in a different namespace are invalid for the
-	// moment, although we will revisit this in the future.
+	// A CACertificateRef is invalid if:
+	//
+	// * It refers to a resource that cannot be resolved (e.g., the referenced resource
+	//   does not exist) or is misconfigured (e.g., a ConfigMap does not contain a key
+	//   named `ca.crt`). In this case, the Reason must be set to `InvalidCACertificateRef`
+	//   and the Message of the Condition must indicate which reference is invalid and why.
+	//
+	// * It refers to an unknown or unsupported kind of resource. In this case, the Reason
+	//   must be set to `InvalidKind` and the Message of the Condition must explain which
+	//   kind of resource is unknown or unsupported.
+	//
+	// * It refers to a resource in another namespace. This may change in future
+	//   spec updates.
+	//
+	// Implementations MAY choose to perform further validation of the certificate
+	// content (e.g., checking expiry or enforcing specific formats). In such cases,
+	// an implementation-specific Reason and Message must be set for the invalid reference.
+	//
+	// In all cases, the implementation MUST ensure the `ResolvedRefs` Condition on
+	// the BackendTLSPolicy is set to `status: False`, with a Reason and Message
+	// that indicate the cause of the error. Connections using an invalid
+	// CACertificateRef MUST fail, and the client MUST receive an HTTP 5xx error
+	// response. If ALL CACertificateRefs are invalid, the implementation MUST also
+	// ensure the `Accepted` Condition on the BackendTLSPolicy is set to
+	// `status: False`, with a Reason `NoValidCACertificate`.
+	//
 	//
 	// A single CACertificateRef to a Kubernetes ConfigMap kind has "Core" support.
 	// Implementations MAY choose to support attaching multiple certificates to
@@ -125,11 +155,12 @@ type BackendTLSPolicyValidation struct {
 	// Support: Core - An optional single reference to a Kubernetes ConfigMap,
 	// with the CA certificate in a key named `ca.crt`.
 	//
-	// Support: Implementation-specific (More than one reference, or other kinds
-	// of resources).
+	// Support: Implementation-specific - More than one reference, other kinds
+	// of resources, or a single reference that includes multiple certificates.
 	//
-	// +kubebuilder:validation:MaxItems=8
 	// +optional
+	// +listType=atomic
+	// +kubebuilder:validation:MaxItems=8
 	CACertificateRefs []v1.LocalObjectReference `json:"caCertificateRefs,omitempty"`
 
 	// WellKnownCACertificates specifies whether system CA certificates may be used in
@@ -137,14 +168,16 @@ type BackendTLSPolicyValidation struct {
 	//
 	// If WellKnownCACertificates is unspecified or empty (""), then CACertificateRefs
 	// must be specified with at least one entry for a valid configuration. Only one of
-	// CACertificateRefs or WellKnownCACertificates may be specified, not both. If an
-	// implementation does not support the WellKnownCACertificates field or the value
-	// supplied is not supported, the Status Conditions on the Policy MUST be
-	// updated to include an Accepted: False Condition with Reason: Invalid.
+	// CACertificateRefs or WellKnownCACertificates may be specified, not both.
+	// If an implementation does not support the WellKnownCACertificates field, or
+	// the supplied value is not recognized, the implementation MUST ensure the
+	// `Accepted` Condition on the BackendTLSPolicy is set to `status: False`, with
+	// a Reason `Invalid`.
 	//
 	// Support: Implementation-specific
 	//
 	// +optional
+	// +listType=atomic
 	WellKnownCACertificates *WellKnownCACertificatesType `json:"wellKnownCACertificates,omitempty"`
 
 	// Hostname is used for two purposes in the connection between Gateways and
@@ -152,10 +185,10 @@ type BackendTLSPolicyValidation struct {
 	//
 	// 1. Hostname MUST be used as the SNI to connect to the backend (RFC 6066).
 	// 2. Hostname MUST be used for authentication and MUST match the certificate served by the matching backend, unless SubjectAltNames is specified.
-	//    authentication and MUST match the certificate served by the matching
-	//    backend.
 	//
 	// Support: Core
+	//
+	// +required
 	Hostname v1.PreciseHostname `json:"hostname"`
 
 	// SubjectAltNames contains one or more Subject Alternative Names.
@@ -165,6 +198,7 @@ type BackendTLSPolicyValidation struct {
 	// Support: Extended
 	//
 	// +optional
+	// +listType=atomic
 	// +kubebuilder:validation:MaxItems=5
 	SubjectAltNames []SubjectAltName `json:"subjectAltNames,omitempty"`
 }
@@ -178,6 +212,8 @@ type SubjectAltName struct {
 	// Type determines the format of the Subject Alternative Name. Always required.
 	//
 	// Support: Core
+	//
+	// +required
 	Type SubjectAltNameType `json:"type"`
 
 	// Hostname contains Subject Alternative Name specified in DNS name format.
@@ -223,4 +259,44 @@ const (
 	//
 	// Support: Core
 	URISubjectAltNameType SubjectAltNameType = "URI"
+)
+
+const (
+	// This reason is used with the "Accepted" condition when it is
+	// set to false because all CACertificateRefs of the
+	// BackendTLSPolicy are invalid.
+	BackendTLSPolicyReasonNoValidCACertificate v1alpha2.PolicyConditionReason = "NoValidCACertificate"
+)
+
+const (
+	// This condition indicates whether the controller was able to resolve all
+	// object references for the BackendTLSPolicy.
+	//
+	// Possible reasons for this condition to be True are:
+	//
+	// * "ResolvedRefs"
+	//
+	// Possible reasons for this condition to be False are:
+	//
+	// * "InvalidCACertificateRef"
+	// * "InvalidKind"
+	//
+	// Controllers may raise this condition with other reasons, but should
+	// prefer to use the reasons listed above to improve interoperability.
+	BackendTLSPolicyConditionResolvedRefs v1alpha2.PolicyConditionType = "ResolvedRefs"
+
+	// This reason is used with the "ResolvedRefs" condition when the condition
+	// is true.
+	BackendTLSPolicyReasonResolvedRefs v1alpha2.PolicyConditionReason = "ResolvedRefs"
+
+	// This reason is used with the "ResolvedRefs" condition when one of the
+	// BackendTLSPolicy's CACertificateRefs is invalid.
+	// A CACertificateRef is considered invalid when it refers to a nonexistent
+	// resource or when the data within that resource is malformed.
+	BackendTLSPolicyReasonInvalidCACertificateRef v1alpha2.PolicyConditionReason = "InvalidCACertificateRef"
+
+	// This reason is used with the "ResolvedRefs" condition when one of the
+	// BackendTLSPolicy's CACertificateRefs references an unknown or unsupported
+	// Group and/or Kind.
+	BackendTLSPolicyReasonInvalidKind v1alpha2.PolicyConditionReason = "InvalidKind"
 )

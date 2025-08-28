@@ -88,9 +88,9 @@ type Listener = v1.Listener
 // +k8s:deepcopy-gen=false
 type ProtocolType = v1.ProtocolType
 
-// GatewayTLSConfig describes a TLS configuration.
+// ListenerTLSConfig describes a TLS configuration.
 // +k8s:deepcopy-gen=false
-type GatewayTLSConfig = v1.GatewayTLSConfig
+type ListenerTLSConfig = v1.ListenerTLSConfig
 
 // TLSModeType type defines how a Gateway handles TLS sessions.
 //
@@ -131,7 +131,7 @@ type RouteNamespaces = v1.RouteNamespaces
 // +k8s:deepcopy-gen=false
 type RouteGroupKind = v1.RouteGroupKind
 
-// GatewayAddress describes an address that can be bound to a Gateway.
+// GatewaySpecAddress describes an address that can be bound to a Gateway.
 // +k8s:deepcopy-gen=false
 type GatewaySpecAddress = v1.GatewaySpecAddress
 

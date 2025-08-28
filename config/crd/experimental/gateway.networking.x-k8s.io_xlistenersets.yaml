@@ -34,8 +34,33 @@ spec:
     schema:
       openAPIV3Schema:
         description: |-
-          XListenerSet defines a set of additional listeners
-          to attach to an existing Gateway.
+          XListenerSet defines a set of additional listeners to attach to an existing Gateway.
+          This resource provides a mechanism to merge multiple listeners into a single Gateway.
+
+          The parent Gateway must explicitly allow ListenerSet attachment through its
+          AllowedListeners configuration. By default, Gateways do not allow ListenerSet
+          attachment.
+
+          Routes can attach to a ListenerSet by specifying it as a parentRef, and can
+          optionally target specific listeners using the sectionName field.
+
+          Policy Attachment:
+          - Policies that attach to a ListenerSet apply to all listeners defined in that resource
+          - Policies do not impact listeners in the parent Gateway
+          - Different ListenerSets attached to the same Gateway can have different policies
+          - If an implementation cannot apply a policy to specific listeners, it should reject the policy
+
+          ReferenceGrant Semantics:
+          - ReferenceGrants applied to a Gateway are not inherited by child ListenerSets
+          - ReferenceGrants applied to a ListenerSet do not grant permission to the parent Gateway's listeners
+          - A ListenerSet can reference secrets/backends in its own namespace without a ReferenceGrant
+
+          Gateway Integration:
+          - The parent Gateway's status will include an "AttachedListenerSets" condition
+          - This condition will be:
+            - True: when AllowedListeners is set and at least one child ListenerSet is attached
+            - False: when AllowedListeners is set but no valid listeners are attached, or when AllowedListeners is not set or false
+            - Unknown: when no AllowedListeners config is present
         properties:
           apiVersion:
             description: |-
@@ -73,10 +98,10 @@ spec:
 
                   1. "parent" Gateway
                   2. ListenerSet ordered by creation time (oldest first)
-                  3. ListenerSet ordered alphabetically by “{namespace}/{name}”.
+                  3. ListenerSet ordered alphabetically by "{namespace}/{name}".
 
                   An implementation MAY reject listeners by setting the ListenerEntryStatus
-                  `Accepted`` condition to False with the Reason `TooManyListeners`
+                  `Accepted` condition to False with the Reason `TooManyListeners`
 
                   If a listener has a conflict, this will be reported in the
                   Status.ListenerEntryStatus setting the `Conflicted` condition to True.
@@ -149,6 +174,7 @@ spec:
                             type: object
                           maxItems: 8
                           type: array
+                          x-kubernetes-list-type: atomic
                         namespaces:
                           default:
                             from: Same
@@ -271,12 +297,18 @@ spec:
                       pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                       type: string
                     port:
+                      default: 0
                       description: |-
                         Port is the network port. Multiple listeners may use the
                         same port, subject to the Listener compatibility rules.
+
+                        If the port is not set or specified as zero, the implementation will assign
+                        a unique port. If the implementation does not support dynamic port
+                        assignment, it MUST set `Accepted` condition to `False` with the
+                        `UnsupportedPort` reason.
                       format: int32
                       maximum: 65535
-                      minimum: 1
+                      minimum: 0
                       type: integer
                     protocol:
                       description: Protocol specifies the network protocol this listener
@@ -291,7 +323,7 @@ spec:
                         the Protocol field is "HTTPS" or "TLS". It is invalid to set this field
                         if the Protocol field is "HTTP", "TCP", or "UDP".
 
-                        The association of SNIs to Certificate defined in GatewayTLSConfig is
+                        The association of SNIs to Certificate defined in ListenerTLSConfig is
                         defined based on the Hostname field for this listener.
 
                         The GatewayClass MUST use the longest matching SNI out of all
@@ -376,93 +408,7 @@ spec:
                             type: object
                           maxItems: 64
                           type: array
-                        frontendValidation:
-                          description: |-
-                            FrontendValidation holds configuration information for validating the frontend (client).
-                            Setting this field will require clients to send a client certificate
-                            required for validation during the TLS handshake. In browsers this may result in a dialog appearing
-                            that requests a user to specify the client certificate.
-                            The maximum depth of a certificate chain accepted in verification is Implementation specific.
-
-                            Support: Extended
-                          properties:
-                            caCertificateRefs:
-                              description: |-
-                                CACertificateRefs contains one or more references to
-                                Kubernetes objects that contain TLS certificates of
-                                the Certificate Authorities that can be used
-                                as a trust anchor to validate the certificates presented by the client.
-
-                                A single CA certificate reference to a Kubernetes ConfigMap
-                                has "Core" support.
-                                Implementations MAY choose to support attaching multiple CA certificates to
-                                a Listener, but this behavior is implementation-specific.
-
-                                Support: Core - A single reference to a Kubernetes ConfigMap
-                                with the CA certificate in a key named `ca.crt`.
-
-                                Support: Implementation-specific (More than one reference, or other kinds
-                                of resources).
-
-                                References to a resource in a different namespace are invalid UNLESS there
-                                is a ReferenceGrant in the target namespace that allows the certificate
-                                to be attached. If a ReferenceGrant does not allow this reference, the
-                                "ResolvedRefs" condition MUST be set to False for this listener with the
-                                "RefNotPermitted" reason.
-                              items:
-                                description: |-
-                                  ObjectReference identifies an API object including its namespace.
-
-                                  The API object must be valid in the cluster; the Group and Kind must
-                                  be registered in the cluster for this reference to be valid.
-
-                                  References to objects with invalid Group and Kind are not valid, and must
-                                  be rejected by the implementation, with appropriate Conditions set
-                                  on the containing object.
-                                properties:
-                                  group:
-                                    description: |-
-                                      Group is the group of the referent. For example, "gateway.networking.k8s.io".
-                                      When set to the empty string, core API group is inferred.
-                                    maxLength: 253
-                                    pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
-                                    type: string
-                                  kind:
-                                    description: Kind is kind of the referent. For
-                                      example "ConfigMap" or "Service".
-                                    maxLength: 63
-                                    minLength: 1
-                                    pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
-                                    type: string
-                                  name:
-                                    description: Name is the name of the referent.
-                                    maxLength: 253
-                                    minLength: 1
-                                    type: string
-                                  namespace:
-                                    description: |-
-                                      Namespace is the namespace of the referenced object. When unspecified, the local
-                                      namespace is inferred.
-
-                                      Note that when a namespace different than the local namespace is specified,
-                                      a ReferenceGrant object is required in the referent namespace to allow that
-                                      namespace's owner to accept the reference. See the ReferenceGrant
-                                      documentation for details.
-
-                                      Support: Core
-                                    maxLength: 63
-                                    minLength: 1
-                                    pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
-                                    type: string
-                                required:
-                                - group
-                                - kind
-                                - name
-                                type: object
-                              maxItems: 8
-                              minItems: 1
-                              type: array
-                          type: object
+                          x-kubernetes-list-type: atomic
                         mode:
                           default: Terminate
                           description: |-
@@ -514,7 +460,6 @@ spec:
                           > 0 || size(self.options) > 0 : true'
                   required:
                   - name
-                  - port
                   - protocol
                   type: object
                 maxItems: 64
@@ -814,6 +759,7 @@ spec:
                         type: object
                       maxItems: 8
                       type: array
+                      x-kubernetes-list-type: atomic
                   required:
                   - attachedRoutes
                   - conditions

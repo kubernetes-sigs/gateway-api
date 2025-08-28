@@ -69,7 +69,7 @@ steps:
 
 1. select a [profile](#profiles)
 2. [integrate](#integration) tests in the downstream project
-3. [report results and get certified](#certification)
+3. [report results][#reporting-process] and get certified][#certification-process]
 
 The goal is to make selecting a conformance profile as simple and automatic of a
 process as feasible and support both the existing command line integration
@@ -164,7 +164,7 @@ for i := 0; i < len(tests.ConformanceTests); i++ {
 > but when used in conjunction with `Profile` this will result in a report that
 > the profile is not valid for reporting. Implementations in this state may be
 > able to report themselves as "in progress", see the
-> [certification section](#certification) for details.
+> [certification section](#certification-process) for details.
 
 Alternatively for an `Extended` conformance profile where not all of the
 features are implemented (as described in the [profiles](#profiles) section
@@ -234,7 +234,7 @@ support, or opt-out of the features you _don't_ support using
 `UnsupportedFeatures`.
 
 Once an implementation has integrated with the conformance test suite, they can
-move on to [certification](#certification) to report the results.
+move on to [certification](#certification-process) to report the results.
 
 [go-test]:https://go.dev/doc/tutorial/add-a-test
 [go]:https://go.dev

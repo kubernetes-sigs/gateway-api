@@ -151,6 +151,8 @@ use the `experimental` Golang build tag to denote experimental functionality.
 Some other requirements must be met before marking a GEP `Experimental`:
 
 - the graduation criteria to reach `Standard` MUST be filled out
+- the GEP must have at least one Feature Name for features described inside that
+  will need to be tested by conformance tests.
 - a proposed probationary period (see next section) must be included in the GEP
   and approved by maintainers.
 

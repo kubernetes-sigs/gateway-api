@@ -52,8 +52,12 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1.CommonRouteSpecApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("CookieConfig"):
 		return &apisv1.CookieConfigApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("ForwardBodyConfig"):
+		return &apisv1.ForwardBodyConfigApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("Fraction"):
 		return &apisv1.FractionApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("FrontendTLSConfig"):
+		return &apisv1.FrontendTLSConfigApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("FrontendTLSValidation"):
 		return &apisv1.FrontendTLSValidationApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("Gateway"):
@@ -78,6 +82,8 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1.GatewayStatusAddressApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("GatewayTLSConfig"):
 		return &apisv1.GatewayTLSConfigApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("GRPCAuthConfig"):
+		return &apisv1.GRPCAuthConfigApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("GRPCBackendRef"):
 		return &apisv1.GRPCBackendRefApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("GRPCHeaderMatch"):
@@ -96,10 +102,14 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1.GRPCRouteSpecApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("GRPCRouteStatus"):
 		return &apisv1.GRPCRouteStatusApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("HTTPAuthConfig"):
+		return &apisv1.HTTPAuthConfigApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("HTTPBackendRef"):
 		return &apisv1.HTTPBackendRefApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("HTTPCORSFilter"):
 		return &apisv1.HTTPCORSFilterApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("HTTPExternalAuthFilter"):
+		return &apisv1.HTTPExternalAuthFilterApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("HTTPHeader"):
 		return &apisv1.HTTPHeaderApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("HTTPHeaderFilter"):
@@ -140,6 +150,8 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1.ListenerNamespacesApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("ListenerStatus"):
 		return &apisv1.ListenerStatusApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("ListenerTLSConfig"):
+		return &apisv1.ListenerTLSConfigApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("LocalObjectReference"):
 		return &apisv1.LocalObjectReferenceApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("LocalParametersReference"):
@@ -164,6 +176,10 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1.SessionPersistenceApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("SupportedFeature"):
 		return &apisv1.SupportedFeatureApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("TLSConfig"):
+		return &apisv1.TLSConfigApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("TLSPortConfig"):
+		return &apisv1.TLSPortConfigApplyConfiguration{}
 
 		// Group=gateway.networking.k8s.io, Version=v1alpha2
 	case v1alpha2.SchemeGroupVersion.WithKind("GRPCRoute"):
@@ -212,6 +228,10 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1alpha3.BackendTLSPolicyValidationApplyConfiguration{}
 	case v1alpha3.SchemeGroupVersion.WithKind("SubjectAltName"):
 		return &apisv1alpha3.SubjectAltNameApplyConfiguration{}
+	case v1alpha3.SchemeGroupVersion.WithKind("TLSRoute"):
+		return &apisv1alpha3.TLSRouteApplyConfiguration{}
+	case v1alpha3.SchemeGroupVersion.WithKind("TLSRouteSpec"):
+		return &apisv1alpha3.TLSRouteSpecApplyConfiguration{}
 
 		// Group=gateway.networking.k8s.io, Version=v1beta1
 	case v1beta1.SchemeGroupVersion.WithKind("Gateway"):

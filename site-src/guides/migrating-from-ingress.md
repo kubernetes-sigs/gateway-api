@@ -251,7 +251,7 @@ In contrast, Gateway API specifies how to merge rules and resolve conflicts:
 * A Gateway implementation must merge the routing rules from all HTTPRoutes
   attached to a listener.
 * Conflicts must be handled as
-  prescribed in [API Design Guide: Conflicts](/guides/api-design/#conflicts). For example, more specific
+  prescribed in [API Design Guide: Conflicts](../guides/api-design.md#conflicts). For example, more specific
   matches in a routing rule win over the less specific ones.
 
 #### Default Backend

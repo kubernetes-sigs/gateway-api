@@ -1,0 +1,18 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: backend-tls
+spec:
+  gatewayClassName: acme-lb
+  tls:
+    backend:
+      clientCertificateRef:
+        kind: Secret
+        group: ""
+        name: foo-example-cert
+  listeners:
+  - name: foo-https
+    protocol: HTTP
+    port: 80
+    hostname: foo.example.com
+---

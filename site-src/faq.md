@@ -1,7 +1,8 @@
 # Frequently Asked Questions (FAQ)
 
 #### How can I get involved with Gateway API?
-The [community](/contributing/community) page keeps track of how to get involved
+
+The [community](contributing/index.md) page keeps track of how to get involved
 with the project.
 
 #### Will Gateway API replace the Ingress API?

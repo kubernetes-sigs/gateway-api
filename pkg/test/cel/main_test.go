@@ -19,7 +19,7 @@ package main
 import (
 	"fmt"
 	"os"
-	"path"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -29,34 +29,84 @@ import (
 	"sigs.k8s.io/gateway-api/apis/v1beta1"
 	apisxv1alpha1 "sigs.k8s.io/gateway-api/apisx/v1alpha1"
 
+	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/envtest"
 )
 
 var k8sClient client.Client
 
 func TestMain(m *testing.M) {
+	scheme := runtime.NewScheme()
+	var restConfig *rest.Config
+	var testEnv *envtest.Environment
+	var err error
+
+	v1alpha3.Install(scheme)
+	v1alpha2.Install(scheme)
+	v1beta1.Install(scheme)
+	v1.Install(scheme)
+	apisxv1alpha1.Install(scheme)
+
+	// Add core APIs in case we refer secrets, services and configmaps
+	corev1.AddToScheme(scheme)
+
+	// If one wants to use a local cluster, a KUBECONFIG envvar should be passed,
+	// otherwise testenv will be used
 	kubeconfig := os.Getenv("KUBECONFIG")
-	if kubeconfig == "" {
-		kubeconfig = path.Join(os.Getenv("HOME"), ".kube/config")
+	if kubeconfig != "" {
+		restConfig, err = clientcmd.BuildConfigFromFlags("", kubeconfig)
+		if err != nil {
+			panic(fmt.Sprintf("Failed to get restConfig from BuildConfigFromFlags: %v", err))
+		}
+	} else {
+		// The version used here MUST reflect the available versions at
+		// controller-runtime repo: https://raw.githubusercontent.com/kubernetes-sigs/controller-tools/HEAD/envtest-releases.yaml
+		// If the envvar is not passed, the latest GA will be used
+		k8sVersion := os.Getenv("K8S_VERSION")
+
+		crdChannel := "standard"
+		if requestedCRDChannel, ok := os.LookupEnv("CRD_CHANNEL"); ok {
+			crdChannel = requestedCRDChannel
+		}
+
+		testEnv = &envtest.Environment{
+			Scheme:                      scheme,
+			ErrorIfCRDPathMissing:       true,
+			DownloadBinaryAssets:        true,
+			DownloadBinaryAssetsVersion: k8sVersion,
+			CRDInstallOptions: envtest.CRDInstallOptions{
+				Paths: []string{
+					filepath.Join("..", "..", "..", "config", "crd", crdChannel),
+				},
+				CleanUpAfterUse: true,
+			},
+		}
+
+		restConfig, err = testEnv.Start()
+		if err != nil {
+			panic(fmt.Sprintf("Error initializing test environment: %v", err))
+		}
 	}
 
-	restConfig, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
-	if err != nil {
-		panic(fmt.Sprintf("Failed to get restConfig from BuildConfigFromFlags: %v", err))
-	}
-
-	k8sClient, err = client.New(restConfig, client.Options{})
+	k8sClient, err = client.New(restConfig, client.Options{
+		Scheme: scheme,
+	})
 	if err != nil {
 		panic(fmt.Sprintf("Error initializing Kubernetes client: %v", err))
 	}
-	v1alpha3.Install(k8sClient.Scheme())
-	v1alpha2.Install(k8sClient.Scheme())
-	v1beta1.Install(k8sClient.Scheme())
-	v1.Install(k8sClient.Scheme())
-	apisxv1alpha1.Install(k8sClient.Scheme())
 
-	os.Exit(m.Run())
+	rc := m.Run()
+	if testEnv != nil {
+		if err := testEnv.Stop(); err != nil {
+			panic(fmt.Sprintf("error stopping test environment: %v", err))
+		}
+	}
+
+	os.Exit(rc)
 }
 
 func ptrTo[T any](a T) *T {

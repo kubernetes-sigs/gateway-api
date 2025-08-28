@@ -17,7 +17,7 @@ your feedback!
 
 [:octicons-arrow-right-24: Continue reading][Gateway API: Introducing Service Mesh Support!]
 
-[status]:../geps/overview.md#status
+[status]:../geps/overview.md#gep-states
 [Gateway API: Introducing Service Mesh Support!]:2023/0829-mesh-support.md
 
 ## [Gateway API Graduates to Beta]

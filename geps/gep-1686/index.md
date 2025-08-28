@@ -16,7 +16,7 @@ This testing plan specifies a new set of tests to define a "Mesh" [conformance p
 ## Focus
 
 Currently the GAMMA spec consists of two Gateway API GEPs [defining terminology and goals of Gateway API for service meshes](../gep-1324/index.md)
-and specifically [how route resources work in a service mesh context](/geps/gep-1426/).
+and specifically [how route resources work in a service mesh context](../gep-1294/index.md).
 The goal of the initial conformance testing is to check the essential behavior as defined by GEP-1426, as it differs from the wider Gateway API spec. This GEP focuses on using a `Service` object as an `xRoute` `parentRef` to control how the GAMMA implementation directs traffic to the endpoints specified by the `Services` in `backendRefs` and how the traffic is filtered and modified.
 
 ## Conformance Profile

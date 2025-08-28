@@ -46,5 +46,5 @@ formalize guidance for this use case.
 [Service]: https://kubernetes.io/docs/concepts/services-networking/service/
 [north/south]:../concepts/glossary.md#northsouth-traffic
 [east/west traffic]:../concepts/glossary.md#eastwest-traffic
-[gamma]:/concepts/gamma/
+[gamma]:gamma.md
 [Ana]:../concepts/roles-and-personas.md#ana

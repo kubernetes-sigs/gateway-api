@@ -44,5 +44,5 @@ The simplest way to get started is to attend one of the regular Gateway API
 [role-oriented]:../concepts/roles-and-personas.md
 [geps]:../geps/overview.md
 [contributor-ladder]:../contributing/contributor-ladder.md
-[meetings]:/contributing/community/#meetings
+[meetings]:../contributing/index.md/#meetings
 [GAMMA leads]:https://github.com/kubernetes-sigs/gateway-api/blob/main/OWNERS_ALIASES#L23
