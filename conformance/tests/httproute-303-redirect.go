@@ -29,23 +29,22 @@ import (
 )
 
 func init() {
-	ConformanceTests = append(ConformanceTests, HTTPRoute303RedirectScheme)
+	ConformanceTests = append(ConformanceTests, HTTPRoute303Redirect)
 }
 
-var HTTPRoute303RedirectScheme = suite.ConformanceTest{
-	ShortName:   "HTTPRoute303RedirectScheme",
-	Description: "An HTTPRoute with a 303 scheme redirect filter",
-	Manifests:   []string{"tests/httproute-303-redirect-scheme.yaml"},
+var HTTPRoute303Redirect = suite.ConformanceTest{
+	ShortName:   "HTTPRoute303Redirect",
+	Description: "An HTTPRoute with a 303 redirect filter",
+	Manifests:   []string{"tests/httproute-303-redirect.yaml"},
 	Provisional: true,
 	Features: []features.FeatureName{
 		features.SupportGateway,
 		features.SupportHTTPRoute,
-		features.SupportHTTPRouteSchemeRedirect,
 		features.SupportHTTPRoute303RedirectStatusCode,
 	},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
-		routeNN := types.NamespacedName{Name: "redirect-scheme", Namespace: ns}
+		routeNN := types.NamespacedName{Name: "redirect-path", Namespace: ns}
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: ns}
 		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
 		kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN)
@@ -53,14 +52,15 @@ var HTTPRoute303RedirectScheme = suite.ConformanceTest{
 		testCases := []http.ExpectedResponse{
 			{
 				Request: http.Request{
-					Path:             "/scheme-and-temporary",
+					Path:             "/see-other",
 					UnfollowRedirect: true,
+					Method:           "POST",
 				},
 				Response: http.Response{
 					StatusCode: 303,
 				},
 				RedirectRequest: &roundtripper.RedirectRequest{
-					Scheme: "https",
+					Path: "/see-other",
 				},
 				Namespace: ns,
 			},

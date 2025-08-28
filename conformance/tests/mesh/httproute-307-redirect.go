@@ -14,53 +14,47 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package tests
+package meshtests
 
 import (
 	"testing"
 
-	"k8s.io/apimachinery/pkg/types"
-
+	"sigs.k8s.io/gateway-api/conformance/utils/echo"
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
-	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/roundtripper"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
 	"sigs.k8s.io/gateway-api/pkg/features"
 )
 
 func init() {
-	ConformanceTests = append(ConformanceTests, HTTPRoute308RedirectScheme)
+	MeshConformanceTests = append(MeshConformanceTests, MeshHTTPRoute307Redirect)
 }
 
-var HTTPRoute308RedirectScheme = suite.ConformanceTest{
-	ShortName:   "HTTPRoute308RedirectScheme",
-	Description: "An HTTPRoute with a 308 scheme redirect filter",
-	Manifests:   []string{"tests/httproute-308-redirect-scheme.yaml"},
+var MeshHTTPRoute307Redirect = suite.ConformanceTest{
+	ShortName:   "MeshHTTPRoute307Redirect",
+	Description: "An HTTPRoute with statusCode 307 redirect filter",
 	Provisional: true,
 	Features: []features.FeatureName{
-		features.SupportGateway,
+		features.SupportMesh,
 		features.SupportHTTPRoute,
-		features.SupportHTTPRouteSchemeRedirect,
-		features.SupportHTTPRoute308RedirectStatusCode,
+		features.SupportHTTPRoute307RedirectStatusCode,
 	},
-	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
-		ns := "gateway-conformance-infra"
-		routeNN := types.NamespacedName{Name: "redirect-scheme", Namespace: ns}
-		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: ns}
-		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
-		kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN)
+	Manifests: []string{"tests/mesh/httproute-303-redirect.yaml"},
+	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
+		ns := "gateway-conformance-mesh"
+		client := echo.ConnectToApp(t, s, echo.MeshAppEchoV1)
 
 		testCases := []http.ExpectedResponse{
 			{
 				Request: http.Request{
-					Path:             "/scheme-and-temporary",
+					Path:             "/temporary",
 					UnfollowRedirect: true,
 				},
 				Response: http.Response{
-					StatusCode: 308,
+					StatusCode: 307,
 				},
 				RedirectRequest: &roundtripper.RedirectRequest{
-					Scheme: "https",
+					Path: "/temporary",
 				},
 				Namespace: ns,
 			},
@@ -71,7 +65,7 @@ var HTTPRoute308RedirectScheme = suite.ConformanceTest{
 			tc := testCases[i]
 			t.Run(tc.GetTestCaseName(i), func(t *testing.T) {
 				t.Parallel()
-				http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, tc)
+				client.MakeRequestAndExpectEventuallyConsistentResponse(t, tc, s.TimeoutConfig)
 			})
 		}
 	},

@@ -14,48 +14,52 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package meshtests
+package tests
 
 import (
 	"testing"
 
-	"sigs.k8s.io/gateway-api/conformance/utils/echo"
+	"k8s.io/apimachinery/pkg/types"
+
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
+	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/roundtripper"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
 	"sigs.k8s.io/gateway-api/pkg/features"
 )
 
 func init() {
-	MeshConformanceTests = append(MeshConformanceTests, MeshHTTPRoute303RedirectHostAndStatus)
+	ConformanceTests = append(ConformanceTests, HTTPRoute307Redirect)
 }
 
-var MeshHTTPRoute303RedirectHostAndStatus = suite.ConformanceTest{
-	ShortName:   "MeshHTTPRoute303RedirectHostAndStatus",
-	Description: "An HTTPRoute with hostname and statusCode 303 redirect filter",
+var HTTPRoute307Redirect = suite.ConformanceTest{
+	ShortName:   "HTTPRoute307Redirect",
+	Description: "An HTTPRoute with a 307 path redirect filter",
+	Manifests:   []string{"tests/httproute-307-redirect.yaml"},
 	Provisional: true,
 	Features: []features.FeatureName{
-		features.SupportMesh,
+		features.SupportGateway,
 		features.SupportHTTPRoute,
-		features.SupportHTTPRoute303RedirectStatusCode,
+		features.SupportHTTPRoute307RedirectStatusCode,
 	},
-	Manifests: []string{"tests/mesh/httproute-303-redirect-host-and-status.yaml"},
-	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
-		ns := "gateway-conformance-mesh"
-		client := echo.ConnectToApp(t, s, echo.MeshAppEchoV1)
+	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
+		ns := "gateway-conformance-infra"
+		routeNN := types.NamespacedName{Name: "redirect-path", Namespace: ns}
+		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: ns}
+		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
+		kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN)
 
 		testCases := []http.ExpectedResponse{
 			{
 				Request: http.Request{
-					Host:             "echo",
-					Path:             "/host-and-status-temporary",
+					Path:             "/temporary",
 					UnfollowRedirect: true,
 				},
 				Response: http.Response{
-					StatusCode: 303,
+					StatusCode: 307,
 				},
 				RedirectRequest: &roundtripper.RedirectRequest{
-					Host: "example.org",
+					Path: "/temporary",
 				},
 				Namespace: ns,
 			},
@@ -66,7 +70,7 @@ var MeshHTTPRoute303RedirectHostAndStatus = suite.ConformanceTest{
 			tc := testCases[i]
 			t.Run(tc.GetTestCaseName(i), func(t *testing.T) {
 				t.Parallel()
-				client.MakeRequestAndExpectEventuallyConsistentResponse(t, tc, s.TimeoutConfig)
+				http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, tc)
 			})
 		}
 	},
