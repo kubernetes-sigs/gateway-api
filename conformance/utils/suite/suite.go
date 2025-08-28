@@ -390,12 +390,7 @@ func (suite *ConformanceTestSuite) Setup(t *testing.T, tests []ConformanceTest) 
 		suite.Applier.MustApplyObjectsWithCleanup(t, suite.Client, suite.TimeoutConfig, []client.Object{secret}, suite.Cleanup)
 		caConfigMap, ca, caPrivKey := kubernetes.MustCreateCACertConfigMap(t, "gateway-conformance-infra", "tls-checks-ca-certificate")
 		suite.Applier.MustApplyObjectsWithCleanup(t, suite.Client, suite.TimeoutConfig, []client.Object{caConfigMap}, suite.Cleanup)
-		secret = kubernetes.MustCreateCASignedCertSecret(t, "gateway-conformance-infra", "tls-checks-certificate", []string{"abc.example.com"}, ca, caPrivKey)
-		suite.Applier.MustApplyObjectsWithCleanup(t, suite.Client, suite.TimeoutConfig, []client.Object{secret}, suite.Cleanup)
-		// TODO(kl52752) Merge CA certificates for Backend TLS Policy and move Deployment to common file.
-		caConfigMap, ca, caPrivKey = kubernetes.MustCreateCACertConfigMap(t, "gateway-conformance-infra", "backend-tls-with-san-certificate", []string{"abc.example.com", "spiffe://abc.example.com/test-identity"})
-		suite.Applier.MustApplyObjectsWithCleanup(t, suite.Client, suite.TimeoutConfig, []client.Object{caConfigMap}, suite.Cleanup)
-		secret = kubernetes.MustCreateCASignedCertSecret(t, "gateway-conformance-infra", "tls-with-san-certificate", []string{"abc.example.com", "spiffe://abc.example.com/test-identity"}, ca, caPrivKey)
+		secret = kubernetes.MustCreateCASignedCertSecret(t, "gateway-conformance-infra", "tls-checks-certificate", []string{"abc.example.com", "spiffe://abc.example.com/test-identity"}, ca, caPrivKey)
 		suite.Applier.MustApplyObjectsWithCleanup(t, suite.Client, suite.TimeoutConfig, []client.Object{secret}, suite.Cleanup)
 
 		// The following CA ceritficate is used for BackendTLSPolicy testing to intentionally force TLS validation to fail.

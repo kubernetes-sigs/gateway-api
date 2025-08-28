@@ -1,11 +1,11 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-  name: gateway-conformance-infra-test
+  name: backendtlspolicy
   namespace: gateway-conformance-infra
 spec:
   parentRefs:
-  - name: gateway-backendtlspolicy
+  - name: same-namespace
     namespace: gateway-conformance-infra
   hostnames:
   - abc.example.com
@@ -18,7 +18,7 @@ spec:
     matches:
     - path:
         type: Exact
-        value: /backendTLS
+        value: /backendtlspolicy
   - backendRefs:
     - group: ""
       kind: Service
@@ -27,7 +27,7 @@ spec:
     matches:
     - path:
         type: Exact
-        value: /backendTLSHostMismatch
+        value: /backendtlspolicy-host-mismatch
   - backendRefs:
     - group: ""
       kind: Service
@@ -36,7 +36,29 @@ spec:
     matches:
     - path:
         type: Exact
-        value: /backendTLSCertMismatch
+        value: /backendtlspolicy-cert-mismatch
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: backendtlspolicy-reencrypt
+  namespace: gateway-conformance-infra
+spec:
+  parentRefs:
+  - name: same-namespace-with-https-listener
+    namespace: gateway-conformance-infra
+  hostnames:
+  - https-listener.org
+  rules:
+  - backendRefs:
+    - group: ""
+      kind: Service
+      name: backendtlspolicy-test
+      port: 443
+    matches:
+    - path:
+        type: Exact
+        value: /backendtlspolicy
 ---
 apiVersion: v1
 kind: Service
@@ -85,7 +107,7 @@ spec:
 apiVersion: gateway.networking.k8s.io/v1alpha3
 kind: BackendTLSPolicy
 metadata:
-  name: normative-test-backendtlspolicy
+  name: normative-test
   namespace: gateway-conformance-infra
 spec:
   targetRefs:
@@ -105,7 +127,7 @@ spec:
 apiVersion: gateway.networking.k8s.io/v1alpha3
 kind: BackendTLSPolicy
 metadata:
-  name: backendtlspolicy-host-mismatch
+  name: host-mismatch
   namespace: gateway-conformance-infra
 spec:
   targetRefs:
@@ -125,7 +147,7 @@ spec:
 apiVersion: gateway.networking.k8s.io/v1alpha3
 kind: BackendTLSPolicy
 metadata:
-  name: backendtlspolicy-cert-mismatch
+  name: cert-mismatch
   namespace: gateway-conformance-infra
 spec:
   targetRefs:
