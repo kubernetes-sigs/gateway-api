@@ -241,7 +241,7 @@ type CommonRouteSpec struct {
 	// <gateway:experimental:validation:XValidation:message="sectionName or port must be unique when parentRefs includes 2 or more references to the same parent",rule="self.all(p1, self.exists_one(p2, p1.group == p2.group && p1.kind == p2.kind && p1.name == p2.name && (((!has(p1.__namespace__) || p1.__namespace__ == '') && (!has(p2.__namespace__) || p2.__namespace__ == '')) || (has(p1.__namespace__) && has(p2.__namespace__) && p1.__namespace__ == p2.__namespace__ )) && (((!has(p1.sectionName) || p1.sectionName == '') && (!has(p2.sectionName) || p2.sectionName == '')) || ( has(p1.sectionName) && has(p2.sectionName) && p1.sectionName == p2.sectionName)) && (((!has(p1.port) || p1.port == 0) && (!has(p2.port) || p2.port == 0)) || (has(p1.port) && has(p2.port) && p1.port == p2.port))))">
 	ParentRefs []ParentReference `json:"parentRefs,omitempty"`
 
-	// useDefaultGateway indicates the default Gateway scope to use for this
+	// UseDefaultGateway indicates the default Gateway scope to use for this
 	// Route. If unset (the default), the Route will not be attached to any
 	// default Gateway; if set, it will be attached to any default Gateway
 	// supporting the named scope, subject to the usual rules about which
@@ -251,7 +251,8 @@ type CommonRouteSpec struct {
 	// Gateways supporting the requested scope can change over time without
 	// any notice to the Route author, and in many situations it will not be
 	// appropriate to request a default Gateway for a given Route -- for
-	// example, a Route with specific security needs should almost certainly
+	// example, a Route with specific security requirements should almost certainly
+	// not use a default Gateway.
 	// not use a default Gateway.
 	//
 	// +optional <gateway:experimental>
