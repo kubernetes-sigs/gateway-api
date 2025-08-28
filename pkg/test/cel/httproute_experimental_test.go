@@ -241,6 +241,135 @@ func toDuration(durationString string) *gatewayv1.Duration {
 	return (*gatewayv1.Duration)(&durationString)
 }
 
+func TestHTTPRouteCORS(t *testing.T) {
+	tests := []struct {
+		name       string
+		wantErrors []string
+		corsfilter *gatewayv1.HTTPCORSFilter
+	}{
+		{
+			name:       "Valid cors should be accepted",
+			wantErrors: nil,
+			corsfilter: &gatewayv1.HTTPCORSFilter{
+				AllowOrigins: []gatewayv1.CORSOrigin{
+					"https://xpto.com",
+					"http://*.abcd.com",
+					"http://*.abcd.com:12345",
+				},
+			},
+		},
+		{
+			name:       "Using wildcard only is accepted",
+			wantErrors: nil,
+			corsfilter: &gatewayv1.HTTPCORSFilter{
+				AllowOrigins: []gatewayv1.CORSOrigin{
+					"*",
+				},
+			},
+		},
+		{
+			name:       "Wildcard and other hosts on the same origin list should be denied",
+			wantErrors: []string{"AllowOrigins cannot contain '*' alongside other origins"},
+			corsfilter: &gatewayv1.HTTPCORSFilter{
+				AllowOrigins: []gatewayv1.CORSOrigin{
+					"*",
+					"https://xpto.com",
+				},
+			},
+		},
+		{
+			name:       "An origin without the format scheme://host should be denied",
+			wantErrors: []string{"Invalid value: \"xpto.com\": spec.rules[0].filters[0].cors.allowOrigins[1] in body should match"},
+			corsfilter: &gatewayv1.HTTPCORSFilter{
+				AllowOrigins: []gatewayv1.CORSOrigin{
+					"https://xpto.com",
+					"xpto.com",
+				},
+			},
+		},
+		{
+			name:       "An origin as http://*.com should be accepted",
+			wantErrors: nil,
+			corsfilter: &gatewayv1.HTTPCORSFilter{
+				AllowOrigins: []gatewayv1.CORSOrigin{
+					"https://*.com",
+				},
+			},
+		},
+		{
+			name:       "An origin with an invalid port should be denied",
+			wantErrors: []string{"Invalid value: \"https://xpto.com:notaport\": spec.rules[0].filters[0].cors.allowOrigins[0] in body should match"},
+			corsfilter: &gatewayv1.HTTPCORSFilter{
+				AllowOrigins: []gatewayv1.CORSOrigin{
+					"https://xpto.com:notaport",
+				},
+			},
+		},
+		{
+			name:       "An origin with an value before the scheme definition should be denied",
+			wantErrors: []string{"Invalid value: \"xpto/https://xpto.com\""},
+			corsfilter: &gatewayv1.HTTPCORSFilter{
+				AllowOrigins: []gatewayv1.CORSOrigin{
+					"xpto/https://xpto.com",
+				},
+			},
+		},
+		{
+			name:       "Using an invalid HTTP method should be denied",
+			wantErrors: []string{"Unsupported value: \"BAZINGA\""},
+			corsfilter: &gatewayv1.HTTPCORSFilter{
+				AllowMethods: []gatewayv1.HTTPMethodWithWildcard{
+					"BAZINGA",
+				},
+			},
+		},
+		{
+			name:       "Using wildcard and a valid method should be denied",
+			wantErrors: []string{"AllowMethods cannot contain '*' alongside other methods"},
+			corsfilter: &gatewayv1.HTTPCORSFilter{
+				AllowMethods: []gatewayv1.HTTPMethodWithWildcard{
+					"GET",
+					"*",
+					"POST",
+				},
+			},
+		},
+		{
+			name:       "Using an array of valid methods should be accepted",
+			wantErrors: nil,
+			corsfilter: &gatewayv1.HTTPCORSFilter{
+				AllowMethods: []gatewayv1.HTTPMethodWithWildcard{
+					"GET",
+					"OPTIONS",
+					"POST",
+				},
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			route := &gatewayv1.HTTPRoute{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      fmt.Sprintf("foo-%v", time.Now().UnixNano()),
+					Namespace: metav1.NamespaceDefault,
+				},
+				Spec: gatewayv1.HTTPRouteSpec{Rules: []gatewayv1.HTTPRouteRule{
+					{
+						Filters: []gatewayv1.HTTPRouteFilter{
+							{
+								Type: gatewayv1.HTTPRouteFilterCORS,
+								CORS: tc.corsfilter,
+							},
+						},
+					},
+				}},
+			}
+			validateHTTPRoute(t, route, tc.wantErrors)
+		})
+	}
+}
+
 func TestHTTPRouteTimeouts(t *testing.T) {
 	tests := []struct {
 		name       string

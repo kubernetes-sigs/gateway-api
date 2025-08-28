@@ -608,6 +608,17 @@ type PreciseHostname string
 // +kubebuilder:validation:Pattern=`^(([^:/?#]+):)(//([^/?#]*))([^?#]*)(\?([^#]*))?(#(.*))?`
 type AbsoluteURI string
 
+// The CORSOrigin MUST NOT be a relative URI, and it MUST follow the URI syntax and
+// encoding rules specified in RFC3986.  The CORSOrigin MUST include both a
+// scheme (e.g., "http" or "spiffe") and a scheme-specific-part, or it should be a single '*' character.
+// URIs that include an authority MUST include a fully qualified domain name or
+// IP address as the host.
+// <gateway:util:excludeFromCRD> The below regex was generated to simplify the assertion of scheme://host:<port> being port optional </gateway:util:excludeFromCRD>
+// +kubebuilder:validation:MinLength=1
+// +kubebuilder:validation:MaxLength=253
+// +kubebuilder:validation:Pattern=`(^\*$)|(^([a-zA-Z][a-zA-Z0-9+\-.]+):\/\/([^:/?#]+)(:([0-9]{1,5}))?$)`
+type CORSOrigin string
+
 // Group refers to a Kubernetes Group. It must either be an empty string or a
 // RFC 1123 subdomain.
 //

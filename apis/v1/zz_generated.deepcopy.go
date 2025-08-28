@@ -976,7 +976,7 @@ func (in *HTTPCORSFilter) DeepCopyInto(out *HTTPCORSFilter) {
 	*out = *in
 	if in.AllowOrigins != nil {
 		in, out := &in.AllowOrigins, &out.AllowOrigins
-		*out = make([]AbsoluteURI, len(*in))
+		*out = make([]CORSOrigin, len(*in))
 		copy(*out, *in)
 	}
 	if in.AllowCredentials != nil {

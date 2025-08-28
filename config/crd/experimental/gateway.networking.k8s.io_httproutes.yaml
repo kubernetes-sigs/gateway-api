@@ -657,18 +657,22 @@ spec:
                                         Support: Extended
                                       items:
                                         description: |-
-                                          The AbsoluteURI MUST NOT be a relative URI, and it MUST follow the URI syntax and
-                                          encoding rules specified in RFC3986.  The AbsoluteURI MUST include both a
-                                          scheme (e.g., "http" or "spiffe") and a scheme-specific-part.  URIs that
-                                          include an authority MUST include a fully qualified domain name or
+                                          The CORSOrigin MUST NOT be a relative URI, and it MUST follow the URI syntax and
+                                          encoding rules specified in RFC3986.  The CORSOrigin MUST include both a
+                                          scheme (e.g., "http" or "spiffe") and a scheme-specific-part, or it should be a single '*' character.
+                                          URIs that include an authority MUST include a fully qualified domain name or
                                           IP address as the host.
                                         maxLength: 253
                                         minLength: 1
-                                        pattern: ^(([^:/?#]+):)(//([^/?#]*))([^?#]*)(\?([^#]*))?(#(.*))?
+                                        pattern: (^\*$)|(^([a-zA-Z][a-zA-Z0-9+\-.]+):\/\/([^:/?#]+)(:([0-9]{1,5}))?$)
                                         type: string
                                       maxItems: 64
                                       type: array
                                       x-kubernetes-list-type: set
+                                      x-kubernetes-validations:
+                                      - message: AllowOrigins cannot contain '*' alongside
+                                          other origins
+                                        rule: '!(''*'' in self && self.size() > 1)'
                                     exposeHeaders:
                                       description: |-
                                         ExposeHeaders indicates which HTTP response headers can be exposed
@@ -2139,18 +2143,22 @@ spec:
                                   Support: Extended
                                 items:
                                   description: |-
-                                    The AbsoluteURI MUST NOT be a relative URI, and it MUST follow the URI syntax and
-                                    encoding rules specified in RFC3986.  The AbsoluteURI MUST include both a
-                                    scheme (e.g., "http" or "spiffe") and a scheme-specific-part.  URIs that
-                                    include an authority MUST include a fully qualified domain name or
+                                    The CORSOrigin MUST NOT be a relative URI, and it MUST follow the URI syntax and
+                                    encoding rules specified in RFC3986.  The CORSOrigin MUST include both a
+                                    scheme (e.g., "http" or "spiffe") and a scheme-specific-part, or it should be a single '*' character.
+                                    URIs that include an authority MUST include a fully qualified domain name or
                                     IP address as the host.
                                   maxLength: 253
                                   minLength: 1
-                                  pattern: ^(([^:/?#]+):)(//([^/?#]*))([^?#]*)(\?([^#]*))?(#(.*))?
+                                  pattern: (^\*$)|(^([a-zA-Z][a-zA-Z0-9+\-.]+):\/\/([^:/?#]+)(:([0-9]{1,5}))?$)
                                   type: string
                                 maxItems: 64
                                 type: array
                                 x-kubernetes-list-type: set
+                                x-kubernetes-validations:
+                                - message: AllowOrigins cannot contain '*' alongside
+                                    other origins
+                                  rule: '!(''*'' in self && self.size() > 1)'
                               exposeHeaders:
                                 description: |-
                                   ExposeHeaders indicates which HTTP response headers can be exposed
@@ -4801,18 +4809,22 @@ spec:
                                         Support: Extended
                                       items:
                                         description: |-
-                                          The AbsoluteURI MUST NOT be a relative URI, and it MUST follow the URI syntax and
-                                          encoding rules specified in RFC3986.  The AbsoluteURI MUST include both a
-                                          scheme (e.g., "http" or "spiffe") and a scheme-specific-part.  URIs that
-                                          include an authority MUST include a fully qualified domain name or
+                                          The CORSOrigin MUST NOT be a relative URI, and it MUST follow the URI syntax and
+                                          encoding rules specified in RFC3986.  The CORSOrigin MUST include both a
+                                          scheme (e.g., "http" or "spiffe") and a scheme-specific-part, or it should be a single '*' character.
+                                          URIs that include an authority MUST include a fully qualified domain name or
                                           IP address as the host.
                                         maxLength: 253
                                         minLength: 1
-                                        pattern: ^(([^:/?#]+):)(//([^/?#]*))([^?#]*)(\?([^#]*))?(#(.*))?
+                                        pattern: (^\*$)|(^([a-zA-Z][a-zA-Z0-9+\-.]+):\/\/([^:/?#]+)(:([0-9]{1,5}))?$)
                                         type: string
                                       maxItems: 64
                                       type: array
                                       x-kubernetes-list-type: set
+                                      x-kubernetes-validations:
+                                      - message: AllowOrigins cannot contain '*' alongside
+                                          other origins
+                                        rule: '!(''*'' in self && self.size() > 1)'
                                     exposeHeaders:
                                       description: |-
                                         ExposeHeaders indicates which HTTP response headers can be exposed
@@ -6283,18 +6295,22 @@ spec:
                                   Support: Extended
                                 items:
                                   description: |-
-                                    The AbsoluteURI MUST NOT be a relative URI, and it MUST follow the URI syntax and
-                                    encoding rules specified in RFC3986.  The AbsoluteURI MUST include both a
-                                    scheme (e.g., "http" or "spiffe") and a scheme-specific-part.  URIs that
-                                    include an authority MUST include a fully qualified domain name or
+                                    The CORSOrigin MUST NOT be a relative URI, and it MUST follow the URI syntax and
+                                    encoding rules specified in RFC3986.  The CORSOrigin MUST include both a
+                                    scheme (e.g., "http" or "spiffe") and a scheme-specific-part, or it should be a single '*' character.
+                                    URIs that include an authority MUST include a fully qualified domain name or
                                     IP address as the host.
                                   maxLength: 253
                                   minLength: 1
-                                  pattern: ^(([^:/?#]+):)(//([^/?#]*))([^?#]*)(\?([^#]*))?(#(.*))?
+                                  pattern: (^\*$)|(^([a-zA-Z][a-zA-Z0-9+\-.]+):\/\/([^:/?#]+)(:([0-9]{1,5}))?$)
                                   type: string
                                 maxItems: 64
                                 type: array
                                 x-kubernetes-list-type: set
+                                x-kubernetes-validations:
+                                - message: AllowOrigins cannot contain '*' alongside
+                                    other origins
+                                  rule: '!(''*'' in self && self.size() > 1)'
                               exposeHeaders:
                                 description: |-
                                   ExposeHeaders indicates which HTTP response headers can be exposed

@@ -25,7 +25,7 @@ import (
 // HTTPCORSFilterApplyConfiguration represents a declarative configuration of the HTTPCORSFilter type for use
 // with apply.
 type HTTPCORSFilterApplyConfiguration struct {
-	AllowOrigins     []apisv1.AbsoluteURI            `json:"allowOrigins,omitempty"`
+	AllowOrigins     []apisv1.CORSOrigin             `json:"allowOrigins,omitempty"`
 	AllowCredentials *bool                           `json:"allowCredentials,omitempty"`
 	AllowMethods     []apisv1.HTTPMethodWithWildcard `json:"allowMethods,omitempty"`
 	AllowHeaders     []apisv1.HTTPHeaderName         `json:"allowHeaders,omitempty"`
@@ -42,7 +42,7 @@ func HTTPCORSFilter() *HTTPCORSFilterApplyConfiguration {
 // WithAllowOrigins adds the given value to the AllowOrigins field in the declarative configuration
 // and returns the receiver, so that objects can be build by chaining "With" function invocations.
 // If called multiple times, values provided by each call will be appended to the AllowOrigins field.
-func (b *HTTPCORSFilterApplyConfiguration) WithAllowOrigins(values ...apisv1.AbsoluteURI) *HTTPCORSFilterApplyConfiguration {
+func (b *HTTPCORSFilterApplyConfiguration) WithAllowOrigins(values ...apisv1.CORSOrigin) *HTTPCORSFilterApplyConfiguration {
 	for i := range values {
 		b.AllowOrigins = append(b.AllowOrigins, values[i])
 	}
