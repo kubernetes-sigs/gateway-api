@@ -1,11 +1,11 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-  name: route-backendtlspolicy-san-test
+  name: backendtlspolicy-san-test
   namespace: gateway-conformance-infra
 spec:
   parentRefs:
-  - name: gateway-backendtlspolicy
+  - name: same-namespace
     namespace: gateway-conformance-infra
   hostnames:
   - abc.example.com
@@ -18,7 +18,7 @@ spec:
     matches:
     - path:
         type: Exact
-        value: /backendTLSSanDns
+        value: /backendtlspolicy-san-dns
   - backendRefs:
     - group: ""
       kind: Service
@@ -27,7 +27,7 @@ spec:
     matches:
     - path:
         type: Exact
-        value: /backendTLSSanDnsMismatch
+        value: /backendtlspolicy-san-dns-mismatch
   - backendRefs:
     - group: ""
       kind: Service
@@ -36,7 +36,7 @@ spec:
     matches:
     - path:
         type: Exact
-        value: /backendTLSSanUri
+        value: /backendtlspolicy-san-uri
   - backendRefs:
     - group: ""
       kind: Service
@@ -45,7 +45,7 @@ spec:
     matches:
     - path:
         type: Exact
-        value: /backendTLSSanUriMismatch
+        value: /backendtlspolicy-san-uri-mismatch
   - backendRefs:
     - group: ""
       kind: Service
@@ -54,7 +54,7 @@ spec:
     matches:
     - path:
         type: Exact
-        value: /backendTLSMultiSans
+        value: /backendtlspolicy-multiple-sans
   - backendRefs:
     - group: ""
       kind: Service
@@ -63,7 +63,7 @@ spec:
     matches:
     - path:
         type: Exact
-        value: /backendTLSMultiMismatchSans
+        value: /backendtlspolicy-multiple-mismatch-sans
 ---
 apiVersion: v1
 kind: Service
@@ -72,7 +72,7 @@ metadata:
   namespace: gateway-conformance-infra
 spec:
   selector:
-    app: backendtlspolicy-san-test
+    app: tls-backend
   ports:
   - name: "btls"
     protocol: TCP
@@ -86,7 +86,7 @@ metadata:
   namespace: gateway-conformance-infra
 spec:
   selector:
-    app: backendtlspolicy-san-test
+    app: tls-backend
   ports:
   - name: "btls"
     protocol: TCP
@@ -101,7 +101,7 @@ metadata:
   namespace: gateway-conformance-infra
 spec:
   selector:
-    app: backendtlspolicy-san-test
+    app: tls-backend
   ports:
   - name: "btls"
     protocol: TCP
@@ -116,7 +116,7 @@ metadata:
   namespace: gateway-conformance-infra
 spec:
   selector:
-    app: backendtlspolicy-san-test
+    app: tls-backend
   ports:
   - name: "btls"
     protocol: TCP
@@ -131,7 +131,7 @@ metadata:
   namespace: gateway-conformance-infra
 spec:
   selector:
-    app: backendtlspolicy-san-test
+    app: tls-backend
   ports:
   - name: "btls"
     protocol: TCP
@@ -146,7 +146,7 @@ metadata:
   namespace: gateway-conformance-infra
 spec:
   selector:
-    app: backendtlspolicy-san-test
+    app: tls-backend
   ports:
   - name: "btls"
     protocol: TCP
@@ -154,60 +154,10 @@ spec:
     port: 443
     targetPort: 8443
 ---
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: backendtlspolicy-san-test
-  namespace: gateway-conformance-infra
-  labels:
-    app: backendtlspolicy-san-test
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: backendtlspolicy-san-test
-  template:
-    metadata:
-      labels:
-        app: backendtlspolicy-san-test
-    spec:
-      containers:
-      - name: backendtlspolicy-san-test
-        image: gcr.io/k8s-staging-gateway-api/echo-basic:v20240412-v1.0.0-394-g40c666fd
-        volumeMounts:
-        - name: secret-volume
-          mountPath: /etc/secret-volume
-        env:
-        - name: POD_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.name
-        - name: NAMESPACE
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.namespace
-        - name: TLS_SERVER_CERT
-          value: /etc/secret-volume/crt
-        - name: TLS_SERVER_PRIVKEY
-          value: /etc/secret-volume/key
-        resources:
-          requests:
-            cpu: 10m
-      volumes:
-      - name: secret-volume
-        secret:
-          # This secret is generated dynamically by the test suite.
-          secretName: tls-with-san-certificate
-          items:
-          - key: tls.crt
-            path: crt
-          - key: tls.key
-            path: key
----
 apiVersion: gateway.networking.k8s.io/v1alpha3
 kind: BackendTLSPolicy
 metadata:
-  name: backendtlspolicy-san-dns
+  name: san-dns
   namespace: gateway-conformance-infra
 spec:
   targetRefs:
@@ -219,8 +169,9 @@ spec:
     caCertificateRefs:
     - group: ""
       kind: ConfigMap
-      # This secret is generated dynamically by the test suite.
-      name: "backend-tls-with-san-certificate"
+      # This ConfigMap is generated dynamically by the test suite.
+      # It contains the CA certificate used to sign the tls-backend serving certificate.
+      name: "tls-checks-ca-certificate"
     hostname: "abc.example.com"
     subjectAltNames:
     - type: "Hostname"
@@ -229,7 +180,7 @@ spec:
 apiVersion: gateway.networking.k8s.io/v1alpha3
 kind: BackendTLSPolicy
 metadata:
-  name: backendtlspolicy-san-dns-mismatch
+  name: san-dns-mismatch
   namespace: gateway-conformance-infra
 spec:
   targetRefs:
@@ -241,8 +192,9 @@ spec:
     caCertificateRefs:
     - group: ""
       kind: ConfigMap
-      # This secret is generated dynamically by the test suite.
-      name: "backend-tls-with-san-certificate"
+      # This ConfigMap is generated dynamically by the test suite.
+      # It contains the CA certificate used to sign the tls-backend serving certificate.
+      name: "tls-checks-ca-certificate"
     hostname: "abc.example.com"
     subjectAltNames:
     - type: "Hostname"
@@ -251,7 +203,7 @@ spec:
 apiVersion: gateway.networking.k8s.io/v1alpha3
 kind: BackendTLSPolicy
 metadata:
-  name: backendtlspolicy-san-uri
+  name: san-uri
   namespace: gateway-conformance-infra
 spec:
   targetRefs:
@@ -263,8 +215,9 @@ spec:
     caCertificateRefs:
     - group: ""
       kind: ConfigMap
-      # This secret is generated dynamically by the test suite.
-      name: "backend-tls-with-san-certificate"
+      # This ConfigMap is generated dynamically by the test suite.
+      # It contains the CA certificate used to sign the tls-backend serving certificate.
+      name: "tls-checks-ca-certificate"
     hostname: "abc.example.com"
     subjectAltNames:
     - type: "URI"
@@ -273,7 +226,7 @@ spec:
 apiVersion: gateway.networking.k8s.io/v1alpha3
 kind: BackendTLSPolicy
 metadata:
-  name: backendtlspolicy-san-uri-mismatch
+  name: san-uri-mismatch
   namespace: gateway-conformance-infra
 spec:
   targetRefs:
@@ -285,8 +238,9 @@ spec:
     caCertificateRefs:
     - group: ""
       kind: ConfigMap
-      # This secret is generated dynamically by the test suite.
-      name: "backend-tls-with-san-certificate"
+      # This ConfigMap is generated dynamically by the test suite.
+      # It contains the CA certificate used to sign the tls-backend serving certificate.
+      name: "tls-checks-ca-certificate"
     hostname: "abc.example.com"
     subjectAltNames:
     - type: "URI"
@@ -295,7 +249,7 @@ spec:
 apiVersion: gateway.networking.k8s.io/v1alpha3
 kind: BackendTLSPolicy
 metadata:
-  name: backendtlspolicy-multiple-sans
+  name: multiple-sans
   namespace: gateway-conformance-infra
 spec:
   targetRefs:
@@ -307,8 +261,9 @@ spec:
     caCertificateRefs:
     - group: ""
       kind: ConfigMap
-      # This secret is generated dynamically by the test suite.
-      name: "backend-tls-with-san-certificate"
+      # This ConfigMap is generated dynamically by the test suite.
+      # It contains the CA certificate used to sign the tls-backend serving certificate.
+      name: "tls-checks-ca-certificate"
     hostname: "abc.example.com"
     subjectAltNames:
     - type: "URI"
@@ -319,7 +274,7 @@ spec:
 apiVersion: gateway.networking.k8s.io/v1alpha3
 kind: BackendTLSPolicy
 metadata:
-  name: backendtlspolicy-multiple-mismatch-sans
+  name: multiple-mismatch-sans
   namespace: gateway-conformance-infra
 spec:
   targetRefs:
@@ -331,8 +286,9 @@ spec:
     caCertificateRefs:
     - group: ""
       kind: ConfigMap
-      # This secret is generated dynamically by the test suite.
-      name: "backend-tls-with-san-certificate"
+      # This ConfigMap is generated dynamically by the test suite.
+      # It contains the CA certificate used to sign the tls-backend serving certificate.
+      name: "tls-checks-ca-certificate"
     hostname: "abc.example.com"
     subjectAltNames:
     - type: "URI"

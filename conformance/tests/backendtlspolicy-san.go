@@ -46,8 +46,8 @@ var BackendTLSPolicySANValidation = suite.ConformanceTest{
 	Manifests: []string{"tests/backendtlspolicy-san.yaml"},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
-		routeNN := types.NamespacedName{Name: "route-backendtlspolicy-san-test", Namespace: ns}
-		gwNN := types.NamespacedName{Name: "gateway-backendtlspolicy", Namespace: ns}
+		routeNN := types.NamespacedName{Name: "backendtlspolicy-san-test", Namespace: ns}
+		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: ns}
 
 		kubernetes.NamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, []string{ns})
 		gwAddr := kubernetes.GatewayAndRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), &gatewayv1.HTTPRoute{}, false, routeNN)
@@ -63,7 +63,7 @@ var BackendTLSPolicySANValidation = suite.ConformanceTest{
 
 		// Verify that the request sent to Service with valid BackendTLSPolicy containing dns SAN should succeed.
 		t.Run("HTTP request sent to Service with valid BackendTLSPolicy containing dns SAN should succeed", func(t *testing.T) {
-			policyNN := types.NamespacedName{Name: "backendtlspolicy-san-dns", Namespace: ns}
+			policyNN := types.NamespacedName{Name: "san-dns", Namespace: ns}
 			kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, policyNN, gwNN, policyCond)
 
 			h.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr,
@@ -71,16 +71,16 @@ var BackendTLSPolicySANValidation = suite.ConformanceTest{
 					Namespace: ns,
 					Request: h.Request{
 						Host: serverStr,
-						Path: "/backendTLSSanDns",
+						Path: "/backendtlspolicy-san-dns",
 						SNI:  serverStr,
 					},
-					Response: h.Response{StatusCode: 200},
+					Response: h.Response{StatusCodes: []int{200}},
 				})
 		})
 
 		// Verify that the request sent to a Service targeted by a BackendTLSPolicy with mismatched dns SAN should fail.
 		t.Run("HTTP request sent to Service targeted by BackendTLSPolicy with mismatched dns SAN should return an HTTP error", func(t *testing.T) {
-			policyNN := types.NamespacedName{Name: "backendtlspolicy-san-dns-mismatch", Namespace: ns}
+			policyNN := types.NamespacedName{Name: "san-dns-mismatch", Namespace: ns}
 			kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, policyNN, gwNN, policyCond)
 
 			h.MakeRequestAndExpectFailure(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr,
@@ -88,7 +88,7 @@ var BackendTLSPolicySANValidation = suite.ConformanceTest{
 					Namespace: ns,
 					Request: h.Request{
 						Host: serverStr,
-						Path: "/backendTLSSanDnsMismatch",
+						Path: "/backendtlspolicy-san-dns-mismatch",
 						SNI:  serverStr,
 					},
 				})
@@ -96,7 +96,7 @@ var BackendTLSPolicySANValidation = suite.ConformanceTest{
 
 		// Verify that the request sent to Service with valid BackendTLSPolicy containing uri SAN should succeed.
 		t.Run("HTTP request sent to Service with valid BackendTLSPolicy containing uri SAN should succeed", func(t *testing.T) {
-			policyNN := types.NamespacedName{Name: "backendtlspolicy-san-uri", Namespace: ns}
+			policyNN := types.NamespacedName{Name: "san-uri", Namespace: ns}
 			kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, policyNN, gwNN, policyCond)
 
 			h.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr,
@@ -104,16 +104,16 @@ var BackendTLSPolicySANValidation = suite.ConformanceTest{
 					Namespace: ns,
 					Request: h.Request{
 						Host: serverStr,
-						Path: "/backendTLSSanUri",
+						Path: "/backendtlspolicy-san-uri",
 						SNI:  serverStr,
 					},
-					Response: h.Response{StatusCode: 200},
+					Response: h.Response{StatusCodes: []int{200}},
 				})
 		})
 
 		// Verify that the request sent to a Service targeted by a BackendTLSPolicy with mismatched uri SAN should fail.
 		t.Run("HTTP request sent to Service targeted by BackendTLSPolicy with mismatched uri SAN should return an HTTP error", func(t *testing.T) {
-			policyNN := types.NamespacedName{Name: "backendtlspolicy-san-uri-mismatch", Namespace: ns}
+			policyNN := types.NamespacedName{Name: "san-uri-mismatch", Namespace: ns}
 			kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, policyNN, gwNN, policyCond)
 
 			h.MakeRequestAndExpectFailure(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr,
@@ -121,7 +121,7 @@ var BackendTLSPolicySANValidation = suite.ConformanceTest{
 					Namespace: ns,
 					Request: h.Request{
 						Host: serverStr,
-						Path: "/backendTLSSanUriMismatch",
+						Path: "/backendtlspolicy-san-uri-mismatch",
 						SNI:  serverStr,
 					},
 				})
@@ -129,7 +129,7 @@ var BackendTLSPolicySANValidation = suite.ConformanceTest{
 
 		// Verify that the request sent to Service with valid BackendTLSPolicy containing multi SANs should succeed.
 		t.Run("HTTP request sent to Service with valid BackendTLSPolicy containing multi SAN should succeed", func(t *testing.T) {
-			policyNN := types.NamespacedName{Name: "backendtlspolicy-multiple-sans", Namespace: ns}
+			policyNN := types.NamespacedName{Name: "multiple-sans", Namespace: ns}
 			kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, policyNN, gwNN, policyCond)
 
 			h.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr,
@@ -137,16 +137,16 @@ var BackendTLSPolicySANValidation = suite.ConformanceTest{
 					Namespace: ns,
 					Request: h.Request{
 						Host: serverStr,
-						Path: "/backendTLSMultiSans",
+						Path: "/backendtlspolicy-multiple-sans",
 						SNI:  serverStr,
 					},
-					Response: h.Response{StatusCode: 200},
+					Response: h.Response{StatusCodes: []int{200}},
 				})
 		})
 
 		// Verify that the request sent to a Service targeted by a BackendTLSPolicy with mismatched multi SAN should fail.
 		t.Run("HTTP request sent to Service targeted by BackendTLSPolicy with mismatched multi SAN should return an HTTP error", func(t *testing.T) {
-			policyNN := types.NamespacedName{Name: "backendtlspolicy-multiple-mismatch-sans", Namespace: ns}
+			policyNN := types.NamespacedName{Name: "multiple-mismatch-sans", Namespace: ns}
 			kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, policyNN, gwNN, policyCond)
 
 			h.MakeRequestAndExpectFailure(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr,
@@ -154,7 +154,7 @@ var BackendTLSPolicySANValidation = suite.ConformanceTest{
 					Namespace: ns,
 					Request: h.Request{
 						Host: serverStr,
-						Path: "/backendTLSMultiMismatchSans",
+						Path: "/backendtlspolicy-multiple-mismatch-sans",
 						SNI:  serverStr,
 					},
 				})

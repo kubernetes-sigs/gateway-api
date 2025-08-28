@@ -1,11 +1,11 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-  name: gateway-conformance-infra-test
+  name: backendtlspolicy
   namespace: gateway-conformance-infra
 spec:
   parentRefs:
-  - name: gateway-backendtlspolicy
+  - name: same-namespace
     namespace: gateway-conformance-infra
   hostnames:
   - abc.example.com
@@ -18,7 +18,7 @@ spec:
     matches:
     - path:
         type: Exact
-        value: /backendTLS
+        value: /backendtlspolicy
   - backendRefs:
     - group: ""
       kind: Service
@@ -27,7 +27,7 @@ spec:
     matches:
     - path:
         type: Exact
-        value: /backendTLSHostMismatch
+        value: /backendtlspolicy-host-mismatch
   - backendRefs:
     - group: ""
       kind: Service
@@ -36,7 +36,29 @@ spec:
     matches:
     - path:
         type: Exact
-        value: /backendTLSCertMismatch
+        value: /backendtlspolicy-cert-mismatch
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: backendtlspolicy-reencrypt
+  namespace: gateway-conformance-infra
+spec:
+  parentRefs:
+  - name: same-namespace-with-https-listener
+    namespace: gateway-conformance-infra
+  hostnames:
+  - https-listener.org
+  rules:
+  - backendRefs:
+    - group: ""
+      kind: Service
+      name: backendtlspolicy-test
+      port: 443
+    matches:
+    - path:
+        type: Exact
+        value: /backendtlspolicy
 ---
 apiVersion: v1
 kind: Service
@@ -45,7 +67,7 @@ metadata:
   namespace: gateway-conformance-infra
 spec:
   selector:
-    app: backendtlspolicy-test
+    app: tls-backend
   ports:
   - name: "btls"
     protocol: TCP
@@ -59,7 +81,7 @@ metadata:
   namespace: gateway-conformance-infra
 spec:
   selector:
-    app: backendtlspolicy-test
+    app: tls-backend
   ports:
   - name: "btls"
     protocol: TCP
@@ -74,7 +96,7 @@ metadata:
   namespace: gateway-conformance-infra
 spec:
   selector:
-    app: backendtlspolicy-test
+    app: tls-backend
   ports:
   - name: "btls"
     protocol: TCP
@@ -82,76 +104,10 @@ spec:
     port: 443
     targetPort: 8443
 ---
-# Deployment must not be applied until after the secret is generated.
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: backendtlspolicy-test
-  namespace: gateway-conformance-infra
-  labels:
-    app: backendtlspolicy-test
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: backendtlspolicy-test
-  template:
-    metadata:
-      labels:
-        app: backendtlspolicy-test
-    spec:
-      containers:
-      - name: backendtlspolicy-test
-        image: gcr.io/k8s-staging-gateway-api/echo-basic:v20240412-v1.0.0-394-g40c666fd
-        volumeMounts:
-        - name: ca-volume
-          mountPath: /etc/ca-volume
-        - name: secret-volume
-          mountPath: /etc/secret-volume
-        env:
-        - name: POD_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.name
-        - name: NAMESPACE
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.namespace
-        - name: CA_CERT
-          value: /etc/ca-volume/crt
-        - name: CA_CERT_KEY
-          value: /etc/ca-volume/key
-        - name: TLS_SERVER_CERT
-          value: /etc/secret-volume/crt
-        - name: TLS_SERVER_PRIVKEY
-          value: /etc/secret-volume/key
-        resources:
-          requests:
-            cpu: 10m
-      volumes:
-      - name: ca-volume
-        configMap:
-          # This configMap is generated dynamically by the test suite.
-          name: backend-tls-checks-certificate
-          items:
-          - key: ca.crt
-            path: crt
-          - key: key.crt
-            path: key
-      - name: secret-volume
-        secret:
-          # This secret is generated dynamically by the test suite.
-          secretName: tls-checks-certificate
-          items:
-          - key: tls.crt
-            path: crt
-          - key: tls.key
-            path: key
----
 apiVersion: gateway.networking.k8s.io/v1alpha3
 kind: BackendTLSPolicy
 metadata:
-  name: normative-test-backendtlspolicy
+  name: normative-test
   namespace: gateway-conformance-infra
 spec:
   targetRefs:
@@ -163,14 +119,15 @@ spec:
     caCertificateRefs:
     - group: ""
       kind: ConfigMap
-      # This secret is generated dynamically by the test suite.
-      name: "backend-tls-checks-certificate"
+      # This ConfigMap is generated dynamically by the test suite.
+      # It contains the CA certificate used to sign the tls-backend serving certificate.
+      name: "tls-checks-ca-certificate"
     hostname: "abc.example.com"
 ---
 apiVersion: gateway.networking.k8s.io/v1alpha3
 kind: BackendTLSPolicy
 metadata:
-  name: backendtlspolicy-host-mismatch
+  name: host-mismatch
   namespace: gateway-conformance-infra
 spec:
   targetRefs:
@@ -182,14 +139,15 @@ spec:
     caCertificateRefs:
     - group: ""
       kind: ConfigMap
-      # This secret is generated dynamically by the test suite.
-      name: "backend-tls-checks-certificate"
+      # This ConfigMap is generated dynamically by the test suite.
+      # It contains the CA certificate used to sign the tls-backend serving certificate.
+      name: "tls-checks-ca-certificate"
     hostname: "mismatch.example.com"
 ---
 apiVersion: gateway.networking.k8s.io/v1alpha3
 kind: BackendTLSPolicy
 metadata:
-  name: backendtlspolicy-cert-mismatch
+  name: cert-mismatch
   namespace: gateway-conformance-infra
 spec:
   targetRefs:
@@ -201,6 +159,7 @@ spec:
     caCertificateRefs:
     - group: ""
       kind: ConfigMap
-      # This secret is generated dynamically by the test suite.
-      name: "backend-tls-mismatch-certificate"
+      # This ConfigMap is generated dynamically by the test suite.
+      # It contains a random, unused CA certificate to force validation to fail.
+      name: "mismatch-ca-certificate"
     hostname: "abc.example.com"
