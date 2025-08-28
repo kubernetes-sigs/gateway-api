@@ -73,7 +73,6 @@ type Request struct {
 	Host             string
 	Method           string
 	Path             string
-	Port             uint32
 	Headers          map[string]string
 	UnfollowRedirect bool
 	Protocol         string
@@ -148,7 +147,7 @@ func MakeRequest(t *testing.T, expected *ExpectedResponse, gwAddr, protocol, sch
 	}
 
 	path, query, _ := strings.Cut(expected.Request.Path, "?")
-	reqURL := url.URL{Scheme: scheme, Host: CalculateHost(t, gwAddr, scheme, expected.Request), Path: path, RawQuery: query}
+	reqURL := url.URL{Scheme: scheme, Host: CalculateHost(t, gwAddr, scheme), Path: path, RawQuery: query}
 
 	tlog.Logf(t, "Making %s request to host %s via %s", expected.Request.Method, expected.Request.Host, reqURL.String())
 
@@ -183,17 +182,13 @@ func MakeRequest(t *testing.T, expected *ExpectedResponse, gwAddr, protocol, sch
 // case of any error, the input gwAddr will be returned as the default.
 //
 // [HTTP spec]: https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.23
-func CalculateHost(t *testing.T, gwAddr, scheme string, request Request) string {
+func CalculateHost(t *testing.T, gwAddr, scheme string) string {
 	host, port, err := net.SplitHostPort(gwAddr) // note: this will strip brackets of an IPv6 address
 	if err != nil && strings.Contains(err.Error(), "too many colons in address") {
 		// This is an IPv6 address; assume it's valid ipv6
 		// Assume caller won't add a port without brackets
 		gwAddr = "[" + gwAddr + "]"
 		host, port, err = net.SplitHostPort(gwAddr)
-	}
-	if request.Port != 0 {
-		gwAddr, _, _ = strings.Cut(gwAddr, ":")
-		gwAddr = fmt.Sprintf("%s:%d", gwAddr, request.Port)
 	}
 	if err != nil {
 		// An address without a port causes an error, but it's fine for some cases.

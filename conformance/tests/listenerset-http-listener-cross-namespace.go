@@ -37,7 +37,7 @@ func init() {
 
 var ListenerSetCrossNamespace = suite.ConformanceTest{
 	ShortName:   "ListenerSetCrossNamespace",
-	Description: "Listener Set in a different namespace than the Gateway",
+	Description: "ListenerSet in a different namespace than the Gateway",
 	Features: []features.FeatureName{
 		features.SupportGateway,
 		features.SupportGatewayListenerSet,
@@ -127,7 +127,7 @@ var ListenerSetCrossNamespace = suite.ConformanceTest{
 				Backend:   "infra-backend-v1",
 				Namespace: ns,
 			},
-			// Requests to listenerset-2-listener-1-listener on the listener set in a different namespace should not work
+			// Requests to listenerset-2-listener-1-listener on the listener set in a non-allowed namespace should not work
 			{
 				Request:  http.Request{Host: "listenerset-2-listener-1.com", Path: "/listenerset-2-route"},
 				Response: http.Response{StatusCode: 404},
@@ -140,11 +140,18 @@ var ListenerSetCrossNamespace = suite.ConformanceTest{
 			{Namespace: "gateway-api-example-ns3", Name: "gateway-listener-2-route"},
 		}
 
+		// Gateway, routes and gateway conditions
 		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), gwRoutes...)
 		for _, routeNN := range gwRoutes {
 			kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN)
 		}
+		kubernetes.GatewayMustHaveCondition(t, suite.Client, suite.TimeoutConfig, gwNN, metav1.Condition{
+			Type:   string(gatewayv1.GatewayConditionAttachedListenerSets),
+			Status: metav1.ConditionTrue,
+			Reason: string(gatewayv1.GatewayReasonListenerSetsAttached),
+		})
 
+		// Allowed ListenerSet, listenerSet routes and listenerSet conditions
 		lsNN := types.NamespacedName{Name: "listenerset-with-http-listener", Namespace: "gateway-api-example-ns1"}
 		lsRoutes := []types.NamespacedName{
 			{Namespace: "gateway-api-example-ns4", Name: "listenerset-1-route"},
@@ -159,12 +166,6 @@ var ListenerSetCrossNamespace = suite.ConformanceTest{
 		for _, routeNN := range lsRoutes {
 			kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN, lsNN)
 		}
-
-		kubernetes.GatewayMustHaveCondition(t, suite.Client, suite.TimeoutConfig, gwNN, metav1.Condition{
-			Type:   string(gatewayv1.GatewayConditionAttachedListenerSets),
-			Status: metav1.ConditionTrue,
-			Reason: string(gatewayv1.GatewayReasonListenerSetsAttached),
-		})
 		kubernetes.ListenerSetMustHaveCondition(t, suite.Client, suite.TimeoutConfig, lsNN, metav1.Condition{
 			Type:   string(gatewayxv1a1.ListenerSetConditionAccepted),
 			Status: metav1.ConditionTrue,
@@ -176,6 +177,7 @@ var ListenerSetCrossNamespace = suite.ConformanceTest{
 			Reason: string(gatewayxv1a1.ListenerSetReasonProgrammed),
 		})
 
+		// Disallowed ListenerSet, listenerSet routes and listenerSet conditions
 		disallowedLsNN := types.NamespacedName{Name: "listenerset-not-allowed", Namespace: "gateway-api-example-ns6"}
 		kubernetes.ListenerSetMustHaveCondition(t, suite.Client, suite.TimeoutConfig, disallowedLsNN, metav1.Condition{
 			Type:   string(gatewayxv1a1.ListenerSetConditionAccepted),

@@ -93,7 +93,7 @@ func makeRequest(t *testing.T, exp *http.ExpectedResponse) []string {
 	if protocol == "" {
 		protocol = "http"
 	}
-	host := http.CalculateHost(t, r.Host, protocol, r)
+	host := http.CalculateHost(t, r.Host, protocol)
 	args := []string{"client", fmt.Sprintf("%s://%s%s", protocol, host, r.Path)}
 	if r.Method != "" {
 		args = append(args, "--method="+r.Method)
