@@ -191,13 +191,13 @@ gwctl get authorizationPolicy -o json
 
 Without dedicated tooling, the `LabelSelector` approach could significantly degrade the user experience and observability.
 
-##### Namespace-Wide Policies
+##### Targeting All **Pods** in a Namespace
 
-A common case for authorization is to target a whole namespace. We can achieve the above with a few patterns:
+A common case for authorization is to target all the workloads in the namespace (where the policy resource lives). We can achieve the above with a few patterns:
 
 ###### Option 1
 
-Target a namespace, name MUST be empty (as this is already namespaced policy)
+Target a namespace, `name` MUST be empty (will be the namespace where the policy resource lives).
 
 ```yaml
 targetRefs:
@@ -215,7 +215,7 @@ This option is also inconsistent with other API fields where an empty field or a
 
 ###### Option 3 (Recommended)
 
-An empty pod selector. Kubernetes official docs clarify that the semantics of empty selectors are the decision of the API owner. In fact, many Kubernetes APIs (I know Service API does the opposite :/) using empty selectors as a select-all mechanism. See [NetworkPolicy podSelector](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/#networkpolicy-v1-networking-k8s-io), PodDisruptionBudget, ResourceQuota, and more.
+An empty pod selector to target all **workloads** in the namespace. Kubernetes official docs clarify that the semantics of empty selectors are the decision of the API owner. In fact, many Kubernetes APIs (I know Service API does the opposite :/) using empty selectors as a select-all mechanism. See [NetworkPolicy podSelector](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/#networkpolicy-v1-networking-k8s-io), PodDisruptionBudget, ResourceQuota, and more.
 
 ```yaml
 targetRefs:
