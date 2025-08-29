@@ -184,7 +184,11 @@ type BackendTLSPolicyValidation struct {
 	// backends:
 	//
 	// 1. Hostname MUST be used as the SNI to connect to the backend (RFC 6066).
-	// 2. Hostname MUST be used for authentication and MUST match the certificate served by the matching backend, unless SubjectAltNames is specified.
+	// 2. Hostname MUST be used for authentication and MUST match the certificate
+	//    served by the matching backend, unless SubjectAltNames is specified.
+	// 3. If SubjectAltNames are specified, Hostname can be used for certificate selection
+	//    but MUST NOT be used for authentication. If you want to use the value
+	//    of the Hostname field for authentication, you MUST add it to the SubjectAltNames list.
 	//
 	// Support: Core
 	//

@@ -7632,7 +7632,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha3_BackendTLSPolicyValidation(ref c
 					},
 					"hostname": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Hostname is used for two purposes in the connection between Gateways and backends:\n\n1. Hostname MUST be used as the SNI to connect to the backend (RFC 6066). 2. Hostname MUST be used for authentication and MUST match the certificate served by the matching backend, unless SubjectAltNames is specified.\n\nSupport: Core",
+							Description: "Hostname is used for two purposes in the connection between Gateways and backends:\n\n1. Hostname MUST be used as the SNI to connect to the backend (RFC 6066). 2. Hostname MUST be used for authentication and MUST match the certificate\n   served by the matching backend, unless SubjectAltNames is specified.\n3. If SubjectAltNames are specified, Hostname can be used for certificate selection\n   but MUST NOT be used for authentication. If you want to use the value\n   of the Hostname field for authentication, you MUST add it to the SubjectAltNames list.\n\nSupport: Core",
 							Default:     "",
 							Type:        []string{"string"},
 							Format:      "",
