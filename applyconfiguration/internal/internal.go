@@ -496,6 +496,9 @@ var schemaYAML = typed.YAMLObject(`types:
           elementType:
             namedType: io.k8s.sigs.gateway-api.apis.v1.GRPCRouteRule
           elementRelationship: atomic
+    - name: useDefaultGateway
+      type:
+        scalar: string
 - name: io.k8s.sigs.gateway-api.apis.v1.GRPCRouteStatus
   map:
     fields:
@@ -613,6 +616,9 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: allowedListeners
       type:
         namedType: io.k8s.sigs.gateway-api.apis.v1.AllowedListeners
+    - name: defaultScope
+      type:
+        scalar: string
     - name: gatewayClassName
       type:
         scalar: string
@@ -1045,6 +1051,9 @@ var schemaYAML = typed.YAMLObject(`types:
           elementType:
             namedType: io.k8s.sigs.gateway-api.apis.v1.HTTPRouteRule
           elementRelationship: atomic
+    - name: useDefaultGateway
+      type:
+        scalar: string
 - name: io.k8s.sigs.gateway-api.apis.v1.HTTPRouteStatus
   map:
     fields:
@@ -1478,6 +1487,9 @@ var schemaYAML = typed.YAMLObject(`types:
           elementType:
             namedType: io.k8s.sigs.gateway-api.apis.v1alpha2.TCPRouteRule
           elementRelationship: atomic
+    - name: useDefaultGateway
+      type:
+        scalar: string
 - name: io.k8s.sigs.gateway-api.apis.v1alpha2.TCPRouteStatus
   map:
     fields:
@@ -1541,6 +1553,9 @@ var schemaYAML = typed.YAMLObject(`types:
           elementType:
             namedType: io.k8s.sigs.gateway-api.apis.v1alpha2.TLSRouteRule
           elementRelationship: atomic
+    - name: useDefaultGateway
+      type:
+        scalar: string
 - name: io.k8s.sigs.gateway-api.apis.v1alpha2.TLSRouteStatus
   map:
     fields:
@@ -1598,6 +1613,9 @@ var schemaYAML = typed.YAMLObject(`types:
           elementType:
             namedType: io.k8s.sigs.gateway-api.apis.v1alpha2.UDPRouteRule
           elementRelationship: atomic
+    - name: useDefaultGateway
+      type:
+        scalar: string
 - name: io.k8s.sigs.gateway-api.apis.v1alpha2.UDPRouteStatus
   map:
     fields:
@@ -1723,6 +1741,9 @@ var schemaYAML = typed.YAMLObject(`types:
           elementType:
             namedType: io.k8s.sigs.gateway-api.apis.v1alpha2.TLSRouteRule
           elementRelationship: atomic
+    - name: useDefaultGateway
+      type:
+        scalar: string
 - name: io.k8s.sigs.gateway-api.apis.v1beta1.Gateway
   map:
     fields:
