@@ -43,20 +43,24 @@ Specifying credentials at the gateway level is the default operation mode, where
 backends will be presented with a single gateway certificate. Per-service overrides are
 subject for consideration as the future work.
 
-**1. Add a new `BackendValidation` field at TLSConfig struct located in GatewayTLSConfig.Default field**
+**1. Add a new `Backend` field at GatewayTLSConfig struct located in Gateway**
 
 ```go
-// TLSConfig describes TLS configuration that can apply to multiple Listeners
-// within this Gateway.
-type TLSConfig struct {
-    ...
-	// GatewayBackendTLS describes TLS configuration for gateway when connecting
+// GatewayTLSConfig specifies frontend and backend tls configuration for gateway.
+type GatewayTLSConfig struct {
+	// Backend describes TLS configuration for gateway when connecting
 	// to backends.
+	//
+	// Note that this contains only details for the Gateway as a TLS client,
+	// and does _not_ imply behavior about how to choose which backend should
+	// get a TLS connection. That is determined by the presence of a BackendTLSPolicy.
+	//
 	// Support: Core
 	//
 	// +optional
 	// <gateway:experimental>
-	BackendValidation *GatewayBackendTLS `json:"backendValidation,omitempty"`
+	Backend *GatewayBackendTLS `json:"backend,omitempty"`
+    ...
 }
 type GatewayBackendTLS struct {
   // ClientCertificateRef is a reference to an object that contains a Client
