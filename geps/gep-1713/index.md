@@ -49,6 +49,9 @@ The feature will be part of the experimental channel, which implementations can 
 
 This proposal introduces a new `ListenerSet` resource that has the ability to attach a set of listeners to multiple parent `Gateways`.
 
+**Note**: While this API is experimental, its `Kind` will be `XListenerSet` and 
+once the API is gratuated to stable it will be renamed to `ListenerSet`.
+
 ### Go
 
 ```go
@@ -362,7 +365,7 @@ spec:
     port: 80
 ---
 apiVersion: gateway.networking.x-k8s.io/v1alpha1
-kind: ListenerSet
+kind: XListenerSet
 metadata:
   name: first-workload-listeners
 spec:
@@ -383,7 +386,7 @@ spec:
         name: first-workload-cert # Provisioned via HTTP01 challenge
 ---
 apiVersion: gateway.networking.x-k8s.io/v1alpha1
-kind: ListenerSet
+kind: XListenerSet
 metadata:
   name: second-workload-listeners
 spec:
@@ -449,11 +452,11 @@ metadata:
 spec:
   parentRefs:
   - name: second-workload-listeners
-    kind: ListenerSet
+    kind: XListenerSet
     sectionName: second
 ```
 
-If routes MUST attach to a `ListenerSet` and its parent `Gateway`, it MUST have multiple `parentRefs` eg:
+If routes MUST attach to a `XListenerSet` and its parent `Gateway`, it MUST have multiple `parentRefs` eg:
 
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
@@ -463,14 +466,14 @@ metadata:
 spec:
   parentRefs:
   - name: second-workload-listeners
-    kind: ListenerSet
+    kind: XListenerSet
     sectionName: second
   - name: parent-gateway
     kind: Gateway
     sectionName: foo
 ```
 
-For instance, the following `HTTPRoute` attempts to attach to a listener defined in the parent `Gateway` using the sectionName `foo`, which also exists on a ListenerSet.
+For instance, the following `HTTPRoute` attempts to attach to a listener defined in the parent `Gateway` using the sectionName `foo`, which also exists on a `ListenerSet`.
 This is not valid and the route's status `Accepted` condition should be set to `False`
 
 ```yaml
@@ -490,7 +493,7 @@ spec:
     port: 80
 ---
 apiVersion: gateway.networking.x-k8s.io/v1alpha1
-kind: ListenerSet
+kind: XListenerSet
 metadata:
   name: first-workload-listeners
 spec:
@@ -547,7 +550,7 @@ spec:
     port: 80
 ---
 apiVersion: gateway.networking.x-k8s.io/v1alpha1
-kind: ListenerSet
+kind: XListenerSet
 metadata:
   name: first-workload-listeners
 spec:
@@ -709,7 +712,7 @@ spec:
         name: default-cert
 ---
 apiVersion: gateway.networking.x-k8s.io/v1alpha1
-kind: ListenerSet
+kind: XListenerSet
 metadata:
   name: user-listenerset
   namespace: user01
@@ -738,7 +741,7 @@ but they use different termination TLS certificates:
 
 ```yaml
 apiVersion: gateway.networking.x-k8s.io/v1alpha1
-kind: ListenerSet
+kind: XListenerSet
 metadata:
   name: user-listenerset
   namespace: user01
@@ -770,7 +773,7 @@ was not accepted
 
 ```yaml
 apiVersion: gateway.networking.x-k8s.io/v1alpha1
-kind: ListenerSet
+kind: XListenerSet
 metadata:
   creationTimestamp: "2025-08-11T15:44:05Z"
   name: listenerset1
@@ -793,7 +796,7 @@ spec:
         name: app-cert
 ---
 apiVersion: gateway.networking.x-k8s.io/v1alpha1
-kind: ListenerSet
+kind: XListenerSet
 metadata:
   creationTimestamp: "2025-08-11T13:44:05Z"
   name: listenerset2
@@ -825,7 +828,7 @@ The status of ListenerSets can be defined as the following:
 
 ```yaml
 apiVersion: gateway.networking.x-k8s.io/v1alpha1
-kind: ListenerSet
+kind: XListenerSet
 metadata:
   creationTimestamp: "2025-08-11T15:44:05Z"
   name: listenerset1
@@ -843,7 +846,7 @@ status:
       type: Conflicted
 ---
 apiVersion: gateway.networking.x-k8s.io/v1alpha1
-kind: ListenerSet
+kind: XListenerSet
 metadata:
   creationTimestamp: "2025-08-11T13:44:05Z"
   name: listenerset2
