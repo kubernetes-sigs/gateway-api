@@ -70,6 +70,7 @@ var BackendTLSPolicyConflictResolution = suite.ConformanceTest{
 			})
 
 			t.Run("Second BackendTLSPolicy should have a false Accepted condition with reason Conflicted ", func(t *testing.T) {
+				// This is not specific to BackendTLSPolicy, it follows the conflict-resolution rules, as defined in GEP-713.
 				conflictedPolicyNN := types.NamespacedName{Name: "conflicted-without-section-name-2", Namespace: ns}
 				kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, conflictedPolicyNN, gwNN, conflictedCond)
 			})
@@ -95,6 +96,7 @@ var BackendTLSPolicyConflictResolution = suite.ConformanceTest{
 			})
 
 			t.Run("Second BackendTLSPolicy should have a false Accepted condition with reason Conflicted ", func(t *testing.T) {
+				// This is not specific to BackendTLSPolicy, it follows the conflict-resolution rules, as defined in GEP-713.
 				conflictedPolicyNN := types.NamespacedName{Name: "conflicted-with-section-name-2", Namespace: ns}
 				kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, conflictedPolicyNN, gwNN, conflictedCond)
 			})
