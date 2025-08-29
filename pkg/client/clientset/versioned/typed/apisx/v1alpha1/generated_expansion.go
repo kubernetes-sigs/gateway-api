@@ -21,3 +21,5 @@ package v1alpha1
 type XBackendTrafficPolicyExpansion interface{}
 
 type XListenerSetExpansion interface{}
+
+type XMeshExpansion interface{}

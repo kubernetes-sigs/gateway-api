@@ -36,6 +36,10 @@ func (c *FakeExperimentalV1alpha1) XListenerSets(namespace string) v1alpha1.XLis
 	return newFakeXListenerSets(c, namespace)
 }
 
+func (c *FakeExperimentalV1alpha1) XMeshes() v1alpha1.XMeshInterface {
+	return newFakeXMeshes(c)
+}
+
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
 func (c *FakeExperimentalV1alpha1) RESTClient() rest.Interface {

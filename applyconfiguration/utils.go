@@ -262,6 +262,10 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisxv1alpha1.ListenerSetSpecApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("ListenerSetStatus"):
 		return &apisxv1alpha1.ListenerSetStatusApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("MeshSpec"):
+		return &apisxv1alpha1.MeshSpecApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("MeshStatus"):
+		return &apisxv1alpha1.MeshStatusApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("ParentGatewayReference"):
 		return &apisxv1alpha1.ParentGatewayReferenceApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("RequestRate"):
@@ -272,6 +276,8 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisxv1alpha1.XBackendTrafficPolicyApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("XListenerSet"):
 		return &apisxv1alpha1.XListenerSetApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("XMesh"):
+		return &apisxv1alpha1.XMeshApplyConfiguration{}
 
 	}
 	return nil

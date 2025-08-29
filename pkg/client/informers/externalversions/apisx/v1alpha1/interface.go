@@ -28,6 +28,8 @@ type Interface interface {
 	XBackendTrafficPolicies() XBackendTrafficPolicyInformer
 	// XListenerSets returns a XListenerSetInformer.
 	XListenerSets() XListenerSetInformer
+	// XMeshes returns a XMeshInformer.
+	XMeshes() XMeshInformer
 }
 
 type version struct {
@@ -49,4 +51,9 @@ func (v *version) XBackendTrafficPolicies() XBackendTrafficPolicyInformer {
 // XListenerSets returns a XListenerSetInformer.
 func (v *version) XListenerSets() XListenerSetInformer {
 	return &xListenerSetInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// XMeshes returns a XMeshInformer.
+func (v *version) XMeshes() XMeshInformer {
+	return &xMeshInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }
