@@ -3688,7 +3688,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GRPCRouteSpec(ref common.ReferenceCall
 					"hostnames": {
 						VendorExtensible: spec.VendorExtensible{
 							Extensions: spec.Extensions{
-								"x-kubernetes-list-type": "atomic",
+								"x-kubernetes-list-type": "set",
 							},
 						},
 						SchemaProps: spec.SchemaProps{
@@ -5255,7 +5255,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteRetry(ref common.ReferenceCal
 					"codes": {
 						VendorExtensible: spec.VendorExtensible{
 							Extensions: spec.Extensions{
-								"x-kubernetes-list-type": "atomic",
+								"x-kubernetes-list-type": "set",
 							},
 						},
 						SchemaProps: spec.SchemaProps{
@@ -5418,7 +5418,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteSpec(ref common.ReferenceCall
 					"hostnames": {
 						VendorExtensible: spec.VendorExtensible{
 							Extensions: spec.Extensions{
-								"x-kubernetes-list-type": "atomic",
+								"x-kubernetes-list-type": "set",
 							},
 						},
 						SchemaProps: spec.SchemaProps{
@@ -7125,7 +7125,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_TLSRouteSpec(ref common.Referenc
 					"hostnames": {
 						VendorExtensible: spec.VendorExtensible{
 							Extensions: spec.Extensions{
-								"x-kubernetes-list-type": "atomic",
+								"x-kubernetes-list-type": "set",
 							},
 						},
 						SchemaProps: spec.SchemaProps{
@@ -7830,7 +7830,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha3_TLSRouteSpec(ref common.Referenc
 					"hostnames": {
 						VendorExtensible: spec.VendorExtensible{
 							Extensions: spec.Extensions{
-								"x-kubernetes-list-type": "atomic",
+								"x-kubernetes-list-type": "set",
 							},
 						},
 						SchemaProps: spec.SchemaProps{

@@ -483,7 +483,7 @@ var schemaYAML = typed.YAMLObject(`types:
         list:
           elementType:
             scalar: string
-          elementRelationship: atomic
+          elementRelationship: associative
     - name: parentRefs
       type:
         list:
@@ -990,7 +990,7 @@ var schemaYAML = typed.YAMLObject(`types:
         list:
           elementType:
             scalar: numeric
-          elementRelationship: atomic
+          elementRelationship: associative
 - name: io.k8s.sigs.gateway-api.apis.v1.HTTPRouteRule
   map:
     fields:
@@ -1032,7 +1032,7 @@ var schemaYAML = typed.YAMLObject(`types:
         list:
           elementType:
             scalar: string
-          elementRelationship: atomic
+          elementRelationship: associative
     - name: parentRefs
       type:
         list:
@@ -1528,7 +1528,7 @@ var schemaYAML = typed.YAMLObject(`types:
         list:
           elementType:
             scalar: string
-          elementRelationship: atomic
+          elementRelationship: associative
     - name: parentRefs
       type:
         list:
@@ -1710,7 +1710,7 @@ var schemaYAML = typed.YAMLObject(`types:
         list:
           elementType:
             scalar: string
-          elementRelationship: atomic
+          elementRelationship: associative
     - name: parentRefs
       type:
         list:
