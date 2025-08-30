@@ -33,7 +33,7 @@ import (
 type UDPRoute struct {
 	metav1.TypeMeta `json:",inline"`
 	// +optional
-	metav1.ObjectMeta `json:"metadata,omitempty"`
+	metav1.ObjectMeta `json:"metadata,omitzero"`
 
 	// Spec defines the desired state of UDPRoute.
 	// +required
@@ -41,7 +41,7 @@ type UDPRoute struct {
 
 	// Status defines the current state of UDPRoute.
 	// +optional
-	Status UDPRouteStatus `json:"status,omitempty"`
+	Status UDPRouteStatus `json:"status,omitzero"`
 }
 
 // UDPRouteSpec defines the desired state of UDPRoute.
@@ -98,6 +98,7 @@ type UDPRouteRule struct {
 // UDPRouteList contains a list of UDPRoute
 type UDPRouteList struct {
 	metav1.TypeMeta `json:",inline"`
-	metav1.ListMeta `json:"metadata,omitempty"`
+	// +optional
+	metav1.ListMeta `json:"metadata,omitzero"`
 	Items           []UDPRoute `json:"items"`
 }
