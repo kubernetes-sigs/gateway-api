@@ -93,11 +93,12 @@ type ExpectedRequest struct {
 // Response defines expected properties of a response from a backend.
 type Response struct {
 	// Deprecated: Use StatusCodes instead, which supports matching against multiple status codes.
-	StatusCode    int
-	StatusCodes   []int
-	Headers       map[string]string
-	AbsentHeaders []string
-	Protocol      string
+	StatusCode                int
+	StatusCodes               []int
+	Headers                   map[string]string
+	HeadersWithMultipleValues map[string][]string
+	AbsentHeaders             []string
+	Protocol                  string
 	// IgnoreWhitespace will cause whitespace to be ignored when comparing the respond
 	// header values.
 	IgnoreWhitespace bool
@@ -323,14 +324,6 @@ func CompareRoundTrip(t *testing.T, req *roundtripper.Request, cReq *roundtrippe
 	if expected.Response.Protocol != "" && expected.Response.Protocol != cRes.Protocol {
 		return fmt.Errorf("expected protocol to be %s, got %s", expected.Response.Protocol, cRes.Protocol)
 	}
-
-	if cRes.StatusCode == 200 {
-		// The request expected to arrive at the backend is
-		// the same as the request made, unless otherwise
-		// specified.
-		if expected.ExpectedRequest == nil {
-			expected.ExpectedRequest = &ExpectedRequest{Request: expected.Request}
-		}
 
 	if cRes.StatusCode == 200 || cRes.StatusCode == 204 {
 		if cRes.StatusCode == 200 {
