@@ -1641,7 +1641,12 @@ var schemaYAML = typed.YAMLObject(`types:
         list:
           elementType:
             namedType: io.k8s.sigs.gateway-api.apis.v1alpha2.LocalPolicyTargetReferenceWithSectionName
-          elementRelationship: atomic
+          elementRelationship: associative
+          keys:
+          - group
+          - kind
+          - name
+          - sectionName
     - name: validation
       type:
         namedType: io.k8s.sigs.gateway-api.apis.v1alpha3.BackendTLSPolicyValidation

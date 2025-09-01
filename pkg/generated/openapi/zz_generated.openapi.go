@@ -7544,7 +7544,13 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha3_BackendTLSPolicySpec(ref common.
 					"targetRefs": {
 						VendorExtensible: spec.VendorExtensible{
 							Extensions: spec.Extensions{
-								"x-kubernetes-list-type": "atomic",
+								"x-kubernetes-list-map-keys": []interface{}{
+									"group",
+									"kind",
+									"name",
+									"sectionName",
+								},
+								"x-kubernetes-list-type": "map",
 							},
 						},
 						SchemaProps: spec.SchemaProps{

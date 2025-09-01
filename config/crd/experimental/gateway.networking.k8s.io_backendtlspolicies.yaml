@@ -164,7 +164,12 @@ spec:
                 maxItems: 16
                 minItems: 1
                 type: array
-                x-kubernetes-list-type: atomic
+                x-kubernetes-list-map-keys:
+                - group
+                - kind
+                - name
+                - sectionName
+                x-kubernetes-list-type: map
                 x-kubernetes-validations:
                 - message: sectionName must be specified when targetRefs includes
                     2 or more references to the same target
