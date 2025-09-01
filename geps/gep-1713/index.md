@@ -473,7 +473,7 @@ spec:
     sectionName: foo
 ```
 
-For instance, the following `HTTPRoute` attempts to attach to a listener defined in the parent `Gateway` using the sectionName `foo`, which also exists on a `ListenerSet`.
+For instance, the following `HTTPRoute` attempts to attach to a listener defined in the parent `Gateway` using the sectionName `foo`, which exists on a `ListenerSet` but not on a `Gateway`.
 This is not valid and the route's status `Accepted` condition should be set to `False`
 
 ```yaml
@@ -487,7 +487,7 @@ spec:
     namespaces:
       from: Same
   listeners:
-  - name: foo
+  - name: notfoo
     hostname: foo.com
     protocol: HTTP
     port: 80
