@@ -232,7 +232,7 @@ type CommonRouteSpec struct {
 }
 
 // PortNumber defines a network port.
-type PortNumber int32
+type PortNumber = int32
 
 // BackendRef defines how a Route should forward a request to a Kubernetes
 // resource.

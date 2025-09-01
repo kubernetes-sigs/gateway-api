@@ -27,7 +27,7 @@ import (
 type ListenerApplyConfiguration struct {
 	Name          *apisv1.SectionName                  `json:"name,omitempty"`
 	Hostname      *apisv1.Hostname                     `json:"hostname,omitempty"`
-	Port          *apisv1.PortNumber                   `json:"port,omitempty"`
+	Port          *int32                               `json:"port,omitempty"`
 	Protocol      *apisv1.ProtocolType                 `json:"protocol,omitempty"`
 	TLS           *ListenerTLSConfigApplyConfiguration `json:"tls,omitempty"`
 	AllowedRoutes *AllowedRoutesApplyConfiguration     `json:"allowedRoutes,omitempty"`
@@ -58,7 +58,7 @@ func (b *ListenerApplyConfiguration) WithHostname(value apisv1.Hostname) *Listen
 // WithPort sets the Port field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Port field is set to the value of the last call.
-func (b *ListenerApplyConfiguration) WithPort(value apisv1.PortNumber) *ListenerApplyConfiguration {
+func (b *ListenerApplyConfiguration) WithPort(value int32) *ListenerApplyConfiguration {
 	b.Port = &value
 	return b
 }

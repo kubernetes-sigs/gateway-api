@@ -28,7 +28,7 @@ import (
 // with apply.
 type ListenerEntryStatusApplyConfiguration struct {
 	Name           *v1.SectionName                           `json:"name,omitempty"`
-	Port           *v1.PortNumber                            `json:"port,omitempty"`
+	Port           *int32                                    `json:"port,omitempty"`
 	SupportedKinds []apisv1.RouteGroupKindApplyConfiguration `json:"supportedKinds,omitempty"`
 	AttachedRoutes *int32                                    `json:"attachedRoutes,omitempty"`
 	Conditions     []metav1.ConditionApplyConfiguration      `json:"conditions,omitempty"`
@@ -51,7 +51,7 @@ func (b *ListenerEntryStatusApplyConfiguration) WithName(value v1.SectionName) *
 // WithPort sets the Port field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Port field is set to the value of the last call.
-func (b *ListenerEntryStatusApplyConfiguration) WithPort(value v1.PortNumber) *ListenerEntryStatusApplyConfiguration {
+func (b *ListenerEntryStatusApplyConfiguration) WithPort(value int32) *ListenerEntryStatusApplyConfiguration {
 	b.Port = &value
 	return b
 }
