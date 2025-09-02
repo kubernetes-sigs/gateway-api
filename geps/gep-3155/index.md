@@ -99,6 +99,10 @@ type BackendTLSPolicyValidation struct {
   // SubjectAltNames contains one or more Subject Alternative Names.
   // When specified, the certificate served from the backend MUST have at least one
   // Subject Alternate Name matching one of the specified SubjectAltNames.
+  // If SubjectAltNames are specified, Hostname MUST NOT be used for authentication,
+  // even if this would cause a failure in the case that the SubjectAltNames do not match.
+  // If you want to use Hostname for authentication, you must add Hostname to the SubjectAltNames list.
+  //
   // +kubebuilder:validation:MaxItems=5
   SubjectAltNames []SubjectAltName `json:"subjectAltNames,omitempty"`
 }
