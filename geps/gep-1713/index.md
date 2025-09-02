@@ -456,7 +456,7 @@ spec:
     sectionName: second
 ```
 
-If routes MUST attach to a `XListenerSet` and its parent `Gateway`, it MUST have multiple `parentRefs` eg:
+To attach a Route to a `XListenerSet` and its parent `Gateway`, it MUST have multiple `parentRefs` eg:
 
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
@@ -673,9 +673,9 @@ ListenerSet conflicts should be managed similarly to [Gateway resource conflict]
 management.
 
 With ListenerSet this validation should happen within the same ListenerSet resource, 
-but MUST be validated also within a Gateway scope and all of the attached Listeners/ListenerSets. The SectionName field is an exception for this validation, and while 
-it should not conflict within the same ListenerSet, it can be duplicated between 
-different ListenerSets.
+but MUST be validated also within a Gateway scope and all of the attached Listeners/ListenerSets. 
+The SectionName field is an exception for this validation, and while it should 
+not conflict within the same ListenerSet, it can be duplicated between different ListenerSets.
 
 This means that the validation should happen now between distinct ListenerSets 
 attached to the same Gateway, and in case of a conflict, the [Listener Precedence](#listener-precedence) 
