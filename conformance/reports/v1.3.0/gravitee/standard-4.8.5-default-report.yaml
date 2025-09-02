@@ -1,0 +1,29 @@
+typemeta:
+  kind: ConformanceReport
+  apiversion: gateway.networking.k8s.io/v1
+implementation:
+  organization: gravitee.io
+  project: gravitee-kubernetes-operator
+  url: https://github.com/gravitee-io/gravitee-kubernetes-operator
+  version: 4.8.5
+  contact:
+  - team-devex@graviteesource.com
+date: "2025-09-02T11:08:29+02:00"
+gatewayapiversion: v1.3.0
+mode: default
+gatewayapichannel: standard
+profilereports:
+- name: GATEWAY-HTTP
+  summary: Core tests partially succeeded with 2 test skips.
+  core:
+    result: partial
+    statistics:
+      passed: 31
+      skipped: 2
+      failed: 0
+    skippedtests:
+    - HTTPRouteMatchingAcrossRoutes
+    - HTTPRouteServiceTypes
+    failedtests: []
+  extended: null
+succeededprovisionaltests: []
