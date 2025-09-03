@@ -17,6 +17,7 @@ limitations under the License.
 package tests
 
 import (
+	"sigs.k8s.io/gateway-api/conformance/utils/mirror"
 	"testing"
 
 	"k8s.io/apimachinery/pkg/types"
@@ -58,15 +59,15 @@ var HTTPRouteRequestMultipleMirrors = suite.ConformanceTest{
 					},
 				},
 				Backend: "infra-backend-v1",
-				MirroredTo: []http.MirroredBackend{
+				MirroredTo: []mirror.MirroredBackend{
 					{
-						BackendRef: http.BackendRef{
+						BackendRef: mirror.BackendRef{
 							Name:      "infra-backend-v2",
 							Namespace: ns,
 						},
 					},
 					{
-						BackendRef: http.BackendRef{
+						BackendRef: mirror.BackendRef{
 							Name:      "infra-backend-v3",
 							Namespace: ns,
 						},
@@ -94,15 +95,15 @@ var HTTPRouteRequestMultipleMirrors = suite.ConformanceTest{
 				},
 				Namespace: ns,
 				Backend:   "infra-backend-v1",
-				MirroredTo: []http.MirroredBackend{
+				MirroredTo: []mirror.MirroredBackend{
 					{
-						BackendRef: http.BackendRef{
+						BackendRef: mirror.BackendRef{
 							Name:      "infra-backend-v2",
 							Namespace: ns,
 						},
 					},
 					{
-						BackendRef: http.BackendRef{
+						BackendRef: mirror.BackendRef{
 							Name:      "infra-backend-v3",
 							Namespace: ns,
 						},
@@ -117,7 +118,7 @@ var HTTPRouteRequestMultipleMirrors = suite.ConformanceTest{
 			t.Run(tc.GetTestCaseName(i), func(t *testing.T) {
 				t.Parallel()
 				http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, tc)
-				http.ExpectMirroredRequest(t, suite.Client, suite.Clientset, tc.MirroredTo, tc.Request.Path)
+				mirror.ExpectMirroredRequest(t, suite.Client, suite.Clientset, tc.MirroredTo, mirror.GetHttpRegexPattern(tc.Request.Path))
 			})
 		}
 	},

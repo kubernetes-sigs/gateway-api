@@ -413,6 +413,19 @@ func GatewayAndHTTPRoutesMustBeAccepted(t *testing.T, c client.Client, timeoutCo
 	return GatewayAndRoutesMustBeAccepted(t, c, timeoutConfig, controllerName, gw, &gatewayv1.HTTPRoute{}, true, routeNNs...)
 }
 
+// GatewayAndGRPCRoutesMustBeAccepted waits until:
+//  1. The specified Gateway has an IP address assigned to it.
+//  2. The route has a ParentRef referring to the Gateway.
+//  3. All the gateway's listeners have the following conditions set to true:
+//     - ListenerConditionResolvedRefs
+//     - ListenerConditionAccepted
+//     - ListenerConditionProgrammed
+//
+// The test will fail if these conditions are not met before the timeouts.
+func GatewayAndGRPCRoutesMustBeAccepted(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, controllerName string, gw GatewayRef, routeNNs ...types.NamespacedName) string {
+	return GatewayAndRoutesMustBeAccepted(t, c, timeoutConfig, controllerName, gw, &gatewayv1.GRPCRoute{}, true, routeNNs...)
+}
+
 // GatewayAndUDPRoutesMustBeAccepted waits until the specified Gateway has an IP
 // address assigned to it and the UDPRoute has a ParentRef referring to the
 // Gateway. The test will fail if these conditions are not met before the

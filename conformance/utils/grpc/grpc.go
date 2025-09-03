@@ -19,6 +19,7 @@ package grpc
 import (
 	"context"
 	"fmt"
+	"sigs.k8s.io/gateway-api/conformance/utils/mirror"
 	"sort"
 	"strings"
 	"testing"
@@ -88,6 +89,9 @@ type ExpectedResponse struct {
 
 	Backend   string
 	Namespace string
+
+	// MirroredTo is the destination BackendRefs of the mirrored request.
+	MirroredTo []mirror.MirroredBackend
 
 	// User Given TestCase name
 	TestCaseName string
