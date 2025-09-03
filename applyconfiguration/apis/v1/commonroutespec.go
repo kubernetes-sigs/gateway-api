@@ -25,8 +25,8 @@ import (
 // CommonRouteSpecApplyConfiguration represents a declarative configuration of the CommonRouteSpec type for use
 // with apply.
 type CommonRouteSpecApplyConfiguration struct {
-	ParentRefs        []ParentReferenceApplyConfiguration `json:"parentRefs,omitempty"`
-	UseDefaultGateway *apisv1.GatewayDefaultScope         `json:"useDefaultGateway,omitempty"`
+	ParentRefs         []ParentReferenceApplyConfiguration `json:"parentRefs,omitempty"`
+	UseDefaultGateways *apisv1.GatewayDefaultScope         `json:"useDefaultGateways,omitempty"`
 }
 
 // CommonRouteSpecApplyConfiguration constructs a declarative configuration of the CommonRouteSpec type for use with
@@ -48,10 +48,10 @@ func (b *CommonRouteSpecApplyConfiguration) WithParentRefs(values ...*ParentRefe
 	return b
 }
 
-// WithUseDefaultGateway sets the UseDefaultGateway field in the declarative configuration to the given value
+// WithUseDefaultGateways sets the UseDefaultGateways field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
-// If called multiple times, the UseDefaultGateway field is set to the value of the last call.
-func (b *CommonRouteSpecApplyConfiguration) WithUseDefaultGateway(value apisv1.GatewayDefaultScope) *CommonRouteSpecApplyConfiguration {
-	b.UseDefaultGateway = &value
+// If called multiple times, the UseDefaultGateways field is set to the value of the last call.
+func (b *CommonRouteSpecApplyConfiguration) WithUseDefaultGateways(value apisv1.GatewayDefaultScope) *CommonRouteSpecApplyConfiguration {
+	b.UseDefaultGateways = &value
 	return b
 }

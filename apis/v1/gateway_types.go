@@ -299,10 +299,11 @@ type GatewaySpec struct {
 	// meaning it will dynamically and implicitly have Routes (e.g. HTTPRoute)
 	// attached to it, according to the scope configured here.
 	//
-	// If unset or set to an empty string `""` (the default), the Gateway
-	// will not act as a default Gateway; if set, the Gateway will claim any
-	// Route with a matching scope set in its UseDefaultGateway field, subject
-	// to the usual rules about which routes the Gateway can attach to.
+	// If unset (the default), set to an empty string (`""`), or set to None,
+	// the Gateway will not act as a default Gateway; if set, the Gateway will
+	// claim any Route with a matching scope set in its UseDefaultGateway
+	// field, subject to the usual rules about which routes the Gateway can
+	// attach to.
 	//
 	// Think carefully before using this functionality! While the normal rules
 	// about which Route can apply are still enforced, it is simply easier for

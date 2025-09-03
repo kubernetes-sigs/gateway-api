@@ -50,11 +50,11 @@ func (b *TLSRouteSpecApplyConfiguration) WithParentRefs(values ...*v1.ParentRefe
 	return b
 }
 
-// WithUseDefaultGateway sets the UseDefaultGateway field in the declarative configuration to the given value
+// WithUseDefaultGateways sets the UseDefaultGateways field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
-// If called multiple times, the UseDefaultGateway field is set to the value of the last call.
-func (b *TLSRouteSpecApplyConfiguration) WithUseDefaultGateway(value apisv1.GatewayDefaultScope) *TLSRouteSpecApplyConfiguration {
-	b.CommonRouteSpecApplyConfiguration.UseDefaultGateway = &value
+// If called multiple times, the UseDefaultGateways field is set to the value of the last call.
+func (b *TLSRouteSpecApplyConfiguration) WithUseDefaultGateways(value apisv1.GatewayDefaultScope) *TLSRouteSpecApplyConfiguration {
+	b.CommonRouteSpecApplyConfiguration.UseDefaultGateways = &value
 	return b
 }
 

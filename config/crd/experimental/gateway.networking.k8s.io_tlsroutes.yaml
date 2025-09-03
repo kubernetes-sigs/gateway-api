@@ -511,21 +511,24 @@ spec:
                 - message: Rule name must be unique within the route
                   rule: self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name)
                     && l1.name == l2.name))
-              useDefaultGateway:
+              useDefaultGateways:
                 description: |-
-                  UseDefaultGateway indicates the default Gateway scope to use for this
-                  Route. If unset (the default), the Route will not be attached to any
-                  default Gateway; if set, it will be attached to any default Gateway
-                  supporting the named scope, subject to the usual rules about which
-                  Routes a Gateway is allowed to claim.
+                  UseDefaultGateways indicates the default Gateway scope to use for this
+                  Route. If unset (the default), set to an empty string (`""`), or set to
+                  None, the Route will not be attached to any default Gateway; if set, it
+                  will be attached to any default Gateway supporting the named scope,
+                  subject to the usual rules about which Routes a Gateway is allowed to
+                  claim.
 
                   Think carefully before using this functionality! The set of default
                   Gateways supporting the requested scope can change over time without
                   any notice to the Route author, and in many situations it will not be
                   appropriate to request a default Gateway for a given Route -- for
-                  example, a Route with specific security requirements should almost certainly
-                  not use a default Gateway.
-                  not use a default Gateway.
+                  example, a Route with specific security requirements should almost
+                  certainly not use a default Gateway.
+                enum:
+                - All
+                - None
                 type: string
             required:
             - rules
@@ -1305,21 +1308,24 @@ spec:
                 - message: Rule name must be unique within the route
                   rule: self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name)
                     && l1.name == l2.name))
-              useDefaultGateway:
+              useDefaultGateways:
                 description: |-
-                  UseDefaultGateway indicates the default Gateway scope to use for this
-                  Route. If unset (the default), the Route will not be attached to any
-                  default Gateway; if set, it will be attached to any default Gateway
-                  supporting the named scope, subject to the usual rules about which
-                  Routes a Gateway is allowed to claim.
+                  UseDefaultGateways indicates the default Gateway scope to use for this
+                  Route. If unset (the default), set to an empty string (`""`), or set to
+                  None, the Route will not be attached to any default Gateway; if set, it
+                  will be attached to any default Gateway supporting the named scope,
+                  subject to the usual rules about which Routes a Gateway is allowed to
+                  claim.
 
                   Think carefully before using this functionality! The set of default
                   Gateways supporting the requested scope can change over time without
                   any notice to the Route author, and in many situations it will not be
                   appropriate to request a default Gateway for a given Route -- for
-                  example, a Route with specific security requirements should almost certainly
-                  not use a default Gateway.
-                  not use a default Gateway.
+                  example, a Route with specific security requirements should almost
+                  certainly not use a default Gateway.
+                enum:
+                - All
+                - None
                 type: string
             required:
             - hostnames
