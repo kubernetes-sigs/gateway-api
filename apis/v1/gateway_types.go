@@ -299,7 +299,7 @@ type GatewaySpec struct {
 	// meaning it will dynamically and implicitly have Routes (e.g. HTTPRoute)
 	// attached to it, according to the scope configured here.
 	//
-	// If unset or set to the empty string `""` (the default), the Gateway
+	// If unset or set to an empty string `""` (the default), the Gateway
 	// will not act as a default Gateway; if set, the Gateway will claim any
 	// Route with a matching scope set in its UseDefaultGateway field, subject
 	// to the usual rules about which routes the Gateway can attach to.
@@ -311,7 +311,7 @@ type GatewaySpec struct {
 	// control of the scope (e.g. namespace) with tight controls and checks on
 	// what kind of workloads and Routes get added in that scope, we strongly
 	// recommend not using this just because it seems convenient, and instead
-	// stick to explicit Route attachment.
+	// stick to direct Route attachment.
 	//
 	// +optional <gateway:experimental>
 	DefaultScope GatewayDefaultScope `json:"defaultScope,omitempty"`

@@ -253,7 +253,6 @@ type CommonRouteSpec struct {
 	// appropriate to request a default Gateway for a given Route -- for
 	// example, a Route with specific security requirements should almost certainly
 	// not use a default Gateway.
-	// not use a default Gateway.
 	//
 	// +optional <gateway:experimental>
 	UseDefaultGateway GatewayDefaultScope `json:"useDefaultGateway,omitempty"`
