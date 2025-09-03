@@ -133,29 +133,6 @@ spec:
                 - message: Hostname values must be unique
                   rule: 'self.all(a1, a1.type == ''Hostname'' ? self.exists_one(a2,
                     a2.type == a1.type && a2.value == a1.value) : true )'
-              defaultScope:
-                description: |-
-                  DefaultScope, when set, configures the Gateway as a default Gateway,
-                  meaning it will dynamically and implicitly have Routes (e.g. HTTPRoute)
-                  attached to it, according to the scope configured here.
-
-                  If unset (the default) or set to None, the Gateway will not act as a
-                  default Gateway; if set, the Gateway will claim any Route with a
-                  matching scope set in its UseDefaultGateway field, subject to the usual
-                  rules about which routes the Gateway can attach to.
-
-                  Think carefully before using this functionality! While the normal rules
-                  about which Route can apply are still enforced, it is simply easier for
-                  the wrong Route to be accidentally attached to this Gateway in this
-                  configuration. If the Gateway operator is not also the operator in
-                  control of the scope (e.g. namespace) with tight controls and checks on
-                  what kind of workloads and Routes get added in that scope, we strongly
-                  recommend not using this just because it seems convenient, and instead
-                  stick to direct Route attachment.
-                enum:
-                - All
-                - None
-                type: string
               gatewayClassName:
                 description: |-
                   GatewayClassName used for this Gateway. This is the name of a
@@ -1267,29 +1244,6 @@ spec:
                 - message: Hostname values must be unique
                   rule: 'self.all(a1, a1.type == ''Hostname'' ? self.exists_one(a2,
                     a2.type == a1.type && a2.value == a1.value) : true )'
-              defaultScope:
-                description: |-
-                  DefaultScope, when set, configures the Gateway as a default Gateway,
-                  meaning it will dynamically and implicitly have Routes (e.g. HTTPRoute)
-                  attached to it, according to the scope configured here.
-
-                  If unset (the default) or set to None, the Gateway will not act as a
-                  default Gateway; if set, the Gateway will claim any Route with a
-                  matching scope set in its UseDefaultGateway field, subject to the usual
-                  rules about which routes the Gateway can attach to.
-
-                  Think carefully before using this functionality! While the normal rules
-                  about which Route can apply are still enforced, it is simply easier for
-                  the wrong Route to be accidentally attached to this Gateway in this
-                  configuration. If the Gateway operator is not also the operator in
-                  control of the scope (e.g. namespace) with tight controls and checks on
-                  what kind of workloads and Routes get added in that scope, we strongly
-                  recommend not using this just because it seems convenient, and instead
-                  stick to direct Route attachment.
-                enum:
-                - All
-                - None
-                type: string
               gatewayClassName:
                 description: |-
                   GatewayClassName used for this Gateway. This is the name of a
