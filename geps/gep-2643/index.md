@@ -197,6 +197,34 @@ be at least one intersecting hostname for the `TLSRoute` to be attached to the
   the later must not be considered for a match.  
   * In any of the cases above, the `TLSRoute` should have a `Condition` of `Accepted=True`.
 
+## Multiplexing support
+
+It may be desired that on a `Gateway` a single TLS listener provides termination 
+for `HTTPRoutes` and passthrough to `TLSRoutes`.
+
+This can be achieved with a `Gateway` that specifies the following listeners:
+
+```yaml
+  listeners:
+  - name: somelistener
+    port: 443
+    protocol: TLS
+    hostname: "*.example.tld"
+    tls:
+      mode: Passthrough
+  - name: httpslistener
+    port: 443
+    protocol: HTTPS
+    hostname: "*.anotherexample.tld"
+    tls:
+      mode: Terminate
+      certificateRefs: ...
+```
+
+With the specification above, any request to hostnames on `*.example.tld` should be 
+attached to `TLSRoutes` while requests to `*.anotherexample.tld` are terminated 
+on the `Gateway` and attached to a `HTTPRoute`.
+
 ## Conformance Details
 
 ###  Feature Names
