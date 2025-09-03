@@ -28,17 +28,6 @@ to prevent the complications involved with sharing trust across namespace bounda
 
 All Gateway API Routes that point to a referenced Service should respect a configured BackendTLSPolicy.
 
-## Gateway Backend TLS Configuration
-
-??? example "Experimental Channel since v1.1.0"
-
-    These fields were added to Gateway in `v1.1.0`
-The Gateway specification now includes a new backendTLS field that allows configuration of TLS settings when the Gateway connects to backends. This provides a default configuration for all backend Services. It is important to note that if a BackendTLSPolicy is attached to a specific Service, it will override the backendTLS configuration on the Gateway.
-This functionality enables the specification of client certificates that the Gateway should use when establishing TLS connections with backends. 
-The backendTLS configuration consists of a single field:
-
-- [ClientCertificateRef][clientCertificateRef] - References an object containing a Client Certificate and its associated private key
-
 ## Spec
 
 The specification of a [BackendTLSPolicy][backendtlspolicy] consists of:
