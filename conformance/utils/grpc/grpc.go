@@ -72,16 +72,6 @@ type RequestMetadata struct {
 	Metadata map[string]string
 }
 
-type BackendRef struct {
-	Name      string
-	Namespace string
-}
-
-type MirroredBackend struct {
-	BackendRef
-	Percent *int32
-}
-
 // ExpectedResponse defines the response expected for a given request.
 type ExpectedResponse struct {
 	// Defines the request to make. Only one of EchoRequest and EchoTwoRequest
@@ -101,7 +91,7 @@ type ExpectedResponse struct {
 	Namespace string
 
 	// MirroredTo is the destination BackendRefs of the mirrored request
-	MirroredTo []MirroredBackend
+	MirroredTo []http.MirroredBackend
 
 	// User Given TestCase name
 	TestCaseName string

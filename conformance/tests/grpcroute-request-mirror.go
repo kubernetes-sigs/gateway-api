@@ -1,5 +1,5 @@
 /*
-Copyright 2023 The Kubernetes Authors.
+Copyright 2025 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import (
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 	pb "sigs.k8s.io/gateway-api/conformance/echo-basic/grpcechoserver"
 	"sigs.k8s.io/gateway-api/conformance/utils/grpc"
+	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
 	"sigs.k8s.io/gateway-api/pkg/features"
@@ -54,9 +55,9 @@ var GRPCRouteRequestMirror = suite.ConformanceTest{
 				EchoRequest: &pb.EchoRequest{},
 				Backend:     "grpc-infra-backend-v1",
 				Namespace:   ns,
-				MirroredTo: []grpc.MirroredBackend{
+				MirroredTo: []http.MirroredBackend{
 					{
-						BackendRef: grpc.BackendRef{
+						BackendRef: http.BackendRef{
 							Name:      "grpc-infra-backend-v2",
 							Namespace: ns,
 						},
@@ -76,9 +77,9 @@ var GRPCRouteRequestMirror = suite.ConformanceTest{
 					},
 				},
 				Namespace: ns,
-				MirroredTo: []grpc.MirroredBackend{
+				MirroredTo: []http.MirroredBackend{
 					{
-						BackendRef: grpc.BackendRef{
+						BackendRef: http.BackendRef{
 							Name:      "grpc-infra-backend-v2",
 							Namespace: ns,
 						},
@@ -104,7 +105,7 @@ var GRPCRouteRequestMirror = suite.ConformanceTest{
 			t.Run(tc.GetTestCaseName(i), func(t *testing.T) {
 				t.Parallel()
 				grpc.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.GRPCClient, suite.TimeoutConfig, gwAddr, tc)
-				grpc.ExpectMirroredRequest(t, suite.Client, suite.Clientset, tc.MirroredTo)
+				http.ExpectMirroredRequest(t, suite.Client, suite.Clientset, tc.MirroredTo, "Received over plaintext:")
 			})
 		}
 	},
