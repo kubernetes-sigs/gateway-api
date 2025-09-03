@@ -158,7 +158,9 @@ type ParentReference struct {
 // GatewayDefaultScope defines the set of default scopes that a Gateway
 // can claim, for use in any Route type. At present the only supported
 // scopes are "All" and "None". "None" is a special scope which
-// explicitly means that the Route MUST NOT be defaulted.
+// explicitly means that the Route MUST NOT attached to any default
+// Gateway.
+//
 // +kubebuilder:validation:Enum=All;None
 type GatewayDefaultScope string
 
@@ -260,7 +262,8 @@ type CommonRouteSpec struct {
 	// example, a Route with specific security requirements should almost
 	// certainly not use a default Gateway.
 	//
-	// +optional <gateway:experimental>
+	// +optional
+	// <gateway:experimental>
 	UseDefaultGateways GatewayDefaultScope `json:"useDefaultGateways,omitempty"`
 }
 

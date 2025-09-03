@@ -313,7 +313,8 @@ type GatewaySpec struct {
 	// recommend not using this just because it seems convenient, and instead
 	// stick to direct Route attachment.
 	//
-	// +optional <gateway:experimental>
+	// +optional
+	// <gateway:experimental>
 	DefaultScope GatewayDefaultScope `json:"defaultScope,omitempty"`
 }
 
