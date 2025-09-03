@@ -155,15 +155,21 @@ type ParentReference struct {
 	Port *PortNumber `json:"port,omitempty"`
 }
 
-// GatewayDefaultScope defines the set of default scopes that a Gateway can
-// claim, for configuring default Gateways and selecting default Gateways in
-// any Route type. At present the only supported scope is "All".
+// GatewayDefaultScope defines the set of default scopes that a Gateway
+// can claim, for use in any Route type. At present the only supported
+// scopes are "All" and "None". "None" is a special scope which
+// explicitly means that the Route MUST NOT be defaulted.
+// +kubebuilder:validation:Enum=All;None
 type GatewayDefaultScope string
 
 const (
 	// GatewayDefaultScopeAll indicates that a Gateway can claim absolutely
 	// any Route asking for a default Gateway.
 	GatewayDefaultScopeAll GatewayDefaultScope = "All"
+
+	// GatewayDefaultScopeNone indicates that a Gateway MUST NOT claim
+	// any Route asking for a default Gateway.
+	GatewayDefaultScopeNone GatewayDefaultScope = "None"
 )
 
 // CommonRouteSpec defines the common attributes that all Routes MUST include
@@ -241,21 +247,22 @@ type CommonRouteSpec struct {
 	// <gateway:experimental:validation:XValidation:message="sectionName or port must be unique when parentRefs includes 2 or more references to the same parent",rule="self.all(p1, self.exists_one(p2, p1.group == p2.group && p1.kind == p2.kind && p1.name == p2.name && (((!has(p1.__namespace__) || p1.__namespace__ == '') && (!has(p2.__namespace__) || p2.__namespace__ == '')) || (has(p1.__namespace__) && has(p2.__namespace__) && p1.__namespace__ == p2.__namespace__ )) && (((!has(p1.sectionName) || p1.sectionName == '') && (!has(p2.sectionName) || p2.sectionName == '')) || ( has(p1.sectionName) && has(p2.sectionName) && p1.sectionName == p2.sectionName)) && (((!has(p1.port) || p1.port == 0) && (!has(p2.port) || p2.port == 0)) || (has(p1.port) && has(p2.port) && p1.port == p2.port))))">
 	ParentRefs []ParentReference `json:"parentRefs,omitempty"`
 
-	// UseDefaultGateway indicates the default Gateway scope to use for this
-	// Route. If unset (the default), the Route will not be attached to any
-	// default Gateway; if set, it will be attached to any default Gateway
-	// supporting the named scope, subject to the usual rules about which
-	// Routes a Gateway is allowed to claim.
+	// UseDefaultGateways indicates the default Gateway scope to use for this
+	// Route. If unset (the default), set to an empty string (`""`), or set to
+	// None, the Route will not be attached to any default Gateway; if set, it
+	// will be attached to any default Gateway supporting the named scope,
+	// subject to the usual rules about which Routes a Gateway is allowed to
+	// claim.
 	//
 	// Think carefully before using this functionality! The set of default
 	// Gateways supporting the requested scope can change over time without
 	// any notice to the Route author, and in many situations it will not be
 	// appropriate to request a default Gateway for a given Route -- for
-	// example, a Route with specific security requirements should almost certainly
-	// not use a default Gateway.
+	// example, a Route with specific security requirements should almost
+	// certainly not use a default Gateway.
 	//
 	// +optional <gateway:experimental>
-	UseDefaultGateway GatewayDefaultScope `json:"useDefaultGateway,omitempty"`
+	UseDefaultGateways GatewayDefaultScope `json:"useDefaultGateways,omitempty"`
 }
 
 // PortNumber defines a network port.

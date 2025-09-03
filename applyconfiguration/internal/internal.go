@@ -496,7 +496,7 @@ var schemaYAML = typed.YAMLObject(`types:
           elementType:
             namedType: io.k8s.sigs.gateway-api.apis.v1.GRPCRouteRule
           elementRelationship: atomic
-    - name: useDefaultGateway
+    - name: useDefaultGateways
       type:
         scalar: string
 - name: io.k8s.sigs.gateway-api.apis.v1.GRPCRouteStatus
@@ -1051,7 +1051,7 @@ var schemaYAML = typed.YAMLObject(`types:
           elementType:
             namedType: io.k8s.sigs.gateway-api.apis.v1.HTTPRouteRule
           elementRelationship: atomic
-    - name: useDefaultGateway
+    - name: useDefaultGateways
       type:
         scalar: string
 - name: io.k8s.sigs.gateway-api.apis.v1.HTTPRouteStatus
@@ -1487,7 +1487,7 @@ var schemaYAML = typed.YAMLObject(`types:
           elementType:
             namedType: io.k8s.sigs.gateway-api.apis.v1alpha2.TCPRouteRule
           elementRelationship: atomic
-    - name: useDefaultGateway
+    - name: useDefaultGateways
       type:
         scalar: string
 - name: io.k8s.sigs.gateway-api.apis.v1alpha2.TCPRouteStatus
@@ -1553,7 +1553,7 @@ var schemaYAML = typed.YAMLObject(`types:
           elementType:
             namedType: io.k8s.sigs.gateway-api.apis.v1alpha2.TLSRouteRule
           elementRelationship: atomic
-    - name: useDefaultGateway
+    - name: useDefaultGateways
       type:
         scalar: string
 - name: io.k8s.sigs.gateway-api.apis.v1alpha2.TLSRouteStatus
@@ -1613,7 +1613,7 @@ var schemaYAML = typed.YAMLObject(`types:
           elementType:
             namedType: io.k8s.sigs.gateway-api.apis.v1alpha2.UDPRouteRule
           elementRelationship: atomic
-    - name: useDefaultGateway
+    - name: useDefaultGateways
       type:
         scalar: string
 - name: io.k8s.sigs.gateway-api.apis.v1alpha2.UDPRouteStatus
@@ -1741,7 +1741,7 @@ var schemaYAML = typed.YAMLObject(`types:
           elementType:
             namedType: io.k8s.sigs.gateway-api.apis.v1alpha2.TLSRouteRule
           elementRelationship: atomic
-    - name: useDefaultGateway
+    - name: useDefaultGateways
       type:
         scalar: string
 - name: io.k8s.sigs.gateway-api.apis.v1beta1.Gateway

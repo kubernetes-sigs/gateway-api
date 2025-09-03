@@ -3045,9 +3045,9 @@ func schema_sigsk8sio_gateway_api_apis_v1_CommonRouteSpec(ref common.ReferenceCa
 							},
 						},
 					},
-					"useDefaultGateway": {
+					"useDefaultGateways": {
 						SchemaProps: spec.SchemaProps{
-							Description: "UseDefaultGateway indicates the default Gateway scope to use for this Route. If unset (the default), the Route will not be attached to any default Gateway; if set, it will be attached to any default Gateway supporting the named scope, subject to the usual rules about which Routes a Gateway is allowed to claim.\n\nThink carefully before using this functionality! The set of default Gateways supporting the requested scope can change over time without any notice to the Route author, and in many situations it will not be appropriate to request a default Gateway for a given Route -- for example, a Route with specific security requirements should almost certainly not use a default Gateway. not use a default Gateway.",
+							Description: "UseDefaultGateways indicates the default Gateway scope to use for this Route. If unset (the default), set to an empty string (`\"\"`), or set to None, the Route will not be attached to any default Gateway; if set, it will be attached to any default Gateway supporting the named scope, subject to the usual rules about which Routes a Gateway is allowed to claim.\n\nThink carefully before using this functionality! The set of default Gateways supporting the requested scope can change over time without any notice to the Route author, and in many situations it will not be appropriate to request a default Gateway for a given Route -- for example, a Route with specific security requirements should almost certainly not use a default Gateway.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -3696,9 +3696,9 @@ func schema_sigsk8sio_gateway_api_apis_v1_GRPCRouteSpec(ref common.ReferenceCall
 							},
 						},
 					},
-					"useDefaultGateway": {
+					"useDefaultGateways": {
 						SchemaProps: spec.SchemaProps{
-							Description: "UseDefaultGateway indicates the default Gateway scope to use for this Route. If unset (the default), the Route will not be attached to any default Gateway; if set, it will be attached to any default Gateway supporting the named scope, subject to the usual rules about which Routes a Gateway is allowed to claim.\n\nThink carefully before using this functionality! The set of default Gateways supporting the requested scope can change over time without any notice to the Route author, and in many situations it will not be appropriate to request a default Gateway for a given Route -- for example, a Route with specific security requirements should almost certainly not use a default Gateway. not use a default Gateway.",
+							Description: "UseDefaultGateways indicates the default Gateway scope to use for this Route. If unset (the default), set to an empty string (`\"\"`), or set to None, the Route will not be attached to any default Gateway; if set, it will be attached to any default Gateway supporting the named scope, subject to the usual rules about which Routes a Gateway is allowed to claim.\n\nThink carefully before using this functionality! The set of default Gateways supporting the requested scope can change over time without any notice to the Route author, and in many situations it will not be appropriate to request a default Gateway for a given Route -- for example, a Route with specific security requirements should almost certainly not use a default Gateway.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -4228,7 +4228,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewaySpec(ref common.ReferenceCallba
 					},
 					"defaultScope": {
 						SchemaProps: spec.SchemaProps{
-							Description: "DefaultScope, when set, configures the Gateway as a default Gateway, meaning it will dynamically and implicitly have Routes (e.g. HTTPRoute) attached to it, according to the scope configured here.\n\nIf unset or set to the empty string `\"\"` (the default), the Gateway will not act as a default Gateway; if set, the Gateway will claim any Route with a matching scope set in its UseDefaultGateway field, subject to the usual rules about which routes the Gateway can attach to.\n\nThink carefully before using this functionality! While the normal rules about which Route can apply are still enforced, it is simply easier for the wrong Route to be accidentally attached to this Gateway in this configuration. If the Gateway operator is not also the operator in control of the scope (e.g. namespace) with tight controls and checks on what kind of workloads and Routes get added in that scope, we strongly recommend not using this just because it seems convenient, and instead stick to explicit Route attachment.",
+							Description: "DefaultScope, when set, configures the Gateway as a default Gateway, meaning it will dynamically and implicitly have Routes (e.g. HTTPRoute) attached to it, according to the scope configured here.\n\nIf unset (the default), set to an empty string (`\"\"`), or set to None, the Gateway will not act as a default Gateway; if set, the Gateway will claim any Route with a matching scope set in its UseDefaultGateway field, subject to the usual rules about which routes the Gateway can attach to.\n\nThink carefully before using this functionality! While the normal rules about which Route can apply are still enforced, it is simply easier for the wrong Route to be accidentally attached to this Gateway in this configuration. If the Gateway operator is not also the operator in control of the scope (e.g. namespace) with tight controls and checks on what kind of workloads and Routes get added in that scope, we strongly recommend not using this just because it seems convenient, and instead stick to direct Route attachment.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -5440,9 +5440,9 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteSpec(ref common.ReferenceCall
 							},
 						},
 					},
-					"useDefaultGateway": {
+					"useDefaultGateways": {
 						SchemaProps: spec.SchemaProps{
-							Description: "UseDefaultGateway indicates the default Gateway scope to use for this Route. If unset (the default), the Route will not be attached to any default Gateway; if set, it will be attached to any default Gateway supporting the named scope, subject to the usual rules about which Routes a Gateway is allowed to claim.\n\nThink carefully before using this functionality! The set of default Gateways supporting the requested scope can change over time without any notice to the Route author, and in many situations it will not be appropriate to request a default Gateway for a given Route -- for example, a Route with specific security requirements should almost certainly not use a default Gateway. not use a default Gateway.",
+							Description: "UseDefaultGateways indicates the default Gateway scope to use for this Route. If unset (the default), set to an empty string (`\"\"`), or set to None, the Route will not be attached to any default Gateway; if set, it will be attached to any default Gateway supporting the named scope, subject to the usual rules about which Routes a Gateway is allowed to claim.\n\nThink carefully before using this functionality! The set of default Gateways supporting the requested scope can change over time without any notice to the Route author, and in many situations it will not be appropriate to request a default Gateway for a given Route -- for example, a Route with specific security requirements should almost certainly not use a default Gateway.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -6924,9 +6924,9 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_TCPRouteSpec(ref common.Referenc
 							},
 						},
 					},
-					"useDefaultGateway": {
+					"useDefaultGateways": {
 						SchemaProps: spec.SchemaProps{
-							Description: "UseDefaultGateway indicates the default Gateway scope to use for this Route. If unset (the default), the Route will not be attached to any default Gateway; if set, it will be attached to any default Gateway supporting the named scope, subject to the usual rules about which Routes a Gateway is allowed to claim.\n\nThink carefully before using this functionality! The set of default Gateways supporting the requested scope can change over time without any notice to the Route author, and in many situations it will not be appropriate to request a default Gateway for a given Route -- for example, a Route with specific security requirements should almost certainly not use a default Gateway. not use a default Gateway.",
+							Description: "UseDefaultGateways indicates the default Gateway scope to use for this Route. If unset (the default), set to an empty string (`\"\"`), or set to None, the Route will not be attached to any default Gateway; if set, it will be attached to any default Gateway supporting the named scope, subject to the usual rules about which Routes a Gateway is allowed to claim.\n\nThink carefully before using this functionality! The set of default Gateways supporting the requested scope can change over time without any notice to the Route author, and in many situations it will not be appropriate to request a default Gateway for a given Route -- for example, a Route with specific security requirements should almost certainly not use a default Gateway.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -7161,9 +7161,9 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_TLSRouteSpec(ref common.Referenc
 							},
 						},
 					},
-					"useDefaultGateway": {
+					"useDefaultGateways": {
 						SchemaProps: spec.SchemaProps{
-							Description: "UseDefaultGateway indicates the default Gateway scope to use for this Route. If unset (the default), the Route will not be attached to any default Gateway; if set, it will be attached to any default Gateway supporting the named scope, subject to the usual rules about which Routes a Gateway is allowed to claim.\n\nThink carefully before using this functionality! The set of default Gateways supporting the requested scope can change over time without any notice to the Route author, and in many situations it will not be appropriate to request a default Gateway for a given Route -- for example, a Route with specific security requirements should almost certainly not use a default Gateway. not use a default Gateway.",
+							Description: "UseDefaultGateways indicates the default Gateway scope to use for this Route. If unset (the default), set to an empty string (`\"\"`), or set to None, the Route will not be attached to any default Gateway; if set, it will be attached to any default Gateway supporting the named scope, subject to the usual rules about which Routes a Gateway is allowed to claim.\n\nThink carefully before using this functionality! The set of default Gateways supporting the requested scope can change over time without any notice to the Route author, and in many situations it will not be appropriate to request a default Gateway for a given Route -- for example, a Route with specific security requirements should almost certainly not use a default Gateway.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -7418,9 +7418,9 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_UDPRouteSpec(ref common.Referenc
 							},
 						},
 					},
-					"useDefaultGateway": {
+					"useDefaultGateways": {
 						SchemaProps: spec.SchemaProps{
-							Description: "UseDefaultGateway indicates the default Gateway scope to use for this Route. If unset (the default), the Route will not be attached to any default Gateway; if set, it will be attached to any default Gateway supporting the named scope, subject to the usual rules about which Routes a Gateway is allowed to claim.\n\nThink carefully before using this functionality! The set of default Gateways supporting the requested scope can change over time without any notice to the Route author, and in many situations it will not be appropriate to request a default Gateway for a given Route -- for example, a Route with specific security requirements should almost certainly not use a default Gateway. not use a default Gateway.",
+							Description: "UseDefaultGateways indicates the default Gateway scope to use for this Route. If unset (the default), set to an empty string (`\"\"`), or set to None, the Route will not be attached to any default Gateway; if set, it will be attached to any default Gateway supporting the named scope, subject to the usual rules about which Routes a Gateway is allowed to claim.\n\nThink carefully before using this functionality! The set of default Gateways supporting the requested scope can change over time without any notice to the Route author, and in many situations it will not be appropriate to request a default Gateway for a given Route -- for example, a Route with specific security requirements should almost certainly not use a default Gateway.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -7880,9 +7880,9 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha3_TLSRouteSpec(ref common.Referenc
 							},
 						},
 					},
-					"useDefaultGateway": {
+					"useDefaultGateways": {
 						SchemaProps: spec.SchemaProps{
-							Description: "UseDefaultGateway indicates the default Gateway scope to use for this Route. If unset (the default), the Route will not be attached to any default Gateway; if set, it will be attached to any default Gateway supporting the named scope, subject to the usual rules about which Routes a Gateway is allowed to claim.\n\nThink carefully before using this functionality! The set of default Gateways supporting the requested scope can change over time without any notice to the Route author, and in many situations it will not be appropriate to request a default Gateway for a given Route -- for example, a Route with specific security requirements should almost certainly not use a default Gateway. not use a default Gateway.",
+							Description: "UseDefaultGateways indicates the default Gateway scope to use for this Route. If unset (the default), set to an empty string (`\"\"`), or set to None, the Route will not be attached to any default Gateway; if set, it will be attached to any default Gateway supporting the named scope, subject to the usual rules about which Routes a Gateway is allowed to claim.\n\nThink carefully before using this functionality! The set of default Gateways supporting the requested scope can change over time without any notice to the Route author, and in many situations it will not be appropriate to request a default Gateway for a given Route -- for example, a Route with specific security requirements should almost certainly not use a default Gateway.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
