@@ -266,7 +266,6 @@ func compareResponse(expected *ExpectedResponse, response *Response) error {
 
 		expectedHeaders := expected.Response.Headers
 		if expectedHeaders != nil {
-
 			if receivedHeaders == nil {
 				return fmt.Errorf("No headers captured: expected %v headers", len(*expectedHeaders))
 			}
@@ -298,7 +297,6 @@ func compareResponse(expected *ExpectedResponse, response *Response) error {
 				}
 			}
 		}
-
 	}
 	return nil
 }
