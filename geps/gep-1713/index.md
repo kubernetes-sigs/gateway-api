@@ -49,6 +49,9 @@ The feature will be part of the experimental channel, which implementations can 
 
 This proposal introduces a new `ListenerSet` resource that has the ability to attach a set of listeners to multiple parent `Gateways`.
 
+**Note**: While this API is experimental, its `Kind` will be `XListenerSet` and 
+once the API is gratuated to stable it will be renamed to `ListenerSet`.
+
 ### Go
 
 ```go
@@ -59,7 +62,7 @@ type GatewaySpec struct {
 }
 
 type AllowedListeners struct {
-	// +kubebuilder:default={from:Same}
+	// +kubebuilder:default={from: None}
 	Namespaces *ListenerNamespaces `json:"namespaces,omitempty"`
 }
 
@@ -69,7 +72,7 @@ type ListenerNamespaces struct {
 	// values are:
 	//
 	// * Same: Only ListenerSets in the same namespace may be attached to this Gateway.
-	// * Selector: ListenerSets in namespaces selected by the selector may be attached to this Gateway.:w
+	// * Selector: ListenerSets in namespaces selected by the selector may be attached to this Gateway.
 	// * All: ListenerSets in all namespaces may be attached to this Gateway.
 	// * None: Only listeners defined in the Gateway's spec are allowed
 	//
@@ -109,12 +112,24 @@ type ListenerSetSpec struct {
 	// Listeners in a `Gateway` and their attached `ListenerSets` are concatenated
 	// as a list when programming the underlying infrastructure.
 	//
+	// <gateway:util:excludeFromCRD>
 	// Listeners should be merged using the following precedence:
 	//
 	// 1. "parent" Gateway
 	// 2. ListenerSet ordered by creation time (oldest first)
 	// 3. ListenerSet ordered alphabetically by “{namespace}/{name}”.
 	//
+	// Regarding Conflict Management, Listeners in a ListenerSet follow the same
+	// rules of Listeners on a Gateway resource.
+	// 
+	// Listener validation should happen within all of the ListenerSets attached to a 
+	// Gateway, and the precedence of "parent Gateway" -> "oldest first" -> 
+	// "alphabetically ordered" should be respected.
+	// 
+	// ListenerSets containing conflicting Listeners MUST set the Conflicted 
+	// Condition to true and clearly indicate which Listeners are conflicted.
+	// </gateway:util:excludeFromCRD>
+	// 
 	// +listType=map
 	// +listMapKey=name
 	// +kubebuilder:validation:MinItems=1
@@ -330,7 +345,8 @@ type ParentGatewayReference struct {
 
 ### YAML
 
-The following example shows a `Gateway` with an HTTP listener and two child HTTPS `ListenerSets` with unique hostnames and certificates.
+The following example shows a `Gateway` with an HTTP listener and two child HTTPS `ListenerSets` with unique hostnames and certificates. 
+Only `ListenerSets` from the same namespace of the `Gateway` will be accepted:
 
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
@@ -339,6 +355,9 @@ metadata:
   name: parent-gateway
 spec:
   gatewayClassName: example
+  allowedListeners:
+    namespaces:
+      from: Same
   listeners:
   - name: foo
     hostname: foo.com
@@ -346,7 +365,7 @@ spec:
     port: 80
 ---
 apiVersion: gateway.networking.x-k8s.io/v1alpha1
-kind: ListenerSet
+kind: XListenerSet
 metadata:
   name: first-workload-listeners
 spec:
@@ -367,7 +386,7 @@ spec:
         name: first-workload-cert # Provisioned via HTTP01 challenge
 ---
 apiVersion: gateway.networking.x-k8s.io/v1alpha1
-kind: ListenerSet
+kind: XListenerSet
 metadata:
   name: second-workload-listeners
 spec:
@@ -397,6 +416,22 @@ spec:
 
 ## Semantics
 
+### Summary of attachments
+
+Nick Young did a great summarization of how a handshake and route attachment should behave. This is copied as/is as it is a great summary:
+
+* Routes attach to all **relevant** Listeners in their **direct Parent** object.
+* If a Route has a parentRef that is a ListenerSet, then the ListenerSet is the **direct Parent**.
+* If a Route has a parentRef that is a Gateway, then the Gateway is the **direct Parent**.
+* If the Route is using Gateway defaulting, then the default Gateway is the **direct Parent**.
+* If `sectionName` is not set, then all Listeners in the direct Parent object are **relevant**, and the Route must attach to all of them (subject to any `allowedRoutes` criteria.)
+* If `sectionName` is set, then only the Listener in the direct Parent object with the `name` field set to the same value as `sectionname` is **relevant**, and the Route must attach only to that Listener (subject to any `allowedRoutes` criteria).
+* If there are no relevant Listeners (because, for example, a sectionName is specified that does not exist on the direct Parent), then the Route has nowhere to attach to and MUST be have `Accepted` set to `false` for that `parentRef`.
+
+Route status is per-`parentRef`, so if a new parentRef is added, that attachment is independent of any existing parentRefs. A Route can be Accepted by one parentRef and not another, that's fine.
+
+If you have a Route that has a Gateway `parentRef` with a sectionName, that is Accepted already, and you add another parentRef that points to a `ListenerSet` with a `sectionName`, and the `ListenerSet` does not include a Listener with a name matching the sectionName, then the `ListenerSet parentRef` must be `Accepted status: false`. That does not affect the Gateway parentRef.
+
 ### Gateway Changes
 
 An initial experimental release of `ListenerSets` _will have no modifications_ to listener list on the `Gateway` resource. Using `ListenerSets` will  require a dummy listener to be configured.
@@ -417,15 +452,14 @@ metadata:
   name: parent-gateway
 spec:
   allowedListeners:
-  - from: Same
+    namespaces:
+      from: Same
 ```
 
 ### Route Attachment
 
 Routes MUST be able to specify a `ListenerSet` as a `parentRef`. Routes can use `sectionName`/`port` fields in `ParentReference` to help target a specific listener. If no listener is targeted (`sectionName`/`port` are unset) then the Route attaches to all the listeners in the `ListenerSet`.
 
-Routes MUST be able to attach to a `ListenerSet` and it's parent `Gateway` by having multiple `parentRefs` eg:
-
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
@@ -434,25 +468,12 @@ metadata:
 spec:
   parentRefs:
   - name: second-workload-listeners
-    kind: ListenerSet
+    kind: XListenerSet
     sectionName: second
 ```
 
-For instance, the following `HTTPRoute` attempts to attach to a listener defined in the parent `Gateway` using the sectionName `foo`. This is not valid and the route's status `Accepted` condition should be set to `False`
+To attach a Route to a `XListenerSet` and its parent `Gateway`, it MUST have multiple `parentRefs` eg:
 
-```yaml
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
-metadata:
-  name: httproute-example
-spec:
-  parentRefs:
-  - name: some-workload-listeners
-    kind: ListenerSet
-    sectionName: foo
-```
-
-To attach to listeners in both a `Gateway` and `ListenerSet` the route MUST have two `parentRefs`:
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
@@ -461,16 +482,131 @@ metadata:
 spec:
   parentRefs:
   - name: second-workload-listeners
-    kind: ListenerSet
+    kind: XListenerSet
     sectionName: second
   - name: parent-gateway
     kind: Gateway
     sectionName: foo
 ```
 
-#### Optional Section Name
+For instance, the following `HTTPRoute` attempts to attach to a listener defined in the parent `Gateway` using the sectionName `foo`, which exists on a `ListenerSet` but not on a `Gateway`.
+This is not valid and the route's status `Accepted` condition should be set to `False`
 
-If a `sectionName` in a Route's `parentRef` is not set then the Route MUST attach to only the listeners in the referenced parent. As an example given a `Gateway` and it's child `ListenerSets` a route attaching to the `Gateway` with an empty `sectionName` shall only attach to the listeners in the `Gateways` immediate `spec.listeners` list. In other words, the Route will not attach to any listeners in the `ListenerSets`. This is necessary because, for UX reasons, the `name` field does not have to be unique across all Listeners merged into a Gateway (see the section below for details).
+```yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: parent-gateway
+spec:
+  gatewayClassName: example
+  allowedListeners:
+    namespaces:
+      from: Same
+  listeners:
+  - name: notfoo
+    hostname: foo.com
+    protocol: HTTP
+    port: 80
+---
+apiVersion: gateway.networking.x-k8s.io/v1alpha1
+kind: XListenerSet
+metadata:
+  name: first-workload-listeners
+spec:
+  parentRef:
+    name: parent-gateway
+    kind: Gateway
+    group: gateway.networking.k8s.io
+  listeners:
+  - name: foo
+    hostname: first.foo.com
+    protocol: HTTP
+    port: 80
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: httproute-example
+spec:
+  parentRefs:
+  - name: parent-gateway
+    kind: Gateway
+    sectionName: foo
+```
+
+#### Gateway parents and sectionName
+
+If a `sectionName` in a Route's `parentRef` is not set then the Route MUST attach to only the listeners in the referenced parent. As an example given a `Gateway` and it's child `ListenerSets` a route attaching to the `Gateway` with an empty `sectionName` shall only attach to the listeners in the `Gateways` immediate `spec.listeners` list. 
+
+In other words, the Route MUST attach just to the Gateway listeners specified on `.spec.listeners` and MUST NOT not attach to any listeners in the child `ListenerSets` 
+of the `Gateway`.
+
+This is necessary because, for UX reasons, the `name` field does not have to be unique across all Listeners merged into a Gateway (see the section below for details).
+
+The following manifest exemplifies this situation:
+
+```yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: parent-gateway
+spec:
+  gatewayClassName: example
+  allowedListeners:
+    namespaces:
+      from: Same
+  listeners:
+  - name: foo2
+    hostname: foo.com
+    protocol: HTTP
+    port: 80
+  - name: foo3
+    hostname: foo1.com
+    protocol: HTTP
+    port: 80
+---
+apiVersion: gateway.networking.x-k8s.io/v1alpha1
+kind: XListenerSet
+metadata:
+  name: first-workload-listeners
+spec:
+  parentRef:
+    name: parent-gateway
+    kind: Gateway
+    group: gateway.networking.k8s.io
+  listeners:
+  - name: foo
+    hostname: first.foo.com
+    protocol: HTTP
+    port: 80
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: httproute-example
+spec:
+  parentRefs:
+  # No SectionName is set on this parentRef
+  - name: some-workload-listeners 
+    kind: Gateway
+```
+
+The example above SHOULD be attached only to the following listeners:
+```yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+.....
+spec:
+  listeners:
+  - name: foo2
+    hostname: foo.com
+    protocol: HTTP
+    port: 80
+  - name: foo3
+    hostname: foo1.com
+    protocol: HTTP
+    port: 80
+```
 
 ### Policy Attachment
 
@@ -545,7 +681,203 @@ Listeners should be merged using the following precedence:
 2. ListenerSet ordered by creation time (oldest first)
 3. ListenerSet ordered alphabetically by “{namespace}/{name}”.
 
-Conflicts are covered in the section 'ListenerConditions within a ListenerSet'
+Conflicts are covered in the section [Listener and ListenerSet conflicts](#listener-and-listenerset-conflicts)
+
+### Listener and ListenerSet conflicts
+
+ListenerSet conflicts should be managed similarly to [Gateway resource conflict](https://github.com/kubernetes-sigs/gateway-api/blob/372a5b06624cff12117f41dcd26c08cb1def22e7/apis/v1/gateway_types.go#L76)
+management.
+
+With ListenerSet this validation should happen within the same ListenerSet resource, 
+but MUST be validated also within a Gateway scope and all of the attached Listeners/ListenerSets. 
+The SectionName field is an exception for this validation, and while it should 
+not conflict within the same ListenerSet, it can be duplicated between different ListenerSets.
+
+This means that the validation should happen now between distinct ListenerSets 
+attached to the same Gateway, and in case of a conflict, the [Listener Precedence](#listener-precedence) 
+should be respected, so the first Listener on the precedence list MUST be accepted, 
+and should not have a `Conflicted` condition, while the conflicting listeners 
+MUST have a `Conflicted` condition set to True and with an explicit reason on its message.
+
+Following are some examples of a conflict situation:
+
+#### Conflict between ListenerSet and parent Gateway
+
+Given the following resource definitions:
+
+```yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: parent-gateway
+  namespace: infra
+spec:
+  allowedListeners:
+    namespaces:
+      from: All
+  listeners:
+  - name: foo
+    hostname: www.something.tld
+    protocol: HTTPS
+    port: 443
+    tls:
+      mode: Terminate
+      certificateRefs:
+      - kind: Secret
+        group: ""
+        name: default-cert
+---
+apiVersion: gateway.networking.x-k8s.io/v1alpha1
+kind: XListenerSet
+metadata:
+  name: user-listenerset
+  namespace: user01
+spec:
+  parentRef:
+    name: parent-gateway
+    kind: Gateway
+    group: gateway.networking.k8s.io
+  listeners:
+  - name: myapp
+    hostname: www.something.tld
+    protocol: HTTPS
+    port: 443
+    tls:
+      mode: Terminate
+      certificateRefs:
+      - kind: Secret
+        group: ""
+        name: app-cert
+```
+
+The ListenerSet `user-listenerset` should be marked as Conflicted, as the `parent-gateway`
+has a listener definition called `foo` that conflicts with the ListenetSet definition
+called `myapp`. The conflict happens because hostname is the same on both `ListenerSet` 
+but they use different termination TLS certificates:
+
+```yaml
+apiVersion: gateway.networking.x-k8s.io/v1alpha1
+kind: XListenerSet
+metadata:
+  name: user-listenerset
+  namespace: user01
+....
+status:
+  listeners:
+  - name: myapp
+    hostname: www.something.tld
+    protocol: HTTPS
+    port: 443
+    conditions:
+	- message: ListenerSet has conflicts with Gateway 'infra/parent-gateway'
+      reason: ParentNotAccepted
+      status: "False"
+      type: Accepted
+    - message: ListenerSet has conflicts with Gateway 'infra/parent-gateway'
+      reason: ListenerConflict
+      status: "True"
+      type: Conflicted
+```
+
+#### Conflict between two ListenerSets
+
+The following example represents a conflict between two ListenerSets on distinct
+namespaces. The controller should avoid setting any Condition that exposes information
+from other users, but still provide meaningful information of why a ListenerSet 
+was not accepted
+
+
+```yaml
+apiVersion: gateway.networking.x-k8s.io/v1alpha1
+kind: XListenerSet
+metadata:
+  creationTimestamp: "2025-08-11T15:44:05Z"
+  name: listenerset1
+  namespace: user01
+spec:
+  parentRef:
+    name: parent-gateway
+    kind: Gateway
+    group: gateway.networking.k8s.io
+  listeners:
+  - name: myapp
+    hostname: www.something.tld
+    protocol: HTTPS
+    port: 443
+    tls:
+      mode: Terminate
+      certificateRefs:
+      - kind: Secret
+        group: ""
+        name: app-cert
+---
+apiVersion: gateway.networking.x-k8s.io/v1alpha1
+kind: XListenerSet
+metadata:
+  creationTimestamp: "2025-08-11T13:44:05Z"
+  name: listenerset2
+  namespace: user02
+spec:
+  parentRef:
+    name: parent-gateway
+    kind: Gateway
+    group: gateway.networking.k8s.io
+  listeners:
+  - name: myapp
+    hostname: www.something.tld
+    protocol: HTTPS
+    port: 443
+    tls:
+      mode: Terminate
+      certificateRefs:
+      - kind: Secret
+        group: ""
+        name: other-app-cert
+```
+
+In this case, there's a conflict as both users are setting the same hostname and 
+port on distinct Listeners. In this case, because the ListenerSet `user02/listenerset2` 
+is older, it will be accepted while `user01/listenerset1` should not be accepted, 
+and receive a `Conflicted=True` condition.
+
+The status of ListenerSets can be defined as the following:
+
+```yaml
+apiVersion: gateway.networking.x-k8s.io/v1alpha1
+kind: XListenerSet
+metadata:
+  creationTimestamp: "2025-08-11T15:44:05Z"
+  name: listenerset1
+  namespace: user01
+status:
+  listeners:
+  - name: myapp
+    hostname: www.something.tld
+    protocol: HTTPS
+    port: 443
+    conditions:
+    - message: ListenerSet has conflicts with other listeners attached to the same Gateway
+      reason: ListenerConflict
+      status: "True"
+      type: Conflicted
+---
+apiVersion: gateway.networking.x-k8s.io/v1alpha1
+kind: XListenerSet
+metadata:
+  creationTimestamp: "2025-08-11T13:44:05Z"
+  name: listenerset2
+  namespace: user02
+status:
+  listeners:
+  - name: myapp
+    hostname: www.something.tld
+    protocol: HTTPS
+    port: 443
+    conditions:
+    - reason: Accepted
+      status: "True"
+      type: Accepted
+```
 
 ### Gateway Conditions
 
@@ -587,6 +919,8 @@ An implementation MAY reject listeners by setting the `ListenerEntryStatus` `Acc
 If a listener has a conflict, this should be reported in the `ListenerEntryStatus` of the conflicted `ListenerSet` by setting the `Conflicted` condition to `True`.
 
 Implementations SHOULD be cautious about what information from the parent or siblings are reported to avoid accidentally leaking sensitive information that the child would not otherwise have access to. This can include contents of secrets etc.
+
+Conflicts are covered in the section [Listener and ListenerSet conflicts](#listener-and-listenerset-conflicts)
 
 ## Alternatives
 
