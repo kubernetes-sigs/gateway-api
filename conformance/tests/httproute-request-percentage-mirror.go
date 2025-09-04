@@ -20,10 +20,11 @@ import (
 	"errors"
 	"fmt"
 	"regexp"
-	"sigs.k8s.io/gateway-api/conformance/utils/mirror"
 	"sync"
 	"testing"
 	"time"
+
+	"sigs.k8s.io/gateway-api/conformance/utils/mirror"
 
 	"github.com/stretchr/testify/require"
 	"k8s.io/apimachinery/pkg/types"

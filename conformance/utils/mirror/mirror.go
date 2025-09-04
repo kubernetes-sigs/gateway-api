@@ -18,15 +18,18 @@ package mirror
 
 import (
 	"fmt"
-	"github.com/stretchr/testify/require"
-	clientset "k8s.io/client-go/kubernetes"
 	"regexp"
-	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
-	"sigs.k8s.io/gateway-api/conformance/utils/tlog"
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/require"
+	clientset "k8s.io/client-go/kubernetes"
+
+	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
+	"sigs.k8s.io/gateway-api/conformance/utils/tlog"
 )
 
 type BackendRef struct {
@@ -39,11 +42,11 @@ type MirroredBackend struct {
 	Percent *int32
 }
 
-func GetHttpRegexPattern(path string) *regexp.Regexp {
+func GetHTTPRegexPattern(path string) *regexp.Regexp {
 	return regexp.MustCompile(fmt.Sprintf("Echoing back request made to \\%s to client", path))
 }
 
-func GetGrpcRegexPattern() *regexp.Regexp {
+func GetGRPCRegexPattern() *regexp.Regexp {
 	return regexp.MustCompile("Received over plaintext")
 }
 
@@ -64,7 +67,6 @@ func ExpectMirroredRequest(t *testing.T, client client.Client, clientset clients
 			defer wg.Done()
 
 			require.Eventually(t, func() bool {
-
 				tlog.Log(t, "Searching for the mirrored request log")
 				tlog.Logf(t, `Reading "%s/%s" logs`, mirrorPod.Namespace, mirrorPod.Name)
 				logs, err := kubernetes.DumpEchoLogs(mirrorPod.Namespace, mirrorPod.Name, client, clientset, assertionStart)

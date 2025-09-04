@@ -20,11 +20,12 @@ import (
 	"fmt"
 	"net"
 	"net/url"
-	"sigs.k8s.io/gateway-api/conformance/utils/mirror"
 	"slices"
 	"strings"
 	"testing"
 	"time"
+
+	"sigs.k8s.io/gateway-api/conformance/utils/mirror"
 
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
 	"sigs.k8s.io/gateway-api/conformance/utils/roundtripper"

@@ -17,10 +17,11 @@ limitations under the License.
 package tests
 
 import (
+	"testing"
+
 	pb "sigs.k8s.io/gateway-api/conformance/echo-basic/grpcechoserver"
 	"sigs.k8s.io/gateway-api/conformance/utils/grpc"
 	"sigs.k8s.io/gateway-api/conformance/utils/mirror"
-	"testing"
 
 	"k8s.io/apimachinery/pkg/types"
 
@@ -71,7 +72,7 @@ var GRPCRouteRequestMirror = suite.ConformanceTest{
 			t.Run(tc.GetTestCaseName(i), func(t *testing.T) {
 				t.Parallel()
 				grpc.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.GRPCClient, suite.TimeoutConfig, gwAddr, tc)
-				mirror.ExpectMirroredRequest(t, suite.Client, suite.Clientset, tc.MirroredTo, mirror.GetGrpcRegexPattern())
+				mirror.ExpectMirroredRequest(t, suite.Client, suite.Clientset, tc.MirroredTo, mirror.GetGRPCRegexPattern())
 			})
 		}
 	},

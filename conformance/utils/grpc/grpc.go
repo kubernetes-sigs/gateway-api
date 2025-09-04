@@ -19,11 +19,12 @@ package grpc
 import (
 	"context"
 	"fmt"
-	"sigs.k8s.io/gateway-api/conformance/utils/mirror"
 	"sort"
 	"strings"
 	"testing"
 	"time"
+
+	"sigs.k8s.io/gateway-api/conformance/utils/mirror"
 
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"

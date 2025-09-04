@@ -17,8 +17,9 @@ limitations under the License.
 package tests
 
 import (
-	"sigs.k8s.io/gateway-api/conformance/utils/mirror"
 	"testing"
+
+	"sigs.k8s.io/gateway-api/conformance/utils/mirror"
 
 	"k8s.io/apimachinery/pkg/types"
 
@@ -118,7 +119,7 @@ var HTTPRouteRequestMultipleMirrors = suite.ConformanceTest{
 			t.Run(tc.GetTestCaseName(i), func(t *testing.T) {
 				t.Parallel()
 				http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, tc)
-				mirror.ExpectMirroredRequest(t, suite.Client, suite.Clientset, tc.MirroredTo, mirror.GetHttpRegexPattern(tc.Request.Path))
+				mirror.ExpectMirroredRequest(t, suite.Client, suite.Clientset, tc.MirroredTo, mirror.GetHTTPRegexPattern(tc.Request.Path))
 			})
 		}
 	},
