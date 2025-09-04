@@ -3220,7 +3220,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GRPCAuthConfig(ref common.ReferenceCal
 							},
 						},
 						SchemaProps: spec.SchemaProps{
-							Description: "AllowedRequestHeaders specifies what headers from the client request will be sent to the authorization server.\n\nIf this list is empty, then the following headers must be sent:\n\n- `Authorization` - `Location` - `Proxy-Authenticate` - `Set-Cookie` - `WWW-Authenticate`\n\nIf the list has entries, only those entries must be sent.",
+							Description: "AllowedRequestHeaders specifies what headers from the client request will be sent to the authorization server.\n\nIf this list is empty, then all headers must be sent.\n\nIf the list has entries, only those entries must be sent.",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
