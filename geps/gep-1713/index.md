@@ -416,6 +416,22 @@ spec:
 
 ## Semantics
 
+### Summary of attachments
+
+Nick Young did a great summarization of how a handshake and route attachment should behave. This is copied as/is as it is a great summary:
+
+* Routes attach to all **relevant** Listeners in their **direct Parent** object.
+* If a Route has a parentRef that is a ListenerSet, then the ListenerSet is the **direct Parent**.
+* If a Route has a parentRef that is a Gateway, then the Gateway is the **direct Parent**.
+* If the Route is using Gateway defaulting, then the default Gateway is the **direct Parent**.
+* If `sectionName` is not set, then all Listeners in the direct Parent object are **relevant**, and the Route must attach to all of them (subject to any `allowedRoutes` criteria.)
+* If `sectionName` is set, then only the Listener in the direct Parent object with the `name` field set to the same value as `sectionname` is **relevant**, and the Route must attach only to that Listener (subject to any `allowedRoutes` criteria).
+* If there are no relevant Listeners (because, for example, a sectionName is specified that does not exist on the direct Parent), then the Route has nowhere to attach to and MUST be have `Accepted` set to `false` for that `parentRef`.
+
+Route status is per-`parentRef`, so if a new parentRef is added, that attachment is independent of any existing parentRefs. A Route can be Accepted by one parentRef and not another, that's fine.
+
+If you have a Route that has a Gateway `parentRef` with a sectionName, that is Accepted already, and you add another parentRef that points to a `ListenerSet` with a `sectionName`, and the `ListenerSet` does not include a Listener with a name matching the sectionName, then the `ListenerSet parentRef` must be `Accepted status: false`. That does not affect the Gateway parentRef.
+
 ### Gateway Changes
 
 An initial experimental release of `ListenerSets` _will have no modifications_ to listener list on the `Gateway` resource. Using `ListenerSets` will  require a dummy listener to be configured.
