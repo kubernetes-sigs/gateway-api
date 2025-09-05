@@ -43,11 +43,11 @@ import metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 type ReferenceGrant struct {
 	metav1.TypeMeta `json:",inline"`
 	// +optional
-	metav1.ObjectMeta `json:"metadata,omitempty"`
+	metav1.ObjectMeta `json:"metadata,omitzero"`
 
 	// Spec defines the desired state of ReferenceGrant.
 	// +optional
-	Spec ReferenceGrantSpec `json:"spec,omitempty"`
+	Spec ReferenceGrantSpec `json:"spec,omitzero"`
 
 	// Note that `Status` sub-resource has been excluded at the
 	// moment as it was difficult to work out the design.
@@ -58,7 +58,8 @@ type ReferenceGrant struct {
 // ReferenceGrantList contains a list of ReferenceGrant.
 type ReferenceGrantList struct {
 	metav1.TypeMeta `json:",inline"`
-	metav1.ListMeta `json:"metadata,omitempty"`
+	// +optional
+	metav1.ListMeta `json:"metadata,omitzero"`
 	Items           []ReferenceGrant `json:"items"`
 }
 
