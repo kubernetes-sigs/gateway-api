@@ -169,7 +169,6 @@ type GRPCRouteRule struct {
 	//
 	// For example, take the following matches configuration:
 	//
-	// ```
 	// matches:
 	// - method:
 	//     service: foo.bar
@@ -178,7 +177,6 @@ type GRPCRouteRule struct {
 	//       version: 2
 	// - method:
 	//     service: foo.bar.v2
-	// ```
 	//
 	// For a request to match against this rule, it MUST satisfy
 	// EITHER of the two conditions:
