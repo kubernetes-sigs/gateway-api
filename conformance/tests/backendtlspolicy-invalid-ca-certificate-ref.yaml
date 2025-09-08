@@ -55,7 +55,7 @@ spec:
       port: 443
       targetPort: 8443
 ---
-apiVersion: gateway.networking.k8s.io/v1alpha3
+apiVersion: gateway.networking.k8s.io/v1
 kind: BackendTLSPolicy
 metadata:
   name: nonexistent-ca-certificate-ref
@@ -72,7 +72,7 @@ spec:
         name: "nonexistent-ca-certificate"
     hostname: "abc.example.com"
 ---
-apiVersion: gateway.networking.k8s.io/v1alpha3
+apiVersion: gateway.networking.k8s.io/v1
 kind: BackendTLSPolicy
 metadata:
   name: malformed-ca-certificate-ref

@@ -32,9 +32,7 @@ func (in *BackendTrafficPolicySpec) DeepCopyInto(out *BackendTrafficPolicySpec) 
 	if in.TargetRefs != nil {
 		in, out := &in.TargetRefs, &out.TargetRefs
 		*out = make([]LocalPolicyTargetReference, len(*in))
-		for i := range *in {
-			(*in)[i].DeepCopyInto(&(*out)[i])
-		}
+		copy(*out, *in)
 	}
 	if in.RetryConstraint != nil {
 		in, out := &in.RetryConstraint, &out.RetryConstraint

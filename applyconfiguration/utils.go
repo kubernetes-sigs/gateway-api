@@ -48,6 +48,12 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1.BackendObjectReferenceApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("BackendRef"):
 		return &apisv1.BackendRefApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("BackendTLSPolicy"):
+		return &apisv1.BackendTLSPolicyApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("BackendTLSPolicySpec"):
+		return &apisv1.BackendTLSPolicySpecApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("BackendTLSPolicyValidation"):
+		return &apisv1.BackendTLSPolicyValidationApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("CommonRouteSpec"):
 		return &apisv1.CommonRouteSpecApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("CookieConfig"):
@@ -156,12 +162,20 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1.LocalObjectReferenceApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("LocalParametersReference"):
 		return &apisv1.LocalParametersReferenceApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("LocalPolicyTargetReference"):
+		return &apisv1.LocalPolicyTargetReferenceApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("LocalPolicyTargetReferenceWithSectionName"):
+		return &apisv1.LocalPolicyTargetReferenceWithSectionNameApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("ObjectReference"):
 		return &apisv1.ObjectReferenceApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("ParametersReference"):
 		return &apisv1.ParametersReferenceApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("ParentReference"):
 		return &apisv1.ParentReferenceApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("PolicyAncestorStatus"):
+		return &apisv1.PolicyAncestorStatusApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("PolicyStatus"):
+		return &apisv1.PolicyStatusApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("RouteGroupKind"):
 		return &apisv1.RouteGroupKindApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("RouteNamespaces"):
@@ -174,6 +188,8 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1.SecretObjectReferenceApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("SessionPersistence"):
 		return &apisv1.SessionPersistenceApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("SubjectAltName"):
+		return &apisv1.SubjectAltNameApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("SupportedFeature"):
 		return &apisv1.SupportedFeatureApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("TLSConfig"):
@@ -184,14 +200,6 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		// Group=gateway.networking.k8s.io, Version=v1alpha2
 	case v1alpha2.SchemeGroupVersion.WithKind("GRPCRoute"):
 		return &apisv1alpha2.GRPCRouteApplyConfiguration{}
-	case v1alpha2.SchemeGroupVersion.WithKind("LocalPolicyTargetReference"):
-		return &apisv1alpha2.LocalPolicyTargetReferenceApplyConfiguration{}
-	case v1alpha2.SchemeGroupVersion.WithKind("LocalPolicyTargetReferenceWithSectionName"):
-		return &apisv1alpha2.LocalPolicyTargetReferenceWithSectionNameApplyConfiguration{}
-	case v1alpha2.SchemeGroupVersion.WithKind("PolicyAncestorStatus"):
-		return &apisv1alpha2.PolicyAncestorStatusApplyConfiguration{}
-	case v1alpha2.SchemeGroupVersion.WithKind("PolicyStatus"):
-		return &apisv1alpha2.PolicyStatusApplyConfiguration{}
 	case v1alpha2.SchemeGroupVersion.WithKind("ReferenceGrant"):
 		return &apisv1alpha2.ReferenceGrantApplyConfiguration{}
 	case v1alpha2.SchemeGroupVersion.WithKind("TCPRoute"):
@@ -222,12 +230,6 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		// Group=gateway.networking.k8s.io, Version=v1alpha3
 	case v1alpha3.SchemeGroupVersion.WithKind("BackendTLSPolicy"):
 		return &apisv1alpha3.BackendTLSPolicyApplyConfiguration{}
-	case v1alpha3.SchemeGroupVersion.WithKind("BackendTLSPolicySpec"):
-		return &apisv1alpha3.BackendTLSPolicySpecApplyConfiguration{}
-	case v1alpha3.SchemeGroupVersion.WithKind("BackendTLSPolicyValidation"):
-		return &apisv1alpha3.BackendTLSPolicyValidationApplyConfiguration{}
-	case v1alpha3.SchemeGroupVersion.WithKind("SubjectAltName"):
-		return &apisv1alpha3.SubjectAltNameApplyConfiguration{}
 	case v1alpha3.SchemeGroupVersion.WithKind("TLSRoute"):
 		return &apisv1alpha3.TLSRouteApplyConfiguration{}
 	case v1alpha3.SchemeGroupVersion.WithKind("TLSRouteSpec"):

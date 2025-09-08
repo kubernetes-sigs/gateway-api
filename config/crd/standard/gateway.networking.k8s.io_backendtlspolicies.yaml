@@ -4,7 +4,7 @@ metadata:
   annotations:
     api-approved.kubernetes.io: https://github.com/kubernetes-sigs/gateway-api/pull/3328
     gateway.networking.k8s.io/bundle-version: v1.3.0
-    gateway.networking.k8s.io/channel: experimental
+    gateway.networking.k8s.io/channel: standard
   labels:
     gateway.networking.k8s.io/policy: Direct
   name: backendtlspolicies.gateway.networking.k8s.io
@@ -498,18 +498,6 @@ spec:
                             Gateway has the AllowedRoutes field, and ReferenceGrant provides a
                             generic way to enable any other kind of cross-namespace reference.
 
-
-                            ParentRefs from a Route to a Service in the same namespace are "producer"
-                            routes, which apply default routing rules to inbound connections from
-                            any namespace to the Service.
-
-                            ParentRefs from a Route to a Service in a different namespace are
-                            "consumer" routes, and these routing rules are only applied to outbound
-                            connections originating from the same namespace as the Route, for which
-                            the intended destination of the connections are a Service targeted as a
-                            ParentRef of the Route.
-
-
                             Support: Core
                           maxLength: 63
                           minLength: 1
@@ -527,12 +515,6 @@ spec:
                             as opposed to a listener(s) whose port(s) may be changed. When both Port
                             and SectionName are specified, the name and port of the selected listener
                             must match both specified values.
-
-
-                            When the parent resource is a Service, this targets a specific port in the
-                            Service spec. When both Port (experimental) and SectionName are specified,
-                            the name and port of the selected port must match both specified values.
-
 
                             Implementations MAY choose to support other parent resources.
                             Implementations supporting other types of parent resources MUST clearly
@@ -1161,18 +1143,6 @@ spec:
                             Gateway has the AllowedRoutes field, and ReferenceGrant provides a
                             generic way to enable any other kind of cross-namespace reference.
 
-
-                            ParentRefs from a Route to a Service in the same namespace are "producer"
-                            routes, which apply default routing rules to inbound connections from
-                            any namespace to the Service.
-
-                            ParentRefs from a Route to a Service in a different namespace are
-                            "consumer" routes, and these routing rules are only applied to outbound
-                            connections originating from the same namespace as the Route, for which
-                            the intended destination of the connections are a Service targeted as a
-                            ParentRef of the Route.
-
-
                             Support: Core
                           maxLength: 63
                           minLength: 1
@@ -1190,12 +1160,6 @@ spec:
                             as opposed to a listener(s) whose port(s) may be changed. When both Port
                             and SectionName are specified, the name and port of the selected listener
                             must match both specified values.
-
-
-                            When the parent resource is a Service, this targets a specific port in the
-                            Service spec. When both Port (experimental) and SectionName are specified,
-                            the name and port of the selected port must match both specified values.
-
 
                             Implementations MAY choose to support other parent resources.
                             Implementations supporting other types of parent resources MUST clearly
@@ -1344,7 +1308,7 @@ spec:
         required:
         - spec
         type: object
-    served: true
+    served: false
     storage: false
 status:
   acceptedNames:
