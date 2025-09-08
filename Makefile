@@ -182,6 +182,14 @@ live-docs:
 	docker build -t gw/mkdocs hack/mkdocs/image
 	docker run --rm -it -p 3000:3000 -v ${PWD}:/docs gw/mkdocs
 
+.PHONY: verify-toc
+verify-toc:
+	hack/verify-gep-toc.sh
+
+.PHONY: update-toc
+update-toc:
+	hack/verify-gep-toc.sh
+
 .PHONY: api-ref-docs
 api-ref-docs:
 	crd-ref-docs \

@@ -52,7 +52,7 @@ if $SILENT ; then
   echo "Running in the silent mode, run with -v if you want to see script logs."
 fi
 
-EXCLUDE="verify-all.sh"
+EXCLUDE="verify-all.sh verify-gep-toc.sh"
 
 SCRIPTS=$(find "${SCRIPT_ROOT}"/hack -name "verify-*.sh")
 
