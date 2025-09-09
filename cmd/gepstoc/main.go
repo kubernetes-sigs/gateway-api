@@ -41,6 +41,15 @@ var (
 	SkipGEPNumber  string
 )
 
+// Those are the GEPs that will be included in the final navigation bar
+// The order established below will be the order that the statuses will be shown
+var includeGEPStatus = []gep.GEPStatus{
+	gep.GEPStatusImplementable,
+	gep.GEPStatusExperimental,
+	gep.GEPStatusStandard,
+	gep.GEPStatusMemorandum,
+}
+
 type GEPArray []GEPList
 
 type GEPList struct {
@@ -119,10 +128,18 @@ func walkGEPs(dir string, skipGEPs []string) (GEPArray, error) {
 			return nil
 		}
 
+		// Skip the GEPs types we don't care
+		if !slices.Contains(includeGEPStatus, gepDetail.Status) {
+			return nil
+		}
+
+		// Skip the GEPs numbers we don't care
 		if slices.Contains(skipGEPs, strconv.FormatUint(uint64(gepDetail.Number), 10)) {
 			return nil
 		}
 
+		// Add the GEP to a map indexed by GEP types, so we can provide the sorted array
+		// easily later
 		_, ok := tmpMap[gepDetail.Status]
 		if !ok {
 			tmpMap[gepDetail.Status] = GEPList{
@@ -140,13 +157,13 @@ func walkGEPs(dir string, skipGEPs []string) (GEPArray, error) {
 		return nil, err
 	}
 
-	for _, v := range tmpMap {
-		gepArray = append(gepArray, v)
-	}
+	// Include the GEPs toc on the desired order
+	for _, v := range includeGEPStatus {
+		if geps, ok := tmpMap[v]; ok {
+			gepArray = append(gepArray, geps)
 
-	sort.SliceStable(gepArray, func(i, j int) bool {
-		return gepArray[i].GepType < gepArray[j].GepType
-	})
+		}
+	}
 
 	for i := range gepArray {
 		sort.SliceStable(gepArray[i].Geps, func(x, y int) bool {
