@@ -161,7 +161,6 @@ func walkGEPs(dir string, skipGEPs []string) (GEPArray, error) {
 	for _, v := range includeGEPStatus {
 		if geps, ok := tmpMap[v]; ok {
 			gepArray = append(gepArray, geps)
-
 		}
 	}
 
