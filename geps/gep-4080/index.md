@@ -1,4 +1,4 @@
-# GEP-4080: Certificate Revocation Lists for Certificate Validiation
+# GEP-4080: Certificate Revocation Lists for Certificate Validation
 
 * Issue: [#4080](https://github.com/kubernetes-sigs/gateway-api/issues/4080)
 * Status: Provisional
@@ -15,7 +15,7 @@ only when, they appear in all capitals, as shown here.
 ## What
 Extend the TLS certificate validation mechanisms defined in [GEP-91](../gep-91/index.md) (Frontend TLS Validation) and [GEP-1897](../gep-1897/index.md) (Backend TLS Validation) by introducing support for Certificate Revocation Lists (CRLs).  
 
-With this enhancement, operators and application developpers can configure CRLs that Gateways use during TLS authentication, both when verifying clients connecting to the Gateway and when verifying backends that the Gateway connects to. In both cases, the Gateway will check the presented certificate against the configured CRLs to ensure it has not been revoked by the issuing Certificate Authority (CA).
+With this enhancement, operators and application developers can configure CRLs that Gateways use during TLS authentication, both when verifying clients connecting to the Gateway and when verifying backends that the Gateway connects to. In both cases, the Gateway will check the presented certificate against the configured CRLs to ensure it has not been revoked by the issuing Certificate Authority (CA).
 
 ## Why
 While [GEP-91](../gep-91/index.md) and [GEP-1897](../gep-1897/index.md) define how certificates are validated against trusted CAs, neither addresses the issue of revocation. In practice, certificates may need to be revoked long before expiration (e.g., if private keys are compromised, a device is decommissioned, or access rights are withdrawn). Without revocation checks, Gateways may continue to trust certificates that should no longer be valid, exposing clusters to unauthorized access.  
