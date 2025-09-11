@@ -60,9 +60,15 @@ CEL_TEST_CRD_CHANNEL ?= standard
 
 all: generate vet fmt verify test
 
+.PHONY: clean-generated
+clean-generated:
+	rm -rf pkg/client/clientset
+	rm -rf pkg/client/listers
+	rm -rf pkg/client/informers
+
 # Run generators for protos, Deepcopy funcs, CRDs, and docs.
 .PHONY: generate
-generate: update-codegen
+generate: clean-generated update-codegen
 
 .PHONY: update-codegen
 update-codegen:
