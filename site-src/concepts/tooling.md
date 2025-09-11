@@ -14,6 +14,12 @@ A command line tool for managing your Gateway API resources. Explore your polici
 
 Get started with [kubernetes-sigs/gwctl: installation](https://github.com/kubernetes-sigs/gwctl?tab=readme-ov-file#installation)!
 
+## `Headlamp`
+
+A UI for Kubernetes which has Gateway API support built in. View Gateway API resources in a map view, or in data tables. Updated in real time, with links between Kubernetes resources to make it easier to see relationships.
+
+Get started with [kubernetes-sigs/headlamp: installation](https://github.com/kubernetes-sigs/headlamp?tab=readme-ov-file#quickstart)!
+
 ## Third-Party Tooling
 
 ### `policy-machinery`
