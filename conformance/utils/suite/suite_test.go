@@ -411,6 +411,46 @@ func TestSuiteReport(t *testing.T) {
 	}
 }
 
+func TestSuiteReportBlocksManualSource(t *testing.T) {
+	testCases := []struct {
+		name              string
+		supportedFeatures FeaturesSet
+		profiles          sets.Set[ConformanceProfileName]
+		wantErr           bool
+	}{
+		{
+			name:              "should block with no mesh features",
+			supportedFeatures: namesToFeatureSet(statusFeatureNames),
+			profiles:          sets.New(testProfileName),
+			wantErr:           true,
+		},
+		{
+			name:              "should not block with mesh features",
+			supportedFeatures: sets.New(features.SupportMeshClusterIPMatching, features.SupportMeshConsumerRoute),
+		},
+		{
+			name:              "should not block with mesh profile",
+			supportedFeatures: namesToFeatureSet(statusFeatureNames),
+			profiles:          sets.New(MeshHTTPConformanceProfileName),
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			conformanceProfileMap[testProfileName] = testProfile
+
+			suite := ConformanceTestSuite{
+				supportedFeaturesSource: supportedFeaturesSourceManual,
+				conformanceProfiles:     tc.profiles,
+				SupportedFeatures:       tc.supportedFeatures,
+			}
+			_, err := suite.Report()
+			if tc.wantErr && err == nil {
+				t.Errorf("Expected an error but got nil")
+			}
+		})
+	}
+}
+
 var statusFeatureNames = []string{
 	"Gateway",
 	"GatewayPort8080",
