@@ -199,7 +199,7 @@ In this section you will find specific links to blog posts, documentation and ot
 ### Airlock Microgateway
 [![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.3.0-Airlock%20Microgateway-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.3.0/airlock-microgateway)
 
-[Airlock Microgateway][airlock-microgateway] is a Kubernetes native WAAP (Web Application and API Protection, formerly known as WAF) solution optimized for Kubernetes environments and certified for RedHat OpenShift.
+[Airlock Microgateway][airlock-microgateway] is a Kubernetes native WAAP (Web Application and API Protection, formerly known as WAF) solution optimized for Kubernetes environments and certified for Red Hat OpenShift.
 Modern application security is embedded in the development workflow and follows DevSecOps paradigms.
 Airlock Microgateway protects your applications and microservices with the tried-and-tested Airlock security features against attacks, while also providing a high degree of scalability.
 
