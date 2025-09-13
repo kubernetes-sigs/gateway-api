@@ -1,7 +1,7 @@
 ---
 name: Enhancement Request
 about: Suggest an enhancement to the gateway-api project
-labels: kind/feature
+labels: kind/gep
 
 ---
 <!-- Please only use this template for submitting enhancement requests -->
