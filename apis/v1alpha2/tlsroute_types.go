@@ -35,7 +35,7 @@ import (
 type TLSRoute struct {
 	metav1.TypeMeta `json:",inline"`
 	// +optional
-	metav1.ObjectMeta `json:"metadata,omitempty"`
+	metav1.ObjectMeta `json:"metadata,omitzero"`
 
 	// Spec defines the desired state of TLSRoute.
 	// +required
@@ -43,7 +43,7 @@ type TLSRoute struct {
 
 	// Status defines the current state of TLSRoute.
 	// +optional
-	Status TLSRouteStatus `json:"status,omitempty"`
+	Status TLSRouteStatus `json:"status,omitzero"`
 }
 
 // TLSRouteSpec defines the desired state of a TLSRoute resource.
@@ -142,6 +142,7 @@ type TLSRouteRule struct {
 // TLSRouteList contains a list of TLSRoute
 type TLSRouteList struct {
 	metav1.TypeMeta `json:",inline"`
-	metav1.ListMeta `json:"metadata,omitempty"`
+	// +optional
+	metav1.ListMeta `json:"metadata,omitzero"`
 	Items           []TLSRoute `json:"items"`
 }

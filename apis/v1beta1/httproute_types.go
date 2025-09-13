@@ -40,7 +40,8 @@ type HTTPRoute v1.HTTPRoute
 // HTTPRouteList contains a list of HTTPRoute.
 type HTTPRouteList struct {
 	metav1.TypeMeta `json:",inline"`
-	metav1.ListMeta `json:"metadata,omitempty"`
+	//+optional
+	metav1.ListMeta `json:"metadata,omitzero"`
 	Items           []HTTPRoute `json:"items"`
 }
 
