@@ -20,15 +20,14 @@ package v1alpha1
 
 import (
 	v1 "sigs.k8s.io/gateway-api/applyconfiguration/apis/v1"
-	v1alpha2 "sigs.k8s.io/gateway-api/applyconfiguration/apis/v1alpha2"
 )
 
 // BackendTrafficPolicySpecApplyConfiguration represents a declarative configuration of the BackendTrafficPolicySpec type for use
 // with apply.
 type BackendTrafficPolicySpecApplyConfiguration struct {
-	TargetRefs         []v1alpha2.LocalPolicyTargetReferenceApplyConfiguration `json:"targetRefs,omitempty"`
-	RetryConstraint    *RetryConstraintApplyConfiguration                      `json:"retryConstraint,omitempty"`
-	SessionPersistence *v1.SessionPersistenceApplyConfiguration                `json:"sessionPersistence,omitempty"`
+	TargetRefs         []v1.LocalPolicyTargetReferenceApplyConfiguration `json:"targetRefs,omitempty"`
+	RetryConstraint    *RetryConstraintApplyConfiguration                `json:"retryConstraint,omitempty"`
+	SessionPersistence *v1.SessionPersistenceApplyConfiguration          `json:"sessionPersistence,omitempty"`
 }
 
 // BackendTrafficPolicySpecApplyConfiguration constructs a declarative configuration of the BackendTrafficPolicySpec type for use with
@@ -40,7 +39,7 @@ func BackendTrafficPolicySpec() *BackendTrafficPolicySpecApplyConfiguration {
 // WithTargetRefs adds the given value to the TargetRefs field in the declarative configuration
 // and returns the receiver, so that objects can be build by chaining "With" function invocations.
 // If called multiple times, values provided by each call will be appended to the TargetRefs field.
-func (b *BackendTrafficPolicySpecApplyConfiguration) WithTargetRefs(values ...*v1alpha2.LocalPolicyTargetReferenceApplyConfiguration) *BackendTrafficPolicySpecApplyConfiguration {
+func (b *BackendTrafficPolicySpecApplyConfiguration) WithTargetRefs(values ...*v1.LocalPolicyTargetReferenceApplyConfiguration) *BackendTrafficPolicySpecApplyConfiguration {
 	for i := range values {
 		if values[i] == nil {
 			panic("nil value passed to WithTargetRefs")

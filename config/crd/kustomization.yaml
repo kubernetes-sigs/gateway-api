@@ -4,3 +4,4 @@ resources:
 - standard/gateway.networking.k8s.io_grpcroutes.yaml
 - standard/gateway.networking.k8s.io_httproutes.yaml
 - standard/gateway.networking.k8s.io_referencegrants.yaml
+- standard/gateway.networking.k8s.io_backendtlspolicies.yaml

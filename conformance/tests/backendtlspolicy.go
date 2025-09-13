@@ -23,8 +23,6 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
-	"sigs.k8s.io/gateway-api/apis/v1alpha2"
-	"sigs.k8s.io/gateway-api/apis/v1alpha3"
 	h "sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
@@ -49,14 +47,14 @@ var BackendTLSPolicy = suite.ConformanceTest{
 		ns := "gateway-conformance-infra"
 
 		acceptedCond := metav1.Condition{
-			Type:   string(v1alpha2.PolicyConditionAccepted),
+			Type:   string(gatewayv1.PolicyConditionAccepted),
 			Status: metav1.ConditionTrue,
-			Reason: string(v1alpha2.PolicyReasonAccepted),
+			Reason: string(gatewayv1.PolicyReasonAccepted),
 		}
 		resolvedRefsCond := metav1.Condition{
-			Type:   string(v1alpha3.BackendTLSPolicyConditionResolvedRefs),
+			Type:   string(gatewayv1.BackendTLSPolicyConditionResolvedRefs),
 			Status: metav1.ConditionTrue,
-			Reason: string(v1alpha3.BackendTLSPolicyReasonResolvedRefs),
+			Reason: string(gatewayv1.BackendTLSPolicyReasonResolvedRefs),
 		}
 
 		t.Run("Re-encrypt HTTPS request sent to Service with valid BackendTLSPolicy should succeed", func(t *testing.T) {
@@ -138,7 +136,7 @@ var BackendTLSPolicy = suite.ConformanceTest{
 				})
 		})
 
-		// Verify that request sent to Service targeted by BackendTLSPolicy with mismatched cert should failed.
+		// Verify that request sent to Service targeted by BackendTLSPolicy with mismatched cert should fail.
 		t.Run("HTTP request send to Service targeted by BackendTLSPolicy with mismatched cert should return HTTP error", func(t *testing.T) {
 			invalidCertPolicyNN := types.NamespacedName{Name: "cert-mismatch", Namespace: ns}
 			kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, invalidCertPolicyNN, gwNN, acceptedCond)
