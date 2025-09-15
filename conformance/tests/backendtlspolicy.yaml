@@ -104,7 +104,7 @@ spec:
     port: 443
     targetPort: 8443
 ---
-apiVersion: gateway.networking.k8s.io/v1alpha3
+apiVersion: gateway.networking.k8s.io/v1
 kind: BackendTLSPolicy
 metadata:
   name: normative-test
@@ -124,7 +124,7 @@ spec:
       name: "tls-checks-ca-certificate"
     hostname: "abc.example.com"
 ---
-apiVersion: gateway.networking.k8s.io/v1alpha3
+apiVersion: gateway.networking.k8s.io/v1
 kind: BackendTLSPolicy
 metadata:
   name: host-mismatch
@@ -144,7 +144,7 @@ spec:
       name: "tls-checks-ca-certificate"
     hostname: "mismatch.example.com"
 ---
-apiVersion: gateway.networking.k8s.io/v1alpha3
+apiVersion: gateway.networking.k8s.io/v1
 kind: BackendTLSPolicy
 metadata:
   name: cert-mismatch

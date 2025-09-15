@@ -23,7 +23,6 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
-	"sigs.k8s.io/gateway-api/apis/v1alpha2"
 	h "sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
@@ -53,14 +52,14 @@ var BackendTLSPolicyConflictResolution = suite.ConformanceTest{
 		kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN)
 
 		acceptedCond := metav1.Condition{
-			Type:   string(v1alpha2.PolicyConditionAccepted),
+			Type:   string(gatewayv1.PolicyConditionAccepted),
 			Status: metav1.ConditionTrue,
-			Reason: string(v1alpha2.PolicyReasonAccepted),
+			Reason: string(gatewayv1.PolicyReasonAccepted),
 		}
 		conflictedCond := metav1.Condition{
-			Type:   string(v1alpha2.PolicyConditionAccepted),
+			Type:   string(gatewayv1.PolicyConditionAccepted),
 			Status: metav1.ConditionFalse,
-			Reason: string(v1alpha2.PolicyReasonConflicted),
+			Reason: string(gatewayv1.PolicyReasonConflicted),
 		}
 
 		t.Run("Conflicting BackendTLSPolicies targeting the same Service without a section name", func(t *testing.T) {
