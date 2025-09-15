@@ -154,7 +154,7 @@ spec:
     port: 443
     targetPort: 8443
 ---
-apiVersion: gateway.networking.k8s.io/v1alpha3
+apiVersion: gateway.networking.k8s.io/v1
 kind: BackendTLSPolicy
 metadata:
   name: san-dns
@@ -177,7 +177,7 @@ spec:
     - type: "Hostname"
       hostname: "abc.example.com"
 ---
-apiVersion: gateway.networking.k8s.io/v1alpha3
+apiVersion: gateway.networking.k8s.io/v1
 kind: BackendTLSPolicy
 metadata:
   name: san-dns-mismatch
@@ -200,7 +200,7 @@ spec:
     - type: "Hostname"
       hostname: "dce.example.com"
 ---
-apiVersion: gateway.networking.k8s.io/v1alpha3
+apiVersion: gateway.networking.k8s.io/v1
 kind: BackendTLSPolicy
 metadata:
   name: san-uri
@@ -223,7 +223,7 @@ spec:
     - type: "URI"
       uri: "spiffe://abc.example.com/test-identity"
 ---
-apiVersion: gateway.networking.k8s.io/v1alpha3
+apiVersion: gateway.networking.k8s.io/v1
 kind: BackendTLSPolicy
 metadata:
   name: san-uri-mismatch
@@ -246,7 +246,7 @@ spec:
     - type: "URI"
       uri: "spiffe://def.example.com/test-identity"
 ---
-apiVersion: gateway.networking.k8s.io/v1alpha3
+apiVersion: gateway.networking.k8s.io/v1
 kind: BackendTLSPolicy
 metadata:
   name: multiple-sans
@@ -271,7 +271,7 @@ spec:
     - type: "Hostname"
       hostname: "abc.example.com"
 ---
-apiVersion: gateway.networking.k8s.io/v1alpha3
+apiVersion: gateway.networking.k8s.io/v1
 kind: BackendTLSPolicy
 metadata:
   name: multiple-mismatch-sans

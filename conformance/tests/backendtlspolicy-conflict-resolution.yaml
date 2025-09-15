@@ -115,7 +115,7 @@ spec:
         name: "tls-checks-ca-certificate"
     hostname: "other.example.com"
 ---
-apiVersion: gateway.networking.k8s.io/v1alpha3
+apiVersion: gateway.networking.k8s.io/v1
 kind: BackendTLSPolicy
 metadata:
   name: conflicted-without-section-name-2
@@ -134,7 +134,7 @@ spec:
         name: "tls-checks-ca-certificate"
     hostname: "abc.example.com"
 ---
-apiVersion: gateway.networking.k8s.io/v1alpha3
+apiVersion: gateway.networking.k8s.io/v1
 kind: BackendTLSPolicy
 metadata:
   name: conflicted-with-section-name-1
@@ -154,7 +154,7 @@ spec:
         name: "tls-checks-ca-certificate"
     hostname: "other.example.com"
 ---
-apiVersion: gateway.networking.k8s.io/v1alpha3
+apiVersion: gateway.networking.k8s.io/v1
 kind: BackendTLSPolicy
 metadata:
   name: conflicted-with-section-name-2
@@ -174,7 +174,7 @@ spec:
         name: "tls-checks-ca-certificate"
     hostname: "abc.example.com"
 ---
-apiVersion: gateway.networking.k8s.io/v1alpha3
+apiVersion: gateway.networking.k8s.io/v1
 kind: BackendTLSPolicy
 metadata:
   name: not-conflicted-with-section-name
@@ -194,7 +194,7 @@ spec:
         name: "tls-checks-ca-certificate"
     hostname: "other.example.com"
 ---
-apiVersion: gateway.networking.k8s.io/v1alpha3
+apiVersion: gateway.networking.k8s.io/v1
 kind: BackendTLSPolicy
 metadata:
   name: not-conflicted-without-section-name

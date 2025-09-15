@@ -18,7 +18,6 @@ package v1alpha1
 
 import (
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
-	v1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
 )
 
 type (
@@ -34,8 +33,8 @@ type (
 	SectionName                = v1.SectionName
 	Namespace                  = v1.Namespace
 	Duration                   = v1.Duration
-	PolicyStatus               = v1alpha2.PolicyStatus
-	LocalPolicyTargetReference = v1alpha2.LocalPolicyTargetReference
+	PolicyStatus               = v1.PolicyStatus
+	LocalPolicyTargetReference = v1.LocalPolicyTargetReference
 	SessionPersistence         = v1.SessionPersistence
 )
 

@@ -33,11 +33,12 @@ import (
 )
 
 var standardKinds = map[string]bool{
-	"GatewayClass":   true,
-	"Gateway":        true,
-	"GRPCRoute":      true,
-	"HTTPRoute":      true,
-	"ReferenceGrant": true,
+	"GatewayClass":     true,
+	"Gateway":          true,
+	"GRPCRoute":        true,
+	"HTTPRoute":        true,
+	"ReferenceGrant":   true,
+	"BackendTLSPolicy": true,
 }
 
 // This generation code is largely copied from
