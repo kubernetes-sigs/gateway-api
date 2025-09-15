@@ -760,7 +760,7 @@ type FrontendTLSValidation struct {
 	//
 	// +required
 	// +listType=atomic
-	// +kubebuilder:validation:MaxItems=8
+	// +kubebuilder:validation:MaxItems=16
 	// +kubebuilder:validation:MinItems=1
 	CACertificateRefs []ObjectReference `json:"caCertificateRefs"`
 
