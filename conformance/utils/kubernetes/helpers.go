@@ -1017,6 +1017,10 @@ func ListenerSetListenersMustHaveConditions(t *testing.T, client client.Client, 
 			return false, fmt.Errorf("error fetching Gateway: %w", err)
 		}
 
+		if err := ConditionsHaveLatestObservedGeneration(&parent, parent.Status.Conditions); err != nil {
+			return false, err
+		}
+
 		for _, condition := range conditions {
 			for _, listener := range parent.Status.Listeners {
 				// Skip if the listener is not in listenerNames
