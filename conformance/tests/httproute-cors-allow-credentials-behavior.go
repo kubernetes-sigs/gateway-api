@@ -28,13 +28,13 @@ import (
 )
 
 func init() {
-	ConformanceTests = append(ConformanceTests, CORSAllowCredentialsBehavior)
+	ConformanceTests = append(ConformanceTests, HTTPRouteCORSAllowCredentialsBehavior)
 }
 
-var CORSAllowCredentialsBehavior = suite.ConformanceTest{
-	ShortName:   "CORSAllowCredentialsBehavior",
-	Description: "Validate ACA-Credentials responses",
-	Manifests:   []string{"tests/cors-allow-credentials-behavior.yaml"},
+var HTTPRouteCORSAllowCredentialsBehavior = suite.ConformanceTest{
+	ShortName:   "HTTPRouteCORSAllowCredentialsBehavior",
+	Description: "An HTTPRoute with CORS includes Access-Control-Allow-Credentials only when configured as 'true', and then only alongside a matching Access-Control-Allow-Origin.",
+	Manifests:   []string{"tests/httproute-cors-allow-credentials-behavior.yaml"},
 	Features: []features.FeatureName{
 		features.SupportGateway,
 		features.SupportHTTPRoute,
@@ -56,6 +56,22 @@ var CORSAllowCredentialsBehavior = suite.ConformanceTest{
 					Path:   "/cors-behavior-creds-false",
 					Headers: map[string]string{
 						"Origin":        origin,
+						"Cookie":        "sid=abc123",
+						"Authorization": "Bearer test",
+					},
+				},
+				Response: http.Response{
+					StatusCode:    200,
+					AbsentHeaders: []string{"Access-Control-Allow-Credentials"},
+				},
+				Namespace: ns,
+			},
+			{
+				Request: http.Request{
+					Method: "GET",
+					Path:   "/cors-behavior-creds-true",
+					Headers: map[string]string{
+						"Origin":        "http://not-app.example",
 						"Cookie":        "sid=abc123",
 						"Authorization": "Bearer test",
 					},
