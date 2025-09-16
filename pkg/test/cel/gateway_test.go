@@ -584,6 +584,54 @@ func TestValidateGateway(t *testing.T) {
 			},
 			wantErrors: []string{"IPAddress values must be unique", "Hostname values must be unique"},
 		},
+		{
+			desc: "optional ip address or hostname values",
+			mutate: func(gw *gatewayv1.Gateway) {
+				gw.Spec.Addresses = []gatewayv1.GatewaySpecAddress{
+					{
+						Type: ptrTo(gatewayv1.IPAddressType),
+					},
+					{
+						Type: ptrTo(gatewayv1.HostnameAddressType),
+					},
+				}
+			},
+		},
+		{
+			desc: "multiple optional ip address or hostname values alongside defined values",
+			mutate: func(gw *gatewayv1.Gateway) {
+				gw.Spec.Addresses = []gatewayv1.GatewaySpecAddress{
+					{
+						Type: ptrTo(gatewayv1.HostnameAddressType),
+					},
+					{
+						Type: ptrTo(gatewayv1.IPAddressType),
+					},
+					{
+						Type:  ptrTo(gatewayv1.IPAddressType),
+						Value: "1.2.3.4",
+					},
+					{
+						Type:  ptrTo(gatewayv1.HostnameAddressType),
+						Value: "foo.bar",
+					},
+					{
+						Type: ptrTo(gatewayv1.IPAddressType),
+					},
+					{
+						Type: ptrTo(gatewayv1.HostnameAddressType),
+					},
+					{
+						Type:  ptrTo(gatewayv1.IPAddressType),
+						Value: "2.3.4.5",
+					},
+					{
+						Type:  ptrTo(gatewayv1.HostnameAddressType),
+						Value: "bar.bar",
+					},
+				}
+			},
+		},
 	}
 
 	for _, tc := range testCases {
