@@ -1,6 +1,6 @@
-#!/bin/sh
+#!/bin/bash
 
-# Copyright 2019 The Kubernetes Authors.
+# Copyright 2025 The Kubernetes Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,13 +15,14 @@
 # limitations under the License.
 
 set -o errexit
+set -o nounset
+set -o pipefail
 
-CMD=$1
+SCRIPT_ROOT=$(dirname "${BASH_SOURCE}")/..
 
-if [ "$CMD" = "build" ];
-then
-  mkdocs build
-  exit 0;
-fi
+GEPS_TOC_SKIP="${GEPS_TOC_SKIP:-696}"
+NAV_CONF="${NAV_CONF:-${SCRIPT_ROOT}/nav.yml}"
+NAV_TEMPLATE="${NAV_TEMPLATE:-${NAV_CONF}.tmpl}"
+GEPS_TOC_DIR=${GEPS_TOC_DIR:-${SCRIPT_ROOT}/geps}
 
-mkdocs serve --dev-addr=0.0.0.0:3000 --livereload
+go run cmd/gepstoc/main.go -g "${GEPS_TOC_DIR}/" -t "${NAV_TEMPLATE}" -s "${GEPS_TOC_SKIP}" > "${NAV_CONF}"

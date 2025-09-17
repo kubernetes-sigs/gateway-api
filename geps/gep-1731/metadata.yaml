@@ -11,12 +11,12 @@ relationships:
   # obsoletes indicates that a GEP makes the linked GEP obsolete, and completely
   # replaces that GEP. The obsoleted GEP MUST have its obsoletedBy field
   # set back to this GEP, and MUST be moved to Declined.
-  obsoletes: {}
-  obsoletedBy: {}
+  obsoletes: []
+  obsoletedBy: []
   # extends indicates that a GEP extends the linked GEP, adding more detail
   # or additional implementation. The extended GEP MUST have its extendedBy
   # field set back to this GEP.
-  extends: {}
+  extends: []
   extendedBy:
     - number: 3388
       name: Retry Budgets
@@ -44,4 +44,4 @@ featureNames:
   - SupportHTTPRouteRetryConnectionError
 # changelog is a list of hyperlinks to PRs that make changes to the GEP, in
 # ascending date order.
-changelog: {}
+changelog: []
