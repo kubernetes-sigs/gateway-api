@@ -72,7 +72,6 @@ nav:
       - geps/gep-1731/index.md
       - geps/gep-1748/index.md
       - geps/gep-1767/index.md
-      - geps/gep-1897/index.md
       - geps/gep-2162/index.md
       - geps/gep-3155/index.md
     - Standard:
@@ -93,6 +92,7 @@ nav:
       - geps/gep-1742/index.md
       - geps/gep-1762/index.md
       - geps/gep-1867/index.md
+      - geps/gep-1897/index.md
       - geps/gep-1911/index.md
       - geps/gep-2257/index.md
       - geps/gep-3171/index.md

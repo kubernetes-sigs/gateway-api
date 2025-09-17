@@ -2,12 +2,14 @@ apiVersion: internal.gateway.networking.k8s.io/v1alpha1
 kind: GEPDetails
 number: 1897
 name: BackendTLSPolicy - Explicit Backend TLS Connection Configuration
-status: Experimental
+status: Standard
 authors:
   - candita
   - brianehlert
   - robscott
   - youngnick
+  - howardjohn
+  - snorwin
 relationships:
   obsoletes:
     - number: 1282
