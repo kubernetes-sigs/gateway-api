@@ -4,6 +4,7 @@ ignore: |
   .github/
   .golangci.yml
   mkdocs.yml
+  nav.yml
   cloudbuild.yaml
   config/crd
 
