@@ -27,12 +27,12 @@
 the content into the GEP as online documents are easier to lose
 -- e.g. owner messes up the permissions, accidental deletion)
 
-Write here "What" we want to do. What is the idea of the proposal
+Write here "What" we want to do. What is the proposal aiming to do?
 
 ## Purpose (Why and Who)
 
 Write here "Why" we want to do it. What problems are being solved? What personas are
-the target of this proposal, and why this proposal will make their lifes better.
+the target of this proposal, and why will this proposal will make their lives better?
 
 ## API
 (... details, can point to PR with changes)
@@ -82,8 +82,10 @@ In any case, the conformance tests file names should be meaningful and easy to u
 
 (Make sure to also include conformance tests that cover mesh)
 
-It is desired that, when describing the new feature, some conformance tests are added as a "What/Why"
-to guarantee that future implementors understand what "Conformance means" and what will be tested.
+When describing the new feature, write down some conformance test scenarios the feature should manage,
+to guarantee that future implementors understand what "Conformance" means and what will be tested.
+
+At least _some_ tests should be added at each phase, starting with Provisional.
 
 ## Alternatives
 
