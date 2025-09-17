@@ -534,6 +534,7 @@ var meshStatusFeatureNames = []string{
 	"MeshTLSClientCert",
 	"MeshTrafficSplit",
 	"MeshAccessControl",
+	"HTTPRoute",
 }
 
 func TestXMeshInferSupportedFeatures(t *testing.T) {
@@ -548,26 +549,26 @@ func TestXMeshInferSupportedFeatures(t *testing.T) {
 	}{
 		{
 			name:             "properly infer mesh supported features",
-			expectedFeatures: namesToFeatureSet(gwcStatusFeatureNames),
+			expectedFeatures: namesToFeatureSet(meshStatusFeatureNames),
 			expectedSource:   supportedFeaturesSourceInferred,
 		},
 		{
 			name:              "no features",
-			supportedFeatures: sets.New[features.FeatureName]("Gateway"),
-			expectedFeatures:  sets.New[features.FeatureName]("Gateway"),
+			supportedFeatures: sets.New[features.FeatureName]("Mesh"),
+			expectedFeatures:  sets.New[features.FeatureName]("Mesh"),
 			expectedSource:    supportedFeaturesSourceManual,
 		},
 		{
 			name:              "remove exempt features",
-			supportedFeatures: sets.New[features.FeatureName]("Gateway", "HTTPRoute"),
-			exemptFeatures:    sets.New[features.FeatureName]("HTTPRoute"),
-			expectedFeatures:  sets.New[features.FeatureName]("Gateway"),
+			supportedFeatures: sets.New[features.FeatureName]("MeshTLS", "MeshAccessControl"),
+			exemptFeatures:    sets.New[features.FeatureName]("MeshAccessControl"),
+			expectedFeatures:  sets.New[features.FeatureName]("MeshTLS"),
 			expectedSource:    supportedFeaturesSourceManual,
 		},
 		{
 			name:               "supports conformance profile - core",
-			ConformanceProfile: sets.New(GatewayHTTPConformanceProfileName),
-			expectedFeatures:   namesToFeatureSet(gwcStatusFeatureNames),
+			ConformanceProfile: sets.New(MeshHTTPConformanceProfileName),
+			expectedFeatures:   namesToFeatureSet(meshStatusFeatureNames),
 			expectedSource:     supportedFeaturesSourceInferred,
 		},
 	}
@@ -600,13 +601,13 @@ func TestXMeshInferSupportedFeatures(t *testing.T) {
 		WithLists(&apiextensionsv1.CustomResourceDefinitionList{}).
 		Build()
 
-	gatewayv1.Install(fakeClient.Scheme())
+	xmeshv1alpha1.Install(fakeClient.Scheme())
 	apiextensionsv1.AddToScheme(fakeClient.Scheme())
 
 	for _, tc := range testCases {
 		options := ConformanceOptions{
 			AllowCRDsMismatch:          true,
-			GatewayClassName:           meshName,
+			MeshName:                   meshName,
 			EnableAllSupportedFeatures: tc.allowAllFeatures,
 			SupportedFeatures:          tc.supportedFeatures,
 			ExemptFeatures:             tc.exemptFeatures,
