@@ -37,9 +37,5 @@ spec:
       name: "observed-generation-bump-test"
       sectionName: "https"
   validation:
-    caCertificateRefs:
-      - group: ""
-        kind: ConfigMap
-        # This ConfigMap is generated dynamically by the test suite.
-        name: "backend-tls-checks-certificate"
+    wellKnownCACertificates: System
     hostname: "abc.example.com"
