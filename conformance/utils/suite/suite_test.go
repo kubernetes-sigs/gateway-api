@@ -631,6 +631,7 @@ func TestXMeshInferSupportedFeatures(t *testing.T) {
 		})
 	}
 }
+
 func TestGWCPublishedMeshFeatures(t *testing.T) {
 	gwcName := "ochopintre"
 	gwc := &gatewayv1.GatewayClass{
