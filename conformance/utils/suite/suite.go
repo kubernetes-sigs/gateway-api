@@ -216,16 +216,16 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 			}
 		}
 
-		xmeshFeatures := FeaturesSet{}
+		supportedMeshFeatures := FeaturesSet{}
 		if options.MeshName != "" {
-			xmeshFeatures, err = fetchMeshSupportedFeatures(options.Client, options.MeshName)
+			supportedMeshFeatures, err = fetchMeshSupportedFeatures(options.Client, options.MeshName)
 			if err != nil {
 				return nil, fmt.Errorf("cannot infer supported features from XMesh: %w", err)
 			}
 		}
 
 		source = supportedFeaturesSourceInferred
-		supportedFeatures = supportedFeatures.Union(xmeshFeatures)
+		supportedFeatures = supportedFeatures.Union(supportedMeshFeatures)
 	}
 
 	// If features were not inferred from Status, it's a GWC issue.
