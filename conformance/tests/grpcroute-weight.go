@@ -38,7 +38,7 @@ func init() {
 
 var GRPCRouteWeight = suite.ConformanceTest{
 	ShortName:   "GRPCRouteWeight",
-	Description: "An GRPCRoute with weighted backends",
+	Description: "A GRPCRoute with weighted backends",
 	Manifests:   []string{"tests/grpcroute-weight.yaml"},
 	Features: []features.FeatureName{
 		features.SupportGateway,
