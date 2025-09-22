@@ -125,10 +125,18 @@ this are based on the Kubernetes process:
 * Extensions can be granted on a per-GEP basis
   * The owners of the GEP have to ask and provide a timeline (measured in
     days) as to when they believe the GEP will be ready for merge.
-* The request and approval for a GEP extension needs to be in public.
+* The request and approval for a GEP extension must be on the original GEP issue.
+* An extension can only be granted for a time period up to the distance from
+  the deadline when the extension is requested. So, an extension of a week
+  must be asked for at least a week out from a deadline, while an extension of
+  day must be asked for at least a day out from the deadline. Extension requests
+  not meeting this timing criteria will be denied.  
 * Extensions can only be granted with a majority agreement by maintainers
-  / release-managers
+  / release-managers.
 
-For our purposes we use GitHub discussions as the public place for
-requesting/approving extensions. Contributors should use an existing
-discussion for the release when feasible, otherwise create a discussion.
+For our purposes we use GitHub issues, specifically the related GEP issue,
+as the public place for requesting/approving extensions.
+
+This extension policy also affects reviews.
+If feedback is submitted sufficiently late that it is impossible to address within these guidelines,
+the feedback (not necessarily the GEP) may be deferred to a future release.
