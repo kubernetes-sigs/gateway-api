@@ -303,12 +303,12 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 		// the use of a conformance profile implicitly enables any features of
 		// that profile which are supported at a Core level of support.
 		for _, f := range conformanceProfile.CoreFeatures.UnsortedList() {
-			if !options.SupportedFeatures.Has(f) {
+			if !suite.SupportedFeatures.Has(f) {
 				suite.SupportedFeatures.Insert(f)
 			}
 		}
 		for _, f := range conformanceProfile.ExtendedFeatures.UnsortedList() {
-			if options.SupportedFeatures.Has(f) {
+			if suite.SupportedFeatures.Has(f) {
 				if suite.extendedSupportedFeatures[conformanceProfileName] == nil {
 					suite.extendedSupportedFeatures[conformanceProfileName] = FeaturesSet{}
 				}
