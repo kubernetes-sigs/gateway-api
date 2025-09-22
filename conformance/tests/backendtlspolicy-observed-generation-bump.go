@@ -39,7 +39,7 @@ func init() {
 
 var BackendTLSPolicyObservedGenerationBump = suite.ConformanceTest{
 	ShortName:   "BackendTLSPolicyObservedGenerationBump",
-	Description: "A BackendTLSPolicy in the gateway-conformance-infra namespace should update the observedGeneration in all of it's Status.Conditions after an update to the spec",
+	Description: "A BackendTLSPolicy in the gateway-conformance-infra namespace should update the observedGeneration in all of its Status.Conditions after an update to the spec",
 	Features: []features.FeatureName{
 		features.SupportGateway,
 		features.SupportHTTPRoute,
