@@ -13,7 +13,7 @@ only when, they appear in all capitals, as shown here.
 [RFC8174]: https://www.rfc-editor.org/rfc/rfc8174
 
 ## What
-Enhance the existing Client Certificate Validation defined in [GEP-91](../gep-91/index.md) by introducing support for certificate pinning. This allows specifying one or more certificate or public key hashes (SPKI) that are considered valid for client connections. During TLS client authentication, the Gateway will validate not only against the configured CAs, but also against the pinned certificates or keys. This provides a mechanism to restrict allowed clients to a narrowly defined set of certificates, even if the CA trust domain is broad.
+Enhance the existing Client Certificate Validation defined in [GEP-91](../gep-91/index.md) by introducing support for certificate pinning. This allows specifying one or more certificate or public key hashes (SPKI) that are considered valid for client connections. During TLS client authentication, the Gateway can validate client certificates either against the configured CAs or against the pinned certificates. This provides a mechanism to restrict allowed clients to a narrowly defined set of certificates, in cases where the CA trust domain is too broad.
 
 ## Why
 While [GEP-91](../gep-91/index.md) enables client certificate validation against a CA, in practice many operators rely on large organizational CAs or even on public CAs. These often cover many certificates and, as a result, unintentionally expand the trust boundary. This limitation becomes particularly significant when client certificates are used not only for encryption but also for authentication. In these cases, operators may want to restrict access to an explicit set of identities, rather than the entire population served by a CA.  
