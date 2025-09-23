@@ -185,6 +185,14 @@ live-docs:
 	docker build -t gw/mkdocs hack/mkdocs/image
 	docker run --rm -it -p 3000:3000 -v ${PWD}:/docs gw/mkdocs
 
+.PHONY: verify-mkdocs-nav
+verify-mkdocs-nav:
+	hack/verify-mkdocs-nav.sh
+
+.PHONY: update-mkdocs-nav
+update-mkdocs-nav:
+	hack/update-mkdocs-nav.sh
+
 .PHONY: api-ref-docs
 api-ref-docs:
 	crd-ref-docs \

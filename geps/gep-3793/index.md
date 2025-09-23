@@ -275,40 +275,56 @@ GEP covers **all** intended changes to Gateway API behavior.
 Since Ana must be able to choose whether a Route is defaulted or not, marking
 a Route as defaulted must be an active configuration step she takes, rather
 than any kind of implicit behavior. To that end, the `CommonRouteSpec`
-resource will gain a new field, `useDefaultGateway`, which defines the
+resource will gain a new field, `UseDefaultGateway`, which defines the
 _scope_ for the defaulted Route:
 
 ```go
 // GatewayDefaultScope defines the set of default scopes that a Gateway
-// can claim. At present the only supported scope is "All".
+// can claim, for use in any Route type. At present the only supported
+// scopes are "All" and "None". "None" is a special scope which
+// explicitly means that the Route MUST NOT be defaulted.
 type GatewayDefaultScope string
 
 const (
   // GatewayDefaultScopeAll indicates that a Gateway can claim absolutely
   // any Route asking for a default Gateway.
   GatewayDefaultScopeAll GatewayDefaultScope = "All"
+
+  // GatewayDefaultScopeNone indicates that a Gateway MUST NOT claim
+  // any Route asking for a default Gateway.
+  GatewayDefaultScopeNone GatewayDefaultScope = "None"
 )
 
 type CommonRouteSpec struct {
-    // ... other fields ...
-    useDefaultGateway GatewayDefaultScope `json:"useDefaultGateway,omitempty"`
+  // ... other fields ...
+  // UseDefaultGateways indicates the default Gateway scope to use for this
+  // Route. If unset (the default), set to an empty string (`""`), or set to
+  // None, the Route will not be attached to any default Gateway; if set, it
+  // will be attached to any default Gateway supporting the named scope,
+  // subject to the usual rules about which Routes a Gateway is allowed to
+  // claim.
+  //
+  // +optional
+  // <gateway:experimental>
+  // +kubebuilder:validation:Enum=All;None
+  UseDefaultGateways GatewayDefaultScope `json:"useDefaultGateways,omitempty"`
 }
 ```
 
 For Ana to indicate that a Route should use a default Gateway, she MUST set
-the Route's `spec.useDefaultGateway` to the desired scope:
+the Route's `spec.useDefaultGateways` to the desired scope:
 
 ```yaml
 ...
 spec:
-  useDefaultGateway: All
+  useDefaultGateways: All
 ```
 
 A defaulted Route MUST be accepted only by Gateways that have been configured
-with a matching `spec.useDefaultGateway` scope.
+with a matching `spec.useDefaultGateways` scope.
 
 A Route MAY include explicit `parentRefs` in addition to setting
-`spec.useDefaultGateway`. In this case, the Route will be a candidate for
+`spec.useDefaultGateways`. In this case, the Route will be a candidate for
 being bound to default Gateways, but it will also be bound to its
 explicitly-specified `parentRefs`. This allows Ana to create a single Route
 that handles N/S traffic via the default Gateways and also handles E/W traffic
@@ -328,7 +344,7 @@ kind: HTTPRoute
 metadata:
   name: my-route
 spec:
-  useDefaultGateway: All
+  useDefaultGateways: All
   rules:
   - backendRefs:
     - name: my-service
@@ -346,7 +362,7 @@ kind: HTTPRoute
 metadata:
   name: ns-ew-route
 spec:
-  useDefaultGateway: All
+  useDefaultGateways: All
   parentRefs:
   - kind: Service
     name: face
@@ -357,7 +373,7 @@ spec:
       port: 80
 ```
 
-**Multiple Gateways**: A defaulted Route MAY both set `useDefaultGateway` and
+**Multiple Gateways**: A defaulted Route MAY both set `useDefaultGateways` and
 name other Gateways in `parentRefs`, although this is not expected to be
 common in practice:
 
@@ -367,7 +383,7 @@ kind: HTTPRoute
 metadata:
   name: multi-gateway-route
 spec:
-  useDefaultGateway: All
+  useDefaultGateways: All
   parentRefs:
   - kind: Gateway
     name: my-gateway
@@ -403,10 +419,10 @@ indicate that the Route has been claimed by a default Gateway. This becomes
 important if the set of default Gateways changes, or (in some situations) if
 GitOps tools are in play.
 
-If there are no default Gateways in the cluster, `spec.useDefaultGateway` MUST
-be treated as if it were set to `false` in all Routes, parallel to the
-situation where a Route specifies a Gateway by name, but no Gateway of that
-name exists in the cluster.
+If there are no default Gateways in the cluster, `spec.useDefaultGateways`
+MUST be treated as if it were unset in all Routes, parallel to the situation
+where a Route specifies a Gateway by name, but no Gateway of that name exists
+in the cluster.
 
 #### 2. Controlling which Gateways accept Defaulted Routes
 
@@ -418,18 +434,31 @@ behavior. To that end, the Gateway resource will gain a new field,
 
 ```go
 type GatewaySpec struct {
-    // ... other fields ...
-    DefaultScope GatewayDefaultScope `json:"defaultScope,omitempty"`
+  // ... other fields ...
+  // DefaultScope, when set, configures the Gateway as a default Gateway,
+  // meaning it will dynamically and implicitly have Routes (e.g. HTTPRoute)
+  // attached to it, according to the scope configured here.
+  //
+  // If unset (the default), set to an empty string (`""`), or set to None,
+  // the Gateway will not act as a default Gateway; if set, the Gateway will
+  // claim any Route with a matching scope set in its UseDefaultGateway
+  // field, subject to the usual rules about which routes the Gateway can
+  // attach to.
+	//
+	// +optional
+	// <gateway:experimental>
+  DefaultScope GatewayDefaultScope `json:"defaultScope,omitempty"`
 }
 ```
 
-Again, the only currently-defined scope is `All`.
+Again, the only currently-defined scopes are `All` and `None`, with `None`
+explicitly disabling default-Gateway functionality.
 
 If `spec.defaultScope` is set, the Gateway MUST claim Routes that have set
-`spec.useDefaultGateway` to a matching value (subject to the usual Gateway API
-rules about which Routes may be bound to a Gateway), and it MUST update its
-own `status` with a `condition` of type `DefaultGateway` and `status` true to
-indicate that it is a default Gateway and what its scope is, for example:
+`spec.useDefaultGateways` to a matching value (subject to the usual Gateway
+API rules about which Routes may be bound to a Gateway), and it MUST update
+its own `status` with a `condition` of type `DefaultGateway` and `status` true
+to indicate that it is a default Gateway and what its scope is, for example:
 
 ```yaml
 status:
@@ -455,7 +484,8 @@ from its own namespace.
 ##### Behavior with No Default Gateway
 
 If no Gateway has `spec.defaultScope` set, then all Gateways MUST ignore
-`spec.useDefaultGateway` in all Routes. A Route will be bound to only those Gateways that it specifically names in `parentRefs` entries.
+`spec.useDefaultGateways` in all Routes. A Route will be bound to only those
+Gateways that it specifically names in `parentRefs` entries.
 
 ##### Deleting a Default Gateway
 
@@ -479,7 +509,7 @@ options here.
 
 1. Don't bother with any enforcement logic.
 
-    In this case, a Route that sets `spec.useDefaultGateway` would be bound to
+    In this case, a Route that sets `spec.useDefaultGateways` would be bound to
     _all_ Gateways that have `spec.defaultScope` set a matching scope. Since
     Gateway API already allows a Route to be bound to multiple Gateways, and
     the Route `status` is already designed for it, this should function
@@ -495,7 +525,7 @@ options here.
     In this case, every Gateway with `spec.defaultScope` set would ignore it,
     with the final effect being the same as if no Gateway had
     `spec.defaultScope` set: all Gateways would ignore
-    `spec.useDefaultGateway` in all Routes, and each Gateway would only accept
+    `spec.useDefaultGateways` in all Routes, and each Gateway would only accept
     Routes that explicitly named it in `parentRefs`.
 
     Each Gateway with `spec.defaultScope` set would also update its `status`
@@ -515,9 +545,9 @@ options here.
 
     In this case, the oldest Gateway with `spec.defaultScope` set would be
     considered the only default Gateway. That oldest Gateway would be the only
-    one that honors `spec.useDefaultGateway` in Routes, and all other Gateways
-    with `spec.defaultScope` set would ignore `spec.useDefaultGateway` in
-    every Route.
+    one that honors `spec.useDefaultGateways` in Routes, and all other
+    Gateways with `spec.defaultScope` set would ignore
+    `spec.useDefaultGateways` in every Route.
 
     The oldest default Gateway would update its `status` to reflect that it
     the default Gateway; all other Gateways with `spec.defaultScope` set to
@@ -584,7 +614,7 @@ merged with other Gateways.
 #### 4. Enumerating Routes Bound to Default Gateways
 
 To enumerate Routes bound to the default Gateways, any of Ana, Chihiro, or Ian
-can look for Routes that set `spec.useDefaultGateway` to `true`, and then
+can look for Routes that set `spec.useDefaultGateways` to `true`, and then
 check the `status.parents` of those Routes to see if the Route has been
 claimed. Since this will also show _which_ Gateways have claimed a given
 defaulted Route, it neatly solves the problem of allowing Ana to determine
@@ -605,7 +635,7 @@ Mesh traffic is defined by using a Service as a `parentRef` rather than a
 Gateway. As such, there is no case where a default Gateway would be used for
 mesh traffic.
 
-As noted above, a Route MAY both set `spec.useDefaultGateway` _and_ include a
+As noted above, a Route MAY both set `spec.useDefaultGateways` _and_ include a
 `Service` `parentRef` entry, allowing a single Route to handle both N/S and
 E/W traffic. In this case, the Route will be bound to both the default Gateway
 and the mesh, and the `status` will show both parents.

@@ -179,14 +179,14 @@ type ListenerEntry struct {
 	// the Protocol field is "HTTPS" or "TLS". It is invalid to set this field
 	// if the Protocol field is "HTTP", "TCP", or "UDP".
 	//
-	// The association of SNIs to Certificate defined in GatewayTLSConfig is
+	// The association of SNIs to Certificate defined in ListenerTLSConfig is
 	// defined based on the Hostname field for this listener.
 	//
 	// The GatewayClass MUST use the longest matching SNI out of all
 	// available certificates for any TLS handshake.
 	//
 	// +optional
-	TLS *GatewayTLSConfig `json:"tls,omitempty"`
+	TLS *ListenerTLSConfig `json:"tls,omitempty"`
 
 	// AllowedRoutes defines the types of routes that MAY be attached to a
 	// Listener and the trusted namespaces where those Route resources MAY be

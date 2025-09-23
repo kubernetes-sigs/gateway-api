@@ -36,6 +36,8 @@ import (
 	clientset "k8s.io/client-go/kubernetes"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
+	"sigs.k8s.io/controller-runtime/pkg/log"
+	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	"sigs.k8s.io/yaml"
 )
 
@@ -43,6 +45,9 @@ import (
 // ConformanceOptions struct. It will also initialize the various clients
 // required by the tests.
 func DefaultOptions(t *testing.T) suite.ConformanceOptions {
+	// This line prevents controller-runtime from complaining about log.SetLogger never being called
+	log.SetLogger(zap.New(zap.WriteTo(os.Stdout), zap.UseDevMode(true)))
+
 	cfg, err := config.GetConfig()
 	require.NoError(t, err, "error loading Kubernetes config")
 	clientOptions := client.Options{}
@@ -88,6 +93,7 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 		ExemptFeatures:             exemptFeatures,
 		ManifestFS:                 []fs.FS{&Manifests},
 		GatewayClassName:           *flags.GatewayClassName,
+		MeshName:                   *flags.MeshName,
 		Implementation:             implementation,
 		Mode:                       *flags.Mode,
 		NamespaceAnnotations:       namespaceAnnotations,

@@ -27,6 +27,7 @@ import (
 	"io"
 	"math/big"
 	"net"
+	"net/url"
 	"strings"
 	"testing"
 	"time"
@@ -119,6 +120,8 @@ func generateRSACert(hosts []string, keyOut, certOut io.Writer, ca *x509.Certifi
 			template.IPAddresses = append(template.IPAddresses, ip)
 		} else if err = validateHost(h); err == nil {
 			template.DNSNames = append(template.DNSNames, h)
+		} else if u, parseErr := url.Parse(h); parseErr == nil {
+			template.URIs = append(template.URIs, u)
 		}
 	}
 
@@ -148,12 +151,10 @@ func generateRSACert(hosts []string, keyOut, certOut io.Writer, ca *x509.Certifi
 
 // MustCreateCACertConfigMap will create a ConfigMap containing a CA Certificate, given a TLS Secret
 // for that CA certificate.  Also returns the CA certificate.
-func MustCreateCACertConfigMap(t *testing.T, namespace, configMapName string, hosts []string) (*corev1.ConfigMap, *x509.Certificate, *rsa.PrivateKey) {
-	require.NotEmpty(t, hosts, "require a non-empty hosts for Subject Alternate Name values")
-
+func MustCreateCACertConfigMap(t *testing.T, namespace, configMapName string) (*corev1.ConfigMap, *x509.Certificate, *rsa.PrivateKey) {
 	var certData, keyData bytes.Buffer
 
-	ca, caBytes, caPrivKey, err := generateCACert(hosts)
+	ca, caBytes, caPrivKey, err := generateCACert()
 	if err != nil {
 		t.Errorf("failed to generate CA certificate and key: %v", err)
 		return nil, nil, nil
@@ -184,8 +185,8 @@ func MustCreateCACertConfigMap(t *testing.T, namespace, configMapName string, ho
 	return caConfigMap, ca, caPrivKey
 }
 
-// generateCACert generates a CA and a CA-signed certificate valid for a year.
-func generateCACert(hosts []string) (*x509.Certificate, []byte, *rsa.PrivateKey, error) {
+// generateCACert generates a CA certificate valid for a year.
+func generateCACert() (*x509.Certificate, []byte, *rsa.PrivateKey, error) {
 	var caBytes []byte
 
 	// Create the CA certificate template.
@@ -207,15 +208,6 @@ func generateCACert(hosts []string) (*x509.Certificate, []byte, *rsa.PrivateKey,
 		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth},
 		KeyUsage:              x509.KeyUsageDigitalSignature | x509.KeyUsageCertSign,
 		BasicConstraintsValid: true,
-	}
-
-	// Ensure only valid hosts make it into the CA cert.
-	for _, h := range hosts {
-		if ip := net.ParseIP(h); ip != nil {
-			ca.IPAddresses = append(ca.IPAddresses, ip)
-		} else if err := validateHost(h); err == nil {
-			ca.DNSNames = append(ca.DNSNames, h)
-		}
 	}
 
 	// Generate the private key to sign certificates.

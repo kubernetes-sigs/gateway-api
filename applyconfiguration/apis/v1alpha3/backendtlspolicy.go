@@ -24,7 +24,7 @@ import (
 	managedfields "k8s.io/apimachinery/pkg/util/managedfields"
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 	apisv1alpha3 "sigs.k8s.io/gateway-api/apis/v1alpha3"
-	v1alpha2 "sigs.k8s.io/gateway-api/applyconfiguration/apis/v1alpha2"
+	apisv1 "sigs.k8s.io/gateway-api/applyconfiguration/apis/v1"
 	internal "sigs.k8s.io/gateway-api/applyconfiguration/internal"
 )
 
@@ -33,8 +33,8 @@ import (
 type BackendTLSPolicyApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
-	Spec                             *BackendTLSPolicySpecApplyConfiguration  `json:"spec,omitempty"`
-	Status                           *v1alpha2.PolicyStatusApplyConfiguration `json:"status,omitempty"`
+	Spec                             *apisv1.BackendTLSPolicySpecApplyConfiguration `json:"spec,omitempty"`
+	Status                           *apisv1.PolicyStatusApplyConfiguration         `json:"status,omitempty"`
 }
 
 // BackendTLSPolicy constructs a declarative configuration of the BackendTLSPolicy type for use with
@@ -83,6 +83,7 @@ func extractBackendTLSPolicy(backendTLSPolicy *apisv1alpha3.BackendTLSPolicy, fi
 	b.WithAPIVersion("gateway.networking.k8s.io/v1alpha3")
 	return b, nil
 }
+func (b BackendTLSPolicyApplyConfiguration) IsApplyConfiguration() {}
 
 // WithKind sets the Kind field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
@@ -245,7 +246,7 @@ func (b *BackendTLSPolicyApplyConfiguration) ensureObjectMetaApplyConfigurationE
 // WithSpec sets the Spec field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Spec field is set to the value of the last call.
-func (b *BackendTLSPolicyApplyConfiguration) WithSpec(value *BackendTLSPolicySpecApplyConfiguration) *BackendTLSPolicyApplyConfiguration {
+func (b *BackendTLSPolicyApplyConfiguration) WithSpec(value *apisv1.BackendTLSPolicySpecApplyConfiguration) *BackendTLSPolicyApplyConfiguration {
 	b.Spec = value
 	return b
 }
@@ -253,13 +254,29 @@ func (b *BackendTLSPolicyApplyConfiguration) WithSpec(value *BackendTLSPolicySpe
 // WithStatus sets the Status field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Status field is set to the value of the last call.
-func (b *BackendTLSPolicyApplyConfiguration) WithStatus(value *v1alpha2.PolicyStatusApplyConfiguration) *BackendTLSPolicyApplyConfiguration {
+func (b *BackendTLSPolicyApplyConfiguration) WithStatus(value *apisv1.PolicyStatusApplyConfiguration) *BackendTLSPolicyApplyConfiguration {
 	b.Status = value
 	return b
+}
+
+// GetKind retrieves the value of the Kind field in the declarative configuration.
+func (b *BackendTLSPolicyApplyConfiguration) GetKind() *string {
+	return b.TypeMetaApplyConfiguration.Kind
+}
+
+// GetAPIVersion retrieves the value of the APIVersion field in the declarative configuration.
+func (b *BackendTLSPolicyApplyConfiguration) GetAPIVersion() *string {
+	return b.TypeMetaApplyConfiguration.APIVersion
 }
 
 // GetName retrieves the value of the Name field in the declarative configuration.
 func (b *BackendTLSPolicyApplyConfiguration) GetName() *string {
 	b.ensureObjectMetaApplyConfigurationExists()
 	return b.ObjectMetaApplyConfiguration.Name
+}
+
+// GetNamespace retrieves the value of the Namespace field in the declarative configuration.
+func (b *BackendTLSPolicyApplyConfiguration) GetNamespace() *string {
+	b.ensureObjectMetaApplyConfigurationExists()
+	return b.ObjectMetaApplyConfiguration.Namespace
 }

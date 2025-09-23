@@ -60,7 +60,7 @@ func TestValidateGateway(t *testing.T) {
 						Name:     gatewayv1.SectionName("http"),
 						Protocol: gatewayv1.HTTPProtocolType,
 						Port:     gatewayv1.PortNumber(8080),
-						TLS:      &gatewayv1.GatewayTLSConfig{},
+						TLS:      &gatewayv1.ListenerTLSConfig{},
 					},
 				}
 			},
@@ -74,7 +74,7 @@ func TestValidateGateway(t *testing.T) {
 						Name:     gatewayv1.SectionName("https"),
 						Protocol: gatewayv1.HTTPSProtocolType,
 						Port:     gatewayv1.PortNumber(8080),
-						TLS: &gatewayv1.GatewayTLSConfig{
+						TLS: &gatewayv1.ListenerTLSConfig{
 							Mode: ptrTo(gatewayv1.TLSModeType("Passthrough")),
 						},
 					},
@@ -90,7 +90,7 @@ func TestValidateGateway(t *testing.T) {
 						Name:     gatewayv1.SectionName("https"),
 						Protocol: gatewayv1.HTTPSProtocolType,
 						Port:     gatewayv1.PortNumber(8080),
-						TLS: &gatewayv1.GatewayTLSConfig{
+						TLS: &gatewayv1.ListenerTLSConfig{
 							CertificateRefs: []gatewayv1.SecretObjectReference{
 								{Name: gatewayv1.ObjectName("foo")},
 							},
@@ -107,7 +107,7 @@ func TestValidateGateway(t *testing.T) {
 						Name:     gatewayv1.SectionName("tcp"),
 						Protocol: gatewayv1.TCPProtocolType,
 						Port:     gatewayv1.PortNumber(8080),
-						TLS:      &gatewayv1.GatewayTLSConfig{},
+						TLS:      &gatewayv1.ListenerTLSConfig{},
 					},
 				}
 			},
@@ -212,7 +212,7 @@ func TestValidateGateway(t *testing.T) {
 						Name:     gatewayv1.SectionName("https"),
 						Protocol: gatewayv1.HTTPSProtocolType,
 						Port:     gatewayv1.PortNumber(8443),
-						TLS: &gatewayv1.GatewayTLSConfig{
+						TLS: &gatewayv1.ListenerTLSConfig{
 							Mode: &tlsMode,
 						},
 					},
@@ -229,7 +229,7 @@ func TestValidateGateway(t *testing.T) {
 						Name:     gatewayv1.SectionName("tls"),
 						Protocol: gatewayv1.TLSProtocolType,
 						Port:     gatewayv1.PortNumber(8443),
-						TLS: &gatewayv1.GatewayTLSConfig{
+						TLS: &gatewayv1.ListenerTLSConfig{
 							Mode: &tlsMode,
 						},
 					},
@@ -246,7 +246,7 @@ func TestValidateGateway(t *testing.T) {
 						Name:     gatewayv1.SectionName("https"),
 						Protocol: gatewayv1.HTTPSProtocolType,
 						Port:     gatewayv1.PortNumber(8443),
-						TLS: &gatewayv1.GatewayTLSConfig{
+						TLS: &gatewayv1.ListenerTLSConfig{
 							Mode: &tlsMode,
 							CertificateRefs: []gatewayv1.SecretObjectReference{
 								{Name: gatewayv1.ObjectName("foo")},
@@ -265,7 +265,7 @@ func TestValidateGateway(t *testing.T) {
 						Name:     gatewayv1.SectionName("tls"),
 						Protocol: gatewayv1.TLSProtocolType,
 						Port:     gatewayv1.PortNumber(8443),
-						TLS: &gatewayv1.GatewayTLSConfig{
+						TLS: &gatewayv1.ListenerTLSConfig{
 							Mode: &tlsMode,
 							CertificateRefs: []gatewayv1.SecretObjectReference{
 								{Name: gatewayv1.ObjectName("foo")},
@@ -284,7 +284,7 @@ func TestValidateGateway(t *testing.T) {
 						Name:     gatewayv1.SectionName("https"),
 						Protocol: gatewayv1.HTTPSProtocolType,
 						Port:     gatewayv1.PortNumber(8443),
-						TLS: &gatewayv1.GatewayTLSConfig{
+						TLS: &gatewayv1.ListenerTLSConfig{
 							Mode: &tlsMode,
 							Options: map[gatewayv1.AnnotationKey]gatewayv1.AnnotationValue{
 								"networking.example.com/tls-version": "1.2",
@@ -303,7 +303,7 @@ func TestValidateGateway(t *testing.T) {
 						Name:     gatewayv1.SectionName("tls"),
 						Protocol: gatewayv1.TLSProtocolType,
 						Port:     gatewayv1.PortNumber(8443),
-						TLS: &gatewayv1.GatewayTLSConfig{
+						TLS: &gatewayv1.ListenerTLSConfig{
 							Mode: &tlsMode,
 							Options: map[gatewayv1.AnnotationKey]gatewayv1.AnnotationValue{
 								"networking.example.com/tls-version": "1.2",
@@ -473,7 +473,7 @@ func TestValidateGateway(t *testing.T) {
 						Protocol: gatewayv1.HTTPSProtocolType,
 						Port:     gatewayv1.PortNumber(8000),
 						Hostname: &hostnameFoo,
-						TLS: &gatewayv1.GatewayTLSConfig{
+						TLS: &gatewayv1.ListenerTLSConfig{
 							CertificateRefs: []gatewayv1.SecretObjectReference{
 								{Name: gatewayv1.ObjectName("foo")},
 							},
@@ -583,6 +583,54 @@ func TestValidateGateway(t *testing.T) {
 				}
 			},
 			wantErrors: []string{"IPAddress values must be unique", "Hostname values must be unique"},
+		},
+		{
+			desc: "optional ip address or hostname values",
+			mutate: func(gw *gatewayv1.Gateway) {
+				gw.Spec.Addresses = []gatewayv1.GatewaySpecAddress{
+					{
+						Type: ptrTo(gatewayv1.IPAddressType),
+					},
+					{
+						Type: ptrTo(gatewayv1.HostnameAddressType),
+					},
+				}
+			},
+		},
+		{
+			desc: "multiple optional ip address or hostname values alongside defined values",
+			mutate: func(gw *gatewayv1.Gateway) {
+				gw.Spec.Addresses = []gatewayv1.GatewaySpecAddress{
+					{
+						Type: ptrTo(gatewayv1.HostnameAddressType),
+					},
+					{
+						Type: ptrTo(gatewayv1.IPAddressType),
+					},
+					{
+						Type:  ptrTo(gatewayv1.IPAddressType),
+						Value: "1.2.3.4",
+					},
+					{
+						Type:  ptrTo(gatewayv1.HostnameAddressType),
+						Value: "foo.bar",
+					},
+					{
+						Type: ptrTo(gatewayv1.IPAddressType),
+					},
+					{
+						Type: ptrTo(gatewayv1.HostnameAddressType),
+					},
+					{
+						Type:  ptrTo(gatewayv1.IPAddressType),
+						Value: "2.3.4.5",
+					},
+					{
+						Type:  ptrTo(gatewayv1.HostnameAddressType),
+						Value: "bar.bar",
+					},
+				}
+			},
 		},
 	}
 

@@ -28,6 +28,10 @@ type FakeGatewayV1 struct {
 	*testing.Fake
 }
 
+func (c *FakeGatewayV1) BackendTLSPolicies(namespace string) v1.BackendTLSPolicyInterface {
+	return newFakeBackendTLSPolicies(c, namespace)
+}
+
 func (c *FakeGatewayV1) GRPCRoutes(namespace string) v1.GRPCRouteInterface {
 	return newFakeGRPCRoutes(c, namespace)
 }

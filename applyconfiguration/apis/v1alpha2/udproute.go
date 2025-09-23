@@ -82,6 +82,7 @@ func extractUDPRoute(uDPRoute *apisv1alpha2.UDPRoute, fieldManager string, subre
 	b.WithAPIVersion("gateway.networking.k8s.io/v1alpha2")
 	return b, nil
 }
+func (b UDPRouteApplyConfiguration) IsApplyConfiguration() {}
 
 // WithKind sets the Kind field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
@@ -257,8 +258,24 @@ func (b *UDPRouteApplyConfiguration) WithStatus(value *UDPRouteStatusApplyConfig
 	return b
 }
 
+// GetKind retrieves the value of the Kind field in the declarative configuration.
+func (b *UDPRouteApplyConfiguration) GetKind() *string {
+	return b.TypeMetaApplyConfiguration.Kind
+}
+
+// GetAPIVersion retrieves the value of the APIVersion field in the declarative configuration.
+func (b *UDPRouteApplyConfiguration) GetAPIVersion() *string {
+	return b.TypeMetaApplyConfiguration.APIVersion
+}
+
 // GetName retrieves the value of the Name field in the declarative configuration.
 func (b *UDPRouteApplyConfiguration) GetName() *string {
 	b.ensureObjectMetaApplyConfigurationExists()
 	return b.ObjectMetaApplyConfiguration.Name
+}
+
+// GetNamespace retrieves the value of the Namespace field in the declarative configuration.
+func (b *UDPRouteApplyConfiguration) GetNamespace() *string {
+	b.ensureObjectMetaApplyConfigurationExists()
+	return b.ObjectMetaApplyConfiguration.Namespace
 }

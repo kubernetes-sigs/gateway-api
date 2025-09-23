@@ -8,11 +8,14 @@ This GEP aims to define high level TLS terminology and structure within Gateway
 API to ensure that all our independent proposals related to TLS result in a
 coherent set of APIs. This will result in some adjustments to provisional and
 experimental TLS-related GEPs, specifically [BackendTLSPolicy](../gep-1897/index.md)
-and [Client Certificate Verification](../gep-91/index.md).
 
 ## Goals
-* Define high-level terminology for how we refer to TLS in Gateway API.
-* Define top level fields where TLS configuration can live.
+1. Define high-level terminology for how we refer to TLS in Gateway API.
+2. Define top level fields where TLS configuration can live for all below cases:
+* Client to Gateway (Frontend) TLS configuration.
+* Gateway to Client TLS configuration (Client Certificate Validation)
+* Gateway to backend (Gateway Client Certificate)
+3. Document how to use `BackendTLSPolicy` to support Gateway to Backend TLS configuration.
 
 ## Non-Goals
 * Add or change fields directly. (This may inspire changes in other GEPs
@@ -30,29 +33,15 @@ in scope for this GEP. In the future, this GEP may be expanded to include:
 
 ## Introduction
 
-### Where TLS could be configured
-We have three different places where we might want to configure TLS:
+### TLS mode
 
-#### A. Gateways
-Config attached at this layer will apply to everything behind a single address
-such as a virtual IP.
+TLS can be configured with two distinct modes:
+* **Passthrough**: The Gateway forwards encrypted traffic directly to the backend from the entity originating the connection (called later a client). The TLS connection is established between the client and the backend; the Gateway does not participate in the TLS handshake.
 
-#### B. Gateway Listeners
-Each Gateway contains multiple “Listeners”. Each HTTPS Listener in a Gateway
-must have a unique combination of protocol, port, and SNI (Server Name
-Indication). TLS configuration attached at this layer should be [isolated via
-SNI](../../guides/implementers.md#listener-isolation).
-
-#### C. BackendTLSPolicy
-This policy allows us to attach unique TLS configuration per Backend. Depending
-on the organization, this policy may be owned by the application owner or the
-cluster operator. Note that this configuration will be used by all Gateways
-(potentially from different implementations) that are connecting to the backend.
+* **Terminate**: The Gateway acts as a man-in-the-middle, terminating the client's TLS connection and originating a separate connection to the backend when routing the traffic. Both connections can independently support TLS and mutual TLS due to their distinct TLS configurations. The Gateway's dual role as a client or server affects the placement of TLS settings needed for given connection.
 
 ### "Frontend" and "Backend"
-A guiding principle in this naming is to use consistent naming for “Downstream”
-(1+2) and “Upstream” (3+4), similar to Envoy. To avoid the confusion with what
-is upstream and downstream, Gateway API will use “Frontend” (1+2) and “Backend”
+A guiding principle in this naming is to use consistent naming for both TLS connections “Downstream” (1+2) and “Upstream” (3+4) handled by the Gateway (similar to Envoy). To avoid the confusion with what is upstream and downstream, Gateway API will use “Frontend” (1+2) and “Backend”
 (3+4).
 
 *  **Frontend:** The entity connecting to a Gateway, typically a client
@@ -73,43 +62,34 @@ flowchart LR
 
 The above diagram depicts these four segments as edges in a graph.
 
-### TLS mode
+#### Frontend configuration
 
-TLS can be configured with two distinct modes:
+In the Frontend TLS connection Gateway acts as a server and presents Server certificate during TLS handshake. Client connects to the Gateway on domain basis and this is desired to configure Server certificates on the Listener.
+In the mutual frontend TLS Gateway needs to verify client certificates with configured CA. It was expected that CA configuration would be also defined on Listener but due to connection coalescing this solution was not secure. We decided to move client certificate validation configuration on the Gateway level and allow for per port overrides.
 
-* **Terminate**: the TLS connection is instantiated between the frontend and the
-  Gateway. The connection between the Gateway and the backend is left unencrypted
- unless a new TLS connection between the two entities is configured via BackendTLSPolicy.
-* **Passthrough**: the TLS connection is instantiated between the frontend and the
-  backend. The traffic flows through the Gateway encrypted, and the Gateway is not
-  able to decrypt or inspect the encrypted portions of the TLS stream.
+#### Backend configuration
+
+In the Backend connection Gateway acts as a client. The nature of the connection (HTTP or HTTPS) is configured on the Service using BackendTLSPolicy. If BackendTLSPolicy is defined for a Service, the Gateway must establish an HTTPS connection with the backend. During the TLS handshake, the backend presents a Server certificate. The Gateway validates this certificate against a CA certificate (and optionally SANs) configured by BackendTLSPolicy.
+For mutual backend TLS, the Gateway's identity must be configured. This identity, a client certificate set on the Gateway object, will be presented by the Gateway. The Gateway uses the same client certificate for all backend connections originating mutual TLS.
+
 
 ## Proposed Segments
-Note that this does not represent any form of commitment that any of these
-fields or concepts will exist within Gateway API. If or when they do, we propose
-the following naming structure:
 
-### 1. Validate Client Certificate provided by Frontend
+
+### 1. Gateway level configuration
+
+Gateway-level configurations are required for both Frontend and Backend connections. We propose a top-level GatewayTLSConfig that is divided into independent Backend and Frontend configurations.
 
 | Proposed Placement | Name | Status |
 |-|-|-|
-| Gateway Listener | `Listener.TLS.FrontendValidation` | Proposed |
+| Gateway | `Gateway.TLS.Frontend` | Proposed |
+| Gateway | `Gateway.TLS.Backend` | Proposed |
 
 #### Rationale
-Use FrontendValidation to leave room for concepts like trust anchors and trust
-domains. Anything not strictly tied to validation would belong to Listener.TLS
-which is now reserved exclusively for “Frontend” TLS configuration (1+2).
+From the security point of view both TLS configurations require a Gateway level field. The configurations are independent and can coexist.
 
-#### Why Not Frontend.Validation?
-Part of the idea behind this GEP is that Listener.TLS is really entirely focused
-on 1+2 - the bits of TLS between frontend and Gateway. That means that if we
-were to add any additional TLS configuration in the Listener.TLS struct, it
-would tied to that limited scope, and thus we don't really need a separate
-Frontend struct.
-
-One could make an argument that Listener.TLS.Validation should be the field name
-here to avoid any ambiguity, but in this specific context, we think that it's
-probably helpful to specifically spell out frontend.
+#### Why Not Listener.Frontend?
+Due to connection coalescing, the client certificate validation for the frontend was moved to a Gateway level field to address security concerns. [GEP-91 Update PR](https://github.com/kubernetes-sigs/gateway-api/pull/3942)
 
 #### Why Not FrontendTLSPolicy?
 It could be reasonable to try to mirror BackendTLSPolicy for Frontend TLS. As we
@@ -129,7 +109,7 @@ We don't think either of those reasons really apply to frontend TLS. Instead,
 frontend TLS could theoretically be configured either for an entire Gateway, or
 a specific Gateway listener. Given that many implementations already support
 distinguishing this config per SNI, it seems to make sense to start with
-listener level attachment. We think that the persona that would be responsible
+Listener level attachment. We think that the persona that would be responsible
 for a Gateway is not sufficiently different than the persona that would be
 responsible for frontend TLS, so the current proposal is likely the best option
 available to us.
@@ -145,17 +125,30 @@ This is already finalized in the API and so we're stuck with this name. In
 hindsight a name that was more clearly tied to frontend TLS would have been
 ideal here.
 
-### 3. Configure Client Certificate that Gateway should use to connect to Backend
+### 3. Configure Client Certificate Validation for Frontend
+
+Client certificate validation will reside at the Gateway level. This configuration will be
+either applied globally to all Listeners in the Gateway or can be overridden on a per-port basis.
 
 | Proposed Placement | Name | Status |
 |-|-|-|
-| Gateway | `Gateway.Spec.BackendTLS.ClientCertificateRef` | Not Proposed |
-| BackendTLSPolicy | `BackendTLSPolicy.Spec.ClientCertificateRef` | Not Proposed |
+| Gateway | `Gateway.TLS.Frontend.Default.Validation` | Proposed |
+| Gateway | `Gateway.TLS.Frontend.PerPort` | Proposed |
 
 #### Rationale
-It's not yet obvious which of the above options are preferable, but a case could
-be made for either or both. If we add a `BackendTLS` struct to Gateway it would
-leave room for concepts like TLS version, ALPN, cipher suites, etc.
+Gateway level configuration for client certificate validation was chosen due to security issue.
+
+#### Why per port override
+HTTPS connection can be reused between multiple Listeners sharing the same port. This might lead to bypassing client certificate validation configuration for a given Listener becasue new TLS handshake will not be triggered for different hostname.
+
+### 4. Configure Client Certificate that Gateway should use to connect to Backend
+
+| Proposed Placement | Name | Status |
+|-|-|-|
+| Gateway | `Gateway.Spec.TLS.Backend.ClientCertificateRef` | Proposed |
+
+#### Rationale
+Client certificate is part of Gateway identity and should not be overriden per backend.
 
 #### Why Not Listener level to match FrontendValidation?
 In general, we'd expect this identity to represent a Gateway as a whole, and
@@ -167,7 +160,7 @@ use when connecting to a backend, it should likely either be tied directly to
 the Gateway or Backend, but the Listener is not particularly relevant in this
 context.
 
-### 4. Validate Server Certificate that is provided by Backend
+### 5. Validate Server Certificate that is provided by Backend
 | Proposed Placement | Name | Status |
 |-|-|-|
 | Gateway | `Gateway.Spec.BackendTLS.Validation` | Not Proposed |
@@ -179,42 +172,7 @@ already clearly backend-focused, config like TLS Version, ALPN, and cipher
 suites, could live at the same level without confusion. It's also plausible that
 some Gateways may want to express Gateway-wide CAs that are trusted.
 
-#### Why BackendTLS on Gateways?
-Although this GEP is intentionally not committing to adding new fields or
-features, it's possible that at some point in the future we may want to have
-some kind of Backend TLS config at the Gateway level. For example, it may be
-useful to configure a set of CAs that a Gateway trusts or a client cert that a
-Gateway should use to connect to all backends. If this existed, there would
-likely be some overlap in config with BackendTLSPolicy, and if a future GEP
-proposed this, it would need to include how overlapping config should be
-handled.
-
-#### Why the inconsistency between Frontend and Backend TLS config on Gateways?
-If we were to populate all the possible fields described in this GEP, we'd end
-up with the following config on Gateways:
-
-```
-Gateway.Spec.Listeners.TLS.FrontendValidation
-Gateway.Spec.Listeners.TLS
-Gateway.Spec.BackendTLS.ClientCertificateRef
-Gateway.Spec.BackendTLS.Validation
-```
-
-This is all tied to the need to provide backwards compatibility with the TLS
-config that is already GA on Listeners (`Listener.TLS`). If we were naming that
-field today with the broader vision of TLS configuration throughout Gateway API
-we would almost certainly choose a more descriptive name that was more clearly
-tied to Frontend TLS. Unfortunately we're too late to change that name, but we
-can try to make the rest of the terminology clearly tied to frontend or backend
-TLS.
-
-One [suggestion by @candita](https://github.com/kubernetes-sigs/gateway-api/pull/2910#discussion_r1552534017)
-would be to introduce a Listener like resource for BackendTLS, resulting in a
-more consistent naming scheme within Gateway TLS configuration. Although it's
-not yet clear if we need this additional layer, we should reconsider it as we're
-further developing Backend TLS.
-
-### 5. Configure TLS mode
+### 6. Configure TLS mode
 
 | Proposed Placement | Name | Status |
 |-|-|-|
@@ -236,8 +194,8 @@ does not need to be provided, as the TLS termination is handled by the backend.
 
 ## Routes and TLS
 
-Multiple routes can be attached to listeners specifying TLS configuration. This section
-intends to clearly state how and when Routes can attach to listeners with TLS configuration.
+Multiple routes can be attached to Listeners specifying TLS configuration. This section
+intends to clearly state how and when Routes can attach to Listeners with TLS configuration.
 
 ### Context
 
@@ -265,12 +223,12 @@ with the compatible protocol.
 |-----------|---------|---------------|----------------|
 | HTTP      | `HTTPRoute`/`GRPCRoute` | no  | no  |
 | HTTPS     | `HTTPRoute`/`GRPCRoute` | yes | no  |
-| TLS       | `TLSRoute`  | yes | yes | 
+| TLS       | `TLSRoute`  | yes | yes |
 | TCP       | `TCPRoute`  | yes | no  |
 | UDP       | `UDPRoute`  | no  | no  |
 
 > [!NOTE]
-> When the traffic is routed to the backend via a listener configured with TLS `Passthrough`
-> and a compatible route, the packets are left untouched by the gateway. In order to
-> terminate the TLS connection to the gateway and forward the traffic unencrypted to the backend,
-> a listener configured with TLS `Terminate` and a compatible route must be used.
+> When the traffic is routed to the backend via a Listener configured with TLS `Passthrough`
+> and a compatible route, the packets are left untouched by the Gateway. In order to
+> terminate the TLS connection to the Gateway and forward the traffic unencrypted to the backend,
+> a Listener configured with TLS `Terminate` and a compatible route must be used.

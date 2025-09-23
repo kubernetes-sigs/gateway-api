@@ -35,7 +35,7 @@ func init() {
 
 var GRPCRouteNamedRule = suite.ConformanceTest{
 	ShortName:   "GRPCRouteNamedRule",
-	Description: "An GRPCRoute with a named GRPCRouteRule",
+	Description: "A GRPCRoute with a named GRPCRouteRule",
 	Manifests:   []string{"tests/grpcroute-named-rule.yaml"},
 	Features: []features.FeatureName{
 		features.SupportGateway,

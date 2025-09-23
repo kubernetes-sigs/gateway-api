@@ -18,17 +18,11 @@ limitations under the License.
 
 package v1
 
-import (
-	apisv1 "sigs.k8s.io/gateway-api/apis/v1"
-)
-
 // GatewayTLSConfigApplyConfiguration represents a declarative configuration of the GatewayTLSConfig type for use
 // with apply.
 type GatewayTLSConfigApplyConfiguration struct {
-	Mode               *apisv1.TLSModeType                             `json:"mode,omitempty"`
-	CertificateRefs    []SecretObjectReferenceApplyConfiguration       `json:"certificateRefs,omitempty"`
-	FrontendValidation *FrontendTLSValidationApplyConfiguration        `json:"frontendValidation,omitempty"`
-	Options            map[apisv1.AnnotationKey]apisv1.AnnotationValue `json:"options,omitempty"`
+	Backend  *GatewayBackendTLSApplyConfiguration `json:"backend,omitempty"`
+	Frontend *FrontendTLSConfigApplyConfiguration `json:"frontend,omitempty"`
 }
 
 // GatewayTLSConfigApplyConfiguration constructs a declarative configuration of the GatewayTLSConfig type for use with
@@ -37,45 +31,18 @@ func GatewayTLSConfig() *GatewayTLSConfigApplyConfiguration {
 	return &GatewayTLSConfigApplyConfiguration{}
 }
 
-// WithMode sets the Mode field in the declarative configuration to the given value
+// WithBackend sets the Backend field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
-// If called multiple times, the Mode field is set to the value of the last call.
-func (b *GatewayTLSConfigApplyConfiguration) WithMode(value apisv1.TLSModeType) *GatewayTLSConfigApplyConfiguration {
-	b.Mode = &value
+// If called multiple times, the Backend field is set to the value of the last call.
+func (b *GatewayTLSConfigApplyConfiguration) WithBackend(value *GatewayBackendTLSApplyConfiguration) *GatewayTLSConfigApplyConfiguration {
+	b.Backend = value
 	return b
 }
 
-// WithCertificateRefs adds the given value to the CertificateRefs field in the declarative configuration
-// and returns the receiver, so that objects can be build by chaining "With" function invocations.
-// If called multiple times, values provided by each call will be appended to the CertificateRefs field.
-func (b *GatewayTLSConfigApplyConfiguration) WithCertificateRefs(values ...*SecretObjectReferenceApplyConfiguration) *GatewayTLSConfigApplyConfiguration {
-	for i := range values {
-		if values[i] == nil {
-			panic("nil value passed to WithCertificateRefs")
-		}
-		b.CertificateRefs = append(b.CertificateRefs, *values[i])
-	}
-	return b
-}
-
-// WithFrontendValidation sets the FrontendValidation field in the declarative configuration to the given value
+// WithFrontend sets the Frontend field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
-// If called multiple times, the FrontendValidation field is set to the value of the last call.
-func (b *GatewayTLSConfigApplyConfiguration) WithFrontendValidation(value *FrontendTLSValidationApplyConfiguration) *GatewayTLSConfigApplyConfiguration {
-	b.FrontendValidation = value
-	return b
-}
-
-// WithOptions puts the entries into the Options field in the declarative configuration
-// and returns the receiver, so that objects can be build by chaining "With" function invocations.
-// If called multiple times, the entries provided by each call will be put on the Options field,
-// overwriting an existing map entries in Options field with the same key.
-func (b *GatewayTLSConfigApplyConfiguration) WithOptions(entries map[apisv1.AnnotationKey]apisv1.AnnotationValue) *GatewayTLSConfigApplyConfiguration {
-	if b.Options == nil && len(entries) > 0 {
-		b.Options = make(map[apisv1.AnnotationKey]apisv1.AnnotationValue, len(entries))
-	}
-	for k, v := range entries {
-		b.Options[k] = v
-	}
+// If called multiple times, the Frontend field is set to the value of the last call.
+func (b *GatewayTLSConfigApplyConfiguration) WithFrontend(value *FrontendTLSConfigApplyConfiguration) *GatewayTLSConfigApplyConfiguration {
+	b.Frontend = value
 	return b
 }

@@ -20,15 +20,14 @@ package v1alpha3
 
 import (
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
-	apisv1alpha3 "sigs.k8s.io/gateway-api/apis/v1alpha3"
 )
 
 // SubjectAltNameApplyConfiguration represents a declarative configuration of the SubjectAltName type for use
 // with apply.
 type SubjectAltNameApplyConfiguration struct {
-	Type     *apisv1alpha3.SubjectAltNameType `json:"type,omitempty"`
-	Hostname *v1.Hostname                     `json:"hostname,omitempty"`
-	URI      *v1.AbsoluteURI                  `json:"uri,omitempty"`
+	Type     *v1.SubjectAltNameType `json:"type,omitempty"`
+	Hostname *v1.Hostname           `json:"hostname,omitempty"`
+	URI      *v1.AbsoluteURI        `json:"uri,omitempty"`
 }
 
 // SubjectAltNameApplyConfiguration constructs a declarative configuration of the SubjectAltName type for use with
@@ -40,7 +39,7 @@ func SubjectAltName() *SubjectAltNameApplyConfiguration {
 // WithType sets the Type field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Type field is set to the value of the last call.
-func (b *SubjectAltNameApplyConfiguration) WithType(value apisv1alpha3.SubjectAltNameType) *SubjectAltNameApplyConfiguration {
+func (b *SubjectAltNameApplyConfiguration) WithType(value v1.SubjectAltNameType) *SubjectAltNameApplyConfiguration {
 	b.Type = &value
 	return b
 }

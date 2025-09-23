@@ -145,7 +145,7 @@ TLS-encrypted upstream connection where Pods backing the `dev` Service are expec
 certificate for `dev.example.com`.
 
 ```yaml
-{% include 'experimental/v1alpha3/backendtlspolicy-system-certs.yaml' %}
+{% include 'standard/backendtlspolicy/backendtlspolicy-system-certs.yaml' %}
 ```
 
 #### Using Explicit CA Certificates
@@ -155,7 +155,7 @@ map `auth-cert` to connect with a TLS-encrypted upstream connection where Pods b
 are expected to serve a valid certificate for `auth.example.com`.
 
 ```yaml
-{% include 'experimental/v1alpha3/backendtlspolicy-ca-certs.yaml' %}
+{% include 'standard/backendtlspolicy/backendtlspolicy-ca-certs.yaml' %}
 ```
 
 ## Extensions
