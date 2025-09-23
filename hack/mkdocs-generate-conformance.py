@@ -22,6 +22,7 @@ from fnmatch import fnmatch
 import glob
 import os
 import re
+import semver
 
 log = logging.getLogger(f'mkdocs.plugins.{__name__}')
 
@@ -183,7 +184,7 @@ def generate_profiles_report(reports, route, version):
 
     http_table = http_table.rename(
         columns={"project": "Project", "version": "Version", "mode": "Mode", "core.result": "Core"})
-    if version != 'v1.3.0':
+    if semver.compare(version, 'v1.3.0') <= 0:
         http_table = http_table.drop(columns=["Core"])
     if version == 'v1.0.0':
         http_table = http_table.drop(columns=["Mode"])
