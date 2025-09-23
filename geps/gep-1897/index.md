@@ -1,7 +1,7 @@
 # GEP-1897: BackendTLSPolicy - Explicit Backend TLS Connection Configuration
 
 * Issue: [#1897](https://github.com/kubernetes-sigs/gateway-api/issues/1897)
-* Status: Experimental
+* Status: Standard
 
 ## TLDR
 
@@ -30,11 +30,9 @@ Gateway to backend**, such as server name indication and trusted CA certificates
 ## Longer Term Goals
 
 These are worthy goals, but deserve a different GEP for proper attention.  This GEP is concerned entirely with the
-the hop between gateway client and backend.
-
-1. [TCPRoute](../../reference/spec.md#gateway.networking.k8s.io/v1alpha2.TCPRoute) and
-[GRPCRoute](../../reference/spec.md#gateway.networking.k8s.io/v1alpha2.GRPCRoute) use cases
-are not addressed here, because at this point in time these two route types are not graduated to beta.
+hop between gateway client and backend.
+1. [TCPRoute](../../apis/v1alpha2/tcproute_types.go) use cases are not addressed here, because at this point in time
+TCPRoute is not graduated to beta.
 2. Mutual TLS (mTLS) use cases are intentionally out of scope for this GEP for two reasons.  First, the design of Gateway
 API is backend-attached and does not currently support mutual authentication, and also because this GEP does not
 address the case where connections to TLS are **implicitly configured** on behalf of the user, which is the norm for mTLS.
@@ -52,18 +50,21 @@ These are worthy goals, but will not be covered by this GEP.
 2. Providing a mechanism to decorate multiple route instances
 3. TLSRoute use cases
 4. UDPRoute use cases
-5. Controlling TLS versions or cipher suites used in TLS handshakes. (Use case #5 in [Gateway API TLS Use Cases](#references))
-6. Controlling certificates used by more than one workload (#6 in [Gateway API TLS Use Cases](#references))
-7. Client certificate settings used in TLS **from external clients to the
+5. GRPCRoute use cases
+6. Controlling TLS versions or cipher suites used in TLS handshakes. (Use case #5 in [Gateway API TLS Use Cases](#references))
+7. Controlling certificates used by more than one workload (#6 in [Gateway API TLS Use Cases](#references))
+8. Client certificate settings used in TLS **from external clients to the
 Listener** (#7 in [Gateway API TLS Use Cases](#references))
-8. Service Mesh "mesh transport security".
-9. Providing a mechanism for the cluster operator to override gateway to backend TLS settings.
+9. Service Mesh "mesh transport security".
+10. Providing a mechanism for the cluster operator to override gateway to backend TLS settings.
 
-> It is very common for service mesh implementations to implement some form of transparent transport security, whether that is WireGuard, mTLS, or others.
-> This is completely orthogonal to the use cases being tackled by this GEP.
-> * The "mesh transport security" is something invisible to the user's application, and is simply used to secure communication between components in the mesh.
+> It is very common for service mesh implementations to implement some form of transparent transport security, whether
+> that is WireGuard, mTLS, or others. This is completely orthogonal to the use cases being tackled by this GEP.
+> * The "mesh transport security" is something invisible to the user's application, and is simply used to secure
+> communication between components in the mesh.
 > * This proposal, instead, explicitly calls for sending TLS **to the user's application**.
-> However, this does not mean service meshes are outside of scope for this proposal, merely that only the application-level TLS configuration is in scope.
+> However, this does not mean service meshes are outside of scope for this proposal, merely that only the
+> application-level TLS configuration is in scope.
 
 ![](images/mesh.png "Mesh transport")
 
@@ -84,7 +85,6 @@ backend pod).  As mentioned, this solution satisfies the use case in which the b
 has its own certificate and the gateway client needs to know how to connect to the backend pod.
 
 ![image depicting TLS termination types](images/1897-TLStermtypes.png "TLS termination types")
-
 Gateway API is missing a mechanism for separately providing the details for the backend TLS handshake,
 including (but not limited to):
 
@@ -157,8 +157,8 @@ substituted without blocking acceptance of the content of the API change.
 
 The selection of the applicable Gateway API persona is important in the design of BackendTLSPolicy, because it provides
 a way to explicitly describe the _expectations_ of the connection to the application.
-In this GEP, BackendTLSPolicy will be configured only by the application developer Gateway API persona to tell gateway clients how to connect to
-the application, from a TLS perspective.
+In this GEP, BackendTLSPolicy will be configured only by the application developer Gateway API persona to tell gateway
+clients how to connect to the application, from a TLS perspective.
 Future iterations *may* expand this to additionally allow consumer overrides; see [Future plans](#future-plans).
 
 During the course of discussion of this proposal, we did consider allowing the cluster operator persona to have some access
@@ -181,7 +181,8 @@ as a TLS Client:
 BackendTLSPolicy is defined as a Direct Policy Attachment without defaults or overrides, applied to a Service that
 accesses the backend in question, where the BackendTLSPolicy resides in the same namespace as the Service it is
 applied to.  For now, the BackendTLSPolicy and the Service must reside in the same namespace in order to prevent the
-complications involved with sharing trust across namespace boundaries (see [Future plans](#future-plans)).  We chose the Service resource as a target,
+complications involved with sharing trust across namespace boundaries (see [Future plans](#future-plans)).  We chose the Service
+resource as a target,
 rather than the Route resource, so that we can reuse the same BackendTLSPolicy for all the different Routes that
 might point to this Service.
 
@@ -196,7 +197,10 @@ that is appropriate, such as one of the HTTP error codes: 400 (Bad Request), 401
 other signal that makes the failure sufficiently clear to the requester without revealing too much about the transaction,
 based on established security requirements.
 
-BackendTLSPolicy applies only to TCP traffic. If a policy explicitly attaches to a UDP port of a Service (that is, the `targetRef` has a `sectionName` specifying a single port or the service has only 1 port), the `Accepted: False` Condition with `Reason: Invalid` MUST be set. If the policy attaches to a mix of TCP and UDP ports, implementations SHOULD include a warning in the `Accepted` condition message (`ancestors.conditions`); the policy will only be effective for the TCP ports.
+BackendTLSPolicy applies only to TCP traffic. If a policy explicitly attaches to a UDP port of a Service (that is, the
+`targetRef` has a `sectionName` specifying a single port or the service has only 1 port), the `Accepted: False` Condition
+with `Reason: Invalid` MUST be set. If the policy attaches to a mix of TCP and UDP ports, implementations SHOULD include
+a warning in the `Accepted` condition message (`ancestors.conditions`); the policy will only be effective for the TCP ports.
 
 All policy resources must include `TargetRefs` with the fields specified
 in [PolicyTargetReference](https://github.com/kubernetes-sigs/gateway-api/blob/a33a934af9ec6997b34fd9b00d2ecd13d143e48b/apis/v1alpha2/policy_types.go#L24-L41).
@@ -214,12 +218,20 @@ configuration. CACertificateRefs is an implementation-specific slice of
 named object references, each containing a single cert. We originally proposed to follow the convention established by the
 [CertificateRefs field on Gateway](https://github.com/kubernetes-sigs/gateway-api/blob/18e79909f7310aafc625ba7c862dfcc67b385250/apis/v1beta1/gateway_types.go#L340)
 , but the CertificateRef requires both a tls.key and tls.crt and a certificate reference only requires the tls.crt.
-If any of the CACertificateRefs cannot be resolved (e.g., the referenced resource does not exist) or is misconfigured (e.g., ConfigMap does not contain a key named `ca.crt`), the `ResolvedRefs` status condition MUST be set to `False` with `Reason: InvalidCACertificateRef`. Connections using that CACertificateRef MUST fail, and the client MUST receive an HTTP 5xx error response.
-References to objects with an unsupported Group and Kind are not valid, and MUST be rejected by the implementation with the `ResolvedRefs` status condition set to `False` and `Reason: InvalidKind`.
-Implementations MAY perform further validation of the certificate content (i.e., checking expiry or enforcing specific formats). If they do, they MUST ensure that the `ResolvedRefs` Condition is `False` and use an implementation-specific `Reason`, like `ExpiredCertificate` or similar.
-If `ResolvedRefs` Condition is `False` implementations SHOULD include a message specifying which references are invalid and explaining why.
+If any of the CACertificateRefs cannot be resolved (e.g., the referenced resource does not exist) or is misconfigured
+(e.g., ConfigMap does not contain a key named `ca.crt`), the `ResolvedRefs` status condition MUST be set to `False` with
+`Reason: InvalidCACertificateRef`. Connections using that CACertificateRef MUST fail, and the client MUST receive an
+HTTP 5xx error response.
+References to objects with an unsupported Group and Kind are not valid, and MUST be rejected by the implementation with
+the `ResolvedRefs` status condition set to `False` and `Reason: InvalidKind`.
+Implementations MAY perform further validation of the certificate content (i.e., checking expiry or enforcing specific
+formats). If they do, they MUST ensure that the `ResolvedRefs` Condition is `False` and use an implementation-specific
+`Reason`, like `ExpiredCertificate` or similar.
+If `ResolvedRefs` Condition is `False` implementations SHOULD include a message specifying which references are invalid
+and explaining why.
 
-If all CertificateRefs cannot be resolved, the BackendTLSPolicy is considered invalid and the implementation MUST set the `Accepted` Condition to `False`, with a reason of `NoValidCACertificate` and a message explaining this.
+If all CertificateRefs cannot be resolved, the BackendTLSPolicy is considered invalid and the implementation MUST set
+the `Accepted` Condition to `False`, with a reason of `NoValidCACertificate` and a message explaining this.
 
 WellKnownCACertificates is an optional enum that allows users to specify whether to use the set of CA certificates trusted by the
 Gateway (WellKnownCACertificates specified as "System"), or to use the existing CACertificateRefs (WellKnownCACertificates
@@ -228,13 +240,17 @@ these certificates are obtained from the underlying operating system. CACertific
 references to Kubernetes objects that contain PEM-encoded TLS certificates, which are used to establish a TLS handshake
 between the gateway and backend pod. References to a resource in a different namespace are invalid.
 If ClientCertificateRefs is unspecified, then WellKnownCACertificates must be set to "System" for a valid configuration.
-If WellKnownCACertificates is unspecified, then CACertificateRefs must be specified with at least one entry for a valid configuration.
-If an implementation does not support the WellKnownCACertificates, or the provided value is unsupported,the BackendTLSPolicy is considered invalid, and the implementation MUST set the `Accepted` Condition to `False`, with a reason of `Invalid` and a message explaining this.
+If WellKnownCACertificates is unspecified, then CACertificateRefs must be specified with at least one entry for a valid
+configuration.
+If an implementation does not support the WellKnownCACertificates, or the provided value is unsupported,the
+BackendTLSPolicy is considered invalid, and the implementation MUST set the `Accepted` Condition to `False`, with a
+reason of `Invalid` and a message explaining this.
 
 For an invalid BackendTLSPolicy, implementations MUST NOT fall back to unencrypted (plaintext) connections. 
 Instead, the corresponding TLS connection MUST fail, and the client MUST receive an HTTP 5xx error response.
 
-Implementations MUST NOT modify any status other than their own. Ownership of a status is determined by the `controllerName`, which identifies the responsible controller.
+Implementations MUST NOT modify any status other than their own. Ownership of a status is determined by the `controllerName`,
+which identifies the responsible controller.
 
 The `Hostname` field is required and is to be used to configure the SNI the Gateway should use to connect to the backend.
 Implementations must validate that at least one name in the certificate served by the backend matches this field.
@@ -245,10 +261,309 @@ but may be added in the future.
 We originally proposed allowing the configuration of expected TLS versions, but determined that this was [not needed in
 the first round](https://github.com/kubernetes-sigs/gateway-api/pull/2113#issuecomment-1696127092).
 
-Thus, the following additions would be made to the Gateway API:
+Thus, the following additions would be made to Gateway API.  See the
+[BackendTLSPolicy API](https://kubernetes-sigs/gateway-api/blob/main/apis/v1/backendtlspolicy_types.go) for more
+details.
 
 ```go
-//TODO: Will update this section once API changes from PR 2955 are approved.
+// +genclient
+// +kubebuilder:object:root=true
+// +kubebuilder:subresource:status
+// +kubebuilder:storageversion
+// +kubebuilder:resource:categories=gateway-api,shortName=btlspolicy
+// +kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
+//
+// BackendTLSPolicy is a Direct Attached Policy.
+// +kubebuilder:metadata:labels="gateway.networking.k8s.io/policy=Direct"
+
+// BackendTLSPolicy provides a way to configure how a Gateway
+// connects to a Backend via TLS.
+type BackendTLSPolicy struct {
+	metav1.TypeMeta `json:",inline"`
+	// +optional
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+
+	// Spec defines the desired state of BackendTLSPolicy.
+	// +required
+	Spec BackendTLSPolicySpec `json:"spec"`
+
+	// Status defines the current state of BackendTLSPolicy.
+	// +optional
+	Status PolicyStatus `json:"status,omitempty"`
+}
+
+// BackendTLSPolicyList contains a list of BackendTLSPolicies
+// +kubebuilder:object:root=true
+type BackendTLSPolicyList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []BackendTLSPolicy `json:"items"`
+}
+
+// BackendTLSPolicySpec defines the desired state of BackendTLSPolicy.
+//
+// Support: Extended
+type BackendTLSPolicySpec struct {
+	// TargetRefs identifies an API object to apply the policy to.
+	// Only Services have Extended support. Implementations MAY support
+	// additional objects, with Implementation Specific support.
+	// Note that this config applies to the entire referenced resource
+	// by default, but this default may change in the future to provide
+	// a more granular application of the policy.
+	//
+	// TargetRefs must be _distinct_. This means either that:
+	//
+	// * They select different targets. If this is the case, then targetRef
+	//   entries are distinct. In terms of fields, this means that the
+	//   multi-part key defined by `group`, `kind`, and `name` must
+	//   be unique across all targetRef entries in the BackendTLSPolicy.
+	// * They select different sectionNames in the same target.
+	//
+	//
+	// When more than one BackendTLSPolicy selects the same target and
+	// sectionName, implementations MUST determine precedence using the
+	// following criteria, continuing on ties:
+	//
+	// * The older policy by creation timestamp takes precedence. For
+	//   example, a policy with a creation timestamp of "2021-07-15
+	//   01:02:03" MUST be given precedence over a policy with a
+	//   creation timestamp of "2021-07-15 01:02:04".
+	// * The policy appearing first in alphabetical order by {name}.
+	//   For example, a policy named `bar` is given precedence over a
+	//   policy named `baz`.
+	//
+	// For any BackendTLSPolicy that does not take precedence, the
+	// implementation MUST ensure the `Accepted` Condition is set to
+	// `status: False`, with Reason `Conflicted`.
+	//
+	// Support: Extended for Kubernetes Service
+	//
+	// Support: Implementation-specific for any other resource
+	//
+	// +required
+	// +listType=atomic
+	// +kubebuilder:validation:MinItems=1
+	// +kubebuilder:validation:MaxItems=16
+	// +kubebuilder:validation:XValidation:message="sectionName must be specified when targetRefs includes 2 or more references to the same target",rule="self.all(p1, self.all(p2, p1.group == p2.group && p1.kind == p2.kind && p1.name == p2.name ? ((!has(p1.sectionName) || p1.sectionName == '') == (!has(p2.sectionName) || p2.sectionName == '')) : true))"
+	// +kubebuilder:validation:XValidation:message="sectionName must be unique when targetRefs includes 2 or more references to the same target",rule="self.all(p1, self.exists_one(p2, p1.group == p2.group && p1.kind == p2.kind && p1.name == p2.name && (((!has(p1.sectionName) || p1.sectionName == '') && (!has(p2.sectionName) || p2.sectionName == '')) || (has(p1.sectionName) && has(p2.sectionName) && p1.sectionName == p2.sectionName))))"
+	TargetRefs []LocalPolicyTargetReferenceWithSectionName `json:"targetRefs"`
+
+	// Validation contains backend TLS validation configuration.
+	// +required
+	Validation BackendTLSPolicyValidation `json:"validation"`
+
+	// Options are a list of key/value pairs to enable extended TLS
+	// configuration for each implementation. For example, configuring the
+	// minimum TLS version or supported cipher suites.
+	//
+	// A set of common keys MAY be defined by the API in the future. To avoid
+	// any ambiguity, implementation-specific definitions MUST use
+	// domain-prefixed names, such as `example.com/my-custom-option`.
+	// Un-prefixed names are reserved for key names defined by Gateway API.
+	//
+	// Support: Implementation-specific
+	//
+	// +optional
+	// +kubebuilder:validation:MaxProperties=16
+	Options map[AnnotationKey]AnnotationValue `json:"options,omitempty"`
+}
+
+// BackendTLSPolicyValidation contains backend TLS validation configuration.
+// +kubebuilder:validation:XValidation:message="must not contain both CACertificateRefs and WellKnownCACertificates",rule="!(has(self.caCertificateRefs) && size(self.caCertificateRefs) > 0 && has(self.wellKnownCACertificates) && self.wellKnownCACertificates != \"\")"
+// +kubebuilder:validation:XValidation:message="must specify either CACertificateRefs or WellKnownCACertificates",rule="(has(self.caCertificateRefs) && size(self.caCertificateRefs) > 0 || has(self.wellKnownCACertificates) && self.wellKnownCACertificates != \"\")"
+type BackendTLSPolicyValidation struct {
+	// CACertificateRefs contains one or more references to Kubernetes objects that
+	// contain a PEM-encoded TLS CA certificate bundle, which is used to
+	// validate a TLS handshake between the Gateway and backend Pod.
+	//
+	// If CACertificateRefs is empty or unspecified, then WellKnownCACertificates must be
+	// specified. Only one of CACertificateRefs or WellKnownCACertificates may be specified,
+	// not both. If CACertificateRefs is empty or unspecified, the configuration for
+	// WellKnownCACertificates MUST be honored instead if supported by the implementation.
+	//
+	// A CACertificateRef is invalid if:
+	//
+	// * It refers to a resource that cannot be resolved (e.g., the referenced resource
+	//   does not exist) or is misconfigured (e.g., a ConfigMap does not contain a key
+	//   named `ca.crt`). In this case, the Reason must be set to `InvalidCACertificateRef`
+	//   and the Message of the Condition must indicate which reference is invalid and why.
+	//
+	// * It refers to an unknown or unsupported kind of resource. In this case, the Reason
+	//   must be set to `InvalidKind` and the Message of the Condition must explain which
+	//   kind of resource is unknown or unsupported.
+	//
+	// * It refers to a resource in another namespace. This may change in future
+	//   spec updates.
+	//
+	// Implementations MAY choose to perform further validation of the certificate
+	// content (e.g., checking expiry or enforcing specific formats). In such cases,
+	// an implementation-specific Reason and Message must be set for the invalid reference.
+	//
+	// In all cases, the implementation MUST ensure the `ResolvedRefs` Condition on
+	// the BackendTLSPolicy is set to `status: False`, with a Reason and Message
+	// that indicate the cause of the error. Connections using an invalid
+	// CACertificateRef MUST fail, and the client MUST receive an HTTP 5xx error
+	// response. If ALL CACertificateRefs are invalid, the implementation MUST also
+	// ensure the `Accepted` Condition on the BackendTLSPolicy is set to
+	// `status: False`, with a Reason `NoValidCACertificate`.
+	//
+	//
+	// A single CACertificateRef to a Kubernetes ConfigMap kind has "Core" support.
+	// Implementations MAY choose to support attaching multiple certificates to
+	// a backend, but this behavior is implementation-specific.
+	//
+	// Support: Core - An optional single reference to a Kubernetes ConfigMap,
+	// with the CA certificate in a key named `ca.crt`.
+	//
+	// Support: Implementation-specific - More than one reference, other kinds
+	// of resources, or a single reference that includes multiple certificates.
+	//
+	// +optional
+	// +listType=atomic
+	// +kubebuilder:validation:MaxItems=8
+	CACertificateRefs []LocalObjectReference `json:"caCertificateRefs,omitempty"`
+
+	// WellKnownCACertificates specifies whether system CA certificates may be used in
+	// the TLS handshake between the gateway and backend pod.
+	//
+	// If WellKnownCACertificates is unspecified or empty (""), then CACertificateRefs
+	// must be specified with at least one entry for a valid configuration. Only one of
+	// CACertificateRefs or WellKnownCACertificates may be specified, not both.
+	// If an implementation does not support the WellKnownCACertificates field, or
+	// the supplied value is not recognized, the implementation MUST ensure the
+	// `Accepted` Condition on the BackendTLSPolicy is set to `status: False`, with
+	// a Reason `Invalid`.
+	//
+	// Support: Implementation-specific
+	//
+	// +optional
+	// +listType=atomic
+	WellKnownCACertificates *WellKnownCACertificatesType `json:"wellKnownCACertificates,omitempty"`
+
+	// Hostname is used for two purposes in the connection between Gateways and
+	// backends:
+	//
+	// 1. Hostname MUST be used as the SNI to connect to the backend (RFC 6066).
+	// 2. Hostname MUST be used for authentication and MUST match the certificate
+	//    served by the matching backend, unless SubjectAltNames is specified.
+	// 3. If SubjectAltNames are specified, Hostname can be used for certificate selection
+	//    but MUST NOT be used for authentication. If you want to use the value
+	//    of the Hostname field for authentication, you MUST add it to the SubjectAltNames list.
+	//
+	// Support: Core
+	//
+	// +required
+	Hostname PreciseHostname `json:"hostname"`
+
+	// SubjectAltNames contains one or more Subject Alternative Names.
+	// When specified the certificate served from the backend MUST
+	// have at least one Subject Alternate Name matching one of the specified SubjectAltNames.
+	//
+	// Support: Extended
+	//
+	// +optional
+	// +listType=atomic
+	// +kubebuilder:validation:MaxItems=5
+	SubjectAltNames []SubjectAltName `json:"subjectAltNames,omitempty"`
+}
+
+// SubjectAltName represents Subject Alternative Name.
+// +kubebuilder:validation:XValidation:message="SubjectAltName element must contain Hostname, if Type is set to Hostname",rule="!(self.type == \"Hostname\" && (!has(self.hostname) || self.hostname == \"\"))"
+// +kubebuilder:validation:XValidation:message="SubjectAltName element must not contain Hostname, if Type is not set to Hostname",rule="!(self.type != \"Hostname\" && has(self.hostname) && self.hostname != \"\")"
+// +kubebuilder:validation:XValidation:message="SubjectAltName element must contain URI, if Type is set to URI",rule="!(self.type == \"URI\" && (!has(self.uri) || self.uri == \"\"))"
+// +kubebuilder:validation:XValidation:message="SubjectAltName element must not contain URI, if Type is not set to URI",rule="!(self.type != \"URI\" && has(self.uri) && self.uri != \"\")"
+type SubjectAltName struct {
+	// Type determines the format of the Subject Alternative Name. Always required.
+	//
+	// Support: Core
+	//
+	// +required
+	Type SubjectAltNameType `json:"type"`
+
+	// Hostname contains Subject Alternative Name specified in DNS name format.
+	// Required when Type is set to Hostname, ignored otherwise.
+	//
+	// Support: Core
+	//
+	// +optional
+	Hostname Hostname `json:"hostname,omitempty"`
+
+	// URI contains Subject Alternative Name specified in a full URI format.
+	// It MUST include both a scheme (e.g., "http" or "ftp") and a scheme-specific-part.
+	// Common values include SPIFFE IDs like "spiffe://mycluster.example.com/ns/myns/sa/svc1sa".
+	// Required when Type is set to URI, ignored otherwise.
+	//
+	// Support: Core
+	//
+	// +optional
+	URI AbsoluteURI `json:"uri,omitempty"`
+}
+
+// WellKnownCACertificatesType is the type of CA certificate that will be used
+// when the caCertificateRefs field is unspecified.
+// +kubebuilder:validation:Enum=System
+type WellKnownCACertificatesType string
+
+const (
+	// WellKnownCACertificatesSystem indicates that well known system CA certificates should be used.
+	WellKnownCACertificatesSystem WellKnownCACertificatesType = "System"
+)
+
+// SubjectAltNameType is the type of the Subject Alternative Name.
+// +kubebuilder:validation:Enum=Hostname;URI
+type SubjectAltNameType string
+
+const (
+	// HostnameSubjectAltNameType specifies hostname-based SAN.
+	//
+	// Support: Core
+	HostnameSubjectAltNameType SubjectAltNameType = "Hostname"
+
+	// URISubjectAltNameType specifies URI-based SAN, e.g. SPIFFE id.
+	//
+	// Support: Core
+	URISubjectAltNameType SubjectAltNameType = "URI"
+)
+
+const (
+	// This reason is used with the "Accepted" condition when it is
+	// set to false because all CACertificateRefs of the
+	// BackendTLSPolicy are invalid.
+	BackendTLSPolicyReasonNoValidCACertificate PolicyConditionReason = "NoValidCACertificate"
+)
+
+const (
+	// This condition indicates whether the controller was able to resolve all
+	// object references for the BackendTLSPolicy.
+	//
+	// Possible reasons for this condition to be True are:
+	//
+	// * "ResolvedRefs"
+	//
+	// Possible reasons for this condition to be False are:
+	//
+	// * "InvalidCACertificateRef"
+	// * "InvalidKind"
+	//
+	// Controllers may raise this condition with other reasons, but should
+	// prefer to use the reasons listed above to improve interoperability.
+	BackendTLSPolicyConditionResolvedRefs PolicyConditionType = "ResolvedRefs"
+
+	// This reason is used with the "ResolvedRefs" condition when the condition
+	// is true.
+	BackendTLSPolicyReasonResolvedRefs PolicyConditionReason = "ResolvedRefs"
+
+	// This reason is used with the "ResolvedRefs" condition when one of the
+	// BackendTLSPolicy's CACertificateRefs is invalid.
+	// A CACertificateRef is considered invalid when it refers to a nonexistent
+	// resource or when the data within that resource is malformed.
+	BackendTLSPolicyReasonInvalidCACertificateRef PolicyConditionReason = "InvalidCACertificateRef"
+
+	// This reason is used with the "ResolvedRefs" condition when one of the
+	// BackendTLSPolicy's CACertificateRefs references an unknown or unsupported
+	// Group and/or Kind.
+	BackendTLSPolicyReasonInvalidKind PolicyConditionReason = "InvalidKind"
+)
 ```
 
 ## How a client behaves
@@ -262,12 +577,16 @@ For instance, the following will all have the gateway client add TLS if the back
 * A Gateway accepts and terminates TLS on an HTTPS listener
 * A Gateway accepts traffic on a TCP listener
 
-There is no need for a Gateway that accepts traffic with `Mode: Passthrough` to do anything differently here, but implementations MAY choose to treat TLS passthrough as a special case. Implementations that do this SHOULD clearly document their approach if BackendTLSPolicy is treated differently for TLS passthrough.
+There is no need for a Gateway that accepts traffic with `Mode: Passthrough` to do anything differently here, but
+implementations MAY choose to treat TLS passthrough as a special case. Implementations that do this SHOULD clearly
+document their approach if BackendTLSPolicy is treated differently for TLS passthrough.
 
 Note that there are cases where these patterns may result in multiple layers of TLS on a single connection.
-There may be even cases where the gateway implementation is unaware of this; for example, processing TCPRoute traffic -- the traffic may or may not be TLS, and the gateway would be unaware.
+There may be even cases where the gateway implementation is unaware of this; for example, processing TCPRoute traffic --
+the traffic may or may not be TLS, and the gateway would be unaware.
 This is intentional to allow full fidelity of the API, as this is commonly desired for tunneling scenarios.
-When users do not want this, they should ensure that the BackendTLSPolicy is not incorrectly applied to traffic that is already TLS.
+When users do not want this, they should ensure that the BackendTLSPolicy is not incorrectly applied to traffic that is
+already TLS.
 The [Future Plans](#future-plans) include more controls over the API to make this easier to manage.
 
 ## Request Flow
@@ -285,20 +604,26 @@ i.e. Service, in the cluster based on backendRefs rules of the HTTPRoute **and t
 
 ## Future plans
 
-In order to scope this GEP, some some changes are deferred to a near-future GEP.
-This GEP intends to add the ability for additional control by gateway clients to override TLS settings, following previously established patterns of [consumer and producer policies]([glossary](https://gateway-api.sigs.k8s.io/concepts/glossary/?h=gloss#producer-route)).
-Additionally, more contextual control over when to apply the policies will be explored, to enable use cases like "apply TLS only from this route" ([issue](https://github.com/kubernetes-sigs/gateway-api/issues/3856)).
+In order to scope this GEP, some changes are deferred to a near-future GEP.
+This GEP intends to add the ability for additional control by gateway clients to override TLS settings, following previously
+established patterns of [consumer and producer policies]([glossary](https://gateway-api.sigs.k8s.io/concepts/glossary/?h=gloss#producer-route)).
+Additionally, more contextual control over when to apply the policies will be explored, to enable use cases like "apply
+TLS only from this route" ([issue](https://github.com/kubernetes-sigs/gateway-api/issues/3856)).
 
-While the details of these plans are out of scope for this GEP it is important to be aware of the future plans for the API to ensure the immediate-term plans are future-proofed against the proposed plans.
+While the details of these plans are out of scope for this GEP it is important to be aware of the future plans for the
+API to ensure the immediate-term plans are future-proofed against the proposed plans.
 
-Implementations should plan for the existence of future fields that may be added that will control where the TLS policy applies.
+Implementations should plan for the existence of future fields that may be added that will control where the TLS policy
+applies.
 These may include, but are not limited to:
 
 * `spec.targetRefs.namespace`
 * `spec.targetRefs.from`
 * `spec.mode`
 
-While in some cases adding new fields may be seen as a backwards compatibility risk, due to older implementations not knowing to respect the fields, these fields (or similar, should future GEPs decide on new names) are pre-approved to be added in a future release, should the GEPs to add them are approved in the first place.
+While in some cases adding new fields may be seen as a backwards compatibility risk, due to older implementations not
+knowing to respect the fields, these fields (or similar, should future GEPs decide on new names) are pre-approved to be
+added in a future release, should the GEPs to add them are approved in the first place.
 
 ## Alternatives
 Most alternatives are enumerated in the section "The history of backend TLS".  A couple of additional
@@ -396,27 +721,36 @@ developer to provide the appropriate configuration for TLS.  The implementation 
 provided by the application and verify that it satisfies the requirements of the route-as-client, including SAN
 information.  Sometimes the backend owner and route owner are the same entity.
 
-A. This was most recently addressed by
-adding hostname for SNI and removing allowed SANs.
+A. This was most recently addressed by adding hostname for SNI and removing allowed SANs.
+
+Q. Rob Scott is interested in extending the TargetRef to optionally include port, since we are targeting the entirety
+of a Service. See the discussion in https://github.com/kubernetes-sigs/gateway-api/pull/2113/files#r1231594914,
+and follow-up issue in https://github.com/kubernetes-sigs/gateway-api/issues/2147.
+
+A. TargetRef has been changed to `LocalPolicyTargetReferenceWithSectionName`, wherein the `SectionName` field is
+interpreted as a port name for a Service.
 
 ## Graduation Criteria
 
 This section is to record issues that were requested for discussion in the API section before this GEP graduates
 out of `Provisional` status.
 
-1. Rob Scott is interested in extending the TargetRef to optionally include port, since we are targeting the entirety
-of a Service. See the discussion in https://github.com/kubernetes-sigs/gateway-api/pull/2113/files#r1231594914,
-and follow up issue in https://github.com/kubernetes-sigs/gateway-api/issues/2147
-2. Michael Pleshakov asked about conflicts that could arise when multiple implementations are running in a cluster.
+1. Michael Pleshakov asked about conflicts that could arise when multiple implementations are running in a cluster.
 This is a gap in our policy attachment model that needs to be addressed.  See the discussion in
 https://github.com/kubernetes-sigs/gateway-api/pull/2113/files#r1235750540. Graduating this GEP to implementable
 requires an update to the Policy GEP to define how status can be nested to support multiple implementations. This will
 likely look very similar to Route status.
-See [comment](https://github.com/kubernetes-sigs/gateway-api/pull/2113#issuecomment-1696127092).
-3. Rob Scott [wanted to note](https://github.com/kubernetes-sigs/gateway-api/pull/2113#issuecomment-1696127092) that
+
+>This question has been converted to a Gateway API enhancement request for Policy:
+https://github.com/kubernetes-sigs/gateway-api/issues/4098.
+
+2. Rob Scott [wanted to note](https://github.com/kubernetes-sigs/gateway-api/pull/2113#issuecomment-1696127092) that
 when this graduates to the standard channel, implementations of HTTPRoute may also be
 required to watch the BackendTLSPolicy. If one of these policies is attached to a Service targeted by an HTTPRoute,
 the implementation would be required to fully implement the policy or mark the backend invalid.
+
+>This comment may be added to the release notes for v1.4.0 of Gateway API, along with other special notes for the introduction
+of the first standard Policy type.
 
 ## References
 
