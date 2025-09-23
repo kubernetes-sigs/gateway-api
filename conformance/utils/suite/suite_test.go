@@ -419,20 +419,21 @@ var gwcStatusFeatureNames = []string{
 	"HTTPRouteHostRewrite",
 	"HTTPRouteMethodMatching",
 	"HTTPRoutePathRewrite",
-	"TTPRouteQueryParamMatching",
+	"HTTPRouteQueryParamMatching",
 	"HTTPRouteResponseHeaderModification",
 	"ReferenceGrant",
 }
 
 func TestInferGWCSupportedFeatures(t *testing.T) {
 	testCases := []struct {
-		name               string
-		allowAllFeatures   bool
-		supportedFeatures  FeaturesSet
-		exemptFeatures     FeaturesSet
-		ConformanceProfile sets.Set[ConformanceProfileName]
-		expectedFeatures   FeaturesSet
-		expectedSource     supportedFeaturesSource
+		name                     string
+		allowAllFeatures         bool
+		supportedFeatures        FeaturesSet
+		exemptFeatures           FeaturesSet
+		ConformanceProfile       sets.Set[ConformanceProfileName]
+		expectedFeatures         FeaturesSet
+		expectedExtendedFeatures map[ConformanceProfileName]sets.Set[features.FeatureName]
+		expectedSource           supportedFeaturesSource
 	}{
 		{
 			name:             "properly infer supported features",
@@ -459,10 +460,32 @@ func TestInferGWCSupportedFeatures(t *testing.T) {
 			expectedSource:   supportedFeaturesSourceManual,
 		},
 		{
-			name:               "supports conformance profile - core",
+			name:               "supports conformance profile core with specified extended features",
+			ConformanceProfile: sets.New(GatewayHTTPConformanceProfileName),
+			supportedFeatures:  sets.New[features.FeatureName]("GatewayPort8080"),
+			expectedFeatures:   sets.New[features.FeatureName]("Gateway", "HTTPRoute", "GatewayPort8080", "ReferenceGrant"),
+			expectedSource:     supportedFeaturesSourceManual,
+			expectedExtendedFeatures: map[ConformanceProfileName]sets.Set[features.FeatureName]{
+				GatewayHTTPConformanceProfileName: namesToFeatureSet([]string{
+					"GatewayPort8080",
+				}),
+			},
+		},
+		{
+			name:               "supports conformance profile core with inferred extended features",
 			ConformanceProfile: sets.New(GatewayHTTPConformanceProfileName),
 			expectedFeatures:   namesToFeatureSet(gwcStatusFeatureNames),
 			expectedSource:     supportedFeaturesSourceInferred,
+			expectedExtendedFeatures: map[ConformanceProfileName]sets.Set[features.FeatureName]{
+				GatewayHTTPConformanceProfileName: namesToFeatureSet([]string{
+					"GatewayPort8080",
+					"HTTPRouteHostRewrite",
+					"HTTPRouteMethodMatching",
+					"HTTPRoutePathRewrite",
+					"HTTPRouteQueryParamMatching",
+					"HTTPRouteResponseHeaderModification",
+				}),
+			},
 		},
 	}
 
@@ -521,6 +544,11 @@ func TestInferGWCSupportedFeatures(t *testing.T) {
 			if equal := cSuite.SupportedFeatures.Equal(tc.expectedFeatures); !equal {
 				t.Errorf("SupportedFeatures mismatch: got %v, want %v", cSuite.SupportedFeatures.UnsortedList(), tc.expectedFeatures.UnsortedList())
 			}
+
+			if tc.expectedExtendedFeatures == nil {
+				tc.expectedExtendedFeatures = make(map[ConformanceProfileName]sets.Set[features.FeatureName])
+			}
+			assert.Equal(t, tc.expectedExtendedFeatures, cSuite.extendedSupportedFeatures, "expectedExtendedFeatures mismatch")
 		})
 	}
 }
