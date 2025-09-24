@@ -344,7 +344,7 @@ func GatewayAndRoutesMustBeAccepted(t *testing.T, c client.Client, timeoutConfig
 	// If the Gateway has multiple listeners, get a portless gwAddr.
 	// Otherwise, you get the first listener's port, which might not be the one you want.
 	if !usePort {
-		gwAddr, _, _ = strings.Cut(gwAddr, ":")
+		gwAddr, _, _ = net.SplitHostPort(gwAddr)
 	}
 
 	ns := gatewayv1.Namespace(gw.Namespace)
