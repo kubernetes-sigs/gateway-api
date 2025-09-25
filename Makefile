@@ -166,10 +166,13 @@ release-staging: image.multiarch.setup
 
 # Docs
 
+DOCS_BUILD_CONTAINER_NAME ?= gateway-api-mkdocs
+
 .PHONY: build-docs
 build-docs:
 	docker build --pull -t gaie/mkdocs hack/mkdocs/image
-	docker run --rm -v ${PWD}:/docs gaie/mkdocs build
+	docker rm -f $(DOCS_BUILD_CONTAINER_NAME) || true
+	docker run --name $(DOCS_BUILD_CONTAINER_NAME) --rm -v ${PWD}:/docs gaie/mkdocs build
 
 .PHONY: build-docs-netlify
 build-docs-netlify:

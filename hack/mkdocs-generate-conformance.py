@@ -22,6 +22,7 @@ from fnmatch import fnmatch
 import glob
 import os
 import re
+import semver
 
 log = logging.getLogger(f'mkdocs.plugins.{__name__}')
 
@@ -149,7 +150,7 @@ def generate_conformance_tables(reports, currVersion, mkdocsConfig):
 
     return new_file
 
-def generate_profiles_report(reports, route,version):
+def generate_profiles_report(reports, route, version):
 
     http_reports = reports.loc[reports["name"] == route]
     http_reports.set_index('organization')
@@ -159,21 +160,32 @@ def generate_profiles_report(reports, route,version):
         columns=http_reports['organization'])
 
     http_table = http_reports[['organization', 'project',
-                               'version','mode', 'extended.supportedFeatures']].T
+                               'version', 'mode', 'core.result', 'extended.supportedFeatures']].T
     http_table.columns = http_table.iloc[0]
     http_table = http_table[1:].T
+    # change core.result value
 
     for row in http_table.itertuples():
-        if type(row._4) is list:
-            for feat in row._4:
+        if row._4 == "success":
+            http_table.loc[(row.Index, 'core.result')] = ':white_check_mark:'
+        else:
+            http_table.loc[(row.Index, 'core.result')] = ':x:'
+
+        if type(row._5) is list:
+            for feat in row._5:
                 # Process feature name before using it as a column
                 processed_feat = process_feature_name(feat)
-                http_table.loc[row.Index, processed_feat] = ':white_check_mark:'
+                http_table.loc[(http_table.index == row.Index) & \
+                               (http_table['project'] == row.project) & \
+                               (http_table['version'] == row.version) & \
+                               (http_table['mode'] == row.mode), processed_feat] = ':white_check_mark:'
     http_table = http_table.fillna(':x:')
     http_table = http_table.drop(['extended.supportedFeatures'], axis=1)
 
     http_table = http_table.rename(
-        columns={"project": "Project", "version": "Version", "mode":"Mode"})
+        columns={"project": "Project", "version": "Version", "mode": "Mode", "core.result": "Core"})
+    if semver.compare(version.removeprefix('v'), '1.3.0') < 0:
+        http_table = http_table.drop(columns=["Core"])
     if version == 'v1.0.0':
         http_table = http_table.drop(columns=["Mode"])
     return http_table
