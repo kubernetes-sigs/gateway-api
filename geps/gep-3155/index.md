@@ -67,8 +67,6 @@ type GatewayBackendTLS struct {
   // and its associated private key. It can reference standard Kubernetes resources,
   // i.e., Secret, or implementation-specific custom resources.
   //
-  // This setting can be overridden on the service level by use of BackendTLSPolicy.
-  //
   // A ClientCertificateRef is considered invalid if:
   //
   // * It refers to a resource that cannot be resolved (e.g., the referenced resource
