@@ -16,6 +16,20 @@ filters](../reference/spec.md#gateway.networking.k8s.io/v1.HTTPRequestRedirectFi
 instruct Gateways to emit a redirect response to requests matching a filtered
 HTTPRoute rule.
 
+### Supported Status Codes
+
+Gateway API supports the following HTTP redirect status codes:
+
+- **301 (Moved Permanently)**: Indicates that the resource has permanently moved to a new location. Search engines and clients will update their references to use the new URL. Use this for permanent redirects like HTTP to HTTPS upgrades or permanent URL changes.
+
+- **302 (Found)**: Indicates that the resource is temporarily available at a different location. This is the default status code if none is specified. Use this for temporary redirects where the original URL may be valid again in the future.
+
+- **303 (See Other)**: Indicates that the response to the request can be found at a different URL using a GET method. This is commonly used after POST requests to redirect to a confirmation page and prevent duplicate form submissions.
+
+- **307 (Temporary Redirect)**: Similar to 302, but guarantees that the HTTP method will not change when following the redirect. Use this when you need to preserve the original HTTP method (POST, PUT, etc.) in the redirect.
+
+- **308 (Permanent Redirect)**: Similar to 301, but guarantees that the HTTP method will not change when following the redirect. Use this for permanent redirects where the HTTP method must be preserved.
+
 Redirect filters can substitute various URL components independently. For
 example, to issue a permanent redirect (301) from HTTP to HTTPS, configure
 `requestRedirect.statusCode=301` and `requestRedirect.scheme="https"`:
@@ -30,6 +44,28 @@ example, the request `GET http://redirect.example/cinnamon` will result in a
 301 response with a `location: https://redirect.example/cinnamon` header. The
 hostname (`redirect.example`), path (`/cinnamon`), and port (implicit) remain
 unchanged.
+
+### Method-Preserving Redirects
+
+When you need to ensure that the HTTP method is preserved during a redirect, use status codes 307 or 308:
+
+```yaml
+{% include 'standard/http-redirect-rewrite/httproute-redirect-307.yaml' %}
+```
+
+For permanent redirects that must preserve the HTTP method, use status code 308:
+
+```yaml
+{% include 'standard/http-redirect-rewrite/httproute-redirect-308.yaml' %}
+```
+
+### POST-Redirect-GET Pattern
+
+For implementing the POST-Redirect-GET pattern, use status code 303 to redirect POST requests to a GET endpoint:
+
+```yaml
+{% include 'standard/http-redirect-rewrite/httproute-redirect-303.yaml' %}
+```
 
 ### HTTP-to-HTTPS redirects
 
@@ -61,7 +97,9 @@ HTTPS traffic to application backends.
 
 Path redirects use an HTTP Path Modifier to replace either entire paths or path
 prefixes. For example, the HTTPRoute below will issue a 302 redirect to all
-`redirect.example` requests whose path begins with `/cayenne` to `/paprika`:
+`redirect.example` requests whose path begins with `/cayenne` to `/paprika`.
+Note that you can use any of the supported status codes (301, 302, 303, 307, 308)
+depending on your specific requirements:
 
 ```yaml
 {% include 'standard/http-redirect-rewrite/httproute-redirect-full.yaml' %}
