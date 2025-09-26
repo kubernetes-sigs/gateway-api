@@ -8,7 +8,7 @@ implementation:
   organization: GKE
   project: gke-gateway
   url: https://cloud.google.com/kubernetes-engine/docs/concepts/gateway-api
-  version: 1.30.3-gke.1211000
+  version: 1.33.4-gke.1134000
 kind: ConformanceReport
 mode: default
 profiles:

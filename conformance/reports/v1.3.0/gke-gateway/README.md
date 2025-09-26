@@ -4,13 +4,13 @@
 
 |API channel|Implementation version|Mode|Report|
 |-----------|----------------------|----|------|
-|standard|1.30.3-gke.1211000|gke-l7-global-external-managed|[v1.30.3 gxlb report](./standard-1.30.3-gxlb-report.yaml)|
+|standard|1.33.4-gke.1134000|gke-l7-global-external-managed|[v1.33.4 gxlb report](./standard-1.33.4-gxlb-report.yaml)|
 
 ## Reproduce
 
 GKE Gateway conformance report can be reproduced by the following steps.
 
-1. create a GKE cluster with Gateway API enabled
+1. create a GKE cluster with Gateway API enabled (the minimum cluster version that supports v1.3.0 CRD is `1.33.2-gke.1335000`)
 
 ```
 gcloud container clusters create "${cluster_name}" --gateway-api=standard --location="${location}"
@@ -27,7 +27,7 @@ go test ./conformance -run TestConformance -v -timeout=3h -args \
     --organization=GKE \
     --project=gke-gateway \
     --url=https://cloud.google.com/kubernetes-engine/docs/concepts/gateway-api \
-    --version=1.30.3-gke.1211000 \
+    --version=1.33.4-gke.1134000 \
     --contact=gke-gateway-dev@google.com \
     --report-output="/path/to/report"
 ```
