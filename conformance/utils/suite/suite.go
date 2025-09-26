@@ -39,6 +39,7 @@ import (
 
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/gateway-api/apis/v1beta1"
+	xmeshv1alpha1 "sigs.k8s.io/gateway-api/apisx/v1alpha1"
 	confv1 "sigs.k8s.io/gateway-api/conformance/apis/v1"
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
 	"sigs.k8s.io/gateway-api/conformance/utils/flags"
@@ -65,6 +66,7 @@ type ConformanceTestSuite struct {
 	RoundTripper             roundtripper.RoundTripper
 	GRPCClient               grpc.Client
 	GatewayClassName         string
+	MeshName                 string
 	ControllerName           string
 	Debug                    bool
 	Cleanup                  bool
@@ -136,6 +138,7 @@ type ConformanceOptions struct {
 	Clientset            clientset.Interface
 	RestConfig           *rest.Config
 	GatewayClassName     string
+	MeshName             string
 	AddressType          string
 	Debug                bool
 	RoundTripper         roundtripper.RoundTripper
@@ -206,20 +209,23 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 		supportedFeatures = features.SetsToNamesSet(features.AllFeatures)
 	} else if shouldInferSupportedFeatures(&options) {
 		var err error
-		supportedFeatures, err = fetchSupportedFeatures(options.Client, options.GatewayClassName)
-		if err != nil {
-			return nil, fmt.Errorf("cannot infer supported features: %w", err)
-		}
-
-		// If Mesh features are populated in the GatewayClass we remove them from the supported features set.
-		meshFeatureNames := features.SetsToNamesSet(features.MeshCoreFeatures, features.MeshExtendedFeatures)
-		for _, f := range supportedFeatures.UnsortedList() {
-			if meshFeatureNames.Has(f) {
-				supportedFeatures.Delete(f)
-				fmt.Printf("WARNING: Mesh feature %q should not be populated in GatewayClass, skipping...", f)
+		if options.GatewayClassName != "" {
+			supportedFeatures, err = fetchGatewayClassSupportedFeatures(options.Client, options.GatewayClassName)
+			if err != nil {
+				return nil, fmt.Errorf("cannot infer supported features from GWC: %w", err)
 			}
 		}
+
+		supportedMeshFeatures := FeaturesSet{}
+		if options.MeshName != "" {
+			supportedMeshFeatures, err = fetchMeshSupportedFeatures(options.Client, options.MeshName)
+			if err != nil {
+				return nil, fmt.Errorf("cannot infer supported features from XMesh: %w", err)
+			}
+		}
+
 		source = supportedFeaturesSourceInferred
+		supportedFeatures = supportedFeatures.Union(supportedMeshFeatures)
 	}
 
 	// If features were not inferred from Status, it's a GWC issue.
@@ -591,21 +597,56 @@ func ParseConformanceProfiles(p string) sets.Set[ConformanceProfileName] {
 	return res
 }
 
-func fetchSupportedFeatures(client client.Client, gatewayClassName string) (FeaturesSet, error) {
+func fetchGatewayClassSupportedFeatures(client client.Client, gatewayClassName string) (FeaturesSet, error) {
 	if gatewayClassName == "" {
 		return nil, fmt.Errorf("GatewayClass name must be provided to fetch supported features")
 	}
 	gwc := &gatewayv1.GatewayClass{}
 	err := client.Get(context.TODO(), types.NamespacedName{Name: gatewayClassName}, gwc)
 	if err != nil {
-		return nil, fmt.Errorf("fetchSupportedFeatures(): %w", err)
+		return nil, fmt.Errorf("fetchGatewayClassSupportedFeatures(): %w", err)
 	}
 
 	fs := FeaturesSet{}
 	for _, feature := range gwc.Status.SupportedFeatures {
 		fs.Insert(features.FeatureName(feature.Name))
 	}
+
+	// If Mesh features are populated in the GatewayClass we remove them from the supported features set.
+	meshFeatureNames := features.SetsToNamesSet(features.MeshCoreFeatures, features.MeshExtendedFeatures)
+	for _, f := range fs.UnsortedList() {
+		if meshFeatureNames.Has(f) {
+			fs.Delete(f)
+			fmt.Printf("WARNING: Mesh feature %q should not be populated in GatewayClass, skipping...", f)
+		}
+	}
 	fmt.Printf("Supported features for GatewayClass %s: %v\n", gatewayClassName, fs.UnsortedList())
+	return fs, nil
+}
+
+func fetchMeshSupportedFeatures(client client.Client, meshName string) (FeaturesSet, error) {
+	if meshName == "" {
+		return nil, fmt.Errorf("mesh name must be provided to fetch supported features")
+	}
+	xmesh := &xmeshv1alpha1.XMesh{}
+	err := client.Get(context.TODO(), types.NamespacedName{Name: meshName}, xmesh)
+	if err != nil {
+		return nil, fmt.Errorf("fetchMeshSupportedFeatures(): %w", err)
+	}
+
+	fs := FeaturesSet{}
+	for _, feature := range xmesh.Status.SupportedFeatures {
+		fs.Insert(features.FeatureName(feature.Name))
+	}
+
+	gwcFeatureNames := features.SetsToNamesSet(features.GatewayCoreFeatures, features.GatewayExtendedFeatures)
+	for _, f := range fs.UnsortedList() {
+		if gwcFeatureNames.Has(f) {
+			fs.Delete(f)
+			fmt.Printf("WARNING: Mesh feature %q should not be populated in XMesh.Status, skipping...", f)
+		}
+	}
+	fmt.Printf("Supported features for XMesh%s: %v\n", meshName, fs.UnsortedList())
 	return fs, nil
 }
 
