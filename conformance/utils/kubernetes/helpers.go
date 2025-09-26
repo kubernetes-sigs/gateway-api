@@ -1026,6 +1026,14 @@ func BackendTLSPolicyMustHaveCondition(t *testing.T, client client.Client, timeo
 	require.NoErrorf(t, waitErr, "error waiting for BackendTLSPolicy %v status to have a Condition %v", policyNN, condition)
 }
 
+func BackendTLSPolicyMustHaveAcceptedConditionTrue(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, policyNN, gwNN types.NamespacedName) {
+	BackendTLSPolicyMustHaveCondition(t, client, timeoutConfig, policyNN, gwNN, metav1.Condition{
+		Type:   string(gatewayv1.PolicyConditionAccepted),
+		Status: metav1.ConditionTrue,
+		Reason: string(gatewayv1.PolicyReasonAccepted),
+	})
+}
+
 // BackendTLSPolicyMustHaveLatestConditions will fail the test if there are
 // conditions that were not updated
 func BackendTLSPolicyMustHaveLatestConditions(t *testing.T, r *gatewayv1.BackendTLSPolicy) {
