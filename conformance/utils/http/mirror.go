@@ -17,7 +17,6 @@ limitations under the License.
 package http
 
 import (
-	"fmt"
 	"regexp"
 	"sync"
 	"testing"
@@ -31,10 +30,10 @@ import (
 	"sigs.k8s.io/gateway-api/conformance/utils/tlog"
 )
 
-func ExpectMirroredRequest(t *testing.T, client client.Client, clientset clientset.Interface, mirrorPods []MirroredBackend, path string) {
+func ExpectMirroredRequest(t *testing.T, client client.Client, clientset clientset.Interface, mirrorPods []MirroredBackend, logPattern string) {
 	for i, mirrorPod := range mirrorPods {
 		if mirrorPod.Name == "" {
-			tlog.Fatalf(t, "Mirrored BackendRef[%d].Name wasn't provided in the testcase, this test should only check http request mirror.", i)
+			tlog.Fatalf(t, "Mirrored BackendRef[%d].Name wasn't provided in the testcase, this test should only validate request mirroring.", i)
 		}
 	}
 
@@ -48,7 +47,7 @@ func ExpectMirroredRequest(t *testing.T, client client.Client, clientset clients
 			defer wg.Done()
 
 			require.Eventually(t, func() bool {
-				mirrorLogRegexp := regexp.MustCompile(fmt.Sprintf("Echoing back request made to \\%s to client", path))
+				mirrorLogRegexp := regexp.MustCompile(logPattern)
 
 				tlog.Log(t, "Searching for the mirrored request log")
 				tlog.Logf(t, `Reading "%s/%s" logs`, mirrorPod.Namespace, mirrorPod.Name)
