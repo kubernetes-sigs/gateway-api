@@ -31,7 +31,7 @@ _Appears in:_
 {{ end -}}
 
 {{ range $type.Members -}}
-| `{{ .Name  }}` _{{ markdownRenderType .Type }}_ {{- if contains "<gateway:experimental>" .Doc -}}<br />**Experimental**{{ end -}}| {{ template "type_members" . }} | {{ markdownRenderDefault .Default }} | {{ range .Validation -}} {{ markdownRenderFieldDoc . }} <br />{{ end }} |
+| `{{ .Name  }}` _{{ markdownRenderType .Type }}_ {{- if contains "<gateway:experimental>" .Doc -}}<br /> :warning: **Experimental**{{ end -}}| {{ template "type_members" . }} | {{ markdownRenderDefault .Default }} | {{ range .Validation -}} {{ markdownRenderFieldDoc . }} <br />{{ end }} |
 {{ end -}}
 
 {{ end -}}
