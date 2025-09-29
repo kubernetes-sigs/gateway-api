@@ -21,6 +21,7 @@ balanced backends
 
 ## Longer Term Goals
 * Implement capabilities for [ESNI](https://www.cloudflare.com/learning/ssl/what-is-encrypted-sni/)
+* Implement matchers on TLSRoute rules like [ALPN](https://en.wikipedia.org/wiki/Application-Layer_Protocol_Negotiation)
 
 ## Non-Goals
 * Provide an interface for users to define different listeners or ports for the
@@ -71,6 +72,7 @@ type TLSRouteSpec struct {
   // 2. A hostname may be prefixed with a wildcard label (`*.`). The wildcard
   //    label must appear by itself as the first label.
   //
+  // <gateway:util:excludeFromCRD>
   // If a hostname is specified by both the Listener and TLSRoute, there
   // must be at least one intersecting hostname for the TLSRoute to be
   // attached to the Listener. For example:
@@ -85,20 +87,27 @@ type TLSRouteSpec struct {
   //   match.
   //
   // If both the Listener and TLSRoute have specified hostnames, any
-  // TLSRoute hostnames that do not match the Listener hostname MUST be
+  // TLSRoute hostnames that do not match any Listener hostname MUST be
   // ignored. For example, if a Listener specified `*.example.com`, and the
   // TLSRoute specified `test.example.com` and `test.example.net`,
   // `test.example.net` must not be considered for a match.
   //
   // If both the Listener and TLSRoute have specified hostnames, and none
-  // match with the criteria above, then the TLSRoute is not accepted. The
+  // match with the criteria above, then the TLSRoute is not accepted for that 
+  // Listener. If the TLSRoute does not match any Listener on the parent, the 
   // implementation must raise an 'Accepted' Condition with a status of
   // `False` in the corresponding RouteParentStatus.
+  // 
+  // A Listener MUST be of type TLS when a TLSRoute attaches to it. The 
+  // impolementation MUST raise an 'Accepted' Condition with a status of
+  // `False` in the corresponding RouteParentStatus with the reason 
+  // of "UnsupportedValue" in case a Listener of the wrong type is used.
+  // </gateway:util:excludeFromCRD>
   // +required
   // +kubebuilder:validation:MinItems=1
   // +kubebuilder:validation:MaxItems=16
   Hostnames []Hostname `json:"hostnames,omitempty"`
-  // Rules are a list of actions.
+  // Rules is a list of TLS matchers and actions.
   //
   // +required
   // +kubebuilder:validation:MinItems=1
@@ -173,14 +182,13 @@ i.e. `Service`, in the cluster based on `backendRefs` rules of the `TLSRoute`.
 
 The following conflict situations are covered by TLSRoute and TLS passthrough cases:
 
-* When a Gateway contains a listener with `protocol=TLS`, the Gateway MUST NOT
-allow any other kind of listener on the same port and the Gateway SHOULD be
-marked as `Accepted=False` in case there are different kinds of listeners on
-the same port.  
-* When a Gateway contains a listener with `protocol=TLS` and `tls.mode=Passthrough`,
-the `Gateway` MUST NOT allow another listener on the same port with a different
-`tls.mode` and the `Gateway` SHOULD be marked as `Accepted=False`.  
-* Any violating Listener should have a Condition `Conflicted=True`.  
+* When a Gateway supports [Multiplexing](#multiplexing-support) it CAN allow multiple
+listeners on the same port, as soon as they have different protocols (TLS or HTTPS), 
+and the related `tls.mode`, and different hostnames.
+* When a Gateway does not support [Multiplexing](#multiplexing-support) and contains 
+a listener with `protocol=TLS`, the Gateway MUST NOT allow any other kind of 
+listener on the same port, and any violating Listener should have a Condition `OverlappingTLSConfig=True`
+with the reason `OverlappingProtocols`.
 * If a hostname is specified by both the `Listener` and `TLSRoute`, there must
 be at least one intersecting hostname for the `TLSRoute` to be attached to the
 `Listener`.  
@@ -225,11 +233,18 @@ With the specification above, any request to hostnames on `*.example.tld` should
 attached to `TLSRoutes` while requests to `*.anotherexample.tld` are terminated 
 on the `Gateway` and attached to a `HTTPRoute`.
 
+The support for Multiplexing on TLS is `Implementation Specific`, and implementations
+that support this feature MUST announce it on `GatewayClass.Status.SupportedFeatures`.
+
+Implementations that don't support multiplexing SHOULD mark the violating listeners with
+a Condition `Conflicted=True`.
+
 ## Conformance Details
 
 ###  Feature Names
 
 * TLSRoute
+* TLSMultiplexing
 
 ### Conformance tests
 
