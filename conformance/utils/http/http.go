@@ -17,11 +17,10 @@ limitations under the License.
 package http
 
 import (
-	"crypto/rand"
 	"fmt"
-	"math/big"
 	"net"
 	"net/url"
+	"slices"
 	"strings"
 	"testing"
 	"time"
@@ -29,6 +28,7 @@ import (
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
 	"sigs.k8s.io/gateway-api/conformance/utils/roundtripper"
 	"sigs.k8s.io/gateway-api/conformance/utils/tlog"
+	"sigs.k8s.io/gateway-api/conformance/utils/weight"
 )
 
 // ExpectedResponse defines the response expected for a given request.
@@ -91,7 +91,9 @@ type ExpectedRequest struct {
 
 // Response defines expected properties of a response from a backend.
 type Response struct {
+	// Deprecated: Use StatusCodes instead, which supports matching against multiple status codes.
 	StatusCode    int
+	StatusCodes   []int
 	Headers       map[string]string
 	AbsentHeaders []string
 	Protocol      string
@@ -138,8 +140,13 @@ func MakeRequest(t *testing.T, expected *ExpectedResponse, gwAddr, protocol, sch
 		expected.Request.Method = "GET"
 	}
 
-	if expected.Response.StatusCode == 0 {
-		expected.Response.StatusCode = 200
+	// if the deprecated field StatusCode is set, append it to StatusCodes for backwards compatibility
+	if expected.Response.StatusCode != 0 {
+		expected.Response.StatusCodes = append(expected.Response.StatusCodes, expected.Response.StatusCode)
+	}
+
+	if len(expected.Response.StatusCodes) == 0 {
+		expected.Response.StatusCodes = []int{200}
 	}
 
 	if expected.Request.Protocol == "" {
@@ -300,12 +307,14 @@ func WaitForConsistentFailureResponse(t *testing.T, r roundtripper.RoundTripper,
 
 func CompareRoundTrip(t *testing.T, req *roundtripper.Request, cReq *roundtripper.CapturedRequest, cRes *roundtripper.CapturedResponse, expected ExpectedResponse) error {
 	if roundtripper.IsTimeoutError(cRes.StatusCode) {
-		if roundtripper.IsTimeoutError(expected.Response.StatusCode) {
-			return nil
+		for _, statusCode := range expected.Response.StatusCodes {
+			if roundtripper.IsTimeoutError(statusCode) {
+				return nil
+			}
 		}
 	}
-	if expected.Response.StatusCode != cRes.StatusCode {
-		return fmt.Errorf("expected status code to be %d, got %d. CRes: %v", expected.Response.StatusCode, cRes.StatusCode, cRes)
+	if !slices.Contains(expected.Response.StatusCodes, cRes.StatusCode) {
+		return fmt.Errorf("expected status code to be one of %v, got %d. CRes: %v", expected.Response.StatusCodes, cRes.StatusCode, cRes)
 	}
 	if expected.Response.Protocol != "" && expected.Response.Protocol != cRes.Protocol {
 		return fmt.Errorf("expected protocol to be %s, got %s", expected.Response.Protocol, cRes.Protocol)
@@ -467,7 +476,8 @@ func (er *ExpectedResponse) GetTestCaseName(i int) string {
 	if er.Backend != "" {
 		return fmt.Sprintf("%s should go to %s", reqStr, er.Backend)
 	}
-	return fmt.Sprintf("%s should receive a %d", reqStr, er.Response.StatusCode)
+
+	return fmt.Sprintf("%s should receive one of %v", reqStr, er.Response.StatusCodes)
 }
 
 func setRedirectRequestDefaults(req *roundtripper.Request, cRes *roundtripper.CapturedResponse, expected *ExpectedResponse) {
@@ -486,53 +496,13 @@ func setRedirectRequestDefaults(req *roundtripper.Request, cRes *roundtripper.Ca
 	}
 }
 
-// addEntropy adds jitter to the request by adding either a delay up to 1 second, or a random header value, or both.
+// AddEntropy adds jitter to the request by adding either a delay up to 1 second, or a random header value, or both.
 func AddEntropy(exp *ExpectedResponse) error {
-	randomNumber := func(limit int64) (*int64, error) {
-		number, err := rand.Int(rand.Reader, big.NewInt(limit))
-		if err != nil {
-			return nil, err
-		}
-		n := number.Int64()
-		return &n, nil
-	}
-
-	// adds a delay
-	delay := func(limit int64) error {
-		randomSleepDuration, err := randomNumber(limit)
-		if err != nil {
-			return err
-		}
-		time.Sleep(time.Duration(*randomSleepDuration) * time.Millisecond)
-		return nil
-	}
-	// adds random header value
-	randomHeader := func(limit int64) error {
-		randomHeaderValue, err := randomNumber(limit)
-		if err != nil {
-			return err
-		}
+	addRandomHeader := func(randomValue string) error {
 		exp.Request.Headers = make(map[string]string)
-		exp.Request.Headers["X-Jitter"] = fmt.Sprintf("%d", *randomHeaderValue)
+		exp.Request.Headers["X-Jitter"] = randomValue
 		return nil
 	}
 
-	random, err := randomNumber(3)
-	if err != nil {
-		return err
-	}
-
-	switch *random {
-	case 0:
-		return delay(1000)
-	case 1:
-		return randomHeader(10000)
-	case 2:
-		if err := delay(1000); err != nil {
-			return err
-		}
-		return randomHeader(10000)
-	default:
-		return fmt.Errorf("invalid random value: %d", *random)
-	}
+	return weight.AddRandomEntropy(addRandomHeader)
 }

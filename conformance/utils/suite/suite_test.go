@@ -28,6 +28,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
+	xmeshv1alpha1 "sigs.k8s.io/gateway-api/apisx/v1alpha1"
 	confv1 "sigs.k8s.io/gateway-api/conformance/apis/v1"
 	"sigs.k8s.io/gateway-api/pkg/consts"
 	"sigs.k8s.io/gateway-api/pkg/features"
@@ -411,31 +412,32 @@ func TestSuiteReport(t *testing.T) {
 	}
 }
 
-var statusFeatureNames = []string{
+var gwcStatusFeatureNames = []string{
 	"Gateway",
 	"GatewayPort8080",
 	"HTTPRoute",
 	"HTTPRouteHostRewrite",
 	"HTTPRouteMethodMatching",
 	"HTTPRoutePathRewrite",
-	"TTPRouteQueryParamMatching",
+	"HTTPRouteQueryParamMatching",
 	"HTTPRouteResponseHeaderModification",
 	"ReferenceGrant",
 }
 
-func TestInferSupportedFeatures(t *testing.T) {
+func TestInferGWCSupportedFeatures(t *testing.T) {
 	testCases := []struct {
-		name               string
-		allowAllFeatures   bool
-		supportedFeatures  FeaturesSet
-		exemptFeatures     FeaturesSet
-		ConformanceProfile sets.Set[ConformanceProfileName]
-		expectedFeatures   FeaturesSet
-		expectedSource     supportedFeaturesSource
+		name                     string
+		allowAllFeatures         bool
+		supportedFeatures        FeaturesSet
+		exemptFeatures           FeaturesSet
+		ConformanceProfile       sets.Set[ConformanceProfileName]
+		expectedFeatures         FeaturesSet
+		expectedExtendedFeatures map[ConformanceProfileName]sets.Set[features.FeatureName]
+		expectedSource           supportedFeaturesSource
 	}{
 		{
 			name:             "properly infer supported features",
-			expectedFeatures: namesToFeatureSet(statusFeatureNames),
+			expectedFeatures: namesToFeatureSet(gwcStatusFeatureNames),
 			expectedSource:   supportedFeaturesSourceInferred,
 		},
 		{
@@ -458,10 +460,32 @@ func TestInferSupportedFeatures(t *testing.T) {
 			expectedSource:   supportedFeaturesSourceManual,
 		},
 		{
-			name:               "supports conformance profile - core",
+			name:               "supports conformance profile core with specified extended features",
 			ConformanceProfile: sets.New(GatewayHTTPConformanceProfileName),
-			expectedFeatures:   namesToFeatureSet(statusFeatureNames),
+			supportedFeatures:  sets.New[features.FeatureName]("GatewayPort8080"),
+			expectedFeatures:   sets.New[features.FeatureName]("Gateway", "HTTPRoute", "GatewayPort8080", "ReferenceGrant"),
+			expectedSource:     supportedFeaturesSourceManual,
+			expectedExtendedFeatures: map[ConformanceProfileName]sets.Set[features.FeatureName]{
+				GatewayHTTPConformanceProfileName: namesToFeatureSet([]string{
+					"GatewayPort8080",
+				}),
+			},
+		},
+		{
+			name:               "supports conformance profile core with inferred extended features",
+			ConformanceProfile: sets.New(GatewayHTTPConformanceProfileName),
+			expectedFeatures:   namesToFeatureSet(gwcStatusFeatureNames),
 			expectedSource:     supportedFeaturesSourceInferred,
+			expectedExtendedFeatures: map[ConformanceProfileName]sets.Set[features.FeatureName]{
+				GatewayHTTPConformanceProfileName: namesToFeatureSet([]string{
+					"GatewayPort8080",
+					"HTTPRouteHostRewrite",
+					"HTTPRouteMethodMatching",
+					"HTTPRoutePathRewrite",
+					"HTTPRouteQueryParamMatching",
+					"HTTPRouteResponseHeaderModification",
+				}),
+			},
 		},
 	}
 
@@ -482,7 +506,7 @@ func TestInferSupportedFeatures(t *testing.T) {
 					Message: "GatewayClass is accepted and ready for use",
 				},
 			},
-			SupportedFeatures: featureNamesToSet(statusFeatureNames),
+			SupportedFeatures: featureNamesToSet(gwcStatusFeatureNames),
 		},
 	}
 	scheme := runtime.NewScheme()
@@ -500,6 +524,118 @@ func TestInferSupportedFeatures(t *testing.T) {
 		options := ConformanceOptions{
 			AllowCRDsMismatch:          true,
 			GatewayClassName:           gwcName,
+			EnableAllSupportedFeatures: tc.allowAllFeatures,
+			SupportedFeatures:          tc.supportedFeatures,
+			ExemptFeatures:             tc.exemptFeatures,
+			ConformanceProfiles:        tc.ConformanceProfile,
+			Client:                     fakeClient,
+		}
+
+		t.Run(tc.name, func(t *testing.T) {
+			cSuite, err := NewConformanceTestSuite(options)
+			if err != nil {
+				t.Fatalf("error initializing conformance suite: %v", err)
+			}
+
+			if cSuite.supportedFeaturesSource != tc.expectedSource {
+				t.Errorf("InferredSupportedFeatures mismatch: got %v, want %v", cSuite.supportedFeaturesSource, tc.expectedSource)
+			}
+
+			if equal := cSuite.SupportedFeatures.Equal(tc.expectedFeatures); !equal {
+				t.Errorf("SupportedFeatures mismatch: got %v, want %v", cSuite.SupportedFeatures.UnsortedList(), tc.expectedFeatures.UnsortedList())
+			}
+
+			if tc.expectedExtendedFeatures == nil {
+				tc.expectedExtendedFeatures = make(map[ConformanceProfileName]sets.Set[features.FeatureName])
+			}
+			assert.Equal(t, tc.expectedExtendedFeatures, cSuite.extendedSupportedFeatures, "expectedExtendedFeatures mismatch")
+		})
+	}
+}
+
+var meshStatusFeatureNames = []string{
+	"Mesh",
+	"MeshClusterIPMatching",
+	"MeshNamespaceSelector",
+	"MeshServiceAccountSelector",
+	"MeshTLS",
+	"MeshTLSClientCert",
+	"MeshTrafficSplit",
+	"MeshAccessControl",
+	"HTTPRoute",
+}
+
+func TestXMeshInferSupportedFeatures(t *testing.T) {
+	testCases := []struct {
+		name               string
+		allowAllFeatures   bool
+		supportedFeatures  FeaturesSet
+		exemptFeatures     FeaturesSet
+		ConformanceProfile sets.Set[ConformanceProfileName]
+		expectedFeatures   FeaturesSet
+		expectedSource     supportedFeaturesSource
+	}{
+		{
+			name:             "properly infer mesh supported features",
+			expectedFeatures: namesToFeatureSet(meshStatusFeatureNames),
+			expectedSource:   supportedFeaturesSourceInferred,
+		},
+		{
+			name:              "no features",
+			supportedFeatures: sets.New[features.FeatureName]("Mesh"),
+			expectedFeatures:  sets.New[features.FeatureName]("Mesh"),
+			expectedSource:    supportedFeaturesSourceManual,
+		},
+		{
+			name:              "remove exempt features",
+			supportedFeatures: sets.New[features.FeatureName]("MeshTLS", "MeshAccessControl"),
+			exemptFeatures:    sets.New[features.FeatureName]("MeshAccessControl"),
+			expectedFeatures:  sets.New[features.FeatureName]("MeshTLS"),
+			expectedSource:    supportedFeaturesSourceManual,
+		},
+		{
+			name:               "supports conformance profile - core",
+			ConformanceProfile: sets.New(MeshHTTPConformanceProfileName),
+			expectedFeatures:   namesToFeatureSet(meshStatusFeatureNames),
+			expectedSource:     supportedFeaturesSourceInferred,
+		},
+	}
+
+	meshName := "xochopintre"
+	xmesh := &xmeshv1alpha1.XMesh{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: meshName,
+		},
+		Spec: xmeshv1alpha1.MeshSpec{
+			ControllerName: "example.com/mesh-controller",
+		},
+		Status: xmeshv1alpha1.MeshStatus{
+			Conditions: []metav1.Condition{
+				{
+					Type:    string(xmeshv1alpha1.MeshConditionAccepted),
+					Status:  metav1.ConditionTrue,
+					Reason:  "Accepted",
+					Message: "XMesh is accepted and ready for use",
+				},
+			},
+			SupportedFeatures: featureNamesToSet(meshStatusFeatureNames),
+		},
+	}
+	scheme := runtime.NewScheme()
+	scheme.AddKnownTypes(xmeshv1alpha1.SchemeGroupVersion, &xmeshv1alpha1.XMesh{})
+	fakeClient := fake.NewClientBuilder().
+		WithScheme(scheme).
+		WithObjects(xmesh).
+		WithLists(&apiextensionsv1.CustomResourceDefinitionList{}).
+		Build()
+
+	xmeshv1alpha1.Install(fakeClient.Scheme())
+	apiextensionsv1.AddToScheme(fakeClient.Scheme())
+
+	for _, tc := range testCases {
+		options := ConformanceOptions{
+			AllowCRDsMismatch:          true,
+			MeshName:                   meshName,
 			EnableAllSupportedFeatures: tc.allowAllFeatures,
 			SupportedFeatures:          tc.supportedFeatures,
 			ExemptFeatures:             tc.exemptFeatures,

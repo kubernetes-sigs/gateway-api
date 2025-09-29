@@ -60,9 +60,15 @@ CEL_TEST_CRD_CHANNEL ?= standard
 
 all: generate vet fmt verify test
 
+.PHONY: clean-generated
+clean-generated:
+	rm -rf pkg/client/clientset
+	rm -rf pkg/client/listers
+	rm -rf pkg/client/informers
+
 # Run generators for protos, Deepcopy funcs, CRDs, and docs.
 .PHONY: generate
-generate: update-codegen
+generate: clean-generated update-codegen
 
 .PHONY: update-codegen
 update-codegen:
@@ -166,10 +172,13 @@ release-staging: image.multiarch.setup
 
 # Docs
 
+DOCS_BUILD_CONTAINER_NAME ?= gateway-api-mkdocs
+
 .PHONY: build-docs
 build-docs:
 	docker build --pull -t gaie/mkdocs hack/mkdocs/image
-	docker run --rm -v ${PWD}:/docs gaie/mkdocs build
+	docker rm -f $(DOCS_BUILD_CONTAINER_NAME) || true
+	docker run --name $(DOCS_BUILD_CONTAINER_NAME) --rm -v ${PWD}:/docs gaie/mkdocs build
 
 .PHONY: build-docs-netlify
 build-docs-netlify:
@@ -181,6 +190,14 @@ build-docs-netlify:
 live-docs:
 	docker build -t gw/mkdocs hack/mkdocs/image
 	docker run --rm -it -p 3000:3000 -v ${PWD}:/docs gw/mkdocs
+
+.PHONY: verify-mkdocs-nav
+verify-mkdocs-nav:
+	hack/verify-mkdocs-nav.sh
+
+.PHONY: update-mkdocs-nav
+update-mkdocs-nav:
+	hack/update-mkdocs-nav.sh
 
 .PHONY: api-ref-docs
 api-ref-docs:

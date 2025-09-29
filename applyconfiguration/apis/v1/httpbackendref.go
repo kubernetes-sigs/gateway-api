@@ -70,7 +70,7 @@ func (b *HTTPBackendRefApplyConfiguration) WithNamespace(value apisv1.Namespace)
 // WithPort sets the Port field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Port field is set to the value of the last call.
-func (b *HTTPBackendRefApplyConfiguration) WithPort(value apisv1.PortNumber) *HTTPBackendRefApplyConfiguration {
+func (b *HTTPBackendRefApplyConfiguration) WithPort(value int32) *HTTPBackendRefApplyConfiguration {
 	b.BackendObjectReferenceApplyConfiguration.Port = &value
 	return b
 }

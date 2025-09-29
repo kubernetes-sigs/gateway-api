@@ -40,7 +40,6 @@ import (
 
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/gateway-api/apis/v1alpha2"
-	"sigs.k8s.io/gateway-api/apis/v1alpha3"
 	gatewayxv1a1 "sigs.k8s.io/gateway-api/apisx/v1alpha1"
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
 	"sigs.k8s.io/gateway-api/conformance/utils/tlog"
@@ -418,7 +417,7 @@ func GatewayAndRoutesMustBeAccepted(t *testing.T, c client.Client, timeoutConfig
 	// If the Gateway has multiple listeners, get a portless gwAddr.
 	// Otherwise, you get the first listener's port, which might not be the one you want.
 	if !usePort {
-		gwAddr, _, _ = strings.Cut(gwAddr, ":")
+		gwAddr, _, _ = net.SplitHostPort(gwAddr)
 	}
 
 	resourceRef := resourceRefFromGatewayRef(gw,
@@ -476,7 +475,7 @@ func WaitForGatewayAddress(t *testing.T, client client.Client, timeoutConfig con
 		}
 		port = strconv.FormatInt(int64(listener.Port), 10)
 		for _, address := range gw.Status.Addresses {
-			if address.Type != nil && (*address.Type == gatewayv1.IPAddressType || *address.Type == v1alpha2.HostnameAddressType) {
+			if address.Type != nil {
 				ipAddr = address.Value
 				return true, nil
 			}
@@ -1179,10 +1178,10 @@ func findPodConditionInList(t *testing.T, conditions []v1.PodCondition, condName
 func BackendTLSPolicyMustHaveCondition(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, policyNN, gwNN types.NamespacedName, condition metav1.Condition) {
 	t.Helper()
 	waitErr := wait.PollUntilContextTimeout(context.Background(), 1*time.Second, timeoutConfig.HTTPRouteMustHaveCondition, true, func(ctx context.Context) (bool, error) {
-		policy := &v1alpha3.BackendTLSPolicy{}
+		policy := &gatewayv1.BackendTLSPolicy{}
 		err := client.Get(ctx, policyNN, policy)
 		if err != nil {
-			return false, fmt.Errorf("error fetching BackendTLSPolicy: %w", err)
+			return false, fmt.Errorf("error fetching BackendTLSPolicy %v err: %w", policyNN, err)
 		}
 
 		for _, parent := range policy.Status.Ancestors {
@@ -1203,5 +1202,17 @@ func BackendTLSPolicyMustHaveCondition(t *testing.T, client client.Client, timeo
 		return false, nil
 	})
 
-	require.NoErrorf(t, waitErr, "error waiting for BackendTLSPolicy status to have a Condition %v", condition)
+	require.NoErrorf(t, waitErr, "error waiting for BackendTLSPolicy %v status to have a Condition %v", policyNN, condition)
+}
+
+// BackendTLSPolicyMustHaveLatestConditions will fail the test if there are
+// conditions that were not updated
+func BackendTLSPolicyMustHaveLatestConditions(t *testing.T, r *gatewayv1.BackendTLSPolicy) {
+	t.Helper()
+
+	for _, ancestor := range r.Status.Ancestors {
+		if err := ConditionsHaveLatestObservedGeneration(r, ancestor.Conditions); err != nil {
+			tlog.Fatalf(t, "BackendTLSPolicy(controller=%v, ancestorRef=%#v) %v", ancestor.ControllerName, parentRefToString(ancestor.AncestorRef), err)
+		}
+	}
 }

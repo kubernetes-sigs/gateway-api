@@ -30,7 +30,7 @@ type ParentReferenceApplyConfiguration struct {
 	Namespace   *apisv1.Namespace   `json:"namespace,omitempty"`
 	Name        *apisv1.ObjectName  `json:"name,omitempty"`
 	SectionName *apisv1.SectionName `json:"sectionName,omitempty"`
-	Port        *apisv1.PortNumber  `json:"port,omitempty"`
+	Port        *int32              `json:"port,omitempty"`
 }
 
 // ParentReferenceApplyConfiguration constructs a declarative configuration of the ParentReference type for use with
@@ -82,7 +82,7 @@ func (b *ParentReferenceApplyConfiguration) WithSectionName(value apisv1.Section
 // WithPort sets the Port field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Port field is set to the value of the last call.
-func (b *ParentReferenceApplyConfiguration) WithPort(value apisv1.PortNumber) *ParentReferenceApplyConfiguration {
+func (b *ParentReferenceApplyConfiguration) WithPort(value int32) *ParentReferenceApplyConfiguration {
 	b.Port = &value
 	return b
 }

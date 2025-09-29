@@ -19,6 +19,7 @@ limitations under the License.
 package v1alpha2
 
 import (
+	apisv1 "sigs.k8s.io/gateway-api/apis/v1"
 	v1 "sigs.k8s.io/gateway-api/applyconfiguration/apis/v1"
 )
 
@@ -45,6 +46,14 @@ func (b *UDPRouteSpecApplyConfiguration) WithParentRefs(values ...*v1.ParentRefe
 		}
 		b.CommonRouteSpecApplyConfiguration.ParentRefs = append(b.CommonRouteSpecApplyConfiguration.ParentRefs, *values[i])
 	}
+	return b
+}
+
+// WithUseDefaultGateways sets the UseDefaultGateways field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the UseDefaultGateways field is set to the value of the last call.
+func (b *UDPRouteSpecApplyConfiguration) WithUseDefaultGateways(value apisv1.GatewayDefaultScope) *UDPRouteSpecApplyConfiguration {
+	b.CommonRouteSpecApplyConfiguration.UseDefaultGateways = &value
 	return b
 }
 

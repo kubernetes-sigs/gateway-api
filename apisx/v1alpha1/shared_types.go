@@ -18,40 +18,24 @@ package v1alpha1
 
 import (
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
-	v1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
 )
 
 type (
-	// +k8s:deepcopy-gen=false
-	AllowedRoutes = v1.AllowedRoutes
-	// +k8s:deepcopy-gen=false
-	GatewayTLSConfig = v1.GatewayTLSConfig
-	// +k8s:deepcopy-gen=false
-	Group = v1.Group
-	// +k8s:deepcopy-gen=false
-	Hostname = v1.Hostname
-	// +k8s:deepcopy-gen=false
-	Kind = v1.Kind
-	// +k8s:deepcopy-gen=false
-	ObjectName = v1.ObjectName
-	// +k8s:deepcopy-gen=false
-	PortNumber = v1.PortNumber
-	// +k8s:deepcopy-gen=false
-	ProtocolType = v1.ProtocolType
-	// +k8s:deepcopy-gen=false
-	RouteGroupKind = v1.RouteGroupKind
-	// +k8s:deepcopy-gen=false
-	SectionName = v1.SectionName
-	// +k8s:deepcopy-gen=false
-	Namespace = v1.Namespace
-	// +k8s:deepcopy-gen=false
-	Duration = v1.Duration
-	// +k8s:deepcopy-gen=false
-	PolicyStatus = v1alpha2.PolicyStatus
-	// +k8s:deepcopy-gen=false
-	LocalPolicyTargetReference = v1alpha2.LocalPolicyTargetReference
-	// +k8s:deepcopy-gen=false
-	SessionPersistence = v1.SessionPersistence
+	AllowedRoutes              = v1.AllowedRoutes
+	ListenerTLSConfig          = v1.ListenerTLSConfig
+	Group                      = v1.Group
+	Hostname                   = v1.Hostname
+	Kind                       = v1.Kind
+	ObjectName                 = v1.ObjectName
+	PortNumber                 = v1.PortNumber
+	ProtocolType               = v1.ProtocolType
+	RouteGroupKind             = v1.RouteGroupKind
+	SectionName                = v1.SectionName
+	Namespace                  = v1.Namespace
+	Duration                   = v1.Duration
+	PolicyStatus               = v1.PolicyStatus
+	LocalPolicyTargetReference = v1.LocalPolicyTargetReference
+	SessionPersistence         = v1.SessionPersistence
 )
 
 // ParentGatewayReference identifies an API object including its namespace,
