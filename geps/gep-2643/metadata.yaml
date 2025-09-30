@@ -14,3 +14,4 @@ relationships:
       name: TLS Configuration Placement and Terminology
 references:
   - https://datatracker.ietf.org/doc/html/rfc6066#section-3
+  - https://github.com/kubernetes-sigs/gateway-api/issues/2111
