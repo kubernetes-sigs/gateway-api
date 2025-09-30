@@ -93,7 +93,10 @@ var (
 			features.SupportReferenceGrant,
 			features.SupportTLSRoute,
 		),
-		ExtendedFeatures: features.SetsToNamesSet(features.GatewayExtendedFeatures),
+		ExtendedFeatures: features.SetsToNamesSet(
+			features.GatewayExtendedFeatures,
+			features.TLSRouteExtendedFeatures,
+		),
 	}
 
 	// GatewayGRPCConformanceProfile is a ConformanceProfile that covers testing GRPC
