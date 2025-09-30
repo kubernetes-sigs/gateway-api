@@ -38,6 +38,7 @@ var TLSRouteTerminateSimpleSameNamespace = suite.ConformanceTest{
 	Features: []features.FeatureName{
 		features.SupportGateway,
 		features.SupportTLSRoute,
+		features.SupportTLSRouteModeTerminate,
 	},
 	Manifests: []string{"tests/tlsroute-terminate-simple-same-namespace.yaml"},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
