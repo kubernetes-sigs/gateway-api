@@ -17,9 +17,14 @@ _Validation:_
 
 {{ if $type.References -}}
 _Appears in:_
-{{- range $type.SortedReferences }}
+{{ range $type.SortedReferences }}
 - {{ markdownRenderTypeLink . }}
+{{- range .Fields -}}
+{{- if eq .Type.Name $type.Name -}}
+{{- if contains "<gateway:experimental>" .Doc }} :warning: Experimental in `{{.Name}}` field {{- end }}
 {{- end }}
+{{- end }}
+{{ end }}
 {{- end }}
 
 {{ if $type.Members -}}
