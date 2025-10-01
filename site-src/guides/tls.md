@@ -12,7 +12,7 @@ implementation(s) you're using with Gateway API.
 
 !!! info "Experimental Channel"
 
-    The `TLSRoute` resources described below is currently only included in the
+    The `TLSRoute` resource described below is currently only included in the
     "Experimental" channel of Gateway API. For more information on release
     channels, refer to our [versioning guide](../concepts/versioning.md).
 
