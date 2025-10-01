@@ -71,8 +71,14 @@ const (
 	// This option indicates support for HTTPRoute host rewrite (extended conformance)
 	SupportHTTPRouteHostRewrite FeatureName = "HTTPRouteHostRewrite"
 
+	// This option indicates support for HTTPRoute host rewrite (extended conformance)
+	SupportHTTPRouteHostRewriteBackend FeatureName = "HTTPRouteHostRewriteBackend"
+
 	// This option indicates support for HTTPRoute path rewrite (extended conformance)
 	SupportHTTPRoutePathRewrite FeatureName = "HTTPRoutePathRewrite"
+
+	// This option indicates support for HTTPRoute path rewrite (extended conformance)
+	SupportHTTPRoutePathRewriteBackend FeatureName = "HTTPRoutePathRewriteBackend"
 
 	// This option indicates support for HTTPRoute request mirror (extended conformance).
 	SupportHTTPRouteRequestMirror FeatureName = "HTTPRouteRequestMirror"
