@@ -27,7 +27,7 @@ cd "${KUBE_ROOT}"
 mkdir -p cache
 
 failed=false
-for module in $(find . -name "go.mod" | xargs -n1 dirname); do
+for module in $(find . -name "go.mod" | grep -v "^./tools" | xargs -n1 dirname); do
   echo "Linting ${module}"
 
   docker run --rm \
