@@ -9,7 +9,8 @@
 }
 
 /* Increase size of logo */
-.md-header__button.md-logo img, .md-header__button.md-logo svg {
+.md-header__button.md-logo img,
+.md-header__button.md-logo svg {
     height: 1.8rem;
 }
 
@@ -18,6 +19,7 @@
     .md-header__button.md-logo {
         display: block;
     }
+
     .md-tabs {
         display: block;
     }
@@ -31,6 +33,7 @@
 [data-md-toggle=search]:checked~.md-header .md-search__form {
     border-radius: .5rem .5rem 0 0;
 }
+
 [dir=ltr] .md-search__output {
     border-radius: 0 0 .5rem .5rem;
 }
@@ -40,4 +43,10 @@ img.center {
     display: block;
     margin: 20px auto;
     width: 550px;
+}
+
+/* Make tables use the maximum available size */
+.md-typeset__table {
+    min-width: 100%;
+    width: 100%;
 }
