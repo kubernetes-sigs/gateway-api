@@ -19,6 +19,7 @@ set -o nounset
 set -o pipefail
 
 GOPATH=${GOPATH:-$(go env GOPATH)}
+TOOLSMODFILE=${TOOLSMODFILE:-tools/go.mod}
 
 # "go env" doesn't print anything if GOBIN is the default, so we
 # have to manually default it.
@@ -27,9 +28,7 @@ GOBIN=${GOBIN:-${GOPATH}/bin}
 
 echo $GOBIN
 
-go install github.com/elastic/crd-ref-docs
-
-${GOBIN}/crd-ref-docs \
+go tool -modfile ${TOOLSMODFILE} crd-ref-docs \
     --source-path=${PWD}/apis \
     --config=crd-ref-docs.yaml \
     --renderer=markdown \

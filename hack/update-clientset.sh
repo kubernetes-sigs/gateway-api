@@ -60,8 +60,12 @@ GATEWAY_API_DIRS_COMMA="${GATEWAY_API_DIRS_COMMA%,}" # drop trailing comma
 # throw away
 new_report="$(mktemp -t "$(basename "$0").api_violations.XXXXXX")"
 
+TOOLSMODFILE="${TOOLSMODFILE:-$SCRIPT_ROOT/tools/go.mod}"
+GOTOOL="go tool -modfile=${TOOLSMODFILE}"
+
+
 echo "Generating openapi schema"
-go run k8s.io/kube-openapi/cmd/openapi-gen \
+$GOTOOL openapi-gen \
   --output-file zz_generated.openapi.go \
   --report-filename "${new_report}" \
   --output-dir "pkg/generated/openapi" \
@@ -74,7 +78,7 @@ go run k8s.io/kube-openapi/cmd/openapi-gen \
 
 
 echo "Generating apply configuration"
-go run k8s.io/code-generator/cmd/applyconfiguration-gen \
+$GOTOOL applyconfiguration-gen \
   --openapi-schema <(go run ${SCRIPT_ROOT}/cmd/modelschema) \
   --output-dir "applyconfiguration" \
   --output-pkg "${APIS_PKG}/applyconfiguration" \
@@ -82,7 +86,7 @@ go run k8s.io/code-generator/cmd/applyconfiguration-gen \
   ${GATEWAY_INPUT_DIRS_SPACE}
 
 echo "Generating clientset at ${OUTPUT_PKG}/${CLIENTSET_PKG_NAME}"
-go run k8s.io/code-generator/cmd/client-gen \
+$GOTOOL client-gen \
   --clientset-name "${CLIENTSET_NAME}" \
   --input-base "${APIS_PKG}" \
   --input "${GATEWAY_INPUT_DIRS_COMMA//${APIS_PKG}/}" \
@@ -92,14 +96,14 @@ go run k8s.io/code-generator/cmd/client-gen \
   ${COMMON_FLAGS}
 
 echo "Generating listers at ${OUTPUT_PKG}/listers"
-go run k8s.io/code-generator/cmd/lister-gen \
+$GOTOOL lister-gen \
   --output-dir "${OUTPUT_DIR}/listers" \
   --output-pkg "${OUTPUT_PKG}/listers" \
   ${COMMON_FLAGS} \
   ${GATEWAY_INPUT_DIRS_SPACE}
 
 echo "Generating informers"
-go run k8s.io/code-generator/cmd/informer-gen \
+$GOTOOL informer-gen \
   --versioned-clientset-package "${OUTPUT_PKG}/${CLIENTSET_PKG_NAME}/${CLIENTSET_NAME}" \
   --listers-package "${OUTPUT_PKG}/listers" \
   --output-dir "${OUTPUT_DIR}/informers" \
@@ -108,13 +112,13 @@ go run k8s.io/code-generator/cmd/informer-gen \
   ${GATEWAY_INPUT_DIRS_SPACE}
 
 echo "Generating register helpers"
-go run k8s.io/code-generator/cmd/register-gen \
+$GOTOOL register-gen \
   --output-file zz_generated.register.go \
   ${COMMON_FLAGS} \
   ${GATEWAY_INPUT_DIRS_SPACE}
 
 echo "Generating deepcopy"
-go run sigs.k8s.io/controller-tools/cmd/controller-gen \
+$GOTOOL controller-gen \
   object:headerFile=${SCRIPT_ROOT}/hack/boilerplate/boilerplate.generatego.txt \
   paths="./apis/..." \
   paths="./apisx/..."

@@ -201,13 +201,4 @@ update-mkdocs-nav:
 
 .PHONY: api-ref-docs
 api-ref-docs:
-	crd-ref-docs \
-		--source-path=${PWD}/apis \
-		--config=crd-ref-docs.yaml \
-		--renderer=markdown \
-		--output-path=${PWD}/site-src/reference/spec.md
-	crd-ref-docs \
-		--source-path=${PWD}/apisx \
-		--config=crd-ref-docs.yaml \
-		--renderer=markdown \
-		--output-path=${PWD}/site-src/reference/specx.md
+	hack/mkdocs/generate.sh
