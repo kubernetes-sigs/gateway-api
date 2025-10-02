@@ -119,8 +119,9 @@ TLSRoute is for multiplexing TLS connections, discriminated via SNI. It's intend
 for where you want to use the SNI as the main routing method, and are not interested
 in properties of the higher-level protocols like HTTP. The byte stream of the
 connection is proxied without any inspection to the backend when using a `Passthrough` 
-TLS listener, or proxied unencrypted to the backend when using a `Terminate` TLS 
-listener.
+TLS listener, or being __TLS Terminated__ by the proxy when  using a `Terminate` 
+TLS listener. In the later case, the proxy may re-encrypt the traffic to the backend
+in cases like a `BackendTLSPolicy` is applied.
 
 #### TCPRoute and UDPRoute
 
