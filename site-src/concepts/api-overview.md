@@ -117,11 +117,15 @@ modifying them in-flight.
 
 TLSRoute is for multiplexing TLS connections, discriminated via SNI. It's intended
 for where you want to use the SNI as the main routing method, and are not interested
-in properties of the higher-level protocols like HTTP. The byte stream of the
-connection is proxied without any inspection to the backend when using a `Passthrough` 
-TLS listener, or being __TLS Terminated__ by the proxy when  using a `Terminate` 
-TLS listener. In the later case, the proxy may re-encrypt the traffic to the backend
-in cases like a `BackendTLSPolicy` is applied.
+in properties of the higher-level protocols like HTTP. When using a `Passthrough` 
+TLS listener, the encrypted byte stream of the connection is proxied directly to 
+the backend destination (which is then responsible for decrypting the stream) 
+without any introspection beyond the TLS metadata. When using a `Terminate`
+TLS listener, encryption is removed at the gateway to "unwrap" the connection,
+allowing traffic inspection and routing based on attributes of the inner request
+payload. In this latter case, the gateway may be configured to re-encrypt
+the traffic before sending it on to the backend, such as when a
+`BackendTLSPolicy` has been applied to the destination.
 
 #### TCPRoute and UDPRoute
 
