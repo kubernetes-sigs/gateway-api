@@ -60,6 +60,15 @@ nav:
     - Policy Attachment: reference/policy-attachment.md
   - Enhancements:
     - Overview: geps/overview.md
+    - Provisional:
+      - geps/gep-91/index.md
+      - geps/gep-1619/index.md
+      - geps/gep-1651/index.md
+      - geps/gep-2627/index.md
+      - geps/gep-2648/index.md
+      - geps/gep-2649/index.md
+      - geps/gep-3779/index.md
+      - geps/gep-3792/index.md
     - Implementable:
       - geps/gep-1494/index.md
       - geps/gep-3388/index.md
