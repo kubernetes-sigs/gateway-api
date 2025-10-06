@@ -45,7 +45,7 @@ beta, including GatewayClass, Gateway, HTTPRoute, and ReferenceGrant. To install
 this channel, run the following kubectl command:
 
 ```bash
-kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.3.0/standard-install.yaml
+kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.0/standard-install.yaml
 ```
 
 ### Install Experimental Channel
@@ -63,7 +63,7 @@ documentation](../concepts/versioning.md).
 To install the experimental channel, run the following kubectl command:
 
 ```bash
-kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.3.0/experimental-install.yaml
+kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.0/experimental-install.yaml
 ```
 
 ### v1.2 Upgrade Notes
