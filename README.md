@@ -6,7 +6,7 @@ the specification and Custom Resource Definitions (CRDs).
 ## Status
 
 The latest supported version is `v1` as released by
-the [v1.3.0 release][gh_release] of this project.
+the [v1.4.0 release][gh_release] of this project.
 
 This version of the API is has GA level support for the following resources:
 
@@ -71,7 +71,7 @@ Participation in the Kubernetes community is governed by the
 [spec]: https://gateway-api.sigs.k8s.io/reference/spec/
 [concepts]: https://gateway-api.sigs.k8s.io/concepts/api-overview
 [security-model]: https://gateway-api.sigs.k8s.io/concepts/security-model
-[gh_release]: https://github.com/kubernetes-sigs/gateway-api/releases/tag/v1.3.0
+[gh_release]: https://github.com/kubernetes-sigs/gateway-api/releases/tag/v1.4.0
 [godoc]: https://pkg.go.dev/sigs.k8s.io/gateway-api
 [conformance-docs]: https://gateway-api.sigs.k8s.io/concepts/conformance/
 [reports-readme]: ./conformance/reports/README.md
