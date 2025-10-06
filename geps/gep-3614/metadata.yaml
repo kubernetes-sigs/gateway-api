@@ -1,0 +1,7 @@
+apiVersion: internal.gateway.networking.k8s.io/v1alpha1
+kind: GEPDetails
+number: 3614
+name: Gateway Firewall Support
+status: Provisional
+authors:
+  - shaneutt
