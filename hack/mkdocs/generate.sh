@@ -28,7 +28,7 @@ GOBIN=${GOBIN:-${GOPATH}/bin}
 
 echo $GOBIN
 
-go tool -modfile ${TOOLSMODFILE} crd-ref-docs \
+go tool crd-ref-docs \
     --source-path=${PWD}/apis \
     --config=crd-ref-docs.yaml \
     --renderer=markdown \

@@ -61,7 +61,7 @@ GATEWAY_API_DIRS_COMMA="${GATEWAY_API_DIRS_COMMA%,}" # drop trailing comma
 new_report="$(mktemp -t "$(basename "$0").api_violations.XXXXXX")"
 
 TOOLSMODFILE="${TOOLSMODFILE:-$SCRIPT_ROOT/tools/go.mod}"
-GOTOOL="go tool -modfile=${TOOLSMODFILE}"
+GOTOOL="go tool"
 
 
 echo "Generating openapi schema"
@@ -79,7 +79,7 @@ $GOTOOL openapi-gen \
 
 echo "Generating apply configuration"
 $GOTOOL applyconfiguration-gen \
-  --openapi-schema <(go run ${SCRIPT_ROOT}/cmd/modelschema) \
+  --openapi-schema <(go run ${SCRIPT_ROOT}/tools/modelschema) \
   --output-dir "applyconfiguration" \
   --output-pkg "${APIS_PKG}/applyconfiguration" \
   ${COMMON_FLAGS} \

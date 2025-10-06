@@ -37,7 +37,7 @@ cleanup
 
 mkdir -p "${TMP_DIFFROOT}"
 
-go run cmd/gepstoc/main.go -g "${GEPS_TOC_DIR}/" -t "${NAV_TEMPLATE}" -s "${GEPS_TOC_SKIP}" > "${TMP_FILE}"
+go run tools/gepstoc/main.go -g "${GEPS_TOC_DIR}/" -t "${NAV_TEMPLATE}" -s "${GEPS_TOC_SKIP}" > "${TMP_FILE}"
 
 echo "diffing ${NAV_CONF} against freshly generated configuration"
 ret=0
