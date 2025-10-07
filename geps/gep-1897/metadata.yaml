@@ -15,3 +15,6 @@ relationships:
     - number: 1282
       name: Describing Backend Properties
       description: Implements just part of the Backend Properties GEP.
+extendedBy:
+  - number: 4152
+    name: Extending TLS Validation in BackendTLSPolicy
