@@ -206,7 +206,7 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 	supportedFeatures := options.SupportedFeatures.Difference(options.ExemptFeatures)
 	source := supportedFeaturesSourceManual
 	if options.EnableAllSupportedFeatures {
-		supportedFeatures = features.SetsToNamesSet(features.AllFeatures)
+		supportedFeatures = features.SetsToNamesSet(features.AllFeatures).Difference(options.ExemptFeatures)
 	} else if shouldInferSupportedFeatures(&options) {
 		var err error
 		if options.GatewayClassName != "" {
@@ -231,22 +231,6 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 	// If features were not inferred from Status, it's a GWC issue.
 	if source == supportedFeaturesSourceInferred && supportedFeatures.Len() == 0 {
 		return nil, fmt.Errorf("no supported features were determined for test suite")
-	}
-
-	extendedSupportedFeatures := make(map[ConformanceProfileName]FeaturesSet, 0)
-	extendedUnsupportedFeatures := make(map[ConformanceProfileName]FeaturesSet, 0)
-
-	for _, conformanceProfileName := range options.ConformanceProfiles.UnsortedList() {
-		conformanceProfile, err := getConformanceProfileForName(conformanceProfileName)
-		if err != nil {
-			return nil, fmt.Errorf("failed to retrieve conformance profile: %w", err)
-		}
-		// the use of a conformance profile implicitly enables any features of
-		// that profile which are supported at a Core level of support.
-		supportedFeatures = supportedFeatures.Union(conformanceProfile.CoreFeatures)
-
-		extendedSupportedFeatures[conformanceProfileName] = conformanceProfile.ExtendedFeatures.Intersection(supportedFeatures)
-		extendedUnsupportedFeatures[conformanceProfileName] = conformanceProfile.ExtendedFeatures.Difference(supportedFeatures)
 	}
 
 	config.SetupTimeoutConfig(&options.TimeoutConfig)
@@ -306,8 +290,8 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 		UsableNetworkAddresses:      options.UsableNetworkAddresses,
 		UnusableNetworkAddresses:    options.UnusableNetworkAddresses,
 		results:                     make(map[string]testResult),
-		extendedUnsupportedFeatures: extendedUnsupportedFeatures,
-		extendedSupportedFeatures:   extendedSupportedFeatures,
+		extendedUnsupportedFeatures: make(map[ConformanceProfileName]sets.Set[features.FeatureName]),
+		extendedSupportedFeatures:   make(map[ConformanceProfileName]sets.Set[features.FeatureName]),
 		conformanceProfiles:         options.ConformanceProfiles,
 		implementation:              options.Implementation,
 		mode:                        mode,
@@ -315,6 +299,37 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 		apiChannel:                  apiChannel,
 		supportedFeaturesSource:     source,
 		Hook:                        options.Hook,
+	}
+
+	for _, conformanceProfileName := range options.ConformanceProfiles.UnsortedList() {
+		conformanceProfile, err := getConformanceProfileForName(conformanceProfileName)
+		if err != nil {
+			return nil, fmt.Errorf("failed to retrieve conformance profile: %w", err)
+		}
+		// the use of a conformance profile implicitly enables any features of
+		// that profile which are supported at a Core level of support.
+		for _, f := range conformanceProfile.CoreFeatures.UnsortedList() {
+			if !options.SupportedFeatures.Has(f) {
+				suite.SupportedFeatures.Insert(f)
+			}
+		}
+		for _, f := range conformanceProfile.ExtendedFeatures.UnsortedList() {
+			if options.SupportedFeatures.Has(f) {
+				if suite.extendedSupportedFeatures[conformanceProfileName] == nil {
+					suite.extendedSupportedFeatures[conformanceProfileName] = FeaturesSet{}
+				}
+				suite.extendedSupportedFeatures[conformanceProfileName].Insert(f)
+			} else {
+				if suite.extendedUnsupportedFeatures[conformanceProfileName] == nil {
+					suite.extendedUnsupportedFeatures[conformanceProfileName] = FeaturesSet{}
+				}
+				suite.extendedUnsupportedFeatures[conformanceProfileName].Insert(f)
+			}
+			// Add Exempt Features into unsupported features list
+			if options.ExemptFeatures.Has(f) {
+				suite.extendedUnsupportedFeatures[conformanceProfileName].Insert(f)
+			}
+		}
 	}
 
 	// apply defaults
