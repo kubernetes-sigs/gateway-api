@@ -34,7 +34,7 @@ For downstream connections, depending on the Listener Protocol, different TLS mo
 | Listener Protocol | TLS Mode    | Route Type Supported |
 |-------------------|-------------|---------------------|
 | TLS               | Passthrough | TLSRoute            |
-| TLS               | Terminate   | TLSRoute            |
+| TLS               | Terminate   | TLSRoute (extended) |
 | TLS               | Terminate   | TCPRoute            |
 | HTTPS             | Terminate   | HTTPRoute           |
 | GRPC              | Terminate   | GRPCRoute           |

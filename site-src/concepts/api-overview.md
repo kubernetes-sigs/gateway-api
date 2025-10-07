@@ -121,7 +121,7 @@ in properties of the higher-level protocols like HTTP. When using a `Passthrough
 TLS listener, the encrypted byte stream of the connection is proxied directly to 
 the backend destination (which is then responsible for decrypting the stream) 
 without any introspection beyond the TLS metadata. When using a `Terminate`
-TLS listener, encryption is removed at the gateway to "unwrap" the connection,
+TLS listener, encryption is terminated at the gateway to "unwrap" the connection,
 allowing traffic inspection and routing based on attributes of the inner request
 payload.
 
