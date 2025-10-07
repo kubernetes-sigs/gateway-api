@@ -50,8 +50,6 @@ the Gateway.
 
 For `TLSRoute`, the use of `Terminate` means that the TLS termination happens on 
 the `Gateway` and the connection to the backend may happen as a unencrypted TCP connection. 
-`BackendTLSPolicy` can be used in this case to re-encrypt the connection using different
-set of certificate authorities, SNI and other configurations.
 
 ## Downstream TLS
 

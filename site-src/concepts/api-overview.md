@@ -123,9 +123,7 @@ the backend destination (which is then responsible for decrypting the stream)
 without any introspection beyond the TLS metadata. When using a `Terminate`
 TLS listener, encryption is removed at the gateway to "unwrap" the connection,
 allowing traffic inspection and routing based on attributes of the inner request
-payload. In this latter case, the gateway may be configured to re-encrypt
-the traffic before sending it on to the backend, such as when a
-`BackendTLSPolicy` has been applied to the destination.
+payload.
 
 #### TCPRoute and UDPRoute
 
