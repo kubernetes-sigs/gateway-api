@@ -170,7 +170,7 @@ other functions (like managing DNS or creating certificates).
 [37]:#kgateway
 [38]:#google-cloud-service-mesh
 [39]:#kubvernor
-[40]:#agentgateway-with-kgateway
+[40]:#agent-gateway-with-kgateway
 [41]:#kruise-rollouts
 
 
