@@ -38,7 +38,7 @@ CA bundles.
 * As an application developer, I want an alternative to disabling verification,
   such as certificate or SPKI pinning, so I can securely communicate with
   backends using self-signed certificates without managing CA bundles.
-* As a gateway operator, I want to control whether skipping TLS verification is
+* As a gateway operator, I want to control whether skipping TLS validation is
   permitted for specific Gateways.
 * As a security officer, I want transparency and auditability into where TLS
   verification has been disabled.
@@ -46,13 +46,15 @@ CA bundles.
 ## Goals
 
 * Enable connecting to backends over TLS without requiring certificate
-  validation.
+  verification.
 * Support certificate and SPKI pinning as alternatives to disabling verification
   or relying on CA trust chains.
 * Maintain a secure-by-default approach, with certificate verification enabled
   unless explicitly opted out.
 * Provide operator-level controls so Gateway constraints can restrict or permit
   the use of skip-verify.
+* Provide clear runtime indicators that security is degraded when TLS validation
+  is disabled.
 
 ## API
 
