@@ -70,6 +70,13 @@ access to their `Gateways`.
 building consensus on the motivation, goals and non-goals first. _"How?"_ we
 implement shall be left open-ended until _"What?"_ and _"Why?"_ are solid.
 
+> **Note**: Note: Implementation details are premature. However, we consider it
+> valid for this GEP to become a memorandum outlining how to implement these
+> capabilities via existing extension mechanisms (e.g., filters, policy
+> attachment) without API changes if API modifications are not warranted. We
+> may need to work on _ordering_ in these mechanisms however if we decide that
+> is the way to go, as that's an underserved area.
+
 ## Alternatives Considered
 
 ### NetworkPolicy
