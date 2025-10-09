@@ -189,7 +189,6 @@ type BackendTLSPolicyValidation struct {
 	// Support: Implementation-specific
 	//
 	// +optional
-	// +listType=atomic
 	WellKnownCACertificates *WellKnownCACertificatesType `json:"wellKnownCACertificates,omitempty"`
 
 	// Hostname is used for two purposes in the connection between Gateways and
