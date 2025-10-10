@@ -48,8 +48,6 @@ upstream TLS configuration. For `HTTPRoute`, the use of both `Terminate` TLS mod
 Using these together provides what is commonly known as a connection that is terminated and then re-encrypted at
 the Gateway.
 
-For `TLSRoute`, the use of `Terminate` means that the TLS termination happens on 
-the `Gateway` and the connection to the backend resumes as an unencrypted connection. 
 The use of `Terminate` on `TLSRoute` is available on `Extended` [Support Level].
 
 [Support Level]: https://gateway-api.sigs.k8s.io/concepts/conformance/#2-support-levels

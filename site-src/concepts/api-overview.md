@@ -116,14 +116,11 @@ modifying them in-flight.
     our [versioning guide](versioning.md).
 
 TLSRoute is for multiplexing TLS connections, discriminated via SNI. It's intended
-for where you want to use the SNI as the main routing method, and are not interested
-in properties of the higher-level protocols like HTTP. When using a `Passthrough` 
-TLS listener, the encrypted byte stream of the connection is proxied directly to 
-the backend destination (which is then responsible for decrypting the stream) 
-without any introspection beyond the TLS metadata. When using a `Terminate`
-TLS listener, encryption is terminated at the gateway to "unwrap" the connection,
-allowing traffic inspection and routing based on attributes of the inner request
-payload.
+for where you want to route based on TLS metadata, and are not interested in properties
+of the higher-level protocols like HTTP. When using a `Passthrough` TLS listener, the
+encrypted byte stream of the connection is proxied directly to the destination backend,
+which is then responsible for decrypting the stream. When using a `Terminate` TLS
+listener, encryption is terminated at the gateway.
 
 #### TCPRoute and UDPRoute
 
