@@ -1,17 +1,17 @@
 apiVersion: gateway.networking.k8s.io/v1alpha3
 kind: TLSRoute
 metadata:
-  name: gateway-conformance-infra-test
+  name: gateway-conformance-mqtt-test
   namespace: gateway-conformance-infra
 spec:
   parentRefs:
   - name: gateway-tlsroute-terminate
     namespace: gateway-conformance-infra
   hostnames:
-  - abc.example.com
+  - tls.terminate.com
   rules:
   - backendRefs:
-    - name: infra-backend-v2
+    - name: mqtt-backend
       port: 8080
 ---
 apiVersion: gateway.networking.k8s.io/v1
@@ -22,10 +22,10 @@ metadata:
 spec:
   gatewayClassName: "{GATEWAY_CLASS_NAME}"
   listeners:
-  - name: https
-    port: 443
+  - name: mqtt
+    port: 1883
     protocol: TLS
-    hostname: abc.example.com
+    hostname: tls.terminate.com
     allowedRoutes:
       namespaces:
         from: Same
@@ -34,4 +34,62 @@ spec:
     tls:
       mode: Terminate
       certificateRefs:
-      - name: tls-checks-certificate
+      - name: tls-terminate-checks-certificate
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mqtt-backend
+  namespace: gateway-conformance-infra
+spec:
+  selector:
+    app: mqtt-backend
+  ports:
+  - protocol: TCP
+    port: 8080
+    targetPort: 1883
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mqtt-backend
+  namespace: gateway-conformance-infra
+  labels:
+    app: mqtt-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mqtt-backend
+  template:
+    metadata:
+      labels:
+        app: mqtt-backend
+    spec:
+      containers:
+      - name: mqtt-backend
+        # https://hub.docker.com/_/eclipse-mosquitto
+        image: eclipse-mosquitto:2
+        volumeMounts:
+        - name: config
+          mountPath: /mosquitto/config/mosquitto.conf
+          subPath: mosquitto.conf
+        ports:
+        - containerPort: 1883
+        resources:
+          requests:
+            cpu: 10m
+      volumes:
+      - name: config
+        configMap:
+          name: mosquitto-config
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mosquitto-config
+  namespace: gateway-conformance-infra
+data:
+  mosquitto.conf: |
+    listener 1883
+    allow_anonymous true
