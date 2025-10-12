@@ -17,15 +17,19 @@ limitations under the License.
 package tests
 
 import (
+	"crypto/tls"
+	"crypto/x509"
+	"fmt"
 	"testing"
 
 	"k8s.io/apimachinery/pkg/types"
 
-	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
-	"sigs.k8s.io/gateway-api/conformance/utils/tls"
+	"sigs.k8s.io/gateway-api/conformance/utils/tlog"
 	"sigs.k8s.io/gateway-api/pkg/features"
+
+	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
 func init() {
@@ -43,9 +47,9 @@ var TLSRouteTerminateSimpleSameNamespace = suite.ConformanceTest{
 	Manifests: []string{"tests/tlsroute-terminate-simple-same-namespace.yaml"},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
-		routeNN := types.NamespacedName{Name: "gateway-conformance-infra-test", Namespace: ns}
+		routeNN := types.NamespacedName{Name: "gateway-conformance-mqtt-test", Namespace: ns}
 		gwNN := types.NamespacedName{Name: "gateway-tlsroute-terminate", Namespace: ns}
-		certNN := types.NamespacedName{Name: "tls-checks-certificate", Namespace: ns}
+		caCertNN := types.NamespacedName{Name: "tls-checks-ca-certificate", Namespace: ns}
 
 		kubernetes.NamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, []string{ns})
 
@@ -55,17 +59,37 @@ var TLSRouteTerminateSimpleSameNamespace = suite.ConformanceTest{
 		}
 		serverStr := string(hostnames[0])
 
-		cPem, keyPem, err := GetTLSSecret(suite.Client, certNN)
+		caConfigMap, err := kubernetes.GetConfigMapData(suite.Client, caCertNN)
 		if err != nil {
 			t.Fatalf("unexpected error finding TLS secret: %v", err)
 		}
-		t.Run("Simple TLS request matching TLSRoute should reach infra-backend", func(t *testing.T) {
-			tls.MakeTLSRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, cPem, keyPem, serverStr,
-				http.ExpectedResponse{
-					Request:   http.Request{Host: serverStr, Path: "/"},
-					Backend:   "infra-backend-v2",
-					Namespace: "gateway-conformance-infra",
-				})
+		caString, ok := caConfigMap["ca.crt"]
+		if !ok {
+			t.Fatalf("ca.crt not found in configmap: %s/%s", caCertNN.Namespace, caCertNN.Name)
+		}
+
+		t.Run("Simple MQTT TLS request matching TLSRoute should reach mqtt-backend", func(t *testing.T) {
+			tlog.Logf(t, "Establishing MQTT connection to host %s via %s", serverStr, gwAddr)
+
+			certpool := x509.NewCertPool()
+			if !certpool.AppendCertsFromPEM([]byte(caString)) {
+				t.Fatal("Failed to append CA certificate")
+			}
+
+			opts := mqtt.NewClientOptions()
+			opts.AddBroker(fmt.Sprintf("tls://%s", gwAddr))
+			opts.SetTLSConfig(&tls.Config{
+				RootCAs:    certpool,
+				ServerName: serverStr,
+				MinVersion: tls.VersionTLS13,
+			})
+			opts.SetConnectRetry(true)
+
+			client := mqtt.NewClient(opts)
+			token := client.Connect()
+			if token.Wait() && token.Error() != nil {
+				t.Fatalf("Connection failed: %v", token.Error())
+			}
 		})
 	},
 }
