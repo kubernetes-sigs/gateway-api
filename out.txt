@@ -1,3 +1,0 @@
-kubectl kustomize config/crd/experimental | kubectl apply -f -
-kubectl kustomize config/crd/experimental | kubectl apply -f -
-kubectl kustomize config/crd/experimental | kubectl apply -f -
