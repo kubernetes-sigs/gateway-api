@@ -1,4 +1,4 @@
-Click==8.1.8
+Click==8.3.0
 htmlmin==0.1.12
 Jinja2==3.1.6
 jsmin==3.0.1
