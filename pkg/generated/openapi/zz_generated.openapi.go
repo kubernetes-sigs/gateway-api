@@ -4941,7 +4941,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPHeader(ref common.ReferenceCallbac
 					},
 					"value": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Value is the value of HTTP Header to be matched.",
+							Description: "Value is the value of HTTP Header to be matched. <gateway:experimental:description> Must consist of printable US-ASCII characters, optionally separated by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2 </gateway:experimental:description>\n\n<gateway:experimental:validation:Pattern=`^[!-~]+([\\t ]?[!-~]+)*$`>",
 							Default:     "",
 							Type:        []string{"string"},
 							Format:      "",
@@ -5057,7 +5057,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPHeaderMatch(ref common.ReferenceCa
 					},
 					"value": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Value is the value of HTTP Header to be matched.",
+							Description: "Value is the value of HTTP Header to be matched. <gateway:experimental:description> Must consist of printable US-ASCII characters, optionally separated by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2 </gateway:experimental:description>\n\n<gateway:experimental:validation:Pattern=`^[!-~]+([\\t ]?[!-~]+)*$`>",
 							Default:     "",
 							Type:        []string{"string"},
 							Format:      "",

@@ -621,10 +621,15 @@ type HTTPHeaderMatch struct {
 	Name HTTPHeaderName `json:"name"`
 
 	// Value is the value of HTTP Header to be matched.
+	// <gateway:experimental:description>
+	// Must consist of printable US-ASCII characters, optionally separated
+	// by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
+	// </gateway:experimental:description>
 	//
 	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=4096
 	// +required
+	// <gateway:experimental:validation:Pattern=`^[!-~]+([\t ]?[!-~]+)*$`>
 	Value string `json:"value"`
 }
 
@@ -1022,10 +1027,15 @@ type HTTPHeader struct {
 	Name HTTPHeaderName `json:"name"`
 
 	// Value is the value of HTTP Header to be matched.
+	// <gateway:experimental:description>
+	// Must consist of printable US-ASCII characters, optionally separated
+	// by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
+	// </gateway:experimental:description>
 	//
 	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=4096
 	// +required
+	// <gateway:experimental:validation:Pattern=`^[!-~]+([\t ]?[!-~]+)*$`>
 	Value string `json:"value"`
 }
 
