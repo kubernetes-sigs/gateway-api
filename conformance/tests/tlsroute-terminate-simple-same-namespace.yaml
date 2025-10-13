@@ -8,7 +8,7 @@ spec:
   - name: gateway-tlsroute-terminate
     namespace: gateway-conformance-infra
   hostnames:
-  - tls.terminate.com
+  - tls.example.com
   rules:
   - backendRefs:
     - name: mqtt-backend
@@ -25,7 +25,7 @@ spec:
   - name: mqtt
     port: 1883
     protocol: TLS
-    hostname: tls.terminate.com
+    hostname: tls.example.com
     allowedRoutes:
       namespaces:
         from: Same
