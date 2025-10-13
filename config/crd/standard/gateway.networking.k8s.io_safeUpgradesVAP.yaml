@@ -15,8 +15,14 @@ spec:
       operations:  ["CREATE", "UPDATE"]
       resources:   ["*"]
   validations:
-    - expression: "object.metadata.annotations['gateway.networking.k8s.io/channel'] != 'experimental'"
+    - expression: "object.spec.group != 'gateway.networking.k8s.io' || 
+        object.metadata.annotations['gateway.networking.k8s.io/channel'] != 'experimental'" 
       message: "Installing experimental CRDs on top of standard channel CRDs is prohibited by default. Uninstall gateway-api-safe-upgrades.gateway.networking.k8s.io to install experimental CRDs on top of standard channel CRDs."
+      reason: Invalid
+    - expression: "object.spec.group != 'gateway.networking.k8s.io' || 
+        (!matches(object.metadata.annotations['gateway.networking.k8s.io/bundle-version'], 'v1.[0-3].\\\\d+') &&
+        !matches(object.metadata.annotations['gateway.networking.k8s.io/bundle-version'], 'v0'))"
+      message: "Installing CRDs with version before v1.4.0 is prohibited by default. Uninstall gateway-api-safe-upgrades.gateway.networking.k8s.io to install older versions."
       reason: Invalid
 
 ---
