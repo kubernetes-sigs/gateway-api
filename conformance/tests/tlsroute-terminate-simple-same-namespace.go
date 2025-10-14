@@ -20,13 +20,14 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
+	"sync"
 	"testing"
+	"time"
 
 	"k8s.io/apimachinery/pkg/types"
 
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
-	"sigs.k8s.io/gateway-api/conformance/utils/tlog"
 	"sigs.k8s.io/gateway-api/pkg/features"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
@@ -69,7 +70,7 @@ var TLSRouteTerminateSimpleSameNamespace = suite.ConformanceTest{
 		}
 
 		t.Run("Simple MQTT TLS request matching TLSRoute should reach mqtt-backend", func(t *testing.T) {
-			tlog.Logf(t, "Establishing MQTT connection to host %s via %s", serverStr, gwAddr)
+			t.Logf("Establishing MQTT connection to host %s via %s", serverStr, gwAddr)
 
 			certpool := x509.NewCertPool()
 			if !certpool.AppendCertsFromPEM([]byte(caString)) {
@@ -85,10 +86,42 @@ var TLSRouteTerminateSimpleSameNamespace = suite.ConformanceTest{
 			})
 			opts.SetConnectRetry(true)
 
+			var wg sync.WaitGroup
+			wg.Add(1)
+
+			topic := "test/tlsroute-terminate"
+			opts.OnConnect = func(c mqtt.Client) {
+				t.Log("Connected to MQTT broker")
+
+				if token := c.Subscribe(topic, 0, func(_ mqtt.Client, msg mqtt.Message) {
+					t.Logf("Received message: %s\n", string(msg.Payload()))
+					wg.Done()
+				}); token.Wait() && token.Error() != nil {
+					t.Fatalf("Failed to subscribe: %v", token.Error())
+				}
+
+				t.Log("Subscribed, publishing test message...")
+				if token := c.Publish(topic, 0, false, "Hello TLSRoute Terminate MQTT!"); token.Wait() && token.Error() != nil {
+					t.Fatalf("Failed to publish: %v", token.Error())
+				}
+			}
+
 			client := mqtt.NewClient(opts)
-			token := client.Connect()
-			if token.Wait() && token.Error() != nil {
+			if token := client.Connect(); token.Wait() && token.Error() != nil {
 				t.Fatalf("Connection failed: %v", token.Error())
+			}
+
+			waitCh := make(chan struct{})
+			go func() {
+				wg.Wait()
+				close(waitCh)
+			}()
+
+			select {
+			case <-waitCh:
+				t.Log("Round-trip test succeeded")
+			case <-time.After(5 * time.Second):
+				t.Fatal("Timed out waiting for message")
 			}
 		})
 	},
