@@ -27,7 +27,6 @@ type (
 	Hostname                   = v1.Hostname
 	Kind                       = v1.Kind
 	ObjectName                 = v1.ObjectName
-	PortNumber                 = v1.PortNumber
 	ProtocolType               = v1.ProtocolType
 	RouteGroupKind             = v1.RouteGroupKind
 	SectionName                = v1.SectionName
@@ -37,6 +36,20 @@ type (
 	LocalPolicyTargetReference = v1.LocalPolicyTargetReference
 	SessionPersistence         = v1.SessionPersistence
 )
+
+// PortNumber defines a network port.
+//
+// +kubebuilder:validation:Minimum=0
+// +kubebuilder:validation:Maximum=65535
+type PortNumber int32
+
+// StatusPortNumber defines a network port in status fields.
+// Unlike PortNumber, this does not allow 0 since status fields
+// reflect actual assigned ports.
+//
+// +kubebuilder:validation:Minimum=1
+// +kubebuilder:validation:Maximum=65535
+type StatusPortNumber int32
 
 // ParentGatewayReference identifies an API object including its namespace,
 // defaulting to Gateway.

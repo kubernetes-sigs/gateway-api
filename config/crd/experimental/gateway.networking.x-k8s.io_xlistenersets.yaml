@@ -306,6 +306,8 @@ spec:
                         assignment, it MUST set `Accepted` condition to `False` with the
                         `UnsupportedPort` reason.
                       format: int32
+                      maximum: 65535
+                      minimum: 0
                       type: integer
                     protocol:
                       description: Protocol specifies the network protocol this listener
@@ -721,6 +723,8 @@ spec:
                       description: Port is the network port the listener is configured
                         to listen on.
                       format: int32
+                      maximum: 65535
+                      minimum: 1
                       type: integer
                     supportedKinds:
                       description: |-
