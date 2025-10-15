@@ -181,7 +181,7 @@ build-docs:
 	docker run --name $(DOCS_BUILD_CONTAINER_NAME) --rm -v ${PWD}:/docs gaie/mkdocs build
 
 .PHONY: build-docs-netlify
-build-docs-netlify:
+build-docs-netlify: api-ref-docs
 	hack/mkdocs/generate.sh
 	pip install -r hack/mkdocs/image/requirements.txt
 	python -m mkdocs build
@@ -201,13 +201,4 @@ update-mkdocs-nav:
 
 .PHONY: api-ref-docs
 api-ref-docs:
-	crd-ref-docs \
-		--source-path=${PWD}/apis \
-		--config=crd-ref-docs.yaml \
-		--renderer=markdown \
-		--output-path=${PWD}/site-src/reference/spec.md
-	crd-ref-docs \
-		--source-path=${PWD}/apisx \
-		--config=crd-ref-docs.yaml \
-		--renderer=markdown \
-		--output-path=${PWD}/site-src/reference/specx.md
+	hack/mkdocs/generate.sh
