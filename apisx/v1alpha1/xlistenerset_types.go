@@ -252,7 +252,7 @@ type ListenerEntryStatus struct {
 	// Port is the network port the listener is configured to listen on.
 	//
 	// +required
-	Port PortNumber `json:"port"`
+	Port StatusPortNumber `json:"port"`
 
 	// SupportedKinds is the list indicating the Kinds supported by this
 	// listener. This MUST represent the kinds an implementation supports for
