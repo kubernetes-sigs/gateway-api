@@ -50,7 +50,6 @@ Session.vim
 /www/test_out
 .*.timestamp
 /site
-go.work
 go.work.sum
 
 /cache
