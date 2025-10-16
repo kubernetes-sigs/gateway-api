@@ -1,7 +1,7 @@
 # GEP-1686: Mesh conformance testing plan
 
-- Issue: [#1686](https://github.com/kubernetes-sigs/gateway-api/issues/1686)
-- Status: Standard
+* Issue: [#1686](https://github.com/kubernetes-sigs/gateway-api/issues/1686)
+* Status: Standard
 
 ## TLDR
 
