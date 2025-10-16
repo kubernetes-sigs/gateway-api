@@ -167,7 +167,7 @@ type ListenerEntry struct {
 	// +optional
 	//
 	// +kubebuilder:default=0
-	Port PortNumber `json:"port,omitempty"`
+	Port PortNumberWith0 `json:"port,omitempty"`
 
 	// Protocol specifies the network protocol this listener expects to receive.
 	// +required

@@ -37,14 +37,17 @@ type (
 	SessionPersistence         = v1.SessionPersistence
 )
 
-// PortNumber defines a network port.
+// PortNumberWith0 defines a network port that allows 0 to indicate dynamic
+// port assignment. This type should only be used in spec fields where port 0
+// has the special meaning of "auto-assign a port". In most cases,
+// StatusPortNumber (which excludes 0) should be preferred.
 //
 // +kubebuilder:validation:Minimum=0
 // +kubebuilder:validation:Maximum=65535
-type PortNumber int32
+type PortNumberWith0 int32
 
 // StatusPortNumber defines a network port in status fields.
-// Unlike PortNumber, this does not allow 0 since status fields
+// Unlike PortNumberWith0, this does not allow 0 since status fields
 // reflect actual assigned ports.
 //
 // +kubebuilder:validation:Minimum=1
