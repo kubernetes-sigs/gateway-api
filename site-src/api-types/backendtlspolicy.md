@@ -69,15 +69,15 @@ The following illustrates a BackendTLSPolicy that configures TLS for a Service s
 flowchart LR
     client(["client"])
     gateway["Gateway"]
-    style gateway fill:#02f,color:#fff
+    style gateway fill:#3af
     httproute["HTTP<BR>Route"]
-    style httproute fill:#02f,color:#fff
+    style httproute fill:#3af
     service["Service"]
-    style service fill:#02f,color:#fff
+    style service fill:#3af
     pod1["Pod"]
-    style pod1 fill:#02f,color:#fff
+    style pod1 fill:#3af
     pod2["Pod"]
-    style pod2 fill:#02f,color:#fff
+    style pod2 fill:#3af
     client -.->|HTTP <br> request| gateway
     gateway --> httproute
     httproute -.->|BackendTLSPolicy|service
