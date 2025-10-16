@@ -57,3 +57,5 @@ go.work.sum
 .venv/
 release/
 site-src/reference/spec.md
+site-src/reference/specx.md
+

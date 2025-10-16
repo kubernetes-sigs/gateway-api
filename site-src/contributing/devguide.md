@@ -61,7 +61,7 @@ outside $GOPATH as well.
 
 ### Build the Code
 
-The project uses `make` to drive the build. `make` will run code generators, and
+The project uses `make` to drive the build. `make` will clean up previously generated code, run code generators, and
 run static analysis against the code and generate Kubernetes CRDs. You can kick
 off an overall build from the top-level makefile:
 

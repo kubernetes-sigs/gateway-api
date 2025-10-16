@@ -116,9 +116,11 @@ modifying them in-flight.
     our [versioning guide](versioning.md).
 
 TLSRoute is for multiplexing TLS connections, discriminated via SNI. It's intended
-for where you want to use the SNI as the main routing method, and are not interested
-in properties of the higher-level protocols like HTTP.  The byte stream of the
-connection is proxied without any inspection to the backend.
+for where you want to route based on TLS metadata, and are not interested in properties
+of the higher-level protocols like HTTP. When using a `Passthrough` TLS listener, the
+encrypted byte stream of the connection is proxied directly to the destination backend,
+which is then responsible for decrypting the stream. When using a `Terminate` TLS
+listener, encryption is terminated at the gateway.
 
 #### TCPRoute and UDPRoute
 
@@ -157,7 +159,7 @@ to allow multiple Routes to share ports on the Listener.
 |------|---------|---------------------|-----------|-------|
 |HTTPRoute| Layer 7 | Anything in the HTTP Protocol | Terminated only | HTTP and HTTPS Routing|
 |TLSRoute| Somewhere between layer 4 and 7| SNI or other TLS properties| Passthrough or Terminated | Routing of TLS protocols including HTTPS where inspection of the HTTP stream is not required.|
-|TCPRoute| Layer 4| destination port | Passthrough or Terminated | Allows for forwarding of a TCP stream from the Listener to the Backends |
+|TCPRoute| Layer 4| destination port | Terminated | Allows for forwarding of a TCP stream from the Listener to the Backends |
 |UDPRoute| Layer 4| destination port | None | Allows for forwarding of a UDP stream from the Listener to the Backends. |
 |GRPCRoute| Layer 7 | Anything in the gRPC Protocol | Terminated only | gRPC Routing over HTTP/2 and HTTP/2 cleartext|
 
