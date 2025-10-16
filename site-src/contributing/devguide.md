@@ -141,20 +141,18 @@ manually preview docs changes locally, you can install mkdocs and run:
  make docs
 ```
 
-To make it easier to use the right version of mkdocs, there is a `.venv`
-target to create a Python virtualenv that includes mkdocs. To use the
-mkdocs live preview server while you edit, you can run mkdocs from
-the virtualenv:
+To make it easier to use the right version of mkdocs, you can build and serve the docs in a container:
 
 ```shell
-$ make .venv
-Creating a virtualenv in .venv... OK
-To enter the virtualenv type "source .venv/bin/activate", to exit type "deactivate"
-(.venv) $ source .venv/bin/activate
-(.venv) $ mkdocs serve
-INFO    -  Building documentation...
+$ make build-docs
 ...
+INFO    -  Documentation built in 6.73 seconds
+$ make live-docs
+...
+INFO    -  [15:16:59] Serving on http://0.0.0.0:3000/
 ```
+
+You can then view the docs at http://localhost:3000/.
 
 For more information on how documentation should be written, refer to our
 [Documentation Style Guide](style-guide.md).
