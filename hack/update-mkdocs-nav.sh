@@ -25,4 +25,4 @@ NAV_CONF="${NAV_CONF:-${SCRIPT_ROOT}/nav.yml}"
 NAV_TEMPLATE="${NAV_TEMPLATE:-${NAV_CONF}.tmpl}"
 GEPS_TOC_DIR=${GEPS_TOC_DIR:-${SCRIPT_ROOT}/geps}
 
-go run cmd/gepstoc/main.go -g "${GEPS_TOC_DIR}/" -t "${NAV_TEMPLATE}" -s "${GEPS_TOC_SKIP}" > "${NAV_CONF}"
+go run tools/gepstoc/main.go -g "${GEPS_TOC_DIR}/" -t "${NAV_TEMPLATE}" -s "${GEPS_TOC_SKIP}" > "${NAV_CONF}"
