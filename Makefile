@@ -58,6 +58,10 @@ GO_TEST_FLAGS ?=
 CEL_TEST_K8S_VERSION ?= 
 CEL_TEST_CRD_CHANNEL ?= standard
 
+# Compilation flags for binaries
+GOARCH ?= $(shell go env GOARCH)
+GOOS ?= $(shell go env GOOS)
+
 all: generate vet fmt verify test
 
 .PHONY: clean-generated
@@ -102,6 +106,11 @@ test.crds-validation:
 .PHONY: conformance
 conformance:
 	go test ${GO_TEST_FLAGS} -v ./conformance -run TestConformance -args ${CONFORMANCE_FLAGS}
+
+# Build a conformance.test binary that can be used as a standalone binary to run conformance test
+.PHONY: conformance-bin
+conformance-bin:
+	GOOS=$(GOOS) GOARCH=$(GOARCH) go test -c -v ./conformance 
 
 # Install CRD's and example resources to a preexisting cluster.
 .PHONY: install
