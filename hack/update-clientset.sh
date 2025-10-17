@@ -120,8 +120,9 @@ go run sigs.k8s.io/controller-tools/cmd/controller-gen \
   paths="./apisx/..."
 
 echo "Validating CRD markers"
+echo "Validating CRD markers"
 go run sigs.k8s.io/controller-tools/cmd/controller-gen \
-  crd:headerFile=${SCRIPT_ROOT}/hack/boilerplate/boilerplate.generatego.txt \
+  crd \
   paths="./apis/..." \
   paths="./apisx/..." \
-  output:crd:dir=/tmp/gateway-api-crd-validation
+  output:none
