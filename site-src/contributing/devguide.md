@@ -161,3 +161,12 @@ For more information on how documentation should be written, refer to our
 
 To develop or run conformance tests, refer to the [Conformance Test
 Documentation](../concepts/conformance.md#running-tests).
+
+### Adding new tools
+The tools used to build and manage this project are self-contained on their own
+directory at the `tools` directory.
+
+To add a new tool, use `go get -tool -modfile tools/go.mod the.tool.repo/toolname@version`
+and tidy the specific module with `go mod tidy -modfile=tools/go.mod`.
+
+To execute the new tool, use `go tool -modfile=tools/go.mod toolname`.
