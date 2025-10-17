@@ -52,6 +52,7 @@ Session.vim
 /site
 go.work.sum
 /tmp
+/conformance.test
 
 /cache
 .venv/
