@@ -44,6 +44,7 @@ var (
 // Those are the GEPs that will be included in the final navigation bar
 // The order established below will be the order that the statuses will be shown
 var includeGEPStatus = []gep.GEPStatus{
+	gep.GEPStatusProvisional,
 	gep.GEPStatusImplementable,
 	gep.GEPStatusExperimental,
 	gep.GEPStatusStandard,
