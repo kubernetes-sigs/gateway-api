@@ -27,7 +27,6 @@ type (
 	Hostname                   = v1.Hostname
 	Kind                       = v1.Kind
 	ObjectName                 = v1.ObjectName
-	PortNumber                 = v1.PortNumber
 	ProtocolType               = v1.ProtocolType
 	RouteGroupKind             = v1.RouteGroupKind
 	SectionName                = v1.SectionName
@@ -37,6 +36,23 @@ type (
 	LocalPolicyTargetReference = v1.LocalPolicyTargetReference
 	SessionPersistence         = v1.SessionPersistence
 )
+
+// PortNumberWith0 defines a network port that allows 0 to indicate dynamic
+// port assignment. This type should only be used in spec fields where port 0
+// has the special meaning of "auto-assign a port". In most cases,
+// StatusPortNumber (which excludes 0) should be preferred.
+//
+// +kubebuilder:validation:Minimum=0
+// +kubebuilder:validation:Maximum=65535
+type PortNumberWith0 int32
+
+// StatusPortNumber defines a network port in status fields.
+// Unlike PortNumberWith0, this does not allow 0 since status fields
+// reflect actual assigned ports.
+//
+// +kubebuilder:validation:Minimum=1
+// +kubebuilder:validation:Maximum=65535
+type StatusPortNumber int32
 
 // ParentGatewayReference identifies an API object including its namespace,
 // defaulting to Gateway.

@@ -167,9 +167,7 @@ type ListenerEntry struct {
 	// +optional
 	//
 	// +kubebuilder:default=0
-	// +kubebuilder:validation:Minimum=0
-	// +kubebuilder:validation:Maximum=65535
-	Port PortNumber `json:"port,omitempty"`
+	Port PortNumberWith0 `json:"port,omitempty"`
 
 	// Protocol specifies the network protocol this listener expects to receive.
 	// +required
@@ -253,11 +251,8 @@ type ListenerEntryStatus struct {
 
 	// Port is the network port the listener is configured to listen on.
 	//
-	// +kubebuilder:validation:Minimum=1
-	// +kubebuilder:validation:Maximum=65535
-	//
 	// +required
-	Port PortNumber `json:"port"`
+	Port StatusPortNumber `json:"port"`
 
 	// SupportedKinds is the list indicating the Kinds supported by this
 	// listener. This MUST represent the kinds an implementation supports for
