@@ -183,6 +183,27 @@ implementations pass those tests.
 [network_plugins]: https://kubernetes.io/docs/concepts/extend-kubernetes/compute-storage-net/network-plugins/
 [netpol]: https://kubernetes.io/docs/concepts/services-networking/network-policies/
 
+### Compiling Conformance tests
+!!! note
+    This step is optional, and the binary can be used to execute conformance tests
+    on an environment different from the developer environment
+
+In case there's a need to generate a conformance test binary to be executed on a 
+different environment, a binary `conformance.test` can be generated with:
+
+```
+make conformance-bin
+```
+
+Specific GOOS and GOARCH flags can be passed to generate the binary for different
+architectures:
+
+```
+make GOOS=darwin GOARCH=arm64 conformance-bin
+```
+
+Then the conformance binary can be called as `./conformance.test <flags>`
+
 ### Conformance Profiles
 
 The Conformance profiles are a tool to group multiple supported features, with the
