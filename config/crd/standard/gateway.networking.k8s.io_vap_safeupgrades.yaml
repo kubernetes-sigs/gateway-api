@@ -4,7 +4,7 @@ metadata:
   annotations:
     gateway.networking.k8s.io/bundle-version: v1.4.0
     gateway.networking.k8s.io/channel: standard
-  name: "gateway-api-safe-upgrades.gateway.networking.k8s.io"
+  name: "safe-upgrades.gateway.networking.k8s.io"
 spec:
   failurePolicy: Fail
   matchConstraints:
@@ -34,7 +34,7 @@ metadata:
   annotations:
     gateway.networking.k8s.io/bundle-version: v1.4.0
     gateway.networking.k8s.io/channel: standard
-  name: gateway-api-safe-upgrades.gateway.networking.k8s.io
+  name: safe-upgrades.gateway.networking.k8s.io
 spec:
   policyName: gateway-api-safe-upgrades.gateway.networking.k8s.io
   validationActions: [Deny]
