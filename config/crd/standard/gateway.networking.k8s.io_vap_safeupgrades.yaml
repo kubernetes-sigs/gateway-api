@@ -2,7 +2,6 @@ apiVersion: admissionregistration.k8s.io/v1
 kind: ValidatingAdmissionPolicy
 metadata:
   annotations:
-    api-approved.kubernetes.io: https://github.com/kubernetes-sigs/gateway-api/pull/3328
     gateway.networking.k8s.io/bundle-version: v1.4.0
     gateway.networking.k8s.io/channel: standard
   name: "gateway-api-safe-upgrades.gateway.networking.k8s.io"
@@ -15,12 +14,14 @@ spec:
       operations:  ["CREATE", "UPDATE"]
       resources:   ["*"]
   validations:
-    - expression: "(object.spec.group != 'gateway.networking.k8s.io' && object.spec.group != 'gateway.networking.x-k8s.io') || 
-        object.metadata.annotations['gateway.networking.k8s.io/channel'] != 'experimental'" 
+    - expression: "object.spec.group != 'gateway.networking.k8s.io' || (
+        has(object.metadata.annotations) && object.metadata.annotations.exists(k, k == 'gateway.networking.k8s.io/channel') && 
+        object.metadata.annotations['gateway.networking.k8s.io/channel'] == 'standard' )"
       message: "Installing experimental CRDs on top of standard channel CRDs is prohibited by default. Uninstall ValidatingAdmissionPolicy gateway-api-safe-upgrades.gateway.networking.k8s.io to install experimental CRDs on top of standard channel CRDs."
       reason: Invalid
-    - expression: "(object.spec.group != 'gateway.networking.k8s.io' && object.spec.group != 'gateway.networking.x-k8s.io') || 
-        (!matches(object.metadata.annotations['gateway.networking.k8s.io/bundle-version'], 'v1.[0-3].\\\\d+') &&
+    - expression: "object.spec.group != 'gateway.networking.k8s.io' || 
+        (has(object.metadata.annotations) && object.metadata.annotations.exists(k, k == 'gateway.networking.k8s.io/bundle-version') && 
+        !matches(object.metadata.annotations['gateway.networking.k8s.io/bundle-version'], 'v1.[0-3].\\\\d+') &&
         !matches(object.metadata.annotations['gateway.networking.k8s.io/bundle-version'], 'v0'))"
       message: "Installing CRDs with version before v1.4.0 is prohibited by default. Uninstall ValidatingAdmissionPolicy gateway-api-safe-upgrades.gateway.networking.k8s.io to install older versions."
       reason: Invalid
@@ -31,7 +32,6 @@ apiVersion: admissionregistration.k8s.io/v1
 kind: ValidatingAdmissionPolicyBinding
 metadata:
   annotations:
-    api-approved.kubernetes.io: https://github.com/kubernetes-sigs/gateway-api/pull/3328
     gateway.networking.k8s.io/bundle-version: v1.4.0
     gateway.networking.k8s.io/channel: standard
   name: gateway-api-safe-upgrades.gateway.networking.k8s.io
@@ -40,3 +40,7 @@ spec:
   validationActions: [Deny]
   matchResources:
     objectSelector: {}
+
+# !has(object.metadata.annotations['gateway.networking.k8s.io/channel']) ||
+
+# !has(object.metadata.annotations['gateway.networking.k8s.io/bundle-version']) ||
