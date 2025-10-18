@@ -1,0 +1,9 @@
+apiVersion: internal.gateway.networking.k8s.io/v1alpha1
+kind: GEPDetails
+number: 4012
+name: API godoc structure
+status: Memorandum
+authors:
+  - rikatz
+references:
+  - "https://kubernetes.slack.com/archives/CR0H13KGA/p1755796516065299"
