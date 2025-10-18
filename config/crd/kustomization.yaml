@@ -5,4 +5,4 @@ resources:
 - standard/gateway.networking.k8s.io_httproutes.yaml
 - standard/gateway.networking.k8s.io_referencegrants.yaml
 - standard/gateway.networking.k8s.io_backendtlspolicies.yaml
-- standard/gateway.networking.k8s.io_safeUpgradesVAP.yaml
+- standard/gateway.networking.k8s.io_vap_safeupgrades.yaml
