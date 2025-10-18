@@ -22,7 +22,6 @@ import (
 	"google.golang.org/grpc/codes"
 	"k8s.io/apimachinery/pkg/types"
 
-	v1 "sigs.k8s.io/gateway-api/apis/v1"
 	pb "sigs.k8s.io/gateway-api/conformance/echo-basic/grpcechoserver"
 	"sigs.k8s.io/gateway-api/conformance/utils/grpc"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
@@ -51,17 +50,14 @@ var GRPCRouteListenerHostnameMatching = suite.ConformanceTest{
 
 		gwNN := types.NamespacedName{Name: "grpcroute-listener-hostname-matching", Namespace: ns}
 
-		_ = kubernetes.GatewayAndRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName,
-			kubernetes.NewGatewayRef(gwNN, "listener-1"), &v1.GRPCRoute{}, true,
-			types.NamespacedName{Namespace: ns, Name: "backend-v1"},
+		_ = kubernetes.GatewayAndGRPCRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName,
+			kubernetes.NewGatewayRef(gwNN, "listener-1"), types.NamespacedName{Namespace: ns, Name: "backend-v1"},
 		)
-		_ = kubernetes.GatewayAndRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName,
-			kubernetes.NewGatewayRef(gwNN, "listener-2"), &v1.GRPCRoute{}, true,
-			types.NamespacedName{Namespace: ns, Name: "backend-v2"},
+		_ = kubernetes.GatewayAndGRPCRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName,
+			kubernetes.NewGatewayRef(gwNN, "listener-2"), types.NamespacedName{Namespace: ns, Name: "backend-v2"},
 		)
-		gwAddr := kubernetes.GatewayAndRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName,
-			kubernetes.NewGatewayRef(gwNN, "listener-3", "listener-4"), &v1.GRPCRoute{}, true,
-			types.NamespacedName{Namespace: ns, Name: "backend-v3"},
+		gwAddr := kubernetes.GatewayAndGRPCRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName,
+			kubernetes.NewGatewayRef(gwNN, "listener-3", "listener-4"), types.NamespacedName{Namespace: ns, Name: "backend-v3"},
 		)
 
 		testCases := []grpc.ExpectedResponse{{

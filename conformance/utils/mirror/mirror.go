@@ -1,5 +1,5 @@
 /*
-Copyright 2023 The Kubernetes Authors.
+Copyright 2025 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package http
+package mirror
 
 import (
 	"fmt"
@@ -25,13 +25,32 @@ import (
 
 	"github.com/stretchr/testify/require"
 	clientset "k8s.io/client-go/kubernetes"
+
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/tlog"
 )
 
-func ExpectMirroredRequest(t *testing.T, client client.Client, clientset clientset.Interface, mirrorPods []MirroredBackend, path string) {
+type BackendRef struct {
+	Name      string
+	Namespace string
+}
+
+type MirroredBackend struct {
+	BackendRef
+	Percent *int32
+}
+
+func GetHTTPRegexPattern(path string) *regexp.Regexp {
+	return regexp.MustCompile(fmt.Sprintf("Echoing back request made to \\%s to client", path))
+}
+
+func GetGRPCRegexPattern() *regexp.Regexp {
+	return regexp.MustCompile("Received over plaintext")
+}
+
+func ExpectMirroredRequest(t *testing.T, client client.Client, clientset clientset.Interface, mirrorPods []MirroredBackend, mirrorLogRegexp *regexp.Regexp) {
 	for i, mirrorPod := range mirrorPods {
 		if mirrorPod.Name == "" {
 			tlog.Fatalf(t, "Mirrored BackendRef[%d].Name wasn't provided in the testcase, this test should only check http request mirror.", i)
@@ -48,8 +67,6 @@ func ExpectMirroredRequest(t *testing.T, client client.Client, clientset clients
 			defer wg.Done()
 
 			require.Eventually(t, func() bool {
-				mirrorLogRegexp := regexp.MustCompile(fmt.Sprintf("Echoing back request made to \\%s to client", path))
-
 				tlog.Log(t, "Searching for the mirrored request log")
 				tlog.Logf(t, `Reading "%s/%s" logs`, mirrorPod.Namespace, mirrorPod.Name)
 				logs, err := kubernetes.DumpEchoLogs(mirrorPod.Namespace, mirrorPod.Name, client, clientset, assertionStart)

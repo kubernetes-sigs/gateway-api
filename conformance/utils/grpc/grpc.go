@@ -24,6 +24,8 @@ import (
 	"testing"
 	"time"
 
+	"sigs.k8s.io/gateway-api/conformance/utils/mirror"
+
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -88,6 +90,9 @@ type ExpectedResponse struct {
 
 	Backend   string
 	Namespace string
+
+	// MirroredTo is the destination BackendRefs of the mirrored request.
+	MirroredTo []mirror.MirroredBackend
 
 	// User Given TestCase name
 	TestCaseName string
