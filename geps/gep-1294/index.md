@@ -96,6 +96,10 @@ Implementations SHOULD support the default [`ClusterIP`](https://kubernetes.io/d
 
 Services supported as `backendRefs` SHOULD be consistent with expectations for North/South Gateway API implementations, and MUST have associated endpoints. `ClusterIP` `Services` with selectors SHOULD be supported as a `backendRef`.
 
+#### `ServiceImport` as `backendRef`
+
+Implementations that support [GEP-1748: Gateway API Interaction with Multi-Cluster Services](../gep-1748/index.md) MAY allow `ServiceImport` to be used as a `backendRef`. When supported, the semantics MUST follow GEP-1748. Headless `ServiceImport` is out of scope and not currently a part of the spec.
+
 #### `Service` without selectors
 
 An alternate pattern additionally supported by this approach would be to target a `Service` without selectors as the `parentRef`. This could be a clean way to create a pure routing construct and abstract a logical frontend, as traffic would resolve to a `backendRef` `Service` with selectors defined on the `HTTPRoute`, or receive a 4xx/5xx error response if no matching path or valid backend was found.
