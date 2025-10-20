@@ -12,23 +12,23 @@ Indication attribute (aka SNI) of a TLS handshake to make the routing decision.
 While this feature is also known sometimes as TLS passthrough, where after the 
 server name is identified, the gateway does a full encrypted passthrough of the 
 communication, this GEP will also cover cases where a TLS communication is 
-terminated on the Gateway and passed unencrypted to a backend.
+terminated on the Gateway before being passed unencrypted to a backend.
 
 ## Goals
 
 * Provide a TLS route type, based on the SNI identification.
-* Support both Termination and Passthrough TLS modes for TLSRoute
+* Support both Termination (extended support) and Passthrough (core support) TLS modes for TLSRoute
 * Provide load balancing of a TLS route, allowing a user to define a route, 
 based on the SNI identification that should pass the traffic to N load balanced backends
 
 ## Longer Term Goals
 * Implement capabilities for [ESNI](https://www.cloudflare.com/learning/ssl/what-is-encrypted-sni/)
 * Implement matchers on TLSRoute rules like [ALPN](https://en.wikipedia.org/wiki/Application-Layer_Protocol_Negotiation)
+* Extend TLSRouteRule to support hostname being a matcher
 
 ## Non-Goals
 * Provide an interface for users to define different listeners or ports for the
 `TLSRoute` - This will be covered by the `ListenerSet` enhancement.
-* Replace `TCPRoute` for cases where terminated frontend encryption is not needed.
 * When using `TLSRoute` passthrough, support `PROXY` protocol on the gateway listener.
 * When using `TLSRoute` passthrough, support `PROXY` protocol on the communication
 between the Gateway and the backend.
@@ -38,7 +38,7 @@ between the Gateway and the backend.
 ## Introduction
 
 While many application routing cases can be implemented using HTTP/L7 matching
-(the tuple protocol:hostname:port:path), there are some specific cases where direct,
+(the tuple `protocol:hostname:port:path`), there are some specific cases where direct,
 encrypted communication to the backend may be required, without further assertion. For example:
 * A backend that is TLS based but not HTTP based (e.g., a Kafka service, or a
 Postgres service, with its listener being TLS enabled).
@@ -65,6 +65,10 @@ enables the use of a single gateway listener to handle traffic for multiple rout
 ## API
 
 ```golang
+// TLSRouteSpec defines the expected behavior of a TLSRoute.
+// A TLSRoute MUST be attached to a Listener of protocol TLS.
+// Core: The listener CAN be of type Passthrough
+// Extended: The listener CAN be of type Terminate 
 type TLSRouteSpec struct {
   // Hostnames defines a set of SNI hostnames that should match against the
   // SNI attribute of TLS ClientHello message in TLS handshake. This matches
@@ -104,6 +108,8 @@ type TLSRouteSpec struct {
   // implementation MUST raise an 'Accepted' Condition with a status of
   // `False` in the corresponding RouteParentStatus with the reason 
   // of "UnsupportedValue" in case a Listener of the wrong type is used.
+  // Core: A TLS listener CAN have mode Passthrough
+  // Extended: A TLS listener CAN have mode Terminate 
   // </gateway:util:excludeFromCRD>
   // +required
   // +kubebuilder:validation:MinItems=1
@@ -138,6 +144,8 @@ Following are some of the requests flow covered by TLSRoute
 In this workflow, the TLS traffic will be matched against the `SNI attribute` of 
 the request and then directed to the backends.
 
+This workflow MUST be supported on Core support level.
+
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
@@ -158,7 +166,7 @@ spec:
     tls:
       mode: Passthrough
 ---
-apiVersion: gateway.networking.k8s.io/v1alpha2
+apiVersion: gateway.networking.k8s.io/v1alpha3
 kind: TLSRoute
 metadata:
   name: my-tls-route
@@ -185,8 +193,9 @@ i.e. `Service`, in the cluster based on `backendRefs` rules of the `TLSRoute`.
 
 ### TLSRoute + TLS Termination
 In this workflow, the TLS traffic will be matched against the `SNI attribute` of 
-the request, terminated on the `Gateway` and passed unencrypted as a `TCP` connection
-to the backends.
+the request and terminated on the `Gateway`. 
+
+This workflow CAN be supported on Extended support level.
 
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
@@ -211,7 +220,7 @@ spec:
       - name: listener
         kind: Secret
 ---
-apiVersion: gateway.networking.k8s.io/v1alpha2
+apiVersion: gateway.networking.k8s.io/v1alpha3
 kind: TLSRoute
 metadata:
   name: my-rtmp-route
@@ -241,6 +250,9 @@ i.e. `Service`, in the cluster based on `backendRefs` rules of the `TLSRoute`.
 In this workflow, the TLS traffic will be matched against the `SNI attribute` of 
 the request, and based on the SNI attribute be directed to the backends on Passthrough
 mode or be terminated on the `Gateway` and passed unencrypted to the backends.
+
+This workflow CAN be supported on Implementation Specific support level and will
+be covered on a further GEP.
 
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
@@ -276,7 +288,7 @@ spec:
     tls:
       mode: Passthrough
 ---
-apiVersion: gateway.networking.k8s.io/v1alpha2
+apiVersion: gateway.networking.k8s.io/v1alpha3
 kind: TLSRoute
 metadata:
   name: my-tls-route
@@ -290,7 +302,7 @@ spec:
     - name: tls-backend
       port: 443
 ---
-apiVersion: gateway.networking.k8s.io/v1alpha2
+apiVersion: gateway.networking.k8s.io/v1alpha3
 kind: TLSRoute
 metadata:
   name: my-rtmp-route
@@ -326,6 +338,8 @@ In the case of TLSRoute + HTTPs multiplexing, it should operate similarly to the
 mixed TLSRoute, but instead of decrypting and passing the TCP connection as is to 
 the backend, the proper HTTPRoute workflow should happen.
 
+Multiplexing is supported on `Implementation Specific` support level.
+
 ## Conflict management and precedences
 
 The following conflict situations are covered by TLSRoute cases:
@@ -340,7 +354,7 @@ listener on the same port, and any violating Listener should have a Condition
 be at least one intersecting hostname for the `TLSRoute` to be attached to the
 `Listener`.  
   * A `Gateway listener` with `test.example.com` as the hostname matches a `TLSRoute` that
-  specifies `test.example.com` but does not match a `TLSRoute` that specifies `*.example.com`  
+  specifies at least one of `test.example.com` or `*.example.com`  
   * A `Gateway listener` with `*.example.com` as the hostname matches a `TLSRoute` that
   specifies at least one hostname that matches the `Gateway listener` hostname.
   For example, `test.example.com` and `*.example.com` would both match. On the
@@ -391,6 +405,7 @@ a Condition `Conflicted=True`.
 ###  Feature Names
 
 * TLSRoute
+* TLSRouteTermination
 * TLSMultiplexing
 
 ### Conformance tests
@@ -407,7 +422,7 @@ a Condition `Conflicted=True`.
 | A Gateway with \*.example.tld on a TLS listener should allow a TLSRoute with hostname some.example.tld to be attached to it (and the same, but with a non wildcard hostname) | TLSRoute should be able to attach to the Gateway using the matching hostname, a request should succeed | [https://github.com/kubernetes-sigs/gateway-api/issues/1579](https://github.com/kubernetes-sigs/gateway-api/issues/1579)  |
 | A Gateway with something.example.tld on a TLS listener hostname should not allow a TLSRoute of \*.example.tld to be attached  | TLSRoute should be rejected with invalid hostname (we should NOT support wildcard hostnames on a TLSRoute spec) | [https://github.com/kubernetes-sigs/gateway-api/issues/1579](https://github.com/kubernetes-sigs/gateway-api/issues/1579)  |
 | Invalid TLSRoute with invalid BackendObjectReference performs no default forwarding  |  | [https://github.com/kubernetes-sigs/gateway-api/issues/1579](https://github.com/kubernetes-sigs/gateway-api/issues/1579)  |
-| For a [Listener](https://gateway-api.sigs.k8s.io/v1alpha2/references/spec/#gateway.networking.k8s.io%2fv1beta1.ListenerStatus) setting mode: "terminate", TLSRoute should be present in [ListenerStatus.SupportedKinds](https://gateway-api.sigs.k8s.io/v1alpha2/references/spec/#gateway.networking.k8s.io%2fv1beta1.ListenerStatus) in case TLSRoute termination is supported |  | [https://github.com/kubernetes-sigs/gateway-api/issues/1579](https://github.com/kubernetes-sigs/gateway-api/issues/1579)  |
+| For a [Listener](https://gateway-api.sigs.k8s.io/reference/spec/#listener) setting mode: "terminate", TLSRoute should be present in [ListenerStatus.SupportedKinds](https://gateway-api.sigs.k8s.io/reference/spec/#listenerstatus) in case TLSRoute termination is supported |  | [https://github.com/kubernetes-sigs/gateway-api/issues/1579](https://github.com/kubernetes-sigs/gateway-api/issues/1579)  |
 
 Pending conformance verifications:
 
