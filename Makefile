@@ -62,7 +62,7 @@ CEL_TEST_CRD_CHANNEL ?= standard
 GOARCH ?= $(shell go env GOARCH)
 GOOS ?= $(shell go env GOOS)
 
-all: generate vet fmt verify test
+all: generate vet fmt verify test conformance-bin
 
 .PHONY: clean-generated
 clean-generated:
