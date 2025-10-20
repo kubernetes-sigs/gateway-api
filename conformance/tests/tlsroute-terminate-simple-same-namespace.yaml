@@ -12,7 +12,7 @@ spec:
   rules:
   - backendRefs:
     - name: mqtt-backend
-      port: 8080
+      port: 1883
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
@@ -23,7 +23,7 @@ spec:
   gatewayClassName: "{GATEWAY_CLASS_NAME}"
   listeners:
   - name: mqtt
-    port: 1883
+    port: 8883
     protocol: TLS
     hostname: tls.example.com
     allowedRoutes:
@@ -46,7 +46,7 @@ spec:
     app: mqtt-backend
   ports:
   - protocol: TCP
-    port: 8080
+    port: 1883
     targetPort: 1883
 ---
 apiVersion: apps/v1
