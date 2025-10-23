@@ -39,4 +39,8 @@ spec:
   policyName: safe-upgrades.gateway.networking.k8s.io
   validationActions: [Deny]
   matchResources:
-    objectSelector: {}
+    resourceRules:
+    - apiGroups:   ["apiextensions.k8s.io"]
+      apiVersions: ["v1"]
+      resources:   ["customresourcedefinitions"]
+      operations:  ["CREATE", "UPDATE"]
