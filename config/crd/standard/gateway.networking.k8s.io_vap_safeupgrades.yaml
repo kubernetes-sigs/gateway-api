@@ -36,11 +36,7 @@ metadata:
     gateway.networking.k8s.io/channel: standard
   name: safe-upgrades.gateway.networking.k8s.io
 spec:
-  policyName: gateway-api-safe-upgrades.gateway.networking.k8s.io
+  policyName: safe-upgrades.gateway.networking.k8s.io
   validationActions: [Deny]
   matchResources:
     objectSelector: {}
-
-# !has(object.metadata.annotations['gateway.networking.k8s.io/channel']) ||
-
-# !has(object.metadata.annotations['gateway.networking.k8s.io/bundle-version']) ||
