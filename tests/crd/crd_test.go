@@ -24,6 +24,7 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -70,40 +71,96 @@ func TestCRDValidation(t *testing.T) {
 		crdChannel = requestedCRDChannel
 	}
 
-	t.Run("should be able to start test environment", func(_ *testing.T) {
-		testEnv = &envtest.Environment{
-			Scheme:                      scheme,
-			ErrorIfCRDPathMissing:       true,
-			DownloadBinaryAssets:        true,
-			DownloadBinaryAssetsVersion: k8sVersion,
-			CRDInstallOptions: envtest.CRDInstallOptions{
-				Paths: []string{
-					filepath.Join("..", "..", "config", "crd", crdChannel),
-				},
-				CleanUpAfterUse: true,
+	testEnv = &envtest.Environment{
+		Scheme:                      scheme,
+		ErrorIfCRDPathMissing:       true,
+		DownloadBinaryAssets:        true,
+		DownloadBinaryAssetsVersion: k8sVersion,
+		CRDInstallOptions: envtest.CRDInstallOptions{
+			Paths: []string{
+				filepath.Join("..", "..", "..", "config", "crd", crdChannel),
 			},
-		}
+			CleanUpAfterUse: true,
+		},
+	}
 
-		_, err = testEnv.Start()
-		if err != nil {
-			panic(fmt.Sprintf("Error initializing test environment: %v", err))
-		}
-	})
-
+	_, err = testEnv.Start()
 	t.Cleanup(func() {
 		require.NoError(t, testEnv.Stop())
 	})
+	require.NoError(t, err, "Error initializing test environment")
 
-	t.Run("should be able to set kubectl and kubeconfig and connect to the cluster", func(t *testing.T) {
-		kubectlLocation = testEnv.ControlPlane.KubectlPath
-		require.NotEmpty(t, kubectlLocation)
+	// Setup kubectl and kubeconfig
+	kubectlLocation = testEnv.ControlPlane.KubectlPath
+	require.NotEmpty(t, kubectlLocation, "Error initializing Kubectl")
 
-		kubeconfigLocation = fmt.Sprintf("%s/kubeconfig", filepath.Dir(kubectlLocation))
-		require.NoError(t, os.WriteFile(kubeconfigLocation, testEnv.KubeConfig, 0o600))
+	kubeconfigLocation = fmt.Sprintf("%s/kubeconfig", filepath.Dir(kubectlLocation))
+	err = os.WriteFile(kubeconfigLocation, testEnv.KubeConfig, 0o600)
+	require.NoError(t, err, "Error initializing kubeconfig")
 
-		apiResources, err := executeKubectlCommand(t, kubectlLocation, kubeconfigLocation, []string{"api-resources"})
+	apiResources, err := executeKubectlCommand(t, kubectlLocation, kubeconfigLocation, []string{"api-resources"})
+	require.NoError(t, err)
+	require.Contains(t, apiResources, "gateway.networking.k8s.io/v1")
+
+	t.Run("safeupgrades VAP should validate correctly", func(t *testing.T) {
+		if crdChannel == "experimental" {
+			t.Skipf("skipping safeupgrades VAP")
+		}
+
+		output, err := executeKubectlCommand(t, kubectlLocation, kubeconfigLocation,
+			[]string{"apply", "--server-side", "--wait", "-f", filepath.Join("..", "..", "..", "config", "crd", "standard", "gateway.networking.k8s.io_vap_safeupgrades.yaml")})
 		require.NoError(t, err)
-		require.Contains(t, apiResources, "gateway.networking.k8s.io/v1")
+
+		// Even though --wait is applied I noticed a race condition that causes tests to fail.
+		time.Sleep(time.Second)
+
+		t.Run("should be able to install standard CRDs", func(t *testing.T) {
+			output, err = executeKubectlCommand(t, kubectlLocation, kubeconfigLocation,
+				[]string{"apply", "--server-side", "--wait", "-f", filepath.Join("..", "..", "..", "config", "crd", "standard")})
+			require.NoError(t, err)
+		})
+
+		t.Run("should not be able to install k8s.io experimental CRDs", func(t *testing.T) {
+			t.Cleanup(func() {
+				output, err = executeKubectlCommand(t, kubectlLocation, kubeconfigLocation,
+					[]string{"delete", "--wait", "-f", filepath.Join("..", "..", "..", "config", "crd", "experimental", "*.k8s.*")})
+			})
+
+			output, err = executeKubectlCommand(t, kubectlLocation, kubeconfigLocation,
+				[]string{"apply", "--server-side", "--wait", "-f", filepath.Join("..", "..", "..", "config", "crd", "experimental", "*.k8s.*")})
+			require.Error(t, err)
+			assert.Contains(t, output, "Error from server (Invalid)")
+			assert.Contains(t, output, "ValidatingAdmissionPolicy 'safe-upgrades.gateway.networking.k8s.io' with binding 'safe-upgrades.gateway.networking.k8s.io' denied request")
+
+			// Check that --api-group has no invalid crd's
+			output, err = executeKubectlCommand(t, kubectlLocation, kubeconfigLocation, []string{"describe", "CustomResourceDefinition"})
+			require.NoError(t, err)
+			assert.NotContains(t, output, "gateway.networking.k8s.io/channel: experimental", "output contains 'gateway.networking.k8s.io/channel: experimental'")
+		})
+
+		t.Run("should be able to install x-k8s.io experimental CRDs", func(t *testing.T) {
+			t.Cleanup(func() {
+				output, err = executeKubectlCommand(t, kubectlLocation, kubeconfigLocation,
+					[]string{"delete", "--wait", "-f", filepath.Join("..", "..", "..", "config", "crd", "experimental", "*.x-k8s.*")})
+			})
+
+			output, err = executeKubectlCommand(t, kubectlLocation, kubeconfigLocation,
+				[]string{"apply", "--server-side", "--wait", "-f", filepath.Join("..", "..", "..", "config", "crd", "experimental", "*.x-k8s.*")})
+			require.NoError(t, err)
+		})
+
+		t.Run("should not be able to install CRDs with an older version", func(t *testing.T) {
+			t.Cleanup(func() {
+				output, err = executeKubectlCommand(t, kubectlLocation, kubeconfigLocation,
+					[]string{"delete", "--wait", "-f", filepath.Join(".", "standard-install-1.3.0.yaml")})
+			})
+
+			output, err = executeKubectlCommand(t, kubectlLocation, kubeconfigLocation,
+				[]string{"apply", "--server-side", "--wait", "-f", filepath.Join(".", "standard-install-1.3.0.yaml")})
+			require.Error(t, err)
+			assert.Contains(t, output, "Error from server (Invalid)")
+			assert.Contains(t, output, "ValidatingAdmissionPolicy 'safe-upgrades.gateway.networking.k8s.io' with binding 'safe-upgrades.gateway.networking.k8s.io' denied request")
+		})
 	})
 
 	t.Run("should be able to install standard examples", func(t *testing.T) {
