@@ -42,14 +42,16 @@ These two validation mechanisms operate independently and can be used simultaneo
 	This approach delegates client authorization to the backend and introduce a significant security risk. It should be used in testing environments or
 	on a temporary basis in non-testing environments.
     When `FrontendValidationModeType` is changed from `AllowValidOnly` to `AllowInsecureFallback` the `InsecureFrontendValidationMode` condition MUST be set to `True` with Reason `ConfigurationChanged` on gateway.
-	This condition remains set to `True` even if `FrontendValidationModeType` is later changed back to `AllowValidOnly`.
+	This condition is removed as soon as `FrontendValidationModeType` is changed back to `AllowValidOnly`.
 
 * Introduce a `ObjectReference` structure that can be used to specify `caCertificateRefs` references.
-* Invalid `caCertificateRefs` directly affect the `ResolvedRefs` and `Accepted` conditions of the targeted listeners. 
-  A listener is considered targeted if and only if it is serving HTTPS and either its port  matches the port of the 
-  per-port configuration, or it is using the default configuration. This behavior is important to ensure that when all 
-  CA certificates are invalid, listeners do not implicitly fall back to skipping client 
-  certificate verification.
+* Invalid `caCertificateRefs` directly affect the `ResolvedRefs` and `Accepted` conditions of the targeted listeners.
+  * **For a `perPort` configuration**: A listener is considered targeted if and only if it serves HTTPS and its port
+    matches the port specified in the per-port configuration.
+  * **For the `default` configuration**: A listener is considered targeted if and only if it serves HTTPS and its port
+    does not match any of the per-port configurations.
+  This behavior is important to ensure that when all CA certificates are invalid, listeners do not implicitly fall
+  back to skipping client certificate verification.
 
 ### Impact on listeners
 
@@ -172,6 +174,10 @@ type FrontendTLSValidation struct {
 	//   certificate to be attached. If a ReferenceGrant does not allow this
 	//   reference, the `ResolvedRefs` condition MUST be set with
 	//   the Reason `RefNotPermitted`.
+    //
+	// Implementations MAY choose to perform further validation of the 
+	// certificate content (e.g., checking expiry or enforcing specific formats).
+	// In such cases, an implementation-specific Reason and Message MUST be set.
 	//
 	// In all cases, the implementation MUST ensure that the `ResolvedRefs`
 	// condition is set to `status: False` on all targeted listeners (i.e.,
