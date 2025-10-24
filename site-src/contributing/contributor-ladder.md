@@ -118,7 +118,7 @@ releasing new versions of the API.
 
 The concept of Mesh Leads does not have a perfect parallel on the upstream
 Kubernetes community ladder. They are essentially Subproject Owners, but for the
-GAMMA (Gateway API for Mesh Management and Administration, which also knows as Gateway for Mesh) initiative, which is a major initiative within Gateway API.
+GAMMA (Gateway API for Mesh Management and Administration, which also known as Gateway for Mesh) initiative, which is a major initiative within Gateway API.
 
 To become a Mesh lead, the most important thing we expect are:
 
