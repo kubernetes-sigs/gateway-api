@@ -182,7 +182,6 @@ build-docs:
 
 .PHONY: build-docs-netlify
 build-docs-netlify: api-ref-docs
-	hack/mkdocs/generate.sh
 	pip install -r hack/mkdocs/image/requirements.txt
 	python -m mkdocs build
 
