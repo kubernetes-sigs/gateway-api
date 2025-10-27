@@ -306,7 +306,7 @@ func GatewayMustHaveCondition(
 			}
 
 			if err := ConditionsHaveLatestObservedGeneration(gw, gw.Status.Conditions); err != nil {
-				return false, err
+				return false, nil
 			}
 
 			if findConditionInList(t,
@@ -349,7 +349,7 @@ func ListenerSetMustHaveCondition(
 			}
 
 			if err := ConditionsHaveLatestObservedGeneration(ls, ls.Status.Conditions); err != nil {
-				return false, err
+				return false, nil
 			}
 
 			if findConditionInList(t,
@@ -1015,7 +1015,7 @@ func ListenerSetListenersMustHaveConditions(t *testing.T, client client.Client, 
 		}
 
 		if err := ConditionsHaveLatestObservedGeneration(&parent, parent.Status.Conditions); err != nil {
-			return false, err
+			return false, nil
 		}
 
 		for _, condition := range conditions {
