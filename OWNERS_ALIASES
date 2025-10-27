@@ -47,3 +47,9 @@ aliases:
     - kflynn
     - LiorLieberman
     - rikatz
+
+  gateway-api-doc-approvers:
+    - candita
+    - mikemorris
+    - kflynn
+    - rikatz
