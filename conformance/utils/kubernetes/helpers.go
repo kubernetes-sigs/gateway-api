@@ -365,7 +365,7 @@ func ListenerSetMustHaveCondition(
 		},
 	)
 
-	require.NoErrorf(t, waitErr, "error waiting for ListenerSet status to have a Condition matching expectations")
+	require.NoErrorf(t, waitErr, "error waiting for ListenerSet %s status to have a Condition matching expectations", lsNN.String())
 }
 
 // MeshNamespacesMustBeReady waits until all Pods are marked Ready. This is
@@ -508,10 +508,10 @@ func GatewayListenersMustHaveConditions(t *testing.T, client client.Client, time
 	t.Helper()
 
 	matchListenerSubset := len(listenerNames) != 0
-	matchedListeners := make(map[gatewayv1.SectionName]bool)
+	matchedListeners := make(map[gatewayv1.SectionName]struct{})
 	if matchListenerSubset {
 		for _, listenerName := range listenerNames {
-			matchedListeners[listenerName] = false
+			matchedListeners[listenerName] = struct{}{}
 		}
 	}
 
@@ -533,14 +533,12 @@ func GatewayListenersMustHaveConditions(t *testing.T, client client.Client, time
 					return false, nil
 				}
 
-				matchedListeners[listener.Name] = true
+				delete(matchedListeners, listener.Name)
 			}
 		}
 
-		for _, matched := range matchedListeners {
-			if !matched {
-				return false, nil
-			}
+		if len(matchedListeners) != 0 {
+			return false, nil
 		}
 
 		return true, nil
@@ -1003,10 +1001,10 @@ func ListenerSetListenersMustHaveConditions(t *testing.T, client client.Client, 
 	t.Helper()
 
 	matchListenerSubset := len(listenerNames) != 0
-	matchedListeners := make(map[gatewayv1.SectionName]bool)
+	matchedListeners := make(map[gatewayv1.SectionName]struct{})
 	if matchListenerSubset {
 		for _, listenerName := range listenerNames {
-			matchedListeners[listenerName] = false
+			matchedListeners[listenerName] = struct{}{}
 		}
 	}
 
@@ -1032,14 +1030,12 @@ func ListenerSetListenersMustHaveConditions(t *testing.T, client client.Client, 
 					return false, nil
 				}
 
-				matchedListeners[listener.Name] = true
+				delete(matchedListeners, listener.Name)
 			}
 		}
 
-		for _, matched := range matchedListeners {
-			if !matched {
-				return false, nil
-			}
+		if len(matchedListeners) != 0 {
+			return false, nil
 		}
 
 		return true, nil
