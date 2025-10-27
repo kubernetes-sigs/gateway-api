@@ -26,7 +26,7 @@ readonly GOMODCACHE="$(go env GOMODCACHE)"
 readonly GO111MODULE="on"
 readonly GOFLAGS="-mod=readonly"
 readonly GOPATH="$(mktemp -d)"
-readonly MIN_REQUIRED_GO_VER="$(go list -m -f '{{.GoVersion}}')"
+readonly MIN_REQUIRED_GO_VER="$(go list -m -f '{{.GoVersion}}' sigs.k8s.io/gateway-api)"
 
 function go_version_matches {
   go version | perl -ne "exit 1 unless m{go version go([0-9]+.[0-9]+)}; exit 1 if (\$1 < ${MIN_REQUIRED_GO_VER})"
@@ -47,7 +47,7 @@ mkdir -p "$GOPATH/src/sigs.k8s.io"
 ln -s "${SCRIPT_ROOT}" "$GOPATH/src/sigs.k8s.io/gateway-api"
 
 echo "Generating CRDs"
-go run ./pkg/generator
+go run ./tools/generator
 
 ./hack/update-clientset.sh
 ./hack/update-protos.sh

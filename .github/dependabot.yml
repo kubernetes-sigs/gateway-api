@@ -46,6 +46,10 @@ updates:
     directory: "/hack/mkdocs/image"
     schedule:
       interval: "weekly"
+    groups:
+      mkdocs-deps:
+        patterns:
+          - "*"
     labels:
       - python
       - dependencies

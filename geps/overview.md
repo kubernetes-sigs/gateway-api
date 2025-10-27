@@ -21,11 +21,11 @@ This diagram shows the state diagram of the GEP process at a high level, but the
 flowchart TD
     D([Discuss with<br />the community]) --> C
     C([Issue Created]) -------> Memorandum
-    C([Issue Created]) --> Provisional
-    Provisional -->|If practical <br /> work needed| Prototyping
-    Provisional -->|GEP Doc PR<br />done| Implementable
-    Prototyping -->|GEP Doc PR<br />done| Implementable
-    Implementable -->|Gateway API<br />work completed| Experimental
+    C([Issue Created]) -->|GEP PR with Who/What/Why merged| Provisional
+    Provisional -->|GEP Doc PR with _proposed_ API details merged| Prototyping
+    Provisional -->|GEP Doc PR with agreed API details merged| Implementable
+    Prototyping -->|GEP Doc PR with agreed API details merged| Implementable
+    Implementable -->|API Changes implemented in Go types and YAML| Experimental
     Experimental -->|Supported in<br />multiple implementations<br />+ Conformance tests| Standard
     Standard -->|Entire change is GA or implemented| Completed
 
@@ -111,22 +111,38 @@ Please default to GitHub discussions: they work a lot like GitHub issues which
 makes them easy to search.
 
 ### 2. Create an Issue
+
 [Create a GEP issue](https://github.com/kubernetes-sigs/gateway-api/issues/new?assignees=&labels=kind%2Ffeature&template=enhancement.md) in the repo describing your change.
 At this point, you should copy the outcome of any other conversations or documents
 into this document.
 
-### 3. Agree on the Goals
+### 3. `Provisional` - Agree on the Goals
+
 Although it can be tempting to start writing out all the details of your
 proposal, it's important to first ensure we all agree on the goals.
 
 For API GEPs, the first version of your GEP should aim for a "Provisional"
 status and leave out any implementation details, focusing primarily on
-"Goals" and "Non-Goals".
+"Goals" and "Non-Goals", and documenting "Who" the GEP is for, "What" the
+GEP will do, and "Why" it is needed. For this reason, the `Provisional`
+state is also sometimes called the "Who/What/Why" stage.
 
 For Memorandum GEPs, the first version of your GEP will be the only one, as
 Memorandums have only a single stage - `Accepted`.
 
-### 3. Document Implementation Details
+The `Provisional` state is different to other states (aside from `Memorandum`),
+in that iteration on it can occur outside of the usual Gateway API release process.
+To put this another way, until we have agreement on the "Who/What/Why",
+then the PR does not fall into the regular release process.
+
+GEPs entering the `Provisional` phase need the following to have occurred:
+
+* A GEP PR using the template in GEP-696 merged into the `geps/` directory,
+  describing the "Who", "What", and "Why" of the proposal, along with Goals
+  and Non-Goals.
+
+### 3. `Implementable` - Document Implementation Details
+
 Now that everyone agrees on the goals, it is time to start writing out your
 proposed implementation details. These implementation details should be very
 thorough, including the proposed API spec, and covering any relevant edge cases.
@@ -138,7 +154,29 @@ alternatives. Be sure to document all of these in the GEP, and why we decided
 against them. At this stage, the GEP should be targeting the "Implementable"
 stage.
 
-### 4. Implement the GEP as "Experimental"
+For a GEP to enter the `Implementable` phase, there are some additional
+requirements:
+
+* One or more Gateway API maintainers must agree that the GEP is in-scope
+  for the project.
+* At least two (2) implementations must agree that they are interested in
+  implementing the feature within six (6) months of it reaching `Experimental`.
+  This is to ensure that there's community interest outside of the GEP owner.
+* At least one "shepherd" who will help with navigating the GEP through the
+  rest of the process. This shepherd can be any community member, but someone
+  with experience of the GEP process will be the most helpful. The shepherd
+  for that GEP will be responsible for initial review, as well as to be
+  available to answer questions for the GEP owner about the process. Being
+  a GEP Shepherd is a reasonably significant time commitment, with the
+  time required scaling up sharply as a GEP becomes more complex and/or
+  controversial. This shepherd should be recorded on the GEP issue.
+* A GEP PR that updates the existing `Provisional` documentation with details
+  that will be required to actually make the changes. This must include any
+  API changes, as well as an initial set of test scenarios for implementations
+  and conformance tests to target. Note that, at this stage, _only_ changes to 
+  GEP document must be included.
+
+### 4. `Experimental` - Make the API changes
 
 With the GEP marked as "Implementable", it is time to actually make those
 proposed changes in our API. In some cases, these changes will be documentation
@@ -150,10 +188,13 @@ use the `experimental` Golang build tag to denote experimental functionality.
 
 Some other requirements must be met before marking a GEP `Experimental`:
 
-- the graduation criteria to reach `Standard` MUST be filled out
-- the GEP must have at least one Feature Name for features described inside that
+* Any API changes must be made to the Go types.
+* The graduation criteria to reach `Standard` MUST be filled out. Note that this
+  must include sufficient conformance testing at a minimum, and should include
+  any other relevant criteria for that GEP.
+* The GEP must have at least one Feature Name for features described inside that
   will need to be tested by conformance tests.
-- a proposed probationary period (see next section) must be included in the GEP
+* A proposed probationary period (see next section) must be included in the GEP
   and approved by maintainers.
 
 Before changes are released they MUST be documented. GEPs that have not been
@@ -184,26 +225,28 @@ new strategy for achieving their graduation criteria can be established. Any
 such plan to take a GEP "off the shelf" must be reviewed and accepted by the
 maintainers.
 
-> **Warning**: It is extremely important** that projects which implement
+> **Warning**: It is **extremely important** that projects which implement
 > `Experimental` features clearly document that these features may be removed in
 > future releases.
 
-### 5. Graduate the GEP to "Standard"
+### 5. `Standard` - Graduate the GEP
 
 Once this feature has met the [graduation criteria](../concepts/versioning.md#graduation-criteria), it is
-time to graduate it to the "Standard" channel of the API. Depending on the feature, this may include
-any of the following:
+time to graduate it to the "Standard" channel of the API. Depending on the feature, this will usually
+include one or more of the following:
 
-1. Graduating the resource to beta
-2. Graduating fields to "standard" by removing `<gateway:experimental>` tags
-3. Graduating a concept to "standard" by updating documentation
+* Graduating the resource to `v1`, and ensuring it is included in the Standard channel API Group and
+  YAML install files.
+* Graduating fields to "standard" by removing `<gateway:experimental>` tags.
+* Graduating a concept to "standard" by updating documentation.
 
 ### 6. Close out the GEP issue
 
-The GEP issue should only be closed once the feature has:
-- Moved to the standard channel for distribution (if necessary)
-- Moved to a "v1" `apiVersion` for CRDs
-- been completely implemented and has wide acceptance (for process changes).
+The GEP issue should only be closed once the feature has been:
+
+* Moved to the standard channel for distribution (if necessary).
+* Moved to a "v1" `apiVersion` for CRDs.
+* Completely implemented and has wide acceptance (for process changes).
 
 In short, the GEP issue should only be closed when the work is "done" (whatever
 that means for that GEP).

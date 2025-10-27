@@ -25,12 +25,22 @@ GOPATH=${GOPATH:-$(go env GOPATH)}
 GOBIN=${GOBIN:-$(go env GOBIN)}
 GOBIN=${GOBIN:-${GOPATH}/bin}
 
+readonly GOTOOL="go tool"
+
 echo $GOBIN
 
 go install github.com/elastic/crd-ref-docs
 
-${GOBIN}/crd-ref-docs \
+$GOTOOL crd-ref-docs \
     --source-path=${PWD}/apis \
     --config=crd-ref-docs.yaml \
+    --templates-dir=${PWD}/hack/crd-ref-templates/ \
     --renderer=markdown \
     --output-path=${PWD}/site-src/reference/spec.md
+
+$GOTOOL crd-ref-docs \
+    --source-path=${PWD}/apisx \
+    --config=crd-ref-docs.yaml \
+    --templates-dir=${PWD}/hack/crd-ref-templates/ \
+    --renderer=markdown \
+    --output-path=${PWD}/site-src/reference/specx.md

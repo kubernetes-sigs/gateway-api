@@ -3,7 +3,7 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     api-approved.kubernetes.io: https://github.com/kubernetes-sigs/gateway-api/pull/3328
-    gateway.networking.k8s.io/bundle-version: v1.4.0-rc.2
+    gateway.networking.k8s.io/bundle-version: v1.4.0
     gateway.networking.k8s.io/channel: experimental
   name: httproutes.gateway.networking.k8s.io
 spec:
@@ -915,6 +915,7 @@ spec:
                                             If the list has entries, only those entries must be sent.
                                           items:
                                             type: string
+                                          maxItems: 64
                                           type: array
                                           x-kubernetes-list-type: set
                                       type: object
@@ -953,6 +954,7 @@ spec:
                                             request must be set to the actual number of bytes forwarded.
                                           items:
                                             type: string
+                                          maxItems: 64
                                           type: array
                                           x-kubernetes-list-type: set
                                         allowedResponseHeaders:
@@ -964,6 +966,7 @@ spec:
                                             except Authority or Host must be copied.
                                           items:
                                             type: string
+                                          maxItems: 64
                                           type: array
                                           x-kubernetes-list-type: set
                                         path:
@@ -1457,6 +1460,9 @@ spec:
                                       enum:
                                       - 301
                                       - 302
+                                      - 303
+                                      - 307
+                                      - 308
                                       type: integer
                                   type: object
                                 responseHeaderModifier:
@@ -2395,6 +2401,7 @@ spec:
                                       If the list has entries, only those entries must be sent.
                                     items:
                                       type: string
+                                    maxItems: 64
                                     type: array
                                     x-kubernetes-list-type: set
                                 type: object
@@ -2433,6 +2440,7 @@ spec:
                                       request must be set to the actual number of bytes forwarded.
                                     items:
                                       type: string
+                                    maxItems: 64
                                     type: array
                                     x-kubernetes-list-type: set
                                   allowedResponseHeaders:
@@ -2444,6 +2452,7 @@ spec:
                                       except Authority or Host must be copied.
                                     items:
                                       type: string
+                                    maxItems: 64
                                     type: array
                                     x-kubernetes-list-type: set
                                   path:
@@ -2933,6 +2942,9 @@ spec:
                                 enum:
                                 - 301
                                 - 302
+                                - 303
+                                - 307
+                                - 308
                                 type: integer
                             type: object
                           responseHeaderModifier:
@@ -5073,6 +5085,7 @@ spec:
                                             If the list has entries, only those entries must be sent.
                                           items:
                                             type: string
+                                          maxItems: 64
                                           type: array
                                           x-kubernetes-list-type: set
                                       type: object
@@ -5111,6 +5124,7 @@ spec:
                                             request must be set to the actual number of bytes forwarded.
                                           items:
                                             type: string
+                                          maxItems: 64
                                           type: array
                                           x-kubernetes-list-type: set
                                         allowedResponseHeaders:
@@ -5122,6 +5136,7 @@ spec:
                                             except Authority or Host must be copied.
                                           items:
                                             type: string
+                                          maxItems: 64
                                           type: array
                                           x-kubernetes-list-type: set
                                         path:
@@ -5615,6 +5630,9 @@ spec:
                                       enum:
                                       - 301
                                       - 302
+                                      - 303
+                                      - 307
+                                      - 308
                                       type: integer
                                   type: object
                                 responseHeaderModifier:
@@ -6553,6 +6571,7 @@ spec:
                                       If the list has entries, only those entries must be sent.
                                     items:
                                       type: string
+                                    maxItems: 64
                                     type: array
                                     x-kubernetes-list-type: set
                                 type: object
@@ -6591,6 +6610,7 @@ spec:
                                       request must be set to the actual number of bytes forwarded.
                                     items:
                                       type: string
+                                    maxItems: 64
                                     type: array
                                     x-kubernetes-list-type: set
                                   allowedResponseHeaders:
@@ -6602,6 +6622,7 @@ spec:
                                       except Authority or Host must be copied.
                                     items:
                                       type: string
+                                    maxItems: 64
                                     type: array
                                     x-kubernetes-list-type: set
                                   path:
@@ -7091,6 +7112,9 @@ spec:
                                 enum:
                                 - 301
                                 - 302
+                                - 303
+                                - 307
+                                - 308
                                 type: integer
                             type: object
                           responseHeaderModifier:

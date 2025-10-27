@@ -12,7 +12,7 @@ implementation(s) you're using with Gateway API.
 
 !!! info "Experimental Channel"
 
-    The `TLSRoute` and `BackendTLSPolicy` resources described below are currently only included in the
+    The `TLSRoute` resource described below is currently only included in the
     "Experimental" channel of Gateway API. For more information on release
     channels, refer to our [versioning guide](../concepts/versioning.md).
 
@@ -26,14 +26,15 @@ For Gateways, there are two connections involved:
 - **upstream**: This is the connection between the Gateway and backend resources
    specified by routes. These backend resources will usually be Services.
 
-With Gateway API, TLS configuration of downstream and
-upstream connections is managed independently.
+With Gateway API, TLS configuration of downstream and upstream connections is 
+managed independently.
 
 For downstream connections, depending on the Listener Protocol, different TLS modes and Route types are supported.
 
 | Listener Protocol | TLS Mode    | Route Type Supported |
 |-------------------|-------------|---------------------|
 | TLS               | Passthrough | TLSRoute            |
+| TLS               | Terminate   | TLSRoute (extended) |
 | TLS               | Terminate   | TCPRoute            |
 | HTTPS             | Terminate   | HTTPRoute           |
 | GRPC              | Terminate   | GRPCRoute           |
@@ -46,6 +47,10 @@ For upstream connections, `BackendTLSPolicy` is used, and neither listener proto
 upstream TLS configuration. For `HTTPRoute`, the use of both `Terminate` TLS mode and `BackendTLSPolicy` is supported.
 Using these together provides what is commonly known as a connection that is terminated and then re-encrypted at
 the Gateway.
+
+The use of `Terminate` on `TLSRoute` is available on `Extended` [Support Level].
+
+[Support Level]: https://gateway-api.sigs.k8s.io/concepts/conformance/#2-support-levels
 
 ## Downstream TLS
 
