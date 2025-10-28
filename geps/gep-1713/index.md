@@ -969,3 +969,81 @@ Prior Discussions:
 Gateway Hierarchy Brainstorming:
 
 - https://docs.google.com/document/d/1qj7Xog2t2fWRuzOeTsWkabUaVeOF7_2t_7appe8EXwA/edit
+
+## Conformance Details
+
+A new Gateway Conformance (Extended) feature will be added
+```
+	//  SupportGatewayListenerSet option indicates support for a Gateway
+	//  with ListenerSets
+	SupportGatewayListenerSet FeatureName = "GatewayListenerSet"
+```
+They will validate the following scenarios :
+1. ListenerSet is not allowed on the parent Gateway
+    - `Gateway.spec.allowedListeners` is not specified (defaults to None)
+    - `Gateway.spec.allowedListeners.namespaces.from` is set to `None`
+    In both cases, the ListenerSet is not accepted and the request on the ListenerSet port fails.
+1. A listener on the ListenerSet has a protocol conflict with a listener on the Gateway
+    - The conflicting listener on the Gateway is accepted based on the [Listener Precedence](#listener-precedence) with the appropriate status conditions and messages.
+    - The conflicting listener on the ListenerSet is not accepted with the appropriate status conditions and messages.
+    - The request to the conflicting listener on the Gateway succeeds.
+    - The request to the conflicting listener on the ListenerSet fails.
+1. A listener on a ListenerSet has a protocol conflict with a listener on another ListenerSet
+    - The conflicting listener on the older ListenerSet is accepted based on the [Listener Precedence](#listener-precedence) with the appropriate status conditions and messages.
+    - The conflicting listener on the newer ListenerSet is not accepted with the appropriate status conditions and messages.
+    - The request to the conflicting listener on the older ListenerSet succeeds.
+    - The request to the conflicting listener on the newer ListenerSet fails.
+1. A listener on the ListenerSet has a hostname conflict with a listener on the Gateway
+    - The conflicting listener on the Gateway is accepted based on the [Listener Precedence](#listener-precedence) with the appropriate status conditions and messages.
+    - The conflicting listener on the ListenerSet is not accepted with the appropriate status conditions and messages.
+    - The request to the conflicting listener on the Gateway succeeds.
+    - The request to the conflicting listener on the ListenerSet fails.
+1. A listener on a ListenerSet has a hostname conflict with a listener on another ListenerSet
+    - The conflicting listener on the older ListenerSet is accepted based on the [Listener Precedence](#listener-precedence) with the appropriate status conditions and messages.
+    - The conflicting listener on the newer ListenerSet is not accepted with the appropriate status conditions and messages.
+    - The request to the conflicting listener on the older ListenerSet succeeds.
+    - The request to the conflicting listener on the newer ListenerSet fails.
+1. ListenerSets are allowed only from the same namespace as the parent Gateway (Validates `Gateway.spec.allowedListeners.namespaces.from`)
+    - `Gateway.spec.allowedListeners.namespaces.from` is set to `Same`
+    - The ListenerSet in the same namespace as the parent gateway is accepted.
+    - The request to the listener on the accepted ListenerSet succeeds.
+    - A ListenerSet in a different namespace is not accepted with the appropriate status.
+    - The request to the listener on the rejected ListenerSet fails.
+1. ListenerSets are allowed from namespaces that have the appropriate labels
+    - `Gateway.spec.allowedListeners.namespaces.selector` is set to match a specific namespace's labels
+    - The ListenerSet in the namespace matched by the selector is accepted.
+    - The request to the listener on the accepted ListenerSet succeeds.
+    - A ListenerSet in the namespace not matched by the selector is not accepted with the appropriate status.
+    - The request to the listener on the rejected ListenerSet fails.
+1. A listener on a ListenerSet without a defined port
+    - The listener must have the appropriate status set depending on whether the implementation supports dynamic port assignment.
+    - If the implementation supports dynamic port assignment, the request to the listener must succeed.
+1. A listener on a ListenerSet with a missing ReferenceGrant
+    - The listener on the ListenerSet references a secret without a ReferenceGrant.
+    - The listener must not be accepted with the appropriate status.
+    - The request to the listener on the rejected ListenerSet fails.
+1. A listener on a ListenerSet with a ReferenceGrant for the parent Gateway
+    - The listener on the ListenerSet references a secret the parent Gateway has access to.
+    - The listener on the ListenerSet must not be accepted with the appropriate status.
+    - The request to the listener on the rejected ListenerSet fails.
+1. A listener on a ListenerSet allows routes from the same namespace as the ListenerSet
+    - The route in the same namespace as the ListenerSet is accepted.
+    - The request to the accepted route succeeds.
+    - The route in a different namespace as the ListenerSet is rejected.
+    - The request to the rejected route fails.
+1. A listener on a ListenerSet allows routes from namespaces that have the appropriate labels
+    - The route in the namespace that matches the given labels is accepted.
+    - The request to the accepted route succeeds.
+    - The route in the namespace that does not match the given labels is rejected.
+    - The request to the rejected route fails.
+1. A listener on a ListenerSet allows only specific route kinds
+    - The route that belongs to the list of specified RouteGroupKind is accepted.
+    - The request to the accepted route succeeds.
+    - The route that does not belong to the list of specified RouteGroupKind is rejected.
+    - The request to the rejected route fails.
+1. Valid ListenerSet attached to a Gateway that allows it
+    - The gateway allows attaching ListenerSets.
+    - The ListenerSet is valid and allows routes.
+    - The ListenerSet is accepted and has the appropriate status and `attachedRoutes` count.
+    - The request to the listener on the ListenerSet succeeds.
+
