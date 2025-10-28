@@ -1,10 +1,10 @@
 # BackendTLSPolicy
 
-??? example "Experimental Channel since v1.0.0"
+??? success "Standard Channel since v1.4.0"
 
-    The `BackendTLSPolicy` resource is Alpha and has been part of
-    the Experimental Channel since `v1.0.0`. For more information on release
-    channels, refer to our [versioning guide](../concepts/versioning.md).
+    The `BackendTLSPolicy` resource is GA and has been part of the Standard
+    Channel since `v1.4.0`. For more information on release channels, refer
+    to our [versioning guide](../concepts/versioning.md).
 
 [BackendTLSPolicy][backendtlspolicy] is a Gateway API type for specifying the TLS configuration
 of the connection from the Gateway to a backend pod/s via the Service API object.
