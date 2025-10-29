@@ -893,6 +893,8 @@ The condition's `Status` has the following values:
 
 Parent `Gateways` MUST NOT have `ListenerSet` listeners in their `status.listeners` conditions list.
 
+Implementations MUST support a new `Gateway` status field `AttachedListeners` that specifies the count of ListenerSets attached to the Gateway.
+
 ### ListenerSet Conditions
 
 `ListenerSets` have a top-level `Accepted` and `Programmed` conditions.
@@ -979,22 +981,38 @@ A new Gateway Conformance (Extended) feature will be added
 	SupportGatewayListenerSet FeatureName = "GatewayListenerSet"
 ```
 They will validate the following scenarios :
-1. ListenerSet is not allowed on the parent Gateway
+
+1. AllowedListeners is not specified on the parent Gateway
     - `Gateway.spec.allowedListeners` is not specified (defaults to None)
+
+    - The ListenerSet is not accepted with the following status :
+      | Type    | Status | Reason |
+      | -------- | ------- | ------- |
+      | Accepted  | False    | NotAllowed |
+
+    - The parent gateway has the following status :
+      | Type    | Status | Reason |
+      | -------- | ------- | ------- |
+      | AttachedListenerSets  | Unknown    | // any reason // |
+      | AttachedListeners  | 0    |  |
+
+    - The request on the ListenerSet port fails.
+
+1. ListenerSets are not allowed on the parent Gateway
     - `Gateway.spec.allowedListeners.namespaces.from` is set to `None`
 
-    In both cases, the ListenerSet is not accepted with the following status :
-    | Type    | Status | Reason |
-    | -------- | ------- | ------- |
-    | Accepted  | False    | NotAllowed |
+    - The ListenerSet is not accepted with the following status :
+      | Type    | Status | Reason |
+      | -------- | ------- | ------- |
+      | Accepted  | False    | NotAllowed |
 
-    The parent gateway has the following status :
-    | Type    | Status | Reason |
-    | -------- | ------- | ------- |
-    | AttachedListenerSets  | False    | ListenerSetsNotAllowed |
-    | AttachedListeners  | 0    |  |
+    - The parent gateway has the following status :
+      | Type    | Status | Reason |
+      | -------- | ------- | ------- |
+      | AttachedListenerSets  | False    | ListenerSetsNotAllowed |
+      | AttachedListeners  | 0    |  |
 
-    The request on the ListenerSet port fails.
+    - The request on the ListenerSet port fails.
 
 1. A listener on the ListenerSet has a protocol conflict with a listener on the Gateway
     - The conflicting listener on the Gateway is accepted based on the [Listener Precedence](#listener-precedence) with the following status :
@@ -1005,7 +1023,7 @@ They will validate the following scenarios :
     - The parent gateway has the following status :
       | Type    | Status | Reason |
       | -------- | ------- | ------- |
-      | AttachedListenerSets  | True    | ListenerSetsAttached |
+      | AttachedListenerSets  | // depends on whether there are any other valid listeners in the attached ListenerSets // | ListenerSetsAttached |
       | AttachedListeners  | // total number of child listenerSets // |  |
 
     - The conflicting listener on the ListenerSet is not accepted with the following status :
@@ -1070,7 +1088,7 @@ They will validate the following scenarios :
     - The parent gateway has the following status :
       | Type    | Status | Reason |
       | -------- | ------- | ------- |
-      | AttachedListenerSets  | True    | ListenerSetsAttached |
+      | AttachedListenerSets  | // depends on whether there are any other valid listeners in the attached ListenerSets // | ListenerSetsAttached |
       | AttachedListeners  | // total number of child listenerSets // |  |
 
     - The request to the conflicting listener on the Gateway succeeds.
@@ -1159,7 +1177,7 @@ They will validate the following scenarios :
       - The parent gateway has the following status :
         | Type    | Status | Reason |
         | -------- | ------- | ------- |
-        | AttachedListenerSets  | True    | ListenerSetsAttached |
+        | AttachedListenerSets  | // depends on whether there are any other valid listeners in the attached ListenerSets // | ListenerSetsAttached |
         | AttachedListeners  | 1    |  |
 
       - The request to the ListenerSet port must succeed.
@@ -1173,7 +1191,7 @@ They will validate the following scenarios :
       - The parent gateway has the following status :
         | Type    | Status | Reason |
         | -------- | ------- | ------- |
-        | AttachedListenerSets  | True    | ListenerSetsAttached |
+        | AttachedListenerSets  | // depends on whether there are any other valid listeners in the ListenerSets // | ListenerSetsAttached |
         | AttachedListeners  | 1    |  |
 
       - The request to the ListenerSet port must not succeed.
@@ -1186,6 +1204,12 @@ They will validate the following scenarios :
       | -------- | ------- | ------- |
       | ResolvedRefs  | False    | RefNotPermitted |
 
+    - The parent gateway has the following status :
+      | Type    | Status | Reason |
+      | -------- | ------- | ------- |
+      | AttachedListenerSets  | // depends on whether there are any other valid listeners in the ListenerSets // | ListenerSetsAttached |
+      | AttachedListeners  | 1    |  |
+
     - The request to the listener on the ListenerSet fails.
 
 1. A listener on a ListenerSet with a ReferenceGrant for the parent Gateway
@@ -1195,6 +1219,12 @@ They will validate the following scenarios :
       | Type    | Status | Reason |
       | -------- | ------- | ------- |
       | ResolvedRefs  | False    | RefNotPermitted |
+
+    - The parent gateway has the following status :
+      | Type    | Status | Reason |
+      | -------- | ------- | ------- |
+      | AttachedListenerSets  | // depends on whether there are any other valid listeners in the ListenerSets // | ListenerSetsAttached |
+      | AttachedListeners  | 1    |  |
 
     - The request to the listener on the ListenerSet fails.
 
