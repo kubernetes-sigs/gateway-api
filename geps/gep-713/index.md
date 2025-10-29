@@ -14,11 +14,21 @@ It lays out guidelines for Gateway API implementations and other stakeholders fo
 !!! warning
     This GEP specifies a _pattern_, not an API field or new object. It defines some terms, including _Metaresource_, _Policies_ and _Policy Attachment_, and their related concepts.
 
-This pattern is currently unique to the Gateway API community. It's possible that in the future a better and broader form of extending Kubernetes APIs will emerge that could make this one obsolete.
-Policy attachment is the best way we've found to extend Gateway API resources so far, but it does come with meaningful challenges, such as the [Discoverability problem](#the-discoverability-problem) and the [Fanout status update problem](#fanout-status-update-problems).
-In many cases, it will be better to work to include configuration directly inside upstream APIs instead of resorting to policy attachment.
+!!! danger "Policies SHOULD NOT be your first option"
 
-## Overview and Concepts
+    This pattern is currently unique to the Gateway API community. It's possible that in the future a better and broader form of extending Kubernetes APIs will emerge that could make this one obsolete.
+
+    Policy attachment is the best way we've found to extend Gateway API resources so far, but it does come with meaningful challenges, such as the [Discoverability problem](#policy-discoverability) and the [Fanout status update problem](#fanout-status-update-problems).
+
+    In many cases, it will be better to work to include configuration directly inside upstream APIs instead of resorting to policy attachment.
+
+!!! info "Feature status"
+
+    Some of the features of Metaresources and Policy Attachment are **Standard** features of Gateway API, while others are **Experimental** or even **Provisional**, still lacking wider adoption by the implementations. Features supported by the [BackendTLSPolicy (GEP-1897)](../gep-1897/index.md) kind are examples of Standard features.
+
+    While this GEP tries to focus on features that are at least Experimental, it also lays out some Provisional features and features that are merely examples of known practices adopted by some indivual Policy implementations. The latter are still provided as reference though despite some of these features never being expected to become core in Gateway API, due to one of the inherent natures of Metaresources and Policies of being a framework for introducing gateway capabilities that are implementation-specific. These examples are still useful to the overall community though, which can draw analogies for their own particular cases and designs.
+
+## Overview
 
 ### Background
 
@@ -72,7 +82,24 @@ All [risks and caveats](#tldr) considered, these are in general a few reasons fo
 * Decoupling responsibility over the management and implementation of the metaresources themselves.
 * Avoid alternatives based on annotations which are often non-standardized, poorly documented, and generally hard to maintain, in favor of proper, expressive APIs (self-documenting intents) instead.
 
-### Definitions
+### Goals
+
+* Establish a pattern which will be used for any Policy resources included in the Gateway API spec.
+* Establish a pattern that should be adopted for any implementation-specific Policy resources used with Gateway API resources.
+* Discuss the problems with communicating status for metaresource and policy objects, and suggest mechanisms that APIs can use to mitigate some of them.
+* Provide a way to distinguish between required and default values for all policy API implementations.
+* Enable Policy Attachment at all relevant scopes in Gateway API, including Gateways, Routes, Backends, along with how values should flow across a hierarchy if necessary.
+* Ensure the Policy Attachment specification is generic and forward thinking enough that it could be easily adapted to other grouping mechanisms like Namespaces in the future.
+* Provide a means of attachment that works for both ingress and mesh implementations of Gateway API.
+* Provide a consistent specification that will ensure familiarity between both API-defined and implementation-specific Policy resources so they can both be interpreted the same way.
+* Provide a reference pattern to other implementations of metaresource and policy APIs outside of Gateway API, that are based on similar concepts (i.e., augmenting the behavior of other Kubernetes objects, attachment points, nested contexts and inheritance, Defaults & Overrides, etc.)
+* Facilitate the development of tooling that help circumvent known challenges of Policy Attachment such as the [Discoverability problem](#policy-discoverability) without requiring any predefined understanding or awareness of the implementation-specific policies.
+
+### Out of scope
+
+* Define all potential metaresource and/or policy kinds that may be attached to resources.
+
+## Concepts
 
 #### Metaresource
 
@@ -93,32 +120,63 @@ Policy kinds are typically named _xPolicy_, such as `BackendTLSPolicy` (a policy
 
 The application of policies, implemented by a controller, to augment the behavior of other Kubernetes objects.
 
-### Goals
+#### Policy scope
 
-* Establish a pattern which will be used for any Policy resources included in the Gateway API spec.
-* Establish a pattern that should be adopted for any implementation-specific Policy resources used with Gateway API resources.
-* Discuss the problems with communicating status for metaresource and policy objects, and suggest mechanisms that APIs can use to mitigate some of them.
-* Provide a way to distinguish between required and default values for all policy API implementations.
-* Enable Policy Attachment at all relevant scopes in Gateway API, including Gateways, Routes, Backends, along with how values should flow across a hierarchy if necessary.
-* Ensure the Policy Attachment specification is generic and forward thinking enough that it could be easily adapted to other grouping mechanisms like Namespaces in the future.
-* Provide a means of attachment that works for both ingress and mesh implementations of Gateway API.
-* Provide a consistent specification that will ensure familiarity between both API-defined and implementation-specific Policy resources so they can both be interpreted the same way.
-* Provide a reference pattern to other implementations of metaresource and policy APIs outside of Gateway API, that are based on similar concepts (i.e., augmenting the behavior of other Kubernetes objects, attachment points, nested contexts and inheritance, Defaults & Overrides, etc.)
-* Facilitate the development of tooling that help circumvent known challenges of Policy Attachment such as the [Discoverability problem](#the-discoverability-problem) without requiring any predefined understanding or awareness of the implementation-specific policies.
+A resource (or resource section) that belongs to a hierarchy whose root is targeted by a policy, within the range of effect of the policy kind across levels of the hierarchy. Also known as _effective target_ of a policy (as opposed to the _declared target_ of the policy). It is not the same as the target of the policy.
 
-### Out of scope
+#### Merge strategy
 
-* Define all potential metaresource and/or policy kinds that may be attached to resources.
+A function that receives two policy specs and returns a new spec, i.e., `𝑓(spec, spec) → spec`.
 
-## Guide-level explanation
+Merge strategies are often invoked to resolve conflicts and thus compute an _effective policy_ to enforce at particular scope.
 
-This section describes concepts and aspects for designing and using metaresource and policy objects.
+This GEP defines the following basic merge strategies:
 
-It reinforces previously defined concepts and defines other important ones such as the concepts of [Hierarchy of target kinds](#hierarchy-of-target-kinds), [Merge strategy](#merge-strategies), and [Effective policies](#effective-policies). It also describes an [Abstract process for calculating effective specs](#abstract-process-for-calculating-effective-policies) out of a set of Policy objects.
+* **Defaults:** (Standard) a policy spec that challenges an accepted and established another as the one to specify the behavior to augment a particular scope with _wins_ over the accepted and established other.
+* **Overrides:** (Experimental) a policy spec that is accepted and established and is challenged by another as the one to specify the behavior to augment a particular scope with _wins_ over the challenger other.
 
-Designers of new policy kinds are encouraged to read this section top-to-bottom while users of policies may refer to it more specifically, to further understand about the design decisions and thus make inferences about the behavior and alternatives for a given Policy kind.
+Implementations MAY derive variations of the basic merge strategies with different levels of _granularity_ other than the full policy spec treated as an atomic unit. For example, instead of (or additionally to) a challenger policy spec fully winning over an estalished one (_Atomic defaults_), an implementation MAY support merging the two policy specs together by applying [JSON Merge Patch (RFC 7386)](https://datatracker.ietf.org/doc/html/rfc7386) strategy.
 
-### Metaresources
+These an other merge strategies, such as **None** and **Custom** are further described in section _Implementation guide_ > [Designing a merge strategy](#designing-a-merge-strategy).
+
+#### Effective policy
+
+A combinatorial spec computed from a set of policies that affect a same policy scope, by orderly invoking defined merge strategies to resolve the conflict.
+
+See _Implementation guide_ > [Understanding Effective policies](#understanding-effective-policies) for details.
+
+#### Classes of policies
+
+While the notion of classes of policy kinds was more central in previous iterations of this GEP (see [GEP-2648](../gep-2648/index.md) and [GEP-2649](../gep-2649/index.md)), it here serves primarily as a communicative and organizational aid. The classification reflects patterns that emerge from the properties and behaviors described in sections of this GEP, but it does not impose any prescriptive or normative requirements on the implementations. These classes—namely _Direct_ and _Inherited_—remain in the specification to support clarity and shared understanding, especially for implementations and users familiar with earlier versions.
+
+<table>
+  <thead>
+    <tr>
+      <th>Direct</th>
+      <th>Inherited</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <ul>
+          <li>A single kind supported in <code>spec.targetRefs.kind</code></li>
+          <li>Effects of the policies do not <a href="#spanning-behavior-across-relationships-of-a-target">span across the hierarchy</a>, i.e. the <i>Declared target kind</i> is equal to the <i>Effective target kind</i></li>
+          <li><b>None</b> is the only merge strategy supported</li>
+          <li>If supported, could typically be implemented by directly extending the API of the target kind with the fields otherwise defined at the policy (e.g. Gateway API xRoute filter)</li>
+        </ul>
+      </td>
+      <td>
+        <ul>
+          <li>Superset of <i>Direct</i></li>
+          <li>Any policy kind that do not comply with at least one characteristic of the Direct class of policies</li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+## Implementation guide
 
 As defined above, a metaresource is a resource whose purpose is to augment the behavior of some other resource. At its most basic level, the metaresource pattern consists of:
 
@@ -128,11 +186,25 @@ As defined above, a metaresource is a resource whose purpose is to augment the b
 
 In the real world, of course, things can be much more complex. There may be multiple conflicting metaresources, or the user might attempt to apply a metaresource that they aren't allowed to, or there may be errors in the metaresources. The controller(s) implementing the metaresources MUST be able to handle all of these cases, and MUST communicate status correctly in all situations.
 
-Additionally, since this GEP defines a pattern rather than an API field or resource, it is not possible to enumerate all possible metaresource and/or policy kinds in this GEP. This means that policies MUST follow a well-known structure so that Gateway API users and implementations can work with them in a consistent way, and this GEP focuses on that well-known structure.
+This section describes concepts and aspects for implementing metaresource and policy objects.
 
-#### Policy structure
+### Responsibility
 
-A typical Policy resource might look like the following:
+Metaresources and policies are typically implemented and managed by a custom controller. This controller can be the same controller that is responsible for managing the objects that are targeted by the metaresources or another controller specifically responsible for the aspect of the object that the metaresource augments or modifies. For policy kinds of metaresources, this controller is often referred to as the "policy controller".
+
+Ultimately, it is the responsibility of the controller to provide enough information to resource owners that help circumvent or mitigate the discoverability problem (described in the next section). This typically involves populating the status stanza of the target objects, although may as well resort to additional tools (e.g. CRDs, CLI tools) that help visualize the hierarchical topology of target objects and policies, effective policies, etc.
+
+### Policy structure
+
+since this GEP defines a pattern rather than an API field or resource, it is not possible to enumerate all possible metaresource and/or policy kinds in this GEP. This means that policies MUST follow a well-known structure so that Gateway API users and implementations can work with them in a consistent way, and this GEP focuses on that well-known structure.
+
+A typical Policy resource contains:
+
+- Kubernetes metadata elements: `apiVersion`, `kind`, and `metadata`;
+- a `spec` stanza, where the targets and other fields ("spec proper") of the policy are declared;
+- a `status` stanza.
+
+A particular Policy resource might look like the following:
 
 ```yaml
 apiVersion: policies.example.com/v1
@@ -145,15 +217,57 @@ spec:
     kind: Gateway
     name: my-gateway
   color: blue ## the "spec proper", i.e., one or more fields that specify the intent – e.g. to color the traffic flowing through the my-gateway Gateway blue
+status:
+  conditions:
+  - type: Accepted
+    status: "True"
+    reason: Accepted
+    message: Policy has been accepted
+  - type: Programmed
+    status: "False"
+    reason: Reconciling
+    message: Policy is being reconciled
 ```
 
 _(This is a hypothetical example: no ColorPolicy resource is defined in Gateway API.)_
 
-- Every policy MUST include a `targetRefs` stanza specifying which resource(s) the policy intends to augment.
+- Every policy MUST include a [`targetRefs`](#the-targetrefs-stanza) stanza specifying which resource(s) the policy intends to augment.
 - Every policy MUST include one or more implementation-specific fields specifying how the policy will augment the behavior of the target resource(s). This is informally referred to as the "spec proper."
-- A policy MAY include additional fields specifying a so-called [_merge strategy_](#merge-strategies), i.e., how the policy should be combined with other policies that affect the same target resource(s). This typically include directives for dealing with conflicting and/or missing specs.
+- A policy MAY include additional fields specifying a so-called [_merge strategy_](#designing-a-merge-strategy), i.e., how the policy should be combined with other policies that affect the same target resource(s). This typically include directives for dealing with conflicting and/or missing specs.
+- A policy MUST include a [`status`](#the-status-stanza-of-policy-objects) stanza.
 
-#### The `targetRefs` stanza
+### Scoping the intent
+
+The targets of a policy must be interpreted within a given semantics that is proper to the policy kind. Sometimes the declared targets directly define the scope of application of the policy and no other. Inversely, a policy kind may use the targets as indirections to the actual scope of application of its policy objects.
+
+The _scope_ of a policy is the most granular unit perceived by users/owners of target resources, which an implementation either requires to build configuration for, for conditionally enforcing the policy, and/or chooses to adopt for reasoning about the status of the policy. It is a resource (or resource section) that belongs to a hierarchy whose root is targeted by a policy, within the range of effect of the policy kind across levels of this hierarchy.
+
+Users do not specify _scopes_ in the policy objects; they declare an intent in association to a _target_ (or list of targets). Therefore, implementations MUST calculate the scope (multiple scopes) of effect of a policy for each declared target, given a _hierarchy of nested contexts_. In its simplest form, there is one scope for each target.
+
+#### Spanning behavior across relationships of a target
+
+Typically, the relationships between direct and indirect target kinds are organized in a _hierarchy of nested contexts_.
+
+An example of such is a policy that targets a Namespace. Depending on the design of the policy kind, the policy object may declare intent to affect the behavior of the namespace itself (for what concerns the implementation of Namespaces in Kubernetes) or alternatively it can act as a means to affect the behavior of other objects that exist in the referred namespace (e.g. ConfigMaps). While in the former case, the (direct) target object is the Namespace itself, in the latter the (indirect) target is a set of objects of a different kind (e.g. ConfigMaps.)
+
+Another example of this semantic difference in the context of Gateway API objects is a policy that targets the `Gateway` kind, which can be:
+
+* a way to augment the behavior of the `Gateway` object itself (e.g. reconcile cloud infrastructure provider settings from the spec declared by the `Gateway` according to the rules specified by the policy attached to the `Gateway`), or
+* a means to augment the behavior of all `HTTPRoute` objects attached to the `Gateway` (in a way that every new `HTTPRoute` that gets created or modified so it enters the context of the `Gateway` is automatically put in the scope of the policy.)
+
+Objects may participate in multiple hierarchies, including other hierarchies not targeted by a policy. This means an object may be partially _in the scope_ of a policy and partially _outside of the scope_ of the policy. For example, for a policy kind that _targets_ a Gateway resource ultimately with _intent_ to augment the behavior of xRoute rules, any individual route rule under the targeted gateway object is in the scope of the policy. Inversily, any route rule and route object not linked to the targeted gateway are outside of the scope of the policy. Similarly, this same set of routes and route rules, that are _in the scope of the policy_ when activated within the context of the target gateway, if a route has a second gateway as parent which is not targeted by the policy, then this route and route rules are _outside the scope of the policy_ within the context of the non-target gateway.
+
+#### Declared targets versus Effective targets
+
+The target kinds specified in the `targetRefs` stanza of a policy are referred to as *Declared target* kinds.
+
+These are distinct from *Effective target* kinds, which are the kinds of target objects whose behaviors are actually augmented by the policy. That occurs when declared targets are not equal to the actual targets augmented by the policy, but rather serve as a means for reaching other levels (typically lower levels) of a hierarchy of related object kinds ("hierarchy of nested contexts").
+
+To avoid ambiguity in the interpretation of the targets, policy designs MUST clearly define the extent of the effects of the policy respectively to the object kinds they can target (semantics of scoping a policy). This can be done via documentation and it typically refers to a known hierarchy of resource kinds.
+
+### The `targetRefs` stanza
+
+_Status:_ Standard
 
 The targets of a Policy object are other Kubernetes objects (or parts of objects), including virtual kinds. They are referenced in the policies by name or using other referencing mechanisms.
 
@@ -163,7 +277,7 @@ Alternatively, a singular `targetRef` field MAY be used in Policy objects that a
 
 All kinds of references SHOULD also specify Group, Version and Kind (GVK) information as part of the target (unless the API ensures no more than one kind of object can be targeted).
 
-##### Reference by name
+#### Reference by name
 
 The target reference includes the exact name of an object whose behavior to augment. E.g.:
 
@@ -220,12 +334,12 @@ spec:
   ```
 </details>
 
-##### Cross namespace references
+#### Cross namespace references
 
 Policies can opt for allowing instances to target objects across Kubernetes namespaces, in which case an optional `namespace` field MUST be defined with the target reference.
 
 !!! warning
-    Although not strictly forbidden, this is in general discouraged due to [discoverability](#the-discoverability-problem) issues and security implications. Cross namespace references can often lead to escalation of privileges associated with the [Confused deputy problem](https://en.wikipedia.org/wiki/Confused_deputy_problem).
+    Although not strictly forbidden, this is in general discouraged due to [discoverability](#policy-discoverability) issues and security implications. Cross namespace references can often lead to escalation of privileges associated with the [Confused deputy problem](https://en.wikipedia.org/wiki/Confused_deputy_problem).
 
 Implementations that opt for designing policies that allow for cross namespace references MUST support one of the following combined approaches, to address the security concern:
 
@@ -273,7 +387,7 @@ Implementations that opt for designing policies that allow for cross namespace r
   ```
 </details>
 
-##### Targeting sections of an object
+#### Targeting sections of an object
 
 Policy CRDs can offer the option to target a section of an object whose spec defines sections uniquely identifiable by name. These policies typically include a field `spec.targetRefs.sectionName` that can be used along with compatible kinds.
 
@@ -336,7 +450,7 @@ spec:
   ```
 </details>
 
-##### Targeting virtual types
+#### Targeting virtual types
 
 _Virtual types_ are defined as those with a group unknown by the Kubernetes API server. They can be used to apply policies to objects that are not actual Kubernetes resources nor Kubernetes custom resources. Rather, virtual types have a meaning for the controller(s) responsible for implementing the policy.
 
@@ -357,46 +471,17 @@ spec:
 
 As a pattern, targeting virtual types has prior art in Kubernetes with the Role Based Access Control (RBAC), where Roles and ClusterRoles can be used to specify permissions regarding any kind of resource including non-Kubernetes resources.
 
-### Scoping the intent
-
-The targets of a policy must be interpreted within a given semantics that is proper to the policy kind. Sometimes the declared targets define the direct scope of application of the policy. Inversely, depending on the policy kind, the targets can also represent indirections to the actual scope of application of the policy.
-
-Two different policy kinds that support targeting the same kind X may have very different semantics. This is not only because the policy kinds' purposes differ, but also because the scopes induced by specifying instances of X as targets differ, with consequences to the entire mechanics of calculating and applying the augmented behavior in each case.
-
-#### Spanning behavior across relationships of a target
-
-Often, the semantics of scoping a policy is tightly related to the connections the target kind has with other kinds of objects. In this scenario, targeting a given resource kind may have the semantics of spanning effect across these other objects to which the target is related.
-
-Typically, the relationships between direct and indirect target kinds are organized in a _hierarchy of nested contexts_.
-
-An example of such is a policy that targets a Namespace. Depending on the design of the policy kind, the policy object may declare intent to affect the behavior of the namespace itself (for what concerns the implementation of Namespaces in Kubernetes) or alternatively it can act as a means to affect the behavior of other objects that exist in the referred namespace (e.g. ConfigMaps). While in the former case, the (direct) target object is the Namespace itself, in the latter the (indirect) target is a set of objects of a different kind (e.g. ConfigMaps.)
-
-Another example of this semantic difference in the context of Gateway API objects is a policy that targets the `Gateway` kind, which can be:
-
-* a way to augment the behavior of the `Gateway` object itself (e.g. reconcile cloud infrastructure provider settings from the spec declared by the `Gateway` according to the rules specified by the policy attached to the `Gateway`), or
-* a means to augment the behavior of all `HTTPRoute` objects attached to the `Gateway` (in a way that every new `HTTPRoute` that gets created or modified so it enters the context of the `Gateway` is automatically put in the scope of the policy.)
-
-#### Declared targets versus Effective targets
-
-The target kinds specified in the `targetRefs` stanza of a policy are referred to as *Declared target* kinds.
-
-These are distinct from *Effective target* kinds, which are the kinds of target objects whose behaviors are actually augmented by the policy. That occurs when declared targets are not equal to the actual targets augmented by the policy, but rather serve as a means for reaching other levels (typically lower levels) of a hierarchy of related object kinds ("hierarchy of nested contexts").
-
-To avoid ambiguity in the interpretation of the targets, policy designs MUST clearly define the extent of the effects of the policy respectively to the object kinds they can target (semantics of scoping a policy). This can be done via documentation and it typically refers to a known hierarchy of resource kinds.
-
-### Conflicting specs, Inheritance, Merge strategies, and Effective policies
+### Resolving conflicts
 
 With policies (and metaresources in general), declaring additional specifications to objects from the outside will often yield conflicts that need to be addressed.
 
-Multiple policy resources may (directly or indirectly) affect the same object (same effective target), thus posing a conflict to be resolved regarding which amongst the two declared intents the controller shall honor, i.e. which spec to use to augment the behavior of the object.
+- Multiple policy resources may (directly or indirectly) affect the same object (same scope), thus posing a conflict to be resolved regarding which amongst the two declared intents the controller shall honor, i.e. which spec to use to augment the behavior of the object.
 
-Another way that conflicts may arise is by allowing policies to target different levels of the same hierarchy. This includes hierarchies between different kinds of objects, as well as hierarchies between objects and sections of these objects.
+- Another way that conflicts may arise is by allowing policies to target different levels of the same hierarchy. This includes hierarchies between different kinds of objects, as well as hierarchies between objects and sections of these objects.
 
-There are multiple ways to resolve these conflicts.
+Conflicts MUST be resolved according to a defined [merge strategy](#designing-a-merge-strategy). This is typically done by traversing a [hierarchy of target resources](#hierarchy-of-target-kinds) and calculating an [effective policy](#understanding-effective-policies) for each relevant policy scope.
 
-In some cases, for example, the most recent spec between two conflicting policies may be desired to win, whereas in other cases it might be the oldest. In a different scenario, the winning spec may not be based on creation timestamp but rather determined by the hierarchical level that the policy applies (e.g. specs defined higher in the hierarchy wins over specs defined lower, or the other way around). And sometimes other criteria must be adopted to resolve conflicts between policies that are ultimately affecting the same target.
-
-This section describes the concepts and rules for dealing with conflicting specs, including the concept of [hierarchy and the semantics of inheritance](#hierarchy-of-target-kinds), and how to calculate so-called [_Effective policies_](#effective-policies) by applying [_Merge strategies_](#merge-strategies), two other concepts defined in this section.
+This section identifies the key concepts involved in this process and guides implementations through the mechanics of resolving policy conficts.
 
 #### Hierarchy of target kinds
 
@@ -432,13 +517,27 @@ Lower levels in a hierarchy (e.g., more specific kinds) *inherit* the definition
 
 E.g., given the Gateway API’s hierarchy of network resources for the ingress use case `GatewayClass` > `Gateway` > `HTTPRoute` > `Backend`. A policy that attaches to a `GatewayClass` object, if defined as a policy kind ultimately to augment the behavior of `HTTPRoute` objects, affects all `Gateways` under the `GatewayClass`, as well as all `HTTPRoutes` under those `Gateways`. Any other instance of this policy kind targeting a lower level than the `GatewayClass` (e.g. `Gateway` or `HTTPRoute`, assuming it's supported) should be treated as a conflict against the higher level policy spec in the specific scope that is rooted at the lower level target, i.e., for the subset of the topology that is afftected by both policies.
 
-Conflicts between policies ultimately affecting the same scope MUST be resolved into so-called [*Effective policies*](#effective-policies), according to some defined [*merge strategies*](#merge-strategies).
+In the face of a conflict due to multiple policy objects of a kind targeting different levels or same level in the hierarchy, the conflicting policy specs MUST be organized into [_established_ specs and _challenger_ ones](#established-and-challenger-policy-specs), so a single [effective policy](#understanding-effective-policies) can be calculated for each affetced scope, give one or more [merge strategies](#designing-a-merge-strategy) applicable in the process. The next subsections guide implementations through these remaining concepts and the perocess that links them together.
 
-#### Effective policies
+#### _Established_ and _challenger_ policy specs
+
+In a conflict resolution scenario between two specs (two policies), one spec MUST be assigned as the _established_ spec and the other one as the _challenger_ spec.
+
+Knowing the distinction between _established_ and _challenger_ is useful to determine which and how a particular merge strategy will be applied.
+
+With the exception of the [**None**](#merge-strategy-none) merge strategy, the following rules, continuing on ties, MUST be followed to assign which spec (which policy object) is the _established_ and which one is the _challenger_:
+
+1. Between two policies targeting at different levels of the hierarchy, the one attached higher (less specific) MUST be assigned as the _established_ one.
+2. Between two policies targeting at the same level of the hierarchy, the older policy based on creation timestamp MUST be assigned as the _established_ one.
+3. Between two policies targeting at the same level of the hierarchy and identical creation timestamps, the policy appearing first in alphabetical order by `{namespace}/{name}` MUST be assigned as the _established_ one.
+
+For Policy CRDs that let users specify merge strategies at individual Policy CRs, the spec assigned as _established_ MUST dictate the merge strategy to apply to resolve a conflict. I.e., `established ⇒ 𝑓`.
+
+#### Understanding effective policies
 
 The DAG that represents the hierarchy of targetable objects works as a map to orderly resolve, for each [effective target](#declared-targets-versus-effective-targets), a combinatorial spec that MUST be computed from the set of policies affecting the target. This combinatorial spec of each effective target is referred to as the *Effective policy*.
 
-The process of calculating Effective policies consists of walking the hierarchy of target objects, from least specific to most specific (i.e., "top-down" or, equivalently, from the roots towards the leaves of the DAG of target objects) or from most specific to least specific ("bottom-up"), map reducing to a single policy spec each pair of policies adjacent to each other in the hierarchy, by applying at each step one of the supported [*merge strategies*](#merge-strategies) (described below), until no more than one spec remains for each effective target.
+The process of calculating Effective policies consists of walking the hierarchy of target objects, from least specific to most specific (i.e., "top-down" or, equivalently, from the roots towards the leaves of the DAG of target objects) or from most specific to least specific ("bottom-up"), map reducing to a single policy spec each pair of policies adjacent to each other in the hierarchy, by applying at each step one of the supported merge strategies (described below), until no more than one spec remains for each effective target.
 
 Example of Effective policies based on a hierarchy of Gateway API resources:
 
@@ -469,127 +568,14 @@ graph
 
 The above yields 2 Effective policies:
 
-- For `Route 1`: some combination of `Policy 1` and `Policy 2`
+- For `Route 1`: some combination of `Policy 1` and `Policy 2`, according to a selected merge strategy
 - For `Route 2`: equal to `Policy 1`
-
-#### Merge strategies
-
-If multiple policies have the same scope (that is, multiple CRs based on the same Policy kind affect the same [effective target](#declared-targets-versus-effective-targets)), this is considered to be a _conflict_.
-
-Conflicts MUST be resolved according to a defined _merge strategy_. A merge strategy is a function that receives two conflicting specs and returns a new spec with the conflict resolved. I.e., `𝑓(spec, spec) → spec`
-
-This GEP defines the following merge strategies, specified in the subsections below:
-
-* None
-* Atomic defaults
-* Atomic overrides
-* Patch defaults
-* Patch overrides
-* Custom
-
-Policy CRDs MUST implement at least one of the merge strategies listed above.
-
-Policy CRD that implement more than one merge strategy MUST provide a way for users to select the merge strategy at runtime. This typically involves defining additional fields that users can configure at individual Policy CRs or settings of the controllers implementing the policy.
-
-##### Conflict resolution rules
-
-In a conflict resolution scenario between two specs (two policies), one spec MUST be assigned as the _established_ spec and the other one as the _challenger_ spec.
-
-Knowing the distinction between _established_ and _challenger_ is useful to determine which and how a particular merge strategy will be applied.
-
-With the exception of the **None** merge strategy, the following rules, continuing on ties, MUST be followed to assign which spec (which policy object) is the _established_ and which one is the _challenger_:
-
-1. Between two policies targeting at different levels of the hierarchy, the one attached higher (less specific) MUST be assigned as the _established_ one.
-2. Between two policies targeting at the same level of the hierarchy, the older policy based on creation timestamp MUST be assigned as the _established_ one.
-3. Between two policies targeting at the same level of the hierarchy and identical creation timestamps, the policy appearing first in alphabetical order by `{namespace}/{name}` MUST be assigned as the _established_ one.
-
-For Policy CRDs that let users specify merge strategies at individual Policy CRs, the spec assigned as _established_ MUST dictate the merge strategy to apply to resolve a conflict. I.e., `established ⇒ 𝑓`.
-
-##### Merge strategy: None
-
-The spec (policy resource) with the oldest creation timestamp MUST be considered the _established_ spec and that spec beats all _challenger_ specs (policy resources with newer creation timestamps). In short: `𝑓(established = oldest, challenger) → established`.
-
-In case the conflicting policy resources have identical creation timestamps, the one appearing first in alphabetical order by `{namespace}/{name}` MUST be considered as the _established_ one and that spec beats all others (i.e., beats all _challenger_ specs).
-
-In other words, for the **None** merge strategy, rules ② → ③ of the [Conflict resolution rules](#conflict-resolution-rules) MUST be used to assign the _established_ and _challenger_ specs, and the _established_ spec (policy resource) always wins. All _challenger_ specs (policy resources) MUST be rejected.
-
-For all policies rejected due the application of the **None** merge estrategy, the [`Accepted`](#policy-status) status condition of the policy SHOULD be set to false.
-
-The **None** merge strategy MUST NOT be implemented in combination with any other merge strategy. I.e., if the Policy CRD implements the **None** merge strategy, then no other merge strategy MUST be implemented by the Policy CRD.
-
-Policy kinds that do not specify any merge strategy and only support targeting a single kind, with [Declared target equal to Effective target](#declared-targets-versus-effective-targets), by default MUST implement the **None** merge strategy. (See the definition of [Direct](#direct) class of policies below.)
-
-##### Merge strategy: Atomic defaults
-
-Between two specs (two policy resources) in conflict, the _challenger_ spec beats the _established_ one. The conflicting specs MUST be treated as atomic units (indivisible), therefore the effective policy's spec proper MUST be set to equal to the winning spec in its entirety (rather than parts ot it.) In short: `𝑓(established, challenger) → challenger`.
-
-For example, if two policies are attached at different levels of the hierarchy, e.g. `Gateway` and `HTTPRoute`, by application of the [Conflict resolution rules](#conflict-resolution-rules), the policy attached to the `Gateway` (higher, less specific level) will be considered the _established_ spec, whereas the policy attached to the `HTTPRoute` (lower, more specific level) will be considered the _challenger_ spec. By applying the **Atomic defaults** merge strategy, the effective policy is set to equal to the spec proper of the policy attached to the `HTTPRoute`, and the policy attached to the `Gateway` MUST NOT be enforced in the scope of the `HTTPRoute` augmented by the effective policy (although occasionally it might in the scope of other effective targets, i.e., other HTTPRoutes).
-
-Policy kinds that do not specify any merge strategy and support targeting multiple effective kinds MUST by default implement the **Atomic Defaults** merge strategy.
-
-##### Merge strategy: Atomic overrides
-
-Between two specs (two policy resources) in conflict, the _established_ spec beats the _challenger_ one. The conflicting specs MUST be treated as atomic units (indivisible), therefore the effective policy's spec proper MUST be set to equal to the winning spec in its entirety (rather than parts ot it.) In short: `𝑓(established, challenger) → established`.
-
-For example, if two policies are attached at different levels of the hierarchy, e.g. `Gateway` and `HTTPRoute`, by application of the [Conflict resolution rules](#conflict-resolution-rules), the policy attached to the `Gateway` (higher, less specific level) will be considered the _established_ spec, whereas the policy attached to the `HTTPRoute` (lower, more specific level) will be considered the _challenger_ spec. By applying the **Atomic overrides** merge strategy, the effective policy is set to equal to the spec proper of the policy attached to the `Gateway`, and the policy attached to the `HTTPRoute` MUST NOT be enforced in the scope of the `Gateway` augmented by the effective policy (although occasionally it might in the scope of other effective targets, i.e., other Gateways).
-
-##### Merge strategy: Patch defaults
-
-Between two specs (two policy resources) in conflict, the _challenger_ spec is applied onto the _established_ one in a [JSON Merge Patch (RFC 7386)](https://datatracker.ietf.org/doc/html/rfc7386) operation. Therefore, the effective policy's spec proper MUST be set to a combination of both specs where the _challenger_ spec beats the _established_ one only for all conflicting fields, at the scalar level, with non-conflicting fields from both specs occasionally remaining. In short: `𝑓(established, challenger) → rfc7386(target = established, patch = challenger)`.
-
-For example, if two policies are attached at different levels of the hierarchy, e.g. `Gateway` and `HTTPRoute`, by application of the [Conflict resolution rules](#conflict-resolution-rules), the policy attached to the `Gateway` (higher, less specific level) will be considered the _established_ spec, whereas the policy attached to the `HTTPRoute` (lower, more specific level) will be considered the _challenger_ spec. By applying the **Patch defaults** merge strategy, the effective policy is set to equal to the spec of the policy attached to the `Gateway` JSON-merge-patched using the spec of the policy attached to the `HTTPRoute`, i.e., with any conflicting fields at the scalar level set to their values as specified in the policy attached to the `HTTPRoute`.
-
-##### Merge strategy: Patch overrides
-
-Between two specs (two policy resources) in conflict, the _established_ spec is applied onto the _challenger_ one in a [JSON Merge Patch (RFC 7386)](https://datatracker.ietf.org/doc/html/rfc7386) operation. Therefore, the effective policy's spec proper MUST be set to a combination of both specs where the _established_ spec beats the _challenger_ one only for all conflicting fields, at the scalar level, with non-conflicting fields from both specs occasionally remaining. In short: `𝑓(established, challenger) → rfc7386(target = challenger, patch = established)`.
-
-For example, if two policies are attached at different levels of the hierarchy, e.g. `Gateway` and `HTTPRoute`, by application of the [Conflict resolution rules](#conflict-resolution-rules), the policy attached to the `Gateway` (higher, less specific level) will be considered the _established_ spec, whereas the policy attached to the `HTTPRoute` (lower, more specific level) will be considered the _challenger_ spec. By applying the **Patch overrides** merge strategy, the effective policy is set to equal to the spec of the policy attached to the `HTTPRoute` JSON-merge-patched using the spec of the policy attached to the `Gateway`, i.e., with any conflicting fields at the scalar level set to their values as specified in the policy attached to the `Gateway`.
-
-##### Custom merge strategies
-
-Implementations MAY specify _custom_ merge strategies. These are implementation-specific strategies where the specs of two policies in conflict are resolved into one following a custom merge algorithm specified by the policy kind.
-
-##### Selecting a merge strategy at runtime
-
-Implementations that support multiple merge strategies associated with a particular Policy kind MUST define how a particular merge strategy can be selected at runtime. I.e., how users can specify their preferred merge strategy to use to resolve the conflicts between Policy CRs of that kind. One of the following approaches SHOULD be adopted for this:
-
-- The Policy CRD allows specifying, at any individual Policy CR, one and only one of the merge strategies associated with the Policy CRD, and that specified merged strategy MUST be used to resolve conflicts involving this Policy CR according to the [Conflict resolution rules](#conflict-resolution-rules) specified in this GEP.
-- The controller implementing the policy has its own predefined way to determine among multiple implemented merge strategies which merge strategy to apply to resolve the conflicts between the Policy CRs according to the [Conflict resolution rules](#conflict-resolution-rules) specified in this GEP. This approach MAY include configurations of the controller implementing the Policy kind or any other way other than specifying the merge strategy at individual Policy CRs.
-
-Policy CRDs that let users specify at any individual Policy CR one of multiple implemented merge strategies MUST define a clear structure for the users to do so.
-
-User MUST NOT be allowed to specify at any individual Policy CR more than one merge strategy at a time.
-
-Two known patterns adopted by Policy implementations that support specifying one of multiple merge strategies in the Policy CRs are:
-
-- The definition of a `strategy` field in the `spec` stanza of the Policy, or equivalentely a `mergeType` field.
-- The definition of `defaults` and/or `overrides` fields in the `spec` stanza of the policy wrapping the "spec proper" fields.
-
-Policy CRDs that define a `defaults` field to specify the merge strategy at individual Policy CRs, in the lack of further discrimination of a more specific strategy, SHOULD assume the **Atomic Defaults** merge strategy whenever this field is used to determine the merge strategy.
-
-Policy CRDs that define an `overrides` field to specify the merge strategy at individual Policy CRs, in the lack of further discrimination of a more specific strategy, SHOULD assume the **Atomic Overrides** merge strategy whenever this field is used to determine the merge strategy.
-
-For Policy kinds that implement multiple merge strategies, whenever the merge strategy is not specified, the first of the following merge strategies associated with the Policy kind, in order, SHOULD be assumed:
-
-- Atomic Defaults
-- Patch Defaults
-- Atomic Overrides
-- Patch Overrides
-- Custom
-
-##### Reflecting the applied merge strategy in the status stanza of the policy
-
-Policy implementations SHOULD reflect in the `status` stanza of the policies how the applied merge strategies are altering the effectiveness of the policy spec declared in that particular policy object. Merge strategies referred in the status message MUST use the same name of strategy as defined in this GEP.
-
-Whenever possible, each scope targeted by a policy SHOULD be explained in the `status` stanza regarding how they are being affected by the policy due to applying the merge strategies.
-
-Examples of policy status conditions include if a policy has been successfuly programmed to be enforced or if has been overridden, partially or completely, given all the different scopes targeted by the policy and variations to the spec after occasionally merging with other policies.
-
-See the [Policy status](#policy-status) section for more details.
 
 #### Abstract process for calculating Effective policies
 
-The following is a description of an abstract process for calculating effective policies.
+_Status:_ Provisional
+
+The following is a provisional abstract process for calculating effective policies, based on an example DAG for a hierarchy of target objects and policies.
 
 Given:
 
@@ -625,7 +611,7 @@ graph
     p2 -.-> b2
 ```
 
-For each expanded context that is induced by the instances of targetable resource of kind `C` and its relationships given by the hierarchy, i.e. for each of: `a1` > `b1` > `c1`, `a1` > `b2` > `c1`, and `a1` > `b2` > `c2`, stack the policies targeting the context at any level, ordered from the most specific level (i.e. `C`) to the least specific one (i.e. `A`), applying the [conflict resolution rules](#conflict-resolution-rules) described before if necessary:
+For each expanded context that is induced by the instances of targetable resource of kind `C` and its relationships given by the hierarchy, i.e. for each of: `a1` > `b1` > `c1`, `a1` > `b2` > `c1`, and `a1` > `b2` > `c2`, stack the policies targeting the context at any level, ordered from the most specific level (i.e. `C`) to the least specific one (i.e. `A`), applying the [conflict resolution rules between established and challenger specs](#established-and-challenger-policy-specs) described before if necessary:
 
 1. Pop two policies from the stack and combine them into one effective policy.
 2. Push the calculated effective policy back into the stack.
@@ -665,29 +651,436 @@ In the example above, the expected outcome of the process is:
 
 In the most trivial case where policies can only directly target the objects whose behavior they intend to augment (i.e. instances of `C` without any indirections) and no policy specs are merged at all, the outcome of the process of calculating effective policies is simplified to a 1:1 mapping between policy and target object at most, where the declared policy equals the effective one, with no combinatorial specs nor contextual variations.
 
-### Classes of policies
+#### Designing a merge strategy
 
-While the notion of classes of policy kinds was more central in previous iterations of this GEP (see [GEP-2648](../gep-2648/index.md) and [GEP-2649](../gep-2649/index.md)), it here serves primarily as a communicative and organizational aid. The classification reflects patterns that emerge from the properties and behaviors described in earlier sections, but it does not impose any prescriptive or normative requirements on the implementations. These classes—namely _Direct_ and _Inherited_—remain in the specification to support clarity and shared understanding, especially for implementations and users familiar with earlier versions.
+Policy CRDs MUST implement at least one of the merge strategies described in this section.
 
-#### Direct
+Policy CRD that implement more than one merge strategy MUST provide a way for users to [select the merge strategy at runtime](#selecting-a-merge-strategy-at-runtime). This typically involves defining additional fields that users can configure at individual Policy CRs or settings of the controllers implementing the policy.
 
-* A single kind supported in `spec.targetRefs.kind`
-* Effects of the policies do not span across the hierarchy, i.e. the _Declared target kind_ is equal to the _Effective target kind_
-* *None* is the only merge strategy supported
-* If supported, could typically be implemented by directly extending the API of the target kind with the fields otherwise defined at the policy (e.g. Gateway API xRoute filter)
+##### Merge strategy: None
 
-#### Inherited
+_Status:_ Standard
 
-* Superset of the above
-* Any policy kind that do not comply with at least one characteristic of the Direct class of policies
+_None_ is often used to describe the absense of a defined merge strategy, meaning the conflict cannot be strictly resolved.
+
+Implementation-wise, the spec (policy resource) with the oldest creation timestamp MUST be considered the _established_ spec and that spec beats all _challenger_ specs (policy resources with newer creation timestamps). In short: `𝑓(established = oldest, challenger) → established`.
+
+In case the conflicting policy resources have identical creation timestamps, the one appearing first in alphabetical order by `{namespace}/{name}` MUST be considered as the _established_ one and that spec beats all others (i.e., beats all _challenger_ specs).
+
+In other words, for the **None** merge strategy, rules ② → ③ of the [conflict resolution rules between established and challenger specs](#established-and-challenger-policy-specs) MUST be used to assign the _established_ and _challenger_ specs, and the _established_ spec (policy resource) always wins. All _challenger_ specs (policy resources) MUST be rejected.
+
+For all policies rejected due the application of the **None** merge estrategy, the [`Accepted`](#status-conditions) status condition of the policy SHOULD be set to false.
+
+The **None** merge strategy MUST NOT be implemented in combination with any other merge strategy. I.e., if the Policy CRD implements the **None** merge strategy, then no other merge strategy MUST be implemented by the Policy CRD.
+
+Policy kinds that do not specify any merge strategy and only support targeting a single kind, with [Declared target equal to Effective target](#declared-targets-versus-effective-targets), by default MUST implement the **None** merge strategy. (See definition of the _Direct_ [class of policies](#classes-of-policies).)
+
+##### Merge strategy: Atomic defaults
+
+_Status:_ Standard
+
+Between two specs (two policy resources) in conflict, the _challenger_ spec beats the _established_ one. The conflicting specs MUST be treated as atomic units (indivisible), therefore the effective policy's spec proper MUST be set to equal to the winning spec in its entirety (rather than parts ot it.) In short: `𝑓(established, challenger) → challenger`.
+
+For example, if two policies are attached at different levels of the hierarchy, e.g. `Gateway` and `HTTPRoute`, by application of the [conflict resolution rules between established and challenger specs](#established-and-challenger-policy-specs), the policy attached to the `Gateway` (higher, less specific level) will be considered the _established_ spec, whereas the policy attached to the `HTTPRoute` (lower, more specific level) will be considered the _challenger_ spec. By applying the **Atomic defaults** merge strategy, the effective policy is set to equal to the spec proper of the policy attached to the `HTTPRoute`, and the policy attached to the `Gateway` MUST NOT be enforced in the scope of the `HTTPRoute` augmented by the effective policy (although occasionally it might in the scope of other effective targets, i.e., other HTTPRoutes).
+
+Policy kinds that do not specify any merge strategy and support targeting multiple effective kinds MUST by default implement the **Atomic Defaults** merge strategy.
+
+##### Merge strategy: Atomic overrides
+
+_Status:_ Experimental
+
+Between two specs (two policy resources) in conflict, the _established_ spec beats the _challenger_ one. The conflicting specs MUST be treated as atomic units (indivisible), therefore the effective policy's spec proper MUST be set to equal to the winning spec in its entirety (rather than parts ot it.) In short: `𝑓(established, challenger) → established`.
+
+For example, if two policies are attached at different levels of the hierarchy, e.g. `Gateway` and `HTTPRoute`, by application of the [conflict resolution rules between established and challenger specs](#established-and-challenger-policy-specs), the policy attached to the `Gateway` (higher, less specific level) will be considered the _established_ spec, whereas the policy attached to the `HTTPRoute` (lower, more specific level) will be considered the _challenger_ spec. By applying the **Atomic overrides** merge strategy, the effective policy is set to equal to the spec proper of the policy attached to the `Gateway`, and the policy attached to the `HTTPRoute` MUST NOT be enforced in the scope of the `Gateway` augmented by the effective policy (although occasionally it might in the scope of other effective targets, i.e., other Gateways).
+
+##### Merge strategy: Patch defaults
+
+_Status:_ Experimental
+
+Between two specs (two policy resources) in conflict, the _challenger_ spec is applied onto the _established_ one in a [JSON Merge Patch (RFC 7386)](https://datatracker.ietf.org/doc/html/rfc7386) operation. Therefore, the effective policy's spec proper MUST be set to a combination of both specs where the _challenger_ spec beats the _established_ one only for all conflicting fields, at the scalar level, with non-conflicting fields from both specs occasionally remaining. In short: `𝑓(established, challenger) → rfc7386(target = established, patch = challenger)`.
+
+For example, if two policies are attached at different levels of the hierarchy, e.g. `Gateway` and `HTTPRoute`, by application of the [conflict resolution rules between established and challenger specs](#established-and-challenger-policy-specs), the policy attached to the `Gateway` (higher, less specific level) will be considered the _established_ spec, whereas the policy attached to the `HTTPRoute` (lower, more specific level) will be considered the _challenger_ spec. By applying the **Patch defaults** merge strategy, the effective policy is set to equal to the spec of the policy attached to the `Gateway` JSON-merge-patched using the spec of the policy attached to the `HTTPRoute`, i.e., with any conflicting fields at the scalar level set to their values as specified in the policy attached to the `HTTPRoute`.
+
+##### Merge strategy: Patch overrides
+
+_Status:_ Experimental
+
+Between two specs (two policy resources) in conflict, the _established_ spec is applied onto the _challenger_ one in a [JSON Merge Patch (RFC 7386)](https://datatracker.ietf.org/doc/html/rfc7386) operation. Therefore, the effective policy's spec proper MUST be set to a combination of both specs where the _established_ spec beats the _challenger_ one only for all conflicting fields, at the scalar level, with non-conflicting fields from both specs occasionally remaining. In short: `𝑓(established, challenger) → rfc7386(target = challenger, patch = established)`.
+
+For example, if two policies are attached at different levels of the hierarchy, e.g. `Gateway` and `HTTPRoute`, by application of the [conflict resolution rules between established and challenger specs](#established-and-challenger-policy-specs), the policy attached to the `Gateway` (higher, less specific level) will be considered the _established_ spec, whereas the policy attached to the `HTTPRoute` (lower, more specific level) will be considered the _challenger_ spec. By applying the **Patch overrides** merge strategy, the effective policy is set to equal to the spec of the policy attached to the `HTTPRoute` JSON-merge-patched using the spec of the policy attached to the `Gateway`, i.e., with any conflicting fields at the scalar level set to their values as specified in the policy attached to the `Gateway`.
+
+##### Custom merge strategies
+
+_Status:_ Implementation-specific
+
+Implementations MAY specify **Custom** merge strategies. These are implementation-specific strategies where the specs of two policies in conflict are resolved into one following a custom merge algorithm specified by the policy kind.
+
+##### Selecting a merge strategy at runtime
+
+_Status:_ Experimental
+
+Implementations that support multiple merge strategies associated with a particular Policy kind MUST define how a particular merge strategy can be selected at runtime. I.e., how users can specify their preferred merge strategy to use to resolve the conflicts between Policy CRs of that kind. One of the following approaches SHOULD be adopted for this:
+
+- The Policy CRD allows specifying, at any individual Policy CR, one and only one of the merge strategies associated with the Policy CRD, and that specified merged strategy MUST be used to resolve conflicts involving this Policy CR according to the [conflict resolution rules between established and challenger specs](#established-and-challenger-policy-specs) specified in this GEP.
+- The controller implementing the policy has its own predefined way to determine among multiple implemented merge strategies which merge strategy to apply to resolve the conflicts between the Policy CRs according to the [conflict resolution rules between established and challenger specs](#established-and-challenger-policy-specs) specified in this GEP. This approach MAY include configurations of the controller implementing the Policy kind or any other way other than specifying the merge strategy at individual Policy CRs.
+
+Policy CRDs that let users specify at any individual Policy CR one of multiple implemented merge strategies MUST define a clear structure for the users to do so.
+
+User MUST NOT be allowed to specify at any individual Policy CR more than one merge strategy at a time.
+
+Two known patterns adopted by Policy implementations that support specifying one of multiple merge strategies in the Policy CRs are:
+
+- The definition of `defaults` and/or `overrides` fields within the `spec` of the policy, wrapping the "spec proper" fields. (This is the pattern originally proposed by previous versions of this GEP.)
+- The definition of a `strategy` field in the `spec` stanza of the Policy, or equivalentely a `mergeType` field. (See, for example, [Kuadrant](#kuadrant) and [Envoy Gateway](#envoy-gateway) kinds of policies respectively)
+
+Policy CRDs that define a `defaults` field to specify the merge strategy at individual Policy CRs, in the lack of further discrimination of a more specific strategy, SHOULD assume the **Atomic Defaults** merge strategy whenever this field is used to determine the merge strategy.
+
+Policy CRDs that define an `overrides` field to specify the merge strategy at individual Policy CRs, in the lack of further discrimination of a more specific strategy, SHOULD assume the **Atomic Overrides** merge strategy whenever this field is used to determine the merge strategy.
+
+For Policy kinds that implement multiple merge strategies, whenever the merge strategy is not specified, the first of the following merge strategies associated with the Policy kind, in order, SHOULD be assumed:
+
+- Atomic Defaults
+- Patch Defaults
+- Atomic Overrides
+- Patch Overrides
+- Custom
+
+#### Reflecting the applied merge strategy in the status stanza of the policy
+
+_Status:_ Experimental
+
+Policy implementations SHOULD reflect in the `status` stanza of the policies how the applied merge strategies are altering the effectiveness of the policy spec declared in that particular policy object. Merge strategies referred in the status message MUST use the same name of strategy as defined in this GEP.
+
+Whenever possible, each scope targeted by a policy SHOULD be explained in the `status` stanza regarding how they are being affected by the policy due to applying the merge strategies.
+
+Examples of policy status conditions include if a policy has been successfuly programmed to be enforced or if has been overridden, partially or completely, given all the different scopes targeted by the policy and variations to the spec after occasionally merging with other policies.
+
+See the section on [policy status](#the-status-stanza-of-policy-objects) for more details.
+
+### Policy discoverability
+
+A well-known problem of declaring specifications into separate objects, that ultimately will reshape or govern the behavior of their targeted ones, regards the discoverability of metaresources. That is, how an object owner gets to know what metaresource (or set of metaresources) is affecting their object and with what content.
+
+Part of the solution involves [status reporting](#status-reporting), though it may require more than that. Even though Kubernetes has always had analogous problems－the most obvious example being Role Based Access Control (RBAC)－, the discoverability issue remains a challenging one to be addressed. To better understand it, consider the following parable described in the context of Gateway API, with thanks to [Flynn](https://github.com/kflynn):
+
+#### The discoverability problem • A Parabol
+
+It's a sunny Wednesday afternoon, and the lead microservices developer for Evil Genius Cupcakes is windsurfing. Work has been eating Ana alive for the past two and a half weeks, but after successfully deploying version 3.6.0 of the `baker` service this morning, she's escaped early to try to unwind a bit.
+
+Her shoulders are just starting to unknot when her phone pings with a text from Chihiro, down in the NOC. Waterproof phones are a blessing, but also a curse.
+
+**Chihiro**: *Hey Ana. Things are still running, more or less, but latencies on everything in the `baker` namespace are crazy high after your last rollout, and `baker` itself has a weirdly high load. Sorry to interrupt you on the lake but can you take a look? Thanks\!\!*
+
+Ana stares at the phone for a long moment, heart sinking, then sighs and turns back to shore.
+
+What she finds when dries off and grabs her laptop is strange. `baker` does seem to be taking much more load than its clients are sending, and its clients report much higher latencies than they’d expect. She doublechecks the Deployment, the Service, and all the HTTPRoutes around `baker`; everything looks good. `baker`’s logs show her mostly failed requests... with a lot of duplicates? Ana checks her HTTPRoute again, though she's pretty sure you can't configure retries there, and finds nothing. But it definitely looks like clients are retrying when they shouldn’t be.
+
+She pings Chihiro.
+
+**Ana**: *Hey Chihiro. Something weird is up, looks like requests to `baker` are failing but getting retried??*
+
+A minute later they answer.
+
+**Chihiro**: 🤷 *Did you configure retries?*
+
+**Ana**: *Dude. I don’t even know how to.* 😂
+
+**Chihiro**: *You just attach a RetryPolicy to your HTTPRoute.*
+
+**Ana**: *Nope. Definitely didn’t do that.*
+
+She types `kubectl get retrypolicy -n baker` and gets a permission error.
+
+**Ana**: *Huh, I actually don’t have permissions for RetryPolicy.* 🤔
+
+**Chihiro**: 🤷 *Feels like you should but OK, guess that can’t be it.*
+
+Minutes pass while both look at logs.
+
+**Chihiro**: *I’m an idiot. There’s a RetryPolicy for the whole namespace – sorry, too many policies in the dashboard and I missed it. Deleting that since you don’t want retries.*
+
+**Ana**: *Are you sure that’s a good–*
+
+Ana’s phone shrills while she’s typing, and she drops it. When she picks it up again she sees a stack of alerts. She goes pale as she quickly flips through them: there’s one for every single service in the `baker` namespace.
+
+**Ana**: *PUT IT BACK\!\!*
+
+**Chihiro**: *Just did. Be glad you couldn't hear all the alarms here.* 😕
+
+**Ana**: *What the hell just happened??*
+
+**Chihiro**: *At a guess, all the workloads in the `baker` namespace actually fail a lot, but they seem OK because there are retries across the whole namespace?* 🤔
+
+Ana's blood runs cold.
+
+**Chihiro**: *Yeah. Looking a little closer, I think your `baker` rollout this morning would have failed without those retries.* 😕
+
+There is a pause while Ana's mind races through increasingly unpleasant possibilities.
+
+**Ana**: *I don't even know where to start here. How long did that RetryPolicy go in? Is it the only thing like it?*
+
+**Chihiro**: *Didn’t look closely before deleting it, but I think it said a few months ago. And there are lots of different kinds of policy and lots of individual policies, hang on a minute...*
+
+**Chihiro**: *Looks like about 47 for your chunk of the world, a couple hundred system-wide.*
+
+**Ana**: 😱 *Can you tell me what they’re doing for each of our services? I can’t even* look *at these things.* 😕
+
+**Chihiro**: *That's gonna take awhile. Our tooling to show us which policies bind to a given workload doesn't go the other direction.*
+
+**Ana**: *...wait. You have to* build tools *to know if retries are turned on??*
+
+Pause.
+
+**Chihiro**: *Policy Attachment is more complex than we’d like, yeah.* 😐 *Look, how about roll back your `baker` change for now? We can get together in the morning and start sorting this out.*
+
+Ana shakes her head and rolls back her edits to the `baker` Deployment, then sits looking out over the lake as the deployment progresses.
+
+**Ana**: *Done. Are things happier now?*
+
+**Chihiro**: *Looks like, thanks. Reckon you can get back to your sailboard.* 🙂
+
+Ana sighs.
+
+**Ana**: *Wish I could. Wind’s died down, though, and it'll be dark soon. Just gonna head home.*
+
+**Chihiro**: *Ouch. Sorry to hear that.* 😐
+
+One more look out at the lake.
+
+**Ana**: *Thanks for the help. Wish we’d found better answers.* 😢
+
+#### The Problem, restated
+
+What this parable makes clear is that, in the absence of information about what metaresource is affecting an object, it’s very easy to make poor decisions.
+
+It’s critical that this proposal solve the problem of showing up to three things, listed in increasing order of desirability:
+
+* *That* some metaresource/policy is affecting a particular object
+* *Which* metaresource/policy is (or metaresources/policies are) affecting a particular object
+* *What* settings in the metaresource/policy are affecting the object.
+
+In the parable, if Ana and Chihiro had known that there were policies affecting the relevant object, then they could have gone looking for the relevant policies and things would have played out differently. If they knew which policies, they would need to look less hard, and if they knew what the settings being applied were, then the parable would have been able to be very short indeed.
+
+(There’s also another use case to consider, in that Chihiro should have been able to see that the metaresource on the namespace was in use in many places before deleting it.)
+
+To put this another way, Metaresources and Policy Attachment is effectively adding another persona among the stakeholders, the Policy Admin, and without a solution to the discoverability problem, their actions are largely invisible to the Application Developer. Not only that, but their concerns cut across the previously established levels.
+
+![Gateway API diagram with Policy Admin](images/713-the-diagram-with-policy-admin.png)
+
+From the Policy Admin’s point of view, they need to know across their whole remit (which conceivably could be the whole cluster):
+
+* *What* metaresource/policy has been created
+* *Where* it’s applied
+* *What* the resultant (effective) metaresource/policy is saying
+
+Which again, comes down to discoverability, and can probably be addressed in similar ways at an API level to the Application Developer's concerns.
+
+An important note here is that a key piece of information for Policy Admins and Cluster Operators is "How many things does this Policy affect?". In the parable, this would have enabled Chihiro to know that deleting the Namespace policy would affect many other people than just Ana.
+
+#### Gateway API personas and the discoverability problem
+
+Let's go through the various users of Gateway API and what they need to know about policies affecting their objects.
+
+In all of these cases, keeping the troubleshooting distance low is desired; that is, that there should be a minimum of hops required between objects from the one owned by the user to the one responsible for a setting.
+
+Another way to think of the troubleshooting distance in this context is "How many `kubectl` commands would the user need to do to understand that a policy is relevant, which policy is relevant, and what configuration the full set of policy is setting?"
+
+##### Application Developer Discoverability
+
+How does Ana, or any Application Developer who owns one or more Route objects know that their object is affected by a policy, which policy is affecting it, and what the content of the policy is?
+
+The best outcome is that Ana needs to look only at a specific route to know what policy settings are being applied to that Route, and where they come from. However, some of the other problems below make it very difficult to achieve this.
+
+##### Policy Admin Discoverability
+
+How does the Policy Admin know what policy is applied where, and what the content of that policy is? How do they validate that the policy is being used in ways acceptable to their organization? For any given policy object, how do they know how many places it's being used?
+
+##### Cluster Admin Discoverability
+
+The Cluster Admin has similar concerns to the Policy Admin, but with a focus on being able to determine what's relevant when something is broken.
+
+How does the Cluster Admin know what policy is applied where, and what the content of that policy is?
+
+For any given policy object, how do they know how many places it's being used?
+
+#### Hinting on a solution for the discoverability problem
+
+Querying the status of objects stored in the cluster may be the Kubernetes way of knowing the state of the system, in a world where objects are declarative and there are only so many links between objects to hop in between. However, this is still a proxy used to model a real life problem that often has otherwise different ways to be thought about as well.
+
+In the context of traffic networking, for example, often the question asked by users is *"What happens when a network request X comes in?"*. There is an implicit expectation that a set of Kubernetes resources suffices to represent all the rules for a given workload to be activated and thus process request X, and often that is the case. For more complex cases however (e.g, multiple personas, application concerns separated into dedicated resource kinds, interaction between groups of users, etc), real life can get more complicated than a simple `kubectl get x`, or at least additional steps must be automated to encompass complexity into what can be achieved with a single declarative object.
+
+With that in mind, a possible solution for the discoverability problem may involve designing tools (e.g. CLI tools/plugins), new CRDs, etc that let users ask questions in terms of the real life problems they have to deal with on a daily basis, rather than shaped by the underlying technologies used in the process. For instance, a simple Kubernetes object that is used to declare the rules to process a HTTP request cannot have its status reported simply as Ready/Not ready. By being a complex object composed of multiple routing rules, potentially affected by specifications declared from other objects as well, its status MUST account for that complexity and be structured in such a way that informs the owner with respect to each possible case, whether the ones induced by the internal specification declared by the object itself or its external relationships.
+
+In other words, the discoverability problem exists and must be addressed in light of the complexity associated with the topology of nested contexts induced by a set of hierarchically related resources. One should always have that topology in mind while asking questions regarding the behavior of a given resource, because just like a routing object (e.g. HTTPRoute) does not exist independently from its parent contexts (e.g. Gateways) or its children (e.g. Backends), any resource in focus may be just a part of a whole.
+
+### Status reporting
+
+#### The `status` stanza of policy objects
+
+_Status:_ Standard
+
+Policy CRDs MUST define a `status` stanza, and the `status` stanza MUST contain a `conditions` stanza, using the standard Condition format, to report the status of the policy.
+
+##### Status conditions
+
+Policy implementations SHOULD use the following status conditions and reasons for policy objects are (represented in Go code):
+
+```go
+// PolicyConditionType is a type of condition for a policy.
+type PolicyConditionType string
+
+// PolicyConditionReason is a reason for a policy condition.
+type PolicyConditionReason string
+
+const (
+  // PolicyConditionAccepted indicates whether the policy has passed both syntactic validation by the
+  // API server and semantic validation enforced by the controller, such as whether the target objects exist.
+  //
+  // Possible reasons for this condition to be True are:
+  //
+  // * "Accepted"
+  //
+  // Possible reasons for this condition to be False are:
+  //
+  // * "Conflicted"
+  // * "Invalid"
+  // * "TargetNotFound"
+  //
+  // Non-accepted policy objects are also not **Programmed** and not **Overridden**
+  PolicyConditionAccepted PolicyConditionType = "Accepted"
+
+  // PolicyReasonAccepted is used with the "Accepted" condition when the policy has been
+  // accepted by the targeted resource.
+  PolicyReasonAccepted PolicyConditionReason = "Accepted"
+
+  // PolicyReasonConflicted is used with the "Accepted" condition when the policy has not
+  // been accepted by a targeted resource because there is another policy that targets the same
+  // resource and a merge is not possible.
+  PolicyReasonConflicted PolicyConditionReason = "Conflicted"
+
+  // PolicyReasonInvalid is used with the "Accepted" condition when the policy is syntactically
+  // or semantically invalid.
+  PolicyReasonInvalid PolicyConditionReason = "Invalid"
+
+  // PolicyReasonTargetNotFound is used with the "Accepted" condition when the policy is attached to
+  // an invalid target resource
+  PolicyReasonTargetNotFound PolicyConditionReason = "TargetNotFound"
+
+  // PolicyConditionProgrammed indicated whether the policy's spec is guaranteed by the controller to
+  // be fully programmed for enforcement.
+  //
+  // Possible reasons for this condition to be True are:
+  //
+  // * "Programmed"
+  // * "PartiallyProgrammed"
+  //
+  // Possible reasons for this condition to be False are:
+  //
+  // * "Reconciling"
+  // * "Overridden"
+  //
+  PolicyConditionProgrammed PolicyConditionType = "Programmed"
+
+  // PolicyReasonProgrammed is used with the "Programmed" condition when the full spec of the policy has been
+  // programmed to affect the entire scope under the associated target for the status, with no parts of the
+  // policy overridden during conflict resolution against other policies of the same kind.
+  // Inversily, it is used with the "Overridden" condition when the policy is not overridden due to been programmed.
+  PolicyReasonProgrammed PolicyConditionReason = "Programmed"
+
+  // PolicyReasonPartiallyProgrammed is used with the "Programmed" condition when parts of the policy's spec have
+  // been programmed, while other parts are known to have been superseded by other specs during conflict resolution,
+  // and/or only parts of the scope under the associated target for the status are expected to be affected by
+  // the policy spec, with other parts of the scope affected by other specs preferred during conflict resolution.
+  // The status message SHOULD include details highlighting which parts of the policy/scope are reconciled and
+  // which parts have been superseded, with the references to all other related policies.
+  PolicyReasonPartiallyProgrammed PolicyConditionReason = "PartiallyProgrammed"
+
+  // PolicyReasonReconciling is used with the "Programmed" condition to indicate the policy is currently being
+  // reconciled by the controller.
+  PolicyReasonReconciling PolicyConditionReason = "Reconciling"
+
+  // PolicyReasonOverridden is used with the "Programmed" condition to indicate the policy has been fully
+  // overridden by other specs during conflict resolution.
+  // The status message SHOULD include the references to the other related policies.
+  PolicyReasonOverridden PolicyConditionReason = "Overridden"
+)
+```
+
+The following table summarizes the possible statuses:
+
+| Accepted                                      | Programmed                              |
+|:---------------------------------------------:|:---------------------------------------:|
+| False (Conflicted / Invalid / TargetNotFound) | ∅                                       |
+| True                                          | False (Reconciling / Overridden)        |
+| True                                          | True (Programmed / PartiallyProgrammed) |
+
+##### Using upstream `PolicyAncestorStatus` struct
+
+_Status:_ Provisional
+
+Policy objects SHOULD use the upstream `PolicyAncestorStatus` struct in their respective Status structs. Please see the included `PolicyAncestorStatus` struct, and its use in the `BackendTLSPolicy` object for detailed examples. Included here is a representative version.
+
+This pattern enables different conditions to be set for different "Ancestors" of the target resource. This is particularly helpful for policies that may be implemented by multiple controllers or attached to resources with different effects or capabilities. For example a Policy that could attach to Route or Service to set load balancing properties may be reconciled by multiple controllers, and so needs further namespacing of its status. This pattern also provides a clear view of what resources a policy is affecting.
+
+For the best integration with community tooling and consistency across the broader community, we recommend that all implementations transition to Policy status with this kind of nested structure.
+
+This is an `Ancestor` status rather than a `Parent` status, as in the Route status, because, for Policy Attachment, the relevant object may or may not be the direct parent.
+
+For example, `BackendTLSPolicy` directly attaches to a Service, which may be included in multiple Routes, in multiple Gateways. However, for many implementations, the status of the `BackendTLSPolicy` will be different only at the Gateway level, so Gateway is the relevant Ancestor for the status. Each Gateway that has a Route that includes a backend with an attached `BackendTLSPolicy` SHOULD have a separate `PolicyAncestorStatus` section in the `BackendTLSPolicy`'s `status.ancestors` stanza, which mandates that entries must be distinct using the combination of the `AncestorRef` and the `ControllerName` fields as a key. See [GEP-1897][../gep-1897/index.md] for the exact details.
+
+For other kinds of policies, `Ancestor` status may coincide with `Parent` status, as in having exactly one block of status conditions for each target in the `targetRefs` stanza of the policy suffices. This is usually the case of policy kinds that allow targeting only `Gateway` and/or gateway listeners (i.e. `Gateway` + `sectionName`).
+
+#### Target object status
+
+_Status:_ Experimental
+
+To facilitate [policy discoverability](#policy-discoverability), implementations of Policies kinds SHOULD put a condition into `status.Conditions` of any objects affected by the policy.
+
+That condition, if added, MUST be named according to the pattern `<metaresource-kind>Affected` (e.g. `colors.controller.k8s.io/ColorPolicyAffected`), and SHOULD include an `observedGeneration` field kept up to date when the spec of the target object changes.
+
+Implementations SHOULD use their own unique domain prefix for this condition type. Gateway API implementations, for instance, SHOULD use the same domain as in the `controllerName` field on `GatewayClass` (or some other implementation-unique domain for implementations that do not use `GatewayClass`.)
+
+E.g. – given a `Gateway` object that is targeted by a hypothetical `ColorPolicy` policy object named `policy-namespace/my-policy`, which is owned by a `colors.controller.k8s.io` controller and with status `Enforced` or `PartiallyEnforced`. The controller SHOULD add to the status of the `Gateway` object a condition `colors.controller.k8s.io/ColorPolicyAffected: true`, and reason ideally referring to the `policy-namespace/my-policy` by name.
+
+Similarly, for a hypothetical `ColorPolicy` policy that targets a specific named section of the `Gateway` object (e.g., `http-listener`), the controller SHOULD add to the status of the listener section within the `Gateway` object a condition `colors.controller.k8s.io/ColorPolicyAffected: true`.
+
+For objects that do not have a `status.Conditions` field available (`Secret` is a good example), that object SHOULD instead have an annotation of `colors.controller.k8s.io/ColorPolicyAffected: true` added instead.
+
+#### Status needs to be namespaced by implementation
+
+_Status:_ Experimental
+
+Because an object can be affected by multiple implementations at once, any added status, to the policy objects or targets, MUST be namespaced by the implementation.
+
+In Gateway API's Route Parent status, `parentRef` plus the controller name have been used for this.
+
+For policies, something similar can be done, namespacing by the reference to the implementation's controller name.
+
+#### A note on status representation patterns for the policy and target object statuses
+
+Defining a _common_ pattern for including the details of an _arbitrarily defined_ object, to be included in a library for all possible implementations, is challenging, to say the least.
+
+Structured data cannot be used because there is no way of knowing what the structure will be beforehand. This suggests a need to use unstructured data for representing the main body of the arbitrary policy objects. Practically, this will have to be a string representation of the YAML form (or JSON, equivalently) of the body of the policy object (absent the metadata part of every Kubernetes object).
+
+Metaresources and Policy Attachment does not mandate anything about the design of the object's top level except that it must be a Kubernetes object, so the only possible thing to rely upon here is the presence of the Kubernetes metadata elements: `apiVersion`, `kind`, and `metadata`.
+
+Therefore, a string representation of the rest of the file is likely the best that can be done here.
+
+#### Fanout status update problems
+
+The fanout problem is that, when an update takes place in a single object (a policy, or an object with a policy attached), an implementation may need to update _many_ objects if it needs to place details of what policy applies, or what the resultant set of policies is on _every_ object.
+
+Historically, this is a risky strategy and needs to be carefully applied, as it's an excellent way to create apiserver load problems, which can produce a large range of bad effects for cluster stability.
+
+This does not mean that nothing at all that affects multiple objects can be done, but that careful consideration of what information is stored in status, so that _every_ policy update does not require a corresponding status update, is advised.
 
 ## End-to-end examples
 
-This section presents a series of synthetic examples of applications of policies for different kinds of topologies and contexts.
+This section presents a series of synthetic examples of applications of policies for different kinds of topologies and contexts. The examples are implementations of the [Abstract process for calculating effective policies](#abstract-process-for-calculating-effective-policies). They are not prescriptive on exactly how policies must be designed, but rather illustrational of the different types of merge strategy and mechanics for calculating effective policies.
 
-In all cases, the background of targetable object kinds is assumed to be a hierarchy of network resource kinds `Gateway` (`g`) > `Route` (`r`) > `Backend` (`b`), where `Gateway` is the least specific kind (instances denoted "`gX`") and `Backend` is the most specific kind (instances denoted "`bX`").
+Consider for all the examples the following hierarchy of network resource kinds: `Gateway` (`g`) > `Route` (`r`) > `Backend` (`b`), where `Gateway` is the least specific kind (instances denoted "`gX`") and `Backend` is the most specific kind (instances denoted "`bX`").
 
-Moreover, a `ColorPolicy` kind is defined however with variations in its semantics across examples to accommodate for each case. Instances of the `ColorPolicy` kind (denoted "`pX[spec]`" and referred to simply as "policies") may target one or more kinds of targetable resources, depending on each example. A policy represents an intent to "color" the network traffic that flows through the portion of the network corresponding to the target with a given color or color set that is specified in the policy.
+Moreover, a `ColorPolicy` kind is defined with variations in its semantics across examples to accommodate for each case. Instances of the `ColorPolicy` kind (denoted "`pX[spec]`" and referred to simply as "policies") may target one or more kinds of targetable resources, depending on each end-to-end example. A policy represents an intent to "color" the network traffic that flows through the portion of the network corresponding to the target with a given color or color set that is specified in the policy.
 
 ### Example 1. Direct Policy
 
@@ -876,227 +1269,6 @@ The expected outcome to be implemented by the controller is:
 8. Status of `ColorPolicy` `p2` must be reported as enforced.
 9. Status of `ColorPolicy` `p3` must be reported as enforced.
 10. Status of `ColorPolicy` `p4` must be reported as partially enforced, due to being partially overridden by `ColorPolicy` `p3`.
-
-## Managing metaresources in real life
-
-### Responsibility
-
-Metaresources and policies are typically implemented and managed by a custom controller. This controller can be the same controller that is responsible for managing the objects that are targeted by the metaresources or another controller specifically responsible for the aspect of the object that the metaresource augments or modifies. For policy kinds of metaresources, this controller is often referred to as the "policy controller".
-
-Ultimately, it is the responsibility of the controller to provide enough information to resource owners that help circumvent or mitigate the discoverability problem (described in the next section). This typically involves populating the status stanza of the target objects, although may as well resort to additional tools (e.g. CRDs, CLI tools) that help visualize the hierarchical topology of target objects and policies, effective policies, etc.
-
-### The discoverability problem
-
-A well-known problem of declaring specifications into separate objects, that ultimately will reshape or govern the behavior of their targeted ones, regards the discoverability of metaresources. That is, how an object owner gets to know what metaresource (or set of metaresources) is affecting their object and with what content.
-
-Even though Kubernetes already has analogous problems in its core－the most obvious example being the Kubernetes Role Based Access Control (RBAC)－, the discoverability issue remains a challenging one to be addressed. To better understand it, consider the following parable described in the context of Gateway API, with thanks to [Flynn](https://github.com/kflynn):
-
-#### The Parabol
-
-It's a sunny Wednesday afternoon, and the lead microservices developer for Evil Genius Cupcakes is windsurfing. Work has been eating Ana alive for the past two and a half weeks, but after successfully deploying version 3.6.0 of the `baker` service this morning, she's escaped early to try to unwind a bit.
-
-Her shoulders are just starting to unknot when her phone pings with a text from Chihiro, down in the NOC. Waterproof phones are a blessing, but also a curse.
-
-**Chihiro**: *Hey Ana. Things are still running, more or less, but latencies on everything in the `baker` namespace are crazy high after your last rollout, and `baker` itself has a weirdly high load. Sorry to interrupt you on the lake but can you take a look? Thanks\!\!*
-
-Ana stares at the phone for a long moment, heart sinking, then sighs and turns back to shore.
-
-What she finds when dries off and grabs her laptop is strange. `baker` does seem to be taking much more load than its clients are sending, and its clients report much higher latencies than they’d expect. She doublechecks the Deployment, the Service, and all the HTTPRoutes around `baker`; everything looks good. `baker`’s logs show her mostly failed requests... with a lot of duplicates? Ana checks her HTTPRoute again, though she's pretty sure you can't configure retries there, and finds nothing. But it definitely looks like clients are retrying when they shouldn’t be.
-
-She pings Chihiro.
-
-**Ana**: *Hey Chihiro. Something weird is up, looks like requests to `baker` are failing but getting retried??*
-
-A minute later they answer.
-
-**Chihiro**: 🤷 *Did you configure retries?*
-
-**Ana**: *Dude. I don’t even know how to.* 😂
-
-**Chihiro**: *You just attach a RetryPolicy to your HTTPRoute.*
-
-**Ana**: *Nope. Definitely didn’t do that.*
-
-She types `kubectl get retrypolicy -n baker` and gets a permission error.
-
-**Ana**: *Huh, I actually don’t have permissions for RetryPolicy.* 🤔
-
-**Chihiro**: 🤷 *Feels like you should but OK, guess that can’t be it.*
-
-Minutes pass while both look at logs.
-
-**Chihiro**: *I’m an idiot. There’s a RetryPolicy for the whole namespace – sorry, too many policies in the dashboard and I missed it. Deleting that since you don’t want retries.*
-
-**Ana**: *Are you sure that’s a good–*
-
-Ana’s phone shrills while she’s typing, and she drops it. When she picks it up again she sees a stack of alerts. She goes pale as she quickly flips through them: there’s one for every single service in the `baker` namespace.
-
-**Ana**: *PUT IT BACK\!\!*
-
-**Chihiro**: *Just did. Be glad you couldn't hear all the alarms here.* 😕
-
-**Ana**: *What the hell just happened??*
-
-**Chihiro**: *At a guess, all the workloads in the `baker` namespace actually fail a lot, but they seem OK because there are retries across the whole namespace?* 🤔
-
-Ana's blood runs cold.
-
-**Chihiro**: *Yeah. Looking a little closer, I think your `baker` rollout this morning would have failed without those retries.* 😕
-
-There is a pause while Ana's mind races through increasingly unpleasant possibilities.
-
-**Ana**: *I don't even know where to start here. How long did that RetryPolicy go in? Is it the only thing like it?*
-
-**Chihiro**: *Didn’t look closely before deleting it, but I think it said a few months ago. And there are lots of different kinds of policy and lots of individual policies, hang on a minute...*
-
-**Chihiro**: *Looks like about 47 for your chunk of the world, a couple hundred system-wide.*
-
-**Ana**: 😱 *Can you tell me what they’re doing for each of our services? I can’t even* look *at these things.* 😕
-
-**Chihiro**: *That's gonna take awhile. Our tooling to show us which policies bind to a given workload doesn't go the other direction.*
-
-**Ana**: *...wait. You have to* build tools *to know if retries are turned on??*
-
-Pause.
-
-**Chihiro**: *Policy Attachment is more complex than we’d like, yeah.* 😐 *Look, how about roll back your `baker` change for now? We can get together in the morning and start sorting this out.*
-
-Ana shakes her head and rolls back her edits to the `baker` Deployment, then sits looking out over the lake as the deployment progresses.
-
-**Ana**: *Done. Are things happier now?*
-
-**Chihiro**: *Looks like, thanks. Reckon you can get back to your sailboard.* 🙂
-
-Ana sighs.
-
-**Ana**: *Wish I could. Wind’s died down, though, and it'll be dark soon. Just gonna head home.*
-
-**Chihiro**: *Ouch. Sorry to hear that.* 😐
-
-One more look out at the lake.
-
-**Ana**: *Thanks for the help. Wish we’d found better answers.* 😢
-
-#### The Problem, restated
-
-What this parable makes clear is that, in the absence of information about what metaresource is affecting an object, it’s very easy to make poor decisions.
-
-It’s critical that this proposal solve the problem of showing up to three things, listed in increasing order of desirability:
-
-* *That* some metaresource/policy is affecting a particular object
-* *Which* metaresource/policy is (or metaresources/policies are) affecting a particular object
-* *What* settings in the metaresource/policy are affecting the object.
-
-In the parable, if Ana and Chihiro had known that there were policies affecting the relevant object, then they could have gone looking for the relevant policies and things would have played out differently. If they knew which policies, they would need to look less hard, and if they knew what the settings being applied were, then the parable would have been able to be very short indeed.
-
-(There’s also another use case to consider, in that Chihiro should have been able to see that the metaresource on the namespace was in use in many places before deleting it.)
-
-To put this another way, Metaresources and Policy Attachment is effectively adding another persona among the stakeholders, the Policy Admin, and without a solution to the discoverability problem, their actions are largely invisible to the Application Developer. Not only that, but their concerns cut across the previously established levels.
-
-![Gateway API diagram with Policy Admin](images/713-the-diagram-with-policy-admin.png)
-
-From the Policy Admin’s point of view, they need to know across their whole remit (which conceivably could be the whole cluster):
-
-* *What* metaresource/policy has been created
-* *Where* it’s applied
-* *What* the resultant (effective) metaresource/policy is saying
-
-Which again, comes down to discoverability, and can probably be addressed in similar ways at an API level to the Application Developer's concerns.
-
-An important note here is that a key piece of information for Policy Admins and Cluster Operators is "How many things does this Policy affect?". In the parable, this would have enabled Chihiro to know that deleting the Namespace policy would affect many other people than just Ana.
-
-#### Gateway API personas and the discoverability problem
-
-Let's go through the various users of Gateway API and what they need to know about policies affecting their objects.
-
-In all of these cases, keeping the troubleshooting distance low is desired; that is, that there should be a minimum of hops required between objects from the one owned by the user to the one responsible for a setting.
-
-Another way to think of the troubleshooting distance in this context is "How many `kubectl` commands would the user need to do to understand that a policy is relevant, which policy is relevant, and what configuration the full set of policy is setting?"
-
-##### Application Developer Discoverability
-
-How does Ana, or any Application Developer who owns one or more Route objects know that their object is affected by a policy, which policy is affecting it, and what the content of the policy is?
-
-The best outcome is that Ana needs to look only at a specific route to know what policy settings are being applied to that Route, and where they come from. However, some of the other problems below make it very difficult to achieve this.
-
-##### Policy Admin Discoverability
-
-How does the Policy Admin know what policy is applied where, and what the content of that policy is? How do they validate that the policy is being used in ways acceptable to their organization? For any given policy object, how do they know how many places it's being used?
-
-##### Cluster Admin Discoverability
-
-The Cluster Admin has similar concerns to the Policy Admin, but with a focus on being able to determine what's relevant when something is broken.
-
-How does the Cluster Admin know what policy is applied where, and what the content of that policy is?
-
-For any given policy object, how do they know how many places it's being used?
-
-#### Hinting on a solution for the discoverability problem
-
-Querying the status of objects stored in the cluster may be the Kubernetes way of knowing the state of the system, in a world where objects are declarative and there are only so many links between objects to hop in between. However, this is still a proxy used to model a real life problem that often has otherwise different ways to be thought about as well.
-
-In the context of traffic networking, for example, often the question asked by users is *"What happens when a network request X comes in?"*. There is an implicit expectation that a set of Kubernetes resources suffices to represent all the rules for a given workload to be activated and thus process request X, and often that is the case. For more complex cases however (e.g, multiple personas, application concerns separated into dedicated resource kinds, interaction between groups of users, etc), real life can get more complicated than a simple `kubectl get x`, or at least additional steps must be automated to encompass complexity into what can be achieved with a single declarative object.
-
-With that in mind, a possible solution for the discoverability problem may involve designing tools (e.g. CLI tools/plugins), new CRDs, etc that let users ask questions in terms of the real life problems they have to deal with on a daily basis, rather than shaped by the underlying technologies used in the process. For instance, a simple Kubernetes object that is used to declare the rules to process a HTTP request cannot have its status reported simply as Ready/Not ready. By being a complex object composed of multiple routing rules, potentially affected by specifications declared from other objects as well, its status MUST account for that complexity and be structured in such a way that informs the owner with respect to each possible case, whether the ones induced by the internal specification declared by the object itself or its external relationships.
-
-In other words, the discoverability problem exists and must be addressed in light of the complexity associated with the topology of nested contexts induced by a set of hierarchically related resources. One should always have that topology in mind while asking questions regarding the behavior of a given resource, because just like a routing object (e.g. HTTPRoute) does not exist independently from its parent contexts (e.g. Gateways) or its children (e.g. Backends), any resource in focus may be just a part of a whole.
-
-### Status reporting
-
-#### Policy status
-
-Policy CRDs MUST define a status stanza that allows for reporting the status of the policy with respect to each scope the resource may apply.
-
-The basic status conditions are:
-
-* **Accepted**: the policy passed both syntactic validation by the API server and semantic validation enforced by the controller, such as whether the target objects exist.
-* **Enforced**: the policy's spec is guaranteed to be fully enforced, to the extent of what the controller can ensure.
-* **PartiallyEnforced**: parts of the policy's spec is guaranteed to be enforced, while other parts are known to have been superseded by other specs, to the extent of what the controller can ensure. The status should include details highlighting which parts of the policy are enforced and which parts have been superseded, with the references to all other related policies.
-* **Overridden**: the policy's spec is known to have been fully overridden by other specs. The status should include the references to the other related policies.
-
-Policy implementations SHOULD support these basic status conditions.
-
-#### Target object status
-
-Implementations of Policies kinds SHOULD put a condition into `status.Conditions` of any objects affected by the policy.
-
-That condition, if added, MUST be named according to the pattern `<metaresource-kind>Affected` (e.g. `colors.controller.k8s.io/ColorPolicyAffected`), and SHOULD include an `observedGeneration` field kept up to date when the spec of the target object changes.
-
-Implementations SHOULD use their own unique domain prefix for this condition type. Gateway API implementations, for instance, SHOULD use the same domain as in the `controllerName` field on `GatewayClass` (or some other implementation-unique domain for implementations that do not use `GatewayClass`.)
-
-E.g. – given a `Gateway` object that is targeted by a hypothetical `ColorPolicy` policy object named `policy-namespace/my-policy`, which is owned by a `colors.controller.k8s.io` controller and with status `Enforced` or `PartiallyEnforced`. The controller SHOULD add to the status of the `Gateway` object a condition `colors.controller.k8s.io/ColorPolicyAffected: true`, and reason ideally referring to the `policy-namespace/my-policy` by name.
-
-Similarly, for a hypothetical `ColorPolicy` policy that targets a specific named section of the `Gateway` object (e.g., `http-listener`), the controller SHOULD add to the status of the listener section within the `Gateway` object a condition `colors.controller.k8s.io/ColorPolicyAffected: true`.
-
-For objects that do not have a `status.Conditions` field available (`Secret` is a good example), that object SHOULD instead have an annotation of `colors.controller.k8s.io/ColorPolicyAffected: true` added instead.
-
-#### Status needs to be namespaced by implementation
-
-Because an object can be affected by multiple implementations at once, any added status MUST be namespaced by the implementation.
-
-In Gateway API's Route Parent status, `parentRef` plus the controller name have been used for this.
-
-For a policy, something similar can be done, namespacing by the reference to the implementation's controller name.
-
-Namespacing by the originating policy cannot easily be done because the source could be more than one policy object.
-
-#### Creating common data representation patterns
-
-Defining a _common_ pattern for including the details of an _arbitrarily defined_ object, to be included in a library for all possible implementations, is challenging, to say the least.
-
-Structured data cannot be used because there is no way of knowing what the structure will be beforehand. This suggests a need to use unstructured data for representing the main body of the arbitrary policy objects. Practically, this will have to be a string representation of the YAML form (or JSON, equivalently) of the body of the policy object (absent the metadata part of every Kubernetes object).
-
-Metaresources and Policy Attachment does not mandate anything about the design of the object's top level except that it must be a Kubernetes object, so the only possible thing to rely upon here is the presence of the Kubernetes metadata elements: `apiVersion`, `kind`, and `metadata`.
-
-Therefore, a string representation of the rest of the file is likely the best that can be done here.
-
-#### Fanout status update problems
-
-The fanout problem is that, when an update takes place in a single object (a policy, or an object with a policy attached), an implementation may need to update _many_ objects if it needs to place details of what policy applies, or what the resultant set of policies is on _every_ object.
-
-Historically, this is a risky strategy and needs to be carefully applied, as it's an excellent way to create apiserver load problems, which can produce a large range of bad effects for cluster stability.
-
-This does not mean that nothing at all that affects multiple objects can be done, but that careful consideration of what information is stored in status, so that _every_ policy update does not require a corresponding status update, is advised.
 
 ## Current use of policies
 
