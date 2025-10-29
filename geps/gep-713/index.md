@@ -26,7 +26,7 @@ It lays out guidelines for Gateway API implementations and other stakeholders fo
 
     Some of the features of Metaresources and Policy Attachment are **Standard** features of Gateway API, while others are **Experimental** or even **Provisional**, still lacking wider adoption by the implementations. Features supported by the [BackendTLSPolicy (GEP-1897)](../gep-1897/index.md) kind are examples of Standard features.
 
-    While this GEP tries to focus on features that are at least Experimental, it also lays out some Provisional features and features that are merely examples of known practices adopted by some indivual Policy implementations. The latter are still provided as reference though despite some of these features never being expected to become core in Gateway API, due to one of the inherent natures of Metaresources and Policies of being a framework for introducing gateway capabilities that are implementation-specific. These examples are still useful to the overall community though, which can draw analogies for their own particular cases and designs.
+    While this GEP tries to focus on features that are at least Experimental, it also lays out some Provisional features and features that are merely examples of known practices adopted by some individual Policy implementations. The latter are still provided as reference though despite some of these features never being expected to become core in Gateway API, due to one of the inherent natures of Metaresources and Policies of being a framework for introducing gateway capabilities that are implementation-specific. These examples are still useful to the overall community though, which can draw analogies for their own particular cases and designs.
 
 ## Overview
 
@@ -135,7 +135,7 @@ This GEP defines the following basic merge strategies:
 * **Defaults:** (Standard) a policy spec that challenges an accepted and established another as the one to specify the behavior to augment a particular scope with _wins_ over the accepted and established other.
 * **Overrides:** (Experimental) a policy spec that is accepted and established and is challenged by another as the one to specify the behavior to augment a particular scope with _wins_ over the challenger other.
 
-Implementations MAY derive variations of the basic merge strategies with different levels of _granularity_ other than the full policy spec treated as an atomic unit. For example, instead of (or additionally to) a challenger policy spec fully winning over an estalished one (_Atomic defaults_), an implementation MAY support merging the two policy specs together by applying [JSON Merge Patch (RFC 7386)](https://datatracker.ietf.org/doc/html/rfc7386) strategy.
+Implementations MAY derive variations of the basic merge strategies with different levels of _granularity_ other than the full policy spec treated as an atomic unit. For example, instead of (or additionally to) a challenger policy spec fully winning over an established one (_Atomic defaults_), an implementation MAY support merging the two policy specs together by applying [JSON Merge Patch (RFC 7386)](https://datatracker.ietf.org/doc/html/rfc7386) strategy.
 
 These an other merge strategies, such as **None** and **Custom** are further described in section _Implementation guide_ > [Designing a merge strategy](#designing-a-merge-strategy).
 
@@ -481,7 +481,7 @@ With policies (and metaresources in general), declaring additional specification
 
 Conflicts MUST be resolved according to a defined [merge strategy](#designing-a-merge-strategy). This is typically done by traversing a [hierarchy of target resources](#hierarchy-of-target-kinds) and calculating an [effective policy](#understanding-effective-policies) for each relevant policy scope.
 
-This section identifies the key concepts involved in this process and guides implementations through the mechanics of resolving policy conficts.
+This section identifies the key concepts involved in this process and guides implementations through the mechanics of resolving policy conflicts.
 
 #### Hierarchy of target kinds
 
@@ -515,9 +515,9 @@ For any given path within the DAG, nodes closer to a root are considered "higher
 
 Lower levels in a hierarchy (e.g., more specific kinds) *inherit* the definitions applied at the higher levels (e.g. less specific kinds), in such a way that higher level rules may be understood as having an "umbrella effect" over everything beneath.
 
-E.g., given the Gateway API’s hierarchy of network resources for the ingress use case `GatewayClass` > `Gateway` > `HTTPRoute` > `Backend`. A policy that attaches to a `GatewayClass` object, if defined as a policy kind ultimately to augment the behavior of `HTTPRoute` objects, affects all `Gateways` under the `GatewayClass`, as well as all `HTTPRoutes` under those `Gateways`. Any other instance of this policy kind targeting a lower level than the `GatewayClass` (e.g. `Gateway` or `HTTPRoute`, assuming it's supported) should be treated as a conflict against the higher level policy spec in the specific scope that is rooted at the lower level target, i.e., for the subset of the topology that is afftected by both policies.
+E.g., given the Gateway API's hierarchy of network resources for the ingress use case `GatewayClass` > `Gateway` > `HTTPRoute` > `Backend`. A policy that attaches to a `GatewayClass` object, if defined as a policy kind ultimately to augment the behavior of `HTTPRoute` objects, affects all `Gateways` under the `GatewayClass`, as well as all `HTTPRoutes` under those `Gateways`. Any other instance of this policy kind targeting a lower level than the `GatewayClass` (e.g. `Gateway` or `HTTPRoute`, assuming it's supported) should be treated as a conflict against the higher level policy spec in the specific scope that is rooted at the lower level target, i.e., for the subset of the topology that is affected by both policies.
 
-In the face of a conflict due to multiple policy objects of a kind targeting different levels or same level in the hierarchy, the conflicting policy specs MUST be organized into [_established_ specs and _challenger_ ones](#established-and-challenger-policy-specs), so a single [effective policy](#understanding-effective-policies) can be calculated for each affetced scope, give one or more [merge strategies](#designing-a-merge-strategy) applicable in the process. The next subsections guide implementations through these remaining concepts and the perocess that links them together.
+In the face of a conflict due to multiple policy objects of a kind targeting different levels or same level in the hierarchy, the conflicting policy specs MUST be organized into [_established_ specs and _challenger_ ones](#established-and-challenger-policy-specs), so a single [effective policy](#understanding-effective-policies) can be calculated for each affected scope, give one or more [merge strategies](#designing-a-merge-strategy) applicable in the process. The next subsections guide implementations through these remaining concepts and the process that links them together.
 
 #### _Established_ and _challenger_ policy specs
 
@@ -763,7 +763,7 @@ A well-known problem of declaring specifications into separate objects, that ult
 
 Part of the solution involves [status reporting](#status-reporting), though it may require more than that. Even though Kubernetes has always had analogous problems－the most obvious example being Role Based Access Control (RBAC)－, the discoverability issue remains a challenging one to be addressed. To better understand it, consider the following parable described in the context of Gateway API, with thanks to [Flynn](https://github.com/kflynn):
 
-#### The discoverability problem • A Parabol
+#### The discoverability problem • A Parable
 
 It's a sunny Wednesday afternoon, and the lead microservices developer for Evil Genius Cupcakes is windsurfing. Work has been eating Ana alive for the past two and a half weeks, but after successfully deploying version 3.6.0 of the `baker` service this morning, she's escaped early to try to unwind a bit.
 
