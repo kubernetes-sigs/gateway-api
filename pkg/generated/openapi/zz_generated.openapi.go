@@ -4576,7 +4576,6 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewayStatus(ref common.ReferenceCall
 						},
 					},
 				},
-				Required: []string{"attachedListeners"},
 			},
 		},
 		Dependencies: []string{

@@ -1014,7 +1014,7 @@ type GatewayStatus struct {
 	//
 	// Uses for this field include troubleshooting AttachedListeners attachment and
 	// measuring blast radius/impact of changes to a Gateway.
-	// +required
+	// +optional
 	AttachedListeners int32 `json:"attachedListeners"`
 }
 
