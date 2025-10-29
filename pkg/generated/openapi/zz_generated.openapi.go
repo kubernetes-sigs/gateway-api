@@ -4567,7 +4567,16 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewayStatus(ref common.ReferenceCall
 							},
 						},
 					},
+					"attachedListeners": {
+						SchemaProps: spec.SchemaProps{
+							Description: "AttachedListeners represents the total number of ListenerSets that have been successfully attached to this Gateway.\n\nSuccessful attachment of a ListenerSets to a Gateway is based solely on the combination of the AllowedListeners field on the Gateway and the ListenerSets's ParentRefs field. A ListenerSets is successfully attached to a Gateway when it is selected by the ListenerSets's AllowedListeners field AND the ListenerSets has a valid ParentRef selecting the Gateway resource as a parent resource. ListenerSets status does not impact successful attachment, i.e. the AttachedListeners field count MUST be set for ListenerSets with condition Accepted: false and MUST count successfully attached AttachedListeners that may themselves have Accepted: false conditions.\n\nUses for this field include troubleshooting AttachedListeners attachment and measuring blast radius/impact of changes to a Gateway.",
+							Default:     0,
+							Type:        []string{"integer"},
+							Format:      "int32",
+						},
+					},
 				},
+				Required: []string{"attachedListeners"},
 			},
 		},
 		Dependencies: []string{
