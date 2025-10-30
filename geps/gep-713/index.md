@@ -11,22 +11,17 @@ This GEP aims to standardize terminology and processes around "metaresources", i
 
 It lays out guidelines for Gateway API implementations and other stakeholders for the design and/or handling of custom resources in compliance with a pattern known as Policy Attachment.
 
-!!! warning
-    This GEP specifies a _pattern_, not an API field or new object. It defines some terms, including _Metaresource_, _Policies_ and _Policy Attachment_, and their related concepts.
+This GEP specifies a _pattern_, not an API field or new object. It defines some terms, including _Metaresource_, _Policies_ and _Policy Attachment_, and their related concepts.
 
-!!! danger "Policies SHOULD NOT be your first option"
+This pattern is currently unique to the Gateway API community. It's possible that in the future a better and broader form of extending Kubernetes APIs will emerge that could make this one obsolete.
 
-    This pattern is currently unique to the Gateway API community. It's possible that in the future a better and broader form of extending Kubernetes APIs will emerge that could make this one obsolete.
+Policy attachment is the best way we've found to extend Gateway API resources so far, but it does come with meaningful challenges, such as the [Discoverability problem](#policy-discoverability) and the [Fanout status update problem](#fanout-status-update-problems).
 
-    Policy attachment is the best way we've found to extend Gateway API resources so far, but it does come with meaningful challenges, such as the [Discoverability problem](#policy-discoverability) and the [Fanout status update problem](#fanout-status-update-problems).
+In many cases, it will be better to work to include configuration directly inside upstream APIs instead of resorting to policy attachment.
 
-    In many cases, it will be better to work to include configuration directly inside upstream APIs instead of resorting to policy attachment.
+Some of the features of Metaresources and Policy Attachment are **Standard** features of Gateway API, while others are **Experimental** or even **Provisional**, still lacking wider adoption by the implementations. Features supported by the [BackendTLSPolicy (GEP-1897)](../gep-1897/index.md) kind are examples of Standard features.
 
-!!! info "Feature status"
-
-    Some of the features of Metaresources and Policy Attachment are **Standard** features of Gateway API, while others are **Experimental** or even **Provisional**, still lacking wider adoption by the implementations. Features supported by the [BackendTLSPolicy (GEP-1897)](../gep-1897/index.md) kind are examples of Standard features.
-
-    While this GEP tries to focus on features that are at least Experimental, it also lays out some Provisional features and features that are merely examples of known practices adopted by some individual Policy implementations. The latter are still provided as reference though despite some of these features never being expected to become core in Gateway API, due to one of the inherent natures of Metaresources and Policies of being a framework for introducing gateway capabilities that are implementation-specific. These examples are still useful to the overall community though, which can draw analogies for their own particular cases and designs.
+While this GEP tries to focus on features that are at least Experimental, it also lays out some Provisional features and features that are merely examples of known practices adopted by some individual Policy implementations. The latter are still provided as reference though despite some of these features never being expected to become core in Gateway API, due to one of the inherent natures of Metaresources and Policies of being a framework for introducing gateway capabilities that are implementation-specific. These examples are still useful to the overall community though, which can draw analogies for their own particular cases and designs.
 
 ## Overview
 
