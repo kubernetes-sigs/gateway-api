@@ -1011,7 +1011,7 @@ The following table summarizes the possible statuses:
 
 ##### Using upstream `PolicyAncestorStatus` struct
 
-_Status:_ Provisional
+_Status:_ Experimental
 
 Policy objects SHOULD use the upstream `PolicyAncestorStatus` struct in their respective Status structs. Please see the included `PolicyAncestorStatus` struct, and its use in the `BackendTLSPolicy` object for detailed examples. Included here is a representative version.
 
