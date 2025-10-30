@@ -45,7 +45,8 @@ var TLSRouteTerminateSimpleSameNamespace = suite.ConformanceTest{
 		features.SupportTLSRoute,
 		features.SupportTLSRouteModeTerminate,
 	},
-	Manifests: []string{"tests/tlsroute-terminate-simple-same-namespace.yaml"},
+	Provisional: true,
+	Manifests:   []string{"tests/tlsroute-terminate-simple-same-namespace.yaml"},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
 		routeNN := types.NamespacedName{Name: "gateway-conformance-mqtt-test", Namespace: ns}
