@@ -1284,7 +1284,7 @@ Gateway API defines two kinds of Direct policies, both for augmenting the behavi
 
 #### Envoy Gateway
 
-https://gateway.envoyproxy.io/docs/api/extension_types/
+[https://gateway.envoyproxy.io/docs/api/extension_types/](https://gateway.envoyproxy.io/docs/api/extension_types/)
 
 Gateway API implementation that defines the following kinds of policies:
 
@@ -1298,7 +1298,7 @@ Gateway API implementation that defines the following kinds of policies:
 
 #### Istio
 
-https://istio.io/latest/docs/reference/config/
+[https://istio.io/latest/docs/reference/config/](https://istio.io/latest/docs/reference/config/)
 
 Gateway API implementation that defines the following kinds of policies:
 
@@ -1312,7 +1312,7 @@ Gateway API implementation that defines the following kinds of policies:
 
 #### NGINX Gateway Fabric
 
-https://docs.nginx.com/nginx-gateway-fabric/overview/custom-policies/
+[https://docs.nginx.com/nginx-gateway-fabric/overview/custom-policies/](https://docs.nginx.com/nginx-gateway-fabric/overview/custom-policies/)
 
 Gateway API implementation that supports Gateway API’s `BackendTLSPolicy` as well as the following kinds of policies:
 
@@ -1324,7 +1324,7 @@ Gateway API implementation that supports Gateway API’s `BackendTLSPolicy` as w
 
 #### Gloo Gateway
 
-https://docs.solo.io/gateway/latest/about/custom-resources/#policies
+[https://docs.solo.io/gateway/latest/about/custom-resources/#policies](https://docs.solo.io/gateway/latest/about/custom-resources/#policies)
 
 Gateway API implementation that defines the following kinds of policies:
 
@@ -1337,7 +1337,7 @@ Gateway API implementation that defines the following kinds of policies:
 
 #### Kuadrant
 
-https://docs.kuadrant.io
+[https://docs.kuadrant.io](https://docs.kuadrant.io)
 
 First Gateway API integration entirely based on the Metaresources and Policy Attachment pattern. Defines the following kinds of policies:
 
@@ -1352,7 +1352,7 @@ First Gateway API integration entirely based on the Metaresources and Policy Att
 
 #### Network Policy API (Working Group, SIG-NETWORK)
 
-https://network-policy-api.sigs.k8s.io/
+[https://network-policy-api.sigs.k8s.io/](https://network-policy-api.sigs.k8s.io/)
 
 Defines two kinds of metaresources respectively for specifying *default* and *override* of networking policy rules: **AdminNetworkPolicy** and **BaselineAdminNetworkPolicy**. Builds on top of Kubernetes core `NetworkPolicy` kind.
 
@@ -1360,7 +1360,7 @@ Although the Network Policy API custom resources do not strictly implement the M
 
 #### Open Cluster Management
 
-https://open-cluster-management.io/docs/getting-started/integration/policy-controllers/policy-framework/
+[https://open-cluster-management.io/docs/getting-started/integration/policy-controllers/policy-framework/](https://open-cluster-management.io/docs/getting-started/integration/policy-controllers/policy-framework/)
 
 Does not implement Metaresources and Policy Attachment. However, defines a virtual policy kind (**ConfigurationPolicy**) and supports distributing other third-party kinds of policies such as Gatekeeper's **ConstraintTemplate** kind, via a **Policy** resource whose targets are nonetheless controlled by a separate set of resource (**Placement** and **PlacementBinding**).
 
@@ -1370,13 +1370,13 @@ The following tools can be useful for implementing and supporting policies and p
 
 #### gwctl
 
-https://github.com/kubernetes-sigs/gwctl
+[https://github.com/kubernetes-sigs/gwctl](https://github.com/kubernetes-sigs/gwctl)
 
 CLI tool for visualizing and managing Gateway API resources in a Kubernetes cluster. Includes commands to visualize effective policies affecting the resources in compliance with the Metaresources and Policy Attachment pattern.
 
 #### policy-machinery
 
-https://github.com/Kuadrant/policy-machinery
+[https://github.com/Kuadrant/policy-machinery](https://github.com/Kuadrant/policy-machinery)
 
 Golang library for implementing policy controllers. Defines types and functions to build Directed Acyclic Graphs (DAG) to represent hierarchies of targetable resources and attached policies, calculate effective policies based on standard and custom merge strategies, etc. Includes helpers for applications based on Gateway API.
 
