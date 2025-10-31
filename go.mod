@@ -3,6 +3,7 @@ module sigs.k8s.io/gateway-api
 go 1.24.0
 
 require (
+	github.com/eclipse/paho.mqtt.golang v1.5.1
 	github.com/miekg/dns v1.1.68
 	github.com/stretchr/testify v1.11.1
 	golang.org/x/net v0.46.0
