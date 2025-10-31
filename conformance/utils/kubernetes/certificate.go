@@ -49,7 +49,7 @@ func MustCreateSelfSignedCertSecret(t *testing.T, namespace, secretName string, 
 
 	var serverKey, serverCert bytes.Buffer
 
-	require.NoError(t, generateRSACert(hosts, &serverKey, &serverCert, nil, nil), "failed to generate RSA certificate")
+	require.NoError(t, generateRSACert(hosts, &serverKey, &serverCert, []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth}, nil, nil), "failed to generate RSA certificate")
 
 	return formatSecret(serverCert, serverKey, namespace, secretName)
 }
@@ -60,7 +60,16 @@ func MustCreateCASignedCertSecret(t *testing.T, namespace, secretName string, ho
 
 	var serverCert, serverKey bytes.Buffer
 
-	require.NoError(t, generateRSACert(hosts, &serverKey, &serverCert, ca, caPrivKey), "failed to generate CA signed RSA certificate")
+	require.NoError(t, generateRSACert(hosts, &serverKey, &serverCert, []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth}, ca, caPrivKey), "failed to generate CA signed RSA certificate")
+
+	return formatSecret(serverCert, serverKey, namespace, secretName)
+}
+
+// MustCreateCASignedClientCertSecret creates a CA-signed SSL certificate and stores it in a secret
+func MustCreateCASignedClientCertSecret(t *testing.T, namespace, secretName string, ca *x509.Certificate, caPrivKey *rsa.PrivateKey) *corev1.Secret {
+	var serverCert, serverKey bytes.Buffer
+
+	require.NoError(t, generateRSACert([]string{}, &serverKey, &serverCert, []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth}, ca, caPrivKey), "failed to generate CA signed RSA client certificate")
 
 	return formatSecret(serverCert, serverKey, namespace, secretName)
 }
@@ -87,7 +96,7 @@ func formatSecret(serverCert bytes.Buffer, serverKey bytes.Buffer, namespace str
 
 // generateRSACert generates a basic self-signed certificate if ca and caPrivKey are nil,
 // otherwise it creates CA-signed cert with ca and caPrivkey input. Certs are valid for a year.
-func generateRSACert(hosts []string, keyOut, certOut io.Writer, ca *x509.Certificate, caPrivKey *rsa.PrivateKey) error {
+func generateRSACert(hosts []string, keyOut, certOut io.Writer, extKeyUsage []x509.ExtKeyUsage, ca *x509.Certificate, caPrivKey *rsa.PrivateKey) error {
 	priv, err := rsa.GenerateKey(rand.Reader, rsaBits)
 	if err != nil {
 		return fmt.Errorf("failed to generate key: %w", err)
@@ -111,7 +120,7 @@ func generateRSACert(hosts []string, keyOut, certOut io.Writer, ca *x509.Certifi
 		NotAfter:  notAfter,
 
 		KeyUsage:              x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature,
-		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
+		ExtKeyUsage:           extKeyUsage,
 		BasicConstraintsValid: true,
 	}
 
