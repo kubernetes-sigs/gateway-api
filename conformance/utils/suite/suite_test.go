@@ -488,7 +488,7 @@ func TestInferGWCSupportedFeatures(t *testing.T) {
 			},
 		},
 		{
-			name:             "all features combined with exampt features",
+			name:             "all features combined with exempt features",
 			allowAllFeatures: true,
 			exemptFeatures:   sets.New[features.FeatureName]("ReferenceGrant", "HTTPRoute"),
 			expectedSource:   supportedFeaturesSourceManual,
