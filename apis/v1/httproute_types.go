@@ -1807,9 +1807,7 @@ type HTTPBackendRef struct {
 	//
 	// * The BackendTLSPolicy object is installed in the cluster, a BackendTLSPolicy
 	//   is present that refers to the Service, and the implementation is unable
-	//   to meet the requirement. At the time of writing, BackendTLSPolicy is
-	//   experimental, but once it becomes standard, this will become a MUST
-	//   requirement.
+	//   to meet the requirement.
 	//
 	// Support: Core for Kubernetes Service
 	//
@@ -1819,7 +1817,7 @@ type HTTPBackendRef struct {
 	//
 	// Support for Kubernetes Service appProtocol: Extended
 	//
-	// Support for BackendTLSPolicy: Experimental and ImplementationSpecific
+	// Support for BackendTLSPolicy: Extended
 	//
 	// +optional
 	BackendRef `json:",inline"`
