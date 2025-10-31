@@ -114,6 +114,7 @@ nav:
       - geps/gep-1324/index.md
       - geps/gep-2722/index.md
       - geps/gep-2907/index.md
+      - geps/gep-4012/index.md
   - Contributing:
     - How to Get Involved: contributing/index.md
     - Developer Guide: contributing/devguide.md
