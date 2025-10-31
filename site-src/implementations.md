@@ -604,13 +604,13 @@ STUNner currently supports version `v1alpha2` of the Gateway API specification. 
 
 [Traefik Proxy][traefik-proxy] is an open source cloud-native application proxy.
 
-Traefik Proxy currently supports version `v1.3.0` of the Gateway API specification, check the [Kubernetes Gateway Provider Documentation][traefik-proxy-gateway-api-doc] for more information on how to deploy and use it.
+Traefik Proxy currently supports version `v1.4.0` of the Gateway API specification, check the [Kubernetes Gateway Provider Documentation][traefik-proxy-gateway-api-doc] for more information on how to deploy and use it.
 Traefik Proxy's implementation passes all HTTP core and some extended conformance tests, like GRPCRoute, but also supports TCPRoute and TLSRoute features from the Experimental channel.
 
 For help and support with Traefik Proxy, [create an issue][traefik-proxy-issue-new] or ask for help in the [Traefik Labs Community Forum][traefiklabs-community-forum].
 
 [traefik-proxy]:https://traefik.io
-[traefik-proxy-gateway-api-doc]:https://doc.traefik.io/traefik/v3.2/routing/providers/kubernetes-gateway/
+[traefik-proxy-gateway-api-doc]:https://doc.traefik.io/traefik/v3.6/reference/install-configuration/providers/kubernetes/kubernetes-gateway
 [traefik-proxy-issue-new]:https://github.com/traefik/traefik/issues/new/choose
 [traefiklabs-community-forum]:https://community.traefik.io/c/traefik/traefik-v3/21
 
