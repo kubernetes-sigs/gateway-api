@@ -58,4 +58,6 @@ go.work.sum
 release/
 site-src/reference/spec.md
 site-src/reference/specx.md
+site-src/reference/**/spec.md
+site-src/reference/**/specx.md
 
