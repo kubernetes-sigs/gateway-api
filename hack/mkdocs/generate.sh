@@ -45,7 +45,10 @@ for i in "${arr[@]}"; do
     git fetch ${REMOTE} ${i}
 	git --work-tree=${tmpdir} checkout ${REMOTE}/${i} -- apis apisx
 	
+    # Start removing any "release-" prefix from docpath
     docpath=${i#"release-"}
+    # If the release is "main" simply remove it
+    docpath=${docpath#"main"}
 	mkdir -p "${PWD}/site-src/reference/${docpath}"
 
     $GOTOOL crd-ref-docs \
