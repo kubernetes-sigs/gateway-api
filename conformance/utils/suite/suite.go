@@ -206,7 +206,7 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 	supportedFeatures := options.SupportedFeatures.Difference(options.ExemptFeatures)
 	source := supportedFeaturesSourceManual
 	if options.EnableAllSupportedFeatures {
-		supportedFeatures = features.SetsToNamesSet(features.AllFeatures)
+		supportedFeatures = features.SetsToNamesSet(features.AllFeatures).Difference(options.ExemptFeatures)
 	} else if shouldInferSupportedFeatures(&options) {
 		var err error
 		if options.GatewayClassName != "" {
