@@ -17,6 +17,7 @@ limitations under the License.
 package conformance
 
 import (
+	"encoding/json"
 	"io/fs"
 	"os"
 	"testing"
@@ -81,6 +82,13 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 		*flags.ImplementationContact,
 	)
 
+	timeoutConfig := conformanceconfig.DefaultTimeoutConfig()
+
+	if *flags.TimeoutConfig != "" {
+		err := json.Unmarshal([]byte(*flags.TimeoutConfig), &timeoutConfig)
+		require.NoError(t, err, "error initializing timeout config from the input")
+	}
+
 	return suite.ConformanceOptions{
 		AllowCRDsMismatch:          *flags.AllowCRDsMismatch,
 		CleanupBaseResources:       *flags.CleanupBaseResources,
@@ -103,7 +111,7 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 		RunTest:                    *flags.RunTest,
 		SkipTests:                  skipTests,
 		SupportedFeatures:          supportedFeatures,
-		TimeoutConfig:              conformanceconfig.DefaultTimeoutConfig(),
+		TimeoutConfig:              timeoutConfig,
 		SkipProvisionalTests:       *flags.SkipProvisionalTests,
 	}
 }

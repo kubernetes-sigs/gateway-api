@@ -50,4 +50,7 @@ var (
 	ConformanceProfiles        = flag.String("conformance-profiles", "", "Comma-separated list of the conformance profiles to run")
 	ReportOutput               = flag.String("report-output", "", "The file where to write the conformance report")
 	SkipProvisionalTests       = flag.Bool("skip-provisional-tests", false, "Whether to skip provisional tests")
+	UseFQDNHost                = flag.Bool("use-fqdn-host", false, "Use FQDN for hosts for all requests")
+	AppendPortToHost           = flag.Bool("append-port-to-host", false, "add port to the host for all ports including 80 and 443")
+	TimeoutConfig              = flag.String("timeout-config", "", "TimeoutConfig object in json format")
 )

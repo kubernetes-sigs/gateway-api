@@ -34,6 +34,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
+	"sigs.k8s.io/gateway-api/conformance/utils/flags"
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
 	"sigs.k8s.io/gateway-api/conformance/utils/tlog"
@@ -102,6 +103,10 @@ func makeRequest(t *testing.T, exp *http.ExpectedResponse) []string {
 
 	if len(exp.Response.StatusCodes) == 0 {
 		exp.Response.StatusCodes = []int{200}
+	}
+
+	if *flags.UseFQDNHost {
+		r.Host = fmt.Sprintf("%v.%v", strings.Split(r.Host, ".")[0], "gateway-conformance-mesh.svc.cluster.local")
 	}
 
 	host := http.CalculateHost(t, r.Host, protocol)

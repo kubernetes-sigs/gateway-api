@@ -28,6 +28,11 @@ spec:
       - name: echo
         image: gcr.io/k8s-staging-gateway-api/echo-advanced:v20240412-v1.0.0-394-g40c666fd
         imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+        - containerPort: 8443
+        - containerPort: 9090
+        - containerPort: 7070
         args:
         - --tcp=9090
         - --port=8080
@@ -85,6 +90,11 @@ spec:
       - name: echo
         image: gcr.io/k8s-staging-gateway-api/echo-advanced:v20240412-v1.0.0-394-g40c666fd
         imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+        - containerPort: 8443
+        - containerPort: 9090
+        - containerPort: 7070
         args:
         - --tcp=9090
         - --port=8080

@@ -26,6 +26,7 @@ import (
 	"time"
 
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
+	"sigs.k8s.io/gateway-api/conformance/utils/flags"
 	"sigs.k8s.io/gateway-api/conformance/utils/roundtripper"
 	"sigs.k8s.io/gateway-api/conformance/utils/tlog"
 	"sigs.k8s.io/gateway-api/conformance/utils/weight"
@@ -202,12 +203,23 @@ func CalculateHost(t *testing.T, gwAddr, scheme string) string {
 		if !strings.Contains(err.Error(), "missing port in address") {
 			tlog.Logf(t, "Failed to parse host %q: %v", gwAddr, err)
 		}
+		if *flags.AppendPortToHost {
+			if port != "" {
+				return gwAddr
+			}
+			if strings.ToLower(scheme) == "http" {
+				return fmt.Sprintf("%v:%v", gwAddr, "80")
+			}
+			if strings.ToLower(scheme) == "https" {
+				return fmt.Sprintf("%v:%v", gwAddr, "443")
+			}
+		}
 		return gwAddr
 	}
-	if strings.ToLower(scheme) == "http" && port == "80" {
+	if strings.ToLower(scheme) == "http" && port == "80" && !*flags.AppendPortToHost {
 		return Ipv6SafeHost(host)
 	}
-	if strings.ToLower(scheme) == "https" && port == "443" {
+	if strings.ToLower(scheme) == "https" && port == "443" && !*flags.AppendPortToHost {
 		return Ipv6SafeHost(host)
 	}
 	return gwAddr
