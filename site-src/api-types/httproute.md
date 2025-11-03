@@ -343,7 +343,7 @@ resolution applies to merging, refer to the [API specification][httprouterule].
 [matches]: ../reference/spec.md#httproutematch
 [filters]: ../reference/spec.md#httproutefilter
 [backendRef]: ../reference/spec.md#httpbackendref
-[parentRef]: ../reference/spec.md#parentref
+[parentRef]: ../reference/spec.md#parentreference
 [timeouts]: ../reference/spec.md#httproutetimeouts
 [appProtocol]: https://kubernetes.io/docs/concepts/services-networking/service/#application-protocol
 [sectionName]: ../reference/spec.md#sectionname

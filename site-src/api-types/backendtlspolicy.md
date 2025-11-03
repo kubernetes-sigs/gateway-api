@@ -172,4 +172,4 @@ uses `PolicyAncestorStatus` to allow you to know which parentReference set that 
 [rfc-3986]: https://tools.ietf.org/html/rfc3986
 [targetRefs]: ../references/spec/#localpolicytargetreferencewithsectionname
 [subjectAltNames]: ../references/spec/#subjectaltname
-[options]: ../references/spec/#gatewaytlsconfig
+[options]: ../references/spec/#backendtlspolicyspec

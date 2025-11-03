@@ -279,5 +279,5 @@ resolution applies to merging, refer to the [API specification][grpcrouterule].
 [matches]: ../reference/spec.md#grpcroutematch
 [filters]: ../reference/spec.md#grpcroutefilter
 [backendRef]: ../reference/spec.md#grpcbackendref
-[parentRef]: ../reference/spec.md#parentref
+[parentRef]: ../reference/spec.md#parentreference
 [name]: ../reference/spec.md#sectionname
