@@ -8,7 +8,7 @@ implementation:
   organization: envoyproxy
   project: envoy-gateway
   url: https://github.com/envoyproxy/gateway
-  version: b191887
+  version: v1.6.0-rc.1
 kind: ConformanceReport
 mode: gateway-namespace-mode
 profiles:
