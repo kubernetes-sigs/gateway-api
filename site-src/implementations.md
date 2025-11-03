@@ -6,7 +6,7 @@ and provides status and resource references for them.
 Implementors and integrators of Gateway API are encouraged to update this
 document with status information about their implementations, the versions they
 cover, and documentation to help users get started. This status information should
-be no longer than a few paragraphs. 
+be no longer than a few paragraphs.
 
 ## Conformance levels
 
@@ -19,7 +19,7 @@ These implementations have submitted at least one conformance report that has pa
   * All core conformance tests for at least one combination of Route type and
     Profile
   * All claimed Extended features
-  
+
 for one of the two (2) most recent Gateway API releases.
 
 So, it's conformant to support Mesh + HTTPRoute, or Gateway + HTTPRoute, or
@@ -386,7 +386,7 @@ Google Cloud Service Mesh supports [Envoy-based sidecar mesh][envoy-sidecar-mesh
 
 ### Google Kubernetes Engine
 
-[![Conformance](https://img.shields.io/badge/Gateway_API_Partial_Conformance_v1.3.0-Google_Kubernetes_Engine-orange)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.3.0/gke-gateway)
+[![Conformance](https://img.shields.io/badge/Gateway_API_Partial_Conformance_v1.3.0-Google_Kubernetes_Engine-orange)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.4.0/gke-gateway)
 
 [Google Kubernetes Engine (GKE)][gke] is a managed Kubernetes platform offered
 by Google Cloud. GKE's implementation of the Gateway API is through the [GKE
@@ -399,7 +399,7 @@ advanced routing, multi-cluster load balancing and more. See the docs to deploy
 Gateways][gke-multi-cluster-gateway].
 
 The GKE Gateway controller passes all the core Gateway API conformance tests in the
-v1.3.0 release for the GATEWAY_HTTP conformance profile except `HTTPRouteHostnameIntersection`.
+v1.4.0 release for the GATEWAY_HTTP conformance profile except `HTTPRouteHostnameIntersection`.
 
 [gke]:https://cloud.google.com/kubernetes-engine
 [gke-gateway]:https://cloud.google.com/kubernetes-engine/docs/concepts/gateway-api
@@ -740,7 +740,7 @@ Page review timeline, starting with the v1.3 Page Review:
   any implementations that are are still Stale (after a right-of-reply period).
 * Gateway API v1.5 release Page Review (at least one month after the actual
   release): We will remove the Stale category, and implementation maintainers
-  will need to be at least partially conformant on each review, or during the 
+  will need to be at least partially conformant on each review, or during the
   right-of-reply period, or be removed from the implementations page.
 
 This means that, after the Gateway API v1.5 release, implementations cannot be
