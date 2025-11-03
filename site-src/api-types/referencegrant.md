@@ -90,7 +90,7 @@ While the API is simplistic in nature, it comes with a few notable decisions:
    other. This makes it impossible for them to conflict with each other.
 
 Please see the [API
-Specification](../reference/spec.md#gateway.networking.k8s.io/v1alpha2.ReferenceGrant)
+Specification](../reference/spec.md#referencegrant)
 for more details on how specific ReferenceGrant fields are interpreted.
 
 ## Implementation Guidelines
