@@ -19,6 +19,8 @@ package tests
 import (
 	"testing"
 
+	"sigs.k8s.io/gateway-api/conformance/utils/mirror"
+
 	"k8s.io/apimachinery/pkg/types"
 
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
@@ -42,7 +44,7 @@ var HTTPRouteRequestMirror = suite.ConformanceTest{
 	},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
-		routeNN := types.NamespacedName{Name: "request-mirror", Namespace: ns}
+		routeNN := types.NamespacedName{Name: "httproute-request-mirror", Namespace: ns}
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: ns}
 		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
 
@@ -57,9 +59,9 @@ var HTTPRouteRequestMirror = suite.ConformanceTest{
 					},
 				},
 				Backend: "infra-backend-v1",
-				MirroredTo: []http.MirroredBackend{
+				MirroredTo: []mirror.MirroredBackend{
 					{
-						BackendRef: http.BackendRef{
+						BackendRef: mirror.BackendRef{
 							Name:      "infra-backend-v2",
 							Namespace: ns,
 						},
@@ -88,9 +90,9 @@ var HTTPRouteRequestMirror = suite.ConformanceTest{
 				},
 				Namespace: ns,
 				Backend:   "infra-backend-v1",
-				MirroredTo: []http.MirroredBackend{
+				MirroredTo: []mirror.MirroredBackend{
 					{
-						BackendRef: http.BackendRef{
+						BackendRef: mirror.BackendRef{
 							Name:      "infra-backend-v2",
 							Namespace: ns,
 						},
@@ -105,7 +107,7 @@ var HTTPRouteRequestMirror = suite.ConformanceTest{
 			t.Run(tc.GetTestCaseName(i), func(t *testing.T) {
 				t.Parallel()
 				http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, tc)
-				http.ExpectMirroredRequest(t, suite.Client, suite.Clientset, tc.MirroredTo, tc.Request.Path)
+				mirror.ExpectMirroredRequest(t, suite.Client, suite.Clientset, tc.MirroredTo, mirror.GetHTTPRegexPattern(tc.Request.Path))
 			})
 		}
 	},

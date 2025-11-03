@@ -1,0 +1,24 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: GRPCRoute
+metadata:
+  name: grpcroute-request-mirror
+  namespace: gateway-conformance-infra
+spec:
+  parentRefs:
+  - name: same-namespace
+  rules:
+  - matches:
+    - method:
+        service: gateway_api_conformance.echo_basic.grpcecho.GrpcEcho
+        method: Echo
+    filters:
+    - type: RequestMirror
+      requestMirror:
+        backendRef:
+          name: grpc-infra-backend-v2
+          namespace: gateway-conformance-infra
+          port: 8080
+    backendRefs:
+    - name: grpc-infra-backend-v1
+      port: 8080
+      namespace: gateway-conformance-infra

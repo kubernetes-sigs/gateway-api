@@ -19,32 +19,33 @@ package tests
 import (
 	"testing"
 
-	"k8s.io/apimachinery/pkg/types"
-
 	pb "sigs.k8s.io/gateway-api/conformance/echo-basic/grpcechoserver"
 	"sigs.k8s.io/gateway-api/conformance/utils/grpc"
+	"sigs.k8s.io/gateway-api/conformance/utils/mirror"
+
+	"k8s.io/apimachinery/pkg/types"
+
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
 	"sigs.k8s.io/gateway-api/pkg/features"
 )
 
 func init() {
-	ConformanceTests = append(ConformanceTests, GRPCRouteNamedRule)
+	ConformanceTests = append(ConformanceTests, GRPCRouteRequestMirror)
 }
 
-var GRPCRouteNamedRule = suite.ConformanceTest{
-	ShortName:   "GRPCRouteNamedRule",
-	Description: "A GRPCRoute with a named GRPCRouteRule",
-	Manifests:   []string{"tests/grpcroute-named-rule.yaml"},
+var GRPCRouteRequestMirror = suite.ConformanceTest{
+	ShortName:   "GRPCRouteRequestMirror",
+	Description: "An GRPCRoute with request mirror filter",
+	Manifests:   []string{"tests/grpcroute-request-mirror.yaml"},
 	Features: []features.FeatureName{
 		features.SupportGateway,
 		features.SupportGRPCRoute,
-		features.SupportGRPCRouteNamedRouteRule,
+		features.SupportGRPCRouteRequestMirror,
 	},
-	Provisional: true,
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
-		routeNN := types.NamespacedName{Name: "grpc-named-rules", Namespace: ns}
+		routeNN := types.NamespacedName{Name: "grpcroute-request-mirror", Namespace: ns}
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: ns}
 		gwAddr := kubernetes.GatewayAndGRPCRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
 
@@ -53,18 +54,25 @@ var GRPCRouteNamedRule = suite.ConformanceTest{
 				EchoRequest: &pb.EchoRequest{},
 				Backend:     "grpc-infra-backend-v1",
 				Namespace:   ns,
-			}, {
-				EchoTwoRequest: &pb.EchoRequest{},
-				Backend:        "grpc-infra-backend-v2",
-				Namespace:      ns,
+				MirroredTo: []mirror.MirroredBackend{
+					{
+						BackendRef: mirror.BackendRef{
+							Name:      "grpc-infra-backend-v2",
+							Namespace: ns,
+						},
+					},
+				},
 			},
 		}
 
 		for i := range testCases {
+			// Declare tc here to avoid loop variable
+			// reuse issues across parallel tests.
 			tc := testCases[i]
 			t.Run(tc.GetTestCaseName(i), func(t *testing.T) {
 				t.Parallel()
 				grpc.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.GRPCClient, suite.TimeoutConfig, gwAddr, tc)
+				mirror.ExpectMirroredRequest(t, suite.Client, suite.Clientset, tc.MirroredTo, mirror.GetGRPCRegexPattern())
 			})
 		}
 	},

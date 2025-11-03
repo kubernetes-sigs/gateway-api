@@ -24,6 +24,8 @@ import (
 	"testing"
 	"time"
 
+	"sigs.k8s.io/gateway-api/conformance/utils/mirror"
+
 	"github.com/stretchr/testify/require"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/utils/ptr"
@@ -78,9 +80,9 @@ var HTTPRouteRequestPercentageMirror = suite.ConformanceTest{
 					},
 				},
 				Backend: "infra-backend-v1",
-				MirroredTo: []http.MirroredBackend{
+				MirroredTo: []mirror.MirroredBackend{
 					{
-						BackendRef: http.BackendRef{
+						BackendRef: mirror.BackendRef{
 							Name:      "infra-backend-v2",
 							Namespace: ns,
 						},
@@ -96,9 +98,9 @@ var HTTPRouteRequestPercentageMirror = suite.ConformanceTest{
 					},
 				},
 				Backend: "infra-backend-v1",
-				MirroredTo: []http.MirroredBackend{
+				MirroredTo: []mirror.MirroredBackend{
 					{
-						BackendRef: http.BackendRef{
+						BackendRef: mirror.BackendRef{
 							Name:      "infra-backend-v2",
 							Namespace: ns,
 						},
@@ -126,9 +128,9 @@ var HTTPRouteRequestPercentageMirror = suite.ConformanceTest{
 				},
 				Namespace: ns,
 				Backend:   "infra-backend-v1",
-				MirroredTo: []http.MirroredBackend{
+				MirroredTo: []mirror.MirroredBackend{
 					{
-						BackendRef: http.BackendRef{
+						BackendRef: mirror.BackendRef{
 							Name:      "infra-backend-v2",
 							Namespace: ns,
 						},

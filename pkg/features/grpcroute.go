@@ -44,6 +44,9 @@ var GRPCRouteCoreFeatures = sets.New(
 // -----------------------------------------------------------------------------
 
 const (
+	// This option indicates support for request mirror in the GRPCRouteRule (extended conformance)
+	SupportGRPCRouteRequestMirror FeatureName = "GRPCRouteRequestMirror"
+
 	// This option indicates support for the name field in the GRPCRouteRule (extended conformance)
 	SupportGRPCRouteNamedRouteRule FeatureName = "GRPCRouteNamedRouteRule"
 )
@@ -54,9 +57,16 @@ var GRPCRouteNamedRouteRule = Feature{
 	Channel: FeatureChannelStandard,
 }
 
+// GRPCRouteRequestMirror contains metadata for the SupportGRPCRouteRequestMirror feature.
+var GRPCRouteRequestMirror = Feature{
+	Name:    SupportGRPCRouteRequestMirror,
+	Channel: FeatureChannelStandard,
+}
+
 // GRPCRouteExtendedFeatures includes all extended features for GRPCRoute
 // conformance and can be used to opt-in to run all GRPCRoute extended features tests.
 // This does not include any Core Features.
 var GRPCRouteExtendedFeatures = sets.New(
+	GRPCRouteRequestMirror,
 	GRPCRouteNamedRouteRule,
 )
