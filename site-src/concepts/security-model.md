@@ -100,12 +100,3 @@ the ReferenceGrant.
 For more information on ReferenceGrant, refer to our [detailed documentation
 for this resource](../api-types/referencegrant.md).
 
-## Advanced Concept: Limiting Namespaces Where a GatewayClass Can Be Used
-Some infrastructure providers or cluster operators may wish to limit the
-namespaces where a GatewayClass can be used. At this point, we do not have a
-solution for this built into the API. In lieu of that, we recommend using a
-policy agent such as Open Policy Agent and
-[Gatekeeper](https://github.com/open-policy-agent/gatekeeper) to enforce these
-kinds of policies. For reference, we've created an [example of
-configuration](https://github.com/open-policy-agent/gatekeeper-library/pull/24)
-that could be used for this.
