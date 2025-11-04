@@ -4,7 +4,7 @@
 
 |API channel|Implementation version|Mode|Report|
 |-----------|----------------------|----|------|
-|standard|1.33.4-gke.1134000|gke-l7-global-external-managed|[v1.33.4 gxlb report](./standard-1.33.4-gxlb-report.yaml)|
+|standard|1.33.4-gke.1134000|gke-l7-global-external-managed|[v1.33.4 managed-gxlb report](./standard-1.33.4-managed-gxlb-report.yaml)|
 
 ## Reproduce
 
