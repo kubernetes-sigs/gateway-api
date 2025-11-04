@@ -2,17 +2,17 @@ apiVersion: internal.gateway.networking.k8s.io/v1alpha1
 kind: GEPDetails
 number: 2648
 name: Direct Policy Attachment
-status: Provisional
+status: Declined
 # Any authors who contribute to the GEP in any way should be listed here using
 # their GitHub handle.
 authors:
   - youngnick
   - robscott
 relationships:
-  extends:
+  obsoletedBy:
     - name: Metaresources and Policy Attachment
       number: 713
-      description: Split out Direct Policy Attachment into its own GEP
+      description: Merged back into the original spec for Metaresources and Policy Attachment where it's presented as a well-defined class of metaresource
 # references is a list of hyperlinks to relevant external references.
 # It's intended to be used for storing GitHub discussions, Google docs, etc.
 references:

@@ -9,14 +9,15 @@ authors:
   - kflynn
   - sanjaypujare
   - spacewander
+  - guicassolato
 relationships:
-  extendedBy:
+  obsoletes:
     - name: Direct Policy Attachment
       number: 2648
-      description: Split out Direct Policy Attachment
+      description: Former split out of the Direct class of policies (Declined)
     - name: Inherited Policy Attachment
       number: 2649
-      description: Split out Inherited Policy Attachment
+      description: Former split out of the Inherited class of policies (Declined)
 references:
   - "https://github.com/kubernetes-sigs/gateway-api/issues/611"
   - "https://docs.google.com/document/d/13fyptUtO9NV_ZAgkoJlfukcBf2PVGhsKWG37yLkppJo/edit?resourcekey=0-Urhtj9gBkGBkSL1gHgbWKw"
