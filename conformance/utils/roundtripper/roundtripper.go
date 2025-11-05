@@ -85,6 +85,7 @@ type CapturedRequest struct {
 	Method   string              `json:"method"`
 	Protocol string              `json:"proto"`
 	Headers  map[string][]string `json:"headers"`
+	HTTPPort string              `json:"httpPort,omitempty"`
 
 	Namespace string `json:"namespace"`
 	Pod       string `json:"pod"`
