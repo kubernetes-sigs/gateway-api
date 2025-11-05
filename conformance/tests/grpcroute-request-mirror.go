@@ -106,7 +106,7 @@ var GRPCRouteRequestMirror = suite.ConformanceTest{
 			t.Run(tc.GetTestCaseName(i), func(t *testing.T) {
 				t.Parallel()
 				grpc.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.GRPCClient, suite.TimeoutConfig, gwAddr, tc)
-				http.ExpectMirroredRequest(t, suite.Client, suite.Clientset, tc.MirroredTo, "Received over plaintext:")
+				http.ExpectMirroredRequest(t, suite.Client, suite.Clientset, tc.MirroredTo, "Received over plaintext:", suite.TimeoutConfig)
 			})
 		}
 	},
