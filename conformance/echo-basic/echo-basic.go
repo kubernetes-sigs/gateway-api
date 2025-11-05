@@ -39,11 +39,12 @@ import (
 
 // RequestAssertions contains information about the request and the Ingress
 type RequestAssertions struct {
-	Path    string              `json:"path"`
-	Host    string              `json:"host"`
-	Method  string              `json:"method"`
-	Proto   string              `json:"proto"`
-	Headers map[string][]string `json:"headers"`
+	Path     string              `json:"path"`
+	Host     string              `json:"host"`
+	Method   string              `json:"method"`
+	Proto    string              `json:"proto"`
+	Headers  map[string][]string `json:"headers"`
+	HTTPPort string              `json:"httpPort"`
 
 	Context `json:",inline"`
 
@@ -76,12 +77,10 @@ type Context struct {
 	Pod       string `json:"pod"`
 }
 
-var context Context
-
-// advertisePortHeader controls whether the server includes the port it listens on
-// in the HTTP response headers.
-var advertisePortHeader bool
-var httpPort string
+var (
+	context  Context
+	httpPort string
+)
 
 func main() {
 	if os.Getenv("GRPC_ECHO_SERVER") != "" {
@@ -101,11 +100,6 @@ func main() {
 	httpsPort := os.Getenv("HTTPS_PORT")
 	if httpsPort == "" {
 		httpsPort = "8443"
-	}
-
-	// When set, the server will add port headers.
-	if os.Getenv("INCLUDE_HTTP_PORT_HEADER") != "" {
-		advertisePortHeader = true
 	}
 
 	context = Context{
@@ -226,6 +220,7 @@ func echoHandler(w http.ResponseWriter, r *http.Request) {
 		r.Method,
 		r.Proto,
 		r.Header,
+		httpPort,
 
 		context,
 
@@ -239,10 +234,6 @@ func echoHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	writeEchoResponseHeaders(w, r.Header)
-	// Optionally advertise the http port this process is serving.
-	if advertisePortHeader {
-		w.Header().Set("X-Echo-HTTP-Port", httpPort)
-	}
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("X-Content-Type-Options", "nosniff")
 	_, _ = w.Write(js)

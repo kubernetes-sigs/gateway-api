@@ -228,24 +228,19 @@ func TestWriteEchoResponseHeaders(t *testing.T) {
 	}
 }
 
-func TestEchoHandler_PortHeader_Enabled(t *testing.T) {
-	// Restore globals to avoid cross-test contamination.
-	prevAdvertise := advertisePortHeader
+func TestEchoHandler_IncludesHTTPPort(t *testing.T) {
+	// Preserve global across tests.
 	prevHTTPPort := httpPort
-	defer func() {
-		advertisePortHeader = prevAdvertise
-		httpPort = prevHTTPPort
-	}()
+	defer func() { httpPort = prevHTTPPort }()
 
-	advertisePortHeader = true
 	httpPort = "3002"
 
-	// Minimal context to satisfy marshaling (values don’t matter here).
+	// Minimal context to satisfy marshaling (values don’t matter for this check).
 	context = Context{
-		Namespace: "ns",
-		Ingress:   "ing",
-		Service:   "svc",
-		Pod:       "pod",
+		Namespace: "testNamespace",
+		Ingress:   "testIngress",
+		Service:   "testService",
+		Pod:       "testPod",
 	}
 
 	req := httptest.NewRequest("GET", "/", nil)
@@ -257,25 +252,21 @@ func TestEchoHandler_PortHeader_Enabled(t *testing.T) {
 		t.Fatalf("expected status %d, got %d", http.StatusOK, status)
 	}
 
-	// Assert port header is present and correct.
-	got := rr.Header().Get("X-Echo-HTTP-Port")
-	if got != "3002" {
-		t.Errorf("expected X-Echo-HTTP-Port %q, got %q", "3002", got)
+	var resp RequestAssertions
+	if err := json.Unmarshal(rr.Body.Bytes(), &resp); err != nil {
+		t.Fatalf("failed to unmarshal echo response: %v", err)
+	}
+	if resp.HTTPPort != "3002" {
+		t.Errorf("expected HTTPPort %q, got %q", "3002", resp.HTTPPort)
 	}
 }
 
-func TestEchoHandler_PortHeader_Disabled(t *testing.T) {
-	// Restore globals
-	prevAdvertise := advertisePortHeader
+func TestEchoHandler_HTTPPortReflectsChange(t *testing.T) {
+	// Preserve global across tests.
 	prevHTTPPort := httpPort
-	defer func() {
-		advertisePortHeader = prevAdvertise
-		httpPort = prevHTTPPort
-	}()
+	defer func() { httpPort = prevHTTPPort }()
 
-	advertisePortHeader = false
 	httpPort = "3004"
-
 	context = Context{
 		Namespace: "ns",
 		Ingress:   "ing",
@@ -292,9 +283,12 @@ func TestEchoHandler_PortHeader_Disabled(t *testing.T) {
 		t.Fatalf("expected status %d, got %d", http.StatusOK, status)
 	}
 
-	// Assert port header is absent.
-	if v := rr.Header().Get("X-Echo-HTTP-Port"); v != "" {
-		t.Errorf("expected no X-Echo-HTTP-Port header when disabled, got %q", v)
+	var resp RequestAssertions
+	if err := json.Unmarshal(rr.Body.Bytes(), &resp); err != nil {
+		t.Fatalf("failed to unmarshal echo response: %v", err)
+	}
+	if resp.HTTPPort != "3004" {
+		t.Errorf("expected HTTPPort %q, got %q", "3004", resp.HTTPPort)
 	}
 }
 
