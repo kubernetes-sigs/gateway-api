@@ -30,22 +30,55 @@ To avoid this situation, the following actions should be taken:
 
 * On Gateways, admins SHOULD ensure that hostnames are clearly delegated to a specific namespace or set of namespaces:
 
-```yaml
-apiVersion: gateway.networking.k8s.io/v1
-kind: Gateway
-metadata:
-  name: gateway1
-spec:
-  listeners:
-  - hostname: "something.tld"
-    port: 80
-    protocol: HTTP
-    allowedRoutes:
-      namespaces:
-        from: Selector
-        selector:
-            kubernetes.io/metadata.name: ns1
-```
+=== "Good configuration"
+
+    ```yaml
+    apiVersion: gateway.networking.k8s.io/v1
+    kind: Gateway
+    metadata:
+      name: gateway
+    spec:
+      gatewayClassName: some-class
+      listeners:
+      - hostname: "something.tld"
+        name: listener1
+        port: 80
+        protocol: HTTP
+        allowedRoutes:
+          namespaces:
+            from: Selector
+            selector:
+              matchLabels:
+                kubernetes.io/metadata.name: ns1
+      - hostname: "otherthing.tld"
+        name: listener2
+        port: 80
+        protocol: HTTP
+        allowedRoutes:
+          namespaces:
+            from: Selector
+            selector:
+              matchLabels:
+                kubernetes.io/metadata.name: ns2
+    ```
+
+=== "Insecure configuration"
+
+    ```yaml
+    apiVersion: gateway.networking.k8s.io/v1
+    kind: Gateway
+    metadata:
+      name: gateway
+    spec:
+      gatewayClassName: some-class
+      listeners:
+      - name: listener1
+        port: 80
+        protocol: HTTP
+        allowedRoutes:
+          namespaces:
+            from: All
+    ```
 
 ### More than 64 listeners
 
