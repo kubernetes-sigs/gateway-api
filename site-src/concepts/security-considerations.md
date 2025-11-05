@@ -11,7 +11,7 @@ provide a safer environment.
 Gateway controllers work to disambiguate and detect conflicts caused by sharing
 different ports, protocols, etc. between various listeners. (?)
 
-Generally this conflict detection works on a first-come, first-served basis, where
+Generally this conflict resolution works on a first-come, first-served basis, where
 the first created resource wins in the  conflict management.
 
 The [hostname definition](../reference/spec.md#httproutespec) is a list, so given the
@@ -23,13 +23,12 @@ and defines hostname `something.tld`.
 * `HTTPRoute` with name `route2` is created on namespace `ns2`, with `creationTimestamp: 00:00:30`
 and defines hostname `otherthing.tld`.
 
-The owner of `route1` can hijack the domain `otherthing.tld` from `route2` because
-`route1` is an older resource.
+If the owner of `route1` adds later `otherthing.tld` to the list of hostnames, the 
+route will be hijacked from `route2` because `route1` is older.
 
 To avoid this situation, the following actions should be taken:
 
-* On shared gateways, admin SHOULD specify on the listener definitions different
-domains, and specific namespaces allowed to use each domain, as the example below:
+* On Gateways, admins SHOULD ensure that hostnames are clearly delegated to a specific namespace or set of namespaces:
 
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
@@ -48,10 +47,15 @@ spec:
             kubernetes.io/metadata.name: ns1
 ```
 
-* Because the number of listeners is limited on a Gateway, the administrator should
-instead rely on some validation (like ValidationAdmissionPolicy or some other mechanism)
-that limits what hostnames can be used on routes of each namespaces.
-* In case of `ListenerSet` (still experimental) a validation policy should also be applied.
+### More than 64 listeners
+
+Gateway resource has a limitation of 64 listener entries. If you need more than 64
+listeners, you should consider allowing your users to set their hostnames directly
+on the routes of each namespaces but limiting what namespace can use what hostname
+by relying on a mechanism like `ValidatingAdmissionPolicy`.
+
+In case you opt to use (the still experimental) `ListenerSet`, a similar mechanism
+should also be considered to limit what hostnames a `ListenerSet` can claim.
 
 ### Example of a ValidatingAdmissionPolicy
 
@@ -116,33 +120,63 @@ domains with a command like `kubectl annotate ns default domains=www.dom1.tld,ww
 Additionally, when dealing with environments that provide DNS record creations,
 admins should be aware and limit the DNS creation based on the same constraints above.
 
-## Usage of ReferenceGrant
+## Limiting Cross-Namespace References
 
 Owners of resources should be aware of the usage of [ReferenceGrants](../api-types/referencegrant.md).
-This should be audited and limited by admins (needs some better writing here).
 
-The intended use of ReferenceGrants is to allow for the *owner* of an object where
-Gateway API cannot change the spec (such as a Secret or Service) to have a way to
-allow cross-namespace use of that object for Gateway API purposes.
+ReferenceGrant allows resource owners to make their resources available to
+Gateway API resources in other namespaces. It may be beneficial to restrict where
+this can be done.
 
-It’s intended to require that the use of an object in a Gateway API object requires
-both the ***referrer*** (generally the Gateway or Route) and the ***referent***
-(a Secret or Service) to *agree* that the reference is allowed. This means that,
-when the referrer and referent are owned by different people, then those two people
-must also agree that the reference is allowed.
+A `ValidatingAdmissionPolicy` can be used to limit what kind of `resource` and which `namespace`
+can create a `ReferenceGrant`.
 
-The design of ReferenceGrant is intended to be as secure as possible by default:
+Below is an **EXAMPLE** that can be used to limit the usage of a `ReferenceGrant` just 
+on namespaces labeled with `referencegrants=allow` and only allowing objects of kind `HTTPRoute`
+to reference an object of kind `Service` that MUST have a name:
 
-* Without a ReferenceGrant, cross-namespace references to a Secret or Gateway
-(or any other resource that Gateway API does not control the spec of) MUST fail.  
-* The ReferenceGrant MUST be created in the same namespace as the object that
-reference permissions are being granted to. This makes it easier to ensure that
-the same person owns both the referent object and the ReferenceGrant.  
-* Most fields in the ReferenceGrant object are **required**, so that the
-ReferenceGrant cannot be overly broad.
+```yaml
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: reference-grant-limit
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+    - apiGroups: ["gateway.networking.k8s.io"]
+      apiVersions: ["v1beta1"]
+      operations: ["CREATE", "UPDATE"]
+      resources: ["referencegrants"]
+  variables:
+  - name: allowed_grant_ns
+    expression: |
+      has(namespaceObject.metadata.labels) && 
+      has(namespaceObject.metadata.labels.referencegrants) &&
+      namespaceObject.metadata.labels['referencegrants'] == 'allow' 
+  - name: allowed_from_kind
+    expression: |
+      object.spec.from.all(f, f.kind=='HTTPRoute')
+  - name: allowed_to_kind
+    expression: |
+      object.spec.to.all(t, t.kind == 'Service' && has(t.name) && t.name != '')
+  validations:
+  - expression: |
+      variables.allowed_grant_ns && variables.allowed_from_kind && variables.allowed_to_kind
+    message: "ReferenceGrant must be explicitly allowed on the namespace, from an HTTPRoute to a named service"
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: reference-grant-limit
+spec:
+  policyName: reference-grant-limit
+  validationActions: ["Deny"]
+  matchResources:
+    namespaceSelector: {}
+```
 
-Because of this design, ReferenceGrant owners should ensure that the reference
-permissions being granted are as minimal as possible.
+ReferenceGrant owners should ensure that the reference permissions being granted are as minimal as possible.
 
 * Specify `to` targets in all possible ways (`group`, `kind`, **and** `name`)  
   * In particular, DO NOT leave `name` unspecified, even though it is optional, without a *very* good reason, as that is granting a blanket 
