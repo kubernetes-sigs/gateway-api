@@ -228,6 +228,76 @@ func TestWriteEchoResponseHeaders(t *testing.T) {
 	}
 }
 
+func TestEchoHandler_PortHeader_Enabled(t *testing.T) {
+	// Restore globals to avoid cross-test contamination.
+	prevAdvertise := advertisePortHeader
+	prevHTTPPort := httpPort
+	defer func() {
+		advertisePortHeader = prevAdvertise
+		httpPort = prevHTTPPort
+	}()
+
+	advertisePortHeader = true
+	httpPort = "3002"
+
+	// Minimal context to satisfy marshaling (values don’t matter here).
+	context = Context{
+		Namespace: "ns",
+		Ingress:   "ing",
+		Service:   "svc",
+		Pod:       "pod",
+	}
+
+	req := httptest.NewRequest("GET", "/", nil)
+	rr := httptest.NewRecorder()
+
+	echoHandler(rr, req)
+
+	if status := rr.Code; status != http.StatusOK {
+		t.Fatalf("expected status %d, got %d", http.StatusOK, status)
+	}
+
+	// Assert port header is present and correct.
+	got := rr.Header().Get("X-Echo-HTTP-Port")
+	if got != "3002" {
+		t.Errorf("expected X-Echo-HTTP-Port %q, got %q", "3002", got)
+	}
+}
+
+func TestEchoHandler_PortHeader_Disabled(t *testing.T) {
+	// Restore globals
+	prevAdvertise := advertisePortHeader
+	prevHTTPPort := httpPort
+	defer func() {
+		advertisePortHeader = prevAdvertise
+		httpPort = prevHTTPPort
+	}()
+
+	advertisePortHeader = false
+	httpPort = "3004"
+
+	context = Context{
+		Namespace: "ns",
+		Ingress:   "ing",
+		Service:   "svc",
+		Pod:       "pod",
+	}
+
+	req := httptest.NewRequest("GET", "/", nil)
+	rr := httptest.NewRecorder()
+
+	echoHandler(rr, req)
+
+	if status := rr.Code; status != http.StatusOK {
+		t.Fatalf("expected status %d, got %d", http.StatusOK, status)
+	}
+
+	// Assert port header is absent.
+	if v := rr.Header().Get("X-Echo-HTTP-Port"); v != "" {
+		t.Errorf("expected no X-Echo-HTTP-Port header when disabled, got %q", v)
+	}
+}
+
 func TestProcessError(t *testing.T) {
 	// Create a response recorder to capture the response
 	rr := httptest.NewRecorder()

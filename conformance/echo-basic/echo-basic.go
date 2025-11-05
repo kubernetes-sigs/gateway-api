@@ -78,13 +78,18 @@ type Context struct {
 
 var context Context
 
+// advertisePortHeader controls whether the server includes the port it listens on
+// in the HTTP response headers.
+var advertisePortHeader bool
+var httpPort string
+
 func main() {
 	if os.Getenv("GRPC_ECHO_SERVER") != "" {
 		g.Main()
 		return
 	}
 
-	httpPort := os.Getenv("HTTP_PORT")
+	httpPort = os.Getenv("HTTP_PORT")
 	if httpPort == "" {
 		httpPort = "3000"
 	}
@@ -96,6 +101,11 @@ func main() {
 	httpsPort := os.Getenv("HTTPS_PORT")
 	if httpsPort == "" {
 		httpsPort = "8443"
+	}
+
+	// When set, the server will add port headers.
+	if os.Getenv("INCLUDE_HTTP_PORT_HEADER") != "" {
+		advertisePortHeader = true
 	}
 
 	context = Context{
@@ -229,6 +239,10 @@ func echoHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	writeEchoResponseHeaders(w, r.Header)
+	// Optionally advertise the http port this process is serving.
+	if advertisePortHeader {
+		w.Header().Set("X-Echo-HTTP-Port", httpPort)
+	}
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("X-Content-Type-Options", "nosniff")
 	_, _ = w.Write(js)
