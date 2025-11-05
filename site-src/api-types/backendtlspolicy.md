@@ -170,6 +170,6 @@ uses `PolicyAncestorStatus` to allow you to know which parentReference set that 
 [wellKnownCACertificates]: ../reference/spec.md#localobjectreference
 [hostname]: ../reference/spec.md#precisehostname
 [rfc-3986]: https://tools.ietf.org/html/rfc3986
-[targetRefs]: ../reference/spec/#localpolicytargetreferencewithsectionname
-[subjectAltNames]: ../reference/spec/#subjectaltname
-[options]: ../reference/spec/#backendtlspolicyspec
+[targetRefs]: ../reference/spec.md#localpolicytargetreferencewithsectionname
+[subjectAltNames]: ../reference/spec.md#subjectaltname
+[options]: ../reference/spec.md#backendtlspolicyspec
