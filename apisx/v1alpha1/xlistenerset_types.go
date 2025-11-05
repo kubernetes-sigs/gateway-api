@@ -51,11 +51,12 @@ import (
 // - A ListenerSet can reference secrets/backends in its own namespace without a ReferenceGrant
 //
 // Gateway Integration:
-// - The parent Gateway's status will include an "AttachedListenerSets" condition
-// - This condition will be:
-//   - True: when AllowedListeners is set and at least one child ListenerSet is attached
-//   - False: when AllowedListeners is set but no valid listeners are attached, or when AllowedListeners is not set or false
-//   - Unknown: when no AllowedListeners config is present
+//   - The parent Gateway's status will include "AttachedListenerSets"
+//     which is the count of ListenerSets that have successfully attached to a Gateway
+//     A ListenerSet is successfully attached to a Gateway when all the following conditions are met:
+//   - The ListenerSet is selected by the Gateway's AllowedListeners field
+//   - The ListenerSet has a valid ParentRef selecting the Gateway
+//   - The ListenerSet's status has the condition "Accepted: true"
 type XListenerSet struct {
 	metav1.TypeMeta `json:",inline"`
 	// +optional
@@ -159,17 +160,11 @@ type ListenerEntry struct {
 	// Port is the network port. Multiple listeners may use the
 	// same port, subject to the Listener compatibility rules.
 	//
-	// If the port is not set or specified as zero, the implementation will assign
-	// a unique port. If the implementation does not support dynamic port
-	// assignment, it MUST set `Accepted` condition to `False` with the
-	// `UnsupportedPort` reason.
-	//
-	// +optional
-	//
-	// +kubebuilder:default=0
-	// +kubebuilder:validation:Minimum=0
+	// +kubebuilder:validation:Minimum=1
 	// +kubebuilder:validation:Maximum=65535
-	Port PortNumber `json:"port,omitempty"`
+	//
+	// +required
+	Port PortNumber `json:"port"`
 
 	// Protocol specifies the network protocol this listener expects to receive.
 	// +required
@@ -179,14 +174,14 @@ type ListenerEntry struct {
 	// the Protocol field is "HTTPS" or "TLS". It is invalid to set this field
 	// if the Protocol field is "HTTP", "TCP", or "UDP".
 	//
-	// The association of SNIs to Certificate defined in GatewayTLSConfig is
+	// The association of SNIs to Certificate defined in ListenerTLSConfig is
 	// defined based on the Hostname field for this listener.
 	//
 	// The GatewayClass MUST use the longest matching SNI out of all
 	// available certificates for any TLS handshake.
 	//
 	// +optional
-	TLS *GatewayTLSConfig `json:"tls,omitempty"`
+	TLS *ListenerTLSConfig `json:"tls,omitempty"`
 
 	// AllowedRoutes defines the types of routes that MAY be attached to a
 	// Listener and the trusted namespaces where those Route resources MAY be
@@ -251,16 +246,8 @@ type ListenerEntryStatus struct {
 	// +required
 	Name SectionName `json:"name"`
 
-	// Port is the network port the listener is configured to listen on.
-	//
-	// +kubebuilder:validation:Minimum=1
-	// +kubebuilder:validation:Maximum=65535
-	//
-	// +required
-	Port PortNumber `json:"port"`
-
 	// SupportedKinds is the list indicating the Kinds supported by this
-	// listener. This MUST represent the kinds an implementation supports for
+	// listener. This MUST represent the kinds supported by an implementation for
 	// that Listener configuration.
 	//
 	// If kinds are specified in Spec that are not supported, they MUST NOT
@@ -284,10 +271,13 @@ type ListenerEntryStatus struct {
 	// AND the Route has a valid ParentRef selecting the whole Gateway
 	// resource or a specific Listener as a parent resource (more detail on
 	// attachment semantics can be found in the documentation on the various
-	// Route kinds ParentRefs fields). Listener or Route status does not impact
+	// Route kinds ParentRefs fields). Listener status does not impact
 	// successful attachment, i.e. the AttachedRoutes field count MUST be set
-	// for Listeners with condition Accepted: false and MUST count successfully
-	// attached Routes that may themselves have Accepted: false conditions.
+	// for Listeners, even if the Accepted condition of an individual Listener is set
+	// to "False". The AttachedRoutes number represents the number of Routes with
+	// the Accepted condition set to "True" that have been attached to this Listener.
+	// Routes with any other value for the Accepted condition MUST NOT be included
+	// in this count.
 	//
 	// Uses for this field include troubleshooting Route attachment and
 	// measuring blast radius/impact of changes to a Listener.
@@ -392,9 +382,9 @@ const (
 
 	// This reason is used with the "Accepted" condition when one or
 	// more Listeners have an invalid or unsupported configuration
-	// and cannot be configured on the Gateway.
+	// and cannot be configured on the ListenerSet.
 	// This can be the reason when "Accepted" is "True" or "False", depending on whether
-	// the listener being invalid causes the entire Gateway to not be accepted.
+	// the listener being invalid causes the entire ListenerSet to not be accepted.
 	ListenerSetReasonListenersNotValid ListenerSetConditionReason = "ListenersNotValid"
 )
 
@@ -408,7 +398,7 @@ const (
 
 	// This reason is used with the "Accepted" and "Programmed"
 	// conditions when the status is "Unknown" and no controller has reconciled
-	// the Gateway.
+	// the ListenerSet.
 	ListenerSetReasonPending ListenerSetConditionReason = "Pending"
 )
 
@@ -501,12 +491,12 @@ const (
 	ListenerEntryReasonAccepted ListenerEntryConditionReason = "Accepted"
 
 	// This reason is used with the "Accepted" condition when the
-	// Listener could not be attached to be Gateway because its
+	// Listener could not be attached to the Gateway because its
 	// protocol type is not supported.
 	ListenerEntryReasonUnsupportedProtocol ListenerEntryConditionReason = "UnsupportedProtocol"
 
 	// This reason is used with the "Accepted" condition when the
-	// Listener could not be attached to be Gateway because the Gateway
+	// Listener could not be attached to the Gateway because the Gateway
 	// has too many Listeners.
 	ListenerEntryReasonTooManyListeners ListenerEntryConditionReason = "TooManyListeners"
 )
@@ -541,7 +531,7 @@ const (
 	// or unsupported resource or kind, or when the data within that resource
 	// is malformed.
 	// This reason must be used only when the reference is allowed, either by
-	// referencing an object in the same namespace as the Gateway, or when
+	// referencing an object in the same namespace as the ListenerSet, or when
 	// a cross-namespace reference has been explicitly allowed by a ReferenceGrant.
 	// If the reference is not allowed, the reason RefNotPermitted must be used
 	// instead.

@@ -24,10 +24,39 @@ import (
 
 // GatewayClassSpecApplyConfiguration represents a declarative configuration of the GatewayClassSpec type for use
 // with apply.
+//
+// GatewayClassSpec reflects the configuration of a class of Gateways.
 type GatewayClassSpecApplyConfiguration struct {
-	ControllerName *apisv1.GatewayController              `json:"controllerName,omitempty"`
-	ParametersRef  *ParametersReferenceApplyConfiguration `json:"parametersRef,omitempty"`
-	Description    *string                                `json:"description,omitempty"`
+	// ControllerName is the name of the controller that is managing Gateways of
+	// this class. The value of this field MUST be a domain prefixed path.
+	//
+	// Example: "example.net/gateway-controller".
+	//
+	// This field is not mutable and cannot be empty.
+	//
+	// Support: Core
+	ControllerName *apisv1.GatewayController `json:"controllerName,omitempty"`
+	// ParametersRef is a reference to a resource that contains the configuration
+	// parameters corresponding to the GatewayClass. This is optional if the
+	// controller does not require any additional configuration.
+	//
+	// ParametersRef can reference a standard Kubernetes resource, i.e. ConfigMap,
+	// or an implementation-specific custom resource. The resource can be
+	// cluster-scoped or namespace-scoped.
+	//
+	// If the referent cannot be found, refers to an unsupported kind, or when
+	// the data within that resource is malformed, the GatewayClass SHOULD be
+	// rejected with the "Accepted" status condition set to "False" and an
+	// "InvalidParameters" reason.
+	//
+	// A Gateway for this GatewayClass may provide its own `parametersRef`. When both are specified,
+	// the merging behavior is implementation specific.
+	// It is generally recommended that GatewayClass provides defaults that can be overridden by a Gateway.
+	//
+	// Support: Implementation-specific
+	ParametersRef *ParametersReferenceApplyConfiguration `json:"parametersRef,omitempty"`
+	// Description helps describe a GatewayClass with more details.
+	Description *string `json:"description,omitempty"`
 }
 
 // GatewayClassSpecApplyConfiguration constructs a declarative configuration of the GatewayClassSpec type for use with

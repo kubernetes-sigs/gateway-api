@@ -13,7 +13,7 @@ HTTP header modification is the process of adding, removing, or modifying HTTP h
 
 To configure HTTP header modification, define a Gateway object with one or more HTTP filters. Each filter specifies a specific modification to make to incoming requests, such as adding a custom header or modifying an existing header.
 
-To add a header to a HTTP request, use a filter of the type `RequestHeaderModifier`, with the `add` action and the name and value of the header:
+To add a header to an HTTP request, use a filter of the type `RequestHeaderModifier`, with the `add` action and the name and value of the header:
 
 ```yaml
 {% include 'standard/http-request-header-add.yaml' %}

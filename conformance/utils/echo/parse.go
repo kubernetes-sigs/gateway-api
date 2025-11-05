@@ -74,7 +74,7 @@ var (
 
 // Response represents a response to a single echo request.
 type Response struct {
-	// RequestURL is the requested URL. This differs from URL, which is the just the path.
+	// RequestURL is the requested URL. This differs from URL, which is just the path.
 	// For example, RequestURL=http://foo/bar, URL=/bar
 	RequestURL string
 	// Method used (for HTTP).
@@ -87,7 +87,7 @@ type Response struct {
 	RawContent string
 	// ID is a unique identifier of the resource in the response
 	ID string
-	// URL is the url the request is sent to
+	// URL is the url to which the request is sent
 	URL string
 	// Version is the version of the resource in the response
 	Version string
@@ -208,6 +208,29 @@ func ParseResponse(output string) Response {
 	}
 
 	return out
+}
+
+// parseMultipleResponses parses output containing multiple responses separated by blank lines
+func parseMultipleResponses(output string) []Response {
+	// Split by double newline which typically separates individual responses
+	// in batch mode output
+	responseSections := strings.Split(output, "\n\n")
+
+	var responses []Response
+	for _, section := range responseSections {
+		section = strings.TrimSpace(section)
+		if section == "" {
+			continue
+		}
+		// Parse each section as a separate response
+		resp := ParseResponse(section)
+		// Only add responses that have meaningful content (at least a hostname or code)
+		if resp.Hostname != "" || resp.Code != "" {
+			responses = append(responses, resp)
+		}
+	}
+
+	return responses
 }
 
 // HeaderType is a helper enum for retrieving Headers from a Response.

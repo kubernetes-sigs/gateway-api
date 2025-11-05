@@ -57,6 +57,6 @@ missing or not `canary` then it'll be forwarded to `bar-svc`.
 {% include 'standard/http-routing/bar-httproute.yaml' %}
 ```
 
-[gateway]: ../reference/spec.md#gateway.networking.k8s.io/v1.Gateway
-[spec]: ../reference/spec.md#gateway.networking.k8s.io/v1.HTTPRouteSpec
+[gateway]: ../reference/spec.md#gateway
+[spec]: ../reference/spec.md#httproutespec
 [svc]:https://kubernetes.io/docs/concepts/services-networking/service/

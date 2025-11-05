@@ -86,7 +86,7 @@ interested in conforming to the API, the following resources will help give
 you the necessary background:
 
 - [API overview](concepts/api-overview.md)
-- [User guides](guides/index.md)
+- [User guides](guides/getting-started/index.md)
 - [Implementations](implementations.md)
 - [API reference spec](reference/spec.md)
 - [Community links](contributing/index.md) and [developer guide](contributing/devguide.md)

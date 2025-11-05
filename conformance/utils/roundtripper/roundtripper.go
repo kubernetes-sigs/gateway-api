@@ -40,6 +40,7 @@ import (
 
 const (
 	H2CPriorKnowledgeProtocol = "H2C_PRIOR_KNOWLEDGE"
+	HTTPSProtocol             = "HTTPS"
 )
 
 // RoundTripper is an interface used to make requests within conformance tests.
@@ -50,30 +51,31 @@ type RoundTripper interface {
 
 // Request is the primary input for making a request.
 type Request struct {
-	T                *testing.T
-	URL              url.URL
-	Host             string
-	Protocol         string
-	Method           string
-	Headers          map[string][]string
-	UnfollowRedirect bool
-	CertPem          []byte
-	KeyPem           []byte
-	Server           string
-	Body             string
+	T                    *testing.T
+	URL                  url.URL
+	Host                 string
+	Protocol             string
+	Method               string
+	Headers              map[string][]string
+	UnfollowRedirect     bool
+	ClientCertificate    []byte
+	ClientCertificateKey []byte
+	ServerCertificate    []byte
+	ServerName           string
+	Body                 string
 }
 
 // String returns a printable version of Request for logging. Note that the
-// CertPem and KeyPem are truncated.
+// ServerCertificate, ClientCertificate, and ClientCertificateKey are truncated.
 func (r Request) String() string {
-	return fmt.Sprintf("{URL: %+v, Host: %v, Protocol: %v, Method: %v, Headers: %v, UnfollowRedirect: %v, Server: %v, CertPem: <truncated>, KeyPem: <truncated>}",
+	return fmt.Sprintf("{URL: %+v, Host: %v, Protocol: %v, Method: %v, Headers: %v, UnfollowRedirect: %v, ServerName: %v, ServerCertificate: <truncated>, ClientCertificate: <truncated>, ClientCertificateKey: <truncated>}",
 		r.URL,
 		r.Host,
 		r.Protocol,
 		r.Method,
 		r.Headers,
 		r.UnfollowRedirect,
-		r.Server,
+		r.ServerName,
 	)
 }
 
@@ -85,6 +87,7 @@ type CapturedRequest struct {
 	Method   string              `json:"method"`
 	Protocol string              `json:"proto"`
 	Headers  map[string][]string `json:"headers"`
+	HTTPPort string              `json:"httpPort,omitempty"`
 
 	Namespace string `json:"namespace"`
 	Pod       string `json:"pod"`
@@ -92,10 +95,11 @@ type CapturedRequest struct {
 }
 
 type TLS struct {
-	Version            string `json:"version"`
-	ServerName         string `json:"serverName"`
-	NegotiatedProtocol string `json:"negotiatedProtocol"`
-	CipherSuite        string `json:"cipherSuite"`
+	Version            string   `json:"version"`
+	ServerName         string   `json:"serverName"`
+	NegotiatedProtocol string   `json:"negotiatedProtocol"`
+	CipherSuite        string   `json:"cipherSuite"`
+	PeerCertificates   []string `json:"peerCertificates"`
 }
 
 // RedirectRequest contains a follow up request metadata captured from a redirect
@@ -137,8 +141,8 @@ func (d *DefaultRoundTripper) httpTransport(request Request) (http.RoundTripper,
 		// Ref. https://github.com/kubernetes-sigs/gateway-api/issues/2357
 		DisableKeepAlives: true,
 	}
-	if request.Server != "" && len(request.CertPem) != 0 && len(request.KeyPem) != 0 {
-		tlsConfig, err := tlsClientConfig(request.Server, request.CertPem, request.KeyPem)
+	if request.Protocol == HTTPSProtocol {
+		tlsConfig, err := createTLSClientConfig(request)
 		if err != nil {
 			return nil, err
 		}
@@ -149,8 +153,8 @@ func (d *DefaultRoundTripper) httpTransport(request Request) (http.RoundTripper,
 }
 
 func (d *DefaultRoundTripper) h2cPriorKnowledgeTransport(request Request) (http.RoundTripper, error) {
-	if request.Server != "" && len(request.CertPem) != 0 && len(request.KeyPem) != 0 {
-		return nil, errors.New("request has configured cert and key but h2 prior knowledge is not encrypted")
+	if request.ServerName != "" && len(request.ServerCertificate) > 0 {
+		return nil, errors.New("request has configured trusted CA certificates but h2 prior knowledge is not encrypted")
 	}
 
 	transport := &http2.Transport{
@@ -306,30 +310,36 @@ func (d *DefaultRoundTripper) defaultRoundTrip(request Request, transport http.R
 	return cReq, cRes, nil
 }
 
-func tlsClientConfig(server string, certPem []byte, keyPem []byte) (*tls.Config, error) {
-	// Create a certificate from the provided cert and key
-	cert, err := tls.X509KeyPair(certPem, keyPem)
-	if err != nil {
-		return nil, fmt.Errorf("unexpected error creating cert: %w", err)
+func createTLSClientConfig(request Request) (*tls.Config, error) {
+	if request.ServerName == "" {
+		return nil, errors.New("https request has no server name configured")
+	}
+	if len(request.ServerCertificate) == 0 {
+		return nil, errors.New("https request has no trusted certificates configured")
 	}
 
-	// Add the provided cert as a trusted CA
-	certPool := x509.NewCertPool()
-	if !certPool.AppendCertsFromPEM(certPem) {
-		return nil, fmt.Errorf("unexpected error adding trusted CA: %w", err)
+	rootCAs := x509.NewCertPool()
+	if !rootCAs.AppendCertsFromPEM(request.ServerCertificate) {
+		return nil, errors.New("unexpected error adding trusted certificates failed")
 	}
 
-	if server == "" {
-		return nil, fmt.Errorf("unexpected error, server name required for TLS")
+	var certificates []tls.Certificate
+	if len(request.ClientCertificate) > 0 && len(request.ClientCertificateKey) > 0 {
+		certificate, err := tls.X509KeyPair(request.ClientCertificate, request.ClientCertificateKey)
+		if err != nil {
+			return nil, fmt.Errorf("unexpected error creating client cert: %w", err)
+		}
+
+		certificates = append(certificates, certificate)
 	}
 
 	// Create the tls Config for this provided host, cert, and trusted CA
 	// Disable G402: TLS MinVersion too low. (gosec)
 	// #nosec G402
 	return &tls.Config{
-		Certificates: []tls.Certificate{cert},
-		ServerName:   server,
-		RootCAs:      certPool,
+		ServerName:   request.ServerName,
+		RootCAs:      rootCAs,
+		Certificates: certificates,
 	}, nil
 }
 

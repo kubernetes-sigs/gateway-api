@@ -26,12 +26,44 @@ import (
 
 // ListenerEntryStatusApplyConfiguration represents a declarative configuration of the ListenerEntryStatus type for use
 // with apply.
+//
+// ListenerStatus is the status associated with a Listener.
 type ListenerEntryStatusApplyConfiguration struct {
-	Name           *v1.SectionName                           `json:"name,omitempty"`
-	Port           *v1.PortNumber                            `json:"port,omitempty"`
+	// Name is the name of the Listener that this status corresponds to.
+	Name *v1.SectionName `json:"name,omitempty"`
+	// SupportedKinds is the list indicating the Kinds supported by this
+	// listener. This MUST represent the kinds supported by an implementation for
+	// that Listener configuration.
+	//
+	// If kinds are specified in Spec that are not supported, they MUST NOT
+	// appear in this list and an implementation MUST set the "ResolvedRefs"
+	// condition to "False" with the "InvalidRouteKinds" reason. If both valid
+	// and invalid Route kinds are specified, the implementation MUST
+	// reference the valid Route kinds that have been specified.
 	SupportedKinds []apisv1.RouteGroupKindApplyConfiguration `json:"supportedKinds,omitempty"`
-	AttachedRoutes *int32                                    `json:"attachedRoutes,omitempty"`
-	Conditions     []metav1.ConditionApplyConfiguration      `json:"conditions,omitempty"`
+	// AttachedRoutes represents the total number of Routes that have been
+	// successfully attached to this Listener.
+	//
+	// Successful attachment of a Route to a Listener is based solely on the
+	// combination of the AllowedRoutes field on the corresponding Listener
+	// and the Route's ParentRefs field. A Route is successfully attached to
+	// a Listener when it is selected by the Listener's AllowedRoutes field
+	// AND the Route has a valid ParentRef selecting the whole Gateway
+	// resource or a specific Listener as a parent resource (more detail on
+	// attachment semantics can be found in the documentation on the various
+	// Route kinds ParentRefs fields). Listener status does not impact
+	// successful attachment, i.e. the AttachedRoutes field count MUST be set
+	// for Listeners, even if the Accepted condition of an individual Listener is set
+	// to "False". The AttachedRoutes number represents the number of Routes with
+	// the Accepted condition set to "True" that have been attached to this Listener.
+	// Routes with any other value for the Accepted condition MUST NOT be included
+	// in this count.
+	//
+	// Uses for this field include troubleshooting Route attachment and
+	// measuring blast radius/impact of changes to a Listener.
+	AttachedRoutes *int32 `json:"attachedRoutes,omitempty"`
+	// Conditions describe the current condition of this listener.
+	Conditions []metav1.ConditionApplyConfiguration `json:"conditions,omitempty"`
 }
 
 // ListenerEntryStatusApplyConfiguration constructs a declarative configuration of the ListenerEntryStatus type for use with
@@ -45,14 +77,6 @@ func ListenerEntryStatus() *ListenerEntryStatusApplyConfiguration {
 // If called multiple times, the Name field is set to the value of the last call.
 func (b *ListenerEntryStatusApplyConfiguration) WithName(value v1.SectionName) *ListenerEntryStatusApplyConfiguration {
 	b.Name = &value
-	return b
-}
-
-// WithPort sets the Port field in the declarative configuration to the given value
-// and returns the receiver, so that objects can be built by chaining "With" function invocations.
-// If called multiple times, the Port field is set to the value of the last call.
-func (b *ListenerEntryStatusApplyConfiguration) WithPort(value v1.PortNumber) *ListenerEntryStatusApplyConfiguration {
-	b.Port = &value
 	return b
 }
 

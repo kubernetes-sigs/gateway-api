@@ -24,13 +24,45 @@ GOPATH=${GOPATH:-$(go env GOPATH)}
 # have to manually default it.
 GOBIN=${GOBIN:-$(go env GOBIN)}
 GOBIN=${GOBIN:-${GOPATH}/bin}
+REMOTE=${REMOTE:-origin}
+
+readonly GOTOOL="go tool"
 
 echo $GOBIN
 
 go install github.com/elastic/crd-ref-docs
+declare -a arr=(
+    "release-1.3"
+    "release-1.4"
+    "main"
+)
 
-${GOBIN}/crd-ref-docs \
-    --source-path=${PWD}/apis \
-    --config=crd-ref-docs.yaml \
-    --renderer=markdown \
-    --output-path=${PWD}/site-src/reference/spec.md
+mkdir -p ${PWD}/tmp
+
+for i in "${arr[@]}"; do
+    tmpdir=$(mktemp -d --tmpdir=${PWD}/tmp)
+    
+    git fetch ${REMOTE} ${i} || 
+	    echo "You need a git remote pointing to upstream for API Ref generation. To solve this issue locally, execute 'git remote add upstream git@github.com:kubernetes-sigs/gateway-api.git' and then call the script again with 'REMOTE=upstream <command>'"
+    git --work-tree=${tmpdir} checkout ${REMOTE}/${i} -- apis apisx
+	
+    # Start removing any "release-" prefix from docpath
+    docpath=${i#"release-"}
+    # If the release is "main" simply remove it
+    docpath=${docpath#"main"}
+	mkdir -p "${PWD}/site-src/reference/${docpath}"
+
+    $GOTOOL crd-ref-docs \
+        --source-path=${tmpdir}/apis \
+        --config=crd-ref-docs.yaml \
+        --templates-dir=${PWD}/hack/crd-ref-templates/ \
+        --renderer=markdown \
+        --output-path=${PWD}/site-src/reference/${docpath}/spec.md
+
+    $GOTOOL crd-ref-docs \
+        --source-path=${tmpdir}/apisx \
+        --config=crd-ref-docs.yaml \
+        --templates-dir=${PWD}/hack/crd-ref-templates/ \
+        --renderer=markdown \
+        --output-path=${PWD}/site-src/reference/${docpath}/specx.md
+done

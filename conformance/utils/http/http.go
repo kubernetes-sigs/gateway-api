@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"net"
 	"net/url"
+	"slices"
 	"strings"
 	"testing"
 	"time"
@@ -27,6 +28,7 @@ import (
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
 	"sigs.k8s.io/gateway-api/conformance/utils/roundtripper"
 	"sigs.k8s.io/gateway-api/conformance/utils/tlog"
+	"sigs.k8s.io/gateway-api/conformance/utils/weight"
 )
 
 // ExpectedResponse defines the response expected for a given request.
@@ -76,6 +78,7 @@ type Request struct {
 	Protocol         string
 	Body             string
 	SNI              string
+	ClientCert       string
 }
 
 // ExpectedRequest defines expected properties of a request that reaches a backend.
@@ -85,13 +88,18 @@ type ExpectedRequest struct {
 	// AbsentHeaders are names of headers that are expected
 	// *not* to be present on the request.
 	AbsentHeaders []string
+	// If set, CompareRoundTrip asserts the echoed httpPort equals this value.
+	HTTPPort string
 }
 
 // Response defines expected properties of a response from a backend.
 type Response struct {
+	// Deprecated: Use StatusCodes instead, which supports matching against multiple status codes.
 	StatusCode    int
+	StatusCodes   []int
 	Headers       map[string]string
 	AbsentHeaders []string
+	Protocol      string
 }
 
 type BackendRef struct {
@@ -135,8 +143,13 @@ func MakeRequest(t *testing.T, expected *ExpectedResponse, gwAddr, protocol, sch
 		expected.Request.Method = "GET"
 	}
 
-	if expected.Response.StatusCode == 0 {
-		expected.Response.StatusCode = 200
+	// if the deprecated field StatusCode is set, append it to StatusCodes for backwards compatibility
+	if expected.Response.StatusCode != 0 {
+		expected.Response.StatusCodes = append(expected.Response.StatusCodes, expected.Response.StatusCode)
+	}
+
+	if len(expected.Response.StatusCodes) == 0 {
+		expected.Response.StatusCodes = []int{200}
 	}
 
 	if expected.Request.Protocol == "" {
@@ -229,7 +242,7 @@ func AwaitConvergence(t *testing.T, threshold int, maxTimeToConsistency time.Dur
 		default:
 		}
 
-		completed := fn(time.Now().Sub(start))
+		completed := fn(time.Since(start))
 		attempts++
 		if completed {
 			successes++
@@ -297,13 +310,19 @@ func WaitForConsistentFailureResponse(t *testing.T, r roundtripper.RoundTripper,
 
 func CompareRoundTrip(t *testing.T, req *roundtripper.Request, cReq *roundtripper.CapturedRequest, cRes *roundtripper.CapturedResponse, expected ExpectedResponse) error {
 	if roundtripper.IsTimeoutError(cRes.StatusCode) {
-		if roundtripper.IsTimeoutError(expected.Response.StatusCode) {
-			return nil
+		for _, statusCode := range expected.Response.StatusCodes {
+			if roundtripper.IsTimeoutError(statusCode) {
+				return nil
+			}
 		}
 	}
-	if expected.Response.StatusCode != cRes.StatusCode {
-		return fmt.Errorf("expected status code to be %d, got %d. CRes: %v", expected.Response.StatusCode, cRes.StatusCode, cRes)
+	if !slices.Contains(expected.Response.StatusCodes, cRes.StatusCode) {
+		return fmt.Errorf("expected status code to be one of %v, got %d. CRes: %v", expected.Response.StatusCodes, cRes.StatusCode, cRes)
 	}
+	if expected.Response.Protocol != "" && expected.Response.Protocol != cRes.Protocol {
+		return fmt.Errorf("expected protocol to be %s, got %s", expected.Response.Protocol, cRes.Protocol)
+	}
+
 	if cRes.StatusCode == 200 {
 		// The request expected to arrive at the backend is
 		// the same as the request made, unless otherwise
@@ -344,6 +363,10 @@ func CompareRoundTrip(t *testing.T, req *roundtripper.Request, cReq *roundtrippe
 					return fmt.Errorf("expected %s header to be set to %s, got %s", name, expectedVal, strings.Join(actualVal, ","))
 				}
 			}
+		}
+
+		if expected.ExpectedRequest.HTTPPort != "" && expected.ExpectedRequest.HTTPPort != cReq.HTTPPort {
+			return fmt.Errorf("expected httpPort %q, got %q", expected.ExpectedRequest.HTTPPort, cReq.HTTPPort)
 		}
 
 		if expected.Response.Headers != nil {
@@ -398,6 +421,12 @@ func CompareRoundTrip(t *testing.T, req *roundtripper.Request, cReq *roundtrippe
 
 		if expected.ExpectedRequest.SNI != "" && expected.ExpectedRequest.SNI != cReq.TLS.ServerName {
 			return fmt.Errorf("expected SNI %q to be equal to %q", cReq.TLS.ServerName, expected.ExpectedRequest.SNI)
+		}
+
+		if expected.ExpectedRequest.ClientCert != "" {
+			if !slices.Contains(cReq.TLS.PeerCertificates, expected.ExpectedRequest.ClientCert) {
+				return fmt.Errorf("expected client certiifcate was not captured")
+			}
 		}
 	} else if roundtripper.IsRedirect(cRes.StatusCode) {
 		if expected.RedirectRequest == nil {
@@ -460,7 +489,8 @@ func (er *ExpectedResponse) GetTestCaseName(i int) string {
 	if er.Backend != "" {
 		return fmt.Sprintf("%s should go to %s", reqStr, er.Backend)
 	}
-	return fmt.Sprintf("%s should receive a %d", reqStr, er.Response.StatusCode)
+
+	return fmt.Sprintf("%s should receive one of %v", reqStr, er.Response.StatusCodes)
 }
 
 func setRedirectRequestDefaults(req *roundtripper.Request, cRes *roundtripper.CapturedResponse, expected *ExpectedResponse) {
@@ -477,4 +507,15 @@ func setRedirectRequestDefaults(req *roundtripper.Request, cRes *roundtripper.Ca
 	if expected.RedirectRequest.Path == "" {
 		expected.RedirectRequest.Path = req.URL.Path
 	}
+}
+
+// AddEntropy adds jitter to the request by adding either a delay up to 1 second, or a random header value, or both.
+func AddEntropy(exp *ExpectedResponse) error {
+	addRandomHeader := func(randomValue string) error {
+		exp.Request.Headers = make(map[string]string)
+		exp.Request.Headers["X-Jitter"] = randomValue
+		return nil
+	}
+
+	return weight.AddRandomEntropy(addRandomHeader)
 }

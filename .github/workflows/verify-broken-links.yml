@@ -1,0 +1,21 @@
+name: Verify docs broken links
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+# Remove all permissions from GITHUB_TOKEN except metadata.
+permissions: {}
+
+jobs:
+  verify-docs:
+    name: Build website and run lychee
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # tag=v6.0.1
+        with:
+          persist-credentials: false
+      - name: Run validation
+        run: |
+          make verify-docs

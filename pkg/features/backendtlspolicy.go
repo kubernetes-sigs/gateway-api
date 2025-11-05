@@ -25,16 +25,32 @@ import "k8s.io/apimachinery/pkg/util/sets"
 const (
 	// This option indicates support for BackendTLSPolicy.
 	SupportBackendTLSPolicy FeatureName = "BackendTLSPolicy"
+
+	// This option indicates support for BackendTLSPolicy SubjectAltName Validation.
+	SupportBackendTLSPolicySANValidation FeatureName = "BackendTLSPolicySANValidation"
 )
 
-// TLSRouteFeature contains metadata for the TLSRoute feature.
+// BackendTLSPolicyFeature contains metadata for the BackendTLSPolicy feature.
 var BackendTLSPolicyFeature = Feature{
 	Name:    SupportBackendTLSPolicy,
-	Channel: FeatureChannelExperimental,
+	Channel: FeatureChannelStandard,
+}
+
+// BackendTLSPolicySanValidationFeature contains metadata for the BackendTLSPolicy
+// SubjectAltName Validation feature.
+var BackendTLSPolicySanValidationFeature = Feature{
+	Name:    SupportBackendTLSPolicySANValidation,
+	Channel: FeatureChannelStandard,
 }
 
 // BackendTLSPolicyCoreFeatures includes all the supported features for the
 // BackendTLSPolicy API at a Core level of support.
 var BackendTLSPolicyCoreFeatures = sets.New(
 	BackendTLSPolicyFeature,
+)
+
+// BackendTLSPolicyExtendedFeatures includes all the supported features for the
+// BackendTLSPolicy API at a Extended level of support.
+var BackendTLSPolicyExtendedFeatures = sets.New(
+	BackendTLSPolicySanValidationFeature,
 )

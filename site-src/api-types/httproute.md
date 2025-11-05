@@ -237,9 +237,9 @@ on `weight` and other fields.
 
 #### Timeouts (optional)
 
-??? example "Experimental Channel since v1.0.0"
+??? success "Standard Channel since v1.2.0"
 
-    HTTPRoute timeouts have been part of the Experimental Channel since `v1.0.0`.
+    HTTPRoute timeouts have been part of the Standard Channel since `v1.2.0`.
     For more information on release channels, refer to our
     [versioning guide](../concepts/versioning.md).
 
@@ -307,7 +307,7 @@ RouteStatus defines the observed state that is required across all route types.
 
 Parents define a list of the Gateways (or other parent resources) that are
 associated with the HTTPRoute, and the status of the HTTPRoute with respect to
-each of these Gateways. When a HTTPRoute adds a reference to a Gateway in
+each of these Gateways. When an HTTPRoute adds a reference to a Gateway in
 parentRefs, the controller that manages the Gateway should add an entry to this
 list when the controller first sees the route and should update the entry as
 appropriate when the route is modified.
@@ -336,14 +336,14 @@ only one Route rule may match each request. For more information on how conflict
 resolution applies to merging, refer to the [API specification][httprouterule].
 
 
-[httproute]: ../reference/spec.md#gateway.networking.k8s.io/v1.HTTPRoute
-[httprouterule]: ../reference/spec.md#gateway.networking.k8s.io/v1.HTTPRouteRule
-[hostname]: ../reference/spec.md#gateway.networking.k8s.io/v1.Hostname
+[httproute]: ../reference/spec.md#httproute
+[httprouterule]: ../reference/spec.md#httprouterule
+[hostname]: ../reference/spec.md#hostname
 [rfc-3986]: https://tools.ietf.org/html/rfc3986
-[matches]: ../reference/spec.md#gateway.networking.k8s.io/v1.HTTPRouteMatch
-[filters]: ../reference/spec.md#gateway.networking.k8s.io/v1.HTTPRouteFilter
-[backendRef]: ../reference/spec.md#gateway.networking.k8s.io/v1.HTTPBackendRef
-[parentRef]: ../reference/spec.md#gateway.networking.k8s.io/v1.ParentRef
-[timeouts]: ../reference/spec.md#gateway.networking.k8s.io/v1.HTTPRouteTimeouts
+[matches]: ../reference/spec.md#httproutematch
+[filters]: ../reference/spec.md#httproutefilter
+[backendRef]: ../reference/spec.md#httpbackendref
+[parentRef]: ../reference/spec.md#parentreference
+[timeouts]: ../reference/spec.md#httproutetimeouts
 [appProtocol]: https://kubernetes.io/docs/concepts/services-networking/service/#application-protocol
-[sectionName]: ../reference/spec.md#gateway.networking.k8s.io/v1.SectionName
+[sectionName]: ../reference/spec.md#sectionname

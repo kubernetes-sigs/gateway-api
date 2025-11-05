@@ -519,7 +519,7 @@ type SessionPersistence struct {
     IdleTimeout *Duration `json:"idleTimeout,omitempty"`
 
     // Type defines the type of session persistence such as through
-    // the use a header or cookie. Defaults to cookie based session
+    // the use of a header or cookie. Defaults to cookie based session
     // persistence.
     //
     // Support: Core for "Cookie" type
@@ -678,7 +678,7 @@ route in any given implementation.
 
 The new `BackendLBPolicy` metaresource only supports attaching to a backend. A backend can be a Service,
 ServiceImport (see [GEP-1748](../gep-1748/index.md)), or any implementation-specific backends that are a valid
-[`BackendObjectReference`](../../reference/spec.md#gateway.networking.k8s.io%2fv1.BackendObjectReference). Enabling session
+[`BackendObjectReference`](../../reference/spec.md#backendobjectreference). Enabling session
 persistence for a backend enables subsequently enables it for any route directing traffic to this backend. To learn more
 about the process of attaching a policy to a backend, please refer to [GEP-713](../gep-713/index.md).
 
@@ -741,7 +741,7 @@ standards due to wide acceptance are:
 - SameSite=[Strict|Lax|None]
 - Partitioned
 
-Unless a `sessionPersistence` API field can be satisfied through a manipulating a cookie attribute, the attributes
+Unless a `sessionPersistence` API field can be satisfied through manipulating a cookie attribute, the attributes
 of the cookies are considered as opaque values in this spec and are to be determined by the individual implementations.
 Let's discuss some of these cookie attributes in more detail.
 

@@ -29,11 +29,16 @@ import (
 
 // GatewayApplyConfiguration represents a declarative configuration of the Gateway type for use
 // with apply.
+//
+// Gateway represents an instance of a service-traffic handling infrastructure
+// by binding Listeners to a set of IP addresses.
 type GatewayApplyConfiguration struct {
 	metav1.TypeMetaApplyConfiguration    `json:",inline"`
 	*metav1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
-	Spec                                 *GatewaySpecApplyConfiguration   `json:"spec,omitempty"`
-	Status                               *GatewayStatusApplyConfiguration `json:"status,omitempty"`
+	// Spec defines the desired state of Gateway.
+	Spec *GatewaySpecApplyConfiguration `json:"spec,omitempty"`
+	// Status defines the current state of Gateway.
+	Status *GatewayStatusApplyConfiguration `json:"status,omitempty"`
 }
 
 // Gateway constructs a declarative configuration of the Gateway type for use with
@@ -47,29 +52,14 @@ func Gateway(name, namespace string) *GatewayApplyConfiguration {
 	return b
 }
 
-// ExtractGateway extracts the applied configuration owned by fieldManager from
-// gateway. If no managedFields are found in gateway for fieldManager, a
-// GatewayApplyConfiguration is returned with only the Name, Namespace (if applicable),
-// APIVersion and Kind populated. It is possible that no managed fields were found for because other
-// field managers have taken ownership of all the fields previously owned by fieldManager, or because
-// the fieldManager never owned fields any fields.
+// ExtractGatewayFrom extracts the applied configuration owned by fieldManager from
+// gateway for the specified subresource. Pass an empty string for subresource to extract
+// the main resource. Common subresources include "status", "scale", etc.
 // gateway must be a unmodified Gateway API object that was retrieved from the Kubernetes API.
-// ExtractGateway provides a way to perform a extract/modify-in-place/apply workflow.
+// ExtractGatewayFrom provides a way to perform a extract/modify-in-place/apply workflow.
 // Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
 // applied if another fieldManager has updated or force applied any of the previously applied fields.
-// Experimental!
-func ExtractGateway(gateway *apisv1.Gateway, fieldManager string) (*GatewayApplyConfiguration, error) {
-	return extractGateway(gateway, fieldManager, "")
-}
-
-// ExtractGatewayStatus is the same as ExtractGateway except
-// that it extracts the status subresource applied configuration.
-// Experimental!
-func ExtractGatewayStatus(gateway *apisv1.Gateway, fieldManager string) (*GatewayApplyConfiguration, error) {
-	return extractGateway(gateway, fieldManager, "status")
-}
-
-func extractGateway(gateway *apisv1.Gateway, fieldManager string, subresource string) (*GatewayApplyConfiguration, error) {
+func ExtractGatewayFrom(gateway *apisv1.Gateway, fieldManager string, subresource string) (*GatewayApplyConfiguration, error) {
 	b := &GatewayApplyConfiguration{}
 	err := managedfields.ExtractInto(gateway, internal.Parser().Type("io.k8s.sigs.gateway-api.apis.v1.Gateway"), fieldManager, b, subresource)
 	if err != nil {
@@ -82,6 +72,28 @@ func extractGateway(gateway *apisv1.Gateway, fieldManager string, subresource st
 	b.WithAPIVersion("gateway.networking.k8s.io/v1")
 	return b, nil
 }
+
+// ExtractGateway extracts the applied configuration owned by fieldManager from
+// gateway. If no managedFields are found in gateway for fieldManager, a
+// GatewayApplyConfiguration is returned with only the Name, Namespace (if applicable),
+// APIVersion and Kind populated. It is possible that no managed fields were found for because other
+// field managers have taken ownership of all the fields previously owned by fieldManager, or because
+// the fieldManager never owned fields any fields.
+// gateway must be a unmodified Gateway API object that was retrieved from the Kubernetes API.
+// ExtractGateway provides a way to perform a extract/modify-in-place/apply workflow.
+// Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
+// applied if another fieldManager has updated or force applied any of the previously applied fields.
+func ExtractGateway(gateway *apisv1.Gateway, fieldManager string) (*GatewayApplyConfiguration, error) {
+	return ExtractGatewayFrom(gateway, fieldManager, "")
+}
+
+// ExtractGatewayStatus extracts the applied configuration owned by fieldManager from
+// gateway for the status subresource.
+func ExtractGatewayStatus(gateway *apisv1.Gateway, fieldManager string) (*GatewayApplyConfiguration, error) {
+	return ExtractGatewayFrom(gateway, fieldManager, "status")
+}
+
+func (b GatewayApplyConfiguration) IsApplyConfiguration() {}
 
 // WithKind sets the Kind field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
@@ -257,8 +269,24 @@ func (b *GatewayApplyConfiguration) WithStatus(value *GatewayStatusApplyConfigur
 	return b
 }
 
+// GetKind retrieves the value of the Kind field in the declarative configuration.
+func (b *GatewayApplyConfiguration) GetKind() *string {
+	return b.TypeMetaApplyConfiguration.Kind
+}
+
+// GetAPIVersion retrieves the value of the APIVersion field in the declarative configuration.
+func (b *GatewayApplyConfiguration) GetAPIVersion() *string {
+	return b.TypeMetaApplyConfiguration.APIVersion
+}
+
 // GetName retrieves the value of the Name field in the declarative configuration.
 func (b *GatewayApplyConfiguration) GetName() *string {
 	b.ensureObjectMetaApplyConfigurationExists()
 	return b.ObjectMetaApplyConfiguration.Name
+}
+
+// GetNamespace retrieves the value of the Namespace field in the declarative configuration.
+func (b *GatewayApplyConfiguration) GetNamespace() *string {
+	b.ensureObjectMetaApplyConfigurationExists()
+	return b.ObjectMetaApplyConfiguration.Namespace
 }

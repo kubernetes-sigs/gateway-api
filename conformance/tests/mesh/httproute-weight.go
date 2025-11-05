@@ -17,23 +17,13 @@ limitations under the License.
 package meshtests
 
 import (
-	"cmp"
-	"crypto/rand"
-	"errors"
 	"fmt"
-	"math"
-	"math/big"
-	"slices"
-	"strings"
-	"sync"
 	"testing"
-	"time"
-
-	"golang.org/x/sync/errgroup"
 
 	"sigs.k8s.io/gateway-api/conformance/utils/echo"
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
+	"sigs.k8s.io/gateway-api/conformance/utils/weight"
 	"sigs.k8s.io/gateway-api/pkg/features"
 )
 
@@ -62,9 +52,28 @@ var MeshHTTPRouteWeight = suite.ConformanceTest{
 
 			// Assert request succeeds before doing our distribution check
 			client.MakeRequestAndExpectEventuallyConsistentResponse(t, expected, s.TimeoutConfig)
-			for i := 0; i < 10; i++ {
-				if err := testDistribution(t, client, expected); err != nil {
-					t.Logf("Traffic distribution test failed (%d/10): %s", i+1, err)
+
+			expectedWeights := map[string]float64{
+				"echo-v1": 0.7,
+				"echo-v2": 0.3,
+			}
+
+			sender := weight.NewBatchFunctionBasedSender(func(count int) ([]string, error) {
+				responses, err := client.RequestBatch(t, expected, count)
+				if err != nil {
+					return nil, fmt.Errorf("failed batch mesh request: %w", err)
+				}
+
+				hostnames := make([]string, len(responses))
+				for i, resp := range responses {
+					hostnames[i] = resp.Hostname
+				}
+				return hostnames, nil
+			})
+
+			for i := range weight.MaxTestRetries {
+				if err := weight.TestWeightedDistributionBatch(sender, expectedWeights); err != nil {
+					t.Logf("Traffic distribution test failed (%d/%d): %s", i+1, weight.MaxTestRetries, err)
 				} else {
 					return
 				}
@@ -72,130 +81,4 @@ var MeshHTTPRouteWeight = suite.ConformanceTest{
 			t.Fatal("Weighted distribution tests failed")
 		})
 	},
-}
-
-func testDistribution(t *testing.T, client echo.MeshPod, expected http.ExpectedResponse) error {
-	const (
-		concurrentRequests  = 10
-		tolerancePercentage = 0.05
-		totalRequests       = 500.0
-	)
-	var (
-		g               errgroup.Group
-		seenMutex       sync.Mutex
-		seen            = make(map[string]float64, 2 /* number of backends */)
-		expectedWeights = map[string]float64{
-			"echo-v1": 0.7,
-			"echo-v2": 0.3,
-		}
-	)
-	g.SetLimit(concurrentRequests)
-	for i := 0.0; i < totalRequests; i++ {
-		g.Go(func() error {
-			uniqueExpected := expected
-			if err := addEntropy(&uniqueExpected); err != nil {
-				return fmt.Errorf("error adding entropy: %w", err)
-			}
-			_, cRes, err := client.CaptureRequestResponseAndCompare(t, uniqueExpected)
-			if err != nil {
-				return fmt.Errorf("failed: %w", err)
-			}
-
-			seenMutex.Lock()
-			defer seenMutex.Unlock()
-
-			for expectedBackend := range expectedWeights {
-				if strings.HasPrefix(cRes.Hostname, expectedBackend) {
-					seen[expectedBackend]++
-					return nil
-				}
-			}
-
-			return fmt.Errorf("request was handled by an unexpected pod %q", cRes.Hostname)
-		})
-	}
-
-	if err := g.Wait(); err != nil {
-		return fmt.Errorf("error while sending requests: %w", err)
-	}
-
-	var errs []error
-	if len(seen) != 2 {
-		errs = append(errs, fmt.Errorf("expected only two backends to receive traffic"))
-	}
-
-	for wantBackend, wantPercent := range expectedWeights {
-		gotCount, ok := seen[wantBackend]
-
-		if !ok && wantPercent != 0.0 {
-			errs = append(errs, fmt.Errorf("expect traffic to hit backend %q - but none was received", wantBackend))
-			continue
-		}
-
-		gotPercent := gotCount / totalRequests
-
-		if math.Abs(gotPercent-wantPercent) > tolerancePercentage {
-			errs = append(errs, fmt.Errorf("backend %q weighted traffic of %v not within tolerance %v (+/-%f)",
-				wantBackend,
-				gotPercent,
-				wantPercent,
-				tolerancePercentage,
-			))
-		}
-	}
-	slices.SortFunc(errs, func(a, b error) int {
-		return cmp.Compare(a.Error(), b.Error())
-	})
-	return errors.Join(errs...)
-}
-
-// addEntropy adds jitter to the request by adding either a delay up to 1 second, or a random header value, or both.
-func addEntropy(exp *http.ExpectedResponse) error {
-	randomNumber := func(limit int64) (*int64, error) {
-		number, err := rand.Int(rand.Reader, big.NewInt(limit))
-		if err != nil {
-			return nil, err
-		}
-		n := number.Int64()
-		return &n, nil
-	}
-
-	// adds a delay
-	delay := func(limit int64) error {
-		randomSleepDuration, err := randomNumber(limit)
-		if err != nil {
-			return err
-		}
-		time.Sleep(time.Duration(*randomSleepDuration) * time.Millisecond)
-		return nil
-	}
-	// adds random header value
-	randomHeader := func(limit int64) error {
-		randomHeaderValue, err := randomNumber(limit)
-		if err != nil {
-			return err
-		}
-		exp.Request.Headers = make(map[string]string)
-		exp.Request.Headers["X-Jitter"] = fmt.Sprintf("%d", *randomHeaderValue)
-		return nil
-	}
-
-	random, err := randomNumber(3)
-	if err != nil {
-		return err
-	}
-
-	switch *random {
-	case 0:
-		return delay(1000)
-	case 1:
-		return randomHeader(10000)
-	case 2:
-		if err := delay(1000); err != nil {
-			return err
-		}
-		return randomHeader(10000)
-	default:
-		return fmt.Errorf("invalid random value: %d", *random)
-	}
 }

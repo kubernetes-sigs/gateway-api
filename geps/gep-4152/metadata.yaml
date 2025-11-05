@@ -1,0 +1,10 @@
+apiVersion: internal.gateway.networking.k8s.io/v1alpha1
+kind: GEPDetails
+number: 4152
+name: Extending TLS Validation in BackendTLSPolicy
+status: Provisional
+authors:
+  - snorwin
+extends:
+  - number: 1897
+    name: BackendTLSPolicy - Explicit Backend TLS Connection Configuration
