@@ -22,7 +22,7 @@ spec:
     - expression: "object.spec.group != 'gateway.networking.k8s.io' || 
         (has(object.metadata.annotations) && object.metadata.annotations.exists(k, k == 'gateway.networking.k8s.io/bundle-version') && 
         !matches(object.metadata.annotations['gateway.networking.k8s.io/bundle-version'], 'v1.[0-3].\\\\d+') &&
-        !matches(object.metadata.annotations['gateway.networking.k8s.io/bundle-version'], 'v0'))"
+        !matches(object.metadata.annotations['gateway.networking.k8s.io/bundle-version'], 'v0'))" #TODO Kubernetes 1.37: Migrate to kubernetes semver library
       message: "Installing CRDs with version before v1.4.0 is prohibited by default. Uninstall ValidatingAdmissionPolicy gateway-api-safe-upgrades.gateway.networking.k8s.io to install older versions."
       reason: Invalid
 

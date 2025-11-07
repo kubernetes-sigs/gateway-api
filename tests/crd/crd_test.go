@@ -17,11 +17,14 @@ limitations under the License.
 package crd_test
 
 import (
+	"bytes"
 	"fmt"
+	"io"
 	"io/fs"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"testing"
 	"time"
@@ -152,13 +155,22 @@ func TestCRDValidation(t *testing.T) {
 		t.Run("should not be able to install CRDs with an older version", func(t *testing.T) {
 			t.Cleanup(func() {
 				output, err = executeKubectlCommand(t, kubectlLocation, kubeconfigLocation,
-					[]string{"delete", "--wait", "-f", filepath.Join(".", "standard-install-1.3.0.yaml")})
+					[]string{"delete", "--wait", "-f", filepath.Join("..", "..", "..", "config", "crd", "standard", "gateway.networking.k8s.io_httproutes.yaml")})
 			})
 
-			output, err = executeKubectlCommand(t, kubectlLocation, kubeconfigLocation,
-				[]string{"apply", "--server-side", "--wait", "-f", filepath.Join(".", "standard-install-1.3.0.yaml")})
+			// Read test crd into []byte
+			httpCrd, err := os.ReadFile(filepath.Join("..", "..", "..", "config", "crd", "standard", "gateway.networking.k8s.io_httproutes.yaml"))
+			require.NoError(t, err)
+
+			// do replace on gateway.networking.k8s.io/bundle-version: v1.4.0
+			re := regexp.MustCompile(`gateway\.networking\.k8s\.io\/bundle-version: \S*`)
+			sub := []byte("gateway.networking.k8s.io/bundle-version: v1.3.0")
+			oldCrd := re.ReplaceAll(httpCrd, sub)
+
+			// supply crd to stdin of cmd and kubectl apply -f -
+			output, err = executeKubectlCommandStdin(t, kubectlLocation, kubeconfigLocation, bytes.NewReader(oldCrd), []string{"apply", "-f", "-"})
+
 			require.Error(t, err)
-			assert.Contains(t, output, "Error from server (Invalid)")
 			assert.Contains(t, output, "ValidatingAdmissionPolicy 'safe-upgrades.gateway.networking.k8s.io' with binding 'safe-upgrades.gateway.networking.k8s.io' denied request")
 		})
 	})
@@ -207,6 +219,22 @@ func executeKubectlCommand(t *testing.T, kubectl, kubeconfig string, args []stri
 	cmd.Env = []string{
 		fmt.Sprintf("KUBECONFIG=%s", kubeconfig),
 	}
+
+	output, err := cmd.CombinedOutput()
+	return string(output), err
+}
+
+func executeKubectlCommandStdin(t *testing.T, kubectl, kubeconfig string, stdin io.Reader, args []string) (string, error) {
+	t.Helper()
+
+	cacheDir := filepath.Dir(kubeconfig)
+	args = append([]string{"--cache-dir", cacheDir}, args...)
+
+	cmd := exec.Command(kubectl, args...)
+	cmd.Env = []string{
+		fmt.Sprintf("KUBECONFIG=%s", kubeconfig),
+	}
+	cmd.Stdin = stdin
 
 	output, err := cmd.CombinedOutput()
 	return string(output), err
