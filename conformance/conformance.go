@@ -21,6 +21,7 @@ import (
 	"os"
 	"testing"
 
+	"k8s.io/utils/ptr"
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/gateway-api/apis/v1alpha2"
 	"sigs.k8s.io/gateway-api/apis/v1alpha3"
@@ -80,6 +81,19 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 		*flags.ImplementationVersion,
 		*flags.ImplementationContact,
 	)
+	var usable, unusable []v1beta1.GatewaySpecAddress
+	if v := *flags.UsableAddress; v != "" {
+		usable = append(usable, v1beta1.GatewaySpecAddress{
+			Type:  ptr.To(v1beta1.HostnameAddressType),
+			Value: v,
+		})
+	}
+	if v := *flags.UnusableAddress; v != "" {
+		unusable = append(unusable, v1beta1.GatewaySpecAddress{
+			Type:  ptr.To(v1beta1.HostnameAddressType),
+			Value: v,
+		})
+	}
 
 	return suite.ConformanceOptions{
 		AllowCRDsMismatch:          *flags.AllowCRDsMismatch,
@@ -93,6 +107,8 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 		ExemptFeatures:             exemptFeatures,
 		ManifestFS:                 []fs.FS{&Manifests},
 		GatewayClassName:           *flags.GatewayClassName,
+		UsableNetworkAddresses:     usable,
+		UnusableNetworkAddresses:   unusable,
 		MeshName:                   *flags.MeshName,
 		Implementation:             implementation,
 		Mode:                       *flags.Mode,
