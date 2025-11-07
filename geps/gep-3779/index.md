@@ -45,7 +45,7 @@ An identity-based authorization API is essential because it provides a structure
 
 ### Current AuthZ Support within Meshes
 
-Istio, Linkerd, and Cilium all support identity-aware authorization via vendored policies, but differ in mechanics and philosophy. Istio and Linkerd rely on mTLS-derived identities tightly coupled with service accounts, while Cilium broadens the scope using BPF-based identities tied to labels, IPs, and SPIFFE. Istio offers policy layering (namespace/system-wide), including support for DENY and CUSTOM rules, enforced at sidecars or ztunnel/waypoints. Linkerd injects proxies, emphasizes mTLS, and supports ALLOW/AUDIT — there's no DENY. Cilium stands apart with L3–L7 policy enforcement (via kernel or envoy), and broader match targets including pod/node selectors and CIDRs. It also uniquely maps identities into the datapath ([#CiliumIdentity[#CiliumIdentity]]), and supports explicit default-deny enforcement patterns. See [#state-of-the-world](#state-of-the-world) for more detailed comparison.
+Istio, Linkerd, and Cilium all support identity-aware authorization via vendored policies, but differ in mechanics and philosophy. Istio and Linkerd rely on mTLS-derived identities tightly coupled with service accounts, while Cilium broadens the scope using BPF-based identities tied to labels, IPs, and SPIFFE. Istio offers policy layering (namespace/system-wide), including support for DENY and CUSTOM rules, enforced at sidecars or ztunnel/waypoints. Linkerd injects proxies, emphasizes mTLS, and supports ALLOW/AUDIT — there's no DENY. Cilium stands apart with L3–L7 policy enforcement (via kernel or envoy), and broader match targets including pod/node selectors and CIDRs. It also uniquely maps identities into the datapath ([#CiliumIdentity](#CiliumIdentity)), and supports explicit default-deny enforcement patterns. See [#state-of-the-world](#state-of-the-world) for more detailed comparison.
 
 ## API
 
@@ -60,10 +60,10 @@ Each `AuthorizationPolicy` resource contains a list of rules. A request matches 
 A rule may specify:
 
   * **Sources:** The source identities to which the rule applies. A request’s identity must match one of the listed sources. Supported sources are:
+    * **Kubernetes ServiceAccount** (with the ability to specify all ServiceAccounts in a given namespace)
     * **SPIFFE ID**
-    * **Kubernetes ServiceAccount** (with the ability to specify a whole namespace)
 
-  * **Attributes:** Conditions on the target workload, at the time of writing this, only port is supported. If no attributes are specified, the rule applies to all traffic toward the target.
+  * **Attributes:** Used to narrow the scope of the rule to apply to only some subset of traffic for the target workload destination. Currently, only port is supported. If no attributes are specified, the rule applies to all traffic toward the target.
 
 
 ### Policy Actions
@@ -239,7 +239,7 @@ targetRefs:
 
 To mitigate the challenges L7 support across dataplanes is going to present, and to encourage policy authors to be more explicit, we introduce a new EnforcementLevel Enum.
 
-We start by only support the Network value, and Application is kept for future iteration.
+We start by only supporting the Network value, and Application is reserved for future iteration.
 
 Note: The whole point of this Enum is to encourage explicitness, we **do not** want to start without it and default to Network if and when introduced later.
 
