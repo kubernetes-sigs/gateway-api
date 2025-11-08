@@ -65,21 +65,21 @@ func MustCreateCASignedCertSecret(t *testing.T, namespace, secretName string, ho
 	return formatSecret(serverCert, serverKey, namespace, secretName)
 }
 
-// MustCreateCASignedClientCertSecret creates a CA-signed SSL certificate and stores it in a secret
+// MustCreateCASignedClientCertSecret creates a CA-signed SSL client certificate and stores it in a secret
 func MustCreateCASignedClientCertSecret(t *testing.T, namespace, secretName string, ca *x509.Certificate, caPrivKey *rsa.PrivateKey) *corev1.Secret {
-	var serverCert, serverKey bytes.Buffer
+	var clientCert, clientKey bytes.Buffer
 
-	require.NoError(t, generateRSACert([]string{}, &serverKey, &serverCert, []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth}, ca, caPrivKey), "failed to generate CA signed RSA client certificate")
+	require.NoError(t, generateRSACert([]string{}, &clientKey, &clientCert, []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth}, ca, caPrivKey), "failed to generate CA signed RSA client certificate")
 
-	return formatSecret(serverCert, serverKey, namespace, secretName)
+	return formatSecret(clientCert, clientKey, namespace, secretName)
 }
 
-// formatSecret formats the server certificate, key, namespace, and secretName
+// formatSecret formats the certificate, key, namespace, and secretName
 // and converts it to a Kubernetes Secret object.
-func formatSecret(serverCert bytes.Buffer, serverKey bytes.Buffer, namespace string, secretName string) *corev1.Secret {
+func formatSecret(cert bytes.Buffer, privateKey bytes.Buffer, namespace string, secretName string) *corev1.Secret {
 	data := map[string][]byte{
-		corev1.TLSCertKey:       serverCert.Bytes(),
-		corev1.TLSPrivateKeyKey: serverKey.Bytes(),
+		corev1.TLSCertKey:       cert.Bytes(),
+		corev1.TLSPrivateKeyKey: privateKey.Bytes(),
 	}
 
 	newSecret := &corev1.Secret{
