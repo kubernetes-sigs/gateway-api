@@ -1250,7 +1250,8 @@ const (
 const (
 	// This condition indicates whether the controller was able to resolve all
 	// the object references for the Gateway that are not part of a specific
-	// Listener configuration.
+	// Listener configuration, and also provides a positive-polarity summary of
+	// the Listener's "ResolvedRefs" condition.
 	//
 	// Possible reasons for this condition to be True are:
 	//
@@ -1260,6 +1261,7 @@ const (
 	//
 	// * "RefNotPermitted"
 	// * "InvalidClientCertificateRef"
+	// * "ListenersNotResolved"
 	//
 	// Controllers may raise this condition with other reasons, but should
 	// prefer to use the reasons listed above to improve interoperability.
@@ -1289,6 +1291,10 @@ const (
 	// another namespace, where the object in the other namespace does not have
 	// a ReferenceGrant explicitly allowing the reference.
 	GatewayReasonRefNotPermitted GatewayConditionReason = "RefNotPermitted"
+
+	// This reason is used with the "ResolvedRefs" condition when one or more
+	// Listeners have their "ResolvedRefs" condition set to false in their status.
+	GatewayReasonListenersNotResolved GatewayConditionReason = "ListenersNotResolved"
 )
 
 const (
