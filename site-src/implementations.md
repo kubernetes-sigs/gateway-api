@@ -86,7 +86,7 @@ other functions (like managing DNS or creating certificates).
 ### Conformant
 - [Agent Gateway][40]
 - [Airlock Microgateway][34]
-- [Cilium][16] (beta)
+- [Cilium][16]
 - [Envoy Gateway][18] (GA)
 - [Istio][9] (GA)
 - [kgateway][37] (GA)
@@ -128,6 +128,7 @@ other functions (like managing DNS or creating certificates).
 ### Conformant
 - [Istio][9] (GA)
 - [Linkerd][28] (GA)
+- [Cilium][16] (GA)
 
 ### Stale
 - [Google Cloud Service Mesh][38] (GA)
