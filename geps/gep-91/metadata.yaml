@@ -5,3 +5,7 @@ name: Client Certificate Validation for TLS terminating at the Gateway Listener
 status: Experimental
 authors:
   - arkodg
+relationships:
+  extendedBy:
+    - number: 4080
+      name: Certificate Revocation Lists for Certificate Validiation
