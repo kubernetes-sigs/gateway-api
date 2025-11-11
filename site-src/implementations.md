@@ -79,49 +79,60 @@ other functions (like managing DNS or creating certificates).
 
 !!! info "Compare extended supported features across implementations"
 
-    [View a table to quickly compare supported features of projects](implementations/v1.2.md). These outline Gateway controller implementations that have passed core conformance tests, and focus on extended conformance features that they have implemented.
+    [View a table to quickly compare supported features of projects](implementations/v1.4.md). These outline Gateway controller implementations that have passed core conformance tests, and focus on extended conformance features that they have implemented.
 
 ## Gateway Controller Implementation Status <a name="gateways"></a>
 
-- [Acnodal EPIC][1]
+### Conformant
 - [Agent Gateway][40]
 - [Airlock Microgateway][34]
+- [Cilium][16]
+- [Envoy Gateway][18] (GA)
+- [Istio][9] (GA)
+- [kgateway][37] (GA)
+- [NGINX Gateway Fabric][12] (GA)
+- [Traefik Proxy][13] (GA)
+
+### Partially Conformant
+
+- [Azure Application Gateway for Containers][27] (GA)
+- [Contour][3] (GA)
+- [Gloo Gateway][5] (GA)
+- [Google Kubernetes Engine][6] (GA)
+- [Kong Ingress Controller][10] (GA)
+- [Kong Gateway Operator][35] (GA)
+- [Kubvernor][39](work in progress)
+
+### Stale
+
+- [Acnodal EPIC][1]
 - [Amazon Elastic Kubernetes Service][23] (GA)
 - [Apache APISIX][2] (beta)
 - [Avi Kubernetes Operator][31]
-- [Azure Application Gateway for Containers][27] (GA)
-- [Cilium][16] (beta)
-- [Contour][3] (GA)
 - [Easegress][30] (GA)
 - [Emissary-Ingress (Ambassador API Gateway)][4] (alpha)
-- [Envoy Gateway][18] (GA)
 - [Flomesh Service Mesh][17] (beta)
-- [Gloo Gateway][5] (GA)
-- [Google Kubernetes Engine][6] (GA)
 - [HAProxy Ingress][7] (alpha)
 - [HAProxy Kubernetes Ingress Controller][32] (GA)
 - [HashiCorp Consul][8]
-- [Istio][9] (GA)
-- [kgateway][37] (GA)
-- [Kong Ingress Controller][10] (GA)
-- [Kong Gateway Operator][35] (GA)
-* [Kubvernor][39](work in progress)
 - [Kuma][11] (GA)
 - [LiteSpeed Ingress Controller][19]
 - [LoxiLB][36] (beta)
-- [NGINX Gateway Fabric][12] (GA)
 - [ngrok][33] (preview)
 - [STUNner][21] (beta)
-- [Traefik Proxy][13] (GA)
 - [Tyk][29] (work in progress)
 - [WSO2 APK][25] (GA)
 
 ## Service Mesh Implementation Status <a name="meshes"></a>
 
-- [Google Cloud Service Mesh][38] (GA)
+### Conformant
 - [Istio][9] (GA)
-- [Kuma][11] (GA)
 - [Linkerd][28] (GA)
+- [Cilium][16] (GA)
+
+### Stale
+- [Google Cloud Service Mesh][38] (GA)
+- [Kuma][11] (GA)
 
 ## Integrations <a name="integrations"></a>
 
@@ -721,6 +732,7 @@ finds implementations that are in the "Stale" state, then that maintainer will:
 
 * Inform the other maintainers and get their agreement on the list of stale and
 to-be-removed implementations
+* Open a draft PR with the changes to this page.
 * Post on the #sig-network-gateway-api channel informing the maintainers of
 implementations that are no longer at least partially conformant should contact
 the Gateway API maintainers to discuss the implementation's status. This period
@@ -730,19 +742,21 @@ as a lazy consensus period.
 downgraded in status, either by being moved to "Stale", or being removed
 from this page if they are already "Stale".
 
-Page review timeline, starting with the v1.3 Page Review:
+Page review timeline, starting with the v1.4 Page Review:
 
-* Gateway API v1.3 release Page Review: a maintainer will move anyone who hasn't
-  submitted a conformance report using the rules above to "Stale". They will also
-  contact anyone who moves to Stale to inform them about this rule change.
 * Gateway API v1.4 release Page Review (at least one month after the actual
+  release): a maintainer will move anyone who hasn't submitted a conformance
+  report using the rules above to "Stale". They will also contact anyone who
+  moves to Stale to inform them about this rule change.
+  **You are here**
+* Gateway API v1.5 release Page Review (at least one month after the actual
   release): A maintainer will perform the Page Review process again, removing
   any implementations that are are still Stale (after a right-of-reply period).
-* Gateway API v1.5 release Page Review (at least one month after the actual
+* Gateway API v1.6 release Page Review (at least one month after the actual
   release): We will remove the Stale category, and implementation maintainers
   will need to be at least partially conformant on each review, or during the
   right-of-reply period, or be removed from the implementations page.
 
-This means that, after the Gateway API v1.5 release, implementations cannot be
+This means that, after the Gateway API v1.6 release, implementations cannot be
 added to this page unless they have submitted at least a Partially Conformant
 conformance report.
