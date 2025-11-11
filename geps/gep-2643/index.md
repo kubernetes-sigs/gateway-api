@@ -17,7 +17,7 @@ terminated on the Gateway before being passed unencrypted to a backend.
 ## Goals
 
 * Provide a TLS route type, based on the SNI identification.
-* Support both Termination (extended support) and Passthrough (core support) TLS modes for TLSRoute
+* Support both Passthrough (core support) and Termination (extended support) TLS modes for TLSRoute
 * Provide load balancing of a TLS route, allowing a user to define a route, 
 based on the SNI identification that should pass the traffic to N load balanced backends
 
@@ -34,6 +34,8 @@ based on the SNI identification that should pass the traffic to N load balanced 
 between the Gateway and the backend.
 * Support TLS over UDP or UDP-based protocols such as `QUIC`.
 * Support attributes other than the SNI/hostname for the route selection
+* Support multiplexing (HTTPS and TLS protocols) on the same Listener - This should be covered
+on a different GEP
 
 ## Introduction
 
@@ -333,23 +335,10 @@ happens.
 and passes through the request directly to one or more objects,
 i.e. `Service`, in the cluster based on `backendRefs` rules of the `TLSRoute`.
 
-### TLSRoute + HTTPs multiplexing
-In the case of TLSRoute + HTTPs multiplexing, it should operate similarly to the 
-mixed TLSRoute, but instead of decrypting and passing the TCP connection as is to 
-the backend, the proper HTTPRoute workflow should happen.
-
-Multiplexing is supported on `Implementation Specific` support level.
-
 ## Conflict management and precedences
 
 The following conflict situations are covered by TLSRoute cases:
 
-* When a Gateway supports [Multiplexing](#multiplexing-support) it CAN allow multiple
-listeners on the same port, as soon as they do not conflict on `hostnames` and `tls.mode`.
-* When a Gateway does not support [Multiplexing](#multiplexing-support) and contains 
-a listener with `protocol=TLS`, the Gateway MUST NOT allow any other kind of 
-listener on the same port, and any violating Listener should have a Condition 
-`OverlappingTLSConfig=True` with the reason `OverlappingProtocols`.
 * If a hostname is specified by both the `Listener` and `TLSRoute`, there must
 be at least one intersecting hostname for the `TLSRoute` to be attached to the
 `Listener`.  
@@ -366,47 +355,12 @@ be at least one intersecting hostname for the `TLSRoute` to be attached to the
   the later must not be considered for a match.  
   * In any of the cases above, the `TLSRoute` should have a `Condition` of `Accepted=True`.
 
-## Multiplexing support
-
-It may be desired that on a `Gateway` a single TLS listener provides termination 
-for `HTTPRoutes` and passthrough to `TLSRoutes`.
-
-This can be achieved with a `Gateway` that specifies the following listeners:
-
-```yaml
-  listeners:
-  - name: somelistener
-    port: 443
-    protocol: TLS
-    hostname: "*.example.tld"
-    tls:
-      mode: Passthrough
-  - name: httpslistener
-    port: 443
-    protocol: HTTPS
-    hostname: "*.anotherexample.tld"
-    tls:
-      mode: Terminate
-      certificateRefs: ...
-```
-
-With the specification above, any request to hostnames on `*.example.tld` should be 
-attached to `TLSRoutes` while requests to `*.anotherexample.tld` are terminated 
-on the `Gateway` and attached to a `HTTPRoute`.
-
-The support for Multiplexing on TLS is `Implementation Specific`, and implementations
-that support this feature MUST announce it on `GatewayClass.Status.SupportedFeatures`.
-
-Implementations that don't support multiplexing SHOULD mark the violating listeners with
-a Condition `Conflicted=True`.
-
 ## Conformance Details
 
 ###  Feature Names
 
 * TLSRoute
 * TLSRouteTermination
-* TLSMultiplexing
 
 ### Conformance tests
 
@@ -417,7 +371,6 @@ a Condition `Conflicted=True`.
 | A TLSRoute trying to attach to a gateway without a “tls” listener should be rejected  | Condition on the TLSRoute that it was rejected (discuss with community the right condition to be used here) | [https://github.com/kubernetes-sigs/gateway-api/issues/1579](https://github.com/kubernetes-sigs/gateway-api/issues/1579)  |
 | A TLSRoute with a hostname that does not match the Gateway hostname should be rejected (eg.: route with hostname [www.example.com](http://www.example.com), gateway with hostname www1.example.com) | Condition on the TLSRoute that it was rejected |  |
 | A TLSRoute with an IP on its hostname should be rejected | Condition on the TLSRoute that it was rejected |  |
-| A Gateway containing a Listener of type TLS/Passthrough and a Listener of type HTTPS/Terminate should be accepted, and should multiplex the requests to TLSRoute and HTTPRoute correctly | Being able to do a request to a HTTP route being terminated on gateway (eg.: terminated.example.tld/xpto) and to a TLS Passthrough route on the same gateway, but different host (passthrough.example.tld) |  |
 | A Gateway containing a Listener of type TLS/Passthrough and a Listener of type TLS/Terminate should be accepted, and should direct the requests to the right TLSRoute | Being able to do a request to a TLS route being terminated on gateway (eg.: terminated.example.tld/xpto) and to a TLS Passthrough route on the same gateway, but different host (passthrough.example.tld) |  |
 | A Gateway with \*.example.tld on a TLS listener should allow a TLSRoute with hostname some.example.tld to be attached to it (and the same, but with a non wildcard hostname) | TLSRoute should be able to attach to the Gateway using the matching hostname, a request should succeed | [https://github.com/kubernetes-sigs/gateway-api/issues/1579](https://github.com/kubernetes-sigs/gateway-api/issues/1579)  |
 | A Gateway with something.example.tld on a TLS listener hostname should not allow a TLSRoute of \*.example.tld to be attached  | TLSRoute should be rejected with invalid hostname (we should NOT support wildcard hostnames on a TLSRoute spec) | [https://github.com/kubernetes-sigs/gateway-api/issues/1579](https://github.com/kubernetes-sigs/gateway-api/issues/1579)  |
@@ -433,7 +386,6 @@ Pending conformance verifications:
 * [Existing API](https://github.com/kubernetes-sigs/gateway-api/blob/main/apis/v1alpha3/tlsroute_types.go)
 * [TLS Terminology - Needs update](https://github.com/kubernetes-sigs/gateway-api/blob/d28cd59d37887be07b879f098cff7b14a87c0080/geps/gep-2907/index.md?plain=1#L29)
 * [TLSRoute promotion issue](https://github.com/kubernetes-sigs/gateway-api/issues/3165)
-* [TLS Multiplexing issue discussion](https://github.com/kubernetes-sigs/gateway-api/issues/623)
 * [TLSRoute intersecting hostnames issue](https://github.com/kubernetes-sigs/gateway-api/issues/3541)
 * [TLSRoute termination feature request](https://github.com/kubernetes-sigs/gateway-api/issues/2111)
 * [GatewayAPI TLS Use Cases](https://docs.google.com/document/d/17sctu2uMJtHmJTGtBi_awGB0YzoCLodtR6rUNmKMCs8)
