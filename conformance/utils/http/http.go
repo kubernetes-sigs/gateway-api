@@ -87,6 +87,8 @@ type ExpectedRequest struct {
 	// AbsentHeaders are names of headers that are expected
 	// *not* to be present on the request.
 	AbsentHeaders []string
+	// If set, CompareRoundTrip asserts the echoed httpPort equals this value.
+	HTTPPort string
 }
 
 // Response defines expected properties of a response from a backend.
@@ -360,6 +362,10 @@ func CompareRoundTrip(t *testing.T, req *roundtripper.Request, cReq *roundtrippe
 					return fmt.Errorf("expected %s header to be set to %s, got %s", name, expectedVal, strings.Join(actualVal, ","))
 				}
 			}
+		}
+
+		if expected.ExpectedRequest.HTTPPort != "" && expected.ExpectedRequest.HTTPPort != cReq.HTTPPort {
+			return fmt.Errorf("expected httpPort %q, got %q", expected.ExpectedRequest.HTTPPort, cReq.HTTPPort)
 		}
 
 		if expected.Response.Headers != nil {

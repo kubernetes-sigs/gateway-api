@@ -241,13 +241,13 @@ APISIX currently supports Gateway API `v1beta1` version of the specification for
 
 [Avi Kubernetes Operator (AKO)][ako] provides L4-L7 load-balancing using VMware AVI Advanced Load Balancer.
 
-Starting with AKO version [v1.13.1], Gateway API version v1.0.0 is supported. It implements v1 version of Gateway API specification supporting GatewayClass, Gateway and HTTPRoute objects.
+Starting with AKO version [v2.1.1], Gateway API version v1.3.0 is supported. It implements v1 version of Gateway API specification supporting GatewayClass, Gateway and HTTPRoute objects.
 
 Documentation to deploy and use AKO Gateway API can be found at [Avi Kubernetes Operator Gateway API][ako-gw].
 
-[ako]:https://techdocs.broadcom.com/us/en/vmware-security-load-balancing/avi-load-balancer/avi-kubernetes-operator/AKO/avi-kubernetes-operator-1-13/avi-kubernetes-operator.html
-[ako-gw]:https://techdocs.broadcom.com/us/en/vmware-security-load-balancing/avi-load-balancer/avi-kubernetes-operator/AKO/avi-kubernetes-operator-1-13/gateway-api/gateway-api-v1.html
-[v1.13.1]:https://github.com/vmware/load-balancer-and-ingress-services-for-kubernetes
+[ako]:https://techdocs.broadcom.com/us/en/vmware-security-load-balancing/avi-load-balancer/avi-kubernetes-operator/2-1.html
+[ako-gw]:https://techdocs.broadcom.com/us/en/vmware-security-load-balancing/avi-load-balancer/avi-kubernetes-operator/2-1/avi-kubernetes-operator-guide-2-1/gateway-api/gateway-api-v1.html
+[v2.1.1]:https://github.com/vmware/load-balancer-and-ingress-services-for-kubernetes
 
 ### Azure Application Gateway for Containers
 
@@ -261,7 +261,7 @@ Documentation to deploy and use AKO Gateway API can be found at [Avi Kubernetes 
 
 ### Cilium
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.3.0-Cilium-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.3.0/cilium-cilium)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.4.0-Cilium-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.4.0/cilium)
 
 [Cilium][cilium] is an eBPF-based networking, observability and security
 solution for Kubernetes and other networking environments. It includes [Cilium
@@ -269,7 +269,7 @@ Service Mesh][cilium-service-mesh], a highly efficient mesh data plane that can
 be run in [sidecarless mode][cilium-sidecarless] to dramatically improve
 performance, and avoid the operational complexity of sidecars. Cilium also
 supports the sidecar proxy model, offering choice to users.
-Cilium supports Gateway API, passing conformance for v1.3.0 as of [Cilium 1.18][cilium118blog].
+Cilium supports Gateway API, passing conformance for v1.4.0 as of Cilium 1.19
 
 Cilium is open source and is a CNCF Graduated project.
 
@@ -600,7 +600,7 @@ STUNner currently supports version `v1alpha2` of the Gateway API specification. 
 
 ### Traefik Proxy
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.3.0-Traefik Proxy-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.3.0/traefik-traefik)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.4.0-Traefik Proxy-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.4.0/traefik-traefik)
 
 [Traefik Proxy][traefik-proxy] is an open source cloud-native application proxy.
 
