@@ -74,7 +74,9 @@ If no authorization policies exist for a workload, traffic is permitted by defau
 
 ### Target of Authorization
 
-The `targetRef` of the policy specifies the workload(s) to which the policy applies
+The `targetRef` of the policy specifies the workload(s) to which the policy applies.
+
+Note: Its worth noting that a policy will only ever target objects within the its namespace. Targeting objects in different namespaces brings security concerns, and while some implementations has some semantics to target across all namespaces (cluster-wide), the overall preference is to have a specific ClusterAuthorizationPolicy resource for this purpose.
 
 > Note: in sidecar mode, it happens to also be the policy enforcement point, in ambient however, this is not true.
 
@@ -313,10 +315,11 @@ type AuthorizationPolicySpec struct {
 // AuthorizationRule defines a single authorization rule.
 // A request matches the rule if it matches ALL fields specified.
 type AuthorizationRule struct {
-    // Source specifies who is making the request.
+    // Sources specify a list of sources to match. 
+    // a request matches this policy if it matches **any** of the specified sources (logical OR).
     // If omitted, matches any source.
     // +optional
-    Source *AuthorizationSource `json:"source,omitempty"`
+    Sources []*AuthorizationSource `json:"sources,omitempty"`
 
     // NetworkAttributes specifies TCP-level matching criteria.
     // If omitted, matches any TCP traffic.
@@ -324,33 +327,35 @@ type AuthorizationRule struct {
     NetworkAttributes *AuthorizationNetworkAttributes `json:"networkAttributes,omitempty"`
 }
 
+// AuthorizationSourceType identifies a type of source for authorization.
+// +kubebuilder:validation:Enum=ServiceAccount;SPIFFE
+type AuthorizationSourceType string
 
+const (
+  // AuthorizationSourceTypeSPIFFE is used to identify a request matches a SPIFFE Identity.
+
+  AuthorizationSourceTypeSPIFFE AuthorizationSourceType = "SPIFFE"
+
+  // AuthorizationSourceTypeServiceAccount is used to identify a request matches a ServiceAccount from within the cluster.
+
+  AuthorizationSourceTypeServiceAccount AuthorizationSourceType = "ServiceAccount"
+)
 
 // Source specifies the source of a request.
 //
-// At least one field may be set. If multiple fields are set,
-// a request matches this Source if it matches
-// **any** of the specified criteria (logical OR across fields).
+// Type must be set to indicate the type of source type.
+// Similarly, either SPIFFE or Serviceaccount can be set based on the type.
 //
-// For example, if both `Identities` and `ServiceAccounts` are provided,
-// the rule matches a request if either:
-// - the request's identity is in `Identities`
-// - OR the request's Serviceaccount matches an entry in `ServiceAccounts`.
-//
-// Each list within the fields (e.g. `Identities`) is itself an OR list.
-//
-// If this struct is omitted in a rule, it matches any source.
-//
-// <gateway:util:excludeFromCRD> NOTE: In the future, if there’s a need to express more complex
-// logical conditions (e.g. requiring a request to match multiple
-// criteria simultaneously—logical AND), we may evolve this API
-// to support richer match expressions or logical operators. </gateway:util:excludeFromCRD>
 type Source struct {
 
-    // Identities specifies a list of identities that are matched by this rule.
-    // A request's identity must be present in this list to match the rule.
+    // +unionDiscriminator
+    // +kubebuilder:validation:Enum=ServiceAccount;SPIFFE
+    // +required
+    Type AuthorizationSourceType `json:"type"`
+
+    // spiffe specifies an identity that is matched by this rule.
     //
-    // Identities must be specified as SPIFFE-formatted URIs following the pattern:
+    // spiffe identities must be specified as SPIFFE-formatted URIs following the pattern:
     //   spiffe://<trust_domain>/<workload-identifier>
     //
     // While the exact workload identifier structure is implementation-specific,
@@ -358,7 +363,7 @@ type Source struct {
     // `spiffe://<trust_domain>/ns/<namespace>/sa/<serviceaccount>`
     // when representing Kubernetes workload identities.
     //
-    // Identities for authorization can be derived in various ways by the underlying
+    // spiffe identities for authorization can be derived in various ways by the underlying
     // implementation. Common methods include:
     // - From peer mTLS certificates: The identity is extracted from the client's
     //   mTLS certificate presented during connection establishment.
@@ -373,33 +378,33 @@ type Source struct {
     // within the request itself.
     //
     // +optional
-    Identities []string `json:"identities,omitempty"`
+    SPIFFE *AuthorizationSourceSPIFFE `json:"spiffe,omitempty"`
 
-    // ServiceAccounts specifies a list of Kubernetes Service Accounts that are
+    // ServiceAccount specifies a Kubernetes Service Account that is
     // matched by this rule. A request originating from a pod associated with
-    // one of these Serviceaccounts will match the rule.
+    // this serviceaccount will match the rule.
     //
-    // Values must be in one of the following formats:
-    //   - "<namespace>/<serviceaccount-name>": A specific Serviceaccount in a namespace.
-    //   - "<namespace>/*": All Serviceaccounts in the given namespace.
-    //   - "<serviceaccount-name>": a Serviceaccount in the same namespace as the policy.
-    //
-    // Use of "*" alone (i.e., all Serviceaccounts in all namespaces) is not allowed.
-    // To select all Serviceaccounts in the current namespace, use "<namespace>/*" explicitly.
-    //
-    // Example:
-    //   - "default/bookstore" → Matches Serviceaccount "bookstore" in namespace "default"
-    //   - "payments/*" → Matches any Serviceaccount in namespace "payments"
-    //   - "frontend" → Matches "frontend" Serviceaccount in the same namespace as the policy
-    //
-    // The ServiceAccounts listed here are expected to exist within the same
+    // The ServiceAccount listed here is expected to exist within the same
     // trust domain as the targeted workload, which in many environments means
     // the same Kubernetes cluster. Cross-cluster or cross-trust-domain access
-    // should instead be expressed using the `Identities` field.
-    // 
-    // +optional 
-    ServiceAccounts []string `json:"serviceAccounts,omitempty"`
+    // should instead be expressed using the `SPIFFE` field.
+    // +optional
+    ServiceAccount AuthorizationSourceServiceAccount `json:"serviceAccount,omitempty"`
 }
+
+type AuthorizationSourceSPIFFE AbsoluteURI
+
+type AuthorizationSourceServiceAccount struct {
+  // Namespace is the namespace of the ServiceAccount
+  // If not specified, current namespace (the namespace of the policy) is used.
+  Namespace *Namespace `json:"namespace,omitempty"`
+
+  // Name is the name of the ServiceAccount. 
+  // Use "*" to indicate all serviceaccounts in the namespace.
+  // +required
+  Name string `json:"name"`
+}
+
 
 // AuthorizationAttribute defines L4 properties of a request destination.
 type AuthorizationNetworkAttributes struct {
