@@ -2,10 +2,10 @@
 
 ## Table of Contents
 
-| API channel  | Implementation version                                                        | Mode                         | Report                                                                |
-|--------------|-------------------------------------------------------------------------------|------------------------------|-----------------------------------------------------------------------|
-| experimental | [v1.6.0-rc.1](https://github.com/envoyproxy/gateway/releases/tag/v1.6.0-rc.1) | ControllerNamespace(default) | [link](./experimental-v1.6.0-rc.1-default-report.yaml)                |
-| experimental | [v1.6.0-rc.1](https://github.com/envoyproxy/gateway/releases/tag/v1.6.0-rc.1) | GatewayNamespace             | [link](./experimental-v1.6.0-rc.1-gateway-namespace-mode-report.yaml) |
+| API channel  | Implementation version                                              | Mode                         | Report                                                           |
+| ------------ | ------------------------------------------------------------------- | ---------------------------- | ---------------------------------------------------------------- |
+| experimental | [v1.6.0](https://github.com/envoyproxy/gateway/releases/tag/v1.6.0) | ControllerNamespace(default) | [link](./experimental-v1.6.0-default-report.yaml)                |
+| experimental | [v1.6.0](https://github.com/envoyproxy/gateway/releases/tag/v1.6.0) | GatewayNamespace             | [link](./experimental-v1.6.0-gateway-namespace-mode-report.yaml) |
 
 
 ## Overview
