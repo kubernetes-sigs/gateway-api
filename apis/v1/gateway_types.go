@@ -1251,7 +1251,8 @@ const (
 	// This condition indicates whether the controller was able to resolve all
 	// the object references for the Gateway that are not part of a specific
 	// Listener configuration, and also provides a positive-polarity summary of
-	// the Listener's "ResolvedRefs" condition.
+	// Listener's "ResolvedRefs" condition. This condition does not directly
+	// impact the Gateway's Accepted or Programmed conditions.
 	//
 	// Possible reasons for this condition to be True are:
 	//
