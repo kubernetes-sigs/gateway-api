@@ -526,20 +526,30 @@ const (
 
 // GatewayBackendTLS describes backend TLS configuration for gateway.
 type GatewayBackendTLS struct {
-	// ClientCertificateRef is a reference to an object that contains a Client
-	// Certificate and the associated private key.
+	// ClientCertificateRef references an object that contains a client certificate
+	// and its associated private key. It can reference standard Kubernetes resources,
+	// i.e., Secret, or implementation-specific custom resources.
 	//
-	// References to a resource in different namespace are invalid UNLESS there
-	// is a ReferenceGrant in the target namespace that allows the certificate
-	// to be attached. If a ReferenceGrant does not allow this reference, the
-	// "ResolvedRefs" condition MUST be set to False for this listener with the
-	// "RefNotPermitted" reason.
+	// A ClientCertificateRef is considered invalid if:
 	//
-	// ClientCertificateRef can reference to standard Kubernetes resources, i.e.
-	// Secret, or implementation-specific custom resources.
+	// * It refers to a resource that cannot be resolved (e.g., the referenced resource
+	//   does not exist) or is misconfigured (e.g., a Secret does not contain the keys
+	//   named `tls.crt` and `tls.key`). In this case, the `ResolvedRefs` condition
+	//   on the Gateway MUST be set to False with the Reason `InvalidClientCertificateRef`
+	//   and the Message of the Condition MUST indicate why the reference is invalid.
 	//
-	// Support: Core
+	// * It refers to a resource in another namespace UNLESS there is a ReferenceGrant
+	//   in the target namespace that allows the certificate to be attached.
+	//   If a ReferenceGrant does not allow this reference, the `ResolvedRefs` condition
+	//   on the Gateway MUST be set to False with the Reason `RefNotPermitted`.
 	//
+	// Implementations MAY choose to perform further validation of the certificate
+	// content (e.g., checking expiry or enforcing specific formats). In such cases,
+	// an implementation-specific Reason and Message MUST be set.
+	//
+	// Support: Core - Reference to a Kubernetes TLS Secret (with the type `kubernetes.io/tls`).
+	// Support: Implementation-specific - Other resource kinds or Secrets with a
+	// different type (e.g., `Opaque`).
 	// +optional
 	// <gateway:experimental>
 	ClientCertificateRef *SecretObjectReference `json:"clientCertificateRef,omitempty"`
@@ -1235,6 +1245,57 @@ const (
 
 	// Deprecated: Use "Pending" instead.
 	GatewayReasonNotReconciled GatewayConditionReason = "NotReconciled"
+)
+
+const (
+	// This condition indicates whether the controller was able to resolve all
+	// the object references for the Gateway that are not part of a specific
+	// Listener configuration, and also provides a positive-polarity summary of
+	// Listener's "ResolvedRefs" condition. This condition does not directly
+	// impact the Gateway's Accepted or Programmed conditions.
+	//
+	// Possible reasons for this condition to be True are:
+	//
+	// * "ResolvedRefs"
+	//
+	// Possible reasons for this condition to be False are:
+	//
+	// * "RefNotPermitted"
+	// * "InvalidClientCertificateRef"
+	// * "ListenersNotResolved"
+	//
+	// Controllers may raise this condition with other reasons, but should
+	// prefer to use the reasons listed above to improve interoperability.
+	//
+	// Note: This condition is considered Experimental and may change in future
+	// releases of the API.
+	GatewayConditionResolvedRefs GatewayConditionType = "ResolvedRefs"
+
+	// This reason is used with the "ResolvedRefs" condition when the condition
+	// is true.
+	GatewayReasonResolvedRefs GatewayConditionReason = "ResolvedRefs"
+
+	// This reason is used with the "ResolvedRefs" condition when the Gateway
+	// has an invalid ClientCertificateRef in its backend TLS configuration.
+	// A ClientCertificateRef is considered invalid when it refers to a
+	// nonexistent or unsupported resource or kind, or when the data within
+	// that resource is malformed.
+	// This reason must be used only when the reference is allowed, either by
+	// referencing an object in the same namespace as the Gateway, or when
+	// a cross-namespace reference has been explicitly allowed by a ReferenceGrant.
+	// If the reference is not allowed, the reason RefNotPermitted must be used
+	// instead.
+	GatewayReasonInvalidClientCertificateRef GatewayConditionReason = "InvalidClientCertificateRef"
+
+	// This reason is used with the "ResolvedRefs" condition when the Gateway
+	// has a top-level backend TLS configuration that references an object in
+	// another namespace, where the object in the other namespace does not have
+	// a ReferenceGrant explicitly allowing the reference.
+	GatewayReasonRefNotPermitted GatewayConditionReason = "RefNotPermitted"
+
+	// This reason is used with the "ResolvedRefs" condition when one or more
+	// Listeners have their "ResolvedRefs" condition set to false in their status.
+	GatewayReasonListenersNotResolved GatewayConditionReason = "ListenersNotResolved"
 )
 
 const (
