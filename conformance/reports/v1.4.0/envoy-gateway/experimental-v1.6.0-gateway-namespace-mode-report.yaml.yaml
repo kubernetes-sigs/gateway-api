@@ -1,5 +1,5 @@
 apiVersion: gateway.networking.k8s.io/v1
-date: "2025-10-31T17:36:32Z"
+date: "2025-11-11T06:59:42Z"
 gatewayAPIChannel: experimental
 gatewayAPIVersion: v1.4.0
 implementation:
@@ -8,10 +8,31 @@ implementation:
   organization: envoyproxy
   project: envoy-gateway
   url: https://github.com/envoyproxy/gateway
-  version: v1.6.0-rc.1
+  version: v1.6.0
 kind: ConformanceReport
 mode: gateway-namespace-mode
 profiles:
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 11
+      Skipped: 0
+  extended:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 2
+      Skipped: 0
+    supportedFeatures:
+    - GatewayAddressEmpty
+    - GatewayHTTPListenerIsolation
+    - GatewayInfrastructurePropagation
+    - GatewayPort8080
+    unsupportedFeatures:
+    - GatewayStaticAddresses
+  name: GATEWAY-TLS
+  summary: Core tests succeeded. Extended tests succeeded.
 - core:
     result: success
     statistics:
@@ -73,27 +94,6 @@ profiles:
     unsupportedFeatures:
     - GatewayStaticAddresses
   name: GATEWAY-HTTP
-  summary: Core tests succeeded. Extended tests succeeded.
-- core:
-    result: success
-    statistics:
-      Failed: 0
-      Passed: 11
-      Skipped: 0
-  extended:
-    result: success
-    statistics:
-      Failed: 0
-      Passed: 2
-      Skipped: 0
-    supportedFeatures:
-    - GatewayAddressEmpty
-    - GatewayHTTPListenerIsolation
-    - GatewayInfrastructurePropagation
-    - GatewayPort8080
-    unsupportedFeatures:
-    - GatewayStaticAddresses
-  name: GATEWAY-TLS
   summary: Core tests succeeded. Extended tests succeeded.
 succeededProvisionalTests:
 - GRPCRouteNamedRule
