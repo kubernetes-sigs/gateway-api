@@ -1,0 +1,81 @@
+name: New Release Issue
+
+on:
+    release:
+        types: [published]
+
+jobs:
+    create_release_issue:
+        runs-on: ubuntu-latest
+
+        permissions:
+            contents: write
+            issues: write
+            pull-requests: write
+
+        env:
+            OWNER_FILE: roles/blog-post-team.yml
+            GH_TOKEN: ${{ github.token }}
+
+        steps:
+            - name: 1. Checkout repository code
+              uses: actions/checkout@v4
+
+            - name: 2. Extract Assignee from Nested OWNERS File
+              env:
+                  RELEASE_VERSION: ${{ github.event.release.tag_name }}
+                  ISSUE_BODY: |
+                      A new Gateway API version for standard channel has been released and we need to publish the corresponding blog post.
+
+                      **Release Name:** ${{ github.event.release.name }}
+                      **Tag:** ${{ github.event.release.tag_name }}
+                      **Date Created:** ${{ github.event.release.created_at }}
+
+                      Release announcement should go live within 30 days from the date created, and the draft PR should be proposed to the `kubernetes/website` repository at least 14 days before the go-live date for sigs-doc team to give enough time for review.
+
+                      Please adhere to the k8s [blog post guidelines](https://kubernetes.io/docs/contribute/blog/article-submission/#route-1) when drafting the post.
+
+                      Feature leads that contributed to this release should provide writeup for their features to be included in the blog post.
+
+                      [View the full release notes here](${{ github.event.release.html_url }})
+
+              run: |
+                  OWNERS=$(yq '.blog-post-owners.members[]' ${{ env.OWNER_FILE }})
+                  OWNER_ARRAY=($OWNERS)
+                  OWNER_COUNT=${#OWNER_ARRAY[@]}
+                  LAST_ASSIGNEE=$(yq '.blog-post-owners.last-assignee' ${{ env.OWNER_FILE }})
+
+                  NEXT_INDEX=0
+                  if [ -n "$LAST_ASSIGNEE" ]; then
+                    for i in "${!OWNER_ARRAY[@]}"; do
+                      if [[ "${OWNER_ARRAY[$i]}" = "$LAST_ASSIGNEE" ]]; then
+                        NEXT_INDEX=$(( (i + 1) % OWNER_COUNT ))
+                        break
+                      fi
+                    done
+                  fi
+
+                  ASSIGNEE=${OWNER_ARRAY[$NEXT_INDEX]}
+                  echo "Assigning issue to: ${ASSIGNEE} (Index: ${NEXT_INDEX})"
+
+                  gh issue create \
+                    --title "Publish $RELEASE_VERSION release blog post!" \
+                    --body "$ISSUE_BODY" \
+                    --assignee "$ASSIGNEE"
+
+                  FILE_TO_UPDATE="${{ env.OWNER_FILE }}"
+                  id=$ASSIGNEE yq -i '.blog-post-owners.last-assignee = env(id)' $FILE_TO_UPDATE
+                  echo "Updated $FILE_TO_UPDATE: last-assigned-user is now $ASSIGNEE"
+
+            - name: 3. Commit Updated Team File
+              run: |
+                  git config user.name github-actions
+                  git config user.email github-actions@github.com
+                  git add .
+                  git commit -m "chore: Update last assigned owner in team.yml"
+
+            - name: 4. Push changes
+              uses: ad-m/github-push-action@master
+              with:
+                  branch: ${{ github.head_ref }}
+                  force: true
