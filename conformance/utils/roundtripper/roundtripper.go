@@ -93,10 +93,11 @@ type CapturedRequest struct {
 }
 
 type TLS struct {
-	Version            string `json:"version"`
-	ServerName         string `json:"serverName"`
-	NegotiatedProtocol string `json:"negotiatedProtocol"`
-	CipherSuite        string `json:"cipherSuite"`
+	Version            string   `json:"version"`
+	ServerName         string   `json:"serverName"`
+	NegotiatedProtocol string   `json:"negotiatedProtocol"`
+	CipherSuite        string   `json:"cipherSuite"`
+	PeerCertificates   []string `json:"peerCertificates"`
 }
 
 // RedirectRequest contains a follow up request metadata captured from a redirect
