@@ -30,6 +30,8 @@ const (
 
 var (
 	GatewayClassName           = flag.String("gateway-class", "gateway-conformance", "Name of GatewayClass to use for tests")
+	UsableAddress              = flag.String("usable-address", "", "Usable address for GatewayStaticAddresses test")
+	UnusableAddress            = flag.String("unusable-address", "", "Unusable address for GatewayStaticAddresses test")
 	MeshName                   = flag.String("mesh-name", "", "Name of Mesh to use for tests")
 	ShowDebug                  = flag.Bool("debug", false, "Whether to print debug logs")
 	CleanupBaseResources       = flag.Bool("cleanup-base-resources", true, "Whether to cleanup base test resources after the run")
