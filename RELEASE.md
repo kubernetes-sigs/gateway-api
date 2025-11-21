@@ -45,6 +45,7 @@ The following steps must be done by one of the [Gateway API maintainers][gateway
   in the upcoming steps.
 - Use `git` to cherry-pick all relevant PRs into your branch.
 - Update `pkg/consts/consts.go` with the new semver tag and any updates to the API review URL.
+- Update regex spec.validations.expression in `config/crd/standard/gateway.networking.k8s.io_vap_safeupgrades.yaml` to match older versions.
 - Run the following command `BASE_REF=vmajor.minor.patch make generate` which
   will update generated docs with the correct version info. (Note that you can't
   test with these YAMLs yet as they contain references to elements which wont
@@ -63,6 +64,7 @@ The following steps must be done by one of the [Gateway API maintainers][gateway
 - Cut a `release-major.minor` branch that we can tag things in as needed.
 - Check out the `release-major.minor` release branch locally.
 - Update `pkg/consts/consts.go` with the new semver tag and any updates to the API review URL.
+- Update regex spec.validations.expression in `config/crd/standard/gateway.networking.k8s.io_vap_safeupgrades.yaml` to match older versions.
 - Run the following command `BASE_REF=vmajor.minor.patch make generate` which
   will update generated docs with the correct version info. (Note that you can't
   test with these YAMLs yet as they contain references to elements which wont
