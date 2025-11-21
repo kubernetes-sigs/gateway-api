@@ -13,7 +13,7 @@ Provide a method for configuring Gateway API Mesh implementations to enforce eas
 
 (Using the [Gateway API Personas](../../concepts/roles-and-personas.md))
 
-* A way for Ana the Application Developer to configure a Gateway API for Mesh implementation to enforce authorization policy that **allows** identity or multiple identities to talk with some set (could be namespace or more granualr) of the workloads she controls.
+* A way for Ana the Application Developer to configure a Gateway API for Mesh implementation to enforce authorization policy that **allows** identity or multiple identities to talk with some set (could be namespace or more granular) of the workloads she controls.
 
 * A way for both Ana and Chihiro to restrict the scope of the policies they deploy to specific ports.
 
@@ -23,7 +23,7 @@ Provide a method for configuring Gateway API Mesh implementations to enforce eas
 
 * A way for Chihiro, the Cluster Admin, to configure a Gateway API for Mesh implementation to enforce non-overridable cluster-wide, authorization policies that **allows** or **denies** identity or multiple identities to talk with some set of the workloads in the cluster.
 
-* A way for Chihiro, the Cluster Admin, to configure a Gateway API for Mesh implementation to enforce default, overridable, cluster-wide, authorization policies that **allows** or **denies** identity or multiple identities to talk with some set of the workloads in the cluster.
+* A way for Chihiro, the Cluster Admin, to configure a Gateway API for Mesh implementation to enforce default, overridable, cluster-wide, authorization policies that **allows** identity or multiple identities to talk with some set of the workloads in the cluster.
 
 ## Deferred Goals
 
@@ -55,7 +55,7 @@ This GEP does not define support for L7 authorization policy (see the [Future En
 
 ### Policy Rules
 
-Each `AuthorizationPolicy` resource contains a list of rules. A request matches the policy if it matches **any** rule in the list (logical OR). Each rule defines multiple matching criteria; a request matches a rule only if it matches **all** criteria within that rule (logical AND).
+Each `AuthorizationPolicy` resource contains a list of rules. The policy action is applied if the request matches **any** rule in the list (logical OR). Each rule defines multiple matching criteria; a request matches a rule only if it matches **all** criteria within that rule (logical AND).
 
 A rule may specify:
 
@@ -70,7 +70,7 @@ A rule may specify:
 
 The only currently-defined policy action is `ALLOW`. A request is allowed if and only if it matches at least one rule in any ALLOW policy targeting the workload.
 
-If no authorization policies exist for a workload, traffic is permitted by default.
+If no authorization policies exist for a workload, and no other policies exist in the cluster or namespace which would deny traffic to the workload, traffic is permitted by default.
 
 ### Target of Authorization
 
@@ -221,8 +221,8 @@ An empty pod selector to target all **workloads** in the namespace. Kubernetes o
 
 ```yaml
 targetRefs:
-- Kind: Pod
-  Selector: {}
+- kind: Pod
+  selector: {}
 ```
 
 This provides a clearer separation between workloads and gateways. Gateways that happen to be Pods in the cluster, will also get selected. However they can be excluded with the right `matchExpression` if desired.
@@ -231,8 +231,8 @@ Below is a pseudo example:
 
 ```yaml
 targetRefs:
-- Kind: Pod
-  Selector:
+- kind: Pod
+  selector:
     matchExpression:
     - { key: "purpose", operator: NotIn, values: ["gateway"] }
 ```
@@ -307,16 +307,17 @@ type AuthorizationPolicySpec struct {
     Action AuthorizationPolicyAction `json:"action"`
 
     // Rules defines the list of authorization rules.
-    // A request matches the policy if it matches any of these rules.
+    // The policy action is applied if the request matches any of these rules.
     // +optional
     Rules []AuthorizationRule `json:"rules,omitempty"`
 }
 
 // AuthorizationRule defines a single authorization rule.
-// A request matches the rule if it matches ALL fields specified.
+// A request matches the rule if it matches both Sources and NetworkAttributes specified (logical AND).
 type AuthorizationRule struct {
     // Sources specify a list of sources to match. 
     // a request matches this policy if it matches **any** of the specified sources (logical OR).
+    // If specified as an empty list, matches **no** sources ("allow nothing").
     // If omitted, matches any source.
     // +optional
     Sources []*AuthorizationSource `json:"sources,omitempty"`
@@ -358,10 +359,7 @@ type Source struct {
     // spiffe identities must be specified as SPIFFE-formatted URIs following the pattern:
     //   spiffe://<trust_domain>/<workload-identifier>
     //
-    // While the exact workload identifier structure is implementation-specific,
-    // implementations are encouraged to follow the convention of
-    // `spiffe://<trust_domain>/ns/<namespace>/sa/<serviceaccount>`
-    // when representing Kubernetes workload identities.
+    // The exact workload identifier structure is implementation-specific.
     //
     // spiffe identities for authorization can be derived in various ways by the underlying
     // implementation. Common methods include:
@@ -385,13 +383,13 @@ type Source struct {
     // this serviceaccount will match the rule.
     //
     // The ServiceAccount listed here is expected to exist within the same
-    // trust domain as the targeted workload, which in many environments means
-    // the same Kubernetes cluster. Cross-cluster or cross-trust-domain access
+    // trust domain as the targeted workload. Cross-trust-domain access
     // should instead be expressed using the `SPIFFE` field.
     // +optional
     ServiceAccount AuthorizationSourceServiceAccount `json:"serviceAccount,omitempty"`
 }
 
+// +kubebuilder:validation:XValidation:rule="self.startsWith("spiffe://") && size(self.split("/")) >= 3", message="spiffe source must start with spiffe:// and include at least / separating trust domain from the workload identity."
 type AuthorizationSourceSPIFFE AbsoluteURI
 
 type AuthorizationSourceServiceAccount struct {
