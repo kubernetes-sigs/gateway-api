@@ -55,7 +55,7 @@ CONFORMANCE_FLAGS ?=
 GO_TEST_FLAGS ?=
 
 # Flags for CRD validation tests
-CEL_TEST_K8S_VERSION ?= 
+CEL_TEST_K8S_VERSION ?=
 CEL_TEST_CRD_CHANNEL ?= standard
 
 all: generate vet fmt verify test
@@ -77,6 +77,10 @@ update-codegen:
 .PHONY: build-install-yaml
 build-install-yaml:
 	hack/build-install-yaml.sh
+
+.PHONY: build-monthly-yaml
+build-monthly-yaml:
+	hack/build-monthly-yaml.sh
 
 # Run go fmt against code
 fmt:
