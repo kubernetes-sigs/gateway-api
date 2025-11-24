@@ -29,4 +29,6 @@ bash hack/build-install-yaml.sh --experimental-only
 # DON'T commit the generated YAML here.
 git restore .
 
+mv release/experimental-install.yaml release/${TAG}-install.yaml
+echo "Generated release/${TAG}-install.yaml"
 
