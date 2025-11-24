@@ -192,7 +192,7 @@ API request flow for a gateway implemented using a `TLSRoute` is:
 * The reverse proxy receives the request on a `Listener` and uses the
 [Server Name Indication](https://datatracker.ietf.org/doc/html/rfc6066#section-3)
 attribute to match an `TLSRoute`.
-* The reverse proxy passes through the request directly to one or more objects,
+* The reverse proxy passes through the request directly to one object,
 i.e. `Service`, in the cluster based on `backendRefs` rules of the `TLSRoute`.
 
 ### TLSRoute + TLS Termination
@@ -374,7 +374,6 @@ be at least one intersecting hostname for the `TLSRoute` to be attached to the
 | A TLSRoute with an IP on its hostname should be rejected | Condition on the TLSRoute that it was rejected |  |
 | A Gateway containing a Listener of type TLS/Passthrough and a Listener of type TLS/Terminate should be accepted, and should direct the requests to the right TLSRoute | Being able to do a request to a TLS route being terminated on gateway (eg.: terminated.example.tld/xpto) and to a TLS Passthrough route on the same gateway, but different host (passthrough.example.tld) |  |
 | A Gateway with \*.example.tld on a TLS listener should allow a TLSRoute with hostname some.example.tld to be attached to it (and the same, but with a non wildcard hostname) | TLSRoute should be able to attach to the Gateway using the matching hostname, a request should succeed | [https://github.com/kubernetes-sigs/gateway-api/issues/1579](https://github.com/kubernetes-sigs/gateway-api/issues/1579)  |
-| Invalid TLSRoute with invalid BackendObjectReference performs no default forwarding  |  | [https://github.com/kubernetes-sigs/gateway-api/issues/1579](https://github.com/kubernetes-sigs/gateway-api/issues/1579)  |
 | For a [Listener](https://gateway-api.sigs.k8s.io/reference/spec/#listener) setting mode: "terminate", TLSRoute should be present in [ListenerStatus.SupportedKinds](https://gateway-api.sigs.k8s.io/reference/spec/#listenerstatus) in case TLSRoute termination is supported |  | [https://github.com/kubernetes-sigs/gateway-api/issues/1579](https://github.com/kubernetes-sigs/gateway-api/issues/1579)  |
 | A Gateway containing a Listener of type TLS/Passthrough and a Listener of type HTTPS/Terminate should not be accepted, and should mark all such listeners as `Conflicted` with `Reason: ListenerConflict` | Expose that multiplexing / using different protocols is not allowed/supported |  |
 
