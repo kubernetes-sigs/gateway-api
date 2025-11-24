@@ -28,14 +28,14 @@ based on the SNI identification that should pass the traffic to N load balanced 
 
 ## Non-Goals
 * Provide an interface for users to define different listeners or ports for the
-`TLSRoute` - This will be covered by the `ListenerSet` enhancement.
+`TLSRoute` - This will be covered by the [ListenerSet enhancement](https://gateway-api.sigs.k8s.io/geps/gep-1713/).
 * When using `TLSRoute` passthrough, support `PROXY` protocol on the gateway listener.
 * When using `TLSRoute` passthrough, support `PROXY` protocol on the communication
 between the Gateway and the backend.
 * Support TLS over UDP or UDP-based protocols such as `QUIC`.
 * Support attributes other than the SNI/hostname for the route selection
 * Support multiplexing (HTTPS and TLS protocols) on the same Listener - This should be covered
-on a different GEP
+on [GEP-4271](https://github.com/kubernetes-sigs/gateway-api/issues/4271)
 
 ## Introduction
 
