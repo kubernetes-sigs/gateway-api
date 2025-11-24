@@ -435,6 +435,7 @@ GEP is removed after 3 releases unless:
 
   1. There is more than 1 implementation (implementations that are nearing completion can count here)
   2. There are conformance tests in place
+3. The label selector pattern is added to the policy attachment definition in GEP-713.
 
 GEP is removed after 6 releases if it hasn't graduated to GA.
 
