@@ -310,6 +310,12 @@ type AuthorizationPolicySpec struct {
     // The policy action is applied if the request matches any of these rules.
     // +optional
     Rules []AuthorizationRule `json:"rules,omitempty"`
+
+    // Informs where the policy is expected to be enforced, and what attributes are
+    // allowed in policy rules.
+    // +kubebuilder:validation:Required
+    // +kubebuilder:validation:Enum=Network;
+    EnforcementLevel string `json:"enforcementLevel"`
 }
 
 // AuthorizationRule defines a single authorization rule.
