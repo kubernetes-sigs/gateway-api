@@ -18,9 +18,9 @@ package main
 
 import (
 	"bytes"
+	"embed"
 	"flag"
 	"fmt"
-	"html/template"
 	"io/fs"
 	"log"
 	"os"
@@ -29,48 +29,49 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"text/template"
 
 	"sigs.k8s.io/yaml"
 
 	gep "sigs.k8s.io/gateway-api/pkg/gep"
 )
 
+//go:embed template.tmpl
+var templateFile embed.FS
+
 var (
-	GEPSDir        string
-	MKDocsTemplate string
-	SkipGEPNumber  string
+	GEPSDir       string
+	SkipGEPNumber string
 )
 
 // Those are the GEPs that will be included in the final navigation bar
 // The order established below will be the order that the statuses will be shown
 var includeGEPStatus = []gep.GEPStatus{
+	gep.GEPStatusProvisional,
+	gep.GEPStatusPrototyping,
 	gep.GEPStatusImplementable,
 	gep.GEPStatusExperimental,
 	gep.GEPStatusStandard,
 	gep.GEPStatusMemorandum,
 }
 
-type GEPArray []GEPList
+type GEPArray []GEPs
 
-type GEPList struct {
-	GepType string
-	Geps    []uint
-}
-
-type TemplateData struct {
-	GEPData GEPArray
+type GEPs struct {
+	GepType     string
+	GepsDetails []*gep.GEPDetail
 }
 
 const kindDetails = "GEPDetails"
 
 func main() {
 	flag.StringVar(&GEPSDir, "g", "", "Defines the absolute path of the directory containing the GEPs")
-	flag.StringVar(&MKDocsTemplate, "t", "", "Defines the absolute path of mkdocs.yaml file")
 	flag.StringVar(&SkipGEPNumber, "s", "696", "Defines GEPs number to be skipped, should be comma-separated")
+
 	flag.Parse()
 
-	if GEPSDir == "" || MKDocsTemplate == "" {
-		log.Fatal("-g and -c are mandatory arguments")
+	if GEPSDir == "" {
+		log.Fatal("-g is mandatory arguments")
 	}
 
 	if strings.Contains(SkipGEPNumber, " ") {
@@ -79,31 +80,33 @@ func main() {
 
 	skipGep := strings.Split(SkipGEPNumber, ",")
 
+	tmpl, err := template.ParseFS(templateFile, "template.tmpl")
+	if err != nil {
+		log.Fatalf("error reading mkdocs template: %s", err)
+	}
+
 	geps, err := walkGEPs(GEPSDir, skipGep)
 	if err != nil {
 		panic(err)
 	}
 
-	tmpl, err := template.ParseFiles(MKDocsTemplate)
-	if err != nil {
-		log.Fatalf("error reading mkdocs template: %s", err)
+	for _, gep := range geps {
+		buf := &bytes.Buffer{}
+		fileName := fmt.Sprintf("%s/landing/%s.md", GEPSDir, strings.ToLower(gep.GepType))
+		if err := tmpl.Execute(buf, gep); err != nil {
+			panic(err)
+		}
+
+		if err := os.WriteFile(fileName, buf.Bytes(), 0644); err != nil {
+			panic(err)
+		}
 	}
 
-	tmplData := TemplateData{
-		GEPData: geps,
-	}
-
-	buf := &bytes.Buffer{}
-
-	if err := tmpl.Execute(buf, tmplData); err != nil {
-		panic(err)
-	}
-	fmt.Print(buf.String())
 }
 
 func walkGEPs(dir string, skipGEPs []string) (GEPArray, error) {
 	gepArray := make(GEPArray, 0)
-	tmpMap := make(map[gep.GEPStatus]GEPList)
+	tmpMap := make(map[gep.GEPStatus]GEPs)
 
 	err := filepath.WalkDir(dir, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
@@ -142,14 +145,14 @@ func walkGEPs(dir string, skipGEPs []string) (GEPArray, error) {
 		// easily later
 		_, ok := tmpMap[gepDetail.Status]
 		if !ok {
-			tmpMap[gepDetail.Status] = GEPList{
-				GepType: string(gepDetail.Status),
-				Geps:    make([]uint, 0),
+			tmpMap[gepDetail.Status] = GEPs{
+				GepType:     string(gepDetail.Status),
+				GepsDetails: make([]*gep.GEPDetail, 0),
 			}
 		}
 
 		item := tmpMap[gepDetail.Status]
-		item.Geps = append(item.Geps, gepDetail.Number)
+		item.GepsDetails = append(item.GepsDetails, gepDetail)
 		tmpMap[gepDetail.Status] = item
 		return nil
 	})
@@ -165,8 +168,8 @@ func walkGEPs(dir string, skipGEPs []string) (GEPArray, error) {
 	}
 
 	for i := range gepArray {
-		sort.SliceStable(gepArray[i].Geps, func(x, y int) bool {
-			return gepArray[i].Geps[x] < gepArray[i].Geps[y]
+		sort.SliceStable(gepArray[i].GepsDetails, func(x, y int) bool {
+			return gepArray[i].GepsDetails[x].Number < gepArray[i].GepsDetails[y].Number
 		})
 	}
 

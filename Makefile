@@ -193,28 +193,24 @@ release-staging: image.multiarch.setup
 DOCS_BUILD_CONTAINER_NAME ?= gateway-api-mkdocs
 
 .PHONY: build-docs
-build-docs:
+build-docs: update-geps
 	docker build --pull -t gaie/mkdocs hack/mkdocs/image
 	docker rm -f $(DOCS_BUILD_CONTAINER_NAME) || true
 	docker run --name $(DOCS_BUILD_CONTAINER_NAME) --rm -v ${PWD}:/docs gaie/mkdocs build
 
 .PHONY: build-docs-netlify
-build-docs-netlify: api-ref-docs
+build-docs-netlify: update-geps api-ref-docs
 	pip install -r hack/mkdocs/image/requirements.txt
 	python -m mkdocs build
 
 .PHONY: live-docs
-live-docs:
+live-docs: update-geps
 	docker build -t gw/mkdocs hack/mkdocs/image
 	docker run --rm -it -p 3000:3000 -v ${PWD}:/docs gw/mkdocs
 
-.PHONY: verify-mkdocs-nav
-verify-mkdocs-nav:
-	hack/verify-mkdocs-nav.sh
-
-.PHONY: update-mkdocs-nav
-update-mkdocs-nav:
-	hack/update-mkdocs-nav.sh
+.PHONY: update-geps
+update-geps:
+	hack/update-geps.sh
 
 .PHONY: api-ref-docs
 api-ref-docs:
