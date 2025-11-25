@@ -49,7 +49,7 @@ Istio, Linkerd, and Cilium all support identity-aware authorization via vendored
 
 ## API
 
-This GEP introduces a new policy resource, `AuthorizationPolicy`, for **identity-based** authorization. The policy defines a target, a single `ALLOW`, and a set of rules that include sources (the “who”) and an optional port attribute.
+This GEP introduces a new policy resource, `AuthorizationPolicy`, for **identity-based** authorization. The policy defines a target destination, an action, and a set of rules that include sources (the “who”) and attributes to limit the scope of the action.
 
 This GEP does not define support for L7 authorization policy (see the [Future Enhancement](#future-enhancements) section to for more information).
 
