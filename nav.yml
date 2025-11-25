@@ -70,6 +70,7 @@ nav:
     - Experimental: geps/landing/experimental.md
     - Standard: geps/landing/standard.md
     - Memorandum: geps/landing/memorandum.md
+    - List: geps/landing/tab.md
   - Contributing:
     - How to Get Involved: contributing/index.md
     - Developer Guide: contributing/devguide.md

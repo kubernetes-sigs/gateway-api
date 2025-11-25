@@ -36,7 +36,7 @@ import (
 	gep "sigs.k8s.io/gateway-api/pkg/gep"
 )
 
-//go:embed template.tmpl
+//go:embed templates/*.tmpl
 var templateFile embed.FS
 
 var (
@@ -80,7 +80,7 @@ func main() {
 
 	skipGep := strings.Split(SkipGEPNumber, ",")
 
-	tmpl, err := template.ParseFS(templateFile, "template.tmpl")
+	tmpl, err := template.ParseFS(templateFile, "templates/template.tmpl")
 	if err != nil {
 		log.Fatalf("error reading mkdocs template: %s", err)
 	}
@@ -100,6 +100,20 @@ func main() {
 		if err := os.WriteFile(fileName, buf.Bytes(), 0644); err != nil {
 			panic(err)
 		}
+	}
+
+	tmplTab, err := template.ParseFS(templateFile, "templates/template-tab.tmpl")
+	if err != nil {
+		log.Fatalf("error reading mkdocs template: %s", err)
+	}
+	buf := &bytes.Buffer{}
+	fileName := fmt.Sprintf("%s/landing/tab.md", GEPSDir)
+	if err := tmplTab.Execute(buf, geps); err != nil {
+		panic(err)
+	}
+
+	if err := os.WriteFile(fileName, buf.Bytes(), 0644); err != nil {
+		panic(err)
 	}
 
 }
