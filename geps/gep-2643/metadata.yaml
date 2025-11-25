@@ -2,7 +2,7 @@ apiVersion: internal.gateway.networking.k8s.io/v1alpha1
 kind: GEPDetails
 number: 2643
 name: TLS based passthrough Route / TLSRoute
-status: Provisional
+status: Experimental
 # Note: The feature already exists, the GEP is a retroactive collection of information
 authors:
   - candita
@@ -13,6 +13,10 @@ relationships:
   seeAlso:
     - number: 2907
       name: TLS Configuration Placement and Terminology
+    - number: 4274
+      name: BackendTLSPolicy - Extend support for TLSRoute
+    - number: 4271
+      name: TLSRoute/HTTPRoute multiplexing
 references:
   - https://datatracker.ietf.org/doc/html/rfc6066#section-3
   - https://github.com/kubernetes-sigs/gateway-api/issues/2111
