@@ -17,6 +17,64 @@ documentation].
 
 [the release documentation]: https://gateway-api.sigs.k8s.io/concepts/versioning/
 
+## Releasing a monthly version
+
+### Starting point
+
+Make sure all the changes that should be part of the monthly release are
+merged into `main`.
+
+### Tagging the monthly release
+
+Start by tagging the `main` branch with a tag of the form
+`monthly-YYYY.MM` (for example, `monthly-2025.11`). Push this to GitHub.
+Later, CI will handle the rest of the release process -- for now, you'll
+do it by hand.
+
+### Building the monthly YAMLs
+
+```
+make build-monthly-yaml
+```
+
+This will use the current date to generate a tag of the form
+`monthly-YYYY.MM` (for example, `monthly-2025.11`), then generate the
+install YAMLs for the monthly release in `release/$TAG-install.yaml`. If
+desired, you can override the tag by setting `TAG` in your environment
+before running the command.
+
+Generating the monthly CRD YAML makes changes in the
+`config/crd/experimental/` directory. These changes should not be
+committed, so `make build-monthly-yaml` will ask if you want it to use
+`git restore` to clean up. Since these are derived objects, typically you
+would answer "Y" to this question. To prevent the prompt and silently
+clean up, set `MONTHLY_NONINTERACTIVE=true` in your environment before
+running the command.
+
+Once you've generated the monthly YAML, you can create a GitHub release
+and attach the `release/$TAG-install.yaml` file to it as an artifact.
+**DO NOT** mark this release as the latest release.
+
+### Writing the Release Changelog
+
+Since monthlies always happen on `main` and affect only the experimental
+resources, there's a streamlined process for generating the changelog.
+
+You'll need the `$TAG` used for this monthly release as well as `$PREV_TAG` used for the previous monthly release, then:
+
+```
+git log --stat ${PREV_TAG}..${TAG} -- config/crd/experimental
+```
+
+will show you a one-line summary of all the changes to experimental CRDs
+since the last monthly release. Likewise running
+
+```
+git diff ${PREV_TAG}..${TAG} -- config/crd/experimental
+```
+
+will show you the actual diffs. Use this information to write release notes for the monthly release.
+
 ## Releasing a new version
 
 ### Writing a Changelog
