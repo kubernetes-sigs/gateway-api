@@ -2,7 +2,7 @@ apiVersion: internal.gateway.networking.k8s.io/v1alpha1
 kind: GEPDetails
 number: 3779
 name: Identity Based Authz for east-west traffic
-status: Provisional
+status: Implementable
 # Any authors who contribute to the GEP in any way should be listed here using
 # their GitHub handle.
 authors:
@@ -16,4 +16,4 @@ references: []
 featureNames: []
 # changelog is a list of hyperlinks to PRs that make changes to the GEP, in
 # ascending date order.
-changelog: []
+changelog: [] 

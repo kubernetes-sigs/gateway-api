@@ -70,6 +70,7 @@ nav:
     - Overview: geps/overview.md
     - Implementable:
       - geps/gep-1494/index.md
+      - geps/gep-3779/index.md
       - geps/gep-3793/index.md
       - geps/gep-3949/index.md
     - Experimental:
