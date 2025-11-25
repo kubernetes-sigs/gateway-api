@@ -62,7 +62,7 @@ CEL_TEST_CRD_CHANNEL ?= standard
 GOARCH ?= $(shell go env GOARCH)
 GOOS ?= $(shell go env GOOS)
 
-all: generate vet fmt verify test conformance-bin
+all: tidy generate vet fmt verify test conformance-bin
 
 .PHONY: clean-generated
 clean-generated:
@@ -72,7 +72,7 @@ clean-generated:
 
 # Run generators for protos, Deepcopy funcs, CRDs, and docs.
 .PHONY: generate
-generate: clean-generated update-codegen
+generate: clean-generated tidy update-codegen
 
 .PHONY: update-codegen
 update-codegen:
@@ -95,6 +95,10 @@ test:
 	go test -race -cover ./apis/... ./conformance/utils/...
 # Run tests for each submodule.
 	cd "conformance/echo-basic" && go test -race -cover ./...
+
+.PHONY: tidy
+tidy:
+	find . -name go.mod -execdir sh -c 'go mod tidy' \;
 
 # Run tests for CRDs validation
 .PHONY: test.crds-validation
