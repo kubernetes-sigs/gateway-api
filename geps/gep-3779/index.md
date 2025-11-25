@@ -357,7 +357,7 @@ type Source struct {
 
     // +unionDiscriminator
     // +kubebuilder:validation:Enum=ServiceAccount;SPIFFE
-    // +required
+    // +kubebuilder:validation:Required
     Type AuthorizationSourceType `json:"type"`
 
     // spiffe specifies an identity that is matched by this rule.
@@ -405,7 +405,7 @@ type AuthorizationSourceServiceAccount struct {
 
   // Name is the name of the ServiceAccount. 
   // Use "*" to indicate all serviceaccounts in the namespace.
-  // +required
+  // +kubebuilder:validation:Required
   Name string `json:"name"`
 }
 
@@ -415,6 +415,9 @@ type AuthorizationNetworkAttributes struct {
     // Ports specifies a list of destination ports to match on.
     // Traffic is matched if it is going to any of these ports.
     // If not specified, the rule applies to all ports.
+    // <gateway:util:excludeFromCRD>
+    // Note: We *may* introduce breaking change to this field if we decide to support port ranges.
+    // </gateway:util:excludeFromCRD>
     // +optional
     Ports []gatewayv1.PortNumber `json:"ports,omitempty"`
 }
