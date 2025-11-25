@@ -112,10 +112,9 @@ func main() {
 		panic(err)
 	}
 
-	if err := os.WriteFile(fileName, buf.Bytes(), 0644); err != nil {
+	if err := os.WriteFile(fileName, buf.Bytes(), 0600); err != nil {
 		panic(err)
 	}
-
 }
 
 func walkGEPs(dir string, skipGEPs []string) (GEPArray, error) {
