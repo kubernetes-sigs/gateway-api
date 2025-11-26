@@ -664,7 +664,7 @@ In case the conflicting policy resources have identical creation timestamps, the
 
 In other words, for the **None** merge strategy, rules ② → ③ of the [conflict resolution rules between established and challenger specs](#established-and-challenger-policy-specs) MUST be used to assign the _established_ and _challenger_ specs, and the _established_ spec (policy resource) always wins. All _challenger_ specs (policy resources) MUST be rejected.
 
-For all policies rejected due the application of the **None** merge estrategy, the [`Accepted`](#status-conditions) status condition of the policy SHOULD be set to false.
+For all policies rejected due the application of the **None** merge strategy, the [`Accepted`](#status-conditions) status condition of the policy SHOULD be set to false.
 
 The **None** merge strategy MUST NOT be implemented in combination with any other merge strategy. I.e., if the Policy CRD implements the **None** merge strategy, then no other merge strategy MUST be implemented by the Policy CRD.
 
