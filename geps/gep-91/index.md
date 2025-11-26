@@ -19,7 +19,7 @@ Gateway API standard defines a `Listener` as "the concept of a logical endpoint 
 * Define an API field to specify the CA Certificate within the Gateway configuration that can be used as a trust anchor to validate the certificates presented by the client.
 This use case has been highlighted in the [TLS Configuration GEP][] under segment 1 and in the [Gateway API TLS Use Cases][] document under point 7.
 * Introduce explicit client certificate validation modes that reflect common TLS behaviors (e.g., optional vs. required client certs)
-* Ensure the configuration mitigates the authentication bypass risks associated with HTTP/2 connection coalesing as described in [GEP-3567](https://gateway-api.sigs.k8s.io/geps/gep-3567/#interaction-with-client-cert-validation).
+* Ensure the configuration mitigates the authentication bypass risks associated with HTTP/2 connection coalescing as described in [GEP-3567](https://gateway-api.sigs.k8s.io/geps/gep-3567/#interaction-with-client-cert-validation).
 
 ## Non-Goals
 * Define other fields that can be used to verify the client certificate such as the Certificate Hash.
