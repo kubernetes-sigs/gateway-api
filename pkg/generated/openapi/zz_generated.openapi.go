@@ -6693,7 +6693,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_SessionPersistence(ref common.Referenc
 					},
 					"type": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Type defines the type of session persistence such as through the use a header or cookie. Defaults to cookie based session persistence.\n\nSupport: Core for \"Cookie\" type\n\nSupport: Extended for \"Header\" type",
+							Description: "Type defines the type of session persistence such as through the use of a header or cookie. Defaults to cookie based session persistence.\n\nSupport: Core for \"Cookie\" type\n\nSupport: Extended for \"Header\" type",
 							Type:        []string{"string"},
 							Format:      "",
 						},

@@ -936,7 +936,7 @@ type SessionPersistence struct {
 	IdleTimeout *Duration `json:"idleTimeout,omitempty"`
 
 	// Type defines the type of session persistence such as through
-	// the use a header or cookie. Defaults to cookie based session
+	// the use of a header or cookie. Defaults to cookie based session
 	// persistence.
 	//
 	// Support: Core for "Cookie" type
