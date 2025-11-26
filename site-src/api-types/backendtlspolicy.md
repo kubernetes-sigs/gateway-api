@@ -7,7 +7,7 @@
     to our [versioning guide](../concepts/versioning.md).
 
 [BackendTLSPolicy][backendtlspolicy] is a Gateway API type for specifying the TLS configuration
-of the connection from the Gateway to a backend pod/s via the Service API object.
+of the connection from the Gateway to a backend pod(s) via the Service API object.
 
 ## Background
 
