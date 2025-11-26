@@ -1073,7 +1073,7 @@ This does not mean that nothing at all that affects multiple objects can be done
 
 This section presents a series of synthetic examples of applications of policies for different kinds of topologies and contexts. The examples are implementations of the [Abstract process for calculating effective policies](#abstract-process-for-calculating-effective-policies). They are not prescriptive on exactly how policies must be designed, but rather illustrational of the different types of merge strategy and mechanics for calculating effective policies.
 
-Consider for all the examples the following hierarchy of network resource kinds: `Gateway` (`g`) > `Route` (`r`) > `Backend` (`b`), where `Gateway` is the least specific kind (instances denoted "`gX`") and `Backend` is the most specific kind (instances denoted "`bX`").
+Consider for all the examples, the following hierarchy of network resource kinds: `Gateway` (`g`) > `Route` (`r`) > `Backend` (`b`), where `Gateway` is the least specific kind (instances denoted "`gX`") and `Backend` is the most specific kind (instances denoted "`bX`").
 
 Moreover, a `ColorPolicy` kind is defined with variations in its semantics across examples to accommodate for each case. Instances of the `ColorPolicy` kind (denoted "`pX[spec]`" and referred to simply as "policies") may target one or more kinds of targetable resources, depending on each end-to-end example. A policy represents an intent to "color" the network traffic that flows through the portion of the network corresponding to the target with a given color or color set that is specified in the policy.
 
