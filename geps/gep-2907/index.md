@@ -155,7 +155,7 @@ In general, we'd expect this identity to represent a Gateway as a whole, and
 thus per-Listener configuration probably does not make sense here. Having
 FrontendValidation at the Listener level allows a Gateway to accept different
 client certs per SNI (a matching attribute of the frontend -> Gateway
-connection). On the other hand, when determining the identity a Gateway should
+connection). On the other hand, when determining the identity, a Gateway should
 use when connecting to a backend, it should likely either be tied directly to
 the Gateway or Backend, but the Listener is not particularly relevant in this
 context.
