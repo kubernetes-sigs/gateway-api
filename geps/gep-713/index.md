@@ -1271,7 +1271,7 @@ The expected outcome to be implemented by the controller is:
 
 These are a few known implementations of policies in compliance with this GEP.
 
-Users should refer to the official documentation from each implementation for for more up to date information.
+Users should refer to the official documentation from each implementation for more up to date information.
 
 #### Gateway API (core)
 

@@ -110,7 +110,7 @@ spec:
 ## Rationale
 
 #### 1. Remove Complexity While it is Still Possible
-A goal of v1alpha2 is to make any breaking changes we think we'll need to for
+A goal of v1alpha2 is to make any breaking changes we think we'll need for
 the lifetime of the API. After this release, we plan to provide a fully
 convertible, and hopefully also fully backwards compatible, API. If we really
 do need more advanced functionality in the future, it will be fairly
