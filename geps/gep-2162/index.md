@@ -152,7 +152,7 @@ The core purpose of conformance tests for GatewayClass is to verify that reporte
 While the community currently operates on a trust-based system for conformance reports, programmatically inferring features from the GatewayClass status field creates a strong, verifiable link between an implementation's claims and the test results.
 Having this connection between supported features and conformance tests, helps improve the UX and make it easier for implementers to run the correct conformance tests.
 
-## Followups
+## Follow-ups
 
 Before we make the changes we need to;
 
