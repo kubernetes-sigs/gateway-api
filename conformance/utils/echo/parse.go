@@ -74,7 +74,7 @@ var (
 
 // Response represents a response to a single echo request.
 type Response struct {
-	// RequestURL is the requested URL. This differs from URL, which is the just the path.
+	// RequestURL is the requested URL. This differs from URL, which is just the path.
 	// For example, RequestURL=http://foo/bar, URL=/bar
 	RequestURL string
 	// Method used (for HTTP).
