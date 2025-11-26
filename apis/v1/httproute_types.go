@@ -1439,7 +1439,7 @@ type HTTPCORSFilter struct {
 	// Valid values are any method defined by RFC9110, along with the special
 	// value `*`, which represents all HTTP methods are allowed.
 	//
-	// Method names are case sensitive, so these values are also case-sensitive.
+	// Method names are case-sensitive, so these values are also case-sensitive.
 	// (See https://www.rfc-editor.org/rfc/rfc2616#section-5.1.1)
 	//
 	// Multiple method names in the value of the `Access-Control-Allow-Methods`
@@ -1483,7 +1483,7 @@ type HTTPCORSFilter struct {
 	// AllowHeaders indicates which HTTP request headers are supported for
 	// accessing the requested resource.
 	//
-	// Header names are not case sensitive.
+	// Header names are not case-sensitive.
 	//
 	// Multiple header names in the value of the `Access-Control-Allow-Headers`
 	// response header are separated by a comma (",").
@@ -1542,7 +1542,7 @@ type HTTPCORSFilter struct {
 	// this additional header will be exposed as part of the response to the
 	// client.
 	//
-	// Header names are not case sensitive.
+	// Header names are not case-sensitive.
 	//
 	// Multiple header names in the value of the `Access-Control-Expose-Headers`
 	// response header are separated by a comma (",").
