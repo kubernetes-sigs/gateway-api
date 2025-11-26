@@ -394,7 +394,7 @@ type Listener struct {
 	//   the Gateway SHOULD return a 421.
 	// * If the current Listener (selected by SNI matching during ClientHello)
 	//   does not match the Host:
-	//     * If another Listener does match the Host the Gateway SHOULD return a
+	//     * If another Listener does match the Host, the Gateway SHOULD return a
 	//       421.
 	//     * If no other Listener matches the Host, the Gateway MUST return a
 	//       404.
