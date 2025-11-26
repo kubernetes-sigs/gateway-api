@@ -726,7 +726,7 @@ User MUST NOT be allowed to specify at any individual Policy CR more than one me
 Two known patterns adopted by Policy implementations that support specifying one of multiple merge strategies in the Policy CRs are:
 
 - The definition of `defaults` and/or `overrides` fields within the `spec` of the policy, wrapping the "spec proper" fields. (This is the pattern originally proposed by previous versions of this GEP.)
-- The definition of a `strategy` field in the `spec` stanza of the Policy, or equivalentely a `mergeType` field. (See, for example, [Kuadrant](#kuadrant) and [Envoy Gateway](#envoy-gateway) kinds of policies respectively)
+- The definition of a `strategy` field in the `spec` stanza of the Policy, or equivalently a `mergeType` field. (See, for example, [Kuadrant](#kuadrant) and [Envoy Gateway](#envoy-gateway) kinds of policies respectively)
 
 Policy CRDs that define a `defaults` field to specify the merge strategy at individual Policy CRs, in the lack of further discrimination of a more specific strategy, SHOULD assume the **Atomic Defaults** merge strategy whenever this field is used to determine the merge strategy.
 
