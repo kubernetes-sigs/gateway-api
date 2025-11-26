@@ -256,7 +256,7 @@ Note: The whole point of this Enum is to encourage explicitness, we **do not** w
 //     at connection time (e.g., source identity, port). Recommended for broad,
 //     coarse-grained access controls.
 //
-//     NOTE FOR REVIEWRS -- THIS IS FOR FUTURE ENHANCEMENT
+//     NOTE FOR REVIEWERS -- THIS IS FOR FUTURE ENHANCEMENT
 //
 //   - Application: Enforces the policy at the application layer (L7), typically at
 //     HTTP/gRPC-aware sidecars or L7 proxies. Enables fine-grained authorization
