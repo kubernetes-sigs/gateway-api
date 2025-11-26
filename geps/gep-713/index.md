@@ -449,7 +449,7 @@ spec:
 
 _Virtual types_ are defined as those with a group unknown by the Kubernetes API server. They can be used to apply policies to objects that are not actual Kubernetes resources nor Kubernetes custom resources. Rather, virtual types have a meaning for the controller(s) responsible for implementing the policy.
 
-An example of such, from Gateway API mesh case, would be a hypothetical need for defining a policy to "color requests" to external services. To accomplish this, implementations MAY choose to support a reference to a virtual resource type `ExternalService`, unknown by the Kuberentes API server but known by the controller. E.g.:
+An example of such, from Gateway API mesh case, would be a hypothetical need for defining a policy to "color requests" to external services. To accomplish this, implementations MAY choose to support a reference to a virtual resource type `ExternalService`, unknown by the Kubernetes API server but known by the controller. E.g.:
 
 ```yaml
 apiVersion: policies.example.com/v1
