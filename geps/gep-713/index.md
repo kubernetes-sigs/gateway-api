@@ -13,7 +13,7 @@ It lays out guidelines for Gateway API implementations and other stakeholders fo
 
 This GEP specifies a _pattern_, not an API field or new object. It defines some terms, including _Metaresource_, _Policies_ and _Policy Attachment_, and their related concepts.
 
-This pattern is currently unique to the Gateway API community. It's possible that in the future a better and broader form of extending Kubernetes APIs will emerge that could make this one obsolete.
+This pattern is currently unique to the Gateway API community. It's possible that, in the future, a better and broader form of extending Kubernetes APIs will emerge that could make this one obsolete.
 
 Policy attachment is the best way we've found to extend Gateway API resources so far, but it does come with meaningful challenges, such as the [Discoverability problem](#policy-discoverability) and the [Fanout status update problem](#fanout-status-update-problems).
 
