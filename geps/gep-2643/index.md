@@ -7,7 +7,7 @@
 ## TLDR
 
 This GEP documents the implementation of a route type that uses the Server Name
-Indication attribute (aka SNI) of a TLS handshake to make the routing decision.
+Indication attribute (aka SNI) of a TLS handshake to chose the route destination.
 
 While this feature is also known sometimes as TLS passthrough, where after the 
 server name is identified, the gateway does a full encrypted passthrough of the 
@@ -30,7 +30,7 @@ based on the SNI identification that should pass the traffic to N load balanced 
 * Provide an interface for users to define different listeners or ports for the
 `TLSRoute` - This will be covered by the [ListenerSet enhancement](https://gateway-api.sigs.k8s.io/geps/gep-1713/).
 * Describe re-encryption capabilities when TLS Termination is being used - This will
-be covered by [GEP-4274](https://github.com/kubernetes-sigs/gateway-api/issues/4274), extending
+be proposed in [GEP-4274](https://github.com/kubernetes-sigs/gateway-api/issues/4274), extending
 `BackendTLSPolicy` to allow `TLSRoute`.
 * When using `TLSRoute` passthrough, support `PROXY` protocol on the gateway listener.
 * When using `TLSRoute` passthrough, support `PROXY` protocol on the communication
@@ -39,6 +39,7 @@ between the Gateway and the backend.
 * Support attributes other than the SNI/hostname for the route selection
 * Support multiplexing (HTTPS and TLS protocols) on the same Listener - This should be covered
 on [GEP-4271](https://github.com/kubernetes-sigs/gateway-api/issues/4271)
+* Define timeout for TLSRoute - This will be proposed in [GEP-4280](https://github.com/kubernetes-sigs/gateway-api/issues/4280)
 
 ## Introduction
 
@@ -64,8 +65,7 @@ traffic control, etc.
 
 An implementation of `TLSRoute` achieves this end using the
 [server_name TLS attribute](https://datatracker.ietf.org/doc/html/rfc6066#section-3)
-to determine what backend should be used for a given request. `TLSRoute` thereby
-enables the use of a single gateway listener to handle traffic for multiple routes.
+to determine what backend should be used for a given request.
 
 ## API
 
@@ -75,6 +75,8 @@ enables the use of a single gateway listener to handle traffic for multiple rout
 // Core: The listener CAN be of type Passthrough
 // Extended: The listener CAN be of type Terminate 
 type TLSRouteSpec struct {
+  CommonRouteSpec `json:",inline"`
+  
   // Hostnames defines a set of SNI hostnames that should match against the
   // SNI attribute of TLS ClientHello message in TLS handshake. This matches
   // the RFC 1123 definition of a hostname with 2 notable exceptions:
@@ -107,7 +109,7 @@ type TLSRouteSpec struct {
   //
   // If both the Listener and TLSRoute have specified hostnames, and none
   // match with the criteria above, then the TLSRoute is not accepted for that 
-  // Listener. If the TLSRoute does not match any Listener on the parent, the 
+  // Listener. If the TLSRoute does not match any Listener on its parent, the 
   // implementation must raise an 'Accepted' Condition with a status of
   // `False` in the corresponding RouteParentStatus.
   // 
@@ -121,6 +123,9 @@ type TLSRouteSpec struct {
   // +required
   // +kubebuilder:validation:MinItems=1
   // +kubebuilder:validation:MaxItems=16
+  // +kubebuilder:validation:XValidation:message="Hostnames cannot contain an IP",rule="self.all(h, !isIP(h))"
+  // +kubebuilder:validation:XValidation:message="Hostnames must be valid based on RFC-1123",rule="self.all(h, !h.contains('*') ? !format.dns1123Subdomain().validate(h).hasValue() : true )"
+	// +kubebuilder:validation:XValidation:message="Wildcards on hostnames must be the first label, and the rest of hostname must be valid based on RFC-1123",rule="self.all(h, h.contains('*') ? (h.startsWith('*.') && !format.dns1123Subdomain().validate(h.substring(2)).hasValue()) : true )"
   Hostnames []Hostname `json:"hostnames,omitempty"`
   // Rules is a list of TLS matchers and actions.
   //
@@ -128,6 +133,11 @@ type TLSRouteSpec struct {
   // +kubebuilder:validation:MinItems=1
   // +kubebuilder:validation:MaxItems=1
   Rules []TLSRouteRule `json:"rules,omitempty"`
+}
+
+// TLSRouteStatus defines the observed state of TLSRoute
+type TLSRouteStatus struct {
+	RouteStatus `json:",inline"`
 }
 
 type TLSRouteRule struct {
@@ -215,7 +225,7 @@ metadata:
 spec:
   gatewayClassName: "my-class"
   listeners:
-  - name: somelistener
+  - name: my-terminated-listener
     port: 443
     protocol: TLS
     hostname: "*.example.com"
@@ -264,6 +274,18 @@ listeners:
   - attachedRoutes: 0
     name: my-terminated-listener
     supportedKinds: []
+```
+
+Also, in case the implementation does not support TLSRoute termination, the TLSRoute 
+resource status MUST be updated to contain the following condition:
+
+```yaml
+status:
+  parents:
+  - conditions:
+    - reason: NotAllowedByListeners
+      status: "False"
+      type: Accepted
 ```
 
 ### TLSRoute + Mixed Termination
@@ -452,18 +474,20 @@ The following are hostname intersection cases between the Gateway and TLSRoutes
 
 * If a hostname is specified by both the `Listener` and `TLSRoute`, there MUST
 be at least one intersecting hostname for the `TLSRoute` to be attached to the
-`Listener`.  
+`Listener`.
   * A `Gateway listener` with `test.example.com` as the hostname matches a `TLSRoute` that
-  specifies at least one of `test.example.com` or `*.example.com`  
+  specifies at least one of `test.example.com` or `*.example.com`
   * A `Gateway listener` with `*.example.com` as the hostname matches a `TLSRoute` that
   specifies at least one hostname that matches the `Gateway listener` hostname.
   For example, `test.example.com` and `*.example.com` would both match. On the
-  other hand, `example.com` and `test.example.net` would not match.  
+  other hand, `example.com` and `test.example.net` would not match.
   * If both the `Gateway listener` and `TLSRoute` specify hostnames, any `TLSRoute`
   hostnames that do not match the `Gateway listener` hostname MUST be ignored
   for that Listener. For example, if a `Gateway listener` specified `*.example.com`,
   and the `TLSRoute` specified `test.example.com` and `test.example.net`,
-  the later must not be considered for a match.  
+  the later must not be considered for a match. In case none of the hostnames specified
+  on the `TLSRoute` matches the Gateway hostnames, the route MUST have a `Condition` of 
+  `Accepted=False` with the reason `NoMatchingListenerHostname`.
   * In any of the cases above, the `TLSRoute` should have a `Condition` of `Accepted=True`.
 
 ## Conformance Details
@@ -482,7 +506,6 @@ be at least one intersecting hostname for the `TLSRoute` to be attached to the
 | A single TLSRoute in the gateway-conformance-infra namespace, with a backendRef in another namespace without valid ReferenceGrant, should have the ResolvedRefs condition set to False. <br/> Code: [ReferenceGrant] and the request to the route MUST fail [Invalid ReferenceGrant Request] | TLSRoute conditions must have a `RefNotPermitted` status. A request to the route MUST fail | SupportTLSRoute + SupportReferenceGrant |
 | A TLSRoute trying to attach to a gateway without a “tls” listener MUST be rejected  | TLSRoute should have a parent condition of type `Accepted=False` with Reason `NoMatchingParent`. Request to the route MUST fail. | SupportTLSRoute |
 | A TLSRoute with a hostname that does not match the Gateway hostname MUST be rejected (eg.: route with hostname [www.example.com](http://www.example.com), gateway with hostname www1.example.com) <br/> Issue: [TLSRoute conformance] | Condition on the TLSRoute parent of type `Accepted=False` with Reason `NoMatchingListenerHostname`. Request to the route MUST fail. | SupportTLSRoute |
-| A TLSRoute with an IP on its hostname MUST be rejected | Condition on the TLSRoute parent of type `Accepted=False` with Reason `UnsupportedValue`. No request test is required, as the Listener will not be accepted | SupportTLSRoute |
 | A Gateway containing a Listener of type TLS/Terminate SHOULD be accepted, and SHOULD direct the requests to the right TLSRoute when TLSRoute termination is supported. <br/> Issue: [Termination] | Being able to do a request to a TLS route being terminated on gateway (eg.: terminated.example.tld/xpto) | SupportTLSRoute + SupportTLSRouteTermination |
 | A Gateway containing a Listener of type TLS/Passthrough and a Listener of type TLS/Terminate SHOULD be accepted, and should direct the requests to the right TLSRoute when mixed mode is supported. <br/> Issue: [Termination] | Being able to do a request to a TLS route being terminated on gateway (eg.: terminated.example.tld/xpto) and to a TLS Passthrough route on the same gateway, but different host (passthrough.example.tld) | SupportTLSRoute + SupportTLSRouteTermination + SupportTLSRouteMixedMode |
 | A Gateway containing a Listener of type TLS/Passthrough and a Listener of type TLS/Terminate SHOULD NOT be accepted when mixed mode is not supported | Listener condition SHOULD have Condition Conflicted=True with reason `ProtocolConflict`. A request to any route attached to any of the listeners MUST fail. | SupportTLSRoute + SupportTLSRouteTermination + !SupportTLSRouteMixedMode |
@@ -497,12 +520,35 @@ be at least one intersecting hostname for the `TLSRoute` to be attached to the
 [Termination]: https://github.com/kubernetes-sigs/gateway-api/issues/3466
 [TLSRoute conformance]: https://github.com/kubernetes-sigs/gateway-api/issues/1579
 
+## Changes between v1alpha3 and v1
+
+The following changes exists between v1alpha3 and v1
+
+### Route hostnames are validated with CEL
+
+The following rules are now enforced using CEL validations directly on the API:
+
+* The hostname is not an IP
+* The hostname is a valid domain, per RFC-1123
+* In case the hostname contains a wildcard prefix (`*.example.tld`), the remaining 
+content of the hostname (`example.tld`) is a valid domain per RFC-1123
+* Only a single wildcard prefix can be used.
+
+### Explicit support for mixed modes on a TLS listener
+
+Previously there wasn't explicit support for mixed TLS modes on a Gateway. This means 
+that it wasn't clear if one listener being of type "Passthrough" and the other of type 
+"Terminate" was supported.
+
+On the current specification it was made explicit that this mode is supported on `Extended`
+support level.
+
 ## Alternatives considered
 
 ### Hostname as a rule matcher
 Moving the `hostname` to a matcher inside `.spec.rules`  was considered as part of this GEP. 
 This alternative will be considered as a long term discussion, as of by the time of the creation of 
-this GEP moving the this field to another place would be a breaking change, and duplicating
+this GEP moving this field to another place would be a breaking change, and duplicating
 the field can be considered too complex.
 
 ## References
