@@ -139,7 +139,7 @@ either applied globally to all Listeners in the Gateway or can be overridden on 
 Gateway level configuration for client certificate validation was chosen due to security issue.
 
 #### Why per port override
-HTTPS connection can be reused between multiple Listeners sharing the same port. This might lead to bypassing client certificate validation configuration for a given Listener becasue new TLS handshake will not be triggered for different hostname.
+HTTPS connection can be reused between multiple Listeners sharing the same port. This might lead to bypassing client certificate validation configuration for a given Listener because new TLS handshake will not be triggered for different hostname.
 
 ### 4. Configure Client Certificate that Gateway should use to connect to Backend
 
