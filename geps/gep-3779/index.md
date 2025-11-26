@@ -211,7 +211,7 @@ This however gives the (confusing) impression that Gateways (whether in-cluster 
 ###### Option 2
 
 Leaving an empty targetRefs. While this is theoretically possible without a breaking change, this would be another fundamental change to policy attachment (to allow policies without a targetRef).
-Additionally, this is also suffer from the same problem of being perceived as an applicable scope for both Gateways and Workloads in the namespace.
+Additionally, this also suffers from the same problem of being perceived as an applicable scope for both Gateways and Workloads in the namespace.
 
 This option is also inconsistent with other API fields where an empty field or absence of a it does not mean select all. See [recent comment](https://github.com/kubernetes-sigs/gateway-api/pull/3887#discussion_r2176125600) on the proposal for empty ParentRef field.
 
