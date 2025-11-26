@@ -25,7 +25,7 @@ import "k8s.io/apimachinery/pkg/util/sets"
 // FeatureName is the type used to represent the name of a feature.
 type FeatureName string
 
-// FeatureChannel is the type used to represent the channel a feature belongs to.
+// FeatureChannel is the type used to represent the channel to which a feature belongs.
 type FeatureChannel string
 
 const (
