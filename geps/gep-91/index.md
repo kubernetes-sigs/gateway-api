@@ -46,7 +46,7 @@ These two validation mechanisms operate independently and can be used simultaneo
 
 ### Impact on listeners
 
-This proposal removes frontendTLSValidation from Listener's TLS configuration and introduces gateways level per port configuration. This is a breaking change for exisitng implementation which uses this feature from Experimental API.
+This proposal removes frontendTLSValidation from Listener's TLS configuration and introduces gateways level per port configuration. This is a breaking change for existing implementation which uses this feature from Experimental API.
  Once gateway level TLS is configured (either by default or for a specific port), the TLS settings will apply to all existing and newly created Listeners serving HTTPS that match the configuration.
 
 #### GO
