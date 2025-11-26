@@ -172,7 +172,7 @@ As we continue to mature the API for production use cases, here are some of the 
 - [GAMMA Initiative](../../mesh/index.md) - Gateway API for Service Mesh
 
 If there's something on this list you want to get involved in, or there's
-something not on this list that you want to advocate for to get on the roadmap
+something not on this list that you want to advocate be on the roadmap
 please join us in the #sig-network-gateway-api channel on Kubernetes Slack or our weekly [community calls](../../contributing/index.md#meetings).
 
 [gep1016]:https://github.com/kubernetes-sigs/gateway-api/blob/master/geps/gep-1016.md
