@@ -132,7 +132,7 @@ This GEP defines the following basic merge strategies:
 
 Implementations MAY derive variations of the basic merge strategies with different levels of _granularity_ other than the full policy spec treated as an atomic unit. For example, instead of (or additionally to) a challenger policy spec fully winning over an established one (_Atomic defaults_), an implementation MAY support merging the two policy specs together by applying [JSON Merge Patch (RFC 7386)](https://datatracker.ietf.org/doc/html/rfc7386) strategy.
 
-These an other merge strategies, such as **None** and **Custom** are further described in section _Implementation guide_ > [Designing a merge strategy](#designing-a-merge-strategy).
+These other merge strategies, such as **None** and **Custom** are further described in section _Implementation guide_ > [Designing a merge strategy](#designing-a-merge-strategy).
 
 #### Effective policy
 
