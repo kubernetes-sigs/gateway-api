@@ -521,7 +521,7 @@ For help and support with Kong Gateway operator please feel free to [create an i
 
 [Kuma][kuma] is an open source service mesh.
 
-Kuma implements the Gateway API specification for the Kuma built-in, Envoy-based Gateway with a beta stability guarantee. Check the [Gateway API Documentation][kuma-1] for information on how to setup a Kuma built-in gateway using the Gateway API.
+Kuma implements the Gateway API specification for the Kuma built-in, Envoy-based Gateway with a beta stability guarantee. Check the [Gateway API Documentation][kuma-1] for information on how to set up a Kuma built-in gateway using the Gateway API.
 
 Kuma 2.3 and later support the [GAMMA initiative's][gamma]
 Gateway API [support for east-west traffic management][gamma] within the mesh.
