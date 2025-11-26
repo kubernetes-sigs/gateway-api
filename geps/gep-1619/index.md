@@ -741,7 +741,7 @@ standards due to wide acceptance are:
 - SameSite=[Strict|Lax|None]
 - Partitioned
 
-Unless a `sessionPersistence` API field can be satisfied through a manipulating a cookie attribute, the attributes
+Unless a `sessionPersistence` API field can be satisfied through manipulating a cookie attribute, the attributes
 of the cookies are considered as opaque values in this spec and are to be determined by the individual implementations.
 Let's discuss some of these cookie attributes in more detail.
 
