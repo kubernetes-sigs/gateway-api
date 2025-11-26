@@ -47,7 +47,7 @@ def on_files(files, config, **kwargs):
 
     for root_dir, _, gep_files in Path('geps').walk():
 
-      # Iterate over the all the files in the GEP folder and add them to the site
+      # Iterate over all the files in the GEP folder and add them to the site
       for filename in gep_files:
         file_path = str(root_dir / filename)
 
