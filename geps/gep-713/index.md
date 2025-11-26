@@ -250,7 +250,7 @@ Another example of this semantic difference in the context of Gateway API object
 * a way to augment the behavior of the `Gateway` object itself (e.g. reconcile cloud infrastructure provider settings from the spec declared by the `Gateway` according to the rules specified by the policy attached to the `Gateway`), or
 * a means to augment the behavior of all `HTTPRoute` objects attached to the `Gateway` (in a way that every new `HTTPRoute` that gets created or modified so it enters the context of the `Gateway` is automatically put in the scope of the policy.)
 
-Objects may participate in multiple hierarchies, including other hierarchies not targeted by a policy. This means an object may be partially _in the scope_ of a policy and partially _outside of the scope_ of the policy. For example, for a policy kind that _targets_ a Gateway resource ultimately with _intent_ to augment the behavior of xRoute rules, any individual route rule under the targeted gateway object is in the scope of the policy. Inversily, any route rule and route object not linked to the targeted gateway are outside of the scope of the policy. Similarly, this same set of routes and route rules, that are _in the scope of the policy_ when activated within the context of the target gateway, if a route has a second gateway as parent which is not targeted by the policy, then this route and route rules are _outside the scope of the policy_ within the context of the non-target gateway.
+Objects may participate in multiple hierarchies, including other hierarchies not targeted by a policy. This means an object may be partially _in the scope_ of a policy and partially _outside of the scope_ of the policy. For example, for a policy kind that _targets_ a Gateway resource ultimately with _intent_ to augment the behavior of xRoute rules, any individual route rule under the targeted gateway object is in the scope of the policy. Inversely, any route rule and route object not linked to the targeted gateway are outside of the scope of the policy. Similarly, this same set of routes and route rules, that are _in the scope of the policy_ when activated within the context of the target gateway, if a route has a second gateway as parent which is not targeted by the policy, then this route and route rules are _outside the scope of the policy_ within the context of the non-target gateway.
 
 #### Declared targets versus Effective targets
 
@@ -979,7 +979,7 @@ const (
   // PolicyReasonProgrammed is used with the "Programmed" condition when the full spec of the policy has been
   // programmed to affect the entire scope under the associated target for the status, with no parts of the
   // policy overridden during conflict resolution against other policies of the same kind.
-  // Inversily, it is used with the "Overridden" condition when the policy is not overridden due to been programmed.
+  // Inversely, it is used with the "Overridden" condition when the policy is not overridden due to been programmed.
   PolicyReasonProgrammed PolicyConditionReason = "Programmed"
 
   // PolicyReasonPartiallyProgrammed is used with the "Programmed" condition when parts of the policy's spec have
