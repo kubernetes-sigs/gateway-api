@@ -668,7 +668,7 @@ Here is the very high-level traffic flow for sidecar-based meshes:
 
   ```sh
   Client → Request to backend-service:8080
-      → Source sidecar resolves service → backend-pod-1 (<ip>>:8080)
+      → Source sidecar resolves service → backend-pod-1 (<ip>:8080)
       → Destination sidecar receives traffic on pod IP
       → Destination sidecar has NO context that this came via "backend-service"
   ```
