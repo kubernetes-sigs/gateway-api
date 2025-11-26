@@ -888,7 +888,7 @@ The best outcome is that Ana needs to look only at a specific route to know what
 
 ##### Policy Admin Discoverability
 
-How does the Policy Admin know what policy is applied where, and what the content of that policy is? How do they validate that the policy is being used in ways acceptable to their organization? For any given policy object, how do they know how many places it's being used?
+How does the Policy Admin know what policy is applied where, and what the content of that policy is? How do they validate that the policy is being used in ways acceptable to their organization? For any given policy object, how do they know how many places it is being used?
 
 ##### Cluster Admin Discoverability
 
@@ -896,7 +896,7 @@ The Cluster Admin has similar concerns to the Policy Admin, but with a focus on 
 
 How does the Cluster Admin know what policy is applied where, and what the content of that policy is?
 
-For any given policy object, how do they know how many places it's being used?
+For any given policy object, how do they know how many places it is being used?
 
 #### Hinting on a solution for the discoverability problem
 
