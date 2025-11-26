@@ -148,7 +148,7 @@ HTTPS connection can be reused between multiple Listeners sharing the same port.
 | Gateway | `Gateway.Spec.TLS.Backend.ClientCertificateRef` | Proposed |
 
 #### Rationale
-Client certificate is part of Gateway identity and should not be overriden per backend.
+Client certificate is part of Gateway identity and should not be overridden per backend.
 
 #### Why Not Listener level to match FrontendValidation?
 In general, we'd expect this identity to represent a Gateway as a whole, and
