@@ -87,18 +87,18 @@ func main() {
 
 	geps, err := walkGEPs(GEPSDir, skipGep)
 	if err != nil {
-		panic(err)
+		log.Fatalf("error walking GEPs: %s", err)
 	}
 
 	for _, gep := range geps {
 		buf := &bytes.Buffer{}
 		fileName := fmt.Sprintf("%s/landing/%s.md", GEPSDir, strings.ToLower(gep.GepType))
-		if err := tmpl.Execute(buf, gep); err != nil {
-			panic(err)
+		if errTmpl := tmpl.Execute(buf, gep); errTmpl != nil {
+			log.Fatalf("error rendering template: %s", errTmpl)
 		}
 
-		if err := os.WriteFile(fileName, buf.Bytes(), 0644); err != nil {
-			panic(err)
+		if errTmpl := os.WriteFile(fileName, buf.Bytes(), 0o600); errTmpl != nil {
+			log.Fatalf("error writing file: %s", errTmpl)
 		}
 	}
 
@@ -109,11 +109,11 @@ func main() {
 	buf := &bytes.Buffer{}
 	fileName := fmt.Sprintf("%s/landing/tab.md", GEPSDir)
 	if err := tmplTab.Execute(buf, geps); err != nil {
-		panic(err)
+		log.Fatalf("error rendering template: %s", err)
 	}
 
-	if err := os.WriteFile(fileName, buf.Bytes(), 0600); err != nil {
-		panic(err)
+	if err := os.WriteFile(fileName, buf.Bytes(), 0o600); err != nil {
+		log.Fatalf("error writing file: %s", err)
 	}
 }
 

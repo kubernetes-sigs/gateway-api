@@ -27,7 +27,6 @@ theme:
     - navigation.tabs
     - navigation.top
     - navigation.expand
-    - toc.integrate
     - content.tabs.link
   palette:
     - scheme: default
