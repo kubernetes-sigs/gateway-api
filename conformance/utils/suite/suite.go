@@ -89,7 +89,7 @@ type ConformanceTestSuite struct {
 	supportedFeaturesSource supportedFeaturesSource
 
 	// mode is the operating mode of the implementation.
-	// The default value for it is "default".
+	// The default value is "default".
 	mode string
 
 	// implementation contains the details of the implementation, such as
