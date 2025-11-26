@@ -748,7 +748,7 @@ Policy implementations SHOULD reflect in the `status` stanza of the policies how
 
 Whenever possible, each scope targeted by a policy SHOULD be explained in the `status` stanza regarding how they are being affected by the policy due to applying the merge strategies.
 
-Examples of policy status conditions include if a policy has been successfuly programmed to be enforced or if has been overridden, partially or completely, given all the different scopes targeted by the policy and variations to the spec after occasionally merging with other policies.
+Examples of policy status conditions include if a policy has been successfully programmed to be enforced or if has been overridden, partially or completely, given all the different scopes targeted by the policy and variations to the spec after occasionally merging with other policies.
 
 See the section on [policy status](#the-status-stanza-of-policy-objects) for more details.
 
