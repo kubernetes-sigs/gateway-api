@@ -219,8 +219,8 @@ a Gateway with no Listener matching the protocol needed by the Route, the Route
 The following is a summary of all the Routes and the TLS termination mode they support, along
 with the compatible protocol.
 
-| Protocol  |  Routes | TLS Terminate | TLS Passthough |
-|-----------|---------|---------------|----------------|
+| Protocol  |  Routes | TLS Terminate | TLS Passthrough |
+|-----------|---------|---------------|-----------------|
 | HTTP      | `HTTPRoute`/`GRPCRoute` | no  | no  |
 | HTTPS     | `HTTPRoute`/`GRPCRoute` | yes | no  |
 | TLS       | `TLSRoute`  | yes | yes |
