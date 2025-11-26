@@ -335,7 +335,7 @@ type ListenerStatus struct {
 
     // SupportedKinds is the list indicating the Kinds supported by this
     // listener. When this is not specified on the Listener, this MUST represent
-    // the kinds an implementation supports for the specified protocol. When
+    // the kinds supported by an implementation for the specified protocol. When
     // there are kinds specified on the Listener, this MUST represent the
     // intersection of those kinds and the kinds supported by the implementation
     // for the specified protocol.
