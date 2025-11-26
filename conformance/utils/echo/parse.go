@@ -87,7 +87,7 @@ type Response struct {
 	RawContent string
 	// ID is a unique identifier of the resource in the response
 	ID string
-	// URL is the url the request is sent to
+	// URL is the url to which the request is sent
 	URL string
 	// Version is the version of the resource in the response
 	Version string
