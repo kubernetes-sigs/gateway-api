@@ -994,7 +994,7 @@ func findPodConditionInList(t *testing.T, conditions []v1.PodCondition, condName
 	return false
 }
 
-// BackendTLSPolicyMustHaveCondition checks that the created BackentTLSPolicy has the Condition,
+// BackendTLSPolicyMustHaveCondition checks that the created BackendTLSPolicy has the Condition,
 // halting after the specified timeout is exceeded.
 func BackendTLSPolicyMustHaveCondition(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, policyNN, gwNN types.NamespacedName, condition metav1.Condition) {
 	t.Helper()
