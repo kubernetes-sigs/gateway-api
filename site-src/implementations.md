@@ -24,7 +24,7 @@ for one of the two (2) most recent Gateway API releases.
 
 So, it's conformant to support Mesh + HTTPRoute, or Gateway + HTTPRoute, or
 Gateway + TLSRoute, or Gateway + Mesh + HTTPRoute, plus any extended features
-the implementation claims. But implementaions _must_ support at least one
+the implementation claims. But implementations _must_ support at least one
 Profile and one Route type in that profile, and must pass all Core conformance
 tests for that Profile and Route type in addition to all claimed Extended
 features.
