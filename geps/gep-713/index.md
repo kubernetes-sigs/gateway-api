@@ -107,7 +107,7 @@ A resource that augments the behavior of another resource without modifying the 
 
 An instance of a subclass of metaresources ("policies") whose intent is to specify _rules that control the behavior_ of the target resources.
 
-Policies are Custom Resource Definitions (CRDs) that MUST comply with a particular [structure](#policy-structure). This structure includes standardized fields for specifying the target(s), policy-specific fields to describe the intended augmentation, and standardized status fields to communicate whether the augmentation is happening or not.
+Policies are Custom Resource Definitions (CRDs) that MUST comply with a particular [structure](#policy-structure). This structure includes standardized fields for specifying the target(s), policy-specific fields to describe the intended augmentation, and standardized status fields to communicate whether or not the augmentation is happening.
 
 Policy kinds are typically named _xPolicy_, such as `BackendTLSPolicy` (a policy kind implemented by Gateway API to augment Backends with TLS configuration.)
 
@@ -177,7 +177,7 @@ As defined above, a metaresource is a resource whose purpose is to augment the b
 
 - A user defines a metaresource describing both the target resource(s) they want to augment, and the intent of the augmentation.
 - The controller(s) implementing the metaresource notices the metaresource and applies the intent to the target resource(s).
-- The controller(s) implementing the metaresource reports the status of the metaresource, indicating whether the intent is being applied or not.
+- The controller(s) implementing the metaresource reports the status of the metaresource, indicating whether or not the intent is being applied.
 
 In the real world, of course, things can be much more complex. There may be multiple conflicting metaresources, or the user might attempt to apply a metaresource that they aren't allowed to, or there may be errors in the metaresources. The controller(s) implementing the metaresources MUST be able to handle all of these cases, and MUST communicate status correctly in all situations.
 
