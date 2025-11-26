@@ -751,7 +751,7 @@ spec:
 ```
 
 The ListenerSet `user-listenerset` should be marked as Conflicted, as the `parent-gateway`
-has a listener definition called `foo` that conflicts with the ListenetSet definition
+has a listener definition called `foo` that conflicts with the ListenerSet definition
 called `myapp`. The conflict happens because hostname is the same on both `ListenerSet` 
 but they use different termination TLS certificates:
 
