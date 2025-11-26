@@ -656,7 +656,7 @@ Policy CRD that implement more than one merge strategy MUST provide a way for us
 
 _Status:_ Standard
 
-_None_ is often used to describe the absense of a defined merge strategy, meaning the conflict cannot be strictly resolved.
+_None_ is often used to describe the absence of a defined merge strategy, meaning the conflict cannot be strictly resolved.
 
 Implementation-wise, the spec (policy resource) with the oldest creation timestamp MUST be considered the _established_ spec and that spec beats all _challenger_ specs (policy resources with newer creation timestamps). In short: `𝑓(established = oldest, challenger) → established`.
 
