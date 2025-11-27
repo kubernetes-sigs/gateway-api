@@ -146,7 +146,7 @@ func executeKubectlCommand(t *testing.T, kubectl, kubeconfig string, args []stri
 	cacheDir := filepath.Dir(kubeconfig)
 	args = append([]string{"--cache-dir", cacheDir}, args...)
 
-	cmd := exec.Command(kubectl, args...)
+	cmd := exec.CommandContext(t.Context(), kubectl, args...)
 	cmd.Env = []string{
 		fmt.Sprintf("KUBECONFIG=%s", kubeconfig),
 	}
