@@ -58,7 +58,11 @@ GO_TEST_FLAGS ?=
 CEL_TEST_K8S_VERSION ?= 
 CEL_TEST_CRD_CHANNEL ?= standard
 
-all: generate vet fmt verify test
+# Compilation flags for binaries
+GOARCH ?= $(shell go env GOARCH)
+GOOS ?= $(shell go env GOOS)
+
+all: tidy generate vet fmt verify test conformance-bin
 
 .PHONY: clean-generated
 clean-generated:
@@ -68,7 +72,7 @@ clean-generated:
 
 # Run generators for protos, Deepcopy funcs, CRDs, and docs.
 .PHONY: generate
-generate: clean-generated update-codegen
+generate: clean-generated tidy update-codegen
 
 .PHONY: update-codegen
 update-codegen:
@@ -92,6 +96,11 @@ test:
 # Run tests for each submodule.
 	cd "conformance/echo-basic" && go test -race -cover ./...
 
+.PHONY: tidy
+tidy:
+	go work sync
+	find . -name go.mod -execdir sh -c 'go mod tidy' \;
+
 # Run tests for CRDs validation
 .PHONY: test.crds-validation
 test.crds-validation:
@@ -102,6 +111,11 @@ test.crds-validation:
 .PHONY: conformance
 conformance:
 	go test ${GO_TEST_FLAGS} -v ./conformance -run TestConformance -args ${CONFORMANCE_FLAGS}
+
+# Build a conformance.test binary that can be used as a standalone binary to run conformance test
+.PHONY: conformance-bin
+conformance-bin:
+	GOOS=$(GOOS) GOARCH=$(GOARCH) go test -c -v ./conformance 
 
 # Install CRD's and example resources to a preexisting cluster.
 .PHONY: install
