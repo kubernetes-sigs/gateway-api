@@ -62,7 +62,7 @@ CEL_TEST_CRD_CHANNEL ?= standard
 GOARCH ?= $(shell go env GOARCH)
 GOOS ?= $(shell go env GOOS)
 
-all: tidy generate vet fmt verify test conformance-bin
+all: generate vet fmt verify test conformance-bin
 
 .PHONY: clean-generated
 clean-generated:
@@ -72,7 +72,7 @@ clean-generated:
 
 # Run generators for protos, Deepcopy funcs, CRDs, and docs.
 .PHONY: generate
-generate: clean-generated tidy update-codegen
+generate: clean-generated update-codegen tidy
 
 .PHONY: update-codegen
 update-codegen:
@@ -104,8 +104,8 @@ tidy:
 # Run tests for CRDs validation
 .PHONY: test.crds-validation
 test.crds-validation:
-	K8S_VERSION=$(CEL_TEST_K8S_VERSION) CRD_CHANNEL=$(CEL_TEST_CRD_CHANNEL) go test ${GO_TEST_FLAGS} -count=1 -timeout=120s --tags=$(CEL_TEST_CRD_CHANNEL) -v ./pkg/test/cel
-	K8S_VERSION=$(CEL_TEST_K8S_VERSION) CRD_CHANNEL=$(CEL_TEST_CRD_CHANNEL) go test ${GO_TEST_FLAGS} -count=1 -timeout=120s -v ./pkg/test/crd
+	K8S_VERSION=$(CEL_TEST_K8S_VERSION) CRD_CHANNEL=$(CEL_TEST_CRD_CHANNEL) go test ${GO_TEST_FLAGS} -count=1 -timeout=120s --tags=$(CEL_TEST_CRD_CHANNEL) -v ./tests/cel
+	K8S_VERSION=$(CEL_TEST_K8S_VERSION) CRD_CHANNEL=$(CEL_TEST_CRD_CHANNEL) go test ${GO_TEST_FLAGS} -count=1 -timeout=120s -v ./tests/crd
 
 # Run conformance tests against controller implementation
 .PHONY: conformance

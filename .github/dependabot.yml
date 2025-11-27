@@ -5,6 +5,7 @@ updates:
     directories:
     - "/"
     - "/conformance"
+    - "/tests"
     - "/tools"
     schedule:
       interval: "weekly"
