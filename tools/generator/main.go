@@ -225,6 +225,18 @@ func gatewayTweaks(channel string, name string, jsonProps apiext.JSONSchemaProps
 				Rule:    celMatch[2],
 			})
 		}
+
+		patternRe := regexp.MustCompile(validationPrefix + "Pattern=`([^`]*)`")
+		patternMatches := patternRe.FindAllStringSubmatch(jsonProps.Description, 64)
+		if len(patternMatches) == 1 && jsonProps.Pattern == "" {
+			patternMatch := patternMatches[0]
+			if len(patternMatch) != 2 {
+				log.Fatalf("Invalid %s Pattern tag for %s", validationPrefix, name)
+			}
+
+			numValid++
+			jsonProps.Pattern = patternMatch[1]
+		}
 	}
 
 	if numValid < numExpressions {
