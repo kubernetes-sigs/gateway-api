@@ -22,7 +22,7 @@ From [Gateway Hierarchy Brainstorming](https://docs.google.com/document/d/1qj7Xo
 - Provide a mechanism for third party components to generate listeners and attach them to a Gateway ([\#1863](https://github.com/kubernetes-sigs/gateway-api/pull/1863))
 - Delegate TLS certificate management to App Owners and/or different namespaces ([\#102](https://github.com/kubernetes-sigs/gateway-api/issues/102), [\#103](https://github.com/kubernetes-sigs/gateway-api/issues/103))
 - Delegate domains to different namespaces, but allow those namespace to define TLS and routing configuration within those namespaces with Gateway-like resources ([\#102](https://github.com/kubernetes-sigs/gateway-api/issues/102), [\#103](https://github.com/kubernetes-sigs/gateway-api/issues/103))
-- Enable admins to delegate SNI-based routing for TLS passthrough to other teams and/or namespaces ([\#3177](https://github.com/kubernetes-sigs/gateway-api/discussions/3177)) (Remove TLSRoute)
+- Enable admins to delegate SNI-based routing for TLS passthrough to other teams and/or namespaces ([\#3177](https://github.com/kubernetes-sigs/gateway-api/discussions/3177))
 - Simplify L4 routing by removing at least one of the required layers (Gateway \-\> Route \-\> Service)
 - Delegate routing to namespaces based on path prefix (previously known as [Route delegation](https://github.com/kubernetes-sigs/gateway-api/issues/1058))
 - Static infrastructure attachment ([\#3103](https://github.com/kubernetes-sigs/gateway-api/discussions/3103\#discussioncomment-9678523))
@@ -38,12 +38,15 @@ More broadly, large scale gateway users often expose `O(1000)` domains, but are 
 
 The [spec currently has language](https://github.com/kubernetes-sigs/gateway-api/blob/541e9fc2b3c2f62915cb58dc0ee5e43e4096b3e2/apis/v1beta1/gateway_types.go#L76-L78) to indicate implementations `MAY` merge `Gateways` resources but does not define any specific requirements for how that should work.
 
+Additionally, one of the main complains of users coming from Ingress to Gateway API is the
+lack of possibility to manage their own application certificates. `ListenerSet`, being a
+mechanism that allows users to define their own Listeners and attach them to a `Gateway`
+will make this requirement viable.
 
 ## Feature Details
 
 We define `ListenerSet` as the name of the feature outlined in this GEP.
 The feature will be part of the experimental channel, which implementations can choose to support. All the `MUST` requirements in this document apply to implementations that choose to support this feature.
-
 
 ## API
 
@@ -57,11 +60,38 @@ once the API is gratuated to stable it will be renamed to `ListenerSet`.
 ```go
 type GatewaySpec struct {
 	...
+	// AllowedListeners defines which ListenerSets can be attached to this Gateway.
+	// While this feature is experimental, the default value is to allow no ListenerSets.
+	//
 	AllowedListeners *AllowedListeners `json:"allowedListeners"`
+}
+
+type GatewayStatus struct {
 	...
+	// AttachedListeners represents the total number of ListenerSets that have been
+	// successfully attached to this Gateway.
+	//
+	// Successful attachment of a ListenerSets to a Gateway is based solely on the
+	// combination of the AllowedListeners field on the Gateway
+	// and the ListenerSets's ParentRefs field. A ListenerSets is successfully attached to
+	// a Gateway when it is selected by the ListenerSets's AllowedListeners field
+	// AND the ListenerSets has a valid ParentRef selecting the Gateway
+	// resource as a parent resource. ListenerSets status does not impact
+	// successful attachment, i.e. the AttachedListeners field count MUST be set
+	// for ListenerSets with condition Accepted: false and MUST count successfully
+	// attached AttachedListeners that may themselves have Accepted: false conditions.
+	//
+	// Uses for this field include troubleshooting AttachedListeners attachment and
+	// measuring blast radius/impact of changes to a Gateway.
+	// +optional
+	AttachedListeners *int32 `json:"attachedListeners"`
 }
 
 type AllowedListeners struct {
+	// Namespaces defines which namespaces ListenerSets can be attached to this Gateway.
+	// While this feature is experimental, the default value is to allow no ListenerSets.
+	//
+	// +optional
 	// +kubebuilder:default={from: None}
 	Namespaces *ListenerNamespaces `json:"namespaces,omitempty"`
 }
@@ -178,20 +208,19 @@ type ListenerEntry struct {
 
 	// Port is the network port. Multiple listeners may use the
 	// same port, subject to the Listener compatibility rules.
-    //
-	// If the port is not set or specified as zero, the implementation will assign
+	//
+	// If the port is not set, the implementation will assign
 	// a unique port. If the implementation does not support dynamic port
 	// assignment, it MUST set `Accepted` condition to `False` with the
 	// `UnsupportedPort` reason.
-    //
+	//
 	// Support: Core
 	//
 	// +optional
 	//
-	// +kubebuilder:default=0
-	// +kubebuilder:validation:Minimum=0
+	// +kubebuilder:validation:Minimum=1
 	// +kubebuilder:validation:Maximum=65535
-	Port PortNumber `json:"port,omitempty"`
+	Port *PortNumber `json:"port,omitempty"`
 
 	// Protocol specifies the network protocol this listener expects to receive.
 	//
@@ -769,7 +798,7 @@ status:
     protocol: HTTPS
     port: 443
     conditions:
-	- message: ListenerSet has conflicts with Gateway 'infra/parent-gateway'
+    - message: ListenerSet has conflicts with Gateway 'infra/parent-gateway'
       reason: ParentNotAccepted
       status: "False"
       type: Accepted
