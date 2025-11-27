@@ -45,6 +45,13 @@ var (
 
 type profileReportsMap map[ConformanceProfileName]confv1.ProfileReport
 
+func (p profileReportsMap) list() (profileReports []confv1.ProfileReport) {
+	for _, profileReport := range p {
+		profileReports = append(profileReports, profileReport)
+	}
+	return //nolint:gofumpt
+}
+
 func newReports() profileReportsMap {
 	return make(profileReportsMap)
 }
@@ -97,13 +104,6 @@ func (p profileReportsMap) addTestResults(conformanceProfile ConformanceProfile,
 		}
 	}
 	p[conformanceProfile.Name] = report
-}
-
-func (p profileReportsMap) list() (profileReports []confv1.ProfileReport) {
-	for _, profileReport := range p {
-		profileReports = append(profileReports, profileReport)
-	}
-	return
 }
 
 func (p profileReportsMap) compileResults(supportedFeaturesMap map[ConformanceProfileName]FeaturesSet, unsupportedFeaturesMap map[ConformanceProfileName]FeaturesSet) {
