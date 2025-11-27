@@ -98,6 +98,7 @@ test:
 
 .PHONY: tidy
 tidy:
+	go work sync
 	find . -name go.mod -execdir sh -c 'go mod tidy' \;
 
 # Run tests for CRDs validation
