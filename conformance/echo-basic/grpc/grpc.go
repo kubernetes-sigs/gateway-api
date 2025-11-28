@@ -173,7 +173,7 @@ func runServer(config serverConfig) (int, int) { //nolint:unparam
 	fullService := string(svcd.FullName())
 
 	// Set up plaintext server.
-	lis, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%d", config.HTTPPort))
+	lis, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%d", config.HTTPPort)) //nolint:noctx
 	if err != nil {
 		fmt.Printf("failed to listen: %v\n", err)
 		os.Exit(1)
@@ -200,7 +200,7 @@ func runServer(config serverConfig) (int, int) { //nolint:unparam
 			fmt.Printf("failed to create credentials: %v\n", err)
 			os.Exit(1)
 		}
-		secureListener, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%d", config.HTTPSPort))
+		secureListener, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%d", config.HTTPSPort)) //nolint:noctx
 		if err != nil {
 			fmt.Printf("failed to listen: %v\n", err)
 			os.Exit(1)

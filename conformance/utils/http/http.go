@@ -241,7 +241,7 @@ func AwaitConvergence(t *testing.T, threshold int, maxTimeToConsistency time.Dur
 		default:
 		}
 
-		completed := fn(time.Now().Sub(start))
+		completed := fn(time.Since(start))
 		attempts++
 		if completed {
 			successes++

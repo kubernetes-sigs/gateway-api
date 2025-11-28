@@ -371,5 +371,5 @@ func convertGatewayAddrsToPrimitives(gwaddrs []v1beta1.GatewaySpecAddress) (raw 
 			"value": addr.Value,
 		})
 	}
-	return
+	return //nolint:gofumpt
 }

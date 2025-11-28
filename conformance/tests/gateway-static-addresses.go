@@ -166,7 +166,7 @@ func filterAddr(addrs []v1.GatewaySpecAddress, filter v1.GatewaySpecAddress) (ne
 			newAddrs = append(newAddrs, addr)
 		}
 	}
-	return
+	return //nolint:gofumpt
 }
 
 var finalExpectedListenerState = []v1.ListenerStatus{
