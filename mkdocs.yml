@@ -14,6 +14,7 @@ extra_javascript:
 hooks:
 - hack/mkdocs-copy-geps.py
 - hack/mkdocs-generate-conformance.py
+- hack/mkdocs-linking.py
 watch:
 - geps
 theme:
@@ -47,18 +48,12 @@ plugins:
   - macros:
       include_dir: examples
       j2_line_comment_prefix: "#$"
-  - redirects:
-      redirect_maps:
-        'guides/getting-started.md': 'guides/index.md'
-        'concepts/gamma.md': 'mesh/index.md'
-        'concepts/service-facets.md': 'mesh/service-facets.md'
-        'concepts/guidelines.md': 'guides/api-design.md'
-        'contributing/community.md': 'contributing/index.md'
-        'contributing/gamma.md': 'mesh/index.md#contributing'
-        'reference/implementers-guide.md': 'guides/implementers.md'
-        'references/implementers-guide.md': 'guides/implementers.md'
-        'references/spec.md': 'reference/spec.md'
-        'references/policy-attachment.md': 'reference/policy-attachment.md'
+      module_name: mkdocs-main.py
+  # Do not add manual redirects here, they will be overwritten. Add them to 
+  # hack/redirect.json if needed in exceptional cases, but the mkdocs_linking.py
+  # hook and accompanying macro largely negate the need for manual redirects:
+  # https://github.com/kubernetes-sigs/gateway-api/pull/3999
+  - redirects: 
   - mermaid2
 markdown_extensions:
   - admonition
