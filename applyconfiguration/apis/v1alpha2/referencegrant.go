@@ -53,8 +53,8 @@ func ReferenceGrant(name, namespace string) *ReferenceGrantApplyConfiguration {
 // APIVersion and Kind populated. It is possible that no managed fields were found for because other
 // field managers have taken ownership of all the fields previously owned by fieldManager, or because
 // the fieldManager never owned fields any fields.
-// referenceGrant must be a unmodified ReferenceGrant API object that was retrieved from the Kubernetes API.
-// ExtractReferenceGrant provides a way to perform a extract/modify-in-place/apply workflow.
+// referenceGrant must be an unmodified ReferenceGrant API object that was retrieved from the Kubernetes API.
+// ExtractReferenceGrant provides a way to perform an extract/modify-in-place/apply workflow.
 // Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
 // applied if another fieldManager has updated or force applied any of the previously applied fields.
 // Experimental!

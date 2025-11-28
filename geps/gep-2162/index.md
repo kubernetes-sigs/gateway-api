@@ -133,7 +133,7 @@ In any case, the conformance tests file names should be meaningful and easy to u
 
 #### Conformance report
 
-In order for to verify that the list of features reported are indeed supported by GatewayClass tests will be run based on the features from the GatewayClassStatus.
+In order to verify that the list of features reported are indeed supported by GatewayClass tests will be run based on the features from the GatewayClassStatus.
 If the source of Gateway features are not inferred and manually provided the conformance suite will block the report from being submitted.
 
 #### Reporting Mesh features
@@ -152,7 +152,7 @@ The core purpose of conformance tests for GatewayClass is to verify that reporte
 While the community currently operates on a trust-based system for conformance reports, programmatically inferring features from the GatewayClass status field creates a strong, verifiable link between an implementation's claims and the test results.
 Having this connection between supported features and conformance tests, helps improve the UX and make it easier for implementers to run the correct conformance tests.
 
-## Followups
+## Follow-ups
 
 Before we make the changes we need to;
 

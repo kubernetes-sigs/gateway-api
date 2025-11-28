@@ -95,7 +95,7 @@ type RequestRate struct {
 	// time during which the given count of requests occur.
 	//
 	// Support: Extended
-	// +kubebuilder:validation:XValidation:message="interval can not be greater than one hour",rule="!(duration(self) == duration('0s') || duration(self) > duration('1h'))"
+	// +kubebuilder:validation:XValidation:message="interval cannot be greater than one hour",rule="!(duration(self) == duration('0s') || duration(self) > duration('1h'))"
 	// +optional
 	Interval *Duration `json:"interval,omitempty"`
 }

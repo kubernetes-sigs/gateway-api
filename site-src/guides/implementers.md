@@ -155,7 +155,7 @@ these Conditions on each resource or part thereof.
 
 Additionally, the upstream `Conditions` struct contains an optional
 `observedGeneration` field - implementations MUST use this field and set it to
-the `metadata.generation` field of the object at the time the status is generated.
+the `metadata.generation` field of the object when the status is generated.
 This allows users of the API to determine if the status is relevant to the current
 version of the object.
 

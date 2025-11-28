@@ -24,7 +24,7 @@ for one of the two (2) most recent Gateway API releases.
 
 So, it's conformant to support Mesh + HTTPRoute, or Gateway + HTTPRoute, or
 Gateway + TLSRoute, or Gateway + Mesh + HTTPRoute, plus any extended features
-the implementation claims. But implementaions _must_ support at least one
+the implementation claims. But implementations _must_ support at least one
 Profile and one Route type in that profile, and must pass all Core conformance
 tests for that Profile and Route type in addition to all claimed Extended
 features.
@@ -500,7 +500,7 @@ For help and support with Kong Gateway operator please feel free to [create an i
 
 
 ### Kubvernor
-[Kubvernor][kubvernor] is an open-source, highly experimental implementation of API controller in Rust programming language. Currently, Kubernor supports Envoy Proxy. The project aims to be as generic as possible so Kubvernor can be used to manage/deploy different gateways (Envoy, Nginx, HAProxy, etc.).
+[Kubvernor][kubvernor] is an open-source, highly experimental implementation of API controller in Rust programming language. Currently, Kubvernor supports Envoy Proxy. The project aims to be as generic as possible so Kubvernor can be used to manage/deploy different gateways (Envoy, Nginx, HAProxy, etc.).
 
 [kubvernor]:https://github.com/kubvernor/kubvernor
 
@@ -510,7 +510,7 @@ For help and support with Kong Gateway operator please feel free to [create an i
 
 [Kuma][kuma] is an open source service mesh.
 
-Kuma implements the Gateway API specification for the Kuma built-in, Envoy-based Gateway with a beta stability guarantee. Check the [Gateway API Documentation][kuma-1] for information on how to setup a Kuma built-in gateway using the Gateway API.
+Kuma implements the Gateway API specification for the Kuma built-in, Envoy-based Gateway with a beta stability guarantee. Check the [Gateway API Documentation][kuma-1] for information on how to set up a Kuma built-in gateway using the Gateway API.
 
 Kuma 2.3 and later support the [GAMMA initiative's][gamma]
 Gateway API [support for east-west traffic management][gamma] within the mesh.
@@ -737,7 +737,7 @@ Page review timeline, starting with the v1.3 Page Review:
   contact anyone who moves to Stale to inform them about this rule change.
 * Gateway API v1.4 release Page Review (at least one month after the actual
   release): A maintainer will perform the Page Review process again, removing
-  any implementations that are are still Stale (after a right-of-reply period).
+  any implementations that are still Stale (after a right-of-reply period).
 * Gateway API v1.5 release Page Review (at least one month after the actual
   release): We will remove the Stale category, and implementation maintainers
   will need to be at least partially conformant on each review, or during the

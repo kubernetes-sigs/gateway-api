@@ -139,7 +139,7 @@ either applied globally to all Listeners in the Gateway or can be overridden on 
 Gateway level configuration for client certificate validation was chosen due to security issue.
 
 #### Why per port override
-HTTPS connection can be reused between multiple Listeners sharing the same port. This might lead to bypassing client certificate validation configuration for a given Listener becasue new TLS handshake will not be triggered for different hostname.
+HTTPS connection can be reused between multiple Listeners sharing the same port. This might lead to bypassing client certificate validation configuration for a given Listener because new TLS handshake will not be triggered for different hostname.
 
 ### 4. Configure Client Certificate that Gateway should use to connect to Backend
 
@@ -148,14 +148,14 @@ HTTPS connection can be reused between multiple Listeners sharing the same port.
 | Gateway | `Gateway.Spec.TLS.Backend.ClientCertificateRef` | Proposed |
 
 #### Rationale
-Client certificate is part of Gateway identity and should not be overriden per backend.
+Client certificate is part of Gateway identity and should not be overridden per backend.
 
 #### Why Not Listener level to match FrontendValidation?
 In general, we'd expect this identity to represent a Gateway as a whole, and
 thus per-Listener configuration probably does not make sense here. Having
 FrontendValidation at the Listener level allows a Gateway to accept different
 client certs per SNI (a matching attribute of the frontend -> Gateway
-connection). On the other hand, when determining the identity a Gateway should
+connection). On the other hand, when determining the identity, a Gateway should
 use when connecting to a backend, it should likely either be tied directly to
 the Gateway or Backend, but the Listener is not particularly relevant in this
 context.
@@ -219,8 +219,8 @@ a Gateway with no Listener matching the protocol needed by the Route, the Route
 The following is a summary of all the Routes and the TLS termination mode they support, along
 with the compatible protocol.
 
-| Protocol  |  Routes | TLS Terminate | TLS Passthough |
-|-----------|---------|---------------|----------------|
+| Protocol  |  Routes | TLS Terminate | TLS Passthrough |
+|-----------|---------|---------------|-----------------|
 | HTTP      | `HTTPRoute`/`GRPCRoute` | no  | no  |
 | HTTPS     | `HTTPRoute`/`GRPCRoute` | yes | no  |
 | TLS       | `TLSRoute`  | yes | yes |

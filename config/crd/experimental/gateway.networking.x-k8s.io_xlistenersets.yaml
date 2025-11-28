@@ -71,7 +71,7 @@ spec:
           kind:
             description: |-
               Kind is a string value representing the REST resource this object represents.
-              Servers may infer this from the endpoint the client submits requests to.
+              Servers may infer this from the endpoint to which the client submits requests.
               Cannot be updated.
               In CamelCase.
               More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
@@ -729,7 +729,7 @@ spec:
                     supportedKinds:
                       description: |-
                         SupportedKinds is the list indicating the Kinds supported by this
-                        listener. This MUST represent the kinds an implementation supports for
+                        listener. This MUST represent the kinds supported by an implementation for
                         that Listener configuration.
 
                         If kinds are specified in Spec that are not supported, they MUST NOT

@@ -43,7 +43,7 @@ spec:
           kind:
             description: |-
               Kind is a string value representing the REST resource this object represents.
-              Servers may infer this from the endpoint the client submits requests to.
+              Servers may infer this from the endpoint to which the client submits requests.
               Cannot be updated.
               In CamelCase.
               More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
@@ -2614,7 +2614,7 @@ spec:
 
                         * The Route refers to a nonexistent parent.
                         * The Route is of a type that the controller does not support.
-                        * The Route is in a namespace the controller does not have access to.
+                        * The Route is in a namespace to which the controller does not have access.
                       items:
                         description: Condition contains details for one aspect of
                           the current state of this API Resource.
@@ -2858,7 +2858,7 @@ spec:
           kind:
             description: |-
               Kind is a string value representing the REST resource this object represents.
-              Servers may infer this from the endpoint the client submits requests to.
+              Servers may infer this from the endpoint to which the client submits requests.
               Cannot be updated.
               In CamelCase.
               More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
@@ -5429,7 +5429,7 @@ spec:
 
                         * The Route refers to a nonexistent parent.
                         * The Route is of a type that the controller does not support.
-                        * The Route is in a namespace the controller does not have access to.
+                        * The Route is in a namespace to which the controller does not have access.
                       items:
                         description: Condition contains details for one aspect of
                           the current state of this API Resource.

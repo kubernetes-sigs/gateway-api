@@ -110,7 +110,7 @@ spec:
 ## Rationale
 
 #### 1. Remove Complexity While it is Still Possible
-A goal of v1alpha2 is to make any breaking changes we think we'll need to for
+A goal of v1alpha2 is to make any breaking changes we think we'll need for
 the lifetime of the API. After this release, we plan to provide a fully
 convertible, and hopefully also fully backwards compatible, API. If we really
 do need more advanced functionality in the future, it will be fairly
@@ -335,7 +335,7 @@ type ListenerStatus struct {
 
     // SupportedKinds is the list indicating the Kinds supported by this
     // listener. When this is not specified on the Listener, this MUST represent
-    // the kinds an implementation supports for the specified protocol. When
+    // the kinds supported by an implementation for the specified protocol. When
     // there are kinds specified on the Listener, this MUST represent the
     // intersection of those kinds and the kinds supported by the implementation
     // for the specified protocol.

@@ -410,7 +410,7 @@ type HTTPRouteRetry struct {
 	// For example, setting the `rules[].retry.backoff` field to the value
 	// `100ms` will cause a backend request to first be retried approximately
 	// 100 milliseconds after timing out or receiving a response code configured
-	// to be retryable.
+	// to be retriable.
 	//
 	// An implementation MAY use an exponential or alternative backoff strategy
 	// for subsequent retry attempts, MAY cap the maximum backoff duration to
@@ -448,7 +448,7 @@ type HTTPRouteRetry struct {
 // HTTPRouteRetryStatusCode defines an HTTP response status code for
 // which a backend request should be retried.
 //
-// Implementations MUST support the following status codes as retryable:
+// Implementations MUST support the following status codes as retriable:
 //
 // * 500
 // * 502
@@ -1439,7 +1439,7 @@ type HTTPCORSFilter struct {
 	// Valid values are any method defined by RFC9110, along with the special
 	// value `*`, which represents all HTTP methods are allowed.
 	//
-	// Method names are case sensitive, so these values are also case-sensitive.
+	// Method names are case-sensitive, so these values are also case-sensitive.
 	// (See https://www.rfc-editor.org/rfc/rfc2616#section-5.1.1)
 	//
 	// Multiple method names in the value of the `Access-Control-Allow-Methods`
@@ -1483,7 +1483,7 @@ type HTTPCORSFilter struct {
 	// AllowHeaders indicates which HTTP request headers are supported for
 	// accessing the requested resource.
 	//
-	// Header names are not case sensitive.
+	// Header names are not case-sensitive.
 	//
 	// Multiple header names in the value of the `Access-Control-Allow-Headers`
 	// response header are separated by a comma (",").
@@ -1542,7 +1542,7 @@ type HTTPCORSFilter struct {
 	// this additional header will be exposed as part of the response to the
 	// client.
 	//
-	// Header names are not case sensitive.
+	// Header names are not case-sensitive.
 	//
 	// Multiple header names in the value of the `Access-Control-Expose-Headers`
 	// response header are separated by a comma (",").
@@ -1574,7 +1574,7 @@ type HTTPCORSFilter struct {
 	MaxAge int32 `json:"maxAge,omitempty"`
 }
 
-// HTTPRouteExternalAuthProtcol specifies what protocol should be used
+// HTTPRouteExternalAuthProtocol specifies what protocol should be used
 // for communicating with an external authorization server.
 //
 // Valid values are supplied as constants below.

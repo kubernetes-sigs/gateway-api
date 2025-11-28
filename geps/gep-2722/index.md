@@ -306,7 +306,7 @@ TLDR: This GEP proposes `gwctl`, a new command line tool designed to streamline
             </tr>
             <tr>
                 <td>TARGET NAME</td>
-                <td>Name of the resource the policy applies to</td>
+                <td>Name of the resource to which the policy applies</td>
                 <td></td>
             </tr>
             <tr>

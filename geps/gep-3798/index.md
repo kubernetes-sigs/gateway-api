@@ -88,6 +88,6 @@ Below are some implementations of ClientIP persistence which allows configuring 
 
 * [F5](https://techdocs.f5.com/content/kb/en-us/products/big-ip_ltm/manuals/product/ltm-concepts-11-5-1/11.html#:~:text=is%20persisted%20properly.-,Source%20address%20affinity%20persistence,-Source%20address%20affinity)
 * [Fortinet](https://help.fortinet.com/fadc/4-8-0/olh/Content/FortiADC/handbook/slb_persistence.htm)
-* [Huwaei](https://info.support.huawei.com/hedex/api/pages/EDOC1100149308/AEJ0713J/18/resources/cli/session_persistence.html)
+* [Huawei](https://info.support.huawei.com/hedex/api/pages/EDOC1100149308/AEJ0713J/18/resources/cli/session_persistence.html)
 * [NetScaler](https://docs.netscaler.com/en-us/citrix-adc/current-release/load-balancing/load-balancing-persistence/no-rule-persistence#:~:text=For%20IP%2Dbased%20persistence%2C%20you%20can%20also%20set%20the%20persistMask%20parameter)
 * [AVI](https://techdocs.broadcom.com/us/en/vmware-security-load-balancing/avi-load-balancer/avi-load-balancer/30-2/load-balancing-overview/persistence/client-ip-persistence.html)

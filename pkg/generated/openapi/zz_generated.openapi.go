@@ -236,7 +236,7 @@ func schema_pkg_apis_meta_v1_APIGroup(ref common.ReferenceCallback) common.OpenA
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint to which the client submits requests. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -319,7 +319,7 @@ func schema_pkg_apis_meta_v1_APIGroupList(ref common.ReferenceCallback) common.O
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint to which the client submits requests. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -490,7 +490,7 @@ func schema_pkg_apis_meta_v1_APIResourceList(ref common.ReferenceCallback) commo
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint to which the client submits requests. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -547,7 +547,7 @@ func schema_pkg_apis_meta_v1_APIVersions(ref common.ReferenceCallback) common.Op
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint to which the client submits requests. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -616,7 +616,7 @@ func schema_pkg_apis_meta_v1_ApplyOptions(ref common.ReferenceCallback) common.O
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint to which the client submits requests. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -741,7 +741,7 @@ func schema_pkg_apis_meta_v1_CreateOptions(ref common.ReferenceCallback) common.
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint to which the client submits requests. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -802,7 +802,7 @@ func schema_pkg_apis_meta_v1_DeleteOptions(ref common.ReferenceCallback) common.
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint to which the client submits requests. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -958,7 +958,7 @@ func schema_pkg_apis_meta_v1_GetOptions(ref common.ReferenceCallback) common.Ope
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint to which the client submits requests. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -1310,7 +1310,7 @@ func schema_pkg_apis_meta_v1_List(ref common.ReferenceCallback) common.OpenAPIDe
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint to which the client submits requests. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -1401,7 +1401,7 @@ func schema_pkg_apis_meta_v1_ListOptions(ref common.ReferenceCallback) common.Op
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint to which the client submits requests. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -1816,7 +1816,7 @@ func schema_pkg_apis_meta_v1_PartialObjectMetadata(ref common.ReferenceCallback)
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint to which the client submits requests. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -1852,7 +1852,7 @@ func schema_pkg_apis_meta_v1_PartialObjectMetadataList(ref common.ReferenceCallb
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint to which the client submits requests. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -1914,7 +1914,7 @@ func schema_pkg_apis_meta_v1_PatchOptions(ref common.ReferenceCallback) common.O
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint to which the client submits requests. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -2073,7 +2073,7 @@ func schema_pkg_apis_meta_v1_Status(ref common.ReferenceCallback) common.OpenAPI
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint to which the client submits requests. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -2251,7 +2251,7 @@ func schema_pkg_apis_meta_v1_Table(ref common.ReferenceCallback) common.OpenAPID
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint to which the client submits requests. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -2380,7 +2380,7 @@ func schema_pkg_apis_meta_v1_TableOptions(ref common.ReferenceCallback) common.O
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint to which the client submits requests. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -2560,7 +2560,7 @@ func schema_pkg_apis_meta_v1_TypeMeta(ref common.ReferenceCallback) common.OpenA
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint to which the client submits requests. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -2587,7 +2587,7 @@ func schema_pkg_apis_meta_v1_UpdateOptions(ref common.ReferenceCallback) common.
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint to which the client submits requests. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -3030,7 +3030,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_BackendTLSPolicy(ref common.ReferenceC
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint to which the client submits requests. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -3080,7 +3080,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_BackendTLSPolicyList(ref common.Refere
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint to which the client submits requests. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -3632,7 +3632,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GRPCRoute(ref common.ReferenceCallback
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint to which the client submits requests. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -3730,7 +3730,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GRPCRouteList(ref common.ReferenceCall
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint to which the client submits requests. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -4022,7 +4022,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_Gateway(ref common.ReferenceCallback) 
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint to which the client submits requests. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -4093,7 +4093,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewayClass(ref common.ReferenceCallb
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint to which the client submits requests. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -4143,7 +4143,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewayClassList(ref common.ReferenceC
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint to which the client submits requests. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -4340,7 +4340,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewayList(ref common.ReferenceCallba
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint to which the client submits requests. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -4810,7 +4810,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPCORSFilter(ref common.ReferenceCal
 							},
 						},
 						SchemaProps: spec.SchemaProps{
-							Description: "AllowMethods indicates which HTTP methods are supported for accessing the requested resource.\n\nValid values are any method defined by RFC9110, along with the special value `*`, which represents all HTTP methods are allowed.\n\nMethod names are case sensitive, so these values are also case-sensitive. (See https://www.rfc-editor.org/rfc/rfc2616#section-5.1.1)\n\nMultiple method names in the value of the `Access-Control-Allow-Methods` response header are separated by a comma (\",\").\n\nA CORS-safelisted method is a method that is `GET`, `HEAD`, or `POST`. (See https://fetch.spec.whatwg.org/#cors-safelisted-method) The CORS-safelisted methods are always allowed, regardless of whether they are specified in the `AllowMethods` field.\n\nWhen the `AllowMethods` field is configured with one or more methods, the gateway must return the `Access-Control-Allow-Methods` response header which value is present in the `AllowMethods` field.\n\nIf the HTTP method of the `Access-Control-Request-Method` request header is not included in the list of methods specified by the response header `Access-Control-Allow-Methods`, it will present an error on the client side.\n\nThe `Access-Control-Allow-Methods` response header can only use `*` wildcard as value when the `AllowCredentials` field is false or omitted.\n\nWhen the `AllowCredentials` field is true and `AllowMethods` field specified with the `*` wildcard, the gateway must specify one HTTP method in the value of the Access-Control-Allow-Methods response header. The value of the header `Access-Control-Allow-Methods` is same as the `Access-Control-Request-Method` header provided by the client. If the header `Access-Control-Request-Method` is not included in the request, the gateway will omit the `Access-Control-Allow-Methods` response header, instead of specifying the `*` wildcard. A Gateway implementation may choose to add implementation-specific default methods.\n\nSupport: Extended",
+							Description: "AllowMethods indicates which HTTP methods are supported for accessing the requested resource.\n\nValid values are any method defined by RFC9110, along with the special value `*`, which represents all HTTP methods are allowed.\n\nMethod names are case-sensitive, so these values are also case-sensitive. (See https://www.rfc-editor.org/rfc/rfc2616#section-5.1.1)\n\nMultiple method names in the value of the `Access-Control-Allow-Methods` response header are separated by a comma (\",\").\n\nA CORS-safelisted method is a method that is `GET`, `HEAD`, or `POST`. (See https://fetch.spec.whatwg.org/#cors-safelisted-method) The CORS-safelisted methods are always allowed, regardless of whether they are specified in the `AllowMethods` field.\n\nWhen the `AllowMethods` field is configured with one or more methods, the gateway must return the `Access-Control-Allow-Methods` response header which value is present in the `AllowMethods` field.\n\nIf the HTTP method of the `Access-Control-Request-Method` request header is not included in the list of methods specified by the response header `Access-Control-Allow-Methods`, it will present an error on the client side.\n\nThe `Access-Control-Allow-Methods` response header can only use `*` wildcard as value when the `AllowCredentials` field is false or omitted.\n\nWhen the `AllowCredentials` field is true and `AllowMethods` field specified with the `*` wildcard, the gateway must specify one HTTP method in the value of the Access-Control-Allow-Methods response header. The value of the header `Access-Control-Allow-Methods` is same as the `Access-Control-Request-Method` header provided by the client. If the header `Access-Control-Request-Method` is not included in the request, the gateway will omit the `Access-Control-Allow-Methods` response header, instead of specifying the `*` wildcard. A Gateway implementation may choose to add implementation-specific default methods.\n\nSupport: Extended",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -4830,7 +4830,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPCORSFilter(ref common.ReferenceCal
 							},
 						},
 						SchemaProps: spec.SchemaProps{
-							Description: "AllowHeaders indicates which HTTP request headers are supported for accessing the requested resource.\n\nHeader names are not case sensitive.\n\nMultiple header names in the value of the `Access-Control-Allow-Headers` response header are separated by a comma (\",\").\n\nWhen the `AllowHeaders` field is configured with one or more headers, the gateway must return the `Access-Control-Allow-Headers` response header which value is present in the `AllowHeaders` field.\n\nIf any header name in the `Access-Control-Request-Headers` request header is not included in the list of header names specified by the response header `Access-Control-Allow-Headers`, it will present an error on the client side.\n\nIf any header name in the `Access-Control-Allow-Headers` response header does not recognize by the client, it will also occur an error on the client side.\n\nA wildcard indicates that the requests with all HTTP headers are allowed. The `Access-Control-Allow-Headers` response header can only use `*` wildcard as value when the `AllowCredentials` field is false or omitted.\n\nWhen the `AllowCredentials` field is true and `AllowHeaders` field specified with the `*` wildcard, the gateway must specify one or more HTTP headers in the value of the `Access-Control-Allow-Headers` response header. The value of the header `Access-Control-Allow-Headers` is same as the `Access-Control-Request-Headers` header provided by the client. If the header `Access-Control-Request-Headers` is not included in the request, the gateway will omit the `Access-Control-Allow-Headers` response header, instead of specifying the `*` wildcard. A Gateway implementation may choose to add implementation-specific default headers.\n\nSupport: Extended",
+							Description: "AllowHeaders indicates which HTTP request headers are supported for accessing the requested resource.\n\nHeader names are not case-sensitive.\n\nMultiple header names in the value of the `Access-Control-Allow-Headers` response header are separated by a comma (\",\").\n\nWhen the `AllowHeaders` field is configured with one or more headers, the gateway must return the `Access-Control-Allow-Headers` response header which value is present in the `AllowHeaders` field.\n\nIf any header name in the `Access-Control-Request-Headers` request header is not included in the list of header names specified by the response header `Access-Control-Allow-Headers`, it will present an error on the client side.\n\nIf any header name in the `Access-Control-Allow-Headers` response header does not recognize by the client, it will also occur an error on the client side.\n\nA wildcard indicates that the requests with all HTTP headers are allowed. The `Access-Control-Allow-Headers` response header can only use `*` wildcard as value when the `AllowCredentials` field is false or omitted.\n\nWhen the `AllowCredentials` field is true and `AllowHeaders` field specified with the `*` wildcard, the gateway must specify one or more HTTP headers in the value of the `Access-Control-Allow-Headers` response header. The value of the header `Access-Control-Allow-Headers` is same as the `Access-Control-Request-Headers` header provided by the client. If the header `Access-Control-Request-Headers` is not included in the request, the gateway will omit the `Access-Control-Allow-Headers` response header, instead of specifying the `*` wildcard. A Gateway implementation may choose to add implementation-specific default headers.\n\nSupport: Extended",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -4850,7 +4850,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPCORSFilter(ref common.ReferenceCal
 							},
 						},
 						SchemaProps: spec.SchemaProps{
-							Description: "ExposeHeaders indicates which HTTP response headers can be exposed to client-side scripts in response to a cross-origin request.\n\nA CORS-safelisted response header is an HTTP header in a CORS response that it is considered safe to expose to the client scripts. The CORS-safelisted response headers include the following headers: `Cache-Control` `Content-Language` `Content-Length` `Content-Type` `Expires` `Last-Modified` `Pragma` (See https://fetch.spec.whatwg.org/#cors-safelisted-response-header-name) The CORS-safelisted response headers are exposed to client by default.\n\nWhen an HTTP header name is specified using the `ExposeHeaders` field, this additional header will be exposed as part of the response to the client.\n\nHeader names are not case sensitive.\n\nMultiple header names in the value of the `Access-Control-Expose-Headers` response header are separated by a comma (\",\").\n\nA wildcard indicates that the responses with all HTTP headers are exposed to clients. The `Access-Control-Expose-Headers` response header can only use `*` wildcard as value when the `AllowCredentials` field is false or omitted.\n\nSupport: Extended",
+							Description: "ExposeHeaders indicates which HTTP response headers can be exposed to client-side scripts in response to a cross-origin request.\n\nA CORS-safelisted response header is an HTTP header in a CORS response that it is considered safe to expose to the client scripts. The CORS-safelisted response headers include the following headers: `Cache-Control` `Content-Language` `Content-Length` `Content-Type` `Expires` `Last-Modified` `Pragma` (See https://fetch.spec.whatwg.org/#cors-safelisted-response-header-name) The CORS-safelisted response headers are exposed to client by default.\n\nWhen an HTTP header name is specified using the `ExposeHeaders` field, this additional header will be exposed as part of the response to the client.\n\nHeader names are not case-sensitive.\n\nMultiple header names in the value of the `Access-Control-Expose-Headers` response header are separated by a comma (\",\").\n\nA wildcard indicates that the responses with all HTTP headers are exposed to clients. The `Access-Control-Expose-Headers` response header can only use `*` wildcard as value when the `AllowCredentials` field is false or omitted.\n\nSupport: Extended",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -5264,7 +5264,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRoute(ref common.ReferenceCallback
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint to which the client submits requests. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -5386,7 +5386,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteList(ref common.ReferenceCall
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint to which the client submits requests. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -5534,7 +5534,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteRetry(ref common.ReferenceCal
 					},
 					"backoff": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Backoff specifies the minimum duration a Gateway should wait between retry attempts and is represented in Gateway API Duration formatting.\n\nFor example, setting the `rules[].retry.backoff` field to the value `100ms` will cause a backend request to first be retried approximately 100 milliseconds after timing out or receiving a response code configured to be retryable.\n\nAn implementation MAY use an exponential or alternative backoff strategy for subsequent retry attempts, MAY cap the maximum backoff duration to some amount greater than the specified minimum, and MAY add arbitrary jitter to stagger requests, as long as unsuccessful backend requests are not retried before the configured minimum duration.\n\nIf a Request timeout (`rules[].timeouts.request`) is configured on the route, the entire duration of the initial request and any retry attempts MUST not exceed the Request timeout duration. If any retry attempts are still in progress when the Request timeout duration has been reached, these SHOULD be canceled if possible and the Gateway MUST immediately return a timeout error.\n\nIf a BackendRequest timeout (`rules[].timeouts.backendRequest`) is configured on the route, any retry attempts which reach the configured BackendRequest timeout duration without a response SHOULD be canceled if possible and the Gateway should wait for at least the specified backoff duration before attempting to retry the backend request again.\n\nIf a BackendRequest timeout is _not_ configured on the route, retry attempts MAY time out after an implementation default duration, or MAY remain pending until a configured Request timeout or implementation default duration for total request time is reached.\n\nWhen this field is unspecified, the time to wait between retry attempts is implementation-specific.\n\nSupport: Extended",
+							Description: "Backoff specifies the minimum duration a Gateway should wait between retry attempts and is represented in Gateway API Duration formatting.\n\nFor example, setting the `rules[].retry.backoff` field to the value `100ms` will cause a backend request to first be retried approximately 100 milliseconds after timing out or receiving a response code configured to be retriable.\n\nAn implementation MAY use an exponential or alternative backoff strategy for subsequent retry attempts, MAY cap the maximum backoff duration to some amount greater than the specified minimum, and MAY add arbitrary jitter to stagger requests, as long as unsuccessful backend requests are not retried before the configured minimum duration.\n\nIf a Request timeout (`rules[].timeouts.request`) is configured on the route, the entire duration of the initial request and any retry attempts MUST not exceed the Request timeout duration. If any retry attempts are still in progress when the Request timeout duration has been reached, these SHOULD be canceled if possible and the Gateway MUST immediately return a timeout error.\n\nIf a BackendRequest timeout (`rules[].timeouts.backendRequest`) is configured on the route, any retry attempts which reach the configured BackendRequest timeout duration without a response SHOULD be canceled if possible and the Gateway should wait for at least the specified backoff duration before attempting to retry the backend request again.\n\nIf a BackendRequest timeout is _not_ configured on the route, retry attempts MAY time out after an implementation default duration, or MAY remain pending until a configured Request timeout or implementation default duration for total request time is reached.\n\nWhen this field is unspecified, the time to wait between retry attempts is implementation-specific.\n\nSupport: Extended",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -5829,7 +5829,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_Listener(ref common.ReferenceCallback)
 					},
 					"hostname": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Hostname specifies the virtual hostname to match for protocol types that define this concept. When unspecified, all hostnames are matched. This field is ignored for protocols that don't require hostname based matching.\n\nImplementations MUST apply Hostname matching appropriately for each of the following protocols:\n\n* TLS: The Listener Hostname MUST match the SNI. * HTTP: The Listener Hostname MUST match the Host header of the request. * HTTPS: The Listener Hostname SHOULD match both the SNI and Host header.\n  Note that this does not require the SNI and Host header to be the same.\n  The semantics of this are described in more detail below.\n\nTo ensure security, Section 11.1 of RFC-6066 emphasizes that server implementations that rely on SNI hostname matching MUST also verify hostnames within the application protocol.\n\nSection 9.1.2 of RFC-7540 provides a mechanism for servers to reject the reuse of a connection by responding with the HTTP 421 Misdirected Request status code. This indicates that the origin server has rejected the request because it appears to have been misdirected.\n\nTo detect misdirected requests, Gateways SHOULD match the authority of the requests with all the SNI hostname(s) configured across all the Gateway Listeners on the same port and protocol:\n\n* If another Listener has an exact match or more specific wildcard entry,\n  the Gateway SHOULD return a 421.\n* If the current Listener (selected by SNI matching during ClientHello)\n  does not match the Host:\n    * If another Listener does match the Host the Gateway SHOULD return a\n      421.\n    * If no other Listener matches the Host, the Gateway MUST return a\n      404.\n\nFor HTTPRoute and TLSRoute resources, there is an interaction with the `spec.hostnames` array. When both listener and route specify hostnames, there MUST be an intersection between the values for a Route to be accepted. For more information, refer to the Route specific Hostnames documentation.\n\nHostnames that are prefixed with a wildcard label (`*.`) are interpreted as a suffix match. That means that a match for `*.example.com` would match both `test.example.com`, and `foo.test.example.com`, but not `example.com`.\n\nSupport: Core",
+							Description: "Hostname specifies the virtual hostname to match for protocol types that define this concept. When unspecified, all hostnames are matched. This field is ignored for protocols that don't require hostname based matching.\n\nImplementations MUST apply Hostname matching appropriately for each of the following protocols:\n\n* TLS: The Listener Hostname MUST match the SNI. * HTTP: The Listener Hostname MUST match the Host header of the request. * HTTPS: The Listener Hostname SHOULD match both the SNI and Host header.\n  Note that this does not require the SNI and Host header to be the same.\n  The semantics of this are described in more detail below.\n\nTo ensure security, Section 11.1 of RFC-6066 emphasizes that server implementations that rely on SNI hostname matching MUST also verify hostnames within the application protocol.\n\nSection 9.1.2 of RFC-7540 provides a mechanism for servers to reject the reuse of a connection by responding with the HTTP 421 Misdirected Request status code. This indicates that the origin server has rejected the request because it appears to have been misdirected.\n\nTo detect misdirected requests, Gateways SHOULD match the authority of the requests with all the SNI hostname(s) configured across all the Gateway Listeners on the same port and protocol:\n\n* If another Listener has an exact match or more specific wildcard entry,\n  the Gateway SHOULD return a 421.\n* If the current Listener (selected by SNI matching during ClientHello)\n  does not match the Host:\n    * If another Listener does match the Host, the Gateway SHOULD return a\n      421.\n    * If no other Listener matches the Host, the Gateway MUST return a\n      404.\n\nFor HTTPRoute and TLSRoute resources, there is an interaction with the `spec.hostnames` array. When both listener and route specify hostnames, there MUST be an intersection between the values for a Route to be accepted. For more information, refer to the Route specific Hostnames documentation.\n\nHostnames that are prefixed with a wildcard label (`*.`) are interpreted as a suffix match. That means that a match for `*.example.com` would match both `test.example.com`, and `foo.test.example.com`, but not `example.com`.\n\nSupport: Core",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -5921,7 +5921,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_ListenerStatus(ref common.ReferenceCal
 							},
 						},
 						SchemaProps: spec.SchemaProps{
-							Description: "SupportedKinds is the list indicating the Kinds supported by this listener. This MUST represent the kinds an implementation supports for that Listener configuration.\n\nIf kinds are specified in Spec that are not supported, they MUST NOT appear in this list and an implementation MUST set the \"ResolvedRefs\" condition to \"False\" with the \"InvalidRouteKinds\" reason. If both valid and invalid Route kinds are specified, the implementation MUST reference the valid Route kinds that have been specified.",
+							Description: "SupportedKinds is the list indicating the Kinds supported by this listener. This MUST represent the kinds supported by an implementation for that Listener configuration.\n\nIf kinds are specified in Spec that are not supported, they MUST NOT appear in this list and an implementation MUST set the \"ResolvedRefs\" condition to \"False\" with the \"InvalidRouteKinds\" reason. If both valid and invalid Route kinds are specified, the implementation MUST reference the valid Route kinds that have been specified.",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -6557,7 +6557,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_RouteParentStatus(ref common.Reference
 							},
 						},
 						SchemaProps: spec.SchemaProps{
-							Description: "Conditions describes the status of the route with respect to the Gateway. Note that the route's availability is also subject to the Gateway's own status conditions and listener status.\n\nIf the Route's ParentRef specifies an existing Gateway that supports Routes of this kind AND that Gateway's controller has sufficient access, then that Gateway's controller MUST set the \"Accepted\" condition on the Route, to indicate whether the route has been accepted or rejected by the Gateway, and why.\n\nA Route MUST be considered \"Accepted\" if at least one of the Route's rules is implemented by the Gateway.\n\nThere are a number of cases where the \"Accepted\" condition may not be set due to lack of controller visibility, that includes when:\n\n* The Route refers to a nonexistent parent. * The Route is of a type that the controller does not support. * The Route is in a namespace the controller does not have access to.\n\n<gateway:util:excludeFromCRD>\n\nNotes for implementors:\n\nConditions are a listType `map`, which means that they function like a map with a key of the `type` field _in the k8s apiserver_.\n\nThis means that implementations must obey some rules when updating this section.\n\n* Implementations MUST perform a read-modify-write cycle on this field\n  before modifying it. That is, when modifying this field, implementations\n  must be confident they have fetched the most recent version of this field,\n  and ensure that changes they make are on that recent version.\n* Implementations MUST NOT remove or reorder Conditions that they are not\n  directly responsible for. For example, if an implementation sees a Condition\n  with type `special.io/SomeField`, it MUST NOT remove, change or update that\n  Condition.\n* Implementations MUST always _merge_ changes into Conditions of the same Type,\n  rather than creating more than one Condition of the same Type.\n* Implementations MUST always update the `observedGeneration` field of the\n  Condition to the `metadata.generation` of the Gateway at the time of update creation.\n* If the `observedGeneration` of a Condition is _greater than_ the value the\n  implementation knows about, then it MUST NOT perform the update on that Condition,\n  but must wait for a future reconciliation and status update. (The assumption is that\n  the implementation's copy of the object is stale and an update will be re-triggered\n  if relevant.)\n\n</gateway:util:excludeFromCRD>",
+							Description: "Conditions describes the status of the route with respect to the Gateway. Note that the route's availability is also subject to the Gateway's own status conditions and listener status.\n\nIf the Route's ParentRef specifies an existing Gateway that supports Routes of this kind AND that Gateway's controller has sufficient access, then that Gateway's controller MUST set the \"Accepted\" condition on the Route, to indicate whether the route has been accepted or rejected by the Gateway, and why.\n\nA Route MUST be considered \"Accepted\" if at least one of the Route's rules is implemented by the Gateway.\n\nThere are a number of cases where the \"Accepted\" condition may not be set due to lack of controller visibility, that includes when:\n\n* The Route refers to a nonexistent parent. * The Route is of a type that the controller does not support. * The Route is in a namespace to which the controller does not have access.\n\n<gateway:util:excludeFromCRD>\n\nNotes for implementors:\n\nConditions are a listType `map`, which means that they function like a map with a key of the `type` field _in the k8s apiserver_.\n\nThis means that implementations must obey some rules when updating this section.\n\n* Implementations MUST perform a read-modify-write cycle on this field\n  before modifying it. That is, when modifying this field, implementations\n  must be confident they have fetched the most recent version of this field,\n  and ensure that changes they make are on that recent version.\n* Implementations MUST NOT remove or reorder Conditions that they are not\n  directly responsible for. For example, if an implementation sees a Condition\n  with type `special.io/SomeField`, it MUST NOT remove, change or update that\n  Condition.\n* Implementations MUST always _merge_ changes into Conditions of the same Type,\n  rather than creating more than one Condition of the same Type.\n* Implementations MUST always update the `observedGeneration` field of the\n  Condition to the `metadata.generation` of the Gateway at the time of update creation.\n* If the `observedGeneration` of a Condition is _greater than_ the value the\n  implementation knows about, then it MUST NOT perform the update on that Condition,\n  but must wait for a future reconciliation and status update. (The assumption is that\n  the implementation's copy of the object is stale and an update will be re-triggered\n  if relevant.)\n\n</gateway:util:excludeFromCRD>",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -6686,7 +6686,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_SessionPersistence(ref common.Referenc
 					},
 					"type": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Type defines the type of session persistence such as through the use a header or cookie. Defaults to cookie based session persistence.\n\nSupport: Core for \"Cookie\" type\n\nSupport: Extended for \"Header\" type",
+							Description: "Type defines the type of session persistence such as through the use of a header or cookie. Defaults to cookie based session persistence.\n\nSupport: Core for \"Cookie\" type\n\nSupport: Extended for \"Header\" type",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -6841,7 +6841,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_GRPCRoute(ref common.ReferenceCa
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint to which the client submits requests. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -6890,7 +6890,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_GRPCRouteList(ref common.Referen
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint to which the client submits requests. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -7150,7 +7150,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_ReferenceGrant(ref common.Refere
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint to which the client submits requests. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -7192,7 +7192,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_ReferenceGrantList(ref common.Re
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint to which the client submits requests. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -7241,7 +7241,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_TCPRoute(ref common.ReferenceCal
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint to which the client submits requests. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -7291,7 +7291,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_TCPRouteList(ref common.Referenc
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint to which the client submits requests. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -7478,7 +7478,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_TLSRoute(ref common.ReferenceCal
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint to which the client submits requests. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -7528,7 +7528,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_TLSRouteList(ref common.Referenc
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint to which the client submits requests. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -7735,7 +7735,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_UDPRoute(ref common.ReferenceCal
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint to which the client submits requests. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -7785,7 +7785,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_UDPRouteList(ref common.Referenc
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint to which the client submits requests. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -7971,7 +7971,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha3_BackendTLSPolicy(ref common.Refe
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint to which the client submits requests. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -8020,7 +8020,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha3_BackendTLSPolicyList(ref common.
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint to which the client submits requests. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -8069,7 +8069,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha3_TLSRoute(ref common.ReferenceCal
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint to which the client submits requests. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -8119,7 +8119,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha3_TLSRouteList(ref common.Referenc
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint to which the client submits requests. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -8249,7 +8249,7 @@ func schema_sigsk8sio_gateway_api_apis_v1beta1_Gateway(ref common.ReferenceCallb
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint to which the client submits requests. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -8299,7 +8299,7 @@ func schema_sigsk8sio_gateway_api_apis_v1beta1_GatewayClass(ref common.Reference
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint to which the client submits requests. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -8349,7 +8349,7 @@ func schema_sigsk8sio_gateway_api_apis_v1beta1_GatewayClassList(ref common.Refer
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint to which the client submits requests. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -8398,7 +8398,7 @@ func schema_sigsk8sio_gateway_api_apis_v1beta1_GatewayList(ref common.ReferenceC
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint to which the client submits requests. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -8447,7 +8447,7 @@ func schema_sigsk8sio_gateway_api_apis_v1beta1_HTTPRoute(ref common.ReferenceCal
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint to which the client submits requests. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -8497,7 +8497,7 @@ func schema_sigsk8sio_gateway_api_apis_v1beta1_HTTPRouteList(ref common.Referenc
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint to which the client submits requests. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -8546,7 +8546,7 @@ func schema_sigsk8sio_gateway_api_apis_v1beta1_ReferenceGrant(ref common.Referen
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint to which the client submits requests. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -8626,7 +8626,7 @@ func schema_sigsk8sio_gateway_api_apis_v1beta1_ReferenceGrantList(ref common.Ref
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint to which the client submits requests. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -8923,7 +8923,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerEntryStatus(ref common.
 							},
 						},
 						SchemaProps: spec.SchemaProps{
-							Description: "SupportedKinds is the list indicating the Kinds supported by this listener. This MUST represent the kinds an implementation supports for that Listener configuration.\n\nIf kinds are specified in Spec that are not supported, they MUST NOT appear in this list and an implementation MUST set the \"ResolvedRefs\" condition to \"False\" with the \"InvalidRouteKinds\" reason. If both valid and invalid Route kinds are specified, the implementation MUST reference the valid Route kinds that have been specified.",
+							Description: "SupportedKinds is the list indicating the Kinds supported by this listener. This MUST represent the kinds supported by an implementation for that Listener configuration.\n\nIf kinds are specified in Spec that are not supported, they MUST NOT appear in this list and an implementation MUST set the \"ResolvedRefs\" condition to \"False\" with the \"InvalidRouteKinds\" reason. If both valid and invalid Route kinds are specified, the implementation MUST reference the valid Route kinds that have been specified.",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -9278,7 +9278,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_XBackendTrafficPolicy(ref commo
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint to which the client submits requests. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -9328,7 +9328,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_XBackendTrafficPolicyList(ref c
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint to which the client submits requests. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -9377,7 +9377,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_XListenerSet(ref common.Referen
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint to which the client submits requests. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -9426,7 +9426,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_XListenerSetList(ref common.Ref
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint to which the client submits requests. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -9475,7 +9475,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_XMesh(ref common.ReferenceCallb
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint to which the client submits requests. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -9524,7 +9524,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_XMeshList(ref common.ReferenceC
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint to which the client submits requests. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
 							Type:        []string{"string"},
 							Format:      "",
 						},

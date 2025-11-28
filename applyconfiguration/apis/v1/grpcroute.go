@@ -53,8 +53,8 @@ func GRPCRoute(name, namespace string) *GRPCRouteApplyConfiguration {
 // APIVersion and Kind populated. It is possible that no managed fields were found for because other
 // field managers have taken ownership of all the fields previously owned by fieldManager, or because
 // the fieldManager never owned fields any fields.
-// gRPCRoute must be a unmodified GRPCRoute API object that was retrieved from the Kubernetes API.
-// ExtractGRPCRoute provides a way to perform a extract/modify-in-place/apply workflow.
+// gRPCRoute must be an unmodified GRPCRoute API object that was retrieved from the Kubernetes API.
+// ExtractGRPCRoute provides a way to perform an extract/modify-in-place/apply workflow.
 // Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
 // applied if another fieldManager has updated or force applied any of the previously applied fields.
 // Experimental!

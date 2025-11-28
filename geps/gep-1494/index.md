@@ -301,7 +301,7 @@ and is not an additional CRD.
 
 ```go
 
-// HTTPRouteExtAuthProtcol specifies what protocol should be used
+// HTTPRouteExtAuthProtocol specifies what protocol should be used
 // for communicating with an external authorization server.
 //
 // Valid values are supplied as constants below.
