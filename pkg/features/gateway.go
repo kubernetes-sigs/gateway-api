@@ -64,6 +64,10 @@ const (
 	//  SupportGatewayAddressEmpty option indicates support for an empty
 	//  spec.addresses.value field
 	SupportGatewayAddressEmpty FeatureName = "GatewayAddressEmpty"
+
+	//  SupportGatewayListenerSet option indicates support for a Gateway
+	//  with ListenerSets
+	SupportGatewayListenerSet FeatureName = "GatewayListenerSet"
 )
 
 var (
@@ -92,6 +96,11 @@ var (
 		Name:    SupportGatewayAddressEmpty,
 		Channel: FeatureChannelStandard,
 	}
+	// GatewayListenerSetFeature contains metadata for the SupportGatewayListenerSet feature.
+	GatewayListenerSetFeature = Feature{
+		Name:    SupportGatewayListenerSet,
+		Channel: FeatureChannelExperimental,
+	}
 )
 
 // GatewayExtendedFeatures are extra generic features that implementations may
@@ -102,4 +111,5 @@ var GatewayExtendedFeatures = sets.New(
 	GatewayHTTPListenerIsolationFeature,
 	GatewayInfrastructurePropagationFeature,
 	GatewayEmptyAddressFeature,
+	GatewayListenerSetFeature,
 )
