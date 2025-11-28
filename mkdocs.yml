@@ -27,7 +27,7 @@ theme:
     - navigation.tabs
     - navigation.top
     - navigation.expand
-    - toc.integrate
+    - content.tabs.link
   palette:
     - scheme: default
       primary: custom
@@ -75,6 +75,8 @@ markdown_extensions:
           class: mermaid
           format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
   - toc:
       permalink: true
   - tables

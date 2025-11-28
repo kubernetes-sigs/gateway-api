@@ -20,32 +20,9 @@ set -o pipefail
 
 SCRIPT_ROOT=$(dirname "${BASH_SOURCE}")/..
 
-TMP_DIFFROOT="${SCRIPT_ROOT}/_tmp"
-TMP_FILE="${TMP_DIFFROOT}/nav.yml"
-
 GEPS_TOC_SKIP="${GEPS_TOC_SKIP:-696}"
 NAV_CONF="${NAV_CONF:-${SCRIPT_ROOT}/nav.yml}"
 NAV_TEMPLATE="${NAV_TEMPLATE:-${NAV_CONF}.tmpl}"
 GEPS_TOC_DIR=${GEPS_TOC_DIR:-${SCRIPT_ROOT}/geps}
 
-cleanup() {
-  rm -rf "${TMP_DIFFROOT}"
-}
-trap "cleanup" EXIT SIGINT
-
-cleanup
-
-mkdir -p "${TMP_DIFFROOT}"
-
-go run tools/gepstoc/main.go -g "${GEPS_TOC_DIR}/" -t "${NAV_TEMPLATE}" -s "${GEPS_TOC_SKIP}" > "${TMP_FILE}"
-
-echo "diffing ${NAV_CONF} against freshly generated configuration"
-ret=0
-diff -Naupr --no-dereference "${NAV_CONF}" "${TMP_FILE}" || ret=1
-
-if [[ $ret -eq 0 ]]; then
-  echo "${NAV_CONF} up to date."
-else
-  echo "${NAV_CONF} is out of date. Please run hack/update-mkdocs-nav.sh"
-  exit 1
-fi
+go run tools/geps/main.go -g "${GEPS_TOC_DIR}/" -s "${GEPS_TOC_SKIP}"
