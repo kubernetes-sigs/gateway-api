@@ -65,6 +65,7 @@ type ConformanceTestSuite struct {
 	RestConfig               *rest.Config
 	RoundTripper             roundtripper.RoundTripper
 	GRPCClient               grpc.Client
+	CurrentTest              *ConformanceTest
 	GatewayClassName         string
 	MeshName                 string
 	ControllerName           string
@@ -459,7 +460,30 @@ func (suite *ConformanceTestSuite) Run(t *testing.T, tests []ConformanceTest) er
 	// run all tests and collect the test results for conformance reporting
 	results := make(map[string]testResult)
 	sleepForTestIsolation := false
+
+	testsToRun := []ConformanceTest{}
 	for _, test := range tests {
+		if len(test.MeshFeatures) > 0 {
+			// Create Gateway version
+			gwTest := test
+			gwTest.MeshFeatures = nil
+			gwTest.MeshManifests = nil
+			gwTest.IsMesh = false
+			testsToRun = append(testsToRun, gwTest)
+
+			// Create Mesh version
+			meshTest := test
+			meshTest.ShortName = "Mesh" + meshTest.ShortName
+			meshTest.Features = test.MeshFeatures
+			meshTest.Manifests = test.MeshManifests
+			meshTest.IsMesh = true
+			testsToRun = append(testsToRun, meshTest)
+		} else {
+			testsToRun = append(testsToRun, test)
+		}
+	}
+
+	for _, test := range testsToRun {
 		res := testSucceeded
 		if suite.RunTest != "" && test.ShortName != suite.RunTest {
 			res = testSkipped
