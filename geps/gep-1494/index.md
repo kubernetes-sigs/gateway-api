@@ -1,7 +1,7 @@
 # GEP-1494: HTTP Auth in Gateway API
 
 * Issue: [#1494](https://github.com/kubernetes-sigs/gateway-api/issues/1494)
-* Status: Implementable
+* Status: Experimental
 
 (See [status definitions](../overview.md#gep-states).)
 
