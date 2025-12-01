@@ -69,6 +69,10 @@ type BackendTrafficPolicySpec struct {
 	// Currently, a TargetRef can not be scoped to a specific port on a
 	// Service.
 	//
+	// Because of concerns over recording status correctly in some edge cases,
+	// currently, Core support is only given to one (1) TargetRef. More than
+	// one TargetRef is Implementation Specific.
+	//
 	// +listType=map
 	// +listMapKey=group
 	// +listMapKey=kind

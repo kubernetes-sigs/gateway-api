@@ -625,6 +625,20 @@ While in some cases adding new fields may be seen as a backwards compatibility r
 knowing to respect the fields, these fields (or similar, should future GEPs decide on new names) are pre-approved to be
 added in a future release, should the GEPs to add them are approved in the first place.
 
+## Outstanding issues
+
+### Multiple TargetRefs rolling up to the same Gateway cannot be represented in status
+
+It is possible to have a BackendTLSPolicy target multiple, different Services that are used in HTTPRoutes that attach
+to the same Gateway.
+
+As written, the Status section of BackendTLSPolicy does not have a way to represent these separate statuses, as the
+status is namespaced by `controllerName` and `ancestorRef` (where "ancestor" is the Gateway in this case).
+
+We need to decide if this is enough of an issue to change the status design, or if we record this as a design decision
+and accept the tradeoff.
+
+
 ## Alternatives
 Most alternatives are enumerated in the section "The history of backend TLS".  A couple of additional
 alternatives are also listed here.
