@@ -21,13 +21,29 @@ set -o pipefail
 ROOT=$(dirname "${BASH_SOURCE[0]}")/..
 cd "$ROOT" || exit 1
 
-TAG=monthly-$(date +"%Y.%m")
+TAG=${TAG:-monthly-$(date +"%Y.%m")}
 
 go run ./tools/generator --experimental-only --version=$TAG
 bash hack/build-install-yaml.sh --experimental-only
 
-# DON'T commit the generated YAML here.
-git restore .
+DO_RESTORE=
+
+set +o nounset
+
+if [ -z "$MONTHLY_NONINTERACTIVE" ]; then
+    read -p "Do you want to git restore config/crd/experimental? [Y/n]: " -r
+
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        DO_RESTORE=yes
+    fi
+fi
+
+set -o nounset
+
+if [ -n "$DO_RESTORE" ]; then
+    # DON'T commit the generated YAML here.
+    git restore config/crd/experimental
+fi
 
 mv release/experimental-install.yaml release/${TAG}-install.yaml
 echo "Generated release/${TAG}-install.yaml"
