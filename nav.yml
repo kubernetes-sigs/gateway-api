@@ -69,12 +69,12 @@ nav:
   - Enhancements:
     - Overview: geps/overview.md
     - Implementable:
-      - geps/gep-1494/index.md
       - geps/gep-3779/index.md
       - geps/gep-3793/index.md
       - geps/gep-3949/index.md
     - Experimental:
       - geps/gep-91/index.md
+      - geps/gep-1494/index.md
       - geps/gep-1619/index.md
       - geps/gep-1713/index.md
       - geps/gep-1731/index.md
