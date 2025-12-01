@@ -53,7 +53,8 @@ running the command.
 
 Once you've generated the monthly YAML, you can create a GitHub release
 and attach the `release/$TAG-install.yaml` file to it as an artifact.
-**DO NOT** mark this release as the latest release.
+Mark this release as a prerelease; **DO NOT** mark it as the latest
+release.
 
 ### Writing the Release Changelog
 
