@@ -296,6 +296,7 @@ func (m *MeshPod) RequestBatch(t *testing.T, exp http.ExpectedResponse, count in
 	// Each response is separated by a blank line in the output
 	responses := parseMultipleResponses(resp.RawContent)
 
+	tlog.Logf(t, "Processed %d requests", len(responses))
 	if len(responses) != count {
 		return nil, fmt.Errorf("expected %d responses but got %d", count, len(responses))
 	}
