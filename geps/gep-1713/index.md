@@ -728,6 +728,17 @@ should be respected, so the first Listener on the precedence list MUST be accept
 and should not have a `Conflicted` condition, while the conflicting listeners 
 MUST have a `Conflicted` condition set to True and with an explicit reason on its message.
 
+A `Route` MAY attach to a `Conflicted` ListenerSet, and once this ListenerSet is not conflicted
+anymore the implementations SHOULD support that the traffic of this route is accepted on 
+this ListenerSet and flow without downtime.
+
+As an example, given 2 ListenerSets attached to the same Gateway, being one of them conflicted with
+the other, and a `HTTPRoute` attached to both ListenerSets, once the old `ListenerSet` is deleted
+the new `ListenerSet` should become valid then the traffic should flow to the new `ListenerSet` without
+disruption.
+
+This feature will be supported by the feature `ListenerSetHotMigration`.
+
 Following are some examples of a conflict situation:
 
 #### Conflict between ListenerSet and parent Gateway
@@ -908,19 +919,14 @@ status:
       type: Accepted
 ```
 
+### Gateway Status
+
+`Gateway` status MUST report the number of successful attached listeners to `.status.attachedListeners`.
+
 ### Gateway Conditions
 
 `Gateway`'s `Accepted` and `Programmed` top-level conditions remain unchanged and reflect the status of the local configuration.
-
-Implementations MUST support a new `Gateway` condition type `AttachedListenerSets`.
-
-The condition's `Status` has the following values:
-
-- `True` when `Spec.AllowedListeners` is set and at least one child Listener arrives from a `ListenerSet`
-- `False` when `Spec.AllowedListeners` is set but has no valid listeners are attached
-- `Unknown` when no `Spec.AllowedListeners` config is present
-
-Parent `Gateways` MUST NOT have `ListenerSet` listeners in their `status.listeners` conditions list.
+ conditions list.
 
 ### ListenerSet Conditions
 
