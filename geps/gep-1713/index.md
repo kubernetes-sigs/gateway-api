@@ -71,20 +71,15 @@ type GatewayStatus struct {
 	// AttachedListeners represents the total number of ListenerSets that have been
 	// successfully attached to this Gateway.
 	//
-	// Successful attachment of a ListenerSets to a Gateway is based solely on the
-	// combination of the AllowedListeners field on the Gateway
-	// and the ListenerSets's ParentRefs field. A ListenerSets is successfully attached to
-	// a Gateway when it is selected by the ListenerSets's AllowedListeners field
-	// AND the ListenerSets has a valid ParentRef selecting the Gateway
-	// resource as a parent resource. ListenerSets status does not impact
-	// successful attachment, i.e. the AttachedListeners field count MUST be set
-	// for ListenerSets with condition Accepted: false and MUST count successfully
-	// attached AttachedListeners that may themselves have Accepted: false conditions.
+  // A ListenerSet is successfully attached to a Gateway when all the following conditions are met:
+	// - The ListenerSet is selected by the Gateway's AllowedListeners field
+	// - The ListenerSet has a valid ParentRef selecting the Gateway
+	// - The ListenerSet's status has the condition "Accepted: true"
 	//
 	// Uses for this field include troubleshooting AttachedListeners attachment and
 	// measuring blast radius/impact of changes to a Gateway.
 	// +optional
-	AttachedListeners *int32 `json:"attachedListeners"`
+	AttachedListeners *int32 `json:"attachedListeners,omitempty"`
 }
 
 type AllowedListeners struct {
