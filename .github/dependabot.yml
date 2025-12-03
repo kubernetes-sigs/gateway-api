@@ -59,3 +59,14 @@ updates:
       - dependencies
       - ok-to-test
       - release-note-none
+  
+  #  Github actions updates
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "release-note-none"
+      - "ok-to-test"
+
