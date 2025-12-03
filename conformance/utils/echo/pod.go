@@ -64,7 +64,7 @@ func (m *MeshPod) MakeRequestAndExpectEventuallyConsistentResponse(t *testing.T,
 
 		resp, err := m.request(req)
 		if err != nil {
-			tlog.Logf(t, "Request %v failed, not ready yet: %v (after %v)", req, err.Error(), elapsed)
+			tlog.Logf(t, "Request test %v failed, not ready yet: %v (after %v)", req, err.Error(), elapsed)
 			return false
 		}
 		tlog.Logf(t, "Got resp %v", resp)
