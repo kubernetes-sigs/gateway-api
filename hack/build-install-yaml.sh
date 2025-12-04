@@ -15,7 +15,6 @@
 # limitations under the License.
 
 set -o errexit
-set -o nounset
 set -o pipefail
 
 CHANNELS=(standard experimental)
@@ -24,6 +23,8 @@ if [ "$1" == "--experimental-only" ]; then
     CHANNELS=(experimental)
     shift
 fi
+
+set -o nounset
 
 readonly YEAR=$(date +"%Y")
 
