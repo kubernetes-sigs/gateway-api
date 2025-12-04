@@ -893,8 +893,6 @@ The condition's `Status` has the following values:
 
 Parent `Gateways` MUST NOT have `ListenerSet` listeners in their `status.listeners` conditions list.
 
-Implementations MUST support a new `Gateway` status field `AttachedListeners` that specifies the count of ListenerSets attached to the Gateway.
-
 ### ListenerSet Conditions
 
 `ListenerSets` have a top-level `Accepted` and `Programmed` conditions.
@@ -986,306 +984,566 @@ They will validate the following scenarios :
     - `Gateway.spec.allowedListeners` is not specified (defaults to None)
 
     - The ListenerSet is not accepted with the following status :
-      | Type    | Status | Reason |
-      | -------- | ------- | ------- |
-      | Accepted  | False    | NotAllowed |
-
+      ```
+      conditions:
+        - type: Accepted
+          status: False
+          reason: NotAllowed
+        - type: Programmed
+          status: False
+          reason: NotAllowed
+      ```
     - The parent gateway has the following status :
-      | Type    | Status | Reason |
-      | -------- | ------- | ------- |
-      | AttachedListenerSets  | Unknown    | // any reason // |
-      | AttachedListeners  | 0    |  |
-
-    - The request on the ListenerSet port fails.
+      ```
+      status:
+        allowedListeners: 0
+      ```
 
 1. ListenerSets are not allowed on the parent Gateway
     - `Gateway.spec.allowedListeners.namespaces.from` is set to `None`
 
     - The ListenerSet is not accepted with the following status :
-      | Type    | Status | Reason |
-      | -------- | ------- | ------- |
-      | Accepted  | False    | NotAllowed |
-
+      ```
+      conditions:
+        - type: Accepted
+          status: False
+          reason: NotAllowed
+        - type: Programmed
+          status: False
+          reason: NotAllowed
+      ```
     - The parent gateway has the following status :
-      | Type    | Status | Reason |
-      | -------- | ------- | ------- |
-      | AttachedListenerSets  | False    | ListenerSetsNotAllowed |
-      | AttachedListeners  | 0    |  |
-
-    - The request on the ListenerSet port fails.
-
-1. A listener on the ListenerSet has a protocol conflict with a listener on the Gateway
-    - The conflicting listener on the Gateway is accepted based on the [Listener Precedence](#listener-precedence) with the following status :
-      | Type    | Status | Reason |
-      | -------- | ------- | ------- |
-      | Conflicted  | False    | NoConflicts |
-
-    - The parent gateway has the following status :
-      | Type    | Status | Reason |
-      | -------- | ------- | ------- |
-      | AttachedListenerSets  | // depends on whether there are any other valid listeners in the attached ListenerSets // | ListenerSetsAttached |
-      | AttachedListeners  | // total number of child listenerSets // |  |
-
-    - The conflicting listener on the ListenerSet is not accepted with the following status :
-      | Type    | Status | Reason |
-      | -------- | ------- | ------- |
-      | Conflicted  | True    | ProtocolConflict |
-
-    - The ListenerSet has the following status :
-      | Type    | Status | Reason |
-      | -------- | ------- | ------- |
-      | Accepted  | True    | ListenersNotValid |
-
-    - The request to the conflicting listener on the Gateway succeeds.
-    - The request to the conflicting listener on the ListenerSet fails.
-
-1. A listener on a ListenerSet has a protocol conflict with a listener on another ListenerSet
-    - The conflicting listener on the older ListenerSet is accepted based on the [Listener Precedence](#listener-precedence) with the following status :
-      | Type    | Status | Reason |
-      | -------- | ------- | ------- |
-      | Conflicted  | False    | NoConflicts |
-
-    - The older ListenerSet has the following status :
-      | Type    | Status | Reason |
-      | -------- | ------- | ------- |
-      | Accepted  | True    | // any reason // |
-
-    - The conflicting listener on the newer ListenerSet is not accepted with the following status :
-      | Type    | Status | Reason |
-      | -------- | ------- | ------- |
-      | Conflicted  | True    | ProtocolConflict |
-
-    - The newer ListenerSet has the following status :
-      | Type    | Status | Reason |
-      | -------- | ------- | ------- |
-      | Accepted  | True    | ListenersNotValid |
-
-    - The parent gateway has the following status :
-      | Type    | Status | Reason |
-      | -------- | ------- | ------- |
-      | AttachedListenerSets  | True    | ListenerSetsAttached |
-      | AttachedListeners  | // total number of child listenerSets // |  |
-
-    - The request to the conflicting listener on the older ListenerSet succeeds.
-    - The request to the conflicting listener on the newer ListenerSet fails.
-
-1. A listener on the ListenerSet has a hostname conflict with a listener on the Gateway
-    - The conflicting listener on the Gateway is accepted based on the [Listener Precedence](#listener-precedence) with the following status :
-      | Type    | Status | Reason |
-      | -------- | ------- | ------- |
-      | Conflicted  | False    | NoConflicts |
-
-    - The conflicting listener on the ListenerSet is not accepted with the following status :
-      | Type    | Status | Reason |
-      | -------- | ------- | ------- |
-      | Conflicted  | True    | HostnameConflict |
-
-    - The ListenerSet has the following status :
-      | Type    | Status | Reason |
-      | -------- | ------- | ------- |
-      | Accepted  | True    | ListenersNotValid |
-
-    - The parent gateway has the following status :
-      | Type    | Status | Reason |
-      | -------- | ------- | ------- |
-      | AttachedListenerSets  | // depends on whether there are any other valid listeners in the attached ListenerSets // | ListenerSetsAttached |
-      | AttachedListeners  | // total number of child listenerSets // |  |
-
-    - The request to the conflicting listener on the Gateway succeeds.
-    - The request to the conflicting listener on the ListenerSet fails.
-
-1. A listener on a ListenerSet has a hostname conflict with a listener on another ListenerSet
-    - The conflicting listener on the older ListenerSet is accepted based on the [Listener Precedence](#listener-precedence) with the following status :
-      | Type    | Status | Reason |
-      | -------- | ------- | ------- |
-      | Conflicted  | False    | NoConflicts |
-
-    - The older ListenerSet has the following status :
-      | Type    | Status | Reason |
-      | -------- | ------- | ------- |
-      | Accepted  | True    | // any reason // |
-
-    - The conflicting listener on the newer ListenerSet is not accepted with the following status :
-      | Type    | Status | Reason |
-      | -------- | ------- | ------- |
-      | Conflicted  | True    | HostnameConflict |
-
-    - The newer ListenerSet has the following status :
-      | Type    | Status | Reason |
-      | -------- | ------- | ------- |
-      | Accepted  | True    | ListenersNotValid |
-
-    - The parent gateway has the following status :
-      | Type    | Status | Reason |
-      | -------- | ------- | ------- |
-      | AttachedListenerSets  | True    | ListenerSetsAttached |
-      | AttachedListeners  | // total number of child listenerSets // |  |
-
-    - The request to the conflicting listener on the older ListenerSet succeeds.
-    - The request to the conflicting listener on the newer ListenerSet fails.
+      ```
+      status:
+        allowedListeners: 0
+      ```
 
 1. ListenerSets are allowed only from the same namespace as the parent Gateway (Validates `Gateway.spec.allowedListeners.namespaces.from`)
     - `Gateway.spec.allowedListeners.namespaces.from` is set to `Same`
-    - The ListenerSet in the same namespace as the parent gateway is accepted with the following status :
-      | Type    | Status | Reason |
-      | -------- | ------- | ------- |
-      | Accepted  | True    | // any reason // |
-
-    - A ListenerSet in a different namespace is not accepted with the following status :
-      | Type    | Status | Reason |
-      | -------- | ------- | ------- |
-      | Accepted  | False    | NotAllowed |
+    - There exist two ListenerSets :
+      - `ls-allowed` in the same namespace as the parent Gateway
+      - `ls-not-allowed` in a different namespace than the parent Gateway
 
     - The parent gateway has the following status :
-      | Type    | Status | Reason |
-      | -------- | ------- | ------- |
-      | AttachedListenerSets  | True    | ListenerSetsAttached |
-      | AttachedListeners  | 1    |  |
+      ```
+      status:
+        allowedListeners: 1
+      ```
 
-    - The request to the listener on the accepted ListenerSet succeeds.
-    - The request to the listener on the rejected ListenerSet fails.
+    - The ListenerSet `ls-allowed` in the same namespace as the parent Gateway has the following status :
+      ```
+      conditions:
+      - type: Accepted
+        status: True
+        reason: Accepted
+      - type: Programmed
+        status: True
+        reason: Programmed
+      ```
+
+    - The ListenerSet `ls-not-allowed` in a different namespace from the parent Gateway has the following status :
+      ```
+      conditions:
+        - type: Accepted
+          status: False
+          reason: NotAllowed
+        - type: Programmed
+          status: False
+          reason: NotAllowed
+      ```
 
 1. ListenerSets are allowed from namespaces that have the appropriate labels
     - `Gateway.spec.allowedListeners.namespaces.selector` is set to match a specific namespace's labels
-    - The ListenerSet in the namespace matched by the selector is accepted with the following status :
-      | Type    | Status | Reason |
-      | -------- | ------- | ------- |
-      | Accepted  | True    | // any reason // |
-
-    - A ListenerSet in the namespace not matched by the selector is not accepted with the following status :
-      | Type    | Status | Reason |
-      | -------- | ------- | ------- |
-      | Accepted  | False    | NotAllowed |
+    - There exist two ListenerSets :
+      - `ls-allowed` in a namespace matched by the selector
+      - `ls-not-allowed` in a namespace not matched by the selector
 
     - The parent gateway has the following status :
-      | Type    | Status | Reason |
-      | -------- | ------- | ------- |
-      | AttachedListenerSets  | True    | ListenerSetsAttached |
-      | AttachedListeners  | 1    |  |
+      ```
+      status:
+        allowedListeners: 1
+      ```
 
-    - The request to the listener on the accepted ListenerSet succeeds.
-    - The request to the listener on the rejected ListenerSet fails.
+    - The ListenerSet `ls-allowed` in a namespace matched by the selector has the following status :
+      ```
+      conditions:
+      - type: Accepted
+        status: True
+        reason: Accepted
+      - type: Programmed
+        status: True
+        reason: Programmed
+      ```
+
+    - The ListenerSet `ls-not-allowed` in namespace not matched by the selector has the following status :
+      ```
+      conditions:
+        - type: Accepted
+          status: False
+          reason: NotAllowed
+        - type: Programmed
+          status: False
+          reason: NotAllowed
+      ```
+
+1. A listener `ls-8080` on the ListenerSet has a protocol conflict with a listener `gw-8080` on the Gateway
+    - The parent gateway has the following status :
+      ```
+      conditions:
+      - type: Accepted
+        status: True
+        reason: Accepted
+      - type: Programmed
+        status: True
+        reason: Programmed
+      listeners:
+      - name: gw-8080
+        conditions:
+        - type: Accepted
+          status: True
+          reason: Accepted
+        - type: Programmed
+          status: True
+          reason: Programmed
+        - type: Conflicted
+          status: False
+          reason: NoConflicts
+
+      allowedListeners: 1
+      ```
+
+    - The listener set has the following status :
+      ```
+      conditions:
+      - type: Accepted
+        status: True
+        reason: Accepted
+      - type: Programmed
+        status: True
+        reason: Programmed
+      listeners:
+      - name: ls-8080
+        conditions:
+        - type: Accepted
+          status: False
+          reason: PortUnavailable
+        - type: Programmed
+          status: False
+          reason: PortUnavailable
+        - type: Conflicted
+          status: True
+          reason: ProtocolConflict
+      // Other accepted listeners if applicable
+      ```
+
+1. A listener `ls-conflicted-8080` on a ListenerSet `ls-conflicted` has a protocol conflict with a listener `ls-accepted-8080` on another ListenerSet `ls-accepted`
+    - The parent gateway has the following status :
+      ```
+      status:
+        allowedListeners: 2
+      ```
+
+    - The `ls-accepted` ListenerSet has the following status :
+      ```
+      conditions:
+      - type: Accepted
+        status: True
+        reason: Accepted
+      - type: Programmed
+        status: True
+        reason: Programmed
+      listeners:
+      - name: ls-accepted-8080
+        conditions:
+        - type: Accepted
+          status: True
+          reason: Accepted
+        - type: Programmed
+          status: True
+          reason: Programmed
+        - type: Conflicted
+          status: False
+          reason: NoConflicts
+      ```
+
+    - The `ls-conflicted` ListenerSet has the following status :
+      ```
+      conditions:
+      - type: Accepted
+        status: True
+        reason: Accepted
+      - type: Programmed
+        status: True
+        reason: Programmed
+      listeners:
+      - name: ls-conflicted-8080
+        conditions:
+        - type: Accepted
+          status: False
+          reason: PortUnavailable
+        - type: Programmed
+          status: False
+          reason: PortUnavailable
+        - type: Conflicted
+          status: True
+          reason: ProtocolConflict
+      // Other accepted listeners if applicable
+      ```
+
+1. A listener `ls-8080` on the ListenerSet has a hostname conflict with a listener `gw-8080` on the Gateway
+    - The parent gateway has the following status :
+      ```
+      conditions:
+      - type: Accepted
+        status: True
+        reason: Accepted
+      - type: Programmed
+        status: True
+        reason: Programmed
+      listeners:
+      - name: gw-8080
+        conditions:
+        - type: Accepted
+          status: True
+          reason: Accepted
+        - type: Programmed
+          status: True
+          reason: Programmed
+        - type: Conflicted
+          status: False
+          reason: NoConflicts
+
+      allowedListeners: 1
+      ```
+
+    - The listener set has the following status :
+      ```
+      conditions:
+      - type: Accepted
+        status: True
+        reason: Accepted
+      - type: Programmed
+        status: True
+        reason: Programmed
+      listeners:
+      - name: ls-8080
+        conditions:
+        - type: Accepted
+          status: False
+          reason: PortUnavailable
+        - type: Programmed
+          status: False
+          reason: PortUnavailable
+        - type: Conflicted
+          status: True
+          reason: HostnameConflict
+      // Other accepted listeners if applicable
+      ```
+
+
+1. A listener `ls-conflicted-8080` on a ListenerSet `ls-conflicted` has a hostname conflict with a listener `ls-accepted-8080` on another ListenerSet `ls-accepted`
+    - The parent gateway has the following status :
+      ```
+      status:
+        allowedListeners: 2
+      ```
+
+    - The `ls-accepted` ListenerSet has the following status :
+      ```
+      conditions:
+      - type: Accepted
+        status: True
+        reason: Accepted
+      - type: Programmed
+        status: True
+        reason: Programmed
+      listeners:
+      - name: ls-accepted-8080
+        conditions:
+        - type: Accepted
+          status: True
+          reason: Accepted
+        - type: Programmed
+          status: True
+          reason: Programmed
+        - type: Conflicted
+          status: False
+          reason: NoConflicts
+      ```
+
+    - The `ls-conflicted` ListenerSet has the following status :
+      ```
+      conditions:
+      - type: Accepted
+        status: True
+        reason: Accepted
+      - type: Programmed
+        status: True
+        reason: Programmed
+      listeners:
+      - name: ls-conflicted-8080
+        conditions:
+        - type: Accepted
+          status: False
+          reason: PortUnavailable
+        - type: Programmed
+          status: False
+          reason: PortUnavailable
+        - type: Conflicted
+          status: True
+          reason: HostnameConflict
+      // Other accepted listeners if applicable
+      ```
 
 1. A listener on a ListenerSet without a defined port
     - If the implementation supports dynamic port assignment :
       - The listener must have the following status :
-        | Type    | Status | Reason |
-        | -------- | ------- | ------- |
-        | Port  | // unique port value //    | |
-        | Accepted  | True    | // any reason // |
+        ```
+        name: listener-without-port
+        port: <unique port value>
+        conditions:
+        - type: Accepted
+          status: True
+          reason: Accepted
+        - type: Programmed
+          status: True
+          reason: Programmed
+        ```
 
       - The parent gateway has the following status :
-        | Type    | Status | Reason |
-        | -------- | ------- | ------- |
-        | AttachedListenerSets  | // depends on whether there are any other valid listeners in the attached ListenerSets // | ListenerSetsAttached |
-        | AttachedListeners  | 1    |  |
+      ```
+      status:
+        allowedListeners: 1
+      ```
 
       - The request to the ListenerSet port must succeed.
 
     - If the implementation does not support dynamic port assignment :
-      - The listener must have the following status :
-        | Type    | Status | Reason |
-        | -------- | ------- | ------- |
-        | Accepted  | False    | UnsupportedPort |
+        ```
+        name: listener-without-port
+        conditions:
+        - type: Accepted
+          status: False
+          reason: UnsupportedPort
+        - type: Programmed
+          status: False
+          reason: UnsupportedPort
+        ```
 
       - The parent gateway has the following status :
-        | Type    | Status | Reason |
-        | -------- | ------- | ------- |
-        | AttachedListenerSets  | // depends on whether there are any other valid listeners in the ListenerSets // | ListenerSetsAttached |
-        | AttachedListeners  | 1    |  |
+      ```
+      status:
+        allowedListeners: 0
+      ```
 
-      - The request to the ListenerSet port must not succeed.
+1. A listener on a ListenerSet allows routes from the same namespace as the ListenerSet
+    - The route in the same namespace as the ListenerSet is accepted with the following status :
+      ```
+      parents:
+      - parentRef:
+          group: gateway.networking.k8s.io
+          kind: ListenerSet
+          name: ls-allows-same-ns-routes
+        conditions:
+        - reason: Accepted
+          status: True
+          type: Accepted
+      ```
+
+    - The route in a different namespace as the ListenerSet is rejected with the following status :
+      ```
+      parents:
+      - parentRef:
+          group: gateway.networking.k8s.io
+          kind: ListenerSet
+          name: ls-allows-same-ns-routes
+        conditions:
+        - reason: Accepted
+          status: False
+          type: NotAllowedByListeners
+      ```
+
+1. A listener on a ListenerSet allows routes from namespaces that have the appropriate labels
+    - The route in the namespace that matches the given labels is accepted with the following status :
+      ```
+      parents:
+      - parentRef:
+          group: gateway.networking.k8s.io
+          kind: ListenerSet
+          name: ls-allows-selected-ns-routes
+        conditions:
+        - reason: Accepted
+          status: True
+          type: Accepted
+      ```
+
+    - The route in the namespace that does not match the given labels is rejected with the following status :
+      ```
+      parents:
+      - parentRef:
+          group: gateway.networking.k8s.io
+          kind: ListenerSet
+          name: ls-allows-selected-ns-routes
+        conditions:
+        - reason: Accepted
+          status: False
+          type: NotAllowedByListeners
+      ```
+
+1. A listener on a ListenerSet allows only specific route kinds
+    - The route that belongs to the list of specified RouteGroupKind is accepted with the following status :
+      ```
+      parents:
+      - parentRef:
+          group: gateway.networking.k8s.io
+          kind: ListenerSet
+          name: ls-allows-selected-ns-routes
+        conditions:
+        - reason: Accepted
+          status: True
+          type: Accepted
+      ```
+
+    - The route that does not belong to the list of specified RouteGroupKind is rejected with the following status :
+      ```
+      parents:
+      - parentRef:
+          group: gateway.networking.k8s.io
+          kind: ListenerSet
+          name: ls-allows-selected-ns-routes
+        conditions:
+        - reason: Accepted
+          status: False
+          type: NotAllowedByListeners
+      ```
 
 1. A listener on a ListenerSet with a missing ReferenceGrant
     - The listener on the ListenerSet references a secret without a ReferenceGrant.
 
-    - The listener must not be accepted with the following status :
-      | Type    | Status | Reason |
-      | -------- | ------- | ------- |
-      | ResolvedRefs  | False    | RefNotPermitted |
+    - The listenerSet must have the following status
+      ```
+      conditions:
+      - type: Accepted
+        status: True
+        reason: Accepted
+      - type: Programmed
+        status: True
+        reason: Programmed
+      listeners:
+      - name: ls-without-ref-grant
+        conditions:
+        - type: Accepted
+          status: False
+        - type: Programmed
+          status: False
+        - type: ResolvedRefs
+          status: False
+          reason: RefNotPermitted
+      // Other accepted listeners if applicable
+      ```
 
     - The parent gateway has the following status :
-      | Type    | Status | Reason |
-      | -------- | ------- | ------- |
-      | AttachedListenerSets  | // depends on whether there are any other valid listeners in the ListenerSets // | ListenerSetsAttached |
-      | AttachedListeners  | 1    |  |
-
-    - The request to the listener on the ListenerSet fails.
+      ```
+      status:
+        allowedListeners: 1
+      ```
 
 1. A listener on a ListenerSet with a ReferenceGrant for the parent Gateway
     - The listener on the ListenerSet references a secret the parent Gateway has access to.
 
-    - The listener must not be accepted with the following status :
-      | Type    | Status | Reason |
-      | -------- | ------- | ------- |
-      | ResolvedRefs  | False    | RefNotPermitted |
+    - The listenerSet must have the following status
+      ```
+      conditions:
+      - type: Accepted
+        status: True
+        reason: Accepted
+      - type: Programmed
+        status: True
+        reason: Programmed
+      listeners:
+      - name: ls-without-ref-grant
+        conditions:
+        - type: Accepted
+          status: False
+        - type: Programmed
+          status: False
+        - type: ResolvedRefs
+          status: False
+          reason: RefNotPermitted
+      // Other accepted listeners if applicable
+      ```
 
     - The parent gateway has the following status :
-      | Type    | Status | Reason |
-      | -------- | ------- | ------- |
-      | AttachedListenerSets  | // depends on whether there are any other valid listeners in the ListenerSets // | ListenerSetsAttached |
-      | AttachedListeners  | 1    |  |
+      ```
+      status:
+        allowedListeners: 1
+      ```
 
-    - The request to the listener on the ListenerSet fails.
+1. A listener on a ListenerSet with a valid ReferenceGrant for the parent Gateway
+    - The listenerSet must have the following status
+      ```
+      conditions:
+      - type: Accepted
+        status: True
+        reason: Accepted
+      - type: Programmed
+        status: True
+        reason: Programmed
+      listeners:
+      - name: ls-with-valid-ref-grant
+        conditions:
+        - type: Accepted
+          status: False
+        - type: Programmed
+          status: False
+        - type: ResolvedRefs
+          status: True
+          reason: ResolvedRefs
+      // Other accepted listeners if applicable
+      ```
 
-1. A listener on a ListenerSet allows routes from the same namespace as the ListenerSet
-    - The route in the same namespace as the ListenerSet is accepted with the following status :
-      | Type    | Status | Reason |
-      | -------- | ------- | ------- |
-      | Accepted  | True    | // any reason // |
+    - The parent gateway has the following status :
+      ```
+      status:
+        allowedListeners: 1
+      ```
 
-    - The request to the accepted route succeeds.
-
-    - The route in a different namespace as the ListenerSet is rejected with the following status :
-      | Type    | Status | Reason |
-      | -------- | ------- | ------- |
-      | Accepted  | False    | NotAllowedByListeners |
-
-    - The request to the rejected route fails.
-
-1. A listener on a ListenerSet allows routes from namespaces that have the appropriate labels
-    - The route in the namespace that matches the given labels is accepted with the following status :
-      | Type    | Status | Reason |
-      | -------- | ------- | ------- |
-      | Accepted  | True    | // any reason // |
-
-    - The request to the accepted route succeeds.
-
-    - The route in the namespace that does not match the given labels is rejected with the following status :
-      | Type    | Status | Reason |
-      | -------- | ------- | ------- |
-      | Accepted  | False    | NotAllowedByListeners |
-
-    - The request to the rejected route fails.
-
-1. A listener on a ListenerSet allows only specific route kinds
-    - The route that belongs to the list of specified RouteGroupKind is accepted with the following status :
-      | Type    | Status | Reason |
-      | -------- | ------- | ------- |
-      | Accepted  | True    | // any reason // |
-
-    - The request to the accepted route succeeds.
-    - The route that does not belong to the list of specified RouteGroupKind is rejected with the following status :
-      | Type    | Status | Reason |
-      | -------- | ------- | ------- |
-      | Accepted  | False    | NotAllowedByListeners |
-
-    - The request to the rejected route fails.
 
 1. Valid ListenerSet attached to a Gateway that allows it
     - The gateway allows attaching ListenerSets.
     - The ListenerSet is valid and allows routes.
 
     - The ListenerSet is accepted and has the following status :
-      | Type    | Status | Reason |
-      | -------- | ------- | ------- |
-      | Accepted  | True    | // any reason // |
-      | AttachedRoutes  | // total number of attached routes //| |
+      ```
+      conditions:
+      - type: Accepted
+        status: True
+        reason: Accepted
+      - type: Programmed
+        status: True
+        reason: Programmed
+      listeners:
+      - name: ls-accepted-8080
+        conditions:
+        - type: Accepted
+          status: True
+          reason: Accepted
+        - type: Programmed
+          status: True
+          reason: Programmed
+        - type: Conflicted
+          status: False
+          reason: NoConflicts
+        - type: ResolvedRefs
+          status: True
+          reason: ResolvedRefs
+      ```
+
 
     - The parent gateway has the following status :
-      | Type    | Status | Reason |
-      | -------- | ------- | ------- |
-      | AttachedListenerSets  | True    | ListenerSetsAttached |
-      | AttachedListeners  | 1    |  |
+      ```
+      status:
+        allowedListeners: 1
+      ```
 
     - The request to the listener on the ListenerSet succeeds.
