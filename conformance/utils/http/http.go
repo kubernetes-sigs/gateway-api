@@ -78,6 +78,7 @@ type Request struct {
 	Protocol         string
 	Body             string
 	SNI              string
+	ClientCert       string
 }
 
 // ExpectedRequest defines expected properties of a request that reaches a backend.
@@ -420,6 +421,12 @@ func CompareRoundTrip(t *testing.T, req *roundtripper.Request, cReq *roundtrippe
 
 		if expected.ExpectedRequest.SNI != "" && expected.ExpectedRequest.SNI != cReq.TLS.ServerName {
 			return fmt.Errorf("expected SNI %q to be equal to %q", cReq.TLS.ServerName, expected.ExpectedRequest.SNI)
+		}
+
+		if expected.ExpectedRequest.ClientCert != "" {
+			if !slices.Contains(cReq.TLS.PeerCertificates, expected.ExpectedRequest.ClientCert) {
+				return fmt.Errorf("expected client certiifcate was not captured")
+			}
 		}
 	} else if roundtripper.IsRedirect(cRes.StatusCode) {
 		if expected.RedirectRequest == nil {
