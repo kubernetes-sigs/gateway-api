@@ -1008,6 +1008,20 @@ type GatewayStatus struct {
 	// +listMapKey=name
 	// +kubebuilder:validation:MaxItems=64
 	Listeners []ListenerStatus `json:"listeners,omitempty"`
+
+	// AttachedListeners represents the total number of ListenerSets that have been
+	// successfully attached to this Gateway.
+	//
+	// A ListenerSet is successfully attached to a Gateway
+	// when all the following conditions are met :
+	// - The ListenerSet is selected by the Gateway's AllowedListeners field
+	// - The ListenerSet has a valid ParentRef selecting the Gateway
+	// - The ListenerSet's status has the condition "Accepted: true"
+	//
+	// Uses for this field include troubleshooting AttachedListeners attachment and
+	// measuring blast radius/impact of changes to a Gateway.
+	// +optional
+	AttachedListeners *int32 `json:"attachedListeners,omitempty"`
 }
 
 // GatewayInfrastructure defines infrastructure level attributes about a Gateway instance.
