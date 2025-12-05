@@ -89,7 +89,7 @@ discretion of the maintainers.
 
 In the normal case however, when a GEP misses the timeline for a phase it will
 be pulled out of the release to maximize bandwidth and reduce disruptions to the
-overall release timeline. In such a case the Gateway API maintainers will stop
+overall release timeline. In such a case, the Gateway API maintainers will stop
 progression and set the status of the GEP to a halted status (such as `Deferred`
 or `Declined`) with a note on the GEP explaining why it reached this status and
 what it would take to get it re-approved for work in a later iteration.

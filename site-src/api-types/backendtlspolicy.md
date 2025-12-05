@@ -7,7 +7,7 @@
     to our [versioning guide](../concepts/versioning.md).
 
 [BackendTLSPolicy][backendtlspolicy] is a Gateway API type for specifying the TLS configuration
-of the connection from the Gateway to a backend pod/s via the Service API object.
+of the connection from the Gateway to a backend pod(s) via the Service API object.
 
 ## Background
 
@@ -83,7 +83,7 @@ flowchart LR
 
 A BackendTLSPolicy targets a backend Pod (or set of Pods) via one or more TargetRefs to a Service.  This TargetRef is a
 required object reference that specifies a Service by its Name, Kind (Service), and optionally its Namespace and Group.
-TargetRefs identify the Service/s for which your HTTPRoute requires TLS.
+TargetRefs identify the Service(s) for which your HTTPRoute requires TLS.
 
 !!! info "Restrictions"
 

@@ -89,7 +89,7 @@ type ConformanceTestSuite struct {
 	supportedFeaturesSource supportedFeaturesSource
 
 	// mode is the operating mode of the implementation.
-	// The default value for it is "default".
+	// The default value is "default".
 	mode string
 
 	// implementation contains the details of the implementation, such as
@@ -386,7 +386,7 @@ func (suite *ConformanceTestSuite) Setup(t *testing.T, tests []ConformanceTest) 
 		secret = kubernetes.MustCreateCASignedClientCertSecret(t, "gateway-conformance-infra", "tls-checks-client-certificate", ca, caPrivKey)
 		suite.Applier.MustApplyObjectsWithCleanup(t, suite.Client, suite.TimeoutConfig, []client.Object{secret}, suite.Cleanup)
 
-		// The following CA ceritficate is used for BackendTLSPolicy testing to intentionally force TLS validation to fail.
+		// The following CA certificate is used for BackendTLSPolicy testing to intentionally force TLS validation to fail.
 		caConfigMap, _, _ = kubernetes.MustCreateCACertConfigMap(t, "gateway-conformance-infra", "mismatch-ca-certificate")
 		suite.Applier.MustApplyObjectsWithCleanup(t, suite.Client, suite.TimeoutConfig, []client.Object{caConfigMap}, suite.Cleanup)
 

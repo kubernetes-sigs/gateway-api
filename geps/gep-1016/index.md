@@ -675,7 +675,7 @@ type GRPCRouteFilter struct {
 	ExtensionRef *LocalObjectReference `json:"extensionRef,omitempty"`
 }
 ```
-{% endraw%}
+{% endraw %}
 
 
 

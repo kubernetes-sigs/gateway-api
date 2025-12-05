@@ -23,7 +23,7 @@ The release manager has the responsibility to:
 
 * Ensure that the release has agreed-on dates for the final release, and for as many phases as possible. The community has indicated a clear preference for dates communicated up front as much as possible.  
 * Ensure the release happens on the agreed upon date, or as close as possible, including assisting the community in meeting agreed-upon deadlines  
-* Ensure that the community is informed about the progress of the release during the burndown process, particularly what is in and out of scope of the release. This can be by the maintenance of Github Boards or Milestones, or any other method that the Release Manager agrees with the leadership team and the community  
+* Ensure that the community is informed about the progress of the release during the burndown process, particularly what is in and out of scope of the release. This can be by the maintenance of GitHub Boards or Milestones, or any other method that the Release Manager agrees with the leadership team and the community  
 * Notify feature owners if their feature is at risk of or has fallen out of scope for the release  
 * Refine the design of and improve documentation for the release process itself  
 * Prepare the change log for the release  
@@ -66,7 +66,7 @@ In the interest of ensuring that the changes we include are what the community i
 
 In all cases, the Release Manager *must* ensure that all the factors involved in the scoping decisions are publicly available.
 
-For example, for v1.4, we had scoping performed using the votes on the Github discussions that proposed inclusion (which are publicly visible, and attributable to individuals), and for v1.3, we used community votes plus some additional factors like “difficulty of change” and “future importance”. In the v1.3 case, those weights were agreed upon by the maintainers and made available in a [world-readable Google sheet](https://docs.google.com/spreadsheets/d/1tLVmYHCyVuRLwnvMJuYMhiEtVX0fUF1aLHBLIc7mBKE/edit?gid=0#gid=0).
+For example, for v1.4, we had scoping performed using the votes on the GitHub discussions that proposed inclusion (which are publicly visible, and attributable to individuals), and for v1.3, we used community votes plus some additional factors like “difficulty of change” and “future importance”. In the v1.3 case, those weights were agreed upon by the maintainers and made available in a [world-readable Google sheet](https://docs.google.com/spreadsheets/d/1tLVmYHCyVuRLwnvMJuYMhiEtVX0fUF1aLHBLIc7mBKE/edit?gid=0#gid=0).
 
 ### GEP Refinement
 

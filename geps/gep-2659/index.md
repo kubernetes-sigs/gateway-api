@@ -149,7 +149,7 @@ GEPs:
 - `SeeAlso` - when a GEP is relevant to another GEP, but is not affected in any
   other defined way.
 
-Each stanza in `relationships` includes a `number`, `name`, and a optional free-form
+Each stanza in `relationships` includes a `number`, `name`, and an optional free-form
 `description` field, which can be used to better describe the relationship.
 
 At this time it's the updater's responsibility to ensure that both directions

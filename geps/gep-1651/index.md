@@ -346,7 +346,7 @@ From: [https://github.com/kubernetes-sigs/gateway-api/pull/1653#issuecomment-145
 > - ClusterLocalIPv4Address
 > - ClusterLocalIPv6Address
 >
-> For each dimension we avoid adding a separate field for and instead try to embed into a single name, we risk this kind of name explosion. Of course none of the above even begins to cover my idea of NetworkLocal which could further complicate this.
+> For each dimension we avoid adding a separate field for and instead try to embed into a single name, we risk this kind of name explosion. Of course, none of the above even begins to cover my idea of NetworkLocal which could further complicate this.
 
 ### Scope/reachability/routability field on GatewayAddress
 

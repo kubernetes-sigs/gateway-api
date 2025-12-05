@@ -394,7 +394,7 @@ type Listener struct {
 	//   the Gateway SHOULD return a 421.
 	// * If the current Listener (selected by SNI matching during ClientHello)
 	//   does not match the Host:
-	//     * If another Listener does match the Host the Gateway SHOULD return a
+	//     * If another Listener does match the Host, the Gateway SHOULD return a
 	//       421.
 	//     * If no other Listener matches the Host, the Gateway MUST return a
 	//       404.
@@ -1372,7 +1372,7 @@ type ListenerStatus struct {
 	Name SectionName `json:"name"`
 
 	// SupportedKinds is the list indicating the Kinds supported by this
-	// listener. This MUST represent the kinds an implementation supports for
+	// listener. This MUST represent the kinds supported by an implementation for
 	// that Listener configuration.
 	//
 	// If kinds are specified in Spec that are not supported, they MUST NOT

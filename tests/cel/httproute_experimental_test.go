@@ -306,7 +306,7 @@ func TestHTTPRouteCORS(t *testing.T) {
 			},
 		},
 		{
-			name:       "An origin with an value before the scheme definition should be denied",
+			name:       "An origin with a value before the scheme definition should be denied",
 			wantErrors: []string{"Invalid value: \"xpto/https://xpto.com\""},
 			corsfilter: &gatewayv1.HTTPCORSFilter{
 				AllowOrigins: []gatewayv1.CORSOrigin{

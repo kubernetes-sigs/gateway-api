@@ -83,7 +83,7 @@ flowchart LR
 `BackendTrafficPolicy` targets a group of backend Pods via one or more
 TargetRefs such as Service, ServiceImport, or implementation-specific
 backendRef. TargetRefs is a required object reference, specifying a Backend via
-its Name, Kind, and Group. Currently, TargetRefs can not be scoped to
+its Name, Kind, and Group. Currently, TargetRefs cannot be scoped to
 specific ports on a service. 
 
 [backendtrafficpolicy]: /references/specx.md#xbackendtrafficpolicy
