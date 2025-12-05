@@ -65,12 +65,13 @@ nav:
     - Policy Attachment: reference/policy-attachment.md
   - Enhancements:
     - Overview: geps/overview.md
-    - Provisional: geps/landing/provisional.md
-    - Implementable: geps/landing/implementable.md
-    - Experimental: geps/landing/experimental.md
-    - Standard: geps/landing/standard.md
-    - Memorandum: geps/landing/memorandum.md
     - List: geps/landing/tab.md
+    - By State:
+      - Standard: geps/landing/standard.md
+      - Memorandum: geps/landing/memorandum.md
+      - Experimental: geps/landing/experimental.md
+      - Implementable: geps/landing/implementable.md
+      - Provisional: geps/landing/provisional.md    
   - Contributing:
     - How to Get Involved: contributing/index.md
     - Developer Guide: contributing/devguide.md
