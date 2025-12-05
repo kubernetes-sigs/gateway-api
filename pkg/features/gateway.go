@@ -101,7 +101,7 @@ var (
 		Channel: FeatureChannelStandard,
 	}
 
-  // GatewayListenerSetFeature contains metadata for the SupportGatewayListenerSet feature.
+	// GatewayListenerSetFeature contains metadata for the SupportGatewayListenerSet feature.
 	GatewayListenerSetFeature = Feature{
 		Name:    SupportGatewayListenerSet,
 		Channel: FeatureChannelExperimental,
