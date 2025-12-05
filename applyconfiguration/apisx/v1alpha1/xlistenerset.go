@@ -53,8 +53,8 @@ func XListenerSet(name, namespace string) *XListenerSetApplyConfiguration {
 // APIVersion and Kind populated. It is possible that no managed fields were found for because other
 // field managers have taken ownership of all the fields previously owned by fieldManager, or because
 // the fieldManager never owned fields any fields.
-// xListenerSet must be an unmodified XListenerSet API object that was retrieved from the Kubernetes API.
-// ExtractXListenerSet provides a way to perform an extract/modify-in-place/apply workflow.
+// xListenerSet must be a unmodified XListenerSet API object that was retrieved from the Kubernetes API.
+// ExtractXListenerSet provides a way to perform a extract/modify-in-place/apply workflow.
 // Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
 // applied if another fieldManager has updated or force applied any of the previously applied fields.
 // Experimental!
