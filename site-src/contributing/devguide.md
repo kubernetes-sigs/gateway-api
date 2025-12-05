@@ -174,13 +174,13 @@ To execute the new tool, use `go tool -modfile=tools/go.mod toolname`.
 ## API Documentation
 
 When writing API documentation (the `godoc` for API fields and structures) it should be done
- in a meaningful and concise way, where information are provided for the different 
+ in a meaningful and concise way, where information is provided for the different 
  Gateway API personas (Ian, Chihiro and Ana) without leaking implementation details.
 
-The implementation details are still important for a Gateway API implementation
-developer, and they should still be provided but without being exposed on the
-CRD generation, that can end leaking to users on a diverse set of ways, like
-on Gateway API documentation website, or via `kubectl explain`.
+The implementation details are still important for Gateway API implementation
+developers, and should still be provided, but we need to ensure they are not 
+exposed in the generated CRDs. That can end up leaking to users in multiple ways,
+such as on the Gateway API documentation website, or via `kubectl explain`.
 
 Additionally, it is worth noticing that API documentation reflects on the CRD generation
 size, which impacts directly on resource consumption like a maximum Kubernetes resource size 
@@ -194,8 +194,8 @@ There are two kind of API documentations:
 
 ### User facing Documentation
 
-The API documentation, when meaningful, helps users of it on doing proper configuration
-in a way that Gateway API controllers react and configure the proxies the right way.
+The API documentation, when meaningful, helps users of it understand and create configuration
+in a way that ensures that their Gateway API implementation does what they want it to do.
 
 A good API documentation should cover:
 
@@ -288,17 +288,17 @@ contain a callout that those are a Note for implementors:
 Mode *TLSModeType `json:"mode,omitempty"`
 ```
 
-### Advices when writing the API documentation
-As an advice, the person writing the documentation should always being questioning:
+### Advice when writing the API documentation
+When writing the documentation, you should always consider questions like:
 
 **As a user**:
 
-* Does the documentation provide meaningful information and removes any doubt 
+* Does the documentation provide meaningful information and remove any doubt 
 about what will happen when setting this field?
 * Does the documentation provide information about where should I look if something
 goes wrong?
 * If I do `kubectl explain` or look into the API Reference, do I have enough
-information to achieve my goals without being buried with information I don't care?
+information to achieve my goals without being buried with information I don't care about?
 
 **As a developer/implementor**:
 
@@ -309,5 +309,5 @@ should be verified to provide the right behavior?
 * Does the documentation provide enough information on how I should signal to the 
 users what went right/wrong and how to fix it?
 
-It is important to exercise changing the personas for which you are writing the 
-documentation.
+It is important to you consider the personas for which you are writing for, when
+working on each type of documentation.
