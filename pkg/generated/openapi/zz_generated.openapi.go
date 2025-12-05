@@ -8783,7 +8783,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendTrafficPolicySpec(ref co
 							},
 						},
 						SchemaProps: spec.SchemaProps{
-							Description: "TargetRefs identifies API object(s) to apply this policy to. Currently, Backends (A grouping of like endpoints such as Service, ServiceImport, or any implementation-specific backendRef) are the only valid API target references.\n\nCurrently, a TargetRef can not be scoped to a specific port on a Service.",
+							Description: "TargetRefs identifies API object(s) to apply this policy to. Currently, Backends (A grouping of like endpoints such as Service, ServiceImport, or any implementation-specific backendRef) are the only valid API target references.\n\nCurrently, a TargetRef cannot be scoped to a specific port on a Service.",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
