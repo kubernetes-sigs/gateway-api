@@ -116,8 +116,8 @@ would be invalid.
 
 ## Upstream TLS
 
-Upstream TLS settings are configured using the experimental `BackendTLSPolicy`
-attached to a `Service` via a target reference.
+Upstream TLS settings are configured using the `BackendTLSPolicy` attached to a
+`Service` via a target reference.
 
 This resource can be used to describe the SNI the Gateway should use to connect to the
 backend and how the certificate served by the backend Pod(s) should be verified.

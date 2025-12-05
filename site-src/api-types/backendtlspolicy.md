@@ -1,10 +1,10 @@
 # BackendTLSPolicy
 
-??? example "Experimental Channel since v1.0.0"
+??? success "Standard Channel since v1.4.0"
 
-    The `BackendTLSPolicy` resource is Alpha and has been part of
-    the Experimental Channel since `v1.0.0`. For more information on release
-    channels, refer to our [versioning guide](../concepts/versioning.md).
+    The `BackendTLSPolicy` resource is GA and has been part of the Standard
+    Channel since `v1.4.0`. For more information on release channels, refer
+    to our [versioning guide](../concepts/versioning.md).
 
 [BackendTLSPolicy][backendtlspolicy] is a Gateway API type for specifying the TLS configuration
 of the connection from the Gateway to a backend pod/s via the Service API object.
@@ -164,12 +164,12 @@ Status defines the observed state of the BackendTLSPolicy and is not user-config
 way you do for other Gateway API objects to verify correct operation.  Note that the status in BackendTLSPolicy
 uses `PolicyAncestorStatus` to allow you to know which parentReference set that particular status.
 
-[backendtlspolicy]: ../reference/spec.md#gateway.networking.k8s.io/v1alpha3.BackendTLSPolicy
-[validation]: ../reference/spec.md#gateway.networking.k8s.io/v1alpha3.BackendTLSPolicy.Validation
-[caCertificateRefs]: ../reference/spec.md#gateway.networking.k8s.io/v1alpha3.BackendTLSPolicyValidation.CACertificateRefs
-[wellKnownCACertificates]: ../reference/spec.md#gateway.networking.k8s.io/v1alpha3.BackendTLSPolicyValidation.WellKnownCACertificates
-[hostname]: ../reference/spec.md#gateway.networking.k8s.io/v1.PreciseHostname
+[backendtlspolicy]: ../reference/spec.md#backendtlspolicy
+[validation]: ../reference/spec.md#backendtlspolicyvalidation
+[caCertificateRefs]: ../reference/spec.md#localobjectreference
+[wellKnownCACertificates]: ../reference/spec.md#localobjectreference
+[hostname]: ../reference/spec.md#precisehostname
 [rfc-3986]: https://tools.ietf.org/html/rfc3986
-[targetRefs]: ../references/spec/#gateway.networking.k8s.io/v1alpha2.PolicyTargetReference
-[subjectAltNames]: ../references/spec/#gateway.networking.k8s.io/v1alpha3.BackendTLSPolicyValidation 
-[options]: ../references/spec/#gateway.networking.k8s.io/v1alpha3.GatewayTLSConfig
+[targetRefs]: ../reference/spec.md#localpolicytargetreferencewithsectionname
+[subjectAltNames]: ../reference/spec.md#subjectaltname
+[options]: ../reference/spec.md#backendtlspolicyspec

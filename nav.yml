@@ -56,23 +56,30 @@ nav:
         - BackendTrafficPolicy: api-types/backendtrafficpolicy.md
       - ReferenceGrant: api-types/referencegrant.md
     - API specification:
-      - Standard: reference/spec.md
-      - Experimental: reference/specx.md
+      - Development:
+        - Standard: reference/spec.md
+        - Experimental: reference/specx.md
+      - v1.4:
+        - Standard: reference/1.4/spec.md
+        - Experimental: reference/1.4/specx.md
+      - v1.3:
+        - Standard: reference/1.3/spec.md
+        - Experimental: reference/1.3/specx.md
     - Policy Attachment: reference/policy-attachment.md
   - Enhancements:
     - Overview: geps/overview.md
     - Implementable:
-      - geps/gep-1494/index.md
+      - geps/gep-3779/index.md
       - geps/gep-3793/index.md
       - geps/gep-3949/index.md
     - Experimental:
       - geps/gep-91/index.md
+      - geps/gep-1494/index.md
       - geps/gep-1619/index.md
       - geps/gep-1713/index.md
       - geps/gep-1731/index.md
       - geps/gep-1748/index.md
       - geps/gep-1767/index.md
-      - geps/gep-2649/index.md
       - geps/gep-3155/index.md
       - geps/gep-3388/index.md
       - geps/gep-3567/index.md

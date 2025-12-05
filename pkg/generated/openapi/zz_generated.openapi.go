@@ -3134,7 +3134,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_BackendTLSPolicySpec(ref common.Refere
 							},
 						},
 						SchemaProps: spec.SchemaProps{
-							Description: "TargetRefs identifies an API object to apply the policy to. Only Services have Extended support. Implementations MAY support additional objects, with Implementation Specific support. Note that this config applies to the entire referenced resource by default, but this default may change in the future to provide a more granular application of the policy.\n\nTargetRefs must be _distinct_. This means either that:\n\n* They select different targets. If this is the case, then targetRef\n  entries are distinct. In terms of fields, this means that the\n  multi-part key defined by `group`, `kind`, and `name` must\n  be unique across all targetRef entries in the BackendTLSPolicy.\n* They select different sectionNames in the same target.\n\nWhen more than one BackendTLSPolicy selects the same target and sectionName, implementations MUST determine precedence using the following criteria, continuing on ties:\n\n* The older policy by creation timestamp takes precedence. For\n  example, a policy with a creation timestamp of \"2021-07-15\n  01:02:03\" MUST be given precedence over a policy with a\n  creation timestamp of \"2021-07-15 01:02:04\".\n* The policy appearing first in alphabetical order by {name}.\n  For example, a policy named `bar` is given precedence over a\n  policy named `baz`.\n\nFor any BackendTLSPolicy that does not take precedence, the implementation MUST ensure the `Accepted` Condition is set to `status: False`, with Reason `Conflicted`.\n\nSupport: Extended for Kubernetes Service\n\nSupport: Implementation-specific for any other resource",
+							Description: "TargetRefs identifies an API object to apply the policy to. Only Services have Extended support. Implementations MAY support additional objects, with Implementation Specific support. Note that this config applies to the entire referenced resource by default, but this default may change in the future to provide a more granular application of the policy.\n\nTargetRefs must be _distinct_. This means either that:\n\n* They select different targets. If this is the case, then targetRef\n  entries are distinct. In terms of fields, this means that the\n  multi-part key defined by `group`, `kind`, and `name` must\n  be unique across all targetRef entries in the BackendTLSPolicy.\n* They select different sectionNames in the same target.\n\nWhen more than one BackendTLSPolicy selects the same target and sectionName, implementations MUST determine precedence using the following criteria, continuing on ties:\n\n* The older policy by creation timestamp takes precedence. For\n  example, a policy with a creation timestamp of \"2021-07-15\n  01:02:03\" MUST be given precedence over a policy with a\n  creation timestamp of \"2021-07-15 01:02:04\".\n* The policy appearing first in alphabetical order by {name}.\n  For example, a policy named `bar` is given precedence over a\n  policy named `baz`.\n\nFor any BackendTLSPolicy that does not take precedence, the implementation MUST ensure the `Accepted` Condition is set to `status: False`, with Reason `Conflicted`.\n\nImplementations SHOULD NOT support more than one targetRef at this time. Although the API technically allows for this, the current guidance for conflict resolution and status handling is lacking. Until that can be clarified in a future release, the safest approach is to support a single targetRef.\n\nSupport: Extended for Kubernetes Service\n\nSupport: Implementation-specific for any other resource",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -4072,7 +4072,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewayBackendTLS(ref common.Reference
 				Properties: map[string]spec.Schema{
 					"clientCertificateRef": {
 						SchemaProps: spec.SchemaProps{
-							Description: "ClientCertificateRef is a reference to an object that contains a Client Certificate and the associated private key.\n\nReferences to a resource in different namespace are invalid UNLESS there is a ReferenceGrant in the target namespace that allows the certificate to be attached. If a ReferenceGrant does not allow this reference, the \"ResolvedRefs\" condition MUST be set to False for this listener with the \"RefNotPermitted\" reason.\n\nClientCertificateRef can reference to standard Kubernetes resources, i.e. Secret, or implementation-specific custom resources.\n\nSupport: Core\n\n<gateway:experimental>",
+							Description: "ClientCertificateRef references an object that contains a client certificate and its associated private key. It can reference standard Kubernetes resources, i.e., Secret, or implementation-specific custom resources.\n\nA ClientCertificateRef is considered invalid if:\n\n* It refers to a resource that cannot be resolved (e.g., the referenced resource\n  does not exist) or is misconfigured (e.g., a Secret does not contain the keys\n  named `tls.crt` and `tls.key`). In this case, the `ResolvedRefs` condition\n  on the Gateway MUST be set to False with the Reason `InvalidClientCertificateRef`\n  and the Message of the Condition MUST indicate why the reference is invalid.\n\n* It refers to a resource in another namespace UNLESS there is a ReferenceGrant\n  in the target namespace that allows the certificate to be attached.\n  If a ReferenceGrant does not allow this reference, the `ResolvedRefs` condition\n  on the Gateway MUST be set to False with the Reason `RefNotPermitted`.\n\nImplementations MAY choose to perform further validation of the certificate content (e.g., checking expiry or enforcing specific formats). In such cases, an implementation-specific Reason and Message MUST be set.\n\nSupport: Core - Reference to a Kubernetes TLS Secret (with the type `kubernetes.io/tls`). Support: Implementation-specific - Other resource kinds or Secrets with a different type (e.g., `Opaque`). <gateway:experimental>",
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.SecretObjectReference"),
 						},
 					},
@@ -4567,6 +4567,13 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewayStatus(ref common.ReferenceCall
 							},
 						},
 					},
+					"attachedListeners": {
+						SchemaProps: spec.SchemaProps{
+							Description: "AttachedListeners represents the total number of ListenerSets that have been successfully attached to this Gateway.\n\nA ListenerSet is successfully attached to a Gateway when all the following conditions are met : - The ListenerSet is selected by the Gateway's AllowedListeners field - The ListenerSet has a valid ParentRef selecting the Gateway - The ListenerSet's status has the condition \"Accepted: true\"\n\nUses for this field include troubleshooting AttachedListeners attachment and measuring blast radius/impact of changes to a Gateway.",
+							Type:        []string{"integer"},
+							Format:      "int32",
+						},
+					},
 				},
 			},
 		},
@@ -4941,7 +4948,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPHeader(ref common.ReferenceCallbac
 					},
 					"value": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Value is the value of HTTP Header to be matched.",
+							Description: "Value is the value of HTTP Header to be matched. <gateway:experimental:description> Must consist of printable US-ASCII characters, optionally separated by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2 </gateway:experimental:description>\n\n<gateway:experimental:validation:Pattern=`^[!-~]+([\\t ]?[!-~]+)*$`>",
 							Default:     "",
 							Type:        []string{"string"},
 							Format:      "",
@@ -5057,7 +5064,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPHeaderMatch(ref common.ReferenceCa
 					},
 					"value": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Value is the value of HTTP Header to be matched.",
+							Description: "Value is the value of HTTP Header to be matched. <gateway:experimental:description> Must consist of printable US-ASCII characters, optionally separated by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2 </gateway:experimental:description>\n\n<gateway:experimental:validation:Pattern=`^[!-~]+([\\t ]?[!-~]+)*$`>",
 							Default:     "",
 							Type:        []string{"string"},
 							Format:      "",

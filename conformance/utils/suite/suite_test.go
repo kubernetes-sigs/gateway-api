@@ -487,6 +487,13 @@ func TestInferGWCSupportedFeatures(t *testing.T) {
 				}),
 			},
 		},
+		{
+			name:             "all features combined with exempt features",
+			allowAllFeatures: true,
+			exemptFeatures:   sets.New[features.FeatureName]("ReferenceGrant", "HTTPRoute"),
+			expectedSource:   supportedFeaturesSourceManual,
+			expectedFeatures: features.SetsToNamesSet(features.AllFeatures).Difference(sets.New[features.FeatureName]("ReferenceGrant", "HTTPRoute")),
+		},
 	}
 
 	gwcName := "ochopintre"

@@ -24,23 +24,44 @@ GOPATH=${GOPATH:-$(go env GOPATH)}
 # have to manually default it.
 GOBIN=${GOBIN:-$(go env GOBIN)}
 GOBIN=${GOBIN:-${GOPATH}/bin}
+REMOTE=${REMOTE:-origin}
 
 readonly GOTOOL="go tool"
 
 echo $GOBIN
 
 go install github.com/elastic/crd-ref-docs
+declare -a arr=(
+    "release-1.3"
+    "release-1.4"
+    "main"
+)
 
-$GOTOOL crd-ref-docs \
-    --source-path=${PWD}/apis \
-    --config=crd-ref-docs.yaml \
-    --templates-dir=${PWD}/hack/crd-ref-templates/ \
-    --renderer=markdown \
-    --output-path=${PWD}/site-src/reference/spec.md
+mkdir -p ${PWD}/tmp
 
-$GOTOOL crd-ref-docs \
-    --source-path=${PWD}/apisx \
-    --config=crd-ref-docs.yaml \
-    --templates-dir=${PWD}/hack/crd-ref-templates/ \
-    --renderer=markdown \
-    --output-path=${PWD}/site-src/reference/specx.md
+for i in "${arr[@]}"; do
+    tmpdir=$(mktemp -d --tmpdir=${PWD}/tmp)
+    
+    git fetch ${REMOTE} ${i}
+	git --work-tree=${tmpdir} checkout ${REMOTE}/${i} -- apis apisx
+	
+    # Start removing any "release-" prefix from docpath
+    docpath=${i#"release-"}
+    # If the release is "main" simply remove it
+    docpath=${docpath#"main"}
+	mkdir -p "${PWD}/site-src/reference/${docpath}"
+
+    $GOTOOL crd-ref-docs \
+        --source-path=${tmpdir}/apis \
+        --config=crd-ref-docs.yaml \
+        --templates-dir=${PWD}/hack/crd-ref-templates/ \
+        --renderer=markdown \
+        --output-path=${PWD}/site-src/reference/${docpath}/spec.md
+
+    $GOTOOL crd-ref-docs \
+        --source-path=${tmpdir}/apisx \
+        --config=crd-ref-docs.yaml \
+        --templates-dir=${PWD}/hack/crd-ref-templates/ \
+        --renderer=markdown \
+        --output-path=${PWD}/site-src/reference/${docpath}/specx.md
+done

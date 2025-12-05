@@ -58,7 +58,11 @@ GO_TEST_FLAGS ?=
 CEL_TEST_K8S_VERSION ?= 
 CEL_TEST_CRD_CHANNEL ?= standard
 
-all: generate vet fmt verify test
+# Compilation flags for binaries
+GOARCH ?= $(shell go env GOARCH)
+GOOS ?= $(shell go env GOOS)
+
+all: generate vet fmt verify test conformance-bin
 
 .PHONY: clean-generated
 clean-generated:
@@ -68,7 +72,7 @@ clean-generated:
 
 # Run generators for protos, Deepcopy funcs, CRDs, and docs.
 .PHONY: generate
-generate: clean-generated update-codegen
+generate: clean-generated update-codegen tidy
 
 .PHONY: update-codegen
 update-codegen:
@@ -77,6 +81,10 @@ update-codegen:
 .PHONY: build-install-yaml
 build-install-yaml:
 	hack/build-install-yaml.sh
+
+.PHONY: build-monthly-yaml
+build-monthly-yaml:
+	hack/build-monthly-yaml.sh
 
 # Run go fmt against code
 fmt:
@@ -92,16 +100,26 @@ test:
 # Run tests for each submodule.
 	cd "conformance/echo-basic" && go test -race -cover ./...
 
+.PHONY: tidy
+tidy:
+	go work sync
+	find . -name go.mod -execdir sh -c 'go mod tidy' \;
+
 # Run tests for CRDs validation
 .PHONY: test.crds-validation
 test.crds-validation:
-	K8S_VERSION=$(CEL_TEST_K8S_VERSION) CRD_CHANNEL=$(CEL_TEST_CRD_CHANNEL) go test ${GO_TEST_FLAGS} -count=1 -timeout=120s --tags=$(CEL_TEST_CRD_CHANNEL) -v ./pkg/test/cel
-	K8S_VERSION=$(CEL_TEST_K8S_VERSION) CRD_CHANNEL=$(CEL_TEST_CRD_CHANNEL) go test ${GO_TEST_FLAGS} -count=1 -timeout=120s -v ./pkg/test/crd
+	K8S_VERSION=$(CEL_TEST_K8S_VERSION) CRD_CHANNEL=$(CEL_TEST_CRD_CHANNEL) go test ${GO_TEST_FLAGS} -count=1 -timeout=120s --tags=$(CEL_TEST_CRD_CHANNEL) -v ./tests/cel
+	K8S_VERSION=$(CEL_TEST_K8S_VERSION) CRD_CHANNEL=$(CEL_TEST_CRD_CHANNEL) go test ${GO_TEST_FLAGS} -count=1 -timeout=120s -v ./tests/crd
 
 # Run conformance tests against controller implementation
 .PHONY: conformance
 conformance:
 	go test ${GO_TEST_FLAGS} -v ./conformance -run TestConformance -args ${CONFORMANCE_FLAGS}
+
+# Build a conformance.test binary that can be used as a standalone binary to run conformance test
+.PHONY: conformance-bin
+conformance-bin:
+	GOOS=$(GOOS) GOARCH=$(GOARCH) go test -c -v ./conformance 
 
 # Install CRD's and example resources to a preexisting cluster.
 .PHONY: install
@@ -182,7 +200,6 @@ build-docs:
 
 .PHONY: build-docs-netlify
 build-docs-netlify: api-ref-docs
-	hack/mkdocs/generate.sh
 	pip install -r hack/mkdocs/image/requirements.txt
 	python -m mkdocs build
 

@@ -51,10 +51,14 @@ Session.vim
 .*.timestamp
 /site
 go.work.sum
+/tmp
+/conformance.test
 
 /cache
 .venv/
 release/
 site-src/reference/spec.md
 site-src/reference/specx.md
+site-src/reference/**/spec.md
+site-src/reference/**/specx.md
 

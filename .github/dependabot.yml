@@ -2,7 +2,11 @@ version: 2
 updates:
   # Dependencies listed in go.mod
   - package-ecosystem: "gomod"
-    directory: "/" # Location of package manifests
+    directories:
+    - "/"
+    - "/conformance"
+    - "/tests"
+    - "/tools"
     schedule:
       interval: "weekly"
     groups:

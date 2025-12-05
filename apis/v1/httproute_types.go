@@ -621,10 +621,15 @@ type HTTPHeaderMatch struct {
 	Name HTTPHeaderName `json:"name"`
 
 	// Value is the value of HTTP Header to be matched.
+	// <gateway:experimental:description>
+	// Must consist of printable US-ASCII characters, optionally separated
+	// by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
+	// </gateway:experimental:description>
 	//
 	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=4096
 	// +required
+	// <gateway:experimental:validation:Pattern=`^[!-~]+([\t ]?[!-~]+)*$`>
 	Value string `json:"value"`
 }
 
@@ -1022,10 +1027,15 @@ type HTTPHeader struct {
 	Name HTTPHeaderName `json:"name"`
 
 	// Value is the value of HTTP Header to be matched.
+	// <gateway:experimental:description>
+	// Must consist of printable US-ASCII characters, optionally separated
+	// by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
+	// </gateway:experimental:description>
 	//
 	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=4096
 	// +required
+	// <gateway:experimental:validation:Pattern=`^[!-~]+([\t ]?[!-~]+)*$`>
 	Value string `json:"value"`
 }
 
@@ -1807,9 +1817,7 @@ type HTTPBackendRef struct {
 	//
 	// * The BackendTLSPolicy object is installed in the cluster, a BackendTLSPolicy
 	//   is present that refers to the Service, and the implementation is unable
-	//   to meet the requirement. At the time of writing, BackendTLSPolicy is
-	//   experimental, but once it becomes standard, this will become a MUST
-	//   requirement.
+	//   to meet the requirement.
 	//
 	// Support: Core for Kubernetes Service
 	//
@@ -1819,7 +1827,7 @@ type HTTPBackendRef struct {
 	//
 	// Support for Kubernetes Service appProtocol: Extended
 	//
-	// Support for BackendTLSPolicy: Experimental and ImplementationSpecific
+	// Support for BackendTLSPolicy: Extended
 	//
 	// +optional
 	BackendRef `json:",inline"`
