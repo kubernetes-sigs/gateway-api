@@ -14,23 +14,39 @@ new features and resources start in the Experimental release channel. From that
 point, these may graduate to the Standard release channel or be dropped from the
 API entirely.
 
+To get a new item into the Experimental channel, you need:
+* A Who/What/Why [GEP](../geps/overview.md) merged as Provisional
+* Implementations willing to sponsor the item by agreeing to implement it as an 
+experimental feature
+  * Items affecting north-south aspects of Gateway API require three sponsors
+  * Items affecting only east-west aspects require two sponsors
+
+The GEP can be merged into Provisional before soliciting sponsors. Once an item 
+moves from Provisional to Implementable, it will be automatically dropped if it 
+doesn't make any significant progress in six months. This process is handled 
+with a public review, typically at the first meeting of every month.
+
 The following diagram provides a high level overview of the lifecycle of a
 feature or resource proposed by a new [GEP](../geps/overview.md) (enhancement
 proposal) in Gateway API:
 
 ```mermaid
 flowchart TD
-    0([Implementable GEP]) --> A
+    0([Provisional GEP]) --> 1([Sponsors Committed])
+    1 --> 2([Implementable GEP])
+    2 --> A
     A>Experimental Channel] --> B([Widely used and working well?])
     B -->|Yes| C>Standard Channel]
     B -->|No| D([Could Changes Help?])
     D -->|Yes| E([Adjust and try again])
     D -->|No| F>Remove From API]
     E -->A
-
+    2 -->|No progress in 6 months| G([Auto-dropped])
+    
 style A fill:#eeb
 style C fill:#beb
 style F fill:#ebb
+style G fill:#ebb
 ```
 
 The Standard release channel includes:
@@ -53,6 +69,15 @@ experience. Many implementations also provide support for the Experimental
 Channel which enables us to iterate on new features quickly. Note that this
 channel makes no backwards compatibility guarantees and breaking changes may be
 released at any point.
+
+#### Validating Admission Policies (VAP)
+Gateway API uses Validating Admission Policies to protect channel boundaries:
+
+* **Upgrade VAP**: Prevents applying experimental-channel CRDs over 
+standard-channel CRDs. If you need to do this, you'll have to remove this VAP.
+* **Guardrails VAP**: Prevents setting any experimental fields of a resource 
+unless an annotation is also present. Without the annotation, you get 
+standard-channel functionality only.
 
 ### API Versions
 Upstream Kubernetes APIs have 3 levels of stability, denoted by alpha, beta, and
@@ -98,6 +123,40 @@ Until that is resolved, it is likely that ReferenceGrant will be effectively
 frozen as beta in Gateway API. When it is widely available as a built-in
 Kubernetes API, we will likely remove it from the Standard Channel of Gateway
 API.
+
+## Release Process
+
+### Standard Channel Releases
+Standard-channel releases follow a date-based cadence. The release date is 
+chosen in advance and will not slip; however, the content is flexible. Whatever 
+content is ready to go at the release date will ship; content that isn't ready 
+will wait for the next release. The release number is ideally chosen at the 
+point when its content is known.
+
+### Monthly Experimental Releases
+Gateway API publishes monthly releases of the Experimental channel, tagged as 
+`monthly-$year-$month` (e.g., `monthly-2025-11`). These releases:
+
+* Only include `experimental-install.yaml`
+* Are not allowed to change the Standard channel
+* Are snapshots of the main branch
+* Do not receive backports of bugfixes (upgrade to a newer monthly instead)
+* Do not use SemVer release numbers, as breaking changes to experimental 
+resources and fields are always allowed between monthlies
+
+The purpose of monthly releases is to enable faster iteration in the 
+Experimental channel.
+
+### SemVer Releases
+Gateway API continues to publish SemVer releases (e.g., `1.5.0`, `1.6.0`) on a 
+regular cadence. These releases:
+
+* Include both `experimental-install.yaml` and `standard-install.yaml`
+* Are not snapshots of main: they have release branches to allow for backporting
+ bugfixes
+* Most likely, the `experimental-install.yaml` in a SemVer release will be 
+identical to the one contained in the monthly release right before it, though 
+that's not required
 
 ## Version Indicators
 Each CRD will be published with annotations that indicate their bundle version
