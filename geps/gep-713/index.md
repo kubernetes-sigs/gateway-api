@@ -1035,7 +1035,7 @@ That condition, if added, MUST be named according to the pattern `<metaresource-
 
 Implementations SHOULD use their own unique domain prefix for this condition type. Gateway API implementations, for instance, SHOULD use the same domain as in the `controllerName` field on `GatewayClass` (or some other implementation-unique domain for implementations that do not use `GatewayClass`.)
 
-E.g. – given a `Gateway` object that is targeted by a hypothetical `ColorPolicy` policy object named `policy-namespace/my-policy`, which is owned by a `colors.controller.k8s.io` controller and with status `Enforced` or `PartiallyEnforced`. The controller SHOULD add to the status of the `Gateway` object a condition `colors.controller.k8s.io/ColorPolicyAffected: true`, and reason ideally referring to the `policy-namespace/my-policy` by name.
+E.g. – given a `Gateway` object that is targeted by a hypothetical `ColorPolicy` policy object named `policy-namespace/my-policy`, which is owned by a `colors.controller.k8s.io` controller and with status `Programmed` or `PartiallyProgrammed`. The controller SHOULD add to the status of the `Gateway` object a condition `colors.controller.k8s.io/ColorPolicyAffected: true`, and reason ideally referring to the `policy-namespace/my-policy` by name.
 
 Similarly, for a hypothetical `ColorPolicy` policy that targets a specific named section of the `Gateway` object (e.g., `http-listener`), the controller SHOULD add to the status of the listener section within the `Gateway` object a condition `colors.controller.k8s.io/ColorPolicyAffected: true`.
 
