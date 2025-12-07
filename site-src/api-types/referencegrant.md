@@ -39,7 +39,7 @@ in the `to` list because a ReferenceGrant can only be used to allow references
 to resources in the same namespace as the ReferenceGrant.
 
 ## Example
-The following example shows how a HTTPRoute in namespace `foo` can reference a
+The following example shows how an HTTPRoute in namespace `foo` can reference a
 Service in namespace `bar`. In this example a ReferenceGrant in the `bar`
 namespace explicitly allows references to Services from HTTPRoutes in the `foo`
 namespace.

@@ -307,7 +307,7 @@ RouteStatus defines the observed state that is required across all route types.
 
 Parents define a list of the Gateways (or other parent resources) that are
 associated with the HTTPRoute, and the status of the HTTPRoute with respect to
-each of these Gateways. When a HTTPRoute adds a reference to a Gateway in
+each of these Gateways. When an HTTPRoute adds a reference to a Gateway in
 parentRefs, the controller that manages the Gateway should add an entry to this
 list when the controller first sees the route and should update the entry as
 appropriate when the route is modified.
