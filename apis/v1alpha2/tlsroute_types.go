@@ -86,15 +86,15 @@ type TLSRouteSpec struct {
 	//
 	// +optional
 	// +listType=atomic
-	// +kubebuilder:validation:MaxItems=16
+	// +kubebuilder:validation:MaxItems=4096
 	Hostnames []Hostname `json:"hostnames,omitempty"`
 
 	// Rules are a list of TLS matchers and actions.
 	//
 	// +required
 	// +listType=atomic
+  // +kubebuilder:validation:MaxItems=16
 	// +kubebuilder:validation:MinItems=1
-	// +kubebuilder:validation:MaxItems=16
 	// <gateway:experimental:validation:XValidation:message="Rule name must be unique within the route",rule="self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name) && l1.name == l2.name))">
 	Rules []TLSRouteRule `json:"rules"`
 }
