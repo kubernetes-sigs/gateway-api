@@ -35,21 +35,30 @@ This proposal adds the ability to validate the TLS certificate presented by the 
 These two validation mechanisms operate independently and can be used simultaneously.
 * Introduce a `caCertificateRefs` field within `FrontendTLSValidation` that can be used to specify a list of CA Certificates that can be used as a trust anchor to validate the certificates presented by the client.
 * Add a new `FrontendValidationModeType` enum within `FrontendTLSValidation` indicating how gateway should validate client certificates. As for now we support following values but it might change in the future:
-  1) `AllowValidOnly` (Core Support)
-  2) `AllowInsecureFallback` (Extended Support)
+  1. `AllowValidOnly` (Core Support)
+  2. `AllowInsecureFallback` (Extended Support)
 
-    `AllowInsecureFallback` mode indicates the gateway will accept connections even if the client certificate is not presented or fails verification.
+	`AllowInsecureFallback` mode indicates the gateway will accept connections even if the client certificate is not presented or fails verification.
 	This approach delegates client authorization to the backend and introduce a significant security risk. It should be used in testing environments or
 	on a temporary basis in non-testing environments.
     When `FrontendValidationModeType` is changed from `AllowValidOnly` to `AllowInsecureFallback` the `InsecureFrontendValidationMode` condition MUST be set to `True` with Reason `ConfigurationChanged` on gateway.
+	This condition is removed as soon as `FrontendValidationModeType` is changed back to `AllowValidOnly`.
+
 * Introduce a `ObjectReference` structure that can be used to specify `caCertificateRefs` references.
+* Invalid `caCertificateRefs` directly affect the `ResolvedRefs` and `Accepted` conditions of the targeted listeners.
+  * **For a `perPort` configuration**: A listener is considered targeted if and only if it serves HTTPS and its port
+    matches the port specified in the per-port configuration.
+  * **For the `default` configuration**: A listener is considered targeted if and only if it serves HTTPS and its port
+    does not match any of the per-port configurations.
+  This behavior is important to ensure that when all CA certificates are invalid, listeners do not implicitly fall
+  back to skipping client certificate verification.
 
 ### Impact on listeners
 
 This proposal removes frontendTLSValidation from Listener's TLS configuration and introduces gateways level per port configuration. This is a breaking change for existing implementation which uses this feature from Experimental API.
  Once gateway level TLS is configured (either by default or for a specific port), the TLS settings will apply to all existing and newly created Listeners serving HTTPS that match the configuration.
 
-#### GO
+#### Go
 
 ```go
 // ObjectReference identifies an API object including its namespace.
@@ -142,27 +151,51 @@ type TLSPortConfig struct {
 // FrontendTLSValidation holds configuration information that can be used to validate
 // the frontend initiating the TLS connection
 type FrontendTLSValidation struct {
-	// CACertificateRefs contains one or more references to
-	// Kubernetes objects that contain TLS certificates of
-	// the Certificate Authorities that can be used
-	// as a trust anchor to validate the certificates presented by the client.
+	// CACertificateRefs contains one or more references to Kubernetes
+	// objects that contain a PEM-encoded TLS CA certificate bundle, which
+	// is used as a trust anchor to validate the certificates presented by
+	// the client.
 	//
-	// A single CA certificate reference to a Kubernetes ConfigMap
-	// has "Core" support.
-	// Implementations MAY choose to support attaching multiple CA certificates to
-	// a Listener, but this behavior is implementation-specific.
+	// A CACertificateRef is invalid if:
 	//
-	// Support: Core - A single reference to a Kubernetes ConfigMap
-	// with the CA certificate in a key named `ca.crt`.
+	// * It refers to a resource that cannot be resolved (e.g., the
+	//   referenced resource does not exist) or is misconfigured (e.g., a
+	//   ConfigMap does not contain a key named `ca.crt`). In this case, the
+	//   Reason must be set to `InvalidCACertificateRef` and the Message of
+	//   the Condition must indicate which reference is invalid and why.
 	//
-	// Support: Implementation-specific (More than one certificate in a ConfigMap with different keys or more than one reference, or other kinds of resources).
+	// * It refers to an unknown or unsupported kind of resource. In this
+	//   case, the Reason must be set to `InvalidKind` and the Message of
+	//   the Condition must explain which kind of resource is unknown or
+	//   unsupported.
 	//
-	// References to a resource in a different namespace are invalid UNLESS there
-	// is a ReferenceGrant in the target namespace that allows the certificate
-	// to be attached. If a ReferenceGrant does not allow this reference, the
-	// "ResolvedRefs" condition MUST be set to False for this listener with the
-	// "RefNotPermitted" reason.
+	// * It refers to a resource in another namespace UNLESS there is a
+	//   ReferenceGrant in the target namespace that allows the CA
+	//   certificate to be attached. If a ReferenceGrant does not allow this
+	//   reference, the `ResolvedRefs` condition MUST be set with
+	//   the Reason `RefNotPermitted`.
+    //
+	// Implementations MAY choose to perform further validation of the 
+	// certificate content (e.g., checking expiry or enforcing specific formats).
+	// In such cases, an implementation-specific Reason and Message MUST be set.
 	//
+	// In all cases, the implementation MUST ensure that the `ResolvedRefs`
+	// condition is set to `status: False` on all targeted listeners (i.e.,
+	// listeners serving HTTPS on a matching port). The condition MUST
+	// include a Reason and Message that indicate the cause of the error. If
+	// ALL CACertificateRefs are invalid, the implementation MUST also ensure
+	// the `Accepted` condition on the listener is set to `status: False`, with
+	// the Reason `NoValidCACertificate`.
+	// Implementations MAY choose to support attaching multiple CA certificates
+	// to a listener, but this behavior is implementation-specific.
+	//
+	// Support: Core - A single reference to a Kubernetes ConfigMap, with the
+	// CA certificate in a key named `ca.crt`.
+	//
+	// Support: Implementation-specific - More than one reference, other kinds
+	// of resources, or a single reference that includes multiple certificates.
+	//
+	// +listType=atomic
 	// +kubebuilder:validation:MaxItems=8
 	// +kubebuilder:validation:MinItems=1
 	CACertificateRefs []ObjectReference `json:"caCertificateRefs,omitempty"`
@@ -182,7 +215,9 @@ type FrontendTLSValidation struct {
 	//
 	// Defaults to AllowValidOnly.
 	//
-	// Support: Core
+	// Support: Core - AllowValidOnly
+	//
+	// Support: Extended - AllowInsecureFallback
 	//
 	// +optional
 	// +kubebuilder:default=AllowValidOnly
