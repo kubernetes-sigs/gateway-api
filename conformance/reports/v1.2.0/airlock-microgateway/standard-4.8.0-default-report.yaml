@@ -1,14 +1,14 @@
 apiVersion: gateway.networking.k8s.io/v1
-date: "2025-10-29T09:40:20Z"
-gatewayAPIChannel: experimental
-gatewayAPIVersion: v1.4.0
+date: "2025-11-26T14:35:34Z"
+gatewayAPIChannel: standard
+gatewayAPIVersion: v1.2.0
 implementation:
   contact:
   - https://www.airlock.com/en/contact
   organization: airlock
   project: microgateway
   url: https://github.com/airlock/microgateway
-  version: 4.8.0-alpha1
+  version: 4.8.0
 kind: ConformanceReport
 mode: default
 profiles:
@@ -22,19 +22,18 @@ profiles:
     result: success
     statistics:
       Failed: 0
-      Passed: 20
+      Passed: 19
       Skipped: 0
     supportedFeatures:
+    - GatewayHTTPListenerIsolation
     - GatewayInfrastructurePropagation
     - GatewayPort8080
     - HTTPRouteBackendProtocolH2C
     - HTTPRouteBackendProtocolWebSocket
     - HTTPRouteBackendTimeout
-    - HTTPRouteCORS
     - HTTPRouteDestinationPortMatching
     - HTTPRouteHostRewrite
     - HTTPRouteMethodMatching
-    - HTTPRouteNamedRouteRule
     - HTTPRouteParentRefPort
     - HTTPRoutePathRedirect
     - HTTPRoutePathRewrite
@@ -44,15 +43,11 @@ profiles:
     - HTTPRouteResponseHeaderModification
     - HTTPRouteSchemeRedirect
     unsupportedFeatures:
-    - GatewayAddressEmpty
-    - GatewayHTTPListenerIsolation
     - GatewayStaticAddresses
     - HTTPRouteBackendRequestHeaderModification
     - HTTPRouteRequestMirror
     - HTTPRouteRequestMultipleMirrors
-    - HTTPRouteRequestPercentageMirror
   name: GATEWAY-HTTP
   summary: Core tests succeeded. Extended tests succeeded.
 succeededProvisionalTests:
 - GatewayInfrastructure
-- HTTPRouteNamedRule
