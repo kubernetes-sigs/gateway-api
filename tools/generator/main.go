@@ -17,6 +17,7 @@ limitations under the License.
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -45,6 +46,22 @@ var standardKinds = map[string]bool{
 // This generation code is largely copied from
 // github.com/kubernetes-sigs/controller-tools/blob/ab52f76cc7d167925b2d5942f24bf22e30f49a02/pkg/crd/gen.go
 func main() {
+	channels := []string{"standard", "experimental"}
+	bundleVersion := consts.BundleVersion
+
+	experimentalOnly := flag.Bool("experimental-only", false, "Generate only experimental CRDs")
+	versionFlag := flag.String("version", bundleVersion, "The bundle version to set in the CRD annotations")
+
+	flag.Parse()
+
+	if *experimentalOnly {
+		channels = []string{"experimental"}
+	}
+
+	if *versionFlag != "" {
+		bundleVersion = *versionFlag
+	}
+
 	roots, err := loader.LoadRoots(
 		"k8s.io/apimachinery/pkg/runtime/schema", // Needed to parse generated register functions.
 		"sigs.k8s.io/gateway-api/apis/v1alpha3",
@@ -88,14 +105,13 @@ func main() {
 		log.Fatalf("no objects in the roots")
 	}
 
-	channels := []string{"standard", "experimental"}
 	for _, channel := range channels {
 		for _, groupKind := range kubeKinds {
 			if channel == "standard" && !standardKinds[groupKind.Kind] {
 				continue
 			}
 
-			log.Printf("generating %s CRD for %v\n", channel, groupKind)
+			log.Printf("generating %s %s CRD for %v\n", channel, bundleVersion, groupKind)
 
 			parser.NeedCRDFor(groupKind, nil)
 			crdRaw := parser.CustomResourceDefinitions[groupKind]
@@ -104,7 +120,7 @@ func main() {
 			if crdRaw.ObjectMeta.Annotations == nil {
 				crdRaw.ObjectMeta.Annotations = map[string]string{}
 			}
-			crdRaw.ObjectMeta.Annotations[consts.BundleVersionAnnotation] = consts.BundleVersion
+			crdRaw.ObjectMeta.Annotations[consts.BundleVersionAnnotation] = bundleVersion
 			crdRaw.ObjectMeta.Annotations[consts.ChannelAnnotation] = channel
 			crdRaw.ObjectMeta.Annotations[apiext.KubeAPIApprovedAnnotation] = consts.ApprovalLink
 
@@ -224,6 +240,18 @@ func gatewayTweaks(channel string, name string, jsonProps apiext.JSONSchemaProps
 				Message: celMatch[1],
 				Rule:    celMatch[2],
 			})
+		}
+
+		patternRe := regexp.MustCompile(validationPrefix + "Pattern=`([^`]*)`")
+		patternMatches := patternRe.FindAllStringSubmatch(jsonProps.Description, 64)
+		if len(patternMatches) == 1 && jsonProps.Pattern == "" {
+			patternMatch := patternMatches[0]
+			if len(patternMatch) != 2 {
+				log.Fatalf("Invalid %s Pattern tag for %s", validationPrefix, name)
+			}
+
+			numValid++
+			jsonProps.Pattern = patternMatch[1]
 		}
 	}
 

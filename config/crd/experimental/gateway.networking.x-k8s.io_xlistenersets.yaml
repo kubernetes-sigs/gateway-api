@@ -3,7 +3,7 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     api-approved.kubernetes.io: https://github.com/kubernetes-sigs/gateway-api/pull/3328
-    gateway.networking.k8s.io/bundle-version: v1.4.0
+    gateway.networking.k8s.io/bundle-version: v1.4.1
     gateway.networking.k8s.io/channel: experimental
   name: xlistenersets.gateway.networking.x-k8s.io
 spec:
@@ -729,7 +729,7 @@ spec:
                     supportedKinds:
                       description: |-
                         SupportedKinds is the list indicating the Kinds supported by this
-                        listener. This MUST represent the kinds an implementation supports for
+                        listener. This MUST represent the kinds supported by an implementation for
                         that Listener configuration.
 
                         If kinds are specified in Spec that are not supported, they MUST NOT

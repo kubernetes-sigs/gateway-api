@@ -78,6 +78,7 @@ type Request struct {
 	Protocol         string
 	Body             string
 	SNI              string
+	ClientCert       string
 }
 
 // ExpectedRequest defines expected properties of a request that reaches a backend.
@@ -87,6 +88,8 @@ type ExpectedRequest struct {
 	// AbsentHeaders are names of headers that are expected
 	// *not* to be present on the request.
 	AbsentHeaders []string
+	// If set, CompareRoundTrip asserts the echoed httpPort equals this value.
+	HTTPPort string
 }
 
 // Response defines expected properties of a response from a backend.
@@ -362,6 +365,10 @@ func CompareRoundTrip(t *testing.T, req *roundtripper.Request, cReq *roundtrippe
 			}
 		}
 
+		if expected.ExpectedRequest.HTTPPort != "" && expected.ExpectedRequest.HTTPPort != cReq.HTTPPort {
+			return fmt.Errorf("expected httpPort %q, got %q", expected.ExpectedRequest.HTTPPort, cReq.HTTPPort)
+		}
+
 		if expected.Response.Headers != nil {
 			if cRes.Headers == nil {
 				return fmt.Errorf("no headers captured, expected %v", len(expected.ExpectedRequest.Headers))
@@ -414,6 +421,12 @@ func CompareRoundTrip(t *testing.T, req *roundtripper.Request, cReq *roundtrippe
 
 		if expected.ExpectedRequest.SNI != "" && expected.ExpectedRequest.SNI != cReq.TLS.ServerName {
 			return fmt.Errorf("expected SNI %q to be equal to %q", cReq.TLS.ServerName, expected.ExpectedRequest.SNI)
+		}
+
+		if expected.ExpectedRequest.ClientCert != "" {
+			if !slices.Contains(cReq.TLS.PeerCertificates, expected.ExpectedRequest.ClientCert) {
+				return fmt.Errorf("expected client certiifcate was not captured")
+			}
 		}
 	} else if roundtripper.IsRedirect(cRes.StatusCode) {
 		if expected.RedirectRequest == nil {

@@ -511,7 +511,7 @@ type RouteParentStatus struct {
 	//
 	// * The Route refers to a nonexistent parent.
 	// * The Route is of a type that the controller does not support.
-	// * The Route is in a namespace the controller does not have access to.
+	// * The Route is in a namespace to which the controller does not have access.
 	//
 	// <gateway:util:excludeFromCRD>
 	//
@@ -936,7 +936,7 @@ type SessionPersistence struct {
 	IdleTimeout *Duration `json:"idleTimeout,omitempty"`
 
 	// Type defines the type of session persistence such as through
-	// the use a header or cookie. Defaults to cookie based session
+	// the use of a header or cookie. Defaults to cookie based session
 	// persistence.
 	//
 	// Support: Core for "Cookie" type

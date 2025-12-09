@@ -57,13 +57,17 @@ const (
 	// of HTTP listeners.
 	SupportGatewayHTTPListenerIsolation FeatureName = "GatewayHTTPListenerIsolation"
 
-	// SupportGatewayInfrastructureAnnotations option indicates support for
+	// SupportGatewayInfrastructurePropagation option indicates support for
 	// spec.infrastructure.annotations and spec.infrastructure.labels
 	SupportGatewayInfrastructurePropagation FeatureName = "GatewayInfrastructurePropagation"
 
-	//  SupportGatewayAddressEmpty option indicates support for an empty
-	//  spec.addresses.value field
+	// SupportGatewayAddressEmpty option indicates support for an empty
+	// spec.addresses.value field
 	SupportGatewayAddressEmpty FeatureName = "GatewayAddressEmpty"
+
+	// SupportGatewayTLSBackendClientCertificate option indicates support for
+	// specifying client certificates, which will be sent to the backend.
+	SupportGatewayTLSBackendClientCertificate = "GatewayTLSBackendClientCertificate"
 )
 
 var (
@@ -87,10 +91,16 @@ var (
 		Name:    SupportGatewayInfrastructurePropagation,
 		Channel: FeatureChannelStandard,
 	}
-	// GatewayAddressEmptyFeature contains metadata for the SupportGatewayAddressEmpty feature.
+	// GatewayEmptyAddressFeature contains metadata for the SupportGatewayAddressEmpty feature.
 	GatewayEmptyAddressFeature = Feature{
 		Name:    SupportGatewayAddressEmpty,
 		Channel: FeatureChannelStandard,
+	}
+
+	// GatewayTLSBackendClientCertificate contains metadata for the SupportGatewayTLSBackendClientCertificate feature.
+	GatewayTLSBackendClientCertificate = Feature{
+		Name:    SupportGatewayTLSBackendClientCertificate,
+		Channel: FeatureChannelExperimental,
 	}
 )
 
@@ -102,4 +112,5 @@ var GatewayExtendedFeatures = sets.New(
 	GatewayHTTPListenerIsolationFeature,
 	GatewayInfrastructurePropagationFeature,
 	GatewayEmptyAddressFeature,
+	GatewayTLSBackendClientCertificate,
 )

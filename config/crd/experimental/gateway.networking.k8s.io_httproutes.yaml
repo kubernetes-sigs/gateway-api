@@ -3,7 +3,7 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     api-approved.kubernetes.io: https://github.com/kubernetes-sigs/gateway-api/pull/3328
-    gateway.networking.k8s.io/bundle-version: v1.4.0
+    gateway.networking.k8s.io/bundle-version: v1.4.1
     gateway.networking.k8s.io/channel: experimental
   name: httproutes.gateway.networking.k8s.io
 spec:
@@ -483,7 +483,7 @@ spec:
                                         AllowHeaders indicates which HTTP request headers are supported for
                                         accessing the requested resource.
 
-                                        Header names are not case sensitive.
+                                        Header names are not case-sensitive.
 
                                         Multiple header names in the value of the `Access-Control-Allow-Headers`
                                         response header are separated by a comma (",").
@@ -545,7 +545,7 @@ spec:
                                         Valid values are any method defined by RFC9110, along with the special
                                         value `*`, which represents all HTTP methods are allowed.
 
-                                        Method names are case sensitive, so these values are also case-sensitive.
+                                        Method names are case-sensitive, so these values are also case-sensitive.
                                         (See https://www.rfc-editor.org/rfc/rfc2616#section-5.1.1)
 
                                         Multiple method names in the value of the `Access-Control-Allow-Methods`
@@ -694,7 +694,7 @@ spec:
                                         this additional header will be exposed as part of the response to the
                                         client.
 
-                                        Header names are not case sensitive.
+                                        Header names are not case-sensitive.
 
                                         Multiple header names in the value of the `Access-Control-Expose-Headers`
                                         response header are separated by a comma (",").
@@ -1071,10 +1071,14 @@ spec:
                                             pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
                                             type: string
                                           value:
-                                            description: Value is the value of HTTP
-                                              Header to be matched.
+                                            description: |-
+                                              Value is the value of HTTP Header to be matched.
+
+                                              Must consist of printable US-ASCII characters, optionally separated
+                                              by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
                                             maxLength: 4096
                                             minLength: 1
+                                            pattern: ^[!-~]+([\t ]?[!-~]+)*$
                                             type: string
                                         required:
                                         - name
@@ -1146,10 +1150,14 @@ spec:
                                             pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
                                             type: string
                                           value:
-                                            description: Value is the value of HTTP
-                                              Header to be matched.
+                                            description: |-
+                                              Value is the value of HTTP Header to be matched.
+
+                                              Must consist of printable US-ASCII characters, optionally separated
+                                              by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
                                             maxLength: 4096
                                             minLength: 1
+                                            pattern: ^[!-~]+([\t ]?[!-~]+)*$
                                             type: string
                                         required:
                                         - name
@@ -1510,10 +1518,14 @@ spec:
                                             pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
                                             type: string
                                           value:
-                                            description: Value is the value of HTTP
-                                              Header to be matched.
+                                            description: |-
+                                              Value is the value of HTTP Header to be matched.
+
+                                              Must consist of printable US-ASCII characters, optionally separated
+                                              by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
                                             maxLength: 4096
                                             minLength: 1
+                                            pattern: ^[!-~]+([\t ]?[!-~]+)*$
                                             type: string
                                         required:
                                         - name
@@ -1585,10 +1597,14 @@ spec:
                                             pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
                                             type: string
                                           value:
-                                            description: Value is the value of HTTP
-                                              Header to be matched.
+                                            description: |-
+                                              Value is the value of HTTP Header to be matched.
+
+                                              Must consist of printable US-ASCII characters, optionally separated
+                                              by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
                                             maxLength: 4096
                                             minLength: 1
+                                            pattern: ^[!-~]+([\t ]?[!-~]+)*$
                                             type: string
                                         required:
                                         - name
@@ -1969,7 +1985,7 @@ spec:
                                   AllowHeaders indicates which HTTP request headers are supported for
                                   accessing the requested resource.
 
-                                  Header names are not case sensitive.
+                                  Header names are not case-sensitive.
 
                                   Multiple header names in the value of the `Access-Control-Allow-Headers`
                                   response header are separated by a comma (",").
@@ -2031,7 +2047,7 @@ spec:
                                   Valid values are any method defined by RFC9110, along with the special
                                   value `*`, which represents all HTTP methods are allowed.
 
-                                  Method names are case sensitive, so these values are also case-sensitive.
+                                  Method names are case-sensitive, so these values are also case-sensitive.
                                   (See https://www.rfc-editor.org/rfc/rfc2616#section-5.1.1)
 
                                   Multiple method names in the value of the `Access-Control-Allow-Methods`
@@ -2180,7 +2196,7 @@ spec:
                                   this additional header will be exposed as part of the response to the
                                   client.
 
-                                  Header names are not case sensitive.
+                                  Header names are not case-sensitive.
 
                                   Multiple header names in the value of the `Access-Control-Expose-Headers`
                                   response header are separated by a comma (",").
@@ -2554,10 +2570,14 @@ spec:
                                       pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
                                       type: string
                                     value:
-                                      description: Value is the value of HTTP Header
-                                        to be matched.
+                                      description: |-
+                                        Value is the value of HTTP Header to be matched.
+
+                                        Must consist of printable US-ASCII characters, optionally separated
+                                        by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
                                       maxLength: 4096
                                       minLength: 1
+                                      pattern: ^[!-~]+([\t ]?[!-~]+)*$
                                       type: string
                                   required:
                                   - name
@@ -2628,10 +2648,14 @@ spec:
                                       pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
                                       type: string
                                     value:
-                                      description: Value is the value of HTTP Header
-                                        to be matched.
+                                      description: |-
+                                        Value is the value of HTTP Header to be matched.
+
+                                        Must consist of printable US-ASCII characters, optionally separated
+                                        by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
                                       maxLength: 4096
                                       minLength: 1
+                                      pattern: ^[!-~]+([\t ]?[!-~]+)*$
                                       type: string
                                   required:
                                   - name
@@ -2991,10 +3015,14 @@ spec:
                                       pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
                                       type: string
                                     value:
-                                      description: Value is the value of HTTP Header
-                                        to be matched.
+                                      description: |-
+                                        Value is the value of HTTP Header to be matched.
+
+                                        Must consist of printable US-ASCII characters, optionally separated
+                                        by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
                                       maxLength: 4096
                                       minLength: 1
+                                      pattern: ^[!-~]+([\t ]?[!-~]+)*$
                                       type: string
                                   required:
                                   - name
@@ -3065,10 +3093,14 @@ spec:
                                       pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
                                       type: string
                                     value:
-                                      description: Value is the value of HTTP Header
-                                        to be matched.
+                                      description: |-
+                                        Value is the value of HTTP Header to be matched.
+
+                                        Must consist of printable US-ASCII characters, optionally separated
+                                        by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
                                       maxLength: 4096
                                       minLength: 1
+                                      pattern: ^[!-~]+([\t ]?[!-~]+)*$
                                       type: string
                                   required:
                                   - name
@@ -3402,10 +3434,14 @@ spec:
                                   - RegularExpression
                                   type: string
                                 value:
-                                  description: Value is the value of HTTP Header to
-                                    be matched.
+                                  description: |-
+                                    Value is the value of HTTP Header to be matched.
+
+                                    Must consist of printable US-ASCII characters, optionally separated
+                                    by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
                                   maxLength: 4096
                                   minLength: 1
+                                  pattern: ^[!-~]+([\t ]?[!-~]+)*$
                                   type: string
                               required:
                               - name
@@ -3614,7 +3650,7 @@ spec:
                             For example, setting the `rules[].retry.backoff` field to the value
                             `100ms` will cause a backend request to first be retried approximately
                             100 milliseconds after timing out or receiving a response code configured
-                            to be retryable.
+                            to be retriable.
 
                             An implementation MAY use an exponential or alternative backoff strategy
                             for subsequent retry attempts, MAY cap the maximum backoff duration to
@@ -3657,7 +3693,7 @@ spec:
                               HTTPRouteRetryStatusCode defines an HTTP response status code for
                               which a backend request should be retried.
 
-                              Implementations MUST support the following status codes as retryable:
+                              Implementations MUST support the following status codes as retriable:
 
                               * 500
                               * 502
@@ -3748,7 +3784,7 @@ spec:
                           default: Cookie
                           description: |-
                             Type defines the type of session persistence such as through
-                            the use a header or cookie. Defaults to cookie based session
+                            the use of a header or cookie. Defaults to cookie based session
                             persistence.
 
                             Support: Core for "Cookie" type
@@ -3951,7 +3987,7 @@ spec:
 
                         * The Route refers to a nonexistent parent.
                         * The Route is of a type that the controller does not support.
-                        * The Route is in a namespace the controller does not have access to.
+                        * The Route is in a namespace to which the controller does not have access.
                       items:
                         description: Condition contains details for one aspect of
                           the current state of this API Resource.
@@ -4653,7 +4689,7 @@ spec:
                                         AllowHeaders indicates which HTTP request headers are supported for
                                         accessing the requested resource.
 
-                                        Header names are not case sensitive.
+                                        Header names are not case-sensitive.
 
                                         Multiple header names in the value of the `Access-Control-Allow-Headers`
                                         response header are separated by a comma (",").
@@ -4715,7 +4751,7 @@ spec:
                                         Valid values are any method defined by RFC9110, along with the special
                                         value `*`, which represents all HTTP methods are allowed.
 
-                                        Method names are case sensitive, so these values are also case-sensitive.
+                                        Method names are case-sensitive, so these values are also case-sensitive.
                                         (See https://www.rfc-editor.org/rfc/rfc2616#section-5.1.1)
 
                                         Multiple method names in the value of the `Access-Control-Allow-Methods`
@@ -4864,7 +4900,7 @@ spec:
                                         this additional header will be exposed as part of the response to the
                                         client.
 
-                                        Header names are not case sensitive.
+                                        Header names are not case-sensitive.
 
                                         Multiple header names in the value of the `Access-Control-Expose-Headers`
                                         response header are separated by a comma (",").
@@ -5241,10 +5277,14 @@ spec:
                                             pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
                                             type: string
                                           value:
-                                            description: Value is the value of HTTP
-                                              Header to be matched.
+                                            description: |-
+                                              Value is the value of HTTP Header to be matched.
+
+                                              Must consist of printable US-ASCII characters, optionally separated
+                                              by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
                                             maxLength: 4096
                                             minLength: 1
+                                            pattern: ^[!-~]+([\t ]?[!-~]+)*$
                                             type: string
                                         required:
                                         - name
@@ -5316,10 +5356,14 @@ spec:
                                             pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
                                             type: string
                                           value:
-                                            description: Value is the value of HTTP
-                                              Header to be matched.
+                                            description: |-
+                                              Value is the value of HTTP Header to be matched.
+
+                                              Must consist of printable US-ASCII characters, optionally separated
+                                              by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
                                             maxLength: 4096
                                             minLength: 1
+                                            pattern: ^[!-~]+([\t ]?[!-~]+)*$
                                             type: string
                                         required:
                                         - name
@@ -5680,10 +5724,14 @@ spec:
                                             pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
                                             type: string
                                           value:
-                                            description: Value is the value of HTTP
-                                              Header to be matched.
+                                            description: |-
+                                              Value is the value of HTTP Header to be matched.
+
+                                              Must consist of printable US-ASCII characters, optionally separated
+                                              by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
                                             maxLength: 4096
                                             minLength: 1
+                                            pattern: ^[!-~]+([\t ]?[!-~]+)*$
                                             type: string
                                         required:
                                         - name
@@ -5755,10 +5803,14 @@ spec:
                                             pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
                                             type: string
                                           value:
-                                            description: Value is the value of HTTP
-                                              Header to be matched.
+                                            description: |-
+                                              Value is the value of HTTP Header to be matched.
+
+                                              Must consist of printable US-ASCII characters, optionally separated
+                                              by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
                                             maxLength: 4096
                                             minLength: 1
+                                            pattern: ^[!-~]+([\t ]?[!-~]+)*$
                                             type: string
                                         required:
                                         - name
@@ -6139,7 +6191,7 @@ spec:
                                   AllowHeaders indicates which HTTP request headers are supported for
                                   accessing the requested resource.
 
-                                  Header names are not case sensitive.
+                                  Header names are not case-sensitive.
 
                                   Multiple header names in the value of the `Access-Control-Allow-Headers`
                                   response header are separated by a comma (",").
@@ -6201,7 +6253,7 @@ spec:
                                   Valid values are any method defined by RFC9110, along with the special
                                   value `*`, which represents all HTTP methods are allowed.
 
-                                  Method names are case sensitive, so these values are also case-sensitive.
+                                  Method names are case-sensitive, so these values are also case-sensitive.
                                   (See https://www.rfc-editor.org/rfc/rfc2616#section-5.1.1)
 
                                   Multiple method names in the value of the `Access-Control-Allow-Methods`
@@ -6350,7 +6402,7 @@ spec:
                                   this additional header will be exposed as part of the response to the
                                   client.
 
-                                  Header names are not case sensitive.
+                                  Header names are not case-sensitive.
 
                                   Multiple header names in the value of the `Access-Control-Expose-Headers`
                                   response header are separated by a comma (",").
@@ -6724,10 +6776,14 @@ spec:
                                       pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
                                       type: string
                                     value:
-                                      description: Value is the value of HTTP Header
-                                        to be matched.
+                                      description: |-
+                                        Value is the value of HTTP Header to be matched.
+
+                                        Must consist of printable US-ASCII characters, optionally separated
+                                        by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
                                       maxLength: 4096
                                       minLength: 1
+                                      pattern: ^[!-~]+([\t ]?[!-~]+)*$
                                       type: string
                                   required:
                                   - name
@@ -6798,10 +6854,14 @@ spec:
                                       pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
                                       type: string
                                     value:
-                                      description: Value is the value of HTTP Header
-                                        to be matched.
+                                      description: |-
+                                        Value is the value of HTTP Header to be matched.
+
+                                        Must consist of printable US-ASCII characters, optionally separated
+                                        by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
                                       maxLength: 4096
                                       minLength: 1
+                                      pattern: ^[!-~]+([\t ]?[!-~]+)*$
                                       type: string
                                   required:
                                   - name
@@ -7161,10 +7221,14 @@ spec:
                                       pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
                                       type: string
                                     value:
-                                      description: Value is the value of HTTP Header
-                                        to be matched.
+                                      description: |-
+                                        Value is the value of HTTP Header to be matched.
+
+                                        Must consist of printable US-ASCII characters, optionally separated
+                                        by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
                                       maxLength: 4096
                                       minLength: 1
+                                      pattern: ^[!-~]+([\t ]?[!-~]+)*$
                                       type: string
                                   required:
                                   - name
@@ -7235,10 +7299,14 @@ spec:
                                       pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
                                       type: string
                                     value:
-                                      description: Value is the value of HTTP Header
-                                        to be matched.
+                                      description: |-
+                                        Value is the value of HTTP Header to be matched.
+
+                                        Must consist of printable US-ASCII characters, optionally separated
+                                        by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
                                       maxLength: 4096
                                       minLength: 1
+                                      pattern: ^[!-~]+([\t ]?[!-~]+)*$
                                       type: string
                                   required:
                                   - name
@@ -7572,10 +7640,14 @@ spec:
                                   - RegularExpression
                                   type: string
                                 value:
-                                  description: Value is the value of HTTP Header to
-                                    be matched.
+                                  description: |-
+                                    Value is the value of HTTP Header to be matched.
+
+                                    Must consist of printable US-ASCII characters, optionally separated
+                                    by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
                                   maxLength: 4096
                                   minLength: 1
+                                  pattern: ^[!-~]+([\t ]?[!-~]+)*$
                                   type: string
                               required:
                               - name
@@ -7784,7 +7856,7 @@ spec:
                             For example, setting the `rules[].retry.backoff` field to the value
                             `100ms` will cause a backend request to first be retried approximately
                             100 milliseconds after timing out or receiving a response code configured
-                            to be retryable.
+                            to be retriable.
 
                             An implementation MAY use an exponential or alternative backoff strategy
                             for subsequent retry attempts, MAY cap the maximum backoff duration to
@@ -7827,7 +7899,7 @@ spec:
                               HTTPRouteRetryStatusCode defines an HTTP response status code for
                               which a backend request should be retried.
 
-                              Implementations MUST support the following status codes as retryable:
+                              Implementations MUST support the following status codes as retriable:
 
                               * 500
                               * 502
@@ -7918,7 +7990,7 @@ spec:
                           default: Cookie
                           description: |-
                             Type defines the type of session persistence such as through
-                            the use a header or cookie. Defaults to cookie based session
+                            the use of a header or cookie. Defaults to cookie based session
                             persistence.
 
                             Support: Core for "Cookie" type
@@ -8121,7 +8193,7 @@ spec:
 
                         * The Route refers to a nonexistent parent.
                         * The Route is of a type that the controller does not support.
-                        * The Route is in a namespace the controller does not have access to.
+                        * The Route is in a namespace to which the controller does not have access.
                       items:
                         description: Condition contains details for one aspect of
                           the current state of this API Resource.

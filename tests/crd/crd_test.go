@@ -78,7 +78,7 @@ func TestCRDValidation(t *testing.T) {
 			DownloadBinaryAssetsVersion: k8sVersion,
 			CRDInstallOptions: envtest.CRDInstallOptions{
 				Paths: []string{
-					filepath.Join("..", "..", "..", "config", "crd", crdChannel),
+					filepath.Join("..", "..", "config", "crd", crdChannel),
 				},
 				CleanUpAfterUse: true,
 			},
@@ -107,7 +107,7 @@ func TestCRDValidation(t *testing.T) {
 	})
 
 	t.Run("should be able to install standard examples", func(t *testing.T) {
-		output, err := executeKubectlCommand(t, kubectlLocation, kubeconfigLocation, []string{"apply", "--recursive", "-f", filepath.Join("..", "..", "..", "examples", "standard")})
+		output, err := executeKubectlCommand(t, kubectlLocation, kubeconfigLocation, []string{"apply", "--recursive", "-f", filepath.Join("..", "..", "examples", "standard")})
 		assert.NoError(t, err, "output", output)
 	})
 
@@ -115,7 +115,7 @@ func TestCRDValidation(t *testing.T) {
 		if crdChannel != "experimental" {
 			t.Skipf("experimental channel not being tested")
 		}
-		output, err := executeKubectlCommand(t, kubectlLocation, kubeconfigLocation, []string{"apply", "--recursive", "-f", filepath.Join("..", "..", "..", "examples", "experimental")})
+		output, err := executeKubectlCommand(t, kubectlLocation, kubeconfigLocation, []string{"apply", "--recursive", "-f", filepath.Join("..", "..", "examples", "experimental")})
 		assert.NoError(t, err, "output", output)
 	})
 
@@ -159,7 +159,7 @@ func getInvalidExamplesFiles(t *testing.T, crdChannel string) ([]string, error) 
 	t.Helper()
 
 	var files []string
-	err := filepath.WalkDir(filepath.Join("..", "..", "..", "hack", "invalid-examples"), func(path string, d fs.DirEntry, err error) error {
+	err := filepath.WalkDir(filepath.Join("..", "..", "hack", "invalid-examples"), func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
