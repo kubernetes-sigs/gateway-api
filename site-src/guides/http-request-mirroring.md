@@ -10,7 +10,7 @@ requests to another backend using
 [filters](../api-types/httproute.md#filters-optional). This guide shows how to use
 this feature.
 
-Mirrored requests will must only be sent to one single destination endpoint
+Mirrored requests will only be sent to one single destination endpoint
 within this backendRef, and responses from this backend MUST be ignored by
 the Gateway.
 
