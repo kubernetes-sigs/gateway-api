@@ -50,7 +50,7 @@ The feature will be part of the experimental channel, which implementations can 
 This proposal introduces a new `ListenerSet` resource that has the ability to attach a set of listeners to multiple parent `Gateways`.
 
 **Note**: While this API is experimental, its `Kind` will be `XListenerSet` and 
-once the API is gratuated to stable it will be renamed to `ListenerSet`.
+once the API is graduated to stable it will be renamed to `ListenerSet`.
 
 ### Go
 
@@ -280,7 +280,7 @@ type ListenerEntryStatus struct {
 	Port PortNumber `json:"port"`
 
 	// SupportedKinds is the list indicating the Kinds supported by this
-	// listener. This MUST represent the kinds an implementation supports for
+	// listener. This MUST represent the kinds supported by an implementation for
 	// that Listener configuration.
 	//
 	// If kinds are specified in Spec that are not supported, they MUST NOT
@@ -536,7 +536,7 @@ spec:
 
 #### Gateway parents and sectionName
 
-If a `sectionName` in a Route's `parentRef` is not set then the Route MUST attach to only the listeners in the referenced parent. As an example given a `Gateway` and it's child `ListenerSets` a route attaching to the `Gateway` with an empty `sectionName` shall only attach to the listeners in the `Gateways` immediate `spec.listeners` list. 
+If a `sectionName` in a Route's `parentRef` is not set then the Route MUST attach to only the listeners in the referenced parent. As an example given a `Gateway` and its child `ListenerSets` a route attaching to the `Gateway` with an empty `sectionName` shall only attach to the listeners in the `Gateways` immediate `spec.listeners` list. 
 
 In other words, the Route MUST attach just to the Gateway listeners specified on `.spec.listeners` and MUST NOT not attach to any listeners in the child `ListenerSets` 
 of the `Gateway`.
@@ -751,7 +751,7 @@ spec:
 ```
 
 The ListenerSet `user-listenerset` should be marked as Conflicted, as the `parent-gateway`
-has a listener definition called `foo` that conflicts with the ListenetSet definition
+has a listener definition called `foo` that conflicts with the ListenerSet definition
 called `myapp`. The conflict happens because hostname is the same on both `ListenerSet` 
 but they use different termination TLS certificates:
 

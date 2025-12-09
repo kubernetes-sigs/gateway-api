@@ -100,7 +100,7 @@ spec:
                         pattern: ^([0-9]{1,5}(h|m|s|ms)){1,4}$
                         type: string
                         x-kubernetes-validations:
-                        - message: interval can not be greater than one hour or less
+                        - message: interval cannot be greater than one hour or less
                             than one second
                           rule: '!(duration(self) < duration(''1s'') || duration(self)
                             > duration(''1h''))'
@@ -150,7 +150,7 @@ spec:
                         pattern: ^([0-9]{1,5}(h|m|s|ms)){1,4}$
                         type: string
                         x-kubernetes-validations:
-                        - message: interval can not be greater than one hour
+                        - message: interval cannot be greater than one hour
                           rule: '!(duration(self) == duration(''0s'') || duration(self)
                             > duration(''1h''))'
                     type: object
@@ -228,7 +228,7 @@ spec:
                     default: Cookie
                     description: |-
                       Type defines the type of session persistence such as through
-                      the use a header or cookie. Defaults to cookie based session
+                      the use of a header or cookie. Defaults to cookie based session
                       persistence.
 
                       Support: Core for "Cookie" type
@@ -251,7 +251,7 @@ spec:
                   ServiceImport, or any implementation-specific backendRef) are the only
                   valid API target references.
 
-                  Currently, a TargetRef can not be scoped to a specific port on a
+                  Currently, a TargetRef cannot be scoped to a specific port on a
                   Service.
                 items:
                   description: |-

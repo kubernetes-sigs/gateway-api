@@ -62,7 +62,7 @@ Absence of the `appProtocol` field does not imply the implementation should disa
 
 Only the Kubernetes `Service` `protocol` field supports multiple protocols on the same port. See the details in [KEP-1435][kep-1435].
 
-Implementations MAY support Kubernetes Service BackendRefs that are multiplexing TCP and UDP on the same port. Otherwise implementations MUST set *Route ResolvedRefs condition to False with the "UnsupportedProtocol" Reason with a clear message that multiplexing is not supported.
+Implementations MAY support Kubernetes Service BackendRefs that are multiplexing TCP and UDP on the same port. Otherwise, implementations MUST set *Route ResolvedRefs condition to False with the "UnsupportedProtocol" Reason with a clear message that multiplexing is not supported.
 
 Currently Kubernetes `Service` API only allows different `appProtocol` values for the same port when `protocol` fields differs. At this time there seems to be interest in changing `appProtocol` to be a list in order to facilitate this use-case.
 
