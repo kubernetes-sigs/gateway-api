@@ -125,12 +125,12 @@ type TLSRouteSpec struct {
   // implementation must raise an 'Accepted' Condition with a status of
   // `False` in the corresponding RouteParentStatus.
   // 
-  // A Listener MUST be of type TLS when a TLSRoute attaches to it. The 
+  // A Listener MUST be have protocol set to TLS when a TLSRoute attaches to it. The 
   // implementation MUST raise an 'Accepted' Condition with a status of
   // `False` in the corresponding RouteParentStatus with the reason 
   // of "UnsupportedValue" in case a Listener of the wrong type is used.
-  // Core: A TLS listener CAN have mode Passthrough
-  // Extended: A TLS listener CAN have mode Terminate 
+  // Core: Listener with `protocol` `TLS` and `tls.mode` `Passthrough`.
+  // Extended: Listener with `protocol` `TLS` and `tls.mode` `Terminate`. The feature name for this Extended feature is `TLSRouteTermination`.
   // </gateway:util:excludeFromCRD>
   // +required
   // +kubebuilder:validation:MinItems=1
@@ -189,8 +189,7 @@ behavior:
 In this workflow, the TLS traffic will be matched against the `SNI attribute` of 
 the request and then directed to the backends.
 
-This workflow MUST be supported on Core support level and should be exposed with the
-feature `SupportTLSRoute`.
+This is the base use case for the TLSRoute object, and is included in the base TLSRoute feature, `TLSRoute`. To put this another way, this feature has Core support within the TLSRoute object.
 
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
@@ -242,8 +241,7 @@ i.e. `Service`, in the cluster based on `backendRefs` rules of the `TLSRoute`.
 In this workflow, the TLS traffic will be matched against the `SNI attribute` of 
 the request and terminated on the `Gateway`. 
 
-This workflow CAN be supported on Extended support level and should be exposed with the
-feature `SupportTLSRouteTermination`.
+This use case is Extended for TLSRoute, and so MAY be supported, with the featurename `TLSRouteTermination`.
 
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
@@ -292,8 +290,10 @@ API request flow for a gateway implemented using both `TLSRoute` is:
 [Server Name Indication](https://datatracker.ietf.org/doc/html/rfc6066#section-3)
 attribute to match an `TLSRoute`.
 * The reverse proxy terminates the TLS negotiation on the `Gateway`.
-* The reverse proxy passes unencrypted request to one or more objects,
+* The reverse proxy passes unencrypted TCP packets to one or more objects,
 i.e. `Service`, in the cluster based on `backendRefs` rules of the `TLSRoute`.
+It is not valid to make any assumptions about the content of the traffic in this case,
+it MUST be treated as _only_ TCP traffic.
 
 In case the implementation does not support this TLSRoute termination, it MUST 
 add the Listener status as:
@@ -322,8 +322,7 @@ In this workflow, the TLS traffic will be matched against the `SNI attribute` of
 the request, and based on the SNI attribute be directed to the backends on Passthrough
 mode or be terminated on the `Gateway` and passed unencrypted to the backends.
 
-This workflow CAN be supported on `Extended` support level and should be exposed with the
-feature `SupportTLSRouteMixedMode`.
+This use case is Extended for TLSRoute, and so MAY be supported, with the feature name `TLSRouteMixedMode`.
 
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
