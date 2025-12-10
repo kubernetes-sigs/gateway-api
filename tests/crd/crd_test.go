@@ -81,7 +81,7 @@ func TestCRDValidation(t *testing.T) {
 		DownloadBinaryAssetsVersion: k8sVersion,
 		CRDInstallOptions: envtest.CRDInstallOptions{
 			Paths: []string{
-				filepath.Join("..", "..", "..", "config", "crd", crdChannel),
+				filepath.Join("..", "..", "config", "crd", crdChannel),
 			},
 			CleanUpAfterUse: true,
 		},
