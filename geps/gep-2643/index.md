@@ -23,7 +23,6 @@ based on the SNI identification that should pass the traffic to N load balanced 
 
 ## Longer Term Goals
 
-* Implement capabilities for [ESNI](https://www.cloudflare.com/learning/ssl/what-is-encrypted-sni/)
 * Implement capabilities for [ECH](https://blog.cloudflare.com/encrypted-client-hello/)
 * Extend TLSRouteRule to support hostname being a matcher
 
@@ -523,25 +522,25 @@ be at least one intersecting hostname for the `TLSRoute` to be attached to the
 
 ###  Feature Names
 
-* SupportTLSRoute
-* SupportTLSRouteTermination
-* SupportTLSRouteMixedMode
+* TLSRoute
+* TLSRouteTermination
+* TLSRouteMixedMode
 
 ### Conformance tests
 
 | Description | Outcome | Features |
 | :---- | :---- | :---- |
-| A single TLSRoute in the gateway-conformance-infra namespace attaches to a Gateway in the same namespace. <br/> Code: [Simple] <br/>Issue: [TLSRoute conformance] | A request to a hostname served by the TLSRoute should be passthrough directly to the backend. Check if the termination happened, if no additional Gateway header was added. | SupportTLSRoute |
-| A single TLSRoute in the gateway-conformance-infra namespace, with a backendRef in another namespace without valid ReferenceGrant, should have the ResolvedRefs condition set to False. <br/> Code: [ReferenceGrant] and the request to the route MUST fail [Invalid ReferenceGrant Request] | TLSRoute conditions must have a `RefNotPermitted` status. A request to the route MUST fail | SupportTLSRoute + SupportReferenceGrant |
-| A TLSRoute trying to attach to a gateway without a “tls” listener MUST be rejected  | TLSRoute should have a parent condition of type `Accepted=False` with Reason `NoMatchingParent`. Request to the route MUST fail. | SupportTLSRoute |
-| A TLSRoute with a hostname that does not match the Gateway hostname MUST be rejected (eg.: route with hostname [www.example.com](http://www.example.com), gateway with hostname www1.example.com) <br/> Issue: [TLSRoute conformance] | Condition on the TLSRoute parent of type `Accepted=False` with Reason `NoMatchingListenerHostname`. Request to the route MUST fail. | SupportTLSRoute |
-| A Gateway containing a Listener of type TLS/Terminate MUST be accepted, and MUST direct the requests to the right TLSRoute when TLSRoute termination is supported. <br/> Issue: [Termination] | Being able to do a request to a TLS route being terminated on gateway (eg.: terminated.example.tld/xpto) | SupportTLSRoute + SupportTLSRouteTermination |
-| A Gateway containing a Listener of type TLS/Passthrough and a Listener of type TLS/Terminate MUST be accepted, and MUST direct the requests to the right TLSRoute when mixed mode is supported. <br/> Issue: [Termination] | Being able to do a request to a TLS route being terminated on gateway (eg.: terminated.example.tld/xpto) and to a TLS Passthrough route on the same gateway, but different host (passthrough.example.tld) | SupportTLSRoute + SupportTLSRouteTermination + SupportTLSRouteMixedMode |
-| A Gateway containing a Listener of type TLS/Passthrough and a Listener of type TLS/Terminate MUST NOT be accepted when mixed mode is not supported | Listener condition MUST have Condition Conflicted=True with reason `ProtocolConflict`. A request to any route attached to any of the listeners MUST fail. | SupportTLSRoute + SupportTLSRouteTermination + !SupportTLSRouteMixedMode |
-| A Gateway with \*.example.tld on a TLS listener MUST allow a TLSRoute with hostname some.example.tld to be attached to it (and the same, but with a non wildcard hostname) <br/> Issue: [TLSRoute conformance] | TLSRoute MUST be able to attach to the Gateway using the matching hostname, a request MUST succeed | SupportTLSRoute  |
-| Expose support for TLSRoute termination <br/> Issue: [Termination] | For a [Listener] setting mode: "terminate", TLSRoute MUST be present in [ListenerStatus.SupportedKinds] in case TLSRoute termination is supported | SupportTLSRouteTermination |
-| Explicitly expose that TLSRoute termination is not supported. <br/> Issue: [Termination] | For a [Listener] setting mode: "terminate" and not being supported, the Listener entry MUST NOT be Accepted containing the condition `Accepted: False` and `Reason: UnsupportedValue`. | SupportTLSRoute + !SupportTLSRouteTermination |
-| Explicitly expose that tls listener accepts termination for TCPRoute only. | For a [Listener] setting mode: "terminate" that supports only `TCPRoute`, a Listener entry MUST exist but only TCPRoute MUST be present in [ListenerStatus.SupportedKinds]. | SupportTLSRoute + !SupportTLSRouteTermination |
+| A single TLSRoute in the gateway-conformance-infra namespace attaches to a Gateway in the same namespace. <br/> Code: [Simple] <br/>Issue: [TLSRoute conformance] | A request to a hostname served by the TLSRoute should be passthrough directly to the backend. Check if the termination happened, if no additional Gateway header was added. | TLSRoute |
+| A single TLSRoute in the gateway-conformance-infra namespace, with a backendRef in another namespace without valid ReferenceGrant, should have the ResolvedRefs condition set to False. <br/> Code: [ReferenceGrant] and the request to the route MUST fail [Invalid ReferenceGrant Request] | TLSRoute conditions must have a `RefNotPermitted` status. A request to the route MUST fail | TLSRoute + ReferenceGrant |
+| A TLSRoute trying to attach to a gateway without a “tls” listener MUST be rejected  | TLSRoute should have a parent condition of type `Accepted=False` with Reason `NoMatchingParent`. Request to the route MUST fail. | TLSRoute |
+| A TLSRoute with a hostname that does not match the Gateway hostname MUST be rejected (eg.: route with hostname [www.example.com](http://www.example.com), gateway with hostname www1.example.com) <br/> Issue: [TLSRoute conformance] | Condition on the TLSRoute parent of type `Accepted=False` with Reason `NoMatchingListenerHostname`. Request to the route MUST fail. | TLSRoute |
+| A Gateway containing a Listener of type TLS/Terminate MUST be accepted, and MUST direct the requests to the right TLSRoute when TLSRoute termination is supported. <br/> Issue: [Termination] | Being able to do a request to a TLS route being terminated on gateway (eg.: terminated.example.tld/xpto) | TLSRoute + TLSRouteTermination |
+| A Gateway containing a Listener of type TLS/Passthrough and a Listener of type TLS/Terminate MUST be accepted, and MUST direct the requests to the right TLSRoute when mixed mode is supported. <br/> Issue: [Termination] | Being able to do a request to a TLS route being terminated on gateway (eg.: terminated.example.tld/xpto) and to a TLS Passthrough route on the same gateway, but different host (passthrough.example.tld) | TLSRoute + TLSRouteTermination + TLSRouteMixedMode |
+| A Gateway containing a Listener of type TLS/Passthrough and a Listener of type TLS/Terminate MUST NOT be accepted when mixed mode is not supported | Listener condition MUST have Condition Conflicted=True with reason `ProtocolConflict`. A request to any route attached to any of the listeners MUST fail. | TLSRoute + TLSRouteTermination + !TLSRouteMixedMode |
+| A Gateway with \*.example.tld on a TLS listener MUST allow a TLSRoute with hostname some.example.tld to be attached to it (and the same, but with a non wildcard hostname) <br/> Issue: [TLSRoute conformance] | TLSRoute MUST be able to attach to the Gateway using the matching hostname, a request MUST succeed | TLSRoute  |
+| Expose support for TLSRoute termination <br/> Issue: [Termination] | For a [Listener] setting mode: "terminate", TLSRoute MUST be present in [ListenerStatus.SupportedKinds] in case TLSRoute termination is supported | TLSRouteTermination |
+| Explicitly expose that TLSRoute termination is not supported. <br/> Issue: [Termination] | For a [Listener] setting mode: "terminate" and not being supported, the Listener entry MUST NOT be Accepted containing the condition `Accepted: False` and `Reason: UnsupportedValue`. | TLSRoute + !TLSRouteTermination |
+| Explicitly expose that tls listener accepts termination for TCPRoute only. | For a [Listener] setting mode: "terminate" that supports only `TCPRoute`, a Listener entry MUST exist but only TCPRoute MUST be present in [ListenerStatus.SupportedKinds]. | TLSRoute + !TLSRouteTermination |
 
 [Simple]: https://github.com/kubernetes-sigs/gateway-api/blob/edd7cbeac3ff1458c75ed21636af52ba1536b73a/conformance/tests/tlsroute-simple-same-namespace.go
 [ReferenceGrant]: https://github.com/kubernetes-sigs/gateway-api/blob/edd7cbeac3ff1458c75ed21636af52ba1536b73a/conformance/tests/tlsroute-invalid-reference-grant.go
