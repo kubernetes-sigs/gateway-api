@@ -1398,8 +1398,11 @@ type ListenerStatus struct {
 	// attachment semantics can be found in the documentation on the various
 	// Route kinds ParentRefs fields). Listener or Route status does not impact
 	// successful attachment, i.e. the AttachedRoutes field count MUST be set
-	// for Listeners with condition Accepted: false and MUST count successfully
-	// attached Routes that may themselves have Accepted: false conditions.
+	// for Listeners, even if the Accepted condition of an individual Listener is set
+	// to "False". The AttachedRoutes number represents the number of Routes with
+	// the Accepted condition set to "True" that have been attached to this Listener.
+	// Routes with any other value for the Accepted condition MUST NOT be included
+	// in this count.
 	//
 	// Uses for this field include troubleshooting Route attachment and
 	// measuring blast radius/impact of changes to a Listener.
