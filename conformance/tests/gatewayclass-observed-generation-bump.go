@@ -48,11 +48,11 @@ var GatewayClassObservedGenerationBump = suite.ConformanceTest{
 			ctx, cancel := context.WithTimeout(context.Background(), s.TimeoutConfig.LatestObservedGenerationSet)
 			defer cancel()
 
+			kubernetes.GWCMustHaveAcceptedConditionAny(t, s.Client, s.TimeoutConfig, gwcNN.Name)
+
 			original := &v1.GatewayClass{}
 			err := s.Client.Get(ctx, gwcNN, original)
 			require.NoErrorf(t, err, "error getting GatewayClass: %v", err)
-
-			kubernetes.GWCMustHaveAcceptedConditionAny(t, s.Client, s.TimeoutConfig, gwcNN.Name)
 
 			// Sanity check
 			kubernetes.GatewayClassMustHaveLatestConditions(t, s.Client, s.TimeoutConfig, gwcNN)
