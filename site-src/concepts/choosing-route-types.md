@@ -1,56 +1,37 @@
 # Choosing the Right Route Type for Your Application
 
-When deploying an application on Kubernetes, one of the first questions developers face is:
+When deploying an application on Kubernetes using Gateway API, one of the first questions developers face is:
 
 **“Which Route type should I use to expose my service?”**
 
-Gateway API provides multiple Route kinds—HTTPRoute, GRPCRoute, TLSRoute, TCPRoute, and UDPRoute—each designed for different traffic patterns and application protocols.
+Gateway API defines multiple Route kinds—`HTTPRoute`, `GRPCRoute`, `TLSRoute`, `TCPRoute`, and `UDPRoute`—each designed for specific protocols and traffic behaviors.  
+Choosing the correct Route ensures your traffic is handled correctly, securely, and efficiently.
 
-This guide helps you understand:
+This guide explains:
 
-- [What to verify on your Gateway before selecting a Route](#1-before-choosing-a-route-check-your-gateway)
-- [How each Route type works and what problems it solves](#2-route-types-explained)
-- [How to choose the right Route type for your application](#3-choosing-the-right-route--decision-table)
-- [When to use HTTPRoute versus TLSRoute for HTTPS traffic](#4-correct-rule-for-https)
-- [What information to confirm with your cluster administrator](#5-what-to-ask-your-administrator)
-- [Examples of each Route type in real deployments](#2-route-types-explained)
-
+- How each Route type works and the problems they solve  
+- How Route types differ in routing discriminators, OSI layers, and TLS behavior  
+- How to select the right Route for your application    
+- When to choose `HTTPRoute` vs `TLSRoute` for HTTPS
+- What to verify in your Gateway and with your administrator before attaching a Route  
 
 ---
 
-## 1. Before Choosing a Route: Check Your Gateway
+## 1. Route Types at a Glance
 
-Each Gateway declares its listeners, which define the protocols and ports it supports:
+The table below summarizes Route types, from the official Route Summary Table.
 
-```yaml
-spec:
-  listeners:
-    - name: http
-      protocol: HTTP
-      port: 80
-    - name: https
-      protocol: HTTPS
-      port: 443
-    - name: tls
-      protocol: TLS
-      port: 8443
-    - name: tcp
-      protocol: TCP
-      port: 5432
-```
-Before creating a Route, verify:
+### Route Summary Table
 
-- Does the Gateway support your protocol?
-- Does the Gateway allow the Route kind you want to attach?
-- Does the GatewayClass implementation support that Route type?
+| Object      | OSI Layer                           | Routing Discriminator         | TLS Support                 | Purpose                                                                 |
+|-------------|--------------------------------------|-------------------------------|-----------------------------|-------------------------------------------------------------------------|
+| UDPRoute    | Layer 4                              | destination port              | None                        | Allows forwarding of a UDP stream from the Listener to the Backends.   |
+| TLSRoute    | Somewhere between Layer 4 and 7      | SNI or other TLS properties   | Passthrough or Terminated   | Routing of TLS protocols including HTTPS where HTTP inspection is not required. |
+| TCPRoute    | Layer 4                              | destination port              | Terminated                  | Allows forwarding of a TCP stream from the Listener to the Backends.   |
+| HTTPRoute   | Layer 7                              | Anything in the HTTP protocol | Terminated only             | HTTP and HTTPS routing.                                                 |
+| GRPCRoute   | Layer 7                              | Anything in the gRPC protocol | Terminated only             | gRPC routing over HTTP/2 and HTTP/2 cleartext.                          |
 
-Your Route must match the listener protocol.
-
-If you're unsure, check:
-
-- The Gateway YAML
-- Your GatewayClass documentation
-- Your administrator’s networking policies
+This provides a quick mental model before diving deeper.
 
 ---
 
@@ -58,15 +39,16 @@ If you're unsure, check:
 
 ### HTTPRoute (Standard)
 
-Use this when your application uses HTTP or HTTPS and you want features such as:
+Use `HTTPRoute` when your workload uses HTTP or HTTPS **and you want L7 routing features**, such as:
 
-- Path-based routing
-- Hostname or header routing
-- Redirects, rewrites, filters
+- Path-based routing  
+- Hostname or header-based matching  
+- Redirects and rewrites  
+- Filters, timeouts, retries  
 
-Most HTTPS workloads use HTTPRoute because the Gateway terminates TLS.
+Most HTTPS workloads use `HTTPRoute` because **the Gateway terminates TLS** and can inspect HTTP requests.
 
-Example:
+**Example:**
 
 ```yaml
 kind: HTTPRoute
@@ -82,13 +64,17 @@ spec:
     - name: api-backend
       port: 8080
 ```
+
 ### GRPCRoute (Standard)
 
-Use this when your application uses gRPC and requires routing at the gRPC service or method level.
+Use `GRPCRoute` for workloads using gRPC. It routes based on:
 
-This Route type requires HTTP/2 support on the Gateway.
+- gRPC service names
+- gRPC method names
 
-Example:
+This Route type requires **HTTP/2** support on the Gateway.
+
+**Example:**
 
 ```yaml
 kind: GRPCRoute
@@ -106,18 +92,18 @@ spec:
 ```
 ### TLSRoute (Promoted)
 
-Use this when your application uses TLS and you want the Gateway to pass encrypted traffic directly to the backend without decrypting it.
+Use `TLSRoute` when your application uses TLS and the Gateway should **not** decrypt the traffic.  
+Routing is based only on **SNI (Server Name Indication)**.
 
 Common scenarios include:
 
 - End-to-end TLS encryption
-- Applications that manage their own certificates
-- Routing based only on the SNI (TLS hostname)
+- Applications that handle their own certificates
+- Routing TLS protocols without HTTP parsing (including HTTPS passthrough)
 
-TLSRoute does not support HTTP-level routing such as paths or headers.  
-Use this only when the Gateway should not terminate TLS.
+`TLSRoute` cannot match HTTP paths or headers because the traffic remains encrypted.
 
-Example:
+**Example:**
 
 ```yaml
 kind: TLSRoute
@@ -133,17 +119,16 @@ spec:
 ```
 ### TCPRoute (Experimental)
 
-Use this when your application communicates using raw TCP.
+Use `TCPRoute` for applications that communicate using raw TCP.  
+This provides simple Layer-4 forwarding with no HTTP or TLS inspection.
 
-Common examples include:
+Common use cases include:
 
-- Databases such as Postgres or MySQL
-- Message brokers such as MQTT or AMQP
-- Mail protocols like SMTP or IMAP
+- Databases (PostgreSQL, MySQL)
+- Message brokers (MQTT, AMQP)
+- Mail protocols (SMTP, IMAP)
 
-TCPRoute provides simple Layer-4 forwarding without HTTP or TLS inspection.
-
-Example:
+**Example:**
 
 ```yaml
 kind: TCPRoute
@@ -156,17 +141,16 @@ spec:
 ```
 ### UDPRoute (Experimental)
 
-Use this when your application uses UDP.
+Use `UDPRoute` for applications that use UDP.  
+UDP traffic is connectionless and forwarded at Layer 4 without protocol inspection.
 
 Common examples include:
 
 - DNS servers
 - Game servers
-- RTP or other streaming workloads
+- RTP or other media streaming workloads
 
-UDPRoute forwards packets at Layer 4 without connection state or protocol inspection.
-
-Example:
+**Example:**
 
 ```yaml
 kind: UDPRoute
@@ -181,68 +165,112 @@ spec:
 
 The table below provides a quick reference for selecting the appropriate Route type based on your application's protocol and routing needs.
 
-| Application Type       | Route Type | Reason                        |
-|------------------------|------------|-------------------------------|
-| Website / REST API     | HTTPRoute  | Layer-7 routing, TLS termination |
-| gRPC service           | GRPCRoute  | Service and method-based routing |
-| HTTPS passthrough      | TLSRoute   | Backend terminates TLS          |
-| Database               | TCPRoute   | Raw TCP protocol                 |
-| DNS                    | UDPRoute   | Uses UDP                        |
-| Game server            | UDPRoute   | Uses UDP                        |
+| Application Type       | Route Type | Reason                            |
+|------------------------|------------|-----------------------------------|
+| Website / REST API     | HTTPRoute  | Full L7 routing with TLS termination |
+| gRPC service           | GRPCRoute  | Service/method-level routing        |
+| HTTPS passthrough      | TLSRoute   | Backend terminates TLS              |
+| Database               | TCPRoute   | Raw TCP protocol                    |
+| DNS                    | UDPRoute   | UDP-based protocol                  |
+| Game server            | UDPRoute   | UDP workload                        |
 
-## 4. Correct Rule for HTTPS
+## 4. Understanding TLS Termination and SNI Routing
 
-Choosing between HTTPRoute and TLSRoute for HTTPS traffic depends on how TLS is handled by the Gateway.
+Choosing between `HTTPRoute` and `TLSRoute` for HTTPS traffic depends on how TLS is handled by the Gateway.
 
-### When the Gateway terminates TLS  
-Use **HTTPRoute**.
+### When the Gateway Terminates TLS
 
-This allows the Gateway to inspect the HTTP request and apply features such as:
+If the Gateway decrypts the TLS session:
 
-- Path matching
-- Hostname-based routing
-- Header-based routing
-- Redirects, rewrites, and filters
+- It can inspect the HTTP request.
+- It can match paths, headers, hostnames, and apply filters.
+- Full Layer-7 routing features become available.
 
-### When the Gateway passes TLS through  
-Use **TLSRoute**.
+**Use `HTTPRoute` in this case.**
 
-In this case:
+### When the Gateway Uses TLS Passthrough
 
-- The Gateway does not decrypt the TLS traffic  
-- Only SNI-based routing is possible  
-- The backend service is responsible for terminating TLS  
+If the Gateway does **not** decrypt TLS:
 
-TLSRoute is not used for plain-text traffic.
+- It only sees the TLS ClientHello.
+- Routing is based solely on **SNI (Server Name Indication)**.
+- The backend service is responsible for terminating TLS.
 
-## 5. What to Ask Your Administrator
+**Use `TLSRoute` in this case.**
 
-Before creating a Route, confirm the following details with your administrator or platform team:
+### Why SNI Matters
 
-### Gateway capabilities
-- Which listener protocols are enabled?
-- Does HTTPS terminate TLS or use passthrough?
-- Are TCP or UDP listeners exposed?
+SNI is the hostname sent by the client before encryption begins.  
+Because the Gateway cannot inspect HTTP headers or paths inside encrypted TLS traffic, SNI becomes the only routing discriminator available for passthrough scenarios.
 
-### Allowed Route types
-Check whether the Gateway restricts which Route kinds can attach to its listeners, using the `allowedRoutes` field.
+`TLSRoute` **cannot** perform path or header matching.
 
-### Implementation support
-- Does the GatewayClass implementation support GRPCRoute?
-- Are experimental Route types such as TCPRoute or UDPRoute enabled?
-- Are there restrictions on using TLS passthrough in production environments?
+### Summary of HTTPS Routing
+
+| Scenario                         | Gateway Behavior | Route Type  |
+|----------------------------------|------------------|-------------|
+| Gateway needs HTTP inspection    | Terminates TLS   | HTTPRoute   |
+| Gateway should not inspect HTTP  | TLS passthrough  | TLSRoute    |
+| Non-HTTP TLS protocols           | Passthrough      | TLSRoute    |
+
+
+# 5. Prerequisites Before Selecting a Route
+
+Before attaching a Route, verify the Gateway and GatewayClass support it.
+
+Gateway Configuration
+
+Check listener protocols:
+
+```yaml
+spec:
+  listeners:
+    - protocol: HTTP
+    - protocol: HTTPS
+    - protocol: TLS
+    - protocol: TCP
+    - protocol: UDP
+```
+Routes must match listener protocols.
+
+**Allowed Route Types**
+
+Gateways may restrict Route kinds:
+```yaml
+allowedRoutes:
+  kinds:
+    - kind: HTTPRoute
+```
+### GatewayClass Implementation Support
+
+These checks ensure the implementation you are using actually supports the Route type you want to attach.
+
+Confirm:
+
+- HTTPS termination rules
+- TLS passthrough support
+- GRPCRoute support
+- TCPRoute and UDPRoute support
+
+### Administrator Policies
+
+These checks ensure your platform or networking team allows the protocol behavior your application requires.
+
+Check:
+
+- TLS termination model
+- Allowed protocols
+- Security requirements
+- Restrictions on TLS passthrough
 
 ## 6. Summary
 
-Choosing the correct Route type depends on understanding how your application communicates and how your Gateway is configured.
+Choosing the correct Route type depends on:
 
-Key factors include:
+- The protocol your application uses
+- Whether TLS is terminated or passed through
+- Gateway listener configuration
+- GatewayClass capabilities
+- Cluster networking policies
 
-1. The protocol your application uses  
-2. Whether TLS is terminated at the Gateway or passed through  
-3. The listener protocols exposed by the Gateway  
-4. The capabilities of your GatewayClass implementation  
-5. Any networking or security policies enforced in your cluster  
-
-By matching your workload to the appropriate Route type, you ensure correct traffic handling and take advantage of the routing features provided by Gateway API.
-
+Selecting the correct Route ensures correct traffic handling and optimal use of Gateway API features.
