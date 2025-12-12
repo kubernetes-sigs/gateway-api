@@ -14,17 +14,8 @@ new features and resources start in the Experimental release channel. From that
 point, these may graduate to the Standard release channel or be dropped from the
 API entirely.
 
-To get a new item into the Experimental channel, you need:
-* A Who/What/Why [GEP](../geps/overview.md) merged as Provisional
-* Implementations willing to sponsor the item by agreeing to implement it as an 
-experimental feature
-  * Items affecting north-south aspects of Gateway API require three sponsors
-  * Items affecting only east-west aspects require two sponsors
-
-The GEP can be merged into Provisional before soliciting sponsors. Once an item 
-moves from Provisional to Implementable, it will be automatically dropped if it 
-doesn't make any significant progress in six months. This process is handled 
-with a public review, typically at the first meeting of every month.
+We have introduced new requirements for each level change, and these
+requirements can be viewed at this [thread](https://github.com/kubernetes-sigs/gateway-api/discussions/4164)
 
 The following diagram provides a high level overview of the lifecycle of a
 feature or resource proposed by a new [GEP](../geps/overview.md) (enhancement
@@ -73,10 +64,10 @@ released at any point.
 #### Validating Admission Policies (VAP)
 Gateway API uses Validating Admission Policies to protect channel boundaries:
 
-* **Upgrade VAP**: Prevents applying experimental-channel CRDs over 
+* **Upgrade VAP**: Prevents applying experimental-channel CRDs over
 standard-channel CRDs. If you need to do this, you'll have to remove this VAP.
-* **Guardrails VAP**: Prevents setting any experimental fields of a resource 
-unless an annotation is also present. Without the annotation, you get 
+* **Guardrails VAP**: Prevents setting any experimental fields of a resource
+unless an annotation is also present. Without the annotation, you get
 standard-channel functionality only.
 
 ### API Versions
