@@ -240,11 +240,14 @@ type HTTPCORSFilter struct {
     // Output:
     //   Access-Control-Allow-Origin: *
     //
-    // When the `allowOrigins` config field contains the "*" wildcard and the
+    // When the `allowCredentials` config field is true,
+    // the `allowOrigins` config field contains the "*" wildcard, and the
     // request is credentialed, the gateway must return a 
     // single origin in the value of the `Access-Control-Allow-Origin` 
-    // response header, instead of specifying the `*` wildcard. The value 
-    // of the header `Access-Control-Allow-Origin` is same as the `Origin` 
+    // response header, instead of specifying the `*` wildcard.
+    // (The wildcard is always forbidden in response to a credentialed
+    // request irrespective of the Gateway configuration.) The value
+    // of the header `Access-Control-Allow-Origin` is same as the `Origin`
     // header provided by the client.
     //
     // Input:
@@ -342,7 +345,9 @@ type HTTPCORSFilter struct {
     // as the `Access-Control-Request-Method` header provided by the client. 
     // If the header `Access-Control-Request-Method` is not included in the 
     // request, the gateway will omit the `Access-Control-Allow-Methods` 
-    // response header, instead of specifying the `*` wildcard. A Gateway 
+    // response header, instead of specifying the `*` wildcard.
+    // (The wildcard is always forbidden in response to a credentialed
+    // request irrespective of the Gateway configuration.) A Gateway
     // implementation may choose to add implementation-specific default 
     // methods.
     //
