@@ -252,7 +252,7 @@ type HTTPCORSFilter struct {
     //
     // Input:
     //   Origin: https://foo.example
-    //   Cookie: pageAccess=2
+    //   Cookie: foo=bar
     //
     // Config:
     //   allowOrigins: ["*"]
@@ -353,7 +353,7 @@ type HTTPCORSFilter struct {
     //
     // Input:
     //   Access-Control-Request-Method: PUT
-    //   Cookie: pageAccess=2
+    //   Cookie: foo=bar
     //
     // Config:
     //   allowMethods: ["*"]
@@ -425,7 +425,7 @@ type HTTPCORSFilter struct {
     //
     // Input:
     //   Access-Control-Request-Headers: Content-Type, Cache-Control
-    //   Cookie: pageAccess=2
+    //   Cookie: foo=bar
     //
     // Config:
     //   allowHeaders: ["*"]
@@ -486,7 +486,7 @@ type HTTPCORSFilter struct {
     // the `Access-Control-Expose-Headers` response header.
     //
     // Input:
-    //   Cookie: pageAccess=2
+    //   Cookie: foo=bar
     //
     // Config:
     //   exposeHeaders: ["*"]
