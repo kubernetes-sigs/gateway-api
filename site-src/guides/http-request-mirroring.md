@@ -1,14 +1,11 @@
 # HTTP request mirroring
 
-??? example "Extended Support Feature"
+???+ info "Extended Support Feature: HTTPRouteRequestMirror"
+    This feature is part of extended support. For more information on release channels, refer to our [versioning guide](../concepts/versioning.md).
 
-    As of v1.0.0, the Request Mirroring feature is an Extended feature, and
-    requires implementations to support the `HTTPRouteRequestMirror` feature.
-
-The [HTTPRoute resource](../api-types/httproute.md) allows you to mirror HTTP
-requests to another backend using
-[filters](../api-types/httproute.md#filters-optional). This guide shows how to use
-this feature.
+The [HTTPRoute resource](../api-types/httproute.md) can be used to mirror
+requests to multiple backends. This is useful for testing new services with
+production traffic.
 
 Mirrored requests will only be sent to one single destination endpoint
 within this backendRef, and responses from this backend MUST be ignored by

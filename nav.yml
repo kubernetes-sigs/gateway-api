@@ -32,6 +32,10 @@ nav:
       - HTTP header modifier: guides/http-header-modifier.md
       - HTTP traffic splitting: guides/traffic-splitting.md
       - HTTP request mirroring: guides/http-request-mirroring.md
+      - HTTP query parameter matching: guides/http-query-param-matching.md
+      - HTTP method matching: guides/http-method-matching.md
+      - HTTP timeouts: guides/http-timeouts.md
+      - HTTP CORS: guides/http-cors.md
       - Cross-Namespace routing: guides/multiple-ns.md
       - TLS: guides/tls.md
       - TCP routing: guides/tcp.md
