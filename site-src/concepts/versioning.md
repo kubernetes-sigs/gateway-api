@@ -14,9 +14,6 @@ new features and resources start in the Experimental release channel. From that
 point, these may graduate to the Standard release channel or be dropped from the
 API entirely.
 
-We have introduced new requirements for each level change, and these
-requirements can be viewed at this [thread](https://github.com/kubernetes-sigs/gateway-api/discussions/4164)
-
 The following diagram provides a high level overview of the lifecycle of a
 feature or resource proposed by a new [GEP](../geps/overview.md) (enhancement
 proposal) in Gateway API:
