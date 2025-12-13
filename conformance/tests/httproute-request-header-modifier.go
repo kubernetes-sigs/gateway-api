@@ -21,6 +21,7 @@ import (
 
 	"k8s.io/apimachinery/pkg/types"
 
+	"sigs.k8s.io/gateway-api/conformance/utils/echo"
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
@@ -43,7 +44,13 @@ var HTTPRouteBackendRequestHeaderModifier = suite.ConformanceTest{
 		features.SupportHTTPRouteBackendRequestHeaderModification,
 	},
 	Manifests: []string{"tests/httproute-request-header-modifier-backend.yaml"},
-	Test:      HTTPRouteRequestHeaderModifier.Test,
+	MeshFeatures: []features.FeatureName{
+		features.SupportMesh,
+		features.SupportHTTPRoute,
+		features.SupportMeshHTTPRouteBackendRequestHeaderModification,
+	},
+	MeshManifests: []string{"tests/mesh/httproute-request-header-modifier-backend.yaml"},
+	Test:          HTTPRouteRequestHeaderModifier.Test,
 }
 
 var HTTPRouteRequestHeaderModifier = suite.ConformanceTest{
@@ -54,12 +61,26 @@ var HTTPRouteRequestHeaderModifier = suite.ConformanceTest{
 		features.SupportHTTPRoute,
 	},
 	Manifests: []string{"tests/httproute-request-header-modifier.yaml"},
-	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
-		ns := "gateway-conformance-infra"
-		routeNN := types.NamespacedName{Name: "request-header-modifier", Namespace: ns}
-		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: ns}
-		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
-		kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN)
+	MeshFeatures: []features.FeatureName{
+		features.SupportMesh,
+		features.SupportHTTPRoute,
+	},
+	MeshManifests: []string{"tests/mesh/httproute-request-header-modifier.yaml"},
+	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
+		var ns string
+		var gwAddr string
+		var client echo.MeshPod
+
+		if !s.CurrentTest.IsMesh {
+			ns = "gateway-conformance-infra"
+			routeNN := types.NamespacedName{Name: "request-header-modifier", Namespace: ns}
+			gwNN := types.NamespacedName{Name: "same-namespace", Namespace: ns}
+			gwAddr = kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, s.Client, s.TimeoutConfig, s.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
+			kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, s.Client, s.TimeoutConfig, routeNN, gwNN)
+		} else {
+			ns = "gateway-conformance-mesh"
+			client = echo.ConnectToApp(t, s, echo.MeshAppEchoV1)
+		}
 
 		testCases := []http.ExpectedResponse{{
 			Request: http.Request{
@@ -207,9 +228,16 @@ var HTTPRouteRequestHeaderModifier = suite.ConformanceTest{
 			// Declare tc here to avoid loop variable
 			// reuse issues across parallel tests.
 			tc := testCases[i]
+			if s.CurrentTest.IsMesh {
+				tc.Backend = "echo-v1"
+			}
 			t.Run(tc.GetTestCaseName(i), func(t *testing.T) {
 				t.Parallel()
-				http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, tc)
+				if !s.CurrentTest.IsMesh {
+					http.MakeRequestAndExpectEventuallyConsistentResponse(t, s.RoundTripper, s.TimeoutConfig, gwAddr, tc)
+				} else {
+					client.MakeRequestAndExpectEventuallyConsistentResponse(t, tc, s.TimeoutConfig)
+				}
 			})
 		}
 	},

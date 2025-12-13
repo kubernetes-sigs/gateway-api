@@ -29,12 +29,15 @@ import (
 type ConformanceTest struct {
 	ShortName   string
 	Description string
-	Features    []features.FeatureName
-	Manifests   []string
-	Slow        bool
-	Parallel    bool
-	Test        func(*testing.T, *ConformanceTestSuite)
-	Provisional bool
+	Features      []features.FeatureName
+	Manifests     []string
+	MeshFeatures  []features.FeatureName
+	MeshManifests []string
+	IsMesh        bool
+	Slow          bool
+	Parallel      bool
+	Test          func(*testing.T, *ConformanceTestSuite)
+	Provisional   bool
 }
 
 // Run runs an individual tests, applying and cleaning up the required manifests
@@ -43,6 +46,7 @@ func (test *ConformanceTest) Run(t *testing.T, suite *ConformanceTestSuite) {
 	if test.Parallel {
 		t.Parallel()
 	}
+	suite.CurrentTest = test
 
 	var featuresInfo string
 	// Test against features if the user hasn't focused on a single test
