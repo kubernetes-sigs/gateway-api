@@ -1,7 +1,7 @@
 # gRPC routing
 
 The [GRPCRoute resource](../api-types/grpcroute.md) allows you to match on gRPC traffic and
-direct it to Kubernetes backends. This guide shows how the GRPCRoute matches
+direct it to Kubernetes backends. This guide shows how the [GRPCRoute](../reference/spec.md#gateway.networking.k8s.io/v1.GRPCRoute) matches
 traffic on host, header, and service, and method fields and forwards it to different
 Kubernetes Services.
 
