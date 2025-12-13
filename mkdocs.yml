@@ -49,7 +49,8 @@ plugins:
       j2_line_comment_prefix: "#$"
   - redirects:
       redirect_maps:
-        'guides/getting-started.md': 'guides/index.md'
+        'guides/index.md': 'guides/getting-started/index.md'
+        'ingress-nginx': 'guides/getting-started/migrating-from-ingress-nginx.md'
         'concepts/gamma.md': 'mesh/index.md'
         'concepts/service-facets.md': 'mesh/service-facets.md'
         'concepts/guidelines.md': 'guides/api-design.md'

@@ -1,20 +1,20 @@
 # Migrating from Ingress
 
-Gateway API project is the successor to the [Ingress API][ing]. However, it
-does not include the Ingress resource (the closest parallel is the HTTPRoute).
-As a result, a one-time conversion from your existing Ingress resources to the
-relevant Gateway API resources is necessary.
+Gateway API is the successor to the [Ingress API][ing]. This guide provides a general overview for migrating from any Ingress implementation to Gateway API. It focuses on the core concepts, differences, and feature mappings between Ingress and Gateway API, and provides a manual conversion example.
 
 [ing]:https://kubernetes.io/docs/concepts/services-networking/ingress/
 
+!!! note "Are you an Ingress-NGINX user?"
+    If you are specifically using Ingress-NGINX, we recommend also checking out the [Ingress-NGINX Migration Guide](./migrating-from-ingress-nginx.md) for more tailored advice and resources.
+
 This guide will help you with the conversion. It will:
 
-* Explain why you may want to switch to Gateway API.
-* Describe the key differences between the Ingress API and Gateway API.
-* Map Ingress features to Gateway API features.
-* Show an example of an Ingress resource converted to Gateway API resources.
-* Mention [ingress2gateway](https://github.com/kubernetes-sigs/ingress2gateway)
-  for automatic conversion.
+*   Explain why you may want to switch to Gateway API.
+*   Describe the key differences between the Ingress API and Gateway API.
+*   Map Ingress features to Gateway API features.
+*   Show an example of an Ingress resource converted to Gateway API resources.
+*   Mention [ingress2gateway](https://github.com/kubernetes-sigs/ingress2gateway)
+    for automatic conversion.
 
 At the same time, it will not prepare you for a live migration or explain how to
 convert some implementation-specific features of your Ingress controller.
@@ -50,9 +50,9 @@ Gateway API addresses those limitations, as the next section will show.
 
 There are three major differences between the Ingress API and Gateway API:
 
-* Personas
-* Available features
-* Approach to extensibility (implementation-specific features)
+*   Personas
+*   Available features
+*   Approach to extensibility (implementation-specific features)
 
 ### Personas
 
@@ -73,16 +73,16 @@ resource, the infrastructure provider and cluster operator became the owners of
 that resource, and thus, explicit personas of the Ingress API.
 
 Gateway API
-includes [four explicit personas](../concepts/security-model.md#roles-and-personas):
+includes [four explicit personas](../../concepts/security-model.md#roles-and-personas):
 the application developer, the application admin, the cluster operator, and the
 infrastructure providers. This allows you to break away from the self-service
 model by splitting the responsibilities of the user persona across those
 personas (all except the infrastructure provider):
 
-* The cluster operator/application admin defines entry points for the external
-  client traffic including TLS termination configuration.
-* The application developer defines routing rules for their applications that
-  attach to those entry points.
+*   The cluster operator/application admin defines entry points for the external
+    client traffic including TLS termination configuration.
+*   The application developer defines routing rules for their applications that
+    attach to those entry points.
 
 Such a split adheres to a common organizational structure where multiple teams
 share the same load-balancing infrastructure. At the same time, it is not
@@ -111,17 +111,17 @@ extensions to the Ingress API.
 The annotations approach to extensibility has two negative consequences for
 users of the Ingress API:
 
-* *Limited portability*. Because so many features are available through
-  annotations, switching between Ingress controllers becomes difficult or even
-  impossible, as it is necessary to convert the annotations of one
-  implementation to another (the other implementation might not even support
-  some features of the first one). This limits the portability of the Ingress
-  API.
-* *Awkwardness of the API*. Because annotations are key-value strings (as
-  opposed to a structured scheme like the spec of the Ingress resource) and
-  applied at the top of a resource (rather than in the relevant parts of the
-  spec), the Ingress API can become awkward to use, especially when a large
-  number of annotations are added to an Ingress resource.
+*   *Limited portability*. Because so many features are available through
+    annotations, switching between Ingress controllers becomes difficult or even
+    impossible, as it is necessary to convert the annotations of one
+    implementation to another (the other implementation might not even support
+    some features of the first one). This limits the portability of the Ingress
+    API.
+*   *Awkwardness of the API*. Because annotations are key-value strings (as
+    opposed to a structured scheme like the spec of the Ingress resource) and
+    applied at the top of a resource (rather than in the relevant parts of the
+    spec), the Ingress API can become awkward to use, especially when a large
+    number of annotations are added to an Ingress resource.
 
 Gateway API supports all the features of the Ingress resources and many
 features that are only available through annotations. As a result, the Gateway
@@ -133,9 +133,9 @@ awkwardness problem.
 
 The Ingress API has two extensions points:
 
-* Annotations on the Ingress resource (described in the previous section)
-* [Resource backends](https://kubernetes.io/docs/concepts/services-networking/ingress/#resource-backend),
-   which is the ability to specify a backend other than a Service
+*   Annotations on the Ingress resource (described in the previous section)
+*   [Resource backends](https://kubernetes.io/docs/concepts/services-networking/ingress/#resource-backend),
+    which is the ability to specify a backend other than a Service
 
 Gateway API is feature-rich compared with the Ingress API. However, to
 configure some advanced features like authentication or common but non-portable
@@ -144,30 +144,30 @@ need to rely on the extensions of Gateway API.
 
 Gateway API has the following primary extension points:
 
-* *External references.* A feature (field) of a Gateway API resource can
-  reference a custom resource specific to the Gateway implementation that
-  configures that feature. For example:
-    * [HTTPRouteFilter](../reference/spec.md#gateway.networking.k8s.io/v1.HTTPRouteFilter)
-      can reference an external resource via the `extensionRef` field, thus
-      configuring an implementation-specific filter.
-    * [BackendObjectReference](../reference/spec.md#gateway.networking.k8s.io/v1.BackendObjectReference)
-      supports resources other than Services.
-    * [SecretObjectReference](../reference/spec.md#gateway.networking.k8s.io/v1.SecretObjectReference)
-      supports resources other than Secrets.
-* *Custom implementations*. For some features, it is left up to an
-  implementation to define how to support them. Those features correspond to the
-  implementation-specific
-  (custom)  [conformance level](../concepts/conformance.md#2-support-levels). For
-  example:
-    * The `RegularExpression` type of
-      the [HTTPPathMatch](../reference/spec.md#gateway.networking.k8s.io/v1.HTTPPathMatch).
-* *Policies.* A Gateway implementation can define custom resources called
-  Policies for exposing data plane features like authentication. Gateway API
-  does not prescribe the details of those resources. However, it prescribes a
-  standard UX. See the [Policy attachment guide](../reference/policy-attachment.md)
-  for more details. In contrast with the *external references* above, a Gateway
-  API resource does not reference a Policy. Instead, a Policy must reference a
-  Gateway API resource.
+*   *External references.* A feature (field) of a Gateway API resource can
+    reference a custom resource specific to the Gateway implementation that
+    configures that feature. For example:
+    *   [HTTPRouteFilter](../../reference/spec.md#gateway.networking.k8s.io/v1.HTTPRouteFilter)
+        can reference an external resource via the `extensionRef` field, thus
+        configuring an implementation-specific filter.
+    *   [BackendObjectReference](../../reference/spec.md#gateway.networking.k8s.io/v1.BackendObjectReference)
+        supports resources other than Services.
+    *   [SecretObjectReference](../../reference/spec.md#gateway.networking.k8s.io/v1.SecretObjectReference)
+        supports resources other than Secrets.
+*   *Custom implementations*. For some features, it is left up to an
+    implementation to define how to support them. Those features correspond to the
+    implementation-specific
+    (custom)  [conformance level](../concepts/conformance.md#2-support-levels). For
+    example:
+    *   The `RegularExpression` type of
+        the [HTTPPathMatch](../../reference/spec.md#gateway.networking.k8s.io/v1.HTTPPathMatch).
+*   *Policies.* A Gateway implementation can define custom resources called
+    Policies for exposing data plane features like authentication. Gateway API
+    does not prescribe the details of those resources. However, it prescribes a
+    standard UX. See the [Policy attachment guide](../../reference/policy-attachment.md)
+    for more details. In contrast with the *external references* above, a Gateway
+    API resource does not reference a Policy. Instead, a Policy must reference a
+    Gateway API resource.
 
 The extension points do not include annotations on Gateway API resources.
 This approach is strongly discouraged for implementations of the API.
@@ -177,9 +177,9 @@ This approach is strongly discouraged for implementations of the API.
 This section will map the Ingress API features to the corresponding Gateway API
 features, covering three major areas:
 
-* Entry points
-* TLS termination
-* Routing rules
+*   Entry points
+*   TLS termination
+*   Routing rules
 
 ### Entry Points
 
@@ -194,7 +194,7 @@ resource will get dedicated entry points.
 In Gateway API, entry points must be explicitly defined in
 a [Gateway](../api-types/gateway.md) resource. For example, if you want the data
 plane to handle HTTP traffic on port 80, you need to define
-a [listener](../reference/spec.md#gateway.networking.k8s.io/v1.Listener) for
+a [listener](../../reference/spec.md#gateway.networking.k8s.io/v1.Listener) for
 that traffic. Typically, a Gateway implementation provides a dedicated data
 plane for each Gateway resource.
 
@@ -207,7 +207,7 @@ the [TLS section](https://kubernetes.io/docs/concepts/services-networking/ingres
 where the TLS certificate and key are stored in a Secret.
 
 In Gateway API, TLS termination is a property of
-the [Gateway listener](../reference/spec.md#gateway.networking.k8s.io/v1.Listener),
+the [Gateway listener](../../reference/spec.md#gateway.networking.k8s.io/v1.Listener),
 and similarly to the Ingress, a TLS certificate and key are also stored in a
 Secret.
 
@@ -218,21 +218,21 @@ application admin own TLS termination.
 
 The [path-based routing rules](https://kubernetes.io/docs/concepts/services-networking/ingress/#path-types)
 of the Ingress resource map directly to
-the [routing rules](../reference/spec.md#gateway.networking.k8s.io/v1.HTTPRouteRule)
+the [routing rules](../../reference/spec.md#gateway.networking.k8s.io/v1.HTTPRouteRule)
 of the [HTTPRoute](../api-types/httproute.md).
 
 The [host-header-based routing rules](https://kubernetes.io/docs/concepts/services-networking/ingress/#name-based-virtual-hosting)
 map to
-the [hostnames](../reference/spec.md#gateway.networking.k8s.io/v1.Hostname) of
+the [hostnames](../../reference/spec.md#gateway.networking.k8s.io/v1.Hostname) of
 the HTTPRoute. However, note that in the Ingress, each hostname has separate
 routing rules, while in the HTTPRoute the routing rules apply to all hostnames.
 
 > The Ingress API uses the term host while Gateway API uses the hostname.
 > This guide will use Gateway API term to refer to the Ingress host.
 
-> The `hostnames` of an HTTPRoute must match the `hostname` of the [Gateway listener](../reference/spec.md#gateway.networking.k8s.io/v1.Listener).
+> The `hostnames` of an HTTPRoute must match the `hostname` of the [Gateway listener](../../reference/spec.md#gateway.networking.k8s.io/v1.Listener).
 > Otherwise, the listener will ignore the routing rules for the unmatched
-> hostnames. See the [HTTPRoute documentation](../reference/spec.md#gateway.networking.k8s.io/v1.HTTPRouteSpec).
+> hostnames. See the [HTTPRoute documentation](../../reference/spec.md#gateway.networking.k8s.io/v1.HTTPRouteSpec).
 
 HTTPRoutes are owned by the application developer.
 
@@ -248,11 +248,11 @@ implement them differently.
 
 In contrast, Gateway API specifies how to merge rules and resolve conflicts:
 
-* A Gateway implementation must merge the routing rules from all HTTPRoutes
-  attached to a listener.
-* Conflicts must be handled as
-  prescribed in [API Design Guide: Conflicts](../guides/api-design.md#conflicts). For example, more specific
-  matches in a routing rule win over the less specific ones.
+*   A Gateway implementation must merge the routing rules from all HTTPRoutes
+    attached to a listener.
+*   Conflicts must be handled as
+    prescribed in [API Design Guide: Conflicts](../api-design.md#conflicts). For example, more specific
+    matches in a routing rule win over the less specific ones.
 
 #### Default Backend
 
@@ -270,7 +270,7 @@ An Ingress resource must specify
 a [class](https://kubernetes.io/docs/concepts/services-networking/ingress/#ingress-class)
 to select which Ingress controller to use. An HTTPRoute must specify which
 Gateway (or Gateways) to attach to via
-a [parentRef](../reference/spec.md#gateway.networking.k8s.io/v1.ParentRef).
+a [parentRef](../../reference/spec.md#gateway.networking.k8s.io/v1.ParentRef).
 
 ### Implementation-Specific Ingress Features (Annotations)
 
@@ -281,10 +281,10 @@ implementations.
 Luckily, some of the features supported through annotations are now part of the
 Gateway API (HTTPRoute), primarily:
 
-* Request redirects (including a TLS redirect)
-* Request/response manipulation
-* Traffic splitting
-* Header, query param, or method-based routing
+*   Request redirects (including a TLS redirect)
+*   Request/response manipulation
+*   Traffic splitting
+*   Header, query param, or method-based routing
 
 However, the remaining features remain largely implementation-specific. To
 convert them, consult the Gateway implementation documentation to see
@@ -299,13 +299,13 @@ API resources.
 
 The example includes the following assumptions:
 
-* All resources belong to the same namespace.
-* The Ingress controller:
-    * Has the corresponding IngressClass resource  `prod` in the cluster.
-    * Supports the TLS redirect feature via
-      the `example-ingress-controller.example.org/tls-redirect` annotation.
-* The Gateway implementation has the corresponding GatewayClass resource `prod`
-  in the cluster.
+*   All resources belong to the same namespace.
+*   The Ingress controller:
+    *   Has the corresponding IngressClass resource  `prod` in the cluster.
+    *   Supports the TLS redirect feature via
+        the `example-ingress-controller.example.org/tls-redirect` annotation.
+*   The Gateway implementation has the corresponding GatewayClass resource `prod`
+    in the cluster.
 
 Additionally, the content of the referenced Secret and Services as well as
 IngressClass and GatewayClass are omitted for brevity.
@@ -314,17 +314,17 @@ IngressClass and GatewayClass are omitted for brevity.
 
 The Ingress below defines the following configuration:
 
-* Configure a TLS redirect for any HTTP request for  `foo.example.com`
-  and `bar.example.com` hostnames using
-  the  `example-ingress-controller.example.org/tls-redirect` annotation.
-* Terminate TLS for the `foo.example.com` and `bar.example.com` hostnames using
-  the TLS certificate and key from the Secret `example-com`.
-* Route HTTPS requests for the `foo.example.com` hostname with the URI
-  prefix `/orders` to the `foo-orders-app` Service.
-* Route HTTPS requests for the  `foo.example.com` hostname with any other prefix
-  to the `foo-app` Service.
-* Route HTTPS requests for the `bar.example.com` hostname with any URI to
-  the `bar-app` Service.
+*   Configure a TLS redirect for any HTTP request for  `foo.example.com`
+    and `bar.example.com` hostnames using
+    the  `example-ingress-controller.example.org/tls-redirect` annotation.
+*   Terminate TLS for the `foo.example.com` and `bar.example.com` hostnames using
+    the TLS certificate and key from the Secret `example-com`.
+*   Route HTTPS requests for the `foo.example.com` hostname with the URI
+    prefix `/orders` to the `foo-orders-app` Service.
+*   Route HTTPS requests for the  `foo.example.com` hostname with any other prefix
+    to the `foo-app` Service.
+*   Route HTTPS requests for the `bar.example.com` hostname with any URI to
+    the `bar-app` Service.
 
 ```yaml
 apiVersion: networking.k8s.io/v1
@@ -358,9 +358,6 @@ spec:
             name: foo-orders-app
             port:
               number: 80
-  - host: bar.example.com
-    http:
-      paths:
       - path: /
         pathType: Prefix
         backend:
@@ -376,15 +373,15 @@ The next three sections convert that Ingress into Gateway API resources.
 
 The following Gateway resource:
 
-* Belongs to our GatewayClass `prod`.
-* Provisions load balancing infrastructure (this depends on the Gateway
-  implementation).
-* Configures HTTP and HTTPS listeners (entry points), which the Ingress resource
-  included implicitly:
-    * The HTTP listener `http` on port `80`
-    * The HTTPS listener `https` on port `443` with TLS termination with the
-      cert and key stored in the `example-com` Secret, which is the same Secret
-      used in the Ingress
+*   Belongs to our GatewayClass `prod`.
+*   Provisions load balancing infrastructure (this depends on the Gateway
+    implementation).
+*   Configures HTTP and HTTPS listeners (entry points), which the Ingress resource
+    included implicitly:
+    *   The HTTP listener `http` on port `80`
+    *   The HTTPS listener `https` on port `443` with TLS termination with the
+        cert and key stored in the `example-com` Secret, which is the same Secret
+        used in the Ingress
 
 Also, note that both listeners allow all HTTPRoutes from the same namespace
 (which is the default setting) and restrict HTTPRoute hostnames to
@@ -410,18 +407,18 @@ for `bar.example.com` hostnames.
 
 Both HTTPRoutes:
 
-* Attach to the `https` listener of the Gateway resource from Step 1.
-* Define the same routing rules as in the Ingress rules for the corresponding
-  hostname.
+*   Attach to the `https` listener of the Gateway resource from Step 1.
+*   Define the same routing rules as in the Ingress rules for the corresponding
+    hostname.
 
 ### Step 3 - Configure TLS Redirect
 
 The following HTTPRoute configures a TLS redirect, which the Ingress resource
 configured via an annotation. The HTTPRoute below:
 
-* Attaches to the `http` listener of our Gateway.
-* Issues a TLS redirect for any HTTP request for the `foo.example.com`
-  or `bar.example.com` hostnames.
+*   Attaches to the `http` listener of our Gateway.
+*   Issues a TLS redirect for any HTTP request for the `foo.example.com`
+    or `bar.example.com` hostnames.
 
 ```yaml
 {% include 'standard/simple-http-https/tls-redirect-route.yaml' %}
