@@ -3904,6 +3904,7 @@ spec:
                       != 1 || !has(self.matches[0].path) || self.matches[0].path.type
                       != ''PathPrefix'') ? false : true) : true'
                 maxItems: 16
+                minItems: 1
                 type: array
                 x-kubernetes-list-type: atomic
                 x-kubernetes-validations:
@@ -8110,6 +8111,7 @@ spec:
                       != 1 || !has(self.matches[0].path) || self.matches[0].path.type
                       != ''PathPrefix'') ? false : true) : true'
                 maxItems: 16
+                minItems: 1
                 type: array
                 x-kubernetes-list-type: atomic
                 x-kubernetes-validations:
