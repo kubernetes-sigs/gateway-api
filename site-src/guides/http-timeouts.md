@@ -4,7 +4,7 @@
     This feature is part of extended support. For more information on release channels, refer to our [versioning guide](../concepts/versioning.md).
 
 The [HTTPRoute resource](../api-types/httproute.md) can be used to configure
-timeouts for HTTP requests. This is useful for preventing long-running requests
+[timeouts](../reference/spec.md#gateway.networking.k8s.io/v1.HTTPRouteTimeouts) for HTTP requests. This is useful for preventing long-running requests
 from consuming resources and for providing a better user experience.
 
 The `timeouts` field in an `HTTPRouteRule` can be used to specify a request

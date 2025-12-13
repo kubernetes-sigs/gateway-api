@@ -1,7 +1,7 @@
 # HTTP traffic splitting
 
 The [HTTPRoute resource](../api-types/httproute.md) allows you to specify
-weights to shift traffic between different backends. This is useful for
+[weights](../reference/spec.md#gateway.networking.k8s.io/v1.HTTPBackendRef) to shift traffic between different backends. This is useful for
 splitting traffic during rollouts, canarying changes, or for emergencies.
 The HTTPRoute`spec.rules.backendRefs` accepts a list of backends that a route
 rule will send traffic to. The relative weights of these backends define
