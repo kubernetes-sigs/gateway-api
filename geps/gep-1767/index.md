@@ -51,6 +51,7 @@ The optional response header `Access-Control-Expose-Headers` controls which HTTP
 
 If the server specifies the response header `Access-Control-Allow-Credentials: true`, the actual cross-origin request will be able to use credentials for getting sensitive resources. 
 Credentials are cookies, TLS client certificates, or authentication headers containing a username and password.
+A "credentialed request" is a request containing some credentials.
 
 After the server has permitted the CORS "preflight" request, the client will be able to send actual cross-origin request.
 If the server doesn't want to allow cross-origin access, it will omit the CORS headers to the client.
@@ -211,8 +212,24 @@ type HTTPCORSFilter struct {
     //
     // Output:
     //
-    // The `Access-Control-Allow-Origin` response header can only use `*` 
-    // wildcard as value when the `AllowCredentials` field is false.
+    // Conversely, if the request `Origin` matches one of the configured
+    // allowed origins, the gateway sets the response header
+    // `Access-Control-Allow-Origin` to the same value as the `Origin`
+    // header provided by the client.
+    //
+    // Input:
+    //   Origin: https://foo.example
+    //
+    // Config:
+    //   allowOrigins: ["https://foo.example", "http://test.example"]
+    //
+    // Output:
+    //   Access-Control-Allow-Origin: https://foo.example
+    //
+    // When config has the wildcard ("*") in allowOrigins, and the request
+    // is not credentialed (e.g., it is a preflight request), the
+    // `Access-Control-Allow-Origin` response header contains the
+    // wildcard as well.
     //
     // Input:
     //   Origin: https://foo.example
@@ -223,15 +240,19 @@ type HTTPCORSFilter struct {
     // Output:
     //   Access-Control-Allow-Origin: *
     //
-    // When the `AllowCredentials` field is true and `AllowOrigins`
-    // field specified with the `*` wildcard, the gateway must return a 
+    // When the `allowCredentials` config field is true,
+    // the `allowOrigins` config field contains the "*" wildcard, and the
+    // request is credentialed, the gateway must return a 
     // single origin in the value of the `Access-Control-Allow-Origin` 
-    // response header, instead of specifying the `*` wildcard. The value 
-    // of the header `Access-Control-Allow-Origin` is same as the `Origin` 
+    // response header, instead of specifying the `*` wildcard.
+    // (The wildcard is always forbidden in response to a credentialed
+    // request irrespective of the Gateway configuration.) The value
+    // of the header `Access-Control-Allow-Origin` is same as the `Origin`
     // header provided by the client.
     //
     // Input:
     //   Origin: https://foo.example
+    //   Cookie: foo=bar
     //
     // Config:
     //   allowOrigins: ["*"]
@@ -304,8 +325,9 @@ type HTTPCORSFilter struct {
     // Output:
     //   Access-Control-Allow-Methods: GET, POST, DELETE, PATCH, OPTIONS
     //
-    // The `Access-Control-Allow-Methods` response header can only use `*` 
-    // wildcard as value when the `AllowCredentials` field is false.
+    // The `Access-Control-Allow-Methods` response header should use `*`
+    // wildcard as value if config contains the wildcard "*" in allowMethods
+    // unless the request is credentialed.
     //
     // Input:
     //   Access-Control-Request-Method: PUT
@@ -316,19 +338,22 @@ type HTTPCORSFilter struct {
     // Output:
     //   Access-Control-Allow-Methods: *
     //
-    // When the `AllowCredentials` field is true and the `AllowMethods`
-    // field specified with the `*` wildcard, the gateway must specify one 
+    // When the `allowCredentials` config field is true and the request is
+    // credentialed, the gateway must specify one 
     // HTTP method in the value of the Access-Control-Allow-Methods response 
     // header. The value of the header `Access-Control-Allow-Methods` is same 
     // as the `Access-Control-Request-Method` header provided by the client. 
     // If the header `Access-Control-Request-Method` is not included in the 
     // request, the gateway will omit the `Access-Control-Allow-Methods` 
-    // response header, instead of specifying the `*` wildcard. A Gateway 
+    // response header, instead of specifying the `*` wildcard.
+    // (The wildcard is always forbidden in response to a credentialed
+    // request irrespective of the Gateway configuration.) A Gateway
     // implementation may choose to add implementation-specific default 
     // methods.
     //
     // Input:
     //   Access-Control-Request-Method: PUT
+    //   Cookie: foo=bar
     //
     // Config:
     //   allowMethods: ["*"]
@@ -363,6 +388,9 @@ type HTTPCORSFilter struct {
     // If any header name in the `Access-Control-Allow-Headers` response header does 
     // not recognize by the client, it will also occur an error on the client side.
     //
+    // A Gateway implementation may choose to add implementation-specific
+    // default headers.
+    //
     // Input:
     //   Access-Control-Request-Headers: Cache-Control, Content-Type
     //
@@ -373,8 +401,9 @@ type HTTPCORSFilter struct {
     //   Access-Control-Allow-Headers: DNT, Keep-Alive, User-Agent, X-Requested-With, If-Modified-Since, Cache-Control, Content-Type, Range, Authorization
     //
     // A wildcard indicates that the requests with all HTTP headers are allowed.
-    // The `Access-Control-Allow-Headers` response header can only use `*` wildcard 
-    // as value when the `AllowCredentials` field is false.
+    // The `Access-Control-Allow-Headers` response header should use the `*`
+    // wildcard as value if the `allowHeaders` config field contains the "*"
+    // wildcard unless the request is credentialed.
     //
     // Input:
     //   Access-Control-Request-Headers: Content-Type, Cache-Control
@@ -385,18 +414,18 @@ type HTTPCORSFilter struct {
     // Output:
     //   Access-Control-Allow-Headers: *
     //
-    // When the `AllowCredentials` field is true and the `AllowHeaders` field
-    // is specified with the `*` wildcard, the gateway must specify one or more
+    // When the `allowHeaders` config field contains the "*" wildcard and the request
+    // is credentialed, the gateway must specify one or more
     // HTTP headers in the value of the `Access-Control-Allow-Headers` response 
     // header. The value of the header `Access-Control-Allow-Headers` is same as 
     // the `Access-Control-Request-Headers` header provided by the client. If 
     // the header `Access-Control-Request-Headers` is not included in the request, 
     // the gateway will omit the `Access-Control-Allow-Headers` response header, 
-    // instead of specifying the `*` wildcard. A Gateway implementation may choose 
-    // to add implementation-specific default headers.
+    // instead of specifying the `*` wildcard.
     //
     // Input:
     //   Access-Control-Request-Headers: Content-Type, Cache-Control
+    //   Cookie: foo=bar
     //
     // Config:
     //   allowHeaders: ["*"]
@@ -443,14 +472,27 @@ type HTTPCORSFilter struct {
     //   Access-Control-Expose-Headers: Content-Security-Policy, Content-Encoding
     //
     // A wildcard indicates that the responses with all HTTP headers are exposed 
-    // to clients. The `Access-Control-Expose-Headers` response header can only use 
-    // `*` wildcard as value when the `AllowCredentials` field is false.
+    // to clients. The `Access-Control-Expose-Headers` response header should use
+    // the `*` wildcard as value unless the request is credentialed.
     //
     // Config:
     //   exposeHeaders: ["*"]
     //
     // Output:
     //   Access-Control-Expose-Headers: *
+    //
+    // When the `exposeHeaders` config field contains the "*" wildcard and
+    // the request is credentialed, the gateway cannot use the `*` wildcard in
+    // the `Access-Control-Expose-Headers` response header.
+    //
+    // Input:
+    //   Cookie: foo=bar
+    //
+    // Config:
+    //   exposeHeaders: ["*"]
+    //
+    // Output:
+    //   Access-Control-Expose-Headers: Content-Encoding, Kuma-Revision
     //
     // Support: Extended
     //
