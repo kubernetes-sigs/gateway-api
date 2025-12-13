@@ -172,7 +172,8 @@ func HTTPRouteMustHaveLatestConditions(t *testing.T, c client.Client, timeoutCon
 
 		for _, parent := range r.Status.Parents {
 			if err := ConditionsHaveLatestObservedGeneration(r, parent.Conditions); err != nil {
-				tlog.Fatalf(t, "HTTPRoute(controller=%v, parentRef=%#v) %v", parent.ControllerName, parent, err)
+				tlog.Logf(t, "HTTPRoute(controller=%v, parentRef=%#v) %v", parent.ControllerName, parent, err)
+				return false, nil
 			}
 		}
 
