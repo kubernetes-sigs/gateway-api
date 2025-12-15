@@ -4,7 +4,7 @@
     This feature is part of extended support. For more information on release channels, refer to our [versioning guide](../concepts/versioning.md).
 
 The [HTTPRoute resource](../api-types/httproute.md) can be used to [mirror
-requests](../reference/spec.md#gateway.networking.k8s.io/v1.HTTPRequestMirrorFilter) to multiple backends. This is useful for testing new services with
+requests](../reference/spec/#gateway) to multiple backends. This is useful for testing new services with
 production traffic.
 
 Mirrored requests will only be sent to one single destination endpoint
