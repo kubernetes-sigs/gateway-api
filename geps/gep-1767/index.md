@@ -240,14 +240,13 @@ type HTTPCORSFilter struct {
     // Output:
     //   Access-Control-Allow-Origin: *
     //
-    // When the `allowCredentials` config field is true,
-    // the `allowOrigins` config field contains the "*" wildcard, and the
-    // request is credentialed, the gateway must return a 
+    // When the request is credentialed, the gateway must not specify the `*`
+    // wildcard in the `Access-Control-Allow-Origin` response header. When
+    // additionally the `AllowCredentials` field is true and `AllowOrigins`
+    // field specified with the `*` wildcard, the gateway must return a 
     // single origin in the value of the `Access-Control-Allow-Origin` 
-    // response header, instead of specifying the `*` wildcard.
-    // (The wildcard is always forbidden in response to a credentialed
-    // request irrespective of the Gateway configuration.) The value
-    // of the header `Access-Control-Allow-Origin` is same as the `Origin`
+    // response header, instead of specifying the `*` wildcard. The value 
+    // of the header `Access-Control-Allow-Origin` is same as the `Origin` 
     // header provided by the client.
     //
     // Input:
@@ -338,16 +337,16 @@ type HTTPCORSFilter struct {
     // Output:
     //   Access-Control-Allow-Methods: *
     //
-    // When the `allowCredentials` config field is true and the request is
-    // credentialed, the gateway must specify one 
+    // When the request is credentialed, the gateway must not specify the `*`
+    // wildcard in the `Access-Control-Allow-Methods` response header. When
+    // also the `AllowCredentials` field is true and `AllowMethods`
+    // field specified with the `*` wildcard, the gateway must specify one 
     // HTTP method in the value of the Access-Control-Allow-Methods response 
     // header. The value of the header `Access-Control-Allow-Methods` is same 
     // as the `Access-Control-Request-Method` header provided by the client. 
     // If the header `Access-Control-Request-Method` is not included in the 
     // request, the gateway will omit the `Access-Control-Allow-Methods` 
-    // response header, instead of specifying the `*` wildcard.
-    // (The wildcard is always forbidden in response to a credentialed
-    // request irrespective of the Gateway configuration.) A Gateway
+    // response header, instead of specifying the `*` wildcard. A Gateway 
     // implementation may choose to add implementation-specific default 
     // methods.
     //
@@ -401,9 +400,8 @@ type HTTPCORSFilter struct {
     //   Access-Control-Allow-Headers: DNT, Keep-Alive, User-Agent, X-Requested-With, If-Modified-Since, Cache-Control, Content-Type, Range, Authorization
     //
     // A wildcard indicates that the requests with all HTTP headers are allowed.
-    // The `Access-Control-Allow-Headers` response header should use the `*`
-    // wildcard as value if the `allowHeaders` config field contains the "*"
-    // wildcard unless the request is credentialed.
+    // The `Access-Control-Allow-Headers` response header can only use `*` wildcard 
+    // as value when the request is not credentialed.
     //
     // Input:
     //   Access-Control-Request-Headers: Content-Type, Cache-Control
@@ -414,8 +412,10 @@ type HTTPCORSFilter struct {
     // Output:
     //   Access-Control-Allow-Headers: *
     //
-    // When the `allowHeaders` config field contains the "*" wildcard and the request
-    // is credentialed, the gateway must specify one or more
+    // When the request is credentialed, the gateway must not specify the `*`
+    // wildcard in the `Access-Control-Allow-Headers` response header. When
+    // also the `AllowCredentials` field is true and the `AllowHeaders` field
+    // is specified with the `*` wildcard, the gateway must specify one or more
     // HTTP headers in the value of the `Access-Control-Allow-Headers` response 
     // header. The value of the header `Access-Control-Allow-Headers` is same as 
     // the `Access-Control-Request-Headers` header provided by the client. If 
@@ -472,8 +472,8 @@ type HTTPCORSFilter struct {
     //   Access-Control-Expose-Headers: Content-Security-Policy, Content-Encoding
     //
     // A wildcard indicates that the responses with all HTTP headers are exposed 
-    // to clients. The `Access-Control-Expose-Headers` response header should use
-    // the `*` wildcard as value unless the request is credentialed.
+    // to clients. The `Access-Control-Expose-Headers` response header can only use 
+    // the `*` wildcard as value when the request is not credentialed.
     //
     // Config:
     //   exposeHeaders: ["*"]
