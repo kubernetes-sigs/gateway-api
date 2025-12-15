@@ -13,6 +13,7 @@ updates:
       k8s.io: # Group k8s.io golang dependencies updates
           patterns:
             - "k8s.io/*"
+            - "sigs.k8s.io/*"
     labels:
       - go
       - dependencies
@@ -28,6 +29,7 @@ updates:
       k8s.io: # Group k8s.io golang dependencies updates
         patterns:
           - "k8s.io/*"
+          - "sigs.k8s.io/*"
     labels:
       - go
       - dependencies
