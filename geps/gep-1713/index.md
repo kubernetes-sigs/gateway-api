@@ -1300,7 +1300,7 @@ They will validate the following scenarios :
       - The listener must have the following status :
         ```
         name: listener-without-port
-        port: <unique port value>
+        port: <unique dynamically assigned port value>
         conditions:
         - type: Accepted
           status: True
