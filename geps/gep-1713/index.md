@@ -49,7 +49,7 @@ The feature will be part of the experimental channel, which implementations can 
 
 This proposal introduces a new `ListenerSet` resource that has the ability to attach a set of listeners to multiple parent `Gateways`.
 
-**Note**: While this API is experimental, its `Kind` will be `XListenerSet` and 
+**Note**: While this API is experimental, its `Kind` will be `XListenerSet` and
 once the API is graduated to stable it will be renamed to `ListenerSet`.
 
 ### Go
@@ -536,7 +536,7 @@ spec:
 
 #### Gateway parents and sectionName
 
-If a `sectionName` in a Route's `parentRef` is not set then the Route MUST attach to only the listeners in the referenced parent. As an example given a `Gateway` and its child `ListenerSets` a route attaching to the `Gateway` with an empty `sectionName` shall only attach to the listeners in the `Gateways` immediate `spec.listeners` list. 
+If a `sectionName` in a Route's `parentRef` is not set then the Route MUST attach to only the listeners in the referenced parent. As an example given a `Gateway` and its child `ListenerSets` a route attaching to the `Gateway` with an empty `sectionName` shall only attach to the listeners in the `Gateways` immediate `spec.listeners` list.
 
 In other words, the Route MUST attach just to the Gateway listeners specified on `.spec.listeners` and MUST NOT not attach to any listeners in the child `ListenerSets`
 of the `Gateway`.
@@ -752,7 +752,7 @@ spec:
 
 The ListenerSet `user-listenerset` should be marked as Conflicted, as the `parent-gateway`
 has a listener definition called `foo` that conflicts with the ListenerSet definition
-called `myapp`. The conflict happens because hostname is the same on both `ListenerSet` 
+called `myapp`. The conflict happens because hostname is the same on both `ListenerSet`
 but they use different termination TLS certificates:
 
 ```yaml
@@ -996,7 +996,7 @@ They will validate the following scenarios :
     - The parent gateway has the following status :
       ```
       status:
-        allowedListeners: 0
+        AttachedListenerSets: 0
       ```
 
 1. ListenerSets are not allowed on the parent Gateway
@@ -1015,7 +1015,7 @@ They will validate the following scenarios :
     - The parent gateway has the following status :
       ```
       status:
-        allowedListeners: 0
+        AttachedListenerSets: 0
       ```
 
 1. ListenerSets are allowed only from the same namespace as the parent Gateway (Validates `Gateway.spec.allowedListeners.namespaces.from`)
@@ -1027,7 +1027,7 @@ They will validate the following scenarios :
     - The parent gateway has the following status :
       ```
       status:
-        allowedListeners: 1
+        AttachedListenerSets: 1
       ```
 
     - The ListenerSet `ls-allowed` in the same namespace as the parent Gateway has the following status :
@@ -1061,7 +1061,7 @@ They will validate the following scenarios :
     - The parent gateway has the following status :
       ```
       status:
-        allowedListeners: 1
+        AttachedListenerSets: 1
       ```
 
     - The ListenerSet `ls-allowed` in a namespace matched by the selector has the following status :
@@ -1109,7 +1109,7 @@ They will validate the following scenarios :
           status: False
           reason: NoConflicts
 
-      allowedListeners: 1
+      AttachedListenerSets: 1
       ```
 
     - The listener set has the following status :
@@ -1140,7 +1140,7 @@ They will validate the following scenarios :
     - The parent gateway has the following status :
       ```
       status:
-        allowedListeners: 2
+        AttachedListenerSets: 2
       ```
 
     - The `ls-accepted` ListenerSet has the following status :
@@ -1213,7 +1213,7 @@ They will validate the following scenarios :
           status: False
           reason: NoConflicts
 
-      allowedListeners: 1
+      AttachedListenerSets: 1
       ```
 
     - The listener set has the following status :
@@ -1245,7 +1245,7 @@ They will validate the following scenarios :
     - The parent gateway has the following status :
       ```
       status:
-        allowedListeners: 2
+        AttachedListenerSets: 2
       ```
 
     - The `ls-accepted` ListenerSet has the following status :
@@ -1313,7 +1313,7 @@ They will validate the following scenarios :
       - The parent gateway has the following status :
       ```
       status:
-        allowedListeners: 1
+        AttachedListenerSets: 1
       ```
 
       - The request to the ListenerSet port must succeed.
@@ -1333,7 +1333,7 @@ They will validate the following scenarios :
       - The parent gateway has the following status :
       ```
       status:
-        allowedListeners: 0
+        AttachedListenerSets: 0
       ```
 
 1. A listener on a ListenerSet allows routes from the same namespace as the ListenerSet
@@ -1445,7 +1445,7 @@ They will validate the following scenarios :
     - The parent gateway has the following status :
       ```
       status:
-        allowedListeners: 1
+        AttachedListenerSets: 1
       ```
 
 1. A listener on a ListenerSet with a ReferenceGrant for the parent Gateway
@@ -1476,7 +1476,7 @@ They will validate the following scenarios :
     - The parent gateway has the following status :
       ```
       status:
-        allowedListeners: 1
+        AttachedListenerSets: 1
       ```
 
 1. A listener on a ListenerSet with a valid ReferenceGrant for the parent Gateway
@@ -1505,7 +1505,7 @@ They will validate the following scenarios :
     - The parent gateway has the following status :
       ```
       status:
-        allowedListeners: 1
+        AttachedListenerSets: 1
       ```
 
 
@@ -1543,7 +1543,7 @@ They will validate the following scenarios :
     - The parent gateway has the following status :
       ```
       status:
-        allowedListeners: 1
+        AttachedListenerSets: 1
       ```
 
     - The request to the listener on the ListenerSet succeeds.
