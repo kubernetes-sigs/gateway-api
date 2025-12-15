@@ -99,6 +99,7 @@ other functions (like managing DNS or creating certificates).
 - [Contour][3] (GA)
 - [Gloo Gateway][5] (GA)
 - [Google Kubernetes Engine][6] (GA)
+- [Gravitee Kubernetes Operator][42] (GA)
 - [Kong Ingress Controller][10] (GA)
 - [Kong Gateway Operator][35] (GA)
 - [Kubvernor][39](work in progress)
@@ -183,6 +184,7 @@ other functions (like managing DNS or creating certificates).
 [39]:#kubvernor
 [40]:#agent-gateway-with-kgateway
 [41]:#kruise-rollouts
+[42]:#gravitee-kubernetes-operator
 
 
 [gamma]:mesh/index.md
@@ -416,6 +418,16 @@ v1.4.0 release for the GATEWAY_HTTP conformance profile except `HTTPRouteHostnam
 [gke-gateway]:https://cloud.google.com/kubernetes-engine/docs/concepts/gateway-api
 [gke-gateway-deploy]:https://cloud.google.com/kubernetes-engine/docs/how-to/deploying-gateways
 [gke-multi-cluster-gateway]:https://cloud.google.com/kubernetes-engine/docs/how-to/deploying-multi-cluster-gateways
+
+### Gravitee Kubernetes Operator
+
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Partial%20Conformance%20v1.3.0-Gravitee%20Kubernetes%20Operator-orange)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.3.0/gravitee)
+
+The [Gravitee Kubernetes Operator](https://documentation.gravitee.io/gravitee-kubernetes-operator-gko) (GKO) lets you manage [Gravitee](https://www.gravitee.io/) APIs, applications, and other assets in a Kubernetes-native and declarative way.
+
+The Gravitee Kubernetes Operator provides partial conformance for Gateway - HTTP features in version 4.8.5. It does not support matching rules across routes or defining services of a type other than Kubernetes Core v1 services. These features will be introduced in a future release.
+
+For support, feedback, or to engage in a discussion about the Gravitee Kubernetes Operator, please feel free to submit an [issue](https://github.com/gravitee-io/issues/issues) or visit our community [forum](https://community.gravitee.io/c/support/gravitee-kubernetes-operator-gko/26).
 
 ### HAProxy Ingress
 
