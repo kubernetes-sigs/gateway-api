@@ -1671,7 +1671,7 @@ type GRPCAuthConfig struct {
 	//
 	// +optional
 	// +listType=set
-	// +kubebuilder:validation:MaxLength=64
+	// +kubebuilder:validation:MaxItems=64
 	AllowedRequestHeaders []string `json:"allowedHeaders,omitempty"`
 }
 
@@ -1719,7 +1719,7 @@ type HTTPAuthConfig struct {
 	//
 	// +optional
 	// +listType=set
-	// +kubebuilder:validation:MaxLength=64
+	// +kubebuilder:validation:MaxItems=64
 	AllowedRequestHeaders []string `json:"allowedHeaders,omitempty"`
 
 	// AllowedResponseHeaders specifies what headers from the authorization response
@@ -1730,7 +1730,7 @@ type HTTPAuthConfig struct {
 	//
 	// +optional
 	// +listType=set
-	// +kubebuilder:validation:MaxLength=64
+	// +kubebuilder:validation:MaxItems=64
 	AllowedResponseHeaders []string `json:"allowedResponseHeaders,omitempty"`
 }
 

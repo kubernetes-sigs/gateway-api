@@ -23,6 +23,7 @@ import (
 	"regexp"
 	"strings"
 
+	"golang.org/x/tools/go/packages"
 	apiext "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	"sigs.k8s.io/controller-tools/pkg/crd"
 	"sigs.k8s.io/controller-tools/pkg/loader"
@@ -134,6 +135,10 @@ func main() {
 				log.Fatalf("failed to write CRD: %s", err)
 			}
 		}
+	}
+
+	if loader.PrintErrors(roots, packages.TypeError) {
+		log.Fatalf("not all generators ran successfully")
 	}
 }
 

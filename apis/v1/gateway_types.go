@@ -803,7 +803,6 @@ type AllowedRoutes struct {
 	// Support: Core
 	//
 	// +optional
-	// +listType=atomic
 	// +kubebuilder:default={from: Same}
 	Namespaces *RouteNamespaces `json:"namespaces,omitempty"`
 
