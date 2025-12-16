@@ -54,11 +54,11 @@ The use of `Terminate` on `TLSRoute` is available on `Extended` [Support Level].
 
 ## Downstream TLS
 
-Downstream TLS settings are configured using [listeners](../reference/spec/#listener) at the Gateway level.
+Downstream TLS settings are configured using [listeners](../../reference/spec/#listener) at the Gateway level.
 
 ### Listeners and TLS
 
-Listeners expose the [TLS setting](../reference/spec/#gatewaytlsconfig) on a per domain or subdomain basis.
+Listeners expose the [TLS setting](../../reference/spec/#gatewaytlsconfig) on a per domain or subdomain basis.
 TLS settings of a listener are applied to all domains that satisfy the
 `hostname` criteria.
 
@@ -116,7 +116,7 @@ would be invalid.
 
 ## Upstream TLS
 
-Upstream TLS settings are configured using the [`BackendTLSPolicy`](../reference/spec/#backendtlspolicy) attached to a
+Upstream TLS settings are configured using the [`BackendTLSPolicy`](../../reference/spec/#backendtlspolicy) attached to a
 `Service` via a target reference.
 
 This resource can be used to describe the SNI the Gateway should use to connect to the
