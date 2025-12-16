@@ -4,7 +4,7 @@
     This feature is part of extended support. For more information on release channels, refer to our [versioning guide](../concepts/versioning.md).
 
 The [HTTPRoute resource](../api-types/httproute.md) can be used to match
-requests based on the [HTTP method](../reference/spec/#gateway.networking.k8s.io/v1.HTTPRouteMatch). This guide shows how to use this
+requests based on the [HTTP method](../reference/spec/#httproutematch). This guide shows how to use this
 functionality.
 
 ## Matching requests based on the HTTP method

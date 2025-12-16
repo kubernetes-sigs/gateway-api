@@ -1,7 +1,7 @@
 # HTTP Header Modifiers
 
 [HTTPRoute resources](../api-types/httproute.md) can modify the headers of HTTP requests and the HTTP responses from clients.
-There are two types of [filters](../api-types/httproute.md#filters-optional) available to meet these requirements: [`RequestHeaderModifier`](../reference/spec/#gateway.networking.k8s.io/v1.HTTPHeaderFilter) and [`ResponseHeaderModifier`](../reference/spec/#gateway.networking.k8s.io/v1.HTTPHeaderFilter).
+There are two types of [filters](../api-types/httproute.md#filters-optional) available to meet these requirements: [`RequestHeaderModifier`](../reference/spec/#httpheaderfilter) and [`ResponseHeaderModifier`](../reference/spec/#httpheaderfilter).
 
 This guide shows how to use these features.
 

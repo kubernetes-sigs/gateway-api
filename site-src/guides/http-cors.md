@@ -8,7 +8,7 @@ Cross-Origin Resource Sharing (CORS). CORS is a security feature that allows
 or denies web applications running at one domain to make requests for resources
 from a different domain.
 
-The [`CORS` filter](../reference/spec/#gateway.networking.k8s.io/v1.HTTPCORSFilter) in an `HTTPRouteRule` can be used to specify the CORS policy.
+The [`CORS` filter](../reference/spec/#httpcorsfilter) in an `HTTPRouteRule` can be used to specify the CORS policy.
 
 ## Allowing requests from a specific origin
 
