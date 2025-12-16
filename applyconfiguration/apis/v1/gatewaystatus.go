@@ -25,10 +25,10 @@ import (
 // GatewayStatusApplyConfiguration represents a declarative configuration of the GatewayStatus type for use
 // with apply.
 type GatewayStatusApplyConfiguration struct {
-	Addresses         []GatewayStatusAddressApplyConfiguration `json:"addresses,omitempty"`
-	Conditions        []metav1.ConditionApplyConfiguration     `json:"conditions,omitempty"`
-	Listeners         []ListenerStatusApplyConfiguration       `json:"listeners,omitempty"`
-	AttachedListeners *int32                                   `json:"attachedListeners,omitempty"`
+	Addresses            []GatewayStatusAddressApplyConfiguration `json:"addresses,omitempty"`
+	Conditions           []metav1.ConditionApplyConfiguration     `json:"conditions,omitempty"`
+	Listeners            []ListenerStatusApplyConfiguration       `json:"listeners,omitempty"`
+	AttachedListenerSets *int32                                   `json:"attachedListenerSets,omitempty"`
 }
 
 // GatewayStatusApplyConfiguration constructs a declarative configuration of the GatewayStatus type for use with
@@ -76,10 +76,10 @@ func (b *GatewayStatusApplyConfiguration) WithListeners(values ...*ListenerStatu
 	return b
 }
 
-// WithAttachedListeners sets the AttachedListeners field in the declarative configuration to the given value
+// WithAttachedListenerSets sets the AttachedListenerSets field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
-// If called multiple times, the AttachedListeners field is set to the value of the last call.
-func (b *GatewayStatusApplyConfiguration) WithAttachedListeners(value int32) *GatewayStatusApplyConfiguration {
-	b.AttachedListeners = &value
+// If called multiple times, the AttachedListenerSets field is set to the value of the last call.
+func (b *GatewayStatusApplyConfiguration) WithAttachedListenerSets(value int32) *GatewayStatusApplyConfiguration {
+	b.AttachedListenerSets = &value
 	return b
 }
