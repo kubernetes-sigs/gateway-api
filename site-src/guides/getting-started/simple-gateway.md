@@ -8,8 +8,8 @@ This guide is a great place to start if you are new to Gateway API. It shows the
 {% include 'standard/simple-gateway/gateway.yaml' %}
 ```
 
-The [Gateway](../../reference/spec.md#gateway.networking.k8s.io/v1.Gateway) represents the instantiation of a logical load balancer and the
-[GatewayClass](../../reference/spec.md#gateway.networking.k8s.io/v1.GatewayClass) defines the load balancer template when users create a Gateway.
+The [Gateway](../../reference/spec/#gateway.networking.k8s.io/v1.Gateway) represents the instantiation of a logical load balancer and the
+[GatewayClass](../../reference/spec/#gateway.networking.k8s.io/v1.GatewayClass) defines the load balancer template when users create a Gateway.
 The example Gateway is templated from a hypothetical `example`
 GatewayClass, which is meant to be a placeholder and substituted by users. Here
 is a list of available
@@ -21,10 +21,10 @@ The Gateway listens for HTTP traffic on port 80. This particular GatewayClass
 automatically assigns an IP address which will be shown in the `Gateway.status`
 after it has been deployed. 
 
-Route resources specify the Gateways they want to attach to using [`ParentRefs`](../../reference/spec.md#gateway.networking.k8s.io/v1.ParentReference). As long as 
+Route resources specify the Gateways they want to attach to using [`ParentRefs`](../../reference/spec/#gateway.networking.k8s.io/v1.ParentReference). As long as 
 the Gateway allows this attachment (by default Routes from the same namespace are trusted),
 this will allow the Route to receive traffic from the parent Gateway. 
-[`BackendRefs`](../../reference/spec.md#gateway.networking.k8s.io/v1.HTTPBackendRef) define the backends that traffic will be sent to. More complex 
+[`BackendRefs`](../../reference/spec/#gateway.networking.k8s.io/v1.HTTPBackendRef) define the backends that traffic will be sent to. More complex 
 bi-directional matching and permissions are possible and explained in other guides.
 
 The following HTTPRoute defines how traffic from the Gateway listener is routed
