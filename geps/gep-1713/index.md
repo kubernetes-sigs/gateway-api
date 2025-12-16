@@ -1452,8 +1452,8 @@ They will validate the following scenarios :
         AttachedListenerSets: 1
       ```
 
-1. A listener on a ListenerSet with a ReferenceGrant for the parent Gateway
-    - The listener on the ListenerSet references a secret the parent Gateway has access to.
+1. A listener on a ListenerSet without a ReferenceGrant but the parent Gateway has a ReferenceGrant
+    - The listener on the ListenerSet without a ReferenceGrant references a secret the parent Gateway has access to.
 
     - The listenerSet must have the following status
       ```
@@ -1483,7 +1483,7 @@ They will validate the following scenarios :
         AttachedListenerSets: 1
       ```
 
-1. A listener on a ListenerSet with a valid ReferenceGrant for the parent Gateway
+1. A listener on a ListenerSet with a valid ReferenceGrant
     - The listenerSet must have the following status
       ```
       conditions:
@@ -1497,9 +1497,9 @@ They will validate the following scenarios :
       - name: ls-with-valid-ref-grant
         conditions:
         - type: Accepted
-          status: False
+          status: True
         - type: Programmed
-          status: False
+          status: True
         - type: ResolvedRefs
           status: True
           reason: ResolvedRefs
