@@ -972,11 +972,15 @@ Gateway Hierarchy Brainstorming:
 
 ## Conformance Details
 
-A new Gateway Conformance (Extended) feature will be added
+The following Gateway Conformance (Extended) features will be added
 ```
 	//  SupportGatewayListenerSet option indicates support for a Gateway
 	//  with ListenerSets
 	SupportGatewayListenerSet FeatureName = "GatewayListenerSet"
+
+	//  SupportListenerSetDynamicPortAssignment option indicates support for a ListenerSet
+	//  to dynamically assign ports
+	SupportListenerSetDynamicPortAssignment FeatureName = "ListenerSetDynamicPortAssignment"
 ```
 They will validate the following scenarios :
 
@@ -1296,7 +1300,7 @@ They will validate the following scenarios :
       ```
 
 1. A listener on a ListenerSet without a defined port
-    - If the implementation supports dynamic port assignment :
+    - If the implementation supports `ListenerSetDynamicPortAssignment` :
       - The listener must have the following status :
         ```
         name: listener-without-port
@@ -1318,7 +1322,7 @@ They will validate the following scenarios :
 
       - The request to the ListenerSet port must succeed.
 
-    - If the implementation does not support dynamic port assignment :
+    - If the implementation does not support `ListenerSetDynamicPortAssignment` :
         ```
         name: listener-without-port
         conditions:
