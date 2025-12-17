@@ -164,6 +164,8 @@ spec:
       - type: URLRewrite
         urlRewrite:
           regexModifier:
+            hostPattern: "^(?<apiversion>[a-z0-9]+)\\.domain\\.com$"
+            hostSubstitution: "domain2.com"
             pathPattern: "^/region/(?<region>[a-z]+)/bucket/(?<storage>[a-zA-Z0-9-]+)/(?<object>[a-z]+)\\.pdf$"
             pathSubstitution: "\\g<region>/bucket-\\g<storage>/\\g<object>.pdf"
     backendRefs:
