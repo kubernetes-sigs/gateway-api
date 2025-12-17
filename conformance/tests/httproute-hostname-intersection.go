@@ -241,6 +241,77 @@ var HTTPRouteHostnameIntersection = suite.ConformanceTest{
 					http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, tc)
 				})
 			}
+
+			// We would like to verify that the gateway status is updated correctly and AttachedRoutes is set correctly.
+			// We are expecting listener-1, listener-2, listener-3 to be attached to the gateway.
+			// We are expecting listener-1 to have 2 attached routes and listener-2 to have 1 attached route.
+			// We are expecting listener-3 to have 1 attached route.
+			// HTTPRoute no-intersecting-hosts should not be attached to any of the listeners.q
+			listeners := []v1.ListenerStatus{
+				{
+					Name: v1.SectionName("listener-1"),
+					SupportedKinds: []v1.RouteGroupKind{{
+						Group: (*v1.Group)(&v1.GroupVersion.Group),
+						Kind:  v1.Kind("HTTPRoute"),
+					}},
+					Conditions: []metav1.Condition{
+						{
+							Type:   string(v1.ListenerConditionAccepted),
+							Status: metav1.ConditionTrue,
+							Reason: "", // any reason
+						},
+						{
+							Type:   string(v1.ListenerConditionResolvedRefs),
+							Status: metav1.ConditionTrue,
+							Reason: "", // any reason
+						},
+					},
+					AttachedRoutes: 2,
+				},
+				{
+					Name: v1.SectionName("listener-2"),
+					SupportedKinds: []v1.RouteGroupKind{{
+						Group: (*v1.Group)(&v1.GroupVersion.Group),
+						Kind:  v1.Kind("HTTPRoute"),
+					}},
+					Conditions: []metav1.Condition{
+						{
+							Type:   string(v1.ListenerConditionAccepted),
+							Status: metav1.ConditionTrue,
+							Reason: "", // any reason
+						},
+						{
+							Type:   string(v1.ListenerConditionResolvedRefs),
+							Status: metav1.ConditionTrue,
+							Reason: "", // any reason
+						},
+					},
+					AttachedRoutes: 1,
+				},
+				{
+					Name: v1.SectionName("listener-3"),
+					SupportedKinds: []v1.RouteGroupKind{{
+						Group: (*v1.Group)(&v1.GroupVersion.Group),
+						Kind:  v1.Kind("HTTPRoute"),
+					}},
+					Conditions: []metav1.Condition{
+						{
+							Type:   string(v1.ListenerConditionAccepted),
+							Status: metav1.ConditionTrue,
+							Reason: "", // any reason
+						},
+						{
+							Type:   string(v1.ListenerConditionResolvedRefs),
+							Status: metav1.ConditionTrue,
+							Reason: "", // any reason
+						},
+					},
+					AttachedRoutes: 1,
+				},
+			}
+
+			kubernetes.GatewayStatusMustHaveListeners(t, suite.Client, suite.TimeoutConfig, gwNN, listeners)
+
 		})
 
 		t.Run("HTTPRoutes intersects with an unspecified hostname listener", func(t *testing.T) {
