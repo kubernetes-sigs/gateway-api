@@ -191,12 +191,17 @@ release-staging: image.multiarch.setup
 # Docs
 
 DOCS_BUILD_CONTAINER_NAME ?= gateway-api-mkdocs
+DOCS_VERIFY_CONTAINER_IMAGE ?= registry.hub.docker.com/lycheeverse/lychee:0.22
 
 .PHONY: build-docs
-build-docs: update-geps
+build-docs: update-geps api-ref-docs
 	docker build --pull -t gaie/mkdocs hack/mkdocs/image
 	docker rm -f $(DOCS_BUILD_CONTAINER_NAME) || true
 	docker run --name $(DOCS_BUILD_CONTAINER_NAME) --rm -v ${PWD}:/docs gaie/mkdocs build
+
+.PHONY: verify-docs
+verify-docs: build-docs
+	docker run -it --rm -w /input -v ${PWD}:/input $(DOCS_VERIFY_CONTAINER_IMAGE) --offline --root-dir /input/site --exclude-path "overrides/partials/.*\.html" /input/site/**/*.html
 
 .PHONY: build-docs-netlify
 build-docs-netlify: update-geps api-ref-docs

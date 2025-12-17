@@ -241,7 +241,7 @@ or Mesh resources.
 ## Graduation Criteria
 
 In addition to the [general graduation
-criteria](../concepts/versioning.md#graduation-criteria), this GEP must also
+criteria](/concepts/versioning#graduation-criteria), this GEP must also
 guarantee that **all four** of the problems listed above need resolutions, and
 must have implementation from at least two different Gateways and two
 different meshes.

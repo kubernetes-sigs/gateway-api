@@ -70,9 +70,9 @@ page][community] which includes links to the Slack channel and community meeting
 
 [crd]:https://kubernetes.io/docs/tasks/extend-kubernetes/custom-resources/custom-resource-definitions/
 [concepts]:../../concepts/api-overview.md
-[guides]:../../guides/index.md
+[guides]:/guides/
 [impl]:../../implementations.md
-[install-crds]:../../guides/index.md#installing-gateway-api
+[install-crds]:/guides/getting-started/#installing-gateway-api
 [issue]:https://github.com/kubernetes-sigs/gateway-api/issues/new/choose
 [disc]:https://github.com/kubernetes-sigs/gateway-api/discussions
 [community]:../../contributing/index.md

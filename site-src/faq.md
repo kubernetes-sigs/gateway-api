@@ -16,7 +16,7 @@ more protocols than just HTTP, and models more infrastructure components to
 provide better deployment and management options for cluster operators.
 
 For more information, see the [Migrating from
-Ingress](guides/migrating-from-ingress.md) guide.
+Ingress](/guides/getting-started/migrating-from-ingress/) guide.
 
 #### Will there be a default controller implementation?
 No. There are already many great [implementations](implementations.md) to choose

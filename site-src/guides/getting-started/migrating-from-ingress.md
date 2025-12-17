@@ -157,7 +157,7 @@ Gateway API has the following primary extension points:
 *   *Custom implementations*. For some features, it is left up to an
     implementation to define how to support them. Those features correspond to the
     implementation-specific
-    (custom)  [conformance level](../concepts/conformance.md#2-support-levels). For
+    (custom)  [conformance level](../../concepts/conformance.md#2-support-levels). For
     example:
     *   The `RegularExpression` type of
         the [HTTPPathMatch](../../reference/spec.md#gateway.networking.k8s.io/v1.HTTPPathMatch).
@@ -192,7 +192,7 @@ Typically, they will either be shared by all Ingress resources, or every Ingress
 resource will get dedicated entry points.
 
 In Gateway API, entry points must be explicitly defined in
-a [Gateway](../api-types/gateway.md) resource. For example, if you want the data
+a [Gateway](../../api-types/gateway.md) resource. For example, if you want the data
 plane to handle HTTP traffic on port 80, you need to define
 a [listener](../../reference/spec.md#gateway.networking.k8s.io/v1.Listener) for
 that traffic. Typically, a Gateway implementation provides a dedicated data
@@ -219,7 +219,7 @@ application admin own TLS termination.
 The [path-based routing rules](https://kubernetes.io/docs/concepts/services-networking/ingress/#path-types)
 of the Ingress resource map directly to
 the [routing rules](../../reference/spec.md#gateway.networking.k8s.io/v1.HTTPRouteRule)
-of the [HTTPRoute](../api-types/httproute.md).
+of the [HTTPRoute](../../api-types/httproute.md).
 
 The [host-header-based routing rules](https://kubernetes.io/docs/concepts/services-networking/ingress/#name-based-virtual-hosting)
 map to

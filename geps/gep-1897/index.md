@@ -31,7 +31,7 @@ Gateway to backend**, such as server name indication and trusted CA certificates
 
 These are worthy goals, but deserve a different GEP for proper attention.  This GEP is concerned entirely with the
 hop between gateway client and backend.
-1. [TCPRoute](../../apis/v1alpha2/tcproute_types.go) use cases are not addressed here, because at this point in time
+1. [TCPRoute](https://github.com/kubernetes-sigs/gateway-api/blob/main/apis/v1alpha2/tcproute_types.go) use cases are not addressed here, because at this point in time
 TCPRoute is not graduated to beta.
 2. Mutual TLS (mTLS) use cases are intentionally out of scope for this GEP for two reasons.  First, the design of Gateway
 API is backend-attached and does not currently support mutual authentication, and also because this GEP does not
@@ -606,7 +606,7 @@ i.e. Service, in the cluster based on backendRefs rules of the HTTPRoute **and t
 
 In order to scope this GEP, some changes are deferred to a near-future GEP.
 This GEP intends to add the ability for additional control by gateway clients to override TLS settings, following previously
-established patterns of [consumer and producer policies]([glossary](https://gateway-api.sigs.k8s.io/concepts/glossary/?h=gloss#producer-route)).
+established patterns of [consumer and producer policies](../../concepts/glossary.md#producer-route).
 Additionally, more contextual control over when to apply the policies will be explored, to enable use cases like "apply
 TLS only from this route" ([issue](https://github.com/kubernetes-sigs/gateway-api/issues/3856)).
 
