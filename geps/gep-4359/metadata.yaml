@@ -1,0 +1,16 @@
+apiVersion: internal.gateway.networking.k8s.io/v1alpha1
+kind: GEPDetails
+number: 4359
+name: Regex-based Path Rewrites
+status: Provisional
+authors:
+  - muxanasov
+relationships:
+  seeAlso:
+    - https://gateway-api.sigs.k8s.io/geps/gep-726/#future-extension
+# references is a list of hyperlinks to relevant external references.
+# It's intended to be used for storing GitHub discussions, Google docs, etc.
+references:
+  - https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/route/v3/route_components.proto#envoy-v3-api-field-config-route-v3-routeaction-regex-rewrite
+featureNames:
+  - Regex-based Path Rewrites
