@@ -69,7 +69,7 @@ spec:
       containers:
       - name: mqtt-backend
         # https://hub.docker.com/_/eclipse-mosquitto
-        image: eclipse-mosquitto:2
+        image: docker.io/eclipse-mosquitto:2
         volumeMounts:
         - name: config
           mountPath: /mosquitto/config/mosquitto.conf

@@ -20,7 +20,6 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
-	"sync"
 	"testing"
 	"time"
 
@@ -87,8 +86,7 @@ var TLSRouteTerminateSimpleSameNamespace = suite.ConformanceTest{
 			})
 			opts.SetConnectRetry(true)
 
-			var wg sync.WaitGroup
-			wg.Add(1)
+			waitCh := make(chan struct{})
 
 			topic := "test/tlsroute-terminate"
 			opts.OnConnect = func(c mqtt.Client) {
@@ -96,32 +94,26 @@ var TLSRouteTerminateSimpleSameNamespace = suite.ConformanceTest{
 
 				if token := c.Subscribe(topic, 0, func(_ mqtt.Client, msg mqtt.Message) {
 					t.Logf("Received message: %s\n", string(msg.Payload()))
-					wg.Done()
-				}); token.Wait() && token.Error() != nil {
+					close(waitCh)
+				}); token.WaitTimeout(suite.TimeoutConfig.RequestTimeout) && token.Error() != nil {
 					t.Fatalf("Failed to subscribe: %v", token.Error())
 				}
 
 				t.Log("Subscribed, publishing test message...")
-				if token := c.Publish(topic, 0, false, "Hello TLSRoute Terminate MQTT!"); token.Wait() && token.Error() != nil {
+				if token := c.Publish(topic, 0, false, "Hello TLSRoute Terminate MQTT!"); token.WaitTimeout(suite.TimeoutConfig.RequestTimeout) && token.Error() != nil {
 					t.Fatalf("Failed to publish: %v", token.Error())
 				}
 			}
 
 			client := mqtt.NewClient(opts)
-			if token := client.Connect(); token.Wait() && token.Error() != nil {
+			if token := client.Connect(); token.WaitTimeout(suite.TimeoutConfig.RequestTimeout) && token.Error() != nil {
 				t.Fatalf("Connection failed: %v", token.Error())
 			}
-
-			waitCh := make(chan struct{})
-			go func() {
-				wg.Wait()
-				close(waitCh)
-			}()
 
 			select {
 			case <-waitCh:
 				t.Log("Round-trip test succeeded")
-			case <-time.After(5 * time.Second):
+			case <-time.After(suite.TimeoutConfig.DefaultTestTimeout):
 				t.Fatal("Timed out waiting for message")
 			}
 		})
