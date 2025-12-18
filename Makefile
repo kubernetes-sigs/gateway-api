@@ -201,7 +201,7 @@ build-docs: update-geps api-ref-docs
 
 .PHONY: verify-docs
 verify-docs: build-docs
-	docker run -it --rm -w /input -v ${PWD}:/input $(DOCS_VERIFY_CONTAINER_IMAGE) --offline --root-dir /input/site --exclude-path "overrides/partials/.*\.html" /input/site/**/*.html
+	docker run -it --rm -w /input -v ${PWD}:/input $(DOCS_VERIFY_CONTAINER_IMAGE) --root-dir /input/site --exclude-path "overrides/partials/.*\.html" --exclude ".*" --include "k8s.io" --include "kubernetes.io" --include "github.com" /input/site/**/*.html
 
 .PHONY: build-docs-netlify
 build-docs-netlify: update-geps api-ref-docs
