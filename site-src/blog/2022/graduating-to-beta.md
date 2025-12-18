@@ -175,7 +175,7 @@ If there's something on this list you want to get involved in, or there's
 something not on this list that you want to advocate be on the roadmap
 please join us in the #sig-network-gateway-api channel on Kubernetes Slack or our weekly [community calls](../../contributing/index.md#meetings).
 
-[gep1016]:https://github.com/kubernetes-sigs/gateway-api/blob/master/geps/gep-1016.md
+[gep1016]:/geps/gep-1016/
 [grpc]:https://grpc.io/
 [pr1085]:https://github.com/kubernetes-sigs/gateway-api/pull/1085
 [tcpr]:https://github.com/kubernetes-sigs/gateway-api/blob/main/apis/v1alpha2/tcproute_types.go

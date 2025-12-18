@@ -28,7 +28,7 @@ This GEP proposes to enhance the [GatewayClassStatus](https://github.com/kuberne
 
 The current [GatewayClassStatus](https://github.com/kubernetes-sigs/gateway-api/blob/f2cd9bb92b4ff392416c40d6148ff7f76b30e649/apis/v1beta1/gatewayclass_types.go#L185) is only used to store conditions the controller publishes.
 
-Partnered with the [Conformance Profiles](https://github.com/kubernetes-sigs/gateway-api/blob/main/geps/gep-1709.md) work, we want to:
+Partnered with the [Conformance Profiles](/geps/gep-1709/) work, we want to:
 
 1. Improve UX by enabling users to easily see what features the implementation(GatewayClass) support.
 1. Standardize features and conformance tests names.
@@ -162,7 +162,7 @@ Before we make the changes we need to;
 
 ### Re-using ConformanceProfiles structs
 
-We could use the same structs as we do in conformance profile object, more specifically, the [ProfileReport](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/apis/v1alpha1/profilereport.go#LL24C6-L24C19) struct.
+We could use the same structs as we do in conformance profile object, more specifically, the [ProfileReport](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/apis/v1/conformancereport.go#LL28C6-L28C19) struct.
 
 Though it would be nice to have only one place to update, these structs seems to include much more data relevant to the conformance report but not for our use case.
 
@@ -170,7 +170,7 @@ That said, conformance profiles are still at experimental stage, we could explor
 
 ### Instruct users to read from the future conformance profiles report
 
-The current plan for conformance profiles is to also include centralized reporting. (more info in [gep-1709](https://github.com/kubernetes-sigs/gateway-api/blob/main/geps/gep-1709.md))
+The current plan for conformance profiles is to also include centralized reporting. (more info in [gep-1709](/geps/gep-1709/))
 We could wait for this to be implemented and instruct users to read from that source to determine what features their installed GatewayClass support.
 
 However, having the supported features published in the GatewayClass Status adds the following values:
