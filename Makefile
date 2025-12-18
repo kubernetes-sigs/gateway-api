@@ -58,6 +58,12 @@ GO_TEST_FLAGS ?=
 CEL_TEST_K8S_VERSION ?= 
 CEL_TEST_CRD_CHANNEL ?= standard
 
+# Flags for docs validation
+# Use this to add extra flags like --offline or --include "github.com/kubernetes"
+# Github is intentionally removed from the checks due to rate limits and because the 
+# anchor validation does not work when pointing to a github code
+VALIDATE_DOCS_EXTRA_FLAGS ?= 
+
 # Compilation flags for binaries
 GOARCH ?= $(shell go env GOARCH)
 GOOS ?= $(shell go env GOOS)
@@ -201,7 +207,7 @@ build-docs: update-geps api-ref-docs
 
 .PHONY: verify-docs
 verify-docs: build-docs
-	docker run -it --rm -w /input -v ${PWD}:/input $(DOCS_VERIFY_CONTAINER_IMAGE) --root-dir /input/site --exclude-path "overrides/partials/.*\.html" --exclude ".*" --include "k8s.io" --include "kubernetes.io" --include "github.com/kubernetes" /input/site/**/*.html
+	docker run --init --rm -w /input -v ${PWD}:/input $(DOCS_VERIFY_CONTAINER_IMAGE) --root-dir /input/site --exclude-path "overrides/partials/.*\.html" --exclude ".*" --include "k8s.io" --include "kubernetes.io" --accept 200 --max-concurrency 10 --include-fragments --cache $(VALIDATE_DOCS_EXTRA_ARGS) /input/site/**/*.html
 
 .PHONY: build-docs-netlify
 build-docs-netlify: update-geps api-ref-docs
