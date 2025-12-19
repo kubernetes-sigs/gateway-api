@@ -84,34 +84,33 @@ var TLSRouteTerminateSimpleSameNamespace = suite.ConformanceTest{
 				ServerName: serverStr,
 				MinVersion: tls.VersionTLS13,
 			})
-			opts.SetConnectRetry(true)
 
-			waitCh := make(chan struct{})
+			msgChan := make(chan string)
 
 			topic := "test/tlsroute-terminate"
-			opts.OnConnect = func(c mqtt.Client) {
-				t.Log("Connected to MQTT broker")
+			message := "Hello TLSRoute Terminate MQTT!"
 
-				if token := c.Subscribe(topic, 0, func(_ mqtt.Client, msg mqtt.Message) {
-					t.Logf("Received message: %s\n", string(msg.Payload()))
-					close(waitCh)
-				}); token.WaitTimeout(suite.TimeoutConfig.RequestTimeout) && token.Error() != nil {
-					t.Fatalf("Failed to subscribe: %v", token.Error())
-				}
-
-				t.Log("Subscribed, publishing test message...")
-				if token := c.Publish(topic, 0, false, "Hello TLSRoute Terminate MQTT!"); token.WaitTimeout(suite.TimeoutConfig.RequestTimeout) && token.Error() != nil {
-					t.Fatalf("Failed to publish: %v", token.Error())
-				}
+			c := mqtt.NewClient(opts)
+			if token := c.Connect(); !token.WaitTimeout(suite.TimeoutConfig.DefaultTestTimeout) || token.Error() != nil {
+				t.Fatalf("Connection failed or timed out: %v", token.Error())
 			}
 
-			client := mqtt.NewClient(opts)
-			if token := client.Connect(); token.WaitTimeout(suite.TimeoutConfig.RequestTimeout) && token.Error() != nil {
-				t.Fatalf("Connection failed: %v", token.Error())
+			if token := c.Publish(topic, 0, true, message); !token.WaitTimeout(suite.TimeoutConfig.DefaultTestTimeout) || token.Error() != nil {
+				t.Fatalf("Failed to publish or timeout: %v", token.Error())
+			}
+
+			if token := c.Subscribe(topic, 0, func(_ mqtt.Client, msg mqtt.Message) {
+				t.Logf("Received message: %s\n", string(msg.Payload()))
+				msgChan <- string(msg.Payload())
+			}); token.WaitTimeout(suite.TimeoutConfig.DefaultTestTimeout) && token.Error() != nil {
+				t.Fatalf("Failed to subscribe or timeout: %v", token.Error())
 			}
 
 			select {
-			case <-waitCh:
+			case msg := <-msgChan:
+				if msg != message {
+					t.Fatalf("Expected message %s does not match the received message %s", msg, message)
+				}
 				t.Log("Round-trip test succeeded")
 			case <-time.After(suite.TimeoutConfig.DefaultTestTimeout):
 				t.Fatal("Timed out waiting for message")
