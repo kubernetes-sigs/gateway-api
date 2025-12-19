@@ -417,9 +417,9 @@ This may be a reasonable approach for configuring broad default retry policies, 
 
 ### HTTPRoute filter
 
-Implementing a `requestRetryPolicy` [HTTPRouteFilter](../../reference/spec.md#gateway.networking.k8s.io/v1.HTTPRouteFilter) type is likely a reasonable alternative implementation (with the downside of slightly deeping nesting and more complex structural configuration) that was not fully explored.
+Implementing a `requestRetryPolicy` [HTTPRouteFilter](../../reference/spec.md#httproutefilter) type is likely a reasonable alternative implementation (with the downside of slightly deeping nesting and more complex structural configuration) that was not fully explored.
 
-Adding a new field to HTTPRouteRule instead is proposed for parity with the similar and intersecting configuration of [HTTPRouteTimeouts](../../reference/spec.md#gateway.networking.k8s.io/v1.HTTPRouteTimeouts).
+Adding a new field to HTTPRouteRule instead is proposed for parity with the similar and intersecting configuration of [HTTPRouteTimeouts](../../reference/spec.md#httproutetimeouts).
 
 ## Other considerations
 

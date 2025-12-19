@@ -216,9 +216,9 @@ Ana has easy access to this information, and that it's clear enough for her to
 understand, is clearly important for many more reasons than just default
 Gateways.
 
-[Ana]: https://gateway-api.sigs.k8s.io/concepts/roles-and-personas/#ana
-[Chihiro]: https://gateway-api.sigs.k8s.io/concepts/roles-and-personas/#chihiro
-[Ian]: https://gateway-api.sigs.k8s.io/concepts/roles-and-personas/#ian
+[Ana]: ../../concepts/roles-and-personas/#ana
+[Chihiro]: ../../concepts/roles-and-personas/#chihiro
+[Ian]: ../../concepts/roles-and-personas/#ian
 
 ## API
 

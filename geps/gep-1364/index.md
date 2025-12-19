@@ -456,4 +456,4 @@ needs updating.)
 [1362]: https://github.com/kubernetes-sigs/gateway-api/issues/1362
 
 [typstatus]: https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#typical-status-properties
-[httpreqredirect]: ../../reference/spec.md#gateway.networking.k8s.io%2fv1beta1.HTTPRequestRedirectFilter
+[httpreqredirect]: ../../reference/spec.md#httprequestredirectfilter

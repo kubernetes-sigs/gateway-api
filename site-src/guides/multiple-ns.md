@@ -155,7 +155,7 @@ Gateway that these Routes want to attach to.
 
 After these three Routes are deployed, they will all be attached to the
 `shared-gateway` Gateway. The Gateway merges these Routes into a single flat
-list of routing rules. [Routing precedence](../reference/spec.md#gateway.networking.k8s.io/v1.HTTPRouteRule)
+list of routing rules. [Routing precedence](../reference/spec.md#httprouterule)
 between these routing rules is determined by most specific match and
 conflicts are handled according to [conflict
 resolution](api-design.md#conflicts). This provides predictable and

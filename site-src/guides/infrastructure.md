@@ -40,6 +40,6 @@ spec:
       linkerd.io/inject: enabled
 ```
 
-[infrastructure]: ../reference/spec.md#gateway.networking.k8s.io/v1.GatewayInfrastructure
+[infrastructure]: ../reference/spec.md#gatewayinfrastructure
 [service]: https://kubernetes.io/docs/concepts/services-networking/service/
 [deployment]: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
