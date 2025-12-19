@@ -78,6 +78,13 @@ type HTTPRegexModifier struct {
 }
 ```
 
+## New Fields relationship
+
+The relationship between new fields shluld stay invartiant across different underlying implementaions and dataplanes. The syntax, however, may vary depending on the implementation.
+
+* `pathPattern` The regular expression used to find portions of a string (hereafter called the “subject string”) that should be replaced. When a new string is produced during the substitution operation, the new string is initially the same as the subject string, but then all matches in the subject string are replaced by the substitution string. If replacing all matches isn’t desired, regular expression anchors can be used to ensure a single match, so as to replace just one occurrence of a pattern. Capture groups can be used in the pattern to extract portions of the subject string, and then referenced in the substitution string.
+* `pathSubstitution` The string that should be substituted into matching portions of the subject string during a substitution operation to produce a new string. Capture groups in the pattern can be referenced in the substitution string. Note, however, that the syntax for referring to capture groups is implementation specific.
+
 ### Example
 
 ```
@@ -115,8 +122,11 @@ These tests will excersie the regex-based path rewrites.
 
 #### Example test scenarios
 
-A HTTPRoute with a URLRewrite filter should rewrite the path according to
-the specification, routing traffic to the backend.
+A HTTPRoute with a URLRewrite filter should rewrite the path according to the specification, routing traffic to the backend. 
+
+While relationship between pattern and substitution are invariant across implementaitons, the regex syntax is implemntation scpeific.
+
+Here we show examples that use Google's [RE2](https://github.com/google/re2) engine and should work in Envoy's [regex_rewrite](https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/route/v3/route_components.proto#envoy-v3-api-field-config-route-v3-routeaction-regex-rewrite).
 
 * A Regex Modifier with `pathPattern ="^/region/(?<region>[a-z]+)/bucket/(?<storage>[a-zA-Z0-9-]+)/(?<object>[a-z]+)\\.pdf$"` and `pathSubstitution ="\\g<region>/bucket-\\g<storage>/\\g<object>.pdf"` should route requests
   to `/region/eu/bucket/prod-storage/object.pdf` to `/eu/bucket-prod-storage/object.pdf` instead.
