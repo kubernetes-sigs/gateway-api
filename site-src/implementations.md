@@ -79,7 +79,7 @@ other functions (like managing DNS or creating certificates).
 
 !!! info "Compare extended supported features across implementations"
 
-    [View a table to quickly compare supported features of projects](implementations/v1.4.md). These outline Gateway controller implementations that have passed core conformance tests, and focus on extended conformance features that they have implemented.
+    [View a table to quickly compare supported features of projects](implementations/v1.4.md). These outline Gateway controller implementations that have passed core conformance tests, and focus on extended conformance features that they have implemented. These tables will be generated and uploaded to the site once at least 3 implementations have uploaded their conformance reports under the [conformance reports](https://github.com/kubernetes-sigs/gateway-api/tree/main/conformance/reports).
 
 ## Gateway Controller Implementation Status <a name="gateways"></a>
 
