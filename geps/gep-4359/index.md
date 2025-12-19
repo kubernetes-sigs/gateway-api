@@ -9,7 +9,9 @@ Right now Gateway API supports only full path or prefix rewrites, we want to ext
 
 ## Goals
 
-Close the feature gap for Gateway API.
+Close the regex-based path rewrites feature gap for Gateway API, i.e.:
+ * Rewrite the path of a request based on a regular expression, regardless of initial match type
+ * Substitute matching section(s) in the regular expression with predefined values
 
 ## Introduction/Overview
 
@@ -33,7 +35,7 @@ In this proposal we are closing the gap between Gateway API and current capabili
 
 This GEP proposes the following API changes:
 
-* Update google3/third_party/golang/sigs_k8s_io/gateway_api/v/v1/apis/v1/httproute_types.go by adding and new HTTPRegexModifier field
+* Update [httproute_types.go](https://github.com/kubernetes-sigs/gateway-api/blob/main/apis/v1beta1/httproute_types.go) by adding and new `HTTPRegexModifier` field
 
 ```go
 type HTTPURLRewriteFilter struct {
@@ -61,7 +63,7 @@ type HTTPURLRewriteFilter struct {
 }
 ```
 
-* Update google3/third_party/golang/sigs_k8s_io/gateway_api/v/v1/apis/v1/httproute_types.go by adding a new HTTPRegexModifier struct
+* Update [httproute_types.go](https://github.com/kubernetes-sigs/gateway-api/blob/main/apis/v1beta1/httproute_types.go) by adding a new `HTTPRegexModifier` struct
 
 ```go
 type HTTPRegexModifier struct {
