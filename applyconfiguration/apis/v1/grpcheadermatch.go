@@ -24,10 +24,22 @@ import (
 
 // GRPCHeaderMatchApplyConfiguration represents a declarative configuration of the GRPCHeaderMatch type for use
 // with apply.
+//
+// GRPCHeaderMatch describes how to select a gRPC route by matching gRPC request
+// headers.
 type GRPCHeaderMatchApplyConfiguration struct {
-	Type  *apisv1.GRPCHeaderMatchType `json:"type,omitempty"`
-	Name  *apisv1.GRPCHeaderName      `json:"name,omitempty"`
-	Value *string                     `json:"value,omitempty"`
+	// Type specifies how to match against the value of the header.
+	Type *apisv1.GRPCHeaderMatchType `json:"type,omitempty"`
+	// Name is the name of the gRPC Header to be matched.
+	//
+	// If multiple entries specify equivalent header names, only the first
+	// entry with an equivalent name MUST be considered for a match. Subsequent
+	// entries with an equivalent header name MUST be ignored. Due to the
+	// case-insensitivity of header names, "foo" and "Foo" are considered
+	// equivalent.
+	Name *apisv1.GRPCHeaderName `json:"name,omitempty"`
+	// Value is the value of the gRPC Header to be matched.
+	Value *string `json:"value,omitempty"`
 }
 
 // GRPCHeaderMatchApplyConfiguration constructs a declarative configuration of the GRPCHeaderMatch type for use with

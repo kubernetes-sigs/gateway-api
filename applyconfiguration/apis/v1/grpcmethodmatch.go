@@ -24,10 +24,29 @@ import (
 
 // GRPCMethodMatchApplyConfiguration represents a declarative configuration of the GRPCMethodMatch type for use
 // with apply.
+//
+// GRPCMethodMatch describes how to select a gRPC route by matching the gRPC
+// request service and/or method.
+//
+// At least one of Service and Method MUST be a non-empty string.
 type GRPCMethodMatchApplyConfiguration struct {
-	Type    *apisv1.GRPCMethodMatchType `json:"type,omitempty"`
-	Service *string                     `json:"service,omitempty"`
-	Method  *string                     `json:"method,omitempty"`
+	// Type specifies how to match against the service and/or method.
+	// Support: Core (Exact with service and method specified)
+	//
+	// Support: Implementation-specific (Exact with method specified but no service specified)
+	//
+	// Support: Implementation-specific (RegularExpression)
+	Type *apisv1.GRPCMethodMatchType `json:"type,omitempty"`
+	// Value of the service to match against. If left empty or omitted, will
+	// match any service.
+	//
+	// At least one of Service and Method MUST be a non-empty string.
+	Service *string `json:"service,omitempty"`
+	// Value of the method to match against. If left empty or omitted, will
+	// match all services.
+	//
+	// At least one of Service and Method MUST be a non-empty string.
+	Method *string `json:"method,omitempty"`
 }
 
 // GRPCMethodMatchApplyConfiguration constructs a declarative configuration of the GRPCMethodMatch type for use with

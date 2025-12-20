@@ -30,11 +30,18 @@ import (
 
 // HTTPRouteApplyConfiguration represents a declarative configuration of the HTTPRoute type for use
 // with apply.
+//
+// HTTPRoute provides a way to route HTTP requests. This includes the capability
+// to match requests by hostname, path, header, or query param. Filters can be
+// used to specify additional processing steps. Backends specify where matching
+// requests should be routed.
 type HTTPRouteApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
-	Spec                             *apisv1.HTTPRouteSpecApplyConfiguration   `json:"spec,omitempty"`
-	Status                           *apisv1.HTTPRouteStatusApplyConfiguration `json:"status,omitempty"`
+	// Spec defines the desired state of HTTPRoute.
+	Spec *apisv1.HTTPRouteSpecApplyConfiguration `json:"spec,omitempty"`
+	// Status defines the current state of HTTPRoute.
+	Status *apisv1.HTTPRouteStatusApplyConfiguration `json:"status,omitempty"`
 }
 
 // HTTPRoute constructs a declarative configuration of the HTTPRoute type for use with
@@ -48,29 +55,14 @@ func HTTPRoute(name, namespace string) *HTTPRouteApplyConfiguration {
 	return b
 }
 
-// ExtractHTTPRoute extracts the applied configuration owned by fieldManager from
-// hTTPRoute. If no managedFields are found in hTTPRoute for fieldManager, a
-// HTTPRouteApplyConfiguration is returned with only the Name, Namespace (if applicable),
-// APIVersion and Kind populated. It is possible that no managed fields were found for because other
-// field managers have taken ownership of all the fields previously owned by fieldManager, or because
-// the fieldManager never owned fields any fields.
+// ExtractHTTPRouteFrom extracts the applied configuration owned by fieldManager from
+// hTTPRoute for the specified subresource. Pass an empty string for subresource to extract
+// the main resource. Common subresources include "status", "scale", etc.
 // hTTPRoute must be a unmodified HTTPRoute API object that was retrieved from the Kubernetes API.
-// ExtractHTTPRoute provides a way to perform a extract/modify-in-place/apply workflow.
+// ExtractHTTPRouteFrom provides a way to perform a extract/modify-in-place/apply workflow.
 // Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
 // applied if another fieldManager has updated or force applied any of the previously applied fields.
-// Experimental!
-func ExtractHTTPRoute(hTTPRoute *apisv1beta1.HTTPRoute, fieldManager string) (*HTTPRouteApplyConfiguration, error) {
-	return extractHTTPRoute(hTTPRoute, fieldManager, "")
-}
-
-// ExtractHTTPRouteStatus is the same as ExtractHTTPRoute except
-// that it extracts the status subresource applied configuration.
-// Experimental!
-func ExtractHTTPRouteStatus(hTTPRoute *apisv1beta1.HTTPRoute, fieldManager string) (*HTTPRouteApplyConfiguration, error) {
-	return extractHTTPRoute(hTTPRoute, fieldManager, "status")
-}
-
-func extractHTTPRoute(hTTPRoute *apisv1beta1.HTTPRoute, fieldManager string, subresource string) (*HTTPRouteApplyConfiguration, error) {
+func ExtractHTTPRouteFrom(hTTPRoute *apisv1beta1.HTTPRoute, fieldManager string, subresource string) (*HTTPRouteApplyConfiguration, error) {
 	b := &HTTPRouteApplyConfiguration{}
 	err := managedfields.ExtractInto(hTTPRoute, internal.Parser().Type("io.k8s.sigs.gateway-api.apis.v1beta1.HTTPRoute"), fieldManager, b, subresource)
 	if err != nil {
@@ -83,6 +75,27 @@ func extractHTTPRoute(hTTPRoute *apisv1beta1.HTTPRoute, fieldManager string, sub
 	b.WithAPIVersion("gateway.networking.k8s.io/v1beta1")
 	return b, nil
 }
+
+// ExtractHTTPRoute extracts the applied configuration owned by fieldManager from
+// hTTPRoute. If no managedFields are found in hTTPRoute for fieldManager, a
+// HTTPRouteApplyConfiguration is returned with only the Name, Namespace (if applicable),
+// APIVersion and Kind populated. It is possible that no managed fields were found for because other
+// field managers have taken ownership of all the fields previously owned by fieldManager, or because
+// the fieldManager never owned fields any fields.
+// hTTPRoute must be a unmodified HTTPRoute API object that was retrieved from the Kubernetes API.
+// ExtractHTTPRoute provides a way to perform a extract/modify-in-place/apply workflow.
+// Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
+// applied if another fieldManager has updated or force applied any of the previously applied fields.
+func ExtractHTTPRoute(hTTPRoute *apisv1beta1.HTTPRoute, fieldManager string) (*HTTPRouteApplyConfiguration, error) {
+	return ExtractHTTPRouteFrom(hTTPRoute, fieldManager, "")
+}
+
+// ExtractHTTPRouteStatus extracts the applied configuration owned by fieldManager from
+// hTTPRoute for the status subresource.
+func ExtractHTTPRouteStatus(hTTPRoute *apisv1beta1.HTTPRoute, fieldManager string) (*HTTPRouteApplyConfiguration, error) {
+	return ExtractHTTPRouteFrom(hTTPRoute, fieldManager, "status")
+}
+
 func (b HTTPRouteApplyConfiguration) IsApplyConfiguration() {}
 
 // WithKind sets the Kind field in the declarative configuration to the given value

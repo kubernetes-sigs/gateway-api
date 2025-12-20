@@ -20,10 +20,46 @@ package v1
 
 // HTTPRequestMirrorFilterApplyConfiguration represents a declarative configuration of the HTTPRequestMirrorFilter type for use
 // with apply.
+//
+// HTTPRequestMirrorFilter defines configuration for the RequestMirror filter.
 type HTTPRequestMirrorFilterApplyConfiguration struct {
+	// BackendRef references a resource where mirrored requests are sent.
+	//
+	// Mirrored requests must be sent only to a single destination endpoint
+	// within this BackendRef, irrespective of how many endpoints are present
+	// within this BackendRef.
+	//
+	// If the referent cannot be found, this BackendRef is invalid and must be
+	// dropped from the Gateway. The controller must ensure the "ResolvedRefs"
+	// condition on the Route status is set to `status: False` and not configure
+	// this backend in the underlying implementation.
+	//
+	// If there is a cross-namespace reference to an *existing* object
+	// that is not allowed by a ReferenceGrant, the controller must ensure the
+	// "ResolvedRefs"  condition on the Route is set to `status: False`,
+	// with the "RefNotPermitted" reason and not configure this backend in the
+	// underlying implementation.
+	//
+	// In either error case, the Message of the `ResolvedRefs` Condition
+	// should be used to provide more detail about the problem.
+	//
+	// Support: Extended for Kubernetes Service
+	//
+	// Support: Implementation-specific for any other resource
 	BackendRef *BackendObjectReferenceApplyConfiguration `json:"backendRef,omitempty"`
-	Percent    *int32                                    `json:"percent,omitempty"`
-	Fraction   *FractionApplyConfiguration               `json:"fraction,omitempty"`
+	// Percent represents the percentage of requests that should be
+	// mirrored to BackendRef. Its minimum value is 0 (indicating 0% of
+	// requests) and its maximum value is 100 (indicating 100% of requests).
+	//
+	// Only one of Fraction or Percent may be specified. If neither field
+	// is specified, 100% of requests will be mirrored.
+	Percent *int32 `json:"percent,omitempty"`
+	// Fraction represents the fraction of requests that should be
+	// mirrored to BackendRef.
+	//
+	// Only one of Fraction or Percent may be specified. If neither field
+	// is specified, 100% of requests will be mirrored.
+	Fraction *FractionApplyConfiguration `json:"fraction,omitempty"`
 }
 
 // HTTPRequestMirrorFilterApplyConfiguration constructs a declarative configuration of the HTTPRequestMirrorFilter type for use with

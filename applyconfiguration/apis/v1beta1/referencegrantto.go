@@ -24,10 +24,26 @@ import (
 
 // ReferenceGrantToApplyConfiguration represents a declarative configuration of the ReferenceGrantTo type for use
 // with apply.
+//
+// ReferenceGrantTo describes what Kinds are allowed as targets of the
+// references.
 type ReferenceGrantToApplyConfiguration struct {
-	Group *v1.Group      `json:"group,omitempty"`
-	Kind  *v1.Kind       `json:"kind,omitempty"`
-	Name  *v1.ObjectName `json:"name,omitempty"`
+	// Group is the group of the referent.
+	// When empty, the Kubernetes core API group is inferred.
+	//
+	// Support: Core
+	Group *v1.Group `json:"group,omitempty"`
+	// Kind is the kind of the referent. Although implementations may support
+	// additional resources, the following types are part of the "Core"
+	// support level for this field:
+	//
+	// * Secret when used to permit a SecretObjectReference
+	// * Service when used to permit a BackendObjectReference
+	Kind *v1.Kind `json:"kind,omitempty"`
+	// Name is the name of the referent. When unspecified, this policy
+	// refers to all resources of the specified Group and Kind in the local
+	// namespace.
+	Name *v1.ObjectName `json:"name,omitempty"`
 }
 
 // ReferenceGrantToApplyConfiguration constructs a declarative configuration of the ReferenceGrantTo type for use with

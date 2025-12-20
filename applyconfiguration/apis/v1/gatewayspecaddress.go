@@ -24,9 +24,19 @@ import (
 
 // GatewaySpecAddressApplyConfiguration represents a declarative configuration of the GatewaySpecAddress type for use
 // with apply.
+//
+// GatewaySpecAddress describes an address that can be bound to a Gateway.
 type GatewaySpecAddressApplyConfiguration struct {
-	Type  *apisv1.AddressType `json:"type,omitempty"`
-	Value *string             `json:"value,omitempty"`
+	// Type of the address.
+	Type *apisv1.AddressType `json:"type,omitempty"`
+	// When a value is unspecified, an implementation SHOULD automatically
+	// assign an address matching the requested type if possible.
+	//
+	// If an implementation does not support an empty value, they MUST set the
+	// "Programmed" condition in status to False with a reason of "AddressNotAssigned".
+	//
+	// Examples: `1.2.3.4`, `128::1`, `my-ip-address`.
+	Value *string `json:"value,omitempty"`
 }
 
 // GatewaySpecAddressApplyConfiguration constructs a declarative configuration of the GatewaySpecAddress type for use with

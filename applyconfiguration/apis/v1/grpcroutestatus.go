@@ -20,6 +20,8 @@ package v1
 
 // GRPCRouteStatusApplyConfiguration represents a declarative configuration of the GRPCRouteStatus type for use
 // with apply.
+//
+// GRPCRouteStatus defines the observed state of GRPCRoute.
 type GRPCRouteStatusApplyConfiguration struct {
 	RouteStatusApplyConfiguration `json:",inline"`
 }

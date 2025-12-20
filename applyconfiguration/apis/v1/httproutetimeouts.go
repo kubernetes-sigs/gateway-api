@@ -24,8 +24,52 @@ import (
 
 // HTTPRouteTimeoutsApplyConfiguration represents a declarative configuration of the HTTPRouteTimeouts type for use
 // with apply.
+//
+// HTTPRouteTimeouts defines timeouts that can be configured for an HTTPRoute.
+// Timeout values are represented with Gateway API Duration formatting.
 type HTTPRouteTimeoutsApplyConfiguration struct {
-	Request        *apisv1.Duration `json:"request,omitempty"`
+	// Request specifies the maximum duration for a gateway to respond to an HTTP request.
+	// If the gateway has not been able to respond before this deadline is met, the gateway
+	// MUST return a timeout error.
+	//
+	// For example, setting the `rules.timeouts.request` field to the value `10s` in an
+	// `HTTPRoute` will cause a timeout if a client request is taking longer than 10 seconds
+	// to complete.
+	//
+	// Setting a timeout to the zero duration (e.g. "0s") SHOULD disable the timeout
+	// completely. Implementations that cannot completely disable the timeout MUST
+	// instead interpret the zero duration as the longest possible value to which
+	// the timeout can be set.
+	//
+	// This timeout is intended to cover as close to the whole request-response transaction
+	// as possible although an implementation MAY choose to start the timeout after the entire
+	// request stream has been received instead of immediately after the transaction is
+	// initiated by the client.
+	//
+	// The value of Request is a Gateway API Duration string as defined by GEP-2257. When this
+	// field is unspecified, request timeout behavior is implementation-specific.
+	//
+	// Support: Extended
+	Request *apisv1.Duration `json:"request,omitempty"`
+	// BackendRequest specifies a timeout for an individual request from the gateway
+	// to a backend. This covers the time from when the request first starts being
+	// sent from the gateway to when the full response has been received from the backend.
+	//
+	// Setting a timeout to the zero duration (e.g. "0s") SHOULD disable the timeout
+	// completely. Implementations that cannot completely disable the timeout MUST
+	// instead interpret the zero duration as the longest possible value to which
+	// the timeout can be set.
+	//
+	// An entire client HTTP transaction with a gateway, covered by the Request timeout,
+	// may result in more than one call from the gateway to the destination backend,
+	// for example, if automatic retries are supported.
+	//
+	// The value of BackendRequest must be a Gateway API Duration string as defined by
+	// GEP-2257.  When this field is unspecified, its behavior is implementation-specific;
+	// when specified, the value of BackendRequest must be no more than the value of the
+	// Request timeout (since the Request timeout encompasses the BackendRequest timeout).
+	//
+	// Support: Extended
 	BackendRequest *apisv1.Duration `json:"backendRequest,omitempty"`
 }
 

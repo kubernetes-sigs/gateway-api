@@ -24,10 +24,19 @@ import (
 
 // ParametersReferenceApplyConfiguration represents a declarative configuration of the ParametersReference type for use
 // with apply.
+//
+// ParametersReference identifies an API object containing controller-specific
+// configuration resource within the cluster.
 type ParametersReferenceApplyConfiguration struct {
-	Group     *apisv1.Group     `json:"group,omitempty"`
-	Kind      *apisv1.Kind      `json:"kind,omitempty"`
-	Name      *string           `json:"name,omitempty"`
+	// Group is the group of the referent.
+	Group *apisv1.Group `json:"group,omitempty"`
+	// Kind is kind of the referent.
+	Kind *apisv1.Kind `json:"kind,omitempty"`
+	// Name is the name of the referent.
+	Name *string `json:"name,omitempty"`
+	// Namespace is the namespace of the referent.
+	// This field is required when referring to a Namespace-scoped resource and
+	// MUST be unset when referring to a Cluster-scoped resource.
 	Namespace *apisv1.Namespace `json:"namespace,omitempty"`
 }
 

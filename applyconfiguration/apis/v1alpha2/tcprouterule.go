@@ -25,8 +25,27 @@ import (
 
 // TCPRouteRuleApplyConfiguration represents a declarative configuration of the TCPRouteRule type for use
 // with apply.
+//
+// TCPRouteRule is the configuration for a given rule.
 type TCPRouteRuleApplyConfiguration struct {
-	Name        *v1.SectionName                       `json:"name,omitempty"`
+	// Name is the name of the route rule. This name MUST be unique within a Route if it is set.
+	//
+	// Support: Extended
+	Name *v1.SectionName `json:"name,omitempty"`
+	// BackendRefs defines the backend(s) where matching requests should be
+	// sent. If unspecified or invalid (refers to a nonexistent resource or a
+	// Service with no endpoints), the underlying implementation MUST actively
+	// reject connection attempts to this backend. Connection rejections must
+	// respect weight; if an invalid backend is requested to have 80% of
+	// connections, then 80% of connections must be rejected instead.
+	//
+	// Support: Core for Kubernetes Service
+	//
+	// Support: Extended for Kubernetes ServiceImport
+	//
+	// Support: Implementation-specific for any other resource
+	//
+	// Support for weight: Extended
 	BackendRefs []apisv1.BackendRefApplyConfiguration `json:"backendRefs,omitempty"`
 }
 

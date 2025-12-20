@@ -24,12 +24,70 @@ import (
 
 // GRPCRouteFilterApplyConfiguration represents a declarative configuration of the GRPCRouteFilter type for use
 // with apply.
+//
+// GRPCRouteFilter defines processing steps that must be completed during the
+// request or response lifecycle. GRPCRouteFilters are meant as an extension
+// point to express processing that may be done in Gateway implementations. Some
+// examples include request or response modification, implementing
+// authentication strategies, rate-limiting, and traffic shaping. API
+// guarantee/conformance is defined based on the type of the filter.
 type GRPCRouteFilterApplyConfiguration struct {
-	Type                   *apisv1.GRPCRouteFilterType                `json:"type,omitempty"`
-	RequestHeaderModifier  *HTTPHeaderFilterApplyConfiguration        `json:"requestHeaderModifier,omitempty"`
-	ResponseHeaderModifier *HTTPHeaderFilterApplyConfiguration        `json:"responseHeaderModifier,omitempty"`
-	RequestMirror          *HTTPRequestMirrorFilterApplyConfiguration `json:"requestMirror,omitempty"`
-	ExtensionRef           *LocalObjectReferenceApplyConfiguration    `json:"extensionRef,omitempty"`
+	// Type identifies the type of filter to apply. As with other API fields,
+	// types are classified into three conformance levels:
+	//
+	// - Core: Filter types and their corresponding configuration defined by
+	// "Support: Core" in this package, e.g. "RequestHeaderModifier". All
+	// implementations supporting GRPCRoute MUST support core filters.
+	//
+	// - Extended: Filter types and their corresponding configuration defined by
+	// "Support: Extended" in this package, e.g. "RequestMirror". Implementers
+	// are encouraged to support extended filters.
+	//
+	// - Implementation-specific: Filters that are defined and supported by specific vendors.
+	// In the future, filters showing convergence in behavior across multiple
+	// implementations will be considered for inclusion in extended or core
+	// conformance levels. Filter-specific configuration for such filters
+	// is specified using the ExtensionRef field. `Type` MUST be set to
+	// "ExtensionRef" for custom filters.
+	//
+	// Implementers are encouraged to define custom implementation types to
+	// extend the core API with implementation-specific behavior.
+	//
+	// If a reference to a custom filter type cannot be resolved, the filter
+	// MUST NOT be skipped. Instead, requests that would have been processed by
+	// that filter MUST receive a HTTP error response.
+	//
+	// <gateway:experimental:validation:Enum=ResponseHeaderModifier;RequestHeaderModifier;RequestMirror;ExtensionRef>
+	Type *apisv1.GRPCRouteFilterType `json:"type,omitempty"`
+	// RequestHeaderModifier defines a schema for a filter that modifies request
+	// headers.
+	//
+	// Support: Core
+	RequestHeaderModifier *HTTPHeaderFilterApplyConfiguration `json:"requestHeaderModifier,omitempty"`
+	// ResponseHeaderModifier defines a schema for a filter that modifies response
+	// headers.
+	//
+	// Support: Extended
+	ResponseHeaderModifier *HTTPHeaderFilterApplyConfiguration `json:"responseHeaderModifier,omitempty"`
+	// RequestMirror defines a schema for a filter that mirrors requests.
+	// Requests are sent to the specified destination, but responses from
+	// that destination are ignored.
+	//
+	// This filter can be used multiple times within the same rule. Note that
+	// not all implementations will be able to support mirroring to multiple
+	// backends.
+	//
+	// Support: Extended
+	RequestMirror *HTTPRequestMirrorFilterApplyConfiguration `json:"requestMirror,omitempty"`
+	// ExtensionRef is an optional, implementation-specific extension to the
+	// "filter" behavior.  For example, resource "myroutefilter" in group
+	// "networking.example.net"). ExtensionRef MUST NOT be used for core and
+	// extended filters.
+	//
+	// Support: Implementation-specific
+	//
+	// This filter can be used multiple times within the same rule.
+	ExtensionRef *LocalObjectReferenceApplyConfiguration `json:"extensionRef,omitempty"`
 }
 
 // GRPCRouteFilterApplyConfiguration constructs a declarative configuration of the GRPCRouteFilter type for use with

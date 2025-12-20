@@ -24,6 +24,8 @@ import (
 
 // TLSRouteStatusApplyConfiguration represents a declarative configuration of the TLSRouteStatus type for use
 // with apply.
+//
+// TLSRouteStatus defines the observed state of TLSRoute
 type TLSRouteStatusApplyConfiguration struct {
 	v1.RouteStatusApplyConfiguration `json:",inline"`
 }

@@ -25,8 +25,22 @@ import (
 
 // ListenerNamespacesApplyConfiguration represents a declarative configuration of the ListenerNamespaces type for use
 // with apply.
+//
+// ListenerNamespaces indicate which namespaces ListenerSets should be selected from.
 type ListenerNamespacesApplyConfiguration struct {
-	From     *apisv1.FromNamespaces                  `json:"from,omitempty"`
+	// From indicates where ListenerSets can attach to this Gateway. Possible
+	// values are:
+	//
+	// * Same: Only ListenerSets in the same namespace may be attached to this Gateway.
+	// * Selector: ListenerSets in namespaces selected by the selector may be attached to this Gateway.
+	// * All: ListenerSets in all namespaces may be attached to this Gateway.
+	// * None: Only listeners defined in the Gateway's spec are allowed
+	//
+	// While this feature is experimental, the default value None
+	From *apisv1.FromNamespaces `json:"from,omitempty"`
+	// Selector must be specified when From is set to "Selector". In that case,
+	// only ListenerSets in Namespaces matching this Selector will be selected by this
+	// Gateway. This field is ignored for other values of "From".
 	Selector *metav1.LabelSelectorApplyConfiguration `json:"selector,omitempty"`
 }
 

@@ -24,10 +24,55 @@ import (
 
 // BackendTrafficPolicySpecApplyConfiguration represents a declarative configuration of the BackendTrafficPolicySpec type for use
 // with apply.
+//
+// BackendTrafficPolicySpec define the desired state of BackendTrafficPolicy
+// Note: there is no Override or Default policy configuration.
 type BackendTrafficPolicySpecApplyConfiguration struct {
-	TargetRefs         []v1.LocalPolicyTargetReferenceApplyConfiguration `json:"targetRefs,omitempty"`
-	RetryConstraint    *RetryConstraintApplyConfiguration                `json:"retryConstraint,omitempty"`
-	SessionPersistence *v1.SessionPersistenceApplyConfiguration          `json:"sessionPersistence,omitempty"`
+	// TargetRefs identifies API object(s) to apply this policy to.
+	// Currently, Backends (A grouping of like endpoints such as Service,
+	// ServiceImport, or any implementation-specific backendRef) are the only
+	// valid API target references.
+	//
+	// Currently, a TargetRef cannot be scoped to a specific port on a
+	// Service.
+	TargetRefs []v1.LocalPolicyTargetReferenceApplyConfiguration `json:"targetRefs,omitempty"`
+	// RetryConstraint defines the configuration for when to allow or prevent
+	// further retries to a target backend, by dynamically calculating a 'retry
+	// budget'. This budget is calculated based on the percentage of incoming
+	// traffic composed of retries over a given time interval. Once the budget
+	// is exceeded, additional retries will be rejected.
+	//
+	// For example, if the retry budget interval is 10 seconds, there have been
+	// 1000 active requests in the past 10 seconds, and the allowed percentage
+	// of requests that can be retried is 20% (the default), then 200 of those
+	// requests may be composed of retries. Active requests will only be
+	// considered for the duration of the interval when calculating the retry
+	// budget. Retrying the same original request multiple times within the
+	// retry budget interval will lead to each retry being counted towards
+	// calculating the budget.
+	//
+	// Configuring a RetryConstraint in BackendTrafficPolicy is compatible with
+	// HTTPRoute Retry settings for each HTTPRouteRule that targets the same
+	// backend. While the HTTPRouteRule Retry stanza can specify whether a
+	// request will be retried, and the number of retry attempts each client
+	// may perform, RetryConstraint helps prevent cascading failures such as
+	// retry storms during periods of consistent failures.
+	//
+	// After the retry budget has been exceeded, additional retries to the
+	// backend MUST return a 503 response to the client.
+	//
+	// Additional configurations for defining a constraint on retries MAY be
+	// defined in the future.
+	//
+	// Support: Extended
+	//
+	// <gateway:experimental>
+	RetryConstraint *RetryConstraintApplyConfiguration `json:"retryConstraint,omitempty"`
+	// SessionPersistence defines and configures session persistence
+	// for the backend.
+	//
+	// Support: Extended
+	SessionPersistence *v1.SessionPersistenceApplyConfiguration `json:"sessionPersistence,omitempty"`
 }
 
 // BackendTrafficPolicySpecApplyConfiguration constructs a declarative configuration of the BackendTrafficPolicySpec type for use with
