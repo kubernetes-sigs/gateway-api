@@ -20,9 +20,24 @@ package v1alpha1
 
 // RetryConstraintApplyConfiguration represents a declarative configuration of the RetryConstraint type for use
 // with apply.
+//
+// RetryConstraint defines the configuration for when to retry a request.
 type RetryConstraintApplyConfiguration struct {
-	Budget       *BudgetDetailsApplyConfiguration `json:"budget,omitempty"`
-	MinRetryRate *RequestRateApplyConfiguration   `json:"minRetryRate,omitempty"`
+	// Budget holds the details of the retry budget configuration.
+	Budget *BudgetDetailsApplyConfiguration `json:"budget,omitempty"`
+	// MinRetryRate defines the minimum rate of retries that will be allowable
+	// over a specified duration of time.
+	//
+	// The effective overall minimum rate of retries targeting the backend
+	// service may be much higher, as there can be any number of clients which
+	// are applying this setting locally.
+	//
+	// This ensures that requests can still be retried during periods of low
+	// traffic, where the budget for retries may be calculated as a very low
+	// value.
+	//
+	// Support: Extended
+	MinRetryRate *RequestRateApplyConfiguration `json:"minRetryRate,omitempty"`
 }
 
 // RetryConstraintApplyConfiguration constructs a declarative configuration of the RetryConstraint type for use with

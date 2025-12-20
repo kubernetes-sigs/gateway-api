@@ -20,6 +20,8 @@ jobs:
           persist-credentials: false
       - name: Set up Go
         uses: actions/setup-go@4dc6199c7b1a012772edbd06daecab0f50c9053c # tag=v6.1.0
+        with:
+          go-version-file: 'go.work'
       - name: Install Golang CI Lint
         run: go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.7.0
       - name: Build KAL

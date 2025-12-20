@@ -517,15 +517,13 @@ func TestInferGWCSupportedFeatures(t *testing.T) {
 		},
 	}
 	scheme := runtime.NewScheme()
-	scheme.AddKnownTypes(gatewayv1.SchemeGroupVersion, &gatewayv1.GatewayClass{})
+	gatewayv1.Install(scheme)
+	apiextensionsv1.AddToScheme(scheme)
 	fakeClient := fake.NewClientBuilder().
 		WithScheme(scheme).
 		WithObjects(gwc).
 		WithLists(&apiextensionsv1.CustomResourceDefinitionList{}).
 		Build()
-
-	gatewayv1.Install(fakeClient.Scheme())
-	apiextensionsv1.AddToScheme(fakeClient.Scheme())
 
 	for _, tc := range testCases {
 		options := ConformanceOptions{
@@ -629,15 +627,13 @@ func TestXMeshInferSupportedFeatures(t *testing.T) {
 		},
 	}
 	scheme := runtime.NewScheme()
-	scheme.AddKnownTypes(xmeshv1alpha1.SchemeGroupVersion, &xmeshv1alpha1.XMesh{})
+	xmeshv1alpha1.Install(scheme)
+	apiextensionsv1.AddToScheme(scheme)
 	fakeClient := fake.NewClientBuilder().
 		WithScheme(scheme).
 		WithObjects(xmesh).
 		WithLists(&apiextensionsv1.CustomResourceDefinitionList{}).
 		Build()
-
-	xmeshv1alpha1.Install(fakeClient.Scheme())
-	apiextensionsv1.AddToScheme(fakeClient.Scheme())
 
 	for _, tc := range testCases {
 		options := ConformanceOptions{
@@ -693,15 +689,13 @@ func TestGWCPublishedMeshFeatures(t *testing.T) {
 		},
 	}
 	scheme := runtime.NewScheme()
-	scheme.AddKnownTypes(gatewayv1.SchemeGroupVersion, &gatewayv1.GatewayClass{})
+	gatewayv1.Install(scheme)
+	apiextensionsv1.AddToScheme(scheme)
 	fakeClient := fake.NewClientBuilder().
 		WithScheme(scheme).
 		WithObjects(gwc).
 		WithLists(&apiextensionsv1.CustomResourceDefinitionList{}).
 		Build()
-
-	gatewayv1.Install(fakeClient.Scheme())
-	apiextensionsv1.AddToScheme(fakeClient.Scheme())
 
 	options := ConformanceOptions{
 		AllowCRDsMismatch: true,

@@ -20,8 +20,26 @@ package v1
 
 // FrontendTLSConfigApplyConfiguration represents a declarative configuration of the FrontendTLSConfig type for use
 // with apply.
+//
+// FrontendTLSConfig specifies frontend tls configuration for gateway.
 type FrontendTLSConfigApplyConfiguration struct {
-	Default *TLSConfigApplyConfiguration      `json:"default,omitempty"`
+	// Default specifies the default client certificate validation configuration
+	// for all Listeners handling HTTPS traffic, unless a per-port configuration
+	// is defined.
+	//
+	// support: Core
+	//
+	// <gateway:experimental>
+	Default *TLSConfigApplyConfiguration `json:"default,omitempty"`
+	// PerPort specifies tls configuration assigned per port.
+	// Per port configuration is optional. Once set this configuration overrides
+	// the default configuration for all Listeners handling HTTPS traffic
+	// that match this port.
+	// Each override port requires a unique TLS configuration.
+	//
+	// support: Core
+	//
+	// <gateway:experimental>
 	PerPort []TLSPortConfigApplyConfiguration `json:"perPort,omitempty"`
 }
 
