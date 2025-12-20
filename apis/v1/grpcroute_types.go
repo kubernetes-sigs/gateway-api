@@ -308,7 +308,7 @@ type GRPCRouteRule struct {
 //     service: "foo"
 //     headers:
 //   - name: "version"
-//     value "v1"
+//     value: "v1"
 //
 // ```
 type GRPCRouteMatch struct {
