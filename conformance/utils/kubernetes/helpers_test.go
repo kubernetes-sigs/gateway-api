@@ -68,7 +68,7 @@ func TestNewGatewayRef(t *testing.T) {
 			require.IsType(t, GatewayRef{}, ref)
 			if test.listenerNames == nil {
 				require.Len(t, ref.listenerNames, 1)
-				assert.Equal(t, "", string(*ref.listenerNames[0]))
+				assert.Empty(t, string(*ref.listenerNames[0]))
 			} else {
 				require.Len(t, ref.listenerNames, len(test.listenerNames))
 				for i := 0; i < len(ref.listenerNames); i++ {
