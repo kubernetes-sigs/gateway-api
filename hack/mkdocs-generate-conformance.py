@@ -12,6 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+###
+# Note: At least 3 implementations have to upload their report under a version folder in order for the table to be generated
+###
+
 import logging
 from io import StringIO
 from mkdocs import plugins
