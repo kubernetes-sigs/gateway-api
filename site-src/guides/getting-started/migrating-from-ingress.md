@@ -43,7 +43,7 @@ However, the Ingress API has several limitations:
 
 Gateway API addresses those limitations, as the next section will show.
 
-> Read more about the [design goals](../index.md#gateway-api-concepts)
+> Read more about the [design goals](../../index.md#gateway-api-concepts)
 > of Gateway API.
 
 ## Key Differences Between Ingress API and Gateway API
