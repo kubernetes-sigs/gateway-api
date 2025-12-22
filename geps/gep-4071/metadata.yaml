@@ -1,0 +1,10 @@
+apiVersion: internal.gateway.networking.k8s.io/v1alpha1
+kind: GEPDetails
+number: 4071
+name: Implementation Specific usage of BackendTLSPolicy for any kind of service
+status: Provisional
+authors:
+  - rikatz
+extends:
+  - number: 1897
+    name: BackendTLSPolicy - Explicit Backend TLS Connection Configuration
