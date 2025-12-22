@@ -45,6 +45,7 @@ profiles:
       Passed: 21
       Skipped: 0
     supportedFeatures:
+    - BackendTLSPolicy
     - GatewayAddressEmpty
     - GatewayHTTPListenerIsolation
     - GatewayInfrastructurePropagation
@@ -65,6 +66,7 @@ profiles:
     - HTTPRouteResponseHeaderModification
     - HTTPRouteSchemeRedirect
     unsupportedFeatures:
+    - BackendTLSPolicySANValidation
     - HTTPRouteBackendProtocolH2C
     - HTTPRouteBackendRequestHeaderModification
     - HTTPRouteBackendTimeout
