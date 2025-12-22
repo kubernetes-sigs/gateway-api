@@ -14,7 +14,7 @@ relationships:
     - number: 2907
       name: TLS Configuration Placement and Terminology
     - number: 4274
-      name: BackendTLSPolicy - Extend support for TLSRoute
+      name: BackendTLSPolicy Support for TLSRoute
     - number: 4271
       name: TLSRoute/HTTPRoute multiplexing
 references:
