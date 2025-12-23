@@ -19,8 +19,8 @@ cluster, for various reasons which are out of the scope of this GEP. Chihiro
 and Ian want to be able to use these out-of-cluster proxies effectively and
 safely, though they recognize that this may require additional configuration.
 
-[Chihiro]: https://gateway-api.sigs.k8s.io/concepts/roles-and-personas/#chihiro
-[Ian]: https://gateway-api.sigs.k8s.io/concepts/roles-and-personas/#ian
+[Chihiro]: ../../concepts/roles-and-personas.md#chihiro
+[Ian]: ../../concepts/roles-and-personas/#ian
 
 ### Nomenclature and Background
 
@@ -241,7 +241,7 @@ or Mesh resources.
 ## Graduation Criteria
 
 In addition to the [general graduation
-criteria](../concepts/versioning.md#graduation-criteria), this GEP must also
+criteria](/concepts/versioning#graduation-criteria), this GEP must also
 guarantee that **all four** of the problems listed above need resolutions, and
 must have implementation from at least two different Gateways and two
 different meshes.

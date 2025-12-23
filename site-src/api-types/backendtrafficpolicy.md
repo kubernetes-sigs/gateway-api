@@ -86,8 +86,8 @@ backendRef. TargetRefs is a required object reference, specifying a Backend via
 its Name, Kind, and Group. Currently, TargetRefs cannot be scoped to
 specific ports on a service. 
 
-[backendtrafficpolicy]: /references/specx.md#xbackendtrafficpolicy
-[localpolicytargetreference]: /references/spec/#gateway.networking.k8s.io/v1alpha2.LocalPolicyTargetReference
-[retryConstraint]: /references/specx.md#retryconstraint
-[sessionPersistence]: /references/spec/#gateway.networking.k8s.io/v1.SessionPersistence
-[httproute]: /references/spec/#https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1beta1.HTTPRoute
+[backendtrafficpolicy]: /reference/specx/#xbackendtrafficpolicy
+[localpolicytargetreference]: /references/spec/#localpolicytargetreference
+[retryConstraint]: /reference/specx/#retryconstraint
+[sessionPersistence]: /references/spec/#sessionpersistence
+[httproute]: /references/spec/#httproute

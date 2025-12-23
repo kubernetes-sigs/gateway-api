@@ -78,9 +78,14 @@ in Go type definitions. Gateway API CRD generation will only include these
 fields in the experimental set of CRDs.
 
 If experimental fields are removed or renamed, the original field name should be
-removed from the go struct, with a tombstone comment
-([example](https://github.com/kubernetes/kubernetes/blob/707b8b6efd1691b84095c9f995f2c259244e276c/staging/src/k8s.io/api/core/v1/types.go#L4444-L4445))
-ensuring the field name will not be reused.
+removed from the go struct, with a tombstone comment ensuring the field name will not be reused.
+
+Example:
+
+```golang
+// DeprecatedField is tombstoned to show why 16 is reserved protobuf tag.
+// DeprecatedField string `json:"deprecatedField,omitempty" protobuf:"bytes,16,opt,name=deprecatedField"`
+```
 
 ### Deploy the Code
 
@@ -99,7 +104,7 @@ kubectl get crds
 ### Test Manually
 
 Install a [gateway API implementation](../implementations.md) and test out the change. Take a look at some
-[examples](../guides/index.md).
+[examples](/guides/).
 
 ### Verify
 

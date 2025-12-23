@@ -206,7 +206,7 @@ Namespace.
 <!-- source: https://docs.google.com/presentation/d/1neBkFDTZ__vRoDXIWvAcxk2Pb7-evdBT6ykw_frf9QQ/edit?usp=sharing -->
 ![route binding](../images/gateway-route-binding.png)
 
-[Chihiro]:roles-and-personas.md#Chihiro
+[Chihiro]:roles-and-personas.md#chihiro
 
 ### How it Works
 

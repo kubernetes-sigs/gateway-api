@@ -35,7 +35,7 @@ If you are looking to migrate from Kubernetes Ingress, we have guides to help yo
 
 ## Installing a Gateway controller
 
-There are [multiple projects](../implementations.md) that support Gateway API. By
+There are [multiple projects](../../implementations.md) that support Gateway API. By
 installing a Gateway controller in your Kubernetes cluster, you can try out the
 guides above. This will demonstrate that the desired routing configuration is
 actually being implemented by your Gateway resources (and the network
@@ -77,7 +77,7 @@ Note that future releases of the API could include breaking changes to
 experimental resources and fields. For example, any experimental resource or
 field could be removed in a future release. For more information on the
 experimental channel, refer to our [versioning
-documentation](../concepts/versioning.md).
+documentation](../../concepts/versioning.md).
 
 To install the experimental channel, run the following kubectl command:
 
@@ -212,4 +212,4 @@ break anything using these resources.
 ### More on CRD Management
 This guide only provides a high level overview of how to get started with
 Gateway API. For more on the topic of managing Gateway API CRDs, refer to our
-[CRD Management Guide](crd-management.md).
+[CRD Management Guide](../crd-management.md).
