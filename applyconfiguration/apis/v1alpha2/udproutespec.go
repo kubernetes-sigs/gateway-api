@@ -25,9 +25,14 @@ import (
 
 // UDPRouteSpecApplyConfiguration represents a declarative configuration of the UDPRouteSpec type for use
 // with apply.
+//
+// UDPRouteSpec defines the desired state of UDPRoute.
 type UDPRouteSpecApplyConfiguration struct {
 	v1.CommonRouteSpecApplyConfiguration `json:",inline"`
-	Rules                                []UDPRouteRuleApplyConfiguration `json:"rules,omitempty"`
+	// Rules are a list of UDP matchers and actions.
+	//
+	// <gateway:experimental:validation:XValidation:message="Rule name must be unique within the route",rule="self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name) && l1.name == l2.name))">
+	Rules []UDPRouteRuleApplyConfiguration `json:"rules,omitempty"`
 }
 
 // UDPRouteSpecApplyConfiguration constructs a declarative configuration of the UDPRouteSpec type for use with

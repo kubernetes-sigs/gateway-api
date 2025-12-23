@@ -29,11 +29,41 @@ import (
 
 // GRPCRouteApplyConfiguration represents a declarative configuration of the GRPCRoute type for use
 // with apply.
+//
+// GRPCRoute provides a way to route gRPC requests. This includes the capability
+// to match requests by hostname, gRPC service, gRPC method, or HTTP/2 header.
+// Filters can be used to specify additional processing steps. Backends specify
+// where matching requests will be routed.
+//
+// GRPCRoute falls under extended support within the Gateway API. Within the
+// following specification, the word "MUST" indicates that an implementation
+// supporting GRPCRoute must conform to the indicated requirement, but an
+// implementation not supporting this route type need not follow the requirement
+// unless explicitly indicated.
+//
+// Implementations supporting `GRPCRoute` with the `HTTPS` `ProtocolType` MUST
+// accept HTTP/2 connections without an initial upgrade from HTTP/1.1, i.e. via
+// ALPN. If the implementation does not support this, then it MUST set the
+// "Accepted" condition to "False" for the affected listener with a reason of
+// "UnsupportedProtocol".  Implementations MAY also accept HTTP/2 connections
+// with an upgrade from HTTP/1.
+//
+// Implementations supporting `GRPCRoute` with the `HTTP` `ProtocolType` MUST
+// support HTTP/2 over cleartext TCP (h2c,
+// https://www.rfc-editor.org/rfc/rfc7540#section-3.1) without an initial
+// upgrade from HTTP/1.1, i.e. with prior knowledge
+// (https://www.rfc-editor.org/rfc/rfc7540#section-3.4). If the implementation
+// does not support this, then it MUST set the "Accepted" condition to "False"
+// for the affected listener with a reason of "UnsupportedProtocol".
+// Implementations MAY also accept HTTP/2 connections with an upgrade from
+// HTTP/1, i.e. without prior knowledge.
 type GRPCRouteApplyConfiguration struct {
 	metav1.TypeMetaApplyConfiguration    `json:",inline"`
 	*metav1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
-	Spec                                 *GRPCRouteSpecApplyConfiguration   `json:"spec,omitempty"`
-	Status                               *GRPCRouteStatusApplyConfiguration `json:"status,omitempty"`
+	// Spec defines the desired state of GRPCRoute.
+	Spec *GRPCRouteSpecApplyConfiguration `json:"spec,omitempty"`
+	// Status defines the current state of GRPCRoute.
+	Status *GRPCRouteStatusApplyConfiguration `json:"status,omitempty"`
 }
 
 // GRPCRoute constructs a declarative configuration of the GRPCRoute type for use with
@@ -47,29 +77,14 @@ func GRPCRoute(name, namespace string) *GRPCRouteApplyConfiguration {
 	return b
 }
 
-// ExtractGRPCRoute extracts the applied configuration owned by fieldManager from
-// gRPCRoute. If no managedFields are found in gRPCRoute for fieldManager, a
-// GRPCRouteApplyConfiguration is returned with only the Name, Namespace (if applicable),
-// APIVersion and Kind populated. It is possible that no managed fields were found for because other
-// field managers have taken ownership of all the fields previously owned by fieldManager, or because
-// the fieldManager never owned fields any fields.
+// ExtractGRPCRouteFrom extracts the applied configuration owned by fieldManager from
+// gRPCRoute for the specified subresource. Pass an empty string for subresource to extract
+// the main resource. Common subresources include "status", "scale", etc.
 // gRPCRoute must be a unmodified GRPCRoute API object that was retrieved from the Kubernetes API.
-// ExtractGRPCRoute provides a way to perform a extract/modify-in-place/apply workflow.
+// ExtractGRPCRouteFrom provides a way to perform a extract/modify-in-place/apply workflow.
 // Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
 // applied if another fieldManager has updated or force applied any of the previously applied fields.
-// Experimental!
-func ExtractGRPCRoute(gRPCRoute *apisv1.GRPCRoute, fieldManager string) (*GRPCRouteApplyConfiguration, error) {
-	return extractGRPCRoute(gRPCRoute, fieldManager, "")
-}
-
-// ExtractGRPCRouteStatus is the same as ExtractGRPCRoute except
-// that it extracts the status subresource applied configuration.
-// Experimental!
-func ExtractGRPCRouteStatus(gRPCRoute *apisv1.GRPCRoute, fieldManager string) (*GRPCRouteApplyConfiguration, error) {
-	return extractGRPCRoute(gRPCRoute, fieldManager, "status")
-}
-
-func extractGRPCRoute(gRPCRoute *apisv1.GRPCRoute, fieldManager string, subresource string) (*GRPCRouteApplyConfiguration, error) {
+func ExtractGRPCRouteFrom(gRPCRoute *apisv1.GRPCRoute, fieldManager string, subresource string) (*GRPCRouteApplyConfiguration, error) {
 	b := &GRPCRouteApplyConfiguration{}
 	err := managedfields.ExtractInto(gRPCRoute, internal.Parser().Type("io.k8s.sigs.gateway-api.apis.v1.GRPCRoute"), fieldManager, b, subresource)
 	if err != nil {
@@ -82,6 +97,27 @@ func extractGRPCRoute(gRPCRoute *apisv1.GRPCRoute, fieldManager string, subresou
 	b.WithAPIVersion("gateway.networking.k8s.io/v1")
 	return b, nil
 }
+
+// ExtractGRPCRoute extracts the applied configuration owned by fieldManager from
+// gRPCRoute. If no managedFields are found in gRPCRoute for fieldManager, a
+// GRPCRouteApplyConfiguration is returned with only the Name, Namespace (if applicable),
+// APIVersion and Kind populated. It is possible that no managed fields were found for because other
+// field managers have taken ownership of all the fields previously owned by fieldManager, or because
+// the fieldManager never owned fields any fields.
+// gRPCRoute must be a unmodified GRPCRoute API object that was retrieved from the Kubernetes API.
+// ExtractGRPCRoute provides a way to perform a extract/modify-in-place/apply workflow.
+// Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
+// applied if another fieldManager has updated or force applied any of the previously applied fields.
+func ExtractGRPCRoute(gRPCRoute *apisv1.GRPCRoute, fieldManager string) (*GRPCRouteApplyConfiguration, error) {
+	return ExtractGRPCRouteFrom(gRPCRoute, fieldManager, "")
+}
+
+// ExtractGRPCRouteStatus extracts the applied configuration owned by fieldManager from
+// gRPCRoute for the status subresource.
+func ExtractGRPCRouteStatus(gRPCRoute *apisv1.GRPCRoute, fieldManager string) (*GRPCRouteApplyConfiguration, error) {
+	return ExtractGRPCRouteFrom(gRPCRoute, fieldManager, "status")
+}
+
 func (b GRPCRouteApplyConfiguration) IsApplyConfiguration() {}
 
 // WithKind sets the Kind field in the declarative configuration to the given value

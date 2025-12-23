@@ -30,11 +30,17 @@ import (
 
 // XBackendTrafficPolicyApplyConfiguration represents a declarative configuration of the XBackendTrafficPolicy type for use
 // with apply.
+//
+// BackendTrafficPolicy is a Direct Attached Policy.
+// XBackendTrafficPolicy defines the configuration for how traffic to a
+// target backend should be handled.
 type XBackendTrafficPolicyApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
-	Spec                             *BackendTrafficPolicySpecApplyConfiguration `json:"spec,omitempty"`
-	Status                           *apisv1.PolicyStatusApplyConfiguration      `json:"status,omitempty"`
+	// Spec defines the desired state of BackendTrafficPolicy.
+	Spec *BackendTrafficPolicySpecApplyConfiguration `json:"spec,omitempty"`
+	// Status defines the current state of BackendTrafficPolicy.
+	Status *apisv1.PolicyStatusApplyConfiguration `json:"status,omitempty"`
 }
 
 // XBackendTrafficPolicy constructs a declarative configuration of the XBackendTrafficPolicy type for use with
@@ -48,29 +54,14 @@ func XBackendTrafficPolicy(name, namespace string) *XBackendTrafficPolicyApplyCo
 	return b
 }
 
-// ExtractXBackendTrafficPolicy extracts the applied configuration owned by fieldManager from
-// xBackendTrafficPolicy. If no managedFields are found in xBackendTrafficPolicy for fieldManager, a
-// XBackendTrafficPolicyApplyConfiguration is returned with only the Name, Namespace (if applicable),
-// APIVersion and Kind populated. It is possible that no managed fields were found for because other
-// field managers have taken ownership of all the fields previously owned by fieldManager, or because
-// the fieldManager never owned fields any fields.
+// ExtractXBackendTrafficPolicyFrom extracts the applied configuration owned by fieldManager from
+// xBackendTrafficPolicy for the specified subresource. Pass an empty string for subresource to extract
+// the main resource. Common subresources include "status", "scale", etc.
 // xBackendTrafficPolicy must be a unmodified XBackendTrafficPolicy API object that was retrieved from the Kubernetes API.
-// ExtractXBackendTrafficPolicy provides a way to perform a extract/modify-in-place/apply workflow.
+// ExtractXBackendTrafficPolicyFrom provides a way to perform a extract/modify-in-place/apply workflow.
 // Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
 // applied if another fieldManager has updated or force applied any of the previously applied fields.
-// Experimental!
-func ExtractXBackendTrafficPolicy(xBackendTrafficPolicy *apisxv1alpha1.XBackendTrafficPolicy, fieldManager string) (*XBackendTrafficPolicyApplyConfiguration, error) {
-	return extractXBackendTrafficPolicy(xBackendTrafficPolicy, fieldManager, "")
-}
-
-// ExtractXBackendTrafficPolicyStatus is the same as ExtractXBackendTrafficPolicy except
-// that it extracts the status subresource applied configuration.
-// Experimental!
-func ExtractXBackendTrafficPolicyStatus(xBackendTrafficPolicy *apisxv1alpha1.XBackendTrafficPolicy, fieldManager string) (*XBackendTrafficPolicyApplyConfiguration, error) {
-	return extractXBackendTrafficPolicy(xBackendTrafficPolicy, fieldManager, "status")
-}
-
-func extractXBackendTrafficPolicy(xBackendTrafficPolicy *apisxv1alpha1.XBackendTrafficPolicy, fieldManager string, subresource string) (*XBackendTrafficPolicyApplyConfiguration, error) {
+func ExtractXBackendTrafficPolicyFrom(xBackendTrafficPolicy *apisxv1alpha1.XBackendTrafficPolicy, fieldManager string, subresource string) (*XBackendTrafficPolicyApplyConfiguration, error) {
 	b := &XBackendTrafficPolicyApplyConfiguration{}
 	err := managedfields.ExtractInto(xBackendTrafficPolicy, internal.Parser().Type("io.k8s.sigs.gateway-api.apisx.v1alpha1.XBackendTrafficPolicy"), fieldManager, b, subresource)
 	if err != nil {
@@ -83,6 +74,27 @@ func extractXBackendTrafficPolicy(xBackendTrafficPolicy *apisxv1alpha1.XBackendT
 	b.WithAPIVersion("gateway.networking.x-k8s.io/v1alpha1")
 	return b, nil
 }
+
+// ExtractXBackendTrafficPolicy extracts the applied configuration owned by fieldManager from
+// xBackendTrafficPolicy. If no managedFields are found in xBackendTrafficPolicy for fieldManager, a
+// XBackendTrafficPolicyApplyConfiguration is returned with only the Name, Namespace (if applicable),
+// APIVersion and Kind populated. It is possible that no managed fields were found for because other
+// field managers have taken ownership of all the fields previously owned by fieldManager, or because
+// the fieldManager never owned fields any fields.
+// xBackendTrafficPolicy must be a unmodified XBackendTrafficPolicy API object that was retrieved from the Kubernetes API.
+// ExtractXBackendTrafficPolicy provides a way to perform a extract/modify-in-place/apply workflow.
+// Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
+// applied if another fieldManager has updated or force applied any of the previously applied fields.
+func ExtractXBackendTrafficPolicy(xBackendTrafficPolicy *apisxv1alpha1.XBackendTrafficPolicy, fieldManager string) (*XBackendTrafficPolicyApplyConfiguration, error) {
+	return ExtractXBackendTrafficPolicyFrom(xBackendTrafficPolicy, fieldManager, "")
+}
+
+// ExtractXBackendTrafficPolicyStatus extracts the applied configuration owned by fieldManager from
+// xBackendTrafficPolicy for the status subresource.
+func ExtractXBackendTrafficPolicyStatus(xBackendTrafficPolicy *apisxv1alpha1.XBackendTrafficPolicy, fieldManager string) (*XBackendTrafficPolicyApplyConfiguration, error) {
+	return ExtractXBackendTrafficPolicyFrom(xBackendTrafficPolicy, fieldManager, "status")
+}
+
 func (b XBackendTrafficPolicyApplyConfiguration) IsApplyConfiguration() {}
 
 // WithKind sets the Kind field in the declarative configuration to the given value

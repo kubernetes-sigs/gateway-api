@@ -24,10 +24,25 @@ import (
 
 // SubjectAltNameApplyConfiguration represents a declarative configuration of the SubjectAltName type for use
 // with apply.
+//
+// SubjectAltName represents Subject Alternative Name.
 type SubjectAltNameApplyConfiguration struct {
-	Type     *apisv1.SubjectAltNameType `json:"type,omitempty"`
-	Hostname *apisv1.Hostname           `json:"hostname,omitempty"`
-	URI      *apisv1.AbsoluteURI        `json:"uri,omitempty"`
+	// Type determines the format of the Subject Alternative Name. Always required.
+	//
+	// Support: Core
+	Type *apisv1.SubjectAltNameType `json:"type,omitempty"`
+	// Hostname contains Subject Alternative Name specified in DNS name format.
+	// Required when Type is set to Hostname, ignored otherwise.
+	//
+	// Support: Core
+	Hostname *apisv1.Hostname `json:"hostname,omitempty"`
+	// URI contains Subject Alternative Name specified in a full URI format.
+	// It MUST include both a scheme (e.g., "http" or "ftp") and a scheme-specific-part.
+	// Common values include SPIFFE IDs like "spiffe://mycluster.example.com/ns/myns/sa/svc1sa".
+	// Required when Type is set to URI, ignored otherwise.
+	//
+	// Support: Core
+	URI *apisv1.AbsoluteURI `json:"uri,omitempty"`
 }
 
 // SubjectAltNameApplyConfiguration constructs a declarative configuration of the SubjectAltName type for use with

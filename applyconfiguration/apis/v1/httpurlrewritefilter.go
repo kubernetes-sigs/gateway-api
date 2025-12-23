@@ -24,9 +24,22 @@ import (
 
 // HTTPURLRewriteFilterApplyConfiguration represents a declarative configuration of the HTTPURLRewriteFilter type for use
 // with apply.
+//
+// HTTPURLRewriteFilter defines a filter that modifies a request during
+// forwarding. At most one of these filters may be used on a Route rule. This
+// MUST NOT be used on the same Route rule as a HTTPRequestRedirect filter.
+//
+// Support: Extended
 type HTTPURLRewriteFilterApplyConfiguration struct {
-	Hostname *apisv1.PreciseHostname             `json:"hostname,omitempty"`
-	Path     *HTTPPathModifierApplyConfiguration `json:"path,omitempty"`
+	// Hostname is the value to be used to replace the Host header value during
+	// forwarding.
+	//
+	// Support: Extended
+	Hostname *apisv1.PreciseHostname `json:"hostname,omitempty"`
+	// Path defines a path rewrite.
+	//
+	// Support: Extended
+	Path *HTTPPathModifierApplyConfiguration `json:"path,omitempty"`
 }
 
 // HTTPURLRewriteFilterApplyConfiguration constructs a declarative configuration of the HTTPURLRewriteFilter type for use with

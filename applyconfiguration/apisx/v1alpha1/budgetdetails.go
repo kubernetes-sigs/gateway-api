@@ -24,8 +24,20 @@ import (
 
 // BudgetDetailsApplyConfiguration represents a declarative configuration of the BudgetDetails type for use
 // with apply.
+//
+// BudgetDetails specifies the details of the budget configuration, like
+// the percentage of requests in the budget, and the interval between
+// checks.
 type BudgetDetailsApplyConfiguration struct {
-	Percent  *int         `json:"percent,omitempty"`
+	// Percent defines the maximum percentage of active requests that may
+	// be made up of retries.
+	//
+	// Support: Extended
+	Percent *int `json:"percent,omitempty"`
+	// Interval defines the duration in which requests will be considered
+	// for calculating the budget for retries.
+	//
+	// Support: Extended
 	Interval *v1.Duration `json:"interval,omitempty"`
 }
 

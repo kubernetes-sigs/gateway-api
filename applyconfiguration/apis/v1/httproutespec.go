@@ -24,10 +24,68 @@ import (
 
 // HTTPRouteSpecApplyConfiguration represents a declarative configuration of the HTTPRouteSpec type for use
 // with apply.
+//
+// HTTPRouteSpec defines the desired state of HTTPRoute
 type HTTPRouteSpecApplyConfiguration struct {
 	CommonRouteSpecApplyConfiguration `json:",inline"`
-	Hostnames                         []apisv1.Hostname                 `json:"hostnames,omitempty"`
-	Rules                             []HTTPRouteRuleApplyConfiguration `json:"rules,omitempty"`
+	// Hostnames defines a set of hostnames that should match against the HTTP Host
+	// header to select a HTTPRoute used to process the request. Implementations
+	// MUST ignore any port value specified in the HTTP Host header while
+	// performing a match and (absent of any applicable header modification
+	// configuration) MUST forward this header unmodified to the backend.
+	//
+	// Valid values for Hostnames are determined by RFC 1123 definition of a
+	// hostname with 2 notable exceptions:
+	//
+	// 1. IPs are not allowed.
+	// 2. A hostname may be prefixed with a wildcard label (`*.`). The wildcard
+	// label must appear by itself as the first label.
+	//
+	// If a hostname is specified by both the Listener and HTTPRoute, there
+	// must be at least one intersecting hostname for the HTTPRoute to be
+	// attached to the Listener. For example:
+	//
+	// * A Listener with `test.example.com` as the hostname matches HTTPRoutes
+	// that have either not specified any hostnames, or have specified at
+	// least one of `test.example.com` or `*.example.com`.
+	// * A Listener with `*.example.com` as the hostname matches HTTPRoutes
+	// that have either not specified any hostnames or have specified at least
+	// one hostname that matches the Listener hostname. For example,
+	// `*.example.com`, `test.example.com`, and `foo.test.example.com` would
+	// all match. On the other hand, `example.com` and `test.example.net` would
+	// not match.
+	//
+	// Hostnames that are prefixed with a wildcard label (`*.`) are interpreted
+	// as a suffix match. That means that a match for `*.example.com` would match
+	// both `test.example.com`, and `foo.test.example.com`, but not `example.com`.
+	//
+	// If both the Listener and HTTPRoute have specified hostnames, any
+	// HTTPRoute hostnames that do not match the Listener hostname MUST be
+	// ignored. For example, if a Listener specified `*.example.com`, and the
+	// HTTPRoute specified `test.example.com` and `test.example.net`,
+	// `test.example.net` must not be considered for a match.
+	//
+	// If both the Listener and HTTPRoute have specified hostnames, and none
+	// match with the criteria above, then the HTTPRoute is not accepted. The
+	// implementation must raise an 'Accepted' Condition with a status of
+	// `False` in the corresponding RouteParentStatus.
+	//
+	// In the event that multiple HTTPRoutes specify intersecting hostnames (e.g.
+	// overlapping wildcard matching and exact matching hostnames), precedence must
+	// be given to rules from the HTTPRoute with the largest number of:
+	//
+	// * Characters in a matching non-wildcard hostname.
+	// * Characters in a matching hostname.
+	//
+	// If ties exist across multiple Routes, the matching precedence rules for
+	// HTTPRouteMatches takes over.
+	//
+	// Support: Core
+	Hostnames []apisv1.Hostname `json:"hostnames,omitempty"`
+	// Rules are a list of HTTP matchers, filters and actions.
+	//
+	// <gateway:experimental:validation:XValidation:message="Rule name must be unique within the route",rule="self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name) && l1.name == l2.name))">
+	Rules []HTTPRouteRuleApplyConfiguration `json:"rules,omitempty"`
 }
 
 // HTTPRouteSpecApplyConfiguration constructs a declarative configuration of the HTTPRouteSpec type for use with

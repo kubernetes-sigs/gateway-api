@@ -24,8 +24,46 @@ import (
 
 // GatewayClassStatusApplyConfiguration represents a declarative configuration of the GatewayClassStatus type for use
 // with apply.
+//
+// GatewayClassStatus is the current status for the GatewayClass.
 type GatewayClassStatusApplyConfiguration struct {
-	Conditions        []metav1.ConditionApplyConfiguration `json:"conditions,omitempty"`
+	// Conditions is the current status from the controller for
+	// this GatewayClass.
+	//
+	// Controllers should prefer to publish conditions using values
+	// of GatewayClassConditionType for the type of each Condition.
+	//
+	// <gateway:util:excludeFromCRD>
+	// Notes for implementors:
+	//
+	// Conditions are a listType `map`, which means that they function like a
+	// map with a key of the `type` field _in the k8s apiserver_.
+	//
+	// This means that implementations must obey some rules when updating this
+	// section.
+	//
+	// * Implementations MUST perform a read-modify-write cycle on this field
+	// before modifying it. That is, when modifying this field, implementations
+	// must be confident they have fetched the most recent version of this field,
+	// and ensure that changes they make are on that recent version.
+	// * Implementations MUST NOT remove or reorder Conditions that they are not
+	// directly responsible for. For example, if an implementation sees a Condition
+	// with type `special.io/SomeField`, it MUST NOT remove, change or update that
+	// Condition.
+	// * Implementations MUST always _merge_ changes into Conditions of the same Type,
+	// rather than creating more than one Condition of the same Type.
+	// * Implementations MUST always update the `observedGeneration` field of the
+	// Condition to the `metadata.generation` of the Gateway at the time of update creation.
+	// * If the `observedGeneration` of a Condition is _greater than_ the value the
+	// implementation knows about, then it MUST NOT perform the update on that Condition,
+	// but must wait for a future reconciliation and status update. (The assumption is that
+	// the implementation's copy of the object is stale and an update will be re-triggered
+	// if relevant.)
+	//
+	// </gateway:util:excludeFromCRD>
+	Conditions []metav1.ConditionApplyConfiguration `json:"conditions,omitempty"`
+	// SupportedFeatures is the set of features the GatewayClass support.
+	// It MUST be sorted in ascending alphabetical order by the Name key.
 	SupportedFeatures []SupportedFeatureApplyConfiguration `json:"supportedFeatures,omitempty"`
 }
 

@@ -29,11 +29,34 @@ import (
 
 // GatewayClassApplyConfiguration represents a declarative configuration of the GatewayClass type for use
 // with apply.
+//
+// GatewayClass describes a class of Gateways available to the user for creating
+// Gateway resources.
+//
+// It is recommended that this resource be used as a template for Gateways. This
+// means that a Gateway is based on the state of the GatewayClass at the time it
+// was created and changes to the GatewayClass or associated parameters are not
+// propagated down to existing Gateways. This recommendation is intended to
+// limit the blast radius of changes to GatewayClass or associated parameters.
+// If implementations choose to propagate GatewayClass changes to existing
+// Gateways, that MUST be clearly documented by the implementation.
+//
+// Whenever one or more Gateways are using a GatewayClass, implementations SHOULD
+// add the `gateway-exists-finalizer.gateway.networking.k8s.io` finalizer on the
+// associated GatewayClass. This ensures that a GatewayClass associated with a
+// Gateway is not deleted while in use.
+//
+// GatewayClass is a Cluster level resource.
 type GatewayClassApplyConfiguration struct {
 	metav1.TypeMetaApplyConfiguration    `json:",inline"`
 	*metav1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
-	Spec                                 *GatewayClassSpecApplyConfiguration   `json:"spec,omitempty"`
-	Status                               *GatewayClassStatusApplyConfiguration `json:"status,omitempty"`
+	// Spec defines the desired state of GatewayClass.
+	Spec *GatewayClassSpecApplyConfiguration `json:"spec,omitempty"`
+	// Status defines the current state of GatewayClass.
+	//
+	// Implementations MUST populate status on all GatewayClass resources which
+	// specify their controller name.
+	Status *GatewayClassStatusApplyConfiguration `json:"status,omitempty"`
 }
 
 // GatewayClass constructs a declarative configuration of the GatewayClass type for use with
@@ -46,29 +69,14 @@ func GatewayClass(name string) *GatewayClassApplyConfiguration {
 	return b
 }
 
-// ExtractGatewayClass extracts the applied configuration owned by fieldManager from
-// gatewayClass. If no managedFields are found in gatewayClass for fieldManager, a
-// GatewayClassApplyConfiguration is returned with only the Name, Namespace (if applicable),
-// APIVersion and Kind populated. It is possible that no managed fields were found for because other
-// field managers have taken ownership of all the fields previously owned by fieldManager, or because
-// the fieldManager never owned fields any fields.
+// ExtractGatewayClassFrom extracts the applied configuration owned by fieldManager from
+// gatewayClass for the specified subresource. Pass an empty string for subresource to extract
+// the main resource. Common subresources include "status", "scale", etc.
 // gatewayClass must be a unmodified GatewayClass API object that was retrieved from the Kubernetes API.
-// ExtractGatewayClass provides a way to perform a extract/modify-in-place/apply workflow.
+// ExtractGatewayClassFrom provides a way to perform a extract/modify-in-place/apply workflow.
 // Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
 // applied if another fieldManager has updated or force applied any of the previously applied fields.
-// Experimental!
-func ExtractGatewayClass(gatewayClass *apisv1.GatewayClass, fieldManager string) (*GatewayClassApplyConfiguration, error) {
-	return extractGatewayClass(gatewayClass, fieldManager, "")
-}
-
-// ExtractGatewayClassStatus is the same as ExtractGatewayClass except
-// that it extracts the status subresource applied configuration.
-// Experimental!
-func ExtractGatewayClassStatus(gatewayClass *apisv1.GatewayClass, fieldManager string) (*GatewayClassApplyConfiguration, error) {
-	return extractGatewayClass(gatewayClass, fieldManager, "status")
-}
-
-func extractGatewayClass(gatewayClass *apisv1.GatewayClass, fieldManager string, subresource string) (*GatewayClassApplyConfiguration, error) {
+func ExtractGatewayClassFrom(gatewayClass *apisv1.GatewayClass, fieldManager string, subresource string) (*GatewayClassApplyConfiguration, error) {
 	b := &GatewayClassApplyConfiguration{}
 	err := managedfields.ExtractInto(gatewayClass, internal.Parser().Type("io.k8s.sigs.gateway-api.apis.v1.GatewayClass"), fieldManager, b, subresource)
 	if err != nil {
@@ -80,6 +88,27 @@ func extractGatewayClass(gatewayClass *apisv1.GatewayClass, fieldManager string,
 	b.WithAPIVersion("gateway.networking.k8s.io/v1")
 	return b, nil
 }
+
+// ExtractGatewayClass extracts the applied configuration owned by fieldManager from
+// gatewayClass. If no managedFields are found in gatewayClass for fieldManager, a
+// GatewayClassApplyConfiguration is returned with only the Name, Namespace (if applicable),
+// APIVersion and Kind populated. It is possible that no managed fields were found for because other
+// field managers have taken ownership of all the fields previously owned by fieldManager, or because
+// the fieldManager never owned fields any fields.
+// gatewayClass must be a unmodified GatewayClass API object that was retrieved from the Kubernetes API.
+// ExtractGatewayClass provides a way to perform a extract/modify-in-place/apply workflow.
+// Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
+// applied if another fieldManager has updated or force applied any of the previously applied fields.
+func ExtractGatewayClass(gatewayClass *apisv1.GatewayClass, fieldManager string) (*GatewayClassApplyConfiguration, error) {
+	return ExtractGatewayClassFrom(gatewayClass, fieldManager, "")
+}
+
+// ExtractGatewayClassStatus extracts the applied configuration owned by fieldManager from
+// gatewayClass for the status subresource.
+func ExtractGatewayClassStatus(gatewayClass *apisv1.GatewayClass, fieldManager string) (*GatewayClassApplyConfiguration, error) {
+	return ExtractGatewayClassFrom(gatewayClass, fieldManager, "status")
+}
+
 func (b GatewayClassApplyConfiguration) IsApplyConfiguration() {}
 
 // WithKind sets the Kind field in the declarative configuration to the given value

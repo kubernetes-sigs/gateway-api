@@ -24,8 +24,17 @@ import (
 
 // RequestRateApplyConfiguration represents a declarative configuration of the RequestRate type for use
 // with apply.
+//
+// RequestRate expresses a rate of requests over a given period of time.
 type RequestRateApplyConfiguration struct {
-	Count    *int         `json:"count,omitempty"`
+	// Count specifies the number of requests per time interval.
+	//
+	// Support: Extended
+	Count *int `json:"count,omitempty"`
+	// Interval specifies the divisor of the rate of requests, the amount of
+	// time during which the given count of requests occur.
+	//
+	// Support: Extended
 	Interval *v1.Duration `json:"interval,omitempty"`
 }
 

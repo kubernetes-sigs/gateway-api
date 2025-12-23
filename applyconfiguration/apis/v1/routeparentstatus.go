@@ -25,10 +25,77 @@ import (
 
 // RouteParentStatusApplyConfiguration represents a declarative configuration of the RouteParentStatus type for use
 // with apply.
+//
+// RouteParentStatus describes the status of a route with respect to an
+// associated Parent.
 type RouteParentStatusApplyConfiguration struct {
-	ParentRef      *ParentReferenceApplyConfiguration   `json:"parentRef,omitempty"`
-	ControllerName *apisv1.GatewayController            `json:"controllerName,omitempty"`
-	Conditions     []metav1.ConditionApplyConfiguration `json:"conditions,omitempty"`
+	// ParentRef corresponds with a ParentRef in the spec that this
+	// RouteParentStatus struct describes the status of.
+	ParentRef *ParentReferenceApplyConfiguration `json:"parentRef,omitempty"`
+	// ControllerName is a domain/path string that indicates the name of the
+	// controller that wrote this status. This corresponds with the
+	// controllerName field on GatewayClass.
+	//
+	// Example: "example.net/gateway-controller".
+	//
+	// The format of this field is DOMAIN "/" PATH, where DOMAIN and PATH are
+	// valid Kubernetes names
+	// (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names).
+	//
+	// Controllers MUST populate this field when writing status. Controllers should ensure that
+	// entries to status populated with their ControllerName are cleaned up when they are no
+	// longer necessary.
+	ControllerName *apisv1.GatewayController `json:"controllerName,omitempty"`
+	// Conditions describes the status of the route with respect to the Gateway.
+	// Note that the route's availability is also subject to the Gateway's own
+	// status conditions and listener status.
+	//
+	// If the Route's ParentRef specifies an existing Gateway that supports
+	// Routes of this kind AND that Gateway's controller has sufficient access,
+	// then that Gateway's controller MUST set the "Accepted" condition on the
+	// Route, to indicate whether the route has been accepted or rejected by the
+	// Gateway, and why.
+	//
+	// A Route MUST be considered "Accepted" if at least one of the Route's
+	// rules is implemented by the Gateway.
+	//
+	// There are a number of cases where the "Accepted" condition may not be set
+	// due to lack of controller visibility, that includes when:
+	//
+	// * The Route refers to a nonexistent parent.
+	// * The Route is of a type that the controller does not support.
+	// * The Route is in a namespace to which the controller does not have access.
+	//
+	// <gateway:util:excludeFromCRD>
+	//
+	// Notes for implementors:
+	//
+	// Conditions are a listType `map`, which means that they function like a
+	// map with a key of the `type` field _in the k8s apiserver_.
+	//
+	// This means that implementations must obey some rules when updating this
+	// section.
+	//
+	// * Implementations MUST perform a read-modify-write cycle on this field
+	// before modifying it. That is, when modifying this field, implementations
+	// must be confident they have fetched the most recent version of this field,
+	// and ensure that changes they make are on that recent version.
+	// * Implementations MUST NOT remove or reorder Conditions that they are not
+	// directly responsible for. For example, if an implementation sees a Condition
+	// with type `special.io/SomeField`, it MUST NOT remove, change or update that
+	// Condition.
+	// * Implementations MUST always _merge_ changes into Conditions of the same Type,
+	// rather than creating more than one Condition of the same Type.
+	// * Implementations MUST always update the `observedGeneration` field of the
+	// Condition to the `metadata.generation` of the Gateway at the time of update creation.
+	// * If the `observedGeneration` of a Condition is _greater than_ the value the
+	// implementation knows about, then it MUST NOT perform the update on that Condition,
+	// but must wait for a future reconciliation and status update. (The assumption is that
+	// the implementation's copy of the object is stale and an update will be re-triggered
+	// if relevant.)
+	//
+	// </gateway:util:excludeFromCRD>
+	Conditions []metav1.ConditionApplyConfiguration `json:"conditions,omitempty"`
 }
 
 // RouteParentStatusApplyConfiguration constructs a declarative configuration of the RouteParentStatus type for use with

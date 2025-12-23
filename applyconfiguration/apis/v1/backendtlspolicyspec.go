@@ -24,10 +24,65 @@ import (
 
 // BackendTLSPolicySpecApplyConfiguration represents a declarative configuration of the BackendTLSPolicySpec type for use
 // with apply.
+//
+// BackendTLSPolicySpec defines the desired state of BackendTLSPolicy.
+//
+// Support: Extended
 type BackendTLSPolicySpecApplyConfiguration struct {
+	// TargetRefs identifies an API object to apply the policy to.
+	// Only Services have Extended support. Implementations MAY support
+	// additional objects, with Implementation Specific support.
+	// Note that this config applies to the entire referenced resource
+	// by default, but this default may change in the future to provide
+	// a more granular application of the policy.
+	//
+	// TargetRefs must be _distinct_. This means either that:
+	//
+	// * They select different targets. If this is the case, then targetRef
+	// entries are distinct. In terms of fields, this means that the
+	// multi-part key defined by `group`, `kind`, and `name` must
+	// be unique across all targetRef entries in the BackendTLSPolicy.
+	// * They select different sectionNames in the same target.
+	//
+	// When more than one BackendTLSPolicy selects the same target and
+	// sectionName, implementations MUST determine precedence using the
+	// following criteria, continuing on ties:
+	//
+	// * The older policy by creation timestamp takes precedence. For
+	// example, a policy with a creation timestamp of "2021-07-15
+	// 01:02:03" MUST be given precedence over a policy with a
+	// creation timestamp of "2021-07-15 01:02:04".
+	// * The policy appearing first in alphabetical order by {name}.
+	// For example, a policy named `bar` is given precedence over a
+	// policy named `baz`.
+	//
+	// For any BackendTLSPolicy that does not take precedence, the
+	// implementation MUST ensure the `Accepted` Condition is set to
+	// `status: False`, with Reason `Conflicted`.
+	//
+	// Implementations SHOULD NOT support more than one targetRef at this
+	// time. Although the API technically allows for this, the current guidance
+	// for conflict resolution and status handling is lacking. Until that can be
+	// clarified in a future release, the safest approach is to support a single
+	// targetRef.
+	//
+	// Support: Extended for Kubernetes Service
+	//
+	// Support: Implementation-specific for any other resource
 	TargetRefs []LocalPolicyTargetReferenceWithSectionNameApplyConfiguration `json:"targetRefs,omitempty"`
-	Validation *BackendTLSPolicyValidationApplyConfiguration                 `json:"validation,omitempty"`
-	Options    map[apisv1.AnnotationKey]apisv1.AnnotationValue               `json:"options,omitempty"`
+	// Validation contains backend TLS validation configuration.
+	Validation *BackendTLSPolicyValidationApplyConfiguration `json:"validation,omitempty"`
+	// Options are a list of key/value pairs to enable extended TLS
+	// configuration for each implementation. For example, configuring the
+	// minimum TLS version or supported cipher suites.
+	//
+	// A set of common keys MAY be defined by the API in the future. To avoid
+	// any ambiguity, implementation-specific definitions MUST use
+	// domain-prefixed names, such as `example.com/my-custom-option`.
+	// Un-prefixed names are reserved for key names defined by Gateway API.
+	//
+	// Support: Implementation-specific
+	Options map[apisv1.AnnotationKey]apisv1.AnnotationValue `json:"options,omitempty"`
 }
 
 // BackendTLSPolicySpecApplyConfiguration constructs a declarative configuration of the BackendTLSPolicySpec type for use with

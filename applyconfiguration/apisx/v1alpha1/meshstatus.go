@@ -25,8 +25,17 @@ import (
 
 // MeshStatusApplyConfiguration represents a declarative configuration of the MeshStatus type for use
 // with apply.
+//
+// MeshStatus is the current status for the Mesh.
 type MeshStatusApplyConfiguration struct {
-	Conditions        []v1.ConditionApplyConfiguration            `json:"conditions,omitempty"`
+	// Conditions is the current status from the controller for
+	// this Mesh.
+	//
+	// Controllers should prefer to publish conditions using values
+	// of MeshConditionType for the type of each Condition.
+	Conditions []v1.ConditionApplyConfiguration `json:"conditions,omitempty"`
+	// SupportedFeatures is the set of features the Mesh support.
+	// It MUST be sorted in ascending alphabetical order by the Name key.
 	SupportedFeatures []apisv1.SupportedFeatureApplyConfiguration `json:"supportedFeatures,omitempty"`
 }
 

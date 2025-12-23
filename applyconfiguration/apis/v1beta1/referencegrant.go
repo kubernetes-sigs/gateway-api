@@ -29,10 +29,28 @@ import (
 
 // ReferenceGrantApplyConfiguration represents a declarative configuration of the ReferenceGrant type for use
 // with apply.
+//
+// ReferenceGrant identifies kinds of resources in other namespaces that are
+// trusted to reference the specified kinds of resources in the same namespace
+// as the policy.
+//
+// Each ReferenceGrant can be used to represent a unique trust relationship.
+// Additional Reference Grants can be used to add to the set of trusted
+// sources of inbound references for the namespace they are defined within.
+//
+// All cross-namespace references in Gateway API (with the exception of cross-namespace
+// Gateway-route attachment) require a ReferenceGrant.
+//
+// ReferenceGrant is a form of runtime verification allowing users to assert
+// which cross-namespace object references are permitted. Implementations that
+// support ReferenceGrant MUST NOT permit cross-namespace references which have
+// no grant, and MUST respond to the removal of a grant by revoking the access
+// that the grant allowed.
 type ReferenceGrantApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
-	Spec                             *ReferenceGrantSpecApplyConfiguration `json:"spec,omitempty"`
+	// Spec defines the desired state of ReferenceGrant.
+	Spec *ReferenceGrantSpecApplyConfiguration `json:"spec,omitempty"`
 }
 
 // ReferenceGrant constructs a declarative configuration of the ReferenceGrant type for use with
@@ -46,29 +64,14 @@ func ReferenceGrant(name, namespace string) *ReferenceGrantApplyConfiguration {
 	return b
 }
 
-// ExtractReferenceGrant extracts the applied configuration owned by fieldManager from
-// referenceGrant. If no managedFields are found in referenceGrant for fieldManager, a
-// ReferenceGrantApplyConfiguration is returned with only the Name, Namespace (if applicable),
-// APIVersion and Kind populated. It is possible that no managed fields were found for because other
-// field managers have taken ownership of all the fields previously owned by fieldManager, or because
-// the fieldManager never owned fields any fields.
+// ExtractReferenceGrantFrom extracts the applied configuration owned by fieldManager from
+// referenceGrant for the specified subresource. Pass an empty string for subresource to extract
+// the main resource. Common subresources include "status", "scale", etc.
 // referenceGrant must be a unmodified ReferenceGrant API object that was retrieved from the Kubernetes API.
-// ExtractReferenceGrant provides a way to perform a extract/modify-in-place/apply workflow.
+// ExtractReferenceGrantFrom provides a way to perform a extract/modify-in-place/apply workflow.
 // Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
 // applied if another fieldManager has updated or force applied any of the previously applied fields.
-// Experimental!
-func ExtractReferenceGrant(referenceGrant *apisv1beta1.ReferenceGrant, fieldManager string) (*ReferenceGrantApplyConfiguration, error) {
-	return extractReferenceGrant(referenceGrant, fieldManager, "")
-}
-
-// ExtractReferenceGrantStatus is the same as ExtractReferenceGrant except
-// that it extracts the status subresource applied configuration.
-// Experimental!
-func ExtractReferenceGrantStatus(referenceGrant *apisv1beta1.ReferenceGrant, fieldManager string) (*ReferenceGrantApplyConfiguration, error) {
-	return extractReferenceGrant(referenceGrant, fieldManager, "status")
-}
-
-func extractReferenceGrant(referenceGrant *apisv1beta1.ReferenceGrant, fieldManager string, subresource string) (*ReferenceGrantApplyConfiguration, error) {
+func ExtractReferenceGrantFrom(referenceGrant *apisv1beta1.ReferenceGrant, fieldManager string, subresource string) (*ReferenceGrantApplyConfiguration, error) {
 	b := &ReferenceGrantApplyConfiguration{}
 	err := managedfields.ExtractInto(referenceGrant, internal.Parser().Type("io.k8s.sigs.gateway-api.apis.v1beta1.ReferenceGrant"), fieldManager, b, subresource)
 	if err != nil {
@@ -81,6 +84,21 @@ func extractReferenceGrant(referenceGrant *apisv1beta1.ReferenceGrant, fieldMana
 	b.WithAPIVersion("gateway.networking.k8s.io/v1beta1")
 	return b, nil
 }
+
+// ExtractReferenceGrant extracts the applied configuration owned by fieldManager from
+// referenceGrant. If no managedFields are found in referenceGrant for fieldManager, a
+// ReferenceGrantApplyConfiguration is returned with only the Name, Namespace (if applicable),
+// APIVersion and Kind populated. It is possible that no managed fields were found for because other
+// field managers have taken ownership of all the fields previously owned by fieldManager, or because
+// the fieldManager never owned fields any fields.
+// referenceGrant must be a unmodified ReferenceGrant API object that was retrieved from the Kubernetes API.
+// ExtractReferenceGrant provides a way to perform a extract/modify-in-place/apply workflow.
+// Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
+// applied if another fieldManager has updated or force applied any of the previously applied fields.
+func ExtractReferenceGrant(referenceGrant *apisv1beta1.ReferenceGrant, fieldManager string) (*ReferenceGrantApplyConfiguration, error) {
+	return ExtractReferenceGrantFrom(referenceGrant, fieldManager, "")
+}
+
 func (b ReferenceGrantApplyConfiguration) IsApplyConfiguration() {}
 
 // WithKind sets the Kind field in the declarative configuration to the given value

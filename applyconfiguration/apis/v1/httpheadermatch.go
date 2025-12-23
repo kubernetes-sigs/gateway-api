@@ -24,10 +24,44 @@ import (
 
 // HTTPHeaderMatchApplyConfiguration represents a declarative configuration of the HTTPHeaderMatch type for use
 // with apply.
+//
+// HTTPHeaderMatch describes how to select a HTTP route by matching HTTP request
+// headers.
 type HTTPHeaderMatchApplyConfiguration struct {
-	Type  *apisv1.HeaderMatchType `json:"type,omitempty"`
-	Name  *apisv1.HTTPHeaderName  `json:"name,omitempty"`
-	Value *string                 `json:"value,omitempty"`
+	// Type specifies how to match against the value of the header.
+	//
+	// Support: Core (Exact)
+	//
+	// Support: Implementation-specific (RegularExpression)
+	//
+	// Since RegularExpression HeaderMatchType has implementation-specific
+	// conformance, implementations can support POSIX, PCRE or any other dialects
+	// of regular expressions. Please read the implementation's documentation to
+	// determine the supported dialect.
+	Type *apisv1.HeaderMatchType `json:"type,omitempty"`
+	// Name is the name of the HTTP Header to be matched. Name matching MUST be
+	// case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
+	//
+	// If multiple entries specify equivalent header names, only the first
+	// entry with an equivalent name MUST be considered for a match. Subsequent
+	// entries with an equivalent header name MUST be ignored. Due to the
+	// case-insensitivity of header names, "foo" and "Foo" are considered
+	// equivalent.
+	//
+	// When a header is repeated in an HTTP request, it is
+	// implementation-specific behavior as to how this is represented.
+	// Generally, proxies should follow the guidance from the RFC:
+	// https://www.rfc-editor.org/rfc/rfc7230.html#section-3.2.2 regarding
+	// processing a repeated header, with special handling for "Set-Cookie".
+	Name *apisv1.HTTPHeaderName `json:"name,omitempty"`
+	// Value is the value of HTTP Header to be matched.
+	// <gateway:experimental:description>
+	// Must consist of printable US-ASCII characters, optionally separated
+	// by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
+	// </gateway:experimental:description>
+	//
+	// <gateway:experimental:validation:Pattern=`^[!-~]+([\t ]?[!-~]+)*$`>
+	Value *string `json:"value,omitempty"`
 }
 
 // HTTPHeaderMatchApplyConfiguration constructs a declarative configuration of the HTTPHeaderMatch type for use with

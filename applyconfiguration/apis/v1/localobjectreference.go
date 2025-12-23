@@ -24,10 +24,23 @@ import (
 
 // LocalObjectReferenceApplyConfiguration represents a declarative configuration of the LocalObjectReference type for use
 // with apply.
+//
+// LocalObjectReference identifies an API object within the namespace of the
+// referrer.
+// The API object must be valid in the cluster; the Group and Kind must
+// be registered in the cluster for this reference to be valid.
+//
+// References to objects with invalid Group and Kind are not valid, and must
+// be rejected by the implementation, with appropriate Conditions set
+// on the containing object.
 type LocalObjectReferenceApplyConfiguration struct {
-	Group *apisv1.Group      `json:"group,omitempty"`
-	Kind  *apisv1.Kind       `json:"kind,omitempty"`
-	Name  *apisv1.ObjectName `json:"name,omitempty"`
+	// Group is the group of the referent. For example, "gateway.networking.k8s.io".
+	// When unspecified or empty string, core API group is inferred.
+	Group *apisv1.Group `json:"group,omitempty"`
+	// Kind is kind of the referent. For example "HTTPRoute" or "Service".
+	Kind *apisv1.Kind `json:"kind,omitempty"`
+	// Name is the name of the referent.
+	Name *apisv1.ObjectName `json:"name,omitempty"`
 }
 
 // LocalObjectReferenceApplyConfiguration constructs a declarative configuration of the LocalObjectReference type for use with

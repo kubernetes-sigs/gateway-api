@@ -24,10 +24,16 @@ import (
 
 // LocalParametersReferenceApplyConfiguration represents a declarative configuration of the LocalParametersReference type for use
 // with apply.
+//
+// LocalParametersReference identifies an API object containing controller-specific
+// configuration resource within the namespace.
 type LocalParametersReferenceApplyConfiguration struct {
+	// Group is the group of the referent.
 	Group *apisv1.Group `json:"group,omitempty"`
-	Kind  *apisv1.Kind  `json:"kind,omitempty"`
-	Name  *string       `json:"name,omitempty"`
+	// Kind is kind of the referent.
+	Kind *apisv1.Kind `json:"kind,omitempty"`
+	// Name is the name of the referent.
+	Name *string `json:"name,omitempty"`
 }
 
 // LocalParametersReferenceApplyConfiguration constructs a declarative configuration of the LocalParametersReference type for use with

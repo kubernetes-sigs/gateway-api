@@ -24,10 +24,19 @@ import (
 
 // LocalPolicyTargetReferenceApplyConfiguration represents a declarative configuration of the LocalPolicyTargetReference type for use
 // with apply.
+//
+// LocalPolicyTargetReference identifies an API object to apply a direct or
+// inherited policy to. This should be used as part of Policy resources
+// that can target Gateway API resources. For more information on how this
+// policy attachment model works, and a sample Policy resource, refer to
+// the policy attachment documentation for Gateway API.
 type LocalPolicyTargetReferenceApplyConfiguration struct {
-	Group *apisv1.Group      `json:"group,omitempty"`
-	Kind  *apisv1.Kind       `json:"kind,omitempty"`
-	Name  *apisv1.ObjectName `json:"name,omitempty"`
+	// Group is the group of the target resource.
+	Group *apisv1.Group `json:"group,omitempty"`
+	// Kind is kind of the target resource.
+	Kind *apisv1.Kind `json:"kind,omitempty"`
+	// Name is the name of the target resource.
+	Name *apisv1.ObjectName `json:"name,omitempty"`
 }
 
 // LocalPolicyTargetReferenceApplyConfiguration constructs a declarative configuration of the LocalPolicyTargetReference type for use with
