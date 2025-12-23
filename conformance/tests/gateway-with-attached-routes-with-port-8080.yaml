@@ -38,3 +38,19 @@ spec:
   - backendRefs:
     - name: infra-backend-v1
       port: 8080
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: http-route-port-8080-not-accepted
+  namespace: gateway-conformance-infra
+spec:
+  parentRefs:
+    - kind: Gateway
+      name: gateway-with-two-listeners-and-one-attached-route
+      namespace: gateway-conformance-infra
+      sectionName: http
+  rules:
+    - backendRefs:
+        - name: infra-backend-v1
+          port: 8080
