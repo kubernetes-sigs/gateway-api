@@ -117,12 +117,12 @@ func main() {
 			crdRaw := parser.CustomResourceDefinitions[groupKind]
 
 			// Inline version of "addAttribution(&crdRaw)" ...
-			if crdRaw.ObjectMeta.Annotations == nil {
-				crdRaw.ObjectMeta.Annotations = map[string]string{}
+			if crdRaw.Annotations == nil {
+				crdRaw.Annotations = map[string]string{}
 			}
-			crdRaw.ObjectMeta.Annotations[consts.BundleVersionAnnotation] = bundleVersion
-			crdRaw.ObjectMeta.Annotations[consts.ChannelAnnotation] = channel
-			crdRaw.ObjectMeta.Annotations[apiext.KubeAPIApprovedAnnotation] = consts.ApprovalLink
+			crdRaw.Annotations[consts.BundleVersionAnnotation] = bundleVersion
+			crdRaw.Annotations[consts.ChannelAnnotation] = channel
+			crdRaw.Annotations[apiext.KubeAPIApprovedAnnotation] = consts.ApprovalLink
 
 			// Prevent the top level metadata for the CRD to be generated regardless of the intention in the arguments
 			crd.FixTopLevelMetadata(crdRaw)
@@ -160,7 +160,7 @@ func main() {
 
 func gatewayTweaksMap(channel string, props map[string]apiext.JSONSchemaProps) map[string]apiext.JSONSchemaProps {
 	for name := range props {
-		jsonProps, _ := props[name]
+		jsonProps := props[name]
 		p := gatewayTweaks(channel, name, jsonProps)
 		if p == nil {
 			delete(props, name)
