@@ -51,11 +51,12 @@ import (
 // - A ListenerSet can reference secrets/backends in its own namespace without a ReferenceGrant
 //
 // Gateway Integration:
-// - The parent Gateway's status will include an "AttachedListenerSets" condition
-// - This condition will be:
-//   - True: when AllowedListeners is set and at least one child ListenerSet is attached
-//   - False: when AllowedListeners is set but no valid listeners are attached, or when AllowedListeners is not set or false
-//   - Unknown: when no AllowedListeners config is present
+//   - The parent Gateway's status will include "AttachedListenerSets"
+//     which is the count of ListenerSets that have successfully attached to a Gateway
+//     A ListenerSet is successfully attached to a Gateway when all the following conditions are met:
+//   - The ListenerSet is selected by the Gateway's AllowedListeners field
+//   - The ListenerSet has a valid ParentRef selecting the Gateway
+//   - The ListenerSet's status has the condition "Accepted: true"
 type XListenerSet struct {
 	metav1.TypeMeta `json:",inline"`
 	// +optional

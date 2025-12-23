@@ -716,7 +716,7 @@ var schemaYAML = typed.YAMLObject(`types:
           elementType:
             namedType: io.k8s.sigs.gateway-api.apis.v1.GatewayStatusAddress
           elementRelationship: atomic
-    - name: attachedListeners
+    - name: attachedListenerSets
       type:
         scalar: numeric
     - name: conditions

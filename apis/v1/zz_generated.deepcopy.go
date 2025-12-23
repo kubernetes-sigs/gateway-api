@@ -985,8 +985,8 @@ func (in *GatewayStatus) DeepCopyInto(out *GatewayStatus) {
 			(*in)[i].DeepCopyInto(&(*out)[i])
 		}
 	}
-	if in.AttachedListeners != nil {
-		in, out := &in.AttachedListeners, &out.AttachedListeners
+	if in.AttachedListenerSets != nil {
+		in, out := &in.AttachedListenerSets, &out.AttachedListenerSets
 		*out = new(int32)
 		**out = **in
 	}
