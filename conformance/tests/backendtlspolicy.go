@@ -19,6 +19,10 @@ package tests
 import (
 	"testing"
 
+	"github.com/stretchr/testify/require"
+	corev1 "k8s.io/api/core/v1"
+	"sigs.k8s.io/controller-runtime/pkg/client"
+
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
@@ -150,6 +154,110 @@ var BackendTLSPolicy = suite.ConformanceTest{
 						Path: "/backendtlspolicy-cert-mismatch",
 						SNI:  "abc.example.com",
 					},
+				})
+		})
+
+		// Verify that changing a ConfigMap content should be reconciled by the controller
+		t.Run("Changing the content of a ConfigMap used by BackendTLSPolicy as CA certificate should be reconciled by the controller", func(t *testing.T) {
+			ctx := t.Context()
+			routeNN := types.NamespacedName{Name: "backendtlspolicy", Namespace: ns}
+			gwNN := types.NamespacedName{Name: "same-namespace", Namespace: ns}
+			validconfigmap := types.NamespacedName{Name: "tls-checks-ca-certificate", Namespace: ns}
+
+			kubernetes.NamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, []string{ns})
+			gwAddr := kubernetes.GatewayAndRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), &gatewayv1.HTTPRoute{}, false, routeNN)
+			kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN)
+
+			validPolicyNN := types.NamespacedName{Name: "normative-test", Namespace: ns}
+			kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, validPolicyNN, gwNN, acceptedCond)
+			kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, validPolicyNN, gwNN, resolvedRefsCond)
+
+			validcm := &corev1.ConfigMap{}
+			err := suite.Client.Get(ctx, validconfigmap, validcm)
+			require.NoErrorf(t, err, "failed to get valid configmap")
+
+			originalCAData := validcm.Data["ca.crt"]
+
+			t.Cleanup(func() {
+
+				currentCM := &corev1.ConfigMap{}
+				err = suite.Client.Get(ctx, validconfigmap, currentCM)
+				if err != nil {
+					t.Logf("cleanup: error getting ConfigMap: %v", err)
+					return
+				}
+
+				if currentCM.Data["ca.crt"] != originalCAData {
+					restored := currentCM.DeepCopy()
+					restored.Data["ca.crt"] = originalCAData
+					err = suite.Client.Patch(ctx, restored, client.MergeFrom(currentCM))
+					if err != nil {
+						t.Logf("cleanup: error restoring ConfigMap: %v", err)
+					}
+				}
+			})
+			h.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr,
+				h.ExpectedResponse{
+					Namespace: ns,
+					Request: h.Request{
+						Host: "abc.example.com",
+						Path: "/backendtlspolicy",
+					},
+					Response: h.Response{StatusCodes: []int{200}},
+				})
+
+			mutatedCM := validcm.DeepCopy()
+			mutatedCM.Data["ca.crt"] = ""
+			err = suite.Client.Patch(ctx, mutatedCM, client.MergeFrom(validcm))
+			require.NoErrorf(t, err, "failed to mutate ConfigMap")
+
+			invalidAcceptedCond := metav1.Condition{
+				Type:   string(gatewayv1.PolicyConditionAccepted),
+				Status: metav1.ConditionFalse,
+				Reason: string(gatewayv1.BackendTLSPolicyReasonNoValidCACertificate),
+			}
+			invalidResolvedRefsCond := metav1.Condition{
+				Type:   string(gatewayv1.BackendTLSPolicyConditionResolvedRefs),
+				Status: metav1.ConditionFalse,
+				Reason: string(gatewayv1.BackendTLSPolicyReasonInvalidCACertificateRef),
+			}
+
+			kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, validPolicyNN, gwNN, invalidAcceptedCond)
+			kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, validPolicyNN, gwNN, invalidResolvedRefsCond)
+
+			h.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr,
+				h.ExpectedResponse{
+					Namespace: ns,
+					Request: h.Request{
+						Host: "abc.example.com",
+						Path: "/backendtlspolicy",
+					},
+					Response: h.Response{
+						StatusCodes: []int{500, 502, 503},
+					},
+				})
+
+			currentCM := &corev1.ConfigMap{}
+			err = suite.Client.Get(ctx, validconfigmap, currentCM)
+			require.NoErrorf(t, err, "failed to get valid configmap")
+
+			restoredCM := currentCM.DeepCopy()
+			restoredCM.Data["ca.crt"] = originalCAData
+			err = suite.Client.Patch(ctx, restoredCM, client.MergeFrom(currentCM))
+			require.NoErrorf(t, err, "failed to mutate ConfigMap")
+
+			kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, validPolicyNN, gwNN, acceptedCond)
+			kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, validPolicyNN, gwNN, resolvedRefsCond)
+
+			h.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr,
+				h.ExpectedResponse{
+					Namespace: ns,
+					Request: h.Request{
+						Host: "abc.example.com",
+						Path: "/backendtlspolicy",
+						SNI:  "abc.example.com",
+					},
+					Response: h.Response{StatusCodes: []int{200}},
 				})
 		})
 	},
