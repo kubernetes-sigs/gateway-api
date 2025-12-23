@@ -18,3 +18,5 @@ relationships:
 extendedBy:
   - number: 4152
     name: Extending TLS Validation in BackendTLSPolicy
+  - number: 4274
+    name: BackendTLSPolicy Support for TLSRoute
