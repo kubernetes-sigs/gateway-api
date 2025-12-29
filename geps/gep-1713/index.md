@@ -47,7 +47,7 @@ The feature will be part of the experimental channel, which implementations can 
 
 ## API
 
-This proposal introduces a new `ListenerSet` resource that has the ability to attach a set of listeners to multiple parent `Gateways`.
+This proposal introduces a new `ListenerSet` resource that has the ability to attach a set of listeners to a parent `Gateway`.
 
 **Note**: While this API is experimental, its `Kind` will be `XListenerSet` and 
 once the API is gratuated to stable it will be renamed to `ListenerSet`.
