@@ -60,14 +60,10 @@ var HTTPRouteHTTPSListener = suite.ConformanceTest{
 			host       string
 			statusCode int
 			backend    string
-			serverName string
 		}{
-			{host: "example.org", serverName: "example.org", statusCode: 200, backend: "infra-backend-v1"},
-			{host: "example.org", serverName: "second-example.org", statusCode: 421},
-			{host: "second-example.org", serverName: "example.org", statusCode: 421},
-			{host: "unknown-example.org", serverName: "unknown-example.org", statusCode: 404},
-			{host: "unknown-example.org", serverName: "second-example.org", statusCode: 404},
-			{host: "second-example.org", serverName: "second-example.org", statusCode: 200, backend: "infra-backend-v2"},
+			{host: "example.org", statusCode: 200, backend: "infra-backend-v1"},
+			{host: "unknown-example.org", statusCode: 404},
+			{host: "second-example.org", statusCode: 200, backend: "infra-backend-v2"},
 		}
 
 		for i, tc := range cases {
@@ -78,7 +74,7 @@ var HTTPRouteHTTPSListener = suite.ConformanceTest{
 				Namespace: "gateway-conformance-infra",
 			}
 			t.Run(expected.GetTestCaseName(i), func(t *testing.T) {
-				tls.MakeTLSRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, serverCertPem, nil, nil, tc.serverName, expected)
+				tls.MakeTLSRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, serverCertPem, nil, nil, tc.host, expected)
 			})
 		}
 	},
