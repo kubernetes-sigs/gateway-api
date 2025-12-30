@@ -1,7 +1,7 @@
 # HTTP method matching
 
 ???+ info "Extended Support Feature: HTTPRouteMethodMatching"
-    This feature is part of extended support. For more information on release channels, refer to our [versioning guide](../concepts/versioning.md).
+    This feature is part of extended support. For more information on support levels, refer to our [conformance guide](../concepts/conformance.md).
 
 The [HTTPRoute resource](../api-types/httproute.md) can be used to match
 requests based on the HTTP method. This guide shows how to use this
