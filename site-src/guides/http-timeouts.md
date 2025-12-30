@@ -1,7 +1,7 @@
 # HTTP timeouts
 
 ???+ info "Extended Support Feature: HTTPRouteRequestTimeout"
-    This feature is part of extended support. For more information on release channels, refer to our [versioning guide](../concepts/versioning.md).
+    This feature is part of extended support. For more information on support levels, refer to our [conformance guide](../concepts/conformance.md).
 
 The [HTTPRoute resource](../api-types/httproute.md) can be used to configure
 timeouts for HTTP requests. This is useful for preventing long-running requests
