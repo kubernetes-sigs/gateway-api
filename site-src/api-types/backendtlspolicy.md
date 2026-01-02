@@ -9,10 +9,14 @@
 [BackendTLSPolicy][backendtlspolicy] is a Gateway API type for specifying the TLS configuration
 of the connection from the Gateway to a backend pod(s) via the Service API object.
 
+Implementations may also decide to support the usage of `BackendTLSPolicy` for specifying the TLS configuration
+of the connection from the Gateway to services not connected via HTTPRoute, and any 
+other kind of backend like [InferencePool](https://gateway-api-inference-extension.sigs.k8s.io/reference/spec/#inferencepool)
+
 ## Background
 
 `BackendTLSPolicy` specifically addresses the configuration of TLS in order to convey HTTPS from the Gateway
-dataplane to the backend.  This is referred to as "backend TLS termination" and enables the Gateway to know
+dataplane to the backend. This is referred to as "backend TLS termination" and enables the Gateway to know
 how to connect to a backend pod that has its own certificate.
 
 While there are other API objects provided for TLS to be configured for **passthrough** and **edge** termination,
@@ -26,13 +30,17 @@ applied to a Service that accesses a backend, where the BackendTLSPolicy resides
 Service to which it is applied. The BackendTLSPolicy and the Service must reside in the same namespace in order
 to prevent the complications involved with sharing trust across namespace boundaries.
 
+Additionally, implementations may use BackendTLSPolicy for specifying the TLS configuration 
+of the connection from the Gateway to services not connected via HTTPRoute, and any other
+kind of backend, but this behavior is optional and may not be available on all implementations.
+
 All Gateway API Routes that point to a referenced Service should respect a configured BackendTLSPolicy.
 
 ## Spec
 
 The specification of a [BackendTLSPolicy][backendtlspolicy] consists of:
 
-- [TargetRefs][targetRefs] - Defines the targeted API object of the policy.  Only Service is allowed.
+- [TargetRefs][targetRefs] - Defines the targeted API object of the policy.
 - [Validation][validation] - Defines the configuration for TLS, including hostname, CACertificateRefs, and
 WellKnownCACertificates.
 - [Hostname][hostname] - Defines the Server Name Indication (SNI) that the Gateway uses to connect to the backend.
