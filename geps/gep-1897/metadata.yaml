@@ -18,3 +18,5 @@ relationships:
 extendedBy:
   - number: 4152
     name: Extending TLS Validation in BackendTLSPolicy
+changelog:
+  - 2025/Jan/02 (rikatz) -  Add clarification about Implementation-specific usage of a BackendTLSPolicy for non-Gateway API resources regardless of whether it is referenced by a Route resource.

@@ -38,9 +38,8 @@ API is backend-attached and does not currently support mutual authentication, an
 address the case where connections to TLS are **implicitly configured** on behalf of the user, which is the norm for mTLS.
 This GEP is about the case where an application developer needs to **explicitly express** that they expect TLS when
 there is no automatic, implicit configuration available.
-3. Service mesh use cases are not addressed here because this GEP is specifically concerned with the connection between
-Gateways and Backends, not Service to Service.  Service mesh use cases should ignore the design components described in
-this proposal.
+3. Service mesh use cases for workload-to-service communication are supported as Implementation-Specific features
+(see [Implementation-Specific Usage](#implementation-specific-usage)).
 
 ## Non-Goals
 
@@ -305,8 +304,25 @@ type BackendTLSPolicyList struct {
 // Support: Extended
 type BackendTLSPolicySpec struct {
 	// TargetRefs identifies an API object to apply the policy to.
-	// Only Services have Extended support. Implementations MAY support
-	// additional objects, with Implementation Specific support.
+	//
+	// Support Levels:
+	//
+	// * Extended: Kubernetes Service referenced by HTTPRoute backendRefs.
+	//
+	// * Implementation-Specific: Any Service or other resource, regardless of
+	//   Route association. Implementations MAY use BackendTLSPolicy for:
+	//   - Services not referenced by any Route (e.g., infrastructure services)
+	//   - Gateway feature backends (e.g., ExternalAuth, rate-limiting services)
+	//   - Service mesh workload-to-service communication
+	//   - Other resource types beyond Service
+	//
+	// When applied to Services or resources not referenced by Routes, the behavior
+	// is implementation-specific. Implementations SHOULD clearly document how
+	// BackendTLSPolicy is interpreted in these scenarios, including:
+	//   - Which resources beyond Service are supported
+	//   - How the policy is discovered and applied
+	//   - Any implementation-specific semantics or restrictions
+	//
 	// Note that this config applies to the entire referenced resource
 	// by default, but this default may change in the future to provide
 	// a more granular application of the policy.
@@ -601,6 +617,40 @@ reverse proxy. This is shown as **bolded** additions in step 6 below.
 5. Optionally, the reverse proxy can modify the request, i.e. add/remove headers, based on filter rules of the HTTPRoute.
 6. Lastly, the reverse proxy **optionally performs a TLS handshake** and forwards the request to one or more objects,
 i.e. Service, in the cluster based on backendRefs rules of the HTTPRoute **and the TargetRefs of the BackendTLSPolicy**.
+
+## Implementation-Specific Usage
+
+While the core design of BackendTLSPolicy focuses on the HTTPRoute -> Service use case (Extended support),
+implementations MAY use BackendTLSPolicy as an Implementation-Specific feature to configure TLS for any
+Service or other resource, regardless of whether it is referenced by a Route resource.
+
+This enables implementations to use BackendTLSPolicy for scenarios such as:
+
+* Services consumed by Gateway features (e.g., ExternalAuth filters, rate-limiting services) that expose TLS listeners
+* Infrastructure services (monitoring, logging, tracing) that the Gateway communicates with
+* Service mesh workload-to-service communication where Routes may not be defined
+* Other resource types beyond Kubernetes Service
+
+See [issue #4071](https://github.com/kubernetes-sigs/gateway-api/issues/4071) for the original discussion.
+
+### Implementation Guidance
+
+Implementations choosing to support Implementation-Specific usage of BackendTLSPolicy SHOULD:
+
+1. Clearly document which scenarios and resource types are supported beyond the Extended support level
+   (HTTPRoute -> Service).
+2. Specify how BackendTLSPolicy is discovered and applied to backend connections in these scenarios.
+3. Report status consistently using the standard BackendTLSPolicy status conditions defined in this GEP.
+4. Respect all validation semantics defined in this GEP, including CA certificate validation, hostname
+   validation, SNI configuration, and other TLS handshake properties.
+
+For service mesh implementations, document how BackendTLSPolicy integrates with mesh-specific TLS
+features and any interactions with automatic mTLS or other mesh transport security mechanisms.
+
+### Conformance
+
+Implementation-Specific usage is **not** subject to Gateway API conformance testing. Only the
+Extended support level (HTTPRoute → Service referenced in backendRefs) is covered by conformance tests.
 
 ## Future plans
 
