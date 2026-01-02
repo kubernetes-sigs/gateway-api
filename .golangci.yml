@@ -1,79 +1,115 @@
+version: "2"
 run:
-  timeout: 10m
+  modules-download-mode: readonly
   issues-exit-code: 1
   tests: true
-  modules-download-mode: readonly
   allow-parallel-runners: false
-
 linters:
-  fast: false
   enable:
-  - errcheck
-  - copyloopvar
-  - gocritic
-  - gofumpt
-  - goimports
-  - gomodguard
-  - gosec
-  - govet
-  - misspell
-  - revive
-  - unconvert
-  - unparam
-  - unused
-  - whitespace
-  disable-all: false
-  presets:
-  - bugs
-  - unused
-
-# all available settings of specific linters
-linters-settings:
-  gofmt:
-    # simplify code: gofmt with `-s` option, true by default
-    simplify: true
-  goimports:
-    local-prefixes: sigs.k8s.io/gateway-api
-  govet:
-    enable:
-      - shadow
-    settings:
-      shadow:
-        # Whether to be strict about shadowing; can be noisy.
-        strict: false
-  misspell:
-    locale: US
-    ignore-words: []
-  gomodguard:
-    blocked:
-    # List of blocked modules.
-      modules:
-        - io/ioutil:
-            recommendations:
-              - io
-              - os
-            reason: "Deprecation of package ioutil in Go 1.16."
-
+    - asasalint
+    - asciicheck
+    - bidichk
+    - bodyclose
+    - contextcheck
+    - copyloopvar
+    - durationcheck
+    - errchkjson
+    - errorlint
+    - exhaustive
+    - gocheckcompilerdirectives
+    - gochecksumtype
+    - gocritic
+    - gomodguard
+    - gosec
+    - gosmopolitan
+    - loggercheck
+    - makezero
+    - misspell
+    - musttag
+    - nilerr
+    - nilnesserr
+    - noctx
+    - protogetter
+    - reassign
+    - recvcheck
+    - revive
+    - rowserrcheck
+    - spancheck
+    - sqlclosecheck
+    - testifylint
+    - unconvert
+    - unparam
+    - whitespace
+    - zerologlint
+  # all available settings of specific linters
+  settings:
+    gomodguard:
+      blocked:
+        # List of blocked modules.
+        modules:
+          - io/ioutil:
+              recommendations:
+                - io
+                - os
+              reason: Deprecation of package ioutil in Go 1.16.
+    govet:
+      enable:
+        - shadow
+      settings:
+        shadow:
+          # Whether to be strict about shadowing; can be noisy.
+          strict: false
+    misspell:
+      locale: US
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    rules:
+      # Exclude some linters from running on tests files.
+      - linters:
+          - dupl
+          - errcheck
+          - gocyclo
+        path: _test\.go
+      # Too many false positives - for examples see: https://github.com/Antonboom/testifylint/issues/67
+      - linters:
+          - testifylint
+        text: require must only be used in the goroutine running the test function
+      - linters:
+          - testifylint
+        text: contains assertions that must only be used in the goroutine running the test function
+      # It is valid usage to wrap errors without using %w to not make them part of
+      # the API contract.
+      - linters:
+          - errorlint
+        text: non-wrapping format verb for fmt.Errorf. Use `%w` to format errors
+      - path: (.+)\.go$
+        text: Using the variable on range scope `tc` in function literal
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
 issues:
   max-issues-per-linter: 0
   max-same-issues: 0
-  exclude-rules:
-    # Exclude some linters from running on tests files.
-    - path: _test\.go
-      linters:
-        - gocyclo
-        - errcheck
-        - dupl
-     # Too many false positives - for examples see: https://github.com/Antonboom/testifylint/issues/67
-    - linters:
-      - testifylint
-      text: "require must only be used in the goroutine running the test function"
-    - linters:
-      - testifylint
-      text: "contains assertions that must only be used in the goroutine running the test function"
-    # It is valid usage to wrap errors without using %w to not make them part of
-    # the API contract.
-    - linters: ["errorlint"]
-      text: "non-wrapping format verb for fmt.Errorf. Use `%w` to format errors"
-  exclude:
-    - Using the variable on range scope `tc` in function literal
+formatters:
+  enable:
+    - gofumpt
+    - goimports
+  settings:
+    gofmt:
+      # simplify code: gofmt with `-s` option, true by default
+      simplify: true
+    goimports:
+      local-prefixes:
+        - sigs.k8s.io/gateway-api
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$

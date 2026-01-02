@@ -1324,6 +1324,7 @@ const (
 	//
 	// Note: This condition is not really "deprecated", but rather "reserved"; however, deprecated triggers Go linters
 	// to alert about usage.
+	//
 	// Deprecated: Ready is reserved for future use
 	GatewayConditionReady GatewayConditionType = "Ready"
 
