@@ -71,12 +71,12 @@ var BackendTLSPolicy = suite.ConformanceTest{
 
 			// For the re-encrypt case, we need to use the cert for the frontend tls listener.
 			certNN := types.NamespacedName{Name: "tls-validity-checks-certificate", Namespace: ns}
-			cPem, keyPem, err := GetTLSSecret(suite.Client, certNN)
+			serverCertPem, _, err := GetTLSSecret(suite.Client, certNN)
 			if err != nil {
 				t.Fatalf("unexpected error finding TLS secret: %v", err)
 			}
 			// Verify that the request to a re-encrypted call to /backendTLS should succeed.
-			tls.MakeTLSRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, cPem, keyPem, "https-listener.org",
+			tls.MakeTLSRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, serverCertPem, nil, nil, "https-listener.org",
 				h.ExpectedResponse{
 					Namespace: ns,
 					Request: h.Request{
