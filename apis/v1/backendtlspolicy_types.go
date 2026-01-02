@@ -57,8 +57,25 @@ type BackendTLSPolicyList struct {
 // Support: Extended
 type BackendTLSPolicySpec struct {
 	// TargetRefs identifies an API object to apply the policy to.
-	// Only Services have Extended support. Implementations MAY support
-	// additional objects, with Implementation Specific support.
+	//
+	// Support Levels:
+	//
+	// * Extended: Kubernetes Service referenced by HTTPRoute backendRefs.
+	//
+	// * Implementation-Specific: Services not connected via HTTPRoute, and any
+	//   other kind of backend. Implementations MAY use BackendTLSPolicy for:
+	//   - Services not referenced by any Route (e.g., infrastructure services)
+	//   - Gateway feature backends (e.g., ExternalAuth, rate-limiting services)
+	//   - Service mesh workload-to-service communication
+	//   - Other resource types beyond Service
+	//
+	// Implementations SHOULD aim to ensure that BackendTLSPolicy behavior is consistent,
+	// even outside of the extended HTTPRoute -> Service path. They SHOULD clearly document how
+	// BackendTLSPolicy is interpreted in these scenarios, including:
+	//   - Which resources beyond Service are supported
+	//   - How the policy is discovered and applied
+	//   - Any implementation-specific semantics or restrictions
+	//
 	// Note that this config applies to the entire referenced resource
 	// by default, but this default may change in the future to provide
 	// a more granular application of the policy.
