@@ -309,15 +309,15 @@ type BackendTLSPolicySpec struct {
 	//
 	// * Extended: Kubernetes Service referenced by HTTPRoute backendRefs.
 	//
-	// * Implementation-Specific: Any Service or other resource, regardless of
-	//   Route association. Implementations MAY use BackendTLSPolicy for:
+	// * Implementation-Specific: Services not connected via HTTPRoute, and any
+	//   other kind of backend. Implementations MAY use BackendTLSPolicy for:
 	//   - Services not referenced by any Route (e.g., infrastructure services)
 	//   - Gateway feature backends (e.g., ExternalAuth, rate-limiting services)
 	//   - Service mesh workload-to-service communication
 	//   - Other resource types beyond Service
 	//
-	// When applied to Services or resources not referenced by Routes, the behavior
-	// is implementation-specific. Implementations SHOULD clearly document how
+	// Implementations SHOULD aim to ensure that BackendTLSPolicy behavior is consistent,
+	 // even outside of the extended HTTPRoute -> Service path. They SHOULD clearly document how
 	// BackendTLSPolicy is interpreted in these scenarios, including:
 	//   - Which resources beyond Service are supported
 	//   - How the policy is discovered and applied
@@ -351,6 +351,12 @@ type BackendTLSPolicySpec struct {
 	// For any BackendTLSPolicy that does not take precedence, the
 	// implementation MUST ensure the `Accepted` Condition is set to
 	// `status: False`, with Reason `Conflicted`.
+	//
+	// Implementations SHOULD NOT support more than one targetRef at this
+	// time. Although the API technically allows for this, the current guidance
+	// for conflict resolution and status handling is lacking. Until that can be
+	// clarified in a future release, the safest approach is to support a single 
+	// targetRef.
 	//
 	// Support: Extended for Kubernetes Service
 	//
@@ -629,7 +635,7 @@ This enables implementations to use BackendTLSPolicy for scenarios such as:
 * Services consumed by Gateway features (e.g., ExternalAuth filters, rate-limiting services) that expose TLS listeners
 * Infrastructure services (monitoring, logging, tracing) that the Gateway communicates with
 * Service mesh workload-to-service communication where Routes may not be defined
-* Other resource types beyond Kubernetes Service
+* Other resource types beyond Kubernetes Service, such as InferencePool
 
 See [issue #4071](https://github.com/kubernetes-sigs/gateway-api/issues/4071) for the original discussion.
 
