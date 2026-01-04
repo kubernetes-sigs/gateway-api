@@ -60,7 +60,7 @@ var TLSRouteTerminateSimpleSameNamespace = suite.ConformanceTest{
 		}
 		serverStr := string(hostnames[0])
 
-		caConfigMap, err := kubernetes.GetConfigMapData(suite.Client, caCertNN)
+		caConfigMap, err := kubernetes.GetConfigMapData(suite.Client, suite.TimeoutConfig, caCertNN)
 		if err != nil {
 			t.Fatalf("unexpected error finding TLS secret: %v", err)
 		}

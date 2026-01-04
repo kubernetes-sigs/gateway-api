@@ -1073,8 +1073,8 @@ func BackendTLSPolicyMustHaveLatestConditions(t *testing.T, r *gatewayv1.Backend
 }
 
 // GetConfigMapData fetches the named ConfigMap
-func GetConfigMapData(client client.Client, name types.NamespacedName) (map[string]string, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+func GetConfigMapData(client client.Client, timeoutConfig config.TimeoutConfig, name types.NamespacedName) (map[string]string, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutConfig.GetTimeout)
 	defer cancel()
 
 	configMap := &v1.ConfigMap{}
