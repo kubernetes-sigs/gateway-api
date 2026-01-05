@@ -208,6 +208,10 @@ type BackendTLSPolicyValidation struct {
 	// `Accepted` Condition on the BackendTLSPolicy is set to `status: False`, with
 	// a Reason `Invalid`.
 	//
+	// Implementations MAY define their own sets of CA certificates. Such definitions
+	// MUST use an implementation-specific, prefixed name, such as
+	// `mycompany.com/my-custom-ca-certifcates`.
+	//
 	// Support: Implementation-specific
 	//
 	// +optional
@@ -274,7 +278,8 @@ type SubjectAltName struct {
 
 // WellKnownCACertificatesType is the type of CA certificate that will be used
 // when the caCertificateRefs field is unspecified.
-// +kubebuilder:validation:Enum=System
+// +kubebuilder:validation:MaxLength=253
+// +kubebuilder:validation:XValidation:message="must be set to 'System' or be specified as an implementation-specific name, which is prefixed with a subdomain (as per RFC1123)",rule="self == 'System' || (self.contains('/') && !format.qualifiedName().validate(self).hasValue())"
 type WellKnownCACertificatesType string
 
 const (

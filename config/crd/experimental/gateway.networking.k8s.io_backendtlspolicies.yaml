@@ -383,10 +383,17 @@ spec:
                       `Accepted` Condition on the BackendTLSPolicy is set to `status: False`, with
                       a Reason `Invalid`.
 
+                      Implementations MAY define their own sets of CA certificates. Such definitions
+                      MUST use an implementation-specific, prefixed name, such as
+                      `mycompany.com/my-custom-ca-certifcates`.
+
                       Support: Implementation-specific
-                    enum:
-                    - System
+                    maxLength: 253
                     type: string
+                    x-kubernetes-validations:
+                    - message: must be set to 'System' or be specified as an implementation-specific
+                        name, which is prefixed with a subdomain (as per RFC1123)
+                      rule: self == 'System' || (self.contains('/') && !format.qualifiedName().validate(self).hasValue())
                 required:
                 - hostname
                 type: object
@@ -1069,10 +1076,17 @@ spec:
                       `Accepted` Condition on the BackendTLSPolicy is set to `status: False`, with
                       a Reason `Invalid`.
 
+                      Implementations MAY define their own sets of CA certificates. Such definitions
+                      MUST use an implementation-specific, prefixed name, such as
+                      `mycompany.com/my-custom-ca-certifcates`.
+
                       Support: Implementation-specific
-                    enum:
-                    - System
+                    maxLength: 253
                     type: string
+                    x-kubernetes-validations:
+                    - message: must be set to 'System' or be specified as an implementation-specific
+                        name, which is prefixed with a subdomain (as per RFC1123)
+                      rule: self == 'System' || (self.contains('/') && !format.qualifiedName().validate(self).hasValue())
                 required:
                 - hostname
                 type: object
