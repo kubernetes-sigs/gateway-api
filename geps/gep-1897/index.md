@@ -305,28 +305,6 @@ type BackendTLSPolicyList struct {
 type BackendTLSPolicySpec struct {
 	// TargetRefs identifies an API object to apply the policy to.
 	//
-	// Support Levels:
-	//
-	// * Extended: Kubernetes Service referenced by HTTPRoute backendRefs.
-	//
-	// * Implementation-Specific: Services not connected via HTTPRoute, and any
-	//   other kind of backend. Implementations MAY use BackendTLSPolicy for:
-	//   - Services not referenced by any Route (e.g., infrastructure services)
-	//   - Gateway feature backends (e.g., ExternalAuth, rate-limiting services)
-	//   - Service mesh workload-to-service communication
-	//   - Other resource types beyond Service
-	//
-	// Implementations SHOULD aim to ensure that BackendTLSPolicy behavior is consistent,
-	 // even outside of the extended HTTPRoute -> Service path. They SHOULD clearly document how
-	// BackendTLSPolicy is interpreted in these scenarios, including:
-	//   - Which resources beyond Service are supported
-	//   - How the policy is discovered and applied
-	//   - Any implementation-specific semantics or restrictions
-	//
-	// Note that this config applies to the entire referenced resource
-	// by default, but this default may change in the future to provide
-	// a more granular application of the policy.
-	//
 	// TargetRefs must be _distinct_. This means either that:
 	//
 	// * They select different targets. If this is the case, then targetRef
@@ -358,9 +336,28 @@ type BackendTLSPolicySpec struct {
 	// clarified in a future release, the safest approach is to support a single 
 	// targetRef.
 	//
-	// Support: Extended for Kubernetes Service
+	// Support Levels:
 	//
-	// Support: Implementation-specific for any other resource
+	// * Extended: Kubernetes Service referenced by HTTPRoute backendRefs.
+	//
+	// * Implementation-Specific: Services not connected via HTTPRoute, and any
+	//   other kind of backend. Implementations MAY use BackendTLSPolicy for:
+	//   - Services not referenced by any Route (e.g., infrastructure services)
+	//   - Gateway feature backends (e.g., ExternalAuth, rate-limiting services)
+	//   - Service mesh workload-to-service communication
+	//   - Other resource types beyond Service
+	//
+	// Implementations SHOULD aim to ensure that BackendTLSPolicy behavior is consistent,
+	// even outside of the extended HTTPRoute -(backendRef) -> Service path. 
+	// They SHOULD clearly document how BackendTLSPolicy is interpreted in these 
+	// scenarios, including:
+	//   - Which resources beyond Service are supported
+	//   - How the policy is discovered and applied
+	//   - Any implementation-specific semantics or restrictions
+	//
+	// Note that this config applies to the entire referenced resource
+	// by default, but this default may change in the future to provide
+	// a more granular application of the policy.
 	//
 	// +required
 	// +listType=atomic
@@ -626,7 +623,7 @@ i.e. Service, in the cluster based on backendRefs rules of the HTTPRoute **and t
 
 ## Implementation-Specific Usage
 
-While the core design of BackendTLSPolicy focuses on the HTTPRoute -> Service use case (Extended support),
+While the core design of BackendTLSPolicy focuses on the HTTPRoute -(backendRef) -> Service use case (Extended support),
 implementations MAY use BackendTLSPolicy as an Implementation-Specific feature to configure TLS for any
 Service or other resource, regardless of whether it is referenced by a Route resource.
 
@@ -644,7 +641,7 @@ See [issue #4071](https://github.com/kubernetes-sigs/gateway-api/issues/4071) fo
 Implementations choosing to support Implementation-Specific usage of BackendTLSPolicy SHOULD:
 
 1. Clearly document which scenarios and resource types are supported beyond the Extended support level
-   (HTTPRoute -> Service).
+   (HTTPRoute -(backendRef) -> Service).
 2. Specify how BackendTLSPolicy is discovered and applied to backend connections in these scenarios.
 3. Report status consistently using the standard BackendTLSPolicy status conditions defined in this GEP.
 4. Respect all validation semantics defined in this GEP, including CA certificate validation, hostname
