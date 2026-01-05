@@ -374,7 +374,7 @@ func CompareRoundTrip(t *testing.T, req *roundtripper.Request, cReq *roundtrippe
 			return fmt.Errorf("expected httpPort %q, got %q", expected.ExpectedRequest.HTTPPort, cReq.HTTPPort)
 		}
 
-		if expected.Response.Headers != nil || expected.Response.HeadersWithMultipleValues != nil {
+		if len(expected.Response.Headers) > 0 || len(expected.Response.HeadersWithMultipleValues) > 0 {
 			if cRes.Headers == nil {
 				if len(expected.Response.Headers) > 0 {
 					return fmt.Errorf("no headers captured, expected %d single-value headers", len(expected.Response.Headers))
