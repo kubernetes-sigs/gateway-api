@@ -420,14 +420,7 @@ func CompareRoundTrip(t *testing.T, req *roundtripper.Request, cReq *roundtrippe
 							expectedVals[i] = strings.ReplaceAll(expectedVals[i], " ", "")
 						}
 					}
-					matched := false
-					for _, expectedVal := range expectedVals {
-						if actualValStr == expectedVal {
-							matched = true
-							break
-						}
-					}
-					if !matched {
+					if !slices.Contains(expectedVals, actualValStr) {
 						return fmt.Errorf("expected %s header to be set to one of %v, got %s", name, expectedVals, actualValStr)
 					}
 				}
