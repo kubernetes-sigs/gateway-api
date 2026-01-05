@@ -163,7 +163,7 @@ func (s *echoServer) EchoTwo(ctx context.Context, in *pb.EchoRequest) (*pb.EchoR
 	return s.doEcho("EchoTwo", ctx, in)
 }
 
-func runServer(config serverConfig) (int, int) { //nolint:unparam
+func runServer(ctx context.Context, config serverConfig) (int, int) { //nolint:unparam
 	svcs := pb.File_grpcecho_proto.Services()
 	svcd := svcs.ByName("GrpcEcho")
 	if svcd == nil {
@@ -173,7 +173,8 @@ func runServer(config serverConfig) (int, int) { //nolint:unparam
 	fullService := string(svcd.FullName())
 
 	// Set up plaintext server.
-	lis, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%d", config.HTTPPort))
+	plc := net.ListenConfig{}
+	lis, err := plc.Listen(ctx, "tcp", fmt.Sprintf("0.0.0.0:%d", config.HTTPPort))
 	if err != nil {
 		fmt.Printf("failed to listen: %v\n", err)
 		os.Exit(1)
@@ -200,7 +201,8 @@ func runServer(config serverConfig) (int, int) { //nolint:unparam
 			fmt.Printf("failed to create credentials: %v\n", err)
 			os.Exit(1)
 		}
-		secureListener, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%d", config.HTTPSPort))
+		slc := net.ListenConfig{}
+		secureListener, err := slc.Listen(ctx, "tcp", fmt.Sprintf("0.0.0.0:%d", config.HTTPSPort))
 		if err != nil {
 			fmt.Printf("failed to listen: %v\n", err)
 			os.Exit(1)
@@ -262,7 +264,7 @@ func Main() {
 		TLSServerPrivKey: os.Getenv("TLS_SERVER_PRIV_KEY"),
 		HTTPSPort:        httpsPort,
 	}
-	runServer(config)
+	runServer(context.Background(), config)
 	done := make(chan os.Signal, 1)
 	signal.Notify(done, syscall.SIGINT, syscall.SIGTERM)
 	<-done

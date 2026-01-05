@@ -12,23 +12,23 @@ relationships:
   # obsoletes indicates that a GEP makes the linked GEP obsolete, and completely
   # replaces that GEP. The obsoleted GEP MUST have its obsoletedBy field
   # set back to this GEP, and MUST be moved to Declined.
-  obsoletes: {}
-  obsoletedBy: {}
+  obsoletes: []
+  obsoletedBy: []
   # extends indicates that a GEP extends the linked GEP, adding more detail
   # or additional implementation. The extended GEP MUST have its extendedBy
   # field set back to this GEP.
-  extends: {}
-  extendedBy: {}
+  extends: []
+  extendedBy: []
   # seeAlso indicates other GEPs that are relevant in some way without being
   # covered by an existing relationship.
-  seeAlso: {}
+  seeAlso: []
 # references is a list of hyperlinks to relevant external references.
 # It's intended to be used for storing GitHub discussions, Google docs, etc.
-references: {}
+references: []
 # featureNames is a list of the feature names introduced by the GEP, if there
 # are any. This will allow us to track which feature was introduced by which GEP.
 # This is the value added to supportedFeatures and the conformance tests, in string form.
-featureNames: {}
+featureNames: []
 # changelog is a list of hyperlinks to PRs that make changes to the GEP, in
 # ascending date order.
-changelog: {}
+changelog: []

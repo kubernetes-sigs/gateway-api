@@ -18,41 +18,41 @@ package v1alpha1
 
 import (
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
-	v1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
 )
 
 type (
-	// +k8s:deepcopy-gen=false
-	AllowedRoutes = v1.AllowedRoutes
-	// +k8s:deepcopy-gen=false
-	ListenerTLSConfig = v1.ListenerTLSConfig
-	// +k8s:deepcopy-gen=false
-	Group = v1.Group
-	// +k8s:deepcopy-gen=false
-	Hostname = v1.Hostname
-	// +k8s:deepcopy-gen=false
-	Kind = v1.Kind
-	// +k8s:deepcopy-gen=false
-	ObjectName = v1.ObjectName
-	// +k8s:deepcopy-gen=false
-	PortNumber = v1.PortNumber
-	// +k8s:deepcopy-gen=false
-	ProtocolType = v1.ProtocolType
-	// +k8s:deepcopy-gen=false
-	RouteGroupKind = v1.RouteGroupKind
-	// +k8s:deepcopy-gen=false
-	SectionName = v1.SectionName
-	// +k8s:deepcopy-gen=false
-	Namespace = v1.Namespace
-	// +k8s:deepcopy-gen=false
-	Duration = v1.Duration
-	// +k8s:deepcopy-gen=false
-	PolicyStatus = v1alpha2.PolicyStatus
-	// +k8s:deepcopy-gen=false
-	LocalPolicyTargetReference = v1alpha2.LocalPolicyTargetReference
-	// +k8s:deepcopy-gen=false
-	SessionPersistence = v1.SessionPersistence
+	AllowedRoutes              = v1.AllowedRoutes
+	ListenerTLSConfig          = v1.ListenerTLSConfig
+	Group                      = v1.Group
+	Hostname                   = v1.Hostname
+	Kind                       = v1.Kind
+	ObjectName                 = v1.ObjectName
+	ProtocolType               = v1.ProtocolType
+	RouteGroupKind             = v1.RouteGroupKind
+	SectionName                = v1.SectionName
+	Namespace                  = v1.Namespace
+	Duration                   = v1.Duration
+	PolicyStatus               = v1.PolicyStatus
+	LocalPolicyTargetReference = v1.LocalPolicyTargetReference
+	SessionPersistence         = v1.SessionPersistence
 )
+
+// PortNumberWith0 defines a network port that allows 0 to indicate dynamic
+// port assignment. This type should only be used in spec fields where port 0
+// has the special meaning of "auto-assign a port". In most cases,
+// StatusPortNumber (which excludes 0) should be preferred.
+//
+// +kubebuilder:validation:Minimum=0
+// +kubebuilder:validation:Maximum=65535
+type PortNumberWith0 int32
+
+// StatusPortNumber defines a network port in status fields.
+// Unlike PortNumberWith0, this does not allow 0 since status fields
+// reflect actual assigned ports.
+//
+// +kubebuilder:validation:Minimum=1
+// +kubebuilder:validation:Maximum=65535
+type StatusPortNumber int32
 
 // ParentGatewayReference identifies an API object including its namespace,
 // defaulting to Gateway.
@@ -95,7 +95,7 @@ type RequestRate struct {
 	// time during which the given count of requests occur.
 	//
 	// Support: Extended
-	// +kubebuilder:validation:XValidation:message="interval can not be greater than one hour",rule="!(duration(self) == duration('0s') || duration(self) > duration('1h'))"
+	// +kubebuilder:validation:XValidation:message="interval cannot be greater than one hour",rule="!(duration(self) == duration('0s') || duration(self) > duration('1h'))"
 	// +optional
 	Interval *Duration `json:"interval,omitempty"`
 }

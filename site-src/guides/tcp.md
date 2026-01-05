@@ -64,9 +64,9 @@ downside of more tightly coupling the relationship between the Gateway and
 its associated Routes. Refer to [Attaching to Gateways][attaching] for more
 details.
 
-[tcproute]:../reference/spec.md#gateway.networking.k8s.io/v1alpha2.TCPRoute
+[tcproute]:../reference/spec.md#tcproute
 [tcp]:https://datatracker.ietf.org/doc/html/rfc793
-[httproute]:../reference/spec.md#gateway.networking.k8s.io/v1alpha2.HTTPRoute
-[gateway]:../reference/spec.md#gateway.networking.k8s.io/v1alpha2.Gateway
+[httproute]:../reference/spec.md#httproute
+[gateway]:../reference/spec.md#gateway
 [svc]:https://kubernetes.io/docs/concepts/services-networking/service/
 [attaching]:../api-types/httproute.md#attaching-to-gateways

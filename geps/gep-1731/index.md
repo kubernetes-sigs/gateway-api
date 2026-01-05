@@ -196,8 +196,8 @@ rejected by the server. These requests are generally considered to be safe to re
 
 * <status> Retry on select HTTP status codes among "401" (Unauthorized), "403" (Forbidden), "404" (Not Found), "408" (Request Timeout), "425" (Too Early), "500" (Server Error), "501" (Not Implemented), "502" (Bad Gateway), "503" (Service Unavailable), "504" (Gateway Timeout).
 
-* `all-retryable-errors` Retry request for any error that are considered
-retryable. This currently activates "conn-failure", "empty-response", "junk-response", "response-timeout", "0rtt-rejected", "500", "502", "503", and "504".
+* `all-retriable-errors` Retry request for any error that are considered
+retriable. This currently activates "conn-failure", "empty-response", "junk-response", "response-timeout", "0rtt-rejected", "500", "502", "503", and "504".
 
 The [`option redispatch`](https://docs.haproxy.org/3.0/configuration.html#4.2-option%20redispatch) configuration can be used to distribute retries across multiple backend servers, allowing the proxy to break cookie or consistent hash based persistence and redistribute them to a working server.
 
@@ -292,7 +292,7 @@ type HTTPRouteRetry struct {
     // For example, setting the `rules[].retry.backoff` field to the value
     // `100ms` will cause a backend request to first be retried approximately
     // 100 milliseconds after timing out or receiving a response code configured
-    // to be retryable.
+    // to be retriable.
     //
     // An implementation MAY use an exponential or alternative backoff strategy
     // for subsequent retry attempts, MAY cap the maximum backoff duration to
@@ -330,7 +330,7 @@ type HTTPRouteRetry struct {
 // HTTPRouteRetryStatusCode defines an HTTP response status code for
 // which a backend request should be retried.
 //
-// Implementations MUST support the following status codes as retryable:
+// Implementations MUST support the following status codes as retriable:
 //
 // * 500
 // * 502
@@ -417,9 +417,9 @@ This may be a reasonable approach for configuring broad default retry policies, 
 
 ### HTTPRoute filter
 
-Implementing a `requestRetryPolicy` [HTTPRouteFilter](../../reference/spec.md#gateway.networking.k8s.io/v1.HTTPRouteFilter) type is likely a reasonable alternative implementation (with the downside of slightly deeping nesting and more complex structural configuration) that was not fully explored.
+Implementing a `requestRetryPolicy` [HTTPRouteFilter](../../reference/spec.md#httproutefilter) type is likely a reasonable alternative implementation (with the downside of slightly deeping nesting and more complex structural configuration) that was not fully explored.
 
-Adding a new field to HTTPRouteRule instead is proposed for parity with the similar and intersecting configuration of [HTTPRouteTimeouts](../../reference/spec.md#gateway.networking.k8s.io/v1.HTTPRouteTimeouts).
+Adding a new field to HTTPRouteRule instead is proposed for parity with the similar and intersecting configuration of [HTTPRouteTimeouts](../../reference/spec.md#httproutetimeouts).
 
 ## Other considerations
 

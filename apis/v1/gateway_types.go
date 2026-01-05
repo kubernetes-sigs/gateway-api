@@ -246,7 +246,7 @@ type GatewaySpec struct {
 	// Addresses requested for this Gateway. This is optional and behavior can
 	// depend on the implementation. If a value is set in the spec and the
 	// requested address is invalid or unavailable, the implementation MUST
-	// indicate this in the associated entry in GatewayStatus.Addresses.
+	// indicate this in an associated entry in GatewayStatus.Conditions.
 	//
 	// The Addresses field represents a request for the address(es) on the
 	// "outside of the Gateway", that traffic bound for this Gateway will use.
@@ -268,8 +268,8 @@ type GatewaySpec struct {
 	// +listType=atomic
 	// <gateway:validateIPAddress>
 	// +kubebuilder:validation:MaxItems=16
-	// +kubebuilder:validation:XValidation:message="IPAddress values must be unique",rule="self.all(a1, a1.type == 'IPAddress' ? self.exists_one(a2, a2.type == a1.type && a2.value == a1.value) : true )"
-	// +kubebuilder:validation:XValidation:message="Hostname values must be unique",rule="self.all(a1, a1.type == 'Hostname' ? self.exists_one(a2, a2.type == a1.type && a2.value == a1.value) : true )"
+	// +kubebuilder:validation:XValidation:message="IPAddress values must be unique",rule="self.all(a1, a1.type == 'IPAddress' && has(a1.value) ? self.exists_one(a2, a2.type == a1.type && has(a2.value) && a2.value == a1.value) : true )"
+	// +kubebuilder:validation:XValidation:message="Hostname values must be unique",rule="self.all(a1, a1.type == 'Hostname'  && has(a1.value) ? self.exists_one(a2, a2.type == a1.type && has(a2.value) && a2.value == a1.value) : true )"
 	Addresses []GatewaySpecAddress `json:"addresses,omitempty"`
 
 	// Infrastructure defines infrastructure level attributes about this Gateway instance.
@@ -294,6 +294,28 @@ type GatewaySpec struct {
 	// +optional
 	// <gateway:experimental>
 	TLS *GatewayTLSConfig `json:"tls,omitempty"`
+
+	// DefaultScope, when set, configures the Gateway as a default Gateway,
+	// meaning it will dynamically and implicitly have Routes (e.g. HTTPRoute)
+	// attached to it, according to the scope configured here.
+	//
+	// If unset (the default) or set to None, the Gateway will not act as a
+	// default Gateway; if set, the Gateway will claim any Route with a
+	// matching scope set in its UseDefaultGateway field, subject to the usual
+	// rules about which routes the Gateway can attach to.
+	//
+	// Think carefully before using this functionality! While the normal rules
+	// about which Route can apply are still enforced, it is simply easier for
+	// the wrong Route to be accidentally attached to this Gateway in this
+	// configuration. If the Gateway operator is not also the operator in
+	// control of the scope (e.g. namespace) with tight controls and checks on
+	// what kind of workloads and Routes get added in that scope, we strongly
+	// recommend not using this just because it seems convenient, and instead
+	// stick to direct Route attachment.
+	//
+	// +optional
+	// <gateway:experimental>
+	DefaultScope GatewayDefaultScope `json:"defaultScope,omitempty"`
 }
 
 // AllowedListeners defines which ListenerSets can be attached to this Gateway.
@@ -372,7 +394,7 @@ type Listener struct {
 	//   the Gateway SHOULD return a 421.
 	// * If the current Listener (selected by SNI matching during ClientHello)
 	//   does not match the Host:
-	//     * If another Listener does match the Host the Gateway SHOULD return a
+	//     * If another Listener does match the Host, the Gateway SHOULD return a
 	//       421.
 	//     * If no other Listener matches the Host, the Gateway MUST return a
 	//       404.
@@ -504,20 +526,30 @@ const (
 
 // GatewayBackendTLS describes backend TLS configuration for gateway.
 type GatewayBackendTLS struct {
-	// ClientCertificateRef is a reference to an object that contains a Client
-	// Certificate and the associated private key.
+	// ClientCertificateRef references an object that contains a client certificate
+	// and its associated private key. It can reference standard Kubernetes resources,
+	// i.e., Secret, or implementation-specific custom resources.
 	//
-	// References to a resource in different namespace are invalid UNLESS there
-	// is a ReferenceGrant in the target namespace that allows the certificate
-	// to be attached. If a ReferenceGrant does not allow this reference, the
-	// "ResolvedRefs" condition MUST be set to False for this listener with the
-	// "RefNotPermitted" reason.
+	// A ClientCertificateRef is considered invalid if:
 	//
-	// ClientCertificateRef can reference to standard Kubernetes resources, i.e.
-	// Secret, or implementation-specific custom resources.
+	// * It refers to a resource that cannot be resolved (e.g., the referenced resource
+	//   does not exist) or is misconfigured (e.g., a Secret does not contain the keys
+	//   named `tls.crt` and `tls.key`). In this case, the `ResolvedRefs` condition
+	//   on the Gateway MUST be set to False with the Reason `InvalidClientCertificateRef`
+	//   and the Message of the Condition MUST indicate why the reference is invalid.
 	//
-	// Support: Core
+	// * It refers to a resource in another namespace UNLESS there is a ReferenceGrant
+	//   in the target namespace that allows the certificate to be attached.
+	//   If a ReferenceGrant does not allow this reference, the `ResolvedRefs` condition
+	//   on the Gateway MUST be set to False with the Reason `RefNotPermitted`.
 	//
+	// Implementations MAY choose to perform further validation of the certificate
+	// content (e.g., checking expiry or enforcing specific formats). In such cases,
+	// an implementation-specific Reason and Message MUST be set.
+	//
+	// Support: Core - Reference to a Kubernetes TLS Secret (with the type `kubernetes.io/tls`).
+	// Support: Implementation-specific - Other resource kinds or Secrets with a
+	// different type (e.g., `Opaque`).
 	// +optional
 	// <gateway:experimental>
 	ClientCertificateRef *SecretObjectReference `json:"clientCertificateRef,omitempty"`
@@ -781,7 +813,6 @@ type AllowedRoutes struct {
 	// Support: Core
 	//
 	// +optional
-	// +listType=atomic
 	// +kubebuilder:default={from: Same}
 	Namespaces *RouteNamespaces `json:"namespaces,omitempty"`
 
@@ -862,7 +893,7 @@ type RouteGroupKind struct {
 
 // GatewaySpecAddress describes an address that can be bound to a Gateway.
 //
-// +kubebuilder:validation:XValidation:message="Hostname value must only contain valid characters (matching ^(\\*\\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$)",rule="self.type == 'Hostname' ? self.value.matches(r\"\"\"^(\\*\\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$\"\"\"): true"
+// +kubebuilder:validation:XValidation:message="Hostname value must be empty or contain only valid characters (matching ^(\\*\\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$)",rule="self.type == 'Hostname' ? (!has(self.value) || self.value.matches(r\"\"\"^(\\*\\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$\"\"\")): true"
 type GatewaySpecAddress struct {
 	// Type of the address.
 	//
@@ -977,6 +1008,20 @@ type GatewayStatus struct {
 	// +listMapKey=name
 	// +kubebuilder:validation:MaxItems=64
 	Listeners []ListenerStatus `json:"listeners,omitempty"`
+
+	// AttachedListeners represents the total number of ListenerSets that have been
+	// successfully attached to this Gateway.
+	//
+	// A ListenerSet is successfully attached to a Gateway
+	// when all the following conditions are met :
+	// - The ListenerSet is selected by the Gateway's AllowedListeners field
+	// - The ListenerSet has a valid ParentRef selecting the Gateway
+	// - The ListenerSet's status has the condition "Accepted: true"
+	//
+	// Uses for this field include troubleshooting AttachedListeners attachment and
+	// measuring blast radius/impact of changes to a Gateway.
+	// +optional
+	AttachedListeners *int32 `json:"attachedListeners,omitempty"`
 }
 
 // GatewayInfrastructure defines infrastructure level attributes about a Gateway instance.
@@ -1217,6 +1262,57 @@ const (
 )
 
 const (
+	// This condition indicates whether the controller was able to resolve all
+	// the object references for the Gateway that are not part of a specific
+	// Listener configuration, and also provides a positive-polarity summary of
+	// Listener's "ResolvedRefs" condition. This condition does not directly
+	// impact the Gateway's Accepted or Programmed conditions.
+	//
+	// Possible reasons for this condition to be True are:
+	//
+	// * "ResolvedRefs"
+	//
+	// Possible reasons for this condition to be False are:
+	//
+	// * "RefNotPermitted"
+	// * "InvalidClientCertificateRef"
+	// * "ListenersNotResolved"
+	//
+	// Controllers may raise this condition with other reasons, but should
+	// prefer to use the reasons listed above to improve interoperability.
+	//
+	// Note: This condition is considered Experimental and may change in future
+	// releases of the API.
+	GatewayConditionResolvedRefs GatewayConditionType = "ResolvedRefs"
+
+	// This reason is used with the "ResolvedRefs" condition when the condition
+	// is true.
+	GatewayReasonResolvedRefs GatewayConditionReason = "ResolvedRefs"
+
+	// This reason is used with the "ResolvedRefs" condition when the Gateway
+	// has an invalid ClientCertificateRef in its backend TLS configuration.
+	// A ClientCertificateRef is considered invalid when it refers to a
+	// nonexistent or unsupported resource or kind, or when the data within
+	// that resource is malformed.
+	// This reason must be used only when the reference is allowed, either by
+	// referencing an object in the same namespace as the Gateway, or when
+	// a cross-namespace reference has been explicitly allowed by a ReferenceGrant.
+	// If the reference is not allowed, the reason RefNotPermitted must be used
+	// instead.
+	GatewayReasonInvalidClientCertificateRef GatewayConditionReason = "InvalidClientCertificateRef"
+
+	// This reason is used with the "ResolvedRefs" condition when the Gateway
+	// has a top-level backend TLS configuration that references an object in
+	// another namespace, where the object in the other namespace does not have
+	// a ReferenceGrant explicitly allowing the reference.
+	GatewayReasonRefNotPermitted GatewayConditionReason = "RefNotPermitted"
+
+	// This reason is used with the "ResolvedRefs" condition when one or more
+	// Listeners have their "ResolvedRefs" condition set to false in their status.
+	GatewayReasonListenersNotResolved GatewayConditionReason = "ListenersNotResolved"
+)
+
+const (
 	// "Ready" is a condition type reserved for future use. It should not be used by implementations.
 	//
 	// If used in the future, "Ready" will represent the final state where all configuration is confirmed good
@@ -1228,6 +1324,7 @@ const (
 	//
 	// Note: This condition is not really "deprecated", but rather "reserved"; however, deprecated triggers Go linters
 	// to alert about usage.
+	//
 	// Deprecated: Ready is reserved for future use
 	GatewayConditionReady GatewayConditionType = "Ready"
 
@@ -1276,7 +1373,7 @@ type ListenerStatus struct {
 	Name SectionName `json:"name"`
 
 	// SupportedKinds is the list indicating the Kinds supported by this
-	// listener. This MUST represent the kinds an implementation supports for
+	// listener. This MUST represent the kinds supported by an implementation for
 	// that Listener configuration.
 	//
 	// If kinds are specified in Spec that are not supported, they MUST NOT
@@ -1302,8 +1399,11 @@ type ListenerStatus struct {
 	// attachment semantics can be found in the documentation on the various
 	// Route kinds ParentRefs fields). Listener or Route status does not impact
 	// successful attachment, i.e. the AttachedRoutes field count MUST be set
-	// for Listeners with condition Accepted: false and MUST count successfully
-	// attached Routes that may themselves have Accepted: false conditions.
+	// for Listeners, even if the Accepted condition of an individual Listener is set
+	// to "False". The AttachedRoutes number represents the number of Routes with
+	// the Accepted condition set to "True" that have been attached to this Listener.
+	// Routes with any other value for the Accepted condition MUST NOT be included
+	// in this count.
 	//
 	// Uses for this field include troubleshooting Route attachment and
 	// measuring blast radius/impact of changes to a Listener.

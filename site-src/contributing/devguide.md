@@ -61,7 +61,7 @@ outside $GOPATH as well.
 
 ### Build the Code
 
-The project uses `make` to drive the build. `make` will run code generators, and
+The project uses `make` to drive the build. `make` will clean up previously generated code, run code generators, and
 run static analysis against the code and generate Kubernetes CRDs. You can kick
 off an overall build from the top-level makefile:
 
@@ -78,9 +78,14 @@ in Go type definitions. Gateway API CRD generation will only include these
 fields in the experimental set of CRDs.
 
 If experimental fields are removed or renamed, the original field name should be
-removed from the go struct, with a tombstone comment
-([example](https://github.com/kubernetes/kubernetes/blob/707b8b6efd1691b84095c9f995f2c259244e276c/staging/src/k8s.io/api/core/v1/types.go#L4444-L4445))
-ensuring the field name will not be reused.
+removed from the go struct, with a tombstone comment ensuring the field name will not be reused.
+
+Example:
+
+```golang
+// DeprecatedField is tombstoned to show why 16 is reserved protobuf tag.
+// DeprecatedField string `json:"deprecatedField,omitempty" protobuf:"bytes,16,opt,name=deprecatedField"`
+```
 
 ### Deploy the Code
 
@@ -99,7 +104,7 @@ kubectl get crds
 ### Test Manually
 
 Install a [gateway API implementation](../implementations.md) and test out the change. Take a look at some
-[examples](../guides/index.md).
+[examples](/guides/).
 
 ### Verify
 
@@ -141,20 +146,18 @@ manually preview docs changes locally, you can install mkdocs and run:
  make docs
 ```
 
-To make it easier to use the right version of mkdocs, there is a `.venv`
-target to create a Python virtualenv that includes mkdocs. To use the
-mkdocs live preview server while you edit, you can run mkdocs from
-the virtualenv:
+To make it easier to use the right version of mkdocs, you can build and serve the docs in a container:
 
 ```shell
-$ make .venv
-Creating a virtualenv in .venv... OK
-To enter the virtualenv type "source .venv/bin/activate", to exit type "deactivate"
-(.venv) $ source .venv/bin/activate
-(.venv) $ mkdocs serve
-INFO    -  Building documentation...
+$ make build-docs
 ...
+INFO    -  Documentation built in 6.73 seconds
+$ make live-docs
+...
+INFO    -  [15:16:59] Serving on http://0.0.0.0:3000/
 ```
+
+You can then view the docs at http://localhost:3000/.
 
 For more information on how documentation should be written, refer to our
 [Documentation Style Guide](style-guide.md).
@@ -163,3 +166,12 @@ For more information on how documentation should be written, refer to our
 
 To develop or run conformance tests, refer to the [Conformance Test
 Documentation](../concepts/conformance.md#running-tests).
+
+### Adding new tools
+The tools used to build and manage this project are self-contained on their own
+directory at the `tools` directory.
+
+To add a new tool, use `go get -tool -modfile tools/go.mod the.tool.repo/toolname@version`
+and tidy the specific module with `go mod tidy -modfile=tools/go.mod`.
+
+To execute the new tool, use `go tool -modfile=tools/go.mod toolname`.

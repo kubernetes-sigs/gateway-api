@@ -2,13 +2,18 @@ version: 2
 updates:
   # Dependencies listed in go.mod
   - package-ecosystem: "gomod"
-    directory: "/" # Location of package manifests
+    directories:
+    - "/"
+    - "/conformance"
+    - "/tests"
+    - "/tools"
     schedule:
       interval: "weekly"
     groups:
       k8s.io: # Group k8s.io golang dependencies updates
           patterns:
             - "k8s.io/*"
+            - "sigs.k8s.io/*"
     labels:
       - go
       - dependencies
@@ -24,6 +29,7 @@ updates:
       k8s.io: # Group k8s.io golang dependencies updates
         patterns:
           - "k8s.io/*"
+          - "sigs.k8s.io/*"
     labels:
       - go
       - dependencies
@@ -46,8 +52,23 @@ updates:
     directory: "/hack/mkdocs/image"
     schedule:
       interval: "weekly"
+    groups:
+      mkdocs-deps:
+        patterns:
+          - "*"
     labels:
       - python
       - dependencies
       - ok-to-test
       - release-note-none
+  
+  #  Github actions updates
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "release-note-none"
+      - "ok-to-test"
+

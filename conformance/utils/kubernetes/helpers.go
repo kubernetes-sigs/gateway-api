@@ -37,7 +37,6 @@ import (
 
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/gateway-api/apis/v1alpha2"
-	"sigs.k8s.io/gateway-api/apis/v1alpha3"
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
 	"sigs.k8s.io/gateway-api/conformance/utils/tlog"
 )
@@ -118,7 +117,7 @@ func gwcMustBeAccepted(t *testing.T, c client.Client, timeoutConfig config.Timeo
 func GatewayMustHaveLatestConditions(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, gwNN types.NamespacedName) {
 	t.Helper()
 
-	waitErr := wait.PollUntilContextTimeout(context.Background(), 1*time.Second, timeoutConfig.LatestObservedGenerationSet, true, func(ctx context.Context) (bool, error) {
+	waitErr := wait.PollUntilContextTimeout(t.Context(), 1*time.Second, timeoutConfig.LatestObservedGenerationSet, true, func(ctx context.Context) (bool, error) {
 		gw := &gatewayv1.Gateway{}
 		err := c.Get(ctx, gwNN, gw)
 		if err != nil {
@@ -126,7 +125,7 @@ func GatewayMustHaveLatestConditions(t *testing.T, c client.Client, timeoutConfi
 		}
 
 		if err := ConditionsHaveLatestObservedGeneration(gw, gw.Status.Conditions); err != nil {
-			tlog.Logf(t, "Gateway %s latest conditions not set yet: %v", gwNN.String(), err)
+			tlog.Logf(t, "Gateway %s latest conditions not set yet: %v", gwNN, err)
 			return false, nil
 		}
 
@@ -136,26 +135,52 @@ func GatewayMustHaveLatestConditions(t *testing.T, c client.Client, timeoutConfi
 	require.NoErrorf(t, waitErr, "error waiting for Gateway %s to have Latest ObservedGeneration to be set: %v", gwNN.String(), waitErr)
 }
 
-// GatewayClassMustHaveLatestConditions will fail the test if there are
-// conditions that were not updated
-func GatewayClassMustHaveLatestConditions(t *testing.T, gwc *gatewayv1.GatewayClass) {
+// GatewayClassMustHaveLatestConditions waits until the specified GatewayClass has
+// all conditions updated with the latest observed generation.
+func GatewayClassMustHaveLatestConditions(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, gwcNN types.NamespacedName) {
 	t.Helper()
 
-	if err := ConditionsHaveLatestObservedGeneration(gwc, gwc.Status.Conditions); err != nil {
-		tlog.Fatalf(t, "GatewayClass %v", err)
-	}
+	waitErr := wait.PollUntilContextTimeout(t.Context(), 1*time.Second, timeoutConfig.LatestObservedGenerationSet, true, func(ctx context.Context) (bool, error) {
+		gwc := &gatewayv1.GatewayClass{}
+		err := c.Get(ctx, gwcNN, gwc)
+		if err != nil {
+			return false, fmt.Errorf("error fetching GatewayClass: %w", err)
+		}
+
+		if err := ConditionsHaveLatestObservedGeneration(gwc, gwc.Status.Conditions); err != nil {
+			tlog.Logf(t, "GatewayClass %s latest conditions not set yet: %v", gwcNN, err)
+			return false, nil
+		}
+
+		return true, nil
+	})
+
+	require.NoErrorf(t, waitErr, "error waiting for GatewayClass %s to have Latest ObservedGeneration to be set: %v", gwcNN, waitErr)
 }
 
-// HTTPRouteMustHaveLatestConditions will fail the test if there are
-// conditions that were not updated
-func HTTPRouteMustHaveLatestConditions(t *testing.T, r *gatewayv1.HTTPRoute) {
+// HTTPRouteMustHaveLatestConditions waits until the specified HTTPRoute has
+// all conditions updated with the latest observed generation.
+func HTTPRouteMustHaveLatestConditions(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, rNN types.NamespacedName) {
 	t.Helper()
 
-	for _, parent := range r.Status.Parents {
-		if err := ConditionsHaveLatestObservedGeneration(r, parent.Conditions); err != nil {
-			tlog.Fatalf(t, "HTTPRoute(controller=%v, parentRef=%#v) %v", parent.ControllerName, parent, err)
+	waitErr := wait.PollUntilContextTimeout(t.Context(), 1*time.Second, timeoutConfig.LatestObservedGenerationSet, true, func(ctx context.Context) (bool, error) {
+		r := &gatewayv1.HTTPRoute{}
+		err := c.Get(ctx, rNN, r)
+		if err != nil {
+			return false, fmt.Errorf("error fetching HTTPRoute: %w", err)
 		}
-	}
+
+		for _, parent := range r.Status.Parents {
+			if err := ConditionsHaveLatestObservedGeneration(r, parent.Conditions); err != nil {
+				tlog.Logf(t, "HTTPRoute(controller=%v, parentRef=%#v) %v", parent.ControllerName, parent, err)
+				return false, nil
+			}
+		}
+
+		return true, nil
+	})
+
+	require.NoErrorf(t, waitErr, "error waiting for HTTPRoute %s to have Latest ObservedGeneration to be set: %v", rNN, waitErr)
 }
 
 func ConditionsHaveLatestObservedGeneration(obj metav1.Object, conditions []metav1.Condition) error {
@@ -345,7 +370,7 @@ func GatewayAndRoutesMustBeAccepted(t *testing.T, c client.Client, timeoutConfig
 	// If the Gateway has multiple listeners, get a portless gwAddr.
 	// Otherwise, you get the first listener's port, which might not be the one you want.
 	if !usePort {
-		gwAddr, _, _ = strings.Cut(gwAddr, ":")
+		gwAddr, _, _ = net.SplitHostPort(gwAddr)
 	}
 
 	ns := gatewayv1.Namespace(gw.Namespace)
@@ -995,12 +1020,12 @@ func findPodConditionInList(t *testing.T, conditions []v1.PodCondition, condName
 	return false
 }
 
-// BackendTLSPolicyMustHaveCondition checks that the created BackentTLSPolicy has the Condition,
+// BackendTLSPolicyMustHaveCondition checks that the created BackendTLSPolicy has the Condition,
 // halting after the specified timeout is exceeded.
 func BackendTLSPolicyMustHaveCondition(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, policyNN, gwNN types.NamespacedName, condition metav1.Condition) {
 	t.Helper()
 	waitErr := wait.PollUntilContextTimeout(context.Background(), 1*time.Second, timeoutConfig.HTTPRouteMustHaveCondition, true, func(ctx context.Context) (bool, error) {
-		policy := &v1alpha3.BackendTLSPolicy{}
+		policy := &gatewayv1.BackendTLSPolicy{}
 		err := client.Get(ctx, policyNN, policy)
 		if err != nil {
 			return false, fmt.Errorf("error fetching BackendTLSPolicy %v err: %w", policyNN, err)
@@ -1027,9 +1052,17 @@ func BackendTLSPolicyMustHaveCondition(t *testing.T, client client.Client, timeo
 	require.NoErrorf(t, waitErr, "error waiting for BackendTLSPolicy %v status to have a Condition %v", policyNN, condition)
 }
 
+func BackendTLSPolicyMustHaveAcceptedConditionTrue(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, policyNN, gwNN types.NamespacedName) {
+	BackendTLSPolicyMustHaveCondition(t, client, timeoutConfig, policyNN, gwNN, metav1.Condition{
+		Type:   string(gatewayv1.PolicyConditionAccepted),
+		Status: metav1.ConditionTrue,
+		Reason: string(gatewayv1.PolicyReasonAccepted),
+	})
+}
+
 // BackendTLSPolicyMustHaveLatestConditions will fail the test if there are
 // conditions that were not updated
-func BackendTLSPolicyMustHaveLatestConditions(t *testing.T, r *v1alpha3.BackendTLSPolicy) {
+func BackendTLSPolicyMustHaveLatestConditions(t *testing.T, r *gatewayv1.BackendTLSPolicy) {
 	t.Helper()
 
 	for _, ancestor := range r.Status.Ancestors {

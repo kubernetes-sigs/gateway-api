@@ -1,0 +1,22 @@
+apiVersion: gateway.networking.k8s.io/v1
+date: "2025-09-07T12:44:41Z"
+gatewayAPIChannel: standard
+gatewayAPIVersion: v1.3.0
+implementation:
+  contact:
+  - https://github.com/kubernetes-sigs/cloud-provider-kind/issues/new
+  organization: sigs.k8s.io
+  project: cloud-provider-kind
+  url: https://github.com/kubernetes-sigs/cloud-provider-kind
+  version: v0.8.0-alpha.1
+kind: ConformanceReport
+mode: default
+profiles:
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 33
+      Skipped: 0
+  name: GATEWAY-HTTP
+  summary: Core tests succeeded.

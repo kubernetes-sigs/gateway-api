@@ -167,9 +167,7 @@ type ListenerEntry struct {
 	// +optional
 	//
 	// +kubebuilder:default=0
-	// +kubebuilder:validation:Minimum=0
-	// +kubebuilder:validation:Maximum=65535
-	Port PortNumber `json:"port,omitempty"`
+	Port PortNumberWith0 `json:"port,omitempty"`
 
 	// Protocol specifies the network protocol this listener expects to receive.
 	// +required
@@ -253,14 +251,11 @@ type ListenerEntryStatus struct {
 
 	// Port is the network port the listener is configured to listen on.
 	//
-	// +kubebuilder:validation:Minimum=1
-	// +kubebuilder:validation:Maximum=65535
-	//
 	// +required
-	Port PortNumber `json:"port"`
+	Port StatusPortNumber `json:"port"`
 
 	// SupportedKinds is the list indicating the Kinds supported by this
-	// listener. This MUST represent the kinds an implementation supports for
+	// listener. This MUST represent the kinds supported by an implementation for
 	// that Listener configuration.
 	//
 	// If kinds are specified in Spec that are not supported, they MUST NOT
@@ -284,10 +279,13 @@ type ListenerEntryStatus struct {
 	// AND the Route has a valid ParentRef selecting the whole Gateway
 	// resource or a specific Listener as a parent resource (more detail on
 	// attachment semantics can be found in the documentation on the various
-	// Route kinds ParentRefs fields). Listener or Route status does not impact
+	// Route kinds ParentRefs fields). Listener status does not impact
 	// successful attachment, i.e. the AttachedRoutes field count MUST be set
-	// for Listeners with condition Accepted: false and MUST count successfully
-	// attached Routes that may themselves have Accepted: false conditions.
+	// for Listeners, even if the Accepted condition of an individual Listener is set
+	// to "False". The AttachedRoutes number represents the number of Routes with
+	// the Accepted condition set to "True" that have been attached to this Listener.
+	// Routes with any other value for the Accepted condition MUST NOT be included
+	// in this count.
 	//
 	// Uses for this field include troubleshooting Route attachment and
 	// measuring blast radius/impact of changes to a Listener.

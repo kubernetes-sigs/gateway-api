@@ -5,9 +5,9 @@
 
 (See [status definitions](../overview.md#gep-states).)
 
-[Chihiro]: https://gateway-api.sigs.k8s.io/concepts/roles-and-personas/#chihiro
-[Ian]: https://gateway-api.sigs.k8s.io/concepts/roles-and-personas/#ian
-[Ana]: https//gateway-api.sigs.k8s.io/concepts/roles-and-personas/#ana
+[Chihiro]: ../../concepts/roles-and-personas/#chihiro
+[Ian]: ../../concepts/roles-and-personas/#ian
+[Ana]: ../../concepts/roles-and-personas/#ana
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
 "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this
@@ -208,8 +208,8 @@ status:
     ...
   supportedFeatures:
     # List of SupportedFeature
-    - name: MeshHTTPRoute
     - name: MeshConsumerRoute
+    - name: MeshHTTPRoute
     - name: OffClusterGateway
     ...
 ```
@@ -333,7 +333,7 @@ there is no Mesh resource with both
 a matching `metadata.name` and
 a matching `spec.controllerName`,
 the implementation MUST act as if
-a Mesh resource was found with a empty `spec`
+a Mesh resource was found with an empty `spec`
 (other than the `controllerName` field).
 Optional configuration MUST remain in its default state,
 and features that require a Mesh resource
@@ -358,7 +358,8 @@ without requiring the mesh to be restarted.
 ### API Type Definitions
 
 ```go
-// Mesh is a Cluster level resource.
+// Mesh defines mesh-wide characteristics of a GAMMA-compliant service mesh.
+// It is a cluster-scoped resource.
 type Mesh struct {
   metav1.TypeMeta   `json:",inline"`
   metav1.ObjectMeta `json:"metadata,omitempty"`
@@ -406,6 +407,12 @@ type MeshSpec struct {
   //
   // +optional
   ParametersRef *ParametersReference `json:"parametersRef,omitempty"`
+
+  // Description optionally provides a human-readable description of a Mesh.
+  //
+  // +kubebuilder:validation:MaxLength=64
+  // +optional
+  Description *string `json:"description,omitempty"`
 }
 
 // MeshConditionType is the type for status conditions on Mesh resources.
@@ -417,8 +424,8 @@ type MeshConditionType string
 type MeshConditionReason string
 
 const (
-  // This condition indicates whether the Mesh has been accepted by the
-  // controller requested in the `spec.controller` field.
+  // The "Accepted" condition indicates whether the Mesh has been accepted
+  // by the controller requested in the `spec.controllerName` field.
   //
   // This condition defaults to Unknown, and MUST be set by a controller
   // when it sees a Mesh using its controller string. The status of this
@@ -435,27 +442,33 @@ const (
   //
   // * "InvalidParameters"
   //
+  // Possible reasons for this condition to be Unknown are:
+  //
+  // * "Pending"
+  //
   // Controllers should prefer to use the values of MeshConditionReason
   // for the corresponding Reason, where appropriate.
-  MeshConditionStatusAccepted MeshConditionType = "Accepted"
+  MeshConditionAccepted MeshConditionType = "Accepted"
 
   // This reason is used with the "Accepted" condition when the condition is
   // true.
-  MeshConditionReasonAccepted MeshConditionReason = "Accepted"
+  MeshReasonAccepted MeshConditionReason = "Accepted"
 
   // This reason is used with the "Accepted" condition when the Mesh
   // was not accepted because the parametersRef field refers to
+  //
   // * a namespaced resource but the Namespace field is not set, or
   // * a cluster-scoped resource but the Namespace field is set, or
   // * a nonexistent object, or
   // * an unsupported resource or kind, or
   // * an existing resource but the data within that resource is malformed.
-  MeshConditionReasonInvalidParameters MeshConditionReason = "InvalidParameters"
+  MeshReasonInvalidParameters MeshConditionReason = "InvalidParameters"
 
-  // This reason is used with the "Accepted" condition when the
-  // requested controller has not yet made a decision about whether
-  // to accept the Mesh. It is the default Reason on a new Mesh.
-  MeshConditionReasonPending MeshConditionReason = "Pending"
+  // This reason is used with the "Accepted" condition when the status is
+  // "Unknown" and the requested controller has not yet made a decision
+  // about whether to accept the Mesh. It is the default Reason on a new
+  // Mesh.
+  MeshReasonPending MeshConditionReason = "Pending"
 )
 
 // MeshStatus is the current status for the Mesh.

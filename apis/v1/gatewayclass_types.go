@@ -304,7 +304,6 @@ type GatewayClassStatus struct {
 	// +optional
 	// +listType=map
 	// +listMapKey=name
-	// <gateway:experimental>
 	// +kubebuilder:validation:MaxItems=64
 	SupportedFeatures []SupportedFeature `json:"supportedFeatures,omitempty"`
 }

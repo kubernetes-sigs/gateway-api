@@ -22,7 +22,7 @@ import (
 	fmt "fmt"
 	sync "sync"
 
-	typed "sigs.k8s.io/structured-merge-diff/v4/typed"
+	typed "sigs.k8s.io/structured-merge-diff/v6/typed"
 )
 
 func Parser() *typed.Parser {
@@ -282,6 +282,67 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: weight
       type:
         scalar: numeric
+- name: io.k8s.sigs.gateway-api.apis.v1.BackendTLSPolicy
+  map:
+    fields:
+    - name: apiVersion
+      type:
+        scalar: string
+    - name: kind
+      type:
+        scalar: string
+    - name: metadata
+      type:
+        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+      default: {}
+    - name: spec
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1.BackendTLSPolicySpec
+      default: {}
+    - name: status
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1.PolicyStatus
+      default: {}
+- name: io.k8s.sigs.gateway-api.apis.v1.BackendTLSPolicySpec
+  map:
+    fields:
+    - name: options
+      type:
+        map:
+          elementType:
+            scalar: string
+    - name: targetRefs
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v1.LocalPolicyTargetReferenceWithSectionName
+          elementRelationship: atomic
+    - name: validation
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1.BackendTLSPolicyValidation
+      default: {}
+- name: io.k8s.sigs.gateway-api.apis.v1.BackendTLSPolicyValidation
+  map:
+    fields:
+    - name: caCertificateRefs
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v1.LocalObjectReference
+          elementRelationship: atomic
+    - name: hostname
+      type:
+        scalar: string
+      default: ""
+    - name: subjectAltNames
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v1.SubjectAltName
+          elementRelationship: atomic
+    - name: wellKnownCACertificates
+      type:
+        scalar: string
 - name: io.k8s.sigs.gateway-api.apis.v1.CookieConfig
   map:
     fields:
@@ -496,6 +557,9 @@ var schemaYAML = typed.YAMLObject(`types:
           elementType:
             namedType: io.k8s.sigs.gateway-api.apis.v1.GRPCRouteRule
           elementRelationship: atomic
+    - name: useDefaultGateways
+      type:
+        scalar: string
 - name: io.k8s.sigs.gateway-api.apis.v1.GRPCRouteStatus
   map:
     fields:
@@ -613,6 +677,9 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: allowedListeners
       type:
         namedType: io.k8s.sigs.gateway-api.apis.v1.AllowedListeners
+    - name: defaultScope
+      type:
+        scalar: string
     - name: gatewayClassName
       type:
         scalar: string
@@ -649,6 +716,9 @@ var schemaYAML = typed.YAMLObject(`types:
           elementType:
             namedType: io.k8s.sigs.gateway-api.apis.v1.GatewayStatusAddress
           elementRelationship: atomic
+    - name: attachedListeners
+      type:
+        scalar: numeric
     - name: conditions
       type:
         list:
@@ -1045,6 +1115,9 @@ var schemaYAML = typed.YAMLObject(`types:
           elementType:
             namedType: io.k8s.sigs.gateway-api.apis.v1.HTTPRouteRule
           elementRelationship: atomic
+    - name: useDefaultGateways
+      type:
+        scalar: string
 - name: io.k8s.sigs.gateway-api.apis.v1.HTTPRouteStatus
   map:
     fields:
@@ -1177,6 +1250,39 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         scalar: string
       default: ""
+- name: io.k8s.sigs.gateway-api.apis.v1.LocalPolicyTargetReference
+  map:
+    fields:
+    - name: group
+      type:
+        scalar: string
+      default: ""
+    - name: kind
+      type:
+        scalar: string
+      default: ""
+    - name: name
+      type:
+        scalar: string
+      default: ""
+- name: io.k8s.sigs.gateway-api.apis.v1.LocalPolicyTargetReferenceWithSectionName
+  map:
+    fields:
+    - name: group
+      type:
+        scalar: string
+      default: ""
+    - name: kind
+      type:
+        scalar: string
+      default: ""
+    - name: name
+      type:
+        scalar: string
+      default: ""
+    - name: sectionName
+      type:
+        scalar: string
 - name: io.k8s.sigs.gateway-api.apis.v1.ObjectReference
   map:
     fields:
@@ -1235,6 +1341,34 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: sectionName
       type:
         scalar: string
+- name: io.k8s.sigs.gateway-api.apis.v1.PolicyAncestorStatus
+  map:
+    fields:
+    - name: ancestorRef
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1.ParentReference
+      default: {}
+    - name: conditions
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Condition
+          elementRelationship: associative
+          keys:
+          - type
+    - name: controllerName
+      type:
+        scalar: string
+      default: ""
+- name: io.k8s.sigs.gateway-api.apis.v1.PolicyStatus
+  map:
+    fields:
+    - name: ancestors
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v1.PolicyAncestorStatus
+          elementRelationship: atomic
 - name: io.k8s.sigs.gateway-api.apis.v1.RouteGroupKind
   map:
     fields:
@@ -1307,6 +1441,19 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: type
       type:
         scalar: string
+- name: io.k8s.sigs.gateway-api.apis.v1.SubjectAltName
+  map:
+    fields:
+    - name: hostname
+      type:
+        scalar: string
+    - name: type
+      type:
+        scalar: string
+      default: ""
+    - name: uri
+      type:
+        scalar: string
 - name: io.k8s.sigs.gateway-api.apis.v1.SupportedFeature
   map:
     fields:
@@ -1352,67 +1499,6 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         namedType: io.k8s.sigs.gateway-api.apis.v1.GRPCRouteStatus
       default: {}
-- name: io.k8s.sigs.gateway-api.apis.v1alpha2.LocalPolicyTargetReference
-  map:
-    fields:
-    - name: group
-      type:
-        scalar: string
-      default: ""
-    - name: kind
-      type:
-        scalar: string
-      default: ""
-    - name: name
-      type:
-        scalar: string
-      default: ""
-- name: io.k8s.sigs.gateway-api.apis.v1alpha2.LocalPolicyTargetReferenceWithSectionName
-  map:
-    fields:
-    - name: group
-      type:
-        scalar: string
-      default: ""
-    - name: kind
-      type:
-        scalar: string
-      default: ""
-    - name: name
-      type:
-        scalar: string
-      default: ""
-    - name: sectionName
-      type:
-        scalar: string
-- name: io.k8s.sigs.gateway-api.apis.v1alpha2.PolicyAncestorStatus
-  map:
-    fields:
-    - name: ancestorRef
-      type:
-        namedType: io.k8s.sigs.gateway-api.apis.v1.ParentReference
-      default: {}
-    - name: conditions
-      type:
-        list:
-          elementType:
-            namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Condition
-          elementRelationship: associative
-          keys:
-          - type
-    - name: controllerName
-      type:
-        scalar: string
-      default: ""
-- name: io.k8s.sigs.gateway-api.apis.v1alpha2.PolicyStatus
-  map:
-    fields:
-    - name: ancestors
-      type:
-        list:
-          elementType:
-            namedType: io.k8s.sigs.gateway-api.apis.v1alpha2.PolicyAncestorStatus
-          elementRelationship: atomic
 - name: io.k8s.sigs.gateway-api.apis.v1alpha2.ReferenceGrant
   map:
     fields:
@@ -1478,6 +1564,9 @@ var schemaYAML = typed.YAMLObject(`types:
           elementType:
             namedType: io.k8s.sigs.gateway-api.apis.v1alpha2.TCPRouteRule
           elementRelationship: atomic
+    - name: useDefaultGateways
+      type:
+        scalar: string
 - name: io.k8s.sigs.gateway-api.apis.v1alpha2.TCPRouteStatus
   map:
     fields:
@@ -1541,6 +1630,9 @@ var schemaYAML = typed.YAMLObject(`types:
           elementType:
             namedType: io.k8s.sigs.gateway-api.apis.v1alpha2.TLSRouteRule
           elementRelationship: atomic
+    - name: useDefaultGateways
+      type:
+        scalar: string
 - name: io.k8s.sigs.gateway-api.apis.v1alpha2.TLSRouteStatus
   map:
     fields:
@@ -1598,6 +1690,9 @@ var schemaYAML = typed.YAMLObject(`types:
           elementType:
             namedType: io.k8s.sigs.gateway-api.apis.v1alpha2.UDPRouteRule
           elementRelationship: atomic
+    - name: useDefaultGateways
+      type:
+        scalar: string
 - name: io.k8s.sigs.gateway-api.apis.v1alpha2.UDPRouteStatus
   map:
     fields:
@@ -1622,65 +1717,12 @@ var schemaYAML = typed.YAMLObject(`types:
       default: {}
     - name: spec
       type:
-        namedType: io.k8s.sigs.gateway-api.apis.v1alpha3.BackendTLSPolicySpec
+        namedType: io.k8s.sigs.gateway-api.apis.v1.BackendTLSPolicySpec
       default: {}
     - name: status
       type:
-        namedType: io.k8s.sigs.gateway-api.apis.v1alpha2.PolicyStatus
+        namedType: io.k8s.sigs.gateway-api.apis.v1.PolicyStatus
       default: {}
-- name: io.k8s.sigs.gateway-api.apis.v1alpha3.BackendTLSPolicySpec
-  map:
-    fields:
-    - name: options
-      type:
-        map:
-          elementType:
-            scalar: string
-    - name: targetRefs
-      type:
-        list:
-          elementType:
-            namedType: io.k8s.sigs.gateway-api.apis.v1alpha2.LocalPolicyTargetReferenceWithSectionName
-          elementRelationship: atomic
-    - name: validation
-      type:
-        namedType: io.k8s.sigs.gateway-api.apis.v1alpha3.BackendTLSPolicyValidation
-      default: {}
-- name: io.k8s.sigs.gateway-api.apis.v1alpha3.BackendTLSPolicyValidation
-  map:
-    fields:
-    - name: caCertificateRefs
-      type:
-        list:
-          elementType:
-            namedType: io.k8s.sigs.gateway-api.apis.v1.LocalObjectReference
-          elementRelationship: atomic
-    - name: hostname
-      type:
-        scalar: string
-      default: ""
-    - name: subjectAltNames
-      type:
-        list:
-          elementType:
-            namedType: io.k8s.sigs.gateway-api.apis.v1alpha3.SubjectAltName
-          elementRelationship: atomic
-    - name: wellKnownCACertificates
-      type:
-        scalar: string
-- name: io.k8s.sigs.gateway-api.apis.v1alpha3.SubjectAltName
-  map:
-    fields:
-    - name: hostname
-      type:
-        scalar: string
-    - name: type
-      type:
-        scalar: string
-      default: ""
-    - name: uri
-      type:
-        scalar: string
 - name: io.k8s.sigs.gateway-api.apis.v1alpha3.TLSRoute
   map:
     fields:
@@ -1723,6 +1765,9 @@ var schemaYAML = typed.YAMLObject(`types:
           elementType:
             namedType: io.k8s.sigs.gateway-api.apis.v1alpha2.TLSRouteRule
           elementRelationship: atomic
+    - name: useDefaultGateways
+      type:
+        scalar: string
 - name: io.k8s.sigs.gateway-api.apis.v1beta1.Gateway
   map:
     fields:
@@ -1860,7 +1905,7 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         list:
           elementType:
-            namedType: io.k8s.sigs.gateway-api.apis.v1alpha2.LocalPolicyTargetReference
+            namedType: io.k8s.sigs.gateway-api.apis.v1.LocalPolicyTargetReference
           elementRelationship: associative
           keys:
           - group
@@ -1961,6 +2006,38 @@ var schemaYAML = typed.YAMLObject(`types:
           elementRelationship: associative
           keys:
           - name
+- name: io.k8s.sigs.gateway-api.apisx.v1alpha1.MeshSpec
+  map:
+    fields:
+    - name: controllerName
+      type:
+        scalar: string
+      default: ""
+    - name: description
+      type:
+        scalar: string
+    - name: parametersRef
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1.ParametersReference
+- name: io.k8s.sigs.gateway-api.apisx.v1alpha1.MeshStatus
+  map:
+    fields:
+    - name: conditions
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Condition
+          elementRelationship: associative
+          keys:
+          - type
+    - name: supportedFeatures
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v1.SupportedFeature
+          elementRelationship: associative
+          keys:
+          - name
 - name: io.k8s.sigs.gateway-api.apisx.v1alpha1.ParentGatewayReference
   map:
     fields:
@@ -2014,7 +2091,7 @@ var schemaYAML = typed.YAMLObject(`types:
       default: {}
     - name: status
       type:
-        namedType: io.k8s.sigs.gateway-api.apis.v1alpha2.PolicyStatus
+        namedType: io.k8s.sigs.gateway-api.apis.v1.PolicyStatus
       default: {}
 - name: io.k8s.sigs.gateway-api.apisx.v1alpha1.XListenerSet
   map:
@@ -2036,6 +2113,27 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: status
       type:
         namedType: io.k8s.sigs.gateway-api.apisx.v1alpha1.ListenerSetStatus
+      default: {}
+- name: io.k8s.sigs.gateway-api.apisx.v1alpha1.XMesh
+  map:
+    fields:
+    - name: apiVersion
+      type:
+        scalar: string
+    - name: kind
+      type:
+        scalar: string
+    - name: metadata
+      type:
+        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+      default: {}
+    - name: spec
+      type:
+        namedType: io.k8s.sigs.gateway-api.apisx.v1alpha1.MeshSpec
+      default: {}
+    - name: status
+      type:
+        namedType: io.k8s.sigs.gateway-api.apisx.v1alpha1.MeshStatus
       default: {}
 - name: __untyped_atomic_
   scalar: untyped

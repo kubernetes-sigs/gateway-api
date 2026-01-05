@@ -29,7 +29,7 @@ type BackendObjectReferenceApplyConfiguration struct {
 	Kind      *apisv1.Kind       `json:"kind,omitempty"`
 	Name      *apisv1.ObjectName `json:"name,omitempty"`
 	Namespace *apisv1.Namespace  `json:"namespace,omitempty"`
-	Port      *apisv1.PortNumber `json:"port,omitempty"`
+	Port      *int32             `json:"port,omitempty"`
 }
 
 // BackendObjectReferenceApplyConfiguration constructs a declarative configuration of the BackendObjectReference type for use with
@@ -73,7 +73,7 @@ func (b *BackendObjectReferenceApplyConfiguration) WithNamespace(value apisv1.Na
 // WithPort sets the Port field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Port field is set to the value of the last call.
-func (b *BackendObjectReferenceApplyConfiguration) WithPort(value apisv1.PortNumber) *BackendObjectReferenceApplyConfiguration {
+func (b *BackendObjectReferenceApplyConfiguration) WithPort(value int32) *BackendObjectReferenceApplyConfiguration {
 	b.Port = &value
 	return b
 }

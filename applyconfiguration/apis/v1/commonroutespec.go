@@ -18,10 +18,15 @@ limitations under the License.
 
 package v1
 
+import (
+	apisv1 "sigs.k8s.io/gateway-api/apis/v1"
+)
+
 // CommonRouteSpecApplyConfiguration represents a declarative configuration of the CommonRouteSpec type for use
 // with apply.
 type CommonRouteSpecApplyConfiguration struct {
-	ParentRefs []ParentReferenceApplyConfiguration `json:"parentRefs,omitempty"`
+	ParentRefs         []ParentReferenceApplyConfiguration `json:"parentRefs,omitempty"`
+	UseDefaultGateways *apisv1.GatewayDefaultScope         `json:"useDefaultGateways,omitempty"`
 }
 
 // CommonRouteSpecApplyConfiguration constructs a declarative configuration of the CommonRouteSpec type for use with
@@ -40,5 +45,13 @@ func (b *CommonRouteSpecApplyConfiguration) WithParentRefs(values ...*ParentRefe
 		}
 		b.ParentRefs = append(b.ParentRefs, *values[i])
 	}
+	return b
+}
+
+// WithUseDefaultGateways sets the UseDefaultGateways field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the UseDefaultGateways field is set to the value of the last call.
+func (b *CommonRouteSpecApplyConfiguration) WithUseDefaultGateways(value apisv1.GatewayDefaultScope) *CommonRouteSpecApplyConfiguration {
+	b.UseDefaultGateways = &value
 	return b
 }

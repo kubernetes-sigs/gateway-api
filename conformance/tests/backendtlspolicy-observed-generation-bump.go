@@ -21,12 +21,13 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"sigs.k8s.io/gateway-api/apis/v1alpha2"
-	"sigs.k8s.io/gateway-api/apis/v1alpha3"
+	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
 	"sigs.k8s.io/gateway-api/pkg/features"
@@ -38,7 +39,7 @@ func init() {
 
 var BackendTLSPolicyObservedGenerationBump = suite.ConformanceTest{
 	ShortName:   "BackendTLSPolicyObservedGenerationBump",
-	Description: "A BackendTLSPolicy in the gateway-conformance-infra namespace should update the observedGeneration in all of it's Status.Conditions after an update to the spec",
+	Description: "A BackendTLSPolicy in the gateway-conformance-infra namespace should update the observedGeneration in all of its Status.Conditions after an update to the spec",
 	Features: []features.FeatureName{
 		features.SupportGateway,
 		features.SupportHTTPRoute,
@@ -57,7 +58,7 @@ var BackendTLSPolicyObservedGenerationBump = suite.ConformanceTest{
 			namespaces := []string{"gateway-conformance-infra"}
 			kubernetes.NamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, namespaces)
 
-			original := &v1alpha3.BackendTLSPolicy{}
+			original := &gatewayv1.BackendTLSPolicy{}
 			err := suite.Client.Get(ctx, policyNN, original)
 			require.NoError(t, err, "error getting HTTPRoute")
 
@@ -70,12 +71,12 @@ var BackendTLSPolicyObservedGenerationBump = suite.ConformanceTest{
 			require.NoError(t, err, "error patching the BackendTLSPolicy")
 
 			kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, policyNN, gwNN, metav1.Condition{
-				Type:   string(v1alpha2.PolicyConditionAccepted),
+				Type:   string(gatewayv1.PolicyConditionAccepted),
 				Status: metav1.ConditionTrue,
 				Reason: "", // any reason
 			})
 
-			updated := &v1alpha3.BackendTLSPolicy{}
+			updated := &gatewayv1.BackendTLSPolicy{}
 			err = suite.Client.Get(ctx, policyNN, updated)
 			require.NoError(t, err, "error getting BackendTLSPolicy")
 

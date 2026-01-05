@@ -25,7 +25,7 @@ import "k8s.io/apimachinery/pkg/util/sets"
 // FeatureName is the type used to represent the name of a feature.
 type FeatureName string
 
-// FeatureChannel is the type used to represent the channel a feature belongs to.
+// FeatureChannel is the type used to represent the channel to which a feature belongs.
 type FeatureChannel string
 
 const (
@@ -61,7 +61,9 @@ var (
 			Insert(MeshCoreFeatures.UnsortedList()...).
 			Insert(MeshExtendedFeatures.UnsortedList()...).
 			Insert(GRPCRouteCoreFeatures.UnsortedList()...).
-			Insert(BackendTLSPolicyCoreFeatures.UnsortedList()...)
+			Insert(GRPCRouteExtendedFeatures.UnsortedList()...).
+			Insert(BackendTLSPolicyCoreFeatures.UnsortedList()...).
+			Insert(BackendTLSPolicyExtendedFeatures.UnsortedList()...)
 
 	featureMap = map[FeatureName]Feature{}
 )

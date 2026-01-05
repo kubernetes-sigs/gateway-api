@@ -23,8 +23,6 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
-	gatewayv1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
-	gatewayv1alpha3 "sigs.k8s.io/gateway-api/apis/v1alpha3"
 	h "sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
@@ -61,9 +59,9 @@ var BackendTLSPolicyInvalidCACertificateRef = suite.ConformanceTest{
 			t.Run("BackendTLSPolicy_"+policyNN.Name, func(t *testing.T) {
 				t.Run("BackendTLSPolicy with a single invalid CACertificateRef has a Accepted Condition with status False and Reason NoValidCACertificate", func(t *testing.T) {
 					acceptedCond := metav1.Condition{
-						Type:   string(gatewayv1alpha2.PolicyConditionAccepted),
+						Type:   string(gatewayv1.PolicyConditionAccepted),
 						Status: metav1.ConditionFalse,
-						Reason: string(gatewayv1alpha3.BackendTLSPolicyReasonNoValidCACertificate),
+						Reason: string(gatewayv1.BackendTLSPolicyReasonNoValidCACertificate),
 					}
 
 					kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, policyNN, gwNN, acceptedCond)
@@ -71,9 +69,9 @@ var BackendTLSPolicyInvalidCACertificateRef = suite.ConformanceTest{
 
 				t.Run("BackendTLSPolicy with a single invalid CACertificateRef has a ResolvedRefs Condition with status False and Reason InvalidCACertificateRef", func(t *testing.T) {
 					resolvedRefsCond := metav1.Condition{
-						Type:   string(gatewayv1alpha3.BackendTLSPolicyConditionResolvedRefs),
+						Type:   string(gatewayv1.BackendTLSPolicyConditionResolvedRefs),
 						Status: metav1.ConditionFalse,
-						Reason: string(gatewayv1alpha3.BackendTLSPolicyReasonInvalidCACertificateRef),
+						Reason: string(gatewayv1.BackendTLSPolicyReasonInvalidCACertificateRef),
 					}
 
 					kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, policyNN, gwNN, resolvedRefsCond)

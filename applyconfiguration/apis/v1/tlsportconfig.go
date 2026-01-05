@@ -18,14 +18,10 @@ limitations under the License.
 
 package v1
 
-import (
-	apisv1 "sigs.k8s.io/gateway-api/apis/v1"
-)
-
 // TLSPortConfigApplyConfiguration represents a declarative configuration of the TLSPortConfig type for use
 // with apply.
 type TLSPortConfigApplyConfiguration struct {
-	Port *apisv1.PortNumber           `json:"port,omitempty"`
+	Port *int32                       `json:"port,omitempty"`
 	TLS  *TLSConfigApplyConfiguration `json:"tls,omitempty"`
 }
 
@@ -38,7 +34,7 @@ func TLSPortConfig() *TLSPortConfigApplyConfiguration {
 // WithPort sets the Port field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Port field is set to the value of the last call.
-func (b *TLSPortConfigApplyConfiguration) WithPort(value apisv1.PortNumber) *TLSPortConfigApplyConfiguration {
+func (b *TLSPortConfigApplyConfiguration) WithPort(value int32) *TLSPortConfigApplyConfiguration {
 	b.Port = &value
 	return b
 }

@@ -18,7 +18,7 @@ set -o errexit
 
 CMD=$1
 
-if [ "$CMD" == "build" ];
+if [ "$CMD" = "build" ];
 then
   mkdocs build
   exit 0;
