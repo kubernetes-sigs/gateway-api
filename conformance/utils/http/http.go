@@ -327,6 +327,7 @@ func CompareRoundTrip(t *testing.T, req *roundtripper.Request, cReq *roundtrippe
 		return fmt.Errorf("expected protocol to be %s, got %s", expected.Response.Protocol, cRes.Protocol)
 	}
 
+	// Both 200 and 204 are valid responses.
 	if cRes.StatusCode == 200 || cRes.StatusCode == 204 {
 		// The request expected to arrive at the backend is
 		// the same as the request made, unless otherwise
