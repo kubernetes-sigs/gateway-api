@@ -1,0 +1,89 @@
+apiVersion: gateway.networking.k8s.io/v1
+date: "2026-01-05T16:40:26-03:00"
+gatewayAPIChannel: standard
+gatewayAPIVersion: v1.4.1
+implementation:
+  contact:
+  - https://github.com/kubernetes-sigs/cloud-provider-kind/issues/new
+  organization: sigs.k8s.io
+  project: cloud-provider-kind
+  url: https://github.com/kubernetes-sigs/cloud-provider-kind
+  version: v0.10.0
+kind: ConformanceReport
+mode: default
+profiles:
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 33
+      Skipped: 0
+  extended:
+    failedTests:
+    - GatewayHTTPListenerIsolation
+    - GatewayInfrastructure
+    - GatewayStaticAddresses
+    - HTTPRoute303Redirect
+    - HTTPRoute307Redirect
+    - HTTPRoute308Redirect
+    - HTTPRouteBackendProtocolH2C
+    - HTTPRouteBackendProtocolWebSocket
+    - HTTPRouteBackendRequestHeaderModifier
+    - HTTPRouteCORSAllowCredentialsBehavior
+    - HTTPRouteMethodMatching
+    - HTTPRouteRedirectPath
+    - HTTPRouteRedirectPort
+    - HTTPRouteRedirectPortAndScheme
+    - HTTPRouteRedirectScheme
+    - HTTPRouteRequestHeaderModifierBackendWeights
+    - HTTPRouteRequestMirror
+    - HTTPRouteRequestMultipleMirrors
+    - HTTPRouteRequestPercentageMirror
+    - HTTPRouteResponseHeaderModifier
+    - HTTPRouteRewriteHost
+    - HTTPRouteRewritePath
+    - HTTPRouteTimeoutBackendRequest
+    - HTTPRouteTimeoutRequest
+    result: failure
+    statistics:
+      Failed: 24
+      Passed: 7
+      Skipped: 0
+    supportedFeatures:
+    - BackendTLSPolicySANValidation
+    - GatewayAddressEmpty
+    - GatewayHTTPListenerIsolation
+    - GatewayInfrastructurePropagation
+    - GatewayPort8080
+    - GatewayStaticAddresses
+    - GatewayTLSBackendClientCertificate
+    - HTTPRoute303RedirectStatusCode
+    - HTTPRoute307RedirectStatusCode
+    - HTTPRoute308RedirectStatusCode
+    - HTTPRouteBackendProtocolH2C
+    - HTTPRouteBackendProtocolWebSocket
+    - HTTPRouteBackendRequestHeaderModification
+    - HTTPRouteBackendTimeout
+    - HTTPRouteCORS
+    - HTTPRouteDestinationPortMatching
+    - HTTPRouteHostRewrite
+    - HTTPRouteMethodMatching
+    - HTTPRouteNamedRouteRule
+    - HTTPRouteParentRefPort
+    - HTTPRoutePathRedirect
+    - HTTPRoutePathRewrite
+    - HTTPRoutePortRedirect
+    - HTTPRouteQueryParamMatching
+    - HTTPRouteRequestMirror
+    - HTTPRouteRequestMultipleMirrors
+    - HTTPRouteRequestPercentageMirror
+    - HTTPRouteRequestTimeout
+    - HTTPRouteResponseHeaderModification
+    - HTTPRouteSchemeRedirect
+    unsupportedFeatures:
+    - BackendTLSPolicy
+  name: GATEWAY-HTTP
+  summary: Core tests succeeded. Extended tests failed with 24 test failures.
+succeededProvisionalTests:
+- GatewayOptionalAddressValue
+- HTTPRouteNamedRule
