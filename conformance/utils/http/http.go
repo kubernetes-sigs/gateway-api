@@ -396,7 +396,12 @@ func CompareRoundTrip(t *testing.T, req *roundtripper.Request, cReq *roundtrippe
 
 		if expected.Response.Headers != nil || expected.Response.HeadersWithMultipleValues != nil {
 			if cRes.Headers == nil {
-				return fmt.Errorf("no headers captured, expected %v", len(expected.Response.Headers))
+				if len(expected.Response.Headers) > 0 {
+					return fmt.Errorf("no headers captured, expected %d single-value headers", len(expected.Response.Headers))
+				}
+				if len(expected.Response.HeadersWithMultipleValues) > 0 {
+					return fmt.Errorf("no headers captured, expected %d multi-value headers", len(expected.Response.HeadersWithMultipleValues))
+				}
 			}
 			for name, val := range cRes.Headers {
 				cRes.Headers[strings.ToLower(name)] = val
