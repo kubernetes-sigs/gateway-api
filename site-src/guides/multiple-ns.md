@@ -119,7 +119,7 @@ Gateway because the  attachment constraint (Namespace label) was not met.
 Note that attachment constraints on the Gateway are not required, but they are
 a best-practice if operating a cluster with many different teams and
 Namespaces. In environments where all apps in a cluster have permission to
-attach to a Gateway then the `listeners[].routes` field does not have to be
+attach to a Gateway then the `listeners[].allowedRoutes` field does not have to be
 configured and all Routes can freely use the Gateway.
 
 
