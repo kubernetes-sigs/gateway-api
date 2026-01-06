@@ -20,7 +20,7 @@ package v1
 // named conformance profile.
 type ProfileReport struct {
 	// Name indicates the name of the conformance profile (e.g. "HTTP",
-	// "TLS", "Mesh", e.t.c.).
+	// "TLS", "Mesh", etc.).
 	Name string `json:"name"`
 
 	// Summary is a human-readable message intended for end-users to understand

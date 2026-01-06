@@ -364,14 +364,14 @@ profiles:
 
 > **NOTE**: The `implementation` field in the above example includes an
 > `organization` and `project` field. Organizations can be an open source
-> organization, an individual, a company, e.t.c.. Organizations can
+> organization, an individual, a company, etc.. Organizations can
 > theoretically have multiple projects and should submit separate reports for
 > each of them.
 
 > **NOTE**: The `contact` field indicates the GitHub usernames or team
 > names of those who are responsible for maintaining this file, so they can be
 > easily contacted when needed (e.g. for relevant release announcements
-> regarding conformance, e.t.c.). Optionally, it can be an email address or
+> regarding conformance, etc.). Optionally, it can be an email address or
 > a support URL (e.g. GitHub new issue page).
 
 The above report describes an implementation that just released `v1`, uses gateway
@@ -641,7 +641,7 @@ We originally started with two high-level profiles:
 
 However, the overwhelming feedback from the community was to go a step down and
 define profiles at the level of each individual API (e.g. `HTTPRoute`,
-`TCPRoute`, `GRPCRoute`, e.t.c.). One of the main reasons for this was that we
+`TCPRoute`, `GRPCRoute`, etc.). One of the main reasons for this was that we
 already have multiple known implementations of Gateway API which only support
 a single route type (`UDPRoute`, in particular as it turns out).
 

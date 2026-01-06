@@ -44,7 +44,7 @@ import (
 // GatewayExcludedFromReadinessChecks is an annotation that can be placed on a
 // Gateway provided via the tests to indicate that it is NOT expected to be
 // Accepted or Provisioned in its default state. This is generally helpful for
-// tests which validate fixing broken Gateways, e.t.c.
+// tests which validate fixing broken Gateways, etc.
 const GatewayExcludedFromReadinessChecks = "gateway-api/skip-this-for-readiness"
 
 // GatewayRef is a tiny type for specifying an HTTP Route ParentRef without
