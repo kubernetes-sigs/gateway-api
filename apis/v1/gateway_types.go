@@ -1009,19 +1009,18 @@ type GatewayStatus struct {
 	// +kubebuilder:validation:MaxItems=64
 	Listeners []ListenerStatus `json:"listeners,omitempty"`
 
-	// AttachedListeners represents the total number of ListenerSets that have been
+	// AttachedListenerSets represents the total number of ListenerSets that have been
 	// successfully attached to this Gateway.
 	//
-	// A ListenerSet is successfully attached to a Gateway
-	// when all the following conditions are met :
+	// A ListenerSet is successfully attached to a Gateway when all the following conditions are met:
 	// - The ListenerSet is selected by the Gateway's AllowedListeners field
 	// - The ListenerSet has a valid ParentRef selecting the Gateway
 	// - The ListenerSet's status has the condition "Accepted: true"
 	//
-	// Uses for this field include troubleshooting AttachedListeners attachment and
+	// Uses for this field include troubleshooting AttachedListenerSets attachment and
 	// measuring blast radius/impact of changes to a Gateway.
 	// +optional
-	AttachedListeners *int32 `json:"attachedListeners,omitempty"`
+	AttachedListenerSets *int32 `json:"attachedListenerSets,omitempty"`
 }
 
 // GatewayInfrastructure defines infrastructure level attributes about a Gateway instance.
@@ -1333,37 +1332,6 @@ const (
 
 	// Deprecated: Ready is reserved for future use
 	GatewayReasonListenersNotReady GatewayConditionReason = "ListenersNotReady"
-)
-
-const (
-	// AttachedListenerSets is a condition that is true when the Gateway has
-	// at least one ListenerSet attached to it.
-	//
-	// Possible reasons for this condition to be True are:
-	//
-	// * "ListenerSetsAttached"
-	//
-	// Possible reasons for this condition to be False are:
-	//
-	// * "NoListenerSetsAttached"
-	// * "ListenerSetsNotAllowed"
-	//
-	// Controllers may raise this condition with other reasons,
-	// but should prefer to use the reasons listed above to improve
-	// interoperability.
-	GatewayConditionAttachedListenerSets GatewayConditionType = "AttachedListenerSets"
-
-	// This reason is used with the "AttachedListenerSets" condition when the
-	// Gateway has at least one ListenerSet attached to it.
-	GatewayReasonListenerSetsAttached GatewayConditionReason = "ListenerSetsAttached"
-
-	// This reason is used with the "AttachedListenerSets" condition when the
-	// Gateway has no ListenerSets attached to it.
-	GatewayReasonNoListenerSetsAttached GatewayConditionReason = "NoListenerSetsAttached"
-
-	// This reason is used with the "AttachedListenerSets" condition when the
-	// Gateway has ListenerSets attached to it, but the ListenerSets are not allowed.
-	GatewayReasonListenerSetsNotAllowed GatewayConditionReason = "ListenerSetsNotAllowed"
 )
 
 // ListenerStatus is the status associated with a Listener.
