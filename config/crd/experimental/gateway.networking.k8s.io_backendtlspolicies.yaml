@@ -389,11 +389,9 @@ spec:
 
                       Support: Implementation-specific
                     maxLength: 253
+                    minLength: 1
+                    pattern: ^(System|([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)?/([A-Za-z0-9][-A-Za-z0-9_.]{0,61})?[A-Za-z0-9]))$
                     type: string
-                    x-kubernetes-validations:
-                    - message: must be set to 'System' or be specified as an implementation-specific
-                        name, which is prefixed with a subdomain (as per RFC1123)
-                      rule: self == 'System' || (self.contains('/') && !format.qualifiedName().validate(self).hasValue())
                 required:
                 - hostname
                 type: object
@@ -1082,11 +1080,9 @@ spec:
 
                       Support: Implementation-specific
                     maxLength: 253
+                    minLength: 1
+                    pattern: ^(System|([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)?/([A-Za-z0-9][-A-Za-z0-9_.]{0,61})?[A-Za-z0-9]))$
                     type: string
-                    x-kubernetes-validations:
-                    - message: must be set to 'System' or be specified as an implementation-specific
-                        name, which is prefixed with a subdomain (as per RFC1123)
-                      rule: self == 'System' || (self.contains('/') && !format.qualifiedName().validate(self).hasValue())
                 required:
                 - hostname
                 type: object

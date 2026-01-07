@@ -278,8 +278,9 @@ type SubjectAltName struct {
 
 // WellKnownCACertificatesType is the type of CA certificate that will be used
 // when the caCertificateRefs field is unspecified.
+// +kubebuilder:validation:MinLength=1
 // +kubebuilder:validation:MaxLength=253
-// +kubebuilder:validation:XValidation:message="must be set to 'System' or be specified as an implementation-specific name, which is prefixed with a subdomain (as per RFC1123)",rule="self == 'System' || (self.contains('/') && !format.qualifiedName().validate(self).hasValue())"
+// +kubebuilder:validation:Pattern=`^(System|([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)?/([A-Za-z0-9][-A-Za-z0-9_.]{0,61})?[A-Za-z0-9]))$`
 type WellKnownCACertificatesType string
 
 const (
