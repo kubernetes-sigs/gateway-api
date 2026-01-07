@@ -127,12 +127,12 @@ other functions (like managing DNS or creating certificates).
 ## Service Mesh Implementation Status <a name="meshes"></a>
 
 ### Conformant
+- [Alibaba Cloud Service Mesh][43] (GA)
 - [Istio][9] (GA)
 - [Linkerd][28] (GA)
 - [Cilium][16] (GA)
 
 ### Stale
-- [Alibaba Cloud Service Mesh][43] (GA)
 - [Google Cloud Service Mesh][38] (GA)
 - [Kuma][11] (GA)
 
