@@ -3800,6 +3800,8 @@ spec:
                           is Permanent
                         rule: '!has(self.cookieConfig) || !has(self.cookieConfig.lifetimeType)
                           || self.cookieConfig.lifetimeType != ''Permanent'' || has(self.absoluteTimeout)'
+                      - message: cookieConfig can only be set with type Cookie
+                        rule: '!has(self.cookieConfig) || self.type == ''Cookie'''
                     timeouts:
                       description: |-
                         Timeouts defines the timeouts that can be configured for an HTTP request.
@@ -8007,6 +8009,8 @@ spec:
                           is Permanent
                         rule: '!has(self.cookieConfig) || !has(self.cookieConfig.lifetimeType)
                           || self.cookieConfig.lifetimeType != ''Permanent'' || has(self.absoluteTimeout)'
+                      - message: cookieConfig can only be set with type Cookie
+                        rule: '!has(self.cookieConfig) || self.type == ''Cookie'''
                     timeouts:
                       description: |-
                         Timeouts defines the timeouts that can be configured for an HTTP request.
