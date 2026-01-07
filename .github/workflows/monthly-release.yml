@@ -1,0 +1,201 @@
+name: Monthly Release
+
+on:
+    schedule:
+        # Run on the first day of every month at 00:00 UTC
+        - cron: "0 0 1 * *"
+    workflow_dispatch:
+        # Allow manual triggering
+        inputs:
+            tag:
+                description: "Monthly tag (e.g., monthly-2026.01). Leave empty to auto-generate."
+                required: false
+                type: string
+
+permissions:
+    contents: write
+    id-token: write
+
+jobs:
+    create-monthly-release:
+        name: Create Monthly Release
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # tag=v6.0.1
+              with:
+                  fetch-depth: 0 # Fetch all history for release notes
+
+            - name: Set up Go
+              uses: actions/setup-go@4dc6199c7b1a012772edbd06daecab0f50c9053c # tag=v6.1.0
+              with:
+                  go-version: "1.23"
+
+            - name: Generate monthly tag
+              id: tag
+              run: |
+                  if [ -n "${{ inputs.tag }}" ]; then
+                    TAG="${{ inputs.tag }}"
+                  else
+                    # Format: monthly-YYYY.MM
+                    TAG="monthly-$(date +"%Y.%m")"
+                  fi
+                  echo "tag=${TAG}" >> $GITHUB_OUTPUT
+                  echo "Generated tag: ${TAG}"
+
+            - name: Check if tag already exists
+              id: check-tag
+              run: |
+                  if git rev-parse "${{ steps.tag.outputs.tag }}" >/dev/null 2>&1; then
+                    echo "exists=true" >> $GITHUB_OUTPUT
+                    echo "Tag ${{ steps.tag.outputs.tag }} already exists, skipping release"
+                  else
+                    echo "exists=false" >> $GITHUB_OUTPUT
+                  fi
+
+            - name: Create and push tag
+              if: steps.check-tag.outputs.exists == 'false'
+              run: |
+                  git config user.name "github-actions[bot]"
+                  git config user.email "github-actions[bot]@users.noreply.github.com"
+                  git tag "${{ steps.tag.outputs.tag }}"
+                  git push origin "${{ steps.tag.outputs.tag }}"
+
+            - name: Build monthly YAML
+              if: steps.check-tag.outputs.exists == 'false'
+              env:
+                  TAG: ${{ steps.tag.outputs.tag }}
+                  MONTHLY_NONINTERACTIVE: "true"
+              run: |
+                  make build-monthly-yaml
+
+            - name: Create source code archives
+              if: steps.check-tag.outputs.exists == 'false'
+              run: |
+                  git archive --format=zip --output=gateway-api-${{ steps.tag.outputs.tag }}.zip ${{ steps.tag.outputs.tag }}
+                  git archive --format=tar.gz --output=gateway-api-${{ steps.tag.outputs.tag }}.tar.gz ${{ steps.tag.outputs.tag }}
+
+            - name: Generate release notes
+              if: steps.check-tag.outputs.exists == 'false'
+              id: release-notes
+              run: |
+                  TAG="${{ steps.tag.outputs.tag }}"
+
+                  # Extract year and month from tag (e.g., monthly-2026.01 -> 2026, 01)
+                  YEAR_MONTH=$(echo "$TAG" | sed 's/monthly-//')
+                  YEAR=$(echo "$YEAR_MONTH" | cut -d. -f1)
+                  MONTH_NUM=$(echo "$YEAR_MONTH" | cut -d. -f2)
+
+                  # Convert month number to month name
+                  case "$MONTH_NUM" in
+                    01) MONTH_NAME="January" ;;
+                    02) MONTH_NAME="February" ;;
+                    03) MONTH_NAME="March" ;;
+                    04) MONTH_NAME="April" ;;
+                    05) MONTH_NAME="May" ;;
+                    06) MONTH_NAME="June" ;;
+                    07) MONTH_NAME="July" ;;
+                    08) MONTH_NAME="August" ;;
+                    09) MONTH_NAME="September" ;;
+                    10) MONTH_NAME="October" ;;
+                    11) MONTH_NAME="November" ;;
+                    12) MONTH_NAME="December" ;;
+                    *) MONTH_NAME="Month $MONTH_NUM" ;;
+                  esac
+
+                  # Find the previous monthly tag
+                  PREV_TAG=$(git tag -l "monthly-*" | sort -V | grep -B1 "^${TAG}$" | head -n1)
+
+                  if [ -z "$PREV_TAG" ]; then
+                    # If no previous monthly tag, use the last tag or main
+                    PREV_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "main")
+                  fi
+
+                  echo "Comparing ${PREV_TAG}..${TAG}"
+
+                  # Start with template
+                  NOTES=$(cat <<EOF
+                  Gateway API ${TAG} Release Notes
+
+                  This is the monthly release for the Gateway API experimental channel for ${MONTH_NAME} ${YEAR}. This release includes the latest features and fixes from Gateway API's main branch.
+
+                  Using this Release
+
+                  To install the CRDs for this release, use install ${TAG}-install.yaml:
+
+                  \`\`\`bash
+                  kubectl apply --server-side=true -f https://github.com/kubernetes-sigs/gateway-api/releases/download/${TAG}/${TAG}-install.yaml
+                  \`\`\`
+
+                  To build using this release in Go, include this release in your go.mod:
+
+                  \`\`\`go
+                  require sigs.k8s.io/gateway-api ${TAG}
+                  \`\`\`
+
+                  and run \`go mod tidy\`. You'll find that ${TAG} gets replaced by a Go pseudoversion; this is expected.
+
+                  EOF
+                  )
+
+                  # Get list of changed files in config/crd/experimental
+                  CHANGED_FILES=$(git diff --name-only ${PREV_TAG}..${TAG} -- config/crd/experimental 2>/dev/null || echo "")
+
+                  if [ -n "$CHANGED_FILES" ]; then
+                    NOTES="${NOTES}
+
+                  ## Changes
+
+                  ### Modified CRDs
+                  \`\`\`
+                  $(echo "$CHANGED_FILES" | sed 's|config/crd/experimental/||' | sort | uniq)
+                  \`\`\`
+                  "
+                  fi
+
+                  # Get commit summary
+                  COMMITS=$(git log --oneline ${PREV_TAG}..${TAG} --no-merges 2>/dev/null | head -20 || echo "")
+
+                  if [ -n "$COMMITS" ]; then
+                    NOTES="${NOTES}
+
+                  ### Recent Changes
+                  \`\`\`
+                  ${COMMITS}
+                  \`\`\`
+                  "
+                  fi
+
+                  # Save to file for use in release
+                  echo "$NOTES" > release-notes.md
+                  echo "notes<<EOF" >> $GITHUB_OUTPUT
+                  echo "$NOTES" >> $GITHUB_OUTPUT
+                  echo "EOF" >> $GITHUB_OUTPUT
+
+            - name: Create GitHub Release
+              if: steps.check-tag.outputs.exists == 'false'
+              uses: softprops/action-gh-release@v2
+              with:
+                  tag_name: ${{ steps.tag.outputs.tag }}
+                  name: Monthly Release ${{ steps.tag.outputs.tag }}
+                  body_path: release-notes.md
+                  prerelease: true
+                  files: |
+                      release/${{ steps.tag.outputs.tag }}-install.yaml
+                      gateway-api-${{ steps.tag.outputs.tag }}.zip
+                      gateway-api-${{ steps.tag.outputs.tag }}.tar.gz
+                  draft: false
+                  generate_release_notes: false
+
+            - name: Summary
+              if: always()
+              run: |
+                  if [ "${{ steps.check-tag.outputs.exists }}" == "true" ]; then
+                    echo "## ⚠️ Release Skipped" >> $GITHUB_STEP_SUMMARY
+                    echo "Tag ${{ steps.tag.outputs.tag }} already exists. No release was created." >> $GITHUB_STEP_SUMMARY
+                  else
+                    echo "## ✅ Release Created" >> $GITHUB_STEP_SUMMARY
+                    echo "Successfully created monthly release: **${{ steps.tag.outputs.tag }}**" >> $GITHUB_STEP_SUMMARY
+                    echo "" >> $GITHUB_STEP_SUMMARY
+                    echo "View the release: https://github.com/${{ github.repository }}/releases/tag/${{ steps.tag.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
+                  fi
