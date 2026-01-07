@@ -1,0 +1,40 @@
+name: Dependabot post update
+
+on:
+  pull_request:
+
+permissions:
+  contents: write # Allow the action to push changes back to the PR
+
+jobs:
+  run-post-update:
+    runs-on: ubuntu-latest
+    # Only run this job if the PR was created by Dependabot
+    if: ${{ github.actor == 'dependabot[bot]' }}
+    
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # tag=v6.0.1
+        name: Checkout code
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set up Go
+        uses: actions/setup-go@4dc6199c7b1a012772edbd06daecab0f50c9053c # tag=v6.1.0
+        with:
+          go-version-file: "go.work"
+      - name: Sync dependencies
+        run: |
+          make tidy
+      - name: Commit and push changes
+        run: |
+          if [[ -n $(git status --porcelain) ]]; then
+            git config --global user.name 'github-actions[bot]'
+            git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+            
+            git add .
+            git commit -m "dependabot: sync dependencies"
+            git push
+          else
+            echo "No changes to commit."
+          fi
