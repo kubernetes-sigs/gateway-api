@@ -114,29 +114,8 @@ func ptrTo[T any](a T) *T {
 }
 
 func celErrorStringMatches(got, want string) bool {
-	gotL := strings.ToLower(got)
-	wantL := strings.ToLower(want)
-
 	// Starting in k8s v1.32, some CEL error messages changed to use "more" instead of "longer"
-	alternativeWantL := strings.ReplaceAll(wantL, "longer", "more")
+	alternativeWant := strings.ReplaceAll(want, "more", "longer")
 
-	// Starting in k8s v1.28, CEL error messages stopped adding spec and status prefixes to path names
-	wantLAdjusted := strings.ReplaceAll(wantL, "spec.", "")
-	wantLAdjusted = strings.ReplaceAll(wantLAdjusted, "status.", "")
-	alternativeWantL = strings.ReplaceAll(alternativeWantL, "spec.", "")
-	alternativeWantL = strings.ReplaceAll(alternativeWantL, "status.", "")
-
-	// Enum validation messages changed in k8s v1.28:
-	// Before: must be one of ['Exact', 'PathPrefix', 'RegularExpression']
-	// After: supported values: "Exact", "PathPrefix", "RegularExpression"
-	if strings.Contains(wantLAdjusted, "must be one of") {
-		r := strings.NewReplacer(
-			"must be one of", "supported values:",
-			"[", "",
-			"]", "",
-			"'", "\"",
-		)
-		wantLAdjusted = r.Replace(wantLAdjusted)
-	}
-	return strings.Contains(gotL, wantL) || strings.Contains(gotL, wantLAdjusted) || strings.Contains(gotL, alternativeWantL)
+	return strings.Contains(got, want) || strings.Contains(got, alternativeWant)
 }

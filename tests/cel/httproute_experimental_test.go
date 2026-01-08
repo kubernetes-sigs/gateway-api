@@ -476,7 +476,7 @@ func TestHTTPRouteTimeouts(t *testing.T) {
 		},
 		{
 			name:       "invalid timeout request 200ms less than backendRequest 1s",
-			wantErrors: []string{"Invalid value: \"object\": backendRequest timeout cannot be longer than request timeout"},
+			wantErrors: []string{"backendRequest timeout cannot be longer than request timeout"},
 			rules: []gatewayv1.HTTPRouteRule{
 				{
 					Timeouts: &gatewayv1.HTTPRouteTimeouts{

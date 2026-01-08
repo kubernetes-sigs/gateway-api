@@ -10,6 +10,12 @@ updates:
     schedule:
       interval: "weekly"
     groups:
+      non-k8s:
+        patterns:
+          - "*"
+        exclude-patterns:
+          - "k8s.io/*"
+          - "sigs.k8s.io/*"
       k8s.io: # Group k8s.io golang dependencies updates
           patterns:
             - "k8s.io/*"
@@ -26,6 +32,12 @@ updates:
     schedule:
       interval: "weekly"
     groups:
+      non-k8s:
+        patterns:
+          - "*"
+        exclude-patterns:
+          - "k8s.io/*"
+          - "sigs.k8s.io/*"
       k8s.io: # Group k8s.io golang dependencies updates
         patterns:
           - "k8s.io/*"

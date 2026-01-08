@@ -24,11 +24,44 @@ import (
 
 // HTTPRouteMatchApplyConfiguration represents a declarative configuration of the HTTPRouteMatch type for use
 // with apply.
+//
+// HTTPRouteMatch defines the predicate used to match requests to a given
+// action. Multiple match types are ANDed together, i.e. the match will
+// evaluate to true only if all conditions are satisfied.
+//
+// For example, the match below will match a HTTP request only if its path
+// starts with `/foo` AND it contains the `version: v1` header:
+//
+// ```
+// match:
+//
+// path:
+// value: "/foo"
+// headers:
+// - name: "version"
+// value "v1"
+//
+// ```
 type HTTPRouteMatchApplyConfiguration struct {
-	Path        *HTTPPathMatchApplyConfiguration        `json:"path,omitempty"`
-	Headers     []HTTPHeaderMatchApplyConfiguration     `json:"headers,omitempty"`
+	// Path specifies a HTTP request path matcher. If this field is not
+	// specified, a default prefix match on the "/" path is provided.
+	Path *HTTPPathMatchApplyConfiguration `json:"path,omitempty"`
+	// Headers specifies HTTP request header matchers. Multiple match values are
+	// ANDed together, meaning, a request must match all the specified headers
+	// to select the route.
+	Headers []HTTPHeaderMatchApplyConfiguration `json:"headers,omitempty"`
+	// QueryParams specifies HTTP query parameter matchers. Multiple match
+	// values are ANDed together, meaning, a request must match all the
+	// specified query parameters to select the route.
+	//
+	// Support: Extended
 	QueryParams []HTTPQueryParamMatchApplyConfiguration `json:"queryParams,omitempty"`
-	Method      *apisv1.HTTPMethod                      `json:"method,omitempty"`
+	// Method specifies HTTP method matcher.
+	// When specified, this route will be matched only if the request has the
+	// specified method.
+	//
+	// Support: Extended
+	Method *apisv1.HTTPMethod `json:"method,omitempty"`
 }
 
 // HTTPRouteMatchApplyConfiguration constructs a declarative configuration of the HTTPRouteMatch type for use with

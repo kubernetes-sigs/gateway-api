@@ -24,9 +24,16 @@ import (
 
 // GatewayStatusAddressApplyConfiguration represents a declarative configuration of the GatewayStatusAddress type for use
 // with apply.
+//
+// GatewayStatusAddress describes a network address that is bound to a Gateway.
 type GatewayStatusAddressApplyConfiguration struct {
-	Type  *apisv1.AddressType `json:"type,omitempty"`
-	Value *string             `json:"value,omitempty"`
+	// Type of the address.
+	Type *apisv1.AddressType `json:"type,omitempty"`
+	// Value of the address. The validity of the values will depend
+	// on the type and support by the controller.
+	//
+	// Examples: `1.2.3.4`, `128::1`, `my-ip-address`.
+	Value *string `json:"value,omitempty"`
 }
 
 // GatewayStatusAddressApplyConfiguration constructs a declarative configuration of the GatewayStatusAddress type for use with

@@ -244,6 +244,8 @@ spec:
                     is Permanent
                   rule: '!has(self.cookieConfig) || !has(self.cookieConfig.lifetimeType)
                     || self.cookieConfig.lifetimeType != ''Permanent'' || has(self.absoluteTimeout)'
+                - message: cookieConfig can only be set with type Cookie
+                  rule: '!has(self.cookieConfig) || self.type == ''Cookie'''
               targetRefs:
                 description: |-
                   TargetRefs identifies API object(s) to apply this policy to.

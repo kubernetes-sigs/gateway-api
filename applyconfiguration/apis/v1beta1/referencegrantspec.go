@@ -20,9 +20,24 @@ package v1beta1
 
 // ReferenceGrantSpecApplyConfiguration represents a declarative configuration of the ReferenceGrantSpec type for use
 // with apply.
+//
+// ReferenceGrantSpec identifies a cross namespace relationship that is trusted
+// for Gateway API.
 type ReferenceGrantSpecApplyConfiguration struct {
+	// From describes the trusted namespaces and kinds that can reference the
+	// resources described in "To". Each entry in this list MUST be considered
+	// to be an additional place that references can be valid from, or to put
+	// this another way, entries MUST be combined using OR.
+	//
+	// Support: Core
 	From []ReferenceGrantFromApplyConfiguration `json:"from,omitempty"`
-	To   []ReferenceGrantToApplyConfiguration   `json:"to,omitempty"`
+	// To describes the resources that may be referenced by the resources
+	// described in "From". Each entry in this list MUST be considered to be an
+	// additional place that references can be valid to, or to put this another
+	// way, entries MUST be combined using OR.
+	//
+	// Support: Core
+	To []ReferenceGrantToApplyConfiguration `json:"to,omitempty"`
 }
 
 // ReferenceGrantSpecApplyConfiguration constructs a declarative configuration of the ReferenceGrantSpec type for use with

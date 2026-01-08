@@ -29,11 +29,17 @@ import (
 
 // BackendTLSPolicyApplyConfiguration represents a declarative configuration of the BackendTLSPolicy type for use
 // with apply.
+//
+// BackendTLSPolicy is a Direct Attached Policy.
+// BackendTLSPolicy provides a way to configure how a Gateway
+// connects to a Backend via TLS.
 type BackendTLSPolicyApplyConfiguration struct {
 	metav1.TypeMetaApplyConfiguration    `json:",inline"`
 	*metav1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
-	Spec                                 *BackendTLSPolicySpecApplyConfiguration `json:"spec,omitempty"`
-	Status                               *PolicyStatusApplyConfiguration         `json:"status,omitempty"`
+	// Spec defines the desired state of BackendTLSPolicy.
+	Spec *BackendTLSPolicySpecApplyConfiguration `json:"spec,omitempty"`
+	// Status defines the current state of BackendTLSPolicy.
+	Status *PolicyStatusApplyConfiguration `json:"status,omitempty"`
 }
 
 // BackendTLSPolicy constructs a declarative configuration of the BackendTLSPolicy type for use with
@@ -47,29 +53,14 @@ func BackendTLSPolicy(name, namespace string) *BackendTLSPolicyApplyConfiguratio
 	return b
 }
 
-// ExtractBackendTLSPolicy extracts the applied configuration owned by fieldManager from
-// backendTLSPolicy. If no managedFields are found in backendTLSPolicy for fieldManager, a
-// BackendTLSPolicyApplyConfiguration is returned with only the Name, Namespace (if applicable),
-// APIVersion and Kind populated. It is possible that no managed fields were found for because other
-// field managers have taken ownership of all the fields previously owned by fieldManager, or because
-// the fieldManager never owned fields any fields.
+// ExtractBackendTLSPolicyFrom extracts the applied configuration owned by fieldManager from
+// backendTLSPolicy for the specified subresource. Pass an empty string for subresource to extract
+// the main resource. Common subresources include "status", "scale", etc.
 // backendTLSPolicy must be a unmodified BackendTLSPolicy API object that was retrieved from the Kubernetes API.
-// ExtractBackendTLSPolicy provides a way to perform a extract/modify-in-place/apply workflow.
+// ExtractBackendTLSPolicyFrom provides a way to perform a extract/modify-in-place/apply workflow.
 // Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
 // applied if another fieldManager has updated or force applied any of the previously applied fields.
-// Experimental!
-func ExtractBackendTLSPolicy(backendTLSPolicy *apisv1.BackendTLSPolicy, fieldManager string) (*BackendTLSPolicyApplyConfiguration, error) {
-	return extractBackendTLSPolicy(backendTLSPolicy, fieldManager, "")
-}
-
-// ExtractBackendTLSPolicyStatus is the same as ExtractBackendTLSPolicy except
-// that it extracts the status subresource applied configuration.
-// Experimental!
-func ExtractBackendTLSPolicyStatus(backendTLSPolicy *apisv1.BackendTLSPolicy, fieldManager string) (*BackendTLSPolicyApplyConfiguration, error) {
-	return extractBackendTLSPolicy(backendTLSPolicy, fieldManager, "status")
-}
-
-func extractBackendTLSPolicy(backendTLSPolicy *apisv1.BackendTLSPolicy, fieldManager string, subresource string) (*BackendTLSPolicyApplyConfiguration, error) {
+func ExtractBackendTLSPolicyFrom(backendTLSPolicy *apisv1.BackendTLSPolicy, fieldManager string, subresource string) (*BackendTLSPolicyApplyConfiguration, error) {
 	b := &BackendTLSPolicyApplyConfiguration{}
 	err := managedfields.ExtractInto(backendTLSPolicy, internal.Parser().Type("io.k8s.sigs.gateway-api.apis.v1.BackendTLSPolicy"), fieldManager, b, subresource)
 	if err != nil {
@@ -82,6 +73,27 @@ func extractBackendTLSPolicy(backendTLSPolicy *apisv1.BackendTLSPolicy, fieldMan
 	b.WithAPIVersion("gateway.networking.k8s.io/v1")
 	return b, nil
 }
+
+// ExtractBackendTLSPolicy extracts the applied configuration owned by fieldManager from
+// backendTLSPolicy. If no managedFields are found in backendTLSPolicy for fieldManager, a
+// BackendTLSPolicyApplyConfiguration is returned with only the Name, Namespace (if applicable),
+// APIVersion and Kind populated. It is possible that no managed fields were found for because other
+// field managers have taken ownership of all the fields previously owned by fieldManager, or because
+// the fieldManager never owned fields any fields.
+// backendTLSPolicy must be a unmodified BackendTLSPolicy API object that was retrieved from the Kubernetes API.
+// ExtractBackendTLSPolicy provides a way to perform a extract/modify-in-place/apply workflow.
+// Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
+// applied if another fieldManager has updated or force applied any of the previously applied fields.
+func ExtractBackendTLSPolicy(backendTLSPolicy *apisv1.BackendTLSPolicy, fieldManager string) (*BackendTLSPolicyApplyConfiguration, error) {
+	return ExtractBackendTLSPolicyFrom(backendTLSPolicy, fieldManager, "")
+}
+
+// ExtractBackendTLSPolicyStatus extracts the applied configuration owned by fieldManager from
+// backendTLSPolicy for the status subresource.
+func ExtractBackendTLSPolicyStatus(backendTLSPolicy *apisv1.BackendTLSPolicy, fieldManager string) (*BackendTLSPolicyApplyConfiguration, error) {
+	return ExtractBackendTLSPolicyFrom(backendTLSPolicy, fieldManager, "status")
+}
+
 func (b BackendTLSPolicyApplyConfiguration) IsApplyConfiguration() {}
 
 // WithKind sets the Kind field in the declarative configuration to the given value

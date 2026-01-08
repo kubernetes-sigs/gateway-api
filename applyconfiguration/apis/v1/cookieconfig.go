@@ -24,7 +24,28 @@ import (
 
 // CookieConfigApplyConfiguration represents a declarative configuration of the CookieConfig type for use
 // with apply.
+//
+// CookieConfig defines the configuration for cookie-based session persistence.
 type CookieConfigApplyConfiguration struct {
+	// LifetimeType specifies whether the cookie has a permanent or
+	// session-based lifetime. A permanent cookie persists until its
+	// specified expiry time, defined by the Expires or Max-Age cookie
+	// attributes, while a session cookie is deleted when the current
+	// session ends.
+	//
+	// When set to "Permanent", AbsoluteTimeout indicates the
+	// cookie's lifetime via the Expires or Max-Age cookie attributes
+	// and is required.
+	//
+	// When set to "Session", AbsoluteTimeout indicates the
+	// absolute lifetime of the cookie tracked by the gateway and
+	// is optional.
+	//
+	// Defaults to "Session".
+	//
+	// Support: Core for "Session" type
+	//
+	// Support: Extended for "Permanent" type
 	LifetimeType *apisv1.CookieLifetimeType `json:"lifetimeType,omitempty"`
 }
 

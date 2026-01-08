@@ -24,9 +24,33 @@ import (
 
 // ReferenceGrantFromApplyConfiguration represents a declarative configuration of the ReferenceGrantFrom type for use
 // with apply.
+//
+// ReferenceGrantFrom describes trusted namespaces and kinds.
 type ReferenceGrantFromApplyConfiguration struct {
-	Group     *v1.Group     `json:"group,omitempty"`
-	Kind      *v1.Kind      `json:"kind,omitempty"`
+	// Group is the group of the referent.
+	// When empty, the Kubernetes core API group is inferred.
+	//
+	// Support: Core
+	Group *v1.Group `json:"group,omitempty"`
+	// Kind is the kind of the referent. Although implementations may support
+	// additional resources, the following types are part of the "Core"
+	// support level for this field.
+	//
+	// When used to permit a SecretObjectReference:
+	//
+	// * Gateway
+	//
+	// When used to permit a BackendObjectReference:
+	//
+	// * GRPCRoute
+	// * HTTPRoute
+	// * TCPRoute
+	// * TLSRoute
+	// * UDPRoute
+	Kind *v1.Kind `json:"kind,omitempty"`
+	// Namespace is the namespace of the referent.
+	//
+	// Support: Core
 	Namespace *v1.Namespace `json:"namespace,omitempty"`
 }
 
