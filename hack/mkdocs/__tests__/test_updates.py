@@ -34,7 +34,7 @@ class TestUpdateMkdocsYml(unittest.TestCase):
         self.test_dir.mkdir()
         self.mkdocs_yml_path = self.test_dir / "mkdocs.yml"
         # Patch the function to use our temporary file path
-        self.patcher = patch("linking.Path")
+        self.patcher = patch("hack.mkdocs_linking.Path")
         self.mock_path = self.patcher.start()
         self.mock_path.return_value = self.mkdocs_yml_path
 

@@ -42,7 +42,7 @@ class TestMigration(unittest.TestCase):
         # The script under test uses module-level globals for configuration.
         # To ensure tests are isolated, we temporarily redirect these globals
         # to point to our test directory during test execution.
-        self.linking_module = sys.modules["linking"]
+        self.linking_module = sys.modules["hack.mkdocs_linking"]
         self.original_globals = {
             "DOCS_DIR": self.linking_module.DOCS_DIR,
             "REDIRECT_MAP_FILE": self.linking_module.REDIRECT_MAP_FILE,
