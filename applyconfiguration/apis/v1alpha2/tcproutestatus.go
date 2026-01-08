@@ -24,6 +24,8 @@ import (
 
 // TCPRouteStatusApplyConfiguration represents a declarative configuration of the TCPRouteStatus type for use
 // with apply.
+//
+// TCPRouteStatus defines the observed state of TCPRoute
 type TCPRouteStatusApplyConfiguration struct {
 	v1.RouteStatusApplyConfiguration `json:",inline"`
 }

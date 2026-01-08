@@ -25,10 +25,37 @@ import (
 
 // MeshSpecApplyConfiguration represents a declarative configuration of the MeshSpec type for use
 // with apply.
+//
+// MeshSpec defines the desired state of an XMesh.
 type MeshSpecApplyConfiguration struct {
-	ControllerName *v1.GatewayController                         `json:"controllerName,omitempty"`
-	ParametersRef  *apisv1.ParametersReferenceApplyConfiguration `json:"parametersRef,omitempty"`
-	Description    *string                                       `json:"description,omitempty"`
+	// ControllerName is the name of a controller that is managing Gateway API
+	// resources for mesh traffic management. The value of this field MUST be a
+	// domain prefixed path.
+	//
+	// Example: "example.com/awesome-mesh".
+	//
+	// This field is not mutable and cannot be empty.
+	//
+	// Support: Core
+	ControllerName *v1.GatewayController `json:"controllerName,omitempty"`
+	// ParametersRef is an optional reference to a resource that contains
+	// implementation-specific configuration for this Mesh. If no
+	// implementation-specific parameters are needed, this field MUST be
+	// omitted.
+	//
+	// ParametersRef can reference a standard Kubernetes resource, i.e.
+	// ConfigMap, or an implementation-specific custom resource. The resource
+	// can be cluster-scoped or namespace-scoped.
+	//
+	// If the referent cannot be found, refers to an unsupported kind, or when
+	// the data within that resource is malformed, the Mesh MUST be rejected
+	// with the "Accepted" status condition set to "False" and an
+	// "InvalidParameters" reason.
+	//
+	// Support: Implementation-specific
+	ParametersRef *apisv1.ParametersReferenceApplyConfiguration `json:"parametersRef,omitempty"`
+	// Description optionally provides a human-readable description of a Mesh.
+	Description *string `json:"description,omitempty"`
 }
 
 // MeshSpecApplyConfiguration constructs a declarative configuration of the MeshSpec type for use with

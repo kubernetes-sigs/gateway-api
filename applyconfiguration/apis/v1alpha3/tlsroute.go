@@ -30,11 +30,20 @@ import (
 
 // TLSRouteApplyConfiguration represents a declarative configuration of the TLSRoute type for use
 // with apply.
+//
+// The TLSRoute resource is similar to TCPRoute, but can be configured
+// to match against TLS-specific metadata. This allows more flexibility
+// in matching streams for a given TLS listener.
+//
+// If you need to forward traffic to a single target for a TLS listener, you
+// could choose to use a TCPRoute with a TLS listener.
 type TLSRouteApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
-	Spec                             *TLSRouteSpecApplyConfiguration            `json:"spec,omitempty"`
-	Status                           *v1alpha2.TLSRouteStatusApplyConfiguration `json:"status,omitempty"`
+	// Spec defines the desired state of TLSRoute.
+	Spec *TLSRouteSpecApplyConfiguration `json:"spec,omitempty"`
+	// Status defines the current state of TLSRoute.
+	Status *v1alpha2.TLSRouteStatusApplyConfiguration `json:"status,omitempty"`
 }
 
 // TLSRoute constructs a declarative configuration of the TLSRoute type for use with
@@ -48,29 +57,14 @@ func TLSRoute(name, namespace string) *TLSRouteApplyConfiguration {
 	return b
 }
 
-// ExtractTLSRoute extracts the applied configuration owned by fieldManager from
-// tLSRoute. If no managedFields are found in tLSRoute for fieldManager, a
-// TLSRouteApplyConfiguration is returned with only the Name, Namespace (if applicable),
-// APIVersion and Kind populated. It is possible that no managed fields were found for because other
-// field managers have taken ownership of all the fields previously owned by fieldManager, or because
-// the fieldManager never owned fields any fields.
+// ExtractTLSRouteFrom extracts the applied configuration owned by fieldManager from
+// tLSRoute for the specified subresource. Pass an empty string for subresource to extract
+// the main resource. Common subresources include "status", "scale", etc.
 // tLSRoute must be a unmodified TLSRoute API object that was retrieved from the Kubernetes API.
-// ExtractTLSRoute provides a way to perform a extract/modify-in-place/apply workflow.
+// ExtractTLSRouteFrom provides a way to perform a extract/modify-in-place/apply workflow.
 // Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
 // applied if another fieldManager has updated or force applied any of the previously applied fields.
-// Experimental!
-func ExtractTLSRoute(tLSRoute *apisv1alpha3.TLSRoute, fieldManager string) (*TLSRouteApplyConfiguration, error) {
-	return extractTLSRoute(tLSRoute, fieldManager, "")
-}
-
-// ExtractTLSRouteStatus is the same as ExtractTLSRoute except
-// that it extracts the status subresource applied configuration.
-// Experimental!
-func ExtractTLSRouteStatus(tLSRoute *apisv1alpha3.TLSRoute, fieldManager string) (*TLSRouteApplyConfiguration, error) {
-	return extractTLSRoute(tLSRoute, fieldManager, "status")
-}
-
-func extractTLSRoute(tLSRoute *apisv1alpha3.TLSRoute, fieldManager string, subresource string) (*TLSRouteApplyConfiguration, error) {
+func ExtractTLSRouteFrom(tLSRoute *apisv1alpha3.TLSRoute, fieldManager string, subresource string) (*TLSRouteApplyConfiguration, error) {
 	b := &TLSRouteApplyConfiguration{}
 	err := managedfields.ExtractInto(tLSRoute, internal.Parser().Type("io.k8s.sigs.gateway-api.apis.v1alpha3.TLSRoute"), fieldManager, b, subresource)
 	if err != nil {
@@ -83,6 +77,27 @@ func extractTLSRoute(tLSRoute *apisv1alpha3.TLSRoute, fieldManager string, subre
 	b.WithAPIVersion("gateway.networking.k8s.io/v1alpha3")
 	return b, nil
 }
+
+// ExtractTLSRoute extracts the applied configuration owned by fieldManager from
+// tLSRoute. If no managedFields are found in tLSRoute for fieldManager, a
+// TLSRouteApplyConfiguration is returned with only the Name, Namespace (if applicable),
+// APIVersion and Kind populated. It is possible that no managed fields were found for because other
+// field managers have taken ownership of all the fields previously owned by fieldManager, or because
+// the fieldManager never owned fields any fields.
+// tLSRoute must be a unmodified TLSRoute API object that was retrieved from the Kubernetes API.
+// ExtractTLSRoute provides a way to perform a extract/modify-in-place/apply workflow.
+// Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
+// applied if another fieldManager has updated or force applied any of the previously applied fields.
+func ExtractTLSRoute(tLSRoute *apisv1alpha3.TLSRoute, fieldManager string) (*TLSRouteApplyConfiguration, error) {
+	return ExtractTLSRouteFrom(tLSRoute, fieldManager, "")
+}
+
+// ExtractTLSRouteStatus extracts the applied configuration owned by fieldManager from
+// tLSRoute for the status subresource.
+func ExtractTLSRouteStatus(tLSRoute *apisv1alpha3.TLSRoute, fieldManager string) (*TLSRouteApplyConfiguration, error) {
+	return ExtractTLSRouteFrom(tLSRoute, fieldManager, "status")
+}
+
 func (b TLSRouteApplyConfiguration) IsApplyConfiguration() {}
 
 // WithKind sets the Kind field in the declarative configuration to the given value

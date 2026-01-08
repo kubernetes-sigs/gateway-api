@@ -20,6 +20,8 @@ package v1
 
 // HTTPRouteStatusApplyConfiguration represents a declarative configuration of the HTTPRouteStatus type for use
 // with apply.
+//
+// HTTPRouteStatus defines the observed state of HTTPRoute.
 type HTTPRouteStatusApplyConfiguration struct {
 	RouteStatusApplyConfiguration `json:",inline"`
 }
