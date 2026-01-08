@@ -43,7 +43,7 @@ from typing import Any, Dict, List, Tuple, Optional
 # --- Configuration ---
 # Global constants defining key file paths and metadata keys.
 DOCS_DIR: Path = Path("docs")
-REDIRECT_MAP_FILE: Path = Path("redirect_map.json")
+REDIRECT_MAP_FILE: Path = Path("hack/redirect_map.json")
 FRONTMATTER_ID_KEY: str = "id"
 
 
