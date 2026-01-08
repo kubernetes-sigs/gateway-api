@@ -6,7 +6,7 @@ replace sigs.k8s.io/gateway-api => ../
 
 require (
 	github.com/eclipse/paho.mqtt.golang v1.5.1
-	github.com/miekg/dns v1.1.68
+	github.com/miekg/dns v1.1.69
 	github.com/stretchr/testify v1.11.1
 	golang.org/x/net v0.48.0
 	golang.org/x/sync v0.19.0
