@@ -24,7 +24,7 @@ The `Gateway` spec defines the following:
 If the desired configuration specified in Gateway spec cannot be achieved, the
 Gateway will be in an error state with details provided by status conditions.
 
-### Deployment models
+## Deployment models
 
 Depending on the `GatewayClass`, the creation of a `Gateway` could do any of
 the following actions:
@@ -38,7 +38,7 @@ the following actions:
 
 The API does not specify which one of these actions will be taken.
 
-### Gateway Status
+## Gateway Status
 
 `GatewayStatus` is used to surface the status of a `Gateway` relative to the
 desired state represented in `spec`. `GatewayStatus` consists of the following:
