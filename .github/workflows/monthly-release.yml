@@ -27,7 +27,7 @@ jobs:
                   fetch-depth: 0 # Fetch all history for release notes
 
             - name: Set up Go
-              uses: actions/setup-go@v5
+              uses: actions/setup-go@4dc6199c7b1a012772edbd06daecab0f50c9053c # tag=v6.1.0
               with:
                 go-version-file: 'go.work'
 
