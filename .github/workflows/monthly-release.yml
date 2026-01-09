@@ -69,12 +69,6 @@ jobs:
               run: |
                   make build-monthly-yaml
 
-            - name: Create source code archives
-              if: steps.check-tag.outputs.exists == 'false'
-              run: |
-                  git archive --format=zip --output=gateway-api-${{ steps.tag.outputs.tag }}.zip ${{ steps.tag.outputs.tag }}
-                  git archive --format=tar.gz --output=gateway-api-${{ steps.tag.outputs.tag }}.tar.gz ${{ steps.tag.outputs.tag }}
-
             - name: Generate release notes
               if: steps.check-tag.outputs.exists == 'false'
               id: release-notes
@@ -182,8 +176,6 @@ jobs:
                   prerelease: true
                   files: |
                       release/${{ steps.tag.outputs.tag }}-install.yaml
-                      gateway-api-${{ steps.tag.outputs.tag }}.zip
-                      gateway-api-${{ steps.tag.outputs.tag }}.tar.gz
                   draft: false
                   generate_release_notes: false
 
