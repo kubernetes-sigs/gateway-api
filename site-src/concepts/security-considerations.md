@@ -8,14 +8,10 @@ provide a safer environment.
 
 ## Avoiding hostname/domain hijacking
 
-Gateway controllers work to disambiguate and detect conflicts caused by sharing
-different ports, protocols, etc. between various listeners. (?)
+On Gateway API, it is possible for distinct Routes and ListenerSets to claim the same hostname. 
+Gateway controllers are responsible for the conflict resolution, that usually works on a first-come, first-served basis, where the first created resource wins in the  conflict management.
 
-Generally this conflict resolution works on a first-come, first-served basis, where
-the first created resource wins in the  conflict management.
-
-The [hostname definition](../reference/spec.md#httproutespec) is a list, so given the
-following scenario:
+The [hostname definition](../reference/spec.md#httproutespec) on a Route or on ListenerSet is a list, and given the following scenario:
 
 * `Gateway` accepts routes from a set of namespaces
 * `HTTPRoute` with name `route1` is created on namespace `ns1`, with `creationTimestamp: 00:00:01`
@@ -97,7 +93,7 @@ can be used to add rules that limits what namespaces can use what domains.
 
 !!! warning
     The validation policy shown here **IS AN EXAMPLE** and the cluster-admin should do
-    adjustments to their own environment! Do not copy/paste this example with proper
+    adjustments to their own environment! Do not copy/paste this example without proper
     adjustments
 
 The policy exemplified here will:
