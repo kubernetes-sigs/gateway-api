@@ -20,10 +20,10 @@ import unittest
 from pathlib import Path
 from types import SimpleNamespace
 
-sys.path.insert(0, str(Path(__file__).parent))
+sys.path.insert(0, str(Path(__file__).parents[2]))
 
-import linking
-from linking import on_config, prepare_docs
+import mkdocs_linking as linking
+from mkdocs_linking import on_config, prepare_docs
 
 
 class TestMigration(unittest.TestCase):
@@ -42,7 +42,7 @@ class TestMigration(unittest.TestCase):
         # The script under test uses module-level globals for configuration.
         # To ensure tests are isolated, we temporarily redirect these globals
         # to point to our test directory during test execution.
-        self.linking_module = sys.modules["hack.mkdocs_linking"]
+        self.linking_module = sys.modules["mkdocs_linking"]
         self.original_globals = {
             "DOCS_DIR": self.linking_module.DOCS_DIR,
             "REDIRECT_MAP_FILE": self.linking_module.REDIRECT_MAP_FILE,

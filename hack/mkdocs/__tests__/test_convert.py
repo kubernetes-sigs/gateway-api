@@ -17,9 +17,9 @@ import sys
 import unittest
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent))
+sys.path.insert(0, str(Path(__file__).parents[2]))
 
-import linking
+import mkdocs_linking as linking
 
 
 class TestConvertFromRelativeLinks(unittest.TestCase):
@@ -41,7 +41,7 @@ class TestConvertFromRelativeLinks(unittest.TestCase):
         self.redirect_map_file = self.test_dir / "redirect_map.json"
         self.docs_path.mkdir(parents=True)
 
-        self.linking_module = sys.modules["hack.mkdocs_linking"]
+        self.linking_module = sys.modules["mkdocs_linking"]
         self.original_globals = {
             "DOCS_DIR": self.linking_module.DOCS_DIR,
             "REDIRECT_MAP_FILE": self.linking_module.REDIRECT_MAP_FILE,

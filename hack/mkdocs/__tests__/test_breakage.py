@@ -19,10 +19,10 @@ import unittest
 from pathlib import Path
 from types import SimpleNamespace
 
-sys.path.insert(0, str(Path(__file__).parent))
+sys.path.insert(0, str(Path(__file__).parents[2]))
 
-import linking
-from linking import on_config, prepare_docs
+import mkdocs_linking as linking
+from mkdocs_linking import on_config, prepare_docs
 
 
 class TestLinkBreakageScenarios(unittest.TestCase):

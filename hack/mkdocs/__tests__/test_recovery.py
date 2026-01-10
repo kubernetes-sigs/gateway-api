@@ -18,10 +18,10 @@ import sys
 import unittest
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent))
+sys.path.insert(0, str(Path(__file__).parents[2]))
 
-import linking
-from linking import prepare_docs
+import mkdocs_linking as linking
+from mkdocs_linking import prepare_docs
 
 
 class TestErrorRecovery(unittest.TestCase):

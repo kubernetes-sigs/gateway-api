@@ -17,9 +17,9 @@ from pathlib import Path
 import shutil
 import sys
 
-sys.path.insert(0, str(Path(__file__).parent))
+sys.path.insert(0, str(Path(__file__).parents[2]))
 
-from main import PageResolver
+from mkdocs_main import PageResolver
 
 
 class TestPageResolver(unittest.TestCase):
