@@ -19,9 +19,9 @@ import yaml
 from pathlib import Path
 from unittest.mock import patch
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(0, str(Path(__file__).parents[2]))
 
-import linking
+import mkdocs_linking as linking
 
 class TestUpdateMkdocsYml(unittest.TestCase):
     """Tests for the _update_mkdocs_yml_redirects function."""
@@ -34,7 +34,7 @@ class TestUpdateMkdocsYml(unittest.TestCase):
         self.test_dir.mkdir()
         self.mkdocs_yml_path = self.test_dir / "mkdocs.yml"
         # Patch the function to use our temporary file path
-        self.patcher = patch("hack.mkdocs_linking.Path")
+        self.patcher = patch("mkdocs_linking.Path")
         self.mock_path = self.patcher.start()
         self.mock_path.return_value = self.mkdocs_yml_path
 
