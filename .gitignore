@@ -61,5 +61,6 @@ site-src/reference/spec.md
 site-src/reference/specx.md
 site-src/reference/**/spec.md
 site-src/reference/**/specx.md
+temp_test_convert_links
 
 .lycheecache
