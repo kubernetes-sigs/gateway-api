@@ -301,7 +301,7 @@ effort, check out the #development channel or join our [weekly developer meeting
 [cilium-service-mesh]:https://docs.cilium.io/en/stable/gettingstarted/#service-mesh
 [cilium-sidecarless]:https://isovalent.com/blog/post/cilium-service-mesh/
 [cilium118blog]:https://isovalent.com/blog/post/cilium-1-18/#service-mesh-gateway-api
-[cilium-slack]:https://cilium.io/slack
+[cilium-slack]:https://slack.cilium.io
 [cilium-meeting]:https://github.com/cilium/cilium#weekly-developer-meeting
 
 ### Contour
