@@ -201,7 +201,7 @@ More precisely, **Routing discriminators** are the information that can be used 
 This table from the [API Overview](link) page summarizes the various Route types included in Gateway API, with their **Routing Discriminators**.
 
 |Object|Protocol|OSI Layer|Routing Discriminator|Listener TLS Support|Backend TLS Support|Purpose|
-|------|--------|---------|---------------------|-----------|-------|
+|------|--------|---------|---------------------|-----------|-------|-------|
 |HTTPRoute|HTTP or HTTPS| Layer 7 | Anything in the HTTP Protocol | Terminated only | Via BackendTLSPolicy |HTTP and HTTPS Routing|
 |TLSRoute|TLS| Somewhere between layer 4 and 7| SNI or other TLS properties| Passthrough or Terminated | None currently, although support for BackendTLSPolicy when Terminated has been discussed.|Routing of TLS protocols including HTTPS where inspection of the HTTP stream is not required.|
 |GRPCRoute|HTTP or HTTPS| Layer 7 | Anything in the gRPC Protocol | Terminated only | None currently, although support for BackendTLSPolicy when Protocol is `HTTPS` has been discussed.| gRPC Routing over HTTP/2 and HTTP/2 cleartext|
