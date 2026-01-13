@@ -21,7 +21,6 @@ package v1alpha1
 import (
 	metav1 "k8s.io/client-go/applyconfigurations/meta/v1"
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
-	apisxv1alpha1 "sigs.k8s.io/gateway-api/apisx/v1alpha1"
 	apisv1 "sigs.k8s.io/gateway-api/applyconfiguration/apis/v1"
 )
 
@@ -32,8 +31,6 @@ import (
 type ListenerEntryStatusApplyConfiguration struct {
 	// Name is the name of the Listener that this status corresponds to.
 	Name *v1.SectionName `json:"name,omitempty"`
-	// Port is the network port the listener is configured to listen on.
-	Port *apisxv1alpha1.StatusPortNumber `json:"port,omitempty"`
 	// SupportedKinds is the list indicating the Kinds supported by this
 	// listener. This MUST represent the kinds supported by an implementation for
 	// that Listener configuration.
@@ -80,14 +77,6 @@ func ListenerEntryStatus() *ListenerEntryStatusApplyConfiguration {
 // If called multiple times, the Name field is set to the value of the last call.
 func (b *ListenerEntryStatusApplyConfiguration) WithName(value v1.SectionName) *ListenerEntryStatusApplyConfiguration {
 	b.Name = &value
-	return b
-}
-
-// WithPort sets the Port field in the declarative configuration to the given value
-// and returns the receiver, so that objects can be built by chaining "With" function invocations.
-// If called multiple times, the Port field is set to the value of the last call.
-func (b *ListenerEntryStatusApplyConfiguration) WithPort(value apisxv1alpha1.StatusPortNumber) *ListenerEntryStatusApplyConfiguration {
-	b.Port = &value
 	return b
 }
 

@@ -204,18 +204,11 @@ type ListenerEntry struct {
 	// Port is the network port. Multiple listeners may use the
 	// same port, subject to the Listener compatibility rules.
 	//
-	// If the port is not set, the implementation will assign
-	// a unique port. If the implementation does not support dynamic port
-	// assignment, it MUST set `Accepted` condition to `False` with the
-	// `UnsupportedPort` reason.
-	//
-	// Support: Core
-	//
-	// +optional
-	//
 	// +kubebuilder:validation:Minimum=1
 	// +kubebuilder:validation:Maximum=65535
-	Port *PortNumber `json:"port,omitempty"`
+	//
+	// +required
+	Port PortNumber `json:"port"`
 
 	// Protocol specifies the network protocol this listener expects to receive.
 	//
@@ -435,11 +428,7 @@ spec:
 ```
 ### ListenerEntry
 
-`ListenerEntry` is currently a copy of the `Listener` struct with some changes noted in the below sections
-
-#### Port
-
-`Port` is now optional to allow for dynamic port assignment.  If the port is unspecified or set to zero, the implementation will assign a unique port. If the implementation does not support dynamic port assignment, it MUST set `Accepted` condition to `False` with the `UnsupportedPort` reason.
+`ListenerEntry` is currently a copy of the `Listener` struct.
 
 ## Semantics
 
