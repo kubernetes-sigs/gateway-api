@@ -70,10 +70,9 @@ type HTTPCORSFilterApplyConfiguration struct {
 	// the CORS headers. The cross-origin request fails on the client side.
 	// Therefore, the client doesn't attempt the actual cross-origin request.
 	//
-	// The `Access-Control-Allow-Origin` response header can only use `*`
-	// wildcard as value when the `AllowCredentials` field is false or omitted.
-	//
-	// When the `AllowCredentials` field is true and `AllowOrigins` field
+	// When the request is credentialed, the gateway must not specify the `*`
+	// wildcard in the `Access-Control-Allow-Origin` response header. When
+	// also the `AllowCredentials` field is true and `AllowOrigins` field
 	// specified with the `*` wildcard, the gateway must return a single origin
 	// in the value of the `Access-Control-Allow-Origin` response header,
 	// instead of specifying the `*` wildcard. The value of the header
@@ -123,15 +122,19 @@ type HTTPCORSFilterApplyConfiguration struct {
 	// The `Access-Control-Allow-Methods` response header can only use `*`
 	// wildcard as value when the `AllowCredentials` field is false or omitted.
 	//
-	// When the `AllowCredentials` field is true and `AllowMethods` field
+	// When the request is credentialed, the gateway must not specify the `*`
+	// wildcard in the `Access-Control-Allow-Methods` response header. When
+	// also the `AllowCredentials` field is true and `AllowMethods` field
 	// specified with the `*` wildcard, the gateway must specify one HTTP method
 	// in the value of the Access-Control-Allow-Methods response header. The
 	// value of the header `Access-Control-Allow-Methods` is same as the
 	// `Access-Control-Request-Method` header provided by the client. If the
 	// header `Access-Control-Request-Method` is not included in the request,
 	// the gateway will omit the `Access-Control-Allow-Methods` response header,
-	// instead of specifying the `*` wildcard. A Gateway implementation may
-	// choose to add implementation-specific default methods.
+	// instead of specifying the `*` wildcard.
+	//
+	// A Gateway implementation may choose to add implementation-specific
+	// default methods.
 	//
 	// Support: Extended
 	AllowMethods []apisv1.HTTPMethodWithWildcard `json:"allowMethods,omitempty"`
@@ -160,15 +163,19 @@ type HTTPCORSFilterApplyConfiguration struct {
 	// The `Access-Control-Allow-Headers` response header can only use `*`
 	// wildcard as value when the `AllowCredentials` field is false or omitted.
 	//
-	// When the `AllowCredentials` field is true and `AllowHeaders` field
+	// When the request is credentialed, the gateway must not specify the `*`
+	// wildcard in the `Access-Control-Allow-Headers` response header. When
+	// also the `AllowCredentials` field is true and `AllowHeaders` field
 	// specified with the `*` wildcard, the gateway must specify one or more
 	// HTTP headers in the value of the `Access-Control-Allow-Headers` response
 	// header. The value of the header `Access-Control-Allow-Headers` is same as
 	// the `Access-Control-Request-Headers` header provided by the client. If
 	// the header `Access-Control-Request-Headers` is not included in the
 	// request, the gateway will omit the `Access-Control-Allow-Headers`
-	// response header, instead of specifying the `*` wildcard. A Gateway
-	// implementation may choose to add implementation-specific default headers.
+	// response header, instead of specifying the `*` wildcard.
+	//
+	// A Gateway implementation may choose to add implementation-specific
+	// default headers.
 	//
 	// Support: Extended
 	AllowHeaders []apisv1.HTTPHeaderName `json:"allowHeaders,omitempty"`
@@ -199,7 +206,7 @@ type HTTPCORSFilterApplyConfiguration struct {
 	//
 	// A wildcard indicates that the responses with all HTTP headers are exposed
 	// to clients. The `Access-Control-Expose-Headers` response header can only
-	// use `*` wildcard as value when the `AllowCredentials` field is false or omitted.
+	// use `*` wildcard as value when the request is not credentialed.
 	//
 	// Support: Extended
 	ExposeHeaders []apisv1.HTTPHeaderName `json:"exposeHeaders,omitempty"`
