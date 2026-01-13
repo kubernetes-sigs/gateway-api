@@ -218,6 +218,7 @@ type BudgetDetails struct {
 //
 // +kubebuilder:validation:Pattern=`^([0-9]{1,5}(h|m|s|ms)){1,4}$`
 type Duration string
+```
 
 ### YAML
 
