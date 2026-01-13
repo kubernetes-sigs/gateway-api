@@ -977,10 +977,6 @@ The following Gateway Conformance (Extended) features will be added
 	//  SupportGatewayListenerSet option indicates support for a Gateway
 	//  with ListenerSets
 	SupportGatewayListenerSet FeatureName = "GatewayListenerSet"
-
-	//  SupportListenerSetDynamicPortAssignment option indicates support for a ListenerSet
-	//  to dynamically assign ports
-	SupportListenerSetDynamicPortAssignment FeatureName = "ListenerSetDynamicPortAssignment"
 ```
 They will validate the following scenarios :
 
@@ -1500,47 +1496,6 @@ They will validate the following scenarios :
           status: True
           reason: HostnameConflict
       // Other accepted listeners
-      ```
-
-1. A listener on a ListenerSet without a defined port
-    - If the implementation supports `ListenerSetDynamicPortAssignment` :
-      - The listener must have the following status :
-        ```
-        name: listener-without-port
-        port: <unique dynamically assigned port value>
-        conditions:
-        - type: Accepted
-          status: True
-          reason: Accepted
-        - type: Programmed
-          status: True
-          reason: Programmed
-        ```
-
-      - The parent gateway has the following status :
-      ```
-      status:
-        AttachedListenerSets: 1
-      ```
-
-      - The request to the ListenerSet port must succeed.
-
-    - If the implementation does not support `ListenerSetDynamicPortAssignment` :
-        ```
-        name: listener-without-port
-        conditions:
-        - type: Accepted
-          status: False
-          reason: UnsupportedPort
-        - type: Programmed
-          status: False
-          reason: UnsupportedPort
-        ```
-
-      - The parent gateway has the following status :
-      ```
-      status:
-        AttachedListenerSets: 0
       ```
 
 1. A listener on a ListenerSet allows routes from the same namespace as the ListenerSet
