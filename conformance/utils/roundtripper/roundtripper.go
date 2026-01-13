@@ -153,7 +153,7 @@ func (d *DefaultRoundTripper) httpTransport(request Request) (http.RoundTripper,
 }
 
 func (d *DefaultRoundTripper) h2cPriorKnowledgeTransport(request Request) (http.RoundTripper, error) {
-	if len(request.ServerCertificate) > 0 {
+	if request.ServerName != "" && len(request.ServerCertificate) > 0 {
 		return nil, errors.New("request has configured trusted CA certificates but h2 prior knowledge is not encrypted")
 	}
 
