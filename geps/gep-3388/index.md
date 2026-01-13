@@ -117,16 +117,39 @@ type BackendTrafficPolicySpec struct {
   // +kubebuilder:validation:MaxItems=16
   TargetRefs []LocalPolicyTargetReference `json:"targetRefs"`
 
-  // Retry defines the configuration for when to retry a request to a target backend.
+  // RetryConstraint defines the configuration for when to allow or prevent
+  // further retries to a target backend, by dynamically calculating a 'retry
+  // budget'. This budget is calculated based on the percentage of incoming
+  // traffic composed of retries over a given time interval. Once the budget
+  // is exceeded, additional retries will be rejected.
   //
-  // Implementations SHOULD retry on connection errors (disconnect, reset, timeout,
-  // TCP failure) if a retry stanza is configured.
+  // For example, if the retry budget interval is 10 seconds, there have been
+  // 1000 active requests in the past 10 seconds, and the allowed percentage
+  // of requests that can be retried is 20% (the default), then 200 of those
+  // requests may be composed of retries. Active requests will only be
+  // considered for the duration of the interval when calculating the retry
+  // budget. Retrying the same original request multiple times within the
+  // retry budget interval will lead to each retry being counted towards
+  // calculating the budget.
+  //
+  // Configuring a RetryConstraint in BackendTrafficPolicy is compatible with
+  // HTTPRoute Retry settings for each HTTPRouteRule that targets the same
+  // backend. While the HTTPRouteRule Retry stanza can specify whether a
+  // request will be retried, and the number of retry attempts each client
+  // may perform, RetryConstraint helps prevent cascading failures such as
+  // retry storms during periods of consistent failures.
+  //
+  // After the retry budget has been exceeded, additional retries to the
+  // backend MUST return a 503 response to the client.
+  //
+  // Additional configurations for defining a constraint on retries MAY be
+  // defined in the future.
   //
   // Support: Extended
   //
   // +optional
   // <gateway:experimental>
-  Retry *CommonRetryPolicy `json:"retry,omitempty"`
+  RetryConstraint *RetryConstraint `json:"retryConstraint,omitempty"`
 
   // SessionPersistence defines and configures session persistence
   // for the backend.
@@ -137,37 +160,56 @@ type BackendTrafficPolicySpec struct {
   SessionPersistence *SessionPersistence `json:"sessionPersistence,omitempty"`
 }
 
-// CommonRetryPolicy defines the configuration for when to retry a request.
-//
-type CommonRetryPolicy struct {
-    // Support: Extended
-    //
-    // +optional
-    BudgetPercent *Int `json:"budgetPercent,omitempty"`
+// RetryConstraint defines the configuration for when to retry a request.
+type RetryConstraint struct {
+	// Budget holds the details of the retry budget configuration.
+	//
+	// +optional
+	// +kubebuilder:default={percent: 20, interval: "10s"}
+	Budget *BudgetDetails `json:"budget,omitempty"`
 
-    // Support: Extended
-    //
-    // +optional
-    BudgetInterval *Duration `json:"budgetInterval,omitempty"`
-
-    // Support: Extended
-    //
-    // +optional
-    MinRetryRate *RequestRate `json:"minRetryRate,omitempty"`
+	// MinRetryRate defines the minimum rate of retries that will be allowable
+	// over a specified duration of time.
+	//
+	// The effective overall minimum rate of retries targeting the backend
+	// service may be much higher, as there can be any number of clients which
+	// are applying this setting locally.
+	//
+	// This ensures that requests can still be retried during periods of low
+	// traffic, where the budget for retries may be calculated as a very low
+	// value.
+	//
+	// Support: Extended
+	//
+	// +optional
+	// +kubebuilder:default={count: 10, interval: "1s"}
+	MinRetryRate *RequestRate `json:"minRetryRate,omitempty"`
 }
 
-// RequestRate expresses a rate of requests over a given period of time.
-//
-type RequestRate struct {
-    // Support: Extended
-    //
-    // +optional
-    Count *Int `json:"count,omitempty"`
+// BudgetDetails specifies the details of the budget configuration, like
+// the percentage of requests in the budget, and the interval between
+// checks.
+type BudgetDetails struct {
+	// Percent defines the maximum percentage of active requests that may
+	// be made up of retries.
+	//
+	// Support: Extended
+	//
+	// +optional
+	// +kubebuilder:default=20
+	// +kubebuilder:validation:Minimum=0
+	// +kubebuilder:validation:Maximum=100
+	Percent *int `json:"percent,omitempty"`
 
-    // Support: Extended
-    //
-    // +optional
-    Interval *Duration `json:"interval,omitempty"`
+	// Interval defines the duration in which requests will be considered
+	// for calculating the budget for retries.
+	//
+	// Support: Extended
+	//
+	// +optional
+	// +kubebuilder:default="10s"
+	// +kubebuilder:validation:XValidation:message="interval cannot be greater than one hour or less than one second",rule="!(duration(self) < duration('1s') || duration(self) > duration('1h'))"
+	Interval *Duration `json:"interval,omitempty"`
 }
 
 // Duration is a string value representing a duration in time. The format is
@@ -189,37 +231,32 @@ spec:
     - group: ""
       kind: Service
       name: foo
-  retry:
-    budgetPercent: 20
-    budgetInterval: 10s
+  retryConstraint:
+    budget:
+      percent: 20
+      interval: 10s
     minRetryRate:
       count: 3
       interval: 1s
   sessionPersistence:
-    ...
-  status:
-    ancestors:
-    - ancestorRef:
-        kind: Mesh
-        namespace: istio-system
-        name: istio
-      controllerName: "istio.io/mesh-controller"
-      conditions:
-      - type: "Accepted"
-        status: "False"
-        reason: "Invalid"
-        message: "BackendTrafficPolicy field sessionPersistence is not supported for Istio mesh traffic."
-    - ancestorRef:
-        kind: Gateway
-        namespace: foo-ns
-        name: foo-ingress
-      controllerName: "istio.io/mesh-controller"
-      conditions:
-      - type: "Accepted"
-        status: "False"
-        reason: "Invalid"
-        message: "BackendTrafficPolicy fields retry.budgetPercentage, retry.budgetInterval and retry.minRetryRate are not supported for Istio ingress gateways."
-    ...
+    sessionName: foo
+    absoluteTimeout: 1h
+    type: Cookie
+    cookieConfig:
+      lifetimeType: Permanent
+status:
+  ancestors:
+  - ancestorRef:
+      kind: Mesh
+      namespace: istio-system
+      name: istio
+    controllerName: "istio.io/mesh-controller"
+    conditions:
+    - type: "Accepted"
+      message: 'Configuration is valid, but Istio does not support the following fields:
+        sessionPersistence'
+      reason: Accepted
+      status: "True"
 ```
 
 ## Conformance Details
