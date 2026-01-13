@@ -1090,7 +1090,56 @@ They will validate the following scenarios :
           reason: NotAllowed
       ```
 
-1. A listener `ls-8080` on the ListenerSet has a protocol conflict with a listener `gw-8080` on the Gateway
+1. A listener `ls-8080` is the only listener on the ListenerSet and it has a protocol conflict with a listener `gw-8080` on the Gateway
+    - The parent gateway has the following status :
+      ```
+      conditions:
+      - type: Accepted
+        status: True
+        reason: Accepted
+      - type: Programmed
+        status: True
+        reason: Programmed
+      listeners:
+      - name: gw-8080
+        conditions:
+        - type: Accepted
+          status: True
+          reason: Accepted
+        - type: Programmed
+          status: True
+          reason: Programmed
+        - type: Conflicted
+          status: False
+          reason: NoConflicts
+
+      AttachedListenerSets: 0
+      ```
+
+    - The listener set has the following status :
+      ```
+      conditions:
+      - type: Accepted
+        status: False
+        reason: ListenersNotValid
+      - type: Programmed
+        status: False
+        reason: ListenersNotValid
+      listeners:
+      - name: ls-8080
+        conditions:
+        - type: Accepted
+          status: False
+          reason: PortUnavailable
+        - type: Programmed
+          status: False
+          reason: PortUnavailable
+        - type: Conflicted
+          status: True
+          reason: ProtocolConflict
+      ```
+
+1. A listener `ls-8080` on the ListenerSet with other valid listeners has a protocol conflict with a listener `gw-8080` on the Gateway
     - The parent gateway has the following status :
       ```
       conditions:
@@ -1137,10 +1186,63 @@ They will validate the following scenarios :
         - type: Conflicted
           status: True
           reason: ProtocolConflict
-      // Other accepted listeners if applicable
+      // Other accepted listeners
       ```
 
-1. A listener `ls-conflicted-8080` on a ListenerSet `ls-conflicted` has a protocol conflict with a listener `ls-accepted-8080` on another ListenerSet `ls-accepted`
+1. A ListenerSet `ls-conflicted` contains only one listener `ls-conflicted-8080` which has a protocol conflict with a listener `ls-accepted-8080` on another ListenerSet `ls-accepted`
+    - The parent gateway has the following status :
+      ```
+      status:
+        AttachedListenerSets: 1
+      ```
+
+    - The `ls-accepted` ListenerSet has the following status :
+      ```
+      conditions:
+      - type: Accepted
+        status: True
+        reason: Accepted
+      - type: Programmed
+        status: True
+        reason: Programmed
+      listeners:
+      - name: ls-accepted-8080
+        conditions:
+        - type: Accepted
+          status: True
+          reason: Accepted
+        - type: Programmed
+          status: True
+          reason: Programmed
+        - type: Conflicted
+          status: False
+          reason: NoConflicts
+      ```
+
+    - The `ls-conflicted` ListenerSet has the following status :
+      ```
+      conditions:
+      - type: Accepted
+        status: False
+        reason: ListenersNotValid
+      - type: Programmed
+        status: False
+        reason: ListenersNotValid
+      listeners:
+      - name: ls-conflicted-8080
+        conditions:
+        - type: Accepted
+          status: False
+          reason: PortUnavailable
+        - type: Programmed
+          status: False
+          reason: PortUnavailable
+        - type: Conflicted
+          status: True
+          reason: ProtocolConflict
+      ```
+
+1. A ListenerSet `ls-conflicted` contains valid listeners and a listener `ls-conflicted-8080` which has a protocol conflict with a listener `ls-accepted-8080` on another ListenerSet `ls-accepted`
     - The parent gateway has the following status :
       ```
       status:
@@ -1191,10 +1293,59 @@ They will validate the following scenarios :
         - type: Conflicted
           status: True
           reason: ProtocolConflict
-      // Other accepted listeners if applicable
+      // Other accepted listeners
       ```
 
-1. A listener `ls-8080` on the ListenerSet has a hostname conflict with a listener `gw-8080` on the Gateway
+1. A listener `ls-8080` on the ListenerSet with only one listener has a hostname conflict with a listener `gw-8080` on the Gateway
+    - The parent gateway has the following status :
+      ```
+      conditions:
+      - type: Accepted
+        status: True
+        reason: Accepted
+      - type: Programmed
+        status: True
+        reason: Programmed
+      listeners:
+      - name: gw-8080
+        conditions:
+        - type: Accepted
+          status: True
+          reason: Accepted
+        - type: Programmed
+          status: True
+          reason: Programmed
+        - type: Conflicted
+          status: False
+          reason: NoConflicts
+
+      AttachedListenerSets: 0
+      ```
+
+    - The listener set has the following status :
+      ```
+      conditions:
+      - type: Accepted
+        status: False
+        reason: ListenersNotValid
+      - type: Programmed
+        status: False
+        reason: ListenersNotValid
+      listeners:
+      - name: ls-8080
+        conditions:
+        - type: Accepted
+          status: False
+          reason: PortUnavailable
+        - type: Programmed
+          status: False
+          reason: PortUnavailable
+        - type: Conflicted
+          status: True
+          reason: HostnameConflict
+      ```
+
+1. A listener `ls-8080` on the ListenerSet with other valid listeners has a hostname conflict with a listener `gw-8080` on the Gateway
     - The parent gateway has the following status :
       ```
       conditions:
@@ -1241,11 +1392,63 @@ They will validate the following scenarios :
         - type: Conflicted
           status: True
           reason: HostnameConflict
-      // Other accepted listeners if applicable
+      // Other accepted listeners
       ```
 
+1. A ListenerSet `ls-conflicted` with only one listener `ls-conflicted-8080` has a hostname conflict with a listener `ls-accepted-8080` on another ListenerSet `ls-accepted`
+    - The parent gateway has the following status :
+      ```
+      status:
+        AttachedListenerSets: 1
+      ```
 
-1. A listener `ls-conflicted-8080` on a ListenerSet `ls-conflicted` has a hostname conflict with a listener `ls-accepted-8080` on another ListenerSet `ls-accepted`
+    - The `ls-accepted` ListenerSet has the following status :
+      ```
+      conditions:
+      - type: Accepted
+        status: True
+        reason: Accepted
+      - type: Programmed
+        status: True
+        reason: Programmed
+      listeners:
+      - name: ls-accepted-8080
+        conditions:
+        - type: Accepted
+          status: True
+          reason: Accepted
+        - type: Programmed
+          status: True
+          reason: Programmed
+        - type: Conflicted
+          status: False
+          reason: NoConflicts
+      ```
+
+    - The `ls-conflicted` ListenerSet has the following status :
+      ```
+      conditions:
+      - type: Accepted
+        status: False
+        reason: ListenersNotValid
+      - type: Programmed
+        status: False
+        reason: ListenersNotValid
+      listeners:
+      - name: ls-conflicted-8080
+        conditions:
+        - type: Accepted
+          status: False
+          reason: PortUnavailable
+        - type: Programmed
+          status: False
+          reason: PortUnavailable
+        - type: Conflicted
+          status: True
+          reason: HostnameConflict
+      ```
+
+1. A ListenerSet `ls-conflicted` with valid listeners and a listener `ls-conflicted-8080` on has a hostname conflict with a listener `ls-accepted-8080` on another ListenerSet `ls-accepted`
     - The parent gateway has the following status :
       ```
       status:
@@ -1296,7 +1499,7 @@ They will validate the following scenarios :
         - type: Conflicted
           status: True
           reason: HostnameConflict
-      // Other accepted listeners if applicable
+      // Other accepted listeners
       ```
 
 1. A listener on a ListenerSet without a defined port
