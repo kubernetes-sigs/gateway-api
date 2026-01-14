@@ -11,63 +11,63 @@ spec:
     port: 7070
   rules:
   - matches:
-    - method:
-        service: gateway_api_conformance.echo_basic.grpcecho.GrpcEcho
-        method: Echo
+    - headers:
+      - name: x-test-case
+        value: set
     filters:
     - type: RequestHeaderModifier
       requestHeaderModifier:
         set:
-        - name: X-Header-Set
+        - name: x-header-set
           value: set-overwrites-values
     backendRefs:
     - name: echo-v1
       port: 7070
   - matches:
-    - method:
-        service: gateway_api_conformance.echo_basic.grpcecho.GrpcEcho
-        method: Echo
+    - headers:
+      - name: x-test-case
+        value: add
     filters:
     - type: RequestHeaderModifier
       requestHeaderModifier:
         add:
-        - name: X-Header-Add
+        - name: x-header-add
           value: add-appends-values
     backendRefs:
     - name: echo-v1
       port: 7070
   - matches:
-    - method:
-        service: gateway_api_conformance.echo_basic.grpcecho.GrpcEcho
-        method: Echo
+    - headers:
+      - name: x-test-case
+        value: remove
     filters:
     - type: RequestHeaderModifier
       requestHeaderModifier:
         remove:
-        - X-Header-Remove
+        - x-header-remove
     backendRefs:
     - name: echo-v1
       port: 7070
   - matches:
-    - method:
-        service: gateway_api_conformance.echo_basic.grpcecho.GrpcEcho
-        method: EchoTwo
+    - headers:
+      - name: x-test-case
+        value: multi
     filters:
     - type: RequestHeaderModifier
       requestHeaderModifier:
         set:
-        - name: X-Header-Set-1
+        - name: x-header-set-1
           value: header-set-1
-        - name: X-Header-Set-2
+        - name: x-header-set-2
           value: header-set-2
         add:
-        - name: X-Header-Add-1
+        - name: x-header-add-1
           value: header-add-1
-        - name: X-Header-Add-2
+        - name: x-header-add-2
           value: header-add-2
         remove:
-        - X-Header-Remove-1
-        - X-Header-Remove-2
+        - x-header-remove-1
+        - x-header-remove-2
     backendRefs:
     - name: echo-v2
       port: 7070
