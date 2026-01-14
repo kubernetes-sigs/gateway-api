@@ -8,9 +8,11 @@ authors:
   - robscott
   - EyalPazz
   - shaneutt
+  - DamianSawicki
 references:
   - https://github.com/kubernetes-sigs/gateway-api/pull/3435
   - https://github.com/kubernetes-sigs/gateway-api/pull/3637
   - https://github.com/kubernetes-sigs/gateway-api/pull/3656
   - https://github.com/kubernetes-sigs/gateway-api/pull/3668
+  - https://github.com/kubernetes-sigs/gateway-api/pull/4281
 
