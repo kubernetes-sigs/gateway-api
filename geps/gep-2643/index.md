@@ -540,7 +540,7 @@ be at least one intersecting hostname for the `TLSRoute` to be attached to the
 | A Gateway with \*.example.tld on a TLS listener MUST allow a TLSRoute with hostname some.example.tld to be attached to it (and the same, but with a non wildcard hostname) <br/> Issue: [TLSRoute conformance] | TLSRoute MUST be able to attach to the Gateway using the matching hostname, a request MUST succeed | TLSRoute  |
 | Expose support for TLSRoute termination <br/> Issue: [Termination] | For a [Listener] setting mode: "terminate", TLSRoute MUST be present in [ListenerStatus.SupportedKinds] in case TLSRoute termination is supported | TLSRouteTermination |
 | Explicitly expose that TLSRoute termination is not supported. <br/> Issue: [Termination] | For a [Listener] setting mode: "terminate" and not being supported, the Listener entry MUST NOT be Accepted containing the condition `Accepted: False` and `Reason: UnsupportedValue`. | TLSRoute + !TLSRouteTermination |
-| Explicitly expose that tls listener accepts termination for TCPRoute only. | For a [Listener] setting mode: "terminate" that supports only `TCPRoute`, a Listener entry MUST exist but only TCPRoute MUST be present in [ListenerStatus.SupportedKinds]. | TLSRoute + !TLSRouteTermination |
+
 
 [Simple]: https://github.com/kubernetes-sigs/gateway-api/blob/edd7cbeac3ff1458c75ed21636af52ba1536b73a/conformance/tests/tlsroute-simple-same-namespace.go
 [ReferenceGrant]: https://github.com/kubernetes-sigs/gateway-api/blob/edd7cbeac3ff1458c75ed21636af52ba1536b73a/conformance/tests/tlsroute-invalid-reference-grant.go

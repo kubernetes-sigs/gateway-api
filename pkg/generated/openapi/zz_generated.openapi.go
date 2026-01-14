@@ -7473,7 +7473,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_TLSRoute(ref common.ReferenceCal
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "The TLSRoute resource is similar to TCPRoute, but can be configured to match against TLS-specific metadata. This allows more flexibility in matching streams for a given TLS listener.\n\nIf you need to forward traffic to a single target for a TLS listener, you could choose to use a TCPRoute with a TLS listener.",
+				Description: "The TLSRoute resource is similar to TCPRoute, but can be configured to match against TLS-specific metadata. This allows more flexibility in matching streams for a given TLS listener.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
