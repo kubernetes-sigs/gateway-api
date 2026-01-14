@@ -391,9 +391,9 @@ const (
 
 	// This reason is used with the "Accepted" condition when one or
 	// more Listeners have an invalid or unsupported configuration
-	// and cannot be configured on the Gateway.
+	// and cannot be configured on the ListenerSet.
 	// This can be the reason when "Accepted" is "True" or "False", depending on whether
-	// the listener being invalid causes the entire Gateway to not be accepted.
+	// the listener being invalid causes the entire ListenerSet to not be accepted.
 	ListenerSetReasonListenersNotValid ListenerSetConditionReason = "ListenersNotValid"
 )
 
@@ -407,7 +407,7 @@ const (
 
 	// This reason is used with the "Accepted" and "Programmed"
 	// conditions when the status is "Unknown" and no controller has reconciled
-	// the Gateway.
+	// the ListenerSet.
 	ListenerSetReasonPending ListenerSetConditionReason = "Pending"
 )
 
@@ -500,12 +500,12 @@ const (
 	ListenerEntryReasonAccepted ListenerEntryConditionReason = "Accepted"
 
 	// This reason is used with the "Accepted" condition when the
-	// Listener could not be attached to be Gateway because its
+	// Listener could not be attached to the Gateway because its
 	// protocol type is not supported.
 	ListenerEntryReasonUnsupportedProtocol ListenerEntryConditionReason = "UnsupportedProtocol"
 
 	// This reason is used with the "Accepted" condition when the
-	// Listener could not be attached to be Gateway because the Gateway
+	// Listener could not be attached to the Gateway because the Gateway
 	// has too many Listeners.
 	ListenerEntryReasonTooManyListeners ListenerEntryConditionReason = "TooManyListeners"
 )
@@ -540,7 +540,7 @@ const (
 	// or unsupported resource or kind, or when the data within that resource
 	// is malformed.
 	// This reason must be used only when the reference is allowed, either by
-	// referencing an object in the same namespace as the Gateway, or when
+	// referencing an object in the same namespace as the ListenerSet, or when
 	// a cross-namespace reference has been explicitly allowed by a ReferenceGrant.
 	// If the reference is not allowed, the reason RefNotPermitted must be used
 	// instead.
