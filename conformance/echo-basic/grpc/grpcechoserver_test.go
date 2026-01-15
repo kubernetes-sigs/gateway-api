@@ -69,7 +69,7 @@ func clientAndServer(t *testing.T) (pb.GrpcEchoClient, serverConfig, string) {
 		HTTPPort:   ServerHTTPPort,
 		PodContext: podContext,
 	}
-	httpPort, _ := runServer(config)
+	httpPort, _ := runServer(t.Context(), config)
 
 	dialOpts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
 

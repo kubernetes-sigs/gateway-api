@@ -511,7 +511,7 @@ type RouteParentStatus struct {
 	//
 	// * The Route refers to a nonexistent parent.
 	// * The Route is of a type that the controller does not support.
-	// * The Route is in a namespace the controller does not have access to.
+	// * The Route is in a namespace to which the controller does not have access.
 	//
 	// <gateway:util:excludeFromCRD>
 	//
@@ -905,6 +905,7 @@ const (
 
 // SessionPersistence defines the desired state of SessionPersistence.
 // +kubebuilder:validation:XValidation:message="AbsoluteTimeout must be specified when cookie lifetimeType is Permanent",rule="!has(self.cookieConfig) || !has(self.cookieConfig.lifetimeType) || self.cookieConfig.lifetimeType != 'Permanent' || has(self.absoluteTimeout)"
+// +kubebuilder:validation:XValidation:message="cookieConfig can only be set with type Cookie",rule="!has(self.cookieConfig) || self.type == 'Cookie'"
 type SessionPersistence struct {
 	// SessionName defines the name of the persistent session token
 	// which may be reflected in the cookie or the header. Users
@@ -936,7 +937,7 @@ type SessionPersistence struct {
 	IdleTimeout *Duration `json:"idleTimeout,omitempty"`
 
 	// Type defines the type of session persistence such as through
-	// the use a header or cookie. Defaults to cookie based session
+	// the use of a header or cookie. Defaults to cookie based session
 	// persistence.
 	//
 	// Support: Core for "Cookie" type

@@ -32,7 +32,7 @@ list][signetg].
 We also have a [Slack channel (sig-network-gateway-api)][slack] on k8s.io for day-to-day
 questions, discussions.
 
-[signetg]: https://groups.google.com/forum/#!forum/kubernetes-sig-network
+[signetg]: https://groups.google.com/a/kubernetes.io/g/sig-network
 [slack]: https://kubernetes.slack.com/archives/CR0H13KGA
 
 ## Meetings

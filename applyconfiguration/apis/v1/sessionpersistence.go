@@ -24,12 +24,41 @@ import (
 
 // SessionPersistenceApplyConfiguration represents a declarative configuration of the SessionPersistence type for use
 // with apply.
+//
+// SessionPersistence defines the desired state of SessionPersistence.
 type SessionPersistenceApplyConfiguration struct {
-	SessionName     *string                         `json:"sessionName,omitempty"`
-	AbsoluteTimeout *apisv1.Duration                `json:"absoluteTimeout,omitempty"`
-	IdleTimeout     *apisv1.Duration                `json:"idleTimeout,omitempty"`
-	Type            *apisv1.SessionPersistenceType  `json:"type,omitempty"`
-	CookieConfig    *CookieConfigApplyConfiguration `json:"cookieConfig,omitempty"`
+	// SessionName defines the name of the persistent session token
+	// which may be reflected in the cookie or the header. Users
+	// should avoid reusing session names to prevent unintended
+	// consequences, such as rejection or unpredictable behavior.
+	//
+	// Support: Implementation-specific
+	SessionName *string `json:"sessionName,omitempty"`
+	// AbsoluteTimeout defines the absolute timeout of the persistent
+	// session. Once the AbsoluteTimeout duration has elapsed, the
+	// session becomes invalid.
+	//
+	// Support: Extended
+	AbsoluteTimeout *apisv1.Duration `json:"absoluteTimeout,omitempty"`
+	// IdleTimeout defines the idle timeout of the persistent session.
+	// Once the session has been idle for more than the specified
+	// IdleTimeout duration, the session becomes invalid.
+	//
+	// Support: Extended
+	IdleTimeout *apisv1.Duration `json:"idleTimeout,omitempty"`
+	// Type defines the type of session persistence such as through
+	// the use of a header or cookie. Defaults to cookie based session
+	// persistence.
+	//
+	// Support: Core for "Cookie" type
+	//
+	// Support: Extended for "Header" type
+	Type *apisv1.SessionPersistenceType `json:"type,omitempty"`
+	// CookieConfig provides configuration settings that are specific
+	// to cookie-based session persistence.
+	//
+	// Support: Core
+	CookieConfig *CookieConfigApplyConfiguration `json:"cookieConfig,omitempty"`
 }
 
 // SessionPersistenceApplyConfiguration constructs a declarative configuration of the SessionPersistence type for use with

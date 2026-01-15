@@ -25,8 +25,20 @@ import (
 // ListenerSetStatusApplyConfiguration represents a declarative configuration of the ListenerSetStatus type for use
 // with apply.
 type ListenerSetStatusApplyConfiguration struct {
-	Conditions []v1.ConditionApplyConfiguration        `json:"conditions,omitempty"`
-	Listeners  []ListenerEntryStatusApplyConfiguration `json:"listeners,omitempty"`
+	// Conditions describe the current conditions of the ListenerSet.
+	//
+	// Implementations MUST express ListenerSet conditions using the
+	// `ListenerSetConditionType` and `ListenerSetConditionReason`
+	// constants so that operators and tools can converge on a common
+	// vocabulary to describe ListenerSet state.
+	//
+	// Known condition types are:
+	//
+	// * "Accepted"
+	// * "Programmed"
+	Conditions []v1.ConditionApplyConfiguration `json:"conditions,omitempty"`
+	// Listeners provide status for each unique listener port defined in the Spec.
+	Listeners []ListenerEntryStatusApplyConfiguration `json:"listeners,omitempty"`
 }
 
 // ListenerSetStatusApplyConfiguration constructs a declarative configuration of the ListenerSetStatus type for use with

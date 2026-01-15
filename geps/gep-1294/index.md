@@ -187,7 +187,7 @@ If `port` is not set, the implementation MUST associate the route with all ports
 
 GAMMA implementations SHOULD NOT infer any functionality from the `hostnames` field on `xRoute`s (currently, `TLSRoute`, `HTTPRoute`, and `GRPCRoute` have this field) due to current under-specification and reserved potential for future usage or API changes.
 
-For the use case of filtering incoming traffic from selected HTTP hostnames, it is recommended to guide users toward configuring [`HTTPHeaderMatch`](../../reference/spec.md#gateway.networking.k8s.io%2fv1beta1.HTTPHeaderMatch) rules for the [`Host`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Host) header. Functionality to be explored in future GEPs may include supporting concurrent usage of an `xRoute` traffic configuration for multiple North/South `Gateways` and East/West mesh use cases or redirection of egress traffic to an in-cluster `Service`.
+For the use case of filtering incoming traffic from selected HTTP hostnames, it is recommended to guide users toward configuring [`HTTPHeaderMatch`](../../reference/spec.md#httpheadermatch) rules for the [`Host`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Host) header. Functionality to be explored in future GEPs may include supporting concurrent usage of an `xRoute` traffic configuration for multiple North/South `Gateways` and East/West mesh use cases or redirection of egress traffic to an in-cluster `Service`.
 
 ### Namespace boundaries
 
@@ -245,7 +245,7 @@ A controller could create a matching selector-less `Service` (i.e. no endpoints)
 
 Ownership/trust would remain based on naming pattern: `serviceName.namespace.svc.[USER_DOMAIN]`
 
-Separate `HttpService`, `TlsService` and `TcpService` resources could have the benefit of allowing us to define protocol specific elements to the spec along with an embedded `CommonServiceSpec`, similar to [`CommonRouteSpec`](../../reference/spec.md#gateway.networking.k8s.io/v1.CommonRouteSpec), and keep similar patterns as `Service`.
+Separate `HttpService`, `TlsService` and `TcpService` resources could have the benefit of allowing us to define protocol specific elements to the spec along with an embedded `CommonServiceSpec`, similar to [`CommonRouteSpec`](../../reference/spec.md#commonroutespec), and keep similar patterns as `Service`.
 
 ##### Drawbacks
 
@@ -303,7 +303,7 @@ spec:
     name: cool-mesh
 ```
 
-It is currently undefined how this approach may interact with either explicitly configured [`hostnames`](../../reference/spec.md#gateway.networking.k8s.io/v1.HTTPRouteSpec) or implicit "transparent proxy" routing for Kubernetes `Services` to determine how traffic should be intercepted and redirected.
+It is currently undefined how this approach may interact with either explicitly configured [`hostnames`](../../reference/spec.md#httproutespec) or implicit "transparent proxy" routing for Kubernetes `Services` to determine how traffic should be intercepted and redirected.
 
 This approach is not entirely abandoned, as it could supplement the proposed approach if explicit attachment to a specific mesh is deemed necessary. Additionally, this approach may offer a future option for attaching an `HTTPRoute` to a mesh, but not a specific service (e.g. to implement mesh-wide egress functionality for all requests to a specific hostname).
 
@@ -324,7 +324,7 @@ spec:
 
 * Would require separate `HTTPRoute` resources to explicitly define _different_ traffic routing rules for the same service on different meshes.
 
-#### Nested `services` and `hostnames` fields in [`ParentReference`](../../reference/spec.md#gateway.networking.k8s.io/v1.ParentReference)
+#### Nested `services` and `hostnames` fields in [`ParentReference`](../../reference/spec.md#parentreference)
 
 In core conformance, the `services` would only be valid for `Mesh` types, and `hostnames` field only for `Gateway`. Mesh implementations could still use a `Host` header match if they wanted limit rules to specific hostnames.
 
@@ -364,7 +364,7 @@ This is done by configuring the `parentRef`, to point to the `istio` `Mesh`. Thi
 
 ### New field on `HTTPRoute` for `Service` binding
 
-A new field `serviceBinding` would be added to `HTTPRoute` to attach to the `Service`. Alternatively, this could be a new field in [`HTTPRouteMatch`](../../reference/spec.md#gateway.networking.k8s.io/v1.HTTPRouteMatch). As with the proposed implementation, this approach could be combined with a `Mesh` resource or similar as the `parentRef`, which would just define that the route would be applied to a mesh.
+A new field `serviceBinding` would be added to `HTTPRoute` to attach to the `Service`. Alternatively, this could be a new field in [`HTTPRouteMatch`](../../reference/spec.md#httproutematch). As with the proposed implementation, this approach could be combined with a `Mesh` resource or similar as the `parentRef`, which would just define that the route would be applied to a mesh.
 
 ```
 spec:

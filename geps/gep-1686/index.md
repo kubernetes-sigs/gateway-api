@@ -98,7 +98,7 @@ Consumer routes have priority over producer routes.
 #### `xRoute`-specific
 
 - Given multiple `xRoutes` of different types
-  - Assert that routes take affect according to the specificity as defined in the spec
+  - Assert that routes take effect according to the specificity as defined in the spec
 - Given an `HTTPRoute` without `matches`, all requests are received at the `Service` endpoints as if no `HTTPRoute` existed
 - Given an `HTTPRoute` with `matches`, unmatched requests are dropped with a 404
 

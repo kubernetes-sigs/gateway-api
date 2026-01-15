@@ -123,6 +123,7 @@ type HTTPRouteSpec struct {
 	// +optional
 	// +listType=atomic
 	// <gateway:experimental:validation:XValidation:message="Rule name must be unique within the route",rule="self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name) && l1.name == l2.name))">
+	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:MaxItems=16
 	// +kubebuilder:default={{matches: {{path: {type: "PathPrefix", value: "/"}}}}}
 	// +kubebuilder:validation:XValidation:message="While 16 rules and 64 matches per rule are allowed, the total number of matches across all rules in a route must be less than 128",rule="(self.size() > 0 ? self[0].matches.size() : 0) + (self.size() > 1 ? self[1].matches.size() : 0) + (self.size() > 2 ? self[2].matches.size() : 0) + (self.size() > 3 ? self[3].matches.size() : 0) + (self.size() > 4 ? self[4].matches.size() : 0) + (self.size() > 5 ? self[5].matches.size() : 0) + (self.size() > 6 ? self[6].matches.size() : 0) + (self.size() > 7 ? self[7].matches.size() : 0) + (self.size() > 8 ? self[8].matches.size() : 0) + (self.size() > 9 ? self[9].matches.size() : 0) + (self.size() > 10 ? self[10].matches.size() : 0) + (self.size() > 11 ? self[11].matches.size() : 0) + (self.size() > 12 ? self[12].matches.size() : 0) + (self.size() > 13 ? self[13].matches.size() : 0) + (self.size() > 14 ? self[14].matches.size() : 0) + (self.size() > 15 ? self[15].matches.size() : 0) <= 128"
@@ -410,7 +411,7 @@ type HTTPRouteRetry struct {
 	// For example, setting the `rules[].retry.backoff` field to the value
 	// `100ms` will cause a backend request to first be retried approximately
 	// 100 milliseconds after timing out or receiving a response code configured
-	// to be retryable.
+	// to be retriable.
 	//
 	// An implementation MAY use an exponential or alternative backoff strategy
 	// for subsequent retry attempts, MAY cap the maximum backoff duration to
@@ -448,7 +449,7 @@ type HTTPRouteRetry struct {
 // HTTPRouteRetryStatusCode defines an HTTP response status code for
 // which a backend request should be retried.
 //
-// Implementations MUST support the following status codes as retryable:
+// Implementations MUST support the following status codes as retriable:
 //
 // * 500
 // * 502
@@ -1401,10 +1402,9 @@ type HTTPCORSFilter struct {
 	// the CORS headers. The cross-origin request fails on the client side.
 	// Therefore, the client doesn't attempt the actual cross-origin request.
 	//
-	// The `Access-Control-Allow-Origin` response header can only use `*`
-	// wildcard as value when the `AllowCredentials` field is false or omitted.
-	//
-	// When the `AllowCredentials` field is true and `AllowOrigins` field
+	// When the request is credentialed, the gateway must not specify the `*`
+	// wildcard in the `Access-Control-Allow-Origin` response header. When
+	// also the `AllowCredentials` field is true and `AllowOrigins` field
 	// specified with the `*` wildcard, the gateway must return a single origin
 	// in the value of the `Access-Control-Allow-Origin` response header,
 	// instead of specifying the `*` wildcard. The value of the header
@@ -1439,7 +1439,7 @@ type HTTPCORSFilter struct {
 	// Valid values are any method defined by RFC9110, along with the special
 	// value `*`, which represents all HTTP methods are allowed.
 	//
-	// Method names are case sensitive, so these values are also case-sensitive.
+	// Method names are case-sensitive, so these values are also case-sensitive.
 	// (See https://www.rfc-editor.org/rfc/rfc2616#section-5.1.1)
 	//
 	// Multiple method names in the value of the `Access-Control-Allow-Methods`
@@ -1462,15 +1462,19 @@ type HTTPCORSFilter struct {
 	// The `Access-Control-Allow-Methods` response header can only use `*`
 	// wildcard as value when the `AllowCredentials` field is false or omitted.
 	//
-	// When the `AllowCredentials` field is true and `AllowMethods` field
+	// When the request is credentialed, the gateway must not specify the `*`
+	// wildcard in the `Access-Control-Allow-Methods` response header. When
+	// also the `AllowCredentials` field is true and `AllowMethods` field
 	// specified with the `*` wildcard, the gateway must specify one HTTP method
 	// in the value of the Access-Control-Allow-Methods response header. The
 	// value of the header `Access-Control-Allow-Methods` is same as the
 	// `Access-Control-Request-Method` header provided by the client. If the
 	// header `Access-Control-Request-Method` is not included in the request,
 	// the gateway will omit the `Access-Control-Allow-Methods` response header,
-	// instead of specifying the `*` wildcard. A Gateway implementation may
-	// choose to add implementation-specific default methods.
+	// instead of specifying the `*` wildcard.
+	//
+	// A Gateway implementation may choose to add implementation-specific
+	// default methods.
 	//
 	// Support: Extended
 	//
@@ -1483,7 +1487,7 @@ type HTTPCORSFilter struct {
 	// AllowHeaders indicates which HTTP request headers are supported for
 	// accessing the requested resource.
 	//
-	// Header names are not case sensitive.
+	// Header names are not case-sensitive.
 	//
 	// Multiple header names in the value of the `Access-Control-Allow-Headers`
 	// response header are separated by a comma (",").
@@ -1505,15 +1509,19 @@ type HTTPCORSFilter struct {
 	// The `Access-Control-Allow-Headers` response header can only use `*`
 	// wildcard as value when the `AllowCredentials` field is false or omitted.
 	//
-	// When the `AllowCredentials` field is true and `AllowHeaders` field
+	// When the request is credentialed, the gateway must not specify the `*`
+	// wildcard in the `Access-Control-Allow-Headers` response header. When
+	// also the `AllowCredentials` field is true and `AllowHeaders` field
 	// specified with the `*` wildcard, the gateway must specify one or more
 	// HTTP headers in the value of the `Access-Control-Allow-Headers` response
 	// header. The value of the header `Access-Control-Allow-Headers` is same as
 	// the `Access-Control-Request-Headers` header provided by the client. If
 	// the header `Access-Control-Request-Headers` is not included in the
 	// request, the gateway will omit the `Access-Control-Allow-Headers`
-	// response header, instead of specifying the `*` wildcard. A Gateway
-	// implementation may choose to add implementation-specific default headers.
+	// response header, instead of specifying the `*` wildcard.
+	//
+	// A Gateway implementation may choose to add implementation-specific
+	// default headers.
 	//
 	// Support: Extended
 	//
@@ -1542,14 +1550,14 @@ type HTTPCORSFilter struct {
 	// this additional header will be exposed as part of the response to the
 	// client.
 	//
-	// Header names are not case sensitive.
+	// Header names are not case-sensitive.
 	//
 	// Multiple header names in the value of the `Access-Control-Expose-Headers`
 	// response header are separated by a comma (",").
 	//
 	// A wildcard indicates that the responses with all HTTP headers are exposed
 	// to clients. The `Access-Control-Expose-Headers` response header can only
-	// use `*` wildcard as value when the `AllowCredentials` field is false or omitted.
+	// use `*` wildcard as value when the request is not credentialed.
 	//
 	// Support: Extended
 	//
@@ -1574,7 +1582,7 @@ type HTTPCORSFilter struct {
 	MaxAge int32 `json:"maxAge,omitempty"`
 }
 
-// HTTPRouteExternalAuthProtcol specifies what protocol should be used
+// HTTPRouteExternalAuthProtocol specifies what protocol should be used
 // for communicating with an external authorization server.
 //
 // Valid values are supplied as constants below.

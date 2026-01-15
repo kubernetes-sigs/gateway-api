@@ -59,12 +59,12 @@ var TLSRouteSimpleSameNamespace = suite.ConformanceTest{
 		}
 		serverStr := string(hostnames[0])
 
-		cPem, keyPem, err := GetTLSSecret(suite.Client, certNN)
+		serverCertPem, _, err := GetTLSSecret(suite.Client, certNN)
 		if err != nil {
 			t.Fatalf("unexpected error finding TLS secret: %v", err)
 		}
 		t.Run("Simple TLS request matching TLSRoute should reach infra-backend", func(t *testing.T) {
-			tls.MakeTLSRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, cPem, keyPem, serverStr,
+			tls.MakeTLSRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, serverCertPem, nil, nil, serverStr,
 				http.ExpectedResponse{
 					Request:   http.Request{Host: serverStr, Path: "/"},
 					Backend:   "tls-backend",

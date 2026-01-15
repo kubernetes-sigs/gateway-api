@@ -24,7 +24,7 @@ for one of the two (2) most recent Gateway API releases.
 
 So, it's conformant to support Mesh + HTTPRoute, or Gateway + HTTPRoute, or
 Gateway + TLSRoute, or Gateway + Mesh + HTTPRoute, plus any extended features
-the implementation claims. But implementaions _must_ support at least one
+the implementation claims. But implementations _must_ support at least one
 Profile and one Route type in that profile, and must pass all Core conformance
 tests for that Profile and Route type in addition to all claimed Extended
 features.
@@ -79,7 +79,7 @@ other functions (like managing DNS or creating certificates).
 
 !!! info "Compare extended supported features across implementations"
 
-    [View a table to quickly compare supported features of projects](implementations/v1.4.md). These outline Gateway controller implementations that have passed core conformance tests, and focus on extended conformance features that they have implemented.
+    [View a table to quickly compare supported features of projects](implementations/v1.4.md). These outline Gateway controller implementations that have passed core conformance tests, and focus on extended conformance features that they have implemented. These tables will be generated and uploaded to the site once at least 3 implementations have uploaded their conformance reports under the [conformance reports](https://github.com/kubernetes-sigs/gateway-api/tree/main/conformance/reports).
 
 ## Gateway Controller Implementation Status <a name="gateways"></a>
 
@@ -99,6 +99,7 @@ other functions (like managing DNS or creating certificates).
 - [Contour][3] (GA)
 - [Gloo Gateway][5] (GA)
 - [Google Kubernetes Engine][6] (GA)
+- [Gravitee Kubernetes Operator][42] (GA)
 - [Kong Ingress Controller][10] (GA)
 - [Kong Gateway Operator][35] (GA)
 - [Kubvernor][39](work in progress)
@@ -126,6 +127,7 @@ other functions (like managing DNS or creating certificates).
 ## Service Mesh Implementation Status <a name="meshes"></a>
 
 ### Conformant
+- [Alibaba Cloud Service Mesh][43] (GA)
 - [Istio][9] (GA)
 - [Linkerd][28] (GA)
 - [Cilium][16] (GA)
@@ -183,6 +185,8 @@ other functions (like managing DNS or creating certificates).
 [39]:#kubvernor
 [40]:#agent-gateway-with-kgateway
 [41]:#kruise-rollouts
+[42]:#gravitee-kubernetes-operator
+[43]:#alibaba-cloud-service-mesh
 
 
 [gamma]:mesh/index.md
@@ -231,6 +235,14 @@ Airlock Microgateway protects your applications and microservices with the tried
 [airlock-microgateway-community-support]:https://forum.airlock.com/
 [airlock-microgateway-premium-support]:https://techzone.ergon.ch/support-process
 
+### Alibaba Cloud Service Mesh
+
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.3.0-Alibaba%20Cloud%20Service%20Mesh-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.3.0/alibaba-cloud-servicemesh)
+
+[Alibaba Cloud Service Mesh (ASM)][asm] provides a fully managed service mesh platform that is compatible with the community Istio. It simplifies service governance, including traffic routing and split management between service calls, authentication security for inter-service communication, and mesh observability capabilities, thereby greatly reducing the workload of development and operations.
+
+[asm]:https://www.alibabacloud.com/help/en/asm/product-overview/what-is-asm
+
 ### Amazon Elastic Kubernetes Service
 
 [Amazon Elastic Kubernetes Service (EKS)][eks] is a managed service that you can use to run Kubernetes on AWS without needing to install, operate, and maintain your own Kubernetes control plane or nodes. EKS's implementation of the Gateway API is through [AWS Gateway API Controller][eks-gateway] which provisions [Amazon VPC Lattice][vpc-lattice] Resources for gateway(s), HTTPRoute(s) in EKS clusters.
@@ -262,7 +274,7 @@ Documentation to deploy and use AKO Gateway API can be found at [Avi Kubernetes 
 
 ### Azure Application Gateway for Containers
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Partial%20Conformance%20v1.1.1-Azure%20Application%20Gateway%20for%20Containers-orange)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.1.0/azure-application-gateway-for-containers)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.2.1-Azure%20Application%20Gateway%20for%20Containers-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.2.1/azure-application-gateway-for-containers)
 
 [Application Gateway for Containers][azure-application-gateway-for-containers] is a managed application (layer 7) load balancing solution, providing dynamic traffic management capabilities for workloads running in a Kubernetes cluster in Azure. Follow the [quickstart guide][azure-application-gateway-for-containers-quickstart-controller] to deploy the ALB controller and get started with Gateway API.
 
@@ -417,6 +429,16 @@ v1.4.0 release for the GATEWAY_HTTP conformance profile except `HTTPRouteHostnam
 [gke-gateway-deploy]:https://cloud.google.com/kubernetes-engine/docs/how-to/deploying-gateways
 [gke-multi-cluster-gateway]:https://cloud.google.com/kubernetes-engine/docs/how-to/deploying-multi-cluster-gateways
 
+### Gravitee Kubernetes Operator
+
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Partial%20Conformance%20v1.3.0-Gravitee%20Kubernetes%20Operator-orange)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.3.0/gravitee)
+
+The [Gravitee Kubernetes Operator](https://documentation.gravitee.io/gravitee-kubernetes-operator-gko) (GKO) lets you manage [Gravitee](https://www.gravitee.io/) APIs, applications, and other assets in a Kubernetes-native and declarative way.
+
+The Gravitee Kubernetes Operator provides partial conformance for Gateway - HTTP features in version 4.8.5. It does not support matching rules across routes or defining services of a type other than Kubernetes Core v1 services. These features will be introduced in a future release.
+
+For support, feedback, or to engage in a discussion about the Gravitee Kubernetes Operator, please feel free to submit an [issue](https://github.com/gravitee-io/issues/issues) or visit our community [forum](https://community.gravitee.io/c/support/gravitee-kubernetes-operator-gko/26).
+
 ### HAProxy Ingress
 
 [HAProxy Ingress][h1] is a community driven ingress controller implementation for HAProxy.
@@ -511,7 +533,7 @@ For help and support with Kong Gateway operator please feel free to [create an i
 
 
 ### Kubvernor
-[Kubvernor][kubvernor] is an open-source, highly experimental implementation of API controller in Rust programming language. Currently, Kubernor supports Envoy Proxy. The project aims to be as generic as possible so Kubvernor can be used to manage/deploy different gateways (Envoy, Nginx, HAProxy, etc.).
+[Kubvernor][kubvernor] is an open-source, highly experimental implementation of API controller in Rust programming language. Currently, Kubvernor supports Envoy Proxy. The project aims to be as generic as possible so Kubvernor can be used to manage/deploy different gateways (Envoy, Nginx, HAProxy, etc.).
 
 [kubvernor]:https://github.com/kubvernor/kubvernor
 
@@ -521,7 +543,7 @@ For help and support with Kong Gateway operator please feel free to [create an i
 
 [Kuma][kuma] is an open source service mesh.
 
-Kuma implements the Gateway API specification for the Kuma built-in, Envoy-based Gateway with a beta stability guarantee. Check the [Gateway API Documentation][kuma-1] for information on how to setup a Kuma built-in gateway using the Gateway API.
+Kuma implements the Gateway API specification for the Kuma built-in, Envoy-based Gateway with a beta stability guarantee. Check the [Gateway API Documentation][kuma-1] for information on how to set up a Kuma built-in gateway using the Gateway API.
 
 Kuma 2.3 and later support the [GAMMA initiative's][gamma]
 Gateway API [support for east-west traffic management][gamma] within the mesh.
@@ -565,7 +587,7 @@ Follow the [quickstart guide][loxigw-guide] to get LoxiLB running with Gateway A
 
 ### NGINX Gateway Fabric
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.2.1-NGINX Gateway Fabric-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.2.1/nginx-nginx-gateway-fabric)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.4.1-NGINX Gateway Fabric-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.4.1/nginx-nginx-gateway-fabric)
 
 [NGINX Gateway Fabric][nginx-gateway-fabric] is an open-source project that provides an implementation of the Gateway API using [NGINX][nginx] as the data plane. The goal of this project is to implement the core Gateway API to configure an HTTP or TCP/UDP load balancer, reverse-proxy, or API gateway for applications running on Kubernetes. You can find the comprehensive NGINX Gateway Fabric user documentation on the [NGINX Documentation][nginx-docs] website.
 
@@ -751,7 +773,7 @@ Page review timeline, starting with the v1.4 Page Review:
   **You are here**
 * Gateway API v1.5 release Page Review (at least one month after the actual
   release): A maintainer will perform the Page Review process again, removing
-  any implementations that are are still Stale (after a right-of-reply period).
+  any implementations that are still Stale (after a right-of-reply period).
 * Gateway API v1.6 release Page Review (at least one month after the actual
   release): We will remove the Stale category, and implementation maintainers
   will need to be at least partially conformant on each review, or during the

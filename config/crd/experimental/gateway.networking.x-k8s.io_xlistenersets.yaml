@@ -55,11 +55,12 @@ spec:
           - A ListenerSet can reference secrets/backends in its own namespace without a ReferenceGrant
 
           Gateway Integration:
-          - The parent Gateway's status will include an "AttachedListenerSets" condition
-          - This condition will be:
-            - True: when AllowedListeners is set and at least one child ListenerSet is attached
-            - False: when AllowedListeners is set but no valid listeners are attached, or when AllowedListeners is not set or false
-            - Unknown: when no AllowedListeners config is present
+            - The parent Gateway's status will include "AttachedListenerSets"
+              which is the count of ListenerSets that have successfully attached to a Gateway
+              A ListenerSet is successfully attached to a Gateway when all the following conditions are met:
+            - The ListenerSet is selected by the Gateway's AllowedListeners field
+            - The ListenerSet has a valid ParentRef selecting the Gateway
+            - The ListenerSet's status has the condition "Accepted: true"
         properties:
           apiVersion:
             description: |-
@@ -640,10 +641,13 @@ spec:
                         AND the Route has a valid ParentRef selecting the whole Gateway
                         resource or a specific Listener as a parent resource (more detail on
                         attachment semantics can be found in the documentation on the various
-                        Route kinds ParentRefs fields). Listener or Route status does not impact
+                        Route kinds ParentRefs fields). Listener status does not impact
                         successful attachment, i.e. the AttachedRoutes field count MUST be set
-                        for Listeners with condition Accepted: false and MUST count successfully
-                        attached Routes that may themselves have Accepted: false conditions.
+                        for Listeners, even if the Accepted condition of an individual Listener is set
+                        to "False". The AttachedRoutes number represents the number of Routes with
+                        the Accepted condition set to "True" that have been attached to this Listener.
+                        Routes with any other value for the Accepted condition MUST NOT be included
+                        in this count.
 
                         Uses for this field include troubleshooting Route attachment and
                         measuring blast radius/impact of changes to a Listener.
@@ -729,7 +733,7 @@ spec:
                     supportedKinds:
                       description: |-
                         SupportedKinds is the list indicating the Kinds supported by this
-                        listener. This MUST represent the kinds an implementation supports for
+                        listener. This MUST represent the kinds supported by an implementation for
                         that Listener configuration.
 
                         If kinds are specified in Spec that are not supported, they MUST NOT

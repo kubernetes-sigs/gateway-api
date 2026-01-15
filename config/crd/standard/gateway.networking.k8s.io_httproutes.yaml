@@ -2552,6 +2552,7 @@ spec:
                       != 1 || !has(self.matches[0].path) || self.matches[0].path.type
                       != ''PathPrefix'') ? false : true) : true'
                 maxItems: 16
+                minItems: 1
                 type: array
                 x-kubernetes-list-type: atomic
                 x-kubernetes-validations:
@@ -2614,7 +2615,7 @@ spec:
 
                         * The Route refers to a nonexistent parent.
                         * The Route is of a type that the controller does not support.
-                        * The Route is in a namespace the controller does not have access to.
+                        * The Route is in a namespace to which the controller does not have access.
                       items:
                         description: Condition contains details for one aspect of
                           the current state of this API Resource.
@@ -5367,6 +5368,7 @@ spec:
                       != 1 || !has(self.matches[0].path) || self.matches[0].path.type
                       != ''PathPrefix'') ? false : true) : true'
                 maxItems: 16
+                minItems: 1
                 type: array
                 x-kubernetes-list-type: atomic
                 x-kubernetes-validations:
@@ -5429,7 +5431,7 @@ spec:
 
                         * The Route refers to a nonexistent parent.
                         * The Route is of a type that the controller does not support.
-                        * The Route is in a namespace the controller does not have access to.
+                        * The Route is in a namespace to which the controller does not have access.
                       items:
                         description: Condition contains details for one aspect of
                           the current state of this API Resource.

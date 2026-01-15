@@ -58,6 +58,12 @@ GO_TEST_FLAGS ?=
 CEL_TEST_K8S_VERSION ?= 
 CEL_TEST_CRD_CHANNEL ?= standard
 
+# Flags for docs validation
+# Use this to add extra flags like --offline or --include "github.com/kubernetes"
+# Github is intentionally removed from the checks due to rate limits and because the 
+# anchor validation does not work when pointing to a github code
+VALIDATE_DOCS_EXTRA_FLAGS ?= 
+
 # Compilation flags for binaries
 GOARCH ?= $(shell go env GOARCH)
 GOOS ?= $(shell go env GOOS)
@@ -191,30 +197,31 @@ release-staging: image.multiarch.setup
 # Docs
 
 DOCS_BUILD_CONTAINER_NAME ?= gateway-api-mkdocs
+DOCS_VERIFY_CONTAINER_IMAGE ?= registry.hub.docker.com/lycheeverse/lychee:0.22
 
 .PHONY: build-docs
-build-docs:
+build-docs: update-geps api-ref-docs
 	docker build --pull -t gaie/mkdocs hack/mkdocs/image
 	docker rm -f $(DOCS_BUILD_CONTAINER_NAME) || true
 	docker run --name $(DOCS_BUILD_CONTAINER_NAME) --rm -v ${PWD}:/docs gaie/mkdocs build
 
+.PHONY: verify-docs
+verify-docs: build-docs
+	docker run --init --rm -w /input -v ${PWD}:/input $(DOCS_VERIFY_CONTAINER_IMAGE) --root-dir /input/site --exclude-path "overrides/partials/.*\.html" --exclude ".*" --include "sigs.k8s.io" --accept 200 --max-concurrency 10 --include-fragments --cache $(VALIDATE_DOCS_EXTRA_ARGS) /input/site/**/*.html
+
 .PHONY: build-docs-netlify
-build-docs-netlify: api-ref-docs
+build-docs-netlify: update-geps api-ref-docs
 	pip install -r hack/mkdocs/image/requirements.txt
 	python -m mkdocs build
 
 .PHONY: live-docs
-live-docs:
+live-docs: update-geps
 	docker build -t gw/mkdocs hack/mkdocs/image
 	docker run --rm -it -p 3000:3000 -v ${PWD}:/docs gw/mkdocs
 
-.PHONY: verify-mkdocs-nav
-verify-mkdocs-nav:
-	hack/verify-mkdocs-nav.sh
-
-.PHONY: update-mkdocs-nav
-update-mkdocs-nav:
-	hack/update-mkdocs-nav.sh
+.PHONY: update-geps
+update-geps:
+	hack/update-geps.sh
 
 .PHONY: api-ref-docs
 api-ref-docs:

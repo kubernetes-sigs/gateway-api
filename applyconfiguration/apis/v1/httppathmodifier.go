@@ -24,10 +24,51 @@ import (
 
 // HTTPPathModifierApplyConfiguration represents a declarative configuration of the HTTPPathModifier type for use
 // with apply.
+//
+// HTTPPathModifier defines configuration for path modifiers.
 type HTTPPathModifierApplyConfiguration struct {
-	Type               *apisv1.HTTPPathModifierType `json:"type,omitempty"`
-	ReplaceFullPath    *string                      `json:"replaceFullPath,omitempty"`
-	ReplacePrefixMatch *string                      `json:"replacePrefixMatch,omitempty"`
+	// Type defines the type of path modifier. Additional types may be
+	// added in a future release of the API.
+	//
+	// Note that values may be added to this enum, implementations
+	// must ensure that unknown values will not cause a crash.
+	//
+	// Unknown values here must result in the implementation setting the
+	// Accepted Condition for the Route to `status: False`, with a
+	// Reason of `UnsupportedValue`.
+	Type *apisv1.HTTPPathModifierType `json:"type,omitempty"`
+	// ReplaceFullPath specifies the value with which to replace the full path
+	// of a request during a rewrite or redirect.
+	ReplaceFullPath *string `json:"replaceFullPath,omitempty"`
+	// ReplacePrefixMatch specifies the value with which to replace the prefix
+	// match of a request during a rewrite or redirect. For example, a request
+	// to "/foo/bar" with a prefix match of "/foo" and a ReplacePrefixMatch
+	// of "/xyz" would be modified to "/xyz/bar".
+	//
+	// Note that this matches the behavior of the PathPrefix match type. This
+	// matches full path elements. A path element refers to the list of labels
+	// in the path split by the `/` separator. When specified, a trailing `/` is
+	// ignored. For example, the paths `/abc`, `/abc/`, and `/abc/def` would all
+	// match the prefix `/abc`, but the path `/abcd` would not.
+	//
+	// ReplacePrefixMatch is only compatible with a `PathPrefix` HTTPRouteMatch.
+	// Using any other HTTPRouteMatch type on the same HTTPRouteRule will result in
+	// the implementation setting the Accepted Condition for the Route to `status: False`.
+	//
+	// Request Path | Prefix Match | Replace Prefix | Modified Path
+	// -------------|--------------|----------------|----------
+	// /foo/bar     | /foo         | /xyz           | /xyz/bar
+	// /foo/bar     | /foo         | /xyz/          | /xyz/bar
+	// /foo/bar     | /foo/        | /xyz           | /xyz/bar
+	// /foo/bar     | /foo/        | /xyz/          | /xyz/bar
+	// /foo         | /foo         | /xyz           | /xyz
+	// /foo/        | /foo         | /xyz           | /xyz/
+	// /foo/bar     | /foo         | <empty string> | /bar
+	// /foo/        | /foo         | <empty string> | /
+	// /foo         | /foo         | <empty string> | /
+	// /foo/        | /foo         | /              | /
+	// /foo         | /foo         | /              | /
+	ReplacePrefixMatch *string `json:"replacePrefixMatch,omitempty"`
 }
 
 // HTTPPathModifierApplyConfiguration constructs a declarative configuration of the HTTPPathModifier type for use with

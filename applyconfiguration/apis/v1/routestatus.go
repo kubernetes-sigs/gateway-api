@@ -20,7 +20,47 @@ package v1
 
 // RouteStatusApplyConfiguration represents a declarative configuration of the RouteStatus type for use
 // with apply.
+//
+// RouteStatus defines the common attributes that all Routes MUST include within
+// their status.
 type RouteStatusApplyConfiguration struct {
+	// Parents is a list of parent resources (usually Gateways) that are
+	// associated with the route, and the status of the route with respect to
+	// each parent. When this route attaches to a parent, the controller that
+	// manages the parent must add an entry to this list when the controller
+	// first sees the route and should update the entry as appropriate when the
+	// route or gateway is modified.
+	//
+	// Note that parent references that cannot be resolved by an implementation
+	// of this API will not be added to this list. Implementations of this API
+	// can only populate Route status for the Gateways/parent resources they are
+	// responsible for.
+	//
+	// A maximum of 32 Gateways will be represented in this list. An empty list
+	// means the route has not been attached to any Gateway.
+	//
+	// <gateway:util:excludeFromCRD>
+	// Notes for implementors:
+	//
+	// While parents is not a listType `map`, this is due to the fact that the
+	// list key is not scalar, and Kubernetes is unable to represent this.
+	//
+	// Parent status MUST be considered to be namespaced by the combination of
+	// the parentRef and controllerName fields, and implementations should keep
+	// the following rules in mind when updating this status:
+	//
+	// * Implementations MUST update only entries that have a matching value of
+	// `controllerName` for that implementation.
+	// * Implementations MUST NOT update entries with non-matching `controllerName`
+	// fields.
+	// * Implementations MUST treat each `parentRef“ in the Route separately and
+	// update its status based on the relationship with that parent.
+	// * Implementations MUST perform a read-modify-write cycle on this field
+	// before modifying it. That is, when modifying this field, implementations
+	// must be confident they have fetched the most recent version of this field,
+	// and ensure that changes they make are on that recent version.
+	//
+	// </gateway:util:excludeFromCRD>
 	Parents []RouteParentStatusApplyConfiguration `json:"parents,omitempty"`
 }
 

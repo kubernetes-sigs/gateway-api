@@ -603,7 +603,7 @@ spec:
                           the Gateway SHOULD return a 421.
                         * If the current Listener (selected by SNI matching during ClientHello)
                           does not match the Host:
-                            * If another Listener does match the Host the Gateway SHOULD return a
+                            * If another Listener does match the Host, the Gateway SHOULD return a
                               421.
                             * If no other Listener matches the Host, the Gateway MUST return a
                               404.
@@ -899,18 +899,17 @@ spec:
                 maxItems: 16
                 type: array
                 x-kubernetes-list-type: atomic
-              attachedListeners:
+              attachedListenerSets:
                 description: |-
-                  AttachedListeners represents the total number of ListenerSets that have been
+                  AttachedListenerSets represents the total number of ListenerSets that have been
                   successfully attached to this Gateway.
 
-                  A ListenerSet is successfully attached to a Gateway
-                  when all the following conditions are met :
+                  A ListenerSet is successfully attached to a Gateway when all the following conditions are met:
                   - The ListenerSet is selected by the Gateway's AllowedListeners field
                   - The ListenerSet has a valid ParentRef selecting the Gateway
                   - The ListenerSet's status has the condition "Accepted: true"
 
-                  Uses for this field include troubleshooting AttachedListeners attachment and
+                  Uses for this field include troubleshooting AttachedListenerSets attachment and
                   measuring blast radius/impact of changes to a Gateway.
                 format: int32
                 type: integer
@@ -1018,8 +1017,11 @@ spec:
                         attachment semantics can be found in the documentation on the various
                         Route kinds ParentRefs fields). Listener or Route status does not impact
                         successful attachment, i.e. the AttachedRoutes field count MUST be set
-                        for Listeners with condition Accepted: false and MUST count successfully
-                        attached Routes that may themselves have Accepted: false conditions.
+                        for Listeners, even if the Accepted condition of an individual Listener is set
+                        to "False". The AttachedRoutes number represents the number of Routes with
+                        the Accepted condition set to "True" that have been attached to this Listener.
+                        Routes with any other value for the Accepted condition MUST NOT be included
+                        in this count.
 
                         Uses for this field include troubleshooting Route attachment and
                         measuring blast radius/impact of changes to a Listener.
@@ -1098,7 +1100,7 @@ spec:
                     supportedKinds:
                       description: |-
                         SupportedKinds is the list indicating the Kinds supported by this
-                        listener. This MUST represent the kinds an implementation supports for
+                        listener. This MUST represent the kinds supported by an implementation for
                         that Listener configuration.
 
                         If kinds are specified in Spec that are not supported, they MUST NOT
@@ -1731,7 +1733,7 @@ spec:
                           the Gateway SHOULD return a 421.
                         * If the current Listener (selected by SNI matching during ClientHello)
                           does not match the Host:
-                            * If another Listener does match the Host the Gateway SHOULD return a
+                            * If another Listener does match the Host, the Gateway SHOULD return a
                               421.
                             * If no other Listener matches the Host, the Gateway MUST return a
                               404.
@@ -2027,18 +2029,17 @@ spec:
                 maxItems: 16
                 type: array
                 x-kubernetes-list-type: atomic
-              attachedListeners:
+              attachedListenerSets:
                 description: |-
-                  AttachedListeners represents the total number of ListenerSets that have been
+                  AttachedListenerSets represents the total number of ListenerSets that have been
                   successfully attached to this Gateway.
 
-                  A ListenerSet is successfully attached to a Gateway
-                  when all the following conditions are met :
+                  A ListenerSet is successfully attached to a Gateway when all the following conditions are met:
                   - The ListenerSet is selected by the Gateway's AllowedListeners field
                   - The ListenerSet has a valid ParentRef selecting the Gateway
                   - The ListenerSet's status has the condition "Accepted: true"
 
-                  Uses for this field include troubleshooting AttachedListeners attachment and
+                  Uses for this field include troubleshooting AttachedListenerSets attachment and
                   measuring blast radius/impact of changes to a Gateway.
                 format: int32
                 type: integer
@@ -2146,8 +2147,11 @@ spec:
                         attachment semantics can be found in the documentation on the various
                         Route kinds ParentRefs fields). Listener or Route status does not impact
                         successful attachment, i.e. the AttachedRoutes field count MUST be set
-                        for Listeners with condition Accepted: false and MUST count successfully
-                        attached Routes that may themselves have Accepted: false conditions.
+                        for Listeners, even if the Accepted condition of an individual Listener is set
+                        to "False". The AttachedRoutes number represents the number of Routes with
+                        the Accepted condition set to "True" that have been attached to this Listener.
+                        Routes with any other value for the Accepted condition MUST NOT be included
+                        in this count.
 
                         Uses for this field include troubleshooting Route attachment and
                         measuring blast radius/impact of changes to a Listener.
@@ -2226,7 +2230,7 @@ spec:
                     supportedKinds:
                       description: |-
                         SupportedKinds is the list indicating the Kinds supported by this
-                        listener. This MUST represent the kinds an implementation supports for
+                        listener. This MUST represent the kinds supported by an implementation for
                         that Listener configuration.
 
                         If kinds are specified in Spec that are not supported, they MUST NOT

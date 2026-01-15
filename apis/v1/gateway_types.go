@@ -394,7 +394,7 @@ type Listener struct {
 	//   the Gateway SHOULD return a 421.
 	// * If the current Listener (selected by SNI matching during ClientHello)
 	//   does not match the Host:
-	//     * If another Listener does match the Host the Gateway SHOULD return a
+	//     * If another Listener does match the Host, the Gateway SHOULD return a
 	//       421.
 	//     * If no other Listener matches the Host, the Gateway MUST return a
 	//       404.
@@ -1009,19 +1009,18 @@ type GatewayStatus struct {
 	// +kubebuilder:validation:MaxItems=64
 	Listeners []ListenerStatus `json:"listeners,omitempty"`
 
-	// AttachedListeners represents the total number of ListenerSets that have been
+	// AttachedListenerSets represents the total number of ListenerSets that have been
 	// successfully attached to this Gateway.
 	//
-	// A ListenerSet is successfully attached to a Gateway
-	// when all the following conditions are met :
+	// A ListenerSet is successfully attached to a Gateway when all the following conditions are met:
 	// - The ListenerSet is selected by the Gateway's AllowedListeners field
 	// - The ListenerSet has a valid ParentRef selecting the Gateway
 	// - The ListenerSet's status has the condition "Accepted: true"
 	//
-	// Uses for this field include troubleshooting AttachedListeners attachment and
+	// Uses for this field include troubleshooting AttachedListenerSets attachment and
 	// measuring blast radius/impact of changes to a Gateway.
 	// +optional
-	AttachedListeners *int32 `json:"attachedListeners,omitempty"`
+	AttachedListenerSets *int32 `json:"attachedListenerSets,omitempty"`
 }
 
 // GatewayInfrastructure defines infrastructure level attributes about a Gateway instance.
@@ -1324,6 +1323,7 @@ const (
 	//
 	// Note: This condition is not really "deprecated", but rather "reserved"; however, deprecated triggers Go linters
 	// to alert about usage.
+	//
 	// Deprecated: Ready is reserved for future use
 	GatewayConditionReady GatewayConditionType = "Ready"
 
@@ -1334,37 +1334,6 @@ const (
 	GatewayReasonListenersNotReady GatewayConditionReason = "ListenersNotReady"
 )
 
-const (
-	// AttachedListenerSets is a condition that is true when the Gateway has
-	// at least one ListenerSet attached to it.
-	//
-	// Possible reasons for this condition to be True are:
-	//
-	// * "ListenerSetsAttached"
-	//
-	// Possible reasons for this condition to be False are:
-	//
-	// * "NoListenerSetsAttached"
-	// * "ListenerSetsNotAllowed"
-	//
-	// Controllers may raise this condition with other reasons,
-	// but should prefer to use the reasons listed above to improve
-	// interoperability.
-	GatewayConditionAttachedListenerSets GatewayConditionType = "AttachedListenerSets"
-
-	// This reason is used with the "AttachedListenerSets" condition when the
-	// Gateway has at least one ListenerSet attached to it.
-	GatewayReasonListenerSetsAttached GatewayConditionReason = "ListenerSetsAttached"
-
-	// This reason is used with the "AttachedListenerSets" condition when the
-	// Gateway has no ListenerSets attached to it.
-	GatewayReasonNoListenerSetsAttached GatewayConditionReason = "NoListenerSetsAttached"
-
-	// This reason is used with the "AttachedListenerSets" condition when the
-	// Gateway has ListenerSets attached to it, but the ListenerSets are not allowed.
-	GatewayReasonListenerSetsNotAllowed GatewayConditionReason = "ListenerSetsNotAllowed"
-)
-
 // ListenerStatus is the status associated with a Listener.
 type ListenerStatus struct {
 	// Name is the name of the Listener that this status corresponds to.
@@ -1372,7 +1341,7 @@ type ListenerStatus struct {
 	Name SectionName `json:"name"`
 
 	// SupportedKinds is the list indicating the Kinds supported by this
-	// listener. This MUST represent the kinds an implementation supports for
+	// listener. This MUST represent the kinds supported by an implementation for
 	// that Listener configuration.
 	//
 	// If kinds are specified in Spec that are not supported, they MUST NOT
@@ -1398,8 +1367,11 @@ type ListenerStatus struct {
 	// attachment semantics can be found in the documentation on the various
 	// Route kinds ParentRefs fields). Listener or Route status does not impact
 	// successful attachment, i.e. the AttachedRoutes field count MUST be set
-	// for Listeners with condition Accepted: false and MUST count successfully
-	// attached Routes that may themselves have Accepted: false conditions.
+	// for Listeners, even if the Accepted condition of an individual Listener is set
+	// to "False". The AttachedRoutes number represents the number of Routes with
+	// the Accepted condition set to "True" that have been attached to this Listener.
+	// Routes with any other value for the Accepted condition MUST NOT be included
+	// in this count.
 	//
 	// Uses for this field include troubleshooting Route attachment and
 	// measuring blast radius/impact of changes to a Listener.

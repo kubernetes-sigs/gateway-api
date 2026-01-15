@@ -306,7 +306,7 @@ func TestHTTPRouteCORS(t *testing.T) {
 			},
 		},
 		{
-			name:       "An origin with an value before the scheme definition should be denied",
+			name:       "An origin with a value before the scheme definition should be denied",
 			wantErrors: []string{"Invalid value: \"xpto/https://xpto.com\""},
 			corsfilter: &gatewayv1.HTTPCORSFilter{
 				AllowOrigins: []gatewayv1.CORSOrigin{
@@ -476,7 +476,7 @@ func TestHTTPRouteTimeouts(t *testing.T) {
 		},
 		{
 			name:       "invalid timeout request 200ms less than backendRequest 1s",
-			wantErrors: []string{"Invalid value: \"object\": backendRequest timeout cannot be longer than request timeout"},
+			wantErrors: []string{"backendRequest timeout cannot be longer than request timeout"},
 			rules: []gatewayv1.HTTPRouteRule{
 				{
 					Timeouts: &gatewayv1.HTTPRouteTimeouts{

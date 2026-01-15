@@ -5,9 +5,9 @@
 
 (See [status definitions](../overview.md#gep-states).)
 
-[Chihiro]: https://gateway-api.sigs.k8s.io/concepts/roles-and-personas/#chihiro
-[Ian]: https://gateway-api.sigs.k8s.io/concepts/roles-and-personas/#ian
-[Ana]: https//gateway-api.sigs.k8s.io/concepts/roles-and-personas/#ana
+[Chihiro]: ../../concepts/roles-and-personas/#chihiro
+[Ian]: ../../concepts/roles-and-personas/#ian
+[Ana]: ../../concepts/roles-and-personas/#ana
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
 "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this
@@ -333,7 +333,7 @@ there is no Mesh resource with both
 a matching `metadata.name` and
 a matching `spec.controllerName`,
 the implementation MUST act as if
-a Mesh resource was found with a empty `spec`
+a Mesh resource was found with an empty `spec`
 (other than the `controllerName` field).
 Optional configuration MUST remain in its default state,
 and features that require a Mesh resource

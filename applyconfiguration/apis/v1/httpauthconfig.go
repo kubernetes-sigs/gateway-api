@@ -20,9 +20,49 @@ package v1
 
 // HTTPAuthConfigApplyConfiguration represents a declarative configuration of the HTTPAuthConfig type for use
 // with apply.
+//
+// HTTPAuthConfig contains configuration for communication with HTTP-speaking
+// backends.
 type HTTPAuthConfigApplyConfiguration struct {
-	Path                   *string  `json:"path,omitempty"`
-	AllowedRequestHeaders  []string `json:"allowedHeaders,omitempty"`
+	// Path sets the prefix that paths from the client request will have added
+	// when forwarded to the authorization server.
+	//
+	// When empty or unspecified, no prefix is added.
+	//
+	// Valid values are the same as the "value" regex for path values in the `match`
+	// stanza, and the validation regex will screen out invalid paths in the same way.
+	// Even with the validation, implementations MUST sanitize this input before using it
+	// directly.
+	Path *string `json:"path,omitempty"`
+	// AllowedRequestHeaders specifies what additional headers from the client request
+	// will be sent to the authorization server.
+	//
+	// The following headers must always be sent to the authorization server,
+	// regardless of this setting:
+	//
+	// * `Host`
+	// * `Method`
+	// * `Path`
+	// * `Content-Length`
+	// * `Authorization`
+	//
+	// If this list is empty, then only those headers must be sent.
+	//
+	// Note that `Content-Length` has a special behavior, in that the length
+	// sent must be correct for the actual request to the external authorization
+	// server - that is, it must reflect the actual number of bytes sent in the
+	// body of the request to the authorization server.
+	//
+	// So if the `forwardBody` stanza is unset, or `forwardBody.maxSize` is set
+	// to `0`, then `Content-Length` must be `0`. If `forwardBody.maxSize` is set
+	// to anything other than `0`, then the `Content-Length` of the authorization
+	// request must be set to the actual number of bytes forwarded.
+	AllowedRequestHeaders []string `json:"allowedHeaders,omitempty"`
+	// AllowedResponseHeaders specifies what headers from the authorization response
+	// will be copied into the request to the backend.
+	//
+	// If this list is empty, then all headers from the authorization server
+	// except Authority or Host must be copied.
 	AllowedResponseHeaders []string `json:"allowedResponseHeaders,omitempty"`
 }
 

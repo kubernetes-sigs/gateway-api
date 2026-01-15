@@ -20,8 +20,24 @@ package v1
 
 // GatewayTLSConfigApplyConfiguration represents a declarative configuration of the GatewayTLSConfig type for use
 // with apply.
+//
+// GatewayTLSConfig specifies frontend and backend tls configuration for gateway.
 type GatewayTLSConfigApplyConfiguration struct {
-	Backend  *GatewayBackendTLSApplyConfiguration `json:"backend,omitempty"`
+	// Backend describes TLS configuration for gateway when connecting
+	// to backends.
+	//
+	// Note that this contains only details for the Gateway as a TLS client,
+	// and does _not_ imply behavior about how to choose which backend should
+	// get a TLS connection. That is determined by the presence of a BackendTLSPolicy.
+	//
+	// Support: Core
+	//
+	// <gateway:experimental>
+	Backend *GatewayBackendTLSApplyConfiguration `json:"backend,omitempty"`
+	// Frontend describes TLS config when client connects to Gateway.
+	// Support: Core
+	//
+	// <gateway:experimental>
 	Frontend *FrontendTLSConfigApplyConfiguration `json:"frontend,omitempty"`
 }
 

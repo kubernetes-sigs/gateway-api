@@ -74,7 +74,7 @@ func TestHTTPPathMatch(t *testing.T) {
 		},
 		{
 			name:       "invalid type",
-			wantErrors: []string{"must be one of ['Exact', 'PathPrefix', 'RegularExpression']"},
+			wantErrors: []string{"supported values: \"Exact\", \"PathPrefix\", \"RegularExpression\""},
 			path: &gatewayv1.HTTPPathMatch{
 				Type:  ptrTo(gatewayv1.PathMatchType("FooBar")),
 				Value: ptrTo("/path"),

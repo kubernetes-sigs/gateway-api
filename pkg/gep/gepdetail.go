@@ -74,7 +74,7 @@ type GEPDetail struct {
 	FeatureNames []string
 
 	// Changelog provides a list of hyperlinks to PRs that affected this GEP.
-	Changelog []string
+	Changelog []string `json:"changelog,omitempty"`
 }
 
 // GEPRelationships describes the possible relationships GEPs may have.

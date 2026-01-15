@@ -1,25 +1,41 @@
 # Getting started with Gateway API
 
-**1.**  **[Install a Gateway controller](#installing-a-gateway-controller)**
- _OR_  **[install the Gateway API CRDs manually](#installing-gateway-api)**
+Welcome to the Gateway API! This page is the best place to start, whether you're a new user or migrating from another ingress solution.
 
-_THEN_
+## For New Users
 
-**2.**   **Try out one of the available guides:**
+If you are new to Gateway API, we recommend the following path:
 
-- [Simple Gateway](simple-gateway.md) (a good one to start out with)
-- [HTTP routing](http-routing.md)
-- [HTTP redirects and rewrites](http-redirect-rewrite.md)
-- [HTTP traffic splitting](traffic-splitting.md)
-- [Routing across Namespaces](multiple-ns.md)
-- [Configuring TLS](tls.md)
-- [TCP routing](tcp.md)
-- [gRPC routing](grpc-routing.md)
-- [Migrating from Ingress](migrating-from-ingress.md)
+**1. Install Gateway API CRDs and a Controller**
+
+You can either [install a Gateway controller](#installing-a-gateway-controller) which often installs the CRDs for you, or [install the Gateway API CRDs manually](#installing-gateway-api).
+
+**2. Try out the guides**
+
+Once you have a controller running, you can start with a simple example and then explore more advanced features.
+
+- [Deploying a simple Gateway](./simple-gateway.md) (a good one to start out with)
+- [HTTP routing](../http-routing.md)
+- [HTTP redirects and rewrites](../http-redirect-rewrite.md)
+- [HTTP traffic splitting](../traffic-splitting.md)
+- [Routing across Namespaces](../multiple-ns.md)
+- [Configuring TLS](../tls.md)
+- [TCP routing](../tcp.md)
+- [gRPC routing](../grpc-routing.md)
+
+
+## Migrating from Ingress
+
+If you are looking to migrate from Kubernetes Ingress, we have guides to help you get started.
+
+- **[Migrating from Ingress](./migrating-from-ingress.md)**: A general guide for migrating from any Ingress implementation to Gateway API. It covers the key differences and provides a manual migration example.
+- **[A Welcome Guide for Ingress-NGINX Users](./migrating-from-ingress-nginx.md)**: A guide specifically for users of Ingress-NGINX, the most popular Ingress implementation. It provides a set of resources and answers to frequently asked questions.
+
+---
 
 ## Installing a Gateway controller
 
-There are [multiple projects](../implementations.md) that support Gateway API. By
+There are [multiple projects](../../implementations.md) that support Gateway API. By
 installing a Gateway controller in your Kubernetes cluster, you can try out the
 guides above. This will demonstrate that the desired routing configuration is
 actually being implemented by your Gateway resources (and the network
@@ -61,7 +77,7 @@ Note that future releases of the API could include breaking changes to
 experimental resources and fields. For example, any experimental resource or
 field could be removed in a future release. For more information on the
 experimental channel, refer to our [versioning
-documentation](../concepts/versioning.md).
+documentation](../../concepts/versioning.md).
 
 To install the experimental channel, run the following kubectl command:
 
@@ -196,4 +212,4 @@ break anything using these resources.
 ### More on CRD Management
 This guide only provides a high level overview of how to get started with
 Gateway API. For more on the topic of managing Gateway API CRDs, refer to our
-[CRD Management Guide](crd-management.md).
+[CRD Management Guide](../crd-management.md).

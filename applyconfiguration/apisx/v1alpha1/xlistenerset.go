@@ -29,11 +29,42 @@ import (
 
 // XListenerSetApplyConfiguration represents a declarative configuration of the XListenerSet type for use
 // with apply.
+//
+// XListenerSet defines a set of additional listeners to attach to an existing Gateway.
+// This resource provides a mechanism to merge multiple listeners into a single Gateway.
+//
+// The parent Gateway must explicitly allow ListenerSet attachment through its
+// AllowedListeners configuration. By default, Gateways do not allow ListenerSet
+// attachment.
+//
+// Routes can attach to a ListenerSet by specifying it as a parentRef, and can
+// optionally target specific listeners using the sectionName field.
+//
+// Policy Attachment:
+// - Policies that attach to a ListenerSet apply to all listeners defined in that resource
+// - Policies do not impact listeners in the parent Gateway
+// - Different ListenerSets attached to the same Gateway can have different policies
+// - If an implementation cannot apply a policy to specific listeners, it should reject the policy
+//
+// ReferenceGrant Semantics:
+// - ReferenceGrants applied to a Gateway are not inherited by child ListenerSets
+// - ReferenceGrants applied to a ListenerSet do not grant permission to the parent Gateway's listeners
+// - A ListenerSet can reference secrets/backends in its own namespace without a ReferenceGrant
+//
+// Gateway Integration:
+// - The parent Gateway's status will include "AttachedListenerSets"
+// which is the count of ListenerSets that have successfully attached to a Gateway
+// A ListenerSet is successfully attached to a Gateway when all the following conditions are met:
+// - The ListenerSet is selected by the Gateway's AllowedListeners field
+// - The ListenerSet has a valid ParentRef selecting the Gateway
+// - The ListenerSet's status has the condition "Accepted: true"
 type XListenerSetApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
-	Spec                             *ListenerSetSpecApplyConfiguration   `json:"spec,omitempty"`
-	Status                           *ListenerSetStatusApplyConfiguration `json:"status,omitempty"`
+	// Spec defines the desired state of ListenerSet.
+	Spec *ListenerSetSpecApplyConfiguration `json:"spec,omitempty"`
+	// Status defines the current state of ListenerSet.
+	Status *ListenerSetStatusApplyConfiguration `json:"status,omitempty"`
 }
 
 // XListenerSet constructs a declarative configuration of the XListenerSet type for use with
@@ -47,29 +78,14 @@ func XListenerSet(name, namespace string) *XListenerSetApplyConfiguration {
 	return b
 }
 
-// ExtractXListenerSet extracts the applied configuration owned by fieldManager from
-// xListenerSet. If no managedFields are found in xListenerSet for fieldManager, a
-// XListenerSetApplyConfiguration is returned with only the Name, Namespace (if applicable),
-// APIVersion and Kind populated. It is possible that no managed fields were found for because other
-// field managers have taken ownership of all the fields previously owned by fieldManager, or because
-// the fieldManager never owned fields any fields.
+// ExtractXListenerSetFrom extracts the applied configuration owned by fieldManager from
+// xListenerSet for the specified subresource. Pass an empty string for subresource to extract
+// the main resource. Common subresources include "status", "scale", etc.
 // xListenerSet must be a unmodified XListenerSet API object that was retrieved from the Kubernetes API.
-// ExtractXListenerSet provides a way to perform a extract/modify-in-place/apply workflow.
+// ExtractXListenerSetFrom provides a way to perform a extract/modify-in-place/apply workflow.
 // Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
 // applied if another fieldManager has updated or force applied any of the previously applied fields.
-// Experimental!
-func ExtractXListenerSet(xListenerSet *apisxv1alpha1.XListenerSet, fieldManager string) (*XListenerSetApplyConfiguration, error) {
-	return extractXListenerSet(xListenerSet, fieldManager, "")
-}
-
-// ExtractXListenerSetStatus is the same as ExtractXListenerSet except
-// that it extracts the status subresource applied configuration.
-// Experimental!
-func ExtractXListenerSetStatus(xListenerSet *apisxv1alpha1.XListenerSet, fieldManager string) (*XListenerSetApplyConfiguration, error) {
-	return extractXListenerSet(xListenerSet, fieldManager, "status")
-}
-
-func extractXListenerSet(xListenerSet *apisxv1alpha1.XListenerSet, fieldManager string, subresource string) (*XListenerSetApplyConfiguration, error) {
+func ExtractXListenerSetFrom(xListenerSet *apisxv1alpha1.XListenerSet, fieldManager string, subresource string) (*XListenerSetApplyConfiguration, error) {
 	b := &XListenerSetApplyConfiguration{}
 	err := managedfields.ExtractInto(xListenerSet, internal.Parser().Type("io.k8s.sigs.gateway-api.apisx.v1alpha1.XListenerSet"), fieldManager, b, subresource)
 	if err != nil {
@@ -82,6 +98,27 @@ func extractXListenerSet(xListenerSet *apisxv1alpha1.XListenerSet, fieldManager 
 	b.WithAPIVersion("gateway.networking.x-k8s.io/v1alpha1")
 	return b, nil
 }
+
+// ExtractXListenerSet extracts the applied configuration owned by fieldManager from
+// xListenerSet. If no managedFields are found in xListenerSet for fieldManager, a
+// XListenerSetApplyConfiguration is returned with only the Name, Namespace (if applicable),
+// APIVersion and Kind populated. It is possible that no managed fields were found for because other
+// field managers have taken ownership of all the fields previously owned by fieldManager, or because
+// the fieldManager never owned fields any fields.
+// xListenerSet must be a unmodified XListenerSet API object that was retrieved from the Kubernetes API.
+// ExtractXListenerSet provides a way to perform a extract/modify-in-place/apply workflow.
+// Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
+// applied if another fieldManager has updated or force applied any of the previously applied fields.
+func ExtractXListenerSet(xListenerSet *apisxv1alpha1.XListenerSet, fieldManager string) (*XListenerSetApplyConfiguration, error) {
+	return ExtractXListenerSetFrom(xListenerSet, fieldManager, "")
+}
+
+// ExtractXListenerSetStatus extracts the applied configuration owned by fieldManager from
+// xListenerSet for the status subresource.
+func ExtractXListenerSetStatus(xListenerSet *apisxv1alpha1.XListenerSet, fieldManager string) (*XListenerSetApplyConfiguration, error) {
+	return ExtractXListenerSetFrom(xListenerSet, fieldManager, "status")
+}
+
 func (b XListenerSetApplyConfiguration) IsApplyConfiguration() {}
 
 // WithKind sets the Kind field in the declarative configuration to the given value

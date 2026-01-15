@@ -38,7 +38,7 @@ func ParseDuration(s string) (*time.Duration, error) {
 		See https://gateway-api.sigs.k8s.io/geps/gep-2257/ for more details.
 	*/
 	if !re.MatchString(s) {
-		return nil, errors.New("Invalid duration format")
+		return nil, errors.New("invalid duration format")
 	}
 	parsedTime, err := time.ParseDuration(s)
 	if err != nil {
@@ -72,17 +72,17 @@ func FormatDuration(duration time.Duration) (string, error) {
 
 	// check if a negative value
 	if duration < 0 {
-		return "", errors.New("Invalid duration format. Cannot have negative durations")
+		return "", errors.New("invalid duration format. Cannot have negative durations")
 	}
 	// check for the maximum value allowed to be expressed
 	if duration > maxDuration {
-		return "", errors.New("Invalid duration format. Duration larger than maximum expression allowed in GEP-2257")
+		return "", errors.New("invalid duration format. Duration larger than maximum expression allowed in GEP-2257")
 	}
 	// time.Duration allows for floating point ms, which is not allowed in GEP-2257
 	durationMicroseconds := duration.Microseconds()
 
 	if durationMicroseconds%1000 != 0 {
-		return "", errors.New("Cannot express sub-milliseconds precision in GEP-2257")
+		return "", errors.New("cannot express sub-milliseconds precision in GEP-2257")
 	}
 
 	output := ""
