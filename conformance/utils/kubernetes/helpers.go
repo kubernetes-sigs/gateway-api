@@ -351,6 +351,33 @@ func GatewayMustHaveCondition(
 	require.NoErrorf(t, waitErr, "error waiting for Gateway status to have a Condition matching expectations")
 }
 
+// GatewayMustHaveAttachedListeners validates that the gateway has the specified number of attachedListeners.
+func GatewayMustHaveAttachedListeners(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, gwName types.NamespacedName, count int32) {
+	var gotStatus *gatewayv1.GatewayStatus
+
+	waitErr := wait.PollUntilContextTimeout(context.Background(), 1*time.Second, timeoutConfig.GatewayStatusMustHaveListeners, true, func(ctx context.Context) (bool, error) {
+		gw := &gatewayv1.Gateway{}
+
+		err := client.Get(ctx, gwName, gw)
+		require.NoError(t, err, "error fetching Gateway")
+
+		if err := ConditionsHaveLatestObservedGeneration(gw, gw.Status.Conditions); err != nil {
+			tlog.Log(t, "Gateway ", err)
+			return false, nil
+		}
+
+		if gw.Status.AttachedListenerSets == nil && count == 0 {
+			return true, nil
+		}
+
+		gotStatus = &gw.Status
+		return *gw.Status.AttachedListenerSets == count, nil
+	})
+	if waitErr != nil {
+		tlog.Errorf(t, "Error waiting for gateway, got Gateway Status %v, want zero listeners or exactly 1 listener with zero routes", gotStatus)
+	}
+}
+
 // ListenerSetMustHaveCondition checks that the supplied ListenerSet has the supplied Condition,
 // halting after the specified timeout is exceeded.
 func ListenerSetMustHaveCondition(

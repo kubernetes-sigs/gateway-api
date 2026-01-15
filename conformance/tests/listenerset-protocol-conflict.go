@@ -134,11 +134,8 @@ var ListenerSetProtocolConflict = suite.ConformanceTest{
 			{Name: "gateway-route", Namespace: ns},
 		}
 		gwAddr := kubernetes.GatewayAndRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), &gatewayv1.HTTPRoute{}, false, gwRoutes...)
-		kubernetes.GatewayMustHaveCondition(t, suite.Client, suite.TimeoutConfig, gwNN, metav1.Condition{
-			Type:   string(gatewayv1.GatewayConditionAttachedListenerSets),
-			Status: metav1.ConditionTrue,
-			Reason: string(gatewayv1.GatewayReasonListenerSetsAttached),
-		})
+		// Both listenerSets are accepted as they each contain a valid listener
+		kubernetes.GatewayMustHaveAttachedListeners(t, suite.Client, suite.TimeoutConfig, gwNN, 2)
 		kubernetes.GatewayListenersMustHaveConditions(t, suite.Client, suite.TimeoutConfig, gwNN, acceptedListenerConditions, "gateway-listener")
 		// The first conflicted listener is accepted based on Listener precedence
 		kubernetes.GatewayListenersMustHaveConditions(t, suite.Client, suite.TimeoutConfig, gwNN, acceptedListenerConditions, "protocol-conflict-listener-1")

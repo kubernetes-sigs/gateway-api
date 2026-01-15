@@ -22,7 +22,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
-	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	gatewayxv1a1 "sigs.k8s.io/gateway-api/apisx/v1alpha1"
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
@@ -77,12 +76,8 @@ var ListenerSetNotAllowed = suite.ConformanceTest{
 		for _, routeNN := range gwRoutes {
 			kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN)
 		}
-
-		kubernetes.GatewayMustHaveCondition(t, suite.Client, suite.TimeoutConfig, gwNN, metav1.Condition{
-			Type:   string(gatewayv1.GatewayConditionAttachedListenerSets),
-			Status: metav1.ConditionUnknown,
-			Reason: string(gatewayv1.GatewayReasonListenerSetsNotAllowed),
-		})
+		// ListenerSets are not allowed
+		kubernetes.GatewayMustHaveAttachedListeners(t, suite.Client, suite.TimeoutConfig, gwNN, 0)
 		disallowedLsNN := types.NamespacedName{Name: "listenerset-not-allowed", Namespace: ns}
 		kubernetes.ListenerSetMustHaveCondition(t, suite.Client, suite.TimeoutConfig, disallowedLsNN, metav1.Condition{
 			Type:   string(gatewayxv1a1.ListenerSetConditionAccepted),

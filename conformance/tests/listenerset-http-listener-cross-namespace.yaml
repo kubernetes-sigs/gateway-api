@@ -221,7 +221,7 @@ spec:
   - kind: XListenerSet
     group: gateway.networking.x-k8s.io
     name: listenerset-not-allowed
-  namespace: gateway-api-example-ns6
+    namespace: gateway-api-example-ns6
   rules:
   - matches:
     - path:

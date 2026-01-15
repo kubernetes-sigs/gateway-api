@@ -145,11 +145,8 @@ var ListenerSetCrossNamespace = suite.ConformanceTest{
 		for _, routeNN := range gwRoutes {
 			kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN)
 		}
-		kubernetes.GatewayMustHaveCondition(t, suite.Client, suite.TimeoutConfig, gwNN, metav1.Condition{
-			Type:   string(gatewayv1.GatewayConditionAttachedListenerSets),
-			Status: metav1.ConditionTrue,
-			Reason: string(gatewayv1.GatewayReasonListenerSetsAttached),
-		})
+		// Only one listenerset is in a namespace that matches the labels
+		kubernetes.GatewayMustHaveAttachedListeners(t, suite.Client, suite.TimeoutConfig, gwNN, 1)
 
 		// Allowed ListenerSet, listenerSet routes and listenerSet conditions
 		lsNN := types.NamespacedName{Name: "listenerset-with-http-listener", Namespace: "gateway-api-example-ns1"}

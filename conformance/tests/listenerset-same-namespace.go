@@ -144,11 +144,8 @@ var ListenerSetSameNamespace = suite.ConformanceTest{
 		for _, routeNN := range gwRoutes {
 			kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN)
 		}
-		kubernetes.GatewayMustHaveCondition(t, suite.Client, suite.TimeoutConfig, gwNN, metav1.Condition{
-			Type:   string(gatewayv1.GatewayConditionAttachedListenerSets),
-			Status: metav1.ConditionTrue,
-			Reason: string(gatewayv1.GatewayReasonListenerSetsAttached),
-		})
+		// Only one ListenerSet is in the same namespace as the parent gateway
+		kubernetes.GatewayMustHaveAttachedListeners(t, suite.Client, suite.TimeoutConfig, gwNN, 1)
 
 		// Allowed ListenerSet, route and conditions
 		lsNN := types.NamespacedName{Name: "listenerset-with-http-listener", Namespace: ns}
