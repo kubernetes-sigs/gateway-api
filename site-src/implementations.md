@@ -236,6 +236,9 @@ Airlock Microgateway protects your applications and microservices with the tried
 [airlock-microgateway-premium-support]:https://techzone.ergon.ch/support-process
 
 ### Alibaba Cloud Service Mesh
+
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.3.0-Alibaba%20Cloud%20Service%20Mesh-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.3.0/alibaba-cloud-servicemesh)
+
 [Alibaba Cloud Service Mesh (ASM)][asm] provides a fully managed service mesh platform that is compatible with the community Istio. It simplifies service governance, including traffic routing and split management between service calls, authentication security for inter-service communication, and mesh observability capabilities, thereby greatly reducing the workload of development and operations.
 
 [asm]:https://www.alibabacloud.com/help/en/asm/product-overview/what-is-asm

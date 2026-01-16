@@ -1936,6 +1936,7 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: port
       type:
         scalar: numeric
+      default: 0
     - name: protocol
       type:
         scalar: string
@@ -1962,10 +1963,6 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         scalar: string
       default: ""
-    - name: port
-      type:
-        scalar: numeric
-      default: 0
     - name: supportedKinds
       type:
         list:

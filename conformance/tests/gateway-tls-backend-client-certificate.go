@@ -19,6 +19,7 @@ package tests
 import (
 	"testing"
 
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
@@ -53,6 +54,12 @@ var GatewayTLSBackendClientCertificate = suite.ConformanceTest{
 		gwAddr := kubernetes.GatewayAndRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), &gatewayv1.HTTPRoute{}, false, routeNN)
 		kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN)
 		kubernetes.BackendTLSPolicyMustHaveAcceptedConditionTrue(t, suite.Client, suite.TimeoutConfig, policyNN, gwNN)
+
+		kubernetes.GatewayMustHaveCondition(t, suite.Client, suite.TimeoutConfig, gwNN, metav1.Condition{
+			Type:   string(gatewayv1.GatewayConditionResolvedRefs),
+			Status: metav1.ConditionTrue,
+			Reason: string(gatewayv1.GatewayReasonResolvedRefs),
+		})
 
 		t.Run("HTTP request sent to Service using TLS should succeed and the configured client certificate should be presented.", func(t *testing.T) {
 			expectedClientCert, _, err := GetTLSSecret(suite.Client, types.NamespacedName{Name: "tls-checks-client-certificate", Namespace: ns})

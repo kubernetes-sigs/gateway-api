@@ -160,15 +160,11 @@ type ListenerEntry struct {
 	// Port is the network port. Multiple listeners may use the
 	// same port, subject to the Listener compatibility rules.
 	//
-	// If the port is not set or specified as zero, the implementation will assign
-	// a unique port. If the implementation does not support dynamic port
-	// assignment, it MUST set `Accepted` condition to `False` with the
-	// `UnsupportedPort` reason.
+	// +kubebuilder:validation:Minimum=1
+	// +kubebuilder:validation:Maximum=65535
 	//
-	// +optional
-	//
-	// +kubebuilder:default=0
-	Port PortNumberWith0 `json:"port,omitempty"`
+	// +required
+	Port PortNumber `json:"port"`
 
 	// Protocol specifies the network protocol this listener expects to receive.
 	// +required
@@ -249,11 +245,6 @@ type ListenerEntryStatus struct {
 	// Name is the name of the Listener that this status corresponds to.
 	// +required
 	Name SectionName `json:"name"`
-
-	// Port is the network port the listener is configured to listen on.
-	//
-	// +required
-	Port StatusPortNumber `json:"port"`
 
 	// SupportedKinds is the list indicating the Kinds supported by this
 	// listener. This MUST represent the kinds supported by an implementation for
@@ -391,9 +382,9 @@ const (
 
 	// This reason is used with the "Accepted" condition when one or
 	// more Listeners have an invalid or unsupported configuration
-	// and cannot be configured on the Gateway.
+	// and cannot be configured on the ListenerSet.
 	// This can be the reason when "Accepted" is "True" or "False", depending on whether
-	// the listener being invalid causes the entire Gateway to not be accepted.
+	// the listener being invalid causes the entire ListenerSet to not be accepted.
 	ListenerSetReasonListenersNotValid ListenerSetConditionReason = "ListenersNotValid"
 )
 
@@ -407,7 +398,7 @@ const (
 
 	// This reason is used with the "Accepted" and "Programmed"
 	// conditions when the status is "Unknown" and no controller has reconciled
-	// the Gateway.
+	// the ListenerSet.
 	ListenerSetReasonPending ListenerSetConditionReason = "Pending"
 )
 
@@ -500,12 +491,12 @@ const (
 	ListenerEntryReasonAccepted ListenerEntryConditionReason = "Accepted"
 
 	// This reason is used with the "Accepted" condition when the
-	// Listener could not be attached to be Gateway because its
+	// Listener could not be attached to the Gateway because its
 	// protocol type is not supported.
 	ListenerEntryReasonUnsupportedProtocol ListenerEntryConditionReason = "UnsupportedProtocol"
 
 	// This reason is used with the "Accepted" condition when the
-	// Listener could not be attached to be Gateway because the Gateway
+	// Listener could not be attached to the Gateway because the Gateway
 	// has too many Listeners.
 	ListenerEntryReasonTooManyListeners ListenerEntryConditionReason = "TooManyListeners"
 )
@@ -540,7 +531,7 @@ const (
 	// or unsupported resource or kind, or when the data within that resource
 	// is malformed.
 	// This reason must be used only when the reference is allowed, either by
-	// referencing an object in the same namespace as the Gateway, or when
+	// referencing an object in the same namespace as the ListenerSet, or when
 	// a cross-namespace reference has been explicitly allowed by a ReferenceGrant.
 	// If the reference is not allowed, the reason RefNotPermitted must be used
 	// instead.
