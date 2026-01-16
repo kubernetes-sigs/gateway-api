@@ -15,6 +15,7 @@ on:
 permissions:
     contents: write
     id-token: write
+    pull-requests: read 
 
 jobs:
     create-monthly-release:
@@ -72,15 +73,19 @@ jobs:
             - name: Generate release notes
               if: steps.check-tag.outputs.exists == 'false'
               id: release-notes
+              env:
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: |
                   TAG="${{ steps.tag.outputs.tag }}"
 
-                  # Extract year and month from tag (e.g., monthly-2026.01 -> 2026, 01)
+                  # 1. Install the K8s release-notes tool
+                  go install k8s.io/release/cmd/release-notes@latest
+                  
+                  # 2. Extract year and month for the header
                   YEAR_MONTH=$(echo "$TAG" | sed 's/monthly-//')
                   YEAR=$(echo "$YEAR_MONTH" | cut -d. -f1)
                   MONTH_NUM=$(echo "$YEAR_MONTH" | cut -d. -f2)
-
-                  # Convert month number to month name
+                  
                   case "$MONTH_NUM" in
                     01) MONTH_NAME="January" ;;
                     02) MONTH_NAME="February" ;;
@@ -97,74 +102,57 @@ jobs:
                     *) MONTH_NAME="Month $MONTH_NUM" ;;
                   esac
 
-                  # Find the previous monthly tag
+                  # 3. Find SHAs for the tool
+                  # Ensure we have history
+                  git fetch --tags --force
+                  
                   PREV_TAG=$(git tag -l "monthly-*" | sort -V | grep -B1 "^${TAG}$" | head -n1)
-
-                  if [ -z "$PREV_TAG" ]; then
-                    # If no previous monthly tag, use the last tag or main
-                    PREV_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "main")
+                  
+                  if [ -z "$PREV_TAG" ] || [ "$PREV_TAG" == "$TAG" ]; then
+                    # Fallback if first monthly release: go back ~30 days
+                    START_SHA=$(git rev-list -n 1 --before="1 month" origin/main)
+                  else
+                    START_SHA=$(git rev-parse "$PREV_TAG")
                   fi
+                  END_SHA=$(git rev-parse HEAD)
 
-                  echo "Comparing ${PREV_TAG}..${TAG}"
+                  # 4. Create the mandatory Header
+                  cat <<EOF > release-notes.md
+                    Gateway API ${TAG} Release Notes
 
-                  # Start with template
-                  NOTES=$(cat <<EOF
-                  Gateway API ${TAG} Release Notes
+                    This is the monthly release for the Gateway API experimental channel for ${MONTH_NAME} ${YEAR}. This release includes the latest features and fixes from Gateway API's main branch.
 
-                  This is the monthly release for the Gateway API experimental channel for ${MONTH_NAME} ${YEAR}. This release includes the latest features and fixes from Gateway API's main branch.
+                    Using this Release
 
-                  Using this Release
+                    To install the CRDs for this release, use install ${TAG}-install.yaml:
 
-                  To install the CRDs for this release, use install ${TAG}-install.yaml:
+                    \`\`\`bash
+                    kubectl apply --server-side=true -f https://github.com/kubernetes-sigs/gateway-api/releases/download/${TAG}/${TAG}-install.yaml
+                    \`\`\`
 
-                  \`\`\`bash
-                  kubectl apply --server-side=true -f https://github.com/kubernetes-sigs/gateway-api/releases/download/${TAG}/${TAG}-install.yaml
-                  \`\`\`
+                    To build using this release in Go, include this release in your go.mod:
 
-                  To build using this release in Go, include this release in your go.mod:
+                    \`\`\`go
+                    require sigs.k8s.io/gateway-api ${TAG}
+                    \`\`\`
 
-                  \`\`\`go
-                  require sigs.k8s.io/gateway-api ${TAG}
-                  \`\`\`
+                    and run \`go mod tidy\`. You'll find that ${TAG} gets replaced by a Go pseudoversion; this is expected.
 
-                  and run \`go mod tidy\`. You'll find that ${TAG} gets replaced by a Go pseudoversion; this is expected.
+                    ---
+                    ## Changelog
+                    EOF
 
-                  EOF
-                  )
+                  # 5. Run the K8s tool and append the output
+                  # Use the full path to the go bin
+                  $(go env GOPATH)/bin/release-notes \
+                    --start-sha "$START_SHA" \
+                    --end-sha "$END_SHA" \
+                    --branch main \
+                    --repo gateway-api \
+                    --org kubernetes-sigs \
+                    --output /tmp/k8s-changelog.md
 
-                  # Get list of changed files in config/crd/experimental
-                  CHANGED_FILES=$(git diff --name-only ${PREV_TAG}..${TAG} -- config/crd/experimental 2>/dev/null || echo "")
-
-                  if [ -n "$CHANGED_FILES" ]; then
-                    NOTES="${NOTES}
-
-                  ## Changes
-
-                  ### Modified CRDs
-                  \`\`\`
-                  $(echo "$CHANGED_FILES" | sed 's|config/crd/experimental/||' | sort | uniq)
-                  \`\`\`
-                  "
-                  fi
-
-                  # Get commit summary
-                  COMMITS=$(git log --oneline ${PREV_TAG}..${TAG} --no-merges 2>/dev/null | head -20 || echo "")
-
-                  if [ -n "$COMMITS" ]; then
-                    NOTES="${NOTES}
-
-                  ### Recent Changes
-                  \`\`\`
-                  ${COMMITS}
-                  \`\`\`
-                  "
-                  fi
-
-                  # Save to file for use in release
-                  echo "$NOTES" > release-notes.md
-                  echo "notes<<EOF" >> $GITHUB_OUTPUT
-                  echo "$NOTES" >> $GITHUB_OUTPUT
-                  echo "EOF" >> $GITHUB_OUTPUT
+                  cat /tmp/k8s-changelog.md >> release-notes.md
 
             - name: Create GitHub Release
               if: steps.check-tag.outputs.exists == 'false'
