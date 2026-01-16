@@ -10,6 +10,7 @@ Right now Gateway API supports only full path or prefix rewrites, we want to ext
 ## Goals
 
 Close the regex-based path rewrites feature gap for Gateway API, i.e.:
+
  * Rewrite the path of a request based on a regular expression, regardless of initial match type
  * Substitute matching section(s) in the regular expression with predefined values
 
@@ -35,7 +36,7 @@ In this proposal we are closing the gap between Gateway API and current capabili
 
 This GEP proposes the following API changes:
 
-* Update [httproute_types.go](https://github.com/kubernetes-sigs/gateway-api/blob/main/apis/v1beta1/httproute_types.go) by adding and new `HTTPRegexModifier` field
+* Update [httproute_types.go](https://github.com/kubernetes-sigs/gateway-api/blob/main/apis/v1beta1/httproute_types.go) by adding and a new `HTTPRegexModifier` field
 
 ```go
 type HTTPURLRewriteFilter struct {
@@ -54,7 +55,7 @@ type HTTPURLRewriteFilter struct {
 	// +optional
 	Path *HTTPPathModifier `json:"path,omitempty"`
 
-	// RegexModifier defines a regex-based host and/or path rewrite.
+	// RegexModifier defines a regex-based path rewrite.
 	//
 	// Support: Extended
 	//
@@ -80,9 +81,9 @@ type HTTPRegexModifier struct {
 
 ## New Fields relationship
 
-The relationship between new fields shluld stay invartiant across different underlying implementaions and dataplanes. The syntax, however, may vary depending on the implementation.
+The relationship between new fields should be consistent across different underlying implementations and dataplanes. The syntax, however, may vary depending on the implementation.
 
-* `pathPattern` The regular expression used to find portions of a string (hereafter called the “subject string”) that should be replaced. When a new string is produced during the substitution operation, the new string is initially the same as the subject string, but then all matches in the subject string are replaced by the substitution string. If replacing all matches isn’t desired, regular expression anchors can be used to ensure a single match, so as to replace just one occurrence of a pattern. Capture groups can be used in the pattern to extract portions of the subject string, and then referenced in the substitution string.
+* `pathPattern` The regular expression used to find portions of a string (hereafter called the `subject string`) that should be replaced. When a new string is produced during the substitution operation, the new string is initially the same as the subject string, but then all matches in the subject string are replaced by the substitution string. If replacing all matches isn’t desired, regular expression anchors can be used to ensure a single match, so as to replace just one occurrence of a pattern. Capture groups can be used in the pattern to extract portions of the subject string, and then referenced in the substitution string.
 * `pathSubstitution` The string that should be substituted into matching portions of the subject string during a substitution operation to produce a new string. Capture groups in the pattern can be referenced in the substitution string. Note, however, that the syntax for referring to capture groups is implementation specific.
 
 ### Example
@@ -96,8 +97,6 @@ spec:
   parentRefs:
   - kind: Gateway
     name: external-http
-  hostnames:
-  - "*"
   rules:
   - matches:
     - path:
@@ -119,6 +118,8 @@ spec:
 These tests will excersie the regex-based path rewrites.
 
 ### Conformance test scenarios
+
+This feature has vendor specific implemntation. To this end, conformance tests have to be configured with the regex dialect. Here below we provide example scenarious for RE2, during the tests implemntation we need to plugin other dialects (vendor-specific).
 
 #### Example test scenarios
 
