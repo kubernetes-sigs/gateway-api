@@ -61,12 +61,7 @@ type ListenerEntryApplyConfiguration struct {
 	Hostname *v1.Hostname `json:"hostname,omitempty"`
 	// Port is the network port. Multiple listeners may use the
 	// same port, subject to the Listener compatibility rules.
-	//
-	// If the port is not set or specified as zero, the implementation will assign
-	// a unique port. If the implementation does not support dynamic port
-	// assignment, it MUST set `Accepted` condition to `False` with the
-	// `UnsupportedPort` reason.
-	Port *apisxv1alpha1.PortNumberWith0 `json:"port,omitempty"`
+	Port *apisxv1alpha1.PortNumber `json:"port,omitempty"`
 	// Protocol specifies the network protocol this listener expects to receive.
 	Protocol *v1.ProtocolType `json:"protocol,omitempty"`
 	// TLS is the TLS configuration for the Listener. This field is required if
@@ -129,7 +124,7 @@ func (b *ListenerEntryApplyConfiguration) WithHostname(value v1.Hostname) *Liste
 // WithPort sets the Port field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Port field is set to the value of the last call.
-func (b *ListenerEntryApplyConfiguration) WithPort(value apisxv1alpha1.PortNumberWith0) *ListenerEntryApplyConfiguration {
+func (b *ListenerEntryApplyConfiguration) WithPort(value apisxv1alpha1.PortNumber) *ListenerEntryApplyConfiguration {
 	b.Port = &value
 	return b
 }
