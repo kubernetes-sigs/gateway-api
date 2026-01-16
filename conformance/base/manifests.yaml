@@ -61,6 +61,32 @@ spec:
         kind: Secret
         name: tls-validity-checks-certificate
         namespace: gateway-conformance-infra
+  - name: https-with-wildcard-hostname
+    port: 443
+    hostname: "*.wildcard.org"
+    protocol: HTTPS
+    allowedRoutes:
+      namespaces:
+        from: Same
+    tls:
+      certificateRefs:
+      - group: ""
+        kind: Secret
+        name: tls-validity-checks-certificate
+        namespace: gateway-conformance-infra
+  - name: https-with-hostname-matching-wildcard
+    port: 443
+    hostname: "third-example.wildcard.org"
+    protocol: HTTPS
+    allowedRoutes:
+      namespaces:
+        from: Same
+    tls:
+      certificateRefs:
+      - group: ""
+        kind: Secret
+        name: tls-validity-checks-certificate
+        namespace: gateway-conformance-infra
 ---
 apiVersion: gateway.networking.k8s.io/v1beta1
 kind: Gateway
