@@ -10,5 +10,7 @@ relationships:
     - https://gateway-api.sigs.k8s.io/geps/gep-726/#future-extension
 references:
   - https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/route/v3/route_components.proto#envoy-v3-api-field-config-route-v3-routeaction-regex-rewrite
+  - https://cbonte.github.io/haproxy-dconv/2.5/configuration.html#4.2-http-request%20replace-path
+  - https://nginx.org/en/docs/http/ngx_http_rewrite_module.html#rewrite
 featureNames:
   - Regex-based Path Rewrites
