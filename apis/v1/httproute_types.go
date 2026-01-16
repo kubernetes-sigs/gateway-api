@@ -748,7 +748,7 @@ const (
 //	  value: "/foo"
 //	headers:
 //	- name: "version"
-//	  value "v1"
+//	  value: "v1"
 //
 // ```
 type HTTPRouteMatch struct {

@@ -2213,7 +2213,7 @@ spec:
                           match below will match a HTTP request only if its path\nstarts
                           with `/foo` AND it contains the `version: v1` header:\n\n```\nmatch:\n\n\tpath:\n\t
                           \ value: \"/foo\"\n\theaders:\n\t- name: \"version\"\n\t
-                          \ value \"v1\"\n\n```"
+                          \ value: \"v1\"\n\n```"
                         properties:
                           headers:
                             description: |-
@@ -5029,7 +5029,7 @@ spec:
                           match below will match a HTTP request only if its path\nstarts
                           with `/foo` AND it contains the `version: v1` header:\n\n```\nmatch:\n\n\tpath:\n\t
                           \ value: \"/foo\"\n\theaders:\n\t- name: \"version\"\n\t
-                          \ value \"v1\"\n\n```"
+                          \ value: \"v1\"\n\n```"
                         properties:
                           headers:
                             description: |-
