@@ -72,8 +72,8 @@ type BackendTLSPolicyValidationApplyConfiguration struct {
 	// Support: Implementation-specific - More than one reference, other kinds
 	// of resources, or a single reference that includes multiple certificates.
 	CACertificateRefs []LocalObjectReferenceApplyConfiguration `json:"caCertificateRefs,omitempty"`
-	// WellKnownCACertificates specifies whether system CA certificates may be used in
-	// the TLS handshake between the gateway and backend pod.
+	// WellKnownCACertificates specifies whether a well-known set of CA certificates
+	// may be used in the TLS handshake between the gateway and backend pod.
 	//
 	// If WellKnownCACertificates is unspecified or empty (""), then CACertificateRefs
 	// must be specified with at least one entry for a valid configuration. Only one of
@@ -82,6 +82,13 @@ type BackendTLSPolicyValidationApplyConfiguration struct {
 	// the supplied value is not recognized, the implementation MUST ensure the
 	// `Accepted` Condition on the BackendTLSPolicy is set to `status: False`, with
 	// a Reason `Invalid`.
+	//
+	// Valid values include:
+	// * "System" - indicates that well-known system CA certificates should be used.
+	//
+	// Implementations MAY define their own sets of CA certificates. Such definitions
+	// MUST use an implementation-specific, prefixed name, such as
+	// `mycompany.com/my-custom-ca-certifcates`.
 	//
 	// Support: Implementation-specific
 	WellKnownCACertificates *apisv1.WellKnownCACertificatesType `json:"wellKnownCACertificates,omitempty"`
