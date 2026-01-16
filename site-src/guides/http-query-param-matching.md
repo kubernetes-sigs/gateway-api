@@ -13,7 +13,7 @@ The following `HTTPRoute` splits traffic between two backends based on the
 value of the `animal` query parameter:
 
 ```yaml
-apiVersion: gateway.networking.k.io/v1
+apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
   name: query-param-matching
