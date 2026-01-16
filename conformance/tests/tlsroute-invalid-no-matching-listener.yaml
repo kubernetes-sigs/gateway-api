@@ -1,0 +1,117 @@
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: gateway-http-only
+  namespace: gateway-conformance-infra
+spec:
+  gatewayClassName: "{GATEWAY_CLASS_NAME}"
+  listeners:
+    - name: http
+      port: 80
+      protocol: HTTP
+      allowedRoutes:
+        namespaces:
+          from: Same
+        kinds:
+          - kind: TLSRoute
+---
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TLSRoute
+metadata:
+  name: tlsroute-no-matching-listener
+  namespace: gateway-conformance-infra
+spec:
+  parentRefs:
+    - name: gateway-http-only
+  hostnames:
+    - tls.example.com
+  rules:
+    - backendRefs:
+        - name: tls-backend
+          port: 443
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: gateway-tls-httproute-only
+  namespace: gateway-conformance-infra
+spec:
+  gatewayClassName: "{GATEWAY_CLASS_NAME}"
+  listeners:
+    - name: http
+      port: 80
+      protocol: HTTP
+      allowedRoutes:
+        namespaces:
+          from: Same
+        kinds:
+          - kind: HTTPRoute
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: gateway-https-only
+  namespace: gateway-conformance-infra
+spec:
+  gatewayClassName: "{GATEWAY_CLASS_NAME}"
+  listeners:
+    - name: https
+      port: 443
+      protocol: HTTPS
+      allowedRoutes:
+        namespaces:
+          from: Same
+        kinds:
+          - kind: TLSRoute
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: tls-validity-checks-certificate
+            namespace: gateway-conformance-infra
+---
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TLSRoute
+metadata:
+  name: tlsroute-not-allowed-kind
+  namespace: gateway-conformance-infra
+spec:
+  parentRefs:
+    - name: gateway-tls-httproute-only
+  hostnames:
+    - tls.example.com
+  rules:
+    - backendRefs:
+        - name: tls-backend
+          port: 443
+---
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TLSRoute
+metadata:
+  name: tlsroute-wrong-protocol
+  namespace: gateway-conformance-infra
+spec:
+  parentRefs:
+    - name: gateway-https-only
+  hostnames:
+    - tls.example.com
+  rules:
+    - backendRefs:
+        - name: tls-backend
+          port: 443
+---
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TLSRoute
+metadata:
+  name: tlsroute-wrong-section-name
+  namespace: gateway-conformance-infra
+spec:
+  parentRefs:
+    - name: gateway-http-only
+      sectionName: nonexistent-listener
+  hostnames:
+    - tls.example.com
+  rules:
+    - backendRefs:
+        - name: tls-backend
+          port: 443
