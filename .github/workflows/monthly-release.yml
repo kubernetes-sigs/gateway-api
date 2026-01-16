@@ -74,60 +74,98 @@ jobs:
               id: release-notes
               run: |
                   TAG="${{ steps.tag.outputs.tag }}"
+
+                  # Extract year and month from tag (e.g., monthly-2026.01 -> 2026, 01)
                   YEAR_MONTH=$(echo "$TAG" | sed 's/monthly-//')
                   YEAR=$(echo "$YEAR_MONTH" | cut -d. -f1)
                   MONTH_NUM=$(echo "$YEAR_MONTH" | cut -d. -f2)
 
-                  # 1. Calculate Previous Month/Year for the comparison
-                  if [ "$MONTH_NUM" = "01" ]; then
-                      PREV_MONTH="12"; PREV_YEAR=$((YEAR - 1))
-                  else
-                      PREV_MONTH=$(printf "%02d" $((10#$MONTH_NUM - 1)))
-                      PREV_YEAR=$YEAR
+                  # Convert month number to month name
+                  case "$MONTH_NUM" in
+                    01) MONTH_NAME="January" ;;
+                    02) MONTH_NAME="February" ;;
+                    03) MONTH_NAME="March" ;;
+                    04) MONTH_NAME="April" ;;
+                    05) MONTH_NAME="May" ;;
+                    06) MONTH_NAME="June" ;;
+                    07) MONTH_NAME="July" ;;
+                    08) MONTH_NAME="August" ;;
+                    09) MONTH_NAME="September" ;;
+                    10) MONTH_NAME="October" ;;
+                    11) MONTH_NAME="November" ;;
+                    12) MONTH_NAME="December" ;;
+                    *) MONTH_NAME="Month $MONTH_NUM" ;;
+                  esac
+
+                  # Find the previous monthly tag
+                  PREV_TAG=$(git tag -l "monthly-*" | sort -V | grep -B1 "^${TAG}$" | head -n1)
+
+                  if [ -z "$PREV_TAG" ]; then
+                    # If no previous monthly tag, use the last tag or main
+                    PREV_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "main")
                   fi
-                  
-                  TARGET_PREV_TAG="monthly-$PREV_YEAR.$PREV_MONTH"
 
-                  if git rev-parse "$TARGET_PREV_TAG" >/dev/null 2>&1; then
-                      PREV_TAG="$TARGET_PREV_TAG"
-                  else
-                      PREV_TAG=$(git describe --tags --abbrev=0 "${TAG}^" 2>/dev/null || echo "main")
+                  echo "Comparing ${PREV_TAG}..${TAG}"
+
+                  # Start with template
+                  NOTES=$(cat <<EOF
+                  Gateway API ${TAG} Release Notes
+
+                  This is the monthly release for the Gateway API experimental channel for ${MONTH_NAME} ${YEAR}. This release includes the latest features and fixes from Gateway API's main branch.
+
+                  Using this Release
+
+                  To install the CRDs for this release, use install ${TAG}-install.yaml:
+
+                  \`\`\`bash
+                  kubectl apply --server-side=true -f https://github.com/kubernetes-sigs/gateway-api/releases/download/${TAG}/${TAG}-install.yaml
+                  \`\`\`
+
+                  To build using this release in Go, include this release in your go.mod:
+
+                  \`\`\`go
+                  require sigs.k8s.io/gateway-api ${TAG}
+                  \`\`\`
+
+                  and run \`go mod tidy\`. You'll find that ${TAG} gets replaced by a Go pseudoversion; this is expected.
+
+                  EOF
+                  )
+
+                  # Get list of changed files in config/crd/experimental
+                  CHANGED_FILES=$(git diff --name-only ${PREV_TAG}..${TAG} -- config/crd/experimental 2>/dev/null || echo "")
+
+                  if [ -n "$CHANGED_FILES" ]; then
+                    NOTES="${NOTES}
+
+                  ## Changes
+
+                  ### Modified CRDs
+                  \`\`\`
+                  $(echo "$CHANGED_FILES" | sed 's|config/crd/experimental/||' | sort | uniq)
+                  \`\`\`
+                  "
                   fi
 
-                  # 2. Get Month Name for the header
-                  MONTH_NAME=$(date -d "$YEAR-$MONTH_NUM-01" +"%B" 2>/dev/null || echo "Month $MONTH_NUM")
+                  # Get commit summary
+                  COMMITS=$(git log --oneline ${PREV_TAG}..${TAG} --no-merges 2>/dev/null | head -20 || echo "")
 
-                  # 3. Build the Notes
-                  {
-                    echo "# Gateway API ${TAG} Release Notes"
-                    echo ""
-                    echo "This is the monthly release for the Gateway API experimental channel for **${MONTH_NAME} ${YEAR}**."
-                    echo ""
-                    echo "## Installation"
-                    echo "\`\`\`bash"
-                    echo "kubectl apply --server-side=true -f https://github.com/${{ github.repository }}/releases/download/${TAG}/${TAG}-install.yaml"
-                    echo "\`\`\`"
-                    echo ""
-                    echo "---"
-                    
-                    # Modified CRDs
-                    CHANGED_FILES=$(git diff --name-only ${PREV_TAG}..${TAG} -- config/crd/experimental 2>/dev/null || echo "")
-                    if [ -n "$CHANGED_FILES" ]; then
-                        echo "### 🛠 Modified Experimental CRDs"
-                        echo "\`\`\`"
-                        echo "$CHANGED_FILES" | sed 's|config/crd/experimental/||' | sort | uniq
-                        echo "\`\`\`"
-                        echo ""
-                    fi
+                  if [ -n "$COMMITS" ]; then
+                    NOTES="${NOTES}
 
-                    # Full Commits
-                    echo "### 📝 Full Changelog"
-                    git log ${PREV_TAG}..${TAG} --no-merges --pretty=format:"* %h %s"
-                    echo ""
-                    echo ""
-                    echo "**Full Diff**: https://github.com/${{ github.repository }}/compare/${PREV_TAG}...${TAG}"
-                  } > release-notes.md
-              
+                  ### Recent Changes
+                  \`\`\`
+                  ${COMMITS}
+                  \`\`\`
+                  "
+                  fi
+
+                  # Save to file for use in release
+                  echo "$NOTES" > release-notes.md
+                  echo "notes<<EOF" >> $GITHUB_OUTPUT
+                  echo "$NOTES" >> $GITHUB_OUTPUT
+                  echo "EOF" >> $GITHUB_OUTPUT
+
             - name: Create GitHub Release
               if: steps.check-tag.outputs.exists == 'false'
               uses: softprops/action-gh-release@v2
