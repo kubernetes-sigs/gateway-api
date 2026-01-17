@@ -1,181 +1,184 @@
 name: Monthly Release
 
 on:
-    schedule:
-        # Run on the first day of every month at 00:00 UTC
-        - cron: "0 0 1 * *"
-    workflow_dispatch:
-        # Allow manual triggering
-        inputs:
-            tag:
-                description: "Monthly tag (e.g., monthly-2026.01). Leave empty to auto-generate."
-                required: false
-                type: string
+  schedule:
+    # Run on the first day of every month at 00:00 UTC
+    - cron: "0 0 1 * *"
+  workflow_dispatch:
+    # Allow manual triggering
+    inputs:
+      tag:
+        description: "Monthly tag (e.g., monthly-2026.01). Leave empty to auto-generate."
+        required: false
+        type: string
 
 permissions:
-    contents: write
-    id-token: write
-    pull-requests: read 
+  contents: write
+  id-token: write
+  pull-requests: read
 
 jobs:
-    create-monthly-release:
-        name: Create Monthly Release
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # tag=v6.0.1
-              with:
-                  fetch-depth: 0 # Fetch all history for release notes
+  create-monthly-release:
+    name: Create Monthly Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # tag=v6.0.1
+        with:
+          fetch-depth: 0 # Fetch all history for release notes
 
-            - name: Set up Go
-              uses: actions/setup-go@4dc6199c7b1a012772edbd06daecab0f50c9053c # tag=v6.1.0
-              with:
-                go-version-file: 'go.work'
+      - name: Set up Go
+        uses: actions/setup-go@4dc6199c7b1a012772edbd06daecab0f50c9053c # tag=v6.1.0
+        with:
+          go-version-file: "go.work"
 
-            - name: Generate monthly tag
-              id: tag
-              run: |
-                  if [ -n "${{ inputs.tag }}" ]; then
-                    TAG="${{ inputs.tag }}"
-                  else
-                    # Format: monthly-YYYY.MM
-                    TAG="monthly-$(date +"%Y.%m")"
-                  fi
-                  echo "tag=${TAG}" >> $GITHUB_OUTPUT
-                  echo "Generated tag: ${TAG}"
+      - name: Generate monthly tag
+        id: tag
+        run: |
+          if [ -n "${{ inputs.tag }}" ]; then
+            TAG="${{ inputs.tag }}"
+          else
+            # Format: monthly-YYYY.MM
+            TAG="monthly-$(date +"%Y.%m")"
+          fi
+          echo "tag=${TAG}" >> $GITHUB_OUTPUT
+          echo "Generated tag: ${TAG}"
 
-            - name: Check if tag already exists
-              id: check-tag
-              run: |
-                  if git rev-parse "${{ steps.tag.outputs.tag }}" >/dev/null 2>&1; then
-                    echo "exists=true" >> $GITHUB_OUTPUT
-                    echo "Tag ${{ steps.tag.outputs.tag }} already exists, skipping release"
-                  else
-                    echo "exists=false" >> $GITHUB_OUTPUT
-                  fi
+      - name: Check if tag already exists
+        id: check-tag
+        run: |
+          if git rev-parse "${{ steps.tag.outputs.tag }}" >/dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+            echo "Tag ${{ steps.tag.outputs.tag }} already exists, skipping release"
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
 
-            - name: Create and push tag
-              if: steps.check-tag.outputs.exists == 'false'
-              run: |
-                  git config user.name "github-actions[bot]"
-                  git config user.email "github-actions[bot]@users.noreply.github.com"
-                  git tag "${{ steps.tag.outputs.tag }}"
-                  git push origin "${{ steps.tag.outputs.tag }}"
+      - name: Create and push tag
+        if: steps.check-tag.outputs.exists == 'false'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag "${{ steps.tag.outputs.tag }}"
+          git push origin "${{ steps.tag.outputs.tag }}"
 
-            - name: Build monthly YAML
-              if: steps.check-tag.outputs.exists == 'false'
-              env:
-                  TAG: ${{ steps.tag.outputs.tag }}
-                  MONTHLY_NONINTERACTIVE: "true"
-              run: |
-                  make build-monthly-yaml
+      - name: Build monthly YAML
+        if: steps.check-tag.outputs.exists == 'false'
+        env:
+          TAG: ${{ steps.tag.outputs.tag }}
+          MONTHLY_NONINTERACTIVE: "true"
+        run: |
+          make build-monthly-yaml
 
-            - name: Generate release notes
-              if: steps.check-tag.outputs.exists == 'false'
-              id: release-notes
-              env:
-                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              run: |
-                  TAG="${{ steps.tag.outputs.tag }}"
+      - name: Generate release notes
+        if: steps.check-tag.outputs.exists == 'false'
+        id: release-notes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${{ steps.tag.outputs.tag }}"
 
-                  # 1. Install the K8s release-notes tool
-                  go install k8s.io/release/cmd/release-notes@latest
-                  
-                  # 2. Extract year and month for the header
-                  YEAR_MONTH=$(echo "$TAG" | sed 's/monthly-//')
-                  YEAR=$(echo "$YEAR_MONTH" | cut -d. -f1)
-                  MONTH_NUM=$(echo "$YEAR_MONTH" | cut -d. -f2)
-                  
-                  case "$MONTH_NUM" in
-                    01) MONTH_NAME="January" ;;
-                    02) MONTH_NAME="February" ;;
-                    03) MONTH_NAME="March" ;;
-                    04) MONTH_NAME="April" ;;
-                    05) MONTH_NAME="May" ;;
-                    06) MONTH_NAME="June" ;;
-                    07) MONTH_NAME="July" ;;
-                    08) MONTH_NAME="August" ;;
-                    09) MONTH_NAME="September" ;;
-                    10) MONTH_NAME="October" ;;
-                    11) MONTH_NAME="November" ;;
-                    12) MONTH_NAME="December" ;;
-                    *) MONTH_NAME="Month $MONTH_NUM" ;;
-                  esac
+          # 1. Install the K8s release-notes tool
+          go install k8s.io/release/cmd/release-notes@latest
 
-                  # 3. Find SHAs for the tool
-                  # Ensure we have history
-                  git fetch --tags --force
-                  
-                  PREV_TAG=$(git tag -l "monthly-*" | sort -V | grep -B1 "^${TAG}$" | head -n1)
-                  
-                  if [ -z "$PREV_TAG" ] || [ "$PREV_TAG" == "$TAG" ]; then
-                    # Fallback if first monthly release: go back ~30 days
-                    START_SHA=$(git rev-list -n 1 --before="1 month" origin/main)
-                  else
-                    START_SHA=$(git rev-parse "$PREV_TAG")
-                  fi
-                  END_SHA=$(git rev-parse HEAD)
+          # 2. Extract year and month for the header
+          YEAR_MONTH=$(echo "$TAG" | sed 's/monthly-//')
+          YEAR=$(echo "$YEAR_MONTH" | cut -d. -f1)
+          MONTH_NUM=$(echo "$YEAR_MONTH" | cut -d. -f2)
 
-                  # 4. Create the mandatory Header
-                  cat <<EOF > release-notes.md
-                    Gateway API ${TAG} Release Notes
+          case "$MONTH_NUM" in
+            01) MONTH_NAME="January" ;;
+            02) MONTH_NAME="February" ;;
+            03) MONTH_NAME="March" ;;
+            04) MONTH_NAME="April" ;;
+            05) MONTH_NAME="May" ;;
+            06) MONTH_NAME="June" ;;
+            07) MONTH_NAME="July" ;;
+            08) MONTH_NAME="August" ;;
+            09) MONTH_NAME="September" ;;
+            10) MONTH_NAME="October" ;;
+            11) MONTH_NAME="November" ;;
+            12) MONTH_NAME="December" ;;
+            *) MONTH_NAME="Month $MONTH_NUM" ;;
+          esac
 
-                    This is the monthly release for the Gateway API experimental channel for ${MONTH_NAME} ${YEAR}. This release includes the latest features and fixes from Gateway API's main branch.
+          # 3. Find SHAs for the tool
+          # Ensure we have history
+          git fetch --tags --force
 
-                    Using this Release
+          PREV_TAG=$(git tag -l "monthly-*" | sort -V | grep -B1 "^${TAG}$" | head -n1)
 
-                    To install the CRDs for this release, use install ${TAG}-install.yaml:
+          if [ -z "$PREV_TAG" ] || [ "$PREV_TAG" == "$TAG" ]; then
+            # Fallback if first monthly release: go back ~30 days
+            START_SHA=$(git rev-list -n 1 --before="1 month" origin/main)
+          else
+            START_SHA=$(git rev-parse "$PREV_TAG")
+          fi
+          END_SHA=$(git rev-parse HEAD)
 
-                    \`\`\`bash
-                    kubectl apply --server-side=true -f https://github.com/kubernetes-sigs/gateway-api/releases/download/${TAG}/${TAG}-install.yaml
-                    \`\`\`
+           # 4. Create the mandatory Header
+           cat > release-notes.md <<'RELEASE_NOTES_EOF'
+           Gateway API ${TAG} Release Notes
 
-                    To build using this release in Go, include this release in your go.mod:
+           This is the monthly release for the Gateway API experimental channel for ${MONTH_NAME} ${YEAR}. This release includes the latest features and fixes from Gateway API's main branch.
 
-                    \`\`\`go
-                    require sigs.k8s.io/gateway-api ${TAG}
-                    \`\`\`
+           Using this Release
 
-                    and run \`go mod tidy\`. You'll find that ${TAG} gets replaced by a Go pseudoversion; this is expected.
+           To install the CRDs for this release, use install ${TAG}-install.yaml:
 
-                    ---
-                    ## Changelog
-                    EOF
+           ```bash
+           kubectl apply --server-side=true -f https://github.com/kubernetes-sigs/gateway-api/releases/download/${TAG}/${TAG}-install.yaml
+           ```
 
-                  # 5. Run the K8s tool and append the output
-                  # Use the full path to the go bin
-                  $(go env GOPATH)/bin/release-notes \
-                    --start-sha "$START_SHA" \
-                    --end-sha "$END_SHA" \
-                    --branch main \
-                    --repo gateway-api \
-                    --org kubernetes-sigs \
-                    --output /tmp/k8s-changelog.md
+           To build using this release in Go, include this release in your go.mod:
 
-                  cat /tmp/k8s-changelog.md >> release-notes.md
+           ```go
+           require sigs.k8s.io/gateway-api ${TAG}
+           ```
 
-            - name: Create GitHub Release
-              if: steps.check-tag.outputs.exists == 'false'
-              uses: softprops/action-gh-release@v2
-              with:
-                  tag_name: ${{ steps.tag.outputs.tag }}
-                  name: Monthly Release ${{ steps.tag.outputs.tag }}
-                  body_path: release-notes.md
-                  prerelease: true
-                  files: |
-                      release/${{ steps.tag.outputs.tag }}-install.yaml
-                  draft: false
-                  generate_release_notes: false
+           and run `go mod tidy`. You'll find that ${TAG} gets replaced by a Go pseudoversion; this is expected.
 
-            - name: Summary
-              if: always()
-              run: |
-                  if [ "${{ steps.check-tag.outputs.exists }}" == "true" ]; then
-                    echo "## ⚠️ Release Skipped" >> $GITHUB_STEP_SUMMARY
-                    echo "Tag ${{ steps.tag.outputs.tag }} already exists. No release was created." >> $GITHUB_STEP_SUMMARY
-                  else
-                    echo "## ✅ Release Created" >> $GITHUB_STEP_SUMMARY
-                    echo "Successfully created monthly release: **${{ steps.tag.outputs.tag }}**" >> $GITHUB_STEP_SUMMARY
-                    echo "" >> $GITHUB_STEP_SUMMARY
-                    echo "View the release: https://github.com/${{ github.repository }}/releases/tag/${{ steps.tag.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
-                  fi
+           ---
+           ## Changelog
+           RELEASE_NOTES_EOF
+
+           # Substitute variables in the template
+           sed -i "s|\${TAG}|${TAG}|g; s|\${MONTH_NAME}|${MONTH_NAME}|g; s|\${YEAR}|${YEAR}|g" release-notes.md
+
+          # 5. Run the K8s tool and append the output
+          # Use the full path to the go bin
+          $(go env GOPATH)/bin/release-notes \
+            --start-sha "$START_SHA" \
+            --end-sha "$END_SHA" \
+            --branch main \
+            --repo gateway-api \
+            --org kubernetes-sigs \
+            --output /tmp/k8s-changelog.md
+
+          cat /tmp/k8s-changelog.md >> release-notes.md
+
+      - name: Create GitHub Release
+        if: steps.check-tag.outputs.exists == 'false'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.tag }}
+          name: Monthly Release ${{ steps.tag.outputs.tag }}
+          body_path: release-notes.md
+          prerelease: true
+          files: |
+            release/${{ steps.tag.outputs.tag }}-install.yaml
+          draft: false
+          generate_release_notes: false
+
+      - name: Summary
+        if: always()
+        run: |
+          if [ "${{ steps.check-tag.outputs.exists }}" == "true" ]; then
+            echo "## ⚠️ Release Skipped" >> $GITHUB_STEP_SUMMARY
+            echo "Tag ${{ steps.tag.outputs.tag }} already exists. No release was created." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "## ✅ Release Created" >> $GITHUB_STEP_SUMMARY
+            echo "Successfully created monthly release: **${{ steps.tag.outputs.tag }}**" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "View the release: https://github.com/${{ github.repository }}/releases/tag/${{ steps.tag.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
+          fi
