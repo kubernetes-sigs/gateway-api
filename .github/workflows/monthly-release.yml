@@ -75,6 +75,7 @@ jobs:
         id: release-notes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
         run: |
           TAG="${{ steps.tag.outputs.tag }}"
 
@@ -130,17 +131,7 @@ jobs:
             printf 'require sigs.k8s.io/gateway-api %s\n' "${TAG}"
             printf '```\n\n'
             printf 'and run go mod tidy. You'\''ll find that %s gets replaced by a Go pseudoversion; this is expected.\n\n' "${TAG}"
-            printf 'Cautions\n\n'
-            printf 'N/A\n\n'
             printf 'Changes Summary\n\n'
-            printf 'Bundle Version\n\n'
-            printf 'Updated bundle version across all experimental CRDs\n\n'
-            printf 'Gateway API Enhancements\n\n'
-            printf 'See What'\''s Changed section below for details.\n\n'
-            printf 'Documentation Improvements\n\n'
-            printf 'See What'\''s Changed section below for details.\n\n'
-            printf 'Affected Resources\n\n'
-            printf 'All experimental CRDs\n\n'
           } > release-notes.md
 
           # 5. Run the K8s tool and append the output
@@ -169,7 +160,8 @@ jobs:
 
           # Add Full Changelog link at the end
           if [ -n "$PREV_TAG" ] && [ "$PREV_TAG" != "$TAG" ]; then
-            printf '\nFull Changelog: %s...%s\n' "${PREV_TAG}" "${TAG}" >> release-notes.md
+            COMPARE_URL="https://github.com/${GITHUB_REPOSITORY}/compare/${PREV_TAG}...${TAG}"
+            printf '\nFull Changelog: [%s...%s](%s)\n' "${PREV_TAG}" "${TAG}" "${COMPARE_URL}" >> release-notes.md
           else
             printf '\nFull Changelog: See commit history\n' >> release-notes.md
           fi
