@@ -117,7 +117,7 @@ jobs:
           END_SHA=$(git rev-parse HEAD)
 
            # 4. Create the mandatory Header
-           cat > release-notes.md <<'RELEASE_NOTES_EOF'
+           cat << EOF > release-notes.md
            Gateway API ${TAG} Release Notes
 
            This is the monthly release for the Gateway API experimental channel for ${MONTH_NAME} ${YEAR}. This release includes the latest features and fixes from Gateway API's main branch.
@@ -140,7 +140,7 @@ jobs:
 
            ---
            ## Changelog
-           RELEASE_NOTES_EOF
+           EOF
 
            # Substitute variables in the template
            sed -i "s|\${TAG}|${TAG}|g; s|\${MONTH_NAME}|${MONTH_NAME}|g; s|\${YEAR}|${YEAR}|g" release-notes.md
