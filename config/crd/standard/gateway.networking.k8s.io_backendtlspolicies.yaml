@@ -98,9 +98,9 @@ spec:
                     example, a policy with a creation timestamp of "2021-07-15
                     01:02:03" MUST be given precedence over a policy with a
                     creation timestamp of "2021-07-15 01:02:04".
-                  * The policy appearing first in alphabetical order by {name}.
-                    For example, a policy named `bar` is given precedence over a
-                    policy named `baz`.
+                  * The policy appearing first in alphabetical order by {namespace}/{name}.
+                    For example, a policy named `foo/bar` is given precedence over a
+                    policy named `foo/baz`.
 
                   For any BackendTLSPolicy that does not take precedence, the
                   implementation MUST ensure the `Accepted` Condition is set to
@@ -774,9 +774,9 @@ spec:
                     example, a policy with a creation timestamp of "2021-07-15
                     01:02:03" MUST be given precedence over a policy with a
                     creation timestamp of "2021-07-15 01:02:04".
-                  * The policy appearing first in alphabetical order by {name}.
-                    For example, a policy named `bar` is given precedence over a
-                    policy named `baz`.
+                  * The policy appearing first in alphabetical order by {namespace}/{name}.
+                    For example, a policy named `foo/bar` is given precedence over a
+                    policy named `foo/baz`.
 
                   For any BackendTLSPolicy that does not take precedence, the
                   implementation MUST ensure the `Accepted` Condition is set to
