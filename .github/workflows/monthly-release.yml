@@ -79,10 +79,7 @@ jobs:
         run: |
           TAG="${{ steps.tag.outputs.tag }}"
 
-          # 1. Install the K8s release-notes tool
-          go install k8s.io/release/cmd/release-notes@latest
-
-          # 2. Extract year and month for the header
+          # Extract year and month for the header
           YEAR_MONTH=$(echo "$TAG" | sed 's/monthly-//')
           YEAR=$(echo "$YEAR_MONTH" | cut -d. -f1)
           MONTH_NUM=$(echo "$YEAR_MONTH" | cut -d. -f2)
@@ -103,7 +100,7 @@ jobs:
             *) MONTH_NAME="Month $MONTH_NUM" ;;
           esac
 
-          # 3. Find SHAs for the tool
+          # Find previous tag and SHAs for PR extraction
           # Ensure we have history
           git fetch --tags --force
 
@@ -134,29 +131,51 @@ jobs:
             printf 'Changes Summary\n\n'
           } > release-notes.md
 
-          # 5. Run the K8s tool and append the output
-          # Use the full path to the go bin
-          RELEASE_NOTES_BIN="$(go env GOPATH)/bin/release-notes"
-          if [ -f "$RELEASE_NOTES_BIN" ]; then
-            "$RELEASE_NOTES_BIN" \
-              --start-sha "$START_SHA" \
-              --end-sha "$END_SHA" \
-              --branch main \
-              --repo gateway-api \
-              --org kubernetes-sigs \
-              --output /tmp/k8s-changelog.md 2>&1 || true
+          # Extract PR numbers from git log and format as links
+          printf '### Merged Pull Requests\n\n' >> release-notes.md
 
-            # Append the changelog from the tool if it was generated
-            if [ -f /tmp/k8s-changelog.md ] && [ -s /tmp/k8s-changelog.md ]; then
-              cat /tmp/k8s-changelog.md >> release-notes.md
-            else
-              printf '\n## What'\''s Changed\n\n'
-              printf 'See commit history for details.\n' >> release-notes.md
-            fi
+          # Get all PR numbers from commit messages between START_SHA and END_SHA
+          # PRs are typically referenced as #1234, fixes #1234, closes #1234, etc.
+          # Also check merge commit messages which often contain "Merge pull request #1234"
+          PR_NUMBERS=$(git log --format="%s %B" "${START_SHA}..${END_SHA}" | grep -oE '(#[0-9]+|pull request #[0-9]+)' | grep -oE '[0-9]+' | sort -u -n)
+
+          if [ -n "$PR_NUMBERS" ]; then
+            for PR_NUM in $PR_NUMBERS; do
+              # Get PR title and author from GitHub API
+              PR_DATA=$(curl -s -H "Authorization: token ${GITHUB_TOKEN}" \
+                -H "Accept: application/vnd.github.v3+json" \
+                "https://api.github.com/repos/${GITHUB_REPOSITORY}/pulls/${PR_NUM}" 2>/dev/null || echo "")
+              
+              if [ -n "$PR_DATA" ]; then
+                PR_TITLE=$(echo "$PR_DATA" | grep -o '"title":"[^"]*"' | head -1 | cut -d'"' -f4 || echo "")
+                PR_AUTHOR=$(echo "$PR_DATA" | grep -o '"login":"[^"]*"' | head -1 | cut -d'"' -f4 || echo "")
+              fi
+              
+              # Fallback: get from commit message if API fails
+              if [ -z "$PR_TITLE" ]; then
+                COMMIT_MSG=$(git log --format="%s" "${START_SHA}..${END_SHA}" | grep -m1 "#${PR_NUM}" || echo "")
+                if [ -n "$COMMIT_MSG" ]; then
+                  PR_TITLE=$(echo "$COMMIT_MSG" | sed 's/.*#'"${PR_NUM}"'[^:]*: *//' | sed 's/^Merge pull request.*//' | head -c 100)
+                fi
+                [ -z "$PR_TITLE" ] && PR_TITLE="PR #${PR_NUM}"
+              fi
+              
+              if [ -z "$PR_AUTHOR" ]; then
+                # Fallback: get author from commit that mentions this PR
+                PR_AUTHOR=$(git log --format="%an" --grep="#${PR_NUM}" "${START_SHA}..${END_SHA}" | head -1 || echo "unknown")
+              fi
+              
+              PR_URL="https://github.com/${GITHUB_REPOSITORY}/pull/${PR_NUM}"
+              printf '- %s by @%s in [#%s](%s)\n' "$PR_TITLE" "$PR_AUTHOR" "$PR_NUM" "$PR_URL" >> release-notes.md
+              
+              # Small delay to avoid rate limiting
+              sleep 0.1
+            done
           else
-            printf '\n## What'\''s Changed\n\n'
-            printf 'See commit history for details.\n' >> release-notes.md
+            printf 'No pull requests found in this release.\n' >> release-notes.md
           fi
+
+          printf '\n' >> release-notes.md
 
           # Add Full Changelog link at the end
           if [ -n "$PREV_TAG" ] && [ "$PREV_TAG" != "$TAG" ]; then
