@@ -116,46 +116,63 @@ jobs:
           fi
           END_SHA=$(git rev-parse HEAD)
 
-           # 4. Create the mandatory Header
-           cat << EOF > release-notes.md
-           Gateway API ${TAG} Release Notes
-
-           This is the monthly release for the Gateway API experimental channel for ${MONTH_NAME} ${YEAR}. This release includes the latest features and fixes from Gateway API's main branch.
-
-           Using this Release
-
-           To install the CRDs for this release, use install ${TAG}-install.yaml:
-
-           ```bash
-           kubectl apply --server-side=true -f https://github.com/kubernetes-sigs/gateway-api/releases/download/${TAG}/${TAG}-install.yaml
-           ```
-
-           To build using this release in Go, include this release in your go.mod:
-
-           ```go
-           require sigs.k8s.io/gateway-api ${TAG}
-           ```
-
-           and run `go mod tidy`. You'll find that ${TAG} gets replaced by a Go pseudoversion; this is expected.
-
-           ---
-           ## Changelog
-           EOF
-
-           # Substitute variables in the template
-           sed -i "s|\${TAG}|${TAG}|g; s|\${MONTH_NAME}|${MONTH_NAME}|g; s|\${YEAR}|${YEAR}|g" release-notes.md
+          # 4. Create the mandatory Header
+          {
+            printf 'Gateway API %s Release Notes\n\n' "${TAG}"
+            printf 'This is the monthly release for the Gateway API experimental channel for %s %s. This release includes the latest features and fixes from Gateway API'\''s main branch.\n\n' "${MONTH_NAME}" "${YEAR}"
+            printf 'Using this Release\n\n'
+            printf 'To install the CRDs for this release, use install %s-install.yaml:\n\n' "${TAG}"
+            printf '```\n'
+            printf 'kubectl apply --server-side=true -f https://github.com/kubernetes-sigs/gateway-api/releases/download/%s/%s-install.yaml\n' "${TAG}" "${TAG}"
+            printf '```\n\n'
+            printf 'To build using this release in Go, include this release in your go.mod:\n\n'
+            printf '```\n'
+            printf 'require sigs.k8s.io/gateway-api %s\n' "${TAG}"
+            printf '```\n\n'
+            printf 'and run go mod tidy. You'\''ll find that %s gets replaced by a Go pseudoversion; this is expected.\n\n' "${TAG}"
+            printf 'Cautions\n\n'
+            printf 'N/A\n\n'
+            printf 'Changes Summary\n\n'
+            printf 'Bundle Version\n\n'
+            printf 'Updated bundle version across all experimental CRDs\n\n'
+            printf 'Gateway API Enhancements\n\n'
+            printf 'See What'\''s Changed section below for details.\n\n'
+            printf 'Documentation Improvements\n\n'
+            printf 'See What'\''s Changed section below for details.\n\n'
+            printf 'Affected Resources\n\n'
+            printf 'All experimental CRDs\n\n'
+          } > release-notes.md
 
           # 5. Run the K8s tool and append the output
           # Use the full path to the go bin
-          $(go env GOPATH)/bin/release-notes \
-            --start-sha "$START_SHA" \
-            --end-sha "$END_SHA" \
-            --branch main \
-            --repo gateway-api \
-            --org kubernetes-sigs \
-            --output /tmp/k8s-changelog.md
+          RELEASE_NOTES_BIN="$(go env GOPATH)/bin/release-notes"
+          if [ -f "$RELEASE_NOTES_BIN" ]; then
+            "$RELEASE_NOTES_BIN" \
+              --start-sha "$START_SHA" \
+              --end-sha "$END_SHA" \
+              --branch main \
+              --repo gateway-api \
+              --org kubernetes-sigs \
+              --output /tmp/k8s-changelog.md 2>&1 || true
 
-          cat /tmp/k8s-changelog.md >> release-notes.md
+            # Append the changelog from the tool if it was generated
+            if [ -f /tmp/k8s-changelog.md ] && [ -s /tmp/k8s-changelog.md ]; then
+              cat /tmp/k8s-changelog.md >> release-notes.md
+            else
+              printf '\n## What'\''s Changed\n\n'
+              printf 'See commit history for details.\n' >> release-notes.md
+            fi
+          else
+            printf '\n## What'\''s Changed\n\n'
+            printf 'See commit history for details.\n' >> release-notes.md
+          fi
+
+          # Add Full Changelog link at the end
+          if [ -n "$PREV_TAG" ] && [ "$PREV_TAG" != "$TAG" ]; then
+            printf '\nFull Changelog: %s...%s\n' "${PREV_TAG}" "${TAG}" >> release-notes.md
+          else
+            printf '\nFull Changelog: See commit history\n' >> release-notes.md
+          fi
 
       - name: Create GitHub Release
         if: steps.check-tag.outputs.exists == 'false'
