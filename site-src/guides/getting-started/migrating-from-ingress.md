@@ -358,6 +358,9 @@ spec:
             name: foo-orders-app
             port:
               number: 80
+  - host: bar.example.com
+    http:
+      paths:
       - path: /
         pathType: Prefix
         backend:
