@@ -87,7 +87,7 @@ jobs:
           TAG="${{ steps.tag.outputs.tag }}"
 
           # Install github-changelog-generator
-          gem install github_changelog_generator --no-document
+          # gem install github_changelog_generator --no-document
 
           # Extract year and month for the header
           YEAR_MONTH=$(echo "$TAG" | sed 's/monthly-//')
