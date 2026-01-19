@@ -138,7 +138,7 @@ jobs:
             printf 'require sigs.k8s.io/gateway-api %s\n' "${TAG}"
             printf '```\n\n'
             printf 'and run go mod tidy. You'\''ll find that %s gets replaced by a Go pseudoversion; this is expected.\n\n' "${TAG}"
-          printf 'Changes Summary\n\n'
+          printf '## Changes Summary\n\n'
           } > release-notes.md
 
           # Generate changelog using github-changelog-generator
@@ -165,19 +165,6 @@ jobs:
               --http-cache \
               --max-issues 500 || true
             cat /tmp/changelog.md
-            
-            # Extract the changelog content
-            if [ -f /tmp/changelog.md ] && [ -s /tmp/changelog.md ]; then
-              # Extract the section for the current tag (future-release)
-              # The generator creates a section like "## [TAG]" followed by PRs
-              # We want everything from "## Merged Pull Requests" until the next section or end
-              sed -n "/## Merged Pull Requests/,/^## \[/p" /tmp/changelog.md | sed '/^## \[/d' | sed '/^## Merged Pull Requests/d' >> release-notes.md || \
-              grep -A 1000 "## Merged Pull Requests" /tmp/changelog.md | grep -B 1000 -m 1 "^## " | grep -v "^## " >> release-notes.md || \
-              tail -n +2 /tmp/changelog.md >> release-notes.md
-            else
-              printf '### Merged Pull Requests\n\n'
-              printf 'No pull requests found in this release.\n' >> release-notes.md
-            fi
           else
             printf '### Merged Pull Requests\n\n'
             printf 'No pull requests found in this release.\n' >> release-notes.md
