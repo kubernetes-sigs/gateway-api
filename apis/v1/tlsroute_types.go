@@ -1,5 +1,5 @@
 /*
-Copyright 2020 The Kubernetes Authors.
+Copyright 2026 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,23 +14,25 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package v1alpha2
+package v1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
-	v1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
 // +genclient
 // +kubebuilder:object:root=true
 // +kubebuilder:resource:categories=gateway-api
 // +kubebuilder:subresource:status
+// +kubebuilder:storageversion
 // +kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 
 // The TLSRoute resource is similar to TCPRoute, but can be configured
 // to match against TLS-specific metadata. This allows more flexibility
 // in matching streams for a given TLS listener.
+//
+// If you need to forward traffic to a single target for a TLS listener, you
+// could choose to use a TCPRoute with a TLS listener.
 type TLSRoute struct {
 	metav1.TypeMeta `json:",inline"`
 	// +optional
@@ -49,11 +51,11 @@ type TLSRoute struct {
 type TLSRouteSpec struct {
 	CommonRouteSpec `json:",inline"`
 
-	// Hostnames defines a set of SNI names that should match against the
+	// Hostnames defines a set of SNI hostnames that should match against the
 	// SNI attribute of TLS ClientHello message in TLS handshake. This matches
 	// the RFC 1123 definition of a hostname with 2 notable exceptions:
 	//
-	// 1. IPs are not allowed in SNI names per RFC 6066.
+	// 1. IPs are not allowed in SNI hostnames per RFC 6066.
 	// 2. A hostname may be prefixed with a wildcard label (`*.`). The wildcard
 	//    label must appear by itself as the first label.
 	//
@@ -62,13 +64,13 @@ type TLSRouteSpec struct {
 	// attached to the Listener. For example:
 	//
 	// * A Listener with `test.example.com` as the hostname matches TLSRoutes
-	//   that have either not specified any hostnames, or have specified at
-	//   least one of `test.example.com` or `*.example.com`.
+	//   that have specified at least one of `test.example.com` or
+	//   `*.example.com`.
 	// * A Listener with `*.example.com` as the hostname matches TLSRoutes
-	//   that have either not specified any hostnames or have specified at least
-	//   one hostname that matches the Listener hostname. For example,
-	//   `test.example.com` and `*.example.com` would both match. On the other
-	//   hand, `example.com` and `test.example.net` would not match.
+	//   that have specified at least one hostname that matches the Listener
+	//   hostname. For example, `test.example.com` and `*.example.com` would both
+	//   match. On the other hand, `example.com` and `test.example.net` would not
+	//   match.
 	//
 	// If both the Listener and TLSRoute have specified hostnames, any
 	// TLSRoute hostnames that do not match the Listener hostname MUST be
@@ -83,28 +85,59 @@ type TLSRouteSpec struct {
 	//
 	// Support: Core
 	//
-	// +optional
+	// +required
 	// +listType=atomic
+	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:MaxItems=16
 	Hostnames []Hostname `json:"hostnames,omitempty"`
 
-	// Rules are a list of TLS matchers and actions.
+	// Rules are a list of actions.
+	//
+	// +required
+	// +listType=atomic
+	// +kubebuilder:validation:MinItems=1
+	// +kubebuilder:validation:MaxItems=1
+	// <gateway:experimental:validation:XValidation:message="Rule name must be unique within the route",rule="self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name) && l1.name == l2.name))">
+	Rules []TLSRouteRule `json:"rules,omitempty"`
+}
+
+// TLSRouteStatus defines the observed state of TLSRoute
+type TLSRouteStatus struct {
+	RouteStatus `json:",inline"`
+}
+
+// TLSRouteRule is the configuration for a given rule.
+type TLSRouteRule struct {
+	// Name is the name of the route rule. This name MUST be unique within a Route if it is set.
+	//
+	// Support: Extended
+	// +optional
+	Name *SectionName `json:"name,omitempty"`
+
+	// BackendRefs defines the backend(s) where matching requests should be
+	// sent. If unspecified or invalid (refers to a nonexistent resource or
+	// a Service with no endpoints), the rule performs no forwarding; if no
+	// filters are specified that would result in a response being sent, the
+	// underlying implementation must actively reject request attempts to this
+	// backend, by rejecting the connection or returning a 500 status code.
+	// Request rejections must respect weight; if an invalid backend is
+	// requested to have 80% of requests, then 80% of requests must be rejected
+	// instead.
+	//
+	// Support: Core for Kubernetes Service
+	//
+	// Support: Extended for Kubernetes ServiceImport
+	//
+	// Support: Implementation-specific for any other resource
+	//
+	// Support for weight: Extended
 	//
 	// +required
 	// +listType=atomic
 	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:MaxItems=16
-	// <gateway:experimental:validation:XValidation:message="Rule name must be unique within the route",rule="self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name) && l1.name == l2.name))">
-	Rules []TLSRouteRule `json:"rules"`
+	BackendRefs []BackendRef `json:"backendRefs,omitempty"`
 }
-
-// TLSRouteStatus defines the observed state of TLSRoute
-// +k8s:deepcopy-gen=false
-type TLSRouteStatus v1.TLSRouteStatus
-
-// TLSRouteRule is the configuration for a given rule.
-// +k8s:deepcopy-gen=false
-type TLSRouteRule v1.TLSRouteRule
 
 // +kubebuilder:object:root=true
 
