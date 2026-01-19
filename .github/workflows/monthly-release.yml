@@ -35,8 +35,7 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: "3.1"
-          bundler-cache: false
+          ruby-version: "2.7"
 
       - name: Generate monthly tag
         id: tag
@@ -81,6 +80,7 @@ jobs:
         id: release-notes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
           CHANGELOG_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -143,29 +143,45 @@ jobs:
 
           # Generate changelog using github-changelog-generator
           if [ -n "$PREV_TAG" ] && [ "$PREV_TAG" != "$TAG" ]; then
-            # Use the upstream repository (kubernetes-sigs/gateway-api) not the fork
-            REPO_USER="kubernetes-sigs"
-            REPO_PROJECT="gateway-api"
+            # Get ISO dates for the tags
+            # Ensure fetch-depth: 0 was used in checkout
+            SINCE_DATE=$(git log -1 --format=%aI "${PREV_TAG}")
+            DUE_DATE=$(git log -1 --format=%aI "${NEW_TAG}")
             
-            # Generate changelog between previous tag and current tag
-            # Use token from environment variable
-            export CHANGELOG_GITHUB_TOKEN="${GITHUB_TOKEN}"
-            # This environment variable is the key to stopping the FrozenError in Ruby 3.x
-            export RUBYOPT="--disable-frozen-string-literal"
+            echo "## Merged Pull Requests (${PREV_TAG} to ${NEW_TAG})" > /tmp/changelog.md
+            
+            gh pr list \
+              --base main \
+              --state merged \
+              --search "merged:${SINCE_DATE}..${DUE_DATE}" \
+              --limit 500 \
+              --json number,title,author \
+              --template '{{range .}}* {{.title}} (#{{.number}}) @{{.author.login}}{{"\n"}}{{end}}' >> /tmp/changelog.md
 
-            github_changelog_generator \
-              --user "${REPO_USER}" \
-              --project "${REPO_PROJECT}" \
-              --since-tag "${PREV_TAG}" \
-              --due-tag "${TAG}" \
-              --output /tmp/changelog.md \
-              --no-unreleased \
-              --no-issues \
-              --pull-requests \
-              --header-label "## Merged Pull Requests between ${PREV_TAG} and ${TAG}" \
-              --exclude-labels question,duplicate,invalid,wontfix
+
+            # # Use the upstream repository (kubernetes-sigs/gateway-api) not the fork
+            # REPO_USER="kubernetes-sigs"
+            # REPO_PROJECT="gateway-api"
             
-            cat /tmp/changelog.md >> release-notes.md
+            # # Generate changelog between previous tag and current tag
+            # # Use token from environment variable
+            # export CHANGELOG_GITHUB_TOKEN="${GITHUB_TOKEN}"
+            # # This environment variable is the key to stopping the FrozenError in Ruby 3.x
+            # export RUBYOPT="--disable-frozen-string-literal"
+
+            # github_changelog_generator \
+            #   --user "${REPO_USER}" \
+            #   --project "${REPO_PROJECT}" \
+            #   --since-tag "${PREV_TAG}" \
+            #   --due-tag "${TAG}" \
+            #   --output /tmp/changelog.md \
+            #   --no-unreleased \
+            #   --no-issues \
+            #   --pull-requests \
+            #   --header-label "## Merged Pull Requests between ${PREV_TAG} and ${TAG}" \
+            #   --exclude-labels question,duplicate,invalid,wontfix
+            
+            # cat /tmp/changelog.md >> release-notes.md
           else
             printf '### Merged Pull Requests\n\n'
             printf 'No pull requests found in this release.\n' >> release-notes.md
