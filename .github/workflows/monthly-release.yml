@@ -164,7 +164,8 @@ jobs:
               --header-label "## Merged Pull Requests" \
               --http-cache \
               --max-issues 500 || true
-            cat /tmp/changelog.md
+            
+            cat /tmp/changelog.md >> release-notes.md
           else
             printf '### Merged Pull Requests\n\n'
             printf 'No pull requests found in this release.\n' >> release-notes.md
