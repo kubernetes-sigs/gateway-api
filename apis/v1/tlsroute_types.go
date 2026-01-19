@@ -47,7 +47,10 @@ type TLSRoute struct {
 	Status TLSRouteStatus `json:"status,omitempty"`
 }
 
-// TLSRouteSpec defines the desired state of a TLSRoute resource.
+// TLSRouteSpec defines the expected behavior of a TLSRoute.
+// A TLSRoute MUST be attached to a Listener of protocol TLS.
+// Core: The listener CAN be of type Passthrough
+// Extended: The listener CAN be of type Terminate
 type TLSRouteSpec struct {
 	CommonRouteSpec `json:",inline"`
 
@@ -59,6 +62,7 @@ type TLSRouteSpec struct {
 	// 2. A hostname may be prefixed with a wildcard label (`*.`). The wildcard
 	//    label must appear by itself as the first label.
 	//
+	// <gateway:util:excludeFromCRD>
 	// If a hostname is specified by both the Listener and TLSRoute, there
 	// must be at least one intersecting hostname for the TLSRoute to be
 	// attached to the Listener. For example:
@@ -71,24 +75,36 @@ type TLSRouteSpec struct {
 	//   hostname. For example, `test.example.com` and `*.example.com` would both
 	//   match. On the other hand, `example.com` and `test.example.net` would not
 	//   match.
+	// * A listener with `something.example.com` as the hostname matches a
+	//   TLSRoute with hostname `*.example.com`.
 	//
 	// If both the Listener and TLSRoute have specified hostnames, any
-	// TLSRoute hostnames that do not match the Listener hostname MUST be
+	// TLSRoute hostnames that do not match any Listener hostname MUST be
 	// ignored. For example, if a Listener specified `*.example.com`, and the
 	// TLSRoute specified `test.example.com` and `test.example.net`,
 	// `test.example.net` must not be considered for a match.
 	//
 	// If both the Listener and TLSRoute have specified hostnames, and none
-	// match with the criteria above, then the TLSRoute is not accepted. The
+	// match with the criteria above, then the TLSRoute is not accepted for that
+	// Listener. If the TLSRoute does not match any Listener on its parent, the
 	// implementation must raise an 'Accepted' Condition with a status of
 	// `False` in the corresponding RouteParentStatus.
 	//
-	// Support: Core
+	// A Listener MUST be have protocol set to TLS when a TLSRoute attaches to it. The
+	// implementation MUST raise an 'Accepted' Condition with a status of
+	// `False` in the corresponding RouteParentStatus with the reason
+	// of "UnsupportedValue" in case a Listener of the wrong type is used.
+	// Core: Listener with `protocol` `TLS` and `tls.mode` `Passthrough`.
+	// Extended: Listener with `protocol` `TLS` and `tls.mode` `Terminate`. The feature name for this Extended feature is `TLSRouteTermination`.
+	// </gateway:util:excludeFromCRD>
 	//
 	// +required
 	// +listType=atomic
 	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:MaxItems=16
+  // +kubebuilder:validation:XValidation:message="Hostnames cannot contain an IP",rule="self.all(h, !isIP(h))"
+  // +kubebuilder:validation:XValidation:message="Hostnames must be valid based on RFC-1123",rule="self.all(h, !h.contains('*') ? !format.dns1123Subdomain().validate(h).hasValue() : true )"
+	// +kubebuilder:validation:XValidation:message="Wildcards on hostnames must be the first label, and the rest of hostname must be valid based on RFC-1123",rule="self.all(h, h.contains('*') ? (h.startsWith('*.') && !format.dns1123Subdomain().validate(h.substring(2)).hasValue()) : true )"
 	Hostnames []Hostname `json:"hostnames,omitempty"`
 
 	// Rules are a list of actions.
@@ -97,7 +113,6 @@ type TLSRouteSpec struct {
 	// +listType=atomic
 	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:MaxItems=1
-	// <gateway:experimental:validation:XValidation:message="Rule name must be unique within the route",rule="self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name) && l1.name == l2.name))">
 	Rules []TLSRouteRule `json:"rules,omitempty"`
 }
 
@@ -110,7 +125,6 @@ type TLSRouteStatus struct {
 type TLSRouteRule struct {
 	// Name is the name of the route rule. This name MUST be unique within a Route if it is set.
 	//
-	// Support: Extended
 	// +optional
 	Name *SectionName `json:"name,omitempty"`
 
