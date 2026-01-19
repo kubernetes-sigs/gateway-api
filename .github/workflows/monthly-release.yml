@@ -32,6 +32,12 @@ jobs:
         with:
           go-version-file: "go.work"
 
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.1"
+          bundler-cache: false
+
       - name: Generate monthly tag
         id: tag
         run: |
@@ -76,8 +82,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
+          CHANGELOG_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           TAG="${{ steps.tag.outputs.tag }}"
+
+          # Install github-changelog-generator
+          gem install github_changelog_generator --no-document
 
           # Extract year and month for the header
           YEAR_MONTH=$(echo "$TAG" | sed 's/monthly-//')
@@ -128,50 +138,42 @@ jobs:
             printf 'require sigs.k8s.io/gateway-api %s\n' "${TAG}"
             printf '```\n\n'
             printf 'and run go mod tidy. You'\''ll find that %s gets replaced by a Go pseudoversion; this is expected.\n\n' "${TAG}"
-            printf 'Changes Summary\n\n'
+          printf 'Changes Summary\n\n'
           } > release-notes.md
 
-          # Extract PR numbers from git log and format as links
-          printf '### Merged Pull Requests\n\n' >> release-notes.md
-
-          # Get all PR numbers from commit messages between START_SHA and END_SHA
-          # PRs are typically referenced as #1234, fixes #1234, closes #1234, etc.
-          # Also check merge commit messages which often contain "Merge pull request #1234"
-          PR_NUMBERS=$(git log --format="%s %B" "${START_SHA}..${END_SHA}" | grep -oE '(#[0-9]+|pull request #[0-9]+)' | grep -oE '[0-9]+' | sort -u -n)
-
-          if [ -n "$PR_NUMBERS" ]; then
-            for PR_NUM in $PR_NUMBERS; do
-              # Get PR title and author from GitHub API
-              PR_DATA=$(curl -s -H "Authorization: token ${GITHUB_TOKEN}" \
-                -H "Accept: application/vnd.github.v3+json" \
-                "https://api.github.com/repos/${GITHUB_REPOSITORY}/pulls/${PR_NUM}" 2>/dev/null || echo "")
-              
-              if [ -n "$PR_DATA" ]; then
-                PR_TITLE=$(echo "$PR_DATA" | grep -o '"title":"[^"]*"' | head -1 | cut -d'"' -f4 || echo "")
-                PR_AUTHOR=$(echo "$PR_DATA" | grep -o '"login":"[^"]*"' | head -1 | cut -d'"' -f4 || echo "")
-              fi
-              
-              # Fallback: get from commit message if API fails
-              if [ -z "$PR_TITLE" ]; then
-                COMMIT_MSG=$(git log --format="%s" "${START_SHA}..${END_SHA}" | grep -m1 "#${PR_NUM}" || echo "")
-                if [ -n "$COMMIT_MSG" ]; then
-                  PR_TITLE=$(echo "$COMMIT_MSG" | sed 's/.*#'"${PR_NUM}"'[^:]*: *//' | sed 's/^Merge pull request.*//' | head -c 100)
-                fi
-                [ -z "$PR_TITLE" ] && PR_TITLE="PR #${PR_NUM}"
-              fi
-              
-              if [ -z "$PR_AUTHOR" ]; then
-                # Fallback: get author from commit that mentions this PR
-                PR_AUTHOR=$(git log --format="%an" --grep="#${PR_NUM}" "${START_SHA}..${END_SHA}" | head -1 || echo "unknown")
-              fi
-              
-              PR_URL="https://github.com/${GITHUB_REPOSITORY}/pull/${PR_NUM}"
-              printf '- %s by @%s in [#%s](%s)\n' "$PR_TITLE" "$PR_AUTHOR" "$PR_NUM" "$PR_URL" >> release-notes.md
-              
-              # Small delay to avoid rate limiting
-              sleep 0.1
-            done
+          # Generate changelog using github-changelog-generator
+          if [ -n "$PREV_TAG" ] && [ "$PREV_TAG" != "$TAG" ]; then
+            # Extract user and project from repository (e.g., kubernetes-sigs/gateway-api)
+            REPO_USER=$(echo "${GITHUB_REPOSITORY}" | cut -d'/' -f1)
+            REPO_PROJECT=$(echo "${GITHUB_REPOSITORY}" | cut -d'/' -f2)
+            
+            # Generate changelog between previous tag and current tag
+            github_changelog_generator \
+              --user "${REPO_USER}" \
+              --project "${REPO_PROJECT}" \
+              --since-tag "${PREV_TAG}" \
+              --future-release "${TAG}" \
+              --output /tmp/changelog.md \
+              --no-unreleased \
+              --no-issues \
+              --pull-requests \
+              --exclude-labels question,duplicate,invalid,wontfix \
+              --header-label "## Merged Pull Requests" || true
+            
+            # Extract the changelog content
+            if [ -f /tmp/changelog.md ] && [ -s /tmp/changelog.md ]; then
+              # Extract the section for the current tag (future-release)
+              # The generator creates a section like "## [TAG]" followed by PRs
+              # We want everything from "## Merged Pull Requests" until the next section or end
+              sed -n "/## Merged Pull Requests/,/^## \[/p" /tmp/changelog.md | sed '/^## \[/d' | sed '/^## Merged Pull Requests/d' >> release-notes.md || \
+              grep -A 1000 "## Merged Pull Requests" /tmp/changelog.md | grep -B 1000 -m 1 "^## " | grep -v "^## " >> release-notes.md || \
+              tail -n +2 /tmp/changelog.md >> release-notes.md
+            else
+              printf '### Merged Pull Requests\n\n'
+              printf 'No pull requests found in this release.\n' >> release-notes.md
+            fi
           else
+            printf '### Merged Pull Requests\n\n'
             printf 'No pull requests found in this release.\n' >> release-notes.md
           fi
 
