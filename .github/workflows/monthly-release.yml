@@ -146,9 +146,9 @@ jobs:
             # Get ISO dates for the tags
             # Ensure fetch-depth: 0 was used in checkout
             SINCE_DATE=$(git log -1 --format=%aI "${PREV_TAG}")
-            DUE_DATE=$(git log -1 --format=%aI "${NEW_TAG}")
+            DUE_DATE=$(git log -1 --format=%aI "${TAG}")
             
-            echo "## Merged Pull Requests (${PREV_TAG} to ${NEW_TAG})" > /tmp/changelog.md
+            echo "## Merged Pull Requests (${PREV_TAG} to ${TAG})" > /tmp/changelog.md
             
             gh pr list \
               --base main \
