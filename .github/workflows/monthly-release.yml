@@ -155,7 +155,6 @@ jobs:
               --user "${REPO_USER}" \
               --project "${REPO_PROJECT}" \
               --since-tag "${PREV_TAG}" \
-              --due-tag "${TAG}" \
               --output /tmp/changelog.md \
               --no-unreleased \
               --no-issues \
