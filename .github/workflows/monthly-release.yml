@@ -164,7 +164,7 @@ jobs:
               --header-label "## Merged Pull Requests" \
               --http-cache \
               --max-issues 500 || true
-            echo "cat /tmp/changelog.md"
+            cat /tmp/changelog.md
             
             # Extract the changelog content
             if [ -f /tmp/changelog.md ] && [ -s /tmp/changelog.md ]; then
