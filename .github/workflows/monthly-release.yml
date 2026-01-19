@@ -143,11 +143,14 @@ jobs:
 
           # Generate changelog using github-changelog-generator
           if [ -n "$PREV_TAG" ] && [ "$PREV_TAG" != "$TAG" ]; then
-            # Extract user and project from repository (e.g., kubernetes-sigs/gateway-api)
-            REPO_USER=$(echo "${GITHUB_REPOSITORY}" | cut -d'/' -f1)
-            REPO_PROJECT=$(echo "${GITHUB_REPOSITORY}" | cut -d'/' -f2)
+            # Use the upstream repository (kubernetes-sigs/gateway-api) not the fork
+            REPO_USER="kubernetes-sigs"
+            REPO_PROJECT="gateway-api"
             
             # Generate changelog between previous tag and current tag
+            # Use token from environment variable
+            export CHANGELOG_GITHUB_TOKEN="${GITHUB_TOKEN}"
+            
             github_changelog_generator \
               --user "${REPO_USER}" \
               --project "${REPO_PROJECT}" \
@@ -158,7 +161,9 @@ jobs:
               --no-issues \
               --pull-requests \
               --exclude-labels question,duplicate,invalid,wontfix \
-              --header-label "## Merged Pull Requests" || true
+              --header-label "## Merged Pull Requests" \
+              --http-cache \
+              --max-issues 500 || true
             
             # Extract the changelog content
             if [ -f /tmp/changelog.md ] && [ -s /tmp/changelog.md ]; then
