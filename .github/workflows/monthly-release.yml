@@ -80,7 +80,6 @@ jobs:
         run: |
           TAG="${{ steps.tag.outputs.tag }}"
 
-          # Extract year and month for the header
           YEAR_MONTH=$(echo "$TAG" | sed 's/monthly-//')
           YEAR=$(echo "$YEAR_MONTH" | cut -d. -f1)
           MONTH_NUM=$(echo "$YEAR_MONTH" | cut -d. -f2)
@@ -102,20 +101,18 @@ jobs:
           esac
 
           # Find previous tag and SHAs for PR extraction
-          # Ensure we have history
           git fetch --tags --force
 
           PREV_TAG=$(git tag -l "monthly-*" | sort -V | grep -B1 "^${TAG}$" | head -n1)
 
           if [ -z "$PREV_TAG" ] || [ "$PREV_TAG" == "$TAG" ]; then
-            # Fallback if first monthly release: go back ~30 days
             START_SHA=$(git rev-list -n 1 --before="1 month" origin/main)
           else
             START_SHA=$(git rev-parse "$PREV_TAG")
           fi
           END_SHA=$(git rev-parse HEAD)
 
-          # 4. Create the mandatory Header
+          # Create the release notes header
           {
             printf 'Gateway API %s Release Notes\n\n' "${TAG}"
             printf 'This is the monthly release for the Gateway API experimental channel for %s %s. This release includes the latest features and fixes from Gateway API'\''s main branch.\n\n' "${MONTH_NAME}" "${YEAR}"
@@ -132,10 +129,7 @@ jobs:
           printf '## Changes Summary\n\n'
           } > release-notes.md
 
-          # Generate changelog using github-changelog-generator
           if [ -n "$PREV_TAG" ] && [ "$PREV_TAG" != "$TAG" ]; then
-            # Get ISO dates for the tags
-            # Ensure fetch-depth: 0 was used in checkout
             SINCE_DATE=$(git log -1 --format=%aI "${PREV_TAG}")
             DUE_DATE=$(git log -1 --format=%aI "${TAG}")
             echo "SINCE_DATE: ${SINCE_DATE}"
@@ -151,9 +145,15 @@ jobs:
               --json number,title,author \
               --template '{{range .}}* {{.title}} (#{{.number}}) @{{.author.login}}{{"\n"}}{{end}}' >> release-notes.md
 
+            # Add Full Changelog link
+            printf '\n' >> release-notes.md
+            COMPARE_URL="https://github.com/${GITHUB_REPOSITORY}/compare/${PREV_TAG}...${TAG}"
+            printf 'Full Changelog: [%s...%s](%s)\n' "${PREV_TAG}" "${TAG}" "${COMPARE_URL}" >> release-notes.md
+
           else
             printf '### Merged Pull Requests\n\n'
             printf 'No pull requests found in this release.\n' >> release-notes.md
+            printf '\nFull Changelog: See commit history\n' >> release-notes.md
           fi
 
       - name: Create GitHub Release
