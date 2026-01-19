@@ -18,6 +18,7 @@ package conformance
 
 import (
 	"io/fs"
+	"net/netip"
 	"os"
 	"testing"
 
@@ -35,6 +36,7 @@ import (
 	"github.com/stretchr/testify/require"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	clientset "k8s.io/client-go/kubernetes"
+	"k8s.io/utils/ptr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -82,6 +84,13 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 		*flags.ImplementationVersion,
 		*flags.ImplementationContact,
 	)
+	var usable, unusable []v1beta1.GatewaySpecAddress
+	if v := *flags.UsableAddress; v != "" {
+		usable = append(usable, parseAddress(v))
+	}
+	if v := *flags.UnusableAddress; v != "" {
+		unusable = append(unusable, parseAddress(v))
+	}
 
 	return suite.ConformanceOptions{
 		AllowCRDsMismatch:          *flags.AllowCRDsMismatch,
@@ -95,6 +104,8 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 		ExemptFeatures:             exemptFeatures,
 		ManifestFS:                 []fs.FS{&Manifests},
 		GatewayClassName:           *flags.GatewayClassName,
+		UsableNetworkAddresses:     usable,
+		UnusableNetworkAddresses:   unusable,
 		MeshName:                   *flags.MeshName,
 		Implementation:             implementation,
 		Mode:                       *flags.Mode,
@@ -107,6 +118,20 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 		SupportedFeatures:          supportedFeatures,
 		TimeoutConfig:              conformanceconfig.DefaultTimeoutConfig(),
 		SkipProvisionalTests:       *flags.SkipProvisionalTests,
+	}
+}
+
+func parseAddress(v string) v1beta1.GatewaySpecAddress {
+	_, err := netip.ParseAddr(v)
+	if err == nil {
+		return v1beta1.GatewaySpecAddress{
+			Type:  ptr.To(v1beta1.IPAddressType),
+			Value: v,
+		}
+	}
+	return v1beta1.GatewaySpecAddress{
+		Type:  ptr.To(v1beta1.HostnameAddressType),
+		Value: v,
 	}
 }
 
