@@ -42,6 +42,9 @@ jobs:
             TAG="monthly-$(date +"%Y.%m")"
           fi
           echo "tag=${TAG}" >> $GITHUB_OUTPUT
+          # Extract year.month for the release title (e.g., monthly-2026.01 -> 2026.01)
+          YEAR_MONTH=$(echo "${TAG}" | sed 's/monthly-//')
+          echo "year_month=${YEAR_MONTH}" >> $GITHUB_OUTPUT
           echo "Generated tag: ${TAG}"
 
       - name: Check if tag already exists
@@ -130,6 +133,11 @@ jobs:
           } > release-notes.md
 
           if [ -n "$PREV_TAG" ] && [ "$PREV_TAG" != "$TAG" ]; then
+            # Add Full Changelog link
+            printf '\n' >> release-notes.md
+            COMPARE_URL="https://github.com/${GITHUB_REPOSITORY}/compare/${PREV_TAG}...${TAG}"
+            printf 'Full Changelog: [%s...%s](%s)\n' "${PREV_TAG}" "${TAG}" "${COMPARE_URL}\n\n" >> release-notes.md
+
             SINCE_DATE=$(git log -1 --format=%aI "${PREV_TAG}")
             DUE_DATE=$(git log -1 --format=%aI "${TAG}")
             echo "SINCE_DATE: ${SINCE_DATE}"
@@ -145,11 +153,6 @@ jobs:
               --json number,title,author \
               --template '{{range .}}* {{.title}} (#{{.number}}) @{{.author.login}}{{"\n"}}{{end}}' >> release-notes.md
 
-            # Add Full Changelog link
-            printf '\n' >> release-notes.md
-            COMPARE_URL="https://github.com/${GITHUB_REPOSITORY}/compare/${PREV_TAG}...${TAG}"
-            printf 'Full Changelog: [%s...%s](%s)\n' "${PREV_TAG}" "${TAG}" "${COMPARE_URL}" >> release-notes.md
-
           else
             printf '### Merged Pull Requests\n\n'
             printf 'No pull requests found in this release.\n' >> release-notes.md
@@ -161,7 +164,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.tag.outputs.tag }}
-          name: Monthly Release ${{ steps.tag.outputs.tag }}
+          name: Monthly Release for ${{ steps.tag.outputs.year_month }}
           body_path: release-notes.md
           prerelease: true
           files: |
