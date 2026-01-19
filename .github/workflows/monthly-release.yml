@@ -148,7 +148,7 @@ jobs:
             SINCE_DATE=$(git log -1 --format=%aI "${PREV_TAG}")
             DUE_DATE=$(git log -1 --format=%aI "${TAG}")
             
-            echo "## Merged Pull Requests (${PREV_TAG} to ${TAG})" > /tmp/changelog.md
+            echo "## Merged Pull Requests (${PREV_TAG} to ${TAG})" > release-notes.md
             
             gh pr list \
               --base main \
@@ -156,7 +156,7 @@ jobs:
               --search "merged:${SINCE_DATE}..${DUE_DATE}" \
               --limit 500 \
               --json number,title,author \
-              --template '{{range .}}* {{.title}} (#{{.number}}) @{{.author.login}}{{"\n"}}{{end}}' >> /tmp/changelog.md
+              --template '{{range .}}* {{.title}} (#{{.number}}) @{{.author.login}}{{"\n"}}{{end}}' >> release-notes.md
 
 
             # # Use the upstream repository (kubernetes-sigs/gateway-api) not the fork
