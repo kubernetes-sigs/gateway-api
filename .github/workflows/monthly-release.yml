@@ -157,12 +157,12 @@ jobs:
               --user "${REPO_USER}" \
               --project "${REPO_PROJECT}" \
               --since-tag "${PREV_TAG}" \
-              --due-tag "${NEW_TAG}" \
+              --due-tag "${TAG}" \
               --output /tmp/changelog.md \
               --no-unreleased \
               --no-issues \
               --pull-requests \
-              --header-label "## Merged Pull Requests between ${PREV_TAG} and ${NEW_TAG}" \
+              --header-label "## Merged Pull Requests between ${PREV_TAG} and ${TAG}" \
               --exclude-labels question,duplicate,invalid,wontfix
             
             cat /tmp/changelog.md >> release-notes.md
