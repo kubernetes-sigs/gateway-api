@@ -147,8 +147,10 @@ jobs:
             # Ensure fetch-depth: 0 was used in checkout
             SINCE_DATE=$(git log -1 --format=%aI "${PREV_TAG}")
             DUE_DATE=$(git log -1 --format=%aI "${TAG}")
+            echo "SINCE_DATE: ${SINCE_DATE}"
+            echo "DUE_DATE: ${DUE_DATE}"
             
-            echo "## Merged Pull Requests (${PREV_TAG} to ${TAG})\n" >> release-notes.md
+            echo "## Merged Pull Requests (${PREV_TAG} to ${TAG})" >> release-notes.md
             
             gh pr list \
               --base main \
