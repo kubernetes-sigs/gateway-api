@@ -155,7 +155,7 @@ jobs:
               --user "${REPO_USER}" \
               --project "${REPO_PROJECT}" \
               --since-tag "${PREV_TAG}" \
-              --future-release "${TAG}" \
+              --due-tag "${TAG}" \
               --output /tmp/changelog.md \
               --no-unreleased \
               --no-issues \
@@ -163,6 +163,7 @@ jobs:
               --exclude-labels question,duplicate,invalid,wontfix \
               --header-label "## Merged Pull Requests" \
               --http-cache \
+              --compare-link \
               --max-issues 500 || true
             
             cat /tmp/changelog.md >> release-notes.md
