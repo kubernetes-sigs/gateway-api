@@ -136,7 +136,8 @@ jobs:
             # Add Full Changelog link
             printf '\n' >> release-notes.md
             COMPARE_URL="https://github.com/${GITHUB_REPOSITORY}/compare/${PREV_TAG}...${TAG}"
-            printf 'Full Changelog: [%s...%s](%s)\n' "${PREV_TAG}" "${TAG}" "${COMPARE_URL}\n\n" >> release-notes.md
+            printf 'Full Changelog: [%s...%s](%s)\n' "${PREV_TAG}" "${TAG}" "${COMPARE_URL}" >> release-notes.md
+            printf '\n' >> release-notes.md
 
             SINCE_DATE=$(git log -1 --format=%aI "${PREV_TAG}")
             DUE_DATE=$(git log -1 --format=%aI "${TAG}")
