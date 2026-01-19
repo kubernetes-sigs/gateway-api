@@ -117,9 +117,9 @@ jobs:
 
           # Create the release notes header
           {
-            printf 'Gateway API %s Release Notes\n\n' "${TAG}"
+            printf '## Gateway API %s Release Notes\n\n' "${TAG}"
             printf 'This is the monthly release for the Gateway API experimental channel for %s %s. This release includes the latest features and fixes from Gateway API'\''s main branch.\n\n' "${MONTH_NAME}" "${YEAR}"
-            printf 'Using this Release\n\n'
+            printf '## Using this Release\n\n'
             printf 'To install the CRDs for this release, use install %s-install.yaml:\n\n' "${TAG}"
             printf '```\n'
             printf 'kubectl apply --server-side=true -f https://github.com/kubernetes-sigs/gateway-api/releases/download/%s/%s-install.yaml\n' "${TAG}" "${TAG}"
