@@ -25,6 +25,7 @@ import (
 	"sigs.k8s.io/gateway-api/apis/v1alpha2"
 	"sigs.k8s.io/gateway-api/apis/v1alpha3"
 	"sigs.k8s.io/gateway-api/apis/v1beta1"
+	xv1alpha1 "sigs.k8s.io/gateway-api/apisx/v1alpha1"
 	confv1 "sigs.k8s.io/gateway-api/conformance/apis/v1"
 	"sigs.k8s.io/gateway-api/conformance/tests"
 	conformanceconfig "sigs.k8s.io/gateway-api/conformance/utils/config"
@@ -63,6 +64,7 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 	require.NoError(t, v1alpha3.Install(client.Scheme()))
 	require.NoError(t, v1alpha2.Install(client.Scheme()))
 	require.NoError(t, v1beta1.Install(client.Scheme()))
+	require.NoError(t, xv1alpha1.Install(client.Scheme()))
 	require.NoError(t, v1.Install(client.Scheme()))
 	require.NoError(t, apiextensionsv1.AddToScheme(client.Scheme()))
 
