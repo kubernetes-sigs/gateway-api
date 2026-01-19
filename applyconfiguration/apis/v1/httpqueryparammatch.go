@@ -24,10 +24,41 @@ import (
 
 // HTTPQueryParamMatchApplyConfiguration represents a declarative configuration of the HTTPQueryParamMatch type for use
 // with apply.
+//
+// HTTPQueryParamMatch describes how to select a HTTP route by matching HTTP
+// query parameters.
 type HTTPQueryParamMatchApplyConfiguration struct {
-	Type  *apisv1.QueryParamMatchType `json:"type,omitempty"`
-	Name  *apisv1.HTTPHeaderName      `json:"name,omitempty"`
-	Value *string                     `json:"value,omitempty"`
+	// Type specifies how to match against the value of the query parameter.
+	//
+	// Support: Extended (Exact)
+	//
+	// Support: Implementation-specific (RegularExpression)
+	//
+	// Since RegularExpression QueryParamMatchType has Implementation-specific
+	// conformance, implementations can support POSIX, PCRE or any other
+	// dialects of regular expressions. Please read the implementation's
+	// documentation to determine the supported dialect.
+	Type *apisv1.QueryParamMatchType `json:"type,omitempty"`
+	// Name is the name of the HTTP query param to be matched. This must be an
+	// exact string match. (See
+	// https://tools.ietf.org/html/rfc7230#section-2.7.3).
+	//
+	// If multiple entries specify equivalent query param names, only the first
+	// entry with an equivalent name MUST be considered for a match. Subsequent
+	// entries with an equivalent query param name MUST be ignored.
+	//
+	// If a query param is repeated in an HTTP request, the behavior is
+	// purposely left undefined, since different data planes have different
+	// capabilities. However, it is *recommended* that implementations should
+	// match against the first value of the param if the data plane supports it,
+	// as this behavior is expected in other load balancing contexts outside of
+	// the Gateway API.
+	//
+	// Users SHOULD NOT route traffic based on repeated query params to guard
+	// themselves against potential differences in the implementations.
+	Name *apisv1.HTTPHeaderName `json:"name,omitempty"`
+	// Value is the value of HTTP query param to be matched.
+	Value *string `json:"value,omitempty"`
 }
 
 // HTTPQueryParamMatchApplyConfiguration constructs a declarative configuration of the HTTPQueryParamMatch type for use with

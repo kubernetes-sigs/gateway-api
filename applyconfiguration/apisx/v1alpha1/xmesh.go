@@ -29,11 +29,20 @@ import (
 
 // XMeshApplyConfiguration represents a declarative configuration of the XMesh type for use
 // with apply.
+//
+// XMesh defines mesh-wide characteristics of a GAMMA-compliant service mesh.
 type XMeshApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
-	Spec                             *MeshSpecApplyConfiguration   `json:"spec,omitempty"`
-	Status                           *MeshStatusApplyConfiguration `json:"status,omitempty"`
+	// Spec defines the desired state of XMesh.
+	Spec *MeshSpecApplyConfiguration `json:"spec,omitempty"`
+	// Status defines the current state of XMesh.
+	//
+	// <gateway:util:excludeFromCRD>
+	// Implementations MUST populate status on all Mesh resources which
+	// specify their controller name.
+	// </gateway:util:excludeFromCRD>
+	Status *MeshStatusApplyConfiguration `json:"status,omitempty"`
 }
 
 // XMesh constructs a declarative configuration of the XMesh type for use with
@@ -46,29 +55,14 @@ func XMesh(name string) *XMeshApplyConfiguration {
 	return b
 }
 
-// ExtractXMesh extracts the applied configuration owned by fieldManager from
-// xMesh. If no managedFields are found in xMesh for fieldManager, a
-// XMeshApplyConfiguration is returned with only the Name, Namespace (if applicable),
-// APIVersion and Kind populated. It is possible that no managed fields were found for because other
-// field managers have taken ownership of all the fields previously owned by fieldManager, or because
-// the fieldManager never owned fields any fields.
+// ExtractXMeshFrom extracts the applied configuration owned by fieldManager from
+// xMesh for the specified subresource. Pass an empty string for subresource to extract
+// the main resource. Common subresources include "status", "scale", etc.
 // xMesh must be a unmodified XMesh API object that was retrieved from the Kubernetes API.
-// ExtractXMesh provides a way to perform a extract/modify-in-place/apply workflow.
+// ExtractXMeshFrom provides a way to perform a extract/modify-in-place/apply workflow.
 // Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
 // applied if another fieldManager has updated or force applied any of the previously applied fields.
-// Experimental!
-func ExtractXMesh(xMesh *apisxv1alpha1.XMesh, fieldManager string) (*XMeshApplyConfiguration, error) {
-	return extractXMesh(xMesh, fieldManager, "")
-}
-
-// ExtractXMeshStatus is the same as ExtractXMesh except
-// that it extracts the status subresource applied configuration.
-// Experimental!
-func ExtractXMeshStatus(xMesh *apisxv1alpha1.XMesh, fieldManager string) (*XMeshApplyConfiguration, error) {
-	return extractXMesh(xMesh, fieldManager, "status")
-}
-
-func extractXMesh(xMesh *apisxv1alpha1.XMesh, fieldManager string, subresource string) (*XMeshApplyConfiguration, error) {
+func ExtractXMeshFrom(xMesh *apisxv1alpha1.XMesh, fieldManager string, subresource string) (*XMeshApplyConfiguration, error) {
 	b := &XMeshApplyConfiguration{}
 	err := managedfields.ExtractInto(xMesh, internal.Parser().Type("io.k8s.sigs.gateway-api.apisx.v1alpha1.XMesh"), fieldManager, b, subresource)
 	if err != nil {
@@ -80,6 +74,27 @@ func extractXMesh(xMesh *apisxv1alpha1.XMesh, fieldManager string, subresource s
 	b.WithAPIVersion("gateway.networking.x-k8s.io/v1alpha1")
 	return b, nil
 }
+
+// ExtractXMesh extracts the applied configuration owned by fieldManager from
+// xMesh. If no managedFields are found in xMesh for fieldManager, a
+// XMeshApplyConfiguration is returned with only the Name, Namespace (if applicable),
+// APIVersion and Kind populated. It is possible that no managed fields were found for because other
+// field managers have taken ownership of all the fields previously owned by fieldManager, or because
+// the fieldManager never owned fields any fields.
+// xMesh must be a unmodified XMesh API object that was retrieved from the Kubernetes API.
+// ExtractXMesh provides a way to perform a extract/modify-in-place/apply workflow.
+// Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
+// applied if another fieldManager has updated or force applied any of the previously applied fields.
+func ExtractXMesh(xMesh *apisxv1alpha1.XMesh, fieldManager string) (*XMeshApplyConfiguration, error) {
+	return ExtractXMeshFrom(xMesh, fieldManager, "")
+}
+
+// ExtractXMeshStatus extracts the applied configuration owned by fieldManager from
+// xMesh for the status subresource.
+func ExtractXMeshStatus(xMesh *apisxv1alpha1.XMesh, fieldManager string) (*XMeshApplyConfiguration, error) {
+	return ExtractXMeshFrom(xMesh, fieldManager, "status")
+}
+
 func (b XMeshApplyConfiguration) IsApplyConfiguration() {}
 
 // WithKind sets the Kind field in the declarative configuration to the given value

@@ -20,9 +20,26 @@ package v1
 
 // AllowedRoutesApplyConfiguration represents a declarative configuration of the AllowedRoutes type for use
 // with apply.
+//
+// AllowedRoutes defines which Routes may be attached to this Listener.
 type AllowedRoutesApplyConfiguration struct {
+	// Namespaces indicates namespaces from which Routes may be attached to this
+	// Listener. This is restricted to the namespace of this Gateway by default.
+	//
+	// Support: Core
 	Namespaces *RouteNamespacesApplyConfiguration `json:"namespaces,omitempty"`
-	Kinds      []RouteGroupKindApplyConfiguration `json:"kinds,omitempty"`
+	// Kinds specifies the groups and kinds of Routes that are allowed to bind
+	// to this Gateway Listener. When unspecified or empty, the kinds of Routes
+	// selected are determined using the Listener protocol.
+	//
+	// A RouteGroupKind MUST correspond to kinds of Routes that are compatible
+	// with the application protocol specified in the Listener's Protocol field.
+	// If an implementation does not support or recognize this resource type, it
+	// MUST set the "ResolvedRefs" condition to False for this Listener with the
+	// "InvalidRouteKinds" reason.
+	//
+	// Support: Core
+	Kinds []RouteGroupKindApplyConfiguration `json:"kinds,omitempty"`
 }
 
 // AllowedRoutesApplyConfiguration constructs a declarative configuration of the AllowedRoutes type for use with

@@ -251,6 +251,14 @@ func TestBackendTLSPolicyValidation(t *testing.T) {
 			wantErrors: []string{},
 		},
 		{
+			name: "valid BackendTLSPolicyValidation with implementation-specific WellKnownCACertificates",
+			policyValidation: gatewayv1.BackendTLSPolicyValidation{
+				WellKnownCACertificates: ptrTo(gatewayv1.WellKnownCACertificatesType("mycompany.com/my-custom-ca-certifcates")),
+				Hostname:                "foo.example.com",
+			},
+			wantErrors: []string{},
+		},
+		{
 			name: "valid BackendTLSPolicyValidation with CACertificateRefs",
 			policyValidation: gatewayv1.BackendTLSPolicyValidation{
 				CACertificateRefs: []gatewayv1.LocalObjectReference{
@@ -286,12 +294,28 @@ func TestBackendTLSPolicyValidation(t *testing.T) {
 			wantErrors: []string{"must not contain both CACertificateRefs and WellKnownCACertificates"},
 		},
 		{
-			name: "invalid BackendTLSPolicyValidation with Unsupported value for WellKnownCACertificates",
+			name: "invalid BackendTLSPolicyValidation with invalid WellKnownCACertificates value",
 			policyValidation: gatewayv1.BackendTLSPolicyValidation{
-				WellKnownCACertificates: ptrTo(gatewayv1.WellKnownCACertificatesType("bar")),
+				WellKnownCACertificates: ptrTo(gatewayv1.WellKnownCACertificatesType("MySystem")),
 				Hostname:                "foo.example.com",
 			},
-			wantErrors: []string{"supported values: \"System\""},
+			wantErrors: []string{"spec.validation.wellKnownCACertificates in body should match '^(System|([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)?/([A-Za-z0-9][-A-Za-z0-9_.]{0,61})?[A-Za-z0-9]))$"},
+		},
+		{
+			name: "invalid BackendTLSPolicyValidation with invalid implementation-specific WellKnownCACertificates value without which isprefix for ",
+			policyValidation: gatewayv1.BackendTLSPolicyValidation{
+				WellKnownCACertificates: ptrTo(gatewayv1.WellKnownCACertificatesType("my-system")),
+				Hostname:                "foo.example.com",
+			},
+			wantErrors: []string{"spec.validation.wellKnownCACertificates in body should match '^(System|([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)?/([A-Za-z0-9][-A-Za-z0-9_.]{0,61})?[A-Za-z0-9]))$"},
+		},
+		{
+			name: "invalid BackendTLSPolicyValidation  with invalid implementation-specific WellKnownCACertificates value with invalid prefix",
+			policyValidation: gatewayv1.BackendTLSPolicyValidation{
+				WellKnownCACertificates: ptrTo(gatewayv1.WellKnownCACertificatesType("in..va..lid./my-custom-ca-certifcates")),
+				Hostname:                "foo.example.com",
+			},
+			wantErrors: []string{"spec.validation.wellKnownCACertificates in body should match '^(System|([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)?/([A-Za-z0-9][-A-Za-z0-9_.]{0,61})?[A-Za-z0-9]))$"},
 		},
 		{
 			name: "invalid BackendTLSPolicyValidation with empty Hostname field",

@@ -297,18 +297,12 @@ spec:
                       pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                       type: string
                     port:
-                      default: 0
                       description: |-
                         Port is the network port. Multiple listeners may use the
                         same port, subject to the Listener compatibility rules.
-
-                        If the port is not set or specified as zero, the implementation will assign
-                        a unique port. If the implementation does not support dynamic port
-                        assignment, it MUST set `Accepted` condition to `False` with the
-                        `UnsupportedPort` reason.
                       format: int32
                       maximum: 65535
-                      minimum: 0
+                      minimum: 1
                       type: integer
                     protocol:
                       description: Protocol specifies the network protocol this listener
@@ -460,6 +454,7 @@ spec:
                           > 0 || size(self.options) > 0 : true'
                   required:
                   - name
+                  - port
                   - protocol
                   type: object
                 maxItems: 64
@@ -723,13 +718,6 @@ spec:
                       minLength: 1
                       pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                       type: string
-                    port:
-                      description: Port is the network port the listener is configured
-                        to listen on.
-                      format: int32
-                      maximum: 65535
-                      minimum: 1
-                      type: integer
                     supportedKinds:
                       description: |-
                         SupportedKinds is the list indicating the Kinds supported by this
@@ -767,7 +755,6 @@ spec:
                   - attachedRoutes
                   - conditions
                   - name
-                  - port
                   - supportedKinds
                   type: object
                 maxItems: 64

@@ -21,8 +21,21 @@ package v1
 // TLSPortConfigApplyConfiguration represents a declarative configuration of the TLSPortConfig type for use
 // with apply.
 type TLSPortConfigApplyConfiguration struct {
-	Port *int32                       `json:"port,omitempty"`
-	TLS  *TLSConfigApplyConfiguration `json:"tls,omitempty"`
+	// The Port indicates the Port Number to which the TLS configuration will be
+	// applied. This configuration will be applied to all Listeners handling HTTPS
+	// traffic that match this port.
+	//
+	// Support: Core
+	//
+	// <gateway:experimental>
+	Port *int32 `json:"port,omitempty"`
+	// TLS store the configuration that will be applied to all Listeners handling
+	// HTTPS traffic and matching given port.
+	//
+	// Support: Core
+	//
+	// <gateway:experimental>
+	TLS *TLSConfigApplyConfiguration `json:"tls,omitempty"`
 }
 
 // TLSPortConfigApplyConfiguration constructs a declarative configuration of the TLSPortConfig type for use with

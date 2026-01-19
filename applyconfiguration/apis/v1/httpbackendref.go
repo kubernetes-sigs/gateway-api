@@ -24,9 +24,77 @@ import (
 
 // HTTPBackendRefApplyConfiguration represents a declarative configuration of the HTTPBackendRef type for use
 // with apply.
+//
+// HTTPBackendRef defines how a HTTPRoute forwards a HTTP request.
+//
+// Note that when a namespace different than the local namespace is specified, a
+// ReferenceGrant object is required in the referent namespace to allow that
+// namespace's owner to accept the reference. See the ReferenceGrant
+// documentation for details.
+//
+// <gateway:experimental:description>
+//
+// When the BackendRef points to a Kubernetes Service, implementations SHOULD
+// honor the appProtocol field if it is set for the target Service Port.
+//
+// Implementations supporting appProtocol SHOULD recognize the Kubernetes
+// Standard Application Protocols defined in KEP-3726.
+//
+// If a Service appProtocol isn't specified, an implementation MAY infer the
+// backend protocol through its own means. Implementations MAY infer the
+// protocol from the Route type referring to the backend Service.
+//
+// If a Route is not able to send traffic to the backend using the specified
+// protocol then the backend is considered invalid. Implementations MUST set the
+// "ResolvedRefs" condition to "False" with the "UnsupportedProtocol" reason.
+//
+// </gateway:experimental:description>
 type HTTPBackendRefApplyConfiguration struct {
+	// BackendRef is a reference to a backend to forward matched requests to.
+	//
+	// A BackendRef can be invalid for the following reasons. In all cases, the
+	// implementation MUST ensure the `ResolvedRefs` Condition on the Route
+	// is set to `status: False`, with a Reason and Message that indicate
+	// what is the cause of the error.
+	//
+	// A BackendRef is invalid if:
+	//
+	// * It refers to an unknown or unsupported kind of resource. In this
+	// case, the Reason must be set to `InvalidKind` and Message of the
+	// Condition must explain which kind of resource is unknown or unsupported.
+	//
+	// * It refers to a resource that does not exist. In this case, the Reason must
+	// be set to `BackendNotFound` and the Message of the Condition must explain
+	// which resource does not exist.
+	//
+	// * It refers a resource in another namespace when the reference has not been
+	// explicitly allowed by a ReferenceGrant (or equivalent concept). In this
+	// case, the Reason must be set to `RefNotPermitted` and the Message of the
+	// Condition must explain which cross-namespace reference is not allowed.
+	//
+	// * It refers to a Kubernetes Service that has an incompatible appProtocol
+	// for the given Route type
+	//
+	// * The BackendTLSPolicy object is installed in the cluster, a BackendTLSPolicy
+	// is present that refers to the Service, and the implementation is unable
+	// to meet the requirement.
+	//
+	// Support: Core for Kubernetes Service
+	//
+	// Support: Implementation-specific for any other resource
+	//
+	// Support for weight: Core
+	//
+	// Support for Kubernetes Service appProtocol: Extended
+	//
+	// Support for BackendTLSPolicy: Extended
 	BackendRefApplyConfiguration `json:",inline"`
-	Filters                      []HTTPRouteFilterApplyConfiguration `json:"filters,omitempty"`
+	// Filters defined at this level should be executed if and only if the
+	// request is being forwarded to the backend defined here.
+	//
+	// Support: Implementation-specific (For broader support of filters, use the
+	// Filters field in HTTPRouteRule.)
+	Filters []HTTPRouteFilterApplyConfiguration `json:"filters,omitempty"`
 }
 
 // HTTPBackendRefApplyConfiguration constructs a declarative configuration of the HTTPBackendRef type for use with

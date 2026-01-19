@@ -372,8 +372,8 @@ spec:
                     x-kubernetes-list-type: atomic
                   wellKnownCACertificates:
                     description: |-
-                      WellKnownCACertificates specifies whether system CA certificates may be used in
-                      the TLS handshake between the gateway and backend pod.
+                      WellKnownCACertificates specifies whether a well-known set of CA certificates
+                      may be used in the TLS handshake between the gateway and backend pod.
 
                       If WellKnownCACertificates is unspecified or empty (""), then CACertificateRefs
                       must be specified with at least one entry for a valid configuration. Only one of
@@ -383,9 +383,17 @@ spec:
                       `Accepted` Condition on the BackendTLSPolicy is set to `status: False`, with
                       a Reason `Invalid`.
 
+                      Valid values include:
+                      * "System" - indicates that well-known system CA certificates should be used.
+
+                      Implementations MAY define their own sets of CA certificates. Such definitions
+                      MUST use an implementation-specific, prefixed name, such as
+                      `mycompany.com/my-custom-ca-certifcates`.
+
                       Support: Implementation-specific
-                    enum:
-                    - System
+                    maxLength: 253
+                    minLength: 1
+                    pattern: ^(System|([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)?/([A-Za-z0-9][-A-Za-z0-9_.]{0,61})?[A-Za-z0-9]))$
                     type: string
                 required:
                 - hostname
@@ -1058,8 +1066,8 @@ spec:
                     x-kubernetes-list-type: atomic
                   wellKnownCACertificates:
                     description: |-
-                      WellKnownCACertificates specifies whether system CA certificates may be used in
-                      the TLS handshake between the gateway and backend pod.
+                      WellKnownCACertificates specifies whether a well-known set of CA certificates
+                      may be used in the TLS handshake between the gateway and backend pod.
 
                       If WellKnownCACertificates is unspecified or empty (""), then CACertificateRefs
                       must be specified with at least one entry for a valid configuration. Only one of
@@ -1069,9 +1077,17 @@ spec:
                       `Accepted` Condition on the BackendTLSPolicy is set to `status: False`, with
                       a Reason `Invalid`.
 
+                      Valid values include:
+                      * "System" - indicates that well-known system CA certificates should be used.
+
+                      Implementations MAY define their own sets of CA certificates. Such definitions
+                      MUST use an implementation-specific, prefixed name, such as
+                      `mycompany.com/my-custom-ca-certifcates`.
+
                       Support: Implementation-specific
-                    enum:
-                    - System
+                    maxLength: 253
+                    minLength: 1
+                    pattern: ^(System|([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)?/([A-Za-z0-9][-A-Za-z0-9_.]{0,61})?[A-Za-z0-9]))$
                     type: string
                 required:
                 - hostname

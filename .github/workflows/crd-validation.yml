@@ -15,7 +15,8 @@ jobs:
       fail-fast: false
       matrix:
         # Available versions at https://raw.githubusercontent.com/kubernetes-sigs/controller-tools/HEAD/envtest-releases.yaml
-        k8s_version: [v1.34.0, v1.33.0, v1.32.0, v1.31.0, v1.30.3]
+        # Our goal is to cover the most recent 5 minor versions, even if the oldest one is EOL.
+        k8s_version: [v1.35.0, v1.34.1, v1.33.0, v1.32.0, v1.31.0]
         crd_channel: [standard, experimental]
     steps:
       - name: Checkout code
@@ -23,7 +24,9 @@ jobs:
         with:
           persist-credentials: false
       - name: Set up Go
-        uses: actions/setup-go@4dc6199c7b1a012772edbd06daecab0f50c9053c # tag=v6.1.0
+        uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # tag=v6.2.0
+        with:
+          go-version-file: 'go.work'
       - name: Run CRD Validation tests
         env:
           K8S_VERSION: ${{ matrix.k8s_version }}

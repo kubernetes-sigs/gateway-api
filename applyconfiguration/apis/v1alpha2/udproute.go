@@ -29,11 +29,17 @@ import (
 
 // UDPRouteApplyConfiguration represents a declarative configuration of the UDPRoute type for use
 // with apply.
+//
+// UDPRoute provides a way to route UDP traffic. When combined with a Gateway
+// listener, it can be used to forward traffic on the port specified by the
+// listener to a set of backends specified by the UDPRoute.
 type UDPRouteApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
-	Spec                             *UDPRouteSpecApplyConfiguration   `json:"spec,omitempty"`
-	Status                           *UDPRouteStatusApplyConfiguration `json:"status,omitempty"`
+	// Spec defines the desired state of UDPRoute.
+	Spec *UDPRouteSpecApplyConfiguration `json:"spec,omitempty"`
+	// Status defines the current state of UDPRoute.
+	Status *UDPRouteStatusApplyConfiguration `json:"status,omitempty"`
 }
 
 // UDPRoute constructs a declarative configuration of the UDPRoute type for use with
@@ -47,29 +53,14 @@ func UDPRoute(name, namespace string) *UDPRouteApplyConfiguration {
 	return b
 }
 
-// ExtractUDPRoute extracts the applied configuration owned by fieldManager from
-// uDPRoute. If no managedFields are found in uDPRoute for fieldManager, a
-// UDPRouteApplyConfiguration is returned with only the Name, Namespace (if applicable),
-// APIVersion and Kind populated. It is possible that no managed fields were found for because other
-// field managers have taken ownership of all the fields previously owned by fieldManager, or because
-// the fieldManager never owned fields any fields.
+// ExtractUDPRouteFrom extracts the applied configuration owned by fieldManager from
+// uDPRoute for the specified subresource. Pass an empty string for subresource to extract
+// the main resource. Common subresources include "status", "scale", etc.
 // uDPRoute must be a unmodified UDPRoute API object that was retrieved from the Kubernetes API.
-// ExtractUDPRoute provides a way to perform a extract/modify-in-place/apply workflow.
+// ExtractUDPRouteFrom provides a way to perform a extract/modify-in-place/apply workflow.
 // Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
 // applied if another fieldManager has updated or force applied any of the previously applied fields.
-// Experimental!
-func ExtractUDPRoute(uDPRoute *apisv1alpha2.UDPRoute, fieldManager string) (*UDPRouteApplyConfiguration, error) {
-	return extractUDPRoute(uDPRoute, fieldManager, "")
-}
-
-// ExtractUDPRouteStatus is the same as ExtractUDPRoute except
-// that it extracts the status subresource applied configuration.
-// Experimental!
-func ExtractUDPRouteStatus(uDPRoute *apisv1alpha2.UDPRoute, fieldManager string) (*UDPRouteApplyConfiguration, error) {
-	return extractUDPRoute(uDPRoute, fieldManager, "status")
-}
-
-func extractUDPRoute(uDPRoute *apisv1alpha2.UDPRoute, fieldManager string, subresource string) (*UDPRouteApplyConfiguration, error) {
+func ExtractUDPRouteFrom(uDPRoute *apisv1alpha2.UDPRoute, fieldManager string, subresource string) (*UDPRouteApplyConfiguration, error) {
 	b := &UDPRouteApplyConfiguration{}
 	err := managedfields.ExtractInto(uDPRoute, internal.Parser().Type("io.k8s.sigs.gateway-api.apis.v1alpha2.UDPRoute"), fieldManager, b, subresource)
 	if err != nil {
@@ -82,6 +73,27 @@ func extractUDPRoute(uDPRoute *apisv1alpha2.UDPRoute, fieldManager string, subre
 	b.WithAPIVersion("gateway.networking.k8s.io/v1alpha2")
 	return b, nil
 }
+
+// ExtractUDPRoute extracts the applied configuration owned by fieldManager from
+// uDPRoute. If no managedFields are found in uDPRoute for fieldManager, a
+// UDPRouteApplyConfiguration is returned with only the Name, Namespace (if applicable),
+// APIVersion and Kind populated. It is possible that no managed fields were found for because other
+// field managers have taken ownership of all the fields previously owned by fieldManager, or because
+// the fieldManager never owned fields any fields.
+// uDPRoute must be a unmodified UDPRoute API object that was retrieved from the Kubernetes API.
+// ExtractUDPRoute provides a way to perform a extract/modify-in-place/apply workflow.
+// Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
+// applied if another fieldManager has updated or force applied any of the previously applied fields.
+func ExtractUDPRoute(uDPRoute *apisv1alpha2.UDPRoute, fieldManager string) (*UDPRouteApplyConfiguration, error) {
+	return ExtractUDPRouteFrom(uDPRoute, fieldManager, "")
+}
+
+// ExtractUDPRouteStatus extracts the applied configuration owned by fieldManager from
+// uDPRoute for the status subresource.
+func ExtractUDPRouteStatus(uDPRoute *apisv1alpha2.UDPRoute, fieldManager string) (*UDPRouteApplyConfiguration, error) {
+	return ExtractUDPRouteFrom(uDPRoute, fieldManager, "status")
+}
+
 func (b UDPRouteApplyConfiguration) IsApplyConfiguration() {}
 
 // WithKind sets the Kind field in the declarative configuration to the given value

@@ -98,7 +98,7 @@ func TestGatewayInfrastructureLabels(t *testing.T) {
 			labels: map[gatewayv1.LabelKey]gatewayv1.LabelValue{
 				"key": gatewayv1.LabelValue(strings.Repeat("a", 64)),
 			},
-			wantErrors: []string{"Too long: may not be longer than 63"},
+			wantErrors: []string{"Too long: may not be more than 63"},
 		},
 		{
 			name: "invalid label value with invalid characters",

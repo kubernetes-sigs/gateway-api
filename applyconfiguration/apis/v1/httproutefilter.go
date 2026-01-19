@@ -24,16 +24,110 @@ import (
 
 // HTTPRouteFilterApplyConfiguration represents a declarative configuration of the HTTPRouteFilter type for use
 // with apply.
+//
+// HTTPRouteFilter defines processing steps that must be completed during the
+// request or response lifecycle. HTTPRouteFilters are meant as an extension
+// point to express processing that may be done in Gateway implementations. Some
+// examples include request or response modification, implementing
+// authentication strategies, rate-limiting, and traffic shaping. API
+// guarantee/conformance is defined based on the type of the filter.
+//
+// <gateway:experimental:validation:XValidation:message="filter.cors must be nil if the filter.type is not CORS",rule="!(has(self.cors) && self.type != 'CORS')">
+// <gateway:experimental:validation:XValidation:message="filter.cors must be specified for CORS filter.type",rule="!(!has(self.cors) && self.type == 'CORS')">
+// <gateway:experimental:validation:XValidation:message="filter.externalAuth must be nil if the filter.type is not ExternalAuth",rule="!(has(self.externalAuth) && self.type != 'ExternalAuth')">
+// <gateway:experimental:validation:XValidation:message="filter.externalAuth must be specified for ExternalAuth filter.type",rule="!(!has(self.externalAuth) && self.type == 'ExternalAuth')">
 type HTTPRouteFilterApplyConfiguration struct {
-	Type                   *apisv1.HTTPRouteFilterType                  `json:"type,omitempty"`
-	RequestHeaderModifier  *HTTPHeaderFilterApplyConfiguration          `json:"requestHeaderModifier,omitempty"`
-	ResponseHeaderModifier *HTTPHeaderFilterApplyConfiguration          `json:"responseHeaderModifier,omitempty"`
-	RequestMirror          *HTTPRequestMirrorFilterApplyConfiguration   `json:"requestMirror,omitempty"`
-	RequestRedirect        *HTTPRequestRedirectFilterApplyConfiguration `json:"requestRedirect,omitempty"`
-	URLRewrite             *HTTPURLRewriteFilterApplyConfiguration      `json:"urlRewrite,omitempty"`
-	CORS                   *HTTPCORSFilterApplyConfiguration            `json:"cors,omitempty"`
-	ExternalAuth           *HTTPExternalAuthFilterApplyConfiguration    `json:"externalAuth,omitempty"`
-	ExtensionRef           *LocalObjectReferenceApplyConfiguration      `json:"extensionRef,omitempty"`
+	// Type identifies the type of filter to apply. As with other API fields,
+	// types are classified into three conformance levels:
+	//
+	// - Core: Filter types and their corresponding configuration defined by
+	// "Support: Core" in this package, e.g. "RequestHeaderModifier". All
+	// implementations must support core filters.
+	//
+	// - Extended: Filter types and their corresponding configuration defined by
+	// "Support: Extended" in this package, e.g. "RequestMirror". Implementers
+	// are encouraged to support extended filters.
+	//
+	// - Implementation-specific: Filters that are defined and supported by
+	// specific vendors.
+	// In the future, filters showing convergence in behavior across multiple
+	// implementations will be considered for inclusion in extended or core
+	// conformance levels. Filter-specific configuration for such filters
+	// is specified using the ExtensionRef field. `Type` should be set to
+	// "ExtensionRef" for custom filters.
+	//
+	// Implementers are encouraged to define custom implementation types to
+	// extend the core API with implementation-specific behavior.
+	//
+	// If a reference to a custom filter type cannot be resolved, the filter
+	// MUST NOT be skipped. Instead, requests that would have been processed by
+	// that filter MUST receive a HTTP error response.
+	//
+	// Note that values may be added to this enum, implementations
+	// must ensure that unknown values will not cause a crash.
+	//
+	// Unknown values here must result in the implementation setting the
+	// Accepted Condition for the Route to `status: False`, with a
+	// Reason of `UnsupportedValue`.
+	//
+	// <gateway:experimental:validation:Enum=RequestHeaderModifier;ResponseHeaderModifier;RequestMirror;RequestRedirect;URLRewrite;ExtensionRef;CORS;ExternalAuth>
+	Type *apisv1.HTTPRouteFilterType `json:"type,omitempty"`
+	// RequestHeaderModifier defines a schema for a filter that modifies request
+	// headers.
+	//
+	// Support: Core
+	RequestHeaderModifier *HTTPHeaderFilterApplyConfiguration `json:"requestHeaderModifier,omitempty"`
+	// ResponseHeaderModifier defines a schema for a filter that modifies response
+	// headers.
+	//
+	// Support: Extended
+	ResponseHeaderModifier *HTTPHeaderFilterApplyConfiguration `json:"responseHeaderModifier,omitempty"`
+	// RequestMirror defines a schema for a filter that mirrors requests.
+	// Requests are sent to the specified destination, but responses from
+	// that destination are ignored.
+	//
+	// This filter can be used multiple times within the same rule. Note that
+	// not all implementations will be able to support mirroring to multiple
+	// backends.
+	//
+	// Support: Extended
+	RequestMirror *HTTPRequestMirrorFilterApplyConfiguration `json:"requestMirror,omitempty"`
+	// RequestRedirect defines a schema for a filter that responds to the
+	// request with an HTTP redirection.
+	//
+	// Support: Core
+	RequestRedirect *HTTPRequestRedirectFilterApplyConfiguration `json:"requestRedirect,omitempty"`
+	// URLRewrite defines a schema for a filter that modifies a request during forwarding.
+	//
+	// Support: Extended
+	URLRewrite *HTTPURLRewriteFilterApplyConfiguration `json:"urlRewrite,omitempty"`
+	// CORS defines a schema for a filter that responds to the
+	// cross-origin request based on HTTP response header.
+	//
+	// Support: Extended
+	//
+	// <gateway:experimental>
+	CORS *HTTPCORSFilterApplyConfiguration `json:"cors,omitempty"`
+	// ExternalAuth configures settings related to sending request details
+	// to an external auth service. The external service MUST authenticate
+	// the request, and MAY authorize the request as well.
+	//
+	// If there is any problem communicating with the external service,
+	// this filter MUST fail closed.
+	//
+	// Support: Extended
+	//
+	// <gateway:experimental>
+	ExternalAuth *HTTPExternalAuthFilterApplyConfiguration `json:"externalAuth,omitempty"`
+	// ExtensionRef is an optional, implementation-specific extension to the
+	// "filter" behavior.  For example, resource "myroutefilter" in group
+	// "networking.example.net"). ExtensionRef MUST NOT be used for core and
+	// extended filters.
+	//
+	// This filter can be used multiple times within the same rule.
+	//
+	// Support: Implementation-specific
+	ExtensionRef *LocalObjectReferenceApplyConfiguration `json:"extensionRef,omitempty"`
 }
 
 // HTTPRouteFilterApplyConfiguration constructs a declarative configuration of the HTTPRouteFilter type for use with
