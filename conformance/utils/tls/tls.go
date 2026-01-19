@@ -31,23 +31,23 @@ import (
 //
 // Once the request succeeds consistently with the response having the expected status code, make
 // additional assertions on the response body using the provided ExpectedResponse.
-func MakeTLSRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtripper.RoundTripper, timeoutConfig config.TimeoutConfig, gwAddr string, cPem, keyPem []byte, server string, expected http.ExpectedResponse) {
+func MakeTLSRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtripper.RoundTripper, timeoutConfig config.TimeoutConfig, gwAddr string, serverCertificate, clientCertificate, clientCertificateKey []byte, serverName string, expected http.ExpectedResponse) {
 	t.Helper()
 
-	req := http.MakeRequest(t, &expected, gwAddr, "HTTPS", "https")
+	req := http.MakeRequest(t, &expected, gwAddr, roundtripper.HTTPSProtocol, "https")
+	req.ServerName = serverName
+	req.ServerCertificate = serverCertificate
+	req.ClientCertificate = clientCertificate
+	req.ClientCertificateKey = clientCertificateKey
 
-	WaitForConsistentTLSResponse(t, r, req, expected, timeoutConfig.RequiredConsecutiveSuccesses, timeoutConfig.MaxTimeToConsistency, cPem, keyPem, server)
+	WaitForConsistentTLSResponse(t, r, req, expected, timeoutConfig.RequiredConsecutiveSuccesses, timeoutConfig.MaxTimeToConsistency)
 }
 
 // WaitForConsistentTLSResponse - repeats the provided request until it completes with a response having
 // the expected response consistently. The provided threshold determines how many times in
 // a row this must occur to be considered "consistent".
-func WaitForConsistentTLSResponse(t *testing.T, r roundtripper.RoundTripper, req roundtripper.Request, expected http.ExpectedResponse, threshold int, maxTimeToConsistency time.Duration, cPem, keyPem []byte, server string) {
+func WaitForConsistentTLSResponse(t *testing.T, r roundtripper.RoundTripper, req roundtripper.Request, expected http.ExpectedResponse, threshold int, maxTimeToConsistency time.Duration) {
 	http.AwaitConvergence(t, threshold, maxTimeToConsistency, func(elapsed time.Duration) bool {
-		req.KeyPem = keyPem
-		req.CertPem = cPem
-		req.Server = server
-
 		cReq, cRes, err := r.CaptureRoundTrip(req)
 		if err != nil {
 			tlog.Logf(t, "Request failed, not ready yet: %v (after %v)", err.Error(), elapsed)

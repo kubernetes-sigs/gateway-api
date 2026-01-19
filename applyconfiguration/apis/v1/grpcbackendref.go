@@ -24,9 +24,68 @@ import (
 
 // GRPCBackendRefApplyConfiguration represents a declarative configuration of the GRPCBackendRef type for use
 // with apply.
+//
+// GRPCBackendRef defines how a GRPCRoute forwards a gRPC request.
+//
+// Note that when a namespace different than the local namespace is specified, a
+// ReferenceGrant object is required in the referent namespace to allow that
+// namespace's owner to accept the reference. See the ReferenceGrant
+// documentation for details.
+//
+// <gateway:experimental:description>
+//
+// When the BackendRef points to a Kubernetes Service, implementations SHOULD
+// honor the appProtocol field if it is set for the target Service Port.
+//
+// Implementations supporting appProtocol SHOULD recognize the Kubernetes
+// Standard Application Protocols defined in KEP-3726.
+//
+// If a Service appProtocol isn't specified, an implementation MAY infer the
+// backend protocol through its own means. Implementations MAY infer the
+// protocol from the Route type referring to the backend Service.
+//
+// If a Route is not able to send traffic to the backend using the specified
+// protocol then the backend is considered invalid. Implementations MUST set the
+// "ResolvedRefs" condition to "False" with the "UnsupportedProtocol" reason.
+//
+// </gateway:experimental:description>
 type GRPCBackendRefApplyConfiguration struct {
+	// BackendRef is a reference to a backend to forward matched requests to.
+	//
+	// A BackendRef can be invalid for the following reasons. In all cases, the
+	// implementation MUST ensure the `ResolvedRefs` Condition on the Route
+	// is set to `status: False`, with a Reason and Message that indicate
+	// what is the cause of the error.
+	//
+	// A BackendRef is invalid if:
+	//
+	// * It refers to an unknown or unsupported kind of resource. In this
+	// case, the Reason MUST be set to `InvalidKind` and Message of the
+	// Condition MUST explain which kind of resource is unknown or unsupported.
+	//
+	// * It refers to a resource that does not exist. In this case, the Reason MUST
+	// be set to `BackendNotFound` and the Message of the Condition MUST explain
+	// which resource does not exist.
+	//
+	// * It refers a resource in another namespace when the reference has not been
+	// explicitly allowed by a ReferenceGrant (or equivalent concept). In this
+	// case, the Reason MUST be set to `RefNotPermitted` and the Message of the
+	// Condition MUST explain which cross-namespace reference is not allowed.
+	//
+	// Support: Core for Kubernetes Service
+	//
+	// Support: Extended for Kubernetes ServiceImport
+	//
+	// Support: Implementation-specific for any other resource
+	//
+	// Support for weight: Core
 	BackendRefApplyConfiguration `json:",inline"`
-	Filters                      []GRPCRouteFilterApplyConfiguration `json:"filters,omitempty"`
+	// Filters defined at this level MUST be executed if and only if the
+	// request is being forwarded to the backend defined here.
+	//
+	// Support: Implementation-specific (For broader support of filters, use the
+	// Filters field in GRPCRouteRule.)
+	Filters []GRPCRouteFilterApplyConfiguration `json:"filters,omitempty"`
 }
 
 // GRPCBackendRefApplyConfiguration constructs a declarative configuration of the GRPCBackendRef type for use with

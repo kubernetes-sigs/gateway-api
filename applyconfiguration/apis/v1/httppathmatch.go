@@ -24,9 +24,17 @@ import (
 
 // HTTPPathMatchApplyConfiguration represents a declarative configuration of the HTTPPathMatch type for use
 // with apply.
+//
+// HTTPPathMatch describes how to select a HTTP route by matching the HTTP request path.
 type HTTPPathMatchApplyConfiguration struct {
-	Type  *apisv1.PathMatchType `json:"type,omitempty"`
-	Value *string               `json:"value,omitempty"`
+	// Type specifies how to match against the path Value.
+	//
+	// Support: Core (Exact, PathPrefix)
+	//
+	// Support: Implementation-specific (RegularExpression)
+	Type *apisv1.PathMatchType `json:"type,omitempty"`
+	// Value of the HTTP path to match against.
+	Value *string `json:"value,omitempty"`
 }
 
 // HTTPPathMatchApplyConfiguration constructs a declarative configuration of the HTTPPathMatch type for use with

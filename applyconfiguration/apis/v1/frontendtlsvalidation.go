@@ -24,9 +24,49 @@ import (
 
 // FrontendTLSValidationApplyConfiguration represents a declarative configuration of the FrontendTLSValidation type for use
 // with apply.
+//
+// FrontendTLSValidation holds configuration information that can be used to validate
+// the frontend initiating the TLS connection
 type FrontendTLSValidationApplyConfiguration struct {
+	// CACertificateRefs contains one or more references to
+	// Kubernetes objects that contain TLS certificates of
+	// the Certificate Authorities that can be used
+	// as a trust anchor to validate the certificates presented by the client.
+	//
+	// A single CA certificate reference to a Kubernetes ConfigMap
+	// has "Core" support.
+	// Implementations MAY choose to support attaching multiple CA certificates to
+	// a Listener, but this behavior is implementation-specific.
+	//
+	// Support: Core - A single reference to a Kubernetes ConfigMap
+	// with the CA certificate in a key named `ca.crt`.
+	//
+	// Support: Implementation-specific (More than one certificate in a ConfigMap
+	// with different keys or more than one reference, or other kinds of resources).
+	//
+	// References to a resource in a different namespace are invalid UNLESS there
+	// is a ReferenceGrant in the target namespace that allows the certificate
+	// to be attached. If a ReferenceGrant does not allow this reference, the
+	// "ResolvedRefs" condition MUST be set to False for this listener with the
+	// "RefNotPermitted" reason.
 	CACertificateRefs []ObjectReferenceApplyConfiguration `json:"caCertificateRefs,omitempty"`
-	Mode              *apisv1.FrontendValidationModeType  `json:"mode,omitempty"`
+	// FrontendValidationMode defines the mode for validating the client certificate.
+	// There are two possible modes:
+	//
+	// - AllowValidOnly: In this mode, the gateway will accept connections only if
+	// the client presents a valid certificate. This certificate must successfully
+	// pass validation against the CA certificates specified in `CACertificateRefs`.
+	// - AllowInsecureFallback: In this mode, the gateway will accept connections
+	// even if the client certificate is not presented or fails verification.
+	//
+	// This approach delegates client authorization to the backend and introduce
+	// a significant security risk. It should be used in testing environments or
+	// on a temporary basis in non-testing environments.
+	//
+	// Defaults to AllowValidOnly.
+	//
+	// Support: Core
+	Mode *apisv1.FrontendValidationModeType `json:"mode,omitempty"`
 }
 
 // FrontendTLSValidationApplyConfiguration constructs a declarative configuration of the FrontendTLSValidation type for use with

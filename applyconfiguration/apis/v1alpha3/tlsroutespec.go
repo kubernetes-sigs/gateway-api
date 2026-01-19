@@ -26,10 +26,48 @@ import (
 
 // TLSRouteSpecApplyConfiguration represents a declarative configuration of the TLSRouteSpec type for use
 // with apply.
+//
+// TLSRouteSpec defines the desired state of a TLSRoute resource.
 type TLSRouteSpecApplyConfiguration struct {
 	v1.CommonRouteSpecApplyConfiguration `json:",inline"`
-	Hostnames                            []apisv1.Hostname                         `json:"hostnames,omitempty"`
-	Rules                                []v1alpha2.TLSRouteRuleApplyConfiguration `json:"rules,omitempty"`
+	// Hostnames defines a set of SNI hostnames that should match against the
+	// SNI attribute of TLS ClientHello message in TLS handshake. This matches
+	// the RFC 1123 definition of a hostname with 2 notable exceptions:
+	//
+	// 1. IPs are not allowed in SNI hostnames per RFC 6066.
+	// 2. A hostname may be prefixed with a wildcard label (`*.`). The wildcard
+	// label must appear by itself as the first label.
+	//
+	// If a hostname is specified by both the Listener and TLSRoute, there
+	// must be at least one intersecting hostname for the TLSRoute to be
+	// attached to the Listener. For example:
+	//
+	// * A Listener with `test.example.com` as the hostname matches TLSRoutes
+	// that have specified at least one of `test.example.com` or
+	// `*.example.com`.
+	// * A Listener with `*.example.com` as the hostname matches TLSRoutes
+	// that have specified at least one hostname that matches the Listener
+	// hostname. For example, `test.example.com` and `*.example.com` would both
+	// match. On the other hand, `example.com` and `test.example.net` would not
+	// match.
+	//
+	// If both the Listener and TLSRoute have specified hostnames, any
+	// TLSRoute hostnames that do not match the Listener hostname MUST be
+	// ignored. For example, if a Listener specified `*.example.com`, and the
+	// TLSRoute specified `test.example.com` and `test.example.net`,
+	// `test.example.net` must not be considered for a match.
+	//
+	// If both the Listener and TLSRoute have specified hostnames, and none
+	// match with the criteria above, then the TLSRoute is not accepted. The
+	// implementation must raise an 'Accepted' Condition with a status of
+	// `False` in the corresponding RouteParentStatus.
+	//
+	// Support: Core
+	Hostnames []apisv1.Hostname `json:"hostnames,omitempty"`
+	// Rules are a list of actions.
+	//
+	// <gateway:experimental:validation:XValidation:message="Rule name must be unique within the route",rule="self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name) && l1.name == l2.name))">
+	Rules []v1alpha2.TLSRouteRuleApplyConfiguration `json:"rules,omitempty"`
 }
 
 // TLSRouteSpecApplyConfiguration constructs a declarative configuration of the TLSRouteSpec type for use with

@@ -127,6 +127,7 @@ other functions (like managing DNS or creating certificates).
 ## Service Mesh Implementation Status <a name="meshes"></a>
 
 ### Conformant
+- [Alibaba Cloud Service Mesh][43] (GA)
 - [Istio][9] (GA)
 - [Linkerd][28] (GA)
 - [Cilium][16] (GA)
@@ -185,6 +186,7 @@ other functions (like managing DNS or creating certificates).
 [40]:#agent-gateway-with-kgateway
 [41]:#kruise-rollouts
 [42]:#gravitee-kubernetes-operator
+[43]:#alibaba-cloud-service-mesh
 
 
 [gamma]:mesh/index.md
@@ -232,6 +234,14 @@ Airlock Microgateway protects your applications and microservices with the tried
 [airlock-microgateway-guide]:https://docs.airlock.com/microgateway/latest/?topic=MGW-00000142
 [airlock-microgateway-community-support]:https://forum.airlock.com/
 [airlock-microgateway-premium-support]:https://techzone.ergon.ch/support-process
+
+### Alibaba Cloud Service Mesh
+
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.3.0-Alibaba%20Cloud%20Service%20Mesh-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.3.0/alibaba-cloud-servicemesh)
+
+[Alibaba Cloud Service Mesh (ASM)][asm] provides a fully managed service mesh platform that is compatible with the community Istio. It simplifies service governance, including traffic routing and split management between service calls, authentication security for inter-service communication, and mesh observability capabilities, thereby greatly reducing the workload of development and operations.
+
+[asm]:https://www.alibabacloud.com/help/en/asm/product-overview/what-is-asm
 
 ### Amazon Elastic Kubernetes Service
 

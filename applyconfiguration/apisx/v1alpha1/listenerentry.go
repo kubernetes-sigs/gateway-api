@@ -27,12 +27,76 @@ import (
 // ListenerEntryApplyConfiguration represents a declarative configuration of the ListenerEntry type for use
 // with apply.
 type ListenerEntryApplyConfiguration struct {
-	Name          *v1.SectionName                             `json:"name,omitempty"`
-	Hostname      *v1.Hostname                                `json:"hostname,omitempty"`
-	Port          *apisxv1alpha1.PortNumberWith0              `json:"port,omitempty"`
-	Protocol      *v1.ProtocolType                            `json:"protocol,omitempty"`
-	TLS           *apisv1.ListenerTLSConfigApplyConfiguration `json:"tls,omitempty"`
-	AllowedRoutes *apisv1.AllowedRoutesApplyConfiguration     `json:"allowedRoutes,omitempty"`
+	// Name is the name of the Listener. This name MUST be unique within a
+	// ListenerSet.
+	//
+	// Name is not required to be unique across a Gateway and ListenerSets.
+	// Routes can attach to a Listener by having a ListenerSet as a parentRef
+	// and setting the SectionName
+	Name *v1.SectionName `json:"name,omitempty"`
+	// Hostname specifies the virtual hostname to match for protocol types that
+	// define this concept. When unspecified, all hostnames are matched. This
+	// field is ignored for protocols that don't require hostname based
+	// matching.
+	//
+	// Implementations MUST apply Hostname matching appropriately for each of
+	// the following protocols:
+	//
+	// * TLS: The Listener Hostname MUST match the SNI.
+	// * HTTP: The Listener Hostname MUST match the Host header of the request.
+	// * HTTPS: The Listener Hostname SHOULD match at both the TLS and HTTP
+	// protocol layers as described above. If an implementation does not
+	// ensure that both the SNI and Host header match the Listener hostname,
+	// it MUST clearly document that.
+	//
+	// For HTTPRoute and TLSRoute resources, there is an interaction with the
+	// `spec.hostnames` array. When both listener and route specify hostnames,
+	// there MUST be an intersection between the values for a Route to be
+	// accepted. For more information, refer to the Route specific Hostnames
+	// documentation.
+	//
+	// Hostnames that are prefixed with a wildcard label (`*.`) are interpreted
+	// as a suffix match. That means that a match for `*.example.com` would match
+	// both `test.example.com`, and `foo.test.example.com`, but not `example.com`.
+	Hostname *v1.Hostname `json:"hostname,omitempty"`
+	// Port is the network port. Multiple listeners may use the
+	// same port, subject to the Listener compatibility rules.
+	Port *apisxv1alpha1.PortNumber `json:"port,omitempty"`
+	// Protocol specifies the network protocol this listener expects to receive.
+	Protocol *v1.ProtocolType `json:"protocol,omitempty"`
+	// TLS is the TLS configuration for the Listener. This field is required if
+	// the Protocol field is "HTTPS" or "TLS". It is invalid to set this field
+	// if the Protocol field is "HTTP", "TCP", or "UDP".
+	//
+	// The association of SNIs to Certificate defined in ListenerTLSConfig is
+	// defined based on the Hostname field for this listener.
+	//
+	// The GatewayClass MUST use the longest matching SNI out of all
+	// available certificates for any TLS handshake.
+	TLS *apisv1.ListenerTLSConfigApplyConfiguration `json:"tls,omitempty"`
+	// AllowedRoutes defines the types of routes that MAY be attached to a
+	// Listener and the trusted namespaces where those Route resources MAY be
+	// present.
+	//
+	// Although a client request may match multiple route rules, only one rule
+	// may ultimately receive the request. Matching precedence MUST be
+	// determined in order of the following criteria:
+	//
+	// * The most specific match as defined by the Route type.
+	// * The oldest Route based on creation timestamp. For example, a Route with
+	// a creation timestamp of "2020-09-08 01:02:03" is given precedence over
+	// a Route with a creation timestamp of "2020-09-08 01:02:04".
+	// * If everything else is equivalent, the Route appearing first in
+	// alphabetical order (namespace/name) should be given precedence. For
+	// example, foo/bar is given precedence over foo/baz.
+	//
+	// All valid rules within a Route attached to this Listener should be
+	// implemented. Invalid Route rules can be ignored (sometimes that will mean
+	// the full Route). If a Route rule transitions from valid to invalid,
+	// support for that Route rule should be dropped to ensure consistency. For
+	// example, even if a filter specified by a Route rule is invalid, the rest
+	// of the rules within that Route should still be supported.
+	AllowedRoutes *apisv1.AllowedRoutesApplyConfiguration `json:"allowedRoutes,omitempty"`
 }
 
 // ListenerEntryApplyConfiguration constructs a declarative configuration of the ListenerEntry type for use with
@@ -60,7 +124,7 @@ func (b *ListenerEntryApplyConfiguration) WithHostname(value v1.Hostname) *Liste
 // WithPort sets the Port field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Port field is set to the value of the last call.
-func (b *ListenerEntryApplyConfiguration) WithPort(value apisxv1alpha1.PortNumberWith0) *ListenerEntryApplyConfiguration {
+func (b *ListenerEntryApplyConfiguration) WithPort(value apisxv1alpha1.PortNumber) *ListenerEntryApplyConfiguration {
 	b.Port = &value
 	return b
 }
