@@ -148,12 +148,12 @@ jobs:
             SINCE_DATE=$(git log -1 --format=%aI "${PREV_TAG}")
             DUE_DATE=$(git log -1 --format=%aI "${TAG}")
             
-            echo "## Merged Pull Requests (${PREV_TAG} to ${TAG})" > release-notes.md
+            echo "## Merged Pull Requests (${PREV_TAG} to ${TAG})\n" >> release-notes.md
             
             gh pr list \
               --base main \
               --state merged \
-              --search "merged:${SINCE_DATE}..${DUE_DATE}" \
+              --search "merged:${SINCE_DATE}..${DUE_DATE} -label:question -label:duplicate -label:invalid -label:wontfix"
               --limit 500 \
               --json number,title,author \
               --template '{{range .}}* {{.title}} (#{{.number}}) @{{.author.login}}{{"\n"}}{{end}}' >> release-notes.md
