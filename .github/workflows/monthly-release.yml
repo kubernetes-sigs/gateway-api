@@ -172,6 +172,11 @@ jobs:
           draft: false
           generate_release_notes: false
 
+      - name: Cleanup
+        if: always() && steps.check-tag.outputs.exists == 'false'
+        run: |
+          rm -f release-notes.md
+
       - name: Summary
         if: always()
         run: |
