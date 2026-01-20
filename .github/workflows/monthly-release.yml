@@ -170,7 +170,7 @@ jobs:
           prerelease: true
           files: |
             release/${{ steps.tag.outputs.tag }}-install.yaml
-          draft: false
+          draft: true
           generate_release_notes: false
 
       - name: Cleanup
