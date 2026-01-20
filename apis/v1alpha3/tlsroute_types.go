@@ -34,7 +34,6 @@ import (
 //
 // If you need to forward traffic to a single target for a TLS listener, you
 // could choose to use a TCPRoute with a TLS listener.
-// +k8s:deepcopy-gen=false
 type TLSRoute v1.TLSRoute
 
 // TLSRouteSpec defines the desired state of a TLSRoute resource.
