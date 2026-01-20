@@ -51,18 +51,19 @@ type RoundTripper interface {
 
 // Request is the primary input for making a request.
 type Request struct {
-	T                    *testing.T
-	URL                  url.URL
-	Host                 string
-	Protocol             string
-	Method               string
-	Headers              map[string][]string
-	UnfollowRedirect     bool
-	ClientCertificate    []byte
-	ClientCertificateKey []byte
-	ServerCertificate    []byte
-	ServerName           string
-	Body                 string
+	T                        *testing.T
+	URL                      url.URL
+	Host                     string
+	Protocol                 string
+	Method                   string
+	Headers                  map[string][]string
+	UnfollowRedirect         bool
+	ClientCertificate        []byte
+	ClientCertificateKey     []byte
+	ServerCertificate        []byte
+	ServerName               string
+	Body                     string
+	GetClientCertificateHook func(*tls.CertificateRequestInfo) (*tls.Certificate, error)
 }
 
 // String returns a printable version of Request for logging. Note that the
@@ -335,11 +336,13 @@ func createTLSClientConfig(request Request) (*tls.Config, error) {
 
 	// Create the tls Config for this provided host, cert, and trusted CA
 	// Disable G402: TLS MinVersion too low. (gosec)
+	// Use GetClientCertificate hook for testing purposes.
 	// #nosec G402
 	return &tls.Config{
-		ServerName:   request.ServerName,
-		RootCAs:      rootCAs,
-		Certificates: certificates,
+		ServerName:           request.ServerName,
+		RootCAs:              rootCAs,
+		Certificates:         certificates,
+		GetClientCertificate: request.GetClientCertificateHook,
 	}, nil
 }
 
