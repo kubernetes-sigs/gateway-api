@@ -24,7 +24,7 @@ import (
 	managedfields "k8s.io/apimachinery/pkg/util/managedfields"
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 	apisv1alpha3 "sigs.k8s.io/gateway-api/apis/v1alpha3"
-	v1alpha2 "sigs.k8s.io/gateway-api/applyconfiguration/apis/v1alpha2"
+	apisv1 "sigs.k8s.io/gateway-api/applyconfiguration/apis/v1"
 	internal "sigs.k8s.io/gateway-api/applyconfiguration/internal"
 )
 
@@ -41,9 +41,9 @@ type TLSRouteApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	// Spec defines the desired state of TLSRoute.
-	Spec *TLSRouteSpecApplyConfiguration `json:"spec,omitempty"`
+	Spec *apisv1.TLSRouteSpecApplyConfiguration `json:"spec,omitempty"`
 	// Status defines the current state of TLSRoute.
-	Status *v1alpha2.TLSRouteStatusApplyConfiguration `json:"status,omitempty"`
+	Status *apisv1.TLSRouteStatusApplyConfiguration `json:"status,omitempty"`
 }
 
 // TLSRoute constructs a declarative configuration of the TLSRoute type for use with
@@ -261,7 +261,7 @@ func (b *TLSRouteApplyConfiguration) ensureObjectMetaApplyConfigurationExists() 
 // WithSpec sets the Spec field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Spec field is set to the value of the last call.
-func (b *TLSRouteApplyConfiguration) WithSpec(value *TLSRouteSpecApplyConfiguration) *TLSRouteApplyConfiguration {
+func (b *TLSRouteApplyConfiguration) WithSpec(value *apisv1.TLSRouteSpecApplyConfiguration) *TLSRouteApplyConfiguration {
 	b.Spec = value
 	return b
 }
@@ -269,7 +269,7 @@ func (b *TLSRouteApplyConfiguration) WithSpec(value *TLSRouteSpecApplyConfigurat
 // WithStatus sets the Status field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Status field is set to the value of the last call.
-func (b *TLSRouteApplyConfiguration) WithStatus(value *v1alpha2.TLSRouteStatusApplyConfiguration) *TLSRouteApplyConfiguration {
+func (b *TLSRouteApplyConfiguration) WithStatus(value *apisv1.TLSRouteStatusApplyConfiguration) *TLSRouteApplyConfiguration {
 	b.Status = value
 	return b
 }
