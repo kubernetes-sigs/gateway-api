@@ -216,6 +216,14 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1.TLSConfigApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("TLSPortConfig"):
 		return &apisv1.TLSPortConfigApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("TLSRoute"):
+		return &apisv1.TLSRouteApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("TLSRouteRule"):
+		return &apisv1.TLSRouteRuleApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("TLSRouteSpec"):
+		return &apisv1.TLSRouteSpecApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("TLSRouteStatus"):
+		return &apisv1.TLSRouteStatusApplyConfiguration{}
 
 		// Group=gateway.networking.k8s.io, Version=v1alpha2
 	case v1alpha2.SchemeGroupVersion.WithKind("GRPCRoute"):
@@ -252,8 +260,6 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1alpha3.BackendTLSPolicyApplyConfiguration{}
 	case v1alpha3.SchemeGroupVersion.WithKind("TLSRoute"):
 		return &apisv1alpha3.TLSRouteApplyConfiguration{}
-	case v1alpha3.SchemeGroupVersion.WithKind("TLSRouteSpec"):
-		return &apisv1alpha3.TLSRouteSpecApplyConfiguration{}
 
 		// Group=gateway.networking.k8s.io, Version=v1beta1
 	case v1beta1.SchemeGroupVersion.WithKind("Gateway"):

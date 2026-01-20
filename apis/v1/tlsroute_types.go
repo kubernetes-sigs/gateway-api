@@ -102,8 +102,8 @@ type TLSRouteSpec struct {
 	// +listType=atomic
 	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:MaxItems=16
-  // +kubebuilder:validation:XValidation:message="Hostnames cannot contain an IP",rule="self.all(h, !isIP(h))"
-  // +kubebuilder:validation:XValidation:message="Hostnames must be valid based on RFC-1123",rule="self.all(h, !h.contains('*') ? !format.dns1123Subdomain().validate(h).hasValue() : true )"
+	// +kubebuilder:validation:XValidation:message="Hostnames cannot contain an IP",rule="self.all(h, !isIP(h))"
+	// +kubebuilder:validation:XValidation:message="Hostnames must be valid based on RFC-1123",rule="self.all(h, !h.contains('*') ? !format.dns1123Subdomain().validate(h).hasValue() : true )"
 	// +kubebuilder:validation:XValidation:message="Wildcards on hostnames must be the first label, and the rest of hostname must be valid based on RFC-1123",rule="self.all(h, h.contains('*') ? (h.startsWith('*.') && !format.dns1123Subdomain().validate(h.substring(2)).hasValue()) : true )"
 	Hostnames []Hostname `json:"hostnames,omitempty"`
 

@@ -56,6 +56,10 @@ func (c *FakeGatewayV1) ReferenceGrants(namespace string) v1.ReferenceGrantInter
 	return newFakeReferenceGrants(c, namespace)
 }
 
+func (c *FakeGatewayV1) TLSRoutes(namespace string) v1.TLSRouteInterface {
+	return newFakeTLSRoutes(c, namespace)
+}
+
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
 func (c *FakeGatewayV1) RESTClient() rest.Interface {
