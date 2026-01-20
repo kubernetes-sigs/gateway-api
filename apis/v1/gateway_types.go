@@ -736,27 +736,49 @@ type TLSPortConfig struct {
 // FrontendTLSValidation holds configuration information that can be used to validate
 // the frontend initiating the TLS connection
 type FrontendTLSValidation struct {
-	// CACertificateRefs contains one or more references to
-	// Kubernetes objects that contain TLS certificates of
-	// the Certificate Authorities that can be used
-	// as a trust anchor to validate the certificates presented by the client.
+	// CACertificateRefs contains one or more references to Kubernetes
+	// objects that contain a PEM-encoded TLS CA certificate bundle, which
+	// is used as a trust anchor to validate the certificates presented by
+	// the client.
 	//
-	// A single CA certificate reference to a Kubernetes ConfigMap
-	// has "Core" support.
-	// Implementations MAY choose to support attaching multiple CA certificates to
-	// a Listener, but this behavior is implementation-specific.
+	// A CACertificateRef is invalid if:
 	//
-	// Support: Core - A single reference to a Kubernetes ConfigMap
-	// with the CA certificate in a key named `ca.crt`.
+	// * It refers to a resource that cannot be resolved (e.g., the
+	//   referenced resource does not exist) or is misconfigured (e.g., a
+	//   ConfigMap does not contain a key named `ca.crt`). In this case, the
+	//   Reason on all matching HTTPS listeners must be set to `InvalidCACertificateRef`
+	//   and the Message of the Condition must indicate which reference is invalid and why.
 	//
-	// Support: Implementation-specific (More than one certificate in a ConfigMap
-	// with different keys or more than one reference, or other kinds of resources).
+	// * It refers to an unknown or unsupported kind of resource. In this
+	//   case, the Reason on all matching HTTPS listeners must be set to
+	//   `InvalidCACertificateKind` and the Message of the Condition must explain
+	//   which kind of resource is unknown or unsupported.
 	//
-	// References to a resource in a different namespace are invalid UNLESS there
-	// is a ReferenceGrant in the target namespace that allows the certificate
-	// to be attached. If a ReferenceGrant does not allow this reference, the
-	// "ResolvedRefs" condition MUST be set to False for this listener with the
-	// "RefNotPermitted" reason.
+	// * It refers to a resource in another namespace UNLESS there is a
+	//   ReferenceGrant in the target namespace that allows the CA
+	//   certificate to be attached. If a ReferenceGrant does not allow this
+	//   reference, the `ResolvedRefs` on all matching HTTPS listeners condition
+	//   MUST be set with the Reason `RefNotPermitted`.
+	//
+	// Implementations MAY choose to perform further validation of the
+	// certificate content (e.g., checking expiry or enforcing specific formats).
+	// In such cases, an implementation-specific Reason and Message MUST be set.
+	//
+	// In all cases, the implementation MUST ensure that the `ResolvedRefs`
+	// condition is set to `status: False` on all targeted listeners (i.e.,
+	// listeners serving HTTPS on a matching port). The condition MUST
+	// include a Reason and Message that indicate the cause of the error. If
+	// ALL CACertificateRefs are invalid, the implementation MUST also ensure
+	// the `Accepted` condition on the listener is set to `status: False`, with
+	// the Reason `NoValidCACertificate`.
+	// Implementations MAY choose to support attaching multiple CA certificates
+	// to a listener, but this behavior is implementation-specific.
+	//
+	// Support: Core - A single reference to a Kubernetes ConfigMap, with the
+	// CA certificate in a key named `ca.crt`.
+	//
+	// Support: Implementation-specific - More than one reference, other kinds
+	// of resources, or a single reference that includes multiple certificates.
 	//
 	// +required
 	// +listType=atomic
@@ -1483,6 +1505,7 @@ const (
 	//
 	// * "PortUnavailable"
 	// * "UnsupportedProtocol"
+	// * "NoValidCACertificate"
 	//
 	// Possible reasons for this condition to be Unknown are:
 	//
@@ -1518,6 +1541,11 @@ const (
 	// Listener could not be attached to be Gateway because its
 	// protocol type is not supported.
 	ListenerReasonUnsupportedProtocol ListenerConditionReason = "UnsupportedProtocol"
+
+	// This reason is used with the "Accepted" condition when the
+	// Listener could not resolve the references to any CACertificate used
+	// to configure Gateway's Client Certificate Validation
+	ListenerReasonNoValidCACertificate ListenerConditionReason = "NoValidCACertificate"
 )
 
 const (
@@ -1533,6 +1561,8 @@ const (
 	// * "InvalidCertificateRef"
 	// * "InvalidRouteKinds"
 	// * "RefNotPermitted"
+	// * "InvalidCACertificateRef"
+	// * "InvalidCACertificateKind"
 	//
 	// Controllers may raise this condition with other reasons,
 	// but should prefer to use the reasons listed above to improve
@@ -1565,6 +1595,16 @@ const (
 	// namespace, where the object in the other namespace does not have a
 	// ReferenceGrant explicitly allowing the reference.
 	ListenerReasonRefNotPermitted ListenerConditionReason = "RefNotPermitted"
+
+	// This reason is used with the "ResolvedRefs" condition when one or more
+	// CACertificate References used to configure Client Certificate
+	// validation for Gateway are invalid.
+	ListenerReasonInvalidCACertificateRef GatewayConditionReason = "InvalidCACertificateRef"
+
+	// This reason is used with the "ResolvedRefs" condition when one or more
+	// CACertificate References used to configure Client Certificate
+	// validation for Gateway has unknown or unsupported kind.
+	ListenerReasonInvalidCACertificateKind GatewayConditionReason = "InvalidCACertificateKind"
 )
 
 const (
