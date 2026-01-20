@@ -99,11 +99,9 @@ type TLSRouteSpec struct {
 }
 
 // TLSRouteStatus defines the observed state of TLSRoute
-// +k8s:deepcopy-gen=false
 type TLSRouteStatus v1.TLSRouteStatus
 
 // TLSRouteRule is the configuration for a given rule.
-// +k8s:deepcopy-gen=false
 type TLSRouteRule v1.TLSRouteRule
 
 // +kubebuilder:object:root=true
