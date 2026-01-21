@@ -834,9 +834,34 @@ func GatewayStatusMustHaveListeners(t *testing.T, cl client.Client, timeoutConfi
 		}
 
 		actual = gw.Status.Listeners
-		return listenersMatch(t, listeners, actual), nil
+		return gatewayListenersMatch(t, listeners, actual), nil
 	})
 	require.NoErrorf(t, waitErr, "error waiting for Gateway status to have listeners matching expectations")
+}
+
+// ListenerSetStatusMustHaveListeners waits for the specified ListenerSet to have listeners
+// in status that match the expected listeners. This will cause the test to halt
+// if the specified timeout is exceeded.
+func ListenerSetStatusMustHaveListeners(t *testing.T, cl client.Client, timeoutConfig config.TimeoutConfig, lsNN types.NamespacedName, listeners []gatewayxv1a1.ListenerEntryStatus) {
+	t.Helper()
+
+	var actual []gatewayxv1a1.ListenerEntryStatus
+	waitErr := wait.PollUntilContextTimeout(context.Background(), 1*time.Second, timeoutConfig.ListenerSetListenersMustHaveConditions, true, func(ctx context.Context) (bool, error) {
+		gw := &gatewayxv1a1.XListenerSet{}
+		err := cl.Get(ctx, lsNN, gw)
+		if err != nil {
+			return false, fmt.Errorf("error fetching ListenerSet: %w", err)
+		}
+
+		if err := ConditionsHaveLatestObservedGeneration(gw, gw.Status.Conditions); err != nil {
+			tlog.Logf(t, "ListenerSet %s %v", client.ObjectKeyFromObject(gw), err)
+			return false, nil
+		}
+
+		actual = gw.Status.Listeners
+		return listenerSetListenersMatch(t, listeners, actual), nil
+	})
+	require.NoErrorf(t, waitErr, "error waiting for ListenerSet status to have listeners matching expectations")
 }
 
 // HTTPRouteMustHaveCondition checks that the supplied HTTPRoute has the supplied Condition,
@@ -1101,7 +1126,7 @@ func ListenerSetListenersMustHaveConditions(t *testing.T, client client.Client, 
 }
 
 // TODO(mikemorris): this and parentsMatch could possibly be rewritten as a generic function?
-func listenersMatch(t *testing.T, expected, actual []gatewayv1.ListenerStatus) bool {
+func gatewayListenersMatch(t *testing.T, expected, actual []gatewayv1.ListenerStatus) bool {
 	t.Helper()
 
 	if len(expected) != len(actual) {
@@ -1207,6 +1232,73 @@ func findConditionInList(t *testing.T, conditions []metav1.Condition, condName, 
 
 	tlog.Logf(t, "%s was not in conditions list [%v]", condName, conditions)
 	return false
+}
+
+// TODO(mikemorris): this and parentsMatch could possibly be rewritten as a generic function?
+func listenerSetListenersMatch(t *testing.T, expected, actual []gatewayxv1a1.ListenerEntryStatus) bool {
+	t.Helper()
+
+	if len(expected) != len(actual) {
+		tlog.Logf(t, "Expected %d Gateway status listeners, got %d", len(expected), len(actual))
+		return false
+	}
+
+	for _, eListener := range expected {
+		var aListener *gatewayxv1a1.ListenerEntryStatus
+		for i := range actual {
+			if actual[i].Name == eListener.Name {
+				aListener = &actual[i]
+				break
+			}
+		}
+		if aListener == nil {
+			tlog.Logf(t, "Expected status for listener %s to be present", eListener.Name)
+			return false
+		}
+
+		if len(eListener.SupportedKinds) == 0 && len(aListener.SupportedKinds) != 0 {
+			tlog.Logf(t, "Expected list of SupportedKinds was empty, but the actual list for comparison was not:  %v",
+				aListener.SupportedKinds)
+			return false
+		}
+		// Ensure that the expected Listener.SupportedKinds items are present in actual Listener.SupportedKinds
+		// Find the items instead of performing an exact match of the slice because the implementation
+		// might support more Kinds than defined in the test
+		for _, eKind := range eListener.SupportedKinds {
+			found := false
+
+			for _, aKind := range aListener.SupportedKinds {
+				if eKind.Group == nil {
+					eKind.Group = (*gatewayv1.Group)(&gatewayv1.GroupVersion.Group)
+				}
+
+				if aKind.Group == nil {
+					aKind.Group = (*gatewayv1.Group)(&gatewayv1.GroupVersion.Group)
+				}
+
+				if *eKind.Group == *aKind.Group && eKind.Kind == aKind.Kind {
+					found = true
+					break
+				}
+			}
+			if !found {
+				tlog.Logf(t, "Expected Group:%s Kind:%s to be present in SupportedKinds", *eKind.Group, eKind.Kind)
+				return false
+			}
+		}
+
+		if aListener.AttachedRoutes != eListener.AttachedRoutes {
+			tlog.Logf(t, "Expected AttachedRoutes to be %v, got %v", eListener.AttachedRoutes, aListener.AttachedRoutes)
+			return false
+		}
+		if !conditionsMatch(t, eListener.Conditions, aListener.Conditions) {
+			tlog.Logf(t, "Expected Conditions to be %v, got %v", eListener.Conditions, aListener.Conditions)
+			return false
+		}
+	}
+
+	tlog.Logf(t, "Gateway status listeners matched expectations")
+	return true
 }
 
 func findPodConditionInList(t *testing.T, conditions []v1.PodCondition, condName, condValue string) bool {
