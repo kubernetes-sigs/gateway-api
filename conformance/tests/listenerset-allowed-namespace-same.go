@@ -19,7 +19,6 @@ package tests
 import (
 	"testing"
 
-	"github.com/stretchr/testify/require"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
@@ -83,8 +82,10 @@ var ListenerSetAllowedNamespaceSame = suite.ConformanceTest{
 		gwNN := types.NamespacedName{Name: "gateway-allows-listenerset-in-same-namespace", Namespace: ns}
 
 		// Gateway and conditions
-		gwAddr, err := kubernetes.WaitForGatewayAddress(t, suite.Client, suite.TimeoutConfig, kubernetes.NewGatewayRef(gwNN))
-		require.NoErrorf(t, err, "timed out waiting for Gateway address to be assigned")
+		routes := []types.NamespacedName{
+			{Name: "attaches-to-all-listeners", Namespace: ns},
+		}
+		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routes...)
 
 		// ListenerSet gateway-conformance-infra/listenerset-in-same-namespace is accepted since it is in the same ns as the parent gateway
 		// ListenerSet gateway-api-example-not-allowed-ns/listenerset-in-different-namespace is accepted since it is in a different ns than the parent gateway
@@ -103,9 +104,6 @@ var ListenerSetAllowedNamespaceSame = suite.ConformanceTest{
 			Reason: string(gatewayxv1a1.ListenerSetReasonProgrammed),
 		})
 
-		routes := []types.NamespacedName{
-			{Name: "attaches-to-all-listeners", Namespace: ns},
-		}
 		routeParentRefs := []gatewayv1.ParentReference{
 			gatewayToParentRef(gwNN),
 			listenerSetToParentRef(lsNN),

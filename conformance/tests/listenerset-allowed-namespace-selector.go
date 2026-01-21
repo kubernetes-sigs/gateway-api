@@ -19,7 +19,6 @@ package tests
 import (
 	"testing"
 
-	"github.com/stretchr/testify/require"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
@@ -84,8 +83,10 @@ var ListenerSetAllowedNamespaceSelector = suite.ConformanceTest{
 		gwNN := types.NamespacedName{Name: "gateway-allows-listenerset-in-selected-namespace", Namespace: ns}
 
 		// Gateway and conditions
-		gwAddr, err := kubernetes.WaitForGatewayAddress(t, suite.Client, suite.TimeoutConfig, kubernetes.NewGatewayRef(gwNN))
-		require.NoErrorf(t, err, "timed out waiting for Gateway address to be assigned")
+		routes := []types.NamespacedName{
+			{Name: "attaches-to-all-listeners", Namespace: ns},
+		}
+		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routes...)
 
 		// ListenerSet gateway-api-example-allowed-ns/listenerset-in-selected-namespace is accepted since it is in the namespace that matches the label selector defined in `allowedListeners`
 		// ListenerSet gateway-api-example-not-allowed-ns/listenerset-not-in-selected-namespace is accepted since it is not in the namespace that matches the label selector defined in `allowedListeners`
@@ -104,9 +105,6 @@ var ListenerSetAllowedNamespaceSelector = suite.ConformanceTest{
 			Reason: string(gatewayxv1a1.ListenerSetReasonProgrammed),
 		})
 
-		routes := []types.NamespacedName{
-			{Name: "attaches-to-all-listeners", Namespace: ns},
-		}
 		routeParentRefs := []gatewayv1.ParentReference{
 			gatewayToParentRef(gwNN),
 			listenerSetToParentRef(lsNN),
