@@ -80,18 +80,18 @@ var ListenerSetAllowedNamespaceSame = suite.ConformanceTest{
 			},
 		}
 
-		gwNN := types.NamespacedName{Name: "gateway-with-listenerset-http-listener", Namespace: ns}
+		gwNN := types.NamespacedName{Name: "gateway-allows-listenerset-in-same-namespace", Namespace: ns}
 
 		// Gateway and conditions
 		gwAddr, err := kubernetes.WaitForGatewayAddress(t, suite.Client, suite.TimeoutConfig, kubernetes.NewGatewayRef(gwNN))
 		require.NoErrorf(t, err, "timed out waiting for Gateway address to be assigned")
 
-		// ListenerSet gateway-conformance-infra/listenerset-with-http-listener is accepted since it is in the same ns as the parent gateway
-		// ListenerSet gateway-api-example-not-allowed-ns/enerset-not-allowed is accepted since it is in a different ns than the parent gateway
+		// ListenerSet gateway-conformance-infra/listenerset-in-same-namespace is accepted since it is in the same ns as the parent gateway
+		// ListenerSet gateway-api-example-not-allowed-ns/listenerset-in-different-namespace is accepted since it is in a different ns than the parent gateway
 		kubernetes.GatewayMustHaveAttachedListeners(t, suite.Client, suite.TimeoutConfig, gwNN, 1)
 
 		// Allowed ListenerSet, route and conditions
-		lsNN := types.NamespacedName{Name: "listenerset-with-http-listener", Namespace: ns}
+		lsNN := types.NamespacedName{Name: "listenerset-in-same-namespace", Namespace: ns}
 		kubernetes.ListenerSetMustHaveCondition(t, suite.Client, suite.TimeoutConfig, lsNN, metav1.Condition{
 			Type:   string(gatewayxv1a1.ListenerSetConditionAccepted),
 			Status: metav1.ConditionTrue,
@@ -117,7 +117,7 @@ var ListenerSetAllowedNamespaceSame = suite.ConformanceTest{
 		}
 
 		// Disallowed ListenerSet, route and conditions
-		disallowedLsNN := types.NamespacedName{Name: "listenerset-not-allowed", Namespace: "gateway-api-example-not-allowed-ns"}
+		disallowedLsNN := types.NamespacedName{Name: "listenerset-in-different-namespace", Namespace: "gateway-api-example-not-allowed-ns"}
 		kubernetes.ListenerSetMustHaveCondition(t, suite.Client, suite.TimeoutConfig, disallowedLsNN, metav1.Condition{
 			Type:   string(gatewayxv1a1.ListenerSetConditionAccepted),
 			Status: metav1.ConditionFalse,

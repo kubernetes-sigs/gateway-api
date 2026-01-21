@@ -1,7 +1,7 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
-  name: gateway-with-listenerset-http-listener
+  name: gateway-allows-listenerset-in-same-namespace
   namespace: gateway-conformance-infra
 spec:
   gatewayClassName: "{GATEWAY_CLASS_NAME}"
@@ -21,13 +21,13 @@ spec:
 apiVersion: gateway.networking.x-k8s.io/v1alpha1
 kind: XListenerSet
 metadata:
-  name: listenerset-with-http-listener
+  name: listenerset-in-same-namespace
   namespace: gateway-conformance-infra
 spec:
   parentRef:
     kind: Gateway
     group: gateway.networking.k8s.io
-    name: gateway-with-listenerset-http-listener
+    name: gateway-allows-listenerset-in-same-namespace
     namespace: gateway-conformance-infra
   listeners:
   - name: listener-set-1-listener-1
@@ -55,13 +55,13 @@ metadata:
 apiVersion: gateway.networking.x-k8s.io/v1alpha1
 kind: XListenerSet
 metadata:
-  name: listenerset-not-allowed
+  name: listenerset-in-different-namespace
   namespace: gateway-api-example-not-allowed-ns
 spec:
   parentRef:
     kind: Gateway
     group: gateway.networking.k8s.io
-    name: gateway-with-listenerset-http-listener
+    name: gateway-allows-listenerset-in-same-namespace
     namespace: gateway-conformance-infra
   listeners:
   - name: listener-set-2-listener-1
@@ -86,15 +86,15 @@ metadata:
   namespace: gateway-conformance-infra
 spec:
   parentRefs:
-  - name: gateway-with-listenerset-http-listener
+  - name: gateway-allows-listenerset-in-same-namespace
     namespace: gateway-conformance-infra
   - kind: XListenerSet
     group: gateway.networking.x-k8s.io
-    name: listenerset-with-http-listener
+    name: listenerset-in-same-namespace
     namespace: gateway-conformance-infra
   - kind: XListenerSet
     group: gateway.networking.x-k8s.io
-    name: listenerset-not-allowed
+    name: listenerset-in-different-namespace
     namespace: gateway-api-example-not-allowed-ns
   rules:
   - matches:
