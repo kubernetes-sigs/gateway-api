@@ -713,6 +713,9 @@ spec:
     - jsonPath: .metadata.creationTimestamp
       name: Age
       type: date
+    deprecated: true
+    deprecationWarning: The v1alpha2 version of TLSRoute has been deprecated and will
+      be removed in a future release of the API. Please upgrade to v1.
     name: v1alpha2
     schema:
       openAPIV3Schema:
@@ -1415,6 +1418,9 @@ spec:
     - jsonPath: .metadata.creationTimestamp
       name: Age
       type: date
+    deprecated: true
+    deprecationWarning: The v1alpha3 version of TLSRoute has been deprecated and will
+      be removed in a future release of the API. Please upgrade to v1.
     name: v1alpha3
     schema:
       openAPIV3Schema:

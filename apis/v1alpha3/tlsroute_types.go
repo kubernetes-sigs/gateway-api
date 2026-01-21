@@ -27,6 +27,7 @@ import (
 // +kubebuilder:resource:categories=gateway-api
 // +kubebuilder:subresource:status
 // +kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
+// +kubebuilder:deprecatedversion:warning="The v1alpha3 version of TLSRoute has been deprecated and will be removed in a future release of the API. Please upgrade to v1."
 
 // The TLSRoute resource is similar to TCPRoute, but can be configured
 // to match against TLS-specific metadata. This allows more flexibility
