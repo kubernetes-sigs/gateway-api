@@ -109,8 +109,18 @@ var ListenerSetHostnameConflict = suite.ConformanceTest{
 				Status: metav1.ConditionTrue,
 				Reason: "", // any reason
 			},
+			{
+				Type:   string(gatewayv1.ListenerConditionConflicted),
+				Status: metav1.ConditionFalse,
+				Reason: string(gatewayv1.ListenerReasonNoConflicts),
+			},
 		}
 		hostnameConflictedListenerConditions := []metav1.Condition{
+			{
+				Type:   string(gatewayv1.ListenerConditionResolvedRefs),
+				Status: metav1.ConditionTrue,
+				Reason: "", // any reason
+			},
 			{
 				Type:   string(gatewayv1.ListenerConditionAccepted),
 				Status: metav1.ConditionFalse,
