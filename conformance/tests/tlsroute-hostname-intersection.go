@@ -50,7 +50,7 @@ var TLSRouteHostnameIntersection = suite.ConformanceTest{
 
 		t.Run("TLSRoutes with wildcard hostname intersects with exact listener hostname", func(t *testing.T) {
 			routeNN := types.NamespacedName{Namespace: ns, Name: "tlsroute-more-specific-wildcard-hostname"}
-			gwNN := types.NamespacedName{Name: "gateway-exact-hostname", Namespace: ns}
+			gwNN := types.NamespacedName{Name: "gateway-tlsroute-exact-hostname-intersection", Namespace: ns}
 			gwAddr, _ := kubernetes.GatewayAndTLSRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
 
 			kubernetes.TLSRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN)
@@ -72,7 +72,7 @@ var TLSRouteHostnameIntersection = suite.ConformanceTest{
 
 		t.Run("TLSRoutes with exact hostname intersects with wildcard listener hostname", func(t *testing.T) {
 			routeNN := types.NamespacedName{Namespace: ns, Name: "tlsroute-exact-hostname"}
-			gwNN := types.NamespacedName{Name: "gateway-more-specific-wildcard-hostname", Namespace: ns}
+			gwNN := types.NamespacedName{Name: "gateway-tlsroute-more-specific-wildcard-hostname-intersection", Namespace: ns}
 			gwAddr, _ := kubernetes.GatewayAndTLSRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
 
 			kubernetes.TLSRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN)
@@ -94,7 +94,7 @@ var TLSRouteHostnameIntersection = suite.ConformanceTest{
 
 		t.Run("TLSRoute with wildcard hostname intersects with empty listener hostname", func(t *testing.T) {
 			routeNN := types.NamespacedName{Namespace: ns, Name: "tlsroute-less-specific-wildcard-hostname"}
-			gwNN := types.NamespacedName{Name: "gateway-empty-hostname", Namespace: ns}
+			gwNN := types.NamespacedName{Name: "gateway-tlsroute-empty-hostname-intersection", Namespace: ns}
 			gwAddr, _ := kubernetes.GatewayAndTLSRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
 
 			kubernetes.TLSRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN)
