@@ -1,7 +1,7 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
-  name: gateway-with-listenerset-http-listener
+  name: gateway-with-listenerset-hostname-conflict
   namespace: gateway-conformance-infra
 spec:
   gatewayClassName: "{GATEWAY_CLASS_NAME}"
@@ -16,10 +16,121 @@ spec:
     allowedRoutes:
       namespaces:
         from: All
-  - name: hostname-conflict-listener-1
+  # The following listener should be accepted based on listener precedence
+  - name: hostname-conflict-with-gateway-listener
     port: 80
     protocol: HTTP
-    hostname: "hostname-conflict-listener-1.com"
+    hostname: "hostname-conflict-with-gateway-listener.com"
+    allowedRoutes:
+      namespaces:
+        from: All
+---
+# The listener `hostname-conflict-with-gateway-listener` should be rejected but the listenerSet should be accepted since it has other valid listeners
+apiVersion: gateway.networking.x-k8s.io/v1alpha1
+kind: XListenerSet
+metadata:
+  name: listenerset-with-hostname-conflict-with-gateway-1
+  namespace: gateway-conformance-infra
+spec:
+  parentRef:
+    kind: Gateway
+    group: gateway.networking.k8s.io
+    name: gateway-with-listenerset-hostname-conflict
+    namespace: gateway-conformance-infra
+  listeners:
+  - name: listener-set-1-listener
+    port: 80
+    protocol: HTTP
+    hostname: "listener-set-1-listener.com"
+    allowedRoutes:
+      namespaces:
+        from: All
+  # The following listener should be rejected since it conflicts with the gateway listener
+  - name: hostname-conflict-with-gateway-listener
+    port: 80
+    protocol: HTTP
+    hostname: "hostname-conflict-with-gateway-listener.com"
+    allowedRoutes:
+      namespaces:
+        from: All
+  # The following listener should be accepted based on listener precedence
+  - name: hostname-conflict-with-listener-set-listener
+    port: 80
+    protocol: HTTP
+    hostname: "hostname-conflict-with-listener-set-listener.com"
+    allowedRoutes:
+      namespaces:
+        from: All
+---
+# This listenerSet should not be accepted since its only listener `hostname-conflict-with-gateway-listener` is rejected
+apiVersion: gateway.networking.x-k8s.io/v1alpha1
+kind: XListenerSet
+metadata:
+  name: listenerset-with-hostname-conflict-with-gateway-2
+  namespace: gateway-conformance-infra
+spec:
+  parentRef:
+    kind: Gateway
+    group: gateway.networking.k8s.io
+    name: gateway-with-listenerset-hostname-conflict
+    namespace: gateway-conformance-infra
+  listeners:
+  # The following listener should be rejected since it conflicts with the gateway listener
+  - name: hostname-conflict-with-gateway-listener
+    port: 80
+    protocol: HTTP
+    hostname: "hostname-conflict-with-gateway-listener.com"
+    allowedRoutes:
+      namespaces:
+        from: All
+---
+# The listener `hostname-conflict-with-listener-set-listener` should be rejected but the listenerSet should be accepted since it has other valid listeners
+apiVersion: gateway.networking.x-k8s.io/v1alpha1
+kind: XListenerSet
+metadata:
+  name: listenerset-with-hostname-conflict-with-listener-set-1
+  namespace: gateway-conformance-infra
+spec:
+  parentRef:
+    kind: Gateway
+    group: gateway.networking.k8s.io
+    name: gateway-with-listenerset-hostname-conflict
+    namespace: gateway-conformance-infra
+  listeners:
+  - name: listener-set-2-listener
+    port: 80
+    protocol: HTTP
+    hostname: "listener-set-2-listener.com"
+    allowedRoutes:
+      namespaces:
+        from: All
+  # The following listener should be rejected since it conflicts with another listenerSet's listener
+  - name: hostname-conflict-with-listener-set-listener
+    port: 80
+    protocol: HTTP
+    hostname: "hostname-conflict-with-listener-set-listener.com"
+    allowedRoutes:
+      namespaces:
+        from: All
+---
+# This listenerSet should not be accepted since its only listener `hostname-conflict-with-listener-set-listener` is rejected
+apiVersion: gateway.networking.x-k8s.io/v1alpha1
+kind: XListenerSet
+metadata:
+  name: listenerset-with-hostname-conflict-with-listener-set-2
+  namespace: gateway-conformance-infra
+spec:
+  parentRef:
+    kind: Gateway
+    group: gateway.networking.k8s.io
+    name: gateway-with-listenerset-hostname-conflict
+    namespace: gateway-conformance-infra
+  listeners:
+  # The following listener should be rejected since it conflicts with another listenerSet's listener
+  - name: hostname-conflict-with-listener-set-listener
+    port: 80
+    protocol: HTTP
+    hostname: "hostname-conflict-with-listener-set-listener.com"
     allowedRoutes:
       namespaces:
         from: All
@@ -31,7 +142,7 @@ metadata:
   namespace: gateway-conformance-infra
 spec:
   parentRefs:
-  - name: gateway-with-listenerset-http-listener
+  - name: gateway-with-listenerset-hostname-conflict
     namespace: gateway-conformance-infra
   rules:
   - matches:
@@ -42,110 +153,43 @@ spec:
     - name: infra-backend-v1
       port: 8080
 ---
-apiVersion: gateway.networking.x-k8s.io/v1alpha1
-kind: XListenerSet
-metadata:
-  name: listenerset-with-conflict-1
-  namespace: gateway-conformance-infra
-spec:
-  parentRef:
-    kind: Gateway
-    group: gateway.networking.k8s.io
-    name: gateway-with-listenerset-http-listener
-    namespace: gateway-conformance-infra
-  listeners:
-  - name: listenerset-1-listener
-    port: 80
-    protocol: HTTP
-    hostname: "listenerset-1-listener.com"
-    allowedRoutes:
-      namespaces:
-        from: All
-  - name: hostname-conflict-listener-1
-    port: 80
-    protocol: HTTP
-    hostname: "hostname-conflict-listener-1.com"
-    allowedRoutes:
-      namespaces:
-        from: All
-  - name: hostname-conflict-listener-2
-    port: 80
-    protocol: HTTP
-    hostname: "hostname-conflict-listener-2.com"
-    allowedRoutes:
-      namespaces:
-        from: All
----
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-  name: listenerset-with-conflict-1-route
+  name: listenerset-with-hostname-conflict-with-gateway-1-route
   namespace: gateway-conformance-infra
 spec:
   parentRefs:
   - kind: XListenerSet
     group: gateway.networking.x-k8s.io
-    name: listenerset-with-conflict-1
+    name: listenerset-with-hostname-conflict-with-gateway-1
     namespace: gateway-conformance-infra
   rules:
   - matches:
     - path:
         type: PathPrefix
-        value: /listenerset-1-route
+        value: /listener-set-1-route
     backendRefs:
     - name: infra-backend-v2
       port: 8080
 ---
-apiVersion: gateway.networking.x-k8s.io/v1alpha1
-kind: XListenerSet
-metadata:
-  name: listenerset-with-conflict-2
-  namespace: gateway-conformance-infra
-spec:
-  parentRef:
-    kind: Gateway
-    group: gateway.networking.k8s.io
-    name: gateway-with-listenerset-http-listener
-    namespace: gateway-conformance-infra
-  listeners:
-  - name: listenerset-2-listener
-    port: 80
-    protocol: HTTP
-    hostname: "listenerset-2-listener.com"
-    allowedRoutes:
-      namespaces:
-        from: All
-  - name: hostname-conflict-listener-1
-    port: 80
-    protocol: HTTP
-    hostname: "hostname-conflict-listener-1.com"
-    allowedRoutes:
-      namespaces:
-        from: All
-  - name: hostname-conflict-listener-2
-    port: 80
-    protocol: HTTP
-    hostname: "hostname-conflict-listener-2.com"
-    allowedRoutes:
-      namespaces:
-        from: All
----
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-  name: listenerset-with-conflict-2-route
+  name: listenerset-with-hostname-conflict-with-listener-set-1-route
   namespace: gateway-conformance-infra
 spec:
   parentRefs:
   - kind: XListenerSet
     group: gateway.networking.x-k8s.io
-    name: listenerset-with-conflict-2
+    name: listenerset-with-hostname-conflict-with-listener-set-1
     namespace: gateway-conformance-infra
   rules:
   - matches:
     - path:
         type: PathPrefix
-        value: /listenerset-2-route
+        value: /listener-set-2-route
     backendRefs:
     - name: infra-backend-v3
       port: 8080
+
