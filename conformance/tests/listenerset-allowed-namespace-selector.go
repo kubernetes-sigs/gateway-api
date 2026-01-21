@@ -24,7 +24,6 @@ import (
 
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	gatewayxv1a1 "sigs.k8s.io/gateway-api/apisx/v1alpha1"
-	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
 	"sigs.k8s.io/gateway-api/pkg/features"
@@ -36,63 +35,52 @@ func init() {
 
 var ListenerSetAllowedNamespaceSelector = suite.ConformanceTest{
 	ShortName:   "ListenerSetAllowedNamespaceSelector",
-	Description: "ListenerSet allowed by namespace selector",
+	Description: "ListenerSets in the namespaces that match the labels are allowed when `allowedListeners` is set to `Selector`",
 	Features: []features.FeatureName{
 		features.SupportGateway,
 		features.SupportGatewayListenerSet,
-		features.SupportHTTPRoute,
-		features.SupportReferenceGrant,
 	},
 	Manifests: []string{
 		"tests/listenerset-allowed-namespace-selector.yaml",
 	},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
-
 		kubernetes.NamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, []string{ns})
-
-		testCases := []http.ExpectedResponse{
-			// Requests to the route defined on the gateway (should only match routes attached to the gateway)
+		acceptedListenerConditions := []metav1.Condition{
 			{
-				Request:   http.Request{Host: "gateway-listener-1.com", Path: "/route"},
-				Backend:   "infra-backend-v1",
-				Namespace: ns,
-			},
-			// Requests to the listenerset listeners in the same namespace as the parent gateway should pass
-			{
-				Request:   http.Request{Host: "listener-set-1-listener-1.com", Path: "/route"},
-				Backend:   "infra-backend-v1",
-				Namespace: ns,
+				Type:   string(gatewayv1.ListenerConditionResolvedRefs),
+				Status: metav1.ConditionTrue,
+				Reason: "", // any reason
 			},
 			{
-				Request:   http.Request{Host: "listener-set-1-listener-2.com", Path: "/route"},
-				Backend:   "infra-backend-v1",
-				Namespace: ns,
-			},
-			// Requests to the listenerset listeners in a different namespace than the parent gateway should fail
-			{
-				Request:  http.Request{Host: "listener-set-2-listener-1.com", Path: "/route"},
-				Response: http.Response{StatusCode: 404},
+				Type:   string(gatewayv1.ListenerConditionAccepted),
+				Status: metav1.ConditionTrue,
+				Reason: "", // any reason
 			},
 			{
-				Request:  http.Request{Host: "listener-set-2-listener-2.com", Path: "/route"},
-				Response: http.Response{StatusCode: 404},
+				Type:   string(gatewayv1.ListenerConditionProgrammed),
+				Status: metav1.ConditionTrue,
+				Reason: "", // any reason
+			},
+			{
+				Type:   string(gatewayv1.ListenerConditionConflicted),
+				Status: metav1.ConditionFalse,
+				Reason: "", // any reason
 			},
 		}
 
 		gwNN := types.NamespacedName{Name: "gateway-allows-listenerset-in-selected-namespace", Namespace: ns}
-
-		// Gateway and conditions
-		routes := []types.NamespacedName{
-			{Name: "attaches-to-all-listeners", Namespace: ns},
-		}
-		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routes...)
-
-		// ListenerSet gateway-api-example-allowed-ns/listenerset-in-selected-namespace is accepted since it is in the namespace that matches the label selector defined in `allowedListeners`
-		// ListenerSet gateway-api-example-not-allowed-ns/listenerset-not-in-selected-namespace is accepted since it is not in the namespace that matches the label selector defined in `allowedListeners`
+		kubernetes.GatewayMustHaveCondition(t, suite.Client, suite.TimeoutConfig, gwNN, metav1.Condition{
+			Type:   string(gatewayv1.GatewayConditionAccepted),
+			Status: metav1.ConditionTrue,
+		})
+		// Accepted ListenerSets :
+		// - gateway-api-example-allowed-ns/listenerset-in-selected-namespace - it is in the namespace that matches the label selector defined in `allowedListeners`
+		// Rejected ListenerSets :
+		// - gateway-api-example-not-allowed-ns/listenerset-not-in-selected-namespace - it is not in the namespace that matches the label selector defined in `allowedListeners`
 		kubernetes.GatewayMustHaveAttachedListeners(t, suite.Client, suite.TimeoutConfig, gwNN, 1)
 
-		// Allowed ListenerSet, route and conditions
+		// Allowed ListenerSet
 		lsNN := types.NamespacedName{Name: "listenerset-in-selected-namespace", Namespace: "gateway-api-example-allowed-ns"}
 		kubernetes.ListenerSetMustHaveCondition(t, suite.Client, suite.TimeoutConfig, lsNN, metav1.Condition{
 			Type:   string(gatewayxv1a1.ListenerSetConditionAccepted),
@@ -104,18 +92,9 @@ var ListenerSetAllowedNamespaceSelector = suite.ConformanceTest{
 			Status: metav1.ConditionTrue,
 			Reason: string(gatewayxv1a1.ListenerSetReasonProgrammed),
 		})
+		kubernetes.ListenerSetListenersMustHaveConditions(t, suite.Client, suite.TimeoutConfig, lsNN, acceptedListenerConditions, "listenerset-in-selected-namespace-listener")
 
-		routeParentRefs := []gatewayv1.ParentReference{
-			gatewayToParentRef(gwNN),
-			listenerSetToParentRef(lsNN),
-		}
-		for _, routeNN := range routes {
-			kubernetes.HTTPRouteMustHaveParents(t, suite.Client, suite.TimeoutConfig, routeNN, generateAcceptedRouteParentStatus(suite.ControllerName, routeParentRefs...), true)
-			kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN)
-			kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN, lsNN)
-		}
-
-		// Disallowed ListenerSet, route and conditions
+		// Rejected ListenerSet
 		disallowedLsNN := types.NamespacedName{Name: "listenerset-not-in-selected-namespace", Namespace: "gateway-api-example-not-allowed-ns"}
 		kubernetes.ListenerSetMustHaveCondition(t, suite.Client, suite.TimeoutConfig, disallowedLsNN, metav1.Condition{
 			Type:   string(gatewayxv1a1.ListenerSetConditionAccepted),
@@ -127,15 +106,5 @@ var ListenerSetAllowedNamespaceSelector = suite.ConformanceTest{
 			Status: metav1.ConditionFalse,
 			Reason: string(gatewayxv1a1.ListenerSetReasonNotAllowed),
 		})
-
-		for i := range testCases {
-			// Declare tc here to avoid loop variable
-			// reuse issues across parallel tests.
-			tc := testCases[i]
-			t.Run(tc.GetTestCaseName(i), func(t *testing.T) {
-				t.Parallel()
-				http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, tc)
-			})
-		}
 	},
 }

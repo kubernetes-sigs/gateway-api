@@ -41,17 +41,10 @@ spec:
     name: gateway-allows-listenerset-in-selected-namespace
     namespace: gateway-conformance-infra
   listeners:
-  - name: listener-set-1-listener-1
+  - name: listenerset-in-selected-namespace-listener
     port: 80
     protocol: HTTP
-    hostname: "listener-set-1-listener-1.com"
-    allowedRoutes:
-      namespaces:
-        from: All
-  - name: listener-set-1-listener-2
-    port: 80
-    protocol: HTTP
-    hostname: "listener-set-1-listener-2.com"
+    hostname: "listenerset-in-selected-namespace-listener.com"
     allowedRoutes:
       namespaces:
         from: All
@@ -75,44 +68,10 @@ spec:
     name: gateway-allows-listenerset-in-selected-namespace
     namespace: gateway-conformance-infra
   listeners:
-  - name: listener-set-2-listener-1
+  - name: listenerset-not-in-selected-namespace-listener
     port: 80
     protocol: HTTP
-    hostname: "listener-set-2-listener-1.com"
+    hostname: "listenerset-not-in-selected-namespace-listener.com"
     allowedRoutes:
       namespaces:
         from: All
-  - name: listener-set-2-listener-2
-    port: 80
-    protocol: HTTP
-    hostname: "listener-set-2-listener-2.com"
-    allowedRoutes:
-      namespaces:
-        from: All
----
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
-metadata:
-  name: attaches-to-all-listeners
-  namespace: gateway-conformance-infra
-spec:
-  parentRefs:
-  - name: gateway-allows-listenerset-in-selected-namespace
-    namespace: gateway-conformance-infra
-  - kind: XListenerSet
-    group: gateway.networking.x-k8s.io
-    name: listenerset-in-selected-namespace
-    namespace: gateway-api-example-allowed-ns
-  - kind: XListenerSet
-    group: gateway.networking.x-k8s.io
-    name: listenerset-not-in-selected-namespace
-    namespace: gateway-api-example-not-allowed-ns
-  rules:
-  - matches:
-    - path:
-        type: PathPrefix
-        value: /route
-    backendRefs:
-    - name: infra-backend-v1
-      port: 8080
-

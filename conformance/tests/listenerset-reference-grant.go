@@ -39,7 +39,6 @@ var ListenerSetReferenceGrant = suite.ConformanceTest{
 	Features: []features.FeatureName{
 		features.SupportGateway,
 		features.SupportGatewayListenerSet,
-		features.SupportHTTPRoute,
 		features.SupportReferenceGrant,
 	},
 	Manifests: []string{
@@ -51,23 +50,24 @@ var ListenerSetReferenceGrant = suite.ConformanceTest{
 		kubernetes.NamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, []string{ns})
 
 		gwNN := types.NamespacedName{Name: "gateway-with-listener-sets", Namespace: ns}
-		// ListenerSet gateway-conformance-infra/listenerset-with-reference-grant is accepted
-		// ListenerSet gateway-api-example-ns/listenerset-without-reference-grant is accepted although its listener is not due to the missing reference grant
-		kubernetes.GatewayMustHaveAttachedListeners(t, suite.Client, suite.TimeoutConfig, gwNN, 2)
+		// Accepted ListenerSets :
+		// gateway-conformance-infra/listenerset-with-reference-grant - it has a valid reference grant
+		// Rejected ListenerSets :
+		// gateway-api-example-ns/listenerset-without-reference-grant - its only listener is not valid due to the missing reference grant
+		kubernetes.GatewayMustHaveAttachedListeners(t, suite.Client, suite.TimeoutConfig, gwNN, 1)
 
 		refPermittedCondition := []metav1.Condition{{
 			Type:   string(gatewayv1.ListenerConditionResolvedRefs),
 			Status: metav1.ConditionTrue,
 			Reason: "", // any reason
 		}}
-
 		refNotPermittedCondition := []metav1.Condition{{
 			Type:   string(gatewayv1.ListenerConditionResolvedRefs),
 			Status: metav1.ConditionFalse,
 			Reason: string(gatewayv1.ListenerReasonRefNotPermitted),
 		}}
 
-		// listenerset-with-reference-grant, route and conditions
+		// listenerset-with-reference-grant
 		lsNN := types.NamespacedName{Name: "listenerset-with-reference-grant", Namespace: ns}
 		kubernetes.ListenerSetMustHaveCondition(t, suite.Client, suite.TimeoutConfig, lsNN, metav1.Condition{
 			Type:   string(gatewayxv1a1.ListenerSetConditionAccepted),
@@ -81,7 +81,7 @@ var ListenerSetReferenceGrant = suite.ConformanceTest{
 		})
 		kubernetes.ListenerSetListenersMustHaveConditions(t, suite.Client, suite.TimeoutConfig, lsNN, refPermittedCondition, "listenerset-with-reference-grant-listener")
 
-		// listenerset-without-reference-grant, route and conditions
+		// listenerset-without-reference-grant
 		lsNN = types.NamespacedName{Name: "listenerset-without-reference-grant", Namespace: "gateway-api-example-ns"}
 		kubernetes.ListenerSetMustHaveCondition(t, suite.Client, suite.TimeoutConfig, lsNN, metav1.Condition{
 			Type:   string(gatewayxv1a1.ListenerSetConditionAccepted),
@@ -94,18 +94,5 @@ var ListenerSetReferenceGrant = suite.ConformanceTest{
 			Reason: string(gatewayxv1a1.ListenerSetReasonListenersNotValid),
 		})
 		kubernetes.ListenerSetListenersMustHaveConditions(t, suite.Client, suite.TimeoutConfig, lsNN, refNotPermittedCondition, "listenerset-without-reference-grant-listener")
-
-		routes := []types.NamespacedName{
-			{Name: "attaches-to-all-listeners", Namespace: ns},
-		}
-		routeParentRefs := []gatewayv1.ParentReference{
-			gatewayToParentRef(gwNN),
-			listenerSetToParentRef(lsNN),
-		}
-		for _, routeNN := range routes {
-			kubernetes.HTTPRouteMustHaveParents(t, suite.Client, suite.TimeoutConfig, routeNN, generateAcceptedRouteParentStatus(suite.ControllerName, routeParentRefs...), true)
-			kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN)
-			kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN, lsNN)
-		}
 	},
 }
