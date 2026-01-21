@@ -366,8 +366,11 @@ func GatewayMustHaveAttachedListeners(t *testing.T, client client.Client, timeou
 			return false, nil
 		}
 
-		if gw.Status.AttachedListenerSets == nil && count == 0 {
-			return true, nil
+		if gw.Status.AttachedListenerSets == nil {
+			if count == 0 {
+				return true, nil
+			}
+			return false, nil
 		}
 
 		gotStatus = &gw.Status
@@ -772,37 +775,37 @@ func TLSRouteMustHaveParents(t *testing.T, client client.Client, timeoutConfig c
 func parentsForRouteMatch(t *testing.T, routeName types.NamespacedName, expected, actual []gatewayv1.RouteParentStatus, namespaceRequired bool) bool {
 	t.Helper()
 
-	if len(expected) != len(actual) {
-		tlog.Logf(t, "Route %s expected %d Parents got %d", routeName, len(expected), len(actual))
-		return false
-	}
-
-	// TODO(robscott): Allow for arbitrarily ordered parents
-	for i, eParent := range expected {
-		aParent := actual[i]
-		if aParent.ControllerName != eParent.ControllerName {
-			tlog.Logf(t, "Route %s ControllerName doesn't match", routeName)
-			return false
-		}
-		if !reflect.DeepEqual(aParent.ParentRef.Group, eParent.ParentRef.Group) {
-			tlog.Logf(t, "Route %s expected ParentReference.Group to be %v, got %v", routeName, ptr.Deref(eParent.ParentRef.Group, gatewayv1.Group(gatewayv1.GroupVersion.Group)), ptr.Deref(eParent.ParentRef.Group, gatewayv1.Group(gatewayv1.GroupVersion.Group)))
-			return false
-		}
-		if !reflect.DeepEqual(aParent.ParentRef.Kind, eParent.ParentRef.Kind) {
-			tlog.Logf(t, "Route %s expected ParentReference.Kind to be %v, got %v", routeName, ptr.Deref(eParent.ParentRef.Kind, GatewayKind), ptr.Deref(eParent.ParentRef.Kind, GatewayKind))
-			return false
-		}
-		if aParent.ParentRef.Name != eParent.ParentRef.Name {
-			tlog.Logf(t, "Route %s ParentReference.Name doesn't match", routeName)
-			return false
-		}
-		if !reflect.DeepEqual(aParent.ParentRef.Namespace, eParent.ParentRef.Namespace) {
-			if namespaceRequired || aParent.ParentRef.Namespace != nil {
-				tlog.Logf(t, "Route %s expected ParentReference.Namespace to be %v, got %v", routeName, eParent.ParentRef.Namespace, aParent.ParentRef.Namespace)
-				return false
+	for _, eParent := range expected {
+		matched := false
+		for _, aParent := range actual {
+			if aParent.ControllerName != eParent.ControllerName {
+				tlog.Logf(t, "Route %s ControllerName doesn't match", routeName)
+				continue
 			}
+			if !reflect.DeepEqual(aParent.ParentRef.Group, eParent.ParentRef.Group) {
+				tlog.Logf(t, "Route %s expected ParentReference.Group to be %v, got %v", routeName, ptr.Deref(eParent.ParentRef.Group, gatewayv1.Group(gatewayv1.GroupVersion.Group)), ptr.Deref(eParent.ParentRef.Group, gatewayv1.Group(gatewayv1.GroupVersion.Group)))
+				continue
+			}
+			if !reflect.DeepEqual(aParent.ParentRef.Kind, eParent.ParentRef.Kind) {
+				tlog.Logf(t, "Route %s expected ParentReference.Kind to be %v, got %v", routeName, ptr.Deref(eParent.ParentRef.Kind, GatewayKind), ptr.Deref(eParent.ParentRef.Kind, GatewayKind))
+				continue
+			}
+			if aParent.ParentRef.Name != eParent.ParentRef.Name {
+				tlog.Logf(t, "Route %s ParentReference.Name doesn't match", routeName)
+				continue
+			}
+			if !reflect.DeepEqual(aParent.ParentRef.Namespace, eParent.ParentRef.Namespace) {
+				if namespaceRequired || aParent.ParentRef.Namespace != nil {
+					tlog.Logf(t, "Route %s expected ParentReference.Namespace to be %v, got %v", routeName, eParent.ParentRef.Namespace, aParent.ParentRef.Namespace)
+					continue
+				}
+			}
+			if !conditionsMatch(t, eParent.Conditions, aParent.Conditions) {
+				continue
+			}
+			matched = true
 		}
-		if !conditionsMatch(t, eParent.Conditions, aParent.Conditions) {
+		if matched == false {
 			return false
 		}
 	}
