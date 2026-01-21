@@ -49,14 +49,14 @@ spec:
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: gateway-api-example-ns1
+  name: gateway-api-example-not-allowed-ns
 ---
 # This listenerSet should not be accepted since it is in a different namespace than the gateway but the Gateway only allows ListenerSets in the same namespace.
 apiVersion: gateway.networking.x-k8s.io/v1alpha1
 kind: XListenerSet
 metadata:
   name: listenerset-not-allowed
-  namespace: gateway-api-example-ns1
+  namespace: gateway-api-example-not-allowed-ns
 spec:
   parentRef:
     kind: Gateway
@@ -95,7 +95,7 @@ spec:
   - kind: XListenerSet
     group: gateway.networking.x-k8s.io
     name: listenerset-not-allowed
-    namespace: gateway-api-example-ns1
+    namespace: gateway-api-example-not-allowed-ns
   rules:
   - matches:
     - path:

@@ -87,7 +87,7 @@ var ListenerSetAllowedNamespaceSame = suite.ConformanceTest{
 		require.NoErrorf(t, err, "timed out waiting for Gateway address to be assigned")
 
 		// ListenerSet gateway-conformance-infra/listenerset-with-http-listener is accepted since it is in the same ns as the parent gateway
-		// ListenerSet gateway-api-example-ns1/enerset-not-allowed is accepted since it is in a different ns than the parent gateway
+		// ListenerSet gateway-api-example-not-allowed-ns/enerset-not-allowed is accepted since it is in a different ns than the parent gateway
 		kubernetes.GatewayMustHaveAttachedListeners(t, suite.Client, suite.TimeoutConfig, gwNN, 1)
 
 		// Allowed ListenerSet, route and conditions
@@ -117,7 +117,7 @@ var ListenerSetAllowedNamespaceSame = suite.ConformanceTest{
 		}
 
 		// Disallowed ListenerSet, route and conditions
-		disallowedLsNN := types.NamespacedName{Name: "listenerset-not-allowed", Namespace: "gateway-api-example-ns1"}
+		disallowedLsNN := types.NamespacedName{Name: "listenerset-not-allowed", Namespace: "gateway-api-example-not-allowed-ns"}
 		kubernetes.ListenerSetMustHaveCondition(t, suite.Client, suite.TimeoutConfig, disallowedLsNN, metav1.Condition{
 			Type:   string(gatewayxv1a1.ListenerSetConditionAccepted),
 			Status: metav1.ConditionFalse,
