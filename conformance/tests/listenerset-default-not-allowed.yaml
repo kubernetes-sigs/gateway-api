@@ -6,10 +6,10 @@ metadata:
 spec:
   gatewayClassName: "{GATEWAY_CLASS_NAME}"
   listeners:
-  - name: gateway-listener-1
+  - name: gateway-listener
     port: 80
     protocol: HTTP
-    hostname: "gateway-listener-1.com"
+    hostname: "gateway-listener.com"
     allowedRoutes:
       namespaces:
         from: All
