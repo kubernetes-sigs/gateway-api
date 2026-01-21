@@ -776,7 +776,7 @@ func parentsForRouteMatch(t *testing.T, routeName types.NamespacedName, expected
 	t.Helper()
 
 	for _, eParent := range expected {
-		matched := false
+		parentMatched := false
 		for _, aParent := range actual {
 			if aParent.ControllerName != eParent.ControllerName {
 				tlog.Logf(t, "Route %s ControllerName doesn't match", routeName)
@@ -803,9 +803,9 @@ func parentsForRouteMatch(t *testing.T, routeName types.NamespacedName, expected
 			if !conditionsMatch(t, eParent.Conditions, aParent.Conditions) {
 				continue
 			}
-			matched = true
+			parentMatched = true
 		}
-		if matched == false {
+		if !parentMatched {
 			return false
 		}
 	}
