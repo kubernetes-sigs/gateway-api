@@ -366,15 +366,9 @@ func GatewayMustHaveAttachedListeners(t *testing.T, client client.Client, timeou
 			return false, nil
 		}
 
-		if gw.Status.AttachedListenerSets == nil {
-			if count == 0 {
-				return true, nil
-			}
-			return false, nil
-		}
-
 		gotStatus = &gw.Status
-		return *gw.Status.AttachedListenerSets == count, nil
+		attachedListenerSets := ptr.Deref(gw.Status.AttachedListenerSets, 0)
+		return attachedListenerSets == count, nil
 	})
 	if waitErr != nil {
 		tlog.Errorf(t, "Error waiting for gateway, got Gateway Status %v, want zero listeners or exactly 1 listener with zero routes", gotStatus)
