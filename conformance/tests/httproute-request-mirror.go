@@ -17,7 +17,6 @@ limitations under the License.
 package tests
 
 import (
-	"fmt"
 	"testing"
 
 	"k8s.io/apimachinery/pkg/types"

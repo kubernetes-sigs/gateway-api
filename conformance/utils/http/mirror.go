@@ -17,6 +17,7 @@ limitations under the License.
 package http //nolint:revive
 
 import (
+	"fmt"
 	"regexp"
 	"sync"
 	"testing"
@@ -32,6 +33,13 @@ import (
 )
 
 func ExpectMirroredRequest(t *testing.T, client client.Client, clientset clientset.Interface, mirrorPods []MirroredBackend, path string, timeoutConfig config.TimeoutConfig) {
+	logPattern := fmt.Sprintf("Echoing back request made t \\%s to client", path)
+	ExpectMirroredRequestWithPattern(t, client, clientset, mirrorPods, logPattern, timeoutConfig)
+}
+
+// ExpectMirroredRequestWithPattern validates that requests were mirrored to the specified backends
+// by checking for the given log pattern in the backend pod logs.
+func ExpectMirroredRequestWithPattern(t *testing.T, client client.Client, clientset clientset.Interface, mirrorPods []MirroredBackend, logPattern string, timeoutConfig config.TimeoutConfig) {
 	for i, mirrorPod := range mirrorPods {
 		if mirrorPod.Name == "" {
 			tlog.Fatalf(t, "Mirrored BackendRef[%d].Name wasn't provided in the testcase, this test should only validate request mirroring.", i)
