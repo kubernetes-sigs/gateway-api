@@ -19,14 +19,20 @@ limitations under the License.
 package v1alpha2
 
 import (
+	apisv1 "sigs.k8s.io/gateway-api/apis/v1"
 	v1 "sigs.k8s.io/gateway-api/applyconfiguration/apis/v1"
 )
 
 // UDPRouteSpecApplyConfiguration represents a declarative configuration of the UDPRouteSpec type for use
 // with apply.
+//
+// UDPRouteSpec defines the desired state of UDPRoute.
 type UDPRouteSpecApplyConfiguration struct {
 	v1.CommonRouteSpecApplyConfiguration `json:",inline"`
-	Rules                                []UDPRouteRuleApplyConfiguration `json:"rules,omitempty"`
+	// Rules are a list of UDP matchers and actions.
+	//
+	// <gateway:experimental:validation:XValidation:message="Rule name must be unique within the route",rule="self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name) && l1.name == l2.name))">
+	Rules []UDPRouteRuleApplyConfiguration `json:"rules,omitempty"`
 }
 
 // UDPRouteSpecApplyConfiguration constructs a declarative configuration of the UDPRouteSpec type for use with
@@ -45,6 +51,14 @@ func (b *UDPRouteSpecApplyConfiguration) WithParentRefs(values ...*v1.ParentRefe
 		}
 		b.CommonRouteSpecApplyConfiguration.ParentRefs = append(b.CommonRouteSpecApplyConfiguration.ParentRefs, *values[i])
 	}
+	return b
+}
+
+// WithUseDefaultGateways sets the UseDefaultGateways field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the UseDefaultGateways field is set to the value of the last call.
+func (b *UDPRouteSpecApplyConfiguration) WithUseDefaultGateways(value apisv1.GatewayDefaultScope) *UDPRouteSpecApplyConfiguration {
+	b.CommonRouteSpecApplyConfiguration.UseDefaultGateways = &value
 	return b
 }
 

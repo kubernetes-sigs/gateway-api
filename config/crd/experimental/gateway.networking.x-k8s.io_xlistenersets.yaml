@@ -3,9 +3,8 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     api-approved.kubernetes.io: https://github.com/kubernetes-sigs/gateway-api/pull/3328
-    gateway.networking.k8s.io/bundle-version: v1.3.0
+    gateway.networking.k8s.io/bundle-version: v1.4.1
     gateway.networking.k8s.io/channel: experimental
-  creationTimestamp: null
   name: xlistenersets.gateway.networking.x-k8s.io
 spec:
   group: gateway.networking.x-k8s.io
@@ -56,11 +55,12 @@ spec:
           - A ListenerSet can reference secrets/backends in its own namespace without a ReferenceGrant
 
           Gateway Integration:
-          - The parent Gateway's status will include an "AttachedListenerSets" condition
-          - This condition will be:
-            - True: when AllowedListeners is set and at least one child ListenerSet is attached
-            - False: when AllowedListeners is set but no valid listeners are attached, or when AllowedListeners is not set or false
-            - Unknown: when no AllowedListeners config is present
+            - The parent Gateway's status will include "AttachedListenerSets"
+              which is the count of ListenerSets that have successfully attached to a Gateway
+              A ListenerSet is successfully attached to a Gateway when all the following conditions are met:
+            - The ListenerSet is selected by the Gateway's AllowedListeners field
+            - The ListenerSet has a valid ParentRef selecting the Gateway
+            - The ListenerSet's status has the condition "Accepted: true"
         properties:
           apiVersion:
             description: |-
@@ -297,18 +297,12 @@ spec:
                       pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                       type: string
                     port:
-                      default: 0
                       description: |-
                         Port is the network port. Multiple listeners may use the
                         same port, subject to the Listener compatibility rules.
-
-                        If the port is not set or specified as zero, the implementation will assign
-                        a unique port. If the implementation does not support dynamic port
-                        assignment, it MUST set `Accepted` condition to `False` with the
-                        `UnsupportedPort` reason.
                       format: int32
                       maximum: 65535
-                      minimum: 0
+                      minimum: 1
                       type: integer
                     protocol:
                       description: Protocol specifies the network protocol this listener
@@ -323,7 +317,7 @@ spec:
                         the Protocol field is "HTTPS" or "TLS". It is invalid to set this field
                         if the Protocol field is "HTTP", "TCP", or "UDP".
 
-                        The association of SNIs to Certificate defined in GatewayTLSConfig is
+                        The association of SNIs to Certificate defined in ListenerTLSConfig is
                         defined based on the Hostname field for this listener.
 
                         The GatewayClass MUST use the longest matching SNI out of all
@@ -409,96 +403,6 @@ spec:
                           maxItems: 64
                           type: array
                           x-kubernetes-list-type: atomic
-                        frontendValidation:
-                          description: |-
-                            FrontendValidation holds configuration information for validating the frontend (client).
-                            Setting this field will require clients to send a client certificate
-                            required for validation during the TLS handshake. In browsers this may result in a dialog appearing
-                            that requests a user to specify the client certificate.
-                            The maximum depth of a certificate chain accepted in verification is Implementation specific.
-
-                            Support: Extended
-                          properties:
-                            caCertificateRefs:
-                              description: |-
-                                CACertificateRefs contains one or more references to
-                                Kubernetes objects that contain TLS certificates of
-                                the Certificate Authorities that can be used
-                                as a trust anchor to validate the certificates presented by the client.
-
-                                A single CA certificate reference to a Kubernetes ConfigMap
-                                has "Core" support.
-                                Implementations MAY choose to support attaching multiple CA certificates to
-                                a Listener, but this behavior is implementation-specific.
-
-                                Support: Core - A single reference to a Kubernetes ConfigMap
-                                with the CA certificate in a key named `ca.crt`.
-
-                                Support: Implementation-specific (More than one reference, or other kinds
-                                of resources).
-
-                                References to a resource in a different namespace are invalid UNLESS there
-                                is a ReferenceGrant in the target namespace that allows the certificate
-                                to be attached. If a ReferenceGrant does not allow this reference, the
-                                "ResolvedRefs" condition MUST be set to False for this listener with the
-                                "RefNotPermitted" reason.
-                              items:
-                                description: |-
-                                  ObjectReference identifies an API object including its namespace.
-
-                                  The API object must be valid in the cluster; the Group and Kind must
-                                  be registered in the cluster for this reference to be valid.
-
-                                  References to objects with invalid Group and Kind are not valid, and must
-                                  be rejected by the implementation, with appropriate Conditions set
-                                  on the containing object.
-                                properties:
-                                  group:
-                                    description: |-
-                                      Group is the group of the referent. For example, "gateway.networking.k8s.io".
-                                      When set to the empty string, core API group is inferred.
-                                    maxLength: 253
-                                    pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
-                                    type: string
-                                  kind:
-                                    description: Kind is kind of the referent. For
-                                      example "ConfigMap" or "Service".
-                                    maxLength: 63
-                                    minLength: 1
-                                    pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
-                                    type: string
-                                  name:
-                                    description: Name is the name of the referent.
-                                    maxLength: 253
-                                    minLength: 1
-                                    type: string
-                                  namespace:
-                                    description: |-
-                                      Namespace is the namespace of the referenced object. When unspecified, the local
-                                      namespace is inferred.
-
-                                      Note that when a namespace different than the local namespace is specified,
-                                      a ReferenceGrant object is required in the referent namespace to allow that
-                                      namespace's owner to accept the reference. See the ReferenceGrant
-                                      documentation for details.
-
-                                      Support: Core
-                                    maxLength: 63
-                                    minLength: 1
-                                    pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
-                                    type: string
-                                required:
-                                - group
-                                - kind
-                                - name
-                                type: object
-                              maxItems: 8
-                              minItems: 1
-                              type: array
-                              x-kubernetes-list-type: atomic
-                          required:
-                          - caCertificateRefs
-                          type: object
                         mode:
                           default: Terminate
                           description: |-
@@ -550,6 +454,7 @@ spec:
                           > 0 || size(self.options) > 0 : true'
                   required:
                   - name
+                  - port
                   - protocol
                   type: object
                 maxItems: 64
@@ -731,10 +636,13 @@ spec:
                         AND the Route has a valid ParentRef selecting the whole Gateway
                         resource or a specific Listener as a parent resource (more detail on
                         attachment semantics can be found in the documentation on the various
-                        Route kinds ParentRefs fields). Listener or Route status does not impact
+                        Route kinds ParentRefs fields). Listener status does not impact
                         successful attachment, i.e. the AttachedRoutes field count MUST be set
-                        for Listeners with condition Accepted: false and MUST count successfully
-                        attached Routes that may themselves have Accepted: false conditions.
+                        for Listeners, even if the Accepted condition of an individual Listener is set
+                        to "False". The AttachedRoutes number represents the number of Routes with
+                        the Accepted condition set to "True" that have been attached to this Listener.
+                        Routes with any other value for the Accepted condition MUST NOT be included
+                        in this count.
 
                         Uses for this field include troubleshooting Route attachment and
                         measuring blast radius/impact of changes to a Listener.
@@ -810,17 +718,10 @@ spec:
                       minLength: 1
                       pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                       type: string
-                    port:
-                      description: Port is the network port the listener is configured
-                        to listen on.
-                      format: int32
-                      maximum: 65535
-                      minimum: 1
-                      type: integer
                     supportedKinds:
                       description: |-
                         SupportedKinds is the list indicating the Kinds supported by this
-                        listener. This MUST represent the kinds an implementation supports for
+                        listener. This MUST represent the kinds supported by an implementation for
                         that Listener configuration.
 
                         If kinds are specified in Spec that are not supported, they MUST NOT
@@ -854,7 +755,6 @@ spec:
                   - attachedRoutes
                   - conditions
                   - name
-                  - port
                   - supportedKinds
                   type: object
                 maxItems: 64

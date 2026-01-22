@@ -39,7 +39,7 @@ in the `to` list because a ReferenceGrant can only be used to allow references
 to resources in the same namespace as the ReferenceGrant.
 
 ## Example
-The following example shows how a HTTPRoute in namespace `foo` can reference a
+The following example shows how an HTTPRoute in namespace `foo` can reference a
 Service in namespace `bar`. In this example a ReferenceGrant in the `bar`
 namespace explicitly allows references to Services from HTTPRoutes in the `foo`
 namespace.
@@ -90,7 +90,7 @@ While the API is simplistic in nature, it comes with a few notable decisions:
    other. This makes it impossible for them to conflict with each other.
 
 Please see the [API
-Specification](../reference/spec.md#gateway.networking.k8s.io/v1alpha2.ReferenceGrant)
+Specification](../reference/spec.md#referencegrant)
 for more details on how specific ReferenceGrant fields are interpreted.
 
 ## Implementation Guidelines

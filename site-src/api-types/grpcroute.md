@@ -272,12 +272,12 @@ Multiple GRPCRoutes can be attached to a single Gateway resource. Importantly,
 only one Route rule may match each request. For more information on how conflict
 resolution applies to merging, refer to the [API specification][grpcrouterule].
 
-[grpcroute]: ../reference/spec.md#gateway.networking.k8s.io/v1.GRPCRoute
-[grpcrouterule]: ../reference/spec.md#gateway.networking.k8s.io/v1.GRPCRouteRule
-[hostname]: ../reference/spec.md#gateway.networking.k8s.io/v1.Hostname
+[grpcroute]: ../reference/spec.md#grpcroute
+[grpcrouterule]: ../reference/spec.md#grpcrouterule
+[hostname]: ../reference/spec.md#hostname
 [rfc-3986]: https://tools.ietf.org/html/rfc3986
-[matches]: ../reference/spec.md#gateway.networking.k8s.io/v1.GRPCRouteMatch
-[filters]: ../reference/spec.md#gateway.networking.k8s.io/v1.GRPCRouteFilter
-[backendRef]: ../reference/spec.md#gateway.networking.k8s.io/v1.GRPCBackendRef
-[parentRef]: ../reference/spec.md#gateway.networking.k8s.io/v1.ParentRef
-[name]: ../reference/spec.md#gateway.networking.k8s.io/v1.SectionName
+[matches]: ../reference/spec.md#grpcroutematch
+[filters]: ../reference/spec.md#grpcroutefilter
+[backendRef]: ../reference/spec.md#grpcbackendref
+[parentRef]: ../reference/spec.md#parentreference
+[name]: ../reference/spec.md#sectionname

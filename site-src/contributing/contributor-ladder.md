@@ -87,7 +87,7 @@ reviewer or approver, this includes:
 * Documentation
 * GEPs
 
-## Maintainers and GAMMA Leads
+## Maintainers and Mesh Leads
 
 The final steps on the contributor ladder represent large overall leadership
 roles within the project as a whole. The spaces available for these roles are
@@ -114,20 +114,20 @@ reviewers, and ensure that there are healthy processes in place for discussion
 and decision making. Finally, maintainers are ultimately responsible for
 releasing new versions of the API.
 
-## GAMMA Leads
+## Mesh Leads
 
-The concept of GAMMA Leads does not have a perfect parallel on the upstream
+The concept of Mesh Leads does not have a perfect parallel on the upstream
 Kubernetes community ladder. They are essentially Subproject Owners, but for the
-GAMMA initiative, which is a major initiative within Gateway API.
+GAMMA (Gateway API for Mesh Management and Administration, which also known as Gateway for Mesh) initiative, which is a major initiative within Gateway API.
 
-To become a GAMMA lead, the most important thing we expect are:
+To become a Mesh lead, the most important thing we expect are:
 
 * Significant experience with Service Mesh implementation(s)
 * Deep understanding of technical goals and direction of the project
 * Long term, sustained contributions to the GAMMA initiative for at least 6 months
 * Ability to lead community meetings
 
-In addition to all of the expectations described above, we expect GAMMA Leads to
+In addition to all of the expectations described above, we expect Mesh Leads to
 set the technical direction and goals for the GAMMA initiative. They should
 ensure that there are healthy processes in place for discussion and decision
 making and that the release goals and milestones are clearly defined.

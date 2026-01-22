@@ -58,11 +58,27 @@ GO_TEST_FLAGS ?=
 CEL_TEST_K8S_VERSION ?= 
 CEL_TEST_CRD_CHANNEL ?= standard
 
-all: generate vet fmt verify test
+# Flags for docs validation
+# Use this to add extra flags like --offline or --include "github.com/kubernetes"
+# Github is intentionally removed from the checks due to rate limits and because the 
+# anchor validation does not work when pointing to a github code
+VALIDATE_DOCS_EXTRA_FLAGS ?= 
+
+# Compilation flags for binaries
+GOARCH ?= $(shell go env GOARCH)
+GOOS ?= $(shell go env GOOS)
+
+all: generate vet fmt verify test conformance-bin
+
+.PHONY: clean-generated
+clean-generated:
+	rm -rf pkg/client/clientset
+	rm -rf pkg/client/listers
+	rm -rf pkg/client/informers
 
 # Run generators for protos, Deepcopy funcs, CRDs, and docs.
 .PHONY: generate
-generate: update-codegen
+generate: clean-generated update-codegen tidy
 
 .PHONY: update-codegen
 update-codegen:
@@ -71,6 +87,10 @@ update-codegen:
 .PHONY: build-install-yaml
 build-install-yaml:
 	hack/build-install-yaml.sh
+
+.PHONY: build-monthly-yaml
+build-monthly-yaml:
+	hack/build-monthly-yaml.sh
 
 # Run go fmt against code
 fmt:
@@ -86,16 +106,26 @@ test:
 # Run tests for each submodule.
 	cd "conformance/echo-basic" && go test -race -cover ./...
 
+.PHONY: tidy
+tidy:
+	go work sync
+	find . -name go.mod -execdir sh -c 'go mod tidy' \;
+
 # Run tests for CRDs validation
 .PHONY: test.crds-validation
 test.crds-validation:
-	K8S_VERSION=$(CEL_TEST_K8S_VERSION) CRD_CHANNEL=$(CEL_TEST_CRD_CHANNEL) go test ${GO_TEST_FLAGS} -count=1 -timeout=120s --tags=$(CEL_TEST_CRD_CHANNEL) -v ./pkg/test/cel
-	K8S_VERSION=$(CEL_TEST_K8S_VERSION) CRD_CHANNEL=$(CEL_TEST_CRD_CHANNEL) go test ${GO_TEST_FLAGS} -count=1 -timeout=120s -v ./pkg/test/crd
+	K8S_VERSION=$(CEL_TEST_K8S_VERSION) CRD_CHANNEL=$(CEL_TEST_CRD_CHANNEL) go test ${GO_TEST_FLAGS} -count=1 -timeout=120s --tags=$(CEL_TEST_CRD_CHANNEL) -v ./tests/cel
+	K8S_VERSION=$(CEL_TEST_K8S_VERSION) CRD_CHANNEL=$(CEL_TEST_CRD_CHANNEL) go test ${GO_TEST_FLAGS} -count=1 -timeout=120s -v ./tests/crd
 
 # Run conformance tests against controller implementation
 .PHONY: conformance
 conformance:
 	go test ${GO_TEST_FLAGS} -v ./conformance -run TestConformance -args ${CONFORMANCE_FLAGS}
+
+# Build a conformance.test binary that can be used as a standalone binary to run conformance test
+.PHONY: conformance-bin
+conformance-bin:
+	GOOS=$(GOOS) GOARCH=$(GOARCH) go test -c -v ./conformance 
 
 # Install CRD's and example resources to a preexisting cluster.
 .PHONY: install
@@ -166,31 +196,33 @@ release-staging: image.multiarch.setup
 
 # Docs
 
+DOCS_BUILD_CONTAINER_NAME ?= gateway-api-mkdocs
+DOCS_VERIFY_CONTAINER_IMAGE ?= registry.hub.docker.com/lycheeverse/lychee:0.22
+
 .PHONY: build-docs
-build-docs:
+build-docs: update-geps api-ref-docs
 	docker build --pull -t gaie/mkdocs hack/mkdocs/image
-	docker run --rm -v ${PWD}:/docs gaie/mkdocs build
+	docker rm -f $(DOCS_BUILD_CONTAINER_NAME) || true
+	docker run --name $(DOCS_BUILD_CONTAINER_NAME) --rm -v ${PWD}:/docs gaie/mkdocs build
+
+.PHONY: verify-docs
+verify-docs: build-docs
+	docker run --init --rm -w /input -v ${PWD}:/input $(DOCS_VERIFY_CONTAINER_IMAGE) --root-dir /input/site --exclude-path "overrides/partials/.*\.html" --exclude ".*" --include "sigs.k8s.io" --accept 200 --max-concurrency 10 --include-fragments --cache $(VALIDATE_DOCS_EXTRA_ARGS) /input/site/**/*.html
 
 .PHONY: build-docs-netlify
-build-docs-netlify:
-	hack/mkdocs/generate.sh
+build-docs-netlify: update-geps api-ref-docs
 	pip install -r hack/mkdocs/image/requirements.txt
 	python -m mkdocs build
 
 .PHONY: live-docs
-live-docs:
+live-docs: update-geps
 	docker build -t gw/mkdocs hack/mkdocs/image
 	docker run --rm -it -p 3000:3000 -v ${PWD}:/docs gw/mkdocs
 
+.PHONY: update-geps
+update-geps:
+	hack/update-geps.sh
+
 .PHONY: api-ref-docs
 api-ref-docs:
-	crd-ref-docs \
-		--source-path=${PWD}/apis \
-		--config=crd-ref-docs.yaml \
-		--renderer=markdown \
-		--output-path=${PWD}/site-src/reference/spec.md
-	crd-ref-docs \
-		--source-path=${PWD}/apisx \
-		--config=crd-ref-docs.yaml \
-		--renderer=markdown \
-		--output-path=${PWD}/site-src/reference/specx.md
+	hack/mkdocs/generate.sh

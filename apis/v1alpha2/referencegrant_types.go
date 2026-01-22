@@ -25,7 +25,6 @@ import (
 // +genclient
 // +kubebuilder:object:root=true
 // +kubebuilder:resource:categories=gateway-api,shortName=refgrant
-// +kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 // +kubebuilder:skipversion
 // +kubebuilder:deprecatedversion:warning="The v1alpha2 version of ReferenceGrant has been deprecated and will be removed in a future release of the API. Please upgrade to v1beta1."
 
@@ -59,16 +58,8 @@ type ReferenceGrantList struct {
 	Items           []ReferenceGrant `json:"items"`
 }
 
-// ReferenceGrantSpec identifies a cross namespace relationship that is trusted
-// for Gateway API.
-// +k8s:deepcopy-gen=false
 type ReferenceGrantSpec = v1beta1.ReferenceGrantSpec
 
-// ReferenceGrantFrom describes trusted namespaces and kinds.
-// +k8s:deepcopy-gen=false
 type ReferenceGrantFrom = v1beta1.ReferenceGrantFrom
 
-// ReferenceGrantTo describes what Kinds are allowed as targets of the
-// references.
-// +k8s:deepcopy-gen=false
 type ReferenceGrantTo = v1beta1.ReferenceGrantTo

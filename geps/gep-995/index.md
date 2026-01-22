@@ -5,7 +5,7 @@
 
 ## TLDR
 
-Add a new optional `name` field to the route rule types ([GRPCRouteRule](../../reference/spec.md#gateway.networking.k8s.io/v1alpha2.GRPCRouteRule), [HTTPRouteRule](../../reference/spec.md#gateway.networking.k8s.io/v1.HTTPRouteRule), [TCPRouteRule](../../reference/spec.md#gateway.networking.k8s.io/v1alpha2.TCPRouteRule), [TLSRouteRule](../../reference/spec.md#gateway.networking.k8s.io/v1alpha2.TLSRouteRule) and [UDPRouteRule](../../reference/spec.md#gateway.networking.k8s.io/v1alpha2.UDPRouteRule)) to support referencing individual rules by name.
+Add a new optional `name` field to the route rule types ([GRPCRouteRule](../../reference/spec.md#grpcrouterule), [HTTPRouteRule](../../reference/spec.md#httprouterule), [TCPRouteRule](../../reference/spec.md#tcprouterule), [TLSRouteRule](../../reference/spec.md#tlsrouterule) and [UDPRouteRule](../../reference/spec.md#udprouterule)) to support referencing individual rules by name.
 
 ## Goals
 
@@ -23,13 +23,13 @@ Add a new optional `name` field to the route rule types ([GRPCRouteRule](../../r
 
 ## Introduction
 
-Some kinds of Gateway API types are complex types that support specifying lists of yet other complex object details within them. Examples include the [`GatewaySpec`](../../reference/spec.md#gateway.networking.k8s.io/v1.GatewaySpec) type, the [`HTTPRouteSpec`](../../reference/spec.md#gateway.networking.k8s.io/v1.HTTPRouteSpec) type, as well as other kinds of route specification types. Specifically, `Gateway` objects can declare multiple complex listener details (`spec.listeners`); similarly, `HTTPRoute` objects may contain multiple complex routing rule details (`spec.rules`).
+Some kinds of Gateway API types are complex types that support specifying lists of yet other complex object details within them. Examples include the [`GatewaySpec`](../../reference/spec.md#gatewayspec) type, the [`HTTPRouteSpec`](../../reference/spec.md#httproutespec) type, as well as other kinds of route specification types. Specifically, `Gateway` objects can declare multiple complex listener details (`spec.listeners`); similarly, `HTTPRoute` objects may contain multiple complex routing rule details (`spec.rules`).
 
 Even with a limited number of elements declared within those lists of resource specification details, without a field that works as a unique identifier of each element (e.g., a `name` field), referring individual ones can often lead to implementations that are inconsistent, complex, and error-prone. This is an issue for any kind of referencing pattern, including for Policy Attachment, status reporting, event logging, etc.
 
 Referencing list elements without a unique identifier is also prone to execution errors, either when relying on how the elements are sorted in the list (i.e., based on the index) or on partial or total repetition of values of the referents. The order of elements within a list may change without necessarily any semantic reason. Complex elements can sometimes differ only subtly from each other, thus easily being overlooked when making the reference and resulting in a higher chance of typos and/or references that are possibly ambiguous or broken. In both cases, such references are fragile and can result in unexpected errors.
 
-For the `Gateway` resource, problems above were addressed/mitigated by adding a `name` field to the [`Listener`](../../reference/spec.md#gateway.networking.k8s.io/v1.Listener) type ([#724](https://github.com/kubernetes-sigs/gateway-api/issues/).) Listener names are required and must be unique of each listener declared in a gateway. This allowed for more explicit route and policy attachment relying on _sectionName_, as well as it opened for better implementation of status reporting and log recording of events related to specific gateway listeners.
+For the `Gateway` resource, problems above were addressed/mitigated by adding a `name` field to the [`Listener`](../../reference/spec.md#listener) type ([#724](https://github.com/kubernetes-sigs/gateway-api/issues/).) Listener names are required and must be unique of each listener declared in a gateway. This allowed for more explicit route and policy attachment relying on _sectionName_, as well as it opened for better implementation of status reporting and log recording of events related to specific gateway listeners.
 
 In general, declaring explicit names for complex list elements is a common pattern in Kubernetes, observed in several other APIs. Examples include [containers](https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#containers) and [volumes](https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#volumes) of a Pod, [ports](https://kubernetes.io/docs/reference/kubernetes-api/service-resources/service-v1/#ServiceSpec) of a Service, and many others.
 
@@ -37,7 +37,7 @@ This GEP aims to rollout the same pattern of declarative `name` fields of these 
 
 ## API
 
-This GEP proposes to add a new optional `name` field to the [GRPCRouteRule](../../reference/spec.md#gateway.networking.k8s.io/v1alpha2.GRPCRouteRule), [HTTPRouteRule](../../reference/spec.md#gateway.networking.k8s.io/v1.HTTPRouteRule), [TCPRouteRule](../../reference/spec.md#gateway.networking.k8s.io/v1alpha2.TCPRouteRule), [TLSRouteRule](../../reference/spec.md#gateway.networking.k8s.io/v1alpha2.TLSRouteRule) and [UDPRouteRule](../../reference/spec.md#gateway.networking.k8s.io/v1alpha2.UDPRouteRule) types.
+This GEP proposes to add a new optional `name` field to the [GRPCRouteRule](../../reference/spec.md#grpcrouterule), [HTTPRouteRule](../../reference/spec.md#httprouterule), [TCPRouteRule](../../reference/spec.md#tcprouterule), [TLSRouteRule](../../reference/spec.md#tlsrouterule) and [UDPRouteRule](../../reference/spec.md#udprouterule) types.
 
 ### Format
 

@@ -1,7 +1,7 @@
 # GEP-91: Client Certificate Validation for TLS terminating at the Gateway
 
 * Issue: [#91](https://github.com/kubernetes-sigs/gateway-api/issues/91)
-* Status: Implementable
+* Status: Experimental
 
 (See definitions in [GEP States](../overview.md#gep-states).)
 
@@ -19,30 +19,46 @@ Gateway API standard defines a `Listener` as "the concept of a logical endpoint 
 * Define an API field to specify the CA Certificate within the Gateway configuration that can be used as a trust anchor to validate the certificates presented by the client.
 This use case has been highlighted in the [TLS Configuration GEP][] under segment 1 and in the [Gateway API TLS Use Cases][] document under point 7.
 * Introduce explicit client certificate validation modes that reflect common TLS behaviors (e.g., optional vs. required client certs)
-* Ensure the configuration mitigates the authentication bypass risks associated with HTTP/2 connection coalesing as described in [GEP-3567](https://gateway-api.sigs.k8s.io/geps/gep-3567/#interaction-with-client-cert-validation).
+* Ensure the configuration mitigates the authentication bypass risks associated with HTTP/2 connection coalescing as described in [GEP-3567](https://gateway-api.sigs.k8s.io/geps/gep-3567/#interaction-with-client-cert-validation).
 
 ## Non-Goals
 * Define other fields that can be used to verify the client certificate such as the Certificate Hash.
 
 ### API
 
-* Introduce two new structs `TLSConfig` and `FrontendTLSValidation` allowing for the definition of certificate validation used to authenticate the peer (frontend) in a TLS connection. A new `tls` field, storing an array of `TLSConfigs`, will be added to the gateway object.
+* Introduce new structs: `GatewayTLSConfig`, `TLSConfig`, `TLSPortConfig`, `FrontendTLSValidation` allowing for the definition of certificate validation used to authenticate the peer (frontend) in a TLS connection. A new `tls` field with gateway tls configuration will be added to the gateway object.
+* `TLSConfig` will allow defining client certificate validation per port which will be applied to all Listeners matching this port. We might want to extend this struct with other tls configurations.
+* `TLSPortConfig` will allow defining client certificate validation per port which will be applied to all Listeners matching this port.
+* `GatewayTLSConfig` struct contains default and (optional) per port configuration. Default configuration will apply to all Listeners which are not matching per port override.
 * This new field is separate from the existing [BackendTLSPolicy][] configuration. [BackendTLSPolicy][] controls TLS certificate validation for connections *from* the Gateway to the backend service.
 This proposal adds the ability to validate the TLS certificate presented by the *client* connecting to the Gateway (the frontend).
 These two validation mechanisms operate independently and can be used simultaneously.
 * Introduce a `caCertificateRefs` field within `FrontendTLSValidation` that can be used to specify a list of CA Certificates that can be used as a trust anchor to validate the certificates presented by the client.
 * Add a new `FrontendValidationModeType` enum within `FrontendTLSValidation` indicating how gateway should validate client certificates. As for now we support following values but it might change in the future:
-  1) `AllowValidOnly`
-  2) `AllowInvalidOrMissingCert`
+  1. `AllowValidOnly` (Core Support)
+  2. `AllowInsecureFallback` (Extended Support)
+
+	`AllowInsecureFallback` mode indicates the gateway will accept connections even if the client certificate is not presented or fails verification.
+	This approach delegates client authorization to the backend and introduce a significant security risk. It should be used in testing environments or
+	on a temporary basis in non-testing environments.
+    When `FrontendValidationModeType` is changed from `AllowValidOnly` to `AllowInsecureFallback` the `InsecureFrontendValidationMode` condition MUST be set to `True` with Reason `ConfigurationChanged` on gateway.
+	This condition is removed as soon as `FrontendValidationModeType` is changed back to `AllowValidOnly`.
+
 * Introduce a `ObjectReference` structure that can be used to specify `caCertificateRefs` references.
-* Introduce a `tls` field within the Gateway Spec to allow for a common TLS configuration to apply across all listeners.
+* Invalid `caCertificateRefs` directly affect the `ResolvedRefs` and `Accepted` conditions of the targeted listeners.
+  * **For a `perPort` configuration**: A listener is considered targeted if and only if it serves HTTPS and its port
+    matches the port specified in the per-port configuration.
+  * **For the `default` configuration**: A listener is considered targeted if and only if it serves HTTPS and its port
+    does not match any of the per-port configurations.
+  This behavior is important to ensure that when all CA certificates are invalid, listeners do not implicitly fall
+  back to skipping client certificate verification.
 
 ### Impact on listeners
 
-This proposal removes frontendTLSValidation from Listener's TLS configuration and introduces gateways level per port configuration. This is a breaking change for exisitng implementation which uses this feature from Experimental API.
- Once gateway level TLS is configured (either by default or for a specific port), the TLS settings will apply to all existing and newly created Listeners that match the configuration.
+This proposal removes frontendTLSValidation from Listener's TLS configuration and introduces gateways level per port configuration. This is a breaking change for existing implementation which uses this feature from Experimental API.
+ Once gateway level TLS is configured (either by default or for a specific port), the TLS settings will apply to all existing and newly created Listeners serving HTTPS that match the configuration.
 
-#### GO
+#### Go
 
 ```go
 // ObjectReference identifies an API object including its namespace.
@@ -78,69 +94,108 @@ type ObjectReference struct {
 	Namespace *Namespace `json:"namespace,omitempty"`
 }
 
-// GatewayTLSConfigs stores TLS configurations for a Gateway.
-//
-// * If the `port` field in `TLSConfig` is not set, the TLS configuration applies
-//   to all listeners in the gateway. We call this `default` configuration.
-// * If the `port` field in `TLSConfig` is set, the TLS configuration applies
-//   only to listeners with a matching port. Each port requires a unique TLS configuration.
-// * Per-port configurations can override the `default` configuration.
-// * The `default` configuration is optional. Clients can apply TLS configuration
-//   to a subset of listeners by creating only per-port configurations. Listeners
-//   with a port that does not match any TLS configuration will not have
-//   `frontendValidation` set.
-type GatewayTLSConfigs = []TLSConfig
+// GatewayTLSConfig specifies frontend tls configuration for gateway.
+type GatewayTLSConfig struct {
+    // default specifies the default client certificate validation configuration
+    // for all Listeners handling HTTPS traffic, unless a per-port configuration
+    // is defined.
+    //
+    // support: Core
+    //
+    // +required
+    // <gateway:experimental>
+    Default FrontendTLSValidation `json:"default"`
 
-// TLSConfig describes a TLS configuration that can be applied to all Gateway
-// Listeners or to all Listeners matching the Port if set.
+    // PerPort specifies tls configuration assigned per port.
+    // Per port configuration is optional. Once set this configuration overrides
+    // the default configuration for all Listeners handling HTTPS traffic
+    // that match this port.
+    // Each override port requires a unique TLS configuration.
+    //
+    // support: Core
+    //
+    PerPort []TLSConfig `json:"PerPort,omitempty"`
+}
+
+// TLSConfig describes a TLS configuration. Currently, it stores only the client
+// certificate validation configuration, but this may be extended in the future.
 type TLSConfig struct {
-	// The Port indicates the Port Number to which the TLS configuration will be
-	// applied. If the field is not set the TLS Configuration will be applied to
-	// all Listeners.
-	//
-	// Support: Extended
-	//
-	// +optional
-	// <gateway:experimental>
-	Port *PortNumber
 	// FrontendValidation holds configuration information for validating the frontend (client).
-	// Setting this field will result in mutual authentication when connecting to the gateway. In browsers this may result in a dialog appearing
+	// Setting this field will result in mutual authentication when connecting to the gateway.
+	// In browsers this may result in a dialog appearing
 	// that requests a user to specify the client certificate.
 	// The maximum depth of a certificate chain accepted in verification is Implementation specific.
 	//
-	// Each field may be overidden by an equivalent setting applied at the Listener level.
-	//
 	// Support: Extended
 	//
-	// +optional
+	// +required
 	// <gateway:experimental>
-	FrontendValidation *FrontendTLSValidation `json:"frontendValidation,omitempty"`
+	FrontendValidation FrontendTLSValidation `json:"frontendValidation"`
+}
+
+type TLSPortConfig struct {
+	// The Port indicates the Port Number to which the TLS configuration will be
+	// applied. This configuration will be applied to all Listeners handling HTTPS
+	// traffic that match this port.
+	//
+	// Support: Core
+	//
+	// +required
+	// <gateway:experimental>
+	Port PortNumber `json:"port"`
+	// TLS store the configuration that will be applied to all Listeners handling
+	// HTTPS traffic and matching given port.
+	TLS TLSConfig `json:"tls"`
 }
 
 // FrontendTLSValidation holds configuration information that can be used to validate
 // the frontend initiating the TLS connection
 type FrontendTLSValidation struct {
-	// CACertificateRefs contains one or more references to
-	// Kubernetes objects that contain TLS certificates of
-	// the Certificate Authorities that can be used
-	// as a trust anchor to validate the certificates presented by the client.
+	// CACertificateRefs contains one or more references to Kubernetes
+	// objects that contain a PEM-encoded TLS CA certificate bundle, which
+	// is used as a trust anchor to validate the certificates presented by
+	// the client.
 	//
-	// A single CA certificate reference to a Kubernetes ConfigMap
-	// has "Core" support.
-	// Implementations MAY choose to support attaching multiple CA certificates to
-	// a Listener, but this behavior is implementation-specific.
+	// A CACertificateRef is invalid if:
 	//
-	// Support: Core - A single reference to a Kubernetes ConfigMap
-	// with the CA certificate in a key named `ca.crt`.
+	// * It refers to a resource that cannot be resolved (e.g., the
+	//   referenced resource does not exist) or is misconfigured (e.g., a
+	//   ConfigMap does not contain a key named `ca.crt`). In this case, the
+	//   Reason must be set to `InvalidCACertificateRef` and the Message of
+	//   the Condition must indicate which reference is invalid and why.
 	//
-	// Support: Implementation-specific (More than one certificate in a ConfigMap with different keys or more than one reference, or other kinds of resources).
+	// * It refers to an unknown or unsupported kind of resource. In this
+	//   case, the Reason must be set to `InvalidKind` and the Message of
+	//   the Condition must explain which kind of resource is unknown or
+	//   unsupported.
 	//
-	// References to a resource in a different namespace are invalid UNLESS there
-	// is a ReferenceGrant in the target namespace that allows the certificate
-	// to be attached. If a ReferenceGrant does not allow this reference, the
-	// "ResolvedRefs" condition MUST be set to False for this listener with the
-	// "RefNotPermitted" reason.
+	// * It refers to a resource in another namespace UNLESS there is a
+	//   ReferenceGrant in the target namespace that allows the CA
+	//   certificate to be attached. If a ReferenceGrant does not allow this
+	//   reference, the `ResolvedRefs` condition MUST be set with
+	//   the Reason `RefNotPermitted`.
+    //
+	// Implementations MAY choose to perform further validation of the 
+	// certificate content (e.g., checking expiry or enforcing specific formats).
+	// In such cases, an implementation-specific Reason and Message MUST be set.
 	//
+	// In all cases, the implementation MUST ensure that the `ResolvedRefs`
+	// condition is set to `status: False` on all targeted listeners (i.e.,
+	// listeners serving HTTPS on a matching port). The condition MUST
+	// include a Reason and Message that indicate the cause of the error. If
+	// ALL CACertificateRefs are invalid, the implementation MUST also ensure
+	// the `Accepted` condition on the listener is set to `status: False`, with
+	// the Reason `NoValidCACertificate`.
+	// Implementations MAY choose to support attaching multiple CA certificates
+	// to a listener, but this behavior is implementation-specific.
+	//
+	// Support: Core - A single reference to a Kubernetes ConfigMap, with the
+	// CA certificate in a key named `ca.crt`.
+	//
+	// Support: Implementation-specific - More than one reference, other kinds
+	// of resources, or a single reference that includes multiple certificates.
+	//
+	// +listType=atomic
 	// +kubebuilder:validation:MaxItems=8
 	// +kubebuilder:validation:MinItems=1
 	CACertificateRefs []ObjectReference `json:"caCertificateRefs,omitempty"`
@@ -151,21 +206,27 @@ type FrontendTLSValidation struct {
 	// - AllowValidOnly: In this mode, the gateway will accept connections only if
 	//   the client presents a valid certificate. This certificate must successfully
 	//   pass validation against the CA certificates specified in `CACertificateRefs`.
-	// - AllowInvalidOrMissingCert: In this mode, the gateway will accept
-	//   connections even if the client certificate is not presented or fails verification.
+	// - AllowInsecureFallback: In this mode, the gateway will accept connections
+	//   even if the client certificate is not presented or fails verification.
+	//
+	//   This approach delegates client authorization to the backend and introduce
+	//   a significant security risk. It should be used in testing environments or
+	//   on a temporary basis in non-testing environments.
 	//
 	// Defaults to AllowValidOnly.
 	//
-	// Support: Extended
+	// Support: Core - AllowValidOnly
+	//
+	// Support: Extended - AllowInsecureFallback
 	//
 	// +optional
 	// +kubebuilder:default=AllowValidOnly
-	Mode *FrontendValidationModeType `json:"mode,omitempty"`
+	Mode FrontendValidationModeType `json:"mode,omitempty"`
 }
 
-// FrontendValidationModeType type defines how a Gateway or Listener validates client certificates.
+// FrontendValidationModeType type defines how a Gateway validates client certificates.
 //
-// +kubebuilder:validation:Enum=AllowValidOnly;AllowInvalidOrMissingCert
+// +kubebuilder:validation:Enum=AllowValidOnly;AllowInsecureFallback
 type FrontendValidationModeType string
 
 const (
@@ -173,15 +234,20 @@ const (
 	// during the TLS handshake and MUST pass validation.
 	AllowValidOnly FrontendValidationModeType = "AllowValidOnly"
 
-	// AllowInvalidOrMissingCert indicates that a client certificate may not be
+	// AllowInsecureFallback indicates that a client certificate may not be
 	// presented during the handshake or the validation against CA certificates may fail.
-	AllowInvalidOrMissingCert FrontendValidationModeType = "AllowInvalidOrMissingCert"
+	AllowInsecureFallback FrontendValidationModeType = "AllowInsecureFallback"
 )
 
 type GatewaySpec struct {
     ...
-    // TLSConfigs stores TLS configurations for a Gateway.
-    TLSConfigs GatewayTLSConfigs
+    // GatewayTLSConfig specifies frontend tls configuration for gateway.
+	//
+	// Support: Core
+	//
+	// +optional
+	// <gateway:experimental>
+	TLS *GatewayTLSConfig `json:"tls,omitempty"`
 }
 
 ```
@@ -198,11 +264,12 @@ metadata:
 spec:
   gatewayClassName: acme-lb
   tls:
-    - frontendValidation:
-        caCertificateRefs:
-        - kind: ConfigMap
-          group: ""
-          name: default-cert
+    default:
+    frontendValidation:
+      caCertificateRefs:
+      - kind: ConfigMap
+        group: ""
+        name: default-cert
   listeners:
   - name: foo-https
     protocol: HTTPS
@@ -234,18 +301,20 @@ metadata:
 spec:
   gatewayClassName: acme-lb
   tls:
-    - port: 443
+    default:
       frontendValidation:
         caCertificateRefs:
-        - kind: ConfigMap
-          group: ""
-          name: foo-example-com-ca-cert
-    - frontendValidation:
-        caCertificateRefs:
-        - kind: ConfigMap
-          group: ""
-          name: default-cert
-        mode: AllowInvalidOrMissingCert
+          - kind: ConfigMap
+            group: ""
+            name: default-cert
+        mode: AllowInsecureFallback
+    perPort:
+      - port: 443
+        frontendValidation:
+          caCertificateRefs:
+          - kind: ConfigMap
+            group: ""
+            name: foo-example-com-ca-cert
   listeners:
   - name: foo-https
     protocol: HTTPS
@@ -321,7 +390,6 @@ This GEP aims to standardize this behavior as an official part of the upstream s
 
 [TLS Handshake Protocol]: https://www.rfc-editor.org/rfc/rfc5246#section-7.4
 [Certificate Path Validation]: https://www.rfc-editor.org/rfc/rfc5280#section-6
-[GatewayTLSConfig]: ../../reference/spec.md#gateway.networking.k8s.io/v1.GatewayTLSConfig
 [BackendTLSPolicy]: ../../api-types/backendtlspolicy.md
 [TLS Configuration GEP]: ../gep-2907/index.md
 [Gateway API TLS Use Cases]: https://docs.google.com/document/d/17sctu2uMJtHmJTGtBi_awGB0YzoCLodtR6rUNmKMCs8/edit?pli=1#heading=h.cxuq8vo8pcxm

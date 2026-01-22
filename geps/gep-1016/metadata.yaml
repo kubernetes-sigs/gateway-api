@@ -2,7 +2,7 @@ apiVersion: internal.gateway.networking.k8s.io/v1alpha1
 kind: GEPDetails
 number: 1016
 name: GRPCRoute
-status: Experimental
+status: Standard
 authors:
   - gnossen
   - robscott

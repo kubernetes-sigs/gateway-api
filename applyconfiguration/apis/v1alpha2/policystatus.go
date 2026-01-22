@@ -18,10 +18,14 @@ limitations under the License.
 
 package v1alpha2
 
+import (
+	v1 "sigs.k8s.io/gateway-api/applyconfiguration/apis/v1"
+)
+
 // PolicyStatusApplyConfiguration represents a declarative configuration of the PolicyStatus type for use
 // with apply.
 type PolicyStatusApplyConfiguration struct {
-	Ancestors []PolicyAncestorStatusApplyConfiguration `json:"ancestors,omitempty"`
+	Ancestors []v1.PolicyAncestorStatusApplyConfiguration `json:"ancestors,omitempty"`
 }
 
 // PolicyStatusApplyConfiguration constructs a declarative configuration of the PolicyStatus type for use with
@@ -33,7 +37,7 @@ func PolicyStatus() *PolicyStatusApplyConfiguration {
 // WithAncestors adds the given value to the Ancestors field in the declarative configuration
 // and returns the receiver, so that objects can be build by chaining "With" function invocations.
 // If called multiple times, values provided by each call will be appended to the Ancestors field.
-func (b *PolicyStatusApplyConfiguration) WithAncestors(values ...*PolicyAncestorStatusApplyConfiguration) *PolicyStatusApplyConfiguration {
+func (b *PolicyStatusApplyConfiguration) WithAncestors(values ...*v1.PolicyAncestorStatusApplyConfiguration) *PolicyStatusApplyConfiguration {
 	for i := range values {
 		if values[i] == nil {
 			panic("nil value passed to WithAncestors")

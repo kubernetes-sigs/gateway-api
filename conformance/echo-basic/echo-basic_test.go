@@ -171,8 +171,8 @@ func TestEchoHandler(t *testing.T) {
 
 	// Test RequestAssertions struct contains expected context namespace
 	expectedNamespace := context.Namespace
-	if responseAssertions.Context.Namespace != expectedNamespace {
-		t.Errorf("Expected X-Content-Type-Options header %s, but got %s", expectedNamespace, responseAssertions.Context.Namespace)
+	if responseAssertions.Namespace != expectedNamespace {
+		t.Errorf("Expected X-Content-Type-Options header %s, but got %s", expectedNamespace, responseAssertions.Namespace)
 	}
 }
 
@@ -225,6 +225,70 @@ func TestWriteEchoResponseHeaders(t *testing.T) {
 	headerValuesEmpty := rr.Header().Values(expectedHeaderName)
 	if len(headerValuesEmpty) != 0 {
 		t.Errorf("Expected no header %s, but got %s:%s", expectedHeaderName, expectedHeaderName, headerValuesEmpty[0])
+	}
+}
+
+func TestEchoHandler_IncludesHTTPPort(t *testing.T) {
+	// Preserve global across tests.
+	prevHTTPPort := httpPort
+	defer func() { httpPort = prevHTTPPort }()
+
+	httpPort = "3002"
+
+	// Minimal context to satisfy marshaling (values don’t matter for this check).
+	context = Context{
+		Namespace: "testNamespace",
+		Ingress:   "testIngress",
+		Service:   "testService",
+		Pod:       "testPod",
+	}
+
+	req := httptest.NewRequest("GET", "/", nil)
+	rr := httptest.NewRecorder()
+
+	echoHandler(rr, req)
+
+	if status := rr.Code; status != http.StatusOK {
+		t.Fatalf("expected status %d, got %d", http.StatusOK, status)
+	}
+
+	var resp RequestAssertions
+	if err := json.Unmarshal(rr.Body.Bytes(), &resp); err != nil {
+		t.Fatalf("failed to unmarshal echo response: %v", err)
+	}
+	if resp.HTTPPort != "3002" {
+		t.Errorf("expected HTTPPort %q, got %q", "3002", resp.HTTPPort)
+	}
+}
+
+func TestEchoHandler_HTTPPortReflectsChange(t *testing.T) {
+	// Preserve global across tests.
+	prevHTTPPort := httpPort
+	defer func() { httpPort = prevHTTPPort }()
+
+	httpPort = "3004"
+	context = Context{
+		Namespace: "ns",
+		Ingress:   "ing",
+		Service:   "svc",
+		Pod:       "pod",
+	}
+
+	req := httptest.NewRequest("GET", "/", nil)
+	rr := httptest.NewRecorder()
+
+	echoHandler(rr, req)
+
+	if status := rr.Code; status != http.StatusOK {
+		t.Fatalf("expected status %d, got %d", http.StatusOK, status)
+	}
+
+	var resp RequestAssertions
+	if err := json.Unmarshal(rr.Body.Bytes(), &resp); err != nil {
+		t.Fatalf("failed to unmarshal echo response: %v", err)
+	}
+	if resp.HTTPPort != "3004" {
+		t.Errorf("expected HTTPPort %q, got %q", "3004", resp.HTTPPort)
 	}
 }
 

@@ -12,7 +12,7 @@ implementation(s) you're using with Gateway API.
 
 !!! info "Experimental Channel"
 
-    The `TLSRoute` and `BackendTLSPolicy` resources described below are currently only included in the
+    The `TLSRoute` resource described below is currently only included in the
     "Experimental" channel of Gateway API. For more information on release
     channels, refer to our [versioning guide](../concepts/versioning.md).
 
@@ -26,15 +26,15 @@ For Gateways, there are two connections involved:
 - **upstream**: This is the connection between the Gateway and backend resources
    specified by routes. These backend resources will usually be Services.
 
-With Gateway API, TLS configuration of downstream and
-upstream connections is managed independently.
+With Gateway API, TLS configuration of downstream and upstream connections is 
+managed independently.
 
 For downstream connections, depending on the Listener Protocol, different TLS modes and Route types are supported.
 
 | Listener Protocol | TLS Mode    | Route Type Supported |
 |-------------------|-------------|---------------------|
 | TLS               | Passthrough | TLSRoute            |
-| TLS               | Terminate   | TCPRoute            |
+| TLS               | Terminate   | TLSRoute (extended) |
 | HTTPS             | Terminate   | HTTPRoute           |
 | GRPC              | Terminate   | GRPCRoute           |
 
@@ -46,6 +46,10 @@ For upstream connections, `BackendTLSPolicy` is used, and neither listener proto
 upstream TLS configuration. For `HTTPRoute`, the use of both `Terminate` TLS mode and `BackendTLSPolicy` is supported.
 Using these together provides what is commonly known as a connection that is terminated and then re-encrypted at
 the Gateway.
+
+The use of `Terminate` on `TLSRoute` is available on `Extended` [Support Level].
+
+[Support Level]: https://gateway-api.sigs.k8s.io/concepts/conformance/#2-support-levels
 
 ## Downstream TLS
 
@@ -111,8 +115,8 @@ would be invalid.
 
 ## Upstream TLS
 
-Upstream TLS settings are configured using the experimental `BackendTLSPolicy`
-attached to a `Service` via a target reference.
+Upstream TLS settings are configured using the `BackendTLSPolicy` attached to a
+`Service` via a target reference.
 
 This resource can be used to describe the SNI the Gateway should use to connect to the
 backend and how the certificate served by the backend Pod(s) should be verified.
@@ -145,7 +149,7 @@ TLS-encrypted upstream connection where Pods backing the `dev` Service are expec
 certificate for `dev.example.com`.
 
 ```yaml
-{% include 'experimental/v1alpha3/backendtlspolicy-system-certs.yaml' %}
+{% include 'standard/backendtlspolicy/backendtlspolicy-system-certs.yaml' %}
 ```
 
 #### Using Explicit CA Certificates
@@ -155,7 +159,7 @@ map `auth-cert` to connect with a TLS-encrypted upstream connection where Pods b
 are expected to serve a valid certificate for `auth.example.com`.
 
 ```yaml
-{% include 'experimental/v1alpha3/backendtlspolicy-ca-certs.yaml' %}
+{% include 'standard/backendtlspolicy/backendtlspolicy-ca-certs.yaml' %}
 ```
 
 ## Extensions

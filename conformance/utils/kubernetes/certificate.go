@@ -27,6 +27,7 @@ import (
 	"io"
 	"math/big"
 	"net"
+	"net/url"
 	"strings"
 	"testing"
 	"time"
@@ -48,7 +49,7 @@ func MustCreateSelfSignedCertSecret(t *testing.T, namespace, secretName string, 
 
 	var serverKey, serverCert bytes.Buffer
 
-	require.NoError(t, generateRSACert(hosts, &serverKey, &serverCert, nil, nil), "failed to generate RSA certificate")
+	require.NoError(t, generateRSACert(hosts, &serverKey, &serverCert, []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth}, nil, nil), "failed to generate RSA certificate")
 
 	return formatSecret(serverCert, serverKey, namespace, secretName)
 }
@@ -59,17 +60,26 @@ func MustCreateCASignedCertSecret(t *testing.T, namespace, secretName string, ho
 
 	var serverCert, serverKey bytes.Buffer
 
-	require.NoError(t, generateRSACert(hosts, &serverKey, &serverCert, ca, caPrivKey), "failed to generate CA signed RSA certificate")
+	require.NoError(t, generateRSACert(hosts, &serverKey, &serverCert, []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth}, ca, caPrivKey), "failed to generate CA signed RSA certificate")
 
 	return formatSecret(serverCert, serverKey, namespace, secretName)
 }
 
-// formatSecret formats the server certificate, key, namespace, and secretName
+// MustCreateCASignedClientCertSecret creates a CA-signed SSL client certificate and stores it in a secret
+func MustCreateCASignedClientCertSecret(t *testing.T, namespace, secretName string, ca *x509.Certificate, caPrivKey *rsa.PrivateKey) *corev1.Secret {
+	var clientCert, clientKey bytes.Buffer
+
+	require.NoError(t, generateRSACert([]string{}, &clientKey, &clientCert, []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth}, ca, caPrivKey), "failed to generate CA signed RSA client certificate")
+
+	return formatSecret(clientCert, clientKey, namespace, secretName)
+}
+
+// formatSecret formats the certificate, key, namespace, and secretName
 // and converts it to a Kubernetes Secret object.
-func formatSecret(serverCert bytes.Buffer, serverKey bytes.Buffer, namespace string, secretName string) *corev1.Secret {
+func formatSecret(cert bytes.Buffer, privateKey bytes.Buffer, namespace string, secretName string) *corev1.Secret {
 	data := map[string][]byte{
-		corev1.TLSCertKey:       serverCert.Bytes(),
-		corev1.TLSPrivateKeyKey: serverKey.Bytes(),
+		corev1.TLSCertKey:       cert.Bytes(),
+		corev1.TLSPrivateKeyKey: privateKey.Bytes(),
 	}
 
 	newSecret := &corev1.Secret{
@@ -86,7 +96,7 @@ func formatSecret(serverCert bytes.Buffer, serverKey bytes.Buffer, namespace str
 
 // generateRSACert generates a basic self-signed certificate if ca and caPrivKey are nil,
 // otherwise it creates CA-signed cert with ca and caPrivkey input. Certs are valid for a year.
-func generateRSACert(hosts []string, keyOut, certOut io.Writer, ca *x509.Certificate, caPrivKey *rsa.PrivateKey) error {
+func generateRSACert(hosts []string, keyOut, certOut io.Writer, extKeyUsage []x509.ExtKeyUsage, ca *x509.Certificate, caPrivKey *rsa.PrivateKey) error {
 	priv, err := rsa.GenerateKey(rand.Reader, rsaBits)
 	if err != nil {
 		return fmt.Errorf("failed to generate key: %w", err)
@@ -110,7 +120,7 @@ func generateRSACert(hosts []string, keyOut, certOut io.Writer, ca *x509.Certifi
 		NotAfter:  notAfter,
 
 		KeyUsage:              x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature,
-		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
+		ExtKeyUsage:           extKeyUsage,
 		BasicConstraintsValid: true,
 	}
 
@@ -119,6 +129,8 @@ func generateRSACert(hosts []string, keyOut, certOut io.Writer, ca *x509.Certifi
 			template.IPAddresses = append(template.IPAddresses, ip)
 		} else if err = validateHost(h); err == nil {
 			template.DNSNames = append(template.DNSNames, h)
+		} else if u, parseErr := url.Parse(h); parseErr == nil {
+			template.URIs = append(template.URIs, u)
 		}
 	}
 
@@ -148,12 +160,10 @@ func generateRSACert(hosts []string, keyOut, certOut io.Writer, ca *x509.Certifi
 
 // MustCreateCACertConfigMap will create a ConfigMap containing a CA Certificate, given a TLS Secret
 // for that CA certificate.  Also returns the CA certificate.
-func MustCreateCACertConfigMap(t *testing.T, namespace, configMapName string, hosts []string) (*corev1.ConfigMap, *x509.Certificate, *rsa.PrivateKey) {
-	require.NotEmpty(t, hosts, "require a non-empty hosts for Subject Alternate Name values")
-
+func MustCreateCACertConfigMap(t *testing.T, namespace, configMapName string) (*corev1.ConfigMap, *x509.Certificate, *rsa.PrivateKey) {
 	var certData, keyData bytes.Buffer
 
-	ca, caBytes, caPrivKey, err := generateCACert(hosts)
+	ca, caBytes, caPrivKey, err := generateCACert()
 	if err != nil {
 		t.Errorf("failed to generate CA certificate and key: %v", err)
 		return nil, nil, nil
@@ -184,8 +194,8 @@ func MustCreateCACertConfigMap(t *testing.T, namespace, configMapName string, ho
 	return caConfigMap, ca, caPrivKey
 }
 
-// generateCACert generates a CA and a CA-signed certificate valid for a year.
-func generateCACert(hosts []string) (*x509.Certificate, []byte, *rsa.PrivateKey, error) {
+// generateCACert generates a CA certificate valid for a year.
+func generateCACert() (*x509.Certificate, []byte, *rsa.PrivateKey, error) {
 	var caBytes []byte
 
 	// Create the CA certificate template.
@@ -207,15 +217,6 @@ func generateCACert(hosts []string) (*x509.Certificate, []byte, *rsa.PrivateKey,
 		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth},
 		KeyUsage:              x509.KeyUsageDigitalSignature | x509.KeyUsageCertSign,
 		BasicConstraintsValid: true,
-	}
-
-	// Ensure only valid hosts make it into the CA cert.
-	for _, h := range hosts {
-		if ip := net.ParseIP(h); ip != nil {
-			ca.IPAddresses = append(ca.IPAddresses, ip)
-		} else if err := validateHost(h); err == nil {
-			ca.DNSNames = append(ca.DNSNames, h)
-		}
 	}
 
 	// Generate the private key to sign certificates.

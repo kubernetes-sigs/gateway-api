@@ -11,9 +11,8 @@ aliases:
 
   # Reference: https://github.com/kubernetes/org/blob/main/config/kubernetes-sigs/sig-network/teams.yaml
   gateway-api-maintainers:
-    - mlavacca
+    - rikatz
     - robscott
-    - shaneutt
     - youngnick
 
   emeritus-gateway-api-maintainers:
@@ -21,6 +20,8 @@ aliases:
     - danehans
     - hbagdi
     - jpeach
+    - mlavacca
+    - shaneutt
 
   gateway-api-mesh-leads:
     - howardjohn
@@ -33,6 +34,7 @@ aliases:
 
   gateway-api-conformance-reviewers:
     - candita
+    - snorwin
     - sunjayBhatia
 
   gateway-api-conformance-approvers:
@@ -46,3 +48,8 @@ aliases:
     - gcs278
     - kflynn
     - LiorLieberman
+
+  gateway-api-doc-approvers:
+    - candita
+    - mikemorris
+    - kflynn

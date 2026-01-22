@@ -99,10 +99,10 @@ negotiated with the other Listener’s certificate.
 
 Mapping a request to a Listener matters if the Gateway configuration has
 different
-[HTTPRoutes](../../reference/spec.md#gateway.networking.k8s.io/v1.HTTPRoute)
+[HTTPRoutes](../../reference/spec.md#httproute)
 bound to the different Listeners. It also matters if the Listeners have
 different
-[GatewayTlsConfigs](../../reference/spec.md#gateway.networking.k8s.io/v1.GatewayTLSConfig)
+[GatewayTlsConfigs](../../reference/spec.md#gatewaytlsconfig)
 attached, for example if one Listener uses mutual TLS and the other does not.
 
 

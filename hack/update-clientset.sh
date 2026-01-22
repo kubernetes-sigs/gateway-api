@@ -40,6 +40,8 @@ readonly OUTPUT_DIR=pkg/client
 readonly OUTPUT_PKG=sigs.k8s.io/gateway-api/pkg/client
 readonly API_PATHS=(apis apisx)
 
+readonly GOTOOL="go tool"
+
 GATEWAY_INPUT_DIRS_SPACE=""
 GATEWAY_INPUT_DIRS_COMMA=""
 GATEWAY_API_DIRS_COMMA=""
@@ -61,7 +63,7 @@ GATEWAY_API_DIRS_COMMA="${GATEWAY_API_DIRS_COMMA%,}" # drop trailing comma
 new_report="$(mktemp -t "$(basename "$0").api_violations.XXXXXX")"
 
 echo "Generating openapi schema"
-go run k8s.io/kube-openapi/cmd/openapi-gen \
+$GOTOOL k8s.io/kube-openapi/cmd/openapi-gen \
   --output-file zz_generated.openapi.go \
   --report-filename "${new_report}" \
   --output-dir "pkg/generated/openapi" \
@@ -74,15 +76,15 @@ go run k8s.io/kube-openapi/cmd/openapi-gen \
 
 
 echo "Generating apply configuration"
-go run k8s.io/code-generator/cmd/applyconfiguration-gen \
-  --openapi-schema <(go run ${SCRIPT_ROOT}/cmd/modelschema) \
+$GOTOOL k8s.io/code-generator/cmd/applyconfiguration-gen \
+  --openapi-schema <(go run ${SCRIPT_ROOT}/tools/modelschema) \
   --output-dir "applyconfiguration" \
   --output-pkg "${APIS_PKG}/applyconfiguration" \
   ${COMMON_FLAGS} \
   ${GATEWAY_INPUT_DIRS_SPACE}
 
 echo "Generating clientset at ${OUTPUT_PKG}/${CLIENTSET_PKG_NAME}"
-go run k8s.io/code-generator/cmd/client-gen \
+$GOTOOL k8s.io/code-generator/cmd/client-gen \
   --clientset-name "${CLIENTSET_NAME}" \
   --input-base "${APIS_PKG}" \
   --input "${GATEWAY_INPUT_DIRS_COMMA//${APIS_PKG}/}" \
@@ -92,14 +94,14 @@ go run k8s.io/code-generator/cmd/client-gen \
   ${COMMON_FLAGS}
 
 echo "Generating listers at ${OUTPUT_PKG}/listers"
-go run k8s.io/code-generator/cmd/lister-gen \
+$GOTOOL k8s.io/code-generator/cmd/lister-gen \
   --output-dir "${OUTPUT_DIR}/listers" \
   --output-pkg "${OUTPUT_PKG}/listers" \
   ${COMMON_FLAGS} \
   ${GATEWAY_INPUT_DIRS_SPACE}
 
 echo "Generating informers"
-go run k8s.io/code-generator/cmd/informer-gen \
+$GOTOOL k8s.io/code-generator/cmd/informer-gen \
   --versioned-clientset-package "${OUTPUT_PKG}/${CLIENTSET_PKG_NAME}/${CLIENTSET_NAME}" \
   --listers-package "${OUTPUT_PKG}/listers" \
   --output-dir "${OUTPUT_DIR}/informers" \
@@ -108,13 +110,20 @@ go run k8s.io/code-generator/cmd/informer-gen \
   ${GATEWAY_INPUT_DIRS_SPACE}
 
 echo "Generating register helpers"
-go run k8s.io/code-generator/cmd/register-gen \
+$GOTOOL k8s.io/code-generator/cmd/register-gen \
   --output-file zz_generated.register.go \
   ${COMMON_FLAGS} \
   ${GATEWAY_INPUT_DIRS_SPACE}
 
 echo "Generating deepcopy"
-go run sigs.k8s.io/controller-tools/cmd/controller-gen \
+$GOTOOL sigs.k8s.io/controller-tools/cmd/controller-gen \
   object:headerFile=${SCRIPT_ROOT}/hack/boilerplate/boilerplate.generatego.txt \
   paths="./apis/..." \
   paths="./apisx/..."
+
+echo "Validating CRD markers"
+go run sigs.k8s.io/controller-tools/cmd/controller-gen \
+  crd \
+  paths="./apis/..." \
+  paths="./apisx/..." \
+  output:none

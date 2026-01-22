@@ -17,14 +17,16 @@ limitations under the License.
 package tests
 
 import (
+	"context"
 	"testing"
 
+	"github.com/stretchr/testify/require"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
 	"k8s.io/apimachinery/pkg/types"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
-	"sigs.k8s.io/gateway-api/apis/v1alpha2"
 	h "sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
@@ -47,88 +49,205 @@ var BackendTLSPolicy = suite.ConformanceTest{
 	Manifests: []string{"tests/backendtlspolicy.yaml"},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
-		routeNN := types.NamespacedName{Name: "gateway-conformance-infra-test", Namespace: ns}
-		gwNN := types.NamespacedName{Name: "gateway-backendtlspolicy", Namespace: ns}
+
+		acceptedCond := metav1.Condition{
+			Type:   string(gatewayv1.PolicyConditionAccepted),
+			Status: metav1.ConditionTrue,
+			Reason: string(gatewayv1.PolicyReasonAccepted),
+		}
+		resolvedRefsCond := metav1.Condition{
+			Type:   string(gatewayv1.BackendTLSPolicyConditionResolvedRefs),
+			Status: metav1.ConditionTrue,
+			Reason: string(gatewayv1.BackendTLSPolicyReasonResolvedRefs),
+		}
+
+		t.Run("Re-encrypt HTTPS request sent to Service with valid BackendTLSPolicy should succeed", func(t *testing.T) {
+			routeNN := types.NamespacedName{Name: "backendtlspolicy-reencrypt", Namespace: ns}
+			gwNN := types.NamespacedName{Name: "same-namespace-with-https-listener", Namespace: ns}
+
+			kubernetes.NamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, []string{ns})
+			gwAddr := kubernetes.GatewayAndRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), &gatewayv1.HTTPRoute{}, false, routeNN)
+			kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN)
+
+			validPolicyNN := types.NamespacedName{Name: "normative-test", Namespace: ns}
+			kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, validPolicyNN, gwNN, acceptedCond)
+			kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, validPolicyNN, gwNN, resolvedRefsCond)
+
+			// For the re-encrypt case, we need to use the cert for the frontend tls listener.
+			certNN := types.NamespacedName{Name: "tls-validity-checks-certificate", Namespace: ns}
+			serverCertPem, _, err := GetTLSSecret(suite.Client, certNN)
+			if err != nil {
+				t.Fatalf("unexpected error finding TLS secret: %v", err)
+			}
+			// Verify that the request to a re-encrypted call to /backendTLS should succeed.
+			tls.MakeTLSRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, serverCertPem, nil, nil, "https-listener.org",
+				h.ExpectedResponse{
+					Namespace: ns,
+					Request: h.Request{
+						Host: "https-listener.org",
+						Path: "/backendtlspolicy",
+						SNI:  "https-listener.org",
+					},
+					ExpectedRequest: &h.ExpectedRequest{
+						Request: h.Request{
+							Path: "/backendtlspolicy",
+							SNI:  "abc.example.com",
+						},
+					},
+					Response: h.Response{StatusCodes: []int{200}},
+				})
+		})
+
+		routeNN := types.NamespacedName{Name: "backendtlspolicy", Namespace: ns}
+		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: ns}
 
 		kubernetes.NamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, []string{ns})
 		gwAddr := kubernetes.GatewayAndRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), &gatewayv1.HTTPRoute{}, false, routeNN)
 		kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN)
 
-		policyCond := metav1.Condition{
-			Type:   string(v1alpha2.PolicyConditionAccepted),
-			Status: metav1.ConditionTrue,
-			Reason: string(v1alpha2.PolicyReasonAccepted),
-		}
-
-		validPolicyNN := types.NamespacedName{Name: "normative-test-backendtlspolicy", Namespace: ns}
-		kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, validPolicyNN, gwNN, policyCond)
-
-		invalidPolicyNN := types.NamespacedName{Name: "backendtlspolicy-host-mismatch", Namespace: ns}
-		kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, invalidPolicyNN, gwNN, policyCond)
-
-		invalidCertPolicyNN := types.NamespacedName{Name: "backendtlspolicy-cert-mismatch", Namespace: ns}
-		kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, invalidCertPolicyNN, gwNN, policyCond)
-
-		serverStr := "abc.example.com"
-
 		// Verify that the request sent to Service with valid BackendTLSPolicy should succeed.
 		t.Run("HTTP request sent to Service with valid BackendTLSPolicy should succeed", func(t *testing.T) {
+			validPolicyNN := types.NamespacedName{Name: "normative-test", Namespace: ns}
+			kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, validPolicyNN, gwNN, acceptedCond)
+			kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, validPolicyNN, gwNN, resolvedRefsCond)
+
 			h.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr,
 				h.ExpectedResponse{
 					Namespace: ns,
 					Request: h.Request{
-						Host: serverStr,
-						Path: "/backendTLS",
-						SNI:  serverStr,
+						Host: "abc.example.com",
+						Path: "/backendtlspolicy",
+						SNI:  "abc.example.com",
 					},
-					Response: h.Response{StatusCode: 200},
-				})
-		})
-
-		// For the re-encrypt case, we need to use the cert for the frontend tls listener.
-		certNN := types.NamespacedName{Name: "tls-checks-certificate", Namespace: ns}
-		cPem, keyPem, err := GetTLSSecret(suite.Client, certNN)
-		if err != nil {
-			t.Fatalf("unexpected error finding TLS secret: %v", err)
-		}
-		// Verify that the request to a re-encrypted call to /backendTLS should succeed.
-		t.Run("Re-encrypt HTTPS request sent to Service with valid BackendTLSPolicy should succeed", func(t *testing.T) {
-			tls.MakeTLSRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, cPem, keyPem, serverStr,
-				h.ExpectedResponse{
-					Namespace: ns,
-					Request: h.Request{
-						Host: serverStr,
-						Path: "/backendTLS",
-						SNI:  serverStr,
-					},
-					Response: h.Response{StatusCode: 200},
+					Response: h.Response{StatusCodes: []int{200}},
 				})
 		})
 
 		// Verify that the request sent to a Service targeted by a BackendTLSPolicy with mismatched host will fail.
 		t.Run("HTTP request sent to Service targeted by BackendTLSPolicy with mismatched hostname should return an HTTP error", func(t *testing.T) {
+			invalidPolicyNN := types.NamespacedName{Name: "host-mismatch", Namespace: ns}
+			kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, invalidPolicyNN, gwNN, acceptedCond)
+			kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, invalidPolicyNN, gwNN, resolvedRefsCond)
+
 			h.MakeRequestAndExpectFailure(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr,
 				h.ExpectedResponse{
 					Namespace: ns,
 					Request: h.Request{
-						Host: serverStr,
-						Path: "/backendTLSHostMismatch",
-						SNI:  serverStr,
+						Host: "abc.example.org",
+						Path: "/backendtlspolicy-host-mismatch",
+						SNI:  "abc.example.com",
 					},
 				})
 		})
 
-		// Verify that request sent to Service targeted by BackendTLSPolicy with mismatched cert should failed.
+		// Verify that request sent to Service targeted by BackendTLSPolicy with mismatched cert should fail.
 		t.Run("HTTP request send to Service targeted by BackendTLSPolicy with mismatched cert should return HTTP error", func(t *testing.T) {
+			invalidCertPolicyNN := types.NamespacedName{Name: "cert-mismatch", Namespace: ns}
+			kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, invalidCertPolicyNN, gwNN, acceptedCond)
+			kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, invalidCertPolicyNN, gwNN, resolvedRefsCond)
+
 			h.MakeRequestAndExpectFailure(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr,
 				h.ExpectedResponse{
 					Namespace: ns,
 					Request: h.Request{
-						Host: serverStr,
-						Path: "/backendTLSCertMismatch",
-						SNI:  serverStr,
+						Host: "abc.example.com",
+						Path: "/backendtlspolicy-cert-mismatch",
+						SNI:  "abc.example.com",
 					},
 				})
 		})
+
+		// Verify that changing a ConfigMap content should be reconciled by the controller
+		t.Run("Changing the content of a ConfigMap used by BackendTLSPolicy as CA certificate should be reconciled by the controller", func(t *testing.T) {
+			ctx := t.Context()
+			gwNN := types.NamespacedName{Name: "same-namespace", Namespace: ns}
+			testPolicyNN := types.NamespacedName{Name: "reconcile-test", Namespace: ns}
+
+			kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, testPolicyNN, gwNN, acceptedCond)
+			kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, testPolicyNN, gwNN, resolvedRefsCond)
+
+			sharedCMNN := types.NamespacedName{Name: "tls-checks-ca-certificate", Namespace: ns}
+			sharedCM := &corev1.ConfigMap{}
+			err := suite.Client.Get(ctx, sharedCMNN, sharedCM)
+			require.NoError(t, err, "failed to get shared configmap")
+			originalCAData := sharedCM.Data["ca.crt"]
+
+			// Create test specific ConfigMap with copied CA data
+			testCMName := "tls-checks-ca-certificate-reconcile-test"
+			testCM := &corev1.ConfigMap{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      testCMName,
+					Namespace: ns,
+				},
+				Data: map[string]string{
+					"ca.crt": originalCAData,
+				},
+			}
+
+			testCMNN := types.NamespacedName{Name: testCMName, Namespace: ns}
+
+			policy := &gatewayv1.BackendTLSPolicy{}
+			err = suite.Client.Get(ctx, testPolicyNN, policy)
+			require.NoError(t, err, "failed to get BackendTLSPolicy")
+			originalCACertRefs := policy.Spec.Validation.CACertificateRefs
+
+			updatedPolicy := policy.DeepCopy()
+			updatedPolicy.Spec.Validation.CACertificateRefs = []gatewayv1.LocalObjectReference{
+				{
+					Group: "",
+					Kind:  "ConfigMap",
+					Name:  gatewayv1.ObjectName(testCMName),
+				},
+			}
+			err = suite.Client.Patch(ctx, updatedPolicy, client.MergeFrom(policy))
+			require.NoError(t, err, "failed to update BackendTLSPolicy to use test-specific ConfigMap")
+
+			invalidAcceptedCond := metav1.Condition{
+				Type:   string(gatewayv1.PolicyConditionAccepted),
+				Status: metav1.ConditionFalse,
+				Reason: string(gatewayv1.BackendTLSPolicyReasonNoValidCACertificate),
+			}
+			invalidResolvedRefsCond := metav1.Condition{
+				Type:   string(gatewayv1.BackendTLSPolicyConditionResolvedRefs),
+				Status: metav1.ConditionFalse,
+				Reason: string(gatewayv1.BackendTLSPolicyReasonInvalidCACertificateRef),
+			}
+
+			kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, testPolicyNN, gwNN, invalidAcceptedCond)
+			kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, testPolicyNN, gwNN, invalidResolvedRefsCond)
+			suite.Applier.MustApplyObjectsWithCleanup(t, suite.Client, suite.TimeoutConfig, []client.Object{testCM}, suite.Cleanup)
+			kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, testPolicyNN, gwNN, acceptedCond)
+			kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, testPolicyNN, gwNN, resolvedRefsCond)
+
+			patchConfigMapCACert(ctx, t, suite.Client, testCMNN, "")
+
+			kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, testPolicyNN, gwNN, invalidAcceptedCond)
+			kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, testPolicyNN, gwNN, invalidResolvedRefsCond)
+
+			patchConfigMapCACert(ctx, t, suite.Client, testCMNN, originalCAData)
+
+			kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, testPolicyNN, gwNN, acceptedCond)
+			kubernetes.BackendTLSPolicyMustHaveCondition(t, suite.Client, suite.TimeoutConfig, testPolicyNN, gwNN, resolvedRefsCond)
+
+			err = suite.Client.Get(ctx, testPolicyNN, policy)
+			require.NoError(t, err, "failed to get BackendTLSPolicy for cleanup")
+
+			restoredPolicy := policy.DeepCopy()
+			restoredPolicy.Spec.Validation.CACertificateRefs = originalCACertRefs
+			err = suite.Client.Patch(ctx, restoredPolicy, client.MergeFrom(policy))
+			require.NoError(t, err, "failed to restore BackendTLSPolicy to use shared ConfigMap")
+		})
 	},
+}
+
+func patchConfigMapCACert(ctx context.Context, t *testing.T, c client.Client, cmNN types.NamespacedName, caCertData string) {
+	t.Helper()
+	currentCM := &corev1.ConfigMap{}
+	err := c.Get(ctx, cmNN, currentCM)
+	require.NoError(t, err, "failed to get ConfigMap", "namespace", cmNN.Namespace, "name", cmNN.Name)
+
+	patchedCM := currentCM.DeepCopy()
+	patchedCM.Data["ca.crt"] = caCertData
+	err = c.Patch(ctx, patchedCM, client.MergeFrom(currentCM))
+	require.NoError(t, err, "failed to patch ConfigMap", "namespace", cmNN.Namespace, "name", cmNN.Name)
 }
