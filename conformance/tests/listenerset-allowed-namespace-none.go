@@ -47,6 +47,7 @@ var ListenerSetAllowedNamespaceNone = suite.ConformanceTest{
 		ns := "gateway-conformance-infra"
 		kubernetes.NamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, []string{ns})
 
+		// Verify the gateway is accepted
 		gwNN := types.NamespacedName{Name: "gateway-does-not-allow-listenerset", Namespace: ns}
 		kubernetes.GatewayMustHaveCondition(t, suite.Client, suite.TimeoutConfig, gwNN, metav1.Condition{
 			Type:   string(gatewayv1.GatewayConditionAccepted),
@@ -56,6 +57,7 @@ var ListenerSetAllowedNamespaceNone = suite.ConformanceTest{
 		// - gateway-conformance-infra/listenerset-not-allowed - the gateway is not configured to allow listenerSets
 		kubernetes.GatewayMustHaveAttachedListeners(t, suite.Client, suite.TimeoutConfig, gwNN, 0)
 
+		// Verify that listenerset-not-allowed is rejected with the `ListenerSetReasonNotAllowed` condition
 		disallowedLsNN := types.NamespacedName{Name: "listenerset-not-allowed", Namespace: ns}
 		kubernetes.ListenerSetMustHaveCondition(t, suite.Client, suite.TimeoutConfig, disallowedLsNN, metav1.Condition{
 			Type:   string(gatewayxv1a1.ListenerSetConditionAccepted),

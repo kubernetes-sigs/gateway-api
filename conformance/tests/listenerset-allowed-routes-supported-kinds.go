@@ -50,29 +50,7 @@ var ListenerSetAllowedRoutesSupportedKinds = suite.ConformanceTest{
 		ns := "gateway-conformance-infra"
 		kubernetes.NamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, []string{ns})
 
-		acceptedListenerConditions := []metav1.Condition{
-			{
-				Type:   string(gatewayv1.ListenerConditionResolvedRefs),
-				Status: metav1.ConditionTrue,
-				Reason: "", // any reason
-			},
-			{
-				Type:   string(gatewayv1.ListenerConditionAccepted),
-				Status: metav1.ConditionTrue,
-				Reason: "", // any reason
-			},
-			{
-				Type:   string(gatewayv1.ListenerConditionProgrammed),
-				Status: metav1.ConditionTrue,
-				Reason: "", // any reason
-			},
-			{
-				Type:   string(gatewayv1.ListenerConditionConflicted),
-				Status: metav1.ConditionFalse,
-				Reason: string(gatewayv1.ListenerReasonNoConflicts),
-			},
-		}
-
+		// Verify the gateway is accepted
 		gwNN := types.NamespacedName{Name: "gateway-with-listener-sets", Namespace: ns}
 		kubernetes.GatewayMustHaveCondition(t, suite.Client, suite.TimeoutConfig, gwNN, metav1.Condition{
 			Type:   string(gatewayv1.GatewayConditionAccepted),
@@ -80,7 +58,7 @@ var ListenerSetAllowedRoutesSupportedKinds = suite.ConformanceTest{
 		})
 		kubernetes.GatewayMustHaveAttachedListeners(t, suite.Client, suite.TimeoutConfig, gwNN, 1)
 
-		// listenerset-test-allowed-routes
+		// Verify the accepted listenerSet has the appropriate conditions
 		routes := []types.NamespacedName{
 			{Name: "http-route", Namespace: ns},
 		}
@@ -98,9 +76,9 @@ var ListenerSetAllowedRoutesSupportedKinds = suite.ConformanceTest{
 					Group: (*gatewayv1.Group)(&gatewayv1.GroupVersion.Group),
 					Kind:  gatewayv1.Kind("HTTPRoute"),
 				}},
-				// This attaches to route-in-same-namespace, route-in-selected-namespace, route-not-in-selected-namespace
+				// This only attaches to the HTTPRoute
 				AttachedRoutes: 1,
-				Conditions:     acceptedListenerConditions,
+				Conditions:     generateAcceptedListenerConditions(),
 			},
 		})
 	},

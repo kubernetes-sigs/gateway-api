@@ -52,29 +52,7 @@ var ListenerSetAllowedRoutesNamespaces = suite.ConformanceTest{
 		ns := "gateway-conformance-infra"
 		kubernetes.NamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, []string{ns})
 
-		acceptedListenerConditions := []metav1.Condition{
-			{
-				Type:   string(gatewayv1.ListenerConditionResolvedRefs),
-				Status: metav1.ConditionTrue,
-				Reason: "", // any reason
-			},
-			{
-				Type:   string(gatewayv1.ListenerConditionAccepted),
-				Status: metav1.ConditionTrue,
-				Reason: "", // any reason
-			},
-			{
-				Type:   string(gatewayv1.ListenerConditionProgrammed),
-				Status: metav1.ConditionTrue,
-				Reason: "", // any reason
-			},
-			{
-				Type:   string(gatewayv1.ListenerConditionConflicted),
-				Status: metav1.ConditionFalse,
-				Reason: string(gatewayv1.ListenerReasonNoConflicts),
-			},
-		}
-
+		// Verify the gateway is accepted
 		gwNN := types.NamespacedName{Name: "gateway-with-listener-sets", Namespace: ns}
 		gwAddr, err := kubernetes.WaitForGatewayAddress(t, suite.Client, suite.TimeoutConfig, kubernetes.NewGatewayRef(gwNN, "gateway-listener"))
 		require.NoErrorf(t, err, "timed out waiting for Gateway address to be assigned")
@@ -84,7 +62,7 @@ var ListenerSetAllowedRoutesNamespaces = suite.ConformanceTest{
 		})
 		kubernetes.GatewayMustHaveAttachedListeners(t, suite.Client, suite.TimeoutConfig, gwNN, 1)
 
-		// listenerset-test-allowed-routes
+		// Verify the accepted listenerSet has the appropriate conditions
 		routes := []types.NamespacedName{
 			{Name: "route-in-same-namespace", Namespace: ns},
 			{Name: "route-in-selected-namespace", Namespace: "gateway-api-example-allowed-ns"},
@@ -103,21 +81,21 @@ var ListenerSetAllowedRoutesNamespaces = suite.ConformanceTest{
 				SupportedKinds: generateSupportedRouteKinds(),
 				// This attaches to route-in-same-namespace, route-in-selected-namespace, route-not-in-selected-namespace
 				AttachedRoutes: 3,
-				Conditions:     acceptedListenerConditions,
+				Conditions:     generateAcceptedListenerConditions(),
 			},
 			{
 				Name:           "listener-set-listener-allowed-routes-same",
 				SupportedKinds: generateSupportedRouteKinds(),
 				// This attaches to route-in-same-namespace
 				AttachedRoutes: 1,
-				Conditions:     acceptedListenerConditions,
+				Conditions:     generateAcceptedListenerConditions(),
 			},
 			{
 				Name:           "listener-set-listener-allowed-routes-selector",
 				SupportedKinds: generateSupportedRouteKinds(),
 				// This attaches to route-in-selected-namespace
 				AttachedRoutes: 1,
-				Conditions:     acceptedListenerConditions,
+				Conditions:     generateAcceptedListenerConditions(),
 			},
 		})
 
@@ -178,62 +156,4 @@ var ListenerSetAllowedRoutesNamespaces = suite.ConformanceTest{
 			})
 		}
 	},
-}
-
-// func gatewayToParentRef(gateway types.NamespacedName) gatewayv1.ParentReference {
-// 	var (
-// 		group     = gatewayv1.Group(gatewayv1.GroupName)
-// 		kind      = gatewayv1.Kind("Gateway")
-// 		namespace = gatewayv1.Namespace(gateway.Namespace)
-// 		name      = gatewayv1.ObjectName(gateway.Name)
-// 	)
-
-// 	return gatewayv1.ParentReference{
-// 		Group:     &group,
-// 		Kind:      &kind,
-// 		Namespace: &namespace,
-// 		Name:      name,
-// 	}
-// }
-
-// func listenerSetToParentRef(listenerSet types.NamespacedName) gatewayv1.ParentReference {
-// 	var (
-// 		group     = gatewayv1.Group(gatewayxv1a1.GroupName)
-// 		kind      = gatewayv1.Kind("XListenerSet")
-// 		namespace = gatewayv1.Namespace(listenerSet.Namespace)
-// 		name      = gatewayv1.ObjectName(listenerSet.Name)
-// 	)
-
-// 	return gatewayv1.ParentReference{
-// 		Group:     &group,
-// 		Kind:      &kind,
-// 		Namespace: &namespace,
-// 		Name:      name,
-// 	}
-// }
-
-// func generateAcceptedRouteParentStatus(controllerName string, parentRefs ...gatewayv1.ParentReference) []gatewayv1.RouteParentStatus {
-// 	var routeParentStatus []gatewayv1.RouteParentStatus
-// 	for _, parent := range parentRefs {
-// 		routeParentStatus = append(routeParentStatus, gatewayv1.RouteParentStatus{
-// 			ParentRef:      parent,
-// 			ControllerName: gatewayv1.GatewayController(controllerName),
-// 			Conditions: []metav1.Condition{{
-// 				Type:   string(gatewayv1.RouteConditionAccepted),
-// 				Status: metav1.ConditionTrue,
-// 				Reason: string(gatewayv1.RouteReasonAccepted),
-// 			}},
-// 		})
-// 	}
-// 	return routeParentStatus
-// }
-
-func generateSupportedRouteKinds() []gatewayv1.RouteGroupKind {
-	return []gatewayv1.RouteGroupKind{{
-		Group: (*gatewayv1.Group)(&gatewayv1.GroupVersion.Group),
-		Kind:  gatewayv1.Kind("HTTPRoute"),
-	}, {
-		Group: (*gatewayv1.Group)(&gatewayv1.GroupVersion.Group),
-		Kind:  gatewayv1.Kind("GRPCRoute"),
-	}}
 }

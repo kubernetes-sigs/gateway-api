@@ -47,28 +47,6 @@ var ListenerSetProtocolConflict = suite.ConformanceTest{
 		ns := "gateway-conformance-infra"
 		kubernetes.NamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, []string{ns})
 
-		acceptedListenerConditions := []metav1.Condition{
-			{
-				Type:   string(gatewayv1.ListenerConditionResolvedRefs),
-				Status: metav1.ConditionTrue,
-				Reason: "", // any reason
-			},
-			{
-				Type:   string(gatewayv1.ListenerConditionAccepted),
-				Status: metav1.ConditionTrue,
-				Reason: "", // any reason
-			},
-			{
-				Type:   string(gatewayv1.ListenerConditionProgrammed),
-				Status: metav1.ConditionTrue,
-				Reason: "", // any reason
-			},
-			{
-				Type:   string(gatewayv1.ListenerConditionConflicted),
-				Status: metav1.ConditionFalse,
-				Reason: string(gatewayv1.ListenerReasonNoConflicts),
-			},
-		}
 		protocolConflictedListenerConditions := []metav1.Condition{
 			{
 				Type:   string(gatewayv1.ListenerConditionResolvedRefs),
@@ -92,15 +70,15 @@ var ListenerSetProtocolConflict = suite.ConformanceTest{
 			},
 		}
 
-		// Gateway conditions
+		// Verify the gateway is accepted
 		gwNN := types.NamespacedName{Name: "gateway-with-listenerset-protocol-conflict", Namespace: ns}
 		kubernetes.GatewayMustHaveCondition(t, suite.Client, suite.TimeoutConfig, gwNN, metav1.Condition{
 			Type:   string(gatewayv1.GatewayConditionAccepted),
 			Status: metav1.ConditionTrue,
 		})
-		kubernetes.GatewayListenersMustHaveConditions(t, suite.Client, suite.TimeoutConfig, gwNN, acceptedListenerConditions, "gateway-listener")
+		kubernetes.GatewayListenersMustHaveConditions(t, suite.Client, suite.TimeoutConfig, gwNN, generateAcceptedListenerConditions(), "gateway-listener")
 		// The first conflicted listener is accepted based on Listener precedence
-		kubernetes.GatewayListenersMustHaveConditions(t, suite.Client, suite.TimeoutConfig, gwNN, acceptedListenerConditions, "protocol-conflict-with-gateway-listener")
+		kubernetes.GatewayListenersMustHaveConditions(t, suite.Client, suite.TimeoutConfig, gwNN, generateAcceptedListenerConditions(), "protocol-conflict-with-gateway-listener")
 
 		// The following listenerSets are accepted since they have at least one valid listener :
 		// - listenerset-with-protocol-conflict-with-gateway-1
@@ -124,11 +102,11 @@ var ListenerSetProtocolConflict = suite.ConformanceTest{
 			// TODO: Maybe this should be just programmed ????
 			Reason: string(gatewayxv1a1.ListenerSetReasonListenersNotValid),
 		})
-		kubernetes.ListenerSetListenersMustHaveConditions(t, suite.Client, suite.TimeoutConfig, lsNN, acceptedListenerConditions, "listener-set-1-listener")
+		kubernetes.ListenerSetListenersMustHaveConditions(t, suite.Client, suite.TimeoutConfig, lsNN, generateAcceptedListenerConditions(), "listener-set-1-listener")
 		// The conflicted listener should not be accepted
 		kubernetes.ListenerSetListenersMustHaveConditions(t, suite.Client, suite.TimeoutConfig, lsNN, protocolConflictedListenerConditions, "protocol-conflict-with-gateway-listener")
 		// The first conflicted listener is accepted based on Listener precedence
-		kubernetes.ListenerSetListenersMustHaveConditions(t, suite.Client, suite.TimeoutConfig, lsNN, acceptedListenerConditions, "protocol-conflict-with-listener-set-listener")
+		kubernetes.ListenerSetListenersMustHaveConditions(t, suite.Client, suite.TimeoutConfig, lsNN, generateAcceptedListenerConditions(), "protocol-conflict-with-listener-set-listener")
 
 		// listenerset-with-protocol-conflict-with-gateway-2, route and conditions
 		lsNN = types.NamespacedName{Name: "listenerset-with-protocol-conflict-with-gateway-2", Namespace: ns}
@@ -159,7 +137,7 @@ var ListenerSetProtocolConflict = suite.ConformanceTest{
 			// TODO: Maybe this should be just programmed ????
 			Reason: string(gatewayxv1a1.ListenerSetReasonListenersNotValid),
 		})
-		kubernetes.ListenerSetListenersMustHaveConditions(t, suite.Client, suite.TimeoutConfig, lsNN, acceptedListenerConditions, "listener-set-2-listener")
+		kubernetes.ListenerSetListenersMustHaveConditions(t, suite.Client, suite.TimeoutConfig, lsNN, generateAcceptedListenerConditions(), "listener-set-2-listener")
 		// The conflicted listener should not be accepted
 		kubernetes.ListenerSetListenersMustHaveConditions(t, suite.Client, suite.TimeoutConfig, lsNN, protocolConflictedListenerConditions, "protocol-conflict-with-listener-set-listener")
 

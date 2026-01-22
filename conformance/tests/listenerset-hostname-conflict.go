@@ -47,28 +47,6 @@ var ListenerSetHostnameConflict = suite.ConformanceTest{
 		ns := "gateway-conformance-infra"
 		kubernetes.NamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, []string{ns})
 
-		acceptedListenerConditions := []metav1.Condition{
-			{
-				Type:   string(gatewayv1.ListenerConditionResolvedRefs),
-				Status: metav1.ConditionTrue,
-				Reason: "", // any reason
-			},
-			{
-				Type:   string(gatewayv1.ListenerConditionAccepted),
-				Status: metav1.ConditionTrue,
-				Reason: "", // any reason
-			},
-			{
-				Type:   string(gatewayv1.ListenerConditionProgrammed),
-				Status: metav1.ConditionTrue,
-				Reason: "", // any reason
-			},
-			{
-				Type:   string(gatewayv1.ListenerConditionConflicted),
-				Status: metav1.ConditionFalse,
-				Reason: string(gatewayv1.ListenerReasonNoConflicts),
-			},
-		}
 		hostnameConflictedListenerConditions := []metav1.Condition{
 			{
 				Type:   string(gatewayv1.ListenerConditionResolvedRefs),
@@ -92,15 +70,15 @@ var ListenerSetHostnameConflict = suite.ConformanceTest{
 			},
 		}
 
-		// Gateway conditions
+		// Verify the gateway is accepted
 		gwNN := types.NamespacedName{Name: "gateway-with-listenerset-hostname-conflict", Namespace: ns}
 		kubernetes.GatewayMustHaveCondition(t, suite.Client, suite.TimeoutConfig, gwNN, metav1.Condition{
 			Type:   string(gatewayv1.GatewayConditionAccepted),
 			Status: metav1.ConditionTrue,
 		})
-		kubernetes.GatewayListenersMustHaveConditions(t, suite.Client, suite.TimeoutConfig, gwNN, acceptedListenerConditions, "gateway-listener")
+		kubernetes.GatewayListenersMustHaveConditions(t, suite.Client, suite.TimeoutConfig, gwNN, generateAcceptedListenerConditions(), "gateway-listener")
 		// The first conflicted listener is accepted based on Listener precedence
-		kubernetes.GatewayListenersMustHaveConditions(t, suite.Client, suite.TimeoutConfig, gwNN, acceptedListenerConditions, "hostname-conflict-with-gateway-listener")
+		kubernetes.GatewayListenersMustHaveConditions(t, suite.Client, suite.TimeoutConfig, gwNN, generateAcceptedListenerConditions(), "hostname-conflict-with-gateway-listener")
 		// The following listenerSets are accepted since they have at least one valid listener :
 		// - listenerset-with-hostname-conflict-with-gateway-1
 		// - listenerset-with-hostname-conflict-with-listener-set-1
@@ -123,11 +101,11 @@ var ListenerSetHostnameConflict = suite.ConformanceTest{
 			// TODO: Maybe this should be just programmed ????
 			Reason: string(gatewayxv1a1.ListenerSetReasonListenersNotValid),
 		})
-		kubernetes.ListenerSetListenersMustHaveConditions(t, suite.Client, suite.TimeoutConfig, lsNN, acceptedListenerConditions, "listener-set-1-listener")
+		kubernetes.ListenerSetListenersMustHaveConditions(t, suite.Client, suite.TimeoutConfig, lsNN, generateAcceptedListenerConditions(), "listener-set-1-listener")
 		// The conflicted listener should not be accepted
 		kubernetes.ListenerSetListenersMustHaveConditions(t, suite.Client, suite.TimeoutConfig, lsNN, hostnameConflictedListenerConditions, "hostname-conflict-with-gateway-listener")
 		// The first conflicted listener is accepted based on Listener precedence
-		kubernetes.ListenerSetListenersMustHaveConditions(t, suite.Client, suite.TimeoutConfig, lsNN, acceptedListenerConditions, "hostname-conflict-with-listener-set-listener")
+		kubernetes.ListenerSetListenersMustHaveConditions(t, suite.Client, suite.TimeoutConfig, lsNN, generateAcceptedListenerConditions(), "hostname-conflict-with-listener-set-listener")
 
 		// listenerset-with-hostname-conflict-with-gateway-2 is not accepted since it does not have at least one valid listener
 		lsNN = types.NamespacedName{Name: "listenerset-with-hostname-conflict-with-gateway-2", Namespace: ns}
@@ -158,7 +136,7 @@ var ListenerSetHostnameConflict = suite.ConformanceTest{
 			// TODO: Maybe this should be just programmed ????
 			Reason: string(gatewayxv1a1.ListenerSetReasonListenersNotValid),
 		})
-		kubernetes.ListenerSetListenersMustHaveConditions(t, suite.Client, suite.TimeoutConfig, lsNN, acceptedListenerConditions, "listener-set-2-listener")
+		kubernetes.ListenerSetListenersMustHaveConditions(t, suite.Client, suite.TimeoutConfig, lsNN, generateAcceptedListenerConditions(), "listener-set-2-listener")
 		// The conflicted listener should not be accepted
 		kubernetes.ListenerSetListenersMustHaveConditions(t, suite.Client, suite.TimeoutConfig, lsNN, hostnameConflictedListenerConditions, "hostname-conflict-with-listener-set-listener")
 
