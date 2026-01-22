@@ -99,8 +99,7 @@ var ListenerSetProtocolConflict = suite.ConformanceTest{
 		kubernetes.ListenerSetMustHaveCondition(t, suite.Client, suite.TimeoutConfig, lsNN, metav1.Condition{
 			Type:   string(gatewayxv1a1.ListenerSetConditionProgrammed),
 			Status: metav1.ConditionTrue,
-			// TODO: Maybe this should be just programmed ????
-			Reason: string(gatewayxv1a1.ListenerSetReasonListenersNotValid),
+			Reason: string(gatewayxv1a1.ListenerSetReasonProgrammed),
 		})
 		kubernetes.ListenerSetListenersMustHaveConditions(t, suite.Client, suite.TimeoutConfig, lsNN, generateAcceptedListenerConditions(), "listener-set-1-listener")
 		// The conflicted listener should not be accepted
@@ -134,8 +133,7 @@ var ListenerSetProtocolConflict = suite.ConformanceTest{
 		kubernetes.ListenerSetMustHaveCondition(t, suite.Client, suite.TimeoutConfig, lsNN, metav1.Condition{
 			Type:   string(gatewayxv1a1.ListenerSetConditionProgrammed),
 			Status: metav1.ConditionTrue,
-			// TODO: Maybe this should be just programmed ????
-			Reason: string(gatewayxv1a1.ListenerSetReasonListenersNotValid),
+			Reason: string(gatewayxv1a1.ListenerSetReasonProgrammed),
 		})
 		kubernetes.ListenerSetListenersMustHaveConditions(t, suite.Client, suite.TimeoutConfig, lsNN, generateAcceptedListenerConditions(), "listener-set-2-listener")
 		// The conflicted listener should not be accepted

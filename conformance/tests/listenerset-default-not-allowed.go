@@ -69,6 +69,5 @@ var ListenerSetDefaultNotAllowed = suite.ConformanceTest{
 			Status: metav1.ConditionFalse,
 			Reason: string(gatewayxv1a1.ListenerSetReasonNotAllowed),
 		})
-
 	},
 }
