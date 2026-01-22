@@ -268,7 +268,7 @@ func compareResponse(expected *ExpectedResponse, response *Response) error {
 		expectedHeaders := expected.Response.Headers
 		if expectedHeaders != nil {
 			if receivedHeaders == nil {
-				return fmt.Errorf("No headers captured: expected %v headers", len(*expectedHeaders))
+				return fmt.Errorf("no headers captured: expected %v headers", len(*expectedHeaders))
 			}
 
 			for expectedHeader, expectedValues := range *expectedHeaders {
@@ -284,7 +284,7 @@ func compareResponse(expected *ExpectedResponse, response *Response) error {
 				slices.Sort(sortedReceivedValues)
 
 				if !slices.Equal(sortedExpectedValues, sortedReceivedValues) {
-					return fmt.Errorf("Header: %s, Expected values %v not equal to received values %v", expectedHeader, sortedExpectedValues, sortedReceivedValues)
+					return fmt.Errorf("header: %s, expected values %v not equal to received values %v", expectedHeader, sortedExpectedValues, sortedReceivedValues)
 				}
 			}
 		}
@@ -294,7 +294,7 @@ func compareResponse(expected *ExpectedResponse, response *Response) error {
 			for _, absentHeader := range expected.Response.AbsentHeaders {
 				val, ok := receivedHeadersMap[strings.ToLower(absentHeader)]
 				if ok {
-					return fmt.Errorf("Header: %s, should not be present, got %s", absentHeader, val)
+					return fmt.Errorf("header: %s, should not be present, got %s", absentHeader, val)
 				}
 			}
 		}
