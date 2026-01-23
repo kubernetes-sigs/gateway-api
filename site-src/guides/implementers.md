@@ -105,6 +105,23 @@ to the Gateway API GitHub repo containing details of their testing.
 
 The conformance suite output includes the Gateway API version supported.
 
+### Union feature conformance
+
+Some features are just useful when implemented with another features. 
+As an example, `BackendTLSPolicy` is useful just when combined with a TLS terminated route or a filter that requires encrypted communication with a backend.
+
+We call this behavior a `union feature`. An implementation that decides to support an union feature MUST support the combination with other reported features, being them on `Core` or `Extended` support level.
+
+Let's take the following examples:
+* An implementation that reports support for `BackendTLSPolicy` and `GRPCRoute` MUST support the usage of a `BackendTLSPolicy` when targetting a service inside a `GRPCRoute`.
+* An implementation that reports support for `BackendTLSPolicy` and `TLSRouteTerminate` MUST support the usage of a `BackendTLSPolicy` when targetting a service inside a `TLSRoute` that uses a listener with `mode=Terminate`.
+* An implementation that reports support to `BackendTLSPolicy` and `HTTPRouteRequestMirror` MUST support the usage of a `BackendTLSPolicy` when a route defines a `httproute.spec.rules[].filters.requestMirror.backendRef` of type `Service`.
+
+Features that relies on the `Union feature` behavior MUST make it explicit on their Enhancement Proposal and on their API Reference.
+
+TODO: Maybe mention that ReferenceGrant is the same case.
+TODO: Define how this applies with conformance profiles.
+
 #### Version Compatibility
 
 Once v1.0 is released, for implementations supporting Gateway and GatewayClass,
