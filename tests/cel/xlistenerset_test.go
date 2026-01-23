@@ -82,6 +82,20 @@ func TestValidateXListenerSet(t *testing.T) {
 			},
 			wantErrors: []string{"tls mode must be set for protocol TLS"},
 		},
+		{
+			desc: "tls config present but empty with tls protocol",
+			mutate: func(ls *xgatewayv1alpha1.XListenerSet) {
+				ls.Spec.Listeners = []xgatewayv1alpha1.ListenerEntry{
+					{
+						Name:     xgatewayv1alpha1.SectionName("tls"),
+						Protocol: gatewayv1.TLSProtocolType,
+						Port:     xgatewayv1alpha1.PortNumber(8443),
+						TLS:      &gatewayv1.ListenerTLSConfig{},
+					},
+				}
+			},
+			wantErrors: []string{"tls mode must be set for protocol TLS"},
+		},
 	}
 
 	for _, tc := range testCases {
