@@ -26,6 +26,7 @@ import (
 	"time"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/utils/ptr"
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	xgatewayv1alpha1 "sigs.k8s.io/gateway-api/apisx/v1alpha1"
 )
@@ -38,6 +39,10 @@ func TestValidateXListenerSet(t *testing.T) {
 			Namespace: metav1.NamespaceDefault,
 		},
 		Spec: xgatewayv1alpha1.ListenerSetSpec{
+			ParentRef: xgatewayv1alpha1.ParentGatewayReference{
+				Kind: ptr.To(xgatewayv1alpha1.Kind("Gateway")),
+				Name: xgatewayv1alpha1.ObjectName("example"),
+			},
 			Listeners: []xgatewayv1alpha1.ListenerEntry{
 				{
 					Name:     xgatewayv1alpha1.SectionName("http"),
