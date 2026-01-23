@@ -92,6 +92,28 @@ var TLSRouteHostnameIntersection = suite.ConformanceTest{
 			})
 		})
 
+		t.Run("TLSRoutes with wildcard hostname intersects with wildcard listener hostname", func(t *testing.T) {
+			routeNN := types.NamespacedName{Namespace: ns, Name: "tlsroute-more-specific-wildcard-hostname-2"}
+			gwNN := types.NamespacedName{Name: "gateway-tlsroute-less-specific-wildcard-hostname-intersection", Namespace: ns}
+			gwAddr, _ := kubernetes.GatewayAndTLSRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
+
+			kubernetes.TLSRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN)
+
+			serverCertPem, _, err := GetTLSSecret(suite.Client, certNN)
+			if err != nil {
+				t.Fatalf("unexpected error finding TLS secret: %v", err)
+			}
+
+			t.Run("Simple TLS request matching hostnames intersection should reach backend", func(t *testing.T) {
+				tls.MakeTLSRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, serverCertPem, nil, nil, "other.example.com",
+					http.ExpectedResponse{
+						Request:   http.Request{Host: "other.example.com", Path: "/"},
+						Backend:   "tls-backend",
+						Namespace: ns,
+					})
+			})
+		})
+
 		t.Run("TLSRoute with wildcard hostname intersects with empty listener hostname", func(t *testing.T) {
 			routeNN := types.NamespacedName{Namespace: ns, Name: "tlsroute-less-specific-wildcard-hostname"}
 			gwNN := types.NamespacedName{Name: "gateway-tlsroute-empty-hostname-intersection", Namespace: ns}

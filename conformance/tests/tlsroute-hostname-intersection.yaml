@@ -41,6 +41,26 @@ spec:
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
+  name: gateway-tlsroute-less-specific-wildcard-hostname-intersection
+  namespace: gateway-conformance-infra
+spec:
+  gatewayClassName: "{GATEWAY_CLASS_NAME}"
+  listeners:
+  - name: listener-less-specific-wildcard-hostname
+    protocol: TLS
+    port: 443
+    hostname: "*.com"
+    allowedRoutes:
+      namespaces:
+        from: Same
+      kinds:
+      - kind: TLSRoute
+    tls:
+      mode: Passthrough
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
   name: gateway-tlsroute-empty-hostname-intersection
   namespace: gateway-conformance-infra
 spec:
@@ -81,6 +101,22 @@ metadata:
 spec:
   parentRefs:
   - name: gateway-tlsroute-exact-hostname-intersection
+    namespace: gateway-conformance-infra
+  hostnames:
+  - "*.example.com"
+  rules:
+  - backendRefs:
+    - name: tls-backend
+      port: 443
+---
+apiVersion: gateway.networking.k8s.io/v1alpha3
+kind: TLSRoute
+metadata:
+  name: tlsroute-more-specific-wildcard-hostname-2
+  namespace: gateway-conformance-infra
+spec:
+  parentRefs:
+  - name: gateway-tlsroute-less-specific-wildcard-hostname-intersection
     namespace: gateway-conformance-infra
   hostnames:
   - "*.example.com"
