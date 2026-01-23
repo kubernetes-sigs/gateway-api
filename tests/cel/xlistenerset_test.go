@@ -94,7 +94,7 @@ func TestValidateXListenerSet(t *testing.T) {
 					},
 				}
 			},
-			wantErrors: []string{"tls mode must be set for protocol TLS"},
+			wantErrors: []string{"certificateRefs or options must be specified when mode is Terminate"},
 		},
 	}
 
