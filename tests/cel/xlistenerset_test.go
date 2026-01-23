@@ -1,3 +1,6 @@
+//go:build experimental
+// +build experimental
+
 /*
 Copyright 2026 The Kubernetes Authors.
 
