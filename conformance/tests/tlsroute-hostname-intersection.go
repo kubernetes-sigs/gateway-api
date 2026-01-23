@@ -48,17 +48,17 @@ var TLSRouteHostnameIntersection = suite.ConformanceTest{
 		// namespace so we have to wait for it to be ready.
 		kubernetes.NamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, []string{ns})
 
+		serverCertPem, _, err := GetTLSSecret(suite.Client, certNN)
+		if err != nil {
+			t.Fatalf("unexpected error finding TLS secret: %v", err)
+		}
+
 		t.Run("TLSRoutes with wildcard hostname intersects with exact listener hostname", func(t *testing.T) {
 			routeNN := types.NamespacedName{Namespace: ns, Name: "tlsroute-more-specific-wildcard-hostname"}
 			gwNN := types.NamespacedName{Name: "gateway-tlsroute-exact-hostname-intersection", Namespace: ns}
 			gwAddr, _ := kubernetes.GatewayAndTLSRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
 
 			kubernetes.TLSRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN)
-
-			serverCertPem, _, err := GetTLSSecret(suite.Client, certNN)
-			if err != nil {
-				t.Fatalf("unexpected error finding TLS secret: %v", err)
-			}
 
 			t.Run("Simple TLS request matching hostnames intersection should reach backend", func(t *testing.T) {
 				tls.MakeTLSRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, serverCertPem, nil, nil, "abc.example.com",
@@ -77,11 +77,6 @@ var TLSRouteHostnameIntersection = suite.ConformanceTest{
 
 			kubernetes.TLSRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN)
 
-			serverCertPem, _, err := GetTLSSecret(suite.Client, certNN)
-			if err != nil {
-				t.Fatalf("unexpected error finding TLS secret: %v", err)
-			}
-
 			t.Run("Simple TLS request matching hostnames intersection should reach backend", func(t *testing.T) {
 				tls.MakeTLSRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, serverCertPem, nil, nil, "abc.example.com",
 					http.ExpectedResponse{
@@ -99,11 +94,6 @@ var TLSRouteHostnameIntersection = suite.ConformanceTest{
 
 			kubernetes.TLSRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN)
 
-			serverCertPem, _, err := GetTLSSecret(suite.Client, certNN)
-			if err != nil {
-				t.Fatalf("unexpected error finding TLS secret: %v", err)
-			}
-
 			t.Run("Simple TLS request matching hostnames intersection should reach backend", func(t *testing.T) {
 				tls.MakeTLSRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, serverCertPem, nil, nil, "other.example.com",
 					http.ExpectedResponse{
@@ -120,11 +110,6 @@ var TLSRouteHostnameIntersection = suite.ConformanceTest{
 			gwAddr, _ := kubernetes.GatewayAndTLSRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
 
 			kubernetes.TLSRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN)
-
-			serverCertPem, _, err := GetTLSSecret(suite.Client, certNN)
-			if err != nil {
-				t.Fatalf("unexpected error finding TLS secret: %v", err)
-			}
 
 			t.Run("Simple TLS request matching hostnames intersection should reach backend", func(t *testing.T) {
 				tls.MakeTLSRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, serverCertPem, nil, nil, "other.example.com",
