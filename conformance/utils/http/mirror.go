@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package http //nolint:revive
+package http
 
 import (
 	"fmt"
@@ -33,7 +33,7 @@ import (
 )
 
 func ExpectMirroredRequest(t *testing.T, client client.Client, clientset clientset.Interface, mirrorPods []MirroredBackend, path string, timeoutConfig config.TimeoutConfig) {
-	logPattern := fmt.Sprintf("Echoing back request made t \\%s to client", path)
+	logPattern := fmt.Sprintf("Echoing back request made to \\%s to client", path)
 	ExpectMirroredRequestWithPattern(t, client, clientset, mirrorPods, logPattern, timeoutConfig)
 }
 
