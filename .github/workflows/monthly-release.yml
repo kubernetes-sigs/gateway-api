@@ -79,7 +79,7 @@ jobs:
         run: |
           TAG="${{ steps.tag.outputs.tag }}"
 
-          YEAR_MONTH=$(echo "$TAG" | sed 's/monthly-//')
+          YEAR_MONTH="${{ steps.tag.outputs.year_month }}"
           YEAR=$(echo "$YEAR_MONTH" | cut -d. -f1)
           MONTH_NUM=$(echo "$YEAR_MONTH" | cut -d. -f2)
 
