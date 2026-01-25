@@ -48,17 +48,13 @@ jobs:
           echo "Generated tag: ${TAG}"
 
       - name: Check if tag already exists
-        id: check-tag
         run: |
           if git rev-parse "${{ steps.tag.outputs.tag }}" >/dev/null 2>&1; then
-            echo "exists=true" >> $GITHUB_OUTPUT
-            echo "Tag ${{ steps.tag.outputs.tag }} already exists, skipping release"
-          else
-            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "Error: Tag ${{ steps.tag.outputs.tag }} already exists, aborting release!"
+            exit 1
           fi
 
       - name: Create and push tag
-        if: steps.check-tag.outputs.exists == 'false'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -66,7 +62,6 @@ jobs:
           git push origin "${{ steps.tag.outputs.tag }}"
 
       - name: Build monthly YAML
-        if: steps.check-tag.outputs.exists == 'false'
         env:
           TAG: ${{ steps.tag.outputs.tag }}
           MONTHLY_NONINTERACTIVE: "true"
@@ -74,7 +69,6 @@ jobs:
           make build-monthly-yaml
 
       - name: Generate release notes
-        if: steps.check-tag.outputs.exists == 'false'
         id: release-notes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -148,7 +142,6 @@ jobs:
           fi
 
       - name: Create GitHub Release
-        if: steps.check-tag.outputs.exists == 'false'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.tag.outputs.tag }}
@@ -161,19 +154,14 @@ jobs:
           generate_release_notes: false
 
       - name: Cleanup
-        if: always() && steps.check-tag.outputs.exists == 'false'
+        if: always()
         run: |
           rm -f release-notes.md
 
       - name: Summary
-        if: always()
+        if: success()
         run: |
-          if [ "${{ steps.check-tag.outputs.exists }}" == "true" ]; then
-            echo "## ⚠️ Release Skipped" >> $GITHUB_STEP_SUMMARY
-            echo "Tag ${{ steps.tag.outputs.tag }} already exists. No release was created." >> $GITHUB_STEP_SUMMARY
-          else
-            echo "## ✅ Release Created" >> $GITHUB_STEP_SUMMARY
-            echo "Successfully created monthly release: **${{ steps.tag.outputs.tag }}**" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "View the release: https://github.com/${{ github.repository }}/releases/tag/${{ steps.tag.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
-          fi
+          echo "## ✅ Release Created" >> $GITHUB_STEP_SUMMARY
+          echo "Successfully created monthly release: **${{ steps.tag.outputs.tag }}**" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "View the release: https://github.com/${{ github.repository }}/releases/tag/${{ steps.tag.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
