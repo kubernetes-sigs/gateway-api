@@ -17,6 +17,7 @@ limitations under the License.
 package http
 
 import (
+	"crypto/tls"
 	"fmt"
 	"net"
 	"net/url"
@@ -64,6 +65,10 @@ type ExpectedResponse struct {
 	// ServerName indicates the hostname to which the client attempts to connect,
 	// and which is seen by the backend.
 	ServerName string
+
+	// GetClientCertificateHook is a function called when Server Request Client Certificate.
+	// It is used in tests to verify that a Client Certificate was requested during TLS handshake.
+	GetClientCertificateHook func(*tls.CertificateRequestInfo) (*tls.Certificate, error)
 }
 
 // Request can be used as both the request to make and a means to verify
@@ -162,14 +167,15 @@ func MakeRequest(t *testing.T, expected *ExpectedResponse, gwAddr, protocol, sch
 	tlog.Logf(t, "Making %s request to host %s via %s", expected.Request.Method, expected.Request.Host, reqURL.String())
 
 	req := roundtripper.Request{
-		T:                t,
-		Method:           expected.Request.Method,
-		Host:             expected.Request.Host,
-		URL:              reqURL,
-		Protocol:         expected.Request.Protocol,
-		Headers:          map[string][]string{},
-		UnfollowRedirect: expected.Request.UnfollowRedirect,
-		Body:             expected.Request.Body,
+		T:                        t,
+		Method:                   expected.Request.Method,
+		Host:                     expected.Request.Host,
+		URL:                      reqURL,
+		Protocol:                 expected.Request.Protocol,
+		Headers:                  map[string][]string{},
+		UnfollowRedirect:         expected.Request.UnfollowRedirect,
+		Body:                     expected.Request.Body,
+		GetClientCertificateHook: expected.GetClientCertificateHook,
 	}
 
 	if expected.Request.Headers != nil {

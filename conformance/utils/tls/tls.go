@@ -64,3 +64,20 @@ func WaitForConsistentTLSResponse(t *testing.T, r roundtripper.RoundTripper, req
 	})
 	tlog.Logf(t, "Request passed")
 }
+
+// MakeTLSRequestAndExpectFailureResponse makes one shot request. This function fails
+// when HTTP Status OK (200) is returned.
+func MakeTLSRequestAndExpectFailureResponse(t *testing.T, r roundtripper.RoundTripper, gwAddr string, serverCertificate, clientCertificate, clientCertificateKey []byte, serverName string, expected http.ExpectedResponse) {
+	t.Helper()
+
+	req := http.MakeRequest(t, &expected, gwAddr, roundtripper.HTTPSProtocol, "https")
+	req.ServerName = serverName
+	req.ServerCertificate = serverCertificate
+	req.ClientCertificate = clientCertificate
+	req.ClientCertificateKey = clientCertificateKey
+
+	_, _, err := r.CaptureRoundTrip(req)
+	if err == nil {
+		t.Fatalf("Request should fail")
+	}
+}
