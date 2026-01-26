@@ -26,6 +26,12 @@ If an object is referred to from outside its namespace, the object's owner must
 create a ReferenceGrant resource to explicitly allow that reference. Without a
 ReferenceGrant, a cross namespace reference is invalid.
 
+It is recommended that `ReferenceGrants` are used with caution, and that validations
+and limits are applied by cluster admins to guarantee the proper usage of this resource.
+
+Please refer to [Security Considerations](../concepts/security-considerations.md#limiting-cross-namespace-references)
+for more details.
+
 ## Structure
 Fundamentally a ReferenceGrant is made up of two lists, a list of resources
 references may come from, and a list of resources that may be referenced.
