@@ -107,10 +107,10 @@ The conformance suite output includes the Gateway API version supported.
 
 ### Union feature conformance
 
-Some features are just useful when implemented with another features. 
-As an example, `BackendTLSPolicy` is useful just when combined with a TLS terminated route or a filter that requires encrypted communication with a backend.
+Some features are only useful when implemented with another features. 
+As an example, `BackendTLSPolicy` is useful only when combined with a TLS terminated route or a filter that requires encrypted communication with a backend.
 
-We call this behavior a `union feature`. An implementation that decides to support an union feature MUST support the combination with other reported features, being them on `Core` or `Extended` support level.
+We call this behavior a `union feature`. An implementation that decides to support an union feature MUST support the feature in combination with all other `Core` or `Extended` features that are support by the implementation.
 
 Let's take the following examples:
 * An implementation that reports support for `BackendTLSPolicy` and `GRPCRoute` MUST support the usage of a `BackendTLSPolicy` when targetting a service inside a `GRPCRoute`.
