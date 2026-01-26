@@ -1,4 +1,106 @@
-# Gateway API security considerations
+# Security
+
+## Introduction
+Gateway API has been designed to enable granular authorization for each role in
+a typical organization.
+
+## Resources
+Gateway API has 3 primary API resources:
+
+* **GatewayClass** defines a set of gateways with a common configuration and
+  behavior.
+* **Gateway** requests a point where traffic can be translated to Services
+  within the cluster.
+* **Routes** describe how traffic coming via the Gateway maps to the Services.
+
+## Roles and personas
+
+There are 3 primary roles in Gateway API, as described in [roles and personas]:
+
+- **Ian** (he/him): Infrastructure Provider
+- **Chihiro** (they/them): Cluster Operator
+- **Ana** (she/her): Application Developer
+
+[roles and personas]:roles-and-personas.md
+
+### RBAC
+
+RBAC (role-based access control) is the standard used for Kubernetes
+authorization. This allows users to configure who can perform actions on
+resources in specific scopes. RBAC can be used to enable each of the roles
+defined above. In most cases, it will be desirable to have all resources be
+readable by most roles, so instead we'll focus on write access for this model.
+
+#### Write Permissions for Simple 3 Tier Model
+| | GatewayClass | Gateway | Route |
+|-|-|-|-|
+| Infrastructure Provider | Yes | Yes | Yes |
+| Cluster Operators | No | Yes | Yes |
+| Application Developers | No | No | Yes |
+
+#### Write Permissions for Advanced 4 Tier Model
+| | GatewayClass | Gateway | Route |
+|-|-|-|-|
+| Infrastructure Provider | Yes | Yes | Yes |
+| Cluster Operators | Sometimes | Yes | Yes |
+| Application Admins | No | In Specified Namespaces | In Specified Namespaces |
+| Application Developers | No | No | In Specified Namespaces |
+
+## Crossing Namespace Boundaries
+Gateway API provides new ways to cross namespace boundaries. These
+cross-namespace capabilities are quite powerful but need to be used carefully to
+avoid accidental exposure. As a rule, every time we allow a namespace boundary
+to be crossed, we require a handshake between namespaces. There are 2 different
+ways that can occur:
+
+### 1. Route Binding
+Routes can be connected to Gateways in different namespaces. To accomplish this,
+The Gateway owner must explicitly allow Routes to bind from additional
+namespaces. This is accomplished by configuring allowedRoutes within a Gateway
+listener to look something like this:
+
+```yaml
+namespaces:
+  from: Selector
+  selector:
+    matchExpressions:
+    - key: kubernetes.io/metadata.name
+      operator: In
+      values:
+      - foo
+      - bar
+```
+
+This will allow routes from the "foo" and "bar" namespaces to attach to this
+Gateway listener.
+
+#### Risks of Other Labels
+Although it's possible to use other labels with this selector, it is not quite
+as safe. While the `kubernetes.io/metadata.name` label is consistently set on
+namespaces to the name of the namespace, other labels do not have the same
+guarantee. If you used a custom label such as `env`, anyone that is able to
+label namespaces within your cluster would effectively be able to change the set
+of namespaces your Gateway supported.
+
+### 2. ReferenceGrant
+There are some cases where we allow other object references to cross namespace
+boundaries. This includes Gateways referencing Secrets and Routes referencing
+Backends (usually Services). In these cases, the required handshake is
+accomplished with a ReferenceGrant resource. This resource exists within a
+target namespace and can be used to allow references from other namespaces.
+
+For example, the following ReferenceGrant allows references from HTTPRoutes in
+the "prod" namespace to Services that are deployed in the same namespace as
+the ReferenceGrant.
+
+```yaml
+{% include 'standard/reference-grant.yaml' %}
+```
+
+For more information on ReferenceGrant, refer to our [detailed documentation
+for this resource](../api-types/referencegrant.md).
+
+## Security considerations
 
 Gateway controllers can be deployed in a multi-tenant environment, where different
 namespaces are used by different users and customers.
@@ -6,7 +108,7 @@ namespaces are used by different users and customers.
 Some caution should be taken by the cluster administrators and Gateway owners to
 provide a safer environment.
 
-## Avoiding hostname/domain hijacking
+### Avoiding hostname/domain hijacking
 
 On Gateway API, it is possible for distinct Routes and ListenerSets to claim the same hostname. 
 Gateway controllers are responsible for the conflict resolution, that usually works on a first-come, first-served basis, where the first created resource wins in the  conflict management.
@@ -76,7 +178,7 @@ To avoid this situation, the following actions should be taken:
             from: All
     ```
 
-### More than 64 listeners
+#### More than 64 listeners
 
 Gateway resource has a limitation of 64 listener entries. If you need more than 64
 listeners, you should consider allowing your users to set their hostnames directly
@@ -86,7 +188,7 @@ by relying on a mechanism like `ValidatingAdmissionPolicy`.
 In case you opt to use (the still experimental) `ListenerSet`, a similar mechanism
 should also be considered to limit what hostnames a `ListenerSet` can claim.
 
-### Example of a ValidatingAdmissionPolicy
+#### Example of a ValidatingAdmissionPolicy
 
 A [ValidatingAdmissionPolicy](https://kubernetes.io/docs/reference/access-authn-authz/validating-admission-policy/)
 can be used to add rules that limits what namespaces can use what domains. 
@@ -149,7 +251,7 @@ domains with a command like `kubectl annotate ns default domains=www.dom1.tld,ww
 Additionally, when dealing with environments that provide DNS record creations,
 admins should be aware and limit the DNS creation based on the same constraints above.
 
-## Limiting Cross-Namespace References
+### Limiting Cross-Namespace References
 
 Owners of resources should be aware of the usage of [ReferenceGrants](../api-types/referencegrant.md).
 
@@ -211,7 +313,7 @@ ReferenceGrant owners should ensure that the reference permissions being granted
   * In particular, DO NOT leave `name` unspecified, even though it is optional, without a *very* good reason, as that is granting a blanket 
 
 
-## Proper definition of Roles and RoleBinding
+### Proper definition of Roles and RoleBinding
 
 The creation of a new Gateway should be considered as a privileged permission.
 The unguarded creation of Gateways may increase costs, infrastructure modifications
@@ -225,7 +327,7 @@ allowing regular users to modify a Gateway API status.
 
 For more information about the security model of Gateway API, check [Security Model](security-model.md)
 
-## Usage and limit of GatewayClass
+### Usage and limit of GatewayClass
 
 A cluster may have different GatewayClasses, with different purposes. As an example,
 one GatewayClass may enforce that Gateways attached to it can only use internal load balancers.
