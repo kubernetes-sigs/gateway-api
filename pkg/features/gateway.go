@@ -70,10 +70,13 @@ const (
 	SupportGatewayListenerSet FeatureName = "GatewayListenerSet"
 
 	// SupportGatewayBackendClientCertificate option indicates support for
-	// specifying client certificates, which will be sent to the backend.
+	// specifying client certificates when the Gateway originates the connection
+	// to the backend.
 	SupportGatewayBackendClientCertificate = "GatewayBackendClientCertificate"
 
-	// This option indicates support for Client Certificate Validation for Gateway.
+	// SupportGatewayFrontendClientCertificateValidation option indicates support
+	// for client certificate validation when the Gateway terminates the connection
+	// from the client.
 	SupportGatewayFrontendClientCertificateValidation FeatureName = "GatewayFrontendClientCertificateValidation"
 )
 
