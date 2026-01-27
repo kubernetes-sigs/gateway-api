@@ -1,6 +1,6 @@
-version: v2.7.0
+version: v2.8.0
 name: golangci-kube-api-linter
 destination: ./bin
 plugins:
 - module: 'sigs.k8s.io/kube-api-linter'
-  version: 'v0.0.0-20251201121224-8e86c463aeb8' # Pin to a commit while there's no tag
+  version: 'v0.0.0-20260123105127-470c3a315f3a' # Pin to a commit while there's no tag
