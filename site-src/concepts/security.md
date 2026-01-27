@@ -310,8 +310,7 @@ spec:
 ReferenceGrant owners should ensure that the reference permissions being granted are as minimal as possible.
 
 * Specify `to` targets in all possible ways (`group`, `kind`, **and** `name`)  
-  * In particular, DO NOT leave `name` unspecified, even though it is optional, without a *very* good reason, as that is granting a blanket 
-
+* In particular, DO NOT leave `name` unspecified, even though it is optional, without a *very* good reason, as that is granting a blanket 
 
 ### Proper definition of Roles and RoleBinding
 
@@ -324,8 +323,6 @@ that reflect proper user permissions.
 
 Additionally, it is highly recommended that the strict permissions are given, not
 allowing regular users to modify a Gateway API status.
-
-For more information about the security model of Gateway API, check [Security Model](security-model.md)
 
 ### Usage and limit of GatewayClass
 
