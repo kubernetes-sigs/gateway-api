@@ -1932,15 +1932,12 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: name
       type:
         scalar: string
-      default: ""
     - name: port
       type:
         scalar: numeric
-      default: 0
     - name: protocol
       type:
         scalar: string
-      default: ""
     - name: tls
       type:
         namedType: io.k8s.sigs.gateway-api.apis.v1.ListenerTLSConfig
@@ -1962,7 +1959,6 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: name
       type:
         scalar: string
-      default: ""
     - name: supportedKinds
       type:
         list:
@@ -2009,7 +2005,6 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: controllerName
       type:
         scalar: string
-      default: ""
     - name: description
       type:
         scalar: string
