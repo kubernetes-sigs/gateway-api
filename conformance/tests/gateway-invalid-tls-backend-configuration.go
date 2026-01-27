@@ -37,7 +37,7 @@ var GatewayInvalidTLSBackendConfiguration = suite.ConformanceTest{
 	Description: "A Gateway should have ResolvedRefs condition set false if the Gateway has an invalid backend TLS configuration",
 	Features: []features.FeatureName{
 		features.SupportGateway,
-		features.SupportGatewayTLSBackendClientCertificate,
+		features.SupportGatewayBackendClientCertificate,
 		features.SupportHTTPRoute,
 		features.SupportBackendTLSPolicy,
 	},
