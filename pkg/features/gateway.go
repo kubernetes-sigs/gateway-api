@@ -69,11 +69,14 @@ const (
 	//  with ListenerSets
 	SupportGatewayListenerSet FeatureName = "GatewayListenerSet"
 
-	// SupportGatewayTLSBackendClientCertificate option indicates support for
-	// specifying client certificates, which will be sent to the backend.
-	SupportGatewayTLSBackendClientCertificate = "GatewayTLSBackendClientCertificate"
+	// SupportGatewayBackendClientCertificate option indicates support for
+	// specifying client certificates when the Gateway originates the connection
+	// to the backend.
+	SupportGatewayBackendClientCertificate = "GatewayBackendClientCertificate"
 
-	// This option indicates support for Client Certificate Validation for Gateway.
+	// SupportGatewayFrontendClientCertificateValidation option indicates support
+	// for client certificate validation when the Gateway terminates the connection
+	// from the client.
 	SupportGatewayFrontendClientCertificateValidation FeatureName = "GatewayFrontendClientCertificateValidation"
 )
 
@@ -110,9 +113,9 @@ var (
 		Channel: FeatureChannelExperimental,
 	}
 
-	// GatewayTLSBackendClientCertificate contains metadata for the SupportGatewayTLSBackendClientCertificate feature.
-	GatewayTLSBackendClientCertificate = Feature{
-		Name:    SupportGatewayTLSBackendClientCertificate,
+	// GatewayBackendClientCertificateFeature contains metadata for the SupportGatewayBackendClientCertificate feature.
+	GatewayBackendClientCertificateFeature = Feature{
+		Name:    SupportGatewayBackendClientCertificate,
 		Channel: FeatureChannelExperimental,
 	}
 	// GatewayFrontendClientCertificateValidationFeature contains metadata for the GatewayFrontendClientCertificateValidation feature.
@@ -131,6 +134,6 @@ var GatewayExtendedFeatures = sets.New(
 	GatewayInfrastructurePropagationFeature,
 	GatewayEmptyAddressFeature,
 	GatewayListenerSetFeature,
-	GatewayTLSBackendClientCertificate,
+	GatewayBackendClientCertificateFeature,
 	GatewayFrontendClientCertificateValidationFeature,
 )
