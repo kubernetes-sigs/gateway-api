@@ -24,6 +24,7 @@ import (
 	managedfields "k8s.io/apimachinery/pkg/util/managedfields"
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 	apisv1beta1 "sigs.k8s.io/gateway-api/apis/v1beta1"
+	apisv1 "sigs.k8s.io/gateway-api/applyconfiguration/apis/v1"
 	internal "sigs.k8s.io/gateway-api/applyconfiguration/internal"
 )
 
@@ -50,7 +51,7 @@ type ReferenceGrantApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	// Spec defines the desired state of ReferenceGrant.
-	Spec *ReferenceGrantSpecApplyConfiguration `json:"spec,omitempty"`
+	Spec *apisv1.ReferenceGrantSpecApplyConfiguration `json:"spec,omitempty"`
 }
 
 // ReferenceGrant constructs a declarative configuration of the ReferenceGrant type for use with
@@ -262,7 +263,7 @@ func (b *ReferenceGrantApplyConfiguration) ensureObjectMetaApplyConfigurationExi
 // WithSpec sets the Spec field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Spec field is set to the value of the last call.
-func (b *ReferenceGrantApplyConfiguration) WithSpec(value *ReferenceGrantSpecApplyConfiguration) *ReferenceGrantApplyConfiguration {
+func (b *ReferenceGrantApplyConfiguration) WithSpec(value *apisv1.ReferenceGrantSpecApplyConfiguration) *ReferenceGrantApplyConfiguration {
 	b.Spec = value
 	return b
 }

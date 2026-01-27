@@ -34,6 +34,8 @@ type Interface interface {
 	GatewayClasses() GatewayClassInformer
 	// HTTPRoutes returns a HTTPRouteInformer.
 	HTTPRoutes() HTTPRouteInformer
+	// ReferenceGrants returns a ReferenceGrantInformer.
+	ReferenceGrants() ReferenceGrantInformer
 }
 
 type version struct {
@@ -70,4 +72,9 @@ func (v *version) GatewayClasses() GatewayClassInformer {
 // HTTPRoutes returns a HTTPRouteInformer.
 func (v *version) HTTPRoutes() HTTPRouteInformer {
 	return &hTTPRouteInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// ReferenceGrants returns a ReferenceGrantInformer.
+func (v *version) ReferenceGrants() ReferenceGrantInformer {
+	return &referenceGrantInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
