@@ -1507,6 +1507,7 @@ const (
 	// * "PortUnavailable"
 	// * "UnsupportedProtocol"
 	// * "NoValidCACertificate"
+	// * "UnsupportedValue"
 	//
 	// Possible reasons for this condition to be Unknown are:
 	//
@@ -1547,6 +1548,11 @@ const (
 	// Listener could not resolve the references to any CACertificate used
 	// to configure Gateway's Client Certificate Validation
 	ListenerReasonNoValidCACertificate ListenerConditionReason = "NoValidCACertificate"
+
+	// This reason is used with the "Accepted" condition when the
+	// Listener uses a value for a field that is not supported by the
+	// implementation
+	ListenerReasonUnsupportedValue ListenerConditionReason = "UnsupportedValue"
 )
 
 const (
