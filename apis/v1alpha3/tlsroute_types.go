@@ -26,7 +26,6 @@ import (
 // +kubebuilder:object:root=true
 // +kubebuilder:resource:categories=gateway-api
 // +kubebuilder:subresource:status
-// +kubebuilder:storageversion
 // +kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 // +kubebuilder:deprecatedversion:warning="The v1alpha3 version of TLSRoute has been deprecated and will be removed in a future release of the API. Please upgrade to v1."
 
