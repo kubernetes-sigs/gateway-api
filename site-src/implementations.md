@@ -446,11 +446,11 @@ v1.4.0 release for the GATEWAY_HTTP conformance profile except `HTTPRouteHostnam
 
 ### Gravitee Kubernetes Operator
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Partial%20Conformance%20v1.3.0-Gravitee%20Kubernetes%20Operator-orange)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.3.0/gravitee)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Partial%20Conformance%20v1.4.0-Gravitee%20Kubernetes%20Operator-orange)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.4.0/gravitee)
 
 The [Gravitee Kubernetes Operator](https://documentation.gravitee.io/gravitee-kubernetes-operator-gko) (GKO) lets you manage [Gravitee](https://www.gravitee.io/) APIs, applications, and other assets in a Kubernetes-native and declarative way.
 
-The Gravitee Kubernetes Operator provides partial conformance for Gateway - HTTP features in version 4.8.5. It does not support matching rules across routes or defining services of a type other than Kubernetes Core v1 services. These features will be introduced in a future release.
+The Gravitee Kubernetes Operator provides partial conformance for Gateway - HTTP features in version 4.10.3. It does not support matching rules across routes. These feature will be introduced in a future release.
 
 For support, feedback, or to engage in a discussion about the Gravitee Kubernetes Operator, please feel free to submit an [issue](https://github.com/gravitee-io/issues/issues) or visit our community [forum](https://community.gravitee.io/c/support/gravitee-kubernetes-operator-gko/26).
 
