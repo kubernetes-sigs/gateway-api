@@ -45,7 +45,7 @@ func MakeTLSRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtr
 	if clientCertificate != nil && clientCertificateKey != nil {
 		certificate, err := cryptotls.X509KeyPair(clientCertificate, clientCertificateKey)
 		if err != nil {
-			t.Errorf("unexpected error creating client cert: %v", err)
+			t.Fatalf("unexpected error creating client cert: %v", err)
 		}
 
 		// GetClientCertificateHook is a hook called when server asks for client certificate during TLS handshake,
@@ -99,7 +99,7 @@ func MakeTLSRequestAndExpectFailureResponse(t *testing.T, r roundtripper.RoundTr
 	if clientCertificate != nil && clientCertificateKey != nil {
 		certificate, err := cryptotls.X509KeyPair(clientCertificate, clientCertificateKey)
 		if err != nil {
-			t.Errorf("unexpected error creating client cert: %v", err)
+			t.Fatalf("unexpected error creating client cert: %v", err)
 		}
 
 		// GetClientCertificateHook is a hook called when server asks for client certificate during TLS handshake,
