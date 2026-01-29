@@ -6,6 +6,7 @@ metadata:
 spec:
   parentRefs:
   - name: same-namespace-with-https-listener
+    sectionName: https
   hostnames:
   - example.org
   rules:
@@ -44,9 +45,6 @@ spec:
   parentRefs:
   - name: same-namespace-with-https-listener
     sectionName: https-with-wildcard-hostname
-  hostnames:
-  - "third-example.wildcard.org"
-  - "fourth-example.wildcard.org"
   rules:
   - matches:
     - path:
@@ -65,9 +63,6 @@ spec:
   parentRefs:
   - name: same-namespace-with-https-listener
     sectionName: https-with-hostname-matching-wildcard
-  hostnames:
-  - "third-example.wildcard.org"
-  - "fourth-example.wildcard.org"
   rules:
   - matches:
     - path:

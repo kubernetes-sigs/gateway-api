@@ -76,7 +76,7 @@ spec:
         namespace: gateway-conformance-infra
   - name: https-with-hostname-matching-wildcard
     port: 443
-    hostname: "third-example.wildcard.org"
+    hostname: "fourth-example.wildcard.org"
     protocol: HTTPS
     allowedRoutes:
       namespaces:
