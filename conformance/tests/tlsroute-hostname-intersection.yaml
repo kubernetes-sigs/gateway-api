@@ -1,7 +1,7 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
-  name: gateway-tlsroute-exact-hostname-intersection
+  name: gw-tlsroute-exact-hostname-x-1
   namespace: gateway-conformance-infra
 spec:
   gatewayClassName: "{GATEWAY_CLASS_NAME}"
@@ -21,12 +21,12 @@ spec:
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
-  name: gateway-tlsroute-more-specific-wildcard-hostname-intersection
+  name: gw-tlsroute-more-specific-wc-hostname-x-2
   namespace: gateway-conformance-infra
 spec:
   gatewayClassName: "{GATEWAY_CLASS_NAME}"
   listeners:
-  - name: listener-more-specific-wildcard-hostname
+  - name: listener-more-specific-wc-hostname
     protocol: TLS
     port: 443
     hostname: "*.example.com"
@@ -41,12 +41,12 @@ spec:
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
-  name: gateway-tlsroute-less-specific-wildcard-hostname-intersection
+  name: gw-tlsroute-less-specific-wc-hostname-x-3
   namespace: gateway-conformance-infra
 spec:
   gatewayClassName: "{GATEWAY_CLASS_NAME}"
   listeners:
-  - name: listener-less-specific-wildcard-hostname
+  - name: listener-less-specific-wc-hostname
     protocol: TLS
     port: 443
     hostname: "*.com"
@@ -61,7 +61,7 @@ spec:
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
-  name: gateway-tlsroute-empty-hostname-intersection
+  name: gw-tlsroute-empty-hostname-x-4
   namespace: gateway-conformance-infra
 spec:
   gatewayClassName: "{GATEWAY_CLASS_NAME}"
@@ -80,11 +80,27 @@ spec:
 apiVersion: gateway.networking.k8s.io/v1alpha3
 kind: TLSRoute
 metadata:
-  name: tlsroute-exact-hostname
+  name: tlsroute-more-specific-wc-hostname-x-1
   namespace: gateway-conformance-infra
 spec:
   parentRefs:
-  - name: gateway-tlsroute-more-specific-wildcard-hostname-intersection
+  - name: gw-tlsroute-exact-hostname-x-1
+    namespace: gateway-conformance-infra
+  hostnames:
+  - "*.example.com"
+  rules:
+  - backendRefs:
+    - name: tls-backend
+      port: 443
+---
+apiVersion: gateway.networking.k8s.io/v1alpha3
+kind: TLSRoute
+metadata:
+  name: tlsroute-exact-hostname-x-2
+  namespace: gateway-conformance-infra
+spec:
+  parentRefs:
+  - name: gw-tlsroute-more-specific-wc-hostname-x-2
     namespace: gateway-conformance-infra
   hostnames:
   - abc.example.com
@@ -96,47 +112,79 @@ spec:
 apiVersion: gateway.networking.k8s.io/v1alpha3
 kind: TLSRoute
 metadata:
-  name: tlsroute-more-specific-wildcard-hostname
+  name: tlsroute-less-specific-wc-hostname-x-2
   namespace: gateway-conformance-infra
 spec:
   parentRefs:
-  - name: gateway-tlsroute-exact-hostname-intersection
-    namespace: gateway-conformance-infra
-  hostnames:
-  - "*.example.com"
-  rules:
-  - backendRefs:
-    - name: tls-backend
-      port: 443
----
-apiVersion: gateway.networking.k8s.io/v1alpha3
-kind: TLSRoute
-metadata:
-  name: tlsroute-more-specific-wildcard-hostname-2
-  namespace: gateway-conformance-infra
-spec:
-  parentRefs:
-  - name: gateway-tlsroute-less-specific-wildcard-hostname-intersection
-    namespace: gateway-conformance-infra
-  hostnames:
-  - "*.example.com"
-  rules:
-  - backendRefs:
-    - name: tls-backend
-      port: 443
----
-apiVersion: gateway.networking.k8s.io/v1alpha3
-kind: TLSRoute
-metadata:
-  name: tlsroute-less-specific-wildcard-hostname
-  namespace: gateway-conformance-infra
-spec:
-  parentRefs:
-  - name: gateway-tlsroute-empty-hostname-intersection
+  - name: gw-tlsroute-more-specific-wc-hostname-x-2
     namespace: gateway-conformance-infra
   hostnames:
   - "*.com"
   rules:
   - backendRefs:
+    - name: tls-backend-2
+      port: 443
+---
+apiVersion: gateway.networking.k8s.io/v1alpha3
+kind: TLSRoute
+metadata:
+  name: tlsroute-exact-hostname-x-3
+  namespace: gateway-conformance-infra
+spec:
+  parentRefs:
+  - name: gw-tlsroute-less-specific-wc-hostname-x-3
+    namespace: gateway-conformance-infra
+  hostnames:
+  - abc.example.com
+  rules:
+  - backendRefs:
     - name: tls-backend
+      port: 443
+---
+apiVersion: gateway.networking.k8s.io/v1alpha3
+kind: TLSRoute
+metadata:
+  name: tlsroute-more-specific-wc-hostname-x-3
+  namespace: gateway-conformance-infra
+spec:
+  parentRefs:
+  - name: gw-tlsroute-less-specific-wc-hostname-x-3
+    namespace: gateway-conformance-infra
+  hostnames:
+  - "*.example.com"
+  rules:
+  - backendRefs:
+    - name: tls-backend-2
+      port: 443
+---
+apiVersion: gateway.networking.k8s.io/v1alpha3
+kind: TLSRoute
+metadata:
+  name: tlsroute-exact-hostname-x-4
+  namespace: gateway-conformance-infra
+spec:
+  parentRefs:
+  - name: gw-tlsroute-empty-hostname-x-4
+    namespace: gateway-conformance-infra
+  hostnames:
+  - abc.example.com
+  rules:
+  - backendRefs:
+    - name: tls-backend
+      port: 443
+---
+apiVersion: gateway.networking.k8s.io/v1alpha3
+kind: TLSRoute
+metadata:
+  name: tlsroute-less-specific-wc-hostname-x-4
+  namespace: gateway-conformance-infra
+spec:
+  parentRefs:
+  - name: gw-tlsroute-empty-hostname-x-4
+    namespace: gateway-conformance-infra
+  hostnames:
+  - "*.com"
+  rules:
+  - backendRefs:
+    - name: tls-backend-2
       port: 443
