@@ -61,6 +61,7 @@ var TLSRouteHostnameIntersection = suite.ConformanceTest{
 			kubernetes.TLSRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN)
 
 			t.Run("TLS request matching exact hostnames intersection should reach backend", func(t *testing.T) {
+				t.Parallel()
 				tls.MakeTLSRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, serverCertPem, nil, nil, "abc.example.com",
 					http.ExpectedResponse{
 						Request:   http.Request{Host: "abc.example.com", Path: "/"},
@@ -83,6 +84,7 @@ var TLSRouteHostnameIntersection = suite.ConformanceTest{
 			}
 
 			t.Run("TLS request matching exact hostnames intersection should reach backend", func(t *testing.T) {
+				t.Parallel()
 				tls.MakeTLSRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, serverCertPem, nil, nil, "abc.example.com",
 					http.ExpectedResponse{
 						Request:   http.Request{Host: "abc.example.com", Path: "/"},
@@ -92,6 +94,7 @@ var TLSRouteHostnameIntersection = suite.ConformanceTest{
 			})
 
 			t.Run("TLS request matching wildcard hostnames intersection should reach backend 2", func(t *testing.T) {
+				t.Parallel()
 				tls.MakeTLSRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, serverCertPem, nil, nil, "other.example.com",
 					http.ExpectedResponse{
 						Request:   http.Request{Host: "other.example.com", Path: "/"},
@@ -114,6 +117,7 @@ var TLSRouteHostnameIntersection = suite.ConformanceTest{
 			}
 
 			t.Run("TLS request matching exact hostnames intersection should reach backend", func(t *testing.T) {
+				t.Parallel()
 				tls.MakeTLSRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, serverCertPem, nil, nil, "abc.example.com",
 					http.ExpectedResponse{
 						Request:   http.Request{Host: "abc.example.com", Path: "/"},
@@ -123,6 +127,7 @@ var TLSRouteHostnameIntersection = suite.ConformanceTest{
 			})
 
 			t.Run("TLS request matching wildcard hostnames intersection should reach backend 2", func(t *testing.T) {
+				t.Parallel()
 				tls.MakeTLSRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, serverCertPem, nil, nil, "other.example.com",
 					http.ExpectedResponse{
 						Request:   http.Request{Host: "other.example.com", Path: "/"},
@@ -145,6 +150,7 @@ var TLSRouteHostnameIntersection = suite.ConformanceTest{
 			}
 
 			t.Run("TLS request matching exact hostnames intersection should reach backend", func(t *testing.T) {
+				t.Parallel()
 				tls.MakeTLSRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, serverCertPem, nil, nil, "abc.example.com",
 					http.ExpectedResponse{
 						Request:   http.Request{Host: "abc.example.com", Path: "/"},
@@ -154,6 +160,7 @@ var TLSRouteHostnameIntersection = suite.ConformanceTest{
 			})
 
 			t.Run("TLS request matching wildcard hostnames intersection should reach backend 2", func(t *testing.T) {
+				t.Parallel()
 				tls.MakeTLSRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, serverCertPem, nil, nil, "other.example.com",
 					http.ExpectedResponse{
 						Request:   http.Request{Host: "other.example.com", Path: "/"},
