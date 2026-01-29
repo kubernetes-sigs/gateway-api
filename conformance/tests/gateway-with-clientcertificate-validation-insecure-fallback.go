@@ -123,7 +123,7 @@ var GatewayFrontendClientCertificateValidationInsecureFallback = suite.Conforman
 				tls.MakeTLSRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, perPortAddr, serverCertPem, clientCertPerPortPem, clientCertPerPortKey, "second-example.org", expectedSucces)
 			})
 			t.Run("Send request to the second listener with non-matching client certificate and validate that it is passing", func(t *testing.T) {
-				tls.MakeTLSRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, perPortAddr, serverCertPem, clientCertPem, clientCertKey,"second-example.org", expectedSucces)
+				tls.MakeTLSRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, perPortAddr, serverCertPem, clientCertPem, clientCertKey, "second-example.org", expectedSucces)
 			})
 			t.Run("Send request to the second listener without client certificate and validate that it is passing", func(t *testing.T) {
 				tls.MakeTLSRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, perPortAddr, serverCertPem, nil, nil, "second-example.org", expectedSucces)
