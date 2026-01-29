@@ -1209,7 +1209,7 @@ const (
 
 	// This reason is used with the "InsecureFrontendValidationMode" condition when
 	// the FrontendValidationModeType has been changed from `AllowValidOnly` to
-	//`AllowInsecureFallback`, either at the Gateway level or via a per-port override.
+	// `AllowInsecureFallback`, either at the Gateway level or via a per-port override.
 	GatewayReasonConfigurationChanged GatewayConditionReason = "ConfigurationChanged"
 )
 
