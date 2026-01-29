@@ -17,8 +17,11 @@ limitations under the License.
 package tls
 
 import (
+	cryptotls "crypto/tls"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
@@ -37,10 +40,28 @@ func MakeTLSRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtr
 	req := http.MakeRequest(t, &expected, gwAddr, roundtripper.HTTPSProtocol, "https")
 	req.ServerName = serverName
 	req.ServerCertificate = serverCertificate
-	req.ClientCertificate = clientCertificate
-	req.ClientCertificateKey = clientCertificateKey
+
+	var clientCertificatePresented bool
+	if clientCertificate != nil && clientCertificateKey != nil {
+		certificate, err := cryptotls.X509KeyPair(clientCertificate, clientCertificateKey)
+		if err != nil {
+			t.Fatalf("unexpected error creating client cert: %v", err)
+		}
+
+		// GetClientCertificateHook is a hook called when server asks for client certificate during TLS handshake,
+		// to verify that a client certificate has been requested.
+		req.GetClientCertificateHook = func(_ *cryptotls.CertificateRequestInfo) (*cryptotls.Certificate, error) {
+			t.Log("GetClientCertificateHook was called")
+			clientCertificatePresented = true
+			return &certificate, nil
+		}
+	}
 
 	WaitForConsistentTLSResponse(t, r, req, expected, timeoutConfig.RequiredConsecutiveSuccesses, timeoutConfig.MaxTimeToConsistency)
+
+	if clientCertificate != nil && clientCertificateKey != nil {
+		assert.True(t, clientCertificatePresented, "client certificate was not presented during the handshake")
+	}
 }
 
 // WaitForConsistentTLSResponse - repeats the provided request until it completes with a response having
@@ -73,11 +94,29 @@ func MakeTLSRequestAndExpectFailureResponse(t *testing.T, r roundtripper.RoundTr
 	req := http.MakeRequest(t, &expected, gwAddr, roundtripper.HTTPSProtocol, "https")
 	req.ServerName = serverName
 	req.ServerCertificate = serverCertificate
-	req.ClientCertificate = clientCertificate
-	req.ClientCertificateKey = clientCertificateKey
+
+	var clientCertificatePresented bool
+	if clientCertificate != nil && clientCertificateKey != nil {
+		certificate, err := cryptotls.X509KeyPair(clientCertificate, clientCertificateKey)
+		if err != nil {
+			t.Fatalf("unexpected error creating client cert: %v", err)
+		}
+
+		// GetClientCertificateHook is a hook called when server asks for client certificate during TLS handshake,
+		// to verify that a client certificate has been requested.
+		req.GetClientCertificateHook = func(_ *cryptotls.CertificateRequestInfo) (*cryptotls.Certificate, error) {
+			t.Log("GetClientCertificateHook was called")
+			clientCertificatePresented = true
+			return &certificate, nil
+		}
+	}
 
 	_, _, err := r.CaptureRoundTrip(req)
 	if err == nil {
 		t.Fatalf("Request should fail")
+	}
+
+	if clientCertificate != nil && clientCertificateKey != nil {
+		assert.True(t, clientCertificatePresented, "client certificate was not presented during the handshake")
 	}
 }
