@@ -1097,6 +1097,16 @@ func ListenerSetListenersMustHaveConditions(t *testing.T, client client.Client, 
 	require.NoErrorf(t, waitErr, "error waiting for ListenerSet status to have conditions matching expectations on the listeners")
 }
 
+// TLSRouteMustHaveResolvedRefsConditionsTrue checks that the supplied TLSRoute has the resolvedRefsCondition
+// set to true.
+func TLSRouteMustHaveResolvedRefsConditionsTrue(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeNN types.NamespacedName, gwNN types.NamespacedName) {
+	TLSRouteMustHaveCondition(t, client, timeoutConfig, routeNN, gwNN, metav1.Condition{
+		Type:   string(gatewayv1.RouteConditionResolvedRefs),
+		Status: metav1.ConditionTrue,
+		Reason: string(gatewayv1.RouteReasonResolvedRefs),
+	})
+}
+
 // TODO(mikemorris): this and parentsMatch could possibly be rewritten as a generic function?
 func listenersMatch(t *testing.T, expected, actual []gatewayv1.ListenerStatus) bool {
 	t.Helper()
