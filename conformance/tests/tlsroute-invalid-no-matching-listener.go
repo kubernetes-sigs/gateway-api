@@ -41,14 +41,20 @@ var TLSRouteInvalidNoMatchingListener = suite.ConformanceTest{
 	},
 	Manifests: []string{"tests/tlsroute-invalid-no-matching-listener.yaml"},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
-		routeNoMatchingPortNN := types.NamespacedName{Name: "tlsroute-no-matching-listener", Namespace: "gateway-conformance-infra"}
-		routeNotAllowedKindNN := types.NamespacedName{Name: "tlsroute-not-allowed-kind", Namespace: "gateway-conformance-infra"}
-		routeWrongProtocolNN := types.NamespacedName{Name: "tlsroute-wrong-protocol", Namespace: "gateway-conformance-infra"}
-		routeWrongSectionNN := types.NamespacedName{Name: "tlsroute-wrong-section-name", Namespace: "gateway-conformance-infra"}
+		ns := "gateway-conformance-infra"
 
-		gwHTTPOnlyNN := types.NamespacedName{Name: "gateway-http-only", Namespace: "gateway-conformance-infra"}
-		gwTLSHTTPRouteOnlyNN := types.NamespacedName{Name: "gateway-tls-httproute-only", Namespace: "gateway-conformance-infra"}
-		gwHTTPSOnlyNN := types.NamespacedName{Name: "gateway-https-only", Namespace: "gateway-conformance-infra"}
+		routeNoMatchingPortNN := types.NamespacedName{Name: "tlsroute-no-matching-listener", Namespace: ns}
+		routeNotAllowedKindNN := types.NamespacedName{Name: "tlsroute-not-allowed-kind", Namespace: ns}
+		routeWrongProtocolNN := types.NamespacedName{Name: "tlsroute-wrong-protocol", Namespace: ns}
+		routeWrongSectionNN := types.NamespacedName{Name: "tlsroute-wrong-section-name", Namespace: ns}
+
+		gwHTTPOnlyNN := types.NamespacedName{Name: "gateway-http-only", Namespace: ns}
+		gwTLSHTTPRouteOnlyNN := types.NamespacedName{Name: "gateway-tls-httproute-only", Namespace: ns}
+		gwHTTPSOnlyNN := types.NamespacedName{Name: "gateway-https-only", Namespace: ns}
+
+		// This test creates an additional Gateway in the gateway-conformance-infra
+		// namespace so we have to wait for it to be ready.
+		kubernetes.NamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, []string{ns})
 
 		acceptedCondNoMatchingParent := metav1.Condition{
 			Type:   string(v1.RouteConditionAccepted),
