@@ -50,7 +50,7 @@ var TLSRouteInvalidNoMatchingListener = suite.ConformanceTest{
 
 		gwTLSPassthroughOnlyNN := types.NamespacedName{Name: "gateway-tlsroute-tls-passthrough-only", Namespace: ns}
 		gwHTTPOnlyNN := types.NamespacedName{Name: "same-namespace", Namespace: ns}
-		gwTLSHTTPRouteOnlyNN := types.NamespacedName{Name: "gateway-tls-httproute-only", Namespace: ns}
+		gwTCPPRouteOnlyNN := types.NamespacedName{Name: "gateway-tlsroute-tcproute-only", Namespace: ns}
 		gwHTTPSOnlyNN := types.NamespacedName{Name: "gateway-https-only", Namespace: ns}
 
 		// This test creates an additional Gateway in the gateway-conformance-infra
@@ -71,7 +71,7 @@ var TLSRouteInvalidNoMatchingListener = suite.ConformanceTest{
 			kubernetes.TLSRouteMustHaveCondition(t, suite.Client, suite.TimeoutConfig, routeNotAllowedProtocolHTTPNN, gwHTTPOnlyNN, acceptedCondNotAllowed)
 		})
 		t.Run("TLSRoute rejected when kind not allowed", func(t *testing.T) {
-			kubernetes.TLSRouteMustHaveCondition(t, suite.Client, suite.TimeoutConfig, routeNotAllowedKindNN, gwTLSHTTPRouteOnlyNN, acceptedCondNotAllowed)
+			kubernetes.TLSRouteMustHaveCondition(t, suite.Client, suite.TimeoutConfig, routeNotAllowedKindNN, gwTCPPRouteOnlyNN, acceptedCondNotAllowed)
 		})
 		t.Run("TLSRoute rejected when listener protocol is HTTPS", func(t *testing.T) {
 			kubernetes.TLSRouteMustHaveCondition(t, suite.Client, suite.TimeoutConfig, routeWrongProtocolNN, gwHTTPSOnlyNN, acceptedCondNotAllowed)
@@ -94,8 +94,8 @@ var TLSRouteInvalidNoMatchingListener = suite.ConformanceTest{
 		t.Run("Gateway HTTP-only should have 0 Routes attached", func(t *testing.T) {
 			kubernetes.GatewayMustHaveZeroRoutes(t, suite.Client, suite.TimeoutConfig, gwHTTPOnlyNN)
 		})
-		t.Run("Gateway TLS-HTTPRoute-only should have 0 Routes attached", func(t *testing.T) {
-			kubernetes.GatewayMustHaveZeroRoutes(t, suite.Client, suite.TimeoutConfig, gwTLSHTTPRouteOnlyNN)
+		t.Run("Gateway TCPRoute-only should have 0 Routes attached", func(t *testing.T) {
+			kubernetes.GatewayMustHaveZeroRoutes(t, suite.Client, suite.TimeoutConfig, gwTCPPRouteOnlyNN)
 		})
 		t.Run("Gateway HTTPS-only should have 0 Routes attached", func(t *testing.T) {
 			kubernetes.GatewayMustHaveZeroRoutes(t, suite.Client, suite.TimeoutConfig, gwHTTPSOnlyNN)
