@@ -18,31 +18,14 @@ spec:
       tls:
         mode: Passthrough
 ---
-apiVersion: gateway.networking.k8s.io/v1
-kind: Gateway
-metadata:
-  name: gateway-http-only
-  namespace: gateway-conformance-infra
-spec:
-  gatewayClassName: "{GATEWAY_CLASS_NAME}"
-  listeners:
-    - name: http
-      port: 80
-      protocol: HTTP
-      allowedRoutes:
-        namespaces:
-          from: Same
-        kinds:
-          - kind: TLSRoute
----
 apiVersion: gateway.networking.k8s.io/v1alpha3
 kind: TLSRoute
 metadata:
-  name: tlsroute-no-matching-listener
+  name: tlsroute-not-allowed-protocol-http
   namespace: gateway-conformance-infra
 spec:
   parentRefs:
-    - name: gateway-http-only
+    - name: same-namespace
   hostnames:
     - tls.example.com
   rules:
