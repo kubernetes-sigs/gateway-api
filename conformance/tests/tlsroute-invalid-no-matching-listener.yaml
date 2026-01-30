@@ -2,6 +2,25 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
+  name: gateway-tlsroute-tls-passthrough-only
+  namespace: gateway-conformance-infra
+spec:
+  gatewayClassName: "{GATEWAY_CLASS_NAME}"
+  listeners:
+    - name: tls-passthrough
+      protocol: TLS
+      port: 443
+      allowedRoutes:
+        namespaces:
+          from: Same
+        kinds:
+        - kind: TLSRoute
+      tls:
+        mode: Passthrough
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
   name: gateway-http-only
   namespace: gateway-conformance-infra
 spec:
@@ -103,11 +122,11 @@ spec:
 apiVersion: gateway.networking.k8s.io/v1alpha3
 kind: TLSRoute
 metadata:
-  name: tlsroute-wrong-section-name
+  name: tlsroute-no-matching-section-name
   namespace: gateway-conformance-infra
 spec:
   parentRefs:
-    - name: gateway-http-only
+    - name: gateway-tlsroute-tls-passthrough-only
       sectionName: nonexistent-listener
   hostnames:
     - tls.example.com
