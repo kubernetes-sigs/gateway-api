@@ -51,7 +51,7 @@ var ListenerSetAllowedRoutesSupportedKinds = suite.ConformanceTest{
 		kubernetes.NamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, []string{ns})
 
 		// Verify the gateway is accepted
-		gwNN := types.NamespacedName{Name: "gateway-with-listener-sets", Namespace: ns}
+		gwNN := types.NamespacedName{Name: "gateway-with-listener-sets-test-supported-route-kinds", Namespace: ns}
 		kubernetes.GatewayMustHaveCondition(t, suite.Client, suite.TimeoutConfig, gwNN, metav1.Condition{
 			Type:   string(gatewayv1.GatewayConditionAccepted),
 			Status: metav1.ConditionTrue,
@@ -60,13 +60,13 @@ var ListenerSetAllowedRoutesSupportedKinds = suite.ConformanceTest{
 
 		// Verify the accepted listenerSet has the appropriate conditions
 		routes := []types.NamespacedName{
-			{Name: "http-route", Namespace: ns},
+			{Name: "listener-sets-test-supported-route-kinds-http-route", Namespace: ns},
 		}
 		listenerSetGK := schema.GroupKind{
 			Group: gatewayxv1a1.GroupVersion.Group,
 			Kind:  "XListenerSet",
 		}
-		lsNN := types.NamespacedName{Name: "listenerset-test-allowed-routes", Namespace: ns}
+		lsNN := types.NamespacedName{Name: "listenerset-test-allowed-routes-supported-kinds", Namespace: ns}
 		listenerSetRef := kubernetes.NewResourceRef(listenerSetGK, lsNN)
 		kubernetes.RoutesAndParentMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, listenerSetRef, &gatewayv1.HTTPRoute{}, routes...)
 		kubernetes.ListenerSetStatusMustHaveListeners(t, suite.Client, suite.TimeoutConfig, lsNN, []gatewayxv1a1.ListenerEntryStatus{

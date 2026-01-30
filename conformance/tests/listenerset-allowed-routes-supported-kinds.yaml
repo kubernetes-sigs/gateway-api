@@ -1,7 +1,7 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
-  name: gateway-with-listener-sets
+  name: gateway-with-listener-sets-test-supported-route-kinds
   namespace: gateway-conformance-infra
 spec:
   gatewayClassName: "{GATEWAY_CLASS_NAME}"
@@ -20,13 +20,13 @@ spec:
 apiVersion: gateway.networking.x-k8s.io/v1alpha1
 kind: XListenerSet
 metadata:
-  name: listenerset-test-allowed-routes
+  name: listenerset-test-allowed-routes-supported-kinds
   namespace: gateway-conformance-infra
 spec:
   parentRef:
     kind: Gateway
     group: gateway.networking.k8s.io
-    name: gateway-with-listener-sets
+    name: gateway-with-listener-sets-test-supported-route-kinds
     namespace: gateway-conformance-infra
   listeners:
   - name: listener-set-listener-allowed-routes-http-only
@@ -42,13 +42,13 @@ spec:
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-  name: http-route
+  name: listener-sets-test-supported-route-kinds-http-route
   namespace: gateway-conformance-infra
 spec:
   parentRefs:
   - kind: XListenerSet
     group: gateway.networking.x-k8s.io
-    name: listenerset-test-allowed-routes
+    name: listenerset-test-allowed-routes-supported-kinds
     namespace: gateway-conformance-infra
   rules:
   - matches:
@@ -62,13 +62,13 @@ spec:
 apiVersion: gateway.networking.k8s.io/v1alpha2
 kind: TLSRoute
 metadata:
-  name: tls-route
+  name: listener-sets-test-supported-route-kinds-tls-route
   namespace: gateway-conformance-infra
 spec:
   parentRefs:
   - kind: XListenerSet
     group: gateway.networking.x-k8s.io
-    name: listenerset-test-allowed-routes
+    name: listenerset-test-allowed-routes-supported-kinds
     namespace: gateway-conformance-infra
   hostnames:
   - abc.example.com

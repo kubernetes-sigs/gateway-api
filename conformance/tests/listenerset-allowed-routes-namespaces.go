@@ -53,7 +53,7 @@ var ListenerSetAllowedRoutesNamespaces = suite.ConformanceTest{
 		kubernetes.NamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, []string{ns})
 
 		// Verify the gateway is accepted
-		gwNN := types.NamespacedName{Name: "gateway-with-listener-sets", Namespace: ns}
+		gwNN := types.NamespacedName{Name: "gateway-with-listener-sets-test-allowed-routes", Namespace: ns}
 		gwAddr, err := kubernetes.WaitForGatewayAddress(t, suite.Client, suite.TimeoutConfig, kubernetes.NewGatewayRef(gwNN, "gateway-listener"))
 		require.NoErrorf(t, err, "timed out waiting for Gateway address to be assigned")
 		kubernetes.GatewayMustHaveCondition(t, suite.Client, suite.TimeoutConfig, gwNN, metav1.Condition{
@@ -65,14 +65,14 @@ var ListenerSetAllowedRoutesNamespaces = suite.ConformanceTest{
 		// Verify the accepted listenerSet has the appropriate conditions
 		routes := []types.NamespacedName{
 			{Name: "route-in-same-namespace", Namespace: ns},
-			{Name: "route-in-selected-namespace", Namespace: "gateway-api-example-allowed-ns"},
-			{Name: "route-not-in-selected-namespace", Namespace: "gateway-api-example-not-allowed-ns"},
+			{Name: "route-in-selected-namespace", Namespace: "gateway-api-routes-allowed-ns"},
+			{Name: "route-not-in-selected-namespace", Namespace: "gateway-api-routes-not-allowed-ns"},
 		}
 		listenerSetGK := schema.GroupKind{
 			Group: gatewayxv1a1.GroupVersion.Group,
 			Kind:  "XListenerSet",
 		}
-		lsNN := types.NamespacedName{Name: "listenerset-test-allowed-routes", Namespace: ns}
+		lsNN := types.NamespacedName{Name: "listenerset-test-allowed-routes-namespaces", Namespace: ns}
 		listenerSetRef := kubernetes.NewResourceRef(listenerSetGK, lsNN)
 		kubernetes.RoutesAndParentMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, listenerSetRef, &gatewayv1.HTTPRoute{}, routes...)
 		kubernetes.ListenerSetStatusMustHaveListeners(t, suite.Client, suite.TimeoutConfig, lsNN, []gatewayxv1a1.ListenerEntryStatus{

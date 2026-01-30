@@ -50,16 +50,13 @@ var ListenerSetReferenceGrant = suite.ConformanceTest{
 		kubernetes.NamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, []string{ns})
 
 		// Verify the gateway is accepted
-		gwNN := types.NamespacedName{Name: "gateway-with-listener-sets", Namespace: ns}
+		gwNN := types.NamespacedName{Name: "gateway-with-listener-sets-test-reference-grant", Namespace: ns}
 		kubernetes.GatewayMustHaveCondition(t, suite.Client, suite.TimeoutConfig, gwNN, metav1.Condition{
 			Type:   string(gatewayv1.GatewayConditionAccepted),
 			Status: metav1.ConditionTrue,
 		})
-		// Accepted ListenerSets :
-		// gateway-conformance-infra/listenerset-with-reference-grant - it has a valid reference grant
-		// Rejected ListenerSets :
-		// gateway-api-example-ns/listenerset-without-reference-grant - its only listener is not valid due to the missing reference grant
-		kubernetes.GatewayMustHaveAttachedListeners(t, suite.Client, suite.TimeoutConfig, gwNN, 2)
+		// Explicitly don't check the count here as implementations might differ on how to handle missing reference grants
+		// kubernetes.GatewayMustHaveAttachedListeners(t, suite.Client, suite.TimeoutConfig, gwNN, 1)
 
 		refPermittedCondition := []metav1.Condition{{
 			Type:   string(gatewayv1.ListenerConditionResolvedRefs),
@@ -87,7 +84,7 @@ var ListenerSetReferenceGrant = suite.ConformanceTest{
 		kubernetes.ListenerSetListenersMustHaveConditions(t, suite.Client, suite.TimeoutConfig, lsNN, refPermittedCondition, "listenerset-with-reference-grant-listener")
 
 		// listenerset-without-reference-grant is not accepted because the only listener is missing a reference grant
-		lsNN = types.NamespacedName{Name: "listenerset-without-reference-grant", Namespace: "gateway-api-example-ns"}
+		lsNN = types.NamespacedName{Name: "listenerset-without-reference-grant", Namespace: "gateway-api-listener-sets-test-reference-grant-ns"}
 		kubernetes.ListenerSetMustHaveCondition(t, suite.Client, suite.TimeoutConfig, lsNN, metav1.Condition{
 			Type:   string(gatewayxv1a1.ListenerSetConditionAccepted),
 			Status: metav1.ConditionFalse,

@@ -54,58 +54,58 @@ var ListenerSetHTTPRouting = suite.ConformanceTest{
 			{Name: "gateway-route", Namespace: ns},
 			{Name: "gateway-section-route", Namespace: ns},
 		}
-		gwNN := types.NamespacedName{Name: "gateway-with-listener-sets", Namespace: ns}
+		gwNN := types.NamespacedName{Name: "gateway-with-listener-sets-http-routing", Namespace: ns}
 		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN, "gateway-listener"), gwRoutes...)
 		kubernetes.GatewayMustHaveAttachedListeners(t, suite.Client, suite.TimeoutConfig, gwNN, 2)
 
-		// listener-set-1
+		// listener-set-http-routing-1
 		lsRoutes := []types.NamespacedName{
 			{Name: "attaches-to-all-listeners", Namespace: ns},
-			{Name: "listener-set-1-route", Namespace: ns},
-			{Name: "listener-set-1-section-route", Namespace: ns},
+			{Name: "listener-set-http-routing-1-route", Namespace: ns},
+			{Name: "listener-set-http-routing-1-section-route", Namespace: ns},
 		}
 		listenerSetGK := schema.GroupKind{
 			Group: gatewayxv1a1.GroupVersion.Group,
 			Kind:  "XListenerSet",
 		}
-		lsNN := types.NamespacedName{Name: "listener-set-1", Namespace: ns}
+		lsNN := types.NamespacedName{Name: "listener-set-http-routing-1", Namespace: ns}
 		kubernetes.RoutesAndParentMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewResourceRef(listenerSetGK, lsNN), &gatewayv1.HTTPRoute{}, lsRoutes...)
 		kubernetes.ListenerSetStatusMustHaveListeners(t, suite.Client, suite.TimeoutConfig, lsNN, []gatewayxv1a1.ListenerEntryStatus{
 			{
-				Name:           "listener-set-1-listener-1",
+				Name:           "listener-set-http-routing-1-listener-1",
 				SupportedKinds: generateSupportedRouteKinds(),
-				// This attaches to attaches-to-all-listeners, listener-set-1-route, listener-set-1-section-route
+				// This attaches to attaches-to-all-listeners, listener-set-http-routing-1-route, listener-set-http-routing-1-section-route
 				AttachedRoutes: 3,
 				Conditions:     generateAcceptedListenerConditions(),
 			},
 			{
-				Name:           "listener-set-1-listener-2",
+				Name:           "listener-set-http-routing-1-listener-2",
 				SupportedKinds: generateSupportedRouteKinds(),
-				// This attaches to attaches-to-all-listeners, listener-set-1-route
+				// This attaches to attaches-to-all-listeners, listener-set-http-routing-1-route
 				AttachedRoutes: 2,
 				Conditions:     generateAcceptedListenerConditions(),
 			},
 		})
 
-		// listener-set-2
+		// listener-set-http-routing-2
 		lsRoutes = []types.NamespacedName{
 			{Name: "attaches-to-all-listeners", Namespace: ns},
-			{Name: "listener-set-2-route", Namespace: ns},
+			{Name: "listener-set-http-routing-2-route", Namespace: ns},
 		}
-		lsNN = types.NamespacedName{Name: "listener-set-2", Namespace: ns}
+		lsNN = types.NamespacedName{Name: "listener-set-http-routing-2", Namespace: ns}
 		kubernetes.RoutesAndParentMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewResourceRef(listenerSetGK, lsNN), &gatewayv1.HTTPRoute{}, lsRoutes...)
 		kubernetes.ListenerSetStatusMustHaveListeners(t, suite.Client, suite.TimeoutConfig, lsNN, []gatewayxv1a1.ListenerEntryStatus{
 			{
-				Name:           "listener-set-2-listener-1",
+				Name:           "listener-set-http-routing-2-listener-1",
 				SupportedKinds: generateSupportedRouteKinds(),
-				// This attaches to attaches-to-all-listeners, listener-set-2-route
+				// This attaches to attaches-to-all-listeners, listener-set-http-routing-2-route
 				AttachedRoutes: 2,
 				Conditions:     generateAcceptedListenerConditions(),
 			},
 			{
-				Name:           "listener-set-2-listener-2",
+				Name:           "listener-set-http-routing-2-listener-2",
 				SupportedKinds: generateSupportedRouteKinds(),
-				// This attaches to attaches-to-all-listeners, listener-set-2-route
+				// This attaches to attaches-to-all-listeners, listener-set-http-routing-2-route
 				AttachedRoutes: 2,
 				Conditions:     generateAcceptedListenerConditions(),
 			},
@@ -124,22 +124,22 @@ var ListenerSetHTTPRouting = suite.ConformanceTest{
 				Namespace: ns,
 			},
 			{
-				Request:   http.Request{Host: "listener-set-1-listener-1.com", Path: "/route"},
+				Request:   http.Request{Host: "listener-set-http-routing-1-listener-1.com", Path: "/route"},
 				Backend:   "infra-backend-v1",
 				Namespace: ns,
 			},
 			{
-				Request:   http.Request{Host: "listener-set-1-listener-2.com", Path: "/route"},
+				Request:   http.Request{Host: "listener-set-http-routing-1-listener-2.com", Path: "/route"},
 				Backend:   "infra-backend-v1",
 				Namespace: ns,
 			},
 			{
-				Request:   http.Request{Host: "listener-set-2-listener-1.com", Path: "/route"},
+				Request:   http.Request{Host: "listener-set-http-routing-2-listener-1.com", Path: "/route"},
 				Backend:   "infra-backend-v1",
 				Namespace: ns,
 			},
 			{
-				Request:   http.Request{Host: "listener-set-2-listener-2.com", Path: "/route"},
+				Request:   http.Request{Host: "listener-set-http-routing-2-listener-2.com", Path: "/route"},
 				Backend:   "infra-backend-v1",
 				Namespace: ns,
 			},
@@ -155,19 +155,19 @@ var ListenerSetHTTPRouting = suite.ConformanceTest{
 				Namespace: ns,
 			},
 			{
-				Request:  http.Request{Host: "listener-set-1-listener-1.com", Path: "/gateway-route"},
+				Request:  http.Request{Host: "listener-set-http-routing-1-listener-1.com", Path: "/gateway-route"},
 				Response: http.Response{StatusCode: 404},
 			},
 			{
-				Request:  http.Request{Host: "listener-set-1-listener-2.com", Path: "/gateway-route"},
+				Request:  http.Request{Host: "listener-set-http-routing-1-listener-2.com", Path: "/gateway-route"},
 				Response: http.Response{StatusCode: 404},
 			},
 			{
-				Request:  http.Request{Host: "listener-set-2-listener-1.com", Path: "/gateway-route"},
+				Request:  http.Request{Host: "listener-set-http-routing-2-listener-1.com", Path: "/gateway-route"},
 				Response: http.Response{StatusCode: 404},
 			},
 			{
-				Request:  http.Request{Host: "listener-set-2-listener-2.com", Path: "/gateway-route"},
+				Request:  http.Request{Host: "listener-set-http-routing-2-listener-2.com", Path: "/gateway-route"},
 				Response: http.Response{StatusCode: 404},
 			},
 			// Requests to the gateway-section-route should only succeed on gateway-listener-1
@@ -181,98 +181,98 @@ var ListenerSetHTTPRouting = suite.ConformanceTest{
 				Response: http.Response{StatusCode: 404},
 			},
 			{
-				Request:  http.Request{Host: "listener-set-1-listener-1.com", Path: "/gateway-section-route"},
+				Request:  http.Request{Host: "listener-set-http-routing-1-listener-1.com", Path: "/gateway-section-route"},
 				Response: http.Response{StatusCode: 404},
 			},
 			{
-				Request:  http.Request{Host: "listener-set-1-listener-2.com", Path: "/gateway-section-route"},
+				Request:  http.Request{Host: "listener-set-http-routing-1-listener-2.com", Path: "/gateway-section-route"},
 				Response: http.Response{StatusCode: 404},
 			},
 			{
-				Request:  http.Request{Host: "listener-set-2-listener-1.com", Path: "/gateway-section-route"},
+				Request:  http.Request{Host: "listener-set-http-routing-2-listener-1.com", Path: "/gateway-section-route"},
 				Response: http.Response{StatusCode: 404},
 			},
 			{
-				Request:  http.Request{Host: "listener-set-2-listener-2.com", Path: "/gateway-section-route"},
+				Request:  http.Request{Host: "listener-set-http-routing-2-listener-2.com", Path: "/gateway-section-route"},
 				Response: http.Response{StatusCode: 404},
 			},
-			// Requests to the listener-set-1-route should only succeed on listener-set-1 listeners
+			// Requests to the listener-set-http-routing-1-route should only succeed on listener-set-http-routing-1 listeners
 			{
-				Request:  http.Request{Host: "gateway-listener-1.com", Path: "/listener-set-1-route"},
-				Response: http.Response{StatusCode: 404},
-			},
-			{
-				Request:  http.Request{Host: "gateway-listener-2.com", Path: "/listener-set-1-route"},
+				Request:  http.Request{Host: "gateway-listener-1.com", Path: "/listener-set-http-routing-1-route"},
 				Response: http.Response{StatusCode: 404},
 			},
 			{
-				Request:   http.Request{Host: "listener-set-1-listener-1.com", Path: "/listener-set-1-route"},
+				Request:  http.Request{Host: "gateway-listener-2.com", Path: "/listener-set-http-routing-1-route"},
+				Response: http.Response{StatusCode: 404},
+			},
+			{
+				Request:   http.Request{Host: "listener-set-http-routing-1-listener-1.com", Path: "/listener-set-http-routing-1-route"},
 				Backend:   "infra-backend-v2",
 				Namespace: ns,
 			},
 			{
-				Request:   http.Request{Host: "listener-set-1-listener-2.com", Path: "/listener-set-1-route"},
+				Request:   http.Request{Host: "listener-set-http-routing-1-listener-2.com", Path: "/listener-set-http-routing-1-route"},
 				Backend:   "infra-backend-v2",
 				Namespace: ns,
 			},
 			{
-				Request:  http.Request{Host: "listener-set-2-listener-1.com", Path: "/listener-set-1-route"},
+				Request:  http.Request{Host: "listener-set-http-routing-2-listener-1.com", Path: "/listener-set-http-routing-1-route"},
 				Response: http.Response{StatusCode: 404},
 			},
 			{
-				Request:  http.Request{Host: "listener-set-2-listener-2.com", Path: "/listener-set-1-route"},
+				Request:  http.Request{Host: "listener-set-http-routing-2-listener-2.com", Path: "/listener-set-http-routing-1-route"},
 				Response: http.Response{StatusCode: 404},
 			},
-			// Requests to the listener-set-1-section-route should only succeed on listener-set-1-listener-1
+			// Requests to the listener-set-http-routing-1-section-route should only succeed on listener-set-http-routing-1-listener-1
 			{
-				Request:  http.Request{Host: "gateway-listener-1.com", Path: "/listener-set-1-section-route"},
-				Response: http.Response{StatusCode: 404},
-			},
-			{
-				Request:  http.Request{Host: "gateway-listener-2.com", Path: "/listener-set-1-section-route"},
+				Request:  http.Request{Host: "gateway-listener-1.com", Path: "/listener-set-http-routing-1-section-route"},
 				Response: http.Response{StatusCode: 404},
 			},
 			{
-				Request:   http.Request{Host: "listener-set-1-listener-1.com", Path: "/listener-set-1-section-route"},
+				Request:  http.Request{Host: "gateway-listener-2.com", Path: "/listener-set-http-routing-1-section-route"},
+				Response: http.Response{StatusCode: 404},
+			},
+			{
+				Request:   http.Request{Host: "listener-set-http-routing-1-listener-1.com", Path: "/listener-set-http-routing-1-section-route"},
 				Backend:   "infra-backend-v3",
 				Namespace: ns,
 			},
 			{
-				Request:  http.Request{Host: "listener-set-1-listener-2.com", Path: "/listener-set-1-section-route"},
+				Request:  http.Request{Host: "listener-set-http-routing-1-listener-2.com", Path: "/listener-set-http-routing-1-section-route"},
 				Response: http.Response{StatusCode: 404},
 			},
 			{
-				Request:  http.Request{Host: "listener-set-2-listener-1.com", Path: "/listener-set-1-section-route"},
+				Request:  http.Request{Host: "listener-set-http-routing-2-listener-1.com", Path: "/listener-set-http-routing-1-section-route"},
 				Response: http.Response{StatusCode: 404},
 			},
 			{
-				Request:  http.Request{Host: "listener-set-2-listener-2.com", Path: "/listener-set-1-section-route"},
+				Request:  http.Request{Host: "listener-set-http-routing-2-listener-2.com", Path: "/listener-set-http-routing-1-section-route"},
 				Response: http.Response{StatusCode: 404},
 			},
-			// Requests to the listener-set-2-route should only succeed on listener-set-2 listeners
+			// Requests to the listener-set-http-routing-2-route should only succeed on listener-set-http-routing-2 listeners
 			{
-				Request:  http.Request{Host: "gateway-listener-1.com", Path: "/listener-set-2-route"},
-				Response: http.Response{StatusCode: 404},
-			},
-			{
-				Request:  http.Request{Host: "gateway-listener-2.com", Path: "/listener-set-2-route"},
+				Request:  http.Request{Host: "gateway-listener-1.com", Path: "/listener-set-http-routing-2-route"},
 				Response: http.Response{StatusCode: 404},
 			},
 			{
-				Request:  http.Request{Host: "listener-set-1-listener-1.com", Path: "/listener-set-2-route"},
+				Request:  http.Request{Host: "gateway-listener-2.com", Path: "/listener-set-http-routing-2-route"},
 				Response: http.Response{StatusCode: 404},
 			},
 			{
-				Request:  http.Request{Host: "listener-set-1-listener-2.com", Path: "/listener-set-2-route"},
+				Request:  http.Request{Host: "listener-set-http-routing-1-listener-1.com", Path: "/listener-set-http-routing-2-route"},
 				Response: http.Response{StatusCode: 404},
 			},
 			{
-				Request:   http.Request{Host: "listener-set-2-listener-1.com", Path: "/listener-set-2-route"},
+				Request:  http.Request{Host: "listener-set-http-routing-1-listener-2.com", Path: "/listener-set-http-routing-2-route"},
+				Response: http.Response{StatusCode: 404},
+			},
+			{
+				Request:   http.Request{Host: "listener-set-http-routing-2-listener-1.com", Path: "/listener-set-http-routing-2-route"},
 				Backend:   "infra-backend-v2",
 				Namespace: ns,
 			},
 			{
-				Request:   http.Request{Host: "listener-set-2-listener-2.com", Path: "/listener-set-2-route"},
+				Request:   http.Request{Host: "listener-set-http-routing-2-listener-2.com", Path: "/listener-set-http-routing-2-route"},
 				Backend:   "infra-backend-v2",
 				Namespace: ns,
 			},

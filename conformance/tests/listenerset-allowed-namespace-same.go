@@ -56,7 +56,7 @@ var ListenerSetAllowedNamespaceSame = suite.ConformanceTest{
 		// Accepted ListenerSets :
 		// - gateway-conformance-infra/listenerset-in-same-namespace - it is in the same ns as the parent gateway
 		// Rejected ListenerSets :
-		// - gateway-api-example-not-allowed-ns/listenerset-in-different-namespace - it is in a different ns than the parent gateway
+		// - gateway-api-listenerset-not-allowed-ns/listenerset-in-different-namespace - it is in a different ns than the parent gateway
 		kubernetes.GatewayMustHaveAttachedListeners(t, suite.Client, suite.TimeoutConfig, gwNN, 1)
 
 		// Verify the accepted listenerSet has the appropriate conditions
@@ -74,7 +74,7 @@ var ListenerSetAllowedNamespaceSame = suite.ConformanceTest{
 		kubernetes.ListenerSetListenersMustHaveConditions(t, suite.Client, suite.TimeoutConfig, lsNN, generateAcceptedListenerConditions(), "listenerset-in-same-namespace-listener")
 
 		// Verify the rejected listenerSet has the appropriate conditions
-		disallowedLsNN := types.NamespacedName{Name: "listenerset-in-different-namespace", Namespace: "gateway-api-example-not-allowed-ns"}
+		disallowedLsNN := types.NamespacedName{Name: "listenerset-in-different-namespace", Namespace: "gateway-api-listenerset-not-allowed-ns"}
 		kubernetes.ListenerSetMustHaveCondition(t, suite.Client, suite.TimeoutConfig, disallowedLsNN, metav1.Condition{
 			Type:   string(gatewayxv1a1.ListenerSetConditionAccepted),
 			Status: metav1.ConditionFalse,

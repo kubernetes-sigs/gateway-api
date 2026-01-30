@@ -1,7 +1,7 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
-  name: gateway-with-listener-sets
+  name: gateway-with-listener-sets-test-reference-grant
   namespace: gateway-conformance-infra
 spec:
   gatewayClassName: "{GATEWAY_CLASS_NAME}"
@@ -46,7 +46,7 @@ spec:
   parentRef:
     kind: Gateway
     group: gateway.networking.k8s.io
-    name: gateway-with-listener-sets
+    name: gateway-with-listener-sets-test-reference-grant
     namespace: gateway-conformance-infra
   listeners:
   - name: listenerset-with-reference-grant-listener
@@ -80,18 +80,18 @@ spec:
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: gateway-api-example-ns
+  name: gateway-api-listener-sets-test-reference-grant-ns
 ---
 apiVersion: gateway.networking.x-k8s.io/v1alpha1
 kind: XListenerSet
 metadata:
   name: listenerset-without-reference-grant
-  namespace: gateway-api-example-ns
+  namespace: gateway-api-listener-sets-test-reference-grant-ns
 spec:
   parentRef:
     kind: Gateway
     group: gateway.networking.k8s.io
-    name: gateway-with-listener-sets
+    name: gateway-with-listener-sets-test-reference-grant
     namespace: gateway-conformance-infra
   listeners:
   - name: listenerset-without-reference-grant-listener
