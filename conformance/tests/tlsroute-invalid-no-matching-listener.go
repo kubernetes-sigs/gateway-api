@@ -45,13 +45,13 @@ var TLSRouteInvalidNoMatchingListener = suite.ConformanceTest{
 
 		routeNotAllowedProtocolHTTPNN := types.NamespacedName{Name: "tlsroute-not-allowed-protocol-http", Namespace: ns}
 		routeNotAllowedKindNN := types.NamespacedName{Name: "tlsroute-not-allowed-kind", Namespace: ns}
-		routeWrongProtocolNN := types.NamespacedName{Name: "tlsroute-wrong-protocol", Namespace: ns}
+		routeNotAllowedProtocolHTTPSNN := types.NamespacedName{Name: "tlsroute-not-allowed-protocol-https", Namespace: ns}
 		routeNoMatchingSectionNN := types.NamespacedName{Name: "tlsroute-no-matching-section-name", Namespace: ns}
 
 		gwTLSPassthroughOnlyNN := types.NamespacedName{Name: "gateway-tlsroute-tls-passthrough-only", Namespace: ns}
-		gwHTTPOnlyNN := types.NamespacedName{Name: "same-namespace", Namespace: ns}
+		gwHTTPOnlyNN := types.NamespacedName{Name: "gateway-tlsroute-http-only", Namespace: ns}
 		gwTCPPRouteOnlyNN := types.NamespacedName{Name: "gateway-tlsroute-tcproute-only", Namespace: ns}
-		gwHTTPSOnlyNN := types.NamespacedName{Name: "gateway-https-only", Namespace: ns}
+		gwHTTPSOnlyNN := types.NamespacedName{Name: "gateway-tlsroute-https-only", Namespace: ns}
 
 		// This test creates an additional Gateway in the gateway-conformance-infra
 		// namespace so we have to wait for it to be ready.
@@ -74,7 +74,7 @@ var TLSRouteInvalidNoMatchingListener = suite.ConformanceTest{
 			kubernetes.TLSRouteMustHaveCondition(t, suite.Client, suite.TimeoutConfig, routeNotAllowedKindNN, gwTCPPRouteOnlyNN, acceptedCondNotAllowed)
 		})
 		t.Run("TLSRoute rejected when listener protocol is HTTPS", func(t *testing.T) {
-			kubernetes.TLSRouteMustHaveCondition(t, suite.Client, suite.TimeoutConfig, routeWrongProtocolNN, gwHTTPSOnlyNN, acceptedCondNotAllowed)
+			kubernetes.TLSRouteMustHaveCondition(t, suite.Client, suite.TimeoutConfig, routeNotAllowedProtocolHTTPSNN, gwHTTPSOnlyNN, acceptedCondNotAllowed)
 		})
 		t.Run("TLSRoute rejected when sectionName not found", func(t *testing.T) {
 			kubernetes.TLSRouteMustHaveCondition(t, suite.Client, suite.TimeoutConfig, routeNoMatchingSectionNN, gwTLSPassthroughOnlyNN, acceptedCondNoMatchingParent)
@@ -86,7 +86,7 @@ var TLSRouteInvalidNoMatchingListener = suite.ConformanceTest{
 			kubernetes.TLSRouteMustHaveNoAcceptedParents(t, suite.Client, suite.TimeoutConfig, routeNotAllowedKindNN)
 		})
 		t.Run("TLSRoute (HTTPS listener) should not have Parents accepted", func(t *testing.T) {
-			kubernetes.TLSRouteMustHaveNoAcceptedParents(t, suite.Client, suite.TimeoutConfig, routeWrongProtocolNN)
+			kubernetes.TLSRouteMustHaveNoAcceptedParents(t, suite.Client, suite.TimeoutConfig, routeNotAllowedProtocolHTTPSNN)
 		})
 		t.Run("TLSRoute (wrong sectionName) should not have Parents accepted", func(t *testing.T) {
 			kubernetes.TLSRouteMustHaveNoAcceptedParents(t, suite.Client, suite.TimeoutConfig, routeNoMatchingSectionNN)

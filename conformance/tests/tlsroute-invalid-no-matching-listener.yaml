@@ -16,20 +16,20 @@ spec:
       tls:
         mode: Passthrough
 ---
-apiVersion: gateway.networking.k8s.io/v1alpha3
-kind: TLSRoute
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
 metadata:
-  name: tlsroute-not-allowed-protocol-http
+  name: gateway-tlsroute-http-only
   namespace: gateway-conformance-infra
 spec:
-  parentRefs:
-    - name: same-namespace
-  hostnames:
-    - tls.example.com
-  rules:
-    - backendRefs:
-        - name: tls-backend
-          port: 443
+  gatewayClassName: "{GATEWAY_CLASS_NAME}"
+  listeners:
+    - name: http
+      port: 80
+      protocol: HTTP
+      allowedRoutes:
+        namespaces:
+          from: Same
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
@@ -54,7 +54,7 @@ spec:
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
-  name: gateway-https-only
+  name: gateway-tlsroute-https-only
   namespace: gateway-conformance-infra
 spec:
   gatewayClassName: "{GATEWAY_CLASS_NAME}"
@@ -65,13 +65,26 @@ spec:
       allowedRoutes:
         namespaces:
           from: Same
-        kinds:
-          - kind: TLSRoute
       tls:
         mode: Terminate
         certificateRefs:
           - name: tls-validity-checks-certificate
             namespace: gateway-conformance-infra
+---
+apiVersion: gateway.networking.k8s.io/v1alpha3
+kind: TLSRoute
+metadata:
+  name: tlsroute-not-allowed-protocol-http
+  namespace: gateway-conformance-infra
+spec:
+  parentRefs:
+    - name: gateway-tlsroute-http-only
+  hostnames:
+    - tls.example.com
+  rules:
+    - backendRefs:
+        - name: tls-backend
+          port: 443
 ---
 apiVersion: gateway.networking.k8s.io/v1alpha3
 kind: TLSRoute
@@ -91,11 +104,11 @@ spec:
 apiVersion: gateway.networking.k8s.io/v1alpha3
 kind: TLSRoute
 metadata:
-  name: tlsroute-wrong-protocol
+  name: tlsroute-not-allowed-protocol-https
   namespace: gateway-conformance-infra
 spec:
   parentRefs:
-    - name: gateway-https-only
+    - name: gateway-tlsroute-https-only
   hostnames:
     - tls.example.com
   rules:
