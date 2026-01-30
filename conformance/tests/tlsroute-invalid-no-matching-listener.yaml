@@ -39,7 +39,6 @@ metadata:
 spec:
   gatewayClassName: "{GATEWAY_CLASS_NAME}"
   listeners:
-  listeners:
     - name: tls-passthrough
       protocol: TLS
       port: 443
@@ -47,7 +46,7 @@ spec:
         namespaces:
           from: Same
         kinds:
-        - kind: TCPRoute
+          - kind: TCPRoute
       tls:
         mode: Passthrough
 ---
