@@ -53,3 +53,11 @@ type HTTPRouteListerExpansion interface{}
 // HTTPRouteNamespaceListerExpansion allows custom methods to be added to
 // HTTPRouteNamespaceLister.
 type HTTPRouteNamespaceListerExpansion interface{}
+
+// TLSRouteListerExpansion allows custom methods to be added to
+// TLSRouteLister.
+type TLSRouteListerExpansion interface{}
+
+// TLSRouteNamespaceListerExpansion allows custom methods to be added to
+// TLSRouteNamespaceLister.
+type TLSRouteNamespaceListerExpansion interface{}
