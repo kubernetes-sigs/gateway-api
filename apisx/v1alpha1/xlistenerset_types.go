@@ -64,20 +64,20 @@ type XListenerSet struct {
 
 	// Spec defines the desired state of ListenerSet.
 	// +required
-	Spec ListenerSetSpec `json:"spec"`
+	Spec ListenerSetSpec `json:"spec,omitzero"`
 
 	// Status defines the current state of ListenerSet.
 	//
 	// +kubebuilder:default={conditions: {{type: "Accepted", status: "Unknown", reason:"Pending", message:"Waiting for controller", lastTransitionTime: "1970-01-01T00:00:00Z"},{type: "Programmed", status: "Unknown", reason:"Pending", message:"Waiting for controller", lastTransitionTime: "1970-01-01T00:00:00Z"}}}
 	// +optional
-	Status ListenerSetStatus `json:"status,omitempty"`
+	Status ListenerSetStatus `json:"status,omitempty,omitzero"`
 }
 
 // ListenerSetSpec defines the desired state of a ListenerSet.
 type ListenerSetSpec struct {
 	// ParentRef references the Gateway that the listeners are attached to.
 	// +required
-	ParentRef ParentGatewayReference `json:"parentRef"`
+	ParentRef ParentGatewayReference `json:"parentRef,omitempty"`
 
 	// Listeners associated with this ListenerSet. Listeners define
 	// logical endpoints that are bound on this referenced parent Gateway's addresses.
@@ -117,7 +117,7 @@ type ListenerSetSpec struct {
 	// +kubebuilder:validation:XValidation:message="Listener name must be unique within the Gateway",rule="self.all(l1, self.exists_one(l2, l1.name == l2.name))"
 	// +kubebuilder:validation:XValidation:message="Combination of port, protocol and hostname must be unique for each listener",rule="self.all(l1, !has(l1.port) || self.exists_one(l2, has(l2.port) && l1.port == l2.port && l1.protocol == l2.protocol && (has(l1.hostname) && has(l2.hostname) ? l1.hostname == l2.hostname : !has(l1.hostname) && !has(l2.hostname))))"
 	// +required
-	Listeners []ListenerEntry `json:"listeners"`
+	Listeners []ListenerEntry `json:"listeners,omitempty"`
 }
 
 type ListenerEntry struct {
@@ -128,7 +128,7 @@ type ListenerEntry struct {
 	// Routes can attach to a Listener by having a ListenerSet as a parentRef
 	// and setting the SectionName
 	// +required
-	Name SectionName `json:"name"`
+	Name SectionName `json:"name,omitempty"`
 
 	// Hostname specifies the virtual hostname to match for protocol types that
 	// define this concept. When unspecified, all hostnames are matched. This
@@ -165,11 +165,11 @@ type ListenerEntry struct {
 	// +kubebuilder:validation:Maximum=65535
 	//
 	// +required
-	Port PortNumber `json:"port"`
+	Port PortNumber `json:"port,omitempty"`
 
 	// Protocol specifies the network protocol this listener expects to receive.
 	// +required
-	Protocol ProtocolType `json:"protocol"`
+	Protocol ProtocolType `json:"protocol,omitempty"`
 
 	// TLS is the TLS configuration for the Listener. This field is required if
 	// the Protocol field is "HTTPS" or "TLS". It is invalid to set this field
@@ -245,7 +245,7 @@ type ListenerSetStatus struct {
 type ListenerEntryStatus struct {
 	// Name is the name of the Listener that this status corresponds to.
 	// +required
-	Name SectionName `json:"name"`
+	Name SectionName `json:"name,omitempty"`
 
 	// SupportedKinds is the list indicating the Kinds supported by this
 	// listener. This MUST represent the kinds supported by an implementation for
@@ -260,7 +260,7 @@ type ListenerEntryStatus struct {
 	// +required
 	// +listType=atomic
 	// +kubebuilder:validation:MaxItems=8
-	SupportedKinds []RouteGroupKind `json:"supportedKinds"`
+	SupportedKinds []RouteGroupKind `json:"supportedKinds,omitempty"`
 
 	// AttachedRoutes represents the total number of Routes that have been
 	// successfully attached to this Listener.
@@ -291,7 +291,7 @@ type ListenerEntryStatus struct {
 	// +listMapKey=type
 	// +kubebuilder:validation:MaxItems=8
 	// +required
-	Conditions []metav1.Condition `json:"conditions"`
+	Conditions []metav1.Condition `json:"conditions,omitempty"`
 }
 
 // ListenerSetConditionType is a type of condition associated with a

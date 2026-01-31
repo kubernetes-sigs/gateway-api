@@ -8845,7 +8845,6 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerEntry(ref common.Refere
 					"name": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Name is the name of the Listener. This name MUST be unique within a ListenerSet.\n\nName is not required to be unique across a Gateway and ListenerSets. Routes can attach to a Listener by having a ListenerSet as a parentRef and setting the SectionName",
-							Default:     "",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -8860,7 +8859,6 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerEntry(ref common.Refere
 					"port": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Port is the network port. Multiple listeners may use the same port, subject to the Listener compatibility rules.",
-							Default:     0,
 							Type:        []string{"integer"},
 							Format:      "int32",
 						},
@@ -8868,7 +8866,6 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerEntry(ref common.Refere
 					"protocol": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Protocol specifies the network protocol this listener expects to receive.",
-							Default:     "",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -8904,7 +8901,6 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerEntryStatus(ref common.
 					"name": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Name is the name of the Listener that this status corresponds to.",
-							Default:     "",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -9080,7 +9076,6 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_MeshSpec(ref common.ReferenceCa
 					"controllerName": {
 						SchemaProps: spec.SchemaProps{
 							Description: "ControllerName is the name of a controller that is managing Gateway API resources for mesh traffic management. The value of this field MUST be a domain prefixed path.\n\nExample: \"example.com/awesome-mesh\".\n\nThis field is not mutable and cannot be empty.\n\nSupport: Core",
-							Default:     "",
 							Type:        []string{"string"},
 							Format:      "",
 						},
