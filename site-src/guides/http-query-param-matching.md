@@ -4,7 +4,7 @@
     This feature is part of extended support. For more information on support levels, refer to our [conformance guide](../concepts/conformance.md).
 
 The [HTTPRoute resource](../api-types/httproute.md) can be used to match
-requests based on query parameters. This guide shows how to use this
+requests based on [query parameters](../../reference/spec/#httpqueryparammatch). This guide shows how to use this
 functionality.
 
 ## Matching requests based on a single query parameter
