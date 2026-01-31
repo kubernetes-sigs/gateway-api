@@ -198,6 +198,10 @@ type GatewaySpec struct {
 	// request to "foo.example.com" SHOULD only be routed using routes attached
 	// to the "foo.example.com" Listener (and not the "*.example.com" Listener).
 	//
+	// If HTTP traffic to a Gateway does not match any Listener's hostname
+	// (or if the Listener does not specify a hostname and the request does not
+	// match any attached Route), the request MUST receive a 404 status code and fail.
+	//
 	// This concept is known as "Listener Isolation", and it is an Extended feature
 	// of Gateway API. Implementations that do not support Listener Isolation MUST
 	// clearly document this, and MUST NOT claim support for the
