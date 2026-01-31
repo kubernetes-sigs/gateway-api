@@ -176,6 +176,14 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1.PolicyAncestorStatusApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("PolicyStatus"):
 		return &apisv1.PolicyStatusApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("ReferenceGrant"):
+		return &apisv1.ReferenceGrantApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("ReferenceGrantFrom"):
+		return &apisv1.ReferenceGrantFromApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("ReferenceGrantSpec"):
+		return &apisv1.ReferenceGrantSpecApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("ReferenceGrantTo"):
+		return &apisv1.ReferenceGrantToApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("RouteGroupKind"):
 		return &apisv1.RouteGroupKindApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("RouteNamespaces"):
@@ -244,12 +252,6 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1beta1.HTTPRouteApplyConfiguration{}
 	case v1beta1.SchemeGroupVersion.WithKind("ReferenceGrant"):
 		return &apisv1beta1.ReferenceGrantApplyConfiguration{}
-	case v1beta1.SchemeGroupVersion.WithKind("ReferenceGrantFrom"):
-		return &apisv1beta1.ReferenceGrantFromApplyConfiguration{}
-	case v1beta1.SchemeGroupVersion.WithKind("ReferenceGrantSpec"):
-		return &apisv1beta1.ReferenceGrantSpecApplyConfiguration{}
-	case v1beta1.SchemeGroupVersion.WithKind("ReferenceGrantTo"):
-		return &apisv1beta1.ReferenceGrantToApplyConfiguration{}
 
 		// Group=gateway.networking.x-k8s.io, Version=v1alpha1
 	case v1alpha1.SchemeGroupVersion.WithKind("BackendTrafficPolicySpec"):
