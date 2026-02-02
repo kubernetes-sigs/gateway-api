@@ -136,15 +136,17 @@ The purpose of monthly releases is to enable faster iteration in the
 Experimental channel.
 
 ### SemVer Releases
-Gateway API continues to publish SemVer releases (e.g., `1.5.0`, `1.6.0`) on a 
-regular cadence. These releases:
+Gateway API publishes SemVer releases (e.g., `1.5.0`, `1.6.0`) on a regular 
+cadence. While we use semantic versioning to structure release numbers, our
+versioning scheme differs from strict SemVer due to our release channels. See 
+[What Can Change](#what-can-change) for details on breaking changes that may 
+occur in minor releases within the Experimental channel.
+
+SemVer releases:
 
 * Include both `experimental-install.yaml` and `standard-install.yaml`
-* Are not snapshots of main: they have release branches to allow for backporting
- bugfixes
-* Most likely, the `experimental-install.yaml` in a SemVer release will be 
-identical to the one contained in the monthly release right before it, though 
-that's not required
+* Use release branches to allow for backporting bugfixes
+* Most likely have an `experimental-install.yaml` identical to the monthly release immediately before it, though that is not required
 
 ## Version Indicators
 Each CRD will be published with annotations that indicate their bundle version
