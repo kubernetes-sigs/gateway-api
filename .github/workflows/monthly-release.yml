@@ -83,21 +83,7 @@ jobs:
           YEAR=$(echo "$YEAR_MONTH" | cut -d. -f1)
           MONTH_NUM=$(echo "$YEAR_MONTH" | cut -d. -f2)
 
-          case "$MONTH_NUM" in
-            01) MONTH_NAME="January" ;;
-            02) MONTH_NAME="February" ;;
-            03) MONTH_NAME="March" ;;
-            04) MONTH_NAME="April" ;;
-            05) MONTH_NAME="May" ;;
-            06) MONTH_NAME="June" ;;
-            07) MONTH_NAME="July" ;;
-            08) MONTH_NAME="August" ;;
-            09) MONTH_NAME="September" ;;
-            10) MONTH_NAME="October" ;;
-            11) MONTH_NAME="November" ;;
-            12) MONTH_NAME="December" ;;
-            *) MONTH_NAME="Month $MONTH_NUM" ;;
-          esac
+          MONTH_NAME=$(date -d "${YEAR_MONTH}-01" +"%B")
 
           # Find previous tag and SHAs for PR extraction
           git fetch --tags --force
