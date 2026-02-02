@@ -29,7 +29,7 @@ flowchart TD
     D -->|Yes| E([Adjust and try again])
     D -->|No| F>Remove From API]
     E -->A
-    2 -->|No progress in 6 months| G([Auto-dropped])
+    A -- No progress in 6 months --> G(["Auto-dropped"])
     
 style A fill:#eeb
 style C fill:#beb
@@ -115,7 +115,7 @@ API.
 ## Release Process
 
 ### Standard Channel Releases
-Standard-channel releases follow a date-based cadence. The release date is 
+We target a 4-months cadence for standard channel releases. The release date is 
 chosen in advance and will not slip; however, the content is flexible. Whatever 
 content is ready to go at the release date will ship; content that isn't ready 
 will wait for the next release. The release number is ideally chosen at the 
