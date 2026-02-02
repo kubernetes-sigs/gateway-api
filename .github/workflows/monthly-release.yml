@@ -80,10 +80,9 @@ jobs:
           TAG="${{ steps.tag.outputs.tag }}"
 
           YEAR_MONTH="${{ steps.tag.outputs.year_month }}"
+          YEAR_MONTH_FORMATTED=$(echo "$YEAR_MONTH" | sed 's/\./-/')
           YEAR=$(echo "$YEAR_MONTH" | cut -d. -f1)
-          MONTH_NUM=$(echo "$YEAR_MONTH" | cut -d. -f2)
-
-          MONTH_NAME=$(date -d "${YEAR_MONTH}-01" +"%B")
+          MONTH_NAME=$(date -d "${YEAR_MONTH_FORMATTED}-01" +"%B")
 
           # Find previous tag and SHAs for PR extraction
           git fetch --tags --force
