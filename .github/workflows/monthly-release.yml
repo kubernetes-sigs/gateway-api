@@ -122,7 +122,6 @@ jobs:
           else
             printf '### Merged Pull Requests\n\n'
             printf 'No pull requests found in this release.\n' >> release-notes.md
-            printf '\nFull Changelog: See commit history\n' >> release-notes.md
           fi
 
           gh release create ${{ steps.tag.outputs.tag }} \
