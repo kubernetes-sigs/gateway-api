@@ -78,13 +78,10 @@ jobs:
           GITHUB_REPOSITORY: ${{ github.repository }}
         run: |
           TAG="${{ steps.tag.outputs.tag }}"
+          YEAR_MONTH=$(echo ""${{ steps.tag.outputs.year_month }}"" | sed 's/\./-/')
+          YEAR=$(echo "$YEAR_MONTH" | cut -d- -f1)
+          MONTH_NAME=$(date -d "${YEAR_MONTH}-01" +"%B")
 
-          YEAR_MONTH="${{ steps.tag.outputs.year_month }}"
-          YEAR_MONTH_FORMATTED=$(echo "$YEAR_MONTH" | sed 's/\./-/')
-          YEAR=$(echo "$YEAR_MONTH" | cut -d. -f1)
-          MONTH_NAME=$(date -d "${YEAR_MONTH_FORMATTED}-01" +"%B")
-
-          # Find previous tag and SHAs for PR extraction
           git fetch --tags --force
 
           PREV_TAG=$(git tag -l "monthly-*" | sort -V | grep -B1 "^${TAG}$" | head -n1)
