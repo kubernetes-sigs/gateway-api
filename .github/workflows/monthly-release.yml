@@ -70,8 +70,8 @@ jobs:
         run: |
           make build-monthly-yaml
 
-      - name: Generate release notes
-        id: release-notes
+      - name: Release with notes
+        id: release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -129,17 +129,10 @@ jobs:
             printf '\nFull Changelog: See commit history\n' >> release-notes.md
           fi
 
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ steps.tag.outputs.tag }}
-          name: Monthly Release for ${{ steps.tag.outputs.year_month }}
-          body_path: release-notes.md
-          prerelease: true
-          files: |
-            release/${{ steps.tag.outputs.tag }}-install.yaml
-          draft: true
-          generate_release_notes: false
+          gh release create ${{ steps.tag.outputs.tag }} \
+            -F release-notes.md \
+            --prerelease \
+            --draft release/${{ steps.tag.outputs.tag }}-install.yaml
 
       - name: Cleanup
         if: always()
