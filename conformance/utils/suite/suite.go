@@ -129,6 +129,8 @@ type ConformanceTestSuite struct {
 
 	// lock is a mutex to help ensure thread safety of the test suite object.
 	lock sync.RWMutex
+
+	failFast bool
 }
 
 // ConformanceOptions can be used to initialize a ConformanceTestSuite.
@@ -180,6 +182,8 @@ type ConformanceOptions struct {
 	AllowCRDsMismatch   bool
 	Implementation      confv1.Implementation
 	ConformanceProfiles sets.Set[ConformanceProfileName]
+
+	FailFast bool
 }
 
 type FeaturesSet = sets.Set[features.FeatureName]
@@ -315,6 +319,7 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 		apiChannel:                  apiChannel,
 		supportedFeaturesSource:     source,
 		Hook:                        options.Hook,
+		failFast:                    options.FailFast,
 	}
 
 	// apply defaults
@@ -522,6 +527,10 @@ func (suite *ConformanceTestSuite) Run(t *testing.T, tests []ConformanceTest) er
 		// such as collecting current state of the cluster for debugging.
 		if suite.Hook != nil {
 			suite.Hook(t, test, suite)
+		}
+
+		if suite.failFast {
+			break
 		}
 	}
 
