@@ -1,0 +1,125 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: gateway-tlsroute-mixed-termination
+  namespace: gateway-conformance-infra
+spec:
+  gatewayClassName: "{GATEWAY_CLASS_NAME}"
+  listeners:
+  - name: tls-terminate
+    port: 8883
+    protocol: TLS
+    hostname: tls.example.com # This is the valid cert SAN
+    allowedRoutes:
+      namespaces:
+        from: Same
+      kinds:
+      - kind: TLSRoute
+    tls:
+      mode: Terminate
+      certificateRefs:
+      - name: tls-terminate-checks-certificate
+  - name: tls-passthrough
+    port: 8883
+    protocol: TLS
+    hostname: abc.example.com # This is the valid cert on backend
+    allowedRoutes:
+      namespaces:
+        from: Same
+      kinds:
+      - kind: TLSRoute
+    tls:
+      mode: Passthrough
+---
+# Route for Passthrough
+apiVersion: gateway.networking.k8s.io/v1alpha3
+kind: TLSRoute
+metadata:
+  name: gateway-conformance-mixed-passthroughroute
+  namespace: gateway-conformance-infra
+spec:
+  parentRefs:
+  - name: gateway-tlsroute-mixed-termination
+    namespace: gateway-conformance-infra
+  hostnames:
+  - abc.example.com
+  rules:
+  - backendRefs:
+    - name: tls-backend
+      port: 443
+---
+# TLSRoute and service for the terminated MQTT service
+apiVersion: gateway.networking.k8s.io/v1alpha3
+kind: TLSRoute
+metadata:
+  name: gateway-conformance-mixed-terminateroute
+  namespace: gateway-conformance-infra
+spec:
+  parentRefs:
+  - name: gateway-tlsroute-mixed-termination
+    namespace: gateway-conformance-infra
+  hostnames:
+  - tls.example.com
+  rules:
+  - backendRefs:
+    - name: mqtt-backend
+      port: 1883
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mqtt-backend
+  namespace: gateway-conformance-infra
+spec:
+  selector:
+    app: mqtt-backend
+  ports:
+  - protocol: TCP
+    port: 1883
+    targetPort: 1883
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mqtt-backend
+  namespace: gateway-conformance-infra
+  labels:
+    app: mqtt-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mqtt-backend
+  template:
+    metadata:
+      labels:
+        app: mqtt-backend
+    spec:
+      containers:
+      - name: mqtt-backend
+        # https://hub.docker.com/_/eclipse-mosquitto
+        image: docker.io/eclipse-mosquitto:2
+        volumeMounts:
+        - name: config
+          mountPath: /mosquitto/config/mosquitto.conf
+          subPath: mosquitto.conf
+        ports:
+        - containerPort: 1883
+        resources:
+          requests:
+            cpu: 10m
+      volumes:
+      - name: config
+        configMap:
+          name: mosquitto-config
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mosquitto-config
+  namespace: gateway-conformance-infra
+data:
+  mosquitto.conf: |
+    listener 1883
+    allow_anonymous true
+---

@@ -28,6 +28,9 @@ const (
 
 	// This option indicates support for TLSRoute mode Terminate (extended conformance)
 	SupportTLSRouteModeTerminate FeatureName = "TLSRouteModeTerminate"
+
+	// This option indicates support for TLSRoute mode Mixed (extended conformance)
+	SupportTLSRouteModeMixed FeatureName = "TLSRouteModeMixed"
 )
 
 var (
@@ -39,6 +42,12 @@ var (
 	// TLSRouteModeTerminate contains metadata for the TLSRouteModeTerminate feature.
 	TLSRouteModeTerminateFeature = Feature{
 		Name:    SupportTLSRouteModeTerminate,
+		Channel: FeatureChannelExperimental,
+	}
+
+	// TLSRouteModeTerminate contains metadata for the TLSRouteModeTerminate feature.
+	TLSRouteModeMixedFeature = Feature{
+		Name:    SupportTLSRouteModeMixed,
 		Channel: FeatureChannelExperimental,
 	}
 )
@@ -54,4 +63,5 @@ var TLSRouteCoreFeatures = sets.New(
 // This does not include any Core Features.
 var TLSRouteExtendedFeatures = sets.New(
 	TLSRouteModeTerminateFeature,
+	TLSRouteModeMixedFeature,
 )
