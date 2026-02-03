@@ -57,6 +57,11 @@ const (
 	// of HTTP listeners.
 	SupportGatewayHTTPListenerIsolation FeatureName = "GatewayHTTPListenerIsolation"
 
+	// SupportGatewayHTTPSListenerDetectMisdirectedRequests option indicates
+	// support for detecting and rejecting misdirected HTTPS requests, returning
+	// HTTP 421 (Misdirected Request) when appropriate.
+	SupportGatewayHTTPSListenerDetectMisdirectedRequests = "GatewayHTTPSListenerDetectMisdirectedRequests"
+
 	// SupportGatewayInfrastructurePropagation option indicates support for
 	// spec.infrastructure.annotations and spec.infrastructure.labels
 	SupportGatewayInfrastructurePropagation FeatureName = "GatewayInfrastructurePropagation"
@@ -96,6 +101,11 @@ var (
 		Name:    SupportGatewayHTTPListenerIsolation,
 		Channel: FeatureChannelStandard,
 	}
+	// GatewayHTTPSListenerDetectMisdirectedRequestsFeature contains metadata for the SupportGatewayHTTPSListenerDetectMisdirectedRequests feature.
+	GatewayHTTPSListenerDetectMisdirectedRequestsFeature = Feature{
+		Name:    SupportGatewayHTTPSListenerDetectMisdirectedRequests,
+		Channel: FeatureChannelStandard,
+	}
 	// GatewayInfrastructurePropagationFeature contains metadata for the GatewayInfrastructurePropagation feature.
 	GatewayInfrastructurePropagationFeature = Feature{
 		Name:    SupportGatewayInfrastructurePropagation,
@@ -131,6 +141,7 @@ var GatewayExtendedFeatures = sets.New(
 	GatewayPort8080Feature,
 	GatewayStaticAddressesFeature,
 	GatewayHTTPListenerIsolationFeature,
+	GatewayHTTPSListenerDetectMisdirectedRequestsFeature,
 	GatewayInfrastructurePropagationFeature,
 	GatewayEmptyAddressFeature,
 	GatewayListenerSetFeature,
