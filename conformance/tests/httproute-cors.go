@@ -44,10 +44,12 @@ var HTTPRouteCORS = suite.ConformanceTest{
 		ns := "gateway-conformance-infra"
 		routeNN1 := types.NamespacedName{Name: "cors-multiple-origins-methods-headers", Namespace: ns}
 		routeNN2 := types.NamespacedName{Name: "cors-wildcard-methods", Namespace: ns}
+		routeNN3 := types.NamespacedName{Name: "cors-wildcard-origin", Namespace: ns}
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: ns}
 		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN1, routeNN2)
 		kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN1, gwNN)
 		kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN2, gwNN)
+		kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN3, gwNN)
 
 		testCases := []http.ExpectedResponse{
 			{
@@ -288,6 +290,24 @@ var HTTPRouteCORS = suite.ConformanceTest{
 				Response: http.Response{
 					AbsentHeaders: []string{
 						"access-control-allow-credentials",
+					},
+				},
+			},
+			{
+				TestCaseName: "Simple request from a wildcard origin should return header with '*'",
+				Namespace:    ns,
+				Request: http.Request{
+					Path:   "/cors-wildcard-origin",
+					Method: "GET",
+					Headers: map[string]string{
+						"Origin":                        "https://foobar.com",
+						"access-control-request-method": "GET",
+					},
+				},
+				Response: http.Response{
+					StatusCodes: []int{200, 204},
+					Headers: map[string]string{
+						"access-control-allow-origin": "https://foobar.com",
 					},
 				},
 			},

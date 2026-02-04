@@ -54,3 +54,26 @@ spec:
     backendRefs:
     - name: infra-backend-v1
       port: 8080
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: cors-wildcard-origin   # test CORS with origin *.foo.com and expect the exact answer to come on the header
+  namespace: gateway-conformance-infra
+spec:
+  parentRefs:
+  - name: same-namespace
+  rules:
+  - filters:
+    - type: CORS
+      cors:
+        allowOrigins:
+        - "*"
+        allowMethods: ["*"]
+    matches:
+    - path:
+        type: PathPrefix
+        value: /cors-wildcard-origin
+    backendRefs:
+    - name: infra-backend-v1
+      port: 8080
