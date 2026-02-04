@@ -865,7 +865,6 @@ spec:
       containers:
       - name: tcp-backend
         image: gcr.io/k8s-staging-gateway-api/echo-basic:v20260204-monthly-2026.01-60-g28382302
-        env:
         resources:
           requests:
             cpu: 10m
@@ -887,9 +886,6 @@ spec:
           value: /etc/secret-volume/key
         - name: TCP_ECHO_SERVER
           value: "1"
-        resources:
-          requests:
-            cpu: 10m
       volumes:
       - name: secret-volume
         secret:
