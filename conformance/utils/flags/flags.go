@@ -52,4 +52,5 @@ var (
 	ConformanceProfiles        = flag.String("conformance-profiles", "", "Comma-separated list of the conformance profiles to run")
 	ReportOutput               = flag.String("report-output", "", "The file where to write the conformance report")
 	SkipProvisionalTests       = flag.Bool("skip-provisional-tests", false, "Whether to skip provisional tests")
+	FailFast                   = flag.Bool("fail-fast", false, "Whether to stop the suite execution upon the first test failure")
 )

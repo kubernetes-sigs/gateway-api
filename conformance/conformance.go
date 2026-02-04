@@ -118,6 +118,7 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 		SupportedFeatures:          supportedFeatures,
 		TimeoutConfig:              conformanceconfig.DefaultTimeoutConfig(),
 		SkipProvisionalTests:       *flags.SkipProvisionalTests,
+		FailFast:                   *flags.FailFast,
 	}
 }
 
