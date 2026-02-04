@@ -1,5 +1,5 @@
 /*
-Copyright 2025 The Kubernetes Authors.
+Copyright 2026 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -42,8 +42,8 @@ var HTTPRouteCORS = suite.ConformanceTest{
 	},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
-		routeNN1 := types.NamespacedName{Name: "cors-1", Namespace: ns}
-		routeNN2 := types.NamespacedName{Name: "cors-2", Namespace: ns}
+		routeNN1 := types.NamespacedName{Name: "cors-multiple-origins-methods-headers", Namespace: ns}
+		routeNN2 := types.NamespacedName{Name: "cors-wildcard-methods", Namespace: ns}
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: ns}
 		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN1, routeNN2)
 		kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN1, gwNN)
