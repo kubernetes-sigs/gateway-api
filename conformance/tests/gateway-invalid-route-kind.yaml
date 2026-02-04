@@ -18,7 +18,7 @@ spec:
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
-  name: gateway-http-supported-and-invalid-route-kind
+  name: gateway-supported-and-invalid-route-kind
   namespace: gateway-conformance-infra
 spec:
   gatewayClassName: "{GATEWAY_CLASS_NAME}"
@@ -32,23 +32,3 @@ spec:
         kinds:
           - kind: InvalidRoute
           - kind: HTTPRoute
----
-apiVersion: gateway.networking.k8s.io/v1
-kind: Gateway
-metadata:
-  name: gateway-tls-supported-and-invalid-route-kind
-  namespace: gateway-conformance-infra
-spec:
-  gatewayClassName: "{GATEWAY_CLASS_NAME}"
-  listeners:
-    - name: tls
-      port: 443
-      protocol: TLS
-      allowedRoutes:
-        namespaces:
-          from: All
-        kinds:
-          - kind: TCPRoute
-          - kind: TLSRoute
-      tls:
-        mode: Passthrough

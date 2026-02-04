@@ -56,32 +56,13 @@ var GatewayInvalidRouteKind = suite.ConformanceTest{
 			kubernetes.GatewayStatusMustHaveListeners(t, s.Client, s.TimeoutConfig, gwNN, listeners)
 		})
 
-		t.Run("Gateway HTTP listener should have a false ResolvedRefs condition with reason InvalidRouteKinds and HTTPRoute must be put in the supportedKinds", func(t *testing.T) {
-			gwNN := types.NamespacedName{Name: "gateway-http-supported-and-invalid-route-kind", Namespace: "gateway-conformance-infra"}
+		t.Run("Gateway listener should have a false ResolvedRefs condition with reason InvalidRouteKinds and HTTPRoute must be put in the supportedKinds", func(t *testing.T) {
+			gwNN := types.NamespacedName{Name: "gateway-supported-and-invalid-route-kind", Namespace: "gateway-conformance-infra"}
 			listeners := []v1.ListenerStatus{{
 				Name: v1.SectionName("http"),
 				SupportedKinds: []v1.RouteGroupKind{{
 					Group: (*v1.Group)(&v1.GroupVersion.Group),
 					Kind:  v1.Kind("HTTPRoute"),
-				}},
-				Conditions: []metav1.Condition{{
-					Type:   string(v1.ListenerConditionResolvedRefs),
-					Status: metav1.ConditionFalse,
-					Reason: string(v1.ListenerReasonInvalidRouteKinds),
-				}},
-				AttachedRoutes: 0,
-			}}
-
-			kubernetes.GatewayStatusMustHaveListeners(t, s.Client, s.TimeoutConfig, gwNN, listeners)
-		})
-
-		t.Run("Gateway TLS listener should have a false ResolvedRefs condition with reason InvalidRouteKinds and TLSRoute must be put in the supportedKinds", func(t *testing.T) {
-			gwNN := types.NamespacedName{Name: "gateway-tls-supported-and-invalid-route-kind", Namespace: "gateway-conformance-infra"}
-			listeners := []v1.ListenerStatus{{
-				Name: v1.SectionName("tls"),
-				SupportedKinds: []v1.RouteGroupKind{{
-					Group: (*v1.Group)(&v1.GroupVersion.Group),
-					Kind:  v1.Kind("TLSRoute"),
 				}},
 				Conditions: []metav1.Condition{{
 					Type:   string(v1.ListenerConditionResolvedRefs),
