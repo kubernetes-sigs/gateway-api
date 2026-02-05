@@ -70,9 +70,9 @@ const (
 	// spec.addresses.value field
 	SupportGatewayAddressEmpty FeatureName = "GatewayAddressEmpty"
 
-	//  SupportGatewayListenerSet option indicates support for a Gateway
-	//  with ListenerSets
-	SupportGatewayListenerSet FeatureName = "GatewayListenerSet"
+	// SupportListenerSet option indicates support for a Gateway
+	// with ListenerSets
+	SupportListenerSet FeatureName = "ListenerSet"
 
 	// SupportGatewayBackendClientCertificate option indicates support for
 	// specifying client certificates when the Gateway originates the connection
@@ -117,9 +117,9 @@ var (
 		Channel: FeatureChannelStandard,
 	}
 
-	// GatewayListenerSetFeature contains metadata for the SupportGatewayListenerSet feature.
-	GatewayListenerSetFeature = Feature{
-		Name:    SupportGatewayListenerSet,
+	// ListenerSetFeature contains metadata for the SupportListenerSet feature.
+	ListenerSetFeature = Feature{
+		Name:    SupportListenerSet,
 		Channel: FeatureChannelExperimental,
 	}
 
@@ -144,7 +144,7 @@ var GatewayExtendedFeatures = sets.New(
 	GatewayHTTPSListenerDetectMisdirectedRequestsFeature,
 	GatewayInfrastructurePropagationFeature,
 	GatewayEmptyAddressFeature,
-	GatewayListenerSetFeature,
 	GatewayBackendClientCertificateFeature,
 	GatewayFrontendClientCertificateValidationFeature,
+	ListenerSetFeature,
 )
