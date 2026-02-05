@@ -827,6 +827,91 @@ spec:
                   rule: 'self.all(l1, self.exists_one(l2, l1.port == l2.port && l1.protocol
                     == l2.protocol && (has(l1.hostname) && has(l2.hostname) ? l1.hostname
                     == l2.hostname : !has(l1.hostname) && !has(l2.hostname))))'
+              tls:
+                description: |-
+                  TLS specifies frontend and backend tls configuration for entire gateway.
+
+                  Support: Extended
+                properties:
+                  backend:
+                    description: |-
+                      Backend describes TLS configuration for gateway when connecting
+                      to backends.
+
+                      Note that this contains only details for the Gateway as a TLS client,
+                      and does _not_ imply behavior about how to choose which backend should
+                      get a TLS connection. That is determined by the presence of a BackendTLSPolicy.
+
+                      Support: Core
+                    properties:
+                      clientCertificateRef:
+                        description: |-
+                          ClientCertificateRef references an object that contains a client certificate
+                          and its associated private key. It can reference standard Kubernetes resources,
+                          i.e., Secret, or implementation-specific custom resources.
+
+                          A ClientCertificateRef is considered invalid if:
+
+                          * It refers to a resource that cannot be resolved (e.g., the referenced resource
+                            does not exist) or is misconfigured (e.g., a Secret does not contain the keys
+                            named `tls.crt` and `tls.key`). In this case, the `ResolvedRefs` condition
+                            on the Gateway MUST be set to False with the Reason `InvalidClientCertificateRef`
+                            and the Message of the Condition MUST indicate why the reference is invalid.
+
+                          * It refers to a resource in another namespace UNLESS there is a ReferenceGrant
+                            in the target namespace that allows the certificate to be attached.
+                            If a ReferenceGrant does not allow this reference, the `ResolvedRefs` condition
+                            on the Gateway MUST be set to False with the Reason `RefNotPermitted`.
+
+                          Implementations MAY choose to perform further validation of the certificate
+                          content (e.g., checking expiry or enforcing specific formats). In such cases,
+                          an implementation-specific Reason and Message MUST be set.
+
+                          Support: Core - Reference to a Kubernetes TLS Secret (with the type `kubernetes.io/tls`).
+                          Support: Implementation-specific - Other resource kinds or Secrets with a
+                          different type (e.g., `Opaque`).
+                        properties:
+                          group:
+                            default: ""
+                            description: |-
+                              Group is the group of the referent. For example, "gateway.networking.k8s.io".
+                              When unspecified or empty string, core API group is inferred.
+                            maxLength: 253
+                            pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+                            type: string
+                          kind:
+                            default: Secret
+                            description: Kind is kind of the referent. For example
+                              "Secret".
+                            maxLength: 63
+                            minLength: 1
+                            pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
+                            type: string
+                          name:
+                            description: Name is the name of the referent.
+                            maxLength: 253
+                            minLength: 1
+                            type: string
+                          namespace:
+                            description: |-
+                              Namespace is the namespace of the referenced object. When unspecified, the local
+                              namespace is inferred.
+
+                              Note that when a namespace different than the local namespace is specified,
+                              a ReferenceGrant object is required in the referent namespace to allow that
+                              namespace's owner to accept the reference. See the ReferenceGrant
+                              documentation for details.
+
+                              Support: Core
+                            maxLength: 63
+                            minLength: 1
+                            pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                            type: string
+                        required:
+                        - name
+                        type: object
+                    type: object
+                type: object
             required:
             - gatewayClassName
             - listeners
@@ -1960,6 +2045,91 @@ spec:
                   rule: 'self.all(l1, self.exists_one(l2, l1.port == l2.port && l1.protocol
                     == l2.protocol && (has(l1.hostname) && has(l2.hostname) ? l1.hostname
                     == l2.hostname : !has(l1.hostname) && !has(l2.hostname))))'
+              tls:
+                description: |-
+                  TLS specifies frontend and backend tls configuration for entire gateway.
+
+                  Support: Extended
+                properties:
+                  backend:
+                    description: |-
+                      Backend describes TLS configuration for gateway when connecting
+                      to backends.
+
+                      Note that this contains only details for the Gateway as a TLS client,
+                      and does _not_ imply behavior about how to choose which backend should
+                      get a TLS connection. That is determined by the presence of a BackendTLSPolicy.
+
+                      Support: Core
+                    properties:
+                      clientCertificateRef:
+                        description: |-
+                          ClientCertificateRef references an object that contains a client certificate
+                          and its associated private key. It can reference standard Kubernetes resources,
+                          i.e., Secret, or implementation-specific custom resources.
+
+                          A ClientCertificateRef is considered invalid if:
+
+                          * It refers to a resource that cannot be resolved (e.g., the referenced resource
+                            does not exist) or is misconfigured (e.g., a Secret does not contain the keys
+                            named `tls.crt` and `tls.key`). In this case, the `ResolvedRefs` condition
+                            on the Gateway MUST be set to False with the Reason `InvalidClientCertificateRef`
+                            and the Message of the Condition MUST indicate why the reference is invalid.
+
+                          * It refers to a resource in another namespace UNLESS there is a ReferenceGrant
+                            in the target namespace that allows the certificate to be attached.
+                            If a ReferenceGrant does not allow this reference, the `ResolvedRefs` condition
+                            on the Gateway MUST be set to False with the Reason `RefNotPermitted`.
+
+                          Implementations MAY choose to perform further validation of the certificate
+                          content (e.g., checking expiry or enforcing specific formats). In such cases,
+                          an implementation-specific Reason and Message MUST be set.
+
+                          Support: Core - Reference to a Kubernetes TLS Secret (with the type `kubernetes.io/tls`).
+                          Support: Implementation-specific - Other resource kinds or Secrets with a
+                          different type (e.g., `Opaque`).
+                        properties:
+                          group:
+                            default: ""
+                            description: |-
+                              Group is the group of the referent. For example, "gateway.networking.k8s.io".
+                              When unspecified or empty string, core API group is inferred.
+                            maxLength: 253
+                            pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+                            type: string
+                          kind:
+                            default: Secret
+                            description: Kind is kind of the referent. For example
+                              "Secret".
+                            maxLength: 63
+                            minLength: 1
+                            pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
+                            type: string
+                          name:
+                            description: Name is the name of the referent.
+                            maxLength: 253
+                            minLength: 1
+                            type: string
+                          namespace:
+                            description: |-
+                              Namespace is the namespace of the referenced object. When unspecified, the local
+                              namespace is inferred.
+
+                              Note that when a namespace different than the local namespace is specified,
+                              a ReferenceGrant object is required in the referent namespace to allow that
+                              namespace's owner to accept the reference. See the ReferenceGrant
+                              documentation for details.
+
+                              Support: Core
+                            maxLength: 63
+                            minLength: 1
+                            pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                            type: string
+                        required:
+                        - name
+                        type: object
+                    type: object
+                type: object
             required:
             - gatewayClassName
             - listeners

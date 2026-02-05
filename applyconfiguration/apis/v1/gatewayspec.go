@@ -232,8 +232,6 @@ type GatewaySpecApplyConfiguration struct {
 	// TLS specifies frontend and backend tls configuration for entire gateway.
 	//
 	// Support: Extended
-	//
-	// <gateway:experimental>
 	TLS *GatewayTLSConfigApplyConfiguration `json:"tls,omitempty"`
 	// DefaultScope, when set, configures the Gateway as a default Gateway,
 	// meaning it will dynamically and implicitly have Routes (e.g. HTTPRoute)

@@ -293,7 +293,6 @@ type GatewaySpec struct {
 	// Support: Extended
 	//
 	// +optional
-	// <gateway:experimental>
 	TLS *GatewayTLSConfig `json:"tls,omitempty"`
 
 	// DefaultScope, when set, configures the Gateway as a default Gateway,
@@ -552,7 +551,6 @@ type GatewayBackendTLS struct {
 	// Support: Implementation-specific - Other resource kinds or Secrets with a
 	// different type (e.g., `Opaque`).
 	// +optional
-	// <gateway:experimental>
 	ClientCertificateRef *SecretObjectReference `json:"clientCertificateRef,omitempty"`
 }
 
@@ -636,7 +634,6 @@ type GatewayTLSConfig struct {
 	// Support: Core
 	//
 	// +optional
-	// <gateway:experimental>
 	Backend *GatewayBackendTLS `json:"backend,omitempty"`
 
 	// Frontend describes TLS config when client connects to Gateway.
