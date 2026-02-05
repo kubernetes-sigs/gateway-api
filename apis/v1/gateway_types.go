@@ -281,7 +281,7 @@ type GatewaySpec struct {
 	Infrastructure *GatewayInfrastructure `json:"infrastructure,omitempty"`
 
 	// AllowedListeners defines which ListenerSets can be attached to this Gateway.
-	// While this feature is experimental, the default value is to allow no ListenerSets.
+	// The default value is to allow no ListenerSets.
 	//
 	// +optional
 	AllowedListeners *AllowedListeners `json:"allowedListeners,omitempty"`
@@ -319,7 +319,7 @@ type GatewaySpec struct {
 // AllowedListeners defines which ListenerSets can be attached to this Gateway.
 type AllowedListeners struct {
 	// Namespaces defines which namespaces ListenerSets can be attached to this Gateway.
-	// While this feature is experimental, the default value is to allow no ListenerSets.
+	// The default value is to allow no ListenerSets.
 	//
 	// +optional
 	// +kubebuilder:default={from: None}
@@ -336,7 +336,7 @@ type ListenerNamespaces struct {
 	// * All: ListenerSets in all namespaces may be attached to this Gateway.
 	// * None: Only listeners defined in the Gateway's spec are allowed
 	//
-	// While this feature is experimental, the default value None
+	// The default value None
 	//
 	// +optional
 	// +kubebuilder:default=None

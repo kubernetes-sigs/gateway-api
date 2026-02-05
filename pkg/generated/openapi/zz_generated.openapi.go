@@ -2857,7 +2857,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_AllowedListeners(ref common.ReferenceC
 				Properties: map[string]spec.Schema{
 					"namespaces": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Namespaces defines which namespaces ListenerSets can be attached to this Gateway. While this feature is experimental, the default value is to allow no ListenerSets.",
+							Description: "Namespaces defines which namespaces ListenerSets can be attached to this Gateway. The default value is to allow no ListenerSets.",
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.ListenerNamespaces"),
 						},
 					},
@@ -4439,7 +4439,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewaySpec(ref common.ReferenceCallba
 					},
 					"allowedListeners": {
 						SchemaProps: spec.SchemaProps{
-							Description: "AllowedListeners defines which ListenerSets can be attached to this Gateway. While this feature is experimental, the default value is to allow no ListenerSets.",
+							Description: "AllowedListeners defines which ListenerSets can be attached to this Gateway. The default value is to allow no ListenerSets.",
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.AllowedListeners"),
 						},
 					},
@@ -6009,7 +6009,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_ListenerNamespaces(ref common.Referenc
 				Properties: map[string]spec.Schema{
 					"from": {
 						SchemaProps: spec.SchemaProps{
-							Description: "From indicates where ListenerSets can attach to this Gateway. Possible values are:\n\n* Same: Only ListenerSets in the same namespace may be attached to this Gateway. * Selector: ListenerSets in namespaces selected by the selector may be attached to this Gateway. * All: ListenerSets in all namespaces may be attached to this Gateway. * None: Only listeners defined in the Gateway's spec are allowed\n\nWhile this feature is experimental, the default value None",
+							Description: "From indicates where ListenerSets can attach to this Gateway. Possible values are:\n\n* Same: Only ListenerSets in the same namespace may be attached to this Gateway. * Selector: ListenerSets in namespaces selected by the selector may be attached to this Gateway. * All: ListenerSets in all namespaces may be attached to this Gateway. * None: Only listeners defined in the Gateway's spec are allowed\n\nThe default value None",
 							Type:        []string{"string"},
 							Format:      "",
 						},
