@@ -2,7 +2,7 @@
 
 * Issue: [#4488](https://github.com/kubernetes-sigs/gateway-api/pull/4488)
   * Incubated by the [AI Gateway Working Group](https://github.com/kubernetes-sigs/wg-ai-gateway/pull/20)
-* Status: Provisional
+* Status: Experimental
 
 ## TLDR
 
@@ -154,6 +154,159 @@ The `Backend` resource is a general-purpose, Gateway-native backend abstraction.
 2. **External Destination (Extended)**: A `Backend` of type `ExternalHostname` provides first-class support for external FQDNs, replacing the need for synthetic `ExternalName` Services. This is an Extended feature that addresses the urgent egress and AI use cases.
 
 The Backend resource is explicitly designed as a **consumer resource** — it describes how a gateway should connect to a destination from the client perspective, regardless of whether that destination is internal or external to the cluster.
+
+## API Specification
+
+### Backend Resource Schema
+
+```go
+type Backend struct {
+  metav1.TypeMeta   `json:",inline"`
+  metav1.ObjectMeta `json:"metadata,omitempty"`
+  Spec   BackendSpec   `json:"spec"`
+  Status BackendControllerStatus `json:"status,omitempty"`
+}
+
+// +kubebuilder:validation:Enum=ExternalHostname;EndpointSelector
+type BackendType string
+
+const (
+  BackendTypeExternalHostname             BackendType = "ExternalHostname"
+  BackendTypeEndpointSelector             BackendType = "EndpointSelector"
+)
+
+// +kubebuilder:validation:ExactlyOneOf=ExternalHostname,EndpointSelector
+type BackendSpec struct {
+  // Type defines the destination type
+  // +required
+  Type BackendType `json:"type"`
+
+  // Ports defines the port that the implementation should use when connecting to this backend.
+  // +required
+  Port PortNumber `json:"ports,omitempty"`
+
+  // ExternalHostname specifies the configuration for an ExternalHostname backend. Only used if type is ExternalHostname.
+  // Support: Extended
+  // +optional
+
+  ExternalHostname *ExternalHostnameBackend `json:"hostname,omitempty"`
+
+  // EndpointSelector specifies the configuration for an EndpointSelector backend. Only used if type is EndpointSelector.
+  // As defined in GEP-4731, creation of a `Backend` of type `EndpointSelector` should result in `Backend` controllers
+  // creating the requisite `EndpointSelector` resource and setting ownerReferences appropriately.
+  // TODO: Add link when GEP-4731 merges.
+  // +optional
+  EndpointSelector *EndpointSelectorBackend `json:"endpointSelector,omitempty"`
+
+  // Protocol defines the higher-level protocol for backend communication.
+  // The underlying transport protocol for the proxied traffic will already have been
+  // determined and processed by the dataplane at the routing step.
+  // Support: Extended
+  // +optional
+  Protocol BackendProtocol `json:"protocol"`
+
+  // TLS defines the TLS configuration that a client should use when talking to the backend.
+  // N.B: ExternalHostname backends SHOULD have TLS configured; the lack of TLS for external hostnames
+  // should be considered insecure and a security risk.
+  // +optional
+  TLS *BackendTLS `json:"tls,omitempty"`
+}
+
+// BackendTLSMode defines the TLS mode for backend connections.
+// +kubebuilder:validation:Enum=ServerOnly;ClientAndServer
+type BackendTLSMode string
+
+const (
+  // Enable TLS with simple server certificate verification.
+  BackendTLSModeServerOnly BackendTLSMode = "ServerOnly"
+  // Enable mutual TLS.
+  BackendTLSModeClientAndServer BackendTLSMode = "ClientAndServer"
+)
+
+// +kubebuilder:validation:ExactlyOneOf=SelectorRef,Selector
+type EndpointSelectorBackend struct {
+  // SelectorRef specifies the reference to the EndpointSelector resource that manages the EndpointSlices for this backend.
+  // If omitted, the controller creating this Backend is expected to create an EndpointSelector
+  // resource on behalf of the user and set ownerReferences appropriately so that the lifecycle
+  // of the EndpointSelector is tied to this Backend (as described in GEP-4731).
+  // +optional
+  SelectorRef *LocalObjectReference `json:"selectorRef"`
+
+  // Selector defines the label selector used to identify the endpoints that this backend
+  // should route traffic to. This field is only used if SelectorRef is not specified.
+  // +optional
+  Selector *metav1.LabelSelector `json:"selector,omitempty"`
+}
+
+type BackendTLS struct {
+  // Mode defines the TLS mode for the backend.
+  // +required
+  Mode BackendTLSMode `json:"mode"`
+
+  // ClientCertificateRef defines the reference to the client certificate for mutual
+  // TLS. Only used if mode is MUTUAL.
+  // +optional
+  ClientCertificateRef *SecretObjectReference `json:"clientCertificateRef,omitempty"`
+
+  // Re-use BackendTLS policy validation fields. This is currently missing InsecureSKipVerify
+  // but that will be added in GEP-4152.
+  Validation BackendTLSPolicyValidation `json:"validation,omitempty"`
+}
+
+type BackendControllerStatus struct {
+  // Name is a domain/path string that indicates the name of the controller that manages the
+  // Backend. Name corresponds to the GatewayClass controllerName field when the
+  // controller will manage parents of type "Gateway". Otherwise, the name is implementation-specific.
+  //
+  // Example: "example.net/import-controller".
+  //
+  // The format of this field is DOMAIN "/" PATH, where DOMAIN and PATH are valid Kubernetes
+  // names (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names).
+  //
+  // A controller MUST populate this field when writing status and ensure that entries to status
+  // populated with their controller name are removed when they are no longer necessary.
+  //
+  // +required
+  Name ControllerName `json:"name"`
+  // For Kubernetes API conventions, see:
+  // https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#typical-status-properties
+  // conditions represent the current state of the Backend resource.
+  // Each condition has a unique type and reflects the status of a specific aspect of the resource.
+  //
+  // Standard condition types include:
+  // - "Available": the resource is fully functional
+  // - "Progressing": the resource is being created or updated
+  // - "Degraded": the resource failed to reach or maintain its desired state
+  //
+  // The status of each condition is one of True, False, or Unknown.
+  // +listType=map
+  // +listMapKey=type
+  // +optional
+  Conditions []metav1.Condition `json:"conditions,omitempty"`
+}
+```
+
+### ExternalHostname Backend Configuration
+
+```go
+type ExternalHostnameBackend struct {
+  // Hostname specifies the destination address used to reach this hostname.
+  // IP addresses are not allowed in this field (enforced by validation on the type).
+  // TODO: Should we add additional validation to prevent *.cluster.local hostnames?
+  Hostname PreciseHostname `json:"address"`
+}
+```
+
+### Protocol and Extension Support
+
+```go
+// +kubebuilder:validation:Enum=MCP
+type BackendProtocol string
+
+const (
+  BackendProtocolMCP   BackendProtocol = "MCP"
+)
+```
 
 ## TLS Policy Consolidation Analysis
 
