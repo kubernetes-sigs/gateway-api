@@ -23,7 +23,6 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
-	gatewayxv1a1 "sigs.k8s.io/gateway-api/apisx/v1alpha1"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
 	"sigs.k8s.io/gateway-api/pkg/features"
@@ -62,28 +61,28 @@ var ListenerSetAllowedNamespaceSame = suite.ConformanceTest{
 		// Verify the accepted listenerSet has the appropriate conditions
 		lsNN := types.NamespacedName{Name: "listenerset-in-same-namespace", Namespace: ns}
 		kubernetes.ListenerSetMustHaveCondition(t, suite.Client, suite.TimeoutConfig, lsNN, metav1.Condition{
-			Type:   string(gatewayxv1a1.ListenerSetConditionAccepted),
+			Type:   string(gatewayv1.ListenerSetConditionAccepted),
 			Status: metav1.ConditionTrue,
-			Reason: string(gatewayxv1a1.ListenerSetReasonAccepted),
+			Reason: string(gatewayv1.ListenerSetReasonAccepted),
 		})
 		kubernetes.ListenerSetMustHaveCondition(t, suite.Client, suite.TimeoutConfig, lsNN, metav1.Condition{
-			Type:   string(gatewayxv1a1.ListenerSetConditionProgrammed),
+			Type:   string(gatewayv1.ListenerSetConditionProgrammed),
 			Status: metav1.ConditionTrue,
-			Reason: string(gatewayxv1a1.ListenerSetReasonProgrammed),
+			Reason: string(gatewayv1.ListenerSetReasonProgrammed),
 		})
 		kubernetes.ListenerSetListenersMustHaveConditions(t, suite.Client, suite.TimeoutConfig, lsNN, generateAcceptedListenerConditions(), "listenerset-in-same-namespace-listener")
 
 		// Verify the rejected listenerSet has the appropriate conditions
 		disallowedLsNN := types.NamespacedName{Name: "listenerset-in-different-namespace", Namespace: "gateway-api-listenerset-not-allowed-ns"}
 		kubernetes.ListenerSetMustHaveCondition(t, suite.Client, suite.TimeoutConfig, disallowedLsNN, metav1.Condition{
-			Type:   string(gatewayxv1a1.ListenerSetConditionAccepted),
+			Type:   string(gatewayv1.ListenerSetConditionAccepted),
 			Status: metav1.ConditionFalse,
-			Reason: string(gatewayxv1a1.ListenerSetReasonNotAllowed),
+			Reason: string(gatewayv1.ListenerSetConditionProgrammed),
 		})
 		kubernetes.ListenerSetMustHaveCondition(t, suite.Client, suite.TimeoutConfig, disallowedLsNN, metav1.Condition{
-			Type:   string(gatewayxv1a1.ListenerSetConditionProgrammed),
+			Type:   string(gatewayv1.ListenerSetConditionProgrammed),
 			Status: metav1.ConditionFalse,
-			Reason: string(gatewayxv1a1.ListenerSetReasonNotAllowed),
+			Reason: string(gatewayv1.ListenerSetConditionProgrammed),
 		})
 	},
 }

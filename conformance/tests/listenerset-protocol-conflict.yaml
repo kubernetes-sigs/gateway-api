@@ -26,8 +26,8 @@ spec:
         from: All
 ---
 # The listener `protocol-conflict-with-gateway-listener` should be rejected but the listenerSet should be accepted since it has other valid listeners
-apiVersion: gateway.networking.x-k8s.io/v1alpha1
-kind: XListenerSet
+apiVersion: gateway.networking.k8s.io/v1
+kind: ListenerSet
 metadata:
   name: listenerset-with-protocol-conflict-with-gateway-1
   namespace: gateway-conformance-infra
@@ -62,8 +62,8 @@ spec:
         from: All
 ---
 # This listenerSet should not be accepted since its only listener `protocol-conflict-with-gateway-listener` is rejected
-apiVersion: gateway.networking.x-k8s.io/v1alpha1
-kind: XListenerSet
+apiVersion: gateway.networking.k8s.io/v1
+kind: ListenerSet
 metadata:
   name: listenerset-with-protocol-conflict-with-gateway-2
   namespace: gateway-conformance-infra
@@ -83,8 +83,8 @@ spec:
         from: All
 ---
 # The listener `protocol-conflict-with-listener-set-listener` should be rejected but the listenerSet should be accepted since it has other valid listeners
-apiVersion: gateway.networking.x-k8s.io/v1alpha1
-kind: XListenerSet
+apiVersion: gateway.networking.k8s.io/v1
+kind: ListenerSet
 metadata:
   name: listenerset-with-protocol-conflict-with-listener-set-1
   namespace: gateway-conformance-infra
@@ -111,8 +111,8 @@ spec:
         from: All
 ---
 # This listenerSet should not be accepted since its only listener `protocol-conflict-with-listener-set-listener` is rejected
-apiVersion: gateway.networking.x-k8s.io/v1alpha1
-kind: XListenerSet
+apiVersion: gateway.networking.k8s.io/v1
+kind: ListenerSet
 metadata:
   name: listenerset-with-protocol-conflict-with-listener-set-2
   namespace: gateway-conformance-infra

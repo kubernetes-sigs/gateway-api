@@ -24,8 +24,8 @@ spec:
     namespaces:
       from: All
 ---
-apiVersion: gateway.networking.x-k8s.io/v1alpha1
-kind: XListenerSet
+apiVersion: gateway.networking.k8s.io/v1
+kind: ListenerSet
 metadata:
   name: listener-set-http-routing-1
   namespace: gateway-conformance-infra
@@ -51,8 +51,8 @@ spec:
       namespaces:
         from: All
 ---
-apiVersion: gateway.networking.x-k8s.io/v1alpha1
-kind: XListenerSet
+apiVersion: gateway.networking.k8s.io/v1
+kind: ListenerSet
 metadata:
   name: listener-set-http-routing-2
   namespace: gateway-conformance-infra
@@ -87,12 +87,12 @@ spec:
   parentRefs:
   - name: gateway-with-listener-sets-http-routing
     namespace: gateway-conformance-infra
-  - kind: XListenerSet
-    group: gateway.networking.x-k8s.io
+  - kind: ListenerSet
+    group: gateway.networking.k8s.io
     name: listener-set-http-routing-1
     namespace: gateway-conformance-infra
-  - kind: XListenerSet
-    group: gateway.networking.x-k8s.io
+  - kind: ListenerSet
+    group: gateway.networking.k8s.io
     name: listener-set-http-routing-2
     namespace: gateway-conformance-infra
   rules:
@@ -148,8 +148,8 @@ metadata:
   namespace: gateway-conformance-infra
 spec:
   parentRefs:
-  - kind: XListenerSet
-    group: gateway.networking.x-k8s.io
+  - kind: ListenerSet
+    group: gateway.networking.k8s.io
     name: listener-set-http-routing-1
     namespace: gateway-conformance-infra
   rules:
@@ -168,8 +168,8 @@ metadata:
   namespace: gateway-conformance-infra
 spec:
   parentRefs:
-  - kind: XListenerSet
-    group: gateway.networking.x-k8s.io
+  - kind: ListenerSet
+    group: gateway.networking.k8s.io
     name: listener-set-http-routing-1
     namespace: gateway-conformance-infra
     sectionName: listener-set-http-routing-1-listener-1
@@ -189,8 +189,8 @@ metadata:
   namespace: gateway-conformance-infra
 spec:
   parentRefs:
-  - kind: XListenerSet
-    group: gateway.networking.x-k8s.io
+  - kind: ListenerSet
+    group: gateway.networking.k8s.io
     name: listener-set-http-routing-2
     namespace: gateway-conformance-infra
   rules:

@@ -40,7 +40,6 @@ import (
 
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/gateway-api/apis/v1alpha2"
-	gatewayxv1a1 "sigs.k8s.io/gateway-api/apisx/v1alpha1"
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
 	"sigs.k8s.io/gateway-api/conformance/utils/tlog"
 )
@@ -392,7 +391,7 @@ func ListenerSetMustHaveCondition(
 		timeoutConfig.ListenerSetMustHaveCondition,
 		true,
 		func(ctx context.Context) (bool, error) {
-			ls := &gatewayxv1a1.XListenerSet{}
+			ls := &gatewayv1.ListenerSet{}
 			err := client.Get(ctx, lsNN, ls)
 			if err != nil {
 				return false, fmt.Errorf("error fetching ListenerSet: %w", err)
@@ -911,12 +910,12 @@ func GatewayStatusMustHaveListeners(t *testing.T, cl client.Client, timeoutConfi
 // ListenerSetStatusMustHaveListeners waits for the specified ListenerSet to have listeners
 // in status that match the expected listeners. This will cause the test to halt
 // if the specified timeout is exceeded.
-func ListenerSetStatusMustHaveListeners(t *testing.T, cl client.Client, timeoutConfig config.TimeoutConfig, lsNN types.NamespacedName, listeners []gatewayxv1a1.ListenerEntryStatus) {
+func ListenerSetStatusMustHaveListeners(t *testing.T, cl client.Client, timeoutConfig config.TimeoutConfig, lsNN types.NamespacedName, listeners []gatewayv1.ListenerEntryStatus) {
 	t.Helper()
 
-	var actual []gatewayxv1a1.ListenerEntryStatus
+	var actual []gatewayv1.ListenerEntryStatus
 	waitErr := wait.PollUntilContextTimeout(context.Background(), 1*time.Second, timeoutConfig.ListenerSetListenersMustHaveConditions, true, func(ctx context.Context) (bool, error) {
-		gw := &gatewayxv1a1.XListenerSet{}
+		gw := &gatewayv1.ListenerSet{}
 		err := cl.Get(ctx, lsNN, gw)
 		if err != nil {
 			return false, fmt.Errorf("error fetching ListenerSet: %w", err)
@@ -1138,10 +1137,10 @@ func ResourceListenersMustHaveConditions(t *testing.T, client client.Client, tim
 	switch resource.GroupKind.Kind {
 	case "Gateway":
 		GatewayListenersMustHaveConditions(t, client, timeoutConfig, resource.NamespacedName, conditions)
-	case "XListenerSet":
+	case "ListenerSet":
 		ListenerSetListenersMustHaveConditions(t, client, timeoutConfig, resource.NamespacedName, conditions)
 	default:
-		tlog.Errorf(t, "received unsupported resource kind %s. Supported kinds are `Gateway` and `XListenerSet`", resource.GroupKind.Kind)
+		tlog.Errorf(t, "received unsupported resource kind %s. Supported kinds are `Gateway` and `ListenerSet`", resource.GroupKind.Kind)
 	}
 }
 
@@ -1159,7 +1158,7 @@ func ListenerSetListenersMustHaveConditions(t *testing.T, client client.Client, 
 	}
 
 	waitErr := wait.PollUntilContextTimeout(context.Background(), 1*time.Second, timeoutConfig.ListenerSetListenersMustHaveConditions, true, func(ctx context.Context) (bool, error) {
-		var parent gatewayxv1a1.XListenerSet
+		var parent gatewayv1.ListenerSet
 		if err := client.Get(ctx, lsName, &parent); err != nil {
 			return false, fmt.Errorf("error fetching Gateway: %w", err)
 		}
@@ -1314,7 +1313,7 @@ func findConditionInList(t *testing.T, conditions []metav1.Condition, condName, 
 }
 
 // TODO(mikemorris): this and parentsMatch could possibly be rewritten as a generic function?
-func listenerSetListenersMatch(t *testing.T, expected, actual []gatewayxv1a1.ListenerEntryStatus) bool {
+func listenerSetListenersMatch(t *testing.T, expected, actual []gatewayv1.ListenerEntryStatus) bool {
 	t.Helper()
 
 	if len(expected) != len(actual) {
@@ -1323,7 +1322,7 @@ func listenerSetListenersMatch(t *testing.T, expected, actual []gatewayxv1a1.Lis
 	}
 
 	for _, eListener := range expected {
-		var aListener *gatewayxv1a1.ListenerEntryStatus
+		var aListener *gatewayv1.ListenerEntryStatus
 		for i := range actual {
 			if actual[i].Name == eListener.Name {
 				aListener = &actual[i]

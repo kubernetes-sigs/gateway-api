@@ -23,7 +23,6 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
-	gatewayxv1a1 "sigs.k8s.io/gateway-api/apisx/v1alpha1"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
 	"sigs.k8s.io/gateway-api/pkg/features"
@@ -72,12 +71,12 @@ var ListenerSetReferenceGrant = suite.ConformanceTest{
 		// listenerset-with-reference-grant is accepted with the appropriate conditions
 		lsNN := types.NamespacedName{Name: "listenerset-with-reference-grant", Namespace: ns}
 		kubernetes.ListenerSetMustHaveCondition(t, suite.Client, suite.TimeoutConfig, lsNN, metav1.Condition{
-			Type:   string(gatewayxv1a1.ListenerSetConditionAccepted),
+			Type:   string(gatewayv1.ListenerSetConditionAccepted),
 			Status: metav1.ConditionTrue,
 			Reason: "", // any reason
 		})
 		kubernetes.ListenerSetMustHaveCondition(t, suite.Client, suite.TimeoutConfig, lsNN, metav1.Condition{
-			Type:   string(gatewayxv1a1.ListenerSetConditionProgrammed),
+			Type:   string(gatewayv1.ListenerSetConditionProgrammed),
 			Status: metav1.ConditionTrue,
 			Reason: "", // any reason
 		})
@@ -86,14 +85,14 @@ var ListenerSetReferenceGrant = suite.ConformanceTest{
 		// listenerset-without-reference-grant is not accepted because the only listener is missing a reference grant
 		lsNN = types.NamespacedName{Name: "listenerset-without-reference-grant", Namespace: "gateway-api-listener-sets-test-reference-grant-ns"}
 		kubernetes.ListenerSetMustHaveCondition(t, suite.Client, suite.TimeoutConfig, lsNN, metav1.Condition{
-			Type:   string(gatewayxv1a1.ListenerSetConditionAccepted),
+			Type:   string(gatewayv1.ListenerSetConditionAccepted),
 			Status: metav1.ConditionFalse,
-			Reason: string(gatewayxv1a1.ListenerSetReasonListenersNotValid),
+			Reason: string(gatewayv1.ListenerSetReasonListenersNotValid),
 		})
 		kubernetes.ListenerSetMustHaveCondition(t, suite.Client, suite.TimeoutConfig, lsNN, metav1.Condition{
-			Type:   string(gatewayxv1a1.ListenerSetConditionProgrammed),
+			Type:   string(gatewayv1.ListenerSetConditionProgrammed),
 			Status: metav1.ConditionFalse,
-			Reason: string(gatewayxv1a1.ListenerSetReasonListenersNotValid),
+			Reason: string(gatewayv1.ListenerSetReasonListenersNotValid),
 		})
 		kubernetes.ListenerSetListenersMustHaveConditions(t, suite.Client, suite.TimeoutConfig, lsNN, refNotPermittedCondition, "listenerset-without-reference-grant-listener")
 	},
