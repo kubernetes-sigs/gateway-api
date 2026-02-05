@@ -158,6 +158,11 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"sigs.k8s.io/gateway-api/apis/v1.ParentReference":                                 schema_sigsk8sio_gateway_api_apis_v1_ParentReference(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.PolicyAncestorStatus":                            schema_sigsk8sio_gateway_api_apis_v1_PolicyAncestorStatus(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.PolicyStatus":                                    schema_sigsk8sio_gateway_api_apis_v1_PolicyStatus(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.ReferenceGrant":                                  schema_sigsk8sio_gateway_api_apis_v1_ReferenceGrant(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.ReferenceGrantFrom":                              schema_sigsk8sio_gateway_api_apis_v1_ReferenceGrantFrom(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.ReferenceGrantList":                              schema_sigsk8sio_gateway_api_apis_v1_ReferenceGrantList(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.ReferenceGrantSpec":                              schema_sigsk8sio_gateway_api_apis_v1_ReferenceGrantSpec(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.ReferenceGrantTo":                                schema_sigsk8sio_gateway_api_apis_v1_ReferenceGrantTo(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.RouteGroupKind":                                  schema_sigsk8sio_gateway_api_apis_v1_RouteGroupKind(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.RouteNamespaces":                                 schema_sigsk8sio_gateway_api_apis_v1_RouteNamespaces(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.RouteParentStatus":                               schema_sigsk8sio_gateway_api_apis_v1_RouteParentStatus(ref),
@@ -204,10 +209,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"sigs.k8s.io/gateway-api/apis/v1beta1.HTTPRoute":                                  schema_sigsk8sio_gateway_api_apis_v1beta1_HTTPRoute(ref),
 		"sigs.k8s.io/gateway-api/apis/v1beta1.HTTPRouteList":                              schema_sigsk8sio_gateway_api_apis_v1beta1_HTTPRouteList(ref),
 		"sigs.k8s.io/gateway-api/apis/v1beta1.ReferenceGrant":                             schema_sigsk8sio_gateway_api_apis_v1beta1_ReferenceGrant(ref),
-		"sigs.k8s.io/gateway-api/apis/v1beta1.ReferenceGrantFrom":                         schema_sigsk8sio_gateway_api_apis_v1beta1_ReferenceGrantFrom(ref),
 		"sigs.k8s.io/gateway-api/apis/v1beta1.ReferenceGrantList":                         schema_sigsk8sio_gateway_api_apis_v1beta1_ReferenceGrantList(ref),
-		"sigs.k8s.io/gateway-api/apis/v1beta1.ReferenceGrantSpec":                         schema_sigsk8sio_gateway_api_apis_v1beta1_ReferenceGrantSpec(ref),
-		"sigs.k8s.io/gateway-api/apis/v1beta1.ReferenceGrantTo":                           schema_sigsk8sio_gateway_api_apis_v1beta1_ReferenceGrantTo(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendTrafficPolicySpec":                 schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendTrafficPolicySpec(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.BudgetDetails":                            schema_sigsk8sio_gateway_api_apisx_v1alpha1_BudgetDetails(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.ListenerEntry":                            schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerEntry(ref),
@@ -6468,6 +6470,226 @@ func schema_sigsk8sio_gateway_api_apis_v1_PolicyStatus(ref common.ReferenceCallb
 	}
 }
 
+func schema_sigsk8sio_gateway_api_apis_v1_ReferenceGrant(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ReferenceGrant identifies kinds of resources in other namespaces that are trusted to reference the specified kinds of resources in the same namespace as the policy.\n\nEach ReferenceGrant can be used to represent a unique trust relationship. Additional Reference Grants can be used to add to the set of trusted sources of inbound references for the namespace they are defined within.\n\nAll cross-namespace references in Gateway API (with the exception of cross-namespace Gateway-route attachment) require a ReferenceGrant.\n\nReferenceGrant is a form of runtime verification allowing users to assert which cross-namespace object references are permitted. Implementations that support ReferenceGrant MUST NOT permit cross-namespace references which have no grant, and MUST respond to the removal of a grant by revoking the access that the grant allowed.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref(v1.ObjectMeta{}.OpenAPIModelName()),
+						},
+					},
+					"spec": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Spec defines the desired state of ReferenceGrant.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.ReferenceGrantSpec"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			v1.ObjectMeta{}.OpenAPIModelName(), "sigs.k8s.io/gateway-api/apis/v1.ReferenceGrantSpec"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apis_v1_ReferenceGrantFrom(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ReferenceGrantFrom describes trusted namespaces and kinds.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"group": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Group is the group of the referent. When empty, the Kubernetes core API group is inferred.\n\nSupport: Core",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is the kind of the referent. Although implementations may support additional resources, the following types are part of the \"Core\" support level for this field.\n\nWhen used to permit a SecretObjectReference:\n\n* Gateway\n\nWhen used to permit a BackendObjectReference:\n\n* GRPCRoute * HTTPRoute * TCPRoute * TLSRoute * UDPRoute",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"namespace": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Namespace is the namespace of the referent.\n\nSupport: Core",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"group", "kind", "namespace"},
+			},
+		},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apis_v1_ReferenceGrantList(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ReferenceGrantList contains a list of ReferenceGrant.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref(v1.ListMeta{}.OpenAPIModelName()),
+						},
+					},
+					"items": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.ReferenceGrant"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"items"},
+			},
+		},
+		Dependencies: []string{
+			v1.ListMeta{}.OpenAPIModelName(), "sigs.k8s.io/gateway-api/apis/v1.ReferenceGrant"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apis_v1_ReferenceGrantSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ReferenceGrantSpec identifies a cross namespace relationship that is trusted for Gateway API.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"from": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-type": "atomic",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "From describes the trusted namespaces and kinds that can reference the resources described in \"To\". Each entry in this list MUST be considered to be an additional place that references can be valid from, or to put this another way, entries MUST be combined using OR.\n\nSupport: Core",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.ReferenceGrantFrom"),
+									},
+								},
+							},
+						},
+					},
+					"to": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-type": "atomic",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "To describes the resources that may be referenced by the resources described in \"From\". Each entry in this list MUST be considered to be an additional place that references can be valid to, or to put this another way, entries MUST be combined using OR.\n\nSupport: Core",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.ReferenceGrantTo"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"from", "to"},
+			},
+		},
+		Dependencies: []string{
+			"sigs.k8s.io/gateway-api/apis/v1.ReferenceGrantFrom", "sigs.k8s.io/gateway-api/apis/v1.ReferenceGrantTo"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apis_v1_ReferenceGrantTo(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ReferenceGrantTo describes what Kinds are allowed as targets of the references.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"group": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Group is the group of the referent. When empty, the Kubernetes core API group is inferred.\n\nSupport: Core",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is the kind of the referent. Although implementations may support additional resources, the following types are part of the \"Core\" support level for this field:\n\n* Secret when used to permit a SecretObjectReference * Service when used to permit a BackendObjectReference",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"name": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Name is the name of the referent. When unspecified, this policy refers to all resources of the specified Group and Kind in the local namespace.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"group", "kind"},
+			},
+		},
+	}
+}
+
 func schema_sigsk8sio_gateway_api_apis_v1_RouteGroupKind(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -7172,14 +7394,14 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_ReferenceGrant(ref common.Refere
 						SchemaProps: spec.SchemaProps{
 							Description: "Spec defines the desired state of ReferenceGrant.",
 							Default:     map[string]interface{}{},
-							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1beta1.ReferenceGrantSpec"),
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.ReferenceGrantSpec"),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			v1.ObjectMeta{}.OpenAPIModelName(), "sigs.k8s.io/gateway-api/apis/v1beta1.ReferenceGrantSpec"},
+			v1.ObjectMeta{}.OpenAPIModelName(), "sigs.k8s.io/gateway-api/apis/v1.ReferenceGrantSpec"},
 	}
 }
 
@@ -8568,52 +8790,14 @@ func schema_sigsk8sio_gateway_api_apis_v1beta1_ReferenceGrant(ref common.Referen
 						SchemaProps: spec.SchemaProps{
 							Description: "Spec defines the desired state of ReferenceGrant.",
 							Default:     map[string]interface{}{},
-							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1beta1.ReferenceGrantSpec"),
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.ReferenceGrantSpec"),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			v1.ObjectMeta{}.OpenAPIModelName(), "sigs.k8s.io/gateway-api/apis/v1beta1.ReferenceGrantSpec"},
-	}
-}
-
-func schema_sigsk8sio_gateway_api_apis_v1beta1_ReferenceGrantFrom(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "ReferenceGrantFrom describes trusted namespaces and kinds.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"group": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Group is the group of the referent. When empty, the Kubernetes core API group is inferred.\n\nSupport: Core",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is the kind of the referent. Although implementations may support additional resources, the following types are part of the \"Core\" support level for this field.\n\nWhen used to permit a SecretObjectReference:\n\n* Gateway\n\nWhen used to permit a BackendObjectReference:\n\n* GRPCRoute * HTTPRoute * TCPRoute * TLSRoute * UDPRoute",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"namespace": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Namespace is the namespace of the referent.\n\nSupport: Core",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-				},
-				Required: []string{"group", "kind", "namespace"},
-			},
-		},
+			v1.ObjectMeta{}.OpenAPIModelName(), "sigs.k8s.io/gateway-api/apis/v1.ReferenceGrantSpec"},
 	}
 }
 
@@ -8663,97 +8847,6 @@ func schema_sigsk8sio_gateway_api_apis_v1beta1_ReferenceGrantList(ref common.Ref
 		},
 		Dependencies: []string{
 			v1.ListMeta{}.OpenAPIModelName(), "sigs.k8s.io/gateway-api/apis/v1beta1.ReferenceGrant"},
-	}
-}
-
-func schema_sigsk8sio_gateway_api_apis_v1beta1_ReferenceGrantSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "ReferenceGrantSpec identifies a cross namespace relationship that is trusted for Gateway API.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"from": {
-						VendorExtensible: spec.VendorExtensible{
-							Extensions: spec.Extensions{
-								"x-kubernetes-list-type": "atomic",
-							},
-						},
-						SchemaProps: spec.SchemaProps{
-							Description: "From describes the trusted namespaces and kinds that can reference the resources described in \"To\". Each entry in this list MUST be considered to be an additional place that references can be valid from, or to put this another way, entries MUST be combined using OR.\n\nSupport: Core",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1beta1.ReferenceGrantFrom"),
-									},
-								},
-							},
-						},
-					},
-					"to": {
-						VendorExtensible: spec.VendorExtensible{
-							Extensions: spec.Extensions{
-								"x-kubernetes-list-type": "atomic",
-							},
-						},
-						SchemaProps: spec.SchemaProps{
-							Description: "To describes the resources that may be referenced by the resources described in \"From\". Each entry in this list MUST be considered to be an additional place that references can be valid to, or to put this another way, entries MUST be combined using OR.\n\nSupport: Core",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1beta1.ReferenceGrantTo"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"from", "to"},
-			},
-		},
-		Dependencies: []string{
-			"sigs.k8s.io/gateway-api/apis/v1beta1.ReferenceGrantFrom", "sigs.k8s.io/gateway-api/apis/v1beta1.ReferenceGrantTo"},
-	}
-}
-
-func schema_sigsk8sio_gateway_api_apis_v1beta1_ReferenceGrantTo(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "ReferenceGrantTo describes what Kinds are allowed as targets of the references.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"group": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Group is the group of the referent. When empty, the Kubernetes core API group is inferred.\n\nSupport: Core",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is the kind of the referent. Although implementations may support additional resources, the following types are part of the \"Core\" support level for this field:\n\n* Secret when used to permit a SecretObjectReference * Service when used to permit a BackendObjectReference",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"name": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Name is the name of the referent. When unspecified, this policy refers to all resources of the specified Group and Kind in the local namespace.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-				},
-				Required: []string{"group", "kind"},
-			},
-		},
 	}
 }
 

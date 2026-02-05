@@ -1369,6 +1369,67 @@ var schemaYAML = typed.YAMLObject(`types:
           elementType:
             namedType: io.k8s.sigs.gateway-api.apis.v1.PolicyAncestorStatus
           elementRelationship: atomic
+- name: io.k8s.sigs.gateway-api.apis.v1.ReferenceGrant
+  map:
+    fields:
+    - name: apiVersion
+      type:
+        scalar: string
+    - name: kind
+      type:
+        scalar: string
+    - name: metadata
+      type:
+        namedType: ObjectMeta.v1.meta.apis.pkg.apimachinery.k8s.io
+      default: {}
+    - name: spec
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1.ReferenceGrantSpec
+      default: {}
+- name: io.k8s.sigs.gateway-api.apis.v1.ReferenceGrantFrom
+  map:
+    fields:
+    - name: group
+      type:
+        scalar: string
+      default: ""
+    - name: kind
+      type:
+        scalar: string
+      default: ""
+    - name: namespace
+      type:
+        scalar: string
+      default: ""
+- name: io.k8s.sigs.gateway-api.apis.v1.ReferenceGrantSpec
+  map:
+    fields:
+    - name: from
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v1.ReferenceGrantFrom
+          elementRelationship: atomic
+    - name: to
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v1.ReferenceGrantTo
+          elementRelationship: atomic
+- name: io.k8s.sigs.gateway-api.apis.v1.ReferenceGrantTo
+  map:
+    fields:
+    - name: group
+      type:
+        scalar: string
+      default: ""
+    - name: kind
+      type:
+        scalar: string
+      default: ""
+    - name: name
+      type:
+        scalar: string
 - name: io.k8s.sigs.gateway-api.apis.v1.RouteGroupKind
   map:
     fields:
@@ -1514,7 +1575,7 @@ var schemaYAML = typed.YAMLObject(`types:
       default: {}
     - name: spec
       type:
-        namedType: io.k8s.sigs.gateway-api.apis.v1beta1.ReferenceGrantSpec
+        namedType: io.k8s.sigs.gateway-api.apis.v1.ReferenceGrantSpec
       default: {}
 - name: io.k8s.sigs.gateway-api.apis.v1alpha2.TCPRoute
   map:
@@ -1846,52 +1907,8 @@ var schemaYAML = typed.YAMLObject(`types:
       default: {}
     - name: spec
       type:
-        namedType: io.k8s.sigs.gateway-api.apis.v1beta1.ReferenceGrantSpec
+        namedType: io.k8s.sigs.gateway-api.apis.v1.ReferenceGrantSpec
       default: {}
-- name: io.k8s.sigs.gateway-api.apis.v1beta1.ReferenceGrantFrom
-  map:
-    fields:
-    - name: group
-      type:
-        scalar: string
-      default: ""
-    - name: kind
-      type:
-        scalar: string
-      default: ""
-    - name: namespace
-      type:
-        scalar: string
-      default: ""
-- name: io.k8s.sigs.gateway-api.apis.v1beta1.ReferenceGrantSpec
-  map:
-    fields:
-    - name: from
-      type:
-        list:
-          elementType:
-            namedType: io.k8s.sigs.gateway-api.apis.v1beta1.ReferenceGrantFrom
-          elementRelationship: atomic
-    - name: to
-      type:
-        list:
-          elementType:
-            namedType: io.k8s.sigs.gateway-api.apis.v1beta1.ReferenceGrantTo
-          elementRelationship: atomic
-- name: io.k8s.sigs.gateway-api.apis.v1beta1.ReferenceGrantTo
-  map:
-    fields:
-    - name: group
-      type:
-        scalar: string
-      default: ""
-    - name: kind
-      type:
-        scalar: string
-      default: ""
-    - name: name
-      type:
-        scalar: string
 - name: io.k8s.sigs.gateway-api.apisx.v1alpha1.BackendTrafficPolicySpec
   map:
     fields:

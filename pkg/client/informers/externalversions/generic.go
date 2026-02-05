@@ -67,6 +67,8 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Gateway().V1().GatewayClasses().Informer()}, nil
 	case v1.SchemeGroupVersion.WithResource("httproutes"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Gateway().V1().HTTPRoutes().Informer()}, nil
+	case v1.SchemeGroupVersion.WithResource("referencegrants"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Gateway().V1().ReferenceGrants().Informer()}, nil
 
 		// Group=gateway.networking.k8s.io, Version=v1alpha2
 	case v1alpha2.SchemeGroupVersion.WithResource("grpcroutes"):
