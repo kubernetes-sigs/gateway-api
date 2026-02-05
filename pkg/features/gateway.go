@@ -70,8 +70,8 @@ const (
 	// spec.addresses.value field
 	SupportGatewayAddressEmpty FeatureName = "GatewayAddressEmpty"
 
-	//  SupportGatewayListenerSet option indicates support for a Gateway
-	//  with ListenerSets
+	// SupportGatewayListenerSet option indicates support for a Gateway
+	// with ListenerSets
 	SupportGatewayListenerSet FeatureName = "GatewayListenerSet"
 
 	// SupportGatewayBackendClientCertificate option indicates support for
@@ -83,6 +83,10 @@ const (
 	// for client certificate validation when the Gateway terminates the connection
 	// from the client.
 	SupportGatewayFrontendClientCertificateValidation FeatureName = "GatewayFrontendClientCertificateValidation"
+
+	// SupportGatewayFrontendClientCertificateValidationInsecureFallback option indicates support
+	// for the `AllowInsecureFallback` client certificate validation mode.
+	SupportGatewayFrontendClientCertificateValidationInsecureFallback FeatureName = "GatewayFrontendClientCertificateValidationInsecureFallback"
 )
 
 var (
@@ -133,6 +137,12 @@ var (
 		Name:    SupportGatewayFrontendClientCertificateValidation,
 		Channel: FeatureChannelExperimental,
 	}
+
+	// GatewayFrontendClientCertificateValidationInsecureFallbackFeature contains metadata for the GatewayFrontendClientCertificateValidationInsecureFallback feature.
+	GatewayFrontendClientCertificateValidationInsecureFallbackFeature = Feature{
+		Name:    SupportGatewayFrontendClientCertificateValidationInsecureFallback,
+		Channel: FeatureChannelExperimental,
+	}
 )
 
 // GatewayExtendedFeatures are extra generic features that implementations may
@@ -147,4 +157,5 @@ var GatewayExtendedFeatures = sets.New(
 	GatewayListenerSetFeature,
 	GatewayBackendClientCertificateFeature,
 	GatewayFrontendClientCertificateValidationFeature,
+	GatewayFrontendClientCertificateValidationInsecureFallbackFeature,
 )
