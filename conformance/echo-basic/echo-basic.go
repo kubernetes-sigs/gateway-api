@@ -35,6 +35,7 @@ import (
 	"golang.org/x/net/websocket"
 
 	g "sigs.k8s.io/gateway-api/conformance/echo-basic/grpc"
+	t "sigs.k8s.io/gateway-api/conformance/echo-basic/tcpserver"
 )
 
 // RequestAssertions contains information about the request and the Ingress
@@ -85,6 +86,11 @@ var (
 func main() {
 	if os.Getenv("GRPC_ECHO_SERVER") != "" {
 		g.Main()
+		return
+	}
+
+	if os.Getenv("TCP_ECHO_SERVER") != "" {
+		t.Main()
 		return
 	}
 

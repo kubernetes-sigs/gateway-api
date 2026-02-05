@@ -31,13 +31,9 @@ type GatewayTLSConfigApplyConfiguration struct {
 	// get a TLS connection. That is determined by the presence of a BackendTLSPolicy.
 	//
 	// Support: Core
-	//
-	// <gateway:experimental>
 	Backend *GatewayBackendTLSApplyConfiguration `json:"backend,omitempty"`
 	// Frontend describes TLS config when client connects to Gateway.
 	// Support: Core
-	//
-	// <gateway:experimental>
 	Frontend *FrontendTLSConfigApplyConfiguration `json:"frontend,omitempty"`
 }
 

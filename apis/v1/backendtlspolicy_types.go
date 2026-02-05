@@ -37,7 +37,7 @@ type BackendTLSPolicy struct {
 
 	// Spec defines the desired state of BackendTLSPolicy.
 	// +required
-	Spec BackendTLSPolicySpec `json:"spec"`
+	Spec BackendTLSPolicySpec `json:"spec,omitzero"`
 
 	// Status defines the current state of BackendTLSPolicy.
 	// +optional
@@ -77,9 +77,9 @@ type BackendTLSPolicySpec struct {
 	//   example, a policy with a creation timestamp of "2021-07-15
 	//   01:02:03" MUST be given precedence over a policy with a
 	//   creation timestamp of "2021-07-15 01:02:04".
-	// * The policy appearing first in alphabetical order by {name}.
-	//   For example, a policy named `bar` is given precedence over a
-	//   policy named `baz`.
+	// * The policy appearing first in alphabetical order by {namespace}/{name}.
+	//   For example, a policy named `foo/bar` is given precedence over a
+	//   policy named `foo/baz`.
 	//
 	// For any BackendTLSPolicy that does not take precedence, the
 	// implementation MUST ensure the `Accepted` Condition is set to
@@ -120,7 +120,7 @@ type BackendTLSPolicySpec struct {
 	// +kubebuilder:validation:MaxItems=16
 	// +kubebuilder:validation:XValidation:message="sectionName must be specified when targetRefs includes 2 or more references to the same target",rule="self.all(p1, self.all(p2, p1.group == p2.group && p1.kind == p2.kind && p1.name == p2.name ? ((!has(p1.sectionName) || p1.sectionName == '') == (!has(p2.sectionName) || p2.sectionName == '')) : true))"
 	// +kubebuilder:validation:XValidation:message="sectionName must be unique when targetRefs includes 2 or more references to the same target",rule="self.all(p1, self.exists_one(p2, p1.group == p2.group && p1.kind == p2.kind && p1.name == p2.name && (((!has(p1.sectionName) || p1.sectionName == '') && (!has(p2.sectionName) || p2.sectionName == '')) || (has(p1.sectionName) && has(p2.sectionName) && p1.sectionName == p2.sectionName))))"
-	TargetRefs []LocalPolicyTargetReferenceWithSectionName `json:"targetRefs"`
+	TargetRefs []LocalPolicyTargetReferenceWithSectionName `json:"targetRefs,omitempty"`
 
 	// Validation contains backend TLS validation configuration.
 	// +required

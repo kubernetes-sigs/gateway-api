@@ -597,6 +597,36 @@ func GatewayListenersMustHaveConditions(t *testing.T, client client.Client, time
 	require.NoErrorf(t, waitErr, "error waiting for Gateway status to have conditions matching expectations on the listeners")
 }
 
+// GatewayListenerMustHaveConditions checks if listener of the given name in a given gateway
+// has all the specified conditions.
+func GatewayListenerMustHaveConditions(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, gwName types.NamespacedName, lName string, conditions []metav1.Condition) {
+	t.Helper()
+
+	waitErr := wait.PollUntilContextTimeout(context.Background(), 1*time.Second, timeoutConfig.GatewayListenersMustHaveConditions, true, func(ctx context.Context) (bool, error) {
+		var gw gatewayv1.Gateway
+		if err := client.Get(ctx, gwName, &gw); err != nil {
+			return false, fmt.Errorf("error fetching Gateway: %w", err)
+		}
+
+		for _, listener := range gw.Status.Listeners {
+			if string(listener.Name) != lName {
+				continue
+			}
+			for _, condition := range conditions {
+				if !findConditionInList(t, listener.Conditions, condition.Type, string(condition.Status), condition.Reason) {
+					tlog.Logf(t, "gateway %s doesn't have %s condition with reason %s set to %s on %s listener", gwName, condition.Type, condition.Reason, condition.Status, listener.Name)
+					return false, nil
+				}
+			}
+			return true, nil
+		}
+		tlog.Logf(t, "Listener %s not found in Gateway %s Status", lName, gwName)
+		return false, nil
+	})
+
+	require.NoErrorf(t, waitErr, "error waiting for Gateway status to have conditions matching expectations on listener %s", lName)
+}
+
 // GatewayMustHaveZeroRoutes validates that the gateway has zero routes attached.  The status
 // may indicate a single listener with zero attached routes or no listeners.
 func GatewayMustHaveZeroRoutes(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, gwName types.NamespacedName) {
@@ -675,6 +705,51 @@ func HTTPRouteMustHaveNoAcceptedParents(t *testing.T, client client.Client, time
 		}}, actual[0].Conditions), nil
 	})
 	require.NoErrorf(t, waitErr, "error waiting for HTTPRoute to have no accepted parents")
+}
+
+// TLSRouteMustHaveNoAcceptedParents waits for the specified TLSRoute to have either no parents
+// or a single parent that is not accepted. This is used to validate TLSRoute errors.
+func TLSRouteMustHaveNoAcceptedParents(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeName types.NamespacedName) {
+	t.Helper()
+
+	var actual []v1alpha2.RouteParentStatus
+	emptyChecked := false
+	waitErr := wait.PollUntilContextTimeout(context.Background(), 1*time.Second, timeoutConfig.HTTPRouteMustNotHaveParents, true, func(ctx context.Context) (bool, error) {
+		route := &v1alpha2.TLSRoute{}
+		err := client.Get(ctx, routeName, route)
+		if err != nil {
+			return false, fmt.Errorf("error fetching TLSRoute: %w", err)
+		}
+
+		actual = route.Status.Parents
+
+		if len(actual) == 0 {
+			// For empty status, we need to distinguish between "correctly did not set" and "hasn't set yet"
+			// Ensure we iterate at least two times (taking advantage of the 1s poll delay) to give it some time.
+			if !emptyChecked {
+				emptyChecked = true
+				return false, nil
+			}
+			return true, nil
+		}
+		if len(actual) > 1 {
+			// Only expect one parent
+			return false, nil
+		}
+
+		for _, parent := range actual {
+			if err := ConditionsHaveLatestObservedGeneration(route, parent.Conditions); err != nil {
+				tlog.Logf(t, "TLSRoute %s (controller=%v,ref=%#v) %v", routeName, parent.ControllerName, parent, err)
+				return false, nil
+			}
+		}
+
+		return conditionsMatch(t, []metav1.Condition{{
+			Type:   string(gatewayv1.RouteConditionAccepted),
+			Status: "False",
+		}}, actual[0].Conditions), nil
+	})
+	require.NoErrorf(t, waitErr, "error waiting for TLSRoute to have no accepted parents")
 }
 
 // RouteTypeMustHaveParentsField ensures the provided routeType has a
@@ -1117,6 +1192,16 @@ func ListenerSetListenersMustHaveConditions(t *testing.T, client client.Client, 
 	})
 
 	require.NoErrorf(t, waitErr, "error waiting for ListenerSet status to have conditions matching expectations on the listeners")
+}
+
+// TLSRouteMustHaveResolvedRefsConditionsTrue checks that the supplied TLSRoute has the resolvedRefsCondition
+// set to true.
+func TLSRouteMustHaveResolvedRefsConditionsTrue(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeNN types.NamespacedName, gwNN types.NamespacedName) {
+	TLSRouteMustHaveCondition(t, client, timeoutConfig, routeNN, gwNN, metav1.Condition{
+		Type:   string(gatewayv1.RouteConditionResolvedRefs),
+		Status: metav1.ConditionTrue,
+		Reason: string(gatewayv1.RouteReasonResolvedRefs),
+	})
 }
 
 // TODO(mikemorris): this and parentsMatch could possibly be rewritten as a generic function?

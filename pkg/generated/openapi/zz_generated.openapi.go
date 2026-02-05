@@ -158,6 +158,11 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"sigs.k8s.io/gateway-api/apis/v1.ParentReference":                                 schema_sigsk8sio_gateway_api_apis_v1_ParentReference(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.PolicyAncestorStatus":                            schema_sigsk8sio_gateway_api_apis_v1_PolicyAncestorStatus(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.PolicyStatus":                                    schema_sigsk8sio_gateway_api_apis_v1_PolicyStatus(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.ReferenceGrant":                                  schema_sigsk8sio_gateway_api_apis_v1_ReferenceGrant(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.ReferenceGrantFrom":                              schema_sigsk8sio_gateway_api_apis_v1_ReferenceGrantFrom(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.ReferenceGrantList":                              schema_sigsk8sio_gateway_api_apis_v1_ReferenceGrantList(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.ReferenceGrantSpec":                              schema_sigsk8sio_gateway_api_apis_v1_ReferenceGrantSpec(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.ReferenceGrantTo":                                schema_sigsk8sio_gateway_api_apis_v1_ReferenceGrantTo(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.RouteGroupKind":                                  schema_sigsk8sio_gateway_api_apis_v1_RouteGroupKind(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.RouteNamespaces":                                 schema_sigsk8sio_gateway_api_apis_v1_RouteNamespaces(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.RouteParentStatus":                               schema_sigsk8sio_gateway_api_apis_v1_RouteParentStatus(ref),
@@ -204,10 +209,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"sigs.k8s.io/gateway-api/apis/v1beta1.HTTPRoute":                                  schema_sigsk8sio_gateway_api_apis_v1beta1_HTTPRoute(ref),
 		"sigs.k8s.io/gateway-api/apis/v1beta1.HTTPRouteList":                              schema_sigsk8sio_gateway_api_apis_v1beta1_HTTPRouteList(ref),
 		"sigs.k8s.io/gateway-api/apis/v1beta1.ReferenceGrant":                             schema_sigsk8sio_gateway_api_apis_v1beta1_ReferenceGrant(ref),
-		"sigs.k8s.io/gateway-api/apis/v1beta1.ReferenceGrantFrom":                         schema_sigsk8sio_gateway_api_apis_v1beta1_ReferenceGrantFrom(ref),
 		"sigs.k8s.io/gateway-api/apis/v1beta1.ReferenceGrantList":                         schema_sigsk8sio_gateway_api_apis_v1beta1_ReferenceGrantList(ref),
-		"sigs.k8s.io/gateway-api/apis/v1beta1.ReferenceGrantSpec":                         schema_sigsk8sio_gateway_api_apis_v1beta1_ReferenceGrantSpec(ref),
-		"sigs.k8s.io/gateway-api/apis/v1beta1.ReferenceGrantTo":                           schema_sigsk8sio_gateway_api_apis_v1beta1_ReferenceGrantTo(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendTrafficPolicySpec":                 schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendTrafficPolicySpec(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.BudgetDetails":                            schema_sigsk8sio_gateway_api_apisx_v1alpha1_BudgetDetails(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.ListenerEntry":                            schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerEntry(ref),
@@ -3127,7 +3129,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_BackendTLSPolicySpec(ref common.Refere
 							},
 						},
 						SchemaProps: spec.SchemaProps{
-							Description: "TargetRefs identifies an API object to apply the policy to. Note that this config applies to the entire referenced resource by default, but this default may change in the future to provide a more granular application of the policy.\n\nTargetRefs must be _distinct_. This means either that:\n\n* They select different targets. If this is the case, then targetRef\n  entries are distinct. In terms of fields, this means that the\n  multi-part key defined by `group`, `kind`, and `name` must\n  be unique across all targetRef entries in the BackendTLSPolicy.\n* They select different sectionNames in the same target.\n\nWhen more than one BackendTLSPolicy selects the same target and sectionName, implementations MUST determine precedence using the following criteria, continuing on ties:\n\n* The older policy by creation timestamp takes precedence. For\n  example, a policy with a creation timestamp of \"2021-07-15\n  01:02:03\" MUST be given precedence over a policy with a\n  creation timestamp of \"2021-07-15 01:02:04\".\n* The policy appearing first in alphabetical order by {name}.\n  For example, a policy named `bar` is given precedence over a\n  policy named `baz`.\n\nFor any BackendTLSPolicy that does not take precedence, the implementation MUST ensure the `Accepted` Condition is set to `status: False`, with Reason `Conflicted`.\n\nImplementations SHOULD NOT support more than one targetRef at this time. Although the API technically allows for this, the current guidance for conflict resolution and status handling is lacking. Until that can be clarified in a future release, the safest approach is to support a single targetRef.\n\nSupport Levels:\n\n* Extended: Kubernetes Service referenced by HTTPRoute backendRefs.\n\n* Implementation-Specific: Services not connected via HTTPRoute, and any\n  other kind of backend. Implementations MAY use BackendTLSPolicy for:\n  - Services not referenced by any Route (e.g., infrastructure services)\n  - Gateway feature backends (e.g., ExternalAuth, rate-limiting services)\n  - Service mesh workload-to-service communication\n  - Other resource types beyond Service\n\nImplementations SHOULD aim to ensure that BackendTLSPolicy behavior is consistent, even outside of the extended HTTPRoute -(backendRef) -> Service path. They SHOULD clearly document how BackendTLSPolicy is interpreted in these scenarios, including:\n  - Which resources beyond Service are supported\n  - How the policy is discovered and applied\n  - Any implementation-specific semantics or restrictions\n\nNote that this config applies to the entire referenced resource by default, but this default may change in the future to provide a more granular application of the policy.",
+							Description: "TargetRefs identifies an API object to apply the policy to. Note that this config applies to the entire referenced resource by default, but this default may change in the future to provide a more granular application of the policy.\n\nTargetRefs must be _distinct_. This means either that:\n\n* They select different targets. If this is the case, then targetRef\n  entries are distinct. In terms of fields, this means that the\n  multi-part key defined by `group`, `kind`, and `name` must\n  be unique across all targetRef entries in the BackendTLSPolicy.\n* They select different sectionNames in the same target.\n\nWhen more than one BackendTLSPolicy selects the same target and sectionName, implementations MUST determine precedence using the following criteria, continuing on ties:\n\n* The older policy by creation timestamp takes precedence. For\n  example, a policy with a creation timestamp of \"2021-07-15\n  01:02:03\" MUST be given precedence over a policy with a\n  creation timestamp of \"2021-07-15 01:02:04\".\n* The policy appearing first in alphabetical order by {namespace}/{name}.\n  For example, a policy named `foo/bar` is given precedence over a\n  policy named `foo/baz`.\n\nFor any BackendTLSPolicy that does not take precedence, the implementation MUST ensure the `Accepted` Condition is set to `status: False`, with Reason `Conflicted`.\n\nImplementations SHOULD NOT support more than one targetRef at this time. Although the API technically allows for this, the current guidance for conflict resolution and status handling is lacking. Until that can be clarified in a future release, the safest approach is to support a single targetRef.\n\nSupport Levels:\n\n* Extended: Kubernetes Service referenced by HTTPRoute backendRefs.\n\n* Implementation-Specific: Services not connected via HTTPRoute, and any\n  other kind of backend. Implementations MAY use BackendTLSPolicy for:\n  - Services not referenced by any Route (e.g., infrastructure services)\n  - Gateway feature backends (e.g., ExternalAuth, rate-limiting services)\n  - Service mesh workload-to-service communication\n  - Other resource types beyond Service\n\nImplementations SHOULD aim to ensure that BackendTLSPolicy behavior is consistent, even outside of the extended HTTPRoute -(backendRef) -> Service path. They SHOULD clearly document how BackendTLSPolicy is interpreted in these scenarios, including:\n  - Which resources beyond Service are supported\n  - How the policy is discovered and applied\n  - Any implementation-specific semantics or restrictions\n\nNote that this config applies to the entire referenced resource by default, but this default may change in the future to provide a more granular application of the policy.",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -3356,7 +3358,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_FrontendTLSConfig(ref common.Reference
 				Properties: map[string]spec.Schema{
 					"default": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Default specifies the default client certificate validation configuration for all Listeners handling HTTPS traffic, unless a per-port configuration is defined.\n\nsupport: Core\n\n<gateway:experimental>",
+							Description: "Default specifies the default client certificate validation configuration for all Listeners handling HTTPS traffic, unless a per-port configuration is defined.\n\nsupport: Core",
 							Default:     map[string]interface{}{},
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.TLSConfig"),
 						},
@@ -3371,7 +3373,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_FrontendTLSConfig(ref common.Reference
 							},
 						},
 						SchemaProps: spec.SchemaProps{
-							Description: "PerPort specifies tls configuration assigned per port. Per port configuration is optional. Once set this configuration overrides the default configuration for all Listeners handling HTTPS traffic that match this port. Each override port requires a unique TLS configuration.\n\nsupport: Core\n\n<gateway:experimental>",
+							Description: "PerPort specifies tls configuration assigned per port. Per port configuration is optional. Once set this configuration overrides the default configuration for all Listeners handling HTTPS traffic that match this port. Each override port requires a unique TLS configuration.\n\nsupport: Core",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -3406,7 +3408,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_FrontendTLSValidation(ref common.Refer
 							},
 						},
 						SchemaProps: spec.SchemaProps{
-							Description: "CACertificateRefs contains one or more references to Kubernetes objects that contain TLS certificates of the Certificate Authorities that can be used as a trust anchor to validate the certificates presented by the client.\n\nA single CA certificate reference to a Kubernetes ConfigMap has \"Core\" support. Implementations MAY choose to support attaching multiple CA certificates to a Listener, but this behavior is implementation-specific.\n\nSupport: Core - A single reference to a Kubernetes ConfigMap with the CA certificate in a key named `ca.crt`.\n\nSupport: Implementation-specific (More than one certificate in a ConfigMap with different keys or more than one reference, or other kinds of resources).\n\nReferences to a resource in a different namespace are invalid UNLESS there is a ReferenceGrant in the target namespace that allows the certificate to be attached. If a ReferenceGrant does not allow this reference, the \"ResolvedRefs\" condition MUST be set to False for this listener with the \"RefNotPermitted\" reason.",
+							Description: "CACertificateRefs contains one or more references to Kubernetes objects that contain a PEM-encoded TLS CA certificate bundle, which is used as a trust anchor to validate the certificates presented by the client.\n\nA CACertificateRef is invalid if:\n\n* It refers to a resource that cannot be resolved (e.g., the\n  referenced resource does not exist) or is misconfigured (e.g., a\n  ConfigMap does not contain a key named `ca.crt`). In this case, the\n  Reason on all matching HTTPS listeners must be set to `InvalidCACertificateRef`\n  and the Message of the Condition must indicate which reference is invalid and why.\n\n* It refers to an unknown or unsupported kind of resource. In this\n  case, the Reason on all matching HTTPS listeners must be set to\n  `InvalidCACertificateKind` and the Message of the Condition must explain\n  which kind of resource is unknown or unsupported.\n\n* It refers to a resource in another namespace UNLESS there is a\n  ReferenceGrant in the target namespace that allows the CA\n  certificate to be attached. If a ReferenceGrant does not allow this\n  reference, the `ResolvedRefs` on all matching HTTPS listeners condition\n  MUST be set with the Reason `RefNotPermitted`.\n\nImplementations MAY choose to perform further validation of the certificate content (e.g., checking expiry or enforcing specific formats). In such cases, an implementation-specific Reason and Message MUST be set.\n\nIn all cases, the implementation MUST ensure that the `ResolvedRefs` condition is set to `status: False` on all targeted listeners (i.e., listeners serving HTTPS on a matching port). The condition MUST include a Reason and Message that indicate the cause of the error. If ALL CACertificateRefs are invalid, the implementation MUST also ensure the `Accepted` condition on the listener is set to `status: False`, with the Reason `NoValidCACertificate`. Implementations MAY choose to support attaching multiple CA certificates to a listener, but this behavior is implementation-specific.\n\nSupport: Core - A single reference to a Kubernetes ConfigMap, with the CA certificate in a key named `ca.crt`.\n\nSupport: Implementation-specific - More than one reference, other kinds of resources, or a single reference that includes multiple certificates.",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -4065,7 +4067,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewayBackendTLS(ref common.Reference
 				Properties: map[string]spec.Schema{
 					"clientCertificateRef": {
 						SchemaProps: spec.SchemaProps{
-							Description: "ClientCertificateRef references an object that contains a client certificate and its associated private key. It can reference standard Kubernetes resources, i.e., Secret, or implementation-specific custom resources.\n\nA ClientCertificateRef is considered invalid if:\n\n* It refers to a resource that cannot be resolved (e.g., the referenced resource\n  does not exist) or is misconfigured (e.g., a Secret does not contain the keys\n  named `tls.crt` and `tls.key`). In this case, the `ResolvedRefs` condition\n  on the Gateway MUST be set to False with the Reason `InvalidClientCertificateRef`\n  and the Message of the Condition MUST indicate why the reference is invalid.\n\n* It refers to a resource in another namespace UNLESS there is a ReferenceGrant\n  in the target namespace that allows the certificate to be attached.\n  If a ReferenceGrant does not allow this reference, the `ResolvedRefs` condition\n  on the Gateway MUST be set to False with the Reason `RefNotPermitted`.\n\nImplementations MAY choose to perform further validation of the certificate content (e.g., checking expiry or enforcing specific formats). In such cases, an implementation-specific Reason and Message MUST be set.\n\nSupport: Core - Reference to a Kubernetes TLS Secret (with the type `kubernetes.io/tls`). Support: Implementation-specific - Other resource kinds or Secrets with a different type (e.g., `Opaque`). <gateway:experimental>",
+							Description: "ClientCertificateRef references an object that contains a client certificate and its associated private key. It can reference standard Kubernetes resources, i.e., Secret, or implementation-specific custom resources.\n\nA ClientCertificateRef is considered invalid if:\n\n* It refers to a resource that cannot be resolved (e.g., the referenced resource\n  does not exist) or is misconfigured (e.g., a Secret does not contain the keys\n  named `tls.crt` and `tls.key`). In this case, the `ResolvedRefs` condition\n  on the Gateway MUST be set to False with the Reason `InvalidClientCertificateRef`\n  and the Message of the Condition MUST indicate why the reference is invalid.\n\n* It refers to a resource in another namespace UNLESS there is a ReferenceGrant\n  in the target namespace that allows the certificate to be attached.\n  If a ReferenceGrant does not allow this reference, the `ResolvedRefs` condition\n  on the Gateway MUST be set to False with the Reason `RefNotPermitted`.\n\nImplementations MAY choose to perform further validation of the certificate content (e.g., checking expiry or enforcing specific formats). In such cases, an implementation-specific Reason and Message MUST be set.\n\nSupport: Core - Reference to a Kubernetes TLS Secret (with the type `kubernetes.io/tls`). Support: Implementation-specific - Other resource kinds or Secrets with a different type (e.g., `Opaque`).",
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.SecretObjectReference"),
 						},
 					},
@@ -4443,7 +4445,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewaySpec(ref common.ReferenceCallba
 					},
 					"tls": {
 						SchemaProps: spec.SchemaProps{
-							Description: "TLS specifies frontend and backend tls configuration for entire gateway.\n\nSupport: Extended\n\n<gateway:experimental>",
+							Description: "TLS specifies frontend and backend tls configuration for entire gateway.\n\nSupport: Extended",
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.GatewayTLSConfig"),
 						},
 					},
@@ -4613,13 +4615,13 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewayTLSConfig(ref common.ReferenceC
 				Properties: map[string]spec.Schema{
 					"backend": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Backend describes TLS configuration for gateway when connecting to backends.\n\nNote that this contains only details for the Gateway as a TLS client, and does _not_ imply behavior about how to choose which backend should get a TLS connection. That is determined by the presence of a BackendTLSPolicy.\n\nSupport: Core\n\n<gateway:experimental>",
+							Description: "Backend describes TLS configuration for gateway when connecting to backends.\n\nNote that this contains only details for the Gateway as a TLS client, and does _not_ imply behavior about how to choose which backend should get a TLS connection. That is determined by the presence of a BackendTLSPolicy.\n\nSupport: Core",
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.GatewayBackendTLS"),
 						},
 					},
 					"frontend": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Frontend describes TLS config when client connects to Gateway. Support: Core\n\n<gateway:experimental>",
+							Description: "Frontend describes TLS config when client connects to Gateway. Support: Core",
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.FrontendTLSConfig"),
 						},
 					},
@@ -6468,6 +6470,226 @@ func schema_sigsk8sio_gateway_api_apis_v1_PolicyStatus(ref common.ReferenceCallb
 	}
 }
 
+func schema_sigsk8sio_gateway_api_apis_v1_ReferenceGrant(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ReferenceGrant identifies kinds of resources in other namespaces that are trusted to reference the specified kinds of resources in the same namespace as the policy.\n\nEach ReferenceGrant can be used to represent a unique trust relationship. Additional Reference Grants can be used to add to the set of trusted sources of inbound references for the namespace they are defined within.\n\nAll cross-namespace references in Gateway API (with the exception of cross-namespace Gateway-route attachment) require a ReferenceGrant.\n\nReferenceGrant is a form of runtime verification allowing users to assert which cross-namespace object references are permitted. Implementations that support ReferenceGrant MUST NOT permit cross-namespace references which have no grant, and MUST respond to the removal of a grant by revoking the access that the grant allowed.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref(v1.ObjectMeta{}.OpenAPIModelName()),
+						},
+					},
+					"spec": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Spec defines the desired state of ReferenceGrant.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.ReferenceGrantSpec"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			v1.ObjectMeta{}.OpenAPIModelName(), "sigs.k8s.io/gateway-api/apis/v1.ReferenceGrantSpec"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apis_v1_ReferenceGrantFrom(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ReferenceGrantFrom describes trusted namespaces and kinds.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"group": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Group is the group of the referent. When empty, the Kubernetes core API group is inferred.\n\nSupport: Core",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is the kind of the referent. Although implementations may support additional resources, the following types are part of the \"Core\" support level for this field.\n\nWhen used to permit a SecretObjectReference:\n\n* Gateway\n\nWhen used to permit a BackendObjectReference:\n\n* GRPCRoute * HTTPRoute * TCPRoute * TLSRoute * UDPRoute",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"namespace": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Namespace is the namespace of the referent.\n\nSupport: Core",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"group", "kind", "namespace"},
+			},
+		},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apis_v1_ReferenceGrantList(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ReferenceGrantList contains a list of ReferenceGrant.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref(v1.ListMeta{}.OpenAPIModelName()),
+						},
+					},
+					"items": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.ReferenceGrant"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"items"},
+			},
+		},
+		Dependencies: []string{
+			v1.ListMeta{}.OpenAPIModelName(), "sigs.k8s.io/gateway-api/apis/v1.ReferenceGrant"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apis_v1_ReferenceGrantSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ReferenceGrantSpec identifies a cross namespace relationship that is trusted for Gateway API.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"from": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-type": "atomic",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "From describes the trusted namespaces and kinds that can reference the resources described in \"To\". Each entry in this list MUST be considered to be an additional place that references can be valid from, or to put this another way, entries MUST be combined using OR.\n\nSupport: Core",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.ReferenceGrantFrom"),
+									},
+								},
+							},
+						},
+					},
+					"to": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-type": "atomic",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "To describes the resources that may be referenced by the resources described in \"From\". Each entry in this list MUST be considered to be an additional place that references can be valid to, or to put this another way, entries MUST be combined using OR.\n\nSupport: Core",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.ReferenceGrantTo"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"from", "to"},
+			},
+		},
+		Dependencies: []string{
+			"sigs.k8s.io/gateway-api/apis/v1.ReferenceGrantFrom", "sigs.k8s.io/gateway-api/apis/v1.ReferenceGrantTo"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apis_v1_ReferenceGrantTo(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ReferenceGrantTo describes what Kinds are allowed as targets of the references.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"group": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Group is the group of the referent. When empty, the Kubernetes core API group is inferred.\n\nSupport: Core",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is the kind of the referent. Although implementations may support additional resources, the following types are part of the \"Core\" support level for this field:\n\n* Secret when used to permit a SecretObjectReference * Service when used to permit a BackendObjectReference",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"name": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Name is the name of the referent. When unspecified, this policy refers to all resources of the specified Group and Kind in the local namespace.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"group", "kind"},
+			},
+		},
+	}
+}
+
 func schema_sigsk8sio_gateway_api_apis_v1_RouteGroupKind(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -6770,7 +6992,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_TLSConfig(ref common.ReferenceCallback
 				Properties: map[string]spec.Schema{
 					"validation": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Validation holds configuration information for validating the frontend (client). Setting this field will result in mutual authentication when connecting to the gateway. In browsers this may result in a dialog appearing that requests a user to specify the client certificate. The maximum depth of a certificate chain accepted in verification is Implementation specific.\n\nSupport: Core\n\n<gateway:experimental>",
+							Description: "Validation holds configuration information for validating the frontend (client). Setting this field will result in mutual authentication when connecting to the gateway. In browsers this may result in a dialog appearing that requests a user to specify the client certificate. The maximum depth of a certificate chain accepted in verification is Implementation specific.\n\nSupport: Core",
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.FrontendTLSValidation"),
 						},
 					},
@@ -6790,7 +7012,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_TLSPortConfig(ref common.ReferenceCall
 				Properties: map[string]spec.Schema{
 					"port": {
 						SchemaProps: spec.SchemaProps{
-							Description: "The Port indicates the Port Number to which the TLS configuration will be applied. This configuration will be applied to all Listeners handling HTTPS traffic that match this port.\n\nSupport: Core\n\n<gateway:experimental>",
+							Description: "The Port indicates the Port Number to which the TLS configuration will be applied. This configuration will be applied to all Listeners handling HTTPS traffic that match this port.\n\nSupport: Core",
 							Default:     0,
 							Type:        []string{"integer"},
 							Format:      "int32",
@@ -6798,7 +7020,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_TLSPortConfig(ref common.ReferenceCall
 					},
 					"tls": {
 						SchemaProps: spec.SchemaProps{
-							Description: "TLS store the configuration that will be applied to all Listeners handling HTTPS traffic and matching given port.\n\nSupport: Core\n\n<gateway:experimental>",
+							Description: "TLS store the configuration that will be applied to all Listeners handling HTTPS traffic and matching given port.\n\nSupport: Core",
 							Default:     map[string]interface{}{},
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.TLSConfig"),
 						},
@@ -7172,14 +7394,14 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_ReferenceGrant(ref common.Refere
 						SchemaProps: spec.SchemaProps{
 							Description: "Spec defines the desired state of ReferenceGrant.",
 							Default:     map[string]interface{}{},
-							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1beta1.ReferenceGrantSpec"),
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.ReferenceGrantSpec"),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			v1.ObjectMeta{}.OpenAPIModelName(), "sigs.k8s.io/gateway-api/apis/v1beta1.ReferenceGrantSpec"},
+			v1.ObjectMeta{}.OpenAPIModelName(), "sigs.k8s.io/gateway-api/apis/v1.ReferenceGrantSpec"},
 	}
 }
 
@@ -8568,52 +8790,14 @@ func schema_sigsk8sio_gateway_api_apis_v1beta1_ReferenceGrant(ref common.Referen
 						SchemaProps: spec.SchemaProps{
 							Description: "Spec defines the desired state of ReferenceGrant.",
 							Default:     map[string]interface{}{},
-							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1beta1.ReferenceGrantSpec"),
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.ReferenceGrantSpec"),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			v1.ObjectMeta{}.OpenAPIModelName(), "sigs.k8s.io/gateway-api/apis/v1beta1.ReferenceGrantSpec"},
-	}
-}
-
-func schema_sigsk8sio_gateway_api_apis_v1beta1_ReferenceGrantFrom(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "ReferenceGrantFrom describes trusted namespaces and kinds.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"group": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Group is the group of the referent. When empty, the Kubernetes core API group is inferred.\n\nSupport: Core",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is the kind of the referent. Although implementations may support additional resources, the following types are part of the \"Core\" support level for this field.\n\nWhen used to permit a SecretObjectReference:\n\n* Gateway\n\nWhen used to permit a BackendObjectReference:\n\n* GRPCRoute * HTTPRoute * TCPRoute * TLSRoute * UDPRoute",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"namespace": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Namespace is the namespace of the referent.\n\nSupport: Core",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-				},
-				Required: []string{"group", "kind", "namespace"},
-			},
-		},
+			v1.ObjectMeta{}.OpenAPIModelName(), "sigs.k8s.io/gateway-api/apis/v1.ReferenceGrantSpec"},
 	}
 }
 
@@ -8663,97 +8847,6 @@ func schema_sigsk8sio_gateway_api_apis_v1beta1_ReferenceGrantList(ref common.Ref
 		},
 		Dependencies: []string{
 			v1.ListMeta{}.OpenAPIModelName(), "sigs.k8s.io/gateway-api/apis/v1beta1.ReferenceGrant"},
-	}
-}
-
-func schema_sigsk8sio_gateway_api_apis_v1beta1_ReferenceGrantSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "ReferenceGrantSpec identifies a cross namespace relationship that is trusted for Gateway API.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"from": {
-						VendorExtensible: spec.VendorExtensible{
-							Extensions: spec.Extensions{
-								"x-kubernetes-list-type": "atomic",
-							},
-						},
-						SchemaProps: spec.SchemaProps{
-							Description: "From describes the trusted namespaces and kinds that can reference the resources described in \"To\". Each entry in this list MUST be considered to be an additional place that references can be valid from, or to put this another way, entries MUST be combined using OR.\n\nSupport: Core",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1beta1.ReferenceGrantFrom"),
-									},
-								},
-							},
-						},
-					},
-					"to": {
-						VendorExtensible: spec.VendorExtensible{
-							Extensions: spec.Extensions{
-								"x-kubernetes-list-type": "atomic",
-							},
-						},
-						SchemaProps: spec.SchemaProps{
-							Description: "To describes the resources that may be referenced by the resources described in \"From\". Each entry in this list MUST be considered to be an additional place that references can be valid to, or to put this another way, entries MUST be combined using OR.\n\nSupport: Core",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1beta1.ReferenceGrantTo"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"from", "to"},
-			},
-		},
-		Dependencies: []string{
-			"sigs.k8s.io/gateway-api/apis/v1beta1.ReferenceGrantFrom", "sigs.k8s.io/gateway-api/apis/v1beta1.ReferenceGrantTo"},
-	}
-}
-
-func schema_sigsk8sio_gateway_api_apis_v1beta1_ReferenceGrantTo(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "ReferenceGrantTo describes what Kinds are allowed as targets of the references.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"group": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Group is the group of the referent. When empty, the Kubernetes core API group is inferred.\n\nSupport: Core",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is the kind of the referent. Although implementations may support additional resources, the following types are part of the \"Core\" support level for this field:\n\n* Secret when used to permit a SecretObjectReference * Service when used to permit a BackendObjectReference",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"name": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Name is the name of the referent. When unspecified, this policy refers to all resources of the specified Group and Kind in the local namespace.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-				},
-				Required: []string{"group", "kind"},
-			},
-		},
 	}
 }
 
@@ -8845,7 +8938,6 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerEntry(ref common.Refere
 					"name": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Name is the name of the Listener. This name MUST be unique within a ListenerSet.\n\nName is not required to be unique across a Gateway and ListenerSets. Routes can attach to a Listener by having a ListenerSet as a parentRef and setting the SectionName",
-							Default:     "",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -8860,7 +8952,6 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerEntry(ref common.Refere
 					"port": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Port is the network port. Multiple listeners may use the same port, subject to the Listener compatibility rules.",
-							Default:     0,
 							Type:        []string{"integer"},
 							Format:      "int32",
 						},
@@ -8868,7 +8959,6 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerEntry(ref common.Refere
 					"protocol": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Protocol specifies the network protocol this listener expects to receive.",
-							Default:     "",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -8904,7 +8994,6 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_ListenerEntryStatus(ref common.
 					"name": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Name is the name of the Listener that this status corresponds to.",
-							Default:     "",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -9080,7 +9169,6 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_MeshSpec(ref common.ReferenceCa
 					"controllerName": {
 						SchemaProps: spec.SchemaProps{
 							Description: "ControllerName is the name of a controller that is managing Gateway API resources for mesh traffic management. The value of this field MUST be a domain prefixed path.\n\nExample: \"example.com/awesome-mesh\".\n\nThis field is not mutable and cannot be empty.\n\nSupport: Core",
-							Default:     "",
 							Type:        []string{"string"},
 							Format:      "",
 						},

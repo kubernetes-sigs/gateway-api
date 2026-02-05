@@ -1,7 +1,7 @@
 # GEP-3155: Complete Backend mutual TLS Configuration
 
 * Issue: [#3155](https://github.com/kubernetes-sigs/gateway-api/issues/3155)
-* Status: Experimental
+* Status: Standard
 
 ## TLDR
 
@@ -58,12 +58,11 @@ type GatewayTLSConfig struct {
 	// Support: Core
 	//
 	// +optional
-	// <gateway:experimental>
 	Backend *GatewayBackendTLS `json:"backend,omitempty"`
     ...
 }
 type GatewayBackendTLS struct {
-  // ClientCertificateRef references an object that contains a client certificate 
+  // ClientCertificateRef references an object that contains a client certificate
   // and its associated private key. It can reference standard Kubernetes resources,
   // i.e., Secret, or implementation-specific custom resources.
   //
@@ -71,13 +70,13 @@ type GatewayBackendTLS struct {
   //
   // * It refers to a resource that cannot be resolved (e.g., the referenced resource
   //   does not exist) or is misconfigured (e.g., a Secret does not contain the keys
-  //   named `tls.crt` and `tls.key`). In this case, the `ResolvedRefs` condition 
+  //   named `tls.crt` and `tls.key`). In this case, the `ResolvedRefs` condition
   //   on the Gateway MUST be set to False with the Reason `InvalidClientCertificateRef`
   //   and the Message of the Condition MUST indicate why the reference is invalid.
   //
   // * It refers to a resource in another namespace UNLESS there is a ReferenceGrant
   //   in the target namespace that allows the certificate to be attached.
-  //   If a ReferenceGrant does not allow this reference, the `ResolvedRefs` condition 
+  //   If a ReferenceGrant does not allow this reference, the `ResolvedRefs` condition
   //   on the Gateway MUST be set to False with the Reason `RefNotPermitted`.
   //
   // Implementations MAY choose to perform further validation of the certificate
@@ -88,7 +87,6 @@ type GatewayBackendTLS struct {
   // Support: Implementation-specific - Other resource kinds or Secrets with a
   // different type (e.g., `Opaque`).
   // +optional
-  // <gateway:experimental>
   ClientCertificateRef SecretObjectReference `json:"clientCertificateRef,omitempty"`
 }
 ```

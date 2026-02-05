@@ -720,11 +720,9 @@ anymore the implementations SHOULD support that the traffic of this route is acc
 this ListenerSet and flow without downtime.
 
 As an example, given 2 ListenerSets attached to the same Gateway, being one of them conflicted with
-the other, and a `HTTPRoute` attached to both ListenerSets, once the old `ListenerSet` is deleted
-the new `ListenerSet` should become valid then the traffic should flow to the new `ListenerSet` without
-disruption.
-
-This feature will be supported by the feature `ListenerSetHotMigration`.
+the other, and each ListenerSet having an `HTTPRoute` attached, when one of the conflicting
+`ListenerSet` is deleted the other `ListenerSet` should become valid. Then the traffic SHOULD flow
+to the new `ListenerSet` without disruption.
 
 Following are some examples of a conflict situation:
 

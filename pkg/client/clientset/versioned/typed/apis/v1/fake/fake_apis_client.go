@@ -48,6 +48,10 @@ func (c *FakeGatewayV1) HTTPRoutes(namespace string) v1.HTTPRouteInterface {
 	return newFakeHTTPRoutes(c, namespace)
 }
 
+func (c *FakeGatewayV1) ReferenceGrants(namespace string) v1.ReferenceGrantInterface {
+	return newFakeReferenceGrants(c, namespace)
+}
+
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
 func (c *FakeGatewayV1) RESTClient() rest.Interface {

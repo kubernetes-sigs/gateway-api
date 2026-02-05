@@ -57,6 +57,11 @@ const (
 	// of HTTP listeners.
 	SupportGatewayHTTPListenerIsolation FeatureName = "GatewayHTTPListenerIsolation"
 
+	// SupportGatewayHTTPSListenerDetectMisdirectedRequests option indicates
+	// support for detecting and rejecting misdirected HTTPS requests, returning
+	// HTTP 421 (Misdirected Request) when appropriate.
+	SupportGatewayHTTPSListenerDetectMisdirectedRequests = "GatewayHTTPSListenerDetectMisdirectedRequests"
+
 	// SupportGatewayInfrastructurePropagation option indicates support for
 	// spec.infrastructure.annotations and spec.infrastructure.labels
 	SupportGatewayInfrastructurePropagation FeatureName = "GatewayInfrastructurePropagation"
@@ -69,9 +74,15 @@ const (
 	// with ListenerSets
 	SupportListenerSet FeatureName = "ListenerSet"
 
-	// SupportGatewayTLSBackendClientCertificate option indicates support for
-	// specifying client certificates, which will be sent to the backend.
-	SupportGatewayTLSBackendClientCertificate = "GatewayTLSBackendClientCertificate"
+	// SupportGatewayBackendClientCertificate option indicates support for
+	// specifying client certificates when the Gateway originates the connection
+	// to the backend.
+	SupportGatewayBackendClientCertificate = "GatewayBackendClientCertificate"
+
+	// SupportGatewayFrontendClientCertificateValidation option indicates support
+	// for client certificate validation when the Gateway terminates the connection
+	// from the client.
+	SupportGatewayFrontendClientCertificateValidation FeatureName = "GatewayFrontendClientCertificateValidation"
 )
 
 var (
@@ -88,6 +99,11 @@ var (
 	// GatewayHTTPListenerIsolationFeature contains metadata for the GatewayHTTPListenerIsolation feature.
 	GatewayHTTPListenerIsolationFeature = Feature{
 		Name:    SupportGatewayHTTPListenerIsolation,
+		Channel: FeatureChannelStandard,
+	}
+	// GatewayHTTPSListenerDetectMisdirectedRequestsFeature contains metadata for the SupportGatewayHTTPSListenerDetectMisdirectedRequests feature.
+	GatewayHTTPSListenerDetectMisdirectedRequestsFeature = Feature{
+		Name:    SupportGatewayHTTPSListenerDetectMisdirectedRequests,
 		Channel: FeatureChannelStandard,
 	}
 	// GatewayInfrastructurePropagationFeature contains metadata for the GatewayInfrastructurePropagation feature.
@@ -107,9 +123,14 @@ var (
 		Channel: FeatureChannelExperimental,
 	}
 
-	// GatewayTLSBackendClientCertificate contains metadata for the SupportGatewayTLSBackendClientCertificate feature.
-	GatewayTLSBackendClientCertificate = Feature{
-		Name:    SupportGatewayTLSBackendClientCertificate,
+	// GatewayBackendClientCertificateFeature contains metadata for the SupportGatewayBackendClientCertificate feature.
+	GatewayBackendClientCertificateFeature = Feature{
+		Name:    SupportGatewayBackendClientCertificate,
+		Channel: FeatureChannelExperimental,
+	}
+	// GatewayFrontendClientCertificateValidationFeature contains metadata for the GatewayFrontendClientCertificateValidation feature.
+	GatewayFrontendClientCertificateValidationFeature = Feature{
+		Name:    SupportGatewayFrontendClientCertificateValidation,
 		Channel: FeatureChannelExperimental,
 	}
 )
@@ -120,8 +141,10 @@ var GatewayExtendedFeatures = sets.New(
 	GatewayPort8080Feature,
 	GatewayStaticAddressesFeature,
 	GatewayHTTPListenerIsolationFeature,
+	GatewayHTTPSListenerDetectMisdirectedRequestsFeature,
 	GatewayInfrastructurePropagationFeature,
 	GatewayEmptyAddressFeature,
+	GatewayBackendClientCertificateFeature,
+	GatewayFrontendClientCertificateValidationFeature,
 	ListenerSetFeature,
-	GatewayTLSBackendClientCertificate,
 )

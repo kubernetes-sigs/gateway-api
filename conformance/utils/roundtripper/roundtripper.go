@@ -51,18 +51,17 @@ type RoundTripper interface {
 
 // Request is the primary input for making a request.
 type Request struct {
-	T                    *testing.T
-	URL                  url.URL
-	Host                 string
-	Protocol             string
-	Method               string
-	Headers              map[string][]string
-	UnfollowRedirect     bool
-	ClientCertificate    []byte
-	ClientCertificateKey []byte
-	ServerCertificate    []byte
-	ServerName           string
-	Body                 string
+	T                        *testing.T
+	URL                      url.URL
+	Host                     string
+	Protocol                 string
+	Method                   string
+	Headers                  map[string][]string
+	UnfollowRedirect         bool
+	ServerCertificate        []byte
+	ServerName               string
+	Body                     string
+	GetClientCertificateHook func(*tls.CertificateRequestInfo) (*tls.Certificate, error)
 }
 
 // String returns a printable version of Request for logging. Note that the
@@ -323,23 +322,14 @@ func createTLSClientConfig(request Request) (*tls.Config, error) {
 		return nil, errors.New("unexpected error adding trusted certificates failed")
 	}
 
-	var certificates []tls.Certificate
-	if len(request.ClientCertificate) > 0 && len(request.ClientCertificateKey) > 0 {
-		certificate, err := tls.X509KeyPair(request.ClientCertificate, request.ClientCertificateKey)
-		if err != nil {
-			return nil, fmt.Errorf("unexpected error creating client cert: %w", err)
-		}
-
-		certificates = append(certificates, certificate)
-	}
-
 	// Create the tls Config for this provided host, cert, and trusted CA
 	// Disable G402: TLS MinVersion too low. (gosec)
+	// Use GetClientCertificate hook for testing purposes.
 	// #nosec G402
 	return &tls.Config{
-		ServerName:   request.ServerName,
-		RootCAs:      rootCAs,
-		Certificates: certificates,
+		ServerName:           request.ServerName,
+		RootCAs:              rootCAs,
+		GetClientCertificate: request.GetClientCertificateHook,
 	}, nil
 }
 

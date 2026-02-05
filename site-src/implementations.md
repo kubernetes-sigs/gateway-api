@@ -95,6 +95,7 @@ other functions (like managing DNS or creating certificates).
 
 ### Partially Conformant
 
+- [AWS Load Balancer Controller][44] (GA)
 - [Azure Application Gateway for Containers][27] (GA)
 - [Contour][3] (GA)
 - [Gloo Gateway][5] (GA)
@@ -187,6 +188,7 @@ other functions (like managing DNS or creating certificates).
 [41]:#kruise-rollouts
 [42]:#gravitee-kubernetes-operator
 [43]:#alibaba-cloud-service-mesh
+[44]:#aws-load-balancer-controller
 
 
 [gamma]:mesh/index.md
@@ -259,6 +261,19 @@ APISIX currently supports Gateway API `v1beta1` version of the specification for
 
 [apisix]:https://apisix.apache.org/
 [apisix-1]:https://github.com/apache/apisix-ingress-controller
+
+### AWS Load Balancer Controller
+
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Partial%20Conformance%20v1.3.0-AWS%20Load%20Balancer%20Controller-orange)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.3.0/aws-load-balancer-controller)
+
+[AWS Load Balancer Controller][aws-lbc] manages AWS Elastic Load Balancers for Kubernetes clusters. The controller provisions AWS Application Load Balancers (ALB) when you create a Kubernetes Ingress and AWS Network Load Balancers (NLB) when you create a Kubernetes Service of type LoadBalancer.
+
+Gateway API support is GA for both Layer 4 (L4) and Layer 7 (L7) routing, enabling customers to provision and manage AWS NLBs and ALBs directly from Kubernetes clusters using the extensible Gateway API.
+
+See the [AWS Load Balancer Controller documentation][aws-lbc-docs] for information on how to deploy and use the Gateway API implementation.
+
+[aws-lbc]:https://github.com/kubernetes-sigs/aws-load-balancer-controller
+[aws-lbc-docs]:https://kubernetes-sigs.github.io/aws-load-balancer-controller/
 
 ### Avi Kubernetes Operator
 
@@ -431,11 +446,11 @@ v1.4.0 release for the GATEWAY_HTTP conformance profile except `HTTPRouteHostnam
 
 ### Gravitee Kubernetes Operator
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Partial%20Conformance%20v1.3.0-Gravitee%20Kubernetes%20Operator-orange)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.3.0/gravitee)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Partial%20Conformance%20v1.4.0-Gravitee%20Kubernetes%20Operator-orange)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.4.0/gravitee)
 
 The [Gravitee Kubernetes Operator](https://documentation.gravitee.io/gravitee-kubernetes-operator-gko) (GKO) lets you manage [Gravitee](https://www.gravitee.io/) APIs, applications, and other assets in a Kubernetes-native and declarative way.
 
-The Gravitee Kubernetes Operator provides partial conformance for Gateway - HTTP features in version 4.8.5. It does not support matching rules across routes or defining services of a type other than Kubernetes Core v1 services. These features will be introduced in a future release.
+The Gravitee Kubernetes Operator provides partial conformance for Gateway - HTTP features in version 4.10.3. It does not support matching rules across routes. These feature will be introduced in a future release.
 
 For support, feedback, or to engage in a discussion about the Gravitee Kubernetes Operator, please feel free to submit an [issue](https://github.com/gravitee-io/issues/issues) or visit our community [forum](https://community.gravitee.io/c/support/gravitee-kubernetes-operator-gko/26).
 

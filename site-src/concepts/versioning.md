@@ -20,17 +20,21 @@ proposal) in Gateway API:
 
 ```mermaid
 flowchart TD
-    0([Implementable GEP]) --> A
+    0([Provisional GEP]) --> 1([Sponsors Committed])
+    1 --> 2([Implementable GEP])
+    2 --> A
     A>Experimental Channel] --> B([Widely used and working well?])
     B -->|Yes| C>Standard Channel]
     B -->|No| D([Could Changes Help?])
     D -->|Yes| E([Adjust and try again])
     D -->|No| F>Remove From API]
     E -->A
-
+    A -- No progress in 6 months --> G(["Auto-dropped"])
+    
 style A fill:#eeb
 style C fill:#beb
 style F fill:#ebb
+style G fill:#ebb
 ```
 
 The Standard release channel includes:
@@ -53,6 +57,15 @@ experience. Many implementations also provide support for the Experimental
 Channel which enables us to iterate on new features quickly. Note that this
 channel makes no backwards compatibility guarantees and breaking changes may be
 released at any point.
+
+#### Validating Admission Policies (VAP)
+Gateway API uses Validating Admission Policies to protect channel boundaries:
+
+* **Upgrade VAP**: Prevents applying experimental-channel CRDs over
+standard-channel CRDs. If you need to do this, you'll have to remove this VAP.
+* **Guardrails VAP**: Prevents setting any experimental fields of a resource
+unless an annotation is also present. Without the annotation, you get
+standard-channel functionality only.
 
 ### API Versions
 Upstream Kubernetes APIs have 3 levels of stability, denoted by alpha, beta, and
@@ -98,6 +111,42 @@ Until that is resolved, it is likely that ReferenceGrant will be effectively
 frozen as beta in Gateway API. When it is widely available as a built-in
 Kubernetes API, we will likely remove it from the Standard Channel of Gateway
 API.
+
+## Release Process
+
+### Standard Channel Releases
+We target a 4-months cadence for standard channel releases. The release date is 
+chosen in advance and will not slip; however, the content is flexible. Whatever 
+content is ready to go at the release date will ship; content that isn't ready 
+will wait for the next release. The release number is ideally chosen at the 
+point when its content is known.
+
+### Monthly Experimental Releases
+Gateway API publishes monthly releases of the Experimental channel, tagged as 
+`monthly-$year-$month` (e.g., `monthly-2025-11`). These releases:
+
+* Only include `experimental-install.yaml`
+* Are not allowed to change the Standard channel
+* Are snapshots of the main branch
+* Do not receive backports of bugfixes (upgrade to a newer monthly instead)
+* Do not use SemVer release numbers, as breaking changes to experimental 
+resources and fields are always allowed between monthlies
+
+The purpose of monthly releases is to enable faster iteration in the 
+Experimental channel.
+
+### SemVer Releases
+Gateway API publishes SemVer releases (e.g., `1.5.0`, `1.6.0`) on a regular 
+cadence. While we use semantic versioning to structure release numbers, our
+versioning scheme differs from strict SemVer due to our release channels. See 
+[What Can Change](#what-can-change) for details on breaking changes that may 
+occur in minor releases within the Experimental channel.
+
+SemVer releases:
+
+* Include both `experimental-install.yaml` and `standard-install.yaml`
+* Use release branches to allow for backporting bugfixes
+* Most likely have an `experimental-install.yaml` identical to the monthly release immediately before it, though that is not required
 
 ## Version Indicators
 Each CRD will be published with annotations that indicate their bundle version
