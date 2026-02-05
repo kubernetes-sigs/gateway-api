@@ -911,6 +911,336 @@ spec:
                         - name
                         type: object
                     type: object
+                  frontend:
+                    description: |-
+                      Frontend describes TLS config when client connects to Gateway.
+                      Support: Core
+                    properties:
+                      default:
+                        description: |-
+                          Default specifies the default client certificate validation configuration
+                          for all Listeners handling HTTPS traffic, unless a per-port configuration
+                          is defined.
+
+                          support: Core
+                        properties:
+                          validation:
+                            description: |-
+                              Validation holds configuration information for validating the frontend (client).
+                              Setting this field will result in mutual authentication when connecting to the gateway.
+                              In browsers this may result in a dialog appearing
+                              that requests a user to specify the client certificate.
+                              The maximum depth of a certificate chain accepted in verification is Implementation specific.
+
+                              Support: Core
+                            properties:
+                              caCertificateRefs:
+                                description: |-
+                                  CACertificateRefs contains one or more references to Kubernetes
+                                  objects that contain a PEM-encoded TLS CA certificate bundle, which
+                                  is used as a trust anchor to validate the certificates presented by
+                                  the client.
+
+                                  A CACertificateRef is invalid if:
+
+                                  * It refers to a resource that cannot be resolved (e.g., the
+                                    referenced resource does not exist) or is misconfigured (e.g., a
+                                    ConfigMap does not contain a key named `ca.crt`). In this case, the
+                                    Reason on all matching HTTPS listeners must be set to `InvalidCACertificateRef`
+                                    and the Message of the Condition must indicate which reference is invalid and why.
+
+                                  * It refers to an unknown or unsupported kind of resource. In this
+                                    case, the Reason on all matching HTTPS listeners must be set to
+                                    `InvalidCACertificateKind` and the Message of the Condition must explain
+                                    which kind of resource is unknown or unsupported.
+
+                                  * It refers to a resource in another namespace UNLESS there is a
+                                    ReferenceGrant in the target namespace that allows the CA
+                                    certificate to be attached. If a ReferenceGrant does not allow this
+                                    reference, the `ResolvedRefs` on all matching HTTPS listeners condition
+                                    MUST be set with the Reason `RefNotPermitted`.
+
+                                  Implementations MAY choose to perform further validation of the
+                                  certificate content (e.g., checking expiry or enforcing specific formats).
+                                  In such cases, an implementation-specific Reason and Message MUST be set.
+
+                                  In all cases, the implementation MUST ensure that the `ResolvedRefs`
+                                  condition is set to `status: False` on all targeted listeners (i.e.,
+                                  listeners serving HTTPS on a matching port). The condition MUST
+                                  include a Reason and Message that indicate the cause of the error. If
+                                  ALL CACertificateRefs are invalid, the implementation MUST also ensure
+                                  the `Accepted` condition on the listener is set to `status: False`, with
+                                  the Reason `NoValidCACertificate`.
+                                  Implementations MAY choose to support attaching multiple CA certificates
+                                  to a listener, but this behavior is implementation-specific.
+
+                                  Support: Core - A single reference to a Kubernetes ConfigMap, with the
+                                  CA certificate in a key named `ca.crt`.
+
+                                  Support: Implementation-specific - More than one reference, other kinds
+                                  of resources, or a single reference that includes multiple certificates.
+                                items:
+                                  description: |-
+                                    ObjectReference identifies an API object including its namespace.
+
+                                    The API object must be valid in the cluster; the Group and Kind must
+                                    be registered in the cluster for this reference to be valid.
+
+                                    References to objects with invalid Group and Kind are not valid, and must
+                                    be rejected by the implementation, with appropriate Conditions set
+                                    on the containing object.
+                                  properties:
+                                    group:
+                                      description: |-
+                                        Group is the group of the referent. For example, "gateway.networking.k8s.io".
+                                        When set to the empty string, core API group is inferred.
+                                      maxLength: 253
+                                      pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+                                      type: string
+                                    kind:
+                                      description: Kind is kind of the referent. For
+                                        example "ConfigMap" or "Service".
+                                      maxLength: 63
+                                      minLength: 1
+                                      pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
+                                      type: string
+                                    name:
+                                      description: Name is the name of the referent.
+                                      maxLength: 253
+                                      minLength: 1
+                                      type: string
+                                    namespace:
+                                      description: |-
+                                        Namespace is the namespace of the referenced object. When unspecified, the local
+                                        namespace is inferred.
+
+                                        Note that when a namespace different than the local namespace is specified,
+                                        a ReferenceGrant object is required in the referent namespace to allow that
+                                        namespace's owner to accept the reference. See the ReferenceGrant
+                                        documentation for details.
+
+                                        Support: Core
+                                      maxLength: 63
+                                      minLength: 1
+                                      pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                                      type: string
+                                  required:
+                                  - group
+                                  - kind
+                                  - name
+                                  type: object
+                                maxItems: 8
+                                minItems: 1
+                                type: array
+                                x-kubernetes-list-type: atomic
+                              mode:
+                                default: AllowValidOnly
+                                description: |-
+                                  FrontendValidationMode defines the mode for validating the client certificate.
+                                  There are two possible modes:
+
+                                  - AllowValidOnly: In this mode, the gateway will accept connections only if
+                                    the client presents a valid certificate. This certificate must successfully
+                                    pass validation against the CA certificates specified in `CACertificateRefs`.
+                                  - AllowInsecureFallback: In this mode, the gateway will accept connections
+                                    even if the client certificate is not presented or fails verification.
+
+                                    This approach delegates client authorization to the backend and introduce
+                                    a significant security risk. It should be used in testing environments or
+                                    on a temporary basis in non-testing environments.
+
+                                  Defaults to AllowValidOnly.
+
+                                  Support: Core
+                                enum:
+                                - AllowValidOnly
+                                - AllowInsecureFallback
+                                type: string
+                            required:
+                            - caCertificateRefs
+                            type: object
+                        type: object
+                      perPort:
+                        description: |-
+                          PerPort specifies tls configuration assigned per port.
+                          Per port configuration is optional. Once set this configuration overrides
+                          the default configuration for all Listeners handling HTTPS traffic
+                          that match this port.
+                          Each override port requires a unique TLS configuration.
+
+                          support: Core
+                        items:
+                          properties:
+                            port:
+                              description: |-
+                                The Port indicates the Port Number to which the TLS configuration will be
+                                applied. This configuration will be applied to all Listeners handling HTTPS
+                                traffic that match this port.
+
+                                Support: Core
+                              format: int32
+                              maximum: 65535
+                              minimum: 1
+                              type: integer
+                            tls:
+                              description: |-
+                                TLS store the configuration that will be applied to all Listeners handling
+                                HTTPS traffic and matching given port.
+
+                                Support: Core
+                              properties:
+                                validation:
+                                  description: |-
+                                    Validation holds configuration information for validating the frontend (client).
+                                    Setting this field will result in mutual authentication when connecting to the gateway.
+                                    In browsers this may result in a dialog appearing
+                                    that requests a user to specify the client certificate.
+                                    The maximum depth of a certificate chain accepted in verification is Implementation specific.
+
+                                    Support: Core
+                                  properties:
+                                    caCertificateRefs:
+                                      description: |-
+                                        CACertificateRefs contains one or more references to Kubernetes
+                                        objects that contain a PEM-encoded TLS CA certificate bundle, which
+                                        is used as a trust anchor to validate the certificates presented by
+                                        the client.
+
+                                        A CACertificateRef is invalid if:
+
+                                        * It refers to a resource that cannot be resolved (e.g., the
+                                          referenced resource does not exist) or is misconfigured (e.g., a
+                                          ConfigMap does not contain a key named `ca.crt`). In this case, the
+                                          Reason on all matching HTTPS listeners must be set to `InvalidCACertificateRef`
+                                          and the Message of the Condition must indicate which reference is invalid and why.
+
+                                        * It refers to an unknown or unsupported kind of resource. In this
+                                          case, the Reason on all matching HTTPS listeners must be set to
+                                          `InvalidCACertificateKind` and the Message of the Condition must explain
+                                          which kind of resource is unknown or unsupported.
+
+                                        * It refers to a resource in another namespace UNLESS there is a
+                                          ReferenceGrant in the target namespace that allows the CA
+                                          certificate to be attached. If a ReferenceGrant does not allow this
+                                          reference, the `ResolvedRefs` on all matching HTTPS listeners condition
+                                          MUST be set with the Reason `RefNotPermitted`.
+
+                                        Implementations MAY choose to perform further validation of the
+                                        certificate content (e.g., checking expiry or enforcing specific formats).
+                                        In such cases, an implementation-specific Reason and Message MUST be set.
+
+                                        In all cases, the implementation MUST ensure that the `ResolvedRefs`
+                                        condition is set to `status: False` on all targeted listeners (i.e.,
+                                        listeners serving HTTPS on a matching port). The condition MUST
+                                        include a Reason and Message that indicate the cause of the error. If
+                                        ALL CACertificateRefs are invalid, the implementation MUST also ensure
+                                        the `Accepted` condition on the listener is set to `status: False`, with
+                                        the Reason `NoValidCACertificate`.
+                                        Implementations MAY choose to support attaching multiple CA certificates
+                                        to a listener, but this behavior is implementation-specific.
+
+                                        Support: Core - A single reference to a Kubernetes ConfigMap, with the
+                                        CA certificate in a key named `ca.crt`.
+
+                                        Support: Implementation-specific - More than one reference, other kinds
+                                        of resources, or a single reference that includes multiple certificates.
+                                      items:
+                                        description: |-
+                                          ObjectReference identifies an API object including its namespace.
+
+                                          The API object must be valid in the cluster; the Group and Kind must
+                                          be registered in the cluster for this reference to be valid.
+
+                                          References to objects with invalid Group and Kind are not valid, and must
+                                          be rejected by the implementation, with appropriate Conditions set
+                                          on the containing object.
+                                        properties:
+                                          group:
+                                            description: |-
+                                              Group is the group of the referent. For example, "gateway.networking.k8s.io".
+                                              When set to the empty string, core API group is inferred.
+                                            maxLength: 253
+                                            pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+                                            type: string
+                                          kind:
+                                            description: Kind is kind of the referent.
+                                              For example "ConfigMap" or "Service".
+                                            maxLength: 63
+                                            minLength: 1
+                                            pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
+                                            type: string
+                                          name:
+                                            description: Name is the name of the referent.
+                                            maxLength: 253
+                                            minLength: 1
+                                            type: string
+                                          namespace:
+                                            description: |-
+                                              Namespace is the namespace of the referenced object. When unspecified, the local
+                                              namespace is inferred.
+
+                                              Note that when a namespace different than the local namespace is specified,
+                                              a ReferenceGrant object is required in the referent namespace to allow that
+                                              namespace's owner to accept the reference. See the ReferenceGrant
+                                              documentation for details.
+
+                                              Support: Core
+                                            maxLength: 63
+                                            minLength: 1
+                                            pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                                            type: string
+                                        required:
+                                        - group
+                                        - kind
+                                        - name
+                                        type: object
+                                      maxItems: 8
+                                      minItems: 1
+                                      type: array
+                                      x-kubernetes-list-type: atomic
+                                    mode:
+                                      default: AllowValidOnly
+                                      description: |-
+                                        FrontendValidationMode defines the mode for validating the client certificate.
+                                        There are two possible modes:
+
+                                        - AllowValidOnly: In this mode, the gateway will accept connections only if
+                                          the client presents a valid certificate. This certificate must successfully
+                                          pass validation against the CA certificates specified in `CACertificateRefs`.
+                                        - AllowInsecureFallback: In this mode, the gateway will accept connections
+                                          even if the client certificate is not presented or fails verification.
+
+                                          This approach delegates client authorization to the backend and introduce
+                                          a significant security risk. It should be used in testing environments or
+                                          on a temporary basis in non-testing environments.
+
+                                        Defaults to AllowValidOnly.
+
+                                        Support: Core
+                                      enum:
+                                      - AllowValidOnly
+                                      - AllowInsecureFallback
+                                      type: string
+                                  required:
+                                  - caCertificateRefs
+                                  type: object
+                              type: object
+                          required:
+                          - port
+                          - tls
+                          type: object
+                        maxItems: 64
+                        type: array
+                        x-kubernetes-list-map-keys:
+                        - port
+                        x-kubernetes-list-type: map
+                        x-kubernetes-validations:
+                        - message: Port for TLS configuration must be unique within
+                            the Gateway
+                          rule: self.all(t1, self.exists_one(t2, t1.port == t2.port))
+                    required:
+                    - default
+                    type: object
                 type: object
             required:
             - gatewayClassName
@@ -2128,6 +2458,336 @@ spec:
                         required:
                         - name
                         type: object
+                    type: object
+                  frontend:
+                    description: |-
+                      Frontend describes TLS config when client connects to Gateway.
+                      Support: Core
+                    properties:
+                      default:
+                        description: |-
+                          Default specifies the default client certificate validation configuration
+                          for all Listeners handling HTTPS traffic, unless a per-port configuration
+                          is defined.
+
+                          support: Core
+                        properties:
+                          validation:
+                            description: |-
+                              Validation holds configuration information for validating the frontend (client).
+                              Setting this field will result in mutual authentication when connecting to the gateway.
+                              In browsers this may result in a dialog appearing
+                              that requests a user to specify the client certificate.
+                              The maximum depth of a certificate chain accepted in verification is Implementation specific.
+
+                              Support: Core
+                            properties:
+                              caCertificateRefs:
+                                description: |-
+                                  CACertificateRefs contains one or more references to Kubernetes
+                                  objects that contain a PEM-encoded TLS CA certificate bundle, which
+                                  is used as a trust anchor to validate the certificates presented by
+                                  the client.
+
+                                  A CACertificateRef is invalid if:
+
+                                  * It refers to a resource that cannot be resolved (e.g., the
+                                    referenced resource does not exist) or is misconfigured (e.g., a
+                                    ConfigMap does not contain a key named `ca.crt`). In this case, the
+                                    Reason on all matching HTTPS listeners must be set to `InvalidCACertificateRef`
+                                    and the Message of the Condition must indicate which reference is invalid and why.
+
+                                  * It refers to an unknown or unsupported kind of resource. In this
+                                    case, the Reason on all matching HTTPS listeners must be set to
+                                    `InvalidCACertificateKind` and the Message of the Condition must explain
+                                    which kind of resource is unknown or unsupported.
+
+                                  * It refers to a resource in another namespace UNLESS there is a
+                                    ReferenceGrant in the target namespace that allows the CA
+                                    certificate to be attached. If a ReferenceGrant does not allow this
+                                    reference, the `ResolvedRefs` on all matching HTTPS listeners condition
+                                    MUST be set with the Reason `RefNotPermitted`.
+
+                                  Implementations MAY choose to perform further validation of the
+                                  certificate content (e.g., checking expiry or enforcing specific formats).
+                                  In such cases, an implementation-specific Reason and Message MUST be set.
+
+                                  In all cases, the implementation MUST ensure that the `ResolvedRefs`
+                                  condition is set to `status: False` on all targeted listeners (i.e.,
+                                  listeners serving HTTPS on a matching port). The condition MUST
+                                  include a Reason and Message that indicate the cause of the error. If
+                                  ALL CACertificateRefs are invalid, the implementation MUST also ensure
+                                  the `Accepted` condition on the listener is set to `status: False`, with
+                                  the Reason `NoValidCACertificate`.
+                                  Implementations MAY choose to support attaching multiple CA certificates
+                                  to a listener, but this behavior is implementation-specific.
+
+                                  Support: Core - A single reference to a Kubernetes ConfigMap, with the
+                                  CA certificate in a key named `ca.crt`.
+
+                                  Support: Implementation-specific - More than one reference, other kinds
+                                  of resources, or a single reference that includes multiple certificates.
+                                items:
+                                  description: |-
+                                    ObjectReference identifies an API object including its namespace.
+
+                                    The API object must be valid in the cluster; the Group and Kind must
+                                    be registered in the cluster for this reference to be valid.
+
+                                    References to objects with invalid Group and Kind are not valid, and must
+                                    be rejected by the implementation, with appropriate Conditions set
+                                    on the containing object.
+                                  properties:
+                                    group:
+                                      description: |-
+                                        Group is the group of the referent. For example, "gateway.networking.k8s.io".
+                                        When set to the empty string, core API group is inferred.
+                                      maxLength: 253
+                                      pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+                                      type: string
+                                    kind:
+                                      description: Kind is kind of the referent. For
+                                        example "ConfigMap" or "Service".
+                                      maxLength: 63
+                                      minLength: 1
+                                      pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
+                                      type: string
+                                    name:
+                                      description: Name is the name of the referent.
+                                      maxLength: 253
+                                      minLength: 1
+                                      type: string
+                                    namespace:
+                                      description: |-
+                                        Namespace is the namespace of the referenced object. When unspecified, the local
+                                        namespace is inferred.
+
+                                        Note that when a namespace different than the local namespace is specified,
+                                        a ReferenceGrant object is required in the referent namespace to allow that
+                                        namespace's owner to accept the reference. See the ReferenceGrant
+                                        documentation for details.
+
+                                        Support: Core
+                                      maxLength: 63
+                                      minLength: 1
+                                      pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                                      type: string
+                                  required:
+                                  - group
+                                  - kind
+                                  - name
+                                  type: object
+                                maxItems: 8
+                                minItems: 1
+                                type: array
+                                x-kubernetes-list-type: atomic
+                              mode:
+                                default: AllowValidOnly
+                                description: |-
+                                  FrontendValidationMode defines the mode for validating the client certificate.
+                                  There are two possible modes:
+
+                                  - AllowValidOnly: In this mode, the gateway will accept connections only if
+                                    the client presents a valid certificate. This certificate must successfully
+                                    pass validation against the CA certificates specified in `CACertificateRefs`.
+                                  - AllowInsecureFallback: In this mode, the gateway will accept connections
+                                    even if the client certificate is not presented or fails verification.
+
+                                    This approach delegates client authorization to the backend and introduce
+                                    a significant security risk. It should be used in testing environments or
+                                    on a temporary basis in non-testing environments.
+
+                                  Defaults to AllowValidOnly.
+
+                                  Support: Core
+                                enum:
+                                - AllowValidOnly
+                                - AllowInsecureFallback
+                                type: string
+                            required:
+                            - caCertificateRefs
+                            type: object
+                        type: object
+                      perPort:
+                        description: |-
+                          PerPort specifies tls configuration assigned per port.
+                          Per port configuration is optional. Once set this configuration overrides
+                          the default configuration for all Listeners handling HTTPS traffic
+                          that match this port.
+                          Each override port requires a unique TLS configuration.
+
+                          support: Core
+                        items:
+                          properties:
+                            port:
+                              description: |-
+                                The Port indicates the Port Number to which the TLS configuration will be
+                                applied. This configuration will be applied to all Listeners handling HTTPS
+                                traffic that match this port.
+
+                                Support: Core
+                              format: int32
+                              maximum: 65535
+                              minimum: 1
+                              type: integer
+                            tls:
+                              description: |-
+                                TLS store the configuration that will be applied to all Listeners handling
+                                HTTPS traffic and matching given port.
+
+                                Support: Core
+                              properties:
+                                validation:
+                                  description: |-
+                                    Validation holds configuration information for validating the frontend (client).
+                                    Setting this field will result in mutual authentication when connecting to the gateway.
+                                    In browsers this may result in a dialog appearing
+                                    that requests a user to specify the client certificate.
+                                    The maximum depth of a certificate chain accepted in verification is Implementation specific.
+
+                                    Support: Core
+                                  properties:
+                                    caCertificateRefs:
+                                      description: |-
+                                        CACertificateRefs contains one or more references to Kubernetes
+                                        objects that contain a PEM-encoded TLS CA certificate bundle, which
+                                        is used as a trust anchor to validate the certificates presented by
+                                        the client.
+
+                                        A CACertificateRef is invalid if:
+
+                                        * It refers to a resource that cannot be resolved (e.g., the
+                                          referenced resource does not exist) or is misconfigured (e.g., a
+                                          ConfigMap does not contain a key named `ca.crt`). In this case, the
+                                          Reason on all matching HTTPS listeners must be set to `InvalidCACertificateRef`
+                                          and the Message of the Condition must indicate which reference is invalid and why.
+
+                                        * It refers to an unknown or unsupported kind of resource. In this
+                                          case, the Reason on all matching HTTPS listeners must be set to
+                                          `InvalidCACertificateKind` and the Message of the Condition must explain
+                                          which kind of resource is unknown or unsupported.
+
+                                        * It refers to a resource in another namespace UNLESS there is a
+                                          ReferenceGrant in the target namespace that allows the CA
+                                          certificate to be attached. If a ReferenceGrant does not allow this
+                                          reference, the `ResolvedRefs` on all matching HTTPS listeners condition
+                                          MUST be set with the Reason `RefNotPermitted`.
+
+                                        Implementations MAY choose to perform further validation of the
+                                        certificate content (e.g., checking expiry or enforcing specific formats).
+                                        In such cases, an implementation-specific Reason and Message MUST be set.
+
+                                        In all cases, the implementation MUST ensure that the `ResolvedRefs`
+                                        condition is set to `status: False` on all targeted listeners (i.e.,
+                                        listeners serving HTTPS on a matching port). The condition MUST
+                                        include a Reason and Message that indicate the cause of the error. If
+                                        ALL CACertificateRefs are invalid, the implementation MUST also ensure
+                                        the `Accepted` condition on the listener is set to `status: False`, with
+                                        the Reason `NoValidCACertificate`.
+                                        Implementations MAY choose to support attaching multiple CA certificates
+                                        to a listener, but this behavior is implementation-specific.
+
+                                        Support: Core - A single reference to a Kubernetes ConfigMap, with the
+                                        CA certificate in a key named `ca.crt`.
+
+                                        Support: Implementation-specific - More than one reference, other kinds
+                                        of resources, or a single reference that includes multiple certificates.
+                                      items:
+                                        description: |-
+                                          ObjectReference identifies an API object including its namespace.
+
+                                          The API object must be valid in the cluster; the Group and Kind must
+                                          be registered in the cluster for this reference to be valid.
+
+                                          References to objects with invalid Group and Kind are not valid, and must
+                                          be rejected by the implementation, with appropriate Conditions set
+                                          on the containing object.
+                                        properties:
+                                          group:
+                                            description: |-
+                                              Group is the group of the referent. For example, "gateway.networking.k8s.io".
+                                              When set to the empty string, core API group is inferred.
+                                            maxLength: 253
+                                            pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+                                            type: string
+                                          kind:
+                                            description: Kind is kind of the referent.
+                                              For example "ConfigMap" or "Service".
+                                            maxLength: 63
+                                            minLength: 1
+                                            pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
+                                            type: string
+                                          name:
+                                            description: Name is the name of the referent.
+                                            maxLength: 253
+                                            minLength: 1
+                                            type: string
+                                          namespace:
+                                            description: |-
+                                              Namespace is the namespace of the referenced object. When unspecified, the local
+                                              namespace is inferred.
+
+                                              Note that when a namespace different than the local namespace is specified,
+                                              a ReferenceGrant object is required in the referent namespace to allow that
+                                              namespace's owner to accept the reference. See the ReferenceGrant
+                                              documentation for details.
+
+                                              Support: Core
+                                            maxLength: 63
+                                            minLength: 1
+                                            pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                                            type: string
+                                        required:
+                                        - group
+                                        - kind
+                                        - name
+                                        type: object
+                                      maxItems: 8
+                                      minItems: 1
+                                      type: array
+                                      x-kubernetes-list-type: atomic
+                                    mode:
+                                      default: AllowValidOnly
+                                      description: |-
+                                        FrontendValidationMode defines the mode for validating the client certificate.
+                                        There are two possible modes:
+
+                                        - AllowValidOnly: In this mode, the gateway will accept connections only if
+                                          the client presents a valid certificate. This certificate must successfully
+                                          pass validation against the CA certificates specified in `CACertificateRefs`.
+                                        - AllowInsecureFallback: In this mode, the gateway will accept connections
+                                          even if the client certificate is not presented or fails verification.
+
+                                          This approach delegates client authorization to the backend and introduce
+                                          a significant security risk. It should be used in testing environments or
+                                          on a temporary basis in non-testing environments.
+
+                                        Defaults to AllowValidOnly.
+
+                                        Support: Core
+                                      enum:
+                                      - AllowValidOnly
+                                      - AllowInsecureFallback
+                                      type: string
+                                  required:
+                                  - caCertificateRefs
+                                  type: object
+                              type: object
+                          required:
+                          - port
+                          - tls
+                          type: object
+                        maxItems: 64
+                        type: array
+                        x-kubernetes-list-map-keys:
+                        - port
+                        x-kubernetes-list-type: map
+                        x-kubernetes-validations:
+                        - message: Port for TLS configuration must be unique within
+                            the Gateway
+                          rule: self.all(t1, self.exists_one(t2, t1.port == t2.port))
+                    required:
+                    - default
                     type: object
                 type: object
             required:

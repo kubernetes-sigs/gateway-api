@@ -28,8 +28,6 @@ type FrontendTLSConfigApplyConfiguration struct {
 	// is defined.
 	//
 	// support: Core
-	//
-	// <gateway:experimental>
 	Default *TLSConfigApplyConfiguration `json:"default,omitempty"`
 	// PerPort specifies tls configuration assigned per port.
 	// Per port configuration is optional. Once set this configuration overrides
@@ -38,8 +36,6 @@ type FrontendTLSConfigApplyConfiguration struct {
 	// Each override port requires a unique TLS configuration.
 	//
 	// support: Core
-	//
-	// <gateway:experimental>
 	PerPort []TLSPortConfigApplyConfiguration `json:"perPort,omitempty"`
 }
 

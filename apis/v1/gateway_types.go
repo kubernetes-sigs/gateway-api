@@ -640,7 +640,6 @@ type GatewayTLSConfig struct {
 	// Support: Core
 	//
 	// +optional
-	// <gateway:experimental>
 	Frontend *FrontendTLSConfig `json:"frontend,omitempty"`
 }
 
@@ -653,7 +652,6 @@ type FrontendTLSConfig struct {
 	// support: Core
 	//
 	// +required
-	// <gateway:experimental>
 	Default TLSConfig `json:"default"`
 
 	// PerPort specifies tls configuration assigned per port.
@@ -669,7 +667,6 @@ type FrontendTLSConfig struct {
 	// +listMapKey=port
 	// +kubebuilder:validation:MaxItems=64
 	// +kubebuilder:validation:XValidation:message="Port for TLS configuration must be unique within the Gateway",rule="self.all(t1, self.exists_one(t2, t1.port == t2.port))"
-	// <gateway:experimental>
 	PerPort []TLSPortConfig `json:"perPort,omitempty"`
 }
 
@@ -704,7 +701,6 @@ type TLSConfig struct {
 	// Support: Core
 	//
 	// +optional
-	// <gateway:experimental>
 	Validation *FrontendTLSValidation `json:"validation,omitempty"`
 }
 
@@ -718,7 +714,6 @@ type TLSPortConfig struct {
 	// +required
 	// +kubebuilder:validation:Minimum=1
 	// +kubebuilder:validation:Maximum=65535
-	// <gateway:experimental>
 	Port PortNumber `json:"port"`
 
 	// TLS store the configuration that will be applied to all Listeners handling
@@ -727,7 +722,6 @@ type TLSPortConfig struct {
 	// Support: Core
 	//
 	// +required
-	// <gateway:experimental>
 	TLS TLSConfig `json:"tls"`
 }
 
