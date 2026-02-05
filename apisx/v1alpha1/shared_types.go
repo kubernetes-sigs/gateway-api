@@ -47,13 +47,13 @@ type ParentGatewayReference struct {
 	//
 	// +optional
 	// +kubebuilder:default="gateway.networking.k8s.io"
-	Group *Group `json:"group"`
+	Group *Group `json:"group,omitempty"`
 
 	// Kind is kind of the referent. For example "Gateway".
 	//
 	// +optional
 	// +kubebuilder:default=Gateway
-	Kind *Kind `json:"kind"`
+	Kind *Kind `json:"kind,omitempty"`
 
 	// Name is the name of the referent.
 	// +required
