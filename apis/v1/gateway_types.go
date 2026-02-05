@@ -283,8 +283,6 @@ type GatewaySpec struct {
 	// AllowedListeners defines which ListenerSets can be attached to this Gateway.
 	// While this feature is experimental, the default value is to allow no ListenerSets.
 	//
-	// <gateway:experimental>
-	//
 	// +optional
 	AllowedListeners *AllowedListeners `json:"allowedListeners,omitempty"`
 	//
