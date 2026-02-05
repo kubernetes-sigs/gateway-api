@@ -20,7 +20,6 @@ import (
 	"testing"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
 
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
@@ -40,7 +39,6 @@ var ListenerSetAllowedRoutesSupportedKinds = suite.ConformanceTest{
 	Features: []features.FeatureName{
 		features.SupportGateway,
 		features.SupportListenerSet,
-		features.SupportHTTPRoute,
 		features.SupportTLSRoute,
 	},
 	Manifests: []string{
@@ -56,29 +54,19 @@ var ListenerSetAllowedRoutesSupportedKinds = suite.ConformanceTest{
 			Type:   string(gatewayv1.GatewayConditionAccepted),
 			Status: metav1.ConditionTrue,
 		})
-		kubernetes.GatewayMustHaveAttachedListeners(t, suite.Client, suite.TimeoutConfig, gwNN, 1)
 
 		// Verify the accepted listenerSet has the appropriate conditions
-		routes := []types.NamespacedName{
-			{Name: "listener-sets-test-supported-route-kinds-http-route", Namespace: ns},
-		}
-		listenerSetGK := schema.GroupKind{
-			Group: gatewayxv1a1.GroupVersion.Group,
-			Kind:  "XListenerSet",
-		}
 		lsNN := types.NamespacedName{Name: "listenerset-test-allowed-routes-supported-kinds", Namespace: ns}
-		listenerSetRef := kubernetes.NewResourceRef(listenerSetGK, lsNN)
-		kubernetes.RoutesAndParentMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, listenerSetRef, &gatewayv1.HTTPRoute{}, routes...)
 		kubernetes.ListenerSetStatusMustHaveListeners(t, suite.Client, suite.TimeoutConfig, lsNN, []gatewayxv1a1.ListenerEntryStatus{
 			{
-				Name: "listener-set-listener-allowed-routes-http-only",
-				SupportedKinds: []gatewayv1.RouteGroupKind{{
-					Group: (*gatewayv1.Group)(&gatewayv1.GroupVersion.Group),
-					Kind:  gatewayv1.Kind("HTTPRoute"),
-				}},
-				// This only attaches to the HTTPRoute
-				AttachedRoutes: 1,
-				Conditions:     generateAcceptedListenerConditions(),
+				Name: "listener-set-listener-allowed-routes-tls-only",
+				Conditions: []metav1.Condition{
+					{
+						Type:   string(gatewayv1.ListenerConditionResolvedRefs),
+						Status: metav1.ConditionFalse,
+						Reason: string(gatewayv1.ListenerReasonInvalidRouteKinds),
+					},
+				},
 			},
 		})
 	},
