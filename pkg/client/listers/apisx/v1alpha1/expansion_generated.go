@@ -26,14 +26,6 @@ type XBackendTrafficPolicyListerExpansion interface{}
 // XBackendTrafficPolicyNamespaceLister.
 type XBackendTrafficPolicyNamespaceListerExpansion interface{}
 
-// XListenerSetListerExpansion allows custom methods to be added to
-// XListenerSetLister.
-type XListenerSetListerExpansion interface{}
-
-// XListenerSetNamespaceListerExpansion allows custom methods to be added to
-// XListenerSetNamespaceLister.
-type XListenerSetNamespaceListerExpansion interface{}
-
 // XMeshListerExpansion allows custom methods to be added to
 // XMeshLister.
 type XMeshListerExpansion interface{}

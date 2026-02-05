@@ -226,8 +226,6 @@ type GatewaySpecApplyConfiguration struct {
 	Infrastructure *GatewayInfrastructureApplyConfiguration `json:"infrastructure,omitempty"`
 	// AllowedListeners defines which ListenerSets can be attached to this Gateway.
 	// While this feature is experimental, the default value is to allow no ListenerSets.
-	//
-	// <gateway:experimental>
 	AllowedListeners *AllowedListenersApplyConfiguration `json:"allowedListeners,omitempty"`
 	// TLS specifies frontend and backend tls configuration for entire gateway.
 	//

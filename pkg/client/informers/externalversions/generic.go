@@ -67,6 +67,8 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Gateway().V1().GatewayClasses().Informer()}, nil
 	case v1.SchemeGroupVersion.WithResource("httproutes"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Gateway().V1().HTTPRoutes().Informer()}, nil
+	case v1.SchemeGroupVersion.WithResource("listenersets"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Gateway().V1().ListenerSets().Informer()}, nil
 	case v1.SchemeGroupVersion.WithResource("referencegrants"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Gateway().V1().ReferenceGrants().Informer()}, nil
 
@@ -101,8 +103,6 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		// Group=gateway.networking.x-k8s.io, Version=v1alpha1
 	case v1alpha1.SchemeGroupVersion.WithResource("xbackendtrafficpolicies"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Experimental().V1alpha1().XBackendTrafficPolicies().Informer()}, nil
-	case v1alpha1.SchemeGroupVersion.WithResource("xlistenersets"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Experimental().V1alpha1().XListenerSets().Informer()}, nil
 	case v1alpha1.SchemeGroupVersion.WithResource("xmeshes"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Experimental().V1alpha1().XMeshes().Informer()}, nil
 

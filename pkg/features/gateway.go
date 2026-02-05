@@ -120,7 +120,7 @@ var (
 	// ListenerSetFeature contains metadata for the SupportListenerSet feature.
 	ListenerSetFeature = Feature{
 		Name:    SupportListenerSet,
-		Channel: FeatureChannelExperimental,
+		Channel: FeatureChannelStandard,
 	}
 
 	// GatewayBackendClientCertificateFeature contains metadata for the SupportGatewayBackendClientCertificate feature.
