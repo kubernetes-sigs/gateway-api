@@ -38,3 +38,5 @@ spec:
         from: All
       kinds:
       - kind: HTTPRoute
+    tls:
+      mode: Passthrough
