@@ -1,0 +1,11 @@
+apiVersion: internal.gateway.networking.k8s.io/v1alpha1
+kind: GEPDetails
+number: 4488
+name: Backend Resource
+status: Provisional
+authors:
+  - keithmattix
+# featureNames is a list of the feature names introduced by the GEP, if there
+# are any. This will allow us to track which feature was introduced by which GEP.
+featureNames:
+  - BackendResource
