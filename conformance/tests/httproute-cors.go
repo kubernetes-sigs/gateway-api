@@ -45,11 +45,13 @@ var HTTPRouteCORS = suite.ConformanceTest{
 		routeNN1 := types.NamespacedName{Name: "cors-multiple-origins-methods-headers", Namespace: ns}
 		routeNN2 := types.NamespacedName{Name: "cors-wildcard-methods", Namespace: ns}
 		routeNN3 := types.NamespacedName{Name: "cors-wildcard-origin", Namespace: ns}
+		routeNN4 := types.NamespacedName{Name: "cors-wildcard-methods-headers-auth", Namespace: ns}
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: ns}
 		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN1, routeNN2)
 		kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN1, gwNN)
 		kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN2, gwNN)
 		kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN3, gwNN)
+		kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN4, gwNN)
 
 		testCases := []http.ExpectedResponse{
 			{
@@ -128,6 +130,54 @@ var HTTPRouteCORS = suite.ConformanceTest{
 					StatusCode: 200,
 					HeadersWithMultipleValues: map[string][]string{
 						"access-control-allow-origin": {"https://www.bar.com"},
+						"access-control-allow-methods": {
+							"GET, OPTIONS",
+							"OPTIONS, GET",
+						},
+						"access-control-allow-headers": {
+							"x-header-1, x-header-2",
+							"x-header-2, x-header-1",
+						},
+						"access-control-expose-headers": {
+							"x-header-3, x-header-4",
+							"x-header-4, x-header-3",
+						},
+						"access-control-max-age":           {"3600"},
+						"access-control-allow-credentials": {"true"},
+					},
+					// Ignore whitespace when comparing the response headers. This is because some
+					// implementations add a space after each comma, and some don't. Both are valid.
+					IgnoreWhitespace: true,
+				},
+			},
+			{
+				TestCaseName: "CORS preflight request from a wildcard matching any number of periods left to '*' should be allowed",
+				Request: http.Request{
+					Path:   "/cors-1",
+					Method: "OPTIONS",
+					Headers: map[string]string{
+						"Origin":                         "https://xpto.www.bar.com",
+						"access-control-request-method":  "GET",
+						"access-control-request-headers": "x-header-1, x-header-2",
+					},
+				},
+				// Set the expected request properties and namespace to empty strings.
+				// This is a workaround to avoid the test failure.
+				// The response body is empty because the request is a preflight request,
+				// so we can't get the request properties from the echoserver.
+				ExpectedRequest: &http.ExpectedRequest{
+					Request: http.Request{
+						Host:    "",
+						Method:  "OPTIONS",
+						Path:    "",
+						Headers: nil,
+					},
+				},
+				Namespace: "",
+				Response: http.Response{
+					StatusCode: 200,
+					HeadersWithMultipleValues: map[string][]string{
+						"access-control-allow-origin": {"https://xpto.www.bar.com"},
 						"access-control-allow-methods": {
 							"GET, OPTIONS",
 							"OPTIONS, GET",
@@ -265,6 +315,37 @@ var HTTPRouteCORS = suite.ConformanceTest{
 				},
 			},
 			{
+				TestCaseName: "CORS preflight request requested method '*' should be allowed by allowMethods with wildcard and answer with wildcard methods",
+				Request: http.Request{
+					Path:   "/cors-2",
+					Method: "OPTIONS",
+					Headers: map[string]string{
+						"Origin":                        "https://www.foo.com",
+						"access-control-request-method": "*",
+					},
+				},
+				// Set the expected request properties and namespace to empty strings.
+				// This is a workaround to avoid the test failure.
+				// The response body is empty because the request is a preflight request,
+				// so we can't get the request properties from the echoserver.
+				ExpectedRequest: &http.ExpectedRequest{
+					Request: http.Request{
+						Host:    "",
+						Method:  "OPTIONS",
+						Path:    "",
+						Headers: nil,
+					},
+				},
+				Namespace: "",
+				Response: http.Response{
+					StatusCodes: []int{200, 204},
+					Headers: map[string]string{
+						"access-control-allow-origin":  "https://www.foo.com",
+						"access-control-allow-methods": "*",
+					},
+				},
+			},
+			{
 				TestCaseName: "CORS preflight request should not receive access-control-allow-credentials header without access-control-allow-credentials set to true",
 				Request: http.Request{
 					Path:   "/cors-2",
@@ -294,21 +375,104 @@ var HTTPRouteCORS = suite.ConformanceTest{
 				},
 			},
 			{
-				TestCaseName: "Simple request from a wildcard origin should return header with '*'",
-				Namespace:    ns,
+				TestCaseName: "Pre-flight request from a wildcard origin should return header with '*' or with the requested Origin",
+				Namespace:    "",
 				Request: http.Request{
 					Path:   "/cors-wildcard-origin",
-					Method: "GET",
+					Method: "OPTIONS",
 					Headers: map[string]string{
 						"Origin":                        "https://foobar.com",
-						"access-control-request-method": "GET",
+						"access-control-request-method": "PUT",
+					},
+				},
+				ExpectedRequest: &http.ExpectedRequest{
+					Request: http.Request{
+						Host:    "",
+						Method:  "OPTIONS",
+						Path:    "",
+						Headers: nil,
 					},
 				},
 				Response: http.Response{
 					StatusCodes: []int{200, 204},
-					Headers: map[string]string{
-						"access-control-allow-origin": "https://foobar.com",
+					HeadersWithMultipleValues: map[string][]string{
+						// The access-control-allow-origin for a wildcard domain depends on the implementation.
+						// Envoy enforces the return of the same requested Origin, while NGINX an others may return a "*"
+						// per the spec in case this is a non-authenticated request
+
+						"access-control-allow-origin": {
+							"https://foobar.com",
+							"*",
+						},
+						"access-control-allow-methods": {"PUT"},
 					},
+					Headers: map[string]string{},
+				},
+			},
+			{
+				TestCaseName: "Simple request from a wildcard origin should return header with '*' or with the requested Origin",
+				Namespace:    ns,
+				Request: http.Request{
+					Path:   "/cors-wildcard-origin",
+					Method: "PUT",
+					Headers: map[string]string{
+						"Origin": "https://foobar.com",
+					},
+				},
+				Response: http.Response{
+					StatusCodes: []int{200, 204},
+					HeadersWithMultipleValues: map[string][]string{
+						// The access-control-allow-origin for a wildcard domain depends on the implementation.
+						// Envoy enforces the return of the same requested Origin, while NGINX an others may return a "*"
+						// per the spec in case this is a non-authenticated request
+						"access-control-allow-origin": {
+							"https://foobar.com",
+							"*",
+						},
+					},
+				},
+			},
+			{
+				TestCaseName: "CORS preflight request requesting auth and specific method should be allowed",
+				Request: http.Request{
+					Path:   "/cors-wildcard-methods-headers",
+					Method: "OPTIONS",
+					Headers: map[string]string{
+						"Origin":                         "https://other.foo.com",
+						"access-control-request-method":  "GET",
+						"access-control-request-headers": "x-header-1, x-header-2",
+					},
+				},
+				// Set the expected request properties and namespace to empty strings.
+				// This is a workaround to avoid the test failure.
+				// The response body is empty because the request is a preflight request,
+				// so we can't get the request properties from the echoserver.
+				ExpectedRequest: &http.ExpectedRequest{
+					Request: http.Request{
+						Host:    "",
+						Method:  "OPTIONS",
+						Path:    "",
+						Headers: nil,
+					},
+				},
+				Namespace: "",
+				Response: http.Response{
+					StatusCode: 200,
+					HeadersWithMultipleValues: map[string][]string{
+						"access-control-allow-origin": {"https://other.foo.com"},
+						// Credentialed with wildcard should return specific header
+						"access-control-allow-methods": {
+							"GET",
+						},
+						"access-control-allow-headers": {
+							"x-header-1, x-header-2",
+							"x-header-2, x-header-1",
+						},
+						"access-control-allow-credentials": {"true"},
+					},
+					// Ignore whitespace when comparing the response headers. This is because some
+					// implementations add a space after each comma, and some don't. Both are valid.
+					IgnoreWhitespace: true,
 				},
 			},
 		}
