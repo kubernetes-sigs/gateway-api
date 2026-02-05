@@ -3356,7 +3356,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_FrontendTLSConfig(ref common.Reference
 				Properties: map[string]spec.Schema{
 					"default": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Default specifies the default client certificate validation configuration for all Listeners handling HTTPS traffic, unless a per-port configuration is defined.\n\nsupport: Core\n\n<gateway:experimental>",
+							Description: "Default specifies the default client certificate validation configuration for all Listeners handling HTTPS traffic, unless a per-port configuration is defined.\n\nsupport: Core",
 							Default:     map[string]interface{}{},
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.TLSConfig"),
 						},
@@ -3371,7 +3371,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_FrontendTLSConfig(ref common.Reference
 							},
 						},
 						SchemaProps: spec.SchemaProps{
-							Description: "PerPort specifies tls configuration assigned per port. Per port configuration is optional. Once set this configuration overrides the default configuration for all Listeners handling HTTPS traffic that match this port. Each override port requires a unique TLS configuration.\n\nsupport: Core\n\n<gateway:experimental>",
+							Description: "PerPort specifies tls configuration assigned per port. Per port configuration is optional. Once set this configuration overrides the default configuration for all Listeners handling HTTPS traffic that match this port. Each override port requires a unique TLS configuration.\n\nsupport: Core",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -4619,7 +4619,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewayTLSConfig(ref common.ReferenceC
 					},
 					"frontend": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Frontend describes TLS config when client connects to Gateway. Support: Core\n\n<gateway:experimental>",
+							Description: "Frontend describes TLS config when client connects to Gateway. Support: Core",
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.FrontendTLSConfig"),
 						},
 					},
@@ -6770,7 +6770,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_TLSConfig(ref common.ReferenceCallback
 				Properties: map[string]spec.Schema{
 					"validation": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Validation holds configuration information for validating the frontend (client). Setting this field will result in mutual authentication when connecting to the gateway. In browsers this may result in a dialog appearing that requests a user to specify the client certificate. The maximum depth of a certificate chain accepted in verification is Implementation specific.\n\nSupport: Core\n\n<gateway:experimental>",
+							Description: "Validation holds configuration information for validating the frontend (client). Setting this field will result in mutual authentication when connecting to the gateway. In browsers this may result in a dialog appearing that requests a user to specify the client certificate. The maximum depth of a certificate chain accepted in verification is Implementation specific.\n\nSupport: Core",
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.FrontendTLSValidation"),
 						},
 					},
@@ -6790,7 +6790,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_TLSPortConfig(ref common.ReferenceCall
 				Properties: map[string]spec.Schema{
 					"port": {
 						SchemaProps: spec.SchemaProps{
-							Description: "The Port indicates the Port Number to which the TLS configuration will be applied. This configuration will be applied to all Listeners handling HTTPS traffic that match this port.\n\nSupport: Core\n\n<gateway:experimental>",
+							Description: "The Port indicates the Port Number to which the TLS configuration will be applied. This configuration will be applied to all Listeners handling HTTPS traffic that match this port.\n\nSupport: Core",
 							Default:     0,
 							Type:        []string{"integer"},
 							Format:      "int32",
@@ -6798,7 +6798,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_TLSPortConfig(ref common.ReferenceCall
 					},
 					"tls": {
 						SchemaProps: spec.SchemaProps{
-							Description: "TLS store the configuration that will be applied to all Listeners handling HTTPS traffic and matching given port.\n\nSupport: Core\n\n<gateway:experimental>",
+							Description: "TLS store the configuration that will be applied to all Listeners handling HTTPS traffic and matching given port.\n\nSupport: Core",
 							Default:     map[string]interface{}{},
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.TLSConfig"),
 						},
