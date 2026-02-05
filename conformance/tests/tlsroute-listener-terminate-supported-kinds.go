@@ -44,22 +44,20 @@ var TLSRouteListenerTerminateSupportedKinds = suite.ConformanceTest{
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		gwNN := types.NamespacedName{Name: "gateway-tlsroute-terminate-supported", Namespace: "gateway-conformance-infra"}
 
-		t.Run("Listener with mode Terminate must have TLSRoute in SupportedKinds", func(t *testing.T) {
-			listeners := []v1.ListenerStatus{
-				{
-					Name: v1.SectionName("tls-terminate"),
-					SupportedKinds: []v1.RouteGroupKind{{
-						Group: (*v1.Group)(&v1.GroupVersion.Group),
-						Kind:  v1.Kind("TLSRoute"),
-					}},
-					Conditions: []metav1.Condition{{
-						Type:   string(v1.ListenerConditionAccepted),
-						Status: metav1.ConditionTrue,
-						Reason: string(v1.ListenerReasonAccepted),
-					}},
-					AttachedRoutes: 0,
-				},
-			}
+		t.Run("TLS listener with mode Terminate should have a false ResolvedRefs condition with reason InvalidRouteKinds for TCPRoute, and TLSRoute must be put in the supportedKinds", func(t *testing.T) {
+			listeners := []v1.ListenerStatus{{
+				Name: v1.SectionName("tls-terminate"),
+				SupportedKinds: []v1.RouteGroupKind{{
+					Group: (*v1.Group)(&v1.GroupVersion.Group),
+					Kind:  v1.Kind("TLSRoute"),
+				}},
+				Conditions: []metav1.Condition{{
+					Type:   string(v1.ListenerConditionResolvedRefs),
+					Status: metav1.ConditionFalse,
+					Reason: string(v1.ListenerReasonInvalidRouteKinds),
+				}},
+				AttachedRoutes: 0,
+			}}
 			kubernetes.GatewayStatusMustHaveListeners(t, suite.Client, suite.TimeoutConfig, gwNN, listeners)
 		})
 	},

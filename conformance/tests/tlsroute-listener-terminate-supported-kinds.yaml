@@ -15,6 +15,7 @@ spec:
         namespaces:
           from: Same
         kinds:
+          - kind: TCPRoute
           - kind: TLSRoute
       tls:
         mode: Terminate
