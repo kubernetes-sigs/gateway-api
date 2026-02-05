@@ -71,7 +71,7 @@ spec:
     name: listenerset-test-allowed-routes-supported-kinds
     namespace: gateway-conformance-infra
   hostnames:
-  - abc.example.com
+  - listener-set-listener-allowed-routes-http-only.com
   rules:
   - backendRefs:
     - name: tls-backend

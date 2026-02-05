@@ -99,7 +99,7 @@ spec:
         type: PathPrefix
         value: /route-in-selected-namespace
     backendRefs:
-    - name: infra-backend-v1
+    - name: infra-backend-v2
       namespace: gateway-conformance-infra
       port: 8080
 ---
@@ -126,7 +126,7 @@ spec:
         type: PathPrefix
         value: /route-not-in-selected-namespace
     backendRefs:
-    - name: infra-backend-v1
+    - name: infra-backend-v3
       namespace: gateway-conformance-infra
       port: 8080
 ---

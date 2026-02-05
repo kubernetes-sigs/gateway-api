@@ -39,7 +39,7 @@ var ListenerSetAllowedRoutesSupportedKinds = suite.ConformanceTest{
 	Description: "ListenerSet listeners allow specific route kinds",
 	Features: []features.FeatureName{
 		features.SupportGateway,
-		features.SupportGatewayListenerSet,
+		features.SupportListenerSet,
 		features.SupportHTTPRoute,
 		features.SupportTLSRoute,
 	},

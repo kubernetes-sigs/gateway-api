@@ -38,7 +38,7 @@ var ListenerSetAllowedNamespaceSame = suite.ConformanceTest{
 	Description: "ListenerSets in the same namespace as the Gateway are allowed when `allowedListeners` is set to `Same`",
 	Features: []features.FeatureName{
 		features.SupportGateway,
-		features.SupportGatewayListenerSet,
+		features.SupportListenerSet,
 	},
 	Manifests: []string{
 		"tests/listenerset-allowed-namespace-same.yaml",

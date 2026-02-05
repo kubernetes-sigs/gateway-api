@@ -39,7 +39,7 @@ var ListenerSetHTTPRouting = suite.ConformanceTest{
 	Description: "HTTP Routing works as expected with ListenerSets",
 	Features: []features.FeatureName{
 		features.SupportGateway,
-		features.SupportGatewayListenerSet,
+		features.SupportListenerSet,
 		features.SupportHTTPRoute,
 	},
 	Manifests: []string{

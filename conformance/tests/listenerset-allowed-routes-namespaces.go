@@ -41,7 +41,7 @@ var ListenerSetAllowedRoutesNamespaces = suite.ConformanceTest{
 	Description: "ListenerSet listeners allow routes from the specified namespace",
 	Features: []features.FeatureName{
 		features.SupportGateway,
-		features.SupportGatewayListenerSet,
+		features.SupportListenerSet,
 		features.SupportHTTPRoute,
 		features.SupportReferenceGrant,
 	},
@@ -108,12 +108,12 @@ var ListenerSetAllowedRoutesNamespaces = suite.ConformanceTest{
 			},
 			{
 				Request:   http.Request{Host: "listener-set-listener-allowed-routes-all.com", Path: "/route-in-selected-namespace"},
-				Backend:   "infra-backend-v1",
+				Backend:   "infra-backend-v2",
 				Namespace: ns,
 			},
 			{
 				Request:   http.Request{Host: "listener-set-listener-allowed-routes-all.com", Path: "/route-not-in-selected-namespace"},
-				Backend:   "infra-backend-v1",
+				Backend:   "infra-backend-v3",
 				Namespace: ns,
 			},
 			// Requests only to the route in the same namespace on `listener-set-listener-allowed-routes-same` should succeed
@@ -137,7 +137,7 @@ var ListenerSetAllowedRoutesNamespaces = suite.ConformanceTest{
 			},
 			{
 				Request:   http.Request{Host: "listener-set-listener-allowed-routes-selector.com", Path: "/route-in-selected-namespace"},
-				Backend:   "infra-backend-v1",
+				Backend:   "infra-backend-v2",
 				Namespace: ns,
 			},
 			{

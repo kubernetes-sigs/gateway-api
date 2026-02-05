@@ -38,7 +38,7 @@ var ListenerSetReferenceGrant = suite.ConformanceTest{
 	Description: "ListenerSet with reference grant support",
 	Features: []features.FeatureName{
 		features.SupportGateway,
-		features.SupportGatewayListenerSet,
+		features.SupportListenerSet,
 		features.SupportReferenceGrant,
 	},
 	Manifests: []string{

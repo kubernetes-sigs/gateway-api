@@ -38,7 +38,7 @@ var ListenerSetAllowedNamespaceNone = suite.ConformanceTest{
 	Description: "Listener Sets are not allowed on the Gateway when `allowedListeners` is set to `None`",
 	Features: []features.FeatureName{
 		features.SupportGateway,
-		features.SupportGatewayListenerSet,
+		features.SupportListenerSet,
 	},
 	Manifests: []string{
 		"tests/listenerset-allowed-namespace-none.yaml",

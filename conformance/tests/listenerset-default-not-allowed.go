@@ -38,7 +38,7 @@ var ListenerSetDefaultNotAllowed = suite.ConformanceTest{
 	Description: "Listener Sets are not allowed on the Gateway by default (i.e. when `allowedListeners` is not set)",
 	Features: []features.FeatureName{
 		features.SupportGateway,
-		features.SupportGatewayListenerSet,
+		features.SupportListenerSet,
 	},
 	Manifests: []string{
 		"tests/listenerset-default-not-allowed.yaml",

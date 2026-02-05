@@ -38,7 +38,7 @@ var ListenerSetAllowedNamespaceSelector = suite.ConformanceTest{
 	Description: "ListenerSets in the namespaces that match the labels are allowed when `allowedListeners` is set to `Selector`",
 	Features: []features.FeatureName{
 		features.SupportGateway,
-		features.SupportGatewayListenerSet,
+		features.SupportListenerSet,
 	},
 	Manifests: []string{
 		"tests/listenerset-allowed-namespace-selector.yaml",

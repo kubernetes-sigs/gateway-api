@@ -38,7 +38,7 @@ var ListenerSetHostnameConflict = suite.ConformanceTest{
 	Description: "Validate Listener Precedence when a ListenerSet listener has a hostname conflict",
 	Features: []features.FeatureName{
 		features.SupportGateway,
-		features.SupportGatewayListenerSet,
+		features.SupportListenerSet,
 	},
 	Manifests: []string{
 		"tests/listenerset-hostname-conflict.yaml",
