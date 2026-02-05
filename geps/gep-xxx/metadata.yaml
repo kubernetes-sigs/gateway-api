@@ -1,0 +1,15 @@
+apiVersion: internal.gateway.networking.k8s.io/v1alpha1
+kind: GEPDetails
+number: xxx
+name: Backend Resource
+status: Provisional
+authors:
+  - keithmattix
+relationships:
+  obsoletes: {}
+  obsoletedBy: {}
+  extends: {}
+  extendedBy: {}
+features:
+  - BackendResource
+changelog: []
