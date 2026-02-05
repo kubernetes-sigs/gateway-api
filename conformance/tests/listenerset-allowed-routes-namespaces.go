@@ -25,7 +25,6 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
-	gatewayxv1a1 "sigs.k8s.io/gateway-api/apisx/v1alpha1"
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
@@ -69,13 +68,13 @@ var ListenerSetAllowedRoutesNamespaces = suite.ConformanceTest{
 			{Name: "route-not-in-selected-namespace", Namespace: "gateway-api-routes-not-allowed-ns"},
 		}
 		listenerSetGK := schema.GroupKind{
-			Group: gatewayxv1a1.GroupVersion.Group,
-			Kind:  "XListenerSet",
+			Group: gatewayv1.GroupVersion.Group,
+			Kind:  "ListenerSet",
 		}
 		lsNN := types.NamespacedName{Name: "listenerset-test-allowed-routes-namespaces", Namespace: ns}
 		listenerSetRef := kubernetes.NewResourceRef(listenerSetGK, lsNN)
 		kubernetes.RoutesAndParentMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, listenerSetRef, &gatewayv1.HTTPRoute{}, routes...)
-		kubernetes.ListenerSetStatusMustHaveListeners(t, suite.Client, suite.TimeoutConfig, lsNN, []gatewayxv1a1.ListenerEntryStatus{
+		kubernetes.ListenerSetStatusMustHaveListeners(t, suite.Client, suite.TimeoutConfig, lsNN, []gatewayv1.ListenerEntryStatus{
 			{
 				Name:           "listener-set-listener-allowed-routes-all",
 				SupportedKinds: generateSupportedRouteKinds(),

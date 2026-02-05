@@ -1,5 +1,5 @@
 /*
-Copyright 2025 The Kubernetes Authors.
+Copyright 2026 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package v1alpha1
+package v1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -29,7 +29,7 @@ import (
 // +kubebuilder:printcolumn:name="Programmed",type=string,JSONPath=`.status.conditions[?(@.type=="Programmed")].status`
 // +kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 
-// XListenerSet defines a set of additional listeners to attach to an existing Gateway.
+// ListenerSet defines a set of additional listeners to attach to an existing Gateway.
 // This resource provides a mechanism to merge multiple listeners into a single Gateway.
 //
 // The parent Gateway must explicitly allow ListenerSet attachment through its
@@ -57,7 +57,7 @@ import (
 //   - The ListenerSet is selected by the Gateway's AllowedListeners field
 //   - The ListenerSet has a valid ParentRef selecting the Gateway
 //   - The ListenerSet's status has the condition "Accepted: true"
-type XListenerSet struct {
+type ListenerSet struct {
 	metav1.TypeMeta `json:",inline"`
 	// +optional
 	metav1.ObjectMeta `json:"metadata,omitempty"`
@@ -624,8 +624,8 @@ const (
 )
 
 // +kubebuilder:object:root=true
-type XListenerSetList struct {
+type ListenerSetList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []XListenerSet `json:"items"`
+	Items           []ListenerSet `json:"items"`
 }

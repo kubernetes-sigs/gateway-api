@@ -23,7 +23,6 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
-	gatewayxv1a1 "sigs.k8s.io/gateway-api/apisx/v1alpha1"
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
@@ -65,12 +64,12 @@ var ListenerSetHTTPRouting = suite.ConformanceTest{
 			{Name: "listener-set-http-routing-1-section-route", Namespace: ns},
 		}
 		listenerSetGK := schema.GroupKind{
-			Group: gatewayxv1a1.GroupVersion.Group,
-			Kind:  "XListenerSet",
+			Group: gatewayv1.GroupVersion.Group,
+			Kind:  "ListenerSet",
 		}
 		lsNN := types.NamespacedName{Name: "listener-set-http-routing-1", Namespace: ns}
 		kubernetes.RoutesAndParentMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewResourceRef(listenerSetGK, lsNN), &gatewayv1.HTTPRoute{}, lsRoutes...)
-		kubernetes.ListenerSetStatusMustHaveListeners(t, suite.Client, suite.TimeoutConfig, lsNN, []gatewayxv1a1.ListenerEntryStatus{
+		kubernetes.ListenerSetStatusMustHaveListeners(t, suite.Client, suite.TimeoutConfig, lsNN, []gatewayv1.ListenerEntryStatus{
 			{
 				Name:           "listener-set-http-routing-1-listener-1",
 				SupportedKinds: generateSupportedRouteKinds(),
@@ -94,7 +93,7 @@ var ListenerSetHTTPRouting = suite.ConformanceTest{
 		}
 		lsNN = types.NamespacedName{Name: "listener-set-http-routing-2", Namespace: ns}
 		kubernetes.RoutesAndParentMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewResourceRef(listenerSetGK, lsNN), &gatewayv1.HTTPRoute{}, lsRoutes...)
-		kubernetes.ListenerSetStatusMustHaveListeners(t, suite.Client, suite.TimeoutConfig, lsNN, []gatewayxv1a1.ListenerEntryStatus{
+		kubernetes.ListenerSetStatusMustHaveListeners(t, suite.Client, suite.TimeoutConfig, lsNN, []gatewayv1.ListenerEntryStatus{
 			{
 				Name:           "listener-set-http-routing-2-listener-1",
 				SupportedKinds: generateSupportedRouteKinds(),

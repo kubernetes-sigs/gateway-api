@@ -15,8 +15,8 @@ spec:
         from: All
 ---
 # This listenerSet should not be accepted since the Gateway does not allow ListenerSets by default
-apiVersion: gateway.networking.x-k8s.io/v1alpha1
-kind: XListenerSet
+apiVersion: gateway.networking.k8s.io/v1
+kind: ListenerSet
 metadata:
   name: listenerset-default-not-allowed
   namespace: gateway-conformance-infra

@@ -17,8 +17,8 @@ spec:
     namespaces:
       from: All
 ---
-apiVersion: gateway.networking.x-k8s.io/v1alpha1
-kind: XListenerSet
+apiVersion: gateway.networking.k8s.io/v1
+kind: ListenerSet
 metadata:
   name: listenerset-test-allowed-routes-namespaces
   namespace: gateway-conformance-infra
@@ -61,8 +61,8 @@ metadata:
   namespace: gateway-conformance-infra
 spec:
   parentRefs:
-  - kind: XListenerSet
-    group: gateway.networking.x-k8s.io
+  - kind: ListenerSet
+    group: gateway.networking.k8s.io
     name: listenerset-test-allowed-routes-namespaces
     namespace: gateway-conformance-infra
   rules:
@@ -89,8 +89,8 @@ metadata:
   namespace: gateway-api-routes-allowed-ns
 spec:
   parentRefs:
-  - kind: XListenerSet
-    group: gateway.networking.x-k8s.io
+  - kind: ListenerSet
+    group: gateway.networking.k8s.io
     name: listenerset-test-allowed-routes-namespaces
     namespace: gateway-conformance-infra
   rules:
@@ -116,8 +116,8 @@ metadata:
   namespace: gateway-api-routes-not-allowed-ns
 spec:
   parentRefs:
-  - kind: XListenerSet
-    group: gateway.networking.x-k8s.io
+  - kind: ListenerSet
+    group: gateway.networking.k8s.io
     name: listenerset-test-allowed-routes-namespaces
     namespace: gateway-conformance-infra
   rules:

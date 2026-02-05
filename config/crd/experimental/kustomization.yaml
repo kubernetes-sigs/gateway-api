@@ -9,4 +9,3 @@ resources:
 - gateway.networking.k8s.io_tlsroutes.yaml
 - gateway.networking.k8s.io_udproutes.yaml
 - gateway.networking.x-k8s.io_xbackendtrafficpolicies.yaml
-- gateway.networking.x-k8s.io_xlistenersets.yaml

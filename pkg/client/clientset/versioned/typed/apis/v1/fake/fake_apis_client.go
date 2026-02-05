@@ -48,6 +48,10 @@ func (c *FakeGatewayV1) HTTPRoutes(namespace string) v1.HTTPRouteInterface {
 	return newFakeHTTPRoutes(c, namespace)
 }
 
+func (c *FakeGatewayV1) ListenerSets(namespace string) v1.ListenerSetInterface {
+	return newFakeListenerSets(c, namespace)
+}
+
 func (c *FakeGatewayV1) ReferenceGrants(namespace string) v1.ReferenceGrantInterface {
 	return newFakeReferenceGrants(c, namespace)
 }

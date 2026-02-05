@@ -18,8 +18,8 @@ spec:
       from: Same
 ---
 # This listenerSet should be accepted since it is in the same namespace as the gateway and the Gateway only allows ListenerSets in the same namespace.
-apiVersion: gateway.networking.x-k8s.io/v1alpha1
-kind: XListenerSet
+apiVersion: gateway.networking.k8s.io/v1
+kind: ListenerSet
 metadata:
   name: listenerset-in-same-namespace
   namespace: gateway-conformance-infra
@@ -45,8 +45,8 @@ metadata:
   name: gateway-api-listenerset-not-allowed-ns
 ---
 # This listenerSet should not be accepted since it is in a different namespace than the gateway but the Gateway only allows ListenerSets in the same namespace.
-apiVersion: gateway.networking.x-k8s.io/v1alpha1
-kind: XListenerSet
+apiVersion: gateway.networking.k8s.io/v1
+kind: ListenerSet
 metadata:
   name: listenerset-in-different-namespace
   namespace: gateway-api-listenerset-not-allowed-ns

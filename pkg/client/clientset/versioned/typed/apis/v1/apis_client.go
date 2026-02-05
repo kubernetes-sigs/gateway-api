@@ -33,6 +33,7 @@ type GatewayV1Interface interface {
 	GatewaysGetter
 	GatewayClassesGetter
 	HTTPRoutesGetter
+	ListenerSetsGetter
 	ReferenceGrantsGetter
 }
 
@@ -59,6 +60,10 @@ func (c *GatewayV1Client) GatewayClasses() GatewayClassInterface {
 
 func (c *GatewayV1Client) HTTPRoutes(namespace string) HTTPRouteInterface {
 	return newHTTPRoutes(c, namespace)
+}
+
+func (c *GatewayV1Client) ListenerSets(namespace string) ListenerSetInterface {
+	return newListenerSets(c, namespace)
 }
 
 func (c *GatewayV1Client) ReferenceGrants(namespace string) ReferenceGrantInterface {

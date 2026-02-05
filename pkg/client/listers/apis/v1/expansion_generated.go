@@ -54,6 +54,14 @@ type HTTPRouteListerExpansion interface{}
 // HTTPRouteNamespaceLister.
 type HTTPRouteNamespaceListerExpansion interface{}
 
+// ListenerSetListerExpansion allows custom methods to be added to
+// ListenerSetLister.
+type ListenerSetListerExpansion interface{}
+
+// ListenerSetNamespaceListerExpansion allows custom methods to be added to
+// ListenerSetNamespaceLister.
+type ListenerSetNamespaceListerExpansion interface{}
+
 // ReferenceGrantListerExpansion allows custom methods to be added to
 // ReferenceGrantLister.
 type ReferenceGrantListerExpansion interface{}

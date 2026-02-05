@@ -28,26 +28,25 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/utils/ptr"
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
-	xgatewayv1alpha1 "sigs.k8s.io/gateway-api/apisx/v1alpha1"
 )
 
-func TestValidateXListenerSet(t *testing.T) {
+func TestValidateListenerSet(t *testing.T) {
 	ctx := context.Background()
-	baseXListenerSet := xgatewayv1alpha1.XListenerSet{
+	baseListenerSet := gatewayv1.ListenerSet{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "foo",
 			Namespace: metav1.NamespaceDefault,
 		},
-		Spec: xgatewayv1alpha1.ListenerSetSpec{
-			ParentRef: xgatewayv1alpha1.ParentGatewayReference{
-				Kind: ptr.To(xgatewayv1alpha1.Kind("Gateway")),
-				Name: xgatewayv1alpha1.ObjectName("example"),
+		Spec: gatewayv1.ListenerSetSpec{
+			ParentRef: gatewayv1.ParentGatewayReference{
+				Kind: ptr.To(gatewayv1.Kind("Gateway")),
+				Name: gatewayv1.ObjectName("example"),
 			},
-			Listeners: []xgatewayv1alpha1.ListenerEntry{
+			Listeners: []gatewayv1.ListenerEntry{
 				{
-					Name:     xgatewayv1alpha1.SectionName("http"),
+					Name:     gatewayv1.SectionName("http"),
 					Protocol: gatewayv1.HTTPProtocolType,
-					Port:     xgatewayv1alpha1.PortNumber(80),
+					Port:     gatewayv1.PortNumber(80),
 				},
 			},
 		},
@@ -55,18 +54,18 @@ func TestValidateXListenerSet(t *testing.T) {
 
 	testCases := []struct {
 		desc         string
-		mutate       func(ls *xgatewayv1alpha1.XListenerSet)
-		mutateStatus func(ls *xgatewayv1alpha1.XListenerSet)
+		mutate       func(ls *gatewayv1.ListenerSet)
+		mutateStatus func(ls *gatewayv1.ListenerSet)
 		wantErrors   []string
 	}{
 		{
 			desc: "tls config present with tls protocol",
-			mutate: func(ls *xgatewayv1alpha1.XListenerSet) {
-				ls.Spec.Listeners = []xgatewayv1alpha1.ListenerEntry{
+			mutate: func(ls *gatewayv1.ListenerSet) {
+				ls.Spec.Listeners = []gatewayv1.ListenerEntry{
 					{
-						Name:     xgatewayv1alpha1.SectionName("tls"),
+						Name:     gatewayv1.SectionName("tls"),
 						Protocol: gatewayv1.TLSProtocolType,
-						Port:     xgatewayv1alpha1.PortNumber(8443),
+						Port:     gatewayv1.PortNumber(8443),
 						TLS: &gatewayv1.ListenerTLSConfig{
 							Mode: ptrTo(gatewayv1.TLSModeType("Passthrough")),
 						},
@@ -76,12 +75,12 @@ func TestValidateXListenerSet(t *testing.T) {
 		},
 		{
 			desc: "tls config not set with tls protocol",
-			mutate: func(ls *xgatewayv1alpha1.XListenerSet) {
-				ls.Spec.Listeners = []xgatewayv1alpha1.ListenerEntry{
+			mutate: func(ls *gatewayv1.ListenerSet) {
+				ls.Spec.Listeners = []gatewayv1.ListenerEntry{
 					{
-						Name:     xgatewayv1alpha1.SectionName("tls"),
+						Name:     gatewayv1.SectionName("tls"),
 						Protocol: gatewayv1.TLSProtocolType,
-						Port:     xgatewayv1alpha1.PortNumber(8443),
+						Port:     gatewayv1.PortNumber(8443),
 					},
 				}
 			},
@@ -89,12 +88,12 @@ func TestValidateXListenerSet(t *testing.T) {
 		},
 		{
 			desc: "tls config present but empty with tls protocol",
-			mutate: func(ls *xgatewayv1alpha1.XListenerSet) {
-				ls.Spec.Listeners = []xgatewayv1alpha1.ListenerEntry{
+			mutate: func(ls *gatewayv1.ListenerSet) {
+				ls.Spec.Listeners = []gatewayv1.ListenerEntry{
 					{
-						Name:     xgatewayv1alpha1.SectionName("tls"),
+						Name:     gatewayv1.SectionName("tls"),
 						Protocol: gatewayv1.TLSProtocolType,
-						Port:     xgatewayv1alpha1.PortNumber(8443),
+						Port:     gatewayv1.PortNumber(8443),
 						TLS:      &gatewayv1.ListenerTLSConfig{},
 					},
 				}
@@ -105,7 +104,7 @@ func TestValidateXListenerSet(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
-			ls := baseXListenerSet.DeepCopy()
+			ls := baseListenerSet.DeepCopy()
 			ls.Name = fmt.Sprintf("foo-%v", time.Now().UnixNano())
 
 			if tc.mutate != nil {
