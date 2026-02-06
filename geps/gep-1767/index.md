@@ -228,8 +228,8 @@ type HTTPCORSFilter struct {
     //
     // When config has the wildcard ("*") in allowOrigins, and the request
     // is not credentialed (e.g., it is a preflight request), the
-    // `Access-Control-Allow-Origin` response header contains the
-    // wildcard as well.
+    // `Access-Control-Allow-Origin` response header either contains the
+    // wildcard as well or the Origin from the request.
     //
     // Input:
     //   Origin: https://foo.example
