@@ -70,6 +70,16 @@ type HTTPCORSFilterApplyConfiguration struct {
 	// the CORS headers. The cross-origin request fails on the client side.
 	// Therefore, the client doesn't attempt the actual cross-origin request.
 	//
+	// Conversely, if the request `Origin` matches one of the configured
+	// allowed origins, the gateway sets the response header
+	// `Access-Control-Allow-Origin` to the same value as the `Origin`
+	// header provided by the client.
+	//
+	// When config has the wildcard ("*") in allowOrigins, and the request
+	// is not credentialed (e.g., it is a preflight request), the
+	// `Access-Control-Allow-Origin` response header either contains the
+	// wildcard as well or the Origin from the request.
+	//
 	// When the request is credentialed, the gateway must not specify the `*`
 	// wildcard in the `Access-Control-Allow-Origin` response header. When
 	// also the `AllowCredentials` field is true and `AllowOrigins` field
@@ -119,8 +129,10 @@ type HTTPCORSFilterApplyConfiguration struct {
 	// `Access-Control-Allow-Methods`, it will present an error on the client
 	// side.
 	//
-	// The `Access-Control-Allow-Methods` response header can only use `*`
-	// wildcard as value when the `AllowCredentials` field is false or omitted.
+	// If config contains the wildcard "*" in allowMethods and the request is
+	// not credentialed, the `Access-Control-Allow-Methods` response header
+	// can either use the `*` wildcard or the value of
+	// Access-Control-Request-Method from the request.
 	//
 	// When the request is credentialed, the gateway must not specify the `*`
 	// wildcard in the `Access-Control-Allow-Methods` response header. When
@@ -132,9 +144,6 @@ type HTTPCORSFilterApplyConfiguration struct {
 	// header `Access-Control-Request-Method` is not included in the request,
 	// the gateway will omit the `Access-Control-Allow-Methods` response header,
 	// instead of specifying the `*` wildcard.
-	//
-	// A Gateway implementation may choose to add implementation-specific
-	// default methods.
 	//
 	// Support: Extended
 	AllowMethods []apisv1.HTTPMethodWithWildcard `json:"allowMethods,omitempty"`
@@ -160,22 +169,21 @@ type HTTPCORSFilterApplyConfiguration struct {
 	// client side.
 	//
 	// A wildcard indicates that the requests with all HTTP headers are allowed.
-	// The `Access-Control-Allow-Headers` response header can only use `*`
-	// wildcard as value when the `AllowCredentials` field is false or omitted.
+	// If config contains the wildcard "*" in allowHeaders and the request is
+	// not credentialed, the `Access-Control-Allow-Headers` response header
+	// can either use the `*` wildcard or the value of
+	// Access-Control-Request-Headers from the request.
 	//
 	// When the request is credentialed, the gateway must not specify the `*`
 	// wildcard in the `Access-Control-Allow-Headers` response header. When
 	// also the `AllowCredentials` field is true and `AllowHeaders` field
-	// specified with the `*` wildcard, the gateway must specify one or more
+	// is specified with the `*` wildcard, the gateway must specify one or more
 	// HTTP headers in the value of the `Access-Control-Allow-Headers` response
 	// header. The value of the header `Access-Control-Allow-Headers` is same as
 	// the `Access-Control-Request-Headers` header provided by the client. If
 	// the header `Access-Control-Request-Headers` is not included in the
 	// request, the gateway will omit the `Access-Control-Allow-Headers`
 	// response header, instead of specifying the `*` wildcard.
-	//
-	// A Gateway implementation may choose to add implementation-specific
-	// default headers.
 	//
 	// Support: Extended
 	AllowHeaders []apisv1.HTTPHeaderName `json:"allowHeaders,omitempty"`
@@ -208,6 +216,10 @@ type HTTPCORSFilterApplyConfiguration struct {
 	// to clients. The `Access-Control-Expose-Headers` response header can only
 	// use `*` wildcard as value when the request is not credentialed.
 	//
+	// When the `exposeHeaders` config field contains the "*" wildcard and
+	// the request is credentialed, the gateway cannot use the `*` wildcard in
+	// the `Access-Control-Expose-Headers` response header.
+	//
 	// Support: Extended
 	ExposeHeaders []apisv1.HTTPHeaderName `json:"exposeHeaders,omitempty"`
 	// MaxAge indicates the duration (in seconds) for the client to cache the
@@ -219,6 +231,9 @@ type HTTPCORSFilterApplyConfiguration struct {
 	//
 	// The default value of `Access-Control-Max-Age` response header is 5
 	// (seconds).
+	//
+	// When the `MaxAge` field is unspecified, the gateway sets the response
+	// header "Access-Control-Max-Age: 5" by default.
 	MaxAge *int32 `json:"maxAge,omitempty"`
 }
 
