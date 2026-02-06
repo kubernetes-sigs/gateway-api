@@ -396,8 +396,10 @@ type HTTPCORSFilter struct {
     //   Access-Control-Allow-Headers: DNT, Keep-Alive, User-Agent, X-Requested-With, If-Modified-Since, Cache-Control, Content-Type, Range, Authorization
     //
     // A wildcard indicates that the requests with all HTTP headers are allowed.
-    // The `Access-Control-Allow-Headers` response header can only use `*` wildcard 
-    // as value when the request is not credentialed.
+    // If config contains the wildcard "*" in allowHeaders and the request is
+    // not credentialed, the `Access-Control-Allow-Headers` response header
+    // can either use the `*` wildcard or the value of
+    // Access-Control-Request-Headers from the request.
     //
     // Input:
     //   Access-Control-Request-Headers: Content-Type, Cache-Control
