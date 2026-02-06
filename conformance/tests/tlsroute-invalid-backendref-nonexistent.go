@@ -31,7 +31,7 @@ func init() {
 
 var TLSRouteInvalidBackendRefNonexistent = suite.ConformanceTest{
 	ShortName:   "TLSRouteInvalidBackendRefNonexistent",
-	Description: "A single TLSRoute in the gateway-conformance-infra namespace a ResolvedRefs status False with reason BackendNotFound when binding to a Gateway in the same namespace if the route has a BackendRef Service that does not exist",
+	Description: "A single TLSRoute in the gateway-conformance-infra namespace has a ResolvedRefs status False with reason BackendNotFound when binding to a Gateway in the same namespace, if the route has a BackendRef Service that does not exist",
 	Features: []features.FeatureName{
 		features.SupportGateway,
 		features.SupportTLSRoute,
