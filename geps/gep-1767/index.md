@@ -282,7 +282,7 @@ type HTTPCORSFilter struct {
     //   Access-Control-Allow-Origin: https://foo.example
     //   Access-Control-Allow-Credentials: true
     //
-    // When set to false, the gateway will omit the header
+    // When set to false or omitted, the gateway will omit the header
     // `Access-Control-Allow-Credentials` entirely (this is the standard CORS
     // behavior).
     //
