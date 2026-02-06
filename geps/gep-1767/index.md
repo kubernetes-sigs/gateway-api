@@ -324,9 +324,10 @@ type HTTPCORSFilter struct {
     // Output:
     //   Access-Control-Allow-Methods: GET, POST, DELETE, PATCH, OPTIONS
     //
-    // The `Access-Control-Allow-Methods` response header should use `*`
-    // wildcard as value if config contains the wildcard "*" in allowMethods
-    // unless the request is credentialed.
+    // If config contains the wildcard "*" in allowMethods and the request is
+    // not credentialed, the `Access-Control-Allow-Methods` response header
+    // can either use the `*` wildcard or the value of
+    // Access-Control-Request-Method from the request.
     //
     // Input:
     //   Access-Control-Request-Method: PUT
