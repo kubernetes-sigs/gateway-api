@@ -55,6 +55,50 @@ the only differentiator being URI, the user should use `HTTPRoute` resources for
 both gRPC and HTTP. This will come at the cost of the improved UX of the
 `GRPCRoute` resource.
 
+## When to Use GRPCRoute
+
+gRPC traffic can be routed with either `HTTPRoute` or `GRPCRoute`. For basic
+gRPC load balancing, `GRPCRoute` is not technically required because `HTTPRoute`
+can do it. The following guidance helps you choose the right resource for your
+use case.
+
+### When HTTPRoute Is Sufficient
+
+`HTTPRoute` is sufficient when you only need basic routing and load balancing
+for gRPC traffic without gRPC-specific features. Use `HTTPRoute` when:
+
+- You need simple hostname- or path-based routing and load balancing only.
+- You do not need gRPC-aware retries or metrics (e.g. retries on gRPC status codes, gRPC-oriented metrics).
+- You must serve HTTP and gRPC on the same hostname with URI as the only
+  differentiator; in that case you must use `HTTPRoute` for both (see [Cross
+  Serving](#cross-serving) above).
+
+With `HTTPRoute`, gRPC methods are matched by specifying the gRPC path as a
+URI path (e.g. `/package.Service/Method`). With `GRPCRoute`, you match by
+service and method fields (e.g. `service: com.example.User`, `method: Login`).
+
+### When to Prefer GRPCRoute
+
+Prefer `GRPCRoute` when you need gRPC-specific behavior or better ergonomics
+for gRPC users. Use `GRPCRoute` when:
+
+- You want to match by gRPC service and method names directly (e.g.
+  `service: com.example.User`, `method: Login`) instead of URI paths.
+- You need gRPC-aware policies such as retries conditioned on gRPC status
+  codes (e.g. `CANCELLED`, `RESOURCE_EXHAUSTED`).
+- You need gRPC-oriented metrics or observability from the implementation.
+
+### Guidance for Controller Implementers
+
+Controllers that generate Routes on behalf of users (e.g. higher-level APIs
+that create Gateway API routes) should consider the following:
+
+- If you generate `HTTPRoute` for basic gRPC load balancing, consider
+  offering a `GRPCRoute` option so that users who need gRPC-specific features
+  can use them without switching to manually managing routes.
+- Do not add gRPC-specific policy (such as retries on gRPC status codes) to
+  `HTTPRoute`. Keep gRPC-aware configuration in `GRPCRoute` only.
+
 ## Spec
 
 The specification of a GRPCRoute consists of:
