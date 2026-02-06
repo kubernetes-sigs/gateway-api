@@ -24,6 +24,20 @@ The `Gateway` spec defines the following:
 If the desired configuration specified in Gateway spec cannot be achieved, the
 Gateway will be in an error state with details provided by status conditions.
 
+### Listener conflicts across Gateways
+
+Listener distinctness rules apply within a single `Gateway`. Two distinct
+`Gateway` resources MAY define identical or conflicting listeners because each
+Gateway represents an independent instance.
+
+Implementations that merge multiple Gateways onto a shared data plane SHOULD
+provide listener isolation internally so overlapping listeners do not conflict.
+If an implementation cannot isolate listener binds when merging Gateways, it
+MUST set an implementation-specific condition on the affected Gateway(s) or
+Listeners explaining the conflict. For example, setting `Programmed` or 
+`Accepted` to `False` with a reason like `Conflicted` or a custom 
+implementation-prefixed reason.
+
 ### Deployment models
 
 Depending on the `GatewayClass`, the creation of a `Gateway` could do any of
