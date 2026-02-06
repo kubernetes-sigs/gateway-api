@@ -133,9 +133,6 @@ type HTTPCORSFilterApplyConfiguration struct {
 	// the gateway will omit the `Access-Control-Allow-Methods` response header,
 	// instead of specifying the `*` wildcard.
 	//
-	// A Gateway implementation may choose to add implementation-specific
-	// default methods.
-	//
 	// Support: Extended
 	AllowMethods []apisv1.HTTPMethodWithWildcard `json:"allowMethods,omitempty"`
 	// AllowHeaders indicates which HTTP request headers are supported for
@@ -173,9 +170,6 @@ type HTTPCORSFilterApplyConfiguration struct {
 	// the header `Access-Control-Request-Headers` is not included in the
 	// request, the gateway will omit the `Access-Control-Allow-Headers`
 	// response header, instead of specifying the `*` wildcard.
-	//
-	// A Gateway implementation may choose to add implementation-specific
-	// default headers.
 	//
 	// Support: Extended
 	AllowHeaders []apisv1.HTTPHeaderName `json:"allowHeaders,omitempty"`

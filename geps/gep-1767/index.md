@@ -346,9 +346,7 @@ type HTTPCORSFilter struct {
     // as the `Access-Control-Request-Method` header provided by the client. 
     // If the header `Access-Control-Request-Method` is not included in the 
     // request, the gateway will omit the `Access-Control-Allow-Methods` 
-    // response header, instead of specifying the `*` wildcard. A Gateway 
-    // implementation may choose to add implementation-specific default 
-    // methods.
+    // response header, instead of specifying the `*` wildcard.
     //
     // Input:
     //   Access-Control-Request-Method: PUT
@@ -386,9 +384,6 @@ type HTTPCORSFilter struct {
     //
     // If any header name in the `Access-Control-Allow-Headers` response header does 
     // not recognize by the client, it will also occur an error on the client side.
-    //
-    // A Gateway implementation may choose to add implementation-specific
-    // default headers.
     //
     // Input:
     //   Access-Control-Request-Headers: Cache-Control, Content-Type
