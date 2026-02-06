@@ -37,12 +37,12 @@ var (
 	// TLSRouteFeature contains metadata for the TLSRoute feature.
 	TLSRouteFeature = Feature{
 		Name:    SupportTLSRoute,
-		Channel: FeatureChannelExperimental,
+		Channel: FeatureChannelStandard,
 	}
 	// TLSRouteModeTerminate contains metadata for the TLSRouteModeTerminate feature.
 	TLSRouteModeTerminateFeature = Feature{
 		Name:    SupportTLSRouteModeTerminate,
-		Channel: FeatureChannelExperimental,
+		Channel: FeatureChannelStandard,
 	}
 
 	// TLSRouteModeTerminate contains metadata for the TLSRouteModeTerminate feature.

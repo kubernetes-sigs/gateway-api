@@ -6,3 +6,4 @@ resources:
 - standard/gateway.networking.k8s.io_referencegrants.yaml
 - standard/gateway.networking.k8s.io_backendtlspolicies.yaml
 - standard/gateway.networking.k8s.io_listenersets.yaml
+- standard/gateway.networking.k8s.io_tlsroutes.yaml

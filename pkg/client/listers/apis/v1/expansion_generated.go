@@ -69,3 +69,11 @@ type ReferenceGrantListerExpansion interface{}
 // ReferenceGrantNamespaceListerExpansion allows custom methods to be added to
 // ReferenceGrantNamespaceLister.
 type ReferenceGrantNamespaceListerExpansion interface{}
+
+// TLSRouteListerExpansion allows custom methods to be added to
+// TLSRouteLister.
+type TLSRouteListerExpansion interface{}
+
+// TLSRouteNamespaceListerExpansion allows custom methods to be added to
+// TLSRouteNamespaceLister.
+type TLSRouteNamespaceListerExpansion interface{}

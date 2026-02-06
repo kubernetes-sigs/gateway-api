@@ -31,3 +31,5 @@ type HTTPRouteExpansion interface{}
 type ListenerSetExpansion interface{}
 
 type ReferenceGrantExpansion interface{}
+
+type TLSRouteExpansion interface{}
