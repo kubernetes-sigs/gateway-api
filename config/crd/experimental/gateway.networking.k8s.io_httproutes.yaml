@@ -516,9 +516,6 @@ spec:
                                         request, the gateway will omit the `Access-Control-Allow-Headers`
                                         response header, instead of specifying the `*` wildcard.
 
-                                        A Gateway implementation may choose to add implementation-specific
-                                        default headers.
-
                                         Support: Extended
                                       items:
                                         description: |-
@@ -582,9 +579,6 @@ spec:
                                         header `Access-Control-Request-Method` is not included in the request,
                                         the gateway will omit the `Access-Control-Allow-Methods` response header,
                                         instead of specifying the `*` wildcard.
-
-                                        A Gateway implementation may choose to add implementation-specific
-                                        default methods.
 
                                         Support: Extended
                                       items:
@@ -2025,9 +2019,6 @@ spec:
                                   request, the gateway will omit the `Access-Control-Allow-Headers`
                                   response header, instead of specifying the `*` wildcard.
 
-                                  A Gateway implementation may choose to add implementation-specific
-                                  default headers.
-
                                   Support: Extended
                                 items:
                                   description: |-
@@ -2091,9 +2082,6 @@ spec:
                                   header `Access-Control-Request-Method` is not included in the request,
                                   the gateway will omit the `Access-Control-Allow-Methods` response header,
                                   instead of specifying the `*` wildcard.
-
-                                  A Gateway implementation may choose to add implementation-specific
-                                  default methods.
 
                                   Support: Extended
                                 items:
@@ -4739,9 +4727,6 @@ spec:
                                         request, the gateway will omit the `Access-Control-Allow-Headers`
                                         response header, instead of specifying the `*` wildcard.
 
-                                        A Gateway implementation may choose to add implementation-specific
-                                        default headers.
-
                                         Support: Extended
                                       items:
                                         description: |-
@@ -4805,9 +4790,6 @@ spec:
                                         header `Access-Control-Request-Method` is not included in the request,
                                         the gateway will omit the `Access-Control-Allow-Methods` response header,
                                         instead of specifying the `*` wildcard.
-
-                                        A Gateway implementation may choose to add implementation-specific
-                                        default methods.
 
                                         Support: Extended
                                       items:
@@ -6248,9 +6230,6 @@ spec:
                                   request, the gateway will omit the `Access-Control-Allow-Headers`
                                   response header, instead of specifying the `*` wildcard.
 
-                                  A Gateway implementation may choose to add implementation-specific
-                                  default headers.
-
                                   Support: Extended
                                 items:
                                   description: |-
@@ -6314,9 +6293,6 @@ spec:
                                   header `Access-Control-Request-Method` is not included in the request,
                                   the gateway will omit the `Access-Control-Allow-Methods` response header,
                                   instead of specifying the `*` wildcard.
-
-                                  A Gateway implementation may choose to add implementation-specific
-                                  default methods.
 
                                   Support: Extended
                                 items:
