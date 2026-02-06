@@ -559,7 +559,7 @@ spec:
     filters:
     - cors:
         allowOrigins:
-        - *
+        - "*"
         allowMethods: 
         - GET
         - HEAD
