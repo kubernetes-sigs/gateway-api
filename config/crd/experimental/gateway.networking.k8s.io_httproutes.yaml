@@ -540,6 +540,10 @@ spec:
                                       maxItems: 64
                                       type: array
                                       x-kubernetes-list-type: set
+                                      x-kubernetes-validations:
+                                      - message: AllowHeaders cannot contain '*' alongside
+                                          other methods
+                                        rule: '!(''*'' in self && self.size() > 1)'
                                     allowMethods:
                                       description: |-
                                         AllowMethods indicates which HTTP methods are supported for accessing the
@@ -2064,6 +2068,10 @@ spec:
                                 maxItems: 64
                                 type: array
                                 x-kubernetes-list-type: set
+                                x-kubernetes-validations:
+                                - message: AllowHeaders cannot contain '*' alongside
+                                    other methods
+                                  rule: '!(''*'' in self && self.size() > 1)'
                               allowMethods:
                                 description: |-
                                   AllowMethods indicates which HTTP methods are supported for accessing the
@@ -4793,6 +4801,10 @@ spec:
                                       maxItems: 64
                                       type: array
                                       x-kubernetes-list-type: set
+                                      x-kubernetes-validations:
+                                      - message: AllowHeaders cannot contain '*' alongside
+                                          other methods
+                                        rule: '!(''*'' in self && self.size() > 1)'
                                     allowMethods:
                                       description: |-
                                         AllowMethods indicates which HTTP methods are supported for accessing the
@@ -6317,6 +6329,10 @@ spec:
                                 maxItems: 64
                                 type: array
                                 x-kubernetes-list-type: set
+                                x-kubernetes-validations:
+                                - message: AllowHeaders cannot contain '*' alongside
+                                    other methods
+                                  rule: '!(''*'' in self && self.size() > 1)'
                               allowMethods:
                                 description: |-
                                   AllowMethods indicates which HTTP methods are supported for accessing the

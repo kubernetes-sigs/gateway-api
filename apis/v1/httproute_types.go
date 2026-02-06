@@ -1535,6 +1535,7 @@ type HTTPCORSFilter struct {
 	//
 	// +listType=set
 	// +kubebuilder:validation:MaxItems=64
+	// +kubebuilder:validation:XValidation:message="AllowHeaders cannot contain '*' alongside other methods",rule="!('*' in self && self.size() > 1)"
 	// +optional
 	AllowHeaders []HTTPHeaderName `json:"allowHeaders,omitempty"`
 
