@@ -1515,8 +1515,10 @@ type HTTPCORSFilter struct {
 	// client side.
 	//
 	// A wildcard indicates that the requests with all HTTP headers are allowed.
-	// The `Access-Control-Allow-Headers` response header can only use `*`
-	// wildcard as value when the request is not credentialed.
+	// If config contains the wildcard "*" in allowHeaders and the request is
+	// not credentialed, the `Access-Control-Allow-Headers` response header
+	// can either use the `*` wildcard or the value of
+	// Access-Control-Request-Headers from the request.
 	//
 	// When the request is credentialed, the gateway must not specify the `*`
 	// wildcard in the `Access-Control-Allow-Headers` response header. When
