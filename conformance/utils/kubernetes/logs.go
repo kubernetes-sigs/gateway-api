@@ -32,11 +32,17 @@ import (
 // DumpEchoLogs returns logs of the echoserver pod in
 // in the given namespace and with the given name.
 func DumpEchoLogs(ns, name string, c client.Client, cs clientset.Interface, time time.Time) ([]string, error) {
+	return DumpEchoLogsWithLabels(ns, map[string]string{"app": name}, name, c, cs, time)
+}
+
+// DumpEchoLogsWithLabels returns logs of echoserver pods matching the given
+// label selector and container name.
+func DumpEchoLogsWithLabels(ns string, lbls map[string]string, container string, c client.Client, cs clientset.Interface, time time.Time) ([]string, error) {
 	var logs []string
 
 	pods := new(corev1.PodList)
 	podListOptions := &client.ListOptions{
-		LabelSelector: labels.SelectorFromSet(map[string]string{"app": name}),
+		LabelSelector: labels.SelectorFromSet(lbls),
 		Namespace:     ns,
 	}
 	if err := c.List(context.TODO(), pods, podListOptions); err != nil {
@@ -44,11 +50,10 @@ func DumpEchoLogs(ns, name string, c client.Client, cs clientset.Interface, time
 	}
 
 	podLogOptions := &corev1.PodLogOptions{
-		Container: name,
+		Container: container,
 		SinceTime: &v1.Time{Time: time},
 	}
 	for _, pod := range pods.Items {
-		// fmt.Println(pod.Name)
 		if pod.Status.Phase == corev1.PodFailed {
 			continue
 		}

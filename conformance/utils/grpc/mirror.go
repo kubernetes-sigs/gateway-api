@@ -28,7 +28,15 @@ import (
 
 // ExpectMirroredRequest validates that gRPC requests were mirrored to the specified backends
 // by checking for the gRPC-specific log pattern in the backend pod logs.
+// This uses the echo-basic log pattern ("Received over plaintext:").
 func ExpectMirroredRequest(t *testing.T, client client.Client, clientset clientset.Interface, mirrorPods []http.MirroredBackend, timeoutConfig config.TimeoutConfig) {
 	logPattern := "Received over plaintext:"
+	http.ExpectMirroredRequestWithPattern(t, client, clientset, mirrorPods, logPattern, timeoutConfig)
+}
+
+// ExpectMeshMirroredRequest validates that gRPC requests were mirrored to the specified backends
+// in a mesh environment by checking for the echo-advanced log pattern in the backend pod logs.
+func ExpectMeshMirroredRequest(t *testing.T, client client.Client, clientset clientset.Interface, mirrorPods []http.MirroredBackend, timeoutConfig config.TimeoutConfig) {
+	logPattern := "GRPC Request"
 	http.ExpectMirroredRequestWithPattern(t, client, clientset, mirrorPods, logPattern, timeoutConfig)
 }
