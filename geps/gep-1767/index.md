@@ -93,7 +93,7 @@ Content-Type: text/plain charset=UTF-8
 Content-Length: 0
 ```
 
-If the server allows it, it will respond with an OK status (i.e., 204 or 200) and the following response headers.
+If the server allows it, it MUST respond with an OK status (i.e., 204 or 200) and the following response headers.
 ```
 HTTP/1.1 204 No Content
 Access-Control-Allow-Origin: https://foo.example
@@ -123,6 +123,11 @@ Access-Control-Allow-Methods: GET, PUT, POST, DELETE, PATCH, OPTIONS
 Access-Control-Allow-Headers: DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization
 Access-Control-Expose-Headers: Content-Security-Policy
 ```
+
+While CORS specification does not explicitly deny unmatching CORS preflight requests to be sent to upstream servers, 
+a Gateway API implementation is expected to be the final authority on a CORS preflight request, so any path containing 
+a CORS filter MUST NOT pass the request to the upstream. This enforcement exists so upstream applications don't override
+any CORS configuration set on the `HTTPRoute` resource.
 
 ## API
 This GEP proposes to add a new field `HTTPCORSFilter` to `HTTPRouteFilter`.
