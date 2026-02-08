@@ -45,7 +45,7 @@ var HTTPRouteCORS = suite.ConformanceTest{
 		routeNN1 := types.NamespacedName{Name: "cors-multiple-origins-methods-headers", Namespace: ns}
 		routeNN2 := types.NamespacedName{Name: "cors-wildcard-methods", Namespace: ns}
 		routeNN3 := types.NamespacedName{Name: "cors-wildcard-origin", Namespace: ns}
-		routeNN4 := types.NamespacedName{Name: "cors-wildcard-methods-headers-auth", Namespace: ns}
+		routeNN4 := types.NamespacedName{Name: "cors-wildcard-methods-headers", Namespace: ns}
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: ns}
 		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN1, routeNN2)
 		kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN1, gwNN)
@@ -308,41 +308,13 @@ var HTTPRouteCORS = suite.ConformanceTest{
 				Namespace: "",
 				Response: http.Response{
 					StatusCodes: []int{200, 204},
+					HeadersWithMultipleValues: map[string][]string{
+						"access-control-allow-methods": {"POST", "*"},
+					},
 					Headers: map[string]string{
-						"access-control-allow-origin":  "https://www.foo.com",
-						"access-control-allow-methods": "POST",
+						"access-control-allow-origin": "https://www.foo.com",
 					},
-				},
-			},
-			{
-				TestCaseName: "CORS preflight request requested method '*' should be allowed by allowMethods with wildcard and answer with wildcard methods",
-				Request: http.Request{
-					Path:   "/cors-2",
-					Method: "OPTIONS",
-					Headers: map[string]string{
-						"Origin":                        "https://www.foo.com",
-						"access-control-request-method": "*",
-					},
-				},
-				// Set the expected request properties and namespace to empty strings.
-				// This is a workaround to avoid the test failure.
-				// The response body is empty because the request is a preflight request,
-				// so we can't get the request properties from the echoserver.
-				ExpectedRequest: &http.ExpectedRequest{
-					Request: http.Request{
-						Host:    "",
-						Method:  "OPTIONS",
-						Path:    "",
-						Headers: nil,
-					},
-				},
-				Namespace: "",
-				Response: http.Response{
-					StatusCodes: []int{200, 204},
-					Headers: map[string]string{
-						"access-control-allow-origin":  "https://www.foo.com",
-						"access-control-allow-methods": "*",
-					},
+					AbsentHeaders: []string{"access-control-allow-credentials"},
 				},
 			},
 			{
@@ -369,9 +341,7 @@ var HTTPRouteCORS = suite.ConformanceTest{
 				},
 				Namespace: "",
 				Response: http.Response{
-					AbsentHeaders: []string{
-						"access-control-allow-credentials",
-					},
+					AbsentHeaders: []string{"Access-Control-Allow-Credentials"},
 				},
 			},
 			{
@@ -406,7 +376,66 @@ var HTTPRouteCORS = suite.ConformanceTest{
 						},
 						"access-control-allow-methods": {"PUT"},
 					},
-					Headers: map[string]string{},
+					AbsentHeaders: []string{"Access-Control-Allow-Credentials"},
+				},
+			},
+			{
+				TestCaseName: "Pre-flight request from a wildcard origin containing a port should return header with '*' or with the requested Origin",
+				Namespace:    "",
+				Request: http.Request{
+					Path:   "/cors-wildcard-origin",
+					Method: "OPTIONS",
+					Headers: map[string]string{
+						"Origin":                        "https://foobar.com:12345",
+						"access-control-request-method": "PUT",
+					},
+				},
+				ExpectedRequest: &http.ExpectedRequest{
+					Request: http.Request{
+						Host:    "",
+						Method:  "OPTIONS",
+						Path:    "",
+						Headers: nil,
+					},
+				},
+				Response: http.Response{
+					StatusCodes: []int{200, 204},
+					HeadersWithMultipleValues: map[string][]string{
+						// The access-control-allow-origin for a wildcard domain depends on the implementation.
+						// Envoy enforces the return of the same requested Origin, while NGINX an others may return a "*"
+						// per the spec in case this is a non-authenticated request
+
+						"access-control-allow-origin": {
+							"https://foobar.com:12345",
+							"*",
+						},
+						"access-control-allow-methods": {"PUT"},
+					},
+					AbsentHeaders: []string{"Access-Control-Allow-Credentials"},
+				},
+			},
+			{
+				TestCaseName: "Request from a wildcard origin containing a port should return header with '*' or with the requested Origin",
+				Namespace:    ns,
+				Request: http.Request{
+					Path:   "/cors-wildcard-origin",
+					Method: "PUT",
+					Headers: map[string]string{
+						"Origin": "https://foobar.com:12345",
+					},
+				},
+				Response: http.Response{
+					StatusCodes: []int{200},
+					HeadersWithMultipleValues: map[string][]string{
+						// The access-control-allow-origin for a wildcard domain depends on the implementation.
+						// Envoy enforces the return of the same requested Origin, while NGINX an others may return a "*"
+						// per the spec in case this is a non-authenticated request
+
+						"access-control-allow-origin": {
+							"https://foobar.com:12345",
+							"*",
+						},
+					},
 				},
 			},
 			{
@@ -430,17 +459,19 @@ var HTTPRouteCORS = suite.ConformanceTest{
 							"*",
 						},
 					},
+					AbsentHeaders: []string{"Access-Control-Allow-Credentials"},
 				},
 			},
 			{
-				TestCaseName: "CORS preflight request requesting auth and specific method should be allowed",
+				TestCaseName: "CORS preflight request requesting auth and specific method and headers should be allowed and always echo the origin",
 				Request: http.Request{
 					Path:   "/cors-wildcard-methods-headers",
 					Method: "OPTIONS",
 					Headers: map[string]string{
 						"Origin":                         "https://other.foo.com",
-						"access-control-request-method":  "GET",
+						"access-control-request-method":  "PUT",
 						"access-control-request-headers": "x-header-1, x-header-2",
+						"Authorization":                  "Bearer test",
 					},
 				},
 				// Set the expected request properties and namespace to empty strings.
@@ -460,9 +491,9 @@ var HTTPRouteCORS = suite.ConformanceTest{
 					StatusCode: 200,
 					HeadersWithMultipleValues: map[string][]string{
 						"access-control-allow-origin": {"https://other.foo.com"},
-						// Credentialed with wildcard should return specific header
 						"access-control-allow-methods": {
-							"GET",
+							"PUT",
+							"*",
 						},
 						"access-control-allow-headers": {
 							"x-header-1, x-header-2",
@@ -473,6 +504,49 @@ var HTTPRouteCORS = suite.ConformanceTest{
 					// Ignore whitespace when comparing the response headers. This is because some
 					// implementations add a space after each comma, and some don't. Both are valid.
 					IgnoreWhitespace: true,
+				},
+			},
+			{
+				TestCaseName: "CORS preflight request requesting auth and specific method and headers should hide auth headers on unauth path",
+				Request: http.Request{
+					Path:   "/cors-wildcard-methods-headers-unauth",
+					Method: "OPTIONS",
+					Headers: map[string]string{
+						"Origin":                         "https://other.foo.com",
+						"access-control-request-method":  "PUT",
+						"access-control-request-headers": "x-header-1, x-header-2",
+						"Authorization":                  "Bearer test",
+					},
+				},
+				// Set the expected request properties and namespace to empty strings.
+				// This is a workaround to avoid the test failure.
+				// The response body is empty because the request is a preflight request,
+				// so we can't get the request properties from the echoserver.
+				ExpectedRequest: &http.ExpectedRequest{
+					Request: http.Request{
+						Host:    "",
+						Method:  "OPTIONS",
+						Path:    "",
+						Headers: nil,
+					},
+				},
+				Namespace: "",
+				Response: http.Response{
+					StatusCode: 200,
+					HeadersWithMultipleValues: map[string][]string{
+						"access-control-allow-origin": {"https://other.foo.com", "*"},
+						"access-control-allow-methods": {
+							"PUT",
+							"*",
+						},
+						"access-control-allow-headers": {
+							"x-header-1, x-header-2",
+							"x-header-2, x-header-1",
+						},
+					},
+					AbsentHeaders: []string{
+						"access-control-allow-credentials",
+					},
 				},
 			},
 		}
