@@ -883,7 +883,7 @@ spec:
                   minLength: 1
                   pattern: ^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                   type: string
-                maxItems: 16
+                maxItems: 4096
                 type: array
                 x-kubernetes-list-type: atomic
               parentRefs:
