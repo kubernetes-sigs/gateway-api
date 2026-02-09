@@ -145,6 +145,7 @@ other functions (like managing DNS or creating certificates).
 - [Knative][24] (alpha)
 - [Kuadrant][26] (GA)
 - [kruise-rollouts][41] (alpha)
+- [Signadot][45] (alpha)
 
 [1]:#acnodal-epic
 [2]:#apisix
@@ -189,6 +190,7 @@ other functions (like managing DNS or creating certificates).
 [42]:#gravitee-kubernetes-operator
 [43]:#alibaba-cloud-service-mesh
 [44]:#aws-load-balancer-controller
+[45]:#signadot
 
 
 [gamma]:mesh/index.md
@@ -734,6 +736,16 @@ For help and support with Kuadrant's implementation please feel free to [create 
 [kuadrant]:https://kuadrant.io/
 [kuadrant-issue-new]:https://github.com/Kuadrant/kuadrant-operator/issues/new
 [kuadrant-slack]:https://kubernetes.slack.com/archives/C05J0D0V525
+
+### Signadot
+
+[Signadot][signadot] is an ephemeral environments platform that integrates with the Gateway API to route requests to sandboxed workloads.
+When Gateway API routing is enabled, Signadot creates derived `HTTPRoute` and `GRPCRoute` resources that match on a routing key and send matching requests to sandbox backends while preserving baseline routing behavior.
+
+- [Gateway API request routing guide][signadot-gateway-api]
+
+[signadot]:https://www.signadot.com/
+[signadot-gateway-api]:https://signadot.com/docs/guides/request-routing/gateway-api
 
 ### OpenKruise Rollouts
 [OpenKruise Rollouts][kruise-rollouts] is a plugin-n-play progressive delivery controller for Kubernetes. It supports several advanced deployment methods such as blue/green and canaries. OpenKruise Rollouts has built-in support for the Gateway API.
