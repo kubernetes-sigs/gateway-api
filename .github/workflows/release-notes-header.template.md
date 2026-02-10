@@ -8,6 +8,8 @@ To install the CRDs for this release, use install ${TAG}-install.yaml:
 
 ```
 kubectl apply --server-side=true -f https://github.com/kubernetes-sigs/gateway-api/releases/download/${TAG}/${TAG}-install.yaml
+
+helm upgrade --server-side=true --install gateway-api oci://ghcr.io/kubernetes-sigs/gateway-api/crds --version ${TAG}
 ```
 
 To build using this release in Go, include this release in your go.mod:

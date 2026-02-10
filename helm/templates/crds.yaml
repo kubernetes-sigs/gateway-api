@@ -1,0 +1,1 @@
+{{ .Files.Get (printf "files/%s-install.yaml" .Values.channel) }}
