@@ -93,7 +93,7 @@ jobs:
           helm dependency update ./${{ env.CHART_DIR }}
           cp -R release helm/files
           helm package ./${{ env.CHART_DIR }} --destination ./chart --app-version ${{ steps.tag.outputs.tag }} --version ${{ steps.tag.outputs.tag }}
-          helm push ./chart/${{ github.repository }}-${{ steps.tag.outputs.tag }}.tgz oci://${{ env.HELM_REGISTRY }}/${{ github.repository_owner }}/${{ github.event.repository.name }}
+          helm push ./chart/${{ github.event.repository.name }}-${{ steps.tag.outputs.tag }}.tgz oci://${{ env.HELM_REGISTRY }}/${{ github.repository_owner }}/${{ github.event.repository.name }}
 
       - name: Release with notes
         id: release
