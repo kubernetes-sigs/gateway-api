@@ -95,13 +95,15 @@ type ExpectedRequest struct {
 // Response defines expected properties of a response from a backend.
 type Response struct {
 	// Deprecated: Use StatusCodes instead, which supports matching against multiple status codes.
-	StatusCode                int
-	StatusCodes               []int
-	Headers                   map[string]string
-	HeadersWithMultipleValues map[string][]string
-	AbsentHeaders             []string
-	Protocol                  string
-	// IgnoreWhitespace will cause whitespace to be ignored when comparing the respond
+	StatusCode  int
+	StatusCodes []int
+	Headers     map[string]string
+	// ValidHeaderValues can be used to verify when a header may have
+	// different valid values
+	ValidHeaderValues map[string][]string
+	AbsentHeaders     []string
+	Protocol          string
+	// IgnoreWhitespace will cause whitespace to be ignored when comparing the response
 	// header values.
 	IgnoreWhitespace bool
 }
@@ -374,20 +376,20 @@ func CompareRoundTrip(t *testing.T, req *roundtripper.Request, cReq *roundtrippe
 			return fmt.Errorf("expected httpPort %q, got %q", expected.ExpectedRequest.HTTPPort, cReq.HTTPPort)
 		}
 
-		if len(expected.Response.Headers) > 0 || len(expected.Response.HeadersWithMultipleValues) > 0 {
+		if len(expected.Response.Headers) > 0 || len(expected.Response.ValidHeaderValues) > 0 {
 			if cRes.Headers == nil {
 				if len(expected.Response.Headers) > 0 {
 					return fmt.Errorf("no headers captured, expected %d single-value headers", len(expected.Response.Headers))
 				}
-				if len(expected.Response.HeadersWithMultipleValues) > 0 {
-					return fmt.Errorf("no headers captured, expected %d multi-value headers", len(expected.Response.HeadersWithMultipleValues))
+				if len(expected.Response.ValidHeaderValues) > 0 {
+					return fmt.Errorf("no headers captured, expected %d multi-value headers", len(expected.Response.ValidHeaderValues))
 				}
 			}
 			for name, val := range cRes.Headers {
 				cRes.Headers[strings.ToLower(name)] = val
 			}
 
-			for name, expectedVals := range expected.Response.HeadersWithMultipleValues {
+			for name, expectedVals := range expected.Response.ValidHeaderValues {
 				actualVal, ok := cRes.Headers[strings.ToLower(name)]
 				if !ok {
 					return fmt.Errorf("expected %s header to be set, actual headers: %v", name, cRes.Headers)

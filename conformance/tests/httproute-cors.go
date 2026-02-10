@@ -80,7 +80,7 @@ var HTTPRouteCORS = suite.ConformanceTest{
 				Namespace: "",
 				Response: http.Response{
 					StatusCodes: []int{200, 204},
-					HeadersWithMultipleValues: map[string][]string{
+					ValidHeaderValues: map[string][]string{
 						"access-control-allow-origin": {"https://www.foo.com"},
 						"access-control-allow-methods": {
 							"GET, OPTIONS",
@@ -128,7 +128,7 @@ var HTTPRouteCORS = suite.ConformanceTest{
 				Namespace: "",
 				Response: http.Response{
 					StatusCode: 200,
-					HeadersWithMultipleValues: map[string][]string{
+					ValidHeaderValues: map[string][]string{
 						"access-control-allow-origin": {"https://www.bar.com"},
 						"access-control-allow-methods": {
 							"GET, OPTIONS",
@@ -176,7 +176,7 @@ var HTTPRouteCORS = suite.ConformanceTest{
 				Namespace: "",
 				Response: http.Response{
 					StatusCode: 200,
-					HeadersWithMultipleValues: map[string][]string{
+					ValidHeaderValues: map[string][]string{
 						"access-control-allow-origin": {"https://xpto.www.bar.com"},
 						"access-control-allow-methods": {
 							"GET, OPTIONS",
@@ -308,7 +308,7 @@ var HTTPRouteCORS = suite.ConformanceTest{
 				Namespace: "",
 				Response: http.Response{
 					StatusCodes: []int{200, 204},
-					HeadersWithMultipleValues: map[string][]string{
+					ValidHeaderValues: map[string][]string{
 						"access-control-allow-methods": {"POST", "*"},
 					},
 					Headers: map[string]string{
@@ -365,7 +365,7 @@ var HTTPRouteCORS = suite.ConformanceTest{
 				},
 				Response: http.Response{
 					StatusCodes: []int{200, 204},
-					HeadersWithMultipleValues: map[string][]string{
+					ValidHeaderValues: map[string][]string{
 						// The access-control-allow-origin for a wildcard domain depends on the implementation.
 						// Envoy enforces the return of the same requested Origin, while NGINX an others may return a "*"
 						// per the spec in case this is a non-authenticated request
@@ -400,7 +400,7 @@ var HTTPRouteCORS = suite.ConformanceTest{
 				},
 				Response: http.Response{
 					StatusCodes: []int{200, 204},
-					HeadersWithMultipleValues: map[string][]string{
+					ValidHeaderValues: map[string][]string{
 						// The access-control-allow-origin for a wildcard domain depends on the implementation.
 						// Envoy enforces the return of the same requested Origin, while NGINX an others may return a "*"
 						// per the spec in case this is a non-authenticated request
@@ -426,7 +426,7 @@ var HTTPRouteCORS = suite.ConformanceTest{
 				},
 				Response: http.Response{
 					StatusCodes: []int{200},
-					HeadersWithMultipleValues: map[string][]string{
+					ValidHeaderValues: map[string][]string{
 						// The access-control-allow-origin for a wildcard domain depends on the implementation.
 						// Envoy enforces the return of the same requested Origin, while NGINX an others may return a "*"
 						// per the spec in case this is a non-authenticated request
@@ -450,7 +450,7 @@ var HTTPRouteCORS = suite.ConformanceTest{
 				},
 				Response: http.Response{
 					StatusCodes: []int{200, 204},
-					HeadersWithMultipleValues: map[string][]string{
+					ValidHeaderValues: map[string][]string{
 						// The access-control-allow-origin for a wildcard domain depends on the implementation.
 						// Envoy enforces the return of the same requested Origin, while NGINX an others may return a "*"
 						// per the spec in case this is a non-authenticated request
@@ -489,7 +489,7 @@ var HTTPRouteCORS = suite.ConformanceTest{
 				Namespace: "",
 				Response: http.Response{
 					StatusCode: 200,
-					HeadersWithMultipleValues: map[string][]string{
+					ValidHeaderValues: map[string][]string{
 						"access-control-allow-origin": {"https://other.foo.com"},
 						"access-control-allow-methods": {
 							"PUT",
@@ -533,7 +533,7 @@ var HTTPRouteCORS = suite.ConformanceTest{
 				Namespace: "",
 				Response: http.Response{
 					StatusCode: 200,
-					HeadersWithMultipleValues: map[string][]string{
+					ValidHeaderValues: map[string][]string{
 						"access-control-allow-origin": {"https://other.foo.com", "*"},
 						"access-control-allow-methods": {
 							"PUT",
