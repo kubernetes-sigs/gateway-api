@@ -5316,7 +5316,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteFilter(ref common.ReferenceCa
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "HTTPRouteFilter defines processing steps that must be completed during the request or response lifecycle. HTTPRouteFilters are meant as an extension point to express processing that may be done in Gateway implementations. Some examples include request or response modification, implementing authentication strategies, rate-limiting, and traffic shaping. API guarantee/conformance is defined based on the type of the filter.\n\n<gateway:experimental:validation:XValidation:message=\"filter.cors must be nil if the filter.type is not CORS\",rule=\"!(has(self.cors) && self.type != 'CORS')\"> <gateway:experimental:validation:XValidation:message=\"filter.cors must be specified for CORS filter.type\",rule=\"!(!has(self.cors) && self.type == 'CORS')\"> <gateway:experimental:validation:XValidation:message=\"filter.externalAuth must be nil if the filter.type is not ExternalAuth\",rule=\"!(has(self.externalAuth) && self.type != 'ExternalAuth')\"> <gateway:experimental:validation:XValidation:message=\"filter.externalAuth must be specified for ExternalAuth filter.type\",rule=\"!(!has(self.externalAuth) && self.type == 'ExternalAuth')\">",
+				Description: "HTTPRouteFilter defines processing steps that must be completed during the request or response lifecycle. HTTPRouteFilters are meant as an extension point to express processing that may be done in Gateway implementations. Some examples include request or response modification, implementing authentication strategies, rate-limiting, and traffic shaping. API guarantee/conformance is defined based on the type of the filter.\n\n<gateway:experimental:validation:XValidation:message=\"filter.externalAuth must be nil if the filter.type is not ExternalAuth\",rule=\"!(has(self.externalAuth) && self.type != 'ExternalAuth')\"> <gateway:experimental:validation:XValidation:message=\"filter.externalAuth must be specified for ExternalAuth filter.type\",rule=\"!(!has(self.externalAuth) && self.type == 'ExternalAuth')\">",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"type": {
@@ -5359,7 +5359,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteFilter(ref common.ReferenceCa
 					},
 					"cors": {
 						SchemaProps: spec.SchemaProps{
-							Description: "CORS defines a schema for a filter that responds to the cross-origin request based on HTTP response header.\n\nSupport: Extended\n\n<gateway:experimental>",
+							Description: "CORS defines a schema for a filter that responds to the cross-origin request based on HTTP response header.\n\nSupport: Extended",
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.HTTPCORSFilter"),
 						},
 					},

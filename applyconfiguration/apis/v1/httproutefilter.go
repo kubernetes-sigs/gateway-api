@@ -32,8 +32,6 @@ import (
 // authentication strategies, rate-limiting, and traffic shaping. API
 // guarantee/conformance is defined based on the type of the filter.
 //
-// <gateway:experimental:validation:XValidation:message="filter.cors must be nil if the filter.type is not CORS",rule="!(has(self.cors) && self.type != 'CORS')">
-// <gateway:experimental:validation:XValidation:message="filter.cors must be specified for CORS filter.type",rule="!(!has(self.cors) && self.type == 'CORS')">
 // <gateway:experimental:validation:XValidation:message="filter.externalAuth must be nil if the filter.type is not ExternalAuth",rule="!(has(self.externalAuth) && self.type != 'ExternalAuth')">
 // <gateway:experimental:validation:XValidation:message="filter.externalAuth must be specified for ExternalAuth filter.type",rule="!(!has(self.externalAuth) && self.type == 'ExternalAuth')">
 type HTTPRouteFilterApplyConfiguration struct {
@@ -105,8 +103,6 @@ type HTTPRouteFilterApplyConfiguration struct {
 	// cross-origin request based on HTTP response header.
 	//
 	// Support: Extended
-	//
-	// <gateway:experimental>
 	CORS *HTTPCORSFilterApplyConfiguration `json:"cors,omitempty"`
 	// ExternalAuth configures settings related to sending request details
 	// to an external auth service. The external service MUST authenticate
