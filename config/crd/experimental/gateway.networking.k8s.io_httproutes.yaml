@@ -1774,6 +1774,11 @@ spec:
                               - type
                               type: object
                               x-kubernetes-validations:
+                              - message: filter.cors must be nil if the filter.type
+                                  is not CORS
+                                rule: '!(has(self.cors) && self.type != ''CORS'')'
+                              - message: filter.cors must be specified for CORS filter.type
+                                rule: '!(!has(self.cors) && self.type == ''CORS'')'
                               - message: filter.requestHeaderModifier must be nil
                                   if the filter.type is not RequestHeaderModifier
                                 rule: '!(has(self.requestHeaderModifier) && self.type
@@ -1817,11 +1822,6 @@ spec:
                               - message: filter.extensionRef must be specified for
                                   ExtensionRef filter.type
                                 rule: '!(!has(self.extensionRef) && self.type == ''ExtensionRef'')'
-                              - message: filter.cors must be nil if the filter.type
-                                  is not CORS
-                                rule: '!(has(self.cors) && self.type != ''CORS'')'
-                              - message: filter.cors must be specified for CORS filter.type
-                                rule: '!(!has(self.cors) && self.type == ''CORS'')'
                               - message: filter.externalAuth must be nil if the filter.type
                                   is not ExternalAuth
                                 rule: '!(has(self.externalAuth) && self.type != ''ExternalAuth'')'
@@ -3296,6 +3296,11 @@ spec:
                         - type
                         type: object
                         x-kubernetes-validations:
+                        - message: filter.cors must be nil if the filter.type is not
+                            CORS
+                          rule: '!(has(self.cors) && self.type != ''CORS'')'
+                        - message: filter.cors must be specified for CORS filter.type
+                          rule: '!(!has(self.cors) && self.type == ''CORS'')'
                         - message: filter.requestHeaderModifier must be nil if the
                             filter.type is not RequestHeaderModifier
                           rule: '!(has(self.requestHeaderModifier) && self.type !=
@@ -3336,11 +3341,6 @@ spec:
                         - message: filter.extensionRef must be specified for ExtensionRef
                             filter.type
                           rule: '!(!has(self.extensionRef) && self.type == ''ExtensionRef'')'
-                        - message: filter.cors must be nil if the filter.type is not
-                            CORS
-                          rule: '!(has(self.cors) && self.type != ''CORS'')'
-                        - message: filter.cors must be specified for CORS filter.type
-                          rule: '!(!has(self.cors) && self.type == ''CORS'')'
                         - message: filter.externalAuth must be nil if the filter.type
                             is not ExternalAuth
                           rule: '!(has(self.externalAuth) && self.type != ''ExternalAuth'')'
@@ -6035,6 +6035,11 @@ spec:
                               - type
                               type: object
                               x-kubernetes-validations:
+                              - message: filter.cors must be nil if the filter.type
+                                  is not CORS
+                                rule: '!(has(self.cors) && self.type != ''CORS'')'
+                              - message: filter.cors must be specified for CORS filter.type
+                                rule: '!(!has(self.cors) && self.type == ''CORS'')'
                               - message: filter.requestHeaderModifier must be nil
                                   if the filter.type is not RequestHeaderModifier
                                 rule: '!(has(self.requestHeaderModifier) && self.type
@@ -6078,11 +6083,6 @@ spec:
                               - message: filter.extensionRef must be specified for
                                   ExtensionRef filter.type
                                 rule: '!(!has(self.extensionRef) && self.type == ''ExtensionRef'')'
-                              - message: filter.cors must be nil if the filter.type
-                                  is not CORS
-                                rule: '!(has(self.cors) && self.type != ''CORS'')'
-                              - message: filter.cors must be specified for CORS filter.type
-                                rule: '!(!has(self.cors) && self.type == ''CORS'')'
                               - message: filter.externalAuth must be nil if the filter.type
                                   is not ExternalAuth
                                 rule: '!(has(self.externalAuth) && self.type != ''ExternalAuth'')'
@@ -7557,6 +7557,11 @@ spec:
                         - type
                         type: object
                         x-kubernetes-validations:
+                        - message: filter.cors must be nil if the filter.type is not
+                            CORS
+                          rule: '!(has(self.cors) && self.type != ''CORS'')'
+                        - message: filter.cors must be specified for CORS filter.type
+                          rule: '!(!has(self.cors) && self.type == ''CORS'')'
                         - message: filter.requestHeaderModifier must be nil if the
                             filter.type is not RequestHeaderModifier
                           rule: '!(has(self.requestHeaderModifier) && self.type !=
@@ -7597,11 +7602,6 @@ spec:
                         - message: filter.extensionRef must be specified for ExtensionRef
                             filter.type
                           rule: '!(!has(self.extensionRef) && self.type == ''ExtensionRef'')'
-                        - message: filter.cors must be nil if the filter.type is not
-                            CORS
-                          rule: '!(has(self.cors) && self.type != ''CORS'')'
-                        - message: filter.cors must be specified for CORS filter.type
-                          rule: '!(!has(self.cors) && self.type == ''CORS'')'
                         - message: filter.externalAuth must be nil if the filter.type
                             is not ExternalAuth
                           rule: '!(has(self.externalAuth) && self.type != ''ExternalAuth'')'
