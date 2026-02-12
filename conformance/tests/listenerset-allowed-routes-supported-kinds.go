@@ -56,17 +56,13 @@ var ListenerSetAllowedRoutesSupportedKinds = suite.ConformanceTest{
 
 		// Verify the listenerSet listener has the appropriate conditions
 		lsNN := types.NamespacedName{Name: "listenerset-test-allowed-routes-supported-kinds", Namespace: ns}
-		kubernetes.ListenerSetStatusMustHaveListeners(t, suite.Client, suite.TimeoutConfig, lsNN, []gatewayv1.ListenerEntryStatus{
-			{
-				Name: "listener-set-listener-allowed-routes-tls-only",
-				Conditions: []metav1.Condition{
-					{
-						Type:   string(gatewayv1.ListenerConditionResolvedRefs),
-						Status: metav1.ConditionFalse,
-						Reason: string(gatewayv1.ListenerReasonInvalidRouteKinds),
-					},
+		kubernetes.ListenerSetListenersMustHaveConditions(t, suite.Client, suite.TimeoutConfig, lsNN,
+			[]metav1.Condition{
+				{
+					Type:   string(gatewayv1.ListenerConditionResolvedRefs),
+					Status: metav1.ConditionFalse,
+					Reason: string(gatewayv1.ListenerReasonInvalidRouteKinds),
 				},
-			},
-		})
+			}, "listener-set-listener-allowed-routes-tls-only")
 	},
 }
