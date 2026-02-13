@@ -126,12 +126,12 @@ var (
 	// GatewayBackendClientCertificateFeature contains metadata for the SupportGatewayBackendClientCertificate feature.
 	GatewayBackendClientCertificateFeature = Feature{
 		Name:    SupportGatewayBackendClientCertificate,
-		Channel: FeatureChannelExperimental,
+		Channel: FeatureChannelStandard,
 	}
 	// GatewayFrontendClientCertificateValidationFeature contains metadata for the GatewayFrontendClientCertificateValidation feature.
 	GatewayFrontendClientCertificateValidationFeature = Feature{
 		Name:    SupportGatewayFrontendClientCertificateValidation,
-		Channel: FeatureChannelExperimental,
+		Channel: FeatureChannelStandard,
 	}
 )
 
