@@ -1633,7 +1633,6 @@ spec:
                   - attachedRoutes
                   - conditions
                   - name
-                  - supportedKinds
                   type: object
                 maxItems: 64
                 type: array
@@ -3262,7 +3261,6 @@ spec:
                   - attachedRoutes
                   - conditions
                   - name
-                  - supportedKinds
                   type: object
                 maxItems: 64
                 type: array

@@ -5997,7 +5997,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_ListenerEntryStatus(ref common.Referen
 						},
 					},
 				},
-				Required: []string{"name", "supportedKinds", "attachedRoutes", "conditions"},
+				Required: []string{"name", "attachedRoutes", "conditions"},
 			},
 		},
 		Dependencies: []string{
@@ -6299,7 +6299,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_ListenerStatus(ref common.ReferenceCal
 						},
 					},
 				},
-				Required: []string{"name", "supportedKinds", "attachedRoutes", "conditions"},
+				Required: []string{"name", "attachedRoutes", "conditions"},
 			},
 		},
 		Dependencies: []string{
