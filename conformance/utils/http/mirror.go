@@ -33,27 +33,44 @@ import (
 )
 
 func ExpectMirroredRequest(t *testing.T, client client.Client, clientset clientset.Interface, mirrorPods []MirroredBackend, path string, timeoutConfig config.TimeoutConfig) {
+	logPattern := fmt.Sprintf("Echoing back request made to \\%s to client", path)
+	ExpectMirroredRequestWithPattern(t, client, clientset, mirrorPods, logPattern, timeoutConfig)
+}
+
+// ExpectMirroredRequestWithPattern validates that requests were mirrored to the specified backends
+// by checking for the given log pattern in the backend pod logs.
+func ExpectMirroredRequestWithPattern(t *testing.T, client client.Client, clientset clientset.Interface, mirrorPods []MirroredBackend, logPattern string, timeoutConfig config.TimeoutConfig) {
+	assertionStart := time.Now()
 	for i, mirrorPod := range mirrorPods {
 		if mirrorPod.Name == "" {
-			tlog.Fatalf(t, "Mirrored BackendRef[%d].Name wasn't provided in the testcase, this test should only check http request mirror.", i)
+			tlog.Fatalf(t, "Mirrored BackendRef[%d].Name wasn't provided in the testcase, this test should only validate request mirroring.", i)
 		}
 	}
 
 	var wg sync.WaitGroup
 	wg.Add(len(mirrorPods))
 
-	assertionStart := time.Now()
-
 	for _, mirrorPod := range mirrorPods {
 		go func(mirrorPod MirroredBackend) {
 			defer wg.Done()
 
 			require.Eventually(t, func() bool {
-				mirrorLogRegexp := regexp.MustCompile(fmt.Sprintf("Echoing back request made to \\%s to client", path))
+				mirrorLogRegexp := regexp.MustCompile(logPattern)
 
 				tlog.Log(t, "Searching for the mirrored request log")
 				tlog.Logf(t, `Reading "%s/%s" logs`, mirrorPod.Namespace, mirrorPod.Name)
-				logs, err := kubernetes.DumpEchoLogs(mirrorPod.Namespace, mirrorPod.Name, client, clientset, assertionStart)
+
+				var logs []string
+				var err error
+				if len(mirrorPod.Labels) > 0 {
+					container := mirrorPod.Container
+					if container == "" {
+						container = mirrorPod.Name
+					}
+					logs, err = kubernetes.DumpEchoLogsWithLabels(mirrorPod.Namespace, mirrorPod.Labels, container, client, clientset, assertionStart)
+				} else {
+					logs, err = kubernetes.DumpEchoLogs(mirrorPod.Namespace, mirrorPod.Name, client, clientset, assertionStart)
+				}
 				if err != nil {
 					tlog.Logf(t, `Couldn't read "%s/%s" logs: %v`, mirrorPod.Namespace, mirrorPod.Name, err)
 					return false
