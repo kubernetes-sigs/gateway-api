@@ -15,13 +15,13 @@ spec:
       resources:   ["*"]
   validations:
     - expression: "object.spec.group != 'gateway.networking.k8s.io' || (
-        has(object.metadata.annotations) && object.metadata.annotations.exists(k, k == 'gateway.networking.k8s.io/channel') && 
+        has(object.metadata.annotations) && object.metadata.annotations.exists(k, k == 'gateway.networking.k8s.io/channel') &&
         object.metadata.annotations['gateway.networking.k8s.io/channel'] == 'standard' )"
       message: "Installing experimental CRDs on top of standard channel CRDs is prohibited by default. Uninstall ValidatingAdmissionPolicy safe-upgrades.gateway.networking.k8s.io to install experimental CRDs on top of standard channel CRDs."
       reason: Invalid
-    - expression: "object.spec.group != 'gateway.networking.k8s.io' || 
-        (has(object.metadata.annotations) && object.metadata.annotations.exists(k, k == 'gateway.networking.k8s.io/bundle-version') && 
-        !matches(object.metadata.annotations['gateway.networking.k8s.io/bundle-version'], 'v1.[0-3].\\\\d+') &&
+    - expression: "object.spec.group != 'gateway.networking.k8s.io' ||
+        (has(object.metadata.annotations) && object.metadata.annotations.exists(k, k == 'gateway.networking.k8s.io/bundle-version') &&
+        !matches(object.metadata.annotations['gateway.networking.k8s.io/bundle-version'], 'v1.[0-4].\\\\d+') &&
         !matches(object.metadata.annotations['gateway.networking.k8s.io/bundle-version'], 'v0'))" #TODO Kubernetes 1.37: Migrate to kubernetes semver library
       message: "Installing CRDs with version before v1.5.0 is prohibited by default. Uninstall ValidatingAdmissionPolicy safe-upgrades.gateway.networking.k8s.io to install older versions."
       reason: Invalid
