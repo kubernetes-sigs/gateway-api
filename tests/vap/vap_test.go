@@ -155,7 +155,7 @@ func TestVAPValidation(t *testing.T) {
 		httpCrd, err := os.ReadFile(filepath.Join("..", "..", "config", "crd", "standard", "gateway.networking.k8s.io_httproutes.yaml"))
 		require.NoError(t, err)
 
-		// do replace on gateway.networking.k8s.io/bundle-version: v1.4.0
+		// do replace on gateway.networking.k8s.io/bundle-version: v1.x.0
 		re := regexp.MustCompile(`gateway\.networking\.k8s\.io\/bundle-version: \S*`)
 		sub := []byte("gateway.networking.k8s.io/bundle-version: v1.3.0")
 		oldCrd := re.ReplaceAll(httpCrd, sub)
@@ -174,7 +174,7 @@ func executeKubectlCommand(t *testing.T, kubectl, kubeconfig string, args []stri
 	cacheDir := filepath.Dir(kubeconfig)
 	args = append([]string{"--cache-dir", cacheDir}, args...)
 
-	cmd := exec.Command(kubectl, args...)
+	cmd := exec.CommandContext(t.Context(), kubectl, args...)
 	cmd.Env = []string{
 		fmt.Sprintf("KUBECONFIG=%s", kubeconfig),
 	}
@@ -189,7 +189,7 @@ func executeKubectlCommandStdin(t *testing.T, kubectl, kubeconfig string, stdin 
 	cacheDir := filepath.Dir(kubeconfig)
 	args = append([]string{"--cache-dir", cacheDir}, args...)
 
-	cmd := exec.Command(kubectl, args...)
+	cmd := exec.CommandContext(t.Context(), kubectl, args...)
 	cmd.Env = []string{
 		fmt.Sprintf("KUBECONFIG=%s", kubeconfig),
 	}
