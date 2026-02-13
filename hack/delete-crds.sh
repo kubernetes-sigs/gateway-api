@@ -26,3 +26,6 @@ for TYPE in ${RESOURCES}; do
   kubectl delete ${TYPE} --all
   kubectl delete crd/${TYPE}
 done
+
+kubectl delete ValidatingAdmissionPolicy/safe-upgrades.gateway.networking.k8s.io
+kubectl delete ValidatingAdmissionPolicyBinding/safe-upgrades.gateway.networking.k8s.io
