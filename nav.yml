@@ -11,6 +11,7 @@ nav:
           - Use Cases: concepts/use-cases.md
           - Versioning: concepts/versioning.md
           - Traffic Matching: concepts/traffic-matching.md
+          - Hostnames: concepts/hostnames.md
       - Service Mesh:
           - Overview: mesh/index.md
           - GAMMA Initiative: mesh/gamma.md
