@@ -529,7 +529,7 @@ func (suite *ConformanceTestSuite) Run(t *testing.T, tests []ConformanceTest) er
 			suite.Hook(t, test, suite)
 		}
 
-		if suite.failFast {
+		if suite.failFast && res == testFailed {
 			break
 		}
 	}
