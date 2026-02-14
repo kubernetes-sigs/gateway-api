@@ -75,15 +75,18 @@ type GatewaySpec struct {
 	//
 	// ## Distinct Listeners
 	//
-	// Each Listener in a set of Listeners (for example, in a single Gateway)
-	// MUST be _distinct_, in that a traffic flow MUST be able to be assigned to
-	// exactly one listener. (This section uses "set of Listeners" rather than
-	// "Listeners in a single Gateway" because implementations MAY merge configuration
-	// from multiple Gateways onto a single data plane, and these rules _also_
-	// apply in that case).
+	// Each Listener in a Gateway's set of Listeners MUST be _distinct_, in that a
+	// traffic flow MUST be able to be assigned to exactly one listener.
 	//
-	// Practically, this means that each listener in a set MUST have a unique
+	// Practically, this means that each listener within a Gateway MUST have a unique
 	// combination of Port, Protocol, and, if supported by the protocol, Hostname.
+	//
+	// Separate Gateways MAY define identical or conflicting Listeners because each
+	// Gateway is an independent instance. Implementations that merge multiple
+	// Gateways onto a single data plane SHOULD implement listener isolation
+	// internally. If an implementation cannot isolate listener binds when merging
+	// Gateways, it MUST set an implementation-specific condition on the affected
+	// Gateway(s) explaining the conflict.
 	//
 	// Some combinations of port, protocol, and TLS settings are considered
 	// Core support and MUST be supported by implementations based on the objects
@@ -1440,9 +1443,9 @@ type ListenerConditionReason string
 
 const (
 	// This condition indicates that the controller was unable to resolve
-	// conflicting specification requirements for this Listener. If a
-	// Listener is conflicted, its network port should not be configured
-	// on any network elements.
+	// conflicting specification requirements for this Listener within the
+	// Gateway. If a Listener is conflicted, its network port should not be
+	// configured on any network elements.
 	//
 	// Possible reasons for this condition to be true are:
 	//
