@@ -23,7 +23,7 @@ import (
 
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
-	"sigs.k8s.io/gateway-api/conformance/utils/suite"
+	confsuite "sigs.k8s.io/gateway-api/conformance/utils/suite"
 	"sigs.k8s.io/gateway-api/pkg/features"
 )
 
@@ -31,7 +31,7 @@ func init() {
 	ConformanceTests = append(ConformanceTests, HTTPRouteResponseHeaderModifier)
 }
 
-var HTTPRouteResponseHeaderModifier = suite.ConformanceTest{
+var HTTPRouteResponseHeaderModifier = confsuite.ConformanceTest{
 	ShortName:   "HTTPRouteResponseHeaderModifier",
 	Description: "An HTTPRoute has response header modifier filters applied correctly",
 	Features: []features.FeatureName{
@@ -40,8 +40,8 @@ var HTTPRouteResponseHeaderModifier = suite.ConformanceTest{
 		features.SupportHTTPRouteResponseHeaderModification,
 	},
 	Manifests: []string{"tests/httproute-response-header-modifier.yaml"},
-	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
-		ns := "gateway-conformance-infra"
+	Test: func(t *testing.T, suite *confsuite.ConformanceTestSuite) {
+		ns := confsuite.InfrastructureNamespace
 		routeNN := types.NamespacedName{Name: "response-header-modifier", Namespace: ns}
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: ns}
 		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)

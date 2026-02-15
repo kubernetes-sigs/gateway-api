@@ -44,14 +44,14 @@ var HTTPRouteObservedGenerationBump = suite.ConformanceTest{
 	},
 	Manifests: []string{"tests/httproute-observed-generation-bump.yaml"},
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
-		routeNN := types.NamespacedName{Name: "observed-generation-bump", Namespace: "gateway-conformance-infra"}
-		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: "gateway-conformance-infra"}
+		routeNN := types.NamespacedName{Name: "observed-generation-bump", Namespace: suite.InfrastructureNamespace}
+		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: suite.InfrastructureNamespace}
 
 		t.Run("observedGeneration should increment", func(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.Background(), s.TimeoutConfig.LatestObservedGenerationSet)
 			defer cancel()
 
-			namespaces := []string{"gateway-conformance-infra"}
+			namespaces := []string{suite.InfrastructureNamespace}
 			kubernetes.NamespacesMustBeReady(t, s.Client, s.TimeoutConfig, namespaces)
 
 			original := &v1.HTTPRoute{}

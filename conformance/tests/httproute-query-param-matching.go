@@ -23,7 +23,7 @@ import (
 
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
-	"sigs.k8s.io/gateway-api/conformance/utils/suite"
+	confsuite "sigs.k8s.io/gateway-api/conformance/utils/suite"
 	"sigs.k8s.io/gateway-api/pkg/features"
 )
 
@@ -31,7 +31,7 @@ func init() {
 	ConformanceTests = append(ConformanceTests, HTTPRouteQueryParamMatching)
 }
 
-var HTTPRouteQueryParamMatching = suite.ConformanceTest{
+var HTTPRouteQueryParamMatching = confsuite.ConformanceTest{
 	ShortName:   "HTTPRouteQueryParamMatching",
 	Description: "A single HTTPRoute with query param matching for different backends",
 	Manifests:   []string{"tests/httproute-query-param-matching.yaml"},
@@ -40,8 +40,8 @@ var HTTPRouteQueryParamMatching = suite.ConformanceTest{
 		features.SupportHTTPRoute,
 		features.SupportHTTPRouteQueryParamMatching,
 	},
-	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
-		ns := "gateway-conformance-infra"
+	Test: func(t *testing.T, suite *confsuite.ConformanceTestSuite) {
+		ns := confsuite.InfrastructureNamespace
 		routeNN := types.NamespacedName{Namespace: ns, Name: "query-param-matching"}
 		gwNN := types.NamespacedName{Namespace: ns, Name: "same-namespace"}
 		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)

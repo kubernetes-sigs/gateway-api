@@ -23,7 +23,7 @@ import (
 
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
-	"sigs.k8s.io/gateway-api/conformance/utils/suite"
+	confsuite "sigs.k8s.io/gateway-api/conformance/utils/suite"
 	"sigs.k8s.io/gateway-api/pkg/features"
 )
 
@@ -31,7 +31,7 @@ func init() {
 	ConformanceTests = append(ConformanceTests, GatewayHTTPListenerIsolation)
 }
 
-var GatewayHTTPListenerIsolation = suite.ConformanceTest{
+var GatewayHTTPListenerIsolation = confsuite.ConformanceTest{
 	ShortName:   "GatewayHTTPListenerIsolation",
 	Description: "Listener isolation for HTTP listeners with multiple listeners and HTTPRoutes",
 	Features: []features.FeatureName{
@@ -43,8 +43,8 @@ var GatewayHTTPListenerIsolation = suite.ConformanceTest{
 		"tests/gateway-http-listener-isolation.yaml",
 		"tests/gateway-http-listener-isolation-with-hostname-intersection.yaml",
 	},
-	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
-		ns := "gateway-conformance-infra"
+	Test: func(t *testing.T, suite *confsuite.ConformanceTestSuite) {
+		ns := confsuite.InfrastructureNamespace
 
 		kubernetes.NamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, []string{ns})
 

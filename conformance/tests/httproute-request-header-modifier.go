@@ -23,7 +23,7 @@ import (
 
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
-	"sigs.k8s.io/gateway-api/conformance/utils/suite"
+	confsuite "sigs.k8s.io/gateway-api/conformance/utils/suite"
 	"sigs.k8s.io/gateway-api/pkg/features"
 )
 
@@ -34,7 +34,7 @@ func init() {
 	)
 }
 
-var HTTPRouteBackendRequestHeaderModifier = suite.ConformanceTest{
+var HTTPRouteBackendRequestHeaderModifier = confsuite.ConformanceTest{
 	ShortName:   "HTTPRouteBackendRequestHeaderModifier",
 	Description: "An HTTPRoute backend has request header modifier filters applied correctly",
 	Features: []features.FeatureName{
@@ -46,7 +46,7 @@ var HTTPRouteBackendRequestHeaderModifier = suite.ConformanceTest{
 	Test:      HTTPRouteRequestHeaderModifier.Test,
 }
 
-var HTTPRouteRequestHeaderModifier = suite.ConformanceTest{
+var HTTPRouteRequestHeaderModifier = confsuite.ConformanceTest{
 	ShortName:   "HTTPRouteRequestHeaderModifier",
 	Description: "An HTTPRoute has request header modifier filters applied correctly",
 	Features: []features.FeatureName{
@@ -54,8 +54,8 @@ var HTTPRouteRequestHeaderModifier = suite.ConformanceTest{
 		features.SupportHTTPRoute,
 	},
 	Manifests: []string{"tests/httproute-request-header-modifier.yaml"},
-	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
-		ns := "gateway-conformance-infra"
+	Test: func(t *testing.T, suite *confsuite.ConformanceTestSuite) {
+		ns := confsuite.InfrastructureNamespace
 		routeNN := types.NamespacedName{Name: "request-header-modifier", Namespace: ns}
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: ns}
 		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
