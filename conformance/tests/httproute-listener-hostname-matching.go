@@ -23,7 +23,7 @@ import (
 
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
-	"sigs.k8s.io/gateway-api/conformance/utils/suite"
+	confsuite "sigs.k8s.io/gateway-api/conformance/utils/suite"
 	"sigs.k8s.io/gateway-api/pkg/features"
 )
 
@@ -31,7 +31,7 @@ func init() {
 	ConformanceTests = append(ConformanceTests, HTTPRouteListenerHostnameMatching)
 }
 
-var HTTPRouteListenerHostnameMatching = suite.ConformanceTest{
+var HTTPRouteListenerHostnameMatching = confsuite.ConformanceTest{
 	ShortName:   "HTTPRouteListenerHostnameMatching",
 	Description: "Multiple HTTP listeners with the same port and different hostnames, each with a different HTTPRoute",
 	Features: []features.FeatureName{
@@ -39,8 +39,8 @@ var HTTPRouteListenerHostnameMatching = suite.ConformanceTest{
 		features.SupportHTTPRoute,
 	},
 	Manifests: []string{"tests/httproute-listener-hostname-matching.yaml"},
-	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
-		ns := "gateway-conformance-infra"
+	Test: func(t *testing.T, suite *confsuite.ConformanceTestSuite) {
+		ns := confsuite.InfrastructureNamespace
 
 		// This test creates an additional Gateway in the gateway-conformance-infra
 		// namespace so we have to wait for it to be ready.

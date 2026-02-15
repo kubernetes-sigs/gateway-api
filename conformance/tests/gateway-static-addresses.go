@@ -67,7 +67,7 @@ var GatewayStaticAddresses = suite.ConformanceTest{
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
 		gwNN := types.NamespacedName{
 			Name:      "gateway-static-addresses",
-			Namespace: "gateway-conformance-infra",
+			Namespace: suite.InfrastructureNamespace,
 		}
 		ctx, cancel := context.WithTimeout(context.Background(), s.TimeoutConfig.DefaultTestTimeout)
 		defer cancel()

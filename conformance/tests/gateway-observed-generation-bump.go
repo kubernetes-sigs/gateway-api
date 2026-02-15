@@ -43,10 +43,10 @@ var GatewayObservedGenerationBump = suite.ConformanceTest{
 	},
 	Manifests: []string{"tests/gateway-observed-generation-bump.yaml"},
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
-		gwNN := types.NamespacedName{Name: "gateway-observed-generation-bump", Namespace: "gateway-conformance-infra"}
+		gwNN := types.NamespacedName{Name: "gateway-observed-generation-bump", Namespace: suite.InfrastructureNamespace}
 
 		t.Run("observedGeneration should increment", func(t *testing.T) {
-			namespaces := []string{"gateway-conformance-infra"}
+			namespaces := []string{suite.InfrastructureNamespace}
 			kubernetes.NamespacesMustBeReady(t, s.Client, s.TimeoutConfig, namespaces)
 
 			// Sanity check

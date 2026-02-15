@@ -45,13 +45,13 @@ var GatewayOptionalAddressValue = suite.ConformanceTest{
 		"tests/gateway-optional-address-value.yaml",
 	},
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
-		ns := "gateway-conformance-infra"
+		ns := suite.InfrastructureNamespace
 
 		kubernetes.NamespacesMustBeReady(t, s.Client, s.TimeoutConfig, []string{ns})
 
 		gwNN := types.NamespacedName{
 			Name:      "gateway-without-address-value",
-			Namespace: "gateway-conformance-infra",
+			Namespace: suite.InfrastructureNamespace,
 		}
 		ctx, cancel := context.WithTimeout(context.Background(), s.TimeoutConfig.DefaultTestTimeout)
 		defer cancel()

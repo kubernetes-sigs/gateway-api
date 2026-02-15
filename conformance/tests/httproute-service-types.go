@@ -33,7 +33,7 @@ import (
 
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
-	"sigs.k8s.io/gateway-api/conformance/utils/suite"
+	confsuite "sigs.k8s.io/gateway-api/conformance/utils/suite"
 	"sigs.k8s.io/gateway-api/pkg/features"
 )
 
@@ -41,7 +41,7 @@ func init() {
 	ConformanceTests = append(ConformanceTests, HTTPRouteServiceTypes)
 }
 
-var HTTPRouteServiceTypes = suite.ConformanceTest{
+var HTTPRouteServiceTypes = confsuite.ConformanceTest{
 	ShortName:   "HTTPRouteServiceTypes",
 	Description: "A single HTTPRoute should be able to route traffic to various service type backends",
 	Features: []features.FeatureName{
@@ -49,7 +49,7 @@ var HTTPRouteServiceTypes = suite.ConformanceTest{
 		features.SupportHTTPRoute,
 	},
 	Manifests: []string{"tests/httproute-service-types.yaml"},
-	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
+	Test: func(t *testing.T, suite *confsuite.ConformanceTestSuite) {
 		var (
 			typeManualEndpointSlices = []string{
 				"manual-endpointslices",
@@ -63,7 +63,7 @@ var HTTPRouteServiceTypes = suite.ConformanceTest{
 			serviceTypes = make([]string, 0, len(typeManualEndpointSlices)+len(typeManaged))
 
 			ctx     = context.TODO()
-			ns      = "gateway-conformance-infra"
+			ns      = confsuite.InfrastructureNamespace
 			routeNN = types.NamespacedName{Name: "service-types", Namespace: ns}
 			gwNN    = types.NamespacedName{Name: "same-namespace", Namespace: ns}
 		)
@@ -94,7 +94,7 @@ var HTTPRouteServiceTypes = suite.ConformanceTest{
 				Request:   http.Request{Path: "/" + path},
 				Response:  http.Response{StatusCode: 200},
 				Backend:   "infra-backend-v1",
-				Namespace: "gateway-conformance-infra",
+				Namespace: confsuite.InfrastructureNamespace,
 			}
 
 			t.Run(expected.GetTestCaseName(i), func(t *testing.T) {

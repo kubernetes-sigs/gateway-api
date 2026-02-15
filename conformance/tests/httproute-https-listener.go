@@ -23,7 +23,7 @@ import (
 
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
-	"sigs.k8s.io/gateway-api/conformance/utils/suite"
+	confsuite "sigs.k8s.io/gateway-api/conformance/utils/suite"
 	"sigs.k8s.io/gateway-api/conformance/utils/tls"
 	"sigs.k8s.io/gateway-api/pkg/features"
 )
@@ -32,7 +32,7 @@ func init() {
 	ConformanceTests = append(ConformanceTests, HTTPRouteHTTPSListener)
 }
 
-var HTTPRouteHTTPSListener = suite.ConformanceTest{
+var HTTPRouteHTTPSListener = confsuite.ConformanceTest{
 	ShortName:   "HTTPRouteHTTPSListener",
 	Description: "HTTPRoute attaches to a Gateway's HTTPS listener in the same namespace",
 	Features: []features.FeatureName{
@@ -40,8 +40,8 @@ var HTTPRouteHTTPSListener = suite.ConformanceTest{
 		features.SupportHTTPRoute,
 	},
 	Manifests: []string{"tests/httproute-https-listener.yaml"},
-	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
-		ns := "gateway-conformance-infra"
+	Test: func(t *testing.T, suite *confsuite.ConformanceTestSuite) {
+		ns := confsuite.InfrastructureNamespace
 		routeNN := types.NamespacedName{Name: "httproute-https-test", Namespace: ns}
 		routeNoHostNN := types.NamespacedName{Name: "httproute-https-test-no-hostname", Namespace: ns}
 
@@ -71,7 +71,7 @@ var HTTPRouteHTTPSListener = suite.ConformanceTest{
 				Request:   http.Request{Host: tc.host, Path: "/"},
 				Response:  http.Response{StatusCode: tc.statusCode},
 				Backend:   tc.backend,
-				Namespace: "gateway-conformance-infra",
+				Namespace: confsuite.InfrastructureNamespace,
 			}
 			t.Run(expected.GetTestCaseName(i), func(t *testing.T) {
 				tls.MakeTLSRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, serverCertPem, nil, nil, tc.host, expected)

@@ -24,7 +24,7 @@ import (
 	"sigs.k8s.io/gateway-api/apis/v1beta1"
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
-	"sigs.k8s.io/gateway-api/conformance/utils/suite"
+	confsuite "sigs.k8s.io/gateway-api/conformance/utils/suite"
 	"sigs.k8s.io/gateway-api/pkg/features"
 )
 
@@ -32,7 +32,7 @@ func init() {
 	ConformanceTests = append(ConformanceTests, HTTPRouteSimpleSameNamespace)
 }
 
-var HTTPRouteSimpleSameNamespace = suite.ConformanceTest{
+var HTTPRouteSimpleSameNamespace = confsuite.ConformanceTest{
 	ShortName:   "HTTPRouteSimpleSameNamespace",
 	Description: "A single HTTPRoute in the gateway-conformance-infra namespace attaches to a Gateway in the same namespace",
 	Features: []features.FeatureName{
@@ -40,9 +40,9 @@ var HTTPRouteSimpleSameNamespace = suite.ConformanceTest{
 		features.SupportHTTPRoute,
 	},
 	Manifests: []string{"tests/httproute-simple-same-namespace.yaml"},
-	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
-		ns := v1beta1.Namespace("gateway-conformance-infra")
-		routeNN := types.NamespacedName{Name: "gateway-conformance-infra-test", Namespace: string(ns)}
+	Test: func(t *testing.T, suite *confsuite.ConformanceTestSuite) {
+		ns := v1beta1.Namespace(confsuite.InfrastructureNamespace)
+		routeNN := types.NamespacedName{Name: confsuite.InfrastructureGatewayName, Namespace: string(ns)}
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: string(ns)}
 		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
 		kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN)
@@ -52,7 +52,7 @@ var HTTPRouteSimpleSameNamespace = suite.ConformanceTest{
 				Request:   http.Request{Path: "/"},
 				Response:  http.Response{StatusCode: 200},
 				Backend:   "infra-backend-v1",
-				Namespace: "gateway-conformance-infra",
+				Namespace: confsuite.InfrastructureNamespace,
 			})
 		})
 	},

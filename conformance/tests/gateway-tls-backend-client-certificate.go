@@ -25,7 +25,7 @@ import (
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	h "sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
-	"sigs.k8s.io/gateway-api/conformance/utils/suite"
+	confsuite "sigs.k8s.io/gateway-api/conformance/utils/suite"
 	"sigs.k8s.io/gateway-api/pkg/features"
 )
 
@@ -33,7 +33,7 @@ func init() {
 	ConformanceTests = append(ConformanceTests, GatewayTLSBackendClientCertificate)
 }
 
-var GatewayTLSBackendClientCertificate = suite.ConformanceTest{
+var GatewayTLSBackendClientCertificate = confsuite.ConformanceTest{
 	ShortName:   "GatewayBackendClientCertificateFeature",
 	Description: "A Gateway with a client certificate configured should present the certificate when connecting to a backend using TLS.",
 	Features: []features.FeatureName{
@@ -43,8 +43,8 @@ var GatewayTLSBackendClientCertificate = suite.ConformanceTest{
 		features.SupportBackendTLSPolicy,
 	},
 	Manifests: []string{"tests/gateway-tls-backend-client-certificate.yaml"},
-	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
-		ns := "gateway-conformance-infra"
+	Test: func(t *testing.T, suite *confsuite.ConformanceTestSuite) {
+		ns := confsuite.InfrastructureNamespace
 
 		routeNN := types.NamespacedName{Name: "gateway-tls-backend-client-certificate", Namespace: ns}
 		gwNN := types.NamespacedName{Name: "gateway-tls-backend-client-certificate", Namespace: ns}

@@ -29,7 +29,7 @@ import (
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	h "sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
-	"sigs.k8s.io/gateway-api/conformance/utils/suite"
+	confsuite "sigs.k8s.io/gateway-api/conformance/utils/suite"
 	"sigs.k8s.io/gateway-api/conformance/utils/tls"
 	"sigs.k8s.io/gateway-api/pkg/features"
 )
@@ -38,7 +38,7 @@ func init() {
 	ConformanceTests = append(ConformanceTests, BackendTLSPolicy)
 }
 
-var BackendTLSPolicy = suite.ConformanceTest{
+var BackendTLSPolicy = confsuite.ConformanceTest{
 	ShortName:   "BackendTLSPolicy",
 	Description: "BackendTLSPolicy must be used to configure TLS connection between gateway and backend",
 	Features: []features.FeatureName{
@@ -47,8 +47,8 @@ var BackendTLSPolicy = suite.ConformanceTest{
 		features.SupportBackendTLSPolicy,
 	},
 	Manifests: []string{"tests/backendtlspolicy.yaml"},
-	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
-		ns := "gateway-conformance-infra"
+	Test: func(t *testing.T, suite *confsuite.ConformanceTestSuite) {
+		ns := confsuite.InfrastructureNamespace
 
 		acceptedCond := metav1.Condition{
 			Type:   string(gatewayv1.PolicyConditionAccepted),
