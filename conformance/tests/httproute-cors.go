@@ -369,7 +369,6 @@ var HTTPRouteCORS = suite.ConformanceTest{
 						// The access-control-allow-origin for a wildcard domain depends on the implementation.
 						// Envoy enforces the return of the same requested Origin, while NGINX an others may return a "*"
 						// per the spec in case this is a non-authenticated request
-
 						"access-control-allow-origin": {
 							"https://foobar.com",
 							"*",
@@ -491,11 +490,8 @@ var HTTPRouteCORS = suite.ConformanceTest{
 				Response: http.Response{
 					StatusCode: 200,
 					ValidHeaderValues: map[string][]string{
-						"access-control-allow-origin": {"https://other.foo.com"},
-						"access-control-allow-methods": {
-							"PUT",
-							"*",
-						},
+						"access-control-allow-origin":  {"https://other.foo.com"},
+						"access-control-allow-methods": {"PUT"},
 						"access-control-allow-headers": {
 							"x-header-1, x-header-2",
 							"x-header-2, x-header-1",
