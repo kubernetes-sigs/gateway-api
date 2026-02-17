@@ -369,7 +369,6 @@ var HTTPRouteCORS = suite.ConformanceTest{
 						// The access-control-allow-origin for a wildcard domain depends on the implementation.
 						// Envoy enforces the return of the same requested Origin, while NGINX an others may return a "*"
 						// per the spec in case this is a non-authenticated request
-
 						"access-control-allow-origin": {
 							"https://foobar.com",
 							"*",
@@ -471,7 +470,8 @@ var HTTPRouteCORS = suite.ConformanceTest{
 						"Origin":                         "https://other.foo.com",
 						"access-control-request-method":  "PUT",
 						"access-control-request-headers": "x-header-1, x-header-2",
-						"Authorization":                  "Bearer test",
+						// The actual request following this preflight request
+						// may contain credentials here.
 					},
 				},
 				// Set the expected request properties and namespace to empty strings.
@@ -490,11 +490,8 @@ var HTTPRouteCORS = suite.ConformanceTest{
 				Response: http.Response{
 					StatusCode: 200,
 					ValidHeaderValues: map[string][]string{
-						"access-control-allow-origin": {"https://other.foo.com"},
-						"access-control-allow-methods": {
-							"PUT",
-							"*",
-						},
+						"access-control-allow-origin":  {"https://other.foo.com"},
+						"access-control-allow-methods": {"PUT"},
 						"access-control-allow-headers": {
 							"x-header-1, x-header-2",
 							"x-header-2, x-header-1",
@@ -515,7 +512,6 @@ var HTTPRouteCORS = suite.ConformanceTest{
 						"Origin":                         "https://other.foo.com",
 						"access-control-request-method":  "PUT",
 						"access-control-request-headers": "x-header-1, x-header-2",
-						"Authorization":                  "Bearer test",
 					},
 				},
 				// Set the expected request properties and namespace to empty strings.
@@ -542,7 +538,48 @@ var HTTPRouteCORS = suite.ConformanceTest{
 						"access-control-allow-headers": {
 							"x-header-1, x-header-2",
 							"x-header-2, x-header-1",
+							"*",
 						},
+					},
+					AbsentHeaders: []string{
+						"access-control-allow-credentials",
+					},
+				},
+			},
+			{
+				TestCaseName: "Simple request with credentials auth should be allowed and always echo the origin",
+				Request: http.Request{
+					Path:   "/cors-wildcard-methods-headers",
+					Method: "GET",
+					Headers: map[string]string{
+						"Origin":        "https://other.foo.com",
+						"Authorization": "Bearer test",
+					},
+				},
+				Namespace: ns,
+				Response: http.Response{
+					StatusCode: 200,
+					ValidHeaderValues: map[string][]string{
+						"access-control-allow-origin":      {"https://other.foo.com"},
+						"access-control-allow-credentials": {"true"},
+					},
+				},
+			},
+			{
+				TestCaseName: "Simple request with credentials should hide auth headers on unauth path",
+				Request: http.Request{
+					Path:   "/cors-wildcard-methods-headers-unauth",
+					Method: "GET",
+					Headers: map[string]string{
+						"Origin":        "https://other.foo.com",
+						"Authorization": "Bearer test",
+					},
+				},
+				Namespace: ns,
+				Response: http.Response{
+					StatusCode: 200,
+					ValidHeaderValues: map[string][]string{
+						"access-control-allow-origin": {"https://other.foo.com"},
 					},
 					AbsentHeaders: []string{
 						"access-control-allow-credentials",
