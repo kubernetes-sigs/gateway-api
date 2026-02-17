@@ -471,7 +471,8 @@ var HTTPRouteCORS = suite.ConformanceTest{
 						"Origin":                         "https://other.foo.com",
 						"access-control-request-method":  "PUT",
 						"access-control-request-headers": "x-header-1, x-header-2",
-						"Authorization":                  "Bearer test",
+						// The actual request following this preflight request
+						// may contain credentials here.
 					},
 				},
 				// Set the expected request properties and namespace to empty strings.
@@ -515,7 +516,6 @@ var HTTPRouteCORS = suite.ConformanceTest{
 						"Origin":                         "https://other.foo.com",
 						"access-control-request-method":  "PUT",
 						"access-control-request-headers": "x-header-1, x-header-2",
-						"Authorization":                  "Bearer test",
 					},
 				},
 				// Set the expected request properties and namespace to empty strings.
