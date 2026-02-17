@@ -546,6 +546,46 @@ var HTTPRouteCORS = suite.ConformanceTest{
 					},
 				},
 			},
+			{
+				TestCaseName: "Simple request with credentials auth should be allowed and always echo the origin",
+				Request: http.Request{
+					Path:   "/cors-wildcard-methods-headers",
+					Method: "GET",
+					Headers: map[string]string{
+						"Origin":        "https://other.foo.com",
+						"Authorization": "Bearer test",
+					},
+				},
+				Namespace: ns,
+				Response: http.Response{
+					StatusCode: 200,
+					ValidHeaderValues: map[string][]string{
+						"access-control-allow-origin":      {"https://other.foo.com"},
+						"access-control-allow-credentials": {"true"},
+					},
+				},
+			},
+			{
+				TestCaseName: "Simple request with credentials should hide auth headers on unauth path",
+				Request: http.Request{
+					Path:   "/cors-wildcard-methods-headers-unauth",
+					Method: "GET",
+					Headers: map[string]string{
+						"Origin":        "https://other.foo.com",
+						"Authorization": "Bearer test",
+					},
+				},
+				Namespace: ns,
+				Response: http.Response{
+					StatusCode: 200,
+					ValidHeaderValues: map[string][]string{
+						"access-control-allow-origin": {"https://other.foo.com"},
+					},
+					AbsentHeaders: []string{
+						"access-control-allow-credentials",
+					},
+				},
+			},
 		}
 		for i := range testCases {
 			// Declare tc here to avoid loop variable
