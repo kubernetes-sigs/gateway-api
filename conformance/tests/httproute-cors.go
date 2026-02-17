@@ -538,6 +538,7 @@ var HTTPRouteCORS = suite.ConformanceTest{
 						"access-control-allow-headers": {
 							"x-header-1, x-header-2",
 							"x-header-2, x-header-1",
+							"*",
 						},
 					},
 					AbsentHeaders: []string{
