@@ -88,7 +88,7 @@ type BackendTLSPolicyValidationApplyConfiguration struct {
 	//
 	// Implementations MAY define their own sets of CA certificates. Such definitions
 	// MUST use an implementation-specific, prefixed name, such as
-	// `mycompany.com/my-custom-ca-certifcates`.
+	// `mycompany.com/my-custom-ca-certificates`.
 	//
 	// Support: Implementation-specific
 	WellKnownCACertificates *apisv1.WellKnownCACertificatesType `json:"wellKnownCACertificates,omitempty"`
