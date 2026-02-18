@@ -34,8 +34,8 @@ spec:
             caCertificateRefs:
             - kind: ConfigMap
               group: ""
-              name: gateway-conformance-web-backend
-              namespace: web-backend-cm
+              name: web-backend-cm
+              namespace: gateway-conformance-web-backend
   listeners:
   - name: https
     port: 443
