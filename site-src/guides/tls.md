@@ -32,9 +32,9 @@ For downstream connections, depending on the Listener Protocol, different TLS mo
 | HTTPS             | Terminate   | HTTPRoute           |
 | GRPC              | Terminate   | GRPCRoute           |
 
-Please note that in case of `Passthrough` TLS mode, no TLS settings take
-effect as the TLS session from the client is NOT terminated at the Gateway, but rather
-passes through the Gateway, encrypted.
+In `Passthrough` TLS mode, TLS settings do not take effect because the TLS session
+from the client is not terminated at the Gateway, but rather passes through the Gateway,
+encrypted.
 
 For upstream connections, `BackendTLSPolicy` is used, and neither listener protocol nor TLS mode apply to the
 upstream TLS configuration. For `HTTPRoute`, the use of both `Terminate` TLS mode and `BackendTLSPolicy` is supported.
@@ -47,7 +47,7 @@ the Gateway.
     `v1.5.0`. For more information on release channels, refer to our [versioning
     guide](../concepts/versioning.md).
 
-The use of `Terminate` on `TLSRoute` is available on `Extended` [Support Level].
+The `Terminate` mode for `TLSRoute` is available at the `Extended` [Support Level].
 
 [Support Level]: /concepts/conformance/#2-support-levels
 
@@ -71,7 +71,7 @@ listeners:
 - protocol: HTTPS # Other possible value is `TLS`
   port: 443
   tls:
-    mode: Terminate # If protocol is `TLS`, `Passthrough` is a possible mode
+    mode: Terminate # If protocol is `TLS`, `Passthrough` is another possible mode
     certificateRefs:
     - kind: Secret
       group: ""
@@ -127,7 +127,7 @@ BackendTLSPolicy contains specification for the `TargetRefs` and `Validation`.  
 identifies one or more `Service`s for which your HTTPRoute requires TLS. The `Validation` configuration contains a
 required `Hostname`, and either `CACertificateRefs` or `WellKnownCACertificates`.
 
-Hostname refers to the SNI the Gateway should use to connect to the backend, and
+`Hostname` refers to the SNI the Gateway should use to connect to the backend, and
 must match the certificate served by the backend pod.
 
 CACertificateRefs refer to one or more PEM-encoded TLS certificates. If there are no specific certificates
