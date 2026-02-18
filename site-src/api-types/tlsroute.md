@@ -10,38 +10,38 @@
 using the [server_name TLS attribute](https://datatracker.ietf.org/doc/html/rfc6066#section-3)
 to route requests to backends.
 
-While this feature is also known sometimes as TLS passthrough, where after the server name is identified, the gateway does a full encrypted passthrough of the communication, `TLSRoute` also allows the traffic to be terminated on the Gateway before being passed to a backend. 
+While this feature is also known sometimes as TLS passthrough, where after the server name is identified, the gateway does a full encrypted passthrough of the communication. `TLSRoute` also allows the traffic to be terminated on the Gateway before being passed to a backend. 
 
 TLSRoute is covered by the following features, that may be reported by your implementation
 * `TLSRoute` - If reported, means your implementation supports `TLSRoute` with `Passthrough` mode. Any implementation that claims to support the `TLSRoute` API MUST report this feature.
-* `TLSRouteModeTerminate` - If reported, means your implementation supports `TLSRoute` with `Terminate` mode additionally to  `Passthrough` mode
+* `TLSRouteModeTerminate` - If reported, means your implementation supports `TLSRoute` with `Terminate` mode in addition to `Passthrough` mode
 * `TLSRouteModeMixed` - If reported, means your implementation supports two TLS listeners with distinct modes (`Passthrough` and `Terminate`) on the same port.
 
 ## Background
 
-While many application routing cases can be implemented using HTTP/L7 matching (the tuple protocol:hostname:port:path), there are some specific cases where direct, encrypted communication to the backend may be required, without further assertion. For example:
+While many application routing cases can be implemented using HTTP/L7 matching (the tuple protocol:hostname:port:path), there are some specific cases where direct, encrypted communication to the backend may be required without terminating TLS. For example:
 
 * A backend that is TLS based but not HTTP based (e.g., a Kafka service, or a Postgres service, with its listener being TLS enabled).
 * Some WebRTC solutions.
-* Backends that can require direct client-certificate authentication (e.g., OAuth).
+* Backends that require mutual TLS (mTLS) authentication with client certificates.
 
-For the example cases above, it is desired that the routing is made as a passthrough mode, where the Gateway passes the packets to the backend without terminating TLS.
+For the example cases above, it is desired that the routing uses passthrough mode, where the Gateway passes the packets to the backend without terminating TLS.
 
-On some other cases, it is desired that the termination is done on the Gateway and the proxy passes the unencrypted packets to the backend without caring about attributes other than a TCP communication.
+In other cases, it is desired that the termination is done on the Gateway and the proxy passes the unencrypted packets to the backend, treating it as a basic TCP connection.
 
-`TLSRoute` can be used on these cases, where the traffic between the client and Gateway is encrypted and contains 
-the `server_name` attribute, being able to use this attribute to decide which backend should be used on this request.
+`TLSRoute` can be used in these cases, where the traffic between the client and Gateway is encrypted and contains
+the SNI (Server Name Indication), which can be used to decide which backend should be used for this request.
 
 ## Spec
 
-The specification of an TLSRoute consists of:
+The specification of a TLSRoute consists of:
 
 - [ParentRefs][parentRef] - Define which Gateways this Route wants to be attached
   to.
 - [Hostnames][hostname] (optional) - Define a list of hostnames to use for
-  matching the `server_name TLS attribute` header of a TLS request.
-- [Rules][tlsrouterule]- Define a list of rules to perform actions against
-  matching TLS requests. For TLSRoute this is limited to which [backendRefs](backendRef)
+  matching the SNI (Server Name Indication) of a TLS request.
+- [Rules][tlsrouterule] - Define a list of rules to perform actions against
+  matching TLS requests. For TLSRoute this is limited to which [backendRefs][backendRef]
   should be used.
 
 The following illustrates a TLSRoute that sends all traffic to one Service:
@@ -71,7 +71,7 @@ namespace to be attached for the attachment to be successful.
 For a listener of type `TLS`, defining the field `tls.mode` is mandatory.
 
 This field can contain two values:
-* Passthrough - Means the traffic will be directed to the backends without being unencrypted
+* Passthrough - Means the traffic will be directed to the backends while remaining encrypted
 * Terminate - Means the encrypted traffic will be terminated at the Gateway, and then pass the unencrypted TCP packets to one or more backends.
 
 You can also attach routes to specific sections of the parent resource.
@@ -129,14 +129,14 @@ spec:
 
 However, when binding Routes by port number, Gateway admins will no longer have
 the flexibility to switch ports on the Gateway without also updating the Routes.
-The approach should only be used when a Route should apply to a specific port
-number as opposed to listeners whose ports may be changed.
+This approach should only be used when a Route must bind to a specific port
+number, rather than to named listeners whose ports may change.
 
 ### Hostnames
 
-Hostnames define a list of hostnames to match against the hostname attribute of the
-TLS request. When a match occurs, the TLSRoute is selected to perform request
-routing based on rules. 
+Hostnames define a list of hostnames to match against the SNI (Server Name Indication)
+of the TLS request. When a match occurs, the TLSRoute is selected to route the request
+based on its rules. 
 
 The SNI specification adds the following restrictions for a Hostname definition:
 
