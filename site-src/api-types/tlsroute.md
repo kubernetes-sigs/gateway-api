@@ -44,9 +44,6 @@ The specification of a TLSRoute consists of:
   matching TLS requests. For TLSRoute this is limited to which [backendRefs][backendRef]
   should be used.
 
-The following illustrates a TLSRoute that sends all traffic to one Service:
-![tlsroute-basic-example](../images/tlsroute-basic-example.svg)
-
 ### Attaching to Gateways
 
 Each Route includes a way to reference the parent resources it wants to attach
