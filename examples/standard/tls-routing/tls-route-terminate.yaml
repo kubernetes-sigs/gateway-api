@@ -1,14 +1,14 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: TLSRoute
 metadata:
-  name: foo-route
+  name: bar-route
 spec:
   parentRefs:
   - name: example-gateway
-    sectionName: tls
+    sectionName: tls-terminate
   hostnames:
-  - "foo.example.com"
+  - "bar.example.com"
   rules:
   - backendRefs:
-    - name: foo-svc
+    - name: bar-svc
       port: 443

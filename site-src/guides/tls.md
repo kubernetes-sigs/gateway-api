@@ -10,12 +10,6 @@ allow for different or more advanced forms of TLS configuration. In addition to
 this documentation, it's worth reading the TLS documentation for whichever
 implementation(s) you're using with Gateway API.
 
-!!! info "Experimental Channel"
-
-    The `TLSRoute` resource described below is currently only included in the
-    "Experimental" channel of Gateway API. For more information on release
-    channels, refer to our [versioning guide](../concepts/versioning.md).
-
 ## Client/Server and TLS
 
 ![overview](../images/tls-overview.svg)
@@ -46,6 +40,12 @@ For upstream connections, `BackendTLSPolicy` is used, and neither listener proto
 upstream TLS configuration. For `HTTPRoute`, the use of both `Terminate` TLS mode and `BackendTLSPolicy` is supported.
 Using these together provides what is commonly known as a connection that is terminated and then re-encrypted at
 the Gateway.
+
+??? success "Standard Channel since v1.5.0"
+
+    The `TLSRoute` resource is GA and has been part of the Standard Channel since
+    `v1.5.0`. For more information on release channels, refer to our [versioning
+    guide](../concepts/versioning.md).
 
 The use of `Terminate` on `TLSRoute` is available on `Extended` [Support Level].
 
