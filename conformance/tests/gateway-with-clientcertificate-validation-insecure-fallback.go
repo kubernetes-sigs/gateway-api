@@ -48,8 +48,8 @@ var GatewayFrontendClientCertificateValidationInsecureFallback = suite.Conforman
 		ns := "gateway-conformance-infra"
 
 		routeNNs := []types.NamespacedName{
-			{Name: "client-certificate-validation-insecure-fallback-https-test", Namespace: ns},
-			{Name: "client-certificate-validation-insecure-fallback-https-test-no-hostname", Namespace: ns},
+			{Name: "client-cert-validation-insecure-fallback-test", Namespace: ns},
+			{Name: "client-cert-validation-insecure-fallback-test-no-hostname", Namespace: ns},
 		}
 		gwNN := types.NamespacedName{Name: "client-validation-insecure-fallback", Namespace: ns}
 
