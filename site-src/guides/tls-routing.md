@@ -10,19 +10,6 @@ TLSRoute is covered by the following features, that may be reported by your impl
 * `TLSRouteModeTerminate` - If reported, means your implementation supports `TLSRoute` with `Terminate` mode in addition to `Passthrough` mode
 * `TLSRouteModeMixed` - If reported, means your implementation supports two TLS listeners with distinct modes (`Passthrough` and `Terminate`) on the same port.
 
-The following diagram describes an example traffic flow across two different
-Services:
-
-- Traffic to `foo.example.com` is forwarded as is to `foo-svc`
-- Traffic to `bar.example.com` has its TLS traffic terminated on the Gateway and then 
-forwarded as a TCP stream to `bar-svc`
-
-![TLS Routing](../images/tls-routing.svg)
-
-The dotted lines show the Gateway resources deployed to configure this routing
-behavior. There are two TLSRoute resources that create routing rules on the
-same `example-gateway` Gateway.
-
 In order to receive traffic from a [Gateway][gateway] a `TLSRoute` resource
 must be configured with `ParentRefs` which reference the parent gateway(s) that it
 should be attached to. The following example shows how the combination
