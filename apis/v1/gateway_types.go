@@ -1365,7 +1365,7 @@ type ListenerStatus struct {
 	// +optional
 	// +listType=atomic
 	// +kubebuilder:validation:MaxItems=8
-	SupportedKinds []RouteGroupKind `json:"supportedKinds,omitempty"`
+	SupportedKinds []RouteGroupKind `json:"supportedKinds,omitzero"`
 
 	// AttachedRoutes represents the total number of Routes that have been
 	// successfully attached to this Listener.
