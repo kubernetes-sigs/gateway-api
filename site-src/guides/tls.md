@@ -26,7 +26,7 @@ For Gateways, there are two connections involved:
 - **upstream**: This is the connection between the Gateway and backend resources
    specified by routes. These backend resources will usually be Services.
 
-With Gateway API, TLS configuration of downstream and upstream connections is 
+With Gateway API, TLS configuration of downstream and upstream connections is
 managed independently.
 
 For downstream connections, depending on the Listener Protocol, different TLS modes and Route types are supported.
@@ -111,6 +111,39 @@ would be invalid.
 
 ```yaml
 {% include 'standard/tls-cert-cross-namespace.yaml' %}
+```
+### Client Certificate Validation (Frontend mTLS)
+??? success "Standard Channel since v1.5.0"
+    GatewayFrontendClientCertificateValidation feature has been part of the Standard Channel since
+    `v1.5.0`. For more information on release channels, refer to our [versioning
+    guide](../concepts/versioning.md).
+
+Gateway API supports validating the TLS certificate presented by a frontend client to the Gateway during the TLS handshake.
+
+Unlike server certificate configuration, which is defined per-listener, client certificate validation is configured at the **Gateway level** within the `spec.tls` field. This design is specifically intended to mitigate security risks associated with HTTP/2 and TLS connection coalescing, where a connection established for one listener could be reused for another listener on the same port, potentially bypassing listener-specific validation settings.
+
+#### Configuration Overview
+Client validation is defined using the `frontendValidation` struct, which specifies how the Gateway should verify the client's identity.
+
+*   **`caCertificateRefs`**: A list of references to Kubernetes objects (typically `ConfigMap`s) containing PEM-encoded CA certificate bundles used as trust anchors to validate the client's certificate.
+*   **`mode`**: Defines the validation behavior.
+    *   `AllowValidOnly` (Default): The Gateway accepts connections only if the client presents a valid certificate that passes validation against the specified CA bundle.
+    *   `AllowInsecureFallback`: The Gateway accepts connections even if the client certificate is missing or fails verification. This mode typically delegates authorization to the backend and should be used with caution.
+
+#### Gateway-Level Scoping
+
+Validation can be applied globally to the Gateway or overridden for specific ports:
+
+1.  **Default Configuration**: This configuration applies to all HTTPS listeners on the Gateway, unless a per-port override is defined.
+2.  **Per-Port Configuration**: This allows for fine-grained control, overriding the default configuration for all listeners handling traffic on a specific port.
+
+#### Examples
+
+##### Basic Client Validation
+This example shows how to configure client certificate validation with default configuration and per port override.
+
+```yaml
+{% include 'standard/frontend-cert-validation.yaml' %}
 ```
 
 ## Upstream TLS
