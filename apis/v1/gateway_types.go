@@ -1595,12 +1595,12 @@ const (
 	// This reason is used with the "ResolvedRefs" condition when one or more
 	// CACertificate References used to configure Client Certificate
 	// validation for Gateway are invalid.
-	ListenerReasonInvalidCACertificateRef GatewayConditionReason = "InvalidCACertificateRef"
+	ListenerReasonInvalidCACertificateRef ListenerConditionReason = "InvalidCACertificateRef"
 
 	// This reason is used with the "ResolvedRefs" condition when one or more
 	// CACertificate References used to configure Client Certificate
 	// validation for Gateway has unknown or unsupported kind.
-	ListenerReasonInvalidCACertificateKind GatewayConditionReason = "InvalidCACertificateKind"
+	ListenerReasonInvalidCACertificateKind ListenerConditionReason = "InvalidCACertificateKind"
 )
 
 const (
