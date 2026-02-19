@@ -5,13 +5,19 @@ ListenerSets allow teams to independently define and attach groups of listeners 
 ## ListenerSet use cases
 
 As such, you might use ListenerSets for the following advantages:
+
 - *Multitenancy*: You can let different teams create their own ListenerSets, but share the same Gateway and backing load balancing infrastructure.
+
 - *Large scale deployments*: By using ListenerSets, Gateways can have more than 64 listeners attached. Teams can also share the same ListenerSet configuration to avoid duplication.
+
 - *Certificates for more listeners per gateway*: Because you can now have more than 64 listeners per Gateway, a single Gateway can forward secured traffic to more backends that might have their own certificates. This approach aligns with projects that might require service-level certificates, such as Istio Ambient Mesh or Knative.
 
 The following diagram presents a simple illustration of how ListenerSets can help you decentralize route configuration in a multitenant environment at scale.
+
 - Team 1 and Team 2 each manage their own Service and HTTPRoute resources within their respective namespaces.
+
 - Each HTTPRoute refers to a namespace-local ListenerSet. This way, each team controls how their routes are exposed, such as the protocol, port, and TLS certificate settings.
+
 - The ListenerSets from both teams share a common Gateway in a separate namespace. A separate Gateway team can setup and manage centralized infrastructure or enforce policies as appropriate.
 
 ```mermaid
@@ -61,10 +67,15 @@ spec:
     namespaces:
       from: Same
 ```
+
 The `namespaces.from` field within `AllowedListeners` can take the following four values:
+
 - `None` (Default): No external ListenerSets are allowed to attach. Only the listeners defined directly inside the Gateway resource will be used.
+
 - `Same`: Only ListenerSets located in the same namespace as the Gateway can be attached.
+
 - `All`: ListenerSets from any namespace in the cluster are allowed to attach, provided they have a valid parentRef pointing to the Gateway.
+
 - `Selector`: Only ListenerSets in namespaces that match a specific label selector are allowed. When using this value, you must also provide the selector field
 
 ### ListenerSet Configuration
@@ -120,8 +131,11 @@ spec:
 ## Listener Conflicts
 
 Conflicts occur when multiple listeners claim the same Port, Protocol, and/or Hostname. The controller resolves these using the following priority:
+
 1. Parent Gateway Listeners: Listeners defined directly in the Gateway spec always have the highest priority.
+
 2. ListenerSet Creation Time: If two ListenerSets conflict, the one with the older creationTimestamp wins.
+
 3. ListenerSet Alphabetical Order: If creation timestamps are identical, priority is given based on the alphabetical order of the resource's {namespace}/{name}.
 
 The listener with the highest priority is Accepted and Programmed
@@ -132,8 +146,11 @@ The lower-priority listener is marked with a `Conflicted: True` condition in its
 ## Status Updates
 
 A ListenerSet is considered successfully attached to a Gateway when the following three conditions must all be met:
+
 1. Explicit Gateway Permission : By default, Gateways do not allow any external ListenerSets to attach. The Gateway must have an allowedListeners field in its spec that selects the namespace of the ListenerSet.
+
 2. Valid Parent Reference : The ListenerSet must explicitly point back to the target Gateway.
+
 3. Resource-Level Acceptance : The Gateway Controller must validate and "accept" the resource (all listeners are valid, etc.).
 
 > A ListenerSet can be Accepted overall even if one of its individual listeners is in conflict with another set. In this case, only the non-conflicting listeners are "Programmed" into the data plane.
