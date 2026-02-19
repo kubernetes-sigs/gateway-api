@@ -544,6 +544,9 @@ var HTTPRouteCORS = suite.ConformanceTest{
 					AbsentHeaders: []string{
 						"access-control-allow-credentials",
 					},
+					// Ignore whitespace when comparing the response headers. This is because some
+					// implementations add a space after each comma, and some don't. Both are valid.
+					IgnoreWhitespace: true,
 				},
 			},
 			{
