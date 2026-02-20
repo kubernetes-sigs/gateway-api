@@ -1,20 +1,16 @@
 # TLS routing
 
-The [TLSRoute resource](../api-types/tlsroute.md) allows you to match on TLS traffic and
-direct it to Kubernetes backends. This guide shows how the TLSRoute matches
-traffic on hostname and forwards it to different Kubernetes Services, using passthrough 
-or terminating it on the Gateway.
+The [TLSRoute resource](../api-types/tlsroute.md) allows you to match on TLS
+metadata and direct it to Kubernetes backends. This guide shows how the TLSRoute
+matches traffic on hostname and forwards it to different Kubernetes Services,
+using either `Passthrough` or `Terminate` TLS modes on the Gateway.
 
-TLSRoute is covered by the following features, that may be reported by your implementation
-* `TLSRoute` - If reported, means your implementation supports `TLSRoute` with `Passthrough` mode. Any implementation that claims to support the `TLSRoute` API MUST report this feature.
-* `TLSRouteModeTerminate` - If reported, means your implementation supports `TLSRoute` with `Terminate` mode in addition to `Passthrough` mode
-* `TLSRouteModeMixed` - If reported, means your implementation supports two TLS listeners with distinct modes (`Passthrough` and `Terminate`) on the same port.
-
-In order to receive traffic from a [Gateway][gateway] a `TLSRoute` resource
+In order to receive traffic from a [Gateway][gateway] a TLSRoute resource
 must be configured with `ParentRefs` which reference the parent gateway(s) that it
 should be attached to. The following example shows how the combination
-of `Gateway` and `TLSRoute` would be configured to serve TLS traffic using passthrough
-and terminate, when supported by the Gateway API implementation:
+of Gateway and TLSRoute would be configured to serve TLS traffic using both
+`Passthrough` and `Terminate` modes (when supported by the Gateway API
+implementation):
 
 ```yaml
 {% include 'standard/tls-routing/gateway.yaml' %}
@@ -25,18 +21,20 @@ Since `foo.example.com` and `bar.example.com` are separate hosts with
 different routing requirements, each is deployed as its own TLSRoute -
 `foo-route` and `bar-route`.
 
-The following `foo-route` will match any traffic for `foo.example.com` and apply
-its routing rules to forward the traffic to the configured backend. Since it is attached
-to a listener that is configured as `Passthrough` mode it will pass TCP stream traffic directly
-to the backend:
+The following `foo-route` TLSRoute will match any traffic for `foo.example.com`
+and apply its routing rules to forward the traffic to the configured backend.
+Since it is attached to a listener that is configured in `Passthrough` mode, the
+Gateway will pass the encrypted TCP stream directly to the backend:
 
 ```yaml
 {% include 'standard/tls-routing/tls-route.yaml' %}
 ```
 
-Similarly, the `bar-route`  matches traffic for `bar.example.com`, but given it is attached to
-a listener that is configured as `Terminate` mode, it will first terminate the TLS stream 
-on the Gateway, and then pass an unencrypted TCP stream to the backend.
+Similarly, the `bar-route` TLSRoute matches traffic for `bar.example.com`.
+However, since it is attached to a listener that is configured in `Terminate`
+mode, the Gateway will first terminate the TLS stream using the certificate
+specified on the listener, and then pass the resulting unencrypted TCP stream to
+the backend:
 
 ```yaml
 {% include 'standard/tls-routing/tls-route-terminate.yaml' %}
