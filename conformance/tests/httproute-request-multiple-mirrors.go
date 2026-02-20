@@ -23,7 +23,7 @@ import (
 
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
-	"sigs.k8s.io/gateway-api/conformance/utils/suite"
+	confsuite "sigs.k8s.io/gateway-api/conformance/utils/suite"
 	"sigs.k8s.io/gateway-api/pkg/features"
 )
 
@@ -31,7 +31,7 @@ func init() {
 	ConformanceTests = append(ConformanceTests, HTTPRouteRequestMultipleMirrors)
 }
 
-var HTTPRouteRequestMultipleMirrors = suite.ConformanceTest{
+var HTTPRouteRequestMultipleMirrors = confsuite.ConformanceTest{
 	ShortName:   "HTTPRouteRequestMultipleMirrors",
 	Description: "An HTTPRoute with multiple request mirror filters",
 	Manifests:   []string{"tests/httproute-request-multiple-mirrors.yaml"},
@@ -41,8 +41,8 @@ var HTTPRouteRequestMultipleMirrors = suite.ConformanceTest{
 		features.SupportHTTPRouteRequestMirror,
 		features.SupportHTTPRouteRequestMultipleMirrors,
 	},
-	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
-		ns := "gateway-conformance-infra"
+	Test: func(t *testing.T, suite *confsuite.ConformanceTestSuite) {
+		ns := confsuite.InfrastructureNamespace
 		routeNN := types.NamespacedName{Name: "request-multiple-mirrors", Namespace: ns}
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: ns}
 		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
