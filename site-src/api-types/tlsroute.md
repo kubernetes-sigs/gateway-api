@@ -112,7 +112,7 @@ listeners:
     ...
 ```
 
-You can bind a route to listener `passthrough` only, using the `sectionName`
+You can bind a route to listener `Passthrough` only, using the `sectionName`
 field in `parentRefs`:
 
 ```yaml
@@ -158,7 +158,7 @@ based on its rules.
 
 The SNI specification adds the following restrictions for a Hostname definition:
 
-- the hostname MUST be a fully qualified domain name.
+- The hostname MUST be a fully qualified domain name.
 - The usage of IPv4 and IPv6 addresses is not permitted.
 
 The following example defines hostname "my.example.com":
