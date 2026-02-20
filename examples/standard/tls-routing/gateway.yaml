@@ -10,3 +10,10 @@ spec:
     port: 443
     tls:
       mode: Passthrough
+  - name: tls-terminate
+    protocol: TLS
+    port: 8443
+    tls:
+      mode: Terminate
+      certificateRefs:
+      - name: tls-terminate-certificate
