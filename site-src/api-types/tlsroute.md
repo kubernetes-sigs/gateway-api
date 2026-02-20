@@ -7,30 +7,48 @@
     guide](../concepts/versioning.md).
 
 [TLSRoute][tlsroute] is a Gateway API type for specifying routing behavior
-using the [server_name TLS attribute](https://datatracker.ietf.org/doc/html/rfc6066#section-3)
+using the [server_name TLS attribute (SNI)](https://datatracker.ietf.org/doc/html/rfc6066#section-3)
 to route requests to backends.
 
-While this feature is also known sometimes as TLS passthrough, where after the server name is identified, the gateway does a full encrypted passthrough of the communication. `TLSRoute` also allows the traffic to be terminated on the Gateway before being passed to a backend. 
+This feature is often referred to as "TLS passthrough", where the Gateway
+identifies the server name via SNI and passes the communication directly to the
+backend fully encrypted. However, TLSRoute also allows traffic to be terminated
+at the Gateway before being passed unencrypted to a backend.
 
-TLSRoute is covered by the following features, that may be reported by your implementation
-* `TLSRoute` - If reported, means your implementation supports `TLSRoute` with `Passthrough` mode. Any implementation that claims to support the `TLSRoute` API MUST report this feature.
-* `TLSRouteModeTerminate` - If reported, means your implementation supports `TLSRoute` with `Terminate` mode in addition to `Passthrough` mode
-* `TLSRouteModeMixed` - If reported, means your implementation supports two TLS listeners with distinct modes (`Passthrough` and `Terminate`) on the same port.
+Support for TLSRoute is represented by the following features, which may be
+reported by an implementation:
+
+* `TLSRoute` - If reported, the implementation supports TLSRoute with
+`Passthrough` mode. Any implementation that claims to support the TLSRoute API
+MUST report this feature.
+* `TLSRouteModeTerminate` - If reported, the implementation supports TLSRoute
+with `Terminate` mode in addition to `Passthrough` mode.
+* `TLSRouteModeMixed` - If reported, the implementation supports two TLS
+listeners with distinct modes (`Passthrough` and `Terminate`) on the same port.
 
 ## Background
 
-While many application routing cases can be implemented using HTTP/L7 matching (the tuple protocol:hostname:port:path), there are some specific cases where direct, encrypted communication to the backend may be required without terminating TLS. For example:
+While many application routing cases can be implemented using HTTP/L7 matching
+(the protocol:hostname:port:path tuple), there are specific cases where direct,
+encrypted communication to the backend is required without terminating TLS.
+Common examples include:
 
-* A backend that is TLS based but not HTTP based (e.g., a Kafka service, or a Postgres service, with its listener being TLS enabled).
-* Some WebRTC solutions.
-* Backends that require mutual TLS (mTLS) authentication with client certificates.
+* A backend that is TLS-based but not HTTP-based (e.g., a Kafka service, or a
+Postgres service with a TLS-enabled listener).
+* Specific WebRTC solutions.
+* Backends that require mutual TLS (mTLS) authentication with client
+certificates.
 
-For the example cases above, it is desired that the routing uses passthrough mode, where the Gateway passes the packets to the backend without terminating TLS.
+In these scenarios, it is desirable to use passthrough mode, where the Gateway
+passes the encrypted packets directly to the backend without terminating the TLS
+connection.
 
-In other cases, it is desired that the termination is done on the Gateway and the proxy passes the unencrypted packets to the backend, treating it as a basic TCP connection.
+In other cases, you may want to terminate TLS at the Gateway and pass the
+unencrypted packets to the backend as a basic TCP connection (terminate mode).
 
-`TLSRoute` can be used in these cases, where the traffic between the client and Gateway is encrypted and contains
-the SNI (Server Name Indication), which can be used to decide which backend should be used for this request.
+TLSRoute can be used in these cases, where the traffic between the client and
+Gateway is encrypted and contains the SNI (Server Name Indication), which can be
+used to decide which backend should be used for this request.
 
 ## Spec
 
@@ -39,9 +57,9 @@ The specification of a TLSRoute consists of:
 - [ParentRefs][parentRef] - Define which Gateways this Route wants to be attached
   to.
 - [Hostnames][hostname] (optional) - Define a list of hostnames to use for
-  matching the SNI (Server Name Indication) of a TLS request.
+  matching the SNI (Server Name Indication) of a TLS handshake.
 - [Rules][tlsrouterule] - Define a list of rules to perform actions against
-  matching TLS requests. For TLSRoute this is limited to which [backendRefs][backendRef]
+  matching TLS handshake. For TLSRoute this is limited to which [backendRefs][backendRef]
   should be used.
 
 ### Attaching to Gateways
@@ -65,11 +83,12 @@ spec:
 Note that the target Gateway needs to allow TLSRoutes from the route's
 namespace to be attached for the attachment to be successful.
 
-For a listener of type `TLS`, defining the field `tls.mode` is mandatory.
+For a listener of protocol TLS, defining the `tls.mode` field is mandatory. This
+field accepts two values:
 
-This field can contain two values:
-* Passthrough - Means the traffic will be directed to the backends while remaining encrypted
-* Terminate - Means the encrypted traffic will be terminated at the Gateway, and then pass the unencrypted TCP packets to one or more backends.
+* Passthrough - Traffic is directed to the backends while remaining encrypted.
+* Terminate - Encrypted traffic is terminated at the Gateway, and then
+unencrypted TCP packets are passed to one or more backends.
 
 You can also attach routes to specific sections of the parent resource.
 For example, let's say that the `acme-lb` Gateway includes the following
@@ -91,8 +110,8 @@ listeners:
     ...
 ```
 
-You can bind a route to listener `passthrough` only, using the `sectionName` field
-in `parentRefs`:
+You can bind a route to listener `passthrough` only, using the `sectionName`
+field in `parentRefs`:
 
 ```yaml
 spec:
@@ -133,7 +152,7 @@ number, rather than to named listeners whose ports may change.
 
 Hostnames define a list of hostnames to match against the SNI (Server Name Indication)
 of the TLS request. When a match occurs, the TLSRoute is selected to route the request
-based on its rules. 
+based on its rules.
 
 The SNI specification adds the following restrictions for a Hostname definition:
 
@@ -158,11 +177,11 @@ Rules define the list of actions to be taken with the traffic.
 
 #### BackendRefs
 
-BackendRefs defines API objects where matching requests should be sent. At least 
+BackendRefs defines API objects where matching requests should be sent. At least
 one backendRef must be specified.
 
-The following example forwards TLS requests with the hostname `foo.example.com` to service
-"foo-svc" on port `443`.
+The following example forwards TLS requests with the hostname `foo.example.com`
+to service "foo-svc" on port `443`.
 
 ```yaml
 {% include 'standard/tls-routing/tls-route.yaml' %}
@@ -171,17 +190,19 @@ The following example forwards TLS requests with the hostname `foo.example.com` 
 Reference the [backendRef][backendRef] API documentation for additional details
 on `weight` and other fields.
 
-This TLSRoute attaches to the Gateway TLS listener of name `tls` as defined in:
+This TLSRoute attaches to the Gateway TLS listener named `tls`, as defined below:
 
 ```yaml
 {% include 'standard/tls-routing/gateway.yaml' %}
 ```
 
-Because this listener has its TLS mode configured as `Passthrough`, the traffic
-that is routed via this listener is sent as a direct TCP stream to the backend.
+Because the `tls` listener has its TLS mode configured as `Passthrough`, the
+traffic routed via this listener is sent as a direct encrypted TCP stream to the
+backend.
 
-In case the listener `tls-terminate` is being used, the TLS traffic is terminated and 
-the TCP stream is forwarded unencrypted to the backends.
+If the `tls-terminate` listener were used instead, the TLS traffic would be
+terminated at the Gateway, and the resulting TCP stream would be forwarded
+unencrypted to the backends.
 
 ## Status
 
