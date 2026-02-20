@@ -7,8 +7,9 @@
     guide](../concepts/versioning.md).
 
 [TLSRoute][tlsroute] is a Gateway API type for specifying routing behavior
-using the [server_name TLS attribute (SNI)](https://datatracker.ietf.org/doc/html/rfc6066#section-3)
-to route requests to backends.
+of TLS requests from a client to an API object, i.e. Service. It allows to
+route traffic to specific backend based on the [Server Name Indication (SNI)](https://datatracker.ietf.org/doc/html/rfc6066#section-3)
+hostname provided during the TLS handshake.
 
 This feature is often referred to as "TLS passthrough", where the Gateway
 identifies the server name via SNI and passes the communication directly to the
@@ -48,8 +49,8 @@ In other cases, you may want to terminate TLS at the Gateway and pass the
 unencrypted packets to the backend as a basic TCP connection (terminate mode).
 
 TLSRoute can be used in these cases, where the traffic between the client and
-Gateway is encrypted and contains the SNI (Server Name Indication), which can be
-used to decide which backend should be used for this request.
+Gateway is encrypted and contains the SNI hostname, which can be used to decide
+which backend should be used for this request.
 
 ## Spec
 
@@ -58,7 +59,7 @@ The specification of a TLSRoute consists of:
 - [ParentRefs][parentRef] - Define which Gateways this Route wants to be
   attached to.
 - [Hostnames][hostname] - Define a list of hostnames to use for matching the SNI
-  (Server Name Indication) of a TLS handshake.
+  hostname of a TLS handshake.
 - [Rules][tlsrouterule] - Define a list of rules to perform actions against
   matching TLS handshake. For TLSRoute this is limited to which [backendRefs][backendRef]
   should be used.
@@ -84,8 +85,8 @@ spec:
 Note that the target Gateway needs to allow TLSRoutes from the route's
 namespace to be attached for the attachment to be successful.
 
-For a listener of protocol TLS, defining the `tls.mode` field is mandatory. This
-field accepts two values:
+For TLS listeners, defining the `tls.mode` field is mandatory. This field
+accepts two values:
 
 - Passthrough - Traffic is directed to the backends while remaining encrypted.
 - Terminate - Encrypted traffic is terminated at the Gateway, and then
@@ -151,14 +152,14 @@ number, rather than to named listeners whose ports may change.
 
 ### Hostnames
 
-Hostnames define a list of hostnames to match against the SNI (Server Name
-Indication) of the TLS request. When a match occurs, the TLSRoute is selected to
-route the request based on its rules.
+Hostnames define a list of hostnames to match against the SNI hostname of the
+TLS request. When a match occurs, the TLSRoute is selected to route the request
+based on its rules.
 
 The SNI specification adds the following restrictions for a Hostname definition:
 
-- the hostname MUST be a fully qualified domain name
-- The usage of IPv4 and IPv6 addresses is not permitted
+- the hostname MUST be a fully qualified domain name.
+- The usage of IPv4 and IPv6 addresses is not permitted.
 
 The following example defines hostname "my.example.com":
 
