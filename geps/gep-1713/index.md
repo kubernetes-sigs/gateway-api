@@ -485,6 +485,7 @@ spec:
   parentRefs:
   - name: second-workload-listeners
     kind: XListenerSet
+    group: gateway.networking.x-k8s.io
     sectionName: second
 ```
 
@@ -499,6 +500,7 @@ spec:
   parentRefs:
   - name: second-workload-listeners
     kind: XListenerSet
+    group: gateway.networking.x-k8s.io
     sectionName: second
   - name: parent-gateway
     kind: Gateway
