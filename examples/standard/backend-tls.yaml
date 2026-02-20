@@ -11,7 +11,7 @@ spec:
         group: ""
         name: foo-example-cert
   listeners:
-  - name: foo-https
+  - name: foo-http
     protocol: HTTP
     port: 80
     hostname: foo.example.com
