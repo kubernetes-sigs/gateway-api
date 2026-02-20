@@ -19,8 +19,7 @@ spec:
             caCertificateRefs:
             - kind: ConfigMap
               group: ""
-              name: foo-example-com-ca-cert
-            mode: "AllowInsecureFallback"
+              name: bar-example-com-ca-cert
   listeners:
   - name: foo-https
     protocol: HTTPS
