@@ -394,11 +394,13 @@ func ListenerSetMustHaveCondition(
 			ls := &gatewayv1.ListenerSet{}
 			err := client.Get(ctx, lsNN, ls)
 			if err != nil {
-				return false, fmt.Errorf("error fetching ListenerSet: %w", err)
+				t.Logf("error fetching ListenerSet: %v", err)
+				return false, nil
 			}
 
 			if err := ConditionsHaveLatestObservedGeneration(ls, ls.Status.Conditions); err != nil {
-				return false, err
+				t.Logf("not ready: %v", err)
+				return false, nil
 			}
 
 			if findConditionInList(t,
@@ -851,11 +853,11 @@ func parentsForRouteMatch(t *testing.T, routeName types.NamespacedName, expected
 				continue
 			}
 			if !reflect.DeepEqual(aParent.ParentRef.Group, eParent.ParentRef.Group) {
-				tlog.Logf(t, "Route %s expected ParentReference.Group to be %v, got %v", routeName, ptr.Deref(eParent.ParentRef.Group, gatewayv1.Group(gatewayv1.GroupVersion.Group)), ptr.Deref(eParent.ParentRef.Group, gatewayv1.Group(gatewayv1.GroupVersion.Group)))
+				tlog.Logf(t, "Route %s expected ParentReference.Group to be %v, got %v", routeName, ptr.Deref(eParent.ParentRef.Group, gatewayv1.Group(gatewayv1.GroupVersion.Group)), ptr.Deref(aParent.ParentRef.Group, gatewayv1.Group(gatewayv1.GroupVersion.Group)))
 				continue
 			}
 			if !reflect.DeepEqual(aParent.ParentRef.Kind, eParent.ParentRef.Kind) {
-				tlog.Logf(t, "Route %s expected ParentReference.Kind to be %v, got %v", routeName, ptr.Deref(eParent.ParentRef.Kind, GatewayKind), ptr.Deref(eParent.ParentRef.Kind, GatewayKind))
+				tlog.Logf(t, "Route %s expected ParentReference.Kind to be %v, got %v", routeName, ptr.Deref(eParent.ParentRef.Kind, GatewayKind), ptr.Deref(aParent.ParentRef.Kind, GatewayKind))
 				continue
 			}
 			if aParent.ParentRef.Name != eParent.ParentRef.Name {
