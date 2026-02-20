@@ -18,13 +18,14 @@ at the Gateway before being passed unencrypted to a backend.
 Support for TLSRoute is represented by the following features, which may be
 reported by an implementation:
 
-* `TLSRoute` - If reported, the implementation supports TLSRoute with
-`Passthrough` mode. Any implementation that claims to support the TLSRoute API
-MUST report this feature.
-* `TLSRouteModeTerminate` - If reported, the implementation supports TLSRoute
-with `Terminate` mode in addition to `Passthrough` mode.
-* `TLSRouteModeMixed` - If reported, the implementation supports two TLS
-listeners with distinct modes (`Passthrough` and `Terminate`) on the same port.
+- `TLSRoute` - If reported, the implementation supports TLSRoute with
+  `Passthrough` mode. Any implementation that claims to support the TLSRoute API
+  MUST report this feature.
+- `TLSRouteModeTerminate` - If reported, the implementation supports TLSRoute
+  with `Terminate` mode in addition to `Passthrough` mode.
+- `TLSRouteModeMixed` - If reported, the implementation supports two TLS
+  listeners with distinct modes (`Passthrough` and `Terminate`) on the same
+  port.
 
 ## Background
 
@@ -54,10 +55,10 @@ used to decide which backend should be used for this request.
 
 The specification of a TLSRoute consists of:
 
-- [ParentRefs][parentRef] - Define which Gateways this Route wants to be attached
-  to.
-- [Hostnames][hostname] (optional) - Define a list of hostnames to use for
-  matching the SNI (Server Name Indication) of a TLS handshake.
+- [ParentRefs][parentRef] - Define which Gateways this Route wants to be
+  attached to.
+- [Hostnames][hostname] - Define a list of hostnames to use for matching the SNI
+  (Server Name Indication) of a TLS handshake.
 - [Rules][tlsrouterule] - Define a list of rules to perform actions against
   matching TLS handshake. For TLSRoute this is limited to which [backendRefs][backendRef]
   should be used.
@@ -86,9 +87,9 @@ namespace to be attached for the attachment to be successful.
 For a listener of protocol TLS, defining the `tls.mode` field is mandatory. This
 field accepts two values:
 
-* Passthrough - Traffic is directed to the backends while remaining encrypted.
-* Terminate - Encrypted traffic is terminated at the Gateway, and then
-unencrypted TCP packets are passed to one or more backends.
+- Passthrough - Traffic is directed to the backends while remaining encrypted.
+- Terminate - Encrypted traffic is terminated at the Gateway, and then
+  unencrypted TCP packets are passed to one or more backends.
 
 You can also attach routes to specific sections of the parent resource.
 For example, let's say that the `acme-lb` Gateway includes the following
@@ -150,9 +151,9 @@ number, rather than to named listeners whose ports may change.
 
 ### Hostnames
 
-Hostnames define a list of hostnames to match against the SNI (Server Name Indication)
-of the TLS request. When a match occurs, the TLSRoute is selected to route the request
-based on its rules.
+Hostnames define a list of hostnames to match against the SNI (Server Name
+Indication) of the TLS request. When a match occurs, the TLSRoute is selected to
+route the request based on its rules.
 
 The SNI specification adds the following restrictions for a Hostname definition:
 
@@ -190,7 +191,8 @@ to service "foo-svc" on port `443`.
 Reference the [backendRef][backendRef] API documentation for additional details
 on `weight` and other fields.
 
-This TLSRoute attaches to the Gateway TLS listener named `tls`, as defined below:
+This TLSRoute attaches to the Gateway TLS listener named `tls`, as defined
+below:
 
 ```yaml
 {% include 'standard/tls-routing/gateway.yaml' %}
@@ -241,8 +243,8 @@ status:
 
 ## Merging
 Multiple TLSRoutes can be attached to a single Gateway resource. Importantly,
-only one Route hostname may match each request. For more information on how conflict
-resolution applies to merging, refer to the [API specification][hostname].
+only one Route hostname may match each request. For more information on how
+conflict resolution applies to merging, refer to the [API specification][hostname].
 
 
 [tlsroute]: ../reference/spec.md#tlsroute
