@@ -198,7 +198,7 @@ release-staging: image.multiarch.setup
 # Docs
 
 DOCS_BUILD_CONTAINER_NAME ?= gateway-api-mkdocs
-DOCS_VERIFY_CONTAINER_IMAGE ?= registry.hub.docker.com/lycheeverse/lychee:0.22
+DOCS_VERIFY_CONTAINER_IMAGE ?= registry.hub.docker.com/lycheeverse/lychee:0.23
 
 .PHONY: build-docs
 build-docs: update-geps api-ref-docs

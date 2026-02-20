@@ -49,7 +49,7 @@ the Gateway.
 
 The use of `Terminate` on `TLSRoute` is available on `Extended` [Support Level].
 
-[Support Level]: https://gateway-api.sigs.k8s.io/concepts/conformance/#2-support-levels
+[Support Level]: /concepts/conformance/#2-support-levels
 
 ## Downstream TLS
 
