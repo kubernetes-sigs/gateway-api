@@ -1,5 +1,7 @@
 # Cross-Origin Resource Sharing (CORS)
 
+???+ info "Extended Support Feature: HTTPRouteCORS"
+    This feature is part of extended support. For more information on support levels, refer to our [conformance guide](../concepts/conformance.md).
 The [HTTPRoute resource](../api-types/httproute.md) can be used to configure
 Cross-Origin Resource Sharing (CORS). CORS is a security feature that allows
 or denies web applications running at one domain to make requests for resources
