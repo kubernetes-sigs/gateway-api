@@ -18,6 +18,9 @@ package tls
 
 import (
 	cryptotls "crypto/tls"
+	"errors"
+	"strings"
+	"syscall"
 	"testing"
 	"time"
 
@@ -119,4 +122,48 @@ func MakeTLSRequestAndExpectFailureResponse(t *testing.T, r roundtripper.RoundTr
 	if clientCertificate != nil && clientCertificateKey != nil {
 		assert.True(t, clientCertificatePresented, "client certificate was not presented during the handshake")
 	}
+}
+
+// MakeTLSRequestAndExpectEventuallyConnectionReset makes a TCP (TLS) request and expects the connection to be eventually reset by the peer.
+// This is useful for testing scenarios where a Gateway accepts a connection (handshake) but then closes it due to not matching or invalid routing configuration.
+func MakeTLSRequestAndExpectEventuallyConnectionReset(t *testing.T, timeoutConfig config.TimeoutConfig, gwAddr string, serverName string) {
+	t.Helper()
+
+	dialer := &cryptotls.Dialer{
+		Config: &cryptotls.Config{
+			ServerName: serverName,
+			MinVersion: cryptotls.VersionTLS12,
+		},
+	}
+
+	assert.Eventually(t, func() bool {
+		_, err := dialer.DialContext(t.Context(), "tcp", gwAddr)
+		if err != nil {
+			if isConnectionReset(err) {
+				tlog.Logf(t, "connection reset by peer during dial: %v", err)
+				return true
+			}
+			// If it's another error (e.g. timeout, refused), the Gateway might not be ready yet.
+			tlog.Logf(t, "client could not connect: %s; retrying", err)
+			return false
+		}
+		return false
+	}, timeoutConfig.MaxTimeToConsistency, time.Second)
+}
+
+// isConnectionReset checks if an error message contains "connection reset by peer" or is a syscall.ECONNRESET.
+func isConnectionReset(err error) bool {
+	if err == nil {
+		return false
+	}
+	// Check for standard Go error string
+	if strings.Contains(err.Error(), "connection reset by peer") {
+		return true
+	}
+	// Check for underlying syscall error
+	var sysErr syscall.Errno
+	if errors.As(err, &sysErr) {
+		return sysErr == syscall.ECONNRESET
+	}
+	return false
 }
