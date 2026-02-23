@@ -64,9 +64,9 @@ var TLSRouteInvalidBackendRefNonexistent = suite.ConformanceTest{
 			kubernetes.TLSRouteMustHaveCondition(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN, resolvedRefsCond)
 		})
 
-		t.Run("TLS connection to nonexistent backend should be reset", func(t *testing.T) {
+		t.Run("TLS connection to nonexistent backend should be rejected", func(t *testing.T) {
 			serverStr := string(hostnames[0])
-			tls.MakeTLSRequestAndExpectEventuallyConnectionReset(t, suite.TimeoutConfig, gwAddr, serverStr)
+			tls.MakeTLSConnectionAndExpectEventuallyConnectionRejection(t, suite.TimeoutConfig, gwAddr, serverStr)
 		})
 	},
 }
