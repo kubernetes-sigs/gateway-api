@@ -17,7 +17,7 @@
 Read conformance reports from conformance/reports/ and output controller-wizard-data.json
 for the Controller Recommendation Wizard. Supports --all (one object keyed by version) or
 --version vX.Y.Z (single array for that version). Output path defaults to
-site-src/implementations/controller-wizard-data.json.
+site-src/wizard/data/controller-wizard-data.json. The output directory is created if it does not exist.
 """
 
 import argparse
@@ -195,8 +195,9 @@ def process_report(path):
 
 def aggregate_by_impl(version_dir):
     """
-    Walk all YAML reports under version_dir and aggregate by (organization, project, version, mode).
-    Returns list of implementation dicts (features merged across profiles).
+    Walk all YAML reports under version_dir and aggregate by (organization, project, version).
+    Multiple reports for the same impl (e.g. different modes) are merged into one row.
+    Returns list of implementation dicts (features and conformance merged across reports).
     """
     seen = {}
     for root, _dirs, files in os.walk(version_dir):
@@ -211,7 +212,6 @@ def aggregate_by_impl(version_dir):
                 row["organization"],
                 row["project"],
                 row["version"],
-                row["mode"],
             )
             if key not in seen:
                 seen[key] = {
@@ -256,8 +256,8 @@ def main():
     parser.add_argument(
         "-o",
         "--output",
-        default="site-src/implementations/controller-wizard-data.json",
-        help="Output JSON path (default: site-src/implementations/controller-wizard-data.json)",
+        default="site-src/wizard/data/controller-wizard-data.json",
+        help="Output JSON path (default: site-src/wizard/data/controller-wizard-data.json)",
     )
     args = parser.parse_args()
 
