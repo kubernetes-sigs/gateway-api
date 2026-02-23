@@ -120,7 +120,8 @@ resource is removed, ensuring a secure and predictable traffic flow.
 ## Examples
 
 The following example shows a `Gateway` with an HTTP listener and two child HTTPS `ListenerSets`
-with unique hostnames and certificates. Only `ListenerSets` from the same namespace of the `Gateway` will be accepted:
+with unique hostnames and certificates. Only `ListenerSets` in namespaces that have the `belongs: shared-gateway`
+label will be accepted :
 
 ```yaml
 {% include 'standard/listenerset/listenerset.yaml' %}
