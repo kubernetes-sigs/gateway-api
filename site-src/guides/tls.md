@@ -194,6 +194,22 @@ are expected to serve a valid certificate for `auth.example.com`.
 ```yaml
 {% include 'standard/backendtlspolicy/backendtlspolicy-ca-certs.yaml' %}
 ```
+### Gateway’s Certificate Selection (Backend mTLS)
+??? success "Standard Channel since v1.5.0"
+    GatewayBackendClientCertificate feature has been part of the Standard Channel since
+    `v1.5.0`. For more information on release channels, refer to our [versioning
+    guide](../concepts/versioning.md).
+
+Mutual TLS (mTLS) for upstream connections requires the Gateway to present a client certificate to the backend, in addition to verifying the backend's certificate. This ensures that the backend only accepts connections from authorized Gateways.
+
+#### Gateway’s Client Certificate Configuration
+To configure the client certificate that the Gateway uses when connecting to backends, use the `tls.backend.clientCertificateRef` field in the `Gateway` resource.
+
+This configuration applies to the Gateway as a client for *all* upstream connections managed by that Gateway.
+
+```yaml
+{% include 'standard/backend-tls.yaml' %}
+```
 
 ## Extensions
 
