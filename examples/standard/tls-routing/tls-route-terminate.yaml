@@ -11,5 +11,4 @@ spec:
   rules:
   - backendRefs:
     - name: bar-svc
-      port: 443
-
+      port: 8080
