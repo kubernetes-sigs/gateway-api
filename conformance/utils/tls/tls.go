@@ -140,12 +140,13 @@ func MakeTLSConnectionAndExpectEventuallyConnectionRejection(t *testing.T, timeo
 		_, err := dialer.DialContext(t.Context(), "tcp", gwAddr)
 		if err != nil {
 			if isConnectionRejected(err) {
-				tlog.Logf(t, "connection was rejected during dial: %v", err)
+				tlog.Logf(t, "connection was rejected during dial: %s", err)
 				return true
 			}
 			tlog.Logf(t, "client could not connect: %s; retrying", err)
 			return false
 		}
+		tlog.Logf(t, "client could connect")
 		return false
 	}, timeoutConfig.MaxTimeToConsistency, time.Second)
 }
