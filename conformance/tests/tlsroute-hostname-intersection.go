@@ -72,7 +72,7 @@ var TLSRouteHostnameIntersection = suite.ConformanceTest{
 
 			t.Run("TLS request not matching hostnames intersection should not reach backend", func(t *testing.T) {
 				t.Parallel()
-				tls.MakeTLSRequestAndExpectEventuallyConnectionReset(t, suite.TimeoutConfig, gwAddr, "non.matching.com")
+				tls.MakeTLSConnectionAndExpectEventuallyConnectionRejection(t, suite.TimeoutConfig, gwAddr, "non.matching.com")
 			})
 		})
 
@@ -110,7 +110,7 @@ var TLSRouteHostnameIntersection = suite.ConformanceTest{
 
 			t.Run("TLS request not matching hostnames intersection should not reach backend", func(t *testing.T) {
 				t.Parallel()
-				tls.MakeTLSRequestAndExpectEventuallyConnectionReset(t, suite.TimeoutConfig, gwAddr, "non.matching.com")
+				tls.MakeTLSConnectionAndExpectEventuallyConnectionRejection(t, suite.TimeoutConfig, gwAddr, "non.matching.com")
 			})
 		})
 
@@ -148,7 +148,7 @@ var TLSRouteHostnameIntersection = suite.ConformanceTest{
 
 			t.Run("TLS request not matching hostnames intersection should not reach backend", func(t *testing.T) {
 				t.Parallel()
-				tls.MakeTLSRequestAndExpectEventuallyConnectionReset(t, suite.TimeoutConfig, gwAddr, "non.matching.com")
+				tls.MakeTLSConnectionAndExpectEventuallyConnectionRejection(t, suite.TimeoutConfig, gwAddr, "non.matching.com")
 			})
 		})
 
@@ -186,7 +186,7 @@ var TLSRouteHostnameIntersection = suite.ConformanceTest{
 
 			t.Run("TLS request not matching hostnames intersection should not reach backend", func(t *testing.T) {
 				t.Parallel()
-				tls.MakeTLSRequestAndExpectEventuallyConnectionReset(t, suite.TimeoutConfig, gwAddr, "non.matching.org")
+				tls.MakeTLSConnectionAndExpectEventuallyConnectionRejection(t, suite.TimeoutConfig, gwAddr, "non.matching.org")
 			})
 		})
 	},
