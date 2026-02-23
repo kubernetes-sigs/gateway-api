@@ -1,5 +1,5 @@
 /*
-Copyright 2026 The Kubernetes Authors.
+Copyright The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -544,6 +544,9 @@ var HTTPRouteCORS = suite.ConformanceTest{
 					AbsentHeaders: []string{
 						"access-control-allow-credentials",
 					},
+					// Ignore whitespace when comparing the response headers. This is because some
+					// implementations add a space after each comma, and some don't. Both are valid.
+					IgnoreWhitespace: true,
 				},
 			},
 			{

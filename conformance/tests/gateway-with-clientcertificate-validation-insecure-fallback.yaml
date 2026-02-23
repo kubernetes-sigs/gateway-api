@@ -1,7 +1,7 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
-  name: gateway-with-invalid-client-cert-validation
+  name: client-validation-insecure-fallback
   namespace: gateway-conformance-infra
 spec:
   gatewayClassName: "{GATEWAY_CLASS_NAME}"
@@ -9,33 +9,20 @@ spec:
     frontend:
       default:
         validation:
+          mode: AllowInsecureFallback
           caCertificateRefs:
           - kind: ConfigMap
             group: ""
             name: tls-validity-checks-ca-certificate
       perPort:
-      - port: 7443
-        tls:
-          validation:
-            caCertificateRefs:
-            - kind: ConfigMap
-              group: ""
-              name: non-exisitng-cm
       - port: 8443
         tls:
           validation:
-            caCertificateRefs:
-            - kind: Service
-              group: ""
-              name: infra-backend-v2
-      - port: 6443
-        tls:
-          validation:
+            mode: AllowInsecureFallback
             caCertificateRefs:
             - kind: ConfigMap
               group: ""
-              name: web-backend-cm
-              namespace: gateway-conformance-web-backend
+              name: tls-validity-checks-per-port-ca-certificate
   listeners:
   - name: https
     port: 443
@@ -49,35 +36,9 @@ spec:
         kind: Secret
         name: tls-validity-checks-certificate
         namespace: gateway-conformance-infra
-  - name: https-unresolved
-    port: 7443
-    hostname: first-example.org
-    protocol: HTTPS
-    allowedRoutes:
-      namespaces:
-        from: Same
-    tls:
-      certificateRefs:
-      - group: ""
-        kind: Secret
-        name: tls-validity-checks-certificate
-        namespace: gateway-conformance-infra
-  - name: https-invalid-kind
+  - name: https-with-hostname
     port: 8443
     hostname: second-example.org
-    protocol: HTTPS
-    allowedRoutes:
-      namespaces:
-        from: Same
-    tls:
-      certificateRefs:
-      - group: ""
-        kind: Secret
-        name: tls-validity-checks-certificate
-        namespace: gateway-conformance-infra
-  - name: https-grant-missing
-    port: 6443
-    hostname: fourth-example.org
     protocol: HTTPS
     allowedRoutes:
       namespaces:
@@ -92,14 +53,28 @@ spec:
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-  name: misconfigured-client-certificate-validation-https-test
+  name: client-cert-validation-insecure-fallback-test
   namespace: gateway-conformance-infra
 spec:
   parentRefs:
-  - name: client-validation-invalid
+  - name: client-validation-insecure-fallback
   hostnames:
   - example.org
   rules:
   - backendRefs:
     - name: infra-backend-v1
+      port: 8080
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: client-cert-validation-insecure-fallback-test-no-hostname
+  namespace: gateway-conformance-infra
+spec:
+  parentRefs:
+  - name: client-validation-insecure-fallback
+    sectionName: https-with-hostname
+  rules:
+  - backendRefs:
+    - name: infra-backend-v2
       port: 8080

@@ -1194,12 +1194,22 @@ const (
 	// information on which address is causing the problem and how to resolve it
 	// in the condition message.
 	GatewayReasonAddressNotUsable GatewayConditionReason = "AddressNotUsable"
-	// This condition indicates `FrontendValidationModeType` changed from
-	// `AllowValidOnly` to `AllowInsecureFallback`.
-	GatewayConditionInsecureFrontendValidationMode GatewayConditionReason = "InsecureFrontendValidationMode"
-	// This reason MUST be set for GatewayConditionInsecureFrontendValidationMode
-	// when client change FrontendValidationModeType for a Gateway or per port override
-	// to `AllowInsecureFallback`.
+)
+
+const (
+	// This condition is true when the Gateway FrontendValidationModeType is
+	// configured to allow insecure fallback behavior.
+	//
+	// Possible reasons for this condition to be True are:
+	//
+	// * "ConfigurationChanged"
+	//
+	// This condition is removed as soon as FrontendValidationModeType is changed back to `AllowValidOnly`.
+	GatewayConditionInsecureFrontendValidationMode GatewayConditionType = "InsecureFrontendValidationMode"
+
+	// This reason is used with the "InsecureFrontendValidationMode" condition when
+	// the FrontendValidationModeType has been changed from `AllowValidOnly` to
+	// `AllowInsecureFallback`, either at the Gateway level or via a per-port override.
 	GatewayReasonConfigurationChanged GatewayConditionReason = "ConfigurationChanged"
 )
 
@@ -1365,7 +1375,7 @@ type ListenerStatus struct {
 	// +optional
 	// +listType=atomic
 	// +kubebuilder:validation:MaxItems=8
-	SupportedKinds []RouteGroupKind `json:"supportedKinds,omitempty"`
+	SupportedKinds []RouteGroupKind `json:"supportedKinds,omitzero"`
 
 	// AttachedRoutes represents the total number of Routes that have been
 	// successfully attached to this Listener.

@@ -37,7 +37,7 @@ The tool is under active development, with ongoing work to support the most wide
 
 The first step is to select an implementation that fits your needs. Key factors to consider include:
 
-* **Conformance:** Check the [conformance reports](https://gateway-api.sigs.k8s.io/implementations/) to ensure the implementation supports the Gateway API features you require.
+* **Conformance:** Check the [conformance reports](/implementations/) to ensure the implementation supports the Gateway API features you require.
 * **Underlying Technology:** Your team's familiarity with a proxy like Envoy, NGINX, or others can influence your choice.
 * **Integration:** Your cloud provider or CNI may already offer an integrated Gateway API implementation.
 
