@@ -2,7 +2,7 @@
 
 ListenerSets allow teams to define ports, hostnames, and TLS certificates in separate resources
 rather than cramming everything into one giant Gateway object which has a limit of 64 listeners.
-This enables a delegated management  model suitable for high-scale, multi-tenant environments.
+This enables a delegated management model suitable for high-scale, multi-tenant environments.
 
 As such, you might use ListenerSets for the following advantages:
 
@@ -138,7 +138,7 @@ spec:
     protocol: HTTP
     port: 80
 ---
-apiVersion: gateway.networking.x-k8s.io/v1alpha1
+apiVersion: gateway.networking.k8s.io/v1
 kind: ListenerSet
 metadata:
   name: first-workload-listeners
@@ -159,7 +159,7 @@ spec:
         group: ""
         name: first-workload-cert # Provisioned via HTTP01 challenge
 ---
-apiVersion: gateway.networking.x-k8s.io/v1alpha1
+apiVersion: gateway.networking.k8s.io/v1
 kind: ListenerSet
 metadata:
   name: second-workload-listeners

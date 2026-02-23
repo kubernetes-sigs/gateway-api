@@ -1,4 +1,4 @@
-# Gateway
+# ListenerSet
 
 ??? success "Standard Channel since v1.5.0"
 
@@ -7,7 +7,7 @@
     guide](../concepts/versioning.md).
 
 A `ListenerSet` is a Gateway API type for specifying additional listeners for a Gateway.
-It aims to decouple network listener configurations—such as ports, hostnames, and TLS
+It decouples network listener configurations—such as ports, hostnames, and TLS
 termination—from the central Gateway resource.
 
 ## Background
@@ -17,7 +17,7 @@ shared Gateway. This enables self-service TLS configuration, improves multi-tena
 decentralized listener management, and allows scaling beyond the 64-listener limit of a single
 Gateway resource.
 
-As such, you might use ListenerSets for the following advantages:
+ListenerSets offer the following advantages:
 
 - *Multitenancy*: You can let different teams create their own ListenerSets while sharing the same
 Gateway and backing load-balancing infrastructure.
@@ -102,7 +102,7 @@ spec:
     sectionName: second
 ```
 
-To attach a Route to a `ListenerSet` and its parent `Gateway`, it MUST have multiple `parentRefs` eg:
+In some rare cases, you may want to attach a Route to separate Listeners in both a ListenerSet and its parent Gateway. In that case, your configuration would look like this:
 
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
@@ -128,24 +128,24 @@ Conflicts occur when multiple listeners claim the same Port, Protocol, and/or Ho
 
 2. ListenerSet Creation Time: If two ListenerSets conflict, the one with the older creationTimestamp wins.
 
-3. ListenerSet Alphabetical Order: If creation timestamps are identical, priority is given based on the alphabetical order of the resource's {namespace}/{name}.
+3. ListenerSet Alphabetical Order: If creation timestamps are identical, priority is given based on the alphabetical order of the resource's `{namespace}`/`{name}`.
 
 The listener with the highest priority is Accepted and Programmed
 The lower-priority listener is marked with a `Conflicted: True` condition in its status.
 
-> A ListenerSet may be partially accepted if only some of its listeners are in conflict. Valid listeners will continue to route traffic, while conflicted ones are disabled
+!!! note  A ListenerSet may be partially accepted if only some of its listeners are in conflict. Valid listeners will continue to route traffic, while conflicted ones are disabled
 
 ## Status Updates
 
-A ListenerSet is considered successfully attached to a Gateway when the following three conditions must all be met:
+A ListenerSet successfully attaches to a Gateway when all three of the following conditions are met:
 
-1. Explicit Gateway Permission : By default, Gateways do not allow any external ListenerSets to attach. The Gateway must have an allowedListeners field in its spec that selects the namespace of the ListenerSet.
+1. Explicit Gateway Permission : By default, Gateways do not allow any external ListenerSets to attach. The Gateway must have an `allowedListeners` field in its spec that selects the namespace of the ListenerSet.
 
 2. Valid Parent Reference : The ListenerSet must explicitly point back to the target Gateway.
 
 3. Resource-Level Acceptance : The Gateway Controller must validate and "accept" the resource (all listeners are valid, etc.).
 
-> A ListenerSet can be Accepted overall even if one of its individual listeners is in conflict with another set. In this case, only the non-conflicting listeners are "Programmed" into the data plane.
+!!! note A ListenerSet can be Accepted overall even if one of its individual listeners is in conflict with another set. In this case, only the non-conflicting listeners are "Programmed" into the data plane.
 
 ### Gateway Status
 The parent `Gateway` status reports the number of successful attached listeners to `.status.attachedListenerSets`.
