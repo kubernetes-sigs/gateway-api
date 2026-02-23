@@ -1,4 +1,4 @@
-# ListenerSets
+# ListenerSet
 
 ListenerSets allow teams to define ports, hostnames, and TLS certificates in separate resources
 rather than cramming everything into one giant Gateway object which has a limit of 64 listeners.
@@ -123,62 +123,5 @@ The following example shows a `Gateway` with an HTTP listener and two child HTTP
 with unique hostnames and certificates. Only `ListenerSets` from the same namespace of the `Gateway` will be accepted:
 
 ```yaml
-apiVersion: gateway.networking.k8s.io/v1
-kind: Gateway
-metadata:
-  name: parent-gateway
-spec:
-  gatewayClassName: example
-  allowedListeners:
-    namespaces:
-      from: Same
-  listeners:
-  - name: foo
-    hostname: foo.com
-    protocol: HTTP
-    port: 80
----
-apiVersion: gateway.networking.k8s.io/v1
-kind: ListenerSet
-metadata:
-  name: first-workload-listeners
-spec:
-  parentRef:
-    name: parent-gateway
-    kind: Gateway
-    group: gateway.networking.k8s.io
-  listeners:
-  - name: first
-    hostname: first.foo.com
-    protocol: HTTPS
-    port: 443
-    tls:
-      mode: Terminate
-      certificateRefs:
-      - kind: Secret
-        group: ""
-        name: first-workload-cert # Provisioned via HTTP01 challenge
----
-apiVersion: gateway.networking.k8s.io/v1
-kind: ListenerSet
-metadata:
-  name: second-workload-listeners
-spec:
-  parentRef:
-    name: parent-gateway
-    kind: Gateway
-    group: gateway.networking.k8s.io
-  listeners:
-  - name: second
-    hostname: second.foo.com
-    protocol: HTTPS
-    port: 443
-    tls:
-      mode: Terminate
-      certificateRefs:
-      - kind: Secret
-        group: ""
-        name: second-workload-cert # Provisioned via HTTP01 challenge
+{% include 'standard/listenerset/listenerset.yaml' %}
 ```
-
-

@@ -139,7 +139,7 @@ The lower-priority listener is marked with a `Conflicted: True` condition in its
 
 A ListenerSet successfully attaches to a Gateway when all three of the following conditions are met:
 
-1. Explicit Gateway Permission : By default, Gateways do not allow any external ListenerSets to attach. The Gateway must have an `allowedListeners` field in its spec that selects the namespace of the ListenerSet.
+1. Gateway AllowedListeners Configuration : By default, Gateways do not allow any external ListenerSets to attach. The Gateway must have an `allowedListeners` field in its spec that selects the namespace of the ListenerSet.
 
 2. Valid Parent Reference : The ListenerSet must explicitly point back to the target Gateway.
 
