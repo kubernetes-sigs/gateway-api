@@ -190,6 +190,9 @@ func onDataLoaded(jsonStr string) {
 	sort.Slice(versionKeys, func(i, j int) bool {
 		return versionCompare(versionKeys[j], versionKeys[i]) < 0
 	})
+	if len(versionKeys) > 3 {
+		versionKeys = versionKeys[:3]
+	}
 	currentVersion = versionKeys[0]
 	impls = allVersionsData[currentVersion]
 
@@ -201,6 +204,7 @@ func onDataLoaded(jsonStr string) {
 		opt.Set("textContent", v)
 		versionSelect.Call("appendChild", opt)
 	}
+	versionSelect.Set("value", currentVersion)
 	versionSelect.Call("addEventListener", "change", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		currentVersion = versionSelect.Get("value").String()
 		impls = allVersionsData[currentVersion]
@@ -239,7 +243,7 @@ func updateVersionLinks(versionKey string) {
 	base := "https://gateway-api.sigs.k8s.io/implementations/" + seg + "/"
 	introLink := doc.Call("getElementById", "link-intro-conformance")
 	if introLink.Truthy() {
-		introLink.Set("href", base+"#httproute")
+		introLink.Set("href", base)
 		introLink.Set("textContent", seg+" conformance tables")
 	}
 	for _, id := range []string{"link-httproute", "link-grpcroute", "link-tlsroute"} {
@@ -337,7 +341,7 @@ func renderHTTPRouteWithSpacer(tableID string, gateway, route, backend []feature
 	for _, f := range gatewayFirst {
 		name := prefix + f.ID
 		html.WriteString(fmt.Sprintf(`<tr><td>%s</td><td>
-<label><input type="radio" name="%s" value="must" /> Want to have</label>
+<label><input type="radio" name="%s" value="must" /> Must have</label>
 <label><input type="radio" name="%s" value="good" /> Good to have</label>
 <label><input type="radio" name="%s" value="na" checked /> N/A</label>
 </td></tr>`, escapeHTML(f.Label), name, name, name))
@@ -348,7 +352,7 @@ func renderHTTPRouteWithSpacer(tableID string, gateway, route, backend []feature
 	for _, f := range rest {
 		name := prefix + f.ID
 		html.WriteString(fmt.Sprintf(`<tr><td>%s</td><td>
-<label><input type="radio" name="%s" value="must" /> Want to have</label>
+<label><input type="radio" name="%s" value="must" /> Must have</label>
 <label><input type="radio" name="%s" value="good" /> Good to have</label>
 <label><input type="radio" name="%s" value="na" checked /> N/A</label>
 </td></tr>`, escapeHTML(f.Label), name, name, name))
@@ -359,7 +363,7 @@ func renderHTTPRouteWithSpacer(tableID string, gateway, route, backend []feature
 	for _, f := range backend {
 		name := prefix + f.ID
 		html.WriteString(fmt.Sprintf(`<tr><td>%s</td><td>
-<label><input type="radio" name="%s" value="must" /> Want to have</label>
+<label><input type="radio" name="%s" value="must" /> Must have</label>
 <label><input type="radio" name="%s" value="good" /> Good to have</label>
 <label><input type="radio" name="%s" value="na" checked /> N/A</label>
 </td></tr>`, escapeHTML(f.Label), name, name, name))
@@ -377,7 +381,7 @@ func renderTable(tableID string, rows []featureDef, section string) {
 	for _, f := range rows {
 		name := prefix + f.ID
 		html.WriteString(fmt.Sprintf(`<tr><td>%s</td><td>
-<label><input type="radio" name="%s" value="must" /> Want to have</label>
+<label><input type="radio" name="%s" value="must" /> Must have</label>
 <label><input type="radio" name="%s" value="good" /> Good to have</label>
 <label><input type="radio" name="%s" value="na" checked /> N/A</label>
 </td></tr>`, escapeHTML(f.Label), name, name, name))
@@ -446,7 +450,7 @@ func recommend() {
 
 	must, good := getSelections()
 	if len(must) == 0 && len(good) == 0 {
-		resultsContent.Set("innerHTML", `<p class="no-results">Select at least one requirement as Want to have or Good to have, then click Recommend.</p>`)
+		resultsContent.Set("innerHTML", `<p class="no-results">Select at least one requirement as Must have or Good to have, then click Recommend.</p>`)
 		resultsDiv.Get("classList").Call("add", "visible")
 		setStatus(statusEl, 0)
 		return
@@ -493,7 +497,7 @@ func recommend() {
 		}
 	}
 	if len(scoredList) == 0 {
-		resultsContent.Set("innerHTML", `<p class="no-results">No controller supports any of your Want to have requirements. Try relaxing to Good to have or fewer requirements.</p>`)
+		resultsContent.Set("innerHTML", `<p class="no-results">No controller supports any of your Must have requirements. Try relaxing to Good to have or fewer requirements.</p>`)
 		resultsDiv.Get("classList").Call("add", "visible")
 		setStatus(statusEl, 0)
 		return
@@ -544,7 +548,7 @@ func recommend() {
 		return label
 	}
 	var html strings.Builder
-	html.WriteString(`<table class="results"><thead><tr><th>Organization</th><th>Project</th><th>Conformance</th><th>Want to have</th><th>Good to have</th><th>Missing</th></tr></thead><tbody>`)
+	html.WriteString(`<table class="results"><thead><tr><th>Organization</th><th>Project</th><th>Conformance</th><th>Must have</th><th>Good to have</th><th>Missing</th></tr></thead><tbody>`)
 	for _, c := range scoredList {
 		conformance := strings.Join(c.impl.Conformance, ", ")
 		missingLabels := make([]string, len(c.missing))

@@ -15,9 +15,8 @@
       <label for="version-select"><strong>Gateway API version:</strong></label>
       <select id="version-select"></select>
     </p>
-    <p>For each feature, select <strong>Want to have</strong> (required), <strong>Good to have</strong> (optional), or
-      <strong>N/A</strong>. Feature names match the
-      <a id="link-intro-conformance" href="https://gateway-api.sigs.k8s.io/implementations/v1.4/#httproute" target="_blank" rel="noopener">v1.4
+    <p>For each feature, select <strong>Must have</strong>, <strong>Good to have</strong>, or <strong>N/A</strong>. Feature names match the
+      <a id="link-intro-conformance" href="https://gateway-api.sigs.k8s.io/implementations/v1.4/" target="_blank" rel="noopener">v1.4
         conformance tables</a>.</p>
     <p class="intro-source">Recommendations are generated from the
       <a href="https://github.com/kubernetes-sigs/gateway-api/tree/main/conformance/reports" target="_blank" rel="noopener">conformance reports uploaded by project implementations</a>.
@@ -129,7 +128,7 @@
       const httpLink = document.getElementById('link-httproute');
       const grpcLink = document.getElementById('link-grpcroute');
       const tlsLink = document.getElementById('link-tlsroute');
-      if (introLink) { introLink.href = base + '#httproute'; introLink.textContent = seg + ' conformance tables'; }
+      if (introLink) { introLink.href = base; introLink.textContent = seg + ' conformance tables'; }
       if (httpLink) httpLink.href = base + '#httproute';
       if (grpcLink) grpcLink.href = base + '#grpcroute';
       if (tlsLink) tlsLink.href = base + '#tlsroute';
@@ -178,7 +177,7 @@
         <tr>
           <td>${label}</td>
           <td>
-            <label><input type="radio" name="${prefix}${id}" value="must" /> Want to have</label>
+            <label><input type="radio" name="${prefix}${id}" value="must" /> Must have</label>
             <label><input type="radio" name="${prefix}${id}" value="good" /> Good to have</label>
             <label><input type="radio" name="${prefix}${id}" value="na" checked /> N/A</label>
           </td>
@@ -253,7 +252,7 @@
         }
       };
       if (must.length === 0 && good.length === 0) {
-        resultsContent.innerHTML = '<p class="no-results">Select at least one requirement as Want to have or Good to have, then click Recommend.</p>';
+        resultsContent.innerHTML = '<p class="no-results">Select at least one requirement as Must have or Good to have, then click Recommend.</p>';
         resultsDiv.classList.add('visible');
         resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
         setStatusAfterRecommend(0);
@@ -285,7 +284,7 @@
       }).filter(c => c.mustCount >= 1 || (must.length === 0 && c.goodCount >= 1));
 
       if (scored.length === 0) {
-        resultsContent.innerHTML = '<p class="no-results">No controller supports any of your Want to have requirements. Try relaxing to Good to have or fewer requirements.</p>';
+        resultsContent.innerHTML = '<p class="no-results">No controller supports any of your Must have requirements. Try relaxing to Good to have or fewer requirements.</p>';
         resultsDiv.classList.add('visible');
         resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
         setStatusAfterRecommend(0);
@@ -313,7 +312,7 @@
               <th>Organization</th>
               <th>Project</th>
               <th>Conformance</th>
-              <th>Want to have</th>
+              <th>Must have</th>
               <th>Good to have</th>
               <th>Missing</th>
             </tr>
@@ -378,7 +377,7 @@
               statusEl.textContent = IMPLEMENTATIONS.length ? '' : 'No implementations in data file.';
             } else {
               const versionKeys = Object.keys(data).filter(k => k !== 'featureDefinitions');
-              const versions = versionKeys.sort((a, b) => {
+              const sorted = versionKeys.sort((a, b) => {
                 const pa = a.replace(/^v/, '').split('.').map(Number);
                 const pb = b.replace(/^v/, '').split('.').map(Number);
                 for (let i = 0; i < 3; i++) {
@@ -387,6 +386,7 @@
                 }
                 return 0;
               });
+              const versions = sorted.slice(0, 3);
               if (versions.length === 0) {
                 IMPLEMENTATIONS = [];
                 statusEl.textContent = 'No versions in data file.';
