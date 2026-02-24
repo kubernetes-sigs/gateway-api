@@ -107,6 +107,9 @@ type TimeoutConfig struct {
 	// DefaultTestTimeout is the default amount of time to wait for a test to complete
 	DefaultTestTimeout time.Duration
 
+	// DefaultPollInterval is the default amount of time to poll for status checks.
+	DefaultPollInterval time.Duration
+
 	// RequiredConsecutiveSuccesses is the number of requests that must succeed in a row
 	// to consider a response "consistent" before making additional assertions on the response body.
 	// If this number is not reached within MaxTimeToConsistency, the test will fail.
@@ -136,6 +139,7 @@ func DefaultTimeoutConfig() TimeoutConfig {
 		RequestTimeout:                         10 * time.Second,
 		LatestObservedGenerationSet:            60 * time.Second,
 		DefaultTestTimeout:                     60 * time.Second,
+		DefaultPollInterval:                    time.Millisecond * 100,
 		RequiredConsecutiveSuccesses:           3,
 	}
 }
