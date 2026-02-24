@@ -23,7 +23,7 @@ import (
 
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
-	"sigs.k8s.io/gateway-api/conformance/utils/suite"
+	confsuite "sigs.k8s.io/gateway-api/conformance/utils/suite"
 	"sigs.k8s.io/gateway-api/pkg/features"
 )
 
@@ -31,7 +31,7 @@ func init() {
 	ConformanceTests = append(ConformanceTests, HTTPRouteCORSAllowCredentialsBehavior)
 }
 
-var HTTPRouteCORSAllowCredentialsBehavior = suite.ConformanceTest{
+var HTTPRouteCORSAllowCredentialsBehavior = confsuite.ConformanceTest{
 	ShortName:   "HTTPRouteCORSAllowCredentialsBehavior",
 	Description: "An HTTPRoute with CORS includes Access-Control-Allow-Credentials only when configured as 'true', and then only alongside a matching Access-Control-Allow-Origin.",
 	Manifests:   []string{"tests/httproute-cors-allow-credentials-behavior.yaml"},
@@ -40,8 +40,8 @@ var HTTPRouteCORSAllowCredentialsBehavior = suite.ConformanceTest{
 		features.SupportHTTPRoute,
 		features.SupportHTTPRouteCORS,
 	},
-	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
-		ns := "gateway-conformance-infra"
+	Test: func(t *testing.T, suite *confsuite.ConformanceTestSuite) {
+		ns := confsuite.InfrastructureNamespace
 		routeNN := types.NamespacedName{Name: "cors-allow-credentials", Namespace: ns}
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: ns}
 		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
