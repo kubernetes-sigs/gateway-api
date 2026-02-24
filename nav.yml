@@ -43,6 +43,7 @@ nav:
           - HTTP CORS: guides/http-cors.md
           - Cross-Namespace routing: guides/multiple-ns.md
           - TLS: guides/tls.md
+          - TLS routing: guides/tls-routing.md
           - TCP routing: guides/tcp.md
           - gRPC Routing: guides/grpc-routing.md
           - Backend Protocol Selection: guides/backend-protocol.md
@@ -61,6 +62,7 @@ nav:
               - BackendTLSPolicy: api-types/backendtlspolicy.md
               - BackendTrafficPolicy: api-types/backendtrafficpolicy.md
           - ReferenceGrant: api-types/referencegrant.md
+          - TLSRoute: api-types/tlsroute.md
           - ListenerSet: api-types/listenerset.md
       - API specification:
           - Development:

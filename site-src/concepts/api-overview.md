@@ -150,11 +150,11 @@ modifying them in-flight.
 
 #### TLSRoute
 
-??? example "Experimental Channel since v0.3.0"
+??? success "Standard Channel since v1.5.0"
 
-    The `TLSRoute` resource is Alpha and has been part of the Experimental
-    Channel since `v0.3.0`. For more information on release channels, refer to
-    our [versioning guide](versioning.md).
+    The `TLSRoute` resource is GA and has been part of the Standard Channel since
+    `v1.5.0`. For more information on release channels, refer to our [versioning
+    guide](versioning.md).
 
 TLSRoute is for multiplexing TLS connections, discriminated via SNI. It's intended
 for where you want to route based on TLS metadata, and are not interested in properties
