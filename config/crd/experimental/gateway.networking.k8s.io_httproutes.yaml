@@ -2,7 +2,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    api-approved.kubernetes.io: https://github.com/kubernetes-sigs/gateway-api/pull/3328
+    api-approved.kubernetes.io: https://github.com/kubernetes-sigs/gateway-api/pull/4530
     gateway.networking.k8s.io/bundle-version: v1.4.1
     gateway.networking.k8s.io/channel: experimental
   name: httproutes.gateway.networking.k8s.io
@@ -677,12 +677,12 @@ spec:
                                         description: |-
                                           The CORSOrigin MUST NOT be a relative URI, and it MUST follow the URI syntax and
                                           encoding rules specified in RFC3986.  The CORSOrigin MUST include both a
-                                          scheme (e.g., "http" or "spiffe") and a scheme-specific-part, or it should be a single '*' character.
+                                          scheme ("http" or "https") and a scheme-specific-part, or it should be a single '*' character.
                                           URIs that include an authority MUST include a fully qualified domain name or
                                           IP address as the host.
                                         maxLength: 253
                                         minLength: 1
-                                        pattern: (^\*$)|(^([a-zA-Z][a-zA-Z0-9+\-.]+):\/\/([^:/?#]+)(:([0-9]{1,5}))?$)
+                                        pattern: (^\*$)|(^(http(s)?):\/\/(((\*\.)?([a-zA-Z0-9\-]+\.)*[a-zA-Z0-9-]+|\*)(:([0-9]{1,5}))?)$)
                                         type: string
                                       maxItems: 64
                                       type: array
@@ -1774,6 +1774,11 @@ spec:
                               - type
                               type: object
                               x-kubernetes-validations:
+                              - message: filter.cors must be nil if the filter.type
+                                  is not CORS
+                                rule: '!(has(self.cors) && self.type != ''CORS'')'
+                              - message: filter.cors must be specified for CORS filter.type
+                                rule: '!(!has(self.cors) && self.type == ''CORS'')'
                               - message: filter.requestHeaderModifier must be nil
                                   if the filter.type is not RequestHeaderModifier
                                 rule: '!(has(self.requestHeaderModifier) && self.type
@@ -1817,11 +1822,6 @@ spec:
                               - message: filter.extensionRef must be specified for
                                   ExtensionRef filter.type
                                 rule: '!(!has(self.extensionRef) && self.type == ''ExtensionRef'')'
-                              - message: filter.cors must be nil if the filter.type
-                                  is not CORS
-                                rule: '!(has(self.cors) && self.type != ''CORS'')'
-                              - message: filter.cors must be specified for CORS filter.type
-                                rule: '!(!has(self.cors) && self.type == ''CORS'')'
                               - message: filter.externalAuth must be nil if the filter.type
                                   is not ExternalAuth
                                 rule: '!(has(self.externalAuth) && self.type != ''ExternalAuth'')'
@@ -2205,12 +2205,12 @@ spec:
                                   description: |-
                                     The CORSOrigin MUST NOT be a relative URI, and it MUST follow the URI syntax and
                                     encoding rules specified in RFC3986.  The CORSOrigin MUST include both a
-                                    scheme (e.g., "http" or "spiffe") and a scheme-specific-part, or it should be a single '*' character.
+                                    scheme ("http" or "https") and a scheme-specific-part, or it should be a single '*' character.
                                     URIs that include an authority MUST include a fully qualified domain name or
                                     IP address as the host.
                                   maxLength: 253
                                   minLength: 1
-                                  pattern: (^\*$)|(^([a-zA-Z][a-zA-Z0-9+\-.]+):\/\/([^:/?#]+)(:([0-9]{1,5}))?$)
+                                  pattern: (^\*$)|(^(http(s)?):\/\/(((\*\.)?([a-zA-Z0-9\-]+\.)*[a-zA-Z0-9-]+|\*)(:([0-9]{1,5}))?)$)
                                   type: string
                                 maxItems: 64
                                 type: array
@@ -3296,6 +3296,11 @@ spec:
                         - type
                         type: object
                         x-kubernetes-validations:
+                        - message: filter.cors must be nil if the filter.type is not
+                            CORS
+                          rule: '!(has(self.cors) && self.type != ''CORS'')'
+                        - message: filter.cors must be specified for CORS filter.type
+                          rule: '!(!has(self.cors) && self.type == ''CORS'')'
                         - message: filter.requestHeaderModifier must be nil if the
                             filter.type is not RequestHeaderModifier
                           rule: '!(has(self.requestHeaderModifier) && self.type !=
@@ -3336,11 +3341,6 @@ spec:
                         - message: filter.extensionRef must be specified for ExtensionRef
                             filter.type
                           rule: '!(!has(self.extensionRef) && self.type == ''ExtensionRef'')'
-                        - message: filter.cors must be nil if the filter.type is not
-                            CORS
-                          rule: '!(has(self.cors) && self.type != ''CORS'')'
-                        - message: filter.cors must be specified for CORS filter.type
-                          rule: '!(!has(self.cors) && self.type == ''CORS'')'
                         - message: filter.externalAuth must be nil if the filter.type
                             is not ExternalAuth
                           rule: '!(has(self.externalAuth) && self.type != ''ExternalAuth'')'
@@ -4938,12 +4938,12 @@ spec:
                                         description: |-
                                           The CORSOrigin MUST NOT be a relative URI, and it MUST follow the URI syntax and
                                           encoding rules specified in RFC3986.  The CORSOrigin MUST include both a
-                                          scheme (e.g., "http" or "spiffe") and a scheme-specific-part, or it should be a single '*' character.
+                                          scheme ("http" or "https") and a scheme-specific-part, or it should be a single '*' character.
                                           URIs that include an authority MUST include a fully qualified domain name or
                                           IP address as the host.
                                         maxLength: 253
                                         minLength: 1
-                                        pattern: (^\*$)|(^([a-zA-Z][a-zA-Z0-9+\-.]+):\/\/([^:/?#]+)(:([0-9]{1,5}))?$)
+                                        pattern: (^\*$)|(^(http(s)?):\/\/(((\*\.)?([a-zA-Z0-9\-]+\.)*[a-zA-Z0-9-]+|\*)(:([0-9]{1,5}))?)$)
                                         type: string
                                       maxItems: 64
                                       type: array
@@ -6035,6 +6035,11 @@ spec:
                               - type
                               type: object
                               x-kubernetes-validations:
+                              - message: filter.cors must be nil if the filter.type
+                                  is not CORS
+                                rule: '!(has(self.cors) && self.type != ''CORS'')'
+                              - message: filter.cors must be specified for CORS filter.type
+                                rule: '!(!has(self.cors) && self.type == ''CORS'')'
                               - message: filter.requestHeaderModifier must be nil
                                   if the filter.type is not RequestHeaderModifier
                                 rule: '!(has(self.requestHeaderModifier) && self.type
@@ -6078,11 +6083,6 @@ spec:
                               - message: filter.extensionRef must be specified for
                                   ExtensionRef filter.type
                                 rule: '!(!has(self.extensionRef) && self.type == ''ExtensionRef'')'
-                              - message: filter.cors must be nil if the filter.type
-                                  is not CORS
-                                rule: '!(has(self.cors) && self.type != ''CORS'')'
-                              - message: filter.cors must be specified for CORS filter.type
-                                rule: '!(!has(self.cors) && self.type == ''CORS'')'
                               - message: filter.externalAuth must be nil if the filter.type
                                   is not ExternalAuth
                                 rule: '!(has(self.externalAuth) && self.type != ''ExternalAuth'')'
@@ -6466,12 +6466,12 @@ spec:
                                   description: |-
                                     The CORSOrigin MUST NOT be a relative URI, and it MUST follow the URI syntax and
                                     encoding rules specified in RFC3986.  The CORSOrigin MUST include both a
-                                    scheme (e.g., "http" or "spiffe") and a scheme-specific-part, or it should be a single '*' character.
+                                    scheme ("http" or "https") and a scheme-specific-part, or it should be a single '*' character.
                                     URIs that include an authority MUST include a fully qualified domain name or
                                     IP address as the host.
                                   maxLength: 253
                                   minLength: 1
-                                  pattern: (^\*$)|(^([a-zA-Z][a-zA-Z0-9+\-.]+):\/\/([^:/?#]+)(:([0-9]{1,5}))?$)
+                                  pattern: (^\*$)|(^(http(s)?):\/\/(((\*\.)?([a-zA-Z0-9\-]+\.)*[a-zA-Z0-9-]+|\*)(:([0-9]{1,5}))?)$)
                                   type: string
                                 maxItems: 64
                                 type: array
@@ -7557,6 +7557,11 @@ spec:
                         - type
                         type: object
                         x-kubernetes-validations:
+                        - message: filter.cors must be nil if the filter.type is not
+                            CORS
+                          rule: '!(has(self.cors) && self.type != ''CORS'')'
+                        - message: filter.cors must be specified for CORS filter.type
+                          rule: '!(!has(self.cors) && self.type == ''CORS'')'
                         - message: filter.requestHeaderModifier must be nil if the
                             filter.type is not RequestHeaderModifier
                           rule: '!(has(self.requestHeaderModifier) && self.type !=
@@ -7597,11 +7602,6 @@ spec:
                         - message: filter.extensionRef must be specified for ExtensionRef
                             filter.type
                           rule: '!(!has(self.extensionRef) && self.type == ''ExtensionRef'')'
-                        - message: filter.cors must be nil if the filter.type is not
-                            CORS
-                          rule: '!(has(self.cors) && self.type != ''CORS'')'
-                        - message: filter.cors must be specified for CORS filter.type
-                          rule: '!(!has(self.cors) && self.type == ''CORS'')'
                         - message: filter.externalAuth must be nil if the filter.type
                             is not ExternalAuth
                           rule: '!(has(self.externalAuth) && self.type != ''ExternalAuth'')'

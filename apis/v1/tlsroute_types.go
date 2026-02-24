@@ -1,5 +1,5 @@
 /*
-Copyright 2026 The Kubernetes Authors.
+Copyright The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -133,10 +133,9 @@ type TLSRouteRule struct {
 	// a Service with no endpoints), the rule performs no forwarding; if no
 	// filters are specified that would result in a response being sent, the
 	// underlying implementation must actively reject request attempts to this
-	// backend, by rejecting the connection or returning a 500 status code.
-	// Request rejections must respect weight; if an invalid backend is
-	// requested to have 80% of requests, then 80% of requests must be rejected
-	// instead.
+	// backend, by rejecting the connection. Request rejections must respect
+	// weight; if an invalid backend is requested to have 80% of requests, then
+	// 80% of requests must be rejected instead.
 	//
 	// Support: Core for Kubernetes Service
 	//

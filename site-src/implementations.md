@@ -702,7 +702,7 @@ Flagger can be used to automate canary deployments and A/B testing using Gateway
 
 [cert-manager][cert-manager] is a tool to automate certificate management in cloud native environments.
 
-cert-manager can generate TLS certificates for Gateway resources. This is configured by adding annotations to a Gateway. It currently supports the `v1alpha2` spec of Gateway API. You can refer to the [cert-manager docs][cert-manager-docs] to try it out.
+cert-manager can generate TLS certificates for Gateway resources. This is configured by adding annotations to a Gateway. It currently supports the `v1` spec of Gateway API. You can refer to the [cert-manager docs][cert-manager-docs] to try it out.
 
 [cert-manager]:https://cert-manager.io/
 [cert-manager-docs]:https://cert-manager.io/docs/usage/gateway/

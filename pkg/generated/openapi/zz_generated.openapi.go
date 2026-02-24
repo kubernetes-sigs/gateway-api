@@ -3206,7 +3206,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_BackendTLSPolicyValidation(ref common.
 					},
 					"wellKnownCACertificates": {
 						SchemaProps: spec.SchemaProps{
-							Description: "WellKnownCACertificates specifies whether a well-known set of CA certificates may be used in the TLS handshake between the gateway and backend pod.\n\nIf WellKnownCACertificates is unspecified or empty (\"\"), then CACertificateRefs must be specified with at least one entry for a valid configuration. Only one of CACertificateRefs or WellKnownCACertificates may be specified, not both. If an implementation does not support the WellKnownCACertificates field, or the supplied value is not recognized, the implementation MUST ensure the `Accepted` Condition on the BackendTLSPolicy is set to `status: False`, with a Reason `Invalid`.\n\nValid values include: * \"System\" - indicates that well-known system CA certificates should be used.\n\nImplementations MAY define their own sets of CA certificates. Such definitions MUST use an implementation-specific, prefixed name, such as `mycompany.com/my-custom-ca-certifcates`.\n\nSupport: Implementation-specific",
+							Description: "WellKnownCACertificates specifies whether a well-known set of CA certificates may be used in the TLS handshake between the gateway and backend pod.\n\nIf WellKnownCACertificates is unspecified or empty (\"\"), then CACertificateRefs must be specified with at least one entry for a valid configuration. Only one of CACertificateRefs or WellKnownCACertificates may be specified, not both. If an implementation does not support the WellKnownCACertificates field, or the supplied value is not recognized, the implementation MUST ensure the `Accepted` Condition on the BackendTLSPolicy is set to `status: False`, with a Reason `Invalid`.\n\nValid values include: * \"System\" - indicates that well-known system CA certificates should be used.\n\nImplementations MAY define their own sets of CA certificates. Such definitions MUST use an implementation-specific, prefixed name, such as `mycompany.com/my-custom-ca-certificates`.\n\nSupport: Implementation-specific",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -5316,7 +5316,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteFilter(ref common.ReferenceCa
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "HTTPRouteFilter defines processing steps that must be completed during the request or response lifecycle. HTTPRouteFilters are meant as an extension point to express processing that may be done in Gateway implementations. Some examples include request or response modification, implementing authentication strategies, rate-limiting, and traffic shaping. API guarantee/conformance is defined based on the type of the filter.\n\n<gateway:experimental:validation:XValidation:message=\"filter.cors must be nil if the filter.type is not CORS\",rule=\"!(has(self.cors) && self.type != 'CORS')\"> <gateway:experimental:validation:XValidation:message=\"filter.cors must be specified for CORS filter.type\",rule=\"!(!has(self.cors) && self.type == 'CORS')\"> <gateway:experimental:validation:XValidation:message=\"filter.externalAuth must be nil if the filter.type is not ExternalAuth\",rule=\"!(has(self.externalAuth) && self.type != 'ExternalAuth')\"> <gateway:experimental:validation:XValidation:message=\"filter.externalAuth must be specified for ExternalAuth filter.type\",rule=\"!(!has(self.externalAuth) && self.type == 'ExternalAuth')\">",
+				Description: "HTTPRouteFilter defines processing steps that must be completed during the request or response lifecycle. HTTPRouteFilters are meant as an extension point to express processing that may be done in Gateway implementations. Some examples include request or response modification, implementing authentication strategies, rate-limiting, and traffic shaping. API guarantee/conformance is defined based on the type of the filter.\n\n<gateway:experimental:validation:XValidation:message=\"filter.externalAuth must be nil if the filter.type is not ExternalAuth\",rule=\"!(has(self.externalAuth) && self.type != 'ExternalAuth')\"> <gateway:experimental:validation:XValidation:message=\"filter.externalAuth must be specified for ExternalAuth filter.type\",rule=\"!(!has(self.externalAuth) && self.type == 'ExternalAuth')\">",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"type": {
@@ -5359,7 +5359,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteFilter(ref common.ReferenceCa
 					},
 					"cors": {
 						SchemaProps: spec.SchemaProps{
-							Description: "CORS defines a schema for a filter that responds to the cross-origin request based on HTTP response header.\n\nSupport: Extended\n\n<gateway:experimental>",
+							Description: "CORS defines a schema for a filter that responds to the cross-origin request based on HTTP response header.\n\nSupport: Extended",
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.HTTPCORSFilter"),
 						},
 					},
@@ -5997,7 +5997,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_ListenerEntryStatus(ref common.Referen
 						},
 					},
 				},
-				Required: []string{"name", "supportedKinds", "attachedRoutes", "conditions"},
+				Required: []string{"name", "attachedRoutes", "conditions"},
 			},
 		},
 		Dependencies: []string{
@@ -6299,7 +6299,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_ListenerStatus(ref common.ReferenceCal
 						},
 					},
 				},
-				Required: []string{"name", "supportedKinds", "attachedRoutes", "conditions"},
+				Required: []string{"name", "attachedRoutes", "conditions"},
 			},
 		},
 		Dependencies: []string{
@@ -7530,7 +7530,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_TLSRouteRule(ref common.ReferenceCallb
 							},
 						},
 						SchemaProps: spec.SchemaProps{
-							Description: "BackendRefs defines the backend(s) where matching requests should be sent. If unspecified or invalid (refers to a nonexistent resource or a Service with no endpoints), the rule performs no forwarding; if no filters are specified that would result in a response being sent, the underlying implementation must actively reject request attempts to this backend, by rejecting the connection or returning a 500 status code. Request rejections must respect weight; if an invalid backend is requested to have 80% of requests, then 80% of requests must be rejected instead.\n\nSupport: Core for Kubernetes Service\n\nSupport: Extended for Kubernetes ServiceImport\n\nSupport: Implementation-specific for any other resource\n\nSupport for weight: Extended",
+							Description: "BackendRefs defines the backend(s) where matching requests should be sent. If unspecified or invalid (refers to a nonexistent resource or a Service with no endpoints), the rule performs no forwarding; if no filters are specified that would result in a response being sent, the underlying implementation must actively reject request attempts to this backend, by rejecting the connection. Request rejections must respect weight; if an invalid backend is requested to have 80% of requests, then 80% of requests must be rejected instead.\n\nSupport: Core for Kubernetes Service\n\nSupport: Extended for Kubernetes ServiceImport\n\nSupport: Implementation-specific for any other resource\n\nSupport for weight: Extended",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -8444,7 +8444,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_TLSRouteRule(ref common.Referenc
 							},
 						},
 						SchemaProps: spec.SchemaProps{
-							Description: "BackendRefs defines the backend(s) where matching requests should be sent. If unspecified or invalid (refers to a nonexistent resource or a Service with no endpoints), the rule performs no forwarding; if no filters are specified that would result in a response being sent, the underlying implementation must actively reject request attempts to this backend, by rejecting the connection or returning a 500 status code. Request rejections must respect weight; if an invalid backend is requested to have 80% of requests, then 80% of requests must be rejected instead.\n\nSupport: Core for Kubernetes Service\n\nSupport: Extended for Kubernetes ServiceImport\n\nSupport: Implementation-specific for any other resource\n\nSupport for weight: Extended",
+							Description: "BackendRefs defines the backend(s) where matching requests should be sent. If unspecified or invalid (refers to a nonexistent resource or a Service with no endpoints), the rule performs no forwarding; if no filters are specified that would result in a response being sent, the underlying implementation must actively reject request attempts to this backend, by rejecting the connection. Request rejections must respect weight; if an invalid backend is requested to have 80% of requests, then 80% of requests must be rejected instead.\n\nSupport: Core for Kubernetes Service\n\nSupport: Extended for Kubernetes ServiceImport\n\nSupport: Implementation-specific for any other resource\n\nSupport for weight: Extended",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
