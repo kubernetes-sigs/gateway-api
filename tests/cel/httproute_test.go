@@ -1454,6 +1454,8 @@ func TestHTTPRouteCORS(t *testing.T) {
 					"https://xpto.com",
 					"http://*.abcd.com",
 					"http://*.abcd.com:12345",
+					"https://*:443",
+					"https://*",
 				},
 			},
 		},
@@ -1512,6 +1514,96 @@ func TestHTTPRouteCORS(t *testing.T) {
 					"xpto/https://xpto.com",
 				},
 			},
+		},
+		{
+			name: "invalid-origin-with-six-digit-port",
+			corsfilter: &gatewayv1.HTTPCORSFilter{
+				AllowOrigins: []gatewayv1.CORSOrigin{
+					"http://www.example.com:111111",
+				},
+			},
+			wantErrors: []string{"Invalid value: \"http://www.example.com:111111\": spec.rules[0].filters[0].cors.allowOrigins[0] in body should match"},
+		},
+		{
+			name: "invalid-origin-with-empty-port",
+			corsfilter: &gatewayv1.HTTPCORSFilter{
+				AllowOrigins: []gatewayv1.CORSOrigin{
+					"http://www.example.com:",
+				},
+			},
+			wantErrors: []string{"Invalid value: \"http://www.example.com:\": spec.rules[0].filters[0].cors.allowOrigins[0] in body should match"},
+		},
+		{
+			name: "invalid-origin-with-non-empty-path",
+			corsfilter: &gatewayv1.HTTPCORSFilter{
+				AllowOrigins: []gatewayv1.CORSOrigin{
+					"http://www.example.com/cart",
+				},
+			},
+			wantErrors: []string{"Invalid value: \"http://www.example.com/cart\": spec.rules[0].filters[0].cors.allowOrigins[0] in body should match"},
+		},
+		{
+			name: "invalid-origin-with-non-http-https-scheme",
+			corsfilter: &gatewayv1.HTTPCORSFilter{
+				AllowOrigins: []gatewayv1.CORSOrigin{
+					"spiffe://www.example.com",
+				},
+			},
+			wantErrors: []string{"Invalid value: \"spiffe://www.example.com\": spec.rules[0].filters[0].cors.allowOrigins[0] in body should match"},
+		},
+		{
+			name: "invalid-origin-with-wildcard-as-label-prefix",
+			corsfilter: &gatewayv1.HTTPCORSFilter{
+				AllowOrigins: []gatewayv1.CORSOrigin{
+					"http://*bar.com",
+				},
+			},
+			wantErrors: []string{"Invalid value: \"http://*bar.com\": spec.rules[0].filters[0].cors.allowOrigins[0] in body should match"},
+		},
+		{
+			name: "invalid-origin-with-wildcard-as-label-sufix",
+			corsfilter: &gatewayv1.HTTPCORSFilter{
+				AllowOrigins: []gatewayv1.CORSOrigin{
+					"http://bar*.com",
+				},
+			},
+			wantErrors: []string{"Invalid value: \"http://bar*.com\": spec.rules[0].filters[0].cors.allowOrigins[0] in body should match"},
+		},
+		{
+			name: "invalid-origin-with-wildcard-as-label",
+			corsfilter: &gatewayv1.HTTPCORSFilter{
+				AllowOrigins: []gatewayv1.CORSOrigin{
+					"http://bar.*.com",
+				},
+			},
+			wantErrors: []string{"Invalid value: \"http://bar.*.com\": spec.rules[0].filters[0].cors.allowOrigins[0] in body should match"},
+		},
+		{
+			name: "invalid-origin-with-wildcard-as-hostname-prefix",
+			corsfilter: &gatewayv1.HTTPCORSFilter{
+				AllowOrigins: []gatewayv1.CORSOrigin{
+					"http://*bar",
+				},
+			},
+			wantErrors: []string{"Invalid value: \"http://*bar\": spec.rules[0].filters[0].cors.allowOrigins[0] in body should match"},
+		},
+		{
+			name: "invalid-origin-with-wildcard-as-hostname-sufix",
+			corsfilter: &gatewayv1.HTTPCORSFilter{
+				AllowOrigins: []gatewayv1.CORSOrigin{
+					"http://bar*",
+				},
+			},
+			wantErrors: []string{"Invalid value: \"http://bar*\": spec.rules[0].filters[0].cors.allowOrigins[0] in body should match"},
+		},
+		{
+			name: "invalid-origin-with-multiple-wildcards",
+			corsfilter: &gatewayv1.HTTPCORSFilter{
+				AllowOrigins: []gatewayv1.CORSOrigin{
+					"http://*.bar.*.dev",
+				},
+			},
+			wantErrors: []string{"Invalid value: \"http://*.bar.*.dev\": spec.rules[0].filters[0].cors.allowOrigins[0] in body should match"},
 		},
 		{
 			name:       "Using an invalid HTTP method should be denied",
