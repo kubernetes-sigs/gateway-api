@@ -226,3 +226,15 @@ update-geps:
 .PHONY: api-ref-docs
 api-ref-docs:
 	hack/mkdocs/generate.sh
+
+.PHONY: wizard-wasm
+wizard-wasm:
+	@GOROOT=$$(go env GOROOT); \
+	if [ -f "$$GOROOT/misc/wasm/wasm_exec.js" ]; then cp -f "$$GOROOT/misc/wasm/wasm_exec.js" site-src/wizard/; \
+	elif [ -f "$$GOROOT/lib/wasm/wasm_exec.js" ]; then cp -f "$$GOROOT/lib/wasm/wasm_exec.js" site-src/wizard/; \
+	else echo "ERROR: wasm_exec.js not found in GOROOT"; exit 1; fi
+	GOOS=js GOARCH=wasm go build -o site-src/wizard/main.wasm ./wasm/
+
+.PHONY: serve
+serve: wizard-wasm
+	python3 -m http.server -d site-src/wizard 8080

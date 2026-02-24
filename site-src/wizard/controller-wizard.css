@@ -107,6 +107,13 @@ table.features input[type="radio"] {
   cursor: pointer;
 }
 
+table.features tr.feature-spacer td {
+  border: none;
+  height: 1.5em;
+  padding: 0;
+  vertical-align: middle;
+}
+
 table.features label {
   cursor: pointer;
   display: inline-flex;

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gateway API Controller Recommendation Wizard</title>
+  <link rel="stylesheet" href="controller-wizard.css">
+</head>
+
+<body>
+  <h1>Gateway API Controller Recommendation Wizard</h1>
+  <div class="intro">
+    <p id="version-row">
+      <label for="version-select"><strong>Gateway API version:</strong></label>
+      <select id="version-select"></select>
+    </p>
+    <p>For each feature, select <strong>Want to have</strong> (required), <strong>Good to have</strong> (optional), or
+      <strong>N/A</strong>. Feature names match the
+      <a id="link-intro-conformance" href="https://gateway-api.sigs.k8s.io/implementations/v1.4/#httproute" target="_blank" rel="noopener">v1.4
+        conformance tables</a>.</p>
+    <p class="intro-source">Recommendations are generated from the
+      <a href="https://github.com/kubernetes-sigs/gateway-api/tree/main/conformance/reports" target="_blank" rel="noopener">conformance reports uploaded by project implementations</a>.
+      They are separated into the extended features that each project supports listed in their reports.
+      Implementations only appear in this page if they pass Core conformance for the resource type, and the features listed are Extended features.
+      Implementations that submit conformance reports with skipped tests won't appear.</p>
+    <details class="warning-note" open>
+      <summary>Note</summary>
+      <p>This page is under active development and is not in its final form, especially for the project name and the names of the features. However, as it is based on submitted conformance reports, the information is correct.</p>
+    </details>
+  </div>
+
+  <section class="card">
+    <h2>Gateway Profile</h2>
+
+    <h3 id="httproute">HTTPRoute</h3>
+    <p>Extended features from the <a id="link-httproute"
+        href="https://gateway-api.sigs.k8s.io/implementations/v1.4/#httproute" target="_blank" rel="noopener">HTTPRoute
+        conformance table</a>. Core is implied (controllers must pass Core to appear).</p>
+    <table class="features" id="http-route-features">
+      <thead>
+        <tr>
+          <th>Feature</th>
+          <th>Requirement</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <h3 id="grpcroute">GRPCRoute</h3>
+    <p>Extended features from the <a id="link-grpcroute"
+        href="https://gateway-api.sigs.k8s.io/implementations/v1.4/#grpcroute" target="_blank" rel="noopener">GRPCRoute
+        conformance table</a>.</p>
+    <table class="features" id="grpc-features">
+      <thead>
+        <tr>
+          <th>Feature</th>
+          <th>Requirement</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <h3 id="tlsroute">TLSRoute</h3>
+    <p>Extended features from the <a id="link-tlsroute"
+        href="https://gateway-api.sigs.k8s.io/implementations/v1.4/#tlsroute" target="_blank" rel="noopener">TLSRoute
+        conformance table</a>.</p>
+    <table class="features" id="tls-features">
+      <thead>
+        <tr>
+          <th>Feature</th>
+          <th>Requirement</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </section>
+
+  <p id="wizard-data-status" class="data-status"></p>
+  <button type="button" class="recommend-btn" id="recommend-btn" disabled>Recommend</button>
+  <button type="button" class="reset-btn" id="reset-btn">Reset</button>
+
+  <section class="card" id="results">
+    <h2>Recommended controllers</h2>
+    <div id="results-content"></div>
+  </section>
+
+  <script src="wasm_exec.js"></script>
+  <script>
+    const statusEl = document.getElementById('wizard-data-status');
+    statusEl.textContent = 'Loading…';
+
+    const go = new Go();
+    fetch('main.wasm')
+      .then(function (r) {
+        if (!r.ok) throw new Error('main.wasm not found (404). Run: make wizard-wasm');
+        return WebAssembly.instantiateStreaming(r, go.importObject);
+      })
+      .then(function (result) {
+        go.run(result.instance);
+      })
+      .catch(function (err) {
+        statusEl.textContent = err.message || 'Could not load wizard. Run: make wizard-wasm. Then serve from site-src/wizard/ (e.g. cd site-src/wizard && python3 -m http.server 8000) and open http://localhost:8000/';
+        document.getElementById('recommend-btn').disabled = false;
+      });
+  </script>
+</body>
+
+</html>
