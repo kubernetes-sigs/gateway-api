@@ -185,6 +185,21 @@ def generate_profiles_report(reports, route, version):
 
     http_table = http_table.rename(
         columns={"project": "Project", "version": "Version", "mode": "Mode", "core.result": "Core"})
+    metadata_columns = ["Project", "Version", "Mode", "Core"]
+    feature_columns = [c for c in http_table.columns if c not in metadata_columns]
+    total_features = len(feature_columns)
+    checks = (http_table[feature_columns] == ':white_check_mark:').sum(axis=1)
+    def format_total(count):
+        value = f"{count}/{total_features}"
+        return f"**{value}**" if total_features > 0 and count == total_features else value
+    http_table["Total"] = checks.map(format_total)
+    if "Mode" in http_table.columns:
+        insert_at = http_table.columns.get_loc("Mode") + 1
+    else:
+        insert_at = http_table.columns.get_loc("Version") + 1
+    total_col = http_table.pop("Total")
+    http_table.insert(insert_at, "Total", total_col)
+
     if semver.compare(version.removeprefix('v'), '1.4.0') < 0:
         http_table = http_table.drop(columns=["Core"])
     if version == 'v1.0.0':
