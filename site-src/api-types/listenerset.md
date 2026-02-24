@@ -133,7 +133,8 @@ Conflicts occur when multiple listeners claim the same Port, Protocol, and/or Ho
 The listener with the highest priority is Accepted and Programmed
 The lower-priority listener is marked with a `Conflicted: True` condition in its status.
 
-!!! note  A ListenerSet may be partially accepted if only some of its listeners are in conflict. Valid listeners will continue to route traffic, while conflicted ones are disabled
+!!! note  Partial ListenerSet Acceptance
+    A ListenerSet may be partially accepted if only some of its listeners are in conflict. Valid listeners will continue to route traffic, while conflicted ones will not route traffic.
 
 ## Status Updates
 
@@ -145,7 +146,8 @@ A ListenerSet successfully attaches to a Gateway when all three of the following
 
 3. Resource-Level Acceptance : The Gateway Controller must validate and "accept" the resource (all listeners are valid, etc.).
 
-!!! note A ListenerSet can be Accepted overall even if one of its individual listeners is in conflict with another set. In this case, only the non-conflicting listeners are "Programmed" into the data plane.
+!!! note Partial ListenerSet Acceptance
+    A ListenerSet can be Accepted overall even if one of its individual listeners is in conflict with another set. In this case, only the non-conflicting listeners are "Programmed" into the data plane.
 
 ### Gateway Status
 The parent `Gateway` status reports the number of successful attached listeners to `.status.attachedListenerSets`.

@@ -16,7 +16,7 @@ Teams can also share the same ListenerSet configuration to avoid duplication.
 a single Gateway can forward secured traffic to more backends that might have their own certificates.
 This approach aligns with projects that require service-level certificates, such as Istio Ambient Mesh or Knative.
 
-The following diagram illustrates how ListenerSets help decentralize route configuration in a multi-tenant environment at scale:
+The following diagram illustrates how ListenerSets help decentralize route configuration in a multi-tenant environment:
 
 - Team 1 and Team 2 each manage their own Service and HTTPRoute resources within their respective namespaces.
 
@@ -107,15 +107,18 @@ spec:
 
 ## Listener Conflicts
 
-Since multiple ListenerSets can attach to one Gateway, a conflict-aware merge is performed.
-A listener is unique based on the combination of Port, Protocol, and Hostname.
+Since multiple ListenerSets can attach to one Gateway, there are rules about how to manage conflicts.
+A Listener can be **distinct** across any group of Listeners (within a single ListenerSet object, or in the group of Listeners attached to a Gateway) based on the combination of Port, Protocol, and (depending on the Protocol) Hostname.
 
-In case of a conflict, listener precedence is used to resolve port and hostname collisions.
-The parent Gateway always takes absolute priority; if a conflict exists between external ListenerSets,
-the one with the earliest creation timestamp wins. In the rare event of identical timestamps, the
-alphabetical order of the namespace and name acts as the final tie-breaker. Any "losing" configuration
-is automatically marked with a `Conflicted: True` status and remains inactive until the higher-priority
-resource is removed, ensuring a secure and predictable traffic flow.
+When Listeners are not distinct, there are Listener precedence rules that are used to choose a is used to resolve the conflict, and choose which Listener takes effect. It's often easiest to think of this as a competition, with the "winner" being the Listener that takes effect. The rules go like this, continuing on ties.
+
+* Listeners on the parent Gateway take priority over all others.
+* The ListenerSet with the earliest creation time takes priority.
+* The first ListenerSet alphabetically takes priority.
+ 
+The winning ListenerSet is marked as `Accepted: true`, and the losing ListenerSet(s) are marked with `Accepted: false`, and `Conflidted: true`.
+
+As with all the other conflict resolution rules in Gateway API, this is intended to provide traffic stability - so adding a new, conflicting ListenerSet will never take over an existing config.
 
 ## Examples
 
