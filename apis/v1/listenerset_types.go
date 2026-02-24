@@ -323,6 +323,7 @@ const (
 	//
 	// * "Invalid"
 	// * "ParentNotProgrammed"
+	// * "ListenersNotValid"
 	//
 	// Additional reasons for this condition to be False are influenced by
 	// child ListenerEntry conditions:
