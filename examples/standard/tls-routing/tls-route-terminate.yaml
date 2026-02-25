@@ -1,0 +1,14 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: TLSRoute
+metadata:
+  name: bar-route
+spec:
+  parentRefs:
+  - name: example-gateway
+    sectionName: tls-terminate
+  hostnames:
+  - "bar.example.com"
+  rules:
+  - backendRefs:
+    - name: bar-svc
+      port: 8080

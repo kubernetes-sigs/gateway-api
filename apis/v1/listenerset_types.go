@@ -1,5 +1,5 @@
 /*
-Copyright 2026 The Kubernetes Authors.
+Copyright The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -257,7 +257,7 @@ type ListenerEntryStatus struct {
 	// and invalid Route kinds are specified, the implementation MUST
 	// reference the valid Route kinds that have been specified.
 	//
-	// +required
+	// +optional
 	// +listType=atomic
 	// +kubebuilder:validation:MaxItems=8
 	SupportedKinds []RouteGroupKind `json:"supportedKinds,omitempty"`
@@ -323,6 +323,7 @@ const (
 	//
 	// * "Invalid"
 	// * "ParentNotProgrammed"
+	// * "ListenersNotValid"
 	//
 	// Additional reasons for this condition to be False are influenced by
 	// child ListenerEntry conditions:

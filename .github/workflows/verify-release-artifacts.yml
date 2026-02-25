@@ -1,0 +1,73 @@
+# Verify that release artifacts (standard-install.yaml) match the source at the release tag.
+# Catches cases where the release pipeline was run from a commit ahead of the tagged commit.
+
+name: Verify Release Artifacts
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag to verify (e.g. v1.4.1). Required when run manually.'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  verify-standard-install:
+    name: standard-install.yaml matches source at tag
+    runs-on: ubuntu-latest
+    # On release event: only SemVer tags; on manual run: always run (tag validated by input)
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.event.release.tag_name, 'v')
+    steps:
+      - name: Set tag for verification
+        id: set-tag
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "tag=${{ inputs.tag }}" >> $GITHUB_OUTPUT
+          else
+            echo "tag=${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Set up Go
+        uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # tag=v6.2.0
+
+      - name: Download release assets and source, build, and compare
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.set-tag.outputs.tag }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -e
+          echo "Verifying tag: $TAG"
+          echo "Comparing: (A) standard-install.yaml from release $TAG  vs  (B) standard-install.yaml built from source at $TAG"
+          echo ""
+
+          workdir=$(mktemp -d)
+          cd "$workdir"
+
+          # A) Get standard-install.yaml from this release
+          gh release download "$TAG" --repo "$REPO" --pattern "standard-install.yaml" --dir .
+
+          # B) Get source tarball from release, or fall back to GitHub archive for this tag
+          curl -sSfL -o source.tar.gz "https://github.com/${REPO}/archive/refs/tags/${TAG}.tar.gz"
+          tar --extract --gunzip --file $(ls *.tar.gz | head -1)
+          cd gateway-api-*
+          echo "Building standard-install.yaml from source at tag $TAG (same version)..."
+          make build-install-yaml
+
+          # C) Normalize build files
+          sed 's/Copyright [0-9]\{4\}/Copyright YEAR/' ../standard-install.yaml > /tmp/release.yaml
+          sed 's/Copyright [0-9]\{4\}/Copyright YEAR/' release/standard-install.yaml > /tmp/built.yaml
+
+          echo ""
+          echo "Diff: (A) release asset  vs  (B) built from source. Lines with - are in release, + are in built."
+          if ! diff -u /tmp/release.yaml /tmp/built.yaml; then
+            echo ""
+            echo "::error::Release $TAG: standard-install.yaml in the release does not match the source."
+            exit 1
+          fi
+          echo "Release artifact matches source at tag $TAG. Verification passed."

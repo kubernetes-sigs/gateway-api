@@ -1,5 +1,5 @@
 /*
-Copyright 2026 The Kubernetes Authors.
+Copyright The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -69,6 +69,11 @@ var TLSRouteHostnameIntersection = suite.ConformanceTest{
 						Namespace: ns,
 					})
 			})
+
+			t.Run("TLS request not matching hostnames intersection should not reach backend", func(t *testing.T) {
+				t.Parallel()
+				tls.MakeTLSConnectionAndExpectEventuallyConnectionRejection(t, suite.TimeoutConfig, gwAddr, "non.matching.com")
+			})
 		})
 
 		t.Run("TLSRoutes intersect with more specific wildcard listener hostname", func(t *testing.T) {
@@ -101,6 +106,11 @@ var TLSRouteHostnameIntersection = suite.ConformanceTest{
 						Backend:   "tls-backend-2",
 						Namespace: ns,
 					})
+			})
+
+			t.Run("TLS request not matching hostnames intersection should not reach backend", func(t *testing.T) {
+				t.Parallel()
+				tls.MakeTLSConnectionAndExpectEventuallyConnectionRejection(t, suite.TimeoutConfig, gwAddr, "non.matching.com")
 			})
 		})
 
@@ -135,6 +145,11 @@ var TLSRouteHostnameIntersection = suite.ConformanceTest{
 						Namespace: ns,
 					})
 			})
+
+			t.Run("TLS request not matching hostnames intersection should not reach backend", func(t *testing.T) {
+				t.Parallel()
+				tls.MakeTLSConnectionAndExpectEventuallyConnectionRejection(t, suite.TimeoutConfig, gwAddr, "non.matching.com")
+			})
 		})
 
 		t.Run("TLSRoutes intersect with empty listener hostname", func(t *testing.T) {
@@ -167,6 +182,11 @@ var TLSRouteHostnameIntersection = suite.ConformanceTest{
 						Backend:   "tls-backend-2",
 						Namespace: ns,
 					})
+			})
+
+			t.Run("TLS request not matching hostnames intersection should not reach backend", func(t *testing.T) {
+				t.Parallel()
+				tls.MakeTLSConnectionAndExpectEventuallyConnectionRejection(t, suite.TimeoutConfig, gwAddr, "non.matching.org")
 			})
 		})
 	},

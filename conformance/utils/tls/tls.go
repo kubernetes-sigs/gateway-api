@@ -18,6 +18,9 @@ package tls
 
 import (
 	cryptotls "crypto/tls"
+	"errors"
+	"strings"
+	"syscall"
 	"testing"
 	"time"
 
@@ -119,4 +122,46 @@ func MakeTLSRequestAndExpectFailureResponse(t *testing.T, r roundtripper.RoundTr
 	if clientCertificate != nil && clientCertificateKey != nil {
 		assert.True(t, clientCertificatePresented, "client certificate was not presented during the handshake")
 	}
+}
+
+// MakeTLSConnectionAndExpectEventuallyConnectionRejection initiates a TCP connection, then initiates TLS Handshake, and expects the TCP connection to be eventually rejected.
+// This is useful for testing scenarios where a Gateway accepts a TCP connection but then closes it due to not matching SNI or invalid routing configuration.
+func MakeTLSConnectionAndExpectEventuallyConnectionRejection(t *testing.T, timeoutConfig config.TimeoutConfig, gwAddr string, serverName string) {
+	t.Helper()
+
+	dialer := &cryptotls.Dialer{
+		Config: &cryptotls.Config{
+			ServerName: serverName,
+			MinVersion: cryptotls.VersionTLS12,
+		},
+	}
+
+	assert.Eventually(t, func() bool {
+		_, err := dialer.DialContext(t.Context(), "tcp", gwAddr)
+		if err != nil {
+			if isConnectionRejected(err) {
+				tlog.Logf(t, "connection was rejected during dial: %s", err)
+				return true
+			}
+			tlog.Logf(t, "client could not connect: %s; retrying", err)
+			return false
+		}
+		tlog.Logf(t, "client could connect")
+		return false
+	}, timeoutConfig.MaxTimeToConsistency, time.Second)
+}
+
+// isConnectionRejected checks if an error message contains "connection reset by peer" or is a syscall.ECONNRESET (TCP RST).
+func isConnectionRejected(err error) bool {
+	if err == nil {
+		return false
+	}
+	if strings.Contains(err.Error(), "connection reset by peer") {
+		return true
+	}
+	var sysErr syscall.Errno
+	if errors.As(err, &sysErr) {
+		return sysErr == syscall.ECONNRESET
+	}
+	return false
 }

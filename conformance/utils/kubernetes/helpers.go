@@ -394,11 +394,13 @@ func ListenerSetMustHaveCondition(
 			ls := &gatewayv1.ListenerSet{}
 			err := client.Get(ctx, lsNN, ls)
 			if err != nil {
-				return false, fmt.Errorf("error fetching ListenerSet: %w", err)
+				t.Logf("error fetching ListenerSet: %v", err)
+				return false, nil
 			}
 
 			if err := ConditionsHaveLatestObservedGeneration(ls, ls.Status.Conditions); err != nil {
-				return false, err
+				t.Logf("not ready: %v", err)
+				return false, nil
 			}
 
 			if findConditionInList(t,
@@ -711,10 +713,10 @@ func HTTPRouteMustHaveNoAcceptedParents(t *testing.T, client client.Client, time
 func TLSRouteMustHaveNoAcceptedParents(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeName types.NamespacedName) {
 	t.Helper()
 
-	var actual []v1alpha2.RouteParentStatus
+	var actual []gatewayv1.RouteParentStatus
 	emptyChecked := false
 	waitErr := wait.PollUntilContextTimeout(context.Background(), 1*time.Second, timeoutConfig.HTTPRouteMustNotHaveParents, true, func(ctx context.Context) (bool, error) {
-		route := &v1alpha2.TLSRoute{}
+		route := &gatewayv1.TLSRoute{}
 		err := client.Get(ctx, routeName, route)
 		if err != nil {
 			return false, fmt.Errorf("error fetching TLSRoute: %w", err)
@@ -819,11 +821,11 @@ func UDPRouteMustHaveParents(t *testing.T, client client.Client, timeoutConfig c
 // TLSRouteMustHaveParents waits for the specified TLSRoute to have parents
 // in status that match the expected parents, and also returns the TLSRoute.
 // This will cause the test to halt if the specified timeout is exceeded.
-func TLSRouteMustHaveParents(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeName types.NamespacedName, parents []v1alpha2.RouteParentStatus, namespaceRequired bool) v1alpha2.TLSRoute {
+func TLSRouteMustHaveParents(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeName types.NamespacedName, parents []gatewayv1.RouteParentStatus, namespaceRequired bool) gatewayv1.TLSRoute {
 	t.Helper()
 
 	var actual []gatewayv1.RouteParentStatus
-	var route v1alpha2.TLSRoute
+	var route gatewayv1.TLSRoute
 
 	waitErr := wait.PollUntilContextTimeout(context.Background(), 1*time.Second, timeoutConfig.RouteMustHaveParents, true, func(ctx context.Context) (bool, error) {
 		err := client.Get(ctx, routeName, &route)
@@ -851,11 +853,11 @@ func parentsForRouteMatch(t *testing.T, routeName types.NamespacedName, expected
 				continue
 			}
 			if !reflect.DeepEqual(aParent.ParentRef.Group, eParent.ParentRef.Group) {
-				tlog.Logf(t, "Route %s expected ParentReference.Group to be %v, got %v", routeName, ptr.Deref(eParent.ParentRef.Group, gatewayv1.Group(gatewayv1.GroupVersion.Group)), ptr.Deref(eParent.ParentRef.Group, gatewayv1.Group(gatewayv1.GroupVersion.Group)))
+				tlog.Logf(t, "Route %s expected ParentReference.Group to be %v, got %v", routeName, ptr.Deref(eParent.ParentRef.Group, gatewayv1.Group(gatewayv1.GroupVersion.Group)), ptr.Deref(aParent.ParentRef.Group, gatewayv1.Group(gatewayv1.GroupVersion.Group)))
 				continue
 			}
 			if !reflect.DeepEqual(aParent.ParentRef.Kind, eParent.ParentRef.Kind) {
-				tlog.Logf(t, "Route %s expected ParentReference.Kind to be %v, got %v", routeName, ptr.Deref(eParent.ParentRef.Kind, GatewayKind), ptr.Deref(eParent.ParentRef.Kind, GatewayKind))
+				tlog.Logf(t, "Route %s expected ParentReference.Kind to be %v, got %v", routeName, ptr.Deref(eParent.ParentRef.Kind, GatewayKind), ptr.Deref(aParent.ParentRef.Kind, GatewayKind))
 				continue
 			}
 			if aParent.ParentRef.Name != eParent.ParentRef.Name {
@@ -1038,7 +1040,7 @@ func TLSRouteMustHaveCondition(t *testing.T, client client.Client, timeoutConfig
 	t.Helper()
 
 	waitErr := wait.PollUntilContextTimeout(context.Background(), 1*time.Second, timeoutConfig.TLSRouteMustHaveCondition, true, func(ctx context.Context) (bool, error) {
-		route := &v1alpha2.TLSRoute{}
+		route := &gatewayv1.TLSRoute{}
 		err := client.Get(ctx, routeNN, route)
 		if err != nil {
 			return false, fmt.Errorf("error fetching TLSRoute: %w", err)

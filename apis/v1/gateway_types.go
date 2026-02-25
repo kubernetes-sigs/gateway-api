@@ -1194,12 +1194,22 @@ const (
 	// information on which address is causing the problem and how to resolve it
 	// in the condition message.
 	GatewayReasonAddressNotUsable GatewayConditionReason = "AddressNotUsable"
-	// This condition indicates `FrontendValidationModeType` changed from
-	// `AllowValidOnly` to `AllowInsecureFallback`.
-	GatewayConditionInsecureFrontendValidationMode GatewayConditionReason = "InsecureFrontendValidationMode"
-	// This reason MUST be set for GatewayConditionInsecureFrontendValidationMode
-	// when client change FrontendValidationModeType for a Gateway or per port override
-	// to `AllowInsecureFallback`.
+)
+
+const (
+	// This condition is true when the Gateway FrontendValidationModeType is
+	// configured to allow insecure fallback behavior.
+	//
+	// Possible reasons for this condition to be True are:
+	//
+	// * "ConfigurationChanged"
+	//
+	// This condition is removed as soon as FrontendValidationModeType is changed back to `AllowValidOnly`.
+	GatewayConditionInsecureFrontendValidationMode GatewayConditionType = "InsecureFrontendValidationMode"
+
+	// This reason is used with the "InsecureFrontendValidationMode" condition when
+	// the FrontendValidationModeType has been changed from `AllowValidOnly` to
+	// `AllowInsecureFallback`, either at the Gateway level or via a per-port override.
 	GatewayReasonConfigurationChanged GatewayConditionReason = "ConfigurationChanged"
 )
 
@@ -1362,10 +1372,10 @@ type ListenerStatus struct {
 	// and invalid Route kinds are specified, the implementation MUST
 	// reference the valid Route kinds that have been specified.
 	//
-	// +required
+	// +optional
 	// +listType=atomic
 	// +kubebuilder:validation:MaxItems=8
-	SupportedKinds []RouteGroupKind `json:"supportedKinds"`
+	SupportedKinds []RouteGroupKind `json:"supportedKinds,omitzero"`
 
 	// AttachedRoutes represents the total number of Routes that have been
 	// successfully attached to this Listener.
@@ -1595,12 +1605,12 @@ const (
 	// This reason is used with the "ResolvedRefs" condition when one or more
 	// CACertificate References used to configure Client Certificate
 	// validation for Gateway are invalid.
-	ListenerReasonInvalidCACertificateRef GatewayConditionReason = "InvalidCACertificateRef"
+	ListenerReasonInvalidCACertificateRef ListenerConditionReason = "InvalidCACertificateRef"
 
 	// This reason is used with the "ResolvedRefs" condition when one or more
 	// CACertificate References used to configure Client Certificate
 	// validation for Gateway has unknown or unsupported kind.
-	ListenerReasonInvalidCACertificateKind GatewayConditionReason = "InvalidCACertificateKind"
+	ListenerReasonInvalidCACertificateKind ListenerConditionReason = "InvalidCACertificateKind"
 )
 
 const (
