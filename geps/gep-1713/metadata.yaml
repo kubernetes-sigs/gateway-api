@@ -1,8 +1,8 @@
 apiVersion: internal.gateway.networking.k8s.io/v1alpha1
 kind: GEPDetails
 number: 1713
-name: XListenerSets (Standard Mechanism to Merge Gateways)
-status: Experimental
+name: ListenerSets (Standard Mechanism to Merge Gateways)
+status: Standard
 authors:
   - dprotaso
   - youngnick

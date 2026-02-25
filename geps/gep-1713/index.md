@@ -1,7 +1,7 @@
 # GEP-1713: ListenerSets - Standard Mechanism to Merge Multiple Gateways
 
 * Issue: [#1713](https://github.com/kubernetes-sigs/gateway-api/issues/1713)
-* Status: Experimental
+* Status: Standard
 
 (See [status definitions](../overview.md#gep-states).)
 
@@ -46,14 +46,10 @@ will make this requirement viable.
 ## Feature Details
 
 We define `ListenerSet` as the name of the feature outlined in this GEP.
-The feature will be part of the experimental channel, which implementations can choose to support. All the `MUST` requirements in this document apply to implementations that choose to support this feature.
 
 ## API
 
 This proposal introduces a new `ListenerSet` resource that has the ability to attach a set of listeners to a parent `Gateway`.
-
-**Note**: While this API is experimental, its `Kind` will be `XListenerSet` and
-once the API is graduated to stable it will be renamed to `ListenerSet`.
 
 ### Go
 
@@ -384,8 +380,8 @@ spec:
     protocol: HTTP
     port: 80
 ---
-apiVersion: gateway.networking.x-k8s.io/v1alpha1
-kind: XListenerSet
+apiVersion: gateway.networking.k8s.io/v1
+kind: ListenerSet
 metadata:
   name: first-workload-listeners
 spec:
@@ -405,8 +401,8 @@ spec:
         group: ""
         name: first-workload-cert # Provisioned via HTTP01 challenge
 ---
-apiVersion: gateway.networking.x-k8s.io/v1alpha1
-kind: XListenerSet
+apiVersion: gateway.networking.k8s.io/v1
+kind: ListenerSet
 metadata:
   name: second-workload-listeners
 spec:
@@ -450,7 +446,7 @@ If you have a Route that has a Gateway `parentRef` with a sectionName, that is A
 
 ### Gateway Changes
 
-An initial experimental release of `ListenerSets` _will have no modifications_ to listener list on the `Gateway` resource. Using `ListenerSets` will  require a dummy listener to be configured.
+Using `ListenerSets` will  require a dummy listener to be configured on the Gateway.
 
 In a future (potential) release when an implementation supports `ListenerSets`, `Gateways` MUST allow the list of listeners to be empty. Thus the present `minItems=1` constraint on the listener list will be removed. This allows implementations to avoid security, cost etc. concerns with having dummy listeners.
 When there are no listeners the `Gateway`'s `status.listeners` should be empty or unset. `status.listeners` is already an optional field.
@@ -484,11 +480,11 @@ metadata:
 spec:
   parentRefs:
   - name: second-workload-listeners
-    kind: XListenerSet
+    kind: ListenerSet
     sectionName: second
 ```
 
-To attach a Route to a `XListenerSet` and its parent `Gateway`, it MUST have multiple `parentRefs` eg:
+To attach a Route to a `ListenerSet` and its parent `Gateway`, it MUST have multiple `parentRefs` eg:
 
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
@@ -498,7 +494,7 @@ metadata:
 spec:
   parentRefs:
   - name: second-workload-listeners
-    kind: XListenerSet
+    kind: ListenerSet
     sectionName: second
   - name: parent-gateway
     kind: Gateway
@@ -524,8 +520,8 @@ spec:
     protocol: HTTP
     port: 80
 ---
-apiVersion: gateway.networking.x-k8s.io/v1alpha1
-kind: XListenerSet
+apiVersion: gateway.networking.k8s.io/v1
+kind: ListenerSet
 metadata:
   name: first-workload-listeners
 spec:
@@ -581,8 +577,8 @@ spec:
     protocol: HTTP
     port: 80
 ---
-apiVersion: gateway.networking.x-k8s.io/v1alpha1
-kind: XListenerSet
+apiVersion: gateway.networking.k8s.io/v1
+kind: ListenerSet
 metadata:
   name: first-workload-listeners
 spec:
@@ -752,8 +748,8 @@ spec:
         group: ""
         name: default-cert
 ---
-apiVersion: gateway.networking.x-k8s.io/v1alpha1
-kind: XListenerSet
+apiVersion: gateway.networking.k8s.io/v1
+kind: ListenerSet
 metadata:
   name: user-listenerset
   namespace: user01
@@ -781,8 +777,8 @@ called `myapp`. The conflict happens because hostname is the same on both `Liste
 but they use different termination TLS certificates:
 
 ```yaml
-apiVersion: gateway.networking.x-k8s.io/v1alpha1
-kind: XListenerSet
+apiVersion: gateway.networking.k8s.io/v1
+kind: ListenerSet
 metadata:
   name: user-listenerset
   namespace: user01
@@ -813,8 +809,8 @@ was not accepted
 
 
 ```yaml
-apiVersion: gateway.networking.x-k8s.io/v1alpha1
-kind: XListenerSet
+apiVersion: gateway.networking.k8s.io/v1
+kind: ListenerSet
 metadata:
   creationTimestamp: "2025-08-11T15:44:05Z"
   name: listenerset1
@@ -836,8 +832,8 @@ spec:
         group: ""
         name: app-cert
 ---
-apiVersion: gateway.networking.x-k8s.io/v1alpha1
-kind: XListenerSet
+apiVersion: gateway.networking.k8s.io/v1
+kind: ListenerSet
 metadata:
   creationTimestamp: "2025-08-11T13:44:05Z"
   name: listenerset2
@@ -868,8 +864,8 @@ and receive a `Conflicted=True` condition.
 The status of ListenerSets can be defined as the following:
 
 ```yaml
-apiVersion: gateway.networking.x-k8s.io/v1alpha1
-kind: XListenerSet
+apiVersion: gateway.networking.k8s.io/v1
+kind: ListenerSet
 metadata:
   creationTimestamp: "2025-08-11T15:44:05Z"
   name: listenerset1
@@ -886,8 +882,8 @@ status:
       status: "True"
       type: Conflicted
 ---
-apiVersion: gateway.networking.x-k8s.io/v1alpha1
-kind: XListenerSet
+apiVersion: gateway.networking.k8s.io/v1
+kind: ListenerSet
 metadata:
   creationTimestamp: "2025-08-11T13:44:05Z"
   name: listenerset2
