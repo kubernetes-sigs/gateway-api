@@ -33,6 +33,8 @@ import (
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/apimachinery/pkg/runtime"
+
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/utils/ptr"
@@ -1466,4 +1468,65 @@ func GetConfigMapData(client client.Client, timeoutConfig config.TimeoutConfig, 
 	}
 
 	return configMap.Data, nil
+}
+
+// HTTPRouteMustBeAcceptedAndResolved waits for the specified HTTPRoute
+// to be Accepted and have its references resolved by the specified Gateway.
+// It uses the upstream Gateway API's HTTPRouteMustHaveCondition helper.
+// NOTE: Used in Gateway API Inference Extension conformance.
+func HTTPRouteMustBeAcceptedAndResolved(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, routeNN, gatewayNN types.NamespacedName) {
+	t.Helper()
+
+	acceptedCondition := metav1.Condition{
+		Type:   string(gatewayv1.RouteConditionAccepted),
+		Status: metav1.ConditionTrue,
+		Reason: string(gatewayv1.RouteReasonAccepted),
+	}
+
+	resolvedRefsCondition := metav1.Condition{
+		Type:   string(gatewayv1.RouteConditionResolvedRefs),
+		Status: metav1.ConditionTrue,
+		Reason: string(gatewayv1.RouteReasonResolvedRefs),
+	}
+
+	t.Logf("Waiting for HTTPRoute %s to be Accepted by Gateway %s", routeNN.String(), gatewayNN.String())
+	HTTPRouteMustHaveCondition(t, c, timeoutConfig, routeNN, gatewayNN, acceptedCondition)
+
+	t.Logf("Waiting for HTTPRoute %s to have ResolvedRefs by Gateway %s", routeNN.String(), gatewayNN.String())
+	HTTPRouteMustHaveCondition(t, c, timeoutConfig, routeNN, gatewayNN, resolvedRefsCondition)
+
+	t.Logf("HTTPRoute %s is now Accepted and has ResolvedRefs by Gateway %s", routeNN.String(), gatewayNN.String())
+}
+
+// GetAcceptedByParentGatewayCondition retrieves the 'Accepted' condition with
+// status True and reason 'Accepted' that would be returned in from an input Gateway.
+// NOTE: Used in Gateway API Inference Extension conformance.
+func GetAcceptedByParentGatewayCondition() metav1.Condition {
+	return metav1.Condition{
+		Type:   string(gatewayv1.GatewayConditionAccepted),
+		Status: metav1.ConditionTrue,
+		Reason: string(gatewayv1.GatewayReasonAccepted), // The standard "Accepted" reason
+	}
+}
+
+// NOTE: Used in Gateway API Inference Extension conformance.
+func GetGatewayReadyCondition() metav1.Condition {
+	return metav1.Condition{
+		Type:   string(gatewayv1.GatewayConditionAccepted),
+		Status: metav1.ConditionTrue,
+	}
+}
+
+// NOTE: Used in Gateway API Inference Extension conformance.
+func GetGatewayProgrammedCondition() metav1.Condition {
+	return metav1.Condition{
+		Type:   string(gatewayv1.GatewayConditionProgrammed),
+		Status: metav1.ConditionTrue,
+	}
+}
+
+// Install gatewayv1 types into scheme.
+// NOTE: Used in Gateway API Inference Extension conformance.
+func InstallGatewayV1(scheme *runtime.Scheme) error {
+	return gatewayv1.Install(scheme)
 }
