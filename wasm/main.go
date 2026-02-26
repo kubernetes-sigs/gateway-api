@@ -402,16 +402,16 @@ func renderHTTPRouteWithSpacer(tableID string, gateway, route, backend []feature
 <label><input type="checkbox" name="%s" value="good" /> Nice to have</label>
 </td></tr>`, titleAttr, escapeHTML(label), name, name))
 	}
-	if len(gatewayFirst) > 0 {
-		writeSubhead("Gateway")
-		for _, f := range gatewayFirst {
-			writeRow(f, stripLabelPrefix(f.Label, "Gateway "))
-		}
-	}
 	if len(rest) > 0 {
 		writeSubhead("HTTPRoute")
 		for _, f := range rest {
 			writeRow(f, stripLabelPrefix(f.Label, "HTTPRoute "))
+		}
+	}
+	if len(gatewayFirst) > 0 {
+		writeSubhead("Gateway")
+		for _, f := range gatewayFirst {
+			writeRow(f, stripLabelPrefix(f.Label, "Gateway "))
 		}
 	}
 	if len(backend) > 0 {

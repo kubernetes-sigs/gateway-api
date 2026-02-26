@@ -138,13 +138,13 @@
       const backendTlsRows = httpBackendTls.map(f => ({ id: f.id, label: f.label, description: f.description }));
       const stripPrefix = (label, prefix) => label.startsWith(prefix) ? label.slice(prefix.length) : label;
       let httpRouteRows = [];
-      if (gatewayFirst.length > 0) {
-        httpRouteRows.push({ subhead: 'Gateway' });
-        gatewayFirst.forEach(f => httpRouteRows.push({ id: f.id, label: stripPrefix(f.label, 'Gateway '), description: f.description }));
-      }
       if (rest.length > 0) {
         httpRouteRows.push({ subhead: 'HTTPRoute' });
         rest.forEach(f => httpRouteRows.push({ id: f.id, label: stripPrefix(f.label, 'HTTPRoute '), description: f.description }));
+      }
+      if (gatewayFirst.length > 0) {
+        httpRouteRows.push({ subhead: 'Gateway' });
+        gatewayFirst.forEach(f => httpRouteRows.push({ id: f.id, label: stripPrefix(f.label, 'Gateway '), description: f.description }));
       }
       if (backendTlsRows.length > 0) {
         httpRouteRows.push({ subhead: 'Backend TLS' });
