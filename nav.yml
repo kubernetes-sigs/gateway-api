@@ -17,7 +17,7 @@ nav:
           - Service Facets: mesh/service-facets.md
       - Implementations:
           - List: implementations.md
-          - Recommendation Wizard: implementations/wizard.md
+          - Matching Wizard: implementations/wizard.md
           - Comparisons:
               - v1.4: implementations/v1.4.md
               - v1.3: implementations/v1.3.md

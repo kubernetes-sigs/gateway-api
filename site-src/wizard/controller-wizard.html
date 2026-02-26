@@ -16,14 +16,14 @@
     <p>For each feature, select <strong>Must have</strong>, <strong>Nice to have</strong>, or <strong>N/A</strong>. Feature names match the
       <a id="link-intro-conformance" href="https://gateway-api.sigs.k8s.io/implementations/v1.4/" target="_blank" rel="noopener">v1.4
         conformance tables</a>.</p>
-    <p class="intro-source">Recommendations are generated from the
+    <p class="intro-source">Matches are generated from the
       <a href="https://github.com/kubernetes-sigs/gateway-api/tree/main/conformance/reports" target="_blank" rel="noopener">conformance reports uploaded by project implementations</a>.
       They are separated into the extended features that each project supports listed in their reports.
       Implementations only appear in this page if they pass Core conformance for the resource type, and the features listed are Extended features.
       Implementations that submit conformance reports with skipped tests won't appear.</p>
     <details class="warning-note" open>
       <summary>Note</summary>
-      <p>This page is under active development. But recommendations are based on submitted conformance reports, so the information is correct.</p>
+      <p>This page is under active development. But matches are based on submitted conformance reports, so the information is correct.</p>
     </details>
   </div>
 
@@ -31,54 +31,36 @@
     <h2>Gateway Profile</h2>
 
     <h3 id="httproute">HTTPRoute</h3>
-    <p>Extended features from the <a id="link-httproute"
+    <p class="conformance-intro">Extended features from the <a id="link-httproute"
         href="https://gateway-api.sigs.k8s.io/implementations/v1.4/#httproute" target="_blank" rel="noopener">HTTPRoute
         conformance table</a>. Core is implied (controllers must pass Core to appear).</p>
     <table class="features" id="http-route-features">
-      <thead>
-        <tr>
-          <th>Feature</th>
-          <th>Requirement</th>
-        </tr>
-      </thead>
       <tbody></tbody>
     </table>
 
     <h3 id="grpcroute">GRPCRoute</h3>
-    <p>Extended features from the <a id="link-grpcroute"
+    <p class="conformance-intro">Extended features from the <a id="link-grpcroute"
         href="https://gateway-api.sigs.k8s.io/implementations/v1.4/#grpcroute" target="_blank" rel="noopener">GRPCRoute
         conformance table</a>.</p>
     <table class="features" id="grpc-features">
-      <thead>
-        <tr>
-          <th>Feature</th>
-          <th>Requirement</th>
-        </tr>
-      </thead>
       <tbody></tbody>
     </table>
 
     <h3 id="tlsroute">TLSRoute</h3>
-    <p>Extended features from the <a id="link-tlsroute"
+    <p class="conformance-intro">Extended features from the <a id="link-tlsroute"
         href="https://gateway-api.sigs.k8s.io/implementations/v1.4/#tlsroute" target="_blank" rel="noopener">TLSRoute
         conformance table</a>.</p>
     <table class="features" id="tls-features">
-      <thead>
-        <tr>
-          <th>Feature</th>
-          <th>Requirement</th>
-        </tr>
-      </thead>
       <tbody></tbody>
     </table>
   </section>
 
   <p id="wizard-data-status" class="data-status"></p>
-  <button type="button" class="recommend-btn" id="recommend-btn" disabled>Recommend</button>
+  <button type="button" class="recommend-btn" id="recommend-btn" disabled>Match</button>
   <button type="button" class="reset-btn" id="reset-btn">Reset</button>
 
   <section class="card" id="results">
-    <h2>Recommended controllers</h2>
+    <h2>Matching controllers</h2>
     <div id="results-content"></div>
   </section>
 
@@ -146,42 +128,63 @@
     function updateFeaturesForVersion() {
       const available = IMPLEMENTATIONS.length > 0 ? getAvailableFeatureIds() : null;
       const filter = (list) => available ? list.filter(f => available.has(f.id)) : list;
-      const gatewayHttp = filter(GATEWAY_HTTP_FEATURES).map(f => ({ id: f.id, label: f.label }));
-      const httpRoute = filter(HTTPROUTE_FEATURES).map(f => ({ id: f.id, label: f.label }));
+      const gatewayHttp = filter(GATEWAY_HTTP_FEATURES).map(f => ({ id: f.id, label: f.label, description: f.description }));
+      const httpRoute = filter(HTTPROUTE_FEATURES).map(f => ({ id: f.id, label: f.label, description: f.description }));
       const httpBackendTls = filter(HTTP_BACKEND_TLS_FEATURES);
       const grpc = filter(GRPC_FEATURES);
       const tls = filter(TLS_FEATURES);
-      const gatewayFirst = [...gatewayHttp, ...httpRoute].filter(r => r.label.startsWith('Gateway'));
-      const rest = [...gatewayHttp, ...httpRoute].filter(r => !r.label.startsWith('Gateway'));
-      const backendTlsRows = httpBackendTls.map(f => ({ id: f.id, label: f.label }));
-      let httpRouteRows = rest.length > 0 && gatewayFirst.length > 0
-        ? [...gatewayFirst, { spacer: true }, ...rest]
-        : [...gatewayFirst, ...rest];
+      const gatewayFirst = [...gatewayHttp, ...httpRoute].filter(r => r.label.startsWith('Gateway '));
+      const rest = [...gatewayHttp, ...httpRoute].filter(r => !r.label.startsWith('Gateway '));
+      const backendTlsRows = httpBackendTls.map(f => ({ id: f.id, label: f.label, description: f.description }));
+      const stripPrefix = (label, prefix) => label.startsWith(prefix) ? label.slice(prefix.length) : label;
+      let httpRouteRows = [];
+      if (gatewayFirst.length > 0) {
+        httpRouteRows.push({ subhead: 'Gateway' });
+        gatewayFirst.forEach(f => httpRouteRows.push({ id: f.id, label: stripPrefix(f.label, 'Gateway '), description: f.description }));
+      }
+      if (rest.length > 0) {
+        httpRouteRows.push({ subhead: 'HTTPRoute' });
+        rest.forEach(f => httpRouteRows.push({ id: f.id, label: stripPrefix(f.label, 'HTTPRoute '), description: f.description }));
+      }
       if (backendTlsRows.length > 0) {
-        httpRouteRows = [...httpRouteRows, { spacer: true }, ...backendTlsRows];
+        httpRouteRows.push({ subhead: 'Backend TLS' });
+        backendTlsRows.forEach(f => httpRouteRows.push({ id: f.id, label: stripPrefix(f.label, 'Backend TLS '), description: f.description }));
       }
       renderTable('http-route-features', httpRouteRows, 'http');
-      renderTable('grpc-features', grpc.map(f => ({ id: f.id, label: f.label })), 'grpc');
-      renderTable('tls-features', tls.map(f => ({ id: f.id, label: f.label })), 'tls');
+      const grpcRows = grpc.length > 0 ? [{ subhead: 'Gateway' }, ...grpc.map(f => ({ id: f.id, label: stripPrefix(f.label, 'Gateway '), description: f.description }))] : [];
+      renderTable('grpc-features', grpcRows, 'grpc');
+      const tlsRows = tls.length > 0 ? [{ subhead: 'Gateway' }, ...tls.map(f => ({ id: f.id, label: stripPrefix(f.label, 'Gateway '), description: f.description }))] : [];
+      renderTable('tls-features', tlsRows, 'tls');
     }
 
     function renderTable(tableId, rows, section) {
       const tbody = document.querySelector(`#${tableId} tbody`);
       const prefix = RADIO_PREFIX[section];
       tbody.innerHTML = rows.map((row) => {
+        if (row.subhead) return `<tr class="feature-subhead"><th scope="col">${escapeHtml(row.subhead)}</th><th scope="col">Requirement</th></tr>`;
         if (row.spacer) return '<tr class="feature-spacer"><td colspan="2"></td></tr>';
-        const { id, label } = row;
+        const { id, label, description } = row;
+        const name = prefix + id;
+        const titleAttr = description ? ` title="${escapeHtml(description)}"` : '';
         return `
         <tr>
-          <td>${label}</td>
+          <td${titleAttr}>${escapeHtml(label)}</td>
           <td>
-            <label><input type="radio" name="${prefix}${id}" value="must" /> Must have</label>
-            <label><input type="radio" name="${prefix}${id}" value="good" /> Nice to have</label>
-            <label><input type="radio" name="${prefix}${id}" value="na" checked /> N/A</label>
+            <label><input type="checkbox" name="${name}" value="must" /> Must have</label>
+            <label><input type="checkbox" name="${name}" value="good" /> Nice to have</label>
           </td>
         </tr>
       `;
       }).join('');
+      tbody.querySelectorAll('input[type="checkbox"]').forEach((cb) => {
+        cb.addEventListener('change', function () {
+          if (this.checked) {
+            document.querySelectorAll(`input[name="${this.name}"]`).forEach((other) => {
+              if (other !== this) other.checked = false;
+            });
+          }
+        });
+      });
     }
 
     function resetAll() {
@@ -193,8 +196,7 @@
       sections.forEach(({ section, features }) => {
         const prefix = RADIO_PREFIX[section];
         features.forEach(({ id }) => {
-          const na = document.querySelector(`input[name="${prefix}${id}"][value="na"]`);
-          if (na) na.checked = true;
+          document.querySelectorAll(`input[name="${prefix}${id}"]`).forEach((el) => { el.checked = false; });
         });
       });
       document.getElementById('results').classList.remove('visible');
@@ -213,11 +215,11 @@
       const good = [];
       sections.forEach(({ name: section, features }) => {
         features.forEach(({ id }) => {
-          const r = document.querySelector(`input[name="${RADIO_PREFIX[section]}${id}"]:checked`);
-          if (!r) return;
-          if (r.value === 'must') {
+          const el = document.querySelector(`input[name="${RADIO_PREFIX[section]}${id}"]:checked`);
+          if (!el) return;
+          if (el.value === 'must') {
             must.push({ section, id });
-          } else if (r.value === 'good') {
+          } else if (el.value === 'good') {
             good.push({ section, id });
           }
         });
@@ -245,12 +247,12 @@
       const setStatusAfterRecommend = (recommendedCount) => {
         if (statusEl) {
           statusEl.textContent = recommendedCount === 1
-            ? '1 controller recommended.'
-            : `${recommendedCount} controllers recommended.`;
+            ? '1 controller matches.'
+            : `${recommendedCount} controllers match.`;
         }
       };
       if (must.length === 0 && good.length === 0) {
-        resultsContent.innerHTML = '<p class="no-results">Select at least one requirement as Must have or Nice to have, then click Recommend.</p>';
+        resultsContent.innerHTML = '<p class="no-results">Select at least one requirement as Must have or Nice to have, then click Match.</p>';
         resultsDiv.classList.add('visible');
         resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
         setStatusAfterRecommend(0);

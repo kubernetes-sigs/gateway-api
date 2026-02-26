@@ -16,7 +16,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// Controller Recommendation Wizard - WebAssembly build.
+// Controller Matching Wizard - WebAssembly build.
 // Build with: GOOS=js GOARCH=wasm go build -o site-src/wizard/main.wasm ./wasm/
 // Load from HTML: wasm_exec.js + instantiateStreaming(fetch("main.wasm"), go.importObject).then(r => go.run(r.instance))
 package main
@@ -30,8 +30,9 @@ import (
 )
 
 type featureDef struct {
-	ID    string `json:"id"`
-	Label string `json:"label"`
+	ID          string `json:"id"`
+	Label       string `json:"label"`
+	Description string `json:"description"`
 }
 
 type implementation struct {
@@ -87,6 +88,34 @@ func main() {
 		}
 		jsonStr := args[0].String()
 		onDataLoaded(jsonStr)
+		return nil
+	}))
+
+	// When a requirement checkbox is checked, uncheck the other (Must have / Nice to have are mutually exclusive)
+	doc.Get("body").Call("addEventListener", "change", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		if len(args) < 1 {
+			return nil
+		}
+		ev := args[0]
+		target := ev.Get("target")
+		if target.Get("type").String() != "checkbox" {
+			return nil
+		}
+		if !target.Get("checked").Bool() {
+			return nil
+		}
+		table := target.Call("closest", "table.features")
+		if !table.Truthy() {
+			return nil
+		}
+		name := target.Get("name").String()
+		group := doc.Call("querySelectorAll", fmt.Sprintf(`input[name="%s"]`, name))
+		for i := 0; i < group.Length(); i++ {
+			el := group.Index(i)
+			if !el.Equal(target) {
+				el.Set("checked", false)
+			}
+		}
 		return nil
 	}))
 
@@ -329,15 +358,22 @@ func filterFeatures(list []featureDef, available map[string]bool) []featureDef {
 
 func renderFeatureTables() {
 	renderHTTPRouteWithSpacer("http-route-features", featHTTPGateway, featHTTPRoute, featHTTPBackend, "http")
-	renderTable("grpc-features", featGRPC, "grpc")
-	renderTable("tls-features", featTLS, "tls")
+	renderTable("grpc-features", "grpc", "Gateway", "Gateway ", featGRPC)
+	renderTable("tls-features", "tls", "Gateway", "Gateway ", featTLS)
 }
 
 func renderFeatureTablesFiltered() {
 	avail := getAvailableFeatureIDs()
 	renderHTTPRouteWithSpacer("http-route-features", filterFeatures(featHTTPGateway, avail), filterFeatures(featHTTPRoute, avail), filterFeatures(featHTTPBackend, avail), "http")
-	renderTable("grpc-features", filterFeatures(featGRPC, avail), "grpc")
-	renderTable("tls-features", filterFeatures(featTLS, avail), "tls")
+	renderTable("grpc-features", "grpc", "Gateway", "Gateway ", filterFeatures(featGRPC, avail))
+	renderTable("tls-features", "tls", "Gateway", "Gateway ", filterFeatures(featTLS, avail))
+}
+
+func stripLabelPrefix(label, prefix string) string {
+	if strings.HasPrefix(label, prefix) {
+		return label[len(prefix):]
+	}
+	return label
 }
 
 func renderHTTPRouteWithSpacer(tableID string, gateway, route, backend []featureDef, section string) {
@@ -347,14 +383,14 @@ func renderHTTPRouteWithSpacer(tableID string, gateway, route, backend []feature
 	}
 	var gatewayFirst, rest []featureDef
 	for _, f := range gateway {
-		if strings.HasPrefix(f.Label, "Gateway") {
+		if strings.HasPrefix(f.Label, "Gateway ") {
 			gatewayFirst = append(gatewayFirst, f)
 		} else {
 			rest = append(rest, f)
 		}
 	}
 	for _, f := range route {
-		if strings.HasPrefix(f.Label, "Gateway") {
+		if strings.HasPrefix(f.Label, "Gateway ") {
 			gatewayFirst = append(gatewayFirst, f)
 		} else {
 			rest = append(rest, f)
@@ -362,53 +398,65 @@ func renderHTTPRouteWithSpacer(tableID string, gateway, route, backend []feature
 	}
 	prefix := radioPrefix[section]
 	var html strings.Builder
-	for _, f := range gatewayFirst {
+	writeSubhead := func(subhead string) {
+		html.WriteString(fmt.Sprintf(`<tr class="feature-subhead"><th scope="col">%s</th><th scope="col">Requirement</th></tr>`, escapeHTML(subhead)))
+	}
+	writeRow := func(f featureDef, label string) {
 		name := prefix + f.ID
-		html.WriteString(fmt.Sprintf(`<tr><td>%s</td><td>
-<label><input type="radio" name="%s" value="must" /> Must have</label>
-<label><input type="radio" name="%s" value="good" /> Nice to have</label>
-<label><input type="radio" name="%s" value="na" checked /> N/A</label>
-</td></tr>`, escapeHTML(f.Label), name, name, name))
+		titleAttr := ""
+		if f.Description != "" {
+			titleAttr = fmt.Sprintf(` title="%s"`, escapeHTML(f.Description))
+		}
+		html.WriteString(fmt.Sprintf(`<tr><td%s>%s</td><td>
+<label><input type="checkbox" name="%s" value="must" /> Must have</label>
+<label><input type="checkbox" name="%s" value="good" /> Nice to have</label>
+</td></tr>`, titleAttr, escapeHTML(label), name, name))
 	}
-	if len(gatewayFirst) > 0 && len(rest) > 0 {
-		html.WriteString(`<tr class="feature-spacer"><td colspan="2"></td></tr>`)
+	if len(gatewayFirst) > 0 {
+		writeSubhead("Gateway")
+		for _, f := range gatewayFirst {
+			writeRow(f, stripLabelPrefix(f.Label, "Gateway "))
+		}
 	}
-	for _, f := range rest {
-		name := prefix + f.ID
-		html.WriteString(fmt.Sprintf(`<tr><td>%s</td><td>
-<label><input type="radio" name="%s" value="must" /> Must have</label>
-<label><input type="radio" name="%s" value="good" /> Nice to have</label>
-<label><input type="radio" name="%s" value="na" checked /> N/A</label>
-</td></tr>`, escapeHTML(f.Label), name, name, name))
+	if len(rest) > 0 {
+		writeSubhead("HTTPRoute")
+		for _, f := range rest {
+			writeRow(f, stripLabelPrefix(f.Label, "HTTPRoute "))
+		}
 	}
-	if len(backend) > 0 && (len(gatewayFirst) > 0 || len(rest) > 0) {
-		html.WriteString(`<tr class="feature-spacer"><td colspan="2"></td></tr>`)
-	}
-	for _, f := range backend {
-		name := prefix + f.ID
-		html.WriteString(fmt.Sprintf(`<tr><td>%s</td><td>
-<label><input type="radio" name="%s" value="must" /> Must have</label>
-<label><input type="radio" name="%s" value="good" /> Nice to have</label>
-<label><input type="radio" name="%s" value="na" checked /> N/A</label>
-</td></tr>`, escapeHTML(f.Label), name, name, name))
+	if len(backend) > 0 {
+		writeSubhead("Backend TLS")
+		for _, f := range backend {
+			writeRow(f, stripLabelPrefix(f.Label, "Backend TLS "))
+		}
 	}
 	tbody.Set("innerHTML", html.String())
 }
 
-func renderTable(tableID string, rows []featureDef, section string) {
+func renderTable(tableID string, section string, subhead string, labelPrefix string, rows []featureDef) {
 	tbody := doc.Call("querySelector", "#"+tableID+" tbody")
 	if !tbody.Truthy() {
 		return
 	}
 	prefix := radioPrefix[section]
 	var html strings.Builder
+	if subhead != "" && len(rows) > 0 {
+		html.WriteString(fmt.Sprintf(`<tr class="feature-subhead"><th scope="col">%s</th><th scope="col">Requirement</th></tr>`, escapeHTML(subhead)))
+	}
 	for _, f := range rows {
+		label := f.Label
+		if labelPrefix != "" {
+			label = stripLabelPrefix(label, labelPrefix)
+		}
 		name := prefix + f.ID
-		html.WriteString(fmt.Sprintf(`<tr><td>%s</td><td>
-<label><input type="radio" name="%s" value="must" /> Must have</label>
-<label><input type="radio" name="%s" value="good" /> Nice to have</label>
-<label><input type="radio" name="%s" value="na" checked /> N/A</label>
-</td></tr>`, escapeHTML(f.Label), name, name, name))
+		titleAttr := ""
+		if f.Description != "" {
+			titleAttr = fmt.Sprintf(` title="%s"`, escapeHTML(f.Description))
+		}
+		html.WriteString(fmt.Sprintf(`<tr><td%s>%s</td><td>
+<label><input type="checkbox" name="%s" value="must" /> Must have</label>
+<label><input type="checkbox" name="%s" value="good" /> Nice to have</label>
+</td></tr>`, titleAttr, escapeHTML(label), name, name))
 	}
 	tbody.Set("innerHTML", html.String())
 }
@@ -474,7 +522,7 @@ func recommend() {
 
 	must, good := getSelections()
 	if len(must) == 0 && len(good) == 0 {
-		resultsContent.Set("innerHTML", `<p class="no-results">Select at least one requirement as Must have or Nice to have, then click Recommend.</p>`)
+		resultsContent.Set("innerHTML", `<p class="no-results">Select at least one requirement as Must have or Nice to have, then click Match.</p>`)
 		resultsDiv.Get("classList").Call("add", "visible")
 		setStatus(statusEl, 0)
 		return
@@ -599,9 +647,9 @@ func setStatus(el js.Value, n int) {
 		return
 	}
 	if n == 1 {
-		el.Set("textContent", "1 controller recommended.")
+		el.Set("textContent", "1 controller matches.")
 	} else {
-		el.Set("textContent", fmt.Sprintf("%d controllers recommended.", n))
+		el.Set("textContent", fmt.Sprintf("%d controllers match.", n))
 	}
 }
 
@@ -618,9 +666,9 @@ func resetAll() {
 		prefix := radioPrefix[s.section]
 		for _, f := range s.feats {
 			name := prefix + f.ID
-			na := doc.Call("querySelector", fmt.Sprintf(`input[name="%s"][value="na"]`, name))
-			if na.Truthy() {
-				na.Set("checked", true)
+			group := doc.Call("querySelectorAll", fmt.Sprintf(`input[name="%s"]`, name))
+			for i := 0; i < group.Length(); i++ {
+				group.Index(i).Set("checked", false)
 			}
 		}
 	}

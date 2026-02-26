@@ -89,6 +89,10 @@ table.features th:first-child {
   white-space: nowrap;
 }
 
+table.features td:first-child {
+  cursor: help;
+}
+
 table.features td:nth-child(2),
 table.features th:nth-child(2) {
   width: 300px;
@@ -101,7 +105,8 @@ table.features td:nth-child(2) label {
   margin-right: 10px;
 }
 
-table.features input[type="radio"] {
+table.features input[type="radio"],
+table.features input[type="checkbox"] {
   margin: 0 3px;
   cursor: pointer;
 }
@@ -111,6 +116,24 @@ table.features tr.feature-spacer td {
   height: 1.5em;
   padding: 0;
   vertical-align: middle;
+}
+
+table.features tr.feature-subhead td,
+table.features tr.feature-subhead th {
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+  padding-top: 14px;
+  padding-bottom: 6px;
+  vertical-align: bottom;
+}
+
+table.features tr.feature-subhead:first-child td,
+table.features tr.feature-subhead:first-child th {
+  padding-top: 0;
 }
 
 table.features label {
@@ -263,6 +286,10 @@ section.card h3#tlsroute {
 section.card h3 + p {
   color: var(--text-muted);
   margin-bottom: 16px;
+}
+
+section.card .conformance-intro {
+  font-size: 0.8125rem;
 }
 
 section.card h4 {
