@@ -18,15 +18,21 @@ Read conformance reports from conformance/reports/ and output controller-wizard-
 for the Controller Recommendation Wizard. Supports --all (one object keyed by version) or
 --version vX.Y.Z (single array for that version). Output path defaults to
 site-src/wizard/data/controller-wizard-data.json. The output directory is created if it does not exist.
+
+When loaded as an MkDocs hook (see mkdocs.yml hooks), runs with --all behavior so the
+built site has multi-version wizard data.
 """
 
 import argparse
 import json
+import logging
 import os
 import re
 import sys
 
 import yaml
+
+log = logging.getLogger(__name__)
 
 
 # Profile name (from report) -> conformance label shown in wizard
@@ -106,7 +112,8 @@ def parse_version(version_dir_name):
 
 
 def get_version_dirs(reports_root, patch_zero_only=False):
-    """Return sorted list of version directory paths (e.g. .../v1.4.0)."""
+    """Return sorted list of version directory paths (e.g. .../v1.5.0, v1.4.0, ...), newest first.
+    New versions added under conformance/reports/ automatically appear at the top of the list."""
     if not os.path.isdir(reports_root):
         return []
     dirs = [
@@ -239,6 +246,28 @@ def aggregate_by_impl(version_dir):
     return out
 
 
+def generate_all(repo_root, output_path):
+    """
+    Generate controller-wizard-data.json with all versions (--all behavior).
+    Versions are emitted newest-first so new releases (e.g. v1.5.0) appear at the top of the wizard dropdown.
+    repo_root: repository root (parent of conformance/, site-src/).
+    output_path: full path to output JSON file.
+    Returns True if successful, False if no version dirs (caller may exit or log).
+    """
+    reports_root = os.path.join(repo_root, "conformance", "reports")
+    version_dirs = get_version_dirs(reports_root, patch_zero_only=True)
+    if not version_dirs:
+        return False
+    out = {"featureDefinitions": FEATURE_DEFINITIONS}
+    for version_dir in version_dirs:
+        v = os.path.basename(version_dir)
+        out[v] = aggregate_by_impl(version_dir)
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    with open(output_path, "w", encoding="utf-8") as f:
+        json.dump(out, f, indent=2)
+    return True
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Generate controller-wizard-data.json from conformance reports."
@@ -266,14 +295,15 @@ def main():
     output = os.path.join(repo_root, args.output)
 
     if args.all:
-        version_dirs = get_version_dirs(reports_root, patch_zero_only=True)
-        if not version_dirs:
+        if not generate_all(repo_root, output):
             print("No version dirs under conformance/reports/", file=sys.stderr)
             sys.exit(1)
-        out = {"featureDefinitions": FEATURE_DEFINITIONS}
-        for version_dir in version_dirs:
-            v = os.path.basename(version_dir)
-            out[v] = aggregate_by_impl(version_dir)
+        with open(output, encoding="utf-8") as f:
+            out = json.load(f)
+        version_keys = [k for k in out if k != "featureDefinitions"]
+        total = sum(len(out[v]) for v in version_keys)
+        print(f"Wrote {output} with featureDefinitions and {len(version_keys)} version(s), {total} implementation(s).")
+        return
     elif args.version:
         version_dir = os.path.join(reports_root, args.version)
         if not os.path.isdir(version_dir):
@@ -288,12 +318,18 @@ def main():
     with open(output, "w", encoding="utf-8") as f:
         json.dump(out, f, indent=2)
 
-    if args.all:
-        version_keys = [k for k in out if k != "featureDefinitions"]
-        total = sum(len(out[v]) for v in version_keys)
-        print(f"Wrote {output} with featureDefinitions and {len(version_keys)} version(s), {total} implementation(s).")
+    print(f"Wrote {output} with featureDefinitions and {len(out['implementations'])} implementation(s).")
+
+
+def on_config(config, **kwargs):
+    """MkDocs hook: generate wizard data with --all before build."""
+    repo_root = os.path.dirname(config.config_file_path)
+    output_path = os.path.join(repo_root, "site-src", "wizard", "data", "controller-wizard-data.json")
+    if not generate_all(repo_root, output_path):
+        log.warning("Controller wizard data not generated: no version dirs under conformance/reports/")
     else:
-        print(f"Wrote {output} with featureDefinitions and {len(out['implementations'])} implementation(s).")
+        log.info("Generated controller wizard data (all versions) at %s", output_path)
+    return config
 
 
 if __name__ == "__main__":

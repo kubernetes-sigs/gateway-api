@@ -35,9 +35,12 @@ type wizardData struct {
 		TLS            []featureDef `json:"tls"`
 	} `json:"featureDefinitions"`
 	Implementations []implementation `json:"implementations"`
-	// Version-keyed implementations when multi-version (e.g. v1.4.0 -> []implementation)
+	// Version-keyed implementations when multi-version (e.g. v1.5.0, v1.4.0 -> []implementation)
 	Versions map[string][]implementation `json:"-"`
 }
+
+// maxVersionsInDropdown limits the version selector to the N newest versions (new versions appear at top).
+const maxVersionsInDropdown = 3
 
 var (
 	doc             js.Value
@@ -101,7 +104,7 @@ func main() {
 		}
 		return nil
 	})).Call("catch", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-		doc.Call("getElementById", "wizard-data-status").Set("textContent", "Could not load data. Serve from site-src/wizard/.")
+		doc.Call("getElementById", "wizard-data-status").Set("textContent", "Could not load data. Run 'make wizard-data' (requires conformance/reports/), then serve from site-src/wizard/.")
 		doc.Call("getElementById", "recommend-btn").Set("disabled", false)
 		return nil
 	}))
@@ -190,8 +193,8 @@ func onDataLoaded(jsonStr string) {
 	sort.Slice(versionKeys, func(i, j int) bool {
 		return versionCompare(versionKeys[j], versionKeys[i]) < 0
 	})
-	if len(versionKeys) > 3 {
-		versionKeys = versionKeys[:3]
+	if len(versionKeys) > maxVersionsInDropdown {
+		versionKeys = versionKeys[:maxVersionsInDropdown]
 	}
 	currentVersion = versionKeys[0]
 	impls = allVersionsData[currentVersion]
@@ -237,7 +240,10 @@ func versionSegment(versionKey string) string {
 
 func updateVersionLinks(versionKey string) {
 	if versionKey == "" {
-		versionKey = "v1.4.0"
+		versionKey = currentVersion
+	}
+	if versionKey == "" {
+		versionKey = "v1.0.0"
 	}
 	seg := versionSegment(versionKey)
 	base := "https://gateway-api.sigs.k8s.io/implementations/" + seg + "/"
@@ -342,7 +348,7 @@ func renderHTTPRouteWithSpacer(tableID string, gateway, route, backend []feature
 		name := prefix + f.ID
 		html.WriteString(fmt.Sprintf(`<tr><td>%s</td><td>
 <label><input type="radio" name="%s" value="must" /> Must have</label>
-<label><input type="radio" name="%s" value="good" /> Good to have</label>
+<label><input type="radio" name="%s" value="good" /> Nice to have</label>
 <label><input type="radio" name="%s" value="na" checked /> N/A</label>
 </td></tr>`, escapeHTML(f.Label), name, name, name))
 	}
@@ -353,7 +359,7 @@ func renderHTTPRouteWithSpacer(tableID string, gateway, route, backend []feature
 		name := prefix + f.ID
 		html.WriteString(fmt.Sprintf(`<tr><td>%s</td><td>
 <label><input type="radio" name="%s" value="must" /> Must have</label>
-<label><input type="radio" name="%s" value="good" /> Good to have</label>
+<label><input type="radio" name="%s" value="good" /> Nice to have</label>
 <label><input type="radio" name="%s" value="na" checked /> N/A</label>
 </td></tr>`, escapeHTML(f.Label), name, name, name))
 	}
@@ -364,7 +370,7 @@ func renderHTTPRouteWithSpacer(tableID string, gateway, route, backend []feature
 		name := prefix + f.ID
 		html.WriteString(fmt.Sprintf(`<tr><td>%s</td><td>
 <label><input type="radio" name="%s" value="must" /> Must have</label>
-<label><input type="radio" name="%s" value="good" /> Good to have</label>
+<label><input type="radio" name="%s" value="good" /> Nice to have</label>
 <label><input type="radio" name="%s" value="na" checked /> N/A</label>
 </td></tr>`, escapeHTML(f.Label), name, name, name))
 	}
@@ -382,7 +388,7 @@ func renderTable(tableID string, rows []featureDef, section string) {
 		name := prefix + f.ID
 		html.WriteString(fmt.Sprintf(`<tr><td>%s</td><td>
 <label><input type="radio" name="%s" value="must" /> Must have</label>
-<label><input type="radio" name="%s" value="good" /> Good to have</label>
+<label><input type="radio" name="%s" value="good" /> Nice to have</label>
 <label><input type="radio" name="%s" value="na" checked /> N/A</label>
 </td></tr>`, escapeHTML(f.Label), name, name, name))
 	}
@@ -450,7 +456,7 @@ func recommend() {
 
 	must, good := getSelections()
 	if len(must) == 0 && len(good) == 0 {
-		resultsContent.Set("innerHTML", `<p class="no-results">Select at least one requirement as Must have or Good to have, then click Recommend.</p>`)
+		resultsContent.Set("innerHTML", `<p class="no-results">Select at least one requirement as Must have or Nice to have, then click Recommend.</p>`)
 		resultsDiv.Get("classList").Call("add", "visible")
 		setStatus(statusEl, 0)
 		return
@@ -497,7 +503,7 @@ func recommend() {
 		}
 	}
 	if len(scoredList) == 0 {
-		resultsContent.Set("innerHTML", `<p class="no-results">No controller supports any of your Must have requirements. Try relaxing to Good to have or fewer requirements.</p>`)
+		resultsContent.Set("innerHTML", `<p class="no-results">No controller supports any of your Must have requirements. Try relaxing to Nice to have or fewer requirements.</p>`)
 		resultsDiv.Get("classList").Call("add", "visible")
 		setStatus(statusEl, 0)
 		return
@@ -548,7 +554,7 @@ func recommend() {
 		return label
 	}
 	var html strings.Builder
-	html.WriteString(`<table class="results"><thead><tr><th>Organization</th><th>Project</th><th>Conformance</th><th>Must have</th><th>Good to have</th><th>Missing</th></tr></thead><tbody>`)
+	html.WriteString(`<table class="results"><thead><tr><th>Organization</th><th>Project</th><th>Conformance</th><th>Must have</th><th>Nice to have</th><th>Missing</th></tr></thead><tbody>`)
 	for _, c := range scoredList {
 		conformance := strings.Join(c.impl.Conformance, ", ")
 		missingLabels := make([]string, len(c.missing))
