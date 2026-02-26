@@ -986,6 +986,26 @@ func HTTPRouteMustHaveResolvedRefsConditionsTrue(t *testing.T, client client.Cli
 	})
 }
 
+// HTTPRouteMustHaveResolvedRefsMustHaveBackendsNotFound checks that the supplied HTTPRoute has the resolvedRefsCondition
+// set to false due to RouteReasonBackendNotFound.
+func HTTPRouteMustHaveResolvedRefsMustHaveBackendsNotFound(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeNN types.NamespacedName, gwNN types.NamespacedName) {
+	HTTPRouteMustHaveCondition(t, client, timeoutConfig, routeNN, gwNN, metav1.Condition{
+		Type:   string(gatewayv1.RouteConditionResolvedRefs),
+		Status: metav1.ConditionFalse,
+		Reason: string(gatewayv1.RouteReasonBackendNotFound),
+	})
+}
+
+// HTTPRouteMustHaveRouteAcceptedConditionsTrue checks that the supplied HTTPRoute has RouteConditionAccepted
+// set to true.
+func HTTPRouteMustHaveRouteAcceptedConditionsTrue(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeNN types.NamespacedName, gwNN types.NamespacedName) {
+	HTTPRouteMustHaveCondition(t, client, timeoutConfig, routeNN, gwNN, metav1.Condition{
+		Type:   string(gatewayv1.RouteConditionAccepted),
+		Status: metav1.ConditionTrue,
+		Reason: string(gatewayv1.RouteReasonAccepted),
+	})
+}
+
 func parentRefToString(p gatewayv1.ParentReference) string {
 	if p.Namespace != nil && *p.Namespace != "" {
 		return fmt.Sprintf("%v/%v", p.Namespace, p.Name)
@@ -1510,7 +1530,7 @@ func GetAcceptedByParentGatewayCondition() metav1.Condition {
 }
 
 // NOTE: Used in Gateway API Inference Extension conformance.
-func GetGatewayReadyCondition() metav1.Condition {
+func GetGatewayAcceptedCondition() metav1.Condition {
 	return metav1.Condition{
 		Type:   string(gatewayv1.GatewayConditionAccepted),
 		Status: metav1.ConditionTrue,
@@ -1523,6 +1543,15 @@ func GetGatewayProgrammedCondition() metav1.Condition {
 		Type:   string(gatewayv1.GatewayConditionProgrammed),
 		Status: metav1.ConditionTrue,
 	}
+}
+
+// NOTE: Used in Gateway API Inference Extension conformance.
+func DeleteHTTPRoute(t *testing.T, c client.Client, routeNN types.NamespacedName) {
+	httpRoute := &gatewayv1.HTTPRoute{
+		ObjectMeta: metav1.ObjectMeta{Name: routeNN.Name, Namespace: routeNN.Namespace},
+	}
+	t.Logf("Deleting HTTPRoute %s", routeNN.String())
+	require.NoError(t, c.Delete(context.TODO(), httpRoute), "failed to delete httproute %s", routeNN.String())
 }
 
 // Install gatewayv1 types into scheme.
