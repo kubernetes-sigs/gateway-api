@@ -37,8 +37,10 @@ for module in $(find . -name "go.mod" | xargs -n1 dirname); do
     --security-opt="label=disable" \
     -e GOLANGCI_LINT_CACHE=/cache \
     -e GOFLAGS="-buildvcs=false" \
+    -e GOOS="js" \
+    -e GOARCH="wasm" \
     "golangci/golangci-lint:$VERSION" \
-    golangci-lint run ./... --build-tags=js,wasm || failed=true
+    golangci-lint run ./... || failed=true
 done
 
 if ${failed}; then

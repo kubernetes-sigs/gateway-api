@@ -45,19 +45,6 @@ type implementation struct {
 	Features     []string `json:"features"`
 }
 
-type wizardData struct {
-	FeatureDefinitions struct {
-		HTTPGateway    []featureDef `json:"httpGateway"`
-		HTTPRoute      []featureDef `json:"httpRoute"`
-		HTTPBackendTLS []featureDef `json:"httpBackendTls"`
-		GRPC           []featureDef `json:"grpc"`
-		TLS            []featureDef `json:"tls"`
-	} `json:"featureDefinitions"`
-	Implementations []implementation `json:"implementations"`
-	// Version-keyed implementations when multi-version (e.g. v1.5.0, v1.4.0 -> []implementation)
-	Versions map[string][]implementation `json:"-"`
-}
-
 // maxVersionsInDropdown limits the version selector to the N newest versions (new versions appear at top).
 const maxVersionsInDropdown = 3
 
@@ -72,8 +59,13 @@ var (
 	featGRPC        []featureDef
 	featTLS         []featureDef
 	featHTTPAll     []featureDef
-	radioPrefix = map[string]string{"http": "req-http-", "grpc": "req-grpc-", "tls": "req-tls-"}
 )
+
+var radioPrefix = map[string]string{
+	"http": "req-http-",
+	"grpc": "req-grpc-",
+	"tls":  "req-tls-",
+}
 
 // Feature definitions come only from the loaded JSON (controller-wizard-data.json from hack/generate-controller-wizard-data.py).
 // No hardcoded defaults: tables stay empty until data loads.
@@ -82,7 +74,7 @@ func main() {
 	doc = js.Global().Get("document")
 
 	// Expose callback for when JS has loaded the JSON data
-	js.Global().Set("wizardOnData", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+	js.Global().Set("wizardOnData", js.FuncOf(func(_ js.Value, args []js.Value) interface{} {
 		if len(args) < 1 {
 			return nil
 		}
@@ -92,7 +84,7 @@ func main() {
 	}))
 
 	// When a requirement checkbox is checked, uncheck the other (Must have / Nice to have are mutually exclusive)
-	doc.Get("body").Call("addEventListener", "change", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+	doc.Get("body").Call("addEventListener", "change", js.FuncOf(func(_ js.Value, args []js.Value) interface{} {
 		if len(args) < 1 {
 			return nil
 		}
@@ -121,14 +113,14 @@ func main() {
 
 	// Recommend button
 	recommendBtn := doc.Call("getElementById", "recommend-btn")
-	recommendBtn.Call("addEventListener", "click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+	recommendBtn.Call("addEventListener", "click", js.FuncOf(func(_ js.Value, _ []js.Value) interface{} {
 		recommend()
 		return nil
 	}))
 
 	// Reset button
 	resetBtn := doc.Call("getElementById", "reset-btn")
-	resetBtn.Call("addEventListener", "click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+	resetBtn.Call("addEventListener", "click", js.FuncOf(func(_ js.Value, _ []js.Value) interface{} {
 		resetAll()
 		return nil
 	}))
@@ -136,10 +128,10 @@ func main() {
 	// Feature tables are filled only after data loads (onDataLoaded); no default consts.
 
 	// Fetch data via JS fetch (go.run blocks so we do it from Go)
-	js.Global().Call("fetch", "data/controller-wizard-data.json").Call("then", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+	js.Global().Call("fetch", "data/controller-wizard-data.json").Call("then", js.FuncOf(func(_ js.Value, args []js.Value) interface{} {
 		resp := args[0]
 		if resp.Get("ok").Bool() {
-			resp.Call("json").Call("then", js.FuncOf(func(this js.Value, args2 []js.Value) interface{} {
+			resp.Call("json").Call("then", js.FuncOf(func(_ js.Value, args2 []js.Value) interface{} {
 				data := args2[0]
 				jsonStr := js.Global().Get("JSON").Call("stringify", data).String()
 				onDataLoaded(jsonStr)
@@ -150,7 +142,7 @@ func main() {
 			doc.Call("getElementById", "recommend-btn").Set("disabled", false)
 		}
 		return nil
-	})).Call("catch", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+	})).Call("catch", js.FuncOf(func(_ js.Value, _ []js.Value) interface{} {
 		doc.Call("getElementById", "wizard-data-status").Set("textContent", "Could not load data. Run 'make wizard-data' (requires conformance/reports/), then serve from site-src/wizard/.")
 		doc.Call("getElementById", "recommend-btn").Set("disabled", false)
 		return nil
@@ -255,7 +247,7 @@ func onDataLoaded(jsonStr string) {
 		versionSelect.Call("appendChild", opt)
 	}
 	versionSelect.Set("value", currentVersion)
-	versionSelect.Call("addEventListener", "change", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+	versionSelect.Call("addEventListener", "change", js.FuncOf(func(_ js.Value, _ []js.Value) interface{} {
 		currentVersion = versionSelect.Get("value").String()
 		impls = allVersionsData[currentVersion]
 		updateVersionLinks(currentVersion)
@@ -312,13 +304,13 @@ func versionCompare(a, b string) int {
 		s = strings.TrimPrefix(s, "v")
 		parts := strings.Split(s, ".")
 		if len(parts) > 0 {
-			fmt.Sscanf(parts[0], "%d", &major)
+			_, _ = fmt.Sscanf(parts[0], "%d", &major)
 		}
 		if len(parts) > 1 {
-			fmt.Sscanf(parts[1], "%d", &minor)
+			_, _ = fmt.Sscanf(parts[1], "%d", &minor)
 		}
 		if len(parts) > 2 {
-			fmt.Sscanf(parts[2], "%d", &patch)
+			_, _ = fmt.Sscanf(parts[2], "%d", &patch)
 		}
 		return
 	}
@@ -356,17 +348,11 @@ func filterFeatures(list []featureDef, available map[string]bool) []featureDef {
 	return out
 }
 
-func renderFeatureTables() {
-	renderHTTPRouteWithSpacer("http-route-features", featHTTPGateway, featHTTPRoute, featHTTPBackend, "http")
-	renderTable("grpc-features", "grpc", "Gateway", "Gateway ", featGRPC)
-	renderTable("tls-features", "tls", "Gateway", "Gateway ", featTLS)
-}
-
 func renderFeatureTablesFiltered() {
 	avail := getAvailableFeatureIDs()
 	renderHTTPRouteWithSpacer("http-route-features", filterFeatures(featHTTPGateway, avail), filterFeatures(featHTTPRoute, avail), filterFeatures(featHTTPBackend, avail), "http")
-	renderTable("grpc-features", "grpc", "Gateway", "Gateway ", filterFeatures(featGRPC, avail))
-	renderTable("tls-features", "tls", "Gateway", "Gateway ", filterFeatures(featTLS, avail))
+	renderTable("grpc-features", "grpc", "Gateway ", filterFeatures(featGRPC, avail))
+	renderTable("tls-features", "tls", "Gateway ", filterFeatures(featTLS, avail))
 }
 
 func stripLabelPrefix(label, prefix string) string {
@@ -433,15 +419,15 @@ func renderHTTPRouteWithSpacer(tableID string, gateway, route, backend []feature
 	tbody.Set("innerHTML", html.String())
 }
 
-func renderTable(tableID string, section string, subhead string, labelPrefix string, rows []featureDef) {
+func renderTable(tableID string, section string, labelPrefix string, rows []featureDef) {
 	tbody := doc.Call("querySelector", "#"+tableID+" tbody")
 	if !tbody.Truthy() {
 		return
 	}
 	prefix := radioPrefix[section]
 	var html strings.Builder
-	if subhead != "" && len(rows) > 0 {
-		html.WriteString(fmt.Sprintf(`<tr class="feature-subhead"><th scope="col">%s</th><th scope="col">Requirement</th></tr>`, escapeHTML(subhead)))
+	if len(rows) > 0 {
+		html.WriteString(fmt.Sprintf(`<tr class="feature-subhead"><th scope="col">%s</th><th scope="col">Requirement</th></tr>`, escapeHTML("Gateway")))
 	}
 	for _, f := range rows {
 		label := f.Label
@@ -483,9 +469,10 @@ func getSelections() (must, good []selection) {
 				continue
 			}
 			v := el.Get("value").String()
-			if v == "must" {
+			switch v {
+			case "must":
 				must = append(must, selection{Section: s.name, ID: f.ID})
-			} else if v == "good" {
+			case "good":
 				good = append(good, selection{Section: s.name, ID: f.ID})
 			}
 		}
@@ -678,15 +665,6 @@ func resetAll() {
 		statusEl.Set("textContent", "")
 	}
 	js.Global().Call("scrollTo", 0, 0)
-}
-
-func seen(s []string, x string) bool {
-	for _, v := range s {
-		if v == x {
-			return true
-		}
-	}
-	return false
 }
 
 func escapeHTML(s string) string {
