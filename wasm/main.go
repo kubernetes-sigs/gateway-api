@@ -1,3 +1,4 @@
+//go:build js && wasm
 // Controller Recommendation Wizard - WebAssembly build.
 // Build with: GOOS=js GOARCH=wasm go build -o site-src/wizard/main.wasm ./wasm/
 // Load from HTML: wasm_exec.js + instantiateStreaming(fetch("main.wasm"), go.importObject).then(r => go.run(r.instance))
@@ -82,7 +83,7 @@ func main() {
 	// Reset button
 	resetBtn := doc.Call("getElementById", "reset-btn")
 	resetBtn.Call("addEventListener", "click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-		resetAll()
+		resetAll()//go:build js && wasm
 		return nil
 	}))
 
