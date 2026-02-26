@@ -67,6 +67,15 @@
 
   <script src="wasm_exec.js"></script>
   <script>
+    // When embedded in MkDocs iframe: tell parent our height so it can use one scroll.
+    window.wizardResize = function() {
+      if (window.parent !== window) {
+        var h = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+        window.parent.postMessage({ type: 'wizard-height', height: h }, '*');
+      }
+    };
+    setTimeout(window.wizardResize, 0);
+
     const statusEl = document.getElementById('wizard-data-status');
     statusEl.textContent = 'Loading…';
 
@@ -82,6 +91,7 @@
       .catch(function (err) {
         statusEl.textContent = err.message || 'Could not load wizard. Run: make wizard-wasm. Then serve from site-src/wizard/ (e.g. cd site-src/wizard && python3 -m http.server 8000) and open http://localhost:8000/';
         document.getElementById('recommend-btn').disabled = false;
+        window.wizardResize();
       });
   </script>
 </body>

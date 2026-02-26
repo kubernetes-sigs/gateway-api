@@ -166,6 +166,7 @@ func onDataLoaded(jsonStr string) {
 		statusEl.Set("textContent", "")
 		renderFeatureTablesFiltered()
 		btn.Set("disabled", false)
+		notifyResize()
 		return
 	}
 
@@ -205,6 +206,7 @@ func onDataLoaded(jsonStr string) {
 			statusEl.Set("textContent", "")
 			renderFeatureTablesFiltered()
 			btn.Set("disabled", false)
+			notifyResize()
 			return
 		}
 	}
@@ -254,6 +256,7 @@ func onDataLoaded(jsonStr string) {
 		renderFeatureTablesFiltered()
 		doc.Call("getElementById", "results").Get("classList").Call("remove", "visible")
 		statusEl.Set("textContent", "")
+		notifyResize()
 		return nil
 	}))
 
@@ -261,6 +264,7 @@ func onDataLoaded(jsonStr string) {
 	renderFeatureTablesFiltered()
 	statusEl.Set("textContent", "")
 	btn.Set("disabled", false)
+	notifyResize()
 }
 
 // versionSegment returns "v1.4" from "v1.4.0" for implementation table URLs.
@@ -627,6 +631,7 @@ func recommend() {
 	resultsDiv.Get("classList").Call("add", "visible")
 	resultsDiv.Call("scrollIntoView", map[string]interface{}{"behavior": "smooth", "block": "start"})
 	setStatus(statusEl, len(scoredList))
+	notifyResize()
 }
 
 func setStatus(el js.Value, n int) {
@@ -665,6 +670,7 @@ func resetAll() {
 		statusEl.Set("textContent", "")
 	}
 	js.Global().Call("scrollTo", 0, 0)
+	notifyResize()
 }
 
 func escapeHTML(s string) string {
@@ -673,4 +679,12 @@ func escapeHTML(s string) string {
 	s = strings.ReplaceAll(s, ">", "&gt;")
 	s = strings.ReplaceAll(s, "\"", "&quot;")
 	return s
+}
+
+// notifyResize tells the parent window (when in iframe) to resize the iframe to our content height for single-page scroll.
+func notifyResize() {
+	fn := js.Global().Get("wizardResize")
+	if fn.Truthy() {
+		fn.Invoke()
+	}
 }
