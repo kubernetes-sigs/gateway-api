@@ -112,17 +112,13 @@ type BackendDestination struct {
     // FQDN specifies an external fully qualified domain name
     // +optional
     FQDN *FQDNBackend `json:"fqdn,omitempty"`
-
-    // Service references an existing Service
-    // +optional
-    Service *ServiceBackend `json:"service,omitempty"`
 }
 
 type BackendType string
 
 const (
     BackendTypeFQDN    BackendType = "FQDN"
-    BackendTypeService BackendType = "Service"
+    // TODO: Add WorkloadSelector destination type
 )
 ```
 
@@ -217,7 +213,7 @@ One of the most significant design decisions for the Backend resource concerns T
    - Policies can be shared across multiple Backends
    - Consistent TLS configuration patterns across resource types (e.g. `Service`, `Backend`, `InferencePool`, etc.)
 
-#### Proposed Compromise Approach
+#### Proposed Approach
 
 Based on community feedback and practical considerations, this proposal recommends:
 
