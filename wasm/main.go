@@ -83,7 +83,7 @@ func main() {
 	// Reset button
 	resetBtn := doc.Call("getElementById", "reset-btn")
 	resetBtn.Call("addEventListener", "click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-		resetAll()//go:build js && wasm
+		resetAll()
 		return nil
 	}))
 
