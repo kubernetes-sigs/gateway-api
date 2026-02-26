@@ -1,7 +1,6 @@
 :root {
   --primary: #326ce5;
   --primary-dark: #2952c3;
-  --bg: #f7f8fa;
   --card: #fff;
   --border: #e1e4e8;
   --text: #24292f;
@@ -18,9 +17,7 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
   background: var(--bg);
   color: var(--text);
-  line-height: 1.5;
-  margin: 0;
-  padding: 10px;
+  line-height: 1.3;
   max-width: max-content;
   margin-left: auto;
   margin-right: auto;
@@ -40,9 +37,6 @@ h2 {
 
 .intro {
   background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 20px;
   margin-bottom: 10px;
 }
 
@@ -60,9 +54,6 @@ h2 {
 
 section.card {
   background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 24px;
 }
 
 table.features {
@@ -75,7 +66,7 @@ table.features td {
   padding: 8px 12px;
   text-align: left;
   border-bottom: 1px solid var(--border);
-  font-size: 0.8125rem;
+  font-size: 0.85rem;
 }
 
 table.features th {
