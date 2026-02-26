@@ -27,4 +27,4 @@ jobs:
       - name: Build KAL
         run: golangci-lint custom -v
       - name: run api linter
-        run: ./bin/golangci-kube-api-linter run -c ./.golangci-kal.yml $(go list -e ./... 2>/dev/null | grep -v '/wasm$')
+        run: ./bin/golangci-kube-api-linter run -c ./.golangci-kal.yml ./...

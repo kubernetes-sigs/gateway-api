@@ -20,8 +20,8 @@ body {
   color: var(--text);
   line-height: 1.5;
   margin: 0;
-  padding: 24px;
-  max-width: 900px;
+  padding: 10px;
+  max-width: max-content;
   margin-left: auto;
   margin-right: auto;
 }
@@ -33,7 +33,7 @@ h1 {
 
 h2 {
   font-size: 1.25rem;
-  margin-top: 32px;
+  margin-top: 8px;
   margin-bottom: 16px;
   color: var(--text);
 }
@@ -43,7 +43,7 @@ h2 {
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 20px;
-  margin-bottom: 24px;
+  margin-bottom: 10px;
 }
 
 .intro p {
@@ -63,7 +63,6 @@ section.card {
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 24px;
-  margin-bottom: 24px;
 }
 
 table.features {
@@ -165,7 +164,7 @@ table.features label {
 table.results {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.875rem;
+  font-size: 0.8rem;
 }
 
 table.results th,
@@ -191,7 +190,7 @@ table.results td a:hover {
 
 .missing {
   color: var(--warning);
-  font-size: 0.8125rem;
+  font-size: 0.7rem;
 }
 
 .no-results {
@@ -204,7 +203,7 @@ table.results td a:hover {
   background: rgba(154, 103, 0, 0.08);
   border-left: 4px solid var(--warning);
   padding: 12px 16px;
-  margin: 0 0 20px 0;
+  margin: 0 0 8px 0;
   font-size: 0.9375rem;
   border-radius: 0 4px 4px 0;
 }
