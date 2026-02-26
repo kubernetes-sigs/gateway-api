@@ -1,0 +1,14 @@
+{
+  "guides/index.md": "guides/getting-started/index.md",
+  "ingress-nginx": "guides/getting-started/migrating-from-ingress-nginx.md",
+  "guides/getting-started.md": "guides/index.md",
+  "concepts/gamma.md": "mesh/index.md",
+  "concepts/service-facets.md": "mesh/service-facets.md",
+  "concepts/guidelines.md": "guides/api-design.md",
+  "contributing/community.md": "contributing/index.md",
+  "contributing/gamma.md": "mesh/index.md#contributing",
+  "reference/implementers-guide.md": "guides/implementers.md",
+  "references/implementers-guide.md": "guides/implementers.md",
+  "references/spec.md": "reference/spec.md",
+  "references/policy-attachment.md": "reference/policy-attachment.md"
+}
