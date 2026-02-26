@@ -11,6 +11,9 @@ authors:
   - howardjohn
   - snorwin
 relationships:
+  extendedBy:
+    - number: 4080
+      name: Certificate Revocation Lists for Certificate Validiation
   obsoletes:
     - number: 1282
       name: Describing Backend Properties
