@@ -14,7 +14,7 @@ spec:
       operations:  ["CREATE", "UPDATE"]
       resources:   ["*"]
   validations:
-    - expression: "object.spec.group != 'gateway.networking.k8s.io' || (
+    - expression: "object.spec.group != 'gateway.networking.k8s.io' || oldObject == null || (
         has(object.metadata.annotations) && object.metadata.annotations.exists(k, k == 'gateway.networking.k8s.io/channel') && 
         object.metadata.annotations['gateway.networking.k8s.io/channel'] == 'standard' ) || (
         oldObject != null && has(oldObject.metadata.annotations) && oldObject.metadata.annotations.exists(k, k == 'gateway.networking.k8s.io/channel') && 

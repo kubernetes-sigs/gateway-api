@@ -129,19 +129,35 @@ func TestVAPValidation(t *testing.T) {
 		t.Run("should not be able to install k8s.io experimental CRDs", func(t *testing.T) {
 			t.Cleanup(func() {
 				_, _ = executeKubectlCommand(t, kubectlLocation, kubeconfigLocation,
-					[]string{"delete", "--wait", "-f", filepath.Join("..", "..", "config", "crd", "experimental", "*.k8s.*")})
+					[]string{"delete", "--wait", "-f", filepath.Join("..", "..", "config", "crd", "experimental", "*k8s.*")})
 			})
 
 			output, err := executeKubectlCommand(t, kubectlLocation, kubeconfigLocation,
-				[]string{"apply", "--server-side", "--wait", "-f", filepath.Join("..", "..", "config", "crd", "experimental", "*.k8s.*")})
+				[]string{"apply", "--server-side", "--force-conflicts", "--wait", "-f", filepath.Join("..", "..", "config", "crd", "experimental", "*k8s.*")})
+
 			require.Error(t, err)
 			assert.Contains(t, output, "Error from server (Invalid)")
 			assert.Contains(t, output, "ValidatingAdmissionPolicy 'safe-upgrades.gateway.networking.k8s.io' with binding 'safe-upgrades.gateway.networking.k8s.io' denied request")
 
-			// Check that --api-group has no invalid crd's
-			output, err = executeKubectlCommand(t, kubectlLocation, kubeconfigLocation, []string{"describe", "CustomResourceDefinition"})
+			// Check exact CRD channel output.
+			output, err = executeKubectlCommand(t, kubectlLocation, kubeconfigLocation, []string{
+				"get", "crd", "-o", "template", "--template",
+				`{{range .items}}{{.metadata.name}}: {{index .metadata.annotations "gateway.networking.k8s.io/channel"}}{{"\n"}}{{end}}`,
+			})
 			require.NoError(t, err)
-			assert.NotContains(t, output, "gateway.networking.k8s.io/channel: experimental", "output contains 'gateway.networking.k8s.io/channel: experimental'")
+			assert.Equal(t, `backendtlspolicies.gateway.networking.k8s.io: standard
+gatewayclasses.gateway.networking.k8s.io: standard
+gateways.gateway.networking.k8s.io: standard
+grpcroutes.gateway.networking.k8s.io: standard
+httproutes.gateway.networking.k8s.io: standard
+listenersets.gateway.networking.k8s.io: standard
+referencegrants.gateway.networking.k8s.io: standard
+tcproutes.gateway.networking.k8s.io: experimental
+tlsroutes.gateway.networking.k8s.io: standard
+udproutes.gateway.networking.k8s.io: experimental
+xbackendtrafficpolicies.gateway.networking.x-k8s.io: experimental
+xmeshes.gateway.networking.x-k8s.io: experimental
+`, output)
 		})
 
 		t.Run("should be able to install x-k8s.io experimental CRDs", func(t *testing.T) {
