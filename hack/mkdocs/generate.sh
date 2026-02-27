@@ -34,6 +34,7 @@ go install github.com/elastic/crd-ref-docs
 declare -a arr=(
     "release-1.3"
     "release-1.4"
+    "release-1.5"
     "main"
 )
 
@@ -41,11 +42,11 @@ mkdir -p ${PWD}/tmp
 
 for i in "${arr[@]}"; do
     tmpdir=$(mktemp -d --tmpdir=${PWD}/tmp)
-    
-    git fetch ${REMOTE} ${i} || 
+
+    git fetch ${REMOTE} ${i} ||
 	    echo "You need a git remote pointing to upstream for API Ref generation. To solve this issue locally, execute 'git remote add upstream git@github.com:kubernetes-sigs/gateway-api.git' and then call the script again with 'REMOTE=upstream <command>'"
     git --work-tree=${tmpdir} checkout ${REMOTE}/${i} -- apis apisx
-	
+
     # Start removing any "release-" prefix from docpath
     docpath=${i#"release-"}
     # If the release is "main" simply remove it
