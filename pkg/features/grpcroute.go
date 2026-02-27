@@ -46,6 +46,9 @@ var GRPCRouteCoreFeatures = sets.New(
 const (
 	// This option indicates support for the name field in the GRPCRouteRule (extended conformance)
 	SupportGRPCRouteNamedRouteRule FeatureName = "GRPCRouteNamedRouteRule"
+
+	// This option indicates support for RequestHeaderModifier filter in GRPCRoute (extended conformance)
+	SupportGRPCRouteRequestHeaderModifier FeatureName = "GRPCRouteRequestHeaderModifier"
 )
 
 // GRPCRouteNamedRouteRule contains metadata for the SupportGRPCRouteNamedRouteRule feature.
@@ -54,9 +57,16 @@ var GRPCRouteNamedRouteRule = Feature{
 	Channel: FeatureChannelStandard,
 }
 
+// GRPCRouteRequestHeaderModifier contains metadata for the SupportGRPCRouteRequestHeaderModifier feature.
+var GRPCRouteRequestHeaderModifier = Feature{
+	Name:    SupportGRPCRouteRequestHeaderModifier,
+	Channel: FeatureChannelStandard,
+}
+
 // GRPCRouteExtendedFeatures includes all extended features for GRPCRoute
 // conformance and can be used to opt-in to run all GRPCRoute extended features tests.
 // This does not include any Core Features.
 var GRPCRouteExtendedFeatures = sets.New(
 	GRPCRouteNamedRouteRule,
+	GRPCRouteRequestHeaderModifier,
 )

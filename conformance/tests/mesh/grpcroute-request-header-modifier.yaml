@@ -1,0 +1,73 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: GRPCRoute
+metadata:
+  name: grpc-request-header-modifier
+  namespace: gateway-conformance-mesh
+spec:
+  parentRefs:
+  - group: ""
+    kind: Service
+    name: echo
+    port: 7070
+  rules:
+  - matches:
+    - headers:
+      - name: x-test-case
+        value: set
+    filters:
+    - type: RequestHeaderModifier
+      requestHeaderModifier:
+        set:
+        - name: x-header-set
+          value: set-overwrites-values
+    backendRefs:
+    - name: echo-v1
+      port: 7070
+  - matches:
+    - headers:
+      - name: x-test-case
+        value: add
+    filters:
+    - type: RequestHeaderModifier
+      requestHeaderModifier:
+        add:
+        - name: x-header-add
+          value: add-appends-values
+    backendRefs:
+    - name: echo-v1
+      port: 7070
+  - matches:
+    - headers:
+      - name: x-test-case
+        value: remove
+    filters:
+    - type: RequestHeaderModifier
+      requestHeaderModifier:
+        remove:
+        - x-header-remove
+    backendRefs:
+    - name: echo-v1
+      port: 7070
+  - matches:
+    - headers:
+      - name: x-test-case
+        value: multi
+    filters:
+    - type: RequestHeaderModifier
+      requestHeaderModifier:
+        set:
+        - name: x-header-set-1
+          value: header-set-1
+        - name: x-header-set-2
+          value: header-set-2
+        add:
+        - name: x-header-add-1
+          value: header-add-1
+        - name: x-header-add-2
+          value: header-add-2
+        remove:
+        - x-header-remove-1
+        - x-header-remove-2
+    backendRefs:
+    - name: echo-v2
+      port: 7070
