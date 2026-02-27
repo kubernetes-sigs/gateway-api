@@ -59,6 +59,10 @@ func run(_ *cobra.Command, args []string) error {
 		return err
 	}
 
+	if gatewayAPIDefs {
+		mergeSpecs.Definitions = generateGatewayAPIModels()
+	}
+
 	json, err := mergeSpecs.MarshalJSON()
 	if err != nil {
 		return err
