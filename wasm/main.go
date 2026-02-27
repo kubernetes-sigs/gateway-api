@@ -24,7 +24,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"math/rand"
+	"math/rand/v2"
 	"sort"
 	"strings"
 	"syscall/js"
@@ -562,7 +562,7 @@ func recommend() {
 				impl: impl, mustCount: mustCount, goodCount: goodCount,
 				mustTotal: len(must), goodTotal: len(good), missing: missing,
 				reportDate: impl.ReportDate,
-				tieBreak:   rand.Float64(),
+				tieBreak:   rand.Float64(), //nolint:gosec // randomness is only for non-security tie-breaking in UI sort
 			})
 		}
 	}
