@@ -12,9 +12,12 @@ This version of the API has GA level support for the following resources:
 
 - `v1.GatewayClass`
 - `v1.Gateway`
+- `v1.ListenerSet`
 - `v1.HTTPRoute`
 - `v1.GRPCRoute`
+- `v1.TLSRoute`
 - `v1.BackendTLSPolicy`
+- `v1.ReferenceGrant`
 
 For all the other APIs and their support levels please consult [the spec][spec].
 
