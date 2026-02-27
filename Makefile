@@ -92,6 +92,10 @@ build-install-yaml:
 build-monthly-yaml:
 	hack/build-monthly-yaml.sh
 
+.PHONY: build-openapi-json
+build-openapi-json:
+	hack/build-openapi-json.sh
+
 # Run go fmt against code
 fmt:
 	go fmt ./...
