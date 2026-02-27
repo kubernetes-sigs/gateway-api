@@ -18,6 +18,7 @@
 
 import logging
 from io import StringIO
+from pathlib import Path
 from mkdocs import plugins
 from mkdocs.structure.files import File
 import yaml
@@ -39,6 +40,31 @@ def process_feature_name(feature):
     words = re.findall(r'HTTPRoute|[A-Z]+(?=[A-Z][a-z])|[A-Z][a-z]+|[A-Z\d]+', feature)
     # Join words with spaces
     return ' '.join(words)
+
+
+def load_feature_channels():
+    feature_constants = {}
+    feature_channels = {}
+
+    for path in Path("pkg/features").glob("*.go"):
+        contents = path.read_text()
+        for const_name, feature_name in re.findall(r'([A-Za-z0-9_]+)(?:\s+FeatureName)?\s*=\s*"([^"]+)"', contents):
+            feature_constants[const_name] = feature_name
+        for const_name, channel in re.findall(
+            r'Name:\s*([A-Za-z0-9_]+),\s*[\r\n]+\s*Channel:\s*FeatureChannel(Standard|Experimental)',
+            contents,
+        ):
+            feature_name = feature_constants.get(const_name)
+            if feature_name:
+                feature_channels[process_feature_name(feature_name)] = channel.lower()
+
+    # Historical reports used the pre-rename feature name.
+    feature_channels[process_feature_name("HTTPResponseHeaderModification")] = "standard"
+
+    return feature_channels
+
+
+FEATURE_CHANNELS = load_feature_channels()
 
 
 @plugins.event_priority(100)
@@ -155,7 +181,11 @@ def generate_profiles_report(reports, route, version):
 
     http_reports = reports.loc[reports["name"] == route]
     http_reports.set_index('organization')
-    http_reports.sort_values(['organization', 'version'], inplace=True)
+    http_reports.sort_values(
+        ['organization', 'version'],
+        key=lambda col: col.str.casefold() if col.name == 'organization' else col,
+        inplace=True,
+    )
 
     http_table = pandas.DataFrame(
         columns=http_reports['organization'])
@@ -185,6 +215,29 @@ def generate_profiles_report(reports, route, version):
 
     http_table = http_table.rename(
         columns={"project": "Project", "version": "Version", "mode": "Mode", "core.result": "Core"})
+    metadata_columns = ["Project", "Version", "Mode", "Core"]
+    feature_columns = [c for c in http_table.columns if c not in metadata_columns]
+    standard_feature_columns = [c for c in feature_columns if FEATURE_CHANNELS.get(c, "standard") == "standard"]
+    experimental_feature_columns = [c for c in feature_columns if FEATURE_CHANNELS.get(c) == "experimental"]
+
+    def format_total(columns):
+        total = len(columns)
+        if total == 0:
+            return ['0/0'] * len(http_table.index)
+        checks = (http_table[columns] == ':white_check_mark:').sum(axis=1)
+        return checks.map(lambda count: f"{count}/{total}")
+
+    http_table["Standard Features"] = format_total(standard_feature_columns)
+    http_table["Experimental Features"] = format_total(experimental_feature_columns)
+    if "Mode" in http_table.columns:
+        insert_at = http_table.columns.get_loc("Mode") + 1
+    else:
+        insert_at = http_table.columns.get_loc("Version") + 1
+    experimental_col = http_table.pop("Experimental Features")
+    standard_col = http_table.pop("Standard Features")
+    http_table.insert(insert_at, "Standard Features", standard_col)
+    http_table.insert(insert_at + 1, "Experimental Features", experimental_col)
+
     if semver.compare(version.removeprefix('v'), '1.4.0') < 0:
         http_table = http_table.drop(columns=["Core"])
     if version == 'v1.0.0':
