@@ -116,6 +116,12 @@ type BackendRef struct {
 type MirroredBackend struct {
 	BackendRef
 	Percent *int32
+	// Labels optionally overrides the default label selector ({"app": Name})
+	// used when looking up mirror backend pods for log verification.
+	Labels map[string]string
+	// Container optionally overrides the default container name (Name)
+	// used when reading logs from mirror backend pods.
+	Container string
 }
 
 // MakeRequestAndExpectEventuallyConsistentResponse makes a request with the given parameters,
