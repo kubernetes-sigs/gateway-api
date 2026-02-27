@@ -1,0 +1,20 @@
+Gateway API CRDs have been installed!
+
+  Version: {{ .Chart.Version }}
+  Channel: {{ .Values.channel }}
+
+Installed CRDs:
+  - gatewayclasses.gateway.networking.k8s.io
+  - gateways.gateway.networking.k8s.io
+  - httproutes.gateway.networking.k8s.io
+  - referencegrants.gateway.networking.k8s.io
+  - grpcroutes.gateway.networking.k8s.io
+{{- if eq .Values.channel "experimental" }}
+  - tcproutes.gateway.networking.k8s.io
+  - tlsroutes.gateway.networking.k8s.io
+  - udproutes.gateway.networking.k8s.io
+  - backendtlspolicies.gateway.networking.k8s.io
+{{- end }}
+
+To verify:
+  kubectl get crds | grep gateway.networking.k8s.io
