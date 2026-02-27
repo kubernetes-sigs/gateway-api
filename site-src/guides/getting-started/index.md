@@ -22,7 +22,7 @@ Once you have a controller running, you can start with a simple example and then
 - [Configuring TLS](../tls.md)
 - [TCP routing](../tcp.md)
 - [gRPC routing](../grpc-routing.md)
-
+- [ListenerSet](../listener-set.md)
 
 ## Migrating from Ingress
 

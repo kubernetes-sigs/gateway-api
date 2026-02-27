@@ -1,0 +1,76 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: parent-gateway
+spec:
+  gatewayClassName: example
+  allowedListeners:
+    namespaces:
+      from: Selector
+      selector:
+        matchLabels:
+          belongs-to: shared-gateway
+  listeners:
+  - name: foo
+    hostname: foo.com
+    protocol: HTTP
+    port: 80
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: team-1-ns
+  labels:
+    belongs: shared-gateway
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: ListenerSet
+metadata:
+  name: first-workload-listeners
+  namespace: team-1-ns
+spec:
+  parentRef:
+    namespace: default
+    name: parent-gateway
+    kind: Gateway
+    group: gateway.networking.k8s.io
+  listeners:
+  - name: first
+    hostname: first.foo.com
+    protocol: HTTPS
+    port: 443
+    tls:
+      mode: Terminate
+      certificateRefs:
+      - kind: Secret
+        group: ""
+        name: first-workload-cert
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: team-2-ns
+  labels:
+    belongs: shared-gateway
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: ListenerSet
+metadata:
+  name: second-workload-listeners
+  namespace: team-2-ns
+spec:
+  parentRef:
+    name: parent-gateway
+    kind: Gateway
+    group: gateway.networking.k8s.io
+  listeners:
+  - name: second
+    hostname: second.foo.com
+    protocol: HTTPS
+    port: 443
+    tls:
+      mode: Terminate
+      certificateRefs:
+      - kind: Secret
+        group: ""
+        name: second-workload-cert

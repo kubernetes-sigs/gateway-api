@@ -48,6 +48,7 @@ nav:
           - gRPC Routing: guides/grpc-routing.md
           - Backend Protocol Selection: guides/backend-protocol.md
           - Infrastructure attributes: guides/infrastructure.md
+          - ListenerSet: guides/listener-set.md
       - API Design: guides/api-design.md
       - CRD Management: guides/crd-management.md
       - Implementer's Guide: guides/implementers.md
@@ -62,6 +63,7 @@ nav:
               - BackendTrafficPolicy: api-types/backendtrafficpolicy.md
           - ReferenceGrant: api-types/referencegrant.md
           - TLSRoute: api-types/tlsroute.md
+          - ListenerSet: api-types/listenerset.md
       - API specification:
           - Development:
               - Standard: reference/spec.md
