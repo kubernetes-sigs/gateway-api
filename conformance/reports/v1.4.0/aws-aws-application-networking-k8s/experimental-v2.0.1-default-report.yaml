@@ -1,0 +1,46 @@
+apiVersion: gateway.networking.k8s.io/v1
+date: "2026-02-27T04:11:24Z"
+gatewayAPIChannel: experimental
+gatewayAPIVersion: v1.4.0
+implementation:
+  contact:
+  - https://github.com/aws/aws-application-networking-k8s/issues
+  organization: aws
+  project: aws-application-networking-k8s
+  url: https://github.com/aws/aws-application-networking-k8s
+  version: v2.0.1
+kind: ConformanceReport
+mode: default
+profiles:
+- core:
+    result: partial
+    skippedTests:
+    - GatewayInvalidTLSConfiguration
+    - GatewaySecretInvalidReferenceGrant
+    - GatewaySecretMissingReferenceGrant
+    - GatewayWithAttachedRoutes
+    - HTTPRouteHTTPSListener
+    - HTTPRouteHeaderMatching
+    - HTTPRouteHostnameIntersection
+    - HTTPRouteInvalidBackendRefUnknownKind
+    - HTTPRouteInvalidCrossNamespaceBackendRef
+    - HTTPRouteInvalidNonExistentBackendRef
+    - HTTPRouteInvalidReferenceGrant
+    - HTTPRouteListenerHostnameMatching
+    - HTTPRouteMatching
+    - HTTPRouteMatchingAcrossRoutes
+    - HTTPRouteObservedGenerationBump
+    - HTTPRoutePartiallyInvalidViaInvalidReferenceGrant
+    - HTTPRoutePathMatchOrder
+    - HTTPRouteRedirectHostAndStatus
+    - HTTPRouteReferenceGrant
+    - HTTPRouteRequestHeaderModifier
+    - HTTPRouteServiceTypes
+    - HTTPRouteSimpleSameNamespace
+    - HTTPRouteWeight
+    statistics:
+      Failed: 0
+      Passed: 10
+      Skipped: 23
+  name: GATEWAY-HTTP
+  summary: Core tests partially succeeded with 23 test skips.
