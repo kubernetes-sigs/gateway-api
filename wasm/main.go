@@ -24,6 +24,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"math/rand"
 	"sort"
 	"strings"
 	"syscall/js"
@@ -393,14 +394,16 @@ func renderHTTPRouteWithSpacer(tableID string, gateway, route, backend []feature
 	}
 	writeRow := func(f featureDef, label string) {
 		name := prefix + f.ID
-		titleAttr := ""
+		dataDesc := ""
+		cellClass := ""
 		if f.Description != "" {
-			titleAttr = fmt.Sprintf(` title="%s"`, escapeHTML(f.Description))
+			dataDesc = fmt.Sprintf(` data-description="%s"`, escapeHTML(f.Description))
+			cellClass = "feature-label-cell"
 		}
-		html.WriteString(fmt.Sprintf(`<tr><td%s>%s</td><td>
+		html.WriteString(fmt.Sprintf(`<tr><td class="%s"%s>%s</td><td>
 <label><input type="checkbox" name="%s" value="must" /> Must have</label>
 <label><input type="checkbox" name="%s" value="good" /> Nice to have</label>
-</td></tr>`, titleAttr, escapeHTML(label), name, name))
+</td></tr>`, cellClass, dataDesc, escapeHTML(label), name, name))
 	}
 	if len(rest) > 0 {
 		writeSubhead("HTTPRoute")
@@ -439,14 +442,16 @@ func renderTable(tableID string, section string, labelPrefix string, rows []feat
 			label = stripLabelPrefix(label, labelPrefix)
 		}
 		name := prefix + f.ID
-		titleAttr := ""
+		dataDesc := ""
+		cellClass := ""
 		if f.Description != "" {
-			titleAttr = fmt.Sprintf(` title="%s"`, escapeHTML(f.Description))
+			dataDesc = fmt.Sprintf(` data-description="%s"`, escapeHTML(f.Description))
+			cellClass = "feature-label-cell"
 		}
-		html.WriteString(fmt.Sprintf(`<tr><td%s>%s</td><td>
+		html.WriteString(fmt.Sprintf(`<tr><td class="%s"%s>%s</td><td>
 <label><input type="checkbox" name="%s" value="must" /> Must have</label>
 <label><input type="checkbox" name="%s" value="good" /> Nice to have</label>
-</td></tr>`, titleAttr, escapeHTML(label), name, name))
+</td></tr>`, cellClass, dataDesc, escapeHTML(label), name, name))
 	}
 	tbody.Set("innerHTML", html.String())
 }
@@ -527,6 +532,7 @@ func recommend() {
 		goodTotal  int
 		missing    []selection
 		reportDate string
+		tieBreak   float64
 	}
 	var scoredList []scored
 	for _, impl := range impls {
@@ -556,6 +562,7 @@ func recommend() {
 				impl: impl, mustCount: mustCount, goodCount: goodCount,
 				mustTotal: len(must), goodTotal: len(good), missing: missing,
 				reportDate: impl.ReportDate,
+				tieBreak:   rand.Float64(),
 			})
 		}
 	}
@@ -572,7 +579,7 @@ func recommend() {
 		if scoredList[j].goodCount != scoredList[i].goodCount {
 			return scoredList[j].goodCount < scoredList[i].goodCount
 		}
-		return scoredList[j].reportDate < scoredList[i].reportDate
+		return scoredList[i].tieBreak < scoredList[j].tieBreak
 	})
 
 	featureLabel := func(section, id string) string {

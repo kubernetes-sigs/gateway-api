@@ -65,8 +65,41 @@
     <div id="results-content"></div>
   </section>
 
+  <div id="feature-desc-popup" class="feature-desc-popup" role="tooltip" aria-live="polite" hidden></div>
+
   <script src="wasm_exec.js"></script>
   <script>
+    // Click-to-show feature description (works with WASM-rendered table)
+    function setupFeatureDescPopup() {
+      const popup = document.getElementById('feature-desc-popup');
+      if (!popup || popup.hasAttribute('data-initialized')) return;
+      popup.setAttribute('data-initialized', '1');
+      document.body.addEventListener('click', function (e) {
+        const cell = e.target.closest('td.feature-label-cell[data-description]');
+        if (cell) {
+          e.preventDefault();
+          var desc = cell.getAttribute('data-description');
+          if (popup.getAttribute('data-open') === '1' && popup.textContent === desc) {
+            popup.hidden = true;
+            popup.removeAttribute('data-open');
+            return;
+          }
+          popup.textContent = desc || '';
+          popup.hidden = false;
+          popup.setAttribute('data-open', '1');
+          var rect = cell.getBoundingClientRect();
+          popup.style.left = rect.left + 'px';
+          popup.style.top = (rect.bottom + 4) + 'px';
+          popup.style.maxWidth = Math.max(280, Math.min(400, window.innerWidth - rect.left - 16)) + 'px';
+          return;
+        }
+        if (!popup.contains(e.target)) {
+          popup.hidden = true;
+          popup.removeAttribute('data-open');
+        }
+      });
+    }
+    if (document.body) setupFeatureDescPopup(); else document.addEventListener('DOMContentLoaded', setupFeatureDescPopup);
     // When embedded in MkDocs iframe: tell parent our height so it can use one scroll.
     window.wizardResize = function() {
       if (window.parent !== window) {

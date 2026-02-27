@@ -84,6 +84,22 @@ table.features td:first-child {
   cursor: help;
 }
 
+.feature-desc-popup {
+  position: fixed;
+  z-index: 100;
+  padding: 8px 12px;
+  max-width: 320px;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: #fff;
+  background: rgba(50, 50, 50, 0.92);
+  border: 1px solid rgba(80, 80, 80, 0.9);
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+  white-space: normal;
+}
+
 table.features td:nth-child(2),
 table.features th:nth-child(2) {
   width: 300px;

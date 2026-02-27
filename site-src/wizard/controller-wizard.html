@@ -64,6 +64,8 @@
     <div id="results-content"></div>
   </section>
 
+  <div id="feature-desc-popup" class="feature-desc-popup" role="tooltip" aria-live="polite" hidden></div>
+
   <script>
     // Feature definitions: only from data.featureDefinitions (controller-wizard-data.json from generate-controller-wizard-data.py).
     // No hardcoded defaults; single source of truth is the JSON.
@@ -165,10 +167,11 @@
         if (row.spacer) return '<tr class="feature-spacer"><td colspan="2"></td></tr>';
         const { id, label, description } = row;
         const name = prefix + id;
-        const titleAttr = description ? ` title="${escapeHtml(description)}"` : '';
+        const dataDesc = description ? ` data-description="${escapeHtml(description)}"` : '';
+        const cellClass = description ? 'feature-label-cell' : '';
         return `
         <tr>
-          <td${titleAttr}>${escapeHtml(label)}</td>
+          <td class="${cellClass}"${dataDesc}>${escapeHtml(label)}</td>
           <td>
             <label><input type="checkbox" name="${name}" value="must" /> Must have</label>
             <label><input type="checkbox" name="${name}" value="good" /> Nice to have</label>
@@ -184,6 +187,37 @@
             });
           }
         });
+      });
+      setupFeatureDescPopup();
+    }
+
+    function setupFeatureDescPopup() {
+      const popup = document.getElementById('feature-desc-popup');
+      if (!popup || popup.hasAttribute('data-initialized')) return;
+      popup.setAttribute('data-initialized', '1');
+      document.body.addEventListener('click', function (e) {
+        const cell = e.target.closest('td.feature-label-cell[data-description]');
+        if (cell) {
+          e.preventDefault();
+          const desc = cell.getAttribute('data-description');
+          if (popup.getAttribute('data-open') === '1' && popup.textContent === desc) {
+            popup.hidden = true;
+            popup.removeAttribute('data-open');
+            return;
+          }
+          popup.textContent = desc || '';
+          popup.hidden = false;
+          popup.setAttribute('data-open', '1');
+          const rect = cell.getBoundingClientRect();
+          popup.style.left = rect.left + 'px';
+          popup.style.top = (rect.bottom + 4) + 'px';
+          popup.style.maxWidth = Math.max(280, Math.min(400, window.innerWidth - rect.left - 16)) + 'px';
+          return;
+        }
+        if (!popup.contains(e.target)) {
+          popup.hidden = true;
+          popup.removeAttribute('data-open');
+        }
       });
     }
 
