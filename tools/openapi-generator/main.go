@@ -31,9 +31,10 @@ import (
 )
 
 var (
-	name    string
-	version string
-	output  string
+	name           string
+	version        string
+	output         string
+	gatewayAPIDefs bool
 )
 
 func main() {
@@ -59,6 +60,7 @@ OpenAPI/Swagger v2 spec file in JSON format.`,
 	flags.StringVarP(&name, "name", "n", "undefined", "Name of the API in the output spec")
 	flags.StringVarP(&version, "version", "v", "undefined", "Version of the API in the output spec")
 	flags.StringVarP(&output, "output", "o", "-", "Output file")
+	flags.BoolVar(&gatewayAPIDefs, "add-gateway-api-object-defs", false, "Add the non-top level Gateway API objects to the spec")
 
 	return cmd
 }
@@ -82,6 +84,10 @@ func run(_ *cobra.Command, args []string) error {
 	mergeSpecs, err := builder.MergeSpecs(staticSpec, specs...)
 	if err != nil {
 		return err
+	}
+
+	if gatewayAPIDefs {
+		mergeSpecs.Definitions = generateGatewayAPIModels()
 	}
 
 	json, err := mergeSpecs.MarshalJSON()
