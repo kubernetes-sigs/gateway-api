@@ -7,7 +7,8 @@ authors:
   - mkosieradzki
   - robscott
 featureNames:
-  - BackendTLSPolicySANs
+  - BackendTLSPolicySANValidation
+  - GatewayBackendClientCertificate
 relationships:
   seeAlso:
     - number: 2907

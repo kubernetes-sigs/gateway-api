@@ -15,3 +15,5 @@ references:
   - https://github.com/kubernetes-sigs/gateway-api/pull/3587
   - https://github.com/kubernetes-sigs/gateway-api/pull/3588
   - https://github.com/kubernetes-sigs/gateway-api/pull/3682
+featureNames:
+  - ListenerSet

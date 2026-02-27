@@ -17,4 +17,5 @@ references:
   - https://github.com/kubernetes-sigs/gateway-api/pull/4281
   - https://github.com/kubernetes-sigs/gateway-api/pull/4506
   - https://github.com/kubernetes-sigs/gateway-api/pull/4579
-
+featureNames:
+  - HTTPRouteCORS
