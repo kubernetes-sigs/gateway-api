@@ -5,3 +5,6 @@ name: Client Certificate Validation for TLS terminating at the Gateway Listener
 status: Standard
 authors:
   - arkodg
+featureNames:
+  - GatewayFrontendClientCertificateValidation
+  - GatewayFrontendClientCertificateValidationInsecureFallback
