@@ -5,3 +5,7 @@ name: Client Certificate Validation for TLS terminating at the Gateway Listener
 status: Standard
 authors:
   - arkodg
+relationships:
+  extendedBy:
+    - number: 4078
+      name: Certificate Pinning for Client Certificate Validation
