@@ -1,7 +1,7 @@
 # HTTP traffic splitting
 
 The [HTTPRoute resource](../api-types/httproute.md) allows you to specify
-weights to shift traffic between different backends. This is useful for
+[weights](../../reference/spec/#httpbackendref) to shift traffic between different backends. This is useful for
 splitting traffic during rollouts, canarying changes, or for emergencies.
 The HTTPRoute`spec.rules.backendRefs` accepts a list of backends that a route
 rule will send traffic to. The relative weights of these backends define
@@ -41,7 +41,7 @@ production user traffic for `foo.example.com`. The following HTTPRoute has no
 receive 100% of the traffic matched by each of their route rules. A canary
 route rule is used (matching the header `traffic=test`) to send synthetic test
 traffic before splitting any production user traffic to `foo-v2`.
-[Routing precedence](../reference/spec.md#httprouterule)
+[Routing precedence](../../reference/spec/#httprouterule)
 ensures that all traffic with the matching host and header
 (the most specific match) will be sent to `foo-v2`.
 
