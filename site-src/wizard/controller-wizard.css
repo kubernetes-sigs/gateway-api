@@ -59,6 +59,16 @@ section.card {
 table.features {
   width: 100%;
   border-collapse: collapse;
+  border-top: 1px solid var(--border);
+}
+
+/* No top border above subhead row (HTTPRoute, Gateway, Backend TLS, etc.) */
+table.features:has(tbody > tr.feature-subhead:first-child) {
+  border-top: none;
+}
+
+table.features tr.feature-subhead + tr td {
+  border-top: 1px solid var(--border);
 }
 
 table.features th,
@@ -84,6 +94,11 @@ table.features td:first-child {
   cursor: help;
 }
 
+/* Feature names (selectable) slightly larger */
+table.features tbody td:first-child {
+  font-size: 0.9375rem;
+}
+
 .feature-desc-popup {
   position: fixed;
   z-index: 100;
@@ -105,7 +120,7 @@ table.features th:nth-child(2) {
   width: 300px;
   min-width: 300px;
   vertical-align: middle;
-  font-size: 0.75rem;
+  font-size: 0.9375rem;
 }
 
 table.features td:nth-child(2) label {
@@ -128,13 +143,14 @@ table.features tr.feature-spacer td {
 table.features tr.feature-subhead td,
 table.features tr.feature-subhead th {
   font-weight: 600;
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   text-transform: uppercase;
   letter-spacing: 0.02em;
   color: var(--text-muted);
   border-bottom: 1px solid var(--border);
   padding-top: 14px;
   padding-bottom: 6px;
+  padding-left: 12px;
   vertical-align: bottom;
 }
 
@@ -283,6 +299,52 @@ table.results td a:hover {
 section.card h3 {
   font-size: 1.125rem;
   margin: 24px 0 12px;
+}
+
+section.card h3:first-of-type {
+  margin-top: 0;
+}
+
+.section-intro {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  margin: 0 0 8px;
+  line-height: 1.45;
+}
+
+.core-list {
+  margin: 0 0 16px 1.25em;
+  padding: 0;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+.core-list li {
+  margin-bottom: 4px;
+}
+
+#http-route-core {
+  margin-bottom: 20px;
+  border-top: none;
+}
+
+#gateway-features {
+  border-top: none;
+}
+
+#http-route-core thead th,
+#gateway-features thead th {
+  font-weight: 600;
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+  padding-top: 0;
+  padding-bottom: 6px;
+  padding-left: 12px;
+  vertical-align: bottom;
 }
 
 section.card h3#grpcroute,

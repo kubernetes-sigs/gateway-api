@@ -30,11 +30,42 @@
   <section class="card">
     <h2>Gateway Profile</h2>
 
+    <h3 id="gateway">Gateway</h3>
+    <p class="section-intro">All controllers matched by this wizard include core support of Gateway. That includes many core features, including:</p>
+    <ul class="core-list">
+      <li>Specifying listeners on different ports and protocols</li>
+      <li>TLS configuration (protocol dependent)</li>
+      <li>Hostname matching (protocol dependent)</li>
+      <li>Configuring which Routes can be attached, including the ability to accept Routes from other namespaces</li>
+    </ul>
+    <p class="section-intro">If you'd like additional Gateway features, you can choose from the following list of extended (optional) features.</p>
+    <table class="features" id="gateway-features">
+      <thead><tr><th scope="col">Gateway</th><th scope="col">Requirement</th></tr></thead>
+      <tbody></tbody>
+    </table>
+
     <h3 id="httproute">HTTPRoute</h3>
-    <p class="conformance-intro">Extended features from the <a id="link-httproute"
-        href="https://gateway-api.sigs.k8s.io/implementations/v1.4/#httproute" target="_blank" rel="noopener">HTTPRoute
-        conformance table</a>. Core is implied (controllers must pass Core to appear).</p>
+    <p class="section-intro">Controllers that pass conformance tests for HTTPRoute are guaranteed to support the following features:</p>
+    <ol class="core-list">
+      <li>Traffic splitting with weighted backends</li>
+      <li>Safe cross-namespace references with ReferenceGrant</li>
+      <li>Request header modification</li>
+      <li>Exact and prefix path matching</li>
+      <li>Hostname matching</li>
+      <li>HTTP redirects</li>
+    </ol>
+    <table class="features" id="http-route-core">
+      <thead><tr><th scope="col">HTTPRoute</th><th scope="col">Requirement</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <p class="section-intro">You can choose additional extended features from the <a id="link-httproute" href="https://gateway-api.sigs.k8s.io/implementations/v1.4/#httproute" target="_blank" rel="noopener">HTTPRoute conformance table</a>.</p>
     <table class="features" id="http-route-features">
+      <tbody></tbody>
+    </table>
+
+    <h3 id="backend-tls">Backend TLS</h3>
+    <p class="section-intro">If you need TLS to backends, you can select the following extended features.</p>
+    <table class="features" id="backend-tls-features">
       <tbody></tbody>
     </table>
 
@@ -130,29 +161,32 @@
     function updateFeaturesForVersion() {
       const available = IMPLEMENTATIONS.length > 0 ? getAvailableFeatureIds() : null;
       const filter = (list) => available ? list.filter(f => available.has(f.id)) : list;
-      const gatewayHttp = filter(GATEWAY_HTTP_FEATURES).map(f => ({ id: f.id, label: f.label, description: f.description }));
+      const gateway = filter(GATEWAY_HTTP_FEATURES).map(f => ({ id: f.id, label: f.label, description: f.description }));
       const httpRoute = filter(HTTPROUTE_FEATURES).map(f => ({ id: f.id, label: f.label, description: f.description }));
-      const httpBackendTls = filter(HTTP_BACKEND_TLS_FEATURES);
+      const httpBackendTls = filter(HTTP_BACKEND_TLS_FEATURES).map(f => ({ id: f.id, label: f.label, description: f.description }));
       const grpc = filter(GRPC_FEATURES);
       const tls = filter(TLS_FEATURES);
-      const gatewayFirst = [...gatewayHttp, ...httpRoute].filter(r => r.label.startsWith('Gateway '));
-      const rest = [...gatewayHttp, ...httpRoute].filter(r => !r.label.startsWith('Gateway '));
-      const backendTlsRows = httpBackendTls.map(f => ({ id: f.id, label: f.label, description: f.description }));
       const stripPrefix = (label, prefix) => label.startsWith(prefix) ? label.slice(prefix.length) : label;
-      let httpRouteRows = [];
-      if (rest.length > 0) {
+
+      const gatewayRows = gateway.map(f => ({ id: f.id, label: stripPrefix(f.label, 'Gateway '), description: f.description }));
+      renderTable('gateway-features', gatewayRows, 'http');
+
+      renderTable('http-route-core', [{ id: 'HTTPRouteCore', label: 'Core', description: '' }], 'http');
+
+      const httpRouteRows = [];
+      if (httpRoute.length > 0) {
         httpRouteRows.push({ subhead: 'HTTPRoute' });
-        rest.forEach(f => httpRouteRows.push({ id: f.id, label: stripPrefix(f.label, 'HTTPRoute '), description: f.description }));
-      }
-      if (gatewayFirst.length > 0) {
-        httpRouteRows.push({ subhead: 'Gateway' });
-        gatewayFirst.forEach(f => httpRouteRows.push({ id: f.id, label: stripPrefix(f.label, 'Gateway '), description: f.description }));
-      }
-      if (backendTlsRows.length > 0) {
-        httpRouteRows.push({ subhead: 'Backend TLS' });
-        backendTlsRows.forEach(f => httpRouteRows.push({ id: f.id, label: stripPrefix(f.label, 'Backend TLS '), description: f.description }));
+        httpRoute.forEach(f => httpRouteRows.push({ id: f.id, label: stripPrefix(f.label, 'HTTPRoute '), description: f.description }));
       }
       renderTable('http-route-features', httpRouteRows, 'http');
+
+      const backendTlsRows = [];
+      if (httpBackendTls.length > 0) {
+        backendTlsRows.push({ subhead: 'Backend TLS' });
+        httpBackendTls.forEach(f => backendTlsRows.push({ id: f.id, label: stripPrefix(f.label, 'Backend TLS '), description: f.description }));
+      }
+      renderTable('backend-tls-features', backendTlsRows, 'http');
+
       const grpcRows = grpc.length > 0 ? [{ subhead: 'Gateway' }, ...grpc.map(f => ({ id: f.id, label: stripPrefix(f.label, 'Gateway '), description: f.description }))] : [];
       renderTable('grpc-features', grpcRows, 'grpc');
       const tlsRows = tls.length > 0 ? [{ subhead: 'Gateway' }, ...tls.map(f => ({ id: f.id, label: stripPrefix(f.label, 'Gateway '), description: f.description }))] : [];
@@ -191,6 +225,8 @@
       setupFeatureDescPopup();
     }
 
+    function setupCoreOptionMutualExclusion() {}
+
     function setupFeatureDescPopup() {
       const popup = document.getElementById('feature-desc-popup');
       if (!popup || popup.hasAttribute('data-initialized')) return;
@@ -223,7 +259,7 @@
 
     function resetAll() {
       const sections = [
-        { section: 'http', features: [...GATEWAY_HTTP_FEATURES, ...HTTPROUTE_FEATURES, ...HTTP_BACKEND_TLS_FEATURES] },
+        { section: 'http', features: [{ id: 'HTTPRouteCore' }, ...GATEWAY_HTTP_FEATURES, ...HTTPROUTE_FEATURES, ...HTTP_BACKEND_TLS_FEATURES] },
         { section: 'grpc', features: GRPC_FEATURES },
         { section: 'tls', features: TLS_FEATURES },
       ];
@@ -241,7 +277,7 @@
 
     function getSelections() {
       const sections = [
-        { name: 'http', features: [...GATEWAY_HTTP_FEATURES, ...HTTPROUTE_FEATURES, ...HTTP_BACKEND_TLS_FEATURES] },
+        { name: 'http', features: [{ id: 'HTTPRouteCore' }, ...GATEWAY_HTTP_FEATURES, ...HTTPROUTE_FEATURES, ...HTTP_BACKEND_TLS_FEATURES] },
         { name: 'grpc', features: GRPC_FEATURES },
         { name: 'tls', features: TLS_FEATURES },
       ];
@@ -295,7 +331,8 @@
 
       const scored = IMPLEMENTATIONS.map(impl => {
         const supported = new Set(impl.features);
-        const hasFeature = (id) => supported.has(id);
+        const conformanceSet = new Set(impl.conformance || []);
+        const hasFeature = (id) => id === 'HTTPRouteCore' ? conformanceSet.has('Core') : supported.has(id);
         let mustCount = 0;
         let goodCount = 0;
         const missing = [];
@@ -332,6 +369,7 @@
       });
 
       const featureLabel = (section, id) => {
+        if (id === 'HTTPRouteCore') return 'Core';
         const f = HTTP_FEATURES.find(x => x.id === id) || GRPC_FEATURES.find(x => x.id === id) || TLS_FEATURES.find(x => x.id === id);
         const label = f ? f.label : id;
         if (section === 'grpc') return '(GRPC) ' + label;
@@ -450,6 +488,7 @@
     }
 
     loadImplementations();
+    setupCoreOptionMutualExclusion();
     document.getElementById('recommend-btn').addEventListener('click', recommend);
     document.getElementById('reset-btn').addEventListener('click', resetAll);
   </script>

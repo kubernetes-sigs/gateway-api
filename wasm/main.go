@@ -355,9 +355,12 @@ func filterFeatures(list []featureDef, available map[string]bool) []featureDef {
 
 func renderFeatureTablesFiltered() {
 	avail := getAvailableFeatureIDs()
-	renderHTTPRouteWithSpacer("http-route-features", filterFeatures(featHTTPGateway, avail), filterFeatures(featHTTPRoute, avail), filterFeatures(featHTTPBackend, avail), "http")
-	renderTable("grpc-features", "grpc", "Gateway ", filterFeatures(featGRPC, avail))
-	renderTable("tls-features", "tls", "Gateway ", filterFeatures(featTLS, avail))
+	renderTable("gateway-features", "http", "", "Gateway ", filterFeatures(featHTTPGateway, avail))
+	renderTable("http-route-core", "http", "", "", []featureDef{{ID: "HTTPRouteCore", Label: "Core"}})
+	renderTable("http-route-features", "http", "HTTPRoute", "HTTPRoute ", filterFeatures(featHTTPRoute, avail))
+	renderTable("backend-tls-features", "http", "Backend TLS", "Backend TLS ", filterFeatures(featHTTPBackend, avail))
+	renderTable("grpc-features", "grpc", "Gateway", "Gateway ", filterFeatures(featGRPC, avail))
+	renderTable("tls-features", "tls", "Gateway", "Gateway ", filterFeatures(featTLS, avail))
 }
 
 func stripLabelPrefix(label, prefix string) string {
@@ -367,74 +370,15 @@ func stripLabelPrefix(label, prefix string) string {
 	return label
 }
 
-func renderHTTPRouteWithSpacer(tableID string, gateway, route, backend []featureDef, section string) {
+func renderTable(tableID string, section string, subhead string, labelPrefix string, rows []featureDef) {
 	tbody := doc.Call("querySelector", "#"+tableID+" tbody")
 	if !tbody.Truthy() {
 		return
 	}
-	var gatewayFirst, rest []featureDef
-	for _, f := range gateway {
-		if strings.HasPrefix(f.Label, "Gateway ") {
-			gatewayFirst = append(gatewayFirst, f)
-		} else {
-			rest = append(rest, f)
-		}
-	}
-	for _, f := range route {
-		if strings.HasPrefix(f.Label, "Gateway ") {
-			gatewayFirst = append(gatewayFirst, f)
-		} else {
-			rest = append(rest, f)
-		}
-	}
 	prefix := radioPrefix[section]
 	var html strings.Builder
-	writeSubhead := func(subhead string) {
+	if subhead != "" && len(rows) > 0 {
 		html.WriteString(fmt.Sprintf(`<tr class="feature-subhead"><th scope="col">%s</th><th scope="col">Requirement</th></tr>`, escapeHTML(subhead)))
-	}
-	writeRow := func(f featureDef, label string) {
-		name := prefix + f.ID
-		dataDesc := ""
-		cellClass := ""
-		if f.Description != "" {
-			dataDesc = fmt.Sprintf(` data-description="%s"`, escapeHTML(f.Description))
-			cellClass = "feature-label-cell"
-		}
-		html.WriteString(fmt.Sprintf(`<tr><td class="%s"%s>%s</td><td>
-<label><input type="checkbox" name="%s" value="must" /> Must have</label>
-<label><input type="checkbox" name="%s" value="good" /> Nice to have</label>
-</td></tr>`, cellClass, dataDesc, escapeHTML(label), name, name))
-	}
-	if len(rest) > 0 {
-		writeSubhead("HTTPRoute")
-		for _, f := range rest {
-			writeRow(f, stripLabelPrefix(f.Label, "HTTPRoute "))
-		}
-	}
-	if len(gatewayFirst) > 0 {
-		writeSubhead("Gateway")
-		for _, f := range gatewayFirst {
-			writeRow(f, stripLabelPrefix(f.Label, "Gateway "))
-		}
-	}
-	if len(backend) > 0 {
-		writeSubhead("Backend TLS")
-		for _, f := range backend {
-			writeRow(f, stripLabelPrefix(f.Label, "Backend TLS "))
-		}
-	}
-	tbody.Set("innerHTML", html.String())
-}
-
-func renderTable(tableID string, section string, labelPrefix string, rows []featureDef) {
-	tbody := doc.Call("querySelector", "#"+tableID+" tbody")
-	if !tbody.Truthy() {
-		return
-	}
-	prefix := radioPrefix[section]
-	var html strings.Builder
-	if len(rows) > 0 {
-		html.WriteString(fmt.Sprintf(`<tr class="feature-subhead"><th scope="col">%s</th><th scope="col">Requirement</th></tr>`, escapeHTML("Gateway")))
 	}
 	for _, f := range rows {
 		label := f.Label
@@ -462,11 +406,14 @@ type selection struct {
 }
 
 func getSelections() (must, good []selection) {
+	httpFeats := make([]featureDef, 0, 1+len(featHTTPAll))
+	httpFeats = append(httpFeats, featureDef{ID: "HTTPRouteCore", Label: "Core"})
+	httpFeats = append(httpFeats, featHTTPAll...)
 	sections := []struct {
 		name  string
 		feats []featureDef
 	}{
-		{"http", featHTTPAll},
+		{"http", httpFeats},
 		{"grpc", featGRPC},
 		{"tls", featTLS},
 	}
@@ -540,10 +487,21 @@ func recommend() {
 		for _, f := range impl.Features {
 			supp[f] = true
 		}
+		hasConformanceCore := false
+		for _, c := range impl.Conformance {
+			if c == "Core" {
+				hasConformanceCore = true
+				break
+			}
+		}
 		mustCount := 0
 		var missing []selection
 		for _, sel := range must {
-			if supp[sel.ID] {
+			ok := supp[sel.ID]
+			if sel.ID == "HTTPRouteCore" {
+				ok = hasConformanceCore
+			}
+			if ok {
 				mustCount++
 			} else {
 				missing = append(missing, sel)
@@ -551,7 +509,11 @@ func recommend() {
 		}
 		goodCount := 0
 		for _, sel := range good {
-			if supp[sel.ID] {
+			ok := supp[sel.ID]
+			if sel.ID == "HTTPRouteCore" {
+				ok = hasConformanceCore
+			}
+			if ok {
 				goodCount++
 			} else {
 				missing = append(missing, sel)
@@ -583,6 +545,9 @@ func recommend() {
 	})
 
 	featureLabel := func(section, id string) string {
+		if id == "HTTPRouteCore" {
+			return "Core"
+		}
 		var label string
 		for _, f := range featHTTPAll {
 			if f.ID == id {
@@ -653,11 +618,14 @@ func setStatus(el js.Value, n int) {
 }
 
 func resetAll() {
+	httpFeatsReset := make([]featureDef, 0, 1+len(featHTTPAll))
+	httpFeatsReset = append(httpFeatsReset, featureDef{ID: "HTTPRouteCore", Label: "Core"})
+	httpFeatsReset = append(httpFeatsReset, featHTTPAll...)
 	sections := []struct {
 		section string
 		feats   []featureDef
 	}{
-		{"http", featHTTPAll},
+		{"http", httpFeatsReset},
 		{"grpc", featGRPC},
 		{"tls", featTLS},
 	}
