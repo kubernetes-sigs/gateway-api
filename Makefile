@@ -208,7 +208,7 @@ build-docs: update-geps api-ref-docs
 
 .PHONY: verify-docs
 verify-docs: build-docs
-	docker run --init --rm -w /input -v ${PWD}:/input $(DOCS_VERIFY_CONTAINER_IMAGE) --root-dir /input/site --exclude-path "overrides/partials/.*\.html" --exclude ".*" --include "sigs.k8s.io" --accept 200 --max-concurrency 10 --include-fragments --cache $(VALIDATE_DOCS_EXTRA_ARGS) /input/site/**/*.html
+	docker run --init --rm -w /input -v ${PWD}:/input $(DOCS_VERIFY_CONTAINER_IMAGE) --root-dir /input/site --exclude-path "overrides/partials/.*\.html" --exclude ".*" --include "sigs.k8s.io" --accept 200 --max-concurrency 10 --include-fragments --cache $(VALIDATE_DOCS_EXTRA_FLAGS) /input/site/**/*.html
 
 .PHONY: build-docs-netlify
 build-docs-netlify: update-geps api-ref-docs

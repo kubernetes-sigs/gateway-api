@@ -42,9 +42,11 @@ mkdir -p ${PWD}/tmp
 for i in "${arr[@]}"; do
     tmpdir=$(mktemp -d --tmpdir=${PWD}/tmp)
 
-    git fetch ${REMOTE} ${i} ||
-	    echo "You need a git remote pointing to upstream for API Ref generation. To solve this issue locally, execute 'git remote add upstream git@github.com:kubernetes-sigs/gateway-api.git' and then call the script again with 'REMOTE=upstream <command>'"
-    git --work-tree=${tmpdir} checkout ${REMOTE}/${i} -- apis apisx
+    git fetch "${REMOTE}" "${i}" || {
+        echo "Branch ${i} not found on ${REMOTE}. Try: REMOTE=upstream $0"
+        exit 1
+    }
+    git archive "${REMOTE}/${i}" apis apisx | tar -x -C "${tmpdir}"
 
     # Start removing any "release-" prefix from docpath
     docpath=${i#"release-"}
