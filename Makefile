@@ -231,7 +231,7 @@ build-docs: install-deps update-geps api-ref-docs wizard-wasm wizard-data confor
 
 .PHONY: verify-docs
 verify-docs: build-docs
-	docker run --init --rm -w /input -v ${PWD}:/input $(DOCS_VERIFY_CONTAINER_IMAGE) --root-dir /input/site/public --include "sigs.k8s.io" --accept 200 --max-concurrency 10 --include-fragments --cache $(VALIDATE_DOCS_EXTRA_ARGS) /input/site/public/**/*.html
+	docker run --init --rm -w /input -v ${PWD}:/input $(DOCS_VERIFY_CONTAINER_IMAGE) --root-dir /input/site/public --include "sigs.k8s.io" --accept 200 --max-concurrency 10 --include-fragments --cache $(VALIDATE_DOCS_EXTRA_FLAGS) /input/site/public/**/*.html
 
 .PHONY: build-docs-netlify
 build-docs-netlify: install-deps update-geps api-ref-docs wizard-wasm wizard-data conformance-data
