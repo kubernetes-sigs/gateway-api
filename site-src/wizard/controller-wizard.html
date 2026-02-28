@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="controller-wizard.css">
+</head>
+
+<body>
+  <div class="intro">
+    <p id="version-row">
+      <label for="version-select"><strong>Gateway API version:</strong></label>
+      <select id="version-select"></select>
+    </p>
+    <p class="intro-source">Matches are generated from the
+      <a href="https://github.com/kubernetes-sigs/gateway-api/tree/main/conformance/reports" target="_blank" rel="noopener">conformance reports uploaded by project implementations</a>.
+      <strong>Must have</strong> determines which controllers match; <strong>Nice to have</strong> optionally ranks your results. Feature names match the
+      <a id="link-intro-conformance" href="https://gateway-api.sigs.k8s.io/implementations/v1.4/" target="_blank" rel="noopener">v1.4
+        conformance tables</a>. They are separated into the extended features that each project supports listed in their reports. Implementations only appear in this page if they pass Core conformance for the resource type, and the features listed are Extended features. Implementations that submit conformance reports with skipped tests won't appear.</p>
+    <details class="warning-note" open>
+      <summary>Note</summary>
+      <p>This page is under active development. But matches are based on submitted conformance reports, so the information is correct.</p>
+    </details>
+  </div>
+
+  <section class="card">
+    <h2>Gateway Profile</h2>
+
+    <h3 id="gateway">Gateway</h3>
+    <p class="section-intro">All controllers matched by this wizard include core support of Gateway. That includes many core features, including:</p>
+    <ul class="core-list">
+      <li>Specifying listeners on different ports and protocols</li>
+      <li>TLS configuration (protocol dependent)</li>
+      <li>Hostname matching (protocol dependent)</li>
+      <li>Configuring which Routes can be attached, including the ability to accept Routes from other namespaces</li>
+    </ul>
+    <p class="section-intro">If you'd like additional Gateway features, you can choose from the following list of extended (optional) features.</p>
+    <table class="features" id="gateway-features">
+      <thead><tr><th scope="col">Gateway</th><th scope="col">Requirement</th></tr></thead>
+      <tbody></tbody>
+    </table>
+
+    <h3 id="httproute">HTTPRoute</h3>
+    <p class="section-intro">Controllers that pass conformance tests for HTTPRoute are guaranteed to support the following features:</p>
+    <ol class="core-list">
+      <li>Traffic splitting with weighted backends</li>
+      <li>Safe cross-namespace references with ReferenceGrant</li>
+      <li>Request header modification</li>
+      <li>Exact and prefix path matching</li>
+      <li>Hostname matching</li>
+      <li>HTTP redirects</li>
+    </ol>
+    <table class="features" id="http-route-core">
+      <thead><tr><th scope="col">HTTPRoute</th><th scope="col">Requirement</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <p class="section-intro">You can choose additional extended features from the <a id="link-httproute" href="https://gateway-api.sigs.k8s.io/implementations/v1.4/#httproute" target="_blank" rel="noopener">HTTPRoute conformance table</a>.</p>
+    <table class="features" id="http-route-features">
+      <tbody></tbody>
+    </table>
+
+    <h3 id="backend-tls">Backend TLS</h3>
+    <p class="section-intro">If you need TLS to backends, you can select the following extended features.</p>
+    <table class="features" id="backend-tls-features">
+      <tbody></tbody>
+    </table>
+
+    <h3 id="grpcroute">GRPCRoute</h3>
+    <p class="conformance-intro">Extended features from the <a id="link-grpcroute"
+        href="https://gateway-api.sigs.k8s.io/implementations/v1.4/#grpcroute" target="_blank" rel="noopener">GRPCRoute
+        conformance table</a>.</p>
+    <table class="features" id="grpc-features">
+      <tbody></tbody>
+    </table>
+
+    <h3 id="tlsroute">TLSRoute</h3>
+    <p class="conformance-intro">Extended features from the <a id="link-tlsroute"
+        href="https://gateway-api.sigs.k8s.io/implementations/v1.4/#tlsroute" target="_blank" rel="noopener">TLSRoute
+        conformance table</a>.</p>
+    <table class="features" id="tls-features">
+      <tbody></tbody>
+    </table>
+  </section>
+
+  <p id="wizard-data-status" class="data-status"></p>
+  <button type="button" class="recommend-btn" id="recommend-btn" disabled>Match</button>
+  <button type="button" class="reset-btn" id="reset-btn">Reset</button>
+
+  <section class="card" id="results">
+    <h2>Matching controllers</h2>
+    <div id="results-content"></div>
+  </section>
+
+  <div id="feature-desc-popup" class="feature-desc-popup" role="tooltip" aria-live="polite" hidden></div>
+
+  <script>
+    // Feature definitions: only from data.featureDefinitions (controller-wizard-data.json from generate-controller-wizard-data.py).
+    // No hardcoded defaults; single source of truth is the JSON.
+    let GATEWAY_HTTP_FEATURES = [];
+    let HTTPROUTE_FEATURES = [];
+    let HTTP_BACKEND_TLS_FEATURES = [];
+    let GRPC_FEATURES = [];
+    let TLS_FEATURES = [];
+    let HTTP_FEATURES = [];
+
+    function applyFeatureDefinitions(def) {
+      if (!def || !def.httpGateway) return;
+      GATEWAY_HTTP_FEATURES = def.httpGateway;
+      HTTPROUTE_FEATURES = def.httpRoute || [];
+      HTTP_BACKEND_TLS_FEATURES = def.httpBackendTls || [];
+      GRPC_FEATURES = def.grpc;
+      TLS_FEATURES = def.tls;
+      HTTP_FEATURES = [...GATEWAY_HTTP_FEATURES, ...HTTPROUTE_FEATURES, ...HTTP_BACKEND_TLS_FEATURES];
+    }
+
+    // Implementation data: loaded from data/controller-wizard-data.json (generated by hack/generate-controller-wizard-data.py into wizard/data/)
+    let IMPLEMENTATIONS = [];
+    let ALL_VERSIONS_DATA = null;
+    let CURRENT_VERSION_KEY = ''; // Set from loaded data (newest version first)
+
+    function escapeHtml(s) {
+      if (s == null) return '';
+      const t = String(s);
+      return t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function versionSegment(versionKey) {
+      const parts = (versionKey || '').replace(/^v?/, '').split('.');
+      return 'v' + (parts[0] || '1') + '.' + (parts[1] || '0');
+    }
+
+    function updateVersionLinks(versionKey) {
+      CURRENT_VERSION_KEY = versionKey || CURRENT_VERSION_KEY;
+      const seg = versionSegment(CURRENT_VERSION_KEY || 'v1.0.0');
+      const base = 'https://gateway-api.sigs.k8s.io/implementations/' + seg + '/';
+      const introLink = document.getElementById('link-intro-conformance');
+      const httpLink = document.getElementById('link-httproute');
+      const grpcLink = document.getElementById('link-grpcroute');
+      const tlsLink = document.getElementById('link-tlsroute');
+      if (introLink) { introLink.href = base; introLink.textContent = seg + ' conformance tables'; }
+      if (httpLink) httpLink.href = base + '#httproute';
+      if (grpcLink) grpcLink.href = base + '#grpcroute';
+      if (tlsLink) tlsLink.href = base + '#tlsroute';
+    }
+
+    // Unique name per section so HTTP/GRPC/TLS can be selected independently for shared feature ids
+    const RADIO_PREFIX = { http: 'req-http-', grpc: 'req-grpc-', tls: 'req-tls-' };
+
+    function getAvailableFeatureIds() {
+      const ids = new Set();
+      IMPLEMENTATIONS.forEach(impl => {
+        (impl.features || []).forEach(f => ids.add(f));
+      });
+      return ids;
+    }
+
+    function updateFeaturesForVersion() {
+      const available = IMPLEMENTATIONS.length > 0 ? getAvailableFeatureIds() : null;
+      const filter = (list) => available ? list.filter(f => available.has(f.id)) : list;
+      const gateway = filter(GATEWAY_HTTP_FEATURES).map(f => ({ id: f.id, label: f.label, description: f.description }));
+      const httpRoute = filter(HTTPROUTE_FEATURES).map(f => ({ id: f.id, label: f.label, description: f.description }));
+      const httpBackendTls = filter(HTTP_BACKEND_TLS_FEATURES).map(f => ({ id: f.id, label: f.label, description: f.description }));
+      const grpc = filter(GRPC_FEATURES);
+      const tls = filter(TLS_FEATURES);
+      const stripPrefix = (label, prefix) => label.startsWith(prefix) ? label.slice(prefix.length) : label;
+
+      const gatewayRows = gateway.map(f => ({ id: f.id, label: stripPrefix(f.label, 'Gateway '), description: f.description }));
+      renderTable('gateway-features', gatewayRows, 'http');
+
+      renderTable('http-route-core', [{ id: 'HTTPRouteCore', label: 'Core', description: '' }], 'http');
+
+      const httpRouteRows = [];
+      if (httpRoute.length > 0) {
+        httpRouteRows.push({ subhead: 'HTTPRoute' });
+        httpRoute.forEach(f => httpRouteRows.push({ id: f.id, label: stripPrefix(f.label, 'HTTPRoute '), description: f.description }));
+      }
+      renderTable('http-route-features', httpRouteRows, 'http');
+
+      const backendTlsRows = [];
+      if (httpBackendTls.length > 0) {
+        backendTlsRows.push({ subhead: 'Backend TLS' });
+        httpBackendTls.forEach(f => backendTlsRows.push({ id: f.id, label: stripPrefix(f.label, 'Backend TLS '), description: f.description }));
+      }
+      renderTable('backend-tls-features', backendTlsRows, 'http');
+
+      const grpcRows = grpc.length > 0 ? [{ subhead: 'Gateway' }, ...grpc.map(f => ({ id: f.id, label: stripPrefix(f.label, 'Gateway '), description: f.description }))] : [];
+      renderTable('grpc-features', grpcRows, 'grpc');
+      const tlsRows = tls.length > 0 ? [{ subhead: 'Gateway' }, ...tls.map(f => ({ id: f.id, label: stripPrefix(f.label, 'Gateway '), description: f.description }))] : [];
+      renderTable('tls-features', tlsRows, 'tls');
+    }
+
+    function renderTable(tableId, rows, section) {
+      const tbody = document.querySelector(`#${tableId} tbody`);
+      const prefix = RADIO_PREFIX[section];
+      tbody.innerHTML = rows.map((row) => {
+        if (row.subhead) return `<tr class="feature-subhead"><th scope="col">${escapeHtml(row.subhead)}</th><th scope="col">Requirement</th></tr>`;
+        if (row.spacer) return '<tr class="feature-spacer"><td colspan="2"></td></tr>';
+        const { id, label, description } = row;
+        const name = prefix + id;
+        const dataDesc = description ? ` data-description="${escapeHtml(description)}"` : '';
+        const cellClass = description ? 'feature-label-cell' : '';
+        return `
+        <tr>
+          <td class="${cellClass}"${dataDesc}>${escapeHtml(label)}</td>
+          <td>
+            <label><input type="checkbox" name="${name}" value="must" /> Must have</label>
+            <label><input type="checkbox" name="${name}" value="good" /> Nice to have</label>
+          </td>
+        </tr>
+      `;
+      }).join('');
+      tbody.querySelectorAll('input[type="checkbox"]').forEach((cb) => {
+        cb.addEventListener('change', function () {
+          if (this.checked) {
+            document.querySelectorAll(`input[name="${this.name}"]`).forEach((other) => {
+              if (other !== this) other.checked = false;
+            });
+          }
+        });
+      });
+      setupFeatureDescPopup();
+    }
+
+    function setupCoreOptionMutualExclusion() {}
+
+    function setupFeatureDescPopup() {
+      const popup = document.getElementById('feature-desc-popup');
+      if (!popup || popup.hasAttribute('data-initialized')) return;
+      popup.setAttribute('data-initialized', '1');
+      document.body.addEventListener('click', function (e) {
+        const cell = e.target.closest('td.feature-label-cell[data-description]');
+        if (cell) {
+          e.preventDefault();
+          const desc = cell.getAttribute('data-description');
+          if (popup.getAttribute('data-open') === '1' && popup.textContent === desc) {
+            popup.hidden = true;
+            popup.removeAttribute('data-open');
+            return;
+          }
+          popup.textContent = desc || '';
+          popup.hidden = false;
+          popup.setAttribute('data-open', '1');
+          const rect = cell.getBoundingClientRect();
+          popup.style.left = rect.left + 'px';
+          popup.style.top = (rect.bottom + 4) + 'px';
+          popup.style.maxWidth = Math.max(280, Math.min(400, window.innerWidth - rect.left - 16)) + 'px';
+          return;
+        }
+        if (!popup.contains(e.target)) {
+          popup.hidden = true;
+          popup.removeAttribute('data-open');
+        }
+      });
+    }
+
+    function resetAll() {
+      const sections = [
+        { section: 'http', features: [{ id: 'HTTPRouteCore' }, ...GATEWAY_HTTP_FEATURES, ...HTTPROUTE_FEATURES, ...HTTP_BACKEND_TLS_FEATURES] },
+        { section: 'grpc', features: GRPC_FEATURES },
+        { section: 'tls', features: TLS_FEATURES },
+      ];
+      sections.forEach(({ section, features }) => {
+        const prefix = RADIO_PREFIX[section];
+        features.forEach(({ id }) => {
+          document.querySelectorAll(`input[name="${prefix}${id}"]`).forEach((el) => { el.checked = false; });
+        });
+      });
+      document.getElementById('results').classList.remove('visible');
+      const statusEl = document.getElementById('wizard-data-status');
+      if (statusEl) statusEl.textContent = '';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function getSelections() {
+      const sections = [
+        { name: 'http', features: [{ id: 'HTTPRouteCore' }, ...GATEWAY_HTTP_FEATURES, ...HTTPROUTE_FEATURES, ...HTTP_BACKEND_TLS_FEATURES] },
+        { name: 'grpc', features: GRPC_FEATURES },
+        { name: 'tls', features: TLS_FEATURES },
+      ];
+      const must = [];
+      const good = [];
+      sections.forEach(({ name: section, features }) => {
+        features.forEach(({ id }) => {
+          const el = document.querySelector(`input[name="${RADIO_PREFIX[section]}${id}"]:checked`);
+          if (!el) return;
+          if (el.value === 'must') {
+            must.push({ section, id });
+          } else if (el.value === 'good') {
+            good.push({ section, id });
+          }
+        });
+      });
+      const mustSet = new Set(must.map(m => m.section + '\0' + m.id));
+      const goodFiltered = good.filter(sel => !mustSet.has(sel.section + '\0' + sel.id));
+      return { must, good: goodFiltered };
+    }
+
+    function recommend() {
+      const resultsContent = document.getElementById('results-content');
+      const resultsDiv = document.getElementById('results');
+      const statusEl = document.getElementById('wizard-data-status');
+      resultsContent.innerHTML = '';
+      resultsDiv.classList.remove('visible');
+      if (statusEl) statusEl.textContent = '';
+
+      if (IMPLEMENTATIONS.length === 0) {
+        resultsContent.innerHTML = '<p class="no-results">No implementation data loaded. Run <code>python hack/generate-controller-wizard-data.py --all</code> to generate <code>site-src/wizard/data/controller-wizard-data.json</code>, then serve from <code>site-src/</code> (e.g. <code>python -m http.server 8000</code>), or open the wizard from the built site.</p>';
+        resultsDiv.classList.add('visible');
+        resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        return;
+      }
+      const { must, good } = getSelections();
+      const setStatusAfterRecommend = (recommendedCount) => {
+        if (statusEl) {
+          statusEl.textContent = recommendedCount === 1
+            ? '1 controller matches.'
+            : `${recommendedCount} controllers match.`;
+        }
+      };
+      if (must.length === 0 && good.length === 0) {
+        resultsContent.innerHTML = '<p class="no-results">Select at least one requirement as Must have or Nice to have, then click Match.</p>';
+        resultsDiv.classList.add('visible');
+        resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        setStatusAfterRecommend(0);
+        return;
+      }
+
+      const scored = IMPLEMENTATIONS.map(impl => {
+        const supported = new Set(impl.features);
+        const conformanceSet = new Set(impl.conformance || []);
+        const hasFeature = (id) => id === 'HTTPRouteCore' ? conformanceSet.has('Core') : supported.has(id);
+        let mustCount = 0;
+        let goodCount = 0;
+        const missing = [];
+        must.forEach(({ section, id }) => {
+          const ok = hasFeature(id);
+          if (ok) mustCount++; else missing.push({ section, id });
+        });
+        good.forEach(({ section, id }) => {
+          const ok = hasFeature(id);
+          if (ok) goodCount++; else missing.push({ section, id });
+        });
+        return {
+          ...impl,
+          mustCount,
+          goodCount,
+          mustTotal: must.length,
+          goodTotal: good.length,
+          missing,
+        };
+      }).filter(c => c.mustCount >= 1 || (must.length === 0 && c.goodCount >= 1));
+
+      if (scored.length === 0) {
+        resultsContent.innerHTML = '<p class="no-results">No controller supports any of your Must have requirements. Try relaxing to Nice to have or fewer requirements.</p>';
+        resultsDiv.classList.add('visible');
+        resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        setStatusAfterRecommend(0);
+        return;
+      }
+
+      scored.sort((a, b) => {
+        if (b.mustCount !== a.mustCount) return b.mustCount - a.mustCount;
+        if (b.goodCount !== a.goodCount) return b.goodCount - a.goodCount;
+        return new Date(b.reportDate) - new Date(a.reportDate);
+      });
+
+      const featureLabel = (section, id) => {
+        if (id === 'HTTPRouteCore') return 'Core';
+        const f = HTTP_FEATURES.find(x => x.id === id) || GRPC_FEATURES.find(x => x.id === id) || TLS_FEATURES.find(x => x.id === id);
+        const label = f ? f.label : id;
+        if (section === 'grpc') return '(GRPC) ' + label;
+        if (section === 'tls') return '(TLS) ' + label;
+        return label;
+      };
+
+      const html = `
+        <table class="results">
+          <thead>
+            <tr>
+              <th>Organization</th>
+              <th>Project</th>
+              <th>Conformance</th>
+              <th>Must have</th>
+              <th>Nice to have</th>
+              <th>Missing</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${scored.map(c => `
+              <tr>
+                <td>${escapeHtml(c.organization || '')}</td>
+                <td><a href="${escapeHtml(c.url || '#')}" target="_blank" rel="noopener">${escapeHtml(c.project || '')}</a> ${escapeHtml(c.version || '')}</td>
+                <td>${c.conformance.join(', ')}</td>
+                <td>${c.mustCount}/${c.mustTotal}</td>
+                <td>${c.goodCount}/${c.goodTotal}</td>
+                <td class="missing">${c.missing.length ? c.missing.map(({ section, id }) => featureLabel(section, id)).join(', ') : '—'}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+      resultsContent.innerHTML = html;
+      resultsDiv.classList.add('visible');
+      resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setStatusAfterRecommend(scored.length);
+    }
+
+    function applyVersion(versionKey) {
+      if (!ALL_VERSIONS_DATA || !ALL_VERSIONS_DATA[versionKey]) return;
+      IMPLEMENTATIONS = ALL_VERSIONS_DATA[versionKey];
+      updateFeaturesForVersion();
+      updateVersionLinks(versionKey);
+      const statusEl = document.getElementById('wizard-data-status');
+      statusEl.textContent = IMPLEMENTATIONS.length ? '' : `No implementations for ${versionKey}.`;
+      document.getElementById('results').classList.remove('visible');
+    }
+
+    function loadImplementations() {
+      const statusEl = document.getElementById('wizard-data-status');
+      const btn = document.getElementById('recommend-btn');
+      const versionRow = document.getElementById('version-row');
+      const versionSelect = document.getElementById('version-select');
+      statusEl.textContent = 'Loading implementation data…';
+      fetch('data/controller-wizard-data.json')
+        .then(r => {
+          if (!r.ok) throw new Error(r.statusText || r.status);
+          return r.json();
+        })
+        .then(data => {
+          if (Array.isArray(data)) {
+            ALL_VERSIONS_DATA = null;
+            IMPLEMENTATIONS = data;
+            updateFeaturesForVersion();
+            updateVersionLinks();
+            versionRow.style.display = 'none';
+            statusEl.textContent = IMPLEMENTATIONS.length ? '' : 'No implementations in data file.';
+          } else if (data && typeof data === 'object' && !Array.isArray(data)) {
+            if (data.featureDefinitions) applyFeatureDefinitions(data.featureDefinitions);
+            if (data.implementations != null) {
+              ALL_VERSIONS_DATA = null;
+              IMPLEMENTATIONS = data.implementations;
+              updateFeaturesForVersion();
+              updateVersionLinks();
+              versionRow.style.display = 'none';
+              statusEl.textContent = IMPLEMENTATIONS.length ? '' : 'No implementations in data file.';
+            } else {
+              const versionKeys = Object.keys(data).filter(k => k !== 'featureDefinitions');
+              // Sort newest-first so new releases (e.g. v1.5.0) appear at top of dropdown
+              const sorted = versionKeys.sort((a, b) => {
+                const pa = a.replace(/^v/, '').split('.').map(Number);
+                const pb = b.replace(/^v/, '').split('.').map(Number);
+                for (let i = 0; i < 3; i++) {
+                  const na = pa[i] || 0, nb = pb[i] || 0;
+                  if (nb !== na) return nb - na;
+                }
+                return 0;
+              });
+              const MAX_VERSIONS_IN_DROPDOWN = 4;
+              const versions = sorted.slice(0, MAX_VERSIONS_IN_DROPDOWN);
+              if (versions.length === 0) {
+                IMPLEMENTATIONS = [];
+                statusEl.textContent = 'No versions in data file.';
+              } else {
+                ALL_VERSIONS_DATA = data;
+                versionSelect.innerHTML = versions.map(v => `<option value="${v}">${v}</option>`).join('');
+                versionRow.style.display = 'block';
+                applyVersion(versions[0]);
+                versionSelect.onchange = () => applyVersion(versionSelect.value);
+              }
+            }
+          } else {
+            IMPLEMENTATIONS = [];
+            statusEl.textContent = 'Invalid data format.';
+          }
+          btn.disabled = false;
+        })
+        .catch(() => {
+          IMPLEMENTATIONS = [];
+          ALL_VERSIONS_DATA = null;
+          statusEl.textContent = 'Could not load wizard/data/controller-wizard-data.json. Run python hack/generate-controller-wizard-data.py --all and serve from site-src/ (e.g. python -m http.server 8000).';
+          versionRow.style.display = 'none';
+          btn.disabled = false;
+        });
+    }
+
+    loadImplementations();
+    setupCoreOptionMutualExclusion();
+    document.getElementById('recommend-btn').addEventListener('click', recommend);
+    document.getElementById('reset-btn').addEventListener('click', resetAll);
+  </script>
+</body>
+
+</html>
