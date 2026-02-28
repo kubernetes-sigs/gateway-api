@@ -139,6 +139,11 @@
     };
     setTimeout(window.wizardResize, 0);
     window.addEventListener('resize', window.wizardResize);
+    // When content height changes (e.g. text reflow after narrow window), update parent so iframe stays in sync and no nested scrollbar appears.
+    if (typeof ResizeObserver !== 'undefined' && document.body) {
+      var ro = new ResizeObserver(function() { window.wizardResize(); });
+      ro.observe(document.body);
+    }
 
     const statusEl = document.getElementById('wizard-data-status');
     statusEl.textContent = 'Loading…';
