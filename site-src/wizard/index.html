@@ -14,14 +14,11 @@
       <label for="version-select"><strong>Gateway API version:</strong></label>
       <select id="version-select"></select>
     </p>
-    <p>For each feature, select <strong>Must have</strong>, <strong>Nice to have</strong>, or <strong>N/A</strong>. Feature names match the
-      <a id="link-intro-conformance" href="https://gateway-api.sigs.k8s.io/implementations/v1.4/" target="_blank" rel="noopener">v1.4
-        conformance tables</a>.</p>
     <p class="intro-source">Matches are generated from the
       <a href="https://github.com/kubernetes-sigs/gateway-api/tree/main/conformance/reports" target="_blank" rel="noopener">conformance reports uploaded by project implementations</a>.
-      They are separated into the extended features that each project supports listed in their reports.
-      Implementations only appear in this page if they pass Core conformance for the resource type, and the features listed are Extended features.
-      Implementations that submit conformance reports with skipped tests won't appear.</p>
+      <strong>Must have</strong> determines which controllers match; <strong>Nice to have</strong> optionally ranks your results. Feature names match the
+      <a id="link-intro-conformance" href="https://gateway-api.sigs.k8s.io/implementations/v1.4/" target="_blank" rel="noopener">v1.4
+        conformance tables</a>. They are separated into the extended features that each project supports listed in their reports. Implementations only appear in this page if they pass Core conformance for the resource type, and the features listed are Extended features. Implementations that submit conformance reports with skipped tests won't appear.</p>
     <details class="warning-note" open>
       <summary>Note</summary>
       <p>This page is under active development and is not in its final form, especially for the project name and the names of the features. However, as it is based on submitted conformance reports, the information is correct.</p>
@@ -141,6 +138,7 @@
       }
     };
     setTimeout(window.wizardResize, 0);
+    window.addEventListener('resize', window.wizardResize);
 
     const statusEl = document.getElementById('wizard-data-status');
     statusEl.textContent = 'Loading…';

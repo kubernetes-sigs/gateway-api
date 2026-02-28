@@ -18,7 +18,7 @@ body {
   background: var(--bg);
   color: var(--text);
   line-height: 1.3;
-  max-width: max-content;
+  max-width: 100%;
   margin-left: auto;
   margin-right: auto;
 }
@@ -118,7 +118,8 @@ table.features tbody td:first-child {
 table.features td:nth-child(2),
 table.features th:nth-child(2) {
   width: 300px;
-  min-width: 300px;
+  min-width: 0;
+  max-width: 300px;
   vertical-align: middle;
   font-size: 0.9375rem;
 }
