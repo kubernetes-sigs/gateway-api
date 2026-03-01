@@ -34,7 +34,7 @@ func init() {
 }
 
 var GatewayTLSBackendClientCertificate = suite.ConformanceTest{
-	ShortName:   "GatewayBackendClientCertificateFeature",
+	ShortName:   "GatewayTLSBackendClientCertificate",
 	Description: "A Gateway with a client certificate configured should present the certificate when connecting to a backend using TLS.",
 	Features: []features.FeatureName{
 		features.SupportGateway,
