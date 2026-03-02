@@ -28,6 +28,7 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # tag=v6.0.2
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Set up Go
         uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # tag=v6.3.0
@@ -37,8 +38,8 @@ jobs:
       - name: Generate monthly tag
         id: tag
         run: |
-          if [ -n "${{ inputs.tag }}" ]; then
-            TAG="${{ inputs.tag }}"
+          if [ -n "${INPUTS_TAG}" ]; then
+            TAG="${INPUTS_TAG}"
           else
             # Format: monthly-YYYY.MM
             TAG="monthly-$(date +"%Y.%m")"
@@ -48,20 +49,26 @@ jobs:
           YEAR_MONTH=$(echo "${TAG}" | sed 's/monthly-//')
           echo "year_month=${YEAR_MONTH}" >> $GITHUB_OUTPUT
           echo "Generated tag: ${TAG}"
+        env:
+          INPUTS_TAG: ${{ inputs.tag }}
 
       - name: Check if tag already exists
         run: |
-          if git rev-parse "${{ steps.tag.outputs.tag }}" >/dev/null 2>&1; then
-            echo "Error: Tag ${{ steps.tag.outputs.tag }} already exists, aborting release!"
+          if git rev-parse "${STEPS_TAG_OUTPUTS_TAG}" >/dev/null 2>&1; then
+            echo "Error: Tag ${STEPS_TAG_OUTPUTS_TAG} already exists, aborting release!"
             exit 1
           fi
+        env:
+          STEPS_TAG_OUTPUTS_TAG: ${{ steps.tag.outputs.tag }}
 
       - name: Create and push tag
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag "${{ steps.tag.outputs.tag }}"
-          git push origin "${{ steps.tag.outputs.tag }}"
+          git tag "${STEPS_TAG_OUTPUTS_TAG}"
+          git push origin "${STEPS_TAG_OUTPUTS_TAG}"
+        env:
+          STEPS_TAG_OUTPUTS_TAG: ${{ steps.tag.outputs.tag }}
 
       - name: Build monthly YAML
         env:
@@ -76,9 +83,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
+          STEPS_TAG_OUTPUTS_TAG: ${{ steps.tag.outputs.tag }}
+          STEPS_TAG_OUTPUTS_YEAR_MONTH: ${{ steps.tag.outputs.year_month }}
         run: |
-          TAG="${{ steps.tag.outputs.tag }}"
-          YEAR_MONTH=$(echo ""${{ steps.tag.outputs.year_month }}"" | sed 's/\./-/')
+          TAG="${STEPS_TAG_OUTPUTS_TAG}"
+          YEAR_MONTH=$(echo ""${STEPS_TAG_OUTPUTS_YEAR_MONTH}"" | sed 's/\./-/')
           YEAR=$(echo "$YEAR_MONTH" | cut -d- -f1)
           MONTH_NAME=$(date -d "${YEAR_MONTH}-01" +"%B")
 
@@ -124,10 +133,10 @@ jobs:
             printf 'No pull requests found in this release.\n' >> release-notes.md
           fi
 
-          gh release create ${{ steps.tag.outputs.tag }} \
+          gh release create ${STEPS_TAG_OUTPUTS_TAG} \
             -F release-notes.md \
             --prerelease \
-            --draft release/${{ steps.tag.outputs.tag }}-install.yaml
+            --draft release/${STEPS_TAG_OUTPUTS_TAG}-install.yaml
 
       - name: Cleanup
         if: always()
@@ -138,6 +147,8 @@ jobs:
         if: success()
         run: |
           echo "## ✅ Release Created" >> $GITHUB_STEP_SUMMARY
-          echo "Successfully created monthly release: **${{ steps.tag.outputs.tag }}**" >> $GITHUB_STEP_SUMMARY
+          echo "Successfully created monthly release: **${STEPS_TAG_OUTPUTS_TAG}**" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "View the release: https://github.com/${{ github.repository }}/releases/tag/${{ steps.tag.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
+          echo "View the release: https://github.com/${{ github.repository }}/releases/tag/${STEPS_TAG_OUTPUTS_TAG}" >> $GITHUB_STEP_SUMMARY
+        env:
+          STEPS_TAG_OUTPUTS_TAG: ${{ steps.tag.outputs.tag }}
