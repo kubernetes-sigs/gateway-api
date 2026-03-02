@@ -375,7 +375,7 @@ func GatewayMustHaveAttachedListeners(t *testing.T, client client.Client, timeou
 			tlog.Logf(t, "gateway %s got %d listeners, want %d", gwName.String(), attachedListenerSets, expectedCount)
 		}
 
-		return attachedListenerSets == expectedCount, nil
+		return ret, nil
 	})
 	if waitErr != nil {
 		tlog.Errorf(t, "Error waiting for gateway, got Gateway Status %v, want %d listeners", gotStatus, expectedCount)
