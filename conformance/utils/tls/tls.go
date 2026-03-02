@@ -19,6 +19,7 @@ package tls
 import (
 	cryptotls "crypto/tls"
 	"errors"
+	"io"
 	"strings"
 	"syscall"
 	"testing"
@@ -151,10 +152,14 @@ func MakeTLSConnectionAndExpectEventuallyConnectionRejection(t *testing.T, timeo
 	}, timeoutConfig.MaxTimeToConsistency, time.Second)
 }
 
-// isConnectionRejected checks if an error message contains "connection reset by peer" or is a syscall.ECONNRESET (TCP RST).
+// isConnectionRejected checks if an error indicates either a TCP RST (ECONNRESET)
+// or a TCP FIN-style close (EOF).
 func isConnectionRejected(err error) bool {
 	if err == nil {
 		return false
+	}
+	if errors.Is(err, io.EOF) || errors.Is(err, io.ErrUnexpectedEOF) {
+		return true
 	}
 	if strings.Contains(err.Error(), "connection reset by peer") {
 		return true
