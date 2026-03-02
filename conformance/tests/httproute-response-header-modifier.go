@@ -60,7 +60,7 @@ var HTTPRouteResponseHeaderModifier = confsuite.ConformanceTest{
 					"X-Header-Set":      "set-overwrites-values",
 				},
 			},
-			Backend:   "infra-backend-v1",
+			Backend:   confsuite.InfraBackendServiceNameV1,
 			Namespace: ns,
 		}, {
 			Request: http.Request{
@@ -76,7 +76,7 @@ var HTTPRouteResponseHeaderModifier = confsuite.ConformanceTest{
 					"X-Header-Set":      "set-overwrites-values",
 				},
 			},
-			Backend:   "infra-backend-v1",
+			Backend:   confsuite.InfraBackendServiceNameV1,
 			Namespace: ns,
 		}, {
 			Request: http.Request{
@@ -91,7 +91,7 @@ var HTTPRouteResponseHeaderModifier = confsuite.ConformanceTest{
 					"X-Header-Add":      "add-appends-values",
 				},
 			},
-			Backend:   "infra-backend-v1",
+			Backend:   confsuite.InfraBackendServiceNameV1,
 			Namespace: ns,
 		}, {
 			Request: http.Request{
@@ -107,7 +107,7 @@ var HTTPRouteResponseHeaderModifier = confsuite.ConformanceTest{
 					"X-Header-Add":      "some-other-value,add-appends-values",
 				},
 			},
-			Backend:   "infra-backend-v1",
+			Backend:   confsuite.InfraBackendServiceNameV1,
 			Namespace: ns,
 		}, {
 			Request: http.Request{
@@ -119,7 +119,7 @@ var HTTPRouteResponseHeaderModifier = confsuite.ConformanceTest{
 			Response: http.Response{
 				AbsentHeaders: []string{"X-Header-Remove"},
 			},
-			Backend:   "infra-backend-v1",
+			Backend:   confsuite.InfraBackendServiceNameV1,
 			Namespace: ns,
 		}, {
 			Request: http.Request{
@@ -143,7 +143,7 @@ var HTTPRouteResponseHeaderModifier = confsuite.ConformanceTest{
 				},
 				AbsentHeaders: []string{"X-Header-Remove-1", "X-Header-Remove-2"},
 			},
-			Backend:   "infra-backend-v1",
+			Backend:   confsuite.InfraBackendServiceNameV1,
 			Namespace: ns,
 		}, {
 			Request: http.Request{
@@ -167,7 +167,7 @@ var HTTPRouteResponseHeaderModifier = confsuite.ConformanceTest{
 				},
 				AbsentHeaders: []string{"x-header-remove", "X-Header-Remove"},
 			},
-			Backend:   "infra-backend-v1",
+			Backend:   confsuite.InfraBackendServiceNameV1,
 			Namespace: ns,
 		}, {
 			Request: http.Request{
@@ -209,7 +209,7 @@ var HTTPRouteResponseHeaderModifier = confsuite.ConformanceTest{
 				},
 				AbsentHeaders: []string{"X-Header-Remove-1", "X-Header-Remove-2"},
 			},
-			Backend:   "infra-backend-v1",
+			Backend:   confsuite.InfraBackendServiceNameV1,
 			Namespace: ns,
 		}}
 

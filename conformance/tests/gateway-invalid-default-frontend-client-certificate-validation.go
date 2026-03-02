@@ -89,7 +89,7 @@ var GatewayFrontendInvalidDefaultClientCertificateValidation = confsuite.Conform
 			expectedSuccess := http.ExpectedResponse{
 				Request:   http.Request{Host: "example.org", Path: "/"},
 				Response:  http.Response{StatusCode: 200},
-				Backend:   "infra-backend-v1",
+				Backend:   confsuite.InfraBackendServiceNameV1,
 				Namespace: confsuite.InfrastructureNamespace,
 			}
 			// send request to the first listener and validate that it is passing

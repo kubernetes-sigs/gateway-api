@@ -102,23 +102,23 @@ var ListenerSetAllowedRoutesNamespaces = confsuite.ConformanceTest{
 			// Requests to all the routes on `listener-set-listener-allowed-routes-all` should succeed
 			{
 				Request:   http.Request{Host: "listener-set-listener-allowed-routes-all.com", Path: "/route-in-same-namespace"},
-				Backend:   "infra-backend-v1",
+				Backend:   confsuite.InfraBackendServiceNameV1,
 				Namespace: ns,
 			},
 			{
 				Request:   http.Request{Host: "listener-set-listener-allowed-routes-all.com", Path: "/route-in-selected-namespace"},
-				Backend:   "infra-backend-v2",
+				Backend:   confsuite.InfraBackendServiceNameV2,
 				Namespace: ns,
 			},
 			{
 				Request:   http.Request{Host: "listener-set-listener-allowed-routes-all.com", Path: "/route-not-in-selected-namespace"},
-				Backend:   "infra-backend-v3",
+				Backend:   confsuite.InfraBackendServiceNameV3,
 				Namespace: ns,
 			},
 			// Requests only to the route in the same namespace on `listener-set-listener-allowed-routes-same` should succeed
 			{
 				Request:   http.Request{Host: "listener-set-listener-allowed-routes-same.com", Path: "/route-in-same-namespace"},
-				Backend:   "infra-backend-v1",
+				Backend:   confsuite.InfraBackendServiceNameV1,
 				Namespace: ns,
 			},
 			{
@@ -136,7 +136,7 @@ var ListenerSetAllowedRoutesNamespaces = confsuite.ConformanceTest{
 			},
 			{
 				Request:   http.Request{Host: "listener-set-listener-allowed-routes-selector.com", Path: "/route-in-selected-namespace"},
-				Backend:   "infra-backend-v2",
+				Backend:   confsuite.InfraBackendServiceNameV2,
 				Namespace: ns,
 			},
 			{

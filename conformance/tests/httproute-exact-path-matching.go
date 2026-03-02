@@ -49,11 +49,11 @@ var HTTPRouteExactPathMatching = confsuite.ConformanceTest{
 		testCases := []http.ExpectedResponse{
 			{
 				Request:   http.Request{Path: "/one"},
-				Backend:   "infra-backend-v1",
+				Backend:   confsuite.InfraBackendServiceNameV1,
 				Namespace: ns,
 			}, {
 				Request:   http.Request{Path: "/two"},
-				Backend:   "infra-backend-v2",
+				Backend:   confsuite.InfraBackendServiceNameV2,
 				Namespace: ns,
 			}, {
 				Request:  http.Request{Path: "/"},

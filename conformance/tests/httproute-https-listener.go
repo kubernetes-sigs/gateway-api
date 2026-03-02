@@ -61,9 +61,9 @@ var HTTPRouteHTTPSListener = confsuite.ConformanceTest{
 			statusCode int
 			backend    string
 		}{
-			{host: "example.org", statusCode: 200, backend: "infra-backend-v1"},
+			{host: "example.org", statusCode: 200, backend: confsuite.InfraBackendServiceNameV1},
 			{host: "unknown-example.org", statusCode: 404},
-			{host: "second-example.org", statusCode: 200, backend: "infra-backend-v2"},
+			{host: "second-example.org", statusCode: 200, backend: confsuite.InfraBackendServiceNameV2},
 		}
 
 		for i, tc := range cases {

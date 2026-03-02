@@ -57,7 +57,7 @@ var HTTPRouteRewritePath = confsuite.ConformanceTest{
 						Path: "/one/two",
 					},
 				},
-				Backend:   "infra-backend-v1",
+				Backend:   confsuite.InfraBackendServiceNameV1,
 				Namespace: ns,
 			},
 			{
@@ -69,7 +69,7 @@ var HTTPRouteRewritePath = confsuite.ConformanceTest{
 						Path: "/three",
 					},
 				},
-				Backend:   "infra-backend-v1",
+				Backend:   confsuite.InfraBackendServiceNameV1,
 				Namespace: ns,
 			},
 			{
@@ -81,7 +81,7 @@ var HTTPRouteRewritePath = confsuite.ConformanceTest{
 						Path: "/",
 					},
 				},
-				Backend:   "infra-backend-v1",
+				Backend:   confsuite.InfraBackendServiceNameV1,
 				Namespace: ns,
 			},
 			{
@@ -93,7 +93,7 @@ var HTTPRouteRewritePath = confsuite.ConformanceTest{
 						Path: "/one",
 					},
 				},
-				Backend:   "infra-backend-v1",
+				Backend:   confsuite.InfraBackendServiceNameV1,
 				Namespace: ns,
 			},
 			{
@@ -116,7 +116,7 @@ var HTTPRouteRewritePath = confsuite.ConformanceTest{
 					},
 					AbsentHeaders: []string{"X-Header-Remove"},
 				},
-				Backend:   "infra-backend-v1",
+				Backend:   confsuite.InfraBackendServiceNameV1,
 				Namespace: ns,
 			},
 			{
@@ -139,7 +139,7 @@ var HTTPRouteRewritePath = confsuite.ConformanceTest{
 					},
 					AbsentHeaders: []string{"X-Header-Remove"},
 				},
-				Backend:   "infra-backend-v1",
+				Backend:   confsuite.InfraBackendServiceNameV1,
 				Namespace: ns,
 			},
 		}

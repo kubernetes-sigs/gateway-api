@@ -114,43 +114,43 @@ var ListenerSetHTTPRouting = confsuite.ConformanceTest{
 			// Requests to the route attached to all resources should succeed
 			{
 				Request:   http.Request{Host: "gateway-listener-1.com", Path: "/route"},
-				Backend:   "infra-backend-v1",
+				Backend:   confsuite.InfraBackendServiceNameV1,
 				Namespace: ns,
 			},
 			{
 				Request:   http.Request{Host: "gateway-listener-2.com", Path: "/route"},
-				Backend:   "infra-backend-v1",
+				Backend:   confsuite.InfraBackendServiceNameV1,
 				Namespace: ns,
 			},
 			{
 				Request:   http.Request{Host: "listener-set-http-routing-1-listener-1.com", Path: "/route"},
-				Backend:   "infra-backend-v1",
+				Backend:   confsuite.InfraBackendServiceNameV1,
 				Namespace: ns,
 			},
 			{
 				Request:   http.Request{Host: "listener-set-http-routing-1-listener-2.com", Path: "/route"},
-				Backend:   "infra-backend-v1",
+				Backend:   confsuite.InfraBackendServiceNameV1,
 				Namespace: ns,
 			},
 			{
 				Request:   http.Request{Host: "listener-set-http-routing-2-listener-1.com", Path: "/route"},
-				Backend:   "infra-backend-v1",
+				Backend:   confsuite.InfraBackendServiceNameV1,
 				Namespace: ns,
 			},
 			{
 				Request:   http.Request{Host: "listener-set-http-routing-2-listener-2.com", Path: "/route"},
-				Backend:   "infra-backend-v1",
+				Backend:   confsuite.InfraBackendServiceNameV1,
 				Namespace: ns,
 			},
 			// Requests to the gateway-route should only succeed on gateway listeners
 			{
 				Request:   http.Request{Host: "gateway-listener-1.com", Path: "/gateway-route"},
-				Backend:   "infra-backend-v2",
+				Backend:   confsuite.InfraBackendServiceNameV2,
 				Namespace: ns,
 			},
 			{
 				Request:   http.Request{Host: "gateway-listener-2.com", Path: "/gateway-route"},
-				Backend:   "infra-backend-v2",
+				Backend:   confsuite.InfraBackendServiceNameV2,
 				Namespace: ns,
 			},
 			{
@@ -172,7 +172,7 @@ var ListenerSetHTTPRouting = confsuite.ConformanceTest{
 			// Requests to the gateway-section-route should only succeed on gateway-listener-1
 			{
 				Request:   http.Request{Host: "gateway-listener-1.com", Path: "/gateway-section-route"},
-				Backend:   "infra-backend-v3",
+				Backend:   confsuite.InfraBackendServiceNameV3,
 				Namespace: ns,
 			},
 			{
@@ -206,12 +206,12 @@ var ListenerSetHTTPRouting = confsuite.ConformanceTest{
 			},
 			{
 				Request:   http.Request{Host: "listener-set-http-routing-1-listener-1.com", Path: "/listener-set-http-routing-1-route"},
-				Backend:   "infra-backend-v2",
+				Backend:   confsuite.InfraBackendServiceNameV2,
 				Namespace: ns,
 			},
 			{
 				Request:   http.Request{Host: "listener-set-http-routing-1-listener-2.com", Path: "/listener-set-http-routing-1-route"},
-				Backend:   "infra-backend-v2",
+				Backend:   confsuite.InfraBackendServiceNameV2,
 				Namespace: ns,
 			},
 			{
@@ -233,7 +233,7 @@ var ListenerSetHTTPRouting = confsuite.ConformanceTest{
 			},
 			{
 				Request:   http.Request{Host: "listener-set-http-routing-1-listener-1.com", Path: "/listener-set-http-routing-1-section-route"},
-				Backend:   "infra-backend-v3",
+				Backend:   confsuite.InfraBackendServiceNameV3,
 				Namespace: ns,
 			},
 			{
@@ -267,12 +267,12 @@ var ListenerSetHTTPRouting = confsuite.ConformanceTest{
 			},
 			{
 				Request:   http.Request{Host: "listener-set-http-routing-2-listener-1.com", Path: "/listener-set-http-routing-2-route"},
-				Backend:   "infra-backend-v2",
+				Backend:   confsuite.InfraBackendServiceNameV2,
 				Namespace: ns,
 			},
 			{
 				Request:   http.Request{Host: "listener-set-http-routing-2-listener-2.com", Path: "/listener-set-http-routing-2-route"},
-				Backend:   "infra-backend-v2",
+				Backend:   confsuite.InfraBackendServiceNameV2,
 				Namespace: ns,
 			},
 		}

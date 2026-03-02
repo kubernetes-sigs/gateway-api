@@ -75,7 +75,7 @@ var HTTPRouteServiceTypes = confsuite.ConformanceTest{
 		kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN)
 
 		deployment := &appsv1.Deployment{}
-		err := suite.Client.Get(ctx, client.ObjectKey{Namespace: ns, Name: "infra-backend-v1"}, deployment)
+		err := suite.Client.Get(ctx, client.ObjectKey{Namespace: ns, Name: confsuite.InfraBackendServiceNameV1}, deployment)
 		require.NoError(t, err, "Failed to fetch Deployment 'infra-backend-v1'")
 
 		selector, err := metav1.LabelSelectorAsSelector(deployment.Spec.Selector)
@@ -93,7 +93,7 @@ var HTTPRouteServiceTypes = confsuite.ConformanceTest{
 			expected := http.ExpectedResponse{
 				Request:   http.Request{Path: "/" + path},
 				Response:  http.Response{StatusCode: 200},
-				Backend:   "infra-backend-v1",
+				Backend:   confsuite.InfraBackendServiceNameV1,
 				Namespace: confsuite.InfrastructureNamespace,
 			}
 

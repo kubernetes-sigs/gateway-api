@@ -49,27 +49,27 @@ var HTTPRouteQueryParamMatching = confsuite.ConformanceTest{
 
 		testCases := []http.ExpectedResponse{{
 			Request:   http.Request{Path: "/?animal=whale"},
-			Backend:   "infra-backend-v1",
+			Backend:   confsuite.InfraBackendServiceNameV1,
 			Namespace: ns,
 		}, {
 			Request:   http.Request{Path: "/?animal=dolphin"},
-			Backend:   "infra-backend-v2",
+			Backend:   confsuite.InfraBackendServiceNameV2,
 			Namespace: ns,
 		}, {
 			Request:   http.Request{Path: "/?animal=dolphin&color=blue"},
-			Backend:   "infra-backend-v3",
+			Backend:   confsuite.InfraBackendServiceNameV3,
 			Namespace: ns,
 		}, {
 			Request:   http.Request{Path: "/?ANIMAL=Whale"},
-			Backend:   "infra-backend-v3",
+			Backend:   confsuite.InfraBackendServiceNameV3,
 			Namespace: ns,
 		}, {
 			Request:   http.Request{Path: "/?animal=whale&otherparam=irrelevant"},
-			Backend:   "infra-backend-v1",
+			Backend:   confsuite.InfraBackendServiceNameV1,
 			Namespace: ns,
 		}, {
 			Request:   http.Request{Path: "/?animal=dolphin&color=yellow"},
-			Backend:   "infra-backend-v2",
+			Backend:   confsuite.InfraBackendServiceNameV2,
 			Namespace: ns,
 		}, {
 			Request:  http.Request{Path: "/?color=blue"},
@@ -89,17 +89,17 @@ var HTTPRouteQueryParamMatching = confsuite.ConformanceTest{
 		testCases = append(testCases, []http.ExpectedResponse{
 			{
 				Request:   http.Request{Path: "/path1?animal=whale"},
-				Backend:   "infra-backend-v1",
+				Backend:   confsuite.InfraBackendServiceNameV1,
 				Namespace: ns,
 			},
 			{
 				Request:   http.Request{Headers: map[string]string{"version": "one"}, Path: "/?animal=whale"},
-				Backend:   "infra-backend-v2",
+				Backend:   confsuite.InfraBackendServiceNameV2,
 				Namespace: ns,
 			},
 			{
 				Request:   http.Request{Headers: map[string]string{"version": "two"}, Path: "/path2?animal=whale"},
-				Backend:   "infra-backend-v3",
+				Backend:   confsuite.InfraBackendServiceNameV3,
 				Namespace: ns,
 			},
 		}...)
@@ -109,12 +109,12 @@ var HTTPRouteQueryParamMatching = confsuite.ConformanceTest{
 		testCases = append(testCases, []http.ExpectedResponse{
 			{
 				Request:   http.Request{Path: "/path3?animal=shark"},
-				Backend:   "infra-backend-v1",
+				Backend:   confsuite.InfraBackendServiceNameV1,
 				Namespace: ns,
 			},
 			{
 				Request:   http.Request{Headers: map[string]string{"version": "three"}, Path: "/path4?animal=kraken"},
-				Backend:   "infra-backend-v1",
+				Backend:   confsuite.InfraBackendServiceNameV1,
 				Namespace: ns,
 			},
 		}...)
@@ -137,12 +137,12 @@ var HTTPRouteQueryParamMatching = confsuite.ConformanceTest{
 		testCases = append(testCases, []http.ExpectedResponse{
 			{
 				Request:   http.Request{Path: "/path5?animal=hydra"},
-				Backend:   "infra-backend-v1",
+				Backend:   confsuite.InfraBackendServiceNameV1,
 				Namespace: ns,
 			},
 			{
 				Request:   http.Request{Headers: map[string]string{"version": "four"}, Path: "/?animal=hydra"},
-				Backend:   "infra-backend-v3",
+				Backend:   confsuite.InfraBackendServiceNameV3,
 				Namespace: ns,
 			},
 		}...)

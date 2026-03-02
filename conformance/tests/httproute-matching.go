@@ -48,40 +48,40 @@ var HTTPRouteMatching = confsuite.ConformanceTest{
 
 		testCases := []http.ExpectedResponse{{
 			Request:   http.Request{Path: "/"},
-			Backend:   "infra-backend-v1",
+			Backend:   confsuite.InfraBackendServiceNameV1,
 			Namespace: ns,
 		}, {
 			Request:   http.Request{Path: "/example"},
-			Backend:   "infra-backend-v1",
+			Backend:   confsuite.InfraBackendServiceNameV1,
 			Namespace: ns,
 		}, {
 			Request:   http.Request{Path: "/", Headers: map[string]string{"Version": "one"}},
-			Backend:   "infra-backend-v1",
+			Backend:   confsuite.InfraBackendServiceNameV1,
 			Namespace: ns,
 		}, {
 			Request:   http.Request{Path: "/v2"},
-			Backend:   "infra-backend-v2",
+			Backend:   confsuite.InfraBackendServiceNameV2,
 			Namespace: ns,
 		}, {
 			Request:   http.Request{Path: "/v2/example"},
-			Backend:   "infra-backend-v2",
+			Backend:   confsuite.InfraBackendServiceNameV2,
 			Namespace: ns,
 		}, {
 			Request:   http.Request{Path: "/", Headers: map[string]string{"Version": "two"}},
-			Backend:   "infra-backend-v2",
+			Backend:   confsuite.InfraBackendServiceNameV2,
 			Namespace: ns,
 		}, {
 			Request:   http.Request{Path: "/v2/"},
-			Backend:   "infra-backend-v2",
+			Backend:   confsuite.InfraBackendServiceNameV2,
 			Namespace: ns,
 		}, {
 			// Not a path segment prefix so should not match /v2.
 			Request:   http.Request{Path: "/v2example"},
-			Backend:   "infra-backend-v1",
+			Backend:   confsuite.InfraBackendServiceNameV1,
 			Namespace: ns,
 		}, {
 			Request:   http.Request{Path: "/foo/v2/example"},
-			Backend:   "infra-backend-v1",
+			Backend:   confsuite.InfraBackendServiceNameV1,
 			Namespace: ns,
 		}}
 
