@@ -85,7 +85,7 @@ var GatewayFrontendClientCertificateValidation = confsuite.ConformanceTest{
 			expectedSuccess := http.ExpectedResponse{
 				Request:   http.Request{Host: "example.org", Path: "/"},
 				Response:  http.Response{StatusCode: 200},
-				Backend:   "infra-backend-v1",
+				Backend:   confsuite.InfraBackendServiceName,
 				Namespace: confsuite.InfrastructureNamespace,
 			}
 			tls.MakeTLSRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, defaultAddr, serverCertPem, clientCertPem, clientCertKey, "example.org", expectedSuccess)
@@ -105,7 +105,7 @@ var GatewayFrontendClientCertificateValidation = confsuite.ConformanceTest{
 			expectedSucces := http.ExpectedResponse{
 				Request:   http.Request{Host: "second-example.org", Path: "/"},
 				Response:  http.Response{StatusCode: 200},
-				Backend:   "infra-backend-v2",
+				Backend:   confsuite.InfraBackendServiceNameV2,
 				Namespace: confsuite.InfrastructureNamespace,
 			}
 			tls.MakeTLSRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, perPortAddr, serverCertPem, clientCertPerPortPem, clientCertPerPortKey, "second-example.org", expectedSucces)

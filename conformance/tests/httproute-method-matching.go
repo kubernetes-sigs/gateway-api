@@ -50,11 +50,11 @@ var HTTPRouteMethodMatching = confsuite.ConformanceTest{
 		testCases := []http.ExpectedResponse{
 			{
 				Request:   http.Request{Method: "POST", Path: "/"},
-				Backend:   "infra-backend-v1",
+				Backend:   confsuite.InfraBackendServiceName,
 				Namespace: ns,
 			}, {
 				Request:   http.Request{Method: "GET", Path: "/"},
-				Backend:   "infra-backend-v2",
+				Backend:   confsuite.InfraBackendServiceNameV2,
 				Namespace: ns,
 			}, {
 				Request:  http.Request{Method: "HEAD", Path: "/"},
@@ -66,17 +66,17 @@ var HTTPRouteMethodMatching = confsuite.ConformanceTest{
 		testCases = append(testCases, []http.ExpectedResponse{
 			{
 				Request:   http.Request{Path: "/path1", Method: "GET"},
-				Backend:   "infra-backend-v1",
+				Backend:   confsuite.InfraBackendServiceName,
 				Namespace: ns,
 			},
 			{
 				Request:   http.Request{Headers: map[string]string{"version": "one"}, Path: "/", Method: "PUT"},
-				Backend:   "infra-backend-v2",
+				Backend:   confsuite.InfraBackendServiceNameV2,
 				Namespace: ns,
 			},
 			{
 				Request:   http.Request{Headers: map[string]string{"version": "two"}, Path: "/path2", Method: "POST"},
-				Backend:   "infra-backend-v3",
+				Backend:   confsuite.InfraBackendServiceNameV3,
 				Namespace: ns,
 			},
 		}...)
@@ -86,12 +86,12 @@ var HTTPRouteMethodMatching = confsuite.ConformanceTest{
 		testCases = append(testCases, []http.ExpectedResponse{
 			{
 				Request:   http.Request{Path: "/path3", Method: "PATCH"},
-				Backend:   "infra-backend-v1",
+				Backend:   confsuite.InfraBackendServiceName,
 				Namespace: ns,
 			},
 			{
 				Request:   http.Request{Headers: map[string]string{"version": "three"}, Path: "/path4", Method: "DELETE"},
-				Backend:   "infra-backend-v1",
+				Backend:   confsuite.InfraBackendServiceName,
 				Namespace: ns,
 			},
 		}...)
@@ -114,12 +114,12 @@ var HTTPRouteMethodMatching = confsuite.ConformanceTest{
 		testCases = append(testCases, []http.ExpectedResponse{
 			{
 				Request:   http.Request{Path: "/path5", Method: "PATCH"},
-				Backend:   "infra-backend-v1",
+				Backend:   confsuite.InfraBackendServiceName,
 				Namespace: ns,
 			},
 			{
 				Request:   http.Request{Headers: map[string]string{"version": "four"}, Path: "/", Method: "PATCH"},
-				Backend:   "infra-backend-v2",
+				Backend:   confsuite.InfraBackendServiceNameV2,
 				Namespace: ns,
 			},
 		}...)

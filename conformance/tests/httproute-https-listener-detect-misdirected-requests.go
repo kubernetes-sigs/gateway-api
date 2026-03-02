@@ -68,25 +68,25 @@ var HTTPRouteHTTPSListenerDetectMisdirectedRequests = confsuite.ConformanceTest{
 			backend    string
 			serverName string
 		}{
-			{serverName: "example.org", host: "example.org", statusCode: 200, backend: "infra-backend-v1"},
+			{serverName: "example.org", host: "example.org", statusCode: 200, backend: confsuite.InfraBackendServiceName},
 			{serverName: "example.org", host: "second-example.org", statusCode: 421},
 			{serverName: "example.org", host: "unknown-example.org", statusCode: 404},
 
-			{serverName: "second-example.org", host: "second-example.org", statusCode: 200, backend: "infra-backend-v2"},
+			{serverName: "second-example.org", host: "second-example.org", statusCode: 200, backend: confsuite.InfraBackendServiceNameV2},
 			{serverName: "second-example.org", host: "example.org", statusCode: 421},
 			{serverName: "second-example.org", host: "unknown-example.org", statusCode: 421},
 
-			{serverName: "third-example.wildcard.org", host: "third-example.wildcard.org", statusCode: 200, backend: "infra-backend-v3"},
-			{serverName: "third-example.wildcard.org", host: "fith-example.wildcard.org", statusCode: 200, backend: "infra-backend-v3"},
+			{serverName: "third-example.wildcard.org", host: "third-example.wildcard.org", statusCode: 200, backend: confsuite.InfraBackendServiceNameV3},
+			{serverName: "third-example.wildcard.org", host: "fith-example.wildcard.org", statusCode: 200, backend: confsuite.InfraBackendServiceNameV3},
 			{serverName: "third-example.wildcard.org", host: "fourth-example.wildcard.org", statusCode: 421},
 			{serverName: "third-example.wildcard.org", host: "second-example.org", statusCode: 421},
 			{serverName: "third-example.wildcard.org", host: "unknown-example.org", statusCode: 421},
 
 			// Note: Since infra-backend-v4 does not exist, infra-backend-v1 is reused for the fourth HTTPRoute
-			{serverName: "fourth-example.wildcard.org", host: "fourth-example.wildcard.org", statusCode: 200, backend: "infra-backend-v1"},
+			{serverName: "fourth-example.wildcard.org", host: "fourth-example.wildcard.org", statusCode: 200, backend: confsuite.InfraBackendServiceName},
 			{serverName: "fourth-example.wildcard.org", host: "fith-example.wildcard.org", statusCode: 421},
 
-			{serverName: "unknown-example.org", host: "example.org", statusCode: 200, backend: "infra-backend-v1"},
+			{serverName: "unknown-example.org", host: "example.org", statusCode: 200, backend: confsuite.InfraBackendServiceName},
 			{serverName: "unknown-example.org", host: "unknown-example.org", statusCode: 404},
 		}
 

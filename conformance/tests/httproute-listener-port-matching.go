@@ -64,19 +64,19 @@ var HTTPRouteListenerPortMatching = confsuite.ConformanceTest{
 
 		testCases := []http.ExpectedResponse{{
 			Request:   http.Request{Host: "foo.com", Path: "/"},
-			Backend:   "infra-backend-v1",
+			Backend:   confsuite.InfraBackendServiceName,
 			Namespace: ns,
 		}, {
 			Request:   http.Request{Host: "foo.com:8080", Path: "/"},
-			Backend:   "infra-backend-v2",
+			Backend:   confsuite.InfraBackendServiceNameV2,
 			Namespace: ns,
 		}, {
 			Request:   http.Request{Host: "bar.com:8080", Path: "/"},
-			Backend:   "infra-backend-v2",
+			Backend:   confsuite.InfraBackendServiceNameV2,
 			Namespace: ns,
 		}, {
 			Request:   http.Request{Host: "foo.com:8090", Path: "/"},
-			Backend:   "infra-backend-v3",
+			Backend:   confsuite.InfraBackendServiceNameV3,
 			Namespace: ns,
 		}, {
 			Request:  http.Request{Host: "bar.com:8090", Path: "/"},

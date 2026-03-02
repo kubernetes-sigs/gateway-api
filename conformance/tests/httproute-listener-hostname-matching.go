@@ -62,27 +62,27 @@ var HTTPRouteListenerHostnameMatching = confsuite.ConformanceTest{
 
 		testCases := []http.ExpectedResponse{{
 			Request:   http.Request{Host: "bar.com", Path: "/"},
-			Backend:   "infra-backend-v1",
+			Backend:   confsuite.InfraBackendServiceName,
 			Namespace: ns,
 		}, {
 			Request:   http.Request{Host: "foo.bar.com", Path: "/"},
-			Backend:   "infra-backend-v2",
+			Backend:   confsuite.InfraBackendServiceNameV2,
 			Namespace: ns,
 		}, {
 			Request:   http.Request{Host: "baz.bar.com", Path: "/"},
-			Backend:   "infra-backend-v3",
+			Backend:   confsuite.InfraBackendServiceNameV3,
 			Namespace: ns,
 		}, {
 			Request:   http.Request{Host: "boo.bar.com", Path: "/"},
-			Backend:   "infra-backend-v3",
+			Backend:   confsuite.InfraBackendServiceNameV3,
 			Namespace: ns,
 		}, {
 			Request:   http.Request{Host: "multiple.prefixes.bar.com", Path: "/"},
-			Backend:   "infra-backend-v3",
+			Backend:   confsuite.InfraBackendServiceNameV3,
 			Namespace: ns,
 		}, {
 			Request:   http.Request{Host: "multiple.prefixes.foo.com", Path: "/"},
-			Backend:   "infra-backend-v3",
+			Backend:   confsuite.InfraBackendServiceNameV3,
 			Namespace: ns,
 		}, {
 			Request:  http.Request{Host: "foo.com", Path: "/"},

@@ -49,27 +49,27 @@ var HTTPRoutePathMatchOrder = confsuite.ConformanceTest{
 		testCases := []http.ExpectedResponse{
 			{
 				Request:   http.Request{Path: "/match/exact/one"},
-				Backend:   "infra-backend-v3",
+				Backend:   confsuite.InfraBackendServiceNameV3,
 				Namespace: ns,
 			}, {
 				Request:   http.Request{Path: "/match/exact"},
-				Backend:   "infra-backend-v2",
+				Backend:   confsuite.InfraBackendServiceNameV2,
 				Namespace: ns,
 			}, {
 				Request:   http.Request{Path: "/match"},
-				Backend:   "infra-backend-v1",
+				Backend:   confsuite.InfraBackendServiceName,
 				Namespace: ns,
 			}, {
 				Request:   http.Request{Path: "/match/prefix/one/any"},
-				Backend:   "infra-backend-v2",
+				Backend:   confsuite.InfraBackendServiceNameV2,
 				Namespace: ns,
 			}, {
 				Request:   http.Request{Path: "/match/prefix/any"},
-				Backend:   "infra-backend-v1",
+				Backend:   confsuite.InfraBackendServiceName,
 				Namespace: ns,
 			}, {
 				Request:   http.Request{Path: "/match/any"},
-				Backend:   "infra-backend-v3",
+				Backend:   confsuite.InfraBackendServiceNameV3,
 				Namespace: ns,
 			},
 		}

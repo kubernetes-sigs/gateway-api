@@ -77,11 +77,11 @@ var HTTPRouteRequestPercentageMirror = confsuite.ConformanceTest{
 						Path: "/percent-mirror",
 					},
 				},
-				Backend: "infra-backend-v1",
+				Backend: confsuite.InfraBackendServiceName,
 				MirroredTo: []http.MirroredBackend{
 					{
 						BackendRef: http.BackendRef{
-							Name:      "infra-backend-v2",
+							Name:      confsuite.InfraBackendServiceNameV2,
 							Namespace: ns,
 						},
 						Percent: ptr.To(int32(20)),
@@ -95,11 +95,11 @@ var HTTPRouteRequestPercentageMirror = confsuite.ConformanceTest{
 						Path: "/percent-mirror-fraction",
 					},
 				},
-				Backend: "infra-backend-v1",
+				Backend: confsuite.InfraBackendServiceName,
 				MirroredTo: []http.MirroredBackend{
 					{
 						BackendRef: http.BackendRef{
-							Name:      "infra-backend-v2",
+							Name:      confsuite.InfraBackendServiceNameV2,
 							Namespace: ns,
 						},
 						Percent: ptr.To(int32(50)),
@@ -125,11 +125,11 @@ var HTTPRouteRequestPercentageMirror = confsuite.ConformanceTest{
 					AbsentHeaders: []string{"X-Header-Remove"},
 				},
 				Namespace: ns,
-				Backend:   "infra-backend-v1",
+				Backend:   confsuite.InfraBackendServiceName,
 				MirroredTo: []http.MirroredBackend{
 					{
 						BackendRef: http.BackendRef{
-							Name:      "infra-backend-v2",
+							Name:      confsuite.InfraBackendServiceNameV2,
 							Namespace: ns,
 						},
 						Percent: ptr.To(int32(35)),

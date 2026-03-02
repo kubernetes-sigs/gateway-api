@@ -52,7 +52,7 @@ var GatewayHTTPListenerIsolation = confsuite.ConformanceTest{
 			// Requests to the empty-hostname listener
 			{
 				Request:   http.Request{Host: "bar.com", Path: "/empty-hostname"},
-				Backend:   "infra-backend-v1",
+				Backend:   confsuite.InfraBackendServiceName,
 				Namespace: ns,
 			},
 			{
@@ -74,7 +74,7 @@ var GatewayHTTPListenerIsolation = confsuite.ConformanceTest{
 			},
 			{
 				Request:   http.Request{Host: "bar.example.com", Path: "/wildcard-example-com"},
-				Backend:   "infra-backend-v1",
+				Backend:   confsuite.InfraBackendServiceName,
 				Namespace: ns,
 			},
 			{
@@ -96,7 +96,7 @@ var GatewayHTTPListenerIsolation = confsuite.ConformanceTest{
 			},
 			{
 				Request:   http.Request{Host: "bar.foo.example.com", Path: "/wildcard-foo-example-com"},
-				Backend:   "infra-backend-v1",
+				Backend:   confsuite.InfraBackendServiceName,
 				Namespace: ns,
 			},
 			{
@@ -119,7 +119,7 @@ var GatewayHTTPListenerIsolation = confsuite.ConformanceTest{
 			},
 			{
 				Request:   http.Request{Host: "abc.foo.example.com", Path: "/abc-foo-example-com"},
-				Backend:   "infra-backend-v1",
+				Backend:   confsuite.InfraBackendServiceName,
 				Namespace: ns,
 			},
 		}

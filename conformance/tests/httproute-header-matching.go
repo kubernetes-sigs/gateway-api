@@ -48,19 +48,19 @@ var HTTPRouteHeaderMatching = confsuite.ConformanceTest{
 
 		testCases := []http.ExpectedResponse{{
 			Request:   http.Request{Path: "/", Headers: map[string]string{"Version": "one"}},
-			Backend:   "infra-backend-v1",
+			Backend:   confsuite.InfraBackendServiceName,
 			Namespace: ns,
 		}, {
 			Request:   http.Request{Path: "/", Headers: map[string]string{"Version": "two"}},
-			Backend:   "infra-backend-v2",
+			Backend:   confsuite.InfraBackendServiceNameV2,
 			Namespace: ns,
 		}, {
 			Request:   http.Request{Path: "/", Headers: map[string]string{"Version": "two", "Color": "orange"}},
-			Backend:   "infra-backend-v1",
+			Backend:   confsuite.InfraBackendServiceName,
 			Namespace: ns,
 		}, {
 			Request:   http.Request{Path: "/", Headers: map[string]string{"Version": "two", "Color": "blue"}},
-			Backend:   "infra-backend-v2",
+			Backend:   confsuite.InfraBackendServiceNameV2,
 			Namespace: ns,
 		}, {
 			Request:  http.Request{Path: "/", Headers: map[string]string{"Color": "orange"}},
@@ -70,19 +70,19 @@ var HTTPRouteHeaderMatching = confsuite.ConformanceTest{
 			Response: http.Response{StatusCode: 404},
 		}, {
 			Request:   http.Request{Path: "/", Headers: map[string]string{"Color": "blue"}},
-			Backend:   "infra-backend-v1",
+			Backend:   confsuite.InfraBackendServiceName,
 			Namespace: ns,
 		}, {
 			Request:   http.Request{Path: "/", Headers: map[string]string{"Color": "green"}},
-			Backend:   "infra-backend-v1",
+			Backend:   confsuite.InfraBackendServiceName,
 			Namespace: ns,
 		}, {
 			Request:   http.Request{Path: "/", Headers: map[string]string{"Color": "red"}},
-			Backend:   "infra-backend-v2",
+			Backend:   confsuite.InfraBackendServiceNameV2,
 			Namespace: ns,
 		}, {
 			Request:   http.Request{Path: "/", Headers: map[string]string{"Color": "yellow"}},
-			Backend:   "infra-backend-v2",
+			Backend:   confsuite.InfraBackendServiceNameV2,
 			Namespace: ns,
 		}, {
 			Request:  http.Request{Path: "/", Headers: map[string]string{"Color": "purple"}},

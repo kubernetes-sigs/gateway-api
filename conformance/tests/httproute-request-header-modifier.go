@@ -77,7 +77,7 @@ var HTTPRouteRequestHeaderModifier = confsuite.ConformanceTest{
 					},
 				},
 			},
-			Backend:   "infra-backend-v1",
+			Backend:   confsuite.InfraBackendServiceName,
 			Namespace: ns,
 		}, {
 			Request: http.Request{
@@ -96,7 +96,7 @@ var HTTPRouteRequestHeaderModifier = confsuite.ConformanceTest{
 					},
 				},
 			},
-			Backend:   "infra-backend-v1",
+			Backend:   confsuite.InfraBackendServiceName,
 			Namespace: ns,
 		}, {
 			Request: http.Request{
@@ -114,7 +114,7 @@ var HTTPRouteRequestHeaderModifier = confsuite.ConformanceTest{
 					},
 				},
 			},
-			Backend:   "infra-backend-v1",
+			Backend:   confsuite.InfraBackendServiceName,
 			Namespace: ns,
 		}, {
 			Request: http.Request{
@@ -133,7 +133,7 @@ var HTTPRouteRequestHeaderModifier = confsuite.ConformanceTest{
 					},
 				},
 			},
-			Backend:   "infra-backend-v1",
+			Backend:   confsuite.InfraBackendServiceName,
 			Namespace: ns,
 		}, {
 			Request: http.Request{
@@ -148,7 +148,7 @@ var HTTPRouteRequestHeaderModifier = confsuite.ConformanceTest{
 				},
 				AbsentHeaders: []string{"X-Header-Remove"},
 			},
-			Backend:   "infra-backend-v1",
+			Backend:   confsuite.InfraBackendServiceName,
 			Namespace: ns,
 		}, {
 			Request: http.Request{
@@ -174,7 +174,7 @@ var HTTPRouteRequestHeaderModifier = confsuite.ConformanceTest{
 				},
 				AbsentHeaders: []string{"X-Header-Remove-1", "X-Header-Remove-2"},
 			},
-			Backend:   "infra-backend-v1",
+			Backend:   confsuite.InfraBackendServiceName,
 			Namespace: ns,
 		}, {
 			Request: http.Request{
@@ -199,7 +199,7 @@ var HTTPRouteRequestHeaderModifier = confsuite.ConformanceTest{
 				},
 				AbsentHeaders: []string{"x-header-remove", "X-Header-Remove"},
 			},
-			Backend:   "infra-backend-v1",
+			Backend:   confsuite.InfraBackendServiceName,
 			Namespace: ns,
 		}}
 

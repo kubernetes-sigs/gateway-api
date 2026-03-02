@@ -31,6 +31,13 @@ const (
 	// InfrastructureGatewayName is the default Gateway name in the infra namespace
 	InfrastructureGatewayName = "gateway-conformance-infra-test"
 
+	// InfraBackendServiceName is the name of the main infra backend service
+	InfraBackendServiceName = "infra-backend-v1"
+	// InfraBackendServiceNameV2 is the name of the v2 infra backend service
+	InfraBackendServiceNameV2 = "infra-backend-v2"
+	// InfraBackendServiceNameV3 is the name of the v3 infra backend service
+	InfraBackendServiceNameV3 = "infra-backend-v3"
+
 	// undefinedKeyword is set in the ConformanceReport "GatewayAPIVersion" and
 	// "GatewayAPIChannel" fields in case it's not possible to figure out the actual
 	// values in the cluster, due to multiple versions of CRDs installed.

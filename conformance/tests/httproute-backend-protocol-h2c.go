@@ -59,7 +59,7 @@ var HTTPRouteBackendProtocolH2C = confsuite.ConformanceTest{
 					Protocol: roundtripper.H2CPriorKnowledgeProtocol,
 				},
 				Response:  http.Response{StatusCode: 200},
-				Backend:   "infra-backend-v1",
+				Backend:   confsuite.InfraBackendServiceName,
 				Namespace: confsuite.InfrastructureNamespace,
 			})
 		})

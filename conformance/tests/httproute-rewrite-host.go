@@ -59,7 +59,7 @@ var HTTPRouteRewriteHost = confsuite.ConformanceTest{
 						Host: "one.example.org",
 					},
 				},
-				Backend:   "infra-backend-v1",
+				Backend:   confsuite.InfraBackendServiceName,
 				Namespace: ns,
 			}, {
 				Request: http.Request{
@@ -72,7 +72,7 @@ var HTTPRouteRewriteHost = confsuite.ConformanceTest{
 						Host: "example.org",
 					},
 				},
-				Backend:   "infra-backend-v2",
+				Backend:   confsuite.InfraBackendServiceNameV2,
 				Namespace: ns,
 			}, {
 				Request: http.Request{
@@ -95,7 +95,7 @@ var HTTPRouteRewriteHost = confsuite.ConformanceTest{
 					},
 					AbsentHeaders: []string{"X-Header-Remove"},
 				},
-				Backend:   "infra-backend-v2",
+				Backend:   confsuite.InfraBackendServiceNameV2,
 				Namespace: ns,
 			},
 		}

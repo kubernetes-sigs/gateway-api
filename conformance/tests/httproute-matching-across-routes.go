@@ -53,21 +53,21 @@ var HTTPRouteMatchingAcrossRoutes = confsuite.ConformanceTest{
 				Host: "example.com",
 				Path: "/",
 			},
-			Backend:   "infra-backend-v1",
+			Backend:   confsuite.InfraBackendServiceName,
 			Namespace: ns,
 		}, {
 			Request: http.Request{
 				Host: "example.com",
 				Path: "/example",
 			},
-			Backend:   "infra-backend-v1",
+			Backend:   confsuite.InfraBackendServiceName,
 			Namespace: ns,
 		}, {
 			Request: http.Request{
 				Host: "example.net",
 				Path: "/example",
 			},
-			Backend:   "infra-backend-v1",
+			Backend:   confsuite.InfraBackendServiceName,
 			Namespace: ns,
 		}, {
 			Request: http.Request{
@@ -75,14 +75,14 @@ var HTTPRouteMatchingAcrossRoutes = confsuite.ConformanceTest{
 				Path:    "/example",
 				Headers: map[string]string{"Version": "one"},
 			},
-			Backend:   "infra-backend-v1",
+			Backend:   confsuite.InfraBackendServiceName,
 			Namespace: ns,
 		}, {
 			Request: http.Request{
 				Host: "example.com",
 				Path: "/v2",
 			},
-			Backend:   "infra-backend-v2",
+			Backend:   confsuite.InfraBackendServiceNameV2,
 			Namespace: ns,
 		}, {
 			Request: http.Request{
@@ -90,14 +90,14 @@ var HTTPRouteMatchingAcrossRoutes = confsuite.ConformanceTest{
 				Host: "example.net",
 				Path: "/v2",
 			},
-			Backend:   "infra-backend-v1",
+			Backend:   confsuite.InfraBackendServiceName,
 			Namespace: ns,
 		}, {
 			Request: http.Request{
 				Host: "example.com",
 				Path: "/v2/example",
 			},
-			Backend:   "infra-backend-v2",
+			Backend:   confsuite.InfraBackendServiceNameV2,
 			Namespace: ns,
 		}, {
 			Request: http.Request{
@@ -105,7 +105,7 @@ var HTTPRouteMatchingAcrossRoutes = confsuite.ConformanceTest{
 				Path:    "/",
 				Headers: map[string]string{"Version": "two"},
 			},
-			Backend:   "infra-backend-v2",
+			Backend:   confsuite.InfraBackendServiceNameV2,
 			Namespace: ns,
 		}}
 
