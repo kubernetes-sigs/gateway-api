@@ -357,8 +357,23 @@ func renderFeatureTablesFiltered() {
 	avail := getAvailableFeatureIDs()
 	renderTable("gateway-features", "http", "", "Gateway ", filterFeatures(featHTTPGateway, avail))
 	renderTable("http-route-core", "http", "", "", []featureDef{{ID: "HTTPRouteCore", Label: "Core"}})
-	renderTable("http-route-features", "http", "HTTPRoute", "HTTPRoute ", filterFeatures(featHTTPRoute, avail))
-	renderTable("backend-tls-features", "http", "Backend TLS", "Backend TLS ", filterFeatures(featHTTPBackend, avail))
+	// HTTPRoute table: HTTPRoute subhead + features, then Backend TLS subhead + features (no separate intro/heading)
+	httpRouteAndBackend := make([]featureDef, 0)
+	httpFeat := filterFeatures(featHTTPRoute, avail)
+	if len(httpFeat) > 0 {
+		httpRouteAndBackend = append(httpRouteAndBackend, featureDef{ID: "__subhead__", Label: "HTTPRoute"})
+		for _, f := range httpFeat {
+			httpRouteAndBackend = append(httpRouteAndBackend, featureDef{ID: f.ID, Label: stripLabelPrefix(f.Label, "HTTPRoute "), Description: f.Description})
+		}
+	}
+	backendFeat := filterFeatures(featHTTPBackend, avail)
+	if len(backendFeat) > 0 {
+		httpRouteAndBackend = append(httpRouteAndBackend, featureDef{ID: "__subhead__", Label: "Backend TLS"})
+		for _, f := range backendFeat {
+			httpRouteAndBackend = append(httpRouteAndBackend, featureDef{ID: f.ID, Label: stripLabelPrefix(f.Label, "Backend TLS "), Description: f.Description})
+		}
+	}
+	renderTable("http-route-features", "http", "", "", httpRouteAndBackend)
 	renderTable("grpc-features", "grpc", "Gateway", "Gateway ", filterFeatures(featGRPC, avail))
 	renderTable("tls-features", "tls", "Gateway", "Gateway ", filterFeatures(featTLS, avail))
 }
@@ -381,6 +396,10 @@ func renderTable(tableID string, section string, subhead string, labelPrefix str
 		html.WriteString(fmt.Sprintf(`<tr class="feature-subhead"><th scope="col">%s</th><th scope="col">Requirement</th></tr>`, escapeHTML(subhead)))
 	}
 	for _, f := range rows {
+		if f.ID == "__subhead__" {
+			html.WriteString(fmt.Sprintf(`<tr class="feature-subhead"><th scope="col">%s</th><th scope="col">Requirement</th></tr>`, escapeHTML(f.Label)))
+			continue
+		}
 		label := f.Label
 		if labelPrefix != "" {
 			label = stripLabelPrefix(label, labelPrefix)

@@ -60,12 +60,6 @@
       <tbody></tbody>
     </table>
 
-    <h3 id="backend-tls">Backend TLS</h3>
-    <p class="section-intro">If you need TLS to backends, you can select the following extended features.</p>
-    <table class="features" id="backend-tls-features">
-      <tbody></tbody>
-    </table>
-
     <h3 id="grpcroute">GRPCRoute</h3>
     <p class="conformance-intro">Extended features from the <a id="link-grpcroute"
         href="https://gateway-api.sigs.k8s.io/implementations/v1.4/#grpcroute" target="_blank" rel="noopener">GRPCRoute
@@ -175,14 +169,11 @@
         httpRouteRows.push({ subhead: 'HTTPRoute' });
         httpRoute.forEach(f => httpRouteRows.push({ id: f.id, label: stripPrefix(f.label, 'HTTPRoute '), description: f.description }));
       }
-      renderTable('http-route-features', httpRouteRows, 'http');
-
-      const backendTlsRows = [];
       if (httpBackendTls.length > 0) {
-        backendTlsRows.push({ subhead: 'Backend TLS' });
-        httpBackendTls.forEach(f => backendTlsRows.push({ id: f.id, label: stripPrefix(f.label, 'Backend TLS '), description: f.description }));
+        httpRouteRows.push({ subhead: 'Backend TLS' });
+        httpBackendTls.forEach(f => httpRouteRows.push({ id: f.id, label: stripPrefix(f.label, 'Backend TLS '), description: f.description }));
       }
-      renderTable('backend-tls-features', backendTlsRows, 'http');
+      renderTable('http-route-features', httpRouteRows, 'http');
 
       const grpcRows = grpc.length > 0 ? [{ subhead: 'Gateway' }, ...grpc.map(f => ({ id: f.id, label: stripPrefix(f.label, 'Gateway '), description: f.description }))] : [];
       renderTable('grpc-features', grpcRows, 'grpc');
