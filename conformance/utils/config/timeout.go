@@ -200,4 +200,7 @@ func SetupTimeoutConfig(timeoutConfig *TimeoutConfig) {
 	if timeoutConfig.DefaultTestTimeout == 0 {
 		timeoutConfig.DefaultTestTimeout = defaultTimeoutConfig.DefaultTestTimeout
 	}
+	if timeoutConfig.DefaultPollInterval == 0 {
+		timeoutConfig.DefaultPollInterval = defaultTimeoutConfig.DefaultPollInterval
+	}
 }
