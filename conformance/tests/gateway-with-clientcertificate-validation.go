@@ -17,6 +17,7 @@ limitations under the License.
 package tests
 
 import (
+	"net"
 	"testing"
 
 	"k8s.io/apimachinery/pkg/types"
@@ -79,7 +80,7 @@ var GatewayFrontendClientCertificateValidation = suite.ConformanceTest{
 		}
 
 		t.Run("Validate default configuration", func(t *testing.T) {
-			defaultAddr := gwAddr + ":443"
+			defaultAddr := net.JoinHostPort(gwAddr, "443")
 
 			// Send request to the first listener and validate that it is passing
 			expectedSuccess := http.ExpectedResponse{
@@ -99,7 +100,7 @@ var GatewayFrontendClientCertificateValidation = suite.ConformanceTest{
 		})
 
 		t.Run("Validate per port configuration", func(t *testing.T) {
-			perPortAddr := gwAddr + ":8443"
+			perPortAddr := net.JoinHostPort(gwAddr, "8443")
 
 			// Send request to the second listener and validate that it is passing
 			expectedSucces := http.ExpectedResponse{

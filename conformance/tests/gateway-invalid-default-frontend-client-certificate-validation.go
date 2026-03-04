@@ -116,7 +116,7 @@ var GatewayFrontendInvalidDefaultClientCertificateValidation = suite.Conformance
 			}
 			kubernetes.GatewayListenerMustHaveConditions(t, suite.Client, suite.TimeoutConfig, gwNN, "https", expectedConditions)
 
-			httpsAddr := net.JoinHostPort(gwAddr, "80")
+			httpsAddr := net.JoinHostPort(gwAddr, "443")
 			expectedFailure := http.ExpectedResponse{
 				Request:   http.Request{Host: "example.org", Path: "/"},
 				Namespace: "gateway-conformance-infra",
