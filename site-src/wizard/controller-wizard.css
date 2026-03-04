@@ -296,6 +296,7 @@ table.results td a:hover {
 .intro .intro-source {
   font-size: 0.9375rem;
   color: var(--text-muted);
+  margin-bottom: 2em;
 }
 
 .warning-note p {
