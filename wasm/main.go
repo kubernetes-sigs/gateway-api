@@ -137,7 +137,7 @@ func main() {
 		}
 		name := target.Get("name").String()
 		if name == "req-http-HTTPRouteCore" {
-			updateHttpRouteExtendedVisibility()
+			updateHTTPRouteExtendedVisibility()
 		}
 		if name == "req-http-GatewayCore" {
 			updateGatewayExtendedVisibility()
@@ -375,10 +375,10 @@ func filterFeatures(list []featureDef, available map[string]bool) []featureDef {
 func renderFeatureTablesFiltered() {
 	avail := getAvailableFeatureIDs()
 	// Gateway: Core Features row first; extended table only visible when Core (Must have or Nice to have) is selected
-	renderTable("gateway-core", "http", "", "", []featureDef{{ID: "GatewayCore", Label: "Core Features"}}, false)
-	renderTable("gateway-features", "http", "", "Gateway ", filterFeatures(featHTTPGateway, avail), false)
+	renderTable("gateway-core", "http", "", []featureDef{{ID: "GatewayCore", Label: "Core Features"}}, false)
+	renderTable("gateway-features", "http", "Gateway ", filterFeatures(featHTTPGateway, avail), false)
 	// Core Features: show both "Must have" and "Nice to have" so extended block can open for either
-	renderTable("http-route-core", "http", "", "", []featureDef{{ID: "HTTPRouteCore", Label: "Core Features"}}, false)
+	renderTable("http-route-core", "http", "", []featureDef{{ID: "HTTPRouteCore", Label: "Core Features"}}, false)
 	// HTTPRoute table: HTTPRoute subhead + features, then Backend TLS subhead + features (no separate intro/heading)
 	httpRouteAndBackend := make([]featureDef, 0)
 	httpFeat := filterFeatures(featHTTPRoute, avail)
@@ -395,15 +395,15 @@ func renderFeatureTablesFiltered() {
 			httpRouteAndBackend = append(httpRouteAndBackend, featureDef{ID: f.ID, Label: stripLabelPrefix(f.Label, "Backend TLS "), Description: f.Description})
 		}
 	}
-	renderTable("http-route-features", "http", "", "", httpRouteAndBackend, false)
+	renderTable("http-route-features", "http", "", httpRouteAndBackend, false)
 	// GRPCRoute and TLSRoute: Core Features only; no extended feature table (use Gateway for that)
-	renderTable("grpc-route-core", "grpc", "", "", []featureDef{{ID: "GRPCRouteCore", Label: "Core Features"}}, false)
-	renderTable("tls-route-core", "tls", "", "", []featureDef{{ID: "TLSRouteCore", Label: "Core Features"}}, false)
+	renderTable("grpc-route-core", "grpc", "", []featureDef{{ID: "GRPCRouteCore", Label: "Core Features"}}, false)
+	renderTable("tls-route-core", "tls", "", []featureDef{{ID: "TLSRouteCore", Label: "Core Features"}}, false)
 	updateGatewayExtendedVisibility()
-	updateHttpRouteExtendedVisibility()
+	updateHTTPRouteExtendedVisibility()
 }
 
-func updateHttpRouteExtendedVisibility() {
+func updateHTTPRouteExtendedVisibility() {
 	wrap := doc.Call("getElementById", "http-route-extended-wrap")
 	if !wrap.Truthy() {
 		return
@@ -450,16 +450,13 @@ func stripLabelPrefix(label, prefix string) string {
 	return label
 }
 
-func renderTable(tableID string, section string, subhead string, labelPrefix string, rows []featureDef, mustHaveOnly bool) {
+func renderTable(tableID string, section string, labelPrefix string, rows []featureDef, mustHaveOnly bool) {
 	tbody := doc.Call("querySelector", "#"+tableID+" tbody")
 	if !tbody.Truthy() {
 		return
 	}
 	prefix := radioPrefix[section]
 	var html strings.Builder
-	if subhead != "" && len(rows) > 0 {
-		html.WriteString(fmt.Sprintf(`<tr class="feature-subhead"><th scope="col">%s</th><th scope="col">Requirement</th></tr>`, escapeHTML(subhead)))
-	}
 	for _, f := range rows {
 		if f.ID == "__subhead__" {
 			html.WriteString(fmt.Sprintf(`<tr class="feature-subhead"><th scope="col">%s</th><th scope="col">Requirement</th></tr>`, escapeHTML(f.Label)))
@@ -658,14 +655,14 @@ func recommend() {
 		isCore := id == "HTTPRouteCore" || id == "GatewayCore" || id == "GRPCRouteCore" || id == "TLSRouteCore"
 		if isCore {
 			resourceName := ""
-			switch {
-			case id == "GatewayCore":
+			switch id {
+			case "GatewayCore":
 				resourceName = "Gateway"
-			case id == "HTTPRouteCore":
+			case "HTTPRouteCore":
 				resourceName = "HTTPRoute"
-			case id == "GRPCRouteCore":
+			case "GRPCRouteCore":
 				resourceName = "GRPCRoute"
-			case id == "TLSRouteCore":
+			case "TLSRouteCore":
 				resourceName = "TLSRoute"
 			default:
 				resourceName = section
@@ -774,7 +771,7 @@ func resetAll() {
 	js.Global().Call("scrollTo", 0, 0)
 	notifyResize()
 	updateGatewayExtendedVisibility()
-	updateHttpRouteExtendedVisibility()
+	updateHTTPRouteExtendedVisibility()
 }
 
 func escapeHTML(s string) string {
