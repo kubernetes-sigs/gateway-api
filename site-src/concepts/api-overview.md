@@ -94,7 +94,7 @@ Gateway objects bind one or more **Addresses** to one or more **Listeners**.
 Listeners that are not **distinct** are in conflict, and Gateway API includes instructions for what happens in various conflict cases. What makes Listeners distinct is a bit complicated and is discussed in the Distinctiveness section (link).
 
 A critical reason for the requirement that Listeners are distinct is that traffic flowing through a Gateway **must only match a single Listener**.
-Any particular traffic must only be able to be asssigned to a single Listener, and once that Listener is chosen, the traffic **must** be routable via an attached, protcol-specific Route, **or it must be dropped by the Gateway**.
+Any particular traffic must only be able to be assigned to a single Listener, and once that Listener is chosen, the traffic **must** be routable via an attached, protocol-specific Route, **or it must be dropped by the Gateway**.
 
 The most important outcome here is that traffic can't fail to be routed by one Listener, then fall back to another for further processing.
 For more information on this, see the [Traffic Matching](traffic-matching.md) page.
@@ -240,7 +240,7 @@ The Route side of this is intended to ensure that, at all times, control over wh
 Chihiro, the Cluster Admin and Gateway owner, can limit what _shapes_ Routes that can attach to their Gateway can take (via their Kind or their namespace),but they can't force Ana to expose her application.
 The final decision, and control of the Route object, is always Ana's.
 
-The Listener side is intended to ensure that Ana's Route produces a valid confguration, and also matches Chihiro's requirements (if any) about what traffic is allowed to be exposed on that Gateway.
+The Listener side is intended to ensure that Ana's Route produces a valid configuration, and also matches Chihiro's requirements (if any) about what traffic is allowed to be exposed on that Gateway.
 
 ### Example
 

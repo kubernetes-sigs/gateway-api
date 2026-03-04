@@ -245,7 +245,7 @@ This means that controllers must:
 * Find all Gateways that roll up to those GatewayClasses that have `Accepted` Conditions with `status: true` (this is handled by the implementation).
 * Find all ListenerSets that point those Gateways that have `Accepted` Conditions with `status: true`.
   (Remember also that `hostname` fields must be unique across all Listeners attached to a Gateway,
-  whether those are in the Gateway or in attached ListnerSets.
+  whether those are in the Gateway or in attached ListenerSets.
   The implementation should handle this by setting ListenerSets to `Accepted` `status: false` for duplicates.)
 * Find all Routes that point to those Gateways or ListenerSets that have `Accepted` Conditions with `status: true`.
 * Do the hostname intersection calculation for each Gateway-Route pair or each ListenerSet-Route pair.

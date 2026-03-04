@@ -8,7 +8,7 @@ And, if that is not possible, that there is a way to find out what other objects
 
 ## Status and Conditions
 
-In particular, Gateway API has leant hard on the convention of Conditions, a portable respresentation of states of any given object.
+In particular, Gateway API has leant hard on the convention of Conditions, a portable representation of states of any given object.
 
 Conditions have:
 
