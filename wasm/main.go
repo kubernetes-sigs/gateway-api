@@ -413,10 +413,10 @@ func filterFeatures(list []featureDef, available map[string]bool) []featureDef {
 func renderFeatureTablesFiltered() {
 	avail := getAvailableFeatureIDs()
 	// Gateway: Core Features row first; extended table only visible when Core (Must have or Nice to have) is selected
-	renderTable("gateway-core", "http", "", []featureDef{{ID: "GatewayCore", Label: "Core Features"}}, false)
-	renderTable("gateway-features", "http", "Gateway ", filterFeatures(featHTTPGateway, avail), false)
+	renderTable("gateway-core", "http", "", []featureDef{{ID: "GatewayCore", Label: "Core Features"}})
+	renderTable("gateway-features", "http", "Gateway ", filterFeatures(featHTTPGateway, avail))
 	// Core Features: show both "Must have" and "Nice to have" so extended block can open for either
-	renderTable("http-route-core", "http", "", []featureDef{{ID: "HTTPRouteCore", Label: "Core Features"}}, false)
+	renderTable("http-route-core", "http", "", []featureDef{{ID: "HTTPRouteCore", Label: "Core Features"}})
 	// HTTPRoute table: HTTPRoute subhead + features, then Backend TLS subhead + features (no separate intro/heading)
 	httpRouteAndBackend := make([]featureDef, 0)
 	httpFeat := filterFeatures(featHTTPRoute, avail)
@@ -433,10 +433,10 @@ func renderFeatureTablesFiltered() {
 			httpRouteAndBackend = append(httpRouteAndBackend, featureDef{ID: f.ID, Label: stripLabelPrefix(f.Label, "Backend TLS "), Description: f.Description})
 		}
 	}
-	renderTable("http-route-features", "http", "", httpRouteAndBackend, false)
+	renderTable("http-route-features", "http", "", httpRouteAndBackend)
 	// GRPCRoute and TLSRoute: Core Features only; no extended feature table (use Gateway for that)
-	renderTable("grpc-route-core", "grpc", "", []featureDef{{ID: "GRPCRouteCore", Label: "Core Features"}}, false)
-	renderTable("tls-route-core", "tls", "", []featureDef{{ID: "TLSRouteCore", Label: "Core Features"}}, false)
+	renderTable("grpc-route-core", "grpc", "", []featureDef{{ID: "GRPCRouteCore", Label: "Core Features"}})
+	renderTable("tls-route-core", "tls", "", []featureDef{{ID: "TLSRouteCore", Label: "Core Features"}})
 	updateGatewayExtendedVisibility()
 	updateHTTPRouteExtendedVisibility()
 }
@@ -488,7 +488,7 @@ func stripLabelPrefix(label, prefix string) string {
 	return label
 }
 
-func renderTable(tableID string, section string, labelPrefix string, rows []featureDef, mustHaveOnly bool) {
+func renderTable(tableID string, section string, labelPrefix string, rows []featureDef) {
 	tbody := doc.Call("querySelector", "#"+tableID+" tbody")
 	if !tbody.Truthy() {
 		return
@@ -513,9 +513,6 @@ func renderTable(tableID string, section string, labelPrefix string, rows []feat
 		}
 		reqCell := `<label><input type="checkbox" name="` + name + `" value="must" /> Must have</label>
 <label><input type="checkbox" name="` + name + `" value="good" /> Nice to have</label>`
-		if mustHaveOnly {
-			reqCell = `<label><input type="checkbox" name="` + name + `" value="must" /> Must have</label>`
-		}
 		html.WriteString(fmt.Sprintf(`<tr><td class="%s"%s>%s</td><td>
 %s
 </td></tr>`, cellClass, dataDesc, escapeHTML(label), reqCell))
