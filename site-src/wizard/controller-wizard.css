@@ -251,7 +251,7 @@ table.results td a:hover {
   border-left: 4px solid var(--warning);
   padding: 12px 16px;
   margin: 0 0 8px 0;
-  font-size: 0.9375rem;
+  font-size: 0.85rem;
   border-radius: 0 4px 4px 0;
 }
 
