@@ -53,6 +53,7 @@ var (
 	doc             js.Value
 	impls           []implementation
 	allVersionsData map[string][]implementation
+	allVersionKeys  []string // all API version keys, newest first (used for min-version matching)
 	currentVersion  string
 	featHTTPGateway []featureDef
 	featHTTPRoute   []featureDef
@@ -254,15 +255,17 @@ func onDataLoaded(jsonStr string) {
 	sort.Slice(versionKeys, func(i, j int) bool {
 		return versionCompare(versionKeys[j], versionKeys[i]) < 0
 	})
-	if len(versionKeys) > maxVersionsInDropdown {
-		versionKeys = versionKeys[:maxVersionsInDropdown]
+	allVersionKeys = versionKeys
+	dropdownKeys := versionKeys
+	if len(dropdownKeys) > maxVersionsInDropdown {
+		dropdownKeys = dropdownKeys[:maxVersionsInDropdown]
 	}
 	currentVersion = versionKeys[0]
-	impls = allVersionsData[currentVersion]
+	impls = buildImplsForMinVersion(currentVersion)
 
 	versionRow.Get("style").Set("display", "block")
 	versionSelect.Set("innerHTML", "")
-	for _, v := range versionKeys {
+	for _, v := range dropdownKeys {
 		opt := doc.Call("createElement", "option")
 		opt.Set("value", v)
 		opt.Set("textContent", v)
@@ -271,7 +274,7 @@ func onDataLoaded(jsonStr string) {
 	versionSelect.Set("value", currentVersion)
 	versionSelect.Call("addEventListener", "change", js.FuncOf(func(_ js.Value, _ []js.Value) interface{} {
 		currentVersion = versionSelect.Get("value").String()
-		impls = allVersionsData[currentVersion]
+		impls = buildImplsForMinVersion(currentVersion)
 		updateVersionLinks(currentVersion)
 		renderFeatureTablesFiltered()
 		doc.Call("getElementById", "results").Get("classList").Call("remove", "visible")
@@ -347,6 +350,41 @@ func versionCompare(a, b string) int {
 		return mi - mj
 	}
 	return pa - pb
+}
+
+// buildImplsForMinVersion returns implementations that have at least one report >= minVersion.
+// For each controller (org+project), the report used is the most recent one that is >= minVersion.
+// Only one row per (Organization, Project) is returned—the latest reported one.
+func buildImplsForMinVersion(minVersion string) []implementation {
+	if allVersionsData == nil || len(allVersionKeys) == 0 {
+		return nil
+	}
+	// allVersionKeys is newest first; take only keys >= minVersion
+	var keysGEQ []string
+	for _, k := range allVersionKeys {
+		if versionCompare(k, minVersion) >= 0 {
+			keysGEQ = append(keysGEQ, k)
+		}
+	}
+	if len(keysGEQ) == 0 {
+		return nil
+	}
+	// Dedupe by org+project so we show only the latest report per controller
+	controllerKey := func(impl implementation) string {
+		return impl.Organization + "\x00" + impl.Project
+	}
+	seen := make(map[string]bool)
+	var result []implementation
+	for _, apiVersion := range keysGEQ {
+		for _, impl := range allVersionsData[apiVersion] {
+			key := controllerKey(impl)
+			if !seen[key] {
+				seen[key] = true
+				result = append(result, impl)
+			}
+		}
+	}
+	return result
 }
 
 func getAvailableFeatureIDs() map[string]bool {
