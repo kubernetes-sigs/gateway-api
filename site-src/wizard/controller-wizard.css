@@ -330,11 +330,25 @@ section.card h3:first-of-type {
   border-top: none;
 }
 
+#gateway-core {
+  margin-bottom: 20px;
+  border-top: none;
+}
+
+#grpc-route-core {
+  margin-bottom: 20px;
+  border-top: none;
+}
+
+#tls-route-core {
+  margin-bottom: 20px;
+  border-top: none;
+}
+
 #gateway-features {
   border-top: none;
 }
 
-#http-route-core thead th,
 #gateway-features thead th {
   font-weight: 600;
   font-size: 0.6875rem;
