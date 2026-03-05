@@ -59,6 +59,7 @@ linters:
     generated: strict
     paths:
       - conformance/
+      - wasm/
     paths-except:
       - apis/
       - apisx/
