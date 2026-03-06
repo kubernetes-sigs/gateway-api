@@ -1176,8 +1176,12 @@ func TestHTTPRouteRule(t *testing.T) {
 			},
 		},
 		{
-			name:       "invalid because multiple filters are repeated",
-			wantErrors: []string{"ResponseHeaderModifier filter cannot be repeated", "RequestRedirect filter cannot be repeated"},
+			name: "invalid because multiple filters are repeated",
+			wantErrors: []string{
+				"CORS filter cannot be repeated",
+				"ResponseHeaderModifier filter cannot be repeated",
+				"RequestRedirect filter cannot be repeated",
+			},
 			rules: []gatewayv1.HTTPRouteRule{
 				{
 					Matches: []gatewayv1.HTTPRouteMatch{
@@ -1227,6 +1231,18 @@ func TestHTTPRouteRule(t *testing.T) {
 									Type:            gatewayv1.FullPathHTTPPathModifier,
 									ReplaceFullPath: ptrTo("bar"),
 								},
+							},
+						},
+						{
+							Type: gatewayv1.HTTPRouteFilterCORS,
+							CORS: &gatewayv1.HTTPCORSFilter{
+								AllowOrigins: []gatewayv1.CORSOrigin{"http://foo.example.com"},
+							},
+						},
+						{
+							Type: gatewayv1.HTTPRouteFilterCORS,
+							CORS: &gatewayv1.HTTPCORSFilter{
+								AllowOrigins: []gatewayv1.CORSOrigin{"http://bar.example.com"},
 							},
 						},
 					},
@@ -1299,8 +1315,11 @@ func TestHTTPBackendRef(t *testing.T) {
 		rules      []gatewayv1.HTTPRouteRule
 	}{
 		{
-			name:       "invalid because repeated URLRewrite filter within backendRefs",
-			wantErrors: []string{"URLRewrite filter cannot be repeated"},
+			name: "invalid because repeated URLRewrite and CORS filters within backendRefs",
+			wantErrors: []string{
+				"CORS filter cannot be repeated",
+				"URLRewrite filter cannot be repeated",
+			},
 			rules: []gatewayv1.HTTPRouteRule{
 				{
 					Matches: []gatewayv1.HTTPRouteMatch{
@@ -1336,6 +1355,18 @@ func TestHTTPBackendRef(t *testing.T) {
 											Type:               gatewayv1.PrefixMatchHTTPPathModifier,
 											ReplacePrefixMatch: ptrTo("bar"),
 										},
+									},
+								},
+								{
+									Type: gatewayv1.HTTPRouteFilterCORS,
+									CORS: &gatewayv1.HTTPCORSFilter{
+										AllowOrigins: []gatewayv1.CORSOrigin{"http://foo.example.com"},
+									},
+								},
+								{
+									Type: gatewayv1.HTTPRouteFilterCORS,
+									CORS: &gatewayv1.HTTPCORSFilter{
+										AllowOrigins: []gatewayv1.CORSOrigin{"http://bar.example.com"},
 									},
 								},
 							},
