@@ -34,7 +34,7 @@ import (
 	"sigs.k8s.io/gateway-api/conformance/utils/roundtripper"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
 	"sigs.k8s.io/gateway-api/conformance/utils/tlog"
-	"sigs.k8s.io/gateway-api/pkg/features"
+	"sigs.k8s.io/gateway-api/conformance/utils/features"
 )
 
 const (
