@@ -482,17 +482,6 @@ type BackendTrafficPolicySpec struct {
 // +kubebuilder:validation:XValidation:message="AbsoluteTimeout must be specified when cookie lifetimeType is Permanent",rule="!has(self.cookieConfig) || !has(self.cookieConfig.lifetimeType) || self.cookieConfig.lifetimeType != 'Permanent' || has(self.absoluteTimeout)"
 // +kubebuilder:validation:XValidation:message="cookieConfig can only be set with type Cookie",rule="!has(self.cookieConfig) || self.type == 'Cookie'"
 type SessionPersistence struct {
-    // SessionName defines the name of the persistent session token
-    // which may be reflected in the cookie or the header. Users
-    // should avoid reusing session names to prevent unintended
-    // consequences, such as rejection or unpredictable behavior.
-    //
-    // Support: Implementation-specific
-    //
-    // +optional
-    // +kubebuilder:validation:MaxLength=128
-    SessionName *string `json:"sessionName,omitempty"`
-
     // AbsoluteTimeout defines the absolute timeout of the persistent
     // session. Once the AbsoluteTimeout duration has elapsed, the
     // session becomes invalid.
@@ -521,6 +510,14 @@ type SessionPersistence struct {
     //
     // +optional
     CookieConfig *CookieConfig `json:"cookieConfig,omitempty"`
+
+    // HeaderConfig provides configuration settings that are specific
+    // to header-based session persistence.
+    //
+    // Support: Extended
+    //
+    // +optional
+    HeaderConfig *HeaderConfig `json:"headerConfig,omitempty"`
 }
 
 // Duration is a string value representing a duration in time. The format is as specified
@@ -548,6 +545,14 @@ const (
 
 // CookieConfig defines the configuration for cookie-based session persistence.
 type CookieConfig struct {
+    // Name defines the name of the persistent session cookie.
+    //
+    // Support: Extended
+    //
+    // +optional
+    // +kubebuilder:validation:MaxLength=128
+    Name *string `json:"name,omitempty"`
+
     // LifetimeType specifies whether the cookie has a permanent or
     // session-based lifetime. A permanent cookie persists until its
     // specified expiry time, defined by the Expires or Max-Age cookie
@@ -587,6 +592,17 @@ const (
     // Support: Extended
     PermanentCookieLifetimeType  CookieLifetimeType = "Permanent"
 )
+
+// HeaderConfig defines the configuration for header-based session persistence.
+type HeaderConfig struct {
+    // Name defines the name of the header used for session persistence.
+    //
+    // Support: Extended
+    //
+    // +optional
+    // +kubebuilder:validation:MaxLength=128
+    Name *string `json:"name,omitempty"`
+}
 ```
 
 ### Route Rule API
@@ -732,15 +748,13 @@ Let's discuss some of these cookie attributes in more detail.
 
 #### Name
 
-The `Name` cookie attribute MAY be configured via the `SessionName` field in `sessionPersistence`. However, this field
-is implementation-specific because it's impossible to create a conformance test for it, given that sessions could be
-created in a variety of ways. Additionally, `SessionName` is not universally supported as some implementations, such as
-ones supporting global load balancers, don't have the capability to configure the cookie name. Some implementations
-have a fixed cookie name, and therefore `SessionName` may be reflected in the value of the cookie.
+The `Name` cookie attribute MAY be configured via the `cookieConfig.Name` field. This field
+has Extended support because some implementations, such as cloud-based global load balancers,
+don't have the capability to configure the cookie name.
 
-The use case for modifying the cookie name using `SessionName` is that certain users might need to align it with an
+The use case for configuring the cookie name via `cookieConfig.Name` is that certain users might need to align it with an
 existing cookie name, such as Java's `JSESSIONID`. Refer to [Session Initiation Guidelines](#session-initiation-guidelines)
-for details on how this GEP supports existing sessions. If `SessionName` is not specified, then a unique cookie name
+for details on how this GEP supports existing sessions. If `cookieConfig.Name` is not specified, then a unique cookie name
 should be generated.
 
 #### Expires / Max-Age
@@ -863,7 +877,8 @@ spec:
     backendRefs:
     - name: servicev1
     sessionPersistence:
-      sessionName: session-a
+      cookieConfig:
+        name: session-a
   - matches:
     - path:
       value: /b
@@ -873,7 +888,8 @@ spec:
     - name: servicev2
       weight: 100
     sessionPersistence:
-      sessionName: session-b
+      cookieConfig:
+        name: session-b
 ```
 
 Route rules referencing the same service MUST NOT share persistent sessions (i.e. the same cookie). Let's illustrate
@@ -912,8 +928,9 @@ spec:
   - kind: Service
     name: servicev1
   sessionPersistence:
-    sessionName: service-cookie
     type: Cookie
+    cookieConfig:
+      name: service-cookie
 ```
 
 Route rules referencing the same service MUST NOT share persistent sessions (i.e. the same cookie), even if the session persistence is attached to the service via `BackendTrafficPolicy`, and each route rule should have different persistent sessions.
@@ -924,7 +941,7 @@ Route rules referencing the same service MUST NOT share persistent sessions (i.e
 #### Session Naming Collision
 
 Consider the situation in which two different services have cookie-based session persistence configured with the
-same `sessionName`:
+same cookie name:
 
 ```yaml
 kind: HTTPRoute
@@ -946,8 +963,9 @@ spec:
   - kind: Service
     name: servicev1
   sessionPersistence:
-    sessionName: split-route-cookie
     type: Cookie
+    cookieConfig:
+      name: split-route-cookie
 ---
 kind: BackendTrafficPolicy
 metadata:
@@ -957,8 +975,9 @@ spec:
   - kind: Service
     name: servicev2
   sessionPersistence:
-    sessionName: split-route-cookie
     type: Cookie
+    cookieConfig:
+      name: split-route-cookie
 ```
 
 This is an invalid configuration as two separate sessions cannot have the same cookie name. Implementations SHOULD
@@ -981,8 +1000,9 @@ spec:
     - name: servicev2
       weight: 50
     sessionPersistence:
-      sessionName: split-route-cookie
       type: Cookie
+      cookieConfig:
+        name: split-route-cookie
 ```
 
 In this scenario, session persistence is enabled at route rule level and all services in the traffic split have persistent session.
@@ -1016,8 +1036,9 @@ spec:
   - kind: Service
     name: servicev1
   sessionPersistence:
-    sessionName: split-route-cookie
     type: Cookie
+    cookieConfig:
+      name: split-route-cookie
 ```
 
 In this traffic splitting scenario within a single route rule, this GEP leaves the decision to the implementation. An
