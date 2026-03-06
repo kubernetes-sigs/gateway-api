@@ -17,6 +17,7 @@ on:
 permissions:
   contents: write
   id-token: write
+  packages: write
   pull-requests: read
 
 jobs:
@@ -69,6 +70,31 @@ jobs:
           MONTHLY_NONINTERACTIVE: "true"
         run: |
           make build-monthly-yaml
+
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+
+      - name: Log into registry ${{ env.HELM_REGISTRY }}
+        uses: docker/login-action@28218f9b04b4f3f62068d7b6ce6ca5b26e35336c
+        env:
+          HELM_REGISTRY: ghcr.io
+          CHART_DIR: helm
+        with:
+          registry: ${{ env.HELM_REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push Helm charts to registry
+        env:
+          HELM_REGISTRY: ghcr.io
+          CHART_DIR: helm
+        run: |
+          helm dependency update ./${{ env.CHART_DIR }}
+          cp -R release helm/files
+          helm package ./${{ env.CHART_DIR }} --destination ./chart --app-version ${{ steps.tag.outputs.tag }} --version ${{ steps.tag.outputs.tag }}
+          helm push ./chart/${{ github.event.repository.name }}-${{ steps.tag.outputs.tag }}.tgz oci://${{ env.HELM_REGISTRY }}/${{ github.repository_owner }}/${{ github.event.repository.name }}
 
       - name: Release with notes
         id: release
