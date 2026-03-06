@@ -1,4 +1,4 @@
-# GEP-1619: Session Persistence via BackendLBPolicy
+# GEP-1619: Session Persistence via BackendTrafficPolicy
 
 * Issue: [#1619](https://github.com/kubernetes-sigs/gateway-api/issues/1619)
 * Status: Experimental
@@ -18,16 +18,16 @@ Before this GEP graduates to Implementable, we must fulfill the following criter
  1. Should we leave room in this policy to add additional concepts in the future
     such as Session Affinity? If so, how would we adjust the naming and overall
     scope of this policy?
-    - **Answer**: Yes. We adjusted the API to use `BackendLBPolicy`. See [API](#api) for more details.
+    - **Answer**: Yes. We adjusted the API to use `BackendTrafficPolicy`. See [API](#api) for more details.
  2. Should we leave room for configuring different forms of Session Persistence?
     If so, what would that look like?
-    - **Answer**: Yes. See the [BackendLBPolicy API](#backendlbpolicy-api) and [API Granularity](#api-granularity)
+    - **Answer**: Yes. See the [BackendTrafficPolicy API](#backendtrafficpolicy-api) and [API Granularity](#api-granularity)
       sections for more details.
  3. What name appropriately describe the API responsible for configuring load-balancing options for backend traffic?
-    - **Answer**: We decided on `BackendLBPolicy` since it is aligned with `BackendTLSPolicy`, describes configuration
+    - **Answer**: We decided on `BackendTrafficPolicy` since it is aligned with `BackendTLSPolicy`, describes configuration
       related to load balancing, and isn't too long.
  4. Finish designing the [Route Rule API](#route-rule-api) and document edge cases in [Edge Case Behavior](#edge-case-behavior)
-    for configuring session persistence on both `BackendLBPolicy` and route rules.
+    for configuring session persistence on both `BackendTrafficPolicy` and route rules.
     - **Answer**: Yes. See [Route Rule API](#route-rule-api) and [Edge Case Behavior](#edge-case-behavior) for more details.
 
 ### Standard
@@ -422,58 +422,69 @@ In this section, we will explore the questions and design elements associated wi
 
 We will present two distinct patterns for configuring session persistence:
 
-1. `BackendLBPolicy`: a Direct Policy Attachment for backends (Services, ServiceImports, or any
+1. `BackendTrafficPolicy`: a Direct Policy Attachment for backends (Services, ServiceImports, or any
    implementation-specific backendRef)
 2. An inline API update to HTTPRoute and GRPCRoute rules
 
-### BackendLBPolicy API
+### BackendTrafficPolicy API
 
 In order to apply session persistence configuration to a backend, we will implement it as a [Policy Attachment](../../reference/policy-attachment.md).
-The new metaresource is named `BackendLBPolicy` and is responsible for configuring load balancing-related configuration
+The new metaresource is named `BackendTrafficPolicy` and is responsible for configuring load balancing-related configuration
 for traffic intended for a backend after routing has occurred. It is defined as a [Direct Policy Attachment](../gep-713/index.md#direct-policy-attachment)
 without defaults or overrides, applied to the targeted backend.
 
 Instead of utilizing a specific, session persistence-only policy object, we introduce a more generic API object named
-`BackendLBPolicy`. This design provides tighter coupling with other load balancing configuration which helps reduce
-CRD proliferation. For instance, `BackendLBPolicy` could be augmented to add configuration for selecting a load
+`BackendTrafficPolicy`. This design provides tighter coupling with other load balancing configuration which helps reduce
+CRD proliferation. For instance, `BackendTrafficPolicy` could be augmented to add configuration for selecting a load
 balancing algorithm for traffic to the backends, as desired in issue [#1778](https://github.com/kubernetes-sigs/gateway-api/issues/1778).
-`BackendLBPolicy` could also be later expanded to contain [session affinity](#the-relationship-of-session-persistence-and-session-affinity)
+`BackendTrafficPolicy` could also be later expanded to contain [session affinity](#the-relationship-of-session-persistence-and-session-affinity)
 configuration. This would provide a convenient grouping of the two related APIs within the same policy object.
 Additionally, other future enhancements to the API may include the addition of timeouts, connection draining, and
-logging within `BackendLBPolicy`.
+logging within `BackendTrafficPolicy`.
 
 As for achieving session persistence, this API currently exposes the `Type` field which allows selection between
 cookie-based and header-based session persistence. Cookie-based session persistence is considered a core feature,
 while header-based session persistence is extended and therefore optional.
 
 ```go
-// BackendLBPolicy provides a way to define load balancing rules
+// BackendTrafficPolicy provides a way to define load balancing rules
 // for a backend.
-type BackendLBPolicy struct {
+type XBackendTrafficPolicy struct {
+    // Support: Extended
+    //
+    // +optional
+
     metav1.TypeMeta   `json:",inline"`
+    // +optional
     metav1.ObjectMeta `json:"metadata,omitempty"`
 
-    // Spec defines the desired state of BackendLBPolicy.
-    Spec BackendLBPolicySpec `json:"spec"`
+    // Spec defines the desired state of BackendTrafficPolicy.
+    // +required
+    Spec BackendTrafficPolicySpec `json:"spec"`
 
-    // Status defines the current state of BackendLBPolicy.
+    // Status defines the current state of BackendTrafficPolicy.
+    // +optional
     Status PolicyStatus `json:"status,omitempty"`
 }
 
-// BackendLBPolicySpec defines the desired state of
-// BackendLBPolicy.
+// BackendTrafficPolicySpec define the desired state of BackendTrafficPolicy
 // Note: there is no Override or Default policy configuration.
-type BackendLBPolicySpec struct {
-    // TargetRef identifies an API object to apply policy to.
-    // Currently, Backends (i.e. Service, ServiceImport, or any
-    // implementation-specific backendRef) are the only valid API
-    // target references.
+type BackendTrafficPolicySpec struct {
+    // TargetRefs identifies API object(s) to apply this policy to.
+    // Currently, Backends (A grouping of like endpoints such as Service,
+    // ServiceImport, or any implementation-specific backendRef) are the only
+    // valid API target references.
+    //
+    // Currently, a TargetRef cannot be scoped to a specific port on a
+    // Service.
+    //
     // +listType=map
     // +listMapKey=group
     // +listMapKey=kind
     // +listMapKey=name
     // +kubebuilder:validation:MinItems=1
     // +kubebuilder:validation:MaxItems=16
+    // +required
     TargetRefs []LocalPolicyTargetReference `json:"targetRefs"`
 
     // SessionPersistence defines and configures session persistence
@@ -482,24 +493,14 @@ type BackendLBPolicySpec struct {
     // Support: Extended
     //
     // +optional
-    SessionPersistence *SessionPersistence `json:"sessionPersistence"`
+    SessionPersistence *SessionPersistence `json:"sessionPersistence,omitempty"`
 }
 
-// SessionPersistence defines the desired state of
-// SessionPersistence.
+// SessionPersistence defines the desired state of SessionPersistence.
 // +kubebuilder:validation:XValidation:message="AbsoluteTimeout must be specified when cookie lifetimeType is Permanent",rule="!has(self.cookieConfig) || !has(self.cookieConfig.lifetimeType) || self.cookieConfig.lifetimeType != 'Permanent' || has(self.absoluteTimeout)"
+// +kubebuilder:validation:XValidation:message="cookieConfig can only be set with type Cookie",rule="!has(self.cookieConfig) || self.type == 'Cookie'"
+// +kubebuilder:validation:XValidation:message="headerConfig can only be set with type Header",rule="!has(self.headerConfig) || self.type == 'Header'"
 type SessionPersistence struct {
-    // SessionName defines the name of the persistent session token
-    // which may be reflected in the cookie or the header. Users
-    // should avoid reusing session names to prevent unintended
-    // consequences, such as rejection or unpredictable behavior.
-    //
-    // Support: Implementation-specific
-    //
-    // +optional
-    // +kubebuilder:validation:MaxLength=128
-    SessionName *string `json:"sessionName,omitempty"`
-
     // AbsoluteTimeout defines the absolute timeout of the persistent
     // session. Once the AbsoluteTimeout duration has elapsed, the
     // session becomes invalid.
@@ -610,7 +611,7 @@ const (
 To support route rule level configuration, this GEP also introduces an API as inline fields within HTTPRouteRule and GRPCRouteRule.
 Any configuration that is specified at Route Rule level MUST override configuration that is attached at the backend level because route rule have a more global view and responsibility for the overall traffic routing.
 This route rule level API for enabling session persistence currently uses the same `SessionPersistence` struct from the
-`BackendLBPolicy` API.
+`BackendTrafficPolicy` API.
 
 ```go
 type HTTPRouteRule struct {
@@ -622,7 +623,8 @@ type HTTPRouteRule struct {
     // Support: Extended
     //
     // +optional
-    SessionPersistence *SessionPersistence `json:"sessionPersistence"`
+    // <gateway:experimental>
+    SessionPersistence *SessionPersistence `json:"sessionPersistence,omitempty"`
 }
 ```
 
@@ -636,7 +638,8 @@ type GRPCRouteRule struct {
     // Support: Extended
     //
     // +optional
-    SessionPersistence *SessionPersistence `json:"sessionPersistence"`
+    // <gateway:experimental>
+    SessionPersistence *SessionPersistence `json:"sessionPersistence,omitempty"`
 }
 ```
 
@@ -676,7 +679,7 @@ route in any given implementation.
 
 ### API Attachment Points
 
-The new `BackendLBPolicy` metaresource only supports attaching to a backend. A backend can be a Service,
+The new `BackendTrafficPolicy` metaresource only supports attaching to a backend. A backend can be a Service,
 ServiceImport (see [GEP-1748](../gep-1748/index.md)), or any implementation-specific backends that are a valid
 [`BackendObjectReference`](../../reference/spec.md#backendobjectreference). Enabling session
 persistence for a backend enables subsequently enables it for any route directing traffic to this backend. To learn more
@@ -688,12 +691,12 @@ to a route rule MUST NOT affect traffic for other routes or route rules. Designi
 route rule section rather than the route entirely, allows users to configure session persistence in a more granular
 fashion. This approach avoids the need to decompose routes if the configuration is specific to a route path.
 
-Session persistence configuration specified in a route rule SHALL override equivalent configuration in `BackendLBPolicy`.
+Session persistence configuration specified in a route rule SHALL override equivalent configuration in `BackendTrafficPolicy`.
 In this situation, implementations MAY want to indicate a warning via a log or status. Refer to [GEP-713](../gep-713/index.md)
 and/or [GEP-2648](../gep-2648/index.md) for more specific details on how to handle override scenarios.
 
 Edge cases will arise when implementing session persistence support for both backends and route rules through
-`BackendLBPolicy` and the route rule's `sessionPersistence` field. For guidance on addressing conflicting
+`BackendTrafficPolicy` and the route rule's `sessionPersistence` field. For guidance on addressing conflicting
 attachments, please consult the [Edge Case Behavior](#edge-case-behavior) section, which outlines API
 use cases. Only a subset of implementations have already designed their data plane to incorporate route rule level session
 persistence, making it likely that route rule level session persistence will be less widely implemented.
@@ -796,7 +799,7 @@ It is also important to note that this design makes persistent session unique pe
 distinct routes, one with path prefix `/foo` and the other with `/bar`, both target the same service, the persistent
 session won't be shared between these two paths.
 
-Conversely, if the `BackendLBPolicy` policy is attached to a service, the `Path` attribute MUST be left
+Conversely, if the `BackendTrafficPolicy` policy is attached to a service, the `Path` attribute MUST be left
 unset. This is because multiple routes can target a single service. If the `Path` cookie attribute is configured in this
 scenario, it could result in problems due to the possibility of different paths being taken for the same cookie.
 Implementations MUST also handle the case where the client is a browser making requests to multiple persistent services
@@ -846,18 +849,18 @@ configuration scenarios (use cases) and how implementations should handle them.
 
 In a situation which:
 
-- `ServiceA` with `BackendLBPolicy` attached
+- `ServiceA` with `BackendTrafficPolicy` attached
 - `RouteX` with `sessionPersistence` configured on the route rule and backend `ServiceA`
 
-The `sessionPersistence` configuration inline to `RouteX` route rule MUST take precedence over `BackendLBPolicy`. Since
+The `sessionPersistence` configuration inline to `RouteX` route rule MUST take precedence over `BackendTrafficPolicy`. Since
 routes direct traffic to services, the policy attached to route operates at a higher-level and MUST override policies
 applied to individual services.
 
 ```mermaid
 graph TB
    RouteX ----> ServiceA((ServiceA))
-   BackendLBPolicyServiceA[BackendLBPolicy] -.-> ServiceA
-   BackendLBPolicyRouteA[SessionPersistence] -.Precedence.-> RouteX
+   BackendTrafficPolicyServiceA[BackendTrafficPolicy] -.-> ServiceA
+   BackendTrafficPolicyRouteA[SessionPersistence] -.Precedence.-> RouteX
    linkStyle 2 stroke:red;
 ```
 
@@ -878,7 +881,7 @@ spec:
     backendRefs:
     - name: servicev1
     sessionPersistence:
-      name: session-a
+      sessionName: session-a
   - matches:
     - path:
       value: /b
@@ -888,7 +891,7 @@ spec:
     - name: servicev2
       weight: 100
     sessionPersistence:
-      name: session-b
+      sessionName: session-b
 ```
 
 Route rules referencing the same service MUST NOT share persistent sessions (i.e. the same cookie). Let's illustrate
@@ -900,7 +903,7 @@ this by the following commands:
 
 #### Route Rules Referencing to a Session Persistent Enabled Service Must Not Share Sessions
 
-Consider the situation in which two different route paths are going to the same service, and session persistence is enabled with the service via `BackendLBPolicy`:
+Consider the situation in which two different route paths are going to the same service, and session persistence is enabled with the service via `BackendTrafficPolicy`:
 
 ```yaml
 kind: HTTPRoute
@@ -919,19 +922,19 @@ spec:
     backendRefs:
     - name: servicev1
 ---
-kind: BackendLBPolicy
+kind: BackendTrafficPolicy
 metadata:
   name: lbp
 spec:
-  targetRef:
-    kind: Service
-    Name: servicev1
+  targetRefs:
+  - kind: Service
+    name: servicev1
   sessionPersistence:
     sessionName: service-cookie
     type: Cookie
 ```
 
-Route rules referencing the same service MUST NOT share persistent sessions (i.e. the same cookie), even if the session persistence is attached to the service via `BackendLBPolicy`, and each route rule should have different persistent sessions.
+Route rules referencing the same service MUST NOT share persistent sessions (i.e. the same cookie), even if the session persistence is attached to the service via `BackendTrafficPolicy`, and each route rule should have different persistent sessions.
 
 1. Curl to `/a` which establishes a persistent session with `servicev1`
 2. Curl to `/b` which establishes another persistent session with `servicev1` since the previous session established earlier is not shared with this route path.
@@ -953,24 +956,24 @@ spec:
     - name: servicev2
       weight: 50
 ---
-kind: BackendLBPolicy
+kind: BackendTrafficPolicy
 metadata:
   name: lbp-split-route
 spec:
-  targetRef:
-    kind: Service
-    Name: servicev1
+  targetRefs:
+  - kind: Service
+    name: servicev1
   sessionPersistence:
     sessionName: split-route-cookie
     type: Cookie
 ---
-kind: BackendLBPolicy
+kind: BackendTrafficPolicy
 metadata:
   name: lbp-split-route2
 spec:
-  targetRef:
-    kind: Service
-    Name: servicev2
+  targetRefs:
+  - kind: Service
+    name: servicev2
   sessionPersistence:
     sessionName: split-route-cookie
     type: Cookie
@@ -1006,10 +1009,10 @@ That is to say, traffic routing to `servicev1` previously MUST continue to be ro
 
 When cookie is not present, such as, a new session, it will be routed based on the `weight` configuration and choose one of the services.
 
-#### Traffic Splitting with BackendLBPolicy attached to some Backends (not all)
+#### Traffic Splitting with BackendTrafficPolicy attached to some Backends (not all)
 
 Consider the scenario where a route is traffic splitting between two backends, and additionally, a
-`BackendLBPolicy` with `sessionPersistence` config is attached to one of the services:
+`BackendTrafficPolicy` with `sessionPersistence` config is attached to one of the services:
 
 ```yaml
 kind: HTTPRoute
@@ -1023,13 +1026,13 @@ spec:
     - name: servicev2
       weight: 50
 ---
-kind: BackendLBPolicy
+kind: BackendTrafficPolicy
 metadata:
   name: lbp-split-route
 spec:
-  targetRef:
-    kind: Service
-    Name: servicev1
+  targetRefs:
+  - kind: Service
+    name: servicev1
   sessionPersistence:
     sessionName: split-route-cookie
     type: Cookie
@@ -1038,8 +1041,8 @@ spec:
 In this traffic splitting scenario within a single route rule, this GEP leaves the decision to the implementation. An
 implementation MUST choose one of the following:
 
-1. Apply session persistence configured in `BackendLBPolicy` to `servicev1` and `servicev2` equally
-2. Reject the session persistence configured in `BackendLBPolicy` so that `servicev1` does not have session persistence
+1. Apply session persistence configured in `BackendTrafficPolicy` to `servicev1` and `servicev2` equally
+2. Reject the session persistence configured in `BackendTrafficPolicy` so that `servicev1` does not have session persistence
 3. Apply session persistence for only `servicev1`, potentially causing all traffic to eventually migrate to `servicev1`
 
 This is also described in [Traffic Splitting](#traffic-splitting).
@@ -1088,7 +1091,7 @@ The following are items that we intend to resolve in future revisions:
 potential scenarios where session persistence could break so an implementation can implement session persistence in a
 predicable way.
 - We need to clean up the [Implementations](#implementations) table to make it more organized and readable.
-- We need to revisit how to indicate to a user that a `BackendLBPolicy` configuration is being overridden by a route
+- We need to revisit how to indicate to a user that a `BackendTrafficPolicy` configuration is being overridden by a route
 configuration via a warning status or log.
     - This might require addressing as part of an update to [GEP-2648](../gep-2648/index.md).
 
@@ -1101,7 +1104,7 @@ than containing all load balancing configuration within a single metaresource, w
 with a metaresource called `SessionPersistencePolicy`, specifically to handle session persistence configuration.
 
 The advantage of `SessionPersistencePolicy` is that it is more specific, which may enable a smoother transition to
-attaching to routes in the future (see [Route Attachment Future Work](#route-attachment-future-work)).
+attaching to routes in the future.
 
 ```go
 // SessionPersistencePolicy provides a way to define session persistence rules
@@ -1139,7 +1142,7 @@ Alternatively, the API for session persistence could be tightly coupled to cooki
 described in [API Granularity](#api-granularity). The advantage here is the API's ability to offer greater control
 through specific cookie attributes and configuration, catering to the needs of advanced users. However, there could be
 challenges with implementations adhering to an API that is closely tied to cookies. This alternative could apply to the
-current [`BackendLBPolicy`](#api) design or the [`SessionPersistencePolicy`](#sessionpersistence-api-alternative)
+current [`BackendTrafficPolicy`](#api) design or the [`SessionPersistencePolicy`](#sessionpersistence-api-alternative)
 alternative.
 
 The cookie attributes can be defined either as a loosely-typed list of attributes or as strongly-typed attribute fields.
