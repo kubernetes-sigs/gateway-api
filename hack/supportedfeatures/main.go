@@ -21,7 +21,7 @@ import (
 	"sort"
 	"strings"
 
-	"sigs.k8s.io/gateway-api/pkg/features"
+	"sigs.k8s.io/gateway-api/conformance/utils/features"
 )
 
 func main() {

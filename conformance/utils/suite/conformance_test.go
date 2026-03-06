@@ -22,7 +22,7 @@ import (
 
 	"k8s.io/apimachinery/pkg/util/sets"
 
-	"sigs.k8s.io/gateway-api/pkg/features"
+	"sigs.k8s.io/gateway-api/conformance/utils/features"
 )
 
 func TestParseSupportedFeatures(t *testing.T) {
