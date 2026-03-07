@@ -17,6 +17,7 @@ limitations under the License.
 package tests
 
 import (
+	"net"
 	"testing"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -89,7 +90,7 @@ var GatewayFrontendClientCertificateValidationInsecureFallback = suite.Conforman
 		}
 
 		t.Run("Validate default TLS configuration", func(t *testing.T) {
-			defaultAddr := gwAddr + ":443"
+			defaultAddr := net.JoinHostPort(gwAddr, "443")
 
 			expectedSuccess := http.ExpectedResponse{
 				Request:   http.Request{Host: "example.org", Path: "/"},
@@ -110,7 +111,7 @@ var GatewayFrontendClientCertificateValidationInsecureFallback = suite.Conforman
 		})
 
 		t.Run("Validate per port TLS configuration", func(t *testing.T) {
-			perPortAddr := gwAddr + ":8443"
+			perPortAddr := net.JoinHostPort(gwAddr, "8443")
 
 			expectedSucces := http.ExpectedResponse{
 				Request:   http.Request{Host: "second-example.org", Path: "/"},
