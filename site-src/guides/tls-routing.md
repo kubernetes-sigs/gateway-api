@@ -16,10 +16,11 @@ implementation):
 {% include 'standard/tls-routing/gateway.yaml' %}
 ```
 
-A TLSRoute can match against a [single set of hostnames][spec].
-Since `foo.example.com` and `bar.example.com` are separate hosts with
-different routing requirements, each is deployed as its own TLSRoute -
-`foo-route` and `bar-route`.
+A TLSRoute can match against a [single set of hostnames][spec]. For details on
+hostname intersection with Listeners and routing behavior, see [Hostnames in
+Gateway API](../concepts/hostnames.md). Since `foo.example.com` and
+`bar.example.com` are separate hosts with different routing requirements, each
+is deployed as its own TLSRoute - `foo-route` and `bar-route`.
 
 The following `foo-route` TLSRoute will match any traffic for `foo.example.com`
 and apply its routing rules to forward the traffic to the configured backend.
