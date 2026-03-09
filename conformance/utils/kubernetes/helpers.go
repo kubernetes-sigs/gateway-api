@@ -351,7 +351,7 @@ func GatewayMustHaveCondition(
 }
 
 // GatewayMustHaveAttachedListeners validates that the gateway has the specified number of attachedListeners.
-func GatewayMustHaveAttachedListeners(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, gwName types.NamespacedName, count int32) {
+func GatewayMustHaveAttachedListeners(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, gwName types.NamespacedName, expectedCount int32) {
 	var gotStatus *gatewayv1.GatewayStatus
 
 	waitErr := wait.PollUntilContextTimeout(context.Background(), timeoutConfig.DefaultPollInterval, timeoutConfig.GatewayStatusMustHaveListeners, true, func(ctx context.Context) (bool, error) {
@@ -370,10 +370,15 @@ func GatewayMustHaveAttachedListeners(t *testing.T, client client.Client, timeou
 
 		gotStatus = &gw.Status
 		attachedListenerSets := ptr.Deref(gw.Status.AttachedListenerSets, 0)
-		return attachedListenerSets == count, nil
+		ret := attachedListenerSets == expectedCount
+		if !ret {
+			tlog.Logf(t, "gateway %s got %d listeners, want %d", gwName.String(), attachedListenerSets, expectedCount)
+		}
+
+		return ret, nil
 	})
 	if waitErr != nil {
-		tlog.Errorf(t, "Error waiting for gateway, got Gateway Status %v, want zero listeners or exactly 1 listener with zero routes", gotStatus)
+		tlog.Errorf(t, "Error waiting for gateway, got Gateway Status %v, want %d listeners", gotStatus, expectedCount)
 	}
 }
 
