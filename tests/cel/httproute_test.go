@@ -23,6 +23,7 @@ import (
 	"time"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/utils/ptr"
 
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
@@ -1664,6 +1665,46 @@ func TestHTTPRouteCORS(t *testing.T) {
 					"GET",
 					"OPTIONS",
 					"POST",
+				},
+			},
+		},
+		{
+			name:       "Using wildcard in allowOrigins when allowCredentials is true should be denied",
+			wantErrors: []string{"When allowCredentials is true, wildcards '*' are not allowed in allowOrigins, allowMethods, allowHeaders, or exposeHeaders"},
+			corsfilter: &gatewayv1.HTTPCORSFilter{
+				AllowCredentials: ptr.To(true),
+				AllowOrigins: []gatewayv1.CORSOrigin{
+					"*",
+				},
+			},
+		},
+		{
+			name:       "Using wildcard in allowMethods when allowCredentials is true should be denied",
+			wantErrors: []string{"When allowCredentials is true, wildcards '*' are not allowed in allowOrigins, allowMethods, allowHeaders, or exposeHeaders"},
+			corsfilter: &gatewayv1.HTTPCORSFilter{
+				AllowCredentials: ptr.To(true),
+				AllowMethods: []gatewayv1.HTTPMethodWithWildcard{
+					"*",
+				},
+			},
+		},
+		{
+			name:       "Using wildcard in allowHeaders when allowCredentials is true should be denied",
+			wantErrors: []string{"When allowCredentials is true, wildcards '*' are not allowed in allowOrigins, allowMethods, allowHeaders, or exposeHeaders"},
+			corsfilter: &gatewayv1.HTTPCORSFilter{
+				AllowCredentials: ptr.To(true),
+				AllowHeaders: []gatewayv1.HTTPHeaderName{
+					"*",
+				},
+			},
+		},
+		{
+			name:       "Using wildcard in exposeHeaders when allowCredentials is true should be denied",
+			wantErrors: []string{"When allowCredentials is true, wildcards '*' are not allowed in allowOrigins, allowMethods, allowHeaders, or exposeHeaders"},
+			corsfilter: &gatewayv1.HTTPCORSFilter{
+				AllowCredentials: ptr.To(true),
+				ExposeHeaders: []gatewayv1.HTTPHeaderName{
+					"*",
 				},
 			},
 		},
