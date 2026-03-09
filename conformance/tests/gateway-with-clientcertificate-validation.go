@@ -25,7 +25,7 @@ import (
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
-	"sigs.k8s.io/gateway-api/conformance/utils/suite"
+	confsuite "sigs.k8s.io/gateway-api/conformance/utils/suite"
 	"sigs.k8s.io/gateway-api/conformance/utils/tls"
 	"sigs.k8s.io/gateway-api/conformance/utils/features"
 )
@@ -34,7 +34,7 @@ func init() {
 	ConformanceTests = append(ConformanceTests, GatewayFrontendClientCertificateValidation)
 }
 
-var GatewayFrontendClientCertificateValidation = suite.ConformanceTest{
+var GatewayFrontendClientCertificateValidation = confsuite.ConformanceTest{
 	ShortName:   "GatewayFrontendClientCertificateValidation",
 	Description: "Gateway's client certificate validation config should be used for HTTPS traffic",
 	Features: []features.FeatureName{
@@ -43,8 +43,8 @@ var GatewayFrontendClientCertificateValidation = suite.ConformanceTest{
 		features.SupportGatewayFrontendClientCertificateValidation,
 	},
 	Manifests: []string{"tests/gateway-with-clientcertificate-validation.yaml"},
-	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
-		ns := "gateway-conformance-infra"
+	Test: func(t *testing.T, suite *confsuite.ConformanceTestSuite) {
+		ns := confsuite.InfrastructureNamespace
 
 		routeNNs := []types.NamespacedName{
 			{Name: "client-certificate-validation-https-test", Namespace: ns},
@@ -86,15 +86,15 @@ var GatewayFrontendClientCertificateValidation = suite.ConformanceTest{
 			expectedSuccess := http.ExpectedResponse{
 				Request:   http.Request{Host: "example.org", Path: "/"},
 				Response:  http.Response{StatusCode: 200},
-				Backend:   "infra-backend-v1",
-				Namespace: "gateway-conformance-infra",
+				Backend:   confsuite.InfraBackendServiceNameV1,
+				Namespace: confsuite.InfrastructureNamespace,
 			}
 			tls.MakeTLSRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, defaultAddr, serverCertPem, clientCertPem, clientCertKey, "example.org", expectedSuccess)
 
 			// Send request to the first listener with a non-matching and validate that it is failing
 			expectedFailure := http.ExpectedResponse{
 				Request:   http.Request{Host: "example.org", Path: "/"},
-				Namespace: "gateway-conformance-infra",
+				Namespace: confsuite.InfrastructureNamespace,
 			}
 			tls.MakeTLSRequestAndExpectFailureResponse(t, suite.RoundTripper, defaultAddr, serverCertPem, clientCertPerPortPem, clientCertPerPortKey, "example.org", expectedFailure)
 		})
@@ -106,15 +106,15 @@ var GatewayFrontendClientCertificateValidation = suite.ConformanceTest{
 			expectedSucces := http.ExpectedResponse{
 				Request:   http.Request{Host: "second-example.org", Path: "/"},
 				Response:  http.Response{StatusCode: 200},
-				Backend:   "infra-backend-v2",
-				Namespace: "gateway-conformance-infra",
+				Backend:   confsuite.InfraBackendServiceNameV2,
+				Namespace: confsuite.InfrastructureNamespace,
 			}
 			tls.MakeTLSRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, perPortAddr, serverCertPem, clientCertPerPortPem, clientCertPerPortKey, "second-example.org", expectedSucces)
 
 			// Send request to the second listener with a non-matching and validate that it is failing
 			expectedFailure := http.ExpectedResponse{
 				Request:   http.Request{Host: "second-example.org", Path: "/"},
-				Namespace: "gateway-conformance-infra",
+				Namespace: confsuite.InfrastructureNamespace,
 			}
 			tls.MakeTLSRequestAndExpectFailureResponse(t, suite.RoundTripper, perPortAddr, serverCertPem, clientCertPem, clientCertKey, "second-example.org", expectedFailure)
 		})

@@ -41,7 +41,7 @@ var GatewaySecretInvalidReferenceGrant = suite.ConformanceTest{
 	},
 	Manifests: []string{"tests/gateway-secret-invalid-reference-grant.yaml"},
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
-		gwNN := types.NamespacedName{Name: "gateway-secret-invalid-reference-grant", Namespace: "gateway-conformance-infra"}
+		gwNN := types.NamespacedName{Name: "gateway-secret-invalid-reference-grant", Namespace: suite.InfrastructureNamespace}
 
 		t.Run("Gateway listener should have a false ResolvedRefs condition with reason RefNotPermitted", func(t *testing.T) {
 			listeners := []v1.ListenerStatus{{

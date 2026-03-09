@@ -26,7 +26,7 @@ import (
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
-	"sigs.k8s.io/gateway-api/conformance/utils/suite"
+	confsuite "sigs.k8s.io/gateway-api/conformance/utils/suite"
 	"sigs.k8s.io/gateway-api/conformance/utils/tls"
 	"sigs.k8s.io/gateway-api/conformance/utils/features"
 )
@@ -35,7 +35,7 @@ func init() {
 	ConformanceTests = append(ConformanceTests, GatewayFrontendClientCertificateValidationInsecureFallback)
 }
 
-var GatewayFrontendClientCertificateValidationInsecureFallback = suite.ConformanceTest{
+var GatewayFrontendClientCertificateValidationInsecureFallback = confsuite.ConformanceTest{
 	ShortName:   "GatewayFrontendClientCertificateValidationInsecureFallback",
 	Description: "Gateway's client certificate validation set to AllowInsecureFallback allows any HTTPS traffic.",
 	Features: []features.FeatureName{
@@ -45,7 +45,7 @@ var GatewayFrontendClientCertificateValidationInsecureFallback = suite.Conforman
 		features.SupportGatewayFrontendClientCertificateValidationInsecureFallback,
 	},
 	Manifests: []string{"tests/gateway-with-clientcertificate-validation-insecure-fallback.yaml"},
-	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
+	Test: func(t *testing.T, suite *confsuite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
 
 		routeNNs := []types.NamespacedName{
@@ -95,7 +95,7 @@ var GatewayFrontendClientCertificateValidationInsecureFallback = suite.Conforman
 			expectedSuccess := http.ExpectedResponse{
 				Request:   http.Request{Host: "example.org", Path: "/"},
 				Response:  http.Response{StatusCode: 200},
-				Backend:   "infra-backend-v1",
+				Backend:   confsuite.InfraBackendServiceNameV1,
 				Namespace: "gateway-conformance-infra",
 			}
 
@@ -116,7 +116,7 @@ var GatewayFrontendClientCertificateValidationInsecureFallback = suite.Conforman
 			expectedSucces := http.ExpectedResponse{
 				Request:   http.Request{Host: "second-example.org", Path: "/"},
 				Response:  http.Response{StatusCode: 200},
-				Backend:   "infra-backend-v2",
+				Backend:   confsuite.InfraBackendServiceNameV2,
 				Namespace: "gateway-conformance-infra",
 			}
 

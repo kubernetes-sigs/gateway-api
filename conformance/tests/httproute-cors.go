@@ -23,7 +23,7 @@ import (
 
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
-	"sigs.k8s.io/gateway-api/conformance/utils/suite"
+	confsuite "sigs.k8s.io/gateway-api/conformance/utils/suite"
 	"sigs.k8s.io/gateway-api/conformance/utils/features"
 )
 
@@ -31,7 +31,7 @@ func init() {
 	ConformanceTests = append(ConformanceTests, HTTPRouteCORS)
 }
 
-var HTTPRouteCORS = suite.ConformanceTest{
+var HTTPRouteCORS = confsuite.ConformanceTest{
 	ShortName:   "HTTPRouteCORS",
 	Description: "An HTTPRoute with CORS filter should allow CORS requests from specified origins",
 	Manifests:   []string{"tests/httproute-cors.yaml"},
@@ -40,8 +40,8 @@ var HTTPRouteCORS = suite.ConformanceTest{
 		features.SupportHTTPRoute,
 		features.SupportHTTPRouteCORS,
 	},
-	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
-		ns := "gateway-conformance-infra"
+	Test: func(t *testing.T, suite *confsuite.ConformanceTestSuite) {
+		ns := confsuite.InfrastructureNamespace
 		routeNN1 := types.NamespacedName{Name: "cors-multiple-origins-methods-headers", Namespace: ns}
 		routeNN2 := types.NamespacedName{Name: "cors-wildcard-methods", Namespace: ns}
 		routeNN3 := types.NamespacedName{Name: "cors-wildcard-origin", Namespace: ns}
@@ -551,13 +551,13 @@ var HTTPRouteCORS = suite.ConformanceTest{
 				},
 			},
 			{
-				TestCaseName: "Simple request with credentials auth should be allowed and always echo the origin",
+				TestCaseName: "CORS request with credentials auth should be allowed and always echo the origin",
 				Request: http.Request{
 					Path:   "/cors-wildcard-methods-headers",
 					Method: "GET",
 					Headers: map[string]string{
-						"Origin":        "https://other.foo.com",
-						"Authorization": "Bearer test",
+						"Origin": "https://other.foo.com",
+						"Cookie": "foo=bar", // Cookie is a credential.
 					},
 				},
 				Namespace: ns,
@@ -570,13 +570,13 @@ var HTTPRouteCORS = suite.ConformanceTest{
 				},
 			},
 			{
-				TestCaseName: "Simple request with credentials should hide auth headers on unauth path",
+				TestCaseName: "CORS request with credentials should hide auth headers on unauth path",
 				Request: http.Request{
 					Path:   "/cors-wildcard-methods-headers-unauth",
 					Method: "GET",
 					Headers: map[string]string{
-						"Origin":        "https://other.foo.com",
-						"Authorization": "Bearer test",
+						"Origin": "https://other.foo.com",
+						"Cookie": "foo=bar", // Cookie is a credential.
 					},
 				},
 				Namespace: ns,

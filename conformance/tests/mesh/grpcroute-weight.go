@@ -47,7 +47,7 @@ var MeshGRPCRouteWeight = suite.ConformanceTest{
 			expected := http.ExpectedResponse{
 				Request:   http.Request{Protocol: "grpc", Path: "", Host: "echo:7070"},
 				Response:  http.Response{StatusCode: 200},
-				Namespace: "gateway-conformance-mesh",
+				Namespace: suite.MeshNamespace,
 			}
 
 			// Assert request succeeds before doing our distribution check
