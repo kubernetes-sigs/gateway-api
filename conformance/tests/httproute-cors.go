@@ -551,13 +551,13 @@ var HTTPRouteCORS = suite.ConformanceTest{
 				},
 			},
 			{
-				TestCaseName: "Simple request with credentials auth should be allowed and always echo the origin",
+				TestCaseName: "CORS request with credentials auth should be allowed and always echo the origin",
 				Request: http.Request{
 					Path:   "/cors-wildcard-methods-headers",
 					Method: "GET",
 					Headers: map[string]string{
-						"Origin":        "https://other.foo.com",
-						"Authorization": "Bearer test",
+						"Origin": "https://other.foo.com",
+						"Cookie": "foo=bar", // Cookie is a credential.
 					},
 				},
 				Namespace: ns,
@@ -570,13 +570,13 @@ var HTTPRouteCORS = suite.ConformanceTest{
 				},
 			},
 			{
-				TestCaseName: "Simple request with credentials should hide auth headers on unauth path",
+				TestCaseName: "CORS request with credentials should hide auth headers on unauth path",
 				Request: http.Request{
 					Path:   "/cors-wildcard-methods-headers-unauth",
 					Method: "GET",
 					Headers: map[string]string{
-						"Origin":        "https://other.foo.com",
-						"Authorization": "Bearer test",
+						"Origin": "https://other.foo.com",
+						"Cookie": "foo=bar", // Cookie is a credential.
 					},
 				},
 				Namespace: ns,
