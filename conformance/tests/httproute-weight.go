@@ -64,7 +64,7 @@ var HTTPRouteWeight = confsuite.ConformanceTest{
 			http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, expected)
 
 			expectedWeights := map[string]float64{
-				confsuite.InfraBackendServiceNameV1:   0.7,
+				confsuite.InfraBackendServiceNameV1: 0.7,
 				confsuite.InfraBackendServiceNameV2: 0.3,
 				confsuite.InfraBackendServiceNameV3: 0.0,
 			}
