@@ -27,7 +27,7 @@ import (
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
-	"sigs.k8s.io/gateway-api/conformance/utils/suite"
+	confsuite "sigs.k8s.io/gateway-api/conformance/utils/suite"
 	"sigs.k8s.io/gateway-api/pkg/features"
 )
 
@@ -35,7 +35,7 @@ func init() {
 	ConformanceTests = append(ConformanceTests, ListenerSetAllowedRoutesNamespaces)
 }
 
-var ListenerSetAllowedRoutesNamespaces = suite.ConformanceTest{
+var ListenerSetAllowedRoutesNamespaces = confsuite.ConformanceTest{
 	ShortName:   "ListenerSetAllowedRoutesNamespaces",
 	Description: "ListenerSet listeners allow routes from the specified namespace",
 	Features: []features.FeatureName{
@@ -47,8 +47,8 @@ var ListenerSetAllowedRoutesNamespaces = suite.ConformanceTest{
 	Manifests: []string{
 		"tests/listenerset-allowed-routes-namespaces.yaml",
 	},
-	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
-		ns := "gateway-conformance-infra"
+	Test: func(t *testing.T, suite *confsuite.ConformanceTestSuite) {
+		ns := confsuite.InfrastructureNamespace
 		kubernetes.NamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, []string{ns})
 
 		// Verify the gateway is accepted
@@ -102,23 +102,23 @@ var ListenerSetAllowedRoutesNamespaces = suite.ConformanceTest{
 			// Requests to all the routes on `listener-set-listener-allowed-routes-all` should succeed
 			{
 				Request:   http.Request{Host: "listener-set-listener-allowed-routes-all.com", Path: "/route-in-same-namespace"},
-				Backend:   "infra-backend-v1",
+				Backend:   confsuite.InfraBackendServiceNameV1,
 				Namespace: ns,
 			},
 			{
 				Request:   http.Request{Host: "listener-set-listener-allowed-routes-all.com", Path: "/route-in-selected-namespace"},
-				Backend:   "infra-backend-v2",
+				Backend:   confsuite.InfraBackendServiceNameV2,
 				Namespace: ns,
 			},
 			{
 				Request:   http.Request{Host: "listener-set-listener-allowed-routes-all.com", Path: "/route-not-in-selected-namespace"},
-				Backend:   "infra-backend-v3",
+				Backend:   confsuite.InfraBackendServiceNameV3,
 				Namespace: ns,
 			},
 			// Requests only to the route in the same namespace on `listener-set-listener-allowed-routes-same` should succeed
 			{
 				Request:   http.Request{Host: "listener-set-listener-allowed-routes-same.com", Path: "/route-in-same-namespace"},
-				Backend:   "infra-backend-v1",
+				Backend:   confsuite.InfraBackendServiceNameV1,
 				Namespace: ns,
 			},
 			{
@@ -136,7 +136,7 @@ var ListenerSetAllowedRoutesNamespaces = suite.ConformanceTest{
 			},
 			{
 				Request:   http.Request{Host: "listener-set-listener-allowed-routes-selector.com", Path: "/route-in-selected-namespace"},
-				Backend:   "infra-backend-v2",
+				Backend:   confsuite.InfraBackendServiceNameV2,
 				Namespace: ns,
 			},
 			{

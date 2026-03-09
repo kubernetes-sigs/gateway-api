@@ -27,7 +27,7 @@ import (
 
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
-	"sigs.k8s.io/gateway-api/conformance/utils/suite"
+	confsuite "sigs.k8s.io/gateway-api/conformance/utils/suite"
 	"sigs.k8s.io/gateway-api/pkg/features"
 )
 
@@ -37,7 +37,7 @@ func init() {
 	)
 }
 
-var HTTPRouteBackendProtocolWebSocket = suite.ConformanceTest{
+var HTTPRouteBackendProtocolWebSocket = confsuite.ConformanceTest{
 	ShortName:   "HTTPRouteBackendProtocolWebSocket",
 	Description: "A HTTPRoute with a BackendRef that has an appProtocol kubernetes.io/ws should be functional",
 	Features: []features.FeatureName{
@@ -48,8 +48,8 @@ var HTTPRouteBackendProtocolWebSocket = suite.ConformanceTest{
 	Manifests: []string{
 		"tests/httproute-backend-protocol-websocket.yaml",
 	},
-	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
-		ns := "gateway-conformance-infra"
+	Test: func(t *testing.T, suite *confsuite.ConformanceTestSuite) {
+		ns := confsuite.InfrastructureNamespace
 		routeNN := types.NamespacedName{Name: "backend-protocol-ws", Namespace: ns}
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: ns}
 		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
