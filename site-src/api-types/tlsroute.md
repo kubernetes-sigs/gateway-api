@@ -60,7 +60,7 @@ The specification of a TLSRoute consists of:
   attached to.
 - [Hostnames][hostname] (required) - Define a list of hostnames to use for
   matching the SNI hostname of a TLS handshake. For details on hostname
-  intersection and routing, see the [Hostnames concept][hostnames-concept].
+  intersection and routing, see the [Hostnames docs][hostnames-concept].
 - [Rules][tlsrouterule] - Define a list of rules to perform actions against
   matching TLS handshake. For TLSRoute this is limited to which [backendRefs][backendRef]
   should be used.
@@ -251,7 +251,7 @@ status:
 ## Merging
 Multiple TLSRoutes can be attached to a single Gateway resource. Importantly,
 only one Route hostname may match each request. For more information on how
-hostnames and conflict resolution apply, refer to the [Hostnames concept][hostnames-concept]
+hostnames and conflict resolution apply, refer to the [Hostnames docs][hostnames-concept]
 and the [API specification][hostname].
 
 
