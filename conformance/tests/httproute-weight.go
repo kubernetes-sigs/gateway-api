@@ -22,11 +22,11 @@ import (
 
 	"k8s.io/apimachinery/pkg/types"
 
+	"sigs.k8s.io/gateway-api/conformance/utils/features"
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	confsuite "sigs.k8s.io/gateway-api/conformance/utils/suite"
 	"sigs.k8s.io/gateway-api/conformance/utils/weight"
-	"sigs.k8s.io/gateway-api/conformance/utils/features"
 )
 
 func init() {

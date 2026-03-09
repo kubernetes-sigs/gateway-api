@@ -28,9 +28,9 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
+	"sigs.k8s.io/gateway-api/conformance/utils/features"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	confsuite "sigs.k8s.io/gateway-api/conformance/utils/suite"
-	"sigs.k8s.io/gateway-api/conformance/utils/features"
 )
 
 func init() {

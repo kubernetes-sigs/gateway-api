@@ -21,8 +21,8 @@ import (
 	"strings"
 	"testing"
 
-	"sigs.k8s.io/gateway-api/conformance/utils/tlog"
 	"sigs.k8s.io/gateway-api/conformance/utils/features"
+	"sigs.k8s.io/gateway-api/conformance/utils/tlog"
 )
 
 // ConformanceTest is used to define each individual conformance test.

@@ -29,12 +29,12 @@ import (
 	"k8s.io/utils/ptr"
 
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
+	"sigs.k8s.io/gateway-api/conformance/utils/features"
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/roundtripper"
 	confsuite "sigs.k8s.io/gateway-api/conformance/utils/suite"
 	"sigs.k8s.io/gateway-api/conformance/utils/tlog"
-	"sigs.k8s.io/gateway-api/conformance/utils/features"
 )
 
 const (

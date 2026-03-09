@@ -24,10 +24,10 @@ import (
 
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 	pb "sigs.k8s.io/gateway-api/conformance/echo-basic/grpcechoserver"
+	"sigs.k8s.io/gateway-api/conformance/utils/features"
 	"sigs.k8s.io/gateway-api/conformance/utils/grpc"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	confsuite "sigs.k8s.io/gateway-api/conformance/utils/suite"
-	"sigs.k8s.io/gateway-api/conformance/utils/features"
 )
 
 func init() {

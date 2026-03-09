@@ -42,13 +42,13 @@ import (
 	xmeshv1alpha1 "sigs.k8s.io/gateway-api/apisx/v1alpha1"
 	confv1 "sigs.k8s.io/gateway-api/conformance/apis/v1"
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
+	"sigs.k8s.io/gateway-api/conformance/utils/features"
 	"sigs.k8s.io/gateway-api/conformance/utils/flags"
 	"sigs.k8s.io/gateway-api/conformance/utils/grpc"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/roundtripper"
 	"sigs.k8s.io/gateway-api/conformance/utils/tlog"
 	"sigs.k8s.io/gateway-api/pkg/consts"
-	"sigs.k8s.io/gateway-api/conformance/utils/features"
 )
 
 // -----------------------------------------------------------------------------
