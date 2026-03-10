@@ -477,10 +477,12 @@ type BackendTrafficPolicySpec struct {
     SessionPersistence *SessionPersistence `json:"sessionPersistence,omitempty"`
 }
 
-// SessionPersistence defines the desired state of
-// SessionPersistence.
-// +kubebuilder:validation:XValidation:message="AbsoluteTimeout must be specified when cookie lifetimeType is Permanent",rule="!has(self.cookieConfig) || !has(self.cookieConfig.lifetimeType) || self.cookieConfig.lifetimeType != 'Permanent' || has(self.absoluteTimeout)"
-// +kubebuilder:validation:XValidation:message="cookieConfig can only be set with type Cookie",rule="!has(self.cookieConfig) || self.type == 'Cookie'"
+// SessionPersistence defines the desired state of SessionPersistence.
+// +kubebuilder:validation:XValidation:message="AbsoluteTimeout must be specified when cookie lifetimeType is Permanent",rule="!has(self.cookie) || !has(self.cookie.lifetimeType) || self.cookie.lifetimeType != 'Permanent' || has(self.absoluteTimeout)"
+// +kubebuilder:validation:XValidation:message="cookie must be nil if type is not Cookie",rule="!has(self.cookie) || self.type == 'Cookie'"
+// +kubebuilder:validation:XValidation:message="cookie must be specified for Cookie type",rule="self.type != 'Cookie' || has(self.cookie)"
+// +kubebuilder:validation:XValidation:message="header must be nil if type is not Header",rule="!has(self.header) || self.type == 'Header'"
+// +kubebuilder:validation:XValidation:message="header must be specified for Header type",rule="self.type != 'Header' || has(self.header)"
 type SessionPersistence struct {
     // AbsoluteTimeout defines the absolute timeout of the persistent
     // session. Once the AbsoluteTimeout duration has elapsed, the
@@ -508,25 +510,26 @@ type SessionPersistence struct {
     //
     // Support: Extended for "Header" type
     //
+    // +unionDiscriminator
     // +optional
     // +kubebuilder:default=Cookie
     Type *SessionPersistenceType `json:"type,omitempty"`
 
-    // CookieConfig provides configuration settings that are specific
+    // Cookie provides configuration settings that are specific
     // to cookie-based session persistence.
     //
     // Support: Core
     //
     // +optional
-    CookieConfig *CookieConfig `json:"cookieConfig,omitempty"`
+    Cookie *CookieConfig `json:"cookie,omitempty"`
 
-    // HeaderConfig provides configuration settings that are specific
+    // Header provides configuration settings that are specific
     // to header-based session persistence.
     //
     // Support: Extended
     //
     // +optional
-    HeaderConfig *HeaderConfig `json:"headerConfig,omitempty"`
+    Header *HeaderConfig `json:"header,omitempty"`
 }
 
 // Duration is a string value representing a duration in time. The format is as specified
@@ -757,13 +760,13 @@ Let's discuss some of these cookie attributes in more detail.
 
 #### Name
 
-The `Name` cookie attribute MAY be configured via the `cookieConfig.Name` field. This field
+The `Name` cookie attribute MAY be configured via the `cookie.name` field. This field
 has Extended support because some implementations, such as cloud-based global load balancers,
 don't have the capability to configure the cookie name.
 
-The use case for configuring the cookie name via `cookieConfig.Name` is that certain users might need to align it with an
+The use case for configuring the cookie name via `cookie.name` is that certain users might need to align it with an
 existing cookie name, such as Java's `JSESSIONID`. Refer to [Session Initiation Guidelines](#session-initiation-guidelines)
-for details on how this GEP supports existing sessions. If `cookieConfig.Name` is not specified, then a unique cookie name
+for details on how this GEP supports existing sessions. If `cookie.name` is not specified, then a unique cookie name
 should be generated.
 
 #### Expires / Max-Age
@@ -886,7 +889,7 @@ spec:
     backendRefs:
     - name: servicev1
     sessionPersistence:
-      cookieConfig:
+      cookie:
         name: session-a
   - matches:
     - path:
@@ -897,7 +900,7 @@ spec:
     - name: servicev2
       weight: 100
     sessionPersistence:
-      cookieConfig:
+      cookie:
         name: session-b
 ```
 
@@ -938,7 +941,7 @@ spec:
     name: servicev1
   sessionPersistence:
     type: Cookie
-    cookieConfig:
+    cookie:
       name: service-cookie
 ```
 
@@ -973,7 +976,7 @@ spec:
     name: servicev1
   sessionPersistence:
     type: Cookie
-    cookieConfig:
+    cookie:
       name: split-route-cookie
 ---
 kind: BackendTrafficPolicy
@@ -985,7 +988,7 @@ spec:
     name: servicev2
   sessionPersistence:
     type: Cookie
-    cookieConfig:
+    cookie:
       name: split-route-cookie
 ```
 
@@ -1010,7 +1013,7 @@ spec:
       weight: 50
     sessionPersistence:
       type: Cookie
-      cookieConfig:
+      cookie:
         name: split-route-cookie
 ```
 
@@ -1046,7 +1049,7 @@ spec:
     name: servicev1
   sessionPersistence:
     type: Cookie
-    cookieConfig:
+    cookie:
       name: split-route-cookie
 ```
 
