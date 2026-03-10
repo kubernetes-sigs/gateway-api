@@ -1472,6 +1472,7 @@ const (
 	// Controllers may raise this condition with other reasons,
 	// but should prefer to use the reasons listed above to improve
 	// interoperability.
+	// If this condition is not set, it is assumed that there are no conflicts.
 	ListenerConditionConflicted ListenerConditionType = "Conflicted"
 
 	// This reason is used with the "Conflicted" condition when
