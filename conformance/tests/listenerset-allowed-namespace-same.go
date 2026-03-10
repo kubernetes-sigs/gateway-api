@@ -104,10 +104,5 @@ func generateAcceptedListenerConditions() []metav1.Condition {
 			Status: metav1.ConditionTrue,
 			Reason: "", // any reason
 		},
-		{
-			Type:   string(gatewayv1.ListenerConditionConflicted),
-			Status: metav1.ConditionFalse,
-			Reason: "", // any reason
-		},
 	}
 }
