@@ -661,7 +661,7 @@ their preferred form of session persistence if desired.
 
 ### Target Persona
 
-Referring to the [Gateway API Security Model](../../concepts/security-model.md#roles-and-personas),
+Referring to the [Gateway API Security Model](../../concepts/security.md#roles-and-personas),
 the target kubernetes role/persona for session persistence are application developers, as mentioned in the [When does an application require session persistence?](#when-does-an-application-require-session-persistence)
 section. It is the responsibility of the application developers to adjust the persistence configuration to ensure the
 functionality of their applications.

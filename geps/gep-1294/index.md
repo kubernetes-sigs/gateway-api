@@ -11,7 +11,7 @@ This GEP is intended to establish an implementable, but experimental, baseline f
 
 ## Personas
 
-This GEP uses the [roles and personas](../../concepts/security-model.md#roles-and-personas) defined in the Gateway API security model, and the service "producer" and "consumer" roles defined in [GEP-1324: Service Mesh in Gateway API](../gep-1324/index.md#producer-and-consumer).
+This GEP uses the [roles and personas](../../concepts/security.md#roles-and-personas) defined in the Gateway API security model, and the service "producer" and "consumer" roles defined in [GEP-1324: Service Mesh in Gateway API](../gep-1324/index.md#producer-and-consumer).
 
 ## Goals
 
