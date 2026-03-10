@@ -14,7 +14,7 @@
 
    ```sh
    export VERSION="v2.2.1"
-   git clone https://github.com/kgateway-dev/kgateway.git && cd kgateway && git checkout tags/$VERSION
+   git clone https://github.com/kgateway-dev/kgateway.git && cd kgateway && git checkout 8d9b57e08dc8ce2fffc3aa417f507ec45a9e01b6
    ```
 
 2. Bootstrap a KinD cluster with all the necessary components installed:
