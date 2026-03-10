@@ -321,9 +321,9 @@ type ListenerEntryStatus struct {
 	// attachment semantics can be found in the documentation on the various
 	// Route kinds ParentRefs fields). Listener or Route status does not impact
     // successful attachment, i.e. the AttachedRoutes field count MUST be set
-    // for Listeners, even if the Accepted condition of an individual Listener is set 
-    // to "False". The AttachedRoutes number represents the number of Routes with 
-    // the Accepted condition set to "True" that have been attached to this Listener. 
+    // for Listeners, even if the Accepted condition of an individual Listener is set
+    // to "False". The AttachedRoutes number represents the number of Routes with
+    // the Accepted condition set to "True" that have been attached to this Listener.
     // Routes with any other value for the Accepted condition MUST NOT be included
     // in this count.
 	//
@@ -716,7 +716,7 @@ and should not have a `Conflicted` condition, while the conflicting listeners
 MUST have a `Conflicted` condition set to True and with an explicit reason on its message.
 
 A `Route` MAY attach to a `Conflicted` ListenerSet, and once this ListenerSet is not conflicted
-anymore the implementations SHOULD support that the traffic of this route is accepted on 
+anymore the implementations SHOULD support that the traffic of this route is accepted on
 this ListenerSet and flow without downtime.
 
 As an example, given 2 ListenerSets attached to the same Gateway, being one of them conflicted with
@@ -1125,10 +1125,6 @@ They will validate the following scenarios :
         - type: Programmed
           status: True
           reason: Programmed
-        - type: Conflicted
-          status: False
-          reason: NoConflicts
-
       AttachedListenerSets: 0
       ```
 
@@ -1174,10 +1170,6 @@ They will validate the following scenarios :
         - type: Programmed
           status: True
           reason: Programmed
-        - type: Conflicted
-          status: False
-          reason: NoConflicts
-
       AttachedListenerSets: 1
       ```
 
@@ -1230,9 +1222,6 @@ They will validate the following scenarios :
         - type: Programmed
           status: True
           reason: Programmed
-        - type: Conflicted
-          status: False
-          reason: NoConflicts
       ```
 
     - The `ls-conflicted` ListenerSet has the following status :
@@ -1283,9 +1272,6 @@ They will validate the following scenarios :
         - type: Programmed
           status: True
           reason: Programmed
-        - type: Conflicted
-          status: False
-          reason: NoConflicts
       ```
 
     - The `ls-conflicted` ListenerSet has the following status :
@@ -1331,10 +1317,6 @@ They will validate the following scenarios :
         - type: Programmed
           status: True
           reason: Programmed
-        - type: Conflicted
-          status: False
-          reason: NoConflicts
-
       AttachedListenerSets: 0
       ```
 
@@ -1380,10 +1362,6 @@ They will validate the following scenarios :
         - type: Programmed
           status: True
           reason: Programmed
-        - type: Conflicted
-          status: False
-          reason: NoConflicts
-
       AttachedListenerSets: 1
       ```
 
@@ -1436,9 +1414,6 @@ They will validate the following scenarios :
         - type: Programmed
           status: True
           reason: Programmed
-        - type: Conflicted
-          status: False
-          reason: NoConflicts
       ```
 
     - The `ls-conflicted` ListenerSet has the following status :
@@ -1489,9 +1464,6 @@ They will validate the following scenarios :
         - type: Programmed
           status: True
           reason: Programmed
-        - type: Conflicted
-          status: False
-          reason: NoConflicts
       ```
 
     - The `ls-conflicted` ListenerSet has the following status :
@@ -1713,9 +1685,6 @@ They will validate the following scenarios :
         - type: Programmed
           status: True
           reason: Programmed
-        - type: Conflicted
-          status: False
-          reason: NoConflicts
         - type: ResolvedRefs
           status: True
           reason: ResolvedRefs
