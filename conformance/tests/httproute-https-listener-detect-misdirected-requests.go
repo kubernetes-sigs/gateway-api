@@ -20,6 +20,7 @@ import (
 	"testing"
 
 	"k8s.io/apimachinery/pkg/types"
+	"sigs.k8s.io/gateway-api/conformance/utils/roundtripper"
 
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
@@ -92,7 +93,11 @@ var HTTPRouteHTTPSListenerDetectMisdirectedRequests = confsuite.ConformanceTest{
 
 		for i, tc := range cases {
 			expected := http.ExpectedResponse{
-				Request:   http.Request{Host: tc.host, Path: "/detect-misdirected-requests"},
+				Request: http.Request{
+					Host:     tc.host,
+					Path:     "/detect-misdirected-requests",
+					Protocol: roundtripper.H2Protocol,
+				},
 				Response:  http.Response{StatusCodes: []int{tc.statusCode}},
 				Backend:   tc.backend,
 				Namespace: confsuite.InfrastructureNamespace,

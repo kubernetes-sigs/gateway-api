@@ -41,6 +41,7 @@ import (
 const (
 	H2CPriorKnowledgeProtocol = "H2C_PRIOR_KNOWLEDGE"
 	HTTPSProtocol             = "HTTPS"
+	H2Protocol                = "H2"
 )
 
 // RoundTripper is an interface used to make requests within conformance tests.
@@ -151,6 +152,18 @@ func (d *DefaultRoundTripper) httpTransport(request Request) (http.RoundTripper,
 	return transport, nil
 }
 
+func (d *DefaultRoundTripper) h2Transport(request Request) (http.RoundTripper, error) {
+	transport := &http2.Transport{}
+
+	tlsConfig, err := createTLSClientConfig(request)
+	if err != nil {
+		return nil, err
+	}
+	transport.TLSClientConfig = tlsConfig
+
+	return transport, nil
+}
+
 func (d *DefaultRoundTripper) h2cPriorKnowledgeTransport(request Request) (http.RoundTripper, error) {
 	if request.ServerName != "" && len(request.ServerCertificate) > 0 {
 		return nil, errors.New("request has configured trusted CA certificates but h2 prior knowledge is not encrypted")
@@ -178,6 +191,8 @@ func (d *DefaultRoundTripper) CaptureRoundTrip(request Request) (*CapturedReques
 	switch request.Protocol {
 	case H2CPriorKnowledgeProtocol:
 		transport, err = d.h2cPriorKnowledgeTransport(request)
+	case H2Protocol:
+		transport, err = d.h2Transport(request)
 	default:
 		transport, err = d.httpTransport(request)
 	}
