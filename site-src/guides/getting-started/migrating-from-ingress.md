@@ -202,6 +202,9 @@ Gateway resources are owned by the cluster operator and the application admin.
 
 ### TLS Termination
 
+???+ info "Extended Support Feature: TLSRouteModeTerminate"
+    This feature is part of extended support. For more information on support levels, refer to our [conformance guide](../../concepts/conformance.md).
+
 The Ingress resource supports TLS termination via
 the [TLS section](https://kubernetes.io/docs/concepts/services-networking/ingress/#tls),
 where the TLS certificate and key are stored in a Secret.

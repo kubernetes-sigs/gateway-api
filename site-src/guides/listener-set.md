@@ -1,5 +1,8 @@
 # ListenerSet
 
+???+ info "Extended Support Feature: ListenerSet"
+    This feature is part of extended support. For more information on support levels, refer to our [conformance guide](../concepts/conformance.md).
+
 ListenerSets allow teams to define ports, hostnames, and TLS certificates in separate resources
 rather than cramming everything into one giant Gateway object which has a limit of 64 listeners.
 This enables a delegated management model suitable for high-scale, multi-tenant environments.

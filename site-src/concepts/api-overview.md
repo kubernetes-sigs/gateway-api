@@ -269,6 +269,9 @@ As said above, the following is required for a Route to be attached to a Gateway
 
 #### Referencing Gateways
 
+???+ info "Extended Support Feature: HTTPRouteParentRefPort"
+    This feature is part of extended support. For more information on support levels, refer to our [conformance guide](../concepts/conformance.md).
+
 ??? example "Extended Feature"
 
     The `Port` field described below is an Extended feature, and so is _optional_ for implementations to support.
