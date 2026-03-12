@@ -116,6 +116,7 @@ tidy:
 test.crds-validation:
 	K8S_VERSION=$(CEL_TEST_K8S_VERSION) CRD_CHANNEL=$(CEL_TEST_CRD_CHANNEL) go test ${GO_TEST_FLAGS} -count=1 -timeout=120s --tags=$(CEL_TEST_CRD_CHANNEL) -v ./tests/cel
 	K8S_VERSION=$(CEL_TEST_K8S_VERSION) CRD_CHANNEL=$(CEL_TEST_CRD_CHANNEL) go test ${GO_TEST_FLAGS} -count=1 -timeout=120s -v ./tests/crd
+	K8S_VERSION=$(CEL_TEST_K8S_VERSION) CRD_CHANNEL=$(CEL_TEST_CRD_CHANNEL) go test ${GO_TEST_FLAGS} -count=1 -timeout=120s -v ./tests/vap
 
 # Run conformance tests against controller implementation
 .PHONY: conformance
@@ -197,7 +198,7 @@ release-staging: image.multiarch.setup
 # Docs
 
 DOCS_BUILD_CONTAINER_NAME ?= gateway-api-mkdocs
-DOCS_VERIFY_CONTAINER_IMAGE ?= registry.hub.docker.com/lycheeverse/lychee:0.22
+DOCS_VERIFY_CONTAINER_IMAGE ?= registry.hub.docker.com/lycheeverse/lychee:0.23
 
 .PHONY: build-docs
 build-docs: update-geps api-ref-docs
@@ -210,7 +211,7 @@ verify-docs: build-docs
 	docker run --init --rm -w /input -v ${PWD}:/input $(DOCS_VERIFY_CONTAINER_IMAGE) --root-dir /input/site --exclude-path "overrides/partials/.*\.html" --exclude ".*" --include "sigs.k8s.io" --accept 200 --max-concurrency 10 --include-fragments --cache $(VALIDATE_DOCS_EXTRA_ARGS) /input/site/**/*.html
 
 .PHONY: build-docs-netlify
-build-docs-netlify: update-geps api-ref-docs
+build-docs-netlify: update-geps api-ref-docs wizard-wasm
 	pip install -r hack/mkdocs/image/requirements.txt
 	python -m mkdocs build
 
@@ -226,3 +227,22 @@ update-geps:
 .PHONY: api-ref-docs
 api-ref-docs:
 	hack/mkdocs/generate.sh
+
+.PHONY: wizard-wasm
+wizard-wasm:
+	@GOROOT=$$(go env GOROOT); \
+	if [ -f "$$GOROOT/misc/wasm/wasm_exec.js" ]; then cp -f "$$GOROOT/misc/wasm/wasm_exec.js" site-src/wizard/; \
+	elif [ -f "$$GOROOT/lib/wasm/wasm_exec.js" ]; then cp -f "$$GOROOT/lib/wasm/wasm_exec.js" site-src/wizard/; \
+	else echo "ERROR: wasm_exec.js not found in GOROOT"; exit 1; fi
+	GOOS=js GOARCH=wasm go build -o site-src/wizard/main.wasm ./wasm/
+
+# Generate controller wizard data (multi-version). Requires conformance/reports/ with version dirs.
+# Run manually if make serve is used without conformance reports.
+.PHONY: wizard-data
+wizard-data:
+	python3 hack/mkdocs-generate-controller-wizard-data.py --all -o site-src/wizard/data/controller-wizard-data.json
+
+.PHONY: serve
+serve: wizard-wasm
+	@echo "Tip: Run 'make wizard-data' first if you have conformance/reports/ to load implementation data."
+	python3 -m http.server -d site-src/wizard 8080

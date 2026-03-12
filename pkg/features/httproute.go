@@ -212,7 +212,7 @@ var (
 	// HTTPRouteCORS contains metadata for the SupportHTTPRouteCORS feature.
 	HTTPRouteCORS = Feature{
 		Name:    SupportHTTPRouteCORS,
-		Channel: FeatureChannelExperimental,
+		Channel: FeatureChannelStandard,
 	}
 	// HTTPRoute303RedirectStatusCodeFeature contains metadata for the HTTPRoute303RedirectStatusCode feature.
 	HTTPRoute303RedirectStatusCodeFeature = Feature{

@@ -27,3 +27,9 @@ type GatewayExpansion interface{}
 type GatewayClassExpansion interface{}
 
 type HTTPRouteExpansion interface{}
+
+type ListenerSetExpansion interface{}
+
+type ReferenceGrantExpansion interface{}
+
+type TLSRouteExpansion interface{}

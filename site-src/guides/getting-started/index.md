@@ -22,7 +22,7 @@ Once you have a controller running, you can start with a simple example and then
 - [Configuring TLS](../tls.md)
 - [TCP routing](../tcp.md)
 - [gRPC routing](../grpc-routing.md)
-
+- [ListenerSet](../listener-set.md)
 
 ## Migrating from Ingress
 
@@ -61,7 +61,7 @@ beta, including GatewayClass, Gateway, HTTPRoute, and ReferenceGrant. To install
 this channel, run the following kubectl command:
 
 ```bash
-kubectl apply --server-side -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.1/standard-install.yaml
+kubectl apply --server-side -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.5.0/standard-install.yaml
 ```
 
 Refer to the [server-side apply documentation](https://kubernetes.io/docs/reference/using-api/server-side-apply/)
@@ -82,7 +82,7 @@ documentation](../../concepts/versioning.md).
 To install the experimental channel, run the following kubectl command:
 
 ```bash
-kubectl apply --server-side -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.1/experimental-install.yaml
+kubectl apply --server-side -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.5.0/experimental-install.yaml
 ```
 
 Refer to the [server-side apply documentation](https://kubernetes.io/docs/reference/using-api/server-side-apply/)

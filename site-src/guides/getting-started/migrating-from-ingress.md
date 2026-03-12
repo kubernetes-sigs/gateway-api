@@ -73,7 +73,7 @@ resource, the infrastructure provider and cluster operator became the owners of
 that resource, and thus, explicit personas of the Ingress API.
 
 Gateway API
-includes [four explicit personas](../../concepts/security-model.md#roles-and-personas):
+includes [four explicit personas](../../concepts/security.md#roles-and-personas):
 the application developer, the application admin, the cluster operator, and the
 infrastructure providers. This allows you to break away from the self-service
 model by splitting the responsibilities of the user persona across those
@@ -358,6 +358,9 @@ spec:
             name: foo-orders-app
             port:
               number: 80
+  - host: bar.example.com
+    http:
+      paths:
       - path: /
         pathType: Prefix
         backend:

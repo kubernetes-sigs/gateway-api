@@ -1,7 +1,7 @@
 # GEP-91: Client Certificate Validation for TLS terminating at the Gateway
 
 * Issue: [#91](https://github.com/kubernetes-sigs/gateway-api/issues/91)
-* Status: Experimental
+* Status: Standard
 
 (See definitions in [GEP States](../overview.md#gep-states).)
 
@@ -103,7 +103,6 @@ type GatewayTLSConfig struct {
     // support: Core
     //
     // +required
-    // <gateway:experimental>
     Default FrontendTLSValidation `json:"default"`
 
     // PerPort specifies tls configuration assigned per port.
@@ -129,7 +128,6 @@ type TLSConfig struct {
 	// Support: Extended
 	//
 	// +required
-	// <gateway:experimental>
 	FrontendValidation FrontendTLSValidation `json:"frontendValidation"`
 }
 
@@ -141,7 +139,6 @@ type TLSPortConfig struct {
 	// Support: Core
 	//
 	// +required
-	// <gateway:experimental>
 	Port PortNumber `json:"port"`
 	// TLS store the configuration that will be applied to all Listeners handling
 	// HTTPS traffic and matching given port.
@@ -175,7 +172,7 @@ type FrontendTLSValidation struct {
 	//   reference, the `ResolvedRefs` condition MUST be set with
 	//   the Reason `RefNotPermitted`.
     //
-	// Implementations MAY choose to perform further validation of the 
+	// Implementations MAY choose to perform further validation of the
 	// certificate content (e.g., checking expiry or enforcing specific formats).
 	// In such cases, an implementation-specific Reason and Message MUST be set.
 	//
@@ -246,7 +243,6 @@ type GatewaySpec struct {
 	// Support: Core
 	//
 	// +optional
-	// <gateway:experimental>
 	TLS *GatewayTLSConfig `json:"tls,omitempty"`
 }
 

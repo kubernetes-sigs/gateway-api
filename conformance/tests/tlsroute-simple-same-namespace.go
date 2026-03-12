@@ -26,10 +26,9 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
-	"sigs.k8s.io/gateway-api/conformance/utils/suite"
-	"sigs.k8s.io/gateway-api/conformance/utils/tls"
+	confsuite "sigs.k8s.io/gateway-api/conformance/utils/suite"
+	"sigs.k8s.io/gateway-api/conformance/utils/tcp"
 	"sigs.k8s.io/gateway-api/pkg/features"
 )
 
@@ -37,7 +36,7 @@ func init() {
 	ConformanceTests = append(ConformanceTests, TLSRouteSimpleSameNamespace)
 }
 
-var TLSRouteSimpleSameNamespace = suite.ConformanceTest{
+var TLSRouteSimpleSameNamespace = confsuite.ConformanceTest{
 	ShortName:   "TLSRouteSimpleSameNamespace",
 	Description: "A single TLSRoute in the gateway-conformance-infra namespace attaches to a Gateway in the same namespace",
 	Features: []features.FeatureName{
@@ -45,11 +44,11 @@ var TLSRouteSimpleSameNamespace = suite.ConformanceTest{
 		features.SupportTLSRoute,
 	},
 	Manifests: []string{"tests/tlsroute-simple-same-namespace.yaml"},
-	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
-		ns := "gateway-conformance-infra"
-		routeNN := types.NamespacedName{Name: "gateway-conformance-infra-test", Namespace: ns}
+	Test: func(t *testing.T, suite *confsuite.ConformanceTestSuite) {
+		ns := confsuite.InfrastructureNamespace
+		routeNN := types.NamespacedName{Name: confsuite.InfrastructureGatewayName, Namespace: ns}
 		gwNN := types.NamespacedName{Name: "gateway-tlsroute", Namespace: ns}
-		certNN := types.NamespacedName{Name: "tls-checks-certificate", Namespace: ns}
+		certNN := types.NamespacedName{Name: "tls-passthrough-checks-certificate", Namespace: ns}
 
 		kubernetes.NamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, []string{ns})
 
@@ -59,16 +58,17 @@ var TLSRouteSimpleSameNamespace = suite.ConformanceTest{
 		}
 		serverStr := string(hostnames[0])
 
-		cPem, keyPem, err := GetTLSSecret(suite.Client, certNN)
+		serverCertPem, _, err := GetTLSSecret(suite.Client, certNN)
 		if err != nil {
 			t.Fatalf("unexpected error finding TLS secret: %v", err)
 		}
 		t.Run("Simple TLS request matching TLSRoute should reach infra-backend", func(t *testing.T) {
-			tls.MakeTLSRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, cPem, keyPem, serverStr,
-				http.ExpectedResponse{
-					Request:   http.Request{Host: serverStr, Path: "/"},
-					Backend:   "tls-backend",
-					Namespace: "gateway-conformance-infra",
+			tcp.MakeTCPRequestAndExpectEventuallyValidResponse(t, suite.TimeoutConfig, gwAddr, serverCertPem, serverStr, true,
+				tcp.ExpectedResponse{
+					BackendIsTLS: true, // Passthrough expects a TLS Backend
+					Backend:      "tcp-backend",
+					Namespace:    confsuite.InfrastructureNamespace,
+					Hostname:     serverStr,
 				})
 		})
 	},

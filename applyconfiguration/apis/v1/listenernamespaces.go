@@ -36,7 +36,7 @@ type ListenerNamespacesApplyConfiguration struct {
 	// * All: ListenerSets in all namespaces may be attached to this Gateway.
 	// * None: Only listeners defined in the Gateway's spec are allowed
 	//
-	// While this feature is experimental, the default value None
+	// The default value None
 	From *apisv1.FromNamespaces `json:"from,omitempty"`
 	// Selector must be specified when From is set to "Selector". In that case,
 	// only ListenerSets in Namespaces matching this Selector will be selected by this

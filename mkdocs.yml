@@ -15,6 +15,7 @@ hooks:
 - hack/mkdocs-copy-geps.py
 - hack/mkdocs-generate-conformance.py
 - hack/mkdocs_linking.py
+- hack/mkdocs-generate-controller-wizard-data.py
 watch:
 - geps
 theme:
@@ -61,6 +62,7 @@ plugins:
         'concepts/gamma.md': 'mesh/index.md'
         'concepts/service-facets.md': 'mesh/service-facets.md'
         'concepts/guidelines.md': 'guides/api-design.md'
+        'concepts/security-model.md': 'concepts/security.md'
         'contributing/community.md': 'contributing/index.md'
         'contributing/gamma.md': 'mesh/index.md#contributing'
         'reference/implementers-guide.md': 'guides/implementers.md'

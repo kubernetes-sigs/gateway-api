@@ -250,6 +250,7 @@ type HTTPRouteRule struct {
 	// +listType=atomic
 	// +kubebuilder:validation:MaxItems=16
 	// +kubebuilder:validation:XValidation:message="May specify either httpRouteFilterRequestRedirect or httpRouteFilterRequestRewrite, but not both",rule="!(self.exists(f, f.type == 'RequestRedirect') && self.exists(f, f.type == 'URLRewrite'))"
+	// +kubebuilder:validation:XValidation:message="CORS filter cannot be repeated",rule="self.filter(f, f.type == 'CORS').size() <= 1"
 	// +kubebuilder:validation:XValidation:message="RequestHeaderModifier filter cannot be repeated",rule="self.filter(f, f.type == 'RequestHeaderModifier').size() <= 1"
 	// +kubebuilder:validation:XValidation:message="ResponseHeaderModifier filter cannot be repeated",rule="self.filter(f, f.type == 'ResponseHeaderModifier').size() <= 1"
 	// +kubebuilder:validation:XValidation:message="RequestRedirect filter cannot be repeated",rule="self.filter(f, f.type == 'RequestRedirect').size() <= 1"
@@ -798,6 +799,8 @@ type HTTPRouteMatch struct {
 // authentication strategies, rate-limiting, and traffic shaping. API
 // guarantee/conformance is defined based on the type of the filter.
 //
+// +kubebuilder:validation:XValidation:message="filter.cors must be nil if the filter.type is not CORS",rule="!(has(self.cors) && self.type != 'CORS')"
+// +kubebuilder:validation:XValidation:message="filter.cors must be specified for CORS filter.type",rule="!(!has(self.cors) && self.type == 'CORS')"
 // +kubebuilder:validation:XValidation:message="filter.requestHeaderModifier must be nil if the filter.type is not RequestHeaderModifier",rule="!(has(self.requestHeaderModifier) && self.type != 'RequestHeaderModifier')"
 // +kubebuilder:validation:XValidation:message="filter.requestHeaderModifier must be specified for RequestHeaderModifier filter.type",rule="!(!has(self.requestHeaderModifier) && self.type == 'RequestHeaderModifier')"
 // +kubebuilder:validation:XValidation:message="filter.responseHeaderModifier must be nil if the filter.type is not ResponseHeaderModifier",rule="!(has(self.responseHeaderModifier) && self.type != 'ResponseHeaderModifier')"
@@ -808,8 +811,6 @@ type HTTPRouteMatch struct {
 // +kubebuilder:validation:XValidation:message="filter.requestRedirect must be specified for RequestRedirect filter.type",rule="!(!has(self.requestRedirect) && self.type == 'RequestRedirect')"
 // +kubebuilder:validation:XValidation:message="filter.urlRewrite must be nil if the filter.type is not URLRewrite",rule="!(has(self.urlRewrite) && self.type != 'URLRewrite')"
 // +kubebuilder:validation:XValidation:message="filter.urlRewrite must be specified for URLRewrite filter.type",rule="!(!has(self.urlRewrite) && self.type == 'URLRewrite')"
-// <gateway:experimental:validation:XValidation:message="filter.cors must be nil if the filter.type is not CORS",rule="!(has(self.cors) && self.type != 'CORS')">
-// <gateway:experimental:validation:XValidation:message="filter.cors must be specified for CORS filter.type",rule="!(!has(self.cors) && self.type == 'CORS')">
 // <gateway:experimental:validation:XValidation:message="filter.externalAuth must be nil if the filter.type is not ExternalAuth",rule="!(has(self.externalAuth) && self.type != 'ExternalAuth')">
 // <gateway:experimental:validation:XValidation:message="filter.externalAuth must be specified for ExternalAuth filter.type",rule="!(!has(self.externalAuth) && self.type == 'ExternalAuth')">
 // +kubebuilder:validation:XValidation:message="filter.extensionRef must be nil if the filter.type is not ExtensionRef",rule="!(has(self.extensionRef) && self.type != 'ExtensionRef')"
@@ -849,7 +850,7 @@ type HTTPRouteFilter struct {
 	// Reason of `UnsupportedValue`.
 	//
 	// +unionDiscriminator
-	// +kubebuilder:validation:Enum=RequestHeaderModifier;ResponseHeaderModifier;RequestMirror;RequestRedirect;URLRewrite;ExtensionRef
+	// +kubebuilder:validation:Enum=RequestHeaderModifier;ResponseHeaderModifier;RequestMirror;RequestRedirect;URLRewrite;ExtensionRef;CORS
 	// <gateway:experimental:validation:Enum=RequestHeaderModifier;ResponseHeaderModifier;RequestMirror;RequestRedirect;URLRewrite;ExtensionRef;CORS;ExternalAuth>
 	// +required
 	Type HTTPRouteFilterType `json:"type"`
@@ -906,7 +907,6 @@ type HTTPRouteFilter struct {
 	// Support: Extended
 	//
 	// +optional
-	// <gateway:experimental>
 	CORS *HTTPCORSFilter `json:"cors,omitempty"`
 
 	// ExternalAuth configures settings related to sending request details
@@ -990,7 +990,6 @@ const (
 	// Support in HTTPRouteRule: Extended
 	//
 	// Support in HTTPBackendRef: Extended
-	// <gateway:experimental>
 	HTTPRouteFilterCORS HTTPRouteFilterType = "CORS"
 
 	// HTTPRouteFilterExternalAuth can be used to configure a Gateway implementation
@@ -1402,10 +1401,19 @@ type HTTPCORSFilter struct {
 	// the CORS headers. The cross-origin request fails on the client side.
 	// Therefore, the client doesn't attempt the actual cross-origin request.
 	//
-	// The `Access-Control-Allow-Origin` response header can only use `*`
-	// wildcard as value when the `AllowCredentials` field is false or omitted.
+	// Conversely, if the request `Origin` matches one of the configured
+	// allowed origins, the gateway sets the response header
+	// `Access-Control-Allow-Origin` to the same value as the `Origin`
+	// header provided by the client.
 	//
-	// When the `AllowCredentials` field is true and `AllowOrigins` field
+	// When config has the wildcard ("*") in allowOrigins, and the request
+	// is not credentialed (e.g., it is a preflight request), the
+	// `Access-Control-Allow-Origin` response header either contains the
+	// wildcard as well or the Origin from the request.
+	//
+	// When the request is credentialed, the gateway must not specify the `*`
+	// wildcard in the `Access-Control-Allow-Origin` response header. When
+	// also the `AllowCredentials` field is true and `AllowOrigins` field
 	// specified with the `*` wildcard, the gateway must return a single origin
 	// in the value of the `Access-Control-Allow-Origin` response header,
 	// instead of specifying the `*` wildcard. The value of the header
@@ -1460,18 +1468,21 @@ type HTTPCORSFilter struct {
 	// `Access-Control-Allow-Methods`, it will present an error on the client
 	// side.
 	//
-	// The `Access-Control-Allow-Methods` response header can only use `*`
-	// wildcard as value when the `AllowCredentials` field is false or omitted.
+	// If config contains the wildcard "*" in allowMethods and the request is
+	// not credentialed, the `Access-Control-Allow-Methods` response header
+	// can either use the `*` wildcard or the value of
+	// Access-Control-Request-Method from the request.
 	//
-	// When the `AllowCredentials` field is true and `AllowMethods` field
+	// When the request is credentialed, the gateway must not specify the `*`
+	// wildcard in the `Access-Control-Allow-Methods` response header. When
+	// also the `AllowCredentials` field is true and `AllowMethods` field
 	// specified with the `*` wildcard, the gateway must specify one HTTP method
 	// in the value of the Access-Control-Allow-Methods response header. The
 	// value of the header `Access-Control-Allow-Methods` is same as the
 	// `Access-Control-Request-Method` header provided by the client. If the
 	// header `Access-Control-Request-Method` is not included in the request,
 	// the gateway will omit the `Access-Control-Allow-Methods` response header,
-	// instead of specifying the `*` wildcard. A Gateway implementation may
-	// choose to add implementation-specific default methods.
+	// instead of specifying the `*` wildcard.
 	//
 	// Support: Extended
 	//
@@ -1503,23 +1514,27 @@ type HTTPCORSFilter struct {
 	// client side.
 	//
 	// A wildcard indicates that the requests with all HTTP headers are allowed.
-	// The `Access-Control-Allow-Headers` response header can only use `*`
-	// wildcard as value when the `AllowCredentials` field is false or omitted.
+	// If config contains the wildcard "*" in allowHeaders and the request is
+	// not credentialed, the `Access-Control-Allow-Headers` response header
+	// can either use the `*` wildcard or the value of
+	// Access-Control-Request-Headers from the request.
 	//
-	// When the `AllowCredentials` field is true and `AllowHeaders` field
-	// specified with the `*` wildcard, the gateway must specify one or more
+	// When the request is credentialed, the gateway must not specify the `*`
+	// wildcard in the `Access-Control-Allow-Headers` response header. When
+	// also the `AllowCredentials` field is true and `AllowHeaders` field
+	// is specified with the `*` wildcard, the gateway must specify one or more
 	// HTTP headers in the value of the `Access-Control-Allow-Headers` response
 	// header. The value of the header `Access-Control-Allow-Headers` is same as
 	// the `Access-Control-Request-Headers` header provided by the client. If
 	// the header `Access-Control-Request-Headers` is not included in the
 	// request, the gateway will omit the `Access-Control-Allow-Headers`
-	// response header, instead of specifying the `*` wildcard. A Gateway
-	// implementation may choose to add implementation-specific default headers.
+	// response header, instead of specifying the `*` wildcard.
 	//
 	// Support: Extended
 	//
 	// +listType=set
 	// +kubebuilder:validation:MaxItems=64
+	// +kubebuilder:validation:XValidation:message="AllowHeaders cannot contain '*' alongside other methods",rule="!('*' in self && self.size() > 1)"
 	// +optional
 	AllowHeaders []HTTPHeaderName `json:"allowHeaders,omitempty"`
 
@@ -1550,7 +1565,11 @@ type HTTPCORSFilter struct {
 	//
 	// A wildcard indicates that the responses with all HTTP headers are exposed
 	// to clients. The `Access-Control-Expose-Headers` response header can only
-	// use `*` wildcard as value when the `AllowCredentials` field is false or omitted.
+	// use `*` wildcard as value when the request is not credentialed.
+	//
+	// When the `exposeHeaders` config field contains the "*" wildcard and
+	// the request is credentialed, the gateway cannot use the `*` wildcard in
+	// the `Access-Control-Expose-Headers` response header.
 	//
 	// Support: Extended
 	//
@@ -1568,6 +1587,9 @@ type HTTPCORSFilter struct {
 	//
 	// The default value of `Access-Control-Max-Age` response header is 5
 	// (seconds).
+	//
+	// When the `MaxAge` field is unspecified, the gateway sets the response
+	// header "Access-Control-Max-Age: 5" by default.
 	//
 	// +optional
 	// +kubebuilder:default=5
@@ -1843,6 +1865,7 @@ type HTTPBackendRef struct {
 	// +listType=atomic
 	// +kubebuilder:validation:MaxItems=16
 	// +kubebuilder:validation:XValidation:message="May specify either httpRouteFilterRequestRedirect or httpRouteFilterRequestRewrite, but not both",rule="!(self.exists(f, f.type == 'RequestRedirect') && self.exists(f, f.type == 'URLRewrite'))"
+	// +kubebuilder:validation:XValidation:message="CORS filter cannot be repeated",rule="self.filter(f, f.type == 'CORS').size() <= 1"
 	// +kubebuilder:validation:XValidation:message="RequestHeaderModifier filter cannot be repeated",rule="self.filter(f, f.type == 'RequestHeaderModifier').size() <= 1"
 	// +kubebuilder:validation:XValidation:message="ResponseHeaderModifier filter cannot be repeated",rule="self.filter(f, f.type == 'ResponseHeaderModifier').size() <= 1"
 	// +kubebuilder:validation:XValidation:message="RequestRedirect filter cannot be repeated",rule="self.filter(f, f.type == 'RequestRedirect').size() <= 1"

@@ -164,6 +164,12 @@ type GatewaySpecApplyConfiguration struct {
 	// request to "foo.example.com" SHOULD only be routed using routes attached
 	// to the "foo.example.com" Listener (and not the "*.example.com" Listener).
 	//
+	// If traffic to a Gateway does not match any Listener's hostname (or if
+	// the Listener does not specify a hostname and the request does not match
+	// any attached Route), the request MUST be rejected. The specific mechanism
+	// for rejection depends on the protocol: HTTP returns a 404 status code,
+	// while gRPC returns an Unimplemented status code.
+	//
 	// This concept is known as "Listener Isolation", and it is an Extended feature
 	// of Gateway API. Implementations that do not support Listener Isolation MUST
 	// clearly document this, and MUST NOT claim support for the
@@ -225,15 +231,11 @@ type GatewaySpecApplyConfiguration struct {
 	// Support: Extended
 	Infrastructure *GatewayInfrastructureApplyConfiguration `json:"infrastructure,omitempty"`
 	// AllowedListeners defines which ListenerSets can be attached to this Gateway.
-	// While this feature is experimental, the default value is to allow no ListenerSets.
-	//
-	// <gateway:experimental>
+	// The default value is to allow no ListenerSets.
 	AllowedListeners *AllowedListenersApplyConfiguration `json:"allowedListeners,omitempty"`
 	// TLS specifies frontend and backend tls configuration for entire gateway.
 	//
 	// Support: Extended
-	//
-	// <gateway:experimental>
 	TLS *GatewayTLSConfigApplyConfiguration `json:"tls,omitempty"`
 	// DefaultScope, when set, configures the Gateway as a default Gateway,
 	// meaning it will dynamically and implicitly have Routes (e.g. HTTPRoute)

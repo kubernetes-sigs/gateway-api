@@ -24,7 +24,7 @@ package v1
 // AllowedListeners defines which ListenerSets can be attached to this Gateway.
 type AllowedListenersApplyConfiguration struct {
 	// Namespaces defines which namespaces ListenerSets can be attached to this Gateway.
-	// While this feature is experimental, the default value is to allow no ListenerSets.
+	// The default value is to allow no ListenerSets.
 	Namespaces *ListenerNamespacesApplyConfiguration `json:"namespaces,omitempty"`
 }
 

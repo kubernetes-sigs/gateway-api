@@ -64,8 +64,6 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 	scheme.AddKnownTypes(SchemeGroupVersion,
 		&XBackendTrafficPolicy{},
 		&XBackendTrafficPolicyList{},
-		&XListenerSet{},
-		&XListenerSetList{},
 		&XMesh{},
 		&XMeshList{},
 	)

@@ -32,7 +32,7 @@ import (
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/roundtripper"
-	"sigs.k8s.io/gateway-api/conformance/utils/suite"
+	confsuite "sigs.k8s.io/gateway-api/conformance/utils/suite"
 	"sigs.k8s.io/gateway-api/conformance/utils/tlog"
 	"sigs.k8s.io/gateway-api/pkg/features"
 )
@@ -48,7 +48,7 @@ func init() {
 	ConformanceTests = append(ConformanceTests, HTTPRouteRequestPercentageMirror)
 }
 
-var HTTPRouteRequestPercentageMirror = suite.ConformanceTest{
+var HTTPRouteRequestPercentageMirror = confsuite.ConformanceTest{
 	ShortName:   "HTTPRouteRequestPercentageMirror",
 	Description: "An HTTPRoute with percentage based request mirroring",
 	Manifests:   []string{"tests/httproute-request-percentage-mirror.yaml"},
@@ -58,9 +58,9 @@ var HTTPRouteRequestPercentageMirror = suite.ConformanceTest{
 		features.SupportHTTPRouteRequestPercentageMirror,
 	},
 	Provisional: true,
-	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
+	Test: func(t *testing.T, suite *confsuite.ConformanceTestSuite) {
 		var (
-			ns      = "gateway-conformance-infra"
+			ns      = confsuite.InfrastructureNamespace
 			routeNN = types.NamespacedName{Name: "request-percentage-mirror", Namespace: ns}
 			gwNN    = types.NamespacedName{Name: "same-namespace", Namespace: ns}
 			gwAddr  = kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
@@ -77,11 +77,11 @@ var HTTPRouteRequestPercentageMirror = suite.ConformanceTest{
 						Path: "/percent-mirror",
 					},
 				},
-				Backend: "infra-backend-v1",
+				Backend: confsuite.InfraBackendServiceNameV1,
 				MirroredTo: []http.MirroredBackend{
 					{
 						BackendRef: http.BackendRef{
-							Name:      "infra-backend-v2",
+							Name:      confsuite.InfraBackendServiceNameV2,
 							Namespace: ns,
 						},
 						Percent: ptr.To(int32(20)),
@@ -95,11 +95,11 @@ var HTTPRouteRequestPercentageMirror = suite.ConformanceTest{
 						Path: "/percent-mirror-fraction",
 					},
 				},
-				Backend: "infra-backend-v1",
+				Backend: confsuite.InfraBackendServiceNameV1,
 				MirroredTo: []http.MirroredBackend{
 					{
 						BackendRef: http.BackendRef{
-							Name:      "infra-backend-v2",
+							Name:      confsuite.InfraBackendServiceNameV2,
 							Namespace: ns,
 						},
 						Percent: ptr.To(int32(50)),
@@ -125,11 +125,11 @@ var HTTPRouteRequestPercentageMirror = suite.ConformanceTest{
 					AbsentHeaders: []string{"X-Header-Remove"},
 				},
 				Namespace: ns,
-				Backend:   "infra-backend-v1",
+				Backend:   confsuite.InfraBackendServiceNameV1,
 				MirroredTo: []http.MirroredBackend{
 					{
 						BackendRef: http.BackendRef{
-							Name:      "infra-backend-v2",
+							Name:      confsuite.InfraBackendServiceNameV2,
 							Namespace: ns,
 						},
 						Percent: ptr.To(int32(35)),
@@ -176,7 +176,7 @@ var HTTPRouteRequestPercentageMirror = suite.ConformanceTest{
 	},
 }
 
-func testMirroredRequestsDistribution(t *testing.T, suite *suite.ConformanceTestSuite, expected http.ExpectedResponse, timeVal time.Time) error {
+func testMirroredRequestsDistribution(t *testing.T, suite *confsuite.ConformanceTestSuite, expected http.ExpectedResponse, timeVal time.Time) error {
 	mirrorPods := expected.MirroredTo
 	for i, mirrorPod := range mirrorPods {
 		if mirrorPod.Name == "" {
@@ -193,7 +193,7 @@ func testMirroredRequestsDistribution(t *testing.T, suite *suite.ConformanceTest
 
 			tlog.Log(t, "Searching for the mirrored request log")
 			tlog.Logf(t, `Reading "%s/%s" logs`, mirrorPod.Namespace, mirrorPod.Name)
-			logs, err := kubernetes.DumpEchoLogs(mirrorPod.Namespace, mirrorPod.Name, suite.Client, suite.Clientset, timeVal)
+			logs, err := kubernetes.DumpEchoLogs(t.Context(), mirrorPod.Namespace, mirrorPod.Name, suite.Client, suite.Clientset, timeVal)
 			if err != nil {
 				tlog.Logf(t, `Couldn't read "%s/%s" logs: %v`, mirrorPod.Namespace, mirrorPod.Name, err)
 				return false

@@ -47,7 +47,6 @@ type GatewayBackendTLSApplyConfiguration struct {
 	// Support: Core - Reference to a Kubernetes TLS Secret (with the type `kubernetes.io/tls`).
 	// Support: Implementation-specific - Other resource kinds or Secrets with a
 	// different type (e.g., `Opaque`).
-	// <gateway:experimental>
 	ClientCertificateRef *SecretObjectReferenceApplyConfiguration `json:"clientCertificateRef,omitempty"`
 }
 

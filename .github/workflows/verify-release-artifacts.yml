@@ -1,0 +1,77 @@
+# Verify that release artifacts (standard-install.yaml) match the source at the release tag.
+# Runs when a new release is published (any tag). For release events, GitHub uses the workflow
+# from the default branch—ensure this file is on main (or your default branch).
+# For past releases that didn't trigger, run manually: Actions -> Verify Release Artifacts -> Run workflow.
+
+name: Verify Release Artifacts
+
+on:
+  release:
+    types:
+      - published
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag to verify (e.g. v1.4.1). Required when run manually.'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  verify-standard-install:
+    name: standard-install.yaml matches source at tag
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set tag for verification
+        id: set-tag
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "tag=${{ inputs.tag }}" >> $GITHUB_OUTPUT
+          else
+            echo "tag=${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Set up Go
+        uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # tag=v6.3.0
+
+      - name: Download release assets and source, build, and compare
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.set-tag.outputs.tag }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -e
+          echo "Verifying tag: $TAG"
+          echo "Comparing: (A) standard-install.yaml from release $TAG  vs  (B) standard-install.yaml built from source at $TAG"
+          echo ""
+
+          workdir=$(mktemp -d)
+          cd "$workdir"
+
+          # A) Get standard-install.yaml from this release
+          echo "Downloading release assets."
+          gh release download "$TAG" --repo "$REPO" --pattern "standard-install.yaml" --dir .
+
+          # B) Get source tarball from release, or fall back to GitHub archive for this tag
+          echo "Downloading source tarball"
+          curl -sSfL -o source.tar.gz "https://github.com/${REPO}/archive/refs/tags/${TAG}.tar.gz"
+          tar --extract --gunzip --file $(ls *.tar.gz | head -1)
+          cd gateway-api-*
+          echo "Building standard-install.yaml from source at tag $TAG (same version)..."
+          VERSION=$TAG make build-install-yaml 2>/dev/null || make build-install-yaml
+
+          # C) Normalize build files
+          sed 's/Copyright [0-9]\{4\}/Copyright YEAR/' ../standard-install.yaml > /tmp/release.yaml
+          sed 's/Copyright [0-9]\{4\}/Copyright YEAR/' release/standard-install.yaml > /tmp/built.yaml
+
+          echo ""
+          echo "Diff: (A) release asset  vs  (B) built from source. Lines with - are in release, + are in built."
+          if ! diff -u /tmp/release.yaml /tmp/built.yaml; then
+              echo ""
+              echo "::error::Validation FAILED. The CRD logic in the release does not match the source code."
+              exit 1
+          fi
+          echo ""
+          echo "Success! The manifest logic in the $TAG release matches the source code."

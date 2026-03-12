@@ -314,7 +314,7 @@ func Test_listenersMatch(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			assert.Equal(t, test.want, listenersMatch(t, test.expected, test.actual))
+			assert.Equal(t, test.want, gatewayListenersMatch(t, test.expected, test.actual))
 		})
 	}
 }

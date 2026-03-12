@@ -646,13 +646,12 @@ type AbsoluteURI string
 
 // The CORSOrigin MUST NOT be a relative URI, and it MUST follow the URI syntax and
 // encoding rules specified in RFC3986.  The CORSOrigin MUST include both a
-// scheme (e.g., "http" or "spiffe") and a scheme-specific-part, or it should be a single '*' character.
+// scheme ("http" or "https") and a scheme-specific-part, or it should be a single '*' character.
 // URIs that include an authority MUST include a fully qualified domain name or
 // IP address as the host.
-// <gateway:util:excludeFromCRD> The below regex was generated to simplify the assertion of scheme://host:<port> being port optional </gateway:util:excludeFromCRD>
 // +kubebuilder:validation:MinLength=1
 // +kubebuilder:validation:MaxLength=253
-// +kubebuilder:validation:Pattern=`(^\*$)|(^([a-zA-Z][a-zA-Z0-9+\-.]+):\/\/([^:/?#]+)(:([0-9]{1,5}))?$)`
+// +kubebuilder:validation:Pattern=`(^\*$)|(^(http(s)?):\/\/(((\*\.)?([a-zA-Z0-9\-]+\.)*[a-zA-Z0-9-]+|\*)(:([0-9]{1,5}))?)$)`
 type CORSOrigin string
 
 // Group refers to a Kubernetes Group. It must either be an empty string or a
@@ -1028,4 +1027,31 @@ type Fraction struct {
 	// +kubebuilder:default=100
 	// +kubebuilder:validation:Minimum=1
 	Denominator *int32 `json:"denominator,omitempty"`
+}
+
+// ParentGatewayReference identifies an API object including its namespace,
+// defaulting to Gateway.
+type ParentGatewayReference struct {
+	// Group is the group of the referent.
+	//
+	// +optional
+	// +kubebuilder:default="gateway.networking.k8s.io"
+	Group *Group `json:"group,omitempty"`
+
+	// Kind is kind of the referent. For example "Gateway".
+	//
+	// +optional
+	// +kubebuilder:default=Gateway
+	Kind *Kind `json:"kind,omitempty"`
+
+	// Name is the name of the referent.
+	// +required
+	Name ObjectName `json:"name"`
+
+	// Namespace is the namespace of the referent.  If not present,
+	// the namespace of the referent is assumed to be the same as
+	// the namespace of the referring object.
+	//
+	// +optional
+	Namespace *Namespace `json:"namespace,omitempty"`
 }

@@ -94,7 +94,7 @@ Gateway objects bind one or more **Addresses** to one or more **Listeners**.
 Listeners that are not **distinct** are in conflict, and Gateway API includes instructions for what happens in various conflict cases. What makes Listeners distinct is a bit complicated and is discussed in the Distinctiveness section (link).
 
 A critical reason for the requirement that Listeners are distinct is that traffic flowing through a Gateway **must only match a single Listener**.
-Any particular traffic must only be able to be asssigned to a single Listener, and once that Listener is chosen, the traffic **must** be routable via an attached, protcol-specific Route, **or it must be dropped by the Gateway**.
+Any particular traffic must only be able to be assigned to a single Listener, and once that Listener is chosen, the traffic **must** be routable via an attached, protocol-specific Route, **or it must be dropped by the Gateway**.
 
 The most important outcome here is that traffic can't fail to be routed by one Listener, then fall back to another for further processing.
 For more information on this, see the [Traffic Matching](traffic-matching.md) page.
@@ -150,11 +150,11 @@ modifying them in-flight.
 
 #### TLSRoute
 
-??? example "Experimental Channel since v0.3.0"
+??? success "Standard Channel since v1.5.0"
 
-    The `TLSRoute` resource is Alpha and has been part of the Experimental
-    Channel since `v0.3.0`. For more information on release channels, refer to
-    our [versioning guide](versioning.md).
+    The `TLSRoute` resource is GA and has been part of the Standard Channel since
+    `v1.5.0`. For more information on release channels, refer to our [versioning
+    guide](versioning.md).
 
 TLSRoute is for multiplexing TLS connections, discriminated via SNI. It's intended
 for where you want to route based on TLS metadata, and are not interested in properties
@@ -201,7 +201,7 @@ More precisely, **Routing discriminators** are the information that can be used 
 This table from the [API Overview](link) page summarizes the various Route types included in Gateway API, with their **Routing Discriminators**.
 
 |Object|Protocol|OSI Layer|Routing Discriminator|Listener TLS Support|Backend TLS Support|Purpose|
-|------|--------|---------|---------------------|-----------|-------|
+|------|--------|---------|---------------------|-----------|-------|-------|
 |HTTPRoute|HTTP or HTTPS| Layer 7 | Anything in the HTTP Protocol | Terminated only | Via BackendTLSPolicy |HTTP and HTTPS Routing|
 |TLSRoute|TLS| Somewhere between layer 4 and 7| SNI or other TLS properties| Passthrough or Terminated | None currently, although support for BackendTLSPolicy when Terminated has been discussed.|Routing of TLS protocols including HTTPS where inspection of the HTTP stream is not required.|
 |GRPCRoute|HTTP or HTTPS| Layer 7 | Anything in the gRPC Protocol | Terminated only | None currently, although support for BackendTLSPolicy when Protocol is `HTTPS` has been discussed.| gRPC Routing over HTTP/2 and HTTP/2 cleartext|
@@ -240,7 +240,7 @@ The Route side of this is intended to ensure that, at all times, control over wh
 Chihiro, the Cluster Admin and Gateway owner, can limit what _shapes_ Routes that can attach to their Gateway can take (via their Kind or their namespace),but they can't force Ana to expose her application.
 The final decision, and control of the Route object, is always Ana's.
 
-The Listener side is intended to ensure that Ana's Route produces a valid confguration, and also matches Chihiro's requirements (if any) about what traffic is allowed to be exposed on that Gateway.
+The Listener side is intended to ensure that Ana's Route produces a valid configuration, and also matches Chihiro's requirements (if any) about what traffic is allowed to be exposed on that Gateway.
 
 ### Example
 

@@ -95,6 +95,7 @@ other functions (like managing DNS or creating certificates).
 
 ### Partially Conformant
 
+- [AWS Load Balancer Controller][44] (GA)
 - [Azure Application Gateway for Containers][27] (GA)
 - [Contour][3] (GA)
 - [Gloo Gateway][5] (GA)
@@ -187,6 +188,7 @@ other functions (like managing DNS or creating certificates).
 [41]:#kruise-rollouts
 [42]:#gravitee-kubernetes-operator
 [43]:#alibaba-cloud-service-mesh
+[44]:#aws-load-balancer-controller
 
 
 [gamma]:mesh/index.md
@@ -206,10 +208,11 @@ In this section you will find specific links to blog posts, documentation and ot
 [epicdocs]:https://www.epic-gateway.org/
 [epicsource]:https://github.com/epic-gateway
 
-### Agent Gateway (with Kgateway)
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.4.0-Agentgateway-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.4.0/agentgateway-agentgateway)
+### Agentgateway
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.4.1-Agentgateway-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.4.1/agentgateway-agentgateway)
 
-[Agent Gateway](https://agentgateway.dev/) is an open source Gateway API implementation focusing on AI use cases, including LLM consumption, LLM serving, agent-to-agent ([A2A](https://a2aproject.github.io/A2A/latest/)), and agent-to-tool ([MCP](https://modelcontextprotocol.io/introduction)). It is the first and only proxy designed specifically for the Kubernetes Gateway API, powered by a high performance and scalable Rust dataplane implementation.
+[Agentgateway](https://agentgateway.dev/) is an open source Gateway API implementation hosted as a part of the Linux Foundation, focusing on AI use cases, including LLM consumption, LLM serving, agent-to-agent ([A2A](https://a2aproject.github.io/A2A/latest/)), agent-to-tool ([MCP](https://modelcontextprotocol.io/introduction)), as well as traditional TCP/HTTP traffic serving.
+It is the first and only proxy designed specifically for the Kubernetes Gateway API, powered by a high performance and scalable Rust dataplane implementation.
 
 ### Airlock Microgateway
 [![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.4.0-Airlock%20Microgateway-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.4.0/airlock-microgateway)
@@ -236,6 +239,9 @@ Airlock Microgateway protects your applications and microservices with the tried
 [airlock-microgateway-premium-support]:https://techzone.ergon.ch/support-process
 
 ### Alibaba Cloud Service Mesh
+
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.3.0-Alibaba%20Cloud%20Service%20Mesh-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.3.0/alibaba-cloud-servicemesh)
+
 [Alibaba Cloud Service Mesh (ASM)][asm] provides a fully managed service mesh platform that is compatible with the community Istio. It simplifies service governance, including traffic routing and split management between service calls, authentication security for inter-service communication, and mesh observability capabilities, thereby greatly reducing the workload of development and operations.
 
 [asm]:https://www.alibabacloud.com/help/en/asm/product-overview/what-is-asm
@@ -256,6 +262,19 @@ APISIX currently supports Gateway API `v1beta1` version of the specification for
 
 [apisix]:https://apisix.apache.org/
 [apisix-1]:https://github.com/apache/apisix-ingress-controller
+
+### AWS Load Balancer Controller
+
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Partial%20Conformance%20v1.3.0-AWS%20Load%20Balancer%20Controller-orange)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.3.0/aws-load-balancer-controller)
+
+[AWS Load Balancer Controller][aws-lbc] manages AWS Elastic Load Balancers for Kubernetes clusters. The controller provisions AWS Application Load Balancers (ALB) when you create a Kubernetes Ingress and AWS Network Load Balancers (NLB) when you create a Kubernetes Service of type LoadBalancer.
+
+Gateway API support is GA for both Layer 4 (L4) and Layer 7 (L7) routing, enabling customers to provision and manage AWS NLBs and ALBs directly from Kubernetes clusters using the extensible Gateway API.
+
+See the [AWS Load Balancer Controller documentation][aws-lbc-docs] for information on how to deploy and use the Gateway API implementation.
+
+[aws-lbc]:https://github.com/kubernetes-sigs/aws-load-balancer-controller
+[aws-lbc-docs]:https://kubernetes-sigs.github.io/aws-load-balancer-controller/
 
 ### Avi Kubernetes Operator
 
@@ -301,7 +320,7 @@ effort, check out the #development channel or join our [weekly developer meeting
 [cilium-service-mesh]:https://docs.cilium.io/en/stable/gettingstarted/#service-mesh
 [cilium-sidecarless]:https://isovalent.com/blog/post/cilium-service-mesh/
 [cilium118blog]:https://isovalent.com/blog/post/cilium-1-18/#service-mesh-gateway-api
-[cilium-slack]:https://cilium.io/slack
+[cilium-slack]:https://slack.cilium.io
 [cilium-meeting]:https://github.com/cilium/cilium#weekly-developer-meeting
 
 ### Contour
@@ -428,11 +447,11 @@ v1.4.0 release for the GATEWAY_HTTP conformance profile except `HTTPRouteHostnam
 
 ### Gravitee Kubernetes Operator
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Partial%20Conformance%20v1.3.0-Gravitee%20Kubernetes%20Operator-orange)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.3.0/gravitee)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Partial%20Conformance%20v1.4.0-Gravitee%20Kubernetes%20Operator-orange)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.4.0/gravitee)
 
 The [Gravitee Kubernetes Operator](https://documentation.gravitee.io/gravitee-kubernetes-operator-gko) (GKO) lets you manage [Gravitee](https://www.gravitee.io/) APIs, applications, and other assets in a Kubernetes-native and declarative way.
 
-The Gravitee Kubernetes Operator provides partial conformance for Gateway - HTTP features in version 4.8.5. It does not support matching rules across routes or defining services of a type other than Kubernetes Core v1 services. These features will be introduced in a future release.
+The Gravitee Kubernetes Operator provides partial conformance for Gateway - HTTP features in version 4.10.3. It does not support matching rules across routes. These feature will be introduced in a future release.
 
 For support, feedback, or to engage in a discussion about the Gravitee Kubernetes Operator, please feel free to submit an [issue](https://github.com/gravitee-io/issues/issues) or visit our community [forum](https://community.gravitee.io/c/support/gravitee-kubernetes-operator-gko/26).
 
@@ -684,7 +703,7 @@ Flagger can be used to automate canary deployments and A/B testing using Gateway
 
 [cert-manager][cert-manager] is a tool to automate certificate management in cloud native environments.
 
-cert-manager can generate TLS certificates for Gateway resources. This is configured by adding annotations to a Gateway. It currently supports the `v1alpha2` spec of Gateway API. You can refer to the [cert-manager docs][cert-manager-docs] to try it out.
+cert-manager can generate TLS certificates for Gateway resources. This is configured by adding annotations to a Gateway. It currently supports the `v1` spec of Gateway API. You can refer to the [cert-manager docs][cert-manager-docs] to try it out.
 
 [cert-manager]:https://cert-manager.io/
 [cert-manager-docs]:https://cert-manager.io/docs/usage/gateway/

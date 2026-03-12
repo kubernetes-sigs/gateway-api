@@ -41,6 +41,8 @@ var standardKinds = map[string]bool{
 	"HTTPRoute":        true,
 	"ReferenceGrant":   true,
 	"BackendTLSPolicy": true,
+	"ListenerSet":      true,
+	"TLSRoute":         true,
 }
 
 // This generation code is largely copied from

@@ -2,7 +2,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    api-approved.kubernetes.io: https://github.com/kubernetes-sigs/gateway-api/pull/3328
+    api-approved.kubernetes.io: https://github.com/kubernetes-sigs/gateway-api/pull/4530
     gateway.networking.k8s.io/bundle-version: v1.4.1
     gateway.networking.k8s.io/channel: standard
   labels:
@@ -98,9 +98,9 @@ spec:
                     example, a policy with a creation timestamp of "2021-07-15
                     01:02:03" MUST be given precedence over a policy with a
                     creation timestamp of "2021-07-15 01:02:04".
-                  * The policy appearing first in alphabetical order by {name}.
-                    For example, a policy named `bar` is given precedence over a
-                    policy named `baz`.
+                  * The policy appearing first in alphabetical order by {namespace}/{name}.
+                    For example, a policy named `foo/bar` is given precedence over a
+                    policy named `foo/baz`.
 
                   For any BackendTLSPolicy that does not take precedence, the
                   implementation MUST ensure the `Accepted` Condition is set to
@@ -372,8 +372,8 @@ spec:
                     x-kubernetes-list-type: atomic
                   wellKnownCACertificates:
                     description: |-
-                      WellKnownCACertificates specifies whether system CA certificates may be used in
-                      the TLS handshake between the gateway and backend pod.
+                      WellKnownCACertificates specifies whether a well-known set of CA certificates
+                      may be used in the TLS handshake between the gateway and backend pod.
 
                       If WellKnownCACertificates is unspecified or empty (""), then CACertificateRefs
                       must be specified with at least one entry for a valid configuration. Only one of
@@ -383,9 +383,17 @@ spec:
                       `Accepted` Condition on the BackendTLSPolicy is set to `status: False`, with
                       a Reason `Invalid`.
 
+                      Valid values include:
+                      * "System" - indicates that well-known system CA certificates should be used.
+
+                      Implementations MAY define their own sets of CA certificates. Such definitions
+                      MUST use an implementation-specific, prefixed name, such as
+                      `mycompany.com/my-custom-ca-certificates`.
+
                       Support: Implementation-specific
-                    enum:
-                    - System
+                    maxLength: 253
+                    minLength: 1
+                    pattern: ^(System|([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/([A-Za-z0-9][-A-Za-z0-9_.]{0,61})?[A-Za-z0-9]))$
                     type: string
                 required:
                 - hostname
@@ -766,9 +774,9 @@ spec:
                     example, a policy with a creation timestamp of "2021-07-15
                     01:02:03" MUST be given precedence over a policy with a
                     creation timestamp of "2021-07-15 01:02:04".
-                  * The policy appearing first in alphabetical order by {name}.
-                    For example, a policy named `bar` is given precedence over a
-                    policy named `baz`.
+                  * The policy appearing first in alphabetical order by {namespace}/{name}.
+                    For example, a policy named `foo/bar` is given precedence over a
+                    policy named `foo/baz`.
 
                   For any BackendTLSPolicy that does not take precedence, the
                   implementation MUST ensure the `Accepted` Condition is set to
@@ -1040,8 +1048,8 @@ spec:
                     x-kubernetes-list-type: atomic
                   wellKnownCACertificates:
                     description: |-
-                      WellKnownCACertificates specifies whether system CA certificates may be used in
-                      the TLS handshake between the gateway and backend pod.
+                      WellKnownCACertificates specifies whether a well-known set of CA certificates
+                      may be used in the TLS handshake between the gateway and backend pod.
 
                       If WellKnownCACertificates is unspecified or empty (""), then CACertificateRefs
                       must be specified with at least one entry for a valid configuration. Only one of
@@ -1051,9 +1059,17 @@ spec:
                       `Accepted` Condition on the BackendTLSPolicy is set to `status: False`, with
                       a Reason `Invalid`.
 
+                      Valid values include:
+                      * "System" - indicates that well-known system CA certificates should be used.
+
+                      Implementations MAY define their own sets of CA certificates. Such definitions
+                      MUST use an implementation-specific, prefixed name, such as
+                      `mycompany.com/my-custom-ca-certificates`.
+
                       Support: Implementation-specific
-                    enum:
-                    - System
+                    maxLength: 253
+                    minLength: 1
+                    pattern: ^(System|([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/([A-Za-z0-9][-A-Za-z0-9_.]{0,61})?[A-Za-z0-9]))$
                     type: string
                 required:
                 - hostname

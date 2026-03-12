@@ -6,18 +6,21 @@ nav:
           - Troubleshooting and Status: concepts/troubleshooting.md
           - Conformance: concepts/conformance.md
           - Roles and Personas: concepts/roles-and-personas.md
-          - Security Model: concepts/security-model.md
+          - Security: concepts/security.md
           - Tools: concepts/tooling.md
           - Use Cases: concepts/use-cases.md
           - Versioning: concepts/versioning.md
           - Traffic Matching: concepts/traffic-matching.md
+          - Hostnames: concepts/hostnames.md
       - Service Mesh:
           - Overview: mesh/index.md
           - GAMMA Initiative: mesh/gamma.md
           - Service Facets: mesh/service-facets.md
       - Implementations:
           - List: implementations.md
+          - Matching Wizard: implementations/wizard.md
           - Comparisons:
+            #   - v1.5: implementations/v1.5.md
               - v1.4: implementations/v1.4.md
               - v1.3: implementations/v1.3.md
               - v1.2: implementations/v1.2.md
@@ -43,10 +46,12 @@ nav:
           - HTTP CORS: guides/http-cors.md
           - Cross-Namespace routing: guides/multiple-ns.md
           - TLS: guides/tls.md
+          - TLS routing: guides/tls-routing.md
           - TCP routing: guides/tcp.md
           - gRPC Routing: guides/grpc-routing.md
           - Backend Protocol Selection: guides/backend-protocol.md
           - Infrastructure attributes: guides/infrastructure.md
+          - ListenerSet: guides/listener-set.md
       - API Design: guides/api-design.md
       - CRD Management: guides/crd-management.md
       - Implementer's Guide: guides/implementers.md
@@ -60,16 +65,18 @@ nav:
               - BackendTLSPolicy: api-types/backendtlspolicy.md
               - BackendTrafficPolicy: api-types/backendtrafficpolicy.md
           - ReferenceGrant: api-types/referencegrant.md
+          - TLSRoute: api-types/tlsroute.md
+          - ListenerSet: api-types/listenerset.md
       - API specification:
           - Development:
               - Standard: reference/spec.md
               - Experimental: reference/specx.md
+          - v1.5:
+              - Standard: reference/1.5/spec.md
+              - Experimental: reference/1.5/specx.md
           - v1.4:
               - Standard: reference/1.4/spec.md
               - Experimental: reference/1.4/specx.md
-          - v1.3:
-              - Standard: reference/1.3/spec.md
-              - Experimental: reference/1.3/specx.md
       - Policy Attachment: reference/policy-attachment.md
   - Enhancements:
       - Overview: geps/overview.md

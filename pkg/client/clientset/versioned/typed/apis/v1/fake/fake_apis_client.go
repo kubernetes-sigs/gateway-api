@@ -48,6 +48,18 @@ func (c *FakeGatewayV1) HTTPRoutes(namespace string) v1.HTTPRouteInterface {
 	return newFakeHTTPRoutes(c, namespace)
 }
 
+func (c *FakeGatewayV1) ListenerSets(namespace string) v1.ListenerSetInterface {
+	return newFakeListenerSets(c, namespace)
+}
+
+func (c *FakeGatewayV1) ReferenceGrants(namespace string) v1.ReferenceGrantInterface {
+	return newFakeReferenceGrants(c, namespace)
+}
+
+func (c *FakeGatewayV1) TLSRoutes(namespace string) v1.TLSRouteInterface {
+	return newFakeTLSRoutes(c, namespace)
+}
+
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
 func (c *FakeGatewayV1) RESTClient() rest.Interface {

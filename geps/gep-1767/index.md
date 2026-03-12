@@ -1,7 +1,7 @@
 # GEP 1767: CORS Filter
 
 * Issue: [#1767](https://github.com/kubernetes-sigs/gateway-api/issues/1767)
-* Status: Experimental
+* Status: Standard
 
 ## TLDR
 Cross-origin resource sharing (CORS) is an HTTP-header based mechanism that allows a web page to access restricted resources from a server on an origin (domain, scheme, or port) different than the domain that served the web page.
@@ -51,6 +51,7 @@ The optional response header `Access-Control-Expose-Headers` controls which HTTP
 
 If the server specifies the response header `Access-Control-Allow-Credentials: true`, the actual cross-origin request will be able to use credentials for getting sensitive resources. 
 Credentials are cookies, TLS client certificates, or authentication headers containing a username and password.
+A "credentialed request" is a request containing some credentials.
 
 After the server has permitted the CORS "preflight" request, the client will be able to send actual cross-origin request.
 If the server doesn't want to allow cross-origin access, it will omit the CORS headers to the client.
@@ -92,7 +93,7 @@ Content-Type: text/plain charset=UTF-8
 Content-Length: 0
 ```
 
-If the server allows it, it will respond with an OK status (i.e., 204 or 200) and the following response headers.
+If the server allows it, it MUST respond with an OK status (i.e., 204 or 200) and the following response headers.
 ```
 HTTP/1.1 204 No Content
 Access-Control-Allow-Origin: https://foo.example
@@ -122,6 +123,11 @@ Access-Control-Allow-Methods: GET, PUT, POST, DELETE, PATCH, OPTIONS
 Access-Control-Allow-Headers: DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization
 Access-Control-Expose-Headers: Content-Security-Policy
 ```
+
+While CORS specification does not explicitly deny unmatching CORS preflight requests to be sent to upstream servers, 
+a Gateway API implementation is expected to be the final authority on a CORS preflight request, so any path containing 
+a CORS filter MUST NOT pass the request to the upstream. This enforcement exists so upstream applications don't override
+any CORS configuration set on the `HTTPRoute` resource.
 
 ## API
 This GEP proposes to add a new field `HTTPCORSFilter` to `HTTPRouteFilter`.
@@ -211,8 +217,24 @@ type HTTPCORSFilter struct {
     //
     // Output:
     //
-    // The `Access-Control-Allow-Origin` response header can only use `*` 
-    // wildcard as value when the `AllowCredentials` field is false.
+    // Conversely, if the request `Origin` matches one of the configured
+    // allowed origins, the gateway sets the response header
+    // `Access-Control-Allow-Origin` to the same value as the `Origin`
+    // header provided by the client.
+    //
+    // Input:
+    //   Origin: https://foo.example
+    //
+    // Config:
+    //   allowOrigins: ["https://foo.example", "http://test.example"]
+    //
+    // Output:
+    //   Access-Control-Allow-Origin: https://foo.example
+    //
+    // When config has the wildcard ("*") in allowOrigins, and the request
+    // is not credentialed (e.g., it is a preflight request), the
+    // `Access-Control-Allow-Origin` response header either contains the
+    // wildcard as well or the Origin from the request.
     //
     // Input:
     //   Origin: https://foo.example
@@ -223,7 +245,9 @@ type HTTPCORSFilter struct {
     // Output:
     //   Access-Control-Allow-Origin: *
     //
-    // When the `AllowCredentials` field is true and `AllowOrigins`
+    // When the request is credentialed, the gateway must not specify the `*`
+    // wildcard in the `Access-Control-Allow-Origin` response header. When
+    // additionally the `AllowCredentials` field is true and `AllowOrigins`
     // field specified with the `*` wildcard, the gateway must return a 
     // single origin in the value of the `Access-Control-Allow-Origin` 
     // response header, instead of specifying the `*` wildcard. The value 
@@ -232,6 +256,7 @@ type HTTPCORSFilter struct {
     //
     // Input:
     //   Origin: https://foo.example
+    //   Cookie: foo=bar
     //
     // Config:
     //   allowOrigins: ["*"]
@@ -262,7 +287,7 @@ type HTTPCORSFilter struct {
     //   Access-Control-Allow-Origin: https://foo.example
     //   Access-Control-Allow-Credentials: true
     //
-    // When set to false, the gateway will omit the header
+    // When set to false or omitted, the gateway will omit the header
     // `Access-Control-Allow-Credentials` entirely (this is the standard CORS
     // behavior).
     //
@@ -304,8 +329,10 @@ type HTTPCORSFilter struct {
     // Output:
     //   Access-Control-Allow-Methods: GET, POST, DELETE, PATCH, OPTIONS
     //
-    // The `Access-Control-Allow-Methods` response header can only use `*` 
-    // wildcard as value when the `AllowCredentials` field is false.
+    // If config contains the wildcard "*" in allowMethods and the request is
+    // not credentialed, the `Access-Control-Allow-Methods` response header
+    // can either use the `*` wildcard or the value of
+    // Access-Control-Request-Method from the request.
     //
     // Input:
     //   Access-Control-Request-Method: PUT
@@ -316,19 +343,20 @@ type HTTPCORSFilter struct {
     // Output:
     //   Access-Control-Allow-Methods: *
     //
-    // When the `AllowCredentials` field is true and the `AllowMethods`
+    // When the request is credentialed, the gateway must not specify the `*`
+    // wildcard in the `Access-Control-Allow-Methods` response header. When
+    // also the `AllowCredentials` field is true and `AllowMethods`
     // field specified with the `*` wildcard, the gateway must specify one 
     // HTTP method in the value of the Access-Control-Allow-Methods response 
     // header. The value of the header `Access-Control-Allow-Methods` is same 
     // as the `Access-Control-Request-Method` header provided by the client. 
     // If the header `Access-Control-Request-Method` is not included in the 
     // request, the gateway will omit the `Access-Control-Allow-Methods` 
-    // response header, instead of specifying the `*` wildcard. A Gateway 
-    // implementation may choose to add implementation-specific default 
-    // methods.
+    // response header, instead of specifying the `*` wildcard.
     //
     // Input:
     //   Access-Control-Request-Method: PUT
+    //   Cookie: foo=bar
     //
     // Config:
     //   allowMethods: ["*"]
@@ -373,8 +401,10 @@ type HTTPCORSFilter struct {
     //   Access-Control-Allow-Headers: DNT, Keep-Alive, User-Agent, X-Requested-With, If-Modified-Since, Cache-Control, Content-Type, Range, Authorization
     //
     // A wildcard indicates that the requests with all HTTP headers are allowed.
-    // The `Access-Control-Allow-Headers` response header can only use `*` wildcard 
-    // as value when the `AllowCredentials` field is false.
+    // If config contains the wildcard "*" in allowHeaders and the request is
+    // not credentialed, the `Access-Control-Allow-Headers` response header
+    // can either use the `*` wildcard or the value of
+    // Access-Control-Request-Headers from the request.
     //
     // Input:
     //   Access-Control-Request-Headers: Content-Type, Cache-Control
@@ -385,18 +415,20 @@ type HTTPCORSFilter struct {
     // Output:
     //   Access-Control-Allow-Headers: *
     //
-    // When the `AllowCredentials` field is true and the `AllowHeaders` field
+    // When the request is credentialed, the gateway must not specify the `*`
+    // wildcard in the `Access-Control-Allow-Headers` response header. When
+    // also the `AllowCredentials` field is true and the `AllowHeaders` field
     // is specified with the `*` wildcard, the gateway must specify one or more
     // HTTP headers in the value of the `Access-Control-Allow-Headers` response 
     // header. The value of the header `Access-Control-Allow-Headers` is same as 
     // the `Access-Control-Request-Headers` header provided by the client. If 
     // the header `Access-Control-Request-Headers` is not included in the request, 
     // the gateway will omit the `Access-Control-Allow-Headers` response header, 
-    // instead of specifying the `*` wildcard. A Gateway implementation may choose 
-    // to add implementation-specific default headers.
+    // instead of specifying the `*` wildcard.
     //
     // Input:
     //   Access-Control-Request-Headers: Content-Type, Cache-Control
+    //   Cookie: foo=bar
     //
     // Config:
     //   allowHeaders: ["*"]
@@ -444,13 +476,26 @@ type HTTPCORSFilter struct {
     //
     // A wildcard indicates that the responses with all HTTP headers are exposed 
     // to clients. The `Access-Control-Expose-Headers` response header can only use 
-    // `*` wildcard as value when the `AllowCredentials` field is false.
+    // the `*` wildcard as value when the request is not credentialed.
     //
     // Config:
     //   exposeHeaders: ["*"]
     //
     // Output:
     //   Access-Control-Expose-Headers: *
+    //
+    // When the `exposeHeaders` config field contains the "*" wildcard and
+    // the request is credentialed, the gateway cannot use the `*` wildcard in
+    // the `Access-Control-Expose-Headers` response header.
+    //
+    // Input:
+    //   Cookie: foo=bar
+    //
+    // Config:
+    //   exposeHeaders: ["*"]
+    //
+    // Output:
+    //   Access-Control-Expose-Headers: Content-Encoding, Kuma-Revision
     //
     // Support: Extended
     //
@@ -517,7 +562,7 @@ spec:
     filters:
     - cors:
         allowOrigins:
-        - *
+        - "*"
         allowMethods: 
         - GET
         - HEAD
@@ -685,6 +730,59 @@ spec:
 Omitting the field, and setting it to `false` both mean `false`. In this
 configuration the gateway will _not_ include the
 `Access-Control-Allow-Credentials` header in responses.
+
+##  Wildcard Resolution and Credentials
+
+Since this has been a source of [confusion](https://github.com/kubernetes-sigs/gateway-api/issues/3861), this section explains the treatment of wildcards with respect to (un)credentialed requests.
+
+When a Gateway is configured with a wildcard (`"*"`) for `allowOrigins`, `allowMethods`, or `allowHeaders`, the actual values returned in the CORS response headers may need to be resolved dynamically based on whether the incoming request is **credentialed**.
+
+* **Credentialed Requests:** Requests that include credentials (cookies, TLS client certificates, or authentication headers):
+  * **Rule:** The Gateway **MUST NOT** return the `*` wildcard in `Access-Control-Allow-*` headers. Instead, it **MUST** echo the specific value(s) from the request (`Origin`, `Access-Control-Request-Method`, or `Access-Control-Request-Headers`).
+  * **Note:** If the Gateway is configured with `allowCredentials: false` or `allowCredentials` is omitted, the Gateway **MUST NOT** set any CORS headers in the response to a credentialed request.
+* **Uncredentialed Requests:** Requests without credentials (including all preflight requests).
+  * **Rule:** The Gateway **MAY** return the `*` wildcard, **OR** it **MAY** echo the specific value(s) from the request.
+  * *Context: Echoing the specific value is permitted because due to limited [browser](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Access-Control-Allow-Methods#browser_compatibility) [compatibility](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Access-Control-Allow-Headers#browser_compatibility) with wildcards in the past, implementations [switched](https://github.com/envoyproxy/envoy/issues/8218) to using specific values.*
+
+### Behavior Matrix for `allowOrigins: ["*"]`
+
+The following table describes the required Gateway behavior when `allowOrigins` contains `*`.
+
+| Request Type | `allowCredentials` (Config) | Response `Access-Control-Allow-Origin` |
+| :--- | :--- | :--- |
+| **Credentialed** | **`true`** | **Specific Origin** (Echo Request `Origin`) |
+| **Credentialed** | **`false`** (or omitted) | (Omitted) |
+| **Uncredentialed** | Any | **`*`** OR **Specific Origin** (Echo Request `Origin`) |
+
+### Behavior Matrix for `allowMethods: ["*"]`
+
+When `allowMethods` contains `*`:
+
+| Request Type | `allowCredentials` (Config) | Response `Access-Control-Allow-Methods` |
+| :--- | :--- | :--- |
+| **Credentialed** | **`true`**  | **Specific Methods** (Echo Request `Access-Control-Request-Methods`) |
+| **Credentialed** | **`false`** (or omitted) | (Omitted) |
+| **Uncredentialed** | Any | **`*`** OR **Specific Methods** (Echo Request `Access-Control-Request-Methods`) |
+
+### Behavior Matrix for `allowHeaders: ["*"]`
+
+When `allowHeaders` contains `*`:
+
+| Request Type | `allowCredentials` (Config) | Response `Access-Control-Allow-Headers` |
+| :--- | :--- | :--- |
+| **Credentialed** | **`true`** | **Specific Headers** (Echo Request `Access-Control-Request-Headers`) |
+| **Credentialed** | **`false`** (or omitted) | (Omitted) |
+| **Uncredentialed** | Any | **`*`** OR **Specific Headers** (Echo Request `Access-Control-Request-Headers`) |
+
+### Behavior Matrix for `allowCredentials:`
+
+The following table is rather obvious, but let's spell it out for completeness.
+
+| Request Type | `allowCredentials` (Config) | Response `Access-Control-Allow-Credentials` |
+| :--- | :--- | :--- |
+| Any | **`true`** | `true` |
+| Any | **`false`** (or omitted) | (Omitted) |
+
 
 ## Prior Art
 Some implementations already support CORS.

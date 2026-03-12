@@ -17,26 +17,21 @@ limitations under the License.
 package tests
 
 import (
-	"crypto/tls"
-	"crypto/x509"
-	"fmt"
 	"testing"
-	"time"
 
 	"k8s.io/apimachinery/pkg/types"
 
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
-	"sigs.k8s.io/gateway-api/conformance/utils/suite"
+	confsuite "sigs.k8s.io/gateway-api/conformance/utils/suite"
+	"sigs.k8s.io/gateway-api/conformance/utils/tcp"
 	"sigs.k8s.io/gateway-api/pkg/features"
-
-	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
 func init() {
 	ConformanceTests = append(ConformanceTests, TLSRouteTerminateSimpleSameNamespace)
 }
 
-var TLSRouteTerminateSimpleSameNamespace = suite.ConformanceTest{
+var TLSRouteTerminateSimpleSameNamespace = confsuite.ConformanceTest{
 	ShortName:   "TLSRouteTerminateSimpleSameNamespace",
 	Description: "A single TLSRoute in the gateway-conformance-infra namespace attaches to a Gateway using Terminate mode in the same namespace",
 	Features: []features.FeatureName{
@@ -46,9 +41,9 @@ var TLSRouteTerminateSimpleSameNamespace = suite.ConformanceTest{
 	},
 	Provisional: true,
 	Manifests:   []string{"tests/tlsroute-terminate-simple-same-namespace.yaml"},
-	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
-		ns := "gateway-conformance-infra"
-		routeNN := types.NamespacedName{Name: "gateway-conformance-mqtt-test", Namespace: ns}
+	Test: func(t *testing.T, suite *confsuite.ConformanceTestSuite) {
+		ns := confsuite.InfrastructureNamespace
+		routeNN := types.NamespacedName{Name: "tlsroute-terminated-test", Namespace: ns}
 		gwNN := types.NamespacedName{Name: "gateway-tlsroute-terminate", Namespace: ns}
 		caCertNN := types.NamespacedName{Name: "tls-checks-ca-certificate", Namespace: ns}
 
@@ -69,52 +64,14 @@ var TLSRouteTerminateSimpleSameNamespace = suite.ConformanceTest{
 			t.Fatalf("ca.crt not found in configmap: %s/%s", caCertNN.Namespace, caCertNN.Name)
 		}
 
-		t.Run("Simple MQTT TLS request matching TLSRoute should reach mqtt-backend", func(t *testing.T) {
-			t.Logf("Establishing MQTT connection to host %s via %s", serverStr, gwAddr)
-
-			certpool := x509.NewCertPool()
-			if !certpool.AppendCertsFromPEM([]byte(caString)) {
-				t.Fatal("Failed to append CA certificate")
-			}
-
-			opts := mqtt.NewClientOptions()
-			opts.AddBroker(fmt.Sprintf("tls://%s", gwAddr))
-			opts.SetTLSConfig(&tls.Config{
-				RootCAs:    certpool,
-				ServerName: serverStr,
-				MinVersion: tls.VersionTLS13,
-			})
-
-			msgChan := make(chan string)
-
-			topic := "test/tlsroute-terminate"
-			message := "Hello TLSRoute Terminate MQTT!"
-
-			c := mqtt.NewClient(opts)
-			if token := c.Connect(); !token.WaitTimeout(suite.TimeoutConfig.DefaultTestTimeout) || token.Error() != nil {
-				t.Fatalf("Connection failed or timed out: %v", token.Error())
-			}
-
-			if token := c.Publish(topic, 0, true, message); !token.WaitTimeout(suite.TimeoutConfig.DefaultTestTimeout) || token.Error() != nil {
-				t.Fatalf("Failed to publish or timeout: %v", token.Error())
-			}
-
-			if token := c.Subscribe(topic, 0, func(_ mqtt.Client, msg mqtt.Message) {
-				t.Logf("Received message: %s\n", string(msg.Payload()))
-				msgChan <- string(msg.Payload())
-			}); token.WaitTimeout(suite.TimeoutConfig.DefaultTestTimeout) && token.Error() != nil {
-				t.Fatalf("Failed to subscribe or timeout: %v", token.Error())
-			}
-
-			select {
-			case msg := <-msgChan:
-				if msg != message {
-					t.Fatalf("Expected message %s does not match the received message %s", msg, message)
-				}
-				t.Log("Round-trip test succeeded")
-			case <-time.After(suite.TimeoutConfig.DefaultTestTimeout):
-				t.Fatal("Timed out waiting for message")
-			}
+		t.Run("Simple TLS request matching terminated TLSRoute should reach tcp-backend with plain text", func(t *testing.T) {
+			tcp.MakeTCPRequestAndExpectEventuallyValidResponse(t, suite.TimeoutConfig, gwAddr, []byte(caString), serverStr, true,
+				tcp.ExpectedResponse{
+					BackendIsTLS: false, // It is terminated on the gateway
+					Backend:      "tcp-backend",
+					Namespace:    confsuite.InfrastructureNamespace,
+					Hostname:     "", // Terminated tests do not contain a SNI attribute on the backend
+				})
 		})
 	},
 }
