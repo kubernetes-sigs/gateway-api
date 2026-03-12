@@ -346,7 +346,7 @@ var HTTPRouteCORS = confsuite.ConformanceTest{
 				},
 			},
 			{
-				TestCaseName: "Pre-flight request from a wildcard origin should return header with '*' or with the requested Origin",
+				TestCaseName: "CORS preflight request from a wildcard origin should return header with '*' or with the requested Origin",
 				Namespace:    "",
 				Request: http.Request{
 					Path:   "/cors-wildcard-origin",
@@ -369,7 +369,7 @@ var HTTPRouteCORS = confsuite.ConformanceTest{
 					ValidHeaderValues: map[string][]string{
 						// The access-control-allow-origin for a wildcard domain depends on the implementation.
 						// Envoy enforces the return of the same requested Origin, while NGINX an others may return a "*"
-						// per the spec in case this is a non-authenticated request
+						// per the spec in case that allowCredentials is set to false
 						"access-control-allow-origin": {
 							"https://foobar.com",
 							"*",
@@ -380,7 +380,7 @@ var HTTPRouteCORS = confsuite.ConformanceTest{
 				},
 			},
 			{
-				TestCaseName: "Pre-flight request from a wildcard origin containing a port should return header with '*' or with the requested Origin",
+				TestCaseName: "CORS preflight request from a wildcard origin containing a port should return header with '*' or with the requested Origin",
 				Namespace:    "",
 				Request: http.Request{
 					Path:   "/cors-wildcard-origin",
@@ -403,8 +403,7 @@ var HTTPRouteCORS = confsuite.ConformanceTest{
 					ValidHeaderValues: map[string][]string{
 						// The access-control-allow-origin for a wildcard domain depends on the implementation.
 						// Envoy enforces the return of the same requested Origin, while NGINX an others may return a "*"
-						// per the spec in case this is a non-authenticated request
-
+						// per the spec in case that allowCredentials is set to false
 						"access-control-allow-origin": {
 							"https://foobar.com:12345",
 							"*",
@@ -429,8 +428,7 @@ var HTTPRouteCORS = confsuite.ConformanceTest{
 					ValidHeaderValues: map[string][]string{
 						// The access-control-allow-origin for a wildcard domain depends on the implementation.
 						// Envoy enforces the return of the same requested Origin, while NGINX an others may return a "*"
-						// per the spec in case this is a non-authenticated request
-
+						// per the spec in case that allowCredentials is set to false
 						"access-control-allow-origin": {
 							"https://foobar.com:12345",
 							"*",
@@ -453,7 +451,7 @@ var HTTPRouteCORS = confsuite.ConformanceTest{
 					ValidHeaderValues: map[string][]string{
 						// The access-control-allow-origin for a wildcard domain depends on the implementation.
 						// Envoy enforces the return of the same requested Origin, while NGINX an others may return a "*"
-						// per the spec in case this is a non-authenticated request
+						// per the spec in case that allowCredentials is set to false
 						"access-control-allow-origin": {
 							"https://foobar.com",
 							"*",
@@ -463,7 +461,7 @@ var HTTPRouteCORS = confsuite.ConformanceTest{
 				},
 			},
 			{
-				TestCaseName: "CORS preflight request requesting auth and specific method and headers should be allowed and always echo the origin",
+				TestCaseName: "CORS preflight request requesting specific method and headers should be allowed and always echo the origin with allowCredentials set to true",
 				Request: http.Request{
 					Path:   "/cors-wildcard-methods-headers",
 					Method: "OPTIONS",
@@ -471,8 +469,6 @@ var HTTPRouteCORS = confsuite.ConformanceTest{
 						"Origin":                         "https://other.foo.com",
 						"access-control-request-method":  "PUT",
 						"access-control-request-headers": "x-header-1, x-header-2",
-						// The actual request following this preflight request
-						// may contain credentials here.
 					},
 				},
 				// Set the expected request properties and namespace to empty strings.
@@ -505,7 +501,7 @@ var HTTPRouteCORS = confsuite.ConformanceTest{
 				},
 			},
 			{
-				TestCaseName: "CORS preflight request requesting auth and specific method and headers should hide auth headers on unauth path",
+				TestCaseName: "CORS preflight request requesting specific method and headers should hide access-control-allow-credentials headers with allowCredentials set to false",
 				Request: http.Request{
 					Path:   "/cors-wildcard-methods-headers-unauth",
 					Method: "OPTIONS",
@@ -551,7 +547,7 @@ var HTTPRouteCORS = confsuite.ConformanceTest{
 				},
 			},
 			{
-				TestCaseName: "CORS request should receive access-control-allow-credentials header with access-control-allow-credentials set to true",
+				TestCaseName: "CORS request should receive access-control-allow-credentials header with allowCredentials set to true",
 				Request: http.Request{
 					Path:   "/cors-wildcard-methods-headers",
 					Method: "GET",
@@ -569,7 +565,7 @@ var HTTPRouteCORS = confsuite.ConformanceTest{
 				},
 			},
 			{
-				TestCaseName: "CORS request should not receive access-control-allow-credentials header without access-control-allow-credentials set to true",
+				TestCaseName: "CORS request should not receive access-control-allow-credentials header without allowCredentials set to true",
 				Request: http.Request{
 					Path:   "/cors-wildcard-methods-headers-unauth",
 					Method: "GET",
