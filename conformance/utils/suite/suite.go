@@ -253,6 +253,9 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 		extendedUnsupportedFeatures[conformanceProfileName] = conformanceProfile.ExtendedFeatures.Difference(supportedFeatures)
 	}
 
+	if flags.TimeoutConfigOverrides != nil && *flags.TimeoutConfigOverrides != "" {
+		config.ParseTimeoutOverrides(&options.TimeoutConfig, *flags.TimeoutConfigOverrides)
+	}
 	config.SetupTimeoutConfig(&options.TimeoutConfig)
 
 	roundTripper := options.RoundTripper
