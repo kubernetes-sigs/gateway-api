@@ -281,12 +281,10 @@ table.results td a:hover {
 }
 
 #version-row span {
-  margin: 0 6px;
   font-weight: 600;
 }
 
 #version-select {
-  margin-left: 8px;
   padding: 6px 10px;
   font-size: 0.9375rem;
   border: 1px solid var(--border);
