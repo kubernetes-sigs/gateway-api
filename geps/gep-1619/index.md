@@ -1064,8 +1064,6 @@ supported by some implementations due to their current designs.
 
 ### Conformance Details
 
-TODO
-
 ### Open Questions
 
 - What happens when session persistence causes traffic splitting scenarios to overload a backend?
@@ -1076,6 +1074,24 @@ TODO
       defined in this API?
 - How do we provide a standard way to communicate that an implementation does not support Route Rule API?
     - Do we want something conceptually similar to the `IncompatibleFilters` reason?
+
+## Conformance Details
+
+###  Feature Names
+
+* HTTPRouteSessionPersistence - Base feature for session persistence support
+* HTTPRouteSessionPersistenceCookie - Cookie-based session persistence (Core)
+* HTTPRouteSessionPersistenceCookieLifetimeTypePermanent - Permanent Lifetime for cookie-based session persistence (extended)
+
+### Conformance tests
+
+| Description | Outcome | Features |
+| :---- | :---- | :---- | 
+| Simple Cookie Session Persistence: An HTTPRoute with sessionPersistence configured with type: Cookie (default) on a single backend in gateway-conformance-infra namespace. | HTTPRoute MUST have Accepted=True in parent status. First request MUST receive a Set-Cookie header in response. Subsequent requests with the cookie MUST route to the same backend pod. Verify by checking pod identity across N requests (N>=50). | HTTPRouteSessionPersistence, HTTPRouteSessionPersistenceCookie |
+| Session Cookie Lifetime (Default): HTTPRoute with sessionPersistence and cookieConfig.lifetimeType: Session (default). | HTTPRoute MUST have Accepted=True in parent status. Cookie MUST NOT contain `expiry` attributes. | HTTPRouteSessionPersistence, HTTPRouteSessionPersistenceCookie |
+| Multiple Weighted Backends - Initial Distribution Honored: HTTPRoute with sessionPersistence and multiple backendRefs with weights (e.g., 70/30) on a path. | HTTPRoute MUST have Accepted=True in parent status. Initial requests (without session cookie) MUST respect weight distribution (~70/30 within statistical tolerance). Once session is established, subsequent requests with cookie MUST route to the same backend regardless of weight configuration.| HTTPRouteSessionPersistence, HTTPRouteSessionPersistenceCookie |
+| Session Persistence with cookieConfig.lifetimeType: Permanent and absoluteTimeout: 5min. | HTTPRoute MUST have Accepted=True in parent status. Response Set-Cookie header MUST contain `expiry` attribute. The expiry value MUST correspond to the configured absoluteTimeout duration. Session persistence MUST function correctly until cookie expires.  | HTTPRouteSessionPersistence, HTTPRouteSessionPersistenceCookie, HTTPRouteSessionPersistenceCookieLifetimeTypePermanent |
+| Session Persistence Scoped to Route Rule: HTTPRoute with two rules: Rule 1 (path /a) and Rule 2 (path /b), both with sessionPersistence configured, routing to the same backend Service with multiple pods. | HTTPRoute MUST have Accepted=True in parent status. Sessions MUST NOT be shared between /a and /b. Verify with: 1) Requests to /a establishes session to Pod-X, 2) Requests to /b may route to any pod (Pod-X or Pod-Y), 3) N Multiple requests to /a with session cookie MUST still route to Pod-X, 4) N Multiple requests to /b with its session cookie MUST route to whichever pod was selected for /b. | HTTPRouteSessionPersistence |
 
 ## TODO
 
