@@ -1172,11 +1172,13 @@ func ListenerSetListenersMustHaveConditions(t *testing.T, client client.Client, 
 	waitErr := wait.PollUntilContextTimeout(context.Background(), timeoutConfig.DefaultPollInterval, timeoutConfig.ListenerSetListenersMustHaveConditions, true, func(ctx context.Context) (bool, error) {
 		var parent gatewayv1.ListenerSet
 		if err := client.Get(ctx, lsName, &parent); err != nil {
-			return false, fmt.Errorf("error fetching Gateway: %w", err)
+			tlog.Logf(t, "error fetching Gateway: %v", err)
+			return false, nil
 		}
 
 		if err := ConditionsHaveLatestObservedGeneration(&parent, parent.Status.Conditions); err != nil {
-			return false, err
+			tlog.Logf(t, "condition not yet at observed generation: %v", err)
+			return false, nil
 		}
 
 		for _, condition := range conditions {
