@@ -122,7 +122,8 @@ The following steps must be done by one of the [Gateway API maintainers][gateway
 - Create a tag using the `HEAD` of the `release-x.x` branch. This can be done using the `git` CLI or
   GitHub's [release][release] page.
 - Run the `make build-install-yaml` command which will generate install files in the `release/` directory.
-  Attach these files to the GitHub release.
+- Run the `make build-openapi-json` command which will generate OpenAPIv2 schema files in the `release/` directory.
+- Attach the files in the `release/` directory to the GitHub release.
 - Update the `README.md` and `site-src/guides/index.md` files to point links and examples to the new release.
 
 #### For a **MAJOR** or **MINOR** release:
@@ -138,7 +139,8 @@ The following steps must be done by one of the [Gateway API maintainers][gateway
 - Create a tag using the `HEAD` of the `release-x.x` branch. This can be done using the `git` CLI or
   GitHub's [release][release] page.
 - Run the `make build-install-yaml` command which will generate install files in the `release/` directory.
-  Attach these files to the GitHub release.
+- Run the `make build-openapi-json` command which will generate OpenAPIv2 schema files in the `release/` directory.
+- Attach the files in the `release/` directory to the GitHub release.
 - Update the `README.md` and `site-src/guides/index.md` files to point links and examples to the new release.
 - Update the implementation table path (`nav.Implementations.Comparison`) in the nav of `mkdocs.yml` to point to the latest release file (for example Implementation Comparison points to `implementation-table-v1.2.0.md`). Add the now past version under `Past Version Comparisons`, and edit the text blurb in `mkdocs-generate-conformance.py` to also reflect the added past version.
 - Update `hack/mkdocs/generate.sh` and add the new `release-x.x` to the array of releases.
@@ -156,7 +158,8 @@ The following steps must be done by one of the [Gateway API maintainers][gateway
   page.
 - Run the `make build-install-yaml` command which will generate
   install files in the `release/` directory.
-- Attach these files to the GitHub release.
+- Run the `make build-openapi-json` command which will generate OpenAPIv2 schema files in the `release/` directory.
+- Attach the files in the `release/` directory to the GitHub release.
 
 ### Promoting images to production registry
 Gateway API follows the standard kubernetes image promotion process described [here][kubernetes-image-promotion].
