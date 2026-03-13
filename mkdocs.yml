@@ -51,7 +51,7 @@ plugins:
   - redirects:
       redirect_maps:
         'guides/index.md': 'guides/getting-started/index.md'
-        'ingress-nginx': 'guides/getting-started/migrating-from-ingress-nginx.md'
+        'ingress-nginx.md': 'guides/getting-started/migrating-from-ingress-nginx.md'
         'concepts/gamma.md': 'mesh/index.md'
         'concepts/service-facets.md': 'mesh/service-facets.md'
         'concepts/guidelines.md': 'guides/api-design.md'
