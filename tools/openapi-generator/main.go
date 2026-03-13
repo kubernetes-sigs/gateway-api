@@ -60,7 +60,16 @@ func run(_ *cobra.Command, args []string) error {
 	}
 
 	if gatewayAPIDefs {
+		oldDefinitions := mergeSpecs.Definitions
 		mergeSpecs.Definitions = generateGatewayAPIModels()
+
+		// Fix missing x-kubernetes-group-version-kind and similar props.
+		for name, oldDef := range oldDefinitions {
+			if newDef, has := mergeSpecs.Definitions[name]; has {
+				newDef.VendorExtensible = oldDef.VendorExtensible
+				mergeSpecs.Definitions[name] = newDef
+			}
+		}
 	}
 
 	json, err := mergeSpecs.MarshalJSON()
