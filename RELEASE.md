@@ -146,7 +146,8 @@ of the PR is the community consensus for a new release.
 - Tag `HEAD` of the `release-x.x` branch with the version number (including the initial `v`, so e.g. `v1.5.0-rc.1` or `v1.6.1`). This can be done using the `git` CLI or
   the GitHub UI, but **note well**: if the release manager can't create the tag due to Git permissions, a maintainer will need to do it, and in that case it's more polite for the maintainer to create and push the _tag_, then let the release manager create the _release_, so that it's easier for people to find the manager if there are problems!
 - Run the `make build-install-yaml` command which will generate install files in the `release/` directory.
-  Attach these files to the GitHub release.
+- Run the `make build-openapi-json` command which will generate OpenAPIv2 schema files in the `release/` directory.
+- Attach the files in the `release/` directory to the GitHub release.
 - Update the `README.md` and `site-src/guides/index.md` files to point links and examples to the new release.
 
 #### For a **MAJOR** or **MINOR** release:
@@ -164,7 +165,8 @@ of the PR is the community consensus for a new release.
 - Create a tag using the `HEAD` of the `release-x.x` branch. This can be done using the `git` CLI or
   GitHub's [release][release] page.
 - Run the `make build-install-yaml` command which will generate install files in the `release/` directory.
-  Attach these files to the GitHub release.
+- Run the `make build-openapi-json` command which will generate OpenAPIv2 schema files in the `release/` directory.
+- Attach the files in the `release/` directory to the GitHub release.
 - Update the `README.md` and `site-src/guides/index.md` files to point links and examples to the new release.
 - Edit the text blurb in `hack/docsy-generate-conformance.py` to reflect the added past version if necessary.
 
@@ -181,7 +183,8 @@ of the PR is the community consensus for a new release.
   page.
 - Run the `make build-install-yaml` command which will generate
   install files in the `release/` directory.
-- Attach these files to the GitHub release.
+- Run the `make build-openapi-json` command which will generate OpenAPIv2 schema files in the `release/` directory.
+- Attach the files in the `release/` directory to the GitHub release.
 
 ### Promoting images to production registry
 Gateway API follows the standard kubernetes image promotion process described [here][kubernetes-image-promotion].
