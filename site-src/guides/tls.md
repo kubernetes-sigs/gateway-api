@@ -113,6 +113,10 @@ would be invalid.
 {% include 'standard/tls-cert-cross-namespace.yaml' %}
 ```
 ### Client Certificate Validation (Frontend mTLS)
+
+???+ info "Extended Support Feature: GatewayFrontendClientCertificateValidation"
+    This feature is part of extended support. For more information on support levels, refer to our [conformance guide](../concepts/conformance.md).
+
 ??? success "Standard Channel since v1.5.0"
     GatewayFrontendClientCertificateValidation feature has been part of the Standard Channel since
     `v1.5.0`. For more information on release channels, refer to our [versioning
@@ -123,6 +127,10 @@ Gateway API supports validating the TLS certificate presented by a frontend clie
 Unlike server certificate configuration, which is defined per-listener, client certificate validation is configured at the **Gateway level** within the `spec.tls` field. This design is specifically intended to mitigate security risks associated with HTTP/2 and TLS connection coalescing, where a connection established for one listener could be reused for another listener on the same port, potentially bypassing listener-specific validation settings.
 
 #### Configuration Overview
+
+???+ info "Extended Support Feature: GatewayFrontendClientCertificateValidationInsecureFallback"
+    This feature is part of extended support. For more information on support levels, refer to our [conformance guide](../concepts/conformance.md).
+
 Client validation is defined using the `frontendValidation` struct, which specifies how the Gateway should verify the client's identity.
 
 *   **`caCertificateRefs`**: A list of references to Kubernetes objects (typically `ConfigMap`s) containing PEM-encoded CA certificate bundles used as trust anchors to validate the client's certificate.

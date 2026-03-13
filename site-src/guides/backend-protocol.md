@@ -1,5 +1,8 @@
 # Backend Protocol
 
+???+ info "Extended Support Features: HTTPRouteBackendProtocolH2C, HTTPRouteBackendProtocolWebSocket"
+    These features are part of extended support. For more information on support levels, refer to our [conformance guide](../concepts/conformance.md).
+
 ??? success "Standard Channel since v1.2.0"
 
     This concept has been part of the Standard Channel since `v1.2.0`.
