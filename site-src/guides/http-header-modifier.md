@@ -19,7 +19,7 @@ To add a header to an HTTP request, use a filter of the type `RequestHeaderModif
 {% include 'standard/http-request-header-add.yaml' %}
 ```
 
-To edit an existing header, use the `set` action and specify the value of the header to be modified and the new header value to be set.
+To unconditionally set the value of a header, use `set`. It will override the value of a header with the provided value if the header is already present, or set it to the provided value if the header does not exist.
 
 ```yaml
     filters:
