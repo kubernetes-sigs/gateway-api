@@ -58,8 +58,9 @@ The specification of a TLSRoute consists of:
 
 - [ParentRefs][parentRef] - Define which Gateways this Route wants to be
   attached to.
-- [Hostnames][hostname] - Define a list of hostnames to use for matching the SNI
-  hostname of a TLS handshake.
+- [Hostnames][hostname] (required) - Define a list of hostnames to use for
+  matching the SNI hostname of a TLS handshake. For details on hostname
+  intersection and routing, see the [Hostnames docs][hostnames-concept].
 - [Rules][tlsrouterule] - Define a list of rules to perform actions against
   matching TLS handshake. For TLSRoute this is limited to which [backendRefs][backendRef]
   should be used.
@@ -154,7 +155,12 @@ number, rather than to named listeners whose ports may change.
 
 Hostnames define a list of hostnames to match against the SNI hostname of the
 TLS request. When a match occurs, the TLSRoute is selected to route the request
-based on its rules.
+based on its rules. Unlike HTTPRoute and GRPCRoute, the `hostnames` field is
+**required** for TLSRoute.
+
+For hostname intersection with Listeners, wildcard behavior, and routing
+discrimination, see the [Hostnames in Gateway API][hostnames-concept] concept
+document.
 
 The SNI specification adds the following restrictions for a Hostname definition:
 
@@ -245,12 +251,14 @@ status:
 ## Merging
 Multiple TLSRoutes can be attached to a single Gateway resource. Importantly,
 only one Route hostname may match each request. For more information on how
-conflict resolution applies to merging, refer to the [API specification][hostname].
+hostnames and conflict resolution apply, refer to the [Hostnames docs][hostnames-concept]
+and the [API specification][hostname].
 
 
 [tlsroute]: ../reference/spec.md#tlsroute
 [tlsrouterule]: ../reference/spec.md#tlsrouterouterule
 [hostname]: ../reference/spec.md#hostname
+[hostnames-concept]: ../concepts/hostnames.md
 [backendRef]: ../reference/spec.md#backendref
 [parentRef]: ../reference/spec.md#parentreference
 [name]: ../reference/spec.md#sectionname
