@@ -89,6 +89,7 @@ other functions (like managing DNS or creating certificates).
 - [Cilium][16]
 - [Envoy Gateway][18] (GA)
 - [Google Kubernetes Engine][6] (GA)
+- [HAProxy Ingress][7]
 - [Istio][9] (GA)
 - [kgateway][37] (GA)
 - [NGINX Gateway Fabric][12] (GA)
@@ -114,7 +115,6 @@ other functions (like managing DNS or creating certificates).
 - [Easegress][30] (GA)
 - [Emissary-Ingress (Ambassador API Gateway)][4] (alpha)
 - [Flomesh Service Mesh][17] (beta)
-- [HAProxy Ingress][7] (alpha)
 - [HAProxy Kubernetes Ingress Controller][32] (GA)
 - [HashiCorp Consul][8]
 - [Kuma][11] (GA)
@@ -457,12 +457,13 @@ For support, feedback, or to engage in a discussion about the Gravitee Kubernete
 
 ### HAProxy Ingress
 
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.5.1-HAProxy%20Ingress-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.5.1/haproxy-ingress)
+
 [HAProxy Ingress][h1] is a community driven ingress controller implementation for HAProxy.
 
-HAProxy Ingress v0.13 partially supports the Gateway API's v1alpha1 specification. See the [controller's Gateway API documentation][h2] to get informed about conformance and roadmap.
+HAProxy Ingress is a conformant Gateway API implementation since `v0.17`. It implements all core features from the standard channel, as well as TLSRoute and TCPRoute APIs from the experimental channel.
 
 [h1]:https://haproxy-ingress.github.io/
-[h2]:https://haproxy-ingress.github.io/docs/configuration/gateway-api/
 
 ### HAProxy Kubernetes Ingress Controller
 
