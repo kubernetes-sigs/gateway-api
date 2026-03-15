@@ -1,0 +1,41 @@
+apiVersion: gateway.networking.k8s.io/v1
+date: "2026-03-15T15:41:44+01:00"
+gatewayAPIChannel: experimental
+gatewayAPIVersion: v1.2.1
+implementation:
+  contact:
+  - '@zentinelproxy'
+  organization: zentinelproxy
+  project: zentinel
+  url: https://github.com/zentinelproxy/zentinel
+  version: 0.6.1
+kind: ConformanceReport
+mode: default
+profiles:
+- core:
+    failedTests:
+    - HTTPRouteCrossNamespace
+    - HTTPRouteExactPathMatching
+    - HTTPRouteHTTPSListener
+    - HTTPRouteHeaderMatching
+    - HTTPRouteHostnameIntersection
+    - HTTPRouteInvalidCrossNamespaceParentRef
+    - HTTPRouteInvalidReferenceGrant
+    - HTTPRouteListenerHostnameMatching
+    - HTTPRouteMatching
+    - HTTPRouteMatchingAcrossRoutes
+    - HTTPRoutePartiallyInvalidViaInvalidReferenceGrant
+    - HTTPRoutePathMatchOrder
+    - HTTPRouteRedirectHostAndStatus
+    - HTTPRouteReferenceGrant
+    - HTTPRouteRequestHeaderModifier
+    - HTTPRouteServiceTypes
+    - HTTPRouteSimpleSameNamespace
+    - HTTPRouteWeight
+    result: failure
+    statistics:
+      Failed: 18
+      Passed: 15
+      Skipped: 0
+  name: GATEWAY-HTTP
+  summary: Core tests failed with 18 test failures.
