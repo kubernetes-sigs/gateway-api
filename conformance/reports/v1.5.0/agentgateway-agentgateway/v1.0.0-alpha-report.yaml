@@ -1,5 +1,5 @@
 apiVersion: gateway.networking.k8s.io/v1
-date: "2026-03-03T00:58:56Z"
+date: "2026-03-13T23:24:40Z"
 gatewayAPIChannel: experimental
 gatewayAPIVersion: v1.5.0
 implementation:
@@ -8,7 +8,7 @@ implementation:
   organization: agentgateway
   project: agentgateway
   url: github.com/agentgateway/agentgateway
-  version: v1.0.0-alpha.3
+  version: v1.0.0
 kind: ConformanceReport
 mode: default
 profiles:
