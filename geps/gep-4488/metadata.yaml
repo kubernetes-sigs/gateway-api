@@ -1,6 +1,6 @@
 apiVersion: internal.gateway.networking.k8s.io/v1alpha1
 kind: GEPDetails
-number: xxx
+number: 4488
 name: Backend Resource
 status: Provisional
 authors:
