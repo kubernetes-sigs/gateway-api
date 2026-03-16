@@ -104,6 +104,7 @@ other functions (like managing DNS or creating certificates).
 - [Kong Ingress Controller][10] (GA)
 - [Kong Gateway Operator][35] (GA)
 - [Kubvernor][39](work in progress)
+- [Zentinel][45] (work in progress)
 
 ### Stale
 
@@ -189,6 +190,7 @@ other functions (like managing DNS or creating certificates).
 [42]:#gravitee-kubernetes-operator
 [43]:#alibaba-cloud-service-mesh
 [44]:#aws-load-balancer-controller
+[45]:#zentinel
 
 
 [gamma]:mesh/index.md
@@ -685,6 +687,16 @@ For up-to-date information on the supported version and features of the Gateway 
 [apk-doc]:https://apk.docs.wso2.com/en/latest/catalogs/kubernetes-crds/
 [repo]:https://github.com/wso2/apk
 [discord]:https://discord.com/channels/955510916064092180/1113056079501332541
+
+### Zentinel
+
+[Zentinel][zentinel] is an open-source, security-first reverse proxy and gateway controller built on Cloudflare's [Pingora](https://github.com/cloudflare/pingora) framework in Rust. It watches Gateway API resources and translates them into Zentinel proxy configuration. Key features include crash-isolated external agents for custom logic (WAF, auth, rate limiting), a pure-Rust WAF, and support for HTTP/2, gRPC, TLS passthrough, and WebSockets.
+
+For more information, check the [Zentinel documentation][zentinel-docs] or the [GitHub repository][zentinel]. If you have questions or would like to contribute, feel free to [open an issue][zentinel-issues].
+
+[zentinel]:https://github.com/zentinelproxy/zentinel
+[zentinel-docs]:https://zentinelproxy.io
+[zentinel-issues]:https://github.com/zentinelproxy/zentinel/issues
 
 ## Integrations
 
