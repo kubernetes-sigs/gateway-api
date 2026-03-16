@@ -47,6 +47,9 @@ unchanged.
 
 ### Method-Preserving Redirects
 
+???+ info "Extended Support Features: HTTPRoute307RedirectStatusCode, HTTPRoute308RedirectStatusCode"
+    These features are part of extended support. For more information on support levels, refer to our [conformance guide](../concepts/conformance.md).
+
 When you need to ensure that the HTTP method is preserved during a redirect, use status codes 307 or 308:
 
 ```yaml
@@ -60,6 +63,9 @@ For permanent redirects that must preserve the HTTP method, use status code 308:
 ```
 
 ### POST-Redirect-GET Pattern
+
+???+ info "Extended Support Feature: HTTPRoute303RedirectStatusCode"
+    This feature is part of extended support. For more information on support levels, refer to our [conformance guide](../concepts/conformance.md).
 
 For implementing the POST-Redirect-GET pattern, use status code 303 to redirect POST requests to a GET endpoint:
 
@@ -95,6 +101,9 @@ HTTPS traffic to application backends.
 
 ### Path redirects
 
+???+ info "Extended Support Feature: HTTPRoutePathRedirect"
+    This feature is part of extended support. For more information on support levels, refer to our [conformance guide](../concepts/conformance.md).
+
 Path redirects use an HTTP Path Modifier to replace either entire paths or path
 prefixes. For example, the HTTPRoute below will issue a 302 redirect to all
 `redirect.example` requests whose path begins with `/cayenne` to `/paprika`.
@@ -122,6 +131,9 @@ https://redirect.example/paprika/pinch` and `location:
 https://redirect.example/paprika/teaspoon` response headers.
 
 ## Rewrites
+
+???+ info "Extended Support Feature: HTTPRoutePathRewrite"
+    This feature is part of extended support. For more information on support levels, refer to our [conformance guide](../concepts/conformance.md).
 
 Rewrites modify components of a client request before proxying it upstream. A
 [`URLRewrite`
