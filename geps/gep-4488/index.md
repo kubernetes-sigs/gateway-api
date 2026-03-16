@@ -19,6 +19,7 @@ This conflation creates several significant issues:
 ### External Destination Limitations
 
 Currently, representing external destinations in Gateway API requires synthetic `Service` objects with `type: ExternalName`, which:
+
 - **Security vulnerabilities**: ExternalName Services are subject to DNS rebinding attacks ([CVE-2021-25740](https://github.com/kubernetes/kubernetes/issues/103675))
 - **Policy limitations**: Cannot apply backend-specific policies (TLS, authentication, rate limiting) without affecting all consumers
 - **Synthetic resource overhead**: Creates artificial Kubernetes resources for external dependencies
@@ -27,6 +28,7 @@ Currently, representing external destinations in Gateway API requires synthetic 
 ### Policy Application Complexity
 
 The overloaded Service resource makes policy attachment ambiguous:
+
 - **Producer vs Consumer confusion**: Services represent both "how to call me" (producer) and "where to route" (consumer) concerns
 - **Policy scope unclear**: TLS policies applied to Services affect all consumers, preventing per-route customization
 - **Extension limitations**: Current `BackendTLSPolicy` only supports Service targets, limiting external destination configuration
@@ -34,6 +36,7 @@ The overloaded Service resource makes policy attachment ambiguous:
 ### Gateway API Integration Friction
 
 Gateway API's backend reference system defaults to Services but:
+
 - **Limited extensibility**: Adding new backend types requires significant API changes
 - **Inconsistent patterns**: Different implementations handle external destinations differently
 - **Missing primitives**: No standard way to represent external FQDNs, IPs, or connection metadata
@@ -81,101 +84,176 @@ The Backend resource is explicitly designed as a **consumer resource** - it desc
 
 ```go
 type Backend struct {
-    metav1.TypeMeta   `json:",inline"`
-    metav1.ObjectMeta `json:"metadata,omitempty"`
-    Spec   BackendSpec   `json:"spec"`
-    Status BackendStatus `json:"status,omitempty"`
+  metav1.TypeMeta   `json:",inline"`
+  metav1.ObjectMeta `json:"metadata,omitempty"`
+  Spec   BackendSpec   `json:"spec"`
+  Status BackendControllerStatus `json:"status,omitempty"`
 }
 
 type BackendSpec struct {
-    // Destination defines where traffic should be sent
-    Destination BackendDestination `json:"destination"`
+  // Destination defines where traffic should be sent
+  Destination BackendDestination `json:"destination"`
 
-    // Filters defines filters that should be executed when
-    // sending traffic to this backend. Filters should not
-    // be duplicated on a backendRef (targeting this `Backend`)
-    // and on the `Backend` itself.
-    // +optional
-    // TODO: Specify filter type definition. Should,
-    // at minimum, include ExtensionRef pattern.
-    Filters []BackendFilters `json:"filters,omitempty"`
-}
-
-type BackendDestination struct {
-    // Type defines the destination type
-    Type BackendType `json:"type"`
-
-    // Ports defines the destination ports and protocols
-    // +optional
-    Ports []BackendPort `json:"ports,omitempty"`
-
-    // FQDN specifies an external fully qualified domain name
-    // +optional
-    FQDN *FQDNBackend `json:"fqdn,omitempty"`
+  // Filters defines filters that should be executed when
+  // sending traffic to this backend. Filters should not
+  // be duplicated on a backendRef (targeting this `Backend`)
+  // and on the `Backend` itself.
+  // +optional
+  // TODO: Specify filter type definition. Should,
+  // at minimum, include ExtensionRef pattern.
+  Filters []BackendFilters `json:"filters,omitempty"`
 }
 
 type BackendType string
 
 const (
-    BackendTypeFQDN    BackendType = "FQDN"
-    // TODO: Add WorkloadSelector destination type
+  BackendTypeFQDN    BackendType = "FQDN"
+  // TODO: Add WorkloadSelector destination type
 )
+
+type BackendDestination struct {
+  // Type defines the destination type
+  Type BackendType `json:"type"`
+
+  // Ports defines the destination ports and protocols
+  // kubebuilder:validation:MinItems=1
+  // kubebuilder:validation:MaxItems=16
+  Ports []BackendPort `json:"ports,omitempty"`
+
+  // FQDN specifies an external fully qualified domain name
+  // +optional
+  FQDN *FQDNBackend `json:"fqdn,omitempty"`
+}
+
+// BackendTLSMode defines the TLS mode for backend connections.
+// +kubebuilder:validation:Enum=Simple;Mutual;None
+type BackendTLSMode string
+
+const (
+  // Do not modify or configure TLS. If your platform (or service mesh)
+  // transparently handles TLS, use this mode.
+  BackendTLSModeNone BackendTLSMode = "None"
+  // Enable TLS with simple server certificate verification.
+  BackendTLSModeSimple BackendTLSMode = "Simple"
+  // Enable mutual TLS.
+  BackendTLSModeMutual BackendTLSMode = "Mutual"
+)
+
+type BackendTLS struct {
+  // Mode defines the TLS mode for the backend.
+  // +required
+  Mode BackendTLSMode `json:"mode"`
+  // SNI defines the server name indication to present to the upstream backend.
+  // +optional
+  SNI string `json:"sni,omitempty"`
+  // CaBundleRef defines the reference to the CA bundle for validating the backend's
+  // certificate.
+  // Defaults to system CAs if not specified.
+  // +optional
+  CaBundleRef []ObjectReference `json:"caBundleRef,omitempty"`
+
+  InsecureSkipVerify *bool `json:"insecureSkipVerify,omitempty"`
+
+  // ClientCertificateRef defines the reference to the client certificate for mutual
+  // TLS. Only used if mode is MUTUAL.
+  // +optional
+  ClientCertificateRef *SecretObjectReference `json:"clientCertificateRef,omitempty"`
+
+  SubjectAltNames []string `json:"subjectAltNames,omitempty"`
+}
+
+type BackendControllerStatus struct {
+  // Name is a domain/path string that indicates the name of the controller that manages the
+  // Backend. Name corresponds to the GatewayClass controllerName field when the
+  // controller will manage parents of type "Gateway". Otherwise, the name is implementation-specific.
+  //
+  // Example: "example.net/import-controller".
+  //
+  // The format of this field is DOMAIN "/" PATH, where DOMAIN and PATH are valid Kubernetes
+  // names (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names).
+  //
+  // A controller MUST populate this field when writing status and ensure that entries to status
+  // populated with their controller name are removed when they are no longer necessary.
+  //
+  // +required
+  Name ControllerName `json:"name"`
+  // For Kubernetes API conventions, see:
+  // https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#typical-status-properties
+  // conditions represent the current state of the Backend resource.
+  // Each condition has a unique type and reflects the status of a specific aspect of the resource.
+  //
+  // Standard condition types include:
+  // - "Available": the resource is fully functional
+  // - "Progressing": the resource is being created or updated
+  // - "Degraded": the resource failed to reach or maintain its desired state
+  //
+  // The status of each condition is one of True, False, or Unknown.
+  // +listType=map
+  // +listMapKey=type
+  // +optional
+  Conditions []metav1.Condition `json:"conditions,omitempty"`
+}
+
+type BackendPort struct {
+  // Number defines the port number of the backend.
+  // +required
+  // +kubebuilder:validation:Minimum=1
+  // +kubebuilder:validation:Maximum=65535
+  Number uint32 `json:"number"`
+  // Protocol defines the protocol of the backend.
+  // +required
+  // +kubebuilder:validation:MaxLength=256
+  Protocol BackendProtocol `json:"protocol"`
+  // TLS defines the TLS configuration that a client should use when talking to the backend.
+  // TODO: To prevent duplication on the part of the user, maybe this should be declared once at the
+  // top level with per-port overrides?
+  // +optional
+  TLS *BackendTLS `json:"tls,omitempty"`
+  // +optional
+  ProtocolOptions *BackendProtocolOptions `json:"protocolOptions,omitempty"`
+}
 ```
 
 ### FQDN Backend Configuration
 
 ```go
 type FQDNBackend struct {
-    // Hostname specifies the destination FQDN
-    Hostname string `json:"hostname"`
-
-    // TLS configuration for the connection
-    // +optional
-    TLS *BackendTLSConfig `json:"tls,omitempty"`
-
-    // Protocol specifies the application protocol
-    // +optional
-    Protocol *BackendProtocol `json:"protocol,omitempty"`
-}
-
-type BackendTLSConfig struct {
-    // ServerName for TLS SNI
-    // +optional
-    ServerName *string `json:"serverName,omitempty"`
-
-    // CACertificates for server verification
-    // +optional
-    CACertificates []BackendTLSCertificate `json:"caCertificates,omitempty"`
-
-    // ClientCertificate for mTLS
-    // +optional
-    ClientCertificate *BackendTLSCertificate `json:"clientCertificate,omitempty"`
-
-    // InsecureSkipVerify disables server certificate verification
-    // +optional
-    InsecureSkipVerify *bool `json:"insecureSkipVerify,omitempty"`
-}
-
-type BackendTLSCertificate struct {
-    // Secret reference containing certificate data
-    SecretRef SecretObjectReference `json:"secretRef"`
-
-    // Key within the secret containing the certificate
-    // +optional
-    Key *string `json:"key,omitempty"`
+  // Hostname specifies the destination FQDN
+  Hostname string `json:"hostname"`
 }
 ```
 
 ### Protocol and Extension Support
 
 ```go
-type BackendProtocol struct {
-    // Type specifies the protocol type
-    Type string `json:"type"`
 
-    // Options provides protocol-specific configuration
-    // +optional
-    Options map[string]string `json:"options,omitempty"`
+// BackendProtocol defines the protocol for backend communication.
+// +kubebuilder:validation:Enum=HTTP;HTTP2;TCP;MCP
+type BackendProtocol string
+
+const (
+  BackendProtocolHTTP  BackendProtocol = "HTTP"
+  BackendProtocolHTTP2 BackendProtocol = "HTTP2"
+  BackendProtocolTCP   BackendProtocol = "TCP"
+  BackendProtocolMCP   BackendProtocol = "MCP"
+)
+
+// +kubebuilder:validation:ExactlyOneOf=mcp
+type BackendProtocolOptions struct {
+  // +optional
+  MCP *MCPProtocolOptions `json:"mcp,omitempty"`
+}
+
+type MCPProtocolOptions struct {
+  // MCP protocol version. MUST be a valid MCP version string
+  // per the project's strategy: https://modelcontextprotocol.io/specification/versioning
+  // +optional
+  // +kubebuilder:validation:MaxLength=256
+  Version string `json:"version,omitempty"`
+  // URL path for MCP traffic. Default is /mcp.
+  // +optional
+  // +kubebuilder:default:=/mcp
+  Path string `json:"path,omitempty"`
 }
 ```
 
@@ -312,6 +390,7 @@ After extensive community discussion, this proposal adopts a **DNS trust model**
    - Restrictive validation would break legitimate external integrations
    - Security focus should be on network-level controls, not resource-level validation
    - No initial support for wildcard FQDNs to limit attack surface and the need for Dynamic Forward Proxy support from implementations
+     - Future proposals to add this functionality should include a comprehensive DNS trust specification and threat model.
    - Implementations may also be able to implement data-plane/proxy-level protections for common attack vectors
    - NOTE: This may be a decision we revisit in the future based on user feedback
 
@@ -423,25 +502,6 @@ spec:
 ```
 
 **Use cases**: Retry policies, observability configuration, vendor-specific policies
-
-### Protocol Extensions
-
-The Backend resource supports vendor-specific protocols through a structured extension mechanism:
-
-```yaml
-spec:
-  destination:
-    type: FQDN
-    fqdn:
-      hostname: anthropic.ai
-      protocol:
-        type: "anthropic.io/claude-api"
-        options:
-          version: "2023-06-01"
-          streaming: "true"
-```
-
-**Vendor Prefix Pattern**: Following Gateway API conventions, implementations can define custom protocols using vendor prefixes (e.g., `istio.io/grpc-web`, `linkerd.io/profile`).
 
 ## Graduation Criteria
 
