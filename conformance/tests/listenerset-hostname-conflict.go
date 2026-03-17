@@ -46,16 +46,18 @@ var ListenerSetHostnameConflict = confsuite.ConformanceTest{
 		ns := confsuite.InfrastructureNamespace
 		kubernetes.NamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, []string{ns})
 
+		// GEP-1713 requires conflicted listeners to report Conflicted=True, but
+		// does not normatively require a specific reason for Accepted/Programmed.
 		hostnameConflictedListenerConditions := []metav1.Condition{
 			{
 				Type:   string(gatewayv1.ListenerConditionAccepted),
 				Status: metav1.ConditionFalse,
-				Reason: string(gatewayv1.ListenerReasonHostnameConflict),
+				Reason: "", // any reason
 			},
 			{
 				Type:   string(gatewayv1.ListenerConditionProgrammed),
 				Status: metav1.ConditionFalse,
-				Reason: string(gatewayv1.ListenerReasonHostnameConflict),
+				Reason: "", // any reason
 			},
 			{
 				Type:   string(gatewayv1.ListenerConditionConflicted),
