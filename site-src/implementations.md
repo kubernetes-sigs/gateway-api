@@ -84,7 +84,7 @@ other functions (like managing DNS or creating certificates).
 ## Gateway Controller Implementation Status <a name="gateways"></a>
 
 ### Conformant
-- [Agent Gateway][40]
+- [Agentgateway][40]
 - [Airlock Microgateway][34]
 - [Cilium][16]
 - [Envoy Gateway][18] (GA)
@@ -184,7 +184,7 @@ other functions (like managing DNS or creating certificates).
 [37]:#kgateway
 [38]:#google-cloud-service-mesh
 [39]:#kubvernor
-[40]:#agent-gateway-with-kgateway
+[40]:#agentgateway
 [41]:#kruise-rollouts
 [42]:#gravitee-kubernetes-operator
 [43]:#alibaba-cloud-service-mesh
@@ -209,7 +209,7 @@ In this section you will find specific links to blog posts, documentation and ot
 [epicsource]:https://github.com/epic-gateway
 
 ### Agentgateway
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.4.1-Agentgateway-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.4.1/agentgateway-agentgateway)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.5.0-Agentgateway-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.5.0/agentgateway-agentgateway)
 
 [Agentgateway](https://agentgateway.dev/) is an open source Gateway API implementation hosted as a part of the Linux Foundation, focusing on AI use cases, including LLM consumption, LLM serving, agent-to-agent ([A2A](https://a2aproject.github.io/A2A/latest/)), agent-to-tool ([MCP](https://modelcontextprotocol.io/introduction)), as well as traditional TCP/HTTP traffic serving.
 It is the first and only proxy designed specifically for the Kubernetes Gateway API, powered by a high performance and scalable Rust dataplane implementation.
