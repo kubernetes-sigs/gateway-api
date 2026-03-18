@@ -5,7 +5,7 @@
 
 ## TLDR
 
-This GEP proposes a new `Backend` resource to address limitations in external destination representation, policy application, and security concerns with the current Service-based backend system. The namespace-scoped `Backend` resource serves as a consumer-focused alternative to synthetic Services for external destinations (FQDNs, IPs) and provides a foundation for service decoration and enhanced policy application.
+This GEP proposes a new `Backend` resource to address limitations in external destination representation, policy application, and security concerns with the current Service-based backend system. The namespace-scoped `Backend` resource serves as a consumer-focused alternative to synthetic Services for external hosts and provides a foundation for service decoration and enhanced policy application.
 
 ## Motivation
 
@@ -107,7 +107,7 @@ type BackendSpec struct {
 type BackendType string
 
 const (
-  BackendTypeFQDN             BackendType = "FQDN"
+  BackendTypeHostname             BackendType = "Hostname"
   BackendTypeEndpointSelector BackendType = "EndpointSelector"
 )
 
@@ -120,9 +120,9 @@ type BackendDestination struct {
   // kubebuilder:validation:MaxItems=16
   Ports []BackendPort `json:"ports,omitempty"`
 
-  // FQDN specifies the configuration for an FQDN backend. Only used if type is FQDN.
+  // Hostname specifies the configuration for an Hostname backend. Only used if type is Hostname.
   // +optional
-  FQDN *FQDNBackend `json:"fqdn,omitempty"`
+  Hostname *HostnameBackend `json:"hostname,omitempty"`
 
   // EndpointSelector specifies the configuration for an EndpointSelector backend. Only used if type is EndpointSelector.
   // TODO: Reference EndpointSelector GEP once added.
@@ -217,12 +217,12 @@ type BackendPort struct {
 }
 ```
 
-### FQDN Backend Configuration
+### Hostname Backend Configuration
 
 ```go
-type FQDNBackend struct {
-  // Hostname specifies the destination FQDN
-  Hostname string `json:"hostname"`
+type HostnameBackend struct {
+  // Address specifies the destination address used to reach this hostname.
+  Address string `json:"address"`
 }
 ```
 
@@ -328,9 +328,9 @@ metadata:
   namespace: ai-apps
 spec:
   destination:
-    type: FQDN
-    fqdn:
-      hostname: api.openai.com
+    type: Hostname
+    hostname:
+      address: api.openai.com
       tls:
         serverName: api.openai.com
         clientCertificate:
@@ -389,11 +389,11 @@ After extensive community discussion, this proposal adopts a **DNS trust model**
    - Network policies can restrict egress traffic regardless of Backend configuration (forcing DNS resolution to happen at the gateway only)
 
 3. **Practical Effectiveness**
-   - Trivial for attackers to register FQDNs that resolve to internal addresses
+   - Trivial for attackers to register DNS records that resolve to internal addresses
      - Because of this, implementations implementing `Backend` MUST add either TLS or JWT validation on sensitive localhost endpoints to prevent confused deputy attacks
    - Restrictive validation would break legitimate external integrations
    - Security focus should be on network-level controls, not resource-level validation
-   - No initial support for wildcard FQDNs to limit attack surface and the need for Dynamic Forward Proxy support from implementations
+   - No initial support for wildcard hostnames to limit attack surface and the need for Dynamic Forward Proxy support from implementations
      - Future proposals to add this functionality should include a comprehensive DNS trust specification and threat model.
    - Implementations may also be able to implement data-plane/proxy-level protections for common attack vectors
    - NOTE: This may be a decision we revisit in the future based on user feedback
@@ -435,6 +435,10 @@ spec:
 - Network-level controls (firewalls, proxy configuration) provide defense in depth
 - Backend resources provide audit trail for external dependencies
 
+## EndpointSelector Type
+
+
+
 ## Extension Framework
 
 The Backend resource provides three levels for applying extensions and policies:
@@ -471,9 +475,9 @@ apiVersion: gateway.networking.k8s.io/v1alpha1
 kind: Backend
 spec:
   destination:
-    type: FQDN
-    fqdn:
-      hostname: api.openai.com
+    type: Hostname
+    hostname:
+      address: api.openai.com
   filters:
   - type: ExtensionRef
     extensionRef:
