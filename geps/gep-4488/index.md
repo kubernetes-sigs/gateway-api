@@ -45,7 +45,7 @@ Gateway API's backend reference system defaults to Services but:
 
 - **Introduce Backend resource** as a namespace-scoped consumer resource for representing destinations and connection metadata
 - **Support multiple destination types**: Kubernetes Services and external FQDNs
-- **Enable backend-specific policies**: TLS configuration, authentication, and protocol settings per destination
+- **Enable backend-specific policies**: TLS configuration, authentication, health checks, and protocol settings per destination
 - **Maintain Service compatibility**: Existing Service-based backends continue to work indefinitely
 - **Establish extension framework**: Allow vendor-specific protocol support and connection options
 - **Provide security model**: Clear RBAC patterns and risk documentation for external destinations
@@ -74,7 +74,7 @@ Gateway API's backend reference system defaults to Services but:
 
 ## Proposal
 
-The Backend resource addresses a fundamental gap in Gateway API's backend reference system: first-class support for external destinations. Currently, external APIs, databases, and services must be represented as synthetic Kubernetes Services with `type: ExternalName`, which creates security vulnerabilities, policy application challenges, and resource management overhead.
+The Backend resource addresses a fundamental gap in Gateway API's backend reference system: first-class support for external destinations. Currently, external APIs, databases, and services must be represented as synthetic Kubernetes Services with `type: ExternalName`, which creates security vulnerabilities, policy application challenges, and resource management overhead. Furthermore, `Backend`s of type `EndpointSelector` can be used to decorate existing `Service`s (or other resources that fulfill the backend role) with TLS and protocol configuration.
 
 The Backend resource is explicitly designed as a **consumer resource** - it describes how a gateway should connect to a destination from the client perspective, regardless of whether that destination is internal or external to the cluster.
 
@@ -107,8 +107,8 @@ type BackendSpec struct {
 type BackendType string
 
 const (
-  BackendTypeFQDN    BackendType = "FQDN"
-  // TODO: Add WorkloadSelector destination type
+  BackendTypeFQDN             BackendType = "FQDN"
+  BackendTypeEndpointSelector BackendType = "EndpointSelector"
 )
 
 type BackendDestination struct {
@@ -120,9 +120,14 @@ type BackendDestination struct {
   // kubebuilder:validation:MaxItems=16
   Ports []BackendPort `json:"ports,omitempty"`
 
-  // FQDN specifies an external fully qualified domain name
+  // FQDN specifies the configuration for an FQDN backend. Only used if type is FQDN.
   // +optional
   FQDN *FQDNBackend `json:"fqdn,omitempty"`
+
+  // EndpointSelector specifies the configuration for an EndpointSelector backend. Only used if type is EndpointSelector.
+  // TODO: Reference EndpointSelector GEP once added.
+  // +optional
+  EndpointSelector *EndpointSelectorBackend `json:"endpointSelector,omitempty"`
 }
 
 // BackendTLSMode defines the TLS mode for backend connections.
@@ -139,27 +144,25 @@ const (
   BackendTLSModeMutual BackendTLSMode = "Mutual"
 )
 
+type EndpointSelectorBackend struct {
+  // SelectorRef specifies the reference to the EndpointSelector resource that manages the EndpointSlices for this backend.
+  // +required
+  SelectorRef *LocalObjectReference `json:"selectorRef"`
+}
+
 type BackendTLS struct {
   // Mode defines the TLS mode for the backend.
   // +required
   Mode BackendTLSMode `json:"mode"`
-  // SNI defines the server name indication to present to the upstream backend.
-  // +optional
-  SNI string `json:"sni,omitempty"`
-  // CaBundleRef defines the reference to the CA bundle for validating the backend's
-  // certificate.
-  // Defaults to system CAs if not specified.
-  // +optional
-  CaBundleRef []ObjectReference `json:"caBundleRef,omitempty"`
-
-  InsecureSkipVerify *bool `json:"insecureSkipVerify,omitempty"`
 
   // ClientCertificateRef defines the reference to the client certificate for mutual
   // TLS. Only used if mode is MUTUAL.
   // +optional
   ClientCertificateRef *SecretObjectReference `json:"clientCertificateRef,omitempty"`
 
-  SubjectAltNames []string `json:"subjectAltNames,omitempty"`
+  // Re-use BackendTLS policy validation fields. This is currently missing InsecureSKipVerify
+  // but that will be added in GEP-4152.
+  Validation BackendTLSPolicyValidation `json:"validation,omitempty"`
 }
 
 type BackendControllerStatus struct {
@@ -366,12 +369,12 @@ Allowing namespace-scoped Backend resources to reference external FQDNs raises l
 
 2. **Cross-Namespace Service Access**
    - FQDNs could target internal cluster services via `svc.namespace.svc.cluster.local`
-   - Potential bypass of namespace isolation and RBAC controls
+   - Potential bypass of namespace isolation and authorization controls
    - Risk: Accessing services in other namespaces without proper authorization
 
 #### Risk Assessment and Mitigations
 
-**DNS Trust Model Decision**
+##### DNS Trust Model Decision
 
 After extensive community discussion, this proposal adopts a **DNS trust model** for the following reasons:
 
@@ -387,6 +390,7 @@ After extensive community discussion, this proposal adopts a **DNS trust model**
 
 3. **Practical Effectiveness**
    - Trivial for attackers to register FQDNs that resolve to internal addresses
+     - Because of this, implementations implementing `Backend` MUST add either TLS or JWT validation on sensitive localhost endpoints to prevent confused deputy attacks
    - Restrictive validation would break legitimate external integrations
    - Security focus should be on network-level controls, not resource-level validation
    - No initial support for wildcard FQDNs to limit attack surface and the need for Dynamic Forward Proxy support from implementations
