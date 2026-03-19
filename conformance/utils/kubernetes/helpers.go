@@ -1503,17 +1503,11 @@ func HTTPRouteMustBeAcceptedAndResolved(t *testing.T, c client.Client, timeoutCo
 		Reason: string(gatewayv1.RouteReasonAccepted),
 	}
 
-	resolvedRefsCondition := metav1.Condition{
-		Type:   string(gatewayv1.RouteConditionResolvedRefs),
-		Status: metav1.ConditionTrue,
-		Reason: string(gatewayv1.RouteReasonResolvedRefs),
-	}
-
 	t.Logf("Waiting for HTTPRoute %s to be Accepted by Gateway %s", routeNN.String(), gatewayNN.String())
 	HTTPRouteMustHaveCondition(t, c, timeoutConfig, routeNN, gatewayNN, acceptedCondition)
 
 	t.Logf("Waiting for HTTPRoute %s to have ResolvedRefs by Gateway %s", routeNN.String(), gatewayNN.String())
-	HTTPRouteMustHaveCondition(t, c, timeoutConfig, routeNN, gatewayNN, resolvedRefsCondition)
+	HTTPRouteMustHaveResolvedRefsConditionsTrue(t, c, timeoutConfig, routeNN, gatewayNN)
 
 	t.Logf("HTTPRoute %s is now Accepted and has ResolvedRefs by Gateway %s", routeNN.String(), gatewayNN.String())
 }
@@ -1522,11 +1516,10 @@ func HTTPRouteMustBeAcceptedAndResolved(t *testing.T, c client.Client, timeoutCo
 // status True and reason 'Accepted' that would be returned in from an input Gateway.
 // NOTE: Used in Gateway API Inference Extension conformance.
 func GetAcceptedByParentGatewayCondition() metav1.Condition {
-	return metav1.Condition{
-		Type:   string(gatewayv1.GatewayConditionAccepted),
-		Status: metav1.ConditionTrue,
-		Reason: string(gatewayv1.GatewayReasonAccepted), // The standard "Accepted" reason
-	}
+	acceptedCondition := GetGatewayAcceptedCondition()
+	acceptedCondition.Reason = string(gatewayv1.GatewayReasonAccepted) // The standard "Accepted" reason
+
+	return acceptedCondition
 }
 
 // NOTE: Used in Gateway API Inference Extension conformance.
