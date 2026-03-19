@@ -5,6 +5,7 @@ name: Regex-based Path Rewrites
 status: Provisional
 authors:
   - muxanasov
+  - Stevenjin8
 relationships:
   seeAlso:
     - https://gateway-api.sigs.k8s.io/geps/gep-726/#future-extension
