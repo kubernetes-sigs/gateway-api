@@ -1,5 +1,5 @@
 apiVersion: gateway.networking.k8s.io/v1
-date: "2025-10-31T09:24:35Z"
+date: "2026-03-19T15:18:26Z"
 gatewayAPIChannel: standard
 gatewayAPIVersion: v1.4.0
 implementation:
@@ -8,18 +8,16 @@ implementation:
   organization: GKE
   project: gke-gateway
   url: https://cloud.google.com/kubernetes-engine/docs/concepts/gateway-api
-  version: 1.34.1-gke.1829001
+  version: 1.34.4-gke.1047000
 kind: ConformanceReport
 mode: default
 profiles:
 - core:
-    result: partial
-    skippedTests:
-    - HTTPRouteHostnameIntersection
+    result: success
     statistics:
       Failed: 0
-      Passed: 32
-      Skipped: 1
+      Passed: 33
+      Skipped: 0
   extended:
     result: success
     statistics:
@@ -57,6 +55,6 @@ profiles:
     - HTTPRouteRequestMultipleMirrors
     - HTTPRouteRequestTimeout
   name: GATEWAY-HTTP
-  summary: Core tests partially succeeded with 1 test skips. Extended tests succeeded.
+  summary: Core tests succeeded. Extended tests succeeded.
 succeededProvisionalTests:
 - HTTPRouteRequestPercentageMirror

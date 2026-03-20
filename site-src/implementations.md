@@ -88,6 +88,7 @@ other functions (like managing DNS or creating certificates).
 - [Airlock Microgateway][34]
 - [Cilium][16]
 - [Envoy Gateway][18] (GA)
+- [Google Kubernetes Engine][6] (GA)
 - [Istio][9] (GA)
 - [kgateway][37] (GA)
 - [NGINX Gateway Fabric][12] (GA)
@@ -99,7 +100,6 @@ other functions (like managing DNS or creating certificates).
 - [Azure Application Gateway for Containers][27] (GA)
 - [Contour][3] (GA)
 - [Gloo Gateway][5] (GA)
-- [Google Kubernetes Engine][6] (GA)
 - [Gravitee Kubernetes Operator][42] (GA)
 - [Kong Ingress Controller][10] (GA)
 - [Kong Gateway Operator][35] (GA)
@@ -425,7 +425,7 @@ Google Cloud Service Mesh supports [Envoy-based sidecar mesh][envoy-sidecar-mesh
 
 ### Google Kubernetes Engine
 
-[![Conformance](https://img.shields.io/badge/Gateway_API_Partial_Conformance_v1.3.0-Google_Kubernetes_Engine-orange)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.4.0/gke-gateway)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.4.0-Google_Kubernetes_Engine-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.4.0/gke-gateway)
 
 [Google Kubernetes Engine (GKE)][gke] is a managed Kubernetes platform offered
 by Google Cloud. GKE's implementation of the Gateway API is through the [GKE
