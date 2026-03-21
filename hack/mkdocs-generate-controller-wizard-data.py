@@ -54,6 +54,9 @@ FEATURE_DEFINITIONS = {
         {"id": "GatewayHTTPListenerIsolation", "label": "Gateway HTTP Listener Isolation", "description": "HTTPRoutes can target a single listener; others are isolated."},
         {"id": "GatewayInfrastructurePropagation", "label": "Gateway Infrastructure Propagation", "description": "Gateway status propagates infrastructure details to Routes."},
         {"id": "GatewayStaticAddresses", "label": "Gateway Static Addresses", "description": "Gateway supports static address assignment."},
+        {"id": "GatewayBackendClientCertificate", "label": "Gateway Backend Client Certificate", "description": "Gateway supports client certificates selection for Gateway TLS origination." },
+        {"id": "GatewayFrontendClientCertificateValidation", "label": "Gateway Frontend Client Certificate Validation", "description": "Gateway supports client certificate validation for Gateway TLS termination." },
+        {"id": "ListenerSet", "label": "ListenerSet", "description": "Gateway supports ListenerSet."},
     ],
     "httpRoute": [
         {"id": "HTTPRouteHostRewrite", "label": "HTTPRoute Host Rewrite", "description": "Modify the host header of requests forwarded to backends."},
@@ -61,6 +64,7 @@ FEATURE_DEFINITIONS = {
         {"id": "HTTPRouteRequestMirror", "label": "HTTPRoute Request Mirror", "description": "Mirror a proportion of traffic to another backend."},
         {"id": "HTTPRouteRequestPercentageMirror", "label": "HTTPRoute Request Percentage Mirror", "description": "Mirror a percentage of requests to another backend."},
         {"id": "HTTPRouteResponseHeaderModification", "label": "HTTPRoute Response Header Modification", "description": "Add, set, or remove response headers."},
+        {"id": "HTTPRouteCORS", "label": "HTTPRoute CORS", "description": "CORS policy configuration for HTTPRoute."},
     ],
     "httpBackendTls": [
         {"id": "BackendTLSPolicy", "label": "Backend TLS Policy", "description": "Configure TLS when connecting to backends."},
@@ -79,6 +83,8 @@ FEATURE_DEFINITIONS = {
         {"id": "GatewayInfrastructurePropagation", "label": "Gateway Infrastructure Propagation", "description": "Gateway status propagates to TLSRoutes."},
         {"id": "GatewayPort8080", "label": "Gateway Port 8080", "description": "Gateway listens on port 8080."},
         {"id": "GatewayStaticAddresses", "label": "Gateway Static Addresses", "description": "Gateway supports static address assignment."},
+        {"id": "TLSRouteModeMixed", "label": "TLSRoute Mode Mixed", "description": "Gateway supports both Passthrough and Terminate TLS listeners on the same port."},
+        {"id": "TLSRouteModeTerminate", "label": "TLSRoute Mode Terminate", "description": "Gateway supports TLS termination in addition to passthrough routing."},
     ],
 }
 
