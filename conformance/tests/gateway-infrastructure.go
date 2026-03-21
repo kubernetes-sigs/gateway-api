@@ -85,7 +85,7 @@ var GatewayInfrastructure = suite.ConformanceTest{
 			labels[string(k)] = string(v)
 		}
 		var foundResource bool
-		listOptions := metav1.ListOptions{LabelSelector: "gateway.networking.k8s.io/gateway-name=" + gwNN.Name}
+		listOptions := metav1.ListOptions{LabelSelector: v1.LabelGatewayName + "=" + gwNN.Name}
 		saList, err := s.Clientset.CoreV1().ServiceAccounts(ns).List(ctx, listOptions)
 		require.NoError(t, err, "error listing ServiceAccounts")
 		podList, err := s.Clientset.CoreV1().Pods(ns).List(ctx, listOptions)
