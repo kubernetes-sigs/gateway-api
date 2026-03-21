@@ -90,11 +90,11 @@ var GatewayInfrastructure = suite.ConformanceTest{
 		saList := corev1.ServiceAccountList{}
 		podList := corev1.PodList{}
 		serviceList := corev1.ServiceList{}
-		err = s.Client.List(ctx, &saList, client.MatchingLabels{"gateway.networking.k8s.io/gateway-name": gwNN.Name}, client.InNamespace(ns))
+		err = s.Client.List(ctx, &saList, client.MatchingLabels{v1.LabelGatewayName: gwNN.Name}, client.InNamespace(ns))
 		require.NoError(t, err, "error listing ServiceAccounts")
-		err = s.Client.List(ctx, &podList, client.MatchingLabels{"gateway.networking.k8s.io/gateway-name": gwNN.Name}, client.InNamespace(ns))
+		err = s.Client.List(ctx, &podList, client.MatchingLabels{v1.LabelGatewayName: gwNN.Name}, client.InNamespace(ns))
 		require.NoError(t, err, "error listing Pods")
-		err = s.Client.List(ctx, &serviceList, client.MatchingLabels{"gateway.networking.k8s.io/gateway-name": gwNN.Name}, client.InNamespace(ns))
+		err = s.Client.List(ctx, &serviceList, client.MatchingLabels{v1.LabelGatewayName: gwNN.Name}, client.InNamespace(ns))
 		require.NoError(t, err, "error listing Services")
 		if len(saList.Items) > 0 {
 			foundResource = true
