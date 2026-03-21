@@ -1,0 +1,81 @@
+apiVersion: gateway.networking.k8s.io/v1
+date: "2026-03-15T16:57:11-03:00"
+gatewayAPIChannel: experimental
+gatewayAPIVersion: v1.4.1
+implementation:
+  contact:
+  - https://kubernetes.slack.com/channels/haproxy-ingress
+  organization: HAProxy Ingress
+  project: haproxy-ingress
+  url: https://haproxy-ingress.github.io
+  version: v0.17.0-alpha.1
+kind: ConformanceReport
+mode: default
+profiles:
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 33
+      Skipped: 0
+  extended:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 8
+      Skipped: 0
+    supportedFeatures:
+    - GatewayAddressEmpty
+    - GatewayPort8080
+    - HTTPRouteBackendProtocolWebSocket
+    - HTTPRouteCORS
+    - HTTPRouteDestinationPortMatching
+    - HTTPRouteNamedRouteRule
+    - HTTPRouteResponseHeaderModification
+    - HTTPRouteSchemeRedirect
+    unsupportedFeatures:
+    - BackendTLSPolicy
+    - BackendTLSPolicySANValidation
+    - GatewayHTTPListenerIsolation
+    - GatewayInfrastructurePropagation
+    - GatewayStaticAddresses
+    - HTTPRouteBackendProtocolH2C
+    - HTTPRouteBackendRequestHeaderModification
+    - HTTPRouteBackendTimeout
+    - HTTPRouteHostRewrite
+    - HTTPRouteMethodMatching
+    - HTTPRouteParentRefPort
+    - HTTPRoutePathRedirect
+    - HTTPRoutePathRewrite
+    - HTTPRoutePortRedirect
+    - HTTPRouteQueryParamMatching
+    - HTTPRouteRequestMirror
+    - HTTPRouteRequestMultipleMirrors
+    - HTTPRouteRequestPercentageMirror
+    - HTTPRouteRequestTimeout
+  name: GATEWAY-HTTP
+  summary: Core tests succeeded. Extended tests succeeded.
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 11
+      Skipped: 0
+  extended:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 1
+      Skipped: 0
+    supportedFeatures:
+    - GatewayAddressEmpty
+    - GatewayPort8080
+    unsupportedFeatures:
+    - GatewayHTTPListenerIsolation
+    - GatewayInfrastructurePropagation
+    - GatewayStaticAddresses
+  name: GATEWAY-TLS
+  summary: Core tests succeeded. Extended tests succeeded.
+succeededProvisionalTests:
+- GatewayOptionalAddressValue
+- HTTPRouteNamedRule
