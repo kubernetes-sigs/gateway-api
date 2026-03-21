@@ -96,7 +96,7 @@ def parse_version(version_dir_name):
     return (0, 0, 0)
 
 
-def get_version_dirs(reports_root, patch_zero_only=False):
+def get_version_dirs(reports_root):
     """Return sorted list of version directory paths (e.g. .../v1.5.0, v1.4.0, ...), newest first.
     New versions added under conformance/reports/ automatically appear at the top of the list."""
     if not os.path.isdir(reports_root):
@@ -106,8 +106,6 @@ def get_version_dirs(reports_root, patch_zero_only=False):
         for d in os.listdir(reports_root)
         if os.path.isdir(os.path.join(reports_root, d)) and parse_version(d) != (0, 0, 0)
     ]
-    if patch_zero_only:
-        dirs = [d for d in dirs if parse_version(os.path.basename(d))[2] == 0]
     dirs.sort(key=lambda d: parse_version(os.path.basename(d)), reverse=True)
     return dirs
 
@@ -240,7 +238,7 @@ def generate_all(repo_root, output_path):
     Returns True if successful, False if no version dirs (caller may exit or log).
     """
     reports_root = os.path.join(repo_root, "conformance", "reports")
-    version_dirs = get_version_dirs(reports_root, patch_zero_only=True)
+    version_dirs = get_version_dirs(reports_root)
     if not version_dirs:
         return False
     out = {"featureDefinitions": FEATURE_DEFINITIONS}
