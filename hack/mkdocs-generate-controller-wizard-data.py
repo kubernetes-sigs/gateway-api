@@ -54,6 +54,9 @@ FEATURE_DEFINITIONS = {
         {"id": "GatewayHTTPListenerIsolation", "label": "Gateway HTTP Listener Isolation", "description": "HTTPRoutes can target a single listener; others are isolated."},
         {"id": "GatewayInfrastructurePropagation", "label": "Gateway Infrastructure Propagation", "description": "Gateway status propagates infrastructure details to Routes."},
         {"id": "GatewayStaticAddresses", "label": "Gateway Static Addresses", "description": "Gateway supports static address assignment."},
+        {"id": "GatewayBackendClientCertificate", "label": "Gateway Backend Client Certificate", "description": "Gateway supports client certificates selection for Gateway TLS origination." },
+        {"id": "GatewayFrontendClientCertificateValidation", "label": "Gateway Frontend Client Certificate Validation", "description": "Gateway supports client certificate validation for Gateway TLS termination." },
+        {"id": "ListenerSet", "label": "ListenerSet", "description": "Gateway supports ListenerSet."},
     ],
     "httpRoute": [
         {"id": "HTTPRouteHostRewrite", "label": "HTTPRoute Host Rewrite", "description": "Modify the host header of requests forwarded to backends."},
@@ -61,6 +64,7 @@ FEATURE_DEFINITIONS = {
         {"id": "HTTPRouteRequestMirror", "label": "HTTPRoute Request Mirror", "description": "Mirror a proportion of traffic to another backend."},
         {"id": "HTTPRouteRequestPercentageMirror", "label": "HTTPRoute Request Percentage Mirror", "description": "Mirror a percentage of requests to another backend."},
         {"id": "HTTPRouteResponseHeaderModification", "label": "HTTPRoute Response Header Modification", "description": "Add, set, or remove response headers."},
+        {"id": "HTTPRouteCORS", "label": "HTTPRoute CORS", "description": "CORS policy configuration for HTTPRoute."},
     ],
     "httpBackendTls": [
         {"id": "BackendTLSPolicy", "label": "Backend TLS Policy", "description": "Configure TLS when connecting to backends."},
@@ -79,6 +83,8 @@ FEATURE_DEFINITIONS = {
         {"id": "GatewayInfrastructurePropagation", "label": "Gateway Infrastructure Propagation", "description": "Gateway status propagates to TLSRoutes."},
         {"id": "GatewayPort8080", "label": "Gateway Port 8080", "description": "Gateway listens on port 8080."},
         {"id": "GatewayStaticAddresses", "label": "Gateway Static Addresses", "description": "Gateway supports static address assignment."},
+        {"id": "TLSRouteModeMixed", "label": "TLSRoute Mode Mixed", "description": "Gateway supports both Passthrough and Terminate TLS listeners on the same port."},
+        {"id": "TLSRouteModeTerminate", "label": "TLSRoute Mode Terminate", "description": "Gateway supports TLS termination in addition to passthrough routing."},
     ],
 }
 
@@ -96,7 +102,7 @@ def parse_version(version_dir_name):
     return (0, 0, 0)
 
 
-def get_version_dirs(reports_root, patch_zero_only=False):
+def get_version_dirs(reports_root):
     """Return sorted list of version directory paths (e.g. .../v1.5.0, v1.4.0, ...), newest first.
     New versions added under conformance/reports/ automatically appear at the top of the list."""
     if not os.path.isdir(reports_root):
@@ -106,8 +112,6 @@ def get_version_dirs(reports_root, patch_zero_only=False):
         for d in os.listdir(reports_root)
         if os.path.isdir(os.path.join(reports_root, d)) and parse_version(d) != (0, 0, 0)
     ]
-    if patch_zero_only:
-        dirs = [d for d in dirs if parse_version(os.path.basename(d))[2] == 0]
     dirs.sort(key=lambda d: parse_version(os.path.basename(d)), reverse=True)
     return dirs
 
@@ -240,7 +244,7 @@ def generate_all(repo_root, output_path):
     Returns True if successful, False if no version dirs (caller may exit or log).
     """
     reports_root = os.path.join(repo_root, "conformance", "reports")
-    version_dirs = get_version_dirs(reports_root, patch_zero_only=True)
+    version_dirs = get_version_dirs(reports_root)
     if not version_dirs:
         return False
     out = {"featureDefinitions": FEATURE_DEFINITIONS}

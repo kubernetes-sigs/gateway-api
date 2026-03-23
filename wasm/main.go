@@ -234,6 +234,7 @@ func onDataLoaded(jsonStr string) {
 
 	// Multi-version: keys like v1.4.0, v1.3.0, ...
 	allVersionsData = make(map[string][]implementation)
+	dropdownKeyMap := make(map[string]struct{})
 	var versionKeys []string
 	for k, v := range raw {
 		if k == "featureDefinitions" {
@@ -245,6 +246,9 @@ func onDataLoaded(jsonStr string) {
 		}
 		allVersionsData[k] = list
 		versionKeys = append(versionKeys, k)
+
+		// ignore patch version for drop-down menu
+		dropdownKeyMap[strings.Join(append(strings.Split(k, ".")[0:2], "0"), ".")] = struct{}{}
 	}
 	if len(versionKeys) == 0 {
 		impls = nil
@@ -256,11 +260,17 @@ func onDataLoaded(jsonStr string) {
 		return versionCompare(versionKeys[j], versionKeys[i]) < 0
 	})
 	allVersionKeys = versionKeys
-	dropdownKeys := versionKeys
+	dropdownKeys := make([]string, 0, len(dropdownKeyMap))
+	for k := range dropdownKeyMap {
+		dropdownKeys = append(dropdownKeys, k)
+	}
+	sort.Slice(dropdownKeys, func(i, j int) bool {
+		return versionCompare(dropdownKeys[j], dropdownKeys[i]) < 0
+	})
 	if len(dropdownKeys) > maxVersionsInDropdown {
 		dropdownKeys = dropdownKeys[:maxVersionsInDropdown]
 	}
-	currentVersion = versionKeys[0]
+	currentVersion = dropdownKeys[0]
 	impls = buildImplsForMinVersion(currentVersion)
 
 	versionRow.Get("style").Set("display", "block")
