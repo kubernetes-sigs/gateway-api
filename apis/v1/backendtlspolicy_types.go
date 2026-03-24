@@ -118,6 +118,13 @@ type BackendTLSPolicySpec struct {
 	// +listType=atomic
 	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:MaxItems=16
+	// <gateway:internal-comment>
+	// These two rules mirror the parentRefs consistency and uniqueness rules in
+	// CommonRouteSpec.ParentRefs. They enforce that when the same target (group, kind,
+	// name) appears more than once in targetRefs, every reference must carry a distinct,
+	// non-empty sectionName. Unlike the parentRefs rules, namespace is not checked here
+	// because LocalPolicyTargetReferenceWithSectionName only supports same-namespace targets.
+	// </gateway:internal-comment>
 	// +kubebuilder:validation:XValidation:message="sectionName must be specified when targetRefs includes 2 or more references to the same target",rule="self.all(p1, self.all(p2, p1.group == p2.group && p1.kind == p2.kind && p1.name == p2.name ? ((!has(p1.sectionName) || p1.sectionName == '') == (!has(p2.sectionName) || p2.sectionName == '')) : true))"
 	// +kubebuilder:validation:XValidation:message="sectionName must be unique when targetRefs includes 2 or more references to the same target",rule="self.all(p1, self.exists_one(p2, p1.group == p2.group && p1.kind == p2.kind && p1.name == p2.name && (((!has(p1.sectionName) || p1.sectionName == '') && (!has(p2.sectionName) || p2.sectionName == '')) || (has(p1.sectionName) && has(p2.sectionName) && p1.sectionName == p2.sectionName))))"
 	TargetRefs []LocalPolicyTargetReferenceWithSectionName `json:"targetRefs,omitempty"`

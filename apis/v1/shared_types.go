@@ -243,8 +243,32 @@ type CommonRouteSpec struct {
 	// +optional
 	// +listType=atomic
 	// +kubebuilder:validation:MaxItems=32
+	// <gateway:internal-comment>
+	// The following two standard rules work together to require distinct sectionNames
+	// when the same parent is referenced more than once:
+	//
+	// Consistency rule: for every pair (p1, p2) pointing to the same parent (matching
+	// group, kind, name, and namespace), both must either specify sectionName or both
+	// must omit it. Note that namespace is compared via the CEL __namespace__ field
+	// because "namespace" is not a valid CEL identifier.
+	//
+	// Uniqueness rule: for each parentRef p1, exactly one parentRef p2 shares the same
+	// parent and the same sectionName value (or both absent). The CEL exists_one
+	// constraint guarantees p1 can only match itself, so no two entries can share a
+	// parent with an identical (or both-absent) sectionName.
+	//
+	// Together, these require each reference to a given parent to carry a distinct,
+	// non-empty sectionName whenever the same parent appears more than once.
+	// </gateway:internal-comment>
 	// <gateway:standard:validation:XValidation:message="sectionName must be specified when parentRefs includes 2 or more references to the same parent",rule="self.all(p1, self.all(p2, p1.group == p2.group && p1.kind == p2.kind && p1.name == p2.name && (((!has(p1.__namespace__) || p1.__namespace__ == '') && (!has(p2.__namespace__) || p2.__namespace__ == '')) || (has(p1.__namespace__) && has(p2.__namespace__) && p1.__namespace__ == p2.__namespace__ )) ? ((!has(p1.sectionName) || p1.sectionName == '') == (!has(p2.sectionName) || p2.sectionName == '')) : true))">
 	// <gateway:standard:validation:XValidation:message="sectionName must be unique when parentRefs includes 2 or more references to the same parent",rule="self.all(p1, self.exists_one(p2, p1.group == p2.group && p1.kind == p2.kind && p1.name == p2.name && (((!has(p1.__namespace__) || p1.__namespace__ == '') && (!has(p2.__namespace__) || p2.__namespace__ == '')) || (has(p1.__namespace__) && has(p2.__namespace__) && p1.__namespace__ == p2.__namespace__ )) && (((!has(p1.sectionName) || p1.sectionName == '') && (!has(p2.sectionName) || p2.sectionName == '')) || (has(p1.sectionName) && has(p2.sectionName) && p1.sectionName == p2.sectionName))))">
+	// <gateway:internal-comment>
+	// Experimental variants of the standard rules above that extend disambiguation to
+	// also include port. When the same parent is referenced more than once, the
+	// combination of sectionName and port must be consistently specified (both present
+	// or both absent across all refs to that parent) and unique (no two refs to the
+	// same parent may share identical sectionName and port values, including both absent).
+	// </gateway:internal-comment>
 	// <gateway:experimental:validation:XValidation:message="sectionName or port must be specified when parentRefs includes 2 or more references to the same parent",rule="self.all(p1, self.all(p2, p1.group == p2.group && p1.kind == p2.kind && p1.name == p2.name && (((!has(p1.__namespace__) || p1.__namespace__ == '') && (!has(p2.__namespace__) || p2.__namespace__ == '')) || (has(p1.__namespace__) && has(p2.__namespace__) && p1.__namespace__ == p2.__namespace__)) ? ((!has(p1.sectionName) || p1.sectionName == '') == (!has(p2.sectionName) || p2.sectionName == '') && (!has(p1.port) || p1.port == 0) == (!has(p2.port) || p2.port == 0)): true))">
 	// <gateway:experimental:validation:XValidation:message="sectionName or port must be unique when parentRefs includes 2 or more references to the same parent",rule="self.all(p1, self.exists_one(p2, p1.group == p2.group && p1.kind == p2.kind && p1.name == p2.name && (((!has(p1.__namespace__) || p1.__namespace__ == '') && (!has(p2.__namespace__) || p2.__namespace__ == '')) || (has(p1.__namespace__) && has(p2.__namespace__) && p1.__namespace__ == p2.__namespace__ )) && (((!has(p1.sectionName) || p1.sectionName == '') && (!has(p2.sectionName) || p2.sectionName == '')) || ( has(p1.sectionName) && has(p2.sectionName) && p1.sectionName == p2.sectionName)) && (((!has(p1.port) || p1.port == 0) && (!has(p2.port) || p2.port == 0)) || (has(p1.port) && has(p2.port) && p1.port == p2.port))))">
 	ParentRefs []ParentReference `json:"parentRefs,omitempty"`
