@@ -1,0 +1,146 @@
+apiVersion: gateway.networking.k8s.io/v1
+date: "2026-03-24T17:48:24Z"
+gatewayAPIChannel: experimental
+gatewayAPIVersion: v1.5.1
+implementation:
+  contact:
+  - https://github.com/envoyproxy/gateway/blob/main/GOVERNANCE.md
+  organization: envoyproxy
+  project: envoy-gateway
+  url: https://github.com/envoyproxy/gateway
+  version: v1.8.0-rc.0
+kind: ConformanceReport
+mode: gateway-namespace-mode
+profiles:
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 13
+      Skipped: 0
+  extended:
+    result: partial
+    skippedTests:
+    - ListenerSetHostnameConflict
+    - ListenerSetProtocolConflict
+    statistics:
+      Failed: 0
+      Passed: 7
+      Skipped: 2
+    supportedFeatures:
+    - GatewayAddressEmpty
+    - GatewayBackendClientCertificate
+    - GatewayFrontendClientCertificateValidation
+    - GatewayFrontendClientCertificateValidationInsecureFallback
+    - GatewayHTTPListenerIsolation
+    - GatewayHTTPSListenerDetectMisdirectedRequests
+    - GatewayInfrastructurePropagation
+    - GatewayPort8080
+    - ListenerSet
+    unsupportedFeatures:
+    - GatewayStaticAddresses
+  name: GATEWAY-GRPC
+  summary: Core tests succeeded. Extended tests partially succeeded with 2 test skips.
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 18
+      Skipped: 0
+  extended:
+    result: partial
+    skippedTests:
+    - ListenerSetHostnameConflict
+    - ListenerSetProtocolConflict
+    statistics:
+      Failed: 0
+      Passed: 12
+      Skipped: 2
+    supportedFeatures:
+    - GatewayAddressEmpty
+    - GatewayBackendClientCertificate
+    - GatewayFrontendClientCertificateValidation
+    - GatewayFrontendClientCertificateValidationInsecureFallback
+    - GatewayHTTPListenerIsolation
+    - GatewayHTTPSListenerDetectMisdirectedRequests
+    - GatewayInfrastructurePropagation
+    - GatewayPort8080
+    - ListenerSet
+    - TLSRouteModeMixed
+    - TLSRouteModeTerminate
+    unsupportedFeatures:
+    - GatewayStaticAddresses
+  name: GATEWAY-TLS
+  summary: Core tests succeeded. Extended tests partially succeeded with 2 test skips.
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 33
+      Skipped: 0
+  extended:
+    result: partial
+    skippedTests:
+    - GatewayBackendClientCertificateFeature
+    - GatewayFrontendClientCertificateValidation
+    - GatewayFrontendClientCertificateValidationInsecureFallback
+    - GatewayFrontendInvalidDefaultClientCertificateValidation
+    - GatewayInvalidFrontendClientCertificateValidation
+    - GatewayInvalidTLSBackendConfiguration
+    - HTTPRouteHTTPSListenerDetectMisdirectedRequests
+    - ListenerSetHostnameConflict
+    - ListenerSetProtocolConflict
+    statistics:
+      Failed: 0
+      Passed: 44
+      Skipped: 9
+    supportedFeatures:
+    - BackendTLSPolicy
+    - BackendTLSPolicySANValidation
+    - GatewayAddressEmpty
+    - GatewayBackendClientCertificate
+    - GatewayFrontendClientCertificateValidation
+    - GatewayFrontendClientCertificateValidationInsecureFallback
+    - GatewayHTTPListenerIsolation
+    - GatewayHTTPSListenerDetectMisdirectedRequests
+    - GatewayInfrastructurePropagation
+    - GatewayPort8080
+    - HTTPRoute303RedirectStatusCode
+    - HTTPRoute307RedirectStatusCode
+    - HTTPRoute308RedirectStatusCode
+    - HTTPRouteBackendProtocolH2C
+    - HTTPRouteBackendProtocolWebSocket
+    - HTTPRouteBackendRequestHeaderModification
+    - HTTPRouteBackendTimeout
+    - HTTPRouteCORS
+    - HTTPRouteDestinationPortMatching
+    - HTTPRouteHostRewrite
+    - HTTPRouteMethodMatching
+    - HTTPRouteNamedRouteRule
+    - HTTPRouteParentRefPort
+    - HTTPRoutePathRedirect
+    - HTTPRoutePathRewrite
+    - HTTPRoutePortRedirect
+    - HTTPRouteQueryParamMatching
+    - HTTPRouteRequestMirror
+    - HTTPRouteRequestMultipleMirrors
+    - HTTPRouteRequestPercentageMirror
+    - HTTPRouteRequestTimeout
+    - HTTPRouteResponseHeaderModification
+    - HTTPRouteSchemeRedirect
+    - ListenerSet
+    unsupportedFeatures:
+    - GatewayStaticAddresses
+  name: GATEWAY-HTTP
+  summary: Core tests succeeded. Extended tests partially succeeded with 9 test skips.
+succeededProvisionalTests:
+- GRPCRouteNamedRule
+- GatewayInfrastructure
+- GatewayOptionalAddressValue
+- HTTPRoute303Redirect
+- HTTPRoute307Redirect
+- HTTPRoute308Redirect
+- HTTPRouteNamedRule
+- HTTPRouteRequestPercentageMirror
+- TLSRouteMixedTerminationSameNamespace
+- TLSRouteTerminateSimpleSameNamespace
