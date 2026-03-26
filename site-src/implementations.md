@@ -425,7 +425,7 @@ Google Cloud Service Mesh supports [Envoy-based sidecar mesh][envoy-sidecar-mesh
 
 ### Google Kubernetes Engine
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.4.0-Google_Kubernetes_Engine-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.4.0/gke-gateway)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.5.0-Google_Kubernetes_Engine-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.5.0/gke-gateway)
 
 [Google Kubernetes Engine (GKE)][gke] is a managed Kubernetes platform offered
 by Google Cloud. GKE's implementation of the Gateway API is through the [GKE
@@ -438,7 +438,7 @@ advanced routing, multi-cluster load balancing and more. See the docs to deploy
 Gateways][gke-multi-cluster-gateway].
 
 The GKE Gateway controller passes all the core Gateway API conformance tests in the
-v1.4.0 release for the GATEWAY_HTTP conformance profile except `HTTPRouteHostnameIntersection`.
+v1.5.0 release for the GATEWAY_HTTP conformance profile.
 
 [gke]:https://cloud.google.com/kubernetes-engine
 [gke-gateway]:https://cloud.google.com/kubernetes-engine/docs/concepts/gateway-api
