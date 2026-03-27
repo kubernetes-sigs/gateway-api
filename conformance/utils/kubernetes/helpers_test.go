@@ -17,18 +17,25 @@ limitations under the License.
 package kubernetes
 
 import (
+	"context"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	corev1 "k8s.io/api/core/v1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/utils/ptr"
+	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
+	v1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/gateway-api/apis/v1alpha2"
 	"sigs.k8s.io/gateway-api/apis/v1beta1"
+	"sigs.k8s.io/gateway-api/conformance/utils/config"
 )
 
 // -----------------------------------------------------------------------------
@@ -132,6 +139,62 @@ func TestVerifyConditionsMatchGeneration(t *testing.T) {
 			assert.Equal(t, test.expected, err)
 		})
 	}
+}
+
+func TestHTTPRouteMustBeAcceptedAndResolved(t *testing.T) {
+	scheme := runtime.NewScheme()
+	require.NoError(t, InstallGatewayV1(scheme))
+
+	routeNN := types.NamespacedName{Name: "test-route", Namespace: "default"}
+	gatewayNN := types.NamespacedName{Name: "test-gateway", Namespace: "default"}
+
+	gwNamespace := v1.Namespace(gatewayNN.Namespace)
+	route := &v1.HTTPRoute{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      routeNN.Name,
+			Namespace: routeNN.Namespace,
+		},
+		Status: v1.HTTPRouteStatus{
+			RouteStatus: v1.RouteStatus{
+				Parents: []v1.RouteParentStatus{
+					{
+						ParentRef: v1.ParentReference{
+							Name:      v1.ObjectName(gatewayNN.Name),
+							Namespace: &gwNamespace,
+						},
+						Conditions: []metav1.Condition{
+							{
+								Type:               string(v1.RouteConditionAccepted),
+								Status:             metav1.ConditionTrue,
+								Reason:             string(v1.RouteReasonAccepted),
+								LastTransitionTime: metav1.Now(),
+							},
+							{
+								Type:               string(v1.RouteConditionResolvedRefs),
+								Status:             metav1.ConditionTrue,
+								Reason:             string(v1.RouteReasonResolvedRefs),
+								LastTransitionTime: metav1.Now(),
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	c := fake.NewClientBuilder().WithScheme(scheme).WithObjects(route).Build()
+
+	timeoutConfig := config.TimeoutConfig{
+		HTTPRouteMustHaveCondition: 5 * time.Second,
+		DefaultPollInterval:        100 * time.Millisecond,
+	}
+
+	HTTPRouteMustBeAcceptedAndResolved(t, c, timeoutConfig, routeNN, gatewayNN)
+
+	DeleteHTTPRoute(t, c, routeNN)
+
+	err := c.Get(context.TODO(), routeNN, &v1.HTTPRoute{})
+	assert.True(t, apierrors.IsNotFound(err))
 }
 
 // -----------------------------------------------------------------------------
