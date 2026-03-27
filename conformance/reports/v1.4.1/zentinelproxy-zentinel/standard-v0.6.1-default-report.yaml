@@ -1,0 +1,22 @@
+apiVersion: gateway.networking.k8s.io/v1
+date: "2026-03-21T06:37:35-07:00"
+gatewayAPIChannel: standard
+gatewayAPIVersion: v1.4.1
+implementation:
+  contact:
+  - '@zentinelproxy'
+  organization: zentinelproxy
+  project: zentinel
+  url: https://github.com/zentinelproxy/zentinel
+  version: 0.6.1
+kind: ConformanceReport
+mode: default
+profiles:
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 33
+      Skipped: 0
+  name: GATEWAY-HTTP
+  summary: Core tests succeeded.
