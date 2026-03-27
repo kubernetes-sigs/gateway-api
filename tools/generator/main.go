@@ -303,6 +303,21 @@ func formatDescription(description string, channel string, name string) string {
 		description = re.ReplaceAllString(description, "\n\n\n")
 	}
 
+	// Comments within "gateway:internal-comment" tags are developer-facing explanations
+	// for complex validation rules. They appear in Go source but are stripped from the
+	// generated CRD so they do not become part of the API specification.
+	startTag = "<gateway:internal-comment>"
+	endTag = "</gateway:internal-comment>"
+	if strings.Contains(description, startTag) {
+		regexPattern := `\n*` + regexp.QuoteMeta(startTag) + `(?s:(.*?))` + regexp.QuoteMeta(endTag) + `\n*`
+		re := regexp.MustCompile(regexPattern)
+		match := re.FindStringSubmatch(description)
+		if len(match) != 2 {
+			log.Fatalf("Invalid <gateway:internal-comment> tag for %s", name)
+		}
+		description = re.ReplaceAllString(description, "\n\n")
+	}
+
 	gatewayRe := regexp.MustCompile(`<gateway:.*>`)
 	description = gatewayRe.ReplaceAllLiteralString(description, "")
 

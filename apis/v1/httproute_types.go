@@ -126,6 +126,14 @@ type HTTPRouteSpec struct {
 	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:MaxItems=16
 	// +kubebuilder:default={{matches: {{path: {type: "PathPrefix", value: "/"}}}}}
+	// <gateway:internal-comment>
+	// CEL does not support aggregate functions like sum() over a list, so this rule
+	// manually unrolls the sum across all 16 possible rule indexes. Each term guards
+	// with `self.size() > N` before accessing self[N] to avoid out-of-bounds errors.
+	// The rule enforces that the total number of matches across all rules stays below
+	// the per-route limit of 128, even though individual rules and matches are each
+	// capped higher (16 rules × 64 matches = 1024 theoretical maximum).
+	// </gateway:internal-comment>
 	// +kubebuilder:validation:XValidation:message="While 16 rules and 64 matches per rule are allowed, the total number of matches across all rules in a route must be less than 128",rule="(self.size() > 0 ? self[0].matches.size() : 0) + (self.size() > 1 ? self[1].matches.size() : 0) + (self.size() > 2 ? self[2].matches.size() : 0) + (self.size() > 3 ? self[3].matches.size() : 0) + (self.size() > 4 ? self[4].matches.size() : 0) + (self.size() > 5 ? self[5].matches.size() : 0) + (self.size() > 6 ? self[6].matches.size() : 0) + (self.size() > 7 ? self[7].matches.size() : 0) + (self.size() > 8 ? self[8].matches.size() : 0) + (self.size() > 9 ? self[9].matches.size() : 0) + (self.size() > 10 ? self[10].matches.size() : 0) + (self.size() > 11 ? self[11].matches.size() : 0) + (self.size() > 12 ? self[12].matches.size() : 0) + (self.size() > 13 ? self[13].matches.size() : 0) + (self.size() > 14 ? self[14].matches.size() : 0) + (self.size() > 15 ? self[15].matches.size() : 0) <= 128"
 	Rules []HTTPRouteRule `json:"rules,omitempty"`
 }
