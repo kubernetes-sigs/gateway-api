@@ -76,6 +76,7 @@ nav:
               - Standard: reference/1.4/spec.md
               - Experimental: reference/1.4/specx.md
       - Policy Attachment: reference/policy-attachment.md
+      - Condition Types and Reasons: reference/conditions.md
   - Enhancements:
       - Overview: geps/overview.md
       - List: geps/landing/tab.md
