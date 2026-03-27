@@ -26,6 +26,7 @@ import (
 
 	"golang.org/x/tools/go/packages"
 	apiext "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-tools/pkg/crd"
 	"sigs.k8s.io/controller-tools/pkg/loader"
 	"sigs.k8s.io/controller-tools/pkg/markers"
@@ -33,6 +34,12 @@ import (
 
 	"sigs.k8s.io/gateway-api/pkg/consts"
 )
+
+type customResourceDefinitionManifest struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+	Spec              apiext.CustomResourceDefinitionSpec `json:"spec"`
+}
 
 var standardKinds = map[string]bool{
 	"GatewayClass":     true,
@@ -137,12 +144,17 @@ func main() {
 				version.Schema.OpenAPIV3Schema.Properties = gatewayTweaksMap(channel, version.Schema.OpenAPIV3Schema.Properties)
 			}
 
-			conv, err := crd.AsVersion(*channelCrd, apiext.SchemeGroupVersion)
+			convObj, err := crd.AsVersion(*channelCrd, apiext.SchemeGroupVersion)
 			if err != nil {
 				log.Fatalf("failed to convert CRD: %s", err)
 			}
 
-			out, err := yaml.Marshal(conv)
+			conv, ok := convObj.(*apiext.CustomResourceDefinition)
+			if !ok {
+				log.Fatalf("failed to convert CRD: unexpected type %T", convObj)
+			}
+
+			out, err := marshalCRDManifest(*conv)
 			if err != nil {
 				log.Fatalf("failed to marshal CRD: %s", err)
 			}
@@ -158,6 +170,15 @@ func main() {
 	if loader.PrintErrors(roots, packages.TypeError) {
 		log.Fatalf("not all generators ran successfully")
 	}
+}
+
+func marshalCRDManifest(crd apiext.CustomResourceDefinition) ([]byte, error) {
+	manifest := customResourceDefinitionManifest{
+		TypeMeta:   crd.TypeMeta,
+		ObjectMeta: crd.ObjectMeta,
+		Spec:       crd.Spec,
+	}
+	return yaml.Marshal(manifest)
 }
 
 func gatewayTweaksMap(channel string, props map[string]apiext.JSONSchemaProps) map[string]apiext.JSONSchemaProps {
