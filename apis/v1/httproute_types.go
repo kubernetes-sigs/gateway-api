@@ -1018,11 +1018,8 @@ type HTTPHeader struct {
 	// Name is the name of the HTTP Header to be matched. Name matching MUST be
 	// case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
 	//
-	// If multiple entries specify equivalent header names, the first entry with
-	// an equivalent name MUST be considered for a match. Subsequent entries
-	// with an equivalent header name MUST be ignored. Due to the
-	// case-insensitivity of header names, "foo" and "Foo" are considered
-	// equivalent.
+	// Due to the case-insensitivity of header names, "foo" and "Foo" are
+	// considered equivalent.
 	// +required
 	Name HTTPHeaderName `json:"name"`
 
@@ -1049,6 +1046,10 @@ type HTTPHeaderFilter struct {
 	// Set overwrites the request with the given header (name, value)
 	// before the action.
 	//
+	// Only one action for a given header name is permitted. Filters
+	// specifying multiple actions of the same or different type for any
+	// one header name are invalid.
+	//
 	// Input:
 	//   GET /foo HTTP/1.1
 	//   my-header: foo
@@ -1071,6 +1072,10 @@ type HTTPHeaderFilter struct {
 	// Add adds the given header(s) (name, value) to the request
 	// before the action. It appends to any existing values associated
 	// with the header name.
+	//
+	// Only one action for a given header name is permitted. Filters
+	// specifying multiple actions of the same or different type for any
+	// one header name are invalid.
 	//
 	// Input:
 	//   GET /foo HTTP/1.1
