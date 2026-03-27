@@ -1062,8 +1062,6 @@ The expected behavior is that the gateway SHOULD retain existing persistent sess
 selected, and establish new persistent sessions after a selector update. This use case is uncommon and may not be
 supported by some implementations due to their current designs.
 
-### Conformance Details
-
 ### Open Questions
 
 - What happens when session persistence causes traffic splitting scenarios to overload a backend?
@@ -1077,21 +1075,40 @@ supported by some implementations due to their current designs.
 
 ## Conformance Details
 
+**Note**: Conformance tests are still WIP, and additional test coverage will be added in future PRs.
+
 ###  Feature Names
 
-* HTTPRouteSessionPersistence - Base feature for session persistence support
-* HTTPRouteSessionPersistenceCookie - Cookie-based session persistence (Core)
-* HTTPRouteSessionPersistenceCookieLifetimeTypePermanent - Permanent Lifetime for cookie-based session persistence (extended)
+* HTTPRouteSessionPersistence - Core feature for session persistence support (Extended).
+* HTTPRouteSessionPersistenceCookieLifetimeTypePermanent - Permanent Lifetime for cookie-based session persistence (Extended).
 
-### Conformance tests
+### HTTPRoute Conformance tests
 
 | Description | Outcome | Features |
-| :---- | :---- | :---- | 
-| Simple Cookie Session Persistence: An HTTPRoute with sessionPersistence configured with type: Cookie (default) on a single backend in gateway-conformance-infra namespace. | HTTPRoute MUST have Accepted=True in parent status. First request MUST receive a Set-Cookie header in response. Subsequent requests with the cookie MUST route to the same backend pod. Verify by checking pod identity across N requests (N>=50). | HTTPRouteSessionPersistence, HTTPRouteSessionPersistenceCookie |
-| Session Cookie Lifetime (Default): HTTPRoute with sessionPersistence and cookieConfig.lifetimeType: Session (default). | HTTPRoute MUST have Accepted=True in parent status. Cookie MUST NOT contain `expiry` attributes. | HTTPRouteSessionPersistence, HTTPRouteSessionPersistenceCookie |
-| Multiple Weighted Backends - Initial Distribution Honored: HTTPRoute with sessionPersistence and multiple backendRefs with weights (e.g., 70/30) on a path. | HTTPRoute MUST have Accepted=True in parent status. Initial requests (without session cookie) MUST respect weight distribution (~70/30 within statistical tolerance). Once session is established, subsequent requests with cookie MUST route to the same backend regardless of weight configuration.| HTTPRouteSessionPersistence, HTTPRouteSessionPersistenceCookie |
-| Session Persistence with cookieConfig.lifetimeType: Permanent and absoluteTimeout: 5min. | HTTPRoute MUST have Accepted=True in parent status. Response Set-Cookie header MUST contain `expiry` attribute. The expiry value MUST correspond to the configured absoluteTimeout duration. Session persistence MUST function correctly until cookie expires.  | HTTPRouteSessionPersistence, HTTPRouteSessionPersistenceCookie, HTTPRouteSessionPersistenceCookieLifetimeTypePermanent |
-| Session Persistence Scoped to Route Rule: HTTPRoute with two rules: Rule 1 (path /a) and Rule 2 (path /b), both with sessionPersistence configured, routing to the same backend Service with multiple pods. | HTTPRoute MUST have Accepted=True in parent status. Sessions MUST NOT be shared between /a and /b. Verify with: 1) Requests to /a establishes session to Pod-X, 2) Requests to /b may route to any pod (Pod-X or Pod-Y), 3) N Multiple requests to /a with session cookie MUST still route to Pod-X, 4) N Multiple requests to /b with its session cookie MUST route to whichever pod was selected for /b. | HTTPRouteSessionPersistence |
+| :---- | :---- | :---- |
+| Simple Cookie Session Persistence: An HTTPRoute with sessionPersistence configured with type: Cookie (default) on a single backend in gateway-conformance-infra namespace. | HTTPRoute MUST have Accepted=True in parent status. First request MUST receive a Set-Cookie header in response. Subsequent requests with the cookie MUST route to the same backend pod. Verify by checking pod identity across N requests (N>=50). | HTTPRouteSessionPersistence |
+| Session Cookie Lifetime (Default): HTTPRoute with sessionPersistence and cookieConfig.lifetimeType: Session (default). | HTTPRoute MUST have Accepted=True in parent status. Cookie MUST NOT contain `expiry` attributes. | HTTPRouteSessionPersistence |
+| Multiple Weighted Backends - Initial Distribution Honored: HTTPRoute with sessionPersistence and multiple backendRefs with weights (e.g., 70/30) on a path. | HTTPRoute MUST have Accepted=True in parent status. Initial requests (without session cookie) MUST respect weight distribution (~70/30 within statistical tolerance). Once session is established, subsequent requests with cookie MUST route to the same backend regardless of weight configuration. | HTTPRouteSessionPersistence |
+| Session Persistence Scoped to Route Rule: HTTPRoute with two rules: Rule 1 (path /a) and Rule 2 (path /b), both with sessionPersistence configured, routing to the same backend Service with multiple pods. | HTTPRoute MUST have Accepted=True in parent status. Each rule MUST independently establish and maintain its own session. Verify with: 1) Send an initial request to /a (no cookie) — the response sets a session cookie binding /a to Pod-A, 2) Send an initial request to /b (no cookie) — the response sets a session cookie independently binding /b to Pod-B (Pod-B may or may not be the same pod as Pod-A), 3) N subsequent requests to /a with the /a session cookie MUST all route to Pod-A, 4) N subsequent requests to /b with the /b session cookie MUST all route to Pod-B. | HTTPRouteSessionPersistence |
+| Session Persistence with cookieConfig.lifetimeType: Permanent and absoluteTimeout: 5min. | HTTPRoute MUST have Accepted=True in parent status. Response Set-Cookie header MUST contain `expiry` attribute. The expiry value MUST correspond to the configured absoluteTimeout duration. Session persistence MUST function correctly until cookie expires. | HTTPRouteSessionPersistence, HTTPRouteSessionPersistenceCookieLifetimeTypePermanent |
+
+### GRPCRoute Feature Names
+
+* GRPCRouteSessionPersistence - Core feature for session persistence support on GRPCRoute (Extended).
+* GRPCRouteSessionPersistenceCookieLifetimeTypePermanent - Permanent Lifetime for cookie-based session persistence on GRPCRoute (Extended)
+
+> **Note on gRPC limitations**: Unlike HTTP/1.1 clients, gRPC clients do not automatically manage cookies. There is no built-in cookie jar; the client must explicitly extract `Set-Cookie` response headers and include them as `Cookie` metadata in subsequent requests. For this reason, header-based session persistence (`type: Header`) is the more natural and idiomatic mechanism for gRPC workloads. Cookie-based persistence is still technically valid over HTTP/2, but requires explicit client-side handling in tests.
+
+### GRPCRoute Conformance tests
+
+| Description | Outcome | Features |
+| :---- | :---- | :---- |
+| Simple Cookie-based Session Persistence (GRPCRoute): A GRPCRoute with sessionPersistence configured with type: Cookie (default) on a single backend. The test client MUST explicitly extract the Set-Cookie response header and include it as a Cookie header in subsequent requests. | GRPCRoute MUST have Accepted=True in parent status. First request MUST receive a Set-Cookie response header. Subsequent requests with the cookie header MUST route to the same backend pod. Verify by checking pod identity across N requests (N>=50). | GRPCRouteSessionPersistence |
+| Header-based Session Persistence (GRPCRoute): A GRPCRoute with sessionPersistence configured with type: Header on a single backend. | GRPCRoute MUST have Accepted=True in parent status. First request MUST receive a session identity header in the response metadata. Subsequent requests with that header included in request metadata MUST route to the same backend pod. Verify by checking pod identity across N requests (N>=50). | GRPCRouteSessionPersistence |
+| Session Cookie Lifetime (Default) (GRPCRoute): GRPCRoute with sessionPersistence and cookieConfig.lifetimeType: Session (default). | GRPCRoute MUST have Accepted=True in parent status. Cookie MUST NOT contain `expiry` attributes. | GRPCRouteSessionPersistence |
+| Multiple Weighted Backends - Initial Distribution Honored (GRPCRoute): GRPCRoute with sessionPersistence and multiple backendRefs with weights (e.g., 70/30). | GRPCRoute MUST have Accepted=True in parent status. Initial requests (without session token) MUST respect weight distribution (~70/30 within statistical tolerance). Once session is established, subsequent requests with the session token MUST route to the same backend regardless of weight configuration. | GRPCRouteSessionPersistence |
+| Session Persistence Scoped to Route Rule (GRPCRoute): GRPCRoute with two rules matching different gRPC methods (e.g., Rule 1 matches `/service.Foo/MethodA` and Rule 2 matches `/service.Foo/MethodB`), both with sessionPersistence configured, routing to the same backend Service with multiple pods. | GRPCRoute MUST have Accepted=True in parent status. Each rule MUST independently establish and maintain its own session. Verify with: 1) Send an initial request to MethodA (no session token) — the response sets a session token binding MethodA to Pod-A, 2) Send an initial request to MethodB (no session token) — the response sets a session token independently binding MethodB to Pod-B (Pod-B may or may not be the same pod as Pod-A), 3) N subsequent requests to MethodA with the MethodA session token MUST all route to Pod-A, 4) N subsequent requests to MethodB with the MethodB session token MUST all route to Pod-B. | GRPCRouteSessionPersistence |
+| Session Persistence with cookieConfig.lifetimeType: Permanent and absoluteTimeout: 5min (GRPCRoute). | GRPCRoute MUST have Accepted=True in parent status. Response Set-Cookie header MUST contain `expiry` attribute. The expiry value MUST correspond to the configured absoluteTimeout duration. Session persistence MUST function correctly until cookie expires. | GRPCRouteSessionPersistence, GRPCRouteSessionPersistenceCookieLifetimeTypePermanent |
 
 ## TODO
 
