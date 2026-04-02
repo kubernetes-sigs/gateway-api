@@ -8,7 +8,8 @@ extra:
   trademark: https://www.linuxfoundation.org/legal/trademark-usage
   analytics:
     provider: google
-    property: G-JPP6RFM2BP
+    # Google analytics tag is shared with minikube
+    property: G-JPP6RFM2BP 
 extra_css:
   - stylesheets/extra.css
 extra_javascript:

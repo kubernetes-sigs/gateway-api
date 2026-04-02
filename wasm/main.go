@@ -595,6 +595,9 @@ func gtagEvent(eventName string, params map[string]interface{}) {
 
 func trackWizardSelections(must, good []selection) {
 	track := func(selections []selection, action string) {
+		if len(selections) == 0 {
+			return
+		}
 		for _, sel := range selections {
 			gtagEvent("wizard_feature_selection", map[string]interface{}{
 				"resource_name": sel.Section,
@@ -604,7 +607,6 @@ func trackWizardSelections(must, good []selection) {
 			})
 		}
 	}
-
 	track(must, "must_have")
 	track(good, "nice_to_have")
 }
@@ -627,13 +629,13 @@ func recommend() {
 	}
 
 	must, good := getSelections()
-	trackWizardSelections(must, good)
 	if len(must) == 0 && len(good) == 0 {
 		resultsContent.Set("innerHTML", `<p class="no-results">Select at least one requirement as Must have or Nice to have, then click Match.</p>`)
 		resultsDiv.Get("classList").Call("add", "visible")
 		setStatus(statusEl, 0)
 		return
 	}
+	trackWizardSelections(must, good)
 
 	type scored struct {
 		impl       implementation
