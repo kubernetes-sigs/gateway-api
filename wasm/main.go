@@ -579,6 +579,36 @@ func getSelections() (must, good []selection) {
 	return must, goodFiltered
 }
 
+func gtagEvent(eventName string, params map[string]interface{}) {
+	gtag := js.Global().Get("gtag")
+	if !gtag.Truthy() {
+		parent := js.Global().Get("parent")
+		if parent.Truthy() && !parent.Equal(js.Global()) {
+			gtag = parent.Get("gtag")
+		}
+	}
+	if !gtag.Truthy() {
+		return
+	}
+	gtag.Invoke("event", eventName, js.ValueOf(params))
+}
+
+func trackWizardSelections(must, good []selection) {
+	track := func(selections []selection, action string) {
+		for _, sel := range selections {
+			gtagEvent("wizard_feature_selection", map[string]interface{}{
+				"resource_name": sel.ID,
+				"feature_name":  sel.Section,
+				"version":       currentVersion,
+				"action":        action,
+			})
+		}
+	}
+
+	track(must, "must_have")
+	track(good, "nice_to_have")
+}
+
 func recommend() {
 	resultsContent := doc.Call("getElementById", "results-content")
 	resultsDiv := doc.Call("getElementById", "results")
@@ -597,6 +627,7 @@ func recommend() {
 	}
 
 	must, good := getSelections()
+	trackWizardSelections(must, good)
 	if len(must) == 0 && len(good) == 0 {
 		resultsContent.Set("innerHTML", `<p class="no-results">Select at least one requirement as Must have or Nice to have, then click Match.</p>`)
 		resultsDiv.Get("classList").Call("add", "visible")
