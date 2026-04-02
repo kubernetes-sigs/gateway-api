@@ -580,25 +580,25 @@ func getSelections() (must, good []selection) {
 }
 
 func gtagEvent(eventName string, params map[string]interface{}) {
-	gtag := js.Global().Get("gtag")
-	if !gtag.Truthy() {
-		parent := js.Global().Get("parent")
-		if parent.Truthy() && !parent.Equal(js.Global()) {
-			gtag = parent.Get("gtag")
-		}
-	}
-	if !gtag.Truthy() {
+	global := js.Global()
+	if gtag := global.Get("gtag"); gtag.Truthy() {
+		global.Call("gtag", "event", eventName, js.ValueOf(params))
 		return
 	}
-	gtag.Invoke("event", eventName, js.ValueOf(params))
+	parent := global.Get("parent")
+	if parent.Truthy() && !parent.Equal(global) {
+		if pGtag := parent.Get("gtag"); pGtag.Truthy() {
+			parent.Call("gtag", "event", eventName, js.ValueOf(params))
+		}
+	}
 }
 
 func trackWizardSelections(must, good []selection) {
 	track := func(selections []selection, action string) {
 		for _, sel := range selections {
 			gtagEvent("wizard_feature_selection", map[string]interface{}{
-				"resource_name": sel.ID,
-				"feature_name":  sel.Section,
+				"resource_name": sel.Section,
+				"feature_name":  sel.ID,
 				"version":       currentVersion,
 				"action":        action,
 			})
