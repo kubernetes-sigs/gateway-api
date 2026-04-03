@@ -19,7 +19,7 @@
 export GO111MODULE=on
 
 # The registry to push container images to.
-export REGISTRY ?= gcr.io/k8s-staging-gateway-api
+export REGISTRY ?= us-central1-docker.pkg.dev/k8s-staging-images/gateway-api
 
 # These are overridden by cloudbuild.yaml when run by Prow.
 
