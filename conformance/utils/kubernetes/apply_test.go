@@ -107,7 +107,7 @@ metadata:
 		name:    "setting the gatewayClassName",
 		applier: Applier{},
 		given: `
-apiVersion: gateway.networking.k8s.io/v1beta1
+apiVersion: gateway.networking.k8s.io/v1
 kind:       Gateway
 metadata:
   name: test
@@ -123,7 +123,7 @@ spec:
 `,
 		expected: []unstructured.Unstructured{{
 			Object: map[string]interface{}{
-				"apiVersion": "gateway.networking.k8s.io/v1beta1",
+				"apiVersion": "gateway.networking.k8s.io/v1",
 				"kind":       "Gateway",
 				"metadata": map[string]interface{}{
 					"name": "test",
@@ -149,7 +149,7 @@ spec:
 		name:    "setting the controllerName for a GatewayClass",
 		applier: Applier{},
 		given: `
-apiVersion: gateway.networking.k8s.io/v1beta1
+apiVersion: gateway.networking.k8s.io/v1
 kind:       GatewayClass
 metadata:
   name: test
@@ -158,7 +158,7 @@ spec:
 `,
 		expected: []unstructured.Unstructured{{
 			Object: map[string]interface{}{
-				"apiVersion": "gateway.networking.k8s.io/v1beta1",
+				"apiVersion": "gateway.networking.k8s.io/v1",
 				"kind":       "GatewayClass",
 				"metadata": map[string]interface{}{
 					"name": "test",
