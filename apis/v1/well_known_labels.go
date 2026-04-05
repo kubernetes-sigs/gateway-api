@@ -16,9 +16,14 @@ limitations under the License.
 
 package v1
 
-// Labels for resources derived from Gateway
+// Well-known labels for generated resources (Service, Deployment, etc.) when
+// implementing a Gateway in-cluster. These labels and the recommended naming format can be used to
+// attach resources to those workloads.
+// Reference for further details: https://github.com/kubernetes-sigs/gateway-api/blob/main/geps/gep-1762/index.md
 const (
-	LabelPrefix           = "gateway.networking.k8s.io"
-	LabelGatewayName      = LabelPrefix + "/gateway-name"
-	LabelGatewayClassName = LabelPrefix + "/gateway-class-name"
+	// All generated resources must include a label gateway.networking.k8s.io/gateway-name set to the name of the Gateway resource.
+	GatewayNameLabelKey = GroupName + "/gateway-name"
+	// All generated resources should include the label gateway.networking.k8s.io/gateway-class-name,
+	// with its value set to the name of the GatewayClass resource
+	GatewayClassNameLabelKey = GroupName + "/gateway-class-name"
 )
