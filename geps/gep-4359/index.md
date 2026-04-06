@@ -1,4 +1,4 @@
-# GEP-696: GEP template
+# GEP-4359: Regex Rewrites
 
 * Issue: [#4359](https://github.com/kubernetes-sigs/gateway-api/issues/4359)
 * Status: Provisional
@@ -50,19 +50,19 @@ If the implementation deems `pattern` or `substitution` to be invalid (contains 
 it MUST not accept the HTTPRoute with a `Reason` of `invalid` and a descriptive `Message`.
 
 
-## `Standard` Graduation Criteria
-
-( This section outlines the criteria required for graduation to Standard. It MUST
-contain at least the items in the template, but more MAY be added if necessary. )
-
-( Required for Experimental status and above)
-
-* At least one Feature Name must be listed.
-* The `Conformance Details` must be filled out, with conformance test scenarios listed.
-* Conformance tests must be implemented that test all the listed test scenarios.
-* At least three (3) implementations must have submitted conformance reports that pass
-  those conformance tests.
-* At least six months must have passed from when the GEP moved to `Experimental`.
+<!-- ## `Standard` Graduation Criteria -->
+<!---->
+<!-- ( This section outlines the criteria required for graduation to Standard. It MUST -->
+<!-- contain at least the items in the template, but more MAY be added if necessary. ) -->
+<!---->
+<!-- ( Required for Experimental status and above) -->
+<!---->
+<!-- * At least one Feature Name must be listed. -->
+<!-- * The `Conformance Details` must be filled out, with conformance test scenarios listed. -->
+<!-- * Conformance tests must be implemented that test all the listed test scenarios. -->
+<!-- * At least three (3) implementations must have submitted conformance reports that pass -->
+<!--   those conformance tests. -->
+<!-- * At least six months must have passed from when the GEP moved to `Experimental`. -->
 
 
 ## Future extension
