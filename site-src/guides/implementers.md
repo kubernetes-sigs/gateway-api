@@ -107,20 +107,77 @@ The conformance suite output includes the Gateway API version supported.
 
 ### Union feature conformance
 
-Some features are just useful when implemented with another features. 
-As an example, `BackendTLSPolicy` is useful just when combined with a TLS terminated route or a filter that requires encrypted communication with a backend.
+Some features are only useful when implemented in combination with other
+features. We call this behavior a `union feature` — a feature that applies
+auxiliarily to any other feature that shares a compatible surface.
 
-We call this behavior a `union feature`. An implementation that decides to support an union feature MUST support the combination with other reported features, being them on `Core` or `Extended` support level.
+As an example, `BackendTLSPolicy` is useful only when combined with a route or
+filter that forwards traffic to a backend — a TLS terminated route, a route with
+backend references, or a filter like `RequestMirror` that targets a backend
+service. Similarly, `ReferenceGrant` is only meaningful when combined with
+resources that make cross-namespace references (routes referencing backends in
+other namespaces, Gateways referencing Secrets, etc.).
+
+An implementation that decides to support a union feature MUST support the
+combination with every other reported feature where that combination is
+applicable, regardless of whether those features are at `Core` or `Extended`
+support level.
 
 Let's take the following examples:
-* An implementation that reports support for `BackendTLSPolicy` and `GRPCRoute` MUST support the usage of a `BackendTLSPolicy` when targetting a service inside a `GRPCRoute`.
-* An implementation that reports support for `BackendTLSPolicy` and `TLSRouteTerminate` MUST support the usage of a `BackendTLSPolicy` when targetting a service inside a `TLSRoute` that uses a listener with `mode=Terminate`.
-* An implementation that reports support to `BackendTLSPolicy` and `HTTPRouteRequestMirror` MUST support the usage of a `BackendTLSPolicy` when a route defines a `httproute.spec.rules[].filters.requestMirror.backendRef` of type `Service`.
 
-Features that relies on the `Union feature` behavior MUST make it explicit on their Enhancement Proposal and on their API Reference.
+* An implementation that reports support for `BackendTLSPolicy` and `GRPCRoute` MUST support the usage of a `BackendTLSPolicy` when targeting a service inside a `GRPCRoute`.
+* An implementation that reports support for `BackendTLSPolicy` and `TLSRouteTerminate` MUST support the usage of a `BackendTLSPolicy` when targeting a service inside a `TLSRoute` that uses a listener with `mode=Terminate`.
+* An implementation that reports support for `BackendTLSPolicy` and `HTTPRouteRequestMirror` MUST support the usage of a `BackendTLSPolicy` when a route defines a `httproute.spec.rules[].filters.requestMirror.backendRef` of type `Service`.
 
-TODO: Maybe mention that ReferenceGrant is the same case.
-TODO: Define how this applies with conformance profiles.
+Features that rely on the `Union feature` behavior MUST make it explicit in
+their Enhancement Proposal and in their API Reference.
+
+#### Discovering union feature support
+
+Implementations report their supported features through the
+`GatewayClass.status.supportedFeatures` field. This is the primary mechanism for
+both implementers and users to understand which features — and therefore which
+feature combinations — an implementation supports.
+
+The conformance test suite validates union feature combinations automatically
+through its multi-feature test gating. Each conformance test declares the set of
+features it requires. A test only runs when the implementation claims support for
+**all** of the features listed. This means:
+
+* If an implementation claims support for both `BackendTLSPolicy` and
+  `GRPCRoute`, the conformance tests that require both features will
+  automatically run — and failing those tests means the implementation does not
+  actually support the combination.
+* If an implementation claims only `BackendTLSPolicy` without `GRPCRoute`, those
+  combination tests are skipped.
+* The conformance report output shows `supportedFeatures` and
+  `unsupportedFeatures` per profile, allowing users to verify which combinations
+  are validated.
+
+In short, the conformance suite makes it impossible to claim support for a union
+feature combination without actually passing the tests that validate it.
+
+#### Union features and conformance profiles
+
+Union features MUST be included in the `ExtendedFeatures` set of every
+conformance profile where the combination is applicable. This ensures that when
+an implementation runs conformance for a given profile and claims a union
+feature, the combination tests within that profile are executed.
+
+For example, `BackendTLSPolicy` applies to any profile that involves forwarding
+traffic to backends over TLS. It MUST therefore appear in the extended features
+of `GATEWAY-HTTP`, `GATEWAY-GRPC`, and `GATEWAY-TLS` profiles — not just a
+single profile.
+
+Union features may exist at different support levels:
+
+* **Core union features**: `ReferenceGrant` is a Core feature in all Gateway
+  profiles. Support for cross-namespace references is mandatory whenever the
+  profile is claimed. Because it is Core, implementations cannot opt out of it
+  within a profile.
+* **Extended union features**: `BackendTLSPolicy` is an Extended feature.
+  Implementations may choose not to support it, but if they do, they MUST
+  support it across all applicable feature combinations they report.
 
 #### Version Compatibility
 
