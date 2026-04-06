@@ -44,21 +44,34 @@ spec:
 ### Example (controller creation)
 
 ```yaml
-apiVersion: gateway.networking.x-k8s.io/v1alpha1
+apiVersion: inference.networking.k8s.io/v1
 kind: InferencePool
 metadata:
-  name: my-inference-pool
+  name: vllm-qwen3-32b
 spec:
-  selectorRef:
-    group: gateway.networking.x-k8s.io
-    kind: EndpointSelector
-    name: my-inference-pool-selector
+  targetPorts:
+    - number: 8000
+  selector:
+    app: vllm-qwen3-32b
+  extensionRef:
+    name: vllm-qwen3-32b-epp
+    port: 9002
+    failureMode: FailOpen
+---
+apiVersion: gateway.networking.x-k8s.io/v1alpha1
+kind: EndpointSelector
+metadata:
+  generateName: vllm-qwen3-32b-
+  namespace: default
+  labels:
+    gateway.networking.k8s.io/managed-by: inference-controller.io/gateway
+spec:
   selector:
     matchLabels:
-      app: my-inference-pool
+      app: vllm-qwen3-32b
   ports:
-    - name: grpc
-      port: 50051
+    - name: default
+      port: 9002
       protocol: TCP
 ```
 
