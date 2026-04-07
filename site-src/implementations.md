@@ -87,40 +87,40 @@ other functions (like managing DNS or creating certificates).
 - [Agentgateway][40]
 - [Airlock Microgateway][34]
 - [Cilium][16]
-- [Google Kubernetes Engine][6] (GA)
+- [Google Kubernetes Engine][6]
 - [HAProxy Ingress][7]
-- [Istio][9] (GA)
-- [kgateway][37] (GA)
-- [NGINX Gateway Fabric][12] (GA)
-- [Traefik Proxy][13] (GA)
+- [Istio][9]
+- [kgateway][37]
+- [NGINX Gateway Fabric][12]
+- [Traefik Proxy][13]
 
 ### Partially Conformant
 
-- [Amazon Elastic Kubernetes Service][23] (GA)
-- [AWS Load Balancer Controller][44] (GA)
-- [Contour][3] (GA)
-- [Envoy Gateway][18] (GA)
-- [Gravitee Kubernetes Operator][42] (GA)
-- [Kong Gateway Operator][35] (GA)
+- [Amazon Elastic Kubernetes Service][23]
+- [AWS Load Balancer Controller][44]
+- [Contour][3]
+- [Envoy Gateway][18]
+- [Gravitee Kubernetes Operator][42]
+- [Kong Gateway Operator][35]
 
 ### Stale
 
-- [Azure Application Gateway for Containers][27] (GA)
-- [Gloo Gateway][5] (GA)
-- [Kong Ingress Controller][10] (GA)
-- [Kubvernor][39](work in progress)
+- [Azure Application Gateway for Containers][27]
+- [Gloo Gateway][5]
+- [Kong Ingress Controller][10]
+- [Kubvernor][39]
 
 ## Service Mesh Implementation Status <a name="meshes"></a>
 
 ### Conformant
 
-- [Istio][9] (GA)
-- [Cilium][16] (GA)
+- [Istio][9]
+- [Cilium][16]
 
 ### Partially Conformant
 
-- [Alibaba Cloud Service Mesh][43] (GA)
-- [Linkerd][28] (GA)
+- [Alibaba Cloud Service Mesh][43]
+- [Linkerd][28]
 
 ## Integrations <a name="integrations"></a>
 
