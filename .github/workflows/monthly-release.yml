@@ -4,8 +4,8 @@ on:
   # TODO: Uncomment below code after we have released monthly couple of times.
   # Until then, we will manually trigger the workflow.
   # schedule:
-    # Run on the first day of every month at 00:00 UTC
-    # - cron: "0 0 1 * *"
+  # Run on the first day of every month at 00:00 UTC
+  # - cron: "0 0 1 * *"
   workflow_dispatch:
     # Allow manual triggering
     inputs:
@@ -69,6 +69,7 @@ jobs:
           git push origin "${STEPS_TAG_OUTPUTS_TAG}"
         env:
           STEPS_TAG_OUTPUTS_TAG: ${{ steps.tag.outputs.tag }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build monthly YAML
         env:
