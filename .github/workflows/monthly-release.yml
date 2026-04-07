@@ -1,17 +1,13 @@
 name: Monthly Release
 
+# Manual only: create and push the tag first (e.g. git tag monthly-2026.02 && git push origin monthly-2026.02),
+# then Actions → Run workflow → enter the same tag. This workflow verifies the tag exists and builds the release.
 on:
-  # TODO: Uncomment below code after we have released monthly couple of times.
-  # Until then, we will manually trigger the workflow.
-  # schedule:
-    # Run on the first day of every month at 00:00 UTC
-    # - cron: "0 0 1 * *"
   workflow_dispatch:
-    # Allow manual triggering
     inputs:
       tag:
-        description: "Monthly tag (e.g., monthly-2026.01). Leave empty to auto-generate."
-        required: false
+        description: "Existing monthly tag on origin (required): monthly-YYYY.MM — push the tag before running this workflow"
+        required: true
         type: string
 
 permissions:
@@ -28,47 +24,49 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # tag=v6.0.2
         with:
           fetch-depth: 0
-          persist-credentials: false
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Go
         uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # tag=v6.4.0
         with:
           go-version-file: "go.work"
 
-      - name: Generate monthly tag
+      - name: Verify monthly tag format and set outputs
         id: tag
-        run: |
-          if [ -n "${INPUTS_TAG}" ]; then
-            TAG="${INPUTS_TAG}"
-          else
-            # Format: monthly-YYYY.MM
-            TAG="monthly-$(date +"%Y.%m")"
-          fi
-          echo "tag=${TAG}" >> $GITHUB_OUTPUT
-          # Extract year.month for the release title (e.g., monthly-2026.01 -> 2026.01)
-          YEAR_MONTH=$(echo "${TAG}" | sed 's/monthly-//')
-          echo "year_month=${YEAR_MONTH}" >> $GITHUB_OUTPUT
-          echo "Generated tag: ${TAG}"
         env:
-          INPUTS_TAG: ${{ inputs.tag }}
-
-      - name: Check if tag already exists
+          INPUT_TAG: ${{ inputs.tag }}
         run: |
-          if git rev-parse "${STEPS_TAG_OUTPUTS_TAG}" >/dev/null 2>&1; then
-            echo "Error: Tag ${STEPS_TAG_OUTPUTS_TAG} already exists, aborting release!"
+          TAG="$(echo -n "${INPUT_TAG}" | tr -d '[:space:]')"
+          if [ -z "${TAG}" ]; then
+            echo "::error::Tag must be provided."
             exit 1
           fi
-        env:
-          STEPS_TAG_OUTPUTS_TAG: ${{ steps.tag.outputs.tag }}
+          # Required: monthly-YYYY.MM (four-digit year, zero-padded month 01–12)
+          if [[ ! "${TAG}" =~ ^monthly-[0-9]{4}\.[0-9]{2}$ ]]; then
+            echo "::error::Invalid tag name: '${TAG}'. Expected monthly-YYYY.MM (e.g. monthly-2026.01)."
+            exit 1
+          fi
+          YEAR_MONTH="${TAG#monthly-}"
+          MM="${YEAR_MONTH#*.}"
+          if (( 10#${MM} < 1 || 10#${MM} > 12 )); then
+            echo "::error::Invalid month in tag '${TAG}': month must be 01–12."
+            exit 1
+          fi
+          echo "tag=${TAG}" >> $GITHUB_OUTPUT
+          echo "year_month=${YEAR_MONTH}" >> $GITHUB_OUTPUT
+          echo "Tag format OK: ${TAG}"
 
-      - name: Create and push tag
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag "${STEPS_TAG_OUTPUTS_TAG}"
-          git push origin "${STEPS_TAG_OUTPUTS_TAG}"
+      - name: Verify tag exists on remote and checkout
         env:
-          STEPS_TAG_OUTPUTS_TAG: ${{ steps.tag.outputs.tag }}
+          TAG: ${{ steps.tag.outputs.tag }}
+        run: |
+          git fetch --tags --force
+          if ! git rev-parse "${TAG}" >/dev/null 2>&1; then
+            echo "::error::Tag '${TAG}' not found after fetch. Create and push it to origin first (e.g. git tag ${TAG} && git push origin ${TAG}), then run this workflow."
+            exit 1
+          fi
+          git checkout "${TAG}"
+          echo "Checked out ${TAG} at $(git rev-parse --short HEAD)"
 
       - name: Build monthly YAML
         env:
@@ -117,9 +115,9 @@ jobs:
             DUE_DATE=$(git log -1 --format=%aI "${TAG}")
             echo "SINCE_DATE: ${SINCE_DATE}"
             echo "DUE_DATE: ${DUE_DATE}"
-            
+
             echo "## Merged Pull Requests (${PREV_TAG} to ${TAG})" >> release-notes.md
-            
+
             gh pr list \
               --base main \
               --state merged \
