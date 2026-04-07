@@ -1,12 +1,12 @@
 name: Monthly Release
 
-# Manual only: Actions → Run workflow → provide tag monthly-YYYY.MM (e.g. monthly-2026.01).
-# Not triggered by push, schedule, or other events.
+# Manual only: create and push the tag first (e.g. git tag monthly-2026.02 && git push origin monthly-2026.02),
+# then Actions → Run workflow → enter the same tag. This workflow verifies the tag exists and builds the release.
 on:
   workflow_dispatch:
     inputs:
       tag:
-        description: "Monthly tag (required): monthly-YYYY.MM (e.g. monthly-2026.01)"
+        description: "Existing monthly tag on origin (required): monthly-YYYY.MM — push the tag before running this workflow"
         required: true
         type: string
 
@@ -56,24 +56,17 @@ jobs:
           echo "year_month=${YEAR_MONTH}" >> $GITHUB_OUTPUT
           echo "Tag format OK: ${TAG}"
 
-      - name: Check if tag already exists
+      - name: Verify tag exists on remote and checkout
         env:
           TAG: ${{ steps.tag.outputs.tag }}
         run: |
           git fetch --tags --force
-          if git rev-parse "${TAG}" >/dev/null 2>&1; then
-            echo "::error::Tag ${TAG} already exists, aborting release."
+          if ! git rev-parse "${TAG}" >/dev/null 2>&1; then
+            echo "::error::Tag '${TAG}' not found after fetch. Create and push it to origin first (e.g. git tag ${TAG} && git push origin ${TAG}), then run this workflow."
             exit 1
           fi
-
-      - name: Create and push tag
-        env:
-          TAG: ${{ steps.tag.outputs.tag }}
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag "${TAG}"
-          git push origin "${TAG}"
+          git checkout "${TAG}"
+          echo "Checked out ${TAG} at $(git rev-parse --short HEAD)"
 
       - name: Build monthly YAML
         env:
