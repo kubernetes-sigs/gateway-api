@@ -110,6 +110,7 @@ func generateRSACert(hosts []string, keyOut, certOut io.Writer, extKeyUsage []x5
 		return fmt.Errorf("failed to generate serial number: %w", err)
 	}
 
+	isSelfSigned := ca == nil
 	template := x509.Certificate{
 		SerialNumber: serialNumber,
 		Subject: pkix.Name{
@@ -122,6 +123,10 @@ func generateRSACert(hosts []string, keyOut, certOut io.Writer, extKeyUsage []x5
 		KeyUsage:              x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature,
 		ExtKeyUsage:           extKeyUsage,
 		BasicConstraintsValid: true,
+		IsCA:                  isSelfSigned,
+	}
+	if isSelfSigned {
+		template.KeyUsage |= x509.KeyUsageCertSign
 	}
 
 	for _, h := range hosts {
