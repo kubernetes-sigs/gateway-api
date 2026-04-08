@@ -21,9 +21,10 @@ package v1
 // attach resources to those workloads.
 // Reference for further details: https://github.com/kubernetes-sigs/gateway-api/blob/main/geps/gep-1762/index.md
 const (
-	// All generated resources must include a label gateway.networking.k8s.io/gateway-name set to the name of the Gateway resource.
+	// All generated resources must include a label set to the name of the
+	// Gateway resource.
 	GatewayNameLabelKey = GroupName + "/gateway-name"
-	// All generated resources should include the label gateway.networking.k8s.io/gateway-class-name,
-	// with its value set to the name of the GatewayClass resource
+	// All generated resources should include a label set to the name of the
+	// GatewayClass resource.
 	GatewayClassNameLabelKey = GroupName + "/gateway-class-name"
 )
