@@ -49,7 +49,6 @@ Session.vim
 .vscode
 /www/test_out
 .*.timestamp
-/site
 go.work.sum
 /tmp
 /conformance.test
@@ -62,9 +61,8 @@ site-src/reference/specx.md
 site-src/reference/**/spec.md
 site-src/reference/**/specx.md
 temp_test_convert_links
-site-src/wizard/main.wasm
-site-src/wizard/wasm_exec.js
-site-src/wizard/data/*
+site/static/wizard/main.wasm
+site/static/wizard/wasm_exec.js
+site/static/wizard/data/*
 
 .lycheecache
-

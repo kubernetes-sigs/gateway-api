@@ -147,14 +147,41 @@ of the PR is the community consensus for a new release.
   the GitHub UI, but **note well**: if the release manager can't create the tag due to Git permissions, a maintainer will need to do it, and in that case it's more polite for the maintainer to create and push the _tag_, then let the release manager create the _release_, so that it's easier for people to find the manager if there are problems!
 - Run the `make build-install-yaml` command which will generate install files in the `release/` directory.
   Attach these files to the GitHub release.
-- In a separate PR to `main`:
-   - Update the `README.md` and `site-src/guides/index.md` files to point links and examples to the new release.
-   - **If this is a major or minor release**:
-      - Update the implementation table path (`nav.Implementations.Comparison`) in the nav of `mkdocs.yml` to point to the latest release file (for example Implementation Comparison points to `implementation-table-v1.2.0.md`). Add the now past version under `Past Version Comparisons`, and edit the text blurb in `mkdocs-generate-conformance.py` to also reflect the added past version.
-      - Update `hack/mkdocs/generate.sh` and add the new `release-x.x` to the array of releases.
-   - In any case, this is also a great time to review changes between the release branch and `main`, to see if anything needs to be brought from the release back to `main`.
-- Get this PR reviewed and landed.
-- Announce the new release!
+- Update the `README.md` and `site-src/guides/index.md` files to point links and examples to the new release.
+
+#### For a **MAJOR** or **MINOR** release:
+- Cut a `release-major.minor` branch that we can tag things in as needed.
+- Check out the `release-major.minor` release branch locally.
+- Update `pkg/consts/consts.go` with the new semver tag and any updates to the API review URL.
+- Update `config/crd/standard/gateway.networking.k8s.io_vap_safeupgrades.yaml`
+  - Update the `gateway.networking.k8s.io/bundle-version`.
+  - Update regex `spec.validations.expression` to match older versions. (Look for a regex like `v1.[0-3].`, and replace the `3` with the new minor version number -1).
+- Run the following command `BASE_REF=vmajor.minor.patch make generate` which
+  will update generated docs with the correct version info. (Note that you can't
+  test with these YAMLs yet as they contain references to elements which wont
+  exist until the tag is cut and image is promoted to production registry.)
+- Verify the CI tests pass before continuing.
+- Create a tag using the `HEAD` of the `release-x.x` branch. This can be done using the `git` CLI or
+  GitHub's [release][release] page.
+- Run the `make build-install-yaml` command which will generate install files in the `release/` directory.
+  Attach these files to the GitHub release.
+- Update the `README.md` and `site-src/guides/index.md` files to point links and examples to the new release.
+- Edit the text blurb in `hack/docsy-generate-conformance.py` to reflect the added past version if necessary.
+
+#### For an **RC** release:
+- Update `pkg/consts/consts.go` with the new semver tag (like `v1.2.0-rc1`) and any updates to the API review URL.
+- Run the following command `make generate` which
+  will update generated docs with the correct version info. (Note that you can't
+  test with these YAMLs yet as they contain references to elements which wont
+  exist until the tag is cut and image is promoted to production registry.)
+- Include the changelog update in this PR.
+- Merge the update PR.
+- Tag the release using the commit on `main` where the changelog update merged.
+  This can  be done using the `git` CLI or GitHub's [release][release]
+  page.
+- Run the `make build-install-yaml` command which will generate
+  install files in the `release/` directory.
+- Attach these files to the GitHub release.
 
 ### Promoting images to production registry
 Gateway API follows the standard kubernetes image promotion process described [here][kubernetes-image-promotion].
