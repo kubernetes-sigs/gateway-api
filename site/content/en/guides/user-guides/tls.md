@@ -1,0 +1,397 @@
+---
+title: "TLS Configuration"
+linkTitle: "TLS"
+weight: 12
+---
+
+Gateway API allows for a variety of ways to configure TLS. This document lays
+out various TLS settings and gives general guidelines on how to use them
+effectively.
+
+Although this doc covers the most common forms of TLS configuration with Gateway
+API, some implementations may also offer implementation-specific extensions that
+allow for different or more advanced forms of TLS configuration. In addition to
+this documentation, it's worth reading the TLS documentation for whichever
+implementation(s) you're using with Gateway API.
+
+## Client/Server and TLS
+
+![overview](/images/tls-overview.svg)
+
+For Gateways, there are two connections involved:
+
+- **downstream**: This is the connection between the client and the Gateway.
+- **upstream**: This is the connection between the Gateway and backend resources
+   specified by routes. These backend resources will usually be Services.
+
+With Gateway API, TLS configuration of downstream and upstream connections is
+managed independently.
+
+For downstream connections, depending on the Listener Protocol, different TLS modes and Route types are supported.
+
+| Listener Protocol | TLS Mode    | Route Type Supported |
+|-------------------|-------------|---------------------|
+| TLS               | Passthrough | TLSRoute            |
+| TLS               | Terminate   | TLSRoute (extended) |
+| HTTPS             | Terminate   | HTTPRoute           |
+| GRPC              | Terminate   | GRPCRoute           |
+
+In `Passthrough` TLS mode, TLS settings do not take effect because the TLS session
+from the client is not terminated at the Gateway, but rather passes through the Gateway,
+encrypted.
+
+For upstream connections, `BackendTLSPolicy` is used, and neither listener protocol nor TLS mode apply to the
+upstream TLS configuration. For `HTTPRoute`, the use of both `Terminate` TLS mode and `BackendTLSPolicy` is supported.
+Using these together provides what is commonly known as a connection that is terminated and then re-encrypted at
+the Gateway.
+
+{{< details title="Standard Channel since v1.5.0" >}}
+
+The `TLSRoute` resource is GA and has been part of the Standard Channel since
+`v1.5.0`. For more information on release channels, refer to our [versioning
+guide](docs/concepts/versioning/).
+
+{{< /details >}}
+The `Terminate` mode for `TLSRoute` is available at the `Extended` [Support Level].
+
+[Support Level]: docs/concepts/conformance/#2-support-levels
+
+## Downstream TLS
+
+Downstream TLS settings are configured using listeners at the Gateway level.
+
+### Listeners and TLS
+
+Listeners expose the TLS setting on a per domain or subdomain basis.
+TLS settings of a listener are applied to all domains that satisfy the
+`hostname` criteria.
+
+In the following example, the Gateway serves the TLS certificate
+defined in the `default-cert` Secret resource for all requests.
+Although the example refers to HTTPS protocol, one can also use the same
+feature for TLS-only protocol along with TLSRoutes.
+
+```yaml
+listeners:
+- protocol: HTTPS # Other possible value is `TLS`
+  port: 443
+  tls:
+    mode: Terminate # If protocol is `TLS`, `Passthrough` is another possible mode
+    certificateRefs:
+    - kind: Secret
+      group: ""
+      name: default-cert
+```
+
+### Examples
+
+#### Listeners with different certificates
+
+In this example, the Gateway is configured to serve the `foo.example.com` and
+`bar.example.com` domains. The certificate for these domains is specified
+in the Gateway.
+
+```yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: tls-basic
+spec:
+  gatewayClassName: example
+  listeners:
+  - name: foo-https
+    protocol: HTTPS
+    port: 443
+    hostname: foo.example.com
+    tls:
+      certificateRefs:
+      - kind: Secret
+        group: ""
+        name: foo-example-com-cert
+  - name: bar-https
+    protocol: HTTPS
+    port: 443
+    hostname: bar.example.com
+    tls:
+      certificateRefs:
+      - kind: Secret
+        group: ""
+        name: bar-example-com-cert
+```
+
+#### Wildcard TLS listeners
+
+In this example, the Gateway is configured with a wildcard certificate for
+`*.example.com` and a different certificate for `foo.example.com`.
+Since a specific match takes priority, the Gateway will serve
+`foo-example-com-cert` for requests to `foo.example.com` and
+`wildcard-example-com-cert` for all other requests.
+
+```yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: wildcard-tls-gateway
+spec:
+  gatewayClassName: example
+  listeners:
+  - name: foo-https
+    protocol: HTTPS
+    port: 443
+    hostname: foo.example.com
+    tls:
+      certificateRefs:
+      - kind: Secret
+        group: ""
+        name: foo-example-com-cert
+  - name: wildcard-https
+    protocol: HTTPS
+    port: 443
+    hostname: "*.example.com"
+    tls:
+      certificateRefs:
+      - kind: Secret
+        group: ""
+        name: wildcard-example-com-cert
+```
+
+#### Cross namespace certificate references
+
+In this example, the Gateway is configured to reference a certificate in a
+different namespace. This is allowed by the ReferenceGrant created in the
+target namespace. Without that ReferenceGrant, the cross-namespace reference
+would be invalid.
+
+```yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: cross-namespace-tls-gateway
+  namespace: gateway-api-example-ns1
+spec:
+  gatewayClassName: example
+  listeners:
+  - name: https
+    protocol: HTTPS
+    port: 443
+    hostname: "*.example.com"
+    tls:
+      certificateRefs:
+      - kind: Secret
+        group: ""
+        name: wildcard-example-com-cert
+        namespace: gateway-api-example-ns2
+---
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: ReferenceGrant
+metadata:
+  name: allow-ns1-gateways-to-ref-secrets
+  namespace: gateway-api-example-ns2
+spec:
+  from:
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    namespace: gateway-api-example-ns1
+  to:
+  - group: ""
+    kind: Secret
+```
+
+### Client Certificate Validation (Frontend mTLS)
+
+{{< details title="Extended Support Feature: GatewayFrontendClientCertificateValidation" >}}
+This feature is part of extended support. For more information on support levels, refer to our [conformance guide](docs/concepts/conformance/).
+
+{{< /details >}}
+{{< details title="Standard Channel since v1.5.0" >}}
+GatewayFrontendClientCertificateValidation feature has been part of the Standard Channel since
+`v1.5.0`. For more information on release channels, refer to our [versioning
+guide](docs/concepts/versioning/).
+
+{{< /details >}}
+Gateway API supports validating the TLS certificate presented by a frontend client to the Gateway during the TLS handshake.
+
+Unlike server certificate configuration, which is defined per-listener, client certificate validation is configured at the **Gateway level** within the `spec.tls` field. This design is specifically intended to mitigate security risks associated with HTTP/2 and TLS connection coalescing, where a connection established for one listener could be reused for another listener on the same port, potentially bypassing listener-specific validation settings.
+
+#### Configuration Overview
+
+{{< details title="Extended Support Feature: GatewayFrontendClientCertificateValidationInsecureFallback" >}}
+This feature is part of extended support. For more information on support levels, refer to our [conformance guide](docs/concepts/conformance/).
+
+{{< /details >}}
+Client validation is defined using the `frontendValidation` struct, which specifies how the Gateway should verify the client's identity.
+
+*   **`caCertificateRefs`**: A list of references to Kubernetes objects (typically `ConfigMap`s) containing PEM-encoded CA certificate bundles used as trust anchors to validate the client's certificate.
+*   **`mode`**: Defines the validation behavior.
+    *   `AllowValidOnly` (Default): The Gateway accepts connections only if the client presents a valid certificate that passes validation against the specified CA bundle.
+    *   `AllowInsecureFallback`: The Gateway accepts connections even if the client certificate is missing or fails verification. This mode typically delegates authorization to the backend and should be used with caution.
+
+#### Gateway-Level Scoping
+
+Validation can be applied globally to the Gateway or overridden for specific ports:
+
+1.  **Default Configuration**: This configuration applies to all HTTPS listeners on the Gateway, unless a per-port override is defined.
+2.  **Per-Port Configuration**: This allows for fine-grained control, overriding the default configuration for all listeners handling traffic on a specific port.
+
+#### Examples
+
+##### Basic Client Validation
+This example shows how to configure client certificate validation with default configuration and per port override.
+
+```yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: client-validation-basic
+spec:
+  gatewayClassName: acme-lb
+  tls:
+    frontend:
+      default:
+        validation:
+          caCertificateRefs:
+          - kind: ConfigMap
+            group: ""
+            name: foo-example-com-ca-cert
+      perPort:
+      - port: 8443
+        tls:
+          validation:
+            caCertificateRefs:
+            - kind: ConfigMap
+              group: ""
+              name: bar-example-com-ca-cert
+  listeners:
+  - name: foo-https
+    protocol: HTTPS
+    port: 443
+    hostname: foo.example.com
+    tls:
+      certificateRefs:
+      - kind: Secret
+        group: ""
+        name: foo-example-com-cert
+  - name: bar-https
+    protocol: HTTPS
+    port: 8443
+    hostname: bar.example.com
+    tls:
+      certificateRefs:
+      - kind: Secret
+        group: ""
+        name: bar-example-com-cert
+```
+
+## Upstream TLS
+
+Upstream TLS settings are configured using the `BackendTLSPolicy` attached to a
+`Service` via a target reference.
+
+This resource can be used to describe the SNI the Gateway should use to connect to the
+backend and how the certificate served by the backend Pod(s) should be verified.
+
+### TargetRefs and TLS
+
+BackendTLSPolicy contains specification for the `TargetRefs` and `Validation`.  TargetRefs is required and
+identifies one or more `Service`s for which your HTTPRoute requires TLS. The `Validation` configuration contains a
+required `Hostname`, and either `CACertificateRefs` or `WellKnownCACertificates`.
+
+`Hostname` refers to the SNI the Gateway should use to connect to the backend, and
+must match the certificate served by the backend pod.
+
+CACertificateRefs refer to one or more PEM-encoded TLS certificates. If there are no specific certificates
+to use, then you must set WellKnownCACertificates to "System" to tell the Gateway to use a set of trusted
+CA Certificates. There may be some variation in which system certificates are used by each implementation.
+Refer to documentation from your implementation of choice for more information.
+
+{{% alert color="info" title="Restrictions" %}}
+
+- Cross-namespace certificate references are not allowed.
+- Wildcard hostnames are not allowed.
+
+{{% /alert %}}
+### Examples
+
+#### Using System Certificates
+
+In this example, the `BackendTLSPolicy` is configured to use system certificates to connect with a
+TLS-encrypted upstream connection where Pods backing the `dev` Service are expected to serve a valid
+certificate for `dev.example.com`.
+
+```yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: BackendTLSPolicy
+metadata:
+  name: tls-upstream-dev
+spec:
+  targetRefs:
+    - kind: Service
+      name: dev
+      group: ""
+  validation:
+    wellKnownCACertificates: "System"
+    hostname: dev.example.com
+```
+
+#### Using Explicit CA Certificates
+
+In this example, the `BackendTLSPolicy` is configured to use certificates defined in the configuration
+map `auth-cert` to connect with a TLS-encrypted upstream connection where Pods backing the `auth` Service
+are expected to serve a valid certificate for `auth.example.com`.
+
+```yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: BackendTLSPolicy
+metadata:
+  name: tls-upstream-auth
+spec:
+  targetRefs:
+    - kind: Service
+      name: auth
+      group: ""
+  validation:
+    caCertificateRefs:
+      - kind: ConfigMap
+        name: auth-cert
+        group: ""
+    hostname: auth.example.com
+```
+### Gateway’s Certificate Selection (Backend mTLS)
+{{< details title="Standard Channel since v1.5.0" >}}
+GatewayBackendClientCertificate feature has been part of the Standard Channel since
+`v1.5.0`. For more information on release channels, refer to our [versioning
+guide](docs/concepts/versioning/).
+
+{{< /details >}}
+Mutual TLS (mTLS) for upstream connections requires the Gateway to present a client certificate to the backend, in addition to verifying the backend's certificate. This ensures that the backend only accepts connections from authorized Gateways.
+
+#### Gateway’s Client Certificate Configuration
+To configure the client certificate that the Gateway uses when connecting to backends, use the `tls.backend.clientCertificateRef` field in the `Gateway` resource.
+
+This configuration applies to the Gateway as a client for *all* upstream connections managed by that Gateway.
+
+```yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: backend-tls
+spec:
+  gatewayClassName: acme-lb
+  tls:
+    backend:
+      clientCertificateRef:
+        kind: Secret
+        group: ""
+        name: foo-example-cert
+  listeners:
+  - name: foo-http
+    protocol: HTTP
+    port: 80
+    hostname: foo.example.com
+```
+
+## Extensions
+
+Gateway TLS configurations provides an `options` map to add additional TLS
+settings for implementation-specific features. Some examples of features that
+could go in here would be TLS version restrictions, or ciphers to use.

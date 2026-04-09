@@ -3,7 +3,7 @@
 * Issue: [#1911](https://github.com/kubernetes-sigs/gateway-api/issues/1911)
 * Status: Standard
 
-(See [status definitions](../overview.md#gep-states).)
+(See [status definitions](/enhancements/overview/#gep-states).)
 
 ## TLDR
 

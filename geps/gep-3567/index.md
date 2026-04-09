@@ -50,11 +50,11 @@ Gateway is configured using certificates that use multiple or wildcard SANs.
 ### Example
 
 The following configuration ([from the Gateway API
-documentation](../../guides/tls.md#wildcard-tls-listeners))
+documentation](/guides/user-guides/tls/#wildcard-tls-listeners))
 illustrates the problem:
 
 
-```
+```yaml
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
@@ -99,10 +99,10 @@ negotiated with the other Listener’s certificate.
 
 Mapping a request to a Listener matters if the Gateway configuration has
 different
-[HTTPRoutes](../../reference/spec.md#httproute)
+[HTTPRoutes](/reference/api-spec/main/spec/#httproute)
 bound to the different Listeners. It also matters if the Listeners have
 different
-[GatewayTlsConfigs](../../reference/spec.md#gatewaytlsconfig)
+[GatewayTlsConfigs](/reference/api-spec/main/spec/#gatewaytlsconfig)
 attached, for example if one Listener uses mutual TLS and the other does not.
 
 

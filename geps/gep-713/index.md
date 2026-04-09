@@ -3,7 +3,7 @@
 * Issue: [#713](https://github.com/kubernetes-sigs/gateway-api/issues/713)
 * Status: Memorandum
 
-(See status definitions [here](/geps/overview/#gep-states))
+(See status definitions [here](/enhancements/overview/#gep-states))
 
 ## TL;DR
 
@@ -51,7 +51,7 @@ After multiple iterations of Gateway API experimenting with policies—whether t
 
 ### User stories
 
-- [Ana](../../concepts/roles-and-personas.md#ana) or [Chihiro](../../concepts/roles-and-personas.md#chihiro) would like to specify some new behavior for a standard Kubernetes resource, but that resource doesn't have a way to specify the behavior and neither Ana nor Chihiro can modify it.
+- [Ana](/docs/concepts/roles-and-personas.md#ana) or [Chihiro](/docs/concepts/roles-and-personas.md#chihiro) would like to specify some new behavior for a standard Kubernetes resource, but that resource doesn't have a way to specify the behavior and neither Ana nor Chihiro can modify it.
   E.g., Ana may want to add a rate limit to a Kubernetes Service. The Service object itself doesn't have a field for rate limiting, and Ana can't modify the Service object's definition.
 
 - A Gateway API implementer would like to define some implementation-specific behaviors for Gateway API objects that are already standard.

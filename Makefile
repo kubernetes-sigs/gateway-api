@@ -152,11 +152,6 @@ uninstall:
 verify:
 	hack/verify-all.sh -v
 
-# Build the documentation.
-.PHONY: docs
-docs:
-	hack/make-docs.sh
-
 .PHONY: update-conformance-image-refs
 update-conformance-image-refs:
 	hack/update-conformance-image-refs.sh
@@ -197,28 +192,31 @@ release-staging: image.multiarch.setup
 
 # Docs
 
+PYTHON ?= $(shell if [ -x .venv/bin/python3 ]; then echo "./.venv/bin/python3"; else echo "python3"; fi)
+
 DOCS_BUILD_CONTAINER_NAME ?= gateway-api-mkdocs
 DOCS_VERIFY_CONTAINER_IMAGE ?= registry.hub.docker.com/lycheeverse/lychee:0.23
 
+# Build the documentation.
+.PHONY: docs
+docs:
+	hack/make-hugo-docs.sh
+
 .PHONY: build-docs
 build-docs: update-geps api-ref-docs
-	docker build --pull -t gaie/mkdocs hack/mkdocs/image
-	docker rm -f $(DOCS_BUILD_CONTAINER_NAME) || true
-	docker run --name $(DOCS_BUILD_CONTAINER_NAME) --rm -v ${PWD}:/docs gaie/mkdocs build
+	docker run --rm -v ${PWD}:/src -w /src/site peaceiris/hugo:v0.148.0-extended hugo
 
 .PHONY: verify-docs
 verify-docs: build-docs
-	docker run --init --rm -w /input -v ${PWD}:/input $(DOCS_VERIFY_CONTAINER_IMAGE) --root-dir /input/site --exclude-path "overrides/partials/.*\.html" --exclude ".*" --include "sigs.k8s.io" --accept 200 --max-concurrency 10 --include-fragments --cache $(VALIDATE_DOCS_EXTRA_ARGS) /input/site/**/*.html
+	docker run --init --rm -w /input -v ${PWD}:/input $(DOCS_VERIFY_CONTAINER_IMAGE) --root-dir /input/site/public --exclude-path "overrides/partials/.*\.html" --exclude ".*" --include "sigs.k8s.io" --accept 200 --max-concurrency 10 --include-fragments --cache $(VALIDATE_DOCS_EXTRA_ARGS) /input/site/public/**/*.html
 
 .PHONY: build-docs-netlify
-build-docs-netlify: update-geps api-ref-docs wizard-wasm
-	pip install -r hack/mkdocs/image/requirements.txt
-	python -m mkdocs build
+build-docs-netlify: update-geps api-ref-docs wizard-wasm wizard-data conformance-data
+	hugo --source site
 
 .PHONY: live-docs
-live-docs: update-geps
-	docker build -t gw/mkdocs hack/mkdocs/image
-	docker run --rm -it -p 3000:3000 -v ${PWD}:/docs gw/mkdocs
+live-docs: update-geps api-ref-docs
+	hugo server --source site
 
 .PHONY: update-geps
 update-geps:
@@ -226,23 +224,29 @@ update-geps:
 
 .PHONY: api-ref-docs
 api-ref-docs:
-	hack/mkdocs/generate.sh
+	hack/docsy/generate.sh
 
 .PHONY: wizard-wasm
 wizard-wasm:
+	@mkdir -p site/static/wizard
 	@GOROOT=$$(go env GOROOT); \
-	if [ -f "$$GOROOT/misc/wasm/wasm_exec.js" ]; then cp -f "$$GOROOT/misc/wasm/wasm_exec.js" site-src/wizard/; \
-	elif [ -f "$$GOROOT/lib/wasm/wasm_exec.js" ]; then cp -f "$$GOROOT/lib/wasm/wasm_exec.js" site-src/wizard/; \
+	if [ -f "$$GOROOT/misc/wasm/wasm_exec.js" ]; then cp -f "$$GOROOT/misc/wasm/wasm_exec.js" site/static/wizard/; \
+	elif [ -f "$$GOROOT/lib/wasm/wasm_exec.js" ]; then cp -f "$$GOROOT/lib/wasm/wasm_exec.js" site/static/wizard/; \
 	else echo "ERROR: wasm_exec.js not found in GOROOT"; exit 1; fi
-	GOOS=js GOARCH=wasm go build -o site-src/wizard/main.wasm ./wasm/
+	GOOS=js GOARCH=wasm go build -o site/static/wizard/main.wasm ./wasm/
 
 # Generate controller wizard data (multi-version). Requires conformance/reports/ with version dirs.
 # Run manually if make serve is used without conformance reports.
 .PHONY: wizard-data
 wizard-data:
-	python3 hack/mkdocs-generate-controller-wizard-data.py --all -o site-src/wizard/data/controller-wizard-data.json
+	@mkdir -p site/static/wizard/data
+	$(PYTHON) hack/docsy-generate-controller-wizard-data.py --all -o site/static/wizard/data/controller-wizard-data.json
+
+.PHONY: conformance-data
+conformance-data:
+	$(PYTHON) hack/docsy-generate-conformance.py
 
 .PHONY: serve
-serve: wizard-wasm
+serve: wizard-wasm update-geps api-ref-docs
 	@echo "Tip: Run 'make wizard-data' first if you have conformance/reports/ to load implementation data."
-	python3 -m http.server -d site-src/wizard 8080
+	hugo server --source site

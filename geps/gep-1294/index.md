@@ -11,7 +11,7 @@ This GEP is intended to establish an implementable, but experimental, baseline f
 
 ## Personas
 
-This GEP uses the [roles and personas](../../concepts/security.md#roles-and-personas) defined in the Gateway API security model, and the service "producer" and "consumer" roles defined in [GEP-1324: Service Mesh in Gateway API](../gep-1324/index.md#producer-and-consumer).
+This GEP uses the [roles and personas](/docs/concepts/security/#roles-and-personas) defined in the Gateway API security model, and the service "producer" and "consumer" roles defined in [GEP-1324: Service Mesh in Gateway API](../gep-1324/index.md#producer-and-consumer).
 
 ## Goals
 
@@ -27,7 +27,7 @@ This GEP uses the [roles and personas](../../concepts/security.md#roles-and-pers
     * Redirecting calls from arbitrary custom domains to an in-cluster service.
 * Defining how multiple `Services` or `EndpointSlices` representing instances of a single "logical" service should present an identity for AuthN/AuthZ or be associated with each other beyond routing rules.
 * Defining how AuthZ should be implemented to secure East/West traffic between services.
-* Defining how [Policy Attachment](../../reference/policy-attachment.md) would bind to `xRoute`, services or a mesh.
+* Defining how [Policy Attachment](/reference/policy-attachment) would bind to `xRoute`, services or a mesh.
 * Defining how `Routes` configured for East/West service mesh traffic management might integrate with North/South `Gateways`.
     * This is a bit tricky in that it's effectively a form of delegation as described in [GEP-1058: Route Inclusion and Delegation](https://github.com/kubernetes-sigs/gateway-api/pull/1085), and is planned to be explored in a future GEP.
 * Handling East/West traffic outside the cluster (VMs, etc).
@@ -187,7 +187,7 @@ If `port` is not set, the implementation MUST associate the route with all ports
 
 GAMMA implementations SHOULD NOT infer any functionality from the `hostnames` field on `xRoute`s (currently, `TLSRoute`, `HTTPRoute`, and `GRPCRoute` have this field) due to current under-specification and reserved potential for future usage or API changes.
 
-For the use case of filtering incoming traffic from selected HTTP hostnames, it is recommended to guide users toward configuring [`HTTPHeaderMatch`](../../reference/spec.md#httpheadermatch) rules for the [`Host`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Host) header. Functionality to be explored in future GEPs may include supporting concurrent usage of an `xRoute` traffic configuration for multiple North/South `Gateways` and East/West mesh use cases or redirection of egress traffic to an in-cluster `Service`.
+For the use case of filtering incoming traffic from selected HTTP hostnames, it is recommended to guide users toward configuring [`HTTPHeaderMatch`](/reference/api-spec/main/spec/#httpheadermatch) rules for the [`Host`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Host) header. Functionality to be explored in future GEPs may include supporting concurrent usage of an `xRoute` traffic configuration for multiple North/South `Gateways` and East/West mesh use cases or redirection of egress traffic to an in-cluster `Service`.
 
 ### Namespace boundaries
 
@@ -245,7 +245,7 @@ A controller could create a matching selector-less `Service` (i.e. no endpoints)
 
 Ownership/trust would remain based on naming pattern: `serviceName.namespace.svc.[USER_DOMAIN]`
 
-Separate `HttpService`, `TlsService` and `TcpService` resources could have the benefit of allowing us to define protocol specific elements to the spec along with an embedded `CommonServiceSpec`, similar to [`CommonRouteSpec`](../../reference/spec.md#commonroutespec), and keep similar patterns as `Service`.
+Separate `HttpService`, `TlsService` and `TcpService` resources could have the benefit of allowing us to define protocol specific elements to the spec along with an embedded `CommonServiceSpec`, similar to [`CommonRouteSpec`](/reference/api-spec/main/spec/#commonroutespec), and keep similar patterns as `Service`.
 
 ##### Drawbacks
 
@@ -303,7 +303,7 @@ spec:
     name: cool-mesh
 ```
 
-It is currently undefined how this approach may interact with either explicitly configured [`hostnames`](../../reference/spec.md#httproutespec) or implicit "transparent proxy" routing for Kubernetes `Services` to determine how traffic should be intercepted and redirected.
+It is currently undefined how this approach may interact with either explicitly configured [`hostnames`](/reference/api-spec/main/spec/#httproutespec) or implicit "transparent proxy" routing for Kubernetes `Services` to determine how traffic should be intercepted and redirected.
 
 This approach is not entirely abandoned, as it could supplement the proposed approach if explicit attachment to a specific mesh is deemed necessary. Additionally, this approach may offer a future option for attaching an `HTTPRoute` to a mesh, but not a specific service (e.g. to implement mesh-wide egress functionality for all requests to a specific hostname).
 
@@ -324,11 +324,11 @@ spec:
 
 * Would require separate `HTTPRoute` resources to explicitly define _different_ traffic routing rules for the same service on different meshes.
 
-#### Nested `services` and `hostnames` fields in [`ParentReference`](../../reference/spec.md#parentreference)
+#### Nested `services` and `hostnames` fields in [`ParentReference`](/reference/api-spec/main/spec/#parentreference)
 
 In core conformance, the `services` would only be valid for `Mesh` types, and `hostnames` field only for `Gateway`. Mesh implementations could still use a `Host` header match if they wanted limit rules to specific hostnames.
 
-```
+```yaml
 parentRefs:
 - kind: Mesh
   name: coolmesh
@@ -364,7 +364,7 @@ This is done by configuring the `parentRef`, to point to the `istio` `Mesh`. Thi
 
 ### New field on `HTTPRoute` for `Service` binding
 
-A new field `serviceBinding` would be added to `HTTPRoute` to attach to the `Service`. Alternatively, this could be a new field in [`HTTPRouteMatch`](../../reference/spec.md#httproutematch). As with the proposed implementation, this approach could be combined with a `Mesh` resource or similar as the `parentRef`, which would just define that the route would be applied to a mesh.
+A new field `serviceBinding` would be added to `HTTPRoute` to attach to the `Service`. Alternatively, this could be a new field in [`HTTPRouteMatch`](/reference/api-spec/main/spec/#httproutematch). As with the proposed implementation, this approach could be combined with a `Mesh` resource or similar as the `parentRef`, which would just define that the route would be applied to a mesh.
 
 ```
 spec:

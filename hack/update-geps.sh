@@ -21,8 +21,6 @@ set -o pipefail
 SCRIPT_ROOT=$(dirname "${BASH_SOURCE}")/..
 
 GEPS_TOC_SKIP="${GEPS_TOC_SKIP:-696}"
-NAV_CONF="${NAV_CONF:-${SCRIPT_ROOT}/nav.yml}"
-NAV_TEMPLATE="${NAV_TEMPLATE:-${NAV_CONF}.tmpl}"
 GEPS_TOC_DIR=${GEPS_TOC_DIR:-${SCRIPT_ROOT}/geps}
-
-go run tools/geps/main.go -g "${GEPS_TOC_DIR}/" -s "${GEPS_TOC_SKIP}"
+MD_DEST_DIR=${SCRIPT_ROOT}/site/content/en/enhancements/
+go run tools/geps/main.go -g "${GEPS_TOC_DIR}/" -s "${GEPS_TOC_SKIP}" -o "${MD_DEST_DIR}"

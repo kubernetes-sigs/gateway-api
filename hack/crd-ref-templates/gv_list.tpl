@@ -1,10 +1,10 @@
 {{- define "gvList" -}}
 {{- $groupVersions := . -}}
 ---
-hide:
-- toc
+title: "API Reference"
+linkTitle: LINK_TITLE_PLACEHOLDER
+weight: WEIGHT_PLACEHOLDER
 ---
-# API Reference
 
 {{- range $groupVersions }}
 - {{ markdownRenderGVLink . }}

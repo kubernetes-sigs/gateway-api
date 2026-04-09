@@ -3,7 +3,7 @@
 * Issue: [#3798](https://github.com/kubernetes-sigs/gateway-api/issues/3798)
 * Status: Deferred
 
-(See [status definitions](../overview.md#gep-states).)
+(See [status definitions](/enhancements/overview/#gep-states).)
 
 ## Notes and Disclaimers
 
@@ -20,16 +20,16 @@
 
 [v1.4.0]:https://github.com/kubernetes-sigs/gateway-api/milestone/22
 [PR#3844]:https://github.com/kubernetes-sigs/gateway-api/pull/3844
-[GEP-1619]:https://gateway-api.sigs.k8s.io/geps/gep-1619/
+[GEP-1619]:/geps/gep-1619/
 
 ## TLDR
 
 ### What
  This GEP proposes the addition of Client IP-based session persistence to the Gateway API. This feature will allow Gateway API implementations to ensure that requests originating from a specific client IP address (or a subnet defined by an IP mask) are consistently routed to the same backend endpoint for a configurable duration. This aims to provide a standardized and centralized mechanism for client IP persistence across various Gateway API implementations.
 
- As mentioned in the [GEP-1619](https://gateway-api.sigs.k8s.io/geps/gep-1619/#api), `SessionPersistence` can be applied via `BackendLBPolicy` and `RouteRule` API. Similar [edge case behaviour](https://gateway-api.sigs.k8s.io/geps/gep-1619/#edge-case-behavior) and [API Granularity](https://gateway-api.sigs.k8s.io/geps/gep-1619/#api-granularity) for ClientIP Persistence type should be applicable as well.
+ As mentioned in the [GEP-1619](/geps/gep-1619/#api), `SessionPersistence` can be applied via `BackendLBPolicy` and `RouteRule` API. Similar [edge case behaviour](/geps/gep-1619/#edge-case-behavior) and [API Granularity](/geps/gep-1619/#api-granularity) for ClientIP Persistence type should be applicable as well.
 
- An important addition/difference compared to [GEP-1619](https://gateway-api.sigs.k8s.io/geps/gep-1619) is that the identity of the backend assigned to a client (or a group of clients in the same subnet) is stored on the server (load balancer / gateway) side as opposed to the client side.
+ An important addition/difference compared to [GEP-1619](/geps/gep-1619) is that the identity of the backend assigned to a client (or a group of clients in the same subnet) is stored on the server (load balancer / gateway) side as opposed to the client side.
 
 ## Goals
 

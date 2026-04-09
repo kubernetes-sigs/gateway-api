@@ -1,10 +1,14 @@
 # Netlify build instructions
 [build]
-    command = "make build-docs-netlify"
-    publish = "site"
+    command = "pip install -r hack/mkdocs/image/requirements.txt && cd site && npm install && cd .. && make build-docs-netlify"
+    publish = "site/public"
+
 [build.environment]
     PYTHON_VERSION = "3.12"
     GO_VERSION = "1.24.1"
+    # node Active LTS
+    NODE_VERSION = "20.20.0"
+    HUGO_VERSION = "0.148.0"
 
 # Standard Netlify redirects
 [[redirects]]

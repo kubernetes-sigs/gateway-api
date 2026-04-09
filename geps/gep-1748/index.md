@@ -3,16 +3,17 @@
 * Issue: [#1748](https://github.com/kubernetes-sigs/gateway-api/issues/1748)
 * Status: Experimental
 
-???+ Prolonged Experimental Phase
-    This GEP will be in the "Experimental" channel for a prolonged period of
-    time. This explores the interaction of Gateway API with the Multi-Cluster
-    Services API. Until the MCS API is also GA, it will be impossible for this
-    GEP to graduate beyond "Experimental".
+{{< details title="Prolonged Experimental Phase" >}}
+This GEP will be in the "Experimental" channel for a prolonged period of
+time. This explores the interaction of Gateway API with the Multi-Cluster
+Services API. Until the MCS API is also GA, it will be impossible for this
+GEP to graduate beyond "Experimental".
 
-    This GEP is also exempt from the [Probationary Period][expprob] rules as it
-    predated them.
+This GEP is also exempt from the [Probationary Period][expprob] rules as it
+predated them.
+{{< /details >}}
 
-[expprob]:../overview.md#probationary-period
+[expprob]:/enhancements/overview/#probationary-period
 
 ## TLDR
 
@@ -53,7 +54,19 @@ clusters. For example, the following HTTPRoute would forward traffic to
 endpoints attached to the "store" ServiceImport:
 
 ```yaml
-{% include 'standard/multicluster/httproute-simple.yaml' %}
+kind: HTTPRoute
+apiVersion: gateway.networking.k8s.io/v1beta1
+metadata:
+  name: store
+spec:
+  parentRefs:
+  - name: external-http
+  rules:
+  - backendRefs:
+    - group: multicluster.x-k8s.io
+      kind: ServiceImport
+      name: store
+      port: 8080
 ```
 
 #### Routing to Specific Clusters
@@ -68,7 +81,37 @@ these paths will be routed to the “store” ServiceImport which represents a
 superset of the “store-west” and “store-east” ServiceImports.
 
 ```yaml
-{% include 'standard/multicluster/httproute-location.yaml' %}
+kind: HTTPRoute
+apiVersion: gateway.networking.k8s.io/v1beta1
+metadata:
+  name: store
+spec:
+  parentRefs:
+  - name: external-http
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /west
+    backendRefs:
+    - group: multicluster.x-k8s.io
+      kind: ServiceImport
+      name: store-west
+      port: 8080
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /east
+    backendRefs:
+    - group: multicluster.x-k8s.io
+      kind: ServiceImport
+      name: store-east
+      port: 8080
+  - backendRefs:
+    - group: multicluster.x-k8s.io
+      kind: ServiceImport
+      name: store
+      port: 8080
 ```
 
 #### Advanced Routing With ServiceImports
@@ -80,7 +123,28 @@ Method. In the following example, requests with POST, PUT, and DELETE methods
 are routed to `api-primary` while the rest are routed to `api-replicas`:
 
 ```yaml
-{% include 'standard/multicluster/httproute-method.yaml' %}
+kind: HTTPRoute
+apiVersion: gateway.networking.k8s.io/v1beta1
+metadata:
+  name: api
+spec:
+  parentRefs:
+  - name: api-gw
+  rules:
+  - matches:
+    - method: POST
+    - method: PUT
+    - method: DELETE
+    backendRefs:
+    - group: multicluster.x-k8s.io
+      kind: ServiceImport
+      name: api-primary
+      port: 8080
+  - backendRefs:
+    - group: multicluster.x-k8s.io
+      kind: ServiceImport
+      name: api-replicas
+      port: 8080
 ```
 
 #### Routing to Both Services and ServiceImports
@@ -91,7 +155,24 @@ endpoints attached to the cluster-local "store" Service, and the remaining 10%
 would go to endpoints attached to the Multi-Cluster "store-global" Service:
 
 ```yaml
-{% include 'standard/multicluster/httproute-hybrid.yaml' %}
+kind: HTTPRoute
+apiVersion: gateway.networking.k8s.io/v1beta1
+metadata:
+  name: store
+spec:
+  parentRefs:
+  - name: external-http
+  rules:
+  - backendRefs:
+    - kind: Service
+      name: store
+      port: 8080
+      weight: 90
+    - group: multicluster.x-k8s.io
+      kind: ServiceImport
+      name: store-global
+      port: 8080
+      weight: 10
 ```
 
 #### Cross-Namespace References with ReferenceGrant
@@ -101,7 +182,36 @@ ServiceImports. For example, the following HTTPRoute would forward traffic to
 endpoints attached to the “bar” Multi-Cluster Service in the “bar” namespace:
 
 ```yaml
-{% include 'standard/multicluster/httproute-referencegrant.yaml' %}
+kind: HTTPRoute
+apiVersion: gateway.networking.k8s.io/v1beta1
+metadata:
+  name: foo
+  namespace: foo
+spec:
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /bar
+    backendRefs:
+    - group: multicluster.x-k8s.io
+      kind: ServiceImport
+      name: bar
+      namespace: bar
+---
+kind: ReferenceGrant
+apiVersion: gateway.networking.k8s.io/v1beta1
+metadata:
+  name: bar
+  namespace: bar
+spec:
+  from:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    namespace: foo
+  to:
+  - group: multicluster.x-k8s.io
+    kind: ServiceImport
 ```
 
 ### Mesh: ServiceImport as Parent
@@ -118,7 +228,23 @@ intercept traffic destined for the store ClusterSetIP matching the `/cart` path
 and redirect it to the `cart` Multi-Cluster Service.
 
 ```yaml
-{% include 'standard/multicluster/httproute-gamma.yaml' %}
+kind: HTTPRoute
+apiVersion: gateway.networking.k8s.io/v1beta1
+metadata:
+  name: store
+spec:
+  parentRefs:
+  - group: multicluster.x-k8s.io
+    kind: ServiceImport
+    name: store
+  rules:
+  - matches:
+    - path:
+        value: "/cart"
+    backendRefs:
+    - group: multicluster.x-k8s.io
+      kind: ServiceImport
+      name: cart
 ```
 
 ### Services vs ServiceImports

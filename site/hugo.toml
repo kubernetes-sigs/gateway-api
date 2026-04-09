@@ -1,0 +1,112 @@
+baseURL = "/"
+title = "gateway api"
+defaultContentLanguage = "en"
+
+[services]
+[services.googleAnalytics]
+# Comment out the next line to disable GA tracking. Also disables the feature described in [params.ui.feedback].
+    id = "G-JPP6RFM2BP"
+
+# Allow Hugo to download fonts via resources.GetRemote
+[security]
+  [security.http]
+    mediaTypes = ['(?i)^font/.*$', '(?i)^application/font-woff$']
+
+# Language settings
+[languages]
+  [languages.en]
+    title = "gateway api"
+    languageName = "English"
+    contentDir = "content/en"
+    weight = 1
+
+# Markup configurations to replicate MkDocs markdown_extensions
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true # Required for raw HTML embeds and some Docsy features
+    [markup.goldmark.extensions]
+      [markup.goldmark.extensions.passthrough]
+        enable = false
+  [markup.highlight]
+    noClasses = false
+    guessSyntax = true
+    style = "tango"
+  [markup.tableOfContents]
+    startLevel = 2
+    endLevel = 4
+    ordered = false
+
+# Theme parameters
+[params]
+  copyright = "The Linux Foundation"
+  github_repo = "https://github.com/kubernetes-sigs/gateway-api"
+  github_branch = "main"
+  github_subdir = "content" # Set this to wherever your markdown files live
+
+  # Search settings
+  offlineSearch = true
+  
+  # User Interface settings
+  [params.ui]
+    # Enable to make the sidebar menu foldable.
+    sidebar_menu_foldable = true
+    # Enable to show the side bar menu in its compact state.
+    sidebar_menu_compact = false
+    #  Set to true to disable breadcrumb navigation.
+    breadcrumb_disable = true
+    #  Set to true to hide the sidebar search box (the top nav search box will still be displayed if search is enabled)
+    sidebar_search_disable = false
+    #  Set to false if you don't want to display a logo (/assets/icons/logo.svg) in the top nav bar
+    navbar_logo = true
+  
+  # Top Navbar links
+  [[params.links.user]]
+    name = "GitHub"
+    url = "https://github.com/kubernetes-sigs/gateway-api"
+    icon = "fab fa-github"
+    desc = "Development takes place here!"
+  [[params.links.user]]
+    name = "Trademark"
+    url = "https://www.linuxfoundation.org/legal/trademark-usage"
+  
+
+[[menu.main]]
+    name = "Overview"
+    weight = 10
+    url = "/docs/"
+
+[[menu.main]]
+    name = "Guides"
+    weight = 20
+    url = "/guides/"
+
+[[menu.main]]
+    name = "Reference"
+    weight = 30
+    url = "/reference/"
+
+[[menu.main]]
+    name = "Enhancements"
+    weight = 40
+    url = "/enhancements/"
+
+[[menu.main]]
+    name = "Contributing"
+    weight = 50
+    url = "/contributing/"
+
+# Enable Hugo Modules to pull in the Docsy theme
+[module]
+  proxy = "direct"
+  [[module.imports]]
+    path = "github.com/google/docsy"
+
+# Mount the default content directory
+  [[module.mounts]]
+    source = "content/en"
+    target = "content"
+
+  [[module.mounts]]
+    source = "../geps"
+    target = "content/geps" 

@@ -579,6 +579,38 @@ func getSelections() (must, good []selection) {
 	return must, goodFiltered
 }
 
+func gtagEvent(eventName string, params map[string]interface{}) {
+	global := js.Global()
+	if gtag := global.Get("gtag"); gtag.Truthy() {
+		global.Call("gtag", "event", eventName, js.ValueOf(params))
+		return
+	}
+	parent := global.Get("parent")
+	if parent.Truthy() && !parent.Equal(global) {
+		if pGtag := parent.Get("gtag"); pGtag.Truthy() {
+			parent.Call("gtag", "event", eventName, js.ValueOf(params))
+		}
+	}
+}
+
+func trackWizardSelections(must, good []selection) {
+	track := func(selections []selection, action string) {
+		if len(selections) == 0 {
+			return
+		}
+		for _, sel := range selections {
+			gtagEvent("wizard_feature_selection", map[string]interface{}{
+				"resource_name": sel.Section,
+				"feature_name":  sel.ID,
+				"version":       currentVersion,
+				"action":        action,
+			})
+		}
+	}
+	track(must, "must_have")
+	track(good, "nice_to_have")
+}
+
 func recommend() {
 	resultsContent := doc.Call("getElementById", "results-content")
 	resultsDiv := doc.Call("getElementById", "results")
@@ -603,6 +635,7 @@ func recommend() {
 		setStatus(statusEl, 0)
 		return
 	}
+	trackWizardSelections(must, good)
 
 	type scored struct {
 		impl       implementation

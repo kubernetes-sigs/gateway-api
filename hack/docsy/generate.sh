@@ -1,0 +1,87 @@
+#!/bin/bash
+
+# Copyright 2020 The Kubernetes Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+set -o errexit
+set -o nounset
+set -o pipefail
+
+GOPATH=${GOPATH:-$(go env GOPATH)}
+
+# "go env" doesn't print anything if GOBIN is the default, so we
+# have to manually default it.
+GOBIN=${GOBIN:-$(go env GOBIN)}
+GOBIN=${GOBIN:-${GOPATH}/bin}
+REMOTE=${REMOTE:-origin}
+
+readonly GOTOOL="go tool"
+
+echo $GOBIN
+
+go install github.com/elastic/crd-ref-docs
+declare -a arr=(
+    "release-1.4"
+    "release-1.5"
+    "main"
+)
+
+mkdir -p ${PWD}/tmp
+
+weight_spec=10
+weight_specx=20
+link_title_spec="Standard"
+link_title_specx="Experimental"
+
+for i in "${arr[@]}"; do
+    tmpdir=$(mktemp -d --tmpdir=${PWD}/tmp)
+
+    git fetch ${REMOTE} ${i} ||
+	    echo "You need a git remote pointing to upstream for API Ref generation. To solve this issue locally, execute 'git remote add upstream git@github.com:kubernetes-sigs/gateway-api.git' and then call the script again with 'REMOTE=upstream <command>'"
+    git --work-tree=${tmpdir} checkout ${REMOTE}/${i} -- apis apisx
+
+    # Start removing any "release-" prefix from docpath
+    docpath=${i#"release-"}
+    # If the release is "main" simply remove it
+    #docpath=${docpath#"main"}
+	mkdir -p "${PWD}/site/content/en/reference/api-spec/${docpath}"
+
+    $GOTOOL crd-ref-docs \
+        --source-path=${tmpdir}/apis \
+        --config=crd-ref-docs.yaml \
+        --templates-dir=${PWD}/hack/crd-ref-templates/ \
+        --renderer=markdown \
+        --output-path=${PWD}/site/content/en/reference/api-spec/${docpath}/spec.md
+
+    $GOTOOL crd-ref-docs \
+        --source-path=${tmpdir}/apisx \
+        --config=crd-ref-docs.yaml \
+        --templates-dir=${PWD}/hack/crd-ref-templates/ \
+        --renderer=markdown \
+        --output-path=${PWD}/site/content/en/reference/api-spec/${docpath}/specx.md
+
+    # Replace the weight placeholder in the generated files
+    sed -i.bak "s/WEIGHT_PLACEHOLDER/${weight_spec}/g" "${PWD}/site/content/en/reference/api-spec/${docpath}/spec.md"
+    sed -i.bak "s/WEIGHT_PLACEHOLDER/${weight_specx}/g" "${PWD}/site/content/en/reference/api-spec/${docpath}/specx.md"
+    sed -i.bak "s/LINK_TITLE_PLACEHOLDER/${link_title_spec}/g" "${PWD}/site/content/en/reference/api-spec/${docpath}/spec.md"
+    sed -i.bak "s/LINK_TITLE_PLACEHOLDER/${link_title_specx}/g" "${PWD}/site/content/en/reference/api-spec/${docpath}/specx.md"
+    rm -f "${PWD}/site/content/en/reference/api-spec/${docpath}/spec.md.bak" "${PWD}/site/content/en/reference/api-spec/${docpath}/specx.md.bak"
+
+    # Add 'yaml' syntax highlighting to untagged code blocks
+    for file in "${PWD}/site/content/en/reference/api-spec/${docpath}/spec.md" "${PWD}/site/content/en/reference/api-spec/${docpath}/specx.md"; do
+        awk '/^[ \t]*```/ { if (in_block) { print $0; in_block=0 } else { if ($0 ~ /^[ \t]*```[ \t]*\r?$/) { sub(/```/, "```yaml"); print $0 } else { print $0 }; in_block=1 }; next } { print }' "$file" > "${file}.tmp"
+        mv "${file}.tmp" "$file"
+    done
+
+done
