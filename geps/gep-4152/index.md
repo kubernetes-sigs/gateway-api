@@ -64,4 +64,4 @@ implement shall be left open-ended until _"What?"_ and _"Why?"_ are solid.
 
 ## References
 
-* [GEP-1897: BackendTLSPolicy - Explicit Backend TLS Connection Configuration](https://gateway-api.sigs.k8s.io/geps/gep-1897/)
+* [GEP-1897: BackendTLSPolicy - Explicit Backend TLS Connection Configuration](/geps/gep-1897/)

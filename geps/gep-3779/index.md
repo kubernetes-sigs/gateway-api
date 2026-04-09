@@ -3,7 +3,7 @@
 * Issue: [#3779](https://github.com/kubernetes-sigs/gateway-api/issues/3779)
 * Status: Implementable
 
-(See [status definitions](../overview.md#gep-states).)
+(See [status definitions](/enhancements/overview/#gep-states).)
 
 ## TLDR
 
@@ -11,7 +11,7 @@ Provide a method for configuring Gateway API Mesh implementations to enforce eas
 
 ## Goals
 
-(Using the [Gateway API Personas](../../concepts/roles-and-personas.md))
+(Using the [Gateway API Personas](/docs/concepts/roles-and-personas.md))
 
 * A way for Ana the Application Developer to configure a Gateway API for Mesh implementation to enforce authorization policy that **allows** identity or multiple identities to talk with some set (could be namespace or more granular) of the workloads she controls.
 
@@ -45,7 +45,7 @@ An identity-based authorization API is essential because it provides a structure
 
 ### Current AuthZ Support within Meshes
 
-Istio, Linkerd, and Cilium all support identity-aware authorization via vendored policies, but differ in mechanics and philosophy. Istio and Linkerd rely on mTLS-derived identities tightly coupled with service accounts, while Cilium broadens the scope using BPF-based identities tied to labels, IPs, and SPIFFE. Istio offers policy layering (namespace/system-wide), including support for DENY and CUSTOM rules, enforced at sidecars or ztunnel/waypoints. Linkerd injects proxies, emphasizes mTLS, and supports ALLOW/AUDIT — there's no DENY. Cilium stands apart with L3–L7 policy enforcement (via kernel or envoy), and broader match targets including pod/node selectors and CIDRs. It also uniquely maps identities into the datapath ([#CiliumIdentity](#CiliumIdentity)), and supports explicit default-deny enforcement patterns. See [#state-of-the-world](#state-of-the-world) for more detailed comparison.
+Istio, Linkerd, and Cilium all support identity-aware authorization via vendored policies, but differ in mechanics and philosophy. Istio and Linkerd rely on mTLS-derived identities tightly coupled with service accounts, while Cilium broadens the scope using BPF-based identities tied to labels, IPs, and SPIFFE. Istio offers policy layering (namespace/system-wide), including support for DENY and CUSTOM rules, enforced at sidecars or ztunnel/waypoints. Linkerd injects proxies, emphasizes mTLS, and supports ALLOW/AUDIT — there's no DENY. Cilium stands apart with L3–L7 policy enforcement (via kernel or envoy), and broader match targets including pod/node selectors and CIDRs. It also uniquely maps identities into the datapath ([#CiliumIdentity](#ciliumidentity)), and supports explicit default-deny enforcement patterns. See [#state-of-the-world](#state-of-the-world) for more detailed comparison.
 
 ## API
 

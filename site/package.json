@@ -1,0 +1,21 @@
+{
+  "name": "gateway-api",
+  "version": "1.0.0",
+  "description": "The Gateway API is a part of [SIG Network][sn], and this repository contains the specification and Custom Resource Definitions (CRDs).",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "example": "examples",
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "autoprefixer": "^10.4.27",
+    "postcss-cli": "^11.0.1"
+  }
+}

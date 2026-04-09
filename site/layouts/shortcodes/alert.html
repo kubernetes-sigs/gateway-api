@@ -1,0 +1,6 @@
+{{ $color := .Get "color" | default "primary" }}
+{{ $title := .Get "title" }}
+<div class="alert alert-{{ $color }}" role="alert">
+  {{ with $title }}<h4 class="alert-heading">{{ . }}</h4>{{ end }}
+  {{ .Inner }}
+</div>

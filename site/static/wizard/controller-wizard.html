@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="controller-wizard.css">
+</head>
+
+<body>
+  <div class="intro">
+    <p id="version-row">
+      <label for="version-select"><strong>Minimum Gateway API version</strong></label>
+      <span aria-hidden="true">&gt;=</span>
+      <select id="version-select"></select>
+    </p>
+    <p class="intro-source">Matches are generated from the
+      <a href="https://github.com/kubernetes-sigs/gateway-api/tree/main/conformance/reports" target="_blank" rel="noopener">conformance reports</a> uploaded by project implementations.
+      <strong>Must have</strong> determines which controllers match; <strong>Nice to have</strong> optionally ranks your results. Feature names match the
+      <a id="link-intro-conformance" href="https://gateway-api.sigs.k8s.io/implementations/v1.4/" target="_blank" rel="noopener">v1.4
+        conformance tables</a>. Implementations only appear in this page if they pass Core conformance for the resource type. Implementations that submit conformance reports with skipped tests won't appear.</p>
+  </div>
+
+  <section class="card">
+    <h3 id="gateway">Gateway</h3>
+    <table class="features" id="gateway-core">
+      <tbody></tbody>
+    </table>
+    <p class="section-intro">All controllers matched by this wizard include core support of Gateway. That includes many core features, including:</p>
+    <ul class="core-list">
+      <li>Specifying listeners on different ports and protocols</li>
+      <li>TLS configuration (protocol dependent)</li>
+      <li>Hostname matching (protocol dependent)</li>
+      <li>Configuring which Routes can be attached, including the ability to accept Routes from other namespaces</li>
+    </ul>
+    <p class="section-intro">For extended Gateway features, first select the Gateway Resource, and then you can choose from the following list of extended (optional) features.</p>
+    <div id="gateway-extended-wrap" style="display: none;">
+      <table class="features" id="gateway-features">
+        <thead><tr><th scope="col">Gateway</th><th scope="col">Requirement</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <h3 id="httproute">HTTPRoute</h3>
+    <table class="features" id="http-route-core">
+      <tbody></tbody>
+    </table>
+    <p class="section-intro">Controllers that pass conformance tests for HTTPRoute are guaranteed to support the following features:</p>
+    <ol class="core-list">
+      <li>Traffic splitting with weighted backends</li>
+      <li>Safe cross-namespace references with ReferenceGrant</li>
+      <li>Request header modification</li>
+      <li>Exact and prefix path matching</li>
+      <li>Hostname matching</li>
+      <li>HTTP redirects</li>
+    </ol>
+    <p class="section-intro">For extended HTTPRoute features, first select the HTTPRoute Resource, and then you can choose from the following list of extended (optional) features.</p>
+    <div id="http-route-extended-wrap" style="display: none;">
+      <table class="features" id="http-route-features">
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <h3 id="grpcroute">GRPCRoute</h3>
+    <table class="features" id="grpc-route-core">
+      <tbody></tbody>
+    </table>
+    <p class="section-intro">All GRPCRoute features are included as part of the core conformance, there are no optional features.</p>
+
+    <h3 id="tlsroute">TLSRoute</h3>
+    <table class="features" id="tls-route-core">
+      <tbody></tbody>
+    </table>
+    <p class="section-intro">All TLSRoute features are included as part of the core conformance, there are no optional features.</p>
+  </section>
+
+  <p id="wizard-data-status" class="data-status"></p>
+  <button type="button" class="recommend-btn" id="recommend-btn" disabled>Match</button>
+  <button type="button" class="reset-btn" id="reset-btn">Reset</button>
+
+  <section class="card" id="results">
+    <h2>Matching controllers</h2>
+    <div id="results-content"></div>
+  </section>
+
+  <div id="feature-desc-popup" class="feature-desc-popup" role="tooltip" aria-live="polite" hidden></div>
+
+  <script>
+    // Feature definitions: only from data.featureDefinitions (controller-wizard-data.json from generate-controller-wizard-data.py).
+    // No hardcoded defaults; single source of truth is the JSON.
+    let GATEWAY_HTTP_FEATURES = [];
+    let HTTPROUTE_FEATURES = [];
+    let HTTP_BACKEND_TLS_FEATURES = [];
+    let GRPC_FEATURES = [];
+    let TLS_FEATURES = [];
+    let HTTP_FEATURES = [];
+
+    function applyFeatureDefinitions(def) {
+      if (!def || !def.httpGateway) return;
+      GATEWAY_HTTP_FEATURES = def.httpGateway;
+      HTTPROUTE_FEATURES = def.httpRoute || [];
+      HTTP_BACKEND_TLS_FEATURES = def.httpBackendTls || [];
+      GRPC_FEATURES = def.grpc;
+      TLS_FEATURES = def.tls;
+      HTTP_FEATURES = [...GATEWAY_HTTP_FEATURES, ...HTTPROUTE_FEATURES, ...HTTP_BACKEND_TLS_FEATURES];
+    }
+
+    // Implementation data: loaded from data/controller-wizard-data.json (generated by hack/generate-controller-wizard-data.py into wizard/data/)
+    let IMPLEMENTATIONS = [];
+    let ALL_VERSIONS_DATA = null;
+    let ALL_VERSION_KEYS = []; // all API version keys, newest first (for min-version matching)
+    let CURRENT_VERSION_KEY = ''; // Set from loaded data (newest version first)
+
+    function escapeHtml(s) {
+      if (s == null) return '';
+      const t = String(s);
+      return t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function versionSegment(versionKey) {
+      const parts = (versionKey || '').replace(/^v?/, '').split('.');
+      return 'v' + (parts[0] || '1') + '.' + (parts[1] || '0');
+    }
+
+    function updateVersionLinks(versionKey) {
+      CURRENT_VERSION_KEY = versionKey || CURRENT_VERSION_KEY;
+      const seg = versionSegment(CURRENT_VERSION_KEY || 'v1.0.0');
+      const base = 'https://gateway-api.sigs.k8s.io/implementations/' + seg + '/';
+      const introLink = document.getElementById('link-intro-conformance');
+      const httpLink = document.getElementById('link-httproute');
+      const grpcLink = document.getElementById('link-grpcroute');
+      const tlsLink = document.getElementById('link-tlsroute');
+      if (introLink) { introLink.href = base; introLink.textContent = seg + ' conformance tables'; }
+      if (httpLink) httpLink.href = base + '#httproute';
+      if (grpcLink) grpcLink.href = base + '#grpcroute';
+      if (tlsLink) tlsLink.href = base + '#tlsroute';
+    }
+
+    // Unique name per section so HTTP/GRPC/TLS can be selected independently for shared feature ids
+    const RADIO_PREFIX = { http: 'req-http-', grpc: 'req-grpc-', tls: 'req-tls-' };
+
+    function getAvailableFeatureIds() {
+      const ids = new Set();
+      IMPLEMENTATIONS.forEach(impl => {
+        (impl.features || []).forEach(f => ids.add(f));
+      });
+      return ids;
+    }
+
+    function updateFeaturesForVersion() {
+      const available = IMPLEMENTATIONS.length > 0 ? getAvailableFeatureIds() : null;
+      const filter = (list) => available ? list.filter(f => available.has(f.id)) : list;
+      const gateway = filter(GATEWAY_HTTP_FEATURES).map(f => ({ id: f.id, label: f.label, description: f.description }));
+      const httpRoute = filter(HTTPROUTE_FEATURES).map(f => ({ id: f.id, label: f.label, description: f.description }));
+      const httpBackendTls = filter(HTTP_BACKEND_TLS_FEATURES).map(f => ({ id: f.id, label: f.label, description: f.description }));
+      const grpc = filter(GRPC_FEATURES);
+      const tls = filter(TLS_FEATURES);
+      const stripPrefix = (label, prefix) => label.startsWith(prefix) ? label.slice(prefix.length) : label;
+
+      renderTable('gateway-core', [{ id: 'GatewayCore', label: 'Core Features', description: '' }], 'http');
+      const gatewayRows = gateway.map(f => ({ id: f.id, label: stripPrefix(f.label, 'Gateway '), description: f.description }));
+      renderTable('gateway-features', gatewayRows, 'http');
+
+      renderTable('http-route-core', [{ id: 'HTTPRouteCore', label: 'Core Features', description: '' }], 'http');
+
+      const httpRouteRows = [];
+      if (httpRoute.length > 0) {
+        httpRouteRows.push({ subhead: 'HTTPRoute' });
+        httpRoute.forEach(f => httpRouteRows.push({ id: f.id, label: stripPrefix(f.label, 'HTTPRoute '), description: f.description }));
+      }
+      if (httpBackendTls.length > 0) {
+        httpRouteRows.push({ subhead: 'Backend TLS' });
+        httpBackendTls.forEach(f => httpRouteRows.push({ id: f.id, label: stripPrefix(f.label, 'Backend TLS '), description: f.description }));
+      }
+      renderTable('http-route-features', httpRouteRows, 'http');
+
+      renderTable('grpc-route-core', [{ id: 'GRPCRouteCore', label: 'Core Features', description: '' }], 'grpc');
+      renderTable('tls-route-core', [{ id: 'TLSRouteCore', label: 'Core Features', description: '' }], 'tls');
+      updateGatewayExtendedVisibility();
+      updateHttpRouteExtendedVisibility();
+    }
+
+    function updateGatewayExtendedVisibility() {
+      const wrap = document.getElementById('gateway-extended-wrap');
+      const coreCheckboxes = document.querySelectorAll('input[name="req-http-GatewayCore"]');
+      const anyChecked = Array.from(coreCheckboxes).some(cb => cb.checked);
+      if (wrap) {
+        wrap.style.display = anyChecked ? 'block' : 'none';
+      }
+    }
+
+    function updateHttpRouteExtendedVisibility() {
+      const wrap = document.getElementById('http-route-extended-wrap');
+      const coreCheckboxes = document.querySelectorAll('input[name="req-http-HTTPRouteCore"]');
+      const anyChecked = Array.from(coreCheckboxes).some(cb => cb.checked);
+      if (wrap) {
+        wrap.style.display = anyChecked ? 'block' : 'none';
+      }
+    }
+
+    function renderTable(tableId, rows, section) {
+      const tbody = document.querySelector(`#${tableId} tbody`);
+      const prefix = RADIO_PREFIX[section];
+      tbody.innerHTML = rows.map((row) => {
+        if (row.subhead) return `<tr class="feature-subhead"><th scope="col">${escapeHtml(row.subhead)}</th><th scope="col">Requirement</th></tr>`;
+        if (row.spacer) return '<tr class="feature-spacer"><td colspan="2"></td></tr>';
+        const { id, label, description, mustHaveOnly } = row;
+        const name = prefix + id;
+        const dataDesc = description ? ` data-description="${escapeHtml(description)}"` : '';
+        const cellClass = description ? 'feature-label-cell' : '';
+        const requirementCell = mustHaveOnly
+          ? `<label><input type="checkbox" name="${name}" value="must" /> Must have</label>`
+          : `
+            <label><input type="checkbox" name="${name}" value="must" /> Must have</label>
+            <label><input type="checkbox" name="${name}" value="good" /> Nice to have</label>
+          `;
+        return `
+        <tr>
+          <td class="${cellClass}"${dataDesc}>${escapeHtml(label)}</td>
+          <td>${requirementCell}</td>
+        </tr>
+      `;
+      }).join('');
+      tbody.querySelectorAll('input[type="checkbox"]').forEach((cb) => {
+        cb.addEventListener('change', function () {
+          if (this.checked) {
+            document.querySelectorAll(`input[name="${this.name}"]`).forEach((other) => {
+              if (other !== this) other.checked = false;
+            });
+          }
+        });
+      });
+      setupFeatureDescPopup();
+    }
+
+    function setupCoreOptionMutualExclusion() {}
+
+    function setupFeatureDescPopup() {
+      const popup = document.getElementById('feature-desc-popup');
+      if (!popup || popup.hasAttribute('data-initialized')) return;
+      popup.setAttribute('data-initialized', '1');
+      document.body.addEventListener('click', function (e) {
+        const cell = e.target.closest('td.feature-label-cell[data-description]');
+        if (cell) {
+          e.preventDefault();
+          const desc = cell.getAttribute('data-description');
+          if (popup.getAttribute('data-open') === '1' && popup.textContent === desc) {
+            popup.hidden = true;
+            popup.removeAttribute('data-open');
+            return;
+          }
+          popup.textContent = desc || '';
+          popup.hidden = false;
+          popup.setAttribute('data-open', '1');
+          const rect = cell.getBoundingClientRect();
+          popup.style.left = rect.left + 'px';
+          popup.style.top = (rect.bottom + 4) + 'px';
+          popup.style.maxWidth = Math.max(280, Math.min(400, window.innerWidth - rect.left - 16)) + 'px';
+          return;
+        }
+        if (!popup.contains(e.target)) {
+          popup.hidden = true;
+          popup.removeAttribute('data-open');
+        }
+      });
+    }
+
+    function resetAll() {
+      const sections = [
+        { section: 'http', features: [{ id: 'GatewayCore' }, { id: 'HTTPRouteCore' }, ...GATEWAY_HTTP_FEATURES, ...HTTPROUTE_FEATURES, ...HTTP_BACKEND_TLS_FEATURES] },
+        { section: 'grpc', features: [{ id: 'GRPCRouteCore' }] },
+        { section: 'tls', features: [{ id: 'TLSRouteCore' }] },
+      ];
+      sections.forEach(({ section, features }) => {
+        const prefix = RADIO_PREFIX[section];
+        features.forEach(({ id }) => {
+          document.querySelectorAll(`input[name="${prefix}${id}"]`).forEach((el) => { el.checked = false; });
+        });
+      });
+      document.getElementById('results').classList.remove('visible');
+      const statusEl = document.getElementById('wizard-data-status');
+      if (statusEl) statusEl.textContent = '';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      updateGatewayExtendedVisibility();
+      updateHttpRouteExtendedVisibility();
+      updateGrpcRouteExtendedVisibility();
+      updateTlsRouteExtendedVisibility();
+    }
+
+    function getSelections() {
+      const sections = [
+        { name: 'http', features: [{ id: 'GatewayCore' }, { id: 'HTTPRouteCore' }, ...GATEWAY_HTTP_FEATURES, ...HTTPROUTE_FEATURES, ...HTTP_BACKEND_TLS_FEATURES] },
+        { name: 'grpc', features: [{ id: 'GRPCRouteCore' }] },
+        { name: 'tls', features: [{ id: 'TLSRouteCore' }] },
+      ];
+      const must = [];
+      const good = [];
+      sections.forEach(({ name: section, features }) => {
+        features.forEach(({ id }) => {
+          const el = document.querySelector(`input[name="${RADIO_PREFIX[section]}${id}"]:checked`);
+          if (!el) return;
+          if (el.value === 'must') {
+            must.push({ section, id });
+          } else if (el.value === 'good') {
+            good.push({ section, id });
+          }
+        });
+      });
+      const mustSet = new Set(must.map(m => m.section + '\0' + m.id));
+      const goodFiltered = good.filter(sel => !mustSet.has(sel.section + '\0' + sel.id));
+      return { must, good: goodFiltered };
+    }
+
+    function recommend() {
+      const resultsContent = document.getElementById('results-content');
+      const resultsDiv = document.getElementById('results');
+      const statusEl = document.getElementById('wizard-data-status');
+      resultsContent.innerHTML = '';
+      resultsDiv.classList.remove('visible');
+      if (statusEl) statusEl.textContent = '';
+
+      if (IMPLEMENTATIONS.length === 0) {
+        resultsContent.innerHTML = '<p class="no-results">No implementation data loaded. Run <code>python hack/generate-controller-wizard-data.py --all</code> to generate <code>site-src/wizard/data/controller-wizard-data.json</code>, then serve from <code>site-src/</code> (e.g. <code>python -m http.server 8000</code>), or open the wizard from the built site.</p>';
+        resultsDiv.classList.add('visible');
+        resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        return;
+      }
+      const { must, good } = getSelections();
+      const setStatusAfterRecommend = (recommendedCount) => {
+        if (statusEl) {
+          statusEl.textContent = recommendedCount === 1
+            ? '1 controller matches.'
+            : `${recommendedCount} controllers match.`;
+        }
+      };
+      if (must.length === 0 && good.length === 0) {
+        resultsContent.innerHTML = '<p class="no-results">Select at least one requirement as Must have or Nice to have, then click Match.</p>';
+        resultsDiv.classList.add('visible');
+        resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        setStatusAfterRecommend(0);
+        return;
+      }
+
+      const scored = IMPLEMENTATIONS.map(impl => {
+        const supported = new Set(impl.features);
+        const conformanceSet = new Set(impl.conformance || []);
+        const hasFeature = (id) => {
+          if (id === 'HTTPRouteCore' || id === 'GatewayCore') return conformanceSet.has('Core');
+          if (id === 'GRPCRouteCore') return conformanceSet.has('GRPCRoute');
+          if (id === 'TLSRouteCore') return conformanceSet.has('TLSRoute');
+          return supported.has(id);
+        };
+        let mustCount = 0;
+        let goodCount = 0;
+        const missing = [];
+        must.forEach(({ section, id }) => {
+          const ok = hasFeature(id);
+          if (ok) mustCount++; else missing.push({ section, id });
+        });
+        good.forEach(({ section, id }) => {
+          const ok = hasFeature(id);
+          if (ok) goodCount++; else missing.push({ section, id });
+        });
+        return {
+          ...impl,
+          mustCount,
+          goodCount,
+          mustTotal: must.length,
+          goodTotal: good.length,
+          missing,
+        };
+      }).filter(c => c.mustCount >= 1 || (must.length === 0 && c.goodCount >= 1));
+
+      if (scored.length === 0) {
+        resultsContent.innerHTML = '<p class="no-results">No controller supports any of your Must have requirements. Try relaxing to Nice to have or fewer requirements.</p>';
+        resultsDiv.classList.add('visible');
+        resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        setStatusAfterRecommend(0);
+        return;
+      }
+
+      scored.sort((a, b) => {
+        if (b.mustCount !== a.mustCount) return b.mustCount - a.mustCount;
+        if (b.goodCount !== a.goodCount) return b.goodCount - a.goodCount;
+        return new Date(b.reportDate) - new Date(a.reportDate);
+      });
+
+      const featureLabel = (section, id) => {
+        const isCore = id === 'HTTPRouteCore' || id === 'GatewayCore' || id === 'GRPCRouteCore' || id === 'TLSRouteCore';
+        if (isCore) {
+          let resourceName = '';
+          if (id === 'GatewayCore') resourceName = 'Gateway';
+          else if (id === 'HTTPRouteCore') resourceName = 'HTTPRoute';
+          else if (id === 'GRPCRouteCore') resourceName = 'GRPCRoute';
+          else if (id === 'TLSRouteCore') resourceName = 'TLSRoute';
+          else resourceName = section;
+          return `[${resourceName}] Core Features`;
+        }
+        const f = HTTP_FEATURES.find(x => x.id === id) || GRPC_FEATURES.find(x => x.id === id) || TLS_FEATURES.find(x => x.id === id);
+        const label = f ? f.label : id;
+        if (section === 'grpc') return '(GRPC) ' + label;
+        if (section === 'tls') return '(TLS) ' + label;
+        return label;
+      };
+
+      const html = `
+        <table class="results">
+          <thead>
+            <tr>
+              <th>Organization</th>
+              <th>Project</th>
+              <th>Conformance</th>
+              <th>Must have</th>
+              <th>Nice to have</th>
+              <th>Missing</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${scored.map(c => `
+              <tr>
+                <td>${escapeHtml(c.organization || '')}</td>
+                <td><a href="${escapeHtml(c.url || '#')}" target="_blank" rel="noopener">${escapeHtml(c.project || '')}</a> ${escapeHtml(c.version || '')}</td>
+                <td>${c.conformance.join(', ')}</td>
+                <td>${c.mustCount}/${c.mustTotal}</td>
+                <td>${c.goodCount}/${c.goodTotal}</td>
+                <td class="missing">${c.missing.length ? c.missing.map(({ section, id }) => featureLabel(section, id)).join(', ') : '—'}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+      resultsContent.innerHTML = html;
+      resultsDiv.classList.add('visible');
+      resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setStatusAfterRecommend(scored.length);
+    }
+
+    function versionCompare(a, b) {
+      const pa = (a || '').replace(/^v/, '').split('.').map(Number);
+      const pb = (b || '').replace(/^v/, '').split('.').map(Number);
+      for (let i = 0; i < 3; i++) {
+        const na = pa[i] || 0, nb = pb[i] || 0;
+        if (na !== nb) return na - nb;
+      }
+      return 0;
+    }
+
+    function buildImplsForMinVersion(minVersion) {
+      if (!ALL_VERSIONS_DATA || !ALL_VERSION_KEYS || ALL_VERSION_KEYS.length === 0) return [];
+      const keysGEQ = ALL_VERSION_KEYS.filter(k => versionCompare(k, minVersion) >= 0);
+      if (keysGEQ.length === 0) return [];
+      const seen = new Set();
+      const controllerKey = (impl) => [impl.organization, impl.project].join('\0');
+      const result = [];
+      keysGEQ.forEach(apiVersion => {
+        (ALL_VERSIONS_DATA[apiVersion] || []).forEach(impl => {
+          const key = controllerKey(impl);
+          if (!seen.has(key)) {
+            seen.add(key);
+            result.push(impl);
+          }
+        });
+      });
+      return result;
+    }
+
+    function applyVersion(minVersionKey) {
+      if (!ALL_VERSIONS_DATA) return;
+      IMPLEMENTATIONS = buildImplsForMinVersion(minVersionKey);
+      updateFeaturesForVersion();
+      updateVersionLinks(minVersionKey);
+      const statusEl = document.getElementById('wizard-data-status');
+      statusEl.textContent = IMPLEMENTATIONS.length ? '' : `No implementations for minimum version ${minVersionKey}.`;
+      document.getElementById('results').classList.remove('visible');
+    }
+
+    function loadImplementations() {
+      const statusEl = document.getElementById('wizard-data-status');
+      const btn = document.getElementById('recommend-btn');
+      const versionRow = document.getElementById('version-row');
+      const versionSelect = document.getElementById('version-select');
+      statusEl.textContent = 'Loading implementation data…';
+      fetch('data/controller-wizard-data.json')
+        .then(r => {
+          if (!r.ok) throw new Error(r.statusText || r.status);
+          return r.json();
+        })
+        .then(data => {
+          if (Array.isArray(data)) {
+            ALL_VERSIONS_DATA = null;
+            IMPLEMENTATIONS = data;
+            updateFeaturesForVersion();
+            updateVersionLinks();
+            versionRow.style.display = 'none';
+            statusEl.textContent = IMPLEMENTATIONS.length ? '' : 'No implementations in data file.';
+          } else if (data && typeof data === 'object' && !Array.isArray(data)) {
+            if (data.featureDefinitions) applyFeatureDefinitions(data.featureDefinitions);
+            if (data.implementations != null) {
+              ALL_VERSIONS_DATA = null;
+              IMPLEMENTATIONS = data.implementations;
+              updateFeaturesForVersion();
+              updateVersionLinks();
+              versionRow.style.display = 'none';
+              statusEl.textContent = IMPLEMENTATIONS.length ? '' : 'No implementations in data file.';
+            } else {
+              const versionKeys = Object.keys(data).filter(k => k !== 'featureDefinitions');
+              // Sort newest-first so new releases (e.g. v1.5.0) appear at top of dropdown
+              const sorted = versionKeys.sort((a, b) => {
+                const pa = a.replace(/^v/, '').split('.').map(Number);
+                const pb = b.replace(/^v/, '').split('.').map(Number);
+                for (let i = 0; i < 3; i++) {
+                  const na = pa[i] || 0, nb = pb[i] || 0;
+                  if (nb !== na) return nb - na;
+                }
+                return 0;
+              });
+              ALL_VERSION_KEYS = sorted;
+              const MAX_VERSIONS_IN_DROPDOWN = 3;
+              const versions = sorted.slice(0, MAX_VERSIONS_IN_DROPDOWN);
+              if (versions.length === 0) {
+                IMPLEMENTATIONS = [];
+                statusEl.textContent = 'No versions in data file.';
+              } else {
+                ALL_VERSIONS_DATA = data;
+                versionSelect.innerHTML = versions.map(v => `<option value="${v}">${v}</option>`).join('');
+                versionRow.style.display = 'block';
+                applyVersion(versions[0]);
+                versionSelect.onchange = () => applyVersion(versionSelect.value);
+              }
+            }
+          } else {
+            IMPLEMENTATIONS = [];
+            statusEl.textContent = 'Invalid data format.';
+          }
+          btn.disabled = false;
+        })
+        .catch(() => {
+          IMPLEMENTATIONS = [];
+          ALL_VERSIONS_DATA = null;
+          statusEl.textContent = 'Could not load wizard/data/controller-wizard-data.json. Run python hack/generate-controller-wizard-data.py --all and serve from site-src/ (e.g. python -m http.server 8000).';
+          versionRow.style.display = 'none';
+          btn.disabled = false;
+        });
+    }
+
+    loadImplementations();
+    setupCoreOptionMutualExclusion();
+    document.body.addEventListener('change', function (e) {
+      if (e.target.matches && e.target.matches('input[name="req-http-HTTPRouteCore"]')) {
+        updateHttpRouteExtendedVisibility();
+      }
+      if (e.target.matches && e.target.matches('input[name="req-http-GatewayCore"]')) {
+        updateGatewayExtendedVisibility();
+      }
+    });
+    document.getElementById('recommend-btn').addEventListener('click', recommend);
+    document.getElementById('reset-btn').addEventListener('click', resetAll);
+  </script>
+</body>
+
+</html>

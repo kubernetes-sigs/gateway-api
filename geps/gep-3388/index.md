@@ -3,7 +3,7 @@
 * Issue: [#3388](https://github.com/kubernetes-sigs/gateway-api/issues/3388)
 * Status: Experimental
 
-(See [status definitions](../overview.md#gep-states).)
+(See [status definitions](/enhancements/overview/#gep-states).)
 
 ## TLDR
 
@@ -279,7 +279,7 @@ TODO
 
 ## References
 
-* <https://gateway-api.sigs.k8s.io/geps/gep-1731/>
+* [GEP-1731](../gep-1731/index.md)
 * <https://finagle.github.io/blog/2016/02/08/retry-budgets/>
 * <https://linkerd.io/2019/02/22/how-we-designed-retries-in-linkerd-2-2/>
 * <https://linkerd.io/2.11/tasks/configuring-retries/>

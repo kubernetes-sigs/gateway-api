@@ -1,0 +1,21 @@
+<script>
+  function forceExpandSidebar() {
+    // 1. For newer Docsy versions: the checkboxes do not have a specific class
+    document.querySelectorAll('.td-sidebar-nav input[type="checkbox"]').forEach(function(checkbox) {
+      checkbox.checked = true;
+    });
+
+    // 2. For older Docsy versions using Bootstrap collapse
+    document.querySelectorAll('.td-sidebar-nav ul.collapse').forEach(function(ul) {
+      ul.classList.add('show');
+    });
+    document.querySelectorAll('.td-sidebar-nav [data-bs-toggle="collapse"], .td-sidebar-nav [data-toggle="collapse"]').forEach(function(a) {
+      a.classList.remove('collapsed');
+      a.setAttribute('aria-expanded', 'true');
+    });
+  }
+  
+  // Run immediately and also on load to ensure it overrides Bootstrap 5's auto-initialization
+  forceExpandSidebar();
+  window.addEventListener('load', forceExpandSidebar);
+</script>

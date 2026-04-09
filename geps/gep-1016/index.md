@@ -7,7 +7,7 @@
 > our GEP overview as it existed before those rules did, and so it has been
 > explicitly grandfathered in.
 
-[expprob]:../overview.md#probationary-period
+[expprob]:/enhancements/overview/#probationary-period
 
 ## Goal
 

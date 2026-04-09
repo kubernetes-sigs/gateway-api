@@ -3,7 +3,7 @@
 * Issue: [#3792](https://github.com/kubernetes-sigs/gateway-api/issues/3792)
 * Status: Provisional
 
-(See [status definitions](../overview.md#gep-states).)
+(See [status definitions](/enhancements/overview/#gep-states).)
 
 ## User Story
 
@@ -19,8 +19,8 @@ cluster, for various reasons which are out of the scope of this GEP. Chihiro
 and Ian want to be able to use these out-of-cluster proxies effectively and
 safely, though they recognize that this may require additional configuration.
 
-[Chihiro]: ../../concepts/roles-and-personas.md#chihiro
-[Ian]: ../../concepts/roles-and-personas/#ian
+[Chihiro]: /docs/concepts/roles-and-personas.md#chihiro
+[Ian]: /docs/concepts/roles-and-personas/#ian
 
 ### Nomenclature and Background
 
@@ -241,7 +241,7 @@ or Mesh resources.
 ## Graduation Criteria
 
 In addition to the [general graduation
-criteria](/concepts/versioning#graduation-criteria), this GEP must also
+criteria](/docs/concepts/versioning#graduation-criteria), this GEP must also
 guarantee that **all four** of the problems listed above need resolutions, and
 must have implementation from at least two different Gateways and two
 different meshes.

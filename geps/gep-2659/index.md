@@ -4,7 +4,7 @@
 * Type: Memorandum
 * Status: Accepted
 
-(See [status definitions](../overview.md#gep-states).)
+(See [status definitions](/enhancements/overview/#gep-states).)
 
 ## TLDR
 
