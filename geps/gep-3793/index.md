@@ -3,7 +3,7 @@
 * Issue: [#3793](https://github.com/kubernetes-sigs/gateway-api/issues/3793)
 * Status: Implementable
 
-(See [status definitions](../overview.md#gep-states).)
+(See [status definitions](/enhancements/overview/#gep-states).)
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
 "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this
@@ -216,9 +216,9 @@ Ana has easy access to this information, and that it's clear enough for her to
 understand, is clearly important for many more reasons than just default
 Gateways.
 
-[Ana]: ../../concepts/roles-and-personas/#ana
-[Chihiro]: ../../concepts/roles-and-personas/#chihiro
-[Ian]: ../../concepts/roles-and-personas/#ian
+[Ana]: /docs/concepts/roles-and-personas/#ana
+[Chihiro]: /docs/concepts/roles-and-personas/#chihiro
+[Ian]: /docs/concepts/roles-and-personas/#ian
 
 ## API
 
