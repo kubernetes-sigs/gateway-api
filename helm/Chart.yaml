@@ -1,0 +1,14 @@
+apiVersion: v2
+name: gateway-api
+description: Kubernetes Gateway API Custom Resource Definitions
+type: application
+version: 0.0.0
+appVersion: "0.0.0"
+keywords:
+  - gateway-api
+  - crds
+  - kubernetes
+  - networking
+home: https://gateway-api.sigs.k8s.io
+sources:
+  - https://github.com/kubernetes-sigs/gateway-api
