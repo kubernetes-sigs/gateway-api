@@ -86,6 +86,12 @@ type BackendTLSPolicySpecApplyConfiguration struct {
 	// Note that this config applies to the entire referenced resource
 	// by default, but this default may change in the future to provide
 	// a more granular application of the policy.
+	//
+	// <gateway:util:excludeFromCRD>
+	// Mirrors the parentRefs consistency/uniqueness rules from CommonRouteSpec.ParentRefs.
+	// Requires distinct, non-empty sectionNames when the same target appears more than once.
+	// Namespace is not checked because targetRefs only supports same-namespace targets.
+	// </gateway:util:excludeFromCRD>
 	TargetRefs []LocalPolicyTargetReferenceWithSectionNameApplyConfiguration `json:"targetRefs,omitempty"`
 	// Validation contains backend TLS validation configuration.
 	Validation *BackendTLSPolicyValidationApplyConfiguration `json:"validation,omitempty"`
