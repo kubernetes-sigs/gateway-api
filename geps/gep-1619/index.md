@@ -761,6 +761,9 @@ implementations, such as cloud-based global load balancers, don't have the capab
 - Across all BackendTrafficPolicies
 - Between route-level session persistence and BackendTrafficPolicy configurations
 
+Implementations MAY additionally enforce this uniqueness requirement via a ValidatingAdmissionPolicy,
+but controllers MUST still validate this constraint regardless, as VAPs may be removed by users.
+
 **Rationale for uniqueness requirement:**
 - Avoids "action at a distance" where creating one route changes another route's behavior
 - Prevents configuration conflicts when routes use the same name but different settings
