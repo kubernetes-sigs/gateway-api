@@ -42,31 +42,6 @@ def process_feature_name(feature):
     return ' '.join(words)
 
 
-def load_feature_channels():
-    feature_constants = {}
-    feature_channels = {}
-
-    for path in Path("pkg/features").glob("*.go"):
-        contents = path.read_text()
-        for const_name, feature_name in re.findall(r'([A-Za-z0-9_]+)(?:\s+FeatureName)?\s*=\s*"([^"]+)"', contents):
-            feature_constants[const_name] = feature_name
-        for const_name, channel in re.findall(
-            r'Name:\s*([A-Za-z0-9_]+),\s*[\r\n]+\s*Channel:\s*FeatureChannel(Standard|Experimental)',
-            contents,
-        ):
-            feature_name = feature_constants.get(const_name)
-            if feature_name:
-                feature_channels[process_feature_name(feature_name)] = channel.lower()
-
-    # Historical reports used the pre-rename feature name.
-    feature_channels[process_feature_name("HTTPResponseHeaderModification")] = "standard"
-
-    return feature_channels
-
-
-FEATURE_CHANNELS = load_feature_channels()
-
-
 @plugins.event_priority(100)
 def on_files(files, config, **kwargs):
     log.info("generating conformance")
@@ -177,7 +152,20 @@ def generate_conformance_tables(reports, currVersion, mkdocsConfig):
 
 def generate_profiles_report(reports, route, version):
 
-    http_reports = reports.loc[reports["name"] == route]
+    http_reports = reports.loc[reports["name"] == route].copy()
+    for column in [
+        "extended.result",
+        "core.statistics.Passed",
+        "core.statistics.Failed",
+        "core.statistics.Skipped",
+        "extended.statistics.Passed",
+        "extended.statistics.Failed",
+        "extended.statistics.Skipped",
+        "extended.supportedFeatures",
+        "extended.unsupportedFeatures",
+    ]:
+        if column not in http_reports.columns:
+            http_reports[column] = 0 if ".statistics." in column else None
     http_reports.set_index('organization')
     http_reports.sort_values(
         ['organization', 'version'],
@@ -189,52 +177,99 @@ def generate_profiles_report(reports, route, version):
         columns=http_reports['organization'])
 
     http_table = http_reports[['organization', 'project',
-                               'version', 'mode', 'core.result', 'extended.supportedFeatures']].T
+                               'version', 'mode', 'core.result', 'extended.result',
+                               'core.statistics.Passed', 'core.statistics.Failed', 'core.statistics.Skipped',
+                               'extended.statistics.Passed', 'extended.statistics.Failed', 'extended.statistics.Skipped',
+                               'extended.supportedFeatures',
+                               'extended.unsupportedFeatures']].T
     http_table.columns = http_table.iloc[0]
     http_table = http_table[1:].T
     # change core.result value
 
-    for row in http_table.itertuples():
-        if row._4 == "success":
-            http_table.loc[(row.Index, 'core.result')] = ':white_check_mark:'
-        else:
-            http_table.loc[(row.Index, 'core.result')] = ':x:'
+    for idx, row in http_table.iterrows():
+        row_filter = (http_table.index == idx) & \
+                     (http_table['project'] == row['project']) & \
+                     (http_table['version'] == row['version']) & \
+                     (http_table['mode'] == row['mode'])
 
-        if type(row._5) is list:
-            for feat in row._5:
-                # Process feature name before using it as a column
+        if row['core.result'] == "success":
+            http_table.loc[row_filter, 'core.result'] = ':white_check_mark:'
+        else:
+            http_table.loc[row_filter, 'core.result'] = ':x:'
+
+        if isinstance(row['extended.supportedFeatures'], list):
+            for feat in row['extended.supportedFeatures']:
                 processed_feat = process_feature_name(feat)
-                http_table.loc[(http_table.index == row.Index) & \
-                               (http_table['project'] == row.project) & \
-                               (http_table['version'] == row.version) & \
-                               (http_table['mode'] == row.mode), processed_feat] = ':white_check_mark:'
+                http_table.loc[row_filter, processed_feat] = ':white_check_mark:'
+        if isinstance(row['extended.unsupportedFeatures'], list):
+            for feat in row['extended.unsupportedFeatures']:
+                processed_feat = process_feature_name(feat)
+                http_table.loc[row_filter, processed_feat] = ':x:'
     http_table = http_table.fillna(':x:')
-    http_table = http_table.drop(['extended.supportedFeatures'], axis=1)
 
     http_table = http_table.rename(
-        columns={"project": "Project", "version": "Version", "mode": "Mode", "core.result": "Core"})
-    metadata_columns = ["Project", "Version", "Mode", "Core"]
-    feature_columns = [c for c in http_table.columns if c not in metadata_columns]
-    standard_feature_columns = [c for c in feature_columns if FEATURE_CHANNELS.get(c, "standard") == "standard"]
-    experimental_feature_columns = [c for c in feature_columns if FEATURE_CHANNELS.get(c) == "experimental"]
+        columns={
+            "project": "Project",
+            "version": "Version",
+            "mode": "Mode",
+            "core.result": "Core",
+            "extended.result": "Extended Result",
+            "core.statistics.Passed": "Core Passed",
+            "core.statistics.Failed": "Core Failed",
+            "core.statistics.Skipped": "Core Skipped",
+            "extended.statistics.Passed": "Extended Passed",
+            "extended.statistics.Failed": "Extended Failed",
+            "extended.statistics.Skipped": "Extended Skipped",
+        })
 
-    def format_total(columns):
-        total = len(columns)
-        if total == 0:
-            return ['0/0'] * len(http_table.index)
-        checks = (http_table[columns] == ':white_check_mark:').sum(axis=1)
-        return checks.map(lambda count: f"{count}/{total}")
+    def stat_value(value):
+        if pandas.isna(value) or value == ':x:':
+            return 0
+        return int(value)
 
-    http_table["Standard Features"] = format_total(standard_feature_columns)
-    http_table["Experimental Features"] = format_total(experimental_feature_columns)
+    def count_features(features):
+        if isinstance(features, list):
+            return len(features)
+        return 0
+
+    def build_features_cell(row):
+        core_total = stat_value(row['Core Passed']) + stat_value(row['Core Failed']) + stat_value(row['Core Skipped'])
+        core_failed = stat_value(row['Core Failed'])
+        extended_total = stat_value(row['Extended Passed']) + stat_value(row['Extended Failed']) + stat_value(row['Extended Skipped'])
+        extended_failed = stat_value(row['Extended Failed'])
+        extended_skipped = stat_value(row['Extended Skipped'])
+        supported_features = count_features(row['extended.supportedFeatures'])
+        unsupported_features = count_features(row['extended.unsupportedFeatures'])
+        total_features = supported_features + unsupported_features
+
+        lines = []
+        if core_failed > 0 and core_total > 0:
+            lines.append(f"<b>Failing {core_failed}/{core_total} core tests</b>")
+        lines.append(f"{supported_features}/{total_features} features")
+        if row['Extended Result'] == 'partial' and extended_total > 0:
+            lines.append(f"<b>Partially conformant; {extended_skipped}/{extended_total} tests skipped</b>")
+        elif row['Extended Result'] == 'failure' and extended_total > 0:
+            lines.append(f"<b>Failing {extended_failed}/{extended_total} tests</b>")
+        return '<br>'.join(lines)
+
+    http_table["Extended Features"] = http_table.apply(build_features_cell, axis=1)
+    http_table = http_table.drop([
+        'Extended Result',
+        'Core Passed',
+        'Core Failed',
+        'Core Skipped',
+        'Extended Passed',
+        'Extended Failed',
+        'Extended Skipped',
+        'extended.supportedFeatures',
+        'extended.unsupportedFeatures',
+    ], axis=1)
     if "Mode" in http_table.columns:
         insert_at = http_table.columns.get_loc("Mode") + 1
     else:
         insert_at = http_table.columns.get_loc("Version") + 1
-    experimental_col = http_table.pop("Experimental Features")
-    standard_col = http_table.pop("Standard Features")
-    http_table.insert(insert_at, "Standard Features", standard_col)
-    http_table.insert(insert_at + 1, "Experimental Features", experimental_col)
+    features_col = http_table.pop("Extended Features")
+    http_table.insert(insert_at, "Extended Features", features_col)
 
     if semver.compare(version.removeprefix('v'), '1.4.0') < 0:
         http_table = http_table.drop(columns=["Core"])
