@@ -1,1 +1,1 @@
-FROM gcr.io/istio-release/app:1.21.2
+FROM gcr.io/istio-release/app:1.28.5
