@@ -3,8 +3,7 @@
 ???+ info "Extended Support Feature: HTTPRouteRequestMirror"
     This feature is part of extended support. For more information on support levels, refer to our [conformance guide](../concepts/conformance.md).
 
-The [HTTPRoute resource](../api-types/httproute.md) can be used to mirror
-requests to multiple backends. This is useful for testing new services with
+The [HTTPRoute resource](../api-types/httproute.md) can be used to [mirror requests](../../reference/spec/#httprequestmirrorfilter) to multiple backends. This is useful for testing new services with
 production traffic.
 
 Mirrored requests will only be sent to one single destination endpoint
