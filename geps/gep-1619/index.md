@@ -3,7 +3,7 @@
 * Issue: [#1619](https://github.com/kubernetes-sigs/gateway-api/issues/1619)
 * Status: Experimental
 
-(See [status definitions](../overview.md#gep-states).)
+(See [status definitions](/enhancements/overview/#gep-states).)
 
 ## Graduation Criteria
 
@@ -428,7 +428,7 @@ We will present two distinct patterns for configuring session persistence:
 
 ### BackendLBPolicy API
 
-In order to apply session persistence configuration to a backend, we will implement it as a [Policy Attachment](../../reference/policy-attachment.md).
+In order to apply session persistence configuration to a backend, we will implement it as a [Policy Attachment](/reference/policy-attachment).
 The new metaresource is named `BackendLBPolicy` and is responsible for configuring load balancing-related configuration
 for traffic intended for a backend after routing has occurred. It is defined as a [Direct Policy Attachment](../gep-713/index.md#direct-policy-attachment)
 without defaults or overrides, applied to the targeted backend.
@@ -661,7 +661,7 @@ their preferred form of session persistence if desired.
 
 ### Target Persona
 
-Referring to the [Gateway API Security Model](../../concepts/security.md#roles-and-personas),
+Referring to the [Gateway API Security Model](/docs/concepts/security/#roles-and-personas),
 the target kubernetes role/persona for session persistence are application developers, as mentioned in the [When does an application require session persistence?](#when-does-an-application-require-session-persistence)
 section. It is the responsibility of the application developers to adjust the persistence configuration to ensure the
 functionality of their applications.
@@ -678,7 +678,7 @@ route in any given implementation.
 
 The new `BackendLBPolicy` metaresource only supports attaching to a backend. A backend can be a Service,
 ServiceImport (see [GEP-1748](../gep-1748/index.md)), or any implementation-specific backends that are a valid
-[`BackendObjectReference`](../../reference/spec.md#backendobjectreference). Enabling session
+[`BackendObjectReference`](/reference/api-spec/main/spec/#backendobjectreference). Enabling session
 persistence for a backend enables subsequently enables it for any route directing traffic to this backend. To learn more
 about the process of attaching a policy to a backend, please refer to [GEP-713](../gep-713/index.md).
 
@@ -811,9 +811,9 @@ might not function as expected. In such cases, it's acceptable to make appropria
 
 ### Session Persistence API with GAMMA
 
-The object of the [GAMMA (Gateway API for Mesh Management and Administration)](../../mesh/gamma.md)
+The object of the [GAMMA (Gateway API for Mesh Management and Administration)](/docs/mesh/gamma.md)
 initiative is to provide support for service mesh and mesh-adjacent use-cases with Gateway API. GAMMA is focused on
-defining how Gateway API could also be used for inter-service or [east/west](../../concepts/glossary.md#eastwest-traffic)
+defining how Gateway API could also be used for inter-service or [east/west](/docs/glossary/#eastwest-traffic)
 traffic within the same cluster.
 
 Given that service meshes commonly have session persistence requirements, this API design should take into consideration
@@ -1229,6 +1229,6 @@ Though session persistence is a ubiquitous name, session affinity is more incons
 - [Kube-Proxy Session Affinity](https://kubernetes.io/docs/reference/networking/virtual-ips/#session-affinity)
 - [GEP-713: Metaresources and PolicyAttachment](../gep-713/index.md)
 - [RFC6265](https://www.rfc-editor.org/rfc/rfc6265)
-- [Policy Attachment](../../reference/policy-attachment.md)
+- [Policy Attachment](/reference/policy-attachment)
 - [Envoy Session Persistence Design Doc](https://docs.google.com/document/d/1IU4b76AgOXijNa4sew1gfBfSiOMbZNiEt5Dhis8QpYg/edit#heading=h.sobqsca7i45e)
 - [Envoy Session Persistence Issue](https://github.com/envoyproxy/envoy/issues/16698)

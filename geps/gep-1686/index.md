@@ -29,7 +29,7 @@ Leveraging existing tests for common functionality between N/S and E/W implement
 
 ### Support Levels
 
-Using a conformance profile will enable granular conformance definitions for GAMMA, splitting functionality along the existing Gateway API [support levels](../../concepts/conformance.md?h=conformance+levels#2-support-levels), with required functionality as Core, standardized but optional functionality as Extended, and Implementation-specific for things beyond the current or intended scope of GAMMA configuration. It is expected that some capabilities will begin as Implementation-specific and eventually migrate to Extended or Core conformance as GAMMA matures.
+Using a conformance profile will enable granular conformance definitions for GAMMA, splitting functionality along the existing Gateway API [support levels](/docs/concepts/conformance.md?h=conformance+levels#2-support-levels), with required functionality as Core, standardized but optional functionality as Extended, and Implementation-specific for things beyond the current or intended scope of GAMMA configuration. It is expected that some capabilities will begin as Implementation-specific and eventually migrate to Extended or Core conformance as GAMMA matures.
 
 ## Tests
 

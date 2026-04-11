@@ -3,7 +3,7 @@
 * Issue: [#1731](https://github.com/kubernetes-sigs/gateway-api/issues/1731)
 * Status: Experimental
 
-(See [status definitions](../overview.md#gep-states).)
+(See [status definitions](/enhancements/overview/#gep-states).)
 
 ## TLDR
 
@@ -417,9 +417,9 @@ This may be a reasonable approach for configuring broad default retry policies, 
 
 ### HTTPRoute filter
 
-Implementing a `requestRetryPolicy` [HTTPRouteFilter](../../reference/spec.md#httproutefilter) type is likely a reasonable alternative implementation (with the downside of slightly deeping nesting and more complex structural configuration) that was not fully explored.
+Implementing a `requestRetryPolicy` [HTTPRouteFilter](/reference/api-spec/main/spec/#httproutefilter) type is likely a reasonable alternative implementation (with the downside of slightly deeping nesting and more complex structural configuration) that was not fully explored.
 
-Adding a new field to HTTPRouteRule instead is proposed for parity with the similar and intersecting configuration of [HTTPRouteTimeouts](../../reference/spec.md#httproutetimeouts).
+Adding a new field to HTTPRouteRule instead is proposed for parity with the similar and intersecting configuration of [HTTPRouteTimeouts](/reference/api-spec/main/spec/#httproutetimeouts).
 
 ## Other considerations
 
@@ -433,12 +433,12 @@ Retrying on connection errors (disconnect, reset, timeout, TCP failure) is typic
 
 ### Should whether to retry on a backend timeout be configurable?
 
-On Kubernetes, retrying should _typically_ route a backend request to a different pod if the original destination has become unhealthy and therefore should generally be safe. Even if a [BackendLBPolicy](../gep-1619/index.md) is configured, most dataplane implementations implement "soft" affinity rather than strict session routing. The warnings against this practice in NGINX and HAProxy documentation seem to reference risks with legacy deployment models using a small number of statically-defined servers. We could consider adding something like a `excludeRetryOnTimeout` boolean field (implementable by NGINX and HAProxy, not by Envoy) in the future if this behavior is desirable, while still retaining the retry-on-timeout behavior as a default.
+On Kubernetes, retrying should _typically_ route a backend request to a different pod if the original destination has become unhealthy and therefore should generally be safe. Even if a [BackendLBPolicy](/geps/gep-1619) is configured, most dataplane implementations implement "soft" affinity rather than strict session routing. The warnings against this practice in NGINX and HAProxy documentation seem to reference risks with legacy deployment models using a small number of statically-defined servers. We could consider adding something like a `excludeRetryOnTimeout` boolean field (implementable by NGINX and HAProxy, not by Envoy) in the future if this behavior is desirable, while still retaining the retry-on-timeout behavior as a default.
 
 ## References
 
 * <https://www.rfc-editor.org/rfc/rfc9110>
 * <https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml>
-* <https://gateway-api.sigs.k8s.io/geps/gep-2257/>
-* <https://gateway-api.sigs.k8s.io/geps/gep-1742/>
+* [GEP-2257](/geps/gep-2257)
+* [GEP-1742](/geps/gep-1742)
 * <https://github.com/kubernetes-sigs/gateway-api/issues/3139>

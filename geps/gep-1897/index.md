@@ -661,7 +661,7 @@ Extended support level (HTTPRoute → Service referenced in backendRefs) is cove
 
 In order to scope this GEP, some changes are deferred to a near-future GEP.
 This GEP intends to add the ability for additional control by gateway clients to override TLS settings, following previously
-established patterns of [consumer and producer policies](../../concepts/glossary.md#producer-route).
+established patterns of [consumer and producer policies](/docs/glossary/#producer-route).
 Additionally, more contextual control over when to apply the policies will be explored, to enable use cases like "apply
 TLS only from this route" ([issue](https://github.com/kubernetes-sigs/gateway-api/issues/3856)).
 
@@ -827,7 +827,7 @@ of the first standard Policy type.
 
 [GEP-713: Metaresources and PolicyAttachment](../gep-713/index.md)
 
-[Gateway API TLS](../../guides/tls.md)
+[Gateway API TLS](/guides/user-guides/tls)
 
 [SIG-NET Gateway API: TLS to the K8s.Service/Backend](https://docs.google.com/document/d/1RTYh2brg_vLX9o3pTcrWxtZSsf8Y5NQvIG52lpFcZlo)
 

@@ -3,11 +3,11 @@
 * Issue: [#3949](https://github.com/kubernetes-sigs/gateway-api/issues/3949)
 * Status: Implementable
 
-(See [status definitions](../overview.md#gep-states).)
+(See [status definitions](/enhancements/overview/#gep-states).)
 
-[Chihiro]: ../../concepts/roles-and-personas/#chihiro
-[Ian]: ../../concepts/roles-and-personas/#ian
-[Ana]: ../../concepts/roles-and-personas/#ana
+[Chihiro]: /docs/concepts/roles-and-personas/#chihiro
+[Ian]: /docs/concepts/roles-and-personas/#ian
+[Ana]: /docs/concepts/roles-and-personas/#ana
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
 "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this

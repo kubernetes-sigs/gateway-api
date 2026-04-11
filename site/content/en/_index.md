@@ -1,0 +1,7 @@
+---
+title: "gateway api"
+---
+<a href="/docs">redirecting to /docs</a>
+<script language="javascript">
+  window.location.replace("/docs");
+</script>

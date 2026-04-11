@@ -3,7 +3,7 @@
 * Issue: [#91](https://github.com/kubernetes-sigs/gateway-api/issues/91)
 * Status: Standard
 
-(See definitions in [GEP States](../overview.md#gep-states).)
+(See definitions in [GEP States](/enhancements/overview/#gep-states).)
 
 ## TLDR
 
@@ -12,14 +12,14 @@ This GEP proposes a way to validate the TLS certificate presented by the fronten
 
 ## Connection coalescing security issue
 
-Gateway API standard defines a `Listener` as "the concept of a logical endpoint where a Gateway accepts network connections." This statement is incorrect because once the connection is established (this applies to both HTTP and TLS traffic) it can be reused across multiple listeners sharing the same port. This might lead to bypassing client certificate validation configuration for a given `Listener`. Those concerns were raised in [GEP-3567](). To provide the best experience for gateway users and secure their applications, client certificate configuration needs to be introduced with finer granularity per-port (binding to TCP connection).
+Gateway API standard defines a `Listener` as "the concept of a logical endpoint where a Gateway accepts network connections." This statement is incorrect because once the connection is established (this applies to both HTTP and TLS traffic) it can be reused across multiple listeners sharing the same port. This might lead to bypassing client certificate validation configuration for a given `Listener`. Those concerns were raised in [GEP-3567](/geps/gep-3567). To provide the best experience for gateway users and secure their applications, client certificate configuration needs to be introduced with finer granularity per-port (binding to TCP connection).
 
 ## Goals
 
 * Define an API field to specify the CA Certificate within the Gateway configuration that can be used as a trust anchor to validate the certificates presented by the client.
 This use case has been highlighted in the [TLS Configuration GEP][] under segment 1 and in the [Gateway API TLS Use Cases][] document under point 7.
 * Introduce explicit client certificate validation modes that reflect common TLS behaviors (e.g., optional vs. required client certs)
-* Ensure the configuration mitigates the authentication bypass risks associated with HTTP/2 connection coalescing as described in [GEP-3567](https://gateway-api.sigs.k8s.io/geps/gep-3567/#interaction-with-client-cert-validation).
+* Ensure the configuration mitigates the authentication bypass risks associated with HTTP/2 connection coalescing as described in [GEP-3567](geps/gep-3567/#interaction-with-client-cert-validation).
 
 ## Non-Goals
 * Define other fields that can be used to verify the client certificate such as the Certificate Hash.
@@ -386,7 +386,7 @@ This GEP aims to standardize this behavior as an official part of the upstream s
 
 [TLS Handshake Protocol]: https://www.rfc-editor.org/rfc/rfc5246#section-7.4
 [Certificate Path Validation]: https://www.rfc-editor.org/rfc/rfc5280#section-6
-[BackendTLSPolicy]: ../../api-types/backendtlspolicy.md
-[TLS Configuration GEP]: ../gep-2907/index.md
+[BackendTLSPolicy]: /reference/api-types/policy/backendtlspolicy
+[TLS Configuration GEP]: geps/gep-2907
 [Gateway API TLS Use Cases]: https://docs.google.com/document/d/17sctu2uMJtHmJTGtBi_awGB0YzoCLodtR6rUNmKMCs8/edit?pli=1#heading=h.cxuq8vo8pcxm
-[GEP-3567]: https://gateway-api.sigs.k8s.io/geps/gep-3567/
+[GEP-3567]: /geps/gep-3567
