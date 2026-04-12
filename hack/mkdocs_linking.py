@@ -82,7 +82,7 @@ def _format_frontmatter_str(data: Dict[str, str]) -> str:
     return "\n".join(lines) + "\n"
 
 
-def prepare_docs(docs_dir_path: Optional[str] = None) -> None:
+def prepare_docs(docs_dir_input: Optional[str | Path] = None, dry_run: bool = False) -> None:
     """
     Scan the documentation directory for Markdown files, inject a unique permanent
     ID into the frontmatter of each file if missing, and create a redirect map
@@ -90,58 +90,99 @@ def prepare_docs(docs_dir_path: Optional[str] = None) -> None:
     and enables robust internal linking and redirect generation.
 
     Args:
-        docs_dir_path: Optional path to the documentation directory. If None,
-            uses the default DOCS_DIR.
+        docs_dir_input: Path to the documentation directory (defaults to global DOCS_DIR).
+        dry_run: If True, only preview changes without applying them.
 
     Returns:
-        None. Writes changes to Markdown files and creates/updates the redirect
-        map JSON file on disk.
+        None.
     """
-    print("Starting documentation preparation...")
+    if docs_dir_input is None:
+        docs_dir = DOCS_DIR
+    else:
+        docs_dir = Path(docs_dir_input)
+
+    print(f"Starting documentation preparation ({'DRY RUN' if dry_run else 'LIVE'})...")
+
+    # Validation: Ensure the documentation directory exists.
+    # While main() also performs this check, we keep it here for robust direct function calls.
+    if not docs_dir.exists():
+        print(f"  ERROR: Directory {docs_dir} does not exist")
+        return
+
     redirect_map: Dict[str, str] = {}
 
-    # Use global variables for when no path specified
-    if docs_dir_path is None:
-        docs_dir = DOCS_DIR
+    # Standardize redirect map file location.
+    # If docs_dir corresponds to the default DOCS_DIR, we use the global REDIRECT_MAP_FILE path.
+    # Otherwise, we place it in the parent directory of the docs_dir.
+    if docs_dir.resolve() == DOCS_DIR.resolve():
         redirect_map_file = REDIRECT_MAP_FILE
     else:
-        docs_dir = Path(docs_dir_path)
-        redirect_map_file = Path(docs_dir_path).parent / "redirect_map.json"
+        redirect_map_file = docs_dir.parent / "redirect_map.json"
 
     # Step 1: Iterate through all markdown files in the documentation directory.
-    for md_file in docs_dir.rglob("*.md"):
-        # Step 2: Read file content and extract existing frontmatter.
-        content: str = md_file.read_text("utf-8")
-        frontmatter, end_pos = _get_frontmatter(content)
-        page_id: str | None = frontmatter.get(FRONTMATTER_ID_KEY)
+    md_files = list(docs_dir.rglob("*.md"))
+    print(f"  Found {len(md_files)} markdown files.")
 
-        # Step 3: If no permanent ID exists, generate one from the file path,
-        # inject it into the frontmatter, and rewrite the file.
-        if not page_id:
-            relative_path: Path = md_file.relative_to(docs_dir)
-            page_id = str(relative_path.with_suffix("")).replace(os.path.sep, "-")
-            print(f"  - Assigning ID '{page_id}' to {md_file}")
+    files_needing_ids = []
+    files_with_ids = []
 
-            frontmatter[FRONTMATTER_ID_KEY] = page_id
-            new_frontmatter_str = _format_frontmatter_str(frontmatter)
+    if md_files:
+        for md_file in md_files:
+            try:
+                # Step 2: Read file content and extract existing frontmatter.
+                content: str = md_file.read_text("utf-8")
+                frontmatter, end_pos = _get_frontmatter(content)
+                page_id: str | None = frontmatter.get(FRONTMATTER_ID_KEY)
 
-            body: str = content[end_pos:]
-            new_content: str = f"---\n{new_frontmatter_str}---\n{body}"
-            md_file.write_text(new_content, "utf-8")
-        else:
-            print(f"  - Found existing ID '{page_id}' in {md_file}")
+                # Step 3: If no permanent ID exists, generate one from the file path.
+                if not page_id:
+                    relative_path: Path = md_file.relative_to(docs_dir)
+                    page_id = str(relative_path.with_suffix("")).replace(os.path.sep, "-")
+                    files_needing_ids.append((md_file, page_id, frontmatter, end_pos, content))
+                else:
+                    files_with_ids.append((md_file, page_id))
 
-        # Step 4: Add the page's ID and current path to our map. This captures
-        # the "before" state of the documentation.
-        redirect_map[page_id] = str(md_file.relative_to(docs_dir))
+                # Step 4: Add the page's ID and current path to our map.
+                redirect_map[page_id] = str(md_file.relative_to(docs_dir))
+            except Exception as e:
+                print(f"  Warning: Could not process {md_file}: {e}")
+    else:
+        print("  No markdown files found.")
 
-    # Step 5: Write the completed map to a JSON file for persistence. This file
-    # will be used by the MkDocs hook to generate redirects.
-    redirect_map_file.write_text(json.dumps(redirect_map, indent=2))
-    print(f"Preparation complete. Map saved to {redirect_map_file}")
+    # Step 5: Report and apply changes.
+    if files_needing_ids:
+        print(f"\nFiles that {'would be' if dry_run else 'are being'} modified ({len(files_needing_ids)}):")
+        for md_file, page_id, frontmatter, end_pos, content in files_needing_ids:
+            print(f"  {'+' if dry_run else '-'} {md_file.relative_to(docs_dir)} -> ID: '{page_id}'")
+            if not dry_run:
+                frontmatter[FRONTMATTER_ID_KEY] = page_id
+                new_frontmatter_str = _format_frontmatter_str(frontmatter)
+                body: str = content[end_pos:]
+                new_content: str = f"---\n{new_frontmatter_str}---\n{body}"
+                md_file.write_text(new_content, "utf-8")
+
+    if files_with_ids:
+        print(f"\nFiles already with IDs ({len(files_with_ids)}):")
+        for md_file, page_id in files_with_ids:
+            print(f"  * {md_file.relative_to(docs_dir)} -> ID: '{page_id}'")
+
+    # Step 6: Write or preview the completed map.
+    if not dry_run:
+        redirect_map_file.write_text(json.dumps(redirect_map, indent=2))
+        print(f"\nPreparation complete. Map saved to {redirect_map_file}")
+    else:
+        print(f"\nDry run complete. Would create/update redirect map: {redirect_map_file}")
 
 
-def convert_internal_links(docs_dir_path: str = "docs"):
+def preview_docs(docs_dir_input: Optional[str | Path] = None) -> None:
+    """
+    Simulates the process of preparing documentation files for unique page IDs without making any changes.
+    This is a backward-compatible wrapper for prepare_docs(..., dry_run=True).
+    """
+    prepare_docs(docs_dir_input, dry_run=True)
+
+
+def convert_internal_links(docs_dir_input: Optional[str | Path] = None) -> None:
     """
     Converts all relative Markdown links in a documentation directory to use an internal link macro.
     This function scans all Markdown (.md) files within the specified documentation directory,
@@ -154,8 +195,8 @@ def convert_internal_links(docs_dir_path: str = "docs"):
     The function modifies files in-place and prints a summary of the conversion process,
     including the number of files modified.
     Args:
-        docs_dir_path (str): Path to the root documentation directory containing Markdown files.
-                             Defaults to 'docs'.
+        docs_dir_input (str | Path): Path to the root documentation directory containing Markdown files.
+                             Defaults to global DOCS_DIR.
     Side Effects:
         - Reads and writes Markdown files in the specified directory.
         - Prints progress and summary information to stdout.
@@ -167,8 +208,12 @@ def convert_internal_links(docs_dir_path: str = "docs"):
     Example:
         convert_internal_links('docs')
     """
+    if docs_dir_input is None:
+        docs_dir = DOCS_DIR
+    else:
+        docs_dir = Path(docs_dir_input)
+
     print("Starting internal link conversion...")
-    docs_dir = Path(docs_dir_path)
 
     # Step 1: Build a map of file paths to their unique IDs.
     # This is more efficient than reading the target file for every link.
@@ -467,85 +512,6 @@ def on_files(files, config):
     return files
 
 
-def preview_docs(docs_dir_path: str = "docs") -> None:
-    """
-    Simulates the process of preparing documentation files for unique page IDs without making any changes.
-    This function scans the specified documentation directory (default: 'docs') for Markdown (.md) files.
-    It analyzes each file to determine whether it already contains a unique page ID in its frontmatter.
-    For files missing an ID, it shows what ID would be generated based on the file's relative path.
-    For files with existing IDs, it lists them and their IDs.
-    No files are modified; this is a dry-run/preview mode.
-    The function also indicates where a redirect map (redirect_map.json) would be created or updated
-    if changes were to be applied.
-    Args:
-        docs_dir_path (str): Path to the documentation directory to scan. Defaults to 'docs'.
-    Prints:
-        - The number of Markdown files found.
-        - A list of files that would be modified with new IDs, showing the generated ID for each.
-        - A list of files that already have IDs, showing the existing ID for each.
-        - The path where the redirect map would be created or updated.
-    Notes:
-        - This function does not modify any files or create the redirect map.
-        - Errors encountered while reading files are reported, but do not stop the process.
-        - Requires the existence of helper functions/constants: _get_frontmatter and FRONTMATTER_ID_KEY.
-    """
-    """Shows what the prepare_docs function would do without making changes."""
-    docs_dir = Path(docs_dir_path)
-
-    print(f"Scanning documentation directory: {docs_dir}")
-
-    # Step 1: Validate that the documentation directory exists.
-    if not docs_dir.exists():
-        print(f"  ERROR: Directory {docs_dir} does not exist")
-        return
-
-    # Step 2: Find all markdown files in the documentation directory.
-    md_files = list(docs_dir.rglob("*.md"))
-    if not md_files:
-        print("  No markdown files found")
-        return
-
-    print(f"  Found {len(md_files)} markdown files")
-
-    files_needing_ids = []
-    files_with_ids = []
-
-    # Step 3: Analyze each markdown file to determine its current state.
-    for md_file in md_files:
-        try:
-            content = md_file.read_text("utf-8")
-            frontmatter, _ = _get_frontmatter(content)
-            page_id = frontmatter.get(FRONTMATTER_ID_KEY)
-
-            if page_id:
-                files_with_ids.append((md_file, page_id))
-            else:
-                relative_path = md_file.relative_to(docs_dir)
-                generated_id = str(relative_path.with_suffix("")).replace(
-                    os.path.sep, "-"
-                )
-                files_needing_ids.append((md_file, generated_id))
-        except Exception as e:
-            print(f"  Warning: Could not process {md_file}: {e}")
-
-    # Step 4: Display files that would be modified with new IDs.
-    if files_needing_ids:
-        print(f"\nFiles that would be modified ({len(files_needing_ids)}):")
-        for md_file, generated_id in files_needing_ids:
-            relative_path = md_file.relative_to(docs_dir)
-            print(f"  + {relative_path} -> ID: '{generated_id}'")
-
-    # Step 5: Display files that already have IDs and would be preserved.
-    if files_with_ids:
-        print(f"\nFiles already with IDs ({len(files_with_ids)}):")
-        for md_file, existing_id in files_with_ids:
-            relative_path = md_file.relative_to(docs_dir)
-            print(f"  * {relative_path} -> ID: '{existing_id}'")
-
-    # Step 6: Show where the redirect map would be created or updated.
-    print(
-        f"\nWould create/update redirect map: {Path(docs_dir_path).parent / 'redirect_map.json'}"
-    )
 
 
 def main() -> None:
@@ -574,20 +540,20 @@ def main() -> None:
     )
     args = parser.parse_args()
 
+    docs_dir = Path(args.docs_dir)
+    if not docs_dir.exists():
+        print(f"ERROR: Documentation directory '{docs_dir}' does not exist.")
+        return
+
     if args.prepare:
-        if args.dry_run:
-            print("DRY RUN: Preview of changes that would be made")
-            print("=" * 50)
-            preview_docs(args.docs_dir)
-        else:
-            prepare_docs(args.docs_dir)
+        prepare_docs(docs_dir, dry_run=args.dry_run)
     elif args.convert_links:
         if args.dry_run:
             print(
                 "DRY RUN for link conversion is not implemented. This action directly modifies files."
             )
         else:
-            convert_internal_links(args.docs_dir)
+            convert_internal_links(docs_dir)
     else:
         parser.print_help()
 

@@ -49,7 +49,7 @@ class TestCommandLineInterface(unittest.TestCase):
         # Arrange: Mock prepare_docs to raise an exception
         original_prepare_docs = linking.prepare_docs
 
-        def failing_prepare_docs(docs_dir_path=None):
+        def failing_prepare_docs(docs_dir_path=None, dry_run=False):
             raise Exception("Test exception from prepare_docs")
 
         linking.prepare_docs = failing_prepare_docs
@@ -105,7 +105,7 @@ class TestCommandLineInterface(unittest.TestCase):
         original_prepare_docs = linking.prepare_docs
         prepare_docs_called = False
 
-        def mock_prepare_docs(docs_dir_path=None):
+        def mock_prepare_docs(docs_dir_path=None, dry_run=False):
             nonlocal prepare_docs_called
             prepare_docs_called = True
             # Call the original function to ensure it works
