@@ -86,7 +86,7 @@ def on_files(files, config):
             if abs_path.exists():
                 try:
                     content = abs_path.read_text("utf-8")
-                    frontmatter, _ = mkdocs_utils.get_frontmatter(content)
+                    frontmatter = mkdocs_utils.get_frontmatter(content)
                     page_id = frontmatter.get(FRONTMATTER_ID_KEY)
 
                     if page_id:

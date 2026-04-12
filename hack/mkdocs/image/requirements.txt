@@ -22,3 +22,4 @@ six==1.17.0
 tabulate==0.10.0
 tornado==6.5.5
 semver==3.0.4
+python-frontmatter==1.1.0

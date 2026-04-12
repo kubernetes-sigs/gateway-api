@@ -160,7 +160,7 @@ description: "No ID yet"
         self.assertIn('tags: ["important"]', existing_content)
 
         partial_content = (self.docs_path / "partial.md").read_text()
-        self.assertIn('title: "Partial Frontmatter"', partial_content)
+        self.assertIn("title: Partial Frontmatter", partial_content)
         self.assertIn("id: partial", partial_content)
 
     def test_prepare_multiple_subdirectories(self) -> None:

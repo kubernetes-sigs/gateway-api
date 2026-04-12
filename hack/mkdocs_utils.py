@@ -17,6 +17,7 @@
 The core engine of the documentation tools. Contains all logic for ID generation, frontmatter parsing, link conversion, and YAML updates.
 """
 
+import frontmatter
 import json
 import os
 import re
@@ -63,14 +64,14 @@ def prepare_docs(docs_dir_input: Optional[str | Path] = None, dry_run: bool = Fa
             try:
                 # Step 2: Read file content and extract existing frontmatter.
                 content: str = md_file.read_text("utf-8")
-                frontmatter, end_pos = get_frontmatter(content)
-                page_id: str | None = frontmatter.get(FRONTMATTER_ID_KEY)
+                metadata = get_frontmatter(content)
+                page_id: str | None = metadata.get(FRONTMATTER_ID_KEY)
 
                 # Step 3: If no permanent ID exists, generate one from the file path.
                 if not page_id:
                     relative_path: Path = md_file.relative_to(docs_dir)
                     page_id = str(relative_path.with_suffix("")).replace(os.path.sep, "-")
-                    files_needing_ids.append((md_file, page_id, frontmatter, end_pos, content))
+                    files_needing_ids.append((md_file, page_id, metadata, content))
                 else:
                     files_with_ids.append((md_file, page_id))
 
@@ -84,14 +85,25 @@ def prepare_docs(docs_dir_input: Optional[str | Path] = None, dry_run: bool = Fa
     # Step 5: Report and apply changes.
     if files_needing_ids:
         print(f"\nFiles that {'would be' if dry_run else 'are being'} modified ({len(files_needing_ids)}):")
-        for md_file, page_id, frontmatter, end_pos, content in files_needing_ids:
+        for md_file, page_id, metadata, content_raw in files_needing_ids:
             print(f"  {'+' if dry_run else '-'} {md_file.relative_to(docs_dir)} -> ID: '{page_id}'")
             if not dry_run:
-                frontmatter[FRONTMATTER_ID_KEY] = page_id
-                new_frontmatter_str = format_frontmatter_str(frontmatter)
-                body: str = content[end_pos:]
-                new_content: str = f"---\n{new_frontmatter_str}---\n{body}"
-                md_file.write_text(new_content, "utf-8")
+                try:
+                    post = frontmatter.loads(content_raw)
+                except Exception:
+                    # Fallback for malformed YAML: manually inject ID line
+                    if content_raw.startswith("---"):
+                        parts = content_raw.split("---", 2)
+                        if len(parts) >= 3:
+                            new_fm = parts[1].rstrip() + f"\n{FRONTMATTER_ID_KEY}: {page_id}\n"
+                            md_file.write_text(f"---{new_fm}---\n\n{parts[2]}", "utf-8")
+                            continue
+                    md_file.write_text(f"---\n{FRONTMATTER_ID_KEY}: {page_id}\n---\n\n{content_raw}", "utf-8")
+                    continue
+
+                post[FRONTMATTER_ID_KEY] = page_id
+                md_file.write_text(frontmatter.dumps(post), "utf-8")
+                continue
 
     if files_with_ids:
         print(f"\nFiles already with IDs ({len(files_with_ids)}):")
@@ -272,7 +284,7 @@ def build_id_map(docs_dir: Path) -> Dict[str, Path]:
     for md_file in docs_dir.rglob("*.md"):
         try:
             content = md_file.read_text("utf-8")
-            frontmatter, _ = get_frontmatter(content)
+            frontmatter = get_frontmatter(content)
             page_id = frontmatter.get(FRONTMATTER_ID_KEY)
             if page_id:
                 id_map[page_id] = md_file
@@ -289,36 +301,33 @@ REDIRECT_MAP_FILE: Path = Path("hack/redirect_map.json")
 FRONTMATTER_ID_KEY: str = "id"
 
 
-def get_frontmatter(content: str) -> Tuple[Dict[str, str], int]:
-    """Extracts simple key-value frontmatter using only the standard library.
+def get_frontmatter(content: str) -> Dict[str, str]:
+    """Extracts frontmatter using python-frontmatter.
 
     Args:
         content: The full text content of a file.
 
     Returns:
-        A tuple containing the frontmatter data as a dictionary and the
-        character position where the frontmatter section ends.
+        The metadata as a dictionary.
     """
-    # Step 1: Look for a YAML frontmatter block (e.g., ---...---) at the
-    # beginning of a file.
-    match = re.match(r"^---\s*\n(.*?\n)---\s*\n", content, re.DOTALL)
-    if not match:
-        return {}, 0
-
-    frontmatter_str: str = match.group(1)
-    end_pos: int = len(match.group(0))
-
-    # Step 2: Parse the frontmatter block line-by-line for simple key-value pairs.
-    data: Dict[str, str] = {}
-    for line in frontmatter_str.strip().split("\n"):
-        if ":" in line:
-            key, value = line.split(":", 1)
-            data[key.strip()] = value.strip()
-    return data, end_pos
+    try:
+        metadata, _ = frontmatter.parse(content)
+        return metadata
+    except Exception:
+        # Fallback for malformed YAML: try to extract 'id:' at least
+        metadata = {}
+        match = re.search(r"^---\s*\n(.*?)\n---\s*\n", content, re.DOTALL)
+        if match:
+            fm_text = match.group(1)
+            id_match = re.search(r"^id:\s*(.+)$", fm_text, re.MULTILINE)
+            if id_match:
+                metadata[FRONTMATTER_ID_KEY] = id_match.group(1).strip().strip("\"'")
+            return metadata
+        return {}
 
 
 def format_frontmatter_str(data: Dict[str, str]) -> str:
-    """Formats a simple dictionary into a YAML-like string."""
-    # Convert dictionary to YAML-formatted lines.
-    lines: List[str] = [f"{key}: {value}" for key, value in data.items()]
-    return "\n".join(lines) + "\n"
+    """Formats a dictionary into a YAML frontmatter string block."""
+    if not data:
+        return ""
+    return yaml.dump(data, default_flow_style=False, sort_keys=False, indent=2)

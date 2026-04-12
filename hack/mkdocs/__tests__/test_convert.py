@@ -61,7 +61,7 @@ class TestConvertFromRelativeLinks(unittest.TestCase):
 
         # Assert
         content = (self.docs_path / "index.md").read_text()
-        expected = '---\nid: index\n---\nLink to [About]({{ internal_link("about") }}).'
+        expected = '---\nid: index\n---\n\nLink to [About]({{ internal_link("about") }}).'
         self.assertEqual(content, expected)
 
     def test_file_with_no_links(self) -> None:
@@ -76,7 +76,7 @@ class TestConvertFromRelativeLinks(unittest.TestCase):
 
         # Assert
         final_content = (self.docs_path / "no-links.md").read_text()
-        expected_content = "---\nid: no-links\n---\n" + original_content
+        expected_content = "---\nid: no-links\n---\n\n" + original_content
         self.assertEqual(final_content, expected_content)
 
     def test_handles_complex_relative_paths(self) -> None:
@@ -96,7 +96,7 @@ class TestConvertFromRelativeLinks(unittest.TestCase):
 
         # Assert
         content = (self.docs_path / "guides" / "advanced" / "config.md").read_text()
-        expected = '---\nid: guides-advanced-config\n---\nSee the [Auth API]({{ internal_link("api-v1-auth") }}) for details.'
+        expected = '---\nid: guides-advanced-config\n---\n\nSee the [Auth API]({{ internal_link("api-v1-auth") }}) for details.'
         self.assertEqual(content, expected)
 
     def test_idempotency_does_not_reconvert_links(self) -> None:
@@ -114,7 +114,7 @@ class TestConvertFromRelativeLinks(unittest.TestCase):
         content_after_second_run = (self.docs_path / "index.md").read_text()
 
         # Assert
-        expected = '---\nid: index\n---\nLink to [About]({{ internal_link("about") }}).'
+        expected = '---\nid: index\n---\n\nLink to [About]({{ internal_link("about") }}).'
         self.assertEqual(content_after_first_run, expected)
         self.assertEqual(
             content_after_second_run,
@@ -134,7 +134,7 @@ class TestConvertFromRelativeLinks(unittest.TestCase):
 
         # Assert
         final_content = (self.docs_path / "index.md").read_text()
-        expected_content = "---\nid: index\n---\n" + original_content
+        expected_content = "---\nid: index\n---\n\n" + original_content
         self.assertEqual(
             final_content, expected_content, "Broken link should not be modified."
         )
