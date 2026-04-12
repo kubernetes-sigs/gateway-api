@@ -1,0 +1,23 @@
+apiVersion: internal.gateway.networking.k8s.io/v1alpha1
+kind: GEPDetails
+number: 4747
+name: Egress Gateway Support
+status: Provisional
+authors:
+  - usize
+  - shaneutt
+  - keithmattix
+relationships:
+  obsoletes: []
+  obsoletedBy: []
+  extends: []
+  extendedBy: []
+  seeAlso:
+    - number: 4488
+      name: Backend Resource
+references:
+  - https://github.com/kubernetes-sigs/wg-ai-gateway/blob/main/proposals/10-egress-gateways.md
+  - https://github.com/kubernetes-sigs/gateway-api/issues/1651
+featureNames:
+  - EgressGateway
+changelog: []
