@@ -21,7 +21,7 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).parents[2]))
 
-import mkdocs_linking as linking
+from mkdocs_utils import update_mkdocs_yml_redirects
 
 class TestUpdateMkdocsYml(unittest.TestCase):
     """Tests for the _update_mkdocs_yml_redirects function."""
@@ -33,8 +33,8 @@ class TestUpdateMkdocsYml(unittest.TestCase):
             shutil.rmtree(self.test_dir)
         self.test_dir.mkdir()
         self.mkdocs_yml_path = self.test_dir / "mkdocs.yml"
-        # Patch the function to use our temporary file path
-        self.patcher = patch("mkdocs_linking.Path")
+        # Patch the Path class in mkdocs_utils to use our temporary file path
+        self.patcher = patch("mkdocs_utils.Path")
         self.mock_path = self.patcher.start()
         self.mock_path.return_value = self.mkdocs_yml_path
 
@@ -50,7 +50,7 @@ class TestUpdateMkdocsYml(unittest.TestCase):
         redirects = {"old/path.md": "new/path.md"}
 
         # Act
-        result = linking._update_mkdocs_yml_redirects(redirects)
+        result = update_mkdocs_yml_redirects(redirects)
         
         # Assert
         self.assertTrue(result)
@@ -66,7 +66,7 @@ class TestUpdateMkdocsYml(unittest.TestCase):
         redirects = {"old/path.md": "new/path.md"}
         
         # Act
-        result = linking._update_mkdocs_yml_redirects(redirects)
+        result = update_mkdocs_yml_redirects(redirects)
         
         # Assert
         self.assertTrue(result)
@@ -82,7 +82,7 @@ class TestUpdateMkdocsYml(unittest.TestCase):
         redirects = {"old/path.md": "new/path.md"}
         
         # Act
-        result = linking._update_mkdocs_yml_redirects(redirects)
+        result = update_mkdocs_yml_redirects(redirects)
         
         # Assert
         self.assertTrue(result)
@@ -101,7 +101,7 @@ class TestUpdateMkdocsYml(unittest.TestCase):
         initial_mtime = self.mkdocs_yml_path.stat().st_mtime
         
         # Act
-        result = linking._update_mkdocs_yml_redirects(redirects)
+        result = update_mkdocs_yml_redirects(redirects)
         
         # Assert
         self.assertTrue(result)

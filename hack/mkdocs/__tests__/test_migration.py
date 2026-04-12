@@ -23,7 +23,8 @@ from types import SimpleNamespace
 sys.path.insert(0, str(Path(__file__).parents[2]))
 
 import mkdocs_linking as linking
-from mkdocs_linking import on_config, prepare_docs
+from mkdocs_linking import prepare_docs
+from mkdocs_hooks import on_config, on_files
 
 
 class TestMigration(unittest.TestCase):
@@ -43,20 +44,31 @@ class TestMigration(unittest.TestCase):
         # To ensure tests are isolated, we temporarily redirect these globals
         # to point to our test directory during test execution.
         self.linking_module = sys.modules["mkdocs_linking"]
+        self.utils_module = sys.modules["mkdocs_utils"]
         self.original_globals = {
-            "DOCS_DIR": self.linking_module.DOCS_DIR,
-            "REDIRECT_MAP_FILE": self.linking_module.REDIRECT_MAP_FILE,
+            "DOCS_DIR": self.utils_module.DOCS_DIR,
+            "REDIRECT_MAP_FILE": self.utils_module.REDIRECT_MAP_FILE,
         }
+        self.utils_module.DOCS_DIR = self.docs_path  # type: ignore
+        self.utils_module.REDIRECT_MAP_FILE = self.redirect_map_file  # type: ignore
+        # Also patch linking for those that import it directly
         self.linking_module.DOCS_DIR = self.docs_path  # type: ignore
         self.linking_module.REDIRECT_MAP_FILE = self.redirect_map_file  # type: ignore
+        # And patch hooks if they are already imported
+        if "mkdocs_hooks" in sys.modules:
+            sys.modules["mkdocs_hooks"].REDIRECT_MAP_FILE = self.redirect_map_file  # type: ignore
 
     def tearDown(self) -> None:
         """Clean up the temporary directory after each test."""
         shutil.rmtree(self.test_dir)
         # Restore the original global variables to avoid side-effects between
         # test runs.
-        for key, value in self.original_globals.items():
-            setattr(self.linking_module, key, value)
+        self.utils_module.DOCS_DIR = self.original_globals["DOCS_DIR"]
+        self.utils_module.REDIRECT_MAP_FILE = self.original_globals["REDIRECT_MAP_FILE"]
+        self.linking_module.DOCS_DIR = self.original_globals["DOCS_DIR"]
+        self.linking_module.REDIRECT_MAP_FILE = self.original_globals["REDIRECT_MAP_FILE"]
+        if "mkdocs_hooks" in sys.modules:
+            sys.modules["mkdocs_hooks"].REDIRECT_MAP_FILE = self.original_globals["REDIRECT_MAP_FILE"]
 
     def test_prepare_fresh_run_no_frontmatter(self) -> None:
         """Test that IDs are correctly injected into files."""
@@ -111,7 +123,7 @@ class TestMigration(unittest.TestCase):
         config = {"docs_dir": str(self.docs_path)}
         # on_files prints output, but we want to check the mkdocs.yml or output
         # For this test, just ensure no exceptions and that the function returns the files
-        result = linking.on_files(files, config)
+        result = on_files(files, config)
         self.assertEqual(result, files)
 
     def test_prepare_with_existing_frontmatter(self) -> None:
@@ -242,7 +254,7 @@ description: "No ID yet"
             file_path.parent.mkdir(parents=True, exist_ok=True)
             file_path.write_text(f"---\nid: {file_id}\n---\nContent")
         config = {"docs_dir": str(self.docs_path)}
-        result = linking.on_files(new_files, config)
+        result = on_files(new_files, config)
         self.assertEqual(result, new_files)
 
     def test_prepare_handles_empty_docs_directory(self) -> None:

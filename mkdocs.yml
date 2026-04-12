@@ -14,7 +14,7 @@ extra_javascript:
 hooks:
 - hack/mkdocs-copy-geps.py
 - hack/mkdocs-generate-conformance.py
-- hack/mkdocs_linking.py
+- hack/mkdocs_hooks.py
 - hack/mkdocs-generate-controller-wizard-data.py
 watch:
 - geps

@@ -22,6 +22,7 @@ sys.path.insert(0, str(Path(__file__).parents[2]))
 
 import mkdocs_linking as linking
 from mkdocs_linking import prepare_docs
+import mkdocs_utils
 
 
 class TestErrorRecovery(unittest.TestCase):
@@ -33,15 +34,20 @@ class TestErrorRecovery(unittest.TestCase):
         if self.test_dir.exists():
             shutil.rmtree(self.test_dir)
 
-        self.original_docs_dir = linking.DOCS_DIR
-        self.original_redirect_file = linking.REDIRECT_MAP_FILE
+        self.original_docs_dir = mkdocs_utils.DOCS_DIR
+        self.original_redirect_file = mkdocs_utils.REDIRECT_MAP_FILE
 
-        linking.DOCS_DIR = self.test_dir / "docs"
-        linking.REDIRECT_MAP_FILE = self.test_dir / "redirect_map.json"
-        linking.DOCS_DIR.mkdir(parents=True, exist_ok=True)
+        mkdocs_utils.DOCS_DIR = self.test_dir / "docs"
+        mkdocs_utils.REDIRECT_MAP_FILE = self.test_dir / "redirect_map.json"
+        # Also patch linking for any direct references
+        linking.DOCS_DIR = mkdocs_utils.DOCS_DIR
+        linking.REDIRECT_MAP_FILE = mkdocs_utils.REDIRECT_MAP_FILE
+        mkdocs_utils.DOCS_DIR.mkdir(parents=True, exist_ok=True)
 
     def tearDown(self) -> None:
         """Clean up test environment."""
+        mkdocs_utils.DOCS_DIR = self.original_docs_dir
+        mkdocs_utils.REDIRECT_MAP_FILE = self.original_redirect_file
         linking.DOCS_DIR = self.original_docs_dir
         linking.REDIRECT_MAP_FILE = self.original_redirect_file
         if self.test_dir.exists():

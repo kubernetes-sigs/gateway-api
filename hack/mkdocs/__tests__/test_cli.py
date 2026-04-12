@@ -37,10 +37,14 @@ class TestCommandLineInterface(unittest.TestCase):
         self.docs_path.mkdir(parents=True)
 
         self.linking_module = sys.modules["mkdocs_linking"]
+        self.utils_module = sys.modules["mkdocs_utils"]
         self.original_globals = {
-            "DOCS_DIR": self.linking_module.DOCS_DIR,
-            "REDIRECT_MAP_FILE": self.linking_module.REDIRECT_MAP_FILE,
+            "DOCS_DIR": self.utils_module.DOCS_DIR,
+            "REDIRECT_MAP_FILE": self.utils_module.REDIRECT_MAP_FILE,
         }
+        self.utils_module.DOCS_DIR = self.docs_path  # type: ignore
+        self.utils_module.REDIRECT_MAP_FILE = self.redirect_map_file  # type: ignore
+        # Also patch linking module for those that import it directly
         self.linking_module.DOCS_DIR = self.docs_path  # type: ignore
         self.linking_module.REDIRECT_MAP_FILE = self.redirect_map_file  # type: ignore
 
@@ -55,6 +59,9 @@ class TestCommandLineInterface(unittest.TestCase):
         linking.prepare_docs = failing_prepare_docs
 
         import sys
+        import mkdocs_utils
+        # Ensure prepare_docs in linking module is the one called by main
+        # (main calls linking.prepare_docs)
 
         original_argv = sys.argv
         sys.argv = ["linking.py", "--prepare"]
