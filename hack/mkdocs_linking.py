@@ -219,65 +219,73 @@ def convert_internal_links(docs_dir_input: Optional[str | Path] = None) -> None:
     # This is more efficient than reading the target file for every link.
     path_to_id_map: Dict[str, str] = {}
     for md_file in docs_dir.rglob("*.md"):
-        content = md_file.read_text("utf-8")
-        frontmatter, _ = _get_frontmatter(content)
-        page_id = frontmatter.get(FRONTMATTER_ID_KEY)
-        if page_id:
-            # Use a normalized posix path relative to the docs root as the key
-            relative_path_key = md_file.relative_to(docs_dir).as_posix()
-            path_to_id_map[relative_path_key] = page_id
+        try:
+            content = md_file.read_text("utf-8")
+            frontmatter, _ = _get_frontmatter(content)
+            page_id = frontmatter.get(FRONTMATTER_ID_KEY)
+            if page_id:
+                # Use a normalized posix path relative to the docs root as the key
+                relative_path_key = md_file.relative_to(docs_dir).as_posix()
+                path_to_id_map[relative_path_key] = page_id
+        except Exception as e:
+            print(f"  Warning: Could not build ID map for {md_file}: {e}")
 
     print(f"  - Built a map of {len(path_to_id_map)} page IDs.")
 
     # Step 2: Iterate through each file and replace its links.
     files_converted = 0
     for md_file in docs_dir.rglob("*.md"):
-        content = md_file.read_text("utf-8")
-        original_content = content
+        try:
+            content = md_file.read_text("utf-8")
+            original_content = content
 
-        # This nested function (closure) captures the current file's context.
-        def replace_link(match: re.Match) -> str:
-            link_text = match.group(1)
-            link_url = match.group(2)
+            # This nested function (closure) captures the current file's context.
+            def replace_link(match: re.Match) -> str:
+                link_text = match.group(1)
+                link_url = match.group(2)
 
-            # Ignore external links, anchors, or non-markdown file links
-            if link_url.startswith(("http", "#", "mailto:")) or not link_url.endswith(
-                ".md"
-            ):
-                return match.group(0)
+                # Ignore external links, anchors, or non-markdown file links
+                if link_url.startswith(("http", "#", "mailto:")) or not link_url.endswith(
+                    ".md"
+                ):
+                    return match.group(0)
 
-            # Resolve the relative path to an absolute path from the docs root
-            current_dir = md_file.parent
-            target_file = (current_dir / link_url).resolve()
+                # Resolve the relative path to an absolute path from the docs root
+                current_dir = md_file.parent
+                target_file = (current_dir / link_url).resolve()
 
-            # Make the path relative to the docs dir to use as a lookup key
-            try:
-                target_relative_path = target_file.relative_to(docs_dir.resolve())
-                target_key = target_relative_path.as_posix()
-            except ValueError:
-                # This can happen if the link points outside the docs directory
-                return match.group(0)
+                # Make the path relative to the docs dir to use as a lookup key
+                try:
+                    target_relative_path = target_file.relative_to(docs_dir.resolve())
+                    target_key = target_relative_path.as_posix()
+                except ValueError:
+                    # This can happen if the link points outside the docs directory
+                    return match.group(0)
 
-            # Look up the ID in our map
-            target_id = path_to_id_map.get(target_key)
-            if target_id:
-                # If an ID is found, build the macro
-                return f'[{link_text}]({{{{ internal_link("{target_id}") }}}})'
-            else:
-                # If no ID is found (e.g., broken link), leave it as is
-                return match.group(0)
+                # Look up the ID in our map
+                target_id = path_to_id_map.get(target_key)
+                if target_id:
+                    # If an ID is found, build the macro
+                    return f'[{link_text}]({{{{ internal_link("{target_id}") }}}})'
+                else:
+                    # If no ID is found (e.g., broken link), leave it as is
+                    return match.group(0)
 
-        # Use re.sub with our replacer function to process all links
-        # Regex explanation:
-        # \[([^\]]+)\]   - Capture the link text inside [ ]
-        # \((?!{{)([^)]+)\) - Capture the URL inside ( ), but negative lookahead
-        #                    to avoid re-processing our own macros.
-        content = re.sub(r"\[([^\]]+)\]\((?!{{)([^)]+\.md)\)", replace_link, content)
+            # Use re.sub with our replacer function to process all links
+            # Regex explanation:
+            # \[([^\]]+)\]   - Capture the link text inside [ ]
+            # \((?!{{)([^)]+)\) - Capture the URL inside ( ), but negative lookahead
+            #                    to avoid re-processing our own macros.
+            content = re.sub(
+                r"\[([^\]]+)\]\((?!{{)([^)]+\.md)\)", replace_link, content
+            )
 
-        if content != original_content:
-            files_converted += 1
-            md_file.write_text(content, "utf-8")
-            print(f"  - Converted links in {md_file.relative_to(docs_dir)}")
+            if content != original_content:
+                files_converted += 1
+                md_file.write_text(content, "utf-8")
+                print(f"  - Converted links in {md_file.relative_to(docs_dir)}")
+        except Exception as e:
+            print(f"  Warning: Could not convert links in {md_file}: {e}")
 
     print(f"Link conversion complete. Modified {files_converted} files.")
 
