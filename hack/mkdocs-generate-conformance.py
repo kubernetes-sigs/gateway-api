@@ -111,8 +111,6 @@ warning_text = """
 
 def generate_conformance_tables(reports, currVersion, mkdocsConfig):
 
-    # Enable Pandas copy-on-write
-    pandas.options.mode.copy_on_write = True
 
     gateway_tls_table = pandas.DataFrame()
     gateway_grpc_table = pandas.DataFrame()

@@ -7,6 +7,7 @@
 | experimental | [v4.6.0](https://github.com/airlock/microgateway/releases/tag/4.6.0) | default | [link](./experimental-4.6.0-default-report.yaml) |
 | experimental    | [v4.7.0](https://github.com/airlock/microgateway/releases/tag/4.7.0) | default | [link](./experimental-4.7.0-default-report.yaml) |
 | standard    | [v4.8.0](https://github.com/airlock/microgateway/releases/tag/4.8.0) | default | [link](./standard-4.8.0-default-report.yaml) |
+| standard    | [v5.0.0](https://github.com/airlock/microgateway/releases/tag/5.0.0) | default | [link](./standard-5.0.0-default-report.yaml) |
 
 ## Reproduce
 

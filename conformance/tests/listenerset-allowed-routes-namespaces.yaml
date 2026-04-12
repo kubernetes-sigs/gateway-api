@@ -131,7 +131,7 @@ spec:
       port: 8080
 ---
 kind: ReferenceGrant
-apiVersion: gateway.networking.k8s.io/v1beta1
+apiVersion: gateway.networking.k8s.io/v1
 metadata:
   name: listenerset-test-allowed-routes-namespaces-reference-grant
   namespace: gateway-conformance-infra

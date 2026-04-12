@@ -6,7 +6,6 @@ aliases:
   sig-network-leads:
     - aojea
     - danwinship
-    - shaneutt
     - thockin
 
   # Reference: https://github.com/kubernetes/org/blob/main/config/kubernetes-sigs/sig-network/teams.yaml
@@ -34,20 +33,21 @@ aliases:
 
   gateway-api-conformance-reviewers:
     - candita
+    - davidjumani
+    - kl52752
     - snorwin
-    - sunjayBhatia
 
   gateway-api-conformance-approvers:
-    - arkodg
     - LiorLieberman
-    - sunjayBhatia
 
   gateway-api-gep-reviewers:
-    - arkodg
     - candita
+    - davidjumani
     - gcs278
     - kflynn
+    - kl52752
     - LiorLieberman
+    - snorwin
 
   gateway-api-doc-approvers:
     - candita

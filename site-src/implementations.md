@@ -84,10 +84,12 @@ other functions (like managing DNS or creating certificates).
 ## Gateway Controller Implementation Status <a name="gateways"></a>
 
 ### Conformant
-- [Agent Gateway][40]
+- [Agentgateway][40]
 - [Airlock Microgateway][34]
 - [Cilium][16]
 - [Envoy Gateway][18] (GA)
+- [Google Kubernetes Engine][6] (GA)
+- [HAProxy Ingress][7]
 - [Istio][9] (GA)
 - [kgateway][37] (GA)
 - [NGINX Gateway Fabric][12] (GA)
@@ -99,7 +101,6 @@ other functions (like managing DNS or creating certificates).
 - [Azure Application Gateway for Containers][27] (GA)
 - [Contour][3] (GA)
 - [Gloo Gateway][5] (GA)
-- [Google Kubernetes Engine][6] (GA)
 - [Gravitee Kubernetes Operator][42] (GA)
 - [Kong Ingress Controller][10] (GA)
 - [Kong Gateway Operator][35] (GA)
@@ -114,7 +115,6 @@ other functions (like managing DNS or creating certificates).
 - [Easegress][30] (GA)
 - [Emissary-Ingress (Ambassador API Gateway)][4] (alpha)
 - [Flomesh Service Mesh][17] (beta)
-- [HAProxy Ingress][7] (alpha)
 - [HAProxy Kubernetes Ingress Controller][32] (GA)
 - [HashiCorp Consul][8]
 - [Kuma][11] (GA)
@@ -184,7 +184,7 @@ other functions (like managing DNS or creating certificates).
 [37]:#kgateway
 [38]:#google-cloud-service-mesh
 [39]:#kubvernor
-[40]:#agent-gateway-with-kgateway
+[40]:#agentgateway
 [41]:#kruise-rollouts
 [42]:#gravitee-kubernetes-operator
 [43]:#alibaba-cloud-service-mesh
@@ -209,22 +209,22 @@ In this section you will find specific links to blog posts, documentation and ot
 [epicsource]:https://github.com/epic-gateway
 
 ### Agentgateway
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.4.1-Agentgateway-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.4.1/agentgateway-agentgateway)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.5.0-Agentgateway-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.5.0/agentgateway-agentgateway)
 
 [Agentgateway](https://agentgateway.dev/) is an open source Gateway API implementation hosted as a part of the Linux Foundation, focusing on AI use cases, including LLM consumption, LLM serving, agent-to-agent ([A2A](https://a2aproject.github.io/A2A/latest/)), agent-to-tool ([MCP](https://modelcontextprotocol.io/introduction)), as well as traditional TCP/HTTP traffic serving.
 It is the first and only proxy designed specifically for the Kubernetes Gateway API, powered by a high performance and scalable Rust dataplane implementation.
 
 ### Airlock Microgateway
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.4.0-Airlock%20Microgateway-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.4.0/airlock-microgateway)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.5.1-Airlock%20Microgateway-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.5.1/airlock-microgateway)
 
-[Airlock Microgateway][airlock-microgateway] is a Kubernetes native WAAP (Web Application and API Protection, formerly known as WAF) solution optimized for Kubernetes environments and certified for Red Hat OpenShift.
+[Airlock Microgateway][airlock-microgateway] is a Kubernetes native WAAP (Web Application and API Protection) solution optimized for Kubernetes environments and certified for Red Hat OpenShift.
 Modern application security is embedded in the development workflow and follows DevSecOps paradigms.
 Airlock Microgateway protects your applications and microservices with the tried-and-tested Airlock security features against attacks, while also providing a high degree of scalability.
 
 #### Features
-- Comprehensive WAAP (formerly known as WAF) with security features like Deny Rules to protect against known attacks (OWASP Top 10), header filtering, JSON parsing, OpenAPI specification enforcement, and GraphQL schema validation
-- Identity aware proxy which makes it possible to enforce authentication using JWT authentication or OIDC, with OAuth 2.0 Token Introspection and Token Exchange for continuous validation and secure delegation across services
-- Reverse proxy functionality with request routing rules, TLS termination and remote IP extraction
+- Comprehensive set of security features, including deny rules to protect against known attacks (OWASP Top 10), header filtering, JSON parsing, OpenAPI specification enforcement, GraphQL schema validation, and antivirus scanning with ICAP
+- Identity aware proxy which makes it possible to enforce authentication using client certificate based authentication, JWT authentication or OIDC with step-up authentication to realize multi factor authentication (MFA). Provides OAuth 2.0 Token Introspection and Token Exchange for continuous validation and secure delegation across services
+- Reverse proxy functionality with request routing rules, TLS termination, and remote IP extraction
 - Easy-to-use Grafana dashboards which provide valuable insights in allowed and blocked traffic and other metrics
 
 #### Documentation and links
@@ -325,22 +325,22 @@ effort, check out the #development channel or join our [weekly developer meeting
 
 ### Contour
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.2.1-Contour-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.2.1/projectcontour-contour)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.3.0-Contour-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.3.0/projectcontour-contour)
 
 [Contour][contour] is a CNCF open source Envoy-based ingress controller for Kubernetes.
 
-Contour [v1.31.0][contour-release] implements Gateway API v1.2.1.
+Contour [v1.33.0][contour-release] implements Gateway API v1.3.0.
 All [Standard channel][contour-standard] v1 API group resources (GatewayClass, Gateway, HTTPRoute, ReferenceGrant), plus most v1alpha2 API group resources (TLSRoute, TCPRoute, GRPCRoute, ReferenceGrant, and BackendTLSPolicy) are supported.
-Contour's implementation passes most core extended Gateway API conformance tests included in the v1.2.1 release.
+Contour's implementation passes most core extended Gateway API conformance tests included in the v1.3.0 release.
 
 See the [Contour Gateway API Guide][contour-guide] for information on how to deploy and use Contour's Gateway API implementation.
 
 For help and support with Contour's implementation, [create an issue][contour-issue-new] or ask for help in the [#contour channel on Kubernetes slack][contour-slack].
 
 [contour]:https://projectcontour.io
-[contour-release]:https://github.com/projectcontour/contour/releases/tag/v1.30.0
+[contour-release]:https://github.com/projectcontour/contour/releases/tag/v1.33.0
 [contour-standard]:concepts/versioning.md#release-channels
-[contour-guide]:https://projectcontour.io/docs/1.30/guides/gateway-api/
+[contour-guide]:https://projectcontour.io/docs/1.33/guides/gateway-api/
 [contour-issue-new]:https://github.com/projectcontour/contour/issues/new/choose
 [contour-slack]:https://kubernetes.slack.com/archives/C8XRH2R4J
 
@@ -425,7 +425,7 @@ Google Cloud Service Mesh supports [Envoy-based sidecar mesh][envoy-sidecar-mesh
 
 ### Google Kubernetes Engine
 
-[![Conformance](https://img.shields.io/badge/Gateway_API_Partial_Conformance_v1.3.0-Google_Kubernetes_Engine-orange)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.4.0/gke-gateway)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.5.0-Google_Kubernetes_Engine-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.5.0/gke-gateway)
 
 [Google Kubernetes Engine (GKE)][gke] is a managed Kubernetes platform offered
 by Google Cloud. GKE's implementation of the Gateway API is through the [GKE
@@ -438,7 +438,7 @@ advanced routing, multi-cluster load balancing and more. See the docs to deploy
 Gateways][gke-multi-cluster-gateway].
 
 The GKE Gateway controller passes all the core Gateway API conformance tests in the
-v1.4.0 release for the GATEWAY_HTTP conformance profile except `HTTPRouteHostnameIntersection`.
+v1.5.0 release for the GATEWAY_HTTP conformance profile.
 
 [gke]:https://cloud.google.com/kubernetes-engine
 [gke-gateway]:https://cloud.google.com/kubernetes-engine/docs/concepts/gateway-api
@@ -457,12 +457,13 @@ For support, feedback, or to engage in a discussion about the Gravitee Kubernete
 
 ### HAProxy Ingress
 
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.5.1-HAProxy%20Ingress-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.5.1/haproxy-ingress)
+
 [HAProxy Ingress][h1] is a community driven ingress controller implementation for HAProxy.
 
-HAProxy Ingress v0.13 partially supports the Gateway API's v1alpha1 specification. See the [controller's Gateway API documentation][h2] to get informed about conformance and roadmap.
+HAProxy Ingress is a conformant Gateway API implementation since `v0.17`. It implements all core features from the standard channel, as well as TLSRoute and TCPRoute APIs from the experimental channel.
 
 [h1]:https://haproxy-ingress.github.io/
-[h2]:https://haproxy-ingress.github.io/docs/configuration/gateway-api/
 
 ### HAProxy Kubernetes Ingress Controller
 
@@ -649,17 +650,17 @@ STUNner currently supports version `v1alpha2` of the Gateway API specification. 
 
 ### Traefik Proxy
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.4.0-Traefik Proxy-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.4.0/traefik-traefik)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.5.1-Traefik Proxy-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.5.1/traefik-traefik)
 
 [Traefik Proxy][traefik-proxy] is an open source cloud-native application proxy.
 
-Traefik Proxy currently supports version `v1.4.0` of the Gateway API specification, check the [Kubernetes Gateway Provider Documentation][traefik-proxy-gateway-api-doc] for more information on how to deploy and use it.
-Traefik Proxy's implementation passes all HTTP core and some extended conformance tests, like GRPCRoute, but also supports TCPRoute and TLSRoute features from the Experimental channel.
+Traefik Proxy currently supports version `v1.5.1` of the Gateway API specification, check the [Kubernetes Gateway Provider Documentation][traefik-proxy-gateway-api-doc] for more information on how to deploy and use it.
+Traefik Proxy fully supports all HTTPRoute core and some extended features, like BackendTLSPolicy, GRPCRoute, and TLSRoute resources from the Standard channel, as well as TCPRoute from the Experimental channel.
 
 For help and support with Traefik Proxy, [create an issue][traefik-proxy-issue-new] or ask for help in the [Traefik Labs Community Forum][traefiklabs-community-forum].
 
 [traefik-proxy]:https://traefik.io
-[traefik-proxy-gateway-api-doc]:https://doc.traefik.io/traefik/v3.6/reference/install-configuration/providers/kubernetes/kubernetes-gateway
+[traefik-proxy-gateway-api-doc]:https://doc.traefik.io/traefik/v3.7/reference/install-configuration/providers/kubernetes/kubernetes-gateway
 [traefik-proxy-issue-new]:https://github.com/traefik/traefik/issues/new/choose
 [traefiklabs-community-forum]:https://community.traefik.io/c/traefik/traefik-v3/21
 

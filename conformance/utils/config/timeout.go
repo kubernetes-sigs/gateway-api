@@ -16,7 +16,11 @@ limitations under the License.
 
 package config
 
-import "time"
+import (
+	"strconv"
+	"strings"
+	"time"
+)
 
 type TimeoutConfig struct {
 	// TestIsolation represents the time block between test cases to enhance test isolation.
@@ -141,6 +145,76 @@ func DefaultTimeoutConfig() TimeoutConfig {
 		DefaultTestTimeout:                     60 * time.Second,
 		DefaultPollInterval:                    time.Millisecond * 100,
 		RequiredConsecutiveSuccesses:           3,
+	}
+}
+
+// ParseTimeoutOverrides parses the timeout overrides string and updates the TimeoutConfig.
+func ParseTimeoutOverrides(timeoutConfig *TimeoutConfig, overrides string) {
+	if overrides == "" {
+		return
+	}
+	pairs := strings.Split(overrides, ";")
+	for _, pair := range pairs {
+		parts := strings.Split(pair, ":")
+		if len(parts) != 2 {
+			continue
+		}
+		param := strings.TrimSpace(parts[0])
+		val := strings.TrimSpace(parts[1])
+		valInt, err := strconv.Atoi(val)
+		if err != nil {
+			continue
+		}
+		overrideDuration := time.Duration(valInt) * time.Second
+
+		switch param {
+		case "CreateTimeout":
+			timeoutConfig.CreateTimeout = overrideDuration
+		case "DeleteTimeout":
+			timeoutConfig.DeleteTimeout = overrideDuration
+		case "GetTimeout":
+			timeoutConfig.GetTimeout = overrideDuration
+		case "GatewayMustHaveAddress":
+			timeoutConfig.GatewayMustHaveAddress = overrideDuration
+		case "GatewayMustHaveCondition":
+			timeoutConfig.GatewayMustHaveCondition = overrideDuration
+		case "GatewayStatusMustHaveListeners":
+			timeoutConfig.GatewayStatusMustHaveListeners = overrideDuration
+		case "GatewayListenersMustHaveConditions":
+			timeoutConfig.GatewayListenersMustHaveConditions = overrideDuration
+		case "ListenerSetMustHaveCondition":
+			timeoutConfig.ListenerSetMustHaveCondition = overrideDuration
+		case "ListenerSetListenersMustHaveConditions":
+			timeoutConfig.ListenerSetListenersMustHaveConditions = overrideDuration
+		case "GWCMustBeAccepted":
+			timeoutConfig.GWCMustBeAccepted = overrideDuration
+		case "HTTPRouteMustNotHaveParents":
+			timeoutConfig.HTTPRouteMustNotHaveParents = overrideDuration
+		case "HTTPRouteMustHaveCondition":
+			timeoutConfig.HTTPRouteMustHaveCondition = overrideDuration
+		case "TLSRouteMustHaveCondition":
+			timeoutConfig.TLSRouteMustHaveCondition = overrideDuration
+		case "RouteMustHaveParents":
+			timeoutConfig.RouteMustHaveParents = overrideDuration
+		case "ManifestFetchTimeout":
+			timeoutConfig.ManifestFetchTimeout = overrideDuration
+		case "MaxTimeToConsistency":
+			timeoutConfig.MaxTimeToConsistency = overrideDuration
+		case "NamespacesMustBeReady":
+			timeoutConfig.NamespacesMustBeReady = overrideDuration
+		case "RequestTimeout":
+			timeoutConfig.RequestTimeout = overrideDuration
+		case "LatestObservedGenerationSet":
+			timeoutConfig.LatestObservedGenerationSet = overrideDuration
+		case "DefaultTestTimeout":
+			timeoutConfig.DefaultTestTimeout = overrideDuration
+		case "DefaultPollInterval":
+			timeoutConfig.DefaultPollInterval = overrideDuration
+		case "RequiredConsecutiveSuccesses":
+			timeoutConfig.RequiredConsecutiveSuccesses = valInt
+		case "TestIsolation":
+			timeoutConfig.TestIsolation = overrideDuration
+		}
 	}
 }
 

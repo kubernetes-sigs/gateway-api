@@ -6,6 +6,10 @@ site_dir: site
 docs_dir: site-src
 extra:
   trademark: https://www.linuxfoundation.org/legal/trademark-usage
+  analytics:
+    provider: google
+    # Google analytics tag is shared with minikube
+    property: G-JPP6RFM2BP 
 extra_css:
   - stylesheets/extra.css
 extra_javascript:
@@ -57,8 +61,7 @@ plugins:
   - redirects:
       redirect_maps:
         'guides/index.md': 'guides/getting-started/index.md'
-        'ingress-nginx': 'guides/getting-started/migrating-from-ingress-nginx.md'
-        'guides/getting-started.md': 'guides/index.md'
+        'ingress-nginx.md': 'guides/getting-started/migrating-from-ingress-nginx.md'
         'concepts/gamma.md': 'mesh/index.md'
         'concepts/service-facets.md': 'mesh/service-facets.md'
         'concepts/guidelines.md': 'guides/api-design.md'

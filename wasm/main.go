@@ -234,6 +234,7 @@ func onDataLoaded(jsonStr string) {
 
 	// Multi-version: keys like v1.4.0, v1.3.0, ...
 	allVersionsData = make(map[string][]implementation)
+	dropdownKeyMap := make(map[string]struct{})
 	var versionKeys []string
 	for k, v := range raw {
 		if k == "featureDefinitions" {
@@ -245,6 +246,9 @@ func onDataLoaded(jsonStr string) {
 		}
 		allVersionsData[k] = list
 		versionKeys = append(versionKeys, k)
+
+		// ignore patch version for drop-down menu
+		dropdownKeyMap[strings.Join(append(strings.Split(k, ".")[0:2], "0"), ".")] = struct{}{}
 	}
 	if len(versionKeys) == 0 {
 		impls = nil
@@ -256,11 +260,17 @@ func onDataLoaded(jsonStr string) {
 		return versionCompare(versionKeys[j], versionKeys[i]) < 0
 	})
 	allVersionKeys = versionKeys
-	dropdownKeys := versionKeys
+	dropdownKeys := make([]string, 0, len(dropdownKeyMap))
+	for k := range dropdownKeyMap {
+		dropdownKeys = append(dropdownKeys, k)
+	}
+	sort.Slice(dropdownKeys, func(i, j int) bool {
+		return versionCompare(dropdownKeys[j], dropdownKeys[i]) < 0
+	})
 	if len(dropdownKeys) > maxVersionsInDropdown {
 		dropdownKeys = dropdownKeys[:maxVersionsInDropdown]
 	}
-	currentVersion = versionKeys[0]
+	currentVersion = dropdownKeys[0]
 	impls = buildImplsForMinVersion(currentVersion)
 
 	versionRow.Get("style").Set("display", "block")
@@ -569,6 +579,38 @@ func getSelections() (must, good []selection) {
 	return must, goodFiltered
 }
 
+func gtagEvent(eventName string, params map[string]interface{}) {
+	global := js.Global()
+	if gtag := global.Get("gtag"); gtag.Truthy() {
+		global.Call("gtag", "event", eventName, js.ValueOf(params))
+		return
+	}
+	parent := global.Get("parent")
+	if parent.Truthy() && !parent.Equal(global) {
+		if pGtag := parent.Get("gtag"); pGtag.Truthy() {
+			parent.Call("gtag", "event", eventName, js.ValueOf(params))
+		}
+	}
+}
+
+func trackWizardSelections(must, good []selection) {
+	track := func(selections []selection, action string) {
+		if len(selections) == 0 {
+			return
+		}
+		for _, sel := range selections {
+			gtagEvent("wizard_feature_selection", map[string]interface{}{
+				"resource_name": sel.Section,
+				"feature_name":  sel.ID,
+				"version":       currentVersion,
+				"action":        action,
+			})
+		}
+	}
+	track(must, "must_have")
+	track(good, "nice_to_have")
+}
+
 func recommend() {
 	resultsContent := doc.Call("getElementById", "results-content")
 	resultsDiv := doc.Call("getElementById", "results")
@@ -593,6 +635,7 @@ func recommend() {
 		setStatus(statusEl, 0)
 		return
 	}
+	trackWizardSelections(must, good)
 
 	type scored struct {
 		impl       implementation

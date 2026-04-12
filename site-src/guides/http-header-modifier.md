@@ -9,6 +9,9 @@ Note that these features are compatible. HTTP headers of the incoming requests a
 
 ## HTTP Request Header Modifier
 
+???+ info "Extended Support Feature: HTTPRouteBackendRequestHeaderModification"
+    This feature is part of extended support. For more information on support levels, refer to our [conformance guide](../concepts/conformance.md).
+
 HTTP header modification is the process of adding, removing, or modifying HTTP headers in incoming requests.
 
 To configure HTTP header modification, define a Gateway object with one or more HTTP filters. Each filter specifies a specific modification to make to incoming requests, such as adding a custom header or modifying an existing header.
@@ -42,6 +45,9 @@ Headers can also be removed, by using the `remove` keyword and a list of header 
 Using the example above would remove the `x-request-id` header from the HTTP request.
 
 ### HTTP Response Header Modifier
+
+???+ info "Extended Support Feature: HTTPRouteResponseHeaderModification"
+    This feature is part of extended support. For more information on support levels, refer to our [conformance guide](../concepts/conformance.md).
 
 Just like editing request headers can be useful, the same goes for response headers. For example, it allows teams to add/remove cookies for only a certain backend, which can help in identifying certain users that were redirected to that backend previously.
 

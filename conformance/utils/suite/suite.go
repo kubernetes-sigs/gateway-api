@@ -38,7 +38,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
-	"sigs.k8s.io/gateway-api/apis/v1beta1"
 	xmeshv1alpha1 "sigs.k8s.io/gateway-api/apisx/v1alpha1"
 	confv1 "sigs.k8s.io/gateway-api/conformance/apis/v1"
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
@@ -80,8 +79,8 @@ type ConformanceTestSuite struct {
 	RunTest                  string
 	Hook                     func(t *testing.T, test ConformanceTest, suite *ConformanceTestSuite)
 	ManifestFS               []fs.FS
-	UsableNetworkAddresses   []v1beta1.GatewaySpecAddress
-	UnusableNetworkAddresses []v1beta1.GatewaySpecAddress
+	UsableNetworkAddresses   []gatewayv1.GatewaySpecAddress
+	UnusableNetworkAddresses []gatewayv1.GatewaySpecAddress
 
 	// If SupportedFeatures are automatically determined from GWC Status.
 	// This will be required to report in future iterations as the passing
@@ -171,12 +170,12 @@ type ConformanceOptions struct {
 
 	// UsableNetworkAddresses is an optional pool of usable addresses for
 	// Gateways for tests which need to test manual address assignments.
-	UsableNetworkAddresses []v1beta1.GatewaySpecAddress
+	UsableNetworkAddresses []gatewayv1.GatewaySpecAddress
 
 	// UnusableNetworkAddresses is an optional pool of unusable addresses for
 	// Gateways for tests which need to test failures with manual Gateway
 	// address assignment.
-	UnusableNetworkAddresses []v1beta1.GatewaySpecAddress
+	UnusableNetworkAddresses []gatewayv1.GatewaySpecAddress
 
 	Mode                string
 	AllowCRDsMismatch   bool
@@ -253,6 +252,9 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 		extendedUnsupportedFeatures[conformanceProfileName] = conformanceProfile.ExtendedFeatures.Difference(supportedFeatures)
 	}
 
+	if flags.TimeoutConfigOverrides != nil && *flags.TimeoutConfigOverrides != "" {
+		config.ParseTimeoutOverrides(&options.TimeoutConfig, *flags.TimeoutConfigOverrides)
+	}
 	config.SetupTimeoutConfig(&options.TimeoutConfig)
 
 	roundTripper := options.RoundTripper

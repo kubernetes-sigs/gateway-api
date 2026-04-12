@@ -1,0 +1,68 @@
+apiVersion: gateway.networking.k8s.io/v1
+date: "2026-03-20T09:29:21-03:00"
+gatewayAPIChannel: experimental
+gatewayAPIVersion: v1.5.1
+implementation:
+  contact:
+  - https://kubernetes.slack.com/channels/haproxy-ingress
+  organization: HAProxy Ingress
+  project: haproxy-ingress
+  url: https://haproxy-ingress.github.io
+  version: v0.17.0-alpha.1
+kind: ConformanceReport
+mode: default
+profiles:
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 33
+      Skipped: 0
+  extended:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 9
+      Skipped: 0
+    supportedFeatures:
+    - GatewayAddressEmpty
+    - GatewayPort8080
+    - HTTPRouteBackendProtocolWebSocket
+    - HTTPRouteCORS
+    - HTTPRouteDestinationPortMatching
+    - HTTPRouteNamedRouteRule
+    - HTTPRouteResponseHeaderModification
+    - HTTPRouteSchemeRedirect
+    unsupportedFeatures:
+    - BackendTLSPolicy
+    - BackendTLSPolicySANValidation
+    - GatewayBackendClientCertificate
+    - GatewayFrontendClientCertificateValidation
+    - GatewayFrontendClientCertificateValidationInsecureFallback
+    - GatewayHTTPListenerIsolation
+    - GatewayHTTPSListenerDetectMisdirectedRequests
+    - GatewayInfrastructurePropagation
+    - GatewayStaticAddresses
+    - HTTPRoute303RedirectStatusCode
+    - HTTPRoute307RedirectStatusCode
+    - HTTPRoute308RedirectStatusCode
+    - HTTPRouteBackendProtocolH2C
+    - HTTPRouteBackendRequestHeaderModification
+    - HTTPRouteBackendTimeout
+    - HTTPRouteHostRewrite
+    - HTTPRouteMethodMatching
+    - HTTPRouteParentRefPort
+    - HTTPRoutePathRedirect
+    - HTTPRoutePathRewrite
+    - HTTPRoutePortRedirect
+    - HTTPRouteQueryParamMatching
+    - HTTPRouteRequestMirror
+    - HTTPRouteRequestMultipleMirrors
+    - HTTPRouteRequestPercentageMirror
+    - HTTPRouteRequestTimeout
+    - ListenerSet
+  name: GATEWAY-HTTP
+  summary: Core tests succeeded. Extended tests succeeded.
+succeededProvisionalTests:
+- GatewayOptionalAddressValue
+- HTTPRouteNamedRule

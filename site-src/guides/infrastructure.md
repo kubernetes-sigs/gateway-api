@@ -1,10 +1,7 @@
 # Gateway infrastructure labels and annotations
 
-??? success "Standard Channel since v1.2.0"
-
-    The `infrastructure` field is GA and has been part of the Standard Channel since
-    `v1.2.0`. For more information on release channels, refer to our [versioning
-    guide](../concepts/versioning.md).
+???+ info "Extended Support Feature: GatewayInfrastructurePropagation"
+    This feature is part of extended support. For more information on support levels, refer to our [conformance guide](../concepts/conformance.md).
 
 Gateway API implementations are responsible for creating the backing
 infrastructure needed to make each Gateway work. For example, implementations
