@@ -1331,6 +1331,11 @@ type HTTPRequestMirrorFilter struct {
 	// Support: Extended for Kubernetes Service
 	//
 	// Support: Implementation-specific for any other resource
+	//
+	// If the backend service requires TLS, use BackendTLSPolicy to tell the
+	// implementation to supply the TLS details to be used to connect to that
+	// backend.
+	//
 	// +required
 	BackendRef BackendObjectReference `json:"backendRef"`
 
