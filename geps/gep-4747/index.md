@@ -261,14 +261,13 @@ MUST surface conflicts in status conditions.
 ### Workload-to-Gateway Addressing (Interim)
 
 Until Gateway Routability ([#1651](https://github.com/kubernetes-sigs/gateway-api/issues/1651))
-is resolved, workloads connect to the egress gateway via an implementation-managed Service. Most
-Gateway API implementations already create a Service for each Gateway; for egress, this Service
-SHOULD be of type `ClusterIP` (not `LoadBalancer`).
+is resolved, workloads connect to the egress gateway via an implementation-managed
+address reachable only within the cluster (often a ClusterIP Service).
 
 Implementations should:
 
-- Automatically create a ClusterIP Service for egress Gateways
-- Report the Service's ClusterIP in `gateway.status.addresses`
+- Expose an internally-reachable address for egress Gateways
+- Report this address in `gateway.status.addresses`
 - Use a stable DNS name (e.g., `<gateway-name>.<namespace>.svc.cluster.local`)
 
 ### Traffic Enforcement
