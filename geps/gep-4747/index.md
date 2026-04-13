@@ -23,6 +23,7 @@ only when, they appear in all capitals, as shown here.
 > explicitly requested.
 
 [GEP-4748]: ../gep-4748/index.md
+[GEP-4751]: https://github.com/kubernetes-sigs/gateway-api/issues/4751
 
 ## TLDR
 
@@ -58,7 +59,8 @@ argues that no new Gateway-level resource is required.
 * Define how Gateway + HTTPRoute + Backend ([PR #4488](https://github.com/kubernetes-sigs/gateway-api/pull/4488)) compose for egress
 * Provide an `Egress` conformance profile so implementations can declare support
 * Document egress-specific guidance for listeners, routes, and policy scoping
-* Support two routing modes: Endpoint (direct) and Parent (gateway chaining)
+* Define Endpoint routing mode (direct to external destination); gateway chaining
+  is covered in [GEP-4751]
 
 ## Non-Goals
 
@@ -223,27 +225,6 @@ Workload --> Egress Gateway --> External API (Backend)
 The gateway applies policies, resolves the Backend destination, (optionally) originates
 TLS to the external endpoint, and forwards the request.
 
-#### Parent Mode (Gateway Chaining)
-
-Traffic flows through a local egress gateway to an upstream gateway:
-
-```
-Workload --> Local Egress GW --> Upstream GW --> External API
-```
-
-Use cases:
-
-- Multi-cluster: local cluster routes through a central egress cluster
-- Multi-zone: regional gateways route through a global exit point
-- Compliance: all traffic exits through an audited chokepoint
-
-Requirements:
-
-- Local retries MUST be limited to establishing the upstream connection
-- Request-level retries MUST be performed by the upstream gateway
-- Implementations MUST tag forwarded requests (e.g., via header) to prevent
-  retry loops between chained gateways
-
 ### Policy Application Scopes
 
 Egress policies apply at three levels:
@@ -293,7 +274,6 @@ egress support by passing egress conformance tests.
 
 **Extended egress conformance**:
 
-- Parent mode (gateway chaining)
 - Multi-backend weighted routing and failover
 - Backend TLS origination (Simple, Mutual) -- via [PR #4488](https://github.com/kubernetes-sigs/gateway-api/pull/4488) conformance
 - Cross-namespace Backend references with ReferenceGrant
@@ -336,12 +316,7 @@ within the existing `HTTP` profile?
 Should the GEP recommend specific listener configurations for egress (e.g.,
 "use a single wildcard listener") or leave this entirely to implementations?
 
-### 4. Parent Mode Standardization
-
-Is Parent Mode (gateway chaining) common enough to warrant conformance tests,
-or should it be Implementation-Specific?
-
-### 5. Mixed Ingress/Egress Gateways
+### 4. Mixed Ingress/Egress Gateways
 
 Should a single Gateway be allowed to serve both ingress and egress traffic
 (via multiple listeners)?
