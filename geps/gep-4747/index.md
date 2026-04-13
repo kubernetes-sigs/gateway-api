@@ -267,7 +267,7 @@ is resolved, workloads connect to the egress gateway via an implementation-manag
 Gateway API implementations already create a Service for each Gateway; for egress, this Service
 SHOULD be of type `ClusterIP` (not `LoadBalancer`).
 
-Implementations supporting the Egress conformance profile SHOULD:
+Implementations should:
 
 - Automatically create a ClusterIP Service for egress Gateways
 - Report the Service's ClusterIP in `gateway.status.addresses`
