@@ -40,6 +40,10 @@ import (
 // References to objects with invalid Group and Kind are not valid, and must
 // be rejected by the implementation, with appropriate Conditions set
 // on the containing object.
+//
+// If the backend service requires TLS, use BackendTLSPolicy to tell the
+// implementation to supply the TLS details to be used to connect to that
+// backend.
 type BackendObjectReferenceApplyConfiguration struct {
 	// Group is the group of the referent. For example, "gateway.networking.k8s.io".
 	// When unspecified or empty string, core API group is inferred.
