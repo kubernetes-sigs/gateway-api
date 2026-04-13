@@ -287,7 +287,7 @@ egress support by passing egress conformance tests.
 
 **Core egress conformance** (required for profile):
 
-- Gateway with egress GatewayClass accepts and routes traffic
+- Gateway accepts and routes egress traffic
 - HTTPRoute attached to egress Gateway routes to Backend ([PR #4488](https://github.com/kubernetes-sigs/gateway-api/pull/4488))
 - Policy conflict resolution follows specificity precedence
 
