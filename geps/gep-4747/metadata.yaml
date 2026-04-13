@@ -1,7 +1,7 @@
 apiVersion: internal.gateway.networking.k8s.io/v1alpha1
 kind: GEPDetails
 number: 4747
-name: Egress Gateway Support
+name: L7 Reverse-Proxy Egress Gateway
 status: Provisional
 authors:
   - usize

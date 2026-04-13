@@ -1,4 +1,4 @@
-# GEP-4747: Egress Gateway Support
+# GEP-4747: L7 Reverse-Proxy Egress Gateway
 
 * Issue: [#4747](https://github.com/kubernetes-sigs/gateway-api/issues/4747)
 * Status: Provisional
