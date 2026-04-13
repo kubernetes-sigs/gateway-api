@@ -222,7 +222,7 @@ Traffic flows directly from egress gateway to external destination:
 Workload --> Egress Gateway --> External API (Backend)
 ```
 
-The gateway applies policies, resolves the Backend destination, originates
+The gateway applies policies, resolves the Backend destination, (optionally) originates
 TLS to the external endpoint, and forwards the request.
 
 #### Parent Mode (Gateway Chaining)
