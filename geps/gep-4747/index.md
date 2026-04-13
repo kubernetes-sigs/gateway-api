@@ -272,9 +272,10 @@ Implementations should:
 
 ### Traffic Enforcement
 
-Operators MUST use enforcement mechanisms (like NetworkPolicy, sidecar
-configuration, or CNI-level controls) to deny direct egress from workloads
-and force outbound traffic through the Gateway. This GEP does not define enforcement mechanisms -- it defines what the
+For egress gateways to be effective, operators should deny direct egress
+from workloads and force outbound traffic through the Gateway using
+enforcement mechanisms (like NetworkPolicy, sidecar configuration, or
+CNI-level controls). This GEP does not define enforcement mechanisms -- it defines what the
 Gateway does once traffic arrives.
 
 ## Conformance
