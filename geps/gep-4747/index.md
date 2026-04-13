@@ -179,10 +179,9 @@ spec:
 - Egress gateways typically use a single listener with no hostname filter
   (accepting all destinations), though setting `hostname` to filter by
   destination IS valid and means "only accept requests going to this host."
-- `listeners[].tls` is the server-side TLS config presented to workloads
-  connecting to the gateway. The TLS configuration structure is identical to
-  ingress; only the client/server roles are reversed. Client-side TLS to external
-  destinations is configured on the Backend resource ([PR #4488](https://github.com/kubernetes-sigs/gateway-api/pull/4488)).
+- `listeners[].tls` configures TLS for workloads connecting to the gateway.
+  The TLS configuration is identical to ingress. TLS to external destinations
+  is configured on the Backend resource ([PR #4488](https://github.com/kubernetes-sigs/gateway-api/pull/4488)).
 
 ### Egress Routing
 
@@ -207,10 +206,9 @@ spec:
       name: openai-backend
 ```
 
-`hostnames` on an egress HTTPRoute means "match requests whose destination
-Host header is one of these values." The matching behavior is identical to ingress,
-though the semantic intent differs: ingress routes serve requests TO these hostnames,
-while egress routes forward requests GOING TO these external hostnames.
+`hostnames` on an egress HTTPRoute matches requests whose destination
+Host header is one of these values. The matching behavior is identical
+to ingress.
 
 ### Routing Modes
 
@@ -291,7 +289,6 @@ egress support by passing egress conformance tests.
 
 - Gateway with egress GatewayClass accepts and routes traffic
 - HTTPRoute attached to egress Gateway routes to Backend ([PR #4488](https://github.com/kubernetes-sigs/gateway-api/pull/4488))
-- `hostnames` on HTTPRoute correctly matches destination Host headers
 - Policy conflict resolution follows specificity precedence
 
 **Extended egress conformance**:
