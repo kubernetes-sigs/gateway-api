@@ -210,7 +210,7 @@ func TestWeightedDistributionBatch(sender BatchRequestSender, expectedWeights ma
 
 // Entropy utilities
 
-// AddRandomEntropy randomly chooses to add delay, random value, or both
+// AddRandomEntropy randomly chooses to add a random value.
 // The addRandomValue function should be provided by the caller to handle
 // protocol-specific ways of adding the random value (HTTP headers, gRPC metadata, etc.)
 func AddRandomEntropy(addRandomValue func(string) error) error {
