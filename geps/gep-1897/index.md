@@ -31,14 +31,12 @@ Gateway to backend**, such as server name indication and trusted CA certificates
 
 These are worthy goals, but deserve a different GEP for proper attention.  This GEP is concerned entirely with the
 hop between gateway client and backend.
-1. [TCPRoute](https://github.com/kubernetes-sigs/gateway-api/blob/main/apis/v1alpha2/tcproute_types.go) use cases are not addressed here, because at this point in time
-TCPRoute is not graduated to beta.
-2. Mutual TLS (mTLS) use cases are intentionally out of scope for this GEP for two reasons.  First, the design of Gateway
+1. Mutual TLS (mTLS) use cases are intentionally out of scope for this GEP for two reasons.  First, the design of Gateway
 API is backend-attached and does not currently support mutual authentication, and also because this GEP does not
 address the case where connections to TLS are **implicitly configured** on behalf of the user, which is the norm for mTLS.
 This GEP is about the case where an application developer needs to **explicitly express** that they expect TLS when
 there is no automatic, implicit configuration available.
-3. Service mesh use cases for workload-to-service communication are supported as Implementation-Specific features
+2. Service mesh use cases for workload-to-service communication are supported as Implementation-Specific features
 (see [Implementation-Specific Usage](#implementation-specific-usage)).
 
 ## Non-Goals
@@ -47,15 +45,13 @@ These are worthy goals, but will not be covered by this GEP.
 
 1. Changes to the existing mechanisms for edge or passthrough TLS termination
 2. Providing a mechanism to decorate multiple route instances
-3. TLSRoute use cases
-4. UDPRoute use cases
-5. GRPCRoute use cases
-6. Controlling TLS versions or cipher suites used in TLS handshakes. (Use case #5 in [Gateway API TLS Use Cases](#references))
-7. Controlling certificates used by more than one workload (#6 in [Gateway API TLS Use Cases](#references))
-8. Client certificate settings used in TLS **from external clients to the
+3. UDPRoute use cases
+4. Controlling TLS versions or cipher suites used in TLS handshakes. (Use case #5 in [Gateway API TLS Use Cases](#references))
+5. Controlling certificates used by more than one workload (#6 in [Gateway API TLS Use Cases](#references))
+6. Client certificate settings used in TLS **from external clients to the
 Listener** (#7 in [Gateway API TLS Use Cases](#references))
-9. Service Mesh "mesh transport security".
-10. Providing a mechanism for the cluster operator to override gateway to backend TLS settings.
+7. Service Mesh "mesh transport security".
+8. Providing a mechanism for the cluster operator to override gateway to backend TLS settings.
 
 > It is very common for service mesh implementations to implement some form of transparent transport security, whether
 > that is WireGuard, mTLS, or others. This is completely orthogonal to the use cases being tackled by this GEP.
@@ -144,6 +140,22 @@ In January 2023 we closed GEP-1282 and began a new discussion on enumerating TLS
 [Gateway API TLS Use Cases](#references), for the purposes of a clear definition and separation of concerns.
 This GEP is the outcome of the TLS use case #4 in
 [Gateway API TLS Use Cases](#references) as mentioned in the Immediate Goals section above.
+
+## BackendTLSPolicy is a union feature
+
+BackendTLSPolicy complies with the definition of [Union feature](../../site-src/guides/implementers.md#union-feature-conformance).
+This means that this feature is used in combination with other features. Some examples:
+
+* An implementation that claims support for `GRPCRoute` and `BackendTLSPolicy` MUST support 
+the usage of a `BackendTLSPolicy` on a Backend being used by a `GRPCRoute`.
+* An implementation that claims support for `HTTPRouteRequestMirror` and `BackendTLSPolicy` MUST support
+the usage of a `BackendTLSPolicy` on a Backend being used by a mirror filter.
+
+Implementations that claim some kind of route with TLS termination (eg.: `HTTPRoute`, `GRPCRoute`, `TLSRoute with termination` or `TCPRoute with termination`)
+and the support of `BackendTLSPolicy` MUST support the re-encryption of the traffic using a `BackendTLSPolicy`.
+
+Similarly, implementations that support features/filters that rely on a specific `BackendRef` and claim to support
+`BackendTLSPolicy` MUST support the combination of this feature with `BackendTLSPolicy`.
 
 ## API
 
@@ -701,7 +713,7 @@ alternatives are also listed here.
 1. Expand BackendRef, which is already an expansion point.  At first, it seems logical that since listeners are handling
 the client-gateway certs, BackendRefs could handle the gateway-backend certs.  However, when multiple Routes to target
 the same Service, there would be unnecessary copying of the BackendRef every time the Service was targeted.  As well,
-there could be multiple bBackendRefs with multiple rules on a rRoute, each of which might need the gateway-backend cert
+there could be multiple BackendRefs with multiple rules on a Route, each of which might need the gateway-backend cert
 configuration, so it is not the appropriate pattern.
 2. Extend HTTPRoute to indicate TLS backend support. Extending HTTPRoute would interfere with deployed implementations
 too much to be a practical solution.

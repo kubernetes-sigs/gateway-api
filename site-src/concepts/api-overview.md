@@ -203,9 +203,9 @@ This table from the [API Overview](link) page summarizes the various Route types
 |Object|Protocol|OSI Layer|Routing Discriminator|Listener TLS Support|Backend TLS Support|Purpose|
 |------|--------|---------|---------------------|-----------|-------|-------|
 |HTTPRoute|HTTP or HTTPS| Layer 7 | Anything in the HTTP Protocol | Terminated only | Via BackendTLSPolicy |HTTP and HTTPS Routing|
-|TLSRoute|TLS| Somewhere between layer 4 and 7| SNI or other TLS properties| Passthrough or Terminated | None currently, although support for BackendTLSPolicy when Terminated has been discussed.|Routing of TLS protocols including HTTPS where inspection of the HTTP stream is not required.|
-|GRPCRoute|HTTP or HTTPS| Layer 7 | Anything in the gRPC Protocol | Terminated only | None currently, although support for BackendTLSPolicy when Protocol is `HTTPS` has been discussed.| gRPC Routing over HTTP/2 and HTTP/2 cleartext|
-|TCPRoute|TCP| Layer 4| None | Passthrough or Terminated | None currently, although support for BackendTLSPolicy when Terminated has been discussed.| Allows for forwarding of a TCP stream from the Listener to the Backends |
+|TLSRoute|TLS| Somewhere between layer 4 and 7| SNI or other TLS properties| Passthrough or Terminated | Via BackendTLSPolicy (Extended, when Terminated)|Routing of TLS protocols including HTTPS where inspection of the HTTP stream is not required.|
+|GRPCRoute|HTTP or HTTPS| Layer 7 | Anything in the gRPC Protocol | Terminated only | Via BackendTLSPolicy (Extended)| gRPC Routing over HTTP/2 and HTTP/2 cleartext|
+|TCPRoute|TCP| Layer 4| None | Passthrough or Terminated | Via BackendTLSPolicy (Extended, when Terminated)| Allows for forwarding of a TCP stream from the Listener to the Backends |
 |UDPRoute|UDP| Layer 4| None | None | None | Allows for forwarding of a UDP stream from the Listener to the Backends. |
 
 Notably, because of their lack of other **routing discriminators**, TCPRoute and UDPRoute can only have a _single_ Route attached to any particular Listener.

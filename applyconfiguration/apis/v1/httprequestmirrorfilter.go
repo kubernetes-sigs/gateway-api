@@ -46,6 +46,10 @@ type HTTPRequestMirrorFilterApplyConfiguration struct {
 	// Support: Extended for Kubernetes Service
 	//
 	// Support: Implementation-specific for any other resource
+	//
+	// If the backend service requires TLS, use BackendTLSPolicy to tell the
+	// implementation to supply the TLS details to be used to connect to that
+	// backend.
 	BackendRef *BackendObjectReferenceApplyConfiguration `json:"backendRef,omitempty"`
 	// Percent represents the percentage of requests that should be
 	// mirrored to BackendRef. Its minimum value is 0 (indicating 0% of

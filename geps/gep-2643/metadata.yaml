@@ -24,3 +24,5 @@ featureNames:
   - TLSRoute
   - TLSRouteModeTerminate
   - TLSRouteModeMixed
+changelog: 
+  - 2026/Apr/12 (rikatz) -  Claim support for BackendTLSPolicy on terminated TLSRoutes, given BackendTLSPolicy is a union feature

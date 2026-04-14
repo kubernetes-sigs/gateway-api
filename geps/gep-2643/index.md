@@ -30,9 +30,6 @@ based on the SNI identification that should pass the traffic to N load balanced 
 
 * Provide an interface for users to define different listeners or ports for the
 `TLSRoute` - This will be covered by the [ListenerSet enhancement](../gep-1713/index.md).
-* Describe re-encryption capabilities when TLS Termination is being used - This will
-be proposed in [GEP-4274](https://github.com/kubernetes-sigs/gateway-api/issues/4274), extending
-`BackendTLSPolicy` to allow `TLSRoute`.
 * When using `TLSRoute` passthrough, support `PROXY` protocol on the gateway listener.
 * When using `TLSRoute` passthrough, support `PROXY` protocol on the communication
 between the Gateway and the backend.
@@ -316,6 +313,9 @@ status:
       type: Accepted
 ```
 
+On a terminated `TLSRoute`, a `BackendTLSPolicy` can be used to re-encrypt the traffic to backends,
+in case the implementation claims to support it.
+
 ### TLSRoute + Mixed Termination
 In this workflow, the TLS traffic will be matched against the `SNI attribute` of 
 the request, and based on the SNI attribute be directed to the backends on Passthrough
@@ -540,6 +540,8 @@ be at least one intersecting hostname for the `TLSRoute` to be attached to the
 | A Gateway with \*.example.tld on a TLS listener MUST allow a TLSRoute with hostname some.example.tld to be attached to it (and the same, but with a non wildcard hostname) <br/> Issue: [TLSRoute conformance] | TLSRoute MUST be able to attach to the Gateway using the matching hostname, a request MUST succeed | TLSRoute  |
 | Expose support for TLSRoute termination <br/> Issue: [Termination] | For a [Listener] setting mode: "terminate", TLSRoute MUST be present in [ListenerStatus.SupportedKinds] in case TLSRoute termination is supported | TLSRouteModeTerminate |
 | Explicitly expose that TLSRoute termination is not supported. <br/> Issue: [Termination] | For a [Listener] setting mode: "terminate" and not being supported, the Listener entry MUST NOT be Accepted containing the condition `Accepted: False` and `Reason: UnsupportedValue`. | TLSRoute + !TLSRouteModeTerminate |
+| A Gateway containing a Listener of type TLS/Terminate MUST be accepted, and when used in combination with a `BackendTLSPolicy` the traffic MUST be reencrypted. <br/> Issue: [TLSRoute with BackendTLSPolicy] | For a [Listener] setting mode: "terminate" and the backend being targeted by a `BackendTLSPolicy`, the listener and the policy must be accepted and the traffic must be re-encrypted | TLSRoute + TLSRouteModeTerminate  + BackendTLSPolicy |
+
 
 
 [Simple]: https://github.com/kubernetes-sigs/gateway-api/blob/edd7cbeac3ff1458c75ed21636af52ba1536b73a/conformance/tests/tlsroute-simple-same-namespace.go
@@ -549,6 +551,7 @@ be at least one intersecting hostname for the `TLSRoute` to be attached to the
 [TLSRoute conformance]: https://github.com/kubernetes-sigs/gateway-api/issues/1579
 [Listener]: ../../reference/spec.md#listener
 [ListenerStatus.SupportedKinds]: ../../reference/spec.md#listenerstatus
+[TLSRoute with BackendTLSPolicy]: https://github.com/kubernetes-sigs/gateway-api/issues/4274
 
 ## Changes between v1alpha3 and v1
 
@@ -588,3 +591,4 @@ the field can be considered too complex.
 * [TLSRoute intersecting hostnames issue](https://github.com/kubernetes-sigs/gateway-api/issues/3541)
 * [TLSRoute termination feature request](https://github.com/kubernetes-sigs/gateway-api/issues/2111)
 * [GatewayAPI TLS Use Cases](https://docs.google.com/document/d/17sctu2uMJtHmJTGtBi_awGB0YzoCLodtR6rUNmKMCs8)
+* [Union Features](../../site-src/guides/implementers.md#union-feature-conformance)

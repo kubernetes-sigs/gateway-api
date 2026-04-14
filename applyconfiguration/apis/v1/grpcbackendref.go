@@ -72,6 +72,10 @@ type GRPCBackendRefApplyConfiguration struct {
 	// case, the Reason MUST be set to `RefNotPermitted` and the Message of the
 	// Condition MUST explain which cross-namespace reference is not allowed.
 	//
+	// * The BackendTLSPolicy object is installed in the cluster, a BackendTLSPolicy
+	// is present that refers to the Service, and the implementation is unable
+	// to meet the requirement.
+	//
 	// Support: Core for Kubernetes Service
 	//
 	// Support: Extended for Kubernetes ServiceImport
@@ -79,6 +83,8 @@ type GRPCBackendRefApplyConfiguration struct {
 	// Support: Implementation-specific for any other resource
 	//
 	// Support for weight: Core
+	//
+	// Support for BackendTLSPolicy: Extended
 	BackendRefApplyConfiguration `json:",inline"`
 	// Filters defined at this level MUST be executed if and only if the
 	// request is being forwarded to the backend defined here.
