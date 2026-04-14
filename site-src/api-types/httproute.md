@@ -208,7 +208,7 @@ this configuration error.
 
 BackendRefs defines API objects where matching requests should be sent. If
 unspecified, the rule performs no forwarding. If unspecified and no filters
-are specified that would result in a response being sent, a 404 error code
+are specified that would result in a response being sent, a 500 error code
 is returned.
 
 The following example forwards HTTP requests for path prefix `/bar` to service
