@@ -16,7 +16,7 @@
 """
 A CLI wrapper for documentation tools.
 
-The documentation logic is split into three focused modules:
+The documentation logic is split into four focused modules:
 
 mkdocs_utils.py
 : The core engine of the documentation tools. Contains all logic for ID generation, frontmatter parsing, link conversion, and YAML updates.
