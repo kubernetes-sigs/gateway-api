@@ -67,6 +67,36 @@ func TestValidateGateway(t *testing.T) {
 			wantErrors: []string{"tls must not be specified for protocols ['HTTP', 'TCP', 'UDP']"},
 		},
 		{
+			desc: "tls config present with lowercase http protocol",
+			mutate: func(gw *gatewayv1.Gateway) {
+				gw.Spec.Listeners = []gatewayv1.Listener{
+					{
+						Name:     gatewayv1.SectionName("http"),
+						Protocol: gatewayv1.ProtocolType("http"),
+						Port:     gatewayv1.PortNumber(8080),
+						TLS:      &gatewayv1.ListenerTLSConfig{},
+					},
+				}
+			},
+			wantErrors: []string{"tls must not be specified for protocols ['HTTP', 'TCP', 'UDP']"},
+		},
+		{
+			desc: "lowercase https protocol with Passthrough tls mode",
+			mutate: func(gw *gatewayv1.Gateway) {
+				gw.Spec.Listeners = []gatewayv1.Listener{
+					{
+						Name:     gatewayv1.SectionName("https"),
+						Protocol: gatewayv1.ProtocolType("https"),
+						Port:     gatewayv1.PortNumber(8080),
+						TLS: &gatewayv1.ListenerTLSConfig{
+							Mode: ptrTo(gatewayv1.TLSModeType("Passthrough")),
+						},
+					},
+				}
+			},
+			wantErrors: []string{"tls mode must be Terminate for protocol HTTPS"},
+		},
+		{
 			desc: "https protocol with Passthrough tls mode",
 			mutate: func(gw *gatewayv1.Gateway) {
 				gw.Spec.Listeners = []gatewayv1.Listener{
