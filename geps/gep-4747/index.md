@@ -22,6 +22,8 @@ only when, they appear in all capitals, as shown here.
 > `EgressGateway` resource. Community feedback on both approaches is
 > explicitly requested.
 
+[GEP-91]: ../gep-91/index.md
+[GEP-2907]: ../gep-2907/index.md
 [GEP-4748]: ../gep-4748/index.md
 [GEP-4751]: https://github.com/kubernetes-sigs/gateway-api/issues/4751
 
@@ -101,6 +103,8 @@ semantically valuable within both contexts:
 | `listeners[].port` | Port to accept incoming traffic | Port to accept outbound traffic from workloads |
 | `listeners[].hostname` | Virtual host to match (SNI/Host header) | Filter workload requests by SNI/Host header |
 | `listeners[].tls` | Cert presented to external clients (server TLS) | Cert presented to internal workloads (server TLS) |
+| `tls.frontend` | Client cert validation for external clients ([GEP-91]) | Client cert validation for internal workloads ([GEP-91]) |
+| `tls.backend` | Gateway's client cert for mTLS to internal backends ([GEP-2907]) | Gateway's client cert for mTLS to external destinations ([GEP-2907]) |
 
 The difference between ingress and egress is an emergent property of:
 
@@ -336,6 +340,7 @@ Dynamic routing to arbitrary hostnames (forward proxy) is out of scope. See
 
 * [WG AI Gateway egress proposal](https://github.com/kubernetes-sigs/wg-ai-gateway/blob/main/proposals/10-egress-gateways.md)
 * [GEP-4488: Backend Resource](https://github.com/kubernetes-sigs/gateway-api/pull/4488)
+* [GEP-91: Client Certificate Validation](../gep-91/index.md)
 * [GEP-1897: BackendTLSPolicy](../gep-1897/index.md)
 * [GEP-2907: TLS Terminology](../gep-2907/index.md)
 * [Issue #1651: Gateway Routability](https://github.com/kubernetes-sigs/gateway-api/issues/1651)
