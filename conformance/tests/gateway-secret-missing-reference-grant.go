@@ -40,6 +40,7 @@ var GatewaySecretMissingReferenceGrant = suite.ConformanceTest{
 		features.SupportReferenceGrant,
 	},
 	Manifests: []string{"tests/gateway-secret-missing-reference-grant.yaml"},
+	Parallel:  true,
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
 		gwNN := types.NamespacedName{Name: "gateway-secret-missing-reference-grant", Namespace: suite.InfrastructureNamespace}
 

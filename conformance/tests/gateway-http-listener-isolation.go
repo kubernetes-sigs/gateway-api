@@ -43,6 +43,7 @@ var GatewayHTTPListenerIsolation = confsuite.ConformanceTest{
 		"tests/gateway-http-listener-isolation.yaml",
 		"tests/gateway-http-listener-isolation-with-hostname-intersection.yaml",
 	},
+	Parallel: true,
 	Test: func(t *testing.T, suite *confsuite.ConformanceTestSuite) {
 		ns := confsuite.InfrastructureNamespace
 

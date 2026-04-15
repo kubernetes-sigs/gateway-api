@@ -42,6 +42,7 @@ var GatewayObservedGenerationBump = suite.ConformanceTest{
 		features.SupportGateway,
 	},
 	Manifests: []string{"tests/gateway-observed-generation-bump.yaml"},
+	Parallel:  true,
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
 		gwNN := types.NamespacedName{Name: "gateway-observed-generation-bump", Namespace: suite.InfrastructureNamespace}
 

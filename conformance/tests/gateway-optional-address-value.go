@@ -44,6 +44,7 @@ var GatewayOptionalAddressValue = suite.ConformanceTest{
 	Manifests: []string{
 		"tests/gateway-optional-address-value.yaml",
 	},
+	Parallel: true,
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
 		ns := suite.InfrastructureNamespace
 

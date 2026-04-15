@@ -42,6 +42,7 @@ var GatewayInvalidFrontendClientCertificateValidation = confsuite.ConformanceTes
 		features.SupportGatewayFrontendClientCertificateValidation,
 	},
 	Manifests: []string{"tests/gateway-with-invalid-clientcertificate-validation.yaml"},
+	Parallel:  true,
 	Test: func(t *testing.T, suite *confsuite.ConformanceTestSuite) {
 		// Validate that invalid configuration for Default and PerPort client certificate validation
 		// impacts only status of affected Listener.

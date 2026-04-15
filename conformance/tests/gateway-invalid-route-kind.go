@@ -39,6 +39,7 @@ var GatewayInvalidRouteKind = suite.ConformanceTest{
 		features.SupportGateway,
 	},
 	Manifests: []string{"tests/gateway-invalid-route-kind.yaml"},
+	Parallel:  true,
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
 		t.Run("Gateway listener should have a false ResolvedRefs condition with reason InvalidRouteKinds and no supportedKinds", func(t *testing.T) {
 			gwNN := types.NamespacedName{Name: "gateway-only-invalid-route-kind", Namespace: suite.InfrastructureNamespace}
