@@ -34,7 +34,7 @@ apiVersion: admissionregistration.k8s.io/v1
 kind: ValidatingAdmissionPolicyBinding
 metadata:
   annotations:
-    gateway.networking.k8s.io/bundle-version: v1.5.0-dev
+    gateway.networking.k8s.io/bundle-version: v1.5.2
     gateway.networking.k8s.io/channel: standard
   name: safe-upgrades.gateway.networking.k8s.io
 spec:
