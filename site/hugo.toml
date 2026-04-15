@@ -109,4 +109,5 @@ defaultContentLanguage = "en"
 
   [[module.mounts]]
     source = "../geps"
-    target = "content/geps" 
+    target = "content/enhancements/geps"
+ 

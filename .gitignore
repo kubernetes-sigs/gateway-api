@@ -66,3 +66,6 @@ site/static/wizard/data/*
 
 
 .lycheecache
+
+# Local Netlify folder
+.netlify
