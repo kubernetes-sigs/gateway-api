@@ -43,6 +43,7 @@ var GatewayTLSBackendClientCertificate = confsuite.ConformanceTest{
 		features.SupportBackendTLSPolicy,
 	},
 	Manifests: []string{"tests/gateway-tls-backend-client-certificate.yaml"},
+	Parallel:  true,
 	Test: func(t *testing.T, suite *confsuite.ConformanceTestSuite) {
 		ns := confsuite.InfrastructureNamespace
 
