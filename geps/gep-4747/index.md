@@ -57,7 +57,6 @@ argues that no new Gateway-level resource is required.
 
 * Establish egress as a first-class usage pattern of Gateway API
 * Define how Gateway + HTTPRoute + Backend ([PR #4488](https://github.com/kubernetes-sigs/gateway-api/pull/4488)) compose for egress
-* Provide an `Egress` conformance profile so implementations can declare support
 * Document egress-specific guidance for listeners, routes, and policy scoping
 * Define Endpoint routing mode (direct to external destination); gateway chaining
   is covered in [GEP-4751]
@@ -259,25 +258,6 @@ enforcement mechanisms (like NetworkPolicy, sidecar configuration, or
 CNI-level controls). This GEP does not define enforcement mechanisms -- it defines what the
 Gateway does once traffic arrives.
 
-## Conformance
-
-### Egress Conformance Profile
-
-This GEP defines an `Egress` conformance profile. Implementations declare
-egress support by passing egress conformance tests.
-
-**Core egress conformance** (required for profile):
-
-- Gateway accepts and routes egress traffic
-- HTTPRoute attached to egress Gateway routes to Backend ([PR #4488](https://github.com/kubernetes-sigs/gateway-api/pull/4488))
-- Policy conflict resolution follows specificity precedence
-
-**Extended egress conformance**:
-
-- Multi-backend weighted routing and failover
-- Backend TLS origination (Simple, Mutual) -- via [PR #4488](https://github.com/kubernetes-sigs/gateway-api/pull/4488) conformance
-- Cross-namespace Backend references with ReferenceGrant
-
 ## Security Considerations
 
 ### Egress-Specific Risks
@@ -306,17 +286,12 @@ dedicated `EgressGateway` resource as an alternative. Community input is
 needed to decide which approach to pursue. See
 [Alternatives Considered](#alternatives-considered).
 
-### 2. Egress Conformance Profile Shape
-
-Should egress conformance be a standalone profile (like [`Mesh`](../gep-1709/index.md)) or a feature
-within the existing `HTTP` profile?
-
-### 3. Listener Hostname Guidance
+### 2. Listener Hostname Guidance
 
 Should the GEP recommend specific listener configurations for egress (e.g.,
 "use a single wildcard listener") or leave this entirely to implementations?
 
-### 4. Mixed Ingress/Egress Gateways
+### 3. Mixed Ingress/Egress Gateways
 
 Should a single Gateway be allowed to serve both ingress and egress traffic
 (via multiple listeners)?
@@ -375,23 +350,21 @@ Dynamic routing to arbitrary hostnames (forward proxy) is out of scope. See
 - [ ] Community decision on Gateway reuse (this GEP) vs EgressGateway ([GEP-4748])
 - [ ] [PR #4488](https://github.com/kubernetes-sigs/gateway-api/pull/4488) (Backend) reaches at least Provisional status
 - [ ] Open questions resolved
-- [ ] Egress conformance profile defined in detail
 
 ### Alpha (Experimental)
 
-- [ ] Egress conformance tests implemented
-- [ ] At least one implementation passes egress conformance
+- [ ] At least one implementation supports egress usage pattern
 - [ ] Documentation for egress usage patterns
 
 ### Beta
 
-- [ ] At least two implementations pass egress conformance
+- [ ] At least two implementations support egress usage pattern
 - [ ] Production usage reports from 2+ organizations
 - [ ] Gateway Routability (#1651) resolved or workaround documented
 
 ### GA (Standard)
 
-- [ ] Three implementations passing extended egress conformance
+- [ ] Three implementations supporting egress usage pattern
 - [ ] No API-level changes needed for 6+ months
 - [ ] Security review complete
 
