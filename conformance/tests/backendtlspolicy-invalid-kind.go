@@ -42,6 +42,7 @@ var BackendTLSPolicyInvalidKind = confsuite.ConformanceTest{
 		features.SupportBackendTLSPolicy,
 	},
 	Manifests: []string{"tests/backendtlspolicy-invalid-kind.yaml"},
+	Parallel:  true,
 	Test: func(t *testing.T, suite *confsuite.ConformanceTestSuite) {
 		ns := confsuite.InfrastructureNamespace
 		routeNN := types.NamespacedName{Name: "backendtlspolicy-invalid-kind-test", Namespace: ns}

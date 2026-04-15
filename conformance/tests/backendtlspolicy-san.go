@@ -43,6 +43,7 @@ var BackendTLSPolicySANValidation = confsuite.ConformanceTest{
 		features.SupportBackendTLSPolicySANValidation,
 	},
 	Manifests: []string{"tests/backendtlspolicy-san.yaml"},
+	Parallel:  true,
 	Test: func(t *testing.T, suite *confsuite.ConformanceTestSuite) {
 		ns := confsuite.InfrastructureNamespace
 		routeNN := types.NamespacedName{Name: "backendtlspolicy-san-test", Namespace: ns}
