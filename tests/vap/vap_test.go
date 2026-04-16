@@ -183,7 +183,7 @@ xmeshes.gateway.networking.x-k8s.io: experimental
 
 			// do replace on gateway.networking.k8s.io/bundle-version: v1.x.0
 			re := regexp.MustCompile(`gateway\.networking\.k8s\.io\/bundle-version: \S*`)
-			sub := []byte("gateway.networking.k8s.io/bundle-version: v1.3.0")
+			sub := []byte("gateway.networking.k8s.io/bundle-version: v0.8.0")
 			oldCrd := re.ReplaceAll(httpCrd, sub)
 
 			// supply crd to stdin of cmd and kubectl apply -f -
