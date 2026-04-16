@@ -1,6 +1,7 @@
-# GEP-XXX: Backend Resource for Service Decoration
+# GEP-4488: Backend Resource for Service Decoration
 
-* Issue: [#XXXX](https://github.com/kubernetes-sigs/gateway-api/issues/XXXX)
+* Issue: [#4488](https://github.com/kubernetes-sigs/gateway-api/pull/4488)
+  * Incubated by the [AI Gateway Working Group](https://github.com/kubernetes-sigs/wg-ai-gateway/pull/20)
 * Status: Provisional
 
 ## TLDR
