@@ -28,6 +28,11 @@ mkdir -p cache
 
 failed=false
 for module in $(find . -name "go.mod" | xargs -n1 dirname); do
+  # Skip Hugo site directory as it uses Go modules for thematic mounts,
+  # but shouldn't be linted alongside core project features.
+  if [[ "${module}" == "./site" || "${module}" == ./site/* ]]; then
+    continue
+  fi
   echo "Linting ${module}"
 
   docker run --rm \

@@ -46,7 +46,7 @@ The simplest way to get started is to attend one of the regular Gateway API
 [service mesh]: /docs/glossary/#service-mesh
 [east/west traffic]: /docs/glossary/#eastwest-traffic
 [role-oriented]: /docs/concepts/roles-and-personas/
-[geps]: /geps/overview/
+[geps]: /enhancements/overview/
 [contributor-ladder]: /contributing/contributor-ladder/
 [meetings]: /contributing/get-involved/#meetings
 [GAMMA leads]: https://github.com/kubernetes-sigs/gateway-api/blob/main/OWNERS_ALIASES#L23

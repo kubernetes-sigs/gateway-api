@@ -51,7 +51,7 @@ include reference to a discussion and/or recordings of discussion in our
 community meetings, please note that it _may_ get closed with a request to
 create an initial discussion first.
 
-[gep]: /geps/overview/
+[gep]: /enhancements/overview/
 [discussion]: https://github.com/kubernetes-sigs/gateway-api/discussions/new/choose
 [meetings]: /contributing/get-involved/#meetings
 
