@@ -143,7 +143,7 @@ This GEP is the outcome of the TLS use case #4 in
 
 ## BackendTLSPolicy is a union feature
 
-BackendTLSPolicy complies with the definition of [Union feature](../../site-src/guides/implementers.md#union-feature-conformance).
+BackendTLSPolicy complies with the definition of [Union feature](/guides/implementers-guide/#union-feature-conformance).
 This means that this feature is used in combination with other features. Some examples:
 
 * An implementation that claims support for `GRPCRoute` and `BackendTLSPolicy` MUST support 
@@ -837,7 +837,7 @@ of the first standard Policy type.
 
 [Gateway API TLS Use Cases](https://docs.google.com/document/d/17sctu2uMJtHmJTGtBi_awGB0YzoCLodtR6rUNmKMCs8/edit#heading=h.cxuq8vo8pcxm)
 
-[GEP-713: Metaresources and PolicyAttachment](../gep-713/index.md)
+[GEP-713: Metaresources and PolicyAttachment](/geps/gep-713/)
 
 [Gateway API TLS](/guides/user-guides/tls)
 

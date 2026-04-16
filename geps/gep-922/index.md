@@ -3,11 +3,14 @@
 * Issue: [#922](https://github.com/kubernetes-sigs/gateway-api/issues/922)
 * Status: Memorandum
 
-!!! note
-    Although this GEP serves as a reference for how we developed the Gateway API
-    versioning model, it is not meant to be the current source of truth.
-    Instead, please refer to our [official Versioning
-    Policy](/docs/concepts/versioning) for the most up-to-date guidelines.
+{{% alert color="note" %}}
+
+Although this GEP serves as a reference for how we developed the Gateway API
+versioning model, it is not meant to be the current source of truth.
+Instead, please refer to our [official Versioning
+Policy](/docs/concepts/versioning) for the most up-to-date guidelines.
+
+{{% /alert %}}
 
 ## TLDR
 Each Gateway API release will be represented by a bundle version that represents

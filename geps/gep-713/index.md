@@ -333,8 +333,11 @@ spec:
 
 Policies can opt for allowing instances to target objects across Kubernetes namespaces, in which case an optional `namespace` field MUST be defined with the target reference.
 
-!!! warning
-    Although not strictly forbidden, this is in general discouraged due to [discoverability](#policy-discoverability) issues and security implications. Cross namespace references can often lead to escalation of privileges associated with the [Confused deputy problem](https://en.wikipedia.org/wiki/Confused_deputy_problem).
+{{% alert color="warning" %}}
+
+Although not strictly forbidden, this is in general discouraged due to [discoverability](#policy-discoverability) issues and security implications. Cross namespace references can often lead to escalation of privileges associated with the [Confused deputy problem](https://en.wikipedia.org/wiki/Confused_deputy_problem).
+
+{{% /alert %}}
 
 Implementations that opt for designing policies that allow for cross namespace references MUST support one of the following combined approaches, to address the security concern:
 

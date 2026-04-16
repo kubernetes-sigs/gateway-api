@@ -7,6 +7,6 @@ cascade:
     ui:
       breadcrumb_disable: false
 
-_build:
+build:
   list: never
 ---

@@ -5,10 +5,10 @@
 
 [build.environment]
     PYTHON_VERSION = "3.12"
-    GO_VERSION = "1.24.1"
+    GO_VERSION = "1.25.0"
     # node Active LTS
     NODE_VERSION = "20.20.0"
-    HUGO_VERSION = "0.148.0"
+    HUGO_VERSION = "0.160.1"
 
 # Standard Netlify redirects
 [[redirects]]

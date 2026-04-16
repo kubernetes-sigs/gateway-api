@@ -57,7 +57,7 @@ While there is value out of providing class-wide options as defaults, there is a
 
 Some parallels in existing APIs:
 
-[Policy Attachment](../../reference/policy-attachment.md) offers a hierarchy of defaults and overrides, allowing attachment to GatewayClass and Gateway.
+[Policy Attachment](/reference/policy-attachment/) offers a hierarchy of defaults and overrides, allowing attachment to GatewayClass and Gateway.
 This is similar to our needs here, but representing infrastructure configuration as a "Policy" is a bit problematic, and the existing mechanisms have no hierarchy.
 
 In core Kubernetes, Pods declare their requirements (for example, CPU requests) inline in the Pod resource; there is not a `ResourceClass` API that abstracts these further.
@@ -78,7 +78,7 @@ For example, if I wanted to represent a `version` field and change that to trigg
 In order to address the concerns above, I propose a standard `infrastructure` API is added to `Gateway`.
 
 The exact fields are out of scope for this GEP and will be handled by additional GEPs.
-One example GEP already depending on this is [GEP-1651](../gep-1651/index.md).
+One example GEP already depending on this is [GEP-1651](/geps/gep-1651/).
 
 The fields as defined below are, at time of writing, the existing fields covered by this GEP. More fields may be added as needed.
 
@@ -140,8 +140,11 @@ type GatewayClassInfrastructure struct {
 }
 ```
 
-!!! warning
-    Modifying pod labels via `infrastructure.labels` could result in data plane pods being replaced (depending on the implementation). The way in which the pods are replaced is implementation specific and may result in downtime. Implementations should document how they handle changes to `infrastructure.labels`.
+{{% alert color="warning" %}}
+
+Modifying pod labels via `infrastructure.labels` could result in data plane pods being replaced (depending on the implementation). The way in which the pods are replaced is implementation specific and may result in downtime. Implementations should document how they handle changes to `infrastructure.labels`.
+
+{{% /alert %}}
 
 ### API Principles
 
