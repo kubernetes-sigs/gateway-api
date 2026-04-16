@@ -81,6 +81,48 @@ func TestValidateGateway(t *testing.T) {
 			wantErrors: []string{"tls must not be specified for protocols ['HTTP', 'TCP', 'UDP']"},
 		},
 		{
+			desc: "tls config present with mixed-case Http protocol",
+			mutate: func(gw *gatewayv1.Gateway) {
+				gw.Spec.Listeners = []gatewayv1.Listener{
+					{
+						Name:     gatewayv1.SectionName("http"),
+						Protocol: gatewayv1.ProtocolType("Http"),
+						Port:     gatewayv1.PortNumber(8080),
+						TLS:      &gatewayv1.ListenerTLSConfig{},
+					},
+				}
+			},
+			wantErrors: []string{"tls must not be specified for protocols ['HTTP', 'TCP', 'UDP']"},
+		},
+		{
+			desc: "tls config present with lowercase tcp protocol",
+			mutate: func(gw *gatewayv1.Gateway) {
+				gw.Spec.Listeners = []gatewayv1.Listener{
+					{
+						Name:     gatewayv1.SectionName("tcp"),
+						Protocol: gatewayv1.ProtocolType("tcp"),
+						Port:     gatewayv1.PortNumber(8080),
+						TLS:      &gatewayv1.ListenerTLSConfig{},
+					},
+				}
+			},
+			wantErrors: []string{"tls must not be specified for protocols ['HTTP', 'TCP', 'UDP']"},
+		},
+		{
+			desc: "tls config present with lowercase udp protocol",
+			mutate: func(gw *gatewayv1.Gateway) {
+				gw.Spec.Listeners = []gatewayv1.Listener{
+					{
+						Name:     gatewayv1.SectionName("udp"),
+						Protocol: gatewayv1.ProtocolType("udp"),
+						Port:     gatewayv1.PortNumber(8080),
+						TLS:      &gatewayv1.ListenerTLSConfig{},
+					},
+				}
+			},
+			wantErrors: []string{"tls must not be specified for protocols ['HTTP', 'TCP', 'UDP']"},
+		},
+		{
 			desc: "lowercase https protocol with Passthrough tls mode",
 			mutate: func(gw *gatewayv1.Gateway) {
 				gw.Spec.Listeners = []gatewayv1.Listener{
@@ -95,6 +137,108 @@ func TestValidateGateway(t *testing.T) {
 				}
 			},
 			wantErrors: []string{"tls mode must be Terminate for protocol HTTPS"},
+		},
+		{
+			desc: "mixed-case hTtPs protocol with Passthrough tls mode",
+			mutate: func(gw *gatewayv1.Gateway) {
+				gw.Spec.Listeners = []gatewayv1.Listener{
+					{
+						Name:     gatewayv1.SectionName("https"),
+						Protocol: gatewayv1.ProtocolType("hTtPs"),
+						Port:     gatewayv1.PortNumber(8080),
+						TLS: &gatewayv1.ListenerTLSConfig{
+							Mode: ptrTo(gatewayv1.TLSModeType("Passthrough")),
+						},
+					},
+				}
+			},
+			wantErrors: []string{"tls mode must be Terminate for protocol HTTPS"},
+		},
+		{
+			desc: "lowercase tls protocol requires tls mode to be set",
+			mutate: func(gw *gatewayv1.Gateway) {
+				gw.Spec.Listeners = []gatewayv1.Listener{
+					{
+						Name:     gatewayv1.SectionName("tls"),
+						Protocol: gatewayv1.ProtocolType("tls"),
+						Port:     gatewayv1.PortNumber(8443),
+					},
+				}
+			},
+			wantErrors: []string{"tls mode must be set for protocol TLS"},
+		},
+		{
+			desc: "mixed-case Tls protocol requires tls mode to be set",
+			mutate: func(gw *gatewayv1.Gateway) {
+				gw.Spec.Listeners = []gatewayv1.Listener{
+					{
+						Name:     gatewayv1.SectionName("tls"),
+						Protocol: gatewayv1.ProtocolType("Tls"),
+						Port:     gatewayv1.PortNumber(8443),
+					},
+				}
+			},
+			wantErrors: []string{"tls mode must be set for protocol TLS"},
+		},
+		{
+			desc: "hostname present with lowercase tcp protocol",
+			mutate: func(gw *gatewayv1.Gateway) {
+				hostname := gatewayv1.Hostname("foo")
+				gw.Spec.Listeners = []gatewayv1.Listener{
+					{
+						Name:     gatewayv1.SectionName("tcp"),
+						Protocol: gatewayv1.ProtocolType("tcp"),
+						Port:     gatewayv1.PortNumber(8080),
+						Hostname: &hostname,
+					},
+				}
+			},
+			wantErrors: []string{"hostname must not be specified for protocols ['TCP', 'UDP']"},
+		},
+		{
+			desc: "hostname present with lowercase udp protocol",
+			mutate: func(gw *gatewayv1.Gateway) {
+				hostname := gatewayv1.Hostname("foo")
+				gw.Spec.Listeners = []gatewayv1.Listener{
+					{
+						Name:     gatewayv1.SectionName("udp"),
+						Protocol: gatewayv1.ProtocolType("udp"),
+						Port:     gatewayv1.PortNumber(8080),
+						Hostname: &hostname,
+					},
+				}
+			},
+			wantErrors: []string{"hostname must not be specified for protocols ['TCP', 'UDP']"},
+		},
+		{
+			desc: "lowercase http protocol without tls is valid",
+			mutate: func(gw *gatewayv1.Gateway) {
+				gw.Spec.Listeners = []gatewayv1.Listener{
+					{
+						Name:     gatewayv1.SectionName("http"),
+						Protocol: gatewayv1.ProtocolType("http"),
+						Port:     gatewayv1.PortNumber(8080),
+					},
+				}
+			},
+		},
+		{
+			desc: "duplicate listeners with different-case protocols should conflict",
+			mutate: func(gw *gatewayv1.Gateway) {
+				gw.Spec.Listeners = []gatewayv1.Listener{
+					{
+						Name:     gatewayv1.SectionName("http1"),
+						Protocol: gatewayv1.ProtocolType("HTTP"),
+						Port:     gatewayv1.PortNumber(8080),
+					},
+					{
+						Name:     gatewayv1.SectionName("http2"),
+						Protocol: gatewayv1.ProtocolType("http"),
+						Port:     gatewayv1.PortNumber(8080),
+					},
+				}
+			},
+			wantErrors: []string{"Combination of port, protocol and hostname must be unique for each listener"},
 		},
 		{
 			desc: "https protocol with Passthrough tls mode",
