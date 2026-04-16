@@ -42,13 +42,14 @@ defaultContentLanguage = "en"
   copyright = "The Linux Foundation"
   github_repo = "https://github.com/kubernetes-sigs/gateway-api"
   github_branch = "main"
-  github_subdir = "content" # Set this to wherever your markdown files live
+  github_subdir = "site/content/en" # Set this to wherever your markdown files live
 
   # Search settings
   offlineSearch = true
   
   # User Interface settings
   [params.ui]
+    navbar_theme = "dark"
     # Enable to make the sidebar menu foldable.
     sidebar_menu_foldable = true
     # Enable to show the side bar menu in its compact state.

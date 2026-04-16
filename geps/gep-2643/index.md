@@ -29,7 +29,7 @@ based on the SNI identification that should pass the traffic to N load balanced 
 ## Non-Goals
 
 * Provide an interface for users to define different listeners or ports for the
-`TLSRoute` - This will be covered by the [ListenerSet enhancement](/gep-1713/index.md).
+`TLSRoute` - This will be covered by the [ListenerSet enhancement](/geps/gep-1713/).
 * When using `TLSRoute` passthrough, support `PROXY` protocol on the gateway listener.
 * When using `TLSRoute` passthrough, support `PROXY` protocol on the communication
 between the Gateway and the backend.
@@ -591,4 +591,4 @@ the field can be considered too complex.
 * [TLSRoute intersecting hostnames issue](https://github.com/kubernetes-sigs/gateway-api/issues/3541)
 * [TLSRoute termination feature request](https://github.com/kubernetes-sigs/gateway-api/issues/2111)
 * [GatewayAPI TLS Use Cases](https://docs.google.com/document/d/17sctu2uMJtHmJTGtBi_awGB0YzoCLodtR6rUNmKMCs8)
-* [Union Features](../../site-src/guides/implementers.md#union-feature-conformance)
+* [Union Features](/guides/implementers-guide/#union-feature-conformance)

@@ -89,12 +89,14 @@ flowchart LR
     service --> pod1 & pod2
 ```
 
-!!! note "Union feature"
+{{% alert color="info" title="Union Feature" %}}
 
-    While the diagram above shows an HTTPRoute, BackendTLSPolicy is a
-    [union feature](../guides/implementers.md#union-feature-conformance) and
-    works with any route type that forwards traffic to backends, including
-    GRPCRoute and TLSRoute (when in Terminate mode).
+While the diagram above shows an HTTPRoute, BackendTLSPolicy is a
+[union feature](/guides/implementers-guide/#union-feature-conformance) and
+works with any route type that forwards traffic to backends, including
+GRPCRoute and TLSRoute (when in Terminate mode).
+
+{{% /alert %}}
 
 ### Targeting backends
 
