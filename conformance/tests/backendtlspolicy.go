@@ -47,6 +47,7 @@ var BackendTLSPolicy = confsuite.ConformanceTest{
 		features.SupportBackendTLSPolicy,
 	},
 	Manifests: []string{"tests/backendtlspolicy.yaml"},
+	Parallel:  true,
 	Test: func(t *testing.T, suite *confsuite.ConformanceTestSuite) {
 		ns := confsuite.InfrastructureNamespace
 
