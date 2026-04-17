@@ -1,96 +1,236 @@
-# GEP-4359: Regex Rewrites
+# GEP-4359: Gateway API Regex
 
 * Issue: [#4359](https://github.com/kubernetes-sigs/gateway-api/issues/4359)
 * Status: Provisional
 
 ## TLDR
 
-Right now Gateway API supports only full path or prefix rewrites, we want to extend it to regex-based path rewrites.
-This is already supported by [Envoy](https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/route/v3/route_components.proto#envoy-v3-api-field-config-route-v3-routeaction-regex-rewrite),
-[NGINX](https://nginx.org/en/docs/http/ngx_http_rewrite_module.html#rewrite),
-and [HAProxy](https://cbonte.github.io/haproxy-dconv/2.5/configuration.html#4.2-http-request%20replace-path);
-in this proposal we are closing the gap between Gateway API and current capabilities of the modern LBs.
+Regular expressions provide a powerful and concise method for traffic routing and manipulation, but present portability challenges due to the variety of regex engines.
+The goal of this proposal is to define a common regex syntax and semantics that all implementations should support.
+We use POSIX ERE (as defined in Chapter 9 of the [The Open Group Base Specifications Issue 8]) as the common denominator, with some feature exclusions.
 
 ## Goals
 
-Close the regex-based path rewrites feature gap for Gateway API, i.e.:
-
- * Rewrite the path of a request based on a regular expression, regardless of initial match type
- * Substitute matching section(s) in the regular expression with predefined values
- * Define a common regex syntax that all implementations should support
- * Define capture group references in the substitution string
+* Define a common regex syntax and semantics (Gateway API Regex) for Gateway API that all implementations should support.
+* Define the set of inputs for our regex expressions.
+* Define methods of referencing capturing groups.
 
 ## Non-Goals
 
-  * Any sort of host rewriting
-  * Limit regex features to a common subset.
+* Limit regex features to a common subset.
+* Methods of validating regular expressions at the API level
+* Define specific use cases for regular expressions.
+* Define failure modes when a regular expression or input is unsupported. Such validation requires a context-free grammar, and we cannot do that with CEL.
 
 ## Introduction/Overview
 
-We would like to add an enhancement to the HTTPURLRewriteFilter that would allow the caller to specify path rewrite based on the provided pattern and substitution.
-Right now Gateway API supports only full path or prefix rewrites, we want to extend it taking into account capabilities of the modern LBs.
+Regular expressions are a concise mechanism to describe large sets of strings, and for purposes of traffic routing and manipulation.
+Unfortunately, the many regular expression engines ([RE2](https://github.com/google/re2), [PCRE](https://www.pcre.org/), and [rust-lang/regex](https://docs.rs/regex/latest/regex/))
+present a portability challenge for Gateway API, as different proxies use different engines which support different syntax and features.
 
-## Purpose (Why and Who)
+## Purpose
 
-This is a highly requested feature. This is also supported by Envoy, NGINX, and HAProxy.
+Regular expressions allow users to concisely express patterns for traffic routing and manipulation.
+Although out of scope for this proposal, some use cases are:
 
-In this proposal we are closing the gap between Gateway API and current capabilities of the modern LBs.
+* Path/URL matching
+* URL rewriting
+* Header matching
 
 ## Implementation and Support
 
-| Implementation | Support | Engine |
-|----------------|------------|----------------|
-| Envoy | [config.route.v3.RouteAction.regex_rewrite](https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/route/v3/route_components.proto#envoy-v3-api-field-config-route-v3-routeaction-regex-rewrite) | RE2 |
-| HAProxy | [http-request replace-path](https://cbonte.github.io/haproxy-dconv/2.5/configuration.html#4.2-http-request%20replace-path) | PCRE |
-| NGINX | [ngx_http_rewrite_module.html#rewrite](https://nginx.org/en/docs/http/ngx_http_rewrite_module.html#rewrite) | PCRE |
+The most popular Regex engines are RE2 and PCRE.
 
-NGINX only replaces the first match of the pattern using the rewrite directive, but you can get full substitution using Lua.
-
-## API
-
-This is a provisional GEP, so no specific API details, but at a high level there will be two fields: `pattern` and `substitution`.
-`pattern` will be a regular expression (this is different from a path match of type RegularExpression).
-**ALL** instances of `pattern` in the url path MUST be replaced with `substitution`.
-See below for more details on the regex flavor and substitution syntax.
-The URL path INCLUDES the leading slash when matching against the pattern.
-We do not define what happens if the path is invalid after the substitution (e.g. missing leading slash)
-
-If the implementation deems `pattern` or `substitution` to be invalid (contains illegal characters, unmatched parenthesis, unsupported features),
-the implementation MUST consider the rule to be invalid.
+| Proxy          | Engine         |
+|----------------|----------------|
+| Envoy          | RE2            |
+| HAProxy        | PCRE           |
+| NGINX          | PCRE           |
+| Traefik        | RE2            |
 
 
-Here are some examples
+## Inputs
 
-| `pattern`                   | `substitution` |  Input path  | Output path  |
-| ------------                | -------------- | ------------ | ------------ |
-| `a`                         | `c`            | `/aba`       | `/cbc`       |
-| `^/a`                       | `/c`           | `/aba`       | `/cba`       |
-| `^/a`                       | `/c`           | `/aba`       | `/cba`       |
-| `^/a`                       | `c`            | `/aba`       |  Undefined   |
-| `a$`                        | `c`            | `/aba`        | `/abc`       |
-| `^/([A-Za-z]+)/([A-Za-z]+)` | `/\2/\1`       | `/my/path`   | `/path/my`   |
+For Gateway API Regex we only explicitly support strings composed of ASCII characters that are not null, not control characters, and not spaces (other than space and tab) as inputs.
+In other words, only the following code points are supported:
 
-### Regex Flavor
+* `0x09` (tab)
+* `0x20` (space)
+* `0x21-0x7E` (printable characters)
 
-Because regex flavors differ in features, we define a common denominator to ensure portability.
-Each implementation's regex flavor MUST be a superset of [IEEE POSIX ERE](https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap09.html), with a few exceptions:
+The reason for this restriction is that regex engines differ in their support for line breaks, unicode, and control characters.
+Supporting such inputs would add ambiguity and diminish portability with little practical benefits as such characters are rarely used in traffic routing and manipulation 
+(notably, [HTTP header values can have `0x80-0xFF` code points](https://datatracker.ietf.org/doc/html/rfc9110#section-5.5), but their use is rare).
+For example, in RE2, the `.` character might or might not match line breaks, depending on configuration.
+`rust-lang/regex` treats multi-byte unicode characters as a single character, while in RE2, they are treated as a single character.
+Null and control characters should not show up in traffic routing.
+
+Some examples of valid input strings are
+
+* `foo` (`0x66 0x6F 0x6F`)
+* ` foo bar` (`0x20 0x66 0x6F 0x6F 0x20 0x62 0x61 0x72`)
+* `foo\tbar` (`0x66 0x6F 0x6F 0x09 0x62 0x61 0x72`)
+
+Some examples of invalid input strings are (implementations need not reject these, but they are not explicitly supported by the spec):
+
+* `foo\nbar` (`0x66 0x6F 0x6F 0x0A 0x62 0x61 0x72`)
+* `ｆ๏๏ ß∆я` (`0xef 0xbd 0x86 0xe0 0xb9 0x8f 0xe0 0xb9 0x8f 0xe2 0x80 0x82 0xc3 0x9f 0xe2 0x88 0x86 0xd1 0x8f`)
+
+
+## Gateway API Regex Definition
+
+We use IEEE POSIX ERE (as defined in Chapter 9 of the [The Open Group Base Specifications Issue 8]), as the base of Gateway API Regex, with a few exceptions:
 
 * We do not define whether matches are leftmost-longest, leftmost-first, or something else.
-* Collating symbols. For example, in some locales, the string `ch` is considered to be one character, and `[[.ch.]]` will match it.
-* Equivalence classes. For example, in some locales `a`, `A`, and other unicode variations of `a` are considered to be equivalent, and `[[=a=]]` will match all of them.
-* Character classes. For example, `[:alpha:]`.
-* Any other locale-specific behavior will assume the [C/POSIX locale](https://pubs.opengroup.org/onlinepubs/7908799/xbd/locale.html) (e.g. character ordering).
+* Unescaped square brackets in character classes are undefined (`[[]]`, `[]]`, `[[]`, `[[:alpha:]`, `[[=a=]]`, `[[.ch.]]`).
+* Backslashes (`\`) retain their special meaning in character classes and can escape special characters, even if those special characters lose their special meaning in character classes. For example, `[\-]` matches `-`, and `[\]]` matches `]`.
+* Consecutive quantifiers are undefined (`a**`, `a*?`, `a{1,2}?`).
+* Any locale-specific behavior will assume the [C/POSIX locale](https://pubs.opengroup.org/onlinepubs/7908799/xbd/locale.html) (e.g. character ordering).
 
 IEEE POSIX ERE is a good common denominator because
 * The set of supported features is small (e.g. no backreferences)
 * Broadly compatible across regex engines (RE2, rust-lang/regex, PCRE), especially because we don't have to worry about unicode, line breaks, and control sequences.
 
-Although there is no single source saying POSIX ERE with above exceptions is supported by all three engines, we have verified that the features we need are supported by all three engines, it certainly seems to be the case:
-* They all support the special regex characters (e.g. `*`, `+`, `?`, `|`, `()`, `[]`, `^`, `$`).
-* Special regex characters can be escaped with `\` in all three engines. 
-* Special regex characters lose their special meaning when they are inside a character class (e.g. `[*]` matches `*`).
-* The precedence of operators is the same (though there doesn't seem to be a neat chart for this in PCRE)
+Some notable omissions from Gateway API Regex are:
+* Backreferences (e.g. `\1`, `\2`, etc.)
+* Matching flags (e.g. `(?i)` for case-insensitive matching)
+* `\d` for digit, `\w` for word character, `\s` for whitespace character, and escaping any character that isn't a special character.
+* Hex encoding of characters (e.g. `\xFF` or `\uFFFF`)
+* Lazy vs non-lazy matching (e.g. `*` vs `*?`)
+* Interval range expressions without starting numbers (`a{,2}`, `a{,}`).
 
-For the substitution string, implementations MUST allow `\1`, `\2`, etc to reference capturing groups in the pattern.
-The ordering of the capturing groups MUST be determined by the order of the opening parentheses in the pattern.
+### Examples
+
+For the pattern `^(https?://)?www\.example\.(com|org)$`, the following strings would contain a match
+
+* `www.example.com`
+* `www.example.org`
+* `http://www.example.com`
+* `https://www.example.com`
+* `http://www.example.org`
+* `https://www.example.org`
+
+The following strings would not match
+
+* `example.com`
+* `www.example.net`
+* `www.example.(com|org)`
+* `www.example.corg`
+* `www.example.comorg`
+* `ahttp://www.example.org`
+* `http://www.example.orga`
+
+For the pattern `a*`, the following strings would match
+
+* ``
+* `a` (many possible matches)
+* `aaaaa` (many possible matches)
+* `b` (many possible matches)
+* In fact, any string would contain a match
+
+For the pattern `a+`, the following strings would match
+
+* `a`
+* `baaaaab` (many possible matches).
+
+The following strings would not match
+
+* ``
+* `b`
+
+The patterns `^colo(u|)r$`, `^colou?r$`, `^colo(u)?r$`, `^colo(u)?r$`, `^colou{0,1}r$` are all equivalent, and would match
+
+* `color`
+* `colour`
+
+The following strings would not match
+
+* `colouur`
+* `colo(u)r`
+
+The pattern `\*+` would match
+
+* `*`
+* `****`
+* `\*+`
+
+The pattern `[a-zA-Z0-9.]` would match
+
+* `a`
+* `Z`
+* `5`
+* `.`
+
+The following strings would not match
+
+* `-`
+* ` `
+
+The pattern `[^a-zA-Z]` would match
+
+* `-`
+* ` `
+* `9`
+
+The following strings would not match
+
+* `a`
+* `Z`
+* `k`
+
+For the pattern `^[^^]$`, the only non-matching strings are
+
+* ``
+* `^`
+* Any string with two or more characters
+
+For the patterns `^[-a]$` and `^[a-]$`, the only matching strings are 
+
+* `-`
+* `a`
+
+For the equivalent patterns `^[-.*(){}|^$\\]$` and `^[\-\.\*\(\)\{\}\|\^\$\\]$`, the only matching strings are
+
+* `-`
+* `.`
+* `*`
+* `(`
+* `)`
+* `{`
+* `}`
+* `|`
+* `^`
+* `$`
+* `\`
+
+For the pattern `^[\-Z]$`, the only matching strings are
+
+* `-`
+* `Z`
+
+## Replacement
+
+Replacement is usually straightforward, but has some semantic ambiguities.
+Given a pattern, a replacement, and an input, we allow higher level APIs to define semantics such as
+* whether the first or all matches should be replaced.
+* if replacing all matches, how to deal with overlapping matches.
+
+That said, whether the matches are leftmost-first or leftmost-longest is always undefined.
+
+### Referencing Capturing Groups
+
+In the case that referencing capturing groups is supported, APIs MUST use the `\1`, `\2`, etc. syntax in the replacement string to reference capturing groups.
+Named capturing groups are not explicitly supported, and the syntax for referencing them is undefined.
+A capturing group is any expression enclosed in unescaped parentheses.
+The order of capturing groups is determined by the order of the opening parentheses, from left to right in the pattern, starting at 1.
+If the replacement references a non-existent capturing group, the reference is treated as an empty string.
+If a capturing group has a quantifier at the end, the reference in the replacement string will be replaced with the longest match of that capturing group.
+Here are some examples when replacing all instances of the pattern with the replacement:
+
+| Pattern         | Replacement | Input           | Output          |
+|-----------------|-------------|-----------------|-----------------|
+| `aba`           | `c`         | `abaaba`        | `cc`            |
+| `a([bc])+a`     | `\1`        | `abca`          | `c`             |
+
+
 
