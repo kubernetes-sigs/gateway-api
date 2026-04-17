@@ -172,25 +172,43 @@ xmeshes.gateway.networking.x-k8s.io: experimental
 		})
 
 		t.Run("should not be able to install CRDs with an older version", func(t *testing.T) {
-			t.Cleanup(func() {
-				_, _ = executeKubectlCommand(t, kubectlLocation, kubeconfigLocation,
-					[]string{"delete", "--wait", "-f", filepath.Join("..", "..", "config", "crd", "standard", "gateway.networking.k8s.io_httproutes.yaml")})
-			})
+			versions := []struct {
+				version string
+				fail    bool
+			}{
+				{"v1.0.0", true},
+				{"v1.1.0", true},
+				{"v1.3.0", true},
+				{"v0.0.0-dev", false},
+			}
 
-			// Read test crd into []byte
-			httpCrd, err := os.ReadFile(filepath.Join("..", "..", "config", "crd", "standard", "gateway.networking.k8s.io_httproutes.yaml"))
-			require.NoError(t, err)
+			for _, v := range versions {
+				t.Run(v.version, func(t *testing.T) {
+					t.Cleanup(func() {
+						_, _ = executeKubectlCommand(t, kubectlLocation, kubeconfigLocation,
+							[]string{"delete", "--wait", "--ignore-not-found", "-f", filepath.Join("..", "..", "config", "crd", "standard", "gateway.networking.k8s.io_httproutes.yaml")})
+					})
 
-			// do replace on gateway.networking.k8s.io/bundle-version: v1.x.0
-			re := regexp.MustCompile(`gateway\.networking\.k8s\.io\/bundle-version: \S*`)
-			sub := []byte("gateway.networking.k8s.io/bundle-version: v1.3.0")
-			oldCrd := re.ReplaceAll(httpCrd, sub)
+					// Read test crd into []byte
+					httpCrd, err := os.ReadFile(filepath.Join("..", "..", "config", "crd", "standard", "gateway.networking.k8s.io_httproutes.yaml"))
+					require.NoError(t, err)
 
-			// supply crd to stdin of cmd and kubectl apply -f -
-			output, err := executeKubectlCommandStdin(t, kubectlLocation, kubeconfigLocation, bytes.NewReader(oldCrd), []string{"apply", "-f", "-"})
+					// do replace on gateway.networking.k8s.io/bundle-version: v1.x.0
+					re := regexp.MustCompile(`gateway\.networking\.k8s\.io\/bundle-version: \S*`)
+					sub := []byte(fmt.Sprintf("gateway.networking.k8s.io/bundle-version: %s", v.version))
+					oldCrd := re.ReplaceAll(httpCrd, sub)
 
-			require.Error(t, err)
-			assert.Contains(t, output, "ValidatingAdmissionPolicy 'safe-upgrades.gateway.networking.k8s.io' with binding 'safe-upgrades.gateway.networking.k8s.io' denied request")
+					// supply crd to stdin of cmd and kubectl apply -f -
+					output, err := executeKubectlCommandStdin(t, kubectlLocation, kubeconfigLocation, bytes.NewReader(oldCrd), []string{"apply", "-f", "-"})
+
+					if v.fail {
+						require.Error(t, err, "version %s should be blocked", v.version)
+						assert.Contains(t, output, "ValidatingAdmissionPolicy 'safe-upgrades.gateway.networking.k8s.io' with binding 'safe-upgrades.gateway.networking.k8s.io' denied request")
+					} else {
+						require.NoError(t, err, "output", output)
+					}
+				})
+			}
 		})
 	default:
 		t.Fatalf("invalid CRD channel: %s", crdChannel)
