@@ -1,0 +1,24 @@
+apiVersion: internal.gateway.networking.k8s.io/v1alpha1
+kind: GEPDetails
+number: 4751
+name: Egress Gateway Chaining (Parent Mode)
+status: Provisional
+authors:
+  - usize
+  - shaneutt
+  - keithmattix
+relationships:
+  obsoletes: []
+  obsoletedBy: []
+  extends:
+    - number: 4747
+      name: L7 Reverse-Proxy Egress Gateway
+  extendedBy: []
+  seeAlso:
+    - number: 4748
+      name: EgressGateway Resource
+references:
+  - https://github.com/kubernetes-sigs/wg-ai-gateway/blob/main/proposals/10-egress-gateways.md
+featureNames:
+  - EgressGatewayChaining
+changelog: []
