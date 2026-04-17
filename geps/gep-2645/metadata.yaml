@@ -1,0 +1,11 @@
+apiVersion: internal.gateway.networking.k8s.io/v1alpha1
+kind: GEPDetails
+number: 2645
+name: UDPRoute - Add support for routing based on a UDP port
+status: Experimental
+authors:
+  - zac-nixon
+references:
+  - https://www.ietf.org/rfc/rfc768.txt
+featureNames:
+  - UDPRoute
