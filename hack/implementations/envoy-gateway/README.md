@@ -37,10 +37,12 @@ EOF
 ## Step 4: Run a specific conformance test
 
 ```shell script
-go test -v ./conformance \
---run TestConformance/TLSRouteSimpleSameNamespace \
---gateway-class=envoy-gateway --supported-features=Gateway,TLSRoute \
---allow-crds-mismatch
+go test -v ../../../conformance \
+--run TestConformance/HTTPRouteSessionPersistenceCookie \
+--gateway-class=envoy-gateway \
+--supported-features=Gateway,HTTPRoute,HTTPRouteSessionPersistenceCookie \
+--allow-crds-mismatch \
+--cleanup-base-resources=false --debug
 ```
 
 ## (Optional) Step 4: Delete kind cluster
