@@ -1,0 +1,147 @@
+# Test 1: Delete conflicted ListenerSet without disrupting traffic
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: nondisruptive-listenerset-conflict
+  namespace: gateway-conformance-infra
+spec:
+  gatewayClassName: "{GATEWAY_CLASS_NAME}"
+  listeners:
+  - name: gateway-listener
+    port: 80
+    protocol: HTTP
+    hostname: "nondisruptive-conflict.example.com"
+    allowedRoutes:
+      namespaces:
+        from: All
+  allowedListeners:
+    namespaces:
+      from: Same
+---
+# This ListenerSet wins the hostname conflict by alphabetical precedence (alpha < beta)
+apiVersion: gateway.networking.k8s.io/v1
+kind: ListenerSet
+metadata:
+  name: nondisruptive-ls-alpha
+  namespace: gateway-conformance-infra
+spec:
+  parentRef:
+    kind: Gateway
+    group: gateway.networking.k8s.io
+    name: nondisruptive-listenerset-conflict
+    namespace: gateway-conformance-infra
+  listeners:
+  - name: shared-listener
+    port: 80
+    protocol: HTTP
+    hostname: "nondisruptive-shared.example.com"
+    allowedRoutes:
+      namespaces:
+        from: All
+---
+# This ListenerSet is conflicted because it shares the same hostname as nondisruptive-ls-alpha
+apiVersion: gateway.networking.k8s.io/v1
+kind: ListenerSet
+metadata:
+  name: nondisruptive-ls-beta
+  namespace: gateway-conformance-infra
+spec:
+  parentRef:
+    kind: Gateway
+    group: gateway.networking.k8s.io
+    name: nondisruptive-listenerset-conflict
+    namespace: gateway-conformance-infra
+  listeners:
+  - name: shared-listener
+    port: 80
+    protocol: HTTP
+    hostname: "nondisruptive-shared.example.com"
+    allowedRoutes:
+      namespaces:
+        from: All
+---
+# Route attached to both ListenerSets
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: nondisruptive-conflict-route
+  namespace: gateway-conformance-infra
+spec:
+  parentRefs:
+  - kind: ListenerSet
+    group: gateway.networking.k8s.io
+    name: nondisruptive-ls-alpha
+    namespace: gateway-conformance-infra
+  - kind: ListenerSet
+    group: gateway.networking.k8s.io
+    name: nondisruptive-ls-beta
+    namespace: gateway-conformance-infra
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /test
+    backendRefs:
+    - name: infra-backend-v1
+      port: 8080
+---
+# Test 2: Migrate route from Gateway to ListenerSet without disrupting traffic
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: nondisruptive-route-migration
+  namespace: gateway-conformance-infra
+spec:
+  gatewayClassName: "{GATEWAY_CLASS_NAME}"
+  listeners:
+  - name: wildcard-listener
+    port: 80
+    protocol: HTTP
+    hostname: "*.nondisruptive-app.example.com"
+    allowedRoutes:
+      namespaces:
+        from: All
+  allowedListeners:
+    namespaces:
+      from: Same
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: ListenerSet
+metadata:
+  name: nondisruptive-migration-ls
+  namespace: gateway-conformance-infra
+spec:
+  parentRef:
+    kind: Gateway
+    group: gateway.networking.k8s.io
+    name: nondisruptive-route-migration
+    namespace: gateway-conformance-infra
+  listeners:
+  - name: specific-listener
+    port: 80
+    protocol: HTTP
+    hostname: "something.nondisruptive-app.example.com"
+    allowedRoutes:
+      namespaces:
+        from: All
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: nondisruptive-migration-route
+  namespace: gateway-conformance-infra
+spec:
+  parentRefs:
+  - kind: Gateway
+    name: nondisruptive-route-migration
+    namespace: gateway-conformance-infra
+  hostnames:
+  - "something.nondisruptive-app.example.com"
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /test
+    backendRefs:
+    - name: infra-backend-v1
+      port: 8080
