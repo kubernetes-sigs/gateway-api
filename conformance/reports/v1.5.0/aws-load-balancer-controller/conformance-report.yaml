@@ -1,0 +1,79 @@
+apiVersion: gateway.networking.k8s.io/v1
+date: "2026-04-01T12:23:28-07:00"
+gatewayAPIChannel: standard
+gatewayAPIVersion: v1.5.0
+implementation:
+  contact:
+  - https://github.com/kubernetes-sigs/aws-load-balancer-controller/blob/main/OWNERS#L6
+  organization: aws
+  project: aws-load-balancer-controller
+  url: https://github.com/kubernetes-sigs/aws-load-balancer-controller
+  version: v3.2.0
+kind: ConformanceReport
+mode: default
+profiles:
+- core:
+    result: partial
+    skippedTests:
+    - GatewayInvalidTLSConfiguration
+    - GatewaySecretInvalidReferenceGrant
+    - GatewaySecretMissingReferenceGrant
+    - GatewaySecretReferenceGrantAllInNamespace
+    - GatewaySecretReferenceGrantSpecific
+    - GatewayWithAttachedRoutes
+    - HTTPRouteHTTPSListener
+    - HTTPRouteHostnameIntersection
+    - HTTPRouteRequestHeaderModifier
+    - HTTPRouteServiceTypes
+    statistics:
+      Failed: 0
+      Passed: 23
+      Skipped: 10
+  extended:
+    result: partial
+    skippedTests:
+    - ListenerSetReferenceGrant
+    statistics:
+      Failed: 0
+      Passed: 13
+      Skipped: 1
+    supportedFeatures:
+    - HTTPRouteDestinationPortMatching
+    - HTTPRouteMethodMatching
+    - HTTPRouteParentRefPort
+    - HTTPRoutePortRedirect
+    - ListenerSet
+    unsupportedFeatures:
+    - BackendTLSPolicy
+    - BackendTLSPolicySANValidation
+    - GatewayAddressEmpty
+    - GatewayBackendClientCertificate
+    - GatewayFrontendClientCertificateValidation
+    - GatewayFrontendClientCertificateValidationInsecureFallback
+    - GatewayHTTPListenerIsolation
+    - GatewayHTTPSListenerDetectMisdirectedRequests
+    - GatewayInfrastructurePropagation
+    - GatewayPort8080
+    - GatewayStaticAddresses
+    - HTTPRoute303RedirectStatusCode
+    - HTTPRoute307RedirectStatusCode
+    - HTTPRoute308RedirectStatusCode
+    - HTTPRouteBackendProtocolH2C
+    - HTTPRouteBackendProtocolWebSocket
+    - HTTPRouteBackendRequestHeaderModification
+    - HTTPRouteBackendTimeout
+    - HTTPRouteCORS
+    - HTTPRouteHostRewrite
+    - HTTPRouteNamedRouteRule
+    - HTTPRoutePathRedirect
+    - HTTPRoutePathRewrite
+    - HTTPRouteQueryParamMatching
+    - HTTPRouteRequestMirror
+    - HTTPRouteRequestMultipleMirrors
+    - HTTPRouteRequestPercentageMirror
+    - HTTPRouteRequestTimeout
+    - HTTPRouteResponseHeaderModification
+    - HTTPRouteSchemeRedirect
+  name: GATEWAY-HTTP
+  summary: Core tests partially succeeded with 10 test skips. Extended tests partially
+    succeeded with 1 test skips.
