@@ -302,13 +302,14 @@ type GRPCRouteRule struct {
 // is `foo` AND it contains the `version: v1` header:
 //
 // ```
-// matches:
-//   - method:
-//     type: Exact
-//     service: "foo"
-//   - headers:
-//     name: "version"
-//     value "v1"
+//
+//	matches:
+//	- method:
+//	    type: Exact
+//	    service: "foo"
+//	  headers:
+//	  - name: "version"
+//	    value: "v1"
 //
 // ```
 type GRPCRouteMatch struct {

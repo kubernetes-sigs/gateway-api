@@ -29,13 +29,14 @@ package v1
 // is `foo` AND it contains the `version: v1` header:
 //
 // ```
+//
 // matches:
 // - method:
 // type: Exact
 // service: "foo"
-// - headers:
-// name: "version"
-// value "v1"
+// headers:
+// - name: "version"
+// value: "v1"
 //
 // ```
 type GRPCRouteMatchApplyConfiguration struct {

@@ -1733,24 +1733,14 @@ spec:
                         matching precedence MUST be granted to the first matching rule meeting
                         the above criteria.
                       items:
-                        description: |-
-                          GRPCRouteMatch defines the predicate used to match requests to a given
-                          action. Multiple match types are ANDed together, i.e. the match will
-                          evaluate to true only if all conditions are satisfied.
-
-                          For example, the match below will match a gRPC request only if its service
-                          is `foo` AND it contains the `version: v1` header:
-
-                          ```
-                          matches:
-                            - method:
-                              type: Exact
-                              service: "foo"
-                            - headers:
-                              name: "version"
-                              value "v1"
-
-                          ```
+                        description: "GRPCRouteMatch defines the predicate used to
+                          match requests to a given\naction. Multiple match types
+                          are ANDed together, i.e. the match will\nevaluate to true
+                          only if all conditions are satisfied.\n\nFor example, the
+                          match below will match a gRPC request only if its service\nis
+                          `foo` AND it contains the `version: v1` header:\n\n```\n\n\tmatches:\n\t-
+                          method:\n\t    type: Exact\n\t    service: \"foo\"\n\t  headers:\n\t
+                          \ - name: \"version\"\n\t    value: \"v1\"\n\n```"
                         properties:
                           headers:
                             description: |-
