@@ -935,15 +935,6 @@ type SessionPersistence struct {
 	// +optional
 	AbsoluteTimeout *Duration `json:"absoluteTimeout,omitempty"`
 
-	// IdleTimeout defines the idle timeout of the persistent session.
-	// Once the session has been idle for more than the specified
-	// IdleTimeout duration, the session becomes invalid.
-	//
-	// Support: Extended
-	//
-	// +optional
-	IdleTimeout *Duration `json:"idleTimeout,omitempty"`
-
 	// Type defines the type of session persistence such as through
 	// the use of a header or cookie. Defaults to cookie based session
 	// persistence.

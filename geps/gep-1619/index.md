@@ -509,15 +509,6 @@ type SessionPersistence struct {
     // +optional
     AbsoluteTimeout *Duration `json:"absoluteTimeout,omitempty"`
 
-    // IdleTimeout defines the idle timeout of the persistent session.
-    // Once the session has been idle for more than the specified
-    // IdleTimeout duration, the session becomes invalid.
-    //
-    // Support: Extended
-    //
-    // +optional
-    IdleTimeout *Duration `json:"idleTimeout,omitempty"`
-
     // Type defines the type of session persistence such as through
     // the use of a header or cookie. Defaults to cookie based session
     // persistence.
@@ -1093,6 +1084,19 @@ configuration via a warning status or log.
     - This might require addressing as part of an update to [GEP-2648](../gep-2648/index.md).
 
 ## Alternatives
+
+### IdleTimeout
+
+The `idleTimeout` field was originally included in the SessionPersistence API but
+was removed because no Gateway API implementation has implemented it and no
+implementation has requested it. HTTP cookies have no native idle timeout
+mechanism — `Max-Age`/`Expires` are absolute, not idle-based. Implementing idle
+timeout requires server-side session state tracking (e.g., HAProxy's `maxidle` or
+NGINX's `sticky learn` with `timeout=`), which is additional complexity beyond
+what the current cookie-based model requires. Some dataplanes have no mechanism
+for idle timeout at all, making it unimplementable for those controllers. This
+field could be re-introduced in a future GEP if implementations demonstrate
+viable approaches and express interest.
 
 ### SessionPersistence API Alternative
 
