@@ -3,7 +3,7 @@
 * Issue: [#696](https://github.com/kubernetes-sigs/gateway-api/issues/696)
 * Status: Provisional|Prototyping|Implementable|Experimental|Standard|Completed|Memorandum|Deferred|Declined|Withdrawn
 
-(See [status definitions](/enhancements/overview/#gep-states).)
+(See [status definitions](/geps/overview/#gep-states).)
 
 ## TLDR
 

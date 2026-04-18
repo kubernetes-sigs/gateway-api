@@ -3,7 +3,7 @@
 * Issue: [#1494](https://github.com/kubernetes-sigs/gateway-api/issues/1494)
 * Status: Experimental
 
-(See [status definitions](/enhancements/overview/#gep-states).)
+(See [status definitions](/geps/overview/#gep-states).)
 
 
 ## TLDR

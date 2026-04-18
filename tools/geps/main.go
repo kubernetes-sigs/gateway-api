@@ -74,7 +74,7 @@ const kindDetails = "GEPDetails"
 func main() {
 	flag.StringVar(&GEPSDir, "g", "", "Defines the absolute path of the directory containing the GEPs")
 	flag.StringVar(&SkipGEPNumber, "s", "696", "Defines GEPs number to be skipped, should be comma-separated")
-	flag.StringVar(&OutDir, "o", "", "Defines the absolute path of the output directory (e.g., site/content/en/enhancements/list)")
+	flag.StringVar(&OutDir, "o", "", "Defines the absolute path of the output directory (e.g., site/content/en/geps/list)")
 
 	flag.Parse()
 
@@ -234,9 +234,9 @@ func walkGEPs(dir string, skipGEPs []string) (GEPArray, error) {
 
 func addFrontMatter(buf *bytes.Buffer, title string, weight int) {
 	buf.WriteString("---\n")
-	buf.WriteString(fmt.Sprintf("title: %q\n", title))
+	fmt.Fprintf(buf, "title: %q\n", title)
 	if weight > 0 {
-		buf.WriteString(fmt.Sprintf("weight: %d\n", weight))
+		fmt.Fprintf(buf, "weight: %d\n", weight)
 	}
 	buf.WriteString("---\n\n")
 }

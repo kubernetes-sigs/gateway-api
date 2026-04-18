@@ -90,7 +90,7 @@ defaultContentLanguage = "en"
 [[menu.main]]
     name = "Enhancements"
     weight = 40
-    url = "/enhancements/"
+    url = "/geps/"
 
 [[menu.main]]
     name = "Contributing"
@@ -110,5 +110,5 @@ defaultContentLanguage = "en"
 
   [[module.mounts]]
     source = "../geps"
-    target = "content/enhancements/geps"
+    target = "content/geps"
  

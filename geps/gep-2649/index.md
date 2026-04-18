@@ -3,7 +3,7 @@
 * Issue: [#2649](https://github.com/kubernetes-sigs/gateway-api/issues/2649)
 * Status: Declined
 
-(See [status definitions](/enhancements/overview/#gep-states).)
+(See [status definitions](/geps/overview/#gep-states).)
 
 ## TLDR
 

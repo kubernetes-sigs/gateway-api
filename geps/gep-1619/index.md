@@ -3,7 +3,7 @@
 * Issue: [#1619](https://github.com/kubernetes-sigs/gateway-api/issues/1619)
 * Status: Experimental
 
-(See [status definitions](/enhancements/overview/#gep-states).)
+(See [status definitions](/geps/overview/#gep-states).)
 
 ## Graduation Criteria
 
@@ -1227,7 +1227,7 @@ Though session persistence is a ubiquitous name, session affinity is more incons
 - [LBPolicy](https://static.sched.com/hosted_files/kccnceu2023/c4/Autoscaling%20Elastic%20Kubernetes%20Infrastructure%20for%20Stateful%20Applications%20using%20Proxyless%20gRPC%20and%20Istio.pdf#page=25) (proposed extension for session persistence API)
 - [gRPC Stateful Session Affinity Proposal](https://github.com/grpc/proposal/blob/master/A55-xds-stateful-session-affinity.md) (info on session draining and session persistence in gRPC)
 - [Kube-Proxy Session Affinity](https://kubernetes.io/docs/reference/networking/virtual-ips/#session-affinity)
-- [GEP-713: Metaresources and PolicyAttachment](/enhancements/geps/gep-713/)
+- [GEP-713: Metaresources and PolicyAttachment](/geps/gep-713/)
 - [RFC6265](https://www.rfc-editor.org/rfc/rfc6265)
 - [Policy Attachment](/reference/policy-attachment)
 - [Envoy Session Persistence Design Doc](https://docs.google.com/document/d/1IU4b76AgOXijNa4sew1gfBfSiOMbZNiEt5Dhis8QpYg/edit#heading=h.sobqsca7i45e)

@@ -3,7 +3,7 @@
 * Issue: [#3793](https://github.com/kubernetes-sigs/gateway-api/issues/3793)
 * Status: Implementable
 
-(See [status definitions](/enhancements/overview/#gep-states).)
+(See [status definitions](/geps/overview/#gep-states).)
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
 "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this

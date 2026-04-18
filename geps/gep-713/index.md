@@ -3,7 +3,7 @@
 * Issue: [#713](https://github.com/kubernetes-sigs/gateway-api/issues/713)
 * Status: Memorandum
 
-(See status definitions [here](/enhancements/overview/#gep-states))
+(See status definitions [here](/geps/overview/#gep-states))
 
 ## TL;DR
 
