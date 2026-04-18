@@ -3,7 +3,7 @@
 * Issue: [#91](https://github.com/kubernetes-sigs/gateway-api/issues/91)
 * Status: Standard
 
-(See definitions in [GEP States](/enhancements/overview/#gep-states).)
+(See definitions in [GEP States](/geps/overview/#gep-states).)
 
 ## TLDR
 

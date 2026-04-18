@@ -18,7 +18,7 @@ point, these may graduate to the Standard release channel or be dropped from the
 API entirely.
 
 The following diagram provides a high level overview of the lifecycle of a
-feature or resource proposed by a new [GEP](/enhancements/overview/) (enhancement
+feature or resource proposed by a new [GEP](/geps/overview/) (enhancement
 proposal) in Gateway API:
 
 ```mermaid

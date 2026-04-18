@@ -22,5 +22,5 @@ SCRIPT_ROOT=$(dirname "${BASH_SOURCE}")/..
 
 GEPS_TOC_SKIP="${GEPS_TOC_SKIP:-696}"
 GEPS_TOC_DIR=${GEPS_TOC_DIR:-${SCRIPT_ROOT}/geps}
-MD_DEST_DIR=${SCRIPT_ROOT}/site/content/en/enhancements/
+MD_DEST_DIR=${SCRIPT_ROOT}/site/content/en/geps/
 go run tools/geps/main.go -g "${GEPS_TOC_DIR}/" -s "${GEPS_TOC_SKIP}" -o "${MD_DEST_DIR}"

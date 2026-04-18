@@ -46,7 +46,7 @@ export COMMIT ?= $(shell git rev-parse --short HEAD)
 DOCKER ?= docker
 # TOP is the current directory where this Makefile lives.
 TOP := $(dir $(firstword $(MAKEFILE_LIST)))
-# ROOT is the root of the mkdocs tree.
+# ROOT is the root of the documentation tree.
 ROOT := $(abspath $(TOP))
 
 # Command-line flags passed to "go test" for the conformance
@@ -109,7 +109,7 @@ test:
 .PHONY: tidy
 tidy:
 	go work sync
-	find . -name go.mod -execdir sh -c 'go mod tidy' \;
+	find . -name go.mod -not -path "./site/*" -exec sh -c 'cd "$$(dirname "{}")" && go mod tidy' \;
 
 # Run tests for CRDs validation
 .PHONY: test.crds-validation
@@ -194,7 +194,6 @@ release-staging: image.multiarch.setup
 
 PYTHON ?= $(shell if [ -x .venv/bin/python3 ]; then echo "./.venv/bin/python3"; else echo "python3"; fi)
 
-DOCS_BUILD_CONTAINER_NAME ?= gateway-api-mkdocs
 DOCS_VERIFY_CONTAINER_IMAGE ?= registry.hub.docker.com/lycheeverse/lychee:0.23
 
 # Build the documentation.
@@ -203,12 +202,12 @@ docs:
 	hack/make-hugo-docs.sh
 
 .PHONY: build-docs
-build-docs: update-geps api-ref-docs
-	docker run --rm -v ${PWD}:/src -w /src/site peaceiris/hugo:v0.148.0-extended hugo
+build-docs: update-geps api-ref-docs wizard-wasm wizard-data conformance-data
+	hugo --source site
 
 .PHONY: verify-docs
 verify-docs: build-docs
-	docker run --init --rm -w /input -v ${PWD}:/input $(DOCS_VERIFY_CONTAINER_IMAGE) --root-dir /input/site/public --exclude-path "overrides/partials/.*\.html" --exclude ".*" --include "sigs.k8s.io" --accept 200 --max-concurrency 10 --include-fragments --cache $(VALIDATE_DOCS_EXTRA_ARGS) /input/site/public/**/*.html
+	docker run --init --rm -w /input -v ${PWD}:/input $(DOCS_VERIFY_CONTAINER_IMAGE) --root-dir /input/site/public --include "sigs.k8s.io" --accept 200 --max-concurrency 10 --include-fragments --cache $(VALIDATE_DOCS_EXTRA_ARGS) /input/site/public/**/*.html
 
 .PHONY: build-docs-netlify
 build-docs-netlify: update-geps api-ref-docs wizard-wasm wizard-data conformance-data
