@@ -3,7 +3,7 @@
 * Issue: [#3798](https://github.com/kubernetes-sigs/gateway-api/issues/3798)
 * Status: Deferred
 
-(See [status definitions](/enhancements/overview/#gep-states).)
+(See [status definitions](/geps/overview/#gep-states).)
 
 ## Notes and Disclaimers
 

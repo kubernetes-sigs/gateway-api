@@ -16,11 +16,9 @@
 /reference/api-spec/1.5/  /reference/api-spec/1.5/spec/    301!
 /reference/api-spec/1.4/  /reference/api-spec/1.4/spec/    301!
 
-/enhancements/  /enhancements/overview/    301!
-/enhancements/by-state/  /enhancements/by-state/standard/    301!
+/geps/  /geps/overview/    301!
+geps/by-state/ /geps/by-state/standard/    301!
 
-/geps/*  /enhancements/geps/:splat  301!
-/enhancements/geps/  /enhancements/list/  301!
 
 /contributing/  /contributing/get-involved/    301!
 

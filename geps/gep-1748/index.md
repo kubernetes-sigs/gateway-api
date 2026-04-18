@@ -13,7 +13,7 @@ This GEP is also exempt from the [Probationary Period][expprob] rules as it
 predated them.
 {{< /details >}}
 
-[expprob]:/enhancements/overview/#probationary-period
+[expprob]:/geps/overview/#probationary-period
 
 ## TLDR
 
