@@ -40,12 +40,6 @@ type SessionPersistenceApplyConfiguration struct {
 	//
 	// Support: Extended
 	AbsoluteTimeout *apisv1.Duration `json:"absoluteTimeout,omitempty"`
-	// IdleTimeout defines the idle timeout of the persistent session.
-	// Once the session has been idle for more than the specified
-	// IdleTimeout duration, the session becomes invalid.
-	//
-	// Support: Extended
-	IdleTimeout *apisv1.Duration `json:"idleTimeout,omitempty"`
 	// Type defines the type of session persistence such as through
 	// the use of a header or cookie. Defaults to cookie based session
 	// persistence.
@@ -80,14 +74,6 @@ func (b *SessionPersistenceApplyConfiguration) WithSessionName(value string) *Se
 // If called multiple times, the AbsoluteTimeout field is set to the value of the last call.
 func (b *SessionPersistenceApplyConfiguration) WithAbsoluteTimeout(value apisv1.Duration) *SessionPersistenceApplyConfiguration {
 	b.AbsoluteTimeout = &value
-	return b
-}
-
-// WithIdleTimeout sets the IdleTimeout field in the declarative configuration to the given value
-// and returns the receiver, so that objects can be built by chaining "With" function invocations.
-// If called multiple times, the IdleTimeout field is set to the value of the last call.
-func (b *SessionPersistenceApplyConfiguration) WithIdleTimeout(value apisv1.Duration) *SessionPersistenceApplyConfiguration {
-	b.IdleTimeout = &value
 	return b
 }
 

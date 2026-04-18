@@ -205,15 +205,6 @@ spec:
                         - Session
                         type: string
                     type: object
-                  idleTimeout:
-                    description: |-
-                      IdleTimeout defines the idle timeout of the persistent session.
-                      Once the session has been idle for more than the specified
-                      IdleTimeout duration, the session becomes invalid.
-
-                      Support: Extended
-                    pattern: ^([0-9]{1,5}(h|m|s|ms)){1,4}$
-                    type: string
                   sessionName:
                     description: |-
                       SessionName defines the name of the persistent session token
