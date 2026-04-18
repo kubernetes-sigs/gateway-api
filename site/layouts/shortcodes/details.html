@@ -1,0 +1,8 @@
+<details class="mb-3">
+  <summary class="text-primary" style="cursor: pointer;">
+    <strong>{{ .Get "title" | default "Click to expand" }}</strong>
+  </summary>
+  <div class="p-3 mt-2 border-start border-primary bg-light">
+    {{ .Inner | markdownify }}
+  </div>
+</details>
