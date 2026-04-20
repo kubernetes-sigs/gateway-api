@@ -153,9 +153,9 @@ type ConformanceOptions struct {
 	// CleanupBaseResources indicates whether or not the base test
 	// resources such as Gateways should be cleaned up after the run.
 	CleanupBaseResources       bool `json:"cleanupBaseResources"`
- 	SupportedFeatures          FeaturesSet
+	SupportedFeatures          FeaturesSet
 	ExemptFeatures             FeaturesSet
-	EnableAllSupportedFeatures bool `json:"enableAllSupportedFeatures"`
+	EnableAllSupportedFeatures bool                 `json:"enableAllSupportedFeatures"`
 	TimeoutConfig              config.TimeoutConfig `json:"timeoutConfig"`
 	// SkipTests contains all the tests not to be run and can be used to opt out
 	// of specific tests
@@ -177,8 +177,8 @@ type ConformanceOptions struct {
 	// address assignment.
 	UnusableNetworkAddresses []gatewayv1.GatewaySpecAddress
 
-	Mode                string `json:"mode"`
-	AllowCRDsMismatch   bool `json:"allowCrdsMismatch"`
+	Mode                string                `json:"mode"`
+	AllowCRDsMismatch   bool                  `json:"allowCrdsMismatch"`
 	Implementation      confv1.Implementation `json:"implementation"`
 	ConformanceProfiles sets.Set[ConformanceProfileName]
 

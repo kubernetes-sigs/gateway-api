@@ -21,7 +21,6 @@ import (
 	"testing"
 	"time"
 
-	//"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/assert"
 
 	"sigs.k8s.io/gateway-api/conformance/utils/flags"
@@ -46,11 +45,11 @@ func TestConformanceOptions(t *testing.T) {
 	assert.Equal(t, "test-output/override.yaml", options.ReportOutputPath)
 
 	// Overwritten in yaml file.
-	assert.Equal(t, 30 * time.Second, options.TimeoutConfig.DeleteTimeout)
+	assert.Equal(t, 30*time.Second, options.TimeoutConfig.DeleteTimeout)
 	// Use default value.
-	assert.Equal(t, 60 * time.Second, options.TimeoutConfig.CreateTimeout)
-	assert.Equal(t, 60 * time.Second, options.TimeoutConfig.RouteMustHaveParents)
+	assert.Equal(t, 60*time.Second, options.TimeoutConfig.CreateTimeout)
+	assert.Equal(t, 60*time.Second, options.TimeoutConfig.RouteMustHaveParents)
 	// Specified in yaml file, but overwritten by flag.
-	assert.Equal(t, 40 * time.Second, options.TimeoutConfig.GetTimeout)
-	assert.Equal(t, 45 * time.Second, options.TimeoutConfig.DefaultTestTimeout)
+	assert.Equal(t, 40*time.Second, options.TimeoutConfig.GetTimeout)
+	assert.Equal(t, 45*time.Second, options.TimeoutConfig.DefaultTestTimeout)
 }
