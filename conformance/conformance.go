@@ -17,6 +17,7 @@ limitations under the License.
 package conformance
 
 import (
+	"flag"
 	"io/fs"
 	"net/netip"
 	"os"
@@ -90,7 +91,7 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 		unusable = append(unusable, parseAddress(v))
 	}
 
-	return suite.ConformanceOptions{
+	conformanceOpts := &suite.ConformanceOptions{
 		AllowCRDsMismatch:          *flags.AllowCRDsMismatch,
 		CleanupBaseResources:       *flags.CleanupBaseResources,
 		Client:                     client,
@@ -118,6 +119,48 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 		SkipProvisionalTests:       *flags.SkipProvisionalTests,
 		FailFast:                   *flags.FailFast,
 	}
+
+	// Load conformance options provided via yaml file, if specified.
+	if *flags.ConformanceOptionsFile != "" {
+		data, err := os.ReadFile(*flags.ConformanceOptionsFile)
+		require.NoError(t, err, "error reading conformance options file")
+
+		err = yaml.Unmarshal(data, conformanceOpts)
+		require.NoError(t, err, "error unmarshalling conformance options file")
+
+		useConformanceFlagOverrides(t, conformanceOpts, implementation)
+	}
+
+	return *conformanceOpts
+}
+
+func useConformanceFlagOverrides(t *testing.T, conformanceOpts *suite.ConformanceOptions, implementation confv1.Implementation) {
+	flagOverrides := map[string]func(){
+		"gateway-class":          func() { conformanceOpts.GatewayClassName = *flags.GatewayClassName },
+		"mesh-name":              func() { conformanceOpts.MeshName = *flags.MeshName },
+		"debug":                  func() { conformanceOpts.Debug = *flags.ShowDebug },
+		"cleanup-base-resources": func() { conformanceOpts.CleanupBaseResources = *flags.CleanupBaseResources },
+		"run-test":               func() { conformanceOpts.RunTest = *flags.RunTest },
+		"skip-tests":             func() { conformanceOpts.SkipTests = suite.ParseSkipTests(*flags.SkipTests) },
+		"skip-provisional-tests": func() { conformanceOpts.SkipProvisionalTests = *flags.SkipProvisionalTests },
+		"all-features":           func() { conformanceOpts.EnableAllSupportedFeatures = *flags.EnableAllSupportedFeatures },
+		"allow-crds-mismatch":    func() { conformanceOpts.AllowCRDsMismatch = *flags.AllowCRDsMismatch },
+		"organization":           func() { conformanceOpts.Implementation = implementation },
+		"mode":                   func() { conformanceOpts.Mode = *flags.Mode },
+		"report-output":          func() { conformanceOpts.ReportOutputPath = *flags.ReportOutput },
+		"fail-fast":              func() { conformanceOpts.FailFast = *flags.FailFast },
+		"timeout-config-overrides": func() {
+			conformanceconfig.ParseTimeoutOverrides(&conformanceOpts.TimeoutConfig, *flags.TimeoutConfigOverrides)
+		},
+	}
+
+	// Any flags that were explicitly passed in by the
+	// user should override the values from the yaml file.
+	flag.Visit(func(f *flag.Flag) {
+		if override, ok := flagOverrides[f.Name]; ok {
+			override()
+		}
+	})
 }
 
 func parseAddress(v string) v1.GatewaySpecAddress {

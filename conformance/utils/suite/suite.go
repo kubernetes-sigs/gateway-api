@@ -138,32 +138,32 @@ type ConformanceOptions struct {
 	ClientOptions        client.Options
 	Clientset            clientset.Interface
 	RestConfig           *rest.Config
-	GatewayClassName     string
-	MeshName             string
+	GatewayClassName     string `json:"gatewayClassName"`
+	MeshName             string `json:"meshName"`
 	AddressType          string
-	Debug                bool
+	Debug                bool `json:"debug"`
 	RoundTripper         roundtripper.RoundTripper
 	GRPCClient           grpc.Client
 	BaseManifests        string
 	MeshManifests        string
 	NamespaceLabels      map[string]string
 	NamespaceAnnotations map[string]string
-	ReportOutputPath     string
+	ReportOutputPath     string `json:"reportOutputPath"`
 
 	// CleanupBaseResources indicates whether or not the base test
 	// resources such as Gateways should be cleaned up after the run.
-	CleanupBaseResources       bool
-	SupportedFeatures          FeaturesSet
+	CleanupBaseResources       bool `json:"cleanupBaseResources"`
+ 	SupportedFeatures          FeaturesSet
 	ExemptFeatures             FeaturesSet
-	EnableAllSupportedFeatures bool
-	TimeoutConfig              config.TimeoutConfig
+	EnableAllSupportedFeatures bool `json:"enableAllSupportedFeatures"`
+	TimeoutConfig              config.TimeoutConfig `json:"timeoutConfig"`
 	// SkipTests contains all the tests not to be run and can be used to opt out
 	// of specific tests
 	SkipTests []string
 	// SkipProvisionalTests indicates whether or not to skip provisional tests.
-	SkipProvisionalTests bool
+	SkipProvisionalTests bool `json:"skipProvisionalTests"`
 	// RunTest is a single test to run, mostly for development/debugging convenience.
-	RunTest string
+	RunTest string `json:"runTest"`
 	// Hook is an optional function that can be used to run custom logic after each test at suite level.
 	Hook       func(t *testing.T, test ConformanceTest, suite *ConformanceTestSuite)
 	ManifestFS []fs.FS
@@ -177,12 +177,12 @@ type ConformanceOptions struct {
 	// address assignment.
 	UnusableNetworkAddresses []gatewayv1.GatewaySpecAddress
 
-	Mode                string
-	AllowCRDsMismatch   bool
-	Implementation      confv1.Implementation
+	Mode                string `json:"mode"`
+	AllowCRDsMismatch   bool `json:"allowCrdsMismatch"`
+	Implementation      confv1.Implementation `json:"implementation"`
 	ConformanceProfiles sets.Set[ConformanceProfileName]
 
-	FailFast bool
+	FailFast bool `json:"failFast"`
 }
 
 type FeaturesSet = sets.Set[features.FeatureName]

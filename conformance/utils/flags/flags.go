@@ -50,6 +50,7 @@ var (
 	Mode                       = flag.String("mode", DefaultMode, "The operating mode of the implementation.")
 	AllowCRDsMismatch          = flag.Bool("allow-crds-mismatch", false, "Flag to allow the suite not to fail in case there is a mismatch between CRDs versions and channels.")
 	ConformanceProfiles        = flag.String("conformance-profiles", "", "Comma-separated list of the conformance profiles to run")
+	ConformanceOptionsFile		 = flag.String("conformance-options-file", "", "Path to a YAML file containing the conformance options. Command line flags will override the values in the file.")
 	ReportOutput               = flag.String("report-output", "", "The file where to write the conformance report")
 	SkipProvisionalTests       = flag.Bool("skip-provisional-tests", false, "Whether to skip provisional tests")
 	FailFast                   = flag.Bool("fail-fast", false, "Whether to stop the suite execution upon the first test failure")
