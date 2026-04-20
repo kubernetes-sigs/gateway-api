@@ -19,6 +19,7 @@ package config
 import (
 	"encoding/json"
 	"fmt"
+	"reflect"
 	"strconv"
 	"strings"
 	"time"
@@ -123,58 +124,40 @@ type TimeoutConfig struct {
 }
 
 // UnmarshalJSON ensures time.Duration values are parsed correctly.
+// Use reflection to derive field mappings from json tags.
 func (tc *TimeoutConfig) UnmarshalJSON(data []byte) error {
 	var raw map[string]json.RawMessage
 	if err := json.Unmarshal(data, &raw); err != nil {
 		return err
 	}
 
-	if rawVal, ok := raw["requiredConsecutiveSuccesses"]; ok {
-		if err := json.Unmarshal(rawVal, &tc.RequiredConsecutiveSuccesses); err != nil {
-			return fmt.Errorf("failed to unmarshal json: %v", err)
-		}
-	}
+	v := reflect.ValueOf(tc).Elem()
+	t := v.Type()
 
-	timeoutOptions := map[string]*time.Duration{
-		"testIsolation":                         &tc.TestIsolation,
-		"createTimeout":                         &tc.CreateTimeout,
-		"deleteTimeout":                         &tc.DeleteTimeout,
-		"getTimeout":                            &tc.GetTimeout,
-		"gatewayMustHaveAddress":                &tc.GatewayMustHaveAddress,
-		"gatewayMustHaveCondition":              &tc.GatewayMustHaveCondition,
-		"gatewayStatusMustHaveListeners":        &tc.GatewayStatusMustHaveListeners,
-		"gatewayListenersMustHaveConditions":    &tc.GatewayListenersMustHaveConditions,
-		"listenerSetMustHaveCondition":          &tc.ListenerSetMustHaveCondition,
-		"listenerSetListenersMustHaveConditions": &tc.ListenerSetListenersMustHaveConditions,
-		"gwcMustBeAccepted":                     &tc.GWCMustBeAccepted,
-		"httpRouteMustNotHaveParents":           &tc.HTTPRouteMustNotHaveParents,
-		"httpRouteMustHaveCondition":            &tc.HTTPRouteMustHaveCondition,
-		"tlsRouteMustHaveCondition":             &tc.TLSRouteMustHaveCondition,
-		"routeMustHaveParents":                  &tc.RouteMustHaveParents,
-		"manifestFetchTimeout":                  &tc.ManifestFetchTimeout,
-		"maxTimeToConsistency":                  &tc.MaxTimeToConsistency,
-		"namespacesMustBeReady":                 &tc.NamespacesMustBeReady,
-		"requestTimeout":                        &tc.RequestTimeout,
-		"latestObservedGenerationSet":           &tc.LatestObservedGenerationSet,
-		"defaultTestTimeout":                    &tc.DefaultTestTimeout,
-		"defaultPollInterval":                   &tc.DefaultPollInterval,
-	}
-
-	for k, v := range timeoutOptions {
-		rawValue, ok := raw[k]
+	for i := 0; i < t.NumField(); i++ {
+		field := t.Field(i)
+		jsonTag := strings.Split(field.Tag.Get("json"), ",")[0]
+		rawVal, ok := raw[jsonTag]
 		if !ok {
 			continue
 		}
-		var s string
-		if err := json.Unmarshal(rawValue, &s); err != nil {
-			return fmt.Errorf("failed to unmarshal duration field %s: %v", k, err)
-		}
-		d, err := time.ParseDuration(s)
-		if err != nil {
-			return fmt.Errorf("failed to parse duration for field %s: %v", k, err)
-		}
 
-		*v = d
+		switch field.Type {
+		case reflect.TypeFor[time.Duration]():
+			var s string
+			if err := json.Unmarshal(rawVal, &s); err != nil {
+				return fmt.Errorf("field %q: expected duration string: %w", jsonTag, err)
+			}
+			d, err := time.ParseDuration(s)
+			if err != nil {
+				return fmt.Errorf("field %q: %w", jsonTag, err)
+			}
+			v.Field(i).SetInt(int64(d))
+		default:
+			if err := json.Unmarshal(rawVal, v.Field(i).Addr().Interface()); err != nil {
+				return fmt.Errorf("field %q: %w", jsonTag, err)
+			}
+		}
 	}
 
 	return nil
