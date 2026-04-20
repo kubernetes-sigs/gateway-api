@@ -7,10 +7,10 @@ authors:
   - rikatz
 relationships:
   extends:
-  - number: 1762
-    name: In Cluster Gateway Deployments
-  - number: 1867
-    name: Per-Gateway Infrastructure
+    - number: 1762
+      name: In Cluster Gateway Deployments
+    - number: 1867
+      name: Per-Gateway Infrastructure
   seeAlso:
-  - number: 1651
-    name: Gateway Routability
+    - number: 1651
+      name: Gateway Routability

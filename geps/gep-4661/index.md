@@ -13,6 +13,26 @@ Concretely, this GEP has two goals:
 * Allow users to specify the scope of a service provisioned by an `In-Cluster` implementation, whether the provisioned Service should be of type `ClusterIP` or `LoadBalancer`.
 * Define normative requirements for each service type so that implementations ship with optimal defaults (e.g. `externalTrafficPolicy`, `healthCheckNodePort`)
 
+### Goals
+
+* Introduce a new `AddressType` value that allows Gateway owners to portably
+  provision a Gateway scoped for in-cluster-only visibility (ClusterIP)
+* Introduce a new `AddressType` value that allows Gateway owners to opt in to
+  production-ready LoadBalancer defaults (e.g. `externalTrafficPolicy: Local`) without changing the behavior of existing Gateways
+* Define normative requirements per `AddressType` so implementations ship
+  consistent, well-defined behavior for each service scope
+* Allow users to specify a `LoadBalancerClass` when provisioning a
+  LoadBalancer-backed Gateway
+
+### Non-Goals
+
+* Replicate the full Kubernetes Service API inside Gateway API
+* Change existing LoadBalancer provisioning behavior — optimized defaults are
+  opt-in via new address types, not retroactively applied
+* Replace `infrastructure.parametersRef` for implementation-specific Service
+  customization
+* Support `ExternalName` Service types
+
 ## Motivation (Why)
 
 [GEP-1762](https://gateway-api.sigs.k8s.io/geps/gep-1762/) established the foundation for in-cluster Gateway deployments and acknowledged that Service type matters — its [Gateway IP](https://gateway-api.sigs.k8s.io/geps/gep-1762/#gateway-ip) section references both `ClusterIP` and `LoadBalancer` services — but did not provide a portable mechanism to choose between them. Instead, this was deferred to "arbitrary customization" via `infrastructure.parametersRef` ([GEP-1867](https://gateway-api.sigs.k8s.io/geps/gep-1867/)).
@@ -35,7 +55,8 @@ This GEP benefits Chihiro, the cluster operator as they:
 
 * A Gateway owner provisions a Gateway for
   [inference extension](https://gateway-api-inference-extension.sigs.k8s.io/) and wants it reachable only within the cluster. Today, making the provisioned Service a `ClusterIP` requires implementation-specific knowledge. With this GEP, the owner can express this intent portably.
-* A Gateway owner provisions a Gateway exposed via `LoadBalancer` and expects production-ready traffic routing out of the box — with `externalTrafficPolicy` set to `Local` to preserve client source IP and avoid unnecessary cross-node hops, and `healthCheckNodePort` properly configured so the external load balancer can determine which nodes have healthy Gateway Pods.
+* A Gateway owner provisions a Gateway exposed via `LoadBalancer` and expects production-ready traffic routing out of the box — with `externalTrafficPolicy` set to `Local` to preserve client source IP and avoid unnecessary cross-node hops.
+* A cluster operator migrating from implementation A to implementation B expects their Gateway manifests to work without modification, because the service type and scope are expressed portably rather than through implementation-specific annotations.
 
 
 ## API
