@@ -37,6 +37,30 @@ Although out of scope for this proposal, some use cases are:
 * URL rewriting
 * Header matching
 
+The goal here is to define a common regex syntax and semantics that all implementations should support.
+Individual implementations can support more features, but having a common denominator allows for portable and testable behavior.
+For example, a **hypothetical** path rewrite filter could look something like
+
+```yaml
+pathRewrite:
+  pattern: ^/foo/(.*)$
+  replacement: /bar/\1
+```
+
+Since the above pattern and replacement only use features supported by Gateway API Regex, its behavior should be consistent across implementations.
+
+Individual implementations can support more extended regex features, such as RE2:
+
+```yaml
+pathRewrite:
+  pattern: ^/foo/(?P<name>.*)$
+  replacement: /bar/${name}
+```
+
+but any portability guarantees are now lost.
+
+In other words, any pattern (and replacement) will implement Gateway API Regex syntax and semantics, but implementations can support additional syntax and semantics as well.
+
 ## Implementation and Support
 
 The most popular Regex engines are RE2 and PCRE.
