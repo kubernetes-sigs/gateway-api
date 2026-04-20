@@ -61,9 +61,210 @@ This GEP benefits Chihiro, the cluster operator as they:
 
 ## API
 
-**TODO**: First PR will not include any implementation details, in favor of
-building consensus on the motivation, goals and non-goals first. _"How?"_ we
-implement shall be left open-ended until _"What?"_ and _"Why?"_ are solid.
+This GEP introduces two new predefined `AddressType` values for
+`spec.addresses`: `ClusterIPAddress` and `OptimizedLoadBalancerAddress`
+(name subject to change). These new types allow Gateway owners to express
+service scope and opt in to production-ready defaults without any change
+to the existing `GatewaySpecAddress` struct — only the set of recognized
+`AddressType` values is extended.
+
+No new fields are added to `GatewaySpecAddress`. The `value` field remains
+optional as defined in the current API.
+
+### API Changes
+
+The only API change is the addition of two new `AddressType` constants:
+
+```go
+// A ClusterIPAddress requests that the implementation provisions a
+// ClusterIP Service for this Gateway, making it reachable only within
+// the cluster. The user MUST NOT set a value for this address type;
+// the ClusterIP is allocated by Kubernetes when the Service is created.
+//
+// When a Gateway is provisioned with a ClusterIPAddress, it is also
+// reachable via the internal DNS name of the provisioned Service
+// (e.g. <service-name>.<namespace>.svc.cluster.local).
+//
+// Support: Extended
+ClusterIPAddressType AddressType = "ClusterIPAddress"
+
+// An OptimizedLoadBalancerAddress requests that the implementation
+// provisions a LoadBalancer Service with production-ready defaults.
+// Implementations SHOULD set externalTrafficPolicy to Local and
+// configure healthCheckNodePort accordingly.
+//
+// The value field is optional. When empty, the external address is
+// assigned by the load balancer provider. When set, it requests that
+// specific address from the provider (subject to provider support).
+//
+// This type exists to allow opting in to best-practice defaults
+// without changing the behavior of Gateways that do not specify
+// any address or that use the existing IPAddress / Hostname types.
+//
+// Support: Extended
+OptimizedLoadBalancerAddressType AddressType = "OptimizedLoadBalancerAddress"
+```
+
+### Normative Requirements
+
+#### ClusterIPAddress
+
+* The implementation MUST provision a `ClusterIP` Service for the Gateway.
+* The `value` field MUST be empty. If a user specifies a value, the
+  implementation MUST set the `Programmed` condition to `False` with reason
+  `AddressNotAssigned`.
+* The ClusterIP is allocated by Kubernetes when the Service is created.
+  The implementation MUST report the allocated ClusterIP in
+  `status.addresses`.
+* The Gateway is also reachable via the internal DNS name of the provisioned
+  Service (e.g. `<service-name>.<namespace>.svc.cluster.local`).
+
+#### OptimizedLoadBalancerAddress
+
+* The implementation MUST provision a `LoadBalancer` Service for the Gateway.
+* The `value` field is optional. When empty, the external address is assigned
+  by the load balancer provider. When set, the implementation SHOULD request
+  that specific address from the load balancer provider. If the provider does
+  not support static address assignment, the implementation MUST set the
+  `Programmed` condition to `False` with reason `AddressNotAssigned`.
+* Implementations SHOULD set `externalTrafficPolicy: Local`.
+* Implementations SHOULD configure `healthCheckNodePort` when
+  `externalTrafficPolicy` is `Local`, so external load balancers can detect
+  which nodes have healthy Gateway Pods.
+* The implementation MUST report the assigned external address in
+  `status.addresses`.
+
+### Precedence
+
+`infrastructure.parametersRef` takes precedence over the service type
+expressed via `spec.addresses`. This preserves backward compatibility for
+existing deployments that rely on `parametersRef` to control the provisioned
+Service.
+
+### Examples
+
+#### Current behavior: no addresses specified
+
+When `spec.addresses` is omitted, implementations provision a Gateway using
+their default behavior — typically a `LoadBalancer` Service without any
+guaranteed best-practice defaults:
+
+```yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: default-gateway
+spec:
+  gatewayClassName: example
+  listeners:
+  - name: http
+    port: 80
+    protocol: HTTP
+```
+
+The implementation decides the Service type and configuration. The resulting
+behavior is implementation-specific and may vary across providers.
+
+#### ClusterIP: in-cluster-only Gateway
+
+To provision a Gateway reachable only within the cluster, the owner specifies
+the `ClusterIPAddress` type with no value:
+
+```yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: internal-gateway
+spec:
+  gatewayClassName: example
+  addresses:
+  - type: ClusterIPAddress
+  listeners:
+  - name: http
+    port: 80
+    protocol: HTTP
+```
+
+The implementation provisions a `ClusterIP` Service. Kubernetes allocates
+the ClusterIP and the implementation reports it in status. The Gateway is
+reachable both by its ClusterIP and by the internal DNS name of the
+provisioned Service (e.g. `internal-gateway.default.svc.cluster.local`):
+
+```yaml
+status:
+  addresses:
+  - type: ClusterIPAddress
+    value: "10.96.42.7"
+  conditions:
+  - type: Programmed
+    status: "True"
+```
+
+#### OptimizedLoadBalancer: production-ready external Gateway
+
+To provision a Gateway with a LoadBalancer Service that applies best-practice
+defaults, the owner specifies the `OptimizedLoadBalancerAddress` type:
+
+```yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: production-gateway
+spec:
+  gatewayClassName: example
+  addresses:
+  - type: OptimizedLoadBalancerAddress
+  listeners:
+  - name: http
+    port: 80
+    protocol: HTTP
+```
+
+The implementation provisions a `LoadBalancer` Service with
+`externalTrafficPolicy: Local` and a properly configured `healthCheckNodePort`.
+The external address assigned by the load balancer provider is reported in
+status:
+
+```yaml
+status:
+  addresses:
+  - type: OptimizedLoadBalancerAddress
+    value: "203.0.113.10"
+  conditions:
+  - type: Programmed
+    status: "True"
+```
+
+When a specific external address is desired, the owner can request it via the
+`value` field (subject to load balancer provider support):
+
+```yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: production-gateway-static
+spec:
+  gatewayClassName: example
+  addresses:
+  - type: OptimizedLoadBalancerAddress
+    value: "203.0.113.50"
+  listeners:
+  - name: http
+    port: 80
+    protocol: HTTP
+```
+
+### Mixed Address Types
+
+A Gateway with multiple entries in `spec.addresses` that combine the new types
+(e.g. both `ClusterIPAddress` and `OptimizedLoadBalancerAddress`, or a new type
+alongside an existing `IPAddress`) presents open questions around Service
+provisioning semantics and status reporting.
+
+The behavior for mixed address types is **to be defined** and is not covered
+by this GEP in its current form. Implementations SHOULD reject a Gateway that
+specifies conflicting address types by setting the `Accepted` condition to
+`False` with an appropriate reason until this behavior is specified.
 
 ## References
 
