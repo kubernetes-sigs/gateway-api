@@ -266,5 +266,97 @@ by this GEP in its current form. Implementations SHOULD reject a Gateway that
 specifies conflicting address types by setting the `Accepted` condition to
 `False` with an appropriate reason until this behavior is specified.
 
+### Cluster Policy Enforcement with ValidatingAdmissionPolicy
+
+Cluster administrators can use Kubernetes
+[ValidatingAdmissionPolicy](https://kubernetes.io/docs/reference/access-authn-authz/validating-admission-policy/)
+to enforce organizational constraints on which address types are allowed.
+
+#### Example: Block external LoadBalancers (ClusterIP only)
+
+This policy ensures that every Gateway in the cluster must use
+`ClusterIPAddress`, preventing the creation of externally-exposed Gateways:
+
+```yaml
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: "gateway-clusterip-only.example.com"
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+    - apiGroups:   ["gateway.networking.k8s.io"]
+      apiVersions: ["v1"]
+      operations:  ["CREATE", "UPDATE"]
+      resources:   ["gateways"]
+  validations:
+    - expression: >-
+        has(object.spec.addresses) &&
+        object.spec.addresses.size() > 0 &&
+        object.spec.addresses.all(a, a.type == 'ClusterIPAddress')
+      message: "Gateways in this cluster must use ClusterIPAddress. External LoadBalancers are not allowed."
+      reason: Forbidden
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: gateway-clusterip-only.example.com
+spec:
+  policyName: gateway-clusterip-only.example.com
+  validationActions: [Deny]
+  matchResources:
+    resourceRules:
+    - apiGroups:   ["gateway.networking.k8s.io"]
+      apiVersions: ["v1"]
+      resources:   ["gateways"]
+      operations:  ["CREATE", "UPDATE"]
+```
+
+#### Example: Enforce OptimizedLoadBalancer for external Gateways
+
+This policy allows both `ClusterIPAddress` and `OptimizedLoadBalancerAddress`
+but blocks Gateways that omit `spec.addresses` (which would get
+implementation-default LoadBalancer behavior without best-practice defaults):
+
+```yaml
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: "gateway-optimized-lb.example.com"
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+    - apiGroups:   ["gateway.networking.k8s.io"]
+      apiVersions: ["v1"]
+      operations:  ["CREATE", "UPDATE"]
+      resources:   ["gateways"]
+  validations:
+    - expression: >-
+        has(object.spec.addresses) &&
+        object.spec.addresses.size() > 0 &&
+        object.spec.addresses.all(a,
+          a.type == 'ClusterIPAddress' ||
+          a.type == 'OptimizedLoadBalancerAddress'
+        )
+      message: "Gateways must specify an explicit address type (ClusterIPAddress or OptimizedLoadBalancerAddress). Default LoadBalancer provisioning without optimized defaults is not allowed."
+      reason: Forbidden
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: gateway-optimized-lb.example.com
+spec:
+  policyName: gateway-optimized-lb.example.com
+  validationActions: [Deny]
+  matchResources:
+    resourceRules:
+    - apiGroups:   ["gateway.networking.k8s.io"]
+      apiVersions: ["v1"]
+      resources:   ["gateways"]
+      operations:  ["CREATE", "UPDATE"]
+```
+
 ## References
 
