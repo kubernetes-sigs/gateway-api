@@ -32,6 +32,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
+
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/gateway-api/apis/v1alpha2"
 	"sigs.k8s.io/gateway-api/apis/v1alpha3"
@@ -209,7 +210,7 @@ func TestVAPValidation(t *testing.T) {
 				"get", "crd", "-o", "template", "--template",
 				`{{range .items}}{{.metadata.name}}: {{index .metadata.annotations "gateway.networking.k8s.io/channel"}}{{"\n"}}{{end}}`,
 			})
-			require.NoError(t, err)
+			require.NoError(t, err, "output", output)
 		})
 
 		t.Run("should be able to install x-k8s.io experimental CRDs", func(t *testing.T) {
