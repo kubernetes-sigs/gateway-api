@@ -105,7 +105,7 @@ Some examples of invalid input strings are (implementations need not reject thes
 
 We use IEEE POSIX ERE (as defined in Chapter 9 of the [The Open Group Base Specifications Issue 8]), as the base of Gateway API Regex, with a few exceptions:
 
-* We do not define whether matches are leftmost-longest, leftmost-first, or something else.
+* Matches are leftmost-first rather than leftmost-longest (quantifiers are still greedy).
 * Unescaped square brackets in character classes are undefined (`[[]]`, `[]]`, `[[]`, `[[:alpha:]`, `[[=a=]]`, `[[.ch.]]`).
 * Backslashes (`\`) retain their special meaning in character classes and can escape special characters, even if those special characters lose their special meaning in character classes. For example, `[\-]` matches `-`, and `[\]]` matches `]`.
 * Consecutive quantifiers are undefined (`a**`, `a*?`, `a{1,2}?`).
@@ -237,9 +237,9 @@ For the pattern `^[\-Z]$`, the only matching strings are
 Replacement is usually straightforward, but has some semantic ambiguities.
 Given a pattern, a replacement, and an input, we allow higher level APIs to define semantics such as
 * whether the first or all matches should be replaced.
-* if replacing all matches, how to deal with overlapping matches.
-
-That said, whether the matches are leftmost-first or leftmost-longest is always undefined.
+* if replacing all matches, repeatedly find the next non-overlapping leftmost-first match, replace it, then continue scanning after the replaced match.
+    * This means that some instances of patterns might be skipped if there are overlaps.
+    * The resulting string might contain new matches due to replacements.
 
 ### Referencing Capturing Groups
 
@@ -254,7 +254,11 @@ Here are some examples when replacing all instances of the pattern with the repl
 | Pattern         | Replacement | Input           | Output          |
 |-----------------|-------------|-----------------|-----------------|
 | `aba`           | `c`         | `abaaba`        | `cc`            |
+| `aba`           | `c`         | `ababa`         | `cba`           |
+| `aba`           | `a`         | `ababa`         | `aba`           |
 | `a([bc])+a`     | `\1`        | `abca`          | `c`             |
+| `(a\|ab)`       | `c`         | `ab`            | `cb`            |
 
-
+Note in the last example, the pattern is `(a|ab)`, the backslash is to escape the `|` in the markdown table.
+The output is `cb` rather than `c` because of leftmost-first matching.
 
