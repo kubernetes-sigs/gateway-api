@@ -1,0 +1,27 @@
+meshName: "istio"
+reportOutputPath: "test-output/report.yaml"
+mode: "placeholder"
+timeoutConfig:
+  deleteTimeout: "30s"
+  getTimeout: "30s"
+implementation:
+  organization: "Istio"
+  project: "istio"
+  url: "https://istio.io"
+  version: "1.30.0"
+  contact:
+    - "@test"
+supportedFeatures:
+  HTTPRouteHostRewrite: {}
+  HTTPRouteMethodMatching: {}
+exemptFeatures:
+  GatewayPort8080: {}
+usableAddresses:
+  - type: IPAddress
+    value: "192.168.1.1"
+  - type: Hostname
+    value: "example.com"
+unusableAddresses:
+  - type: IPAddress
+    value: "10.0.0.1"
+debug: true

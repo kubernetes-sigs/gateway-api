@@ -146,20 +146,20 @@ type ConformanceOptions struct {
 	GRPCClient           grpc.Client
 	BaseManifests        string
 	MeshManifests        string
-	NamespaceLabels      map[string]string
-	NamespaceAnnotations map[string]string
+	NamespaceLabels      map[string]string `json:"namespaceLabels"`
+	NamespaceAnnotations map[string]string `json:"namespaceAnnotations"`
 	ReportOutputPath     string `json:"reportOutputPath"`
 
 	// CleanupBaseResources indicates whether or not the base test
 	// resources such as Gateways should be cleaned up after the run.
 	CleanupBaseResources       bool `json:"cleanupBaseResources"`
-	SupportedFeatures          FeaturesSet
-	ExemptFeatures             FeaturesSet
+	SupportedFeatures          FeaturesSet `json:"supportedFeatures"`
+	ExemptFeatures             FeaturesSet `json:"exemptFeatures"`
 	EnableAllSupportedFeatures bool                 `json:"enableAllSupportedFeatures"`
 	TimeoutConfig              config.TimeoutConfig `json:"timeoutConfig"`
 	// SkipTests contains all the tests not to be run and can be used to opt out
 	// of specific tests
-	SkipTests []string
+	SkipTests []string `json:"skipTests"`
 	// SkipProvisionalTests indicates whether or not to skip provisional tests.
 	SkipProvisionalTests bool `json:"skipProvisionalTests"`
 	// RunTest is a single test to run, mostly for development/debugging convenience.
@@ -170,17 +170,17 @@ type ConformanceOptions struct {
 
 	// UsableNetworkAddresses is an optional pool of usable addresses for
 	// Gateways for tests which need to test manual address assignments.
-	UsableNetworkAddresses []gatewayv1.GatewaySpecAddress
+	UsableNetworkAddresses []gatewayv1.GatewaySpecAddress `json:"usableAddresses"`
 
 	// UnusableNetworkAddresses is an optional pool of unusable addresses for
 	// Gateways for tests which need to test failures with manual Gateway
 	// address assignment.
-	UnusableNetworkAddresses []gatewayv1.GatewaySpecAddress
+	UnusableNetworkAddresses []gatewayv1.GatewaySpecAddress `json:"unusableAddresses"`
 
 	Mode                string                `json:"mode"`
 	AllowCRDsMismatch   bool                  `json:"allowCrdsMismatch"`
 	Implementation      confv1.Implementation `json:"implementation"`
-	ConformanceProfiles sets.Set[ConformanceProfileName]
+	ConformanceProfiles sets.Set[ConformanceProfileName] `json:"conformanceProfiles"`
 
 	FailFast bool `json:"failFast"`
 }

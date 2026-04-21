@@ -1,6 +1,0 @@
-meshName: "istio"
-reportOutputPath: "test-output/report.yaml"
-mode: "placeholder"
-timeoutConfig:
-  deleteTimeout: "30s"
-  getTimeout: "30s"

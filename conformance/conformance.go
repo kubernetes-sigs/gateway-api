@@ -91,6 +91,7 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 		unusable = append(unusable, parseAddress(v))
 	}
 
+	// Load conformance options, using flag defaults as needed.
 	conformanceOpts := &suite.ConformanceOptions{
 		AllowCRDsMismatch:          *flags.AllowCRDsMismatch,
 		CleanupBaseResources:       *flags.CleanupBaseResources,
@@ -120,7 +121,7 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 		FailFast:                   *flags.FailFast,
 	}
 
-	// Load conformance options provided via yaml file, if specified.
+	// Load conformance options provided via yaml file, overriding defaults.
 	if *flags.ConformanceOptionsFile != "" {
 		data, err := os.ReadFile(*flags.ConformanceOptionsFile)
 		require.NoError(t, err, "error reading conformance options file")
@@ -149,6 +150,21 @@ func useConformanceFlagOverrides(t *testing.T, conformanceOpts *suite.Conformanc
 		"mode":                   func() { conformanceOpts.Mode = *flags.Mode },
 		"report-output":          func() { conformanceOpts.ReportOutputPath = *flags.ReportOutput },
 		"fail-fast":              func() { conformanceOpts.FailFast = *flags.FailFast },
+		"supported-features":     func() { conformanceOpts.SupportedFeatures = suite.ParseSupportedFeatures(*flags.SupportedFeatures) },
+		"exempt-features":        func() { conformanceOpts.ExemptFeatures = suite.ParseSupportedFeatures(*flags.ExemptFeatures) },
+		"namespace-labels":       func() { conformanceOpts.NamespaceLabels = suite.ParseKeyValuePairs(*flags.NamespaceLabels) },
+		"namespace-annotations":  func() { conformanceOpts.NamespaceAnnotations = suite.ParseKeyValuePairs(*flags.NamespaceAnnotations) },
+		"conformance-profiles":   func() { conformanceOpts.ConformanceProfiles = suite.ParseConformanceProfiles(*flags.ConformanceProfiles) },
+		"usable-address": func() {
+			if v := *flags.UsableAddress; v != "" {
+				conformanceOpts.UsableNetworkAddresses = []v1.GatewaySpecAddress{parseAddress(v)}
+			}
+		},
+		"unusable-address": func() {
+			if v := *flags.UnusableAddress; v != "" {
+				conformanceOpts.UnusableNetworkAddresses = []v1.GatewaySpecAddress{parseAddress(v)}
+			}
+		},
 		"timeout-config-overrides": func() {
 			conformanceconfig.ParseTimeoutOverrides(&conformanceOpts.TimeoutConfig, *flags.TimeoutConfigOverrides)
 		},
