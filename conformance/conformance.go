@@ -69,20 +69,44 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 	require.NoError(t, v1.Install(client.Scheme()))
 	require.NoError(t, apiextensionsv1.AddToScheme(client.Scheme()))
 
-	supportedFeatures := suite.ParseSupportedFeatures(*flags.SupportedFeatures)
-	exemptFeatures := suite.ParseSupportedFeatures(*flags.ExemptFeatures)
-	skipTests := suite.ParseSkipTests(*flags.SkipTests)
-	namespaceLabels := suite.ParseKeyValuePairs(*flags.NamespaceLabels)
-	namespaceAnnotations := suite.ParseKeyValuePairs(*flags.NamespaceAnnotations)
-	conformanceProfiles := suite.ParseConformanceProfiles(*flags.ConformanceProfiles)
+	// Load conformance options, using flag defaults as needed.
+	opts := &suite.ConformanceOptions{
+		CleanupBaseResources: *flags.CleanupBaseResources,
+		Client:               client,
+		ClientOptions:        clientOptions,
+		Clientset:            clientset,
+		ManifestFS:           []fs.FS{&Manifests},
+		GatewayClassName:     *flags.GatewayClassName,
+		Mode:                 *flags.Mode,
+		RestConfig:           cfg,
+		TimeoutConfig:        conformanceconfig.DefaultTimeoutConfig(),
+	}
 
-	implementation := suite.ParseImplementation(
-		*flags.ImplementationOrganization,
-		*flags.ImplementationProject,
-		*flags.ImplementationURL,
-		*flags.ImplementationVersion,
-		*flags.ImplementationContact,
-	)
+	// Load conformance options provided via yaml file, overriding defaults.
+	if *flags.ConformanceOptionsFile != "" {
+		data, err := os.ReadFile(*flags.ConformanceOptionsFile)
+		require.NoError(t, err, "error reading conformance options file")
+
+		err = yaml.Unmarshal(data, opts)
+		require.NoError(t, err, "error unmarshalling conformance options file")
+	}
+
+	applyConformanceFlagOverrides(opts)
+
+	return *opts
+}
+
+func applyConformanceFlagOverrides(opts *suite.ConformanceOptions) {
+	implementationOverride := func() {
+		opts.Implementation = suite.ParseImplementation(
+			*flags.ImplementationOrganization,
+			*flags.ImplementationProject,
+			*flags.ImplementationURL,
+			*flags.ImplementationVersion,
+			*flags.ImplementationContact,
+		)
+	}
+
 	var usable, unusable []v1.GatewaySpecAddress
 	if v := *flags.UsableAddress; v != "" {
 		usable = append(usable, parseAddress(v))
@@ -91,82 +115,33 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 		unusable = append(unusable, parseAddress(v))
 	}
 
-	// Load conformance options, using flag defaults as needed.
-	conformanceOpts := &suite.ConformanceOptions{
-		AllowCRDsMismatch:          *flags.AllowCRDsMismatch,
-		CleanupBaseResources:       *flags.CleanupBaseResources,
-		Client:                     client,
-		ClientOptions:              clientOptions,
-		Clientset:                  clientset,
-		ConformanceProfiles:        conformanceProfiles,
-		Debug:                      *flags.ShowDebug,
-		EnableAllSupportedFeatures: *flags.EnableAllSupportedFeatures,
-		ExemptFeatures:             exemptFeatures,
-		ManifestFS:                 []fs.FS{&Manifests},
-		GatewayClassName:           *flags.GatewayClassName,
-		UsableNetworkAddresses:     usable,
-		UnusableNetworkAddresses:   unusable,
-		MeshName:                   *flags.MeshName,
-		Implementation:             implementation,
-		Mode:                       *flags.Mode,
-		NamespaceAnnotations:       namespaceAnnotations,
-		NamespaceLabels:            namespaceLabels,
-		ReportOutputPath:           *flags.ReportOutput,
-		RestConfig:                 cfg,
-		RunTest:                    *flags.RunTest,
-		SkipTests:                  skipTests,
-		SupportedFeatures:          supportedFeatures,
-		TimeoutConfig:              conformanceconfig.DefaultTimeoutConfig(),
-		SkipProvisionalTests:       *flags.SkipProvisionalTests,
-		FailFast:                   *flags.FailFast,
-	}
-
-	// Load conformance options provided via yaml file, overriding defaults.
-	if *flags.ConformanceOptionsFile != "" {
-		data, err := os.ReadFile(*flags.ConformanceOptionsFile)
-		require.NoError(t, err, "error reading conformance options file")
-
-		err = yaml.Unmarshal(data, conformanceOpts)
-		require.NoError(t, err, "error unmarshalling conformance options file")
-
-		useConformanceFlagOverrides(t, conformanceOpts, implementation)
-	}
-
-	return *conformanceOpts
-}
-
-func useConformanceFlagOverrides(t *testing.T, conformanceOpts *suite.ConformanceOptions, implementation confv1.Implementation) {
 	flagOverrides := map[string]func(){
-		"gateway-class":          func() { conformanceOpts.GatewayClassName = *flags.GatewayClassName },
-		"mesh-name":              func() { conformanceOpts.MeshName = *flags.MeshName },
-		"debug":                  func() { conformanceOpts.Debug = *flags.ShowDebug },
-		"cleanup-base-resources": func() { conformanceOpts.CleanupBaseResources = *flags.CleanupBaseResources },
-		"run-test":               func() { conformanceOpts.RunTest = *flags.RunTest },
-		"skip-tests":             func() { conformanceOpts.SkipTests = suite.ParseSkipTests(*flags.SkipTests) },
-		"skip-provisional-tests": func() { conformanceOpts.SkipProvisionalTests = *flags.SkipProvisionalTests },
-		"all-features":           func() { conformanceOpts.EnableAllSupportedFeatures = *flags.EnableAllSupportedFeatures },
-		"allow-crds-mismatch":    func() { conformanceOpts.AllowCRDsMismatch = *flags.AllowCRDsMismatch },
-		"organization":           func() { conformanceOpts.Implementation = implementation },
-		"mode":                   func() { conformanceOpts.Mode = *flags.Mode },
-		"report-output":          func() { conformanceOpts.ReportOutputPath = *flags.ReportOutput },
-		"fail-fast":              func() { conformanceOpts.FailFast = *flags.FailFast },
-		"supported-features":     func() { conformanceOpts.SupportedFeatures = suite.ParseSupportedFeatures(*flags.SupportedFeatures) },
-		"exempt-features":        func() { conformanceOpts.ExemptFeatures = suite.ParseSupportedFeatures(*flags.ExemptFeatures) },
-		"namespace-labels":       func() { conformanceOpts.NamespaceLabels = suite.ParseKeyValuePairs(*flags.NamespaceLabels) },
-		"namespace-annotations":  func() { conformanceOpts.NamespaceAnnotations = suite.ParseKeyValuePairs(*flags.NamespaceAnnotations) },
-		"conformance-profiles":   func() { conformanceOpts.ConformanceProfiles = suite.ParseConformanceProfiles(*flags.ConformanceProfiles) },
-		"usable-address": func() {
-			if v := *flags.UsableAddress; v != "" {
-				conformanceOpts.UsableNetworkAddresses = []v1.GatewaySpecAddress{parseAddress(v)}
-			}
-		},
-		"unusable-address": func() {
-			if v := *flags.UnusableAddress; v != "" {
-				conformanceOpts.UnusableNetworkAddresses = []v1.GatewaySpecAddress{parseAddress(v)}
-			}
-		},
+		"gateway-class":          func() { opts.GatewayClassName = *flags.GatewayClassName },
+		"mesh-name":              func() { opts.MeshName = *flags.MeshName },
+		"debug":                  func() { opts.Debug = *flags.ShowDebug },
+		"cleanup-base-resources": func() { opts.CleanupBaseResources = *flags.CleanupBaseResources },
+		"run-test":               func() { opts.RunTest = *flags.RunTest },
+		"skip-tests":             func() { opts.SkipTests = suite.ParseSkipTests(*flags.SkipTests) },
+		"skip-provisional-tests": func() { opts.SkipProvisionalTests = *flags.SkipProvisionalTests },
+		"all-features":           func() { opts.EnableAllSupportedFeatures = *flags.EnableAllSupportedFeatures },
+		"allow-crds-mismatch":    func() { opts.AllowCRDsMismatch = *flags.AllowCRDsMismatch },
+		"organization":           implementationOverride,
+		"project":                implementationOverride,
+		"url":                    implementationOverride,
+		"version":                implementationOverride,
+		"contact":                implementationOverride,
+		"mode":                   func() { opts.Mode = *flags.Mode },
+		"report-output":          func() { opts.ReportOutputPath = *flags.ReportOutput },
+		"fail-fast":              func() { opts.FailFast = *flags.FailFast },
+		"supported-features":     func() { opts.SupportedFeatures = suite.ParseSupportedFeatures(*flags.SupportedFeatures) },
+		"exempt-features":        func() { opts.ExemptFeatures = suite.ParseSupportedFeatures(*flags.ExemptFeatures) },
+		"namespace-labels":       func() { opts.NamespaceLabels = suite.ParseKeyValuePairs(*flags.NamespaceLabels) },
+		"namespace-annotations":  func() { opts.NamespaceAnnotations = suite.ParseKeyValuePairs(*flags.NamespaceAnnotations) },
+		"conformance-profiles":   func() { opts.ConformanceProfiles = suite.ParseConformanceProfiles(*flags.ConformanceProfiles) },
+		"usable-address":         func() { opts.UsableNetworkAddresses = usable },
+		"unusable-address":       func() { opts.UnusableNetworkAddresses = unusable },
 		"timeout-config-overrides": func() {
-			conformanceconfig.ParseTimeoutOverrides(&conformanceOpts.TimeoutConfig, *flags.TimeoutConfigOverrides)
+			conformanceconfig.ParseTimeoutOverrides(&opts.TimeoutConfig, *flags.TimeoutConfigOverrides)
 		},
 	}
 
