@@ -132,24 +132,14 @@ type ConformanceTestSuite struct {
 	failFast bool
 }
 
-// ConformanceOptions can be used to initialize a ConformanceTestSuite.
-type ConformanceOptions struct {
-	Client               client.Client
-	ClientOptions        client.Options
-	Clientset            clientset.Interface
-	RestConfig           *rest.Config
-	GatewayClassName     string `json:"gatewayClassName"`
-	MeshName             string `json:"meshName"`
-	AddressType          string
-	Debug                bool `json:"debug"`
-	RoundTripper         roundtripper.RoundTripper
-	GRPCClient           grpc.Client
-	BaseManifests        string
-	MeshManifests        string
+// ConfigurableOptions defines conformance options that are configurable by the user via flags or yaml.
+type ConfigurableOptions struct {
+	GatewayClassName     string            `json:"gatewayClassName"`
+	MeshName             string            `json:"meshName"`
+	Debug                bool              `json:"debug"`
 	NamespaceLabels      map[string]string `json:"namespaceLabels"`
 	NamespaceAnnotations map[string]string `json:"namespaceAnnotations"`
 	ReportOutputPath     string            `json:"reportOutputPath"`
-
 	// CleanupBaseResources indicates whether or not the base test
 	// resources such as Gateways should be cleaned up after the run.
 	CleanupBaseResources       bool                 `json:"cleanupBaseResources"`
@@ -163,10 +153,12 @@ type ConformanceOptions struct {
 	// SkipProvisionalTests indicates whether or not to skip provisional tests.
 	SkipProvisionalTests bool `json:"skipProvisionalTests"`
 	// RunTest is a single test to run, mostly for development/debugging convenience.
-	RunTest string `json:"runTest"`
-	// Hook is an optional function that can be used to run custom logic after each test at suite level.
-	Hook       func(t *testing.T, test ConformanceTest, suite *ConformanceTestSuite)
-	ManifestFS []fs.FS
+	RunTest             string                           `json:"runTest"`
+	Mode                string                           `json:"mode"`
+	AllowCRDsMismatch   bool                             `json:"allowCrdsMismatch"`
+	Implementation      confv1.Implementation            `json:"implementation"`
+	ConformanceProfiles sets.Set[ConformanceProfileName] `json:"conformanceProfiles"`
+	FailFast            bool                             `json:"failFast"`
 
 	// UsableNetworkAddresses is an optional pool of usable addresses for
 	// Gateways for tests which need to test manual address assignments.
@@ -176,13 +168,24 @@ type ConformanceOptions struct {
 	// Gateways for tests which need to test failures with manual Gateway
 	// address assignment.
 	UnusableNetworkAddresses []gatewayv1.GatewaySpecAddress `json:"unusableAddresses"`
+}
 
-	Mode                string                           `json:"mode"`
-	AllowCRDsMismatch   bool                             `json:"allowCrdsMismatch"`
-	Implementation      confv1.Implementation            `json:"implementation"`
-	ConformanceProfiles sets.Set[ConformanceProfileName] `json:"conformanceProfiles"`
+// ConformanceOptions can be used to initialize a ConformanceTestSuite.
+type ConformanceOptions struct {
+	ConfigurableOptions
 
-	FailFast bool `json:"failFast"`
+	Client        client.Client
+	ClientOptions client.Options
+	Clientset     clientset.Interface
+	RestConfig    *rest.Config
+	AddressType   string
+	RoundTripper  roundtripper.RoundTripper
+	GRPCClient    grpc.Client
+	BaseManifests string
+	MeshManifests string
+	// Hook is an optional function that can be used to run custom logic after each test at suite level.
+	Hook       func(t *testing.T, test ConformanceTest, suite *ConformanceTestSuite)
+	ManifestFS []fs.FS
 }
 
 type FeaturesSet = sets.Set[features.FeatureName]

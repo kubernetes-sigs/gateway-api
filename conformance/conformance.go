@@ -71,15 +71,17 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 
 	// Load conformance options, using flag defaults as needed.
 	opts := &suite.ConformanceOptions{
-		CleanupBaseResources: *flags.CleanupBaseResources,
-		Client:               client,
-		ClientOptions:        clientOptions,
-		Clientset:            clientset,
-		ManifestFS:           []fs.FS{&Manifests},
-		GatewayClassName:     *flags.GatewayClassName,
-		Mode:                 *flags.Mode,
-		RestConfig:           cfg,
-		TimeoutConfig:        conformanceconfig.DefaultTimeoutConfig(),
+		ConfigurableOptions: suite.ConfigurableOptions{
+			CleanupBaseResources: *flags.CleanupBaseResources,
+			GatewayClassName:     *flags.GatewayClassName,
+			Mode:                 *flags.Mode,
+			TimeoutConfig:        conformanceconfig.DefaultTimeoutConfig(),
+		},
+		Client:        client,
+		ClientOptions: clientOptions,
+		Clientset:     clientset,
+		ManifestFS:    []fs.FS{&Manifests},
+		RestConfig:    cfg,
 	}
 
 	// Load conformance options provided via yaml file, overriding defaults.
