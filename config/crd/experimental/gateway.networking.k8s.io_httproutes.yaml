@@ -3781,9 +3781,9 @@ spec:
                             Support: Extended
                           pattern: ^([0-9]{1,5}(h|m|s|ms)){1,4}$
                           type: string
-                        cookieConfig:
+                        cookie:
                           description: |-
-                            CookieConfig provides configuration settings that are specific
+                            Cookie provides configuration settings that are specific
                             to cookie-based session persistence.
 
                             Support: Core
@@ -3814,16 +3814,39 @@ spec:
                               - Permanent
                               - Session
                               type: string
-                          type: object
-                        sessionName:
-                          description: |-
-                            SessionName defines the name of the persistent session token
-                            which may be reflected in the cookie or the header. Users
-                            should avoid reusing session names to prevent unintended
-                            consequences, such as rejection or unpredictable behavior.
+                            name:
+                              description: |-
+                                Name defines the name of the persistent session cookie.
+                                Cookie names MUST be unique across all route rules within a Gateway.
 
-                            Support: Implementation-specific
-                          maxLength: 128
+                                Support: Extended
+                              maxLength: 128
+                              type: string
+                          type: object
+                        header:
+                          description: |-
+                            Header provides configuration settings that are specific
+                            to header-based session persistence.
+
+                            Support: Extended
+                          properties:
+                            name:
+                              description: |-
+                                Name defines the name of the header used for session persistence.
+                                Header names MUST be unique across all route rules within a Gateway.
+
+                                Support: Extended
+                              maxLength: 128
+                              type: string
+                          type: object
+                        idleTimeout:
+                          description: |-
+                            IdleTimeout defines the idle timeout of the persistent session.
+                            Once the session has been idle for more than the specified
+                            IdleTimeout duration, the session becomes invalid.
+
+                            Support: Extended
+                          pattern: ^([0-9]{1,5}(h|m|s|ms)){1,4}$
                           type: string
                         type:
                           default: Cookie
@@ -3843,10 +3866,16 @@ spec:
                       x-kubernetes-validations:
                       - message: AbsoluteTimeout must be specified when cookie lifetimeType
                           is Permanent
-                        rule: '!has(self.cookieConfig) || !has(self.cookieConfig.lifetimeType)
-                          || self.cookieConfig.lifetimeType != ''Permanent'' || has(self.absoluteTimeout)'
-                      - message: cookieConfig can only be set with type Cookie
-                        rule: '!has(self.cookieConfig) || self.type == ''Cookie'''
+                        rule: '!has(self.cookie) || !has(self.cookie.lifetimeType)
+                          || self.cookie.lifetimeType != ''Permanent'' || has(self.absoluteTimeout)'
+                      - message: cookie must be nil if type is not Cookie
+                        rule: '!has(self.cookie) || self.type == ''Cookie'''
+                      - message: cookie must be specified for Cookie type
+                        rule: self.type != 'Cookie' || has(self.cookie)
+                      - message: header must be nil if type is not Header
+                        rule: '!has(self.header) || self.type == ''Header'''
+                      - message: header must be specified for Header type
+                        rule: self.type != 'Header' || has(self.header)
                     timeouts:
                       description: |-
                         Timeouts defines the timeouts that can be configured for an HTTP request.
@@ -3972,6 +4001,20 @@ spec:
                 - message: Rule name must be unique within the route
                   rule: self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name)
                     && l1.name == l2.name))
+                - message: Session persistence cookie name must be unique across all
+                    rules within the route
+                  rule: self.filter(l, has(l.sessionPersistence) && has(l.sessionPersistence.cookie)
+                    && has(l.sessionPersistence.cookie.name)).all(l1, self.exists_one(l2,
+                    has(l2.sessionPersistence) && has(l2.sessionPersistence.cookie)
+                    && has(l2.sessionPersistence.cookie.name) && l1.sessionPersistence.cookie.name
+                    == l2.sessionPersistence.cookie.name))
+                - message: Session persistence header name must be unique across all
+                    rules within the route
+                  rule: self.filter(l, has(l.sessionPersistence) && has(l.sessionPersistence.header)
+                    && has(l.sessionPersistence.header.name)).all(l1, self.exists_one(l2,
+                    has(l2.sessionPersistence) && has(l2.sessionPersistence.header)
+                    && has(l2.sessionPersistence.header.name) && l1.sessionPersistence.header.name
+                    == l2.sessionPersistence.header.name))
               useDefaultGateways:
                 description: |-
                   UseDefaultGateways indicates the default Gateway scope to use for this
@@ -8035,9 +8078,9 @@ spec:
                             Support: Extended
                           pattern: ^([0-9]{1,5}(h|m|s|ms)){1,4}$
                           type: string
-                        cookieConfig:
+                        cookie:
                           description: |-
-                            CookieConfig provides configuration settings that are specific
+                            Cookie provides configuration settings that are specific
                             to cookie-based session persistence.
 
                             Support: Core
@@ -8068,16 +8111,39 @@ spec:
                               - Permanent
                               - Session
                               type: string
-                          type: object
-                        sessionName:
-                          description: |-
-                            SessionName defines the name of the persistent session token
-                            which may be reflected in the cookie or the header. Users
-                            should avoid reusing session names to prevent unintended
-                            consequences, such as rejection or unpredictable behavior.
+                            name:
+                              description: |-
+                                Name defines the name of the persistent session cookie.
+                                Cookie names MUST be unique across all route rules within a Gateway.
 
-                            Support: Implementation-specific
-                          maxLength: 128
+                                Support: Extended
+                              maxLength: 128
+                              type: string
+                          type: object
+                        header:
+                          description: |-
+                            Header provides configuration settings that are specific
+                            to header-based session persistence.
+
+                            Support: Extended
+                          properties:
+                            name:
+                              description: |-
+                                Name defines the name of the header used for session persistence.
+                                Header names MUST be unique across all route rules within a Gateway.
+
+                                Support: Extended
+                              maxLength: 128
+                              type: string
+                          type: object
+                        idleTimeout:
+                          description: |-
+                            IdleTimeout defines the idle timeout of the persistent session.
+                            Once the session has been idle for more than the specified
+                            IdleTimeout duration, the session becomes invalid.
+
+                            Support: Extended
+                          pattern: ^([0-9]{1,5}(h|m|s|ms)){1,4}$
                           type: string
                         type:
                           default: Cookie
@@ -8097,10 +8163,16 @@ spec:
                       x-kubernetes-validations:
                       - message: AbsoluteTimeout must be specified when cookie lifetimeType
                           is Permanent
-                        rule: '!has(self.cookieConfig) || !has(self.cookieConfig.lifetimeType)
-                          || self.cookieConfig.lifetimeType != ''Permanent'' || has(self.absoluteTimeout)'
-                      - message: cookieConfig can only be set with type Cookie
-                        rule: '!has(self.cookieConfig) || self.type == ''Cookie'''
+                        rule: '!has(self.cookie) || !has(self.cookie.lifetimeType)
+                          || self.cookie.lifetimeType != ''Permanent'' || has(self.absoluteTimeout)'
+                      - message: cookie must be nil if type is not Cookie
+                        rule: '!has(self.cookie) || self.type == ''Cookie'''
+                      - message: cookie must be specified for Cookie type
+                        rule: self.type != 'Cookie' || has(self.cookie)
+                      - message: header must be nil if type is not Header
+                        rule: '!has(self.header) || self.type == ''Header'''
+                      - message: header must be specified for Header type
+                        rule: self.type != 'Header' || has(self.header)
                     timeouts:
                       description: |-
                         Timeouts defines the timeouts that can be configured for an HTTP request.
@@ -8226,6 +8298,20 @@ spec:
                 - message: Rule name must be unique within the route
                   rule: self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name)
                     && l1.name == l2.name))
+                - message: Session persistence cookie name must be unique across all
+                    rules within the route
+                  rule: self.filter(l, has(l.sessionPersistence) && has(l.sessionPersistence.cookie)
+                    && has(l.sessionPersistence.cookie.name)).all(l1, self.exists_one(l2,
+                    has(l2.sessionPersistence) && has(l2.sessionPersistence.cookie)
+                    && has(l2.sessionPersistence.cookie.name) && l1.sessionPersistence.cookie.name
+                    == l2.sessionPersistence.cookie.name))
+                - message: Session persistence header name must be unique across all
+                    rules within the route
+                  rule: self.filter(l, has(l.sessionPersistence) && has(l.sessionPersistence.header)
+                    && has(l.sessionPersistence.header.name)).all(l1, self.exists_one(l2,
+                    has(l2.sessionPersistence) && has(l2.sessionPersistence.header)
+                    && has(l2.sessionPersistence.header.name) && l1.sessionPersistence.header.name
+                    == l2.sessionPersistence.header.name))
               useDefaultGateways:
                 description: |-
                   UseDefaultGateways indicates the default Gateway scope to use for this

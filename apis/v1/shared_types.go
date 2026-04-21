@@ -912,20 +912,12 @@ const (
 )
 
 // SessionPersistence defines the desired state of SessionPersistence.
-// +kubebuilder:validation:XValidation:message="AbsoluteTimeout must be specified when cookie lifetimeType is Permanent",rule="!has(self.cookieConfig) || !has(self.cookieConfig.lifetimeType) || self.cookieConfig.lifetimeType != 'Permanent' || has(self.absoluteTimeout)"
-// +kubebuilder:validation:XValidation:message="cookieConfig can only be set with type Cookie",rule="!has(self.cookieConfig) || self.type == 'Cookie'"
+// +kubebuilder:validation:XValidation:message="AbsoluteTimeout must be specified when cookie lifetimeType is Permanent",rule="!has(self.cookie) || !has(self.cookie.lifetimeType) || self.cookie.lifetimeType != 'Permanent' || has(self.absoluteTimeout)"
+// +kubebuilder:validation:XValidation:message="cookie must be nil if type is not Cookie",rule="!has(self.cookie) || self.type == 'Cookie'"
+// +kubebuilder:validation:XValidation:message="cookie must be specified for Cookie type",rule="self.type != 'Cookie' || has(self.cookie)"
+// +kubebuilder:validation:XValidation:message="header must be nil if type is not Header",rule="!has(self.header) || self.type == 'Header'"
+// +kubebuilder:validation:XValidation:message="header must be specified for Header type",rule="self.type != 'Header' || has(self.header)"
 type SessionPersistence struct {
-	// SessionName defines the name of the persistent session token
-	// which may be reflected in the cookie or the header. Users
-	// should avoid reusing session names to prevent unintended
-	// consequences, such as rejection or unpredictable behavior.
-	//
-	// Support: Implementation-specific
-	//
-	// +optional
-	// +kubebuilder:validation:MaxLength=128
-	SessionName *string `json:"sessionName,omitempty"`
-
 	// AbsoluteTimeout defines the absolute timeout of the persistent
 	// session. Once the AbsoluteTimeout duration has elapsed, the
 	// session becomes invalid.
@@ -943,17 +935,26 @@ type SessionPersistence struct {
 	//
 	// Support: Extended for "Header" type
 	//
+	// +unionDiscriminator
 	// +optional
 	// +kubebuilder:default=Cookie
 	Type *SessionPersistenceType `json:"type,omitempty"`
 
-	// CookieConfig provides configuration settings that are specific
+	// Cookie provides configuration settings that are specific
 	// to cookie-based session persistence.
 	//
 	// Support: Core
 	//
 	// +optional
-	CookieConfig *CookieConfig `json:"cookieConfig,omitempty"`
+	Cookie *CookieConfig `json:"cookie,omitempty"`
+
+	// Header provides configuration settings that are specific
+	// to header-based session persistence.
+	//
+	// Support: Extended
+	//
+	// +optional
+	Header *HeaderConfig `json:"header,omitempty"`
 }
 
 // +kubebuilder:validation:Enum=Cookie;Header
@@ -975,6 +976,15 @@ const (
 
 // CookieConfig defines the configuration for cookie-based session persistence.
 type CookieConfig struct {
+	// Name defines the name of the persistent session cookie.
+	// Cookie names MUST be unique across all route rules within a Gateway.
+	//
+	// Support: Extended
+	//
+	// +optional
+	// +kubebuilder:validation:MaxLength=128
+	Name *string `json:"name,omitempty"`
+
 	// LifetimeType specifies whether the cookie has a permanent or
 	// session-based lifetime. A permanent cookie persists until its
 	// specified expiry time, defined by the Expires or Max-Age cookie
@@ -1016,6 +1026,18 @@ const (
 	// Support: Extended
 	PermanentCookieLifetimeType CookieLifetimeType = "Permanent"
 )
+
+// HeaderConfig defines the configuration for header-based session persistence.
+type HeaderConfig struct {
+	// Name defines the name of the header used for session persistence.
+	// Header names MUST be unique across all route rules within a Gateway.
+	//
+	// Support: Extended
+	//
+	// +optional
+	// +kubebuilder:validation:MaxLength=128
+	Name *string `json:"name,omitempty"`
+}
 
 // +kubebuilder:validation:XValidation:message="numerator must be less than or equal to denominator",rule="self.numerator <= self.denominator"
 type Fraction struct {

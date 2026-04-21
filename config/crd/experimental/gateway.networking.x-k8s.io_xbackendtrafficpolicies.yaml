@@ -171,9 +171,9 @@ spec:
                       Support: Extended
                     pattern: ^([0-9]{1,5}(h|m|s|ms)){1,4}$
                     type: string
-                  cookieConfig:
+                  cookie:
                     description: |-
-                      CookieConfig provides configuration settings that are specific
+                      Cookie provides configuration settings that are specific
                       to cookie-based session persistence.
 
                       Support: Core
@@ -204,16 +204,39 @@ spec:
                         - Permanent
                         - Session
                         type: string
-                    type: object
-                  sessionName:
-                    description: |-
-                      SessionName defines the name of the persistent session token
-                      which may be reflected in the cookie or the header. Users
-                      should avoid reusing session names to prevent unintended
-                      consequences, such as rejection or unpredictable behavior.
+                      name:
+                        description: |-
+                          Name defines the name of the persistent session cookie.
+                          Cookie names MUST be unique across all route rules within a Gateway.
 
-                      Support: Implementation-specific
-                    maxLength: 128
+                          Support: Extended
+                        maxLength: 128
+                        type: string
+                    type: object
+                  header:
+                    description: |-
+                      Header provides configuration settings that are specific
+                      to header-based session persistence.
+
+                      Support: Extended
+                    properties:
+                      name:
+                        description: |-
+                          Name defines the name of the header used for session persistence.
+                          Header names MUST be unique across all route rules within a Gateway.
+
+                          Support: Extended
+                        maxLength: 128
+                        type: string
+                    type: object
+                  idleTimeout:
+                    description: |-
+                      IdleTimeout defines the idle timeout of the persistent session.
+                      Once the session has been idle for more than the specified
+                      IdleTimeout duration, the session becomes invalid.
+
+                      Support: Extended
+                    pattern: ^([0-9]{1,5}(h|m|s|ms)){1,4}$
                     type: string
                   type:
                     default: Cookie
@@ -233,10 +256,16 @@ spec:
                 x-kubernetes-validations:
                 - message: AbsoluteTimeout must be specified when cookie lifetimeType
                     is Permanent
-                  rule: '!has(self.cookieConfig) || !has(self.cookieConfig.lifetimeType)
-                    || self.cookieConfig.lifetimeType != ''Permanent'' || has(self.absoluteTimeout)'
-                - message: cookieConfig can only be set with type Cookie
-                  rule: '!has(self.cookieConfig) || self.type == ''Cookie'''
+                  rule: '!has(self.cookie) || !has(self.cookie.lifetimeType) || self.cookie.lifetimeType
+                    != ''Permanent'' || has(self.absoluteTimeout)'
+                - message: cookie must be nil if type is not Cookie
+                  rule: '!has(self.cookie) || self.type == ''Cookie'''
+                - message: cookie must be specified for Cookie type
+                  rule: self.type != 'Cookie' || has(self.cookie)
+                - message: header must be nil if type is not Header
+                  rule: '!has(self.header) || self.type == ''Header'''
+                - message: header must be specified for Header type
+                  rule: self.type != 'Header' || has(self.header)
               targetRefs:
                 description: |-
                   TargetRefs identifies API object(s) to apply this policy to.

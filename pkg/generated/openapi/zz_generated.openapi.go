@@ -144,6 +144,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"sigs.k8s.io/gateway-api/apis/v1.HTTPRouteStatus":                                 schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteStatus(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.HTTPRouteTimeouts":                               schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteTimeouts(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.HTTPURLRewriteFilter":                            schema_sigsk8sio_gateway_api_apis_v1_HTTPURLRewriteFilter(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.HeaderConfig":                                    schema_sigsk8sio_gateway_api_apis_v1_HeaderConfig(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.Listener":                                        schema_sigsk8sio_gateway_api_apis_v1_Listener(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.ListenerEntry":                                   schema_sigsk8sio_gateway_api_apis_v1_ListenerEntry(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.ListenerEntryStatus":                             schema_sigsk8sio_gateway_api_apis_v1_ListenerEntryStatus(ref),
@@ -3295,6 +3296,13 @@ func schema_sigsk8sio_gateway_api_apis_v1_CookieConfig(ref common.ReferenceCallb
 				Description: "CookieConfig defines the configuration for cookie-based session persistence.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
+					"name": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Name defines the name of the persistent session cookie. Cookie names MUST be unique across all route rules within a Gateway.\n\nSupport: Extended",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
 					"lifetimeType": {
 						SchemaProps: spec.SchemaProps{
 							Description: "LifetimeType specifies whether the cookie has a permanent or session-based lifetime. A permanent cookie persists until its specified expiry time, defined by the Expires or Max-Age cookie attributes, while a session cookie is deleted when the current session ends.\n\nWhen set to \"Permanent\", AbsoluteTimeout indicates the cookie's lifetime via the Expires or Max-Age cookie attributes and is required.\n\nWhen set to \"Session\", AbsoluteTimeout indicates the absolute lifetime of the cookie tracked by the gateway and is optional.\n\nDefaults to \"Session\".\n\nSupport: Core for \"Session\" type\n\nSupport: Extended for \"Permanent\" type",
@@ -3958,7 +3966,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GRPCRouteSpec(ref common.ReferenceCall
 							},
 						},
 						SchemaProps: spec.SchemaProps{
-							Description: "Rules are a list of GRPC matchers, filters and actions.\n\n<gateway:experimental:validation:XValidation:message=\"Rule name must be unique within the route\",rule=\"self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name) && l1.name == l2.name))\">",
+							Description: "Rules are a list of GRPC matchers, filters and actions.\n\n<gateway:experimental:validation:XValidation:message=\"Rule name must be unique within the route\",rule=\"self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name) && l1.name == l2.name))\"> <gateway:experimental:validation:XValidation:message=\"Session persistence cookie name must be unique across all rules within the route\",rule=\"self.filter(l, has(l.sessionPersistence) && has(l.sessionPersistence.cookie) && has(l.sessionPersistence.cookie.name)).all(l1, self.exists_one(l2, has(l2.sessionPersistence) && has(l2.sessionPersistence.cookie) && has(l2.sessionPersistence.cookie.name) && l1.sessionPersistence.cookie.name == l2.sessionPersistence.cookie.name))\"> <gateway:experimental:validation:XValidation:message=\"Session persistence header name must be unique across all rules within the route\",rule=\"self.filter(l, has(l.sessionPersistence) && has(l.sessionPersistence.header) && has(l.sessionPersistence.header.name)).all(l1, self.exists_one(l2, has(l2.sessionPersistence) && has(l2.sessionPersistence.header) && has(l2.sessionPersistence.header.name) && l1.sessionPersistence.header.name == l2.sessionPersistence.header.name))\">",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -5709,7 +5717,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteSpec(ref common.ReferenceCall
 							},
 						},
 						SchemaProps: spec.SchemaProps{
-							Description: "Rules are a list of HTTP matchers, filters and actions.\n\n<gateway:experimental:validation:XValidation:message=\"Rule name must be unique within the route\",rule=\"self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name) && l1.name == l2.name))\"> <gateway:util:excludeFromCRD> Validates that the total number of matches across all rules does not exceed 128. CEL does not support aggregate functions like sum() over lists, so each of the (up to 16) rules is checked individually and their match counts are summed explicitly. </gateway:util:excludeFromCRD>",
+							Description: "Rules are a list of HTTP matchers, filters and actions.\n\n<gateway:experimental:validation:XValidation:message=\"Rule name must be unique within the route\",rule=\"self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name) && l1.name == l2.name))\"> <gateway:experimental:validation:XValidation:message=\"Session persistence cookie name must be unique across all rules within the route\",rule=\"self.filter(l, has(l.sessionPersistence) && has(l.sessionPersistence.cookie) && has(l.sessionPersistence.cookie.name)).all(l1, self.exists_one(l2, has(l2.sessionPersistence) && has(l2.sessionPersistence.cookie) && has(l2.sessionPersistence.cookie.name) && l1.sessionPersistence.cookie.name == l2.sessionPersistence.cookie.name))\"> <gateway:experimental:validation:XValidation:message=\"Session persistence header name must be unique across all rules within the route\",rule=\"self.filter(l, has(l.sessionPersistence) && has(l.sessionPersistence.header) && has(l.sessionPersistence.header.name)).all(l1, self.exists_one(l2, has(l2.sessionPersistence) && has(l2.sessionPersistence.header) && has(l2.sessionPersistence.header.name) && l1.sessionPersistence.header.name == l2.sessionPersistence.header.name))\"> <gateway:util:excludeFromCRD> Validates that the total number of matches across all rules does not exceed 128. CEL does not support aggregate functions like sum() over lists, so each of the (up to 16) rules is checked individually and their match counts are summed explicitly. </gateway:util:excludeFromCRD>",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -5816,6 +5824,26 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPURLRewriteFilter(ref common.Refere
 		},
 		Dependencies: []string{
 			"sigs.k8s.io/gateway-api/apis/v1.HTTPPathModifier"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apis_v1_HeaderConfig(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "HeaderConfig defines the configuration for header-based session persistence.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"name": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Name defines the name of the header used for session persistence. Header names MUST be unique across all route rules within a Gateway.\n\nSupport: Extended",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+			},
+		},
 	}
 }
 
@@ -7261,13 +7289,6 @@ func schema_sigsk8sio_gateway_api_apis_v1_SessionPersistence(ref common.Referenc
 				Description: "SessionPersistence defines the desired state of SessionPersistence.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
-					"sessionName": {
-						SchemaProps: spec.SchemaProps{
-							Description: "SessionName defines the name of the persistent session token which may be reflected in the cookie or the header. Users should avoid reusing session names to prevent unintended consequences, such as rejection or unpredictable behavior.\n\nSupport: Implementation-specific",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
 					"absoluteTimeout": {
 						SchemaProps: spec.SchemaProps{
 							Description: "AbsoluteTimeout defines the absolute timeout of the persistent session. Once the AbsoluteTimeout duration has elapsed, the session becomes invalid.\n\nSupport: Extended",
@@ -7282,17 +7303,23 @@ func schema_sigsk8sio_gateway_api_apis_v1_SessionPersistence(ref common.Referenc
 							Format:      "",
 						},
 					},
-					"cookieConfig": {
+					"cookie": {
 						SchemaProps: spec.SchemaProps{
-							Description: "CookieConfig provides configuration settings that are specific to cookie-based session persistence.\n\nSupport: Core",
+							Description: "Cookie provides configuration settings that are specific to cookie-based session persistence.\n\nSupport: Core",
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.CookieConfig"),
+						},
+					},
+					"header": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Header provides configuration settings that are specific to header-based session persistence.\n\nSupport: Extended",
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.HeaderConfig"),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"sigs.k8s.io/gateway-api/apis/v1.CookieConfig"},
+			"sigs.k8s.io/gateway-api/apis/v1.CookieConfig", "sigs.k8s.io/gateway-api/apis/v1.HeaderConfig"},
 	}
 }
 

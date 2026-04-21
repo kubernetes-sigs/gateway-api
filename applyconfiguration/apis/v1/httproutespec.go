@@ -85,6 +85,8 @@ type HTTPRouteSpecApplyConfiguration struct {
 	// Rules are a list of HTTP matchers, filters and actions.
 	//
 	// <gateway:experimental:validation:XValidation:message="Rule name must be unique within the route",rule="self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name) && l1.name == l2.name))">
+	// <gateway:experimental:validation:XValidation:message="Session persistence cookie name must be unique across all rules within the route",rule="self.filter(l, has(l.sessionPersistence) && has(l.sessionPersistence.cookie) && has(l.sessionPersistence.cookie.name)).all(l1, self.exists_one(l2, has(l2.sessionPersistence) && has(l2.sessionPersistence.cookie) && has(l2.sessionPersistence.cookie.name) && l1.sessionPersistence.cookie.name == l2.sessionPersistence.cookie.name))">
+	// <gateway:experimental:validation:XValidation:message="Session persistence header name must be unique across all rules within the route",rule="self.filter(l, has(l.sessionPersistence) && has(l.sessionPersistence.header) && has(l.sessionPersistence.header.name)).all(l1, self.exists_one(l2, has(l2.sessionPersistence) && has(l2.sessionPersistence.header) && has(l2.sessionPersistence.header.name) && l1.sessionPersistence.header.name == l2.sessionPersistence.header.name))">
 	// <gateway:util:excludeFromCRD>
 	// Validates that the total number of matches across all rules does not exceed 128.
 	// CEL does not support aggregate functions like sum() over lists, so each of the
