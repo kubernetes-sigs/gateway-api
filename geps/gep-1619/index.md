@@ -618,6 +618,14 @@ This route rule level API for enabling session persistence currently uses the sa
 `BackendTrafficPolicy` API.
 
 ```go
+type HTTPRouteSpec struct {
+    [...]
+
+    // <gateway:experimental:validation:XValidation:message="Session persistence cookie name must be unique across all rules within the route",rule="self.filter(l, has(l.sessionPersistence) && has(l.sessionPersistence.cookie) && has(l.sessionPersistence.cookie.name)).all(l1, self.exists_one(l2, has(l2.sessionPersistence) && has(l2.sessionPersistence.cookie) && has(l2.sessionPersistence.cookie.name) && l1.sessionPersistence.cookie.name == l2.sessionPersistence.cookie.name))">
+    // <gateway:experimental:validation:XValidation:message="Session persistence header name must be unique across all rules within the route",rule="self.filter(l, has(l.sessionPersistence) && has(l.sessionPersistence.header) && has(l.sessionPersistence.header.name)).all(l1, self.exists_one(l2, has(l2.sessionPersistence) && has(l2.sessionPersistence.header) && has(l2.sessionPersistence.header.name) && l1.sessionPersistence.header.name == l2.sessionPersistence.header.name))">
+    Rules []HTTPRouteRule `json:"rules,omitempty"`
+}
+
 type HTTPRouteRule struct {
     [...]
 
@@ -633,6 +641,14 @@ type HTTPRouteRule struct {
 ```
 
 ```go
+type GRPCRouteSpec struct {
+    [...]
+
+    // <gateway:experimental:validation:XValidation:message="Session persistence cookie name must be unique across all rules within the route",rule="self.filter(l, has(l.sessionPersistence) && has(l.sessionPersistence.cookie) && has(l.sessionPersistence.cookie.name)).all(l1, self.exists_one(l2, has(l2.sessionPersistence) && has(l2.sessionPersistence.cookie) && has(l2.sessionPersistence.cookie.name) && l1.sessionPersistence.cookie.name == l2.sessionPersistence.cookie.name))">
+    // <gateway:experimental:validation:XValidation:message="Session persistence header name must be unique across all rules within the route",rule="self.filter(l, has(l.sessionPersistence) && has(l.sessionPersistence.header) && has(l.sessionPersistence.header.name)).all(l1, self.exists_one(l2, has(l2.sessionPersistence) && has(l2.sessionPersistence.header) && has(l2.sessionPersistence.header.name) && l1.sessionPersistence.header.name == l2.sessionPersistence.header.name))">
+    Rules []GRPCRouteRule `json:"rules,omitempty"`
+}
+
 type GRPCRouteRule struct {
     [...]
 
@@ -770,6 +786,10 @@ but controllers MUST still validate this constraint regardless, as VAPs may be r
 - Avoids RFC 6265 compliance issues - when paths overlap, browsers send multiple cookies with the same name, and servers
   cannot determine from the Cookie header which Path was used ([RFC 6265 Section 4.2.2](https://datatracker.ietf.org/doc/html/rfc6265#section-4.2.2)),
   and servers should not rely upon the order of same-named cookies ([RFC 6265 Section 5.4](https://datatracker.ietf.org/doc/html/rfc6265#section-5.4))
+
+See [Route-Level Session Name Uniqueness](#route-level-session-name-uniqueness) and
+[BackendTrafficPolicy Session Name Uniqueness](#backendtrafficpolicy-session-name-uniqueness)
+in the Edge Case Behavior section for how implementations MUST handle violations of this requirement.
 
 The use case for configuring the cookie name via `cookie.name` is that certain users might need to align it with an
 existing cookie name, such as Java's `JSESSIONID`. Refer to [Session Initiation Guidelines](#session-initiation-guidelines)
@@ -917,8 +937,10 @@ Headers are uniquely identified by name only (e.g., `X-Session-ID`). Unlike cook
 
 **How Header Identity Affects Sharing:**
 
-For route-level session persistence, header names must be unique across all route rules, ensuring isolated sessions between
-rules. Within a single route rule with multiple path matches, all those paths share the same session.
+For route-level session persistence, header names MUST be unique across all route rules, ensuring isolated sessions
+between rules. Within a single route rule with multiple path matches, all those paths share the same session. When
+duplicates are detected, the same conflict resolution rules apply as for cookie names. See [Route-Level Session Name
+Uniqueness](#route-level-session-name-uniqueness) for details.
 
 For BackendTrafficPolicy session persistence, all routes targeting that backend share sessions regardless of hostname or
 path, since headers have no Domain/Path scope.
@@ -1061,7 +1083,7 @@ hostname:
 
 See [Session Sharing](#session-sharing) for details on how hostname affects session sharing.
 
-#### Route-Level Session Name Uniqueness
+#### Route-Inline Session Name Uniqueness
 
 Consider the situation in which multiple route rules use the same cookie or header name for session persistence:
 
@@ -1092,9 +1114,18 @@ spec:
 ```
 
 This is an invalid configuration. Cookie and header names MUST be unique across all route rules, both within a single
-HTTPRoute and across multiple HTTPRoutes serving the same Gateway. If multiple route rules configure session persistence
-with the same cookie or header name, implementations MUST reject the configuration and set the route condition to
-`PartiallyInvalid`. See [Name](#name) for the rationale behind this requirement.
+HTTPRoute and across multiple HTTPRoutes serving the same Gateway. See [Name](#name) for the rationale behind this
+requirement.
+
+**Within the same xRoute:** Duplicate session names within the same xRoute are prevented by CEL validation on the
+CRD and will be rejected at admission time. Implementations do not need to handle this case.
+
+**Across multiple xRoutes:** The xRoute with the oldest `creationTimestamp` wins for the conflicting rule. For all
+other xRoutes with conflicting session names, those rules MUST be rejected and a `PartiallyInvalid` Condition with
+reason `UnsupportedValue` MUST be set. In the case of a timestamp tie, the Route with the alphabetically earliest
+`{namespace}/{name}` wins. Note that a Route may have some rules that win (oldest) and other rules that lose (to a
+different, older Route), resulting in partial validity. This conflict resolution model is consistent with how Gateway
+API resolves hostname and path conflicts across HTTPRoutes.
 
 To share sessions across multiple paths, use a single route rule with multiple path matches or use BackendTrafficPolicy. See
 [Session Sharing](#session-sharing) for details.
@@ -1141,9 +1172,61 @@ spec:
       name: split-route-cookie
 ```
 
-This is an invalid configuration as two separate sessions cannot have the same cookie name. Implementations SHOULD
-address this scenario in manner they deem appropriate. Implementations MAY choose to reject the configuration, or they
-MAY non-deterministically allow one cookie to work (e.g. whichever cookie is configured first).
+This is an invalid configuration. Cookie and header names MUST be unique across all BackendTrafficPolicies attached to
+Services served by the same Gateway. When duplicates are detected, the BackendTrafficPolicy with the oldest
+`creationTimestamp` wins. All other BackendTrafficPolicies with conflicting session names MUST be rejected with the
+`Accepted` condition set to `False` and reason `Conflicted`. In the case of a timestamp tie, the policy with the
+alphabetically earliest `{namespace}/{name}` wins. This is consistent with [GEP-713](../gep-713/index.md) conflict
+resolution.
+
+#### Route-Inline and BackendTrafficPolicy Session Name Conflict
+
+Consider the situation in which a route rule has inline session persistence and a BackendTrafficPolicy targets the same
+Service with the same cookie name:
+
+```yaml
+kind: HTTPRoute
+metadata:
+  name: routeX
+spec:
+  rules:
+  - matches:
+    - path:
+      value: /admin
+    backendRefs:
+    - name: my-service
+    sessionPersistence:
+      type: Cookie
+      cookie:
+        name: my-session
+  - matches:
+    - path:
+      value: /public
+    backendRefs:
+    - name: my-service
+---
+kind: BackendTrafficPolicy
+metadata:
+  name: btp-my-service
+spec:
+  targetRefs:
+  - kind: Service
+    name: my-service
+  sessionPersistence:
+    type: Cookie
+    cookie:
+      name: my-session
+```
+
+This is an invalid configuration. Cookie and header names MUST be unique between route-level session persistence and
+BackendTrafficPolicy configurations within the same Gateway. While route-inline session persistence takes precedence
+over BackendTrafficPolicy when both apply to the same traffic (see [Attaching Session Persistence to both Service and
+a Route Rule](#attaching-session-persistence-to-both-service-and-a-route-rule)), the conflict arises because different
+routes may direct traffic to the same Service, some with inline persistence and some without. Using the same cookie
+name with different configurations across these paths leads to inconsistent cookie behavior in the browser.
+
+When duplicates are detected between route-inline and BackendTrafficPolicy, the route-inline configuration wins and the
+BackendTrafficPolicy MUST be rejected with the `Accepted` condition set to `False` and reason `Conflicted`.
 
 #### Traffic Splitting with route rule inline sessionPersistence field
 
