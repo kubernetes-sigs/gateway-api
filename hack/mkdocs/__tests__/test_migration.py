@@ -36,27 +36,35 @@ class TestMigration(unittest.TestCase):
         if self.test_dir.exists():
             shutil.rmtree(self.test_dir)
 
-        self.docs_path = self.test_dir / "docs"
-        self.redirect_map_file = self.test_dir / "redirect_map.json"
+        self.docs_path = self.test_dir / "site-src"
+        self.page_id_map_file = self.test_dir / "page_id_map.json"
+        self.mkdocs_yml_path = self.test_dir / "mkdocs.yml"
         self.docs_path.mkdir(parents=True)
 
+        # Create a mock mkdocs.yml for hooks that update it
+        self.mkdocs_yml_path.write_text("plugins:\n  - redirects:\n      redirect_maps:\n")
+
         # The script under test uses module-level globals for configuration.
-        # To ensure tests are isolated, we temporarily redirect these globals
-        # to point to our test directory during test execution.
-        self.linking_module = sys.modules["mkdocs_linking"]
         self.utils_module = sys.modules["mkdocs_utils"]
         self.original_globals = {
             "DOCS_DIR": self.utils_module.DOCS_DIR,
-            "REDIRECT_MAP_FILE": self.utils_module.REDIRECT_MAP_FILE,
+            "PAGE_ID_MAP_FILE": self.utils_module.PAGE_ID_MAP_FILE,
+            "MKDOCS_YML_PATH": self.utils_module.MKDOCS_YML_PATH,
         }
         self.utils_module.DOCS_DIR = self.docs_path  # type: ignore
-        self.utils_module.REDIRECT_MAP_FILE = self.redirect_map_file  # type: ignore
-        # Also patch linking for those that import it directly
-        self.linking_module.DOCS_DIR = self.docs_path  # type: ignore
-        self.linking_module.REDIRECT_MAP_FILE = self.redirect_map_file  # type: ignore
+        self.utils_module.PAGE_ID_MAP_FILE = self.page_id_map_file  # type: ignore
+        self.utils_module.MKDOCS_YML_PATH = self.mkdocs_yml_path  # type: ignore
+
+        # Patch linking for those that import it directly
+        if "mkdocs_linking" in sys.modules:
+            self.linking_module = sys.modules["mkdocs_linking"]
+            self.linking_module.DOCS_DIR = self.docs_path  # type: ignore
+            self.linking_module.PAGE_ID_MAP_FILE = self.page_id_map_file  # type: ignore
+
         # And patch hooks if they are already imported
         if "mkdocs_hooks" in sys.modules:
-            sys.modules["mkdocs_hooks"].REDIRECT_MAP_FILE = self.redirect_map_file  # type: ignore
+            self.hooks_module = sys.modules["mkdocs_hooks"]
+            self.hooks_module.PAGE_ID_MAP_FILE = self.page_id_map_file  # type: ignore
 
     def tearDown(self) -> None:
         """Clean up the temporary directory after each test."""
@@ -64,11 +72,14 @@ class TestMigration(unittest.TestCase):
         # Restore the original global variables to avoid side-effects between
         # test runs.
         self.utils_module.DOCS_DIR = self.original_globals["DOCS_DIR"]
-        self.utils_module.REDIRECT_MAP_FILE = self.original_globals["REDIRECT_MAP_FILE"]
-        self.linking_module.DOCS_DIR = self.original_globals["DOCS_DIR"]
-        self.linking_module.REDIRECT_MAP_FILE = self.original_globals["REDIRECT_MAP_FILE"]
+        self.utils_module.PAGE_ID_MAP_FILE = self.original_globals["PAGE_ID_MAP_FILE"]
+        self.utils_module.MKDOCS_YML_PATH = self.original_globals["MKDOCS_YML_PATH"]
+
+        if "mkdocs_linking" in sys.modules:
+            self.linking_module.DOCS_DIR = self.original_globals["DOCS_DIR"]
+            self.linking_module.PAGE_ID_MAP_FILE = self.original_globals["PAGE_ID_MAP_FILE"]
         if "mkdocs_hooks" in sys.modules:
-            sys.modules["mkdocs_hooks"].REDIRECT_MAP_FILE = self.original_globals["REDIRECT_MAP_FILE"]
+            self.hooks_module.PAGE_ID_MAP_FILE = self.original_globals["PAGE_ID_MAP_FILE"]
 
     def test_prepare_fresh_run_no_frontmatter(self) -> None:
         """Test that IDs are correctly injected into files."""
@@ -80,9 +91,9 @@ class TestMigration(unittest.TestCase):
         # Act: Run the preparation function.
         prepare_docs()
 
-        # Assert: Verify the redirect map file was created and is correct.
-        self.assertTrue(self.redirect_map_file.exists())
-        redirect_map: Dict[str, str] = json.loads(self.redirect_map_file.read_text())
+        # Assert: Verify the page ID map file was created and is correct.
+        self.assertTrue(self.page_id_map_file.exists())
+        redirect_map: Dict[str, str] = json.loads(self.page_id_map_file.read_text())
         self.assertEqual(redirect_map.get("index"), "index.md")
         self.assertEqual(redirect_map.get("guides-http"), "guides/http.md")
 
@@ -148,7 +159,7 @@ description: "No ID yet"
         prepare_docs()
 
         # Assert: Check that existing ID is preserved and new ID is added
-        redirect_map = json.loads(self.redirect_map_file.read_text())
+        redirect_map = json.loads(self.page_id_map_file.read_text())
         self.assertEqual(redirect_map.get("custom-id"), "existing.md")
         self.assertEqual(redirect_map.get("partial"), "partial.md")
 
@@ -189,7 +200,7 @@ description: "No ID yet"
         prepare_docs()
 
         # Assert: Verify all files get appropriate IDs
-        redirect_map = json.loads(self.redirect_map_file.read_text())
+        redirect_map = json.loads(self.page_id_map_file.read_text())
 
         expected_mappings = {
             "api-v1-auth": "api/v1/auth.md",
@@ -265,15 +276,15 @@ description: "No ID yet"
         prepare_docs()
 
         # Assert: Should create empty redirect map
-        self.assertTrue(self.redirect_map_file.exists())
-        redirect_map = json.loads(self.redirect_map_file.read_text())
+        self.assertTrue(self.page_id_map_file.exists())
+        redirect_map = json.loads(self.page_id_map_file.read_text())
         self.assertEqual(len(redirect_map), 0)
 
-    def test_on_config_missing_redirect_map(self) -> None:
-        """Test on_config behavior when redirect map file doesn't exist."""
-        # Arrange: Ensure redirect map doesn't exist
-        if self.redirect_map_file.exists():
-            self.redirect_map_file.unlink()
+    def test_on_config_missing_page_id_map(self) -> None:
+        """Test on_config behavior when page ID map file doesn't exist."""
+        # Arrange: Ensure page ID map doesn't exist
+        if self.page_id_map_file.exists():
+            self.page_id_map_file.unlink()
 
         mock_config = self._create_mock_config([("test-page", "test.md", "/test/")])
 

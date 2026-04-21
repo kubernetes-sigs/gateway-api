@@ -35,21 +35,21 @@ class TestErrorRecovery(unittest.TestCase):
             shutil.rmtree(self.test_dir)
 
         self.original_docs_dir = mkdocs_utils.DOCS_DIR
-        self.original_redirect_file = mkdocs_utils.REDIRECT_MAP_FILE
+        self.original_redirect_file = mkdocs_utils.PAGE_ID_MAP_FILE
 
         mkdocs_utils.DOCS_DIR = self.test_dir / "docs"
-        mkdocs_utils.REDIRECT_MAP_FILE = self.test_dir / "redirect_map.json"
+        mkdocs_utils.PAGE_ID_MAP_FILE = self.test_dir / "page_id_map.json"
         # Also patch linking for any direct references
         linking.DOCS_DIR = mkdocs_utils.DOCS_DIR
-        linking.REDIRECT_MAP_FILE = mkdocs_utils.REDIRECT_MAP_FILE
+        linking.PAGE_ID_MAP_FILE = mkdocs_utils.PAGE_ID_MAP_FILE
         mkdocs_utils.DOCS_DIR.mkdir(parents=True, exist_ok=True)
 
     def tearDown(self) -> None:
         """Clean up test environment."""
         mkdocs_utils.DOCS_DIR = self.original_docs_dir
-        mkdocs_utils.REDIRECT_MAP_FILE = self.original_redirect_file
+        mkdocs_utils.PAGE_ID_MAP_FILE = self.original_redirect_file
         linking.DOCS_DIR = self.original_docs_dir
-        linking.REDIRECT_MAP_FILE = self.original_redirect_file
+        linking.PAGE_ID_MAP_FILE = self.original_redirect_file
         if self.test_dir.exists():
             shutil.rmtree(self.test_dir)
 
@@ -87,8 +87,8 @@ id: concurrent-2-modified
         modifier_thread.join()
 
         # Should complete successfully despite concurrent modifications
-        self.assertTrue(linking.REDIRECT_MAP_FILE.exists())
-        redirect_map = json.loads(linking.REDIRECT_MAP_FILE.read_text())
+        self.assertTrue(linking.PAGE_ID_MAP_FILE.exists())
+        redirect_map = json.loads(linking.PAGE_ID_MAP_FILE.read_text())
 
         # Should have processed most files
         self.assertGreaterEqual(len(redirect_map), 4)
@@ -117,7 +117,7 @@ id: {expected_id}
         prepare_docs()
 
         # Should handle special characters in filenames
-        redirect_map = json.loads(linking.REDIRECT_MAP_FILE.read_text())
+        redirect_map = json.loads(linking.PAGE_ID_MAP_FILE.read_text())
 
         # Check that files were processed (those that could be created)
         for filename, expected_id in special_files.items():

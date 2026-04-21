@@ -38,16 +38,16 @@ class TestConvertFromRelativeLinks(unittest.TestCase):
             shutil.rmtree(self.test_dir)
 
         self.docs_path = self.test_dir / "docs"
-        self.redirect_map_file = self.test_dir / "redirect_map.json"
+        self.redirect_map_file = self.test_dir / "page_id_map.json"
         self.docs_path.mkdir(parents=True)
 
         self.linking_module = sys.modules["mkdocs_linking"]
         self.original_globals = {
             "DOCS_DIR": self.linking_module.DOCS_DIR,
-            "REDIRECT_MAP_FILE": self.linking_module.REDIRECT_MAP_FILE,
+            "PAGE_ID_MAP_FILE": self.linking_module.PAGE_ID_MAP_FILE,
         }
         self.linking_module.DOCS_DIR = self.docs_path  # type: ignore
-        self.linking_module.REDIRECT_MAP_FILE = self.redirect_map_file  # type: ignore
+        self.linking_module.PAGE_ID_MAP_FILE = self.redirect_map_file  # type: ignore
 
     def test_basic_link_conversion(self) -> None:
         """Test that a simple relative link is converted to a macro."""

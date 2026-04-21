@@ -33,10 +33,10 @@ class TestUpdateMkdocsYml(unittest.TestCase):
             shutil.rmtree(self.test_dir)
         self.test_dir.mkdir()
         self.mkdocs_yml_path = self.test_dir / "mkdocs.yml"
-        # Patch the Path class in mkdocs_utils to use our temporary file path
-        self.patcher = patch("mkdocs_utils.Path")
-        self.mock_path = self.patcher.start()
-        self.mock_path.return_value = self.mkdocs_yml_path
+
+        # Patch mkdocs_utils.MKDOCS_YML_PATH to point to our test directory
+        self.patcher = patch("mkdocs_utils.MKDOCS_YML_PATH", self.mkdocs_yml_path)
+        self.patcher.start()
 
     def tearDown(self) -> None:
         """Clean up the temporary directory after each test."""

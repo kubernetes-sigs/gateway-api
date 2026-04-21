@@ -55,7 +55,7 @@ class TestPreviewDocs(unittest.TestCase):
         self.assertIn("+ index.md -> ID: 'index'", output)
         self.assertIn("Files already with IDs (1):", output)
         self.assertIn("* has-id.md -> ID: 'existing-id'", output)
-        self.assertIn("Would create/update redirect map", output)
+        self.assertIn("Would create/update page ID map", output)
 
     def test_preview_with_empty_directory(self):
         """Test preview output for an empty directory."""

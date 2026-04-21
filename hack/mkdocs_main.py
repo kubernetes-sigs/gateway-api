@@ -20,10 +20,14 @@ This provides the internal_link macro for resilient documentation linking.
 
 from pathlib import Path
 from typing import Dict, Optional
+import logging
+
 from mkdocs_utils import (
     DOCS_DIR,
     build_id_map,
 )
+
+logger = logging.getLogger("mkdocs.macros.internal_link")
 
 
 class PageResolver:
@@ -80,9 +84,13 @@ def define_env(env):
                     current_page_path = page.file.src_path
 
             return resolver.resolve_page_link(page_id, current_page_path)
-        except Exception:
-            # Fallback: use resolver directly
+        except Exception as e:
+            # Fallback: try resolving without context
             try:
                 return resolver.resolve_page_link(page_id, None)
             except ValueError:
+                logger.error(f"Internal link macro error: Page with ID '{page_id}' not found.")
                 return f"[LINK ERROR: Page '{page_id}' not found]"
+            except Exception as e_inner:
+                logger.error(f"Internal link macro unexpected error: {e_inner}")
+                return f"[LINK ERROR: {e_inner}]"

@@ -23,7 +23,7 @@ from typing import Any, Dict
 import mkdocs_utils
 
 # --- Configuration (Exposed for compatibility) ---
-REDIRECT_MAP_FILE = mkdocs_utils.REDIRECT_MAP_FILE
+PAGE_ID_MAP_FILE = mkdocs_utils.PAGE_ID_MAP_FILE
 FRONTMATTER_ID_KEY = mkdocs_utils.FRONTMATTER_ID_KEY
 
 
@@ -41,22 +41,30 @@ def on_config(config: Dict[str, Any]) -> Dict[str, Any]:
         initialized if present.
     """
     print("Running MkDocs migration hook (config phase)...")
-    for plugin_name, plugin_instance in config.get("plugins", {}).items():
-        if plugin_name == "redirects":
-            # Support both dict and object plugin representations
-            if isinstance(plugin_instance, dict):
-                if "config" not in plugin_instance:
-                    plugin_instance["config"] = {}
-                if "redirect_maps" not in plugin_instance["config"]:
-                    plugin_instance["config"]["redirect_maps"] = {}
-            else:
-                # Assume object with .config attribute
-                if not hasattr(plugin_instance, "config"):
-                    plugin_instance.config = type("Config", (), {})()
-                if not hasattr(plugin_instance.config, "redirect_maps"):
-                    plugin_instance.config.redirect_maps = {}  # type: ignore
-            print("  Redirects plugin configured.")
-            break
+    plugins = config.get("plugins")
+    if not plugins:
+        return config
+
+    # Handled differently depending on whether plugins is a list (config phase) 
+    # or a PluginCollection (later phases, though hooks usually see the former).
+    if isinstance(plugins, dict) and "redirects" in plugins:
+        plugin_instance = plugins["redirects"]
+        # Support both dict and object plugin representations
+        if isinstance(plugin_instance, dict):
+            if "config" not in plugin_instance:
+                plugin_instance["config"] = {}
+            if "redirect_maps" not in plugin_instance["config"]:
+                plugin_instance["config"]["redirect_maps"] = {}
+        elif hasattr(plugin_instance, "config"):
+            # If it's an object, it should already have a config object from MkDocs.
+            # We just ensure redirect_maps is present if it's a known config object.
+            if not hasattr(plugin_instance.config, "redirect_maps"):
+                try:
+                    plugin_instance.config.redirect_maps = {}
+                except (AttributeError, TypeError):
+                    # If we can't set it, it's likely not the object we expect.
+                    pass
+        print("  Redirects plugin configuration checked.")
     return config
 
 
@@ -67,14 +75,14 @@ def on_files(files, config):
     print("Running MkDocs migration hook (files phase)...")
 
     # Step 1: Load the "before" state map
-    if not REDIRECT_MAP_FILE.exists():
-        print(f"  Warning: {REDIRECT_MAP_FILE} not found. Skipping.")
+    if not PAGE_ID_MAP_FILE.exists():
+        print(f"  Warning: {PAGE_ID_MAP_FILE} not found. Skipping.")
         return files
 
     try:
-        old_paths_map: Dict[str, str] = json.loads(REDIRECT_MAP_FILE.read_text())
+        old_paths_map: Dict[str, str] = json.loads(PAGE_ID_MAP_FILE.read_text())
     except Exception as e:
-        print(f"  Warning: Could not load redirect map: {e}")
+        print(f"  Warning: Could not load page ID map: {e}")
         return files
 
     # Step 2: Build the "after" state map

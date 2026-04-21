@@ -35,21 +35,21 @@ class TestYAMLFrontmatterEdgeCases(unittest.TestCase):
             shutil.rmtree(self.test_dir)
 
         self.original_docs_dir = mkdocs_utils.DOCS_DIR
-        self.original_redirect_file = mkdocs_utils.REDIRECT_MAP_FILE
+        self.original_redirect_file = mkdocs_utils.PAGE_ID_MAP_FILE
 
         mkdocs_utils.DOCS_DIR = self.test_dir / "docs"
-        mkdocs_utils.REDIRECT_MAP_FILE = self.test_dir / "redirect_map.json"
+        mkdocs_utils.PAGE_ID_MAP_FILE = self.test_dir / "page_id_map.json"
         # Also patch linking for any direct references
         linking.DOCS_DIR = mkdocs_utils.DOCS_DIR
-        linking.REDIRECT_MAP_FILE = mkdocs_utils.REDIRECT_MAP_FILE
+        linking.PAGE_ID_MAP_FILE = mkdocs_utils.PAGE_ID_MAP_FILE
         mkdocs_utils.DOCS_DIR.mkdir(parents=True, exist_ok=True)
 
     def tearDown(self) -> None:
         """Clean up test environment."""
         mkdocs_utils.DOCS_DIR = self.original_docs_dir
-        mkdocs_utils.REDIRECT_MAP_FILE = self.original_redirect_file
+        mkdocs_utils.PAGE_ID_MAP_FILE = self.original_redirect_file
         linking.DOCS_DIR = self.original_docs_dir
-        linking.REDIRECT_MAP_FILE = self.original_redirect_file
+        linking.PAGE_ID_MAP_FILE = self.original_redirect_file
         if self.test_dir.exists():
             shutil.rmtree(self.test_dir)
 
@@ -85,14 +85,15 @@ id: incomplete
         prepare_docs()
 
         # Check that redirect map was created (files with valid structure should work)
-        self.assertTrue(linking.REDIRECT_MAP_FILE.exists())
-        redirect_map = json.loads(linking.REDIRECT_MAP_FILE.read_text())
+        self.assertTrue(linking.PAGE_ID_MAP_FILE.exists())
+        redirect_map = json.loads(linking.PAGE_ID_MAP_FILE.read_text())
 
         # Files with malformed YAML should get auto-generated IDs or extracted IDs
         self.assertIn("broken-yaml", redirect_map)  # From unclosed-quotes.md
         self.assertIn("another-broken", redirect_map)  # From invalid-structure.md
-        self.assertIn("wrong-delimiters", redirect_map)
-        self.assertIn("no-end-delimiter", redirect_map)
+        self.assertIn("wrong-delimiters", redirect_map) # Hugo-style is still ignored (filename ID)
+        self.assertIn("incomplete", redirect_map) # Extracting from unclosed block now works!
+        self.assertEqual(redirect_map["incomplete"], "no-end-delimiter.md")
 
     def test_complex_yaml_structures(self) -> None:
         """Test handling of complex YAML structures in frontmatter."""
@@ -136,7 +137,7 @@ multiline: |
         self.assertIn("multiline: |", updated_content)
 
         # Verify redirect map was created correctly
-        redirect_map = json.loads(linking.REDIRECT_MAP_FILE.read_text())
+        redirect_map = json.loads(linking.PAGE_ID_MAP_FILE.read_text())
         self.assertEqual(redirect_map["complex-yaml"], "complex.md")
 
     def test_unicode_in_yaml_frontmatter(self) -> None:
@@ -159,7 +160,7 @@ tags: ["日本語", "español", "français"]
         self.assertIn("José García-Martínez", updated_content)
         self.assertIn("日本語", updated_content)
 
-        redirect_map = json.loads(linking.REDIRECT_MAP_FILE.read_text())
+        redirect_map = json.loads(linking.PAGE_ID_MAP_FILE.read_text())
         self.assertEqual(redirect_map["unicode-test"], "unicode.md")
 
 

@@ -33,20 +33,20 @@ class TestCommandLineInterface(unittest.TestCase):
             shutil.rmtree(self.test_dir)
 
         self.docs_path = self.test_dir / "docs"
-        self.redirect_map_file = self.test_dir / "redirect_map.json"
+        self.redirect_map_file = self.test_dir / "page_id_map.json"
         self.docs_path.mkdir(parents=True)
 
         self.linking_module = sys.modules["mkdocs_linking"]
         self.utils_module = sys.modules["mkdocs_utils"]
         self.original_globals = {
             "DOCS_DIR": self.utils_module.DOCS_DIR,
-            "REDIRECT_MAP_FILE": self.utils_module.REDIRECT_MAP_FILE,
+            "PAGE_ID_MAP_FILE": self.utils_module.PAGE_ID_MAP_FILE,
         }
         self.utils_module.DOCS_DIR = self.docs_path  # type: ignore
-        self.utils_module.REDIRECT_MAP_FILE = self.redirect_map_file  # type: ignore
+        self.utils_module.PAGE_ID_MAP_FILE = self.redirect_map_file  # type: ignore
         # Also patch linking module for those that import it directly
         self.linking_module.DOCS_DIR = self.docs_path  # type: ignore
-        self.linking_module.REDIRECT_MAP_FILE = self.redirect_map_file  # type: ignore
+        self.linking_module.PAGE_ID_MAP_FILE = self.redirect_map_file  # type: ignore
 
     def test_main_handles_prepare_docs_exceptions(self) -> None:
         """Test main() handles exceptions from prepare_docs gracefully."""

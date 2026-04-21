@@ -37,12 +37,13 @@ import mkdocs_utils
 
 # --- Configuration (Exposed for test compatibility) ---
 DOCS_DIR = mkdocs_utils.DOCS_DIR
-REDIRECT_MAP_FILE = mkdocs_utils.REDIRECT_MAP_FILE
+PAGE_ID_MAP_FILE = mkdocs_utils.PAGE_ID_MAP_FILE
 FRONTMATTER_ID_KEY = mkdocs_utils.FRONTMATTER_ID_KEY
 
 
 from mkdocs_utils import (
     prepare_docs,
+    preview_docs,
     convert_internal_links,
 )
 
@@ -64,7 +65,7 @@ def main() -> None:
         help="Convert all relative Markdown links to the internal_link macro.",
     )
     parser.add_argument(
-        "--docs-dir", default="docs", help="Documentation directory (default: docs)."
+        "--docs-dir", default="site-src", help="Documentation directory (default: site-src)."
     )
     parser.add_argument(
         "--dry-run",

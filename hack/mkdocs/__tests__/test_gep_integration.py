@@ -4,7 +4,7 @@ from pathlib import Path
 import sys
 import shutil
 from dataclasses import dataclass
-from typing import Mapping, Protocol
+from typing import Mapping, Protocol, Optional, List
 
 # Ensure the parent directory (hack) is in the python path to import the module
 sys.path.insert(0, str(Path(__file__).parents[2]))
@@ -15,7 +15,7 @@ class FileLike(Protocol):
 
 
 class FilesLike(Protocol):
-    def get_file_from_path(self, file_path: str) -> object | None:
+    def get_file_from_path(self, file_path: str) -> Optional[object]:
         ...
 
     def append(self, file_obj: FileLike) -> None:
@@ -97,9 +97,9 @@ class TestGEPIntegration(unittest.TestCase):
         # Arrange: Setup mock MkDocs objects
         class FakeFiles:
             def __init__(self) -> None:
-                self.appended_files: list[AddedFile] = []
+                self.appended_files: List[AddedFile] = []
 
-            def get_file_from_path(self, file_path: str) -> object | None:
+            def get_file_from_path(self, file_path: str) -> Optional[object]:
                 return None
 
             def append(self, file_obj: FileLike) -> None:

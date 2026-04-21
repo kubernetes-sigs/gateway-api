@@ -37,21 +37,21 @@ class TestLinkBreakageScenarios(unittest.TestCase):
             shutil.rmtree(self.test_dir)
 
         self.original_docs_dir = mkdocs_utils.DOCS_DIR
-        self.original_redirect_file = mkdocs_utils.REDIRECT_MAP_FILE
+        self.original_redirect_file = mkdocs_utils.PAGE_ID_MAP_FILE
 
         mkdocs_utils.DOCS_DIR = self.test_dir / "docs"
-        mkdocs_utils.REDIRECT_MAP_FILE = self.test_dir / "redirect_map.json"
+        mkdocs_utils.PAGE_ID_MAP_FILE = self.test_dir / "page_id_map.json"
         # Also patch linking for any direct references
         linking.DOCS_DIR = mkdocs_utils.DOCS_DIR
-        linking.REDIRECT_MAP_FILE = mkdocs_utils.REDIRECT_MAP_FILE
+        linking.PAGE_ID_MAP_FILE = mkdocs_utils.PAGE_ID_MAP_FILE
         mkdocs_utils.DOCS_DIR.mkdir(parents=True, exist_ok=True)
 
     def tearDown(self) -> None:
         """Clean up test environment."""
         mkdocs_utils.DOCS_DIR = self.original_docs_dir
-        mkdocs_utils.REDIRECT_MAP_FILE = self.original_redirect_file
+        mkdocs_utils.PAGE_ID_MAP_FILE = self.original_redirect_file
         linking.DOCS_DIR = self.original_docs_dir
-        linking.REDIRECT_MAP_FILE = self.original_redirect_file
+        linking.PAGE_ID_MAP_FILE = self.original_redirect_file
         if self.test_dir.exists():
             shutil.rmtree(self.test_dir)
 
@@ -73,7 +73,7 @@ class TestLinkBreakageScenarios(unittest.TestCase):
         # This is a real scenario: two different guides both get moved to guides/user.md
         # at different times, or one file replaces another
 
-        original_map = json.loads(linking.REDIRECT_MAP_FILE.read_text())
+        original_map = json.loads(linking.PAGE_ID_MAP_FILE.read_text())
 
         # Verify we have the expected initial state
         self.assertEqual(original_map["user-guide"], "user-guide.md")
@@ -205,7 +205,7 @@ title: API Reference
             "page-b": "a.md",  # page-b points to a.md (circular!)
             "page-c": "nonexistent.md",  # broken reference
         }
-        linking.REDIRECT_MAP_FILE.write_text(json.dumps(corrupt_map))
+        linking.PAGE_ID_MAP_FILE.write_text(json.dumps(corrupt_map))
 
         mock_config = {
             "docs_dir": str(linking.DOCS_DIR),
@@ -337,7 +337,7 @@ title: API Reference
         for i, corrupt_content in enumerate(corruption_scenarios):
             with self.subTest(scenario=i):
                 # Corrupt the redirect map
-                linking.REDIRECT_MAP_FILE.write_text(corrupt_content)
+                linking.PAGE_ID_MAP_FILE.write_text(corrupt_content)
 
                 mock_config = {
                     "docs_dir": str(linking.DOCS_DIR),
