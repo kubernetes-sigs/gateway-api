@@ -8,10 +8,14 @@
 This GEP enables Gateway owners to portably select the Kubernetes Service type provisioned by an in-cluster Gateway implementation, 
 and establishes production-ready defaults for each service type so that common best practices are applied automatically.
 
-Concretely, this GEP has two goals:
+Concretely, this GEP:
 
-* Allow users to specify the scope of a service provisioned by an `In-Cluster` implementation, whether the provisioned Service should be of type `ClusterIP` or `LoadBalancer`.
-* Define normative requirements for each service type so that implementations ship with optimal defaults (e.g. `externalTrafficPolicy`)
+* Introduces new `AddressType` values that allow users to portably specify
+  the scope of a service provisioned by an `In-Cluster` implementation —
+  whether the provisioned Service should be a `ClusterIP` or an optimized
+  `LoadBalancer` — as an explicit opt-in, without changing existing behavior.
+* Defines normative requirements per address type so that implementations
+  ship with consistent, well-defined defaults (e.g. `externalTrafficPolicy`).
 
 ### Goals
 
@@ -21,8 +25,6 @@ Concretely, this GEP has two goals:
   production-ready LoadBalancer defaults (e.g. `externalTrafficPolicy: Local`) without changing the behavior of existing Gateways
 * Define normative requirements per `AddressType` so implementations ship
   consistent, well-defined behavior for each service scope
-* Allow users to specify a `LoadBalancerClass` when provisioning a
-  LoadBalancer-backed Gateway
 
 ### Non-Goals
 
@@ -257,18 +259,6 @@ spec:
     protocol: HTTP
 ```
 
-### Mixed Address Types
-
-A Gateway with multiple entries in `spec.addresses` that combine the new types
-(e.g. both `ClusterIPAddress` and `OptimizedLoadBalancerAddress`, or a new type
-alongside an existing `IPAddress`) presents open questions around Service
-provisioning semantics and status reporting.
-
-The behavior for mixed address types is **to be defined** and is not covered
-by this GEP in its current form. Implementations SHOULD reject a Gateway that
-specifies conflicting address types by setting the `Accepted` condition to
-`False` with an appropriate reason until this behavior is specified.
-
 ### Cluster Policy Enforcement with ValidatingAdmissionPolicy
 
 Cluster administrators can use Kubernetes
@@ -363,13 +353,14 @@ spec:
 
 ## Open Questions
 
-* **Multiple addresses of different types**: When a Gateway specifies addresses
-  of different types (e.g. both `ClusterIPAddress` and
-  `OptimizedLoadBalancerAddress`), should the implementation create one Service
-  per type? And when multiple addresses of the same type are specified, should
-  the implementation aggregate them into a single Service? Optimally this would
-  be implementation-specific behavior, as long as `status.addresses` accurately
-  reflects the addresses that were provisioned and are reachable.
+* **Mixed address types**: When a Gateway specifies multiple entries in
+  `spec.addresses` that combine different types (e.g. both `ClusterIPAddress`
+  and `OptimizedLoadBalancerAddress`, or a new type alongside an existing
+  `IPAddress`), should the implementation create one Service per type? And
+  when multiple addresses of the same type are specified, should the
+  implementation aggregate them into a single Service? Optimally this would
+  be implementation-specific behavior, as long as `status.addresses`
+  accurately reflects the addresses that were provisioned and are reachable.
 
 * **Naming and specification of address types**: The names `ClusterIPAddress`
   and `OptimizedLoadBalancerAddress` are working names used throughout this GEP
