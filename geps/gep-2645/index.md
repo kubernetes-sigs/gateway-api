@@ -23,7 +23,7 @@ This GEP retroactively documents the rationale, scope, and design constraints of
 
 ## Non-Goals
 
-- Define rich UDP-specific matching semantics such as address matching or payload inspection.
+- Define rich UDP-specific matching semantics such as address matching, payload inspection, or idle timeouts.
 - Require stateful UDP session tracking or connection management semantics. Implementations are expected to document how they implement such semantics.
 - Define DTLS termination behavior at the Gateway.
 - Define HTTP/3 or QUIC-specific behavior.
@@ -235,19 +235,185 @@ spec:
           port: 53
 ```
 
-## Conformance
+## Conformance Details
 
-UDPRoute will be part of the Gateway API conformance suite with the following requirements:
+The following Gateway Conformance features will be added:
 
-- Implementations MUST support routing UDP traffic to Kubernetes Service backends
-- Implementations MUST respect backend weights for traffic distribution
-- Implementations MUST properly handle invalid backend references
-- Implementations MUST update route status conditions appropriately
+```
+	// SupportUDPRoute option indicates support for UDPRoute
+	SupportUDPRoute FeatureName = "UDPRoute"
+```
 
-Conformance Level: **Core**
+They will validate the following scenarios:
+
+1. UDPRoute attaches to a UDP listener by port specified
+   - A Gateway has a UDP listener on port 5300
+   - A UDPRoute specifies a `parentRef` with `port: 5300`
+
+   - The UDPRoute is accepted with the following status:
+
+     ```
+     parents:
+     - parentRef:
+         group: gateway.networking.k8s.io
+         kind: Gateway
+         name: udp-gateway
+         port: 5300
+       conditions:
+       - type: Accepted
+         status: "True"
+         reason: Accepted
+     ```
+
+   - UDP traffic sent to port 5300 is forwarded to the backend.
+
+1. UDPRoute attaches to a UDP listener by sectionName
+   - A Gateway has a UDP listener named `coredns` on port 5300
+   - A UDPRoute specifies a `parentRef` with `sectionName: coredns`
+
+   - The UDPRoute is accepted with the following status:
+
+     ```
+     parents:
+     - parentRef:
+         group: gateway.networking.k8s.io
+         kind: Gateway
+         name: udp-gateway
+         sectionName: coredns
+       conditions:
+       - type: Accepted
+         status: "True"
+         reason: Accepted
+     ```
+
+   - UDP traffic sent to the `coredns` listener is forwarded to the backend.
+
+1. UDPRoute attaches to a UDP listener by sectionName and port
+   - A Gateway has a UDP listener named `coredns` on port 5300
+   - A UDPRoute specifies a `parentRef` with `sectionName: coredns` and `port: 5300`
+
+   - The UDPRoute is accepted with the following status:
+
+     ```
+     parents:
+     - parentRef:
+         group: gateway.networking.k8s.io
+         kind: Gateway
+         name: udp-gateway
+         sectionName: coredns
+         port: 5300
+       conditions:
+       - type: Accepted
+         status: "True"
+         reason: Accepted
+     ```
+
+   - UDP traffic sent to port 5300 on the `coredns` listener is forwarded to the backend.
+
+1. UDPRoute attaches to all UDP listeners in a Gateway when sectionName and port are omitted
+   - A Gateway has multiple UDP listeners: `dns` on port 5300 and `game` on port 7777
+   - A UDPRoute specifies a `parentRef` with only the Gateway name (no `sectionName` or `port`)
+
+   - The UDPRoute is accepted with the following status:
+
+     ```
+     parents:
+     - parentRef:
+         group: gateway.networking.k8s.io
+         kind: Gateway
+         name: udp-gateway
+       conditions:
+       - type: Accepted
+         status: "True"
+         reason: Accepted
+     ```
+
+   - The UDPRoute attaches to all UDP listeners on the Gateway. Importantly, the backend must be prepared to handle the variety of traffic.
+
+1. UDPRoute fails attachment to a non-UDP listener when port or sectionName is specified
+   - A Gateway has a TCP listener named `tcp-listener` on port 5300 and no UDP listeners on that port/name
+   - A UDPRoute specifies a `parentRef` targeting the TCP listener via `sectionName: tcp-listener`
+
+   - The UDPRoute is not accepted with the following status:
+
+     ```
+     parents:
+     - parentRef:
+         group: gateway.networking.k8s.io
+         kind: Gateway
+         name: mixed-gateway
+         sectionName: tcp-listener
+       conditions:
+       - type: Accepted
+         status: "False"
+         reason: NotAllowedByListeners
+     ```
+
+   - No UDP traffic is routed through the TCP listener.
+
+1. UDPRoute references a backend Service that does not exist
+   - A Gateway has a UDP listener named `coredns` on port 5300
+   - A UDPRoute specifies a `parentRef` with `sectionName: coredns` and a `backendRef` pointing to a Service `nonexistent-service` that does not exist
+
+   - The UDPRoute has the following status:
+
+     ```
+     parents:
+     - parentRef:
+         group: gateway.networking.k8s.io
+         kind: Gateway
+         name: udp-gateway
+         sectionName: coredns
+       conditions:
+       - type: Accepted
+         status: "False"
+         reason: BackendNotFound
+       - type: ResolvedRefs
+         status: "False"
+         reason: BackendNotFound
+     ```
+
+   - No UDP traffic is forwarded for this route.
+
+1. UDPRoute with multiple weighted backends distributes flows according to configured weights
+   - A Gateway has a UDP listener named `game` on port 7777
+   - A UDPRoute specifies a `parentRef` with `sectionName: game` and multiple `backendRefs`:
+     - `game-server-1` with `weight: 70`
+     - `game-server-2` with `weight: 30`
+
+   - The UDPRoute is accepted with the following status:
+
+     ```
+     parents:
+     - parentRef:
+         group: gateway.networking.k8s.io
+         kind: Gateway
+         name: udp-gateway
+         sectionName: game
+       conditions:
+       - type: Accepted
+         status: "True"
+         reason: Accepted
+       - type: ResolvedRefs
+         status: "True"
+         reason: ResolvedRefs
+     ```
+
+   - UDP flows are sent to port 7777 is distributed across backends respecting the configured weights (approximately 70% to `game-server-1` and 30% to `game-server-2`).
+
+Conformance Level: **Extended**
 
 ## References
 
-- [TCPRoute Specification](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1alpha2.TCPRoute)
+- [TCPRoute Specification](https://gateway-api.sigs.k8s.io/reference/spec/#tcproute)
 - [GEP-735: TCP and UDP addresses matching](../gep-735/index.md) (Declined, but relevant context)
 - [Gateway API Use Cases](https://gateway-api.sigs.k8s.io/concepts/use-cases/)
+
+## Provisional TODOs
+
+- Define behavior for multiple UDP routes attaching to same listener [Do we merge? reject?]
+- Declare optional behaviors
+  - Client IP perservation
+  - Flow management [flow timeout]
+  - Routing options [5 tuple, 3 tuple]
+- Port range support
