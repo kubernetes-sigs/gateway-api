@@ -72,6 +72,7 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 	// Load configurable conformance options, using flag defaults as needed.
 	configurableOpts := &suite.ConfigurableOptions{
 		CleanupBaseResources: *flags.CleanupBaseResources,
+		CleanupTestResources: *flags.CleanupTestResources,
 		GatewayClassName:     *flags.GatewayClassName,
 		Mode:                 *flags.Mode,
 		TimeoutConfig:        conformanceconfig.DefaultTimeoutConfig(),
@@ -121,6 +122,7 @@ func applyConformanceFlagOverrides(opts *suite.ConfigurableOptions) {
 		"mesh-name":              func() { opts.MeshName = *flags.MeshName },
 		"debug":                  func() { opts.Debug = *flags.ShowDebug },
 		"cleanup-base-resources": func() { opts.CleanupBaseResources = *flags.CleanupBaseResources },
+		"cleanup-test-resources": func() { opts.CleanupTestResources = *flags.CleanupTestResources },
 		"run-test":               func() { opts.RunTest = *flags.RunTest },
 		"skip-tests":             func() { opts.SkipTests = suite.ParseSkipTests(*flags.SkipTests) },
 		"skip-provisional-tests": func() { opts.SkipProvisionalTests = *flags.SkipProvisionalTests },
@@ -206,7 +208,8 @@ func RunConformanceWithOptions(t *testing.T, opts suite.ConformanceOptions) {
 
 func logOptions(t *testing.T, opts suite.ConformanceOptions) {
 	t.Logf("  GatewayClass: %s", opts.GatewayClassName)
-	t.Logf("  Cleanup Resources: %t", opts.CleanupBaseResources)
+	t.Logf("  Cleanup Base Resources: %t", opts.CleanupBaseResources)
+	t.Logf("  Cleanup Test Resources: %t", opts.CleanupTestResources)
 	t.Logf("  Debug: %t", opts.Debug)
 	t.Logf("  Enable All Features: %t", opts.EnableAllSupportedFeatures)
 	t.Logf("  Supported Features: %v", opts.SupportedFeatures.UnsortedList())
