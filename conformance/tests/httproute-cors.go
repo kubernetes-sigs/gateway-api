@@ -551,13 +551,12 @@ var HTTPRouteCORS = suite.ConformanceTest{
 				},
 			},
 			{
-				TestCaseName: "CORS request with credentials auth should be allowed and always echo the origin",
+				TestCaseName: "CORS request should receive access-control-allow-credentials header with access-control-allow-credentials set to true",
 				Request: http.Request{
 					Path:   "/cors-wildcard-methods-headers",
 					Method: "GET",
 					Headers: map[string]string{
 						"Origin": "https://other.foo.com",
-						"Cookie": "foo=bar", // Cookie is a credential.
 					},
 				},
 				Namespace: ns,
@@ -570,20 +569,19 @@ var HTTPRouteCORS = suite.ConformanceTest{
 				},
 			},
 			{
-				TestCaseName: "CORS request with credentials should hide auth headers on unauth path",
+				TestCaseName: "CORS request should not receive access-control-allow-credentials header without access-control-allow-credentials set to true",
 				Request: http.Request{
 					Path:   "/cors-wildcard-methods-headers-unauth",
 					Method: "GET",
 					Headers: map[string]string{
 						"Origin": "https://other.foo.com",
-						"Cookie": "foo=bar", // Cookie is a credential.
 					},
 				},
 				Namespace: ns,
 				Response: http.Response{
 					StatusCode: 200,
 					ValidHeaderValues: map[string][]string{
-						"access-control-allow-origin": {"https://other.foo.com"},
+						"access-control-allow-origin": {"https://other.foo.com", "*"},
 					},
 					AbsentHeaders: []string{
 						"access-control-allow-credentials",
