@@ -63,9 +63,14 @@ but any portability guarantees are now lost.
 
 In other words, any pattern (and replacement) must implement Gateway API Regex syntax and semantics, but implementations can support additional syntax and semantics as well.
 
+An unfortunate consequence of this API is that there is no way for users to programatically verify whether their regexes fall under this GEP.
+There is an implicit line between standard and implementation-specific behavior configuration.
+That said, this proposal is still an improvement over our current state of `RegularExpression` path matches, which are fully implementation specific and have no conformance tests.
+Further, tools like regex101.com make it easy to check your regex across various implementation.
+
 ## Implementation and Support
 
-The most popular Regex engines are RE2 and PCRE.
+The most popular Regex engines in the networking world are RE2 and PCRE.
 
 | Proxy          | Engine         |
 |----------------|----------------|
