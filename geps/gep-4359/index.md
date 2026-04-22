@@ -144,111 +144,125 @@ If a regex contains undefined syntax, then the behavior is implementation specif
 
 ### Examples
 
-For the pattern `^(https?://)?www\.example\.(com|org)$`, the following strings would contain a match
+In each table below, the "Match" column shows the actual substring matched by the pattern (using leftmost-first semantics), or `_(no match)_` when the pattern does not match the input.
 
-* `www.example.com`
-* `www.example.org`
-* `http://www.example.com`
-* `https://www.example.com`
-* `http://www.example.org`
-* `https://www.example.org`
+For the pattern `^(https?://)?www\.example\.(com|org)$`:
 
-The following strings would not fully match
+| Input                     | Match                     |
+| ------------------------- | ------------------------- |
+| `www.example.com`         | `www.example.com`         |
+| `www.example.org`         | `www.example.org`         |
+| `http://www.example.com`  | `http://www.example.com`  |
+| `https://www.example.com` | `https://www.example.com` |
+| `http://www.example.org`  | `http://www.example.org`  |
+| `https://www.example.org` | `https://www.example.org` |
+| `example.com`             | _(no match)_              |
+| `www.example.net`         | _(no match)_              |
+| `www.example.(com\|org)`  | _(no match)_              |
+| `www.example.corg`        | _(no match)_              |
+| `www.example.comorg`      | _(no match)_              |
+| `ahttp://www.example.org` | _(no match)_              |
+| `http://www.example.orga` | _(no match)_              |
 
-* `example.com`
-* `www.example.net`
-* `www.example.(com|org)`
-* `www.example.corg`
-* `www.example.comorg`
-* `ahttp://www.example.org`
-* `http://www.example.orga`
+For the pattern `a*` (every string contains a match, since `a*` can match the empty string at any position):
 
-For the pattern `a*`, the following strings would contain a match
+| Input        | Match                                      |
+| ------------ | ------------------------------------------ |
+| empty string | _(empty match at start and end of string)_ |
+| `a`          | `a`                                        |
+| `vaaaaaa`    | `aaaaa`                                    |
+| `b`          | _(empty match at start and end of string)_ |
 
-* ``
-* `a`
-* `aaaaa`
-* `b`
-* In fact, any string would contain a match
+For the pattern `a+`:
 
-For the pattern `a+`, the following strings would contain a match
+| Input        | Match        |
+| ------------ | ------------ |
+| `a`          | `a`          |
+| `baaaaab`    | `aaaaa`      |
+| empty string | _(no match)_ |
+| `b`          | _(no match)_ |
 
-* `a`
-* `baaaaab`
+For the equivalent patterns `^colo(u|)r$`, `^colou?r$`, `^colo(u)?r$`, `^colou{0,1}r$`:
 
-The following strings would not contain a match
+| Input      | Match        |
+| ---------- | ------------ |
+| `color`    | `color`      |
+| `colour`   | `colour`     |
+| `colouur`  | _(no match)_ |
+| `colo(u)r` | _(no match)_ |
 
-* ``
-* `b`
+For the pattern `\*+`:
 
-The patterns `^colo(u|)r$`, `^colou?r$`, `^colo(u)?r$`, `^colou{0,1}r$` are all equivalent, and would match
+| Input  | Match  |
+| ------ | ------ |
+| `*`    | `*`    |
+| `****` | `****` |
 
-* `color`
-* `colour`
+For the pattern `[a-zA-Z0-9.]`:
 
-The following strings would not contain a match
+| Input       | Match        |
+| ----------- | ------------ |
+| `a`         | `a`          |
+| `Z`         | `Z`          |
+| `5`         | `5`          |
+| `.`         | `.`          |
+| `-`         | _(no match)_ |
+| ` ` (space) | _(no match)_ |
 
-* `colouur`
-* `colo(u)r`
+For the pattern `[^a-zA-Z]`:
 
-For the pattern `\*+` would match
+| Input       | Match        |
+| ----------- | ------------ |
+| `-`         | `-`          |
+| ` ` (space) | ` ` (space)  |
+| `9`         | `9`          |
+| `a`         | _(no match)_ |
+| `Z`         | _(no match)_ |
+| `k`         | _(no match)_ |
 
-* `*`
-* `****`
+For the pattern `^[^^]$` (any single character other than `^`):
 
-The pattern `[a-zA-Z0-9.]` would fully match
+| Input                                  | Match        |
+| -------------------------------------- | ------------ |
+| `a`                                    | `a`          |
+| `1`                                    | `1`          |
+| `-`                                    | `-`          |
+| empty string                           | _(no match)_ |
+| `^`                                    | _(no match)_ |
+| any string with two or more characters | _(no match)_ |
 
-* `a`
-* `Z`
-* `5`
-* `.`
+For the equivalent patterns `^[-a]$` and `^[a-]$`:
 
-The following strings would not conntain a match
+| Input         | Match        |
+| ------------- | ------------ |
+| `-`           | `-`          |
+| `a`           | `a`          |
+| anything else | _(no match)_ |
 
-* `-`
-* ` `
+For the equivalent patterns `^[-.*(){}|^$\\]$` and `^[\-\.\*\(\)\{\}\|\^\$\\]$`:
 
-The pattern `[^a-zA-Z]` would fully match
+| Input         | Match        |
+| ------------- | ------------ |
+| `-`           | `-`          |
+| `.`           | `.`          |
+| `*`           | `*`          |
+| `(`           | `(`          |
+| `)`           | `)`          |
+| `{`           | `{`          |
+| `}`           | `}`          |
+| `\|`          | `\|`         |
+| `^`           | `^`          |
+| `$`           | `$`          |
+| `\`           | `\`          |
+| anything else | _(no match)_ |
 
-* `-`
-* ` `
-* `9`
+For the pattern `[\-Z]`:
 
-The following strings would not fully match
-
-* `a`
-* `Z`
-* `k`
-
-For the pattern `^[^^]$`, the only non-fully matching strings are
-
-* ``
-* `^`
-* Any string with two or more characters
-
-For the patterns `^[-a]$` and `^[a-]$`, the only matching strings are 
-
-* `-`
-* `a`
-
-For the equivalent patterns `^[-.*(){}|^$\\]$` and `^[\-\.\*\(\)\{\}\|\^\$\\]$`, the only matching strings are
-
-* `-`
-* `.`
-* `*`
-* `(`
-* `)`
-* `{`
-* `}`
-* `|`
-* `^`
-* `$`
-* `\`
-
-For the pattern `^[\-Z]$`, the only matching strings are
-
-* `-`
-* `Z`
+| Input         | Match        |
+| ------------- | ------------ |
+| `-`           | `-`          |
+| `Z`           | `Z`          |
+| anything else | _(no match)_ |
 
 ## Replacement
 
