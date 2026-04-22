@@ -93,6 +93,7 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 	return suite.ConformanceOptions{
 		AllowCRDsMismatch:          *flags.AllowCRDsMismatch,
 		CleanupBaseResources:       *flags.CleanupBaseResources,
+		CleanupTestResources:       *flags.CleanupTestResources,
 		Client:                     client,
 		ClientOptions:              clientOptions,
 		Clientset:                  clientset,
@@ -171,7 +172,8 @@ func RunConformanceWithOptions(t *testing.T, opts suite.ConformanceOptions) {
 
 func logOptions(t *testing.T, opts suite.ConformanceOptions) {
 	t.Logf("  GatewayClass: %s", opts.GatewayClassName)
-	t.Logf("  Cleanup Resources: %t", opts.CleanupBaseResources)
+	t.Logf("  Cleanup Base Resources: %t", opts.CleanupBaseResources)
+	t.Logf("  Cleanup Test Resources: %t", opts.CleanupTestResources)
 	t.Logf("  Debug: %t", opts.Debug)
 	t.Logf("  Enable All Features: %t", opts.EnableAllSupportedFeatures)
 	t.Logf("  Supported Features: %v", opts.SupportedFeatures.UnsortedList())
