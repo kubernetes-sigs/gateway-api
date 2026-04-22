@@ -61,7 +61,7 @@ func MakeTLSRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtr
 		}
 	}
 
-	WaitForConsistentTLSResponse(t, r, req, expected, timeoutConfig.RequiredConsecutiveSuccesses, timeoutConfig.MaxTimeToConsistency)
+	WaitForConsistentTLSResponse(t, r, req, expected, timeoutConfig.RequiredConsecutiveSuccesses, timeoutConfig.MaxTimeToConsistency.Duration)
 
 	if clientCertificate != nil && clientCertificateKey != nil {
 		assert.True(t, clientCertificatePresented, "client certificate was not presented during the handshake")
@@ -149,7 +149,7 @@ func MakeTLSConnectionAndExpectEventuallyConnectionRejection(t *testing.T, timeo
 		}
 		tlog.Logf(t, "client could connect")
 		return false
-	}, timeoutConfig.MaxTimeToConsistency, time.Second)
+	}, timeoutConfig.MaxTimeToConsistency.Duration, time.Second)
 }
 
 // isConnectionRejected checks if an error indicates either a TCP RST (ECONNRESET)

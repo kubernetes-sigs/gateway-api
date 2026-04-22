@@ -184,8 +184,8 @@ func TestHTTPRouteMustBeAcceptedAndResolved(t *testing.T) {
 	c := fake.NewClientBuilder().WithScheme(scheme).WithObjects(route).Build()
 
 	timeoutConfig := config.TimeoutConfig{
-		HTTPRouteMustHaveCondition: 5 * time.Second,
-		DefaultPollInterval:        100 * time.Millisecond,
+		HTTPRouteMustHaveCondition: metav1.Duration{Duration: 5 * time.Second},
+		DefaultPollInterval:        metav1.Duration{Duration: 100 * time.Millisecond},
 	}
 
 	HTTPRouteMustBeAcceptedAndResolved(t, c, timeoutConfig, routeNN, gatewayNN)

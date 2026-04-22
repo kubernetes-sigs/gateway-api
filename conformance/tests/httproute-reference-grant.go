@@ -62,7 +62,7 @@ var HTTPRouteReferenceGrant = confsuite.ConformanceTest{
 			})
 		})
 
-		ctx, cancel := context.WithTimeout(context.Background(), suite.TimeoutConfig.DeleteTimeout)
+		ctx, cancel := context.WithTimeout(context.Background(), suite.TimeoutConfig.DeleteTimeout.Duration)
 		defer cancel()
 		rg := v1.ReferenceGrant{
 			ObjectMeta: metav1.ObjectMeta{

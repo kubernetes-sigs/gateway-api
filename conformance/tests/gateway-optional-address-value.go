@@ -53,7 +53,7 @@ var GatewayOptionalAddressValue = suite.ConformanceTest{
 			Name:      "gateway-without-address-value",
 			Namespace: suite.InfrastructureNamespace,
 		}
-		ctx, cancel := context.WithTimeout(context.Background(), s.TimeoutConfig.DefaultTestTimeout)
+		ctx, cancel := context.WithTimeout(context.Background(), s.TimeoutConfig.DefaultTestTimeout.Duration)
 		defer cancel()
 
 		t.Logf("waiting for Gateway %s to be ready for testing", gwNN.Name)

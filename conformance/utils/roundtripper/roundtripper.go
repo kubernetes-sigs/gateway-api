@@ -219,7 +219,7 @@ func (d *DefaultRoundTripper) defaultRoundTrip(request Request, transport http.R
 	if request.Method != "" {
 		method = request.Method
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), d.TimeoutConfig.RequestTimeout)
+	ctx, cancel := context.WithTimeout(context.Background(), d.TimeoutConfig.RequestTimeout.Duration)
 	defer cancel()
 	ctx = withT(ctx, request.T)
 

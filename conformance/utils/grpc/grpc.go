@@ -276,7 +276,7 @@ func MakeRequestAndExpectEventuallyConsistentResponse(t *testing.T, c Client, ti
 	}
 	defer c.Close()
 	sendRPC := func(elapsed time.Duration) bool {
-		resp, err := c.SendRPC(t, gwAddr, expected, timeoutConfig.MaxTimeToConsistency-elapsed)
+		resp, err := c.SendRPC(t, gwAddr, expected, timeoutConfig.MaxTimeToConsistency.Duration-elapsed)
 		if err != nil {
 			tlog.Logf(t, "Failed to send RPC, not ready yet: %v (after %v)", err, elapsed)
 			return false
@@ -287,7 +287,7 @@ func MakeRequestAndExpectEventuallyConsistentResponse(t *testing.T, c Client, ti
 		}
 		return true
 	}
-	http.AwaitConvergence(t, timeoutConfig.RequiredConsecutiveSuccesses, timeoutConfig.MaxTimeToConsistency, sendRPC)
+	http.AwaitConvergence(t, timeoutConfig.RequiredConsecutiveSuccesses, timeoutConfig.MaxTimeToConsistency.Duration, sendRPC)
 	tlog.Logf(t, "Request passed")
 }
 

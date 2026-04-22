@@ -69,7 +69,7 @@ var GatewayStaticAddresses = suite.ConformanceTest{
 			Name:      "gateway-static-addresses",
 			Namespace: suite.InfrastructureNamespace,
 		}
-		ctx, cancel := context.WithTimeout(context.Background(), s.TimeoutConfig.DefaultTestTimeout)
+		ctx, cancel := context.WithTimeout(context.Background(), s.TimeoutConfig.DefaultTestTimeout.Duration)
 		defer cancel()
 
 		t.Logf("waiting for namespace %s and Gateway %s to be ready for testing", gwNN.Namespace, gwNN.Name)
