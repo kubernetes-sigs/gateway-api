@@ -41,7 +41,6 @@ import (
 	xmeshv1alpha1 "sigs.k8s.io/gateway-api/apisx/v1alpha1"
 	confv1 "sigs.k8s.io/gateway-api/conformance/apis/v1"
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
-	"sigs.k8s.io/gateway-api/conformance/utils/flags"
 	"sigs.k8s.io/gateway-api/conformance/utils/grpc"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/roundtripper"
@@ -259,9 +258,6 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 		extendedUnsupportedFeatures[conformanceProfileName] = conformanceProfile.ExtendedFeatures.Difference(supportedFeatures)
 	}
 
-	if flags.TimeoutConfigOverrides != nil && *flags.TimeoutConfigOverrides != "" {
-		config.ParseTimeoutOverrides(&options.TimeoutConfig, *flags.TimeoutConfigOverrides)
-	}
 	config.SetupTimeoutConfig(&options.TimeoutConfig)
 
 	roundTripper := options.RoundTripper
@@ -286,11 +282,6 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 		}
 		apiVersion = undefinedKeyword
 		apiChannel = undefinedKeyword
-	}
-
-	mode := flags.DefaultMode
-	if options.Mode != "" {
-		mode = options.Mode
 	}
 
 	suite := &ConformanceTestSuite{
@@ -324,7 +315,7 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 		extendedSupportedFeatures:   extendedSupportedFeatures,
 		conformanceProfiles:         options.ConformanceProfiles,
 		implementation:              options.Implementation,
-		mode:                        mode,
+		mode:                        options.Mode,
 		apiVersion:                  apiVersion,
 		apiChannel:                  apiChannel,
 		supportedFeaturesSource:     source,

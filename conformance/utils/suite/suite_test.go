@@ -527,13 +527,15 @@ func TestInferGWCSupportedFeatures(t *testing.T) {
 
 	for _, tc := range testCases {
 		options := ConformanceOptions{
-			AllowCRDsMismatch:          true,
-			GatewayClassName:           gwcName,
-			EnableAllSupportedFeatures: tc.allowAllFeatures,
-			SupportedFeatures:          tc.supportedFeatures,
-			ExemptFeatures:             tc.exemptFeatures,
-			ConformanceProfiles:        tc.ConformanceProfile,
-			Client:                     fakeClient,
+			ConfigurableOptions: ConfigurableOptions{
+				AllowCRDsMismatch:          true,
+				GatewayClassName:           gwcName,
+				EnableAllSupportedFeatures: tc.allowAllFeatures,
+				SupportedFeatures:          tc.supportedFeatures,
+				ExemptFeatures:             tc.exemptFeatures,
+				ConformanceProfiles:        tc.ConformanceProfile,
+			},
+			Client: fakeClient,
 		}
 
 		t.Run(tc.name, func(t *testing.T) {
@@ -637,13 +639,15 @@ func TestXMeshInferSupportedFeatures(t *testing.T) {
 
 	for _, tc := range testCases {
 		options := ConformanceOptions{
-			AllowCRDsMismatch:          true,
-			MeshName:                   meshName,
-			EnableAllSupportedFeatures: tc.allowAllFeatures,
-			SupportedFeatures:          tc.supportedFeatures,
-			ExemptFeatures:             tc.exemptFeatures,
-			ConformanceProfiles:        tc.ConformanceProfile,
-			Client:                     fakeClient,
+			ConfigurableOptions: ConfigurableOptions{
+				AllowCRDsMismatch:          true,
+				MeshName:                   meshName,
+				EnableAllSupportedFeatures: tc.allowAllFeatures,
+				SupportedFeatures:          tc.supportedFeatures,
+				ExemptFeatures:             tc.exemptFeatures,
+				ConformanceProfiles:        tc.ConformanceProfile,
+			},
+			Client: fakeClient,
 		}
 
 		t.Run(tc.name, func(t *testing.T) {
@@ -698,9 +702,11 @@ func TestGWCPublishedMeshFeatures(t *testing.T) {
 		Build()
 
 	options := ConformanceOptions{
-		AllowCRDsMismatch: true,
-		GatewayClassName:  gwcName,
-		Client:            fakeClient,
+		ConfigurableOptions: ConfigurableOptions{
+			AllowCRDsMismatch: true,
+			GatewayClassName:  gwcName,
+		},
+		Client: fakeClient,
 	}
 
 	suite, err := NewConformanceTestSuite(options)

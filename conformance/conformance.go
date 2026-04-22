@@ -17,9 +17,7 @@ limitations under the License.
 package conformance
 
 import (
-	"flag"
 	"io/fs"
-	"net/netip"
 	"os"
 	"testing"
 
@@ -36,7 +34,6 @@ import (
 	"github.com/stretchr/testify/require"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	clientset "k8s.io/client-go/kubernetes"
-	"k8s.io/utils/ptr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -71,10 +68,10 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 
 	// Load configurable conformance options, using flag defaults as needed.
 	configurableOpts := &suite.ConfigurableOptions{
-		CleanupBaseResources: *flags.CleanupBaseResources,
-		CleanupTestResources: *flags.CleanupTestResources,
-		GatewayClassName:     *flags.GatewayClassName,
-		Mode:                 *flags.Mode,
+		CleanupBaseResources: flags.DefaultCleanupBaseResources,
+		CleanupTestResources: flags.DefaultCleanupTestResources,
+		GatewayClassName:     flags.DefaultGatewayClassName,
+		Mode:                 flags.DefaultMode,
 		TimeoutConfig:        conformanceconfig.DefaultTimeoutConfig(),
 	}
 
@@ -86,7 +83,8 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 		err = yaml.Unmarshal(data, configurableOpts)
 		require.NoError(t, err, "error unmarshalling conformance options file")
 	}
-	applyConformanceFlagOverrides(configurableOpts)
+	// Override options with any command line flags that were explicitly set.
+	flags.ApplyAll(configurableOpts)
 
 	return suite.ConformanceOptions{
 		ConfigurableOptions: *configurableOpts,
@@ -95,79 +93,6 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 		Clientset:           clientset,
 		ManifestFS:          []fs.FS{&Manifests},
 		RestConfig:          cfg,
-	}
-}
-
-func applyConformanceFlagOverrides(opts *suite.ConfigurableOptions) {
-	implementationOverride := func() {
-		opts.Implementation = suite.ParseImplementation(
-			*flags.ImplementationOrganization,
-			*flags.ImplementationProject,
-			*flags.ImplementationURL,
-			*flags.ImplementationVersion,
-			*flags.ImplementationContact,
-		)
-	}
-
-	var usable, unusable []v1.GatewaySpecAddress
-	if v := *flags.UsableAddress; v != "" {
-		usable = append(usable, parseAddress(v))
-	}
-	if v := *flags.UnusableAddress; v != "" {
-		unusable = append(unusable, parseAddress(v))
-	}
-
-	flagOverrides := map[string]func(){
-		"gateway-class":          func() { opts.GatewayClassName = *flags.GatewayClassName },
-		"mesh-name":              func() { opts.MeshName = *flags.MeshName },
-		"debug":                  func() { opts.Debug = *flags.ShowDebug },
-		"cleanup-base-resources": func() { opts.CleanupBaseResources = *flags.CleanupBaseResources },
-		"cleanup-test-resources": func() { opts.CleanupTestResources = *flags.CleanupTestResources },
-		"run-test":               func() { opts.RunTest = *flags.RunTest },
-		"skip-tests":             func() { opts.SkipTests = suite.ParseSkipTests(*flags.SkipTests) },
-		"skip-provisional-tests": func() { opts.SkipProvisionalTests = *flags.SkipProvisionalTests },
-		"all-features":           func() { opts.EnableAllSupportedFeatures = *flags.EnableAllSupportedFeatures },
-		"allow-crds-mismatch":    func() { opts.AllowCRDsMismatch = *flags.AllowCRDsMismatch },
-		"organization":           implementationOverride,
-		"project":                implementationOverride,
-		"url":                    implementationOverride,
-		"version":                implementationOverride,
-		"contact":                implementationOverride,
-		"mode":                   func() { opts.Mode = *flags.Mode },
-		"report-output":          func() { opts.ReportOutputPath = *flags.ReportOutput },
-		"fail-fast":              func() { opts.FailFast = *flags.FailFast },
-		"supported-features":     func() { opts.SupportedFeatures = suite.ParseSupportedFeatures(*flags.SupportedFeatures) },
-		"exempt-features":        func() { opts.ExemptFeatures = suite.ParseSupportedFeatures(*flags.ExemptFeatures) },
-		"namespace-labels":       func() { opts.NamespaceLabels = suite.ParseKeyValuePairs(*flags.NamespaceLabels) },
-		"namespace-annotations":  func() { opts.NamespaceAnnotations = suite.ParseKeyValuePairs(*flags.NamespaceAnnotations) },
-		"conformance-profiles":   func() { opts.ConformanceProfiles = suite.ParseConformanceProfiles(*flags.ConformanceProfiles) },
-		"usable-address":         func() { opts.UsableNetworkAddresses = usable },
-		"unusable-address":       func() { opts.UnusableNetworkAddresses = unusable },
-		"timeout-config-overrides": func() {
-			conformanceconfig.ParseTimeoutOverrides(&opts.TimeoutConfig, *flags.TimeoutConfigOverrides)
-		},
-	}
-
-	// Any flags that were explicitly passed in by the
-	// user should override the values from the yaml file.
-	flag.Visit(func(f *flag.Flag) {
-		if override, ok := flagOverrides[f.Name]; ok {
-			override()
-		}
-	})
-}
-
-func parseAddress(v string) v1.GatewaySpecAddress {
-	_, err := netip.ParseAddr(v)
-	if err == nil {
-		return v1.GatewaySpecAddress{
-			Type:  ptr.To(v1.IPAddressType),
-			Value: v,
-		}
-	}
-	return v1.GatewaySpecAddress{
-		Type:  ptr.To(v1.HostnameAddressType),
-		Value: v,
 	}
 }
 
