@@ -140,6 +140,8 @@ Some notable omissions implied from our construction of Gateway API Regex are:
 * Lazy vs non-lazy matching (e.g. `*` vs `*?`).
 * Interval range expressions without starting numbers (`a{,2}`, `a{,}`).
 
+If a regex contains undefined syntax, then the behavior is implementation specific, and implementations are not required to reject such regexes.
+
 ### Examples
 
 For the pattern `^(https?://)?www\.example\.(com|org)$`, the following strings would contain a match
