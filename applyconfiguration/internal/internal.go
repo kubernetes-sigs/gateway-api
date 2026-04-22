@@ -1609,9 +1609,6 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: cookieConfig
       type:
         namedType: io.k8s.sigs.gateway-api.apis.v1.CookieConfig
-    - name: idleTimeout
-      type:
-        scalar: string
     - name: sessionName
       type:
         scalar: string
