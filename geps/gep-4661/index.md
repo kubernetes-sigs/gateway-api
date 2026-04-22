@@ -11,7 +11,7 @@ and establishes production-ready defaults for each service type so that common b
 Concretely, this GEP has two goals:
 
 * Allow users to specify the scope of a service provisioned by an `In-Cluster` implementation, whether the provisioned Service should be of type `ClusterIP` or `LoadBalancer`.
-* Define normative requirements for each service type so that implementations ship with optimal defaults (e.g. `externalTrafficPolicy`, `healthCheckNodePort`)
+* Define normative requirements for each service type so that implementations ship with optimal defaults (e.g. `externalTrafficPolicy`)
 
 ### Goals
 
@@ -71,6 +71,13 @@ to the existing `GatewaySpecAddress` struct — only the set of recognized
 No new fields are added to `GatewaySpecAddress`. The `value` field remains
 optional as defined in the current API.
 
+When a user specifies an address entry without an explicit `type`, the CRD
+defaulting sets it to `IPAddress` (via `+kubebuilder:default=IPAddress` on
+`GatewaySpecAddress.Type`). This means the new address types are always
+opt-in — existing Gateways and Gateways that omit the `type` field continue
+to behave exactly as they do today, with the implementation deciding the
+Service type and configuration.
+
 ### API Changes
 
 The only API change is the addition of two new `AddressType` constants:
@@ -90,8 +97,7 @@ ClusterIPAddressType AddressType = "ClusterIPAddress"
 
 // An OptimizedLoadBalancerAddress requests that the implementation
 // provisions a LoadBalancer Service with production-ready defaults.
-// Implementations SHOULD set externalTrafficPolicy to Local and
-// configure healthCheckNodePort accordingly.
+// Implementations SHOULD set externalTrafficPolicy to Local when using this mode.
 //
 // The value field is optional. When empty, the external address is
 // assigned by the load balancer provider. When set, it requests that
@@ -128,9 +134,6 @@ OptimizedLoadBalancerAddressType AddressType = "OptimizedLoadBalancerAddress"
   not support static address assignment, the implementation MUST set the
   `Programmed` condition to `False` with reason `AddressNotAssigned`.
 * Implementations SHOULD set `externalTrafficPolicy: Local`.
-* Implementations SHOULD configure `healthCheckNodePort` when
-  `externalTrafficPolicy` is `Local`, so external load balancers can detect
-  which nodes have healthy Gateway Pods.
 * The implementation MUST report the assigned external address in
   `status.addresses`.
 
@@ -221,7 +224,7 @@ spec:
 ```
 
 The implementation provisions a `LoadBalancer` Service with
-`externalTrafficPolicy: Local` and a properly configured `healthCheckNodePort`.
+`externalTrafficPolicy: Local`.
 The external address assigned by the load balancer provider is reported in
 status:
 
@@ -357,6 +360,22 @@ spec:
       resources:   ["gateways"]
       operations:  ["CREATE", "UPDATE"]
 ```
+
+## Open Questions
+
+* **Multiple addresses of different types**: When a Gateway specifies addresses
+  of different types (e.g. both `ClusterIPAddress` and
+  `OptimizedLoadBalancerAddress`), should the implementation create one Service
+  per type? And when multiple addresses of the same type are specified, should
+  the implementation aggregate them into a single Service? Optimally this would
+  be implementation-specific behavior, as long as `status.addresses` accurately
+  reflects the addresses that were provisioned and are reachable.
+
+* **Naming and specification of address types**: The names `ClusterIPAddress`
+  and `OptimizedLoadBalancerAddress` are working names used throughout this GEP
+  to convey intent. The final naming, as well as the precise specification of
+  each type (support level, normative requirements), must still be discussed
+  and agreed upon before this GEP moves to Implementable.
 
 ## References
 
