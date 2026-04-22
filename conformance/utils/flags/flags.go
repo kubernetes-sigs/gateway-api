@@ -35,6 +35,7 @@ var (
 	MeshName                   = flag.String("mesh-name", "", "Name of Mesh to use for tests")
 	ShowDebug                  = flag.Bool("debug", false, "Whether to print debug logs")
 	CleanupBaseResources       = flag.Bool("cleanup-base-resources", true, "Whether to cleanup base test resources after the run")
+	CleanupTestResources       = flag.Bool("cleanup-test-resources", true, "Whether to cleanup test-specific resources after each test")
 	SupportedFeatures          = flag.String("supported-features", "", "Supported features included in conformance tests suites")
 	SkipTests                  = flag.String("skip-tests", "", "Comma-separated list of tests to skip")
 	RunTest                    = flag.String("run-test", "", "Name of a single test to run, instead of the whole suite")

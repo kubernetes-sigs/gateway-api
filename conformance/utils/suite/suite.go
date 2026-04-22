@@ -69,6 +69,7 @@ type ConformanceTestSuite struct {
 	ControllerName           string
 	Debug                    bool
 	Cleanup                  bool
+	CleanupTestResources     bool
 	BaseManifests            string
 	MeshManifests            string
 	Applier                  kubernetes.Applier
@@ -152,7 +153,10 @@ type ConformanceOptions struct {
 
 	// CleanupBaseResources indicates whether or not the base test
 	// resources such as Gateways should be cleaned up after the run.
-	CleanupBaseResources       bool
+	CleanupBaseResources bool
+	// CleanupTestResources indicates whether or not test-specific manifests
+	// should be cleaned up after each test.
+	CleanupTestResources       bool
 	SupportedFeatures          FeaturesSet
 	ExemptFeatures             FeaturesSet
 	EnableAllSupportedFeatures bool
@@ -287,17 +291,18 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 	}
 
 	suite := &ConformanceTestSuite{
-		Client:           options.Client,
-		ClientOptions:    options.ClientOptions,
-		Clientset:        options.Clientset,
-		RestConfig:       options.RestConfig,
-		RoundTripper:     roundTripper,
-		GRPCClient:       grpcClient,
-		GatewayClassName: options.GatewayClassName,
-		Debug:            options.Debug,
-		Cleanup:          options.CleanupBaseResources,
-		BaseManifests:    options.BaseManifests,
-		MeshManifests:    options.MeshManifests,
+		Client:               options.Client,
+		ClientOptions:        options.ClientOptions,
+		Clientset:            options.Clientset,
+		RestConfig:           options.RestConfig,
+		RoundTripper:         roundTripper,
+		GRPCClient:           grpcClient,
+		GatewayClassName:     options.GatewayClassName,
+		Debug:                options.Debug,
+		Cleanup:              options.CleanupBaseResources,
+		CleanupTestResources: options.CleanupTestResources,
+		BaseManifests:        options.BaseManifests,
+		MeshManifests:        options.MeshManifests,
 		Applier: kubernetes.Applier{
 			NamespaceLabels:      options.NamespaceLabels,
 			NamespaceAnnotations: options.NamespaceAnnotations,
