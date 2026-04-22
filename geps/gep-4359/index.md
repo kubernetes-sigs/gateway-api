@@ -18,7 +18,7 @@ We use POSIX ERE (as defined in Chapter 9 of the [The Open Group Base Specificat
 ## Non-Goals
 
 * Limit regex features to a common subset.
-* Methods of validating regular expressions at the API level. This is theoretically impossible using regex and CEL.
+* Define methods of validating regular expressions at the API level. This is theoretically impossible using regex and CEL.
 * Define specific use cases for regular expressions.
 * Define failure modes when a regular expression or input is unsupported. Such validation requires a context-free grammar, and we cannot do that with CEL.
 
@@ -66,7 +66,7 @@ In other words, any pattern (and replacement) must implement Gateway API Regex s
 An unfortunate consequence of this API is that there is no way for users to programatically verify whether their regexes fall under this GEP.
 There is an implicit line between standard and implementation-specific behavior configuration.
 That said, this proposal is still an improvement over our current state of `RegularExpression` path matches, which are fully implementation specific and have no conformance tests.
-Further, tools like regex101.com make it easy to check your regex across various implementation.
+Further, tools like [regex101.com](https://regex101.com) make it easy to check your regex across various implementation.
 
 ## Implementation and Support
 
@@ -99,7 +99,7 @@ In other words, only the following code points are supported:
 * `0x20` (space)
 * `0x21-0x7E` (printable characters)
 
-The reason for this restriction is that most modern regex engines differ in their support for line breaks, unicode, and control characters.
+The reason for this restriction is that most modern regex engines differ in their support for line breaks, Unicode, and control characters.
 Supporting such inputs would add ambiguity and diminish portability with little practical benefits as such characters are rarely used in traffic routing and manipulation 
 (notably, [HTTP header values can have `0x80-0xFF` code points](https://datatracker.ietf.org/doc/html/rfc9110#section-5.5), but their use is rare).
 For example, in RE2, the `.` character might or might not match line breaks, depending on configuration.
@@ -115,7 +115,7 @@ Some examples of valid input strings are
 Some examples of invalid input strings are (implementations need not reject these, but they are not explicitly supported by the spec):
 
 * `foo\nbar` (`0x66 0x6F 0x6F 0x0A 0x62 0x61 0x72`)
-* `ｆ๏๏ ß∆я` (`0xef 0xbd 0x86 0xe0 0xb9 0x8f 0xe0 0xb9 0x8f 0xe2 0x80 0x82 0xc3 0x9f 0xe2 0x88 0x86 0xd1 0x8f`)
+* `ｆ๏๏ ß∆я` (`0xef 0xbd 0x86 0xe0 0xb9 0x8f 0xe0 0xb9 0x8f 0xe2 0x80 0x82 0xc3 0x9f 0xe2 0x88 0x86 0xd1 0x8f` using UTF-8)
 
 
 ## Gateway API Regex Definition
