@@ -69,19 +69,12 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 	require.NoError(t, v1.Install(client.Scheme()))
 	require.NoError(t, apiextensionsv1.AddToScheme(client.Scheme()))
 
-	// Load conformance options, using flag defaults as needed.
-	opts := &suite.ConformanceOptions{
-		ConfigurableOptions: suite.ConfigurableOptions{
-			CleanupBaseResources: *flags.CleanupBaseResources,
-			GatewayClassName:     *flags.GatewayClassName,
-			Mode:                 *flags.Mode,
-			TimeoutConfig:        conformanceconfig.DefaultTimeoutConfig(),
-		},
-		Client:        client,
-		ClientOptions: clientOptions,
-		Clientset:     clientset,
-		ManifestFS:    []fs.FS{&Manifests},
-		RestConfig:    cfg,
+	// Load configurable conformance options, using flag defaults as needed.
+	configurableOpts := &suite.ConfigurableOptions{
+		CleanupBaseResources: *flags.CleanupBaseResources,
+		GatewayClassName:     *flags.GatewayClassName,
+		Mode:                 *flags.Mode,
+		TimeoutConfig:        conformanceconfig.DefaultTimeoutConfig(),
 	}
 
 	// Load conformance options provided via yaml file, overriding defaults.
@@ -89,16 +82,22 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 		data, err := os.ReadFile(*flags.ConformanceOptionsFile)
 		require.NoError(t, err, "error reading conformance options file")
 
-		err = yaml.Unmarshal(data, opts)
+		err = yaml.Unmarshal(data, configurableOpts)
 		require.NoError(t, err, "error unmarshalling conformance options file")
 	}
+	applyConformanceFlagOverrides(configurableOpts)
 
-	applyConformanceFlagOverrides(opts)
-
-	return *opts
+	return suite.ConformanceOptions{
+		ConfigurableOptions: *configurableOpts,
+		Client:              client,
+		ClientOptions:       clientOptions,
+		Clientset:           clientset,
+		ManifestFS:          []fs.FS{&Manifests},
+		RestConfig:          cfg,
+	}
 }
 
-func applyConformanceFlagOverrides(opts *suite.ConformanceOptions) {
+func applyConformanceFlagOverrides(opts *suite.ConfigurableOptions) {
 	implementationOverride := func() {
 		opts.Implementation = suite.ParseImplementation(
 			*flags.ImplementationOrganization,
