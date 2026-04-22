@@ -122,7 +122,7 @@ func gwcMustBeAccepted(t *testing.T, c client.Client, timeoutConfig config.Timeo
 	t.Helper()
 
 	var controllerName string
-	waitErr := wait.PollUntilContextTimeout(context.Background(), timeoutConfig.DefaultPollInterval.Duration, timeoutConfig.GWCMustBeAccepted.Duration, true, func(ctx context.Context) (bool, error) {
+	waitErr := wait.PollUntilContextTimeout(context.Background(), timeoutConfig.DefaultPollInterval, timeoutConfig.GWCMustBeAccepted, true, func(ctx context.Context) (bool, error) {
 		gwc := &gatewayv1.GatewayClass{}
 		err := c.Get(ctx, types.NamespacedName{Name: gwcName}, gwc)
 		if err != nil {
@@ -149,7 +149,7 @@ func gwcMustBeAccepted(t *testing.T, c client.Client, timeoutConfig config.Timeo
 func GatewayMustHaveLatestConditions(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, gwNN types.NamespacedName) {
 	t.Helper()
 
-	waitErr := wait.PollUntilContextTimeout(t.Context(), timeoutConfig.DefaultPollInterval.Duration, timeoutConfig.LatestObservedGenerationSet.Duration, true, func(ctx context.Context) (bool, error) {
+	waitErr := wait.PollUntilContextTimeout(t.Context(), timeoutConfig.DefaultPollInterval, timeoutConfig.LatestObservedGenerationSet, true, func(ctx context.Context) (bool, error) {
 		gw := &gatewayv1.Gateway{}
 		err := c.Get(ctx, gwNN, gw)
 		if err != nil {
@@ -172,7 +172,7 @@ func GatewayMustHaveLatestConditions(t *testing.T, c client.Client, timeoutConfi
 func GatewayClassMustHaveLatestConditions(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, gwcNN types.NamespacedName) {
 	t.Helper()
 
-	waitErr := wait.PollUntilContextTimeout(t.Context(), timeoutConfig.DefaultPollInterval.Duration, timeoutConfig.LatestObservedGenerationSet.Duration, true, func(ctx context.Context) (bool, error) {
+	waitErr := wait.PollUntilContextTimeout(t.Context(), timeoutConfig.DefaultPollInterval, timeoutConfig.LatestObservedGenerationSet, true, func(ctx context.Context) (bool, error) {
 		gwc := &gatewayv1.GatewayClass{}
 		err := c.Get(ctx, gwcNN, gwc)
 		if err != nil {
@@ -195,7 +195,7 @@ func GatewayClassMustHaveLatestConditions(t *testing.T, c client.Client, timeout
 func HTTPRouteMustHaveLatestConditions(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, rNN types.NamespacedName) {
 	t.Helper()
 
-	waitErr := wait.PollUntilContextTimeout(t.Context(), timeoutConfig.DefaultPollInterval.Duration, timeoutConfig.LatestObservedGenerationSet.Duration, true, func(ctx context.Context) (bool, error) {
+	waitErr := wait.PollUntilContextTimeout(t.Context(), timeoutConfig.DefaultPollInterval, timeoutConfig.LatestObservedGenerationSet, true, func(ctx context.Context) (bool, error) {
 		r := &gatewayv1.HTTPRoute{}
 		err := c.Get(ctx, rNN, r)
 		if err != nil {
@@ -256,7 +256,7 @@ func FilterStaleConditions(obj metav1.Object, conditions []metav1.Condition) []m
 func NamespacesMustBeReady(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, namespaces []string) {
 	t.Helper()
 
-	waitErr := wait.PollUntilContextTimeout(context.Background(), timeoutConfig.DefaultPollInterval.Duration, timeoutConfig.NamespacesMustBeReady.Duration, true, func(ctx context.Context) (bool, error) {
+	waitErr := wait.PollUntilContextTimeout(context.Background(), timeoutConfig.DefaultPollInterval, timeoutConfig.NamespacesMustBeReady, true, func(ctx context.Context) (bool, error) {
 		for _, ns := range namespaces {
 			gwList := &gatewayv1.GatewayList{}
 			err := c.List(ctx, gwList, client.InNamespace(ns))
@@ -322,8 +322,8 @@ func GatewayMustHaveCondition(
 
 	waitErr := wait.PollUntilContextTimeout(
 		context.Background(),
-		timeoutConfig.DefaultPollInterval.Duration,
-		timeoutConfig.GatewayMustHaveCondition.Duration,
+		timeoutConfig.DefaultPollInterval,
+		timeoutConfig.GatewayMustHaveCondition,
 		true,
 		func(ctx context.Context) (bool, error) {
 			gw := &gatewayv1.Gateway{}
@@ -356,7 +356,7 @@ func GatewayMustHaveCondition(
 func GatewayMustHaveAttachedListeners(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, gwName types.NamespacedName, expectedCount int32) {
 	var gotStatus *gatewayv1.GatewayStatus
 
-	waitErr := wait.PollUntilContextTimeout(context.Background(), timeoutConfig.DefaultPollInterval.Duration, timeoutConfig.GatewayStatusMustHaveListeners.Duration, true, func(ctx context.Context) (bool, error) {
+	waitErr := wait.PollUntilContextTimeout(context.Background(), timeoutConfig.DefaultPollInterval, timeoutConfig.GatewayStatusMustHaveListeners, true, func(ctx context.Context) (bool, error) {
 		gw := &gatewayv1.Gateway{}
 
 		err := client.Get(ctx, gwName, gw)
@@ -397,8 +397,8 @@ func ListenerSetMustHaveCondition(
 
 	waitErr := wait.PollUntilContextTimeout(
 		context.Background(),
-		timeoutConfig.DefaultPollInterval.Duration,
-		timeoutConfig.ListenerSetMustHaveCondition.Duration,
+		timeoutConfig.DefaultPollInterval,
+		timeoutConfig.ListenerSetMustHaveCondition,
 		true,
 		func(ctx context.Context) (bool, error) {
 			ls := &gatewayv1.ListenerSet{}
@@ -435,7 +435,7 @@ func ListenerSetMustHaveCondition(
 func MeshNamespacesMustBeReady(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, namespaces []string) {
 	t.Helper()
 
-	waitErr := wait.PollUntilContextTimeout(context.Background(), timeoutConfig.DefaultPollInterval.Duration, timeoutConfig.NamespacesMustBeReady.Duration, true, func(ctx context.Context) (bool, error) {
+	waitErr := wait.PollUntilContextTimeout(context.Background(), timeoutConfig.DefaultPollInterval, timeoutConfig.NamespacesMustBeReady, true, func(ctx context.Context) (bool, error) {
 		for _, ns := range namespaces {
 			podList := &v1.PodList{}
 			err := c.List(ctx, podList, client.InNamespace(ns))
@@ -517,7 +517,7 @@ func WaitForGatewayAddress(t *testing.T, client client.Client, timeoutConfig con
 	t.Helper()
 
 	var ipAddr, port string
-	waitErr := wait.PollUntilContextTimeout(context.Background(), timeoutConfig.DefaultPollInterval.Duration, timeoutConfig.GatewayMustHaveAddress.Duration, true, func(ctx context.Context) (bool, error) {
+	waitErr := wait.PollUntilContextTimeout(context.Background(), timeoutConfig.DefaultPollInterval, timeoutConfig.GatewayMustHaveAddress, true, func(ctx context.Context) (bool, error) {
 		gw, err := getGatewayStatus(ctx, t, client, gwRef)
 		if gw == nil {
 			// The returned error is nil if the Gateway conditions don't have the latest observed generation.
@@ -576,7 +576,7 @@ func GatewayListenersMustHaveConditions(t *testing.T, client client.Client, time
 		}
 	}
 
-	waitErr := wait.PollUntilContextTimeout(context.Background(), timeoutConfig.DefaultPollInterval.Duration, timeoutConfig.GatewayListenersMustHaveConditions.Duration, true, func(ctx context.Context) (bool, error) {
+	waitErr := wait.PollUntilContextTimeout(context.Background(), timeoutConfig.DefaultPollInterval, timeoutConfig.GatewayListenersMustHaveConditions, true, func(ctx context.Context) (bool, error) {
 		var gw gatewayv1.Gateway
 		if err := client.Get(ctx, gwName, &gw); err != nil {
 			return false, fmt.Errorf("error fetching Gateway: %w", err)
@@ -613,7 +613,7 @@ func GatewayListenersMustHaveConditions(t *testing.T, client client.Client, time
 func GatewayListenerMustHaveConditions(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, gwName types.NamespacedName, lName string, conditions []metav1.Condition) {
 	t.Helper()
 
-	waitErr := wait.PollUntilContextTimeout(context.Background(), timeoutConfig.DefaultPollInterval.Duration, timeoutConfig.GatewayListenersMustHaveConditions.Duration, true, func(ctx context.Context) (bool, error) {
+	waitErr := wait.PollUntilContextTimeout(context.Background(), timeoutConfig.DefaultPollInterval, timeoutConfig.GatewayListenersMustHaveConditions, true, func(ctx context.Context) (bool, error) {
 		var gw gatewayv1.Gateway
 		if err := client.Get(ctx, gwName, &gw); err != nil {
 			return false, fmt.Errorf("error fetching Gateway: %w", err)
@@ -643,7 +643,7 @@ func GatewayListenerMustHaveConditions(t *testing.T, client client.Client, timeo
 func GatewayMustHaveZeroRoutes(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, gwName types.NamespacedName) {
 	var gotStatus *gatewayv1.GatewayStatus
 
-	waitErr := wait.PollUntilContextTimeout(context.Background(), timeoutConfig.DefaultPollInterval.Duration, timeoutConfig.GatewayStatusMustHaveListeners.Duration, true, func(ctx context.Context) (bool, error) {
+	waitErr := wait.PollUntilContextTimeout(context.Background(), timeoutConfig.DefaultPollInterval, timeoutConfig.GatewayStatusMustHaveListeners, true, func(ctx context.Context) (bool, error) {
 		gw := &gatewayv1.Gateway{}
 
 		err := client.Get(ctx, gwName, gw)
@@ -680,8 +680,8 @@ func HTTPRouteMustHaveNoAcceptedParents(t *testing.T, client client.Client, time
 
 	var actual []gatewayv1.RouteParentStatus
 	emptyChecked := false
-	// Note: explicitly do not use timeoutConfig.DefaultPollInterval.Duration here as we are doing a negative test
-	waitErr := wait.PollUntilContextTimeout(context.Background(), 1*time.Second, timeoutConfig.HTTPRouteMustNotHaveParents.Duration, true, func(ctx context.Context) (bool, error) {
+	// Note: explicitly do not use timeoutConfig.DefaultPollInterval here as we are doing a negative test
+	waitErr := wait.PollUntilContextTimeout(context.Background(), 1*time.Second, timeoutConfig.HTTPRouteMustNotHaveParents, true, func(ctx context.Context) (bool, error) {
 		route := &gatewayv1.HTTPRoute{}
 		err := client.Get(ctx, routeName, route)
 		if err != nil {
@@ -726,8 +726,8 @@ func TLSRouteMustHaveNoAcceptedParents(t *testing.T, client client.Client, timeo
 
 	var actual []gatewayv1.RouteParentStatus
 	emptyChecked := false
-	// We explicitly do not use timeoutConfig.DefaultPollInterval.Duration here since we are doing negative testing
-	waitErr := wait.PollUntilContextTimeout(context.Background(), 1*time.Second, timeoutConfig.HTTPRouteMustNotHaveParents.Duration, true, func(ctx context.Context) (bool, error) {
+	// We explicitly do not use timeoutConfig.DefaultPollInterval here since we are doing negative testing
+	waitErr := wait.PollUntilContextTimeout(context.Background(), 1*time.Second, timeoutConfig.HTTPRouteMustNotHaveParents, true, func(ctx context.Context) (bool, error) {
 		route := &gatewayv1.TLSRoute{}
 		err := client.Get(ctx, routeName, route)
 		if err != nil {
@@ -797,7 +797,7 @@ func RouteMustHaveParents(t *testing.T, cli client.Client, timeoutConfig config.
 	require.True(t, ok, "error converting %v to metav1.Object", routeType)
 
 	var actual []gatewayv1.RouteParentStatus
-	waitErr := wait.PollUntilContextTimeout(context.Background(), timeoutConfig.DefaultPollInterval.Duration, timeoutConfig.RouteMustHaveParents.Duration, true, func(ctx context.Context) (bool, error) {
+	waitErr := wait.PollUntilContextTimeout(context.Background(), timeoutConfig.DefaultPollInterval, timeoutConfig.RouteMustHaveParents, true, func(ctx context.Context) (bool, error) {
 		err := cli.Get(ctx, routeName, cliObj)
 		if err != nil {
 			return false, fmt.Errorf("error fetching %s: %w", routeTypeName, err)
@@ -839,7 +839,7 @@ func TLSRouteMustHaveParents(t *testing.T, client client.Client, timeoutConfig c
 	var actual []gatewayv1.RouteParentStatus
 	var route gatewayv1.TLSRoute
 
-	waitErr := wait.PollUntilContextTimeout(context.Background(), timeoutConfig.DefaultPollInterval.Duration, timeoutConfig.RouteMustHaveParents.Duration, true, func(ctx context.Context) (bool, error) {
+	waitErr := wait.PollUntilContextTimeout(context.Background(), timeoutConfig.DefaultPollInterval, timeoutConfig.RouteMustHaveParents, true, func(ctx context.Context) (bool, error) {
 		err := client.Get(ctx, routeName, &route)
 		if err != nil {
 			return false, fmt.Errorf("error fetching TLSRoute: %w", err)
@@ -903,7 +903,7 @@ func GatewayStatusMustHaveListeners(t *testing.T, cl client.Client, timeoutConfi
 	t.Helper()
 
 	var actual []gatewayv1.ListenerStatus
-	waitErr := wait.PollUntilContextTimeout(context.Background(), timeoutConfig.DefaultPollInterval.Duration, timeoutConfig.GatewayStatusMustHaveListeners.Duration, true, func(ctx context.Context) (bool, error) {
+	waitErr := wait.PollUntilContextTimeout(context.Background(), timeoutConfig.DefaultPollInterval, timeoutConfig.GatewayStatusMustHaveListeners, true, func(ctx context.Context) (bool, error) {
 		gw := &gatewayv1.Gateway{}
 		err := cl.Get(ctx, gwNN, gw)
 		if err != nil {
@@ -928,7 +928,7 @@ func ListenerSetStatusMustHaveListeners(t *testing.T, cl client.Client, timeoutC
 	t.Helper()
 
 	var actual []gatewayv1.ListenerEntryStatus
-	waitErr := wait.PollUntilContextTimeout(context.Background(), timeoutConfig.DefaultPollInterval.Duration, timeoutConfig.ListenerSetListenersMustHaveConditions.Duration, true, func(ctx context.Context) (bool, error) {
+	waitErr := wait.PollUntilContextTimeout(context.Background(), timeoutConfig.DefaultPollInterval, timeoutConfig.ListenerSetListenersMustHaveConditions, true, func(ctx context.Context) (bool, error) {
 		gw := &gatewayv1.ListenerSet{}
 		err := cl.Get(ctx, lsNN, gw)
 		if err != nil {
@@ -951,7 +951,7 @@ func ListenerSetStatusMustHaveListeners(t *testing.T, cl client.Client, timeoutC
 func HTTPRouteMustHaveCondition(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeNN types.NamespacedName, gwNN types.NamespacedName, condition metav1.Condition) {
 	t.Helper()
 
-	waitErr := wait.PollUntilContextTimeout(context.Background(), timeoutConfig.DefaultPollInterval.Duration, timeoutConfig.HTTPRouteMustHaveCondition.Duration, true, func(ctx context.Context) (bool, error) {
+	waitErr := wait.PollUntilContextTimeout(context.Background(), timeoutConfig.DefaultPollInterval, timeoutConfig.HTTPRouteMustHaveCondition, true, func(ctx context.Context) (bool, error) {
 		route := &gatewayv1.HTTPRoute{}
 		err := client.Get(ctx, routeNN, route)
 		if err != nil {
@@ -1071,7 +1071,7 @@ func GatewayAndTLSRoutesMustBeAccepted(t *testing.T, c client.Client, timeoutCon
 func TLSRouteMustHaveCondition(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeNN types.NamespacedName, gwNN types.NamespacedName, condition metav1.Condition) {
 	t.Helper()
 
-	waitErr := wait.PollUntilContextTimeout(context.Background(), timeoutConfig.DefaultPollInterval.Duration, timeoutConfig.TLSRouteMustHaveCondition.Duration, true, func(ctx context.Context) (bool, error) {
+	waitErr := wait.PollUntilContextTimeout(context.Background(), timeoutConfig.DefaultPollInterval, timeoutConfig.TLSRouteMustHaveCondition, true, func(ctx context.Context) (bool, error) {
 		route := &gatewayv1.TLSRoute{}
 		err := client.Get(ctx, routeNN, route)
 		if err != nil {
@@ -1191,7 +1191,7 @@ func ListenerSetListenersMustHaveConditions(t *testing.T, client client.Client, 
 		}
 	}
 
-	waitErr := wait.PollUntilContextTimeout(context.Background(), timeoutConfig.DefaultPollInterval.Duration, timeoutConfig.ListenerSetListenersMustHaveConditions.Duration, true, func(ctx context.Context) (bool, error) {
+	waitErr := wait.PollUntilContextTimeout(context.Background(), timeoutConfig.DefaultPollInterval, timeoutConfig.ListenerSetListenersMustHaveConditions, true, func(ctx context.Context) (bool, error) {
 		var parent gatewayv1.ListenerSet
 		if err := client.Get(ctx, lsName, &parent); err != nil {
 			tlog.Logf(t, "error fetching Gateway: %v", err)
@@ -1435,7 +1435,7 @@ func findPodConditionInList(t *testing.T, conditions []v1.PodCondition, condName
 // halting after the specified timeout is exceeded.
 func BackendTLSPolicyMustHaveCondition(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, policyNN, gwNN types.NamespacedName, condition metav1.Condition) {
 	t.Helper()
-	waitErr := wait.PollUntilContextTimeout(context.Background(), timeoutConfig.DefaultPollInterval.Duration, timeoutConfig.HTTPRouteMustHaveCondition.Duration, true, func(ctx context.Context) (bool, error) {
+	waitErr := wait.PollUntilContextTimeout(context.Background(), timeoutConfig.DefaultPollInterval, timeoutConfig.HTTPRouteMustHaveCondition, true, func(ctx context.Context) (bool, error) {
 		policy := &gatewayv1.BackendTLSPolicy{}
 		err := client.Get(ctx, policyNN, policy)
 		if err != nil {
@@ -1485,7 +1485,7 @@ func BackendTLSPolicyMustHaveLatestConditions(t *testing.T, r *gatewayv1.Backend
 
 // GetConfigMapData fetches the named ConfigMap
 func GetConfigMapData(client client.Client, timeoutConfig config.TimeoutConfig, name types.NamespacedName) (map[string]string, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), timeoutConfig.GetTimeout.Duration)
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutConfig.GetTimeout)
 	defer cancel()
 
 	configMap := &v1.ConfigMap{}

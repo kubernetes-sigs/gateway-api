@@ -55,7 +55,7 @@ var UDPRouteTest = confsuite.ConformanceTest{
 			msg := new(dns.Msg)
 			msg.SetQuestion(domain, dns.TypeA)
 			tlog.Logf(t, "performing DNS query %s on %s", domain, gwAddr)
-			if err := wait.PollUntilContextTimeout(context.TODO(), time.Second, suite.TimeoutConfig.DefaultTestTimeout.Duration, true,
+			if err := wait.PollUntilContextTimeout(context.TODO(), time.Second, suite.TimeoutConfig.DefaultTestTimeout, true,
 				func(_ context.Context) (done bool, err error) {
 					r, err := dns.Exchange(msg, gwAddr)
 					if err != nil {

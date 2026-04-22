@@ -55,7 +55,7 @@ var HTTPRouteBackendProtocolWebSocket = confsuite.ConformanceTest{
 		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
 
 		threshold := suite.TimeoutConfig.RequiredConsecutiveSuccesses
-		maxTimeToConsistency := suite.TimeoutConfig.MaxTimeToConsistency.Duration
+		maxTimeToConsistency := suite.TimeoutConfig.MaxTimeToConsistency
 
 		t.Run("websocket connection should reach backend", func(t *testing.T) {
 			http.AwaitConvergence(t, threshold, maxTimeToConsistency, func(_ time.Duration) bool {

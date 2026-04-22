@@ -220,7 +220,7 @@ func (a Applier) prepareResources(t *testing.T, decoder *yaml.YAMLOrJSONDecoder)
 
 func (a Applier) MustApplyObjectsWithCleanup(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, resources []client.Object, cleanup bool) {
 	for _, resource := range resources {
-		ctx, cancel := context.WithTimeout(context.Background(), timeoutConfig.CreateTimeout.Duration)
+		ctx, cancel := context.WithTimeout(context.Background(), timeoutConfig.CreateTimeout)
 		defer cancel()
 
 		tlog.Logf(t, "Creating %s %s", resource.GetName(), resource.GetObjectKind().GroupVersionKind().Kind)
@@ -234,7 +234,7 @@ func (a Applier) MustApplyObjectsWithCleanup(t *testing.T, c client.Client, time
 
 		if cleanup {
 			t.Cleanup(func() {
-				ctx, cancel = context.WithTimeout(context.Background(), timeoutConfig.DeleteTimeout.Duration)
+				ctx, cancel = context.WithTimeout(context.Background(), timeoutConfig.DeleteTimeout)
 				defer cancel()
 				tlog.Logf(t, "Deleting %s %s", resource.GetName(), resource.GetObjectKind().GroupVersionKind().Kind)
 				err = c.Delete(ctx, resource)
@@ -262,7 +262,7 @@ func (a Applier) MustApplyWithCleanup(t *testing.T, c client.Client, timeoutConf
 	for i := range resources {
 		uObj := &resources[i]
 
-		ctx, cancel := context.WithTimeout(context.Background(), timeoutConfig.CreateTimeout.Duration)
+		ctx, cancel := context.WithTimeout(context.Background(), timeoutConfig.CreateTimeout)
 		defer cancel()
 
 		namespacedName := types.NamespacedName{Namespace: uObj.GetNamespace(), Name: uObj.GetName()}
@@ -278,7 +278,7 @@ func (a Applier) MustApplyWithCleanup(t *testing.T, c client.Client, timeoutConf
 
 			if cleanup {
 				t.Cleanup(func() {
-					ctx, cancel = context.WithTimeout(context.Background(), timeoutConfig.DeleteTimeout.Duration)
+					ctx, cancel = context.WithTimeout(context.Background(), timeoutConfig.DeleteTimeout)
 					defer cancel()
 					tlog.Logf(t, "Deleting %s %s", uObj.GetName(), uObj.GetKind())
 					err = c.Delete(ctx, uObj)
@@ -296,7 +296,7 @@ func (a Applier) MustApplyWithCleanup(t *testing.T, c client.Client, timeoutConf
 
 		if cleanup {
 			t.Cleanup(func() {
-				ctx, cancel = context.WithTimeout(context.Background(), timeoutConfig.DeleteTimeout.Duration)
+				ctx, cancel = context.WithTimeout(context.Background(), timeoutConfig.DeleteTimeout)
 				defer cancel()
 				tlog.Logf(t, "Deleting %s %s", uObj.GetName(), uObj.GetKind())
 				err = c.Delete(ctx, uObj)
@@ -315,7 +315,7 @@ func getContentsFromPathOrURL(manifestFS []fs.FS, location string, timeoutConfig
 	if strings.HasPrefix(location, "http://") {
 		return nil, fmt.Errorf("data can't be retrieved from %s: http is not supported, use https", location)
 	} else if strings.HasPrefix(location, "https://") {
-		ctx, cancel := context.WithTimeout(context.Background(), timeoutConfig.ManifestFetchTimeout.Duration)
+		ctx, cancel := context.WithTimeout(context.Background(), timeoutConfig.ManifestFetchTimeout)
 		defer cancel()
 
 		req, err := http.NewRequestWithContext(ctx, http.MethodGet, location, nil)

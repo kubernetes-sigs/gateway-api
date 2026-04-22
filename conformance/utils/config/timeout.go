@@ -17,104 +17,105 @@ limitations under the License.
 package config
 
 import (
+	"encoding/json"
+	"fmt"
+	"reflect"
 	"strconv"
 	"strings"
 	"time"
-
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 type TimeoutConfig struct {
 	// TestIsolation represents the time block between test cases to enhance test isolation.
 	// Max value for conformant implementation: None
-	TestIsolation metav1.Duration `json:"testIsolation"`
+	TestIsolation time.Duration `json:"testIsolation"`
 
 	// CreateTimeout represents the maximum time for a Kubernetes object to be created.
 	// Max value for conformant implementation: None
-	CreateTimeout metav1.Duration `json:"createTimeout"`
+	CreateTimeout time.Duration `json:"createTimeout"`
 
 	// DeleteTimeout represents the maximum time for a Kubernetes object to be deleted.
 	// Max value for conformant implementation: None
-	DeleteTimeout metav1.Duration `json:"deleteTimeout"`
+	DeleteTimeout time.Duration `json:"deleteTimeout"`
 
 	// GetTimeout represents the maximum time to get a Kubernetes object.
 	// Max value for conformant implementation: None
-	GetTimeout metav1.Duration `json:"getTimeout"`
+	GetTimeout time.Duration `json:"getTimeout"`
 
 	// GatewayMustHaveAddress represents the maximum time for at least one IP Address has been set in the status of a Gateway.
 	// Max value for conformant implementation: None
-	GatewayMustHaveAddress metav1.Duration `json:"gatewayMustHaveAddress"`
+	GatewayMustHaveAddress time.Duration `json:"gatewayMustHaveAddress"`
 
 	// GatewayMustHaveCondition represents the maximum amount of time for a
 	// Gateway to have the supplied Condition.
 	// Max value for conformant implementation: None
-	GatewayMustHaveCondition metav1.Duration `json:"gatewayMustHaveCondition"`
+	GatewayMustHaveCondition time.Duration `json:"gatewayMustHaveCondition"`
 
 	// GatewayStatusMustHaveListeners represents the maximum time for a Gateway to have listeners in status that match the expected listeners.
 	// Max value for conformant implementation: None
-	GatewayStatusMustHaveListeners metav1.Duration `json:"gatewayStatusMustHaveListeners"`
+	GatewayStatusMustHaveListeners time.Duration `json:"gatewayStatusMustHaveListeners"`
 
 	// GatewayListenersMustHaveConditions represents the maximum time for a Gateway to have all listeners with a specific condition.
 	// Max value for conformant implementation: None
-	GatewayListenersMustHaveConditions metav1.Duration `json:"gatewayListenersMustHaveConditions"`
+	GatewayListenersMustHaveConditions time.Duration `json:"gatewayListenersMustHaveConditions"`
 
 	// ListenerSetMustHaveCondition represents the maximum amount of time for a
 	// ListenerSet to have the supplied Condition.
 	// Max value for conformant implementation: None
-	ListenerSetMustHaveCondition metav1.Duration `json:"listenerSetMustHaveCondition"`
+	ListenerSetMustHaveCondition time.Duration `json:"listenerSetMustHaveCondition"`
 
 	// ListenerSetListenersMustHaveConditions represents the maximum time for a ListenerSet to have all listeners with a specific condition.
 	// Max value for conformant implementation: None
-	ListenerSetListenersMustHaveConditions metav1.Duration `json:"listenerSetListenersMustHaveConditions"`
+	ListenerSetListenersMustHaveConditions time.Duration `json:"listenerSetListenersMustHaveConditions"`
 
 	// GWCMustBeAccepted represents the maximum time for a GatewayClass to have an Accepted condition set to true.
 	// Max value for conformant implementation: None
-	GWCMustBeAccepted metav1.Duration `json:"gwcMustBeAccepted"`
+	GWCMustBeAccepted time.Duration `json:"gwcMustBeAccepted"`
 
 	// HTTPRouteMustNotHaveParents represents the maximum time for an HTTPRoute to have either no parents or a single parent that is not accepted.
 	// Max value for conformant implementation: None
-	HTTPRouteMustNotHaveParents metav1.Duration `json:"httpRouteMustNotHaveParents"`
+	HTTPRouteMustNotHaveParents time.Duration `json:"httpRouteMustNotHaveParents"`
 
 	// HTTPRouteMustHaveCondition represents the maximum time for an HTTPRoute to have the supplied Condition.
 	// Max value for conformant implementation: None
-	HTTPRouteMustHaveCondition metav1.Duration `json:"httpRouteMustHaveCondition"`
+	HTTPRouteMustHaveCondition time.Duration `json:"httpRouteMustHaveCondition"`
 
 	// TLSRouteMustHaveCondition represents the maximum time for a TLSRoute to have the supplied Condition.
 	// Max value for conformant implementation: None
-	TLSRouteMustHaveCondition metav1.Duration `json:"tlsRouteMustHaveCondition"`
+	TLSRouteMustHaveCondition time.Duration `json:"tlsRouteMustHaveCondition"`
 
 	// RouteMustHaveParents represents the maximum time for an xRoute to have parents in status that match the expected parents.
 	// Max value for conformant implementation: None
-	RouteMustHaveParents metav1.Duration `json:"routeMustHaveParents"`
+	RouteMustHaveParents time.Duration `json:"routeMustHaveParents"`
 
 	// ManifestFetchTimeout represents the maximum time for getting content from a https:// URL.
 	// Max value for conformant implementation: None
-	ManifestFetchTimeout metav1.Duration `json:"manifestFetchTimeout"`
+	ManifestFetchTimeout time.Duration `json:"manifestFetchTimeout"`
 
 	// MaxTimeToConsistency is the maximum time for requiredConsecutiveSuccesses (default 3) requests to succeed in a row before failing the test.
 	// Max value for conformant implementation: 30 seconds
-	MaxTimeToConsistency metav1.Duration `json:"maxTimeToConsistency"`
+	MaxTimeToConsistency time.Duration `json:"maxTimeToConsistency"`
 
 	// NamespacesMustBeReady represents the maximum time for the following to happen within
 	// specified namespace(s):
 	// * All Pods to be marked as "Ready"
 	// * All Gateways to be marked as "Accepted" and "Programmed"
 	// Max value for conformant implementation: None
-	NamespacesMustBeReady metav1.Duration `json:"namespacesMustBeReady"`
+	NamespacesMustBeReady time.Duration `json:"namespacesMustBeReady"`
 
 	// RequestTimeout represents the maximum time for making an HTTP Request with the roundtripper.
 	// Max value for conformant implementation: None
-	RequestTimeout metav1.Duration `json:"requestTimeout"`
+	RequestTimeout time.Duration `json:"requestTimeout"`
 
 	// LatestObservedGenerationSet represents the maximum time for an ObservedGeneration to bump.
 	// Max value for conformant implementation: None
-	LatestObservedGenerationSet metav1.Duration `json:"latestObservedGenerationSet"`
+	LatestObservedGenerationSet time.Duration `json:"latestObservedGenerationSet"`
 
 	// DefaultTestTimeout is the default amount of time to wait for a test to complete
-	DefaultTestTimeout metav1.Duration `json:"defaultTestTimeout"`
+	DefaultTestTimeout time.Duration `json:"defaultTestTimeout"`
 
 	// DefaultPollInterval is the default amount of time to poll for status checks.
-	DefaultPollInterval metav1.Duration `json:"defaultPollInterval"`
+	DefaultPollInterval time.Duration `json:"defaultPollInterval"`
 
 	// RequiredConsecutiveSuccesses is the number of requests that must succeed in a row
 	// to consider a response "consistent" before making additional assertions on the response body.
@@ -122,30 +123,70 @@ type TimeoutConfig struct {
 	RequiredConsecutiveSuccesses int `json:"requiredConsecutiveSuccesses"`
 }
 
+// UnmarshalJSON ensures time.Duration values are parsed correctly.
+// Use reflection to derive field mappings from json tags.
+func (tc *TimeoutConfig) UnmarshalJSON(data []byte) error {
+	var raw map[string]json.RawMessage
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+
+	v := reflect.ValueOf(tc).Elem()
+	t := v.Type()
+
+	for i := 0; i < t.NumField(); i++ {
+		field := t.Field(i)
+		jsonTag := strings.Split(field.Tag.Get("json"), ",")[0]
+		rawVal, ok := raw[jsonTag]
+		if !ok {
+			continue
+		}
+
+		switch field.Type {
+		case reflect.TypeFor[time.Duration]():
+			var s string
+			if err := json.Unmarshal(rawVal, &s); err != nil {
+				return fmt.Errorf("field %q: expected duration string: %w", jsonTag, err)
+			}
+			d, err := time.ParseDuration(s)
+			if err != nil {
+				return fmt.Errorf("field %q: %w", jsonTag, err)
+			}
+			v.Field(i).SetInt(int64(d))
+		default:
+			if err := json.Unmarshal(rawVal, v.Field(i).Addr().Interface()); err != nil {
+				return fmt.Errorf("field %q: %w", jsonTag, err)
+			}
+		}
+	}
+
+	return nil
+}
+
 // DefaultTimeoutConfig populates a TimeoutConfig with the default values.
 func DefaultTimeoutConfig() TimeoutConfig {
 	return TimeoutConfig{
-		CreateTimeout:                          metav1.Duration{Duration: 60 * time.Second},
-		DeleteTimeout:                          metav1.Duration{Duration: 10 * time.Second},
-		GetTimeout:                             metav1.Duration{Duration: 10 * time.Second},
-		GatewayMustHaveAddress:                 metav1.Duration{Duration: 180 * time.Second},
-		GatewayMustHaveCondition:               metav1.Duration{Duration: 180 * time.Second},
-		GatewayStatusMustHaveListeners:         metav1.Duration{Duration: 60 * time.Second},
-		GatewayListenersMustHaveConditions:     metav1.Duration{Duration: 60 * time.Second},
-		ListenerSetMustHaveCondition:           metav1.Duration{Duration: 180 * time.Second},
-		ListenerSetListenersMustHaveConditions: metav1.Duration{Duration: 60 * time.Second},
-		GWCMustBeAccepted:                      metav1.Duration{Duration: 180 * time.Second},
-		HTTPRouteMustNotHaveParents:            metav1.Duration{Duration: 60 * time.Second},
-		HTTPRouteMustHaveCondition:             metav1.Duration{Duration: 60 * time.Second},
-		TLSRouteMustHaveCondition:              metav1.Duration{Duration: 60 * time.Second},
-		RouteMustHaveParents:                   metav1.Duration{Duration: 60 * time.Second},
-		ManifestFetchTimeout:                   metav1.Duration{Duration: 10 * time.Second},
-		MaxTimeToConsistency:                   metav1.Duration{Duration: 30 * time.Second},
-		NamespacesMustBeReady:                  metav1.Duration{Duration: 300 * time.Second},
-		RequestTimeout:                         metav1.Duration{Duration: 10 * time.Second},
-		LatestObservedGenerationSet:            metav1.Duration{Duration: 60 * time.Second},
-		DefaultTestTimeout:                     metav1.Duration{Duration: 60 * time.Second},
-		DefaultPollInterval:                    metav1.Duration{Duration: 100 * time.Millisecond},
+		CreateTimeout:                          60 * time.Second,
+		DeleteTimeout:                          10 * time.Second,
+		GetTimeout:                             10 * time.Second,
+		GatewayMustHaveAddress:                 180 * time.Second,
+		GatewayMustHaveCondition:               180 * time.Second,
+		GatewayStatusMustHaveListeners:         60 * time.Second,
+		GatewayListenersMustHaveConditions:     60 * time.Second,
+		ListenerSetMustHaveCondition:           180 * time.Second,
+		ListenerSetListenersMustHaveConditions: 60 * time.Second,
+		GWCMustBeAccepted:                      180 * time.Second,
+		HTTPRouteMustNotHaveParents:            60 * time.Second,
+		HTTPRouteMustHaveCondition:             60 * time.Second,
+		TLSRouteMustHaveCondition:              60 * time.Second,
+		RouteMustHaveParents:                   60 * time.Second,
+		ManifestFetchTimeout:                   10 * time.Second,
+		MaxTimeToConsistency:                   30 * time.Second,
+		NamespacesMustBeReady:                  300 * time.Second,
+		RequestTimeout:                         10 * time.Second,
+		LatestObservedGenerationSet:            60 * time.Second,
+		DefaultTestTimeout:                     60 * time.Second,
+		DefaultPollInterval:                    time.Millisecond * 100,
 		RequiredConsecutiveSuccesses:           3,
 	}
 }
@@ -167,7 +208,7 @@ func ParseTimeoutOverrides(timeoutConfig *TimeoutConfig, overrides string) {
 		if err != nil {
 			continue
 		}
-		overrideDuration := metav1.Duration{Duration: time.Duration(valInt) * time.Second}
+		overrideDuration := time.Duration(valInt) * time.Second
 
 		switch param {
 		case "CreateTimeout":
@@ -222,61 +263,61 @@ func ParseTimeoutOverrides(timeoutConfig *TimeoutConfig, overrides string) {
 
 func SetupTimeoutConfig(timeoutConfig *TimeoutConfig) {
 	defaultTimeoutConfig := DefaultTimeoutConfig()
-	if timeoutConfig.CreateTimeout.Duration == 0 {
+	if timeoutConfig.CreateTimeout == 0 {
 		timeoutConfig.CreateTimeout = defaultTimeoutConfig.CreateTimeout
 	}
-	if timeoutConfig.DeleteTimeout.Duration == 0 {
+	if timeoutConfig.DeleteTimeout == 0 {
 		timeoutConfig.DeleteTimeout = defaultTimeoutConfig.DeleteTimeout
 	}
-	if timeoutConfig.GetTimeout.Duration == 0 {
+	if timeoutConfig.GetTimeout == 0 {
 		timeoutConfig.GetTimeout = defaultTimeoutConfig.GetTimeout
 	}
-	if timeoutConfig.GatewayMustHaveAddress.Duration == 0 {
+	if timeoutConfig.GatewayMustHaveAddress == 0 {
 		timeoutConfig.GatewayMustHaveAddress = defaultTimeoutConfig.GatewayMustHaveAddress
 	}
-	if timeoutConfig.GatewayMustHaveCondition.Duration == 0 {
+	if timeoutConfig.GatewayMustHaveCondition == 0 {
 		timeoutConfig.GatewayMustHaveCondition = defaultTimeoutConfig.GatewayMustHaveCondition
 	}
-	if timeoutConfig.GatewayStatusMustHaveListeners.Duration == 0 {
+	if timeoutConfig.GatewayStatusMustHaveListeners == 0 {
 		timeoutConfig.GatewayStatusMustHaveListeners = defaultTimeoutConfig.GatewayStatusMustHaveListeners
 	}
-	if timeoutConfig.GatewayListenersMustHaveConditions.Duration == 0 {
+	if timeoutConfig.GatewayListenersMustHaveConditions == 0 {
 		timeoutConfig.GatewayListenersMustHaveConditions = defaultTimeoutConfig.GatewayListenersMustHaveConditions
 	}
-	if timeoutConfig.GWCMustBeAccepted.Duration == 0 {
+	if timeoutConfig.GWCMustBeAccepted == 0 {
 		timeoutConfig.GWCMustBeAccepted = defaultTimeoutConfig.GWCMustBeAccepted
 	}
-	if timeoutConfig.HTTPRouteMustNotHaveParents.Duration == 0 {
+	if timeoutConfig.HTTPRouteMustNotHaveParents == 0 {
 		timeoutConfig.HTTPRouteMustNotHaveParents = defaultTimeoutConfig.HTTPRouteMustNotHaveParents
 	}
-	if timeoutConfig.HTTPRouteMustHaveCondition.Duration == 0 {
+	if timeoutConfig.HTTPRouteMustHaveCondition == 0 {
 		timeoutConfig.HTTPRouteMustHaveCondition = defaultTimeoutConfig.HTTPRouteMustHaveCondition
 	}
-	if timeoutConfig.RouteMustHaveParents.Duration == 0 {
+	if timeoutConfig.RouteMustHaveParents == 0 {
 		timeoutConfig.RouteMustHaveParents = defaultTimeoutConfig.RouteMustHaveParents
 	}
-	if timeoutConfig.ManifestFetchTimeout.Duration == 0 {
+	if timeoutConfig.ManifestFetchTimeout == 0 {
 		timeoutConfig.ManifestFetchTimeout = defaultTimeoutConfig.ManifestFetchTimeout
 	}
-	if timeoutConfig.MaxTimeToConsistency.Duration == 0 {
+	if timeoutConfig.MaxTimeToConsistency == 0 {
 		timeoutConfig.MaxTimeToConsistency = defaultTimeoutConfig.MaxTimeToConsistency
 	}
-	if timeoutConfig.NamespacesMustBeReady.Duration == 0 {
+	if timeoutConfig.NamespacesMustBeReady == 0 {
 		timeoutConfig.NamespacesMustBeReady = defaultTimeoutConfig.NamespacesMustBeReady
 	}
-	if timeoutConfig.RequestTimeout.Duration == 0 {
+	if timeoutConfig.RequestTimeout == 0 {
 		timeoutConfig.RequestTimeout = defaultTimeoutConfig.RequestTimeout
 	}
-	if timeoutConfig.LatestObservedGenerationSet.Duration == 0 {
+	if timeoutConfig.LatestObservedGenerationSet == 0 {
 		timeoutConfig.LatestObservedGenerationSet = defaultTimeoutConfig.LatestObservedGenerationSet
 	}
-	if timeoutConfig.TLSRouteMustHaveCondition.Duration == 0 {
+	if timeoutConfig.TLSRouteMustHaveCondition == 0 {
 		timeoutConfig.TLSRouteMustHaveCondition = defaultTimeoutConfig.TLSRouteMustHaveCondition
 	}
-	if timeoutConfig.DefaultTestTimeout.Duration == 0 {
+	if timeoutConfig.DefaultTestTimeout == 0 {
 		timeoutConfig.DefaultTestTimeout = defaultTimeoutConfig.DefaultTestTimeout
 	}
-	if timeoutConfig.DefaultPollInterval.Duration == 0 {
+	if timeoutConfig.DefaultPollInterval == 0 {
 		timeoutConfig.DefaultPollInterval = defaultTimeoutConfig.DefaultPollInterval
 	}
 }

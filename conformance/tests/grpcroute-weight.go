@@ -75,7 +75,7 @@ var GRPCRouteWeight = confsuite.ConformanceTest{
 				}
 				client := &grpc.DefaultClient{}
 				defer client.Close()
-				resp, err := client.SendRPC(t, gwAddr, uniqueExpected, suite.TimeoutConfig.MaxTimeToConsistency.Duration)
+				resp, err := client.SendRPC(t, gwAddr, uniqueExpected, suite.TimeoutConfig.MaxTimeToConsistency)
 				if err != nil {
 					return "", fmt.Errorf("failed to send gRPC request: %w", err)
 				}

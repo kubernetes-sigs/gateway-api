@@ -128,7 +128,7 @@ func MakeRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtripp
 
 	req := MakeRequest(t, &expected, gwAddr, "HTTP", "http")
 
-	WaitForConsistentResponse(t, r, req, expected, timeoutConfig.RequiredConsecutiveSuccesses, timeoutConfig.MaxTimeToConsistency.Duration)
+	WaitForConsistentResponse(t, r, req, expected, timeoutConfig.RequiredConsecutiveSuccesses, timeoutConfig.MaxTimeToConsistency)
 }
 
 // MakeRequestAndExpectFailure makes a request with the given parameters.
@@ -139,7 +139,7 @@ func MakeRequestAndExpectFailure(t *testing.T, r roundtripper.RoundTripper, time
 
 	req := MakeRequest(t, &expected, gwAddr, "HTTP", "http")
 
-	WaitForConsistentFailureResponse(t, r, req, 5, timeoutConfig.MaxTimeToConsistency.Duration)
+	WaitForConsistentFailureResponse(t, r, req, 5, timeoutConfig.MaxTimeToConsistency)
 }
 
 func MakeRequest(t *testing.T, expected *ExpectedResponse, gwAddr, protocol, scheme string) roundtripper.Request {

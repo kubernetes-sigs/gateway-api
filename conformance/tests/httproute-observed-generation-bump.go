@@ -48,7 +48,7 @@ var HTTPRouteObservedGenerationBump = confsuite.ConformanceTest{
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: confsuite.InfrastructureNamespace}
 
 		t.Run("observedGeneration should increment", func(t *testing.T) {
-			ctx, cancel := context.WithTimeout(context.Background(), s.TimeoutConfig.LatestObservedGenerationSet.Duration)
+			ctx, cancel := context.WithTimeout(context.Background(), s.TimeoutConfig.LatestObservedGenerationSet)
 			defer cancel()
 
 			namespaces := []string{confsuite.InfrastructureNamespace}

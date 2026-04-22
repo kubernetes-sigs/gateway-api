@@ -54,7 +54,7 @@ var GatewayInfrastructure = suite.ConformanceTest{
 			Name:      "gateway-with-infrastructure-metadata",
 			Namespace: "gateway-conformance-infra",
 		}
-		ctx, cancel := context.WithTimeout(context.Background(), s.TimeoutConfig.DefaultTestTimeout.Duration)
+		ctx, cancel := context.WithTimeout(context.Background(), s.TimeoutConfig.DefaultTestTimeout)
 		defer cancel()
 
 		t.Logf("waiting for namespace %s and Gateway %s to be ready for testing", gwNN.Namespace, gwNN.Name)

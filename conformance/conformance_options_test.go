@@ -50,13 +50,13 @@ func TestConformanceOptions(t *testing.T) {
 	assert.Equal(t, "test-output/override.yaml", options.ReportOutputPath)
 
 	// Overwritten in yaml file.
-	assert.Equal(t, 30*time.Second, options.TimeoutConfig.DeleteTimeout.Duration)
+	assert.Equal(t, 30*time.Second, options.TimeoutConfig.DeleteTimeout)
 	// Use default value.
-	assert.Equal(t, 60*time.Second, options.TimeoutConfig.CreateTimeout.Duration)
-	assert.Equal(t, 60*time.Second, options.TimeoutConfig.RouteMustHaveParents.Duration)
+	assert.Equal(t, 60*time.Second, options.TimeoutConfig.CreateTimeout)
+	assert.Equal(t, 60*time.Second, options.TimeoutConfig.RouteMustHaveParents)
 	// Specified in yaml file, but overwritten by flag.
-	assert.Equal(t, 40*time.Second, options.TimeoutConfig.GetTimeout.Duration)
-	assert.Equal(t, 45*time.Second, options.TimeoutConfig.DefaultTestTimeout.Duration)
+	assert.Equal(t, 40*time.Second, options.TimeoutConfig.GetTimeout)
+	assert.Equal(t, 45*time.Second, options.TimeoutConfig.DefaultTestTimeout)
 
 	// Verify SupportedFeatures unmarshalled correctly.
 	expectedSupported := sets.New[features.FeatureName]("HTTPRouteHostRewrite", "HTTPRouteMethodMatching")

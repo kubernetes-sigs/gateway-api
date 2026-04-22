@@ -52,7 +52,7 @@ var BackendTLSPolicyObservedGenerationBump = confsuite.ConformanceTest{
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: ns}
 
 		t.Run("observedGeneration should increment", func(t *testing.T) {
-			ctx, cancel := context.WithTimeout(context.Background(), suite.TimeoutConfig.LatestObservedGenerationSet.Duration)
+			ctx, cancel := context.WithTimeout(context.Background(), suite.TimeoutConfig.LatestObservedGenerationSet)
 			defer cancel()
 
 			namespaces := []string{confsuite.InfrastructureNamespace}

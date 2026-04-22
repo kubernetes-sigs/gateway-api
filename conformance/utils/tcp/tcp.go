@@ -71,7 +71,7 @@ func MakeTCPRequestAndExpectEventuallyValidResponse(t *testing.T, timeoutConfig 
 		}
 	}
 	dialer := makeClient(tlsConfig)
-	WaitForValidTCPResponse(t, dialer, gwAddr, expected, timeoutConfig.MaxTimeToConsistency.Duration)
+	WaitForValidTCPResponse(t, dialer, gwAddr, expected, timeoutConfig.MaxTimeToConsistency)
 }
 
 // WaitForConsistentTCPResponse - repeats the provided request until it completes with a response having
