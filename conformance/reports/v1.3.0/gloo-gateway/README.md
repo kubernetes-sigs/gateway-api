@@ -4,7 +4,7 @@
 
 | API channel  | Implementation version                                                        | Mode    | Report                                                    |
 |--------------|-------------------------------------------------------------------------------|---------|-----------------------------------------------------------|
-| experimental | https://github.com/solo-io/gloo/releases/tag/v1.20.12 | default | [Link](./v1.20.12-report.yaml) |
+| experimental | https://github.com/solo-io/gloo/releases/tag/v1.20.13 | default | [Link](./v1.20.13-report.yaml) |
 
 ## Reproduce
 
@@ -24,12 +24,12 @@ run the conformance tests.
    ```sh
    git clone https://github.com/solo-io/gloo.git
    cd gloo
-   export VERSION="v1.20.12"
+   export VERSION="v1.20.13"
    git checkout $VERSION
 
    ```
 
-   Alternatively, download and extract the [v1.20.12 release source](https://github.com/solo-io/gloo/releases/tag/v1.20.12).
+   Alternatively, download and extract the [v1.20.13 release source](https://github.com/solo-io/gloo/releases/tag/v1.20.13).
 
 1. Create the Kind cluster with MetalLB:
 
