@@ -1,0 +1,26 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: gateway-api-crd-install-all
+  namespace: default
+  labels:
+    app: gateway-api-crd-installer
+spec:
+  ttlSecondsAfterFinished: 600
+  template:
+    metadata:
+      labels:
+        app: gateway-api-crd-installer
+    spec:
+      serviceAccountName: gateway-api-crd-installer
+      restartPolicy: OnFailure
+      containers:
+      - name: installer
+        image: gateway-api-crd-installer:local
+        imagePullPolicy: IfNotPresent
+        command: ["/bin/sh", "/scripts/install.sh", "-a"]
+        env:
+        - name: GATEWAY_API_VERSION
+          value: "v1.2.0"
+        - name: RELEASE_CHANNEL
+          value: "standard"
