@@ -600,18 +600,6 @@ func (suite *ConformanceTestSuite) Report() (*confv1.ConformanceReport, error) {
 	}, nil
 }
 
-// ParseImplementation parses implementation-specific flag arguments and
-// creates a *confv1a1.Implementation.
-func ParseImplementation(org, project, url, version, contact string) confv1.Implementation {
-	return confv1.Implementation{
-		Organization: org,
-		Project:      project,
-		URL:          url,
-		Version:      version,
-		Contact:      strings.Split(contact, ","),
-	}
-}
-
 // ParseConformanceProfiles parses flag arguments and converts the string to
 // sets.Set[ConformanceProfileName].
 func ParseConformanceProfiles(p string) sets.Set[ConformanceProfileName] {
