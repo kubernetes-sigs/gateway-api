@@ -47,20 +47,18 @@ type flagSpec struct {
 // registry maps flag names to their override functions.
 var registry = map[string]*flagSpec{}
 
-func registerStringFlag(name, def, usage string, apply func(*suite.ConfigurableOptions, string)) *string {
+func registerStringFlag(name, def, usage string, apply func(*suite.ConfigurableOptions, string)) {
 	p := flag.String(name, def, usage)
 	registry[name] = &flagSpec{
 		apply: func(o *suite.ConfigurableOptions) { apply(o, *p) },
 	}
-	return p
 }
 
-func registerBoolFlag(name string, def bool, usage string, apply func(*suite.ConfigurableOptions, bool)) *bool {
+func registerBoolFlag(name string, def bool, usage string, apply func(*suite.ConfigurableOptions, bool)) {
 	p := flag.Bool(name, def, usage)
 	registry[name] = &flagSpec{
 		apply: func(o *suite.ConfigurableOptions) { apply(o, *p) },
 	}
-	return p
 }
 
 var ConformanceOptionsFile = flag.String("conformance-options-file", "", "Path to a YAML file containing the conformance options. Command line flags will override the values in the file.")

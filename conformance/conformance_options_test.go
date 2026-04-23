@@ -24,6 +24,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/utils/ptr"
+
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/gateway-api/conformance/utils/flags"
 	"sigs.k8s.io/gateway-api/pkg/features"
@@ -45,7 +46,7 @@ func TestConformanceOptions(t *testing.T) {
 	assert.Equal(t, "istio", options.Implementation.Project)
 	// Use default value.
 	assert.Equal(t, "gateway-conformance", options.GatewayClassName)
-	assert.Equal(t, "", options.RunTest)
+	assert.Empty(t, options.RunTest)
 	// Specified in yaml file, but overwritten by flag.
 	assert.Equal(t, "test-output/override.yaml", options.ReportOutputPath)
 
