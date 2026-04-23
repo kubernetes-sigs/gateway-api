@@ -137,9 +137,9 @@ func logOptions(t *testing.T, opts suite.ConformanceOptions) {
 	t.Logf("  Cleanup Test Resources: %t", opts.CleanupTestResources)
 	t.Logf("  Debug: %t", opts.Debug)
 	t.Logf("  Enable All Features: %t", opts.EnableAllSupportedFeatures)
-	t.Logf("  Supported Features: %v", opts.SupportedFeatures.UnsortedList())
-	t.Logf("  ExemptFeatures: %v", opts.ExemptFeatures.UnsortedList())
-	t.Logf("  ConformanceProfiles: %v", opts.ConformanceProfiles.UnsortedList())
+	t.Logf("  Supported Features: %v", opts.SupportedFeatures)
+	t.Logf("  ExemptFeatures: %v", opts.ExemptFeatures)
+	t.Logf("  ConformanceProfiles: %v", opts.ConformanceProfiles)
 }
 
 func writeReport(logf func(string, ...any), report confv1.ConformanceReport, output string) error {

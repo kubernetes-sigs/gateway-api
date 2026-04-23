@@ -12,10 +12,10 @@ implementation:
   contact:
     - "@test"
 supportedFeatures:
-  HTTPRouteHostRewrite: {}
-  HTTPRouteMethodMatching: {}
+  - HTTPRouteHostRewrite
+  - HTTPRouteMethodMatching
 exemptFeatures:
-  GatewayPort8080: {}
+  - GatewayPort8080
 usableAddresses:
   - type: IPAddress
     value: "192.168.1.1"

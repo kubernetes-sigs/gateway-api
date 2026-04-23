@@ -428,9 +428,9 @@ func TestInferGWCSupportedFeatures(t *testing.T) {
 	testCases := []struct {
 		name                     string
 		allowAllFeatures         bool
-		supportedFeatures        FeaturesSet
-		exemptFeatures           FeaturesSet
-		ConformanceProfile       sets.Set[ConformanceProfileName]
+		supportedFeatures        []features.FeatureName
+		exemptFeatures           []features.FeatureName
+		ConformanceProfile       []ConformanceProfileName
 		expectedFeatures         FeaturesSet
 		expectedExtendedFeatures map[ConformanceProfileName]sets.Set[features.FeatureName]
 		expectedSource           supportedFeaturesSource
@@ -442,14 +442,14 @@ func TestInferGWCSupportedFeatures(t *testing.T) {
 		},
 		{
 			name:              "no features",
-			supportedFeatures: sets.New[features.FeatureName]("Gateway"),
+			supportedFeatures: []features.FeatureName{"Gateway"},
 			expectedFeatures:  sets.New[features.FeatureName]("Gateway"),
 			expectedSource:    supportedFeaturesSourceManual,
 		},
 		{
 			name:              "remove exempt features",
-			supportedFeatures: sets.New[features.FeatureName]("Gateway", "HTTPRoute"),
-			exemptFeatures:    sets.New[features.FeatureName]("HTTPRoute"),
+			supportedFeatures: []features.FeatureName{"Gateway", "HTTPRoute"},
+			exemptFeatures:    []features.FeatureName{"HTTPRoute"},
 			expectedFeatures:  sets.New[features.FeatureName]("Gateway"),
 			expectedSource:    supportedFeaturesSourceManual,
 		},
@@ -461,8 +461,8 @@ func TestInferGWCSupportedFeatures(t *testing.T) {
 		},
 		{
 			name:               "supports conformance profile core with specified extended features",
-			ConformanceProfile: sets.New(GatewayHTTPConformanceProfileName),
-			supportedFeatures:  sets.New[features.FeatureName]("GatewayPort8080"),
+			ConformanceProfile: []ConformanceProfileName{GatewayHTTPConformanceProfileName},
+			supportedFeatures:  []features.FeatureName{"GatewayPort8080"},
 			expectedFeatures:   sets.New[features.FeatureName]("Gateway", "HTTPRoute", "GatewayPort8080", "ReferenceGrant"),
 			expectedSource:     supportedFeaturesSourceManual,
 			expectedExtendedFeatures: map[ConformanceProfileName]sets.Set[features.FeatureName]{
@@ -473,7 +473,7 @@ func TestInferGWCSupportedFeatures(t *testing.T) {
 		},
 		{
 			name:               "supports conformance profile core with inferred extended features",
-			ConformanceProfile: sets.New(GatewayHTTPConformanceProfileName),
+			ConformanceProfile: []ConformanceProfileName{GatewayHTTPConformanceProfileName},
 			expectedFeatures:   namesToFeatureSet(gwcStatusFeatureNames),
 			expectedSource:     supportedFeaturesSourceInferred,
 			expectedExtendedFeatures: map[ConformanceProfileName]sets.Set[features.FeatureName]{
@@ -490,7 +490,7 @@ func TestInferGWCSupportedFeatures(t *testing.T) {
 		{
 			name:             "all features combined with exempt features",
 			allowAllFeatures: true,
-			exemptFeatures:   sets.New[features.FeatureName]("ReferenceGrant", "HTTPRoute"),
+			exemptFeatures:   []features.FeatureName{"ReferenceGrant", "HTTPRoute"},
 			expectedSource:   supportedFeaturesSourceManual,
 			expectedFeatures: features.SetsToNamesSet(features.AllFeatures).Difference(sets.New[features.FeatureName]("ReferenceGrant", "HTTPRoute")),
 		},
@@ -576,9 +576,9 @@ func TestXMeshInferSupportedFeatures(t *testing.T) {
 	testCases := []struct {
 		name               string
 		allowAllFeatures   bool
-		supportedFeatures  FeaturesSet
-		exemptFeatures     FeaturesSet
-		ConformanceProfile sets.Set[ConformanceProfileName]
+		supportedFeatures  []features.FeatureName
+		exemptFeatures     []features.FeatureName
+		ConformanceProfile []ConformanceProfileName
 		expectedFeatures   FeaturesSet
 		expectedSource     supportedFeaturesSource
 	}{
@@ -589,20 +589,20 @@ func TestXMeshInferSupportedFeatures(t *testing.T) {
 		},
 		{
 			name:              "no features",
-			supportedFeatures: sets.New[features.FeatureName]("Mesh"),
+			supportedFeatures: []features.FeatureName{"Mesh"},
 			expectedFeatures:  sets.New[features.FeatureName]("Mesh"),
 			expectedSource:    supportedFeaturesSourceManual,
 		},
 		{
 			name:              "remove exempt features",
-			supportedFeatures: sets.New[features.FeatureName]("MeshTLS", "MeshAccessControl"),
-			exemptFeatures:    sets.New[features.FeatureName]("MeshAccessControl"),
+			supportedFeatures: []features.FeatureName{"MeshTLS", "MeshAccessControl"},
+			exemptFeatures:    []features.FeatureName{"MeshAccessControl"},
 			expectedFeatures:  sets.New[features.FeatureName]("MeshTLS"),
 			expectedSource:    supportedFeaturesSourceManual,
 		},
 		{
 			name:               "supports conformance profile - core",
-			ConformanceProfile: sets.New(MeshHTTPConformanceProfileName),
+			ConformanceProfile: []ConformanceProfileName{MeshHTTPConformanceProfileName},
 			expectedFeatures:   namesToFeatureSet(meshStatusFeatureNames),
 			expectedSource:     supportedFeaturesSourceInferred,
 		},

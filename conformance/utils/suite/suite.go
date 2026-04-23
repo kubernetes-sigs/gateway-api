@@ -145,23 +145,23 @@ type ConfigurableOptions struct {
 	CleanupBaseResources bool `json:"cleanupBaseResources"`
 	// CleanupTestResources indicates whether or not test-specific manifests
 	// should be cleaned up after each test.
-	CleanupTestResources       bool                 `json:"cleanupTestResources"`
-	SupportedFeatures          FeaturesSet          `json:"supportedFeatures"`
-	ExemptFeatures             FeaturesSet          `json:"exemptFeatures"`
-	EnableAllSupportedFeatures bool                 `json:"enableAllSupportedFeatures"`
-	TimeoutConfig              config.TimeoutConfig `json:"timeoutConfig"`
+	CleanupTestResources       bool                   `json:"cleanupTestResources"`
+	SupportedFeatures          []features.FeatureName `json:"supportedFeatures"`
+	ExemptFeatures             []features.FeatureName `json:"exemptFeatures"`
+	EnableAllSupportedFeatures bool                   `json:"enableAllSupportedFeatures"`
+	TimeoutConfig              config.TimeoutConfig   `json:"timeoutConfig"`
 	// SkipTests contains all the tests not to be run and can be used to opt out
 	// of specific tests
 	SkipTests []string `json:"skipTests"`
 	// SkipProvisionalTests indicates whether or not to skip provisional tests.
 	SkipProvisionalTests bool `json:"skipProvisionalTests"`
 	// RunTest is a single test to run, mostly for development/debugging convenience.
-	RunTest             string                           `json:"runTest"`
-	Mode                string                           `json:"mode"`
-	AllowCRDsMismatch   bool                             `json:"allowCrdsMismatch"`
-	Implementation      confv1.Implementation            `json:"implementation"`
-	ConformanceProfiles sets.Set[ConformanceProfileName] `json:"conformanceProfiles"`
-	FailFast            bool                             `json:"failFast"`
+	RunTest             string                   `json:"runTest"`
+	Mode                string                   `json:"mode"`
+	AllowCRDsMismatch   bool                     `json:"allowCrdsMismatch"`
+	Implementation      confv1.Implementation    `json:"implementation"`
+	ConformanceProfiles []ConformanceProfileName `json:"conformanceProfiles"`
+	FailFast            bool                     `json:"failFast"`
 
 	// UsableNetworkAddresses is an optional pool of usable addresses for
 	// Gateways for tests which need to test manual address assignments.
@@ -212,10 +212,10 @@ const (
 
 // NewConformanceTestSuite is a helper to use for creating a new ConformanceTestSuite.
 func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite, error) {
-	supportedFeatures := options.SupportedFeatures.Difference(options.ExemptFeatures)
+	supportedFeatures := sets.New(options.SupportedFeatures...).Difference(sets.New(options.ExemptFeatures...))
 	source := supportedFeaturesSourceManual
 	if options.EnableAllSupportedFeatures {
-		supportedFeatures = features.SetsToNamesSet(features.AllFeatures).Difference(options.ExemptFeatures)
+		supportedFeatures = features.SetsToNamesSet(features.AllFeatures).Difference(sets.New(options.ExemptFeatures...))
 	} else if shouldInferSupportedFeatures(&options) {
 		var err error
 		if options.GatewayClassName != "" {
@@ -245,7 +245,7 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 	extendedSupportedFeatures := make(map[ConformanceProfileName]FeaturesSet, 0)
 	extendedUnsupportedFeatures := make(map[ConformanceProfileName]FeaturesSet, 0)
 
-	for _, conformanceProfileName := range options.ConformanceProfiles.UnsortedList() {
+	for _, conformanceProfileName := range options.ConformanceProfiles {
 		conformanceProfile, err := getConformanceProfileForName(conformanceProfileName)
 		if err != nil {
 			return nil, fmt.Errorf("failed to retrieve conformance profile: %w", err)
@@ -313,7 +313,7 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 		results:                     make(map[string]testResult),
 		extendedUnsupportedFeatures: extendedUnsupportedFeatures,
 		extendedSupportedFeatures:   extendedSupportedFeatures,
-		conformanceProfiles:         options.ConformanceProfiles,
+		conformanceProfiles:         sets.New(options.ConformanceProfiles...),
 		implementation:              options.Implementation,
 		mode:                        options.Mode,
 		apiVersion:                  apiVersion,
@@ -602,14 +602,13 @@ func (suite *ConformanceTestSuite) Report() (*confv1.ConformanceReport, error) {
 
 // ParseConformanceProfiles parses flag arguments and converts the string to
 // sets.Set[ConformanceProfileName].
-func ParseConformanceProfiles(p string) sets.Set[ConformanceProfileName] {
-	res := sets.Set[ConformanceProfileName]{}
+func ParseConformanceProfiles(p string) []ConformanceProfileName {
 	if p == "" {
-		return res
+		return nil
 	}
-
+	var res []ConformanceProfileName
 	for _, value := range strings.Split(p, ",") {
-		res.Insert(ConformanceProfileName(value))
+		res = append(res, ConformanceProfileName(value))
 	}
 	return res
 }
@@ -675,8 +674,8 @@ func shouldInferSupportedFeatures(opts *ConformanceOptions) bool {
 		return false
 	}
 	return !opts.EnableAllSupportedFeatures &&
-		opts.SupportedFeatures.Len() == 0 &&
-		opts.ExemptFeatures.Len() == 0 &&
+		len(opts.SupportedFeatures) == 0 &&
+		len(opts.ExemptFeatures) == 0 &&
 		opts.RunTest == ""
 }
 

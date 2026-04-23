@@ -22,7 +22,6 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/utils/ptr"
 
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
@@ -60,12 +59,10 @@ func TestConformanceOptions(t *testing.T) {
 	assert.Equal(t, 45*time.Second, options.TimeoutConfig.DefaultTestTimeout)
 
 	// Verify SupportedFeatures unmarshalled correctly.
-	expectedSupported := sets.New[features.FeatureName]("HTTPRouteHostRewrite", "HTTPRouteMethodMatching")
-	assert.True(t, options.SupportedFeatures.Equal(expectedSupported), "SupportedFeatures mismatch: got %v", options.SupportedFeatures.UnsortedList())
+	assert.ElementsMatch(t, []features.FeatureName{"HTTPRouteHostRewrite", "HTTPRouteMethodMatching"}, options.SupportedFeatures)
 
 	// Verify ExemptFeatures unmarshalled correctly.
-	expectedExempt := sets.New[features.FeatureName]("GatewayPort8080")
-	assert.True(t, options.ExemptFeatures.Equal(expectedExempt), "ExemptFeatures mismatch: got %v", options.ExemptFeatures.UnsortedList())
+	assert.ElementsMatch(t, []features.FeatureName{"GatewayPort8080"}, options.ExemptFeatures)
 
 	// Verify UsableNetworkAddresses unmarshalled correctly.
 	expectedUsable := []v1.GatewaySpecAddress{
