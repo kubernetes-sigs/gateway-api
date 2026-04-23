@@ -4,7 +4,7 @@
     This feature is part of extended support. For more information on support levels, refer to our [conformance guide](../concepts/conformance.md).
 
 The [HTTPRoute resource](../api-types/httproute.md) can be used to configure
-timeouts for HTTP requests. This is useful for preventing long-running requests
+[timeouts](../../reference/spec/#httproutetimeouts) for HTTP requests. This is useful for preventing long-running requests
 from consuming resources and for providing a better user experience.
 
 The `timeouts` field in an `HTTPRouteRule` can be used to specify a request
