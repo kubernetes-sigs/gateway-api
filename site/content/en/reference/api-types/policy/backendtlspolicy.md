@@ -3,11 +3,12 @@ title: "BackendTLSPolicy"
 weight: 1
 ---
 
-{{< details title="Standard Channel since v1.4.0" >}}
+{{< details title="Standard Channel since v1.4.0" color="success" >}}
 The `BackendTLSPolicy` resource is GA and has been part of the Standard
 Channel since `v1.4.0`. For more information on release channels, refer
 to our [versioning guide](/docs/concepts/versioning/).
 {{< /details >}}
+
 [BackendTLSPolicy][backendtlspolicy] is a Gateway API type for specifying the TLS configuration
 of the connection from the Gateway to a backend pod(s) via the Service API object.
 
@@ -133,9 +134,10 @@ Also note:
 
 #### Subject Alternative Names
 
-{{< details title="Experimental Channel since v1.2.0" >}}
+{{< details title="Experimental Channel since v1.2.0" color="purple" >}}
 This field was added to BackendTLSPolicy in `v1.2.0`
 {{< /details >}}
+
 The subjectAltNames field enables basic mutual TLS configuration between Gateways and backends, as well as the optional use of SPIFFE. When subjectAltNames is specified, the certificate served by the backend must have at least one Subject Alternative Name matching one of the specified values. This is particularly useful for SPIFFE implementations where URI-based SANs may not be valid SNIs.  
 Subject Alternative Names may contain one of either a Hostname or URI field, and must contain a Type specifying whether Hostname or URI is chosen.  
 
@@ -149,9 +151,10 @@ Subject Alternative Names may contain one of either a Hostname or URI field, and
 
 #### TLS Options
 
-{{< details title="Experimental Channel since v1.2.0" >}}
+{{< details title="Experimental Channel since v1.2.0" color="purple" >}}
 This field was added to BackendTLSPolicy in `v1.2.0`
 {{< /details >}}
+
 The options field allows specification of implementation-specific TLS configurations. This can include:  
 
 - Vendor-specific mutual TLS automation configuration  

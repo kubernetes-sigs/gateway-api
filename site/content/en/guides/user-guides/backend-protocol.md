@@ -3,10 +3,11 @@ title: "Backend Protocol"
 weight: 16
 ---
 
-{{< details title="Extended Support Features: HTTPRouteBackendProtocolH2C, HTTPRouteBackendProtocolWebSocket" >}}
+{{< details title="Extended Support Features: HTTPRouteBackendProtocolH2C, HTTPRouteBackendProtocolWebSocket" open="true" >}}
 These features are part of extended support. For more information on support levels, refer to our [conformance guide](/docs/concepts/conformance/).
 
 {{< /details >}}
+
 {{< details title="Standard Channel since v1.2.0" >}}
 
 This concept has been part of the Standard Channel since `v1.2.0`.
@@ -14,6 +15,7 @@ For more information on release channels, refer to our
 [versioning guide](/docs/concepts/versioning/).
 
 {{< /details >}}
+
 Not all implementations of Gateway API support automatic protocol selection. In some cases protocols are disabled without an explicit opt-in.
 
 When a Route's backend references a Kubernetes Service, application developers can specify the protocol using `ServicePort` [`appProtocol`][appProtocol] field.

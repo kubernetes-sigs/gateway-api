@@ -3,11 +3,12 @@ title: "TLSRoute"
 weight: 9
 ---
 
-{{< details title="Standard Channel since v1.5.0" >}}
+{{< details title="Standard Channel since v1.5.0" color="success" >}}
 The `TLSRoute` resource is GA and has been part of the Standard Channel since
 `v1.5.0`. For more information on release channels, refer to our [versioning
 guide](/docs/concepts/versioning/).
 {{< /details >}}
+
 [TLSRoute][tlsroute] is a Gateway API type for specifying routing behavior
 of TLS requests from a client to an API object, i.e. Service. It allows to
 route traffic to specific backend based on the [Server Name Indication (SNI)](https://datatracker.ietf.org/doc/html/rfc6066#section-3)

@@ -3,7 +3,7 @@
 * Issue: [#1748](https://github.com/kubernetes-sigs/gateway-api/issues/1748)
 * Status: Experimental
 
-{{< details title="Prolonged Experimental Phase" >}}
+{{% details title="Prolonged Experimental Phase" open="true" %}}
 This GEP will be in the "Experimental" channel for a prolonged period of
 time. This explores the interaction of Gateway API with the Multi-Cluster
 Services API. Until the MCS API is also GA, it will be impossible for this
@@ -11,7 +11,7 @@ GEP to graduate beyond "Experimental".
 
 This GEP is also exempt from the [Probationary Period][expprob] rules as it
 predated them.
-{{< /details >}}
+{{% /details %}}
 
 [expprob]:/geps/overview/#probationary-period
 
@@ -53,21 +53,7 @@ the exception that the endpoints attached to a ServiceImport may span multiple
 clusters. For example, the following HTTPRoute would forward traffic to
 endpoints attached to the "store" ServiceImport:
 
-```yaml
-kind: HTTPRoute
-apiVersion: gateway.networking.k8s.io/v1beta1
-metadata:
-  name: store
-spec:
-  parentRefs:
-  - name: external-http
-  rules:
-  - backendRefs:
-    - group: multicluster.x-k8s.io
-      kind: ServiceImport
-      name: store
-      port: 8080
-```
+{{< readfile file="/examples/standard/multicluster/httproute-simple.yaml" code="true" lang="yaml" >}}
 
 #### Routing to Specific Clusters
 
@@ -80,39 +66,7 @@ requests with paths prefixed with “/west” to the store-west ServiceImport, a
 these paths will be routed to the “store” ServiceImport which represents a
 superset of the “store-west” and “store-east” ServiceImports.
 
-```yaml
-kind: HTTPRoute
-apiVersion: gateway.networking.k8s.io/v1beta1
-metadata:
-  name: store
-spec:
-  parentRefs:
-  - name: external-http
-  rules:
-  - matches:
-    - path:
-        type: PathPrefix
-        value: /west
-    backendRefs:
-    - group: multicluster.x-k8s.io
-      kind: ServiceImport
-      name: store-west
-      port: 8080
-  - matches:
-    - path:
-        type: PathPrefix
-        value: /east
-    backendRefs:
-    - group: multicluster.x-k8s.io
-      kind: ServiceImport
-      name: store-east
-      port: 8080
-  - backendRefs:
-    - group: multicluster.x-k8s.io
-      kind: ServiceImport
-      name: store
-      port: 8080
-```
+{{< readfile file="/examples/standard/multicluster/httproute-location.yaml" code="true" lang="yaml" >}}
 
 #### Advanced Routing With ServiceImports
 
@@ -122,30 +76,7 @@ multiple read replicas, it could be beneficial to route requests based on HTTP
 Method. In the following example, requests with POST, PUT, and DELETE methods
 are routed to `api-primary` while the rest are routed to `api-replicas`:
 
-```yaml
-kind: HTTPRoute
-apiVersion: gateway.networking.k8s.io/v1beta1
-metadata:
-  name: api
-spec:
-  parentRefs:
-  - name: api-gw
-  rules:
-  - matches:
-    - method: POST
-    - method: PUT
-    - method: DELETE
-    backendRefs:
-    - group: multicluster.x-k8s.io
-      kind: ServiceImport
-      name: api-primary
-      port: 8080
-  - backendRefs:
-    - group: multicluster.x-k8s.io
-      kind: ServiceImport
-      name: api-replicas
-      port: 8080
-```
+{{< readfile file="/examples/standard/multicluster/httproute-method.yaml" code="true" lang="yaml" >}}
 
 #### Routing to Both Services and ServiceImports
 
@@ -154,26 +85,7 @@ Service and ServiceImport. In the following example, 90% of traffic would go to
 endpoints attached to the cluster-local "store" Service, and the remaining 10%
 would go to endpoints attached to the Multi-Cluster "store-global" Service:
 
-```yaml
-kind: HTTPRoute
-apiVersion: gateway.networking.k8s.io/v1beta1
-metadata:
-  name: store
-spec:
-  parentRefs:
-  - name: external-http
-  rules:
-  - backendRefs:
-    - kind: Service
-      name: store
-      port: 8080
-      weight: 90
-    - group: multicluster.x-k8s.io
-      kind: ServiceImport
-      name: store-global
-      port: 8080
-      weight: 10
-```
+{{< readfile file="/examples/standard/multicluster/httproute-hybrid.yaml" code="true" lang="yaml" >}}
 
 #### Cross-Namespace References with ReferenceGrant
 
@@ -181,38 +93,7 @@ It is possible to use ReferenceGrant to enable cross-namespace references to
 ServiceImports. For example, the following HTTPRoute would forward traffic to
 endpoints attached to the “bar” Multi-Cluster Service in the “bar” namespace:
 
-```yaml
-kind: HTTPRoute
-apiVersion: gateway.networking.k8s.io/v1beta1
-metadata:
-  name: foo
-  namespace: foo
-spec:
-  rules:
-  - matches:
-    - path:
-        type: PathPrefix
-        value: /bar
-    backendRefs:
-    - group: multicluster.x-k8s.io
-      kind: ServiceImport
-      name: bar
-      namespace: bar
----
-kind: ReferenceGrant
-apiVersion: gateway.networking.k8s.io/v1beta1
-metadata:
-  name: bar
-  namespace: bar
-spec:
-  from:
-  - group: gateway.networking.k8s.io
-    kind: HTTPRoute
-    namespace: foo
-  to:
-  - group: multicluster.x-k8s.io
-    kind: ServiceImport
-```
+{{< readfile file="/examples/standard/multicluster/httproute-referencegrant.yaml" code="true" lang="yaml" >}}
 
 ### Mesh: ServiceImport as Parent
 
@@ -227,25 +108,7 @@ decisions defined by the Route. In the following example, the mesh would
 intercept traffic destined for the store ClusterSetIP matching the `/cart` path
 and redirect it to the `cart` Multi-Cluster Service.
 
-```yaml
-kind: HTTPRoute
-apiVersion: gateway.networking.k8s.io/v1beta1
-metadata:
-  name: store
-spec:
-  parentRefs:
-  - group: multicluster.x-k8s.io
-    kind: ServiceImport
-    name: store
-  rules:
-  - matches:
-    - path:
-        value: "/cart"
-    backendRefs:
-    - group: multicluster.x-k8s.io
-      kind: ServiceImport
-      name: cart
-```
+{{< readfile file="/examples/standard/multicluster/httproute-gamma.yaml" code="true" lang="yaml" >}}
 
 ### Services vs ServiceImports
 

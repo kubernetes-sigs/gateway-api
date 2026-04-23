@@ -46,13 +46,14 @@ which means it applies to any route or filter that forwards traffic to a backend
 and `TLSRoute` (with `Terminate` mode), the use of `BackendTLSPolicy` enables what is commonly known as a
 connection that is terminated and then re-encrypted at the Gateway.
 
-{{< details title="Standard Channel since v1.5.0" >}}
+{{< details title="Standard Channel since v1.5.0" color="success" >}}
 
 The `TLSRoute` resource is GA and has been part of the Standard Channel since
 `v1.5.0`. For more information on release channels, refer to our [versioning
 guide](docs/concepts/versioning/).
 
 {{< /details >}}
+
 The `Terminate` mode for `TLSRoute` is available at the `Extended` [Support Level].
 
 [Support Level]: docs/concepts/conformance/#2-support-levels
@@ -92,33 +93,7 @@ In this example, the Gateway is configured to serve the `foo.example.com` and
 `bar.example.com` domains. The certificate for these domains is specified
 in the Gateway.
 
-```yaml
-apiVersion: gateway.networking.k8s.io/v1
-kind: Gateway
-metadata:
-  name: tls-basic
-spec:
-  gatewayClassName: example
-  listeners:
-  - name: foo-https
-    protocol: HTTPS
-    port: 443
-    hostname: foo.example.com
-    tls:
-      certificateRefs:
-      - kind: Secret
-        group: ""
-        name: foo-example-com-cert
-  - name: bar-https
-    protocol: HTTPS
-    port: 443
-    hostname: bar.example.com
-    tls:
-      certificateRefs:
-      - kind: Secret
-        group: ""
-        name: bar-example-com-cert
-```
+{{< readfile file="/examples/standard/tls-basic.yaml" code="true" lang="yaml" >}}
 
 #### Wildcard TLS listeners
 
@@ -128,33 +103,7 @@ Since a specific match takes priority, the Gateway will serve
 `foo-example-com-cert` for requests to `foo.example.com` and
 `wildcard-example-com-cert` for all other requests.
 
-```yaml
-apiVersion: gateway.networking.k8s.io/v1
-kind: Gateway
-metadata:
-  name: wildcard-tls-gateway
-spec:
-  gatewayClassName: example
-  listeners:
-  - name: foo-https
-    protocol: HTTPS
-    port: 443
-    hostname: foo.example.com
-    tls:
-      certificateRefs:
-      - kind: Secret
-        group: ""
-        name: foo-example-com-cert
-  - name: wildcard-https
-    protocol: HTTPS
-    port: 443
-    hostname: "*.example.com"
-    tls:
-      certificateRefs:
-      - kind: Secret
-        group: ""
-        name: wildcard-example-com-cert
-```
+{{< readfile file="/examples/standard/wildcard-tls-gateway.yaml" code="true" lang="yaml" >}}
 
 #### Cross namespace certificate references
 
@@ -200,26 +149,29 @@ spec:
 
 ### Client Certificate Validation (Frontend mTLS)
 
-{{< details title="Extended Support Feature: GatewayFrontendClientCertificateValidation" >}}
+{{< details title="Extended Support Feature: GatewayFrontendClientCertificateValidation" open="true" >}}
 This feature is part of extended support. For more information on support levels, refer to our [conformance guide](docs/concepts/conformance/).
 
 {{< /details >}}
-{{< details title="Standard Channel since v1.5.0" >}}
+
+{{< details title="Standard Channel since v1.5.0" color="success" >}}
 GatewayFrontendClientCertificateValidation feature has been part of the Standard Channel since
 `v1.5.0`. For more information on release channels, refer to our [versioning
 guide](docs/concepts/versioning/).
 
 {{< /details >}}
+
 Gateway API supports validating the TLS certificate presented by a frontend client to the Gateway during the TLS handshake.
 
 Unlike server certificate configuration, which is defined per-listener, client certificate validation is configured at the **Gateway level** within the `spec.tls` field. This design is specifically intended to mitigate security risks associated with HTTP/2 and TLS connection coalescing, where a connection established for one listener could be reused for another listener on the same port, potentially bypassing listener-specific validation settings.
 
 #### Configuration Overview
 
-{{< details title="Extended Support Feature: GatewayFrontendClientCertificateValidationInsecureFallback" >}}
+{{< details title="Extended Support Feature: GatewayFrontendClientCertificateValidationInsecureFallback" open="true" >}}
 This feature is part of extended support. For more information on support levels, refer to our [conformance guide](docs/concepts/conformance/).
 
 {{< /details >}}
+
 Client validation is defined using the `frontendValidation` struct, which specifies how the Gateway should verify the client's identity.
 
 *   **`caCertificateRefs`**: A list of references to Kubernetes objects (typically `ConfigMap`s) containing PEM-encoded CA certificate bundles used as trust anchors to validate the client's certificate.
@@ -311,6 +263,7 @@ Refer to documentation from your implementation of choice for more information.
 - Wildcard hostnames are not allowed.
 
 {{% /alert %}}
+
 ### Examples
 
 #### Using System Certificates
@@ -319,20 +272,7 @@ In this example, the `BackendTLSPolicy` is configured to use system certificates
 TLS-encrypted upstream connection where Pods backing the `dev` Service are expected to serve a valid
 certificate for `dev.example.com`.
 
-```yaml
-apiVersion: gateway.networking.k8s.io/v1
-kind: BackendTLSPolicy
-metadata:
-  name: tls-upstream-dev
-spec:
-  targetRefs:
-    - kind: Service
-      name: dev
-      group: ""
-  validation:
-    wellKnownCACertificates: "System"
-    hostname: dev.example.com
-```
+{{< readfile file="/examples/standard/backendtlspolicy/backendtlspolicy-system-certs.yaml" code="true" lang="yaml" >}}
 
 #### Using Explicit CA Certificates
 
@@ -340,30 +280,15 @@ In this example, the `BackendTLSPolicy` is configured to use certificates define
 map `auth-cert` to connect with a TLS-encrypted upstream connection where Pods backing the `auth` Service
 are expected to serve a valid certificate for `auth.example.com`.
 
-```yaml
-apiVersion: gateway.networking.k8s.io/v1
-kind: BackendTLSPolicy
-metadata:
-  name: tls-upstream-auth
-spec:
-  targetRefs:
-    - kind: Service
-      name: auth
-      group: ""
-  validation:
-    caCertificateRefs:
-      - kind: ConfigMap
-        name: auth-cert
-        group: ""
-    hostname: auth.example.com
-```
+{{< readfile file="/examples/standard/backendtlspolicy/backendtlspolicy-ca-certs.yaml" code="true" lang="yaml" >}}
 ### Gateway’s Certificate Selection (Backend mTLS)
-{{< details title="Standard Channel since v1.5.0" >}}
+{{< details title="Standard Channel since v1.5.0" color="success" >}}
 GatewayBackendClientCertificate feature has been part of the Standard Channel since
 `v1.5.0`. For more information on release channels, refer to our [versioning
 guide](docs/concepts/versioning/).
 
 {{< /details >}}
+
 Mutual TLS (mTLS) for upstream connections requires the Gateway to present a client certificate to the backend, in addition to verifying the backend's certificate. This ensures that the backend only accepts connections from authorized Gateways.
 
 #### Gateway’s Client Certificate Configuration
@@ -371,25 +296,7 @@ To configure the client certificate that the Gateway uses when connecting to bac
 
 This configuration applies to the Gateway as a client for *all* upstream connections managed by that Gateway.
 
-```yaml
-apiVersion: gateway.networking.k8s.io/v1
-kind: Gateway
-metadata:
-  name: backend-tls
-spec:
-  gatewayClassName: acme-lb
-  tls:
-    backend:
-      clientCertificateRef:
-        kind: Secret
-        group: ""
-        name: foo-example-cert
-  listeners:
-  - name: foo-http
-    protocol: HTTP
-    port: 80
-    hostname: foo.example.com
-```
+{{< readfile file="/examples/standard/backend-tls.yaml" code="true" lang="yaml" >}}
 
 ## Extensions
 

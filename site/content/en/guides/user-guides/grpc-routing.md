@@ -32,37 +32,7 @@ must be configured with `ParentRefs` which reference the parent gateway(s) that 
 should be attached to. The following example shows how the combination
 of `Gateway` and `GRPCRoute` would be configured to serve gRPC traffic:
 
-```yaml
-apiVersion: gateway.networking.k8s.io/v1
-kind: Gateway
-metadata:
-  name: example-gateway
-spec:
-  gatewayClassName: example-gateway-class
-  listeners:
-  - name: grpc
-    protocol: HTTPS
-    port: 50051
-    tls:
-      certificateRefs:
-      - kind: Secret
-        group: ""
-        name: example-com-cert
----
-apiVersion: gateway.networking.k8s.io/v1
-kind: GRPCRoute
-metadata:
-  name: example-route
-spec:
-  parentRefs:
-  - name: example-gateway
-  hostnames:
-  - "example.com"
-  rules:
-  - backendRefs:
-    - name: example-svc
-      port: 50051
-```
+{{< readfile file="/examples/standard/grpc-routing/gateway.yaml" code="true" lang="yaml" >}}
 
 A `GRPCRoute` can match against a [single set of hostnames][spec].
 These hostnames are matched before any other matching within the GRPCRoute takes
@@ -76,25 +46,7 @@ only one match specified, only requests for the `com.example.User.Login` method 
 `foo.example.com` will be forwarded. RPCs of any other method` will not be matched
 by this Route.
 
-```yaml
-apiVersion: gateway.networking.k8s.io/v1
-kind: GRPCRoute
-metadata:
-  name: foo-route
-spec:
-  parentRefs:
-  - name: example-gateway
-  hostnames:
-  - "foo.example.com"
-  rules:
-  - matches:
-    - method:
-        service: com.example
-        method: Login
-    backendRefs:
-    - name: foo-svc
-      port: 50051
-```
+{{< readfile file="/examples/standard/grpc-routing/foo-grpcroute.yaml" code="true" lang="yaml" >}}
 
 Similarly, the `bar-route` GRPCRoute matches RPCs for `bar.example.com`. All
 traffic for this hostname will be evaluated against the routing rules. The most
@@ -102,29 +54,7 @@ specific match will take precedence which means that any traffic with the `env:
 canary` header will be forwarded to `bar-svc-canary` and if the header is
 missing or does not have the value `canary` then it will be forwarded to `bar-svc`.
 
-```yaml
-apiVersion: gateway.networking.k8s.io/v1
-kind: GRPCRoute
-metadata:
-  name: bar-route
-spec:
-  parentRefs:
-  - name: example-gateway
-  hostnames:
-  - "bar.example.com"
-  rules:
-  - matches:
-    - headers:
-      - type: Exact
-        name: env
-        value: canary
-    backendRefs:
-    - name: bar-svc-canary
-      port: 50051
-  - backendRefs:
-    - name: bar-svc
-      port: 50051
-```
+{{< readfile file="/examples/standard/grpc-routing/bar-grpcroute.yaml" code="true" lang="yaml" >}}
 
 [gRPC
 Reflection](https://github.com/grpc/grpc/blob/v1.49.1/doc/server-reflection.md)
@@ -137,31 +67,7 @@ is likely to be useful in development and staging environments, but this should
 be enabled in production environments only after the security implications have
 been considered.
 
-```yaml
-apiVersion: gateway.networking.k8s.io/v1
-kind: GRPCRoute
-metadata:
-  name: foo-route
-spec:
-  parentRefs:
-  - name: example-gateway
-  hostnames:
-  - "foo.example.com"
-  rules:
-  - matches:
-    - method:
-        service: com.example.User
-        method: Login
-    backendRefs:
-    - name: foo-svc
-      port: 50051
-  - matches:
-    - method:
-        service: grpc.reflection.v1.ServerReflection
-    backendRefs:
-    - name: foo-svc
-      port: 50051
-```
+{{< readfile file="/examples/standard/grpc-routing/reflection-grpcroute.yaml" code="true" lang="yaml" >}}
 
 [gateway]: /reference/api-spec/main/spec/#gateway
 [spec]: /reference/api-spec/main/spec/#grpcroutespec

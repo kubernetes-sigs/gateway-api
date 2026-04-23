@@ -3,11 +3,12 @@ title: "BackendTrafficPolicy"
 weight: 2
 ---
 
-{{< details title="Experimental Channel since v1.3.0" >}}
+{{< details title="Experimental Channel since v1.3.0" color="purple" >}}
 The `BackendTrafficPolicy` resource is a part of the Experimental Channel
 since `v1.3.0`. For more information on release channels, refer to our
 [versioning guide](/docs/concepts/versioning/).
 {{< /details >}}
+
 [BackendTrafficPolicy][backendtrafficpolicy] is a Gateway API type to configure
 the behavior of clients when targeting a valid backend resource.
 

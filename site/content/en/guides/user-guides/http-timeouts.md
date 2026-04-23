@@ -3,10 +3,11 @@ title: "HTTP timeouts"
 weight: 9
 ---
 
-{{< details title="Extended Support Feature: HTTPRouteRequestTimeout" >}}
+{{< details title="Extended Support Feature: HTTPRouteRequestTimeout" open="true" >}}
 This feature is part of extended support. For more information on support levels, refer to our [conformance guide](/docs/concepts/conformance/).
 
 {{< /details >}}
+
 The [HTTPRoute resource](/reference/api-types/httproute/) can be used to configure
 timeouts for HTTP requests. This is useful for preventing long-running requests
 from consuming resources and for providing a better user experience.

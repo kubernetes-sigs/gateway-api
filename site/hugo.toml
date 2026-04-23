@@ -29,7 +29,7 @@ defaultContentLanguage = "en"
       [markup.goldmark.extensions.passthrough]
         enable = false
   [markup.highlight]
-    noClasses = false
+    noClasses = true
     guessSyntax = true
     style = "tango"
   [markup.tableOfContents]
@@ -40,6 +40,7 @@ defaultContentLanguage = "en"
 # Theme parameters
 [params]
   copyright = "The Linux Foundation"
+  favicon = "favicon.png"
   github_repo = "https://github.com/kubernetes-sigs/gateway-api"
   github_branch = "main"
   github_subdir = "site/content/en" # Set this to wherever your markdown files live
@@ -111,4 +112,8 @@ defaultContentLanguage = "en"
   [[module.mounts]]
     source = "../geps"
     target = "content/geps"
+
+  [[module.mounts]]
+    source = "../examples"
+    target = "content/examples"
  

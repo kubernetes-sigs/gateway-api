@@ -3,10 +3,11 @@ title: "HTTP method matching"
 weight: 8
 ---
 
-{{< details title="Extended Support Feature: HTTPRouteMethodMatching" >}}
+{{< details title="Extended Support Feature: HTTPRouteMethodMatching" open="true" >}}
 This feature is part of extended support. For more information on support levels, refer to our [conformance guide](/docs/concepts/conformance/).
 
 {{< /details >}}
+
 The [HTTPRoute resource](/reference/api-types/httproute/) can be used to match
 requests based on the HTTP method. This guide shows how to use this
 functionality.

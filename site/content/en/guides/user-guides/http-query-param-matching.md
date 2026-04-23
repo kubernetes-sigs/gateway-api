@@ -3,10 +3,11 @@ title: "HTTP query parameter matching"
 weight: 7
 ---
 
-{{< details title="Extended Support Feature: HTTPRouteQueryParamMatching" >}}
+{{< details title="Extended Support Feature: HTTPRouteQueryParamMatching" open="true" >}}
 This feature is part of extended support. For more information on support levels, refer to our [conformance guide](/docs/concepts/conformance/).
 
 {{< /details >}}
+
 The [HTTPRoute resource](/reference/api-types/httproute/) can be used to match
 requests based on query parameters. This guide shows how to use this
 functionality.

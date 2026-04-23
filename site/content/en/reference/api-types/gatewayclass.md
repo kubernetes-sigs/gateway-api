@@ -3,11 +3,12 @@ title: "GatewayClass"
 weight: 3
 ---
 
-{{< details title="Standard Channel since v0.5.0" >}}
+{{< details title="Standard Channel since v0.5.0" color="success" >}}
 The `GatewayClass` resource is GA and has been part of the Standard Channel since
 `v0.5.0`. For more information on release channels, refer to our [versioning
 guide](/docs/concepts/versioning/).
 {{< /details >}}
+
 [GatewayClass][gatewayclass] is cluster-scoped resource defined by the
 infrastructure provider. This resource represents a class of Gateways that can
 be instantiated.

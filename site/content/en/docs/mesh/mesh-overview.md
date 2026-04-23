@@ -4,13 +4,14 @@ linkTitle: "Overview"
 weight: 1
 ---
 
-{{< details title="Standard Channel since v1.1.0" >}}
+{{< details title="Standard Channel since v1.1.0" color="success" >}}
 
 The [GAMMA initiative](/docs/mesh/gamma/) work for supporting service mesh use
 cases has been part of the Standard Channel since v1.1.0 and is considered
 GA. For more information refer to our [versioning guide](/docs/concepts/versioning/).
 
 {{< /details >}}
+
 The "[GAMMA initiative](/docs/mesh/gamma/)" refers to the group that is defining how
 Gateway API can be used for Service Mesh. To date, this group has been able to
 define service mesh support in the Gateway API with relatively small changes.
@@ -42,7 +43,7 @@ Service.
 [service-mesh]: /docs/glossary/#service-mesh
 [service-facets]: /docs/mesh/service-facets/
 
-## Connecting routes and services <a name="gateway-api-for-mesh">
+## Connecting routes and services <a name="gateway-api-for-mesh"></a>
 
 GAMMA specifies that individual Route resources attach directly to a Service,
 representing configuration meant to be applied to _any traffic directed to the
@@ -79,6 +80,7 @@ There is ongoing work around the relationship between producer
 routes and consumer routes.
 
 {{% /alert %}}
+
 The relationship between the Route's Namespace and the Service's Namespace is
 important:
 
