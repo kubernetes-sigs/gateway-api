@@ -1,6 +1,6 @@
 apiVersion: internal.gateway.networking.k8s.io/v1alpha1
 kind: GEPDetails
-number: xxx
+number: 4731
 name: EndpointSelector
 status: Provisional
 authors:

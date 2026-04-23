@@ -1,4 +1,4 @@
-# GEP XXX: EndpointSelector Resource
+# GEP 4731: EndpointSelector Resource
 
 * Status: Provisional
 
