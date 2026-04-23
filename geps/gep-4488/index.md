@@ -94,15 +94,6 @@ type Backend struct {
 type BackendSpec struct {
   // Destination defines where traffic should be sent
   Destination BackendDestination `json:"destination"`
-
-  // Filters defines filters that should be executed when
-  // sending traffic to this backend. Filters should not
-  // be duplicated on a backendRef (targeting this `Backend`)
-  // and on the `Backend` itself.
-  // +optional
-  // TODO: Specify filter type definition. Should,
-  // at minimum, include ExtensionRef pattern.
-  Filters []BackendFilters `json:"filters,omitempty"`
 }
 
 type BackendType string
@@ -213,8 +204,6 @@ type BackendPort struct {
   // top level with per-port overrides?
   // +optional
   TLS *BackendTLS `json:"tls,omitempty"`
-  // +optional
-  ProtocolOptions *BackendProtocolOptions `json:"protocolOptions,omitempty"`
 }
 ```
 
@@ -242,18 +231,6 @@ const (
   BackendProtocolMCP   BackendProtocol = "MCP"
 )
 
-// +kubebuilder:validation:ExactlyOneOf=mcp
-type BackendProtocolOptions struct {
-  // +optional
-  MCP *MCPProtocolOptions `json:"mcp,omitempty"`
-}
-
-type MCPProtocolOptions struct {
-  // URL path for MCP traffic. Default is /mcp.
-  // +optional
-  // +kubebuilder:default:=/mcp
-  Path string `json:"path,omitempty"`
-}
 ```
 
 ## TLS Policy Consolidation Analysis
@@ -433,11 +410,11 @@ spec:
 
 ## EndpointSelector Type
 
-
+TODO: Reference GEP 4731 once it merges.
 
 ## Extension Framework
 
-The Backend resource provides three levels for applying extensions and policies:
+The Backend resource provides two levels for applying extensions and policies:
 
 ### 1. Route-Level Extensions (HTTPRoute Filters)
 
@@ -460,34 +437,7 @@ spec:
       kind: Backend
 ```
 
-**Use cases**: Request modification, rate limiting, authentication injection
-
-### 2. Backend-Level Extensions
-
-Applied at the Backend resource, affecting all requests to that destination.
-
-```yaml
-apiVersion: gateway.networking.k8s.io/v1alpha1
-kind: Backend
-spec:
-  destination:
-    type: Hostname
-    hostname:
-      address: api.openai.com
-  filters:
-  - type: ExtensionRef
-    extensionRef:
-      name: connection-pool
-      kind: ConnectionPoolPolicy
-  - type: ExtensionRef
-    extensionRef:
-      name: circuit-breaker
-      kind: CircuitBreakerPolicy
-```
-
-**Use cases**: Connection management, circuit breaking, load balancing
-
-### 3. Policy Attachment
+### 2. Policy Attachment
 
 Separate policy resources attached to Backend resources.
 
@@ -505,7 +455,7 @@ spec:
   backoff: exponential
 ```
 
-**Use cases**: Retry policies, observability configuration, vendor-specific policies
+A third extension mechanism, filters applied on the `Backend` resource itself, may be the subject of a future GEP.
 
 ## Graduation Criteria
 
