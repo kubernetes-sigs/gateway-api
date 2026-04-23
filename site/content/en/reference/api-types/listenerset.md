@@ -3,11 +3,12 @@ title: "ListenerSet"
 weight: 10
 ---
 
-{{< details title="Standard Channel since v1.5.0" >}}
+{{< details title="Standard Channel since v1.5.0" color="success" >}}
 The `ListenerSet` resource is GA and has been part of the Standard Channel since
 `v1.5.0`. For more information on release channels, refer to our [versioning
 guide](/docs/concepts/versioning/).
 {{< /details >}}
+
 A `ListenerSet` is a Gateway API type for specifying additional listeners for a Gateway.
 It decouples network listener configurations—such as ports, hostnames, and TLS
 termination—from the central Gateway resource.

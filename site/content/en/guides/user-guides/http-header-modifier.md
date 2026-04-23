@@ -13,10 +13,11 @@ Note that these features are compatible. HTTP headers of the incoming requests a
 
 ## HTTP Request Header Modifier
 
-{{< details title="Extended Support Feature: HTTPRouteBackendRequestHeaderModification" >}}
+{{< details title="Extended Support Feature: HTTPRouteBackendRequestHeaderModification" open="true" >}}
 This feature is part of extended support. For more information on support levels, refer to our [conformance guide](/docs/concepts/conformance/).
 
 {{< /details >}}
+
 HTTP header modification is the process of adding, removing, or modifying HTTP headers in incoming requests.
 
 To configure HTTP header modification, define a Gateway object with one or more HTTP filters. Each filter specifies a specific modification to make to incoming requests, such as adding a custom header or modifying an existing header.
@@ -71,10 +72,11 @@ Using the example above would remove the `x-request-id` header from the HTTP req
 
 ### HTTP Response Header Modifier
 
-{{< details title="Extended Support Feature: HTTPRouteResponseHeaderModification" >}}
+{{< details title="Extended Support Feature: HTTPRouteResponseHeaderModification" open="true" >}}
 This feature is part of extended support. For more information on support levels, refer to our [conformance guide](/docs/concepts/conformance/).
 
 {{< /details >}}
+
 Just like editing request headers can be useful, the same goes for response headers. For example, it allows teams to add/remove cookies for only a certain backend, which can help in identifying certain users that were redirected to that backend previously.
 
 Another potential use case could be when you have a frontend that needs to know whether it’s talking to a stable or a beta version of the backend server, in order to render different UI or adapt its response parsing accordingly.

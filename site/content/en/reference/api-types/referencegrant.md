@@ -3,16 +3,18 @@ title: "ReferenceGrant"
 weight: 8
 ---
 
-{{< details title="Standard Channel since v0.6.0" >}}
+{{< details title="Standard Channel since v0.6.0" color="success" >}}
 The `ReferenceGrant` resource is Beta and part of the
 Standard Channel since `v0.6.0`. For more information on release
 channels, refer to our [versioning guide](/docs/concepts/versioning/).
 {{< /details >}}
+
 {{% alert color="primary" %}}
 This resource was originally named "ReferencePolicy". It was renamed
 to "ReferenceGrant" to avoid any confusion with policy attachment.
 
 {{% /alert %}}
+
 A ReferenceGrant can be used to enable cross namespace references within
 Gateway API. In particular, Routes may forward traffic to backends in other
 namespaces, or Gateways may refer to Secrets in another namespace.

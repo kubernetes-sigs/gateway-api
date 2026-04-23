@@ -206,10 +206,11 @@ Gateway resources are owned by the cluster operator and the application admin.
 
 ### TLS Termination
 
-{{< details title="Extended Support Feature: TLSRouteModeTerminate" >}}
+{{< details title="Extended Support Feature: TLSRouteModeTerminate" open="true" >}}
 This feature is part of extended support. For more information on support levels, refer to our [conformance guide](/docs/concepts/conformance/).
 
 {{< /details >}}
+
 The Ingress resource supports TLS termination via
 the [TLS section](https://kubernetes.io/docs/concepts/services-networking/ingress/#tls),
 where the TLS certificate and key are stored in a Secret.
@@ -399,91 +400,16 @@ Also, note that both listeners allow all HTTPRoutes from the same namespace
 the `example.com` subdomain (allow hostnames like `foo.example.com` but
 not `foo.kubernetes.io`).
 
-```yaml
-apiVersion: gateway.networking.k8s.io/v1
-kind: Gateway
-metadata:
-  name: example-gateway
-spec:
-  gatewayClassName: prod
-  listeners:
-  - name: http
-    port: 80
-    protocol: HTTP
-    hostname: "*.example.com"
-  - name: https
-    port: 443
-    protocol: HTTPS
-    hostname: "*.example.com"
-    tls:
-      mode: Terminate
-      certificateRefs:
-      - kind: Secret
-        name: example-com
-  - name: https-default-tls-mode
-    port: 8443
-    protocol: HTTPS
-    hostname: "*.foo.com"
-    tls:
-      certificateRefs:
-      - kind: Secret
-        name: foo-com
-```
+{{< readfile file="/examples/standard/simple-http-https/gateway.yaml" code="true" lang="yaml" >}}
 
 ### Conversion Step 2 - Define HTTPRoutes
 
 The Ingress is split into two HTTPRoutes -- one for `foo.example.com` and one
 for `bar.example.com` hostnames.
 
-```yaml
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
-metadata:
-  name: foo
-spec:
-  parentRefs:
-  - name: example-gateway
-    sectionName: https
-  hostnames:
-  - foo.example.com
-  rules:
-  - matches:
-    - path:
-        type: PathPrefix
-        value: /
-    backendRefs:
-    - name: foo-app
-      port: 80
-  - matches:
-    - path:
-        type: PathPrefix
-        value: /orders
-    backendRefs:
-    - name: foo-orders-app
-      port: 80
+{{< readfile file="/examples/standard/simple-http-https/foo-route.yaml" code="true" lang="yaml" >}}
 
-```
-
-```yaml
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
-metadata:
-  name: bar
-spec:
-  parentRefs:
-  - name: example-gateway
-    sectionName: https
-  hostnames:
-  - bar.example.com
-  rules:
-  - matches:
-    - path:
-        type: PathPrefix
-        value: /
-    backendRefs:
-    - name: bar-app
-      port: 80
-```
+{{< readfile file="/examples/standard/simple-http-https/bar-route.yaml" code="true" lang="yaml" >}}
 
 Both HTTPRoutes:
 
@@ -500,25 +426,7 @@ configured via an annotation. The HTTPRoute below:
 *   Issues a TLS redirect for any HTTP request for the `foo.example.com`
     or `bar.example.com` hostnames.
 
-```yaml
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
-metadata:
-  name: tls-redirect
-spec:
-  parentRefs:
-  - name: example-gateway
-    sectionName: http
-  hostnames:
-  - foo.example.com
-  - bar.example.com
-  rules:
-  - filters:
-    - type: RequestRedirect
-      requestRedirect:
-        scheme: https
-        port: 443
-```
+{{< readfile file="/examples/standard/simple-http-https/tls-redirect-route.yaml" code="true" lang="yaml" >}}
 
 ## Automatic Conversion of Ingresses
 

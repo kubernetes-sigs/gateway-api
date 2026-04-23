@@ -81,6 +81,7 @@ removed in v1.1.0. With that said, all of this guidance will still apply for
 implementations as long as they support v1.0.0 or older releases of the API.
 
 {{< /details >}}
+
 CRD and webhook validation is not the final validation, i.e. webhook is "nice UX"
 but not schema enforcement. This validation is intended to provide immediate
 feedback to users when they provide an invalid configuration. Write code

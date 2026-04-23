@@ -7,21 +7,7 @@ This guide is a great place to start if you are new to Gateway API. It shows the
 
 ![Simple Gateway](/images/single-service-gateway.png)
 
-```yaml
-apiVersion: gateway.networking.k8s.io/v1
-kind: Gateway
-metadata:
-  name: prod-web
-spec:
-  gatewayClassName: example
-  listeners:
-  - protocol: HTTP
-    port: 80
-    name: prod-web-gw
-    allowedRoutes:
-      namespaces:
-        from: Same
-```
+{{< readfile file="/examples/standard/simple-gateway/gateway.yaml" code="true" lang="yaml" >}}
 
 The Gateway represents the instantiation of a logical load balancer and the
 GatewayClass defines the load balancer template when users create a Gateway.
@@ -47,19 +33,7 @@ to backends. Because there are no host routes or paths specified, this HTTPRoute
 will match all HTTP traffic that arrives at port 80 of the load balancer and
 send it to the `foo-svc` Pods. 
 
-```yaml  
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
-metadata:
-  name: foo
-spec:
-  parentRefs:
-  - name: prod-web
-  rules:
-  - backendRefs:
-    - name: foo-svc
-      port: 8080
-```
+{{< readfile file="/examples/standard/simple-gateway/httproute.yaml" code="true" lang="yaml" >}}
 
 While Route resources are often used to filter traffic to many different
 backends (potentially with different owners), this demonstrates the simplest

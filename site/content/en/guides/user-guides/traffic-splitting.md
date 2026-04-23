@@ -14,21 +14,7 @@ will split traffic 90% to `foo-v1` and 10% to `foo-v2`.
 
 ![Traffic splitting](/images/simple-split.png)
 
-```yaml
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
-metadata:
-  name: simple-split
-spec:
-  rules:
-  - backendRefs:
-    - name: foo-v1
-      port: 8080
-      weight: 90
-    - name: foo-v2
-      port: 8080
-      weight: 10
-```
+{{< readfile file="/examples/standard/traffic-splitting/simple-split.yaml" code="true" lang="yaml" >}}
 
 `weight` indicates a proportional split of traffic (rather than percentage)
 and so the sum of all the weights within a single route rule is the
@@ -75,29 +61,7 @@ ensures that all traffic with the matching host and header
 ![Traffic splitting](/images/traffic-splitting-1.png)
 
 
-```yaml
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
-metadata:
-  name: foo-route
-  labels:
-    gateway: prod-web-gw
-spec:
-  hostnames:
-  - foo.example.com
-  rules:
-  - backendRefs:
-    - name: foo-v1
-      port: 8080
-  - matches:
-    - headers:
-      - name: traffic
-        value: test
-    backendRefs:
-    - name: foo-v2
-      port: 8080
-
-```
+{{< readfile file="/examples/standard/traffic-splitting/traffic-split-1.yaml" code="true" lang="yaml" >}}
 
 ## Blue-green traffic rollout
 
@@ -111,25 +75,7 @@ as a backend along with weights. The weights add up to a total of 100 so
 ![Traffic splitting](/images/traffic-splitting-2.png)
 
 
-```yaml
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
-metadata:
-  name: foo-route
-  labels:
-    gateway: prod-web-gw
-spec:
-  hostnames:
-  - foo.example.com
-  rules:
-  - backendRefs:
-    - name: foo-v1
-      port: 8080
-      weight: 90
-    - name: foo-v2
-      port: 8080
-      weight: 10
-```
+{{< readfile file="/examples/standard/traffic-splitting/traffic-split-2.yaml" code="true" lang="yaml" >}}
 
 ## Completing the rollout
 
@@ -140,25 +86,7 @@ Finally, if all signals are positive, it is time to fully shift traffic to
 ![Traffic splitting](/images/traffic-splitting-3.png)
 
 
-```yaml
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
-metadata:
-  name: foo-route
-  labels:
-    gateway: prod-web-gw
-spec:
-  hostnames:
-  - foo.example.com
-  rules:
-  - backendRefs:
-    - name: foo-v1
-      port: 8080
-      weight: 0
-    - name: foo-v2
-      port: 8080
-      weight: 1
-```
+{{< readfile file="/examples/standard/traffic-splitting/traffic-split-3.yaml" code="true" lang="yaml" >}}
 
 At this point 100% of the traffic is being routed to `foo-v2` and the
 rollout is complete. If for any reason `foo-v2` experiences errors, the

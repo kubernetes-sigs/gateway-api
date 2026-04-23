@@ -96,20 +96,7 @@ For example, the following ReferenceGrant allows references from HTTPRoutes in
 the "prod" namespace to Services that are deployed in the same namespace as
 the ReferenceGrant.
 
-```yaml
-apiVersion: gateway.networking.k8s.io/v1beta1
-kind: ReferenceGrant
-metadata:
-  name: allow-prod-traffic
-spec:
-  from:
-  - group: gateway.networking.k8s.io
-    kind: HTTPRoute
-    namespace: prod
-  to:
-  - group: ""
-    kind: Service
-```
+{{< readfile file="/examples/standard/reference-grant.yaml" code="true" lang="yaml" >}}
 
 For more information on ReferenceGrant, refer to our [detailed documentation
 for this resource](/reference/api-types/referencegrant/).
@@ -142,8 +129,9 @@ To avoid this situation, the following actions should be taken:
 
 * On Gateways, admins SHOULD ensure that hostnames are clearly delegated to a specific namespace or set of namespaces:
 
-{{< tabpane >}}
-{{< tab header="Good configuration" >}}
+{{< tabpane text=true >}}
+{{% tab header="Good configuration" %}}
+```yaml
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
@@ -171,8 +159,10 @@ spec:
         selector:
           matchLabels:
             kubernetes.io/metadata.name: ns2
-{{< /tab >}}
-{{< tab header="Insecure configuration" >}}
+```
+{{% /tab %}}
+{{% tab header="Insecure configuration" %}}
+```yaml
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
@@ -186,7 +176,8 @@ spec:
     allowedRoutes:
       namespaces:
         from: All
-{{< /tab >}}
+```
+{{% /tab %}}
 {{< /tabpane >}}
 
 #### More than 64 listeners

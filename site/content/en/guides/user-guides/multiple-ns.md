@@ -73,29 +73,7 @@ the Namespaces and types of Routes that a Gateway accepts.
 The infrastructure team deploys the `shared-gateway` Gateway into the `infra-ns`
 Namespace:
 
-```yaml
-apiVersion: gateway.networking.k8s.io/v1
-kind: Gateway
-metadata:
-  name: shared-gateway
-  namespace: infra-ns
-spec:
-  gatewayClassName: shared-gateway-class
-  listeners:
-  - name: https
-    hostname: "foo.example.com"
-    protocol: HTTPS
-    port: 443
-    allowedRoutes:
-      namespaces:
-        from: Selector
-        selector:
-          matchLabels:
-            shared-gateway-access: "true"
-    tls:
-      certificateRefs:
-      - name: foo-example-com
-```
+{{< readfile file="/examples/standard/cross-namespace-routing/gateway.yaml" code="true" lang="yaml" >}}
 
 The `https` listener in the above Gateway matches traffic for the
 `foo.example.com` domain. This allows the infrastructure team to manage all
@@ -135,33 +113,7 @@ Namespaces, if an HTTPRoute existed in the `no-external-access` Namespace with
 a `parentRef`  for `infra-ns/shared-gateway`, it would be ignored by the
 Gateway because the  attachment constraint (Namespace label) was not met.
 
-```yaml
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: infra-ns
-  labels:
-    shared-gateway-access: "true"
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: site-ns
-  labels:
-    shared-gateway-access: "true"
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: store-ns
-  labels:
-    shared-gateway-access: "true"
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: no-external-access
-```
+{{< readfile file="/examples/standard/cross-namespace-routing/0-namespaces.yaml" code="true" lang="yaml" >}}
 
 Note that attachment constraints on the Gateway are not required, but they are
 a best-practice if operating a cluster with many different teams and
@@ -175,24 +127,7 @@ configured and all Routes can freely use the Gateway.
 The store team deploys their route for the `store` Service in the `store-ns`
 Namespace:
 
-```yaml
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
-metadata:
-  name: store
-  namespace: store-ns
-spec:
-  parentRefs:
-  - name: shared-gateway
-    namespace: infra-ns
-  rules:
-  - matches:
-    - path:
-        value: /store
-    backendRefs:
-    - name: store
-      port: 8080
-```
+{{< readfile file="/examples/standard/cross-namespace-routing/store-route.yaml" code="true" lang="yaml" >}}
 
 This Route has straightforward routing logic as it just matches for
 `/store` traffic which it sends to the `store` Service.
@@ -211,42 +146,7 @@ Both of these Routes use the same Gateway attachment configuration which
 specifies `gateway/shared-gateway` in the `infra-ns` Namespace as the only
 Gateway that these Routes want to attach to.
 
-```yaml
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
-metadata:
-  name: home
-  namespace: site-ns
-spec:
-  parentRefs:
-  - name: shared-gateway
-    namespace: infra-ns
-  rules:
-  - backendRefs:
-    - name: home
-      port: 8080
----
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
-metadata:
-  name: login
-  namespace: site-ns
-spec:
-  parentRefs:
-  - name: shared-gateway
-    namespace: infra-ns
-  rules:
-  - matches:
-    - path:
-        value: /login
-    backendRefs:
-    - name: login-v1
-      port: 8080
-      weight: 90
-    - name: login-v2
-      port: 8080
-      weight: 10
-```
+{{< readfile file="/examples/standard/cross-namespace-routing/site-route.yaml" code="true" lang="yaml" >}}
 
 After these three Routes are deployed, they will all be attached to the
 `shared-gateway` Gateway. The Gateway merges these Routes into a single flat

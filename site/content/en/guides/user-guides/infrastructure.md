@@ -4,10 +4,11 @@ linkTitle: "Infrastructure attributes"
 weight: 17
 ---
 
-{{< details title="Extended Support Feature: GatewayInfrastructurePropagation" >}}
+{{< details title="Extended Support Feature: GatewayInfrastructurePropagation" open="true" >}}
 This feature is part of extended support. For more information on support levels, refer to our [conformance guide](/docs/concepts/conformance/).
 
 {{< /details >}}
+
 Gateway API implementations are responsible for creating the backing
 infrastructure needed to make each Gateway work. For example, implementations
 running in a Kubernetes cluster often create [Services][service] and

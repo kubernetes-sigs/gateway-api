@@ -1,8 +1,33 @@
-<details class="mb-3">
-  <summary class="text-primary" style="cursor: pointer;">
-    <strong>{{ .Get "title" | default "Click to expand" }}</strong>
+{{ $color := .Get "color" | default "primary" }}
+{{ $colorVal := $color }}
+{{ $isHex := strings.HasPrefix $color "#" }}
+
+{{ if not $isHex }}
+  {{ if eq $color "purple" }}
+    {{ $colorVal = "#9370DB" }} {{/* Medium Purple */}}
+    {{ $isHex = true }}
+  {{ end }}
+{{ end }}
+
+<details {{ if (or (eq (.Get "open") "true") (eq (.Get "expanded") "true")) }}open{{ end }} 
+         class="border {{ if not $isHex }}border-{{ $color }}{{ end }} rounded" 
+         style="display: table; padding: 0.5rem 1rem; margin: 1rem 0; max-width: 800px; {{ if $isHex }}border-color: {{ $colorVal }} !important;{{ end }}">
+  
+  <summary class="{{ if not $isHex }}text-{{ $color }}{{ end }}" style="cursor: pointer; font-weight: 600; margin-right: 5px; {{ if $isHex }}color: {{ $colorVal }} !important;{{ end }}">
+    {{ .Get "title" | default "Details" | markdownify }}
   </summary>
-  <div class="p-3 mt-2 border-start border-primary bg-light">
+
+  <div class="details-content" style="padding-top: 1rem; overflow-x: auto;">
     {{ .Inner | markdownify }}
   </div>
+
 </details>
+
+<style>
+  /* This ensures that if there's a code block inside, it stays inside */
+  .details-content pre {
+    white-space: pre-wrap;
+    word-break: break-all;
+    max-width: 100%;
+  }
+</style>

@@ -3,11 +3,12 @@ title: "Gateway"
 weight: 2
 ---
 
-{{< details title="Standard Channel since v0.5.0" >}}
+{{< details title="Standard Channel since v0.5.0" color="success" >}}
 The `Gateway` resource is GA and has been part of the Standard Channel since
 `v0.5.0`. For more information on release channels, refer to our [versioning
 guide](/docs/concepts/versioning/).
 {{< /details >}}
+
 A `Gateway` is 1:1 with the lifecycle of the configuration of infrastructure.
 When a user creates a `Gateway`, some load balancing infrastructure is
 provisioned or configured (see below for details) by the `GatewayClass`

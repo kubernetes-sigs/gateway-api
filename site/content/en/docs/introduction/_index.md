@@ -33,6 +33,7 @@ Gateway, GatewayClass, and HTTPRoute have been part of the Standard Channel
 of Gateway API since v0.5.0 and are considered stable APIs. For more
 information refer to our [versioning guide](/docs/concepts/versioning/).
 {{< /details >}}
+
 When using Gateway API to manage ingress traffic, the [Gateway](/reference/api-types/gateway/) resource
 defines a point of access at which traffic can be routed across multiple
 contexts -- for example, from outside the cluster to inside the cluster
@@ -61,6 +62,7 @@ The [GAMMA initiative](/docs/mesh/gamma/) work for supporting service mesh use
 cases has been part of the Standard Channel since v1.1.0 and is considered
 GA. For more information refer to our [versioning guide](/docs/concepts/versioning/).
 {{< /details >}}
+
 Things are a bit different when using Gateway API to manage a [service
 mesh][service-mesh]. Since there will usually only be one mesh active in the
 cluster, the [Gateway](/reference/api-types/gateway/) and

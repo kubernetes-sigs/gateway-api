@@ -4,16 +4,18 @@ linkTitle: "HTTP CORS"
 weight: 10
 ---
 
-{{< details title="Extended Support Feature: HTTPRouteCORS" >}}
+{{< details title="Extended Support Feature: HTTPRouteCORS" open="true" >}}
 This feature is part of extended support, and requires your implementation to support the feature `HTTPRouteCORS`. For more information on support levels, refer to our [conformance guide](/docs/concepts/conformance/).
 
 {{< /details >}}
-{{< details title="Standard Channel since v1.5.0" >}}
+
+{{< details title="Standard Channel since v1.5.0" color="success" >}}
 The `HTTPRouteCORS` feature has been part of the Standard Channel since
 `v1.5.0`. For more information on release channels, refer to our [versioning
 guide](/docs/concepts/versioning/).
 
 {{< /details >}}
+
 The [HTTPRoute resource](/reference/api-types/httproute/) can be used to configure
 Cross-Origin Resource Sharing (CORS). CORS is a security feature that allows
 or denies web applications running at one domain to make requests for resources

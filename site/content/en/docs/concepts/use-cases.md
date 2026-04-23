@@ -40,6 +40,7 @@ since `v0.8.0`. For more information on release
 channels, refer to our [versioning guide](/docs/concepts/versioning/).
 
 {{< /details >}}
+
 Ana has created a microservice application which she wants to run in
 Kubernetes. Her application will be used by clients outside the cluster, and
 while Ana has created the application, setting up the cluster is not in her
@@ -100,6 +101,7 @@ since `v0.8.0`. For more information on release
 channels, refer to our [versioning guide](/docs/concepts/versioning/).
 
 {{< /details >}}
+
 This is remarkably similar to the [basic north/south use
 case](#basic-northsouth-use-case), but there are multiple application teams:
 Ana and her team are managing a storefront application in the `store`

@@ -39,13 +39,14 @@ There are three main types of objects in our resource model:
 
 ### GatewayClass
 
-{{< details title="Standard Channel since v0.5.0" >}}
+{{< details title="Standard Channel since v0.5.0" color="success" >}}
 
 The `GatewayClass` resource is GA and has been part of the Standard Channel since
 `v0.5.0`. For more information on release channels, refer to our [versioning
 guide](/docs/concepts/versioning/).
 
 {{< /details >}}
+
 GatewayClass defines a set of Gateways that share a common configuration and
 behaviour. Each GatewayClass will be handled by a single controller, although
 controllers may handle more than one GatewayClass.
@@ -65,13 +66,14 @@ IngressClass object.
 
 ### Gateway
 
-{{< details title="Standard Channel since v0.5.0" >}}
+{{< details title="Standard Channel since v0.5.0" color="success" >}}
 
 The `Gateway` resource is GA and has been part of the Standard Channel since
 `v0.5.0`. For more information on release channels, refer to our [versioning
 guide](/docs/concepts/versioning/).
 
 {{< /details >}}
+
 A Gateway describes how traffic can be translated to Services within the
 cluster. That is, it defines a request for a way to translate traffic from
 somewhere that does not know about Kubernetes to somewhere that does. For
@@ -118,7 +120,7 @@ If they are, then the entire Gateway is invalid and will not reach `Accepted` st
 
 (Feel free to skip these exact definitions below if you are just starting out, they are very important, but you can learn by doing as well).
 
-{{< details title="Distinctiveness rules, in increasing order of complexity" >}}
+{{< details title="Distinctiveness rules, in increasing order of complexity" color="purple" >}}
 
 * `TCP` and `UDP` Listeners are distinct only on the combination of `protocol` and `port`.
 So, two Listeners that listen on port `53`, but where one has `protocol` set to `TCP` and the other `UDP` are distinct, but two Listeners that both have `protocol` `TCP`, and `port` `22` are not distinct, and are thus Conflicted.
@@ -133,6 +135,7 @@ So, two Listeners that expose `HTTPS` on port `443` are distinct if they have di
 
 
 {{< /details >}}
+
 ### Route Types
 
 Route resources define protocol-specific rules for mapping requests from a Gateway
@@ -144,13 +147,14 @@ types may be added to the API in future.
 
 #### HTTPRoute
 
-{{< details title="Standard Channel since v0.5.0" >}}
+{{< details title="Standard Channel since v0.5.0" color="success" >}}
 
 The `HTTPRoute` resource is GA and has been part of the Standard Channel since
 `v0.5.0`. For more information on release channels, refer to our [versioning
 guide](/docs/concepts/versioning/).
 
 {{< /details >}}
+
 HTTPRoute is for multiplexing HTTP or terminated HTTPS connections. It's intended
 for use in cases where you want to inspect the HTTP stream and use HTTP request data
 for either routing or modification, for example using HTTP Headers for routing, or
@@ -158,13 +162,14 @@ modifying them in-flight.
 
 #### TLSRoute
 
-{{< details title="Standard Channel since v1.5.0" >}}
+{{< details title="Standard Channel since v1.5.0" color="success" >}}
 
 The `TLSRoute` resource is GA and has been part of the Standard Channel since
 `v1.5.0`. For more information on release channels, refer to our [versioning
 guide](/docs/concepts/versioning/).
 
 {{< /details >}}
+
 TLSRoute is for multiplexing TLS connections, discriminated via SNI. It's intended
 for where you want to route based on TLS metadata, and are not interested in properties
 of the higher-level protocols like HTTP. When using a `Passthrough` TLS listener, the
@@ -174,13 +179,14 @@ listener, encryption is terminated at the gateway.
 
 #### TCPRoute and UDPRoute
 
-{{< details title="Experimental Channel since v0.3.0" >}}
+{{< details title="Experimental Channel since v0.3.0" color="purple" >}}
 
 The `TCPRoute` and `UDPRoute` resources are Alpha and have been part of the
 Experimental Channel since `v0.3.0`. For more information on release
 channels, refer to our [versioning guide](/docs/concepts/versioning/).
 
 {{< /details >}}
+
 TCPRoute (and UDPRoute) are intended for use for mapping one or more ports
 to a single backend. In this case, there is no discriminator you can
 use to choose different backends on the same port, so each TCPRoute really needs a
@@ -191,13 +197,14 @@ is passed through to the backend.
 
 #### GRPCRoute
 
-{{< details title="Standard Channel since v1.1.0" >}}
+{{< details title="Standard Channel since v1.1.0" color="success" >}}
 
 The `GRPCRoute` resource is GA and has been part of the Standard Channel since
 `v1.1.0`. For more information on release channels, refer to our [versioning
 guide](/docs/concepts/versioning/).
 
 {{< /details >}}
+
 GRPCRoute is for idiomatically routing gRPC traffic. Gateways supporting
 GRPCRoute are required to support HTTP/2 without an initial upgrade from HTTP/1,
 so gRPC traffic is guaranteed to flow properly.
@@ -280,16 +287,18 @@ As said above, the following is required for a Route to be attached to a Gateway
 
 #### Referencing Gateways
 
-{{< details title="Extended Support Feature: HTTPRouteParentRefPort" >}}
+{{< details title="Extended Support Feature: HTTPRouteParentRefPort" open="true" >}}
 This feature is part of extended support. For more information on support levels, refer to our [conformance guide](/docs/concepts/conformance/).
 
 {{< /details >}}
-{{< details title="Extended Feature" >}}
+
+{{< details title="Extended Feature" color="purple" >}}
 
 The `Port` field described below is an Extended feature, and so is _optional_ for implementations to support.
 The feature name for this feature is `HTTPRouteParentRefPort`, and you should be able to find out if your implementation supports it either in the implementation's GatewayClass (under `status.supportedFeatures`), or on one of the implementation comparison pages (like the [v1.4 comparison](/docs/implementations/versions/v_one_four/).)
 
 {{< /details >}}
+
 A Route can reference a Gateway by specifying the namespace (optional if the
 Route and the Gateway are in the same namespace) and name of the Gateway in
 a `parentRef`. By default, a Route will attach to all listeners of a Gateway,
@@ -334,73 +343,16 @@ The following `my-route` Route wants to attach to the `foo-gateway` in the
 `foo-gateway` is in a different Namespace. The `foo-gateway` must allow
 attachment from HTTPRoutes in the namespace `gateway-api-example-ns2`.
 
-```yaml
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
-metadata:
-  name: my-route
-  namespace: gateway-api-example-ns2
-spec:
-  parentRefs:
-  - kind: Gateway
-    name: foo-gateway
-    namespace: gateway-api-example-ns1
-  rules:
-  - backendRefs:
-    - name: foo-svc
-      port: 8080
-```
+{{< readfile file="/examples/standard/http-route-attachment/httproute.yaml" code="true" lang="yaml" >}}
 
 This `foo-gateway` allows the `my-route` HTTPRoute to attach.
 
-```yaml
-apiVersion: gateway.networking.k8s.io/v1
-kind: Gateway
-metadata:
-  name: foo-gateway
-  namespace: gateway-api-example-ns1
-spec:
-  gatewayClassName: foo-lb
-  listeners:
-  - name: prod-web
-    port: 80
-    protocol: HTTP
-    allowedRoutes:
-      kinds:
-      - kind: HTTPRoute
-      namespaces:
-        from: Selector
-        selector:
-          matchLabels:
-            # This label is added automatically as of K8s 1.22
-            # to all namespaces
-            kubernetes.io/metadata.name: gateway-api-example-ns2
-```
+{{< readfile file="/examples/standard/http-route-attachment/gateway-strict.yaml" code="true" lang="yaml" >}}
 
 For a more permissive example, the below Gateway will allow all HTTPRoute resources
 to attach from Namespaces with the "expose-apps: true" label.
 
-```yaml
-apiVersion: gateway.networking.k8s.io/v1
-kind: Gateway
-metadata:
-  name: prod-gateway
-  namespace: gateway-api-example-ns1
-spec:
-  gatewayClassName: foo-lb
-  listeners:
-  - name: prod-web
-    port: 80
-    protocol: HTTP
-    allowedRoutes:
-      kinds:
-      - kind: HTTPRoute
-      namespaces:
-        from: Selector
-        selector:
-          matchLabels:
-            expose-apps: "true"
-```
+{{< readfile file="/examples/standard/http-route-attachment/gateway-namespaces.yaml" code="true" lang="yaml" >}}
 
 ### Combined types
 
