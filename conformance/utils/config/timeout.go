@@ -120,13 +120,12 @@ type TimeoutConfig struct {
 	// RequiredConsecutiveSuccesses is the number of requests that must succeed in a row
 	// to consider a response "consistent" before making additional assertions on the response body.
 	// If this number is not reached within MaxTimeToConsistency, the test will fail.
-	RequiredConsecutiveSuccesses int `json:"requiredConsecutiveSuccesses"`
+	RequiredConsecutiveSuccesses int
 }
 
 // UnmarshalJSON ensures time.Duration values are parsed correctly.
-// Use reflection to derive field mappings from json tags.
 func (tc *TimeoutConfig) UnmarshalJSON(data []byte) error {
-	var raw map[string]json.RawMessage
+	var raw map[string]string
 	if err := json.Unmarshal(data, &raw); err != nil {
 		return err
 	}
@@ -137,27 +136,18 @@ func (tc *TimeoutConfig) UnmarshalJSON(data []byte) error {
 	for i := 0; i < t.NumField(); i++ {
 		field := t.Field(i)
 		jsonTag := strings.Split(field.Tag.Get("json"), ",")[0]
-		rawVal, ok := raw[jsonTag]
+		if jsonTag == "" {
+			continue
+		}
+		s, ok := raw[jsonTag]
 		if !ok {
 			continue
 		}
-
-		switch field.Type {
-		case reflect.TypeFor[time.Duration]():
-			var s string
-			if err := json.Unmarshal(rawVal, &s); err != nil {
-				return fmt.Errorf("field %q: expected duration string: %w", jsonTag, err)
-			}
-			d, err := time.ParseDuration(s)
-			if err != nil {
-				return fmt.Errorf("field %q: %w", jsonTag, err)
-			}
-			v.Field(i).SetInt(int64(d))
-		default:
-			if err := json.Unmarshal(rawVal, v.Field(i).Addr().Interface()); err != nil {
-				return fmt.Errorf("field %q: %w", jsonTag, err)
-			}
+		d, err := time.ParseDuration(s)
+		if err != nil {
+			return fmt.Errorf("field %q: %w", jsonTag, err)
 		}
+		v.Field(i).SetInt(int64(d))
 	}
 
 	return nil
