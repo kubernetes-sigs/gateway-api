@@ -9,12 +9,8 @@ This proposal introduces a standardized, provider-agnostic Telemetry API to conf
 
 ## Goals
 
-1. Decouple the intent of observability from the underlying vendor-specific implementation.
-2. Provide uniform configurability for both Gateway and Mesh use cases.
-3. Account for the fact that the persona responsible for the Gateway/Mesh infrastructure can be different from the persona responsible for dictating the structure and behavior of telemetry signals.
-4. Empower platform and observability teams to enforce uniform telemetry standards across large-scale heterogeneous environments.
-5. Ensure the API is suitable for the broader ecosystem beyond specialized networking.
-6. Accommodate emerging standards and new protocols through a flexible and extensible API design.
+1. Establish a standardized model to configure provider-agnostic telemetry (metrics, access logs, and traces) for both Gateway and Mesh.
+2. Enable separation of concerns between the persona managing networking infrastructure (Platform Team) and the persona governing telemetry signals (Observability/Security Team).
 
 ## Non-Goals
 
@@ -36,21 +32,10 @@ In the current Kubernetes landscape, the "Who, What, Where, and How Long" of net
 
 1. Enforce consistent auditing standards across different infrastructure providers.
 2. Manage "Mesh" and "Gateway" observability with a single unified API.
-3. Support emerging workloads like AI Agents, which require specialized metrics (e.g., token usage, model latency) and detailed audit logs for tool-use verification.
-
-### The Emergence of Agentic Networking
-
-The most recent pressing driver for this proposal is the shift in traffic patterns introduced by agentic workloads. We are moving from a deterministic Service-to-Service paradigm to a non-deterministic Agent-to-Tool and Agent-to-Agent paradigm.
-
-In an Agentic Mesh:
-
-* Entities are Autonomous: Unlike traditional workloads, the runtime behavior and resulting network traffic of AI Agents are driven dynamically by a Large Language Model (LLM) rather than being statically defined within the application code.
-* Cost is Volatile: Usage is measured in tokens, not just requests. A single HTTP 200 OK could cost $0.01 or $10.00 depending on the prompt and model used.
-* Context is King: Debugging requires knowing the semantic context: Which Model? Which Prompt? Which tool?
-
-Telemetry configuration must be flexible enough to account for emerging standards, such as Generative AI semantic conventions. AI traffic should not be treated as opaque TCP streams or standard HTTP requests. Without a standardized API to enable the extraction and export of bespoke attributes the "Agentic Mesh" risks remaining an observability blind spot.
+3. Support emerging workloads like AI Agents, which elevate the criticality of observability due to their autonomous, non-deterministic nature and requirements for specialized signals.
 
 ### Who
+
 - **Platform Operators**: Need to ensure uniform observability across all networking infrastructure.
 - **Observability Teams**: Responsible for the governance of telemetry data. They need to define and enforce standardized schemas and collection policies across the entire organization.
 - **Security/Auditing Teams**: Require a standardized audit trail for all traffic, especially for autonomous agent actions.
@@ -67,13 +52,13 @@ This proposal argues that the Policy Attachment model is the most effective appr
 1. **Separation of Concerns**: It allows different personas to manage Gateway infrastructure (the Platform Team) independently from the configuration of telemetry signals (the Observability team).
 2. **Fleet-Wide Uniformity**: It enables a single policy to be applied uniformly across a fleet of Gateways and Meshes, eliminating the need to duplicate complex telemetry configurations across individual resources.
 
-To mitigate the challenge of defining merging semantics, this GEP restricts configuration such that only a single `TelemetryPolicy` can target a `Gateway` or `Mesh` at any given time. Attaching multiple `TelemetryPolicy` resources to the same target is considered out of scope for this specification and constitutes undefined behavior.
+To mitigate the challenge of complex merging semantics, this GEP restricts configuration such that only a single `TelemetryPolicy` can target a `Gateway` or `Mesh` at any given time. If multiple `TelemetryPolicy` resources target the same object, precedence is determined based on the creation timestamp.
 
 ### High-level Considerations:
 
 - **Tracing**: Configuration for OTLP endpoints, sampling rates (probabilistic and parent-based), and custom span attributes.
 - **Metrics**: Ability to enable/disable specific metric families and customize dimensions (labels/attributes).
-- **Access Logs**: Filtering for smart logging (e.g., only log 5xx errors or high latency) and field selection.
+- **Access Logs**: Filtering for smart logging (e.g., only log 5xx errors or high latency), multi-protocol support, and log format customization (including field selection).
 
 ## Request Flow
 
