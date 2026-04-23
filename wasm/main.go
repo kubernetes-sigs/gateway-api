@@ -581,14 +581,23 @@ func getSelections() (must, good []selection) {
 
 func gtagEvent(eventName string, params map[string]interface{}) {
 	global := js.Global()
-	if gtag := global.Get("gtag"); gtag.Truthy() {
-		global.Call("gtag", "event", eventName, js.ValueOf(params))
+
+	paramsJS := global.Get("Object").New()
+	for k, v := range params {
+		paramsJS.Set(k, js.ValueOf(v))
+	}
+
+	gtag := global.Get("gtag")
+	if gtag.Truthy() {
+		global.Call("gtag", "event", eventName, paramsJS)
 		return
 	}
+
 	parent := global.Get("parent")
 	if parent.Truthy() && !parent.Equal(global) {
 		if pGtag := parent.Get("gtag"); pGtag.Truthy() {
-			parent.Call("gtag", "event", eventName, js.ValueOf(params))
+			parent.Call("gtag", "event", eventName, paramsJS)
+			return
 		}
 	}
 }
@@ -800,7 +809,10 @@ func recommend() {
 	html.WriteString("</tbody></table>")
 	resultsContent.Set("innerHTML", html.String())
 	resultsDiv.Get("classList").Call("add", "visible")
-	resultsDiv.Call("scrollIntoView", map[string]interface{}{"behavior": "smooth", "block": "start"})
+	scrollOpts := js.Global().Get("Object").New()
+	scrollOpts.Set("behavior", "smooth")
+	scrollOpts.Set("block", "start")
+	resultsDiv.Call("scrollIntoView", scrollOpts)
 	setStatus(statusEl, len(scoredList))
 	notifyResize()
 }
