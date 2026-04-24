@@ -42,6 +42,7 @@ var GatewayInvalidTLSBackendConfiguration = suite.ConformanceTest{
 		features.SupportBackendTLSPolicy,
 	},
 	Manifests: []string{"tests/gateway-invalid-tls-backend-configuration.yaml"},
+	Parallel:  true,
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
 		testCases := []struct {
 			name                  string

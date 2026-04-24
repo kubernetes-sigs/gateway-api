@@ -42,6 +42,7 @@ var BackendTLSPolicyInvalidCACertificateRef = confsuite.ConformanceTest{
 		features.SupportBackendTLSPolicy,
 	},
 	Manifests: []string{"tests/backendtlspolicy-invalid-ca-certificate-ref.yaml"},
+	Parallel:  true,
 	Test: func(t *testing.T, suite *confsuite.ConformanceTestSuite) {
 		ns := confsuite.InfrastructureNamespace
 		routeNN := types.NamespacedName{Name: "backendtlspolicy-invalid-ca-certificate-ref", Namespace: ns}
