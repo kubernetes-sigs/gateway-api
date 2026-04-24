@@ -96,9 +96,9 @@ def load_yaml(path):
 
 def parse_version(version_dir_name):
     """Return (major, minor, patch) or (0,0,0) for sorting."""
-    m = re.match(r"v?(\d+)\.(\d+)\.(\d+)", version_dir_name)
+    m = re.match(r"v?(\d+)\.(\d+)(?:\.(\d+))?", version_dir_name)
     if m:
-        return (int(m.group(1)), int(m.group(2)), int(m.group(3)))
+        return (int(m.group(1)), int(m.group(2)), int(m.group(3) or 0))
     return (0, 0, 0)
 
 
@@ -268,8 +268,8 @@ def main():
     )
     parser.add_argument(
         "--version",
-        metavar="vX.Y.Z",
-        help="Output a single array for this version (e.g. v1.4.0).",
+        metavar="vX.Y",
+        help="Output a single array for this version (e.g. v1.4).",
     )
     parser.add_argument(
         "-o",
@@ -301,7 +301,7 @@ def main():
         impls = aggregate_by_impl(version_dir)
         out = {"featureDefinitions": FEATURE_DEFINITIONS, "implementations": impls}
     else:
-        parser.error("Specify --all or --version vX.Y.Z")
+        parser.error("Specify --all or --version vX.Y")
 
     os.makedirs(os.path.dirname(output), exist_ok=True)
     with open(output, "w", encoding="utf-8") as f:
