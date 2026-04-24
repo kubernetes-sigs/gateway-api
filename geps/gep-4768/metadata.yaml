@@ -1,0 +1,11 @@
+apiVersion: internal.gateway.networking.k8s.io/v1alpha1
+kind: GEPDetails
+number: 4768
+name: Standardized Telemetry API
+status: Provisional
+authors:
+  - gkhom
+seeAlso:
+ - https://github.com/kubernetes-sigs/kube-agentic-networking/pull/69
+ - https://gateway-api.sigs.k8s.io/geps/gep-713/
+
