@@ -18,7 +18,6 @@ package conformance
 
 import (
 	"io/fs"
-	"net/netip"
 	"os"
 	"testing"
 
@@ -35,7 +34,6 @@ import (
 	"github.com/stretchr/testify/require"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	clientset "k8s.io/client-go/kubernetes"
-	"k8s.io/utils/ptr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -68,70 +66,33 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 	require.NoError(t, v1.Install(client.Scheme()))
 	require.NoError(t, apiextensionsv1.AddToScheme(client.Scheme()))
 
-	supportedFeatures := suite.ParseSupportedFeatures(*flags.SupportedFeatures)
-	exemptFeatures := suite.ParseSupportedFeatures(*flags.ExemptFeatures)
-	skipTests := suite.ParseSkipTests(*flags.SkipTests)
-	namespaceLabels := suite.ParseKeyValuePairs(*flags.NamespaceLabels)
-	namespaceAnnotations := suite.ParseKeyValuePairs(*flags.NamespaceAnnotations)
-	conformanceProfiles := suite.ParseConformanceProfiles(*flags.ConformanceProfiles)
+	// Load configurable conformance options, using flag defaults as needed.
+	configurableOpts := &suite.ConfigurableOptions{
+		CleanupBaseResources: flags.DefaultCleanupBaseResources,
+		CleanupTestResources: flags.DefaultCleanupTestResources,
+		GatewayClassName:     flags.DefaultGatewayClassName,
+		Mode:                 flags.DefaultMode,
+		TimeoutConfig:        conformanceconfig.DefaultTimeoutConfig(),
+	}
 
-	implementation := suite.ParseImplementation(
-		*flags.ImplementationOrganization,
-		*flags.ImplementationProject,
-		*flags.ImplementationURL,
-		*flags.ImplementationVersion,
-		*flags.ImplementationContact,
-	)
-	var usable, unusable []v1.GatewaySpecAddress
-	if v := *flags.UsableAddress; v != "" {
-		usable = append(usable, parseAddress(v))
+	// Load conformance options provided via yaml file, overriding defaults.
+	if *flags.ConformanceOptionsFile != "" {
+		data, err := os.ReadFile(*flags.ConformanceOptionsFile)
+		require.NoError(t, err, "error reading conformance options file")
+
+		err = yaml.Unmarshal(data, configurableOpts)
+		require.NoError(t, err, "error unmarshalling conformance options file")
 	}
-	if v := *flags.UnusableAddress; v != "" {
-		unusable = append(unusable, parseAddress(v))
-	}
+	// Override options with any command line flags that were explicitly set.
+	flags.ApplyAll(configurableOpts)
 
 	return suite.ConformanceOptions{
-		AllowCRDsMismatch:          *flags.AllowCRDsMismatch,
-		CleanupBaseResources:       *flags.CleanupBaseResources,
-		CleanupTestResources:       *flags.CleanupTestResources,
-		Client:                     client,
-		ClientOptions:              clientOptions,
-		Clientset:                  clientset,
-		ConformanceProfiles:        conformanceProfiles,
-		Debug:                      *flags.ShowDebug,
-		EnableAllSupportedFeatures: *flags.EnableAllSupportedFeatures,
-		ExemptFeatures:             exemptFeatures,
-		ManifestFS:                 []fs.FS{&Manifests},
-		GatewayClassName:           *flags.GatewayClassName,
-		UsableNetworkAddresses:     usable,
-		UnusableNetworkAddresses:   unusable,
-		MeshName:                   *flags.MeshName,
-		Implementation:             implementation,
-		Mode:                       *flags.Mode,
-		NamespaceAnnotations:       namespaceAnnotations,
-		NamespaceLabels:            namespaceLabels,
-		ReportOutputPath:           *flags.ReportOutput,
-		RestConfig:                 cfg,
-		RunTest:                    *flags.RunTest,
-		SkipTests:                  skipTests,
-		SupportedFeatures:          supportedFeatures,
-		TimeoutConfig:              conformanceconfig.DefaultTimeoutConfig(),
-		SkipProvisionalTests:       *flags.SkipProvisionalTests,
-		FailFast:                   *flags.FailFast,
-	}
-}
-
-func parseAddress(v string) v1.GatewaySpecAddress {
-	_, err := netip.ParseAddr(v)
-	if err == nil {
-		return v1.GatewaySpecAddress{
-			Type:  ptr.To(v1.IPAddressType),
-			Value: v,
-		}
-	}
-	return v1.GatewaySpecAddress{
-		Type:  ptr.To(v1.HostnameAddressType),
-		Value: v,
+		ConfigurableOptions: *configurableOpts,
+		Client:              client,
+		ClientOptions:       clientOptions,
+		Clientset:           clientset,
+		ManifestFS:          []fs.FS{&Manifests},
+		RestConfig:          cfg,
 	}
 }
 
@@ -176,9 +137,9 @@ func logOptions(t *testing.T, opts suite.ConformanceOptions) {
 	t.Logf("  Cleanup Test Resources: %t", opts.CleanupTestResources)
 	t.Logf("  Debug: %t", opts.Debug)
 	t.Logf("  Enable All Features: %t", opts.EnableAllSupportedFeatures)
-	t.Logf("  Supported Features: %v", opts.SupportedFeatures.UnsortedList())
-	t.Logf("  ExemptFeatures: %v", opts.ExemptFeatures.UnsortedList())
-	t.Logf("  ConformanceProfiles: %v", opts.ConformanceProfiles.UnsortedList())
+	t.Logf("  Supported Features: %v", opts.SupportedFeatures)
+	t.Logf("  ExemptFeatures: %v", opts.ExemptFeatures)
+	t.Logf("  ConformanceProfiles: %v", opts.ConformanceProfiles)
 }
 
 func writeReport(logf func(string, ...any), report confv1.ConformanceReport, output string) error {

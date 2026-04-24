@@ -41,7 +41,6 @@ import (
 	xmeshv1alpha1 "sigs.k8s.io/gateway-api/apisx/v1alpha1"
 	confv1 "sigs.k8s.io/gateway-api/conformance/apis/v1"
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
-	"sigs.k8s.io/gateway-api/conformance/utils/flags"
 	"sigs.k8s.io/gateway-api/conformance/utils/grpc"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/roundtripper"
@@ -133,60 +132,63 @@ type ConformanceTestSuite struct {
 	failFast bool
 }
 
-// ConformanceOptions can be used to initialize a ConformanceTestSuite.
-type ConformanceOptions struct {
-	Client               client.Client
-	ClientOptions        client.Options
-	Clientset            clientset.Interface
-	RestConfig           *rest.Config
-	GatewayClassName     string
-	MeshName             string
-	AddressType          string
-	Debug                bool
-	RoundTripper         roundtripper.RoundTripper
-	GRPCClient           grpc.Client
-	BaseManifests        string
-	MeshManifests        string
-	NamespaceLabels      map[string]string
-	NamespaceAnnotations map[string]string
-	ReportOutputPath     string
-
+// ConfigurableOptions defines conformance options that are configurable by the user via flags or yaml.
+type ConfigurableOptions struct {
+	GatewayClassName     string            `json:"gatewayClassName"`
+	MeshName             string            `json:"meshName"`
+	Debug                bool              `json:"debug"`
+	NamespaceLabels      map[string]string `json:"namespaceLabels"`
+	NamespaceAnnotations map[string]string `json:"namespaceAnnotations"`
+	ReportOutputPath     string            `json:"reportOutputPath"`
 	// CleanupBaseResources indicates whether or not the base test
 	// resources such as Gateways should be cleaned up after the run.
-	CleanupBaseResources bool
+	CleanupBaseResources bool `json:"cleanupBaseResources"`
 	// CleanupTestResources indicates whether or not test-specific manifests
 	// should be cleaned up after each test.
-	CleanupTestResources       bool
-	SupportedFeatures          FeaturesSet
-	ExemptFeatures             FeaturesSet
-	EnableAllSupportedFeatures bool
-	TimeoutConfig              config.TimeoutConfig
+	CleanupTestResources       bool                   `json:"cleanupTestResources"`
+	SupportedFeatures          []features.FeatureName `json:"supportedFeatures"`
+	ExemptFeatures             []features.FeatureName `json:"exemptFeatures"`
+	EnableAllSupportedFeatures bool                   `json:"enableAllSupportedFeatures"`
+	TimeoutConfig              config.TimeoutConfig   `json:"timeoutConfig"`
 	// SkipTests contains all the tests not to be run and can be used to opt out
 	// of specific tests
-	SkipTests []string
+	SkipTests []string `json:"skipTests"`
 	// SkipProvisionalTests indicates whether or not to skip provisional tests.
-	SkipProvisionalTests bool
+	SkipProvisionalTests bool `json:"skipProvisionalTests"`
 	// RunTest is a single test to run, mostly for development/debugging convenience.
-	RunTest string
-	// Hook is an optional function that can be used to run custom logic after each test at suite level.
-	Hook       func(t *testing.T, test ConformanceTest, suite *ConformanceTestSuite)
-	ManifestFS []fs.FS
+	RunTest             string                   `json:"runTest"`
+	Mode                string                   `json:"mode"`
+	AllowCRDsMismatch   bool                     `json:"allowCrdsMismatch"`
+	Implementation      confv1.Implementation    `json:"implementation"`
+	ConformanceProfiles []ConformanceProfileName `json:"conformanceProfiles"`
+	FailFast            bool                     `json:"failFast"`
 
 	// UsableNetworkAddresses is an optional pool of usable addresses for
 	// Gateways for tests which need to test manual address assignments.
-	UsableNetworkAddresses []gatewayv1.GatewaySpecAddress
+	UsableNetworkAddresses []gatewayv1.GatewaySpecAddress `json:"usableAddresses"`
 
 	// UnusableNetworkAddresses is an optional pool of unusable addresses for
 	// Gateways for tests which need to test failures with manual Gateway
 	// address assignment.
-	UnusableNetworkAddresses []gatewayv1.GatewaySpecAddress
+	UnusableNetworkAddresses []gatewayv1.GatewaySpecAddress `json:"unusableAddresses"`
+}
 
-	Mode                string
-	AllowCRDsMismatch   bool
-	Implementation      confv1.Implementation
-	ConformanceProfiles sets.Set[ConformanceProfileName]
+// ConformanceOptions can be used to initialize a ConformanceTestSuite.
+type ConformanceOptions struct {
+	ConfigurableOptions
 
-	FailFast bool
+	Client        client.Client
+	ClientOptions client.Options
+	Clientset     clientset.Interface
+	RestConfig    *rest.Config
+	AddressType   string
+	RoundTripper  roundtripper.RoundTripper
+	GRPCClient    grpc.Client
+	BaseManifests string
+	MeshManifests string
+	// Hook is an optional function that can be used to run custom logic after each test at suite level.
+	Hook       func(t *testing.T, test ConformanceTest, suite *ConformanceTestSuite)
+	ManifestFS []fs.FS
 }
 
 type FeaturesSet = sets.Set[features.FeatureName]
@@ -210,10 +212,10 @@ const (
 
 // NewConformanceTestSuite is a helper to use for creating a new ConformanceTestSuite.
 func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite, error) {
-	supportedFeatures := options.SupportedFeatures.Difference(options.ExemptFeatures)
+	supportedFeatures := sets.New(options.SupportedFeatures...).Difference(sets.New(options.ExemptFeatures...))
 	source := supportedFeaturesSourceManual
 	if options.EnableAllSupportedFeatures {
-		supportedFeatures = features.SetsToNamesSet(features.AllFeatures).Difference(options.ExemptFeatures)
+		supportedFeatures = features.SetsToNamesSet(features.AllFeatures).Difference(sets.New(options.ExemptFeatures...))
 	} else if shouldInferSupportedFeatures(&options) {
 		var err error
 		if options.GatewayClassName != "" {
@@ -243,7 +245,7 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 	extendedSupportedFeatures := make(map[ConformanceProfileName]FeaturesSet, 0)
 	extendedUnsupportedFeatures := make(map[ConformanceProfileName]FeaturesSet, 0)
 
-	for _, conformanceProfileName := range options.ConformanceProfiles.UnsortedList() {
+	for _, conformanceProfileName := range options.ConformanceProfiles {
 		conformanceProfile, err := getConformanceProfileForName(conformanceProfileName)
 		if err != nil {
 			return nil, fmt.Errorf("failed to retrieve conformance profile: %w", err)
@@ -256,9 +258,6 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 		extendedUnsupportedFeatures[conformanceProfileName] = conformanceProfile.ExtendedFeatures.Difference(supportedFeatures)
 	}
 
-	if flags.TimeoutConfigOverrides != nil && *flags.TimeoutConfigOverrides != "" {
-		config.ParseTimeoutOverrides(&options.TimeoutConfig, *flags.TimeoutConfigOverrides)
-	}
 	config.SetupTimeoutConfig(&options.TimeoutConfig)
 
 	roundTripper := options.RoundTripper
@@ -283,11 +282,6 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 		}
 		apiVersion = undefinedKeyword
 		apiChannel = undefinedKeyword
-	}
-
-	mode := flags.DefaultMode
-	if options.Mode != "" {
-		mode = options.Mode
 	}
 
 	suite := &ConformanceTestSuite{
@@ -319,9 +313,9 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 		results:                     make(map[string]testResult),
 		extendedUnsupportedFeatures: extendedUnsupportedFeatures,
 		extendedSupportedFeatures:   extendedSupportedFeatures,
-		conformanceProfiles:         options.ConformanceProfiles,
+		conformanceProfiles:         sets.New(options.ConformanceProfiles...),
 		implementation:              options.Implementation,
-		mode:                        mode,
+		mode:                        options.Mode,
 		apiVersion:                  apiVersion,
 		apiChannel:                  apiChannel,
 		supportedFeaturesSource:     source,
@@ -606,28 +600,15 @@ func (suite *ConformanceTestSuite) Report() (*confv1.ConformanceReport, error) {
 	}, nil
 }
 
-// ParseImplementation parses implementation-specific flag arguments and
-// creates a *confv1a1.Implementation.
-func ParseImplementation(org, project, url, version, contact string) confv1.Implementation {
-	return confv1.Implementation{
-		Organization: org,
-		Project:      project,
-		URL:          url,
-		Version:      version,
-		Contact:      strings.Split(contact, ","),
-	}
-}
-
 // ParseConformanceProfiles parses flag arguments and converts the string to
 // sets.Set[ConformanceProfileName].
-func ParseConformanceProfiles(p string) sets.Set[ConformanceProfileName] {
-	res := sets.Set[ConformanceProfileName]{}
+func ParseConformanceProfiles(p string) []ConformanceProfileName {
 	if p == "" {
-		return res
+		return nil
 	}
-
+	var res []ConformanceProfileName
 	for _, value := range strings.Split(p, ",") {
-		res.Insert(ConformanceProfileName(value))
+		res = append(res, ConformanceProfileName(value))
 	}
 	return res
 }
@@ -693,8 +674,8 @@ func shouldInferSupportedFeatures(opts *ConformanceOptions) bool {
 		return false
 	}
 	return !opts.EnableAllSupportedFeatures &&
-		opts.SupportedFeatures.Len() == 0 &&
-		opts.ExemptFeatures.Len() == 0 &&
+		len(opts.SupportedFeatures) == 0 &&
+		len(opts.ExemptFeatures) == 0 &&
 		opts.RunTest == ""
 }
 

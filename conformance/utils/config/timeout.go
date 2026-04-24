@@ -17,6 +17,9 @@ limitations under the License.
 package config
 
 import (
+	"encoding/json"
+	"fmt"
+	"reflect"
 	"strconv"
 	"strings"
 	"time"
@@ -25,99 +28,129 @@ import (
 type TimeoutConfig struct {
 	// TestIsolation represents the time block between test cases to enhance test isolation.
 	// Max value for conformant implementation: None
-	TestIsolation time.Duration
+	TestIsolation time.Duration `json:"testIsolation"`
 
 	// CreateTimeout represents the maximum time for a Kubernetes object to be created.
 	// Max value for conformant implementation: None
-	CreateTimeout time.Duration
+	CreateTimeout time.Duration `json:"createTimeout"`
 
 	// DeleteTimeout represents the maximum time for a Kubernetes object to be deleted.
 	// Max value for conformant implementation: None
-	DeleteTimeout time.Duration
+	DeleteTimeout time.Duration `json:"deleteTimeout"`
 
 	// GetTimeout represents the maximum time to get a Kubernetes object.
 	// Max value for conformant implementation: None
-	GetTimeout time.Duration
+	GetTimeout time.Duration `json:"getTimeout"`
 
 	// GatewayMustHaveAddress represents the maximum time for at least one IP Address has been set in the status of a Gateway.
 	// Max value for conformant implementation: None
-	GatewayMustHaveAddress time.Duration
+	GatewayMustHaveAddress time.Duration `json:"gatewayMustHaveAddress"`
 
 	// GatewayMustHaveCondition represents the maximum amount of time for a
 	// Gateway to have the supplied Condition.
 	// Max value for conformant implementation: None
-	GatewayMustHaveCondition time.Duration
+	GatewayMustHaveCondition time.Duration `json:"gatewayMustHaveCondition"`
 
 	// GatewayStatusMustHaveListeners represents the maximum time for a Gateway to have listeners in status that match the expected listeners.
 	// Max value for conformant implementation: None
-	GatewayStatusMustHaveListeners time.Duration
+	GatewayStatusMustHaveListeners time.Duration `json:"gatewayStatusMustHaveListeners"`
 
 	// GatewayListenersMustHaveConditions represents the maximum time for a Gateway to have all listeners with a specific condition.
 	// Max value for conformant implementation: None
-	GatewayListenersMustHaveConditions time.Duration
+	GatewayListenersMustHaveConditions time.Duration `json:"gatewayListenersMustHaveConditions"`
 
 	// ListenerSetMustHaveCondition represents the maximum amount of time for a
 	// ListenerSet to have the supplied Condition.
 	// Max value for conformant implementation: None
-	ListenerSetMustHaveCondition time.Duration
+	ListenerSetMustHaveCondition time.Duration `json:"listenerSetMustHaveCondition"`
 
 	// ListenerSetListenersMustHaveConditions represents the maximum time for a ListenerSet to have all listeners with a specific condition.
 	// Max value for conformant implementation: None
-	ListenerSetListenersMustHaveConditions time.Duration
+	ListenerSetListenersMustHaveConditions time.Duration `json:"listenerSetListenersMustHaveConditions"`
 
 	// GWCMustBeAccepted represents the maximum time for a GatewayClass to have an Accepted condition set to true.
 	// Max value for conformant implementation: None
-	GWCMustBeAccepted time.Duration
+	GWCMustBeAccepted time.Duration `json:"gwcMustBeAccepted"`
 
 	// HTTPRouteMustNotHaveParents represents the maximum time for an HTTPRoute to have either no parents or a single parent that is not accepted.
 	// Max value for conformant implementation: None
-	HTTPRouteMustNotHaveParents time.Duration
+	HTTPRouteMustNotHaveParents time.Duration `json:"httpRouteMustNotHaveParents"`
 
 	// HTTPRouteMustHaveCondition represents the maximum time for an HTTPRoute to have the supplied Condition.
 	// Max value for conformant implementation: None
-	HTTPRouteMustHaveCondition time.Duration
+	HTTPRouteMustHaveCondition time.Duration `json:"httpRouteMustHaveCondition"`
 
 	// TLSRouteMustHaveCondition represents the maximum time for a TLSRoute to have the supplied Condition.
 	// Max value for conformant implementation: None
-	TLSRouteMustHaveCondition time.Duration
+	TLSRouteMustHaveCondition time.Duration `json:"tlsRouteMustHaveCondition"`
 
 	// RouteMustHaveParents represents the maximum time for an xRoute to have parents in status that match the expected parents.
 	// Max value for conformant implementation: None
-	RouteMustHaveParents time.Duration
+	RouteMustHaveParents time.Duration `json:"routeMustHaveParents"`
 
 	// ManifestFetchTimeout represents the maximum time for getting content from a https:// URL.
 	// Max value for conformant implementation: None
-	ManifestFetchTimeout time.Duration
+	ManifestFetchTimeout time.Duration `json:"manifestFetchTimeout"`
 
 	// MaxTimeToConsistency is the maximum time for requiredConsecutiveSuccesses (default 3) requests to succeed in a row before failing the test.
 	// Max value for conformant implementation: 30 seconds
-	MaxTimeToConsistency time.Duration
+	MaxTimeToConsistency time.Duration `json:"maxTimeToConsistency"`
 
 	// NamespacesMustBeReady represents the maximum time for the following to happen within
 	// specified namespace(s):
 	// * All Pods to be marked as "Ready"
 	// * All Gateways to be marked as "Accepted" and "Programmed"
 	// Max value for conformant implementation: None
-	NamespacesMustBeReady time.Duration
+	NamespacesMustBeReady time.Duration `json:"namespacesMustBeReady"`
 
 	// RequestTimeout represents the maximum time for making an HTTP Request with the roundtripper.
 	// Max value for conformant implementation: None
-	RequestTimeout time.Duration
+	RequestTimeout time.Duration `json:"requestTimeout"`
 
 	// LatestObservedGenerationSet represents the maximum time for an ObservedGeneration to bump.
 	// Max value for conformant implementation: None
-	LatestObservedGenerationSet time.Duration
+	LatestObservedGenerationSet time.Duration `json:"latestObservedGenerationSet"`
 
 	// DefaultTestTimeout is the default amount of time to wait for a test to complete
-	DefaultTestTimeout time.Duration
+	DefaultTestTimeout time.Duration `json:"defaultTestTimeout"`
 
 	// DefaultPollInterval is the default amount of time to poll for status checks.
-	DefaultPollInterval time.Duration
+	DefaultPollInterval time.Duration `json:"defaultPollInterval"`
 
 	// RequiredConsecutiveSuccesses is the number of requests that must succeed in a row
 	// to consider a response "consistent" before making additional assertions on the response body.
 	// If this number is not reached within MaxTimeToConsistency, the test will fail.
 	RequiredConsecutiveSuccesses int
+}
+
+// UnmarshalJSON ensures time.Duration values are parsed correctly.
+func (tc *TimeoutConfig) UnmarshalJSON(data []byte) error {
+	var raw map[string]string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+
+	v := reflect.ValueOf(tc).Elem()
+	t := v.Type()
+
+	for i := 0; i < t.NumField(); i++ {
+		field := t.Field(i)
+		jsonTag := strings.Split(field.Tag.Get("json"), ",")[0]
+		if jsonTag == "" {
+			continue
+		}
+		s, ok := raw[jsonTag]
+		if !ok {
+			continue
+		}
+		d, err := time.ParseDuration(s)
+		if err != nil {
+			return fmt.Errorf("field %q: %w", jsonTag, err)
+		}
+		v.Field(i).SetInt(int64(d))
+	}
+
+	return nil
 }
 
 // DefaultTimeoutConfig populates a TimeoutConfig with the default values.
