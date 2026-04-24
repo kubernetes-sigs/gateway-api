@@ -90,7 +90,8 @@ def generate_conformance_tables(reports, currVersion, mkdocsConfig):
     gateway_tls_table = pandas.DataFrame()
     gateway_grpc_table = pandas.DataFrame()
 
-    if currVersion != 'v1.0.0':
+    is_v1_0 = parse_release(currVersion) < semver.VersionInfo.parse('1.1.0')
+    if not is_v1_0:
         gateway_http_table = generate_profiles_report(reports, 'GATEWAY-HTTP',currVersion)
 
         gateway_grpc_table = generate_profiles_report(reports, 'GATEWAY-GRPC',currVersion)
@@ -125,7 +126,7 @@ def generate_conformance_tables(reports, currVersion, mkdocsConfig):
         f.write("## Gateway Profile\n\n")
         f.write("### HTTPRoute\n\n")
         f.write(gateway_http_table.to_markdown()+'\n\n')
-        if currVersion != 'v1.0.0':
+        if not is_v1_0:
             f.write('### GRPCRoute\n\n')
             f.write(gateway_grpc_table.to_markdown()+'\n\n')
             f.write('### TLSRoute\n\n')
@@ -271,16 +272,20 @@ def generate_profiles_report(reports, route, version):
     features_col = http_table.pop("Extended Features")
     http_table.insert(insert_at, "Extended Features", features_col)
 
-    if semver.compare(version.removeprefix('v'), '1.4.0') < 0:
+    if parse_release(version) < semver.VersionInfo.parse('1.4.0'):
         http_table = http_table.drop(columns=["Core"])
-    if version == 'v1.0.0':
+    if parse_release(version) < semver.VersionInfo.parse('1.1.0'):
         http_table = http_table.drop(columns=["Mode"])
     return http_table
 
 
 pathTemp = "conformance/reports/*/"
 def parse_release(version):
-    return semver.VersionInfo.parse(version.removeprefix('v'))
+    v = version.removeprefix('v')
+    # Support major.minor without patch (e.g. "1.5" -> "1.5.0")
+    if re.fullmatch(r'\d+\.\d+', v):
+        v += '.0'
+    return semver.VersionInfo.parse(v)
 
 
 def release_key(version):
