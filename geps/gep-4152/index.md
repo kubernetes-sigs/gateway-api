@@ -82,7 +82,7 @@ The `mode` field selects one of the following verification strategies:
   `wellKnownCACertificates` to establish trust. Connections to backends presenting
   invalid, expired, untrusted, SAN-mismatch, or hostname-mismatched certificates 
   are rejected.
-* `InsecureSkipSANVerification` performs chain validation against the configured
+* `InsecureSkipOnlySANVerification` performs chain validation against the configured
   trust anchors (`caCertificateRefs`, `wellKnownCACertificates`, or
   `trustedCertificateHashes`), but skips SAN-matching.
 * `InsecureSkipVerification` disables all certificate verification. Neither the
@@ -90,7 +90,8 @@ The `mode` field selects one of the following verification strategies:
   any certificate, including self-signed, expired, or attacker-controlled ones.
   TLS is still negotiated, so traffic is encrypted in transit, but the gateway
   has no cryptographic assurance that it is talking to the intended backend.
-  This mode is intended for development and testing environments.
+  This mode is intended for development and testing environments and SHOULD NOT
+  be used in production.
 
 #### Trusted Certificate Hashes
 `trustedCertificateHashes` is an alternative to `caCertificateRefs` and
@@ -100,12 +101,12 @@ chain is required.
 
 #### API Validations
 
-* When `mode` is `Strict` or `InsecureSkipSANVerification`, at least one of
+* When `mode` is `Strict` or `InsecureSkipOnlySANVerification`, at least one of
   `caCertificateRefs`, `wellKnownCACertificates`, or `trustedCertificateHashes`
   MUST be set.
 * When `mode` is `InsecureSkipVerification`, `caCertificateRefs`,
   `wellKnownCACertificates`, and `trustedCertificateHashes` MUST all be empty.
-* `subjectAltNames` MUST be empty when `mode` is `InsecureSkipSANVerification`
+* `subjectAltNames` MUST be empty when `mode` is `InsecureSkipOnlySANVerification`
   or `InsecureSkipVerification`, as SAN matching is not performed in these
   modes.
 * `hostname` MUST be set in all modes. It is used as the SNI value for
@@ -113,7 +114,7 @@ chain is required.
   is subsequently matched against the presented certificate.
 
 #### Examples
-**BackendTLSPolicy with trusted certificate hashes:**
+BackendTLSPolicy with trusted certificate hashes:
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
 kind: BackendTLSPolicy
@@ -136,7 +137,7 @@ spec:
     hostname: internal.example.com
 ```
 
-**BackendTLSPolicy with insecure verification:**
+BackendTLSPolicy with insecure verification:
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
 kind: BackendTLSPolicy
@@ -152,41 +153,40 @@ spec:
     hostname: internal.example.com
 ```
 
-### Gateway-Level Changes
-A new `mode` field is added to `Gateway.spec.tls.backend.validation` to let
-operators control which `BackendTLSPolicy` verification modes are permitted
-for backends behind this Gateway.
+### Restricting Insecure Verification Modes via ValidatingAdmissionPolicy
 
-* `AllowStrictOnly` _(default)_ permits only `BackendTLSPolicy` objects
-  with `mode: Strict`. Policies requesting `InsecureSkipSANVerification` or
-  `InsecureSkipVerification` are rejected with the `Accepted` condition on the 
-  policy ancestor status set to `False` with `Reason: InsecureVerificationNotAllowed`.
-  In this case implementations MUST NOT fall back to unencrypted (plaintext) or 
-  insecure TLS connections, and the client MUST receive an HTTP 5xx error
-  response.
-* `AllowInsecureVerification` permits all verification modes, including 
-  `InsecureSkipSANVerification` and `InsecureSkipVerification`.
+Gateway operators can restrict insecure backend TLS verification modes using a 
+ValidatingAdmissionPolicy (VAP), which rejects any `BackendTLSPolicy` that sets 
+`mode` to `InsecureSkipVerification` or `InsecureSkipOnlySANVerification`.
 
-#### Status and Observability
-When `mode` is changed from `AllowStrictOnly` to `AllowInsecureVerification`,
-the `InsecureBackendValidationMode` condition MUST be set to `True` with
-Reason `ConfigurationChanged` on the Gateway. This condition is removed as
-soon as `mode` is changed back to `AllowStrictOnly`.
+This approach keeps policy enforcement in a standard Kubernetes mechanism
+rather than extending the Gateway API surface.
 
 #### Example
-
-**Gateway permitting insecure backend verification modes:**
-
 ```yaml
-apiVersion: gateway.networking.k8s.io/v1
-kind: Gateway
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
 metadata:
-  name: example
+  name: disallow-insecure-backend-tls-verification
 spec:
-  tls:
-    backend:
-      validation:
-        mode: AllowInsecureVerification
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+      - apiGroups:   ["gateway.networking.k8s.io"]
+        apiVersions: ["v1alpha3", "v1"]
+        operations:  ["CREATE", "UPDATE"]
+        resources:   ["backendtlspolicies"]
+  validations:
+    - expression: >
+        !has(object.spec.validation.mode) ||
+        (object.spec.validation.mode != "InsecureSkipVerification" &&
+         object.spec.validation.mode != "InsecureSkipSANVerification")
+      reason: Forbidden
+      messageExpression: >
+        "BackendTLSPolicy '" + object.metadata.name +
+        "' uses insecure verification mode '" +
+        object.spec.validation.mode +
+        "'. Only Strict verification is permitted in this cluster."
 ```
 
 ## References
