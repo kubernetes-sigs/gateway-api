@@ -622,7 +622,7 @@ type HTTPRouteSpec struct {
     [...]
 
     // <gateway:experimental:validation:XValidation:message="Session persistence cookie name must be unique across all rules within the route",rule="self.filter(l, has(l.sessionPersistence) && has(l.sessionPersistence.cookie) && has(l.sessionPersistence.cookie.name)).all(l1, self.exists_one(l2, has(l2.sessionPersistence) && has(l2.sessionPersistence.cookie) && has(l2.sessionPersistence.cookie.name) && l1.sessionPersistence.cookie.name == l2.sessionPersistence.cookie.name))">
-    // <gateway:experimental:validation:XValidation:message="Session persistence header name must be unique across all rules within the route",rule="self.filter(l, has(l.sessionPersistence) && has(l.sessionPersistence.header) && has(l.sessionPersistence.header.name)).all(l1, self.exists_one(l2, has(l2.sessionPersistence) && has(l2.sessionPersistence.header) && has(l2.sessionPersistence.header.name) && l1.sessionPersistence.header.name == l2.sessionPersistence.header.name))">
+    // <gateway:experimental:validation:XValidation:message="Session persistence header name must be unique across all rules within the route",rule="self.filter(l, has(l.sessionPersistence) && has(l.sessionPersistence.header) && has(l.sessionPersistence.header.name)).all(l1, self.exists_one(l2, has(l2.sessionPersistence) && has(l2.sessionPersistence.header) && has(l2.sessionPersistence.header.name) && l1.sessionPersistence.header.name.lowerAscii() == l2.sessionPersistence.header.name.lowerAscii()))">
     Rules []HTTPRouteRule `json:"rules,omitempty"`
 }
 
@@ -645,7 +645,7 @@ type GRPCRouteSpec struct {
     [...]
 
     // <gateway:experimental:validation:XValidation:message="Session persistence cookie name must be unique across all rules within the route",rule="self.filter(l, has(l.sessionPersistence) && has(l.sessionPersistence.cookie) && has(l.sessionPersistence.cookie.name)).all(l1, self.exists_one(l2, has(l2.sessionPersistence) && has(l2.sessionPersistence.cookie) && has(l2.sessionPersistence.cookie.name) && l1.sessionPersistence.cookie.name == l2.sessionPersistence.cookie.name))">
-    // <gateway:experimental:validation:XValidation:message="Session persistence header name must be unique across all rules within the route",rule="self.filter(l, has(l.sessionPersistence) && has(l.sessionPersistence.header) && has(l.sessionPersistence.header.name)).all(l1, self.exists_one(l2, has(l2.sessionPersistence) && has(l2.sessionPersistence.header) && has(l2.sessionPersistence.header.name) && l1.sessionPersistence.header.name == l2.sessionPersistence.header.name))">
+    // <gateway:experimental:validation:XValidation:message="Session persistence header name must be unique across all rules within the route",rule="self.filter(l, has(l.sessionPersistence) && has(l.sessionPersistence.header) && has(l.sessionPersistence.header.name)).all(l1, self.exists_one(l2, has(l2.sessionPersistence) && has(l2.sessionPersistence.header) && has(l2.sessionPersistence.header.name) && l1.sessionPersistence.header.name.lowerAscii() == l2.sessionPersistence.header.name.lowerAscii()))">
     Rules []GRPCRouteRule `json:"rules,omitempty"`
 }
 
