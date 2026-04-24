@@ -7,6 +7,7 @@
 
 This GEP enables Gateway owners to portably select the Kubernetes Service type provisioned by an in-cluster Gateway implementation, 
 and establishes production-ready defaults for each service type so that common best practices are applied automatically.
+In-cluster Gateways differ from traditional Gateways because they are used exclusively inside a cluster that has not been provisioned for cloud access.
 
 Concretely, this GEP:
 
@@ -99,7 +100,7 @@ ClusterIPAddressType AddressType = "ClusterIPAddress"
 
 // An OptimizedLoadBalancerAddress requests that the implementation
 // provisions a LoadBalancer Service with production-ready defaults.
-// Implementations SHOULD set externalTrafficPolicy to Local when using this mode.
+// Implementations MUST set externalTrafficPolicy to Local when using this mode.
 //
 // The value field is optional. When empty, the external address is
 // assigned by the load balancer provider. When set, it requests that
@@ -115,6 +116,21 @@ OptimizedLoadBalancerAddressType AddressType = "OptimizedLoadBalancerAddress"
 
 ### Normative Requirements
 
+#### Status Addresses
+
+The new address types (`ClusterIPAddress`, `OptimizedLoadBalancerAddress`)
+express user intent in `spec.addresses` — they control how the Gateway is
+provisioned. However, `status.addresses` describes the *observed state*: the
+actual network endpoints where the Gateway is reachable. Echoing the
+spec type into status is not useful to consumers, because it does not tell
+them whether the address is an IP or a hostname.
+
+Implementations MUST report `status.addresses` using primitive types
+(`IPAddress` or `Hostname`) that describe the concrete address, not the
+requested address type. The `GatewayStatus` documentation already states
+that the status address list may differ from the spec, so this is consistent
+with the existing API contract.
+
 #### ClusterIPAddress
 
 * The implementation MUST provision a `ClusterIP` Service for the Gateway.
@@ -123,7 +139,7 @@ OptimizedLoadBalancerAddressType AddressType = "OptimizedLoadBalancerAddress"
   `AddressNotAssigned`.
 * The ClusterIP is allocated by Kubernetes when the Service is created.
   The implementation MUST report the allocated ClusterIP in
-  `status.addresses`.
+  `status.addresses` with `type: IPAddress`.
 * The Gateway is also reachable via the internal DNS name of the provisioned
   Service (e.g. `<service-name>.<namespace>.svc.cluster.local`).
 
@@ -137,7 +153,8 @@ OptimizedLoadBalancerAddressType AddressType = "OptimizedLoadBalancerAddress"
   `Programmed` condition to `False` with reason `AddressNotAssigned`.
 * Implementations SHOULD set `externalTrafficPolicy: Local`.
 * The implementation MUST report the assigned external address in
-  `status.addresses`.
+  `status.addresses` using the appropriate primitive type (`IPAddress` or
+  `Hostname`) depending on what the load balancer provider assigns.
 
 ### Precedence
 
@@ -198,7 +215,7 @@ provisioned Service (e.g. `internal-gateway.default.svc.cluster.local`):
 ```yaml
 status:
   addresses:
-  - type: ClusterIPAddress
+  - type: IPAddress
     value: "10.96.42.7"
   conditions:
   - type: Programmed
@@ -228,13 +245,26 @@ spec:
 The implementation provisions a `LoadBalancer` Service with
 `externalTrafficPolicy: Local`.
 The external address assigned by the load balancer provider is reported in
-status:
+status using the primitive type — `IPAddress` when the provider assigns an IP,
+or `Hostname` when the provider assigns a DNS name (e.g. cloud load balancers):
 
 ```yaml
+# Provider assigns an IP address
 status:
   addresses:
-  - type: OptimizedLoadBalancerAddress
+  - type: IPAddress
     value: "203.0.113.10"
+  conditions:
+  - type: Programmed
+    status: "True"
+```
+
+```yaml
+# Provider assigns a hostname (e.g. AWS ELB)
+status:
+  addresses:
+  - type: Hostname
+    value: "abc123.us-east-1.elb.amazonaws.com"
   conditions:
   - type: Programmed
     status: "True"
@@ -362,11 +392,61 @@ spec:
   be implementation-specific behavior, as long as `status.addresses`
   accurately reflects the addresses that were provisioned and are reachable.
 
+* **Mutability of address type and value**: The current API spec does not
+  enforce immutability on `spec.addresses` — there are no CEL validation
+  rules comparing against `oldObject`, meaning a user can freely change the
+  `type` or `value` of an existing address entry after Gateway creation (see
+  `Addresses` field definition in
+  [`gateway_types.go`](https://github.com/kubernetes-sigs/gateway-api/blob/main/apis/v1/gateway_types.go)).
+  For the new address types, this raises questions: for example, switching
+  from `ClusterIPAddress` to `OptimizedLoadBalancerAddress` would require
+  the implementation to deprovision one Service type and provision another.
+  It needs to be defined whether this is allowed, and if so, what the
+  expected implementation behavior and status transitions should be during
+  the change.
+
 * **Naming and specification of address types**: The names `ClusterIPAddress`
   and `OptimizedLoadBalancerAddress` are working names used throughout this GEP
   to convey intent. The final naming, as well as the precise specification of
   each type (support level, normative requirements), must still be discussed
   and agreed upon before this GEP moves to Implementable.
+
+## Alternatives Considered
+
+### ServiceRef or external API references
+
+An earlier approach considered adding a field like `serviceRef` to
+`GatewaySpec` that would point to an existing Kubernetes Service, allowing
+users to bring their own pre-configured Service rather than having the
+implementation provision one. This was discarded for several reasons
+(discussed in detail in [SIG-Network Gateway API meeting](https://www.youtube.com/watch?v=zopZ5r_97uU&t=892s)):
+
+* **Escape hatches become impossible to remove**: Once an escape hatch like
+  `serviceRef` exists in a stable API, it becomes a permanent fixture.
+  Users and implementations grow to depend on it, making it effectively
+  impossible to deprecate even when better alternatives are available.
+
+* **Loss of incentive for proper solutions**: When a catch-all escape hatch
+  exists, there is reduced motivation to design focused, well-specified API
+  extensions. Problems that should be solved portably within Gateway API end
+  up being addressed through the escape hatch instead, leaving the portable
+  API incomplete.
+
+* **Fragmentation over unification**: A `serviceRef` would allow users to
+  configure Service-level details outside of Gateway API's control, leading
+  to divergent patterns across implementations. This directly undermines the
+  project's goal of providing a unified, portable API — the same kind of
+  fragmentation that Gateway API was created to eliminate.
+
+* **Complex secondary API surface**: Referencing an external Service
+  introduces questions around ownership, lifecycle management, conflict
+  resolution, and status reporting that would significantly increase the
+  API's complexity without proportional benefit.
+
+This GEP instead takes the approach of expressing intent within the existing
+`spec.addresses` mechanism via new `AddressType` values, keeping the API
+surface narrow and leaving implementation-specific customization to
+`infrastructure.parametersRef`.
 
 ## References
 
