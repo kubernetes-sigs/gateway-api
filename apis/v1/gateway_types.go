@@ -242,7 +242,7 @@ type GatewaySpec struct {
 	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:MaxItems=64
 	// +kubebuilder:validation:XValidation:message="tls must not be specified for protocols ['HTTP', 'TCP', 'UDP']",rule="self.all(l, l.protocol in ['HTTP', 'TCP', 'UDP'] ? !has(l.tls) : true)"
-	// +kubebuilder:validation:XValidation:message="tls mode must be Terminate for protocol HTTPS",rule="self.all(l, (l.protocol == 'HTTPS' && has(l.tls)) ? (l.tls.mode == '' || l.tls.mode == 'Terminate') : true)"
+	// +kubebuilder:validation:XValidation:message="tls mode must be Terminate for protocol HTTPS",rule="self.all(l, (l.protocol == 'HTTPS' ? has(l.tls) && (l.tls.mode == '' || l.tls.mode == 'Terminate') : true))"
 	// +kubebuilder:validation:XValidation:message="tls mode must be set for protocol TLS",rule="self.all(l, (l.protocol == 'TLS' ? has(l.tls) && has(l.tls.mode) && l.tls.mode != '' : true))"
 	// +kubebuilder:validation:XValidation:message="hostname must not be specified for protocols ['TCP', 'UDP']",rule="self.all(l, l.protocol in ['TCP', 'UDP']  ? (!has(l.hostname) || l.hostname == '') : true)"
 	// +kubebuilder:validation:XValidation:message="Listener name must be unique within the Gateway",rule="self.all(l1, self.exists_one(l2, l1.name == l2.name))"
