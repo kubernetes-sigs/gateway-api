@@ -40,6 +40,8 @@ We've also tried to re-use the same Condition `type`s as far as possible, and ha
 * `Programmed`: True when an object's config has been fully parsed, and has been successfully sent to a data plane for configuration. It will be ready "soon", where soon can have different definitions depending on the exact implementation.
 * `ResolvedRefs`: True when all references to other objects inside an object are valid, in that the objects referred to exist, and each is a valid reference for the field where it is used.
 
+For a complete reference of all condition types and reasons across Gateway API resources, see [Condition Types and Reasons Reference](../reference/conditions.md).
+
 In some cases, such as the Gateway object, there are additional Conditions arrays - on the Gateway object, there is also a Condition per `listener` field, as that status is also complex enough to need further clarification.
 
 Conditions are complex enough to be difficult to summarize in a single line, so most `kubectl get` commands cannot summarize them correctly.
