@@ -6,6 +6,11 @@
     `v1.1.0`. For more information on release channels, refer to our [versioning
     guide](../concepts/versioning.md).
 
+!!! note
+    If you know you're working with gRPC, prefer using a `GRPCRoute`. An `HTTPRoute` may be sufficient
+    for basic routing and load balancing, but `GRPCRoute` makes the intent clearer and can unlock
+    more gRPC-specific functionality. See [When to Use GRPCRoute](#when-to-use-grpcroute).
+
 [GRPCRoute][grpcroute] is a Gateway API type for specifying routing behavior
 of gRPC requests from a Gateway listener to an API object, i.e. Service.
 
