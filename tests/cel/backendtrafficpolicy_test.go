@@ -40,9 +40,11 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 		{
 			name: "valid BackendTrafficPolicyConfig no retryConstraint budgetPercent",
 			sessionPersistence: xgatewayv1alpha1.SessionPersistence{
-				SessionName:     ptrTo("foo"),
 				AbsoluteTimeout: toDuration("1h"),
 				Type:            ptrTo(gatewayv1.CookieBasedSessionPersistence),
+				Cookie: &gatewayv1.CookieConfig{
+					Name: ptrTo("foo"),
+				},
 			},
 			retryConstraint: xgatewayv1alpha1.RetryConstraint{
 				Budget: ptrTo(xgatewayv1alpha1.BudgetDetails{
@@ -58,9 +60,11 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 		{
 			name: "valid BackendTrafficPolicyConfig no retryConstraint budgetInterval",
 			sessionPersistence: xgatewayv1alpha1.SessionPersistence{
-				SessionName:     ptrTo("foo"),
 				AbsoluteTimeout: toDuration("1h"),
 				Type:            ptrTo(gatewayv1.CookieBasedSessionPersistence),
+				Cookie: &gatewayv1.CookieConfig{
+					Name: ptrTo("foo"),
+				},
 			},
 			retryConstraint: xgatewayv1alpha1.RetryConstraint{
 				Budget: ptrTo(xgatewayv1alpha1.BudgetDetails{
@@ -76,9 +80,11 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 		{
 			name: "valid BackendTrafficPolicyConfig no retryConstraint minRetryRate",
 			sessionPersistence: xgatewayv1alpha1.SessionPersistence{
-				SessionName:     ptrTo("foo"),
 				AbsoluteTimeout: toDuration("1h"),
 				Type:            ptrTo(gatewayv1.CookieBasedSessionPersistence),
+				Cookie: &gatewayv1.CookieConfig{
+					Name: ptrTo("foo"),
+				},
 			},
 			retryConstraint: xgatewayv1alpha1.RetryConstraint{
 				Budget: ptrTo(xgatewayv1alpha1.BudgetDetails{
@@ -91,9 +97,11 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 		{
 			name: "invalid BackendTrafficPolicyConfig budgetInterval too long",
 			sessionPersistence: xgatewayv1alpha1.SessionPersistence{
-				SessionName:     ptrTo("foo"),
 				AbsoluteTimeout: toDuration("1h"),
 				Type:            ptrTo(gatewayv1.CookieBasedSessionPersistence),
+				Cookie: &gatewayv1.CookieConfig{
+					Name: ptrTo("foo"),
+				},
 			},
 			retryConstraint: xgatewayv1alpha1.RetryConstraint{
 				Budget: ptrTo(xgatewayv1alpha1.BudgetDetails{
@@ -110,9 +118,11 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 		{
 			name: "invalid BackendTrafficPolicyConfig budgetInterval too short",
 			sessionPersistence: xgatewayv1alpha1.SessionPersistence{
-				SessionName:     ptrTo("foo"),
 				AbsoluteTimeout: toDuration("1h"),
 				Type:            ptrTo(gatewayv1.CookieBasedSessionPersistence),
+				Cookie: &gatewayv1.CookieConfig{
+					Name: ptrTo("foo"),
+				},
 			},
 			retryConstraint: xgatewayv1alpha1.RetryConstraint{
 				Budget: ptrTo(xgatewayv1alpha1.BudgetDetails{
@@ -129,9 +139,11 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 		{
 			name: "invalid BackendTrafficPolicyConfig minRetryRate interval",
 			sessionPersistence: xgatewayv1alpha1.SessionPersistence{
-				SessionName:     ptrTo("foo"),
 				AbsoluteTimeout: toDuration("1h"),
 				Type:            ptrTo(gatewayv1.CookieBasedSessionPersistence),
+				Cookie: &gatewayv1.CookieConfig{
+					Name: ptrTo("foo"),
+				},
 			},
 			retryConstraint: xgatewayv1alpha1.RetryConstraint{
 				Budget: ptrTo(xgatewayv1alpha1.BudgetDetails{
@@ -148,9 +160,11 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 		{
 			name: "valid BackendTrafficPolicyConfig no cookie lifetimeType",
 			sessionPersistence: xgatewayv1alpha1.SessionPersistence{
-				SessionName:     ptrTo("foo"),
 				AbsoluteTimeout: toDuration("1h"),
 				Type:            ptrTo(gatewayv1.CookieBasedSessionPersistence),
+				Cookie: &gatewayv1.CookieConfig{
+					Name: ptrTo("foo"),
+				},
 			},
 			retryConstraint: xgatewayv1alpha1.RetryConstraint{
 				Budget: ptrTo(xgatewayv1alpha1.BudgetDetails{
@@ -167,9 +181,9 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 		{
 			name: "valid BackendTrafficPolicyConfig session cookie",
 			sessionPersistence: xgatewayv1alpha1.SessionPersistence{
-				SessionName: ptrTo("foo"),
-				Type:        ptrTo(gatewayv1.CookieBasedSessionPersistence),
-				CookieConfig: &gatewayv1.CookieConfig{
+				Type: ptrTo(gatewayv1.CookieBasedSessionPersistence),
+				Cookie: &gatewayv1.CookieConfig{
+					Name:         ptrTo("foo"),
 					LifetimeType: ptrTo(gatewayv1.SessionCookieLifetimeType),
 				},
 			},
@@ -188,9 +202,9 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 		{
 			name: "invalid BackendTrafficPolicyConfig permanent cookie",
 			sessionPersistence: xgatewayv1alpha1.SessionPersistence{
-				SessionName: ptrTo("foo"),
-				Type:        ptrTo(gatewayv1.CookieBasedSessionPersistence),
-				CookieConfig: &gatewayv1.CookieConfig{
+				Type: ptrTo(gatewayv1.CookieBasedSessionPersistence),
+				Cookie: &gatewayv1.CookieConfig{
+					Name:         ptrTo("foo"),
 					LifetimeType: ptrTo(gatewayv1.PermanentCookieLifetimeType),
 				},
 			},
@@ -209,10 +223,10 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 		{
 			name: "valid BackendTrafficPolicyConfig permanent cookie",
 			sessionPersistence: xgatewayv1alpha1.SessionPersistence{
-				SessionName:     ptrTo("foo"),
 				AbsoluteTimeout: toDuration("1h"),
 				Type:            ptrTo(gatewayv1.CookieBasedSessionPersistence),
-				CookieConfig: &gatewayv1.CookieConfig{
+				Cookie: &gatewayv1.CookieConfig{
+					Name:         ptrTo("foo"),
 					LifetimeType: ptrTo(gatewayv1.PermanentCookieLifetimeType),
 				},
 			},
@@ -229,10 +243,66 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 			wantErrors: []string{},
 		},
 		{
+			name: "invalid BackendTrafficPolicyConfig cookie type with header field",
+			sessionPersistence: xgatewayv1alpha1.SessionPersistence{
+				Type: ptrTo(gatewayv1.CookieBasedSessionPersistence),
+				Header: &gatewayv1.HeaderConfig{
+					Name: ptrTo("foo"),
+				},
+			},
+			retryConstraint: xgatewayv1alpha1.RetryConstraint{},
+			wantErrors:      []string{"header must be nil if type is not Header"},
+		},
+		{
+			name: "invalid BackendTrafficPolicyConfig header type with cookie field",
+			sessionPersistence: xgatewayv1alpha1.SessionPersistence{
+				Type: ptrTo(gatewayv1.HeaderBasedSessionPersistence),
+				Cookie: &gatewayv1.CookieConfig{
+					Name: ptrTo("foo"),
+				},
+			},
+			retryConstraint: xgatewayv1alpha1.RetryConstraint{},
+			wantErrors:      []string{"cookie must be nil if type is not Cookie"},
+		},
+		{
+			name: "valid BackendTrafficPolicyConfig default type (cookie) with cookie field",
+			sessionPersistence: xgatewayv1alpha1.SessionPersistence{
+				Cookie: &gatewayv1.CookieConfig{
+					Name: ptrTo("foo"),
+				},
+			},
+			retryConstraint: xgatewayv1alpha1.RetryConstraint{},
+			wantErrors:      []string{},
+		},
+		{
+			name: "invalid BackendTrafficPolicyConfig default type (cookie) without cookie field",
+			sessionPersistence: xgatewayv1alpha1.SessionPersistence{},
+			retryConstraint:    xgatewayv1alpha1.RetryConstraint{},
+			wantErrors:         []string{"cookie must be specified for Cookie type"},
+		},
+		{
+			name: "invalid BackendTrafficPolicyConfig cookie type without cookie field",
+			sessionPersistence: xgatewayv1alpha1.SessionPersistence{
+				Type: ptrTo(gatewayv1.CookieBasedSessionPersistence),
+			},
+			retryConstraint: xgatewayv1alpha1.RetryConstraint{},
+			wantErrors:      []string{"cookie must be specified for Cookie type"},
+		},
+		{
+			name: "invalid BackendTrafficPolicyConfig header type without header field",
+			sessionPersistence: xgatewayv1alpha1.SessionPersistence{
+				Type: ptrTo(gatewayv1.HeaderBasedSessionPersistence),
+			},
+			retryConstraint: xgatewayv1alpha1.RetryConstraint{},
+			wantErrors:      []string{"header must be specified for Header type"},
+		},
+		{
 			name: "valid BackendTrafficPolicyConfig header-based session persistence",
 			sessionPersistence: xgatewayv1alpha1.SessionPersistence{
-				SessionName: ptrTo("foo"),
-				Type:        ptrTo(gatewayv1.HeaderBasedSessionPersistence),
+				Type: ptrTo(gatewayv1.HeaderBasedSessionPersistence),
+				Header: &gatewayv1.HeaderConfig{
+					Name: ptrTo("foo"),
+				},
 			},
 			retryConstraint: xgatewayv1alpha1.RetryConstraint{
 				Budget: ptrTo(xgatewayv1alpha1.BudgetDetails{

@@ -349,6 +349,9 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: lifetimeType
       type:
         scalar: string
+    - name: name
+      type:
+        scalar: string
 - name: io.k8s.sigs.gateway-api.apis.v1.ForwardBodyConfig
   map:
     fields:
@@ -1145,6 +1148,12 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: path
       type:
         namedType: io.k8s.sigs.gateway-api.apis.v1.HTTPPathModifier
+- name: io.k8s.sigs.gateway-api.apis.v1.HeaderConfig
+  map:
+    fields:
+    - name: name
+      type:
+        scalar: string
 - name: io.k8s.sigs.gateway-api.apis.v1.Listener
   map:
     fields:
@@ -1606,10 +1615,13 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: absoluteTimeout
       type:
         scalar: string
-    - name: cookieConfig
+    - name: cookie
       type:
         namedType: io.k8s.sigs.gateway-api.apis.v1.CookieConfig
-    - name: sessionName
+    - name: header
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1.HeaderConfig
+    - name: idleTimeout
       type:
         scalar: string
     - name: type
