@@ -335,7 +335,7 @@ kind: Ingress
 metadata:
   name: example-ingress
   annotations:
-    some-ingress-controller.example.org/tls-redirect: "True"
+    example-ingress-controller.example.org/tls-redirect: "True"
 spec:
   ingressClassName: prod
   tls:
