@@ -5,8 +5,8 @@
 
 ## TLDR
 
-The ability for the `BackendTLSPolicy` to skip TLS verification or to validate
-certificates based on their fingerprint or public key hash.
+The ability for the `BackendTLSPolicy` to skip TLS verification or to trust
+specific backend certificates.
 
 ## Motivation
 
@@ -38,9 +38,9 @@ CA bundles.
 * As an application developer, I want secure-by-default behavior, ensuring that
   certificate verification is always enabled unless I explicitly opt out, to
   prevent accidentally deploying insecure configurations to production.
-* As an application developer, I want an alternative to disabling verification,
-  such as certificate or SPKI pinning, so I can securely communicate with
-  backends using self-signed certificates without managing CA bundles.
+* As an application developer, I want to securely communicate with backends
+  using self-signed certificates without managing CA bundles or disabling
+  verification, by trusting specific certificates directly.
 * As a gateway operator, I want to control whether skipping TLS validation is
   permitted for specific Gateways.
 * As a security officer, I want transparency and auditability into where TLS
@@ -50,8 +50,8 @@ CA bundles.
 
 * Enable connecting to backends over TLS with full, partial, or no
   certificate verification.
-* Support certificate and SPKI pinning as alternatives to disabling verification
-  or relying on CA trust chains.
+* Support certificate pinning as an alternative to disabling verification or
+  relying on CA trust chains.
 * Maintain a secure-by-default approach, with certificate verification enabled
   unless explicitly opted out.
 * Provide operator-level controls so Gateway constraints can restrict or permit
@@ -63,9 +63,9 @@ CA bundles.
 
 This GEP extends `BackendTLSPolicy.spec.validation` with two new optional fields:
 * `mode` selects the certificate verification strategy.
-* `trustedCertificateHashes` an alternative trust source to `caCertificateRefs`
-  and `wellKnownCACertificates`, allowing backends to be trusted directly by
-  certificate or public-key hash without requiring a CA chain.
+* `trustedCertificates` an alternative trust source to `caCertificateRefs`
+  and `wellKnownCACertificates`, allowing backend certificates to be trusted 
+  directly without requiring a CA chain.
 
 All features introduced by this GEP are Extended support. Only the default
 values, which preserve the existing behavior, are considered Core.
@@ -75,16 +75,20 @@ values, which preserve the existing behavior, are considered Core.
 #### BackendTLSPolicy Validation Mode
 The `mode` field selects one of the following verification strategies:
 
-* `Strict` _(default)_ performs full TLS verification. The backend certificate 
+* `Standard` _(default)_ performs full TLS verification. The backend certificate 
   chain is validated against the trust anchors configured in validation (either 
   `caCertificateRefs` or `wellKnownCACertificates`). As an alternative,
-  `trustedCertificateHashes` can be used instead of  `caCertificateRefs` or 
+  `trustedCertificates` can be used instead of  `caCertificateRefs` or 
   `wellKnownCACertificates` to establish trust. Connections to backends presenting
   invalid, expired, untrusted, SAN-mismatch, or hostname-mismatched certificates 
   are rejected.
+* `InsecureAllowExpired` performs full TLS verification against the configured
+  trust anchors (`caCertificateRefs`, `wellKnownCACertificates`, or
+  `trustedCertificates`), including SAN-matching, but accepts certificates
+  that are expired.
 * `InsecureSkipOnlySANVerification` performs chain validation against the configured
   trust anchors (`caCertificateRefs`, `wellKnownCACertificates`, or
-  `trustedCertificateHashes`), but skips SAN-matching.
+  `trustedCertificates`), but skips SAN-matching.
 * `InsecureSkipVerification` disables all certificate verification. Neither the
   certificate chain nor the hostname is validated, and the backend may present
   any certificate, including self-signed, expired, or attacker-controlled ones.
@@ -93,19 +97,26 @@ The `mode` field selects one of the following verification strategies:
   This mode is intended for development and testing environments and SHOULD NOT
   be used in production.
 
-#### Trusted Certificate Hashes
-`trustedCertificateHashes` is an alternative to `caCertificateRefs` and
-`wellKnownCACertificates`. When set, the backend certificate is accepted if it
-(or its Subject Public Key Info) matches one of the listed hashes, no CA
-chain is required.
+#### Trusted Certificates
+`trustedCertificates` is an alternative to `caCertificateRefs` and
+`wellKnownCACertificates`. It references one or more Kubernetes objects
+(i.e., ConfigMap or Secret) containing PEM-encoded certificates that
+are trusted directly as leaf certificates. When set, the backend certificate
+is accepted if it matches one of the referenced certificates exactly, with no
+CA chain validation required.
+
+Implementations MAY compute the SHA-256 hash of the DER-encoded representation
+of the referenced PEM-encoded certificate and use that hash to match the
+backend certificate, rather than comparing the full certificate.
 
 #### API Validations
 
-* When `mode` is `Strict` or `InsecureSkipOnlySANVerification`, at least one of
-  `caCertificateRefs`, `wellKnownCACertificates`, or `trustedCertificateHashes`
-  MUST be set.
+* When `mode` is `Standard` or `InsecureSkipOnlySANVerification`, at least one of
+  `caCertificateRefs`, `wellKnownCACertificates`, or `trustedCertificates`
+  MUST be set. `caCertificateRefs` and `wellKnownCACertificates` remain mutually
+  exclusive and only at most one of them can be set.
 * When `mode` is `InsecureSkipVerification`, `caCertificateRefs`,
-  `wellKnownCACertificates`, and `trustedCertificateHashes` MUST all be empty.
+  `wellKnownCACertificates`, and `trustedCertificates` MUST all be empty.
 * `subjectAltNames` MUST be empty when `mode` is `InsecureSkipOnlySANVerification`
   or `InsecureSkipVerification`, as SAN matching is not performed in these
   modes.
@@ -114,7 +125,7 @@ chain is required.
   is subsequently matched against the presented certificate.
 
 #### Examples
-BackendTLSPolicy with trusted certificate hashes:
+BackendTLSPolicy with trusted certificates:
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
 kind: BackendTLSPolicy
@@ -126,14 +137,14 @@ spec:
     kind: Service
     name: example
   validation:
-    mode: Strict
-    trustedCertificateHashes:
-    - type: SPKI
-      algorithm: SHA256
-      value: "qrvdF0L7Kp5l3H8k0m3x7VZq3p5O6s4L4kC2Z7tZt+Q="
-    - type: Certificate
-      algorithm: SHA256
-      value: "9C:5E:AD:EE:F4:38:A4:BC:4D:99:65:7B:12:C8:3D:7E:21:B7:40:8F:2E:91:5C:6A:D3:B0:88:19:42:60:AF:33"
+    mode: Standard
+    trustedCertificates:
+    - group: ""
+      kind: ConfigMap
+      name: example-cert-1
+    - group: ""
+      kind: Secret
+      name: example-cert-2  
     hostname: internal.example.com
 ```
 
@@ -180,13 +191,14 @@ spec:
     - expression: >
         !has(object.spec.validation.mode) ||
         (object.spec.validation.mode != "InsecureSkipVerification" &&
+         object.spec.validation.mode != "InsecureAllowExpired" &&
          object.spec.validation.mode != "InsecureSkipSANVerification")
       reason: Forbidden
       messageExpression: >
         "BackendTLSPolicy '" + object.metadata.name +
         "' uses insecure verification mode '" +
         object.spec.validation.mode +
-        "'. Only Strict verification is permitted in this cluster."
+        "'. Only Standard verification is permitted in this cluster."
 ```
 
 ## References
