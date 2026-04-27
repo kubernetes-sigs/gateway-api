@@ -4940,7 +4940,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPHeader(ref common.ReferenceCallbac
 				Properties: map[string]spec.Schema{
 					"name": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Name is the name of the HTTP Header to be matched. Name matching MUST be case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).\n\nIf multiple entries specify equivalent header names, the first entry with an equivalent name MUST be considered for a match. Subsequent entries with an equivalent header name MUST be ignored. Due to the case-insensitivity of header names, \"foo\" and \"Foo\" are considered equivalent.",
+							Description: "Name is the name of the HTTP Header. Name matching MUST be case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).\n\nWhen this type is used in HTTPHeaderFilter lists, entries with equivalent header names are considered duplicates. Due to the case-insensitivity of header names, \"foo\" and \"Foo\" are considered equivalent.",
 							Default:     "",
 							Type:        []string{"string"},
 							Format:      "",
@@ -4948,7 +4948,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPHeader(ref common.ReferenceCallbac
 					},
 					"value": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Value is the value of HTTP Header to be matched. <gateway:experimental:description> Must consist of printable US-ASCII characters, optionally separated by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2 </gateway:experimental:description>\n\n<gateway:experimental:validation:Pattern=`^[!-~]+([\\t ]?[!-~]+)*$`>",
+							Description: "Value is the value of HTTP Header. <gateway:experimental:description> Must consist of printable US-ASCII characters, optionally separated by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2 </gateway:experimental:description>\n\n<gateway:experimental:validation:Pattern=`^[!-~]+([\\t ]?[!-~]+)*$`>",
 							Default:     "",
 							Type:        []string{"string"},
 							Format:      "",
