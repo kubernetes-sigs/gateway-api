@@ -29,7 +29,6 @@ from mkdocs_utils import (
     prepare_docs, convert_internal_links, update_mkdocs_yml_redirects, 
     get_frontmatter, build_id_map
 )
-from mkdocs_hooks import on_files
 
 class TestEdgeCasesAndRobustness(unittest.TestCase):
     def setUp(self):
@@ -46,19 +45,14 @@ class TestEdgeCasesAndRobustness(unittest.TestCase):
         self.patcher_map = patch("mkdocs_utils.PAGE_ID_MAP_FILE", self.test_dir / "page_id_map.json")
         self.patcher_yml = patch("mkdocs_utils.MKDOCS_YML_PATH", self.mkdocs_yml)
         
-        # Also patch hooks which might have already imported these
-        self.patcher_hook_map = patch("mkdocs_hooks.PAGE_ID_MAP_FILE", self.test_dir / "page_id_map.json")
-        
         self.patcher_docs.start()
         self.patcher_map.start()
         self.patcher_yml.start()
-        self.patcher_hook_map.start()
 
     def tearDown(self):
         self.patcher_docs.stop()
         self.patcher_map.stop()
         self.patcher_yml.stop()
-        self.patcher_hook_map.stop()
         shutil.rmtree(self.test_dir)
 
     def test_1_complex_masking_nesting(self):
@@ -163,32 +157,6 @@ plugins:
         
         self.assertEqual(first_content, second_content)
 
-    def test_9_redirect_type_preservation(self):
-        """9. Ensure on_files preserves unrelated redirect config."""
-        self.mkdocs_yml.write_text("plugins:\n  - redirects:\n      redirect_maps: {}\n")
-        
-        # Mock MkDocs config
-        config = {
-            "docs_dir": str(self.docs_dir),
-            "plugins": {
-                "redirects": MagicMock()
-            }
-        }
-        
-        # Use on_files (requires PAGE_ID_MAP_FILE to exist)
-        (self.test_dir / "page_id_map.json").write_text('{"old-id": "old-path.md"}')
-        
-        # File has moved
-        source_file = self.docs_dir / "new-path.md"
-        source_file.write_text("---\nid: old-id\n---\nContent")
-        
-        mock_file = MagicMock()
-        mock_file.src_path = "new-path.md"
-        
-        on_files([mock_file], config)
-        
-        updated_yml = self.mkdocs_yml.read_text()
-        self.assertIn("old-path.md: new-path.md", updated_yml)
 
     def test_10_performance_smoke_test(self):
         """10. Process a large file with thousands of links."""

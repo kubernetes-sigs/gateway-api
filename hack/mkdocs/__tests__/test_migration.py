@@ -18,17 +18,15 @@ import sys
 from typing import Any, Dict, List, Tuple
 import unittest
 from pathlib import Path
-from types import SimpleNamespace
 
 sys.path.insert(0, str(Path(__file__).parents[2]))
 
 import mkdocs_linking as linking
 from mkdocs_linking import prepare_docs
-from mkdocs_hooks import on_config, on_files
 
 
 class TestMigration(unittest.TestCase):
-    """Tests the migration script's prepare and on_config functions."""
+    """Tests the migration script's prepare function."""
 
     def setUp(self) -> None:
         """Set up a temporary directory structure for each test."""
@@ -61,11 +59,6 @@ class TestMigration(unittest.TestCase):
             self.linking_module.DOCS_DIR = self.docs_path  # type: ignore
             self.linking_module.PAGE_ID_MAP_FILE = self.page_id_map_file  # type: ignore
 
-        # And patch hooks if they are already imported
-        if "mkdocs_hooks" in sys.modules:
-            self.hooks_module = sys.modules["mkdocs_hooks"]
-            self.hooks_module.PAGE_ID_MAP_FILE = self.page_id_map_file  # type: ignore
-
     def tearDown(self) -> None:
         """Clean up the temporary directory after each test."""
         shutil.rmtree(self.test_dir)
@@ -78,8 +71,6 @@ class TestMigration(unittest.TestCase):
         if "mkdocs_linking" in sys.modules:
             self.linking_module.DOCS_DIR = self.original_globals["DOCS_DIR"]
             self.linking_module.PAGE_ID_MAP_FILE = self.original_globals["PAGE_ID_MAP_FILE"]
-        if "mkdocs_hooks" in sys.modules:
-            self.hooks_module.PAGE_ID_MAP_FILE = self.original_globals["PAGE_ID_MAP_FILE"]
 
     def test_prepare_fresh_run_no_frontmatter(self) -> None:
         """Test that IDs are correctly injected into files."""
@@ -96,46 +87,6 @@ class TestMigration(unittest.TestCase):
         redirect_map: Dict[str, str] = json.loads(self.page_id_map_file.read_text())
         self.assertEqual(redirect_map.get("index"), "index.md")
         self.assertEqual(redirect_map.get("guides-http"), "guides/http.md")
-
-    def _create_mock_config(
-        self, pages_data: List[Tuple[str, str, str]]
-    ) -> Dict[str, Any]:
-        """Create a mock MkDocs config object for testing the hook function."""
-        mock_pages: List[SimpleNamespace] = []
-        for page_id, src_path, url in pages_data:
-            page = SimpleNamespace(file=SimpleNamespace(src_path=src_path), url=url)
-            # The hook function reads files to get IDs, so we must create them.
-            file_path = self.docs_path / src_path
-            file_path.parent.mkdir(parents=True, exist_ok=True)
-            file_path.write_text(f"---\nid: {page_id}\n---\nContent")
-            mock_pages.append(page)
-
-        return {
-            "docs_dir": str(self.docs_path),
-            "pages": mock_pages,
-            "plugins": {
-                "redirects": {"config": {"redirect_maps": {}}},
-                "macros": {"config": {"python_macros": {}}},
-            },
-        }
-
-    def test_on_files_one_file_moved(self) -> None:
-        """Test that a redirect is correctly generated for a moved file using on_files."""
-        (self.docs_path / "old-path.md").write_text("Content")
-        prepare_docs()
-        # Simulate a file move by creating a mock files list
-        new_file = SimpleNamespace(src_path="new/path/for/doc.md")
-        # Write the file with the same ID in the new location
-        new_file_path = self.docs_path / "new/path/for/doc.md"
-        new_file_path.parent.mkdir(parents=True, exist_ok=True)
-        new_file_path.write_text("---\nid: old-path\n---\nContent")
-        # Call on_files with the new file list and config
-        files = [new_file]
-        config = {"docs_dir": str(self.docs_path)}
-        # on_files prints output, but we want to check the mkdocs.yml or output
-        # For this test, just ensure no exceptions and that the function returns the files
-        result = on_files(files, config)
-        self.assertEqual(result, files)
 
     def test_prepare_with_existing_frontmatter(self) -> None:
         """Test that existing frontmatter is preserved and IDs are respected."""
@@ -216,58 +167,6 @@ description: "No ID yet"
         for expected_id, expected_path in expected_mappings.items():
             self.assertEqual(redirect_map.get(expected_id), expected_path)
 
-    def test_on_config_no_files_moved(self) -> None:
-        """Test that no redirects are generated when files haven't moved."""
-        # Arrange: Create initial state
-        (self.docs_path / "stable.md").write_text(
-            "---\nid: stable-doc\n---\nStable content"
-        )
-        prepare_docs()
-
-        # Arrange: Create config with same paths (no moves)
-        mock_config = self._create_mock_config(
-            [("stable-doc", "stable.md", "/stable/")]
-        )
-
-        # Act: Run the hook
-        updated_config = on_config(mock_config)
-
-        # Assert: No redirect rules should be generated
-        redirects = updated_config["plugins"]["redirects"]["config"]["redirect_maps"]
-        self.assertEqual(len(redirects), 0)
-
-    def test_on_files_multiple_files_moved(self) -> None:
-        """Test redirect generation for multiple moved files using on_files."""
-        initial_files = {
-            "old-guide.md": "old-guide-id",
-            "temp/draft.md": "draft-doc",
-            "archive/old-api.md": "api-v1",
-        }
-        for file_path, file_id in initial_files.items():
-            file_full_path = self.docs_path / file_path
-            file_full_path.parent.mkdir(parents=True, exist_ok=True)
-            file_full_path.write_text(f"---\nid: {file_id}\n---\nContent")
-        prepare_docs()
-        # Simulate all files being moved to new locations
-        new_files = [
-            SimpleNamespace(src_path="guides/user-guide.md"),
-            SimpleNamespace(src_path="published/final-doc.md"),
-            SimpleNamespace(src_path="api/legacy/v1.md"),
-        ]
-        # Write the files with the same IDs in the new locations
-        moved = [
-            ("guides/user-guide.md", "old-guide-id"),
-            ("published/final-doc.md", "draft-doc"),
-            ("api/legacy/v1.md", "api-v1"),
-        ]
-        for path, file_id in moved:
-            file_path = self.docs_path / path
-            file_path.parent.mkdir(parents=True, exist_ok=True)
-            file_path.write_text(f"---\nid: {file_id}\n---\nContent")
-        config = {"docs_dir": str(self.docs_path)}
-        result = on_files(new_files, config)
-        self.assertEqual(result, new_files)
-
     def test_prepare_handles_empty_docs_directory(self) -> None:
         """Test that prepare_docs handles an empty docs directory gracefully."""
         # Arrange: Docs directory exists but is empty (no .md files)
@@ -280,41 +179,6 @@ description: "No ID yet"
         redirect_map = json.loads(self.page_id_map_file.read_text())
         self.assertEqual(len(redirect_map), 0)
 
-    def test_on_config_missing_page_id_map(self) -> None:
-        """Test on_config behavior when page ID map file doesn't exist."""
-        # Arrange: Ensure page ID map doesn't exist
-        if self.page_id_map_file.exists():
-            self.page_id_map_file.unlink()
 
-        mock_config = self._create_mock_config([("test-page", "test.md", "/test/")])
-
-        # Act: Run the hook
-        updated_config = on_config(mock_config)
-
-        # Assert: Should handle missing file gracefully and still set up macro
-        self.assertIn("macros", updated_config["plugins"])
-
-        # No redirects should be generated
-        redirects = updated_config["plugins"]["redirects"]["config"]["redirect_maps"]
-        self.assertEqual(len(redirects), 0)
-
-    def test_on_config_missing_plugins(self) -> None:
-        """Test on_config behavior when expected plugins are not configured."""
-        # Arrange: Create config without redirects or macros plugins
-        (self.docs_path / "test.md").write_text("---\nid: test-page\n---\nContent")
-        prepare_docs()
-
-        mock_config = {
-            "docs_dir": str(self.docs_path),
-            "pages": [
-                SimpleNamespace(file=SimpleNamespace(src_path="test.md"), url="/test/")
-            ],
-            "plugins": {},  # No redirects or macros plugins
-        }
-
-        # Act: Run the hook
-        updated_config = on_config(mock_config)
-
-        # Assert: Should handle missing plugins gracefully
-        self.assertIsInstance(updated_config, dict)
-        self.assertEqual(updated_config["docs_dir"], str(self.docs_path))
+if __name__ == "__main__":
+    unittest.main()

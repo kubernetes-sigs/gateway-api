@@ -36,12 +36,14 @@ class MockCopyGEPsModule:
             return files
 
         docs_parent = Path(docs_dir).parent
-        for root_dir, _, gep_files in (docs_parent / 'geps').walk():
-            for filename in gep_files:
-                file_path = str(root_dir / filename)
-                if files.get_file_from_path(file_path) is None:
-                    file_obj = AddedFile(src_path=file_path)
-                    files.append(file_obj)
+        geps_path = docs_parent / 'geps'
+        if geps_path.exists():
+            for gep_file in geps_path.rglob('*'):
+                if gep_file.is_file():
+                    file_path = str(gep_file)
+                    if files.get_file_from_path(file_path) is None:
+                        file_obj = AddedFile(src_path=file_path)
+                        files.append(file_obj)
         return files
 
 class TestGEPIntegration(unittest.TestCase):
