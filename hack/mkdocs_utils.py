@@ -184,46 +184,36 @@ def convert_internal_links(docs_dir_input: Optional[Union[str, Path]] = None) ->
                 return f"__GW_API_INTERNAL_LINK_MASK_{idx}__"
 
             # Mask frontmatter block (allowing for leading whitespace/bom)
+            # Pattern: From start of file, find ---, capture everything until the next ---.
             content = re.sub(r"^\s*---.*?---\s*\n", mask_content, content, flags=re.DOTALL)
 
             # Mask fenced code blocks (``` ... ```)
+            # Pattern: Find triples of backticks and capture everything between them.
             content = re.sub(r"```.*?```", mask_content, content, flags=re.DOTALL)
 
             # Mask inline code (`...`)
+            # Pattern: Find single backticks (not preceded by another backtick) and capture until next.
             content = re.sub(r"(?<!`)`[^`\n]+`", mask_content, content)
 
             def replace_link(match: re.Match) -> str:
                 # Group 1: link text (inline) or label (reference)
                 # Group 2: delimiter ('(' or ':')
                 # Group 3: path.md
-                # (Optional) Group 4: anchor (#...) - only for reference links in new regex
-                # Group 4/5: trailing suffix (parens or rest of line)
+                # Group 4: anchor (#...)
+                # Group 5: trailing suffix (parens or rest of line)
                 
                 label = match.group(1)
                 delimiter = match.group(2)
                 link_url = match.group(3)
-                
-                # Inline links: Groups are (1:text, 2:(, 3:path, 4:))
-                # Reference links: Groups are (1:label, 2::, 3:path, 4:anchor, 5:suffix)
-                if delimiter == "(":
-                    anchor = ""
-                    suffix = match.group(4)
-                else:
-                    anchor = match.group(4) or ""
-                    suffix = match.group(5)
+                anchor = match.group(4) or ""
+                suffix = match.group(5)
 
                 if link_url.startswith(("http", "#", "mailto:")) or not link_url.endswith(".md"):
                     return match.group(0)
 
                 current_dir = md_file.parent
-                # Strip any anchors from the URL before resolving (if inline link had them)
-                base_url = link_url.split("#")[0]
-                inline_anchor = f"#{link_url.split('#')[1]}" if "#" in link_url else ""
-                
-                # Combine anchors if both exist (rare but possible)
-                final_anchor = anchor or inline_anchor
-                
-                target_file = (current_dir / base_url).resolve()
+                # link_url is already base_url because of the regex change
+                target_file = (current_dir / link_url).resolve()
 
                 try:
                     target_relative_path = target_file.relative_to(docs_dir.resolve())
@@ -233,7 +223,7 @@ def convert_internal_links(docs_dir_input: Optional[Union[str, Path]] = None) ->
 
                 target_id = path_to_id_map.get(target_key)
                 if target_id:
-                    new_url = f'{{{{ internal_link("{target_id}") }}}}{final_anchor}'
+                    new_url = f'{{{{ internal_link("{target_id}") }}}}{anchor}'
                     if delimiter == "(":
                         return f"[{label}]({new_url})"
                     elif delimiter == ":":
@@ -241,12 +231,24 @@ def convert_internal_links(docs_dir_input: Optional[Union[str, Path]] = None) ->
                 
                 return match.group(0)
 
-            # 1. Inline links: [text](path.md)
-            # Groups: 1:text, 2:(, 3:path, 4:)
-            content = re.sub(r"\[([^\]]+)\](\()((?!{{)[^)\n]+\.md)(\))", replace_link, content)
+            # 1. Inline links: [text](path.md#anchor)
+            # Pattern explanation:
+            #   \[([^\]]+)\]      -> Match [text], Group 1 is 'text'
+            #   (\()              -> Match '(', Group 2 is delimiter
+            #   ((?!{{)[^)#\n]+\.md) -> Match 'path.md', Group 3 is the relative path.
+            #                         (?!{{) ensures we don't convert already converted macros.
+            #                         [^)#\n]+ allows spaces and paths but stops at anchor or newline.
+            #   (#[\w-]+)?        -> Match '#anchor', Group 4 is the optional anchor.
+            #   (\))              -> Match ')', Group 5 is trailing suffix
+            content = re.sub(r"\[([^\]]+)\](\()((?!{{)[^)#\n]+\.md)(#[\w-]+)?(\))", replace_link, content)
 
-            # 2. Reference definitions: [label]: path.md
-            # Groups: 1:label, 2::, 3:path, 4:anchor, 5:suffix
+            # 2. Reference definitions: [label]: path.md#anchor
+            # Pattern explanation:
+            #   ^\[([^\]]+)\]     -> Match [label] at start of line, Group 1 is 'label'
+            #   (:)\s*            -> Match ':', Group 2 is delimiter.
+            #   ((?!{{)[^#\n]+\.md) -> Match 'path.md', Group 3 is the relative path.
+            #   (#[\w-]+)?        -> Match '#anchor', Group 4 is the optional anchor.
+            #   (\s.*|$)          -> Match remaining whitespace or end of line, Group 5 is suffix.
             content = re.sub(r"^\[([^\]]+)\](:)\s*((?!{{)[^#\n]+\.md)(#[\w-]+)?(\s.*|$)", replace_link, content, flags=re.MULTILINE)
 
             # Unmask everything

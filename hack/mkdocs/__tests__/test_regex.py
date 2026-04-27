@@ -94,7 +94,7 @@ class TestLinkRegexAdversarial(unittest.TestCase):
         self.assertIn('[Already]({{ internal_link("target-id") }})', converted_content)
         
         # 4. Multiple on one line
-        self.assertEqual(converted_content.count('internal_link("target-id")'), 9) # 6 + reference_style + reference_with_anchor + body (frontmatter is masked)
+        self.assertEqual(converted_content.count('internal_link("target-id")'), 10) # 7 + reference_style + reference_with_anchor + body (frontmatter is masked)
         
         # 5. Spaces - Check if we handle them
         self.assertIn('({{ internal_link("spaces-id") }})', converted_content)
