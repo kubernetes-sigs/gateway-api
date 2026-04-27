@@ -245,17 +245,12 @@ TLS to the external endpoint, and forwards the request.
 
 ### Policy Application Scopes
 
-Egress policies apply at three levels:
-
-| Scope | Mechanism | Egress Examples |
-|-------|-----------|-----------------|
-| **Gateway** | Policy attachment to Gateway | CIDR deny lists, global rate limits, default deny |
-| **Route** | HTTPRoute filters, ExtensionRef | Payload transforms, compliance checks, guardrails |
-| **Backend** | Backend.spec.tls, Backend.spec.filters [PR #4488](https://github.com/kubernetes-sigs/gateway-api/pull/4488) | Per-destination TLS, credential injection |
-
-**Conflict resolution**: Route > Backend > Gateway (most specific wins).
-Same-level ties: oldest resource by `creationTimestamp` wins. Implementations
-MUST surface conflicts in status conditions.
+Egress policies may apply at multiple levels (Gateway, Route, Backend). This
+GEP does not define conflict resolution or precedence ordering between these
+scopes. Policy resolution semantics -- including how conflicts between Gateway,
+Route, and Backend-level policies are handled -- will be addressed as part of
+the Backend resource design
+([PR #4488](https://github.com/kubernetes-sigs/gateway-api/pull/4488)).
 
 ### Workload-to-Gateway Addressing (Interim)
 
