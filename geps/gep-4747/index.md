@@ -280,6 +280,12 @@ Gateway does once traffic arrives.
 3. **Gateway bypass**: Workloads with direct internet access bypass all egress
    policy. NetworkPolicy enforcement may be used to mitigate this.
 
+4. **Outbound abuse**: An actor who can create Routes or Backends may use the
+   egress gateway to launch attacks (e.g., denial-of-service, port scanning)
+   against external targets, with traffic appearing to originate from the
+   cluster's egress IP. Mitigation: restrict Route and Backend creation via
+   RBAC, enforce allowlisted destinations, and apply rate-limiting policies.
+
 ## Open Questions
 
 > These are explicitly marked as open for community feedback during
