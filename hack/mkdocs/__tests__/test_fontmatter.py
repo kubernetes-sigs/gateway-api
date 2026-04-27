@@ -163,6 +163,58 @@ tags: ["日本語", "español", "français"]
         redirect_map = json.loads(linking.PAGE_ID_MAP_FILE.read_text())
         self.assertEqual(redirect_map["unicode-test"], "unicode.md")
 
+    def test_surgical_injection_preserves_formatting(self) -> None:
+        """
+        Test that adding an ID to a file with complex formatting preserves that formatting.
+        """
+        # A file with a multiline description using single quotes and specific indentation
+        original_content = """---
+description: 'This is a long description
+  that spans multiple lines.
+  It uses single quotes and has "nested" double quotes.
+
+  '
+title: "Formatted File"
+# A comment inside frontmatter
+---
+# Content"""
+        
+        source_file = linking.DOCS_DIR / "blog-post.md"
+        source_file.write_text(original_content)
+        
+        # Act
+        prepare_docs()
+        
+        # Assert
+        updated_content = source_file.read_text()
+        
+        # 1. ID should be present
+        self.assertIn("id: blog-post", updated_content)
+        
+        # 2. Formatting should be preserved (surgical injection)
+        # We check that the description block is exactly as it was
+        self.assertIn("description: 'This is a long description", updated_content)
+        self.assertIn("  that spans multiple lines.", updated_content)
+        self.assertIn("title: \"Formatted File\"", updated_content)
+        self.assertIn("# A comment inside frontmatter", updated_content)
+        
+        # 3. Check that it didn't use frontmatter.dumps (which would reformat)
+        # frontmatter.dumps usually removes comments and reformats multiline strings.
+        # If the comment is still there, it was a surgical injection.
+        self.assertIn("# A comment inside frontmatter", updated_content)
+
+    def test_surgical_injection_no_frontmatter(self) -> None:
+        """Test injection when there is no frontmatter at all."""
+        original_content = "# Simple Content"
+        source_file = linking.DOCS_DIR / "simple.md"
+        source_file.write_text(original_content)
+        
+        prepare_docs()
+        
+        updated_content = source_file.read_text()
+        self.assertTrue(updated_content.startswith("---\nid: simple\n---"))
+        self.assertIn("# Simple Content", updated_content)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

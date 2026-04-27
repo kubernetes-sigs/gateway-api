@@ -59,7 +59,9 @@ class TestLinkRegexAdversarial(unittest.TestCase):
             "with_spaces_in_path": "[Spaces](target file with spaces.md)",
             "inside_code_inline": "See `[code](target.md)` which shouldn't be converted", # Current regex might fail
             "inside_code_block": "```\n[block](target.md)\n```", # Current regex might fail
-            "image_link": "![Alt](target.md)", # Should images be converted?
+            "reference_style": "[ref]: target.md",
+            "reference_with_anchor": "[ref-anchor]: target.md#anchor",
+            "frontmatter_masking": "---\ndescription: '[link](target.md)'\n---\nBody link: [body](target.md)",
         }
         
         # Create a file for each scenario or one big file
@@ -70,31 +72,46 @@ class TestLinkRegexAdversarial(unittest.TestCase):
         
         # Also create the file with spaces requested by one scenario
         (self.docs_dir / "target file with spaces.md").write_text("---\nid: spaces-id\n---\n# Spaces")
+        
+        # Frontmatter masking test in a separate file (it must start at beginning)
+        fm_file = self.docs_dir / "fm_mask.md"
+        fm_file.write_text("---\ndescription: '[link](target.md)'\n---\nBody link: [body](target.md)")
 
         # Act
         mkdocs_utils.convert_internal_links(docs_dir_input=self.docs_dir)
 
         # Assert
         converted_content = source_file.read_text()
+        fm_converted = fm_file.read_text()
         
         # 1. Standard should be converted
         self.assertIn('({{ internal_link("target-id") }})', converted_content)
         
-        # 2. Parens in title should be handled (if regex is robust)
+        # 2. Parens in title should be handled
         self.assertIn('[Link (with parens)]({{ internal_link("target-id") }})', converted_content)
         
         # 3. Already converted should stay same
         self.assertIn('[Already]({{ internal_link("target-id") }})', converted_content)
         
         # 4. Multiple on one line
-        self.assertEqual(converted_content.count('internal_link("target-id")'), 6) # standard + multiple (2) + parens + anchor + already_converted
+        self.assertEqual(converted_content.count('internal_link("target-id")'), 9) # 6 + reference_style + reference_with_anchor + body (frontmatter is masked)
         
         # 5. Spaces - Check if we handle them
         self.assertIn('({{ internal_link("spaces-id") }})', converted_content)
 
-        # 6. Anchors - Check if we preserve them (Wait, current macro might not take anchors)
-        # We should check if the anchor is still there or if we lost it.
-        # Actually, internal_link macro only takes the ID. If we want anchors, we need ID#anchor.
+        # 6. Anchors in reference links
+        self.assertIn('[ref-anchor]: {{ internal_link("target-id") }}#anchor', converted_content)
+        self.assertIn('[ref]: {{ internal_link("target-id") }}', converted_content)
+
+        # 7. Code masking
+        self.assertIn("`[code](target.md)`", converted_content)
+        self.assertIn("```\n[block](target.md)\n```", converted_content)
+
+        # 8. Frontmatter masking
+        # The link inside the frontmatter should NOT be converted
+        self.assertIn("description: '[link](target.md)'", fm_converted)
+        # The link in the body should be converted
+        self.assertIn('[body]({{ internal_link("target-id") }})', fm_converted)
         
 if __name__ == "__main__":
     unittest.main()

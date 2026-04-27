@@ -101,21 +101,26 @@ def prepare_docs(docs_dir_input: Optional[Union[str, Path]] = None, dry_run: boo
         for md_file, page_id, metadata, content_raw in files_needing_ids:
             print(f"  {'+' if dry_run else '-'} {md_file.relative_to(docs_dir)} -> ID: '{page_id}'")
             if not dry_run:
-                try:
-                    post = frontmatter.loads(content_raw)
-                except Exception:
-                    # Fallback for malformed YAML: manually inject ID line
-                    if content_raw.startswith("---"):
-                        parts = content_raw.split("---", 2)
-                        if len(parts) >= 3:
-                            new_fm = parts[1].rstrip() + f"\n{FRONTMATTER_ID_KEY}: {page_id}\n"
-                            md_file.write_text(f"---{new_fm}---\n\n{parts[2]}", "utf-8")
-                            continue
-                    md_file.write_text(f"---\n{FRONTMATTER_ID_KEY}: {page_id}\n---\n\n{content_raw}", "utf-8")
-                    continue
-
-                post[FRONTMATTER_ID_KEY] = page_id
-                md_file.write_text(frontmatter.dumps(post), "utf-8")
+                # Injection: Try to inject the ID line without rewriting the whole frontmatter.
+                # This preserves comments, indentation, and specific YAML styles (like block scalars vs quotes).
+                if content_raw.startswith("---"):
+                    parts = content_raw.split("---", 2)
+                    if len(parts) >= 3:
+                        fm_content = parts[1]
+                        # Check if id: is already there (case where parser failed but it exists)
+                        if re.search(r"^id:\s*", fm_content, re.MULTILINE):
+                            # Already has an ID line, use frontmatter lib to be safe if it didn't find it
+                            post = frontmatter.loads(content_raw)
+                            post[FRONTMATTER_ID_KEY] = page_id
+                            md_file.write_text(frontmatter.dumps(post), "utf-8")
+                        else:
+                            # Inject after the first separator
+                            new_fm = f"\nid: {page_id}{fm_content}"
+                            md_file.write_text(f"---{new_fm}---{parts[2]}", "utf-8")
+                        continue
+                
+                # Fallback for files with no frontmatter at all
+                md_file.write_text(f"---\nid: {page_id}\n---\n\n{content_raw}", "utf-8")
                 continue
 
     if files_with_ids:
@@ -170,34 +175,55 @@ def convert_internal_links(docs_dir_input: Optional[Union[str, Path]] = None) ->
             content = md_file.read_text("utf-8")
             original_content = content
 
-            # --- Masking Strategy: Protect code blocks from link conversion ---
+            # --- Masking Strategy: Protect code blocks and frontmatter from link conversion ---
             placeholders: List[str] = []
 
-            def mask_code(match: re.Match) -> str:
+            def mask_content(match: re.Match) -> str:
                 idx = len(placeholders)
                 placeholders.append(match.group(0))
                 return f"__GW_API_INTERNAL_LINK_MASK_{idx}__"
 
+            # Mask frontmatter block (allowing for leading whitespace/bom)
+            content = re.sub(r"^\s*---.*?---\s*\n", mask_content, content, flags=re.DOTALL)
+
             # Mask fenced code blocks (``` ... ```)
-            # Pattern: matches three backticks followed by anything (non-greedy) until the next three backticks.
-            # re.DOTALL is crucial here to ensure '.' matches newlines within the block.
-            content = re.sub(r"```.*?```", mask_code, content, flags=re.DOTALL)
+            content = re.sub(r"```.*?```", mask_content, content, flags=re.DOTALL)
 
             # Mask inline code (`...`)
-            # Pattern: matches a single backtick NOT preceded by another backtick (lookbehind),
-            # followed by any characters that are NOT a backtick or newline, followed by a backtick.
-            # This avoids nested backticks and ensures we don't match our own protectors.
-            content = re.sub(r"(?<!`)`[^`\n]+`", mask_code, content)
+            content = re.sub(r"(?<!`)`[^`\n]+`", mask_content, content)
 
             def replace_link(match: re.Match) -> str:
-                link_text = match.group(1)
-                link_url = match.group(2)
+                # Group 1: link text (inline) or label (reference)
+                # Group 2: delimiter ('(' or ':')
+                # Group 3: path.md
+                # (Optional) Group 4: anchor (#...) - only for reference links in new regex
+                # Group 4/5: trailing suffix (parens or rest of line)
+                
+                label = match.group(1)
+                delimiter = match.group(2)
+                link_url = match.group(3)
+                
+                # Inline links: Groups are (1:text, 2:(, 3:path, 4:))
+                # Reference links: Groups are (1:label, 2::, 3:path, 4:anchor, 5:suffix)
+                if delimiter == "(":
+                    anchor = ""
+                    suffix = match.group(4)
+                else:
+                    anchor = match.group(4) or ""
+                    suffix = match.group(5)
 
                 if link_url.startswith(("http", "#", "mailto:")) or not link_url.endswith(".md"):
                     return match.group(0)
 
                 current_dir = md_file.parent
-                target_file = (current_dir / link_url).resolve()
+                # Strip any anchors from the URL before resolving (if inline link had them)
+                base_url = link_url.split("#")[0]
+                inline_anchor = f"#{link_url.split('#')[1]}" if "#" in link_url else ""
+                
+                # Combine anchors if both exist (rare but possible)
+                final_anchor = anchor or inline_anchor
+                
+                target_file = (current_dir / base_url).resolve()
 
                 try:
                     target_relative_path = target_file.relative_to(docs_dir.resolve())
@@ -207,20 +233,23 @@ def convert_internal_links(docs_dir_input: Optional[Union[str, Path]] = None) ->
 
                 target_id = path_to_id_map.get(target_key)
                 if target_id:
-                    return f'[{link_text}]({{{{ internal_link("{target_id}") }}}})'
-                else:
-                    return match.group(0)
+                    new_url = f'{{{{ internal_link("{target_id}") }}}}{final_anchor}'
+                    if delimiter == "(":
+                        return f"[{label}]({new_url})"
+                    elif delimiter == ":":
+                        return f"[{label}]: {new_url}{suffix}"
+                
+                return match.group(0)
 
-            # Perform the conversion on the remaining text
-            # Regex Breakdown:
-            # \[([^\]]+)\]  -> Matches link text inside square brackets [text]
-            # \(            -> Matches opening parenthesis (
-            # (?!{{)        -> Negative lookahead: Ensures the link does NOT already start with '{{' (already converted)
-            # ([^)]+\.md)   -> Matches the link URL ending in '.md', capturing it in a group
-            # \)            -> Matches closing parenthesis )
-            content = re.sub(r"\[([^\]]+)\]\((?!{{)([^)]+\.md)\)", replace_link, content)
+            # 1. Inline links: [text](path.md)
+            # Groups: 1:text, 2:(, 3:path, 4:)
+            content = re.sub(r"\[([^\]]+)\](\()((?!{{)[^)\n]+\.md)(\))", replace_link, content)
 
-            # Unmask the code blocks
+            # 2. Reference definitions: [label]: path.md
+            # Groups: 1:label, 2::, 3:path, 4:anchor, 5:suffix
+            content = re.sub(r"^\[([^\]]+)\](:)\s*((?!{{)[^#\n]+\.md)(#[\w-]+)?(\s.*|$)", replace_link, content, flags=re.MULTILINE)
+
+            # Unmask everything
             for i, original in enumerate(placeholders):
                 content = content.replace(f"__GW_API_INTERNAL_LINK_MASK_{i}__", original)
 
