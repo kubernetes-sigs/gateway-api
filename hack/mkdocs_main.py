@@ -18,9 +18,15 @@ Main module for mkdocs-macros plugin.
 This provides the internal_link macro for resilient documentation linking.
 """
 
+import os
+import sys
+import logging
 from pathlib import Path
 from typing import Dict, Optional
-import logging
+
+# Ensure the directory containing this script is in the Python path
+# so that internal imports like 'mkdocs_utils' work correctly.
+sys.path.append(os.path.dirname(__file__))
 
 from mkdocs_utils import (
     DOCS_DIR,
