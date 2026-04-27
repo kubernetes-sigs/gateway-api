@@ -18,7 +18,6 @@ extra_javascript:
 hooks:
 - hack/mkdocs-copy-geps.py
 - hack/mkdocs-generate-conformance.py
-- hack/mkdocs_hooks.py
 - hack/mkdocs-generate-controller-wizard-data.py
 watch:
 - geps
@@ -54,10 +53,6 @@ plugins:
       include_dir: examples
 
       module_name: hack/mkdocs_main
-  # Do not add manual redirects here, they will be overwritten. Add them to 
-  # hack/redirect_map.json if needed in exceptional cases, but the mkdocs_linking.py
-  # hook and accompanying macro largely negate the need for manual redirects:
-  # https://github.com/kubernetes-sigs/gateway-api/pull/3999
   - redirects:
       redirect_maps:
         'guides/index.md': 'guides/getting-started/index.md'

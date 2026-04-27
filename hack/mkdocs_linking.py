@@ -22,7 +22,7 @@ mkdocs_utils.py
 : The core engine of the documentation tools. Contains all logic for ID generation, frontmatter parsing, link conversion, and YAML updates.
 
 mkdocs_hooks.py
-: Dedicated module for MkDocs build lifecycle hooks, now purely dependent on mkdocs_utils for logic.
+: Dedicated module for MkDocs build lifecycle hooks.
 
 mkdocs_main.py
 : The macros plugin, simplified to use the centralized ID map scanner.
