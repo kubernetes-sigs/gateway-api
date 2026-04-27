@@ -76,6 +76,7 @@ argues that no new Gateway-level resource is required.
   (see [#1651](https://github.com/kubernetes-sigs/gateway-api/issues/1651))
 * Define or introduce traffic redirection mechanisms (e.g., transparent
   interception of egress traffic)
+* Define mixed-mode (combined ingress/egress) Gateway semantics
 
 ## Introduction
 
@@ -118,6 +119,12 @@ The difference between ingress and egress is an emergent property of:
 Both are already expressible in Gateway API. GatewayClass can provide a
 mechanism for implementations to distinguish egress controllers from ingress
 controllers.
+
+A single Gateway MAY serve both ingress and egress if the implementation
+supports it. However, this GEP does not define a mechanism for distinguishing
+ingress and egress listeners or routes on a shared Gateway. Implementations
+that support mixed-mode gateways would need to surface direction at the
+Listener or Route level; defining such a mechanism is left to a future GEP.
 
 ### Prior Art
 
