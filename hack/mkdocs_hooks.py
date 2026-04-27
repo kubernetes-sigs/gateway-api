@@ -14,7 +14,7 @@
 
 
 """
-Dedicated module for MkDocs build lifecycle hooks, now purely dependent on mkdocs_utils for logic.
+Dedicated module for MkDocs build lifecycle hooks dependent on mkdocs_utils for logic.
 """
 
 import json
