@@ -5,14 +5,13 @@ A suite of tools designed to make the Gateway API documentation resilient to ref
 1.  mkdocs_utils.py: The core engine. Contains all logic for ID generation, frontmatter parsing, link conversion, and YAML updates.
 2.  mkdocs_linking.py: A CLI wrapper for manual maintenance tasks (preparing docs and converting links).
 3.  mkdocs_main.py: The MkDocs macros plugin that provides the `internal_link` macro.
-4.  mkdocs_hooks.py: Lifecycle hooks for automatic redirect generation (currently disabled).
 
 ---
 
 ## Core Features
 
 ### 1. Stable Identification (ID Injection)
-The system ensures every Markdown file has a unique, permanent ID in its frontmatter. If a file is missing an ID, the `prepare` script generates one based on its path and injects it into the frontmatter. The IDs allow the system to track a file even if its filename or directory changes.
+The system ensures every Markdown file has a unique, permanent ID in its frontmatter. If a file is missing an ID, the logic in `mkdocs_utils.py` can generate one based on its path and inject it into the frontmatter. The IDs allow the system to track a file even if its filename or directory changes.
 
 ### 2. Resilient Linking (`internal_link` macro)
 Instead of hardcoding relative paths like `[text](../guides/api.md)`, the system allows using stable IDs:
@@ -20,9 +19,6 @@ Instead of hardcoding relative paths like `[text](../guides/api.md)`, the system
 
 ### 3. Automated Link Conversion
 The toolkit includes a script to bulk-convert existing standard Markdown links into the resilient macro format with a masking strategy to ensure links inside code blocks or backticks are never touched.
-
-### 4. Automatic Redirect Management
-When files move, the system detects the change via the stable IDs and updates the `redirects` plugin in `mkdocs.yml`.
 
 ---
 
@@ -54,45 +50,9 @@ Once rules are generated, the script uses a YAML-aware parser to locate the redi
 
 ---
 
-## Current Status
-
-Note: The hook is currently disabled in the root mkdocs.yml.
-
-It was disabled to prevent destructive mutations to mkdocs.yml during active development and CI runs where side effects are undesirable.
-
-## How to Enable
-
-To re-enable the hook, add `- hack/mkdocs_hooks.py` to the `hooks` list in `mkdocs.yml`:
-
-```yaml
-hooks:
-  - hack/mkdocs-copy-geps.py
-  - hack/mkdocs-generate-conformance.py
-  - hack/mkdocs_hooks.py  # Add this line
-  - hack/mkdocs-generate-controller-wizard-data.py
-```
-
-### 2. Update Redirects Warning
-When re-enabling, you should also re-add the warning comment above the `redirects:` plugin section in `mkdocs.yml` to prevent manual entries that will be overwritten:
-
-```yaml
-  - macros:
-      include_dir: examples
-      module_name: hack/mkdocs_main
-  # Do not add manual redirects here, they will be overwritten. Add them to 
-  # hack/redirect_map.json if needed in exceptional cases, but the mkdocs_linking.py
-  # hook and accompanying macro largely negate the need for manual redirects:
-  # https://github.com/kubernetes-sigs/gateway-api/pull/3999
-  - redirects:
-      redirect_maps:
-        ...
-```
-
----
-
 ## How to Use Manually
 
-The `hack/mkdocs_linking.py` script is your primary interface for maintenance. It is the recommended way to test changes before enabling the hook.
+The `hack/mkdocs_linking.py` script is your primary interface for maintenance.
 
 ### 1. Safety First: Dry Run
 To see what the script would do without actually modifying any files, use the `--dry-run` flag:
@@ -116,7 +76,7 @@ PYTHONPATH=hack python3 hack/mkdocs_linking.py --convert-links
 
 ## Running Tests
 
-To verify the logic (CLI, link conversion, ID generation, regex patching), run the test suite:
+To verify the logic (link conversion, ID generation, regex patching), run the test suite:
 
 ### 1. Using Pytest (Recommended)
 ```bash
@@ -130,13 +90,6 @@ PYTHONPATH=hack python3 -m unittest discover -s hack/mkdocs/__tests__/ -p 'test_
 
 ---
 
-## Troubleshooting & Verification
-
-If you get import errors, ensure you are running from the root of the repository and that `hack` is in your `PYTHONPATH`:
-```bash
-PYTHONPATH=hack python3 hack/mkdocs_linking.py --prepare
-```
-
 ## Prerequisites
 
 This toolkit requires Python 3.9+ and several dependencies.
@@ -147,12 +100,6 @@ Install the required libraries using the repository's requirements file:
 pip install -r hack/mkdocs/image/requirements.txt
 ```
 
-### 2. Using a Virtual Environment
-If you are using the virtual environment provided in the repository, prefix your commands with the environment path:
-```bash
-PYTHONPATH=hack ./.venv/bin/python3 hack/mkdocs_linking.py --prepare
-```
-
-### 3. Page ID Map
+### 2. Page ID Map
 - `hack/page_id_map.json`: This file contains the authoritative mapping of page IDs to their original paths. It must exist (even if empty) for the scripts to run.
 - Frontmatter IDs: Markdown files must have an `id:` field (e.g., `id: geps-101`) to be tracked.
