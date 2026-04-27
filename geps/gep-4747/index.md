@@ -74,6 +74,8 @@ argues that no new Gateway-level resource is required.
 * Address mesh-attached egress (sidecar/waypoint enforcement without Gateway)
 * Solve workload-to-Gateway addressing
   (see [#1651](https://github.com/kubernetes-sigs/gateway-api/issues/1651))
+* Define or introduce traffic redirection mechanisms (e.g., transparent
+  interception of egress traffic)
 
 ## Introduction
 
