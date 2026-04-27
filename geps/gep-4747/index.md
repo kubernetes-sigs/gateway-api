@@ -67,7 +67,8 @@ argues that no new Gateway-level resource is required.
 
 * Introduce a new `EgressGateway` resource (see [GEP-4748] and
   [Alternatives Considered](#alternatives-considered))
-* Define the Backend resource (see [PR #4488](https://github.com/kubernetes-sigs/gateway-api/pull/4488))
+* Define a specific Backend resource (for ongoing work see
+  [PR #4488](https://github.com/kubernetes-sigs/gateway-api/pull/4488))
 * Address forward-proxy egress with dynamic routing
   (see [#4704](https://github.com/kubernetes-sigs/gateway-api/issues/4704))
 * Address L3/L4 network-level egress
@@ -156,6 +157,11 @@ Workload --> Gateway <-------- HTTPRoute ----------> Backend (PR #4488)
                                                   - number: 443
                                                     tls: ...
 ```
+
+Throughout this GEP, **Backend** refers to a CRD that acts as a backendRef
+target for egress routes, representing an external destination. The specific
+resource definition is being developed in
+[PR #4488](https://github.com/kubernetes-sigs/gateway-api/pull/4488).
 
 ### Egress Gateway Configuration
 
