@@ -1141,7 +1141,7 @@ spec:
                                   - kind
                                   - name
                                   type: object
-                                maxItems: 8
+                                maxItems: 16
                                 minItems: 1
                                 type: array
                                 x-kubernetes-list-type: atomic
@@ -1306,7 +1306,7 @@ spec:
                                         - kind
                                         - name
                                         type: object
-                                      maxItems: 8
+                                      maxItems: 16
                                       minItems: 1
                                       type: array
                                       x-kubernetes-list-type: atomic
@@ -2798,7 +2798,7 @@ spec:
                                   - kind
                                   - name
                                   type: object
-                                maxItems: 8
+                                maxItems: 16
                                 minItems: 1
                                 type: array
                                 x-kubernetes-list-type: atomic
@@ -2963,7 +2963,7 @@ spec:
                                         - kind
                                         - name
                                         type: object
-                                      maxItems: 8
+                                      maxItems: 16
                                       minItems: 1
                                       type: array
                                       x-kubernetes-list-type: atomic
