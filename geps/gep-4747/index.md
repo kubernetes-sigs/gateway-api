@@ -249,6 +249,8 @@ MUST surface conflicts in status conditions.
 Until Gateway Routability ([#1651](https://github.com/kubernetes-sigs/gateway-api/issues/1651))
 is resolved, workloads connect to the egress gateway via an implementation-managed
 address reachable only within the cluster (often a ClusterIP Service).
+See also [PR #4767](https://github.com/kubernetes-sigs/gateway-api/pull/4767)
+for ongoing work on service scope and routability.
 
 Implementations should:
 
