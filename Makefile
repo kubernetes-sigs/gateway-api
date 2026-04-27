@@ -213,7 +213,7 @@ verify-docs: build-docs
 .PHONY: build-docs-netlify
 build-docs-netlify: update-geps api-ref-docs wizard-wasm
 	pip install -r hack/mkdocs/image/requirements.txt
-	python -m mkdocs build
+	PYTHONPATH=hack python -m mkdocs build
 
 .PHONY: live-docs
 live-docs: update-geps
