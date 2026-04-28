@@ -27,7 +27,7 @@ There are two main interfaces that will trigger the creation of an `EndpointSele
 
 ```yaml
 apiVersion: gateway.networking.x-k8s.io/v1alpha1
-kind: EndpointSelector
+kind: XEndpointSelector
   metadata:
     name: myapp
     namespace: default
@@ -39,6 +39,19 @@ spec:
     - name: http
       port: 80
       protocol: TCP
+---
+apiVersion: gateway.networking.x-k8s.io/v1alpha1
+kind: XBackend # Reference to GEP 4488
+metadata:
+  name: mybackend
+  namespace: default
+spec:
+  type: EndpointSelector
+  port: 80
+  endpointSelector:
+    selectorRef:
+      name: myapp
+      namespace: default
 ```
 
 ### Example (controller creation)
@@ -59,7 +72,7 @@ spec:
     failureMode: FailOpen
 ---
 apiVersion: gateway.networking.x-k8s.io/v1alpha1
-kind: EndpointSelector
+kind: XEndpointSelector
 metadata:
   generateName: vllm-qwen3-32b-
   namespace: default
