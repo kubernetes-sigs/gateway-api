@@ -62,11 +62,12 @@ var GatewayOverlappingTLSConfigHostnames = suite.ConformanceTest{
 						Reason: string(gatewayv1.ListenerReasonOverlappingHostnames),
 					},
 				},
-				"foo-https", "bar-https", "wildcard-https",
+				"foo-example-https", "bar-example-https", "wildcard-example-https", "wildcard-other-https", "wildcard-bar-other-https",
 			)
 		})
 		t.Run("Gateway listeners without overlapping hostnames must not have OverlappingTLSConfig condition set", func(t *testing.T) {
 			kubernetes.GatewayListenerMustNotHaveCondition(t, s.Client, s.TimeoutConfig, gwNN, "not-overlapping-https", gatewayv1.ListenerConditionOverlappingTLSConfig)
+			kubernetes.GatewayListenerMustNotHaveCondition(t, s.Client, s.TimeoutConfig, gwNN, "not-overlapping-wildcard-https", gatewayv1.ListenerConditionOverlappingTLSConfig)
 		})
 		t.Run("Gateway listeners with overlapping hostnames on different ports must not have OverlappingTLSConfig condition set", func(t *testing.T) {
 			kubernetes.GatewayListenerMustNotHaveCondition(t, s.Client, s.TimeoutConfig, gwNN, "not-overlapping-other-port", gatewayv1.ListenerConditionOverlappingTLSConfig)
