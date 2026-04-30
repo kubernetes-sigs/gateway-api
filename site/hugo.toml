@@ -51,6 +51,7 @@ defaultContentLanguage = "en"
   # User Interface settings
   [params.ui]
     navbar_theme = "dark"
+    showLightDarkModeMenu = true
     # Enable to make the sidebar menu foldable.
     sidebar_menu_foldable = true
     # Enable to show the side bar menu in its compact state.

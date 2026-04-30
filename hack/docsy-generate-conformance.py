@@ -241,7 +241,11 @@ def generate_profiles_report(reports, route, version):
 
 pathTemp = "conformance/reports/*/"
 def parse_release(version):
-    return semver.VersionInfo.parse(version.lstrip('v'))
+    v = version.lstrip('v')
+    parts = v.split('.')
+    if len(parts) == 2:
+        v = f"{v}.0"
+    return semver.VersionInfo.parse(v)
 
 
 def release_key(version):

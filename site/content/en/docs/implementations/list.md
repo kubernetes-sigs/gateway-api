@@ -82,11 +82,13 @@ responsible for these projects, which are listed alphabetically within their
 class.
 
 {{% /alert %}}
+
 {{% alert color="info" title="Compare extended supported features across implementations" %}}
 
 [View a table to quickly compare supported features of projects](/docs/implementations/versions/v_one_four/). These outline Gateway controller implementations that have passed core conformance tests, and focus on extended conformance features that they have implemented. These tables will be generated and uploaded to the site once at least 3 implementations have uploaded their conformance reports under the [conformance reports](https://github.com/kubernetes-sigs/gateway-api/tree/main/conformance/reports).
 
 {{% /alert %}}
+
 ## Gateway Controller Implementation Status <a name="gateways"></a>
 
 ### Conformant
