@@ -5,6 +5,7 @@
 |API channel|Implementation version|Mode|Report|
 |-----------|----------------------|----|------|
 |experimental|[v1.0.0](https://github.com/agentgateway/agentgateway/releases/tag/v1.0.0)|default|[report](./v1.0.0-report.yaml)|
+|experimental|[v1.1.0](https://github.com/agentgateway/agentgateway/releases/tag/v1.1.0)|default|[report](./v1.1.0-report.yaml)|
 
 ## Reproduce
 
@@ -13,7 +14,7 @@
 1. Clone the agentgateway repository:
 
    ```sh
-   git clone https://github.com/agentgateway/agentgateway.git && cd agentgateway && git checkout tags/v1.0.0
+   git clone https://github.com/agentgateway/agentgateway.git && cd agentgateway && git checkout tags/v1.1.0
    ```
 
 2. Bootstrap a KinD cluster with all the necessary components installed:
