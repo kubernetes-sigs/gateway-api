@@ -17,7 +17,7 @@
 Read conformance reports from conformance/reports/ and output controller-wizard-data.json
 for the Controller Recommendation Wizard. Supports --all (one object keyed by version) or
 --version vX.Y.Z (single array for that version). Output path defaults to
-site-src/wizard/data/controller-wizard-data.json. The output directory is created if it does not exist.
+site/static/wizard/data/controller-wizard-data.json. The output directory is created if it does not exist.
 
 When loaded as an MkDocs hook (see mkdocs.yml hooks), runs with --all behavior so the
 built site has multi-version wizard data.
@@ -274,8 +274,8 @@ def main():
     parser.add_argument(
         "-o",
         "--output",
-        default="site-src/wizard/data/controller-wizard-data.json",
-        help="Output JSON path (default: site-src/wizard/data/controller-wizard-data.json)",
+        default="site/static/wizard/data/controller-wizard-data.json",
+        help="Output JSON path (default: site/static/wizard/data/controller-wizard-data.json)",
     )
     args = parser.parse_args()
 

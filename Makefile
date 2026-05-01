@@ -197,12 +197,19 @@ PYTHON ?= $(shell if [ -x .venv/bin/python3 ]; then echo "./.venv/bin/python3"; 
 DOCS_VERIFY_CONTAINER_IMAGE ?= registry.hub.docker.com/lycheeverse/lychee:0.23
 
 # Build the documentation.
+.PHONY: install-deps
+install-deps:
+	cd site && npm install
+	if [ ! -d .venv ]; then python3 -m venv .venv; fi
+	.venv/bin/pip install --index-url https://pypi.org/simple pandas PyYAML semver python-frontmatter tabulate
+
 .PHONY: docs
-docs:
-	hack/make-hugo-docs.sh
+docs: install-deps
+	hack/docsy/generate.sh
+	hugo --source site
 
 .PHONY: build-docs
-build-docs: update-geps api-ref-docs wizard-wasm wizard-data conformance-data
+build-docs: install-deps update-geps api-ref-docs wizard-wasm wizard-data conformance-data
 	hugo --source site
 
 .PHONY: verify-docs
@@ -210,7 +217,7 @@ verify-docs: build-docs
 	docker run --init --rm -w /input -v ${PWD}:/input $(DOCS_VERIFY_CONTAINER_IMAGE) --root-dir /input/site/public --include "sigs.k8s.io" --accept 200 --max-concurrency 10 --include-fragments --cache $(VALIDATE_DOCS_EXTRA_ARGS) /input/site/public/**/*.html
 
 .PHONY: build-docs-netlify
-build-docs-netlify: update-geps api-ref-docs wizard-wasm wizard-data conformance-data
+build-docs-netlify: install-deps update-geps api-ref-docs wizard-wasm wizard-data conformance-data
 	hugo --source site
 
 .PHONY: live-docs
@@ -239,7 +246,7 @@ wizard-wasm:
 .PHONY: wizard-data
 wizard-data:
 	@mkdir -p site/static/wizard/data
-	$(PYTHON) hack/docsy-generate-controller-wizard-data.py --all -o site/static/wizard/data/controller-wizard-data.json
+	$(PYTHON) hack/generate-controller-wizard-data.py --all -o site/static/wizard/data/controller-wizard-data.json
 
 .PHONY: conformance-data
 conformance-data:

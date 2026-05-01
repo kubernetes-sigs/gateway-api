@@ -194,22 +194,7 @@ one backendRef must be specified.
 The following example forwards TLS requests with the hostname `foo.example.com`
 to service "foo-svc" on port `443`.
 
-```yaml
-apiVersion: gateway.networking.k8s.io/v1
-kind: TLSRoute
-metadata:
-  name: foo-route
-spec:
-  parentRefs:
-  - name: example-gateway
-    sectionName: tls
-  hostnames:
-  - "foo.example.com"
-  rules:
-  - backendRefs:
-    - name: foo-svc
-      port: 443
-```
+{{< readfile file="/examples/standard/tls-routing/tls-route.yaml" code="true" lang="yaml" >}}
 
 Reference the [backendRef][backendRef] API documentation for additional details
 on `weight` and other fields.
@@ -217,27 +202,7 @@ on `weight` and other fields.
 This TLSRoute attaches to the Gateway TLS listener named `tls`, as defined
 below:
 
-```yaml
-apiVersion: gateway.networking.k8s.io/v1
-kind: Gateway
-metadata:
-  name: example-gateway
-spec:
-  gatewayClassName: example-gateway-class
-  listeners:
-  - name: tls
-    protocol: TLS
-    port: 443
-    tls:
-      mode: Passthrough
-  - name: tls-terminate
-    protocol: TLS
-    port: 8443
-    tls:
-      mode: Terminate
-      certificateRefs:
-      - name: tls-terminate-certificate
-```
+{{< readfile file="/examples/standard/tls-routing/gateway.yaml" code="true" lang="yaml" >}}
 
 Because the `tls` listener has its TLS mode configured as `Passthrough`, the
 traffic routed via this listener is sent as a direct encrypted TCP stream to the

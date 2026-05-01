@@ -4,7 +4,7 @@ weight: 8
 ---
 
 {{< details title="Standard Channel since v0.6.0" color="success" >}}
-The `ReferenceGrant` resource is Beta and part of the
+The `ReferenceGrant` resource is GA and has been part of the
 Standard Channel since `v0.6.0`. For more information on release
 channels, refer to our [versioning guide](/docs/concepts/versioning/).
 {{< /details >}}

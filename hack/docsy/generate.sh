@@ -53,9 +53,24 @@ for i in "${arr[@]}"; do
 
     # Start removing any "release-" prefix from docpath
     docpath=${i#"release-"}
-    # If the release is "main" simply remove it
-    #docpath=${docpath#"main"}
-	mkdir -p "${PWD}/site/content/en/reference/api-spec/${docpath}"
+    
+    if [ "$docpath" == "main" ]; then
+        weight=1
+        title="Development"
+    else
+        minor=$(echo $docpath | cut -d. -f2)
+        weight=$((90 - minor * 10))
+        title="v${docpath}"
+    fi
+
+    mkdir -p "${PWD}/site/content/en/reference/api-spec/${docpath}"
+
+    cat <<EOF > "${PWD}/site/content/en/reference/api-spec/${docpath}/_index.md"
+---
+title: "${title}"
+weight: ${weight}
+---
+EOF
 
     $GOTOOL crd-ref-docs \
         --source-path=${tmpdir}/apis \
@@ -77,11 +92,5 @@ for i in "${arr[@]}"; do
     sed -i.bak "s/LINK_TITLE_PLACEHOLDER/${link_title_spec}/g" "${PWD}/site/content/en/reference/api-spec/${docpath}/spec.md"
     sed -i.bak "s/LINK_TITLE_PLACEHOLDER/${link_title_specx}/g" "${PWD}/site/content/en/reference/api-spec/${docpath}/specx.md"
     rm -f "${PWD}/site/content/en/reference/api-spec/${docpath}/spec.md.bak" "${PWD}/site/content/en/reference/api-spec/${docpath}/specx.md.bak"
-
-    # Add 'yaml' syntax highlighting to untagged code blocks
-    for file in "${PWD}/site/content/en/reference/api-spec/${docpath}/spec.md" "${PWD}/site/content/en/reference/api-spec/${docpath}/specx.md"; do
-        awk '/^[ \t]*```/ { if (in_block) { print $0; in_block=0 } else { if ($0 ~ /^[ \t]*```[ \t]*\r?$/) { sub(/```/, "```yaml"); print $0 } else { print $0 }; in_block=1 }; next } { print }' "$file" > "${file}.tmp"
-        mv "${file}.tmp" "$file"
-    done
 
 done

@@ -295,7 +295,7 @@ This feature is part of extended support. For more information on support levels
 {{< details title="Extended Feature" color="purple" >}}
 
 The `Port` field described below is an Extended feature, and so is _optional_ for implementations to support.
-The feature name for this feature is `HTTPRouteParentRefPort`, and you should be able to find out if your implementation supports it either in the implementation's GatewayClass (under `status.supportedFeatures`), or on one of the implementation comparison pages (like the [v1.4 comparison](/docs/implementations/versions/v_one_four/).)
+The feature name for this feature is `HTTPRouteParentRefPort`, and you should be able to find out if your implementation supports it either in the implementation's GatewayClass (under `status.supportedFeatures`), or on one of the implementation comparison pages (like the [v1.4 comparison](/docs/implementations/versions/v1.4/).)
 
 {{< /details >}}
 

@@ -220,26 +220,7 @@ The following example adds header "my-header: foo" to gRPC requests with Host
 header "my.filter.com". Note that GRPCRoute uses HTTPRoute filters for features
 with functionality identical to HTTPRoute, such as this.
 
-```yaml
-apiVersion: gateway.networking.k8s.io/v1
-kind: GRPCRoute
-metadata:
-  name: grpc-filter-1
-spec:
-  hostnames:
-    - my.filter.com
-  rules:
-    - filters:
-        - type: RequestHeaderModifier
-          requestHeaderModifier:
-            add:
-              - name: my-header
-                value: foo
-      backendRefs:
-        - name: my-filter-svc1
-          weight: 1
-          port: 50051
-```
+{{< readfile file="/examples/standard/grpc-filter.yaml" code="true" lang="yaml" >}}
 
 API conformance is defined based on the filter type. The effects of ordering
 multiple behaviors are currently unspecified. This may change in the future
@@ -276,25 +257,7 @@ The following example uses the `weight` field to forward 90% of gRPC requests to
 `foo.example.com` to the "foo-v1" Service and the other 10% to the "foo-v2"
 Service:
 
-```yaml
-apiVersion: gateway.networking.k8s.io/v1
-kind: GRPCRoute
-metadata:
-  name: foo-route
-  labels:
-    gateway: prod-web-gw
-spec:
-  hostnames:
-  - foo.example.com
-  rules:
-  - backendRefs:
-    - name: foo-v1
-      port: 50051
-      weight: 90
-    - name: foo-v2
-      port: 50051
-      weight: 10
-```
+{{< readfile file="/examples/standard/traffic-splitting/grpc-traffic-split-2.yaml" code="true" lang="yaml" >}}
 
 Reference the [backendRef][backendRef] API documentation for additional details
 on `weight` and other fields.

@@ -30,21 +30,7 @@ is used to manage the gradual splitting of traffic from v1 to v2.
 
 This example assumes that the following Gateway is deployed:
 
-```yaml
-apiVersion: gateway.networking.k8s.io/v1
-kind: Gateway
-metadata:
-  name: prod-web
-spec:
-  gatewayClassName: example
-  listeners:
-  - protocol: HTTP
-    port: 80
-    name: prod-web-gw
-    allowedRoutes:
-      namespaces:
-        from: Same
-```
+{{< readfile file="/examples/standard/simple-gateway/gateway.yaml" code="true" lang="yaml" >}}
 
 ## Canary traffic rollout
 

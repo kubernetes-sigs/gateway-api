@@ -30,32 +30,7 @@ must be configured with `ParentRefs` which reference the parent gateway(s) that 
 should be attached to. The following example shows how the combination
 of `Gateway` and `HTTPRoute` would be configured to serve HTTP traffic:
 
-```yaml
-apiVersion: gateway.networking.k8s.io/v1
-kind: Gateway
-metadata:
-  name: example-gateway
-spec:
-  gatewayClassName: example-gateway-class
-  listeners:
-  - name: http
-    protocol: HTTP
-    port: 80
----
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
-metadata:
-  name: example-route
-spec:
-  parentRefs:
-  - name: example-gateway
-  hostnames:
-  - "example.com"
-  rules:
-  - backendRefs:
-    - name: example-svc
-      port: 80
-```
+{{< readfile file="/examples/standard/http-routing/gateway.yaml" code="true" lang="yaml" >}}
 
 An HTTPRoute can match against a [single set of hostnames][spec].
 These hostnames are matched before any other matching within the HTTPRoute takes
@@ -69,26 +44,7 @@ only one match specified, only `foo.example.com/login/*` traffic will be
 forwarded. Traffic to any other paths that do not begin with `/login` will not
 be matched by this Route.
 
-```yaml
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
-metadata:
-  name: foo-route
-spec:
-  parentRefs:
-  - name: example-gateway
-  hostnames:
-  - "foo.example.com"
-  rules:
-  - matches:
-    - path:
-        type: PathPrefix
-        value: /login
-    backendRefs:
-    - name: foo-svc
-      port: 8080
-
-```
+{{< readfile file="/examples/standard/http-routing/foo-httproute.yaml" code="true" lang="yaml" >}}
 
 Similarly, the `bar-route` HTTPRoute matches traffic for `bar.example.com`. All
 traffic for this hostname will be evaluated against the routing rules. The most
@@ -96,29 +52,7 @@ specific match will take precedence which means that any traffic with the `env:
 canary` header will be forwarded to `bar-svc-canary` and if the header is
 missing or not `canary` then it'll be forwarded to `bar-svc`.
 
-```yaml
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
-metadata:
-  name: bar-route
-spec:
-  parentRefs:
-  - name: example-gateway
-  hostnames:
-  - "bar.example.com"
-  rules:
-  - matches:
-    - headers:
-      - type: Exact
-        name: env
-        value: canary
-    backendRefs:
-    - name: bar-svc-canary
-      port: 8080
-  - backendRefs:
-    - name: bar-svc
-      port: 8080
-```
+{{< readfile file="/examples/standard/http-routing/bar-httproute.yaml" code="true" lang="yaml" >}}
 
 [gateway]: /reference/api-spec/main/spec/#gateway
 [spec]: /reference/api-spec/main/spec/#httproutespec

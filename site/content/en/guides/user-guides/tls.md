@@ -112,40 +112,7 @@ different namespace. This is allowed by the ReferenceGrant created in the
 target namespace. Without that ReferenceGrant, the cross-namespace reference
 would be invalid.
 
-```yaml
-apiVersion: gateway.networking.k8s.io/v1
-kind: Gateway
-metadata:
-  name: cross-namespace-tls-gateway
-  namespace: gateway-api-example-ns1
-spec:
-  gatewayClassName: example
-  listeners:
-  - name: https
-    protocol: HTTPS
-    port: 443
-    hostname: "*.example.com"
-    tls:
-      certificateRefs:
-      - kind: Secret
-        group: ""
-        name: wildcard-example-com-cert
-        namespace: gateway-api-example-ns2
----
-apiVersion: gateway.networking.k8s.io/v1beta1
-kind: ReferenceGrant
-metadata:
-  name: allow-ns1-gateways-to-ref-secrets
-  namespace: gateway-api-example-ns2
-spec:
-  from:
-  - group: gateway.networking.k8s.io
-    kind: Gateway
-    namespace: gateway-api-example-ns1
-  to:
-  - group: ""
-    kind: Secret
-```
+{{< readfile file="/examples/standard/tls-cert-cross-namespace.yaml" code="true" lang="yaml" >}}
 
 ### Client Certificate Validation (Frontend mTLS)
 
@@ -191,49 +158,7 @@ Validation can be applied globally to the Gateway or overridden for specific por
 ##### Basic Client Validation
 This example shows how to configure client certificate validation with default configuration and per port override.
 
-```yaml
-apiVersion: gateway.networking.k8s.io/v1
-kind: Gateway
-metadata:
-  name: client-validation-basic
-spec:
-  gatewayClassName: acme-lb
-  tls:
-    frontend:
-      default:
-        validation:
-          caCertificateRefs:
-          - kind: ConfigMap
-            group: ""
-            name: foo-example-com-ca-cert
-      perPort:
-      - port: 8443
-        tls:
-          validation:
-            caCertificateRefs:
-            - kind: ConfigMap
-              group: ""
-              name: bar-example-com-ca-cert
-  listeners:
-  - name: foo-https
-    protocol: HTTPS
-    port: 443
-    hostname: foo.example.com
-    tls:
-      certificateRefs:
-      - kind: Secret
-        group: ""
-        name: foo-example-com-cert
-  - name: bar-https
-    protocol: HTTPS
-    port: 8443
-    hostname: bar.example.com
-    tls:
-      certificateRefs:
-      - kind: Secret
-        group: ""
-        name: bar-example-com-cert
-```
+{{< readfile file="/examples/standard/frontend-cert-validation.yaml" code="true" lang="yaml" >}}
 
 ## Upstream TLS
 
@@ -281,7 +206,9 @@ map `auth-cert` to connect with a TLS-encrypted upstream connection where Pods b
 are expected to serve a valid certificate for `auth.example.com`.
 
 {{< readfile file="/examples/standard/backendtlspolicy/backendtlspolicy-ca-certs.yaml" code="true" lang="yaml" >}}
+
 ### Gateway’s Certificate Selection (Backend mTLS)
+
 {{< details title="Standard Channel since v1.5.0" color="success" >}}
 GatewayBackendClientCertificate feature has been part of the Standard Channel since
 `v1.5.0`. For more information on release channels, refer to our [versioning

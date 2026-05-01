@@ -24,29 +24,7 @@ To configure HTTP header modification, define a Gateway object with one or more 
 
 To add a header to an HTTP request, use a filter of the type `RequestHeaderModifier`, with the `add` action and the name and value of the header:
 
-```yaml
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
-metadata:
-  name: header-http-echo
-spec:
-  parentRefs:
-    - name: acme-gw
-  rules:
-    - matches:
-        - path:
-            type: PathPrefix
-            value: /add-a-request-header
-      filters:
-        - type: RequestHeaderModifier
-          requestHeaderModifier:
-            add:
-              - name: my-header-name
-                value: my-header-value
-      backendRefs:
-        - name: echo
-          port: 8080
-```
+{{< readfile file="/examples/standard/http-request-header-add.yaml" code="true" lang="yaml" >}}
 
 To unconditionally set the value of a header, use `set`. It will override the value of a header with the provided value if the header is already present, or set it to the provided value if the header does not exist.
 

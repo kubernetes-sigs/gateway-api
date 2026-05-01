@@ -1,6 +1,6 @@
 # Netlify build instructions
 [build]
-    command = "pip install -r hack/mkdocs/image/requirements.txt && cd site && npm install && cd .. && make build-docs-netlify"
+    command = "make build-docs-netlify"
     publish = "site/public"
 
 [build.environment]

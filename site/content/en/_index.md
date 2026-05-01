@@ -1,7 +1,5 @@
 ---
 title: "gateway api"
 ---
-<a href="/docs">redirecting to /docs</a>
-<script language="javascript">
-  window.location.replace("/docs");
-</script>
+<meta http-equiv="refresh" content="0; url=/docs/">
+<a href="/docs">Redirecting to /docs</a>

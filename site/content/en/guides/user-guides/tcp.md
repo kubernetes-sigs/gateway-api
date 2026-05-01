@@ -10,6 +10,7 @@ The `TCPRoute` resource described below is currently only included in the
 channels, refer to our [versioning guide](/docs/concepts/versioning/).
 
 {{% /alert %}}
+
 Gateway API is designed to work with multiple protocols and [TCPRoute][tcproute]
 is one such route which allows for managing [TCP][tcp] traffic.
 
@@ -25,53 +26,7 @@ In this example two `TCP` listeners will be applied to the [Gateway][gateway]
 in order to route them to two separate backend `TCPRoutes`, note that the
 `protocol` set for the `listeners` on the `Gateway` is `TCP`:
 
-```yaml
-apiVersion: gateway.networking.k8s.io/v1
-kind: Gateway
-metadata:
-  name: my-tcp-gateway
-spec:
-  gatewayClassName: my-tcp-gateway-class
-  listeners:
-  - name: foo
-    protocol: TCP
-    port: 8080
-    allowedRoutes:
-      kinds:
-      - kind: TCPRoute
-  - name: bar
-    protocol: TCP
-    port: 8090
-    allowedRoutes:
-      kinds:
-      - kind: TCPRoute
----
-apiVersion: gateway.networking.k8s.io/v1alpha2
-kind: TCPRoute
-metadata:
-  name: tcp-app-1
-spec:
-  parentRefs:
-  - name: my-tcp-gateway
-    sectionName: foo
-  rules:
-  - backendRefs:
-    - name: my-foo-service
-      port: 6000
----
-apiVersion: gateway.networking.k8s.io/v1alpha2
-kind: TCPRoute
-metadata:
-  name: tcp-app-2
-spec:
-  parentRefs:
-  - name: my-tcp-gateway
-    sectionName: bar
-  rules:
-  - backendRefs:
-    - name: my-bar-service
-      port: 6000
-```
+{{< readfile file="/examples/experimental/basic-tcp.yaml" code="true" lang="yaml" >}}
 
 In the above example we separate the traffic for the two separate backend TCP
 [Services][svc] by using the `sectionName` field in the `parentRefs`:

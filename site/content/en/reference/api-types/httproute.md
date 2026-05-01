@@ -182,6 +182,7 @@ strategies, rate-limiting, and traffic shaping.
 
 The following example adds header "my-header: foo" to HTTP requests with Host
 header "my.filter.com".
+
 {{< readfile file="/examples/standard/http-filter.yaml" code="true" lang="yaml" >}}
 
 API conformance is defined based on the filter type. The effects of ordering
@@ -227,25 +228,7 @@ to service "my-service2" on port `8080`:
 The following example uses the `weight` field to forward 90% of HTTP requests to
 `foo.example.com` to the "foo-v1" Service and the other 10% to the "foo-v2"
 Service:
-```yaml
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
-metadata:
-  name: foo-route
-  labels:
-    gateway: prod-web-gw
-spec:
-  hostnames:
-  - foo.example.com
-  rules:
-  - backendRefs:
-    - name: foo-v1
-      port: 8080
-      weight: 90
-    - name: foo-v2
-      port: 8080
-      weight: 10
-```
+{{< readfile file="/examples/standard/traffic-splitting/traffic-split-2.yaml" code="true" lang="yaml" >}}
 
 Reference the [backendRef][backendRef] API documentation for additional details
 on `weight` and other fields.
@@ -272,26 +255,7 @@ Timeouts are optional, and their fields are of type [Duration](/geps/gep-2257/).
 
 The following example uses the `request` field which will cause a timeout if a client request is taking longer than 10 seconds to complete. The example also defines a 2s `backendRequest` which specifies a timeout for an individual request from the gateway to a backend service `timeout-svc`:
 
-```yaml
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
-metadata:
-  name: timeout-example
-spec:
-  parentRefs:
-  - name: example-gateway
-  rules:
-  - matches:
-    - path:
-        type: PathPrefix
-        value: /timeout
-    timeouts:
-      request: 10s
-      backendRequest: 2s
-    backendRefs:
-    - name: timeout-svc
-      port: 8080
-```
+{{< readfile file="/examples/experimental/http-route-timeouts/timeout-example.yaml" code="true" lang="yaml" >}}
 
 Reference the [timeouts][timeouts] API documentation for additional details.
 
@@ -309,30 +273,7 @@ If specified, the value of the name field must comply with the [`SectionName`](h
 
 The following example specifies the `name` field to identify HTTPRoute Rules used to split traffic between a _read-only_ backend service and a _write-only_ one:
 
-```yaml
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
-metadata:
-  name: example-route
-spec:
-  parentRefs:
-  - name: example-gateway
-  rules:
-  - name: read-only
-    matches:
-    - method: GET
-    backendRefs:
-    - name: backend-mirror-svc
-      port: 8080
-  - name: write-only
-    matches:
-    - method: POST
-    - method: PATCH
-    - method: DELETE
-    backendRefs:
-    - name: backend-svc
-      port: 8080
-```
+{{< readfile file="/examples/experimental/http-route-rule-name.yaml" code="true" lang="yaml" >}}
 
 ##### Backend Protocol
 

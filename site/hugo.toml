@@ -41,9 +41,9 @@ defaultContentLanguage = "en"
 [params]
   copyright = "The Linux Foundation"
   favicon = "favicon.png"
-  github_repo = "https://github.com/kubernetes-sigs/gateway-api"
-  github_branch = "main"
-  github_subdir = "site/content/en" # Set this to wherever your markdown files live
+  # github_repo = "https://github.com/kubernetes-sigs/gateway-api"
+  # github_branch = "main"
+  # github_subdir = "site/content/en" # Set this to wherever your markdown files live
 
   # Search settings
   offlineSearch = true
