@@ -507,7 +507,7 @@ func renderTable(tableID string, section string, labelPrefix string, rows []feat
 	var html strings.Builder
 	for _, f := range rows {
 		if f.ID == "__subhead__" {
-			html.WriteString(fmt.Sprintf(`<tr class="feature-subhead"><th scope="col">%s</th><th scope="col">Requirement</th></tr>`, escapeHTML(f.Label)))
+			fmt.Fprintf(&html, `<tr class="feature-subhead"><th scope="col">%s</th><th scope="col">Requirement</th></tr>`, escapeHTML(f.Label))
 			continue
 		}
 		label := f.Label
@@ -523,9 +523,9 @@ func renderTable(tableID string, section string, labelPrefix string, rows []feat
 		}
 		reqCell := `<label><input type="checkbox" name="` + name + `" value="must" /> Must have</label>
 <label><input type="checkbox" name="` + name + `" value="good" /> Nice to have</label>`
-		html.WriteString(fmt.Sprintf(`<tr><td class="%s"%s>%s</td><td>
+		fmt.Fprintf(&html, `<tr><td class="%s"%s>%s</td><td>
 %s
-</td></tr>`, cellClass, dataDesc, escapeHTML(label), reqCell))
+</td></tr>`, cellClass, dataDesc, escapeHTML(label), reqCell)
 	}
 	tbody.Set("innerHTML", html.String())
 }
@@ -802,9 +802,9 @@ func recommend() {
 		if missingStr == "" {
 			missingStr = "—"
 		}
-		html.WriteString(fmt.Sprintf("<tr><td>%s</td><td><a href=\"%s\" target=\"_blank\" rel=\"noopener\">%s</a> %s</td><td>%s</td><td>%d/%d</td><td>%d/%d</td><td class=\"missing\">%s</td></tr>",
+		fmt.Fprintf(&html, "<tr><td>%s</td><td><a href=\"%s\" target=\"_blank\" rel=\"noopener\">%s</a> %s</td><td>%s</td><td>%d/%d</td><td>%d/%d</td><td class=\"missing\">%s</td></tr>",
 			escapeHTML(c.impl.Organization), escapeHTML(c.impl.URL), escapeHTML(c.impl.Project), escapeHTML(c.impl.Version),
-			escapeHTML(conformance), c.mustCount, c.mustTotal, c.goodCount, c.goodTotal, escapeHTML(missingStr)))
+			escapeHTML(conformance), c.mustCount, c.mustTotal, c.goodCount, c.goodTotal, escapeHTML(missingStr))
 	}
 	html.WriteString("</tbody></table>")
 	resultsContent.Set("innerHTML", html.String())

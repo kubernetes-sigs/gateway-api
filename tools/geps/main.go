@@ -121,6 +121,8 @@ func walkGEPs(dir string, skipGEPs []string) (GEPArray, error) {
 	gepArray := make(GEPArray, 0)
 	tmpMap := make(map[gep.GEPStatus]GEPs)
 
+	rootFS := os.DirFS(dir)
+
 	err := filepath.WalkDir(dir, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return fmt.Errorf("error accessing %s: %w", path, err)
@@ -129,7 +131,12 @@ func walkGEPs(dir string, skipGEPs []string) (GEPArray, error) {
 			return nil
 		}
 
-		content, err := os.ReadFile(path)
+		relPath, err := filepath.Rel(dir, path)
+		if err != nil {
+			return err
+		}
+
+		content, err := fs.ReadFile(rootFS, relPath)
 		if err != nil {
 			return err
 		}

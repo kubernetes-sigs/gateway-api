@@ -18,7 +18,7 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-readonly VERSION="v2.7.2"
+readonly VERSION="v2.11.4"
 readonly KUBE_ROOT=$(dirname "${BASH_SOURCE}")/..
 
 cd "${KUBE_ROOT}"
