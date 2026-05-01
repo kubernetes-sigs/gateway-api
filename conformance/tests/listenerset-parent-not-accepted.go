@@ -1,5 +1,5 @@
 /*
-Copyright 2025 The Kubernetes Authors.
+Copyright The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -29,41 +29,37 @@ import (
 )
 
 func init() {
-	ConformanceTests = append(ConformanceTests, ListenerSetDefaultNotAllowed)
+	ConformanceTests = append(ConformanceTests, ListenerSetParentNotAccepted)
 }
 
-var ListenerSetDefaultNotAllowed = confsuite.ConformanceTest{
-	ShortName:   "ListenerSetDefaultNotAllowed",
-	Description: "Listener Sets are not allowed on the Gateway by default (i.e. when `allowedListeners` is not set)",
+var ListenerSetParentNotAccepted = confsuite.ConformanceTest{
+	ShortName:   "ListenerSetParentNotAccepted",
+	Description: "A ListenerSet attached to a Gateway that is not Accepted should have the Accepted condition set to False with reason ParentNotAccepted.",
 	Features: []features.FeatureName{
 		features.SupportGateway,
 		features.SupportListenerSet,
 	},
 	Manifests: []string{
-		"tests/listenerset-default-not-allowed.yaml",
+		"tests/listenerset-parent-not-accepted.yaml",
 	},
 	Test: func(t *testing.T, suite *confsuite.ConformanceTestSuite) {
 		ns := confsuite.InfrastructureNamespace
 		kubernetes.NamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, []string{ns})
 
-		// Verify the gateway is accepted
-		gwNN := types.NamespacedName{Name: "gateway-default-does-not-allow-listenerset", Namespace: ns}
+		gwNN := types.NamespacedName{Name: "gateway-with-listenerset-not-accepted", Namespace: ns}
 		kubernetes.GatewayMustHaveCondition(t, suite.Client, suite.TimeoutConfig, gwNN, metav1.Condition{
 			Type:   string(gatewayv1.GatewayConditionAccepted),
-			Status: metav1.ConditionTrue,
+			Status: metav1.ConditionFalse,
 		})
-		// Rejected ListenerSets :
-		// - gateway-conformance-infra/listenerset-not-allowed - the gateway is not configured to allow listenerSets
 		kubernetes.GatewayMustHaveAttachedListeners(t, suite.Client, suite.TimeoutConfig, gwNN, 0)
 
-		// Verify the rejected listenerSet has the appropriate conditions
-		disallowedLsNN := types.NamespacedName{Name: "listenerset-default-not-allowed", Namespace: ns}
-		kubernetes.ListenerSetMustHaveCondition(t, suite.Client, suite.TimeoutConfig, disallowedLsNN, metav1.Condition{
+		lsNN := types.NamespacedName{Name: "listenerset-parent-not-accepted", Namespace: ns}
+		kubernetes.ListenerSetMustHaveCondition(t, suite.Client, suite.TimeoutConfig, lsNN, metav1.Condition{
 			Type:   string(gatewayv1.ListenerSetConditionAccepted),
 			Status: metav1.ConditionFalse,
-			Reason: string(gatewayv1.ListenerSetReasonNotAllowed),
+			Reason: string(gatewayv1.ListenerSetReasonParentNotAccepted),
 		})
-		kubernetes.ListenerSetMustHaveCondition(t, suite.Client, suite.TimeoutConfig, disallowedLsNN, metav1.Condition{
+		kubernetes.ListenerSetMustHaveCondition(t, suite.Client, suite.TimeoutConfig, lsNN, metav1.Condition{
 			Type:   string(gatewayv1.ListenerSetConditionProgrammed),
 			Status: metav1.ConditionFalse,
 			Reason: "", // any reason
