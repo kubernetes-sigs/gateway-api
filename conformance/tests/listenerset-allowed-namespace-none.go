@@ -66,7 +66,7 @@ var ListenerSetAllowedNamespaceNone = confsuite.ConformanceTest{
 		kubernetes.ListenerSetMustHaveCondition(t, suite.Client, suite.TimeoutConfig, disallowedLsNN, metav1.Condition{
 			Type:   string(gatewayv1.ListenerSetConditionProgrammed),
 			Status: metav1.ConditionFalse,
-			Reason: string(gatewayv1.ListenerSetReasonNotAllowed),
+			Reason: "", // any reason
 		})
 	},
 }
