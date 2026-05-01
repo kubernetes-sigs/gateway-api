@@ -216,22 +216,20 @@ A third extension mechanism, filters applied on the `Backend` resource itself, m
 
 ## Graduation Criteria
 
-### Alpha
+This GEP follows the standard [Gateway API graduation criteria](https://gateway-api.sigs.k8s.io/concepts/versioning/#release-channels-eg-experimental-standard). The following are additional criteria specific to this GEP:
+
+### Implementable
 - [ ] Backend resource CRD with full schema validation
-- [ ] Reference implementation in at least one Gateway API implementation
-- [ ] Basic conformance tests for FQDN and Service destination types
 - [ ] Documentation and examples for common use cases
 
-### Beta
-- [ ] Multiple Gateway API implementations support Backend resource
-- [ ] Comprehensive conformance test suite
-- [ ] Performance testing with external destinations
+### Experimental
+- [ ] Reference implementation in at least one Gateway API implementation
+- [ ] Basic conformance tests for FQDN and Service destination types
 - [ ] Security review and RBAC documentation
-- [ ] Extension framework validation with vendor implementations
 
-### GA
+### Standard
 - [ ] At least 3 implementations with production usage
-- [ ] Extended conformance testing covering edge cases
+- [ ] Comprehensive conformance test suite
 - [ ] Compatibility testing with existing BackendTLSPolicy patterns
 - [ ] Migration guide from synthetic Services to Backend resources
 - [ ] Integration with policy attachment framework

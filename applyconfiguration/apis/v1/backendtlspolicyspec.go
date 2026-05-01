@@ -27,7 +27,7 @@ import (
 //
 // BackendTLSPolicySpec defines the desired state of BackendTLSPolicy.
 //
-// Support:Extended
+// Support: Extended
 type BackendTLSPolicySpecApplyConfiguration struct {
 	// TargetRefs identifies an API object to apply the policy to.
 	// Note that this config applies to the entire referenced resource
@@ -74,9 +74,6 @@ type BackendTLSPolicySpecApplyConfiguration struct {
 	// - Gateway feature backends (e.g., ExternalAuth, rate-limiting services)
 	// - Service mesh workload-to-service communication
 	// - Other resource types beyond Service
-	//
-	// * Disallowed: `Backend` resource. That resource's inline TLS fields MUST be
-	// used instead of BackendTLSPolicy for TLS configuration of `Backend` resources.
 	//
 	// Implementations SHOULD aim to ensure that BackendTLSPolicy behavior is consistent,
 	// even outside of the extended HTTPRoute -(backendRef) -> Service path.

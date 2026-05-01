@@ -123,9 +123,6 @@ spec:
                     - Service mesh workload-to-service communication
                     - Other resource types beyond Service
 
-                  * Disallowed: `Backend` resource. That resource's inline TLS fields MUST be
-                    used instead of BackendTLSPolicy for TLS configuration of `Backend` resources.
-
                   Implementations SHOULD aim to ensure that BackendTLSPolicy behavior is consistent,
                   even outside of the extended HTTPRoute -(backendRef) -> Service path.
                   They SHOULD clearly document how BackendTLSPolicy is interpreted in these
@@ -801,9 +798,6 @@ spec:
                     - Gateway feature backends (e.g., ExternalAuth, rate-limiting services)
                     - Service mesh workload-to-service communication
                     - Other resource types beyond Service
-
-                  * Disallowed: `Backend` resource. That resource's inline TLS fields MUST be
-                    used instead of BackendTLSPolicy for TLS configuration of `Backend` resources.
 
                   Implementations SHOULD aim to ensure that BackendTLSPolicy behavior is consistent,
                   even outside of the extended HTTPRoute -(backendRef) -> Service path.
