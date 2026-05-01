@@ -216,7 +216,7 @@ A third extension mechanism, filters applied on the `Backend` resource itself, m
 
 ## Graduation Criteria
 
-This GEP follows the standard [Gateway API graduation criteria](https://gateway-api.sigs.k8s.io/concepts/versioning/#release-channels-eg-experimental-standard). The following are additional criteria specific to this GEP:
+This GEP follows the standard [Gateway API graduation criteria](https://gateway-api.sigs.k8s.io/concepts/versioning/#graduation-criteria). The following are additional criteria specific to this GEP:
 
 ### Implementable
 - [ ] Backend resource CRD with full schema validation
