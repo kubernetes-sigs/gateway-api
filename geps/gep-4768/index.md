@@ -56,7 +56,7 @@ To mitigate the challenge of complex merging semantics, this GEP restricts confi
 
 ### High-level Considerations:
 
-- **Tracing**: Configuration for OTLP endpoints, sampling rates (probabilistic and parent-based), and custom span attributes.
+- **Tracing**: Configuration for OTLP endpoints, sampling rates (probabilistic and parent-based), and custom resource/span attributes.
 - **Metrics**: Ability to enable/disable specific metric families and customize dimensions (labels/attributes).
 - **Access Logs**: Filtering for smart logging (e.g., only log 5xx errors or high latency), multi-protocol support, and log format customization (including field selection).
 
