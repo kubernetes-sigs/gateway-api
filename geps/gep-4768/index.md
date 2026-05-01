@@ -9,7 +9,7 @@ This proposal introduces a standardized, provider-agnostic Telemetry API to conf
 
 ## Goals
 
-1. Establish a standardized model to configure provider-agnostic telemetry (metrics, access logs, and traces) for both Gateway and Mesh.
+1. Establish a standardized model to configure provider-agnostic telemetry (metrics, access logs, and traces) for both Gateways and Mesh components.
 2. Enable separation of concerns between the persona managing networking infrastructure (Platform Team) and the persona governing telemetry signals (Observability/Security Team).
 
 ## Non-Goals
@@ -38,7 +38,7 @@ In the current Kubernetes landscape, the "Who, What, Where, and How Long" of net
 
 - **Platform Operators**: Need to ensure uniform observability across all networking infrastructure.
 - **Observability Teams**: Responsible for the governance of telemetry data. They need to define and enforce standardized schemas and collection policies across the entire organization.
-- **Security/Auditing Teams**: Require a standardized audit trail for all traffic, especially for autonomous agent actions.
+- **Security/Auditing Teams**: Require a standardized audit trail for all traffic, an increasingly important need with the emergence of autonomous agent actions.
 - **Application Developers**: Benefit from consistent metrics and traces for debugging without worrying about the underlying mesh or gateway technology.
 
 ## API
@@ -50,7 +50,7 @@ A key area of discussion for this GEP is whether this should be a standalone Pol
 This proposal argues that the Policy Attachment model is the most effective approach to meet the stated goals, primarily for two reasons:
 
 1. **Separation of Concerns**: It allows different personas to manage Gateway infrastructure (the Platform Team) independently from the configuration of telemetry signals (the Observability team).
-2. **Fleet-Wide Uniformity**: It enables a single policy to be applied uniformly across a fleet of Gateways and Meshes, eliminating the need to duplicate complex telemetry configurations across individual resources.
+2. **Cluster-Wide Uniformity**: It enables a single policy to be applied uniformly across a fleet of Gateways and Meshes, eliminating the need to duplicate complex telemetry configurations across individual resources.
 
 To mitigate the challenge of complex merging semantics, this GEP restricts configuration such that only a single `TelemetryPolicy` can target a `Gateway` or `Mesh` at any given time. If multiple `TelemetryPolicy` resources target the same object, precedence is determined based on the creation timestamp.
 
