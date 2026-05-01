@@ -150,7 +150,7 @@ func MakeRequest(t *testing.T, expected *ExpectedResponse, gwAddr, protocol, sch
 	}
 
 	// if the deprecated field StatusCode is set, append it to StatusCodes for backwards compatibility
-	if expected.Response.StatusCode != 0 {
+	if expected.Response.StatusCode != 0 && !slices.Contains(expected.Response.StatusCodes, expected.Response.StatusCode) {
 		expected.Response.StatusCodes = append(expected.Response.StatusCodes, expected.Response.StatusCode)
 	}
 
