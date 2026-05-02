@@ -76,7 +76,7 @@ func main() {
 	doc = js.Global().Get("document")
 
 	// Expose callback for when JS has loaded the JSON data
-	js.Global().Set("wizardOnData", js.FuncOf(func(_ js.Value, args []js.Value) interface{} {
+	js.Global().Set("wizardOnData", js.FuncOf(func(_ js.Value, args []js.Value) any {
 		if len(args) < 1 {
 			return nil
 		}
@@ -86,7 +86,7 @@ func main() {
 	}))
 
 	// When a requirement checkbox is checked, uncheck the other (Must have / Nice to have are mutually exclusive)
-	doc.Get("body").Call("addEventListener", "change", js.FuncOf(func(_ js.Value, args []js.Value) interface{} {
+	doc.Get("body").Call("addEventListener", "change", js.FuncOf(func(_ js.Value, args []js.Value) any {
 		if len(args) < 1 {
 			return nil
 		}
@@ -115,20 +115,20 @@ func main() {
 
 	// Recommend button
 	recommendBtn := doc.Call("getElementById", "recommend-btn")
-	recommendBtn.Call("addEventListener", "click", js.FuncOf(func(_ js.Value, _ []js.Value) interface{} {
+	recommendBtn.Call("addEventListener", "click", js.FuncOf(func(_ js.Value, _ []js.Value) any {
 		recommend()
 		return nil
 	}))
 
 	// Reset button
 	resetBtn := doc.Call("getElementById", "reset-btn")
-	resetBtn.Call("addEventListener", "click", js.FuncOf(func(_ js.Value, _ []js.Value) interface{} {
+	resetBtn.Call("addEventListener", "click", js.FuncOf(func(_ js.Value, _ []js.Value) any {
 		resetAll()
 		return nil
 	}))
 
 	// When Core Features checkbox changes, show/hide the Gateway or HTTPRoute extended features block
-	doc.Get("body").Call("addEventListener", "change", js.FuncOf(func(_ js.Value, args []js.Value) interface{} {
+	doc.Get("body").Call("addEventListener", "change", js.FuncOf(func(_ js.Value, args []js.Value) any {
 		if len(args) < 1 {
 			return nil
 		}
@@ -149,10 +149,10 @@ func main() {
 	// Feature tables are filled only after data loads (onDataLoaded); no default consts.
 
 	// Fetch data via JS fetch (go.run blocks so we do it from Go)
-	js.Global().Call("fetch", "data/controller-wizard-data.json").Call("then", js.FuncOf(func(_ js.Value, args []js.Value) interface{} {
+	js.Global().Call("fetch", "data/controller-wizard-data.json").Call("then", js.FuncOf(func(_ js.Value, args []js.Value) any {
 		resp := args[0]
 		if resp.Get("ok").Bool() {
-			resp.Call("json").Call("then", js.FuncOf(func(_ js.Value, args2 []js.Value) interface{} {
+			resp.Call("json").Call("then", js.FuncOf(func(_ js.Value, args2 []js.Value) any {
 				data := args2[0]
 				jsonStr := js.Global().Get("JSON").Call("stringify", data).String()
 				onDataLoaded(jsonStr)
@@ -163,7 +163,7 @@ func main() {
 			doc.Call("getElementById", "recommend-btn").Set("disabled", false)
 		}
 		return nil
-	})).Call("catch", js.FuncOf(func(_ js.Value, _ []js.Value) interface{} {
+	})).Call("catch", js.FuncOf(func(_ js.Value, _ []js.Value) any {
 		doc.Call("getElementById", "wizard-data-status").Set("textContent", "Could not load data. Run 'make wizard-data' (requires conformance/reports/), then serve from site-src/wizard/.")
 		doc.Call("getElementById", "recommend-btn").Set("disabled", false)
 		return nil
@@ -282,7 +282,7 @@ func onDataLoaded(jsonStr string) {
 		versionSelect.Call("appendChild", opt)
 	}
 	versionSelect.Set("value", currentVersion)
-	versionSelect.Call("addEventListener", "change", js.FuncOf(func(_ js.Value, _ []js.Value) interface{} {
+	versionSelect.Call("addEventListener", "change", js.FuncOf(func(_ js.Value, _ []js.Value) any {
 		currentVersion = versionSelect.Get("value").String()
 		impls = buildImplsForMinVersion(currentVersion)
 		updateVersionLinks(currentVersion)
@@ -579,7 +579,7 @@ func getSelections() (must, good []selection) {
 	return must, goodFiltered
 }
 
-func gtagEvent(eventName string, params map[string]interface{}) {
+func gtagEvent(eventName string, params map[string]any) {
 	global := js.Global()
 
 	paramsJS := global.Get("Object").New()
@@ -608,7 +608,7 @@ func trackWizardSelections(must, good []selection) {
 			return
 		}
 		for _, sel := range selections {
-			gtagEvent("wizard_feature_selection", map[string]interface{}{
+			gtagEvent("wizard_feature_selection", map[string]any{
 				"resource_name": sel.Section,
 				"feature_name":  sel.ID,
 				"version":       currentVersion,

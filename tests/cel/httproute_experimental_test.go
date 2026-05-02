@@ -54,12 +54,12 @@ func TestHTTPRouteParentRefExperimental(t *testing.T) {
 			name:       "invalid because duplicate parent refs without port or section name",
 			wantErrors: []string{"sectionName or port must be unique when parentRefs includes 2 or more references to the same parent"},
 			parentRefs: []gatewayv1.ParentReference{{
-				Kind:  ptrTo(gatewayv1.Kind("Gateway")),
-				Group: ptrTo(gatewayv1.Group("gateway.networking.k8s.io")),
+				Kind:  new(gatewayv1.Kind("Gateway")),
+				Group: new(gatewayv1.Group("gateway.networking.k8s.io")),
 				Name:  "example",
 			}, {
-				Kind:  ptrTo(gatewayv1.Kind("Gateway")),
-				Group: ptrTo(gatewayv1.Group("gateway.networking.k8s.io")),
+				Kind:  new(gatewayv1.Kind("Gateway")),
+				Group: new(gatewayv1.Group("gateway.networking.k8s.io")),
 				Name:  "example",
 			}},
 		},
@@ -67,52 +67,52 @@ func TestHTTPRouteParentRefExperimental(t *testing.T) {
 			name:       "invalid because duplicate parent refs with only one port",
 			wantErrors: []string{"sectionName or port must be specified when parentRefs includes 2 or more references to the same parent"},
 			parentRefs: []gatewayv1.ParentReference{{
-				Kind:  ptrTo(gatewayv1.Kind("Gateway")),
-				Group: ptrTo(gatewayv1.Group("gateway.networking.k8s.io")),
+				Kind:  new(gatewayv1.Kind("Gateway")),
+				Group: new(gatewayv1.Group("gateway.networking.k8s.io")),
 				Name:  "example",
 			}, {
-				Kind:  ptrTo(gatewayv1.Kind("Gateway")),
-				Group: ptrTo(gatewayv1.Group("gateway.networking.k8s.io")),
+				Kind:  new(gatewayv1.Kind("Gateway")),
+				Group: new(gatewayv1.Group("gateway.networking.k8s.io")),
 				Name:  "example",
-				Port:  ptrTo(gatewayv1.PortNumber(80)),
+				Port:  new(gatewayv1.PortNumber(80)),
 			}},
 		},
 		{
 			name:       "invalid because duplicate parent refs with only one sectionName and port",
 			wantErrors: []string{"sectionName or port must be specified when parentRefs includes 2 or more references to the same parent"},
 			parentRefs: []gatewayv1.ParentReference{{
-				Kind:  ptrTo(gatewayv1.Kind("Gateway")),
-				Group: ptrTo(gatewayv1.Group("gateway.networking.k8s.io")),
+				Kind:  new(gatewayv1.Kind("Gateway")),
+				Group: new(gatewayv1.Group("gateway.networking.k8s.io")),
 				Name:  "example",
 			}, {
-				Kind:        ptrTo(gatewayv1.Kind("Gateway")),
-				Group:       ptrTo(gatewayv1.Group("gateway.networking.k8s.io")),
+				Kind:        new(gatewayv1.Kind("Gateway")),
+				Group:       new(gatewayv1.Group("gateway.networking.k8s.io")),
 				Name:        "example",
-				SectionName: ptrTo(gatewayv1.SectionName("foo")),
-				Port:        ptrTo(gatewayv1.PortNumber(80)),
+				SectionName: new(gatewayv1.SectionName("foo")),
+				Port:        new(gatewayv1.PortNumber(80)),
 			}},
 		},
 		{
 			name:       "invalid because duplicate parent refs with duplicate ports",
 			wantErrors: []string{"sectionName or port must be unique when parentRefs includes 2 or more references to the same parent"},
 			parentRefs: []gatewayv1.ParentReference{{
-				Kind:  ptrTo(gatewayv1.Kind("Gateway")),
-				Group: ptrTo(gatewayv1.Group("gateway.networking.k8s.io")),
+				Kind:  new(gatewayv1.Kind("Gateway")),
+				Group: new(gatewayv1.Group("gateway.networking.k8s.io")),
 				Name:  "example",
-				Port:  ptrTo(gatewayv1.PortNumber(80)),
+				Port:  new(gatewayv1.PortNumber(80)),
 			}, {
-				Kind:  ptrTo(gatewayv1.Kind("Gateway")),
-				Group: ptrTo(gatewayv1.Group("gateway.networking.k8s.io")),
+				Kind:  new(gatewayv1.Kind("Gateway")),
+				Group: new(gatewayv1.Group("gateway.networking.k8s.io")),
 				Name:  "example",
-				Port:  ptrTo(gatewayv1.PortNumber(80)),
+				Port:  new(gatewayv1.PortNumber(80)),
 			}},
 		},
 		{
 			name:       "valid single parentRef without sectionName or port",
 			wantErrors: []string{},
 			parentRefs: []gatewayv1.ParentReference{{
-				Kind:  ptrTo(gatewayv1.Kind("Gateway")),
-				Group: ptrTo(gatewayv1.Group("gateway.networking.k8s.io")),
+				Kind:  new(gatewayv1.Kind("Gateway")),
+				Group: new(gatewayv1.Group("gateway.networking.k8s.io")),
 				Name:  "example",
 			}},
 		},
@@ -120,41 +120,41 @@ func TestHTTPRouteParentRefExperimental(t *testing.T) {
 			name:       "valid single parentRef with sectionName and port",
 			wantErrors: []string{},
 			parentRefs: []gatewayv1.ParentReference{{
-				Kind:        ptrTo(gatewayv1.Kind("Gateway")),
-				Group:       ptrTo(gatewayv1.Group("gateway.networking.k8s.io")),
+				Kind:        new(gatewayv1.Kind("Gateway")),
+				Group:       new(gatewayv1.Group("gateway.networking.k8s.io")),
 				Name:        "example",
-				SectionName: ptrTo(gatewayv1.SectionName("foo")),
-				Port:        ptrTo(gatewayv1.PortNumber(443)),
+				SectionName: new(gatewayv1.SectionName("foo")),
+				Port:        new(gatewayv1.PortNumber(443)),
 			}},
 		},
 		{
 			name:       "valid because duplicate parent refs with different ports",
 			wantErrors: []string{},
 			parentRefs: []gatewayv1.ParentReference{{
-				Kind:  ptrTo(gatewayv1.Kind("Gateway")),
-				Group: ptrTo(gatewayv1.Group("gateway.networking.k8s.io")),
+				Kind:  new(gatewayv1.Kind("Gateway")),
+				Group: new(gatewayv1.Group("gateway.networking.k8s.io")),
 				Name:  "example",
-				Port:  ptrTo(gatewayv1.PortNumber(80)),
+				Port:  new(gatewayv1.PortNumber(80)),
 			}, {
-				Kind:  ptrTo(gatewayv1.Kind("Gateway")),
-				Group: ptrTo(gatewayv1.Group("gateway.networking.k8s.io")),
+				Kind:  new(gatewayv1.Kind("Gateway")),
+				Group: new(gatewayv1.Group("gateway.networking.k8s.io")),
 				Name:  "example",
-				Port:  ptrTo(gatewayv1.PortNumber(443)),
+				Port:  new(gatewayv1.PortNumber(443)),
 			}},
 		},
 		{
 			name:       "invalid ParentRefs with multiple mixed references to the same parent",
 			wantErrors: []string{"sectionName or port must be specified when parentRefs includes 2 or more references to the same parent"},
 			parentRefs: []gatewayv1.ParentReference{{
-				Kind:        ptrTo(gatewayv1.Kind("Gateway")),
-				Group:       ptrTo(gatewayv1.Group("gateway.networking.k8s.io")),
+				Kind:        new(gatewayv1.Kind("Gateway")),
+				Group:       new(gatewayv1.Group("gateway.networking.k8s.io")),
 				Name:        "example",
-				SectionName: ptrTo(gatewayv1.SectionName("foo")),
+				SectionName: new(gatewayv1.SectionName("foo")),
 			}, {
-				Kind:  ptrTo(gatewayv1.Kind("Gateway")),
-				Group: ptrTo(gatewayv1.Group("gateway.networking.k8s.io")),
+				Kind:  new(gatewayv1.Kind("Gateway")),
+				Group: new(gatewayv1.Group("gateway.networking.k8s.io")),
 				Name:  "example",
-				Port:  ptrTo(gatewayv1.PortNumber(443)),
+				Port:  new(gatewayv1.PortNumber(443)),
 			}},
 		},
 		{
@@ -162,12 +162,12 @@ func TestHTTPRouteParentRefExperimental(t *testing.T) {
 			wantErrors: []string{},
 			parentRefs: []gatewayv1.ParentReference{{
 				Name:        "example",
-				Port:        ptrTo(gatewayv1.PortNumber(443)),
-				SectionName: ptrTo(gatewayv1.SectionName("foo")),
+				Port:        new(gatewayv1.PortNumber(443)),
+				SectionName: new(gatewayv1.SectionName("foo")),
 			}, {
 				Name:        "example",
-				Port:        ptrTo(gatewayv1.PortNumber(443)),
-				SectionName: ptrTo(gatewayv1.SectionName("bar")),
+				Port:        new(gatewayv1.PortNumber(443)),
+				SectionName: new(gatewayv1.SectionName("bar")),
 			}},
 		},
 		{
@@ -177,29 +177,29 @@ func TestHTTPRouteParentRefExperimental(t *testing.T) {
 			name:       "invalid because duplicate parent refs with first having sectionName and second having both sectionName and port",
 			wantErrors: []string{"sectionName or port must be specified when parentRefs includes 2 or more references to the same parent"},
 			parentRefs: []gatewayv1.ParentReference{{
-				Kind:        ptrTo(gatewayv1.Kind("Gateway")),
-				Group:       ptrTo(gatewayv1.Group("gateway.networking.k8s.io")),
+				Kind:        new(gatewayv1.Kind("Gateway")),
+				Group:       new(gatewayv1.Group("gateway.networking.k8s.io")),
 				Name:        "example",
-				SectionName: ptrTo(gatewayv1.SectionName("foo")),
+				SectionName: new(gatewayv1.SectionName("foo")),
 			}, {
-				Kind:        ptrTo(gatewayv1.Kind("Gateway")),
-				Group:       ptrTo(gatewayv1.Group("gateway.networking.k8s.io")),
+				Kind:        new(gatewayv1.Kind("Gateway")),
+				Group:       new(gatewayv1.Group("gateway.networking.k8s.io")),
 				Name:        "example",
-				Port:        ptrTo(gatewayv1.PortNumber(443)),
-				SectionName: ptrTo(gatewayv1.SectionName("foo")),
+				Port:        new(gatewayv1.PortNumber(443)),
+				SectionName: new(gatewayv1.SectionName("foo")),
 			}},
 		},
 		{
 			name:       "valid because first parentRef has namespace while second doesn't",
 			wantErrors: []string{},
 			parentRefs: []gatewayv1.ParentReference{{
-				Kind:      ptrTo(gatewayv1.Kind("Gateway")),
-				Group:     ptrTo(gatewayv1.Group("gateway.networking.k8s.io")),
+				Kind:      new(gatewayv1.Kind("Gateway")),
+				Group:     new(gatewayv1.Group("gateway.networking.k8s.io")),
 				Name:      "example",
-				Namespace: ptrTo(gatewayv1.Namespace("test")),
+				Namespace: new(gatewayv1.Namespace("test")),
 			}, {
-				Kind:  ptrTo(gatewayv1.Kind("Gateway")),
-				Group: ptrTo(gatewayv1.Group("gateway.networking.k8s.io")),
+				Kind:  new(gatewayv1.Kind("Gateway")),
+				Group: new(gatewayv1.Group("gateway.networking.k8s.io")),
 				Name:  "example",
 			}},
 		},
@@ -207,14 +207,14 @@ func TestHTTPRouteParentRefExperimental(t *testing.T) {
 			name:       "valid because second parentRef has namespace while first doesn't",
 			wantErrors: []string{},
 			parentRefs: []gatewayv1.ParentReference{{
-				Kind:  ptrTo(gatewayv1.Kind("Gateway")),
-				Group: ptrTo(gatewayv1.Group("gateway.networking.k8s.io")),
+				Kind:  new(gatewayv1.Kind("Gateway")),
+				Group: new(gatewayv1.Group("gateway.networking.k8s.io")),
 				Name:  "example",
 			}, {
-				Kind:      ptrTo(gatewayv1.Kind("Gateway")),
-				Group:     ptrTo(gatewayv1.Group("gateway.networking.k8s.io")),
+				Kind:      new(gatewayv1.Kind("Gateway")),
+				Group:     new(gatewayv1.Group("gateway.networking.k8s.io")),
 				Name:      "example",
-				Namespace: ptrTo(gatewayv1.Namespace("test")),
+				Namespace: new(gatewayv1.Namespace("test")),
 			}},
 		},
 	}
@@ -384,10 +384,10 @@ func TestHTTPRouteRuleExperimental(t *testing.T) {
 			wantErrors: []string{"Rule name must be unique within the route"},
 			rules: []gatewayv1.HTTPRouteRule{
 				{
-					Name: ptrTo(gatewayv1.SectionName("name1")),
+					Name: new(gatewayv1.SectionName("name1")),
 				},
 				{
-					Name: ptrTo(gatewayv1.SectionName("name1")),
+					Name: new(gatewayv1.SectionName("name1")),
 				},
 			},
 		},
@@ -396,13 +396,13 @@ func TestHTTPRouteRuleExperimental(t *testing.T) {
 			wantErrors: []string{"Rule name must be unique within the route"},
 			rules: []gatewayv1.HTTPRouteRule{
 				{
-					Name: ptrTo(gatewayv1.SectionName("name1")),
+					Name: new(gatewayv1.SectionName("name1")),
 				},
 				{
-					Name: ptrTo(gatewayv1.SectionName("not-name1")),
+					Name: new(gatewayv1.SectionName("not-name1")),
 				},
 				{
-					Name: ptrTo(gatewayv1.SectionName("name1")),
+					Name: new(gatewayv1.SectionName("name1")),
 				},
 			},
 		},
@@ -413,8 +413,8 @@ func TestHTTPRouteRuleExperimental(t *testing.T) {
 				// Ok to have multiple nil
 				{Name: nil},
 				{Name: nil},
-				{Name: ptrTo(gatewayv1.SectionName("name1"))},
-				{Name: ptrTo(gatewayv1.SectionName("name2"))},
+				{Name: new(gatewayv1.SectionName("name1"))},
+				{Name: new(gatewayv1.SectionName("name2"))},
 			},
 		},
 	}
@@ -452,7 +452,7 @@ func TestHTTPRequestMirrorFilterExperimental(t *testing.T) {
 					RequestMirror: &gatewayv1.HTTPRequestMirrorFilter{
 						BackendRef: gatewayv1.BackendObjectReference{
 							Name: testService,
-							Port: ptrTo(gatewayv1.PortNumber(8081)),
+							Port: new(gatewayv1.PortNumber(8081)),
 						},
 						Percent: &percent,
 						Fraction: &gatewayv1.Fraction{
@@ -472,7 +472,7 @@ func TestHTTPRequestMirrorFilterExperimental(t *testing.T) {
 					RequestMirror: &gatewayv1.HTTPRequestMirrorFilter{
 						BackendRef: gatewayv1.BackendObjectReference{
 							Name: testService,
-							Port: ptrTo(gatewayv1.PortNumber(8081)),
+							Port: new(gatewayv1.PortNumber(8081)),
 						},
 						Fraction: &gatewayv1.Fraction{
 							Numerator:   1001,
@@ -491,7 +491,7 @@ func TestHTTPRequestMirrorFilterExperimental(t *testing.T) {
 					RequestMirror: &gatewayv1.HTTPRequestMirrorFilter{
 						BackendRef: gatewayv1.BackendObjectReference{
 							Name: testService,
-							Port: ptrTo(gatewayv1.PortNumber(8081)),
+							Port: new(gatewayv1.PortNumber(8081)),
 						},
 						Fraction: &gatewayv1.Fraction{
 							Numerator:   0,
@@ -510,7 +510,7 @@ func TestHTTPRequestMirrorFilterExperimental(t *testing.T) {
 					RequestMirror: &gatewayv1.HTTPRequestMirrorFilter{
 						BackendRef: gatewayv1.BackendObjectReference{
 							Name: testService,
-							Port: ptrTo(gatewayv1.PortNumber(8081)),
+							Port: new(gatewayv1.PortNumber(8081)),
 						},
 						Fraction: &gatewayv1.Fraction{
 							Numerator:   -1,
@@ -528,7 +528,7 @@ func TestHTTPRequestMirrorFilterExperimental(t *testing.T) {
 					RequestMirror: &gatewayv1.HTTPRequestMirrorFilter{
 						BackendRef: gatewayv1.BackendObjectReference{
 							Name: testService,
-							Port: ptrTo(gatewayv1.PortNumber(8081)),
+							Port: new(gatewayv1.PortNumber(8081)),
 						},
 						Percent: &percent,
 					},
@@ -543,7 +543,7 @@ func TestHTTPRequestMirrorFilterExperimental(t *testing.T) {
 					RequestMirror: &gatewayv1.HTTPRequestMirrorFilter{
 						BackendRef: gatewayv1.BackendObjectReference{
 							Name: testService,
-							Port: ptrTo(gatewayv1.PortNumber(8081)),
+							Port: new(gatewayv1.PortNumber(8081)),
 						},
 						Fraction: &gatewayv1.Fraction{
 							Numerator:   83,

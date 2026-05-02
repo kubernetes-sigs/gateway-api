@@ -251,8 +251,8 @@ func validateHost(host string) error {
 		return fmt.Errorf("host %s must conform to DNS naming conventions: %v", host, errs)
 	}
 
-	labels := strings.Split(host, ".")
-	for _, l := range labels {
+	labels := strings.SplitSeq(host, ".")
+	for l := range labels {
 		errs := kvalidation.IsDNS1123Label(l)
 		if len(errs) != 0 {
 			return fmt.Errorf("label %s in host %s must conform to DNS naming conventions: %v", l, host, errs)

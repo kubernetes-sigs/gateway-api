@@ -84,7 +84,7 @@ func ParseSupportedFeatures(f string) FeaturesSet {
 		return nil
 	}
 	res := FeaturesSet{}
-	for _, value := range strings.Split(f, ",") {
+	for value := range strings.SplitSeq(f, ",") {
 		res.Insert(features.FeatureName(value))
 	}
 	return res
@@ -97,7 +97,7 @@ func ParseKeyValuePairs(f string) map[string]string {
 		return nil
 	}
 	res := map[string]string{}
-	for _, kv := range strings.Split(f, ",") {
+	for kv := range strings.SplitSeq(f, ",") {
 		parts := strings.Split(kv, "=")
 		if len(parts) == 2 {
 			res[parts[0]] = parts[1]

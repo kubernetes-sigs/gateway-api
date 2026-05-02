@@ -19,6 +19,7 @@ package http //nolint:revive
 import (
 	"fmt"
 	"regexp"
+	"slices"
 	"sync"
 	"testing"
 	"time"
@@ -59,12 +60,7 @@ func ExpectMirroredRequest(t *testing.T, client client.Client, clientset clients
 					return false
 				}
 
-				for _, log := range logs {
-					if mirrorLogRegexp.MatchString(log) {
-						return true
-					}
-				}
-				return false
+				return slices.ContainsFunc(logs, mirrorLogRegexp.MatchString)
 			}, timeoutConfig.RequestTimeout, time.Second, `Couldn't find mirrored request in "%s/%s" logs`, mirrorPod.Namespace, mirrorPod.Name)
 		}(mirrorPod)
 	}
