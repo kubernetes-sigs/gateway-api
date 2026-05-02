@@ -45,20 +45,15 @@ var (
 	OutDir        string
 )
 
-type GEPStatusWeight struct {
-	Status gep.GEPStatus
-	Weight int
-}
-
 // Those are the GEPs that will be included in the final navigation bar
 // The order established below will be the order that the statuses will be shown
-var includeGEPStatus = []GEPStatusWeight{
-	{Status: gep.GEPStatusStandard, Weight: 1},
-	{Status: gep.GEPStatusMemorandum, Weight: 2},
-	{Status: gep.GEPStatusExperimental, Weight: 3},
-	{Status: gep.GEPStatusImplementable, Weight: 4},
-	{Status: gep.GEPStatusPrototyping, Weight: 5},
-	{Status: gep.GEPStatusProvisional, Weight: 6},
+var includeGEPStatus = []gep.GEPStatus{
+	gep.GEPStatusStandard,
+	gep.GEPStatusMemorandum,
+	gep.GEPStatusExperimental,
+	gep.GEPStatusImplementable,
+	gep.GEPStatusPrototyping,
+	gep.GEPStatusProvisional,
 }
 
 type GEPArray []GEPs
@@ -187,9 +182,9 @@ func walkGEPs(dir string, skipGEPs []string) (GEPArray, error) {
 		// Skip the GEPs types we don't care
 		var gepWeight int
 		found := false
-		for _, s := range includeGEPStatus {
-			if s.Status == gepDetail.Status {
-				gepWeight = s.Weight
+		for i, s := range includeGEPStatus {
+			if s == gepDetail.Status {
+				gepWeight = i + 1
 				found = true
 				break
 			}
@@ -224,8 +219,8 @@ func walkGEPs(dir string, skipGEPs []string) (GEPArray, error) {
 	}
 
 	// Include the GEPs toc on the desired order
-	for _, v := range includeGEPStatus {
-		if geps, ok := tmpMap[v.Status]; ok {
+	for _, s := range includeGEPStatus {
+		if geps, ok := tmpMap[s]; ok {
 			gepArray = append(gepArray, geps)
 		}
 	}

@@ -19,8 +19,85 @@
 /geps/  /geps/overview/    301!
 geps/by-state/ /geps/by-state/standard/    301!
 
-
 /contributing/  /contributing/get-involved/    301!
+
+# Scanned legacy redirects from mkdocs.yml
+/guides/index.html  /guides/getting-started/    301!
+/ingress-nginx.html  /guides/getting-started/migrating-from-ingress-nginx/    301!
+/ingress-nginx/  /guides/getting-started/migrating-from-ingress-nginx/    301!
+/concepts/gamma.html  /docs/mesh/    301!
+/concepts/gamma/  /docs/mesh/    301!
+/concepts/service-facets.html  /docs/mesh/service-facets/    301!
+/concepts/service-facets/  /docs/mesh/service-facets/    301!
+/concepts/guidelines.html  /guides/api-design/    301!
+/concepts/guidelines/  /guides/api-design/    301!
+/concepts/security-model.html  /docs/concepts/security/    301!
+/concepts/security-model/  /docs/concepts/security/    301!
+/contributing/community.html  /contributing/    301!
+/contributing/community/  /contributing/    301!
+/contributing/gamma.html  /docs/mesh/#contributing    301!
+/contributing/gamma/  /docs/mesh/#contributing    301!
+/reference/implementers-guide.html  /guides/implementers-guide/    301!
+/reference/implementers-guide/  /guides/implementers-guide/    301!
+/references/implementers-guide.html  /guides/implementers-guide/    301!
+/references/implementers-guide/  /guides/implementers-guide/    301!
+/references/spec.html  /reference/api-spec/main/spec/    301!
+/references/spec/  /reference/api-spec/main/spec/    301!
+/references/policy-attachment.html  /reference/policy-attachment/    301!
+/references/policy-attachment/  /reference/policy-attachment/    301!
+
+# Scanned legacy implementation redirects
+/implementations.html  /docs/implementations/list/    301!
+/implementations/  /docs/implementations/list/    301!
+/implementations/wizard.html  /docs/implementations/wizard/    301!
+/implementations/wizard/  /docs/implementations/wizard/    301!
+/implementations/v1.5.html  /docs/implementations/versions/v1.5/    301!
+/implementations/v1.5/  /docs/implementations/versions/v1.5/    301!
+/implementations/v1.4.html  /docs/implementations/versions/v1.4/    301!
+/implementations/v1.4/  /docs/implementations/versions/v1.4/    301!
+/implementations/v1.3.html  /docs/implementations/versions/v1.3/    301!
+/implementations/v1.3/  /docs/implementations/versions/v1.3/    301!
+/implementations/v1.2.html  /docs/implementations/versions/v1.2/    301!
+/implementations/v1.2/  /docs/implementations/versions/v1.2/    301!
+
+# Scanned legacy user guides redirects
+/guides/http-routing.html  /guides/user-guides/http-routing/    301!
+/guides/http-routing/  /guides/user-guides/http-routing/    301!
+/guides/http-redirect-rewrite.html  /guides/user-guides/http-redirect-rewrite/    301!
+/guides/http-redirect-rewrite/  /guides/user-guides/http-redirect-rewrite/    301!
+/guides/http-header-modifier.html  /guides/user-guides/http-header-modifier/    301!
+/guides/http-header-modifier/  /guides/user-guides/http-header-modifier/    301!
+/guides/traffic-splitting.html  /guides/user-guides/traffic-splitting/    301!
+/guides/traffic-splitting/  /guides/user-guides/traffic-splitting/    301!
+/guides/http-request-mirroring.html  /guides/user-guides/http-request-mirroring/    301!
+/guides/http-request-mirroring/  /guides/user-guides/http-request-mirroring/    301!
+/guides/http-query-param-matching.html  /guides/user-guides/http-query-param-matching/    301!
+/guides/http-query-param-matching/  /guides/user-guides/http-query-param-matching/    301!
+/guides/http-method-matching.html  /guides/user-guides/http-method-matching/    301!
+/guides/http-method-matching/  /guides/user-guides/http-method-matching/    301!
+/guides/http-timeouts.html  /guides/user-guides/http-timeouts/    301!
+/guides/http-timeouts/  /guides/user-guides/http-timeouts/    301!
+/guides/http-cors.html  /guides/user-guides/http-cors/    301!
+/guides/http-cors/  /guides/user-guides/http-cors/    301!
+/guides/multiple-ns.html  /guides/user-guides/multiple-ns/    301!
+/guides/multiple-ns/  /guides/user-guides/multiple-ns/    301!
+/guides/tls.html  /guides/user-guides/tls/    301!
+/guides/tls/  /guides/user-guides/tls/    301!
+/guides/tls-routing.html  /guides/user-guides/tls-routing/    301!
+/guides/tls-routing/  /guides/user-guides/tls-routing/    301!
+/guides/tcp.html  /guides/user-guides/tcp/    301!
+/guides/tcp/  /guides/user-guides/tcp/    301!
+/guides/grpc-routing.html  /guides/user-guides/grpc-routing/    301!
+/guides/grpc-routing/  /guides/user-guides/grpc-routing/    301!
+/guides/backend-protocol.html  /guides/user-guides/backend-protocol/    301!
+/guides/backend-protocol/  /guides/user-guides/backend-protocol/    301!
+/guides/infrastructure.html  /guides/user-guides/infrastructure/    301!
+/guides/infrastructure/  /guides/user-guides/infrastructure/    301!
+/guides/listener-set.html  /guides/user-guides/listener-set/    301!
+/guides/listener-set/  /guides/user-guides/listener-set/    301!
+
+
+
 
 
 
