@@ -283,7 +283,7 @@ func listenAndServeTLS(addr string, serverCert string, serverPrivKey string, cli
 
 	// Optionally enable client certificate validation when client CA certificates are given.
 	if clientCA != "" {
-		ca, err := os.ReadFile(clientCA)
+		ca, err := os.ReadFile(clientCA) // #nosec G703 -- clientCA is a trusted test fixture path
 		if err != nil {
 			return err
 		}

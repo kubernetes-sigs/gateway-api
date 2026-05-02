@@ -1,6 +1,6 @@
 module sigs.k8s.io/gateway-api/tests
 
-go 1.25.0
+go 1.26.0
 
 replace sigs.k8s.io/gateway-api => ../
 
