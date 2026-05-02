@@ -293,8 +293,5 @@ func generateSupportedRouteKinds() []gatewayv1.RouteGroupKind {
 	return []gatewayv1.RouteGroupKind{{
 		Group: (*gatewayv1.Group)(&gatewayv1.GroupVersion.Group),
 		Kind:  gatewayv1.Kind("HTTPRoute"),
-	}, {
-		Group: (*gatewayv1.Group)(&gatewayv1.GroupVersion.Group),
-		Kind:  gatewayv1.Kind("GRPCRoute"),
 	}}
 }
