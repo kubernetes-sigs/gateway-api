@@ -120,6 +120,12 @@ const (
 
 	// This option indicates support for HTTPRoute retry on connection error (extended conformance)
 	SupportHTTPRouteRetryConnectionError FeatureName = "HTTPRouteRetryConnectionError"
+
+	// This option indicates support for URLRewrite filter on HTTPRoute BackendRef (extended conformance).
+	SupportHTTPRouteBackendURLRewrite FeatureName = "HTTPRouteBackendURLRewrite"
+
+	// This option indicates support for RequestRedirect filter on HTTPRoute BackendRef (extended conformance).
+	SupportHTTPRouteBackendRequestRedirect FeatureName = "HTTPRouteBackendRequestRedirect"
 )
 
 var (
@@ -253,6 +259,16 @@ var (
 		Name:    SupportHTTPRouteRetryConnectionError,
 		Channel: FeatureChannelExperimental,
 	}
+	// HTTPRouteBackendURLRewriteFeature contains metadata for the HTTPRouteBackendURLRewrite feature.
+	HTTPRouteBackendURLRewriteFeature = Feature{
+		Name:    SupportHTTPRouteBackendURLRewrite,
+		Channel: FeatureChannelStandard,
+	}
+	// HTTPRouteBackendRequestRedirectFeature contains metadata for the HTTPRouteBackendRequestRedirect feature.
+	HTTPRouteBackendRequestRedirectFeature = Feature{
+		Name:    SupportHTTPRouteBackendRequestRedirect,
+		Channel: FeatureChannelStandard,
+	}
 )
 
 // HTTPRouteExtendedFeatures includes all extended features for HTTPRoute
@@ -285,4 +301,6 @@ var HTTPRouteExtendedFeatures = sets.New(
 	HTTPRouteRetryFeature,
 	HTTPRouteRetryBackendTimeoutFeature,
 	HTTPRouteRetryConnectionErrorFeature,
+	HTTPRouteBackendURLRewriteFeature,
+	HTTPRouteBackendRequestRedirectFeature,
 )
