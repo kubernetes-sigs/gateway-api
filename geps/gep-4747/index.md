@@ -112,9 +112,10 @@ semantically valuable within both contexts:
 
 The difference between ingress and egress is an emergent property of:
 
-1. **Where the Gateway is deployed** (facing internal workloads, not the
-   internet)
-2. **What backends routes reference** (external Backend resources, not internal
+1. **The reachability of the Gateway's addresses** (typically internal
+   workloads, though externally-reachable Gateways targeting external
+   backends are also valid)
+2. **What backends routes reference** (external Backend resources, not just internal
    Services)
 
 Both are already expressible in Gateway API. GatewayClass can provide a
