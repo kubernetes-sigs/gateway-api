@@ -133,7 +133,7 @@ Listener or Route level; defining such a mechanism is left to a future GEP.
 |---|---|---|
 | Istio | [Same `Gateway` resource](https://istio.io/latest/docs/tasks/traffic-management/egress/egress-gateway/) | No |
 | Linkerd | [`EgressNetwork`](https://linkerd.io/2-edge/reference/egress-network/) (classifies traffic, not a Gateway) | Different model |
-| Cilium | `CiliumEgressGatewayPolicy` (L3/L4) | Different layer |
+| Cilium | `CiliumEgressGatewayPolicy` (L3/L4); L7 policy via [`CiliumNetworkPolicy`](https://docs.cilium.io/en/stable/security/policy/layer7) | Different model |
 
 Implementations that use Gateway API's Gateway resource for egress do NOT
 require a separate resource type.
