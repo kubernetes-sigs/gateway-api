@@ -12,7 +12,17 @@ Historically, Kubernetes has tightly coupled the `Service` and `EndpointSlice` r
 
 ## User Stories
 
-TODO: Will likely just point to the KEP.
+* As [Ana], I want to run AI workloads that are load balanced by an intelligent router
+  without exposing a cluster VIP that will result in suboptimal load balancing and higher latency.
+* As [Ana], I want to configure the TLS settings for the in-cluster destinations my service communicates with, so that I can
+  ensure secure communication between my workloads without modifying the underlying `Service`. I may want to pick a specific client certificate to use that the owner of the destination service doesn't know about or have access to.
+* As [Chihiro], I want controllers to automatically create and manage `EndpointSelector` resources in response to
+  higher-level resources like `InferencePool`, so that controllers don't need to create "shadow services" in order
+  to create `EndpointSlices`.
+
+[Ana]: ../../concepts/roles-and-personas.md#ana
+[Chihiro]: ../../concepts/roles-and-personas.md#chihiro
+[Ian]: ../../concepts/roles-and-personas.md#ian
 
 ## Goals
 
