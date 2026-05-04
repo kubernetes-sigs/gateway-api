@@ -6,7 +6,7 @@
 
 ## TLDR
 
-This GEP proposes a new `Backend` resource that fills the [backend role](/geps/gep-2907/) — a Gateway-native resource that can be referenced via `backendRefs` in Routes, just like `Service` is today. The Kubernetes `Service` resource is mature and stable, but it is effectively frozen and cannot be extended with Gateway-specific configuration. Every time we've wanted to add backend-level behavior (TLS settings, protocol metadata, connection policies), we've had to create separate policy CRDs like `BackendTLSPolicy` that attach to Service. This approach has significant limitations around discoverability, implementation complexity, and the conflation of producer and consumer concerns.
+This GEP proposes a new `Backend` resource that fills the [backend role](/geps/gep-2907/) — a **general-purpose decorator for Service** (and other backend types) within Gateway API. The Kubernetes `Service` resource is mature and stable, but it is effectively frozen and SIG-Network leadership has an extreme aversion to expanding its scope. Previous approaches to extend Service behavior (like `BackendTLSPolicy`) have significant limitations around discoverability, implementation complexity, and the conflation of producer and consumer concerns.
 
 The `Backend` resource provides a namespace-scoped, consumer-focused resource that can:
 
@@ -25,7 +25,7 @@ The Kubernetes `Service` resource conflates two distinct concerns that have beco
 
 This conflation creates friction in a few notable areas:
 
-### External Destination Limitationsr. The Backend resource provides
+### External Destination Limitations
 
 Currently, representing external destinations in Gateway API requires synthetic `Service` objects with `type: ExternalName`. There are several drawbacks to this approach:
 
@@ -35,7 +35,7 @@ Currently, representing external destinations in Gateway API requires synthetic 
 
 ### Limitations of Policy-Based Decoration of Service
 
-The current approach to adding Gateway-specific behavior to Services is through policy attachment (e.g., `BackendTLSPolicy`). While this works, it has significant limitations that become more acute with each new backend-level concern we want to add:
+The current approach to adding Gateway-specific behavior to Services is through policy attachment (e.g., `BackendTLSPolicy`). While this works, it has significant limitations:
 
 - **Discoverability**: When looking at a route, it is not clear what policies affect a given backend. Users must search for policy resources targeting the same Service, which scales poorly.
 - **Producer vs Consumer ambiguity**: `BackendTLSPolicy` targets a Service, but it is unclear whether it represents the producer's TLS configuration or a consumer's desired TLS settings. Previous attempts to add consumer overrides (e.g., [GEP 3875](https://github.com/kubernetes-sigs/gateway-api/pull/3876)) introduced significant complexity and were ultimately abandoned.
