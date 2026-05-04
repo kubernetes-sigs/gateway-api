@@ -8,8 +8,7 @@
 ## TLDR
 
 Gateway API needs a first-class Route type for TCP because a meaningful class of Kubernetes workloads cannot be represented by the standard Gateway API routing model without it.
-HTTPRoute only addresses a single class of TCP-based traffic (HTTP/1.1 and HTTP/2 over TCP), leaving the broader universe of TCP workloads without a portable routing API.
-Without TCPRoute, these TCP based workloads must either fall back to Service-based exposure or rely on implementation-specific APIs,
+HTTPRoute only addresses a single class of TCP-based traffic (HTTP/1.1 and HTTP/2 over TCP), and TLSRoute handles routing via SNI, leaving the broader universe of TCP workloads that don't work in either of those cases without a portable routing API.
 which prevents Gateway API from serving as a common and portable configuration model for them.
 TCPRoute standardizes the minimal interoperable API surface for exposing TCP workloads through Gateway API.
 
@@ -402,7 +401,7 @@ They will validate the following scenarios:
 
    - TCP connections sent to port 9092 are distributed across backends respecting the configured weights (approximately 70% to `kafka-broker-1` and 30% to `kafka-broker-2`). In this situation, TCP SYN packets denote one connection for weighting purposes.
 
-Conformance Level: **Core**
+Conformance Level: **Extended**
 
 ## References
 
