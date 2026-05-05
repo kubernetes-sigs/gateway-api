@@ -77,7 +77,6 @@ argues that no new Gateway-level resource is required.
   (see [#1651](https://github.com/kubernetes-sigs/gateway-api/issues/1651))
 * Define or introduce traffic redirection mechanisms (e.g., transparent
   interception of egress traffic)
-* Define mixed-mode (combined ingress/egress) Gateway semantics
 
 ## Introduction
 
@@ -122,11 +121,9 @@ Both are already expressible in Gateway API. GatewayClass can provide a
 mechanism for implementations to distinguish egress controllers from ingress
 controllers.
 
-A single Gateway MAY serve both ingress and egress if the implementation
-supports it. However, this GEP does not define a mechanism for distinguishing
-ingress and egress listeners or routes on a shared Gateway. Implementations
-that support mixed-mode gateways would need to surface direction at the
-Listener or Route level; defining such a mechanism is left to a future GEP.
+A single Gateway MAY serve both ingress and egress by setting
+`type: [Ingress, Egress]`. See [Gateway Type Field](#gateway-type-field) for
+details.
 
 ### Prior Art
 
@@ -141,10 +138,11 @@ require a separate resource type.
 
 ## API
 
-### No New API Types
+### API Overview
 
-This GEP does not introduce new API types. It defines how existing types
-compose for egress:
+This GEP does not introduce new API resources. It extends the Gateway resource
+with a `type` field and a `ClusterIP` address type, and defines how existing
+types compose for egress:
 
 ```
                      parentRef              backendRef
@@ -164,11 +162,42 @@ target for egress routes, representing an external destination. The specific
 resource definition is being developed in
 [PR #4488](https://github.com/kubernetes-sigs/gateway-api/pull/4488).
 
+### Gateway Type Field
+
+This GEP introduces a `type` field on the Gateway spec to indicate whether
+the Gateway handles ingress traffic, egress traffic, or both:
+
+```yaml
+spec:
+  type: [Egress]            # egress only
+  type: [Ingress]           # ingress only (default)
+  type: [Ingress, Egress]   # mixed mode
+```
+
+The `type` field is a list of one or more values:
+
+- **`Ingress`**: The Gateway accepts traffic from external or cross-cluster
+  clients and routes it to backends. This is the default when `type` is unset.
+  Defaulting to `Ingress` prevents existing Gateways from being accidentally
+  configured as open proxies when Backend support is introduced.
+  Implementations that already use Gateway for egress will need to explicitly
+  set `type` to include `Egress`.
+- **`Egress`**: The Gateway accepts traffic from internal workloads and routes
+  it to destinations including external Backend resources. A Gateway with
+  `Egress` in its type MUST support Backend as a backendRef target and MUST
+  provision a cluster-reachable address.
+
+Implementations MUST enforce the declared type. A Gateway whose type does not
+include `Egress` MUST reject routes with Backend backendRefs. This prevents
+existing Gateways from being used as open proxies when Backend support is
+introduced. Routes attached to an egress Gateway MAY reference both Backend
+resources and internal Services (e.g., routing some traffic to a local cache
+and other traffic to external APIs).
+
 ### Egress Gateway Configuration
 
-An egress gateway is a `Gateway`. An egress-specific `GatewayClass` MAY be
-used to apply egress-specific validation, defaults, and to denote that the
-Gateway is being used for egress:
+An egress gateway is a `Gateway` with `type: [Egress]`. An egress-specific
+`GatewayClass` MAY be used to apply egress-specific validation and defaults:
 
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
@@ -184,7 +213,10 @@ metadata:
   name: egress-gateway
   namespace: gateway-system
 spec:
+  type: [Egress]
   gatewayClassName: egress
+  addresses:
+  - type: ClusterIP
   listeners:
   - name: https
     port: 8443
@@ -327,11 +359,6 @@ needed to decide which approach to pursue. See
 
 Should the GEP recommend specific listener configurations for egress (e.g.,
 "use a single wildcard listener") or leave this entirely to implementations?
-
-### 3. Mixed Ingress/Egress Gateways
-
-Should a single Gateway be allowed to serve both ingress and egress traffic
-(via multiple listeners)?
 
 ## Alternatives Considered
 
