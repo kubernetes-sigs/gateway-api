@@ -1,5 +1,5 @@
 apiVersion: gateway.networking.k8s.io/v1
-date: "2026-04-25T02:48:14Z"
+date: "2026-05-05T02:24:07Z"
 gatewayAPIChannel: experimental
 gatewayAPIVersion: v1.5.1
 implementation:
@@ -21,34 +21,20 @@ profiles:
   extended:
     result: partial
     skippedTests:
-    - BackendTLSPolicy
     - BackendTLSPolicyConflictResolution
-    - BackendTLSPolicyObservedGenerationBump
     - GatewayBackendClientCertificateFeature
-    - GatewayFrontendClientCertificateValidation
     - GatewayFrontendClientCertificateValidationInsecureFallback
     - GatewayFrontendInvalidDefaultClientCertificateValidation
     - GatewayInvalidFrontendClientCertificateValidation
     - GatewayInvalidTLSBackendConfiguration
-    - GatewayWithAttachedRoutesWithPort8080
-    - HTTPRoute303Redirect
-    - HTTPRoute307Redirect
-    - HTTPRoute308Redirect
-    - HTTPRouteCORS
     - HTTPRouteHTTPSListenerDetectMisdirectedRequests
-    - ListenerSetAllowedNamespaceNone
-    - ListenerSetAllowedNamespaceSame
-    - ListenerSetAllowedNamespaceSelector
-    - ListenerSetAllowedRoutesNamespaces
-    - ListenerSetDefaultNotAllowed
-    - ListenerSetHTTPRouting
     - ListenerSetHostnameConflict
     - ListenerSetProtocolConflict
     - ListenerSetReferenceGrant
     statistics:
       Failed: 0
-      Passed: 30
-      Skipped: 24
+      Passed: 44
+      Skipped: 10
     supportedFeatures:
     - BackendTLSPolicy
     - BackendTLSPolicySANValidation
@@ -86,7 +72,7 @@ profiles:
     - HTTPRouteSchemeRedirect
     - ListenerSet
   name: GATEWAY-HTTP
-  summary: Core tests succeeded. Extended tests partially succeeded with 24 test skips.
+  summary: Core tests succeeded. Extended tests partially succeeded with 10 test skips.
 - core:
     result: success
     statistics:
@@ -96,17 +82,13 @@ profiles:
   extended:
     result: partial
     skippedTests:
-    - ListenerSetAllowedNamespaceNone
-    - ListenerSetAllowedNamespaceSame
-    - ListenerSetAllowedNamespaceSelector
-    - ListenerSetDefaultNotAllowed
     - ListenerSetHostnameConflict
     - ListenerSetProtocolConflict
     - ListenerSetReferenceGrant
     statistics:
       Failed: 0
-      Passed: 3
-      Skipped: 7
+      Passed: 7
+      Skipped: 3
     supportedFeatures:
     - GatewayAddressEmpty
     - GatewayBackendClientCertificate
@@ -119,7 +101,7 @@ profiles:
     - GatewayStaticAddresses
     - ListenerSet
   name: GATEWAY-GRPC
-  summary: Core tests succeeded. Extended tests partially succeeded with 7 test skips.
+  summary: Core tests succeeded. Extended tests partially succeeded with 3 test skips.
 - core:
     result: success
     statistics:
@@ -129,18 +111,13 @@ profiles:
   extended:
     result: partial
     skippedTests:
-    - ListenerSetAllowedNamespaceNone
-    - ListenerSetAllowedNamespaceSame
-    - ListenerSetAllowedNamespaceSelector
-    - ListenerSetAllowedRoutesSupportedKinds
-    - ListenerSetDefaultNotAllowed
     - ListenerSetHostnameConflict
     - ListenerSetProtocolConflict
     - ListenerSetReferenceGrant
     statistics:
       Failed: 0
-      Passed: 7
-      Skipped: 8
+      Passed: 12
+      Skipped: 3
     supportedFeatures:
     - GatewayAddressEmpty
     - GatewayBackendClientCertificate
@@ -155,7 +132,7 @@ profiles:
     - TLSRouteModeMixed
     - TLSRouteModeTerminate
   name: GATEWAY-TLS
-  summary: Core tests succeeded. Extended tests partially succeeded with 8 test skips.
+  summary: Core tests succeeded. Extended tests partially succeeded with 3 test skips.
 - core:
     result: success
     statistics:
@@ -185,8 +162,13 @@ succeededProvisionalTests:
 - GRPCRouteNamedRule
 - GatewayInfrastructure
 - GatewayOptionalAddressValue
+- HTTPRoute303Redirect
+- HTTPRoute307Redirect
+- HTTPRoute308Redirect
 - HTTPRouteNamedRule
 - HTTPRouteRequestPercentageMirror
+- MeshHTTPRoute303Redirect
+- MeshHTTPRoute308Redirect
 - MeshHTTPRouteNamedRule
 - TLSRouteMixedTerminationSameNamespace
 - TLSRouteTerminateSimpleSameNamespace
