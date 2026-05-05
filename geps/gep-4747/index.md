@@ -253,19 +253,33 @@ Route, and Backend-level policies are handled -- will be addressed as part of
 the Backend resource design
 ([PR #4488](https://github.com/kubernetes-sigs/gateway-api/pull/4488)).
 
-### Workload-to-Gateway Addressing (Interim)
+### Workload-to-Gateway Addressing
 
-Until Gateway Routability ([#1651](https://github.com/kubernetes-sigs/gateway-api/issues/1651))
-is resolved, workloads connect to the egress gateway via an implementation-managed
-address reachable only within the cluster (often a ClusterIP Service).
-See also [PR #4767](https://github.com/kubernetes-sigs/gateway-api/pull/4767)
-for ongoing work on service scope and routability.
+Egress Gateways require an address reachable from within the cluster so that
+workloads can connect to them. Implementations MUST expose such an address and
+report it in `gateway.status.addresses`. Workloads typically reach the gateway
+via a stable DNS name (e.g., `<gateway-name>.<namespace>.svc.cluster.local`).
 
-Implementations should:
+This GEP introduces `ClusterIP` as a new `AddressType` for Gateway. Operators
+can request a cluster-internal-only address by specifying it in
+`gateway.spec.addresses`:
 
-- Expose an internally-reachable address for egress Gateways
-- Report this address in `gateway.status.addresses`
-- Use a stable DNS name (e.g., `<gateway-name>.<namespace>.svc.cluster.local`)
+```yaml
+spec:
+  addresses:
+  - type: ClusterIP
+    value: ""  # implementation-assigned
+```
+
+`ClusterIP` is already a well-understood concept from Kubernetes Services. When
+specified on a Gateway, the implementation MUST provision an address that is
+reachable only from within the cluster and report it in
+`gateway.status.addresses`. This address type has Extended support.
+
+See also [#1651](https://github.com/kubernetes-sigs/gateway-api/issues/1651)
+for prior discussion on cluster-local Gateway addresses and
+[PR #4767](https://github.com/kubernetes-sigs/gateway-api/pull/4767) for
+related work on service scope and routability.
 
 ### Traffic Enforcement
 
@@ -353,7 +367,7 @@ Dynamic routing to arbitrary hostnames (forward proxy) is out of scope. See
 | Dependency | Status | Impact |
 |---|---|---|
 | [PR #4488: Backend Resource](https://github.com/kubernetes-sigs/gateway-api/pull/4488) | PR open | Required -- egress routes need Backend destinations |
-| [#1651: Gateway Routability](https://github.com/kubernetes-sigs/gateway-api/issues/1651) | Issue open | Nice-to-have -- defines how workloads address gateways |
+| [#1651: Gateway Routability](https://github.com/kubernetes-sigs/gateway-api/issues/1651) | Issue open | Formalizes `ClusterIP` as a Gateway `AddressType`; implementations already provision ClusterIP Services for egress |
 
 ## References
 
