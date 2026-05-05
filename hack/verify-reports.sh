@@ -26,13 +26,22 @@ info() {
   echo "INFO: $*" 1>&2
 }
 
+# Normalize a version string: strip leading 'v' and append '.0' if no patch.
+normalize_version() {
+    local v="${1#v}"
+    if [[ "$v" =~ ^[0-9]+\.[0-9]+$ ]]; then
+        v="${v}.0"
+    fi
+    echo "$v"
+}
+
 # Check if the provided Gateway API version is greater than or equal to v1.1.0
 check_ge_v1.1.0() {
-    local version=$1
-    local minimum_version="v1.1.0"
+    local version=$(normalize_version "$1")
+    local minimum_version="1.1.0"
 
-    # Normalize versions to remove leading 'v' and compare using sort -V
-    if [[ $(echo -e "${version#v}\n${minimum_version#v}" | sort -V | head -n1) == "${minimum_version#v}" ]]; then
+    # Compare using sort -V
+    if [[ $(echo -e "${version}\n${minimum_version}" | sort -V | head -n1) == "${minimum_version}" ]]; then
         return 0
     else
         return 1
@@ -49,7 +58,10 @@ check_report_fields() {
     local gateway_api_channel=$(yq eval '.gatewayAPIChannel' "$report")
     local mode=$(yq eval '.mode' "$report")
 
-    if [[ ${gateway_api_version} != ${expected_gateway_api_version} ]]; then
+    # Compare only major.minor, ignoring patch version
+    local expected_major_minor=$(echo "${expected_gateway_api_version}" | sed 's/^\(v\?[0-9]\+\.[0-9]\+\).*/\1/')
+    local actual_major_minor=$(echo "${gateway_api_version}" | sed 's/^\(v\?[0-9]\+\.[0-9]\+\).*/\1/')
+    if [[ ${actual_major_minor} != ${expected_major_minor} ]]; then
         error "$report gatewayAPIVersion does not match Gateway API version folder"
         EXIT_VALUE=1
     fi

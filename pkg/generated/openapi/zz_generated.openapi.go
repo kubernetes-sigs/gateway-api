@@ -67,6 +67,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		v1.Preconditions{}.OpenAPIModelName():                                             schema_pkg_apis_meta_v1_Preconditions(ref),
 		v1.RootPaths{}.OpenAPIModelName():                                                 schema_pkg_apis_meta_v1_RootPaths(ref),
 		v1.ServerAddressByClientCIDR{}.OpenAPIModelName():                                 schema_pkg_apis_meta_v1_ServerAddressByClientCIDR(ref),
+		v1.ShardInfo{}.OpenAPIModelName():                                                 schema_pkg_apis_meta_v1_ShardInfo(ref),
 		v1.Status{}.OpenAPIModelName():                                                    schema_pkg_apis_meta_v1_Status(ref),
 		v1.StatusCause{}.OpenAPIModelName():                                               schema_pkg_apis_meta_v1_StatusCause(ref),
 		v1.StatusDetails{}.OpenAPIModelName():                                             schema_pkg_apis_meta_v1_StatusDetails(ref),
@@ -1391,9 +1392,17 @@ func schema_pkg_apis_meta_v1_ListMeta(ref common.ReferenceCallback) common.OpenA
 							Format:      "int64",
 						},
 					},
+					"shardInfo": {
+						SchemaProps: spec.SchemaProps{
+							Description: "shardInfo is set when the list is a filtered subset of the full collection, as selected by a shard selector on the request. It echoes back the selector so clients can verify which shard they received and merge sharded responses. Clients should not cache sharded list responses as a full representation of the collection.\n\nThis is an alpha field and requires enabling the ShardedListAndWatch feature gate.",
+							Ref:         ref(v1.ShardInfo{}.OpenAPIModelName()),
+						},
+					},
 				},
 			},
 		},
+		Dependencies: []string{
+			v1.ShardInfo{}.OpenAPIModelName()},
 	}
 }
 
@@ -1485,6 +1494,13 @@ func schema_pkg_apis_meta_v1_ListOptions(ref common.ReferenceCallback) common.Op
 						SchemaProps: spec.SchemaProps{
 							Description: "`sendInitialEvents=true` may be set together with `watch=true`. In that case, the watch stream will begin with synthetic events to produce the current state of objects in the collection. Once all such events have been sent, a synthetic \"Bookmark\" event  will be sent. The bookmark will report the ResourceVersion (RV) corresponding to the set of objects, and be marked with `\"k8s.io/initial-events-end\": \"true\"` annotation. Afterwards, the watch stream will proceed as usual, sending watch events corresponding to changes (subsequent to the RV) to objects watched.\n\nWhen `sendInitialEvents` option is set, we require `resourceVersionMatch` option to also be set. The semantic of the watch request is as following: - `resourceVersionMatch` = NotOlderThan\n  is interpreted as \"data at least as new as the provided `resourceVersion`\"\n  and the bookmark event is send when the state is synced\n  to a `resourceVersion` at least as fresh as the one provided by the ListOptions.\n  If `resourceVersion` is unset, this is interpreted as \"consistent read\" and the\n  bookmark event is send when the state is synced at least to the moment\n  when request started being processed.\n- `resourceVersionMatch` set to any other value or unset\n  Invalid error is returned.\n\nDefaults to true if `resourceVersion=\"\"` or `resourceVersion=\"0\"` (for backward compatibility reasons) and to false otherwise.",
 							Type:        []string{"boolean"},
+							Format:      "",
+						},
+					},
+					"shardSelector": {
+						SchemaProps: spec.SchemaProps{
+							Description: "shardSelector restricts the list of returned objects using a CEL-based shard selector expression. The format uses the shardRange() function combined with || (logical OR) to specify one or more hash ranges:\n\n  shardRange(object.metadata.uid, '0x0', '0x8000000000000000')\n  shardRange(object.metadata.uid, '0x0', '0x8000000000000000') || shardRange(object.metadata.uid, '0x8000000000000000', '0x10000000000000000')\n\nField paths use CEL-style object-rooted syntax (e.g. \"object.metadata.uid\"), NOT the fieldSelector format (\"metadata.uid\"). Currently supported paths:\n  - object.metadata.uid\n  - object.metadata.namespace\n\nhexStart and hexEnd are single-quoted CEL string literals with a '0x' prefix, defining the inclusive lower and exclusive upper bounds over the 64-bit FNV-1a hash space. The full range is [0x0, 0x10000000000000000), where the exclusive upper bound equals 2^64.\n\nExamples:\n  2-shard split:\n    shard 0: shardRange(object.metadata.uid, '0x0000000000000000', '0x8000000000000000')\n    shard 1: shardRange(object.metadata.uid, '0x8000000000000000', '0x10000000000000000')\n  4-shard split:\n    shard 0: shardRange(object.metadata.uid, '0x0000000000000000', '0x4000000000000000')\n    shard 1: shardRange(object.metadata.uid, '0x4000000000000000', '0x8000000000000000')\n    shard 2: shardRange(object.metadata.uid, '0x8000000000000000', '0xc000000000000000')\n    shard 3: shardRange(object.metadata.uid, '0xc000000000000000', '0x10000000000000000')\n\nThis is an alpha field and requires enabling the ShardedListAndWatch feature gate.",
+							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
@@ -2064,6 +2080,28 @@ func schema_pkg_apis_meta_v1_ServerAddressByClientCIDR(ref common.ReferenceCallb
 					},
 				},
 				Required: []string{"clientCIDR", "serverAddress"},
+			},
+		},
+	}
+}
+
+func schema_pkg_apis_meta_v1_ShardInfo(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ShardInfo describes the shard selector that was applied to produce a list response. Its presence on a list response indicates the list is a filtered subset.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"selector": {
+						SchemaProps: spec.SchemaProps{
+							Description: "selector is the shard selector string from the request, echoed back so clients can verify which shard they received and merge responses from multiple shards.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"selector"},
 			},
 		},
 	}
@@ -3134,7 +3172,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_BackendTLSPolicySpec(ref common.Refere
 							},
 						},
 						SchemaProps: spec.SchemaProps{
-							Description: "TargetRefs identifies an API object to apply the policy to. Note that this config applies to the entire referenced resource by default, but this default may change in the future to provide a more granular application of the policy.\n\nTargetRefs must be _distinct_. This means either that:\n\n* They select different targets. If this is the case, then targetRef\n  entries are distinct. In terms of fields, this means that the\n  multi-part key defined by `group`, `kind`, and `name` must\n  be unique across all targetRef entries in the BackendTLSPolicy.\n* They select different sectionNames in the same target.\n\nWhen more than one BackendTLSPolicy selects the same target and sectionName, implementations MUST determine precedence using the following criteria, continuing on ties:\n\n* The older policy by creation timestamp takes precedence. For\n  example, a policy with a creation timestamp of \"2021-07-15\n  01:02:03\" MUST be given precedence over a policy with a\n  creation timestamp of \"2021-07-15 01:02:04\".\n* The policy appearing first in alphabetical order by {namespace}/{name}.\n  For example, a policy named `foo/bar` is given precedence over a\n  policy named `foo/baz`.\n\nFor any BackendTLSPolicy that does not take precedence, the implementation MUST ensure the `Accepted` Condition is set to `status: False`, with Reason `Conflicted`.\n\nImplementations SHOULD NOT support more than one targetRef at this time. Although the API technically allows for this, the current guidance for conflict resolution and status handling is lacking. Until that can be clarified in a future release, the safest approach is to support a single targetRef.\n\nSupport Levels:\n\n* Extended: Kubernetes Service referenced by HTTPRoute backendRefs.\n\n* Implementation-Specific: Services not connected via HTTPRoute, and any\n  other kind of backend. Implementations MAY use BackendTLSPolicy for:\n  - Services not referenced by any Route (e.g., infrastructure services)\n  - Gateway feature backends (e.g., ExternalAuth, rate-limiting services)\n  - Service mesh workload-to-service communication\n  - Other resource types beyond Service\n\nImplementations SHOULD aim to ensure that BackendTLSPolicy behavior is consistent, even outside of the extended HTTPRoute -(backendRef) -> Service path. They SHOULD clearly document how BackendTLSPolicy is interpreted in these scenarios, including:\n  - Which resources beyond Service are supported\n  - How the policy is discovered and applied\n  - Any implementation-specific semantics or restrictions\n\nNote that this config applies to the entire referenced resource by default, but this default may change in the future to provide a more granular application of the policy.\n\n<gateway:util:excludeFromCRD> Mirrors the parentRefs consistency/uniqueness rules from CommonRouteSpec.ParentRefs. Requires distinct, non-empty sectionNames when the same target appears more than once. Namespace is not checked because targetRefs only supports same-namespace targets. </gateway:util:excludeFromCRD>",
+							Description: "TargetRefs identifies an API object to apply the policy to. Note that this config applies to the entire referenced resource by default, but this default may change in the future to provide a more granular application of the policy.\n\nTargetRefs must be _distinct_. This means either that:\n\n* They select different targets. If this is the case, then targetRef\n  entries are distinct. In terms of fields, this means that the\n  multi-part key defined by `group`, `kind`, and `name` must\n  be unique across all targetRef entries in the BackendTLSPolicy.\n* They select different sectionNames in the same target.\n\nWhen more than one BackendTLSPolicy selects the same target and sectionName, implementations MUST determine precedence using the following criteria, continuing on ties:\n\n* The older policy by creation timestamp takes precedence. For\n  example, a policy with a creation timestamp of \"2021-07-15\n  01:02:03\" MUST be given precedence over a policy with a\n  creation timestamp of \"2021-07-15 01:02:04\".\n* The policy appearing first in alphabetical order by {namespace}/{name}.\n  For example, a policy named `foo/bar` is given precedence over a\n  policy named `foo/baz`.\n\nFor any BackendTLSPolicy that does not take precedence, the implementation MUST ensure the `Accepted` Condition is set to `status: False`, with Reason `Conflicted`.\n\nImplementations SHOULD NOT support more than one targetRef at this time. Although the API technically allows for this, the current guidance for conflict resolution and status handling is lacking. Until that can be clarified in a future release, the safest approach is to support a single targetRef.\n\nSupport Levels:\n\n* Extended: Kubernetes Service referenced by backendRefs used on a Route.\n  - HTTPRoute, GRPCRoute, TLSRoute with termination\n  - Filters that needs a backend of type Service, like Mirror and External Authorization\n\n* Implementation-Specific: Implementations MAY use BackendTLSPolicy for:\n  - Services not referenced by any Route (e.g., infrastructure services)\n  - Service mesh workload-to-service communication\n  - Other resource types beyond Service\n\nImplementations SHOULD aim to ensure that BackendTLSPolicy behavior is consistent, even outside of the extended HTTPRoute -(backendRef) -> Service path. They SHOULD clearly document how BackendTLSPolicy is interpreted in these scenarios, including:\n  - Which resources beyond Service are supported\n  - How the policy is discovered and applied\n  - Any implementation-specific semantics or restrictions\n\nNote that this config applies to the entire referenced resource by default, but this default may change in the future to provide a more granular application of the policy.\n\n<gateway:util:excludeFromCRD> Mirrors the parentRefs consistency/uniqueness rules from CommonRouteSpec.ParentRefs. Requires distinct, non-empty sectionNames when the same target appears more than once. Namespace is not checked because targetRefs only supports same-namespace targets. </gateway:util:excludeFromCRD>",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
