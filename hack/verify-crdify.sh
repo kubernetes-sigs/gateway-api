@@ -29,7 +29,6 @@ if ! git rev-parse --verify "${CRDIFY_BASE_REF}" >/dev/null 2>&1; then
   git fetch origin "${CRDIFY_BASE_REF}:${CRDIFY_BASE_REF}"
 fi
 
-failed=false
 error_count=0
 
 for crd_dir in config/crd/standard config/crd/experimental; do
@@ -46,7 +45,6 @@ for crd_dir in config/crd/standard config/crd/experimental; do
     if ! crdify \
       "git://${CRDIFY_BASE_REF}?path=${file}" \
       "file://${SCRIPT_ROOT}/${file}"; then
-      failed=true
       error_count=$((error_count + 1))
     fi
   done
@@ -54,7 +52,7 @@ done
 
 echo
 echo "CRD compatibility check summary:"
-if ${failed}; then
+if [[ ${error_count} -gt 0 ]]; then
   echo "Breaking changes detected in ${error_count} CRD file(s)."
   exit 1
 else
