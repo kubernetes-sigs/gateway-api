@@ -177,7 +177,9 @@ spec:
 The `type` field is a list of one or more values:
 
 - **`Ingress`**: The Gateway accepts traffic from external or cross-cluster
-  clients and routes it to backends. This is the default when `type` is unset.
+  clients and routes it to backends. When `type` is unset or an empty list,
+  implementations MUST treat it as `[Ingress]` and surface that value in
+  the Gateway's status.
   Defaulting to `Ingress` prevents existing Gateways from being accidentally
   configured as open proxies when Backend support is introduced.
   Implementations that already use Gateway for egress will need to explicitly
