@@ -59,6 +59,7 @@ nav:
           - GatewayClass: api-types/gatewayclass.md
           - GRPCRoute: api-types/grpcroute.md
           - HTTPRoute: api-types/httproute.md
+          - Conditions and Reasons: api-types/conditions.md
           - Policy:
               - BackendTLSPolicy: api-types/backendtlspolicy.md
               - BackendTrafficPolicy: api-types/backendtrafficpolicy.md
