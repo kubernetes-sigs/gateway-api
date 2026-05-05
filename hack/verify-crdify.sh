@@ -19,7 +19,7 @@ set -o nounset
 set -o pipefail
 
 readonly CRDIFY_VERSION="v0.5.0"
-SCRIPT_ROOT=$(dirname "${BASH_SOURCE}")/..
+readonly SCRIPT_ROOT=$(dirname "${BASH_SOURCE}")/..
 CRDIFY_BASE_REF=${CRDIFY_BASE_REF:-${PULL_BASE_SHA:-main}}
 
 cd "${SCRIPT_ROOT}"
