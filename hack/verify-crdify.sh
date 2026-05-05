@@ -18,10 +18,12 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
+readonly CRDIFY_VERSION="v0.5.0"
 SCRIPT_ROOT=$(dirname "${BASH_SOURCE}")/..
 CRDIFY_BASE_REF=${CRDIFY_BASE_REF:-${PULL_BASE_SHA:-main}}
 
 cd "${SCRIPT_ROOT}"
+go install "sigs.k8s.io/crdify@${CRDIFY_VERSION}"
 
 if ! git rev-parse --verify "${CRDIFY_BASE_REF}" >/dev/null 2>&1; then
   git fetch origin "${CRDIFY_BASE_REF}:${CRDIFY_BASE_REF}"
