@@ -81,7 +81,7 @@ spec:
                   minLength: 1
                   pattern: ^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                   type: string
-                maxItems: 16
+                maxItems: 1024
                 minItems: 1
                 type: array
                 x-kubernetes-list-type: atomic
@@ -803,7 +803,7 @@ spec:
                   minLength: 1
                   pattern: ^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                   type: string
-                maxItems: 16
+                maxItems: 1024
                 type: array
                 x-kubernetes-list-type: atomic
               parentRefs:
@@ -1489,7 +1489,7 @@ spec:
                   minLength: 1
                   pattern: ^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                   type: string
-                maxItems: 16
+                maxItems: 1024
                 minItems: 1
                 type: array
                 x-kubernetes-list-type: atomic
