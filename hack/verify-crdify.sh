@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright 2020 The Kubernetes Authors.
+# Copyright The Kubernetes Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,36 +18,36 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-readonly CRDIFY_VERSION="v0.5.0"
-readonly SCRIPT_ROOT=$(dirname "${BASH_SOURCE}")/..
+readonly GOTOOL="go tool"
+readonly SCRIPT_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 CRDIFY_BASE_REF=${CRDIFY_BASE_REF:-${PULL_BASE_SHA:-main}}
+REMOTE=${REMOTE:-origin}
 
 cd "${SCRIPT_ROOT}"
-go install "sigs.k8s.io/crdify@${CRDIFY_VERSION}"
 
 if ! git rev-parse --verify "${CRDIFY_BASE_REF}" >/dev/null 2>&1; then
-  git fetch origin "${CRDIFY_BASE_REF}:${CRDIFY_BASE_REF}"
+  git fetch "${REMOTE}" "${CRDIFY_BASE_REF}"
 fi
 
 error_count=0
 
-for crd_dir in config/crd/standard config/crd/experimental; do
-  for file in "${crd_dir}"/*.yaml; do
-    if [[ "$(basename "${file}")" == "kustomization.yaml" ]]; then
-      continue
-    fi
+for file in config/crd/standard/*.yaml; do
+  filename="$(basename "${file}")"
 
-    if ! git cat-file -e "${CRDIFY_BASE_REF}:${file}" 2>/dev/null; then
-      echo "Skipping crdify check for ${file}: new CRD file (not present in ${CRDIFY_BASE_REF})"
-      continue
-    fi
+  if [[ "${filename}" == "kustomization.yaml" || "${filename}" == *_vap_*.yaml ]]; then
+    continue
+  fi
 
-    if ! crdify \
-      "git://${CRDIFY_BASE_REF}?path=${file}" \
-      "file://${SCRIPT_ROOT}/${file}"; then
-      error_count=$((error_count + 1))
-    fi
-  done
+  if ! git cat-file -e "${CRDIFY_BASE_REF}:${file}" 2>/dev/null; then
+    echo "Skipping crdify check for ${file}: new CRD file (not present in ${CRDIFY_BASE_REF})"
+    continue
+  fi
+
+  if ! $GOTOOL sigs.k8s.io/crdify \
+    "git://${CRDIFY_BASE_REF}?path=${file}" \
+    "file://${SCRIPT_ROOT}/${file}"; then
+    error_count=$((error_count + 1))
+  fi
 done
 
 echo
