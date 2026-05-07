@@ -36,8 +36,11 @@ Trigger the [`monthly-release`] GitHub workflow, passing it the
 
 [`monthly-release`]: https://github.com/kubernetes-sigs/gateway-api/actions/workflows/monthly-release.yml
 
-CI handles the rest of the release process, including creating a GitHub
-release and populating it with an automatically-generated changelog.
+CI handles the rest of the release process, including creating a
+**draft** GitHub release which includes an automatically-generated
+changelog and the various release artifacts. **You will need to
+publish** this release after making sure that the correct artifacts
+are attached to it and that the CHANGELOG is what you want.
 
 ### Writing the Release Changelog
 
