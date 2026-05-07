@@ -127,6 +127,7 @@ We use IEEE POSIX ERE (as defined in Chapter 9 of the [The Open Group Base Speci
 * Unescaped square brackets in character classes are undefined (`[[]]`, `[]]`, `[[]`, `[[:alpha:]`, `[[=a=]]`, `[[.ch.]]`).
 * Consecutive quantifiers are undefined (`a**`, `a*?`, `a{1,2}?`).
 * Any locale-specific behavior will assume the [C/POSIX locale](https://pubs.opengroup.org/onlinepubs/7908799/xbd/locale.html) (e.g. character ordering).
+* `\d` matches any digit (`[0-9]`), `\w` matches any word character (`[a-zA-Z0-9_]`), `\W` matches any non-word character `[^\w]`, `\s` any whitespace character (in this context, this is only tabs and spaces).
 
 IEEE POSIX ERE is a good common denominator because
 * The set of supported features is small (e.g. no backreferences within patterns)
@@ -135,7 +136,6 @@ IEEE POSIX ERE is a good common denominator because
 Some notable omissions implied from our construction of Gateway API Regex are:
 * Backreferences (e.g. `\1`, `\2`, etc.) within patterns.
 * Matching flags (e.g. `(?i)` for case-insensitive matching).
-* `\d` for digit, `\w` for word characters, `\s` for whitespace characters, and escaping any character that isn't a special character.
 * Hex encoding of characters (e.g. `\xFF` or `\uFFFF`).
 * Lazy vs non-lazy matching (e.g. `*` vs `*?`).
 * Interval range expressions without starting numbers (`a{,2}`, `a{,}`).
