@@ -6,6 +6,6 @@ status: Provisional
 authors:
   - gkhom
 seeAlso:
- - https://github.com/kubernetes-sigs/kube-agentic-networking/pull/69
- - https://gateway-api.sigs.k8s.io/geps/gep-713/
+  - https://github.com/kubernetes-sigs/kube-agentic-networking/pull/69
+  - https://gateway-api.sigs.k8s.io/geps/gep-713/
 
