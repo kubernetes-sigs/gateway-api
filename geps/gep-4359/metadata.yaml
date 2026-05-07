@@ -10,5 +10,8 @@ references:
   - https://github.com/google/re2
   - https://www.pcre.org/
   - https://docs.rs/regex/latest/regex/
+  - https://regex101.com
+  - https://datatracker.ietf.org/doc/html/rfc9110
+  - https://pubs.opengroup.org/onlinepubs/7908799/xbd/locale.html
 featureNames:
   - Gateway API Regex
