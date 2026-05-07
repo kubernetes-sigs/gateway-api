@@ -3,7 +3,7 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     api-approved.kubernetes.io: https://github.com/kubernetes-sigs/gateway-api/pull/4530
-    gateway.networking.k8s.io/bundle-version: v1.4.1
+    gateway.networking.k8s.io/bundle-version: v0.0.0-dev
     gateway.networking.k8s.io/channel: standard
   name: httproutes.gateway.networking.k8s.io
 spec:
@@ -922,6 +922,10 @@ spec:
                                         Support: Extended for Kubernetes Service
 
                                         Support: Implementation-specific for any other resource
+
+                                        If the backend service requires TLS, use BackendTLSPolicy to tell the
+                                        implementation to supply the TLS details to be used to connect to that
+                                        backend.
                                       properties:
                                         group:
                                           default: ""
@@ -2172,6 +2176,10 @@ spec:
                                   Support: Extended for Kubernetes Service
 
                                   Support: Implementation-specific for any other resource
+
+                                  If the backend service requires TLS, use BackendTLSPolicy to tell the
+                                  implementation to supply the TLS details to be used to connect to that
+                                  backend.
                                 properties:
                                   group:
                                     default: ""
@@ -4364,6 +4372,10 @@ spec:
                                         Support: Extended for Kubernetes Service
 
                                         Support: Implementation-specific for any other resource
+
+                                        If the backend service requires TLS, use BackendTLSPolicy to tell the
+                                        implementation to supply the TLS details to be used to connect to that
+                                        backend.
                                       properties:
                                         group:
                                           default: ""
@@ -5614,6 +5626,10 @@ spec:
                                   Support: Extended for Kubernetes Service
 
                                   Support: Implementation-specific for any other resource
+
+                                  If the backend service requires TLS, use BackendTLSPolicy to tell the
+                                  implementation to supply the TLS details to be used to connect to that
+                                  backend.
                                 properties:
                                   group:
                                     default: ""
@@ -6901,9 +6917,3 @@ spec:
     storage: false
     subresources:
       status: {}
-status:
-  acceptedNames:
-    kind: ""
-    plural: ""
-  conditions: null
-  storedVersions: null

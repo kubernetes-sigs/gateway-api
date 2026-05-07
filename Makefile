@@ -19,7 +19,7 @@
 export GO111MODULE=on
 
 # The registry to push container images to.
-export REGISTRY ?= gcr.io/k8s-staging-gateway-api
+export REGISTRY ?= us-central1-docker.pkg.dev/k8s-staging-images/gateway-api
 
 # These are overridden by cloudbuild.yaml when run by Prow.
 
@@ -213,7 +213,7 @@ verify-docs: build-docs
 .PHONY: build-docs-netlify
 build-docs-netlify: update-geps api-ref-docs wizard-wasm
 	pip install -r hack/mkdocs/image/requirements.txt
-	python -m mkdocs build
+	PYTHONPATH=hack python -m mkdocs build
 
 .PHONY: live-docs
 live-docs: update-geps

@@ -22,7 +22,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
-	"sigs.k8s.io/gateway-api/apis/v1beta1"
+	v1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	confsuite "sigs.k8s.io/gateway-api/conformance/utils/suite"
 	"sigs.k8s.io/gateway-api/pkg/features"
@@ -49,9 +49,9 @@ var TLSRouteInvalidReferenceGrant = confsuite.ConformanceTest{
 
 		t.Run("TLSRoute with BackendRef in another namespace and no ReferenceGrant covering the Service has a ResolvedRefs Condition with status False and Reason RefNotPermitted", func(t *testing.T) {
 			resolvedRefsCond := metav1.Condition{
-				Type:   string(v1beta1.RouteConditionResolvedRefs),
+				Type:   string(v1.RouteConditionResolvedRefs),
 				Status: metav1.ConditionFalse,
-				Reason: string(v1beta1.RouteReasonRefNotPermitted),
+				Reason: string(v1.RouteReasonRefNotPermitted),
 			}
 
 			kubernetes.TLSRouteMustHaveCondition(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN, resolvedRefsCond)

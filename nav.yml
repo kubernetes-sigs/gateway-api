@@ -20,12 +20,10 @@ nav:
           - List: implementations.md
           - Matching Wizard: implementations/wizard.md
           - Comparisons:
-            #   - v1.5: implementations/v1.5.md
+              - v1.5: implementations/v1.5.md
               - v1.4: implementations/v1.4.md
               - v1.3: implementations/v1.3.md
               - v1.2: implementations/v1.2.md
-              - v1.1: implementations/v1.1.md
-              - v1.0: implementations/v1.0.md
       - FAQ: faq.md
       - Glossary: concepts/glossary.md
   - Guides:

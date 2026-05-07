@@ -24,7 +24,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
-	"sigs.k8s.io/gateway-api/apis/v1beta1"
+	v1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	confsuite "sigs.k8s.io/gateway-api/conformance/utils/suite"
@@ -64,7 +64,7 @@ var HTTPRouteReferenceGrant = confsuite.ConformanceTest{
 
 		ctx, cancel := context.WithTimeout(context.Background(), suite.TimeoutConfig.DeleteTimeout)
 		defer cancel()
-		rg := v1beta1.ReferenceGrant{
+		rg := v1.ReferenceGrant{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "reference-grant",
 				Namespace: confsuite.WebBackendNamespace,

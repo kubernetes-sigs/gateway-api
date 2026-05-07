@@ -38,7 +38,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
-	"sigs.k8s.io/gateway-api/apis/v1beta1"
 	xmeshv1alpha1 "sigs.k8s.io/gateway-api/apisx/v1alpha1"
 	confv1 "sigs.k8s.io/gateway-api/conformance/apis/v1"
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
@@ -70,6 +69,7 @@ type ConformanceTestSuite struct {
 	ControllerName           string
 	Debug                    bool
 	Cleanup                  bool
+	CleanupTestResources     bool
 	BaseManifests            string
 	MeshManifests            string
 	Applier                  kubernetes.Applier
@@ -80,8 +80,8 @@ type ConformanceTestSuite struct {
 	RunTest                  string
 	Hook                     func(t *testing.T, test ConformanceTest, suite *ConformanceTestSuite)
 	ManifestFS               []fs.FS
-	UsableNetworkAddresses   []v1beta1.GatewaySpecAddress
-	UnusableNetworkAddresses []v1beta1.GatewaySpecAddress
+	UsableNetworkAddresses   []gatewayv1.GatewaySpecAddress
+	UnusableNetworkAddresses []gatewayv1.GatewaySpecAddress
 
 	// If SupportedFeatures are automatically determined from GWC Status.
 	// This will be required to report in future iterations as the passing
@@ -153,7 +153,10 @@ type ConformanceOptions struct {
 
 	// CleanupBaseResources indicates whether or not the base test
 	// resources such as Gateways should be cleaned up after the run.
-	CleanupBaseResources       bool
+	CleanupBaseResources bool
+	// CleanupTestResources indicates whether or not test-specific manifests
+	// should be cleaned up after each test.
+	CleanupTestResources       bool
 	SupportedFeatures          FeaturesSet
 	ExemptFeatures             FeaturesSet
 	EnableAllSupportedFeatures bool
@@ -171,12 +174,12 @@ type ConformanceOptions struct {
 
 	// UsableNetworkAddresses is an optional pool of usable addresses for
 	// Gateways for tests which need to test manual address assignments.
-	UsableNetworkAddresses []v1beta1.GatewaySpecAddress
+	UsableNetworkAddresses []gatewayv1.GatewaySpecAddress
 
 	// UnusableNetworkAddresses is an optional pool of unusable addresses for
 	// Gateways for tests which need to test failures with manual Gateway
 	// address assignment.
-	UnusableNetworkAddresses []v1beta1.GatewaySpecAddress
+	UnusableNetworkAddresses []gatewayv1.GatewaySpecAddress
 
 	Mode                string
 	AllowCRDsMismatch   bool
@@ -288,17 +291,18 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 	}
 
 	suite := &ConformanceTestSuite{
-		Client:           options.Client,
-		ClientOptions:    options.ClientOptions,
-		Clientset:        options.Clientset,
-		RestConfig:       options.RestConfig,
-		RoundTripper:     roundTripper,
-		GRPCClient:       grpcClient,
-		GatewayClassName: options.GatewayClassName,
-		Debug:            options.Debug,
-		Cleanup:          options.CleanupBaseResources,
-		BaseManifests:    options.BaseManifests,
-		MeshManifests:    options.MeshManifests,
+		Client:               options.Client,
+		ClientOptions:        options.ClientOptions,
+		Clientset:            options.Clientset,
+		RestConfig:           options.RestConfig,
+		RoundTripper:         roundTripper,
+		GRPCClient:           grpcClient,
+		GatewayClassName:     options.GatewayClassName,
+		Debug:                options.Debug,
+		Cleanup:              options.CleanupBaseResources,
+		CleanupTestResources: options.CleanupTestResources,
+		BaseManifests:        options.BaseManifests,
+		MeshManifests:        options.MeshManifests,
 		Applier: kubernetes.Applier{
 			NamespaceLabels:      options.NamespaceLabels,
 			NamespaceAnnotations: options.NamespaceAnnotations,

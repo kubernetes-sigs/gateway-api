@@ -25,7 +25,6 @@ import (
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/gateway-api/apis/v1alpha2"
 	"sigs.k8s.io/gateway-api/apis/v1alpha3"
-	"sigs.k8s.io/gateway-api/apis/v1beta1"
 	xv1alpha1 "sigs.k8s.io/gateway-api/apisx/v1alpha1"
 	confv1 "sigs.k8s.io/gateway-api/conformance/apis/v1"
 	"sigs.k8s.io/gateway-api/conformance/tests"
@@ -65,7 +64,6 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 
 	require.NoError(t, v1alpha3.Install(client.Scheme()))
 	require.NoError(t, v1alpha2.Install(client.Scheme()))
-	require.NoError(t, v1beta1.Install(client.Scheme()))
 	require.NoError(t, xv1alpha1.Install(client.Scheme()))
 	require.NoError(t, v1.Install(client.Scheme()))
 	require.NoError(t, apiextensionsv1.AddToScheme(client.Scheme()))
@@ -84,7 +82,7 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 		*flags.ImplementationVersion,
 		*flags.ImplementationContact,
 	)
-	var usable, unusable []v1beta1.GatewaySpecAddress
+	var usable, unusable []v1.GatewaySpecAddress
 	if v := *flags.UsableAddress; v != "" {
 		usable = append(usable, parseAddress(v))
 	}
@@ -95,6 +93,7 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 	return suite.ConformanceOptions{
 		AllowCRDsMismatch:          *flags.AllowCRDsMismatch,
 		CleanupBaseResources:       *flags.CleanupBaseResources,
+		CleanupTestResources:       *flags.CleanupTestResources,
 		Client:                     client,
 		ClientOptions:              clientOptions,
 		Clientset:                  clientset,
@@ -122,16 +121,16 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 	}
 }
 
-func parseAddress(v string) v1beta1.GatewaySpecAddress {
+func parseAddress(v string) v1.GatewaySpecAddress {
 	_, err := netip.ParseAddr(v)
 	if err == nil {
-		return v1beta1.GatewaySpecAddress{
-			Type:  ptr.To(v1beta1.IPAddressType),
+		return v1.GatewaySpecAddress{
+			Type:  ptr.To(v1.IPAddressType),
 			Value: v,
 		}
 	}
-	return v1beta1.GatewaySpecAddress{
-		Type:  ptr.To(v1beta1.HostnameAddressType),
+	return v1.GatewaySpecAddress{
+		Type:  ptr.To(v1.HostnameAddressType),
 		Value: v,
 	}
 }
@@ -173,7 +172,8 @@ func RunConformanceWithOptions(t *testing.T, opts suite.ConformanceOptions) {
 
 func logOptions(t *testing.T, opts suite.ConformanceOptions) {
 	t.Logf("  GatewayClass: %s", opts.GatewayClassName)
-	t.Logf("  Cleanup Resources: %t", opts.CleanupBaseResources)
+	t.Logf("  Cleanup Base Resources: %t", opts.CleanupBaseResources)
+	t.Logf("  Cleanup Test Resources: %t", opts.CleanupTestResources)
 	t.Logf("  Debug: %t", opts.Debug)
 	t.Logf("  Enable All Features: %t", opts.EnableAllSupportedFeatures)
 	t.Logf("  Supported Features: %v", opts.SupportedFeatures.UnsortedList())

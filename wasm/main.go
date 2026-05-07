@@ -234,6 +234,7 @@ func onDataLoaded(jsonStr string) {
 
 	// Multi-version: keys like v1.4.0, v1.3.0, ...
 	allVersionsData = make(map[string][]implementation)
+	dropdownKeyMap := make(map[string]struct{})
 	var versionKeys []string
 	for k, v := range raw {
 		if k == "featureDefinitions" {
@@ -245,6 +246,9 @@ func onDataLoaded(jsonStr string) {
 		}
 		allVersionsData[k] = list
 		versionKeys = append(versionKeys, k)
+
+		// ignore patch version for drop-down menu
+		dropdownKeyMap[strings.Join(append(strings.Split(k, ".")[0:2], "0"), ".")] = struct{}{}
 	}
 	if len(versionKeys) == 0 {
 		impls = nil
@@ -256,11 +260,17 @@ func onDataLoaded(jsonStr string) {
 		return versionCompare(versionKeys[j], versionKeys[i]) < 0
 	})
 	allVersionKeys = versionKeys
-	dropdownKeys := versionKeys
+	dropdownKeys := make([]string, 0, len(dropdownKeyMap))
+	for k := range dropdownKeyMap {
+		dropdownKeys = append(dropdownKeys, k)
+	}
+	sort.Slice(dropdownKeys, func(i, j int) bool {
+		return versionCompare(dropdownKeys[j], dropdownKeys[i]) < 0
+	})
 	if len(dropdownKeys) > maxVersionsInDropdown {
 		dropdownKeys = dropdownKeys[:maxVersionsInDropdown]
 	}
-	currentVersion = versionKeys[0]
+	currentVersion = dropdownKeys[0]
 	impls = buildImplsForMinVersion(currentVersion)
 
 	versionRow.Get("style").Set("display", "block")
@@ -497,7 +507,7 @@ func renderTable(tableID string, section string, labelPrefix string, rows []feat
 	var html strings.Builder
 	for _, f := range rows {
 		if f.ID == "__subhead__" {
-			html.WriteString(fmt.Sprintf(`<tr class="feature-subhead"><th scope="col">%s</th><th scope="col">Requirement</th></tr>`, escapeHTML(f.Label)))
+			fmt.Fprintf(&html, `<tr class="feature-subhead"><th scope="col">%s</th><th scope="col">Requirement</th></tr>`, escapeHTML(f.Label))
 			continue
 		}
 		label := f.Label
@@ -513,9 +523,9 @@ func renderTable(tableID string, section string, labelPrefix string, rows []feat
 		}
 		reqCell := `<label><input type="checkbox" name="` + name + `" value="must" /> Must have</label>
 <label><input type="checkbox" name="` + name + `" value="good" /> Nice to have</label>`
-		html.WriteString(fmt.Sprintf(`<tr><td class="%s"%s>%s</td><td>
+		fmt.Fprintf(&html, `<tr><td class="%s"%s>%s</td><td>
 %s
-</td></tr>`, cellClass, dataDesc, escapeHTML(label), reqCell))
+</td></tr>`, cellClass, dataDesc, escapeHTML(label), reqCell)
 	}
 	tbody.Set("innerHTML", html.String())
 }
@@ -569,6 +579,47 @@ func getSelections() (must, good []selection) {
 	return must, goodFiltered
 }
 
+func gtagEvent(eventName string, params map[string]interface{}) {
+	global := js.Global()
+
+	paramsJS := global.Get("Object").New()
+	for k, v := range params {
+		paramsJS.Set(k, js.ValueOf(v))
+	}
+
+	gtag := global.Get("gtag")
+	if gtag.Truthy() {
+		global.Call("gtag", "event", eventName, paramsJS)
+		return
+	}
+
+	parent := global.Get("parent")
+	if parent.Truthy() && !parent.Equal(global) {
+		if pGtag := parent.Get("gtag"); pGtag.Truthy() {
+			parent.Call("gtag", "event", eventName, paramsJS)
+			return
+		}
+	}
+}
+
+func trackWizardSelections(must, good []selection) {
+	track := func(selections []selection, action string) {
+		if len(selections) == 0 {
+			return
+		}
+		for _, sel := range selections {
+			gtagEvent("wizard_feature_selection", map[string]interface{}{
+				"resource_name": sel.Section,
+				"feature_name":  sel.ID,
+				"version":       currentVersion,
+				"action":        action,
+			})
+		}
+	}
+	track(must, "must_have")
+	track(good, "nice_to_have")
+}
+
 func recommend() {
 	resultsContent := doc.Call("getElementById", "results-content")
 	resultsDiv := doc.Call("getElementById", "results")
@@ -593,6 +644,7 @@ func recommend() {
 		setStatus(statusEl, 0)
 		return
 	}
+	trackWizardSelections(must, good)
 
 	type scored struct {
 		impl       implementation
@@ -750,14 +802,17 @@ func recommend() {
 		if missingStr == "" {
 			missingStr = "—"
 		}
-		html.WriteString(fmt.Sprintf("<tr><td>%s</td><td><a href=\"%s\" target=\"_blank\" rel=\"noopener\">%s</a> %s</td><td>%s</td><td>%d/%d</td><td>%d/%d</td><td class=\"missing\">%s</td></tr>",
+		fmt.Fprintf(&html, "<tr><td>%s</td><td><a href=\"%s\" target=\"_blank\" rel=\"noopener\">%s</a> %s</td><td>%s</td><td>%d/%d</td><td>%d/%d</td><td class=\"missing\">%s</td></tr>",
 			escapeHTML(c.impl.Organization), escapeHTML(c.impl.URL), escapeHTML(c.impl.Project), escapeHTML(c.impl.Version),
-			escapeHTML(conformance), c.mustCount, c.mustTotal, c.goodCount, c.goodTotal, escapeHTML(missingStr)))
+			escapeHTML(conformance), c.mustCount, c.mustTotal, c.goodCount, c.goodTotal, escapeHTML(missingStr))
 	}
 	html.WriteString("</tbody></table>")
 	resultsContent.Set("innerHTML", html.String())
 	resultsDiv.Get("classList").Call("add", "visible")
-	resultsDiv.Call("scrollIntoView", map[string]interface{}{"behavior": "smooth", "block": "start"})
+	scrollOpts := js.Global().Get("Object").New()
+	scrollOpts.Set("behavior", "smooth")
+	scrollOpts.Set("block", "start")
+	resultsDiv.Call("scrollIntoView", scrollOpts)
 	setStatus(statusEl, len(scoredList))
 	notifyResize()
 }

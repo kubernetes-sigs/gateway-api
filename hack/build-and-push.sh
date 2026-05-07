@@ -23,8 +23,10 @@ set -o pipefail
 if [[ -z "${VERIFY-}" ]];
 then
   export DOCKER_PUSH_FLAG="--push"
+  export BUILDX_PLATFORMS="linux/amd64,linux/arm64"
 else
   export DOCKER_PUSH_FLAG=""
+  export BUILDX_PLATFORMS="linux/amd64"
 fi
 
 if [[ -z "${GIT_TAG-}" ]];
@@ -71,8 +73,6 @@ then
     BINARY_TAG="${BASE_REF}"
 fi
 
-# Support multi-arch image build and push.
-BUILDX_PLATFORMS="linux/amd64,linux/arm64"
 
 echo "Building and pushing echo-advanced image (from Istio) ...${BUILDX_PLATFORMS}"
 

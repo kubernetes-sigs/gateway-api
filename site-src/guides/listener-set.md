@@ -125,9 +125,7 @@ As with all the other conflict resolution rules in Gateway API, this is intended
 
 ## Examples
 
-The following example shows a `Gateway` with an HTTP listener and two child HTTPS `ListenerSets`
-with unique hostnames and certificates. Only `ListenerSets` in namespaces that have the `belongs: shared-gateway`
-label will be accepted :
+The following example shows a `Gateway` with an HTTP listener and two child HTTPS `ListenerSets` with unique hostnames and certificates. Only `ListenerSets` in namespaces that have the `belongs-to: shared-gateway` label will be accepted:
 
 ```yaml
 {% include 'standard/listenerset/listenerset.yaml' %}

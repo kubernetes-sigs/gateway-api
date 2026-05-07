@@ -2482,11 +2482,6 @@ func (in *SessionPersistence) DeepCopyInto(out *SessionPersistence) {
 		*out = new(Duration)
 		**out = **in
 	}
-	if in.IdleTimeout != nil {
-		in, out := &in.IdleTimeout, &out.IdleTimeout
-		*out = new(Duration)
-		**out = **in
-	}
 	if in.Type != nil {
 		in, out := &in.Type, &out.Type
 		*out = new(SessionPersistenceType)

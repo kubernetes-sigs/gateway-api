@@ -87,11 +87,18 @@ flowchart LR
     service --> pod1 & pod2
 ```
 
+!!! note "Union feature"
+
+    While the diagram above shows an HTTPRoute, BackendTLSPolicy is a
+    [union feature](../guides/implementers.md#union-feature-conformance) and
+    works with any route type that forwards traffic to backends, including
+    GRPCRoute and TLSRoute (when in Terminate mode).
+
 ### Targeting backends
 
 A BackendTLSPolicy targets a backend Pod (or set of Pods) via one or more TargetRefs to a Service.  This TargetRef is a
 required object reference that specifies a Service by its Name, Kind (Service), and optionally its Namespace and Group.
-TargetRefs identify the Service(s) for which your HTTPRoute requires TLS.
+TargetRefs identify the Service(s) for which your Route requires TLS.
 
 !!! info "Restrictions"
 

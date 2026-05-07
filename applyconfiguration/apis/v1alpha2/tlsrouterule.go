@@ -39,6 +39,9 @@ type TLSRouteRuleApplyConfiguration struct {
 	// weight; if an invalid backend is requested to have 80% of requests, then
 	// 80% of requests must be rejected instead.
 	//
+	// When a TLSRoute is attached to a listener in Terminate mode, a BackendTLSPolicy
+	// can be used to enable re-encryption of the traffic to the backends.
+	//
 	// Support: Core for Kubernetes Service
 	//
 	// Support: Extended for Kubernetes ServiceImport
@@ -46,6 +49,8 @@ type TLSRouteRuleApplyConfiguration struct {
 	// Support: Implementation-specific for any other resource
 	//
 	// Support for weight: Extended
+	//
+	// Support for BackendTLSPolicy: Extended
 	BackendRefs []apisv1.BackendRefApplyConfiguration `json:"backendRefs,omitempty"`
 }
 

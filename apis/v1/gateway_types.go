@@ -32,6 +32,8 @@ import (
 
 // Gateway represents an instance of a service-traffic handling infrastructure
 // by binding Listeners to a set of IP addresses.
+// A Gateway name SHOULD be compliant with RFC 1035, consisting of a maximum of 63 lower case alphanumeric
+// characters or hyphens ('-'), and MUST start and end with an alphanumeric character.
 type Gateway struct {
 	metav1.TypeMeta `json:",inline"`
 	// +optional
@@ -778,7 +780,7 @@ type FrontendTLSValidation struct {
 	//
 	// +required
 	// +listType=atomic
-	// +kubebuilder:validation:MaxItems=8
+	// +kubebuilder:validation:MaxItems=16
 	// +kubebuilder:validation:MinItems=1
 	CACertificateRefs []ObjectReference `json:"caCertificateRefs"`
 
@@ -1071,7 +1073,7 @@ type GatewayInfrastructure struct {
 	// Support: Extended
 	//
 	// +optional
-	// +kubebuilder:validation:MaxProperties=8
+	// +kubebuilder:validation:MaxProperties=16
 	// +kubebuilder:validation:XValidation:message="Annotation keys must be in the form of an optional DNS subdomain prefix followed by a required name segment of up to 63 characters.",rule="self.all(key, key.matches(r\"\"\"^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?([A-Za-z0-9][-A-Za-z0-9_.]{0,61})?[A-Za-z0-9]$\"\"\"))"
 	// +kubebuilder:validation:XValidation:message="If specified, the annotation key's prefix must be a DNS subdomain not longer than 253 characters in total.",rule="self.all(key, key.split(\"/\")[0].size() < 253)"
 	Annotations map[AnnotationKey]AnnotationValue `json:"annotations,omitempty"`

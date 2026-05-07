@@ -69,7 +69,7 @@ In the mutual frontend TLS Gateway needs to verify client certificates with conf
 
 #### Backend configuration
 
-In the Backend connection Gateway acts as a client. The nature of the connection (HTTP or HTTPS) is configured on the Service using BackendTLSPolicy. If BackendTLSPolicy is defined for a Service, the Gateway must establish an HTTPS connection with the backend. During the TLS handshake, the backend presents a Server certificate. The Gateway validates this certificate against a CA certificate (and optionally SANs) configured by BackendTLSPolicy.
+In the Backend connection Gateway acts as a client. The nature of the connection (encrypted or not-encrypted) is configured on the Service using BackendTLSPolicy. If BackendTLSPolicy is defined for a Service, the Gateway must establish a TLS connection with the backend. During the TLS handshake, the backend presents a Server certificate. The Gateway validates this certificate against a CA certificate (and optionally SANs) configured by BackendTLSPolicy.
 For mutual backend TLS, the Gateway's identity must be configured. This identity, a client certificate set on the Gateway object, will be presented by the Gateway. The Gateway uses the same client certificate for all backend connections originating mutual TLS.
 
 

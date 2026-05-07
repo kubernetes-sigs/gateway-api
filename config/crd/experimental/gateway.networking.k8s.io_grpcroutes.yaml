@@ -3,7 +3,7 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     api-approved.kubernetes.io: https://github.com/kubernetes-sigs/gateway-api/pull/4530
-    gateway.networking.k8s.io/bundle-version: v1.4.1
+    gateway.networking.k8s.io/bundle-version: v0.0.0-dev
     gateway.networking.k8s.io/channel: experimental
   name: grpcroutes.gateway.networking.k8s.io
 spec:
@@ -680,6 +680,10 @@ spec:
                                         Support: Extended for Kubernetes Service
 
                                         Support: Implementation-specific for any other resource
+
+                                        If the backend service requires TLS, use BackendTLSPolicy to tell the
+                                        implementation to supply the TLS details to be used to connect to that
+                                        backend.
                                       properties:
                                         group:
                                           default: ""
@@ -1347,6 +1351,10 @@ spec:
                                   Support: Extended for Kubernetes Service
 
                                   Support: Implementation-specific for any other resource
+
+                                  If the backend service requires TLS, use BackendTLSPolicy to tell the
+                                  implementation to supply the TLS details to be used to connect to that
+                                  backend.
                                 properties:
                                   group:
                                     default: ""
@@ -1903,15 +1911,6 @@ spec:
                               - Session
                               type: string
                           type: object
-                        idleTimeout:
-                          description: |-
-                            IdleTimeout defines the idle timeout of the persistent session.
-                            Once the session has been idle for more than the specified
-                            IdleTimeout duration, the session becomes invalid.
-
-                            Support: Extended
-                          pattern: ^([0-9]{1,5}(h|m|s|ms)){1,4}$
-                          type: string
                         sessionName:
                           description: |-
                             SessionName defines the name of the persistent session token
@@ -2271,9 +2270,3 @@ spec:
     storage: true
     subresources:
       status: {}
-status:
-  acceptedNames:
-    kind: ""
-    plural: ""
-  conditions: null
-  storedVersions: null

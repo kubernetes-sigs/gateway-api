@@ -35,7 +35,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/yaml"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"sigs.k8s.io/gateway-api/apis/v1beta1"
+	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
 	"sigs.k8s.io/gateway-api/conformance/utils/tlog"
 )
@@ -61,11 +61,11 @@ type Applier struct {
 
 	// UsableNetworkAddresses is a list of addresses that are expected to be
 	// supported AND usable for Gateways in the underlying implementation.
-	UsableNetworkAddresses []v1beta1.GatewaySpecAddress
+	UsableNetworkAddresses []gatewayv1.GatewaySpecAddress
 
 	// UnusableNetworkAddresses is a list of addresses that are expected to be
 	// supported, but not usable for Gateways in the underlying implementation.
-	UnusableNetworkAddresses []v1beta1.GatewaySpecAddress
+	UnusableNetworkAddresses []gatewayv1.GatewaySpecAddress
 }
 
 // prepareGateway adjusts the gatewayClassName.
@@ -83,7 +83,7 @@ func (a Applier) prepareGateway(t *testing.T, uObj *unstructured.Unstructured) {
 	rawSpecMap, ok := rawSpec.(map[string]interface{})
 	require.True(t, ok, "expected gw spec received %T", rawSpec)
 
-	gwspec := &v1beta1.GatewaySpec{}
+	gwspec := &gatewayv1.GatewaySpec{}
 	require.NoError(t, runtime.DefaultUnstructuredConverter.FromUnstructured(rawSpecMap, gwspec))
 
 	// for tests which have placeholders for static gateway addresses we will
@@ -108,7 +108,7 @@ func (a Applier) prepareGateway(t *testing.T, uObj *unstructured.Unstructured) {
 		// Note: I would really love to find a better way to do this kind of
 		// thing in the future.
 		var overlayUsable, overlayUnusable bool
-		var specialAddrs []v1beta1.GatewaySpecAddress
+		var specialAddrs []gatewayv1.GatewaySpecAddress
 		for _, addr := range gwspec.Addresses {
 			switch addr.Value {
 			case "PLACEHOLDER_USABLE_ADDRS":
@@ -360,9 +360,9 @@ func getContentsFromPathOrURL(manifestFS []fs.FS, location string, timeoutConfig
 // convertGatewayAddrsToPrimitives converts a slice of Gateway addresses
 // to a slice of primitive types and then returns them as a []interface{} so that
 // they can be applied back to an unstructured Gateway.
-func convertGatewayAddrsToPrimitives(gwaddrs []v1beta1.GatewaySpecAddress) (raw []interface{}) {
+func convertGatewayAddrsToPrimitives(gwaddrs []gatewayv1.GatewaySpecAddress) (raw []interface{}) {
 	for _, addr := range gwaddrs {
-		addrType := string(v1beta1.IPAddressType)
+		addrType := string(gatewayv1.IPAddressType)
 		if addr.Type != nil {
 			addrType = string(*addr.Type)
 		}

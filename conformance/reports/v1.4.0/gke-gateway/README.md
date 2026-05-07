@@ -4,7 +4,7 @@
 
 |API channel|Implementation version|Mode|Report|
 |-----------|----------------------|----|------|
-|standard|1.34.1-gke.1829001|gke-l7-regional-external-managed|[v1.34.1 rxlb report](./standard-1.43.1-rxlb-report.yaml)|
+|standard|1.34.4-gke.1047000|gke-l7-regional-external-managed|[v1.34.4 rxlb report](./standard-1.34.4-rxlb-report.yaml)|
 
 ## Reproduce
 
@@ -27,9 +27,8 @@ go test ./conformance -run TestConformance -v -timeout=3h -args \
     --organization=GKE \
     --project=gke-gateway \
     --url=https://cloud.google.com/kubernetes-engine/docs/concepts/gateway-api \
-    --version=1.34.1-gke.1829001 \
+    --version=1.34.4-gke.1047000 \
     --contact=gke-gateway-dev@google.com \
-    --skip-tests=HTTPRouteHostnameIntersection \
     --supported-features=Gateway,HTTPRoute,GatewayPort8080,HTTPRouteHostRewrite,HTTPRoutePathRedirect,HTTPRouteRequestMirror,HTTPRouteRequestPercentageMirror,HTTPRouteResponseHeaderModification,HTTPRouteSchemeRedirect \
     --report-output="/path/to/report"
 ```

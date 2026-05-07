@@ -19,4 +19,5 @@ extendedBy:
   - number: 4152
     name: Extending TLS Validation in BackendTLSPolicy
 changelog:
-  - 2025/Jan/02 (rikatz) -  Add clarification about Implementation-specific usage of a BackendTLSPolicy for non-Gateway API resources regardless of whether it is referenced by a Route resource.
+  - 2026/Jan/02 (rikatz) -  Add clarification about Implementation-specific usage of a BackendTLSPolicy for non-Gateway API resources regardless of whether it is referenced by a Route resource.
+  - 2026/Apr/12 (rikatz) - Clarify that BackendTLSPolicy is a union feature and can be combined with other features.

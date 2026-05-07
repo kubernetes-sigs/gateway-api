@@ -21,7 +21,7 @@ import (
 
 	"k8s.io/apimachinery/pkg/types"
 
-	"sigs.k8s.io/gateway-api/apis/v1beta1"
+	v1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	confsuite "sigs.k8s.io/gateway-api/conformance/utils/suite"
@@ -41,7 +41,7 @@ var HTTPRouteSimpleSameNamespace = confsuite.ConformanceTest{
 	},
 	Manifests: []string{"tests/httproute-simple-same-namespace.yaml"},
 	Test: func(t *testing.T, suite *confsuite.ConformanceTestSuite) {
-		ns := v1beta1.Namespace(confsuite.InfrastructureNamespace)
+		ns := v1.Namespace(confsuite.InfrastructureNamespace)
 		routeNN := types.NamespacedName{Name: confsuite.InfrastructureGatewayName, Namespace: string(ns)}
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: string(ns)}
 		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)

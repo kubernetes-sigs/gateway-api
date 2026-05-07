@@ -1,0 +1,220 @@
+# Copyright 2025 The Kubernetes Authors.
+
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+
+#     http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import json
+import shutil
+import sys
+import unittest
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parents[2]))
+
+import mkdocs_linking as linking
+from mkdocs_linking import prepare_docs
+import mkdocs_utils
+
+
+class TestYAMLFrontmatterEdgeCases(unittest.TestCase):
+    """Tests focused on YAML frontmatter parsing edge cases."""
+
+    def setUp(self) -> None:
+        """Set up test environment."""
+        self.test_dir = Path("./temp_test_yaml")
+        if self.test_dir.exists():
+            shutil.rmtree(self.test_dir)
+
+        self.original_docs_dir = mkdocs_utils.DOCS_DIR
+        self.original_redirect_file = mkdocs_utils.PAGE_ID_MAP_FILE
+
+        mkdocs_utils.DOCS_DIR = self.test_dir / "docs"
+        mkdocs_utils.PAGE_ID_MAP_FILE = self.test_dir / "page_id_map.json"
+        # Also patch linking for any direct references
+        linking.DOCS_DIR = mkdocs_utils.DOCS_DIR
+        linking.PAGE_ID_MAP_FILE = mkdocs_utils.PAGE_ID_MAP_FILE
+        mkdocs_utils.DOCS_DIR.mkdir(parents=True, exist_ok=True)
+
+    def tearDown(self) -> None:
+        """Clean up test environment."""
+        mkdocs_utils.DOCS_DIR = self.original_docs_dir
+        mkdocs_utils.PAGE_ID_MAP_FILE = self.original_redirect_file
+        linking.DOCS_DIR = self.original_docs_dir
+        linking.PAGE_ID_MAP_FILE = self.original_redirect_file
+        if self.test_dir.exists():
+            shutil.rmtree(self.test_dir)
+
+    def test_malformed_yaml_frontmatter(self) -> None:
+        """Test handling of various malformed YAML frontmatter."""
+        malformed_files = {
+            "unclosed-quotes.md": """---
+title: "This quote is never closed
+id: broken-yaml
+---
+# Content""",
+            "invalid-structure.md": """---
+title: Valid Title
+invalid-yaml: [unclosed list
+id: another-broken
+---
+# Content""",
+            "wrong-delimiters.md": """+++
+title: Hugo-style frontmatter
+id: wrong-format
++++
+# Content""",
+            "no-end-delimiter.md": """---
+title: Missing end delimiter
+id: incomplete
+# This should be treated as content""",
+        }
+
+        for filename, content in malformed_files.items():
+            (linking.DOCS_DIR / filename).write_text(content)
+
+        # Should handle malformed YAML gracefully
+        prepare_docs()
+
+        # Check that redirect map was created (files with valid structure should work)
+        self.assertTrue(linking.PAGE_ID_MAP_FILE.exists())
+        redirect_map = json.loads(linking.PAGE_ID_MAP_FILE.read_text())
+
+        # Files with malformed YAML should get auto-generated IDs or extracted IDs
+        self.assertIn("broken-yaml", redirect_map)  # From unclosed-quotes.md
+        self.assertIn("another-broken", redirect_map)  # From invalid-structure.md
+        self.assertIn("wrong-delimiters", redirect_map) # Hugo-style is still ignored (filename ID)
+        self.assertIn("incomplete", redirect_map) # Extracting from unclosed block now works!
+        self.assertEqual(redirect_map["incomplete"], "no-end-delimiter.md")
+
+    def test_complex_yaml_structures(self) -> None:
+        """Test handling of complex YAML structures in frontmatter."""
+        complex_content = """---
+title: "Complex YAML Test"
+id: complex-yaml
+tags:
+  - testing
+  - yaml
+  - complex
+metadata:
+  author: 
+    name: "John Doe"
+    email: "john@example.com"
+  created: 2023-01-01
+  updated: 2023-12-31
+  nested:
+    deeply:
+      very: "deep value"
+categories: ["cat1", "cat2", "cat3"]
+boolean_value: true
+null_value: null
+number_value: 42
+float_value: 3.14
+multiline: |
+  This is a multiline
+  string that spans
+  multiple lines
+---
+# Complex YAML Test"""
+
+        (linking.DOCS_DIR / "complex.md").write_text(complex_content)
+        prepare_docs()
+
+        # Should preserve all the complex YAML structure
+        updated_content = (linking.DOCS_DIR / "complex.md").read_text()
+
+        # Verify the ID was preserved and complex structure remains
+        self.assertIn("id: complex-yaml", updated_content)
+        self.assertIn("deeply:", updated_content)
+        self.assertIn("multiline: |", updated_content)
+
+        # Verify redirect map was created correctly
+        redirect_map = json.loads(linking.PAGE_ID_MAP_FILE.read_text())
+        self.assertEqual(redirect_map["complex-yaml"], "complex.md")
+
+    def test_unicode_in_yaml_frontmatter(self) -> None:
+        """Test handling of Unicode characters in YAML frontmatter."""
+        unicode_content = """---
+title: "测试文档 🚀 Café"
+id: unicode-test
+description: "This contains émojis 🎉 and ñoñ-ASCII çhars"
+author: "José García-Martínez"
+tags: ["日本語", "español", "français"]
+---
+# Unicode Test Document"""
+
+        (linking.DOCS_DIR / "unicode.md").write_text(unicode_content, encoding="utf-8")
+        prepare_docs()
+
+        # Should handle Unicode correctly
+        updated_content = (linking.DOCS_DIR / "unicode.md").read_text(encoding="utf-8")
+        self.assertIn("🚀", updated_content)
+        self.assertIn("José García-Martínez", updated_content)
+        self.assertIn("日本語", updated_content)
+
+        redirect_map = json.loads(linking.PAGE_ID_MAP_FILE.read_text())
+        self.assertEqual(redirect_map["unicode-test"], "unicode.md")
+
+    def test_surgical_injection_preserves_formatting(self) -> None:
+        """
+        Test that adding an ID to a file with complex formatting preserves that formatting.
+        """
+        # A file with a multiline description using single quotes and specific indentation
+        original_content = """---
+description: 'This is a long description
+  that spans multiple lines.
+  It uses single quotes and has "nested" double quotes.
+
+  '
+title: "Formatted File"
+# A comment inside frontmatter
+---
+# Content"""
+        
+        source_file = linking.DOCS_DIR / "blog-post.md"
+        source_file.write_text(original_content)
+        
+        # Act
+        prepare_docs()
+        
+        # Assert
+        updated_content = source_file.read_text()
+        
+        # 1. ID should be present
+        self.assertIn("id: blog-post", updated_content)
+        
+        # 2. Formatting should be preserved (surgical injection)
+        # We check that the description block is exactly as it was
+        self.assertIn("description: 'This is a long description", updated_content)
+        self.assertIn("  that spans multiple lines.", updated_content)
+        self.assertIn("title: \"Formatted File\"", updated_content)
+        self.assertIn("# A comment inside frontmatter", updated_content)
+        
+        # 3. Check that it didn't use frontmatter.dumps (which would reformat)
+        # frontmatter.dumps usually removes comments and reformats multiline strings.
+        # If the comment is still there, it was a surgical injection.
+        self.assertIn("# A comment inside frontmatter", updated_content)
+
+    def test_surgical_injection_no_frontmatter(self) -> None:
+        """Test injection when there is no frontmatter at all."""
+        original_content = "# Simple Content"
+        source_file = linking.DOCS_DIR / "simple.md"
+        source_file.write_text(original_content)
+        
+        prepare_docs()
+        
+        updated_content = source_file.read_text()
+        self.assertTrue(updated_content.startswith("---\nid: simple\n---"))
+        self.assertIn("# Simple Content", updated_content)
+
+
+if __name__ == "__main__":
+    unittest.main(verbosity=2)
