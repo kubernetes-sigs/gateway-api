@@ -43,14 +43,14 @@ In the current Kubernetes landscape, the "Who, What, Where, and How Long" of net
 
 ### Policy Attachment vs. Inline Configuration
 
-A key area of discussion for this GEP is whether this should be a standalone Policy Attachment (e.g., `TelemetryPolicy`) or inline configuration within the `Gateway` resource. 
+A key area of discussion for this GEP is whether this should be a standalone Policy Attachment (e.g., `TelemetryPolicy`) or inline configuration within `Gateway`, or `HTTPRoute` resources. 
 
 This proposal argues that the Policy Attachment model is the most effective approach to meet the stated goals, primarily for two reasons:
 
 1. **Separation of Concerns**: It allows different personas to manage Gateway infrastructure independently from the configuration of telemetry signals.
 2. **Uniformity**: It enables a single policy to be applied uniformly across a set of Gateways, eliminating the need to duplicate complex telemetry configurations across individual resources.
 
-To mitigate the challenge of complex merging semantics, this GEP restricts configuration such that only a single `TelemetryPolicy` can target a specific `Gateway` at any given time. If multiple `TelemetryPolicy` resources target the same object, precedence is determined based on the creation timestamp.
+To mitigate the challenge of complex merging semantics, this GEP restricts configuration such that only a single `TelemetryPolicy` can target a specific `Gateway` at any given time. If multiple `TelemetryPolicy` resources target the same object, precedence is determined based on the creation timestamp. This will allow us to start with simple config and iterate based on feedback whether multiple TelemetryPolicies on the same target are needed.
 
 ### High-level Considerations:
 
