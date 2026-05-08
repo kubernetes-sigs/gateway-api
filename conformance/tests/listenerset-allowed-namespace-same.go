@@ -82,7 +82,7 @@ var ListenerSetAllowedNamespaceSame = confsuite.ConformanceTest{
 		kubernetes.ListenerSetMustHaveCondition(t, suite.Client, suite.TimeoutConfig, disallowedLsNN, metav1.Condition{
 			Type:   string(gatewayv1.ListenerSetConditionProgrammed),
 			Status: metav1.ConditionFalse,
-			Reason: string(gatewayv1.ListenerSetReasonNotAllowed),
+			Reason: "", // any reason
 		})
 	},
 }
@@ -90,19 +90,19 @@ var ListenerSetAllowedNamespaceSame = confsuite.ConformanceTest{
 func generateAcceptedListenerConditions() []metav1.Condition {
 	return []metav1.Condition{
 		{
-			Type:   string(gatewayv1.ListenerConditionResolvedRefs),
+			Type:   string(gatewayv1.ListenerEntryConditionResolvedRefs),
 			Status: metav1.ConditionTrue,
-			Reason: "", // any reason
+			Reason: string(gatewayv1.ListenerEntryReasonResolvedRefs),
 		},
 		{
-			Type:   string(gatewayv1.ListenerConditionAccepted),
+			Type:   string(gatewayv1.ListenerEntryConditionAccepted),
 			Status: metav1.ConditionTrue,
-			Reason: "", // any reason
+			Reason: string(gatewayv1.ListenerEntryReasonAccepted),
 		},
 		{
-			Type:   string(gatewayv1.ListenerConditionProgrammed),
+			Type:   string(gatewayv1.ListenerEntryConditionProgrammed),
 			Status: metav1.ConditionTrue,
-			Reason: "", // any reason
+			Reason: string(gatewayv1.ListenerEntryReasonProgrammed),
 		},
 	}
 }

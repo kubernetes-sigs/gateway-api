@@ -909,6 +909,12 @@ status:
 `Gateway`'s `Accepted` and `Programmed` top-level conditions remain unchanged and reflect the status of the local configuration.
  conditions list.
 
+When a `Gateway` has no valid listeners of its own, it would normally have the `Accepted` condition set to `False` with reason `ListenersNotValid`.
+In this case, if an attached `ListenerSet` contributes a valid listener, the Gateway becomes accepted, but the reason `ListenersNotValid` remains to indicate that the `Gateway` listeners are still not valid.
+
+This behavior also anticipates a potential future enhancement where listeners on the `Gateway` itself become optional.
+In that case, a similar pattern would apply, a `Gateway` with no listeners of its own would be treated equivalently to a `Gateway` whose own listeners are all invalid, relying on attached `ListenerSets` to become Accepted.
+
 ### ListenerSet Conditions
 
 `ListenerSets` have a top-level `Accepted` and `Programmed` conditions.
@@ -918,10 +924,11 @@ The `Accepted` condition MUST be set on every `ListenerSet`, and indicates that 
 Valid reasons for `Accepted` being `False` are:
 
 - `NotAllowed` - the `parentRef` doesn't allow attachment
-- `ParentNotAccepted` - the `parentRef` isn't accepted (eg. invalid address)
-- `ListenersNotValid` - one or more listeners in the set are invalid (or using an unsupported feature)
+- `ParentNotAccepted` - the `parentRef` isn't accepted for reasons other than `ListenersNotValid` (e.g., invalid address, invalid parameters ref)
+- `ListenersNotValid` - one or more listeners in the set are invalid (or using an unsupported feature) 
 
 The `Programmed` condition MUST be set on every `ListenerSet` and have a similar meaning to the Gateway `Programmed` condition but only reflect the listeners in this `ListenerSet`.
+In case the `ListenerSet` is not accepted, the `Programmed` condition MUST be set to `False` with an appropriate reason.
 
 `Accepted` and `Programmed` conditions when surfacing details about listeners, MUST only summarize the `status.listeners` conditions that are exclusive to the `ListenerSet`.
 An exception to this is when the parent `Gateway`'s `Accepted` or `Programmed` conditions transition to `False`
@@ -932,7 +939,7 @@ An exception to this is when the parent `Gateway`'s `Accepted` or `Programmed` c
 
 An implementation MAY reject listeners by setting the `ListenerEntryStatus` `Accepted` condition to `False` with the `Reason` `TooManyListeners`
 
-If a listener has a conflict, this should be reported in the `ListenerEntryStatus` of the conflicted `ListenerSet` by setting the `Conflicted` condition to `True`.
+If a listener has a conflict, this should be reported in the `ListenerEntryStatus` of the conflicted `ListenerSet` by setting the `Conflicted` condition to `True` as well as the `Accepted` condition to `False` with reason `Conflicted`.
 
 Implementations SHOULD be cautious about what information from the parent or siblings are reported to avoid accidentally leaking sensitive information that the child would not otherwise have access to. This can include contents of secrets etc.
 

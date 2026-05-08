@@ -58,14 +58,14 @@ var ListenerSetReferenceGrant = confsuite.ConformanceTest{
 		// kubernetes.GatewayMustHaveAttachedListeners(t, suite.Client, suite.TimeoutConfig, gwNN, 1)
 
 		refPermittedCondition := []metav1.Condition{{
-			Type:   string(gatewayv1.ListenerConditionResolvedRefs),
+			Type:   string(gatewayv1.ListenerEntryConditionResolvedRefs),
 			Status: metav1.ConditionTrue,
-			Reason: "", // any reason
+			Reason: string(gatewayv1.ListenerEntryReasonResolvedRefs),
 		}}
 		refNotPermittedCondition := []metav1.Condition{{
-			Type:   string(gatewayv1.ListenerConditionResolvedRefs),
+			Type:   string(gatewayv1.ListenerEntryConditionResolvedRefs),
 			Status: metav1.ConditionFalse,
-			Reason: string(gatewayv1.ListenerReasonRefNotPermitted),
+			Reason: string(gatewayv1.ListenerEntryReasonRefNotPermitted),
 		}}
 
 		// listenerset-with-reference-grant is accepted with the appropriate conditions
@@ -73,12 +73,12 @@ var ListenerSetReferenceGrant = confsuite.ConformanceTest{
 		kubernetes.ListenerSetMustHaveCondition(t, suite.Client, suite.TimeoutConfig, lsNN, metav1.Condition{
 			Type:   string(gatewayv1.ListenerSetConditionAccepted),
 			Status: metav1.ConditionTrue,
-			Reason: "", // any reason
+			Reason: string(gatewayv1.ListenerSetReasonAccepted),
 		})
 		kubernetes.ListenerSetMustHaveCondition(t, suite.Client, suite.TimeoutConfig, lsNN, metav1.Condition{
 			Type:   string(gatewayv1.ListenerSetConditionProgrammed),
 			Status: metav1.ConditionTrue,
-			Reason: "", // any reason
+			Reason: string(gatewayv1.ListenerSetReasonProgrammed),
 		})
 		kubernetes.ListenerSetListenersMustHaveConditions(t, suite.Client, suite.TimeoutConfig, lsNN, refPermittedCondition, "listenerset-with-reference-grant-listener")
 
@@ -92,7 +92,7 @@ var ListenerSetReferenceGrant = confsuite.ConformanceTest{
 		kubernetes.ListenerSetMustHaveCondition(t, suite.Client, suite.TimeoutConfig, lsNN, metav1.Condition{
 			Type:   string(gatewayv1.ListenerSetConditionProgrammed),
 			Status: metav1.ConditionFalse,
-			Reason: string(gatewayv1.ListenerSetReasonListenersNotValid),
+			Reason: "", // any reason
 		})
 		kubernetes.ListenerSetListenersMustHaveConditions(t, suite.Client, suite.TimeoutConfig, lsNN, refNotPermittedCondition, "listenerset-without-reference-grant-listener")
 	},
