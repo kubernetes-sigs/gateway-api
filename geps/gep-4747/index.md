@@ -189,12 +189,16 @@ The `type` field is a list of one or more values:
   `Egress` in its type MUST support Backend as a backendRef target and MUST
   provision a cluster-reachable address.
 
-Implementations MUST enforce the declared type. A Gateway whose type does not
-include `Egress` MUST reject routes with Backend backendRefs. This prevents
-existing Gateways from being used as open proxies when Backend support is
-introduced. Routes attached to an egress Gateway MAY reference both Backend
-resources and internal Services (e.g., routing some traffic to a local cache
-and other traffic to external APIs).
+Implementations MUST enforce the declared type. When a Route references a
+Backend that targets an external destination and is parented to a Gateway
+whose type does not include `Egress`, the implementation MUST set
+`ResolvedRefs` to `False` with reason `RefNotPermitted` and MUST NOT program
+the backendRef. The mechanism for distinguishing external from internal
+Backend destinations is defined by the Backend resource
+([PR #4488](https://github.com/kubernetes-sigs/gateway-api/pull/4488)).
+Backends that reference internal destinations are permitted regardless of
+Gateway type. Routes attached to an egress Gateway MAY reference both Backend
+resources and internal Services.
 
 ### Egress Gateway Configuration
 
