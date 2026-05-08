@@ -14,7 +14,21 @@ The `Backend` resource provides a namespace-scoped, consumer-focused resource th
 2. **Represent external destinations** via `ExternalHostname`, replacing the need for insecure synthetic `ExternalName` Services.
 3. **Serve as a foundation for future Gateway-level backend configuration** such as retries, session persistence, load balancing algorithms, and other features that are tightly bound to the destination rather than the route.
 
-While egress and AI use cases provide the initial urgent motivation, the `Backend` resource is designed to be useful for **all backend types**. At its core, a `Backend` of type `EndpointSelector` does what `Service` already does — but in a Gateway-native way that allows configuration to grow over time. Egress support via `ExternalHostname` is the first Extended feature built on this foundation.
+While egress and AI use cases provided the initial urgent motivation, the `Backend` resource is designed to be useful for **all backend types**. At its core, a `Backend` of type `EndpointSelector` does what `Service` already does — but in a Gateway-native way that allows configuration to grow over time. Egress support via `ExternalHostname` is the first Extended feature built on this foundation.
+
+### Clarifying the Semantics of "Backend"
+
+It is critically important that we emphasize that the `Backend` resource describes what a specific gateway client connection **MUST** do on the wire when connecting to a destination.
+
+In the common ingress persona, Ana often owns both the `HTTPRoute` and the Service behind it. In this scenario, Ana is being delegated the ability to control how the Gateway consumes her service. In many egress, mesh, and AI-oriented deployments, that ownership model changes: Ana does NOT own the destination behind the route, but she still needs a way to express "how should the gateway connect to this destination" without needing to coordinate with the producer or cluster admin. In other words, the `Backend` resource is a consumer-side resource that describes connection requirements for a particular client path, regardless of who owns the destination.
+
+This distinction is foundational to this GEP:
+
+- `Backend` captures consumer-side connection requirements for a particular client path (for example, SNI, TLS validation, client cert presentation, or higher-level protocol expectations).
+- Producer/server guidance is still valuable, out of scope for this resource: producer hints describe what servers generally **SHOULD** accept, while this resource describes what this client/gateway connection **MUST** attempt.
+- In practice, server hints were always actuated as client configuration anyway. This proposal makes that behavior explicit and auditable.
+
+Said differently: `Backend` is intentionally scoped to "how this client should connect" rather than "what all clients of this server must do."
 
 ## Motivation
 
@@ -54,7 +68,7 @@ The current approach to adding Gateway-specific behavior to Services is through 
 ## Non-Goals
 
 - **Deprecate or replace Services**: Services remain the primary backend type for internal destinations. Backend is a decorator, not a replacement.
-- **Support producer-side policies**: Backend resource is explicitly consumer-focused
+- **Standardize producer-owned backend policy in this GEP**: Producer guidance and hints may inform client behavior, but defining producer-authoritative policy semantics remains out of scope for this proposal.
 - **Provide cluster-scoped backends**: Backend resource is namespace-scoped for security boundaries
 - **Solve all backend configuration at once**: This GEP establishes the Backend resource and its first features (EndpointSelector, ExternalHostname, inline TLS). Additional features (retries, session persistence, load balancing, etc.) will be proposed in follow-on GEPs.
 
@@ -102,7 +116,8 @@ For external destinations, the `Backend` resource replaces the need for syntheti
 ┌─────────────────────────────────────────────┐
 │  Backend (openai-api)                       │
 │  type: ExternalHostname                     │
-│  hostname: api.openai.com                   │
+│  externalHostname:                          │
+│    hostname: api.openai.com                 │
 │  tls: { ... }                               │
 │  (no Service needed)                        │
 └─────────────────────────────────────────────┘
@@ -175,21 +190,23 @@ const (
   BackendTypeEndpointSelector             BackendType = "EndpointSelector"
 )
 
-// +kubebuilder:validation:ExactlyOneOf=ExternalHostname,EndpointSelector
+// +kubebuilder:validation:XValidation:rule="self.type == 'ExternalHostname' ? has(self.externalHostname) : !has(self.externalHostname)",message="externalHostname must be set when type is ExternalHostname and must be unset otherwise"
+// +kubebuilder:validation:XValidation:rule="self.type == 'EndpointSelector' ? has(self.endpointSelector) : !has(self.endpointSelector)",message="endpointSelector must be set when type is EndpointSelector and must be unset otherwise"
 type BackendSpec struct {
-  // Type defines the destination type
+  // Type defines the backend type
+  //
+  // +unionDiscriminator
+  // Port defines the port that the implementation should use when connecting to this backend.
   // +required
-  Type BackendType `json:"type"`
-
-  // Ports defines the port that the implementation should use when connecting to this backend.
+  // Port defines the port that the implementation should use when connecting to this backend.
   // +required
-  Port PortNumber `json:"ports,omitempty"`
+  Port PortNumber `json:"port,omitempty"`
 
   // ExternalHostname specifies the configuration for an ExternalHostname backend. Only used if type is ExternalHostname.
   // Support: Extended
   // +optional
 
-  ExternalHostname *ExternalHostnameBackend `json:"hostname,omitempty"`
+  ExternalHostname *ExternalHostnameBackend `json:"externalHostname,omitempty"`
 
   // EndpointSelector specifies the configuration for an EndpointSelector backend. Only used if type is EndpointSelector.
   // As defined in GEP-4731, creation of a `Backend` of type `EndpointSelector` should result in `Backend` controllers
@@ -213,10 +230,12 @@ type BackendSpec struct {
 }
 
 // BackendTLSMode defines the TLS mode for backend connections.
-// +kubebuilder:validation:Enum=ServerOnly;ClientAndServer
+// +kubebuilder:validation:Enum=None;ServerOnly;ClientAndServer
 type BackendTLSMode string
 
 const (
+  // Disable TLS when connecting to the backend.
+  BackendTLSModeNone BackendTLSMode = "None"
   // Enable TLS with simple server certificate verification.
   BackendTLSModeServerOnly BackendTLSMode = "ServerOnly"
   // Enable mutual TLS.
@@ -238,13 +257,14 @@ type EndpointSelectorBackend struct {
   Selector *metav1.LabelSelector `json:"selector,omitempty"`
 }
 
+// +kubebuilder:validation:XValidation:rule="self.mode == 'ClientAndServer' ? has(self.clientCertificateRef) : !has(self.clientCertificateRef)",message="clientCertificateRef must be set if and only if mode is ClientAndServer"
 type BackendTLS struct {
   // Mode defines the TLS mode for the backend.
   // +required
   Mode BackendTLSMode `json:"mode"`
 
   // ClientCertificateRef defines the reference to the client certificate for mutual
-  // TLS. Only used if mode is MUTUAL.
+  // TLS. Only used if mode is ClientAndServer.
   // +optional
   ClientCertificateRef *SecretObjectReference `json:"clientCertificateRef,omitempty"`
 
@@ -293,7 +313,7 @@ type ExternalHostnameBackend struct {
   // Hostname specifies the destination address used to reach this hostname.
   // IP addresses are not allowed in this field (enforced by validation on the type).
   // TODO: Should we add additional validation to prevent *.cluster.local hostnames?
-  Hostname PreciseHostname `json:"address"`
+  Hostname PreciseHostname `json:"hostname"`
 }
 ```
 
@@ -428,6 +448,7 @@ After extensive community discussion, this proposal adopts a **DNS trust model**
 
 2. **RBAC and Admission Control as Primary Security Control**
    - Application developers are the persona target by the `Backend` resource
+     - Implementations SHOULD provide control-plane guardrails (for example, an allow-list of permitted egress domains)
    - Admission control (e.g. VAP, Gatekeeper, Kyverno) can enforce organizational policies on FQDN usage
    - Network policies can restrict egress traffic regardless of Backend configuration (forcing DNS resolution to happen at the gateway only)
 
@@ -535,7 +556,7 @@ The Backend resource is designed to be the home for backend-level connection con
 - **Session persistence**: Cookie-based, header-based, or connection-based affinity
 - **Timeouts**: Connection timeout, request timeout, idle timeout
 - **Load balancing**: Algorithm selection (round-robin, least-connections, consistent hashing)
-- **Health checks**: Active health checking configuration for the destination
+- **Health checks**: Active health checking configuration for the destination from the consumer dataplane perspective
 
 By inlining these into the Backend resource rather than requiring separate policy attachments, users get a single resource that fully describes "how to connect to this destination," improving discoverability and reducing the number of resources to manage.
 
