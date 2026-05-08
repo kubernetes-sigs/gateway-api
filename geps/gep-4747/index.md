@@ -325,25 +325,42 @@ Gateway does once traffic arrives.
 
 ## Security Considerations
 
-### Egress-Specific Risks
+### Motivation
 
-1. **Data exfiltration**: A compromised workload could use the egress gateway
-   to send data to attacker-controlled endpoints. Mitigation: restrict Backend
-   creation via RBAC, use NetworkPolicy to limit which namespaces can reach the
-   gateway.
+A key motivation for adding explicit egress semantics to Gateway API is to
+support generative AI use cases, where gateways apply common policy
+(credential injection, rate limiting, observability) to inference requests
+destined for external model providers. This naturally makes egress gateways
+attractive targets for abuse: a gateway holding provider credentials becomes a
+high-value asset for attackers seeking unauthorized inference access. Recent
+incidents demonstrate active reconnaissance and exploitation of exposed LLM
+proxy infrastructure
+([GreyNoise, 2026](https://www.greynoise.io/blog/threat-actors-actively-targeting-llms);
+[Pillar Security, 2026](https://www.pillar.security/blog/operation-bizarre-bazaar-first-attributed-llmjacking-campaign-with-commercial-marketplace-monetization)).
 
-2. **Credential exposure**: Backend extensions may inject credentials into
-   requests. The egress gateway becomes a high-value target. Mitigation:
-   standard Kubernetes secrets RBAC, audit logging.
+### Open Relay Precedents
 
-3. **Gateway bypass**: Workloads with direct internet access bypass all egress
+The `type` field and its enforcement exist because permissive-by-default
+external routing has a long history of causing ecosystem-scale damage. The
+following table documents open relay precedents that motivate a default-closed
+posture for Hostname-type Backend routing:
+| Threat | Mechanism | Precedent | 
+|--------|-----------|-----------|
+| **Open relay** | Misconfigured gateway relays traffic to arbitrary external destinations | [Google SMTP relay abuse (2022)](https://www.bleepingcomputer.com/news/security/google-smtp-relay-service-abused-for-sending-phishing-emails/) |
+| **Traffic amplification** | Permissive default enables use as traffic amplifier | [Memcached UDP amplification (2018)](https://github.blog/news-insights/company-news/ddos-incident-report/) |
+| **Confused deputy** | Service-based egress workarounds route to unintended destinations | [CVE-2021-25740](https://github.com/kubernetes/kubernetes/issues/103675) |
+
+The `type` field is defense-in-depth, not the primary security control.
+The primary control is RBAC on Backend creation. What the `type` field
+provides is a stable, declared property on the Gateway that makes policy
+attachment, audit, and enforcement legible. Without it, determining whether
+a Gateway is egress-capable requires inferring it from route topology, which
+is racy and incomplete during reconciliation.
+
+### Additional Risks
+
+1. **Gateway bypass**: Workloads with direct internet access bypass all egress
    policy. NetworkPolicy enforcement may be used to mitigate this.
-
-4. **Outbound abuse**: An actor who can create Routes or Backends may use the
-   egress gateway to launch attacks (e.g., denial-of-service, port scanning)
-   against external targets, with traffic appearing to originate from the
-   cluster's egress IP. Mitigation: restrict Route and Backend creation via
-   RBAC, enforce allowlisted destinations, and apply rate-limiting policies.
 
 ## Open Questions
 
