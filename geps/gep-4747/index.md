@@ -417,7 +417,7 @@ Dynamic routing to arbitrary hostnames (forward proxy) is out of scope. See
 | Dependency | Status | Impact |
 |---|---|---|
 | [PR #4488: Backend Resource](https://github.com/kubernetes-sigs/gateway-api/pull/4488) | PR open | Required -- egress routes need Backend destinations |
-| [#1651: Gateway Routability](https://github.com/kubernetes-sigs/gateway-api/issues/1651) | Issue open | Formalizes `ClusterIP` as a Gateway `AddressType`; implementations already provision ClusterIP Services for egress |
+| [#1651: Gateway Routability](https://github.com/kubernetes-sigs/gateway-api/issues/1651) | Issue open | `ClusterIP` address type is proposed in this GEP, overlapping with #1651; broader routability concerns remain open there |
 
 ## References
 
