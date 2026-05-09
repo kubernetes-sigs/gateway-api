@@ -614,3 +614,201 @@ func TestHTTPExternalAuthFilterExperimental(t *testing.T) {
 	}
 
 }
+
+func TestHTTPRouteSessionPersistence(t *testing.T) {
+	tests := []struct {
+		name       string
+		wantErrors []string
+		rules      []gatewayv1.HTTPRouteRule
+	}{
+		{
+			name:       "valid session persistence with cookie type",
+			wantErrors: []string{},
+			rules: []gatewayv1.HTTPRouteRule{{
+				SessionPersistence: &gatewayv1.SessionPersistence{
+					Type: ptrTo(gatewayv1.CookieBasedSessionPersistence),
+					Cookie: &gatewayv1.CookieConfig{
+						Name: ptrTo("my-session"),
+					},
+				},
+			}},
+		},
+		{
+			name:       "valid session persistence with header type",
+			wantErrors: []string{},
+			rules: []gatewayv1.HTTPRouteRule{{
+				SessionPersistence: &gatewayv1.SessionPersistence{
+					Type: ptrTo(gatewayv1.HeaderBasedSessionPersistence),
+					Header: &gatewayv1.HeaderConfig{
+						Name: ptrTo("x-session-id"),
+					},
+				},
+			}},
+		},
+		{
+			name:       "valid session persistence with default type (cookie)",
+			wantErrors: []string{},
+			rules: []gatewayv1.HTTPRouteRule{{
+				SessionPersistence: &gatewayv1.SessionPersistence{
+					Cookie: &gatewayv1.CookieConfig{
+						Name: ptrTo("my-session"),
+					},
+				},
+			}},
+		},
+		{
+			name:       "invalid session persistence with default type (cookie) but no cookie field",
+			wantErrors: []string{"cookie must be specified for Cookie type"},
+			rules: []gatewayv1.HTTPRouteRule{{
+				SessionPersistence: &gatewayv1.SessionPersistence{},
+			}},
+		},
+		{
+			name:       "invalid cookie type without cookie field",
+			wantErrors: []string{"cookie must be specified for Cookie type"},
+			rules: []gatewayv1.HTTPRouteRule{{
+				SessionPersistence: &gatewayv1.SessionPersistence{
+					Type: ptrTo(gatewayv1.CookieBasedSessionPersistence),
+				},
+			}},
+		},
+		{
+			name:       "invalid header type without header field",
+			wantErrors: []string{"header must be specified for Header type"},
+			rules: []gatewayv1.HTTPRouteRule{{
+				SessionPersistence: &gatewayv1.SessionPersistence{
+					Type: ptrTo(gatewayv1.HeaderBasedSessionPersistence),
+				},
+			}},
+		},
+		{
+			name:       "invalid cookie type with header field set",
+			wantErrors: []string{"header must be nil if type is not Header"},
+			rules: []gatewayv1.HTTPRouteRule{{
+				SessionPersistence: &gatewayv1.SessionPersistence{
+					Type: ptrTo(gatewayv1.CookieBasedSessionPersistence),
+					Header: &gatewayv1.HeaderConfig{
+						Name: ptrTo("x-session-id"),
+					},
+				},
+			}},
+		},
+		{
+			name:       "invalid header type with cookie field set",
+			wantErrors: []string{"cookie must be nil if type is not Cookie"},
+			rules: []gatewayv1.HTTPRouteRule{{
+				SessionPersistence: &gatewayv1.SessionPersistence{
+					Type: ptrTo(gatewayv1.HeaderBasedSessionPersistence),
+					Cookie: &gatewayv1.CookieConfig{
+						Name: ptrTo("my-session"),
+					},
+				},
+			}},
+		},
+		{
+			name:       "valid permanent cookie with absoluteTimeout",
+			wantErrors: []string{},
+			rules: []gatewayv1.HTTPRouteRule{{
+				SessionPersistence: &gatewayv1.SessionPersistence{
+					AbsoluteTimeout: toDuration("1h"),
+					Type:            ptrTo(gatewayv1.CookieBasedSessionPersistence),
+					Cookie: &gatewayv1.CookieConfig{
+						Name:         ptrTo("my-session"),
+						LifetimeType: ptrTo(gatewayv1.PermanentCookieLifetimeType),
+					},
+				},
+			}},
+		},
+		{
+			name:       "invalid permanent cookie without absoluteTimeout",
+			wantErrors: []string{"AbsoluteTimeout must be specified when cookie lifetimeType is Permanent"},
+			rules: []gatewayv1.HTTPRouteRule{{
+				SessionPersistence: &gatewayv1.SessionPersistence{
+					Type: ptrTo(gatewayv1.CookieBasedSessionPersistence),
+					Cookie: &gatewayv1.CookieConfig{
+						Name:         ptrTo("my-session"),
+						LifetimeType: ptrTo(gatewayv1.PermanentCookieLifetimeType),
+					},
+				},
+			}},
+		},
+		{
+			name:       "valid two rules with unique cookie names",
+			wantErrors: []string{},
+			rules: []gatewayv1.HTTPRouteRule{
+				{
+					SessionPersistence: &gatewayv1.SessionPersistence{
+						Type: ptrTo(gatewayv1.CookieBasedSessionPersistence),
+						Cookie: &gatewayv1.CookieConfig{
+							Name: ptrTo("session-a"),
+						},
+					},
+				},
+				{
+					SessionPersistence: &gatewayv1.SessionPersistence{
+						Type: ptrTo(gatewayv1.CookieBasedSessionPersistence),
+						Cookie: &gatewayv1.CookieConfig{
+							Name: ptrTo("session-b"),
+						},
+					},
+				},
+			},
+		},
+		{
+			name:       "invalid two rules with duplicate cookie names",
+			wantErrors: []string{"Session persistence cookie name must be unique across all rules within the route"},
+			rules: []gatewayv1.HTTPRouteRule{
+				{
+					SessionPersistence: &gatewayv1.SessionPersistence{
+						Type: ptrTo(gatewayv1.CookieBasedSessionPersistence),
+						Cookie: &gatewayv1.CookieConfig{
+							Name: ptrTo("my-session"),
+						},
+					},
+				},
+				{
+					SessionPersistence: &gatewayv1.SessionPersistence{
+						Type: ptrTo(gatewayv1.CookieBasedSessionPersistence),
+						Cookie: &gatewayv1.CookieConfig{
+							Name: ptrTo("my-session"),
+						},
+					},
+				},
+			},
+		},
+		{
+			name:       "invalid two rules with duplicate header names",
+			wantErrors: []string{"Session persistence header name must be unique across all rules within the route"},
+			rules: []gatewayv1.HTTPRouteRule{
+				{
+					SessionPersistence: &gatewayv1.SessionPersistence{
+						Type: ptrTo(gatewayv1.HeaderBasedSessionPersistence),
+						Header: &gatewayv1.HeaderConfig{
+							Name: ptrTo("x-session"),
+						},
+					},
+				},
+				{
+					SessionPersistence: &gatewayv1.SessionPersistence{
+						Type: ptrTo(gatewayv1.HeaderBasedSessionPersistence),
+						Header: &gatewayv1.HeaderConfig{
+							Name: ptrTo("x-session"),
+						},
+					},
+				},
+			},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			route := &gatewayv1.HTTPRoute{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      fmt.Sprintf("foo-%v", time.Now().UnixNano()),
+					Namespace: metav1.NamespaceDefault,
+				},
+				Spec: gatewayv1.HTTPRouteSpec{Rules: tc.rules},
+			}
+			validateHTTPRoute(t, route, tc.wantErrors)
+		})
+	}
+}

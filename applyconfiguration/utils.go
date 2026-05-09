@@ -108,6 +108,8 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1.GRPCRouteSpecApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("GRPCRouteStatus"):
 		return &apisv1.GRPCRouteStatusApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("HeaderConfig"):
+		return &apisv1.HeaderConfigApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("HTTPAuthConfig"):
 		return &apisv1.HTTPAuthConfigApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("HTTPBackendRef"):
