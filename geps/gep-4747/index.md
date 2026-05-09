@@ -147,14 +147,14 @@ types compose for egress:
 ```
                      parentRef              backendRef
 Workload --> Gateway <-------- HTTPRoute ----------> Backend (PR #4488)
-              |                   |                     |
-         GatewayClass        hostnames:            destination:
-         (egress)          ["*.openai.com"]       type: Hostname
-                                                  hostname:
-                                                    address: api.openai.com
-                                                  ports:
-                                                  - number: 443
-                                                    tls: ...
+                                  |                     |
+                              hostnames:            destination:
+                            ["*.openai.com"]       type: Hostname
+                                                   hostname:
+                                                     address: api.openai.com
+                                                   ports:
+                                                   - number: 443
+                                                     tls: ...
 ```
 
 Throughout this GEP, **Backend** refers to a CRD that acts as a backendRef
