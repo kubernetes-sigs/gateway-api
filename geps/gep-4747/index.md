@@ -158,8 +158,8 @@ Workload --> Gateway <-------- HTTPRoute ----------> Backend (PR #4488)
 ```
 
 Throughout this GEP, **Backend** refers to a CRD that acts as a backendRef
-target for egress routes, representing an external destination. The specific
-resource definition is being developed in
+target, representing a destination. The specific resource definition is being
+developed in
 [PR #4488](https://github.com/kubernetes-sigs/gateway-api/pull/4488).
 
 ### Gateway Type Field
