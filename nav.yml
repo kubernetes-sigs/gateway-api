@@ -59,13 +59,13 @@ nav:
           - GatewayClass: api-types/gatewayclass.md
           - GRPCRoute: api-types/grpcroute.md
           - HTTPRoute: api-types/httproute.md
-          - Conditions and Reasons: api-types/conditions.md
           - Policy:
               - BackendTLSPolicy: api-types/backendtlspolicy.md
               - BackendTrafficPolicy: api-types/backendtrafficpolicy.md
           - ReferenceGrant: api-types/referencegrant.md
           - TLSRoute: api-types/tlsroute.md
           - ListenerSet: api-types/listenerset.md
+          - Conditions and Reasons: api-types/conditions.md
       - API specification:
           - Development:
               - Standard: reference/spec.md
