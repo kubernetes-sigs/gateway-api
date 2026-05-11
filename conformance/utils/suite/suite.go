@@ -626,7 +626,7 @@ func ParseConformanceProfiles(p string) sets.Set[ConformanceProfileName] {
 		return res
 	}
 
-	for _, value := range strings.Split(p, ",") {
+	for value := range strings.SplitSeq(p, ",") {
 		res.Insert(ConformanceProfileName(value))
 	}
 	return res

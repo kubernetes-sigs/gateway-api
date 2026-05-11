@@ -80,7 +80,7 @@ func (a Applier) prepareGateway(t *testing.T, uObj *unstructured.Unstructured) {
 	require.NoError(t, err, "error retrieving spec.addresses to verify if any static addresses were present on Gateway resource %s/%s", ns, name)
 	require.True(t, hasSpec)
 
-	rawSpecMap, ok := rawSpec.(map[string]interface{})
+	rawSpecMap, ok := rawSpec.(map[string]any)
 	require.True(t, ok, "expected gw spec received %T", rawSpec)
 
 	gwspec := &gatewayv1.GatewaySpec{}
@@ -122,7 +122,7 @@ func (a Applier) prepareGateway(t *testing.T, uObj *unstructured.Unstructured) {
 			}
 		}
 
-		var primOverlayAddrs []interface{}
+		var primOverlayAddrs []any
 		if len(specialAddrs) > 0 {
 			tlog.Logf(t, "the test provides %d special addresses that will be kept", len(specialAddrs))
 			primOverlayAddrs = append(primOverlayAddrs, convertGatewayAddrsToPrimitives(specialAddrs)...)
@@ -358,15 +358,15 @@ func getContentsFromPathOrURL(manifestFS []fs.FS, location string, timeoutConfig
 }
 
 // convertGatewayAddrsToPrimitives converts a slice of Gateway addresses
-// to a slice of primitive types and then returns them as a []interface{} so that
+// to a slice of primitive types and then returns them as a []any so that
 // they can be applied back to an unstructured Gateway.
-func convertGatewayAddrsToPrimitives(gwaddrs []gatewayv1.GatewaySpecAddress) (raw []interface{}) {
+func convertGatewayAddrsToPrimitives(gwaddrs []gatewayv1.GatewaySpecAddress) (raw []any) {
 	for _, addr := range gwaddrs {
 		addrType := string(gatewayv1.IPAddressType)
 		if addr.Type != nil {
 			addrType = string(*addr.Type)
 		}
-		raw = append(raw, map[string]interface{}{
+		raw = append(raw, map[string]any{
 			"type":  addrType,
 			"value": addr.Value,
 		})

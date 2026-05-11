@@ -22,7 +22,6 @@ import (
 
 	"github.com/stretchr/testify/require"
 	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/utils/ptr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
@@ -65,7 +64,7 @@ var GatewayObservedGenerationBump = suite.ConformanceTest{
 			// mutate the Gateway Spec
 			mutate.Spec.Listeners = append(mutate.Spec.Listeners, v1.Listener{
 				Name:     "alternate",
-				Hostname: ptr.To[v1.Hostname]("foo.com"),
+				Hostname: new(v1.Hostname("foo.com")),
 				Port:     80,
 				Protocol: v1.HTTPProtocolType,
 				AllowedRoutes: &v1.AllowedRoutes{

@@ -37,7 +37,7 @@ import (
 
 type customResourceDefinitionManifest struct {
 	metav1.TypeMeta   `json:",inline"`
-	metav1.ObjectMeta `json:"metadata,omitempty"`
+	metav1.ObjectMeta `json:"metadata,omitzero"`
 	Spec              apiext.CustomResourceDefinitionSpec `json:"spec"`
 }
 
@@ -246,7 +246,7 @@ func gatewayTweaks(channel string, name string, jsonProps apiext.JSONSchemaProps
 
 			numValid++
 			jsonProps.Enum = []apiext.JSON{}
-			for _, val := range strings.Split(enumMatch[1], ";") {
+			for val := range strings.SplitSeq(enumMatch[1], ";") {
 				jsonProps.Enum = append(jsonProps.Enum, apiext.JSON{Raw: []byte("\"" + val + "\"")})
 			}
 		}

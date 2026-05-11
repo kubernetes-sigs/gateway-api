@@ -35,7 +35,6 @@ import (
 	"github.com/stretchr/testify/require"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	clientset "k8s.io/client-go/kubernetes"
-	"k8s.io/utils/ptr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -125,12 +124,12 @@ func parseAddress(v string) v1.GatewaySpecAddress {
 	_, err := netip.ParseAddr(v)
 	if err == nil {
 		return v1.GatewaySpecAddress{
-			Type:  ptr.To(v1.IPAddressType),
+			Type:  new(v1.IPAddressType),
 			Value: v,
 		}
 	}
 	return v1.GatewaySpecAddress{
-		Type:  ptr.To(v1.HostnameAddressType),
+		Type:  new(v1.HostnameAddressType),
 		Value: v,
 	}
 }

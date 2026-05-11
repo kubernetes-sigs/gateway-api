@@ -26,7 +26,6 @@ import (
 	"time"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/utils/ptr"
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
@@ -39,7 +38,7 @@ func TestValidateListenerSet(t *testing.T) {
 		},
 		Spec: gatewayv1.ListenerSetSpec{
 			ParentRef: gatewayv1.ParentGatewayReference{
-				Kind: ptr.To(gatewayv1.Kind("Gateway")),
+				Kind: new(gatewayv1.Kind("Gateway")),
 				Name: gatewayv1.ObjectName("example"),
 			},
 			Listeners: []gatewayv1.ListenerEntry{
@@ -67,7 +66,7 @@ func TestValidateListenerSet(t *testing.T) {
 						Protocol: gatewayv1.TLSProtocolType,
 						Port:     gatewayv1.PortNumber(8443),
 						TLS: &gatewayv1.ListenerTLSConfig{
-							Mode: ptrTo(gatewayv1.TLSModeType("Passthrough")),
+							Mode: new(gatewayv1.TLSModeType("Passthrough")),
 						},
 					},
 				}
