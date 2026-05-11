@@ -1,0 +1,13 @@
+apiVersion: internal.gateway.networking.k8s.io/v1alpha1
+kind: GEPDetails
+number: 2644
+name: TCPRoute - Add support for routing based on a TCP port
+status: Provisional
+authors:
+  - zac-nixon
+  - rikatz
+  - youngnick
+references:
+  - https://www.ietf.org/rfc/rfc9293.txt
+featureNames:
+  - TCPRoute

@@ -94,6 +94,7 @@ other functions (like managing DNS or creating certificates).
 - [kgateway][37]
 - [NGINX Gateway Fabric][12]
 - [Traefik Proxy][13]
+- [Varnish Gateway][45]
 
 ### Partially Conformant
 
@@ -159,6 +160,7 @@ other functions (like managing DNS or creating certificates).
 [42]:#gravitee-kubernetes-operator
 [43]:#alibaba-cloud-service-mesh
 [44]:#aws-load-balancer-controller
+[45]:#varnish-gateway
 
 
 [gamma]:mesh/index.md
@@ -240,7 +242,7 @@ See the [AWS Load Balancer Controller documentation][aws-lbc-docs] for informati
 
 ### Cilium
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.4.0-Cilium-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.4.0/cilium)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.5.1-Cilium-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.5.1/cilium)
 
 [Cilium][cilium] is an eBPF-based networking, observability and security
 solution for Kubernetes and other networking environments. It includes [Cilium
@@ -477,6 +479,25 @@ For help and support with Traefik Proxy, [create an issue][traefik-proxy-issue-n
 [traefik-proxy-gateway-api-doc]:https://doc.traefik.io/traefik/v3.7/reference/install-configuration/providers/kubernetes/kubernetes-gateway
 [traefik-proxy-issue-new]:https://github.com/traefik/traefik/issues/new/choose
 [traefiklabs-community-forum]:https://community.traefik.io/c/traefik/traefik-v3/21
+
+### Varnish Gateway
+
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.5.0-Varnish%20Gateway-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.5/varnish-software-varnish-gateway)
+
+[Varnish Gateway][varnish-gateway] is an open source Kubernetes Gateway API implementation
+developed by [Varnish Software AS][varnish-software], using [Varnish][varnish] as its data plane.
+It implements the Gateway API standard channel and passes the v1.5.0 conformance suite for the
+GATEWAY-HTTP profile (core, plus extended features for path/host/scheme/port redirects, path/host
+rewrites, method and query parameter matching, response header modification, and HTTP listener
+isolation).
+
+In addition to Gateway API resources, Varnish Gateway exposes a `VarnishCachePolicy` policy
+attachment for fine-grained caching control (TTL, grace, request coalescing, cache key
+customization, bypass conditions) at the Gateway, HTTPRoute, or rule level.
+
+[varnish-gateway]:https://gateway.varnish.org
+[varnish-software]:https://www.varnish-software.com/
+[varnish]:https://varnish-cache.org/
 
 ## Integrations
 
