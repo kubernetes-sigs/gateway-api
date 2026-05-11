@@ -109,10 +109,6 @@ func TestMain(m *testing.M) {
 	os.Exit(rc)
 }
 
-func ptrTo[T any](a T) *T {
-	return &a
-}
-
 func celErrorStringMatches(got, want string) bool {
 	// Starting in k8s v1.32, some CEL error messages changed to use "more" instead of "longer"
 	alternativeWant := strings.ReplaceAll(want, "more", "longer")

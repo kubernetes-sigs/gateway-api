@@ -9,7 +9,7 @@ extra:
   analytics:
     provider: google
     # Google analytics tag is shared with minikube
-    property: G-JPP6RFM2BP 
+    property: G-JPP6RFM2BP
 extra_css:
   - stylesheets/extra.css
 extra_javascript:
@@ -52,6 +52,7 @@ plugins:
   - macros:
       include_dir: examples
       j2_line_comment_prefix: "#$"
+      module_name: hack/mkdocs_main
   - redirects:
       redirect_maps:
         'guides/index.md': 'guides/getting-started/index.md'

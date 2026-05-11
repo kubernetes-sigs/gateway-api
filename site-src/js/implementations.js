@@ -1,3 +1,10 @@
+if (typeof gtag !== 'function') {
+  window.gtag = function () {
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push(arguments);
+  };
+}
+
 function parseFeatureCount(value) {
   var match = value.trim().match(/^(\d+)\/(\d+)$/)
   return match ? parseInt(match[1], 10) : NaN

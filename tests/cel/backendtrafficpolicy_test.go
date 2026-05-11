@@ -40,16 +40,16 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 		{
 			name: "valid BackendTrafficPolicyConfig no retryConstraint budgetPercent",
 			sessionPersistence: xgatewayv1alpha1.SessionPersistence{
-				SessionName:     ptrTo("foo"),
+				SessionName:     new("foo"),
 				AbsoluteTimeout: toDuration("1h"),
-				Type:            ptrTo(gatewayv1.CookieBasedSessionPersistence),
+				Type:            new(gatewayv1.CookieBasedSessionPersistence),
 			},
 			retryConstraint: xgatewayv1alpha1.RetryConstraint{
-				Budget: ptrTo(xgatewayv1alpha1.BudgetDetails{
+				Budget: new(xgatewayv1alpha1.BudgetDetails{
 					Interval: toDuration("10s"),
 				}),
-				MinRetryRate: ptrTo(xgatewayv1alpha1.RequestRate{
-					Count:    ptrTo(10),
+				MinRetryRate: new(xgatewayv1alpha1.RequestRate{
+					Count:    new(10),
 					Interval: toDuration("1s"),
 				}),
 			},
@@ -58,16 +58,16 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 		{
 			name: "valid BackendTrafficPolicyConfig no retryConstraint budgetInterval",
 			sessionPersistence: xgatewayv1alpha1.SessionPersistence{
-				SessionName:     ptrTo("foo"),
+				SessionName:     new("foo"),
 				AbsoluteTimeout: toDuration("1h"),
-				Type:            ptrTo(gatewayv1.CookieBasedSessionPersistence),
+				Type:            new(gatewayv1.CookieBasedSessionPersistence),
 			},
 			retryConstraint: xgatewayv1alpha1.RetryConstraint{
-				Budget: ptrTo(xgatewayv1alpha1.BudgetDetails{
-					Percent: ptrTo(20),
+				Budget: new(xgatewayv1alpha1.BudgetDetails{
+					Percent: new(20),
 				}),
-				MinRetryRate: ptrTo(xgatewayv1alpha1.RequestRate{
-					Count:    ptrTo(10),
+				MinRetryRate: new(xgatewayv1alpha1.RequestRate{
+					Count:    new(10),
 					Interval: toDuration("1s"),
 				}),
 			},
@@ -76,13 +76,13 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 		{
 			name: "valid BackendTrafficPolicyConfig no retryConstraint minRetryRate",
 			sessionPersistence: xgatewayv1alpha1.SessionPersistence{
-				SessionName:     ptrTo("foo"),
+				SessionName:     new("foo"),
 				AbsoluteTimeout: toDuration("1h"),
-				Type:            ptrTo(gatewayv1.CookieBasedSessionPersistence),
+				Type:            new(gatewayv1.CookieBasedSessionPersistence),
 			},
 			retryConstraint: xgatewayv1alpha1.RetryConstraint{
-				Budget: ptrTo(xgatewayv1alpha1.BudgetDetails{
-					Percent:  ptrTo(20),
+				Budget: new(xgatewayv1alpha1.BudgetDetails{
+					Percent:  new(20),
 					Interval: toDuration("10s"),
 				}),
 			},
@@ -91,17 +91,17 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 		{
 			name: "invalid BackendTrafficPolicyConfig budgetInterval too long",
 			sessionPersistence: xgatewayv1alpha1.SessionPersistence{
-				SessionName:     ptrTo("foo"),
+				SessionName:     new("foo"),
 				AbsoluteTimeout: toDuration("1h"),
-				Type:            ptrTo(gatewayv1.CookieBasedSessionPersistence),
+				Type:            new(gatewayv1.CookieBasedSessionPersistence),
 			},
 			retryConstraint: xgatewayv1alpha1.RetryConstraint{
-				Budget: ptrTo(xgatewayv1alpha1.BudgetDetails{
-					Percent:  ptrTo(20),
+				Budget: new(xgatewayv1alpha1.BudgetDetails{
+					Percent:  new(20),
 					Interval: toDuration("2h"),
 				}),
-				MinRetryRate: ptrTo(xgatewayv1alpha1.RequestRate{
-					Count:    ptrTo(10),
+				MinRetryRate: new(xgatewayv1alpha1.RequestRate{
+					Count:    new(10),
 					Interval: toDuration("10s"),
 				}),
 			},
@@ -110,17 +110,17 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 		{
 			name: "invalid BackendTrafficPolicyConfig budgetInterval too short",
 			sessionPersistence: xgatewayv1alpha1.SessionPersistence{
-				SessionName:     ptrTo("foo"),
+				SessionName:     new("foo"),
 				AbsoluteTimeout: toDuration("1h"),
-				Type:            ptrTo(gatewayv1.CookieBasedSessionPersistence),
+				Type:            new(gatewayv1.CookieBasedSessionPersistence),
 			},
 			retryConstraint: xgatewayv1alpha1.RetryConstraint{
-				Budget: ptrTo(xgatewayv1alpha1.BudgetDetails{
-					Percent:  ptrTo(20),
+				Budget: new(xgatewayv1alpha1.BudgetDetails{
+					Percent:  new(20),
 					Interval: toDuration("1ms"),
 				}),
-				MinRetryRate: ptrTo(xgatewayv1alpha1.RequestRate{
-					Count:    ptrTo(10),
+				MinRetryRate: new(xgatewayv1alpha1.RequestRate{
+					Count:    new(10),
 					Interval: toDuration("10s"),
 				}),
 			},
@@ -129,17 +129,17 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 		{
 			name: "invalid BackendTrafficPolicyConfig minRetryRate interval",
 			sessionPersistence: xgatewayv1alpha1.SessionPersistence{
-				SessionName:     ptrTo("foo"),
+				SessionName:     new("foo"),
 				AbsoluteTimeout: toDuration("1h"),
-				Type:            ptrTo(gatewayv1.CookieBasedSessionPersistence),
+				Type:            new(gatewayv1.CookieBasedSessionPersistence),
 			},
 			retryConstraint: xgatewayv1alpha1.RetryConstraint{
-				Budget: ptrTo(xgatewayv1alpha1.BudgetDetails{
-					Percent:  ptrTo(20),
+				Budget: new(xgatewayv1alpha1.BudgetDetails{
+					Percent:  new(20),
 					Interval: toDuration("10s"),
 				}),
-				MinRetryRate: ptrTo(xgatewayv1alpha1.RequestRate{
-					Count:    ptrTo(10),
+				MinRetryRate: new(xgatewayv1alpha1.RequestRate{
+					Count:    new(10),
 					Interval: toDuration("2h"),
 				}),
 			},
@@ -148,17 +148,17 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 		{
 			name: "valid BackendTrafficPolicyConfig no cookie lifetimeType",
 			sessionPersistence: xgatewayv1alpha1.SessionPersistence{
-				SessionName:     ptrTo("foo"),
+				SessionName:     new("foo"),
 				AbsoluteTimeout: toDuration("1h"),
-				Type:            ptrTo(gatewayv1.CookieBasedSessionPersistence),
+				Type:            new(gatewayv1.CookieBasedSessionPersistence),
 			},
 			retryConstraint: xgatewayv1alpha1.RetryConstraint{
-				Budget: ptrTo(xgatewayv1alpha1.BudgetDetails{
-					Percent:  ptrTo(20),
+				Budget: new(xgatewayv1alpha1.BudgetDetails{
+					Percent:  new(20),
 					Interval: toDuration("10s"),
 				}),
-				MinRetryRate: ptrTo(xgatewayv1alpha1.RequestRate{
-					Count:    ptrTo(10),
+				MinRetryRate: new(xgatewayv1alpha1.RequestRate{
+					Count:    new(10),
 					Interval: toDuration("1s"),
 				}),
 			},
@@ -167,19 +167,19 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 		{
 			name: "valid BackendTrafficPolicyConfig session cookie",
 			sessionPersistence: xgatewayv1alpha1.SessionPersistence{
-				SessionName: ptrTo("foo"),
-				Type:        ptrTo(gatewayv1.CookieBasedSessionPersistence),
+				SessionName: new("foo"),
+				Type:        new(gatewayv1.CookieBasedSessionPersistence),
 				CookieConfig: &gatewayv1.CookieConfig{
-					LifetimeType: ptrTo(gatewayv1.SessionCookieLifetimeType),
+					LifetimeType: new(gatewayv1.SessionCookieLifetimeType),
 				},
 			},
 			retryConstraint: xgatewayv1alpha1.RetryConstraint{
-				Budget: ptrTo(xgatewayv1alpha1.BudgetDetails{
-					Percent:  ptrTo(20),
+				Budget: new(xgatewayv1alpha1.BudgetDetails{
+					Percent:  new(20),
 					Interval: toDuration("10s"),
 				}),
-				MinRetryRate: ptrTo(xgatewayv1alpha1.RequestRate{
-					Count:    ptrTo(10),
+				MinRetryRate: new(xgatewayv1alpha1.RequestRate{
+					Count:    new(10),
 					Interval: toDuration("1s"),
 				}),
 			},
@@ -188,19 +188,19 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 		{
 			name: "invalid BackendTrafficPolicyConfig permanent cookie",
 			sessionPersistence: xgatewayv1alpha1.SessionPersistence{
-				SessionName: ptrTo("foo"),
-				Type:        ptrTo(gatewayv1.CookieBasedSessionPersistence),
+				SessionName: new("foo"),
+				Type:        new(gatewayv1.CookieBasedSessionPersistence),
 				CookieConfig: &gatewayv1.CookieConfig{
-					LifetimeType: ptrTo(gatewayv1.PermanentCookieLifetimeType),
+					LifetimeType: new(gatewayv1.PermanentCookieLifetimeType),
 				},
 			},
 			retryConstraint: xgatewayv1alpha1.RetryConstraint{
-				Budget: ptrTo(xgatewayv1alpha1.BudgetDetails{
-					Percent:  ptrTo(20),
+				Budget: new(xgatewayv1alpha1.BudgetDetails{
+					Percent:  new(20),
 					Interval: toDuration("10s"),
 				}),
-				MinRetryRate: ptrTo(xgatewayv1alpha1.RequestRate{
-					Count:    ptrTo(10),
+				MinRetryRate: new(xgatewayv1alpha1.RequestRate{
+					Count:    new(10),
 					Interval: toDuration("1s"),
 				}),
 			},
@@ -209,20 +209,20 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 		{
 			name: "valid BackendTrafficPolicyConfig permanent cookie",
 			sessionPersistence: xgatewayv1alpha1.SessionPersistence{
-				SessionName:     ptrTo("foo"),
+				SessionName:     new("foo"),
 				AbsoluteTimeout: toDuration("1h"),
-				Type:            ptrTo(gatewayv1.CookieBasedSessionPersistence),
+				Type:            new(gatewayv1.CookieBasedSessionPersistence),
 				CookieConfig: &gatewayv1.CookieConfig{
-					LifetimeType: ptrTo(gatewayv1.PermanentCookieLifetimeType),
+					LifetimeType: new(gatewayv1.PermanentCookieLifetimeType),
 				},
 			},
 			retryConstraint: xgatewayv1alpha1.RetryConstraint{
-				Budget: ptrTo(xgatewayv1alpha1.BudgetDetails{
-					Percent:  ptrTo(20),
+				Budget: new(xgatewayv1alpha1.BudgetDetails{
+					Percent:  new(20),
 					Interval: toDuration("10s"),
 				}),
-				MinRetryRate: ptrTo(xgatewayv1alpha1.RequestRate{
-					Count:    ptrTo(10),
+				MinRetryRate: new(xgatewayv1alpha1.RequestRate{
+					Count:    new(10),
 					Interval: toDuration("1s"),
 				}),
 			},
@@ -231,16 +231,16 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 		{
 			name: "valid BackendTrafficPolicyConfig header-based session persistence",
 			sessionPersistence: xgatewayv1alpha1.SessionPersistence{
-				SessionName: ptrTo("foo"),
-				Type:        ptrTo(gatewayv1.HeaderBasedSessionPersistence),
+				SessionName: new("foo"),
+				Type:        new(gatewayv1.HeaderBasedSessionPersistence),
 			},
 			retryConstraint: xgatewayv1alpha1.RetryConstraint{
-				Budget: ptrTo(xgatewayv1alpha1.BudgetDetails{
-					Percent:  ptrTo(20),
+				Budget: new(xgatewayv1alpha1.BudgetDetails{
+					Percent:  new(20),
 					Interval: toDuration("10s"),
 				}),
-				MinRetryRate: ptrTo(xgatewayv1alpha1.RequestRate{
-					Count:    ptrTo(10),
+				MinRetryRate: new(xgatewayv1alpha1.RequestRate{
+					Count:    new(10),
 					Interval: toDuration("1s"),
 				}),
 			},

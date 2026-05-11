@@ -607,7 +607,7 @@ func ParseConformanceProfiles(p string) []ConformanceProfileName {
 		return nil
 	}
 	var res []ConformanceProfileName
-	for _, value := range strings.Split(p, ",") {
+	for value := range strings.SplitSeq(p, ",") {
 		res = append(res, ConformanceProfileName(value))
 	}
 	return res

@@ -16,7 +16,7 @@ jobs:
       matrix:
         # Available versions at https://raw.githubusercontent.com/kubernetes-sigs/controller-tools/HEAD/envtest-releases.yaml
         # Our goal is to cover the most recent 5 minor versions, even if the oldest one is EOL.
-        k8s_version: [v1.35.0, v1.34.1, v1.33.0, v1.32.0, v1.31.0]
+        k8s_version: [v1.36.0, v1.35.0, v1.34.1, v1.33.0, v1.32.0]
         crd_channel: [standard, experimental]
     steps:
       - name: Checkout code

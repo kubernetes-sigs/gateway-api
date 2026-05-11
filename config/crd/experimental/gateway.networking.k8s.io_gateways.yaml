@@ -3,7 +3,7 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     api-approved.kubernetes.io: https://github.com/kubernetes-sigs/gateway-api/pull/4530
-    gateway.networking.k8s.io/bundle-version: v1.4.1
+    gateway.networking.k8s.io/bundle-version: v0.0.0-dev
     gateway.networking.k8s.io/channel: experimental
   name: gateways.gateway.networking.k8s.io
 spec:
@@ -38,6 +38,8 @@ spec:
         description: |-
           Gateway represents an instance of a service-traffic handling infrastructure
           by binding Listeners to a set of IP addresses.
+          A Gateway name SHOULD be compliant with RFC 1035, consisting of a maximum of 63 lower case alphanumeric
+          characters or hyphens ('-'), and MUST start and end with an alphanumeric character.
         properties:
           apiVersion:
             description: |-
@@ -1139,7 +1141,7 @@ spec:
                                   - kind
                                   - name
                                   type: object
-                                maxItems: 8
+                                maxItems: 16
                                 minItems: 1
                                 type: array
                                 x-kubernetes-list-type: atomic
@@ -1304,7 +1306,7 @@ spec:
                                         - kind
                                         - name
                                         type: object
-                                      maxItems: 8
+                                      maxItems: 16
                                       minItems: 1
                                       type: array
                                       x-kubernetes-list-type: atomic
@@ -2796,7 +2798,7 @@ spec:
                                   - kind
                                   - name
                                   type: object
-                                maxItems: 8
+                                maxItems: 16
                                 minItems: 1
                                 type: array
                                 x-kubernetes-list-type: atomic
@@ -2961,7 +2963,7 @@ spec:
                                         - kind
                                         - name
                                         type: object
-                                      maxItems: 8
+                                      maxItems: 16
                                       minItems: 1
                                       type: array
                                       x-kubernetes-list-type: atomic

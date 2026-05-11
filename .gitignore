@@ -61,6 +61,7 @@ site-src/reference/spec.md
 site-src/reference/specx.md
 site-src/reference/**/spec.md
 site-src/reference/**/specx.md
+temp_test_convert_links
 site-src/wizard/main.wasm
 site-src/wizard/wasm_exec.js
 site-src/wizard/data/*

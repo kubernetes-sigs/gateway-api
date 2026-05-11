@@ -109,7 +109,7 @@ Namespace.
   same `Gateway` resource.
 
 Again, this separation of concerns allows Chihiro to enforce centralized
-policies [such as TLS](../guides/tls.md#downstream-tls) can be enforced at the
+policies [such as TLS](../guides/tls.md#downstream-tls) at the
 Gateway. Meanwhile, Ana and Allison run their applications [in their own
 Namespaces](../guides/multiple-ns.md), but attach their Routes to the same shared
 Gateway, allowing them to independently control their [routing

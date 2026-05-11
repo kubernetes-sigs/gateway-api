@@ -85,7 +85,7 @@ func TestDelayResponse(t *testing.T) {
 
 func TestStatusHandler(t *testing.T) {
 	// Test with a valid status code (200)
-	req := httptest.NewRequest("GET", "/status/200", nil)
+	req := httptest.NewRequestWithContext(t.Context(), "GET", "/status/200", nil)
 	rr := httptest.NewRecorder()
 
 	statusHandler(rr, req)
@@ -95,7 +95,7 @@ func TestStatusHandler(t *testing.T) {
 	}
 
 	// Test with a valid status code (404)
-	req = httptest.NewRequest("GET", "/status/404", nil)
+	req = httptest.NewRequestWithContext(t.Context(), "GET", "/status/404", nil)
 	rr = httptest.NewRecorder()
 
 	statusHandler(rr, req)
@@ -105,7 +105,7 @@ func TestStatusHandler(t *testing.T) {
 	}
 
 	// Test with a valid status (305)
-	req = httptest.NewRequest("GET", "/status/305", nil)
+	req = httptest.NewRequestWithContext(t.Context(), "GET", "/status/305", nil)
 	rr = httptest.NewRecorder()
 
 	statusHandler(rr, req)
@@ -115,7 +115,7 @@ func TestStatusHandler(t *testing.T) {
 	}
 
 	// Test with an invalid status code (string)
-	req = httptest.NewRequest("GET", "/status/invalid", nil)
+	req = httptest.NewRequestWithContext(t.Context(), "GET", "/status/invalid", nil)
 	rr = httptest.NewRecorder()
 
 	statusHandler(rr, req)
@@ -127,7 +127,7 @@ func TestStatusHandler(t *testing.T) {
 
 func TestEchoHandler(t *testing.T) {
 	// Create an HTTP request to the / endpoint
-	req := httptest.NewRequest("GET", "/", nil)
+	req := httptest.NewRequestWithContext(t.Context(), "GET", "/", nil)
 	rr := httptest.NewRecorder()
 
 	// Set up the context
@@ -243,7 +243,7 @@ func TestEchoHandler_IncludesHTTPPort(t *testing.T) {
 		Pod:       "testPod",
 	}
 
-	req := httptest.NewRequest("GET", "/", nil)
+	req := httptest.NewRequestWithContext(t.Context(), "GET", "/", nil)
 	rr := httptest.NewRecorder()
 
 	echoHandler(rr, req)
@@ -274,7 +274,7 @@ func TestEchoHandler_HTTPPortReflectsChange(t *testing.T) {
 		Pod:       "pod",
 	}
 
-	req := httptest.NewRequest("GET", "/", nil)
+	req := httptest.NewRequestWithContext(t.Context(), "GET", "/", nil)
 	rr := httptest.NewRecorder()
 
 	echoHandler(rr, req)
@@ -336,7 +336,7 @@ func TestProcessError(t *testing.T) {
 func TestProcessErrorWithJSONError(t *testing.T) {
 	// Create a response recorder to capture the response
 	rr := httptest.NewRecorder()
-	err := json.Unmarshal([]byte(`testing invalid JSON`), new(interface{}))
+	err := json.Unmarshal([]byte(`testing invalid JSON`), new(any))
 	code := http.StatusInternalServerError
 
 	processError(rr, err, code)

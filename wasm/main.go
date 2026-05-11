@@ -76,7 +76,7 @@ func main() {
 	doc = js.Global().Get("document")
 
 	// Expose callback for when JS has loaded the JSON data
-	js.Global().Set("wizardOnData", js.FuncOf(func(_ js.Value, args []js.Value) interface{} {
+	js.Global().Set("wizardOnData", js.FuncOf(func(_ js.Value, args []js.Value) any {
 		if len(args) < 1 {
 			return nil
 		}
@@ -86,7 +86,7 @@ func main() {
 	}))
 
 	// When a requirement checkbox is checked, uncheck the other (Must have / Nice to have are mutually exclusive)
-	doc.Get("body").Call("addEventListener", "change", js.FuncOf(func(_ js.Value, args []js.Value) interface{} {
+	doc.Get("body").Call("addEventListener", "change", js.FuncOf(func(_ js.Value, args []js.Value) any {
 		if len(args) < 1 {
 			return nil
 		}
@@ -115,20 +115,20 @@ func main() {
 
 	// Recommend button
 	recommendBtn := doc.Call("getElementById", "recommend-btn")
-	recommendBtn.Call("addEventListener", "click", js.FuncOf(func(_ js.Value, _ []js.Value) interface{} {
+	recommendBtn.Call("addEventListener", "click", js.FuncOf(func(_ js.Value, _ []js.Value) any {
 		recommend()
 		return nil
 	}))
 
 	// Reset button
 	resetBtn := doc.Call("getElementById", "reset-btn")
-	resetBtn.Call("addEventListener", "click", js.FuncOf(func(_ js.Value, _ []js.Value) interface{} {
+	resetBtn.Call("addEventListener", "click", js.FuncOf(func(_ js.Value, _ []js.Value) any {
 		resetAll()
 		return nil
 	}))
 
 	// When Core Features checkbox changes, show/hide the Gateway or HTTPRoute extended features block
-	doc.Get("body").Call("addEventListener", "change", js.FuncOf(func(_ js.Value, args []js.Value) interface{} {
+	doc.Get("body").Call("addEventListener", "change", js.FuncOf(func(_ js.Value, args []js.Value) any {
 		if len(args) < 1 {
 			return nil
 		}
@@ -149,10 +149,10 @@ func main() {
 	// Feature tables are filled only after data loads (onDataLoaded); no default consts.
 
 	// Fetch data via JS fetch (go.run blocks so we do it from Go)
-	js.Global().Call("fetch", "data/controller-wizard-data.json").Call("then", js.FuncOf(func(_ js.Value, args []js.Value) interface{} {
+	js.Global().Call("fetch", "data/controller-wizard-data.json").Call("then", js.FuncOf(func(_ js.Value, args []js.Value) any {
 		resp := args[0]
 		if resp.Get("ok").Bool() {
-			resp.Call("json").Call("then", js.FuncOf(func(_ js.Value, args2 []js.Value) interface{} {
+			resp.Call("json").Call("then", js.FuncOf(func(_ js.Value, args2 []js.Value) any {
 				data := args2[0]
 				jsonStr := js.Global().Get("JSON").Call("stringify", data).String()
 				onDataLoaded(jsonStr)
@@ -163,7 +163,7 @@ func main() {
 			doc.Call("getElementById", "recommend-btn").Set("disabled", false)
 		}
 		return nil
-	})).Call("catch", js.FuncOf(func(_ js.Value, _ []js.Value) interface{} {
+	})).Call("catch", js.FuncOf(func(_ js.Value, _ []js.Value) any {
 		doc.Call("getElementById", "wizard-data-status").Set("textContent", "Could not load data. Run 'make wizard-data' (requires conformance/reports/), then serve from site-src/wizard/.")
 		doc.Call("getElementById", "recommend-btn").Set("disabled", false)
 		return nil
@@ -282,7 +282,7 @@ func onDataLoaded(jsonStr string) {
 		versionSelect.Call("appendChild", opt)
 	}
 	versionSelect.Set("value", currentVersion)
-	versionSelect.Call("addEventListener", "change", js.FuncOf(func(_ js.Value, _ []js.Value) interface{} {
+	versionSelect.Call("addEventListener", "change", js.FuncOf(func(_ js.Value, _ []js.Value) any {
 		currentVersion = versionSelect.Get("value").String()
 		impls = buildImplsForMinVersion(currentVersion)
 		updateVersionLinks(currentVersion)
@@ -507,7 +507,7 @@ func renderTable(tableID string, section string, labelPrefix string, rows []feat
 	var html strings.Builder
 	for _, f := range rows {
 		if f.ID == "__subhead__" {
-			html.WriteString(fmt.Sprintf(`<tr class="feature-subhead"><th scope="col">%s</th><th scope="col">Requirement</th></tr>`, escapeHTML(f.Label)))
+			fmt.Fprintf(&html, `<tr class="feature-subhead"><th scope="col">%s</th><th scope="col">Requirement</th></tr>`, escapeHTML(f.Label))
 			continue
 		}
 		label := f.Label
@@ -523,9 +523,9 @@ func renderTable(tableID string, section string, labelPrefix string, rows []feat
 		}
 		reqCell := `<label><input type="checkbox" name="` + name + `" value="must" /> Must have</label>
 <label><input type="checkbox" name="` + name + `" value="good" /> Nice to have</label>`
-		html.WriteString(fmt.Sprintf(`<tr><td class="%s"%s>%s</td><td>
+		fmt.Fprintf(&html, `<tr><td class="%s"%s>%s</td><td>
 %s
-</td></tr>`, cellClass, dataDesc, escapeHTML(label), reqCell))
+</td></tr>`, cellClass, dataDesc, escapeHTML(label), reqCell)
 	}
 	tbody.Set("innerHTML", html.String())
 }
@@ -579,16 +579,25 @@ func getSelections() (must, good []selection) {
 	return must, goodFiltered
 }
 
-func gtagEvent(eventName string, params map[string]interface{}) {
+func gtagEvent(eventName string, params map[string]any) {
 	global := js.Global()
-	if gtag := global.Get("gtag"); gtag.Truthy() {
-		global.Call("gtag", "event", eventName, js.ValueOf(params))
+
+	paramsJS := global.Get("Object").New()
+	for k, v := range params {
+		paramsJS.Set(k, js.ValueOf(v))
+	}
+
+	gtag := global.Get("gtag")
+	if gtag.Truthy() {
+		global.Call("gtag", "event", eventName, paramsJS)
 		return
 	}
+
 	parent := global.Get("parent")
 	if parent.Truthy() && !parent.Equal(global) {
 		if pGtag := parent.Get("gtag"); pGtag.Truthy() {
-			parent.Call("gtag", "event", eventName, js.ValueOf(params))
+			parent.Call("gtag", "event", eventName, paramsJS)
+			return
 		}
 	}
 }
@@ -599,7 +608,7 @@ func trackWizardSelections(must, good []selection) {
 			return
 		}
 		for _, sel := range selections {
-			gtagEvent("wizard_feature_selection", map[string]interface{}{
+			gtagEvent("wizard_feature_selection", map[string]any{
 				"resource_name": sel.Section,
 				"feature_name":  sel.ID,
 				"version":       currentVersion,
@@ -793,14 +802,17 @@ func recommend() {
 		if missingStr == "" {
 			missingStr = "—"
 		}
-		html.WriteString(fmt.Sprintf("<tr><td>%s</td><td><a href=\"%s\" target=\"_blank\" rel=\"noopener\">%s</a> %s</td><td>%s</td><td>%d/%d</td><td>%d/%d</td><td class=\"missing\">%s</td></tr>",
+		fmt.Fprintf(&html, "<tr><td>%s</td><td><a href=\"%s\" target=\"_blank\" rel=\"noopener\">%s</a> %s</td><td>%s</td><td>%d/%d</td><td>%d/%d</td><td class=\"missing\">%s</td></tr>",
 			escapeHTML(c.impl.Organization), escapeHTML(c.impl.URL), escapeHTML(c.impl.Project), escapeHTML(c.impl.Version),
-			escapeHTML(conformance), c.mustCount, c.mustTotal, c.goodCount, c.goodTotal, escapeHTML(missingStr)))
+			escapeHTML(conformance), c.mustCount, c.mustTotal, c.goodCount, c.goodTotal, escapeHTML(missingStr))
 	}
 	html.WriteString("</tbody></table>")
 	resultsContent.Set("innerHTML", html.String())
 	resultsDiv.Get("classList").Call("add", "visible")
-	resultsDiv.Call("scrollIntoView", map[string]interface{}{"behavior": "smooth", "block": "start"})
+	scrollOpts := js.Global().Get("Object").New()
+	scrollOpts.Set("behavior", "smooth")
+	scrollOpts.Set("block", "start")
+	resultsDiv.Call("scrollIntoView", scrollOpts)
 	setStatus(statusEl, len(scoredList))
 	notifyResize()
 }

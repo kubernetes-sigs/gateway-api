@@ -24,11 +24,9 @@ import (
 	"net/netip"
 	"strings"
 
-	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
+	v1 "sigs.k8s.io/gateway-api/apis/v1"
 	conformanceconfig "sigs.k8s.io/gateway-api/conformance/utils/config"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
-
-	"k8s.io/utils/ptr"
 )
 
 const (
@@ -165,16 +163,16 @@ func ApplyAll(opts *suite.ConfigurableOptions) {
 	})
 }
 
-func parseAddress(v string) gatewayv1.GatewaySpecAddress {
+func parseAddress(v string) v1.GatewaySpecAddress {
 	_, err := netip.ParseAddr(v)
 	if err == nil {
-		return gatewayv1.GatewaySpecAddress{
-			Type:  ptr.To(gatewayv1.IPAddressType),
+		return v1.GatewaySpecAddress{
+			Type:  new(v1.IPAddressType),
 			Value: v,
 		}
 	}
-	return gatewayv1.GatewaySpecAddress{
-		Type:  ptr.To(gatewayv1.HostnameAddressType),
+	return v1.GatewaySpecAddress{
+		Type:  new(v1.HostnameAddressType),
 		Value: v,
 	}
 }

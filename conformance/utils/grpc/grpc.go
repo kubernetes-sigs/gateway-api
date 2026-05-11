@@ -114,15 +114,16 @@ func getMapDeterministicStr(m map[string]string) string {
 		keys = append(keys, key)
 	}
 	sort.Strings(keys)
-	out := "{"
+	var out strings.Builder
+	out.WriteString("{")
 	for i, key := range keys {
-		out += key + ":" + m[key]
+		out.WriteString(key + ":" + m[key])
 		if i != len(keys)-1 {
-			out += ","
+			out.WriteString(",")
 		}
 	}
-	out += "}"
-	return out
+	out.WriteString("}")
+	return out.String()
 }
 
 func (er *ExpectedResponse) GetTestCaseName(i int) string {

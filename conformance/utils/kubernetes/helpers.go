@@ -70,7 +70,7 @@ func NewGatewayRef(nn types.NamespacedName, listenerNames ...string) GatewayRef 
 	}
 
 	for _, listener := range listenerNames {
-		listeners = append(listeners, ptr.To(gatewayv1.SectionName(listener)))
+		listeners = append(listeners, new(gatewayv1.SectionName(listener)))
 	}
 	return GatewayRef{
 		NamespacedName: nn,
@@ -780,7 +780,7 @@ func RouteTypeMustHaveParentsField(t *testing.T, routeType any) string {
 
 	parentsField, ok := statusField.Type.FieldByName("Parents")
 	require.True(t, ok, "%s.Status does not have a Parents field", routeTypeName)
-	require.Equal(t, parentsField.Type, reflect.TypeOf([]v1alpha2.RouteParentStatus{}))
+	require.Equal(t, parentsField.Type, reflect.TypeFor[[]v1alpha2.RouteParentStatus]())
 
 	return routeTypeName
 }

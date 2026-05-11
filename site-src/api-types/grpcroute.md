@@ -6,6 +6,11 @@
     `v1.1.0`. For more information on release channels, refer to our [versioning
     guide](../concepts/versioning.md).
 
+!!! note
+    If you know you're working with gRPC, prefer using a `GRPCRoute`. An `HTTPRoute` may be sufficient
+    for basic routing and load balancing, but `GRPCRoute` makes the intent clearer and can unlock
+    more gRPC-specific functionality. See [When to Use GRPCRoute](#when-to-use-grpcroute).
+
 [GRPCRoute][grpcroute] is a Gateway API type for specifying routing behavior
 of gRPC requests from a Gateway listener to an API object, i.e. Service.
 
@@ -40,20 +45,19 @@ gRPC meets all of these criteria, so the decision was made to include `GRPCRoute
 
 ### Cross Serving
 
-Implementations that support GRPCRoute must enforce uniqueness of
-hostnames between `GRPCRoute`s and `HTTPRoute`s. If a route (A) of type `HTTPRoute` or
-`GRPCRoute` is attached to a Listener and that listener already has another Route (B) of
-the other type attached and the intersection of the hostnames of A and B is
-non-empty, then the implementation must reject Route A. That is, the
-implementation must raise an 'Accepted' condition with a status of 'False' in
-the corresponding RouteParentStatus.
-
 In general, it is recommended that separate hostnames be used for gRPC and
 non-gRPC HTTP traffic. This aligns with standard practice in the gRPC community.
-If however, it is a necessity to serve HTTP and gRPC on the same hostname with
-the only differentiator being URI, the user should use `HTTPRoute` resources for
-both gRPC and HTTP. This will come at the cost of the improved UX of the
-`GRPCRoute` resource.
+
+Implementations that support GRPCRoute may enforce uniqueness of
+hostnames between `GRPCRoute`s and `HTTPRoute`s. That is, if a route (A) of type `HTTPRoute` or
+`GRPCRoute` is attached to a Listener and that listener already has another Route (B) of
+the other type attached and the intersection of the hostnames of A and B is
+non-empty, then the implementation may reject Route A and raise an 'Accepted' condition with a status of 'False' in
+the corresponding RouteParentStatus.
+
+If there is a necessity to serve HTTP and gRPC on the same hostname with
+the only differentiator being URI, and the implementation enforces uniqueness, the user should use `HTTPRoute` resources 
+for both gRPC and HTTP. This will come at the cost of the improved UX of the `GRPCRoute` resource.
 
 ## When to Use GRPCRoute
 

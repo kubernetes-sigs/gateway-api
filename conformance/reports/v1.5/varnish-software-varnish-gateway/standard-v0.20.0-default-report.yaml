@@ -1,14 +1,14 @@
 apiVersion: gateway.networking.k8s.io/v1
-date: "2026-03-19T18:04:20Z"
-gatewayAPIChannel: experimental
+date: "2026-05-05T13:50:23+02:00"
+gatewayAPIChannel: standard
 gatewayAPIVersion: v1.5.0
 implementation:
   contact:
-  - https://www.airlock.com/en/contact
-  organization: airlock
-  project: microgateway
-  url: https://github.com/airlock/microgateway
-  version: 5.0.0
+  - '@perbu'
+  organization: Varnish Software AS
+  project: Varnish Gateway
+  url: https://gateway.varnish.org
+  version: v0.20.0
 kind: ConformanceReport
 mode: default
 profiles:
@@ -22,50 +22,44 @@ profiles:
     result: success
     statistics:
       Failed: 0
-      Passed: 38
+      Passed: 9
       Skipped: 0
     supportedFeatures:
+    - GatewayHTTPListenerIsolation
+    - HTTPRouteHostRewrite
+    - HTTPRouteMethodMatching
+    - HTTPRoutePathRedirect
+    - HTTPRoutePathRewrite
+    - HTTPRoutePortRedirect
+    - HTTPRouteQueryParamMatching
+    - HTTPRouteResponseHeaderModification
+    - HTTPRouteSchemeRedirect
+    unsupportedFeatures:
     - BackendTLSPolicy
     - BackendTLSPolicySANValidation
+    - GatewayAddressEmpty
     - GatewayBackendClientCertificate
     - GatewayFrontendClientCertificateValidation
     - GatewayFrontendClientCertificateValidationInsecureFallback
-    - GatewayHTTPListenerIsolation
     - GatewayHTTPSListenerDetectMisdirectedRequests
     - GatewayInfrastructurePropagation
     - GatewayPort8080
+    - GatewayStaticAddresses
     - HTTPRoute303RedirectStatusCode
     - HTTPRoute307RedirectStatusCode
     - HTTPRoute308RedirectStatusCode
     - HTTPRouteBackendProtocolH2C
     - HTTPRouteBackendProtocolWebSocket
+    - HTTPRouteBackendRequestHeaderModification
     - HTTPRouteBackendTimeout
     - HTTPRouteCORS
     - HTTPRouteDestinationPortMatching
-    - HTTPRouteHostRewrite
-    - HTTPRouteMethodMatching
     - HTTPRouteNamedRouteRule
     - HTTPRouteParentRefPort
-    - HTTPRoutePathRedirect
-    - HTTPRoutePathRewrite
-    - HTTPRoutePortRedirect
-    - HTTPRouteQueryParamMatching
-    - HTTPRouteRequestTimeout
-    - HTTPRouteResponseHeaderModification
-    - HTTPRouteSchemeRedirect
-    unsupportedFeatures:
-    - GatewayAddressEmpty
-    - GatewayStaticAddresses
-    - HTTPRouteBackendRequestHeaderModification
     - HTTPRouteRequestMirror
     - HTTPRouteRequestMultipleMirrors
     - HTTPRouteRequestPercentageMirror
+    - HTTPRouteRequestTimeout
     - ListenerSet
   name: GATEWAY-HTTP
   summary: Core tests succeeded. Extended tests succeeded.
-succeededProvisionalTests:
-- GatewayInfrastructure
-- HTTPRoute303Redirect
-- HTTPRoute307Redirect
-- HTTPRoute308Redirect
-- HTTPRouteNamedRule

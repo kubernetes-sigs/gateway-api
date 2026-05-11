@@ -1,4 +1,4 @@
-Click==8.3.2
+Click==8.3.3
 htmlmin==0.1.12
 Jinja2==3.1.6
 jsmin==3.0.1
@@ -13,7 +13,7 @@ mkdocs-macros-plugin==1.5.0
 mkdocs-material==9.7.6
 mkdocs-redirects==1.2.3
 mkdocs-mermaid2-plugin==1.2.3
-pandas>=3.0.0
+pandas>=3.0.2
 pep562==1.1
 Pygments==2.20.0
 pymdown-extensions==10.21.2
@@ -22,3 +22,4 @@ six==1.17.0
 tabulate==0.10.0
 tornado==6.5.5
 semver==3.0.4
+python-frontmatter==1.1.0

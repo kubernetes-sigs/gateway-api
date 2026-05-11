@@ -52,68 +52,68 @@ func TestHTTPPathMatch(t *testing.T) {
 			name:       "invalid because path does not start with '/'",
 			wantErrors: []string{"value must be an absolute path and start with '/' when type one of ['Exact', 'PathPrefix']"},
 			path: &gatewayv1.HTTPPathMatch{
-				Type:  ptrTo(gatewayv1.PathMatchType("PathPrefix")),
-				Value: ptrTo("foo"),
+				Type:  new(gatewayv1.PathMatchType("PathPrefix")),
+				Value: new("foo"),
 			},
 		},
 		{
 			name:       "invalid httpRoute prefix (/.)",
 			wantErrors: []string{"must not end with '/.' when type one of ['Exact', 'PathPrefix']"},
 			path: &gatewayv1.HTTPPathMatch{
-				Type:  ptrTo(gatewayv1.PathMatchType("PathPrefix")),
-				Value: ptrTo("/."),
+				Type:  new(gatewayv1.PathMatchType("PathPrefix")),
+				Value: new("/."),
 			},
 		},
 		{
 			name:       "invalid exact (/./)",
 			wantErrors: []string{"must not contain '/./' when type one of ['Exact', 'PathPrefix']"},
 			path: &gatewayv1.HTTPPathMatch{
-				Type:  ptrTo(gatewayv1.PathMatchType("Exact")),
-				Value: ptrTo("/foo/./bar"),
+				Type:  new(gatewayv1.PathMatchType("Exact")),
+				Value: new("/foo/./bar"),
 			},
 		},
 		{
 			name:       "invalid type",
 			wantErrors: []string{"supported values: \"Exact\", \"PathPrefix\", \"RegularExpression\""},
 			path: &gatewayv1.HTTPPathMatch{
-				Type:  ptrTo(gatewayv1.PathMatchType("FooBar")),
-				Value: ptrTo("/path"),
+				Type:  new(gatewayv1.PathMatchType("FooBar")),
+				Value: new("/path"),
 			},
 		},
 		{
 			name: "valid because type is RegularExpression but would not be valid for Exact",
 			path: &gatewayv1.HTTPPathMatch{
-				Type:  ptrTo(gatewayv1.PathMatchType("RegularExpression")),
-				Value: ptrTo("/foo/./bar"),
+				Type:  new(gatewayv1.PathMatchType("RegularExpression")),
+				Value: new("/foo/./bar"),
 			},
 		},
 		{
 			name: "valid httpRoute prefix",
 			path: &gatewayv1.HTTPPathMatch{
-				Type:  ptrTo(gatewayv1.PathMatchType("PathPrefix")),
-				Value: ptrTo("/path"),
+				Type:  new(gatewayv1.PathMatchType("PathPrefix")),
+				Value: new("/path"),
 			},
 		},
 		{
 			name: "valid path with some special characters",
 			path: &gatewayv1.HTTPPathMatch{
-				Type:  ptrTo(gatewayv1.PathMatchType("Exact")),
-				Value: ptrTo("/abc/123'/a-b-c/d@gmail/%0A"),
+				Type:  new(gatewayv1.PathMatchType("Exact")),
+				Value: new("/abc/123'/a-b-c/d@gmail/%0A"),
 			},
 		},
 		{
 			name: "invalid prefix path (/[])",
 			path: &gatewayv1.HTTPPathMatch{
-				Type:  ptrTo(gatewayv1.PathMatchType("PathPrefix")),
-				Value: ptrTo("/[]"),
+				Type:  new(gatewayv1.PathMatchType("PathPrefix")),
+				Value: new("/[]"),
 			},
 			wantErrors: []string{"must only contain valid characters (matching ^(?:[-A-Za-z0-9/._~!$&'()*+,;=:@]|[%][0-9a-fA-F]{2})+$) for types ['Exact', 'PathPrefix']"},
 		},
 		{
 			name: "invalid exact path (/^)",
 			path: &gatewayv1.HTTPPathMatch{
-				Type:  ptrTo(gatewayv1.PathMatchType("Exact")),
-				Value: ptrTo("/^"),
+				Type:  new(gatewayv1.PathMatchType("Exact")),
+				Value: new("/^"),
 			},
 			wantErrors: []string{"must only contain valid characters (matching ^(?:[-A-Za-z0-9/._~!$&'()*+,;=:@]|[%][0-9a-fA-F]{2})+$) for types ['Exact', 'PathPrefix']"},
 		},
@@ -135,7 +135,7 @@ func TestHTTPPathMatch(t *testing.T) {
 							BackendRef: gatewayv1.BackendRef{
 								BackendObjectReference: gatewayv1.BackendObjectReference{
 									Name: gatewayv1.ObjectName("test"),
-									Port: ptrTo(gatewayv1.PortNumber(8080)),
+									Port: new(gatewayv1.PortNumber(8080)),
 								},
 							},
 						}},
@@ -271,11 +271,11 @@ func TestHTTPRouteFilter(t *testing.T) {
 			routeFilter: gatewayv1.HTTPRouteFilter{
 				Type: gatewayv1.HTTPRouteFilterRequestMirror,
 				RequestMirror: &gatewayv1.HTTPRequestMirrorFilter{BackendRef: gatewayv1.BackendObjectReference{
-					Group:     ptrTo(gatewayv1.Group("group")),
-					Kind:      ptrTo(gatewayv1.Kind("kind")),
+					Group:     new(gatewayv1.Group("group")),
+					Kind:      new(gatewayv1.Kind("kind")),
 					Name:      "name",
-					Namespace: ptrTo(gatewayv1.Namespace("ns")),
-					Port:      ptrTo(gatewayv1.PortNumber(22)),
+					Namespace: new(gatewayv1.Namespace("ns")),
+					Port:      new(gatewayv1.PortNumber(22)),
 				}},
 			},
 		},
@@ -299,14 +299,14 @@ func TestHTTPRouteFilter(t *testing.T) {
 			routeFilter: gatewayv1.HTTPRouteFilter{
 				Type: gatewayv1.HTTPRouteFilterRequestRedirect,
 				RequestRedirect: &gatewayv1.HTTPRequestRedirectFilter{
-					Scheme:   ptrTo("http"),
-					Hostname: ptrTo(gatewayv1.PreciseHostname("hostname")),
+					Scheme:   new("http"),
+					Hostname: new(gatewayv1.PreciseHostname("hostname")),
 					Path: &gatewayv1.HTTPPathModifier{
 						Type:            gatewayv1.FullPathHTTPPathModifier,
-						ReplaceFullPath: ptrTo("path"),
+						ReplaceFullPath: new("path"),
 					},
-					Port:       ptrTo(gatewayv1.PortNumber(8080)),
-					StatusCode: ptrTo(302),
+					Port:       new(gatewayv1.PortNumber(8080)),
+					StatusCode: new(302),
 				},
 			},
 		},
@@ -356,10 +356,10 @@ func TestHTTPRouteFilter(t *testing.T) {
 			routeFilter: gatewayv1.HTTPRouteFilter{
 				Type: gatewayv1.HTTPRouteFilterURLRewrite,
 				URLRewrite: &gatewayv1.HTTPURLRewriteFilter{
-					Hostname: ptrTo(gatewayv1.PreciseHostname("hostname")),
+					Hostname: new(gatewayv1.PreciseHostname("hostname")),
 					Path: &gatewayv1.HTTPPathModifier{
 						Type:            gatewayv1.FullPathHTTPPathModifier,
-						ReplaceFullPath: ptrTo("path"),
+						ReplaceFullPath: new("path"),
 					},
 				},
 			},
@@ -437,8 +437,8 @@ func TestHTTPRouteRule(t *testing.T) {
 					Matches: []gatewayv1.HTTPRouteMatch{
 						{
 							Path: &gatewayv1.HTTPPathMatch{
-								Type:  ptrTo(gatewayv1.PathMatchType("PathPrefix")),
-								Value: ptrTo("/"),
+								Type:  new(gatewayv1.PathMatchType("PathPrefix")),
+								Value: new("/"),
 							},
 						},
 					},
@@ -447,9 +447,9 @@ func TestHTTPRouteRule(t *testing.T) {
 							BackendRef: gatewayv1.BackendRef{
 								BackendObjectReference: gatewayv1.BackendObjectReference{
 									Name: testService,
-									Port: ptrTo(gatewayv1.PortNumber(8080)),
+									Port: new(gatewayv1.PortNumber(8080)),
 								},
-								Weight: ptrTo(int32(100)),
+								Weight: new(int32(100)),
 							},
 						},
 					},
@@ -463,8 +463,8 @@ func TestHTTPRouteRule(t *testing.T) {
 					Matches: []gatewayv1.HTTPRouteMatch{
 						{
 							Path: &gatewayv1.HTTPPathMatch{
-								Type:  ptrTo(gatewayv1.PathMatchType("PathPrefix")),
-								Value: ptrTo("/"),
+								Type:  new(gatewayv1.PathMatchType("PathPrefix")),
+								Value: new("/"),
 							},
 						},
 					},
@@ -474,7 +474,7 @@ func TestHTTPRouteRule(t *testing.T) {
 							RequestMirror: &gatewayv1.HTTPRequestMirrorFilter{
 								BackendRef: gatewayv1.BackendObjectReference{
 									Name: testService,
-									Port: ptrTo(gatewayv1.PortNumber(8081)),
+									Port: new(gatewayv1.PortNumber(8081)),
 								},
 							},
 						},
@@ -489,8 +489,8 @@ func TestHTTPRouteRule(t *testing.T) {
 					Matches: []gatewayv1.HTTPRouteMatch{
 						{
 							Path: &gatewayv1.HTTPPathMatch{
-								Type:  ptrTo(gatewayv1.PathMatchType("PathPrefix")),
-								Value: ptrTo("/"),
+								Type:  new(gatewayv1.PathMatchType("PathPrefix")),
+								Value: new("/"),
 							},
 						},
 					},
@@ -511,7 +511,7 @@ func TestHTTPRouteRule(t *testing.T) {
 							RequestMirror: &gatewayv1.HTTPRequestMirrorFilter{
 								BackendRef: gatewayv1.BackendObjectReference{
 									Name: testService,
-									Port: ptrTo(gatewayv1.PortNumber(8080)),
+									Port: new(gatewayv1.PortNumber(8080)),
 								},
 							},
 						},
@@ -550,7 +550,7 @@ func TestHTTPRouteRule(t *testing.T) {
 							RequestRedirect: &gatewayv1.HTTPRequestRedirectFilter{
 								Path: &gatewayv1.HTTPPathModifier{
 									Type:            gatewayv1.FullPathHTTPPathModifier,
-									ReplaceFullPath: ptrTo("foo"),
+									ReplaceFullPath: new("foo"),
 								},
 							},
 						},
@@ -563,8 +563,8 @@ func TestHTTPRouteRule(t *testing.T) {
 			rules: []gatewayv1.HTTPRouteRule{{
 				Matches: []gatewayv1.HTTPRouteMatch{{
 					Path: &gatewayv1.HTTPPathMatch{
-						Type:  ptrTo(gatewayv1.PathMatchPathPrefix),
-						Value: ptrTo("/bar"),
+						Type:  new(gatewayv1.PathMatchPathPrefix),
+						Value: new("/bar"),
 					},
 				}},
 				Filters: []gatewayv1.HTTPRouteFilter{{
@@ -572,7 +572,7 @@ func TestHTTPRouteRule(t *testing.T) {
 					URLRewrite: &gatewayv1.HTTPURLRewriteFilter{
 						Path: &gatewayv1.HTTPPathModifier{
 							Type:               gatewayv1.PrefixMatchHTTPPathModifier,
-							ReplacePrefixMatch: ptrTo("foo"),
+							ReplacePrefixMatch: new("foo"),
 						},
 					},
 				}},
@@ -635,8 +635,8 @@ func TestHTTPRouteRule(t *testing.T) {
 						{
 							Type: gatewayv1.HTTPRouteFilterRequestRedirect,
 							RequestRedirect: &gatewayv1.HTTPRequestRedirectFilter{
-								Scheme:     ptrTo("https"),
-								StatusCode: ptrTo(301),
+								Scheme:     new("https"),
+								StatusCode: new(301),
 							},
 						},
 					},
@@ -645,7 +645,7 @@ func TestHTTPRouteRule(t *testing.T) {
 							BackendRef: gatewayv1.BackendRef{
 								BackendObjectReference: gatewayv1.BackendObjectReference{
 									Name: testService,
-									Port: ptrTo(gatewayv1.PortNumber(80)),
+									Port: new(gatewayv1.PortNumber(80)),
 								},
 							},
 						},
@@ -661,8 +661,8 @@ func TestHTTPRouteRule(t *testing.T) {
 						{
 							Type: gatewayv1.HTTPRouteFilterRequestRedirect,
 							RequestRedirect: &gatewayv1.HTTPRequestRedirectFilter{
-								Scheme:     ptrTo("https"),
-								StatusCode: ptrTo(301),
+								Scheme:     new("https"),
+								StatusCode: new(301),
 							},
 						},
 					},
@@ -686,7 +686,7 @@ func TestHTTPRouteRule(t *testing.T) {
 							BackendRef: gatewayv1.BackendRef{
 								BackendObjectReference: gatewayv1.BackendObjectReference{
 									Name: testService,
-									Port: ptrTo(gatewayv1.PortNumber(80)),
+									Port: new(gatewayv1.PortNumber(80)),
 								},
 							},
 						},
@@ -703,7 +703,7 @@ func TestHTTPRouteRule(t *testing.T) {
 							BackendRef: gatewayv1.BackendRef{
 								BackendObjectReference: gatewayv1.BackendObjectReference{
 									Name: testService,
-									Port: ptrTo(gatewayv1.PortNumber(80)),
+									Port: new(gatewayv1.PortNumber(80)),
 								},
 							},
 						},
@@ -717,8 +717,8 @@ func TestHTTPRouteRule(t *testing.T) {
 				Matches: []gatewayv1.HTTPRouteMatch{
 					{
 						Path: &gatewayv1.HTTPPathMatch{
-							Type:  ptrTo(gatewayv1.PathMatchPathPrefix),
-							Value: ptrTo("/foo"),
+							Type:  new(gatewayv1.PathMatchPathPrefix),
+							Value: new("/foo"),
 						},
 					},
 				},
@@ -727,7 +727,7 @@ func TestHTTPRouteRule(t *testing.T) {
 					URLRewrite: &gatewayv1.HTTPURLRewriteFilter{
 						Path: &gatewayv1.HTTPPathModifier{
 							Type:               gatewayv1.PrefixMatchHTTPPathModifier,
-							ReplacePrefixMatch: ptrTo("foo"),
+							ReplacePrefixMatch: new("foo"),
 						},
 					},
 				}},
@@ -740,14 +740,14 @@ func TestHTTPRouteRule(t *testing.T) {
 				Matches: []gatewayv1.HTTPRouteMatch{
 					{
 						Path: &gatewayv1.HTTPPathMatch{
-							Type:  ptrTo(gatewayv1.PathMatchPathPrefix),
-							Value: ptrTo("/foo"),
+							Type:  new(gatewayv1.PathMatchPathPrefix),
+							Value: new("/foo"),
 						},
 					},
 					{ // Cannot have multiple path matches.
 						Path: &gatewayv1.HTTPPathMatch{
-							Type:  ptrTo(gatewayv1.PathMatchPathPrefix),
-							Value: ptrTo("/bar"),
+							Type:  new(gatewayv1.PathMatchPathPrefix),
+							Value: new("/bar"),
 						},
 					},
 				},
@@ -756,7 +756,7 @@ func TestHTTPRouteRule(t *testing.T) {
 					URLRewrite: &gatewayv1.HTTPURLRewriteFilter{
 						Path: &gatewayv1.HTTPPathModifier{
 							Type:               gatewayv1.PrefixMatchHTTPPathModifier,
-							ReplacePrefixMatch: ptrTo("foo"),
+							ReplacePrefixMatch: new("foo"),
 						},
 					},
 				}},
@@ -769,8 +769,8 @@ func TestHTTPRouteRule(t *testing.T) {
 				Matches: []gatewayv1.HTTPRouteMatch{
 					{
 						Path: &gatewayv1.HTTPPathMatch{
-							Type:  ptrTo(gatewayv1.PathMatchRegularExpression), // Incorrect Path match Type for URLRewrite filter with ReplacePrefixMatch.
-							Value: ptrTo("/foo"),
+							Type:  new(gatewayv1.PathMatchRegularExpression), // Incorrect Path match Type for URLRewrite filter with ReplacePrefixMatch.
+							Value: new("/foo"),
 						},
 					},
 				},
@@ -779,7 +779,7 @@ func TestHTTPRouteRule(t *testing.T) {
 					URLRewrite: &gatewayv1.HTTPURLRewriteFilter{
 						Path: &gatewayv1.HTTPPathModifier{
 							Type:               gatewayv1.PrefixMatchHTTPPathModifier,
-							ReplacePrefixMatch: ptrTo("foo"),
+							ReplacePrefixMatch: new("foo"),
 						},
 					},
 				}},
@@ -791,8 +791,8 @@ func TestHTTPRouteRule(t *testing.T) {
 				Matches: []gatewayv1.HTTPRouteMatch{
 					{
 						Path: &gatewayv1.HTTPPathMatch{
-							Type:  ptrTo(gatewayv1.PathMatchPathPrefix),
-							Value: ptrTo("/foo"),
+							Type:  new(gatewayv1.PathMatchPathPrefix),
+							Value: new("/foo"),
 						},
 					},
 				},
@@ -801,7 +801,7 @@ func TestHTTPRouteRule(t *testing.T) {
 					RequestRedirect: &gatewayv1.HTTPRequestRedirectFilter{
 						Path: &gatewayv1.HTTPPathModifier{
 							Type:               gatewayv1.PrefixMatchHTTPPathModifier,
-							ReplacePrefixMatch: ptrTo("foo"),
+							ReplacePrefixMatch: new("foo"),
 						},
 					},
 				}},
@@ -814,14 +814,14 @@ func TestHTTPRouteRule(t *testing.T) {
 				Matches: []gatewayv1.HTTPRouteMatch{
 					{
 						Path: &gatewayv1.HTTPPathMatch{
-							Type:  ptrTo(gatewayv1.PathMatchPathPrefix),
-							Value: ptrTo("/foo"),
+							Type:  new(gatewayv1.PathMatchPathPrefix),
+							Value: new("/foo"),
 						},
 					},
 					{ // Cannot have multiple path matches.
 						Path: &gatewayv1.HTTPPathMatch{
-							Type:  ptrTo(gatewayv1.PathMatchPathPrefix),
-							Value: ptrTo("/bar"),
+							Type:  new(gatewayv1.PathMatchPathPrefix),
+							Value: new("/bar"),
 						},
 					},
 				},
@@ -830,7 +830,7 @@ func TestHTTPRouteRule(t *testing.T) {
 					RequestRedirect: &gatewayv1.HTTPRequestRedirectFilter{
 						Path: &gatewayv1.HTTPPathModifier{
 							Type:               gatewayv1.PrefixMatchHTTPPathModifier,
-							ReplacePrefixMatch: ptrTo("foo"),
+							ReplacePrefixMatch: new("foo"),
 						},
 					},
 				}},
@@ -843,8 +843,8 @@ func TestHTTPRouteRule(t *testing.T) {
 				Matches: []gatewayv1.HTTPRouteMatch{
 					{
 						Path: &gatewayv1.HTTPPathMatch{
-							Type:  ptrTo(gatewayv1.PathMatchRegularExpression), // Incorrect Path match Type for RequestRedirect filter with ReplacePrefixMatch.
-							Value: ptrTo("/foo"),
+							Type:  new(gatewayv1.PathMatchRegularExpression), // Incorrect Path match Type for RequestRedirect filter with ReplacePrefixMatch.
+							Value: new("/foo"),
 						},
 					},
 				},
@@ -853,7 +853,7 @@ func TestHTTPRouteRule(t *testing.T) {
 					RequestRedirect: &gatewayv1.HTTPRequestRedirectFilter{
 						Path: &gatewayv1.HTTPPathModifier{
 							Type:               gatewayv1.PrefixMatchHTTPPathModifier,
-							ReplacePrefixMatch: ptrTo("foo"),
+							ReplacePrefixMatch: new("foo"),
 						},
 					},
 				}},
@@ -865,8 +865,8 @@ func TestHTTPRouteRule(t *testing.T) {
 				Matches: []gatewayv1.HTTPRouteMatch{
 					{
 						Path: &gatewayv1.HTTPPathMatch{
-							Type:  ptrTo(gatewayv1.PathMatchPathPrefix),
-							Value: ptrTo("/foo"),
+							Type:  new(gatewayv1.PathMatchPathPrefix),
+							Value: new("/foo"),
 						},
 					},
 				},
@@ -875,7 +875,7 @@ func TestHTTPRouteRule(t *testing.T) {
 						BackendRef: gatewayv1.BackendRef{
 							BackendObjectReference: gatewayv1.BackendObjectReference{
 								Name: testService,
-								Port: ptrTo(gatewayv1.PortNumber(80)),
+								Port: new(gatewayv1.PortNumber(80)),
 							},
 						},
 						Filters: []gatewayv1.HTTPRouteFilter{{
@@ -883,7 +883,7 @@ func TestHTTPRouteRule(t *testing.T) {
 							URLRewrite: &gatewayv1.HTTPURLRewriteFilter{
 								Path: &gatewayv1.HTTPPathModifier{
 									Type:               gatewayv1.PrefixMatchHTTPPathModifier,
-									ReplacePrefixMatch: ptrTo("foo"),
+									ReplacePrefixMatch: new("foo"),
 								},
 							},
 						}},
@@ -898,14 +898,14 @@ func TestHTTPRouteRule(t *testing.T) {
 				Matches: []gatewayv1.HTTPRouteMatch{
 					{
 						Path: &gatewayv1.HTTPPathMatch{
-							Type:  ptrTo(gatewayv1.PathMatchPathPrefix),
-							Value: ptrTo("/foo"),
+							Type:  new(gatewayv1.PathMatchPathPrefix),
+							Value: new("/foo"),
 						},
 					},
 					{ // Cannot have multiple path matches.
 						Path: &gatewayv1.HTTPPathMatch{
-							Type:  ptrTo(gatewayv1.PathMatchPathPrefix),
-							Value: ptrTo("/bar"),
+							Type:  new(gatewayv1.PathMatchPathPrefix),
+							Value: new("/bar"),
 						},
 					},
 				},
@@ -914,7 +914,7 @@ func TestHTTPRouteRule(t *testing.T) {
 						BackendRef: gatewayv1.BackendRef{
 							BackendObjectReference: gatewayv1.BackendObjectReference{
 								Name: testService,
-								Port: ptrTo(gatewayv1.PortNumber(80)),
+								Port: new(gatewayv1.PortNumber(80)),
 							},
 						},
 						Filters: []gatewayv1.HTTPRouteFilter{{
@@ -922,7 +922,7 @@ func TestHTTPRouteRule(t *testing.T) {
 							URLRewrite: &gatewayv1.HTTPURLRewriteFilter{
 								Path: &gatewayv1.HTTPPathModifier{
 									Type:               gatewayv1.PrefixMatchHTTPPathModifier,
-									ReplacePrefixMatch: ptrTo("foo"),
+									ReplacePrefixMatch: new("foo"),
 								},
 							},
 						}},
@@ -937,8 +937,8 @@ func TestHTTPRouteRule(t *testing.T) {
 				Matches: []gatewayv1.HTTPRouteMatch{
 					{
 						Path: &gatewayv1.HTTPPathMatch{
-							Type:  ptrTo(gatewayv1.PathMatchRegularExpression), // Incorrect Path match Type for URLRewrite filter with ReplacePrefixMatch.
-							Value: ptrTo("/foo"),
+							Type:  new(gatewayv1.PathMatchRegularExpression), // Incorrect Path match Type for URLRewrite filter with ReplacePrefixMatch.
+							Value: new("/foo"),
 						},
 					},
 				},
@@ -947,7 +947,7 @@ func TestHTTPRouteRule(t *testing.T) {
 						BackendRef: gatewayv1.BackendRef{
 							BackendObjectReference: gatewayv1.BackendObjectReference{
 								Name: testService,
-								Port: ptrTo(gatewayv1.PortNumber(80)),
+								Port: new(gatewayv1.PortNumber(80)),
 							},
 						},
 						Filters: []gatewayv1.HTTPRouteFilter{{
@@ -955,7 +955,7 @@ func TestHTTPRouteRule(t *testing.T) {
 							URLRewrite: &gatewayv1.HTTPURLRewriteFilter{
 								Path: &gatewayv1.HTTPPathModifier{
 									Type:               gatewayv1.PrefixMatchHTTPPathModifier,
-									ReplacePrefixMatch: ptrTo("foo"),
+									ReplacePrefixMatch: new("foo"),
 								},
 							},
 						}},
@@ -969,8 +969,8 @@ func TestHTTPRouteRule(t *testing.T) {
 				Matches: []gatewayv1.HTTPRouteMatch{
 					{
 						Path: &gatewayv1.HTTPPathMatch{
-							Type:  ptrTo(gatewayv1.PathMatchPathPrefix),
-							Value: ptrTo("/foo"),
+							Type:  new(gatewayv1.PathMatchPathPrefix),
+							Value: new("/foo"),
 						},
 					},
 				},
@@ -979,7 +979,7 @@ func TestHTTPRouteRule(t *testing.T) {
 						BackendRef: gatewayv1.BackendRef{
 							BackendObjectReference: gatewayv1.BackendObjectReference{
 								Name: testService,
-								Port: ptrTo(gatewayv1.PortNumber(80)),
+								Port: new(gatewayv1.PortNumber(80)),
 							},
 						},
 						Filters: []gatewayv1.HTTPRouteFilter{{
@@ -987,7 +987,7 @@ func TestHTTPRouteRule(t *testing.T) {
 							RequestRedirect: &gatewayv1.HTTPRequestRedirectFilter{
 								Path: &gatewayv1.HTTPPathModifier{
 									Type:               gatewayv1.PrefixMatchHTTPPathModifier,
-									ReplacePrefixMatch: ptrTo("foo"),
+									ReplacePrefixMatch: new("foo"),
 								},
 							},
 						}},
@@ -1002,14 +1002,14 @@ func TestHTTPRouteRule(t *testing.T) {
 				Matches: []gatewayv1.HTTPRouteMatch{
 					{
 						Path: &gatewayv1.HTTPPathMatch{
-							Type:  ptrTo(gatewayv1.PathMatchPathPrefix),
-							Value: ptrTo("/foo"),
+							Type:  new(gatewayv1.PathMatchPathPrefix),
+							Value: new("/foo"),
 						},
 					},
 					{ // Cannot have multiple path matches.
 						Path: &gatewayv1.HTTPPathMatch{
-							Type:  ptrTo(gatewayv1.PathMatchPathPrefix),
-							Value: ptrTo("/bar"),
+							Type:  new(gatewayv1.PathMatchPathPrefix),
+							Value: new("/bar"),
 						},
 					},
 				},
@@ -1018,7 +1018,7 @@ func TestHTTPRouteRule(t *testing.T) {
 						BackendRef: gatewayv1.BackendRef{
 							BackendObjectReference: gatewayv1.BackendObjectReference{
 								Name: testService,
-								Port: ptrTo(gatewayv1.PortNumber(80)),
+								Port: new(gatewayv1.PortNumber(80)),
 							},
 						},
 						Filters: []gatewayv1.HTTPRouteFilter{{
@@ -1026,7 +1026,7 @@ func TestHTTPRouteRule(t *testing.T) {
 							RequestRedirect: &gatewayv1.HTTPRequestRedirectFilter{
 								Path: &gatewayv1.HTTPPathModifier{
 									Type:               gatewayv1.PrefixMatchHTTPPathModifier,
-									ReplacePrefixMatch: ptrTo("foo"),
+									ReplacePrefixMatch: new("foo"),
 								},
 							},
 						}},
@@ -1041,8 +1041,8 @@ func TestHTTPRouteRule(t *testing.T) {
 				Matches: []gatewayv1.HTTPRouteMatch{
 					{
 						Path: &gatewayv1.HTTPPathMatch{
-							Type:  ptrTo(gatewayv1.PathMatchRegularExpression), // Incorrect Path match Type for RequestRedirect filter with ReplacePrefixMatch.
-							Value: ptrTo("/foo"),
+							Type:  new(gatewayv1.PathMatchRegularExpression), // Incorrect Path match Type for RequestRedirect filter with ReplacePrefixMatch.
+							Value: new("/foo"),
 						},
 					},
 				},
@@ -1051,7 +1051,7 @@ func TestHTTPRouteRule(t *testing.T) {
 						BackendRef: gatewayv1.BackendRef{
 							BackendObjectReference: gatewayv1.BackendObjectReference{
 								Name: testService,
-								Port: ptrTo(gatewayv1.PortNumber(80)),
+								Port: new(gatewayv1.PortNumber(80)),
 							},
 						},
 						Filters: []gatewayv1.HTTPRouteFilter{{
@@ -1059,7 +1059,7 @@ func TestHTTPRouteRule(t *testing.T) {
 							RequestRedirect: &gatewayv1.HTTPRequestRedirectFilter{
 								Path: &gatewayv1.HTTPPathModifier{
 									Type:               gatewayv1.PrefixMatchHTTPPathModifier,
-									ReplacePrefixMatch: ptrTo("foo"),
+									ReplacePrefixMatch: new("foo"),
 								},
 							},
 						}},
@@ -1076,7 +1076,7 @@ func TestHTTPRouteRule(t *testing.T) {
 					URLRewrite: &gatewayv1.HTTPURLRewriteFilter{
 						Path: &gatewayv1.HTTPPathModifier{
 							Type:               gatewayv1.PrefixMatchHTTPPathModifier,
-							ReplacePrefixMatch: ptrTo("foo"),
+							ReplacePrefixMatch: new("foo"),
 						},
 					},
 				}, {
@@ -1084,7 +1084,7 @@ func TestHTTPRouteRule(t *testing.T) {
 					RequestRedirect: &gatewayv1.HTTPRequestRedirectFilter{
 						Path: &gatewayv1.HTTPPathModifier{
 							Type:               gatewayv1.PrefixMatchHTTPPathModifier,
-							ReplacePrefixMatch: ptrTo("foo"),
+							ReplacePrefixMatch: new("foo"),
 						},
 					},
 				}},
@@ -1098,8 +1098,8 @@ func TestHTTPRouteRule(t *testing.T) {
 					Matches: []gatewayv1.HTTPRouteMatch{
 						{
 							Path: &gatewayv1.HTTPPathMatch{
-								Type:  ptrTo(gatewayv1.PathMatchType("PathPrefix")),
-								Value: ptrTo("/"),
+								Type:  new(gatewayv1.PathMatchType("PathPrefix")),
+								Value: new("/"),
 							},
 						},
 					},
@@ -1109,7 +1109,7 @@ func TestHTTPRouteRule(t *testing.T) {
 							URLRewrite: &gatewayv1.HTTPURLRewriteFilter{
 								Path: &gatewayv1.HTTPPathModifier{
 									Type:               gatewayv1.PrefixMatchHTTPPathModifier,
-									ReplacePrefixMatch: ptrTo("foo"),
+									ReplacePrefixMatch: new("foo"),
 								},
 							},
 						},
@@ -1118,7 +1118,7 @@ func TestHTTPRouteRule(t *testing.T) {
 							URLRewrite: &gatewayv1.HTTPURLRewriteFilter{
 								Path: &gatewayv1.HTTPPathModifier{
 									Type:               gatewayv1.PrefixMatchHTTPPathModifier,
-									ReplacePrefixMatch: ptrTo("bar"),
+									ReplacePrefixMatch: new("bar"),
 								},
 							},
 						},
@@ -1134,8 +1134,8 @@ func TestHTTPRouteRule(t *testing.T) {
 					Matches: []gatewayv1.HTTPRouteMatch{
 						{
 							Path: &gatewayv1.HTTPPathMatch{
-								Type:  ptrTo(gatewayv1.PathMatchType("PathPrefix")),
-								Value: ptrTo("/"),
+								Type:  new(gatewayv1.PathMatchType("PathPrefix")),
+								Value: new("/"),
 							},
 						},
 					},
@@ -1156,7 +1156,7 @@ func TestHTTPRouteRule(t *testing.T) {
 							RequestMirror: &gatewayv1.HTTPRequestMirrorFilter{
 								BackendRef: gatewayv1.BackendObjectReference{
 									Name: testService,
-									Port: ptrTo(gatewayv1.PortNumber(8080)),
+									Port: new(gatewayv1.PortNumber(8080)),
 								},
 							},
 						},
@@ -1187,8 +1187,8 @@ func TestHTTPRouteRule(t *testing.T) {
 					Matches: []gatewayv1.HTTPRouteMatch{
 						{
 							Path: &gatewayv1.HTTPPathMatch{
-								Type:  ptrTo(gatewayv1.PathMatchType("PathPrefix")),
-								Value: ptrTo("/"),
+								Type:  new(gatewayv1.PathMatchType("PathPrefix")),
+								Value: new("/"),
 							},
 						},
 					},
@@ -1220,7 +1220,7 @@ func TestHTTPRouteRule(t *testing.T) {
 							RequestRedirect: &gatewayv1.HTTPRequestRedirectFilter{
 								Path: &gatewayv1.HTTPPathModifier{
 									Type:            gatewayv1.FullPathHTTPPathModifier,
-									ReplaceFullPath: ptrTo("foo"),
+									ReplaceFullPath: new("foo"),
 								},
 							},
 						},
@@ -1229,7 +1229,7 @@ func TestHTTPRouteRule(t *testing.T) {
 							RequestRedirect: &gatewayv1.HTTPRequestRedirectFilter{
 								Path: &gatewayv1.HTTPPathModifier{
 									Type:            gatewayv1.FullPathHTTPPathModifier,
-									ReplaceFullPath: ptrTo("bar"),
+									ReplaceFullPath: new("bar"),
 								},
 							},
 						},
@@ -1255,8 +1255,8 @@ func TestHTTPRouteRule(t *testing.T) {
 			rules: func() []gatewayv1.HTTPRouteRule {
 				match := gatewayv1.HTTPRouteMatch{
 					Path: &gatewayv1.HTTPPathMatch{
-						Type:  ptrTo(gatewayv1.PathMatchType("PathPrefix")),
-						Value: ptrTo("/"),
+						Type:  new(gatewayv1.PathMatchType("PathPrefix")),
+						Value: new("/"),
 					},
 				}
 				var rules []gatewayv1.HTTPRouteRule
@@ -1276,8 +1276,8 @@ func TestHTTPRouteRule(t *testing.T) {
 			rules: func() []gatewayv1.HTTPRouteRule {
 				match := gatewayv1.HTTPRouteMatch{
 					Path: &gatewayv1.HTTPPathMatch{
-						Type:  ptrTo(gatewayv1.PathMatchType("PathPrefix")),
-						Value: ptrTo("/"),
+						Type:  new(gatewayv1.PathMatchType("PathPrefix")),
+						Value: new("/"),
 					},
 				}
 				var rules []gatewayv1.HTTPRouteRule
@@ -1325,8 +1325,8 @@ func TestHTTPBackendRef(t *testing.T) {
 					Matches: []gatewayv1.HTTPRouteMatch{
 						{
 							Path: &gatewayv1.HTTPPathMatch{
-								Type:  ptrTo(gatewayv1.PathMatchType("PathPrefix")),
-								Value: ptrTo("/"),
+								Type:  new(gatewayv1.PathMatchType("PathPrefix")),
+								Value: new("/"),
 							},
 						},
 					},
@@ -1335,7 +1335,7 @@ func TestHTTPBackendRef(t *testing.T) {
 							BackendRef: gatewayv1.BackendRef{
 								BackendObjectReference: gatewayv1.BackendObjectReference{
 									Name: testService,
-									Port: ptrTo(gatewayv1.PortNumber(80)),
+									Port: new(gatewayv1.PortNumber(80)),
 								},
 							},
 							Filters: []gatewayv1.HTTPRouteFilter{
@@ -1344,7 +1344,7 @@ func TestHTTPBackendRef(t *testing.T) {
 									URLRewrite: &gatewayv1.HTTPURLRewriteFilter{
 										Path: &gatewayv1.HTTPPathModifier{
 											Type:               gatewayv1.PrefixMatchHTTPPathModifier,
-											ReplacePrefixMatch: ptrTo("foo"),
+											ReplacePrefixMatch: new("foo"),
 										},
 									},
 								},
@@ -1353,7 +1353,7 @@ func TestHTTPBackendRef(t *testing.T) {
 									URLRewrite: &gatewayv1.HTTPURLRewriteFilter{
 										Path: &gatewayv1.HTTPPathModifier{
 											Type:               gatewayv1.PrefixMatchHTTPPathModifier,
-											ReplacePrefixMatch: ptrTo("bar"),
+											ReplacePrefixMatch: new("bar"),
 										},
 									},
 								},
@@ -1401,7 +1401,7 @@ func TestHTTPPathModifier(t *testing.T) {
 			name: "valid ReplaceFullPath",
 			pathModifier: gatewayv1.HTTPPathModifier{
 				Type:            gatewayv1.FullPathHTTPPathModifier,
-				ReplaceFullPath: ptrTo("foo"),
+				ReplaceFullPath: new("foo"),
 			},
 		},
 		{
@@ -1416,14 +1416,14 @@ func TestHTTPPathModifier(t *testing.T) {
 			wantErrors: []string{"type must be 'ReplaceFullPath' when replaceFullPath is set"},
 			pathModifier: gatewayv1.HTTPPathModifier{
 				Type:            gatewayv1.PrefixMatchHTTPPathModifier,
-				ReplaceFullPath: ptrTo("foo"),
+				ReplaceFullPath: new("foo"),
 			},
 		},
 		{
 			name: "valid ReplacePrefixMatch",
 			pathModifier: gatewayv1.HTTPPathModifier{
 				Type:               gatewayv1.PrefixMatchHTTPPathModifier,
-				ReplacePrefixMatch: ptrTo("/foo"),
+				ReplacePrefixMatch: new("/foo"),
 			},
 		},
 		{
@@ -1438,7 +1438,7 @@ func TestHTTPPathModifier(t *testing.T) {
 			wantErrors: []string{"type must be 'ReplacePrefixMatch' when replacePrefixMatch is set"},
 			pathModifier: gatewayv1.HTTPPathModifier{
 				Type:               gatewayv1.FullPathHTTPPathModifier,
-				ReplacePrefixMatch: ptrTo("/foo"),
+				ReplacePrefixMatch: new("/foo"),
 			},
 		},
 	}

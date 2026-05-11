@@ -7,21 +7,21 @@
 
 ## Introduction
 
-The `Gateway` Resource is a point of contention since it is the only place to attach listeners with certificates. We propose a new resource called `ListenerSet` to allow a shared list of listeners to be attached to a single `Gateway`.
+The `Gateway` resource is a point of contention since it is the only place to attach listeners with certificates. We propose a new resource called `ListenerSet` to allow a shared list of listeners to be attached to a single `Gateway`.
 
 ## Goals
 - Define a mechanism to merge listeners into a single `Gateway`
 - Attaching listeners to `Gateways` in different namespaces
-- Standardize merging multiple lists of Listeners together ([\#1863](https://github.com/kubernetes-sigs/gateway-api/pull/1863))
-- Increase the number of Gateway Listeners that are supported ([\#2869](https://github.com/kubernetes-sigs/gateway-api/issues/2869))
+- Standardize merging multiple lists of listeners together ([\#1863](https://github.com/kubernetes-sigs/gateway-api/pull/1863))
+- Increase the number of Gateway listeners that are supported ([\#2869](https://github.com/kubernetes-sigs/gateway-api/issues/2869))
 
 ## Future Potential Goals (Beyond the GEP)
 
 From [Gateway Hierarchy Brainstorming](https://docs.google.com/document/d/1qj7Xog2t2fWRuzOeTsWkabUaVeOF7_2t_7appe8EXwA/edit#heading=h.w311n4l5qmwk):
 
-- Provide a mechanism for third party components to generate listeners and attach them to a Gateway ([\#1863](https://github.com/kubernetes-sigs/gateway-api/pull/1863))
-- Delegate TLS certificate management to App Owners and/or different namespaces ([\#102](https://github.com/kubernetes-sigs/gateway-api/issues/102), [\#103](https://github.com/kubernetes-sigs/gateway-api/issues/103))
-- Delegate domains to different namespaces, but allow those namespace to define TLS and routing configuration within those namespaces with Gateway-like resources ([\#102](https://github.com/kubernetes-sigs/gateway-api/issues/102), [\#103](https://github.com/kubernetes-sigs/gateway-api/issues/103))
+- Provide a mechanism for third-party components to generate listeners and attach them to a Gateway ([\#1863](https://github.com/kubernetes-sigs/gateway-api/pull/1863))
+- Delegate TLS certificate management to app owners and/or different namespaces ([\#102](https://github.com/kubernetes-sigs/gateway-api/issues/102), [\#103](https://github.com/kubernetes-sigs/gateway-api/issues/103))
+- Delegate domains to different namespaces, but allow those namespaces to define TLS and routing configuration within those namespaces with Gateway-like resources ([\#102](https://github.com/kubernetes-sigs/gateway-api/issues/102), [\#103](https://github.com/kubernetes-sigs/gateway-api/issues/103))
 - Enable admins to delegate SNI-based routing for TLS passthrough to other teams and/or namespaces ([\#3177](https://github.com/kubernetes-sigs/gateway-api/discussions/3177))
 - Simplify L4 routing by removing at least one of the required layers (Gateway \-\> Route \-\> Service)
 - Delegate routing to namespaces based on path prefix (previously known as [Route delegation](https://github.com/kubernetes-sigs/gateway-api/issues/1058))
@@ -29,18 +29,18 @@ From [Gateway Hierarchy Brainstorming](https://docs.google.com/document/d/1qj7Xo
 
 ## Use Cases & Motivation
 
-Knative generates on demand per-service certificates using HTTP-01 challenges.
-There can be O(1000) Knative `Services` in the cluster which means we have O(1000) distinct certificates.
+Knative generates on-demand per-service certificates using HTTP-01 challenges.
+There can be O(1000) Knative `Services` in the cluster, which means we have O(1000) distinct certificates.
 Thus updating a single `Gateway` resource with this many certificates is a contention point and inhibits horizontal scaling of our controllers.
 [Istio Ambient](https://istio.io/v1.15/blog/2022/introducing-ambient-mesh/), similarly, creates a listener per Kubernetes service.
 
-More broadly, large scale gateway users often expose `O(1000)` domains, but are currently limited by the maximum of 64 `listeners`.
+More broadly, large-scale gateway users often expose O(1000) domains, but are currently limited by the maximum of 64 `listeners`.
 
-The [spec currently has language](https://github.com/kubernetes-sigs/gateway-api/blob/541e9fc2b3c2f62915cb58dc0ee5e43e4096b3e2/apis/v1beta1/gateway_types.go#L76-L78) to indicate implementations `MAY` merge `Gateways` resources but does not define any specific requirements for how that should work.
+The [spec currently has language](https://github.com/kubernetes-sigs/gateway-api/blob/541e9fc2b3c2f62915cb58dc0ee5e43e4096b3e2/apis/v1beta1/gateway_types.go#L76-L78) to indicate implementations `MAY` merge `Gateway` resources but does not define any specific requirements for how that should work.
 
-Additionally, one of the main complains of users coming from Ingress to Gateway API is the
+Additionally, one of the main complaints of users coming from Ingress to Gateway API is the
 lack of possibility to manage their own application certificates. `ListenerSet`, being a
-mechanism that allows users to define their own Listeners and attach them to a `Gateway`
+mechanism that allows users to define their own listeners and attach them to a `Gateway`,
 will make this requirement viable.
 
 ## Feature Details
@@ -67,7 +67,7 @@ type GatewayStatus struct {
 	// AttachedListenerSets represents the total number of ListenerSets that have been
 	// successfully attached to this Gateway.
 	//
-  // A ListenerSet is successfully attached to a Gateway when all the following conditions are met:
+	// A ListenerSet is successfully attached to a Gateway when all the following conditions are met:
 	// - The ListenerSet is selected by the Gateway's AllowedListeners field
 	// - The ListenerSet has a valid ParentRef selecting the Gateway
 	// - The ListenerSet's status has the condition "Accepted: true"
@@ -95,7 +95,7 @@ type ListenerNamespaces struct {
 	// * Same: Only ListenerSets in the same namespace may be attached to this Gateway.
 	// * Selector: ListenerSets in namespaces selected by the selector may be attached to this Gateway.
 	// * All: ListenerSets in all namespaces may be attached to this Gateway.
-	// * None: Only listeners defined in the Gateway's spec are allowed
+	// * None: Only listeners defined in the Gateway's spec are allowed.
 	//
 	// +optional
 	// +kubebuilder:default=None
@@ -138,7 +138,7 @@ type ListenerSetSpec struct {
 	//
 	// 1. "parent" Gateway
 	// 2. ListenerSet ordered by creation time (oldest first)
-	// 3. ListenerSet ordered alphabetically by “{namespace}/{name}”.
+	// 3. ListenerSet ordered alphabetically by "{namespace}/{name}".
 	//
 	// Regarding Conflict Management, Listeners in a ListenerSet follow the same
 	// rules of Listeners on a Gateway resource.
@@ -158,6 +158,7 @@ type ListenerSetSpec struct {
 	Listeners []ListenerEntry `json:"listeners"`
 
 }
+
 // ListenerEntry embodies the concept of a logical endpoint where a Gateway accepts
 // network connections.
 type ListenerEntry struct {
@@ -166,12 +167,12 @@ type ListenerEntry struct {
 	//
 	// Name is not required to be unique across a Gateway and ListenerSets.
 	// Routes can attach to a Listener by having a ListenerSet as a parentRef
-	// and setting the SectionName
+	// and setting the SectionName.
 	Name SectionName `json:"name"`
 
 	// Hostname specifies the virtual hostname to match for protocol types that
 	// define this concept. When unspecified, all hostnames are matched. This
-	// field is ignored for protocols that don't require hostname based
+	// field is ignored for protocols that don't require hostname-based
 	// matching.
 	//
 	// Implementations MUST apply Hostname matching appropriately for each of
@@ -255,7 +256,7 @@ type ListenerEntry struct {
 	AllowedRoutes *AllowedRoutes `json:"allowedRoutes,omitempty"`
 }
 
-// ListenerSetStatus defines the observed state of a ListenerSet
+// ListenerSetStatus defines the observed state of a ListenerSet.
 type ListenerSetStatus struct {
 	// Listeners provide status for each unique listener port defined in the Spec.
 	//
@@ -316,12 +317,12 @@ type ListenerEntryStatus struct {
 	// resource or a specific Listener as a parent resource (more detail on
 	// attachment semantics can be found in the documentation on the various
 	// Route kinds ParentRefs fields). Listener or Route status does not impact
-    // successful attachment, i.e. the AttachedRoutes field count MUST be set
-    // for Listeners, even if the Accepted condition of an individual Listener is set
-    // to "False". The AttachedRoutes number represents the number of Routes with
-    // the Accepted condition set to "True" that have been attached to this Listener.
-    // Routes with any other value for the Accepted condition MUST NOT be included
-    // in this count.
+	// successful attachment, i.e. the AttachedRoutes field count MUST be set
+	// for Listeners, even if the Accepted condition of an individual Listener is set
+	// to "False". The AttachedRoutes number represents the number of Routes with
+	// the Accepted condition set to "True" that have been attached to this Listener.
+	// Routes with any other value for the Accepted condition MUST NOT be included
+	// in this count.
 	//
 	// Uses for this field include troubleshooting Route attachment and
 	// measuring blast radius/impact of changes to a Listener.
@@ -344,7 +345,7 @@ type ParentGatewayReference struct {
 	// +kubebuilder:default="gateway.networking.k8s.io"
 	Group *Group `json:"group"`
 
-	// Kind is kind of the referent. For example "Gateway".
+	// Kind is the kind of the referent. For example "Gateway".
 	//
 	// +optional
 	// +kubebuilder:default=Gateway
@@ -353,16 +354,16 @@ type ParentGatewayReference struct {
 	// Name is the name of the referent.
 	Name ObjectName `json:"name"`
 
-	// Namespace is the name of the referent.
+	// Namespace is the namespace of the referent.
 	// +optional
-	Name *ObjectName `json:"namespace"`
+	Namespace *ObjectName `json:"namespace"`
 }
 ```
 
 ### YAML
 
 The following example shows a `Gateway` with an HTTP listener and two child HTTPS `ListenerSets` with unique hostnames and certificates.
-Only `ListenerSets` from the same namespace of the `Gateway` will be accepted:
+Only `ListenerSets` from the same namespace as the `Gateway` will be accepted:
 
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
@@ -399,7 +400,7 @@ spec:
       certificateRefs:
       - kind: Secret
         group: ""
-        name: first-workload-cert # Provisioned via HTTP01 challenge
+        name: first-workload-cert # Provisioned via HTTP-01 challenge
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: ListenerSet
@@ -420,38 +421,39 @@ spec:
       certificateRefs:
       - kind: Secret
         group: ""
-        name: second-workload-cert # Provisioned via HTTP01 challenge
+        name: second-workload-cert # Provisioned via HTTP-01 challenge
 ```
+
 ### ListenerEntry
 
 `ListenerEntry` is currently a copy of the `Listener` struct.
 
 ## Semantics
 
-### Summary of attachments
+### Summary of Attachments
 
-Nick Young did a great summarization of how a handshake and route attachment should behave. This is copied as/is as it is a great summary:
+Nick Young provided a great summary of how a handshake and route attachment should behave. This is copied as-is:
 
-* Routes attach to all **relevant** Listeners in their **direct Parent** object.
-* If a Route has a parentRef that is a ListenerSet, then the ListenerSet is the **direct Parent**.
-* If a Route has a parentRef that is a Gateway, then the Gateway is the **direct Parent**.
-* If the Route is using Gateway defaulting, then the default Gateway is the **direct Parent**.
-* If `sectionName` is not set, then all Listeners in the direct Parent object are **relevant**, and the Route must attach to all of them (subject to any `allowedRoutes` criteria.)
-* If `sectionName` is set, then only the Listener in the direct Parent object with the `name` field set to the same value as `sectionname` is **relevant**, and the Route must attach only to that Listener (subject to any `allowedRoutes` criteria).
-* If there are no relevant Listeners (because, for example, a sectionName is specified that does not exist on the direct Parent), then the Route has nowhere to attach to and MUST be have `Accepted` set to `false` for that `parentRef`.
+* Routes attach to all **relevant** Listeners in their **direct parent** object.
+* If a Route has a `parentRef` that is a `ListenerSet`, then the `ListenerSet` is the **direct parent**.
+* If a Route has a `parentRef` that is a `Gateway`, then the `Gateway` is the **direct parent**.
+* If the Route is using Gateway defaulting, then the default Gateway is the **direct parent**.
+* If `sectionName` is not set, then all Listeners in the direct parent object are **relevant**, and the Route must attach to all of them (subject to any `allowedRoutes` criteria).
+* If `sectionName` is set, then only the Listener in the direct parent object with the `name` field set to the same value as `sectionName` is **relevant**, and the Route must attach only to that Listener (subject to any `allowedRoutes` criteria).
+* If there are no relevant Listeners (because, for example, a `sectionName` is specified that does not exist on the direct parent), then the Route has nowhere to attach to and MUST have `Accepted` set to `false` for that `parentRef`.
 
-Route status is per-`parentRef`, so if a new parentRef is added, that attachment is independent of any existing parentRefs. A Route can be Accepted by one parentRef and not another, that's fine.
+Route status is per-`parentRef`, so if a new `parentRef` is added, that attachment is independent of any existing `parentRefs`. A Route can be Accepted by one `parentRef` and not another.
 
-If you have a Route that has a Gateway `parentRef` with a sectionName, that is Accepted already, and you add another parentRef that points to a `ListenerSet` with a `sectionName`, and the `ListenerSet` does not include a Listener with a name matching the sectionName, then the `ListenerSet parentRef` must be `Accepted status: false`. That does not affect the Gateway parentRef.
+If you have a Route that has a Gateway `parentRef` with a `sectionName` that is already Accepted, and you add another `parentRef` that points to a `ListenerSet` with a `sectionName`, and the `ListenerSet` does not include a Listener with a name matching the `sectionName`, then the `ListenerSet parentRef` must have `Accepted status: false`. That does not affect the Gateway `parentRef`.
 
 ### Gateway Changes
 
-Using `ListenerSets` will  require a dummy listener to be configured on the Gateway.
+Using `ListenerSets` will require a dummy listener to be configured on the Gateway.
 
-In a future (potential) release when an implementation supports `ListenerSets`, `Gateways` MUST allow the list of listeners to be empty. Thus the present `minItems=1` constraint on the listener list will be removed. This allows implementations to avoid security, cost etc. concerns with having dummy listeners.
-When there are no listeners the `Gateway`'s `status.listeners` should be empty or unset. `status.listeners` is already an optional field.
+In a future (potential) release when an implementation supports `ListenerSets`, `Gateways` MUST allow the list of listeners to be empty. Thus the present `minItems=1` constraint on the listener list will be removed. This allows implementations to avoid security, cost, and other concerns with having dummy listeners.
+When there are no listeners, the `Gateway`'s `status.listeners` should be empty or unset. `status.listeners` is already an optional field.
 
-Implementations, when creating a `Gateway`, may provision underlying infrastructure when there are no listeners present. The status conditions `Accepted` and `Programmed` conditions should reflect state of this provisioning.
+Implementations, when creating a `Gateway`, may provision underlying infrastructure when there are no listeners present. The `Accepted` and `Programmed` status conditions should reflect the state of this provisioning.
 
 ### Gateway & ListenerSet Handshake
 
@@ -470,7 +472,7 @@ spec:
 
 ### Route Attachment
 
-Routes MUST be able to specify a `ListenerSet` as a `parentRef`. Routes can use `sectionName`/`port` fields in `ParentReference` to help target a specific listener. If no listener is targeted (`sectionName`/`port` are unset) then the Route attaches to all the listeners in the `ListenerSet`.
+Routes MUST be able to specify a `ListenerSet` as a `parentRef`. Routes can use `sectionName`/`port` fields in `ParentReference` to target a specific listener. If no listener is targeted (`sectionName`/`port` are unset) then the Route attaches to all the listeners in the `ListenerSet`.
 
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
@@ -484,7 +486,7 @@ spec:
     sectionName: second
 ```
 
-To attach a Route to a `ListenerSet` and its parent `Gateway`, it MUST have multiple `parentRefs` eg:
+To attach a Route to a `ListenerSet` and its parent `Gateway`, it MUST have multiple `parentRefs`, e.g.:
 
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
@@ -501,8 +503,8 @@ spec:
     sectionName: foo
 ```
 
-For instance, the following `HTTPRoute` attempts to attach to a listener defined in the parent `Gateway` using the sectionName `foo`, which exists on a `ListenerSet` but not on a `Gateway`.
-This is not valid and the route's status `Accepted` condition should be set to `False`
+For instance, the following `HTTPRoute` attempts to attach to a listener defined in the parent `Gateway` using the `sectionName` `foo`, which exists on a `ListenerSet` but not on a `Gateway`.
+This is not valid and the route's `Accepted` status condition should be set to `False`:
 
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
@@ -546,12 +548,11 @@ spec:
     sectionName: foo
 ```
 
-#### Gateway parents and sectionName
+#### Gateway Parents and sectionName
 
-If a `sectionName` in a Route's `parentRef` is not set then the Route MUST attach to only the listeners in the referenced parent. As an example given a `Gateway` and its child `ListenerSets` a route attaching to the `Gateway` with an empty `sectionName` shall only attach to the listeners in the `Gateways` immediate `spec.listeners` list.
+If a `sectionName` in a Route's `parentRef` is not set then the Route MUST attach to only the listeners in the referenced parent. As an example, given a `Gateway` and its child `ListenerSets`, a Route attaching to the `Gateway` with an empty `sectionName` shall only attach to the listeners in the `Gateway`'s immediate `spec.listeners` list.
 
-In other words, the Route MUST attach just to the Gateway listeners specified on `.spec.listeners` and MUST NOT not attach to any listeners in the child `ListenerSets`
-of the `Gateway`.
+In other words, the Route MUST attach only to the Gateway listeners specified in `.spec.listeners` and MUST NOT attach to any listeners in the child `ListenerSets` of the `Gateway`.
 
 This is necessary because, for UX reasons, the `name` field does not have to be unique across all Listeners merged into a Gateway (see the section below for details).
 
@@ -598,16 +599,17 @@ metadata:
   name: httproute-example
 spec:
   parentRefs:
-  # No SectionName is set on this parentRef
+  # No sectionName is set on this parentRef
   - name: some-workload-listeners
     kind: Gateway
 ```
 
 The example above SHOULD be attached only to the following listeners:
+
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
-.....
+# ...
 spec:
   listeners:
   - name: foo2
@@ -622,9 +624,9 @@ spec:
 
 ### Policy Attachment
 
-Policy attachment is [under discussion] in https://github.com/kubernetes-sigs/gateway-api/discussions/2927
+Policy attachment is [under discussion](https://github.com/kubernetes-sigs/gateway-api/discussions/2927).
 
-Similar to Routes, `ListenerSet` can inherit policy from a Gateway.
+Similar to Routes, a `ListenerSet` can inherit policy from a Gateway.
 Policies that attach to a `ListenerSet` apply to all listeners defined in that resource, but do not impact listeners in the parent `Gateway`. This allows `ListenerSets` attached to the same `Gateway` to have different policies.
 If the implementation cannot apply the policy to only specific listeners, it should reject the policy.
 
@@ -636,18 +638,17 @@ When a `ReferenceGrant` is applied to a `ListenerSet` it MUST NOT grant permissi
 
 A `ListenerSet` must be able to reference a secret/backend in the same namespace as itself without a `ReferenceGrant`.
 
-
 ### Listener Validation
 
-Within a single resource such as a `Gateway` or `ListenerSet` the list of listeners MUST have unique names. Implementations MUST allow listeners from a child `ListenerSet` to be merged into a parent `Gateway` when listeners have the same name. Likewise implementations MUST allow sibling `ListenerSets` listeners with matching names to be merged into a parent `Gateway`. This allows for authors of Routes to simply attach to their desired parentRef and listener without having to worry about naming conflicts across resources.
+Within a single resource such as a `Gateway` or `ListenerSet`, the list of listeners MUST have unique names. Implementations MUST allow listeners from a child `ListenerSet` to be merged into a parent `Gateway` when listeners have the same name. Likewise, implementations MUST allow sibling `ListenerSet` listeners with matching names to be merged into a parent `Gateway`. This allows Route authors to simply attach to their desired `parentRef` and listener without having to worry about naming conflicts across resources.
 
-It is up to the implementations how unique names are generated internally. One example would be to hash the `ListenerSet` name+namespace and prepend it to the listener entry `name`.
+It is up to the implementations to determine how unique names are generated internally. One example would be to hash the `ListenerSet` name and namespace and prepend it to the listener entry `name`.
 
-Implementations MUST treat the parent `Gateway`s as having the merged list of all listeners from itself and attached `ListenerSets` and validation of this list of listeners MUST behave the same as if the list were part of a single `Gateway` with the relaxed listener name constraints.
+Implementations MUST treat the parent `Gateway` as having the merged list of all listeners from itself and attached `ListenerSets`, and validation of this list of listeners MUST behave the same as if the list were part of a single `Gateway` with the relaxed listener name constraints.
 
 Ordering will follow the semantics defined in [Listener Precedence](#listener-precedence).
 
-From the earlier example the above resources would be equivalent to a single `Gateway` where the listeners are collapsed into a single list.
+From the earlier example, the above resources would be equivalent to a single `Gateway` where the listeners are collapsed into a single list:
 
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
@@ -670,7 +671,7 @@ spec:
       certificateRefs:
       - kind: Secret
         group: ""
-        name: first-workload-cert # Provisioned via HTTP01 challenge
+        name: first-workload-cert # Provisioned via HTTP-01 challenge
   - name: second
     hostname: second.foo.com
     protocol: HTTPS
@@ -680,49 +681,48 @@ spec:
       certificateRefs:
       - kind: Secret
         group: ""
-        name: second-workload-cert # Provisioned via HTTP01 challenge
+        name: second-workload-cert # Provisioned via HTTP-01 challenge
 ```
 
 ### Listener Precedence
 
-Listeners in a `Gateway` and their attached `ListenerSets` are concatenated as a list when programming the underlying infrastructure
+Listeners in a `Gateway` and their attached `ListenerSets` are concatenated as a list when programming the underlying infrastructure.
 
 Listeners should be merged using the following precedence:
 
 1. "parent" Gateway
 2. ListenerSet ordered by creation time (oldest first)
-3. ListenerSet ordered alphabetically by “{namespace}/{name}”.
+3. ListenerSet ordered alphabetically by "{namespace}/{name}"
 
-Conflicts are covered in the section [Listener and ListenerSet conflicts](#listener-and-listenerset-conflicts)
+Conflicts are covered in the section [Listener and ListenerSet Conflicts](#listener-and-listenerset-conflicts).
 
-### Listener and ListenerSet conflicts
+### Listener and ListenerSet Conflicts
 
 ListenerSet conflicts should be managed similarly to [Gateway resource conflict](https://github.com/kubernetes-sigs/gateway-api/blob/372a5b06624cff12117f41dcd26c08cb1def22e7/apis/v1/gateway_types.go#L76)
 management.
 
-With ListenerSet this validation should happen within the same ListenerSet resource,
-but MUST be validated also within a Gateway scope and all of the attached Listeners/ListenerSets.
-The SectionName field is an exception for this validation, and while it should
-not conflict within the same ListenerSet, it can be duplicated between different ListenerSets.
+With `ListenerSet`, this validation should happen within the same `ListenerSet` resource,
+but MUST also be validated within a Gateway scope across all attached Listeners and ListenerSets.
+The `SectionName` field is an exception for this validation — while it should
+not conflict within the same `ListenerSet`, it can be duplicated between different ListenerSets.
 
-This means that the validation should happen now between distinct ListenerSets
-attached to the same Gateway, and in case of a conflict, the [Listener Precedence](#listener-precedence)
-should be respected, so the first Listener on the precedence list MUST be accepted,
-and should not have a `Conflicted` condition, while the conflicting listeners
-MUST have a `Conflicted` condition set to True and with an explicit reason on its message.
+This means that validation should now happen between distinct ListenerSets
+attached to the same Gateway. In the case of a conflict, the [Listener Precedence](#listener-precedence)
+should be respected: the first Listener in the precedence list MUST be accepted
+and should not have a `Conflicted` condition, while conflicting listeners
+MUST have a `Conflicted` condition set to `True` with an explicit reason in its message.
 
-A `Route` MAY attach to a `Conflicted` ListenerSet, and once this ListenerSet is not conflicted
-anymore the implementations SHOULD support that the traffic of this route is accepted on
-this ListenerSet and flow without downtime.
+A Route MAY attach to a conflicted `ListenerSet`, and once the `ListenerSet` is no longer conflicted,
+implementations SHOULD ensure that traffic for that route is accepted on the `ListenerSet` without downtime.
 
-As an example, given 2 ListenerSets attached to the same Gateway, being one of them conflicted with
-the other, and each ListenerSet having an `HTTPRoute` attached, when one of the conflicting
-`ListenerSet` is deleted the other `ListenerSet` should become valid. Then the traffic SHOULD flow
-to the new `ListenerSet` without disruption.
+As an example: given two ListenerSets attached to the same Gateway where one is conflicted with
+the other, and each ListenerSet has an `HTTPRoute` attached — when the conflicting
+`ListenerSet` is deleted, the other `ListenerSet` should become valid, and traffic SHOULD flow
+to it without disruption.
 
-Following are some examples of a conflict situation:
+Following are some examples of conflict situations:
 
-#### Conflict between ListenerSet and parent Gateway
+#### Conflict Between a ListenerSet and the Parent Gateway
 
 Given the following resource definitions:
 
@@ -771,10 +771,10 @@ spec:
         name: app-cert
 ```
 
-The ListenerSet `user-listenerset` should be marked as Conflicted, as the `parent-gateway`
+The ListenerSet `user-listenerset` should be marked as Conflicted, as `parent-gateway`
 has a listener definition called `foo` that conflicts with the ListenerSet definition
-called `myapp`. The conflict happens because hostname is the same on both `ListenerSet`
-but they use different termination TLS certificates:
+called `myapp`. The conflict occurs because the hostname is the same on both but
+they use different TLS termination certificates:
 
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
@@ -782,7 +782,7 @@ kind: ListenerSet
 metadata:
   name: user-listenerset
   namespace: user01
-....
+# ...
 status:
   listeners:
   - name: myapp
@@ -800,13 +800,12 @@ status:
       type: Conflicted
 ```
 
-#### Conflict between two ListenerSets
+#### Conflict Between Two ListenerSets
 
-The following example represents a conflict between two ListenerSets on distinct
-namespaces. The controller should avoid setting any Condition that exposes information
-from other users, but still provide meaningful information of why a ListenerSet
-was not accepted
-
+The following example represents a conflict between two ListenerSets in distinct
+namespaces. The controller should avoid setting any condition that exposes information
+from other users, but still provide meaningful information about why a ListenerSet
+was not accepted:
 
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
@@ -856,12 +855,12 @@ spec:
         name: other-app-cert
 ```
 
-In this case, there's a conflict as both users are setting the same hostname and
-port on distinct Listeners. In this case, because the ListenerSet `user02/listenerset2`
-is older, it will be accepted while `user01/listenerset1` should not be accepted,
-and receive a `Conflicted=True` condition.
+In this case, there is a conflict as both users are setting the same hostname and
+port on distinct Listeners. Because `user02/listenerset2` is older, it will be
+accepted while `user01/listenerset1` should not be accepted and will receive a
+`Conflicted=True` condition.
 
-The status of ListenerSets can be defined as the following:
+The status of the ListenerSets can be defined as follows:
 
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
@@ -902,105 +901,101 @@ status:
 
 ### Gateway Status
 
-`Gateway` status MUST report the number of successful attached listeners to `.status.attachedListenerSets`.
+`Gateway` status MUST report the number of successfully attached listener sets in `.status.attachedListenerSets`.
 
 ### Gateway Conditions
 
 `Gateway`'s `Accepted` and `Programmed` top-level conditions remain unchanged and reflect the status of the local configuration.
- conditions list.
 
 ### ListenerSet Conditions
 
-`ListenerSets` have a top-level `Accepted` and `Programmed` conditions.
+`ListenerSets` have top-level `Accepted` and `Programmed` conditions.
 
 The `Accepted` condition MUST be set on every `ListenerSet`, and indicates that the `ListenerSet` is semantically valid and accepted by its `parentRef`.
 
 Valid reasons for `Accepted` being `False` are:
 
-- `NotAllowed` - the `parentRef` doesn't allow attachment
-- `ParentNotAccepted` - the `parentRef` isn't accepted (eg. invalid address)
-- `ListenersNotValid` - one or more listeners in the set are invalid (or using an unsupported feature)
+- `NotAllowed` — the `parentRef` does not allow attachment
+- `ParentNotAccepted` — the `parentRef` is not accepted (e.g. invalid address)
+- `ListenersNotValid` — one or more listeners in the set are invalid (or using an unsupported feature)
 
-The `Programmed` condition MUST be set on every `ListenerSet` and have a similar meaning to the Gateway `Programmed` condition but only reflect the listeners in this `ListenerSet`.
+The `Programmed` condition MUST be set on every `ListenerSet` and has a similar meaning to the Gateway `Programmed` condition, but only reflects the listeners in that `ListenerSet`.
 
-`Accepted` and `Programmed` conditions when surfacing details about listeners, MUST only summarize the `status.listeners` conditions that are exclusive to the `ListenerSet`.
-An exception to this is when the parent `Gateway`'s `Accepted` or `Programmed` conditions transition to `False`
+`Accepted` and `Programmed` conditions, when surfacing details about listeners, MUST only summarize the `status.listeners` conditions that are exclusive to the `ListenerSet`.
+An exception to this is when the parent `Gateway`'s `Accepted` or `Programmed` conditions transition to `False`.
 
-`ListenerSets` MUST NOT have their parent `Gateway`'s' listeners in the associated `status.listeners` conditions list.
+`ListenerSets` MUST NOT have their parent `Gateway`'s listeners in the associated `status.listeners` conditions list.
 
-### ListenerConditions within a ListenerSet
+### ListenerConditions Within a ListenerSet
 
-An implementation MAY reject listeners by setting the `ListenerEntryStatus` `Accepted` condition to `False` with the `Reason` `TooManyListeners`
+An implementation MAY reject listeners by setting the `ListenerEntryStatus` `Accepted` condition to `False` with the reason `TooManyListeners`.
 
 If a listener has a conflict, this should be reported in the `ListenerEntryStatus` of the conflicted `ListenerSet` by setting the `Conflicted` condition to `True`.
 
-Implementations SHOULD be cautious about what information from the parent or siblings are reported to avoid accidentally leaking sensitive information that the child would not otherwise have access to. This can include contents of secrets etc.
+Implementations SHOULD be cautious about what information from the parent or siblings is reported, to avoid accidentally leaking sensitive information that the child would not otherwise have access to (such as the contents of secrets).
 
-Conflicts are covered in the section [Listener and ListenerSet conflicts](#listener-and-listenerset-conflicts)
+Conflicts are covered in the section [Listener and ListenerSet Conflicts](#listener-and-listenerset-conflicts).
 
 ## Alternatives
 
-### Re-using Gateway Resource
+### Re-using the Gateway Resource
 
 The [first iteration of this GEP](https://github.com/kubernetes-sigs/gateway-api/pull/1863) proposed re-using the `Gateway` resource and introducing an `attachTo` property in the `infrastructure` stanza.
 
-The main downside of this approach is that users still require `Gateway` write access to create listeners. Secondly, it introduces complexity to future `Gateway` features as GEP authors would have now have to account for merging semantics.
+The main downside of this approach is that users still require `Gateway` write access to create listeners. Secondly, it introduces complexity to future `Gateway` features as GEP authors would then have to account for merging semantics.
 
 ### New 'GatewayGroup' Resource
 
-This was proposed in the Gateway Hierarchy Brainstorming document (see references below). The idea is to introduce a central resource that will coalesce Gateways together and offer forms of delegation.
+This was proposed in the Gateway Hierarchy Brainstorming document (see references below). The idea is to introduce a central resource that coalesces Gateways together and offers forms of delegation.
 
-Issues with this is complexity with status propagation, cluster vs. namespace scoping etc. It also lacks a migration path for existing Gateways to help shard listeners.
+Issues with this include complexity with status propagation, cluster vs. namespace scoping, etc. It also lacks a migration path for existing Gateways to help shard listeners.
 
 ### Use of Multiple Disjointed Gateways
 
-An alternative would be to encourage users to not use overly large Gateways to minimize the blast radius of any issues. Use of disjoint Gateways could accomplish this but it has the disadvantage of consuming more resources and introducing complexity when it comes to operations work (eg. setting up DNS records etc.)
+An alternative would be to encourage users to avoid overly large Gateways in order to minimize the blast radius of any issues. Use of disjoint Gateways could accomplish this, but it has the disadvantage of consuming more resources and introducing operational complexity (e.g. setting up DNS records).
 
 ### Increase the Listener Limit
 
-Increasing the limit may help in situations where you are creating many listeners such as adding certificates created using an ACME HTTP01 challenge. Unfortunately this still makes the Gateway a single point of contention. Unfortunately, there will always be an upper bound because of etcd limitations.
-For workloads like Knative we can have O(1000) Services on the cluster with unique subdomains.
+Increasing the limit may help in situations where you are creating many listeners, such as when adding certificates created using an ACME HTTP-01 challenge. Unfortunately this still makes the Gateway a single point of contention, and there will always be an upper bound due to etcd limitations.
+For workloads like Knative we can have O(1000) services on the cluster with unique subdomains.
 
 ### Expand Route Functionality
 
-For workloads with many certificates one option would be to introduce a `tls` stanza somewhere in the Route types. These Routes would then attach to a single Gateway. Then application operators can provide their own certificates. This probably would require some ability to have a handshake agreement with the Gateway.
+For workloads with many certificates, one option would be to introduce a `tls` stanza somewhere in the Route types. These Routes would then attach to a single Gateway, allowing application operators to provide their own certificates. This would likely require some ability to have a handshake agreement with the Gateway.
 
-Somewhat related, there was a Route Delegation GEP (https://github.com/kubernetes-sigs/gateway-api/issues/1058) that was abandoned
+Somewhat related, there was a Route Delegation GEP (https://github.com/kubernetes-sigs/gateway-api/issues/1058) that was abandoned.
 
 ## References
 
-First Revision of the GEP
+First revision of the GEP:
 
-- https://github.com/kubernetes-sigs/gateway-api/pull/1863
+- [kubernetes-sigs/gateway-api #1863](https://github.com/kubernetes-sigs/gateway-api/pull/1863)
 
-Mentioned in Prior GEPs:
+Mentioned in prior GEPs:
 
-- https://github.com/kubernetes-sigs/gateway-api/pull/1757
+- [kubernetes-sigs/gateway-api #1757](https://github.com/kubernetes-sigs/gateway-api/pull/1757)
 
-Prior Discussions:
+Prior discussions:
 
-- https://github.com/kubernetes-sigs/gateway-api/discussions/1248
-- https://github.com/kubernetes-sigs/gateway-api/discussions/1246
-
-Gateway Hierarchy Brainstorming:
-
-- https://docs.google.com/document/d/1qj7Xog2t2fWRuzOeTsWkabUaVeOF7_2t_7appe8EXwA/edit
+- [kubernetes-sigs/gateway-api #1248](https://github.com/kubernetes-sigs/gateway-api/discussions/1248)
+- [kubernetes-sigs/gateway-api #1246](https://github.com/kubernetes-sigs/gateway-api/discussions/1246)
+- [Gateway Hierarchy Brainstorming](https://docs.google.com/document/d/1qj7Xog2t2fWRuzOeTsWkabUaVeOF7_2t_7appe8EXwA/edit)
 
 ## Conformance Details
 
-The following Gateway Conformance (Extended) features will be added
+The following Gateway Conformance (Extended) features will be added:
+```go
+//  SupportGatewayListenerSet option indicates support for a Gateway
+//  with ListenerSets
+SupportGatewayListenerSet FeatureName = "GatewayListenerSet"
 ```
-	//  SupportGatewayListenerSet option indicates support for a Gateway
-	//  with ListenerSets
-	SupportGatewayListenerSet FeatureName = "GatewayListenerSet"
-```
-They will validate the following scenarios :
+They will validate the following scenarios:
 
-1. AllowedListeners is not specified on the parent Gateway
-    - `Gateway.spec.allowedListeners` is not specified (defaults to None)
+1. `AllowedListeners` is not specified on the parent Gateway
+    - `Gateway.spec.allowedListeners` is not specified (defaults to `None`)
 
-    - The ListenerSet is not accepted with the following status :
-      ```
+    - The ListenerSet is not accepted with the following status:
+      ```yaml
       conditions:
         - type: Accepted
           status: False
@@ -1009,8 +1004,8 @@ They will validate the following scenarios :
           status: False
           reason: NotAllowed
       ```
-    - The parent gateway has the following status :
-      ```
+    - The parent Gateway has the following status:
+      ```yaml
       status:
         AttachedListenerSets: 0
       ```
@@ -1018,8 +1013,8 @@ They will validate the following scenarios :
 1. ListenerSets are not allowed on the parent Gateway
     - `Gateway.spec.allowedListeners.namespaces.from` is set to `None`
 
-    - The ListenerSet is not accepted with the following status :
-      ```
+    - The ListenerSet is not accepted with the following status:
+      ```yaml
       conditions:
         - type: Accepted
           status: False
@@ -1028,26 +1023,26 @@ They will validate the following scenarios :
           status: False
           reason: NotAllowed
       ```
-    - The parent gateway has the following status :
-      ```
+    - The parent Gateway has the following status:
+      ```yaml
       status:
         AttachedListenerSets: 0
       ```
 
-1. ListenerSets are allowed only from the same namespace as the parent Gateway (Validates `Gateway.spec.allowedListeners.namespaces.from`)
+1. ListenerSets are allowed only from the same namespace as the parent Gateway (validates `Gateway.spec.allowedListeners.namespaces.from`)
     - `Gateway.spec.allowedListeners.namespaces.from` is set to `Same`
-    - There exist two ListenerSets :
+    - There exist two ListenerSets:
       - `ls-allowed` in the same namespace as the parent Gateway
-      - `ls-not-allowed` in a different namespace than the parent Gateway
+      - `ls-not-allowed` in a different namespace from the parent Gateway
 
-    - The parent gateway has the following status :
-      ```
+    - The parent Gateway has the following status:
+      ```yaml
       status:
         AttachedListenerSets: 1
       ```
 
-    - The ListenerSet `ls-allowed` in the same namespace as the parent Gateway has the following status :
-      ```
+    - The ListenerSet `ls-allowed` in the same namespace as the parent Gateway has the following status:
+      ```yaml
       conditions:
       - type: Accepted
         status: True
@@ -1057,8 +1052,8 @@ They will validate the following scenarios :
         reason: Programmed
       ```
 
-    - The ListenerSet `ls-not-allowed` in a different namespace from the parent Gateway has the following status :
-      ```
+    - The ListenerSet `ls-not-allowed` in a different namespace from the parent Gateway has the following status:
+      ```yaml
       conditions:
         - type: Accepted
           status: False
@@ -1070,18 +1065,18 @@ They will validate the following scenarios :
 
 1. ListenerSets are allowed from namespaces that have the appropriate labels
     - `Gateway.spec.allowedListeners.namespaces.selector` is set to match a specific namespace's labels
-    - There exist two ListenerSets :
+    - There exist two ListenerSets:
       - `ls-allowed` in a namespace matched by the selector
       - `ls-not-allowed` in a namespace not matched by the selector
 
-    - The parent gateway has the following status :
-      ```
+    - The parent Gateway has the following status:
+      ```yaml
       status:
         AttachedListenerSets: 1
       ```
 
-    - The ListenerSet `ls-allowed` in a namespace matched by the selector has the following status :
-      ```
+    - The ListenerSet `ls-allowed` in a namespace matched by the selector has the following status:
+      ```yaml
       conditions:
       - type: Accepted
         status: True
@@ -1091,8 +1086,8 @@ They will validate the following scenarios :
         reason: Programmed
       ```
 
-    - The ListenerSet `ls-not-allowed` in namespace not matched by the selector has the following status :
-      ```
+    - The ListenerSet `ls-not-allowed` in a namespace not matched by the selector has the following status:
+      ```yaml
       conditions:
         - type: Accepted
           status: False
@@ -1103,8 +1098,8 @@ They will validate the following scenarios :
       ```
 
 1. A listener `ls-8080` is the only listener on the ListenerSet and it has a protocol conflict with a listener `gw-8080` on the Gateway
-    - The parent gateway has the following status :
-      ```
+    - The parent Gateway has the following status:
+      ```yaml
       conditions:
       - type: Accepted
         status: True
@@ -1124,8 +1119,8 @@ They will validate the following scenarios :
       AttachedListenerSets: 0
       ```
 
-    - The listener set has the following status :
-      ```
+    - The ListenerSet has the following status:
+      ```yaml
       conditions:
       - type: Accepted
         status: False
@@ -1148,8 +1143,8 @@ They will validate the following scenarios :
       ```
 
 1. A listener `ls-8080` on the ListenerSet with other valid listeners has a protocol conflict with a listener `gw-8080` on the Gateway
-    - The parent gateway has the following status :
-      ```
+    - The parent Gateway has the following status:
+      ```yaml
       conditions:
       - type: Accepted
         status: True
@@ -1169,8 +1164,8 @@ They will validate the following scenarios :
       AttachedListenerSets: 1
       ```
 
-    - The listener set has the following status :
-      ```
+    - The ListenerSet has the following status:
+      ```yaml
       conditions:
       - type: Accepted
         status: True
@@ -1190,18 +1185,18 @@ They will validate the following scenarios :
         - type: Conflicted
           status: True
           reason: ProtocolConflict
-      // Other accepted listeners
+      # Other accepted listeners
       ```
 
 1. A ListenerSet `ls-conflicted` contains only one listener `ls-conflicted-8080` which has a protocol conflict with a listener `ls-accepted-8080` on another ListenerSet `ls-accepted`
-    - The parent gateway has the following status :
-      ```
+    - The parent Gateway has the following status:
+      ```yaml
       status:
         AttachedListenerSets: 1
       ```
 
-    - The `ls-accepted` ListenerSet has the following status :
-      ```
+    - The `ls-accepted` ListenerSet has the following status:
+      ```yaml
       conditions:
       - type: Accepted
         status: True
@@ -1220,8 +1215,8 @@ They will validate the following scenarios :
           reason: Programmed
       ```
 
-    - The `ls-conflicted` ListenerSet has the following status :
-      ```
+    - The `ls-conflicted` ListenerSet has the following status:
+      ```yaml
       conditions:
       - type: Accepted
         status: False
@@ -1244,14 +1239,14 @@ They will validate the following scenarios :
       ```
 
 1. A ListenerSet `ls-conflicted` contains valid listeners and a listener `ls-conflicted-8080` which has a protocol conflict with a listener `ls-accepted-8080` on another ListenerSet `ls-accepted`
-    - The parent gateway has the following status :
-      ```
+    - The parent Gateway has the following status:
+      ```yaml
       status:
         AttachedListenerSets: 2
       ```
 
-    - The `ls-accepted` ListenerSet has the following status :
-      ```
+    - The `ls-accepted` ListenerSet has the following status:
+      ```yaml
       conditions:
       - type: Accepted
         status: True
@@ -1270,8 +1265,8 @@ They will validate the following scenarios :
           reason: Programmed
       ```
 
-    - The `ls-conflicted` ListenerSet has the following status :
-      ```
+    - The `ls-conflicted` ListenerSet has the following status:
+      ```yaml
       conditions:
       - type: Accepted
         status: True
@@ -1291,12 +1286,12 @@ They will validate the following scenarios :
         - type: Conflicted
           status: True
           reason: ProtocolConflict
-      // Other accepted listeners
+      # Other accepted listeners
       ```
 
 1. A listener `ls-8080` on the ListenerSet with only one listener has a hostname conflict with a listener `gw-8080` on the Gateway
-    - The parent gateway has the following status :
-      ```
+    - The parent Gateway has the following status:
+      ```yaml
       conditions:
       - type: Accepted
         status: True
@@ -1316,8 +1311,8 @@ They will validate the following scenarios :
       AttachedListenerSets: 0
       ```
 
-    - The listener set has the following status :
-      ```
+    - The ListenerSet has the following status:
+      ```yaml
       conditions:
       - type: Accepted
         status: False
@@ -1340,8 +1335,8 @@ They will validate the following scenarios :
       ```
 
 1. A listener `ls-8080` on the ListenerSet with other valid listeners has a hostname conflict with a listener `gw-8080` on the Gateway
-    - The parent gateway has the following status :
-      ```
+    - The parent Gateway has the following status:
+      ```yaml
       conditions:
       - type: Accepted
         status: True
@@ -1361,8 +1356,8 @@ They will validate the following scenarios :
       AttachedListenerSets: 1
       ```
 
-    - The listener set has the following status :
-      ```
+    - The ListenerSet has the following status:
+      ```yaml
       conditions:
       - type: Accepted
         status: True
@@ -1382,18 +1377,18 @@ They will validate the following scenarios :
         - type: Conflicted
           status: True
           reason: HostnameConflict
-      // Other accepted listeners
+      # Other accepted listeners
       ```
 
 1. A ListenerSet `ls-conflicted` with only one listener `ls-conflicted-8080` has a hostname conflict with a listener `ls-accepted-8080` on another ListenerSet `ls-accepted`
-    - The parent gateway has the following status :
-      ```
+    - The parent Gateway has the following status:
+      ```yaml
       status:
         AttachedListenerSets: 1
       ```
 
-    - The `ls-accepted` ListenerSet has the following status :
-      ```
+    - The `ls-accepted` ListenerSet has the following status:
+      ```yaml
       conditions:
       - type: Accepted
         status: True
@@ -1412,8 +1407,8 @@ They will validate the following scenarios :
           reason: Programmed
       ```
 
-    - The `ls-conflicted` ListenerSet has the following status :
-      ```
+    - The `ls-conflicted` ListenerSet has the following status:
+      ```yaml
       conditions:
       - type: Accepted
         status: False
@@ -1435,15 +1430,15 @@ They will validate the following scenarios :
           reason: HostnameConflict
       ```
 
-1. A ListenerSet `ls-conflicted` with valid listeners and a listener `ls-conflicted-8080` on has a hostname conflict with a listener `ls-accepted-8080` on another ListenerSet `ls-accepted`
-    - The parent gateway has the following status :
-      ```
+1. A ListenerSet `ls-conflicted` with valid listeners and a listener `ls-conflicted-8080` has a hostname conflict with a listener `ls-accepted-8080` on another ListenerSet `ls-accepted`
+    - The parent Gateway has the following status:
+      ```yaml
       status:
         AttachedListenerSets: 2
       ```
 
-    - The `ls-accepted` ListenerSet has the following status :
-      ```
+    - The `ls-accepted` ListenerSet has the following status:
+      ```yaml
       conditions:
       - type: Accepted
         status: True
@@ -1462,8 +1457,8 @@ They will validate the following scenarios :
           reason: Programmed
       ```
 
-    - The `ls-conflicted` ListenerSet has the following status :
-      ```
+    - The `ls-conflicted` ListenerSet has the following status:
+      ```yaml
       conditions:
       - type: Accepted
         status: True
@@ -1483,12 +1478,12 @@ They will validate the following scenarios :
         - type: Conflicted
           status: True
           reason: HostnameConflict
-      // Other accepted listeners
+      # Other accepted listeners
       ```
 
 1. A listener on a ListenerSet allows routes from the same namespace as the ListenerSet
-    - The route in the same namespace as the ListenerSet is accepted with the following status :
-      ```
+    - The route in the same namespace as the ListenerSet is accepted with the following status:
+      ```yaml
       parents:
       - parentRef:
           group: gateway.networking.k8s.io
@@ -1500,8 +1495,8 @@ They will validate the following scenarios :
           type: Accepted
       ```
 
-    - The route in a different namespace as the ListenerSet is rejected with the following status :
-      ```
+    - The route in a different namespace from the ListenerSet is rejected with the following status:
+      ```yaml
       parents:
       - parentRef:
           group: gateway.networking.k8s.io
@@ -1514,8 +1509,8 @@ They will validate the following scenarios :
       ```
 
 1. A listener on a ListenerSet allows routes from namespaces that have the appropriate labels
-    - The route in the namespace that matches the given labels is accepted with the following status :
-      ```
+    - The route in a namespace that matches the given labels is accepted with the following status:
+      ```yaml
       parents:
       - parentRef:
           group: gateway.networking.k8s.io
@@ -1527,8 +1522,8 @@ They will validate the following scenarios :
           type: Accepted
       ```
 
-    - The route in the namespace that does not match the given labels is rejected with the following status :
-      ```
+    - The route in a namespace that does not match the given labels is rejected with the following status:
+      ```yaml
       parents:
       - parentRef:
           group: gateway.networking.k8s.io
@@ -1541,8 +1536,8 @@ They will validate the following scenarios :
       ```
 
 1. A listener on a ListenerSet allows only specific route kinds
-    - The route that belongs to the list of specified RouteGroupKind is accepted with the following status :
-      ```
+    - The route that belongs to the list of specified `RouteGroupKind` is accepted with the following status:
+      ```yaml
       parents:
       - parentRef:
           group: gateway.networking.k8s.io
@@ -1554,8 +1549,8 @@ They will validate the following scenarios :
           type: Accepted
       ```
 
-    - The route that does not belong to the list of specified RouteGroupKind is rejected with the following status :
-      ```
+    - The route that does not belong to the list of specified `RouteGroupKind` is rejected with the following status:
+      ```yaml
       parents:
       - parentRef:
           group: gateway.networking.k8s.io
@@ -1570,8 +1565,8 @@ They will validate the following scenarios :
 1. A listener on a ListenerSet with a missing ReferenceGrant
     - The listener on the ListenerSet references a secret without a ReferenceGrant.
 
-    - The listenerSet must have the following status
-      ```
+    - The ListenerSet must have the following status:
+      ```yaml
       conditions:
       - type: Accepted
         status: True
@@ -1589,20 +1584,20 @@ They will validate the following scenarios :
         - type: ResolvedRefs
           status: False
           reason: RefNotPermitted
-      // Other accepted listeners if applicable
+      # Other accepted listeners if applicable
       ```
 
-    - The parent gateway has the following status :
-      ```
+    - The parent Gateway has the following status:
+      ```yaml
       status:
         AttachedListenerSets: 1
       ```
 
-1. A listener on a ListenerSet without a ReferenceGrant but the parent Gateway has a ReferenceGrant
+1. A listener on a ListenerSet without a ReferenceGrant, but the parent Gateway has a ReferenceGrant
     - The listener on the ListenerSet without a ReferenceGrant references a secret the parent Gateway has access to.
 
-    - The listenerSet must have the following status
-      ```
+    - The ListenerSet must have the following status:
+      ```yaml
       conditions:
       - type: Accepted
         status: True
@@ -1620,18 +1615,18 @@ They will validate the following scenarios :
         - type: ResolvedRefs
           status: False
           reason: RefNotPermitted
-      // Other accepted listeners if applicable
+      # Other accepted listeners if applicable
       ```
 
-    - The parent gateway has the following status :
-      ```
+    - The parent Gateway has the following status:
+      ```yaml
       status:
         AttachedListenerSets: 1
       ```
 
 1. A listener on a ListenerSet with a valid ReferenceGrant
-    - The listenerSet must have the following status
-      ```
+    - The ListenerSet must have the following status:
+      ```yaml
       conditions:
       - type: Accepted
         status: True
@@ -1649,22 +1644,21 @@ They will validate the following scenarios :
         - type: ResolvedRefs
           status: True
           reason: ResolvedRefs
-      // Other accepted listeners if applicable
+      # Other accepted listeners if applicable
       ```
 
-    - The parent gateway has the following status :
-      ```
+    - The parent Gateway has the following status:
+      ```yaml
       status:
         AttachedListenerSets: 1
       ```
 
-
 1. Valid ListenerSet attached to a Gateway that allows it
-    - The gateway allows attaching ListenerSets.
+    - The Gateway allows attaching ListenerSets.
     - The ListenerSet is valid and allows routes.
 
-    - The ListenerSet is accepted and has the following status :
-      ```
+    - The ListenerSet is accepted and has the following status:
+      ```yaml
       conditions:
       - type: Accepted
         status: True
@@ -1686,9 +1680,8 @@ They will validate the following scenarios :
           reason: ResolvedRefs
       ```
 
-
-    - The parent gateway has the following status :
-      ```
+    - The parent Gateway has the following status:
+      ```yaml
       status:
         AttachedListenerSets: 1
       ```

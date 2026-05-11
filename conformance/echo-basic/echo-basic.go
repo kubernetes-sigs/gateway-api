@@ -247,8 +247,8 @@ func echoHandler(w http.ResponseWriter, r *http.Request) {
 
 func writeEchoResponseHeaders(w http.ResponseWriter, headers http.Header) {
 	for _, headerKVList := range headers["X-Echo-Set-Header"] {
-		headerKVs := strings.Split(headerKVList, ",")
-		for _, headerKV := range headerKVs {
+		headerKVs := strings.SplitSeq(headerKVList, ",")
+		for headerKV := range headerKVs {
 			name, value, _ := strings.Cut(strings.TrimSpace(headerKV), ":")
 			// Add directly to the map to preserve casing.
 			if len(w.Header()[name]) == 0 {
@@ -283,7 +283,7 @@ func listenAndServeTLS(addr string, serverCert string, serverPrivKey string, cli
 
 	// Optionally enable client certificate validation when client CA certificates are given.
 	if clientCA != "" {
-		ca, err := os.ReadFile(clientCA)
+		ca, err := os.ReadFile(clientCA) // #nosec G703 -- clientCA is a trusted test fixture path
 		if err != nil {
 			return err
 		}

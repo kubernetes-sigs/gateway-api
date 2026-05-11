@@ -186,8 +186,8 @@ func ParseTimeoutOverrides(timeoutConfig *TimeoutConfig, overrides string) {
 	if overrides == "" {
 		return
 	}
-	pairs := strings.Split(overrides, ";")
-	for _, pair := range pairs {
+	pairs := strings.SplitSeq(overrides, ";")
+	for pair := range pairs {
 		parts := strings.Split(pair, ":")
 		if len(parts) != 2 {
 			continue
