@@ -1,5 +1,5 @@
 #$ Used in:
-#$ - site-src/concepts/security-model.md
+#$ - site-src/concepts/security.md
 apiVersion: gateway.networking.k8s.io/v1
 kind: ReferenceGrant
 metadata:

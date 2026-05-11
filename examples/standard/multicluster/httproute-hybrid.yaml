@@ -1,5 +1,5 @@
 #$ Used in:
-#$ - geps/gep-1748.md
+#$ - geps/gep-1748/index.md
 kind: HTTPRoute
 apiVersion: gateway.networking.k8s.io/v1beta1
 metadata:
