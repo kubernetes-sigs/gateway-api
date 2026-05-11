@@ -39,6 +39,7 @@ var GatewayInvalidParametersRef = suite.ConformanceTest{
 		features.SupportGateway,
 	},
 	Manifests: []string{"tests/gateway-invalid-parameters-ref.yaml"},
+	Parallel:  true,
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
 		gwNN := types.NamespacedName{Name: "gateway-invalid-parameters-ref", Namespace: suite.InfrastructureNamespace}
 
