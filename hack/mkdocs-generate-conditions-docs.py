@@ -41,19 +41,6 @@ SECTIONS = [
     ("Mesh", "Mesh"),
 ]
 
-# Condition type prefix -> resource name
-PREFIX_TO_RESOURCE = {
-    "Policy": "Policy",
-    "GatewayClass": "GatewayClass",
-    "Gateway": "Gateway",
-    "Listener": "Listener",
-    "ListenerSet": "ListenerSet",
-    "ListenerEntry": "ListenerEntry",
-    "Route": "Route",
-    "Mesh": "Mesh",
-}
-
-
 def extract_reasons_from_comment(comment: str) -> dict:
     """Parse 'Possible reasons for this condition to be True/False/Unknown' from comment."""
     result = {"True": [], "False": [], "Unknown": []}
@@ -80,10 +67,10 @@ def extract_const_value(line: str) -> tuple[str | None, str | None, str | None]:
 
 
 def get_resource_from_type(type_name: str) -> str | None:
-    """Map type name to resource (e.g., GatewayConditionType -> Gateway)."""
+    """Map *ConditionType name to resource (e.g., GatewayConditionType -> Gateway)."""
     for prefix in ["GatewayClass", "Gateway", "ListenerSet", "ListenerEntry", "Listener", "Route", "Policy", "Mesh"]:
-        if type_name.startswith(prefix) and ("ConditionType" in type_name or "ConditionReason" in type_name):
-            return PREFIX_TO_RESOURCE.get(prefix)
+        if type_name.startswith(prefix) and "ConditionType" in type_name:
+            return prefix
     return None
 
 
@@ -130,10 +117,7 @@ def parse_file(repo_root: Path, rel_path: str, resource_filter: str | None) -> l
                     continue
 
                 comment_text = " ".join(current_comment)
-                is_condition_type = "ConditionType" in type_name
-                is_reason = "ConditionReason" in type_name or "Reason" in type_name
-
-                if is_condition_type:
+                if "ConditionType" in type_name:
                     reasons_map = extract_reasons_from_comment(comment_text)
                     experimental = "<gateway:experimental>" in comment_text
                     deprecated = "Deprecated:" in comment_text or "deprecated" in comment_text.lower()
@@ -148,14 +132,6 @@ def parse_file(repo_root: Path, rel_path: str, resource_filter: str | None) -> l
                         "experimental": experimental,
                         "deprecated": deprecated,
                         "reserved": reserved,
-                    })
-                elif is_reason:
-                    items.append({
-                        "kind": "reason",
-                        "resource": resource,
-                        "name": value,
-                        "comment": comment_text,
-                        "deprecated": "Deprecated:" in comment_text,
                     })
 
             current_comment = []
@@ -180,53 +156,29 @@ def discover_go_files(repo_root: Path) -> list[str]:
     return sorted(files)
 
 
-def simplify_description(comment: str, max_len: int = 120) -> str:
-    """Extract a short description from a reason comment."""
-    # Remove "This reason is used with the X condition when..." prefix
-    comment = re.sub(r'^This reason is used with the "[^"]+" condition when\s+', "", comment, flags=re.IGNORECASE)
-    comment = re.sub(r'^This reason is used with the "[^"]+" and "[^"]+" conditions when\s+', "", comment, flags=re.IGNORECASE)
-    # Take first sentence
-    first = comment.split(".")[0].strip()
-    m = re.fullmatch(r"the condition is\s+(true|false|unknown)", first, flags=re.IGNORECASE)
-    if m:
-        first = f"Condition is {m.group(1).capitalize()}"
-    if len(first) > max_len:
-        first = first[: max_len - 3] + "..."
-    return first
-
-
-def build_reason_map(items: list[dict]) -> tuple[dict, dict, dict]:
-    """Build resource -> conditions, and resource -> condition -> reasons with status/description."""
+def build_reason_map(items: list[dict]) -> tuple[dict, dict]:
+    """Build resource -> conditions, and resource -> condition -> reasons with status."""
     by_resource = {}
-    reason_descriptions = {}  # resource -> { reason_value: { description, deprecated } }
-    condition_reasons = {}  # resource -> condition_name -> { reason_value: [statuses] }
+    condition_reasons = {}
 
     for item in items:
         r = item.get("resource")
-        if not r:
+        if not r or item["kind"] != "condition":
             continue
         if r not in by_resource:
             by_resource[r] = []
-            reason_descriptions[r] = {}
             condition_reasons[r] = {}
 
-        if item["kind"] == "condition":
-            by_resource[r].append(item)
-            condition_reasons[r][item["name"]] = {}
-            for status, reasons in item["reasons_map"].items():
-                for rv in reasons:
-                    if rv not in condition_reasons[r][item["name"]]:
-                        condition_reasons[r][item["name"]][rv] = []
-                    if status not in condition_reasons[r][item["name"]][rv]:
-                        condition_reasons[r][item["name"]][rv].append(status)
-        elif item["kind"] == "reason":
-            if item["name"] not in reason_descriptions[r]:
-                reason_descriptions[r][item["name"]] = {
-                    "description": simplify_description(item["comment"]),
-                    "deprecated": item.get("deprecated", False),
-                }
+        by_resource[r].append(item)
+        condition_reasons[r][item["name"]] = {}
+        for status, reasons in item["reasons_map"].items():
+            for rv in reasons:
+                if rv not in condition_reasons[r][item["name"]]:
+                    condition_reasons[r][item["name"]][rv] = []
+                if status not in condition_reasons[r][item["name"]][rv]:
+                    condition_reasons[r][item["name"]][rv].append(status)
 
-    return by_resource, condition_reasons, reason_descriptions
+    return by_resource, condition_reasons
 
 
 def render_markdown(repo_root: Path, output_path: Path) -> None:
@@ -236,7 +188,7 @@ def render_markdown(repo_root: Path, output_path: Path) -> None:
         items = parse_file(repo_root, rel_path, None)
         all_items.extend(items)
 
-    by_resource, condition_reasons, reason_descriptions = build_reason_map(all_items)
+    by_resource, condition_reasons = build_reason_map(all_items)
 
     out = []
     out.append("# Condition Types and Reasons Reference")
@@ -306,38 +258,25 @@ def render_markdown(repo_root: Path, output_path: Path) -> None:
 
             reasons = condition_reasons.get(resource, {}).get(name, {})
             if reasons:
-                has_true = any("True" in s for s in reasons.values())
-                has_false = any("False" in s for s in reasons.values())
-                has_unknown = any("Unknown" in s for s in reasons.values())
-
-                headers = ["Reason"]
-                if has_true:
-                    headers.append("True")
-                if has_false:
-                    headers.append("False")
-                if has_unknown:
-                    headers.append("Unknown")
-                headers.append("Description")
-
-                out.append("| " + " | ".join(headers) + " |")
-                out.append("|" + " --- |" * len(headers))
-
-                rdesc = reason_descriptions.get(resource, {})
+                out.append('<div class="conditions-compact-table-wrap" markdown="1">')
+                out.append("")
+                out.append("| Reason | True | False | Unknown |")
+                out.append("| --- | --- | --- | --- |")
                 for reason_name, statuses in sorted(reasons.items()):
-                    row = [reason_name]
-                    if has_true:
-                        row.append("✓" if "True" in statuses else "")
-                    if has_false:
-                        row.append("✓" if "False" in statuses else "")
-                    if has_unknown:
-                        row.append("✓" if "Unknown" in statuses else "")
-                    rinfo = rdesc.get(reason_name, {})
-                    desc = rinfo.get("description", "") or "—"
-                    if rinfo.get("deprecated") and "*Deprecated*" not in desc and "Deprecated:" not in desc:
-                        desc += " *Deprecated:* Use Pending instead."
-                    row.append(desc)
-                    out.append("| " + " | ".join(row) + " |")
-
+                    out.append(
+                        "| "
+                        + " | ".join(
+                            [
+                                reason_name,
+                                "✓" if "True" in statuses else "",
+                                "✓" if "False" in statuses else "",
+                                "✓" if "Unknown" in statuses else "",
+                            ]
+                        )
+                        + " |"
+                    )
+                out.append("")
+                out.append("</div>")
                 out.append("")
             out.append("")
 
