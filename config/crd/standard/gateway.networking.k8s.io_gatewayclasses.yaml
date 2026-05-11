@@ -220,6 +220,7 @@ spec:
                       enum:
                       - "True"
                       - "False"
+                      - Unknown
                       type: string
                     type:
                       description: type of condition in CamelCase or in foo.example.com/CamelCase.

@@ -203,7 +203,6 @@ spec:
                               required:
                               - key
                               - operator
-                              - values
                               type: object
                             type: array
                             x-kubernetes-list-type: atomic
