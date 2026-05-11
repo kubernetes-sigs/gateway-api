@@ -42,6 +42,7 @@ var ListenerSetHostnameConflict = confsuite.ConformanceTest{
 	Manifests: []string{
 		"tests/listenerset-hostname-conflict.yaml",
 	},
+	Parallel: true,
 	Test: func(t *testing.T, suite *confsuite.ConformanceTestSuite) {
 		ns := confsuite.InfrastructureNamespace
 		kubernetes.NamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, []string{ns})

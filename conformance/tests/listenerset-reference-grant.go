@@ -43,6 +43,7 @@ var ListenerSetReferenceGrant = confsuite.ConformanceTest{
 	Manifests: []string{
 		"tests/listenerset-reference-grant.yaml",
 	},
+	Parallel: true,
 	Test: func(t *testing.T, suite *confsuite.ConformanceTestSuite) {
 		ns := confsuite.InfrastructureNamespace
 
