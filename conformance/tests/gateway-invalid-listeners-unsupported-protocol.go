@@ -39,6 +39,7 @@ var GatewayListenerUnsupportedProtocol = suite.ConformanceTest{
 		features.SupportGateway,
 	},
 	Manifests: []string{"tests/gateway-invalid-listeners-unsupported-protocol.yaml"},
+	Parallel:  true,
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
 		t.Run("Gateway with no accepted listeners should not be accepted and the listener should have the Accepted condition set to False with reason UnsupportedProtocol", func(t *testing.T) {
 			t.Parallel()
