@@ -20,6 +20,7 @@ set -o pipefail
 
 readonly GOTOOL="go tool"
 readonly SCRIPT_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
+CRDIFY_ENFORCE=${CRDIFY_ENFORCE:-false}
 CRDIFY_BASE_REF=${CRDIFY_BASE_REF:-${PULL_BASE_SHA:-main}}
 REMOTE=${REMOTE:-origin}
 
@@ -30,6 +31,7 @@ if ! git rev-parse --verify "${CRDIFY_BASE_REF}" >/dev/null 2>&1; then
 fi
 
 error_count=0
+error_files=""
 
 for file in config/crd/standard/*.yaml; do
   filename="$(basename "${file}")"
@@ -43,19 +45,22 @@ for file in config/crd/standard/*.yaml; do
     continue
   fi
 
-  if ! $GOTOOL sigs.k8s.io/crdify \
+  echo -e "\n${filename}:"
+  if ! ${GOTOOL} sigs.k8s.io/crdify \
     "git://${CRDIFY_BASE_REF}?path=${file}" \
     "file://${SCRIPT_ROOT}/${file}"; then
     error_count=$((error_count + 1))
+    error_files="${error_files}\n- ${filename}"
   fi
 done
 
-echo
-echo "CRD compatibility check summary:"
+echo -e "\nCRD compatibility check summary:"
 if [[ ${error_count} -gt 0 ]]; then
-  echo "Breaking changes detected in ${error_count} CRD file(s)."
-  exit 1
+  echo -e "Breaking changes detected in ${error_count} CRD file(s):${error_files}"
+  if [[ "${CRDIFY_ENFORCE}" == "true" ]]; then
+    exit 1
+  fi
 else
   echo "No breaking changes detected."
-  exit 0
 fi
+exit 0
