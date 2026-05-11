@@ -268,7 +268,7 @@ spec:
                       maxLength: 63
                       minLength: 1
                       pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
-                      type: string
+                      type: integer
                     port:
                       description: |-
                         Port is the network port this Route targets. It can be interpreted
