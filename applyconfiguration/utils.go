@@ -212,6 +212,14 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1.SubjectAltNameApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("SupportedFeature"):
 		return &apisv1.SupportedFeatureApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("TCPRoute"):
+		return &apisv1.TCPRouteApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("TCPRouteRule"):
+		return &apisv1.TCPRouteRuleApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("TCPRouteSpec"):
+		return &apisv1.TCPRouteSpecApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("TCPRouteStatus"):
+		return &apisv1.TCPRouteStatusApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("TLSConfig"):
 		return &apisv1.TLSConfigApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("TLSPortConfig"):

@@ -49,6 +49,7 @@ var standardKinds = map[string]bool{
 	"ReferenceGrant":   true,
 	"BackendTLSPolicy": true,
 	"ListenerSet":      true,
+	"TCPRoute":         true,
 	"TLSRoute":         true,
 }
 

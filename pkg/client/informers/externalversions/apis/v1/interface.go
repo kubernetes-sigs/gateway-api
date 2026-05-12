@@ -38,6 +38,8 @@ type Interface interface {
 	ListenerSets() ListenerSetInformer
 	// ReferenceGrants returns a ReferenceGrantInformer.
 	ReferenceGrants() ReferenceGrantInformer
+	// TCPRoutes returns a TCPRouteInformer.
+	TCPRoutes() TCPRouteInformer
 	// TLSRoutes returns a TLSRouteInformer.
 	TLSRoutes() TLSRouteInformer
 }
@@ -86,6 +88,11 @@ func (v *version) ListenerSets() ListenerSetInformer {
 // ReferenceGrants returns a ReferenceGrantInformer.
 func (v *version) ReferenceGrants() ReferenceGrantInformer {
 	return &referenceGrantInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// TCPRoutes returns a TCPRouteInformer.
+func (v *version) TCPRoutes() TCPRouteInformer {
+	return &tCPRouteInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // TLSRoutes returns a TLSRouteInformer.
