@@ -30,7 +30,7 @@ const (
 // TCPRouteFeature contains metadata for the TCPRoute feature.
 var TCPRouteFeature = Feature{
 	Name:    SupportTCPRoute,
-	Channel: FeatureChannelExperimental,
+	Channel: FeatureChannelStandard,
 }
 
 // TCPRouteExtendedFeatures includes all extended features for TCPRoute
