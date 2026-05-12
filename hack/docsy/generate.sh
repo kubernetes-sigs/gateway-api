@@ -51,7 +51,7 @@ for i in "${arr[@]}"; do
         echo "Branch ${i} not found on ${REMOTE}. Try: REMOTE=upstream $0"
         exit 1
     }
-    git archive "${REMOTE}/${i}" apis apisx | tar -x -C "${tmpdir}"
+    git archive --format=tar FETCH_HEAD apis apisx | tar -x -C "${tmpdir}"
 
     # Start removing any "release-" prefix from docpath
     docpath=${i#"release-"}
