@@ -2,7 +2,7 @@ apiVersion: internal.gateway.networking.k8s.io/v1alpha1
 kind: GEPDetails
 number: 2644
 name: TCPRoute - Add support for routing based on a TCP port
-status: Experimental
+status: Standard
 authors:
   - zac-nixon
   - rikatz
@@ -21,3 +21,4 @@ featureNames:
   - TCPRoute
 changelog:
   - 2026/May/18 (rikatz) - Add request flow, conflict management, conformance scenarios, and feature names
+  - 2026/May/28 (zac-nixon) - Move status to Standard
