@@ -1,0 +1,12 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: UDPRoute
+metadata:
+  name: udp-app-1
+spec:
+  parentRefs:
+    - name: my-udp-gateway
+      sectionName: foo
+  rules:
+    - backendRefs:
+        - name: my-foo-service
+          port: 6000
