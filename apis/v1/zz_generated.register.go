@@ -80,6 +80,8 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&TCPRouteList{},
 		&TLSRoute{},
 		&TLSRouteList{},
+		&UDPRoute{},
+		&UDPRouteList{},
 	)
 	// AddToGroupVersion allows the serialization of client types like ListOptions.
 	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)
