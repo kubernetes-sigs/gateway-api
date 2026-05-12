@@ -77,3 +77,11 @@ type TLSRouteListerExpansion interface{}
 // TLSRouteNamespaceListerExpansion allows custom methods to be added to
 // TLSRouteNamespaceLister.
 type TLSRouteNamespaceListerExpansion interface{}
+
+// UDPRouteListerExpansion allows custom methods to be added to
+// UDPRouteLister.
+type UDPRouteListerExpansion interface{}
+
+// UDPRouteNamespaceListerExpansion allows custom methods to be added to
+// UDPRouteNamespaceLister.
+type UDPRouteNamespaceListerExpansion interface{}

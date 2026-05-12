@@ -1,0 +1,13 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: my-udp-gateway
+spec:
+  gatewayClassName: my-udp-gateway-class
+  listeners:
+    - name: foo
+      protocol: UDP
+      port: 8080
+      allowedRoutes:
+        kinds:
+          - kind: UDPRoute

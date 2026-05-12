@@ -40,6 +40,8 @@ type Interface interface {
 	ReferenceGrants() ReferenceGrantInformer
 	// TLSRoutes returns a TLSRouteInformer.
 	TLSRoutes() TLSRouteInformer
+	// UDPRoutes returns a UDPRouteInformer.
+	UDPRoutes() UDPRouteInformer
 }
 
 type version struct {
@@ -91,4 +93,9 @@ func (v *version) ReferenceGrants() ReferenceGrantInformer {
 // TLSRoutes returns a TLSRouteInformer.
 func (v *version) TLSRoutes() TLSRouteInformer {
 	return &tLSRouteInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// UDPRoutes returns a UDPRouteInformer.
+func (v *version) UDPRoutes() UDPRouteInformer {
+	return &uDPRouteInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }

@@ -50,6 +50,7 @@ var standardKinds = map[string]bool{
 	"BackendTLSPolicy": true,
 	"ListenerSet":      true,
 	"TLSRoute":         true,
+	"UDPRoute":         true,
 }
 
 // This generation code is largely copied from

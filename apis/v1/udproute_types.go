@@ -1,5 +1,5 @@
 /*
-Copyright 2020 The Kubernetes Authors.
+Copyright The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,20 +14,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package v1alpha2
+package v1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
-	v1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
 // +genclient
 // +kubebuilder:object:root=true
 // +kubebuilder:resource:categories=gateway-api
 // +kubebuilder:subresource:status
+// +kubebuilder:storageversion
 // +kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
-// +kubebuilder:deprecatedversion:warning="The v1alpha2 version of UDPRoute has been deprecated and will be removed in a future release of the API. Please upgrade to v1."
 
 // UDPRoute provides a way to route UDP traffic. When combined with a Gateway
 // listener, it can be used to forward traffic on the port specified by the
@@ -55,16 +53,37 @@ type UDPRouteSpec struct {
 	// +required
 	// +listType=atomic
 	// +kubebuilder:validation:MinItems=1
-	// +kubebuilder:validation:MaxItems=16
-	// <gateway:experimental:validation:XValidation:message="Rule name must be unique within the route",rule="self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name) && l1.name == l2.name))">
-	Rules []UDPRouteRule `json:"rules"`
+	// +kubebuilder:validation:MaxItems=1
+	Rules []UDPRouteRule `json:"rules,omitempty"`
 }
 
 // UDPRouteStatus defines the observed state of UDPRoute.
-type UDPRouteStatus v1.UDPRouteStatus
+type UDPRouteStatus struct {
+	RouteStatus `json:",inline"`
+}
 
 // UDPRouteRule is the configuration for a given rule.
-type UDPRouteRule v1.UDPRouteRule
+type UDPRouteRule struct {
+	// Name is the name of the route rule. This name MUST be unique within a Route if it is set.
+	//
+	// +optional
+	Name *SectionName `json:"name,omitempty"`
+
+	// BackendRefs defines the backend(s) where matching requests should be
+	// sent. If unspecified or invalid (refers to a nonexistent resource or a
+	// Service with no endpoints), the underlying implementation MUST actively
+	// reject connection attempts to this backend. Packet drops must
+	// respect weight; if an invalid backend is requested to have 80% of
+	// the packets, then 80% of packets must be dropped instead.
+	//
+	// Support: Extended for Kubernetes Service
+	//
+	// +required
+	// +listType=atomic
+	// +kubebuilder:validation:MinItems=1
+	// +kubebuilder:validation:MaxItems=16
+	BackendRefs []BackendRef `json:"backendRefs,omitempty"`
+}
 
 // +kubebuilder:object:root=true
 
