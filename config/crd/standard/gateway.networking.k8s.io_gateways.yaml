@@ -730,7 +730,7 @@ spec:
                         Support: Core
                       format: int32
                       maximum: 65535
-                      minimum: 1
+                      minimum: 10
                       type: integer
                     protocol:
                       description: |-
@@ -2364,7 +2364,7 @@ spec:
                         Support: Core
                       format: int32
                       maximum: 65535
-                      minimum: 1
+                      minimum: 10
                       type: integer
                     protocol:
                       description: |-

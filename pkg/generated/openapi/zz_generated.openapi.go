@@ -5152,9 +5152,9 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPPathModifier(ref common.ReferenceC
 					"type": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Type defines the type of path modifier. Additional types may be added in a future release of the API.\n\nNote that values may be added to this enum, implementations must ensure that unknown values will not cause a crash.\n\nUnknown values here must result in the implementation setting the Accepted Condition for the Route to `status: False`, with a Reason of `UnsupportedValue`.",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
+							Default:     0,
+							Type:        []string{"integer"},
+							Format:      "int32",
 						},
 					},
 					"replaceFullPath": {

@@ -1103,7 +1103,8 @@ spec:
                                           enum:
                                           - ReplaceFullPath
                                           - ReplacePrefixMatch
-                                          type: string
+                                          format: int32
+                                          type: integer
                                       required:
                                       - type
                                       type: object
@@ -1433,7 +1434,8 @@ spec:
                                           enum:
                                           - ReplaceFullPath
                                           - ReplacePrefixMatch
-                                          type: string
+                                          format: int32
+                                          type: integer
                                       required:
                                       - type
                                       type: object
@@ -2357,7 +2359,8 @@ spec:
                                     enum:
                                     - ReplaceFullPath
                                     - ReplacePrefixMatch
-                                    type: string
+                                    format: int32
+                                    type: integer
                                 required:
                                 - type
                                 type: object
@@ -2685,7 +2688,8 @@ spec:
                                     enum:
                                     - ReplaceFullPath
                                     - ReplacePrefixMatch
-                                    type: string
+                                    format: int32
+                                    type: integer
                                 required:
                                 - type
                                 type: object
@@ -4553,7 +4557,8 @@ spec:
                                           enum:
                                           - ReplaceFullPath
                                           - ReplacePrefixMatch
-                                          type: string
+                                          format: int32
+                                          type: integer
                                       required:
                                       - type
                                       type: object
@@ -4883,7 +4888,8 @@ spec:
                                           enum:
                                           - ReplaceFullPath
                                           - ReplacePrefixMatch
-                                          type: string
+                                          format: int32
+                                          type: integer
                                       required:
                                       - type
                                       type: object
@@ -5807,7 +5813,8 @@ spec:
                                     enum:
                                     - ReplaceFullPath
                                     - ReplacePrefixMatch
-                                    type: string
+                                    format: int32
+                                    type: integer
                                 required:
                                 - type
                                 type: object
@@ -6135,7 +6142,8 @@ spec:
                                     enum:
                                     - ReplaceFullPath
                                     - ReplacePrefixMatch
-                                    type: string
+                                    format: int32
+                                    type: integer
                                 required:
                                 - type
                                 type: object
