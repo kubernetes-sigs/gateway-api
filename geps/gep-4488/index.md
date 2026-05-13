@@ -527,16 +527,22 @@ spec:
 
 #### Security Boundaries and Personas
 
-**Namespace-Scoped App Developer Persona**
+##### Namespace-Scoped App Developer Persona
+
 - Can create Backend resources within their namespace
 - Limited to secrets within their namespace for TLS configuration
 - Subject to network policies enforcing egress through gateways
 - RBAC controls prevent cross-namespace resource access
 
-**Cluster-Admin Risk Acceptance**
+##### Cluster-Admin Risk Acceptance
+
 - Cluster administrators who grant Backend creation permissions accept DNS trust model
 - Network-level controls (firewalls, proxy configuration) provide defense in depth
 - Backend resources provide audit trail for external dependencies
+
+### Route Attachment and Consumer Overrides
+
+Backends MUST live in the same namespace as any route (or other parent resource) that references them. For `EndpointSelector` type Backends, consumer override scenarios are supported using the pre-existing GAMMA pattern of creating a route (and therefore a `Backend`) in the consumer namespace and the `Backend` will reference an `EndpointSelector` in a different, producer namespace.
 
 ## EndpointSelector Type
 
@@ -611,16 +617,18 @@ Note: Policy attachment to Backend remains available for vendor-specific or nich
 This GEP follows the standard [Gateway API graduation criteria](/docs/concepts/versioning/#graduation-criteria). The following are additional criteria specific to this GEP:
 
 ### Implementable
+
 - [ ] Backend resource CRD with full schema validation
 - [ ] Documentation and examples for common use cases
 
 ### Experimental
-- [ ] Reference implementation in at least one Gateway API implementation
+
 - [ ] Basic conformance tests for FQDN and Service destination types
 - [ ] Security review and RBAC documentation
 
 ### Standard
-- [ ] At least 3 implementations with production usage
+
+- [ ] At least 3 implementations
 - [ ] Comprehensive conformance test suite
 - [ ] Compatibility testing with existing BackendTLSPolicy patterns
 - [ ] Migration guide from synthetic Services to Backend resources
