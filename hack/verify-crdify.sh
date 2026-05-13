@@ -20,7 +20,7 @@ set -o pipefail
 
 readonly GOTOOL="go tool"
 readonly SCRIPT_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
-CRDIFY_ENFORCE=${CRDIFY_ENFORCE:-false}
+CRDIFY_ENFORCE=${CRDIFY_ENFORCE:-true}
 CRDIFY_BASE_REF=${CRDIFY_BASE_REF:-${PULL_BASE_SHA:-main}}
 REMOTE=${REMOTE:-origin}
 
