@@ -178,6 +178,8 @@ spec:
             - from
             - to
             type: object
+        required:
+        - spec
         type: object
     served: true
     storage: false
@@ -341,6 +343,8 @@ spec:
             - from
             - to
             type: object
+        required:
+        - spec
         type: object
     served: true
     storage: true

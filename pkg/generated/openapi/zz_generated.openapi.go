@@ -6881,6 +6881,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_ReferenceGrant(ref common.ReferenceCal
 						},
 					},
 				},
+				Required: []string{"spec"},
 			},
 		},
 		Dependencies: []string{
@@ -8031,6 +8032,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_ReferenceGrant(ref common.Refere
 						},
 					},
 				},
+				Required: []string{"spec"},
 			},
 		},
 		Dependencies: []string{
@@ -9427,6 +9429,7 @@ func schema_sigsk8sio_gateway_api_apis_v1beta1_ReferenceGrant(ref common.Referen
 						},
 					},
 				},
+				Required: []string{"spec"},
 			},
 		},
 		Dependencies: []string{
