@@ -922,8 +922,8 @@ var schemaYAML = typed.YAMLObject(`types:
         scalar: string
     - name: type
       type:
-        scalar: numeric
-      default: 0
+        scalar: string
+      default: ""
 - name: io.k8s.sigs.gateway-api.apis.v1.HTTPQueryParamMatch
   map:
     fields:
