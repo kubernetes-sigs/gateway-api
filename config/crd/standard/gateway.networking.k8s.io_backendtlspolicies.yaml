@@ -391,7 +391,7 @@ spec:
                       `mycompany.com/my-custom-ca-certificates`.
 
                       Support: Implementation-specific
-                    maxLength: 10
+                    maxLength: 253
                     minLength: 1
                     pattern: ^(System|([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/([A-Za-z0-9][-A-Za-z0-9_.]{0,61})?[A-Za-z0-9]))$
                     type: string
@@ -1067,7 +1067,7 @@ spec:
                       `mycompany.com/my-custom-ca-certificates`.
 
                       Support: Implementation-specific
-                    maxLength: 10
+                    maxLength: 253
                     minLength: 1
                     pattern: ^(System|([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/([A-Za-z0-9][-A-Za-z0-9_.]{0,61})?[A-Za-z0-9]))$
                     type: string

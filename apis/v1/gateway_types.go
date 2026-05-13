@@ -425,7 +425,7 @@ type Listener struct {
 	//
 	// Support: Core
 	//
-	// +kubebuilder:validation:Minimum=10
+	// +kubebuilder:validation:Minimum=1
 	// +kubebuilder:validation:Maximum=65535
 	//
 	// +required
