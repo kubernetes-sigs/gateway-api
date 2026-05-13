@@ -1,5 +1,5 @@
 baseURL = "/"
-title = "gateway api"
+title = "Gateway API"
 defaultContentLanguage = "en"
 
 [services]
@@ -15,7 +15,7 @@ defaultContentLanguage = "en"
 # Language settings
 [languages]
   [languages.en]
-    title = "gateway api"
+    title = "Gateway API"
     languageName = "English"
     contentDir = "content/en"
     weight = 1
@@ -29,7 +29,7 @@ defaultContentLanguage = "en"
       [markup.goldmark.extensions.passthrough]
         enable = false
   [markup.highlight]
-    noClasses = true
+    noClasses = false
     guessSyntax = true
     style = "tango"
   [markup.tableOfContents]

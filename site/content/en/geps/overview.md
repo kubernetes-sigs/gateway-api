@@ -145,7 +145,7 @@ GEPs entering the `Provisional` phase need the following to have occurred:
   describing the "Who", "What", and "Why" of the proposal, along with Goals
   and Non-Goals.
 
-### 3. `Implementable` - Document Implementation Details
+### 4. `Implementable` - Document Implementation Details
 
 Now that everyone agrees on the goals, it is time to start writing out your
 proposed implementation details. These implementation details should be very
@@ -180,7 +180,7 @@ requirements:
   and conformance tests to target. Note that, at this stage, _only_ changes to 
   GEP document must be included.
 
-### 4. `Experimental` - Make the API changes
+### 5. `Experimental` - Make the API changes
 
 With the GEP marked as "Implementable", it is time to actually make those
 proposed changes in our API. In some cases, these changes will be documentation
@@ -233,7 +233,7 @@ maintainers.
 > `Experimental` features clearly document that these features may be removed in
 > future releases.
 
-### 5. `Standard` - Graduate the GEP
+### 6. `Standard` - Graduate the GEP
 
 Once this feature has met the [graduation criteria](/docs/concepts/versioning/#graduation-criteria), it is
 time to graduate it to the "Standard" channel of the API. Depending on the feature, this will usually
@@ -244,7 +244,7 @@ include one or more of the following:
 * Graduating fields to "standard" by removing `<gateway:experimental>` tags.
 * Graduating a concept to "standard" by updating documentation.
 
-### 6. Close out the GEP issue
+### 7. Close out the GEP issue
 
 The GEP issue should only be closed once the feature has been:
 

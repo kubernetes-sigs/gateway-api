@@ -187,11 +187,13 @@ implementations pass those tests.
 [netpol]: https://kubernetes.io/docs/concepts/services-networking/network-policies/
 
 ### Compiling Conformance tests
+
 {{% alert color="primary" %}}
 This step is optional, and the binary can be used to execute conformance tests
 on an environment different from the developer environment
 
 {{% /alert %}}
+
 In case there's a need to generate a conformance test binary to be executed on a 
 different environment, a binary `conformance.test` can be generated with:
 

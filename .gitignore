@@ -69,3 +69,6 @@ site/static/wizard/data/*
 
 # Local Netlify folder
 .netlify
+
+.gocache/
+.hugocache/

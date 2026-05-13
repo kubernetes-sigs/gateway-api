@@ -91,6 +91,11 @@ EOF
     sed -i.bak "s/WEIGHT_PLACEHOLDER/${weight_specx}/g" "${PWD}/site/content/en/reference/api-spec/${docpath}/specx.md"
     sed -i.bak "s/LINK_TITLE_PLACEHOLDER/${link_title_spec}/g" "${PWD}/site/content/en/reference/api-spec/${docpath}/spec.md"
     sed -i.bak "s/LINK_TITLE_PLACEHOLDER/${link_title_specx}/g" "${PWD}/site/content/en/reference/api-spec/${docpath}/specx.md"
+    
+    # Strip gateway:util:excludeFromCRD tags
+    sed -i.bak -E "s/<\/?gateway:util:excludeFromCRD>//g" "${PWD}/site/content/en/reference/api-spec/${docpath}/spec.md"
+    sed -i.bak -E "s/<\/?gateway:util:excludeFromCRD>//g" "${PWD}/site/content/en/reference/api-spec/${docpath}/specx.md"
+    
     rm -f "${PWD}/site/content/en/reference/api-spec/${docpath}/spec.md.bak" "${PWD}/site/content/en/reference/api-spec/${docpath}/specx.md.bak"
 
 done

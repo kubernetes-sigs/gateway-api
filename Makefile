@@ -196,6 +196,23 @@ PYTHON ?= $(shell if [ -x .venv/bin/python3 ]; then echo "./.venv/bin/python3"; 
 
 DOCS_VERIFY_CONTAINER_IMAGE ?= registry.hub.docker.com/lycheeverse/lychee:0.23
 
+HUGO_VERSION ?= 0.160.1
+HUGO_IMAGE ?= ghcr.io/gohugoio/hugo:v$(HUGO_VERSION)
+
+# Use Docker for Hugo by default for local development, but not on Netlify
+USE_DOCKER_HUGO ?= true
+ifeq ($(NETLIFY),true)
+	USE_DOCKER_HUGO = false
+endif
+
+ifeq ($(USE_DOCKER_HUGO),true)
+	HUGO = docker run --rm -u $(shell id -u):$(shell id -g) -v $(PWD):/src -w /src -e GOMODCACHE=/src/.gocache -e HUGO_CACHEDIR=/src/.hugocache $(HUGO_IMAGE)
+	HUGO_SERVER = docker run --rm -u $(shell id -u):$(shell id -g) -v $(PWD):/src -w /src -e GOMODCACHE=/src/.gocache -e HUGO_CACHEDIR=/src/.hugocache -p 1313:1313 $(HUGO_IMAGE) server --bind 0.0.0.0
+else
+	HUGO = hugo
+	HUGO_SERVER = hugo server
+endif
+
 # Build the documentation.
 .PHONY: install-deps
 install-deps:
@@ -206,11 +223,11 @@ install-deps:
 .PHONY: docs
 docs: install-deps
 	hack/docsy/generate.sh
-	hugo --source site
+	$(HUGO) --source site
 
 .PHONY: build-docs
 build-docs: install-deps update-geps api-ref-docs wizard-wasm wizard-data conformance-data
-	hugo --source site
+	$(HUGO) --source site
 
 .PHONY: verify-docs
 verify-docs: build-docs
@@ -218,11 +235,11 @@ verify-docs: build-docs
 
 .PHONY: build-docs-netlify
 build-docs-netlify: install-deps update-geps api-ref-docs wizard-wasm wizard-data conformance-data
-	hugo --source site
+	$(HUGO) --source site
 
 .PHONY: live-docs
 live-docs: update-geps api-ref-docs
-	hugo server --source site
+	$(HUGO_SERVER) --source site
 
 .PHONY: update-geps
 update-geps:
@@ -255,4 +272,4 @@ conformance-data:
 .PHONY: serve
 serve: wizard-wasm update-geps api-ref-docs
 	@echo "Tip: Run 'make wizard-data' first if you have conformance/reports/ to load implementation data."
-	hugo server --source site
+	$(HUGO_SERVER) --source site
