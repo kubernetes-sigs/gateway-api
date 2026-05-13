@@ -96,7 +96,7 @@ def load_yaml(path):
 
 def parse_version(version_dir_name):
     """Return (major, minor, patch) or (0,0,0) for sorting."""
-    m = re.match(r"v?(\d+)\.(\d+)(?:\.(\d+))?", version_dir_name)
+    m = re.match(r"^v?(\d+)\.(\d+)(?:\.(\d+))?$", version_dir_name)
     if m:
         return (int(m.group(1)), int(m.group(2)), int(m.group(3) or 0))
     return (0, 0, 0)

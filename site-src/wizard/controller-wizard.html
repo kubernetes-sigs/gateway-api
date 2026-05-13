@@ -522,7 +522,7 @@
                 statusEl.textContent = 'No versions in data file.';
               } else {
                 ALL_VERSIONS_DATA = data;
-                versionSelect.innerHTML = versions.map(v => `<option value="${v}">${v}</option>`).join('');
+                versionSelect.innerHTML = versions.map(v => `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`).join('');
                 versionRow.style.display = 'block';
                 applyVersion(versions[0]);
                 versionSelect.onchange = () => applyVersion(versionSelect.value);
