@@ -365,7 +365,7 @@ HAProxy Ingress is a conformant Gateway API implementation since `v0.17`. It imp
 
 ### Istio
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.4.0-Istio-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.4.0/istio-istio)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.5.1-Istio-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.5.1/istio-istio)
 
 [Istio][istio] is an open source [service mesh][istio-mesh] and gateway implementation.
 

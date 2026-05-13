@@ -1,0 +1,174 @@
+apiVersion: gateway.networking.k8s.io/v1
+date: "2026-05-05T02:24:07Z"
+gatewayAPIChannel: experimental
+gatewayAPIVersion: v1.5.1
+implementation:
+  contact:
+  - '@istio/maintainers'
+  organization: istio
+  project: istio
+  url: https://istio.io/
+  version: "1.30"
+kind: ConformanceReport
+mode: default
+profiles:
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 33
+      Skipped: 0
+  extended:
+    result: partial
+    skippedTests:
+    - BackendTLSPolicyConflictResolution
+    - GatewayBackendClientCertificateFeature
+    - GatewayFrontendClientCertificateValidationInsecureFallback
+    - GatewayFrontendInvalidDefaultClientCertificateValidation
+    - GatewayInvalidFrontendClientCertificateValidation
+    - GatewayInvalidTLSBackendConfiguration
+    - HTTPRouteHTTPSListenerDetectMisdirectedRequests
+    - ListenerSetHostnameConflict
+    - ListenerSetProtocolConflict
+    - ListenerSetReferenceGrant
+    statistics:
+      Failed: 0
+      Passed: 44
+      Skipped: 10
+    supportedFeatures:
+    - BackendTLSPolicy
+    - BackendTLSPolicySANValidation
+    - GatewayAddressEmpty
+    - GatewayBackendClientCertificate
+    - GatewayFrontendClientCertificateValidation
+    - GatewayFrontendClientCertificateValidationInsecureFallback
+    - GatewayHTTPListenerIsolation
+    - GatewayHTTPSListenerDetectMisdirectedRequests
+    - GatewayInfrastructurePropagation
+    - GatewayPort8080
+    - GatewayStaticAddresses
+    - HTTPRoute303RedirectStatusCode
+    - HTTPRoute307RedirectStatusCode
+    - HTTPRoute308RedirectStatusCode
+    - HTTPRouteBackendProtocolH2C
+    - HTTPRouteBackendProtocolWebSocket
+    - HTTPRouteBackendRequestHeaderModification
+    - HTTPRouteBackendTimeout
+    - HTTPRouteCORS
+    - HTTPRouteDestinationPortMatching
+    - HTTPRouteHostRewrite
+    - HTTPRouteMethodMatching
+    - HTTPRouteNamedRouteRule
+    - HTTPRouteParentRefPort
+    - HTTPRoutePathRedirect
+    - HTTPRoutePathRewrite
+    - HTTPRoutePortRedirect
+    - HTTPRouteQueryParamMatching
+    - HTTPRouteRequestMirror
+    - HTTPRouteRequestMultipleMirrors
+    - HTTPRouteRequestPercentageMirror
+    - HTTPRouteRequestTimeout
+    - HTTPRouteResponseHeaderModification
+    - HTTPRouteSchemeRedirect
+    - ListenerSet
+  name: GATEWAY-HTTP
+  summary: Core tests succeeded. Extended tests partially succeeded with 10 test skips.
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 13
+      Skipped: 0
+  extended:
+    result: partial
+    skippedTests:
+    - ListenerSetHostnameConflict
+    - ListenerSetProtocolConflict
+    - ListenerSetReferenceGrant
+    statistics:
+      Failed: 0
+      Passed: 7
+      Skipped: 3
+    supportedFeatures:
+    - GatewayAddressEmpty
+    - GatewayBackendClientCertificate
+    - GatewayFrontendClientCertificateValidation
+    - GatewayFrontendClientCertificateValidationInsecureFallback
+    - GatewayHTTPListenerIsolation
+    - GatewayHTTPSListenerDetectMisdirectedRequests
+    - GatewayInfrastructurePropagation
+    - GatewayPort8080
+    - GatewayStaticAddresses
+    - ListenerSet
+  name: GATEWAY-GRPC
+  summary: Core tests succeeded. Extended tests partially succeeded with 3 test skips.
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 18
+      Skipped: 0
+  extended:
+    result: partial
+    skippedTests:
+    - ListenerSetHostnameConflict
+    - ListenerSetProtocolConflict
+    - ListenerSetReferenceGrant
+    statistics:
+      Failed: 0
+      Passed: 12
+      Skipped: 3
+    supportedFeatures:
+    - GatewayAddressEmpty
+    - GatewayBackendClientCertificate
+    - GatewayFrontendClientCertificateValidation
+    - GatewayFrontendClientCertificateValidationInsecureFallback
+    - GatewayHTTPListenerIsolation
+    - GatewayHTTPSListenerDetectMisdirectedRequests
+    - GatewayInfrastructurePropagation
+    - GatewayPort8080
+    - GatewayStaticAddresses
+    - ListenerSet
+    - TLSRouteModeMixed
+    - TLSRouteModeTerminate
+  name: GATEWAY-TLS
+  summary: Core tests succeeded. Extended tests partially succeeded with 3 test skips.
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 7
+      Skipped: 0
+  extended:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 7
+      Skipped: 0
+    supportedFeatures:
+    - MeshConsumerRoute
+    - MeshHTTPRouteBackendRequestHeaderModification
+    - MeshHTTPRouteNamedRouteRule
+    - MeshHTTPRouteQueryParamMatching
+    - MeshHTTPRouteRedirectPath
+    - MeshHTTPRouteRedirectPort
+    - MeshHTTPRouteRewritePath
+    - MeshHTTPRouteSchemeRedirect
+    unsupportedFeatures:
+    - MeshClusterIPMatching
+  name: MESH-HTTP
+  summary: Core tests succeeded. Extended tests succeeded.
+succeededProvisionalTests:
+- GRPCRouteNamedRule
+- GatewayInfrastructure
+- GatewayOptionalAddressValue
+- HTTPRoute303Redirect
+- HTTPRoute307Redirect
+- HTTPRoute308Redirect
+- HTTPRouteNamedRule
+- HTTPRouteRequestPercentageMirror
+- MeshHTTPRoute303Redirect
+- MeshHTTPRoute308Redirect
+- MeshHTTPRouteNamedRule
+- TLSRouteMixedTerminationSameNamespace
+- TLSRouteTerminateSimpleSameNamespace
