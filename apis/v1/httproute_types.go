@@ -1121,7 +1121,7 @@ type HTTPHeaderFilter struct {
 }
 
 // HTTPPathModifierType defines the type of path redirect or rewrite.
-type HTTPPathModifierType int32
+type HTTPPathModifierType string
 
 const (
 	// This type of modifier indicates that the full path will be replaced

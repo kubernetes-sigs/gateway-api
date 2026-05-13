@@ -108,7 +108,7 @@ type LocalPolicyTargetReferenceWithSectionName struct {
 
 // PolicyConditionType is a type of condition for a policy. This type should be
 // used with a Policy resource Status.Conditions field.
-type PolicyConditionType int32
+type PolicyConditionType string
 
 // PolicyConditionReason is a reason for a policy condition.
 type PolicyConditionReason string
