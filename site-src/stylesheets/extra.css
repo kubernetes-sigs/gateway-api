@@ -50,3 +50,26 @@ img.center {
     min-width: 100%;
     width: 100%;
 }
+
+/* Reason tables: four columns only (generator omits Description; not a CSS hide); nth-child(n+2) = True/False/Unknown. */
+.conditions-compact-table-wrap .md-typeset__table {
+    display: inline-block !important;
+    width: fit-content !important;
+    max-width: 100%;
+    min-width: 0 !important;
+    overflow-x: auto;
+}
+
+.conditions-compact-table-wrap .md-typeset__table table {
+    display: inline-table !important;
+    width: fit-content !important;
+    min-width: 0 !important;
+    table-layout: auto !important;
+}
+
+.conditions-compact-table-wrap .md-typeset__table th:nth-child(n+2),
+.conditions-compact-table-wrap .md-typeset__table td:nth-child(n+2) {
+    white-space: nowrap;
+    width: 1%;
+    text-align: center;
+}

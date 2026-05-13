@@ -65,6 +65,7 @@ nav:
           - ReferenceGrant: api-types/referencegrant.md
           - TLSRoute: api-types/tlsroute.md
           - ListenerSet: api-types/listenerset.md
+          - Conditions and Reasons: api-types/conditions.md
       - API specification:
           - Development:
               - Standard: reference/spec.md
