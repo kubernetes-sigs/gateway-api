@@ -41,7 +41,12 @@ reference-based mechanism such as `extensionRef` is the likely direction.
 
 This also revisits [GEP-820](../gep-820/index.md), which removed route match
 extension points because there were no concrete use cases at the time. We now
-have concrete use cases.
+have concrete use cases:
+
+* CEL-based matching for complex request logic. CEL is quickly becoming a popular choice
+  for policies both in Gateway API sub-projects (AI Gateway and Agentic Networking) and
+  implementation-specific policies.
+* A custom matcher could allow a CEL matcher, which would enable use cases like [routing based on JWT claims](https://istio.io/latest/docs/tasks/security/authentication/jwt-route/) or [routing based on body](https://gateway-api-inference-extension.sigs.k8s.io/#concepts-and-definitions).
 
 ## Purpose (Why and Who)
 
