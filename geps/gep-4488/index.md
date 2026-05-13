@@ -6,7 +6,7 @@
 
 ## TLDR
 
-This GEP proposes a new `Backend` resource that fills the [backend role](/geps/gep-2907/) — a **general-purpose decorator for Service** (and other backend types) within Gateway API. The Kubernetes `Service` resource is mature and stable, but it is effectively frozen and SIG-Network leadership has an extreme aversion to expanding its scope. Previous approaches to extend Service behavior (like `BackendTLSPolicy`) have significant limitations around discoverability, implementation complexity, and the conflation of producer and consumer concerns.
+This GEP proposes a new `Backend` resource that fills the [backend role](/geps/gep-2907/) — a **general-purpose decorator for Service** (and other backend types) within Gateway API. The Kubernetes `Service` resource is mature and stable, but it is effectively frozen and SIG-Network leadership is very careful about any potential features that would further bloat `Service`'s responsibilities. Previous approaches to extend Service behavior (like `BackendTLSPolicy`) have significant limitations around discoverability, implementation complexity, and the conflation of producer and consumer concerns. `BackendTLSPolicy` in particular was the right solution at the time, but feedback has shown that policy attachment was not the right approach for TLS configuration.
 
 The `Backend` resource provides a namespace-scoped, consumer-focused resource that can:
 
@@ -96,9 +96,9 @@ The `Backend` resource is **not** a replacement for `Service`. Instead, it is a 
                │
                ▼
 ┌─────────────────────────────────────────────┐
-│  Service (my-svc)                           │
+│  EndpointSlice (my-svc)                     │
 │  (unchanged — still provides endpoints,     │
-│   DNS, service discovery as before)         │
+│   as before)                                │
 └─────────────────────────────────────────────┘
 ```
 
@@ -130,7 +130,7 @@ Existing `Service`-based `backendRef`s in HTTPRoutes continue to work indefinite
 The Backend resource is designed with a clear separation between Core and Extended features:
 
 | Feature | Conformance Level | Description |
-|---|---|---|
+| --- | --- | --- |
 | `EndpointSelector` type | Core | Backend wraps an existing Service; behaves equivalently to a Service `backendRef` |
 | `ExternalHostname` type | Extended | First-class external FQDN support, replacing `ExternalName` Services |
 | Inline TLS | Extended | TLS configuration inlined on the Backend resource |
@@ -194,10 +194,9 @@ const (
 // +kubebuilder:validation:XValidation:rule="self.type == 'EndpointSelector' ? has(self.endpointSelector) : !has(self.endpointSelector)",message="endpointSelector must be set when type is EndpointSelector and must be unset otherwise"
 type BackendSpec struct {
   // Type defines the backend type
-  //
   // +unionDiscriminator
-  // Port defines the port that the implementation should use when connecting to this backend.
   // +required
+  Type BackendType `json:"type"`
   // Port defines the port that the implementation should use when connecting to this backend.
   // +required
   Port PortNumber `json:"port,omitempty"`
@@ -215,10 +214,23 @@ type BackendSpec struct {
   // +optional
   EndpointSelector *EndpointSelectorBackend `json:"endpointSelector,omitempty"`
 
-  // Protocol defines the higher-level protocol for backend communication.
-  // The underlying transport protocol for the proxied traffic will already have been
-  // determined and processed by the dataplane at the routing step.
-  // Support: Extended
+  // Protocol defines the protocol for backend communication.
+  // In the common case, the underlying transport protocol for the
+  // proxied traffic will already have been determined and processed
+  // by the dataplane at the routing step. Where this field is useful
+  // is either for higher level protocols or asymmetrical protocol
+  // configurations (e.g. version upgrades or h2c). In cases where the
+  // protocol is negotiated on the wire (e.g. HTTP/1.1 Upgrade or ALPN),
+  // implementations MUST include the protocol set here in the negotiation
+  // options presented to the backend. It is currently undefined whether this
+  // means required, optional, or most preferred (e.g. first in the set).
+  // TODO: Define full semantics in protocol negotation.
+  //
+  // These protocols are also used for validation of future protocol-specific
+  // fields that may be added to the Backend resource (e.g. retries, session persistence, etc.)
+  //
+  // Support: Extended for MCP, Core for TCP, HTTP, HTTP2, and H2C
+  // TODO: Not sure if the above is allowed or viable.
   // +optional
   Protocol BackendProtocol `json:"protocol"`
 
@@ -312,7 +324,9 @@ type BackendControllerStatus struct {
 type ExternalHostnameBackend struct {
   // Hostname specifies the destination address used to reach this hostname.
   // IP addresses are not allowed in this field (enforced by validation on the type).
-  // TODO: Should we add additional validation to prevent *.cluster.local hostnames?
+  // If implementations are aware of custom trust domains being used for `Service` FQDNs,
+  // the MUST also enforce that hostnames ending with those trust domains (e.g. `.cluster.local`) are not allowed.
+  // +kubebuiler:validation:XValidation:rule="!endsWith(self.hostname, '.cluster.local')))",message="hostname must not be an IP address or end with .cluster.local"
   Hostname PreciseHostname `json:"hostname"`
 }
 ```
@@ -320,11 +334,16 @@ type ExternalHostnameBackend struct {
 ### Protocol and Extension Support
 
 ```go
-// +kubebuilder:validation:Enum=MCP
+// +kubebuilder:validation:Enum=TCP,HTTP,HTTP2,HTTP11,H2C,MCP
 type BackendProtocol string
 
 const (
   BackendProtocolMCP   BackendProtocol = "MCP"
+  BackendProtocolTCP   BackendProtocol = "TCP"
+  BackendProtocolHTTP  BackendProtocol = "HTTP"
+  BackendProtocolHTTP2 BackendProtocol = "HTTP2"
+  BackendProtocolH2C   BackendProtocol = "H2C"
+  BackendProtocolHTTP11 BackendProtocol = "HTTP11"
 )
 ```
 
@@ -426,14 +445,14 @@ Allowing namespace-scoped Backend resources to reference external FQDNs raises l
 #### Identified Security Risks
 
 1. **DNS Spoofing Attacks**
-   - Malicious DNS responses could redirect traffic to attacker-controlled servers
-   - Particularly concerning for internal proxy endpoints or localhost addresses (i.e. the [Confused Deputy Problem](https://en.wikipedia.org/wiki/Confused_deputy_problem))
-   - Risk: `api.external.com` resolves to `127.0.0.1`, `169.254.169.254` or other privileged, trusted addresses
+      - Malicious DNS responses could redirect traffic to attacker-controlled servers
+      - Particularly concerning for internal proxy endpoints or localhost addresses (i.e. the [Confused Deputy Problem](https://en.wikipedia.org/wiki/Confused_deputy_problem))
+      - Risk: `api.external.com` resolves to `127.0.0.1`, `169.254.169.254` or other privileged, trusted addresses
 
 2. **Cross-Namespace Service Access**
-   - FQDNs could target internal cluster services via `svc.namespace.svc.cluster.local`
-   - Potential bypass of namespace isolation and authorization controls
-   - Risk: Accessing services in other namespaces without proper authorization
+      - FQDNs could target internal cluster services via `svc.namespace.svc.cluster.local`
+      - Potential bypass of namespace isolation and authorization controls
+      - Risk: Accessing services in other namespaces without proper authorization
 
 #### Risk Assessment and Mitigations
 
