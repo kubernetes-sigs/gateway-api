@@ -22,7 +22,7 @@ readonly SCRIPT_ROOT="$(cd "$(dirname "${BASH_SOURCE}")"/.. && pwd)"
 
 echo "Generating gRPC/Protobuf code"
 
-readonly PROTOC_CACHE_DIR="/tmp/protoc.cache"
+readonly PROTOC_CACHE_DIR="${SCRIPT_ROOT}/.protoc_cache"
 readonly PROTOC_BINARY="${PROTOC_CACHE_DIR}/bin/protoc"
 readonly PROTOC_VERSION="22.2"
 readonly PROTOC_REPO="https://github.com/protocolbuffers/protobuf"
