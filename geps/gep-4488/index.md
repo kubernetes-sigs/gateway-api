@@ -179,7 +179,7 @@ type Backend struct {
   metav1.TypeMeta   `json:",inline"`
   metav1.ObjectMeta `json:"metadata,omitempty"`
   Spec   BackendSpec   `json:"spec"`
-  Status BackendControllerStatus `json:"status,omitempty"`
+  Status BackendStatus `json:"status,omitempty"`
 }
 
 // +kubebuilder:validation:Enum=ExternalHostname;EndpointSelector
@@ -199,7 +199,7 @@ type BackendSpec struct {
   Type BackendType `json:"type"`
   // Port defines the port that the implementation should use when connecting to this backend.
   // +required
-  Port PortNumber `json:"port,omitempty"`
+  Port BackendPort `json:"port,omitempty"`
 
   // ExternalHostname specifies the configuration for an ExternalHostname backend. Only used if type is ExternalHostname.
   // Support: Extended
@@ -254,6 +254,29 @@ const (
   BackendTLSModeClientAndServer BackendTLSMode = "ClientAndServer"
 )
 
+// Inspired by discoveryv1.EndpointPort. No Protocol or AppProtocol is necessary
+// since that's directly on the Backend resource.
+//
+// TODO: We probably want to use this type for EndpointSelector as well.
+// In fact, this should probably be defined by EndpointSelector and referenced
+// here.
+type BackendPort struct {
+  // Name represents the name of this port. All ports in a Backend must have a unique name.
+  // If the EndpointSlice is derived from a Kubernetes service, this corresponds to the Service.ports[].name.
+  // Name must either be an empty string or pass DNS_LABEL validation:
+  // * must be no more than 63 characters long.
+  // * must consist of lower case alphanumeric characters or '-'.
+  // * must start and end with an alphanumeric character.
+  // Default is empty string.
+  Name *string `json:"name,omitempty" protobuf:"bytes,1,name=name"`
+
+  // port represents the port number of the endpoint.
+  // If the EndpointSlice is derived from a Kubernetes service, this must be set
+  // to the service's target port. EndpointSlices used for other purposes may have
+  // a nil port.
+  Port PortNumber `json:"port,omitempty" protobuf:"bytes,3,opt,name=port"`
+}
+
 // +kubebuilder:validation:ExactlyOneOf=SelectorRef,Selector
 type EndpointSelectorBackend struct {
   // SelectorRef specifies the reference to the EndpointSelector resource that manages the EndpointSlices for this backend.
@@ -285,8 +308,25 @@ type BackendTLS struct {
   Validation BackendTLSPolicyValidation `json:"validation,omitempty"`
 }
 
-type BackendControllerStatus struct {
-  // Name is a domain/path string that indicates the name of the controller that manages the
+type BackendStatus struct {
+  // Parents is a list of parent resources, typically Gateways, that are associated with
+  // the Backend, and the status of the Backend with respect to each parent.
+  //
+  // A controller that manages the Backend, must add an entry for each parent it manages
+  // and remove the parent entry when the controller no longer considers the Backend to
+  // be associated with that parent.
+  //
+  // A maximum of 32 parents will be represented in this list. When the list is empty,
+  // it indicates that the Backend is not associated with any parents.
+  //
+  // +kubebuilder:validation:MaxItems=32
+  // +optional
+  // +listType=atomic
+  Parents []ParentStatus `json:"parents,omitempty"`
+}
+
+type BackendParentStatus struct {
+  // ControllerName is a domain/path string that indicates the name of the controller that manages the
   // Backend. Name corresponds to the GatewayClass controllerName field when the
   // controller will manage parents of type "Gateway". Otherwise, the name is implementation-specific.
   //
@@ -299,7 +339,15 @@ type BackendControllerStatus struct {
   // populated with their controller name are removed when they are no longer necessary.
   //
   // +required
-  Name ControllerName `json:"name"`
+  Controller ControllerName `json:"name"`
+
+  // ParentRef is used to identify the parent resource that this status
+  // is associated with. It is used to match the InferencePool with the parent
+  // resource, such as a Gateway.
+  //
+  // +required
+  ParentRef ParentReference `json:"parentRef,omitzero"`
+
   // For Kubernetes API conventions, see:
   // https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#typical-status-properties
   // conditions represent the current state of the Backend resource.
