@@ -1,5 +1,5 @@
 apiVersion: gateway.networking.k8s.io/v1
-date: "2026-03-24T17:48:10Z"
+date: "2026-05-13T05:29:38Z"
 gatewayAPIChannel: experimental
 gatewayAPIVersion: v1.5.1
 implementation:
@@ -8,9 +8,9 @@ implementation:
   organization: envoyproxy
   project: envoy-gateway
   url: https://github.com/envoyproxy/gateway
-  version: v1.8.0-rc.0
+  version: v1.8.0
 kind: ConformanceReport
-mode: default
+mode: gateway-namespace-mode
 profiles:
 - core:
     result: success
@@ -21,19 +21,12 @@ profiles:
   extended:
     result: partial
     skippedTests:
-    - GatewayBackendClientCertificateFeature
-    - GatewayFrontendClientCertificateValidation
-    - GatewayFrontendClientCertificateValidationInsecureFallback
-    - GatewayFrontendInvalidDefaultClientCertificateValidation
-    - GatewayInvalidFrontendClientCertificateValidation
-    - GatewayInvalidTLSBackendConfiguration
-    - HTTPRouteHTTPSListenerDetectMisdirectedRequests
     - ListenerSetHostnameConflict
     - ListenerSetProtocolConflict
     statistics:
       Failed: 0
-      Passed: 43
-      Skipped: 9
+      Passed: 51
+      Skipped: 2
     supportedFeatures:
     - BackendTLSPolicy
     - BackendTLSPolicySANValidation
@@ -42,8 +35,9 @@ profiles:
     - GatewayFrontendClientCertificateValidation
     - GatewayFrontendClientCertificateValidationInsecureFallback
     - GatewayHTTPListenerIsolation
-    - GatewayHTTPSListenerDetectMisdirectedRequests
+    - GatewayInfrastructurePropagation
     - GatewayPort8080
+    - GatewayStaticAddresses
     - HTTPRoute303RedirectStatusCode
     - HTTPRoute307RedirectStatusCode
     - HTTPRoute308RedirectStatusCode
@@ -69,10 +63,9 @@ profiles:
     - HTTPRouteSchemeRedirect
     - ListenerSet
     unsupportedFeatures:
-    - GatewayInfrastructurePropagation
-    - GatewayStaticAddresses
+    - GatewayHTTPSListenerDetectMisdirectedRequests
   name: GATEWAY-HTTP
-  summary: Core tests succeeded. Extended tests partially succeeded with 9 test skips.
+  summary: Core tests succeeded. Extended tests partially succeeded with 2 test skips.
 - core:
     result: success
     statistics:
@@ -86,7 +79,7 @@ profiles:
     - ListenerSetProtocolConflict
     statistics:
       Failed: 0
-      Passed: 6
+      Passed: 8
       Skipped: 2
     supportedFeatures:
     - GatewayAddressEmpty
@@ -94,12 +87,12 @@ profiles:
     - GatewayFrontendClientCertificateValidation
     - GatewayFrontendClientCertificateValidationInsecureFallback
     - GatewayHTTPListenerIsolation
-    - GatewayHTTPSListenerDetectMisdirectedRequests
+    - GatewayInfrastructurePropagation
     - GatewayPort8080
+    - GatewayStaticAddresses
     - ListenerSet
     unsupportedFeatures:
-    - GatewayInfrastructurePropagation
-    - GatewayStaticAddresses
+    - GatewayHTTPSListenerDetectMisdirectedRequests
   name: GATEWAY-GRPC
   summary: Core tests succeeded. Extended tests partially succeeded with 2 test skips.
 - core:
@@ -115,7 +108,7 @@ profiles:
     - ListenerSetProtocolConflict
     statistics:
       Failed: 0
-      Passed: 11
+      Passed: 13
       Skipped: 2
     supportedFeatures:
     - GatewayAddressEmpty
@@ -123,18 +116,19 @@ profiles:
     - GatewayFrontendClientCertificateValidation
     - GatewayFrontendClientCertificateValidationInsecureFallback
     - GatewayHTTPListenerIsolation
-    - GatewayHTTPSListenerDetectMisdirectedRequests
+    - GatewayInfrastructurePropagation
     - GatewayPort8080
+    - GatewayStaticAddresses
     - ListenerSet
     - TLSRouteModeMixed
     - TLSRouteModeTerminate
     unsupportedFeatures:
-    - GatewayInfrastructurePropagation
-    - GatewayStaticAddresses
+    - GatewayHTTPSListenerDetectMisdirectedRequests
   name: GATEWAY-TLS
   summary: Core tests succeeded. Extended tests partially succeeded with 2 test skips.
 succeededProvisionalTests:
 - GRPCRouteNamedRule
+- GatewayInfrastructure
 - GatewayOptionalAddressValue
 - HTTPRoute303Redirect
 - HTTPRoute307Redirect
