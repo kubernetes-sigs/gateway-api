@@ -1,0 +1,4 @@
+# Gateway API CRDs Helm Chart Values
+#
+# channel: standard or experimental
+channel: standard
