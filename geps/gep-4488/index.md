@@ -283,13 +283,16 @@ type EndpointSelectorBackend struct {
   // If omitted, the controller creating this Backend is expected to create an EndpointSelector
   // resource on behalf of the user and set ownerReferences appropriately so that the lifecycle
   // of the EndpointSelector is tied to this Backend (as described in GEP-4731).
+  // Cross-namespace references are allowed and indicate a consumer override.
   // +optional
-  SelectorRef *LocalObjectReference `json:"selectorRef"`
+  SelectorRef *ObjectReference `json:"selectorRef"`
 
-  // Selector defines the label selector used to identify the endpoints that this backend
-  // should route traffic to. This field is only used if SelectorRef is not specified.
+  // Selector defines the label selector used to identify the set of pods whose IP addresses
+  // will make up the endpoints that this Backend should route traffic to.
+  // This field is only used if SelectorRef is not specified.
+  // We make this an embedded struct to avoid stuttering in the API (i.e. `selector.selector`).
   // +optional
-  Selector *metav1.LabelSelector `json:"selector,omitempty"`
+  *metav1.LabelSelector
 }
 
 // +kubebuilder:validation:XValidation:rule="self.mode == 'ClientAndServer' ? has(self.clientCertificateRef) : !has(self.clientCertificateRef)",message="clientCertificateRef must be set if and only if mode is ClientAndServer"
