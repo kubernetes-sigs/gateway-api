@@ -313,7 +313,7 @@ def main():
 def on_config(config, **kwargs):
     """MkDocs hook: generate wizard data with --all before build."""
     repo_root = os.path.dirname(config.config_file_path)
-    output_path = os.path.join(repo_root, "site-src", "wizard", "data", "controller-wizard-data.json")
+    output_path = os.path.join(repo_root, "site", "static", "wizard", "data", "controller-wizard-data.json")
     if not generate_all(repo_root, output_path):
         log.warning("Controller wizard data not generated: no version dirs under conformance/reports/")
     else:

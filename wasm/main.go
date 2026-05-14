@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 // Controller Matching Wizard - WebAssembly build.
-// Build with: GOOS=js GOARCH=wasm go build -o site-src/wizard/main.wasm ./wasm/
+// Build with: GOOS=js GOARCH=wasm go build -o site/static/wizard/main.wasm ./wasm/
 // Load from HTML: wasm_exec.js + instantiateStreaming(fetch("main.wasm"), go.importObject).then(r => go.run(r.instance))
 package main
 
@@ -164,7 +164,7 @@ func main() {
 		}
 		return nil
 	})).Call("catch", js.FuncOf(func(_ js.Value, _ []js.Value) any {
-		doc.Call("getElementById", "wizard-data-status").Set("textContent", "Could not load data. Run 'make wizard-data' (requires conformance/reports/), then serve from site-src/wizard/.")
+		doc.Call("getElementById", "wizard-data-status").Set("textContent", "Could not load data. Run 'make wizard-data' (requires conformance/reports/), then serve from site/static/wizard/.")
 		doc.Call("getElementById", "recommend-btn").Set("disabled", false)
 		return nil
 	}))
