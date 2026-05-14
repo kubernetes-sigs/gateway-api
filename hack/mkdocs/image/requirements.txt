@@ -13,10 +13,10 @@ mkdocs-macros-plugin==1.5.0
 mkdocs-material==9.7.6
 mkdocs-redirects==1.2.3
 mkdocs-mermaid2-plugin==1.2.3
-pandas>=3.0.2
+pandas>=3.0.3
 pep562==1.1
 Pygments==2.20.0
-pymdown-extensions==10.21.2
+pymdown-extensions==10.21.3
 PyYAML==6.0.3
 six==1.17.0
 tabulate==0.10.0
