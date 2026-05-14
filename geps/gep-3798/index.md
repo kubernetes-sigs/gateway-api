@@ -67,7 +67,7 @@ This GEP addresses these issues by providing a first-class API mechanism for cli
 
 ## API
 
-TODO: when we get to the implementation iterations, we need to consider whether we can implement this using functionality established in [GEP-1619](https://gateway-api.sigs.k8s.io/geps/gep-1619).
+TODO: when we get to the implementation iterations, we need to consider whether we can implement this using functionality established in [GEP-1619](/geps/gep-1619/).
 
 ### Conformance tests 
 

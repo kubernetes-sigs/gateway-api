@@ -341,7 +341,7 @@ Although not strictly forbidden, this is in general discouraged due to [discover
 
 Implementations that opt for designing policies that allow for cross namespace references MUST support one of the following combined approaches, to address the security concern:
 
-- The policy is paired with [ReferenceGrants](https://gateway-api.sigs.k8s.io/api-types/referencegrant/?h=referencegrant) or some other form of equivalent handshake that ensures that the target is accepting the policy.
+- The policy is paired with [ReferenceGrants](/reference/api-types/referencegrant/) or some other form of equivalent handshake that ensures that the target is accepting the policy.
 - The policy applied is client-side and does not grant the client any additional access or permissions than it would otherwise have.
 
 <details>

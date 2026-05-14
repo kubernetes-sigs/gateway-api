@@ -6,7 +6,7 @@
 
 ## TLDR
 
-This GEP proposes a new `Backend` resource that fills the [backend role](https://gateway-api.sigs.k8s.io/geps/gep-2907/) — a Gateway-native resource that can be referenced via `backendRefs` in Routes, just like `Service` is today. The Kubernetes `Service` resource is mature and stable, but it is effectively frozen and cannot be extended with Gateway-specific configuration. Every time we've wanted to add backend-level behavior (TLS settings, protocol metadata, connection policies), we've had to create separate policy CRDs like `BackendTLSPolicy` that attach to Service. This approach has significant limitations around discoverability, implementation complexity, and the conflation of producer and consumer concerns.
+This GEP proposes a new `Backend` resource that fills the [backend role](/geps/gep-2907/) — a Gateway-native resource that can be referenced via `backendRefs` in Routes, just like `Service` is today. The Kubernetes `Service` resource is mature and stable, but it is effectively frozen and cannot be extended with Gateway-specific configuration. Every time we've wanted to add backend-level behavior (TLS settings, protocol metadata, connection policies), we've had to create separate policy CRDs like `BackendTLSPolicy` that attach to Service. This approach has significant limitations around discoverability, implementation complexity, and the conflation of producer and consumer concerns.
 
 The `Backend` resource provides a namespace-scoped, consumer-focused resource that can:
 
@@ -415,7 +415,7 @@ Note: Policy attachment to Backend remains available for vendor-specific or nich
 
 ## Graduation Criteria
 
-This GEP follows the standard [Gateway API graduation criteria](https://gateway-api.sigs.k8s.io/concepts/versioning/#graduation-criteria). The following are additional criteria specific to this GEP:
+This GEP follows the standard [Gateway API graduation criteria](/docs/concepts/versioning/#graduation-criteria). The following are additional criteria specific to this GEP:
 
 ### Implementable
 - [ ] Backend resource CRD with full schema validation

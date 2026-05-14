@@ -60,21 +60,6 @@ updates:
       - ok-to-test
       - release-note-none
 
-  # Dependencies listed in requirements.txt
-  - package-ecosystem: "pip"
-    directory: "/hack/mkdocs/image"
-    schedule:
-      interval: "weekly"
-    groups:
-      mkdocs-deps:
-        patterns:
-          - "*"
-    labels:
-      - python
-      - dependencies
-      - ok-to-test
-      - release-note-none
-  
   #  Github actions updates
   - package-ecosystem: "github-actions"
     directory: "/"
