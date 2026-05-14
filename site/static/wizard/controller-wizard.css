@@ -1,12 +1,34 @@
 :root {
   --primary: #326ce5;
   --primary-dark: #2952c3;
+  --bg: #fff;
   --card: #fff;
   --border: #e1e4e8;
   --text: #24292f;
   --text-muted: #57606a;
   --success: #1a7f37;
   --warning: #9a6700;
+}
+
+/* Dark mode theme variables for Docsy (Bootstrap 5) and MkDocs-Material */
+[data-bs-theme="dark"],
+[data-md-color-scheme="slate"] {
+  --bg: #1e1e1e;
+  --card: #252525;
+  --border: #444;
+  --text: #e0e0e0;
+  --text-muted: #a0a0a0;
+}
+
+/* Support for prefers-color-scheme as a fallback */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-bs-theme="light"]):not([data-md-color-scheme="default"]) {
+    --bg: #1e1e1e;
+    --card: #252525;
+    --border: #444;
+    --text: #e0e0e0;
+    --text-muted: #a0a0a0;
+  }
 }
 
 * {

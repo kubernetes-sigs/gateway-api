@@ -5,6 +5,35 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="controller-wizard.css">
+  <script>
+    (function() {
+      // Sync theme with parent Docsy (Bootstrap 5) or MkDocs-Material site
+      function syncTheme() {
+        try {
+          const parentDoc = window.parent.document.documentElement;
+          const theme = parentDoc.getAttribute('data-bs-theme') || 
+                        (parentDoc.getAttribute('data-md-color-scheme') === 'slate' ? 'dark' : 'light');
+          if (theme) {
+            document.documentElement.setAttribute('data-bs-theme', theme);
+          }
+        } catch (e) {
+          // Fallback to system preference if cross-origin or parent not accessible
+          if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.setAttribute('data-bs-theme', 'dark');
+          }
+        }
+      }
+      syncTheme();
+      // Observe parent theme changes if same-origin
+      try {
+        const observer = new MutationObserver(syncTheme);
+        observer.observe(window.parent.document.documentElement, {
+          attributes: true,
+          attributeFilter: ['data-bs-theme', 'data-md-color-scheme']
+        });
+      } catch (e) {}
+    })();
+  </script>
 </head>
 
 <body>
@@ -336,7 +365,7 @@
       if (statusEl) statusEl.textContent = '';
 
       if (IMPLEMENTATIONS.length === 0) {
-        resultsContent.innerHTML = '<p class="no-results">No implementation data loaded. Run <code>python hack/generate-controller-wizard-data.py --all</code> to generate <code>site-src/wizard/data/controller-wizard-data.json</code>, then serve from <code>site-src/</code> (e.g. <code>python -m http.server 8000</code>), or open the wizard from the built site.</p>';
+        resultsContent.innerHTML = '<p class="no-results">No implementation data loaded. Run <code>python hack/generate-controller-wizard-data.py --all</code> to generate <code>site/static/wizard/data/controller-wizard-data.json</code>, then serve from <code>site/static/</code> (e.g. <code>python -m http.server 8000</code>), or open the wizard from the built site.</p>';
         resultsDiv.classList.add('visible');
         resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
         return;
@@ -553,7 +582,7 @@
         .catch(() => {
           IMPLEMENTATIONS = [];
           ALL_VERSIONS_DATA = null;
-          statusEl.textContent = 'Could not load wizard/data/controller-wizard-data.json. Run python hack/generate-controller-wizard-data.py --all and serve from site-src/ (e.g. python -m http.server 8000).';
+          statusEl.textContent = 'Could not load wizard/data/controller-wizard-data.json. Run python hack/generate-controller-wizard-data.py --all and serve from site/static/ (e.g. python -m http.server 8000).';
           versionRow.style.display = 'none';
           btn.disabled = false;
         });

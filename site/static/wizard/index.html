@@ -6,6 +6,35 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Gateway API Controller Matching Wizard</title>
   <link rel="stylesheet" href="controller-wizard.css">
+  <script>
+    (function() {
+      // Sync theme with parent Docsy (Bootstrap 5) or MkDocs-Material site
+      function syncTheme() {
+        try {
+          const parentDoc = window.parent.document.documentElement;
+          const theme = parentDoc.getAttribute('data-bs-theme') || 
+                        (parentDoc.getAttribute('data-md-color-scheme') === 'slate' ? 'dark' : 'light');
+          if (theme) {
+            document.documentElement.setAttribute('data-bs-theme', theme);
+          }
+        } catch (e) {
+          // Fallback to system preference if cross-origin or parent not accessible
+          if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.setAttribute('data-bs-theme', 'dark');
+          }
+        }
+      }
+      syncTheme();
+      // Observe parent theme changes if same-origin
+      try {
+        const observer = new MutationObserver(syncTheme);
+        observer.observe(window.parent.document.documentElement, {
+          attributes: true,
+          attributeFilter: ['data-bs-theme', 'data-md-color-scheme']
+        });
+      } catch (e) {}
+    })();
+  </script>
 </head>
 
 <body>
@@ -149,7 +178,7 @@
         go.run(result.instance);
       })
       .catch(function (err) {
-        statusEl.textContent = err.message || 'Could not load wizard. Run: make wizard-wasm. Then serve from site-src/wizard/ (e.g. cd site-src/wizard && python3 -m http.server 8000) and open http://localhost:8000/';
+        statusEl.textContent = err.message || 'Could not load wizard. Run: make wizard-wasm. Then serve from site/static/wizard/ (e.g. cd site/static/wizard && python3 -m http.server 8000) and open http://localhost:8000/';
         document.getElementById('recommend-btn').disabled = false;
         window.wizardResize();
       });
