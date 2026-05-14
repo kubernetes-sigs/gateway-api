@@ -29,7 +29,7 @@ based on the SNI identification that should pass the traffic to N load balanced 
 ## Non-Goals
 
 * Provide an interface for users to define different listeners or ports for the
-`TLSRoute` - This will be covered by the [ListenerSet enhancement](../gep-1713/index.md).
+`TLSRoute` - This will be covered by the [ListenerSet enhancement](/geps/gep-1713/).
 * When using `TLSRoute` passthrough, support `PROXY` protocol on the gateway listener.
 * When using `TLSRoute` passthrough, support `PROXY` protocol on the communication
 between the Gateway and the backend.
@@ -72,7 +72,7 @@ An example scenario on how TLSRoute may help:
 * [Ana] realizes she could use TCPRoute, but then she would need different ports for each service on the listener (because `TCPRoute` traffic is classified only by the dstip:dstport)
 * [Ana] figures out she can use the `SNI attribute` to listen to the traffic all on the same port (5432) but classify it based on the SNI attribute. This way the same port can be used, but given this is a TLS traffic, the requested hostname would be used to route the traffic to the right Postgres instance.
 
-[Ana]: https://gateway-api.sigs.k8s.io/concepts/roles-and-personas/#ana
+[Ana]: /docs/concepts/roles-and-personas/#ana
 
 
 ## API
@@ -222,7 +222,7 @@ spec:
       port: 443
 ```
 
-A typical [north/south](../../concepts/glossary.md#northsouth-traffic)
+A typical [north/south](/docs/glossary/#northsouth-traffic)
 API request flow for a gateway implemented using a `TLSRoute` is:
 
 * A client makes a request to https://foo.example.com.
@@ -277,7 +277,7 @@ spec:
       port: 12345
 ```
 
-A typical [north/south](../../concepts/glossary.md#northsouth-traffic)
+A typical [north/south](/docs/glossary.md#northsouth-traffic)
 API request flow for a gateway implemented using both `TLSRoute` is:
 
 * A client makes a request to `rtmps://rtmp.example.com:443`.
@@ -386,7 +386,7 @@ spec:
       port: 12345
 ```
 
-A typical [north/south](../../concepts/glossary.md#northsouth-traffic)
+A typical [north/south](/docs/glossary.md#northsouth-traffic)
 API request flow for a gateway implemented using a `TLSRoute` is:
 
 * A client makes a request to `rtmps://rtmp.example.com:443`.
@@ -549,8 +549,8 @@ be at least one intersecting hostname for the `TLSRoute` to be attached to the
 [Invalid ReferenceGrant Request]: https://github.com/kubernetes-sigs/gateway-api/issues/2153
 [Termination]: https://github.com/kubernetes-sigs/gateway-api/issues/3466
 [TLSRoute conformance]: https://github.com/kubernetes-sigs/gateway-api/issues/1579
-[Listener]: ../../reference/spec.md#listener
-[ListenerStatus.SupportedKinds]: ../../reference/spec.md#listenerstatus
+[Listener]: /reference/api-spec/main/spec/#listener
+[ListenerStatus.SupportedKinds]: /reference/api-spec/main/spec/#listenerstatus
 [TLSRoute with BackendTLSPolicy]: https://github.com/kubernetes-sigs/gateway-api/issues/4274
 
 ## Changes between v1alpha3 and v1
@@ -591,4 +591,4 @@ the field can be considered too complex.
 * [TLSRoute intersecting hostnames issue](https://github.com/kubernetes-sigs/gateway-api/issues/3541)
 * [TLSRoute termination feature request](https://github.com/kubernetes-sigs/gateway-api/issues/2111)
 * [GatewayAPI TLS Use Cases](https://docs.google.com/document/d/17sctu2uMJtHmJTGtBi_awGB0YzoCLodtR6rUNmKMCs8)
-* [Union Features](../../site-src/guides/implementers.md#union-feature-conformance)
+* [Union Features](/guides/implementers-guide/#union-feature-conformance)

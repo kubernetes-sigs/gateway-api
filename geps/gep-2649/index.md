@@ -3,14 +3,17 @@
 * Issue: [#2649](https://github.com/kubernetes-sigs/gateway-api/issues/2649)
 * Status: Declined
 
-(See [status definitions](../overview.md#gep-states).)
+(See [status definitions](/geps/overview/#gep-states).)
 
 ## TLDR
 
-!!! warning
-    This GEP has been merged back into [GEP-713](https://gateway-api.sigs.k8s.io/geps/gep-713/)
-    and now it's now obsolete. Please refer the original specification of Metaresources
-    and Policy Attachment for the current state of the pattern.
+{{% alert color="warning" %}}
+
+This GEP has been merged back into [GEP-713](/geps/gep-713/)
+and now it's now obsolete. Please refer the original specification of Metaresources
+and Policy Attachment for the current state of the pattern.
+
+{{% /alert %}}
 
 Describe and specify a design pattern for a class of metaresource that can
 affect specific settings across a multiple target objects.

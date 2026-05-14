@@ -7,6 +7,7 @@ updates:
     - "/conformance"
     - "/tests"
     - "/tools"
+    - "/site"
     schedule:
       interval: "weekly"
     groups:
@@ -83,4 +84,16 @@ updates:
       - "dependencies"
       - "release-note-none"
       - "ok-to-test"
+
+  # Dependencies listed in site/package.json
+  - package-ecosystem: "npm"
+    directory: "/site"
+    schedule:
+      interval: "weekly"
+    labels:
+      - javascript
+      - dependencies
+      - ok-to-test
+      - release-note-none
+
 
