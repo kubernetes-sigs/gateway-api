@@ -325,7 +325,7 @@ type BackendStatus struct {
   // +kubebuilder:validation:MaxItems=32
   // +optional
   // +listType=atomic
-  Parents []ParentStatus `json:"parents,omitempty"`
+  Parents []BackendParentStatus `json:"parents,omitempty"`
 }
 
 type BackendParentStatus struct {
