@@ -28,6 +28,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"golang.org/x/net/http2"
@@ -115,9 +116,12 @@ func main() {
 		Pod:       os.Getenv("POD_NAME"),
 	}
 
+	retrySimulation := &retrySimulation{}
+
 	httpMux := http.NewServeMux()
 	httpMux.HandleFunc("/health", healthHandler)
 	httpMux.HandleFunc("/status/", statusHandler)
+	httpMux.HandleFunc("/retry/", retrySimulation.retrySimulationHandler)
 	httpMux.HandleFunc("/", echoHandler)
 	httpMux.Handle("/ws", websocket.Handler(wsHandler))
 	httpHandler := &preserveSlashes{httpMux}
@@ -172,6 +176,42 @@ func statusHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(code)
+}
+
+type retrySimulation struct {
+	mutex    sync.Mutex
+	attempts map[string]int
+}
+
+func (r *retrySimulation) retrySimulationHandler(w http.ResponseWriter, request *http.Request) {
+	uuid := request.URL.Query().Get("uuid")
+	if uuid == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprintf(w, "uuid is required")
+		return
+	}
+	succeedAfter, err := strconv.Atoi(request.URL.Query().Get("succeedAfter"))
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprintf(w, "succeedAfter is required")
+		return
+	}
+	responseCode, err := strconv.Atoi(request.URL.Query().Get("responseCode"))
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprintf(w, "responseCode is required")
+		return
+	}
+
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+	if r.attempts[uuid] < succeedAfter {
+		r.attempts[uuid]++
+		w.WriteHeader(responseCode)
+		return
+	}
+
+	echoHandler(w, request)
 }
 
 func delayResponse(request *http.Request) error {
