@@ -36,6 +36,7 @@ import (
 
 	g "sigs.k8s.io/gateway-api/conformance/echo-basic/grpc"
 	t "sigs.k8s.io/gateway-api/conformance/echo-basic/tcpserver"
+	u "sigs.k8s.io/gateway-api/conformance/echo-basic/udpechoserver"
 )
 
 // RequestAssertions contains information about the request and the Ingress
@@ -91,6 +92,11 @@ func main() {
 
 	if os.Getenv("TCP_ECHO_SERVER") != "" {
 		t.Main()
+		return
+	}
+
+	if os.Getenv("UDP_ECHO_SERVER") != "" {
+		u.Main()
 		return
 	}
 

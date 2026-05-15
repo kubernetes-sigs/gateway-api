@@ -50,6 +50,10 @@ const (
 	// which covers TLS stream functionality with Gateways.
 	GatewayTLSConformanceProfileName ConformanceProfileName = "GATEWAY-TLS"
 
+	// GatewayUDPConformanceProfileName indicates the name of the conformance profile
+	// which covers UDP functionality with Gateways.
+	GatewayUDPConformanceProfileName ConformanceProfileName = "GATEWAY-UDP"
+
 	// GatewayGRPCConformanceProfileName indicates the name of the conformance profile
 	// which covers GRPC functionality with Gateways.
 	GatewayGRPCConformanceProfileName ConformanceProfileName = "GATEWAY-GRPC"
@@ -98,6 +102,17 @@ var (
 		ExtendedFeatures: features.SetsToNamesSet(
 			features.GatewayExtendedFeatures,
 			features.TLSRouteExtendedFeatures,
+		),
+	}
+
+	// GatewayUDPConformanceProfile is a ConformanceProfile that covers testing UDP
+	// related functionality with Gateways.
+	GatewayUDPConformanceProfile = ConformanceProfile{
+		Name:         GatewayUDPConformanceProfileName,
+		CoreFeatures: sets.New[features.FeatureName](),
+		ExtendedFeatures: features.SetsToNamesSet(
+			features.GatewayExtendedFeatures,
+			features.UDPRouteFeatures,
 		),
 	}
 
@@ -158,6 +173,7 @@ func RegisterConformanceProfile(p ConformanceProfile) {
 var conformanceProfileMap = map[ConformanceProfileName]ConformanceProfile{
 	GatewayHTTPConformanceProfileName: GatewayHTTPConformanceProfile,
 	GatewayTLSConformanceProfileName:  GatewayTLSConformanceProfile,
+	GatewayUDPConformanceProfileName:  GatewayUDPConformanceProfile,
 	GatewayGRPCConformanceProfileName: GatewayGRPCConformanceProfile,
 	MeshHTTPConformanceProfileName:    MeshHTTPConformanceProfile,
 	MeshGRPCConformanceProfileName:    MeshGRPCConformanceProfile,
