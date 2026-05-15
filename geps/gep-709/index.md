@@ -1,4 +1,6 @@
-# GEP-709: Cross Namespace References from Routes
+---
+title: "GEP-709: Cross Namespace References from Routes"
+---
 
 * Issue: [#709](https://github.com/kubernetes-sigs/gateway-api/issues/709)
 * Status: Standard

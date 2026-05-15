@@ -1,4 +1,6 @@
-# GEP-2648: Direct Policy Attachment
+---
+title: "GEP-2648: Direct Policy Attachment"
+---
 
 * Issue: [#2648](https://github.com/kubernetes-sigs/gateway-api/issues/2648)
 * Status: Declined

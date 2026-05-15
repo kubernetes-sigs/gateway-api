@@ -1,4 +1,6 @@
-# GEP-1016: GRPCRoute
+---
+title: "GEP-1016: GRPCRoute"
+---
 
 * Issue: [#1016](https://github.com/kubernetes-sigs/gateway-api/issues/1016)
 * Status: Standard

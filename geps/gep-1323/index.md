@@ -1,4 +1,6 @@
-# GEP 1323: Response Header Filter
+---
+title: "GEP 1323: Response Header Filter"
+---
 
 * Issue: [#1323](https://github.com/kubernetes-sigs/gateway-api/issues/1323)
 * Status: Standard

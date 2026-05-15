@@ -1,4 +1,6 @@
-# GEP-91: Client Certificate Validation for TLS terminating at the Gateway
+---
+title: "GEP-91: Client Certificate Validation for TLS terminating at the Gateway"
+---
 
 * Issue: [#91](https://github.com/kubernetes-sigs/gateway-api/issues/91)
 * Status: Standard

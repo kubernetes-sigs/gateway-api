@@ -1,4 +1,6 @@
-# GEP-2645: UDPRoute
+---
+title: "GEP-2645: UDPRoute"
+---
 
 - Issue: [#2645](https://github.com/kubernetes-sigs/gateway-api/issues/2645)
 - Status: Provisional

@@ -1,4 +1,6 @@
-# GEP-995: Named route rules
+---
+title: "GEP-995: Named route rules"
+---
 
 * Issue: [#995](https://github.com/kubernetes-sigs/gateway-api/issues/995)
 * Status: Standard

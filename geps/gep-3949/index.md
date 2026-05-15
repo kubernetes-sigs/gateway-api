@@ -1,4 +1,6 @@
-# GEP-3949: Mesh Resource
+---
+title: "GEP-3949: Mesh Resource"
+---
 
 * Issue: [#3949](https://github.com/kubernetes-sigs/gateway-api/issues/3949)
 * Status: Implementable

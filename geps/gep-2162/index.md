@@ -1,4 +1,6 @@
-# GEP-2162: Supported features in GatewayClass Status
+---
+title: "GEP-2162: Supported features in GatewayClass Status"
+---
 
 * Issue: [#2162](https://github.com/kubernetes-sigs/gateway-api/issues/2162)
 * Status: Standard

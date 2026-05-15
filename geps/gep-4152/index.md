@@ -1,4 +1,6 @@
-# GEP-4152: Extending TLS Validation in BackendTLSPolicy
+---
+title: "GEP-4152: Extending TLS Validation in BackendTLSPolicy"
+---
 
 * Issue: [#4152](https://github.com/kubernetes-sigs/gateway-api/issues/4152)
 * Status: Provisional

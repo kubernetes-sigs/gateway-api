@@ -1,4 +1,6 @@
-# GEP-922: Gateway API Versioning
+---
+title: "GEP-922: Gateway API Versioning"
+---
 
 * Issue: [#922](https://github.com/kubernetes-sigs/gateway-api/issues/922)
 * Status: Memorandum

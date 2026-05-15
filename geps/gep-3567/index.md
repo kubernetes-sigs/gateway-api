@@ -1,4 +1,6 @@
-# GEP-3567: Gateway TLS Updates for HTTP/2 Connection Coalescing
+---
+title: "GEP-3567: Gateway TLS Updates for HTTP/2 Connection Coalescing"
+---
 
 * Issue: [#3567](https://github.com/kubernetes-sigs/gateway-api/issues/3567)
 * Status: Experimental

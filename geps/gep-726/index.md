@@ -1,4 +1,6 @@
-# GEP-726: Add Path Redirects and Rewrites
+---
+title: "GEP-726: Add Path Redirects and Rewrites"
+---
 
 * Issue: [#726](https://github.com/kubernetes-sigs/gateway-api/issues/726)
 * Status: Standard
