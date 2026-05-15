@@ -4,5 +4,5 @@
     .navbar-brand .font-weight-bold,
     .navbar-brand > span:not(.navbar-logo) { display: none !important; }
   </style>
-  <image href="/images/logo/logo-text-large-horizontal-white.png" width="100%" height="100%" />
+  <image href="/images/logo/logo-text-large-horizontal-white.svg" width="100%" height="100%" />
 </svg>
