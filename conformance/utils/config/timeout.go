@@ -84,6 +84,9 @@ type TimeoutConfig struct {
 	// TCPRouteMustHaveCondition represents the maximum time for a TCPRoute to have the supplied Condition.
 	// Max value for conformant implementation: None
 	TCPRouteMustHaveCondition time.Duration
+	// UDPRouteMustHaveCondition represents the maximum time for a UDPRoute to have the supplied Condition.
+	// Max value for conformant implementation: None
+	UDPRouteMustHaveCondition time.Duration
 
 	// RouteMustHaveParents represents the maximum time for an xRoute to have parents in status that match the expected parents.
 	// Max value for conformant implementation: None
@@ -141,6 +144,7 @@ func DefaultTimeoutConfig() TimeoutConfig {
 		HTTPRouteMustHaveCondition:             60 * time.Second,
 		TLSRouteMustHaveCondition:              60 * time.Second,
 		TCPRouteMustHaveCondition:              60 * time.Second,
+		UDPRouteMustHaveCondition:              60 * time.Second,
 		RouteMustHaveParents:                   60 * time.Second,
 		ManifestFetchTimeout:                   10 * time.Second,
 		MaxTimeToConsistency:                   30 * time.Second,
@@ -201,6 +205,8 @@ func ParseTimeoutOverrides(timeoutConfig *TimeoutConfig, overrides string) {
 			timeoutConfig.TLSRouteMustHaveCondition = overrideDuration
 		case "TCPRouteMustHaveCondition":
 			timeoutConfig.TCPRouteMustHaveCondition = overrideDuration
+		case "UDPRouteMustHaveCondition":
+			timeoutConfig.UDPRouteMustHaveCondition = overrideDuration
 		case "RouteMustHaveParents":
 			timeoutConfig.RouteMustHaveParents = overrideDuration
 		case "ManifestFetchTimeout":
@@ -280,6 +286,9 @@ func SetupTimeoutConfig(timeoutConfig *TimeoutConfig) {
 	}
 	if timeoutConfig.TCPRouteMustHaveCondition == 0 {
 		timeoutConfig.TCPRouteMustHaveCondition = defaultTimeoutConfig.TCPRouteMustHaveCondition
+	}
+	if timeoutConfig.UDPRouteMustHaveCondition == 0 {
+		timeoutConfig.UDPRouteMustHaveCondition = defaultTimeoutConfig.UDPRouteMustHaveCondition
 	}
 	if timeoutConfig.DefaultTestTimeout == 0 {
 		timeoutConfig.DefaultTestTimeout = defaultTimeoutConfig.DefaultTestTimeout
