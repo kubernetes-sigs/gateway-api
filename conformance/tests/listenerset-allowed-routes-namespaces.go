@@ -47,6 +47,7 @@ var ListenerSetAllowedRoutesNamespaces = confsuite.ConformanceTest{
 	Manifests: []string{
 		"tests/listenerset-allowed-routes-namespaces.yaml",
 	},
+	Parallel: true,
 	Test: func(t *testing.T, suite *confsuite.ConformanceTestSuite) {
 		ns := confsuite.InfrastructureNamespace
 		kubernetes.NamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, []string{ns})
