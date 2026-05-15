@@ -1,7 +1,7 @@
 # GEP-3965: HTTPRoute Implementation-Specific Matches
 
 * Issue: [#3965](https://github.com/kubernetes-sigs/gateway-api/issues/3965)
-* Status: Provisional
+* Status: Experimental
 
 (See [status definitions](../overview.md#gep-states).)
 
@@ -36,8 +36,7 @@ Implementations either rely on annotations or make users step outside the Route
 API entirely.
 
 This GEP proposes adding a narrow extension point for custom matching in
-`HTTPRoute`. The exact API shape is intentionally left open for now, but a
-reference-based mechanism such as `extensionRef` is the likely direction.
+`HTTPRoute` with a typed inline string value.
 
 This also revisits [GEP-820](../gep-820/index.md), which removed route match
 extension points because there were no concrete use cases at the time. We now
@@ -58,24 +57,146 @@ standard. Custom matches stay explicitly implementation-specific.
 
 ## API
 
-The exact API is left for a follow-up revision of this GEP.
+Add an `extension` field to `HTTPRouteMatch`.
 
-The likely shape is an implementation-specific reference on `HTTPRouteMatch`,
-or another narrowly scoped mechanism with the same effect.
+```go
+type HTTPRouteMatch struct {
+	// Existing fields omitted.
 
-Whatever shape we choose should:
+	// Extension is an optional, implementation-specific extension to the
+	// request matching rules. Extension MUST NOT be used for core or extended
+	// Gateway API matching mechanisms.
+	//
+	// Support: Implementation-specific
+	//
+	// +optional
+	// <gateway:experimental>
+	Extension *HTTPRouteMatchExtension `json:"extension,omitempty"`
+}
 
-- live next to existing HTTP matches
-- make implementation-specific behavior explicit
-- compose with existing match semantics
-- fail clearly when the referenced matcher is unsupported
+type HTTPRouteMatchExtension struct {
+	// Type identifies how Value should be interpreted.
+	//
+	// This may take two possible forms:
+	//
+	// * A predefined CamelCase string identifier.
+	// * A domain-prefixed string identifier, such as
+	//   `example.com/CustomMatcher`.
+	//
+	// Support: Implementation-specific
+	//
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=253
+	// +kubebuilder:validation:Pattern=`^([A-Za-z0-9]+|[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/[A-Za-z0-9\/\-._~%!$&'()*+,;=:]+)$`
+	Type HTTPRouteMatchExtensionType `json:"type"`
+
+	// Value contains the implementation-specific matcher expression.
+	// The validity and meaning of this value depend on Type.
+	//
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=4096
+	Value string `json:"value"`
+}
+```
+
+```go
+type HTTPRouteMatchExtensionType string
+```
+
+`extension` composes with the existing fields on `HTTPRouteMatch`. A request
+matches an `HTTPRouteMatch` only when it satisfies all specified match criteria,
+including the implementation-specific matcher. If a match contains only
+`extension`, the extension matcher is the entire predicate for that match.
+
+### Ordering and precedence
+
+Extension matchers do not have a portable Gateway API precision model. Each
+extension type defines its own matcher semantics, so Gateway API cannot define a
+standard way to compare how specific two extension matches are.
+
+Implementations MAY define how a supported extension type participates in
+HTTPRoute match ordering. This can include inserting extension-specific
+precedence anywhere relative to the existing HTTPRoute match precedence criteria,
+such as path, method, header count, and query param count. Implementations that
+define precedence for an extension type MUST document that behavior for that
+extension type.
+
+For matches that do not use `extension`, the existing HTTPRoute precedence rules
+are unchanged.
+
+For example, an implementation supporting `example.com/CEL` could document an
+ordering where path precedence is evaluated first, then an implementation-defined
+ranking for `example.com/CEL`, then method, header, and query param criteria.
+This GEP does not standardize that ranking.
+
+The `type` plus `value` shape follows the same extensible pattern used by
+Gateway addresses: well-known CamelCase types can be added in future releases,
+and implementation-specific types use domain-prefixed strings. This GEP does not
+define any portable matcher types.
+
+The `HTTPRouteMatchExtension` struct is intentionally a wrapper rather than a
+bare string field. This preserves room for a future GEP to add another
+representation, such as a reference to a matcher resource, without changing the
+top-level `HTTPRouteMatch` field or its composition semantics.
+
+If an implementation does not support the specified extension type, the
+implementation MUST set the `Accepted` condition to `False` for the relevant
+`RouteParentStatus` with a reason of `UnsupportedValue`. If an implementation
+supports the specified extension type but the value is invalid for that type, the
+implementation MUST set the `Accepted` condition to `False` for the relevant
+`RouteParentStatus` with a reason of `UnsupportedValue`.
+
+Implementations MUST NOT use `extension` to define behavior for portable
+Gateway API match mechanisms. Any behavior behind `extension` is
+implementation-specific unless standardized by a future GEP.
+
+For example, an implementation could define an `example.com/CEL` matcher type:
+
+```yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: example
+spec:
+  parentRefs:
+  - name: example
+  rules:
+  - matches:
+    - extension:
+        type: example.com/CEL
+        value: 'request.path.contains("hi")'
+    backendRefs:
+    - name: example
+      port: 80
+```
 
 ## Conformance Details
 
-No new conformance requirements are proposed in `Provisional`.
+#### Feature Names
+
+None. This GEP defines an implementation-specific extension point, so there is
+no portable feature for conformance reports to claim.
+
+### Conformance test scenarios
+
+None. This GEP defines an implementation-specific extension point and does not
+standardize any concrete matcher type or matcher behavior.
 
 Any implementation-specific match mechanism would be outside core portability
 guarantees unless and until a specific part of it is standardized later.
+
+No conformance test file names are proposed.
+
+## `Standard` Graduation Criteria
+
+To graduate this GEP to the Standard channel:
+
+* A future GEP or revision of this GEP must define portable matcher behavior.
+* Conformance tests must be implemented for that portable behavior.
+* At least three (3) implementations must have submitted conformance reports that
+  pass those future conformance tests.
+* At least six months must have passed from when the GEP moved to
+  `Experimental`.
 
 ## Alternatives
 
