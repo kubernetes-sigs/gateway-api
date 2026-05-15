@@ -81,6 +81,10 @@ type TimeoutConfig struct {
 	// Max value for conformant implementation: None
 	TLSRouteMustHaveCondition time.Duration
 
+	// UDPRouteMustHaveCondition represents the maximum time for a UDPRoute to have the supplied Condition.
+	// Max value for conformant implementation: None
+	UDPRouteMustHaveCondition time.Duration
+
 	// RouteMustHaveParents represents the maximum time for an xRoute to have parents in status that match the expected parents.
 	// Max value for conformant implementation: None
 	RouteMustHaveParents time.Duration
@@ -136,6 +140,7 @@ func DefaultTimeoutConfig() TimeoutConfig {
 		HTTPRouteMustNotHaveParents:            60 * time.Second,
 		HTTPRouteMustHaveCondition:             60 * time.Second,
 		TLSRouteMustHaveCondition:              60 * time.Second,
+		UDPRouteMustHaveCondition:              60 * time.Second,
 		RouteMustHaveParents:                   60 * time.Second,
 		ManifestFetchTimeout:                   10 * time.Second,
 		MaxTimeToConsistency:                   30 * time.Second,
@@ -194,6 +199,8 @@ func ParseTimeoutOverrides(timeoutConfig *TimeoutConfig, overrides string) {
 			timeoutConfig.HTTPRouteMustHaveCondition = overrideDuration
 		case "TLSRouteMustHaveCondition":
 			timeoutConfig.TLSRouteMustHaveCondition = overrideDuration
+		case "UDPRouteMustHaveCondition":
+			timeoutConfig.UDPRouteMustHaveCondition = overrideDuration
 		case "RouteMustHaveParents":
 			timeoutConfig.RouteMustHaveParents = overrideDuration
 		case "ManifestFetchTimeout":
@@ -270,6 +277,9 @@ func SetupTimeoutConfig(timeoutConfig *TimeoutConfig) {
 	}
 	if timeoutConfig.TLSRouteMustHaveCondition == 0 {
 		timeoutConfig.TLSRouteMustHaveCondition = defaultTimeoutConfig.TLSRouteMustHaveCondition
+	}
+	if timeoutConfig.UDPRouteMustHaveCondition == 0 {
+		timeoutConfig.UDPRouteMustHaveCondition = defaultTimeoutConfig.UDPRouteMustHaveCondition
 	}
 	if timeoutConfig.DefaultTestTimeout == 0 {
 		timeoutConfig.DefaultTestTimeout = defaultTimeoutConfig.DefaultTestTimeout

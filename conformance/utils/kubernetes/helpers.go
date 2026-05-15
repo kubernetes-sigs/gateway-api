@@ -830,6 +830,87 @@ func UDPRouteMustHaveParents(t *testing.T, client client.Client, timeoutConfig c
 	RouteMustHaveParents(t, client, timeoutConfig, routeName, parents, namespaceRequired, &v1alpha2.UDPRoute{})
 }
 
+// UDPRouteMustHaveCondition checks that the supplied UDPRoute has the supplied Condition,
+// halting after the specified timeout is exceeded.
+func UDPRouteMustHaveCondition(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeNN types.NamespacedName, gwNN types.NamespacedName, condition metav1.Condition) {
+	t.Helper()
+
+	waitErr := wait.PollUntilContextTimeout(context.Background(), timeoutConfig.DefaultPollInterval, timeoutConfig.UDPRouteMustHaveCondition, true, func(ctx context.Context) (bool, error) {
+		route := &v1alpha2.UDPRoute{}
+		err := client.Get(ctx, routeNN, route)
+		if err != nil {
+			return false, fmt.Errorf("error fetching UDPRoute: %w", err)
+		}
+
+		parents := route.Status.Parents
+		var conditionFound bool
+		for _, parent := range parents {
+			if err := ConditionsHaveLatestObservedGeneration(route, parent.Conditions); err != nil {
+				tlog.Logf(t, "UDPRoute %s (parentRef=%v) %v",
+					routeNN, parentRefToString(parent.ParentRef), err,
+				)
+				return false, nil
+			}
+
+			if parent.ParentRef.Name == gatewayv1.ObjectName(gwNN.Name) && (parent.ParentRef.Namespace == nil || string(*parent.ParentRef.Namespace) == gwNN.Namespace) {
+				if findConditionInList(t, parent.Conditions, condition.Type, string(condition.Status), condition.Reason) {
+					conditionFound = true
+				}
+			}
+		}
+
+		return conditionFound, nil
+	})
+
+	require.NoErrorf(t, waitErr, "error waiting for UDPRoute status to have a Condition matching expectations")
+}
+
+// UDPRouteMustHaveNoAcceptedParents waits for the specified UDPRoute to have either no parents
+// or a single parent that is not accepted. This is used to validate UDPRoute errors.
+func UDPRouteMustHaveNoAcceptedParents(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeName types.NamespacedName) {
+	t.Helper()
+
+	var actual []gatewayv1.RouteParentStatus
+	emptyChecked := false
+	// We explicitly do not use timeoutConfig.DefaultPollInterval here since we are doing negative testing
+	waitErr := wait.PollUntilContextTimeout(context.Background(), 1*time.Second, timeoutConfig.HTTPRouteMustNotHaveParents, true, func(ctx context.Context) (bool, error) {
+		route := &v1alpha2.UDPRoute{}
+		err := client.Get(ctx, routeName, route)
+		if err != nil {
+			return false, fmt.Errorf("error fetching UDPRoute: %w", err)
+		}
+
+		actual = route.Status.Parents
+
+		if len(actual) == 0 {
+			// For empty status, we need to distinguish between "correctly did not set" and "hasn't set yet"
+			// Ensure we iterate at least two times to give it some time.
+			if !emptyChecked {
+				emptyChecked = true
+				return false, nil
+			}
+			return true, nil
+		}
+		if len(actual) > 1 {
+			// Only expect one parent
+			return false, nil
+		}
+
+		for _, parent := range actual {
+			if err := ConditionsHaveLatestObservedGeneration(route, parent.Conditions); err != nil {
+				tlog.Logf(t, "UDPRoute %s (controller=%v,ref=%#v) %v", routeName, parent.ControllerName, parent, err)
+				return false, nil
+			}
+		}
+
+		return conditionsMatch(t, []metav1.Condition{{
+			Type:   string(gatewayv1.RouteConditionAccepted),
+			Status: "False",
+		}}, actual[0].Conditions), nil
+	})
+	require.NoErrorf(t, waitErr, "error waiting for UDPRoute to have no accepted parents")
+}
+
 // TLSRouteMustHaveParents waits for the specified TLSRoute to have parents
 // in status that match the expected parents, and also returns the TLSRoute.
 // This will cause the test to halt if the specified timeout is exceeded.
