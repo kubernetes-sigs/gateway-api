@@ -111,6 +111,12 @@ const (
 
 	// This option indicates support for HTTPRoute additional redirect status code 303 (extended conformance)
 	SupportHTTPRoute308RedirectStatusCode FeatureName = "HTTPRoute308RedirectStatusCode"
+
+	// This option indicates support for URLRewrite filter on HTTPRoute BackendRef (extended conformance).
+	SupportHTTPRouteBackendURLRewrite FeatureName = "HTTPRouteBackendURLRewrite"
+
+	// This option indicates support for RequestRedirect filter on HTTPRoute BackendRef (extended conformance).
+	SupportHTTPRouteBackendRequestRedirect FeatureName = "HTTPRouteBackendRequestRedirect"
 )
 
 var (
@@ -229,6 +235,16 @@ var (
 		Name:    SupportHTTPRoute308RedirectStatusCode,
 		Channel: FeatureChannelStandard,
 	}
+	// HTTPRouteBackendURLRewriteFeature contains metadata for the HTTPRouteBackendURLRewrite feature.
+	HTTPRouteBackendURLRewriteFeature = Feature{
+		Name:    SupportHTTPRouteBackendURLRewrite,
+		Channel: FeatureChannelStandard,
+	}
+	// HTTPRouteBackendRequestRedirectFeature contains metadata for the HTTPRouteBackendRequestRedirect feature.
+	HTTPRouteBackendRequestRedirectFeature = Feature{
+		Name:    SupportHTTPRouteBackendRequestRedirect,
+		Channel: FeatureChannelStandard,
+	}
 )
 
 // HTTPRouteExtendedFeatures includes all extended features for HTTPRoute
@@ -258,4 +274,6 @@ var HTTPRouteExtendedFeatures = sets.New(
 	HTTPRoute303RedirectStatusCodeFeature,
 	HTTPRoute307RedirectStatusCodeFeature,
 	HTTPRoute308RedirectStatusCodeFeature,
+	HTTPRouteBackendURLRewriteFeature,
+	HTTPRouteBackendRequestRedirectFeature,
 )
