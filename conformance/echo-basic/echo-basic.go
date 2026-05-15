@@ -116,7 +116,9 @@ func main() {
 		Pod:       os.Getenv("POD_NAME"),
 	}
 
-	retrySimulation := &retrySimulation{}
+	retrySimulation := &retrySimulation{
+		attempts: make(map[string]int),
+	}
 
 	httpMux := http.NewServeMux()
 	httpMux.HandleFunc("/health", healthHandler)
