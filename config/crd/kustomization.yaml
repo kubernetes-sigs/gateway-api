@@ -1,10 +1,11 @@
 resources:
-- standard/gateway.networking.k8s.io_gatewayclasses.yaml
-- standard/gateway.networking.k8s.io_gateways.yaml
-- standard/gateway.networking.k8s.io_grpcroutes.yaml
-- standard/gateway.networking.k8s.io_httproutes.yaml
-- standard/gateway.networking.k8s.io_referencegrants.yaml
-- standard/gateway.networking.k8s.io_backendtlspolicies.yaml
-- standard/gateway.networking.k8s.io_listenersets.yaml
-- standard/gateway.networking.k8s.io_tlsroutes.yaml
-- standard/gateway.networking.k8s.io_vap_safeupgrades.yaml
+  - standard/gateway.networking.k8s.io_gatewayclasses.yaml
+  - standard/gateway.networking.k8s.io_gateways.yaml
+  - standard/gateway.networking.k8s.io_grpcroutes.yaml
+  - standard/gateway.networking.k8s.io_httproutes.yaml
+  - standard/gateway.networking.k8s.io_referencegrants.yaml
+  - standard/gateway.networking.k8s.io_backendtlspolicies.yaml
+  - standard/gateway.networking.k8s.io_listenersets.yaml
+  - standard/gateway.networking.k8s.io_tlsroutes.yaml
+  - standard/gateway.networking.k8s.io_udproutes.yaml
+  - standard/gateway.networking.k8s.io_vap_safeupgrades.yaml
