@@ -77,15 +77,15 @@ func (test *ConformanceTest) Run(t *testing.T, suite *ConformanceTestSuite) {
 	test.Test(t, suite)
 }
 
-// ParseSupportedFeatures parses flag arguments and converts the string to
-// sets.Set[features.FeatureName]
-func ParseSupportedFeatures(f string) FeaturesSet {
+// ParseSupportedFeatures parses a comma-separated string of feature names
+// into a slice of FeatureName values.
+func ParseSupportedFeatures(f string) []features.FeatureName {
 	if f == "" {
 		return nil
 	}
-	res := FeaturesSet{}
+	var res []features.FeatureName
 	for value := range strings.SplitSeq(f, ",") {
-		res.Insert(features.FeatureName(value))
+		res = append(res, features.FeatureName(value))
 	}
 	return res
 }

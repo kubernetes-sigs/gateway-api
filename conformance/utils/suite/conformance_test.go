@@ -20,8 +20,6 @@ import (
 	"reflect"
 	"testing"
 
-	"k8s.io/apimachinery/pkg/util/sets"
-
 	"sigs.k8s.io/gateway-api/pkg/features"
 )
 
@@ -32,16 +30,14 @@ func TestParseSupportedFeatures(t *testing.T) {
 		"b,c,d",
 	}
 
-	s1 := sets.Set[features.FeatureName]{}
-	s1.Insert("a")
-	s2 := sets.Set[features.FeatureName]{}
-	s2.Insert("b")
-	s2.Insert("c")
-	s2.Insert("d")
-	features := []sets.Set[features.FeatureName]{nil, s1, s2}
+	expected := [][]features.FeatureName{
+		nil,
+		{"a"},
+		{"b", "c", "d"},
+	}
 
 	for i, f := range flags {
-		expect := features[i]
+		expect := expected[i]
 		got := ParseSupportedFeatures(f)
 		if !reflect.DeepEqual(got, expect) {
 			t.Errorf("Unexpected features from flags '%s', expected: %v, got: %v", f, expect, got)
