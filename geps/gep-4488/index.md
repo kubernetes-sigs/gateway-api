@@ -2,7 +2,7 @@
 
 * Issue: [#4488](https://github.com/kubernetes-sigs/gateway-api/pull/4488)
   * Incubated by the [AI Gateway Working Group](https://github.com/kubernetes-sigs/wg-ai-gateway/pull/20)
-* Status: Experimental
+* Status: Implementable
 
 ## TLDR
 
