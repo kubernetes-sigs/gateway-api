@@ -1,4 +1,6 @@
-# GEP-2627: DNS configuration within Gateway API
+---
+title: "GEP-2627: DNS configuration within Gateway API"
+---
 
 * Issue: [#2627](https://github.com/kubernetes-sigs/gateway-api/issues/2627)
 * Status: Provisional

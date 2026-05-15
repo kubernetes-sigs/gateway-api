@@ -1,4 +1,6 @@
-# GEP-3965: HTTPRoute Implementation-Specific Matches
+---
+title: "GEP-3965: HTTPRoute Implementation-Specific Matches"
+---
 
 * Issue: [#3965](https://github.com/kubernetes-sigs/gateway-api/issues/3965)
 * Status: Provisional

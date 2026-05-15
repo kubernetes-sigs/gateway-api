@@ -1,4 +1,6 @@
-# GEP-2649: Inherited Policy Attachment
+---
+title: "GEP-2649: Inherited Policy Attachment"
+---
 
 * Issue: [#2649](https://github.com/kubernetes-sigs/gateway-api/issues/2649)
 * Status: Declined

@@ -1,4 +1,6 @@
-# GEP-1364: Status and Conditions Update
+---
+title: "GEP-1364: Status and Conditions Update"
+---
 
 * Issue: [#1364](https://github.com/kubernetes-sigs/gateway-api/issues/1364)
 * Status: Standard

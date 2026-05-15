@@ -1,4 +1,6 @@
-# GEP-3779: Identity Based Authz for East-West Traffic
+---
+title: "GEP-3779: Identity Based Authz for East-West Traffic"
+---
 
 * Issue: [#3779](https://github.com/kubernetes-sigs/gateway-api/issues/3779)
 * Status: Implementable

@@ -1,4 +1,6 @@
-# GEP-1324: Service Mesh in Gateway API
+---
+title: "GEP-1324: Service Mesh in Gateway API"
+---
 
 * Issue: [#1324](https://github.com/kubernetes-sigs/gateway-api/issues/1324)
 * Status: Memorandum

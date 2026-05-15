@@ -1,5 +1,6 @@
-
-# GEP-2643: TLS/SNI based routing / TLSRoute
+---
+title: "GEP-2643: TLS/SNI based routing / TLSRoute"
+---
 
 * Issue: [#2643](https://github.com/kubernetes-sigs/gateway-api/issues/2643)
 * Status: Standard

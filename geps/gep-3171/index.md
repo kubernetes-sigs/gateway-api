@@ -1,4 +1,6 @@
-# GEP-3171: Percentage-based Request Mirroring
+---
+title: "GEP-3171: Percentage-based Request Mirroring"
+---
 
 * Issue: [#3171](https://github.com/kubernetes-sigs/gateway-api/issues/3171)
 * Status: Standard

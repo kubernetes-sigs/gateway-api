@@ -1,4 +1,6 @@
-# GEP-2659: Document and improve the GEP process
+---
+title: "GEP-2659: Document and improve the GEP process"
+---
 
 * Issue: [#2659](https://github.com/kubernetes-sigs/gateway-api/issues/2659)
 * Type: Memorandum

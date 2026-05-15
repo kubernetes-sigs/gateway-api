@@ -1,4 +1,6 @@
-# GEP-820: Drop extension points from Route matches
+---
+title: "GEP-820: Drop extension points from Route matches"
+---
 
 * Issue: [#820](https://github.com/kubernetes-sigs/gateway-api/issues/820)
 * Status: Standard

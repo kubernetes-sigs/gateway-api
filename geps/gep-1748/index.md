@@ -1,4 +1,6 @@
-# GEP-1748: Gateway API Interaction with Multi-Cluster Services
+---
+title: "GEP-1748: Gateway API Interaction with Multi-Cluster Services"
+---
 
 * Issue: [#1748](https://github.com/kubernetes-sigs/gateway-api/issues/1748)
 * Status: Experimental

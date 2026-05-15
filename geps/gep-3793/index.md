@@ -1,4 +1,6 @@
-# GEP-3793: Default Gateways
+---
+title: "GEP-3793: Default Gateways"
+---
 
 * Issue: [#3793](https://github.com/kubernetes-sigs/gateway-api/issues/3793)
 * Status: Implementable

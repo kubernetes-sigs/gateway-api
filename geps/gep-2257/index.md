@@ -1,4 +1,6 @@
-# GEP-2257: Gateway API Duration Format
+---
+title: "GEP-2257: Gateway API Duration Format"
+---
 
 * Issue: [#2257](https://github.com/kubernetes-sigs/gateway-api/issues/2257)
 * Status: Standard

@@ -1,4 +1,6 @@
-# GEP-3792: Out-of-Cluster Gateways
+---
+title: "GEP-3792: Out-of-Cluster Gateways"
+---
 
 * Issue: [#3792](https://github.com/kubernetes-sigs/gateway-api/issues/3792)
 * Status: Provisional

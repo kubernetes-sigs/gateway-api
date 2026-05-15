@@ -1,4 +1,6 @@
-# GEP-1619: Session Persistence via BackendLBPolicy
+---
+title: "GEP-1619: Session Persistence via BackendLBPolicy"
+---
 
 * Issue: [#1619](https://github.com/kubernetes-sigs/gateway-api/issues/1619)
 * Status: Experimental

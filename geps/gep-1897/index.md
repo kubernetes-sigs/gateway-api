@@ -1,4 +1,6 @@
-# GEP-1897: BackendTLSPolicy - Explicit Backend TLS Connection Configuration
+---
+title: "GEP-1897: BackendTLSPolicy - Explicit Backend TLS Connection Configuration"
+---
 
 * Issue: [#1897](https://github.com/kubernetes-sigs/gateway-api/issues/1897)
 * Status: Standard

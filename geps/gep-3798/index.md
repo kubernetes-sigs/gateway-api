@@ -1,4 +1,6 @@
-# GEP-3798: Client IP-Based Session Persistence
+---
+title: "GEP-3798: Client IP-Based Session Persistence"
+---
 
 * Issue: [#3798](https://github.com/kubernetes-sigs/gateway-api/issues/3798)
 * Status: Deferred

@@ -1,4 +1,6 @@
-# GEP-2907: TLS Configuration Placement and Terminology
+---
+title: "GEP-2907: TLS Configuration Placement and Terminology"
+---
 
 * Issue: [#2907](https://github.com/kubernetes-sigs/gateway-api/issues/2907)
 * Status: Memorandum
