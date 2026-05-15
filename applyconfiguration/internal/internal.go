@@ -1635,6 +1635,66 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         scalar: string
       default: ""
+- name: io.k8s.sigs.gateway-api.apis.v1.TCPRoute
+  map:
+    fields:
+    - name: apiVersion
+      type:
+        scalar: string
+    - name: kind
+      type:
+        scalar: string
+    - name: metadata
+      type:
+        namedType: ObjectMeta.v1.meta.apis.pkg.apimachinery.k8s.io
+      default: {}
+    - name: spec
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1.TCPRouteSpec
+      default: {}
+    - name: status
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1.TCPRouteStatus
+      default: {}
+- name: io.k8s.sigs.gateway-api.apis.v1.TCPRouteRule
+  map:
+    fields:
+    - name: backendRefs
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v1.BackendRef
+          elementRelationship: atomic
+    - name: name
+      type:
+        scalar: string
+- name: io.k8s.sigs.gateway-api.apis.v1.TCPRouteSpec
+  map:
+    fields:
+    - name: parentRefs
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v1.ParentReference
+          elementRelationship: atomic
+    - name: rules
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v1.TCPRouteRule
+          elementRelationship: atomic
+    - name: useDefaultGateways
+      type:
+        scalar: string
+- name: io.k8s.sigs.gateway-api.apis.v1.TCPRouteStatus
+  map:
+    fields:
+    - name: parents
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v1.RouteParentStatus
+          elementRelationship: atomic
 - name: io.k8s.sigs.gateway-api.apis.v1.TLSConfig
   map:
     fields:

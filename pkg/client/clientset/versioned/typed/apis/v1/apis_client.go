@@ -35,6 +35,7 @@ type GatewayV1Interface interface {
 	HTTPRoutesGetter
 	ListenerSetsGetter
 	ReferenceGrantsGetter
+	TCPRoutesGetter
 	TLSRoutesGetter
 }
 
@@ -69,6 +70,10 @@ func (c *GatewayV1Client) ListenerSets(namespace string) ListenerSetInterface {
 
 func (c *GatewayV1Client) ReferenceGrants(namespace string) ReferenceGrantInterface {
 	return newReferenceGrants(c, namespace)
+}
+
+func (c *GatewayV1Client) TCPRoutes(namespace string) TCPRouteInterface {
+	return newTCPRoutes(c, namespace)
 }
 
 func (c *GatewayV1Client) TLSRoutes(namespace string) TLSRouteInterface {

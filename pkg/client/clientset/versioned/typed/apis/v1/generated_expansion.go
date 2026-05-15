@@ -32,4 +32,6 @@ type ListenerSetExpansion interface{}
 
 type ReferenceGrantExpansion interface{}
 
+type TCPRouteExpansion interface{}
+
 type TLSRouteExpansion interface{}
