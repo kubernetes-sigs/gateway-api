@@ -58,13 +58,8 @@ class TestCommandLineInterface(unittest.TestCase):
 
         linking.prepare_docs = failing_prepare_docs
 
-        import sys
-        import mkdocs_utils
-        # Ensure prepare_docs in linking module is the one called by main
-        # (main calls linking.prepare_docs)
-
         original_argv = sys.argv
-        sys.argv = ["linking.py", "--prepare"]
+        sys.argv = ["linking.py", "--prepare", "--docs-dir", str(self.docs_path)]
 
         try:
             # Act & Assert: Exception should propagate (this is expected behavior)
