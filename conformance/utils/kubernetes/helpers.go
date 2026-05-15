@@ -830,13 +830,6 @@ func UDPRouteMustHaveParents(t *testing.T, client client.Client, timeoutConfig c
 	RouteMustHaveParents(t, client, timeoutConfig, routeName, parents, namespaceRequired, &v1alpha2.UDPRoute{})
 }
 
-// TCPRouteMustHaveParents waits for the specified TCPRoute to have parents
-// in status that match the expected parents. This will cause the test to halt
-// if the specified timeout is exceeded.
-func TCPRouteMustHaveParents(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeName types.NamespacedName, parents []gatewayv1.RouteParentStatus, namespaceRequired bool) {
-	RouteMustHaveParents(t, client, timeoutConfig, routeName, parents, namespaceRequired, &v1alpha2.TCPRoute{})
-}
-
 // UDPRouteMustHaveCondition checks that the supplied UDPRoute has the supplied Condition,
 // halting after the specified timeout is exceeded.
 func UDPRouteMustHaveCondition(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeNN types.NamespacedName, gwNN types.NamespacedName, condition metav1.Condition) {
