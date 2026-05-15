@@ -60,7 +60,6 @@ var (
 			Insert(TLSRouteCoreFeatures.UnsortedList()...).
 			Insert(TLSRouteExtendedFeatures.UnsortedList()...).
 			Insert(TCPRouteExtendedFeatures.UnsortedList()...).
-			Insert(TCPRouteCoreFeatures.UnsortedList()...).
 			Insert(UDPRouteFeatures.UnsortedList()...).
 			Insert(MeshCoreFeatures.UnsortedList()...).
 			Insert(MeshExtendedFeatures.UnsortedList()...).
