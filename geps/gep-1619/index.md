@@ -429,22 +429,13 @@ type BackendTrafficPolicySpec struct {
     SessionPersistence *SessionPersistence `json:"sessionPersistence,omitempty"`
 }
 
-// SessionPersistence defines the desired state of
-// SessionPersistence.
-// +kubebuilder:validation:XValidation:message="AbsoluteTimeout must be specified when cookie lifetimeType is Permanent",rule="!has(self.cookieConfig) || !has(self.cookieConfig.lifetimeType) || self.cookieConfig.lifetimeType != 'Permanent' || has(self.absoluteTimeout)"
-// +kubebuilder:validation:XValidation:message="cookieConfig can only be set with type Cookie",rule="!has(self.cookieConfig) || self.type == 'Cookie'"
+// SessionPersistence defines the desired state of SessionPersistence.
+// +kubebuilder:validation:XValidation:message="AbsoluteTimeout must be specified when cookie lifetimeType is Permanent",rule="!has(self.cookie) || !has(self.cookie.lifetimeType) || self.cookie.lifetimeType != 'Permanent' || has(self.absoluteTimeout)"
+// +kubebuilder:validation:XValidation:message="cookie must be nil if type is not Cookie",rule="!has(self.cookie) || self.type == 'Cookie'"
+// +kubebuilder:validation:XValidation:message="cookie must be specified for Cookie type",rule="self.type != 'Cookie' || has(self.cookie)"
+// +kubebuilder:validation:XValidation:message="header must be nil if type is not Header",rule="!has(self.header) || self.type == 'Header'"
+// +kubebuilder:validation:XValidation:message="header must be specified for Header type",rule="self.type != 'Header' || has(self.header)"
 type SessionPersistence struct {
-    // SessionName defines the name of the persistent session token
-    // which may be reflected in the cookie or the header. Users
-    // should avoid reusing session names to prevent unintended
-    // consequences, such as rejection or unpredictable behavior.
-    //
-    // Support: Implementation-specific
-    //
-    // +optional
-    // +kubebuilder:validation:MaxLength=128
-    SessionName *string `json:"sessionName,omitempty"`
-
     // AbsoluteTimeout defines the absolute timeout of the persistent
     // session. Once the AbsoluteTimeout duration has elapsed, the
     // session becomes invalid.
@@ -462,17 +453,26 @@ type SessionPersistence struct {
     //
     // Support: Extended for "Header" type
     //
+    // +unionDiscriminator
     // +optional
     // +kubebuilder:default=Cookie
     Type *SessionPersistenceType `json:"type,omitempty"`
 
-    // CookieConfig provides configuration settings that are specific
+    // Cookie provides configuration settings that are specific
     // to cookie-based session persistence.
     //
     // Support: Core
     //
     // +optional
-    CookieConfig *CookieConfig `json:"cookieConfig,omitempty"`
+    Cookie *CookieConfig `json:"cookie,omitempty"`
+
+    // Header provides configuration settings that are specific
+    // to header-based session persistence.
+    //
+    // Support: Extended
+    //
+    // +optional
+    Header *HeaderConfig `json:"header,omitempty"`
 }
 
 // Duration is a string value representing a duration in time. The format is as specified
@@ -500,6 +500,23 @@ const (
 
 // CookieConfig defines the configuration for cookie-based session persistence.
 type CookieConfig struct {
+    // Name defines the name of the cookie used for session persistence.
+    // If not specified, a unique cookie name will be generated.
+    // Users should avoid reusing cookie names to prevent unintended
+    // consequences, such as rejection or unpredictable behavior.
+    //
+    // <gateway:util:excludeFromCRD>
+    // This field is Extended because not all implementations can
+    // control the cookie name. Implementations SHOULD support this
+    // field if the underlying dataplane allows configuring the cookie
+    // name.
+    // </gateway:util:excludeFromCRD>
+    //
+    // Support: Extended
+    //
+    // +optional
+    Name *HeaderName `json:"name,omitempty"`
+
     // LifetimeType specifies whether the cookie has a permanent or
     // session-based lifetime. A permanent cookie persists until its
     // specified expiry time, defined by the Expires or Max-Age cookie
@@ -539,6 +556,18 @@ const (
     // Support: Extended
     PermanentCookieLifetimeType  CookieLifetimeType = "Permanent"
 )
+
+// HeaderConfig defines the configuration for header-based session persistence.
+type HeaderConfig struct {
+    // Name defines the name of the header used for session persistence.
+    // The client must include this header in subsequent requests to
+    // maintain the session.
+    //
+    // Support: Core
+    //
+    // +required
+    Name HeaderName `json:"name"`
+}
 ```
 
 ### Route Rule API
@@ -703,16 +732,22 @@ Let's discuss some of these cookie attributes in more detail.
 
 #### Name
 
-The `Name` cookie attribute MAY be configured via the `SessionName` field in `sessionPersistence`. However, this field
-is implementation-specific because it's impossible to create a conformance test for it, given that sessions could be
-created in a variety of ways. Additionally, `SessionName` is not universally supported as some implementations, such as
-ones supporting global load balancers, don't have the capability to configure the cookie name. Some implementations
-have a fixed cookie name, and therefore `SessionName` may be reflected in the value of the cookie.
+##### Cookie Name
 
-The use case for modifying the cookie name using `SessionName` is that certain users might need to align it with an
-existing cookie name, such as Java's `JSESSIONID`. Refer to [Session Initiation Guidelines](#session-initiation-guidelines)
-for details on how this GEP supports existing sessions. If `SessionName` is not specified, then a unique cookie name
-should be generated.
+The cookie name is configured via the `cookie.name` field (Extended support). Not all implementations support
+configuring the cookie name. For example, GKE's stateful generated cookie
+([GSSA](https://pkg.go.dev/github.com/GoogleCloudPlatform/gke-gateway-api/apis/networking/v1)) uses a fixed cookie
+name that cannot be changed by the user. If `cookie.name` is not specified, a unique cookie name will be generated.
+
+The use case for configuring the cookie name is that certain users might need to align it with an existing cookie name,
+such as Java's `JSESSIONID`. Refer to [Session Initiation Guidelines](#session-initiation-guidelines) for details on
+how this GEP supports existing sessions.
+
+##### Header Name
+
+The header name is configured via the `header.name` field (Core support). Unlike cookies, headers are not automatically
+managed by browsers, so clients must know the header name to include it in subsequent requests. For this reason,
+`header.name` is a required field.
 
 #### Expires / Max-Age
 
@@ -835,7 +870,9 @@ spec:
     backendRefs:
     - name: servicev1
     sessionPersistence:
-      sessionName: session-a
+      type: Cookie
+      cookie:
+        name: session-a
   - matches:
     - path:
       value: /b
@@ -845,7 +882,9 @@ spec:
     - name: servicev2
       weight: 100
     sessionPersistence:
-      sessionName: session-b
+      type: Cookie
+      cookie:
+        name: session-b
 ```
 
 Route rules referencing the same service MUST NOT share persistent sessions (i.e. the same cookie). Let's illustrate
@@ -884,8 +923,9 @@ spec:
   - kind: Service
     name: servicev1
   sessionPersistence:
-    sessionName: service-cookie
     type: Cookie
+    cookie:
+      name: service-cookie
 ```
 
 Route rules referencing the same service MUST NOT share persistent sessions (i.e. the same cookie), even if the session persistence is attached to the service via `BackendTrafficPolicy`, and each route rule should have different persistent sessions.
@@ -896,7 +936,7 @@ Route rules referencing the same service MUST NOT share persistent sessions (i.e
 #### Session Naming Collision
 
 Consider the situation in which two different services have cookie-based session persistence configured with the
-same `sessionName`:
+same cookie name:
 
 ```yaml
 kind: HTTPRoute
@@ -918,8 +958,9 @@ spec:
   - kind: Service
     name: servicev1
   sessionPersistence:
-    sessionName: split-route-cookie
     type: Cookie
+    cookie:
+      name: split-route-cookie
 ---
 kind: BackendTrafficPolicy
 metadata:
@@ -929,8 +970,9 @@ spec:
   - kind: Service
     name: servicev2
   sessionPersistence:
-    sessionName: split-route-cookie
     type: Cookie
+    cookie:
+      name: split-route-cookie
 ```
 
 This is an invalid configuration as two separate sessions cannot have the same cookie name. Implementations SHOULD
@@ -953,8 +995,9 @@ spec:
     - name: servicev2
       weight: 50
     sessionPersistence:
-      sessionName: split-route-cookie
       type: Cookie
+      cookie:
+        name: split-route-cookie
 ```
 
 In this scenario, session persistence is enabled at route rule level and all services in the traffic split have persistent session.
@@ -988,8 +1031,9 @@ spec:
   - kind: Service
     name: servicev1
   sessionPersistence:
-    sessionName: split-route-cookie
     type: Cookie
+    cookie:
+      name: split-route-cookie
 ```
 
 In this traffic splitting scenario within a single route rule, this GEP leaves the decision to the implementation. An
@@ -1033,10 +1077,10 @@ supported by some implementations due to their current designs.
 | Description | Outcome | Features |
 | :---- | :---- | :---- |
 | Simple Cookie Session Persistence: An HTTPRoute with sessionPersistence configured with type: Cookie (default) on a single backend in gateway-conformance-infra namespace. | HTTPRoute MUST have Accepted=True in parent status. First request MUST receive a Set-Cookie header in response. Subsequent requests with the cookie MUST route to the same backend pod. Verify by checking pod identity across N requests (N>=50). | HTTPRouteSessionPersistence |
-| Session Cookie Lifetime (Default): HTTPRoute with sessionPersistence and cookieConfig.lifetimeType: Session (default). | HTTPRoute MUST have Accepted=True in parent status. Cookie MUST NOT contain `Expires` or `Max-Age`. | HTTPRouteSessionPersistence |
+| Session Cookie Lifetime (Default): HTTPRoute with sessionPersistence and cookie.lifetimeType: Session (default). | HTTPRoute MUST have Accepted=True in parent status. Cookie MUST NOT contain `Expires` or `Max-Age`. | HTTPRouteSessionPersistence |
 | Multiple Weighted Backends - Initial Distribution Honored: HTTPRoute with sessionPersistence and multiple backendRefs with weights (e.g., 70/30) on a path. | HTTPRoute MUST have Accepted=True in parent status. Initial requests (without session cookie) MUST respect weight distribution (~70/30 within statistical tolerance). Once session is established, subsequent requests with cookie MUST route to the same backend regardless of weight configuration. | HTTPRouteSessionPersistence |
 | Session Persistence Scoped to Route Rule: HTTPRoute with two rules: Rule 1 (path /a) and Rule 2 (path /b), both with sessionPersistence configured, routing to the same backend Service with multiple pods. | HTTPRoute MUST have Accepted=True in parent status. Each rule MUST independently establish and maintain its own session. Verify with: 1) Send an initial request to /a (no cookie) — the response sets a session cookie binding /a to Pod-A, 2) Send an initial request to /b (no cookie) — the response sets a session cookie independently binding /b to Pod-B (Pod-B may or may not be the same pod as Pod-A), 3) N subsequent requests to /a with the /a session cookie MUST all route to Pod-A, 4) N subsequent requests to /b with the /b session cookie MUST all route to Pod-B. | HTTPRouteSessionPersistence |
-| Session Persistence with cookieConfig.lifetimeType: Permanent and absoluteTimeout: 5min. | HTTPRoute MUST have Accepted=True in parent status. Response Set-Cookie header MUST contain `Expires` or `Max-Age` attribute. The expiry value MUST correspond to the configured absoluteTimeout duration. Session persistence MUST function correctly until cookie expires. | HTTPRouteSessionPersistence, HTTPRouteSessionPersistenceCookieLifetimeTypePermanent |
+| Session Persistence with cookie.lifetimeType: Permanent and absoluteTimeout: 5min. | HTTPRoute MUST have Accepted=True in parent status. Response Set-Cookie header MUST contain `Expires` or `Max-Age` attribute. The expiry value MUST correspond to the configured absoluteTimeout duration. Session persistence MUST function correctly until cookie expires. | HTTPRouteSessionPersistence, HTTPRouteSessionPersistenceCookieLifetimeTypePermanent |
 
 ### GRPCRoute Feature Names
 
@@ -1049,7 +1093,7 @@ supported by some implementations due to their current designs.
 | :---- | :---- | :---- |
 | Simple Cookie-based Session Persistence (GRPCRoute): A GRPCRoute with sessionPersistence configured with type: Cookie (default) on a single backend. The test client MUST explicitly extract the Set-Cookie response header and include it as a Cookie header in subsequent requests. | GRPCRoute MUST have Accepted=True in parent status. First request MUST receive a Set-Cookie response header. Subsequent requests with the cookie header MUST route to the same backend pod. Verify by checking pod identity across N requests (N>=50). | GRPCRouteSessionPersistence |
 | Header-based Session Persistence (GRPCRoute): A GRPCRoute with sessionPersistence configured with type: Header on a single backend. | GRPCRoute MUST have Accepted=True in parent status. First request MUST receive a session identity header in the response metadata. Subsequent requests with that header included in request metadata MUST route to the same backend pod. Verify by checking pod identity across N requests (N>=50). | GRPCRouteSessionPersistence, GRPCRouteSessionPersistenceHeader |
-| Session Cookie Lifetime (Default) (GRPCRoute): GRPCRoute with sessionPersistence and cookieConfig.lifetimeType: Session (default). | GRPCRoute MUST have Accepted=True in parent status. Cookie MUST NOT contain `Expires` or `Max-Age` attributes. | GRPCRouteSessionPersistence |
+| Session Cookie Lifetime (Default) (GRPCRoute): GRPCRoute with sessionPersistence and cookie.lifetimeType: Session (default). | GRPCRoute MUST have Accepted=True in parent status. Cookie MUST NOT contain `Expires` or `Max-Age` attributes. | GRPCRouteSessionPersistence |
 | Multiple Weighted Backends - Initial Distribution Honored (GRPCRoute): GRPCRoute with sessionPersistence and multiple backendRefs with weights (e.g., 70/30). | GRPCRoute MUST have Accepted=True in parent status. Initial requests (without session token) MUST respect weight distribution (~70/30 within statistical tolerance). Once session is established, subsequent requests with the session token MUST route to the same backend regardless of weight configuration. | GRPCRouteSessionPersistence |
 | Session Persistence Scoped to Route Rule (GRPCRoute): GRPCRoute with two rules matching different gRPC methods (e.g., Rule 1 matches `/service.Foo/MethodA` and Rule 2 matches `/service.Foo/MethodB`), both with sessionPersistence configured, routing to the same backend Service with multiple pods. | GRPCRoute MUST have Accepted=True in parent status. Each rule MUST independently establish and maintain its own session. Verify with: 1) Send an initial request to MethodA (no session token) — the response sets a session token binding MethodA to Pod-A, 2) Send an initial request to MethodB (no session token) — the response sets a session token independently binding MethodB to Pod-B (Pod-B may or may not be the same pod as Pod-A), 3) N subsequent requests to MethodA with the MethodA session token MUST all route to Pod-A, 4) N subsequent requests to MethodB with the MethodB session token MUST all route to Pod-B. | GRPCRouteSessionPersistence |
 
