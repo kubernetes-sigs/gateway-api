@@ -45,7 +45,7 @@ This GEP both introduces new API fields, and standardizes how implementations sh
 A simple `Gateway`, as is configured below is assumed to be an automated deployment:
 
 ```yaml
-apiVersion: gateway.networking.k8s.io/v1beta1
+apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
   name: my-gateway
@@ -98,7 +98,7 @@ For implementations using a `Service`, this means the `clusterIP` or `loadBalanc
 For example:
 
 ```yaml
-apiVersion: gateway.networking.k8s.io/v1beta1
+apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
   name: my-gateway
@@ -120,7 +120,7 @@ This would generate a `Service` with `clusterIP` or `loadBalancerIP`, depending 
 Labels and annotations for generated resources are specified in `infrastructure`:
 
 ```yaml
-apiVersion: gateway.networking.k8s.io/v1beta1
+apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
   name: my-gateway
@@ -168,7 +168,7 @@ many existing resources attach only to resources like `Deployment` or `Service`.
 
 An example using these:
 ```yaml
-apiVersion: gateway.networking.k8s.io/v1beta1
+apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
   name: gateway

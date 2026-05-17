@@ -203,7 +203,7 @@ type GatewayClassStatus struct {
 
 ### YAML
 ```yaml
-apiVersion: gateway.networking.k8s.io/v1beta1
+apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
   name: prod-web
@@ -267,7 +267,7 @@ on how they should behave.
 #### 1. Request a GatewayAddress that is routable within the same cluster
 
 ```yaml
-apiVersion: gateway.networking.k8s.io/v1beta1
+apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
   name: prod-web
@@ -282,7 +282,7 @@ spec:
 
 #### 2. Request a GatewayAddress with a specific routability and address
 ```yaml
-apiVersion: gateway.networking.k8s.io/v1beta1
+apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
   name: prod-web
@@ -299,7 +299,7 @@ spec:
 
 #### 3. Request a GatewayAddress that is routable on the public internet
 ```yaml
-apiVersion: gateway.networking.k8s.io/v1beta1
+apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
   name: prod-web
@@ -314,7 +314,7 @@ spec:
 
 #### 4. Request a GatewayAddress that is a cloud provider's VPC
 ```yaml
-apiVersion: gateway.networking.k8s.io/v1beta1
+apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
   name: prod-web

@@ -255,7 +255,7 @@ type GatewaySpec struct {
 1. Setting default `frontendValidation` config.
 
 ```yaml
-apiVersion: gateway.networking.k8s.io/v1beta1
+apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
   name: client-validation-basic
@@ -292,7 +292,7 @@ spec:
 2. Setting default and per port `frontendValidation` configs.
 
 ```yaml
-apiVersion: gateway.networking.k8s.io/v1beta1
+apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
   name: client-validation-basic
