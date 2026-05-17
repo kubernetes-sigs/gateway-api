@@ -1,6 +1,5 @@
 #$ Used in:
-#$ - site-src/guides/simple-gateway.md
-#$ - site-src/blog/2021/introducing-v1beta1.md
+#$ - guides/getting-started/simple-gateway.md
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:

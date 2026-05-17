@@ -1,5 +1,5 @@
 #$ Used in:
-#$ - site-src/guides/multiple-ns.md
+#$ - guides/user-guides/multiple-ns.md
 apiVersion: v1
 kind: Namespace
 metadata:

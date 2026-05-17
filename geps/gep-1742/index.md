@@ -447,7 +447,7 @@ type Duration string
 ### YAML
 
 ```yaml
-apiVersion: gateway.networking.k8s.io/v1beta1
+apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
   name: timeout-example

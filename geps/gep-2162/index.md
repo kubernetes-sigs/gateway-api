@@ -85,7 +85,7 @@ For Extended/Implementation-specific features we have the supported features nam
 An example of a GatewayClass Status with the SupportedFeatures reported would look like:
 
 ```yaml
-apiVersion: gateway.networking.k8s.io/v1beta1
+apiVersion: gateway.networking.k8s.io/v1
 kind: GatewayClass
 ...
 status:

@@ -1,5 +1,5 @@
 #$ Used in:
-#$ - site-src/guides/http-redirect-rewrite.md
+#$ - guides/user-guides/http-redirect-rewrite.md
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:

@@ -1,5 +1,5 @@
 #$ Used in:
-#$ - site-src/guides/multiple-ns.md
+#$ - guides/user-guides/multiple-ns.md
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
