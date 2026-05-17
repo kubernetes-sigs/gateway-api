@@ -1,4 +1,6 @@
-# GEP-735: TCP and UDP addresses matching
+---
+title: "GEP-735: TCP and UDP addresses matching"
+---
 
 * Issue: [#735](https://github.com/kubernetes-sigs/gateway-api/issues/735)
 * Status: Declined

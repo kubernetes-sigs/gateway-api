@@ -43,10 +43,10 @@ metadata:
   name: test
 `,
 		expected: []unstructured.Unstructured{{
-			Object: map[string]interface{}{
+			Object: map[string]any{
 				"apiVersion": "v1",
 				"kind":       "Namespace",
-				"metadata": map[string]interface{}{
+				"metadata": map[string]any{
 					"name": "test",
 				},
 			},
@@ -65,12 +65,12 @@ metadata:
   name: test
 `,
 		expected: []unstructured.Unstructured{{
-			Object: map[string]interface{}{
+			Object: map[string]any{
 				"apiVersion": "v1",
 				"kind":       "Namespace",
-				"metadata": map[string]interface{}{
+				"metadata": map[string]any{
 					"name": "test",
-					"labels": map[string]interface{}{
+					"labels": map[string]any{
 						"test": "false",
 					},
 				},
@@ -92,12 +92,12 @@ metadata:
     test: 'false'
 `,
 		expected: []unstructured.Unstructured{{
-			Object: map[string]interface{}{
+			Object: map[string]any{
 				"apiVersion": "v1",
 				"kind":       "Namespace",
-				"metadata": map[string]interface{}{
+				"metadata": map[string]any{
 					"name": "test",
-					"labels": map[string]interface{}{
+					"labels": map[string]any{
 						"test": "true",
 					},
 				},
@@ -122,21 +122,21 @@ spec:
           from: Same
 `,
 		expected: []unstructured.Unstructured{{
-			Object: map[string]interface{}{
+			Object: map[string]any{
 				"apiVersion": "gateway.networking.k8s.io/v1",
 				"kind":       "Gateway",
-				"metadata": map[string]interface{}{
+				"metadata": map[string]any{
 					"name": "test",
 				},
-				"spec": map[string]interface{}{
+				"spec": map[string]any{
 					"gatewayClassName": "test-class",
-					"listeners": []interface{}{
-						map[string]interface{}{
+					"listeners": []any{
+						map[string]any{
 							"name":     "http",
 							"port":     int64(80),
 							"protocol": "HTTP",
-							"allowedRoutes": map[string]interface{}{
-								"namespaces": map[string]interface{}{
+							"allowedRoutes": map[string]any{
+								"namespaces": map[string]any{
 									"from": "Same",
 								},
 							},
@@ -157,13 +157,13 @@ spec:
   controllerName: {GATEWAY_CONTROLLER_NAME}
 `,
 		expected: []unstructured.Unstructured{{
-			Object: map[string]interface{}{
+			Object: map[string]any{
 				"apiVersion": "gateway.networking.k8s.io/v1",
 				"kind":       "GatewayClass",
-				"metadata": map[string]interface{}{
+				"metadata": map[string]any{
 					"name": "test",
 				},
-				"spec": map[string]interface{}{
+				"spec": map[string]any{
 					"controllerName": "test-controller",
 				},
 			},

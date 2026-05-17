@@ -1,0 +1,103 @@
+#!/bin/bash
+
+# Copyright The Kubernetes Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+set -o errexit
+set -o nounset
+set -o pipefail
+
+GOPATH=${GOPATH:-$(go env GOPATH)}
+
+# "go env" doesn't print anything if GOBIN is the default, so we
+# have to manually default it.
+GOBIN=${GOBIN:-$(go env GOBIN)}
+GOBIN=${GOBIN:-${GOPATH}/bin}
+REMOTE=${REMOTE:-origin}
+
+readonly GOTOOL="go tool"
+
+echo $GOBIN
+
+go install github.com/elastic/crd-ref-docs
+declare -a arr=(
+    "release-1.4"
+    "release-1.5"
+    "main"
+)
+
+mkdir -p ${PWD}/tmp
+
+weight_spec=10
+weight_specx=20
+link_title_spec="Standard"
+link_title_specx="Experimental"
+
+for i in "${arr[@]}"; do
+    tmpdir=$(mktemp -d --tmpdir=${PWD}/tmp)
+
+    git fetch "${REMOTE}" "${i}" || {
+        echo "Branch ${i} not found on ${REMOTE}. Try: REMOTE=upstream $0"
+        exit 1
+    }
+    git archive --format=tar FETCH_HEAD apis apisx | tar -x -C "${tmpdir}"
+
+    # Start removing any "release-" prefix from docpath
+    docpath=${i#"release-"}
+    
+    if [ "$docpath" == "main" ]; then
+        weight=1
+        title="Development"
+    else
+        minor=$(echo $docpath | cut -d. -f2)
+        weight=$((90 - minor * 10))
+        title="v${docpath}"
+    fi
+
+    mkdir -p "${PWD}/site/content/en/reference/api-spec/${docpath}"
+
+    cat <<EOF > "${PWD}/site/content/en/reference/api-spec/${docpath}/_index.md"
+---
+title: "${title}"
+weight: ${weight}
+---
+EOF
+
+    $GOTOOL crd-ref-docs \
+        --source-path=${tmpdir}/apis \
+        --config=crd-ref-docs.yaml \
+        --templates-dir=${PWD}/hack/crd-ref-templates/ \
+        --renderer=markdown \
+        --output-path=${PWD}/site/content/en/reference/api-spec/${docpath}/spec.md
+
+    $GOTOOL crd-ref-docs \
+        --source-path=${tmpdir}/apisx \
+        --config=crd-ref-docs.yaml \
+        --templates-dir=${PWD}/hack/crd-ref-templates/ \
+        --renderer=markdown \
+        --output-path=${PWD}/site/content/en/reference/api-spec/${docpath}/specx.md
+
+    # Replace the weight placeholder in the generated files
+    sed -i.bak "s/WEIGHT_PLACEHOLDER/${weight_spec}/g" "${PWD}/site/content/en/reference/api-spec/${docpath}/spec.md"
+    sed -i.bak "s/WEIGHT_PLACEHOLDER/${weight_specx}/g" "${PWD}/site/content/en/reference/api-spec/${docpath}/specx.md"
+    sed -i.bak "s/LINK_TITLE_PLACEHOLDER/${link_title_spec}/g" "${PWD}/site/content/en/reference/api-spec/${docpath}/spec.md"
+    sed -i.bak "s/LINK_TITLE_PLACEHOLDER/${link_title_specx}/g" "${PWD}/site/content/en/reference/api-spec/${docpath}/specx.md"
+    
+    # Strip gateway:util:excludeFromCRD tags
+    sed -i.bak -E "s/<\/?gateway:util:excludeFromCRD>//g" "${PWD}/site/content/en/reference/api-spec/${docpath}/spec.md"
+    sed -i.bak -E "s/<\/?gateway:util:excludeFromCRD>//g" "${PWD}/site/content/en/reference/api-spec/${docpath}/specx.md"
+    
+    rm -f "${PWD}/site/content/en/reference/api-spec/${docpath}/spec.md.bak" "${PWD}/site/content/en/reference/api-spec/${docpath}/specx.md.bak"
+
+done

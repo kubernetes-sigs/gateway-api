@@ -42,6 +42,7 @@ var templateFile embed.FS
 var (
 	GEPSDir       string
 	SkipGEPNumber string
+	OutDir        string
 )
 
 // Those are the GEPs that will be included in the final navigation bar
@@ -59,6 +60,7 @@ type GEPArray []GEPs
 
 type GEPs struct {
 	GepType     string
+	Weight      int
 	GepsDetails []*gep.GEPDetail
 }
 
@@ -67,6 +69,7 @@ const kindDetails = "GEPDetails"
 func main() {
 	flag.StringVar(&GEPSDir, "g", "", "Defines the absolute path of the directory containing the GEPs")
 	flag.StringVar(&SkipGEPNumber, "s", "696", "Defines GEPs number to be skipped, should be comma-separated")
+	flag.StringVar(&OutDir, "o", "", "Defines the absolute path of the output directory (e.g., site/content/en/geps/list)")
 
 	flag.Parse()
 
@@ -76,6 +79,24 @@ func main() {
 
 	if strings.Contains(SkipGEPNumber, " ") {
 		log.Fatal("-s flag should not contain spaces")
+	}
+
+	if OutDir == "" {
+		OutDir = filepath.Join(GEPSDir, "list")
+	}
+
+	listDir := OutDir
+	byStateDir := filepath.Join(filepath.Dir(OutDir), "by-state")
+	if filepath.Base(OutDir) != "list" && filepath.Base(OutDir) != "landing" {
+		listDir = filepath.Join(OutDir, "list")
+		byStateDir = filepath.Join(OutDir, "by-state")
+	}
+
+	if err := os.MkdirAll(listDir, 0o755); err != nil {
+		log.Fatalf("error creating list directory: %s", err)
+	}
+	if err := os.MkdirAll(byStateDir, 0o755); err != nil {
+		log.Fatalf("error creating by-state directory: %s", err)
 	}
 
 	skipGep := strings.Split(SkipGEPNumber, ",")
@@ -90,9 +111,17 @@ func main() {
 		log.Fatalf("error walking GEPs: %s", err)
 	}
 
+	tmplTab, err := template.ParseFS(templateFile, "templates/template-tab.tmpl")
+	if err != nil {
+		log.Fatalf("error reading mkdocs template: %s", err)
+	}
+
 	for _, gep := range geps {
 		buf := &bytes.Buffer{}
-		fileName := fmt.Sprintf("%s/landing/%s.md", GEPSDir, strings.ToLower(gep.GepType))
+		fileName := filepath.Join(byStateDir, fmt.Sprintf("%s.md", strings.ToLower(gep.GepType)))
+
+		addFrontMatter(buf, gep.GepType, gep.Weight)
+
 		if errTmpl := tmpl.Execute(buf, gep); errTmpl != nil {
 			log.Fatalf("error rendering template: %s", errTmpl)
 		}
@@ -102,12 +131,11 @@ func main() {
 		}
 	}
 
-	tmplTab, err := template.ParseFS(templateFile, "templates/template-tab.tmpl")
-	if err != nil {
-		log.Fatalf("error reading mkdocs template: %s", err)
-	}
 	buf := &bytes.Buffer{}
-	fileName := fmt.Sprintf("%s/landing/tab.md", GEPSDir)
+	fileName := filepath.Join(listDir, "_index.md")
+
+	addFrontMatter(buf, "GEPs List", 2)
+
 	if err := tmplTab.Execute(buf, geps); err != nil {
 		log.Fatalf("error rendering template: %s", err)
 	}
@@ -152,7 +180,16 @@ func walkGEPs(dir string, skipGEPs []string) (GEPArray, error) {
 		}
 
 		// Skip the GEPs types we don't care
-		if !slices.Contains(includeGEPStatus, gepDetail.Status) {
+		var gepWeight int
+		found := false
+		for i, s := range includeGEPStatus {
+			if s == gepDetail.Status {
+				gepWeight = i + 1
+				found = true
+				break
+			}
+		}
+		if !found {
 			return nil
 		}
 
@@ -167,6 +204,7 @@ func walkGEPs(dir string, skipGEPs []string) (GEPArray, error) {
 		if !ok {
 			tmpMap[gepDetail.Status] = GEPs{
 				GepType:     string(gepDetail.Status),
+				Weight:      gepWeight,
 				GepsDetails: make([]*gep.GEPDetail, 0),
 			}
 		}
@@ -181,8 +219,8 @@ func walkGEPs(dir string, skipGEPs []string) (GEPArray, error) {
 	}
 
 	// Include the GEPs toc on the desired order
-	for _, v := range includeGEPStatus {
-		if geps, ok := tmpMap[v]; ok {
+	for _, s := range includeGEPStatus {
+		if geps, ok := tmpMap[s]; ok {
 			gepArray = append(gepArray, geps)
 		}
 	}
@@ -194,4 +232,13 @@ func walkGEPs(dir string, skipGEPs []string) (GEPArray, error) {
 	}
 
 	return gepArray, nil
+}
+
+func addFrontMatter(buf *bytes.Buffer, title string, weight int) {
+	buf.WriteString("---\n")
+	fmt.Fprintf(buf, "title: %q\n", title)
+	if weight > 0 {
+		fmt.Fprintf(buf, "weight: %d\n", weight)
+	}
+	buf.WriteString("---\n\n")
 }

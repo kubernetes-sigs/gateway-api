@@ -1,4 +1,6 @@
-# GEP-1282: Describing Backend Properties
+---
+title: "GEP-1282: Describing Backend Properties"
+---
 
 * Issue: [#1282](https://github.com/kubernetes-sigs/gateway-api/issues/1282)
 * Status: Declined

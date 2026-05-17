@@ -26,7 +26,6 @@ import (
 
 	"github.com/stretchr/testify/require"
 	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/utils/ptr"
 
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
@@ -84,7 +83,7 @@ var HTTPRouteRequestPercentageMirror = confsuite.ConformanceTest{
 							Name:      confsuite.InfraBackendServiceNameV2,
 							Namespace: ns,
 						},
-						Percent: ptr.To(int32(20)),
+						Percent: new(int32(20)),
 					},
 				},
 			}, {
@@ -102,7 +101,7 @@ var HTTPRouteRequestPercentageMirror = confsuite.ConformanceTest{
 							Name:      confsuite.InfraBackendServiceNameV2,
 							Namespace: ns,
 						},
-						Percent: ptr.To(int32(50)),
+						Percent: new(int32(50)),
 					},
 				},
 			}, {
@@ -132,7 +131,7 @@ var HTTPRouteRequestPercentageMirror = confsuite.ConformanceTest{
 							Name:      confsuite.InfraBackendServiceNameV2,
 							Namespace: ns,
 						},
-						Percent: ptr.To(int32(35)),
+						Percent: new(int32(35)),
 					},
 				},
 			},
@@ -151,9 +150,9 @@ var HTTPRouteRequestPercentageMirror = confsuite.ConformanceTest{
 				semaphore := make(chan struct{}, concurrentRequests)
 				var wg sync.WaitGroup
 
-				for k := 0; k < numDistributionChecks; k++ {
+				for k := range numDistributionChecks {
 					timeNow := time.Now()
-					for j := 0; j < totalRequests; j++ {
+					for range int(totalRequests) {
 						wg.Add(1)
 						semaphore <- struct{}{}
 						go func(t *testing.T, r roundtripper.RoundTripper, timeoutConfig config.TimeoutConfig, gwAddr string, expected http.ExpectedResponse) {

@@ -60,7 +60,8 @@ GATEWAY_INPUT_DIRS_COMMA="${GATEWAY_INPUT_DIRS_COMMA%,}" # drop trailing comma
 GATEWAY_API_DIRS_COMMA="${GATEWAY_API_DIRS_COMMA%,}" # drop trailing comma
 
 # throw away
-new_report="$(mktemp -t "$(basename "$0").api_violations.XXXXXX")"
+new_report="$(mktemp "${SCRIPT_ROOT}/.api_violations.XXXXXX")"
+trap 'rm -f "${new_report}"' EXIT
 
 echo "Generating openapi schema"
 $GOTOOL k8s.io/kube-openapi/cmd/openapi-gen \

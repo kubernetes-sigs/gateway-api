@@ -93,11 +93,11 @@ func TestGRPCRouteFilter(t *testing.T) {
 			routeFilter: gatewayv1.GRPCRouteFilter{
 				Type: gatewayv1.GRPCRouteFilterRequestMirror,
 				RequestMirror: &gatewayv1.HTTPRequestMirrorFilter{BackendRef: gatewayv1.BackendObjectReference{
-					Group:     ptrTo(gatewayv1.Group("group")),
-					Kind:      ptrTo(gatewayv1.Kind("kind")),
+					Group:     new(gatewayv1.Group("group")),
+					Kind:      new(gatewayv1.Kind("kind")),
 					Name:      "name",
-					Namespace: ptrTo(gatewayv1.Namespace("ns")),
-					Port:      ptrTo(gatewayv1.PortNumber(22)),
+					Namespace: new(gatewayv1.Namespace("ns")),
+					Port:      new(gatewayv1.PortNumber(22)),
 				}},
 			},
 		},
@@ -175,8 +175,8 @@ func TestGRPCRouteRule(t *testing.T) {
 					Matches: []gatewayv1.GRPCRouteMatch{
 						{
 							Method: &gatewayv1.GRPCMethodMatch{
-								Type:    ptrTo(gatewayv1.GRPCMethodMatchType("Exact")),
-								Service: ptrTo("helloworld.Greeter"),
+								Type:    new(gatewayv1.GRPCMethodMatchType("Exact")),
+								Service: new("helloworld.Greeter"),
 							},
 						},
 					},
@@ -185,9 +185,9 @@ func TestGRPCRouteRule(t *testing.T) {
 							BackendRef: gatewayv1.BackendRef{
 								BackendObjectReference: gatewayv1.BackendObjectReference{
 									Name: testService,
-									Port: ptrTo(gatewayv1.PortNumber(8080)),
+									Port: new(gatewayv1.PortNumber(8080)),
 								},
-								Weight: ptrTo(int32(100)),
+								Weight: new(int32(100)),
 							},
 						},
 					},
@@ -201,8 +201,8 @@ func TestGRPCRouteRule(t *testing.T) {
 					Matches: []gatewayv1.GRPCRouteMatch{
 						{
 							Method: &gatewayv1.GRPCMethodMatch{
-								Type:   ptrTo(gatewayv1.GRPCMethodMatchType("Exact")),
-								Method: ptrTo("SayHello"),
+								Type:   new(gatewayv1.GRPCMethodMatchType("Exact")),
+								Method: new("SayHello"),
 							},
 						},
 					},
@@ -211,9 +211,9 @@ func TestGRPCRouteRule(t *testing.T) {
 							BackendRef: gatewayv1.BackendRef{
 								BackendObjectReference: gatewayv1.BackendObjectReference{
 									Name: testService,
-									Port: ptrTo(gatewayv1.PortNumber(8080)),
+									Port: new(gatewayv1.PortNumber(8080)),
 								},
-								Weight: ptrTo(int32(100)),
+								Weight: new(int32(100)),
 							},
 						},
 					},
@@ -228,8 +228,8 @@ func TestGRPCRouteRule(t *testing.T) {
 					Matches: []gatewayv1.GRPCRouteMatch{
 						{
 							Method: &gatewayv1.GRPCMethodMatch{
-								Type:    ptrTo(gatewayv1.GRPCMethodMatchType("Exact")),
-								Service: ptrTo("helloworld.Greeter"),
+								Type:    new(gatewayv1.GRPCMethodMatchType("Exact")),
+								Service: new("helloworld.Greeter"),
 							},
 						},
 					},
@@ -289,15 +289,15 @@ func TestGRPCRouteRule(t *testing.T) {
 				match := gatewayv1.GRPCRouteMatch{
 					Headers: []gatewayv1.GRPCHeaderMatch{
 						{
-							Type:  ptrTo(gatewayv1.GRPCHeaderMatchExact),
+							Type:  new(gatewayv1.GRPCHeaderMatchExact),
 							Name:  "version",
 							Value: "v1",
 						},
 					},
 					Method: &gatewayv1.GRPCMethodMatch{
-						Type:    ptrTo(gatewayv1.GRPCMethodMatchExact),
-						Service: ptrTo("foo"),
-						Method:  ptrTo("bar"),
+						Type:    new(gatewayv1.GRPCMethodMatchExact),
+						Service: new("foo"),
+						Method:  new("bar"),
 					},
 				}
 
@@ -319,15 +319,15 @@ func TestGRPCRouteRule(t *testing.T) {
 				match := gatewayv1.GRPCRouteMatch{
 					Headers: []gatewayv1.GRPCHeaderMatch{
 						{
-							Type:  ptrTo(gatewayv1.GRPCHeaderMatchExact),
+							Type:  new(gatewayv1.GRPCHeaderMatchExact),
 							Name:  "version",
 							Value: "v1",
 						},
 					},
 					Method: &gatewayv1.GRPCMethodMatch{
-						Type:    ptrTo(gatewayv1.GRPCMethodMatchExact),
-						Service: ptrTo("foo"),
-						Method:  ptrTo("bar"),
+						Type:    new(gatewayv1.GRPCMethodMatchExact),
+						Service: new("foo"),
+						Method:  new("bar"),
 					},
 				}
 
@@ -366,13 +366,13 @@ func TestGRPCMethodMatch(t *testing.T) {
 		{
 			name: "valid GRPCRoute with 1 service in GRPCMethodMatch field",
 			method: gatewayv1.GRPCMethodMatch{
-				Service: ptrTo("foo.Test.Example"),
+				Service: new("foo.Test.Example"),
 			},
 		},
 		{
 			name: "valid GRPCRoute with 1 method in GRPCMethodMatch field",
 			method: gatewayv1.GRPCMethodMatch{
-				Method: ptrTo("Login"),
+				Method: new("Login"),
 			},
 		},
 		{
@@ -386,63 +386,63 @@ func TestGRPCMethodMatch(t *testing.T) {
 		{
 			name: "GRPCRoute uses regex in service and method with undefined match type",
 			method: gatewayv1.GRPCMethodMatch{
-				Service: ptrTo(".*"),
-				Method:  ptrTo(".*"),
+				Service: new(".*"),
+				Method:  new(".*"),
 			},
 			wantErrors: []string{"service must only contain valid characters (matching ^(?i)\\.?[a-z_][a-z_0-9]*(\\.[a-z_][a-z_0-9]*)*$)", "method must only contain valid characters (matching ^[A-Za-z_][A-Za-z_0-9]*$)"},
 		},
 		{
 			name: "GRPCRoute uses regex in service and method with match type Exact",
 			method: gatewayv1.GRPCMethodMatch{
-				Type:    ptrTo(gatewayv1.GRPCMethodMatchExact),
-				Service: ptrTo(".*"),
-				Method:  ptrTo(".*"),
+				Type:    new(gatewayv1.GRPCMethodMatchExact),
+				Service: new(".*"),
+				Method:  new(".*"),
 			},
 			wantErrors: []string{"service must only contain valid characters (matching ^(?i)\\.?[a-z_][a-z_0-9]*(\\.[a-z_][a-z_0-9]*)*$)", "method must only contain valid characters (matching ^[A-Za-z_][A-Za-z_0-9]*$)"},
 		},
 		{
 			name: "GRPCRoute uses regex in method with undefined match type",
 			method: gatewayv1.GRPCMethodMatch{
-				Method: ptrTo(".*"),
+				Method: new(".*"),
 			},
 			wantErrors: []string{"method must only contain valid characters (matching ^[A-Za-z_][A-Za-z_0-9]*$)"},
 		},
 		{
 			name: "GRPCRoute uses regex in service with match type Exact",
 			method: gatewayv1.GRPCMethodMatch{
-				Type:    ptrTo(gatewayv1.GRPCMethodMatchExact),
-				Service: ptrTo(".*"),
+				Type:    new(gatewayv1.GRPCMethodMatchExact),
+				Service: new(".*"),
 			},
 			wantErrors: []string{"service must only contain valid characters (matching ^(?i)\\.?[a-z_][a-z_0-9]*(\\.[a-z_][a-z_0-9]*)*$)"},
 		},
 		{
 			name: "GRPCRoute uses regex in service and method with match type RegularExpression",
 			method: gatewayv1.GRPCMethodMatch{
-				Type:    ptrTo(gatewayv1.GRPCMethodMatchRegularExpression),
-				Service: ptrTo(".*"),
-				Method:  ptrTo(".*"),
+				Type:    new(gatewayv1.GRPCMethodMatchRegularExpression),
+				Service: new(".*"),
+				Method:  new(".*"),
 			},
 		},
 		{
 			name: "GRPCRoute uses valid service and method with undefined match type",
 			method: gatewayv1.GRPCMethodMatch{
-				Service: ptrTo("foo.Test.Example"),
-				Method:  ptrTo("Login"),
+				Service: new("foo.Test.Example"),
+				Method:  new("Login"),
 			},
 		},
 		{
 			name: "GRPCRoute uses valid service and method with match type Exact",
 			method: gatewayv1.GRPCMethodMatch{
-				Type:    ptrTo(gatewayv1.GRPCMethodMatchExact),
-				Service: ptrTo("foo.Test.Example"),
-				Method:  ptrTo("Login"),
+				Type:    new(gatewayv1.GRPCMethodMatchExact),
+				Service: new("foo.Test.Example"),
+				Method:  new("Login"),
 			},
 		},
 		{
 			name: "GRPCRoute uses a valid service with a leading dot when match type is Exact",
 			method: gatewayv1.GRPCMethodMatch{
-				Type:    ptrTo(gatewayv1.GRPCMethodMatchExact),
-				Service: ptrTo(".foo.Test.Example"),
+				Type:    new(gatewayv1.GRPCMethodMatchExact),
+				Service: new(".foo.Test.Example"),
 			},
 		},
 	}

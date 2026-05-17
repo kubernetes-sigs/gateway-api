@@ -1,4 +1,6 @@
-# GEP-1762: In Cluster Gateway Deployments
+---
+title: "GEP-1762: In Cluster Gateway Deployments"
+---
 
 * Status: Standard
 

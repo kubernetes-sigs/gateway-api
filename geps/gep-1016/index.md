@@ -1,4 +1,6 @@
-# GEP-1016: GRPCRoute
+---
+title: "GEP-1016: GRPCRoute"
+---
 
 * Issue: [#1016](https://github.com/kubernetes-sigs/gateway-api/issues/1016)
 * Status: Standard
@@ -7,7 +9,7 @@
 > our GEP overview as it existed before those rules did, and so it has been
 > explicitly grandfathered in.
 
-[expprob]:../overview.md#probationary-period
+[expprob]:/geps/overview/#probationary-period
 
 ## Goal
 

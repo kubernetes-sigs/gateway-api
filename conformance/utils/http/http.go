@@ -316,10 +316,8 @@ func WaitForConsistentFailureResponse(t *testing.T, r roundtripper.RoundTripper,
 
 func CompareRoundTrip(t *testing.T, req *roundtripper.Request, cReq *roundtripper.CapturedRequest, cRes *roundtripper.CapturedResponse, expected ExpectedResponse) error {
 	if roundtripper.IsTimeoutError(cRes.StatusCode) {
-		for _, statusCode := range expected.Response.StatusCodes {
-			if roundtripper.IsTimeoutError(statusCode) {
-				return nil
-			}
+		if slices.ContainsFunc(expected.Response.StatusCodes, roundtripper.IsTimeoutError) {
+			return nil
 		}
 	}
 	if !slices.Contains(expected.Response.StatusCodes, cRes.StatusCode) {

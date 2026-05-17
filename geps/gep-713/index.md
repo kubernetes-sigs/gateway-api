@@ -1,4 +1,6 @@
-# GEP-713: Metaresources and Policy Attachment
+---
+title: "GEP-713: Metaresources and Policy Attachment"
+---
 
 * Issue: [#713](https://github.com/kubernetes-sigs/gateway-api/issues/713)
 * Status: Memorandum
@@ -51,7 +53,7 @@ After multiple iterations of Gateway API experimenting with policies—whether t
 
 ### User stories
 
-- [Ana](../../concepts/roles-and-personas.md#ana) or [Chihiro](../../concepts/roles-and-personas.md#chihiro) would like to specify some new behavior for a standard Kubernetes resource, but that resource doesn't have a way to specify the behavior and neither Ana nor Chihiro can modify it.
+- [Ana](/docs/concepts/roles-and-personas.md#ana) or [Chihiro](/docs/concepts/roles-and-personas.md#chihiro) would like to specify some new behavior for a standard Kubernetes resource, but that resource doesn't have a way to specify the behavior and neither Ana nor Chihiro can modify it.
   E.g., Ana may want to add a rate limit to a Kubernetes Service. The Service object itself doesn't have a field for rate limiting, and Ana can't modify the Service object's definition.
 
 - A Gateway API implementer would like to define some implementation-specific behaviors for Gateway API objects that are already standard.
@@ -333,12 +335,15 @@ spec:
 
 Policies can opt for allowing instances to target objects across Kubernetes namespaces, in which case an optional `namespace` field MUST be defined with the target reference.
 
-!!! warning
-    Although not strictly forbidden, this is in general discouraged due to [discoverability](#policy-discoverability) issues and security implications. Cross namespace references can often lead to escalation of privileges associated with the [Confused deputy problem](https://en.wikipedia.org/wiki/Confused_deputy_problem).
+{{% alert color="warning" %}}
+
+Although not strictly forbidden, this is in general discouraged due to [discoverability](#policy-discoverability) issues and security implications. Cross namespace references can often lead to escalation of privileges associated with the [Confused deputy problem](https://en.wikipedia.org/wiki/Confused_deputy_problem).
+
+{{% /alert %}}
 
 Implementations that opt for designing policies that allow for cross namespace references MUST support one of the following combined approaches, to address the security concern:
 
-- The policy is paired with [ReferenceGrants](https://gateway-api.sigs.k8s.io/api-types/referencegrant/?h=referencegrant) or some other form of equivalent handshake that ensures that the target is accepting the policy.
+- The policy is paired with [ReferenceGrants](/reference/api-types/referencegrant/) or some other form of equivalent handshake that ensures that the target is accepting the policy.
 - The policy applied is client-side and does not grant the client any additional access or permissions than it would otherwise have.
 
 <details>

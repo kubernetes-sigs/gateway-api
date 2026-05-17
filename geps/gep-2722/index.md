@@ -1,4 +1,6 @@
-# GEP-2722: Goals and UX for gwctl
+---
+title: "GEP-2722: Goals and UX for gwctl"
+---
 
 * Issue: [#2722](https://github.com/kubernetes-sigs/gateway-api/issues/2722)
 * Status: Memorandum
@@ -387,7 +389,7 @@ distribution mechanisms will be provided:
   for visualizing data and presenting information in a visually appealing
   manner.
 * Evaluate how gwctl can be extended to support [Mesh use
-  cases](../../mesh/index.md)
+  cases](/docs/mesh/mesh-overview)
 
 ## References
 

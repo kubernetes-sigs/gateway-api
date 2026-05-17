@@ -1,4 +1,6 @@
-# GEP-1897: BackendTLSPolicy - Explicit Backend TLS Connection Configuration
+---
+title: "GEP-1897: BackendTLSPolicy - Explicit Backend TLS Connection Configuration"
+---
 
 * Issue: [#1897](https://github.com/kubernetes-sigs/gateway-api/issues/1897)
 * Status: Standard
@@ -143,7 +145,7 @@ This GEP is the outcome of the TLS use case #4 in
 
 ## BackendTLSPolicy is a union feature
 
-BackendTLSPolicy complies with the definition of [Union feature](../../site-src/guides/implementers.md#union-feature-conformance).
+BackendTLSPolicy complies with the definition of [Union feature](/guides/implementers-guide/#union-feature-conformance).
 This means that this feature is used in combination with other features. Some examples:
 
 * An implementation that claims support for `GRPCRoute` and `BackendTLSPolicy` MUST support 
@@ -673,7 +675,7 @@ Extended support level (HTTPRoute → Service referenced in backendRefs) is cove
 
 In order to scope this GEP, some changes are deferred to a near-future GEP.
 This GEP intends to add the ability for additional control by gateway clients to override TLS settings, following previously
-established patterns of [consumer and producer policies](../../concepts/glossary.md#producer-route).
+established patterns of [consumer and producer policies](/docs/glossary/#producer-route).
 Additionally, more contextual control over when to apply the policies will be explored, to enable use cases like "apply
 TLS only from this route" ([issue](https://github.com/kubernetes-sigs/gateway-api/issues/3856)).
 
@@ -837,9 +839,9 @@ of the first standard Policy type.
 
 [Gateway API TLS Use Cases](https://docs.google.com/document/d/17sctu2uMJtHmJTGtBi_awGB0YzoCLodtR6rUNmKMCs8/edit#heading=h.cxuq8vo8pcxm)
 
-[GEP-713: Metaresources and PolicyAttachment](../gep-713/index.md)
+[GEP-713: Metaresources and PolicyAttachment](/geps/gep-713/)
 
-[Gateway API TLS](../../guides/tls.md)
+[Gateway API TLS](/guides/user-guides/tls)
 
 [SIG-NET Gateway API: TLS to the K8s.Service/Backend](https://docs.google.com/document/d/1RTYh2brg_vLX9o3pTcrWxtZSsf8Y5NQvIG52lpFcZlo)
 

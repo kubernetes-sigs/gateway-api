@@ -1,0 +1,14 @@
+{{ $color := .Get "color" | default "primary" }}
+{{ $.Scratch.Set "title" (.Get "title") }}
+{{ if not ($.Scratch.Get "title") }}
+  {{ if eq $color "warning" }}
+    {{ $.Scratch.Set "title" "Warning" }}
+  {{ else if eq $color "primary" }}
+    {{ $.Scratch.Set "title" "Note" }}
+  {{ end }}
+{{ end }}
+{{ $title := $.Scratch.Get "title" }}
+<div class="alert alert-{{ $color }}" role="alert">
+  {{ with $title }}<h4 class="alert-heading">{{ . }}</h4>{{ end }}
+  {{ .Inner }}
+</div>

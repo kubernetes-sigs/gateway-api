@@ -1,9 +1,11 @@
-# GEP-1713: ListenerSets - Standard Mechanism to Merge Multiple Gateways
+---
+title: "GEP-1713: ListenerSets - Standard Mechanism to Merge Multiple Gateways"
+---
 
 * Issue: [#1713](https://github.com/kubernetes-sigs/gateway-api/issues/1713)
 * Status: Standard
 
-(See [status definitions](../overview.md#gep-states).)
+(See [status definitions](/geps/overview/#gep-states).)
 
 ## Introduction
 

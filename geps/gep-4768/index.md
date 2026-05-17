@@ -1,4 +1,6 @@
-# GEP: Standardized Telemetry API
+---
+title: "GEP: Standardized Telemetry API"
+---
 
 * Issue: #4768
 * Status: Provisional

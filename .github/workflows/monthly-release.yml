@@ -11,20 +11,23 @@ on:
         type: string
 
 permissions:
-  contents: write
-  id-token: write
-  pull-requests: read
+  contents: read
 
 jobs:
   create-monthly-release:
     name: Create Monthly Release
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+      pull-requests: read
     steps:
       - name: Checkout code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # tag=v6.0.2
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
+          persist-credentials: false
 
       - name: Set up Go
         uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # tag=v6.4.0
@@ -59,8 +62,9 @@ jobs:
       - name: Verify tag exists on remote and checkout
         env:
           TAG: ${{ steps.tag.outputs.tag }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git fetch --tags --force
+          git -c http.https://github.com/.extraheader="AUTHORIZATION: basic $(echo -n "x-access-token:${GITHUB_TOKEN}" | base64)" fetch --tags --force
           if ! git rev-parse "${TAG}" >/dev/null 2>&1; then
             echo "::error::Tag '${TAG}' not found after fetch. Create and push it to origin first (e.g. git tag ${TAG} && git push origin ${TAG}), then run this workflow."
             exit 1
@@ -89,12 +93,12 @@ jobs:
           YEAR=$(echo "$YEAR_MONTH" | cut -d- -f1)
           MONTH_NAME=$(date -d "${YEAR_MONTH}-01" +"%B")
 
-          git fetch --tags --force
+          git -c http.https://github.com/.extraheader="AUTHORIZATION: basic $(echo -n "x-access-token:${GITHUB_TOKEN}" | base64)" fetch --tags --force
 
           PREV_TAG=$(git tag -l "monthly-*" | sort -V | grep -B1 "^${TAG}$" | head -n1)
 
           if [ -z "$PREV_TAG" ] || [ "$PREV_TAG" == "$TAG" ]; then
-            START_SHA=$(git rev-list -n 1 --before="1 month" origin/main)
+            START_SHA=$(git -c http.https://github.com/.extraheader="AUTHORIZATION: basic $(echo -n "x-access-token:${GITHUB_TOKEN}" | base64)" rev-list -n 1 --before="1 month" origin/main)
           else
             START_SHA=$(git rev-parse "$PREV_TAG")
           fi

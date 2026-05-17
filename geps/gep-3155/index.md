@@ -1,4 +1,6 @@
-# GEP-3155: Complete Backend mutual TLS Configuration
+---
+title: "GEP-3155: Complete Backend mutual TLS Configuration"
+---
 
 * Issue: [#3155](https://github.com/kubernetes-sigs/gateway-api/issues/3155)
 * Status: Standard

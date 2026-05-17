@@ -1,9 +1,11 @@
-# GEP-1651: Gateway Routability
+---
+title: "GEP-1651: Gateway Routability"
+---
 
 * Issue: [#1651](https://github.com/kubernetes-sigs/gateway-api/issues/1651)
 * Status: Provisional
 
-(See [status definitions](../overview.md#gep-states).)
+(See [status definitions](/geps/overview/#gep-states).)
 
 ## TLDR
 

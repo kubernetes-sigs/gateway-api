@@ -7,6 +7,7 @@ updates:
     - "/conformance"
     - "/tests"
     - "/tools"
+    - "/site"
     schedule:
       interval: "weekly"
     groups:
@@ -59,21 +60,6 @@ updates:
       - ok-to-test
       - release-note-none
 
-  # Dependencies listed in requirements.txt
-  - package-ecosystem: "pip"
-    directory: "/hack/mkdocs/image"
-    schedule:
-      interval: "weekly"
-    groups:
-      mkdocs-deps:
-        patterns:
-          - "*"
-    labels:
-      - python
-      - dependencies
-      - ok-to-test
-      - release-note-none
-  
   #  Github actions updates
   - package-ecosystem: "github-actions"
     directory: "/"
@@ -83,4 +69,16 @@ updates:
       - "dependencies"
       - "release-note-none"
       - "ok-to-test"
+
+  # Dependencies listed in site/package.json
+  - package-ecosystem: "npm"
+    directory: "/site"
+    schedule:
+      interval: "weekly"
+    labels:
+      - javascript
+      - dependencies
+      - ok-to-test
+      - release-note-none
+
 

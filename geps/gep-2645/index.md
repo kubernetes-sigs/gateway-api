@@ -1,4 +1,6 @@
-# GEP-2645: UDPRoute
+---
+title: "GEP-2645: UDPRoute"
+---
 
 - Issue: [#2645](https://github.com/kubernetes-sigs/gateway-api/issues/2645)
 - Status: Provisional
@@ -405,9 +407,9 @@ Conformance Level: **Extended**
 
 ## References
 
-- [TCPRoute Specification](https://gateway-api.sigs.k8s.io/reference/spec/#tcproute)
+- [TCPRoute Specification](/docs/concepts/api-overview/#tcproute-and-udproute)
 - [GEP-735: TCP and UDP addresses matching](../gep-735/index.md) (Declined, but relevant context)
-- [Gateway API Use Cases](https://gateway-api.sigs.k8s.io/concepts/use-cases/)
+- [Gateway API Use Cases](/docs/concepts/use-cases/)
 
 ## Provisional TODOs
 

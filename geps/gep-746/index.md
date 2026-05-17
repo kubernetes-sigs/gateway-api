@@ -1,4 +1,6 @@
-# GEP-746: Replace Cert Refs on HTTPRoute with Cross Namespace Refs from Gateway
+---
+title: "GEP-746: Replace Cert Refs on HTTPRoute with Cross Namespace Refs from Gateway"
+---
 
 * Issue: [#746](https://github.com/kubernetes-sigs/gateway-api/issues/746)
 * Status: Standard

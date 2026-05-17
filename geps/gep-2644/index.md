@@ -1,4 +1,6 @@
-# GEP-2644: TCPRoute
+---
+title: "GEP-2644: TCPRoute"
+---
 
 - Issue: [#2644](https://github.com/kubernetes-sigs/gateway-api/issues/2644)
 - Status: Provisional
@@ -405,10 +407,10 @@ Conformance Level: **Extended**
 
 ## References
 
-- [UDPRoute Specification](https://gateway-api.sigs.k8s.io/reference/spec/#udproute)
-- [TLSRoute Specification](https://gateway-api.sigs.k8s.io/reference/spec/#tlsroute)
+- [UDPRoute Specification](/docs/concepts/api-overview/#tcproute-and-udproute)
+- [TLSRoute Specification](/reference/api-types/tlsroute/)
 - [GEP-735: TCP and UDP addresses matching](../gep-735/index.md) (Declined, but relevant context)
-- [Gateway API Use Cases](https://gateway-api.sigs.k8s.io/concepts/use-cases/)
+- [Gateway API Use Cases](/docs/concepts/use-cases/)
 
 ## Provisional TODOs
 
