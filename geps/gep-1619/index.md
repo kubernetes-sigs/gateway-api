@@ -487,21 +487,13 @@ type BackendLBPolicySpec struct {
     SessionPersistence *SessionPersistence `json:"sessionPersistence"`
 }
 
-// SessionPersistence defines the desired state of
-// SessionPersistence.
-// +kubebuilder:validation:XValidation:message="AbsoluteTimeout must be specified when cookie lifetimeType is Permanent",rule="!has(self.cookieConfig) || !has(self.cookieConfig.lifetimeType) || self.cookieConfig.lifetimeType != 'Permanent' || has(self.absoluteTimeout)"
+// SessionPersistence defines the desired state of SessionPersistence.
+// +kubebuilder:validation:XValidation:message="AbsoluteTimeout must be specified when cookie lifetimeType is Permanent",rule="!has(self.cookie) || !has(self.cookie.lifetimeType) || self.cookie.lifetimeType != 'Permanent' || has(self.absoluteTimeout)"
+// +kubebuilder:validation:XValidation:message="cookie must be nil if type is not Cookie",rule="!has(self.cookie) || self.type == 'Cookie'"
+// +kubebuilder:validation:XValidation:message="cookie must be specified for Cookie type",rule="self.type != 'Cookie' || has(self.cookie)"
+// +kubebuilder:validation:XValidation:message="header must be nil if type is not Header",rule="!has(self.header) || self.type == 'Header'"
+// +kubebuilder:validation:XValidation:message="header must be specified for Header type",rule="self.type != 'Header' || has(self.header)"
 type SessionPersistence struct {
-    // SessionName defines the name of the persistent session token
-    // which may be reflected in the cookie or the header. Users
-    // should avoid reusing session names to prevent unintended
-    // consequences, such as rejection or unpredictable behavior.
-    //
-    // Support: Implementation-specific
-    //
-    // +optional
-    // +kubebuilder:validation:MaxLength=128
-    SessionName *string `json:"sessionName,omitempty"`
-
     // AbsoluteTimeout defines the absolute timeout of the persistent
     // session. Once the AbsoluteTimeout duration has elapsed, the
     // session becomes invalid.
@@ -519,17 +511,26 @@ type SessionPersistence struct {
     //
     // Support: Extended for "Header" type
     //
+    // +unionDiscriminator
     // +optional
     // +kubebuilder:default=Cookie
     Type *SessionPersistenceType `json:"type,omitempty"`
 
-    // CookieConfig provides configuration settings that are specific
+    // Cookie provides configuration settings that are specific
     // to cookie-based session persistence.
     //
     // Support: Core
     //
     // +optional
-    CookieConfig *CookieConfig `json:"cookieConfig,omitempty"`
+    Cookie *CookieConfig `json:"cookie,omitempty"`
+
+    // Header provides configuration settings that are specific
+    // to header-based session persistence.
+    //
+    // Support: Extended
+    //
+    // +optional
+    Header *HeaderConfig `json:"header,omitempty"`
 }
 
 // Duration is a string value representing a duration in time. The format is as specified
@@ -557,6 +558,16 @@ const (
 
 // CookieConfig defines the configuration for cookie-based session persistence.
 type CookieConfig struct {
+    // Name defines the name of the cookie used for session persistence.
+    // If not specified, a unique cookie name will be generated.
+    // Users should avoid reusing cookie names to prevent unintended
+    // consequences, such as rejection or unpredictable behavior.
+    //
+    // Support: Extended
+    //
+    // +optional
+    Name *HeaderName `json:"name,omitempty"`
+
     // LifetimeType specifies whether the cookie has a permanent or
     // session-based lifetime. A permanent cookie persists until its
     // specified expiry time, defined by the Expires or Max-Age cookie
@@ -596,6 +607,18 @@ const (
     // Support: Extended
     PermanentCookieLifetimeType  CookieLifetimeType = "Permanent"
 )
+
+// HeaderConfig defines the configuration for header-based session persistence.
+type HeaderConfig struct {
+    // Name defines the name of the header used for session persistence.
+    // The client must include this header in subsequent requests to
+    // maintain the session.
+    //
+    // Support: Core
+    //
+    // +required
+    Name HeaderName `json:"name"`
+}
 ```
 
 ### Route Rule API
@@ -740,16 +763,22 @@ Let's discuss some of these cookie attributes in more detail.
 
 #### Name
 
-The `Name` cookie attribute MAY be configured via the `SessionName` field in `sessionPersistence`. However, this field
-is implementation-specific because it's impossible to create a conformance test for it, given that sessions could be
-created in a variety of ways. Additionally, `SessionName` is not universally supported as some implementations, such as
-ones supporting global load balancers, don't have the capability to configure the cookie name. Some implementations
-have a fixed cookie name, and therefore `SessionName` may be reflected in the value of the cookie.
+##### Cookie Name
 
-The use case for modifying the cookie name using `SessionName` is that certain users might need to align it with an
-existing cookie name, such as Java's `JSESSIONID`. Refer to [Session Initiation Guidelines](#session-initiation-guidelines)
-for details on how this GEP supports existing sessions. If `SessionName` is not specified, then a unique cookie name
-should be generated.
+The cookie name is configured via the `cookie.name` field (Extended support). Not all implementations support
+configuring the cookie name. For example, GKE's stateful generated cookie
+([GSSA](https://pkg.go.dev/github.com/GoogleCloudPlatform/gke-gateway-api/apis/networking/v1)) uses a fixed cookie
+name that cannot be changed by the user. If `cookie.name` is not specified, a unique cookie name will be generated.
+
+The use case for configuring the cookie name is that certain users might need to align it with an existing cookie name,
+such as Java's `JSESSIONID`. Refer to [Session Initiation Guidelines](#session-initiation-guidelines) for details on
+how this GEP supports existing sessions.
+
+##### Header Name
+
+The header name is configured via the `header.name` field (Core support). Unlike cookies, headers are not automatically
+managed by browsers, so clients must know the header name to include it in subsequent requests. For this reason,
+`header.name` is a required field.
 
 #### Expires / Max-Age
 
@@ -920,8 +949,9 @@ spec:
     kind: Service
     Name: servicev1
   sessionPersistence:
-    sessionName: service-cookie
     type: Cookie
+    cookie:
+      name: service-cookie
 ```
 
 Route rules referencing the same service MUST NOT share persistent sessions (i.e. the same cookie), even if the session persistence is attached to the service via `BackendLBPolicy`, and each route rule should have different persistent sessions.
@@ -932,7 +962,7 @@ Route rules referencing the same service MUST NOT share persistent sessions (i.e
 #### Session Naming Collision
 
 Consider the situation in which two different services have cookie-based session persistence configured with the
-same `sessionName`:
+same cookie name:
 
 ```yaml
 kind: HTTPRoute
@@ -954,8 +984,9 @@ spec:
     kind: Service
     Name: servicev1
   sessionPersistence:
-    sessionName: split-route-cookie
     type: Cookie
+    cookie:
+      name: split-route-cookie
 ---
 kind: BackendLBPolicy
 metadata:
@@ -965,8 +996,9 @@ spec:
     kind: Service
     Name: servicev2
   sessionPersistence:
-    sessionName: split-route-cookie
     type: Cookie
+    cookie:
+      name: split-route-cookie
 ```
 
 This is an invalid configuration as two separate sessions cannot have the same cookie name. Implementations SHOULD
@@ -989,8 +1021,9 @@ spec:
     - name: servicev2
       weight: 50
     sessionPersistence:
-      sessionName: split-route-cookie
       type: Cookie
+      cookie:
+        name: split-route-cookie
 ```
 
 In this scenario, session persistence is enabled at route rule level and all services in the traffic split have persistent session.
@@ -1024,8 +1057,9 @@ spec:
     kind: Service
     Name: servicev1
   sessionPersistence:
-    sessionName: split-route-cookie
     type: Cookie
+    cookie:
+      name: split-route-cookie
 ```
 
 In this traffic splitting scenario within a single route rule, this GEP leaves the decision to the implementation. An

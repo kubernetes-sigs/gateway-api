@@ -40,9 +40,11 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 		{
 			name: "valid BackendTrafficPolicyConfig no retryConstraint budgetPercent",
 			sessionPersistence: xgatewayv1alpha1.SessionPersistence{
-				SessionName:     new("foo"),
 				AbsoluteTimeout: toDuration("1h"),
 				Type:            new(gatewayv1.CookieBasedSessionPersistence),
+				Cookie: &gatewayv1.CookieConfig{
+					Name: headerNamePtr("foo"),
+				},
 			},
 			retryConstraint: xgatewayv1alpha1.RetryConstraint{
 				Budget: new(xgatewayv1alpha1.BudgetDetails{
@@ -58,9 +60,11 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 		{
 			name: "valid BackendTrafficPolicyConfig no retryConstraint budgetInterval",
 			sessionPersistence: xgatewayv1alpha1.SessionPersistence{
-				SessionName:     new("foo"),
 				AbsoluteTimeout: toDuration("1h"),
 				Type:            new(gatewayv1.CookieBasedSessionPersistence),
+				Cookie: &gatewayv1.CookieConfig{
+					Name: headerNamePtr("foo"),
+				},
 			},
 			retryConstraint: xgatewayv1alpha1.RetryConstraint{
 				Budget: new(xgatewayv1alpha1.BudgetDetails{
@@ -76,9 +80,11 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 		{
 			name: "valid BackendTrafficPolicyConfig no retryConstraint minRetryRate",
 			sessionPersistence: xgatewayv1alpha1.SessionPersistence{
-				SessionName:     new("foo"),
 				AbsoluteTimeout: toDuration("1h"),
 				Type:            new(gatewayv1.CookieBasedSessionPersistence),
+				Cookie: &gatewayv1.CookieConfig{
+					Name: headerNamePtr("foo"),
+				},
 			},
 			retryConstraint: xgatewayv1alpha1.RetryConstraint{
 				Budget: new(xgatewayv1alpha1.BudgetDetails{
@@ -91,9 +97,11 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 		{
 			name: "invalid BackendTrafficPolicyConfig budgetInterval too long",
 			sessionPersistence: xgatewayv1alpha1.SessionPersistence{
-				SessionName:     new("foo"),
 				AbsoluteTimeout: toDuration("1h"),
 				Type:            new(gatewayv1.CookieBasedSessionPersistence),
+				Cookie: &gatewayv1.CookieConfig{
+					Name: headerNamePtr("foo"),
+				},
 			},
 			retryConstraint: xgatewayv1alpha1.RetryConstraint{
 				Budget: new(xgatewayv1alpha1.BudgetDetails{
@@ -110,9 +118,11 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 		{
 			name: "invalid BackendTrafficPolicyConfig budgetInterval too short",
 			sessionPersistence: xgatewayv1alpha1.SessionPersistence{
-				SessionName:     new("foo"),
 				AbsoluteTimeout: toDuration("1h"),
 				Type:            new(gatewayv1.CookieBasedSessionPersistence),
+				Cookie: &gatewayv1.CookieConfig{
+					Name: headerNamePtr("foo"),
+				},
 			},
 			retryConstraint: xgatewayv1alpha1.RetryConstraint{
 				Budget: new(xgatewayv1alpha1.BudgetDetails{
@@ -129,9 +139,11 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 		{
 			name: "invalid BackendTrafficPolicyConfig minRetryRate interval",
 			sessionPersistence: xgatewayv1alpha1.SessionPersistence{
-				SessionName:     new("foo"),
 				AbsoluteTimeout: toDuration("1h"),
 				Type:            new(gatewayv1.CookieBasedSessionPersistence),
+				Cookie: &gatewayv1.CookieConfig{
+					Name: headerNamePtr("foo"),
+				},
 			},
 			retryConstraint: xgatewayv1alpha1.RetryConstraint{
 				Budget: new(xgatewayv1alpha1.BudgetDetails{
@@ -148,9 +160,11 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 		{
 			name: "valid BackendTrafficPolicyConfig no cookie lifetimeType",
 			sessionPersistence: xgatewayv1alpha1.SessionPersistence{
-				SessionName:     new("foo"),
 				AbsoluteTimeout: toDuration("1h"),
 				Type:            new(gatewayv1.CookieBasedSessionPersistence),
+				Cookie: &gatewayv1.CookieConfig{
+					Name: headerNamePtr("foo"),
+				},
 			},
 			retryConstraint: xgatewayv1alpha1.RetryConstraint{
 				Budget: new(xgatewayv1alpha1.BudgetDetails{
@@ -167,9 +181,9 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 		{
 			name: "valid BackendTrafficPolicyConfig session cookie",
 			sessionPersistence: xgatewayv1alpha1.SessionPersistence{
-				SessionName: new("foo"),
-				Type:        new(gatewayv1.CookieBasedSessionPersistence),
-				CookieConfig: &gatewayv1.CookieConfig{
+				Type: new(gatewayv1.CookieBasedSessionPersistence),
+				Cookie: &gatewayv1.CookieConfig{
+					Name:         headerNamePtr("foo"),
 					LifetimeType: new(gatewayv1.SessionCookieLifetimeType),
 				},
 			},
@@ -186,11 +200,11 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 			wantErrors: []string{},
 		},
 		{
-			name: "invalid BackendTrafficPolicyConfig permanent cookie",
+			name: "invalid BackendTrafficPolicyConfig permanent cookie without absoluteTimeout",
 			sessionPersistence: xgatewayv1alpha1.SessionPersistence{
-				SessionName: new("foo"),
-				Type:        new(gatewayv1.CookieBasedSessionPersistence),
-				CookieConfig: &gatewayv1.CookieConfig{
+				Type: new(gatewayv1.CookieBasedSessionPersistence),
+				Cookie: &gatewayv1.CookieConfig{
+					Name:         headerNamePtr("foo"),
 					LifetimeType: new(gatewayv1.PermanentCookieLifetimeType),
 				},
 			},
@@ -209,10 +223,10 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 		{
 			name: "valid BackendTrafficPolicyConfig permanent cookie",
 			sessionPersistence: xgatewayv1alpha1.SessionPersistence{
-				SessionName:     new("foo"),
 				AbsoluteTimeout: toDuration("1h"),
 				Type:            new(gatewayv1.CookieBasedSessionPersistence),
-				CookieConfig: &gatewayv1.CookieConfig{
+				Cookie: &gatewayv1.CookieConfig{
+					Name:         headerNamePtr("foo"),
 					LifetimeType: new(gatewayv1.PermanentCookieLifetimeType),
 				},
 			},
@@ -231,8 +245,10 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 		{
 			name: "valid BackendTrafficPolicyConfig header-based session persistence",
 			sessionPersistence: xgatewayv1alpha1.SessionPersistence{
-				SessionName: new("foo"),
-				Type:        new(gatewayv1.HeaderBasedSessionPersistence),
+				Type: new(gatewayv1.HeaderBasedSessionPersistence),
+				Header: &gatewayv1.HeaderConfig{
+					Name: gatewayv1.HeaderName("x-session-id"),
+				},
 			},
 			retryConstraint: xgatewayv1alpha1.RetryConstraint{
 				Budget: new(xgatewayv1alpha1.BudgetDetails{
@@ -245,6 +261,69 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 				}),
 			},
 			wantErrors: []string{},
+		},
+		{
+			name: "invalid BackendTrafficPolicyConfig cookie type with header field",
+			sessionPersistence: xgatewayv1alpha1.SessionPersistence{
+				Type: new(gatewayv1.CookieBasedSessionPersistence),
+				Header: &gatewayv1.HeaderConfig{
+					Name: gatewayv1.HeaderName("x-session-id"),
+				},
+			},
+			wantErrors: []string{"header must be nil if type is not Header", "cookie must be specified for Cookie type"},
+		},
+		{
+			name: "invalid BackendTrafficPolicyConfig header type with cookie field",
+			sessionPersistence: xgatewayv1alpha1.SessionPersistence{
+				Type: new(gatewayv1.HeaderBasedSessionPersistence),
+				Cookie: &gatewayv1.CookieConfig{
+					Name: headerNamePtr("foo"),
+				},
+			},
+			wantErrors: []string{"cookie must be nil if type is not Cookie", "header must be specified for Header type"},
+		},
+		{
+			name: "invalid BackendTrafficPolicyConfig cookie type without cookie field",
+			sessionPersistence: xgatewayv1alpha1.SessionPersistence{
+				Type: new(gatewayv1.CookieBasedSessionPersistence),
+			},
+			wantErrors: []string{"cookie must be specified for Cookie type"},
+		},
+		{
+			name: "invalid BackendTrafficPolicyConfig header type without header field",
+			sessionPersistence: xgatewayv1alpha1.SessionPersistence{
+				Type: new(gatewayv1.HeaderBasedSessionPersistence),
+			},
+			wantErrors: []string{"header must be specified for Header type"},
+		},
+		{
+			name: "valid BackendTrafficPolicyConfig default type with cookie field",
+			sessionPersistence: xgatewayv1alpha1.SessionPersistence{
+				Cookie: &gatewayv1.CookieConfig{
+					Name: headerNamePtr("foo"),
+				},
+			},
+			wantErrors: []string{},
+		},
+		{
+			name: "invalid BackendTrafficPolicyConfig cookie name with invalid characters",
+			sessionPersistence: xgatewayv1alpha1.SessionPersistence{
+				Type: new(gatewayv1.CookieBasedSessionPersistence),
+				Cookie: &gatewayv1.CookieConfig{
+					Name: headerNamePtr("invalid cookie=name"),
+				},
+			},
+			wantErrors: []string{"name in body should match"},
+		},
+		{
+			name: "invalid BackendTrafficPolicyConfig header name with invalid characters",
+			sessionPersistence: xgatewayv1alpha1.SessionPersistence{
+				Type: new(gatewayv1.HeaderBasedSessionPersistence),
+				Header: &gatewayv1.HeaderConfig{
+					Name: gatewayv1.HeaderName("invalid header:name"),
+				},
+			},
+			wantErrors: []string{"name in body should match"},
 		},
 	}
 	for _, tc := range tests {
@@ -267,6 +346,11 @@ func TestBackendTrafficPolicyConfig(t *testing.T) {
 			validateBackendTrafficPolicy(t, trafficPolicy, tc.wantErrors)
 		})
 	}
+}
+
+func headerNamePtr(name string) *gatewayv1.HeaderName {
+	hn := gatewayv1.HeaderName(name)
+	return &hn
 }
 
 func validateBackendTrafficPolicy(t *testing.T, trafficPolicy *xgatewayv1alpha1.XBackendTrafficPolicy, wantErrors []string) {
