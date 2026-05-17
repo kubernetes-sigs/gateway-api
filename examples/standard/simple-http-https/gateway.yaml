@@ -1,5 +1,5 @@
 #$ Used in:
-#$ - site-src/guides/getting-started/migrating-from-ingress.md
+#$ - guides/getting-started/migrating-from-ingress.md
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:

@@ -1,5 +1,5 @@
 #$ Used in:
-#$ - site-src/guides/http-cors.md
+#$ - guides/user-guides/http-cors.md
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:

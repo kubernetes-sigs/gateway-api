@@ -1,6 +1,6 @@
 #$ Used in:
-#$ - site-src/api-types/tlsroute.md
-#$ - site-src/guides/tls-routing.md
+#$ - guides/user-guides/tls-routing.md
+#$ - reference/api-types/tlsroute.md
 apiVersion: gateway.networking.k8s.io/v1
 kind: TLSRoute
 metadata:
