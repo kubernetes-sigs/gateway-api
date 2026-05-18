@@ -29,6 +29,7 @@ This GEP retroactively documents the rationale, scope, and design constraints of
 - Require stateful UDP session tracking or connection management semantics. Implementations are expected to document how they implement such semantics.
 - Define DTLS termination behavior at the Gateway.
 - Define HTTP/3 or QUIC-specific behavior.
+- Define a mechanism to describe or require UDP packet routing as well as forwarding
 
 ## Longer Term Goals
 
