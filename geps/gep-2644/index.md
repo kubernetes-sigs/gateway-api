@@ -10,8 +10,7 @@ title: "GEP-2644: TCPRoute"
 ## TLDR
 
 Gateway API needs a first-class Route type for TCP because a meaningful class of Kubernetes workloads cannot be represented by the standard Gateway API routing model without it.
-HTTPRoute only addresses a single class of TCP-based traffic (HTTP/1.1 and HTTP/2 over TCP), and TLSRoute handles routing via SNI, leaving the broader universe of TCP workloads that don't work in either of those cases without a portable routing API.
-which prevents Gateway API from serving as a common and portable configuration model for them.
+HTTPRoute only addresses a single class of TCP-based traffic (HTTP/1.1 and HTTP/2 over TCP), and TLSRoute handles routing via SNI, leaving the broader universe of TCP workloads that don't work in either of those cases without a portable routing API, which prevents Gateway API from serving as a common and portable configuration model for them.
 TCPRoute standardizes the minimal interoperable API surface for exposing TCP workloads through Gateway API.
 
 This GEP retroactively documents the rationale, scope, and design constraints of the existing TCPRoute resource.
@@ -30,6 +29,15 @@ This GEP retroactively documents the rationale, scope, and design constraints of
 - Define TLS termination behavior at the Gateway. TLS-aware L4 routing is covered by `TLSRoute`.
 - Define SNI-based or hostname-based routing. Use `TLSRoute` for SNI routing.
 - Define HTTP or gRPC routing behavior. Use `HTTPRoute` or `GRPCRoute` for L7 routing.
+
+## Longer Term Goals
+
+The following topics are out of scope for this GEP but are candidates for future GEPs:
+
+- Client IP preservation (e.g. PROXY protocol)
+- Connection draining and timeout semantics
+- Extended routing options (e.g. 5-tuple or 3-tuple matching)
+- Listener port range support for TCP
 
 ## Introduction
 
@@ -121,9 +129,16 @@ type TCPRouteStatus struct {
 }
 ```
 
-### Example Usage
+## Request flow
 
-#### Basic TCP Service Routing (PostgreSQL)
+Following are some of the request flows covered by TCPRoute, and the expected
+behavior:
+
+### Basic TCP Forwarding
+
+In this workflow, TCP traffic arriving at a specific listener port is forwarded
+directly to the backend service. This is the base use case for the TCPRoute
+object, and is included in the core `TCPRoute` feature.
 
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
@@ -156,13 +171,43 @@ spec:
           port: 5432
 ```
 
-#### Multiple Backend Distribution
+A typical [north/south](/docs/glossary/#northsouth-traffic)
+request flow for a gateway implemented using a `TCPRoute` is:
+
+* A client opens a TCP connection to the Gateway address on port 5432.
+* The Gateway receives the connection on the `Listener` matching port 5432.
+* The Gateway identifies the `TCPRoute` attached to that `Listener`.
+* The Gateway opens a new TCP connection to one of the backend `Service`
+  endpoints based on the `backendRefs` of the `TCPRoute`.
+* The Gateway proxies the TCP stream bidirectionally between the client
+  and the backend for the lifetime of the connection.
+
+### Multiple Weighted Backends
+
+In this workflow, TCP connections are distributed across multiple backends
+according to configured weights. Weight support is Extended for TCPRoute.
 
 ```yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: tcp-gateway
+  namespace: gateway-conformance-infra
+spec:
+  gatewayClassName: example-gateway-class
+  listeners:
+    - name: kafka
+      protocol: TCP
+      port: 9092
+      allowedRoutes:
+        kinds:
+          - kind: TCPRoute
+---
 apiVersion: gateway.networking.k8s.io/v1alpha2
 kind: TCPRoute
 metadata:
   name: kafka-route
+  namespace: gateway-conformance-infra
 spec:
   parentRefs:
     - name: tcp-gateway
@@ -177,11 +222,22 @@ spec:
           weight: 30
 ```
 
-### Mixing Protocols
+* A client opens a TCP connection to the Gateway address on port 9092.
+* The Gateway receives the connection on the `Listener` matching port 9092.
+* The Gateway identifies the `TCPRoute` attached to that `Listener`.
+* The Gateway selects a backend based on the configured weights: approximately
+  70% of new connections are sent to `kafka-broker-1` and 30% to
+  `kafka-broker-2`. Each TCP SYN (new connection) is a single unit for
+  weighting purposes.
+* The Gateway proxies the TCP stream bidirectionally between the client
+  and the selected backend.
 
-A common use-case is to expose the same service over TCP and UDP. An Implementation MAY listen for both TCP and UDP traffic
-utilizing the same Listener port. In this example, all TCP traffic MUST be routed to the TCP route and all UDP traffic
-must be routed to the UDP route.
+### Mixing TCP and UDP Protocols
+
+A common use case is to expose the same service over TCP and UDP (e.g. DNS).
+An implementation MAY listen for both TCP and UDP traffic utilizing the same
+Listener port. In this example, all TCP traffic MUST be routed to the TCPRoute
+and all UDP traffic MUST be routed to the UDPRoute.
 
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
@@ -237,16 +293,204 @@ spec:
           port: 53
 ```
 
+* A client sends a DNS query over TCP to the Gateway address on port 53.
+* The Gateway receives the connection on the `dns-tcp` `Listener`.
+* The Gateway identifies the `TCPRoute` attached to that `Listener` and
+  forwards the TCP connection to `dns-tcp-service`.
+* Separately, a client sends a DNS query over UDP to the same Gateway
+  address on port 53.
+* The Gateway receives the datagram on the `dns-udp` `Listener`.
+* The Gateway identifies the `UDPRoute` attached to that `Listener` and
+  forwards the UDP datagram to `dns-udp-service`.
+
+## Conflict management and precedences
+
+A conflict can happen when two or more distinct listeners on a Gateway definition
+have conflicting behavior, or when multiple routes attempt to attach to the same
+listener.
+
+Unlike TLSRoute (which uses SNI hostnames to disambiguate traffic on the same port),
+TCPRoute traffic is classified only by `protocol:port`. This means that a TCP
+listener's only distinctness field is **port** — there is no further attribute
+to discriminate between connections arriving on the same listener.
+
+### Two TCP listeners on the same port
+
+Two TCP listeners on the same port are always indistinct, because there is no
+hostname or other field to differentiate them. The implementation MUST mark both
+listeners as conflicted:
+
+```yaml
+spec:
+  listeners:
+  - name: listener1
+    port: 5432
+    protocol: TCP
+  - name: listener2
+    port: 5432
+    protocol: TCP
+status:
+  listeners:
+  - name: listener1
+    conditions:
+    - reason: Accepted
+      status: "True"
+      type: Accepted
+    - reason: ProtocolConflict
+      status: "True"
+      type: Conflicted
+  - name: listener2
+    conditions:
+    - reason: Accepted
+      status: "True"
+      type: Accepted
+    - reason: ProtocolConflict
+      status: "True"
+      type: Conflicted
+```
+
+### TCP listener on the same port as an HTTP, HTTPS, or TLS listener
+
+When a TCP protocol listener shares a port with an HTTP, HTTPS, or TLS protocol
+listener, all listeners sharing that port are indistinct and MUST NOT be accepted.
+TCP operates at a lower layer and cannot coexist with protocols that require
+additional parsing (e.g. HTTP Host header or TLS SNI) on the same port:
+
+```yaml
+spec:
+  listeners:
+  - name: tcp-listener
+    port: 443
+    protocol: TCP
+  - name: https-listener
+    port: 443
+    protocol: HTTPS
+    hostname: "app.example.com"
+    tls:
+      mode: Terminate
+      certificateRefs:
+      - name: app-cert
+        kind: Secret
+status:
+  listeners:
+  - name: tcp-listener
+    conditions:
+    - reason: Accepted
+      status: "True"
+      type: Accepted
+    - reason: ProtocolConflict
+      status: "True"
+      type: Conflicted
+  - name: https-listener
+    conditions:
+    - reason: Accepted
+      status: "True"
+      type: Accepted
+    - reason: ProtocolConflict
+      status: "True"
+      type: Conflicted
+```
+
+### Multiple TCPRoutes attaching to the same listener
+
+Because a TCP listener has no mechanism to distinguish between connections (no
+hostname, no SNI, no path), attaching multiple TCPRoutes to the same listener
+results in only one route effectively receiving traffic.
+
+When multiple TCPRoutes reference the same listener, the implementation MUST
+follow the general Gateway API route precedence rules defined in `AllowedRoutes`:
+
+1. The oldest Route based on `metadata.creationTimestamp`.
+2. If timestamps are equal, the Route appearing first in alphabetical order
+   (`namespace/name`).
+
+All attached TCPRoutes are `Accepted`, consistent with how other route types
+handle precedence in the Gateway API. Only the winning route's backends receive
+traffic.
+
+> **Note:** Accepting all conflicting routes without surfacing which one is
+> actively receiving traffic is not optimal for user experience. A future GEP
+> may introduce a dedicated route condition reason to explicitly signal that a
+> route has been superseded by another route on the same listener.
+
+```yaml
+# Two TCPRoutes targeting the same listener
+---
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TCPRoute
+metadata:
+  name: tcp-route-1
+  creationTimestamp: "2026-01-01T00:00:00Z"
+spec:
+  parentRefs:
+    - name: tcp-gateway
+      sectionName: postgres
+  rules:
+    - backendRefs:
+        - name: postgres-primary
+          port: 5432
+---
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TCPRoute
+metadata:
+  name: tcp-route-2
+  creationTimestamp: "2026-01-02T00:00:00Z"
+spec:
+  parentRefs:
+    - name: tcp-gateway
+      sectionName: postgres
+  rules:
+    - backendRefs:
+        - name: postgres-replica
+          port: 5432
+```
+
+Both routes are accepted, but only `tcp-route-1` (the oldest) receives traffic:
+
+```yaml
+# tcp-route-1 status
+status:
+  parents:
+  - parentRef:
+      group: gateway.networking.k8s.io
+      kind: Gateway
+      name: tcp-gateway
+      sectionName: postgres
+    conditions:
+    - type: Accepted
+      status: "True"
+      reason: Accepted
+
+# tcp-route-2 status (accepted, but does not receive traffic)
+status:
+  parents:
+  - parentRef:
+      group: gateway.networking.k8s.io
+      kind: Gateway
+      name: tcp-gateway
+      sectionName: postgres
+    conditions:
+    - type: Accepted
+      status: "True"
+      reason: Accepted
+```
+
+### TCP and UDP listeners on the same port
+
+TCP and UDP are distinct transport protocols. An implementation MAY support
+listeners for both TCP and UDP on the same port without conflict. See the
+[Mixing TCP and UDP Protocols](#mixing-tcp-and-udp-protocols) request flow for
+an example.
+
 ## Conformance Details
 
-The following Gateway Conformance features will be added:
+### Feature Names
 
-```
-	// SupportTCPRoute option indicates support for TCPRoute
-	SupportTCPRoute FeatureName = "TCPRoute"
-```
+* TCPRoute
 
-They will validate the following scenarios:
+### Conformance test scenarios
+
+The following scenarios will be validated:
 
 1. TCPRoute attaches to a TCP listener by port specified
    - A Gateway has a TCP listener on port 5432
@@ -269,6 +513,8 @@ They will validate the following scenarios:
 
    - TCP traffic sent to port 5432 is forwarded to the backend.
 
+   Features: `TCPRoute`
+
 1. TCPRoute attaches to a TCP listener by sectionName
    - A Gateway has a TCP listener named `postgres` on port 5432
    - A TCPRoute specifies a `parentRef` with `sectionName: postgres`
@@ -289,6 +535,8 @@ They will validate the following scenarios:
      ```
 
    - TCP traffic sent to the `postgres` listener is forwarded to the backend.
+
+   Features: `TCPRoute`
 
 1. TCPRoute attaches to a TCP listener by sectionName and port
    - A Gateway has a TCP listener named `postgres` on port 5432
@@ -312,6 +560,8 @@ They will validate the following scenarios:
 
    - TCP traffic sent to port 5432 on the `postgres` listener is forwarded to the backend.
 
+   Features: `TCPRoute`
+
 1. TCPRoute attaches to all TCP listeners in a Gateway when sectionName and port are omitted
    - A Gateway has multiple TCP listeners: `postgres` on port 5432 and `kafka` on port 9092
    - A TCPRoute specifies a `parentRef` with only the Gateway name (no `sectionName` or `port`)
@@ -331,6 +581,8 @@ They will validate the following scenarios:
      ```
 
    - The TCPRoute attaches to all TCP listeners on the Gateway.
+
+   Features: `TCPRoute`
 
 1. TCPRoute fails attachment to a non-TCP listener when port or sectionName is specified
    - A Gateway has a UDP listener named `udp-listener` on port 5432 and no TCP listeners on that port/name
@@ -353,6 +605,8 @@ They will validate the following scenarios:
 
    - No TCP traffic is routed through the UDP listener.
 
+   Features: `TCPRoute`
+
 1. TCPRoute references a backend Service that does not exist
    - A Gateway has a TCP listener named `postgres` on port 5432
    - A TCPRoute specifies a `parentRef` with `sectionName: postgres` and a `backendRef` pointing to a Service `nonexistent-service` that does not exist
@@ -368,14 +622,42 @@ They will validate the following scenarios:
          sectionName: postgres
        conditions:
        - type: Accepted
-         status: "False"
-         reason: BackendNotFound
+         status: "True"
+         reason: Accepted
        - type: ResolvedRefs
          status: "False"
          reason: BackendNotFound
      ```
 
-   - No TCP traffic is forwarded for this route.
+   - TCP connections to this route MUST be rejected.
+
+   Features: `TCPRoute`
+
+1. TCPRoute with a cross-namespace backendRef and no valid ReferenceGrant
+   - A Gateway has a TCP listener named `postgres` on port 5432
+   - A TCPRoute in the `gateway-conformance-infra` namespace specifies a `backendRef` pointing to a Service in another namespace without a valid ReferenceGrant
+
+   - The TCPRoute has the following status:
+
+     ```
+     parents:
+     - parentRef:
+         group: gateway.networking.k8s.io
+         kind: Gateway
+         name: tcp-gateway
+         sectionName: postgres
+       conditions:
+       - type: Accepted
+         status: "True"
+         reason: Accepted
+       - type: ResolvedRefs
+         status: "False"
+         reason: RefNotPermitted
+     ```
+
+   - TCP connections to this route MUST be rejected.
+
+   Features: `TCPRoute`, `ReferenceGrant`
 
 1. TCPRoute with multiple weighted backends distributes connections according to configured weights
    - A Gateway has a TCP listener named `kafka` on port 9092
@@ -403,20 +685,124 @@ They will validate the following scenarios:
 
    - TCP connections sent to port 9092 are distributed across backends respecting the configured weights (approximately 70% to `kafka-broker-1` and 30% to `kafka-broker-2`). In this situation, TCP SYN packets denote one connection for weighting purposes.
 
-Conformance Level: **Extended**
+   Features: `TCPRoute` (weight support is Extended)
+
+1. Two TCP listeners on the same port are marked as conflicted
+   - A Gateway has two TCP listeners on port 5432: `listener1` and `listener2`
+
+   - Both listeners are marked as conflicted with the following status:
+
+     ```
+     listeners:
+     - name: listener1
+       conditions:
+       - type: Accepted
+         status: "True"
+         reason: Accepted
+       - type: Conflicted
+         status: "True"
+         reason: ProtocolConflict
+     - name: listener2
+       conditions:
+       - type: Accepted
+         status: "True"
+         reason: Accepted
+       - type: Conflicted
+         status: "True"
+         reason: ProtocolConflict
+     ```
+
+   - No traffic is routed through either listener.
+
+   Features: `TCPRoute`
+
+1. TCP listener on the same port as an HTTPS listener causes conflict
+   - A Gateway has a TCP listener on port 443 and an HTTPS listener on port 443
+
+   - Both listeners are marked as conflicted with the following status:
+
+     ```
+     listeners:
+     - name: tcp-listener
+       conditions:
+       - type: Accepted
+         status: "True"
+         reason: Accepted
+       - type: Conflicted
+         status: "True"
+         reason: ProtocolConflict
+     - name: https-listener
+       conditions:
+       - type: Accepted
+         status: "True"
+         reason: Accepted
+       - type: Conflicted
+         status: "True"
+         reason: ProtocolConflict
+     ```
+
+   - No traffic is routed through either listener.
+
+   Features: `TCPRoute`
+
+1. Multiple TCPRoutes attaching to the same listener results in only the oldest receiving traffic
+   - A Gateway has a TCP listener named `postgres` on port 5432
+   - Two TCPRoutes (`tcp-route-1` created first, `tcp-route-2` created second) both specify a `parentRef` with `sectionName: postgres`
+
+   - Both routes are accepted:
+
+     ```
+     # tcp-route-1 status
+     parents:
+     - parentRef:
+         group: gateway.networking.k8s.io
+         kind: Gateway
+         name: tcp-gateway
+         sectionName: postgres
+       conditions:
+       - type: Accepted
+         status: "True"
+         reason: Accepted
+     ```
+
+     ```
+     # tcp-route-2 status
+     parents:
+     - parentRef:
+         group: gateway.networking.k8s.io
+         kind: Gateway
+         name: tcp-gateway
+         sectionName: postgres
+       conditions:
+       - type: Accepted
+         status: "True"
+         reason: Accepted
+     ```
+
+   - TCP traffic sent to port 5432 is forwarded only to the backends of `tcp-route-1` (the oldest route).
+
+   Features: `TCPRoute`
+
+## Standard Graduation Criteria
+
+The TCPRoute resource pre-dates the current GEP process and has existed in the
+Gateway API since early releases as a `v1alpha2` resource. This GEP retroactively
+documents the rationale, scope, and design constraints of the existing resource.
+
+Because TCPRoute has been available and implemented for a significant period of
+time, it is being grandfathered into the current process and is not subject to the
+standard probationary period requirement. The graduation criteria for Standard are:
+
+* At least one Feature Name must be listed: `TCPRoute`.
+* The Conformance Details must be filled out, with conformance test scenarios listed.
+* Conformance tests must be implemented that test all the listed test scenarios.
+* At least three (3) implementations must have submitted conformance reports that
+  pass those conformance tests.
 
 ## References
 
-- [UDPRoute Specification](/docs/concepts/api-overview/#tcproute-and-udproute)
+- [TCPRoute and UDPRoute Specification](/docs/concepts/api-overview/#tcproute-and-udproute)
 - [TLSRoute Specification](/reference/api-types/tlsroute/)
 - [GEP-735: TCP and UDP addresses matching](../gep-735/index.md) (Declined, but relevant context)
 - [Gateway API Use Cases](/docs/concepts/use-cases/)
 
-## Provisional TODOs
-
-- Define behavior for multiple TCP routes attaching to same listener [Do we merge? reject?]
-- Declare optional behaviors
-  - Client IP preservation (e.g. PROXY protocol)
-  - Connection draining and timeout semantics
-  - Routing options [5 tuple, 3 tuple]
-- Port range support
