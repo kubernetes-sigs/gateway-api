@@ -182,22 +182,22 @@ To execute the new tool, use `go tool -modfile=tools/go.mod toolname`.
 ## API Documentation
 
 When writing API documentation (the `godoc` for API fields and structures) it should be done
- in a meaningful and concise way, where information is provided for the different 
- Gateway API personas (Ian, Chihiro and Ana) without leaking implementation details.
+in a meaningful and concise way, where information is provided for the different 
+[Gateway API personas](../docs/concepts/roles-and-personas.md#key-roles-and-personas)  without leaking implementation details.
 
 The implementation details are still important for Gateway API implementation
 developers, and should still be provided, but we need to ensure they are not 
 exposed in the generated CRDs. That can end up leaking to users in multiple ways,
 such as on the Gateway API documentation website, or via `kubectl explain`.
 
-Additionally, it is worth noticing that API documentation reflects on the CRD generation
-size, which impacts directly on resource consumption like a maximum Kubernetes resource size 
-(which is limited by etcd maximum value size) and avoiding problems with `last-applied-configuration` 
-annotation, when doing a client-side apply.
+Additionally, it is worth noting that API documentation affects the size of generated CRD manifests,
+which directly impacts the Kubernetes resource size, 
+which is in turn limited by etcd maximum value size.  The situation is exacerbated by the `last-applied-configuration` 
+annotation from client-side apply, which roughly doubles the size of the Kubernetes resource.
 
-There are two kind of API documentations: 
+There are two kind of API documentation: 
 
-* User facing - MUST define how a user should be consuming an API and its field, on a concise way.
+* User facing - MUST define how a user should be consuming an API and its fields, in a concise way.
 * Developer facing - MUST define how a controller should implement an API and its fields. 
 
 ### User facing Documentation
@@ -207,22 +207,22 @@ in a way that ensures that their Gateway API implementation does what they want 
 
 A good API documentation should cover:
 
-* What is the main feature of the API and Field - Eg.: "`Foo` allows configuring how a
+* What is the main feature of the API and Field - Eg.: "`foo` allows configuring how a
 a header should be forwarded to backends"
 * What is the support level of the field - Eg.: "Support: Core/Extended/Implementation Specific"
-* Caveats of that field - Eg.: "Setting `Foo` field can have conflicts with `Bar` field, and in this
+* Caveats of that field - Eg.: "Setting `goo` field can have conflicts with `bar` field, and in this
 case it will be shown as a Condition". (we don't need to cover all the conditions).
 
-In a simple way, a user reading the field documentation should understand, on one or two 
-phrases what happens when the field is configured, what can be configured and what are 
-the impacts of that field
+In one or two phrases, API documentation should help a user who is reading the documentation understand
+what happens when the field is configured, what values can be specified, and what any
+additional important implications of setting the field may be. 
 
 When adding a documentation, it is very important to remove your "Developer hat" 
-and put yourself on a user that is trying to solve a problem: Does setting a field
-solves my needs? How can I use it?
+and put yourself in the role of a user who is trying to solve a problem: Does setting a field
+solve my needs? How can I use it?
 
-On an implementation, a user facing documentation belongs to the field documentation. Taking
-`Listeners`, one of the most complex fields as an example:
+The godoc for an API field contains user-facing documentation. Taking
+`Listeners`, one of the most complex fields, as an example:
 
 ```golang
 // Listeners define logical endpoints that are bound on this Gateway's addresses.
@@ -235,40 +235,42 @@ On an implementation, a user facing documentation belongs to the field documenta
 Listeners []Listener `json:"listeners"`
 ```
 
-We don't specify what are the Protocol types (saving this to the `Protocol` field),
-what a hostname means, when a TLS configuration is required. All of these information
-belongs to each field, so when a user does something like `kubectl explain gateway.spec.listeners`
-they will also get the information of each field.
+We don't specify here what the Protocol types are (this information goes in the `Protocol` field itself),
+how a hostname is defined, or when TLS configuration is required. All of this information
+belongs to the respective API fields, which are sub-fields of `Listener`.  Note that `kubectl explain` prints information about both
+the specified field and its sub-fields, so when a user executes the `kubectl explain gateway.spec.listeners` command,
+they get all of this information.
+
 
 ### Developer facing documentation
 
-Developer facing documentation helps during implementations to define the expected
-behavior of it, and should answer questions like:
+Developer-facing documentation helps implementers to define the expected
+behavior of it, and should answer questions such as the following:
 
-* How that field should be reconciled?
+* How should that field be reconciled?
 * What conditions should be set during the reconciliation? 
 * What should be validated during the reconciliation of that field?
 
-In this case, as the API documentation serves as a guide for implementors on how 
-their implementations should behave, it is very important to be as much verbose as
-required to avoid any ambiguity. These information are used also to define expected
-conformance behavior, and can even point to existing GEPs so a developer looking 
-at it can know where to look for more references on what and why are those the expected
-behavior of this field.
+In this case, as the API documentation serves as a guide for implementers on how 
+their implementations should behave, it is very important to be as verbose as
+required to avoid any ambiguity. This information is used also to define expected
+conformance behavior, and it can point to existing GEPs so a developer looking 
+at it can know where to look for more references on what the expected
+behavior of this field is and why.
 
-Still taking the `Listeners` field as an example, it does good definitions of situations 
-like:
+Continuing with the `Listeners` field as an example, it shows how API documentation can provide guidance for situations 
+such as the following:
 
 * Two listeners have different protocols but the same hostname. Should this be a conflict?
 * A listener of type `XXX` sets the field `TLS`. Is this a problem? How to expose this to 
 the user?
 
-Because these information don't matter for a user, they should be hidden from the CRD/OpenAPI
+Because these details don't matter for a user, they should be hidden from the CRD/OpenAPI
 generation and also from the website API Reference.
 
 This can be achieved putting these information between the tags 
 `<gateway:util:excludeFromCRD></gateway:util:excludeFromCRD>` and preferably 
-contain a callout that those are a Note for implementors:
+contain a callout that those are a Note for implementers:
 
 ```golang
 // Mode defines the TLS behavior for the TLS session initiated by the client.
@@ -286,7 +288,7 @@ contain a callout that those are a Note for implementors:
 // Support: Core
 //
 // <gateway:util:excludeFromCRD>
-// Notes for implementors:
+// Notes for implementers:
 //
 // Setting TLSModeType to Passthrough is only supported on Listeners that are of 
 // type HTTP, HTTPS and TLS. In case a user sets a different type, the implementation
