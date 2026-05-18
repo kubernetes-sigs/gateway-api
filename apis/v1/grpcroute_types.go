@@ -284,6 +284,8 @@ type GRPCRouteRule struct {
 	// +kubebuilder:validation:MaxItems=16
 	BackendRefs []GRPCBackendRef `json:"backendRefs,omitempty"`
 
+	// Deprecated: use the Backend resource for session persistence (GEP-4894).
+	//
 	// SessionPersistence defines and configures session persistence
 	// for the route rule.
 	//
