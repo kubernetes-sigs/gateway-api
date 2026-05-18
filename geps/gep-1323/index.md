@@ -70,7 +70,7 @@ Adding support for this unlocks a lot of real world use cases. Let’s review a 
 * A team has a frontend web app, along with two different versions of their backends exposed as Kubernetes services. If, the frontend needs to know which backend it’s talking to, this can be easily achieved without any modifications to the application code.
 
 ```yaml
-apiVersion: gateway.networking.k8s.io/v1beta1
+apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
   name: http-response-header
@@ -97,7 +97,7 @@ spec:
 * Cookies can be automatically injected into the response of services. This can enable services to identify users that were redirected to a certain backend.
 
 ```yaml
-apiVersion: gateway.networking.k8s.io/v1beta1
+apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
   name: http-response-header

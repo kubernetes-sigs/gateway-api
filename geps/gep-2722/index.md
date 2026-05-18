@@ -468,7 +468,7 @@ outlining the range of values that may be presented:
   Annotations:
     annotation.foo: value1
     annotation.bar.baz: abcdefghijkl
-  API Version: gateway.networking.k8s.io/v1beta1
+  API Version: gateway.networking.k8s.io/v1
   Kind: Gateway
   Metadata:
     creationTimestamp: "2023-12-01T18:29:41Z"
@@ -548,7 +548,7 @@ outlining the range of values that may be presented:
   Namespace: default
   Labels: <none>
   Annotations: <none>
-  API Version: gateway.networking.k8s.io/v1beta1
+  API Version: gateway.networking.k8s.io/v1
   Kind: HTTPRoute
   Metadata:
     creationTimestamp: "2023-11-09T09:45:03Z"
@@ -620,7 +620,7 @@ outlining the range of values that may be presented:
   Name: foo-com-external-gateway-class
   Labels: <none>
   Annotations <none>
-  API Version gateway.networking.k8s.io/v1beta1
+  API Version gateway.networking.k8s.io/v1
   Kind: GatewayClass
   Metadata:
     creationTimestamp: "2023-06-28T17:33:03Z"

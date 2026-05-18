@@ -1,5 +1,5 @@
 #$ Used in:
-#$ - site-src/guides/tls.md
+#$ - guides/user-guides/tls.md
 apiVersion: gateway.networking.k8s.io/v1
 kind: BackendTLSPolicy
 metadata:
