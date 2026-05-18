@@ -6,22 +6,22 @@ metadata:
 spec:
   gatewayClassName: "{GATEWAY_CLASS_NAME}"
   listeners:
-    - name: udp-listener
-      protocol: UDP
+    - name: only-allow-http-routes
+      protocol: TCP
       port: 5300
       allowedRoutes:
         kinds:
-          - kind: UDPRoute
+          - kind: HTTPRoute
 ---
 apiVersion: gateway.networking.k8s.io/v1alpha2
 kind: TCPRoute
 metadata:
-  name: tcp-route-on-udp-listener
+  name: tcp-route
   namespace: gateway-conformance-infra
 spec:
   parentRefs:
     - name: tcp-mixed-protocol-gateway
-      sectionName: udp-listener
+      sectionName: only-allow-http-routes
   rules:
     - backendRefs:
         - name: tcp-echo-backend

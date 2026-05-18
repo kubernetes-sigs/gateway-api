@@ -25,6 +25,7 @@ import (
 	v1 "sigs.k8s.io/gateway-api/apis/v1alpha2"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	confsuite "sigs.k8s.io/gateway-api/conformance/utils/suite"
+	"sigs.k8s.io/gateway-api/conformance/utils/tcp"
 	"sigs.k8s.io/gateway-api/pkg/features"
 )
 
@@ -70,46 +71,57 @@ var TCPRouteParentRefPortAndSectionName = confsuite.ConformanceTest{
 			}
 		}
 
+		expectBackendForListener := func(t *testing.T, listener, backend string) {
+			t.Helper()
+			gwAddr, err := kubernetes.WaitForGatewayAddress(t, suite.Client, suite.TimeoutConfig,
+				kubernetes.NewGatewayRef(gwNN, listener))
+			if err != nil {
+				t.Fatalf("error getting gateway address for listener %q: %v", listener, err)
+			}
+			tcp.MakeTCPRequestAndExpectEventuallyValidResponse(t, suite.TimeoutConfig, gwAddr, nil, "", false,
+				tcp.ExpectedResponse{
+					Backend:   backend,
+					Namespace: ns,
+				})
+		}
+
 		t.Run("TCPRoute attaches to a TCP listener by port", func(t *testing.T) {
 			routeNN := types.NamespacedName{Name: "tcp-route-by-port", Namespace: ns}
 			kubernetes.TCPRouteMustHaveParents(t, suite.Client, suite.TimeoutConfig, routeNN,
 				[]v1.RouteParentStatus{acceptedParent()}, false)
+			expectBackendForListener(t, "one", "tcp-echo-one")
+		})
 
-			gwAddr, err := kubernetes.WaitForGatewayAddress(t, suite.Client, suite.TimeoutConfig,
-				kubernetes.NewGatewayRef(gwNN, "primary"))
-			if err != nil {
-				t.Fatalf("error getting gateway address: %v", err)
-			}
-			expectTCPEchoResponse(t, suite.TimeoutConfig.DefaultTestTimeout, gwAddr)
+		t.Run("TCPRoute attaches to a TCP listener by sectionName", func(t *testing.T) {
+			routeNN := types.NamespacedName{Name: "tcp-route-by-section", Namespace: ns}
+			kubernetes.TCPRouteMustHaveParents(t, suite.Client, suite.TimeoutConfig, routeNN,
+				[]v1.RouteParentStatus{acceptedParent()}, false)
+			expectBackendForListener(t, "two", "tcp-echo-two")
 		})
 
 		t.Run("TCPRoute attaches to a TCP listener by sectionName and port", func(t *testing.T) {
 			routeNN := types.NamespacedName{Name: "tcp-route-by-section-and-port", Namespace: ns}
 			kubernetes.TCPRouteMustHaveParents(t, suite.Client, suite.TimeoutConfig, routeNN,
 				[]v1.RouteParentStatus{acceptedParent()}, false)
-
-			gwAddr, err := kubernetes.WaitForGatewayAddress(t, suite.Client, suite.TimeoutConfig,
-				kubernetes.NewGatewayRef(gwNN, "primary"))
-			if err != nil {
-				t.Fatalf("error getting gateway address: %v", err)
-			}
-			expectTCPEchoResponse(t, suite.TimeoutConfig.DefaultTestTimeout, gwAddr)
+			expectBackendForListener(t, "three", "tcp-echo-three")
 		})
 
+		// Scenario 4 is applied only after the per-listener scenarios above
+		// have been validated. Once an attach-all TCPRoute is in place it
+		// would compete with the existing routes on listeners one/two/three,
+		// where merging behavior is implementation-defined; isolating it
+		// avoids that ambiguity.
 		t.Run("TCPRoute with neither sectionName nor port attaches to every TCP listener on the Gateway", func(t *testing.T) {
+			suite.Applier.MustApplyWithCleanup(t, suite.Client, suite.TimeoutConfig,
+				"tests/tcproute-parentref-attach-all.yaml", suite.CleanupTestResources)
+
 			routeNN := types.NamespacedName{Name: "tcp-route-attach-all", Namespace: ns}
 			kubernetes.TCPRouteMustHaveParents(t, suite.Client, suite.TimeoutConfig, routeNN,
 				[]v1.RouteParentStatus{acceptedParent()}, false)
 
-			// Both TCP listeners should forward to the configured backend.
-			for _, listener := range []string{"primary", "secondary"} {
-				gwAddr, err := kubernetes.WaitForGatewayAddress(t, suite.Client, suite.TimeoutConfig,
-					kubernetes.NewGatewayRef(gwNN, listener))
-				if err != nil {
-					t.Fatalf("error getting gateway address for listener %q: %v", listener, err)
-				}
-				expectTCPEchoResponse(t, suite.TimeoutConfig.DefaultTestTimeout, gwAddr)
-			}
+			// Listener `four` has no scenario-1/2/3 route attached to it, so
+			// the attach-all route is the only TCPRoute serving it.
+			expectBackendForListener(t, "four", "tcp-echo-four")
 		})
 	},
 }

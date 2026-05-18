@@ -22,72 +22,15 @@ import (
 	"encoding/json"
 	"fmt"
 	"net"
-	"strings"
-	"testing"
 	"time"
 
-	"k8s.io/apimachinery/pkg/util/wait"
-
 	"sigs.k8s.io/gateway-api/conformance/echo-basic/tcpserver"
-	"sigs.k8s.io/gateway-api/conformance/utils/tlog"
 )
-
-// expectTCPEchoResponse polls until a TCP echo round-trip against the given
-// gateway address succeeds, or the timeout is exceeded. It speaks the
-// tcpserver protocol: read the welcome banner and validate a PING/PONG
-// exchange to confirm end-to-end TCP routing through the Gateway.
-func expectTCPEchoResponse(t *testing.T, timeout time.Duration, gwAddr string) {
-	t.Helper()
-
-	tlog.Logf(t, "performing TCP echo probe on %s", gwAddr)
-	err := wait.PollUntilContextTimeout(context.TODO(), time.Second, timeout, true,
-		func(ctx context.Context) (bool, error) {
-			var dialer net.Dialer
-			conn, err := dialer.DialContext(ctx, "tcp", gwAddr)
-			if err != nil {
-				tlog.Logf(t, "failed to dial TCP %s: %v", gwAddr, err)
-				return false, nil
-			}
-			defer conn.Close()
-
-			if err = conn.SetDeadline(time.Now().Add(2 * time.Second)); err != nil {
-				return false, fmt.Errorf("setting TCP deadline: %w", err)
-			}
-
-			reader := bufio.NewReader(conn)
-			welcome, err := reader.ReadString('\n')
-			if err != nil {
-				tlog.Logf(t, "failed to read TCP welcome message: %v", err)
-				return false, nil
-			}
-			if welcome != tcpserver.WelcomeMessage {
-				tlog.Logf(t, "unexpected TCP welcome message: %q", welcome)
-				return false, nil
-			}
-
-			if _, err = fmt.Fprint(conn, "PING\n"); err != nil {
-				tlog.Logf(t, "failed to write PING: %v", err)
-				return false, nil
-			}
-			pong, err := reader.ReadString('\n')
-			if err != nil {
-				tlog.Logf(t, "failed to read PONG: %v", err)
-				return false, nil
-			}
-			if strings.TrimSpace(pong) != "PONG" {
-				tlog.Logf(t, "unexpected response to PING: %q", pong)
-				return false, nil
-			}
-			tlog.Logf(t, "got TCP PONG response from %s", gwAddr)
-			return true, nil
-		})
-	if err != nil {
-		t.Errorf("TCP echo probe never succeeded against %s: %v", gwAddr, err)
-	}
-}
 
 // tcpEchoSendOnce opens a single TCP connection to gwAddr, performs the
 // tcpserver TEST handshake, and returns the pod name from the JSON envelope.
+// It is used by tests (e.g. weighted routing) that need to attribute a single
+// response to a specific backend Pod.
 func tcpEchoSendOnce(ctx context.Context, gwAddr string, timeout time.Duration) (string, error) {
 	var dialer net.Dialer
 	conn, err := dialer.DialContext(ctx, "tcp", gwAddr)

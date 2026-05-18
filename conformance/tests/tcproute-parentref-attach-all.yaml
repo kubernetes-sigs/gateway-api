@@ -1,0 +1,15 @@
+# Scenario 4: parentRef with neither `port` nor `sectionName`. Should attach to
+# every TCP listener on the Gateway. Listener `four` has no other route, so it
+# is the listener used to validate scenario 4 in isolation.
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TCPRoute
+metadata:
+  name: tcp-route-attach-all
+  namespace: gateway-conformance-infra
+spec:
+  parentRefs:
+    - name: tcp-multi-listener-gateway
+  rules:
+    - backendRefs:
+        - name: tcp-echo-four
+          port: 3000

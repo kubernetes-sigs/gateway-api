@@ -43,14 +43,14 @@ var TCPRouteInvalidNonTCPListener = confsuite.ConformanceTest{
 	Provisional: true,
 	Test: func(t *testing.T, suite *confsuite.ConformanceTestSuite) {
 		ns := confsuite.InfrastructureNamespace
-		routeNN := types.NamespacedName{Name: "tcp-route-on-udp-listener", Namespace: ns}
+		routeNN := types.NamespacedName{Name: "tcp-route", Namespace: ns}
 		gwNN := types.NamespacedName{Name: "tcp-mixed-protocol-gateway", Namespace: ns}
 
 		// This test creates an additional Gateway in the gateway-conformance-infra
 		// namespace so we have to wait for it to be ready.
 		kubernetes.NamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, []string{ns})
 
-		t.Run("TCPRoute targeting a UDP listener has Accepted=False with reason NotAllowedByListeners", func(t *testing.T) {
+		t.Run("TCPRoute targeting a listener that has no protocol type TCP must have Accepted=False with reason NotAllowedByListeners", func(t *testing.T) {
 			notAllowed := metav1.Condition{
 				Type:   string(v1.RouteConditionAccepted),
 				Status: metav1.ConditionFalse,
