@@ -83,7 +83,7 @@ function ensure_protoc {
 }
 
 ensure_protoc
-go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.36.10
+go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.36.11
 go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.5.1
 
 (cd conformance/echo-basic && \
