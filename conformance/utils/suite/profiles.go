@@ -50,6 +50,10 @@ const (
 	// which covers TLS stream functionality with Gateways.
 	GatewayTLSConformanceProfileName ConformanceProfileName = "GATEWAY-TLS"
 
+	// GatewayTCPConformanceProfileName indicates the name of the conformance profile
+	// which covers TCP functionality with Gateways.
+	GatewayTCPConformanceProfileName ConformanceProfileName = "GATEWAY-TCP"
+
 	// GatewayGRPCConformanceProfileName indicates the name of the conformance profile
 	// which covers GRPC functionality with Gateways.
 	GatewayGRPCConformanceProfileName ConformanceProfileName = "GATEWAY-GRPC"
@@ -98,6 +102,20 @@ var (
 		ExtendedFeatures: features.SetsToNamesSet(
 			features.GatewayExtendedFeatures,
 			features.TLSRouteExtendedFeatures,
+		),
+	}
+
+	// GatewayTCPConformanceProfile is a ConformanceProfile that covers testing TCP
+	// related functionality with Gateways.
+	GatewayTCPConformanceProfile = ConformanceProfile{
+		Name: GatewayTCPConformanceProfileName,
+		CoreFeatures: sets.New(
+			features.SupportGateway,
+			features.SupportTCPRoute,
+		),
+		ExtendedFeatures: features.SetsToNamesSet(
+			features.GatewayExtendedFeatures,
+			features.TCPRouteExtendedFeatures,
 		),
 	}
 
@@ -158,6 +176,7 @@ func RegisterConformanceProfile(p ConformanceProfile) {
 var conformanceProfileMap = map[ConformanceProfileName]ConformanceProfile{
 	GatewayHTTPConformanceProfileName: GatewayHTTPConformanceProfile,
 	GatewayTLSConformanceProfileName:  GatewayTLSConformanceProfile,
+	GatewayTCPConformanceProfileName:  GatewayTCPConformanceProfile,
 	GatewayGRPCConformanceProfileName: GatewayGRPCConformanceProfile,
 	MeshHTTPConformanceProfileName:    MeshHTTPConformanceProfile,
 	MeshGRPCConformanceProfileName:    MeshGRPCConformanceProfile,
