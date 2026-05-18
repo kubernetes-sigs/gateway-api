@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: tcp-echo-attach-all
-  namespace: gateway-conformance-infra
+  name: tcp-invalid-xns-backend
+  namespace: gateway-conformance-web-backend
   labels:
-    app: tcp-echo-attach-all
+    app: tcp-invalid-xns-backend
 spec:
   selector:
-    app: tcp-echo-attach-all
+    app: tcp-invalid-xns-backend
   ports:
     - name: tcp
       protocol: TCP
@@ -17,19 +17,19 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: tcp-echo-attach-all
-  namespace: gateway-conformance-infra
+  name: tcp-invalid-xns-backend
+  namespace: gateway-conformance-web-backend
   labels:
-    app: tcp-echo-attach-all
+    app: tcp-invalid-xns-backend
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: tcp-echo-attach-all
+      app: tcp-invalid-xns-backend
   template:
     metadata:
       labels:
-        app: tcp-echo-attach-all
+        app: tcp-invalid-xns-backend
     spec:
       containers:
         - name: tcp-echo
@@ -47,7 +47,7 @@ spec:
                 fieldRef:
                   fieldPath: metadata.namespace
             - name: SERVICE_NAME
-              value: tcp-echo-attach-all
+              value: tcp-invalid-xns-backend
           ports:
             - containerPort: 3000
               protocol: TCP
@@ -58,48 +58,30 @@ spec:
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
-  name: tcp-attach-all-gateway
+  name: tcp-invalid-cross-namespace-backend-ref-gateway
   namespace: gateway-conformance-infra
 spec:
   gatewayClassName: "{GATEWAY_CLASS_NAME}"
   listeners:
-    - name: one
+    - name: tcp
       protocol: TCP
-      port: 9310
-      allowedRoutes:
-        kinds:
-          - kind: TCPRoute
-    - name: two
-      protocol: TCP
-      port: 9311
-      allowedRoutes:
-        kinds:
-          - kind: TCPRoute
-    - name: three
-      protocol: TCP
-      port: 9312
-      allowedRoutes:
-        kinds:
-          - kind: TCPRoute
-    - name: four
-      protocol: TCP
-      port: 9313
+      port: 9321
       allowedRoutes:
         kinds:
           - kind: TCPRoute
 ---
-# parentRef with neither `port` nor `sectionName`. Should attach to every TCP
-# listener on the Gateway, so traffic to any of the four listeners must reach
-# the same backend.
+# No ReferenceGrant: the cross-namespace backendRef must NOT be permitted.
 apiVersion: gateway.networking.k8s.io/v1alpha2
 kind: TCPRoute
 metadata:
-  name: tcp-route-attach-all
+  name: tcp-invalid-cross-namespace-backend-ref
   namespace: gateway-conformance-infra
 spec:
   parentRefs:
-    - name: tcp-attach-all-gateway
+    - name: tcp-invalid-cross-namespace-backend-ref-gateway
+      sectionName: tcp
   rules:
     - backendRefs:
-        - name: tcp-echo-attach-all
+        - name: tcp-invalid-xns-backend
+          namespace: gateway-conformance-web-backend
           port: 3000

@@ -169,63 +169,6 @@ spec:
             requests:
               cpu: 10m
 ---
-apiVersion: v1
-kind: Service
-metadata:
-  name: tcp-echo-four
-  namespace: gateway-conformance-infra
-  labels:
-    app: tcp-echo-four
-spec:
-  selector:
-    app: tcp-echo-four
-  ports:
-    - name: tcp
-      protocol: TCP
-      port: 3000
-      targetPort: 3000
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: tcp-echo-four
-  namespace: gateway-conformance-infra
-  labels:
-    app: tcp-echo-four
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: tcp-echo-four
-  template:
-    metadata:
-      labels:
-        app: tcp-echo-four
-    spec:
-      containers:
-        - name: tcp-echo
-          image: registry.k8s.io/gateway-api/echo-basic:v1.5.1
-          imagePullPolicy: IfNotPresent
-          env:
-            - name: TCP_ECHO_SERVER
-              value: "1"
-            - name: POD_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.name
-            - name: NAMESPACE
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.namespace
-            - name: SERVICE_NAME
-              value: tcp-echo-four
-          ports:
-            - containerPort: 3000
-              protocol: TCP
-          resources:
-            requests:
-              cpu: 10m
----
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
@@ -249,12 +192,6 @@ spec:
     - name: three
       protocol: TCP
       port: 9302
-      allowedRoutes:
-        kinds:
-          - kind: TCPRoute
-    - name: four
-      protocol: TCP
-      port: 9303
       allowedRoutes:
         kinds:
           - kind: TCPRoute

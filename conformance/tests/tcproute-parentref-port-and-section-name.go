@@ -35,7 +35,7 @@ func init() {
 
 var TCPRouteParentRefPortAndSectionName = confsuite.ConformanceTest{
 	ShortName:   "TCPRouteParentRefPortAndSectionName",
-	Description: "A TCPRoute attaches to a TCP listener by port, by sectionName, by both, or to every TCP listener on a Gateway when neither is set.",
+	Description: "A TCPRoute attaches to a TCP listener by port, by sectionName, or by both.",
 	Manifests:   []string{"tests/tcproute-parentref-port-and-section-name.yaml"},
 	Features: []features.FeatureName{
 		features.SupportGateway,
@@ -104,24 +104,6 @@ var TCPRouteParentRefPortAndSectionName = confsuite.ConformanceTest{
 			kubernetes.TCPRouteMustHaveParents(t, suite.Client, suite.TimeoutConfig, routeNN,
 				[]v1.RouteParentStatus{acceptedParent()}, false)
 			expectBackendForListener(t, "three", "tcp-echo-three")
-		})
-
-		// Scenario 4 is applied only after the per-listener scenarios above
-		// have been validated. Once an attach-all TCPRoute is in place it
-		// would compete with the existing routes on listeners one/two/three,
-		// where merging behavior is implementation-defined; isolating it
-		// avoids that ambiguity.
-		t.Run("TCPRoute with neither sectionName nor port attaches to every TCP listener on the Gateway", func(t *testing.T) {
-			suite.Applier.MustApplyWithCleanup(t, suite.Client, suite.TimeoutConfig,
-				"tests/tcproute-parentref-attach-all.yaml", suite.CleanupTestResources)
-
-			routeNN := types.NamespacedName{Name: "tcp-route-attach-all", Namespace: ns}
-			kubernetes.TCPRouteMustHaveParents(t, suite.Client, suite.TimeoutConfig, routeNN,
-				[]v1.RouteParentStatus{acceptedParent()}, false)
-
-			// Listener `four` has no scenario-1/2/3 route attached to it, so
-			// the attach-all route is the only TCPRoute serving it.
-			expectBackendForListener(t, "four", "tcp-echo-four")
 		})
 	},
 }

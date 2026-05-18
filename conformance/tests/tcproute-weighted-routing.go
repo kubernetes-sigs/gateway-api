@@ -31,6 +31,7 @@ import (
 
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	confsuite "sigs.k8s.io/gateway-api/conformance/utils/suite"
+	"sigs.k8s.io/gateway-api/conformance/utils/tcp"
 	"sigs.k8s.io/gateway-api/conformance/utils/tlog"
 	"sigs.k8s.io/gateway-api/conformance/utils/weight"
 	"sigs.k8s.io/gateway-api/pkg/features"
@@ -100,7 +101,7 @@ func assertTCPWeightedDistribution(ctx context.Context, gwAddr string, expectedW
 
 	for range totalRequests {
 		g.Go(func() error {
-			pod, err := tcpEchoSendOnce(ctx, gwAddr, probeTimeout)
+			pod, err := tcp.EchoSendOnce(ctx, gwAddr, probeTimeout)
 			if err != nil {
 				return err
 			}
