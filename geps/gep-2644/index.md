@@ -37,7 +37,7 @@ The following topics are out of scope for this GEP but are candidates for future
 - Client IP preservation (e.g. PROXY protocol)
 - Connection draining and timeout semantics
 - Extended routing options (e.g. 5-tuple or 3-tuple matching)
-- Port range support
+- Listener port range support for TCP
 
 ## Introduction
 
