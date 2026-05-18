@@ -17,20 +17,15 @@ limitations under the License.
 package tests
 
 import (
-	"context"
-	"fmt"
-	"net"
 	"testing"
-	"time"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/apimachinery/pkg/util/wait"
 
 	v1 "sigs.k8s.io/gateway-api/apis/v1alpha2"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	confsuite "sigs.k8s.io/gateway-api/conformance/utils/suite"
-	"sigs.k8s.io/gateway-api/conformance/utils/tlog"
+	"sigs.k8s.io/gateway-api/conformance/utils/udp"
 	"sigs.k8s.io/gateway-api/pkg/features"
 )
 
@@ -86,7 +81,7 @@ var UDPRouteParentRefPortAndSectionName = confsuite.ConformanceTest{
 			if err != nil {
 				t.Fatalf("error getting gateway address: %v", err)
 			}
-			expectUDPEchoResponse(t, suite.TimeoutConfig.DefaultTestTimeout, gwAddr)
+			udp.ExpectEchoResponse(t, suite.TimeoutConfig.DefaultTestTimeout, gwAddr)
 		})
 
 		t.Run("UDPRoute attaches to a UDP listener by sectionName and port", func(t *testing.T) {
@@ -99,7 +94,7 @@ var UDPRouteParentRefPortAndSectionName = confsuite.ConformanceTest{
 			if err != nil {
 				t.Fatalf("error getting gateway address: %v", err)
 			}
-			expectUDPEchoResponse(t, suite.TimeoutConfig.DefaultTestTimeout, gwAddr)
+			udp.ExpectEchoResponse(t, suite.TimeoutConfig.DefaultTestTimeout, gwAddr)
 		})
 
 		t.Run("UDPRoute with neither sectionName nor port attaches to every UDP listener on the Gateway", func(t *testing.T) {
@@ -114,47 +109,8 @@ var UDPRouteParentRefPortAndSectionName = confsuite.ConformanceTest{
 				if err != nil {
 					t.Fatalf("error getting gateway address for listener %q: %v", listener, err)
 				}
-				expectUDPEchoResponse(t, suite.TimeoutConfig.DefaultTestTimeout, gwAddr)
+				udp.ExpectEchoResponse(t, suite.TimeoutConfig.DefaultTestTimeout, gwAddr)
 			}
 		})
 	},
-}
-
-// expectUDPEchoResponse polls until a UDP echo round-trip against the given
-// gateway address succeeds, or the timeout is exceeded.
-func expectUDPEchoResponse(t *testing.T, timeout time.Duration, gwAddr string) {
-	t.Helper()
-
-	const probe = "gateway-api-conformance-udp-echo"
-	tlog.Logf(t, "performing UDP echo probe on %s", gwAddr)
-	err := wait.PollUntilContextTimeout(context.TODO(), time.Second, timeout, true,
-		func(ctx context.Context) (bool, error) {
-			var dialer net.Dialer
-			conn, err := dialer.DialContext(ctx, "udp", gwAddr)
-			if err != nil {
-				tlog.Logf(t, "failed to dial UDP %s: %v", gwAddr, err)
-				return false, nil
-			}
-			defer conn.Close()
-
-			if err = conn.SetDeadline(time.Now().Add(2 * time.Second)); err != nil {
-				return false, fmt.Errorf("setting UDP deadline: %w", err)
-			}
-			if _, err = conn.Write([]byte(probe)); err != nil {
-				tlog.Logf(t, "failed to write UDP probe: %v", err)
-				return false, nil
-			}
-
-			buf := make([]byte, 1024)
-			n, err := conn.Read(buf)
-			if err != nil {
-				tlog.Logf(t, "failed to read UDP echo response: %v", err)
-				return false, nil
-			}
-			tlog.Logf(t, "got UDP echo response (%d bytes) from %s", n, gwAddr)
-			return true, nil
-		})
-	if err != nil {
-		t.Errorf("UDP echo probe never succeeded against %s: %v", gwAddr, err)
-	}
 }
