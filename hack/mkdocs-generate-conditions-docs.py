@@ -14,15 +14,14 @@
 # limitations under the License.
 
 """
-Generate site-src/api-types/conditions.md from Gateway API condition types and
-reasons defined in the Go API package. Keeps documentation in sync with the API.
+Generate conditions reference markdown from Gateway API condition types in Go.
 
 Usage:
   python3 hack/mkdocs-generate-conditions-docs.py
-  python3 hack/mkdocs-generate-conditions-docs.py -o site-src/api-types/conditions.md
-
-Output path defaults to site-src/api-types/conditions.md.
+  python3 hack/mkdocs-generate-conditions-docs.py -o site/content/en/reference/api-types/conditions.md
 """
+
+DEFAULT_OUTPUT = "site/content/en/reference/api-types/conditions.md"
 
 import argparse
 import re
@@ -190,12 +189,16 @@ def render_markdown(repo_root: Path, output_path: Path) -> None:
 
     by_resource, condition_reasons = build_reason_map(all_items)
 
-    out = []
-    out.append("# Condition Types and Reasons Reference")
-    out.append("")
-    out.append("Conditions provide a standardized way for controllers to communicate the status of resources to users. Each condition has a `type`, `status` (True, False, or Unknown), `reason`, and `message`.")
-    out.append("")
-    out.append("For an introduction to conditions and troubleshooting guidance, see [Troubleshooting and Status](../concepts/troubleshooting.md).")
+    out = [
+        "---",
+        'title: "Conditions and Reasons"',
+        "weight: 11",
+        "---",
+        "",
+        "Conditions provide a standardized way for controllers to communicate the status of resources to users. Each condition has a `type`, `status` (True, False, or Unknown), `reason`, and `message`.",
+        "",
+        "For an introduction to conditions and troubleshooting guidance, see [Troubleshooting and Status](/docs/concepts/troubleshooting/).",
+    ]
     out.append("")
     out.append("## Common Conditions")
     out.append("")
@@ -221,9 +224,7 @@ def render_markdown(repo_root: Path, output_path: Path) -> None:
         out.append("")
 
         if resource == "Mesh":
-            out.append('??? experimental "Experimental"')
-            out.append("")
-            out.append("    See [GEP-3949](../geps/gep-3949/index.md).")
+            out.append("> **Experimental:** See [GEP-3949](/geps/gep-3949/).")
             out.append("")
         elif "Listener (Gateway status)" in display_name:
             out.append("Listeners are defined in `Gateway.spec.listeners`. Their status appears in `Gateway.status.listeners[].conditions`.")
@@ -241,24 +242,18 @@ def render_markdown(repo_root: Path, output_path: Path) -> None:
             out.append("")
 
             if cond.get("experimental"):
-                out.append('??? experimental "Experimental"')
-                out.append("")
-                out.append("    " + cond["comment"].split("\n")[0][:200])
+                out.append("> **Experimental:** " + cond["comment"].split("\n")[0][:200])
                 out.append("")
             elif cond.get("reserved"):
-                out.append('!!! warning "Reserved for future use"')
-                out.append("")
-                out.append("    Not used by implementations. If used in the future, will represent the final state where all configuration is confirmed good and has completely propagated to the data plane.")
+                out.append("> **Reserved for future use:** Not used by implementations. If used in the future, will represent the final state where all configuration is confirmed good and has completely propagated to the data plane.")
                 out.append("")
             elif cond.get("deprecated"):
-                out.append('!!! warning "Deprecated"')
-                out.append("")
-                out.append("    Use Accepted instead.")
+                out.append("> **Deprecated:** Use Accepted instead.")
                 out.append("")
 
             reasons = condition_reasons.get(resource, {}).get(name, {})
             if reasons:
-                out.append('<div class="conditions-compact-table-wrap" markdown="1">')
+                out.append('<div class="conditions-compact-table">')
                 out.append("")
                 out.append("| Reason | True | False | Unknown |")
                 out.append("| --- | --- | --- | --- |")
@@ -290,20 +285,12 @@ def render_markdown(repo_root: Path, output_path: Path) -> None:
 
 def main():
     parser = argparse.ArgumentParser(description="Generate conditions.md from API sources")
-    parser.add_argument("-o", "--output", default="site-src/api-types/conditions.md", help="Output path")
+    parser.add_argument("-o", "--output", default=DEFAULT_OUTPUT, help="Output path")
     args = parser.parse_args()
 
     repo_root = Path(__file__).resolve().parent.parent
     output_path = repo_root / args.output
     render_markdown(repo_root, output_path)
-
-
-def on_config(config, **kwargs):
-    """MkDocs hook: generate conditions.md before build."""
-    repo_root = Path(config.config_file_path).resolve().parent
-    output_path = repo_root / "site-src" / "api-types" / "conditions.md"
-    render_markdown(repo_root, output_path)
-    return config
 
 
 if __name__ == "__main__":

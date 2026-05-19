@@ -226,7 +226,7 @@ docs: install-deps
 	$(HUGO) --source site
 
 .PHONY: build-docs
-build-docs: install-deps update-geps api-ref-docs wizard-wasm wizard-data conformance-data
+build-docs: install-deps update-geps api-ref-docs wizard-wasm wizard-data conformance-data conditions-docs
 	$(HUGO) --source site
 
 .PHONY: verify-docs
@@ -234,7 +234,7 @@ verify-docs: build-docs
 	docker run --init --rm -w /input -v ${PWD}:/input $(DOCS_VERIFY_CONTAINER_IMAGE) --root-dir /input/site/public --include "sigs.k8s.io" --accept 200 --max-concurrency 10 --include-fragments --cache $(VALIDATE_DOCS_EXTRA_FLAGS) /input/site/public/**/*.html
 
 .PHONY: build-docs-netlify
-build-docs-netlify: install-deps update-geps api-ref-docs wizard-wasm wizard-data conformance-data
+build-docs-netlify: install-deps update-geps api-ref-docs wizard-wasm wizard-data conformance-data conditions-docs
 	$(HUGO) --source site
 
 .PHONY: live-docs
@@ -268,6 +268,10 @@ wizard-data:
 .PHONY: conformance-data
 conformance-data:
 	$(PYTHON) hack/docsy-generate-conformance.py
+
+.PHONY: conditions-docs
+conditions-docs:
+	$(PYTHON) hack/mkdocs-generate-conditions-docs.py
 
 .PHONY: serve
 serve: wizard-wasm update-geps api-ref-docs
