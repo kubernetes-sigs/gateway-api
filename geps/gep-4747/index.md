@@ -157,6 +157,10 @@ Throughout this GEP, **Backend** refers to a CRD that acts as a backendRef
 target, representing a destination. The specific resource definition is being
 developed in
 [PR #4488](https://github.com/kubernetes-sigs/gateway-api/pull/4488).
+While this GEP concerns semantics for routing to external backends via a
+Backend resource, it does not preclude other egress mechanisms. Existing
+mechanisms such as ExternalName Services MAY also be used to reference
+external destinations.
 
 ### Egress Gateway Configuration
 
