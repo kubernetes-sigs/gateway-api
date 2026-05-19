@@ -246,7 +246,9 @@ metadata:
   labels:
     app: infra-backend-v3
 spec:
-  replicas: 2
+  # infra-backend-v3 is used for retry tests. It must run with a single replica
+  # because the backend tracks retry attempts in-memory.
+  replicas: 1
   selector:
     matchLabels:
       app: infra-backend-v3
@@ -257,7 +259,7 @@ spec:
     spec:
       containers:
         - name: infra-backend-v3
-          image: registry.k8s.io/gateway-api/echo-basic:v1.5.1
+          image: registry.k8s.io/gateway-api/echo-basic:v1.6.0-dev.1
           env:
             - name: POD_NAME
               valueFrom:
