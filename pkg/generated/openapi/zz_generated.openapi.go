@@ -6567,7 +6567,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_LocalPolicyTargetReferenceWithSectionN
 					},
 					"sectionName": {
 						SchemaProps: spec.SchemaProps{
-							Description: "SectionName is the name of a section within the target resource. When unspecified, this targetRef targets the entire resource. In the following resources, SectionName is interpreted as the following:\n\n* Gateway: Listener name * HTTPRoute: HTTPRouteRule name * Service: Port name\n\nIf a SectionName is specified, but does not exist on the targeted object, the Policy must fail to attach, and the policy implementation should record a `ResolvedRefs` or similar Condition in the Policy's status.",
+							Description: "SectionName is the name of a section within the target resource. When unspecified, this targetRef targets the entire resource. In the following resources, SectionName is interpreted as the following:\n\n* Gateway: Listener name * ListenerSet: Listener name * HTTPRoute: HTTPRouteRule name * Service: Port name\n\nIf a SectionName is specified, but does not exist on the targeted object, the Policy must fail to attach, and the policy implementation should record a `ResolvedRefs` or similar Condition in the Policy's status.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -8378,7 +8378,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_LocalPolicyTargetReferenceWithSe
 					},
 					"sectionName": {
 						SchemaProps: spec.SchemaProps{
-							Description: "SectionName is the name of a section within the target resource. When unspecified, this targetRef targets the entire resource. In the following resources, SectionName is interpreted as the following:\n\n* Gateway: Listener name * HTTPRoute: HTTPRouteRule name * Service: Port name\n\nIf a SectionName is specified, but does not exist on the targeted object, the Policy must fail to attach, and the policy implementation should record a `ResolvedRefs` or similar Condition in the Policy's status.",
+							Description: "SectionName is the name of a section within the target resource. When unspecified, this targetRef targets the entire resource. In the following resources, SectionName is interpreted as the following:\n\n* Gateway: Listener name * ListenerSet: Listener name * HTTPRoute: HTTPRouteRule name * Service: Port name\n\nIf a SectionName is specified, but does not exist on the targeted object, the Policy must fail to attach, and the policy implementation should record a `ResolvedRefs` or similar Condition in the Policy's status.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
