@@ -226,7 +226,7 @@ docs: install-deps
 	$(HUGO) --source site
 
 .PHONY: build-docs
-build-docs: install-deps update-geps api-ref-docs wizard-wasm wizard-data conformance-data
+build-docs: install-deps update-geps api-ref-docs wizard-wasm wizard-data conformance-data conditions-docs
 	$(HUGO) --source site
 
 .PHONY: verify-docs
@@ -234,7 +234,7 @@ verify-docs: build-docs
 	docker run --init --rm -w /input -v ${PWD}:/input $(DOCS_VERIFY_CONTAINER_IMAGE) --root-dir /input/site/public --include "sigs.k8s.io" --accept 200 --max-concurrency 10 --include-fragments --cache $(VALIDATE_DOCS_EXTRA_FLAGS) /input/site/public/**/*.html
 
 .PHONY: build-docs-netlify
-build-docs-netlify: install-deps update-geps api-ref-docs wizard-wasm wizard-data conformance-data
+build-docs-netlify: install-deps update-geps api-ref-docs wizard-wasm wizard-data conformance-data conditions-docs
 	$(HUGO) --source site
 
 .PHONY: live-docs
@@ -245,9 +245,12 @@ live-docs: update-geps api-ref-docs
 update-geps:
 	hack/update-geps.sh
 
+# API ref generation fetches release-* branches; forks often only have them on upstream.
+DOCS_REMOTE ?= $(shell git remote get-url upstream >/dev/null 2>&1 && echo upstream || echo origin)
+
 .PHONY: api-ref-docs
 api-ref-docs:
-	hack/docsy/generate.sh
+	REMOTE=$(DOCS_REMOTE) hack/docsy/generate.sh
 
 .PHONY: wizard-wasm
 wizard-wasm:
@@ -269,7 +272,11 @@ wizard-data:
 conformance-data:
 	$(PYTHON) hack/docsy-generate-conformance.py
 
+.PHONY: conditions-docs
+conditions-docs:
+	$(PYTHON) hack/mkdocs-generate-conditions-docs.py
+
 .PHONY: serve
-serve: wizard-wasm update-geps api-ref-docs
+serve: wizard-wasm update-geps api-ref-docs conditions-docs
 	@echo "Tip: Run 'make wizard-data' first if you have conformance/reports/ to load implementation data."
 	$(HUGO_SERVER) --source site
