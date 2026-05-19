@@ -16,12 +16,14 @@ limitations under the License.
 
 package features
 
+import "k8s.io/apimachinery/pkg/util/sets"
+
 // -----------------------------------------------------------------------------
 // Features - UDPRoute Conformance (Core)
 // -----------------------------------------------------------------------------
 
 const (
-	// This option indicates support for UDPRoute
+	// SupportUDPRoute option indicates support for UDPRoute.
 	SupportUDPRoute FeatureName = "UDPRoute"
 )
 
@@ -31,8 +33,6 @@ var UDPRouteFeature = Feature{
 	Channel: FeatureChannelExperimental,
 }
 
-// UDPRouteCoreFeatures includes all SupportedFeatures needed to be conformant with
+// UDPRouteFeatures includes all SupportedFeatures needed to be conformant with
 // the UDPRoute resource.
-var UDPRouteFeatures = map[FeatureName]Feature{
-	SupportUDPRoute: UDPRouteFeature,
-}
+var UDPRouteFeatures = sets.New(UDPRouteFeature)
