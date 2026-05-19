@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: udp-echo-reference-grant
-  namespace: gateway-conformance-app-backend
+  name: udp-echo-attach-all
+  namespace: gateway-conformance-infra
   labels:
-    app: udp-echo-reference-grant
+    app: udp-echo-attach-all
 spec:
   selector:
-    app: udp-echo-reference-grant
+    app: udp-echo-attach-all
   ports:
     - name: udp
       protocol: UDP
@@ -17,19 +17,19 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: udp-echo-reference-grant
-  namespace: gateway-conformance-app-backend
+  name: udp-echo-attach-all
+  namespace: gateway-conformance-infra
   labels:
-    app: udp-echo-reference-grant
+    app: udp-echo-attach-all
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: udp-echo-reference-grant
+      app: udp-echo-attach-all
   template:
     metadata:
       labels:
-        app: udp-echo-reference-grant
+        app: udp-echo-attach-all
     spec:
       containers:
         - name: udp-echo
@@ -47,7 +47,7 @@ spec:
                 fieldRef:
                   fieldPath: metadata.namespace
             - name: SERVICE_NAME
-              value: udp-echo-reference-grant
+              value: udp-echo-attach-all
           ports:
             - containerPort: 8080
               protocol: UDP
@@ -56,46 +56,43 @@ spec:
               cpu: 10m
 ---
 apiVersion: gateway.networking.k8s.io/v1
-kind: ReferenceGrant
-metadata:
-  name: udp-reference-grant
-  namespace: gateway-conformance-app-backend
-spec:
-  from:
-    - group: gateway.networking.k8s.io
-      kind: UDPRoute
-      namespace: gateway-conformance-infra
-  to:
-    - group: ""
-      kind: Service
-      name: udp-echo-reference-grant
----
-apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
-  name: udp-gateway-reference-grant
+  name: udp-attach-all-listeners-gateway
   namespace: gateway-conformance-infra
 spec:
   gatewayClassName: "{GATEWAY_CLASS_NAME}"
   listeners:
-    - name: udp
+    - name: udp-1
       protocol: UDP
-      port: 5300
+      port: 5310
+      allowedRoutes:
+        kinds:
+          - kind: UDPRoute
+    - name: udp-2
+      protocol: UDP
+      port: 5311
+      allowedRoutes:
+        kinds:
+          - kind: UDPRoute
+    - name: udp-3
+      protocol: UDP
+      port: 5312
       allowedRoutes:
         kinds:
           - kind: UDPRoute
 ---
+# A UDPRoute with no `port` and no `sectionName` set on its parentRef should
+# attach to every UDP listener on the Gateway.
 apiVersion: gateway.networking.k8s.io/v1alpha2
 kind: UDPRoute
 metadata:
-  name: udp-route-reference-grant
+  name: udp-route-attach-all
   namespace: gateway-conformance-infra
 spec:
   parentRefs:
-    - name: udp-gateway-reference-grant
-      sectionName: udp
+    - name: udp-attach-all-listeners-gateway
   rules:
     - backendRefs:
-        - name: udp-echo-reference-grant
-          namespace: gateway-conformance-app-backend
+        - name: udp-echo-attach-all
           port: 8080

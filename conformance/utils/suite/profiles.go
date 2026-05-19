@@ -53,7 +53,7 @@ const (
 	// GatewayTCPConformanceProfileName indicates the name of the conformance profile
 	// which covers TCP functionality with Gateways.
 	GatewayTCPConformanceProfileName ConformanceProfileName = "GATEWAY-TCP"
-	
+
 	// GatewayUDPConformanceProfileName indicates the name of the conformance profile
 	// which covers UDP functionality with Gateways.
 	GatewayUDPConformanceProfileName ConformanceProfileName = "GATEWAY-UDP"
@@ -127,12 +127,15 @@ var (
 	// GatewayUDPConformanceProfile is a ConformanceProfile that covers testing UDP
 	// related functionality with Gateways.
 	GatewayUDPConformanceProfile = ConformanceProfile{
-		Name:         GatewayUDPConformanceProfileName,
-		CoreFeatures: sets.New[features.FeatureName](),
+		Name: GatewayUDPConformanceProfileName,
+		CoreFeatures: sets.New[features.FeatureName](
+			features.SupportGateway,
+			features.SupportUDPRoute,
+			features.SupportReferenceGrant,
+		),
 		ExtendedFeatures: features.SetsToNamesSet(
 			features.GatewayExtendedFeatures,
 			features.UDPRouteFeatures,
-			features.SupportReferenceGrant,
 		),
 	}
 

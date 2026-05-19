@@ -35,7 +35,7 @@ func init() {
 
 var UDPRouteParentRefPortAndSectionName = confsuite.ConformanceTest{
 	ShortName:   "UDPRouteParentRefPortAndSectionName",
-	Description: "A UDPRoute attaches to a UDP listener by port, by sectionName, by both, or to every UDP listener on a Gateway when neither is set.",
+	Description: "A UDPRoute attaches to a UDP listener selected by port, by sectionName, or by both, and traffic to each listener is routed to the backend Service configured by the corresponding UDPRoute.",
 	Manifests:   []string{"tests/udproute-parentref-port-and-section-name.yaml"},
 	Features: []features.FeatureName{
 		features.SupportGateway,
@@ -71,46 +71,52 @@ var UDPRouteParentRefPortAndSectionName = confsuite.ConformanceTest{
 			}
 		}
 
-		t.Run("UDPRoute attaches to a UDP listener by port", func(t *testing.T) {
-			routeNN := types.NamespacedName{Name: "udp-route-by-port", Namespace: ns}
-			kubernetes.UDPRouteMustHaveParents(t, suite.Client, suite.TimeoutConfig, routeNN,
-				[]v1.RouteParentStatus{acceptedParent()}, false)
+		// Each scenario wires a distinct listener to a dedicated backend
+		// Service. Hitting a listener should route to that listener's backend
+		// only, which we verify by checking the service identifier returned by
+		// the UDP echo server.
+		scenarios := []struct {
+			name     string
+			route    string
+			listener string
+			backend  string
+		}{
+			{
+				name:     "UDPRoute attaches to a UDP listener by port",
+				route:    "udp-route-by-port",
+				listener: "by-port",
+				backend:  "udp-echo-by-port",
+			},
+			{
+				name:     "UDPRoute attaches to a UDP listener by sectionName",
+				route:    "udp-route-by-section",
+				listener: "by-section",
+				backend:  "udp-echo-by-section",
+			},
+			{
+				name:     "UDPRoute attaches to a UDP listener by sectionName and port",
+				route:    "udp-route-by-section-and-port",
+				listener: "by-section-and-port",
+				backend:  "udp-echo-by-section-and-port",
+			},
+		}
 
-			gwAddr, err := kubernetes.WaitForGatewayAddress(t, suite.Client, suite.TimeoutConfig,
-				kubernetes.NewGatewayRef(gwNN, "dns"))
-			if err != nil {
-				t.Fatalf("error getting gateway address: %v", err)
-			}
-			udp.ExpectEchoResponse(t, suite.TimeoutConfig.DefaultTestTimeout, gwAddr)
-		})
+		for _, s := range scenarios {
+			t.Run(s.name, func(t *testing.T) {
+				routeNN := types.NamespacedName{Name: s.route, Namespace: ns}
+				kubernetes.UDPRouteMustHaveParents(t, suite.Client, suite.TimeoutConfig, routeNN,
+					[]v1.RouteParentStatus{acceptedParent()}, false)
 
-		t.Run("UDPRoute attaches to a UDP listener by sectionName and port", func(t *testing.T) {
-			routeNN := types.NamespacedName{Name: "udp-route-by-section-and-port", Namespace: ns}
-			kubernetes.UDPRouteMustHaveParents(t, suite.Client, suite.TimeoutConfig, routeNN,
-				[]v1.RouteParentStatus{acceptedParent()}, false)
-
-			gwAddr, err := kubernetes.WaitForGatewayAddress(t, suite.Client, suite.TimeoutConfig,
-				kubernetes.NewGatewayRef(gwNN, "dns"))
-			if err != nil {
-				t.Fatalf("error getting gateway address: %v", err)
-			}
-			udp.ExpectEchoResponse(t, suite.TimeoutConfig.DefaultTestTimeout, gwAddr)
-		})
-
-		t.Run("UDPRoute with neither sectionName nor port attaches to every UDP listener on the Gateway", func(t *testing.T) {
-			routeNN := types.NamespacedName{Name: "udp-route-attach-all", Namespace: ns}
-			kubernetes.UDPRouteMustHaveParents(t, suite.Client, suite.TimeoutConfig, routeNN,
-				[]v1.RouteParentStatus{acceptedParent()}, false)
-
-			// Both UDP listeners should forward to the configured backend.
-			for _, listener := range []string{"dns", "game"} {
 				gwAddr, err := kubernetes.WaitForGatewayAddress(t, suite.Client, suite.TimeoutConfig,
-					kubernetes.NewGatewayRef(gwNN, listener))
+					kubernetes.NewGatewayRef(gwNN, s.listener))
 				if err != nil {
-					t.Fatalf("error getting gateway address for listener %q: %v", listener, err)
+					t.Fatalf("error getting gateway address for listener %q: %v", s.listener, err)
 				}
-				udp.ExpectEchoResponse(t, suite.TimeoutConfig.DefaultTestTimeout, gwAddr)
-			}
-		})
+				udp.ExpectEchoResponseFromBackend(t, suite.TimeoutConfig.DefaultTestTimeout, gwAddr, udp.ExpectedResponse{
+					Service:   s.backend,
+					Namespace: ns,
+				})
+			})
+		}
 	},
 }
