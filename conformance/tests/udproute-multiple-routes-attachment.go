@@ -131,7 +131,7 @@ var UDPRouteMultipleRoutesAttachment = confsuite.ConformanceTest{
 			)
 			pollErr := wait.PollUntilContextTimeout(t.Context(), time.Second, suite.TimeoutConfig.DefaultTestTimeout, true,
 				func(ctx context.Context) (bool, error) {
-					for i := 0; i < probes; i++ {
+					for i := range probes {
 						pod, err := udpEchoSendOnce(ctx, gwAddr, probeTimeout)
 						if err != nil {
 							tlog.Logf(t, "UDP probe %d failed, will retry: %v", i+1, err)
