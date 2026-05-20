@@ -165,12 +165,12 @@ type ConfigurableOptions struct {
 
 	// UsableNetworkAddresses is an optional pool of usable addresses for
 	// Gateways for tests which need to test manual address assignments.
-	UsableNetworkAddresses []gatewayv1.GatewaySpecAddress `json:"usableAddresses"`
+	UsableNetworkAddresses []gatewayv1.GatewaySpecAddress `json:"usableNetworkAddresses"`
 
 	// UnusableNetworkAddresses is an optional pool of unusable addresses for
 	// Gateways for tests which need to test failures with manual Gateway
 	// address assignment.
-	UnusableNetworkAddresses []gatewayv1.GatewaySpecAddress `json:"unusableAddresses"`
+	UnusableNetworkAddresses []gatewayv1.GatewaySpecAddress `json:"unusableNetworkAddresses"`
 }
 
 // ConformanceOptions can be used to initialize a ConformanceTestSuite.
@@ -181,7 +181,6 @@ type ConformanceOptions struct {
 	ClientOptions client.Options
 	Clientset     clientset.Interface
 	RestConfig    *rest.Config
-	AddressType   string
 	RoundTripper  roundtripper.RoundTripper
 	GRPCClient    grpc.Client
 	BaseManifests string
@@ -300,7 +299,6 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 		Applier: kubernetes.Applier{
 			NamespaceLabels:      options.NamespaceLabels,
 			NamespaceAnnotations: options.NamespaceAnnotations,
-			AddressType:          options.AddressType,
 		},
 		SupportedFeatures:           supportedFeatures,
 		TimeoutConfig:               options.TimeoutConfig,

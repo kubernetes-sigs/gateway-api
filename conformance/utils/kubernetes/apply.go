@@ -49,10 +49,6 @@ type Applier struct {
 	// GatewayClass will be used as the spec.gatewayClassName when applying Gateway resources
 	GatewayClass string
 
-	// AddressType is a type that is expected to be supported AND usable
-	// for Gateways in the underlying implementation
-	AddressType string
-
 	// ControllerName will be used as the spec.controllerName when applying GatewayClass resources
 	ControllerName string
 

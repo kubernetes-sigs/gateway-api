@@ -16,12 +16,12 @@ supportedFeatures:
   - HTTPRouteMethodMatching
 exemptFeatures:
   - GatewayPort8080
-usableAddresses:
+usableNetworkAddresses:
   - type: IPAddress
     value: "192.168.1.1"
   - type: Hostname
     value: "example.com"
-unusableAddresses:
+unusableNetworkAddresses:
   - type: IPAddress
     value: "10.0.0.1"
 debug: true
