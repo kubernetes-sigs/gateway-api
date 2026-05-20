@@ -268,9 +268,9 @@ the user?
 Because these details don't matter for a user, they should be hidden from the CRD/OpenAPI
 generation and also from the website API Reference.
 
-This can be achieved putting these information between the tags 
+This can be achieved by putting the information between the tags 
 `<gateway:util:excludeFromCRD></gateway:util:excludeFromCRD>` and preferably 
-contain a callout that those are a Note for implementers:
+contain a callout that is a Note for implementers:
 
 ```golang
 // Mode defines the TLS behavior for the TLS session initiated by the client.
