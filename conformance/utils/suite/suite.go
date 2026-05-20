@@ -211,6 +211,11 @@ const (
 
 // NewConformanceTestSuite is a helper to use for creating a new ConformanceTestSuite.
 func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite, error) {
+	if options.Mode == "" {
+		// Necessary for now, in case downstream consumers call
+		// NewConformanceTestSuite without setting Mode.
+		options.Mode = "default"
+	}
 	supportedFeatures := sets.New(options.SupportedFeatures...).Difference(sets.New(options.ExemptFeatures...))
 	source := supportedFeaturesSourceManual
 	if options.EnableAllSupportedFeatures {

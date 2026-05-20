@@ -130,7 +130,13 @@ func init() {
 		func(o *suite.ConfigurableOptions, v string) { o.Implementation.Version = v },
 	)
 	registerStringFlag("contact", "", "Comma-separated list of contact information for the maintainers",
-		func(o *suite.ConfigurableOptions, v string) { o.Implementation.Contact = strings.Split(v, ",") },
+		func(o *suite.ConfigurableOptions, v string) {
+			if v == "" {
+				o.Implementation.Contact = nil
+				return
+			}
+			o.Implementation.Contact = strings.Split(v, ",")
+		},
 	)
 	registerBoolFlag("skip-provisional-tests", false, "Whether to skip provisional tests",
 		func(o *suite.ConfigurableOptions, v bool) { o.SkipProvisionalTests = v },
@@ -141,14 +147,18 @@ func init() {
 	registerStringFlag("usable-address", "", "Usable address for GatewayStaticAddresses test",
 		func(o *suite.ConfigurableOptions, v string) {
 			if v != "" {
-				o.UsableNetworkAddresses = append(o.UsableNetworkAddresses, parseAddress(v))
+				o.UsableNetworkAddresses = []v1.GatewaySpecAddress{parseAddress(v)}
+			} else {
+				o.UsableNetworkAddresses = nil
 			}
 		},
 	)
 	registerStringFlag("unusable-address", "", "Unusable address for GatewayStaticAddresses test",
 		func(o *suite.ConfigurableOptions, v string) {
 			if v != "" {
-				o.UnusableNetworkAddresses = append(o.UnusableNetworkAddresses, parseAddress(v))
+				o.UnusableNetworkAddresses = []v1.GatewaySpecAddress{parseAddress(v)}
+			} else {
+				o.UnusableNetworkAddresses = nil
 			}
 		},
 	)
