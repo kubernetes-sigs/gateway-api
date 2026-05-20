@@ -22,8 +22,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
-	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
-	v1 "sigs.k8s.io/gateway-api/apis/v1alpha2"
+	v1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	confsuite "sigs.k8s.io/gateway-api/conformance/utils/suite"
 	"sigs.k8s.io/gateway-api/conformance/utils/udp"
@@ -82,35 +81,35 @@ var UDPRouteParentRefAttachAllListeners = confsuite.ConformanceTest{
 		t.Run("Every UDP listener on the Gateway has the UDPRoute attached", func(t *testing.T) {
 			ready := []metav1.Condition{
 				{
-					Type:   string(gatewayv1.ListenerConditionAccepted),
+					Type:   string(v1.ListenerConditionAccepted),
 					Status: metav1.ConditionTrue,
 					Reason: "", // any reason
 				},
 				{
-					Type:   string(gatewayv1.ListenerConditionResolvedRefs),
+					Type:   string(v1.ListenerConditionResolvedRefs),
 					Status: metav1.ConditionTrue,
 					Reason: "", // any reason
 				},
 			}
-			udpRouteKind := []gatewayv1.RouteGroupKind{{
-				Group: (*gatewayv1.Group)(&gatewayv1.GroupVersion.Group),
-				Kind:  gatewayv1.Kind("UDPRoute"),
+			udpRouteKind := []v1.RouteGroupKind{{
+				Group: (*v1.Group)(&v1.GroupVersion.Group),
+				Kind:  v1.Kind("UDPRoute"),
 			}}
-			expectedListeners := []gatewayv1.ListenerStatus{
+			expectedListeners := []v1.ListenerStatus{
 				{
-					Name:           gatewayv1.SectionName("udp-1"),
+					Name:           v1.SectionName("udp-1"),
 					SupportedKinds: udpRouteKind,
 					AttachedRoutes: 1,
 					Conditions:     ready,
 				},
 				{
-					Name:           gatewayv1.SectionName("udp-2"),
+					Name:           v1.SectionName("udp-2"),
 					SupportedKinds: udpRouteKind,
 					AttachedRoutes: 1,
 					Conditions:     ready,
 				},
 				{
-					Name:           gatewayv1.SectionName("udp-3"),
+					Name:           v1.SectionName("udp-3"),
 					SupportedKinds: udpRouteKind,
 					AttachedRoutes: 1,
 					Conditions:     ready,
