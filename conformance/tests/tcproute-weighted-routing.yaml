@@ -112,6 +112,63 @@ spec:
             requests:
               cpu: 10m
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tcp-backend-v3
+  namespace: gateway-conformance-infra
+  labels:
+    app: tcp-backend-v3
+spec:
+  selector:
+    app: tcp-backend-v3
+  ports:
+    - name: tcp
+      protocol: TCP
+      port: 3000
+      targetPort: 3000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tcp-backend-v3
+  namespace: gateway-conformance-infra
+  labels:
+    app: tcp-backend-v3
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tcp-backend-v3
+  template:
+    metadata:
+      labels:
+        app: tcp-backend-v3
+    spec:
+      containers:
+        - name: tcp-backend
+          image: registry.k8s.io/gateway-api/echo-basic:v1.5.1
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: TCP_ECHO_SERVER
+              value: "1"
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: SERVICE_NAME
+              value: tcp-backend-v3
+          ports:
+            - containerPort: 3000
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 10m
+---
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
@@ -144,3 +201,6 @@ spec:
         - name: tcp-backend-v2
           port: 3000
           weight: 30
+        - name: tcp-backend-v3
+          port: 3000
+          weight: 0
