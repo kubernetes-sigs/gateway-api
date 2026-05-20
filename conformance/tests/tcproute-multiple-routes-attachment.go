@@ -1,5 +1,5 @@
 /*
-Copyright 2026 The Kubernetes Authors.
+Copyright The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -62,7 +62,7 @@ var TCPRouteMultipleRoutesAttachment = confsuite.ConformanceTest{
 
 		// CreationTimestamp has second-level precision; sleep ensures the second route
 		// is strictly newer than the first.
-		time.Sleep(5 * time.Second)
+		time.Sleep(time.Second)
 
 		newerRoute := &v1alpha2.TCPRoute{
 			ObjectMeta: metav1.ObjectMeta{
@@ -119,7 +119,7 @@ var TCPRouteMultipleRoutesAttachment = confsuite.ConformanceTest{
 		})
 
 		t.Run("Only the oldest TCPRoute should receive traffic", func(t *testing.T) {
-			// Per GEP-713 conflict-resolution, only the oldest route is bound to the
+			// https://gateway-api.sigs.k8s.io/guides/api-design/#conflicts, only the oldest route is bound to the
 			// listener; traffic must reach pods backing tcp-attach-backend-1 and never
 			// pods backing tcp-attach-backend-2.
 			//

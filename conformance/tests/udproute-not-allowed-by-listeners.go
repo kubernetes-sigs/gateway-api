@@ -1,5 +1,5 @@
 /*
-Copyright 2026 The Kubernetes Authors.
+Copyright The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -33,19 +33,21 @@ func init() {
 }
 
 var UDPRouteNotAllowedByListeners = confsuite.ConformanceTest{
-	ShortName: "UDPRouteNotAllowedByListener",
+	ShortName: "UDPRouteNotAllowedByListeners",
 	Description: "A UDPRoute targeting a Gateway listener whose protocol is not UDP must report " +
 		"Accepted=False with reason NotAllowedByListeners and must not be attached to the listener.",
 	Manifests: []string{"tests/udproute-not-allowed-by-listeners.yaml"},
 	Features: []features.FeatureName{
 		features.SupportGateway,
 		features.SupportUDPRoute,
-		features.SupportTCPRoute,
 	},
 	Provisional: true,
 	Test: func(t *testing.T, suite *confsuite.ConformanceTestSuite) {
+		if !suite.SupportedFeatures.Has(features.SupportTLSRoute) {
+			return
+		}
 		ns := confsuite.InfrastructureNamespace
-		gwNN := types.NamespacedName{Name: "udproute-tcp-only-gateway", Namespace: ns}
+		gwNN := types.NamespacedName{Name: "udproute-tls-only-gateway", Namespace: ns}
 		routeNN := types.NamespacedName{Name: "udproute-not-allowed-by-listeners", Namespace: ns}
 
 		// This test creates an additional Gateway in the gateway-conformance-infra
@@ -60,7 +62,7 @@ var UDPRouteNotAllowedByListeners = confsuite.ConformanceTest{
 			})
 		})
 
-		t.Run("Gateway should have 0 Routes attached on the TCP listener", func(t *testing.T) {
+		t.Run("Gateway should have 0 Routes attached on the TLS listener", func(t *testing.T) {
 			kubernetes.GatewayMustHaveZeroRoutes(t, suite.Client, suite.TimeoutConfig, gwNN)
 		})
 	},
