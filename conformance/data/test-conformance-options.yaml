@@ -1,13 +1,13 @@
-meshName: "istio"
+meshName: "testmesh"
 reportOutputPath: "test-output/report.yaml"
 mode: "placeholder"
 timeoutConfig:
   deleteTimeout: "30s"
   getTimeout: "30s"
 implementation:
-  organization: "Istio"
-  project: "istio"
-  url: "https://istio.io"
+  organization: "testorg"
+  project: "testproject"
+  url: "https://placeholder.com"
   version: "1.30.0"
   contact:
     - "@test"

@@ -40,9 +40,9 @@ func TestConformanceOptions(t *testing.T) {
 	options := DefaultOptions(t)
 
 	// Overwritten in yaml file.
-	assert.Equal(t, "istio", options.MeshName)
+	assert.Equal(t, "testmesh", options.MeshName)
 	assert.Equal(t, "placeholder", options.Mode)
-	assert.Equal(t, "istio", options.Implementation.Project)
+	assert.Equal(t, "testproject", options.Implementation.Project)
 	// Use default value.
 	assert.Equal(t, "gateway-conformance", options.GatewayClassName)
 	assert.Empty(t, options.RunTest)
