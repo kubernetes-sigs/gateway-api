@@ -90,28 +90,6 @@ spec:
                     be unique across all targetRef entries in the BackendTLSPolicy.
                   * They select different sectionNames in the same target.
 
-                  When more than one BackendTLSPolicy selects the same target and
-                  sectionName, implementations MUST determine precedence using the
-                  following criteria, continuing on ties:
-
-                  * The older policy by creation timestamp takes precedence. For
-                    example, a policy with a creation timestamp of "2021-07-15
-                    01:02:03" MUST be given precedence over a policy with a
-                    creation timestamp of "2021-07-15 01:02:04".
-                  * The policy appearing first in alphabetical order by {namespace}/{name}.
-                    For example, a policy named `foo/bar` is given precedence over a
-                    policy named `foo/baz`.
-
-                  For any BackendTLSPolicy that does not take precedence, the
-                  implementation MUST ensure the `Accepted` Condition is set to
-                  `status: False`, with Reason `Conflicted`.
-
-                  Implementations SHOULD NOT support more than one targetRef at this
-                  time. Although the API technically allows for this, the current guidance
-                  for conflict resolution and status handling is lacking. Until that can be
-                  clarified in a future release, the safest approach is to support a single
-                  targetRef.
-
                   Support Levels:
 
                   * Extended: Kubernetes Service referenced by backendRefs used on a Route.
@@ -122,18 +100,6 @@ spec:
                     - Services not referenced by any Route (e.g., infrastructure services)
                     - Service mesh workload-to-service communication
                     - Other resource types beyond Service
-
-                  Implementations SHOULD aim to ensure that BackendTLSPolicy behavior is consistent,
-                  even outside of the extended HTTPRoute -(backendRef) -> Service path.
-                  They SHOULD clearly document how BackendTLSPolicy is interpreted in these
-                  scenarios, including:
-                    - Which resources beyond Service are supported
-                    - How the policy is discovered and applied
-                    - Any implementation-specific semantics or restrictions
-
-                  Note that this config applies to the entire referenced resource
-                  by default, but this default may change in the future to provide
-                  a more granular application of the policy.
                 items:
                   description: |-
                     LocalPolicyTargetReferenceWithSectionName identifies an API object to apply a
@@ -215,32 +181,6 @@ spec:
                       specified. Only one of CACertificateRefs or WellKnownCACertificates may be specified,
                       not both. If CACertificateRefs is empty or unspecified, the configuration for
                       WellKnownCACertificates MUST be honored instead if supported by the implementation.
-
-                      A CACertificateRef is invalid if:
-
-                      * It refers to a resource that cannot be resolved (e.g., the referenced resource
-                        does not exist) or is misconfigured (e.g., a ConfigMap does not contain a key
-                        named `ca.crt`). In this case, the Reason must be set to `InvalidCACertificateRef`
-                        and the Message of the Condition must indicate which reference is invalid and why.
-
-                      * It refers to an unknown or unsupported kind of resource. In this case, the Reason
-                        must be set to `InvalidKind` and the Message of the Condition must explain which
-                        kind of resource is unknown or unsupported.
-
-                      * It refers to a resource in another namespace. This may change in future
-                        spec updates.
-
-                      Implementations MAY choose to perform further validation of the certificate
-                      content (e.g., checking expiry or enforcing specific formats). In such cases,
-                      an implementation-specific Reason and Message must be set for the invalid reference.
-
-                      In all cases, the implementation MUST ensure the `ResolvedRefs` Condition on
-                      the BackendTLSPolicy is set to `status: False`, with a Reason and Message
-                      that indicate the cause of the error. Connections using an invalid
-                      CACertificateRef MUST fail, and the client MUST receive an HTTP 5xx error
-                      response. If ALL CACertificateRefs are invalid, the implementation MUST also
-                      ensure the `Accepted` Condition on the BackendTLSPolicy is set to
-                      `status: False`, with a Reason `NoValidCACertificate`.
 
                       A single CACertificateRef to a Kubernetes ConfigMap kind has "Core" support.
                       Implementations MAY choose to support attaching multiple certificates to
@@ -569,14 +509,6 @@ spec:
                             Implementations supporting other types of parent resources MUST clearly
                             document how/if Port is interpreted.
 
-                            For the purpose of status, an attachment is considered successful as
-                            long as the parent resource accepts it partially. For example, Gateway
-                            listeners can restrict which Routes can attach to them by Route kind,
-                            namespace, or hostname. If 1 of 2 Gateway listeners accept attachment
-                            from the referencing Route, the Route MUST be considered successfully
-                            attached. If no Gateway listeners accept attachment from this Route,
-                            the Route MUST be considered detached from the Gateway.
-
                             Support: Extended
                           format: int32
                           maximum: 65535
@@ -599,13 +531,6 @@ spec:
                             interpreted.
 
                             When unspecified (empty string), this will reference the entire resource.
-                            For the purpose of status, an attachment is considered successful if at
-                            least one section in the parent resource accepts it. For example, Gateway
-                            listeners can restrict which Routes can attach to them by Route kind,
-                            namespace, or hostname. If 1 of 2 Gateway listeners accept attachment from
-                            the referencing Route, the Route MUST be considered successfully
-                            attached. If no Gateway listeners accept attachment from this Route, the
-                            Route MUST be considered detached from the Gateway.
 
                             Support: Core
                           maxLength: 253
@@ -784,28 +709,6 @@ spec:
                     be unique across all targetRef entries in the BackendTLSPolicy.
                   * They select different sectionNames in the same target.
 
-                  When more than one BackendTLSPolicy selects the same target and
-                  sectionName, implementations MUST determine precedence using the
-                  following criteria, continuing on ties:
-
-                  * The older policy by creation timestamp takes precedence. For
-                    example, a policy with a creation timestamp of "2021-07-15
-                    01:02:03" MUST be given precedence over a policy with a
-                    creation timestamp of "2021-07-15 01:02:04".
-                  * The policy appearing first in alphabetical order by {namespace}/{name}.
-                    For example, a policy named `foo/bar` is given precedence over a
-                    policy named `foo/baz`.
-
-                  For any BackendTLSPolicy that does not take precedence, the
-                  implementation MUST ensure the `Accepted` Condition is set to
-                  `status: False`, with Reason `Conflicted`.
-
-                  Implementations SHOULD NOT support more than one targetRef at this
-                  time. Although the API technically allows for this, the current guidance
-                  for conflict resolution and status handling is lacking. Until that can be
-                  clarified in a future release, the safest approach is to support a single
-                  targetRef.
-
                   Support Levels:
 
                   * Extended: Kubernetes Service referenced by backendRefs used on a Route.
@@ -816,18 +719,6 @@ spec:
                     - Services not referenced by any Route (e.g., infrastructure services)
                     - Service mesh workload-to-service communication
                     - Other resource types beyond Service
-
-                  Implementations SHOULD aim to ensure that BackendTLSPolicy behavior is consistent,
-                  even outside of the extended HTTPRoute -(backendRef) -> Service path.
-                  They SHOULD clearly document how BackendTLSPolicy is interpreted in these
-                  scenarios, including:
-                    - Which resources beyond Service are supported
-                    - How the policy is discovered and applied
-                    - Any implementation-specific semantics or restrictions
-
-                  Note that this config applies to the entire referenced resource
-                  by default, but this default may change in the future to provide
-                  a more granular application of the policy.
                 items:
                   description: |-
                     LocalPolicyTargetReferenceWithSectionName identifies an API object to apply a
@@ -909,32 +800,6 @@ spec:
                       specified. Only one of CACertificateRefs or WellKnownCACertificates may be specified,
                       not both. If CACertificateRefs is empty or unspecified, the configuration for
                       WellKnownCACertificates MUST be honored instead if supported by the implementation.
-
-                      A CACertificateRef is invalid if:
-
-                      * It refers to a resource that cannot be resolved (e.g., the referenced resource
-                        does not exist) or is misconfigured (e.g., a ConfigMap does not contain a key
-                        named `ca.crt`). In this case, the Reason must be set to `InvalidCACertificateRef`
-                        and the Message of the Condition must indicate which reference is invalid and why.
-
-                      * It refers to an unknown or unsupported kind of resource. In this case, the Reason
-                        must be set to `InvalidKind` and the Message of the Condition must explain which
-                        kind of resource is unknown or unsupported.
-
-                      * It refers to a resource in another namespace. This may change in future
-                        spec updates.
-
-                      Implementations MAY choose to perform further validation of the certificate
-                      content (e.g., checking expiry or enforcing specific formats). In such cases,
-                      an implementation-specific Reason and Message must be set for the invalid reference.
-
-                      In all cases, the implementation MUST ensure the `ResolvedRefs` Condition on
-                      the BackendTLSPolicy is set to `status: False`, with a Reason and Message
-                      that indicate the cause of the error. Connections using an invalid
-                      CACertificateRef MUST fail, and the client MUST receive an HTTP 5xx error
-                      response. If ALL CACertificateRefs are invalid, the implementation MUST also
-                      ensure the `Accepted` Condition on the BackendTLSPolicy is set to
-                      `status: False`, with a Reason `NoValidCACertificate`.
 
                       A single CACertificateRef to a Kubernetes ConfigMap kind has "Core" support.
                       Implementations MAY choose to support attaching multiple certificates to
@@ -1263,14 +1128,6 @@ spec:
                             Implementations supporting other types of parent resources MUST clearly
                             document how/if Port is interpreted.
 
-                            For the purpose of status, an attachment is considered successful as
-                            long as the parent resource accepts it partially. For example, Gateway
-                            listeners can restrict which Routes can attach to them by Route kind,
-                            namespace, or hostname. If 1 of 2 Gateway listeners accept attachment
-                            from the referencing Route, the Route MUST be considered successfully
-                            attached. If no Gateway listeners accept attachment from this Route,
-                            the Route MUST be considered detached from the Gateway.
-
                             Support: Extended
                           format: int32
                           maximum: 65535
@@ -1293,13 +1150,6 @@ spec:
                             interpreted.
 
                             When unspecified (empty string), this will reference the entire resource.
-                            For the purpose of status, an attachment is considered successful if at
-                            least one section in the parent resource accepts it. For example, Gateway
-                            listeners can restrict which Routes can attach to them by Route kind,
-                            namespace, or hostname. If 1 of 2 Gateway listeners accept attachment from
-                            the referencing Route, the Route MUST be considered successfully
-                            attached. If no Gateway listeners accept attachment from this Route, the
-                            Route MUST be considered detached from the Gateway.
 
                             Support: Core
                           maxLength: 253

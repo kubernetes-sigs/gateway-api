@@ -90,6 +90,12 @@ type HTTPRouteSpec struct {
 	// as a suffix match. That means that a match for `*.example.com` would match
 	// both `test.example.com`, and `foo.test.example.com`, but not `example.com`.
 	//
+	// Support: Core
+	//
+	// <gateway:util:excludeFromCRD>
+	//
+	// Notes for implementers:
+	//
 	// If both the Listener and HTTPRoute have specified hostnames, any
 	// HTTPRoute hostnames that do not match the Listener hostname MUST be
 	// ignored. For example, if a Listener specified `*.example.com`, and the
@@ -111,7 +117,7 @@ type HTTPRouteSpec struct {
 	// If ties exist across multiple Routes, the matching precedence rules for
 	// HTTPRouteMatches takes over.
 	//
-	// Support: Core
+	// </gateway:util:excludeFromCRD>
 	//
 	// +optional
 	// +listType=atomic
@@ -181,6 +187,10 @@ type HTTPRouteRule struct {
 	// path match on "/", which has the effect of matching every
 	// HTTP request.
 	//
+	// <gateway:util:excludeFromCRD>
+	//
+	// Notes for implementers:
+	//
 	// Proxy or Load Balancer routing configuration generated from HTTPRoutes
 	// MUST prioritize matches based on the following criteria, continuing on
 	// ties. Across all rules specified on applicable Routes, precedence must be
@@ -208,6 +218,8 @@ type HTTPRouteRule struct {
 	// When no rules matching a request have been successfully attached to the
 	// parent a request is coming from, a HTTP 404 status code MUST be returned.
 	//
+	// </gateway:util:excludeFromCRD>
+	//
 	// +optional
 	// +listType=atomic
 	// +kubebuilder:validation:MaxItems=64
@@ -216,6 +228,25 @@ type HTTPRouteRule struct {
 
 	// Filters define the filters that are applied to requests that match
 	// this rule.
+	//
+	// Conformance-levels at this level are defined based on the type of filter:
+	//
+	// - ALL core filters MUST be supported by all implementations.
+	// - Implementers are encouraged to support extended filters.
+	// - Implementation-specific custom filters have no API guarantees across
+	//   implementations.
+	//
+	// Specifying the same filter multiple times is not supported unless explicitly
+	// indicated in the filter.
+	//
+	// All filters are expected to be compatible with each other except for the
+	// URLRewrite and RequestRedirect filters, which may not be combined.
+	//
+	// Support: Core
+	//
+	// <gateway:util:excludeFromCRD>
+	//
+	// Notes for implementers:
 	//
 	// Wherever possible, implementations SHOULD implement filters in the order
 	// they are specified.
@@ -231,25 +262,13 @@ type HTTPRouteRule struct {
 	// a portion of Route Rules are invalid, implementations MUST set the
 	// "PartiallyInvalid" condition for the Route.
 	//
-	// Conformance-levels at this level are defined based on the type of filter:
-	//
-	// - ALL core filters MUST be supported by all implementations.
-	// - Implementers are encouraged to support extended filters.
-	// - Implementation-specific custom filters have no API guarantees across
-	//   implementations.
-	//
-	// Specifying the same filter multiple times is not supported unless explicitly
-	// indicated in the filter.
-	//
-	// All filters are expected to be compatible with each other except for the
-	// URLRewrite and RequestRedirect filters, which may not be combined. If an
-	// implementation cannot support other combinations of filters, they must clearly
-	// document that limitation. In cases where incompatible or unsupported
+	// If an implementation cannot support other combinations of filters, they must
+	// clearly document that limitation. In cases where incompatible or unsupported
 	// filters are specified and cause the `Accepted` condition to be set to status
 	// `False`, implementations may use the `IncompatibleFilters` reason to specify
 	// this configuration error.
 	//
-	// Support: Core
+	// </gateway:util:excludeFromCRD>
 	//
 	// +optional
 	// +listType=atomic
@@ -264,6 +283,18 @@ type HTTPRouteRule struct {
 
 	// BackendRefs defines the backend(s) where matching requests should be
 	// sent.
+	//
+	// Support: Core for Kubernetes Service
+	//
+	// Support: Extended for Kubernetes ServiceImport
+	//
+	// Support: Implementation-specific for any other resource
+	//
+	// Support for weight: Core
+	//
+	// <gateway:util:excludeFromCRD>
+	//
+	// Notes for implementers:
 	//
 	// Failure behavior here depends on how many BackendRefs are specified and
 	// how many are invalid.
@@ -290,13 +321,7 @@ type HTTPRouteRule struct {
 	// If an implementation chooses to do this, all of the above rules for 500 responses
 	// MUST also apply for responses that return a 503.
 	//
-	// Support: Core for Kubernetes Service
-	//
-	// Support: Extended for Kubernetes ServiceImport
-	//
-	// Support: Implementation-specific for any other resource
-	//
-	// Support for weight: Core
+	// </gateway:util:excludeFromCRD>
 	//
 	// +optional
 	// +listType=atomic
@@ -843,6 +868,10 @@ type HTTPRouteFilter struct {
 	// Implementers are encouraged to define custom implementation types to
 	// extend the core API with implementation-specific behavior.
 	//
+	// <gateway:util:excludeFromCRD>
+	//
+	// Notes for implementers:
+	//
 	// If a reference to a custom filter type cannot be resolved, the filter
 	// MUST NOT be skipped. Instead, requests that would have been processed by
 	// that filter MUST receive a HTTP error response.
@@ -853,6 +882,8 @@ type HTTPRouteFilter struct {
 	// Unknown values here must result in the implementation setting the
 	// Accepted Condition for the Route to `status: False`, with a
 	// Reason of `UnsupportedValue`.
+	//
+	// </gateway:util:excludeFromCRD>
 	//
 	// +unionDiscriminator
 	// +kubebuilder:validation:Enum=RequestHeaderModifier;ResponseHeaderModifier;RequestMirror;RequestRedirect;URLRewrite;ExtensionRef;CORS
@@ -1319,6 +1350,18 @@ type HTTPRequestMirrorFilter struct {
 	// within this BackendRef, irrespective of how many endpoints are present
 	// within this BackendRef.
 	//
+	// If the backend service requires TLS, use BackendTLSPolicy to tell the
+	// implementation to supply the TLS details to be used to connect to that
+	// backend.
+	//
+	// Support: Extended for Kubernetes Service
+	//
+	// Support: Implementation-specific for any other resource
+	//
+	// <gateway:util:excludeFromCRD>
+	//
+	// Notes for implementers:
+	//
 	// If the referent cannot be found, this BackendRef is invalid and must be
 	// dropped from the Gateway. The controller must ensure the "ResolvedRefs"
 	// condition on the Route status is set to `status: False` and not configure
@@ -1333,13 +1376,7 @@ type HTTPRequestMirrorFilter struct {
 	// In either error case, the Message of the `ResolvedRefs` Condition
 	// should be used to provide more detail about the problem.
 	//
-	// Support: Extended for Kubernetes Service
-	//
-	// Support: Implementation-specific for any other resource
-	//
-	// If the backend service requires TLS, use BackendTLSPolicy to tell the
-	// implementation to supply the TLS details to be used to connect to that
-	// backend.
+	// </gateway:util:excludeFromCRD>
 	//
 	// +required
 	BackendRef BackendObjectReference `json:"backendRef"`
@@ -1624,12 +1661,10 @@ const (
 // +kubebuilder:validation:XValidation:message="protocol must be 'HTTP' when http is set",rule="has(self.http) ? self.protocol == 'HTTP' : true"
 type HTTPExternalAuthFilter struct {
 	// ExternalAuthProtocol describes which protocol to use when communicating with an
-	// ext_authz authorization server.
+	// external authorization server.
 	//
-	// When this is set to GRPC, each backend must use the Envoy ext_authz protocol
-	// on the port specified in `backendRefs`. Requests and responses are defined
-	// in the protobufs explained at:
-	// https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/external_auth.proto
+	// When this is set to GRPC, each backend must use the GRPC ext_authz protocol
+	// on the port specified in `backendRefs`.
 	//
 	// When this is set to HTTP, each backend must respond with a `200` status
 	// code in on a successful authorization. Any other code is considered
@@ -1638,6 +1673,16 @@ type HTTPExternalAuthFilter struct {
 	// Feature Names:
 	// GRPC Support - HTTPRouteExternalAuthGRPC
 	// HTTP Support - HTTPRouteExternalAuthHTTP
+	//
+	// <gateway:util:excludeFromCRD>
+	//
+	// Notes for implementers:
+	//
+	// When the protocol is GRPC, requests and responses are defined in the
+	// Envoy ext_authz protobufs explained at:
+	// https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/external_auth.proto
+	//
+	// </gateway:util:excludeFromCRD>
 	//
 	// +unionDiscriminator
 	// +required
@@ -1820,6 +1865,20 @@ type ForwardBodyConfig struct {
 type HTTPBackendRef struct {
 	// BackendRef is a reference to a backend to forward matched requests to.
 	//
+	// Support: Core for Kubernetes Service
+	//
+	// Support: Implementation-specific for any other resource
+	//
+	// Support for weight: Core
+	//
+	// Support for Kubernetes Service appProtocol: Extended
+	//
+	// Support for BackendTLSPolicy: Extended
+	//
+	// <gateway:util:excludeFromCRD>
+	//
+	// Notes for implementers:
+	//
 	// A BackendRef can be invalid for the following reasons. In all cases, the
 	// implementation MUST ensure the `ResolvedRefs` Condition on the Route
 	// is set to `status: False`, with a Reason and Message that indicate
@@ -1847,15 +1906,7 @@ type HTTPBackendRef struct {
 	//   is present that refers to the Service, and the implementation is unable
 	//   to meet the requirement.
 	//
-	// Support: Core for Kubernetes Service
-	//
-	// Support: Implementation-specific for any other resource
-	//
-	// Support for weight: Core
-	//
-	// Support for Kubernetes Service appProtocol: Extended
-	//
-	// Support for BackendTLSPolicy: Extended
+	// </gateway:util:excludeFromCRD>
 	//
 	// +optional
 	BackendRef `json:",inline"`

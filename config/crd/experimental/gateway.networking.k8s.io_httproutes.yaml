@@ -86,27 +86,6 @@ spec:
                   as a suffix match. That means that a match for `*.example.com` would match
                   both `test.example.com`, and `foo.test.example.com`, but not `example.com`.
 
-                  If both the Listener and HTTPRoute have specified hostnames, any
-                  HTTPRoute hostnames that do not match the Listener hostname MUST be
-                  ignored. For example, if a Listener specified `*.example.com`, and the
-                  HTTPRoute specified `test.example.com` and `test.example.net`,
-                  `test.example.net` must not be considered for a match.
-
-                  If both the Listener and HTTPRoute have specified hostnames, and none
-                  match with the criteria above, then the HTTPRoute is not accepted. The
-                  implementation must raise an 'Accepted' Condition with a status of
-                  `False` in the corresponding RouteParentStatus.
-
-                  In the event that multiple HTTPRoutes specify intersecting hostnames (e.g.
-                  overlapping wildcard matching and exact matching hostnames), precedence must
-                  be given to rules from the HTTPRoute with the largest number of:
-
-                  * Characters in a matching non-wildcard hostname.
-                  * Characters in a matching hostname.
-
-                  If ties exist across multiple Routes, the matching precedence rules for
-                  HTTPRouteMatches takes over.
-
                   Support: Core
                 items:
                   description: |-
@@ -162,27 +141,6 @@ spec:
                     each ParentRef that selects the same object must set the same set of
                     optional fields to different values. If one ParentRef sets a
                     combination of optional fields, all must set the same combination.
-
-                  Some examples:
-
-                  * If one ParentRef sets `sectionName`, all ParentRefs referencing the
-                    same object must also set `sectionName`.
-                  * If one ParentRef sets `port`, all ParentRefs referencing the same
-                    object must also set `port`.
-                  * If one ParentRef sets `sectionName` and `port`, all ParentRefs
-                    referencing the same object must also set `sectionName` and `port`.
-
-                  It is possible to separately reference multiple distinct objects that may
-                  be collapsed by an implementation. For example, some implementations may
-                  choose to merge compatible Gateway Listeners together. If that is the
-                  case, the list of routes attached to those resources should also be
-                  merged.
-
-                  Note that for ParentRefs that cross namespace boundaries, there are specific
-                  rules. Cross-namespace references are only valid if they are explicitly
-                  allowed by something in the namespace they are referring to. For example,
-                  Gateway has the AllowedRoutes field, and ReferenceGrant provides a
-                  generic way to enable other kinds of cross-namespace reference.
 
 
                   ParentRefs from a Route to a Service in the same namespace are "producer"
@@ -295,14 +253,6 @@ spec:
                         Implementations supporting other types of parent resources MUST clearly
                         document how/if Port is interpreted.
 
-                        For the purpose of status, an attachment is considered successful as
-                        long as the parent resource accepts it partially. For example, Gateway
-                        listeners can restrict which Routes can attach to them by Route kind,
-                        namespace, or hostname. If 1 of 2 Gateway listeners accept attachment
-                        from the referencing Route, the Route MUST be considered successfully
-                        attached. If no Gateway listeners accept attachment from this Route,
-                        the Route MUST be considered detached from the Gateway.
-
                         Support: Extended
                       format: int32
                       maximum: 65535
@@ -325,13 +275,6 @@ spec:
                         interpreted.
 
                         When unspecified (empty string), this will reference the entire resource.
-                        For the purpose of status, an attachment is considered successful if at
-                        least one section in the parent resource accepts it. For example, Gateway
-                        listeners can restrict which Routes can attach to them by Route kind,
-                        namespace, or hostname. If 1 of 2 Gateway listeners accept attachment from
-                        the referencing Route, the Route MUST be considered successfully
-                        attached. If no Gateway listeners accept attachment from this Route, the
-                        Route MUST be considered detached from the Gateway.
 
                         Support: Core
                       maxLength: 253
@@ -384,31 +327,6 @@ spec:
                       description: |-
                         BackendRefs defines the backend(s) where matching requests should be
                         sent.
-
-                        Failure behavior here depends on how many BackendRefs are specified and
-                        how many are invalid.
-
-                        If *all* entries in BackendRefs are invalid, and there are also no filters
-                        specified in this route rule, *all* traffic which matches this rule MUST
-                        receive a 500 status code.
-
-                        See the HTTPBackendRef definition for the rules about what makes a single
-                        HTTPBackendRef invalid.
-
-                        When a HTTPBackendRef is invalid, 500 status codes MUST be returned for
-                        requests that would have otherwise been routed to an invalid backend. If
-                        multiple backends are specified, and some are invalid, the proportion of
-                        requests that would otherwise have been routed to an invalid backend
-                        MUST receive a 500 status code.
-
-                        For example, if two backends are specified with equal weights, and one is
-                        invalid, 50 percent of traffic must receive a 500. Implementations may
-                        choose how that 50 percent is determined.
-
-                        When a HTTPBackendRef refers to a Service that has no ready endpoints,
-                        implementations SHOULD return a 503 for requests to that backend instead.
-                        If an implementation chooses to do this, all of the above rules for 500 responses
-                        MUST also apply for responses that return a 503.
 
                         Support: Core for Kubernetes Service
 
@@ -1008,12 +926,10 @@ spec:
                                     protocol:
                                       description: |-
                                         ExternalAuthProtocol describes which protocol to use when communicating with an
-                                        ext_authz authorization server.
+                                        external authorization server.
 
-                                        When this is set to GRPC, each backend must use the Envoy ext_authz protocol
-                                        on the port specified in `backendRefs`. Requests and responses are defined
-                                        in the protobufs explained at:
-                                        https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/external_auth.proto
+                                        When this is set to GRPC, each backend must use the GRPC ext_authz protocol
+                                        on the port specified in `backendRefs`.
 
                                         When this is set to HTTP, each backend must respond with a `200` status
                                         code in on a successful authorization. Any other code is considered
@@ -1210,27 +1126,13 @@ spec:
                                         within this BackendRef, irrespective of how many endpoints are present
                                         within this BackendRef.
 
-                                        If the referent cannot be found, this BackendRef is invalid and must be
-                                        dropped from the Gateway. The controller must ensure the "ResolvedRefs"
-                                        condition on the Route status is set to `status: False` and not configure
-                                        this backend in the underlying implementation.
-
-                                        If there is a cross-namespace reference to an *existing* object
-                                        that is not allowed by a ReferenceGrant, the controller must ensure the
-                                        "ResolvedRefs"  condition on the Route is set to `status: False`,
-                                        with the "RefNotPermitted" reason and not configure this backend in the
-                                        underlying implementation.
-
-                                        In either error case, the Message of the `ResolvedRefs` Condition
-                                        should be used to provide more detail about the problem.
+                                        If the backend service requires TLS, use BackendTLSPolicy to tell the
+                                        implementation to supply the TLS details to be used to connect to that
+                                        backend.
 
                                         Support: Extended for Kubernetes Service
 
                                         Support: Implementation-specific for any other resource
-
-                                        If the backend service requires TLS, use BackendTLSPolicy to tell the
-                                        implementation to supply the TLS details to be used to connect to that
-                                        backend.
                                       properties:
                                         group:
                                           default: ""
@@ -1664,17 +1566,6 @@ spec:
 
                                     Implementers are encouraged to define custom implementation types to
                                     extend the core API with implementation-specific behavior.
-
-                                    If a reference to a custom filter type cannot be resolved, the filter
-                                    MUST NOT be skipped. Instead, requests that would have been processed by
-                                    that filter MUST receive a HTTP error response.
-
-                                    Note that values may be added to this enum, implementations
-                                    must ensure that unknown values will not cause a crash.
-
-                                    Unknown values here must result in the implementation setting the
-                                    Accepted Condition for the Route to `status: False`, with a
-                                    Reason of `UnsupportedValue`.
                                   enum:
                                   - RequestHeaderModifier
                                   - ResponseHeaderModifier
@@ -1944,20 +1835,6 @@ spec:
                         Filters define the filters that are applied to requests that match
                         this rule.
 
-                        Wherever possible, implementations SHOULD implement filters in the order
-                        they are specified.
-
-                        Implementations MAY choose to implement this ordering strictly, rejecting
-                        any combination or order of filters that cannot be supported. If implementations
-                        choose a strict interpretation of filter ordering, they MUST clearly document
-                        that behavior.
-
-                        To reject an invalid combination or order of filters, implementations SHOULD
-                        consider the Route Rules with this configuration invalid. If all Route Rules
-                        in a Route are invalid, the entire Route would be considered invalid. If only
-                        a portion of Route Rules are invalid, implementations MUST set the
-                        "PartiallyInvalid" condition for the Route.
-
                         Conformance-levels at this level are defined based on the type of filter:
 
                         - ALL core filters MUST be supported by all implementations.
@@ -1969,12 +1846,7 @@ spec:
                         indicated in the filter.
 
                         All filters are expected to be compatible with each other except for the
-                        URLRewrite and RequestRedirect filters, which may not be combined. If an
-                        implementation cannot support other combinations of filters, they must clearly
-                        document that limitation. In cases where incompatible or unsupported
-                        filters are specified and cause the `Accepted` condition to be set to status
-                        `False`, implementations may use the `IncompatibleFilters` reason to specify
-                        this configuration error.
+                        URLRewrite and RequestRedirect filters, which may not be combined.
 
                         Support: Core
                       items:
@@ -2537,12 +2409,10 @@ spec:
                               protocol:
                                 description: |-
                                   ExternalAuthProtocol describes which protocol to use when communicating with an
-                                  ext_authz authorization server.
+                                  external authorization server.
 
-                                  When this is set to GRPC, each backend must use the Envoy ext_authz protocol
-                                  on the port specified in `backendRefs`. Requests and responses are defined
-                                  in the protobufs explained at:
-                                  https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/external_auth.proto
+                                  When this is set to GRPC, each backend must use the GRPC ext_authz protocol
+                                  on the port specified in `backendRefs`.
 
                                   When this is set to HTTP, each backend must respond with a `200` status
                                   code in on a successful authorization. Any other code is considered
@@ -2735,27 +2605,13 @@ spec:
                                   within this BackendRef, irrespective of how many endpoints are present
                                   within this BackendRef.
 
-                                  If the referent cannot be found, this BackendRef is invalid and must be
-                                  dropped from the Gateway. The controller must ensure the "ResolvedRefs"
-                                  condition on the Route status is set to `status: False` and not configure
-                                  this backend in the underlying implementation.
-
-                                  If there is a cross-namespace reference to an *existing* object
-                                  that is not allowed by a ReferenceGrant, the controller must ensure the
-                                  "ResolvedRefs"  condition on the Route is set to `status: False`,
-                                  with the "RefNotPermitted" reason and not configure this backend in the
-                                  underlying implementation.
-
-                                  In either error case, the Message of the `ResolvedRefs` Condition
-                                  should be used to provide more detail about the problem.
+                                  If the backend service requires TLS, use BackendTLSPolicy to tell the
+                                  implementation to supply the TLS details to be used to connect to that
+                                  backend.
 
                                   Support: Extended for Kubernetes Service
 
                                   Support: Implementation-specific for any other resource
-
-                                  If the backend service requires TLS, use BackendTLSPolicy to tell the
-                                  implementation to supply the TLS details to be used to connect to that
-                                  backend.
                                 properties:
                                   group:
                                     default: ""
@@ -3187,17 +3043,6 @@ spec:
 
                               Implementers are encouraged to define custom implementation types to
                               extend the core API with implementation-specific behavior.
-
-                              If a reference to a custom filter type cannot be resolved, the filter
-                              MUST NOT be skipped. Instead, requests that would have been processed by
-                              that filter MUST receive a HTTP error response.
-
-                              Note that values may be added to this enum, implementations
-                              must ensure that unknown values will not cause a crash.
-
-                              Unknown values here must result in the implementation setting the
-                              Accepted Condition for the Route to `status: False`, with a
-                              Reason of `UnsupportedValue`.
                             enum:
                             - RequestHeaderModifier
                             - ResponseHeaderModifier
@@ -3403,33 +3248,6 @@ spec:
                         If no matches are specified, the default is a prefix
                         path match on "/", which has the effect of matching every
                         HTTP request.
-
-                        Proxy or Load Balancer routing configuration generated from HTTPRoutes
-                        MUST prioritize matches based on the following criteria, continuing on
-                        ties. Across all rules specified on applicable Routes, precedence must be
-                        given to the match having:
-
-                        * "Exact" path match.
-                        * "Prefix" path match with largest number of characters.
-                        * Method match.
-                        * Largest number of header matches.
-                        * Largest number of query param matches.
-
-                        Note: The precedence of RegularExpression path matches are implementation-specific.
-
-                        If ties still exist across multiple Routes, matching precedence MUST be
-                        determined in order of the following criteria, continuing on ties:
-
-                        * The oldest Route based on creation timestamp.
-                        * The Route appearing first in alphabetical order by
-                          "{namespace}/{name}".
-
-                        If ties still exist within an HTTPRoute, matching precedence MUST be granted
-                        to the FIRST matching rule (in list order) with a match meeting the above
-                        criteria.
-
-                        When no rules matching a request have been successfully attached to the
-                        parent a request is coming from, a HTTP 404 status code MUST be returned.
                       items:
                         description: "HTTPRouteMatch defines the predicate used to
                           match requests to a given\naction. Multiple match types
@@ -4207,14 +4025,6 @@ spec:
                             Implementations supporting other types of parent resources MUST clearly
                             document how/if Port is interpreted.
 
-                            For the purpose of status, an attachment is considered successful as
-                            long as the parent resource accepts it partially. For example, Gateway
-                            listeners can restrict which Routes can attach to them by Route kind,
-                            namespace, or hostname. If 1 of 2 Gateway listeners accept attachment
-                            from the referencing Route, the Route MUST be considered successfully
-                            attached. If no Gateway listeners accept attachment from this Route,
-                            the Route MUST be considered detached from the Gateway.
-
                             Support: Extended
                           format: int32
                           maximum: 65535
@@ -4237,13 +4047,6 @@ spec:
                             interpreted.
 
                             When unspecified (empty string), this will reference the entire resource.
-                            For the purpose of status, an attachment is considered successful if at
-                            least one section in the parent resource accepts it. For example, Gateway
-                            listeners can restrict which Routes can attach to them by Route kind,
-                            namespace, or hostname. If 1 of 2 Gateway listeners accept attachment from
-                            the referencing Route, the Route MUST be considered successfully
-                            attached. If no Gateway listeners accept attachment from this Route, the
-                            Route MUST be considered detached from the Gateway.
 
                             Support: Core
                           maxLength: 253
@@ -4340,27 +4143,6 @@ spec:
                   as a suffix match. That means that a match for `*.example.com` would match
                   both `test.example.com`, and `foo.test.example.com`, but not `example.com`.
 
-                  If both the Listener and HTTPRoute have specified hostnames, any
-                  HTTPRoute hostnames that do not match the Listener hostname MUST be
-                  ignored. For example, if a Listener specified `*.example.com`, and the
-                  HTTPRoute specified `test.example.com` and `test.example.net`,
-                  `test.example.net` must not be considered for a match.
-
-                  If both the Listener and HTTPRoute have specified hostnames, and none
-                  match with the criteria above, then the HTTPRoute is not accepted. The
-                  implementation must raise an 'Accepted' Condition with a status of
-                  `False` in the corresponding RouteParentStatus.
-
-                  In the event that multiple HTTPRoutes specify intersecting hostnames (e.g.
-                  overlapping wildcard matching and exact matching hostnames), precedence must
-                  be given to rules from the HTTPRoute with the largest number of:
-
-                  * Characters in a matching non-wildcard hostname.
-                  * Characters in a matching hostname.
-
-                  If ties exist across multiple Routes, the matching precedence rules for
-                  HTTPRouteMatches takes over.
-
                   Support: Core
                 items:
                   description: |-
@@ -4416,27 +4198,6 @@ spec:
                     each ParentRef that selects the same object must set the same set of
                     optional fields to different values. If one ParentRef sets a
                     combination of optional fields, all must set the same combination.
-
-                  Some examples:
-
-                  * If one ParentRef sets `sectionName`, all ParentRefs referencing the
-                    same object must also set `sectionName`.
-                  * If one ParentRef sets `port`, all ParentRefs referencing the same
-                    object must also set `port`.
-                  * If one ParentRef sets `sectionName` and `port`, all ParentRefs
-                    referencing the same object must also set `sectionName` and `port`.
-
-                  It is possible to separately reference multiple distinct objects that may
-                  be collapsed by an implementation. For example, some implementations may
-                  choose to merge compatible Gateway Listeners together. If that is the
-                  case, the list of routes attached to those resources should also be
-                  merged.
-
-                  Note that for ParentRefs that cross namespace boundaries, there are specific
-                  rules. Cross-namespace references are only valid if they are explicitly
-                  allowed by something in the namespace they are referring to. For example,
-                  Gateway has the AllowedRoutes field, and ReferenceGrant provides a
-                  generic way to enable other kinds of cross-namespace reference.
 
 
                   ParentRefs from a Route to a Service in the same namespace are "producer"
@@ -4549,14 +4310,6 @@ spec:
                         Implementations supporting other types of parent resources MUST clearly
                         document how/if Port is interpreted.
 
-                        For the purpose of status, an attachment is considered successful as
-                        long as the parent resource accepts it partially. For example, Gateway
-                        listeners can restrict which Routes can attach to them by Route kind,
-                        namespace, or hostname. If 1 of 2 Gateway listeners accept attachment
-                        from the referencing Route, the Route MUST be considered successfully
-                        attached. If no Gateway listeners accept attachment from this Route,
-                        the Route MUST be considered detached from the Gateway.
-
                         Support: Extended
                       format: int32
                       maximum: 65535
@@ -4579,13 +4332,6 @@ spec:
                         interpreted.
 
                         When unspecified (empty string), this will reference the entire resource.
-                        For the purpose of status, an attachment is considered successful if at
-                        least one section in the parent resource accepts it. For example, Gateway
-                        listeners can restrict which Routes can attach to them by Route kind,
-                        namespace, or hostname. If 1 of 2 Gateway listeners accept attachment from
-                        the referencing Route, the Route MUST be considered successfully
-                        attached. If no Gateway listeners accept attachment from this Route, the
-                        Route MUST be considered detached from the Gateway.
 
                         Support: Core
                       maxLength: 253
@@ -4638,31 +4384,6 @@ spec:
                       description: |-
                         BackendRefs defines the backend(s) where matching requests should be
                         sent.
-
-                        Failure behavior here depends on how many BackendRefs are specified and
-                        how many are invalid.
-
-                        If *all* entries in BackendRefs are invalid, and there are also no filters
-                        specified in this route rule, *all* traffic which matches this rule MUST
-                        receive a 500 status code.
-
-                        See the HTTPBackendRef definition for the rules about what makes a single
-                        HTTPBackendRef invalid.
-
-                        When a HTTPBackendRef is invalid, 500 status codes MUST be returned for
-                        requests that would have otherwise been routed to an invalid backend. If
-                        multiple backends are specified, and some are invalid, the proportion of
-                        requests that would otherwise have been routed to an invalid backend
-                        MUST receive a 500 status code.
-
-                        For example, if two backends are specified with equal weights, and one is
-                        invalid, 50 percent of traffic must receive a 500. Implementations may
-                        choose how that 50 percent is determined.
-
-                        When a HTTPBackendRef refers to a Service that has no ready endpoints,
-                        implementations SHOULD return a 503 for requests to that backend instead.
-                        If an implementation chooses to do this, all of the above rules for 500 responses
-                        MUST also apply for responses that return a 503.
 
                         Support: Core for Kubernetes Service
 
@@ -5262,12 +4983,10 @@ spec:
                                     protocol:
                                       description: |-
                                         ExternalAuthProtocol describes which protocol to use when communicating with an
-                                        ext_authz authorization server.
+                                        external authorization server.
 
-                                        When this is set to GRPC, each backend must use the Envoy ext_authz protocol
-                                        on the port specified in `backendRefs`. Requests and responses are defined
-                                        in the protobufs explained at:
-                                        https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/external_auth.proto
+                                        When this is set to GRPC, each backend must use the GRPC ext_authz protocol
+                                        on the port specified in `backendRefs`.
 
                                         When this is set to HTTP, each backend must respond with a `200` status
                                         code in on a successful authorization. Any other code is considered
@@ -5464,27 +5183,13 @@ spec:
                                         within this BackendRef, irrespective of how many endpoints are present
                                         within this BackendRef.
 
-                                        If the referent cannot be found, this BackendRef is invalid and must be
-                                        dropped from the Gateway. The controller must ensure the "ResolvedRefs"
-                                        condition on the Route status is set to `status: False` and not configure
-                                        this backend in the underlying implementation.
-
-                                        If there is a cross-namespace reference to an *existing* object
-                                        that is not allowed by a ReferenceGrant, the controller must ensure the
-                                        "ResolvedRefs"  condition on the Route is set to `status: False`,
-                                        with the "RefNotPermitted" reason and not configure this backend in the
-                                        underlying implementation.
-
-                                        In either error case, the Message of the `ResolvedRefs` Condition
-                                        should be used to provide more detail about the problem.
+                                        If the backend service requires TLS, use BackendTLSPolicy to tell the
+                                        implementation to supply the TLS details to be used to connect to that
+                                        backend.
 
                                         Support: Extended for Kubernetes Service
 
                                         Support: Implementation-specific for any other resource
-
-                                        If the backend service requires TLS, use BackendTLSPolicy to tell the
-                                        implementation to supply the TLS details to be used to connect to that
-                                        backend.
                                       properties:
                                         group:
                                           default: ""
@@ -5918,17 +5623,6 @@ spec:
 
                                     Implementers are encouraged to define custom implementation types to
                                     extend the core API with implementation-specific behavior.
-
-                                    If a reference to a custom filter type cannot be resolved, the filter
-                                    MUST NOT be skipped. Instead, requests that would have been processed by
-                                    that filter MUST receive a HTTP error response.
-
-                                    Note that values may be added to this enum, implementations
-                                    must ensure that unknown values will not cause a crash.
-
-                                    Unknown values here must result in the implementation setting the
-                                    Accepted Condition for the Route to `status: False`, with a
-                                    Reason of `UnsupportedValue`.
                                   enum:
                                   - RequestHeaderModifier
                                   - ResponseHeaderModifier
@@ -6198,20 +5892,6 @@ spec:
                         Filters define the filters that are applied to requests that match
                         this rule.
 
-                        Wherever possible, implementations SHOULD implement filters in the order
-                        they are specified.
-
-                        Implementations MAY choose to implement this ordering strictly, rejecting
-                        any combination or order of filters that cannot be supported. If implementations
-                        choose a strict interpretation of filter ordering, they MUST clearly document
-                        that behavior.
-
-                        To reject an invalid combination or order of filters, implementations SHOULD
-                        consider the Route Rules with this configuration invalid. If all Route Rules
-                        in a Route are invalid, the entire Route would be considered invalid. If only
-                        a portion of Route Rules are invalid, implementations MUST set the
-                        "PartiallyInvalid" condition for the Route.
-
                         Conformance-levels at this level are defined based on the type of filter:
 
                         - ALL core filters MUST be supported by all implementations.
@@ -6223,12 +5903,7 @@ spec:
                         indicated in the filter.
 
                         All filters are expected to be compatible with each other except for the
-                        URLRewrite and RequestRedirect filters, which may not be combined. If an
-                        implementation cannot support other combinations of filters, they must clearly
-                        document that limitation. In cases where incompatible or unsupported
-                        filters are specified and cause the `Accepted` condition to be set to status
-                        `False`, implementations may use the `IncompatibleFilters` reason to specify
-                        this configuration error.
+                        URLRewrite and RequestRedirect filters, which may not be combined.
 
                         Support: Core
                       items:
@@ -6791,12 +6466,10 @@ spec:
                               protocol:
                                 description: |-
                                   ExternalAuthProtocol describes which protocol to use when communicating with an
-                                  ext_authz authorization server.
+                                  external authorization server.
 
-                                  When this is set to GRPC, each backend must use the Envoy ext_authz protocol
-                                  on the port specified in `backendRefs`. Requests and responses are defined
-                                  in the protobufs explained at:
-                                  https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/external_auth.proto
+                                  When this is set to GRPC, each backend must use the GRPC ext_authz protocol
+                                  on the port specified in `backendRefs`.
 
                                   When this is set to HTTP, each backend must respond with a `200` status
                                   code in on a successful authorization. Any other code is considered
@@ -6989,27 +6662,13 @@ spec:
                                   within this BackendRef, irrespective of how many endpoints are present
                                   within this BackendRef.
 
-                                  If the referent cannot be found, this BackendRef is invalid and must be
-                                  dropped from the Gateway. The controller must ensure the "ResolvedRefs"
-                                  condition on the Route status is set to `status: False` and not configure
-                                  this backend in the underlying implementation.
-
-                                  If there is a cross-namespace reference to an *existing* object
-                                  that is not allowed by a ReferenceGrant, the controller must ensure the
-                                  "ResolvedRefs"  condition on the Route is set to `status: False`,
-                                  with the "RefNotPermitted" reason and not configure this backend in the
-                                  underlying implementation.
-
-                                  In either error case, the Message of the `ResolvedRefs` Condition
-                                  should be used to provide more detail about the problem.
+                                  If the backend service requires TLS, use BackendTLSPolicy to tell the
+                                  implementation to supply the TLS details to be used to connect to that
+                                  backend.
 
                                   Support: Extended for Kubernetes Service
 
                                   Support: Implementation-specific for any other resource
-
-                                  If the backend service requires TLS, use BackendTLSPolicy to tell the
-                                  implementation to supply the TLS details to be used to connect to that
-                                  backend.
                                 properties:
                                   group:
                                     default: ""
@@ -7441,17 +7100,6 @@ spec:
 
                               Implementers are encouraged to define custom implementation types to
                               extend the core API with implementation-specific behavior.
-
-                              If a reference to a custom filter type cannot be resolved, the filter
-                              MUST NOT be skipped. Instead, requests that would have been processed by
-                              that filter MUST receive a HTTP error response.
-
-                              Note that values may be added to this enum, implementations
-                              must ensure that unknown values will not cause a crash.
-
-                              Unknown values here must result in the implementation setting the
-                              Accepted Condition for the Route to `status: False`, with a
-                              Reason of `UnsupportedValue`.
                             enum:
                             - RequestHeaderModifier
                             - ResponseHeaderModifier
@@ -7657,33 +7305,6 @@ spec:
                         If no matches are specified, the default is a prefix
                         path match on "/", which has the effect of matching every
                         HTTP request.
-
-                        Proxy or Load Balancer routing configuration generated from HTTPRoutes
-                        MUST prioritize matches based on the following criteria, continuing on
-                        ties. Across all rules specified on applicable Routes, precedence must be
-                        given to the match having:
-
-                        * "Exact" path match.
-                        * "Prefix" path match with largest number of characters.
-                        * Method match.
-                        * Largest number of header matches.
-                        * Largest number of query param matches.
-
-                        Note: The precedence of RegularExpression path matches are implementation-specific.
-
-                        If ties still exist across multiple Routes, matching precedence MUST be
-                        determined in order of the following criteria, continuing on ties:
-
-                        * The oldest Route based on creation timestamp.
-                        * The Route appearing first in alphabetical order by
-                          "{namespace}/{name}".
-
-                        If ties still exist within an HTTPRoute, matching precedence MUST be granted
-                        to the FIRST matching rule (in list order) with a match meeting the above
-                        criteria.
-
-                        When no rules matching a request have been successfully attached to the
-                        parent a request is coming from, a HTTP 404 status code MUST be returned.
                       items:
                         description: "HTTPRouteMatch defines the predicate used to
                           match requests to a given\naction. Multiple match types
@@ -8461,14 +8082,6 @@ spec:
                             Implementations supporting other types of parent resources MUST clearly
                             document how/if Port is interpreted.
 
-                            For the purpose of status, an attachment is considered successful as
-                            long as the parent resource accepts it partially. For example, Gateway
-                            listeners can restrict which Routes can attach to them by Route kind,
-                            namespace, or hostname. If 1 of 2 Gateway listeners accept attachment
-                            from the referencing Route, the Route MUST be considered successfully
-                            attached. If no Gateway listeners accept attachment from this Route,
-                            the Route MUST be considered detached from the Gateway.
-
                             Support: Extended
                           format: int32
                           maximum: 65535
@@ -8491,13 +8104,6 @@ spec:
                             interpreted.
 
                             When unspecified (empty string), this will reference the entire resource.
-                            For the purpose of status, an attachment is considered successful if at
-                            least one section in the parent resource accepts it. For example, Gateway
-                            listeners can restrict which Routes can attach to them by Route kind,
-                            namespace, or hostname. If 1 of 2 Gateway listeners accept attachment from
-                            the referencing Route, the Route MUST be considered successfully
-                            attached. If no Gateway listeners accept attachment from this Route, the
-                            Route MUST be considered detached from the Gateway.
 
                             Support: Core
                           maxLength: 253

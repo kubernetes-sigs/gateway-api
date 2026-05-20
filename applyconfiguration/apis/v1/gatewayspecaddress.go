@@ -32,10 +32,16 @@ type GatewaySpecAddressApplyConfiguration struct {
 	// When a value is unspecified, an implementation SHOULD automatically
 	// assign an address matching the requested type if possible.
 	//
+	// Examples: `1.2.3.4`, `128::1`, `my-ip-address`.
+	//
+	// <gateway:util:excludeFromCRD>
+	//
+	// Notes for implementers:
+	//
 	// If an implementation does not support an empty value, they MUST set the
 	// "Programmed" condition in status to False with a reason of "AddressNotAssigned".
 	//
-	// Examples: `1.2.3.4`, `128::1`, `my-ip-address`.
+	// </gateway:util:excludeFromCRD>
 	Value *string `json:"value,omitempty"`
 }
 

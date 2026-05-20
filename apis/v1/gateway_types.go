@@ -75,17 +75,23 @@ type GatewaySpec struct {
 	// logical endpoints that are bound on this Gateway's addresses.
 	// At least one Listener MUST be specified.
 	//
+	// Each Listener in a Gateway MUST be _distinct_, meaning that each traffic
+	// flow MUST be assignable to exactly one Listener. Practically, this means
+	// that each Listener MUST have a unique combination of Port, Protocol, and,
+	// if supported by the protocol, Hostname.
+	//
+	// Support: Core
+	//
+	// <gateway:util:excludeFromCRD>
+	//
+	// Notes for implementers:
+	//
 	// ## Distinct Listeners
 	//
-	// Each Listener in a set of Listeners (for example, in a single Gateway)
-	// MUST be _distinct_, in that a traffic flow MUST be able to be assigned to
-	// exactly one listener. (This section uses "set of Listeners" rather than
-	// "Listeners in a single Gateway" because implementations MAY merge configuration
-	// from multiple Gateways onto a single data plane, and these rules _also_
-	// apply in that case).
-	//
-	// Practically, this means that each listener in a set MUST have a unique
-	// combination of Port, Protocol, and, if supported by the protocol, Hostname.
+	// This section uses "set of Listeners" rather than "Listeners in a single
+	// Gateway" because implementations MAY merge configuration from multiple
+	// Gateways onto a single data plane, and these rules _also_ apply in that
+	// case.
 	//
 	// Some combinations of port, protocol, and TLS settings are considered
 	// Core support and MUST be supported by implementations based on the objects
@@ -237,7 +243,7 @@ type GatewaySpec struct {
 	//
 	// In a future release the MinItems=1 requirement MAY be dropped.
 	//
-	// Support: Core
+	// </gateway:util:excludeFromCRD>
 	//
 	// +listType=map
 	// +listMapKey=name
@@ -267,11 +273,17 @@ type GatewaySpec struct {
 	// Gateway in an implementation-specific manner, assigning an appropriate
 	// set of Addresses.
 	//
+	// Support: Extended
+	//
+	// <gateway:util:excludeFromCRD>
+	//
+	// Notes for implementers:
+	//
 	// The implementation MUST bind all Listeners to every GatewayAddress that
 	// it assigns to the Gateway and add a corresponding entry in
 	// GatewayStatus.Addresses.
 	//
-	// Support: Extended
+	// </gateway:util:excludeFromCRD>
 	//
 	// +optional
 	// +listType=atomic
@@ -374,6 +386,22 @@ type Listener struct {
 	// field is ignored for protocols that don't require hostname based
 	// matching.
 	//
+	// Hostnames that are prefixed with a wildcard label (`*.`) are interpreted
+	// as a suffix match. That means that a match for `*.example.com` would match
+	// both `test.example.com`, and `foo.test.example.com`, but not `example.com`.
+	//
+	// For HTTPRoute and TLSRoute resources, there is an interaction with the
+	// `spec.hostnames` array. When both listener and route specify hostnames,
+	// there MUST be an intersection between the values for a Route to be
+	// accepted. For more information, refer to the Route specific Hostnames
+	// documentation.
+	//
+	// Support: Core
+	//
+	// <gateway:util:excludeFromCRD>
+	//
+	// Notes for implementers:
+	//
 	// Implementations MUST apply Hostname matching appropriately for each of
 	// the following protocols:
 	//
@@ -405,17 +433,7 @@ type Listener struct {
 	//     * If no other Listener matches the Host, the Gateway MUST return a
 	//       404.
 	//
-	// For HTTPRoute and TLSRoute resources, there is an interaction with the
-	// `spec.hostnames` array. When both listener and route specify hostnames,
-	// there MUST be an intersection between the values for a Route to be
-	// accepted. For more information, refer to the Route specific Hostnames
-	// documentation.
-	//
-	// Hostnames that are prefixed with a wildcard label (`*.`) are interpreted
-	// as a suffix match. That means that a match for `*.example.com` would match
-	// both `test.example.com`, and `foo.test.example.com`, but not `example.com`.
-	//
-	// Support: Core
+	// </gateway:util:excludeFromCRD>
 	//
 	// +optional
 	Hostname *Hostname `json:"hostname,omitempty"`
@@ -456,6 +474,12 @@ type Listener struct {
 	// Listener and the trusted namespaces where those Route resources MAY be
 	// present.
 	//
+	// Support: Core
+	//
+	// <gateway:util:excludeFromCRD>
+	//
+	// Notes for implementers:
+	//
 	// Although a client request may match multiple route rules, only one rule
 	// may ultimately receive the request. Matching precedence MUST be
 	// determined in order of the following criteria:
@@ -475,17 +499,13 @@ type Listener struct {
 	// example, even if a filter specified by a Route rule is invalid, the rest
 	// of the rules within that Route should still be supported.
 	//
-	// Support: Core
+	// </gateway:util:excludeFromCRD>
 	// +kubebuilder:default={namespaces:{from: Same}}
 	// +optional
 	AllowedRoutes *AllowedRoutes `json:"allowedRoutes,omitempty"`
 }
 
 // ProtocolType defines the application protocol accepted by a Listener.
-// Implementations are not required to accept all the defined protocols. If an
-// implementation does not support a specified protocol, it MUST set the
-// "Accepted" condition to False for the affected Listener with a reason of
-// "UnsupportedProtocol".
 //
 // Core ProtocolType values are listed in the table below.
 //
@@ -504,6 +524,17 @@ type Listener struct {
 //
 // * "example.com" - must include path if domain is used
 // * "foo.example.com" - must include path if domain is used
+//
+// <gateway:util:excludeFromCRD>
+//
+// Notes for implementers:
+//
+// Implementations are not required to accept all the defined protocols. If an
+// implementation does not support a specified protocol, it MUST set the
+// "Accepted" condition to False for the affected Listener with a reason of
+// "UnsupportedProtocol".
+//
+// </gateway:util:excludeFromCRD>
 //
 // +kubebuilder:validation:MinLength=1
 // +kubebuilder:validation:MaxLength=255
@@ -536,6 +567,14 @@ type GatewayBackendTLS struct {
 	// and its associated private key. It can reference standard Kubernetes resources,
 	// i.e., Secret, or implementation-specific custom resources.
 	//
+	// Support: Core - Reference to a Kubernetes TLS Secret (with the type `kubernetes.io/tls`).
+	// Support: Implementation-specific - Other resource kinds or Secrets with a
+	// different type (e.g., `Opaque`).
+	//
+	// <gateway:util:excludeFromCRD>
+	//
+	// Notes for implementers:
+	//
 	// A ClientCertificateRef is considered invalid if:
 	//
 	// * It refers to a resource that cannot be resolved (e.g., the referenced resource
@@ -553,9 +592,7 @@ type GatewayBackendTLS struct {
 	// content (e.g., checking expiry or enforcing specific formats). In such cases,
 	// an implementation-specific Reason and Message MUST be set.
 	//
-	// Support: Core - Reference to a Kubernetes TLS Secret (with the type `kubernetes.io/tls`).
-	// Support: Implementation-specific - Other resource kinds or Secrets with a
-	// different type (e.g., `Opaque`).
+	// </gateway:util:excludeFromCRD>
 	// +optional
 	ClientCertificateRef *SecretObjectReference `json:"clientCertificateRef,omitempty"`
 }
@@ -591,12 +628,6 @@ type ListenerTLSConfig struct {
 	// Implementations MAY choose to support attaching multiple certificates to
 	// a Listener, but this behavior is implementation-specific.
 	//
-	// References to a resource in different namespace are invalid UNLESS there
-	// is a ReferenceGrant in the target namespace that allows the certificate
-	// to be attached. If a ReferenceGrant does not allow this reference, the
-	// "ResolvedRefs" condition MUST be set to False for this listener with the
-	// "RefNotPermitted" reason.
-	//
 	// This field is required to have at least one element when the mode is set
 	// to "Terminate" (default) and is optional otherwise.
 	//
@@ -606,6 +637,18 @@ type ListenerTLSConfig struct {
 	// Support: Core - A single reference to a Kubernetes Secret of type kubernetes.io/tls
 	//
 	// Support: Implementation-specific (More than one reference or other resource types)
+	//
+	// <gateway:util:excludeFromCRD>
+	//
+	// Notes for implementers:
+	//
+	// References to a resource in different namespace are invalid UNLESS there
+	// is a ReferenceGrant in the target namespace that allows the certificate
+	// to be attached. If a ReferenceGrant does not allow this reference, the
+	// "ResolvedRefs" condition MUST be set to False for this listener with the
+	// "RefNotPermitted" reason.
+	//
+	// </gateway:util:excludeFromCRD>
 	//
 	// +optional
 	// +listType=atomic
@@ -739,6 +782,19 @@ type FrontendTLSValidation struct {
 	// is used as a trust anchor to validate the certificates presented by
 	// the client.
 	//
+	// Implementations MAY choose to support attaching multiple CA certificates
+	// to a listener, but this behavior is implementation-specific.
+	//
+	// Support: Core - A single reference to a Kubernetes ConfigMap, with the
+	// CA certificate in a key named `ca.crt`.
+	//
+	// Support: Implementation-specific - More than one reference, other kinds
+	// of resources, or a single reference that includes multiple certificates.
+	//
+	// <gateway:util:excludeFromCRD>
+	//
+	// Notes for implementers:
+	//
 	// A CACertificateRef is invalid if:
 	//
 	// * It refers to a resource that cannot be resolved (e.g., the
@@ -769,14 +825,8 @@ type FrontendTLSValidation struct {
 	// ALL CACertificateRefs are invalid, the implementation MUST also ensure
 	// the `Accepted` condition on the listener is set to `status: False`, with
 	// the Reason `NoValidCACertificate`.
-	// Implementations MAY choose to support attaching multiple CA certificates
-	// to a listener, but this behavior is implementation-specific.
 	//
-	// Support: Core - A single reference to a Kubernetes ConfigMap, with the
-	// CA certificate in a key named `ca.crt`.
-	//
-	// Support: Implementation-specific - More than one reference, other kinds
-	// of resources, or a single reference that includes multiple certificates.
+	// </gateway:util:excludeFromCRD>
 	//
 	// +required
 	// +listType=atomic
@@ -924,10 +974,16 @@ type GatewaySpecAddress struct {
 	// When a value is unspecified, an implementation SHOULD automatically
 	// assign an address matching the requested type if possible.
 	//
+	// Examples: `1.2.3.4`, `128::1`, `my-ip-address`.
+	//
+	// <gateway:util:excludeFromCRD>
+	//
+	// Notes for implementers:
+	//
 	// If an implementation does not support an empty value, they MUST set the
 	// "Programmed" condition in status to False with a reason of "AddressNotAssigned".
 	//
-	// Examples: `1.2.3.4`, `128::1`, `my-ip-address`.
+	// </gateway:util:excludeFromCRD>
 	//
 	// +optional
 	// +kubebuilder:validation:MaxLength=253
@@ -1374,19 +1430,32 @@ type ListenerStatus struct {
 	// listener. This MUST represent the kinds supported by an implementation for
 	// that Listener configuration.
 	//
+	// <gateway:util:excludeFromCRD>
+	//
+	// Notes for implementers:
+	//
 	// If kinds are specified in Spec that are not supported, they MUST NOT
 	// appear in this list and an implementation MUST set the "ResolvedRefs"
 	// condition to "False" with the "InvalidRouteKinds" reason. If both valid
 	// and invalid Route kinds are specified, the implementation MUST
 	// reference the valid Route kinds that have been specified.
 	//
+	// </gateway:util:excludeFromCRD>
+	//
 	// +optional
 	// +listType=atomic
 	// +kubebuilder:validation:MaxItems=8
 	SupportedKinds []RouteGroupKind `json:"supportedKinds,omitzero"`
 
-	// AttachedRoutes represents the total number of Routes that have been
+	// AttachedRoutes represents the total number of accepted Routes that have been
 	// successfully attached to this Listener.
+	//
+	// Uses for this field include troubleshooting Route attachment and
+	// measuring blast radius/impact of changes to a Listener.
+	//
+	// <gateway:util:excludeFromCRD>
+	//
+	// Notes for implementers:
 	//
 	// Successful attachment of a Route to a Listener is based solely on the
 	// combination of the AllowedRoutes field on the corresponding Listener
@@ -1403,8 +1472,7 @@ type ListenerStatus struct {
 	// Routes with any other value for the Accepted condition MUST NOT be included
 	// in this count.
 	//
-	// Uses for this field include troubleshooting Route attachment and
-	// measuring blast radius/impact of changes to a Listener.
+	// </gateway:util:excludeFromCRD>
 	// +required
 	AttachedRoutes int32 `json:"attachedRoutes"`
 

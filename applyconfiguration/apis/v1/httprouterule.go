@@ -63,6 +63,10 @@ type HTTPRouteRuleApplyConfiguration struct {
 	// path match on "/", which has the effect of matching every
 	// HTTP request.
 	//
+	// <gateway:util:excludeFromCRD>
+	//
+	// Notes for implementers:
+	//
 	// Proxy or Load Balancer routing configuration generated from HTTPRoutes
 	// MUST prioritize matches based on the following criteria, continuing on
 	// ties. Across all rules specified on applicable Routes, precedence must be
@@ -89,9 +93,30 @@ type HTTPRouteRuleApplyConfiguration struct {
 	//
 	// When no rules matching a request have been successfully attached to the
 	// parent a request is coming from, a HTTP 404 status code MUST be returned.
+	//
+	// </gateway:util:excludeFromCRD>
 	Matches []HTTPRouteMatchApplyConfiguration `json:"matches,omitempty"`
 	// Filters define the filters that are applied to requests that match
 	// this rule.
+	//
+	// Conformance-levels at this level are defined based on the type of filter:
+	//
+	// - ALL core filters MUST be supported by all implementations.
+	// - Implementers are encouraged to support extended filters.
+	// - Implementation-specific custom filters have no API guarantees across
+	// implementations.
+	//
+	// Specifying the same filter multiple times is not supported unless explicitly
+	// indicated in the filter.
+	//
+	// All filters are expected to be compatible with each other except for the
+	// URLRewrite and RequestRedirect filters, which may not be combined.
+	//
+	// Support: Core
+	//
+	// <gateway:util:excludeFromCRD>
+	//
+	// Notes for implementers:
 	//
 	// Wherever possible, implementations SHOULD implement filters in the order
 	// they are specified.
@@ -107,28 +132,28 @@ type HTTPRouteRuleApplyConfiguration struct {
 	// a portion of Route Rules are invalid, implementations MUST set the
 	// "PartiallyInvalid" condition for the Route.
 	//
-	// Conformance-levels at this level are defined based on the type of filter:
-	//
-	// - ALL core filters MUST be supported by all implementations.
-	// - Implementers are encouraged to support extended filters.
-	// - Implementation-specific custom filters have no API guarantees across
-	// implementations.
-	//
-	// Specifying the same filter multiple times is not supported unless explicitly
-	// indicated in the filter.
-	//
-	// All filters are expected to be compatible with each other except for the
-	// URLRewrite and RequestRedirect filters, which may not be combined. If an
-	// implementation cannot support other combinations of filters, they must clearly
-	// document that limitation. In cases where incompatible or unsupported
+	// If an implementation cannot support other combinations of filters, they must
+	// clearly document that limitation. In cases where incompatible or unsupported
 	// filters are specified and cause the `Accepted` condition to be set to status
 	// `False`, implementations may use the `IncompatibleFilters` reason to specify
 	// this configuration error.
 	//
-	// Support: Core
+	// </gateway:util:excludeFromCRD>
 	Filters []HTTPRouteFilterApplyConfiguration `json:"filters,omitempty"`
 	// BackendRefs defines the backend(s) where matching requests should be
 	// sent.
+	//
+	// Support: Core for Kubernetes Service
+	//
+	// Support: Extended for Kubernetes ServiceImport
+	//
+	// Support: Implementation-specific for any other resource
+	//
+	// Support for weight: Core
+	//
+	// <gateway:util:excludeFromCRD>
+	//
+	// Notes for implementers:
 	//
 	// Failure behavior here depends on how many BackendRefs are specified and
 	// how many are invalid.
@@ -155,13 +180,7 @@ type HTTPRouteRuleApplyConfiguration struct {
 	// If an implementation chooses to do this, all of the above rules for 500 responses
 	// MUST also apply for responses that return a 503.
 	//
-	// Support: Core for Kubernetes Service
-	//
-	// Support: Extended for Kubernetes ServiceImport
-	//
-	// Support: Implementation-specific for any other resource
-	//
-	// Support for weight: Core
+	// </gateway:util:excludeFromCRD>
 	BackendRefs []HTTPBackendRefApplyConfiguration `json:"backendRefs,omitempty"`
 	// Timeouts defines the timeouts that can be configured for an HTTP request.
 	//
