@@ -125,11 +125,12 @@ type TimeoutConfig struct {
 
 // UnmarshalJSON ensures time.Duration values are parsed correctly.
 func (tc *TimeoutConfig) UnmarshalJSON(data []byte) error {
-	var raw map[string]string
+	var raw map[string]any
 	if err := json.Unmarshal(data, &raw); err != nil {
 		return err
 	}
 
+	durationType := reflect.TypeFor[time.Duration]()
 	v := reflect.ValueOf(tc).Elem()
 	t := v.Type()
 
@@ -139,11 +140,15 @@ func (tc *TimeoutConfig) UnmarshalJSON(data []byte) error {
 		if jsonTag == "" {
 			continue
 		}
-		s, ok := raw[jsonTag]
+		if field.Type != durationType {
+			return fmt.Errorf("field %q has json tag but unsupported type %s; "+
+				"TimeoutConfig.UnmarshalJSON only supports time.Duration fields", field.Name, field.Type)
+		}
+		val, ok := raw[jsonTag]
 		if !ok {
 			continue
 		}
-		d, err := time.ParseDuration(s)
+		d, err := parseDuration(val)
 		if err != nil {
 			return fmt.Errorf("field %q: %w", jsonTag, err)
 		}
@@ -151,6 +156,20 @@ func (tc *TimeoutConfig) UnmarshalJSON(data []byte) error {
 	}
 
 	return nil
+}
+
+// parseDuration accepts a duration as a string (e.g. "30s")
+// or as a bare JSON number (interpreted as nanoseconds, to match the
+// underlying representation of time.Duration).
+func parseDuration(val any) (time.Duration, error) {
+	switch x := val.(type) {
+	case string:
+		return time.ParseDuration(x)
+	case float64:
+		return time.Duration(x), nil
+	default:
+		return 0, fmt.Errorf("expected duration string or number, got %T", val)
+	}
 }
 
 // DefaultTimeoutConfig populates a TimeoutConfig with the default values.
