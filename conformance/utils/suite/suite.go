@@ -607,7 +607,11 @@ func (suite *ConformanceTestSuite) Report() (*confv1.ConformanceReport, error) {
 // profile names into a set. Used for backward compatibility with
 // external consumers of this package.
 func ParseConformanceProfiles(p string) sets.Set[ConformanceProfileName] {
-	return sets.New(ParseConformanceProfilesSlice(p)...)
+	slice := ParseConformanceProfilesSlice(p)
+	if slice == nil {
+		return nil
+	}
+	return sets.New(slice...)
 }
 
 // ParseConformanceProfilesSlice parses a comma-separated string of conformance

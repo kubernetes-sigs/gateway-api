@@ -83,7 +83,11 @@ func (test *ConformanceTest) Run(t *testing.T, suite *ConformanceTestSuite) {
 // into a FeaturesSet. Exists for backward compatibility with external
 // consumers of this package.
 func ParseSupportedFeatures(f string) FeaturesSet {
-	return sets.New(ParseSupportedFeaturesSlice(f)...)
+	slice := ParseSupportedFeaturesSlice(f)
+	if slice == nil {
+		return nil
+	}
+	return sets.New(slice...)
 }
 
 // ParseSupportedFeaturesSlice parses a comma-separated string of feature
