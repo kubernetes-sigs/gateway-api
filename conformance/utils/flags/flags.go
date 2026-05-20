@@ -43,18 +43,21 @@ type flagSpec struct {
 }
 
 // registry maps flag names to their override functions.
+// Override functions are applied when a flag is set to a non-default value.
 var registry = map[string]*flagSpec{}
 
-func registerStringFlag(name, def, usage string, apply func(*suite.ConfigurableOptions, string)) {
-	p := flag.String(name, def, usage)
-	registry[name] = &flagSpec{
+// registerStringFlag registers the override function for a string flag.
+func registerStringFlag(flag_name, default_value, usage string, apply func(*suite.ConfigurableOptions, string)) {
+	p := flag.String(flag_name, default_value, usage)
+	registry[flag_name] = &flagSpec{
 		apply: func(o *suite.ConfigurableOptions) { apply(o, *p) },
 	}
 }
 
-func registerBoolFlag(name string, def bool, usage string, apply func(*suite.ConfigurableOptions, bool)) {
-	p := flag.Bool(name, def, usage)
-	registry[name] = &flagSpec{
+// registerStringFlag registers the override function for a boolean flag.
+func registerBoolFlag(flag_name string, default_value bool, usage string, apply func(*suite.ConfigurableOptions, bool)) {
+	p := flag.Bool(flag_name, default_value, usage)
+	registry[flag_name] = &flagSpec{
 		apply: func(o *suite.ConfigurableOptions) { apply(o, *p) },
 	}
 }
