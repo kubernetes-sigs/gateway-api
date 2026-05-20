@@ -1,0 +1,2 @@
+# Intentionally empty: exercises the partial-YAML load path where the file
+# contributes no overrides and all defaults must be preserved.
