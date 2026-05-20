@@ -136,6 +136,7 @@ jobs:
           fi
 
           gh release create ${STEPS_TAG_OUTPUTS_TAG} \
+            --title "${STEPS_TAG_OUTPUTS_TAG}" \
             -F release-notes.md \
             --prerelease \
             --draft release/${STEPS_TAG_OUTPUTS_TAG}-install.yaml
