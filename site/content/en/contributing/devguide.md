@@ -210,7 +210,7 @@ A good API documentation should cover:
 * What is the main feature of the API and Field - Eg.: "`foo` allows configuring how a
 a header should be forwarded to backends"
 * What is the support level of the field - Eg.: "Support: Core/Extended/Implementation Specific"
-* Caveats of that field - Eg.: "Setting `goo` field can have conflicts with `bar` field, and in this
+* Caveats of that field - Eg.: "Setting `foo` field can have conflicts with `bar` field, and in this
 case it will be shown as a Condition". (we don't need to cover all the conditions).
 
 In one or two phrases, API documentation should help a user who is reading the documentation understand
