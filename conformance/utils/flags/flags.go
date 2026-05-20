@@ -78,10 +78,12 @@ func init() {
 		func(o *suite.ConfigurableOptions, v bool) { o.CleanupTestResources = v },
 	)
 	registerStringFlag("supported-features", "", "Supported features included in conformance tests suites",
-		func(o *suite.ConfigurableOptions, v string) { o.SupportedFeatures = suite.ParseSupportedFeatures(v) },
+		func(o *suite.ConfigurableOptions, v string) {
+			o.SupportedFeatures = suite.ParseSupportedFeaturesSlice(v)
+		},
 	)
 	registerStringFlag("exempt-features", "", "Exempt Features excluded from conformance tests suites",
-		func(o *suite.ConfigurableOptions, v string) { o.ExemptFeatures = suite.ParseSupportedFeatures(v) },
+		func(o *suite.ConfigurableOptions, v string) { o.ExemptFeatures = suite.ParseSupportedFeaturesSlice(v) },
 	)
 	registerBoolFlag("all-features", false, "Whether to enable all supported features for conformance tests",
 		func(o *suite.ConfigurableOptions, v bool) { o.EnableAllSupportedFeatures = v },
@@ -106,7 +108,7 @@ func init() {
 	)
 	registerStringFlag("conformance-profiles", "", "Comma-separated list of the conformance profiles to run",
 		func(o *suite.ConfigurableOptions, v string) {
-			o.ConformanceProfiles = suite.ParseConformanceProfiles(v)
+			o.ConformanceProfiles = suite.ParseConformanceProfilesSlice(v)
 		},
 	)
 	registerStringFlag("report-output", "", "The file where to write the conformance report",

@@ -600,9 +600,16 @@ func (suite *ConformanceTestSuite) Report() (*confv1.ConformanceReport, error) {
 	}, nil
 }
 
-// ParseConformanceProfiles parses flag arguments and converts the string to
-// sets.Set[ConformanceProfileName].
-func ParseConformanceProfiles(p string) []ConformanceProfileName {
+// ParseConformanceProfiles parses a comma-separated string of conformance
+// profile names into a set. Used for backward compatibility with
+// external consumers of this package.
+func ParseConformanceProfiles(p string) sets.Set[ConformanceProfileName] {
+	return sets.New(ParseConformanceProfilesSlice(p)...)
+}
+
+// ParseConformanceProfilesSlice parses a comma-separated string of conformance
+// profile names into a slice. Used internally for populating ConfigurableOptions.
+func ParseConformanceProfilesSlice(p string) []ConformanceProfileName {
 	if p == "" {
 		return nil
 	}
