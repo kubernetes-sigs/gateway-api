@@ -81,6 +81,31 @@ type Request struct {
 	ClientCert       string
 }
 
+const requestIDQueryParam = "gateway-api-conformance-request-id"
+
+// AddRequestIDQueryParam adds a request ID to the request URI so that echo
+// server logs for this request can be matched unambiguously.
+func (e *ExpectedResponse) AddRequestIDQueryParam(requestID string) {
+	e.Request.Path = addQueryParam(e.Request.Path, requestIDQueryParam, requestID)
+	if e.ExpectedRequest != nil {
+		if e.ExpectedRequest.Path == "" {
+			e.ExpectedRequest.Path = e.Request.Path
+		} else {
+			e.ExpectedRequest.Path = addQueryParam(e.ExpectedRequest.Path, requestIDQueryParam, requestID)
+		}
+	}
+}
+
+func addQueryParam(path, name, value string) string {
+	pathOnly, rawQuery, _ := strings.Cut(path, "?")
+	query, err := url.ParseQuery(rawQuery)
+	if err != nil {
+		query = url.Values{}
+	}
+	query.Set(name, value)
+	return pathOnly + "?" + query.Encode()
+}
+
 // ExpectedRequest defines expected properties of a request that reaches a backend.
 type ExpectedRequest struct {
 	Request
@@ -504,26 +529,26 @@ func CompareRoundTrip(t *testing.T, req *roundtripper.Request, cReq *roundtrippe
 }
 
 // GetTestCaseName gets the user-defined test case name or generates one from expected response to a given request.
-func (er *ExpectedResponse) GetTestCaseName(i int) string {
+func (e *ExpectedResponse) GetTestCaseName(i int) string {
 	// If TestCase name is provided then use that or else generate one.
-	if er.TestCaseName != "" {
-		return er.TestCaseName
+	if e.TestCaseName != "" {
+		return e.TestCaseName
 	}
 
 	headerStr := ""
 	reqStr := ""
 
-	if er.Request.Headers != nil {
+	if e.Request.Headers != nil {
 		headerStr = " with headers"
 	}
 
-	reqStr = fmt.Sprintf("%d request to '%s%s'%s", i, er.Request.Host, er.Request.Path, headerStr)
+	reqStr = fmt.Sprintf("%d request to '%s%s'%s", i, e.Request.Host, e.Request.Path, headerStr)
 
-	if er.Backend != "" {
-		return fmt.Sprintf("%s should go to %s", reqStr, er.Backend)
+	if e.Backend != "" {
+		return fmt.Sprintf("%s should go to %s", reqStr, e.Backend)
 	}
 
-	return fmt.Sprintf("%s should receive one of %v", reqStr, er.Response.StatusCodes)
+	return fmt.Sprintf("%s should receive one of %v", reqStr, e.Response.StatusCodes)
 }
 
 func setRedirectRequestDefaults(req *roundtripper.Request, cRes *roundtripper.CapturedResponse, expected *ExpectedResponse) {

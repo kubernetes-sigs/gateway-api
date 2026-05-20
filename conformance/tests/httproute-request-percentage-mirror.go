@@ -24,6 +24,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 	"k8s.io/apimachinery/pkg/types"
 
@@ -140,8 +141,11 @@ var HTTPRouteRequestPercentageMirror = confsuite.ConformanceTest{
 		for i := range testCases {
 			expected := testCases[i]
 			t.Run(expected.GetTestCaseName(i), func(t *testing.T) {
+				initialExpected := expected
+				initialExpected.AddRequestIDQueryParam(uuid.NewString())
+
 				// Assert request succeeds before doing our distribution check
-				http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, expected)
+				http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, initialExpected)
 
 				// Override to not have more requests than expected
 				dedicatedTimeoutConfig := suite.TimeoutConfig
@@ -151,6 +155,8 @@ var HTTPRouteRequestPercentageMirror = confsuite.ConformanceTest{
 				var wg sync.WaitGroup
 
 				for k := range numDistributionChecks {
+					distributionExpected := expected
+					distributionExpected.AddRequestIDQueryParam(uuid.NewString())
 					timeNow := time.Now()
 					for range int(totalRequests) {
 						wg.Add(1)
@@ -159,10 +165,10 @@ var HTTPRouteRequestPercentageMirror = confsuite.ConformanceTest{
 							defer wg.Done()
 							defer func() { <-semaphore }()
 							http.MakeRequestAndExpectEventuallyConsistentResponse(t, r, timeoutConfig, gwAddr, expected)
-						}(t, suite.RoundTripper, dedicatedTimeoutConfig, gwAddr, expected)
+						}(t, suite.RoundTripper, dedicatedTimeoutConfig, gwAddr, distributionExpected)
 					}
 					wg.Wait()
-					if err := testMirroredRequestsDistribution(t, suite, expected, timeNow); err != nil {
+					if err := testMirroredRequestsDistribution(t, suite, distributionExpected, timeNow); err != nil {
 						t.Logf("Traffic distribution test failed (%d/%d): %s", k+1, numDistributionChecks, err)
 						time.Sleep(2 * time.Second)
 					} else {
@@ -188,7 +194,7 @@ func testMirroredRequestsDistribution(t *testing.T, suite *confsuite.Conformance
 
 	for _, mirrorPod := range mirrorPods {
 		require.Eventually(t, func() bool {
-			mirrorLogRegexp := regexp.MustCompile(fmt.Sprintf("Echoing back request made to \\%s to client", expected.Request.Path))
+			mirrorLogRegexp := regexp.MustCompile(fmt.Sprintf("Echoing back request made to %s to client", regexp.QuoteMeta(expected.Request.Path)))
 
 			tlog.Log(t, "Searching for the mirrored request log")
 			tlog.Logf(t, `Reading "%s/%s" logs`, mirrorPod.Namespace, mirrorPod.Name)
