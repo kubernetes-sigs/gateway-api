@@ -47,17 +47,17 @@ type flagSpec struct {
 var registry = map[string]*flagSpec{}
 
 // registerStringFlag registers the override function for a string flag.
-func registerStringFlag(flag_name, default_value, usage string, apply func(*suite.ConfigurableOptions, string)) {
-	p := flag.String(flag_name, default_value, usage)
-	registry[flag_name] = &flagSpec{
+func registerStringFlag(flagName, defaultValue, usage string, apply func(*suite.ConfigurableOptions, string)) {
+	p := flag.String(flagName, defaultValue, usage)
+	registry[flagName] = &flagSpec{
 		apply: func(o *suite.ConfigurableOptions) { apply(o, *p) },
 	}
 }
 
 // registerStringFlag registers the override function for a boolean flag.
-func registerBoolFlag(flag_name string, default_value bool, usage string, apply func(*suite.ConfigurableOptions, bool)) {
-	p := flag.Bool(flag_name, default_value, usage)
-	registry[flag_name] = &flagSpec{
+func registerBoolFlag(flagName string, defaultValue bool, usage string, apply func(*suite.ConfigurableOptions, bool)) {
+	p := flag.Bool(flagName, defaultValue, usage)
+	registry[flagName] = &flagSpec{
 		apply: func(o *suite.ConfigurableOptions) { apply(o, *p) },
 	}
 }
