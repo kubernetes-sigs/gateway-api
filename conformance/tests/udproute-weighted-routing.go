@@ -19,16 +19,12 @@ package tests
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
-	"math"
 	"net"
 	"strings"
-	"sync"
 	"testing"
 	"time"
 
-	"golang.org/x/sync/errgroup"
 	"k8s.io/apimachinery/pkg/types"
 
 	"sigs.k8s.io/gateway-api/conformance/echo-basic/udpechoserver"
@@ -45,7 +41,7 @@ func init() {
 
 var UDPRouteWeightedRouting = confsuite.ConformanceTest{
 	ShortName:   "UDPRouteWeightedRouting",
-	Description: "A UDPRoute with multiple weighted backends should distribute UDP traffic across the backends in proportion to the configured weights.",
+	Description: "A UDPRoute with multiple weighted backends should distribute UDP traffic across the backends in proportion to the configured weights, and a backend with weight 0 should not receive any traffic.",
 	Manifests:   []string{"tests/udproute-weighted-routing.yaml"},
 	Features: []features.FeatureName{
 		features.SupportGateway,
@@ -65,72 +61,29 @@ var UDPRouteWeightedRouting = confsuite.ConformanceTest{
 			kubernetes.NewGatewayRef(gwNN, "udp"), routeNN)
 
 		t.Run("UDP traffic should be distributed across the weighted backends", func(t *testing.T) {
+			// udp-backend-v3 has weight 0 and must not receive any traffic.
+			// Including it in expectedWeights at 0.0 ensures any traffic
+			// landing on it would be caught by weight.TestWeightedDistribution.
 			expectedWeights := map[string]float64{
 				"udp-backend-v1": 0.7,
 				"udp-backend-v2": 0.3,
+				"udp-backend-v3": 0.0,
 			}
 
+			sender := weight.NewFunctionBasedSender(func() (string, error) {
+				return udpEchoSendOnce(t.Context(), gwAddr, 2*time.Second)
+			})
+
 			for i := range weight.MaxTestRetries {
-				err := assertUDPWeightedDistribution(t.Context(), gwAddr, expectedWeights, 0.03)
-				if err == nil {
+				if err := weight.TestWeightedDistribution(sender, expectedWeights); err != nil {
+					tlog.Logf(t, "UDP weighted distribution attempt %d/%d failed: %s", i+1, weight.MaxTestRetries, err)
+				} else {
 					return
 				}
-				tlog.Logf(t, "UDP weighted distribution attempt %d/%d failed: %s", i+1, weight.MaxTestRetries, err)
 			}
 			t.Fatal("UDP weighted distribution did not converge within tolerance")
 		})
 	},
-}
-
-// assertUDPWeightedDistribution sends a fixed number of UDP datagrams to
-// gwAddr in parallel, classifies each response by the backend Deployment that
-// produced it (extracted from the udpechoserver JSON envelope's pod name),
-// and returns nil if the observed distribution is within tolerance of
-// expectedWeights for every backend.
-func assertUDPWeightedDistribution(ctx context.Context, gwAddr string, expectedWeights map[string]float64, tolerance float64) error {
-	const (
-		concurrentRequests = 10
-		totalRequests      = 500
-		probeTimeout       = 2 * time.Second
-	)
-
-	var (
-		mu   sync.Mutex
-		seen = make(map[string]float64, len(expectedWeights))
-		g    errgroup.Group
-	)
-	g.SetLimit(concurrentRequests)
-
-	for range totalRequests {
-		g.Go(func() error {
-			pod, err := udpEchoSendOnce(ctx, gwAddr, probeTimeout)
-			if err != nil {
-				return err
-			}
-			backend := extractBackendName(pod)
-
-			mu.Lock()
-			defer mu.Unlock()
-			if _, ok := expectedWeights[backend]; !ok {
-				return fmt.Errorf("response from unexpected backend %q (pod %q)", backend, pod)
-			}
-			seen[backend]++
-			return nil
-		})
-	}
-	if err := g.Wait(); err != nil {
-		return fmt.Errorf("error while sending UDP probes: %w", err)
-	}
-
-	var errs []error
-	for backend, want := range expectedWeights {
-		got := seen[backend] / float64(totalRequests)
-		if math.Abs(got-want) > tolerance {
-			errs = append(errs, fmt.Errorf("backend %q got %.2f%% of traffic; expected %.2f%% (+/- %.2f%%)",
-				backend, got*100, want*100, tolerance*100))
-		}
-	}
-	return errors.Join(errs...)
 }
 
 // udpEchoSendOnce sends a single UDP datagram to gwAddr and returns the pod

@@ -112,6 +112,63 @@ spec:
             requests:
               cpu: 10m
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: udp-backend-v3
+  namespace: gateway-conformance-infra
+  labels:
+    app: udp-backend-v3
+spec:
+  selector:
+    app: udp-backend-v3
+  ports:
+    - name: udp
+      protocol: UDP
+      port: 8080
+      targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: udp-backend-v3
+  namespace: gateway-conformance-infra
+  labels:
+    app: udp-backend-v3
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: udp-backend-v3
+  template:
+    metadata:
+      labels:
+        app: udp-backend-v3
+    spec:
+      containers:
+        - name: udp-backend
+          image: registry.k8s.io/gateway-api/echo-basic:v1.6.0-dev.2
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: UDP_ECHO_SERVER
+              value: "1"
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: SERVICE_NAME
+              value: udp-backend-v3
+          ports:
+            - containerPort: 8080
+              protocol: UDP
+          resources:
+            requests:
+              cpu: 10m
+---
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
@@ -144,3 +201,6 @@ spec:
         - name: udp-backend-v2
           port: 8080
           weight: 30
+        - name: udp-backend-v3
+          port: 8080
+          weight: 0
