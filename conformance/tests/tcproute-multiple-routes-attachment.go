@@ -17,9 +17,11 @@ limitations under the License.
 package tests
 
 import (
+	"strings"
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/require"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/utils/ptr"
@@ -120,11 +122,34 @@ var TCPRouteMultipleRoutesAttachment = confsuite.ConformanceTest{
 			// Per GEP-713 conflict-resolution, only the oldest route is bound to the
 			// listener; traffic must reach pods backing tcp-attach-backend-1 and never
 			// pods backing tcp-attach-backend-2.
+			//
+			// First wait for the data plane to converge so the older route is
+			// consistently serving traffic.
 			tcp.MakeTCPRequestAndExpectEventuallyValidResponse(t, suite.TimeoutConfig, gwAddr, nil, "", false,
 				tcp.ExpectedResponse{
 					Backend:   "tcp-attach-backend-1",
 					Namespace: ns,
 				})
+
+			// Sample many connections and assert the newer route's backend is
+			// never selected. A single request can hit the older backend by
+			// chance even if both routes were attached, so repeated sampling
+			// strengthens the guarantee that only the oldest route is bound.
+			const (
+				sampleCount   = 100
+				perReqTimeout = 5 * time.Second
+			)
+			const olderBackendPrefix = "tcp-attach-backend-1-"
+			const newerBackendPrefix = "tcp-attach-backend-2-"
+
+			for i := range sampleCount {
+				pod, err := tcp.EchoSendOnce(t.Context(), gwAddr, perReqTimeout)
+				require.NoErrorf(t, err, "TCP echo request %d/%d failed", i+1, sampleCount)
+				require.Falsef(t, strings.HasPrefix(pod, newerBackendPrefix),
+					"request %d/%d reached newer route backend %q; only the oldest route should be attached", i+1, sampleCount, pod)
+				require.Truef(t, strings.HasPrefix(pod, olderBackendPrefix),
+					"request %d/%d reached unexpected backend %q; expected pod from %q", i+1, sampleCount, pod, olderBackendPrefix)
+			}
 		})
 	},
 }
