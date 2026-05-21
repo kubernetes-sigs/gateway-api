@@ -1,0 +1,12 @@
+# Ignore the public directory, which contains hugo output
+public/
+node_modules/
+resources/
+themes/
+
+static/wizard/main.wasm
+static/wizard/wasm_exec.js
+static/wizard/data/*
+
+# Hugo build lock file
+.hugo_build.lock

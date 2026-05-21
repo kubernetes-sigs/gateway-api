@@ -28,8 +28,7 @@ import (
 	discoveryv1 "k8s.io/api/discovery/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/utils/ptr"
-	client "sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
@@ -140,11 +139,11 @@ func setupEndpointSlices(t *testing.T, klient client.Client, endpointPrefixes []
 					endpoint := discoveryv1.Endpoint{
 						Addresses: []string{podIP.IP},
 						Conditions: discoveryv1.EndpointConditions{
-							Ready:       ptr.To(true),
-							Serving:     ptr.To(true),
-							Terminating: ptr.To(false),
+							Ready:       new(true),
+							Serving:     new(true),
+							Terminating: new(false),
 						},
-						NodeName: ptr.To(pod.Spec.NodeName),
+						NodeName: new(pod.Spec.NodeName),
 						TargetRef: &corev1.ObjectReference{
 							Kind:      "Pod",
 							Name:      pod.GetName(),

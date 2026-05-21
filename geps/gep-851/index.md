@@ -1,4 +1,6 @@
-# GEP-851: Allow Multiple Certificate Refs per Gateway Listener
+---
+title: "GEP-851: Allow Multiple Certificate Refs per Gateway Listener"
+---
 
 * Issue: [#851](https://github.com/kubernetes-sigs/gateway-api/issues/851)
 * Status: Standard

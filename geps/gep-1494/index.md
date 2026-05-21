@@ -1,9 +1,11 @@
-# GEP-1494: HTTP Auth in Gateway API
+---
+title: "GEP-1494: HTTP Auth in Gateway API"
+---
 
 * Issue: [#1494](https://github.com/kubernetes-sigs/gateway-api/issues/1494)
 * Status: Experimental
 
-(See [status definitions](../overview.md#gep-states).)
+(See [status definitions](/geps/overview/#gep-states).)
 
 
 ## TLDR
@@ -13,7 +15,7 @@ Provide a method for configuring **Gateway API implementations** to add HTTP Aut
 
 ## Goals
 
-(Using the [Gateway API Personas](../../concepts/roles-and-personas.md))
+(Using the [Gateway API Personas](/docs/concepts/roles-and-personas.md))
 
 * A way for Ana the Application Developer to configure a Gateway API implementation to perform Authentication (at least), with optional Authorization.
 

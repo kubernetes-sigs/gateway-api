@@ -150,7 +150,7 @@ func MakeRequest(t *testing.T, expected *ExpectedResponse, gwAddr, protocol, sch
 	}
 
 	// if the deprecated field StatusCode is set, append it to StatusCodes for backwards compatibility
-	if expected.Response.StatusCode != 0 {
+	if expected.Response.StatusCode != 0 && !slices.Contains(expected.Response.StatusCodes, expected.Response.StatusCode) {
 		expected.Response.StatusCodes = append(expected.Response.StatusCodes, expected.Response.StatusCode)
 	}
 
@@ -316,10 +316,8 @@ func WaitForConsistentFailureResponse(t *testing.T, r roundtripper.RoundTripper,
 
 func CompareRoundTrip(t *testing.T, req *roundtripper.Request, cReq *roundtripper.CapturedRequest, cRes *roundtripper.CapturedResponse, expected ExpectedResponse) error {
 	if roundtripper.IsTimeoutError(cRes.StatusCode) {
-		for _, statusCode := range expected.Response.StatusCodes {
-			if roundtripper.IsTimeoutError(statusCode) {
-				return nil
-			}
+		if slices.ContainsFunc(expected.Response.StatusCodes, roundtripper.IsTimeoutError) {
+			return nil
 		}
 	}
 	if !slices.Contains(expected.Response.StatusCodes, cRes.StatusCode) {

@@ -154,7 +154,7 @@ func TestVAPValidation(t *testing.T) {
 
 					// do replace on gateway.networking.k8s.io/bundle-version: v1.x.0
 					re := regexp.MustCompile(`gateway\.networking\.k8s\.io\/bundle-version: \S*`)
-					sub := []byte(fmt.Sprintf("gateway.networking.k8s.io/bundle-version: %s", v.version))
+					sub := fmt.Appendf(nil, "gateway.networking.k8s.io/bundle-version: %s", v.version)
 					oldCrd := re.ReplaceAll(httpCrd, sub)
 
 					// supply crd to stdin of cmd and kubectl apply -f -
@@ -248,7 +248,7 @@ func TestVAPValidation(t *testing.T) {
 					require.NoError(t, err)
 
 					re := regexp.MustCompile(`gateway\.networking\.k8s\.io\/bundle-version: \S*`)
-					sub := []byte(fmt.Sprintf("gateway.networking.k8s.io/bundle-version: %s", v.version))
+					sub := fmt.Appendf(nil, "gateway.networking.k8s.io/bundle-version: %s", v.version)
 					oldCrd := re.ReplaceAll(httpCrd, sub)
 
 					output, err := executeKubectlCommandStdin(t, kubectlLocation, kubeconfigLocation, bytes.NewReader(oldCrd), []string{"apply", "--server-side", "--force-conflicts", "-f", "-"})

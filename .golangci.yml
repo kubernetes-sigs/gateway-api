@@ -25,6 +25,7 @@ linters:
     - loggercheck
     - makezero
     - misspell
+    - modernize
     - musttag
     - nilerr
     - nilnesserr

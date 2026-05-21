@@ -1,9 +1,11 @@
-# GEPs List
-{{ range . }}
-=== "{{ .GepType }}"
-    {{- with .GepsDetails }}
-    {{ range . }}
-    - [GEP-{{ .Number }}: {{ .Name }}](/geps/gep-{{ .Number }}/)
-    {{- end }}
-    {{ end }}
+{{ "{{< tabpane text=true >}}" }}
+{{- range . }}
+{{ "{{% tab header=\"" }}{{ .GepType }}{{ "\" %}}" }}
+{{- with .GepsDetails }}
+{{- range . }}
+- [GEP-{{ .Number }}: {{ .Name }}]({{ "{{< ref \"gep-" }}{{ .Number }}{{ ".md\" >}}" }})
 {{- end }}
+{{- end }}
+{{ "{{% /tab %}}" }}
+{{- end }}
+{{ "{{< /tabpane >}}" }}

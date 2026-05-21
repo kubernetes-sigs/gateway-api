@@ -6,12 +6,12 @@ metadata:
 spec:
   gatewayClassName: "{GATEWAY_CLASS_NAME}"
   listeners:
-  - name: coredns
-    protocol: UDP
-    port: 5300
-    allowedRoutes:
-      kinds:
-      - kind: UDPRoute
+    - name: coredns
+      protocol: UDP
+      port: 5300
+      allowedRoutes:
+        kinds:
+          - kind: UDPRoute
 ---
 apiVersion: gateway.networking.k8s.io/v1alpha2
 kind: UDPRoute
@@ -20,9 +20,9 @@ metadata:
   namespace: gateway-conformance-infra
 spec:
   parentRefs:
-  - name: udp-gateway
-    sectionName: coredns
+    - name: udp-gateway
+      sectionName: coredns
   rules:
-  - backendRefs:
-    - name: coredns
-      port: 53
+    - backendRefs:
+        - name: coredns
+          port: 53

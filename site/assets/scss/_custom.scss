@@ -1,0 +1,29 @@
+/* Ensure the details container doesn't exceed the parent width */
+.details,
+details {
+  max-width: 100%;
+  overflow-x: hidden;
+  /* Prevents the main container from scrolling */
+}
+
+/* Allow the internal content to scroll if it's too wide (like code blocks) */
+.details-content {
+  max-width: 100%;
+  overflow-x: auto;
+  word-wrap: break-word;
+}
+
+/* Specific fix for code blocks inside details */
+.details-content pre {
+  white-space: pre-wrap;
+  /* Wraps the code instead of scrolling */
+  word-break: break-all;
+}
+
+/* Custom color for details shortcode */
+.border-example {
+  border-color: #7e56c2 !important;
+}
+.text-example {
+  color: #7e56c2 !important;
+}

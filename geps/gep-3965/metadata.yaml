@@ -1,0 +1,16 @@
+apiVersion: internal.gateway.networking.k8s.io/v1alpha1
+kind: GEPDetails
+number: 3965
+name: HTTPRoute Implementation-Specific Matches
+status: Provisional
+authors:
+  - howardjohn
+relationships:
+  seeAlso:
+    - number: 820
+      name: Drop extension points from Route matches
+    - number: 1364
+      name: Status and Conditions Update
+references: []
+featureNames: []
+changelog: []

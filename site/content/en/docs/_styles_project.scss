@@ -1,0 +1,4 @@
+// Custom CSS to replicate old MkDocs styles
+.center {
+  @extend .mx-auto, .d-block;
+}

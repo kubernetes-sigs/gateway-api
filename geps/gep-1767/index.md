@@ -1,4 +1,6 @@
-# GEP 1767: CORS Filter
+---
+title: "GEP 1767: CORS Filter"
+---
 
 * Issue: [#1767](https://github.com/kubernetes-sigs/gateway-api/issues/1767)
 * Status: Standard

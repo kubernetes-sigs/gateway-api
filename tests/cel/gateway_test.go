@@ -75,7 +75,7 @@ func TestValidateGateway(t *testing.T) {
 						Protocol: gatewayv1.HTTPSProtocolType,
 						Port:     gatewayv1.PortNumber(8080),
 						TLS: &gatewayv1.ListenerTLSConfig{
-							Mode: ptrTo(gatewayv1.TLSModeType("Passthrough")),
+							Mode: new(gatewayv1.TLSModeType("Passthrough")),
 						},
 					},
 				}
@@ -488,15 +488,15 @@ func TestValidateGateway(t *testing.T) {
 			mutate: func(gw *gatewayv1.Gateway) {
 				gw.Spec.Addresses = []gatewayv1.GatewaySpecAddress{
 					{
-						Type:  ptrTo(gatewayv1.IPAddressType),
+						Type:  new(gatewayv1.IPAddressType),
 						Value: "1.2.3.4",
 					},
 					{
-						Type:  ptrTo(gatewayv1.IPAddressType),
+						Type:  new(gatewayv1.IPAddressType),
 						Value: "1111:2222:3333:4444::",
 					},
 					{
-						Type:  ptrTo(gatewayv1.HostnameAddressType),
+						Type:  new(gatewayv1.HostnameAddressType),
 						Value: "foo.bar",
 					},
 				}
@@ -507,15 +507,15 @@ func TestValidateGateway(t *testing.T) {
 			mutate: func(gw *gatewayv1.Gateway) {
 				gw.Spec.Addresses = []gatewayv1.GatewaySpecAddress{
 					{
-						Type:  ptrTo(gatewayv1.IPAddressType),
+						Type:  new(gatewayv1.IPAddressType),
 						Value: "1.2.3.4:8080",
 					},
 					{
-						Type:  ptrTo(gatewayv1.HostnameAddressType),
+						Type:  new(gatewayv1.HostnameAddressType),
 						Value: "*foo/bar",
 					},
 					{
-						Type:  ptrTo(gatewayv1.HostnameAddressType),
+						Type:  new(gatewayv1.HostnameAddressType),
 						Value: "12:34:56::",
 					},
 				}
@@ -527,15 +527,15 @@ func TestValidateGateway(t *testing.T) {
 			mutateStatus: func(gw *gatewayv1.Gateway) {
 				gw.Status.Addresses = []gatewayv1.GatewayStatusAddress{
 					{
-						Type:  ptrTo(gatewayv1.IPAddressType),
+						Type:  new(gatewayv1.IPAddressType),
 						Value: "1.2.3.4",
 					},
 					{
-						Type:  ptrTo(gatewayv1.IPAddressType),
+						Type:  new(gatewayv1.IPAddressType),
 						Value: "1111:2222:3333:4444::",
 					},
 					{
-						Type:  ptrTo(gatewayv1.HostnameAddressType),
+						Type:  new(gatewayv1.HostnameAddressType),
 						Value: "foo.bar",
 					},
 				}
@@ -546,15 +546,15 @@ func TestValidateGateway(t *testing.T) {
 			mutateStatus: func(gw *gatewayv1.Gateway) {
 				gw.Status.Addresses = []gatewayv1.GatewayStatusAddress{
 					{
-						Type:  ptrTo(gatewayv1.IPAddressType),
+						Type:  new(gatewayv1.IPAddressType),
 						Value: "1.2.3.4:8080",
 					},
 					{
-						Type:  ptrTo(gatewayv1.HostnameAddressType),
+						Type:  new(gatewayv1.HostnameAddressType),
 						Value: "*foo/bar",
 					},
 					{
-						Type:  ptrTo(gatewayv1.HostnameAddressType),
+						Type:  new(gatewayv1.HostnameAddressType),
 						Value: "12:34:56::",
 					},
 				}
@@ -566,19 +566,19 @@ func TestValidateGateway(t *testing.T) {
 			mutate: func(gw *gatewayv1.Gateway) {
 				gw.Spec.Addresses = []gatewayv1.GatewaySpecAddress{
 					{
-						Type:  ptrTo(gatewayv1.IPAddressType),
+						Type:  new(gatewayv1.IPAddressType),
 						Value: "1.2.3.4",
 					},
 					{
-						Type:  ptrTo(gatewayv1.IPAddressType),
+						Type:  new(gatewayv1.IPAddressType),
 						Value: "1.2.3.4",
 					},
 					{
-						Type:  ptrTo(gatewayv1.HostnameAddressType),
+						Type:  new(gatewayv1.HostnameAddressType),
 						Value: "foo.bar",
 					},
 					{
-						Type:  ptrTo(gatewayv1.HostnameAddressType),
+						Type:  new(gatewayv1.HostnameAddressType),
 						Value: "foo.bar",
 					},
 				}
@@ -590,10 +590,10 @@ func TestValidateGateway(t *testing.T) {
 			mutate: func(gw *gatewayv1.Gateway) {
 				gw.Spec.Addresses = []gatewayv1.GatewaySpecAddress{
 					{
-						Type: ptrTo(gatewayv1.IPAddressType),
+						Type: new(gatewayv1.IPAddressType),
 					},
 					{
-						Type: ptrTo(gatewayv1.HostnameAddressType),
+						Type: new(gatewayv1.HostnameAddressType),
 					},
 				}
 			},
@@ -603,31 +603,31 @@ func TestValidateGateway(t *testing.T) {
 			mutate: func(gw *gatewayv1.Gateway) {
 				gw.Spec.Addresses = []gatewayv1.GatewaySpecAddress{
 					{
-						Type: ptrTo(gatewayv1.HostnameAddressType),
+						Type: new(gatewayv1.HostnameAddressType),
 					},
 					{
-						Type: ptrTo(gatewayv1.IPAddressType),
+						Type: new(gatewayv1.IPAddressType),
 					},
 					{
-						Type:  ptrTo(gatewayv1.IPAddressType),
+						Type:  new(gatewayv1.IPAddressType),
 						Value: "1.2.3.4",
 					},
 					{
-						Type:  ptrTo(gatewayv1.HostnameAddressType),
+						Type:  new(gatewayv1.HostnameAddressType),
 						Value: "foo.bar",
 					},
 					{
-						Type: ptrTo(gatewayv1.IPAddressType),
+						Type: new(gatewayv1.IPAddressType),
 					},
 					{
-						Type: ptrTo(gatewayv1.HostnameAddressType),
+						Type: new(gatewayv1.HostnameAddressType),
 					},
 					{
-						Type:  ptrTo(gatewayv1.IPAddressType),
+						Type:  new(gatewayv1.IPAddressType),
 						Value: "2.3.4.5",
 					},
 					{
-						Type:  ptrTo(gatewayv1.HostnameAddressType),
+						Type:  new(gatewayv1.HostnameAddressType),
 						Value: "bar.bar",
 					},
 				}

@@ -28,6 +28,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"golang.org/x/net/http2"
@@ -36,6 +37,7 @@ import (
 
 	g "sigs.k8s.io/gateway-api/conformance/echo-basic/grpc"
 	t "sigs.k8s.io/gateway-api/conformance/echo-basic/tcpserver"
+	u "sigs.k8s.io/gateway-api/conformance/echo-basic/udpechoserver"
 )
 
 // RequestAssertions contains information about the request and the Ingress
@@ -94,6 +96,11 @@ func main() {
 		return
 	}
 
+	if os.Getenv("UDP_ECHO_SERVER") != "" {
+		u.Main()
+		return
+	}
+
 	httpPort = os.Getenv("HTTP_PORT")
 	if httpPort == "" {
 		httpPort = "3000"
@@ -115,9 +122,14 @@ func main() {
 		Pod:       os.Getenv("POD_NAME"),
 	}
 
+	retrySimulation := &retrySimulation{
+		attempts: make(map[string]int),
+	}
+
 	httpMux := http.NewServeMux()
 	httpMux.HandleFunc("/health", healthHandler)
 	httpMux.HandleFunc("/status/", statusHandler)
+	httpMux.HandleFunc("/retry/", retrySimulation.retrySimulationHandler)
 	httpMux.HandleFunc("/", echoHandler)
 	httpMux.Handle("/ws", websocket.Handler(wsHandler))
 	httpHandler := &preserveSlashes{httpMux}
@@ -172,6 +184,42 @@ func statusHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(code)
+}
+
+type retrySimulation struct {
+	mutex    sync.Mutex
+	attempts map[string]int
+}
+
+func (r *retrySimulation) retrySimulationHandler(w http.ResponseWriter, request *http.Request) {
+	uuid := request.URL.Query().Get("uuid")
+	if uuid == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprintf(w, "uuid is required")
+		return
+	}
+	succeedAfter, err := strconv.Atoi(request.URL.Query().Get("succeedAfter"))
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprintf(w, "succeedAfter is required")
+		return
+	}
+	responseCode, err := strconv.Atoi(request.URL.Query().Get("responseCode"))
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprintf(w, "responseCode is required")
+		return
+	}
+
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+	if r.attempts[uuid] < succeedAfter {
+		r.attempts[uuid]++
+		w.WriteHeader(responseCode)
+		return
+	}
+
+	echoHandler(w, request)
 }
 
 func delayResponse(request *http.Request) error {
@@ -247,8 +295,8 @@ func echoHandler(w http.ResponseWriter, r *http.Request) {
 
 func writeEchoResponseHeaders(w http.ResponseWriter, headers http.Header) {
 	for _, headerKVList := range headers["X-Echo-Set-Header"] {
-		headerKVs := strings.Split(headerKVList, ",")
-		for _, headerKV := range headerKVs {
+		headerKVs := strings.SplitSeq(headerKVList, ",")
+		for headerKV := range headerKVs {
 			name, value, _ := strings.Cut(strings.TrimSpace(headerKV), ":")
 			// Add directly to the map to preserve casing.
 			if len(w.Header()[name]) == 0 {

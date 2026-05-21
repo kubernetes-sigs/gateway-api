@@ -29,7 +29,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/utils/ptr"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
@@ -67,7 +66,7 @@ func TestNewGatewayRef(t *testing.T) {
 		},
 	}
 
-	for i := 0; i < len(tests); i++ {
+	for i := range tests {
 		test := tests[i]
 		t.Run(test.name, func(t *testing.T) {
 			ref := NewGatewayRef(test.nsn, test.listenerNames...)
@@ -131,7 +130,7 @@ func TestVerifyConditionsMatchGeneration(t *testing.T) {
 		},
 	}
 
-	for i := 0; i < len(tests); i++ {
+	for i := range tests {
 		test := tests[i]
 		t.Run(test.name, func(t *testing.T) {
 			err := ConditionsHaveLatestObservedGeneration(test.obj, test.conditions)
@@ -298,7 +297,7 @@ func Test_listenersMatch(t *testing.T) {
 				{
 					SupportedKinds: []gatewayv1.RouteGroupKind{
 						{
-							Group: ptr.To[gatewayv1.Group]("gateway.networking.k8s.io"),
+							Group: new(gatewayv1.Group("gateway.networking.k8s.io")),
 							Kind:  gatewayv1.Kind("HTTPRoute"),
 						},
 					},

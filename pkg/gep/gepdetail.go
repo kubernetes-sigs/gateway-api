@@ -61,7 +61,7 @@ type GEPDetail struct {
 
 	// Relationships describes the possible relationships between this GEP and
 	// other GEPs.
-	Relationships GEPRelationships `json:"relationships,omitempty"`
+	Relationships GEPRelationships `json:"relationships,omitzero"`
 
 	// References provides a list of hyperlinks to other references used by the GEP.
 	References []string `json:"references,omitempty"`

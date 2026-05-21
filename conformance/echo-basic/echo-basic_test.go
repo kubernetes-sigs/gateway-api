@@ -336,7 +336,7 @@ func TestProcessError(t *testing.T) {
 func TestProcessErrorWithJSONError(t *testing.T) {
 	// Create a response recorder to capture the response
 	rr := httptest.NewRecorder()
-	err := json.Unmarshal([]byte(`testing invalid JSON`), new(interface{}))
+	err := json.Unmarshal([]byte(`testing invalid JSON`), new(any))
 	code := http.StatusInternalServerError
 
 	processError(rr, err, code)

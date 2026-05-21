@@ -25,5 +25,5 @@ echo "Verifying docker images"
 docker buildx rm ${BUILDX_CONTEXT} || true
 docker buildx create --use --name ${BUILDX_CONTEXT} --platform "${BUILDX_PLATFORMS}"
 
-VERIFY=true ./hack/build-and-push.sh
+VERIFY=true "${SCRIPT_ROOT}/hack/build-and-push.sh"
 

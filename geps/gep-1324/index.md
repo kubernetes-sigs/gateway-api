@@ -1,4 +1,6 @@
-# GEP-1324: Service Mesh in Gateway API
+---
+title: "GEP-1324: Service Mesh in Gateway API"
+---
 
 * Issue: [#1324](https://github.com/kubernetes-sigs/gateway-api/issues/1324)
 * Status: Memorandum
@@ -7,7 +9,7 @@
 > of our GEP overview as it existed before those rules did, and so it has been
 > explicitly grandfathered in.
 
-[expprob]:../overview.md#probationary-period
+[expprob]:/geps/overview/#probationary-period
 
 ## Overview
 
@@ -33,7 +35,7 @@ Gateway API represents the next generation of traffic routing APIs in Kubernetes
 
 ## Versioning
 
-Features or other modifications to the Gateway API spec that fall under this GEP will be subject to the same [versioning guidelines](../../concepts/versioning.md#graduation-criteria) as the rest of the Gateway API. For example, to move changes concerning a beta feature (e.g. HTTPRoute) from experimental to standard, all of the [graduation criteria](../../concepts/versioning.md#graduation-criteria) must be met (e.g. implemented by several implementations).
+Features or other modifications to the Gateway API spec that fall under this GEP will be subject to the same [versioning guidelines](/docs/concepts/versioning/#graduation-criteria) as the rest of the Gateway API. For example, to move changes concerning a beta feature (e.g. HTTPRoute) from experimental to standard, all of the [graduation criteria](/docs/concepts/versioning/#graduation-criteria) must be met (e.g. implemented by several implementations).
 
 ## Use-Cases
 

@@ -1,4 +1,6 @@
-# GEP-1364: Status and Conditions Update
+---
+title: "GEP-1364: Status and Conditions Update"
+---
 
 * Issue: [#1364](https://github.com/kubernetes-sigs/gateway-api/issues/1364)
 * Status: Standard
@@ -449,6 +451,14 @@ if the condition is true.
 needs updating.)
 
 ## References
+
+* [KEP Status][kep-status]
+* [Issue 1111][1111]
+* [Issue 1110][1110]
+* [Issue 1362][1362]
+* [API Conventions: Typical status properties][typstatus]
+* [HTTPRequestRedirect filter][httpreqredirect]
+
 [kep-status]: https://github.com/kubernetes/enhancements/blob/master/keps/NNNN-kep-template/kep.yaml#L9
 
 [1111]: https://github.com/kubernetes-sigs/gateway-api/issues/1111
@@ -456,4 +466,4 @@ needs updating.)
 [1362]: https://github.com/kubernetes-sigs/gateway-api/issues/1362
 
 [typstatus]: https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#typical-status-properties
-[httpreqredirect]: ../../reference/spec.md#httprequestredirectfilter
+[httpreqredirect]: /reference/api-spec/main/spec/#httprequestredirectfilter

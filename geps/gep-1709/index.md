@@ -1,4 +1,6 @@
-# GEP-1709: Conformance Profiles
+---
+title: "GEP-1709: Conformance Profiles"
+---
 
 * Issue: [#1709](https://github.com/kubernetes-sigs/gateway-api/issues/1709)
 * Status: Standard

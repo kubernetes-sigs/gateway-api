@@ -74,7 +74,7 @@ func TestWeightedDistribution(sender RequestSender, expectedWeights map[string]f
 	)
 
 	g.SetLimit(concurrentRequests)
-	for i := 0; i < totalRequests; i++ {
+	for range totalRequests {
 		g.Go(func() error {
 			podName, err := sender.SendRequest()
 			if err != nil {

@@ -72,11 +72,11 @@ Participation in the Kubernetes community is governed by the
 [cm]: https://gateway-api.sigs.k8s.io/contributing/community
 [slack]: https://kubernetes.slack.com/messages/sig-network-gateway-api
 [getting-started]: https://gateway-api.sigs.k8s.io/guides/
-[spec]: https://gateway-api.sigs.k8s.io/reference/spec/
-[concepts]: https://gateway-api.sigs.k8s.io/concepts/api-overview
+[spec]: https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/
+[concepts]: https://gateway-api.sigs.k8s.io/docs/concepts/api-overview
 [security-model]: https://gateway-api.sigs.k8s.io/concepts/security-model
 [gh_release]: https://github.com/kubernetes-sigs/gateway-api/releases/tag/v1.5.1
 [godoc]: https://pkg.go.dev/sigs.k8s.io/gateway-api
-[conformance-docs]: https://gateway-api.sigs.k8s.io/concepts/conformance/
+[conformance-docs]: https://gateway-api.sigs.k8s.io/docs/concepts/conformance/
 [reports-readme]: ./conformance/reports/README.md
 [conformance-reports]: ./conformance/reports/

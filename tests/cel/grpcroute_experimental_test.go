@@ -63,7 +63,7 @@ func TestGRPCRequestMirrorFilterExperimental(t *testing.T) {
 					RequestMirror: &gatewayv1.HTTPRequestMirrorFilter{
 						BackendRef: gatewayv1.BackendObjectReference{
 							Name: testService,
-							Port: ptrTo(gatewayv1.PortNumber(8081)),
+							Port: new(gatewayv1.PortNumber(8081)),
 						},
 						Percent: &percent,
 						Fraction: &gatewayv1.Fraction{
@@ -83,7 +83,7 @@ func TestGRPCRequestMirrorFilterExperimental(t *testing.T) {
 					RequestMirror: &gatewayv1.HTTPRequestMirrorFilter{
 						BackendRef: gatewayv1.BackendObjectReference{
 							Name: testService,
-							Port: ptrTo(gatewayv1.PortNumber(8081)),
+							Port: new(gatewayv1.PortNumber(8081)),
 						},
 						Fraction: &gatewayv1.Fraction{
 							Numerator:   1001,
@@ -102,7 +102,7 @@ func TestGRPCRequestMirrorFilterExperimental(t *testing.T) {
 					RequestMirror: &gatewayv1.HTTPRequestMirrorFilter{
 						BackendRef: gatewayv1.BackendObjectReference{
 							Name: testService,
-							Port: ptrTo(gatewayv1.PortNumber(8081)),
+							Port: new(gatewayv1.PortNumber(8081)),
 						},
 						Fraction: &gatewayv1.Fraction{
 							Numerator:   0,
@@ -121,7 +121,7 @@ func TestGRPCRequestMirrorFilterExperimental(t *testing.T) {
 					RequestMirror: &gatewayv1.HTTPRequestMirrorFilter{
 						BackendRef: gatewayv1.BackendObjectReference{
 							Name: testService,
-							Port: ptrTo(gatewayv1.PortNumber(8081)),
+							Port: new(gatewayv1.PortNumber(8081)),
 						},
 						Fraction: &gatewayv1.Fraction{
 							Numerator:   -1,
@@ -139,7 +139,7 @@ func TestGRPCRequestMirrorFilterExperimental(t *testing.T) {
 					RequestMirror: &gatewayv1.HTTPRequestMirrorFilter{
 						BackendRef: gatewayv1.BackendObjectReference{
 							Name: testService,
-							Port: ptrTo(gatewayv1.PortNumber(8081)),
+							Port: new(gatewayv1.PortNumber(8081)),
 						},
 						Percent: &percent,
 					},
@@ -154,7 +154,7 @@ func TestGRPCRequestMirrorFilterExperimental(t *testing.T) {
 					RequestMirror: &gatewayv1.HTTPRequestMirrorFilter{
 						BackendRef: gatewayv1.BackendObjectReference{
 							Name: testService,
-							Port: ptrTo(gatewayv1.PortNumber(8081)),
+							Port: new(gatewayv1.PortNumber(8081)),
 						},
 						Fraction: &gatewayv1.Fraction{
 							Numerator:   83,

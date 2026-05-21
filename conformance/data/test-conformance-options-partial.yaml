@@ -1,0 +1,3 @@
+meshName: "partial-only"
+timeoutConfig:
+  deleteTimeout: "5s"

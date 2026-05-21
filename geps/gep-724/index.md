@@ -1,4 +1,6 @@
-# GEP-724: Refresh Route-Gateway Binding
+---
+title: "GEP-724: Refresh Route-Gateway Binding"
+---
 
 * Issue: [#724](https://github.com/kubernetes-sigs/gateway-api/issues/724)
 * Status: Standard

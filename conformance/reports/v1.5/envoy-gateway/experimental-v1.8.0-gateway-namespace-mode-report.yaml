@@ -1,0 +1,139 @@
+apiVersion: gateway.networking.k8s.io/v1
+date: "2026-05-13T05:29:38Z"
+gatewayAPIChannel: experimental
+gatewayAPIVersion: v1.5.1
+implementation:
+  contact:
+  - https://github.com/envoyproxy/gateway/blob/main/GOVERNANCE.md
+  organization: envoyproxy
+  project: envoy-gateway
+  url: https://github.com/envoyproxy/gateway
+  version: v1.8.0
+kind: ConformanceReport
+mode: gateway-namespace-mode
+profiles:
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 33
+      Skipped: 0
+  extended:
+    result: partial
+    skippedTests:
+    - ListenerSetHostnameConflict
+    - ListenerSetProtocolConflict
+    statistics:
+      Failed: 0
+      Passed: 51
+      Skipped: 2
+    supportedFeatures:
+    - BackendTLSPolicy
+    - BackendTLSPolicySANValidation
+    - GatewayAddressEmpty
+    - GatewayBackendClientCertificate
+    - GatewayFrontendClientCertificateValidation
+    - GatewayFrontendClientCertificateValidationInsecureFallback
+    - GatewayHTTPListenerIsolation
+    - GatewayInfrastructurePropagation
+    - GatewayPort8080
+    - GatewayStaticAddresses
+    - HTTPRoute303RedirectStatusCode
+    - HTTPRoute307RedirectStatusCode
+    - HTTPRoute308RedirectStatusCode
+    - HTTPRouteBackendProtocolH2C
+    - HTTPRouteBackendProtocolWebSocket
+    - HTTPRouteBackendRequestHeaderModification
+    - HTTPRouteBackendTimeout
+    - HTTPRouteCORS
+    - HTTPRouteDestinationPortMatching
+    - HTTPRouteHostRewrite
+    - HTTPRouteMethodMatching
+    - HTTPRouteNamedRouteRule
+    - HTTPRouteParentRefPort
+    - HTTPRoutePathRedirect
+    - HTTPRoutePathRewrite
+    - HTTPRoutePortRedirect
+    - HTTPRouteQueryParamMatching
+    - HTTPRouteRequestMirror
+    - HTTPRouteRequestMultipleMirrors
+    - HTTPRouteRequestPercentageMirror
+    - HTTPRouteRequestTimeout
+    - HTTPRouteResponseHeaderModification
+    - HTTPRouteSchemeRedirect
+    - ListenerSet
+    unsupportedFeatures:
+    - GatewayHTTPSListenerDetectMisdirectedRequests
+  name: GATEWAY-HTTP
+  summary: Core tests succeeded. Extended tests partially succeeded with 2 test skips.
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 13
+      Skipped: 0
+  extended:
+    result: partial
+    skippedTests:
+    - ListenerSetHostnameConflict
+    - ListenerSetProtocolConflict
+    statistics:
+      Failed: 0
+      Passed: 8
+      Skipped: 2
+    supportedFeatures:
+    - GatewayAddressEmpty
+    - GatewayBackendClientCertificate
+    - GatewayFrontendClientCertificateValidation
+    - GatewayFrontendClientCertificateValidationInsecureFallback
+    - GatewayHTTPListenerIsolation
+    - GatewayInfrastructurePropagation
+    - GatewayPort8080
+    - GatewayStaticAddresses
+    - ListenerSet
+    unsupportedFeatures:
+    - GatewayHTTPSListenerDetectMisdirectedRequests
+  name: GATEWAY-GRPC
+  summary: Core tests succeeded. Extended tests partially succeeded with 2 test skips.
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 18
+      Skipped: 0
+  extended:
+    result: partial
+    skippedTests:
+    - ListenerSetHostnameConflict
+    - ListenerSetProtocolConflict
+    statistics:
+      Failed: 0
+      Passed: 13
+      Skipped: 2
+    supportedFeatures:
+    - GatewayAddressEmpty
+    - GatewayBackendClientCertificate
+    - GatewayFrontendClientCertificateValidation
+    - GatewayFrontendClientCertificateValidationInsecureFallback
+    - GatewayHTTPListenerIsolation
+    - GatewayInfrastructurePropagation
+    - GatewayPort8080
+    - GatewayStaticAddresses
+    - ListenerSet
+    - TLSRouteModeMixed
+    - TLSRouteModeTerminate
+    unsupportedFeatures:
+    - GatewayHTTPSListenerDetectMisdirectedRequests
+  name: GATEWAY-TLS
+  summary: Core tests succeeded. Extended tests partially succeeded with 2 test skips.
+succeededProvisionalTests:
+- GRPCRouteNamedRule
+- GatewayInfrastructure
+- GatewayOptionalAddressValue
+- HTTPRoute303Redirect
+- HTTPRoute307Redirect
+- HTTPRoute308Redirect
+- HTTPRouteNamedRule
+- HTTPRouteRequestPercentageMirror
+- TLSRouteMixedTerminationSameNamespace
+- TLSRouteTerminateSimpleSameNamespace

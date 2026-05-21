@@ -4,8 +4,8 @@
 
 | API channel  | Implementation version                                                        | Mode                         | Report                                                                |
 |--------------|-------------------------------------------------------------------------------|------------------------------|-----------------------------------------------------------------------|
-| experimental | [v1.8.0-rc.0](https://github.com/envoyproxy/gateway/releases/tag/v1.8.0-rc.0) | ControllerNamespace(default) | [link](./experimental-v1.8.0-rc.0-default-report.yaml)                |
-| experimental | [v1.8.0-rc.0](https://github.com/envoyproxy/gateway/releases/tag/v1.8.0-rc.0) | GatewayNamespace             | [link](./experimental-v1.8.0-rc.0-gateway-namespace-mode-report.yaml) |
+| experimental | [v1.8.0](https://github.com/envoyproxy/gateway/releases/tag/v1.8.0)           | ControllerNamespace(default) | [link](./experimental-v1.8.0-default-report.yaml)                     |
+| experimental | [v1.8.0](https://github.com/envoyproxy/gateway/releases/tag/v1.8.0)           | GatewayNamespace             | [link](./experimental-v1.8.0-gateway-namespace-mode-report.yaml)      |
 
 
 ## Overview

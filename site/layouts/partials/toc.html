@@ -1,0 +1,8 @@
+{{ if not .Params.notoc }}
+<div class="td-toc">
+  <details>
+    <summary class="td-toc-title" style="cursor: pointer;">On this Page</summary>
+    {{ .TableOfContents }}
+  </details>
+</div>
+{{ end }}

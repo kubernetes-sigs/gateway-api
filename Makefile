@@ -46,7 +46,7 @@ export COMMIT ?= $(shell git rev-parse --short HEAD)
 DOCKER ?= docker
 # TOP is the current directory where this Makefile lives.
 TOP := $(dir $(firstword $(MAKEFILE_LIST)))
-# ROOT is the root of the mkdocs tree.
+# ROOT is the root of the documentation tree.
 ROOT := $(abspath $(TOP))
 
 # Command-line flags passed to "go test" for the conformance
@@ -109,7 +109,7 @@ test:
 .PHONY: tidy
 tidy:
 	go work sync
-	find . -name go.mod -execdir sh -c 'go mod tidy' \;
+	find . -name go.mod -not -path "./site/*" -exec sh -c 'cd "$$(dirname "{}")" && go mod tidy' \;
 
 # Run tests for CRDs validation
 .PHONY: test.crds-validation
@@ -152,11 +152,6 @@ uninstall:
 verify:
 	hack/verify-all.sh -v
 
-# Build the documentation.
-.PHONY: docs
-docs:
-	hack/make-docs.sh
-
 .PHONY: update-conformance-image-refs
 update-conformance-image-refs:
 	hack/update-conformance-image-refs.sh
@@ -197,28 +192,54 @@ release-staging: image.multiarch.setup
 
 # Docs
 
-DOCS_BUILD_CONTAINER_NAME ?= gateway-api-mkdocs
+PYTHON ?= $(shell if [ -x .venv/bin/python3 ]; then echo "./.venv/bin/python3"; else echo "python3"; fi)
+
 DOCS_VERIFY_CONTAINER_IMAGE ?= registry.hub.docker.com/lycheeverse/lychee:0.23
 
+HUGO_VERSION ?= 0.160.1
+HUGO_IMAGE ?= ghcr.io/gohugoio/hugo:v$(HUGO_VERSION)
+
+# Use Docker for Hugo by default for local development, but not on Netlify
+USE_DOCKER_HUGO ?= true
+ifeq ($(NETLIFY),true)
+	USE_DOCKER_HUGO = false
+endif
+
+ifeq ($(USE_DOCKER_HUGO),true)
+	HUGO = docker run --rm -u $(shell id -u):$(shell id -g) -v $(PWD):/src -w /src -e GOMODCACHE=/src/.gocache -e HUGO_CACHEDIR=/src/.hugocache $(HUGO_IMAGE)
+	HUGO_SERVER = docker run --rm -u $(shell id -u):$(shell id -g) -v $(PWD):/src -w /src -e GOMODCACHE=/src/.gocache -e HUGO_CACHEDIR=/src/.hugocache -p 1313:1313 $(HUGO_IMAGE) server --bind 0.0.0.0
+else
+	HUGO = hugo
+	HUGO_SERVER = hugo server
+endif
+
+# Build the documentation.
+.PHONY: install-deps
+install-deps:
+	cd site && npm install
+	if [ ! -d .venv ]; then python3 -m venv .venv; fi
+	.venv/bin/pip install --index-url https://pypi.org/simple pandas PyYAML semver python-frontmatter tabulate
+
+.PHONY: docs
+docs: install-deps
+	hack/docsy/generate.sh
+	$(HUGO) --source site
+
 .PHONY: build-docs
-build-docs: update-geps api-ref-docs
-	docker build --pull -t gaie/mkdocs hack/mkdocs/image
-	docker rm -f $(DOCS_BUILD_CONTAINER_NAME) || true
-	docker run --name $(DOCS_BUILD_CONTAINER_NAME) --rm -v ${PWD}:/docs gaie/mkdocs build
+build-docs: install-deps update-geps api-ref-docs wizard-wasm wizard-data conformance-data
+	$(HUGO) --source site
 
 .PHONY: verify-docs
 verify-docs: build-docs
-	docker run --init --rm -w /input -v ${PWD}:/input $(DOCS_VERIFY_CONTAINER_IMAGE) --root-dir /input/site --exclude-path "overrides/partials/.*\.html" --exclude ".*" --include "sigs.k8s.io" --accept 200 --max-concurrency 10 --include-fragments --cache $(VALIDATE_DOCS_EXTRA_ARGS) /input/site/**/*.html
+	docker run --init --rm -w /input -v ${PWD}:/input $(DOCS_VERIFY_CONTAINER_IMAGE) --root-dir /input/site/public --include "sigs.k8s.io" --accept 200 --max-concurrency 10 --include-fragments --cache $(VALIDATE_DOCS_EXTRA_FLAGS) /input/site/public/**/*.html
 
 .PHONY: build-docs-netlify
-build-docs-netlify: update-geps api-ref-docs wizard-wasm
-	pip install -r hack/mkdocs/image/requirements.txt
-	PYTHONPATH=hack python -m mkdocs build
+build-docs-netlify: install-deps update-geps api-ref-docs wizard-wasm wizard-data conformance-data
+	$(HUGO) --source site
 
 .PHONY: live-docs
-live-docs: update-geps
-	docker build -t gw/mkdocs hack/mkdocs/image
-	docker run --rm -it -p 3000:3000 -v ${PWD}:/docs gw/mkdocs
+live-docs: update-geps api-ref-docs
+	$(HUGO_SERVER) --source site
 
 .PHONY: update-geps
 update-geps:
@@ -226,23 +247,29 @@ update-geps:
 
 .PHONY: api-ref-docs
 api-ref-docs:
-	hack/mkdocs/generate.sh
+	hack/docsy/generate.sh
 
 .PHONY: wizard-wasm
 wizard-wasm:
+	@mkdir -p site/static/wizard
 	@GOROOT=$$(go env GOROOT); \
-	if [ -f "$$GOROOT/misc/wasm/wasm_exec.js" ]; then cp -f "$$GOROOT/misc/wasm/wasm_exec.js" site-src/wizard/; \
-	elif [ -f "$$GOROOT/lib/wasm/wasm_exec.js" ]; then cp -f "$$GOROOT/lib/wasm/wasm_exec.js" site-src/wizard/; \
+	if [ -f "$$GOROOT/misc/wasm/wasm_exec.js" ]; then cp -f "$$GOROOT/misc/wasm/wasm_exec.js" site/static/wizard/; \
+	elif [ -f "$$GOROOT/lib/wasm/wasm_exec.js" ]; then cp -f "$$GOROOT/lib/wasm/wasm_exec.js" site/static/wizard/; \
 	else echo "ERROR: wasm_exec.js not found in GOROOT"; exit 1; fi
-	GOOS=js GOARCH=wasm go build -o site-src/wizard/main.wasm ./wasm/
+	GOOS=js GOARCH=wasm go build -o site/static/wizard/main.wasm ./wasm/
 
 # Generate controller wizard data (multi-version). Requires conformance/reports/ with version dirs.
 # Run manually if make serve is used without conformance reports.
 .PHONY: wizard-data
 wizard-data:
-	python3 hack/mkdocs-generate-controller-wizard-data.py --all -o site-src/wizard/data/controller-wizard-data.json
+	@mkdir -p site/static/wizard/data
+	$(PYTHON) hack/generate-controller-wizard-data.py --all -o site/static/wizard/data/controller-wizard-data.json
+
+.PHONY: conformance-data
+conformance-data:
+	$(PYTHON) hack/docsy-generate-conformance.py
 
 .PHONY: serve
-serve: wizard-wasm
+serve: wizard-wasm update-geps api-ref-docs
 	@echo "Tip: Run 'make wizard-data' first if you have conformance/reports/ to load implementation data."
-	python3 -m http.server -d site-src/wizard 8080
+	$(HUGO_SERVER) --source site

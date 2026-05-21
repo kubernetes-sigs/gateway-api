@@ -20,6 +20,7 @@ import (
 	"context"
 	"fmt"
 	"math/rand"
+	"strings"
 	"testing"
 	"time"
 
@@ -47,12 +48,12 @@ const (
 const letters = "abcdefghijklmnopqrstuvwxyz0123456789"
 
 func randStr(length int) string { //nolint:unparam
-	s := ""
-	for i := 0; i < length; i++ {
+	var s strings.Builder
+	for range length {
 		letter := letters[rand.Int()%len(letters)] //nolint:gosec // This is test code.
-		s += string([]byte{letter})
+		s.WriteString(string([]byte{letter}))
 	}
-	return s
+	return s.String()
 }
 
 type methodFunc = func(context.Context, pb.GrpcEchoClient, *pb.EchoRequest) (*pb.EchoResponse, error)

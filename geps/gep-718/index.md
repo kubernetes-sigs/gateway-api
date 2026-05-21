@@ -1,4 +1,6 @@
-# GEP-718: Rework forwardTo segment in routes
+---
+title: "GEP-718: Rework forwardTo segment in routes"
+---
 
 * Issue: [#718](https://github.com/kubernetes-sigs/gateway-api/issues/718)
 * Status: Standard

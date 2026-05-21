@@ -1,9 +1,11 @@
-# GEP-1742: HTTPRoute Timeouts
+---
+title: "GEP-1742: HTTPRoute Timeouts"
+---
 
 * Issue: [#1742](https://github.com/kubernetes-sigs/gateway-api/issues/1742)
 * Status: Standard
 
-(See [status definitions](../overview.md#gep-states).)
+(See [status definitions](/geps/overview/#gep-states).)
 
 ## TLDR
 
@@ -445,7 +447,7 @@ type Duration string
 ### YAML
 
 ```yaml
-apiVersion: gateway.networking.k8s.io/v1beta1
+apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
   name: timeout-example
