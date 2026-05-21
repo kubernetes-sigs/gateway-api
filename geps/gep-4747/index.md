@@ -5,9 +5,9 @@
 
 (See [status definitions](../overview.md#gep-states).)
 
-[Chihiro]: https://gateway-api.sigs.k8s.io/concepts/roles-and-personas/#key-roles-and-personas
-[Ian]: https://gateway-api.sigs.k8s.io/concepts/roles-and-personas/#key-roles-and-personas
-[Ana]: https://gateway-api.sigs.k8s.io/concepts/roles-and-personas/#key-roles-and-personas
+[Chihiro]: https://gateway-api.sigs.k8s.io/docs/concepts/roles-and-personas/#key-roles-and-personas
+[Ian]: https://gateway-api.sigs.k8s.io/docs/concepts/roles-and-personas/#key-roles-and-personas
+[Ana]: https://gateway-api.sigs.k8s.io/docs/concepts/roles-and-personas/#key-roles-and-personas
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
 "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this
