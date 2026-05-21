@@ -4,11 +4,12 @@ title: "GEP-4894: Backend Resource"
 
 * Issue: [#4894](https://github.com/kubernetes-sigs/gateway-api/pull/4894)
   * Incubated by the [AI Gateway Working Group](https://github.com/kubernetes-sigs/wg-ai-gateway/pull/20)
-* Status: Implementable
+* Status: Experimental
 
 ## Sponsors
 
 * [Agentgateway](https://agentgateway.dev/)
+* [Istio](https://istio.io/)
 
 ## TLDR
 
