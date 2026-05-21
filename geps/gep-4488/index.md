@@ -6,6 +6,10 @@ title: "GEP-4894: Backend Resource"
   * Incubated by the [AI Gateway Working Group](https://github.com/kubernetes-sigs/wg-ai-gateway/pull/20)
 * Status: Implementable
 
+## Sponsors
+
+* [Agentgateway](https://agentgateway.dev/)
+
 ## TLDR
 
 This GEP proposes a new `Backend` resource that fills the [backend role](/geps/gep-2907/) — a **general-purpose decorator for Service** (and other backend types) within Gateway API. The Kubernetes `Service` resource is mature and stable, but it is effectively frozen and SIG-Network leadership is very careful about any potential features that would further bloat `Service`'s responsibilities. Previous approaches to extend Service behavior (like `BackendTLSPolicy`) have significant limitations around discoverability, implementation complexity, and the conflation of producer and consumer concerns. `BackendTLSPolicy` in particular was the right solution at the time, but feedback has shown that policy attachment was not the right approach for TLS configuration.
