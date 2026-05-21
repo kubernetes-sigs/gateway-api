@@ -3695,6 +3695,7 @@ spec:
                             a backend request is implementation-specific.
 
                             Support: Extended
+                          minimum: 1
                           type: integer
                         backoff:
                           description: |-
@@ -3763,7 +3764,7 @@ spec:
                             minimum: 400
                             type: integer
                           type: array
-                          x-kubernetes-list-type: atomic
+                          x-kubernetes-list-type: set
                       type: object
                     sessionPersistence:
                       description: |-
@@ -7949,6 +7950,7 @@ spec:
                             a backend request is implementation-specific.
 
                             Support: Extended
+                          minimum: 1
                           type: integer
                         backoff:
                           description: |-
@@ -8017,7 +8019,7 @@ spec:
                             minimum: 400
                             type: integer
                           type: array
-                          x-kubernetes-list-type: atomic
+                          x-kubernetes-list-type: set
                       type: object
                     sessionPersistence:
                       description: |-
