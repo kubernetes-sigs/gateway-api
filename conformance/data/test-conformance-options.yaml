@@ -1,0 +1,27 @@
+meshName: "testmesh"
+reportOutputPath: "test-output/report.yaml"
+mode: "placeholder"
+timeoutConfig:
+  deleteTimeout: "30s"
+  getTimeout: "30s"
+implementation:
+  organization: "testorg"
+  project: "testproject"
+  url: "https://placeholder.com"
+  version: "1.30.0"
+  contact:
+    - "@test"
+supportedFeatures:
+  - HTTPRouteHostRewrite
+  - HTTPRouteMethodMatching
+exemptFeatures:
+  - GatewayPort8080
+usableNetworkAddresses:
+  - type: IPAddress
+    value: "192.168.1.1"
+  - type: Hostname
+    value: "example.com"
+unusableNetworkAddresses:
+  - type: IPAddress
+    value: "10.0.0.1"
+debug: true
