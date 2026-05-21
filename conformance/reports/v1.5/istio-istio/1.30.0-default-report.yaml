@@ -1,5 +1,5 @@
 apiVersion: gateway.networking.k8s.io/v1
-date: "2026-05-05T02:24:07Z"
+date: "2026-05-20T23:56:32Z"
 gatewayAPIChannel: experimental
 gatewayAPIVersion: v1.5.1
 implementation:
@@ -19,31 +19,16 @@ profiles:
       Passed: 33
       Skipped: 0
   extended:
-    result: partial
-    skippedTests:
-    - BackendTLSPolicyConflictResolution
-    - GatewayBackendClientCertificateFeature
-    - GatewayFrontendClientCertificateValidationInsecureFallback
-    - GatewayFrontendInvalidDefaultClientCertificateValidation
-    - GatewayInvalidFrontendClientCertificateValidation
-    - GatewayInvalidTLSBackendConfiguration
-    - HTTPRouteHTTPSListenerDetectMisdirectedRequests
-    - ListenerSetHostnameConflict
-    - ListenerSetProtocolConflict
-    - ListenerSetReferenceGrant
+    result: success
     statistics:
       Failed: 0
-      Passed: 44
-      Skipped: 10
+      Passed: 38
+      Skipped: 0
     supportedFeatures:
     - BackendTLSPolicy
     - BackendTLSPolicySANValidation
     - GatewayAddressEmpty
-    - GatewayBackendClientCertificate
-    - GatewayFrontendClientCertificateValidation
-    - GatewayFrontendClientCertificateValidationInsecureFallback
     - GatewayHTTPListenerIsolation
-    - GatewayHTTPSListenerDetectMisdirectedRequests
     - GatewayInfrastructurePropagation
     - GatewayPort8080
     - GatewayStaticAddresses
@@ -70,9 +55,14 @@ profiles:
     - HTTPRouteRequestTimeout
     - HTTPRouteResponseHeaderModification
     - HTTPRouteSchemeRedirect
+    unsupportedFeatures:
+    - GatewayBackendClientCertificate
+    - GatewayFrontendClientCertificateValidation
+    - GatewayFrontendClientCertificateValidationInsecureFallback
+    - GatewayHTTPSListenerDetectMisdirectedRequests
     - ListenerSet
   name: GATEWAY-HTTP
-  summary: Core tests succeeded. Extended tests partially succeeded with 10 test skips.
+  summary: Core tests succeeded. Extended tests succeeded.
 - core:
     result: success
     statistics:
@@ -80,28 +70,25 @@ profiles:
       Passed: 13
       Skipped: 0
   extended:
-    result: partial
-    skippedTests:
-    - ListenerSetHostnameConflict
-    - ListenerSetProtocolConflict
-    - ListenerSetReferenceGrant
+    result: success
     statistics:
       Failed: 0
-      Passed: 7
-      Skipped: 3
+      Passed: 3
+      Skipped: 0
     supportedFeatures:
     - GatewayAddressEmpty
-    - GatewayBackendClientCertificate
-    - GatewayFrontendClientCertificateValidation
-    - GatewayFrontendClientCertificateValidationInsecureFallback
     - GatewayHTTPListenerIsolation
-    - GatewayHTTPSListenerDetectMisdirectedRequests
     - GatewayInfrastructurePropagation
     - GatewayPort8080
     - GatewayStaticAddresses
+    unsupportedFeatures:
+    - GatewayBackendClientCertificate
+    - GatewayFrontendClientCertificateValidation
+    - GatewayFrontendClientCertificateValidationInsecureFallback
+    - GatewayHTTPSListenerDetectMisdirectedRequests
     - ListenerSet
   name: GATEWAY-GRPC
-  summary: Core tests succeeded. Extended tests partially succeeded with 3 test skips.
+  summary: Core tests succeeded. Extended tests succeeded.
 - core:
     result: success
     statistics:
@@ -109,30 +96,27 @@ profiles:
       Passed: 18
       Skipped: 0
   extended:
-    result: partial
-    skippedTests:
-    - ListenerSetHostnameConflict
-    - ListenerSetProtocolConflict
-    - ListenerSetReferenceGrant
+    result: success
     statistics:
       Failed: 0
-      Passed: 12
-      Skipped: 3
+      Passed: 7
+      Skipped: 0
     supportedFeatures:
     - GatewayAddressEmpty
-    - GatewayBackendClientCertificate
-    - GatewayFrontendClientCertificateValidation
-    - GatewayFrontendClientCertificateValidationInsecureFallback
     - GatewayHTTPListenerIsolation
-    - GatewayHTTPSListenerDetectMisdirectedRequests
     - GatewayInfrastructurePropagation
     - GatewayPort8080
     - GatewayStaticAddresses
-    - ListenerSet
     - TLSRouteModeMixed
     - TLSRouteModeTerminate
+    unsupportedFeatures:
+    - GatewayBackendClientCertificate
+    - GatewayFrontendClientCertificateValidation
+    - GatewayFrontendClientCertificateValidationInsecureFallback
+    - GatewayHTTPSListenerDetectMisdirectedRequests
+    - ListenerSet
   name: GATEWAY-TLS
-  summary: Core tests succeeded. Extended tests partially succeeded with 3 test skips.
+  summary: Core tests succeeded. Extended tests succeeded.
 - core:
     result: success
     statistics:
