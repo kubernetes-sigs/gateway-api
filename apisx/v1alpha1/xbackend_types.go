@@ -142,10 +142,11 @@ type BackendPort struct {
 
 	// Port represents the port number of the endpoint.
 	//
-	// +required
 	// +kubebuilder:validation:Minimum=1
 	// +kubebuilder:validation:Maximum=65535
-	Port v1.PortNumber `json:"port"`
+	//
+	// +required
+	Port PortNumber `json:"port,omitempty"`
 }
 
 // ExternalHostnameBackend specifies the configuration for a backend that
@@ -158,7 +159,7 @@ type ExternalHostnameBackend struct {
 	// (e.g. .cluster.local) are not allowed.
 	//
 	// +required
-	Hostname v1.PreciseHostname `json:"hostname"`
+	Hostname v1.PreciseHostname `json:"hostname,omitempty"`
 }
 
 // BackendProtocol defines the protocol used when connecting to a backend.

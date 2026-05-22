@@ -18,6 +18,14 @@ limitations under the License.
 
 package v1alpha1
 
+// XBackendListerExpansion allows custom methods to be added to
+// XBackendLister.
+type XBackendListerExpansion interface{}
+
+// XBackendNamespaceListerExpansion allows custom methods to be added to
+// XBackendNamespaceLister.
+type XBackendNamespaceListerExpansion interface{}
+
 // XBackendTrafficPolicyListerExpansion allows custom methods to be added to
 // XBackendTrafficPolicyLister.
 type XBackendTrafficPolicyListerExpansion interface{}
