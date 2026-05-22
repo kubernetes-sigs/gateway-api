@@ -10,6 +10,7 @@ title: "GEP-4894: Backend Resource"
 
 * [Agentgateway](https://agentgateway.dev/)
 * [Istio](https://istio.io/)
+* [Airlock](https://github.com/airlock/microgateway)
 
 ## TLDR
 
