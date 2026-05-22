@@ -233,12 +233,20 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"sigs.k8s.io/gateway-api/apis/v1beta1.HTTPRouteList":                              schema_sigsk8sio_gateway_api_apis_v1beta1_HTTPRouteList(ref),
 		"sigs.k8s.io/gateway-api/apis/v1beta1.ReferenceGrant":                             schema_sigsk8sio_gateway_api_apis_v1beta1_ReferenceGrant(ref),
 		"sigs.k8s.io/gateway-api/apis/v1beta1.ReferenceGrantList":                         schema_sigsk8sio_gateway_api_apis_v1beta1_ReferenceGrantList(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendParentStatus":                      schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendParentStatus(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendPort":                              schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendPort(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendSpec":                              schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendSpec(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendStatus":                            schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendStatus(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendTLS":                               schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendTLS(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendTrafficPolicySpec":                 schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendTrafficPolicySpec(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.BudgetDetails":                            schema_sigsk8sio_gateway_api_apisx_v1alpha1_BudgetDetails(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.ExternalHostnameBackend":                  schema_sigsk8sio_gateway_api_apisx_v1alpha1_ExternalHostnameBackend(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.MeshSpec":                                 schema_sigsk8sio_gateway_api_apisx_v1alpha1_MeshSpec(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.MeshStatus":                               schema_sigsk8sio_gateway_api_apisx_v1alpha1_MeshStatus(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.RequestRate":                              schema_sigsk8sio_gateway_api_apisx_v1alpha1_RequestRate(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.RetryConstraint":                          schema_sigsk8sio_gateway_api_apisx_v1alpha1_RetryConstraint(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.XBackend":                                 schema_sigsk8sio_gateway_api_apisx_v1alpha1_XBackend(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.XBackendList":                             schema_sigsk8sio_gateway_api_apisx_v1alpha1_XBackendList(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.XBackendTrafficPolicy":                    schema_sigsk8sio_gateway_api_apisx_v1alpha1_XBackendTrafficPolicy(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.XBackendTrafficPolicyList":                schema_sigsk8sio_gateway_api_apisx_v1alpha1_XBackendTrafficPolicyList(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.XMesh":                                    schema_sigsk8sio_gateway_api_apisx_v1alpha1_XMesh(ref),
@@ -10001,6 +10009,208 @@ func schema_sigsk8sio_gateway_api_apis_v1beta1_ReferenceGrantList(ref common.Ref
 	}
 }
 
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendParentStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "BackendParentStatus describes the status of a Backend with respect to a specific parent resource (typically a Gateway).",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"controllerName": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ControllerName is a domain/path string that indicates the name of the controller that manages the Backend.\n\nExample: \"example.net/gateway-controller\".\n\nThe format of this field is DOMAIN \"/\" PATH, where DOMAIN and PATH are valid Kubernetes names (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names).\n\nA controller MUST populate this field when writing status and ensure that entries to status populated with their controller name are removed when they are no longer necessary.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"parentRef": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ParentRef identifies the parent resource that this status is associated with.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.ParentReference"),
+						},
+					},
+					"conditions": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-map-keys": []interface{}{
+									"type",
+								},
+								"x-kubernetes-list-type": "map",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "Conditions describe the current state of the Backend with respect to this parent.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref(v1.Condition{}.OpenAPIModelName()),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"controllerName", "parentRef"},
+			},
+		},
+		Dependencies: []string{
+			v1.Condition{}.OpenAPIModelName(), "sigs.k8s.io/gateway-api/apis/v1.ParentReference"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendPort(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "BackendPort describes the port the implementation should use when connecting to a Backend. Inspired by discoveryv1.EndpointPort.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"name": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Name represents the name of this port. All ports in a Backend must have a unique name. Name must either be an empty string or pass DNS_LABEL validation: * must be no more than 63 characters long. * must consist of lower case alphanumeric characters or '-'. * must start and end with an alphanumeric character.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"port": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Port represents the port number of the endpoint.",
+							Type:        []string{"integer"},
+							Format:      "int32",
+						},
+					},
+				},
+				Required: []string{"port"},
+			},
+		},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "BackendSpec defines the desired state of a Backend.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"type": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Type defines the backend type.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"port": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Port defines the port that the implementation should use when connecting to this backend.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendPort"),
+						},
+					},
+					"externalHostname": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ExternalHostname specifies the configuration for an ExternalHostname backend. This field must be set when type is ExternalHostname and must be unset otherwise.\n\nSupport: Extended",
+							Ref:         ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.ExternalHostnameBackend"),
+						},
+					},
+					"protocol": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Protocol defines the protocol for backend communication.\n\nIn the common case, the underlying transport protocol for the proxied traffic will already have been determined and processed by the dataplane at the routing step. Where this field is useful is either for higher level protocols or asymmetrical protocol configurations (e.g. version upgrades or h2c). In cases where the protocol is negotiated on the wire (e.g. HTTP/1.1 Upgrade or ALPN), implementations MUST include the protocol set here in the negotiation options presented to the backend.\n\nSupport: Extended for MCP; Core for TCP, HTTP, HTTP2, H2C, and HTTP11",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"tls": {
+						SchemaProps: spec.SchemaProps{
+							Description: "TLS defines the TLS configuration that the implementation should use when connecting to the backend.\n\nExternalHostname backends SHOULD have TLS configured; the lack of TLS for external hostnames should be considered insecure and a security risk.\n\nSupport: Extended",
+							Ref:         ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendTLS"),
+						},
+					},
+				},
+				Required: []string{"type", "port"},
+			},
+		},
+		Dependencies: []string{
+			"sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendPort", "sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendTLS", "sigs.k8s.io/gateway-api/apisx/v1alpha1.ExternalHostnameBackend"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "BackendStatus defines the observed state of a Backend.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"parents": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-type": "atomic",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "Parents is a list of parent resources associated with this Backend, and the status of the Backend with respect to each parent.\n\nA controller that manages the Backend must add an entry for each parent it manages and remove the entry when the controller no longer considers the Backend to be associated with that parent.\n\nA maximum of 32 parents will be represented in this list. An empty list indicates that the Backend is not associated with any parents.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendParentStatus"),
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendParentStatus"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendTLS(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "BackendTLS defines TLS configuration for connecting to a backend.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"mode": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Mode defines the TLS mode for the backend connection.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"clientCertificateRef": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ClientCertificateRef is a reference to a Secret containing the client TLS certificate and private key for mutual TLS. This field is required when mode is ClientAndServer and must be unset otherwise.",
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.SecretObjectReference"),
+						},
+					},
+					"validation": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Validation contains TLS validation configuration for the backend connection. This re-uses the BackendTLSPolicy validation fields for consistency.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.BackendTLSPolicyValidation"),
+						},
+					},
+				},
+				Required: []string{"mode"},
+			},
+		},
+		Dependencies: []string{
+			"sigs.k8s.io/gateway-api/apis/v1.BackendTLSPolicyValidation", "sigs.k8s.io/gateway-api/apis/v1.SecretObjectReference"},
+	}
+}
+
 func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendTrafficPolicySpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -10075,6 +10285,27 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BudgetDetails(ref common.Refere
 						},
 					},
 				},
+			},
+		},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_ExternalHostnameBackend(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ExternalHostnameBackend specifies the configuration for a backend that represents an external hostname destination.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"hostname": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Hostname specifies the FQDN used to reach this backend. IP addresses are not allowed in this field. Implementations that are aware of custom trust domains being used for Service FQDNs MUST also enforce that hostnames ending with those trust domains (e.g. .cluster.local) are not allowed.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"hostname"},
 			},
 		},
 	}
@@ -10225,6 +10456,105 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_RetryConstraint(ref common.Refe
 		},
 		Dependencies: []string{
 			"sigs.k8s.io/gateway-api/apisx/v1alpha1.BudgetDetails", "sigs.k8s.io/gateway-api/apisx/v1alpha1.RequestRate"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_XBackend(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "XBackend is a Gateway API resource that represents a backend destination for routing traffic. It serves as a Gateway-native way to configure external hostname destinations and (in the future) internal service backends.\n\nA Backend of type ExternalHostname provides first-class support for external FQDNs, replacing the need for synthetic ExternalName Services.\n\nSupport: Extended",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref(v1.ObjectMeta{}.OpenAPIModelName()),
+						},
+					},
+					"spec": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Spec defines the desired state of XBackend.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendSpec"),
+						},
+					},
+					"status": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Status defines the current state of XBackend.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendStatus"),
+						},
+					},
+				},
+				Required: []string{"spec"},
+			},
+		},
+		Dependencies: []string{
+			v1.ObjectMeta{}.OpenAPIModelName(), "sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendSpec", "sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendStatus"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_XBackendList(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "XBackendList contains a list of XBackends.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref(v1.ListMeta{}.OpenAPIModelName()),
+						},
+					},
+					"items": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.XBackend"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"items"},
+			},
+		},
+		Dependencies: []string{
+			v1.ListMeta{}.OpenAPIModelName(), "sigs.k8s.io/gateway-api/apisx/v1alpha1.XBackend"},
 	}
 }
 

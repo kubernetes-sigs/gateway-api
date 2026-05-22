@@ -107,6 +107,8 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Gateway().V1beta1().ReferenceGrants().Informer()}, nil
 
 		// Group=gateway.networking.x-k8s.io, Version=v1alpha1
+	case v1alpha1.SchemeGroupVersion.WithResource("xbackends"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Experimental().V1alpha1().XBackends().Informer()}, nil
 	case v1alpha1.SchemeGroupVersion.WithResource("xbackendtrafficpolicies"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Experimental().V1alpha1().XBackendTrafficPolicies().Informer()}, nil
 	case v1alpha1.SchemeGroupVersion.WithResource("xmeshes"):

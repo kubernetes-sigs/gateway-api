@@ -27,6 +27,9 @@ type (
 	SessionPersistence         = v1.SessionPersistence
 )
 
+// PortNumber defines a network port.
+type PortNumber int32
+
 // RequestRate expresses a rate of requests over a given period of time.
 type RequestRate struct {
 	// Count specifies the number of requests per time interval.
