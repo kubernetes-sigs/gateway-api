@@ -21,8 +21,10 @@ import (
 	"crypto/x509"
 	"encoding/json"
 	"encoding/pem"
+	"errors"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"os"
 	"regexp"
@@ -191,6 +193,10 @@ type retrySimulation struct {
 	attempts map[string]int
 }
 
+// retrySimulationHandler simulates a flaky backend to test Gateway retry logic.
+// It tracks the number of attempts per request (identified by uuid) and induces
+// failures until succeedAfter attempts have been made, at which point it
+// responds successfully by echoing the request back.
 func (r *retrySimulation) retrySimulationHandler(w http.ResponseWriter, request *http.Request) {
 	uuid := request.URL.Query().Get("uuid")
 	if uuid == "" {
@@ -204,26 +210,64 @@ func (r *retrySimulation) retrySimulationHandler(w http.ResponseWriter, request 
 		fmt.Fprintf(w, "succeedAfter is required")
 		return
 	}
-	responseCode, err := strconv.Atoi(request.URL.Query().Get("responseCode"))
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		fmt.Fprintf(w, "responseCode is required")
-		return
+
+	// TCP failure mode (default): the simulator hijacks the connection and
+	// aborts it with a TCP RST. The client observes a connection reset rather
+	// than an HTTP response.
+	handleAttempt := func(w http.ResponseWriter) error {
+		hijacker, ok := w.(http.Hijacker)
+		if !ok {
+			return errors.New("response writer does not support hijacking")
+		}
+		conn, _, err := hijacker.Hijack()
+		if err != nil {
+			return err
+		}
+		if tcp, ok := conn.(*net.TCPConn); ok {
+			if err := tcp.SetLinger(0); err != nil {
+				return err
+			}
+		}
+
+		return conn.Close()
+	}
+
+	// HTTP failure mode: if ?responseCode=<int> is set, the simulator replies
+	// with that status code instead of dropping the connection.
+	// For example, ?responseCode=503 simulates a server returning 503 on each
+	// failing attempt.
+	if responseCode, err := strconv.Atoi(request.URL.Query().Get("responseCode")); err == nil {
+		handleAttempt = func(w http.ResponseWriter) error {
+			w.WriteHeader(responseCode)
+			return nil
+		}
 	}
 
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
 	if r.attempts[uuid] < succeedAfter {
 		r.attempts[uuid]++
-		w.WriteHeader(responseCode)
+
+		// If the request has form ?delayRetry=[:duration], wait for that
+		// duration before emitting the failing response.
+		if err := delayResponse(request, "delayRetry"); err != nil {
+			processError(w, err, http.StatusInternalServerError)
+			return
+		}
+
+		if err := handleAttempt(w); err != nil {
+			processError(w, err, http.StatusInternalServerError)
+			return
+		}
+
 		return
 	}
 
 	echoHandler(w, request)
 }
 
-func delayResponse(request *http.Request) error {
-	d := request.FormValue("delay")
+func delayResponse(request *http.Request, key string) error {
+	d := request.FormValue(key)
 	if len(d) == 0 {
 		return nil
 	}
@@ -263,7 +307,7 @@ func echoHandler(w http.ResponseWriter, r *http.Request) {
 
 	// If the request has form ?delay=[:duration] wait for duration
 	// For example, ?delay=10s will cause the response to wait 10s before responding
-	if err := delayResponse(r); err != nil {
+	if err := delayResponse(r, "delay"); err != nil {
 		processError(w, err, http.StatusInternalServerError)
 		return
 	}
