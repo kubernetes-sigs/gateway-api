@@ -261,13 +261,13 @@ implementation is built on the [tigera-operator][calico-operator] and
 custom resource, provisions an Envoy Gateway control plane, and creates
 a default `tigera-gateway-class` GatewayClass on the cluster.
 
-Questions and contributions are welcome on the
-[Project Calico Slack][calico-slack] or on [GitHub][calico].
+Questions and contributions are welcome on [GitHub][calico]. For
+commercial and maintainer inquiries, see the [Tigera contact form][tigera-contact].
 
 [calico]: https://github.com/projectcalico/calico
 [calico-operator]: https://github.com/tigera/operator
 [envoy-gateway]: https://gateway.envoyproxy.io
-[calico-slack]: https://slack.projectcalico.org
+[tigera-contact]: https://www.tigera.io/contact/
 
 ### Cilium
 

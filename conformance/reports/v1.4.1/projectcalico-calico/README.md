@@ -32,7 +32,7 @@ passed (Failed: 0, Skipped: 0).
    ```bash
    make e2e-test-gateway-conformance \
      GATEWAY_CONFORMANCE_VERSION=v3.32.0 \
-     GATEWAY_CONFORMANCE_CONTACT=https://slack.projectcalico.org
+     GATEWAY_CONFORMANCE_CONTACT=https://www.tigera.io/contact/
    ```
 
 3. Inspect the produced report:
@@ -49,10 +49,10 @@ passed (Failed: 0, Skipped: 0).
 
 ## Contact
 
-Questions and issues are tracked in the [Calico project][calico] and on
-the [Project Calico Slack][calico-slack].
+Questions and issues are tracked in the [Calico project][calico]. For
+commercial and maintainer inquiries, see the [Tigera contact form][tigera-contact].
 
 [calico]: https://github.com/projectcalico/calico
 [calico-operator]: https://github.com/tigera/operator
 [envoy-gateway]: https://gateway.envoyproxy.io
-[calico-slack]: https://slack.projectcalico.org
+[tigera-contact]: https://www.tigera.io/contact/

@@ -4,7 +4,7 @@ gatewayAPIChannel: experimental
 gatewayAPIVersion: v1.4.1
 implementation:
   contact:
-  - https://slack.projectcalico.org
+  - https://www.tigera.io/contact/
   organization: projectcalico
   project: calico
   url: https://github.com/projectcalico/calico
