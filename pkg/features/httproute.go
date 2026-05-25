@@ -112,8 +112,11 @@ const (
 	// This option indicates support for HTTPRoute additional redirect status code 303 (extended conformance)
 	SupportHTTPRoute308RedirectStatusCode FeatureName = "HTTPRoute308RedirectStatusCode"
 
-	// This option indicates support for HTTPRoute retries (extended conformance)
-	SupportHTTPRouteRetries FeatureName = "HTTPRouteRetries"
+	// This option indicates support for HTTPRoute retry (extended conformance)
+	SupportHTTPRouteRetry FeatureName = "HTTPRouteRetry"
+
+	// This option indicates support for HTTPRoute retry on backend timeout (extended conformance)
+	SupportHTTPRouteRetryBackendTimeout FeatureName = "HTTPRouteRetryBackendTimeout"
 )
 
 var (
@@ -232,9 +235,14 @@ var (
 		Name:    SupportHTTPRoute308RedirectStatusCode,
 		Channel: FeatureChannelStandard,
 	}
-	// HTTPRouteRetriesFeature contains metadata for the HTTPRouteRetries feature.
-	HTTPRouteRetriesFeature = Feature{
-		Name:    SupportHTTPRouteRetries,
+	// HTTPRouteRetryFeature contains metadata for the HTTPRouteRetry feature.
+	HTTPRouteRetryFeature = Feature{
+		Name:    SupportHTTPRouteRetry,
+		Channel: FeatureChannelExperimental,
+	}
+	// HTTPRouteRetryBackendTimeout contains metadata for the HTTPRouteRetryBackendTimeout feature.
+	HTTPRouteRetryBackendTimeout = Feature{
+		Name:    SupportHTTPRouteRetryBackendTimeout,
 		Channel: FeatureChannelExperimental,
 	}
 )
@@ -266,5 +274,6 @@ var HTTPRouteExtendedFeatures = sets.New(
 	HTTPRoute303RedirectStatusCodeFeature,
 	HTTPRoute307RedirectStatusCodeFeature,
 	HTTPRoute308RedirectStatusCodeFeature,
-	HTTPRouteRetriesFeature,
+	HTTPRouteRetryFeature,
+	HTTPRouteRetryBackendTimeout,
 )
