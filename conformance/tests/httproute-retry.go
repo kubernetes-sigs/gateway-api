@@ -33,17 +33,17 @@ import (
 )
 
 func init() {
-	ConformanceTests = append(ConformanceTests, HTTPRouteRetries)
+	ConformanceTests = append(ConformanceTests, HTTPRouteRetry)
 }
 
-var HTTPRouteRetries = confsuite.ConformanceTest{
-	ShortName:   "HTTPRouteRetries",
+var HTTPRouteRetry = confsuite.ConformanceTest{
+	ShortName:   "HTTPRouteRetry",
 	Description: "An HTTPRoute that has a Retry policy configured should retry failed requests according to the specified codes and attempt limits, returning a successful response when the backend recovers within the retry budget and surfacing the original error when it does not.",
-	Manifests:   []string{"tests/httproute-retries.yaml"},
+	Manifests:   []string{"tests/httproute-retry.yaml"},
 	Features: []features.FeatureName{
 		features.SupportGateway,
 		features.SupportHTTPRoute,
-		features.SupportHTTPRouteRetries,
+		features.SupportHTTPRouteRetry,
 	},
 	Test: func(t *testing.T, suite *confsuite.ConformanceTestSuite) {
 		ns := confsuite.InfrastructureNamespace
