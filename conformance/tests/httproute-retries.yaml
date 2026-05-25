@@ -15,7 +15,6 @@ spec:
         codes:
           - 500
         attempts: 3
-        backoff: 100ms
       backendRefs:
         - name: infra-backend-v3
           port: 8080
@@ -30,7 +29,6 @@ spec:
           - 503
           - 504
         attempts: 2
-        backoff: 100ms
       backendRefs:
         - name: infra-backend-v3
           port: 8080
