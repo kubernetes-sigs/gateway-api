@@ -55,7 +55,7 @@ func TestDelayResponse(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err = delayResponse(req)
+	err = delayResponse(req, "delay")
 	if err != nil {
 		t.Errorf("Expected no error, but got %v", err)
 	}
@@ -66,7 +66,7 @@ func TestDelayResponse(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err = delayResponse(req)
+	err = delayResponse(req, "delay")
 	if err != nil {
 		t.Errorf("Expected no error, but got %v", err)
 	}
@@ -77,7 +77,7 @@ func TestDelayResponse(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err = delayResponse(req)
+	err = delayResponse(req, "delay")
 	if err == nil {
 		t.Errorf("Expected an error, but got nil")
 	}
