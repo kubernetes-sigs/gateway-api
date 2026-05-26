@@ -143,9 +143,6 @@ type BackendPort struct {
 
 	// Port represents the port number of the endpoint.
 	//
-	// +kubebuilder:validation:Minimum=1
-	// +kubebuilder:validation:Maximum=65535
-	//
 	// +required
 	Port PortNumber `json:"port,omitempty"`
 }
