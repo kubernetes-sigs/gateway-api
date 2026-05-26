@@ -68,7 +68,7 @@ var HTTPRouteRetryWithTimeouts = confsuite.ConformanceTest{
 					retrySimulationConfig: url.Values{
 						"responseCode": []string{"500"},
 						"succeedAfter": []string{"2"},
-						"delayRetry":   []string{"1s"},
+						"delayRetry":   []string{"300ms"},
 					},
 				},
 				want: http.Response{StatusCode: 200},
@@ -80,7 +80,7 @@ var HTTPRouteRetryWithTimeouts = confsuite.ConformanceTest{
 					retrySimulationConfig: url.Values{
 						"responseCode": []string{"500"},
 						"succeedAfter": []string{"3"},
-						"delayRetry":   []string{"1s"},
+						"delayRetry":   []string{"300ms"},
 					},
 				},
 				want: http.Response{StatusCode: 504},
@@ -91,7 +91,7 @@ var HTTPRouteRetryWithTimeouts = confsuite.ConformanceTest{
 					path: "/retry/request-timeout-200ms",
 					retrySimulationConfig: url.Values{
 						"responseCode": []string{"500"},
-						"succeedAfter": []string{"4"},
+						"succeedAfter": []string{"1"},
 					},
 				},
 				want: http.Response{StatusCode: 200},
