@@ -95,10 +95,13 @@ spec:
                     pattern: ^[a-z0-9]([a-z0-9-]*[a-z0-9])?$
                     type: string
                   port:
+                    allOf:
+                    - maximum: 65535
+                      minimum: 1
+                    - maximum: 65535
+                      minimum: 1
                     description: Port represents the port number of the endpoint.
                     format: int32
-                    maximum: 65535
-                    minimum: 1
                     type: integer
                 required:
                 - port

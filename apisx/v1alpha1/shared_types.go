@@ -28,6 +28,8 @@ type (
 )
 
 // PortNumber defines a network port.
+// +kubebuilder:validation:Minimum=1
+// +kubebuilder:validation:Maximum=65535
 type PortNumber int32
 
 // RequestRate expresses a rate of requests over a given period of time.

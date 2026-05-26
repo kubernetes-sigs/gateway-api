@@ -1,5 +1,5 @@
 /*
-Copyright 2025 The Kubernetes Authors.
+Copyright The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -159,6 +159,7 @@ type ExternalHostnameBackend struct {
 	// enforce that hostnames ending with those trust domains
 	// (e.g. .cluster.local) are not allowed.
 	//
+	// +kubebuiler:validation:XValidation:rule="!endsWith(self.hostname, '.cluster.local')))",message="hostname must not be an IP address or end with .cluster.local"
 	// +required
 	Hostname v1.PreciseHostname `json:"hostname,omitempty"`
 }
@@ -176,7 +177,7 @@ const (
 
 	// BackendProtocolTCP indicates plain TCP.
 	//
-	// Support: Core
+	// Support: Extended
 	BackendProtocolTCP BackendProtocol = "TCP"
 
 	// BackendProtocolHTTP indicates HTTP (version negotiated via ALPN or
