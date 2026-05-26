@@ -117,6 +117,9 @@ const (
 
 	// This option indicates support for HTTPRoute retry on backend timeout (extended conformance)
 	SupportHTTPRouteRetryBackendTimeout FeatureName = "HTTPRouteRetryBackendTimeout"
+
+	// This option indicates support for HTTPRoute retry on connection error (extended conformance)
+	SupportHTTPRouteRetryConnectionError FeatureName = "HTTPRouteRetryConnectionError"
 )
 
 var (
@@ -240,9 +243,14 @@ var (
 		Name:    SupportHTTPRouteRetry,
 		Channel: FeatureChannelExperimental,
 	}
-	// HTTPRouteRetryBackendTimeout contains metadata for the HTTPRouteRetryBackendTimeout feature.
-	HTTPRouteRetryBackendTimeout = Feature{
+	// HTTPRouteRetryBackendTimeoutFeature contains metadata for the HTTPRouteRetryBackendTimeout feature.
+	HTTPRouteRetryBackendTimeoutFeature = Feature{
 		Name:    SupportHTTPRouteRetryBackendTimeout,
+		Channel: FeatureChannelExperimental,
+	}
+	// HTTPRouteRetryConnectionErrorFeature contains metadata for the HTTPRouteRetryConnectionError feature.
+	HTTPRouteRetryConnectionErrorFeature = Feature{
+		Name:    SupportHTTPRouteRetryConnectionError,
 		Channel: FeatureChannelExperimental,
 	}
 )
@@ -275,5 +283,6 @@ var HTTPRouteExtendedFeatures = sets.New(
 	HTTPRoute307RedirectStatusCodeFeature,
 	HTTPRoute308RedirectStatusCodeFeature,
 	HTTPRouteRetryFeature,
-	HTTPRouteRetryBackendTimeout,
+	HTTPRouteRetryBackendTimeoutFeature,
+	HTTPRouteRetryConnectionErrorFeature,
 )
