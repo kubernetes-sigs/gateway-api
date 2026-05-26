@@ -85,25 +85,42 @@ const requestIDQueryParam = "gateway-api-conformance-request-id"
 
 // AddRequestIDQueryParam adds a request ID to the request URI so that echo
 // server logs for this request can be matched unambiguously.
-func (e *ExpectedResponse) AddRequestIDQueryParam(requestID string) {
-	e.Request.Path = addQueryParam(e.Request.Path, requestIDQueryParam, requestID)
-	if e.ExpectedRequest != nil {
-		if e.ExpectedRequest.Path == "" {
-			e.ExpectedRequest.Path = e.Request.Path
+// Returns a non-nil error if either Request.Path or ExpectedRequest.Path has an unparseable query.
+func (er *ExpectedResponse) AddRequestIDQueryParam(requestID string) error {
+	path, err := addQueryParam(er.Request.Path, requestIDQueryParam, requestID)
+	if err != nil {
+		return err
+	}
+	if er.ExpectedRequest != nil {
+		if er.ExpectedRequest.Path == "" {
+			er.ExpectedRequest.Path = path
 		} else {
-			e.ExpectedRequest.Path = addQueryParam(e.ExpectedRequest.Path, requestIDQueryParam, requestID)
+			er.ExpectedRequest.Path, err = addQueryParam(er.ExpectedRequest.Path, requestIDQueryParam, requestID)
+			if err != nil {
+				return err
+			}
 		}
 	}
+	er.Request.Path = path
+	return nil
 }
 
-func addQueryParam(path, name, value string) string {
-	pathOnly, rawQuery, _ := strings.Cut(path, "?")
-	query, err := url.ParseQuery(rawQuery)
-	if err != nil {
+// addQueryParam adds 'name'='value' query parameter to the given 'path'.
+// returns an error if existing query cannot be parsed.
+func addQueryParam(path, name, value string) (string, error) {
+	var query url.Values
+	pathOnly, rawQuery, found := strings.Cut(path, "?")
+	if found {
+		var err error
+		query, err = url.ParseQuery(rawQuery)
+		if err != nil {
+			return "", err
+		}
+	} else {
 		query = url.Values{}
 	}
 	query.Set(name, value)
-	return pathOnly + "?" + query.Encode()
+	return pathOnly + "?" + query.Encode(), nil
 }
 
 // ExpectedRequest defines expected properties of a request that reaches a backend.
@@ -529,26 +546,26 @@ func CompareRoundTrip(t *testing.T, req *roundtripper.Request, cReq *roundtrippe
 }
 
 // GetTestCaseName gets the user-defined test case name or generates one from expected response to a given request.
-func (e *ExpectedResponse) GetTestCaseName(i int) string {
+func (er *ExpectedResponse) GetTestCaseName(i int) string {
 	// If TestCase name is provided then use that or else generate one.
-	if e.TestCaseName != "" {
-		return e.TestCaseName
+	if er.TestCaseName != "" {
+		return er.TestCaseName
 	}
 
 	headerStr := ""
 	reqStr := ""
 
-	if e.Request.Headers != nil {
+	if er.Request.Headers != nil {
 		headerStr = " with headers"
 	}
 
-	reqStr = fmt.Sprintf("%d request to '%s%s'%s", i, e.Request.Host, e.Request.Path, headerStr)
+	reqStr = fmt.Sprintf("%d request to '%s%s'%s", i, er.Request.Host, er.Request.Path, headerStr)
 
-	if e.Backend != "" {
-		return fmt.Sprintf("%s should go to %s", reqStr, e.Backend)
+	if er.Backend != "" {
+		return fmt.Sprintf("%s should go to %s", reqStr, er.Backend)
 	}
 
-	return fmt.Sprintf("%s should receive one of %v", reqStr, e.Response.StatusCodes)
+	return fmt.Sprintf("%s should receive one of %v", reqStr, er.Response.StatusCodes)
 }
 
 func setRedirectRequestDefaults(req *roundtripper.Request, cRes *roundtripper.CapturedResponse, expected *ExpectedResponse) {
