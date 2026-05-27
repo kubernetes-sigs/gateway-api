@@ -33,8 +33,6 @@ import (
 	"sync"
 	"time"
 
-	"golang.org/x/net/http2"
-	"golang.org/x/net/http2/h2c"
 	"golang.org/x/net/websocket"
 
 	g "sigs.k8s.io/gateway-api/conformance/echo-basic/grpc"
@@ -290,10 +288,14 @@ func runH2CServer(h2cPort string, errchan chan<- error) {
 
 		echoHandler(w, r)
 	})
+	protocols := new(http.Protocols)
+	protocols.SetHTTP1(true)
+	protocols.SetUnencryptedHTTP2(true)
 	h2c := &http.Server{
 		ReadHeaderTimeout: time.Second,
 		Addr:              fmt.Sprintf(":%s", h2cPort),
-		Handler:           h2c.NewHandler(handler, &http2.Server{}),
+		Handler:           handler,
+		Protocols:         protocols,
 	}
 	fmt.Printf("Starting server, listening on port %s (h2c)\n", h2cPort)
 	err := h2c.ListenAndServe()
