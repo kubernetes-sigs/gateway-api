@@ -143,7 +143,7 @@ type BackendPort struct {
 	// alphanumeric character, at most 63 characters).
 	//
 	// +optional
-	// +kubebuilder:validation:XValidation:rule="size(self) == 0 || (size(self) <= 63 && self.matches('^[a-z0-9]([a-z0-9-]*[a-z0-9])?$'))",message="Name must be a valid DNS label"
+	// +kubebuilder:validation:XValidation:rule="size(self) == 0 || format.dns1123Label().validate(self) == null",message="Name must be a valid DNS label"
 	Name *string `json:"name,omitempty"`
 
 	// Port represents the port number of the endpoint.
@@ -166,7 +166,7 @@ type ExternalHostnameBackend struct {
 	// domains (e.g. .cluster.local) are not allowed.
 	// </gateway:util:excludeFromCRD>
 	//
-	// +kubebuilder:validation:XValidation:rule="!isIP(self) && !self.endsWith('.cluster.local')",message="hostname must not be an IP address or end with .cluster.local"
+	// +kubebuilder:validation:XValidation:rule="!self.endsWith('.cluster.local')",message="hostname must not be an IP address or end with .cluster.local"
 	// +required
 	Hostname v1.PreciseHostname `json:"hostname,omitempty"`
 }
