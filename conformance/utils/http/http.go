@@ -105,22 +105,20 @@ func (er *ExpectedResponse) AddRequestIDQueryParam(requestID string) error {
 	return nil
 }
 
-// addQueryParam adds 'name'='value' query parameter to the given 'path'.
-// returns an error if existing query cannot be parsed.
-func addQueryParam(path, name, value string) (string, error) {
-	var query url.Values
-	pathOnly, rawQuery, found := strings.Cut(path, "?")
-	if found {
-		var err error
-		query, err = url.ParseQuery(rawQuery)
-		if err != nil {
-			return "", err
-		}
-	} else {
-		query = url.Values{}
+// addQueryParam adds 'name'='value' query parameter to the given 'rawURL' and returns it.
+// Returns an error if rawURL or its query cannot be parsed.
+func addQueryParam(rawURL, name, value string) (string, error) {
+	parsedURL, err := url.Parse(rawURL)
+	if err != nil {
+		return "", err
+	}
+	query, err := url.ParseQuery(parsedURL.RawQuery)
+	if err != nil {
+		return "", err
 	}
 	query.Set(name, value)
-	return pathOnly + "?" + query.Encode(), nil
+	parsedURL.RawQuery = query.Encode()
+	return parsedURL.String(), nil
 }
 
 // ExpectedRequest defines expected properties of a request that reaches a backend.
