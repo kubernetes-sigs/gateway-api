@@ -30,10 +30,8 @@ import (
 type BackendPortApplyConfiguration struct {
 	// Name represents the name of this port. All ports in a Backend must have
 	// a unique name. Name must either be an empty string or pass DNS_LABEL
-	// validation:
-	// * must be no more than 63 characters long.
-	// * must consist of lower case alphanumeric characters or '-'.
-	// * must start and end with an alphanumeric character.
+	// validation (lowercase alphanumeric or '-', starting and ending with an
+	// alphanumeric character, at most 63 characters).
 	Name *string `json:"name,omitempty"`
 	// Port represents the port number of the endpoint.
 	Port *apisxv1alpha1.PortNumber `json:"port,omitempty"`

@@ -44,12 +44,23 @@ type BackendSpecApplyConfiguration struct {
 	// proxied traffic will already have been determined and processed
 	// by the dataplane at the routing step. Where this field is useful
 	// is either for higher level protocols or asymmetrical protocol
-	// configurations (e.g. version upgrades or h2c). In cases where the
-	// protocol is negotiated on the wire (e.g. HTTP/1.1 Upgrade or ALPN),
-	// implementations MUST include the protocol set here in the negotiation
-	// options presented to the backend.
+	// configurations (e.g. version upgrades or h2c).
 	//
-	// Support: Extended for MCP; Core for TCP, HTTP, HTTP2, H2C, and HTTP11
+	// When set, the implementation uses the specified protocol when connecting
+	// to this backend. When not set, the implementation will use the protocol
+	// determined by the route or listener configuration.
+	//
+	// Support: Core - TCP, HTTP, HTTP2, H2C, and HTTP11
+	//
+	// Support: Extended - MCP
+	//
+	// <gateway:util:excludeFromCRD>
+	// Notes for implementers:
+	//
+	// In cases where the protocol is negotiated on the wire (e.g. HTTP/1.1
+	// Upgrade or ALPN), implementations MUST include the protocol set here
+	// in the negotiation options presented to the backend.
+	// </gateway:util:excludeFromCRD>
 	Protocol *apisxv1alpha1.BackendProtocol `json:"protocol,omitempty"`
 	// TLS defines the TLS configuration that the implementation should use
 	// when connecting to the backend.

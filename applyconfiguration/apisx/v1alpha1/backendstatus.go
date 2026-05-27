@@ -26,12 +26,16 @@ type BackendStatusApplyConfiguration struct {
 	// Parents is a list of parent resources associated with this Backend,
 	// and the status of the Backend with respect to each parent.
 	//
+	// A maximum of 32 parents will be represented in this list. An empty list
+	// indicates that the Backend is not associated with any parents.
+	//
+	// <gateway:util:excludeFromCRD>
+	// Notes for implementers:
+	//
 	// A controller that manages the Backend must add an entry for each parent
 	// it manages and remove the entry when the controller no longer considers
 	// the Backend to be associated with that parent.
-	//
-	// A maximum of 32 parents will be represented in this list. An empty list
-	// indicates that the Backend is not associated with any parents.
+	// </gateway:util:excludeFromCRD>
 	Parents []BackendParentStatusApplyConfiguration `json:"parents,omitempty"`
 }
 
