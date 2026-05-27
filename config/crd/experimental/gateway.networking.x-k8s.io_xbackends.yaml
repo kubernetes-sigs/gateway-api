@@ -71,7 +71,7 @@ spec:
                     type: string
                     x-kubernetes-validations:
                     - message: hostname must not be an IP address or end with .cluster.local
-                      rule: '!isIP(self) && !self.endsWith(''.cluster.local'')'
+                      rule: '!self.endsWith(''.cluster.local'')'
                 required:
                 - hostname
                 type: object
@@ -89,7 +89,8 @@ spec:
                     type: string
                     x-kubernetes-validations:
                     - message: Name must be a valid DNS label
-                      rule: size(self) == 0 || (size(self) <= 63 && self.matches('^[a-z0-9]([a-z0-9-]*[a-z0-9])?$'))
+                      rule: size(self) == 0 || format.dns1123Label().validate(self)
+                        == null
                   port:
                     description: Port represents the port number of the endpoint.
                     format: int32
