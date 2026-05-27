@@ -31,10 +31,6 @@ func init() {
 	ConformanceTests = append(ConformanceTests, HTTPRouteTimeoutRequest)
 }
 
-// Note that here we are only making sure Request timeouts work individually.
-// TODO: once we add retry support to Gateway API (future GEP-1731), add conformance tests to show
-// Request and BackendRequest timeouts working together.
-
 var HTTPRouteTimeoutRequest = confsuite.ConformanceTest{
 	ShortName:   "HTTPRouteTimeoutRequest",
 	Description: "An HTTPRoute with request timeout",

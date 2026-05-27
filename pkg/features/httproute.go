@@ -112,8 +112,14 @@ const (
 	// This option indicates support for HTTPRoute additional redirect status code 303 (extended conformance)
 	SupportHTTPRoute308RedirectStatusCode FeatureName = "HTTPRoute308RedirectStatusCode"
 
-	// This option indicates support for HTTPRoute retries (extended conformance)
-	SupportHTTPRouteRetries FeatureName = "HTTPRouteRetries"
+	// This option indicates support for HTTPRoute retry (extended conformance)
+	SupportHTTPRouteRetry FeatureName = "HTTPRouteRetry"
+
+	// This option indicates support for HTTPRoute retry on backend timeout (extended conformance)
+	SupportHTTPRouteRetryBackendTimeout FeatureName = "HTTPRouteRetryBackendTimeout"
+
+	// This option indicates support for HTTPRoute retry on connection error (extended conformance)
+	SupportHTTPRouteRetryConnectionError FeatureName = "HTTPRouteRetryConnectionError"
 )
 
 var (
@@ -232,9 +238,19 @@ var (
 		Name:    SupportHTTPRoute308RedirectStatusCode,
 		Channel: FeatureChannelStandard,
 	}
-	// HTTPRouteRetriesFeature contains metadata for the HTTPRouteRetries feature.
-	HTTPRouteRetriesFeature = Feature{
-		Name:    SupportHTTPRouteRetries,
+	// HTTPRouteRetryFeature contains metadata for the HTTPRouteRetry feature.
+	HTTPRouteRetryFeature = Feature{
+		Name:    SupportHTTPRouteRetry,
+		Channel: FeatureChannelExperimental,
+	}
+	// HTTPRouteRetryBackendTimeoutFeature contains metadata for the HTTPRouteRetryBackendTimeout feature.
+	HTTPRouteRetryBackendTimeoutFeature = Feature{
+		Name:    SupportHTTPRouteRetryBackendTimeout,
+		Channel: FeatureChannelExperimental,
+	}
+	// HTTPRouteRetryConnectionErrorFeature contains metadata for the HTTPRouteRetryConnectionError feature.
+	HTTPRouteRetryConnectionErrorFeature = Feature{
+		Name:    SupportHTTPRouteRetryConnectionError,
 		Channel: FeatureChannelExperimental,
 	}
 )
@@ -266,5 +282,7 @@ var HTTPRouteExtendedFeatures = sets.New(
 	HTTPRoute303RedirectStatusCodeFeature,
 	HTTPRoute307RedirectStatusCodeFeature,
 	HTTPRoute308RedirectStatusCodeFeature,
-	HTTPRouteRetriesFeature,
+	HTTPRouteRetryFeature,
+	HTTPRouteRetryBackendTimeoutFeature,
+	HTTPRouteRetryConnectionErrorFeature,
 )
