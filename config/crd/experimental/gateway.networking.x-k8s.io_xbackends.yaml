@@ -86,6 +86,7 @@ spec:
                       a unique name. Name must either be an empty string or pass DNS_LABEL
                       validation (lowercase alphanumeric or '-', starting and ending with an
                       alphanumeric character, at most 63 characters).
+                    maxLength: 63
                     type: string
                     x-kubernetes-validations:
                     - message: Name must be a valid DNS label
