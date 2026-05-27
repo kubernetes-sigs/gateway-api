@@ -29,10 +29,15 @@ import (
 // represents an external hostname destination.
 type ExternalHostnameBackendApplyConfiguration struct {
 	// Hostname specifies the FQDN used to reach this backend.
-	// IP addresses are not allowed in this field. Implementations that are
-	// aware of custom trust domains being used for Service FQDNs MUST also
-	// enforce that hostnames ending with those trust domains
-	// (e.g. .cluster.local) are not allowed.
+	// IP addresses are not allowed in this field.
+	//
+	// <gateway:util:excludeFromCRD>
+	// Notes for implementers:
+	//
+	// Implementations that are aware of custom trust domains being used for
+	// Service FQDNs MUST also enforce that hostnames ending with those trust
+	// domains (e.g. .cluster.local) are not allowed.
+	// </gateway:util:excludeFromCRD>
 	Hostname *v1.PreciseHostname `json:"hostname,omitempty"`
 }
 

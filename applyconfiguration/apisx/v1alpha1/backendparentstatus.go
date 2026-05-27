@@ -39,9 +39,13 @@ type BackendParentStatusApplyConfiguration struct {
 	// valid Kubernetes names
 	// (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names).
 	//
+	// <gateway:util:excludeFromCRD>
+	// Notes for implementers:
+	//
 	// A controller MUST populate this field when writing status and ensure that
 	// entries to status populated with their controller name are removed when
 	// they are no longer necessary.
+	// </gateway:util:excludeFromCRD>
 	ControllerName *v1.GatewayController `json:"controllerName,omitempty"`
 	// ParentRef identifies the parent resource that this status is associated with.
 	ParentRef *apisv1.ParentReferenceApplyConfiguration `json:"parentRef,omitempty"`

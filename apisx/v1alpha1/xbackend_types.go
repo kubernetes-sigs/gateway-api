@@ -30,11 +30,8 @@ import (
 // +kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 
 // XBackend is a Gateway API resource that represents a backend destination for
-// routing traffic. It serves as a Gateway-native way to configure external
-// hostname destinations and (in the future) internal service backends.
-//
-// A Backend of type ExternalHostname provides first-class support for external
-// FQDNs, replacing the need for synthetic ExternalName Services.
+// routing traffic. It serves as a Gateway-native way to define where and how a
+// Gateway should connect to a backend.
 //
 // Support: Extended
 type XBackend struct {
@@ -104,12 +101,23 @@ type BackendSpec struct {
 	// proxied traffic will already have been determined and processed
 	// by the dataplane at the routing step. Where this field is useful
 	// is either for higher level protocols or asymmetrical protocol
-	// configurations (e.g. version upgrades or h2c). In cases where the
-	// protocol is negotiated on the wire (e.g. HTTP/1.1 Upgrade or ALPN),
-	// implementations MUST include the protocol set here in the negotiation
-	// options presented to the backend.
+	// configurations (e.g. version upgrades or h2c).
 	//
-	// Support: Extended for MCP; Core for TCP, HTTP, HTTP2, H2C, and HTTP11
+	// When set, the implementation uses the specified protocol when connecting
+	// to this backend. When not set, the implementation will use the protocol
+	// determined by the route or listener configuration.
+	//
+	// Support: Core - TCP, HTTP, HTTP2, H2C, and HTTP11
+	//
+	// Support: Extended - MCP
+	//
+	// <gateway:util:excludeFromCRD>
+	// Notes for implementers:
+	//
+	// In cases where the protocol is negotiated on the wire (e.g. HTTP/1.1
+	// Upgrade or ALPN), implementations MUST include the protocol set here
+	// in the negotiation options presented to the backend.
+	// </gateway:util:excludeFromCRD>
 	//
 	// +optional
 	Protocol *BackendProtocol `json:"protocol,omitempty"`
@@ -131,14 +139,11 @@ type BackendSpec struct {
 type BackendPort struct {
 	// Name represents the name of this port. All ports in a Backend must have
 	// a unique name. Name must either be an empty string or pass DNS_LABEL
-	// validation:
-	// * must be no more than 63 characters long.
-	// * must consist of lower case alphanumeric characters or '-'.
-	// * must start and end with an alphanumeric character.
+	// validation (lowercase alphanumeric or '-', starting and ending with an
+	// alphanumeric character, at most 63 characters).
 	//
 	// +optional
-	// +kubebuilder:validation:MaxLength=63
-	// +kubebuilder:validation:Pattern=`^[a-z0-9]([a-z0-9-]*[a-z0-9])?$`
+	// +kubebuilder:validation:XValidation:rule="size(self) == 0 || (size(self) <= 63 && self.matches('^[a-z0-9]([a-z0-9-]*[a-z0-9])?$'))",message="Name must be a valid DNS label"
 	Name *string `json:"name,omitempty"`
 
 	// Port represents the port number of the endpoint.
@@ -151,12 +156,17 @@ type BackendPort struct {
 // represents an external hostname destination.
 type ExternalHostnameBackend struct {
 	// Hostname specifies the FQDN used to reach this backend.
-	// IP addresses are not allowed in this field. Implementations that are
-	// aware of custom trust domains being used for Service FQDNs MUST also
-	// enforce that hostnames ending with those trust domains
-	// (e.g. .cluster.local) are not allowed.
+	// IP addresses are not allowed in this field.
 	//
-	// +kubebuiler:validation:XValidation:rule="!endsWith(self.hostname, '.cluster.local')))",message="hostname must not be an IP address or end with .cluster.local"
+	// <gateway:util:excludeFromCRD>
+	// Notes for implementers:
+	//
+	// Implementations that are aware of custom trust domains being used for
+	// Service FQDNs MUST also enforce that hostnames ending with those trust
+	// domains (e.g. .cluster.local) are not allowed.
+	// </gateway:util:excludeFromCRD>
+	//
+	// +kubebuilder:validation:XValidation:rule="!isIP(self) && !self.endsWith('.cluster.local')",message="hostname must not be an IP address or end with .cluster.local"
 	// +required
 	Hostname v1.PreciseHostname `json:"hostname,omitempty"`
 }
@@ -232,7 +242,6 @@ type BackendTLS struct {
 	ClientCertificateRef *v1.SecretObjectReference `json:"clientCertificateRef,omitempty"`
 
 	// Validation contains TLS validation configuration for the backend connection.
-	// This re-uses the BackendTLSPolicy validation fields for consistency.
 	//
 	// +optional
 	Validation v1.BackendTLSPolicyValidation `json:"validation,omitempty"`
@@ -243,12 +252,16 @@ type BackendStatus struct {
 	// Parents is a list of parent resources associated with this Backend,
 	// and the status of the Backend with respect to each parent.
 	//
+	// A maximum of 32 parents will be represented in this list. An empty list
+	// indicates that the Backend is not associated with any parents.
+	//
+	// <gateway:util:excludeFromCRD>
+	// Notes for implementers:
+	//
 	// A controller that manages the Backend must add an entry for each parent
 	// it manages and remove the entry when the controller no longer considers
 	// the Backend to be associated with that parent.
-	//
-	// A maximum of 32 parents will be represented in this list. An empty list
-	// indicates that the Backend is not associated with any parents.
+	// </gateway:util:excludeFromCRD>
 	//
 	// +kubebuilder:validation:MaxItems=32
 	// +optional
@@ -268,9 +281,13 @@ type BackendParentStatus struct {
 	// valid Kubernetes names
 	// (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names).
 	//
+	// <gateway:util:excludeFromCRD>
+	// Notes for implementers:
+	//
 	// A controller MUST populate this field when writing status and ensure that
 	// entries to status populated with their controller name are removed when
 	// they are no longer necessary.
+	// </gateway:util:excludeFromCRD>
 	//
 	// +required
 	ControllerName v1.GatewayController `json:"controllerName"`

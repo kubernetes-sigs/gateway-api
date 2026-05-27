@@ -31,11 +31,8 @@ import (
 // with apply.
 //
 // XBackend is a Gateway API resource that represents a backend destination for
-// routing traffic. It serves as a Gateway-native way to configure external
-// hostname destinations and (in the future) internal service backends.
-//
-// A Backend of type ExternalHostname provides first-class support for external
-// FQDNs, replacing the need for synthetic ExternalName Services.
+// routing traffic. It serves as a Gateway-native way to define where and how a
+// Gateway should connect to a backend.
 //
 // Support: Extended
 type XBackendApplyConfiguration struct {

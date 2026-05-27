@@ -35,7 +35,6 @@ type BackendTLSApplyConfiguration struct {
 	// when mode is ClientAndServer and must be unset otherwise.
 	ClientCertificateRef *v1.SecretObjectReferenceApplyConfiguration `json:"clientCertificateRef,omitempty"`
 	// Validation contains TLS validation configuration for the backend connection.
-	// This re-uses the BackendTLSPolicy validation fields for consistency.
 	Validation *v1.BackendTLSPolicyValidationApplyConfiguration `json:"validation,omitempty"`
 }
 
