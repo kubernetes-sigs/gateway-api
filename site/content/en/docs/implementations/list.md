@@ -94,6 +94,7 @@ class.
 ### Conformant
 - [Agentgateway][40]
 - [Airlock Microgateway][34]
+- [Calico][46]
 - [Cilium][16]
 - [Gloo Gateway][5]
 - [Google Kubernetes Engine][6]
@@ -169,6 +170,7 @@ class.
 [43]:#alibaba-cloud-service-mesh
 [44]:#aws-load-balancer-controller
 [45]:#varnish-gateway
+[46]:#calico
 
 
 [gamma]: /docs/mesh/
@@ -247,6 +249,25 @@ See the [AWS Load Balancer Controller documentation][aws-lbc-docs] for informati
 
 [azure-application-gateway-for-containers]: https://aka.ms/appgwcontainers/docs
 [azure-application-gateway-for-containers-quickstart-controller]: https://learn.microsoft.com/azure/application-gateway/for-containers/quickstart-deploy-application-gateway-for-containers-alb-controller
+
+### Calico
+
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.4.1-Calico-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.4.1/projectcalico-calico/experimental-v3.32.0-default-report.yaml)
+
+[Calico][calico] is an open-source networking and security solution for
+Kubernetes and other cloud-native environments. Calico's Gateway API
+implementation is built on the [tigera-operator][calico-operator] and
+[Envoy Gateway][envoy-gateway]: the operator reconciles a `GatewayAPI`
+custom resource, provisions an Envoy Gateway control plane, and creates
+a default `tigera-gateway-class` GatewayClass on the cluster.
+
+Questions and contributions are welcome on [GitHub][calico]. For
+commercial and maintainer inquiries, see the [Tigera contact form][tigera-contact].
+
+[calico]: https://github.com/projectcalico/calico
+[calico-operator]: https://github.com/tigera/operator
+[envoy-gateway]: https://gateway.envoyproxy.io
+[tigera-contact]: https://www.tigera.io/contact/
 
 ### Cilium
 
