@@ -872,6 +872,41 @@ func TCPRouteMustHaveCondition(t *testing.T, client client.Client, timeoutConfig
 	require.NoErrorf(t, waitErr, "error waiting for TCPRoute status to have a Condition matching expectations")
 }
 
+// UDPRouteMustHaveCondition checks that the supplied UDPRoute has the supplied Condition,
+// halting after the specified timeout is exceeded.
+func UDPRouteMustHaveCondition(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeNN types.NamespacedName, gwNN types.NamespacedName, condition metav1.Condition) {
+	t.Helper()
+
+	waitErr := wait.PollUntilContextTimeout(context.Background(), timeoutConfig.DefaultPollInterval, timeoutConfig.UDPRouteMustHaveCondition, true, func(ctx context.Context) (bool, error) {
+		route := &v1alpha2.UDPRoute{}
+		err := client.Get(ctx, routeNN, route)
+		if err != nil {
+			return false, fmt.Errorf("error fetching UDPRoute: %w", err)
+		}
+
+		parents := route.Status.Parents
+		var conditionFound bool
+		for _, parent := range parents {
+			if err := ConditionsHaveLatestObservedGeneration(route, parent.Conditions); err != nil {
+				tlog.Logf(t, "UDPRoute %s (parentRef=%v) %v",
+					routeNN, parentRefToString(parent.ParentRef), err,
+				)
+				return false, nil
+			}
+
+			if parent.ParentRef.Name == gatewayv1.ObjectName(gwNN.Name) && (parent.ParentRef.Namespace == nil || string(*parent.ParentRef.Namespace) == gwNN.Namespace) {
+				if findConditionInList(t, parent.Conditions, condition.Type, string(condition.Status), condition.Reason) {
+					conditionFound = true
+				}
+			}
+		}
+
+		return conditionFound, nil
+	})
+
+	require.NoErrorf(t, waitErr, "error waiting for UDPRoute status to have a Condition matching expectations")
+}
+
 // TCPRouteMustHaveNoAcceptedParents waits for the specified TCPRoute to have either no parents
 // or a single parent that is not accepted. This is used to validate TCPRoute errors.
 func TCPRouteMustHaveNoAcceptedParents(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeName types.NamespacedName) {
@@ -1075,41 +1110,6 @@ func HTTPRouteMustHaveCondition(t *testing.T, client client.Client, timeoutConfi
 	})
 
 	require.NoErrorf(t, waitErr, "error waiting for HTTPRoute status to have a Condition matching expectations")
-}
-
-// UDPRouteMustHaveCondition checks that the supplied UDPRoute has the supplied Condition,
-// halting after the specified timeout is exceeded.
-func UDPRouteMustHaveCondition(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeNN types.NamespacedName, gwNN types.NamespacedName, condition metav1.Condition) {
-	t.Helper()
-
-	waitErr := wait.PollUntilContextTimeout(context.Background(), timeoutConfig.DefaultPollInterval, timeoutConfig.UDPRouteMustHaveCondition, true, func(ctx context.Context) (bool, error) {
-		route := &v1alpha2.UDPRoute{}
-		err := client.Get(ctx, routeNN, route)
-		if err != nil {
-			return false, fmt.Errorf("error fetching UDPRoute: %w", err)
-		}
-
-		parents := route.Status.Parents
-		var conditionFound bool
-		for _, parent := range parents {
-			if err := ConditionsHaveLatestObservedGeneration(route, parent.Conditions); err != nil {
-				tlog.Logf(t, "UDPRoute %s (parentRef=%v) %v",
-					routeNN, parentRefToString(parent.ParentRef), err,
-				)
-				return false, nil
-			}
-
-			if parent.ParentRef.Name == gatewayv1.ObjectName(gwNN.Name) && (parent.ParentRef.Namespace == nil || string(*parent.ParentRef.Namespace) == gwNN.Namespace) {
-				if findConditionInList(t, parent.Conditions, condition.Type, string(condition.Status), condition.Reason) {
-					conditionFound = true
-				}
-			}
-		}
-
-		return conditionFound, nil
-	})
-
-	require.NoErrorf(t, waitErr, "error waiting for UDPRoute status to have a Condition matching expectations")
 }
 
 // UDPRouteMustHaveNoAcceptedParents waits for the specified UDPRoute to have either no parents

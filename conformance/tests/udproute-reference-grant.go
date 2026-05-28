@@ -24,8 +24,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
-	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
-	v1 "sigs.k8s.io/gateway-api/apis/v1alpha2"
+	v1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	confsuite "sigs.k8s.io/gateway-api/conformance/utils/suite"
 	"sigs.k8s.io/gateway-api/conformance/utils/udp"
@@ -72,7 +71,7 @@ var UDPRouteReferenceGrant = confsuite.ConformanceTest{
 
 		ctx, cancel := context.WithTimeout(context.Background(), suite.TimeoutConfig.DeleteTimeout)
 		defer cancel()
-		rg := gatewayv1.ReferenceGrant{
+		rg := v1.ReferenceGrant{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "udp-reference-grant",
 				Namespace: confsuite.AppBackendNamespace,
