@@ -51,6 +51,7 @@ var standardKinds = map[string]bool{
 	"ListenerSet":      true,
 	"TCPRoute":         true,
 	"TLSRoute":         true,
+	"UDPRoute":         true,
 }
 
 // This generation code is largely copied from
