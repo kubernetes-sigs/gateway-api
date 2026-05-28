@@ -224,6 +224,14 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1.TLSRouteSpecApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("TLSRouteStatus"):
 		return &apisv1.TLSRouteStatusApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("UDPRoute"):
+		return &apisv1.UDPRouteApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("UDPRouteRule"):
+		return &apisv1.UDPRouteRuleApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("UDPRouteSpec"):
+		return &apisv1.UDPRouteSpecApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("UDPRouteStatus"):
+		return &apisv1.UDPRouteStatusApplyConfiguration{}
 
 		// Group=gateway.networking.k8s.io, Version=v1alpha2
 	case v1alpha2.SchemeGroupVersion.WithKind("GRPCRoute"):

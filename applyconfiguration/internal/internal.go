@@ -1718,6 +1718,66 @@ var schemaYAML = typed.YAMLObject(`types:
           elementType:
             namedType: io.k8s.sigs.gateway-api.apis.v1.RouteParentStatus
           elementRelationship: atomic
+- name: io.k8s.sigs.gateway-api.apis.v1.UDPRoute
+  map:
+    fields:
+    - name: apiVersion
+      type:
+        scalar: string
+    - name: kind
+      type:
+        scalar: string
+    - name: metadata
+      type:
+        namedType: ObjectMeta.v1.meta.apis.pkg.apimachinery.k8s.io
+      default: {}
+    - name: spec
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1.UDPRouteSpec
+      default: {}
+    - name: status
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1.UDPRouteStatus
+      default: {}
+- name: io.k8s.sigs.gateway-api.apis.v1.UDPRouteRule
+  map:
+    fields:
+    - name: backendRefs
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v1.BackendRef
+          elementRelationship: atomic
+    - name: name
+      type:
+        scalar: string
+- name: io.k8s.sigs.gateway-api.apis.v1.UDPRouteSpec
+  map:
+    fields:
+    - name: parentRefs
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v1.ParentReference
+          elementRelationship: atomic
+    - name: rules
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v1.UDPRouteRule
+          elementRelationship: atomic
+    - name: useDefaultGateways
+      type:
+        scalar: string
+- name: io.k8s.sigs.gateway-api.apis.v1.UDPRouteStatus
+  map:
+    fields:
+    - name: parents
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v1.RouteParentStatus
+          elementRelationship: atomic
 - name: io.k8s.sigs.gateway-api.apis.v1alpha2.GRPCRoute
   map:
     fields:

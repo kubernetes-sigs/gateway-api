@@ -16,6 +16,8 @@ This version of the API has GA level support for the following resources:
 - `v1.HTTPRoute`
 - `v1.GRPCRoute`
 - `v1.TLSRoute`
+- `v1.TCPRoute`
+- `v1.UDPRoute`
 - `v1.BackendTLSPolicy`
 - `v1.ReferenceGrant`
 

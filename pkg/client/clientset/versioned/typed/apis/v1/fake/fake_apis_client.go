@@ -60,6 +60,10 @@ func (c *FakeGatewayV1) TLSRoutes(namespace string) v1.TLSRouteInterface {
 	return newFakeTLSRoutes(c, namespace)
 }
 
+func (c *FakeGatewayV1) UDPRoutes(namespace string) v1.UDPRouteInterface {
+	return newFakeUDPRoutes(c, namespace)
+}
+
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
 func (c *FakeGatewayV1) RESTClient() rest.Interface {
