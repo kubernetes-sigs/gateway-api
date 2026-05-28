@@ -60,23 +60,32 @@ var GatewayFrontendClientCertificateValidation = confsuite.ConformanceTest{
 
 		// Get Server certificate, this certificate is the same for both listeners
 		certNN := types.NamespacedName{Name: "tls-validity-checks-certificate", Namespace: ns}
-		serverCertPem, _, err := GetTLSSecret(suite.Client, certNN)
+		serverCertPem, _, err := kubernetes.GetTLSSecret(suite.Client, certNN)
 		if err != nil {
 			t.Fatalf("unexpected error finding TLS secret: %v", err)
+		}
+		if len(serverCertPem) == 0 {
+			t.Fatal("missing required server certificate pem for the test")
 		}
 
 		// Get client certificate for default configuration
 		clientCertNN := types.NamespacedName{Name: "tls-validity-checks-client-certificate", Namespace: ns}
-		clientCertPem, clientCertKey, err := GetTLSSecret(suite.Client, clientCertNN)
+		clientCertPem, clientCertKey, err := kubernetes.GetTLSSecret(suite.Client, clientCertNN)
 		if err != nil {
 			t.Fatalf("unexpected error finding TLS secret: %v", err)
+		}
+		if len(clientCertPem) == 0 || len(clientCertKey) == 0 {
+			t.Fatal("missing required client certificate and private keypem for the test")
 		}
 
 		// Get client certificate for per port configuration
 		clientCertPerPortNN := types.NamespacedName{Name: "tls-validity-checks-per-port-client-certificate", Namespace: ns}
-		clientCertPerPortPem, clientCertPerPortKey, err := GetTLSSecret(suite.Client, clientCertPerPortNN)
+		clientCertPerPortPem, clientCertPerPortKey, err := kubernetes.GetTLSSecret(suite.Client, clientCertPerPortNN)
 		if err != nil {
 			t.Fatalf("unexpected error finding TLS secret: %v", err)
+		}
+		if len(clientCertPerPortPem) == 0 || len(clientCertPerPortKey) == 0 {
+			t.Fatal("missing required client certificate and private keypem for the test")
 		}
 
 		t.Run("Validate default configuration", func(t *testing.T) {
