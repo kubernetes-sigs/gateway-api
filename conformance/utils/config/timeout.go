@@ -87,6 +87,7 @@ type TimeoutConfig struct {
 	// TCPRouteMustHaveCondition represents the maximum time for a TCPRoute to have the supplied Condition.
 	// Max value for conformant implementation: None
 	TCPRouteMustHaveCondition time.Duration
+
 	// UDPRouteMustHaveCondition represents the maximum time for a UDPRoute to have the supplied Condition.
 	// Max value for conformant implementation: None
 	UDPRouteMustHaveCondition time.Duration

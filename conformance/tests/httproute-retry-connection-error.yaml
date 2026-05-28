@@ -1,0 +1,18 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: retries-connection-error
+  namespace: gateway-conformance-infra
+spec:
+  parentRefs:
+    - name: same-namespace
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /retry/no-status-code-attempts-3
+      retry:
+        attempts: 3
+      backendRefs:
+        - name: infra-backend-v3
+          port: 8080

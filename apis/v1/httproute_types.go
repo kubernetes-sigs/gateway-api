@@ -394,7 +394,7 @@ type HTTPRouteRetry struct {
 	// Support: Extended
 	//
 	// +optional
-	// +listType=atomic
+	// +listType=set
 	Codes []HTTPRouteRetryStatusCode `json:"codes,omitempty"`
 
 	// Attempts specifies the maximum number of times an individual request
@@ -409,6 +409,7 @@ type HTTPRouteRetry struct {
 	// Support: Extended
 	//
 	// +optional
+	// +kubebuilder:validation:Minimum:=1
 	Attempts *int `json:"attempts,omitempty"`
 
 	// Backoff specifies the minimum duration a Gateway should wait between
