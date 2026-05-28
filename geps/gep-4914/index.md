@@ -1,4 +1,4 @@
-# GEP 4731: EndpointSelector Resource
+# GEP 4914: EndpointSelector Resource
 
 * Status: Provisional
 
@@ -71,6 +71,7 @@ apiVersion: inference.networking.k8s.io/v1
 kind: InferencePool
 metadata:
   name: vllm-qwen3-32b
+  uid: 1234
 spec:
   targetPorts:
     - number: 8000
@@ -86,6 +87,11 @@ kind: XEndpointSelector
 metadata:
   generateName: vllm-qwen3-32b-
   namespace: default
+  ownerReferences:
+    - apiVersion: inference.networking.k8s.io/v1 # Will be cleaned up when the InferencePool is cleaned up
+      kind: InferencePool
+      name: vllm-qwen3-32b
+      uid: 1234
   labels:
     gateway.networking.k8s.io/managed-by: inference-controller.io/gateway
 spec:
