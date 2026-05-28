@@ -397,15 +397,17 @@ func (suite *ConformanceTestSuite) Setup(t *testing.T, tests []ConformanceTest) 
 		secret = kubernetes.MustCreateCASignedClientCertSecret(t, InfrastructureNamespace, "tls-validity-checks-per-port-client-certificate", ca, caPrivKey)
 		suite.Applier.MustApplyObjectsWithCleanup(t, suite.Client, suite.TimeoutConfig, []client.Object{secret}, suite.Cleanup)
 
-		secret = kubernetes.MustCreateSelfSignedCertSecret(t, InfrastructureNamespace, "tls-passthrough-checks-certificate", []string{"abc.example.com"})
-		suite.Applier.MustApplyObjectsWithCleanup(t, suite.Client, suite.TimeoutConfig, []client.Object{secret}, suite.Cleanup)
-		secret = kubernetes.MustCreateSelfSignedCertSecret(t, AppBackendNamespace, "tls-passthrough-checks-certificate", []string{"abc.example.com"})
-		suite.Applier.MustApplyObjectsWithCleanup(t, suite.Client, suite.TimeoutConfig, []client.Object{secret}, suite.Cleanup)
 		caConfigMap, ca, caPrivKey = kubernetes.MustCreateCACertConfigMap(t, InfrastructureNamespace, "tls-checks-ca-certificate")
 		suite.Applier.MustApplyObjectsWithCleanup(t, suite.Client, suite.TimeoutConfig, []client.Object{caConfigMap}, suite.Cleanup)
 		secret = kubernetes.MustCreateCASignedCertSecret(t, InfrastructureNamespace, "tls-checks-certificate", []string{"abc.example.com", "spiffe://abc.example.com/test-identity", "other.example.com"}, ca, caPrivKey)
 		suite.Applier.MustApplyObjectsWithCleanup(t, suite.Client, suite.TimeoutConfig, []client.Object{secret}, suite.Cleanup)
 		secret = kubernetes.MustCreateCASignedClientCertSecret(t, InfrastructureNamespace, "tls-checks-client-certificate", ca, caPrivKey)
+		suite.Applier.MustApplyObjectsWithCleanup(t, suite.Client, suite.TimeoutConfig, []client.Object{secret}, suite.Cleanup)
+
+		// Secret used for tcp-backend serving TLS
+		secret = kubernetes.MustCreateCASignedCertSecret(t, InfrastructureNamespace, "tls-passthrough-checks-certificate", []string{"abc.example.com"}, ca, caPrivKey)
+		suite.Applier.MustApplyObjectsWithCleanup(t, suite.Client, suite.TimeoutConfig, []client.Object{secret}, suite.Cleanup)
+		secret = kubernetes.MustCreateCASignedCertSecret(t, AppBackendNamespace, "tls-passthrough-checks-certificate", []string{"abc.example.com"}, ca, caPrivKey)
 		suite.Applier.MustApplyObjectsWithCleanup(t, suite.Client, suite.TimeoutConfig, []client.Object{secret}, suite.Cleanup)
 
 		// The following secret is used for TLSRoute mode Terminate validation

@@ -60,9 +60,12 @@ var GatewayFrontendInvalidDefaultClientCertificateValidation = confsuite.Conform
 
 		// Get Server certificate, this certificate is the same for both listeners
 		certNN := types.NamespacedName{Name: "tls-validity-checks-certificate", Namespace: ns}
-		serverCertPem, _, err := GetTLSSecret(suite.Client, certNN)
+		serverCertPem, _, err := kubernetes.GetTLSSecret(suite.Client, certNN)
 		if err != nil {
 			t.Fatalf("unexpected error finding TLS secret: %v", err)
+		}
+		if len(serverCertPem) == 0 {
+			t.Fatal("missing required server certificate pem for the test")
 		}
 
 		t.Run("Validate tls configuration does not impact HTTP listener", func(t *testing.T) {

@@ -18,6 +18,7 @@ package kubernetes
 
 import (
 	"bytes"
+	"context"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
@@ -34,8 +35,11 @@ import (
 
 	"github.com/stretchr/testify/require"
 	corev1 "k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 	kvalidation "k8s.io/apimachinery/pkg/util/validation"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 const (
@@ -259,4 +263,22 @@ func validateHost(host string) error {
 		}
 	}
 	return nil
+}
+
+// GetTLSSecret fetches the named Secret and converts both cert and key to []byte
+func GetTLSSecret(client client.Client, secretName types.NamespacedName) ([]byte, []byte, error) {
+	var cert, key []byte
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	secret := &v1.Secret{}
+	err := client.Get(ctx, secretName, secret)
+	if err != nil {
+		return cert, key, fmt.Errorf("error fetching TLS Secret: %w", err)
+	}
+	cert = secret.Data["tls.crt"]
+	key = secret.Data["tls.key"]
+
+	return cert, key, nil
 }
