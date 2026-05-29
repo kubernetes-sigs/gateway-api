@@ -49,8 +49,15 @@ type BackendParentStatusApplyConfiguration struct {
 	ControllerName *v1.GatewayController `json:"controllerName,omitempty"`
 	// ParentRef identifies the parent resource that this status is associated with.
 	ParentRef *apisv1.ParentReferenceApplyConfiguration `json:"parentRef,omitempty"`
-	// Conditions describe the current state of the Backend with respect to
-	// this parent.
+	// For Kubernetes API conventions, see:
+	// https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#typical-status-properties
+	// conditions represent the current state of the Backend resource.
+	// Each condition has a unique type and reflects the status of a specific aspect of the resource.
+	//
+	// Defined condition types include:
+	// - "Accepted": the resource has been acknowledged and accepteed by the controller
+	//
+	// The status of each condition is one of True, False, or Unknown.
 	Conditions []metav1.ConditionApplyConfiguration `json:"conditions,omitempty"`
 }
 
