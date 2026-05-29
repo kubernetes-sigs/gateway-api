@@ -33,17 +33,17 @@ import (
 )
 
 func init() {
-	ConformanceTests = append(ConformanceTests, HTTPRouteRetries)
+	ConformanceTests = append(ConformanceTests, HTTPRouteRetry)
 }
 
-var HTTPRouteRetries = confsuite.ConformanceTest{
-	ShortName:   "HTTPRouteRetries",
+var HTTPRouteRetry = confsuite.ConformanceTest{
+	ShortName:   "HTTPRouteRetry",
 	Description: "An HTTPRoute that has a Retry policy configured should retry failed requests according to the specified codes and attempt limits, returning a successful response when the backend recovers within the retry budget and surfacing the original error when it does not.",
-	Manifests:   []string{"tests/httproute-retries.yaml"},
+	Manifests:   []string{"tests/httproute-retry.yaml"},
 	Features: []features.FeatureName{
 		features.SupportGateway,
 		features.SupportHTTPRoute,
-		features.SupportHTTPRouteRetries,
+		features.SupportHTTPRouteRetry,
 	},
 	Test: func(t *testing.T, suite *confsuite.ConformanceTestSuite) {
 		ns := confsuite.InfrastructureNamespace
@@ -185,42 +185,46 @@ var HTTPRouteRetries = confsuite.ConformanceTest{
 			},
 		}
 		for i := range testCases {
-			// Declare tc here to avoid loop variable
-			// reuse issues across parallel tests.
+			// Declare tc here to avoid loop variable reuse issues across parallel tests.
 			tc := testCases[i]
 			t.Run(fmt.Sprintf("%d request to '%s' %s", i, tc.args.path, tc.name), func(t *testing.T) {
 				t.Parallel()
-
-				http.AwaitConvergence(t, suite.TimeoutConfig.RequiredConsecutiveSuccesses, suite.TimeoutConfig.MaxTimeToConsistency, func(elapsed time.Duration) bool {
-					// regenerate UUID on each probe so the retry simulation handler in the echo-basic backend tracks retries independently
-					tc.args.retrySimulationConfig.Set("uuid", uuid.New().String())
-
-					expectedResponse := http.ExpectedResponse{
-						Request: http.Request{
-							Path: tc.args.path + "?" + tc.args.retrySimulationConfig.Encode(),
-						},
-						Response:  tc.want,
-						Backend:   confsuite.InfraBackendServiceNameV3,
-						Namespace: ns,
-					}
-
-					req := http.MakeRequest(t, &expectedResponse, gwAddr, "HTTP", "http")
-
-					cReq, cRes, err := suite.RoundTripper.CaptureRoundTrip(req)
-					if err != nil {
-						tlog.Logf(t, "Request failed, not ready yet: %v (after %v)", err.Error(), elapsed)
-						return false
-					}
-
-					if err := http.CompareRoundTrip(t, &req, cReq, cRes, expectedResponse); err != nil {
-						tlog.Logf(t, "Response expectation failed for request: %+v  not ready yet: %v (after %v)", req, err, elapsed)
-						return false
-					}
-
-					return true
-				})
-				tlog.Logf(t, "Request passed")
+				assertConsistentRetryBehaviour(t, suite, gwAddr, ns, tc.args.path, tc.args.retrySimulationConfig, tc.want)
 			})
 		}
 	},
+}
+
+func assertConsistentRetryBehaviour(t *testing.T, suite *confsuite.ConformanceTestSuite, gwAddr string, ns string, path string, values url.Values, response http.Response) {
+	t.Helper()
+
+	http.AwaitConvergence(t, suite.TimeoutConfig.RequiredConsecutiveSuccesses, suite.TimeoutConfig.MaxTimeToConsistency, func(elapsed time.Duration) bool {
+		// regenerate UUID on each probe so the retry simulation handler in the echo-basic backend tracks retries independently
+		values.Set("uuid", uuid.New().String())
+
+		expectedResponse := http.ExpectedResponse{
+			Request: http.Request{
+				Path: path + "?" + values.Encode(),
+			},
+			Response:  response,
+			Backend:   confsuite.InfraBackendServiceNameV3,
+			Namespace: ns,
+		}
+
+		req := http.MakeRequest(t, &expectedResponse, gwAddr, "HTTP", "http")
+
+		cReq, cRes, err := suite.RoundTripper.CaptureRoundTrip(req)
+		if err != nil {
+			tlog.Logf(t, "Request failed, not ready yet: %v (after %v)", err.Error(), elapsed)
+			return false
+		}
+
+		if err := http.CompareRoundTrip(t, &req, cReq, cRes, expectedResponse); err != nil {
+			tlog.Logf(t, "Response expectation failed for request: %+v  not ready yet: %v (after %v)", req, err, elapsed)
+			return false
+		}
+
+		return true
+	})
+	tlog.Logf(t, "Request passed")
 }
