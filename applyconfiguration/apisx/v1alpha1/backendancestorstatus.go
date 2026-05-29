@@ -24,12 +24,12 @@ import (
 	apisv1 "sigs.k8s.io/gateway-api/applyconfiguration/apis/v1"
 )
 
-// BackendParentStatusApplyConfiguration represents a declarative configuration of the BackendParentStatus type for use
+// BackendAncestorStatusApplyConfiguration represents a declarative configuration of the BackendAncestorStatus type for use
 // with apply.
 //
-// BackendParentStatus describes the status of a Backend with respect to a
+// BackendAncestorStatus describes the status of a Backend with respect to a
 // specific parent resource (typically a Gateway).
-type BackendParentStatusApplyConfiguration struct {
+type BackendAncestorStatusApplyConfiguration struct {
 	// ControllerName is a domain/path string that indicates the name of the
 	// controller that manages the Backend.
 	//
@@ -47,8 +47,8 @@ type BackendParentStatusApplyConfiguration struct {
 	// they are no longer necessary.
 	// </gateway:util:excludeFromCRD>
 	ControllerName *v1.GatewayController `json:"controllerName,omitempty"`
-	// ParentRef identifies the parent resource that this status is associated with.
-	ParentRef *apisv1.ParentReferenceApplyConfiguration `json:"parentRef,omitempty"`
+	// AncestorRef identifies the parent resource that this status is associated with.
+	AncestorRef *apisv1.ParentReferenceApplyConfiguration `json:"parentRef,omitempty"`
 	// For Kubernetes API conventions, see:
 	// https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#typical-status-properties
 	// conditions represent the current state of the Backend resource.
@@ -61,32 +61,32 @@ type BackendParentStatusApplyConfiguration struct {
 	Conditions []metav1.ConditionApplyConfiguration `json:"conditions,omitempty"`
 }
 
-// BackendParentStatusApplyConfiguration constructs a declarative configuration of the BackendParentStatus type for use with
+// BackendAncestorStatusApplyConfiguration constructs a declarative configuration of the BackendAncestorStatus type for use with
 // apply.
-func BackendParentStatus() *BackendParentStatusApplyConfiguration {
-	return &BackendParentStatusApplyConfiguration{}
+func BackendAncestorStatus() *BackendAncestorStatusApplyConfiguration {
+	return &BackendAncestorStatusApplyConfiguration{}
 }
 
 // WithControllerName sets the ControllerName field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the ControllerName field is set to the value of the last call.
-func (b *BackendParentStatusApplyConfiguration) WithControllerName(value v1.GatewayController) *BackendParentStatusApplyConfiguration {
+func (b *BackendAncestorStatusApplyConfiguration) WithControllerName(value v1.GatewayController) *BackendAncestorStatusApplyConfiguration {
 	b.ControllerName = &value
 	return b
 }
 
-// WithParentRef sets the ParentRef field in the declarative configuration to the given value
+// WithAncestorRef sets the AncestorRef field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
-// If called multiple times, the ParentRef field is set to the value of the last call.
-func (b *BackendParentStatusApplyConfiguration) WithParentRef(value *apisv1.ParentReferenceApplyConfiguration) *BackendParentStatusApplyConfiguration {
-	b.ParentRef = value
+// If called multiple times, the AncestorRef field is set to the value of the last call.
+func (b *BackendAncestorStatusApplyConfiguration) WithAncestorRef(value *apisv1.ParentReferenceApplyConfiguration) *BackendAncestorStatusApplyConfiguration {
+	b.AncestorRef = value
 	return b
 }
 
 // WithConditions adds the given value to the Conditions field in the declarative configuration
 // and returns the receiver, so that objects can be build by chaining "With" function invocations.
 // If called multiple times, values provided by each call will be appended to the Conditions field.
-func (b *BackendParentStatusApplyConfiguration) WithConditions(values ...*metav1.ConditionApplyConfiguration) *BackendParentStatusApplyConfiguration {
+func (b *BackendAncestorStatusApplyConfiguration) WithConditions(values ...*metav1.ConditionApplyConfiguration) *BackendAncestorStatusApplyConfiguration {
 	for i := range values {
 		if values[i] == nil {
 			panic("nil value passed to WithConditions")

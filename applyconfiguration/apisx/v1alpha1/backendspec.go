@@ -50,9 +50,9 @@ type BackendSpecApplyConfiguration struct {
 	// to this backend. When not set, the implementation will use the protocol
 	// determined by the route or listener configuration.
 	//
-	// Support: Core - TCP, HTTP, HTTP2, H2C, and HTTP11
+	// Support: Core - GRPC, HTTP, HTTP2, H2C, and HTTP11
 	//
-	// Support: Extended - MCP
+	// Support: Extended - MCP, TCP
 	//
 	// <gateway:util:excludeFromCRD>
 	// Notes for implementers:

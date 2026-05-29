@@ -23,7 +23,7 @@ package v1alpha1
 //
 // BackendStatus defines the observed state of a Backend.
 type BackendStatusApplyConfiguration struct {
-	// Parents is a list of parent resources associated with this Backend,
+	// Ancestors is a list of parent resources associated with this Backend,
 	// and the status of the Backend with respect to each parent.
 	//
 	// A maximum of 32 parents will be represented in this list. An empty list
@@ -35,8 +35,12 @@ type BackendStatusApplyConfiguration struct {
 	// A controller that manages the Backend must add an entry for each parent
 	// it manages and remove the entry when the controller no longer considers
 	// the Backend to be associated with that parent.
+	//
+	// TODO: We may discover that this creates unnecessary apiserver/informer overhead
+	// for little benefit. It may also be unnecessarily complex for implementations to manage.
+	// If so, we'll remove the ancestor-based grouping and make it controller only.
 	// </gateway:util:excludeFromCRD>
-	Parents []BackendParentStatusApplyConfiguration `json:"parents,omitempty"`
+	Ancestors []BackendAncestorStatusApplyConfiguration `json:"parents,omitempty"`
 }
 
 // BackendStatusApplyConfiguration constructs a declarative configuration of the BackendStatus type for use with
@@ -45,15 +49,15 @@ func BackendStatus() *BackendStatusApplyConfiguration {
 	return &BackendStatusApplyConfiguration{}
 }
 
-// WithParents adds the given value to the Parents field in the declarative configuration
+// WithAncestors adds the given value to the Ancestors field in the declarative configuration
 // and returns the receiver, so that objects can be build by chaining "With" function invocations.
-// If called multiple times, values provided by each call will be appended to the Parents field.
-func (b *BackendStatusApplyConfiguration) WithParents(values ...*BackendParentStatusApplyConfiguration) *BackendStatusApplyConfiguration {
+// If called multiple times, values provided by each call will be appended to the Ancestors field.
+func (b *BackendStatusApplyConfiguration) WithAncestors(values ...*BackendAncestorStatusApplyConfiguration) *BackendStatusApplyConfiguration {
 	for i := range values {
 		if values[i] == nil {
-			panic("nil value passed to WithParents")
+			panic("nil value passed to WithAncestors")
 		}
-		b.Parents = append(b.Parents, *values[i])
+		b.Ancestors = append(b.Ancestors, *values[i])
 	}
 	return b
 }

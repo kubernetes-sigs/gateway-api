@@ -2064,7 +2064,7 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         namedType: io.k8s.sigs.gateway-api.apis.v1.ReferenceGrantSpec
       default: {}
-- name: io.k8s.sigs.gateway-api.apisx.v1alpha1.BackendParentStatus
+- name: io.k8s.sigs.gateway-api.apisx.v1alpha1.BackendAncestorStatus
   map:
     fields:
     - name: conditions
@@ -2119,7 +2119,7 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         list:
           elementType:
-            namedType: io.k8s.sigs.gateway-api.apisx.v1alpha1.BackendParentStatus
+            namedType: io.k8s.sigs.gateway-api.apisx.v1alpha1.BackendAncestorStatus
           elementRelationship: atomic
 - name: io.k8s.sigs.gateway-api.apisx.v1alpha1.BackendTLS
   map:
