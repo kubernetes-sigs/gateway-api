@@ -50,7 +50,7 @@ var BackendTLSPolicyTLSRouteTerminate = suite.ConformanceTest{
 		gwNN := types.NamespacedName{Name: "gateway-btls-tlsroute-terminate", Namespace: ns}
 		policyNN := types.NamespacedName{Name: "btls-tlsroute-terminate-test", Namespace: ns}
 		caCertNN := types.NamespacedName{Name: "tls-checks-ca-certificate", Namespace: ns}
-		expectedBackendName := "btls-terminate-tls-backend"
+		expectedBackendName := "tcp-backend"
 		expectedBackendHostname := "abc.example.com"
 
 		kubernetes.NamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, []string{ns})
