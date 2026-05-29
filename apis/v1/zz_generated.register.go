@@ -76,6 +76,8 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&ListenerSetList{},
 		&ReferenceGrant{},
 		&ReferenceGrantList{},
+		&TCPRoute{},
+		&TCPRouteList{},
 		&TLSRoute{},
 		&TLSRouteList{},
 	)
