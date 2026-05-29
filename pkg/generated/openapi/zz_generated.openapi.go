@@ -233,7 +233,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"sigs.k8s.io/gateway-api/apis/v1beta1.HTTPRouteList":                              schema_sigsk8sio_gateway_api_apis_v1beta1_HTTPRouteList(ref),
 		"sigs.k8s.io/gateway-api/apis/v1beta1.ReferenceGrant":                             schema_sigsk8sio_gateway_api_apis_v1beta1_ReferenceGrant(ref),
 		"sigs.k8s.io/gateway-api/apis/v1beta1.ReferenceGrantList":                         schema_sigsk8sio_gateway_api_apis_v1beta1_ReferenceGrantList(ref),
-		"sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendParentStatus":                      schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendParentStatus(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendAncestorStatus":                    schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendAncestorStatus(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendPort":                              schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendPort(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendSpec":                              schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendSpec(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendStatus":                            schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendStatus(ref),
@@ -10009,11 +10009,11 @@ func schema_sigsk8sio_gateway_api_apis_v1beta1_ReferenceGrantList(ref common.Ref
 	}
 }
 
-func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendParentStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendAncestorStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "BackendParentStatus describes the status of a Backend with respect to a specific parent resource (typically a Gateway).",
+				Description: "BackendAncestorStatus describes the status of a Backend with respect to a specific parent resource (typically a Gateway).",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"controllerName": {
@@ -10026,7 +10026,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendParentStatus(ref common.
 					},
 					"parentRef": {
 						SchemaProps: spec.SchemaProps{
-							Description: "ParentRef identifies the parent resource that this status is associated with.",
+							Description: "AncestorRef identifies the parent resource that this status is associated with.",
 							Default:     map[string]interface{}{},
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.ParentReference"),
 						},
@@ -10120,7 +10120,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendSpec(ref common.Referenc
 					},
 					"protocol": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Protocol defines the protocol for backend communication.\n\nIn the common case, the underlying transport protocol for the proxied traffic will already have been determined and processed by the dataplane at the routing step. Where this field is useful is either for higher level protocols or asymmetrical protocol configurations (e.g. version upgrades or h2c).\n\nWhen set, the implementation uses the specified protocol when connecting to this backend. When not set, the implementation will use the protocol determined by the route or listener configuration.\n\nSupport: Core - TCP, HTTP, HTTP2, H2C, and HTTP11\n\nSupport: Extended - MCP\n\n<gateway:util:excludeFromCRD> Notes for implementers:\n\nIn cases where the protocol is negotiated on the wire (e.g. HTTP/1.1 Upgrade or ALPN), implementations MUST include the protocol set here in the negotiation options presented to the backend. </gateway:util:excludeFromCRD>",
+							Description: "Protocol defines the protocol for backend communication.\n\nIn the common case, the underlying transport protocol for the proxied traffic will already have been determined and processed by the dataplane at the routing step. Where this field is useful is either for higher level protocols or asymmetrical protocol configurations (e.g. version upgrades or h2c).\n\nWhen set, the implementation uses the specified protocol when connecting to this backend. When not set, the implementation will use the protocol determined by the route or listener configuration.\n\nSupport: Core - GRPC, HTTP, HTTP2, H2C, and HTTP11\n\nSupport: Extended - MCP, TCP\n\n<gateway:util:excludeFromCRD> Notes for implementers:\n\nIn cases where the protocol is negotiated on the wire (e.g. HTTP/1.1 Upgrade or ALPN), implementations MUST include the protocol set here in the negotiation options presented to the backend. </gateway:util:excludeFromCRD>",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -10154,13 +10154,13 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendStatus(ref common.Refere
 							},
 						},
 						SchemaProps: spec.SchemaProps{
-							Description: "Parents is a list of parent resources associated with this Backend, and the status of the Backend with respect to each parent.\n\nA maximum of 32 parents will be represented in this list. An empty list indicates that the Backend is not associated with any parents.\n\n<gateway:util:excludeFromCRD> Notes for implementers:\n\nA controller that manages the Backend must add an entry for each parent it manages and remove the entry when the controller no longer considers the Backend to be associated with that parent. </gateway:util:excludeFromCRD>",
+							Description: "Ancestors is a list of parent resources associated with this Backend, and the status of the Backend with respect to each parent.\n\nA maximum of 32 parents will be represented in this list. An empty list indicates that the Backend is not associated with any parents.\n\n<gateway:util:excludeFromCRD> Notes for implementers:\n\nA controller that manages the Backend must add an entry for each parent it manages and remove the entry when the controller no longer considers the Backend to be associated with that parent.\n\nfor little benefit. It may also be unnecessarily complex for implementations to manage. If so, we'll remove the ancestor-based grouping and make it controller only. </gateway:util:excludeFromCRD>",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendParentStatus"),
+										Ref:     ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendAncestorStatus"),
 									},
 								},
 							},
@@ -10170,7 +10170,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendStatus(ref common.Refere
 			},
 		},
 		Dependencies: []string{
-			"sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendParentStatus"},
+			"sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendAncestorStatus"},
 	}
 }
 

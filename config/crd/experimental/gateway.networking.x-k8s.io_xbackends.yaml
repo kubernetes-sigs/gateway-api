@@ -115,9 +115,9 @@ spec:
                   to this backend. When not set, the implementation will use the protocol
                   determined by the route or listener configuration.
 
-                  Support: Core - TCP, HTTP, HTTP2, H2C, and HTTP11
+                  Support: Core - GRPC, HTTP, HTTP2, H2C, and HTTP11
 
-                  Support: Extended - MCP
+                  Support: Extended - MCP, TCP
                 enum:
                 - TCP
                 - HTTP
@@ -421,14 +421,14 @@ spec:
             properties:
               parents:
                 description: |-
-                  Parents is a list of parent resources associated with this Backend,
+                  Ancestors is a list of parent resources associated with this Backend,
                   and the status of the Backend with respect to each parent.
 
                   A maximum of 32 parents will be represented in this list. An empty list
                   indicates that the Backend is not associated with any parents.
                 items:
                   description: |-
-                    BackendParentStatus describes the status of a Backend with respect to a
+                    BackendAncestorStatus describes the status of a Backend with respect to a
                     specific parent resource (typically a Gateway).
                   properties:
                     conditions:
@@ -516,8 +516,8 @@ spec:
                       pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/[A-Za-z0-9\/\-._~%!$&'()*+,;=:]+$
                       type: string
                     parentRef:
-                      description: ParentRef identifies the parent resource that this
-                        status is associated with.
+                      description: AncestorRef identifies the parent resource that
+                        this status is associated with.
                       properties:
                         group:
                           default: gateway.networking.k8s.io

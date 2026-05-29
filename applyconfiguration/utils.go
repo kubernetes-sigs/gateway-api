@@ -288,8 +288,8 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1beta1.ReferenceGrantApplyConfiguration{}
 
 		// Group=gateway.networking.x-k8s.io, Version=v1alpha1
-	case v1alpha1.SchemeGroupVersion.WithKind("BackendParentStatus"):
-		return &apisxv1alpha1.BackendParentStatusApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("BackendAncestorStatus"):
+		return &apisxv1alpha1.BackendAncestorStatusApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("BackendPort"):
 		return &apisxv1alpha1.BackendPortApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("BackendSpec"):

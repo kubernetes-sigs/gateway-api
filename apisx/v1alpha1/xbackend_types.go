@@ -107,9 +107,9 @@ type BackendSpec struct {
 	// to this backend. When not set, the implementation will use the protocol
 	// determined by the route or listener configuration.
 	//
-	// Support: Core - TCP, HTTP, HTTP2, H2C, and HTTP11
+	// Support: Core - GRPC, HTTP, HTTP2, H2C, and HTTP11
 	//
-	// Support: Extended - MCP
+	// Support: Extended - MCP, TCP
 	//
 	// <gateway:util:excludeFromCRD>
 	// Notes for implementers:
@@ -208,6 +208,11 @@ const (
 	//
 	// Support: Core
 	BackendProtocolH2C BackendProtocol = "H2C"
+
+	// BackendProtocolGRPC indicates gRPC
+	//
+	// Support: Core
+	BackendProtocolGRPC BackendProtocol = "GRPC"
 )
 
 // BackendTLSMode defines the TLS mode for backend connections.
@@ -250,7 +255,7 @@ type BackendTLS struct {
 
 // BackendStatus defines the observed state of a Backend.
 type BackendStatus struct {
-	// Parents is a list of parent resources associated with this Backend,
+	// Ancestors is a list of parent resources associated with this Backend,
 	// and the status of the Backend with respect to each parent.
 	//
 	// A maximum of 32 parents will be represented in this list. An empty list
@@ -262,17 +267,21 @@ type BackendStatus struct {
 	// A controller that manages the Backend must add an entry for each parent
 	// it manages and remove the entry when the controller no longer considers
 	// the Backend to be associated with that parent.
+	//
+	// TODO: We may discover that this creates unnecessary apiserver/informer overhead
+	// for little benefit. It may also be unnecessarily complex for implementations to manage.
+	// If so, we'll remove the ancestor-based grouping and make it controller only.
 	// </gateway:util:excludeFromCRD>
 	//
 	// +kubebuilder:validation:MaxItems=32
 	// +optional
 	// +listType=atomic
-	Parents []BackendParentStatus `json:"parents,omitempty"`
+	Ancestors []BackendAncestorStatus `json:"parents,omitempty"`
 }
 
-// BackendParentStatus describes the status of a Backend with respect to a
+// BackendAncestorStatus describes the status of a Backend with respect to a
 // specific parent resource (typically a Gateway).
-type BackendParentStatus struct {
+type BackendAncestorStatus struct {
 	// ControllerName is a domain/path string that indicates the name of the
 	// controller that manages the Backend.
 	//
@@ -293,10 +302,10 @@ type BackendParentStatus struct {
 	// +required
 	ControllerName v1.GatewayController `json:"controllerName"`
 
-	// ParentRef identifies the parent resource that this status is associated with.
+	// AncestorRef identifies the parent resource that this status is associated with.
 	//
 	// +required
-	ParentRef v1.ParentReference `json:"parentRef"`
+	AncestorRef v1.ParentReference `json:"parentRef"`
 
 	// For Kubernetes API conventions, see:
 	// https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#typical-status-properties
