@@ -9557,7 +9557,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendParentStatus(ref common.
 							},
 						},
 						SchemaProps: spec.SchemaProps{
-							Description: "Conditions describe the current state of the Backend with respect to this parent.",
+							Description: "For Kubernetes API conventions, see: https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#typical-status-properties conditions represent the current state of the Backend resource. Each condition has a unique type and reflects the status of a specific aspect of the resource.\n\nDefined condition types include: - \"Accepted\": the resource has been acknowledged and accepteed by the controller\n\nThe status of each condition is one of True, False, or Unknown.",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
