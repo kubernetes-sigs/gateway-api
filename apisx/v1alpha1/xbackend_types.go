@@ -107,9 +107,9 @@ type BackendSpec struct {
 	// to this backend. When not set, the implementation will use the protocol
 	// determined by the route or listener configuration.
 	//
-	// Support: Core - GRPC, HTTP, HTTP2, H2C, and HTTP11
+	// Support: Core - HTTP, HTTP2, H2C, and HTTP11
 	//
-	// Support: Extended - MCP, TCP
+	// Support: Extended - GRPC, MCP, TCP
 	//
 	// <gateway:util:excludeFromCRD>
 	// Notes for implementers:
@@ -211,7 +211,7 @@ const (
 
 	// BackendProtocolGRPC indicates gRPC
 	//
-	// Support: Core
+	// Support: Extended
 	BackendProtocolGRPC BackendProtocol = "GRPC"
 )
 
