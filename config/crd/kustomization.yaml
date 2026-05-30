@@ -8,4 +8,5 @@ resources:
   - standard/gateway.networking.k8s.io_listenersets.yaml
   - standard/gateway.networking.k8s.io_tcproutes.yaml
   - standard/gateway.networking.k8s.io_tlsroutes.yaml
+  - standard/gateway.networking.k8s.io_udproutes.yaml
   - standard/gateway.networking.k8s.io_vap_safeupgrades.yaml

@@ -34,7 +34,8 @@ PROFILE_TO_CONFORMANCE = {
     "GATEWAY-HTTP": "Core",
     "GATEWAY-GRPC": "GRPCRoute",
     "GATEWAY-TLS": "TLSRoute",
-    "GATEWAY-TCP": "TCPRoute"
+    "GATEWAY-TCP": "TCPRoute",
+    "GATEWAY-UDP": "UDPRoute"
 }
 
 # Acronyms that should stay uppercase in display names (e.g. GKE not Gke)
