@@ -288,10 +288,22 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1beta1.ReferenceGrantApplyConfiguration{}
 
 		// Group=gateway.networking.x-k8s.io, Version=v1alpha1
+	case v1alpha1.SchemeGroupVersion.WithKind("BackendAncestorStatus"):
+		return &apisxv1alpha1.BackendAncestorStatusApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("BackendPort"):
+		return &apisxv1alpha1.BackendPortApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("BackendSpec"):
+		return &apisxv1alpha1.BackendSpecApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("BackendStatus"):
+		return &apisxv1alpha1.BackendStatusApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("BackendTLS"):
+		return &apisxv1alpha1.BackendTLSApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("BackendTrafficPolicySpec"):
 		return &apisxv1alpha1.BackendTrafficPolicySpecApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("BudgetDetails"):
 		return &apisxv1alpha1.BudgetDetailsApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("ExternalHostnameBackend"):
+		return &apisxv1alpha1.ExternalHostnameBackendApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("MeshSpec"):
 		return &apisxv1alpha1.MeshSpecApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("MeshStatus"):
@@ -300,6 +312,8 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisxv1alpha1.RequestRateApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("RetryConstraint"):
 		return &apisxv1alpha1.RetryConstraintApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("XBackend"):
+		return &apisxv1alpha1.XBackendApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("XBackendTrafficPolicy"):
 		return &apisxv1alpha1.XBackendTrafficPolicyApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("XMesh"):
