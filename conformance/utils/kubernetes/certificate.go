@@ -35,7 +35,6 @@ import (
 
 	"github.com/stretchr/testify/require"
 	corev1 "k8s.io/api/core/v1"
-	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	kvalidation "k8s.io/apimachinery/pkg/util/validation"
@@ -272,7 +271,7 @@ func GetTLSSecret(client client.Client, secretName types.NamespacedName) ([]byte
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	secret := &v1.Secret{}
+	secret := &corev1.Secret{}
 	err := client.Get(ctx, secretName, secret)
 	if err != nil {
 		return cert, key, fmt.Errorf("error fetching TLS Secret: %w", err)
