@@ -18,6 +18,8 @@ limitations under the License.
 
 package v1alpha1
 
+type XBackendExpansion interface{}
+
 type XBackendTrafficPolicyExpansion interface{}
 
 type XMeshExpansion interface{}

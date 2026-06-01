@@ -52,6 +52,7 @@ Session.vim
 go.work.sum
 /tmp
 /conformance.test
+.protoc_cache
 
 /cache
 .venv/
@@ -72,3 +73,7 @@ site/static/wizard/data/*
 
 .gocache/
 .hugocache/
+
+# AI tools
+.claude
+.codex
