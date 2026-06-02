@@ -62,9 +62,12 @@ var GatewayTLSBackendClientCertificate = confsuite.ConformanceTest{
 		})
 
 		t.Run("HTTP request sent to Service using TLS should succeed and the configured client certificate should be presented.", func(t *testing.T) {
-			expectedClientCert, _, err := GetTLSSecret(suite.Client, types.NamespacedName{Name: "tls-checks-client-certificate", Namespace: ns})
+			expectedClientCert, _, err := kubernetes.GetTLSSecret(suite.Client, types.NamespacedName{Name: "tls-checks-client-certificate", Namespace: ns})
 			if err != nil {
 				t.Fatalf("unexpected error finding TLS client certifcate secret: %v", err)
+			}
+			if len(expectedClientCert) == 0 {
+				t.Fatal("missing required server certificate pem for the test")
 			}
 
 			h.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr,

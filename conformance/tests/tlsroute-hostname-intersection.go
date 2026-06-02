@@ -48,9 +48,12 @@ var TLSRouteHostnameIntersection = confsuite.ConformanceTest{
 		// namespace so we have to wait for it to be ready.
 		kubernetes.NamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, []string{ns})
 
-		serverCertPem, _, err := GetTLSSecret(suite.Client, certNN)
+		serverCertPem, _, err := kubernetes.GetTLSSecret(suite.Client, certNN)
 		if err != nil {
 			t.Fatalf("unexpected error finding TLS secret: %v", err)
+		}
+		if len(serverCertPem) == 0 {
+			t.Fatal("missing required server certificate pem for the test")
 		}
 
 		t.Run("TLSRoutes intersect with exact listener hostname", func(t *testing.T) {
