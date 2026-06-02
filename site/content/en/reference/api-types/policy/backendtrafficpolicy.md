@@ -11,7 +11,8 @@ since `v1.3.0`. For more information on release channels, refer to our
 
 [BackendTrafficPolicy][backendtrafficpolicy] is a Gateway API type to configure
 the behavior of clients when targeting a valid backend resource.
-
+For backend destination modeling and connection metadata, see
+[Backend](/reference/api-types/backend/).
 ## Background
 
 `BackendTrafficPolicy` is used to configure the behavior of clients when making
@@ -30,7 +31,7 @@ system, leading to cascading failures such as retry storms. Specifying a
 developers to dynamically calculate a limit on active client-side retries as a percentage of
 the overall active request volume. While the retry stanza within the
 [HTTPRouteRule][httproute] resource allows specifying whether a request
-*should* be retried, as well as the maximum number of 
+*should* be retried, as well as the maximum number of
 retries that may be performed for a failed request, budgeted
 retries instead act as a
 fail-safe in order to ensure that the targeted backend will not be overwhelmed
@@ -87,7 +88,7 @@ flowchart LR
 TargetRefs such as Service, ServiceImport, or implementation-specific
 backendRef. TargetRefs is a required object reference, specifying a Backend via
 its Name, Kind, and Group. Currently, TargetRefs cannot be scoped to
-specific ports on a service. 
+specific ports on a service.
 
 [backendtrafficpolicy]: /reference/api-spec/main/specx/#xbackendtrafficpolicy
 [localpolicytargetreference]: /reference/api-spec/main/spec/#localpolicytargetreference
