@@ -1,13 +1,12 @@
+#$ Used in:
+#$ - reference/api-types/tcproute.md
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
   name: my-tcp-gateway
 spec:
-  gatewayClassName: my-tcp-gateway-class
+  gatewayClassName: example-gateway-class
   listeners:
     - name: foo
       protocol: TCP
       port: 8080
-      allowedRoutes:
-        kinds:
-          - kind: TCPRoute
