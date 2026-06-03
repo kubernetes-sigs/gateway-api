@@ -21,6 +21,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	xnetws "golang.org/x/net/websocket"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -30,6 +31,7 @@ import (
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	xmeshv1alpha1 "sigs.k8s.io/gateway-api/apisx/v1alpha1"
 	confv1 "sigs.k8s.io/gateway-api/conformance/apis/v1"
+	"sigs.k8s.io/gateway-api/conformance/utils/websocket"
 	"sigs.k8s.io/gateway-api/pkg/consts"
 	"sigs.k8s.io/gateway-api/pkg/features"
 )
@@ -558,6 +560,64 @@ func TestInferGWCSupportedFeatures(t *testing.T) {
 			assert.Equal(t, tc.expectedExtendedFeatures, cSuite.extendedSupportedFeatures, "expectedExtendedFeatures mismatch")
 		})
 	}
+}
+
+// stubWebSocketDialer is a no-op websocket.Dialer used to verify the suite
+// preserves a caller-supplied dialer instead of overwriting it with the default.
+type stubWebSocketDialer struct{}
+
+func (*stubWebSocketDialer) Dial(_, _, _ string) (*xnetws.Conn, error) {
+	return nil, nil
+}
+
+// TestNewConformanceTestSuiteWebSocketDialer pins the injection-point contract:
+// an unset WebSocketDialer defaults to the package DefaultDialer (preserving the
+// historical websocket.Dial behavior), and a caller-supplied dialer is kept.
+func TestNewConformanceTestSuiteWebSocketDialer(t *testing.T) {
+	scheme := runtime.NewScheme()
+	gatewayv1.Install(scheme)
+	apiextensionsv1.AddToScheme(scheme)
+	gwc := &gatewayv1.GatewayClass{
+		ObjectMeta: metav1.ObjectMeta{Name: "gateway-conformance"},
+		Spec:       gatewayv1.GatewayClassSpec{ControllerName: "example.com/gateway-controller"},
+	}
+	fakeClient := fake.NewClientBuilder().
+		WithScheme(scheme).
+		WithObjects(gwc).
+		WithLists(&apiextensionsv1.CustomResourceDefinitionList{}).
+		Build()
+
+	newSuite := func(t *testing.T, dialer websocket.Dialer) *ConformanceTestSuite {
+		t.Helper()
+		cSuite, err := NewConformanceTestSuite(ConformanceOptions{
+			ConfigurableOptions: ConfigurableOptions{
+				AllowCRDsMismatch:          true,
+				GatewayClassName:           "gateway-conformance",
+				EnableAllSupportedFeatures: true,
+			},
+			Client:          fakeClient,
+			WebSocketDialer: dialer,
+		})
+		if err != nil {
+			t.Fatalf("error initializing conformance suite: %v", err)
+		}
+		return cSuite
+	}
+
+	t.Run("defaults to DefaultDialer when unset", func(t *testing.T) {
+		cSuite := newSuite(t, nil)
+		if _, ok := cSuite.WebSocketDialer.(*websocket.DefaultDialer); !ok {
+			t.Fatalf("expected WebSocketDialer to default to *websocket.DefaultDialer, got %T", cSuite.WebSocketDialer)
+		}
+	})
+
+	t.Run("preserves a custom dialer", func(t *testing.T) {
+		custom := &stubWebSocketDialer{}
+		cSuite := newSuite(t, custom)
+		if cSuite.WebSocketDialer != custom {
+			t.Fatalf("expected the supplied WebSocketDialer to be preserved, got %T", cSuite.WebSocketDialer)
+		}
+	})
 }
 
 var meshStatusFeatureNames = []string{
