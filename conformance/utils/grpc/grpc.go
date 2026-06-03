@@ -273,9 +273,12 @@ func MakeRequestAndExpectEventuallyConsistentResponse(t *testing.T, c Client, ti
 	t.Helper()
 	validateExpectedResponse(t, expected)
 	if c == nil {
+		// Only the DefaultClient we construct here is ours to close. A
+		// caller-supplied (non-nil) client is owned by the caller and must be
+		// left open so it can be reused after this helper returns.
 		c = &DefaultClient{Conn: nil}
+		defer c.Close()
 	}
-	defer c.Close()
 	sendRPC := func(elapsed time.Duration) bool {
 		resp, err := c.SendRPC(t, gwAddr, expected, timeoutConfig.MaxTimeToConsistency-elapsed)
 		if err != nil {
