@@ -164,7 +164,7 @@ func generateRSACert(hosts []string, keyOut, certOut io.Writer, extKeyUsage []x5
 // MustCreateCACertConfigMap will create a ConfigMap containing a CA Certificate, given a TLS Secret
 // for that CA certificate.  Also returns the CA certificate.
 func MustCreateCACertConfigMap(t *testing.T, namespace, configMapName string) (*corev1.ConfigMap, *x509.Certificate, *rsa.PrivateKey) {
-	var certData, keyData bytes.Buffer
+	var certData bytes.Buffer
 
 	ca, caBytes, caPrivKey, err := generateCACert()
 	if err != nil {
@@ -177,11 +177,6 @@ func MustCreateCACertConfigMap(t *testing.T, namespace, configMapName string) (*
 		return nil, nil, nil
 	}
 
-	if err := pem.Encode(&keyData, &pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(caPrivKey)}); err != nil {
-		t.Errorf("failed creating key: %v", err)
-		return nil, nil, nil
-	}
-
 	// Store the certificate in a ConfigMap.
 	caConfigMap := &corev1.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{
@@ -190,8 +185,6 @@ func MustCreateCACertConfigMap(t *testing.T, namespace, configMapName string) (*
 		},
 		Data: map[string]string{
 			"ca.crt": certData.String(),
-			// Don't do this in production, this is just for conformance testing.
-			"key.crt": keyData.String(),
 		},
 	}
 	return caConfigMap, ca, caPrivKey
