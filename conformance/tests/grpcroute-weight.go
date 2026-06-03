@@ -73,8 +73,19 @@ var GRPCRouteWeight = confsuite.ConformanceTest{
 				if err := grpc.AddEntropy(&uniqueExpected); err != nil {
 					return "", fmt.Errorf("error adding entropy: %w", err)
 				}
-				client := &grpc.DefaultClient{}
-				defer client.Close()
+				// Route the sampler through the injectable Options.GRPCClient, as
+				// the rest of the GRPCRoute tests do, so an implementation whose
+				// Gateway address is not directly dialable still exercises this
+				// test. GRPCClient is nil-guarded at the call site rather than
+				// defaulted in the suite, so on the default path fall back to a
+				// fresh per-request DefaultClient that is closed after the call —
+				// behavior-preserving, and isolated per concurrent sample.
+				client := suite.GRPCClient
+				if client == nil {
+					defaultClient := &grpc.DefaultClient{}
+					defer defaultClient.Close()
+					client = defaultClient
+				}
 				resp, err := client.SendRPC(t, gwAddr, uniqueExpected, suite.TimeoutConfig.MaxTimeToConsistency)
 				if err != nil {
 					return "", fmt.Errorf("failed to send gRPC request: %w", err)
