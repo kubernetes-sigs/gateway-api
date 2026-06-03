@@ -1,6 +1,6 @@
 ---
 title: "Backend"
-weight: 3
+weight: 11
 ---
 
 {{< details title="Experimental Channel" color="purple" >}}
@@ -22,6 +22,27 @@ This is especially useful for:
 - Defining external destinations without synthetic `ExternalName` Services.
 - Setting backend connection protocol expectations.
 - Defining backend TLS settings directly on the backend destination.
+
+## ExternalHostname vs ExternalName
+
+`Backend` supports `ExternalHostname` for external FQDN destinations instead of
+requiring users to create an additional `Service` with `type: ExternalName`.
+
+These options are similar in that both ultimately depend on DNS, but
+`ExternalHostname` gives Gateway API a clearer and safer model for egress
+configuration.
+
+One important reason is DNS rebinding risk. `ExternalName` has a known history
+of DNS rebinding concerns (for example,
+[CVE-2021-25740](https://github.com/kubernetes/kubernetes/issues/103675)),
+where a hostname can resolve to unexpected addresses over time. To reduce this
+risk, `ExternalHostname` validation in this API does not allow hostnames ending
+in `.cluster.local`, which helps prevent references that look like in-cluster
+service names.
+
+Because DNS trust is still required for external destinations, implementations
+should add additional guardrails such as egress domain allow-lists and pair
+this with admission and network-level controls.
 
 ## Spec
 
