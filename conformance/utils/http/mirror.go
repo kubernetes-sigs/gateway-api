@@ -43,7 +43,16 @@ func ExpectMirroredRequest(t *testing.T, client client.Client, clientset clients
 	var wg sync.WaitGroup
 	wg.Add(len(mirrorPods))
 
-	assertionStart := time.Now()
+	// Start the log window before the requests were sent, not at "now". The
+	// caller already dispatched the mirrored requests, and on a high-latency
+	// (e.g. edge-routed) data plane the mirror is logged in-cluster slightly
+	// before the primary response returns to the client, so it can land in an
+	// earlier second than time.Now() and be excluded by the SinceTime filter,
+	// which has 1-second granularity. MaxTimeToConsistency bounds how long the
+	// caller's send loop could have run, and the match regexp is keyed on the
+	// unique request path, so widening the window cannot match an unrelated
+	// test's mirror.
+	assertionStart := time.Now().Add(-timeoutConfig.MaxTimeToConsistency)
 
 	for _, mirrorPod := range mirrorPods {
 		go func(mirrorPod MirroredBackend) {
