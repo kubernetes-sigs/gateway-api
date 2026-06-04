@@ -21,9 +21,9 @@ and a rule consists only of the backends to forward traffic to.
 
 ## Background
 
-While many routing cases can be handled at L7 with HTTPRoute or GRPCRoute, a
-large class of workloads speak plain UDP that fits none of the L7 models. Common
-examples include:
+While many routing cases can be handled at L7 with [HTTPRoute][httproute] or
+[GRPCRoute][grpcroute], a large class of workloads speak plain UDP that fits
+none of the L7 models. Common examples include:
 
 - DNS (Domain Name System).
 - VoIP and real-time communications.
@@ -67,6 +67,10 @@ spec:
 
 Note that the target Gateway needs to allow UDPRoutes from the route's
 namespace to be attached for the attachment to be successful.
+
+Because the example above specifies neither a `sectionName` nor a `port`, the
+UDPRoute attaches to every UDP listener on the `acme-lb` Gateway. Listeners
+using other protocols are not affected.
 
 You can also attach routes to specific sections of the parent resource.
 For example, let's say that the `acme-lb` Gateway includes the following
@@ -184,15 +188,18 @@ status:
 ## Merging
 
 Multiple UDPRoutes can be attached to a single Gateway resource. However,
-because a UDP listener has no hostname, SNI, or path to distinguish between
-datagrams, attaching multiple UDPRoutes to the same listener results in only one
-route effectively receiving traffic. All attached routes are `Accepted`, but
-following the general Gateway API route precedence rules, only the oldest route
-(by `metadata.creationTimestamp`, then alphabetically by `namespace/name`)
-receives traffic.
+because a UDP listener has no hostname, [Server Name Indication (SNI)][sni], or
+path to distinguish between datagrams, attaching multiple UDPRoutes to the same
+listener results in only one route effectively receiving traffic. All attached
+routes are `Accepted`, but following the general Gateway API route precedence
+rules, only the oldest route (by `metadata.creationTimestamp`, then
+alphabetically by `namespace/name`) receives traffic.
 
 [udproute]: /reference/api-spec/main/spec/#udproute
 [udprouterule]: /reference/api-spec/main/spec/#udprouterule
 [tcproute]: /reference/api-types/tcproute/
+[httproute]: /reference/api-types/httproute/
+[grpcroute]: /reference/api-types/grpcroute/
 [backendRef]: /reference/api-spec/main/spec/#backendref
 [parentRef]: /reference/api-spec/main/spec/#parentreference
+[sni]: https://datatracker.ietf.org/doc/html/rfc6066#section-3

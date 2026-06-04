@@ -21,9 +21,10 @@ and a rule consists only of the backends to forward traffic to.
 
 ## Background
 
-While many routing cases can be handled at L7 with HTTPRoute or GRPCRoute, and
-TLS traffic can be routed by SNI with TLSRoute, a large class of workloads speak
-plain TCP that fits none of those models. Common examples include:
+While many routing cases can be handled at L7 with [HTTPRoute][httproute] or
+[GRPCRoute][grpcroute], and TLS traffic can be routed by [Server Name Indication
+(SNI)][sni] with [TLSRoute][tlsroute], a large class of workloads speak plain
+TCP that fits none of those models. Common examples include:
 
 - Databases (e.g. PostgreSQL, MySQL, Redis).
 - Message brokers (e.g. Kafka, RabbitMQ, NATS).
@@ -66,6 +67,10 @@ spec:
 
 Note that the target Gateway needs to allow TCPRoutes from the route's
 namespace to be attached for the attachment to be successful.
+
+Because the example above specifies neither a `sectionName` nor a `port`, the
+TCPRoute attaches to every TCP listener on the `acme-lb` Gateway. Listeners
+using other protocols are not affected.
 
 You can also attach routes to specific sections of the parent resource.
 For example, let's say that the `acme-lb` Gateway includes the following
@@ -194,5 +199,9 @@ receives traffic.
 [tcproute]: /reference/api-spec/main/spec/#tcproute
 [tcprouterule]: /reference/api-spec/main/spec/#tcprouterule
 [udproute]: /reference/api-types/udproute/
+[httproute]: /reference/api-types/httproute/
+[grpcroute]: /reference/api-types/grpcroute/
+[tlsroute]: /reference/api-types/tlsroute/
 [backendRef]: /reference/api-spec/main/spec/#backendref
 [parentRef]: /reference/api-spec/main/spec/#parentreference
+[sni]: https://datatracker.ietf.org/doc/html/rfc6066#section-3
