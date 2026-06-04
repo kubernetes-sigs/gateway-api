@@ -32,6 +32,7 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apimachinery/pkg/util/yaml"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
@@ -214,6 +215,27 @@ func (a Applier) prepareResources(t *testing.T, decoder *yaml.YAMLOrJSONDecoder)
 	return resources, nil
 }
 
+// deleteAndWait deletes obj and blocks until it is fully gone, bounded by
+// timeoutConfig.DeleteTimeout. Needed because a Namespace Delete only starts an
+// async finalizer drain, which would otherwise break a go test -count>1 re-run.
+func deleteAndWait(t *testing.T, c client.Client, obj client.Object, timeoutConfig config.TimeoutConfig) {
+	t.Helper()
+
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutConfig.DeleteTimeout)
+	defer cancel()
+	tlog.Logf(t, "Deleting %s %s", obj.GetName(), obj.GetObjectKind().GroupVersionKind().Kind)
+	if err := c.Delete(ctx, obj); err != nil && !apierrors.IsNotFound(err) {
+		require.NoErrorf(t, err, "error deleting resource")
+	}
+
+	key := client.ObjectKeyFromObject(obj)
+	err := wait.PollUntilContextCancel(ctx, timeoutConfig.DefaultPollInterval, true, func(ctx context.Context) (bool, error) {
+		probe := obj.DeepCopyObject().(client.Object)
+		return apierrors.IsNotFound(c.Get(ctx, key, probe)), nil
+	})
+	require.NoErrorf(t, err, "resource %s/%s still present after delete", key.Namespace, key.Name)
+}
+
 func (a Applier) MustApplyObjectsWithCleanup(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, resources []client.Object, cleanup bool) {
 	for _, resource := range resources {
 		ctx, cancel := context.WithTimeout(context.Background(), timeoutConfig.CreateTimeout)
@@ -230,11 +252,7 @@ func (a Applier) MustApplyObjectsWithCleanup(t *testing.T, c client.Client, time
 
 		if cleanup {
 			t.Cleanup(func() {
-				ctx, cancel = context.WithTimeout(context.Background(), timeoutConfig.DeleteTimeout)
-				defer cancel()
-				tlog.Logf(t, "Deleting %s %s", resource.GetName(), resource.GetObjectKind().GroupVersionKind().Kind)
-				err = c.Delete(ctx, resource)
-				require.NoErrorf(t, err, "error deleting resource")
+				deleteAndWait(t, c, resource, timeoutConfig)
 			})
 		}
 	}
@@ -274,13 +292,7 @@ func (a Applier) MustApplyWithCleanup(t *testing.T, c client.Client, timeoutConf
 
 			if cleanup {
 				t.Cleanup(func() {
-					ctx, cancel = context.WithTimeout(context.Background(), timeoutConfig.DeleteTimeout)
-					defer cancel()
-					tlog.Logf(t, "Deleting %s %s", uObj.GetName(), uObj.GetKind())
-					err = c.Delete(ctx, uObj)
-					if !apierrors.IsNotFound(err) {
-						require.NoErrorf(t, err, "error deleting resource")
-					}
+					deleteAndWait(t, c, uObj, timeoutConfig)
 				})
 			}
 			continue
@@ -292,13 +304,7 @@ func (a Applier) MustApplyWithCleanup(t *testing.T, c client.Client, timeoutConf
 
 		if cleanup {
 			t.Cleanup(func() {
-				ctx, cancel = context.WithTimeout(context.Background(), timeoutConfig.DeleteTimeout)
-				defer cancel()
-				tlog.Logf(t, "Deleting %s %s", uObj.GetName(), uObj.GetKind())
-				err = c.Delete(ctx, uObj)
-				if !apierrors.IsNotFound(err) {
-					require.NoErrorf(t, err, "error deleting resource")
-				}
+				deleteAndWait(t, c, uObj, timeoutConfig)
 			})
 		}
 		require.NoErrorf(t, err, "error updating resource")
