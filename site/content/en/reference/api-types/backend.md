@@ -10,7 +10,7 @@ For more information on release channels, refer to our
 {{< /details >}}
 
 [Backend][backend] is a Gateway API type used to define a backend destination
-and backend-specific connection behavior for Gateway clients.
+and backend-specific connection behavior for Gateways when they act as a client.
 
 ## Background
 
