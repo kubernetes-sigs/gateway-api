@@ -124,7 +124,7 @@ When Listeners are not distinct, there are Listener precedence rules that are us
 * The ListenerSet with the earliest creation time takes priority.
 * The first ListenerSet alphabetically takes priority.
  
-The winning ListenerSet is marked as `Accepted: true`, and the losing ListenerSet(s) are marked with `Accepted: false`, and `Conflidted: true`.
+The winning ListenerSet is marked as `Accepted: true`, and the losing ListenerSet(s) are marked with `Accepted: false`, and `Conflicted: true`.
 
 As with all the other conflict resolution rules in Gateway API, this is intended to provide traffic stability - so adding a new, conflicting ListenerSet will never take over an existing config.
 
