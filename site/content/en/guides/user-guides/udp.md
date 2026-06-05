@@ -18,7 +18,7 @@ In this example two `UDP` listeners will be applied to the [Gateway][gateway]
 in order to route them to two separate backend `UDPRoutes`, note that the
 `protocol` set for the `listeners` on the `Gateway` is `UDP`:
 
-{{< readfile file="/examples/experimental/basic-udp.yaml" code="true" lang="yaml" >}}
+{{< readfile file="/examples/standard/basic-udp.yaml" code="true" lang="yaml" >}}
 
 In the above example we separate the traffic for the two separate backend UDP
 [Services][svc] by using the `sectionName` field in the `parentRefs`:
