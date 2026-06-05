@@ -1,0 +1,17 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: GRPCRoute
+metadata:
+  name: grpcroute-session-persistence-cookie-permanent-lifetime
+  namespace: gateway-conformance-infra
+spec:
+  parentRefs:
+  - name: same-namespace
+  rules:
+  - sessionPersistence:
+      type: Cookie
+      absoluteTimeout: 1h
+      cookieConfig:
+        lifetimeType: Permanent
+    backendRefs:
+    - name: grpc-infra-backend-v1
+      port: 8080

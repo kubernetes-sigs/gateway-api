@@ -1,0 +1,21 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: session-persistence-cookie-permanent-lifetime
+  namespace: gateway-conformance-infra
+spec:
+  parentRefs:
+  - name: same-namespace
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /session-persistence-permanent-lifetime
+    sessionPersistence:
+      type: Cookie
+      absoluteTimeout: 1h
+      cookieConfig:
+        lifetimeType: Permanent
+    backendRefs:
+    - name: infra-backend-v1
+      port: 8080

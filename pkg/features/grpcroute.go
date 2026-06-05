@@ -59,4 +59,6 @@ var GRPCRouteNamedRouteRule = Feature{
 // This does not include any Core Features.
 var GRPCRouteExtendedFeatures = sets.New(
 	GRPCRouteNamedRouteRule,
+	CookieSessionPersistenceFeature,
+	CookieSessionPersistencePermanentLifetimeFeature,
 )
