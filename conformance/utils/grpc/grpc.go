@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"sort"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -53,6 +54,10 @@ type Client interface {
 // DefaultClient is the default implementation of Client. It will
 // be used if a custom implementation is not specified.
 type DefaultClient struct {
+	// mu guards Conn so SendRPC is safe for concurrent use and the client is
+	// reusable after Close (Close drops Conn so the next SendRPC redials,
+	// instead of short-circuiting onto an already-closed connection).
+	mu   sync.Mutex
 	Conn *grpc.ClientConn
 }
 
@@ -151,25 +156,32 @@ func (er *ExpectedResponse) GetTestCaseName(i int) string {
 	return fmt.Sprintf("%s should receive a %s (%d)", reqStr, er.Response.Code.String(), er.Response.Code)
 }
 
-func (c *DefaultClient) ensureConnection(address string, req *RequestMetadata) error {
+func (c *DefaultClient) ensureConnection(address string, req *RequestMetadata) (*grpc.ClientConn, error) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
 	if c.Conn != nil {
-		return nil
+		return c.Conn, nil
 	}
-	var err error
 	dialOpts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
 	if req != nil && req.Authority != "" {
 		dialOpts = append(dialOpts, grpc.WithAuthority(req.Authority))
 	}
 
-	c.Conn, err = grpc.NewClient(address, dialOpts...)
+	conn, err := grpc.NewClient(address, dialOpts...)
 	if err != nil {
-		c.Conn = nil
-		return err
+		return nil, err
 	}
-	return nil
+	c.Conn = conn
+	return c.Conn, nil
 }
 
+// resetConnection closes and clears the shared connection so the next SendRPC
+// redials. SendRPC holds no lock during the RPC, so a reset triggered by one
+// caller (on a codes.Internal response) closes the connection other goroutines
+// may still be using; their in-flight RPCs surface the cancellation as an error.
 func (c *DefaultClient) resetConnection() {
+	c.mu.Lock()
+	defer c.mu.Unlock()
 	if c.Conn == nil {
 		return
 	}
@@ -182,7 +194,8 @@ func (c *DefaultClient) resetConnection() {
 // is received.
 func (c *DefaultClient) SendRPC(t *testing.T, address string, expected ExpectedResponse, timeout time.Duration) (*Response, error) {
 	t.Helper()
-	if err := c.ensureConnection(address, expected.RequestMetadata); err != nil {
+	conn, err := c.ensureConnection(address, expected.RequestMetadata)
+	if err != nil {
 		return &Response{}, err
 	}
 
@@ -198,8 +211,7 @@ func (c *DefaultClient) SendRPC(t *testing.T, address string, expected ExpectedR
 
 	defer cancel()
 
-	stub := pb.NewGrpcEchoClient(c.Conn)
-	var err error
+	stub := pb.NewGrpcEchoClient(conn)
 	tlog.Logf(t, "Sending RPC")
 
 	switch {
@@ -229,8 +241,11 @@ func (c *DefaultClient) SendRPC(t *testing.T, address string, expected ExpectedR
 }
 
 func (c *DefaultClient) Close() {
+	c.mu.Lock()
+	defer c.mu.Unlock()
 	if c.Conn != nil {
 		c.Conn.Close()
+		c.Conn = nil
 	}
 }
 
