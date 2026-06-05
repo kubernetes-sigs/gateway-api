@@ -294,6 +294,10 @@ func NamespacesMustBeReady(t *testing.T, c client.Client, timeoutConfig config.T
 				tlog.Errorf(t, "Error listing Pods: %v", err)
 				return false, nil
 			}
+			if len(podList.Items) == 0 {
+				tlog.Logf(t, "No pods deployed yet")
+				return false, nil
+			}
 			for _, pod := range podList.Items {
 				if !findPodConditionInList(t, pod.Status.Conditions, "Ready", "True") &&
 					pod.Status.Phase != v1.PodSucceeded &&
@@ -441,6 +445,10 @@ func MeshNamespacesMustBeReady(t *testing.T, c client.Client, timeoutConfig conf
 			err := c.List(ctx, podList, client.InNamespace(ns))
 			if err != nil {
 				tlog.Errorf(t, "Error listing Pods: %v", err)
+			}
+			if len(podList.Items) == 0 {
+				tlog.Logf(t, "No pods deployed yet")
+				return false, nil
 			}
 			for _, pod := range podList.Items {
 				if !findPodConditionInList(t, pod.Status.Conditions, "Ready", "True") &&
