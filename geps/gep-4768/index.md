@@ -90,7 +90,12 @@ spec:
   tracing:
     mode: "On"
     provider:
-      endpoint: "otel-collector.monitoring.svc:4317"
+      backendRef:
+        group: ""
+        kind: Service
+        name: otel-collector
+        namepsace: monitoring
+        port: 4317
     samplingRate: 
       numerator: 5 # Represents 5/100 (5%) because denominator defaults to 100
     parentBasedSampling:
@@ -145,13 +150,14 @@ spec:
 
 The following are the Go structs modeling the proposed specification.
 
+```Go
 // TelemetryPolicy defines a direct policy attachment to configure 
 // observability signals for Gateways.
 type TelemetryPolicy struct {
   metav1.TypeMeta   `json:",inline"`
   metav1.ObjectMeta `json:"metadata,omitempty"`
 
-  // Spec defines the desired state of TLSRoute.
+  // Spec defines the desired state of TelemetryPolicy.
   // +required
   Spec TelemetryPolicySpec `json:"spec"`
 
@@ -162,6 +168,10 @@ type TelemetryPolicy struct {
 
 type TelemetryPolicySpec struct {
   // Identifies the target gateways to which this policy attaches (GEP-713).
+  // At least one target reference is required.
+  //
+  // +required
+  // +kubebuilder:validation:MinItems=1
   TargetRefs []NamespacedPolicyTargetReference `json:"targetRefs"`
 
   // Configuration for distributed tracing options.
@@ -206,7 +216,11 @@ type TracingConfig struct {
 }
 
 type TracingProvider struct {
-  Endpoint string `json:"endpoint,omitempty"`
+  // BackendRef is a reference to a Kubernetes Service or other supported 
+  // backend that receives OTLP traces.
+  //
+  // +required
+  BackendRef BackendObjectReference `json:"backendRef"`
 }
 
 type Fraction struct {
@@ -274,7 +288,7 @@ type MetricsConfig struct {
 }
 
 type MetricOverride struct {
-  // The metric name to override (e.g., "http_requests_total" or "gateway.networking.k8s.io/http/request_count").
+  // The metric name to override (e.g., "http_requests_total" or "example.com/http/request_count").
   Name string `json:"name"`
 
   // Type of the metric (e.g., "Counter", "Histogram").
@@ -329,9 +343,6 @@ type AccessLogsConfig struct {
 
   // CEL expression for advanced filtering (e.g., matching response codes, headers).
   Matches string `json:"matches,omitempty"`
-
-  // A list of specific fields or headers to include in the logs.
-  Fields []string `json:"fields,omitempty"`
 
   // A list of specific fields to include in the logs, specifying their source.
   Fields []LogField `json:"fields,omitempty"`
