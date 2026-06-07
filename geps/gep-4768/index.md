@@ -145,13 +145,14 @@ spec:
 
 The following are the Go structs modeling the proposed specification.
 
-```Go
 // TelemetryPolicy defines a direct policy attachment to configure 
 // observability signals for Gateways.
 type TelemetryPolicy struct {
   metav1.TypeMeta   `json:",inline"`
   metav1.ObjectMeta `json:"metadata,omitempty"`
 
+  // Spec defines the desired state of TLSRoute.
+  // +required
   Spec TelemetryPolicySpec `json:"spec"`
 
   // status defines the observed state of TelemetryPolicy.
