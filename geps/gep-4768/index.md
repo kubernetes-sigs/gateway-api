@@ -102,13 +102,13 @@ spec:
       mode: "On"
       samplingRate:
         numerator: 50 # Represents 50/100 (50%)
-    customAttributes:
+    attributes:
       - name: "env"
         type: Literal
         literalValue: "production"
-      - name: "mcp_task_name"
-        type: Metadata
-        metadataKey: "my.custom.filter.mcp_task_name"
+      - name: "mcp_tool_name"
+        type: Reference
+        metadataKey: "gen_ai.tool.name"
 
   # 2. Metrics Configuration
   metrics:
@@ -120,9 +120,9 @@ spec:
           - name: "x-model-id"
             type: Header
             headerName: "X-Model-Id"
-          - name: "mcp_task_name"
-            type: Metadata
-            metadataKey: "my.custom.filter.mcp_task_name"
+          - name: "mcp_tool_name"
+            type: Reference
+            metadataKey: "gen_ai.tool.name"
           - name: "environment"
             type: Literal
             literalValue: "production"
@@ -131,19 +131,19 @@ spec:
   accessLogs:
     mode: "Off" # Explicitly disabled while keeping the configuration intact
     matches: "response.code >= 500" # Conditional logging, CEL filtering for errors
-    fields: # Configure specific fields to include, indicating their source
+    attributes: # Configure specific fields to include, indicating their source
       - name: "start_time"
-        type: Standard
-        standardValue: "RequestStartTime"
+        type: Reference
+        attributeRef: "timestamp"
       - name: "response_code"
-        type: Standard
-        standardValue: "ResponseCode"
+        type: Reference
+        attributeRef: "http.response.status_code"
       - name: "x-token-usage"
         type: Header
         headerName: "X-Token-Usage"
-      - name: "mcp_task_name"
-        type: Metadata
-        metadataKey: "my.custom.filter.mcp_task_name"
+      - name: "mcp_method"
+        type: Reference
+        attributeRef: "mcp.method.name"
 ```
 
 #### Detailed Resource Description
@@ -194,6 +194,60 @@ const (
   TelemetryModeOff TelemetryMode = "Off"
 )
 
+// AttributeSourceType defines the source from which a telemetry attribute
+// value is retrieved.
+type AttributeSourceType string
+const (
+  // AttributeSourceHeader indicates that the attribute value should be 
+  // extracted from a specific HTTP header in the request or response.
+  AttributeSourceHeader = "Header"
+
+  // AttributeSourceLiteral indicates that the attribute value is a static 
+  // string provided directly in the policy configuration.
+  AttributeSourceLiteral = "Literal"
+
+  // AttributeSourceReference indicates that the attribute value refers to 
+  // a standardized property or signal already known to the proxy, 
+  // typically mapped to OpenTelemetry Semantic Conventions.
+  AttributeSourceReference = "Reference"
+)
+
+// Attribute defines a single key-value pair to be attached to telemetry 
+// signals (spans, metrics, or logs).
+type Attribute struct {
+  // Name is the key of the attribute as it will appear in the output.
+  // (e.g., as a span tag, metric label, or log field).
+  //
+  // +required
+  Name string `json:"name"`
+
+  // Type specifies where the attribute value comes from.
+  // Valid values are "Header", "Literal", or "Reference".
+  //
+  // +required
+  // +kubebuilder:validation:Enum=Header;Literal;Reference
+  Type AttributeSourceType `json:"type"`
+
+  // HeaderName specifies the HTTP header to extract the value from.
+  // This is required if Type is "Header".
+  //
+  // +optional
+  HeaderName *string `json:"headerName,omitempty"`
+
+  // LiteralValue specifies a static string value to attach.
+  // This is required if Type is "Literal".
+  //
+  // +optional
+  LiteralValue *string `json:"literalValue,omitempty"`
+
+  // AttributeRef refers to a standard OpenTelemetry attribute.
+  // For example: "http.response.status_code" or "http.request.method".
+  // This is required if Type is "Reference".
+  //
+  // +optional
+  AttributeRef *string `json:"attributeRef,omitempty"`
+}
+
 // --- Tracing Types ---
 
 type TracingConfig struct {
@@ -202,7 +256,7 @@ type TracingConfig struct {
   // +kubebuilder:default=On
   Mode TelemetryMode `json:"mode,omitempty"`
 
-  // Specifies the tracing backend. Includes type (e.g., "OTLP") and endpoint.
+  // Specifies the tracing backend.
   Provider *TracingProvider `json:"provider,omitempty"`
 
   // The base sampling probability for traces.
@@ -211,8 +265,8 @@ type TracingConfig struct {
   // Configures whether to respect the sampling decision of the parent span.
   ParentBasedSampling *ParentBasedSampling `json:"parentBasedSampling,omitempty"`
 
-  // Allows appending custom tags/attributes to spans.
-  CustomAttributes []CustomAttribute `json:"customAttributes,omitempty"`
+  // Allows appending tags/attributes to spans.
+  Attributes []Attribute `json:"attributes,omitempty"`
 }
 
 type TracingProvider struct {
@@ -241,40 +295,6 @@ type ParentBasedSampling struct {
   SamplingRate *Fraction `json:"samplingRate,omitempty"`
 }
 
-// CustomAttributeType defines the source of a trace attribute's value.
-type CustomAttributeType string
-
-const (
-  // CustomAttributeTypeHeader extracts the value from an HTTP header.
-  CustomAttributeTypeHeader CustomAttributeType = "Header"
-  // CustomAttributeTypeMetadata extracts the value from proxy metadata or context.
-  CustomAttributeTypeMetadata CustomAttributeType = "Metadata"
-  // CustomAttributeTypeLiteral provides a static, user-defined string value.
-  CustomAttributeTypeLiteral CustomAttributeType = "Literal"
-)
-
-type CustomAttribute struct {
-  // Name is the key of the attribute as it will appear in the trace span.
-  Name string `json:"name"`
-
-  // Type specifies where the attribute value comes from.
-  // Valid values are "Header", "Metadata", or "Literal".
-  // +kubebuilder:validation:Enum=Header;Metadata;Literal
-  Type CustomAttributeType `json:"type"`
-
-  // HeaderName specifies the HTTP header to extract the value from.
-  // This is required if Type is "Header".
-  HeaderName *string `json:"headerName,omitempty"`
-
-  // MetadataKey specifies the proxy/context metadata key to extract the value from.
-  // This is required if Type is "Metadata".
-  MetadataKey *string `json:"metadataKey,omitempty"`
-
-  // LiteralValue specifies a static string value to attach.
-  // This is required if Type is "Literal".
-  LiteralValue *string `json:"literalValue,omitempty"`
-}
-
 // --- Metrics Types ---
 
 type MetricsConfig struct {
@@ -294,43 +314,9 @@ type MetricOverride struct {
   // Type of the metric (e.g., "Counter", "Histogram").
   Type string `json:"type,omitempty"`
 
-  // Defines custom attributes to attach to the metric. 
+  // Defines attributes to attach to the metric. 
   // These are appended to the standard labels emitted by the proxy.
-  Attributes []MetricAttribute `json:"attributes,omitempty"`
-}
-
-// MetricAttributeType defines the source of a metric attribute's value.
-type MetricAttributeType string
-
-const (
-  // MetricAttributeTypeHeader extracts the value from an HTTP header.
-  MetricAttributeTypeHeader MetricAttributeType = "Header"
-  // MetricAttributeTypeMetadata extracts the value from proxy metadata or context.
-  MetricAttributeTypeMetadata MetricAttributeType = "Metadata"
-  // MetricAttributeTypeLiteral provides a static, user-defined string value.
-  MetricAttributeTypeLiteral MetricAttributeType = "Literal"
-)
-
-type MetricAttribute struct { 
-  // Name is the key of the attribute as it will appear in the metric. 
-  Name string `json:"name"` 
-  
-  // Type specifies where the attribute value comes from.
-  // Valid values are "Header", "Metadata", or "Literal".
-  // +kubebuilder:validation:Enum=Header;Metadata;Literal
-  Type MetricAttributeType `json:"type"`
-
-  // HeaderName specifies the HTTP header to extract the value from.
-  // This is required if Type is "Header".
-  HeaderName *string `json:"headerName,omitempty"`
-
-  // MetadataKey specifies the proxy/context metadata key to extract the value from.
-  // This is required if Type is "Metadata".
-  MetadataKey *string `json:"metadataKey,omitempty"`
-
-  // LiteralValue specifies a static string value to attach.
-  // This is required if Type is "Literal".
-  LiteralValue *string `json:"literalValue,omitempty"`
+  Attributes []Attribute `json:"attributes,omitempty"`
 }
 
 // --- Access Logs Types ---
@@ -344,48 +330,8 @@ type AccessLogsConfig struct {
   // CEL expression for advanced filtering (e.g., matching response codes, headers).
   Matches string `json:"matches,omitempty"`
 
-  // A list of specific fields to include in the logs, specifying their source.
-  Fields []LogField `json:"fields,omitempty"`
-}
-
-// LogFieldType defines the source of a log field's value.
-type LogFieldType string
-
-const (
-  // LogFieldTypeHeader extracts the value from an HTTP header.
-  LogFieldTypeHeader LogFieldType = "Header"
-  // LogFieldTypeMetadata extracts the value from proxy metadata or context.
-  LogFieldTypeMetadata LogFieldType = "Metadata"
-  // LogFieldTypeLiteral provides a static, user-defined string value.
-  LogFieldTypeLiteral LogFieldType = "Literal"
-  // LogFieldTypeStandard extracts a standard proxy log value (e.g., duration, start time).
-  LogFieldTypeStandard LogFieldType = "Standard"
-)
-
-type LogField struct {
-  // Name is the key/name of the field as it will appear in the access log output.
-  Name string `json:"name"`
-
-  // Type specifies where the field value comes from.
-  // Valid values are "Header", "Metadata", "Literal", or "Standard".
-  // +kubebuilder:validation:Enum=Header;Metadata;Literal;Standard
-  Type LogFieldType `json:"type"`
-
-  // HeaderName specifies the HTTP header to extract the value from.
-  // This is required if Type is "Header".
-  HeaderName *string `json:"headerName,omitempty"`
-
-  // MetadataKey specifies the proxy/context metadata key to extract the value from.
-  // This is required if Type is "Metadata".
-  MetadataKey *string `json:"metadataKey,omitempty"`
-
-  // LiteralValue specifies a static string value to attach.
-  // This is required if Type is "Literal".
-  LiteralValue *string `json:"literalValue,omitempty"`
-
-  // StandardValue specifies a standard log property (e.g., "RequestStartTime", "Duration").
-  // This is required if Type is "Standard".
-  StandardValue *string `json:"standardValue,omitempty"`
+  // A list of specific attributes to include in the logs.
+  Attributes []Attribute `json:"attributes,omitempty"`
 }
 
 // --- Policy Status ---
