@@ -151,36 +151,102 @@ spec:
 The following are the Go structs modeling the proposed specification.
 
 ```go
-// TelemetryPolicy defines a direct policy attachment to configure 
-// observability signals for Gateways.
+// TelemetryPolicy defines a Direct Attached Policy to configure 
+// telemetry/observability signals for Gateways.
+//
+// By applying a TelemetryPolicy, platform operators and developers can ensure
+// consistent collection, formatting, and export of observability signals.
+//
+// <gateway:util:excludeFromCRD>
+// Notes for implementors:
+//
+// TelemetryPolicy is a Direct Attached Policy. Implementing controllers MUST
+// adhere to the Policy Attachment guidelines (GEP-713).
+//
+// Precedence and Conflict Resolution:
+// * To prevent complex merging semantics, only a single TelemetryPolicy is
+//   permitted to target a specific Gateway resource at any given time.
+// * If multiple TelemetryPolicy resources target the same Gateway, precedence
+//   MUST be determined using the following criteria, continuing on ties:
+//   1. The older policy by creation timestamp takes precedence.
+//   2. The policy appearing first in alphabetical order by {namespace}/{name}.
+// * For any TelemetryPolicy that does not take precedence, the controller
+//   MUST set the `Accepted` condition on the policy status to `status: False` with
+//   Reason `Conflicted`.
+//
+// Conformance:
+// Implementations MUST support the core resource structure and `targetRefs`.
+// Support for tracing, metrics, and accessLogs blocks is Extended, but if supported,
+// their respective conformance profiles must be met.
+// </gateway:util:excludeFromCRD>
+//
+// Support: Core (Resource shell and targetRefs), Extended (Signals)
 type TelemetryPolicy struct {
   metav1.TypeMeta   `json:",inline"`
   metav1.ObjectMeta `json:"metadata,omitempty"`
 
   // Spec defines the desired state of TelemetryPolicy.
+  //
   // +required
   Spec TelemetryPolicySpec `json:"spec"`
 
-  // status defines the observed state of TelemetryPolicy.
+  // Status defines the observed state of TelemetryPolicy.
+  //
   // +optional
   Status TelemetryPolicyStatus `json:"status,omitempty"`
 }
 
+// TelemetryPolicySpec defines the desired state and target of TelemetryPolicy.
+//
+// Specifying at least one target resource in `targetRefs` is required.
+// Signals (tracing, metrics, and accessLogs) can be individually configured.
+//
+// Support: Core
 type TelemetryPolicySpec struct {
-  // Identifies the target gateways to which this policy attaches (GEP-713).
-  // At least one target reference is required.
+  // TargetRefs identifies the gateways to which this policy applies (GEP-713).
+  //
+  // When configured, the telemetry settings defined in this policy are applied
+  // uniformly to the referenced resources. In the absence of targetRefs, the policy is
+  // invalid and will not be accepted.
+  //
+  // TargetRefs must be distinct.
+  //
+  // Support: Core
   //
   // +required
   // +kubebuilder:validation:MinItems=1
   TargetRefs []NamespacedPolicyTargetReference `json:"targetRefs"`
 
-  // Configuration for distributed tracing options.
+  // Tracing defines the configuration for distributed tracing.
+  //
+  // When configured, distributed tracing spans are generated and exported. In the
+  // absence of this configuration, tracing behavior is determined by implementation
+  // defaults (typically disabled).
+  //
+  // Support: Extended
+  //
+  // +optional
   Tracing *TracingConfig `json:"tracing,omitempty"`
 
-  // Configuration for metric generation and exports.
+  // Metrics defines the configuration for metric generation and custom attributes.
+  //
+  // When configured, custom metric attributes are applied. In the absence of this
+  // configuration, metrics are generated according to implementation-default definitions.
+  //
+  // Support: Extended
+  //
+  // +optional
   Metrics *MetricsConfig `json:"metrics,omitempty"`
 
-  // Configuration for access log generation.
+  // AccessLogs defines the configuration for access log generation and filters.
+  //
+  // When configured, access log generation, filtering, and attribute customisation are
+  // applied. In the absence of this configuration, access logging is determined by
+  // implementation defaults.
+  //
+  // Support: Extended
+  //
+  // +optional
   AccessLogs *AccessLogsConfig `json:"accessLogs,omitempty"`
 }
 
@@ -250,8 +316,21 @@ type Attribute struct {
 
 // --- Tracing Types ---
 
+// TracingConfig defines the configuration for distributed tracing.
+//
+// Distributed tracing tracks the lifecycle of an individual request as it propagates through
+// the Gateway and downstream services. Each service records a segment of the request's path
+// as a "span". This configuration allows platform operators to enable tracing, select the
+// destination backend, control the portion of traffic sampled, and inject custom values as
+// span attributes.
+//
+// Users get granular visibility into request latency, system bottlenecks, and execution flows
+// across complex distributed systems.
+//
+// Support: Extended
 type TracingConfig struct {
   // Mode explicitly controls if tracing is enabled. Valid values are "On" or "Off".
+  //
   // +kubebuilder:validation:Enum=On;Off
   // +kubebuilder:default=On
   Mode TelemetryMode `json:"mode,omitempty"`
