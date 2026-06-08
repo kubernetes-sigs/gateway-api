@@ -348,44 +348,110 @@ type TracingConfig struct {
   Attributes []Attribute `json:"attributes,omitempty"`
 }
 
+// TracingProvider identifies the tracing backend that receives generated spans.
+//
+// Support: Core (within Tracing feature)
 type TracingProvider struct {
   // BackendRef is a reference to a Kubernetes Service or other supported 
   // backend that receives OTLP traces.
+  //
+  // When configured, tracing data is exported to the referenced backend. If the reference
+  // is invalid (e.g., the Service does not exist), the implementation should update the
+  // policy's status conditions to indicate an unresolved reference.
+  //
+  // Support: Core
   //
   // +required
   BackendRef BackendObjectReference `json:"backendRef"`
 }
 
+// Fraction represents a ratio used for probabilistic sampling rates.
+//
+// The probability is calculated as numerator / denominator (e.g. 5 / 100 = 5%).
+//
+// Support: Core (within Tracing feature)
 type Fraction struct {
+  // Numerator specifies the top of the fraction.
+  //
+  // +required
   Numerator int32 `json:"numerator"`
-  
+
+  // Denominator specifies the bottom of the fraction.
+  //
+  // Defaults to 100 if unspecified.
+  //
   // +kubebuilder:default=100
   // +kubebuilder:validation:Minimum=1
+  // +optional
   Denominator int32 `json:"denominator,omitempty"` // Allows e.g., 1 / 10000 for 0.01%
 }
 
+// ParentBasedSampling defines the sampling behavior when a request has a pre-existing upstream
+// trace parent.
+//
+// Support: Extended
 type ParentBasedSampling struct {
   // Mode explicitly controls if parent-based sampling is enabled. Valid values are "On" or "Off".
+  //
+  // Defaults to "On" if parent-based sampling is configured.
+  //
+  // Support: Extended
+  //
   // +kubebuilder:validation:Enum=On;Off
   // +kubebuilder:default=On
   Mode TelemetryMode `json:"mode,omitempty"`
   
-  // The sampling rate to apply when the parent span decision is used.
+  // SamplingRate is the sampling rate to apply when parent-based sampling is active.
+  //
+  // This acts as a downsampling governor. It allows an operator to say: "I want to
+  // respect the parent's decision, but only for 50% of those requests". Even if a
+  // parent is already marked as "Sampled", this allows the Gateway to apply a secondary
+  // filter so that it can respect the parent's intent while still controlling the volume
+  // of spans reported.
+  //
+  // Support: Extended
+  //
+  // +optional
   SamplingRate *Fraction `json:"samplingRate,omitempty"`
 }
 
 // --- Metrics Types ---
 
+// MetricsConfig defines configuration options for proxy metric generation.
+//
+// Metrics provide numeric measurements (counters, gauges, histograms) representing traffic
+// volume, error rates, latency, proxy performance, etc. Gateway users get high-level
+// observability into the behavior of their API traffic.
+//
+// Support: Extended
 type MetricsConfig struct {
   // Mode explicitly controls if metric generation is enabled. Valid values are "On" or "Off".
+  //
+  // Defaults to "On" if the metrics block is configured.
+  //
+  // Support: Core (within Metrics feature)
+  //
   // +kubebuilder:validation:Enum=On;Off
   // +kubebuilder:default=On
   Mode TelemetryMode `json:"mode,omitempty"`
 
-  // List of configurations to customize specific metric families.
+  // Overrides defines a list of customizations to specific metric families.
+  //
+  // When configured, these overrides alter standard metrics by adding custom attributes
+  // (labels) or changing metric-specific settings. In the absence of overrides, only
+  // standard out-of-the-box proxy metrics are generated.
+  //
+  // Support: Extended
+  //
+  // +optional
   Overrides []MetricOverride `json:"overrides,omitempty"`
 }
 
+// MetricOverride configures customization for a specific named metric family.
+//
+// At present it allows the inclusion of additional attributes for existing metrics.
+//
+// Support: Extended
 type MetricOverride struct {
   // The metric name to override (e.g., "http_requests_total" or "example.com/http/request_count").
   Name string `json:"name"`
