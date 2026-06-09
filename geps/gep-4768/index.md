@@ -94,7 +94,7 @@ spec:
         group: ""
         kind: Service
         name: otel-collector
-        namepsace: monitoring
+        namespace: monitoring
         port: 4317
     samplingRate: 
       numerator: 5 # Represents 5/100 (5%) because denominator defaults to 100
@@ -108,7 +108,7 @@ spec:
         literalValue: "production"
       - name: "mcp_tool_name"
         type: Reference
-        metadataKey: "gen_ai.tool.name"
+        attributeRef: "gen_ai.tool.name"
 
   # 2. Metrics Configuration
   metrics:
@@ -122,7 +122,7 @@ spec:
             headerName: "X-Model-Id"
           - name: "mcp_tool_name"
             type: Reference
-            metadataKey: "gen_ai.tool.name"
+            attributeRef: "gen_ai.tool.name"
           - name: "environment"
             type: Literal
             literalValue: "production"
@@ -131,17 +131,17 @@ spec:
   accessLogs:
     mode: "Off" # Explicitly disabled while keeping the configuration intact
     matches: "response.code >= 500" # Conditional logging, CEL filtering for errors
-    attributes: # Configure specific fields to include, indicating their source
-      - name: "start_time"
+    fields: # Configure specific fields to include, indicating their source
+      - path: ["http", "request", "start_time"] # Standard nested JSON structure
         type: Reference
         attributeRef: "timestamp"
-      - name: "response_code"
+      - path: ["http", "response", "status_code"]
         type: Reference
         attributeRef: "http.response.status_code"
-      - name: "x-token-usage"
+      - path: ["token-usage"]
         type: Header
         headerName: "X-Token-Usage"
-      - name: "mcp_method"
+      - path: ["mcp.method"] # Segment with dots (Preserved verbatim as flat key)
         type: Reference
         attributeRef: "mcp.method.name"
 ```
@@ -285,18 +285,58 @@ const (
   AttributeSourceReference = "Reference"
 )
 
-// Attribute defines a single key-value pair to attach to telemetry signals.
+// Attribute defines a single flat key-value pair to attach to metrics and traces.
 //
-// This allows users to enrich spans, metrics, and logs with context like HTTP headers
+// This allows users to enrich spans and metrics with context like HTTP headers
 // (e.g., "X-User-ID"), static tags, or built-in variables.
 //
 // Support: Core
 type Attribute struct {
   // Name is the key of the attribute as it will appear in the output.
-  // (e.g., as a span tag, metric label, or log field).
+  // (e.g., as a span tag or metric label).
   //
   // +required
   Name string `json:"name"`
+
+  // Type specifies where the attribute value comes from.
+  // Valid values are "Header", "Literal", or "Reference".
+  //
+  // +required
+  // +kubebuilder:validation:Enum=Header;Literal;Reference
+  Type AttributeSourceType `json:"type"`
+
+  // HeaderName specifies the HTTP header to extract the value from.
+  // This is required if Type is "Header".
+  //
+  // +optional
+  HeaderName *string `json:"headerName,omitempty"`
+
+  // LiteralValue specifies a static string value to attach.
+  // This is required if Type is "Literal".
+  //
+  // +optional
+  LiteralValue *string `json:"literalValue,omitempty"`
+
+  // AttributeRef refers to a standard OpenTelemetry attribute.
+  // For example: "http.response.status_code" or "http.request.method".
+  // This is required if Type is "Reference".
+  //
+  // +optional
+  AttributeRef *string `json:"attributeRef,omitempty"`
+}
+
+// LogField defines a structured, potentially nested, field to include in JSON access logs.
+//
+// Support: Core
+type LogField struct {
+  // Path defines the nested key path under which the field value will be stored in the JSON payload.
+  // Each element of the slice represents a nesting level. Any individual segment can contain dots,
+  // which are preserved verbatim at that specific level of nesting.
+  // For example, ["user.metadata", "id"] will serialize to {"user.metadata": {"id": "<value>"}}.
+  //
+  // +required
+  // +kubebuilder:validation:MinItems=1
+  Path []string `json:"path"`
 
   // Type specifies where the attribute value comes from.
   // Valid values are "Header", "Literal", or "Reference".
@@ -574,15 +614,16 @@ type AccessLogsConfig struct {
   // +optional
   Matches string `json:"matches,omitempty"`
 
-  // Attributes specifies fields and variables included in the generated access logs.
+  // Fields specifies the structured JSON fields and variables included in the generated access logs.
   //
-  // When configured, the log records will include these attributes. In the absence of
-  // attributes, the proxy uses its default structured format.
+  // When configured, the generated JSON log records will include these fields at the paths
+  // defined by each LogField. In the absence of fields, the proxy uses its default structured
+  // JSON format.
   //
   // Support: Extended
   //
   // +optional
-  Attributes []Attribute `json:"attributes,omitempty"`
+  Fields []LogField `json:"fields,omitempty"`
 }
 
 // --- Policy Status ---
