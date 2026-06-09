@@ -112,7 +112,7 @@ class.
 - [Contour][3]
 - [Envoy Gateway][18]
 - [Gravitee Kubernetes Operator][42]
-- [Kong Gateway Operator][35]
+- [Kong Operator][35]
 
 ### Stale
 
@@ -161,7 +161,7 @@ class.
 [28]:#linkerd
 [33]:#ngrok-kubernetes-operator
 [34]:#airlock-microgateway
-[35]:#kong-gateway-operator
+[35]:#kong-operator
 [37]:#kgateway
 [39]:#kubvernor
 [40]:#agentgateway
@@ -441,19 +441,19 @@ For help and support with Kong Kubernetes Ingress Controller please feel free to
 [kic-disc-new]: https://github.com/Kong/kubernetes-ingress-controller/discussions/new
 [kong-slack]: https://kubernetes.slack.com/archives/CDCA87FRD
 
-### Kong Gateway Operator
+### Kong Operator
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.2.0-Kong%20Gateway%20Operator-orange)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.2.0/kong-gateway-operator)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Partial%20Conformance%20v1.5.1-Kong%20Operator-orange)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.5.1/kong-operator)
 
 [Kong][kong] is an open source API Gateway built for hybrid and multi-cloud environments.
 
-The [Kong Gateway operator (KGO)][kgo] can be used to configure managed Gateways and orchestrate instances of [Kong Kubernetes Ingress Controllers](#kong-kubernetes-ingress-controller).
+The [Kong Operator][kong-operator-docs] can be used to configure managed Gateways and orchestrate instances of [Kong Kubernetes Ingress Controllers](#kong-kubernetes-ingress-controller).
 
-For help and support with Kong Gateway operator please feel free to [create an issue][kgo-issue-new] or a [discussion][kgo-disc-new]. You can also ask for help in the [#kong channel on Kubernetes slack][kong-slack].
+For help and support with Kong Operator please feel free to [create an issue][kong-operator-issue-new] or a [discussion][kong-operator-disc-new]. You can also ask for help in the [#kong channel on Kubernetes slack][kong-slack].
 
-[kgo]: https://docs.konghq.com/gateway-operator/latest/
-[kgo-issue-new]: https://github.com/Kong/gateway-operator/issues/new
-[kgo-disc-new]: https://github.com/Kong/gateway-operator/discussions/new
+[kong-operator-docs]: https://developer.konghq.com/operator/
+[kong-operator-issue-new]: https://github.com/Kong/kong-operator/issues/new
+[kong-operator-disc-new]: https://github.com/Kong/kong-operator/discussions/new
 
 
 ### Kubvernor
