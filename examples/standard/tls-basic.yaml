@@ -12,6 +12,7 @@ spec:
     port: 443
     hostname: foo.example.com
     tls:
+      # mode defaults to `Terminate` when omitted.
       certificateRefs:
       - kind: Secret
         group: ""
