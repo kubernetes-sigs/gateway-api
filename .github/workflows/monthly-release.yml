@@ -64,7 +64,7 @@ jobs:
           TAG: ${{ steps.tag.outputs.tag }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git -c http.https://github.com/.extraheader="AUTHORIZATION: basic $(echo -n "x-access-token:${GITHUB_TOKEN}" | base64)" fetch --tags --force
+          git fetch --tags --force
           if ! git rev-parse "${TAG}" >/dev/null 2>&1; then
             echo "::error::Tag '${TAG}' not found after fetch. Create and push it to origin first (e.g. git tag ${TAG} && git push origin ${TAG}), then run this workflow."
             exit 1
@@ -93,12 +93,12 @@ jobs:
           YEAR=$(echo "$YEAR_MONTH" | cut -d- -f1)
           MONTH_NAME=$(date -d "${YEAR_MONTH}-01" +"%B")
 
-          git -c http.https://github.com/.extraheader="AUTHORIZATION: basic $(echo -n "x-access-token:${GITHUB_TOKEN}" | base64)" fetch --tags --force
+          git fetch --tags --force
 
           PREV_TAG=$(git tag -l "monthly-*" | sort -V | grep -B1 "^${TAG}$" | head -n1)
 
           if [ -z "$PREV_TAG" ] || [ "$PREV_TAG" == "$TAG" ]; then
-            START_SHA=$(git -c http.https://github.com/.extraheader="AUTHORIZATION: basic $(echo -n "x-access-token:${GITHUB_TOKEN}" | base64)" rev-list -n 1 --before="1 month" origin/main)
+            START_SHA=$(git rev-list -n 1 --before="1 month" origin/main)
           else
             START_SHA=$(git rev-parse "$PREV_TAG")
           fi
