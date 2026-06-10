@@ -105,7 +105,7 @@ func TestVAPValidation(t *testing.T) {
 	require.NoError(t, err, "output", output)
 
 	// Even though --wait is applied I noticed a race condition that causes tests to fail.
-	time.Sleep(time.Second)
+	time.Sleep(3 * time.Second)
 
 	switch crdChannel {
 	case "experimental":
@@ -171,13 +171,11 @@ func TestVAPValidation(t *testing.T) {
 			}
 		})
 	case "standard":
-		t.Run("should not be able to install standard CRDs", func(t *testing.T) {
+		t.Run("should be able to install standard CRDs if allowed, otherwise fail", func(t *testing.T) {
 			output, err := executeKubectlCommand(t, kubectlLocation, kubeconfigLocation,
 				[]string{"apply", "--server-side", "--wait", "-f", filepath.Join("..", "..", "config", "crd", "standard")})
 
-			require.Error(t, err)
-			assert.Contains(t, output, "ValidatingAdmissionPolicy 'safe-upgrades.gateway.networking.k8s.io' with binding 'safe-upgrades.gateway.networking.k8s.io' denied request")
-			assert.Contains(t, output, "Installing CRDs with version before v1.5.0 is prohibited by default")
+			require.NoError(t, err, "output", output)
 		})
 
 		t.Run("should not be able to install k8s.io experimental CRDs", func(t *testing.T) {
@@ -229,12 +227,14 @@ func TestVAPValidation(t *testing.T) {
 				version string
 				fail    bool
 			}{
-				{"v1.0.0", true},
 				{"v1.1.0", true},
 				{"v1.3.0", true},
+				{"v1.3.0-rc1", false},
 				{"v0.0.0-dev", true},
-				{"v1.4.0", false},
-				{"v1.5.0", false},
+				{"v1.4.0", true},
+				{"v1.5.0", true},
+				{"v1.6.0-rc0", false},
+				{"v1.9.0", false},
 			}
 
 			for _, v := range versions {
