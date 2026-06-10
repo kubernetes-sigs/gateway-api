@@ -229,11 +229,11 @@ func TestVAPValidation(t *testing.T) {
 			}{
 				{"v1.1.0", true},
 				{"v1.3.0", true},
-				{"v1.3.0-rc1", false},
+				{"v1.3.0-rc.1", false},
 				{"v0.0.0-dev", true},
 				{"v1.4.0", true},
 				{"v1.5.0", true},
-				{"v1.6.0-rc0", false},
+				{"v1.6.0-rc.1", false},
 				{"v1.9.0", false},
 			}
 
