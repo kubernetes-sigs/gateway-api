@@ -15,7 +15,7 @@ This repository is the home for both of the above components.
 The versioning strategy for this project is covered in detail in [the release
 documentation].
 
-[the release documentation]: https://gateway-api.sigs.k8s.io/concepts/versioning/
+[the release documentation]: https://gateway-api.sigs.k8s.io/docs/concepts/versioning/
 
 ## Releasing a monthly version
 
@@ -81,7 +81,7 @@ Once the release branch is cut, the typical pattern is:
 
 - Work that needs to go into a release but should also be carried into
   future major releases should be PR'd into `main`, and cherry-picked
-  into the release. For example, a fix for a bug found in 1.5.0-rc.2
+  into the release. For example, a fix for a bug found in 1.5.0-rc2
   would be PR'd into `main`, but we'd also give the `/cherry-pick
   release-1.5` command to Prow for that PR.
 
@@ -98,11 +98,12 @@ release notes generator].
 ```
 go install k8s.io/release/cmd/release-notes@latest
 export GITHUB_TOKEN=your_token_here
+
 release-notes generate \
   --repo gateway-api --org kubernetes-sigs \
-  --required-author ""
   --branch release-1.X \
   --start-sha EXAMPLE_COMMIT --end-sha EXAMPLE_COMMIT \
+  --repo-path . \
   --output relnotes.md
 ```
 
@@ -122,7 +123,7 @@ The following steps must be done by a release manager, who will need elevated Gi
 
 If the release branch does not exist:
 
-- If you're doing a "first RC", which is to say a 1.x.0-rc.1 release, go ahead and cut the release branch from `main`.
+- If you're doing a "first RC", which is to say a 1.x.0-rc1 release, go ahead and cut the release branch from `main`.
 - If you're doing **any other** kind of release: **STOP. GO FIND A MAINTAINER. DO NOT TOUCH A THING.**
 
 Given that the release branch exists:
@@ -143,7 +144,7 @@ Given that the release branch exists:
 - Create a pull request of the `release-x.x.x` branch into the `release-x.x` branch upstream. Add a hold on this PR waiting for at least one maintainer/codeowner to provide a `lgtm`. Approval
 of the PR is the community consensus for a new release.
 - Verify the CI tests pass and merge the PR into `release-x.x`.
-- Tag `HEAD` of the `release-x.x` branch with the version number (including the initial `v`, so e.g. `v1.5.0-rc.1` or `v1.6.1`). This can be done using the `git` CLI or
+- Tag `HEAD` of the `release-x.x` branch with the version number (including the initial `v`, so e.g. `v1.5.0-rc1` or `v1.6.1`). This can be done using the `git` CLI or
   the GitHub UI, but **note well**: if the release manager can't create the tag due to Git permissions, a maintainer will need to do it, and in that case it's more polite for the maintainer to create and push the _tag_, then let the release manager create the _release_, so that it's easier for people to find the manager if there are problems!
 - Run the `make build-install-yaml` command which will generate install files in the `release/` directory.
   Attach these files to the GitHub release.
