@@ -55,6 +55,14 @@ var TCPRouteMultipleRoutesAttachment = confsuite.ConformanceTest{
 		newerRouteNN := types.NamespacedName{Name: "tcproute-attach-newer", Namespace: ns}
 
 		kubernetes.NamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, []string{ns})
+		staleNewerRoute := &v1alpha2.TCPRoute{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      newerRouteNN.Name,
+				Namespace: newerRouteNN.Namespace,
+			},
+		}
+		err := client.IgnoreNotFound(suite.Client.Delete(t.Context(), staleNewerRoute))
+		require.NoError(t, err, "failed to delete stale newer TCPRoute")
 
 		// Wait for the Gateway and the older TCPRoute to be ready before introducing the
 		// second route, so creation-time ordering is unambiguous.
