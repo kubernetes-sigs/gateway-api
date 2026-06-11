@@ -15,7 +15,7 @@ This repository is the home for both of the above components.
 The versioning strategy for this project is covered in detail in [the release
 documentation].
 
-[the release documentation]: https://gateway-api.sigs.k8s.io/concepts/versioning/
+[the release documentation]: https://gateway-api.sigs.k8s.io/docs/concepts/versioning/
 
 ## Releasing a monthly version
 
@@ -98,11 +98,12 @@ release notes generator].
 ```
 go install k8s.io/release/cmd/release-notes@latest
 export GITHUB_TOKEN=your_token_here
+
 release-notes generate \
   --repo gateway-api --org kubernetes-sigs \
-  --required-author ""
   --branch release-1.X \
   --start-sha EXAMPLE_COMMIT --end-sha EXAMPLE_COMMIT \
+  --repo-path . \
   --output relnotes.md
 ```
 
@@ -169,7 +170,7 @@ of the PR is the community consensus for a new release.
 - Edit the text blurb in `hack/docsy-generate-conformance.py` to reflect the added past version if necessary.
 
 #### For an **RC** release:
-- Update `pkg/consts/consts.go` with the new semver tag (like `v1.2.0-rc1`) and any updates to the API review URL.
+- Update `pkg/consts/consts.go` with the new semver tag (like `v1.2.0-rc.1`) and any updates to the API review URL.
 - Run the following command `make generate` which
   will update generated docs with the correct version info. (Note that you can't
   test with these YAMLs yet as they contain references to elements which wont
