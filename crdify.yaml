@@ -1,0 +1,9 @@
+validations:
+  # Changing a field description is fine
+  - name: description
+    enforcement: None
+  # Adding a new enum is fine. Removing or changing is not
+  - name: enum
+    enforcement: Error
+    configuration:
+      additionPolicy: Allow
