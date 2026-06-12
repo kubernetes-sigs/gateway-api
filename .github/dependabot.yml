@@ -4,9 +4,6 @@ updates:
   - package-ecosystem: "gomod"
     directories:
     - "/"
-    - "/conformance"
-    - "/tests"
-    - "/tools"
     - "/site"
     schedule:
       interval: "weekly"
