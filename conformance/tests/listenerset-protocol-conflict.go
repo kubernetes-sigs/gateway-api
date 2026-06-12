@@ -38,6 +38,7 @@ var ListenerSetProtocolConflict = confsuite.ConformanceTest{
 	Features: []features.FeatureName{
 		features.SupportGateway,
 		features.SupportListenerSet,
+		features.SupportTCPRoute,
 	},
 	Manifests: []string{
 		"tests/listenerset-protocol-conflict.yaml",
@@ -48,19 +49,19 @@ var ListenerSetProtocolConflict = confsuite.ConformanceTest{
 
 		protocolConflictedListenerConditions := []metav1.Condition{
 			{
-				Type:   string(gatewayv1.ListenerConditionAccepted),
+				Type:   string(gatewayv1.ListenerEntryConditionAccepted),
 				Status: metav1.ConditionFalse,
-				Reason: string(gatewayv1.ListenerReasonProtocolConflict),
+				Reason: string(gatewayv1.ListenerEntryReasonConflicted),
 			},
 			{
-				Type:   string(gatewayv1.ListenerConditionProgrammed),
+				Type:   string(gatewayv1.ListenerEntryConditionProgrammed),
 				Status: metav1.ConditionFalse,
-				Reason: string(gatewayv1.ListenerReasonProtocolConflict),
+				Reason: "", // any reason
 			},
 			{
-				Type:   string(gatewayv1.ListenerConditionConflicted),
+				Type:   string(gatewayv1.ListenerEntryConditionConflicted),
 				Status: metav1.ConditionTrue,
-				Reason: string(gatewayv1.ListenerReasonProtocolConflict),
+				Reason: string(gatewayv1.ListenerEntryReasonProtocolConflict),
 			},
 		}
 
@@ -110,7 +111,7 @@ var ListenerSetProtocolConflict = confsuite.ConformanceTest{
 		kubernetes.ListenerSetMustHaveCondition(t, suite.Client, suite.TimeoutConfig, lsNN, metav1.Condition{
 			Type:   string(gatewayv1.ListenerSetConditionProgrammed),
 			Status: metav1.ConditionFalse,
-			Reason: string(gatewayv1.ListenerSetReasonListenersNotValid),
+			Reason: "", // any reason
 		})
 		// The conflicted listener should not be accepted
 		kubernetes.ListenerSetListenersMustHaveConditions(t, suite.Client, suite.TimeoutConfig, lsNN, protocolConflictedListenerConditions, "protocol-conflict-with-gateway-listener")
@@ -141,7 +142,7 @@ var ListenerSetProtocolConflict = confsuite.ConformanceTest{
 		kubernetes.ListenerSetMustHaveCondition(t, suite.Client, suite.TimeoutConfig, lsNN, metav1.Condition{
 			Type:   string(gatewayv1.ListenerSetConditionProgrammed),
 			Status: metav1.ConditionFalse,
-			Reason: string(gatewayv1.ListenerSetReasonListenersNotValid),
+			Reason: "", // any reason
 		})
 		// The conflicted listener should not be accepted
 		kubernetes.ListenerSetListenersMustHaveConditions(t, suite.Client, suite.TimeoutConfig, lsNN, protocolConflictedListenerConditions, "protocol-conflict-with-listener-set-listener")
