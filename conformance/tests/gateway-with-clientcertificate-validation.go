@@ -43,6 +43,7 @@ var GatewayFrontendClientCertificateValidation = confsuite.ConformanceTest{
 		features.SupportGatewayFrontendClientCertificateValidation,
 	},
 	Manifests: []string{"tests/gateway-with-clientcertificate-validation.yaml"},
+	Parallel:  true,
 	Test: func(t *testing.T, suite *confsuite.ConformanceTestSuite) {
 		ns := confsuite.InfrastructureNamespace
 
