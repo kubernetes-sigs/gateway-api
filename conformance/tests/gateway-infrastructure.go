@@ -45,6 +45,7 @@ var GatewayInfrastructure = suite.ConformanceTest{
 	Manifests: []string{
 		"tests/gateway-infrastructure.yaml",
 	},
+	Parallel: true,
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
 

@@ -64,6 +64,7 @@ var GatewayStaticAddresses = suite.ConformanceTest{
 	Manifests: []string{
 		"tests/gateway-static-addresses.yaml",
 	},
+	Parallel: true,
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
 		gwNN := types.NamespacedName{
 			Name:      "gateway-static-addresses",

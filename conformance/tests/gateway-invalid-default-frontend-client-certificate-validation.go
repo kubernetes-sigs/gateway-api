@@ -45,6 +45,7 @@ var GatewayFrontendInvalidDefaultClientCertificateValidation = confsuite.Conform
 		features.SupportGatewayFrontendClientCertificateValidation,
 	},
 	Manifests: []string{"tests/gateway-invalid-default-frontend-client-certificate-validation.yaml"},
+	Parallel:  true,
 	Test: func(t *testing.T, suite *confsuite.ConformanceTestSuite) {
 		ns := confsuite.InfrastructureNamespace
 

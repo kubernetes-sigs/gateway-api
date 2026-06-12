@@ -40,6 +40,7 @@ var GatewaySecretReferenceGrantSpecific = suite.ConformanceTest{
 		features.SupportReferenceGrant,
 	},
 	Manifests: []string{"tests/gateway-secret-reference-grant-specific.yaml"},
+	Parallel:  true,
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
 		gwNN := types.NamespacedName{Name: "gateway-secret-reference-grant-specific", Namespace: suite.InfrastructureNamespace}
 
