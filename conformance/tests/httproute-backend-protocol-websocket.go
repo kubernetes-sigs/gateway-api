@@ -62,7 +62,7 @@ var HTTPRouteBackendProtocolWebSocket = confsuite.ConformanceTest{
 				origin := fmt.Sprintf("ws://gateway/%s", t.Name())
 				remote := fmt.Sprintf("ws://%s/ws", gwAddr)
 
-				ws, err := websocket.Dial(remote, "", origin)
+				ws, err := suite.WebSocketDialer.Dial(remote, "", origin)
 				if err != nil {
 					t.Log("failed to dial", err)
 					return false

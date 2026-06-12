@@ -45,6 +45,7 @@ import (
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/roundtripper"
 	"sigs.k8s.io/gateway-api/conformance/utils/tlog"
+	"sigs.k8s.io/gateway-api/conformance/utils/websocket"
 	"sigs.k8s.io/gateway-api/pkg/consts"
 	"sigs.k8s.io/gateway-api/pkg/features"
 )
@@ -63,6 +64,7 @@ type ConformanceTestSuite struct {
 	RestConfig               *rest.Config
 	RoundTripper             roundtripper.RoundTripper
 	GRPCClient               grpc.Client
+	WebSocketDialer          websocket.Dialer
 	GatewayClassName         string
 	MeshName                 string
 	ControllerName           string
@@ -177,14 +179,15 @@ type ConfigurableOptions struct {
 type ConformanceOptions struct {
 	ConfigurableOptions
 
-	Client        client.Client
-	ClientOptions client.Options
-	Clientset     clientset.Interface
-	RestConfig    *rest.Config
-	RoundTripper  roundtripper.RoundTripper
-	GRPCClient    grpc.Client
-	BaseManifests string
-	MeshManifests string
+	Client          client.Client
+	ClientOptions   client.Options
+	Clientset       clientset.Interface
+	RestConfig      *rest.Config
+	RoundTripper    roundtripper.RoundTripper
+	GRPCClient      grpc.Client
+	WebSocketDialer websocket.Dialer
+	BaseManifests   string
+	MeshManifests   string
 	// Hook is an optional function that can be used to run custom logic after each test at suite level.
 	Hook       func(t *testing.T, test ConformanceTest, suite *ConformanceTestSuite)
 	ManifestFS []fs.FS
@@ -271,6 +274,11 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 
 	grpcClient := options.GRPCClient
 
+	webSocketDialer := options.WebSocketDialer
+	if webSocketDialer == nil {
+		webSocketDialer = &websocket.DefaultDialer{}
+	}
+
 	installedCRDs := &apiextensionsv1.CustomResourceDefinitionList{}
 	err := options.Client.List(context.TODO(), installedCRDs)
 	if err != nil {
@@ -295,6 +303,7 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 		RestConfig:           options.RestConfig,
 		RoundTripper:         roundTripper,
 		GRPCClient:           grpcClient,
+		WebSocketDialer:      webSocketDialer,
 		GatewayClassName:     options.GatewayClassName,
 		Debug:                options.Debug,
 		Cleanup:              options.CleanupBaseResources,
