@@ -67,6 +67,13 @@ downside of more tightly coupling the relationship between the Gateway and
 its associated Routes. Refer to [Attaching to Gateways][attaching] for more
 details.
 
+{{< details title="Note" color="info" >}}
+You cannot attach a `TCPRoute` to an `HTTP` or `HTTPS` listener. A `TCPRoute`
+can only attach to listeners using the `TCP` protocol. Attempting to attach a
+`TCPRoute` to an `HTTP` or `HTTPS` listener will result in the route not being
+accepted.
+{{< /details >}}
+
 [tcproute]: /reference/api-spec/main/spec/#tcproute
 [tcp]: https://datatracker.ietf.org/doc/html/rfc793
 [httproute]: /reference/api-spec/main/spec/#httproute

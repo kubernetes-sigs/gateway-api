@@ -61,6 +61,13 @@ downside of more tightly coupling the relationship between the Gateway and
 its associated Routes. Refer to [Attaching to Gateways][attaching] for more
 details.
 
+{{< details title="Note" color="info" >}}
+You cannot attach a `UDPRoute` to an `HTTP` or `HTTPS` listener. A `UDPRoute`
+can only attach to listeners using the `UDP` protocol. Attempting to attach a
+`UDPRoute` to an `HTTP` or `HTTPS` listener will result in the route not being
+accepted.
+{{< /details >}}
+
 [udproute]: /reference/api-spec/main/spec/#udproute
 [udp]: https://datatracker.ietf.org/doc/html/rfc768
 [gateway]: /reference/api-spec/main/spec/#gateway
