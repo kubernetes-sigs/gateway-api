@@ -162,6 +162,14 @@ This example shows how to configure client certificate validation with default c
 
 ## Upstream TLS
 
+{{< details title="Standard Channel since v1.4.0" color="success" >}}
+
+The `BackendTLSPolicy` resource is GA and has been part of the Standard Channel
+since `v1.4.0`. For more information on release channels, refer to our
+[versioning guide](docs/concepts/versioning/).
+
+{{< /details >}}
+
 Upstream TLS settings are configured using the `BackendTLSPolicy` attached to a
 `Service` via a target reference.
 
