@@ -67,7 +67,8 @@ var GRPCRouteRequestHeaderModifier = suite.ConformanceTest{
 				},
 				Backend:   "grpc-infra-backend-v1",
 				Namespace: ns,
-			}, {
+			},
+			{
 				TestCaseName: "Set headers -- X-Header-Set should get overwritten with the original value",
 				EchoRequest:  &pb.EchoRequest{},
 				RequestMetadata: &grpc.RequestMetadata{
@@ -85,7 +86,8 @@ var GRPCRouteRequestHeaderModifier = suite.ConformanceTest{
 				},
 				Backend:   "grpc-infra-backend-v1",
 				Namespace: ns,
-			}, {
+			},
+			{
 				TestCaseName: "Add headers -- X-Header-Add should have the original value",
 				EchoRequest:  &pb.EchoRequest{},
 				RequestMetadata: &grpc.RequestMetadata{
@@ -121,7 +123,8 @@ var GRPCRouteRequestHeaderModifier = suite.ConformanceTest{
 				},
 				Backend:   "grpc-infra-backend-v1",
 				Namespace: ns,
-			}, {
+			},
+			{
 				TestCaseName: "Remove headers -- X-Header-Remove should be removed",
 				EchoRequest:  &pb.EchoRequest{},
 				RequestMetadata: &grpc.RequestMetadata{
