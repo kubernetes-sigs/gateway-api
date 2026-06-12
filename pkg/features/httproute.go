@@ -120,6 +120,12 @@ const (
 
 	// This option indicates support for HTTPRoute retry on connection error (extended conformance)
 	SupportHTTPRouteRetryConnectionError FeatureName = "HTTPRouteRetryConnectionError"
+
+	// This option indicates support for cookie-based session persistence (experimental conformance).
+	SupportCookieSessionPersistence FeatureName = "CookieSessionPersistence"
+
+	// This option indicates support for permanent cookie lifetime in cookie-based session persistence (experimental conformance).
+	SupportCookieSessionPersistencePermanentLifetime FeatureName = "CookieSessionPersistencePermanentLifetime"
 )
 
 var (
@@ -253,6 +259,16 @@ var (
 		Name:    SupportHTTPRouteRetryConnectionError,
 		Channel: FeatureChannelExperimental,
 	}
+	// CookieSessionPersistenceFeature contains metadata for the CookieSessionPersistence feature.
+	CookieSessionPersistenceFeature = Feature{
+		Name:    SupportCookieSessionPersistence,
+		Channel: FeatureChannelExperimental,
+	}
+	// CookieSessionPersistencePermanentLifetimeFeature contains metadata for the CookieSessionPersistencePermanentLifetime feature.
+	CookieSessionPersistencePermanentLifetimeFeature = Feature{
+		Name:    SupportCookieSessionPersistencePermanentLifetime,
+		Channel: FeatureChannelExperimental,
+	}
 )
 
 // HTTPRouteExtendedFeatures includes all extended features for HTTPRoute
@@ -285,4 +301,6 @@ var HTTPRouteExtendedFeatures = sets.New(
 	HTTPRouteRetryFeature,
 	HTTPRouteRetryBackendTimeoutFeature,
 	HTTPRouteRetryConnectionErrorFeature,
+	CookieSessionPersistenceFeature,
+	CookieSessionPersistencePermanentLifetimeFeature,
 )
