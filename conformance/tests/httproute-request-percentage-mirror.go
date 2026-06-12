@@ -19,6 +19,7 @@ package tests
 import (
 	"errors"
 	"fmt"
+	"math"
 	"regexp"
 	"sync"
 	"testing"
@@ -37,8 +38,13 @@ import (
 )
 
 const (
-	concurrentRequests    = 10
-	tolerancePercentage   = 15.0
+	concurrentRequests = 10
+	// toleranceStdDevs is the acceptance-band half-width expressed in binomial
+	// standard deviations; see testMirroredRequestsDistribution for the
+	// derivation. At 3 sigma the two-sided per-check false-failure probability
+	// is ~2.7e-3 for any mirror percentage, while still rejecting a genuinely
+	// wrong distribution.
+	toleranceStdDevs      = 3.0
 	totalRequests         = 500.0
 	numDistributionChecks = 5
 )
@@ -215,9 +221,21 @@ func testMirroredRequestsDistribution(t *testing.T, suite *confsuite.Conformance
 	var errs []error
 
 	for _, mirrorPod := range mirrorPods {
-		expected := float64(totalRequests) * float64(*mirrorPod.Percent) / 100.0
-		minExpected := expected * (1 - tolerancePercentage/100)
-		maxExpected := expected * (1 + tolerancePercentage/100)
+		// Each request is mirrored independently with probability p, so the
+		// observed mirrored count follows Binomial(totalRequests, p) with
+		// standard deviation sqrt(n*p*(1-p)). Deriving the acceptance band from
+		// that standard deviation keeps the per-check false-failure probability
+		// uniformly low across mirror percentages. A flat relative band does
+		// not: it scales linearly with p while the standard deviation scales
+		// with sqrt(p*(1-p)), so at low percentages the band collapses toward
+		// the sampling noise floor (e.g. p=0.2, n=500 gives stddev ~8.9, so a
+		// +/-15% band spanned only ~1.7 stddev and rejected ~9% of conforming
+		// runs by sampling variance alone).
+		p := float64(*mirrorPod.Percent) / 100.0
+		expected := totalRequests * p
+		margin := toleranceStdDevs * math.Sqrt(totalRequests*p*(1-p))
+		minExpected := expected - margin
+		maxExpected := expected + margin
 
 		actual := float64(mirroredCounts[mirrorPod.Name])
 		tlog.Logf(t, "Pod: %s, Expected: %f (min: %f, max: %f), Actual: %f", mirrorPod.Name, expected, minExpected, maxExpected, actual)
