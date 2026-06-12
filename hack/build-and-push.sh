@@ -93,3 +93,15 @@ docker buildx build \
     ${DOCKER_PUSH_FLAG} \
     -f docker/Dockerfile.echo-basic \
     .
+
+echo "Building and pushing epp-basic conformance image ...${BUILDX_PLATFORMS}"
+
+docker buildx build \
+    -t ${REGISTRY}/epp-basic:${GIT_TAG} \
+    -t ${REGISTRY}/epp-basic:${VERSION_TAG} \
+    --platform ${BUILDX_PLATFORMS} \
+    ${DOCKER_PUSH_FLAG} \
+    -build-arg COMMIT_SHA=${COMMIT} \
+    -build-arg BUILD_REF=${BINARY_TAG} \
+    -f conformance/epp-basic/Dockerfile \
+    .
