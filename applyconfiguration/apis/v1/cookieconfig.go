@@ -27,6 +27,13 @@ import (
 //
 // CookieConfig defines the configuration for cookie-based session persistence.
 type CookieConfigApplyConfiguration struct {
+	// Name defines the name of the cookie used for session persistence.
+	// If not specified, a unique cookie name will be generated.
+	// Users should avoid reusing cookie names to prevent unintended
+	// consequences, such as rejection or unpredictable behavior.
+	//
+	// Support: Extended
+	Name *apisv1.HeaderName `json:"name,omitempty"`
 	// LifetimeType specifies whether the cookie has a permanent or
 	// session-based lifetime. A permanent cookie persists until its
 	// specified expiry time, defined by the Expires or Max-Age cookie
@@ -53,6 +60,14 @@ type CookieConfigApplyConfiguration struct {
 // apply.
 func CookieConfig() *CookieConfigApplyConfiguration {
 	return &CookieConfigApplyConfiguration{}
+}
+
+// WithName sets the Name field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the Name field is set to the value of the last call.
+func (b *CookieConfigApplyConfiguration) WithName(value apisv1.HeaderName) *CookieConfigApplyConfiguration {
+	b.Name = &value
+	return b
 }
 
 // WithLifetimeType sets the LifetimeType field in the declarative configuration to the given value
