@@ -38,6 +38,22 @@ type ListenerApplyConfiguration struct {
 	// field is ignored for protocols that don't require hostname based
 	// matching.
 	//
+	// Hostnames that are prefixed with a wildcard label (`*.`) are interpreted
+	// as a suffix match. That means that a match for `*.example.com` would match
+	// both `test.example.com`, and `foo.test.example.com`, but not `example.com`.
+	//
+	// For HTTPRoute and TLSRoute resources, there is an interaction with the
+	// `spec.hostnames` array. When both listener and route specify hostnames,
+	// there MUST be an intersection between the values for a Route to be
+	// accepted. For more information, refer to the Route specific Hostnames
+	// documentation.
+	//
+	// Support: Core
+	//
+	// <gateway:util:excludeFromCRD>
+	//
+	// Notes for implementers:
+	//
 	// Implementations MUST apply Hostname matching appropriately for each of
 	// the following protocols:
 	//
@@ -69,17 +85,7 @@ type ListenerApplyConfiguration struct {
 	// * If no other Listener matches the Host, the Gateway MUST return a
 	// 404.
 	//
-	// For HTTPRoute and TLSRoute resources, there is an interaction with the
-	// `spec.hostnames` array. When both listener and route specify hostnames,
-	// there MUST be an intersection between the values for a Route to be
-	// accepted. For more information, refer to the Route specific Hostnames
-	// documentation.
-	//
-	// Hostnames that are prefixed with a wildcard label (`*.`) are interpreted
-	// as a suffix match. That means that a match for `*.example.com` would match
-	// both `test.example.com`, and `foo.test.example.com`, but not `example.com`.
-	//
-	// Support: Core
+	// </gateway:util:excludeFromCRD>
 	Hostname *apisv1.Hostname `json:"hostname,omitempty"`
 	// Port is the network port. Multiple listeners may use the
 	// same port, subject to the Listener compatibility rules.
@@ -106,6 +112,12 @@ type ListenerApplyConfiguration struct {
 	// Listener and the trusted namespaces where those Route resources MAY be
 	// present.
 	//
+	// Support: Core
+	//
+	// <gateway:util:excludeFromCRD>
+	//
+	// Notes for implementers:
+	//
 	// Although a client request may match multiple route rules, only one rule
 	// may ultimately receive the request. Matching precedence MUST be
 	// determined in order of the following criteria:
@@ -125,7 +137,7 @@ type ListenerApplyConfiguration struct {
 	// example, even if a filter specified by a Route rule is invalid, the rest
 	// of the rules within that Route should still be supported.
 	//
-	// Support: Core
+	// </gateway:util:excludeFromCRD>
 	AllowedRoutes *AllowedRoutesApplyConfiguration `json:"allowedRoutes,omitempty"`
 }
 

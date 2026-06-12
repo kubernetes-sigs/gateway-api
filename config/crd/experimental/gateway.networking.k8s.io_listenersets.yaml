@@ -334,12 +334,6 @@ spec:
                             Implementations MAY choose to support attaching multiple certificates to
                             a Listener, but this behavior is implementation-specific.
 
-                            References to a resource in different namespace are invalid UNLESS there
-                            is a ReferenceGrant in the target namespace that allows the certificate
-                            to be attached. If a ReferenceGrant does not allow this reference, the
-                            "ResolvedRefs" condition MUST be set to False for this listener with the
-                            "RefNotPermitted" reason.
-
                             This field is required to have at least one element when the mode is set
                             to "Terminate" (default) and is optional otherwise.
 

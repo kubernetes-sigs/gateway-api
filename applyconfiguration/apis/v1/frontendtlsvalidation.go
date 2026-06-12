@@ -33,6 +33,19 @@ type FrontendTLSValidationApplyConfiguration struct {
 	// is used as a trust anchor to validate the certificates presented by
 	// the client.
 	//
+	// Implementations MAY choose to support attaching multiple CA certificates
+	// to a listener, but this behavior is implementation-specific.
+	//
+	// Support: Core - A single reference to a Kubernetes ConfigMap, with the
+	// CA certificate in a key named `ca.crt`.
+	//
+	// Support: Implementation-specific - More than one reference, other kinds
+	// of resources, or a single reference that includes multiple certificates.
+	//
+	// <gateway:util:excludeFromCRD>
+	//
+	// Notes for implementers:
+	//
 	// A CACertificateRef is invalid if:
 	//
 	// * It refers to a resource that cannot be resolved (e.g., the
@@ -63,14 +76,8 @@ type FrontendTLSValidationApplyConfiguration struct {
 	// ALL CACertificateRefs are invalid, the implementation MUST also ensure
 	// the `Accepted` condition on the listener is set to `status: False`, with
 	// the Reason `NoValidCACertificate`.
-	// Implementations MAY choose to support attaching multiple CA certificates
-	// to a listener, but this behavior is implementation-specific.
 	//
-	// Support: Core - A single reference to a Kubernetes ConfigMap, with the
-	// CA certificate in a key named `ca.crt`.
-	//
-	// Support: Implementation-specific - More than one reference, other kinds
-	// of resources, or a single reference that includes multiple certificates.
+	// </gateway:util:excludeFromCRD>
 	CACertificateRefs []ObjectReferenceApplyConfiguration `json:"caCertificateRefs,omitempty"`
 	// FrontendValidationMode defines the mode for validating the client certificate.
 	// There are two possible modes:

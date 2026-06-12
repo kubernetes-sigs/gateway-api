@@ -96,6 +96,13 @@ type ParentReferenceApplyConfiguration struct {
 	// interpreted.
 	//
 	// When unspecified (empty string), this will reference the entire resource.
+	//
+	// Support: Core
+	//
+	// <gateway:util:excludeFromCRD>
+	//
+	// Notes for implementers:
+	//
 	// For the purpose of status, an attachment is considered successful if at
 	// least one section in the parent resource accepts it. For example, Gateway
 	// listeners can restrict which Routes can attach to them by Route kind,
@@ -104,7 +111,7 @@ type ParentReferenceApplyConfiguration struct {
 	// attached. If no Gateway listeners accept attachment from this Route, the
 	// Route MUST be considered detached from the Gateway.
 	//
-	// Support: Core
+	// </gateway:util:excludeFromCRD>
 	SectionName *apisv1.SectionName `json:"sectionName,omitempty"`
 	// Port is the network port this Route targets. It can be interpreted
 	// differently based on the type of parent resource.
@@ -127,6 +134,12 @@ type ParentReferenceApplyConfiguration struct {
 	// Implementations supporting other types of parent resources MUST clearly
 	// document how/if Port is interpreted.
 	//
+	// Support: Extended
+	//
+	// <gateway:util:excludeFromCRD>
+	//
+	// Notes for implementers:
+	//
 	// For the purpose of status, an attachment is considered successful as
 	// long as the parent resource accepts it partially. For example, Gateway
 	// listeners can restrict which Routes can attach to them by Route kind,
@@ -135,7 +148,7 @@ type ParentReferenceApplyConfiguration struct {
 	// attached. If no Gateway listeners accept attachment from this Route,
 	// the Route MUST be considered detached from the Gateway.
 	//
-	// Support: Extended
+	// </gateway:util:excludeFromCRD>
 	Port *int32 `json:"port,omitempty"`
 }
 
