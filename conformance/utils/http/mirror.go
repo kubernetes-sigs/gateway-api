@@ -33,6 +33,10 @@ import (
 	"sigs.k8s.io/gateway-api/conformance/utils/tlog"
 )
 
+func GetMirrorLogRegexp(path string) *regexp.Regexp {
+	return regexp.MustCompile(fmt.Sprintf("Echoing back request made to %s to client", regexp.QuoteMeta(path)))
+}
+
 func ExpectMirroredRequest(t *testing.T, client client.Client, clientset clientset.Interface, mirrorPods []MirroredBackend, path string, timeoutConfig config.TimeoutConfig) func() {
 	for i, mirrorPod := range mirrorPods {
 		if mirrorPod.Name == "" {
@@ -40,10 +44,9 @@ func ExpectMirroredRequest(t *testing.T, client client.Client, clientset clients
 		}
 	}
 
-	mirrorLogRegexp := regexp.MustCompile(fmt.Sprintf("Echoing back request made to %s to client", regexp.QuoteMeta(path)))
+	mirrorLogRegexp := GetMirrorLogRegexp(path)
 
 	var done sync.WaitGroup
-	done.Add(len(mirrorPods))
 	var started sync.WaitGroup
 	started.Add(len(mirrorPods))
 	results := make(chan bool, len(mirrorPods))
@@ -60,10 +63,8 @@ func ExpectMirroredRequest(t *testing.T, client client.Client, clientset clients
 	assertionStart := time.Now().Add(-timeoutConfig.MaxTimeToConsistency)
 
 	for _, mirrorPod := range mirrorPods {
-		go func(mirrorPod MirroredBackend) {
+		done.Go(func() {
 			var startedOnce sync.Once
-
-			defer done.Done()
 
 			success := assert.Eventually(t, func() bool {
 				tlog.Log(t, "Searching for the mirrored request log")
@@ -84,7 +85,7 @@ func ExpectMirroredRequest(t *testing.T, client client.Client, clientset clients
 			// signal done even if all log dumps failed above.
 			startedOnce.Do(started.Done)
 			results <- success
-		}(mirrorPod)
+		})
 	}
 
 	// Wait until each watcher has either dumped logs at least once or timed out.

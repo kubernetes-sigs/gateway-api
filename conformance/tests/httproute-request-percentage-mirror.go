@@ -19,7 +19,6 @@ package tests
 import (
 	"errors"
 	"fmt"
-	"regexp"
 	"sync"
 	"testing"
 	"time"
@@ -193,7 +192,7 @@ func testMirroredRequestsDistribution(t *testing.T, suite *confsuite.Conformance
 
 	for _, mirrorPod := range mirrorPods {
 		require.Eventually(t, func() bool {
-			mirrorLogRegexp := regexp.MustCompile(fmt.Sprintf("Echoing back request made to %s to client", regexp.QuoteMeta(expected.Request.Path)))
+			mirrorLogRegexp := http.GetMirrorLogRegexp(expected.Request.Path)
 
 			tlog.Log(t, "Searching for the mirrored request log")
 			tlog.Logf(t, `Reading "%s/%s" logs`, mirrorPod.Namespace, mirrorPod.Name)
