@@ -645,6 +645,9 @@ spec:
       containers:
         - name: grpc-infra-backend-v1
           image: registry.k8s.io/gateway-api/echo-basic:v1.5.1
+          volumeMounts:
+            - name: secret-volume
+              mountPath: /etc/secret-volume
           env:
             - name: POD_NAME
               valueFrom:
@@ -656,9 +659,22 @@ spec:
                   fieldPath: metadata.namespace
             - name: GRPC_ECHO_SERVER
               value: "1"
+            - name: TLS_SERVER_CERT
+              value: /etc/secret-volume/crt
+            - name: TLS_SERVER_PRIV_KEY
+              value: /etc/secret-volume/key
           resources:
             requests:
               cpu: 10m
+      volumes:
+        - name: secret-volume
+          secret:
+            secretName: tls-checks-certificate
+            items:
+              - key: tls.crt
+                path: crt
+              - key: tls.key
+                path: key
 ---
 apiVersion: v1
 kind: Service
