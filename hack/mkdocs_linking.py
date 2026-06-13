@@ -65,7 +65,9 @@ def main() -> None:
         help="Convert all relative Markdown links to the internal_link macro.",
     )
     parser.add_argument(
-        "--docs-dir", default="site-src", help="Documentation directory (default: site-src)."
+        "--docs-dir",
+        default="site/content/en",
+        help="Documentation directory (default: site/content/en).",
     )
     parser.add_argument(
         "--dry-run",
