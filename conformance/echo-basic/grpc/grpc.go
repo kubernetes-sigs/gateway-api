@@ -80,6 +80,7 @@ func (s *echoServer) doEcho(methodName string, ctx context.Context, in *pb.EchoR
 		connectionType = "TLS"
 	}
 	fmt.Printf("Received over %s: %v\n", connectionType, in)
+	fmt.Printf("Echoing back gRPC request made to %s to client\n", s.fullMethod(methodName))
 	mdElems, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
 		msg := "failed to retrieve metadata from incoming request"
