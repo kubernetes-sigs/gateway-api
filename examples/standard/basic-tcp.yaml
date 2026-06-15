@@ -7,7 +7,7 @@ metadata:
 spec:
   gatewayClassName: my-tcp-gateway-class
   listeners:
-  - name: foo
+    - name: foo
       protocol: TCP
       port: 8080
       allowedRoutes:
