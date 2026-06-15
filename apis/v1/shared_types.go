@@ -394,6 +394,10 @@ const (
 	// are incompatible filters present on a route rule (for example if
 	// the URLRewrite and RequestRedirect are both present on an HTTPRoute).
 	RouteReasonIncompatibleFilters RouteConditionReason = "IncompatibleFilters"
+
+	// This reason is used with the "Accepted" condition when the Route conflicts
+	// with an existing route.
+	RouteReasonConflicted RouteConditionReason = "Conflicted"
 )
 
 const (
