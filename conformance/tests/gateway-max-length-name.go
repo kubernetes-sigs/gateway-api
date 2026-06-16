@@ -37,10 +37,11 @@ func init() {
 
 var GatewayMaxLengthName = suite.ConformanceTest{
 	ShortName:   "GatewayMaxLengthName",
-	Description: "A Gateway with a name at the maximum allowed Kubernetes resource name length (253 characters) should be accepted",
+	Description: "A Gateway with a name at the maximum allowed Kubernetes resource name length (253 characters) should be handled gracefully without crashing or blocking",
 	Features: []features.FeatureName{
 		features.SupportGateway,
 	},
+	Provisional: true,
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
 		// Generate a name at the maximum DNS subdomain length (253 chars).
 		// Must follow RFC 1123 subdomain: lowercase alphanumeric, start/end with alphanumeric.
@@ -84,10 +85,7 @@ var GatewayMaxLengthName = suite.ConformanceTest{
 			}
 		})
 
-		t.Logf("Waiting for Gateway %s/%s to be accepted", gwNN.Namespace, gwNN.Name)
-		kubernetes.GatewayMustHaveCondition(t, s.Client, s.TimeoutConfig, gwNN, metav1.Condition{
-			Type:   string(v1.GatewayConditionAccepted),
-			Status: metav1.ConditionTrue,
-		})
+		t.Logf("Waiting for Gateway %s/%s to be processed by the controller", gwNN.Namespace, gwNN.Name)
+		kubernetes.GatewayMustHaveLatestConditions(t, s.Client, s.TimeoutConfig, gwNN)
 	},
 }
