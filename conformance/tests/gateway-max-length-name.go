@@ -42,6 +42,7 @@ var GatewayMaxLengthName = suite.ConformanceTest{
 		features.SupportGateway,
 	},
 	Provisional: true,
+	Parallel:    true,
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
 		// Generate a name at the maximum DNS subdomain length (253 chars).
 		// Must follow RFC 1123 subdomain: lowercase alphanumeric, start/end with alphanumeric.
@@ -52,7 +53,7 @@ var GatewayMaxLengthName = suite.ConformanceTest{
 			Namespace: suite.InfrastructureNamespace,
 		}
 
-		ctx, cancel := context.WithTimeout(context.Background(), s.TimeoutConfig.CreateTimeout)
+		ctx, cancel := context.WithTimeout(context.Background(), s.TimeoutConfig.DefaultTestTimeout)
 		defer cancel()
 
 		gw := &v1.Gateway{
@@ -87,5 +88,19 @@ var GatewayMaxLengthName = suite.ConformanceTest{
 
 		t.Logf("Waiting for Gateway %s/%s to be processed by the controller", gwNN.Namespace, gwNN.Name)
 		kubernetes.GatewayMustHaveLatestConditions(t, s.Client, s.TimeoutConfig, gwNN)
+
+		t.Logf("Reading Gateway %s/%s to inspect conditions", gwNN.Namespace, gwNN.Name)
+		currentGW := &v1.Gateway{}
+		err = s.Client.Get(ctx, gwNN, currentGW)
+		require.NoError(t, err, "error getting Gateway: %v", err)
+
+		for _, cond := range currentGW.Status.Conditions {
+			t.Logf("Gateway condition: type=%s status=%s reason=%s message=%s", cond.Type, cond.Status, cond.Reason, cond.Message)
+		}
+		if len(currentGW.Status.Conditions) == 0 {
+			t.Logf("No conditions set on Gateway %s/%s", gwNN.Namespace, gwNN.Name)
+		}
+
+		t.Logf("Gateway %s/%s handled successfully (conditions logged above)", gwNN.Namespace, gwNN.Name)
 	},
 }
