@@ -41,7 +41,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
-	"sigs.k8s.io/gateway-api/apis/v1alpha2"
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
 	"sigs.k8s.io/gateway-api/conformance/utils/tlog"
 )
@@ -774,7 +773,7 @@ func TLSRouteMustHaveNoAcceptedParents(t *testing.T, client client.Client, timeo
 }
 
 // RouteTypeMustHaveParentsField ensures the provided routeType has a
-// routeType.Status.Parents field of type []v1alpha2.RouteParentStatus.
+// routeType.Status.Parents field of type []gatewayv1.RouteParentStatus.
 func RouteTypeMustHaveParentsField(t *testing.T, routeType any) string {
 	t.Helper()
 	routeTypePointerObj := reflect.TypeOf(routeType)
@@ -788,7 +787,7 @@ func RouteTypeMustHaveParentsField(t *testing.T, routeType any) string {
 
 	parentsField, ok := statusField.Type.FieldByName("Parents")
 	require.True(t, ok, "%s.Status does not have a Parents field", routeTypeName)
-	require.Equal(t, parentsField.Type, reflect.TypeFor[[]v1alpha2.RouteParentStatus]())
+	require.Equal(t, parentsField.Type, reflect.TypeFor[[]gatewayv1.RouteParentStatus]())
 
 	return routeTypeName
 }
@@ -818,7 +817,7 @@ func RouteMustHaveParents(t *testing.T, cli client.Client, timeoutConfig config.
 			}
 		}
 
-		actual = reflect.ValueOf(cliObj).Elem().FieldByName("Status").FieldByName("Parents").Interface().([]v1alpha2.RouteParentStatus)
+		actual = reflect.ValueOf(cliObj).Elem().FieldByName("Status").FieldByName("Parents").Interface().([]gatewayv1.RouteParentStatus)
 		return parentsForRouteMatch(t, routeName, parents, actual, namespaceRequired), nil
 	})
 	require.NoErrorf(t, waitErr, "error waiting for %s to have parents matching expectations", routeTypeName)
