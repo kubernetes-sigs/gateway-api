@@ -29,7 +29,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
-	"sigs.k8s.io/gateway-api/apis/v1alpha2"
+	v1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	confsuite "sigs.k8s.io/gateway-api/conformance/utils/suite"
 	"sigs.k8s.io/gateway-api/conformance/utils/tlog"
@@ -67,19 +67,19 @@ var UDPRouteMultipleRoutesAttachment = confsuite.ConformanceTest{
 		// is strictly newer than the first.
 		time.Sleep(time.Second)
 
-		newerRoute := &v1alpha2.UDPRoute{
+		newerRoute := &v1.UDPRoute{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      newerRouteNN.Name,
 				Namespace: newerRouteNN.Namespace,
 			},
-			Spec: v1alpha2.UDPRouteSpec{
+			Spec: v1.UDPRouteSpec{
 				CommonRouteSpec: gatewayv1.CommonRouteSpec{
 					ParentRefs: []gatewayv1.ParentReference{{
 						Name:        gatewayv1.ObjectName(gwNN.Name),
 						SectionName: ptr.To(gatewayv1.SectionName("udp")),
 					}},
 				},
-				Rules: []v1alpha2.UDPRouteRule{{
+				Rules: []v1.UDPRouteRule{{
 					BackendRefs: []gatewayv1.BackendRef{{
 						BackendObjectReference: gatewayv1.BackendObjectReference{
 							Name: gatewayv1.ObjectName("udp-attach-backend-2"),
