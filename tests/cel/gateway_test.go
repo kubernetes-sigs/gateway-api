@@ -124,6 +124,7 @@ func TestValidateGateway(t *testing.T) {
 					},
 				}
 			},
+			wantErrors: []string{"tls mode must be Terminate for protocol HTTPS"},
 		},
 		{
 			desc: "tls config not set with tls protocol",
