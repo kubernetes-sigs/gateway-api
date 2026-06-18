@@ -7,7 +7,7 @@ spec:
   gatewayClassName: "{GATEWAY_CLASS_NAME}"
   listeners:
     - name: only-allow-http-routes
-      protocol: TCP
+      protocol: HTTP
       port: 5300
       allowedRoutes:
         kinds:
