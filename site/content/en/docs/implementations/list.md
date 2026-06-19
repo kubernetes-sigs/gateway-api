@@ -102,6 +102,7 @@ class.
 - [Istio][9]
 - [kgateway][37]
 - [NGINX Gateway Fabric][12]
+- [Sunbeam Proxy][47]
 - [Traefik Proxy][13]
 - [Varnish Gateway][45]
 
@@ -171,6 +172,7 @@ class.
 [44]:#aws-load-balancer-controller
 [45]:#varnish-gateway
 [46]:#calico
+[47]:#sunbeam-proxy
 
 
 [gamma]: /docs/mesh/
@@ -491,6 +493,17 @@ If you have any suggestions or experience issues with NGINX Gateway Fabric, plea
 [nginx-issue-new]: https://github.com/nginx/nginx-gateway-fabric/issues/new
 [nginx-disc-new]: https://github.com/nginx/nginx-gateway-fabric/discussions/new
 [nginx-forum]: https://community.nginx.org/
+
+
+### Sunbeam Proxy
+
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.5.1-Sunbeam%20Proxy-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.5/sunbeam-studios-sunbeam-proxy)
+
+[Sunbeam Proxy][sunbeam-proxy] is a cloud-native reverse proxy with adaptive machine learning threat detection which implements the Kubernetes Gateway API v1.5.1 control plane and data plane.
+
+It passes the v1.5.1 experimental conformance suite for the `GATEWAY-HTTP`, `GATEWAY-GRPC`, and `GATEWAY-TLS` profiles, including all core and claimed extended features. It supports TCPRoute and UDPRoute from the experimental channels.
+
+[sunbeam-proxy]: https://github.com/sunbeamdotpt/proxy
 
 
 ### Traefik Proxy
