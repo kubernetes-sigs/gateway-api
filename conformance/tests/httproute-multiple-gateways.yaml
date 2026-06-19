@@ -9,12 +9,12 @@ spec:
   - name: all-namespaces
   rules:
   - matches:
-      - path:
-          type: PathPrefix
-          value: /shared
+    - path:
+        type: PathPrefix
+        value: /shared
     backendRefs:
-      - name: infra-backend-v1
-        port: 8080
+    - name: infra-backend-v1
+      port: 8080
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
@@ -23,15 +23,15 @@ metadata:
   namespace: gateway-conformance-infra
 spec:
   parentRefs:
-    - name: same-namespace
+  - name: same-namespace
   rules:
-    - matches:
-        - path:
-            type: PathPrefix
-            value: /
-      backendRefs:
-        - name: infra-backend-v2
-          port: 8080
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /
+    backendRefs:
+    - name: infra-backend-v2
+      port: 8080
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
@@ -40,12 +40,12 @@ metadata:
   namespace: gateway-conformance-infra
 spec:
   parentRefs:
-    - name: all-namespaces
+  - name: all-namespaces
   rules:
-    - matches:
-        - path:
-            type: PathPrefix
-            value: /
-      backendRefs:
-        - name: infra-backend-v3
-          port: 8080
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /
+    backendRefs:
+    - name: infra-backend-v3
+      port: 8080
