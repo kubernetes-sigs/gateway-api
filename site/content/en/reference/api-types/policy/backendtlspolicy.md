@@ -134,8 +134,8 @@ Also note:
 
 #### Subject Alternative Names
 
-{{< details title="Experimental Channel since v1.2.0" color="purple" >}}
-This field was added to BackendTLSPolicy in `v1.2.0`
+{{< details title="Standard Channel since v1.4.0" color="success" >}}
+This field was added to BackendTLSPolicy in `v1.2.0` and graduated to the Standard Channel in `v1.4.0`.
 {{< /details >}}
 
 The subjectAltNames field enables basic mutual TLS configuration between Gateways and backends, as well as the optional use of SPIFFE. When subjectAltNames is specified, the certificate served by the backend must have at least one Subject Alternative Name matching one of the specified values. This is particularly useful for SPIFFE implementations where URI-based SANs may not be valid SNIs.  
@@ -151,8 +151,8 @@ Subject Alternative Names may contain one of either a Hostname or URI field, and
 
 #### TLS Options
 
-{{< details title="Experimental Channel since v1.2.0" color="purple" >}}
-This field was added to BackendTLSPolicy in `v1.2.0`
+{{< details title="Standard Channel since v1.4.0" color="success" >}}
+This field was added to BackendTLSPolicy in `v1.2.0` and graduated to the Standard Channel in `v1.4.0`.
 {{< /details >}}
 
 The options field allows specification of implementation-specific TLS configurations. This can include:  
