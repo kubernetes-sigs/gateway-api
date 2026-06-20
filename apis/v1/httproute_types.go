@@ -1014,15 +1014,19 @@ const (
 
 // HTTPHeader represents an HTTP Header name and value as defined by RFC 7230.
 type HTTPHeader struct {
-	// Name is the name of the HTTP Header to be matched. Name matching MUST be
+	// Name is the name of the HTTP Header. Name matching MUST be
 	// case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
 	//
 	// Due to the case-insensitivity of header names, "foo" and "Foo" are
-	// considered equivalent.
+	// considered equivalent. Each header name within an HTTPHeaderFilter list
+	// must be unique; entries with identical names are invalid. When two
+	// entries are equivalent only because of case (for example "foo" and
+	// "Foo"), the first entry MUST be applied and the subsequent entry MUST be
+	// ignored.
 	// +required
 	Name HTTPHeaderName `json:"name"`
 
-	// Value is the value of HTTP Header to be matched.
+	// Value is the value of HTTP Header.
 	// <gateway:experimental:description>
 	// Must consist of printable US-ASCII characters, optionally separated
 	// by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
@@ -1044,10 +1048,6 @@ type HTTPHeader struct {
 type HTTPHeaderFilter struct {
 	// Set overwrites the request with the given header (name, value)
 	// before the action.
-	//
-	// Only one action for a given header name is permitted. Filters
-	// specifying multiple actions of the same or different type for any
-	// one header name are invalid.
 	//
 	// Input:
 	//   GET /foo HTTP/1.1
@@ -1071,10 +1071,6 @@ type HTTPHeaderFilter struct {
 	// Add adds the given header(s) (name, value) to the request
 	// before the action. It appends to any existing values associated
 	// with the header name.
-	//
-	// Only one action for a given header name is permitted. Filters
-	// specifying multiple actions of the same or different type for any
-	// one header name are invalid.
 	//
 	// Input:
 	//   GET /foo HTTP/1.1
