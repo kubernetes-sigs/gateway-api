@@ -105,6 +105,7 @@ class.
 - [Sunbeam Proxy][47]
 - [Traefik Proxy][13]
 - [Varnish Gateway][45]
+- [WSO2 Gateway][48]
 
 ### Partially Conformant
 
@@ -173,6 +174,7 @@ class.
 [45]:#varnish-gateway
 [46]:#calico
 [47]:#sunbeam-proxy
+[48]:#wso2-api-platform-gateway
 
 
 [gamma]: /docs/mesh/
@@ -540,6 +542,18 @@ customization, bypass conditions) at the Gateway, HTTPRoute, or rule level.
 [varnish-gateway]:https://gateway.varnish.org
 [varnish-software]:https://www.varnish-software.com/
 [varnish]:https://www.varnish.org/
+
+### WSO2 Gateway
+
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.5.1-WSO2%20Gateway-green)](https://github.com/kubernetes-sigs/gateway-api/tree/main/conformance/reports/v1.5.1/wso2-gateway)
+
+[WSO2 Gateway](https://wso2.com/api-platform/docs/) is an AI-ready, GitOps-driven platform for building, securing, and governing APIs across cloud, hybrid, and on-premises environments. It represents the next generation of the [WSO2 Kubernetes Gateway (APK)](https://apk.docs.wso2.com/en/latest/), delivering a unified Kubernetes-native gateway experience with deeper platform integration and modern GitOps workflows.
+
+The gateway is designed to deliver a modern traffic management experience, seamlessly bridging traditional APIs with next generation AI and MCP workloads while providing centralized governance across diverse environments. Through its extensible policy framework, API developers can apply a wide range of capabilities including security, traffic management, transformations, resiliency, observability, AI integrations, and other cross-cutting concerns in a consistent manner without introducing infrastructure fragmentation.
+
+For supported Gateway API resources and features, see the [Gateway API support guide](https://wso2.com/api-platform/docs/api-gateway/next/deployment/deployment-modes/kubernetes/gateway-operator/#kubernetes-gateway-api-path).
+
+Questions and contributions are welcome on [GitHub](https://github.com/wso2/api-platform). Check out [WSO2 Gateway documentation](https://wso2.com/api-platform/docs/) for further installation and usage information. For commercial inquiries, please [get in touch with the WSO2 team](https://wso2.com/contact/).
 
 ## Integrations
 
