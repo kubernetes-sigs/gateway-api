@@ -3,13 +3,11 @@ title: "TCP routing"
 weight: 14
 ---
 
-{{% alert color="info" title="Experimental Channel" %}}
-
-The `TCPRoute` resource described below is currently only included in the
-"Experimental" channel of Gateway API. For more information on release
-channels, refer to our [versioning guide](/docs/concepts/versioning/).
-
-{{% /alert %}}
+{{< details title="Standard Channel since v1.6.0" color="success" >}}
+The `TCPRoute` resource is GA and has been part of the Standard Channel since
+`v1.6.0`. For more information on release channels, refer to our [versioning
+guide](/docs/concepts/versioning/).
+{{< /details >}}
 
 Gateway API is designed to work with multiple protocols and [TCPRoute][tcproute]
 is one such route which allows for managing [TCP][tcp] traffic.
@@ -26,7 +24,7 @@ In this example two `TCP` listeners will be applied to the [Gateway][gateway]
 in order to route them to two separate backend `TCPRoutes`, note that the
 `protocol` set for the `listeners` on the `Gateway` is `TCP`:
 
-{{< readfile file="/examples/experimental/basic-tcp.yaml" code="true" lang="yaml" >}}
+{{< readfile file="/examples/standard/basic-tcp.yaml" code="true" lang="yaml" >}}
 
 In the above example we separate the traffic for the two separate backend TCP
 [Services][svc] by using the `sectionName` field in the `parentRefs`:
@@ -34,14 +32,14 @@ In the above example we separate the traffic for the two separate backend TCP
 ```yaml
 spec:
   parentRefs:
-  - name: my-tcp-gateway
-    sectionName: foo
+    - name: my-tcp-gateway
+      sectionName: foo
 ```
 
 This corresponds directly with the `name` in the `listeners` in the `Gateway`:
 
 ```yaml
-  listeners:
+listeners:
   - name: foo
     protocol: TCP
     port: 8080
@@ -60,14 +58,21 @@ listeners using the `port` field in the `parentRefs`:
 ```yaml
 spec:
   parentRefs:
-  - name: my-tcp-gateway
-    port: 8080
+    - name: my-tcp-gateway
+      port: 8080
 ```
 
 Using the `port` field instead of `sectionName` for the attachment has the
 downside of more tightly coupling the relationship between the Gateway and
 its associated Routes. Refer to [Attaching to Gateways][attaching] for more
 details.
+
+{{< details title="Note" color="info" >}}
+You cannot attach a `TCPRoute` to an `HTTP` or `HTTPS` listener. A `TCPRoute`
+can only attach to listeners using the `TCP` protocol. Attempting to attach a
+`TCPRoute` to an `HTTP` or `HTTPS` listener will result in the route not being
+accepted.
+{{< /details >}}
 
 [tcproute]: /reference/api-spec/main/spec/#tcproute
 [tcp]: https://datatracker.ietf.org/doc/html/rfc793
