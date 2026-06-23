@@ -45,6 +45,10 @@ const (
 
 // Client is an interface used to make requests within conformance tests for grpc scenarios.
 // This can be overridden with custom implementations whenever necessary.
+//
+// A custom implementation must be safe for concurrent SendRPC calls: the
+// GRPCRouteWeight distribution sampler invokes the suite's client from multiple
+// goroutines.
 type Client interface {
 	SendRPC(t *testing.T, address string, expected ExpectedResponse, timeout time.Duration) (*Response, error)
 	Close()
