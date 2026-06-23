@@ -19,11 +19,11 @@ package tests
 import (
 	"errors"
 	"fmt"
-	"regexp"
 	"sync"
 	"testing"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 	"k8s.io/apimachinery/pkg/types"
 
@@ -151,6 +151,10 @@ var HTTPRouteRequestPercentageMirror = confsuite.ConformanceTest{
 				var wg sync.WaitGroup
 
 				for k := range numDistributionChecks {
+					err := expected.AddRequestIDQueryParam(uuid.NewString())
+					if err != nil {
+						t.Fatalf("Invalid query in path: %v", err)
+					}
 					timeNow := time.Now()
 					for range int(totalRequests) {
 						wg.Add(1)
@@ -188,7 +192,7 @@ func testMirroredRequestsDistribution(t *testing.T, suite *confsuite.Conformance
 
 	for _, mirrorPod := range mirrorPods {
 		require.Eventually(t, func() bool {
-			mirrorLogRegexp := regexp.MustCompile(fmt.Sprintf("Echoing back request made to \\%s to client", expected.Request.Path))
+			mirrorLogRegexp := http.GetMirrorLogRegexp(expected.Request.Path)
 
 			tlog.Log(t, "Searching for the mirrored request log")
 			tlog.Logf(t, `Reading "%s/%s" logs`, mirrorPod.Namespace, mirrorPod.Name)

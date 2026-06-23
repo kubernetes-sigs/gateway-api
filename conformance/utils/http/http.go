@@ -81,6 +81,46 @@ type Request struct {
 	ClientCert       string
 }
 
+const requestIDQueryParam = "gateway-api-conformance-request-id"
+
+// AddRequestIDQueryParam adds a request ID to the request URI so that echo
+// server logs for this request can be matched unambiguously.
+// Returns a non-nil error if either Request.Path or ExpectedRequest.Path has an unparseable query.
+func (er *ExpectedResponse) AddRequestIDQueryParam(requestID string) error {
+	path, err := addQueryParam(er.Request.Path, requestIDQueryParam, requestID)
+	if err != nil {
+		return err
+	}
+	if er.ExpectedRequest != nil {
+		if er.ExpectedRequest.Path == "" {
+			er.ExpectedRequest.Path = path
+		} else {
+			er.ExpectedRequest.Path, err = addQueryParam(er.ExpectedRequest.Path, requestIDQueryParam, requestID)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	er.Request.Path = path
+	return nil
+}
+
+// addQueryParam adds 'name'='value' query parameter to the given 'rawURL' and returns it.
+// Returns an error if rawURL or its query cannot be parsed.
+func addQueryParam(rawURL, name, value string) (string, error) {
+	parsedURL, err := url.Parse(rawURL)
+	if err != nil {
+		return "", err
+	}
+	query, err := url.ParseQuery(parsedURL.RawQuery)
+	if err != nil {
+		return "", err
+	}
+	query.Set(name, value)
+	parsedURL.RawQuery = query.Encode()
+	return parsedURL.String(), nil
+}
+
 // ExpectedRequest defines expected properties of a request that reaches a backend.
 type ExpectedRequest struct {
 	Request
