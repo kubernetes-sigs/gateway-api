@@ -4943,7 +4943,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPExternalAuthFilter(ref common.Refe
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "HTTPExternalAuthFilter defines a filter that modifies requests by sending request details to an external authorization server.\n\nSupport: Extended Feature Name: HTTPRouteExternalAuth",
+				Description: "HTTPExternalAuthFilter defines a filter that modifies requests by sending request details to an external authorization server.\n\nFor Envoy-based implementations leveraging Envoy's ext_authz filter, be aware of the associated route cache clearing risk. Additional filters in the Envoy filter chain may bypass authorization decisions by clearing the route cache after ext_authz has run. See the Envoy documentation for more details: https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/ext_authz_filter#security-considerations\n\nSupport: Extended Feature Name: HTTPRouteExternalAuth",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"protocol": {
