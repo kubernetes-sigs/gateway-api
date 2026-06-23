@@ -12,7 +12,7 @@ spec:
       port: 8080
       allowedRoutes:
         kinds:
-          - kind: TCPRoute
+        - kind: TCPRoute
     - name: bar
       protocol: TCP
       port: 8090
