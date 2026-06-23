@@ -42,10 +42,10 @@ The specification of a TCPRoute consists of:
 
 - [ParentRefs][parentRef] - Define which Gateways this Route wants to be
   attached to.
-- [Rules][tcprouterule] - Define a list of rules to perform actions against
+- [Rules][tcprouterule] - Define a rule to perform actions against
   matching TCP connections. For TCPRoute this is limited to which
   [backendRefs][backendRef] should be used. A TCPRoute may contain a single
-  rule.
+  rule with up to 16 backendRefs.
 
 ### Attaching to Gateways
 
@@ -116,7 +116,7 @@ number, rather than to named listeners whose ports may change.
 ### Rules
 
 Rules define the list of actions to be taken with the traffic. A TCPRoute may
-contain a single rule.
+contain only a single rule defining from 1 to 16 backendRefs.
 
 #### BackendRefs
 
@@ -158,7 +158,7 @@ Status defines the observed state of TCPRoute.
 
 RouteStatus defines the observed state that is required across all route types.
 
-#### Parents
+#### Parent status
 
 Parents define a list of the Gateways (or other parent resources) that are
 associated with the TCPRoute, and the status of the TCPRoute with respect to
@@ -188,9 +188,9 @@ status:
 
 ## Merging
 
-Multiple TCPRoutes can be attached to a single Gateway resource. However,
+Multiple TCPRoutes can be attached to a single Gateway resource with different listeners that can be referenced by sectionNames. However,
 because a TCP listener has no hostname, SNI, or path to distinguish between
-connections, attaching multiple TCPRoutes to the same listener results in only
+connections, attaching multiple TCPRoutes to the **same listener** results in only
 one route effectively receiving traffic. All attached routes are `Accepted`, but
 following the general Gateway API route precedence rules, only the oldest route
 (by `metadata.creationTimestamp`, then alphabetically by `namespace/name`)

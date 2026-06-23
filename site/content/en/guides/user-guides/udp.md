@@ -15,13 +15,13 @@ distribute the traffic with the following rules:
   `my-bar-service` Kubernetes Service.
 
 In this example two `UDP` listeners will be applied to the [Gateway][gateway]
-in order to route them to two separate backend `UDPRoutes`, note that the
+in order to route traffic to two separate backend `UDPRoutes`, note that the
 `protocol` set for the `listeners` on the `Gateway` is `UDP`:
 
 {{< readfile file="/examples/standard/basic-udp.yaml" code="true" lang="yaml" >}}
 
 In the above example we separate the traffic for the two separate backend UDP
-[Services][svc] by using the `sectionName` field in the `parentRefs`:
+[Services][svc] by using the `sectionName` field in the `parentRefs` to refer to a specific named listener:
 
 ```yaml
 spec:
@@ -43,8 +43,8 @@ listeners:
 ```
 
 In this way each `UDPRoute` "attaches" itself to a different port on the
-`Gateway` so that the service `my-foo-service` is taking traffic for port `8080`
-from outside the cluster and `my-bar-service` takes the port `8090` traffic.
+`Gateway` so that the service `my-foo-service` receives traffic for port `8080`
+and `my-bar-service` receives traffic for port `8090`.
 
 Note that you can achieve this same result by binding the Routes to the Gateway
 listeners using the `port` field in the `parentRefs`:

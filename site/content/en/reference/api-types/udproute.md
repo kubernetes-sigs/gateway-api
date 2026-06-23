@@ -45,7 +45,7 @@ The specification of a UDPRoute consists of:
 - [Rules][udprouterule] - Define a list of rules to perform actions against
   matching UDP datagrams. For UDPRoute this is limited to which
   [backendRefs][backendRef] should be used. A UDPRoute may contain a single
-  rule.
+  rule with up to 16 backendRefs.
 
 ### Attaching to Gateways
 
@@ -115,8 +115,8 @@ number, rather than to named listeners whose ports may change.
 
 ### Rules
 
-Rules define the list of actions to be taken with the traffic. A UDPRoute may
-contain a single rule.
+Rules define the action to be taken with the traffic. A UDPRoute may
+contain a single rule with up to 16 backendRefs.
 
 #### BackendRefs
 
