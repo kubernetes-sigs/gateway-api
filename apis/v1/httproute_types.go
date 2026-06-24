@@ -1617,11 +1617,13 @@ const (
 // HTTPExternalAuthFilter defines a filter that modifies requests by sending
 // request details to an external authorization server.
 //
+// <gateway:util:excludeFromCRD>
 // For Envoy-based implementations leveraging Envoy's ext_authz filter, be
 // aware of the associated route cache clearing risk. Additional filters in the
 // Envoy filter chain may bypass authorization decisions by clearing the route
 // cache after ext_authz has run. See the Envoy documentation for more details:
 // https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/ext_authz_filter#security-considerations
+// </gateway:util:excludeFromCRD>
 //
 // Support: Extended
 // Feature Name: HTTPRouteExternalAuth
