@@ -280,6 +280,7 @@ const (
 
   // AttributeSourceReference extracts the value from a proxy-builtin reference variable
   // mapped to OpenTelemetry Semantic Conventions (e.g., "http.request.method").
+  // See: https://opentelemetry.io/docs/specs/semconv/
   //
   // Support: Extended
   AttributeSourceReference = "Reference"
@@ -320,6 +321,7 @@ type Attribute struct {
   // AttributeRef refers to a standard OpenTelemetry attribute.
   // For example: "http.response.status_code" or "http.request.method".
   // This is required if Type is "Reference".
+  // See: https://opentelemetry.io/docs/specs/semconv/
   //
   // +optional
   AttributeRef *string `json:"attributeRef,omitempty"`
@@ -452,6 +454,11 @@ type TracingProvider struct {
   // When configured, tracing data is exported to the referenced backend. If the reference
   // is invalid (e.g., the Service does not exist), the implementation should update the
   // policy's status conditions to indicate an unresolved reference.
+  //
+  // TLS configuration for the connection to the backend is managed by the referenced
+  // object. For example, if the BackendRef points to a Service, a BackendTLSPolicy
+  // can be attached to configure TLS. Alternatively, the referenced backend could be a
+  // custom resource (e.g., XBackend) that natively manages TLS.
   //
   // Support: Core
   //
@@ -667,6 +674,14 @@ type TelemetryPolicyStatus struct {
   Ancestors []PolicyAncestorStatus `json:"ancestors"`
 }
 ```
+
+#### Attribute References and Portability
+
+To ensure portability and avoid implementation-specific lock-in, the `Reference` attribute source type relies exclusively on standard [OpenTelemetry Semantic Conventions](https://opentelemetry.io/docs/specs/semconv/).
+
+When users specify an `attributeRef`, they must use these standardized keys (e.g., `http.request.method`, `http.response.status_code`). The underlying Gateway API implementations are responsible for mapping these standard OpenTelemetry keys to their proxy-specific internal variables.
+
+Implementations MUST NOT expose internal, proxy-specific variables through the `Reference` type. If an implementation does not support mapping a specific standard attribute, it SHOULD gracefully omit it or signal the limitation via policy status conditions.
 
 ## Comparison with Prior Art
 
