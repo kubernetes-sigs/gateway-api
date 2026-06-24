@@ -683,6 +683,22 @@ When users specify an `attributeRef`, they must use these standardized keys (e.g
 
 Implementations MUST NOT expose internal, proxy-specific variables through the `Reference` type. If an implementation does not support mapping a specific standard attribute, it SHOULD gracefully omit it or signal the limitation via policy status conditions.
 
+## Alternatives Considered
+
+### Implementation-Specific OpenTelemetry Enablement
+
+During the initial proposal in the [kube-agentic-networking](https://github.com/kubernetes-sigs/kube-agentic-networking) subproject, an alternative was suggested to avoid defining a new API standard. The idea was that implementations should natively implement the OpenTelemetry specification for traces, metrics, and logs, and simply provide their own implementation-specific mechanisms to enable or disable these features.
+
+**Reason for Rejection:** 
+While this works as a baseline, it falls short when users need to customize their telemetry (which is fairly common). Customizations like adding specific attributes or conditional log filtering would require users to rely on vendor-specific APIs increasing the risk of lock-in.
+
+### Inline Gateway Configuration
+
+Another alternative considered was adding the telemetry configuration directly as a top-level struct on the `Gateway` resource instead of introducing a new Policy object.
+
+**Reason for Rejection:** 
+While inline configuration works well for a 1:1 mapping on a single Gateway, a separate Policy attachment model provides a decoupled, reusable configuration. A single `TelemetryPolicy` can be applied uniformly to multiple gateways, meaning platform operators and developers can ensure consistent telemetry signals across their infrastructure. This approach prevents configuration drift and avoids bloating the core `Gateway` API specification.
+
 ## Comparison with Prior Art
 
 ### Istio
