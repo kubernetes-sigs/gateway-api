@@ -66,7 +66,7 @@ var TLSRouteSimpleSameNamespace = confsuite.ConformanceTest{
 			tcp.MakeTCPRequestAndExpectEventuallyValidResponse(t, suite.TimeoutConfig, gwAddr, []byte(caString), serverStr, true,
 				tcp.ExpectedResponse{
 					BackendIsTLS: true, // Passthrough expects a TLS Backend
-					Backend:      "tcp-backend",
+					Backend:      "l4-backend",
 					Namespace:    confsuite.InfrastructureNamespace,
 					Hostname:     serverStr,
 				})

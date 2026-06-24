@@ -11,7 +11,7 @@ spec:
   - abc.example.com
   rules:
   - backendRefs:
-    - name: tcp-backend
+    - name: l4-backend
       port: 8443
 ---
 apiVersion: gateway.networking.k8s.io/v1

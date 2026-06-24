@@ -17,17 +17,13 @@ limitations under the License.
 package tests
 
 import (
-	"context"
 	"testing"
-	"time"
 
-	"github.com/miekg/dns"
 	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/apimachinery/pkg/util/wait"
 
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	confsuite "sigs.k8s.io/gateway-api/conformance/utils/suite"
-	"sigs.k8s.io/gateway-api/conformance/utils/tlog"
+	"sigs.k8s.io/gateway-api/conformance/utils/udp"
 	"sigs.k8s.io/gateway-api/pkg/features"
 )
 
@@ -45,28 +41,16 @@ var UDPRouteTest = confsuite.ConformanceTest{
 	},
 	Provisional: true,
 	Test: func(t *testing.T, suite *confsuite.ConformanceTestSuite) {
-		t.Run("Simple UDP request matching UDPRoute should reach coredns backend", func(t *testing.T) {
+		t.Run("Simple UDP request matching UDPRoute should reach l4-backend", func(t *testing.T) {
 			namespace := confsuite.InfrastructureNamespace
-			domain := "foo.bar.com."
-			routeNN := types.NamespacedName{Name: "udp-coredns", Namespace: namespace}
+			routeNN := types.NamespacedName{Name: "udp-l4-backend", Namespace: namespace}
 			gwNN := types.NamespacedName{Name: "udp-gateway", Namespace: namespace}
 			gwAddr := kubernetes.GatewayAndUDPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
 
-			msg := new(dns.Msg)
-			msg.SetQuestion(domain, dns.TypeA)
-			tlog.Logf(t, "performing DNS query %s on %s", domain, gwAddr)
-			if err := wait.PollUntilContextTimeout(context.TODO(), time.Second, suite.TimeoutConfig.DefaultTestTimeout, true,
-				func(_ context.Context) (done bool, err error) {
-					r, err := dns.Exchange(msg, gwAddr)
-					if err != nil {
-						tlog.Logf(t, "failed to perform a UDP query: %v", err)
-						return false, nil
-					}
-					tlog.Logf(t, "got DNS response: %s", r.String())
-					return true, nil
-				}); err != nil {
-				t.Errorf("failed to perform DNS query: %v", err)
-			}
+			udp.ExpectEchoResponseFromBackend(t, suite.TimeoutConfig.MaxTimeToConsistency, gwAddr, udp.ExpectedResponse{
+				Service:   "l4-backend",
+				Namespace: namespace,
+			})
 		})
 	},
 }

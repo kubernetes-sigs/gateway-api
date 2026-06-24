@@ -64,11 +64,11 @@ var TLSRouteTerminateSimpleSameNamespace = confsuite.ConformanceTest{
 			t.Fatalf("ca.crt not found in configmap: %s/%s", caCertNN.Namespace, caCertNN.Name)
 		}
 
-		t.Run("Simple TLS request matching terminated TLSRoute should reach tcp-backend with plain text", func(t *testing.T) {
+		t.Run("Simple TLS request matching terminated TLSRoute should reach l4-backend with plain text", func(t *testing.T) {
 			tcp.MakeTCPRequestAndExpectEventuallyValidResponse(t, suite.TimeoutConfig, gwAddr, []byte(caString), serverStr, true,
 				tcp.ExpectedResponse{
 					BackendIsTLS: false, // It is terminated on the gateway
-					Backend:      "tcp-backend",
+					Backend:      "l4-backend",
 					Namespace:    confsuite.InfrastructureNamespace,
 					Hostname:     "", // Terminated tests do not contain a SNI attribute on the backend
 				})

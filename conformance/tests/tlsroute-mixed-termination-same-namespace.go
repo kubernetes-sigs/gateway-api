@@ -108,13 +108,13 @@ var TLSRouteMixedTerminationSameNamespace = confsuite.ConformanceTest{
 			t.Fatalf("ca.crt not found in configmap: %s/%s", caCertNN.Namespace, caCertNN.Name)
 		}
 
-		t.Run("Simple TLS request matching terminated TLSRoute should reach tcp-backend unencrypted", func(t *testing.T) {
+		t.Run("Simple TLS request matching terminated TLSRoute should reach l4-backend unencrypted", func(t *testing.T) {
 			t.Parallel()
 
 			tcp.MakeTCPRequestAndExpectEventuallyValidResponse(t, suite.TimeoutConfig, gwAddr, []byte(caString), serverStrTerminate, true,
 				tcp.ExpectedResponse{
 					BackendIsTLS: false, // It is terminated on the gateway
-					Backend:      "tcp-backend",
+					Backend:      "l4-backend",
 					Namespace:    confsuite.InfrastructureNamespace,
 					Hostname:     "", // Terminated tests do not contain a SNI attribute on the backend
 				})
@@ -125,7 +125,7 @@ var TLSRouteMixedTerminationSameNamespace = confsuite.ConformanceTest{
 			tcp.MakeTCPRequestAndExpectEventuallyValidResponse(t, suite.TimeoutConfig, gwAddr, []byte(caString), serverStrPassthrough, true,
 				tcp.ExpectedResponse{
 					BackendIsTLS: true, // Passthrough expects a TLS Backend
-					Backend:      "tcp-backend",
+					Backend:      "l4-backend",
 					Namespace:    confsuite.InfrastructureNamespace,
 					Hostname:     serverStrPassthrough,
 				})

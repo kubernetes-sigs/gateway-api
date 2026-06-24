@@ -19,10 +19,12 @@ limitations under the License.
 package udpechoserver
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net"
 	"os"
+	"time"
 )
 
 // Context contains information about the pod where the udpechoserver is
@@ -62,6 +64,16 @@ type EchoResponse struct {
 // default "8080") and runs until a fatal error occurs. It is intended to be
 // invoked from echo-basic when UDP_ECHO_SERVER is set.
 func Main() {
+	errchan := make(chan error, 1)
+	Start(context.Background(), errchan)
+	if err := <-errchan; err != nil {
+		fmt.Println("echo server error:", err)
+		os.Exit(1)
+	}
+}
+
+// Start launches the UDP echo listener. The first fatal error is sent to errchan.
+func Start(ctx context.Context, errchan chan<- error) {
 	port := os.Getenv("UDP_PORT")
 	if port == "" {
 		port = "8080"
@@ -73,15 +85,16 @@ func Main() {
 		Pod:       os.Getenv("POD_NAME"),
 	}
 
-	if err := serveUDP(port, podContext); err != nil {
-		fmt.Println("echo server error:", err)
-		os.Exit(1)
-	}
+	go func() {
+		if err := serveUDP(ctx, port, podContext); err != nil {
+			errchan <- err
+		}
+	}()
 }
 
 // serveUDP listens on the given UDP port and replies to each datagram with a
 // JSON-encoded EchoResponse.
-func serveUDP(port string, podContext Context) error {
+func serveUDP(ctx context.Context, port string, podContext Context) error {
 	addr, err := net.ResolveUDPAddr("udp", ":"+port)
 	if err != nil {
 		return fmt.Errorf("resolving UDP address: %w", err)
@@ -97,6 +110,10 @@ func serveUDP(port string, podContext Context) error {
 
 	buffer := make([]byte, 1024)
 	for {
+		if err := ctx.Err(); err != nil {
+			return nil
+		}
+		_ = conn.SetReadDeadline(time.Now().Add(time.Second))
 		n, remoteAddr, err := conn.ReadFromUDP(buffer)
 		if err != nil {
 			fmt.Println("Error reading UDP:", err)

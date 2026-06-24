@@ -14,12 +14,22 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// TCP contains a basic TCP client for l4-backend assertions
-// Opposite to HTTP client, this client can be extremely simple, always running
-// the right commands against the TCP Server, expecting a response and then closing
-// the connection.
-// The client optionally accepts an expected TLS response, meaning it should verify
-// if the TCP answer contains TLS attributes. This option can be used to validate that
-// it is communicating with a TLS enabled backend (and can be used for Passthrough assertions)
+package l4server
 
-package tcp
+import (
+	"context"
+	"fmt"
+
+	tcpserver "sigs.k8s.io/gateway-api/conformance/echo-basic/tcpserver"
+	"sigs.k8s.io/gateway-api/conformance/echo-basic/udpechoserver"
+)
+
+func Main() {
+	ctx := context.Background()
+	errchan := make(chan error, 2)
+	tcpserver.Start(ctx, errchan)
+	udpechoserver.Start(ctx, errchan)
+	if err := <-errchan; err != nil {
+		panic(fmt.Sprintf("Failed to start l4 server: %s\n", err.Error()))
+	}
+}

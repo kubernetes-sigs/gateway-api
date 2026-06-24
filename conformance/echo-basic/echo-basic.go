@@ -36,6 +36,7 @@ import (
 	"golang.org/x/net/websocket"
 
 	g "sigs.k8s.io/gateway-api/conformance/echo-basic/grpc"
+	l "sigs.k8s.io/gateway-api/conformance/echo-basic/l4server"
 	t "sigs.k8s.io/gateway-api/conformance/echo-basic/tcpserver"
 	u "sigs.k8s.io/gateway-api/conformance/echo-basic/udpechoserver"
 )
@@ -88,6 +89,11 @@ var (
 func main() {
 	if os.Getenv("GRPC_ECHO_SERVER") != "" {
 		g.Main()
+		return
+	}
+
+	if os.Getenv("L4_ECHO_SERVER") != "" {
+		l.Main()
 		return
 	}
 

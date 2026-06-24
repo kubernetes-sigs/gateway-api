@@ -69,12 +69,19 @@ var podContext Context
 
 func Main() {
 	ctx := context.Background()
-	// We pass the errchan externally, so it can be used to close/stop the server (by unit tests)
-	errchan := make(chan error)
+	errchan := make(chan error, 1)
+	Start(ctx, errchan)
+	if err := <-errchan; err != nil {
+		panic(fmt.Sprintf("Failed to start tcp server: %s\n", err.Error()))
+	}
+}
+
+// Start launches TCP and optional TLS listeners. The first fatal error is sent to errchan.
+func Start(ctx context.Context, errchan chan<- error) {
 	runServer(ctx, errchan)
 }
 
-func runServer(ctx context.Context, errchan chan error) {
+func runServer(ctx context.Context, errchan chan<- error) {
 	podContext = Context{
 		Namespace: os.Getenv("NAMESPACE"),
 		Ingress:   os.Getenv("INGRESS_NAME"),
@@ -137,9 +144,6 @@ func runServer(ctx context.Context, errchan chan error) {
 				errchan <- err
 			}
 		}()
-	}
-	if err := <-errchan; err != nil {
-		panic(fmt.Sprintf("Failed to start tcp server: %s\n", err.Error()))
 	}
 }
 
