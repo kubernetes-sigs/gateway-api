@@ -1,0 +1,12 @@
+apiVersion: internal.gateway.networking.k8s.io/v1alpha1
+kind: GEPDetails
+number: 3139
+name: GRPCRoute Timeouts
+status: Implementable 
+authors:
+  - xtine 
+relationships:
+  extendedBy:
+    - number: 2257
+      name: Gateway API Duration Format
+      description: Adds a duration format for us in timeouts.
