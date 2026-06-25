@@ -731,3 +731,22 @@ While inline configuration works well for a 1:1 mapping on a single Gateway, a s
 * **Customization**: To make low-level, custom modifications to the data plane configuration that are not supported by Kuadrant's native APIs, users can bypass Kuadrant and directly use the underlying gateway's mechanisms.
 * **Comparison**: While Kuadrant provides powerful, identity-aware telemetry (like token tracking per user), its configuration is fragmented across the `Kuadrant` CR, components specific CRDs, its custom extension `TelemetryPolicy`, and the underlying gateway's native APIs. The proposed `TelemetryPolicy` aims to unify these intent-based capabilities into a single, provider-agnostic resource.
  
+### Airlock Microgateway
+
+[Airlock Microgateway](https://docs.airlock.com/microgateway/5.0/index/api/crds/telemetry/v1alpha1/) defines a `Telemetry` CRD to configure logging, metrics, and tracing.
+
+* **Metrics**: While the `Telemetry` CRD broadly targets telemetry, metric generation is largely handled by default configurations rather than via customization within the CRD itself.
+* **Logs**: Configures access logs with customizable JSON and ECS formats, relying on Envoy-specific log variables and dynamic metadata extraction. 
+* **Tracing**: Supports configuring an OpenTelemetry provider with deep exporter settings (e.g., gRPC/HTTP endpoints and custom TLS certificate pinning) and sampling strategies (ratio or parent-based).
+* **Customization**: Explicitly supports defining mechanisms to extract and propagate correlation identifiers from request headers directly within the telemetry configuration.
+* **Comparison**: While Airlock utilizes a unified `Telemetry` custom resource, its specification includes implementation-specific details (like TLS pinning strategies and Envoy string formatting). The proposed `TelemetryPolicy` abstracts these into a more portable, generalized resource.
+
+### NGINX Gateway Fabric
+
+[NGINX Gateway Fabric](https://docs.nginx.com/nginx-gateway-fabric/reference/api/) splits its telemetry configuration across its `NginxProxy` and `ObservabilityPolicy` custom resources.
+
+* **Metrics**: Global data plane observability, such as Prometheus metrics scraping, is managed via the `NginxProxy` resource which can be referenced from a `GatewayClass` or `Gateway`.
+* **Logs**: Access log formatting and enablement are also managed centrally via the `NginxProxy` resource.
+* **Tracing**: Distributed tracing is configured using the `ObservabilityPolicy`, which is a Direct Attached Policy that specifically targets `HTTPRoute` or `GRPCRoute`. It supports configuring OpenTelemetry sampling strategies (ratio or parent-based), context propagation, custom span names, and span attributes.
+* **Customization**: For advanced proxy configurations not natively covered by the standard policies, users can inject raw NGINX configuration using the `SnippetsPolicy` at the Gateway level or the `SnippetsFilter` at the Route level.
+* **Comparison**: NGINX Gateway Fabric separates its telemetry intents across multiple layers, splitting infrastructure-level metrics and logs from route-level tracing configurations. The proposed `TelemetryPolicy` consolidates these observability signals into a single Direct Attached Policy targeting the `Gateway`.
