@@ -1,7 +1,6 @@
 package mcp
 
 import (
-	"context"
 	"fmt"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -32,13 +31,33 @@ type AgenticDataMeshFilter struct {
 	TokenBudget int32 `json:"tokenBudget,omitempty"`
 }
 
+// +genclient
+// +kubebuilder:object:root=true
+// +kubebuilder:resource:categories=gateway-api
+// +kubebuilder:subresource:status
+// +kubebuilder:storageversion
+
 // LLMRoute is an extension of HTTPRoute tailored for Agentic workloads.
 type LLMRoute struct {
 	metav1.TypeMeta   `json:",inline"`
+	// +optional
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
+	// Spec defines the desired state of LLMRoute.
 	Spec   LLMRouteSpec   `json:"spec,omitempty"`
+	// Status defines the current state of LLMRoute.
+	// +optional
 	Status gatewayv1.RouteStatus `json:"status,omitempty"`
+}
+
+// +kubebuilder:object:root=true
+
+// LLMRouteList contains a list of LLMRoute
+type LLMRouteList struct {
+	metav1.TypeMeta `json:",inline"`
+	// +optional
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []LLMRoute `json:"items"`
 }
 
 // LLMRouteSpec defines the desired state of LLMRoute
