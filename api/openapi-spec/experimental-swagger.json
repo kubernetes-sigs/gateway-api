@@ -18005,7 +18005,7 @@
 					"x-kubernetes-list-type": "atomic"
 				},
 				"rules": {
-					"description": "Rules are a list of GRPC matchers, filters and actions.\n\n<gateway:experimental:validation:XValidation:message=\"Rule name must be unique within the route\",rule=\"self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name) && l1.name == l2.name))\">",
+					"description": "Rules are a list of GRPC matchers, filters and actions.",
 					"type": "array",
 					"items": {
 						"$ref": "io.k8s.networking.gateway.v1.GRPCRouteRule"
@@ -18984,7 +18984,7 @@
 					"x-kubernetes-list-type": "atomic"
 				},
 				"rules": {
-					"description": "Rules are a list of HTTP matchers, filters and actions.\n\n<gateway:experimental:validation:XValidation:message=\"Rule name must be unique within the route\",rule=\"self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name) && l1.name == l2.name))\"> <gateway:util:excludeFromCRD> Validates that the total number of matches across all rules does not exceed 128. CEL does not support aggregate functions like sum() over lists, so each of the (up to 16) rules is checked individually and their match counts are summed explicitly. </gateway:util:excludeFromCRD>",
+					"description": "Rules are a list of HTTP matchers, filters and actions.\n\n<gateway:util:excludeFromCRD> Validates that the total number of matches across all rules does not exceed 128. CEL does not support aggregate functions like sum() over lists, so each of the (up to 16) rules is checked individually and their match counts are summed explicitly. </gateway:util:excludeFromCRD>",
 					"type": "array",
 					"items": {
 						"$ref": "io.k8s.networking.gateway.v1.HTTPRouteRule"
