@@ -150,7 +150,6 @@ spec:
 
 The following are the Go structs modeling the proposed specification.
 
-```go
 // TelemetryPolicy defines a Direct Attached Policy to configure 
 // telemetry/observability signals for Gateways.
 //
@@ -640,7 +639,7 @@ type TelemetryPolicyStatus struct {
   // For Policy Status API conventions, see:
   // https://gateway-api.sigs.k8s.io/geps/gep-713/#the-status-stanza-of-policy-objects
   //
-  // Ancestors is a list of ancestor resources (usually Backend) that are
+  // Ancestors is a list of ancestor resources (usually Gateway) that are
   // associated with the policy, and the status of the policy with respect to
   // each ancestor. When this policy attaches to a parent, the controller that
   // manages the parent and the ancestors MUST add an entry to this list when
