@@ -150,6 +150,7 @@ spec:
 
 The following are the Go structs modeling the proposed specification.
 
+```golang
 // TelemetryPolicy defines a Direct Attached Policy to configure 
 // telemetry/observability signals for Gateways.
 //
