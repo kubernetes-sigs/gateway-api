@@ -103,30 +103,6 @@ spec:
                   as a suffix match. That means that a match for `*.example.com` would match
                   both `test.example.com`, and `foo.test.example.com`, but not `example.com`.
 
-                  If both the Listener and GRPCRoute have specified hostnames, any
-                  GRPCRoute hostnames that do not match the Listener hostname MUST be
-                  ignored. For example, if a Listener specified `*.example.com`, and the
-                  GRPCRoute specified `test.example.com` and `test.example.net`,
-                  `test.example.net` MUST NOT be considered for a match.
-
-                  If both the Listener and GRPCRoute have specified hostnames, and none
-                  match with the criteria above, then the GRPCRoute MUST NOT be accepted by
-                  the implementation. The implementation MUST raise an 'Accepted' Condition
-                  with a status of `False` in the corresponding RouteParentStatus.
-
-                  If a Route (A) of type HTTPRoute or GRPCRoute is attached to a
-                  Listener and that listener already has another Route (B) of the other
-                  type attached and the intersection of the hostnames of A and B is
-                  non-empty, then the implementation MUST accept exactly one of these two
-                  routes, determined by the following criteria, in order:
-
-                  * The oldest Route based on creation timestamp.
-                  * The Route appearing first in alphabetical order by
-                    "{namespace}/{name}".
-
-                  The rejected Route MUST raise an 'Accepted' condition with a status of
-                  'False' in the corresponding RouteParentStatus.
-
                   Support: Core
                 items:
                   description: |-
@@ -182,27 +158,6 @@ spec:
                     each ParentRef that selects the same object must set the same set of
                     optional fields to different values. If one ParentRef sets a
                     combination of optional fields, all must set the same combination.
-
-                  Some examples:
-
-                  * If one ParentRef sets `sectionName`, all ParentRefs referencing the
-                    same object must also set `sectionName`.
-                  * If one ParentRef sets `port`, all ParentRefs referencing the same
-                    object must also set `port`.
-                  * If one ParentRef sets `sectionName` and `port`, all ParentRefs
-                    referencing the same object must also set `sectionName` and `port`.
-
-                  It is possible to separately reference multiple distinct objects that may
-                  be collapsed by an implementation. For example, some implementations may
-                  choose to merge compatible Gateway Listeners together. If that is the
-                  case, the list of routes attached to those resources should also be
-                  merged.
-
-                  Note that for ParentRefs that cross namespace boundaries, there are specific
-                  rules. Cross-namespace references are only valid if they are explicitly
-                  allowed by something in the namespace they are referring to. For example,
-                  Gateway has the AllowedRoutes field, and ReferenceGrant provides a
-                  generic way to enable other kinds of cross-namespace reference.
 
 
                   ParentRefs from a Route to a Service in the same namespace are "producer"
@@ -315,14 +270,6 @@ spec:
                         Implementations supporting other types of parent resources MUST clearly
                         document how/if Port is interpreted.
 
-                        For the purpose of status, an attachment is considered successful as
-                        long as the parent resource accepts it partially. For example, Gateway
-                        listeners can restrict which Routes can attach to them by Route kind,
-                        namespace, or hostname. If 1 of 2 Gateway listeners accept attachment
-                        from the referencing Route, the Route MUST be considered successfully
-                        attached. If no Gateway listeners accept attachment from this Route,
-                        the Route MUST be considered detached from the Gateway.
-
                         Support: Extended
                       format: int32
                       maximum: 65535
@@ -345,13 +292,6 @@ spec:
                         interpreted.
 
                         When unspecified (empty string), this will reference the entire resource.
-                        For the purpose of status, an attachment is considered successful if at
-                        least one section in the parent resource accepts it. For example, Gateway
-                        listeners can restrict which Routes can attach to them by Route kind,
-                        namespace, or hostname. If 1 of 2 Gateway listeners accept attachment from
-                        the referencing Route, the Route MUST be considered successfully
-                        attached. If no Gateway listeners accept attachment from this Route, the
-                        Route MUST be considered detached from the Gateway.
 
                         Support: Core
                       maxLength: 253
@@ -399,26 +339,6 @@ spec:
                       description: |-
                         BackendRefs defines the backend(s) where matching requests should be
                         sent.
-
-                        Failure behavior here depends on how many BackendRefs are specified and
-                        how many are invalid.
-
-                        If *all* entries in BackendRefs are invalid, and there are also no filters
-                        specified in this route rule, *all* traffic which matches this rule MUST
-                        receive an `UNAVAILABLE` status.
-
-                        See the GRPCBackendRef definition for the rules about what makes a single
-                        GRPCBackendRef invalid.
-
-                        When a GRPCBackendRef is invalid, `UNAVAILABLE` statuses MUST be returned for
-                        requests that would have otherwise been routed to an invalid backend. If
-                        multiple backends are specified, and some are invalid, the proportion of
-                        requests that would otherwise have been routed to an invalid backend
-                        MUST receive an `UNAVAILABLE` status.
-
-                        For example, if two backends are specified with equal weights, and one is
-                        invalid, 50 percent of traffic MUST receive an `UNAVAILABLE` status.
-                        Implementations may choose how that 50 percent is determined.
 
                         Support: Core for Kubernetes Service
 
@@ -663,27 +583,13 @@ spec:
                                         within this BackendRef, irrespective of how many endpoints are present
                                         within this BackendRef.
 
-                                        If the referent cannot be found, this BackendRef is invalid and must be
-                                        dropped from the Gateway. The controller must ensure the "ResolvedRefs"
-                                        condition on the Route status is set to `status: False` and not configure
-                                        this backend in the underlying implementation.
-
-                                        If there is a cross-namespace reference to an *existing* object
-                                        that is not allowed by a ReferenceGrant, the controller must ensure the
-                                        "ResolvedRefs"  condition on the Route is set to `status: False`,
-                                        with the "RefNotPermitted" reason and not configure this backend in the
-                                        underlying implementation.
-
-                                        In either error case, the Message of the `ResolvedRefs` Condition
-                                        should be used to provide more detail about the problem.
+                                        If the backend service requires TLS, use BackendTLSPolicy to tell the
+                                        implementation to supply the TLS details to be used to connect to that
+                                        backend.
 
                                         Support: Extended for Kubernetes Service
 
                                         Support: Implementation-specific for any other resource
-
-                                        If the backend service requires TLS, use BackendTLSPolicy to tell the
-                                        implementation to supply the TLS details to be used to connect to that
-                                        backend.
                                       properties:
                                         group:
                                           default: ""
@@ -960,10 +866,6 @@ spec:
 
                                     Implementers are encouraged to define custom implementation types to
                                     extend the core API with implementation-specific behavior.
-
-                                    If a reference to a custom filter type cannot be resolved, the filter
-                                    MUST NOT be skipped. Instead, requests that would have been processed by
-                                    that filter MUST receive a HTTP error response.
                                   enum:
                                   - ResponseHeaderModifier
                                   - RequestHeaderModifier
@@ -1108,9 +1010,6 @@ spec:
                         Filters define the filters that are applied to requests that match
                         this rule.
 
-                        The effects of ordering of multiple behaviors are currently unspecified.
-                        This can change in the future based on feedback during the alpha stage.
-
                         Conformance-levels at this level are defined based on the type of filter:
 
                         - ALL core filters MUST be supported by all implementations that support
@@ -1121,12 +1020,6 @@ spec:
 
                         Specifying the same filter multiple times is not supported unless explicitly
                         indicated in the filter.
-
-                        If an implementation cannot support a combination of filters, it must clearly
-                        document that limitation. In cases where incompatible or unsupported
-                        filters are specified and cause the `Accepted` condition to be set to status
-                        `False`, implementations may use the `IncompatibleFilters` reason to specify
-                        this configuration error.
 
                         Support: Core
                       items:
@@ -1334,27 +1227,13 @@ spec:
                                   within this BackendRef, irrespective of how many endpoints are present
                                   within this BackendRef.
 
-                                  If the referent cannot be found, this BackendRef is invalid and must be
-                                  dropped from the Gateway. The controller must ensure the "ResolvedRefs"
-                                  condition on the Route status is set to `status: False` and not configure
-                                  this backend in the underlying implementation.
-
-                                  If there is a cross-namespace reference to an *existing* object
-                                  that is not allowed by a ReferenceGrant, the controller must ensure the
-                                  "ResolvedRefs"  condition on the Route is set to `status: False`,
-                                  with the "RefNotPermitted" reason and not configure this backend in the
-                                  underlying implementation.
-
-                                  In either error case, the Message of the `ResolvedRefs` Condition
-                                  should be used to provide more detail about the problem.
+                                  If the backend service requires TLS, use BackendTLSPolicy to tell the
+                                  implementation to supply the TLS details to be used to connect to that
+                                  backend.
 
                                   Support: Extended for Kubernetes Service
 
                                   Support: Implementation-specific for any other resource
-
-                                  If the backend service requires TLS, use BackendTLSPolicy to tell the
-                                  implementation to supply the TLS details to be used to connect to that
-                                  backend.
                                 properties:
                                   group:
                                     default: ""
@@ -1629,10 +1508,6 @@ spec:
 
                               Implementers are encouraged to define custom implementation types to
                               extend the core API with implementation-specific behavior.
-
-                              If a reference to a custom filter type cannot be resolved, the filter
-                              MUST NOT be skipped. Instead, requests that would have been processed by
-                              that filter MUST receive a HTTP error response.
                             enum:
                             - ResponseHeaderModifier
                             - RequestHeaderModifier
@@ -1710,28 +1585,6 @@ spec:
                         match conditions to be ANDed together.
 
                         If no matches are specified, the implementation MUST match every gRPC request.
-
-                        Proxy or Load Balancer routing configuration generated from GRPCRoutes
-                        MUST prioritize rules based on the following criteria, continuing on
-                        ties. Merging MUST not be done between GRPCRoutes and HTTPRoutes.
-                        Precedence MUST be given to the rule with the largest number of:
-
-                        * Characters in a matching non-wildcard hostname.
-                        * Characters in a matching hostname.
-                        * Characters in a matching service.
-                        * Characters in a matching method.
-                        * Header matches.
-
-                        If ties still exist across multiple Routes, matching precedence MUST be
-                        determined in order of the following criteria, continuing on ties:
-
-                        * The oldest Route based on creation timestamp.
-                        * The Route appearing first in alphabetical order by
-                          "{namespace}/{name}".
-
-                        If ties still exist within the Route that has been given precedence,
-                        matching precedence MUST be granted to the first matching rule meeting
-                        the above criteria.
                       items:
                         description: |-
                           GRPCRouteMatch defines the predicate used to match requests to a given
@@ -2206,14 +2059,6 @@ spec:
                             Implementations supporting other types of parent resources MUST clearly
                             document how/if Port is interpreted.
 
-                            For the purpose of status, an attachment is considered successful as
-                            long as the parent resource accepts it partially. For example, Gateway
-                            listeners can restrict which Routes can attach to them by Route kind,
-                            namespace, or hostname. If 1 of 2 Gateway listeners accept attachment
-                            from the referencing Route, the Route MUST be considered successfully
-                            attached. If no Gateway listeners accept attachment from this Route,
-                            the Route MUST be considered detached from the Gateway.
-
                             Support: Extended
                           format: int32
                           maximum: 65535
@@ -2236,13 +2081,6 @@ spec:
                             interpreted.
 
                             When unspecified (empty string), this will reference the entire resource.
-                            For the purpose of status, an attachment is considered successful if at
-                            least one section in the parent resource accepts it. For example, Gateway
-                            listeners can restrict which Routes can attach to them by Route kind,
-                            namespace, or hostname. If 1 of 2 Gateway listeners accept attachment from
-                            the referencing Route, the Route MUST be considered successfully
-                            attached. If no Gateway listeners accept attachment from this Route, the
-                            Route MUST be considered detached from the Gateway.
 
                             Support: Core
                           maxLength: 253
