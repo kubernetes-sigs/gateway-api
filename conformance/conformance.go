@@ -86,6 +86,15 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 	// Override options with any command line flags that were explicitly set.
 	flags.ApplyAll(configurableOpts)
 
+	baseManifestsValue := "resources/base.yaml"
+	if baseFromEnv := os.Getenv("INFERENCE_CONFORMANCE_BASE"); baseFromEnv != "" {
+		baseManifestsValue = baseFromEnv
+	}
+
+	// Set baseManifestsValue in suite settings if possible, or pass via ManifestFS
+	// Note: Core gateway-api uses ManifestFS. To allow overriding base.yaml, we can
+	// keep standard FS but we want this custom configuration capability.
+
 	return suite.ConformanceOptions{
 		ConfigurableOptions: *configurableOpts,
 		Client:              client,
