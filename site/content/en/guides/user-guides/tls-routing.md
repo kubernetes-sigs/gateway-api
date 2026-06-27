@@ -1,6 +1,6 @@
 ---
 title: "TLS routing"
-weight: 13
+weight: 14
 ---
 
 The [TLSRoute resource](/reference/api-types/tlsroute/) allows you to match on TLS
