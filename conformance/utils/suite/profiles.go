@@ -148,7 +148,12 @@ var (
 			features.SupportReferenceGrant,
 			features.SupportGRPCRoute,
 		),
-		ExtendedFeatures: features.SetsToNamesSet(features.GatewayExtendedFeatures),
+		ExtendedFeatures: sets.New[features.FeatureName]().
+			Insert(features.SetsToNamesSet(
+				features.GatewayExtendedFeatures,
+				features.BackendTLSPolicyCoreFeatures,
+				features.BackendTLSPolicyExtendedFeatures,
+			).UnsortedList()...),
 	}
 
 	// MeshHTTPConformanceProfile is a ConformanceProfile that covers testing HTTP
