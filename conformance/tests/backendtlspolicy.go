@@ -189,6 +189,14 @@ var BackendTLSPolicy = confsuite.ConformanceTest{
 			}
 
 			testCMNN := types.NamespacedName{Name: testCMName, Namespace: ns}
+			staleCM := &corev1.ConfigMap{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      testCMName,
+					Namespace: ns,
+				},
+			}
+			err = client.IgnoreNotFound(suite.Client.Delete(ctx, staleCM))
+			require.NoError(t, err, "failed to delete stale test-specific ConfigMap")
 
 			policy := &gatewayv1.BackendTLSPolicy{}
 			err = suite.Client.Get(ctx, testPolicyNN, policy)
