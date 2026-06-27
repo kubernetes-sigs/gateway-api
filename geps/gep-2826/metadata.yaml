@@ -1,0 +1,15 @@
+apiVersion: internal.gateway.networking.k8s.io/v1alpha1
+kind: GEPDetails
+number: 2826
+name: DirectResponse HTTPRouteFilter
+status: Experimental
+authors:
+  - lianglli
+references:
+  - https://github.com/kubernetes-sigs/gateway-api/issues/2826
+  - https://istio.io/latest/docs/reference/config/networking/virtual-service/#HTTPDirectResponse
+  - https://projectcontour.io/docs/1.28/config/api/#projectcontour.io/v1.HTTPDirectResponsePolicy
+  - https://gateway.envoyproxy.io/docs/api/extension_types/#httpdirectresponsefilter
+featureNames:
+  - HTTPRouteDirectResponse
+changelog: []

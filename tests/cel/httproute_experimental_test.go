@@ -614,3 +614,146 @@ func TestHTTPExternalAuthFilterExperimental(t *testing.T) {
 	}
 
 }
+
+func TestHTTPDirectResponseFilterExperimental(t *testing.T) {
+	testService := gatewayv1.ObjectName("test-service")
+	tests := []struct {
+		name       string
+		wantErrors []string
+		rules      []gatewayv1.HTTPRouteRule
+	}{
+		{
+			name: "valid DirectResponse with status code and body",
+			rules: []gatewayv1.HTTPRouteRule{{
+				Filters: []gatewayv1.HTTPRouteFilter{{
+					Type: gatewayv1.HTTPRouteFilterDirectResponse,
+					DirectResponse: &gatewayv1.HTTPDirectResponseFilter{
+						StatusCode: 200,
+						Body: &gatewayv1.HTTPDirectResponseBody{
+							String: "hello",
+						},
+					},
+				}},
+			}},
+		},
+		{
+			name: "valid DirectResponse with status code only (no body)",
+			rules: []gatewayv1.HTTPRouteRule{{
+				Filters: []gatewayv1.HTTPRouteFilter{{
+					Type: gatewayv1.HTTPRouteFilterDirectResponse,
+					DirectResponse: &gatewayv1.HTTPDirectResponseFilter{
+						StatusCode: 204,
+					},
+				}},
+			}},
+		},
+		{
+			name: "valid DirectResponse combined with ResponseHeaderModifier",
+			rules: []gatewayv1.HTTPRouteRule{{
+				Filters: []gatewayv1.HTTPRouteFilter{
+					{
+						Type: gatewayv1.HTTPRouteFilterDirectResponse,
+						DirectResponse: &gatewayv1.HTTPDirectResponseFilter{
+							StatusCode: 200,
+							Body: &gatewayv1.HTTPDirectResponseBody{
+								String: `{"status":"ok"}`,
+							},
+						},
+					},
+					{
+						Type: gatewayv1.HTTPRouteFilterResponseHeaderModifier,
+						ResponseHeaderModifier: &gatewayv1.HTTPHeaderFilter{
+							Set: []gatewayv1.HTTPHeader{{
+								Name:  gatewayv1.HTTPHeaderName("Content-Type"),
+								Value: "application/json",
+							}},
+						},
+					},
+				},
+			}},
+		},
+		{
+			name:       "invalid DirectResponse with backendRefs",
+			wantErrors: []string{"DirectResponse filter must not be used together with backendRefs"},
+			rules: []gatewayv1.HTTPRouteRule{{
+				Filters: []gatewayv1.HTTPRouteFilter{{
+					Type: gatewayv1.HTTPRouteFilterDirectResponse,
+					DirectResponse: &gatewayv1.HTTPDirectResponseFilter{
+						StatusCode: 200,
+					},
+				}},
+				BackendRefs: []gatewayv1.HTTPBackendRef{{
+					BackendRef: gatewayv1.BackendRef{
+						BackendObjectReference: gatewayv1.BackendObjectReference{
+							Name: testService,
+							Port: new(gatewayv1.PortNumber(80)),
+						},
+					},
+				}},
+			}},
+		},
+		{
+			name:       "invalid DirectResponse type without directResponse field",
+			wantErrors: []string{"filter.directResponse must be specified for DirectResponse filter.type"},
+			rules: []gatewayv1.HTTPRouteRule{{
+				Filters: []gatewayv1.HTTPRouteFilter{{
+					Type: gatewayv1.HTTPRouteFilterDirectResponse,
+				}},
+			}},
+		},
+		{
+			name:       "invalid directResponse field with mismatched type",
+			wantErrors: []string{"filter.directResponse must be nil if the filter.type is not DirectResponse"},
+			rules: []gatewayv1.HTTPRouteRule{{
+				Filters: []gatewayv1.HTTPRouteFilter{{
+					Type: gatewayv1.HTTPRouteFilterRequestHeaderModifier,
+					RequestHeaderModifier: &gatewayv1.HTTPHeaderFilter{
+						Set: []gatewayv1.HTTPHeader{{
+							Name:  gatewayv1.HTTPHeaderName("x-foo"),
+							Value: "bar",
+						}},
+					},
+					DirectResponse: &gatewayv1.HTTPDirectResponseFilter{
+						StatusCode: 200,
+					},
+				}},
+			}},
+		},
+		{
+			name:       "invalid status code below 100",
+			wantErrors: []string{"statusCode"},
+			rules: []gatewayv1.HTTPRouteRule{{
+				Filters: []gatewayv1.HTTPRouteFilter{{
+					Type: gatewayv1.HTTPRouteFilterDirectResponse,
+					DirectResponse: &gatewayv1.HTTPDirectResponseFilter{
+						StatusCode: 99,
+					},
+				}},
+			}},
+		},
+		{
+			name:       "invalid status code above 599",
+			wantErrors: []string{"statusCode"},
+			rules: []gatewayv1.HTTPRouteRule{{
+				Filters: []gatewayv1.HTTPRouteFilter{{
+					Type: gatewayv1.HTTPRouteFilterDirectResponse,
+					DirectResponse: &gatewayv1.HTTPDirectResponseFilter{
+						StatusCode: 600,
+					},
+				}},
+			}},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			route := &gatewayv1.HTTPRoute{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      fmt.Sprintf("foo-%v", time.Now().UnixNano()),
+					Namespace: metav1.NamespaceDefault,
+				},
+				Spec: gatewayv1.HTTPRouteSpec{Rules: tc.rules},
+			}
+			validateHTTPRoute(t, route, tc.wantErrors)
+		})
+	}
+}

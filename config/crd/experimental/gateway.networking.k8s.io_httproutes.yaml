@@ -762,6 +762,36 @@ spec:
                                       minimum: 1
                                       type: integer
                                   type: object
+                                directResponse:
+                                  description: |-
+                                    DirectResponse defines a schema for a filter that replies to the request
+                                    directly from the gateway, without forwarding to a backend.
+
+                                    Support: Extended
+
+                                    Feature Name: HTTPRouteDirectResponse
+                                  properties:
+                                    body:
+                                      description: Body is the content of the HTTP
+                                        response body to be returned.
+                                      properties:
+                                        string:
+                                          description: String is the response body
+                                            as a plain text string.
+                                          maxLength: 4096
+                                          type: string
+                                      required:
+                                      - string
+                                      type: object
+                                    statusCode:
+                                      description: StatusCode is the HTTP status code
+                                        to be used in the direct response.
+                                      maximum: 599
+                                      minimum: 100
+                                      type: integer
+                                  required:
+                                  - statusCode
+                                  type: object
                                 extensionRef:
                                   description: |-
                                     ExtensionRef is an optional, implementation-specific extension to the
@@ -1684,6 +1714,7 @@ spec:
                                   - ExtensionRef
                                   - CORS
                                   - ExternalAuth
+                                  - DirectResponse
                                   type: string
                                 urlRewrite:
                                   description: |-
@@ -1827,6 +1858,14 @@ spec:
                               - message: filter.externalAuth must be specified for
                                   ExternalAuth filter.type
                                 rule: '!(!has(self.externalAuth) && self.type == ''ExternalAuth'')'
+                              - message: filter.directResponse must be nil if the
+                                  filter.type is not DirectResponse
+                                rule: '!(has(self.directResponse) && self.type !=
+                                  ''DirectResponse'')'
+                              - message: filter.directResponse must be specified for
+                                  DirectResponse filter.type
+                                rule: '!(!has(self.directResponse) && self.type ==
+                                  ''DirectResponse'')'
                             maxItems: 16
                             type: array
                             x-kubernetes-list-type: atomic
@@ -2290,6 +2329,36 @@ spec:
                                 format: int32
                                 minimum: 1
                                 type: integer
+                            type: object
+                          directResponse:
+                            description: |-
+                              DirectResponse defines a schema for a filter that replies to the request
+                              directly from the gateway, without forwarding to a backend.
+
+                              Support: Extended
+
+                              Feature Name: HTTPRouteDirectResponse
+                            properties:
+                              body:
+                                description: Body is the content of the HTTP response
+                                  body to be returned.
+                                properties:
+                                  string:
+                                    description: String is the response body as a
+                                      plain text string.
+                                    maxLength: 4096
+                                    type: string
+                                required:
+                                - string
+                                type: object
+                              statusCode:
+                                description: StatusCode is the HTTP status code to
+                                  be used in the direct response.
+                                maximum: 599
+                                minimum: 100
+                                type: integer
+                            required:
+                            - statusCode
                             type: object
                           extensionRef:
                             description: |-
@@ -3207,6 +3276,7 @@ spec:
                             - ExtensionRef
                             - CORS
                             - ExternalAuth
+                            - DirectResponse
                             type: string
                           urlRewrite:
                             description: |-
@@ -3347,6 +3417,12 @@ spec:
                         - message: filter.externalAuth must be specified for ExternalAuth
                             filter.type
                           rule: '!(!has(self.externalAuth) && self.type == ''ExternalAuth'')'
+                        - message: filter.directResponse must be nil if the filter.type
+                            is not DirectResponse
+                          rule: '!(has(self.directResponse) && self.type != ''DirectResponse'')'
+                        - message: filter.directResponse must be specified for DirectResponse
+                            filter.type
+                          rule: '!(!has(self.directResponse) && self.type == ''DirectResponse'')'
                       maxItems: 16
                       type: array
                       x-kubernetes-list-type: atomic
@@ -3951,6 +4027,11 @@ spec:
                       && has(f.urlRewrite.path.replacePrefixMatch))) )) ? ((size(self.matches)
                       != 1 || !has(self.matches[0].path) || self.matches[0].path.type
                       != ''PathPrefix'') ? false : true) : true'
+                  - message: DirectResponse filter must not be used together with
+                      backendRefs
+                    rule: '(has(self.backendRefs) && size(self.backendRefs) > 0) ?
+                      (!has(self.filters) || self.filters.all(f, !has(f.directResponse))):
+                      true'
                 maxItems: 16
                 minItems: 1
                 type: array
@@ -5017,6 +5098,36 @@ spec:
                                       minimum: 1
                                       type: integer
                                   type: object
+                                directResponse:
+                                  description: |-
+                                    DirectResponse defines a schema for a filter that replies to the request
+                                    directly from the gateway, without forwarding to a backend.
+
+                                    Support: Extended
+
+                                    Feature Name: HTTPRouteDirectResponse
+                                  properties:
+                                    body:
+                                      description: Body is the content of the HTTP
+                                        response body to be returned.
+                                      properties:
+                                        string:
+                                          description: String is the response body
+                                            as a plain text string.
+                                          maxLength: 4096
+                                          type: string
+                                      required:
+                                      - string
+                                      type: object
+                                    statusCode:
+                                      description: StatusCode is the HTTP status code
+                                        to be used in the direct response.
+                                      maximum: 599
+                                      minimum: 100
+                                      type: integer
+                                  required:
+                                  - statusCode
+                                  type: object
                                 extensionRef:
                                   description: |-
                                     ExtensionRef is an optional, implementation-specific extension to the
@@ -5939,6 +6050,7 @@ spec:
                                   - ExtensionRef
                                   - CORS
                                   - ExternalAuth
+                                  - DirectResponse
                                   type: string
                                 urlRewrite:
                                   description: |-
@@ -6082,6 +6194,14 @@ spec:
                               - message: filter.externalAuth must be specified for
                                   ExternalAuth filter.type
                                 rule: '!(!has(self.externalAuth) && self.type == ''ExternalAuth'')'
+                              - message: filter.directResponse must be nil if the
+                                  filter.type is not DirectResponse
+                                rule: '!(has(self.directResponse) && self.type !=
+                                  ''DirectResponse'')'
+                              - message: filter.directResponse must be specified for
+                                  DirectResponse filter.type
+                                rule: '!(!has(self.directResponse) && self.type ==
+                                  ''DirectResponse'')'
                             maxItems: 16
                             type: array
                             x-kubernetes-list-type: atomic
@@ -6545,6 +6665,36 @@ spec:
                                 format: int32
                                 minimum: 1
                                 type: integer
+                            type: object
+                          directResponse:
+                            description: |-
+                              DirectResponse defines a schema for a filter that replies to the request
+                              directly from the gateway, without forwarding to a backend.
+
+                              Support: Extended
+
+                              Feature Name: HTTPRouteDirectResponse
+                            properties:
+                              body:
+                                description: Body is the content of the HTTP response
+                                  body to be returned.
+                                properties:
+                                  string:
+                                    description: String is the response body as a
+                                      plain text string.
+                                    maxLength: 4096
+                                    type: string
+                                required:
+                                - string
+                                type: object
+                              statusCode:
+                                description: StatusCode is the HTTP status code to
+                                  be used in the direct response.
+                                maximum: 599
+                                minimum: 100
+                                type: integer
+                            required:
+                            - statusCode
                             type: object
                           extensionRef:
                             description: |-
@@ -7462,6 +7612,7 @@ spec:
                             - ExtensionRef
                             - CORS
                             - ExternalAuth
+                            - DirectResponse
                             type: string
                           urlRewrite:
                             description: |-
@@ -7602,6 +7753,12 @@ spec:
                         - message: filter.externalAuth must be specified for ExternalAuth
                             filter.type
                           rule: '!(!has(self.externalAuth) && self.type == ''ExternalAuth'')'
+                        - message: filter.directResponse must be nil if the filter.type
+                            is not DirectResponse
+                          rule: '!(has(self.directResponse) && self.type != ''DirectResponse'')'
+                        - message: filter.directResponse must be specified for DirectResponse
+                            filter.type
+                          rule: '!(!has(self.directResponse) && self.type == ''DirectResponse'')'
                       maxItems: 16
                       type: array
                       x-kubernetes-list-type: atomic
@@ -8206,6 +8363,11 @@ spec:
                       && has(f.urlRewrite.path.replacePrefixMatch))) )) ? ((size(self.matches)
                       != 1 || !has(self.matches[0].path) || self.matches[0].path.type
                       != ''PathPrefix'') ? false : true) : true'
+                  - message: DirectResponse filter must not be used together with
+                      backendRefs
+                    rule: '(has(self.backendRefs) && size(self.backendRefs) > 0) ?
+                      (!has(self.filters) || self.filters.all(f, !has(f.directResponse))):
+                      true'
                 maxItems: 16
                 minItems: 1
                 type: array
