@@ -422,61 +422,15 @@ these two configurations.
 
 In this section, we will explore the questions and design elements associated with a session persistence API.
 
-We will present two distinct patterns for configuring session persistence:
+Session persistence is configured as an inline field on the [Backend](../gep-4488/index.md) resource. The `SessionPersistence`
+struct uses a discriminated union pattern with `Type` as the discriminator and type-specific configuration in `cookie` and
+`header` fields.
 
-1. `BackendLBPolicy`: a Direct Policy Attachment for backends (Services, ServiceImports, or any
-   implementation-specific backendRef)
-2. An inline API update to HTTPRoute and GRPCRoute rules
-
-### BackendLBPolicy API
-
-In order to apply session persistence configuration to a backend, we will implement it as a [Policy Attachment](/reference/policy-attachment).
-The new metaresource is named `BackendLBPolicy` and is responsible for configuring load balancing-related configuration
-for traffic intended for a backend after routing has occurred. It is defined as a [Direct Policy Attachment](../gep-713/index.md#direct-policy-attachment)
-without defaults or overrides, applied to the targeted backend.
-
-Instead of utilizing a specific, session persistence-only policy object, we introduce a more generic API object named
-`BackendLBPolicy`. This design provides tighter coupling with other load balancing configuration which helps reduce
-CRD proliferation. For instance, `BackendLBPolicy` could be augmented to add configuration for selecting a load
-balancing algorithm for traffic to the backends, as desired in issue [#1778](https://github.com/kubernetes-sigs/gateway-api/issues/1778).
-`BackendLBPolicy` could also be later expanded to contain [session affinity](#the-relationship-of-session-persistence-and-session-affinity)
-configuration. This would provide a convenient grouping of the two related APIs within the same policy object.
-Additionally, other future enhancements to the API may include the addition of timeouts, connection draining, and
-logging within `BackendLBPolicy`.
-
-As for achieving session persistence, this API currently exposes the `Type` field which allows selection between
-cookie-based and header-based session persistence. Cookie-based session persistence is considered a core feature,
-while header-based session persistence is extended and therefore optional.
+### Backend API
 
 ```go
-// BackendLBPolicy provides a way to define load balancing rules
-// for a backend.
-type BackendLBPolicy struct {
-    metav1.TypeMeta   `json:",inline"`
-    metav1.ObjectMeta `json:"metadata,omitempty"`
-
-    // Spec defines the desired state of BackendLBPolicy.
-    Spec BackendLBPolicySpec `json:"spec"`
-
-    // Status defines the current state of BackendLBPolicy.
-    Status PolicyStatus `json:"status,omitempty"`
-}
-
-// BackendLBPolicySpec defines the desired state of
-// BackendLBPolicy.
-// Note: there is no Override or Default policy configuration.
-type BackendLBPolicySpec struct {
-    // TargetRef identifies an API object to apply policy to.
-    // Currently, Backends (i.e. Service, ServiceImport, or any
-    // implementation-specific backendRef) are the only valid API
-    // target references.
-    // +listType=map
-    // +listMapKey=group
-    // +listMapKey=kind
-    // +listMapKey=name
-    // +kubebuilder:validation:MinItems=1
-    // +kubebuilder:validation:MaxItems=16
-    TargetRefs []LocalPolicyTargetReference `json:"targetRefs"`
+type BackendSpec struct {
+    [...]
 
     // SessionPersistence defines and configures session persistence
     // for the backend.
@@ -484,7 +438,7 @@ type BackendLBPolicySpec struct {
     // Support: Extended
     //
     // +optional
-    SessionPersistence *SessionPersistence `json:"sessionPersistence"`
+    SessionPersistence *SessionPersistence `json:"sessionPersistence,omitempty"`
 }
 
 // SessionPersistence defines the desired state of
@@ -598,41 +552,6 @@ const (
 )
 ```
 
-### Route Rule API
-
-To support route rule level configuration, this GEP also introduces an API as inline fields within HTTPRouteRule and GRPCRouteRule.
-Any configuration that is specified at Route Rule level MUST override configuration that is attached at the backend level because route rule have a more global view and responsibility for the overall traffic routing.
-This route rule level API for enabling session persistence currently uses the same `SessionPersistence` struct from the
-`BackendLBPolicy` API.
-
-```go
-type HTTPRouteRule struct {
-    [...]
-
-    // SessionPersistence defines and configures session persistence
-    // for the route rule.
-    //
-    // Support: Extended
-    //
-    // +optional
-    SessionPersistence *SessionPersistence `json:"sessionPersistence"`
-}
-```
-
-```go
-type GRPCRouteRule struct {
-    [...]
-
-    // SessionPersistence defines and configures session persistence
-    // for the route rule.
-    //
-    // Support: Extended
-    //
-    // +optional
-    SessionPersistence *SessionPersistence `json:"sessionPersistence"`
-}
-```
-
 ### API Granularity
 
 The purpose of this session persistence API spec is to enable developers to specify that a specific backend expects a
@@ -669,27 +588,32 @@ route in any given implementation.
 
 ### API Attachment Points
 
-The new `BackendLBPolicy` metaresource only supports attaching to a backend. A backend can be a Service,
-ServiceImport (see [GEP-1748](../gep-1748/index.md)), or any implementation-specific backends that are a valid
-[`BackendObjectReference`](/reference/api-spec/main/spec/#backendobjectreference). Enabling session
-persistence for a backend enables subsequently enables it for any route directing traffic to this backend. To learn more
-about the process of attaching a policy to a backend, please refer to [GEP-713](../gep-713/index.md).
+This GEP previously defined two attachment points for session persistence: route-inline (`sessionPersistence` on
+HTTPRouteRule and GRPCRouteRule) and `BackendTrafficPolicy`. Going forward, this GEP champions the
+[Backend](../gep-4488/index.md) resource as the primary attachment point for session persistence. See
+[#4462](https://github.com/kubernetes-sigs/gateway-api/discussions/4462) for background on the attachment model
+discussion.
 
-On the other hand, configuring the `sessionPersistence` field in the route rule enables session persistence exclusively
-for the traffic directed to the `backendRefs` in this route rule. This means applying session persistence configuration
-to a route rule MUST NOT affect traffic for other routes or route rules. Designing the configuration for a specific
-route rule section rather than the route entirely, allows users to configure session persistence in a more granular
-fashion. This approach avoids the need to decompose routes if the configuration is specific to a route path.
+The Backend resource (GEP-4488) provides a consumer-focused, namespace-scoped resource that can be referenced via
+`backendRefs` in routes, combining the advantages of the previous attachment points:
 
-Session persistence configuration specified in a route rule SHALL override equivalent configuration in `BackendLBPolicy`.
-In this situation, implementations MAY want to indicate a warning via a log or status. Refer to [GEP-713](../gep-713/index.md)
-and/or [GEP-2648](../gep-2648/index.md) for more specific details on how to handle override scenarios.
+- Like BackendTrafficPolicy, it attaches to the destination (where prior art overwhelmingly puts session persistence)
+- Like route-inline, it is referenced directly from the route, making the configuration discoverable
 
-Edge cases will arise when implementing session persistence support for both backends and route rules through
-`BackendLBPolicy` and the route rule's `sessionPersistence` field. For guidance on addressing conflicting
-attachments, please consult the [Edge Case Behavior](#edge-case-behavior) section, which outlines API
-use cases. Only a subset of implementations have already designed their data plane to incorporate route rule level session
-persistence, making it likely that route rule level session persistence will be less widely implemented.
+#### Route-Inline Session Persistence
+
+Route-inline `sessionPersistence` on HTTPRouteRule and GRPCRouteRule is deprecated in favor of the Backend resource.
+Route-inline will remain in experimental until Backend session persistence reaches Standard and no use cases remain
+that only route-inline can serve.
+
+Implementations SHOULD NOT implement both route-inline and Backend session persistence. Implementations that have
+already shipped route-inline support (NGINX Gateway Fabric, Envoy Gateway, kgateway) may need to support both during
+the transition. How these implementations handle the intersection is left to the implementation.
+
+#### BackendTrafficPolicy Session Persistence
+
+The `sessionPersistence` field on BackendTrafficPolicy is removed in favor of the Backend resource. No Gateway API
+implementation has shipped BackendTrafficPolicy session persistence to users.
 
 ### Traffic Splitting
 
