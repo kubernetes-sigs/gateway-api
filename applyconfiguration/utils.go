@@ -114,6 +114,10 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1.HTTPBackendRefApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("HTTPCORSFilter"):
 		return &apisv1.HTTPCORSFilterApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("HTTPDirectResponseBody"):
+		return &apisv1.HTTPDirectResponseBodyApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("HTTPDirectResponseFilter"):
+		return &apisv1.HTTPDirectResponseFilterApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("HTTPExternalAuthFilter"):
 		return &apisv1.HTTPExternalAuthFilterApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("HTTPHeader"):
