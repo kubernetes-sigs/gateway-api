@@ -539,7 +539,7 @@ customization, bypass conditions) at the Gateway, HTTPRoute, or rule level.
 
 [varnish-gateway]:https://gateway.varnish.org
 [varnish-software]:https://www.varnish-software.com/
-[varnish]:https://varnish-cache.org/
+[varnish]:https://www.varnish.org/
 
 ## Integrations
 

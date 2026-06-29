@@ -1,7 +1,7 @@
 # Varnish Gateway
 
 [Varnish Gateway](https://gateway.varnish.org) is a Kubernetes [Gateway API](https://gateway-api.sigs.k8s.io/)
-implementation that uses [Varnish](https://varnish-cache.org/) as its data plane. It is developed and maintained
+implementation that uses [Varnish](https://www.varnish.org/) as its data plane. It is developed and maintained
 by [Varnish Software AS](https://www.varnish-software.com/).
 
 ## Table of contents
