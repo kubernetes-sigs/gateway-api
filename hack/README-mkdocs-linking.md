@@ -37,7 +37,7 @@ id: concept-api-overview
 ### 2. State Mapping
 The algorithm maintains two "states":
 -   Before State: A snapshot stored in hack/page_id_map.json which maps every page_id to its known file path (e.g., concepts/api.md).
--   After State: A real-time scan of the site-src/ directory, identifying the current file path for every page_id.
+-   After State: A real-time scan of the `site/content/en/` directory, identifying the current file path for every page_id.
 
 ### 3. Change Detection & Rule Generation
 By comparing these two states, the script identifies three scenarios:
@@ -61,7 +61,7 @@ PYTHONPATH=hack python3 hack/mkdocs_linking.py --prepare --dry-run
 ```
 
 ### 2. Prepare Documentation
-Scans `site-src/`, injects missing IDs, and updates `hack/page_id_map.json`.
+Scans `site/content/en/`, injects missing IDs, and updates `hack/page_id_map.json`.
 ```bash
 PYTHONPATH=hack python3 hack/mkdocs_linking.py --prepare
 ```
@@ -95,9 +95,9 @@ PYTHONPATH=hack python3 -m unittest discover -s hack/mkdocs/__tests__/ -p 'test_
 This toolkit requires Python 3.9+ and several dependencies.
 
 ### 1. Dependencies
-Install the required libraries using the repository's requirements file:
+Install the required libraries:
 ```bash
-pip install -r hack/mkdocs/image/requirements.txt
+pip install python-frontmatter PyYAML
 ```
 
 ### 2. Page ID Map

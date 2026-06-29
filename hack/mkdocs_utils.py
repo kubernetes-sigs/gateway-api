@@ -485,7 +485,7 @@ def build_id_map(docs_dir: Path) -> Dict[str, Path]:
 
 # --- Configuration ---
 # Global constants defining key file paths and metadata keys.
-DOCS_DIR: Path = Path("site-src")
+DOCS_DIR: Path = Path("site/content/en")
 PAGE_ID_MAP_FILE: Path = Path("hack/page_id_map.json")
 MKDOCS_YML_PATH: Path = Path("mkdocs.yml")
 FRONTMATTER_ID_KEY: str = "id"
