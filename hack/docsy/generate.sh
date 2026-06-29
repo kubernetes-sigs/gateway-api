@@ -34,6 +34,7 @@ go install github.com/elastic/crd-ref-docs
 declare -a arr=(
     "release-1.4"
     "release-1.5"
+    "release-1.6"
     "main"
 )
 
