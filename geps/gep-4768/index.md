@@ -115,7 +115,6 @@ spec:
     mode: "On"
     overrides:
       - name: "example.com/http/request_count"
-        type: Counter
         attributes: # Inject custom attributes/labels
           - name: "x-model-id"
             type: Header
@@ -561,13 +560,6 @@ type MetricOverride struct {
   //
   // +required
   Name string `json:"name"`
-
-  // Type specifies the metric instrument type (e.g., "Counter", "Histogram").
-  //
-  // Support: Extended
-  //
-  // +optional
-  Type string `json:"type,omitempty"`
 
   // Attributes defines custom labels/dimensions to append to the overridden metric.
   //
