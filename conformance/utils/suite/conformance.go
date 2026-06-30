@@ -112,7 +112,7 @@ func ParseKeyValuePairs(f string) map[string]string {
 	}
 	res := map[string]string{}
 	for kv := range strings.SplitSeq(f, ",") {
-		parts := strings.Split(kv, "=")
+		parts := strings.SplitN(kv, "=", 2)
 		if len(parts) == 2 {
 			res[parts[0]] = parts[1]
 		}
