@@ -190,7 +190,7 @@ In this section you will find specific links to blog posts, documentation and ot
 It is the first and only proxy designed specifically for the Kubernetes Gateway API, powered by a high performance and scalable Rust dataplane implementation.
 
 ### Airlock Microgateway
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.5.1-Airlock%20Microgateway-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.5.1/airlock-microgateway)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.6-Airlock%20Microgateway-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.6/airlock-microgateway)
 
 [Airlock Microgateway][airlock-microgateway] is a Kubernetes native WAAP (Web Application and API Protection) solution optimized for Kubernetes environments and certified for Red Hat OpenShift.
 Modern application security is embedded in the development workflow and follows DevSecOps paradigms.
@@ -204,14 +204,14 @@ Airlock Microgateway protects your applications and microservices with the tried
 
 #### Documentation and links
 - [Product documentation][airlock-microgateway-documentation]
-- [Gateway specific documentation][airlock-microgateway-guide]
+- [Gateway API guide][airlock-microgateway-guide]
 - Check our [Airlock community forum][airlock-microgateway-community-support] and [support process][airlock-microgateway-premium-support] for support.
 
-[airlock-microgateway]: https://www.airlock.com/en/secure-access-hub/components/microgateway
-[airlock-microgateway-documentation]: https://docs.airlock.com/microgateway/latest
-[airlock-microgateway-guide]: https://docs.airlock.com/microgateway/latest/?topic=MGW-00000142
-[airlock-microgateway-community-support]: https://forum.airlock.com/
-[airlock-microgateway-premium-support]: https://techzone.ergon.ch/support-process
+[airlock-microgateway]:https://www.airlock.com/en/secure-access-hub/components/microgateway
+[airlock-microgateway-documentation]:https://docs.airlock.com/microgateway/latest
+[airlock-microgateway-guide]:https://docs.airlock.com/microgateway/latest/?topic=MGW-00000142
+[airlock-microgateway-community-support]:https://forum.airlock.com/
+[airlock-microgateway-premium-support]:https://techzone.ergon.ch/support-process
 
 ### Alibaba Cloud Service Mesh
 
