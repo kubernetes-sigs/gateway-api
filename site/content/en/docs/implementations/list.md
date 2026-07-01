@@ -184,7 +184,7 @@ class.
 In this section you will find specific links to blog posts, documentation and other Gateway API references for specific implementations.
 
 ### Agentgateway
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.5.0-Agentgateway-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.5.0/agentgateway-agentgateway)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.6.0-Agentgateway-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.6.0/agentgateway-agentgateway)
 
 [Agentgateway](https://agentgateway.dev/) is an open source Gateway API implementation hosted as a part of the Linux Foundation, focusing on AI use cases, including LLM consumption, LLM serving, agent-to-agent ([A2A](https://a2aproject.github.io/A2A/latest/)), agent-to-tool ([MCP](https://modelcontextprotocol.io/introduction)), as well as traditional TCP/HTTP traffic serving.
 It is the first and only proxy designed specifically for the Kubernetes Gateway API, powered by a high performance and scalable Rust dataplane implementation.
