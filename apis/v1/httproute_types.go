@@ -144,6 +144,7 @@ type HTTPRouteSpec struct {
 // +kubebuilder:validation:XValidation:message="When using URLRewrite filter with path.replacePrefixMatch, exactly one PathPrefix match must be specified",rule="(has(self.filters) && self.filters.exists_one(f, has(f.urlRewrite) && has(f.urlRewrite.path) && f.urlRewrite.path.type == 'ReplacePrefixMatch' && has(f.urlRewrite.path.replacePrefixMatch))) ? ((size(self.matches) != 1 || !has(self.matches[0].path) || self.matches[0].path.type != 'PathPrefix') ? false : true) : true"
 // +kubebuilder:validation:XValidation:message="Within backendRefs, when using RequestRedirect filter with path.replacePrefixMatch, exactly one PathPrefix match must be specified",rule="(has(self.backendRefs) && self.backendRefs.exists_one(b, (has(b.filters) && b.filters.exists_one(f, has(f.requestRedirect) && has(f.requestRedirect.path) && f.requestRedirect.path.type == 'ReplacePrefixMatch' && has(f.requestRedirect.path.replacePrefixMatch))) )) ? ((size(self.matches) != 1 || !has(self.matches[0].path) || self.matches[0].path.type != 'PathPrefix') ? false : true) : true"
 // +kubebuilder:validation:XValidation:message="Within backendRefs, When using URLRewrite filter with path.replacePrefixMatch, exactly one PathPrefix match must be specified",rule="(has(self.backendRefs) && self.backendRefs.exists_one(b, (has(b.filters) && b.filters.exists_one(f, has(f.urlRewrite) && has(f.urlRewrite.path) && f.urlRewrite.path.type == 'ReplacePrefixMatch' && has(f.urlRewrite.path.replacePrefixMatch))) )) ? ((size(self.matches) != 1 || !has(self.matches[0].path) || self.matches[0].path.type != 'PathPrefix') ? false : true) : true"
+// <gateway:experimental:validation:XValidation:message="DirectResponse filter must not be used together with backendRefs",rule="(has(self.backendRefs) && size(self.backendRefs) > 0) ? (!has(self.filters) || self.filters.all(f, !has(f.directResponse))): true">
 type HTTPRouteRule struct {
 	// Name is the name of the route rule. This name MUST be unique within a Route if it is set.
 	//
@@ -819,6 +820,8 @@ type HTTPRouteMatch struct {
 // +kubebuilder:validation:XValidation:message="filter.urlRewrite must be specified for URLRewrite filter.type",rule="!(!has(self.urlRewrite) && self.type == 'URLRewrite')"
 // <gateway:experimental:validation:XValidation:message="filter.externalAuth must be nil if the filter.type is not ExternalAuth",rule="!(has(self.externalAuth) && self.type != 'ExternalAuth')">
 // <gateway:experimental:validation:XValidation:message="filter.externalAuth must be specified for ExternalAuth filter.type",rule="!(!has(self.externalAuth) && self.type == 'ExternalAuth')">
+// <gateway:experimental:validation:XValidation:message="filter.directResponse must be nil if the filter.type is not DirectResponse",rule="!(has(self.directResponse) && self.type != 'DirectResponse')">
+// <gateway:experimental:validation:XValidation:message="filter.directResponse must be specified for DirectResponse filter.type",rule="!(!has(self.directResponse) && self.type == 'DirectResponse')">
 // +kubebuilder:validation:XValidation:message="filter.extensionRef must be nil if the filter.type is not ExtensionRef",rule="!(has(self.extensionRef) && self.type != 'ExtensionRef')"
 // +kubebuilder:validation:XValidation:message="filter.extensionRef must be specified for ExtensionRef filter.type",rule="!(!has(self.extensionRef) && self.type == 'ExtensionRef')"
 type HTTPRouteFilter struct {
@@ -857,7 +860,7 @@ type HTTPRouteFilter struct {
 	//
 	// +unionDiscriminator
 	// +kubebuilder:validation:Enum=RequestHeaderModifier;ResponseHeaderModifier;RequestMirror;RequestRedirect;URLRewrite;ExtensionRef;CORS
-	// <gateway:experimental:validation:Enum=RequestHeaderModifier;ResponseHeaderModifier;RequestMirror;RequestRedirect;URLRewrite;ExtensionRef;CORS;ExternalAuth>
+	// <gateway:experimental:validation:Enum=RequestHeaderModifier;ResponseHeaderModifier;RequestMirror;RequestRedirect;URLRewrite;ExtensionRef;CORS;ExternalAuth;DirectResponse>
 	// +required
 	Type HTTPRouteFilterType `json:"type"`
 
@@ -927,6 +930,17 @@ type HTTPRouteFilter struct {
 	// +optional
 	// <gateway:experimental>
 	ExternalAuth *HTTPExternalAuthFilter `json:"externalAuth,omitempty"`
+
+	// DirectResponse defines a schema for a filter that replies to the request
+	// directly from the gateway, without forwarding to a backend.
+	//
+	// Support: Extended
+	//
+	// Feature Name: HTTPRouteDirectResponse
+	//
+	// +optional
+	// <gateway:experimental>
+	DirectResponse *HTTPDirectResponseFilter `json:"directResponse,omitempty"`
 
 	// ExtensionRef is an optional, implementation-specific extension to the
 	// "filter" behavior.  For example, resource "myroutefilter" in group
@@ -1009,6 +1023,17 @@ const (
 	//
 	// <gateway:experimental>
 	HTTPRouteFilterExternalAuth HTTPRouteFilterType = "ExternalAuth"
+
+	// HTTPRouteFilterDirectResponse can be used to respond directly to a request
+	// without forwarding it to a backend. This is a terminal filter: it MUST NOT
+	// be used in the same HTTPRouteRule as backendRefs.
+	//
+	// Support in HTTPRouteRule: Extended
+	//
+	// Feature Name: HTTPRouteDirectResponse
+	//
+	// <gateway:experimental>
+	HTTPRouteFilterDirectResponse HTTPRouteFilterType = "DirectResponse"
 
 	// HTTPRouteFilterExtensionRef should be used for configuring custom
 	// HTTP filters.
@@ -1877,6 +1902,41 @@ type HTTPBackendRef struct {
 	// +kubebuilder:validation:XValidation:message="RequestRedirect filter cannot be repeated",rule="self.filter(f, f.type == 'RequestRedirect').size() <= 1"
 	// +kubebuilder:validation:XValidation:message="URLRewrite filter cannot be repeated",rule="self.filter(f, f.type == 'URLRewrite').size() <= 1"
 	Filters []HTTPRouteFilter `json:"filters,omitempty"`
+}
+
+// HTTPDirectResponseFilter defines a filter that replies to the matched request
+// directly from the gateway, without forwarding to any backend.
+//
+// A rule using this filter MUST NOT have backendRefs set.
+//
+// Support: Extended
+//
+// Feature Name: HTTPRouteDirectResponse
+//
+// <gateway:experimental>
+type HTTPDirectResponseFilter struct {
+	// StatusCode is the HTTP status code to be used in the direct response.
+	//
+	// +kubebuilder:validation:Minimum=100
+	// +kubebuilder:validation:Maximum=599
+	// +required
+	StatusCode int `json:"statusCode"`
+
+	// Body is the content of the HTTP response body to be returned.
+	//
+	// +optional
+	Body *HTTPDirectResponseBody `json:"body,omitempty"`
+}
+
+// HTTPDirectResponseBody defines the body of an HTTP direct response.
+//
+// <gateway:experimental>
+type HTTPDirectResponseBody struct {
+	// String is the response body as a plain text string.
+	//
+	// +kubebuilder:validation:MaxLength=4096
+	// +required
+	String string `json:"string"`
 }
 
 // HTTPRouteStatus defines the observed state of HTTPRoute.

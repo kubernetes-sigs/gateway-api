@@ -28,6 +28,8 @@ import (
 // HTTPRouteRule defines semantics for matching an HTTP request based on
 // conditions (matches), processing it (filters), and forwarding the request to
 // an API object (backendRefs).
+//
+// <gateway:experimental:validation:XValidation:message="DirectResponse filter must not be used together with backendRefs",rule="(has(self.backendRefs) && size(self.backendRefs) > 0) ? (!has(self.filters) || self.filters.all(f, !has(f.directResponse))): true">
 type HTTPRouteRuleApplyConfiguration struct {
 	// Name is the name of the route rule. This name MUST be unique within a Route if it is set.
 	//

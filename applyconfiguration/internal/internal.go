@@ -833,6 +833,23 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: maxAge
       type:
         scalar: numeric
+- name: io.k8s.sigs.gateway-api.apis.v1.HTTPDirectResponseBody
+  map:
+    fields:
+    - name: string
+      type:
+        scalar: string
+      default: ""
+- name: io.k8s.sigs.gateway-api.apis.v1.HTTPDirectResponseFilter
+  map:
+    fields:
+    - name: body
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1.HTTPDirectResponseBody
+    - name: statusCode
+      type:
+        scalar: numeric
+      default: 0
 - name: io.k8s.sigs.gateway-api.apis.v1.HTTPExternalAuthFilter
   map:
     fields:
@@ -996,6 +1013,9 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: cors
       type:
         namedType: io.k8s.sigs.gateway-api.apis.v1.HTTPCORSFilter
+    - name: directResponse
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1.HTTPDirectResponseFilter
     - name: extensionRef
       type:
         namedType: io.k8s.sigs.gateway-api.apis.v1.LocalObjectReference

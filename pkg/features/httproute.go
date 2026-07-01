@@ -126,6 +126,9 @@ const (
 
 	// This option indicates support for RequestRedirect filter on HTTPRoute BackendRef (extended conformance).
 	SupportHTTPRouteBackendRequestRedirect FeatureName = "HTTPRouteBackendRequestRedirect"
+
+	// This option indicates support for the DirectResponse filter in the HTTPRouteFilter (extended conformance).
+	SupportHTTPRouteDirectResponse FeatureName = "HTTPRouteDirectResponse"
 )
 
 var (
@@ -269,6 +272,11 @@ var (
 		Name:    SupportHTTPRouteBackendRequestRedirect,
 		Channel: FeatureChannelStandard,
 	}
+	// HTTPRouteDirectResponseFeature contains metadata for the HTTPRouteDirectResponse feature.
+	HTTPRouteDirectResponseFeature = Feature{
+		Name:    SupportHTTPRouteDirectResponse,
+		Channel: FeatureChannelExperimental,
+	}
 )
 
 // HTTPRouteExtendedFeatures includes all extended features for HTTPRoute
@@ -303,4 +311,5 @@ var HTTPRouteExtendedFeatures = sets.New(
 	HTTPRouteRetryConnectionErrorFeature,
 	HTTPRouteBackendURLRewriteFeature,
 	HTTPRouteBackendRequestRedirectFeature,
+	HTTPRouteDirectResponseFeature,
 )

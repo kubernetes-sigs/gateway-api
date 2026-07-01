@@ -34,6 +34,8 @@ import (
 //
 // <gateway:experimental:validation:XValidation:message="filter.externalAuth must be nil if the filter.type is not ExternalAuth",rule="!(has(self.externalAuth) && self.type != 'ExternalAuth')">
 // <gateway:experimental:validation:XValidation:message="filter.externalAuth must be specified for ExternalAuth filter.type",rule="!(!has(self.externalAuth) && self.type == 'ExternalAuth')">
+// <gateway:experimental:validation:XValidation:message="filter.directResponse must be nil if the filter.type is not DirectResponse",rule="!(has(self.directResponse) && self.type != 'DirectResponse')">
+// <gateway:experimental:validation:XValidation:message="filter.directResponse must be specified for DirectResponse filter.type",rule="!(!has(self.directResponse) && self.type == 'DirectResponse')">
 type HTTPRouteFilterApplyConfiguration struct {
 	// Type identifies the type of filter to apply. As with other API fields,
 	// types are classified into three conformance levels:
@@ -68,7 +70,7 @@ type HTTPRouteFilterApplyConfiguration struct {
 	// Accepted Condition for the Route to `status: False`, with a
 	// Reason of `UnsupportedValue`.
 	//
-	// <gateway:experimental:validation:Enum=RequestHeaderModifier;ResponseHeaderModifier;RequestMirror;RequestRedirect;URLRewrite;ExtensionRef;CORS;ExternalAuth>
+	// <gateway:experimental:validation:Enum=RequestHeaderModifier;ResponseHeaderModifier;RequestMirror;RequestRedirect;URLRewrite;ExtensionRef;CORS;ExternalAuth;DirectResponse>
 	Type *apisv1.HTTPRouteFilterType `json:"type,omitempty"`
 	// RequestHeaderModifier defines a schema for a filter that modifies request
 	// headers.
@@ -115,6 +117,15 @@ type HTTPRouteFilterApplyConfiguration struct {
 	//
 	// <gateway:experimental>
 	ExternalAuth *HTTPExternalAuthFilterApplyConfiguration `json:"externalAuth,omitempty"`
+	// DirectResponse defines a schema for a filter that replies to the request
+	// directly from the gateway, without forwarding to a backend.
+	//
+	// Support: Extended
+	//
+	// Feature Name: HTTPRouteDirectResponse
+	//
+	// <gateway:experimental>
+	DirectResponse *HTTPDirectResponseFilterApplyConfiguration `json:"directResponse,omitempty"`
 	// ExtensionRef is an optional, implementation-specific extension to the
 	// "filter" behavior.  For example, resource "myroutefilter" in group
 	// "networking.example.net"). ExtensionRef MUST NOT be used for core and
@@ -193,6 +204,14 @@ func (b *HTTPRouteFilterApplyConfiguration) WithCORS(value *HTTPCORSFilterApplyC
 // If called multiple times, the ExternalAuth field is set to the value of the last call.
 func (b *HTTPRouteFilterApplyConfiguration) WithExternalAuth(value *HTTPExternalAuthFilterApplyConfiguration) *HTTPRouteFilterApplyConfiguration {
 	b.ExternalAuth = value
+	return b
+}
+
+// WithDirectResponse sets the DirectResponse field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the DirectResponse field is set to the value of the last call.
+func (b *HTTPRouteFilterApplyConfiguration) WithDirectResponse(value *HTTPDirectResponseFilterApplyConfiguration) *HTTPRouteFilterApplyConfiguration {
+	b.DirectResponse = value
 	return b
 }
 
