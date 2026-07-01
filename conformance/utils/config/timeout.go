@@ -307,6 +307,12 @@ func SetupTimeoutConfig(timeoutConfig *TimeoutConfig) {
 	if timeoutConfig.GatewayListenersMustHaveConditions == 0 {
 		timeoutConfig.GatewayListenersMustHaveConditions = defaultTimeoutConfig.GatewayListenersMustHaveConditions
 	}
+	if timeoutConfig.ListenerSetMustHaveCondition == 0 {
+		timeoutConfig.ListenerSetMustHaveCondition = defaultTimeoutConfig.ListenerSetMustHaveCondition
+	}
+	if timeoutConfig.ListenerSetListenersMustHaveConditions == 0 {
+		timeoutConfig.ListenerSetListenersMustHaveConditions = defaultTimeoutConfig.ListenerSetListenersMustHaveConditions
+	}
 	if timeoutConfig.GWCMustBeAccepted == 0 {
 		timeoutConfig.GWCMustBeAccepted = defaultTimeoutConfig.GWCMustBeAccepted
 	}
@@ -348,5 +354,8 @@ func SetupTimeoutConfig(timeoutConfig *TimeoutConfig) {
 	}
 	if timeoutConfig.DefaultPollInterval == 0 {
 		timeoutConfig.DefaultPollInterval = defaultTimeoutConfig.DefaultPollInterval
+	}
+	if timeoutConfig.RequiredConsecutiveSuccesses == 0 {
+		timeoutConfig.RequiredConsecutiveSuccesses = defaultTimeoutConfig.RequiredConsecutiveSuccesses
 	}
 }
