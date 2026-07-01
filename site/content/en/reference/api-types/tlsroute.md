@@ -55,6 +55,18 @@ TLSRoute can be used in these cases, where the traffic between the client and
 Gateway is encrypted and contains the SNI hostname, which can be used to decide
 which backend should be used for this request.
 
+{{% alert color="info" title="Union Feature" %}}
+
+When attached to a Listener with `tls.mode` set to `Terminate`, TLSRoute is
+expected to interoperate with
+[BackendTLSPolicy](/reference/api-types/policy/backendtlspolicy/), a
+[union feature](/guides/implementers-guide/#union-feature-conformance) that
+configures TLS from the Gateway to a backend. This does not apply to TLSRoute
+in `Passthrough` mode, since the Gateway never terminates the encrypted
+connection in that mode.
+
+{{% /alert %}}
+
 ## Spec
 
 The specification of a TLSRoute consists of:

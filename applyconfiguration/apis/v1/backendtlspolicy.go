@@ -33,6 +33,13 @@ import (
 // BackendTLSPolicy is a Direct Attached Policy.
 // BackendTLSPolicy provides a way to configure how a Gateway
 // connects to a Backend via TLS.
+//
+// BackendTLSPolicy is a Union Feature: It is expected to be combined with
+// another feature that forwards traffic to a backend.
+//
+// <gateway:union:GRPCRoute>
+// <gateway:union:TLSRoute>
+// <gateway:union:HTTPRequestMirrorFilter>
 type BackendTLSPolicyApplyConfiguration struct {
 	metav1.TypeMetaApplyConfiguration    `json:",inline"`
 	*metav1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
