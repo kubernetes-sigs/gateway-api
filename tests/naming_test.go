@@ -31,29 +31,36 @@ var knownConditionTypes = []v1.GatewayConditionType{
 	v1.GatewayConditionResolvedRefs,
 	v1.GatewayConditionReady,
 	v1.GatewayConditionInsecureFrontendValidationMode,
+	v1.GatewayConditionNameTooLong,
 }
 
-// TestNoNameTooLongCondition documents that no "NameTooLong" condition type
-// exists in the API. If this test starts failing, it means a NameTooLong
-// condition was added, and the gap described in GEP-1762 has been resolved.
-func TestNoNameTooLongCondition(t *testing.T) {
+// TestNameTooLongConditionExists verifies that the "NameTooLong" condition
+// type exists in the API. This validates that the gap described in GEP-1762
+// has been resolved: implementations can now report when a gateway name
+// combined with the gateway class name exceeds the 63-character limit.
+func TestNameTooLongConditionExists(t *testing.T) {
+	found := false
 	for _, ct := range knownConditionTypes {
-		if ct == "NameTooLong" {
-			t.Errorf("found unexpected NameTooLong condition type; this test should be removed when the condition is intentionally added")
+		if ct == v1.GatewayConditionNameTooLong {
+			found = true
+			break
 		}
 	}
-
-	// Also verify no condition type string equals "NameTooLong"
-	if findConditionType("NameTooLong") != nil {
-		t.Errorf("NameTooLong condition type exists but is not listed in knownConditionTypes")
+	if !found {
+		t.Errorf("GatewayConditionNameTooLong is not listed in knownConditionTypes")
 	}
-}
 
-func findConditionType(target string) *v1.GatewayConditionType {
-	// Reflection-based approach would be fragile; this is a compile-time
-	// check that there's no constant with value "NameTooLong".
-	// We rely on TestNoNameTooLongCondition to fail if one is added.
-	return nil
+	// Verify the constant has the expected string value
+	if v1.GatewayConditionNameTooLong != "NameTooLong" {
+		t.Errorf("GatewayConditionNameTooLong = %q, want %q",
+			v1.GatewayConditionNameTooLong, "NameTooLong")
+	}
+
+	// Verify the reason constant matches
+	if v1.GatewayReasonNameTooLong != "NameTooLong" {
+		t.Errorf("GatewayReasonNameTooLong = %q, want %q",
+			v1.GatewayReasonNameTooLong, "NameTooLong")
+	}
 }
 
 // TestNamePlusControllerExceeds63 demonstrates that realistic gateway names

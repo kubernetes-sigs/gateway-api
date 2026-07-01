@@ -1364,6 +1364,34 @@ const (
 	GatewayReasonListenersNotReady GatewayConditionReason = "ListenersNotReady"
 )
 
+const (
+	// This condition indicates whether the name of a Gateway, when combined
+	// with the GatewayClass name, exceeds the 63-character limit for
+	// Kubernetes resource names.
+	//
+	// Generated resource names follow the <NAME>-<GATEWAY CLASS> pattern as
+	// described in GEP-1762. When len(name) + 1 + len(gatewayClassName)
+	// exceeds 63 characters, implementations cannot create child resources
+	// without truncation or failure.
+	//
+	// This condition should be set on the Gateway when the combined name
+	// length would exceed the limit.
+	//
+	// Possible reasons for this condition to be True are:
+	//
+	// * "NameTooLong"
+	//
+	// Controllers may raise this condition with other reasons,
+	// but should prefer to use the reasons listed above to improve
+	// interoperability.
+	GatewayConditionNameTooLong GatewayConditionType = "NameTooLong"
+
+	// This reason is used with the "NameTooLong" condition when the
+	// Gateway's generated resource name would exceed the 63-character
+	// Kubernetes resource name limit.
+	GatewayReasonNameTooLong GatewayConditionReason = "NameTooLong"
+)
+
 // ListenerStatus is the status associated with a Listener.
 type ListenerStatus struct {
 	// Name is the name of the Listener that this status corresponds to.
