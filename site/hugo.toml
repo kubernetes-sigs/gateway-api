@@ -1,6 +1,7 @@
 baseURL = "/"
 title = "Gateway API"
 defaultContentLanguage = "en"
+enableEmoji = true
 
 [services]
 [services.googleAnalytics]
