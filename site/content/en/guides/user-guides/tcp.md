@@ -1,6 +1,6 @@
 ---
 title: "TCP routing"
-weight: 14
+weight: 15
 ---
 
 {{< details title="Standard Channel since v1.6.0" color="success" >}}
