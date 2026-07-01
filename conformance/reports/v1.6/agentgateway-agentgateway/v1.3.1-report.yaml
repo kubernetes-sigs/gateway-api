@@ -1,0 +1,137 @@
+apiVersion: gateway.networking.k8s.io/v1
+date: "2026-06-29T15:04:40-07:00"
+gatewayAPIChannel: experimental
+gatewayAPIVersion: v1.6.0
+implementation:
+  contact:
+  - github.com/agentgateway/agentgateway/issues/new/choose
+  organization: agentgateway
+  project: agentgateway
+  url: http://agentgateway.dev/
+  version: v1.3.1
+kind: ConformanceReport
+mode: default
+profiles:
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 37
+      Skipped: 0
+  extended:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 57
+      Skipped: 0
+    supportedFeatures:
+    - BackendTLSPolicy
+    - BackendTLSPolicySANValidation
+    - GatewayAddressEmpty
+    - GatewayBackendClientCertificate
+    - GatewayFrontendClientCertificateValidation
+    - GatewayFrontendClientCertificateValidationInsecureFallback
+    - GatewayHTTPListenerIsolation
+    - GatewayHTTPSListenerDetectMisdirectedRequests
+    - GatewayInfrastructurePropagation
+    - GatewayPort8080
+    - GatewayStaticAddresses
+    - HTTPRoute303RedirectStatusCode
+    - HTTPRoute307RedirectStatusCode
+    - HTTPRoute308RedirectStatusCode
+    - HTTPRouteBackendProtocolH2C
+    - HTTPRouteBackendProtocolWebSocket
+    - HTTPRouteBackendRequestHeaderModification
+    - HTTPRouteBackendTimeout
+    - HTTPRouteCORS
+    - HTTPRouteDestinationPortMatching
+    - HTTPRouteHostRewrite
+    - HTTPRouteMethodMatching
+    - HTTPRouteNamedRouteRule
+    - HTTPRouteParentRefPort
+    - HTTPRoutePathRedirect
+    - HTTPRoutePathRewrite
+    - HTTPRoutePortRedirect
+    - HTTPRouteQueryParamMatching
+    - HTTPRouteRequestMirror
+    - HTTPRouteRequestMultipleMirrors
+    - HTTPRouteRequestPercentageMirror
+    - HTTPRouteRequestTimeout
+    - HTTPRouteResponseHeaderModification
+    - HTTPRouteRetry
+    - HTTPRouteRetryBackendTimeout
+    - HTTPRouteRetryConnectionError
+    - HTTPRouteSchemeRedirect
+    - ListenerSet
+  name: GATEWAY-HTTP
+  summary: Core tests succeeded. Extended tests succeeded.
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 15
+      Skipped: 0
+  extended:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 10
+      Skipped: 0
+    supportedFeatures:
+    - GatewayAddressEmpty
+    - GatewayBackendClientCertificate
+    - GatewayFrontendClientCertificateValidation
+    - GatewayFrontendClientCertificateValidationInsecureFallback
+    - GatewayHTTPListenerIsolation
+    - GatewayHTTPSListenerDetectMisdirectedRequests
+    - GatewayInfrastructurePropagation
+    - GatewayPort8080
+    - GatewayStaticAddresses
+    - ListenerSet
+  name: GATEWAY-GRPC
+  summary: Core tests succeeded. Extended tests succeeded.
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 20
+      Skipped: 0
+  extended:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 15
+      Skipped: 0
+    supportedFeatures:
+    - GatewayAddressEmpty
+    - GatewayBackendClientCertificate
+    - GatewayFrontendClientCertificateValidation
+    - GatewayFrontendClientCertificateValidationInsecureFallback
+    - GatewayHTTPListenerIsolation
+    - GatewayHTTPSListenerDetectMisdirectedRequests
+    - GatewayInfrastructurePropagation
+    - GatewayPort8080
+    - GatewayStaticAddresses
+    - ListenerSet
+    - TLSRouteModeMixed
+    - TLSRouteModeTerminate
+  name: GATEWAY-TLS
+  summary: Core tests succeeded. Extended tests succeeded.
+succeededProvisionalTests:
+- GRPCRouteNamedRule
+- GatewayInfrastructure
+- GatewayOptionalAddressValue
+- HTTPRoute303Redirect
+- HTTPRoute307Redirect
+- HTTPRoute308Redirect
+- HTTPRouteNamedRule
+- HTTPRouteRequestPercentageMirror
+- TCPRouteInvalidBackendRefNonexistent
+- TCPRouteInvalidCrossNamespaceBackendRef
+- TCPRouteInvalidNonTCPListener
+- TCPRouteParentRefAttachAll
+- TCPRouteParentRefPortAndSectionName
+- TCPRouteReferenceGrant
+- TCPRouteWeightedRouting
+- TLSRouteMixedTerminationSameNamespace
+- TLSRouteTerminateSimpleSameNamespace
