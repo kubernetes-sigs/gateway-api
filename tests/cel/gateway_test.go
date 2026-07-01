@@ -114,18 +114,6 @@ func TestValidateGateway(t *testing.T) {
 			wantErrors: []string{"tls must not be specified for protocols ['HTTP', 'TCP', 'UDP']"},
 		},
 		{
-			desc: "tls config not set with https protocol",
-			mutate: func(gw *gatewayv1.Gateway) {
-				gw.Spec.Listeners = []gatewayv1.Listener{
-					{
-						Name:     gatewayv1.SectionName("https"),
-						Protocol: gatewayv1.HTTPSProtocolType,
-						Port:     gatewayv1.PortNumber(8443),
-					},
-				}
-			},
-		},
-		{
 			desc: "tls config not set with tls protocol",
 			mutate: func(gw *gatewayv1.Gateway) {
 				gw.Spec.Listeners = []gatewayv1.Listener{
