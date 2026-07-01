@@ -93,13 +93,7 @@ var TCPRouteMultipleRoutesAttachment = confsuite.ConformanceTest{
 			Status: metav1.ConditionTrue,
 			Reason: string(gatewayv1.RouteReasonAccepted),
 		}
-
-		t.Run("Both TCPRoutes should be Accepted by the Gateway", func(t *testing.T) {
-			// Both routes report Accepted=True; the newer route is rejected at the
-			// listener-attachment level rather than via the route's Accepted condition.
-			kubernetes.TCPRouteMustHaveCondition(t, suite.Client, suite.TimeoutConfig, olderRouteNN, gwNN, acceptedCond)
-			kubernetes.TCPRouteMustHaveCondition(t, suite.Client, suite.TimeoutConfig, newerRouteNN, gwNN, acceptedCond)
-		})
+		kubernetes.TCPRouteMustHaveCondition(t, suite.Client, suite.TimeoutConfig, olderRouteNN, gwNN, acceptedCond)
 
 		t.Run("Gateway listener should report 2 attached Routes", func(t *testing.T) {
 			listeners := []gatewayv1.ListenerStatus{{

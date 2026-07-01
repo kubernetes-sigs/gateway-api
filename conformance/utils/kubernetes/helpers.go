@@ -1017,7 +1017,7 @@ func parentsForRouteMatch(t *testing.T, routeName types.NamespacedName, expected
 			}
 			if !reflect.DeepEqual(aParent.ParentRef.Namespace, eParent.ParentRef.Namespace) {
 				if namespaceRequired || aParent.ParentRef.Namespace != nil {
-					tlog.Logf(t, "Route %s expected ParentReference.Namespace to be %v, got %v", routeName, eParent.ParentRef.Namespace, aParent.ParentRef.Namespace)
+					tlog.Logf(t, "Route %s expected ParentReference.Namespace to be '%v', got '%v'", routeName, ptr.Deref(eParent.ParentRef.Namespace, ""), ptr.Deref(aParent.ParentRef.Namespace, ""))
 					continue
 				}
 			}
