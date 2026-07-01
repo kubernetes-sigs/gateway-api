@@ -1,0 +1,16 @@
+apiVersion: internal.gateway.networking.k8s.io/v1alpha1
+kind: GEPDetails
+number: 4661
+name: "In-Cluster: Provisioned service scope and optimizations"
+status: Provisional
+authors:
+  - rikatz
+relationships:
+  extends:
+    - number: 1762
+      name: In Cluster Gateway Deployments
+    - number: 1867
+      name: Per-Gateway Infrastructure
+  seeAlso:
+    - number: 1651
+      name: Gateway Routability
