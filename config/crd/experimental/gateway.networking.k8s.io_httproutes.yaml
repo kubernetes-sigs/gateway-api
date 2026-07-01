@@ -3956,6 +3956,9 @@ spec:
                 type: array
                 x-kubernetes-list-type: atomic
                 x-kubernetes-validations:
+                - message: Rule name must be unique within the route
+                  rule: self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name)
+                    && l1.name == l2.name))
                 - message: While 16 rules and 64 matches per rule are allowed, the
                     total number of matches across all rules in a route must be less
                     than 128
@@ -3970,9 +3973,6 @@ spec:
                     : 0) + (self.size() > 12 ? self[12].matches.size() : 0) + (self.size()
                     > 13 ? self[13].matches.size() : 0) + (self.size() > 14 ? self[14].matches.size()
                     : 0) + (self.size() > 15 ? self[15].matches.size() : 0) <= 128'
-                - message: Rule name must be unique within the route
-                  rule: self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name)
-                    && l1.name == l2.name))
               useDefaultGateways:
                 description: |-
                   UseDefaultGateways indicates the default Gateway scope to use for this
@@ -8211,6 +8211,9 @@ spec:
                 type: array
                 x-kubernetes-list-type: atomic
                 x-kubernetes-validations:
+                - message: Rule name must be unique within the route
+                  rule: self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name)
+                    && l1.name == l2.name))
                 - message: While 16 rules and 64 matches per rule are allowed, the
                     total number of matches across all rules in a route must be less
                     than 128
@@ -8225,9 +8228,6 @@ spec:
                     : 0) + (self.size() > 12 ? self[12].matches.size() : 0) + (self.size()
                     > 13 ? self[13].matches.size() : 0) + (self.size() > 14 ? self[14].matches.size()
                     : 0) + (self.size() > 15 ? self[15].matches.size() : 0) <= 128'
-                - message: Rule name must be unique within the route
-                  rule: self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name)
-                    && l1.name == l2.name))
               useDefaultGateways:
                 description: |-
                   UseDefaultGateways indicates the default Gateway scope to use for this
