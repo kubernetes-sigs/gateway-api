@@ -57,6 +57,10 @@ type HTTPRouteFilterApplyConfiguration struct {
 	// Implementers are encouraged to define custom implementation types to
 	// extend the core API with implementation-specific behavior.
 	//
+	// <gateway:util:excludeFromCRD>
+	//
+	// Notes for implementers:
+	//
 	// If a reference to a custom filter type cannot be resolved, the filter
 	// MUST NOT be skipped. Instead, requests that would have been processed by
 	// that filter MUST receive a HTTP error response.
@@ -67,6 +71,8 @@ type HTTPRouteFilterApplyConfiguration struct {
 	// Unknown values here must result in the implementation setting the
 	// Accepted Condition for the Route to `status: False`, with a
 	// Reason of `UnsupportedValue`.
+	//
+	// </gateway:util:excludeFromCRD>
 	//
 	// <gateway:experimental:validation:Enum=RequestHeaderModifier;ResponseHeaderModifier;RequestMirror;RequestRedirect;URLRewrite;ExtensionRef;CORS;ExternalAuth>
 	Type *apisv1.HTTPRouteFilterType `json:"type,omitempty"`

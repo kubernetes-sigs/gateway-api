@@ -69,6 +69,21 @@ type BackendTLSPolicySpec struct {
 	//   be unique across all targetRef entries in the BackendTLSPolicy.
 	// * They select different sectionNames in the same target.
 	//
+	// Support Levels:
+	//
+	// * Extended: Kubernetes Service referenced by backendRefs used on a Route.
+	//   - HTTPRoute, GRPCRoute, TLSRoute with termination
+	//   - Filters that needs a backend of type Service, like Mirror and External Authorization
+	//
+	// * Implementation-Specific: Implementations MAY use BackendTLSPolicy for:
+	//   - Services not referenced by any Route (e.g., infrastructure services)
+	//   - Service mesh workload-to-service communication
+	//   - Other resource types beyond Service
+	//
+	// <gateway:util:excludeFromCRD>
+	//
+	// Notes for implementers:
+	//
 	// When more than one BackendTLSPolicy selects the same target and
 	// sectionName, implementations MUST determine precedence using the
 	// following criteria, continuing on ties:
@@ -91,17 +106,6 @@ type BackendTLSPolicySpec struct {
 	// clarified in a future release, the safest approach is to support a single
 	// targetRef.
 	//
-	// Support Levels:
-	//
-	// * Extended: Kubernetes Service referenced by backendRefs used on a Route.
-	//   - HTTPRoute, GRPCRoute, TLSRoute with termination
-	//   - Filters that needs a backend of type Service, like Mirror and External Authorization
-	//
-	// * Implementation-Specific: Implementations MAY use BackendTLSPolicy for:
-	//   - Services not referenced by any Route (e.g., infrastructure services)
-	//   - Service mesh workload-to-service communication
-	//   - Other resource types beyond Service
-	//
 	// Implementations SHOULD aim to ensure that BackendTLSPolicy behavior is consistent,
 	// even outside of the extended HTTPRoute -(backendRef) -> Service path.
 	// They SHOULD clearly document how BackendTLSPolicy is interpreted in these
@@ -113,6 +117,8 @@ type BackendTLSPolicySpec struct {
 	// Note that this config applies to the entire referenced resource
 	// by default, but this default may change in the future to provide
 	// a more granular application of the policy.
+	//
+	// </gateway:util:excludeFromCRD>
 	//
 	// +required
 	// +listType=atomic
@@ -160,6 +166,20 @@ type BackendTLSPolicyValidation struct {
 	// not both. If CACertificateRefs is empty or unspecified, the configuration for
 	// WellKnownCACertificates MUST be honored instead if supported by the implementation.
 	//
+	// A single CACertificateRef to a Kubernetes ConfigMap kind has "Core" support.
+	// Implementations MAY choose to support attaching multiple certificates to
+	// a backend, but this behavior is implementation-specific.
+	//
+	// Support: Core - An optional single reference to a Kubernetes ConfigMap,
+	// with the CA certificate in a key named `ca.crt`.
+	//
+	// Support: Implementation-specific - More than one reference, other kinds
+	// of resources, or a single reference that includes multiple certificates.
+	//
+	// <gateway:util:excludeFromCRD>
+	//
+	// Notes for implementers:
+	//
 	// A CACertificateRef is invalid if:
 	//
 	// * It refers to a resource that cannot be resolved (e.g., the referenced resource
@@ -186,16 +206,7 @@ type BackendTLSPolicyValidation struct {
 	// ensure the `Accepted` Condition on the BackendTLSPolicy is set to
 	// `status: False`, with a Reason `NoValidCACertificate`.
 	//
-	//
-	// A single CACertificateRef to a Kubernetes ConfigMap kind has "Core" support.
-	// Implementations MAY choose to support attaching multiple certificates to
-	// a backend, but this behavior is implementation-specific.
-	//
-	// Support: Core - An optional single reference to a Kubernetes ConfigMap,
-	// with the CA certificate in a key named `ca.crt`.
-	//
-	// Support: Implementation-specific - More than one reference, other kinds
-	// of resources, or a single reference that includes multiple certificates.
+	// </gateway:util:excludeFromCRD>
 	//
 	// +optional
 	// +listType=atomic

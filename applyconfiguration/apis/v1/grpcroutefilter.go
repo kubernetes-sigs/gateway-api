@@ -53,9 +53,15 @@ type GRPCRouteFilterApplyConfiguration struct {
 	// Implementers are encouraged to define custom implementation types to
 	// extend the core API with implementation-specific behavior.
 	//
+	// <gateway:util:excludeFromCRD>
+	//
+	// Notes for implementers:
+	//
 	// If a reference to a custom filter type cannot be resolved, the filter
 	// MUST NOT be skipped. Instead, requests that would have been processed by
 	// that filter MUST receive a HTTP error response.
+	//
+	// </gateway:util:excludeFromCRD>
 	//
 	// <gateway:experimental:validation:Enum=ResponseHeaderModifier;RequestHeaderModifier;RequestMirror;ExtensionRef>
 	Type *apisv1.GRPCRouteFilterType `json:"type,omitempty"`

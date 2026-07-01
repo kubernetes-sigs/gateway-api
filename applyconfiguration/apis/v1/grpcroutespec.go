@@ -53,6 +53,12 @@ type GRPCRouteSpecApplyConfiguration struct {
 	// as a suffix match. That means that a match for `*.example.com` would match
 	// both `test.example.com`, and `foo.test.example.com`, but not `example.com`.
 	//
+	// Support: Core
+	//
+	// <gateway:util:excludeFromCRD>
+	//
+	// Notes for implementers:
+	//
 	// If both the Listener and GRPCRoute have specified hostnames, any
 	// GRPCRoute hostnames that do not match the Listener hostname MUST be
 	// ignored. For example, if a Listener specified `*.example.com`, and the
@@ -77,7 +83,7 @@ type GRPCRouteSpecApplyConfiguration struct {
 	// The rejected Route MUST raise an 'Accepted' condition with a status of
 	// 'False' in the corresponding RouteParentStatus.
 	//
-	// Support: Core
+	// </gateway:util:excludeFromCRD>
 	Hostnames []apisv1.Hostname `json:"hostnames,omitempty"`
 	// Rules are a list of GRPC matchers, filters and actions.
 	//
