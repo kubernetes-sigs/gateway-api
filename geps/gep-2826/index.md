@@ -131,3 +131,4 @@ structure uniform.
 * Istio HTTPDirectResponse: https://istio.io/latest/docs/reference/config/networking/virtual-service/#HTTPDirectResponse
 * Contour HTTPDirectResponsePolicy: https://projectcontour.io/docs/1.28/config/api/#projectcontour.io/v1.HTTPDirectResponsePolicy
 * Envoy Gateway HTTPDirectResponseFilter: https://gateway.envoyproxy.io/docs/api/extension_types/#httpdirectresponsefilter
+* Airlock Microgateway CustomResponsePolicy https://docs.airlock.com/microgateway/5.1/index/api/crds/microgateway/custom-response-policy/v1alpha1/
