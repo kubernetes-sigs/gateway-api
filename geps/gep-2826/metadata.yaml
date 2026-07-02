@@ -4,7 +4,7 @@ number: 2826
 name: DirectResponse HTTPRouteFilter
 status: Provisional
 authors:
-  - lianglli
+  - n0rm4l-me
 references:
   - https://github.com/kubernetes-sigs/gateway-api/issues/2826
   - https://istio.io/latest/docs/reference/config/networking/virtual-service/#HTTPDirectResponse
