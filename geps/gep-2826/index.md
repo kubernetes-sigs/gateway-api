@@ -110,6 +110,76 @@ An `HTTPRoute` rule that specifies both a `DirectResponse` filter and non-empty
   that pass those conformance tests.
 * At least six months must have passed from when the GEP moved to `Experimental`.
 
+## Prior Art
+
+Several Gateway implementations already support direct responses via
+proprietary extensions. The table below summarises what each offers:
+
+| Implementation | Feature | Status code | Body | Content-Type | Body from ConfigMap |
+|---|---|---|---|---|---|
+| Istio | `HTTPDirectResponse` | ✓ | inline string | ✗ | ✗ |
+| Contour | `HTTPDirectResponsePolicy` | ✓ | inline string | ✗ | ✗ |
+| Envoy Gateway | `HTTPDirectResponseFilter` | ✓ | inline string or ValueRef | ✓ | ✓ |
+| Airlock Microgateway | `CustomResponsePolicy` | ✓ | inline string | ✓ | ✗ |
+
+Key observations:
+- All four implementations support a status code and an inline body string.
+- Envoy Gateway and Airlock both include a `contentType` field, confirming it
+  is a common need.
+- Envoy Gateway additionally supports referencing a ConfigMap for the body
+  (`ValueRef`), which is useful for larger or separately managed responses.
+- None of the implementations allow this filter to be combined with backend
+  forwarding — it is universally treated as a terminal action.
+
+### Istio
+
+```yaml
+http:
+- match:
+  - uri:
+      prefix: /metrics
+  directResponse:
+    status: 403
+    body:
+      string: "Forbidden"
+```
+
+### Contour
+
+```yaml
+conditions:
+- prefix: /robots.txt
+directResponsePolicy:
+  statusCode: 200
+  body: "User-agent: *\nDisallow: /"
+```
+
+### Envoy Gateway
+
+```yaml
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: HTTPRouteFilter
+spec:
+  directResponse:
+    contentType: application/json
+    statusCode: 503
+    body:
+      type: Inline
+      inline: '{"error":"service unavailable"}'
+```
+
+### Airlock Microgateway
+
+```yaml
+apiVersion: microgateway.airlock.com/v1alpha1
+kind: CustomResponsePolicy
+spec:
+  response:
+    statusCode: 403
+    contentType: text/plain
+    body: "Access denied"
+```
+
 ## Alternatives
 
 ### Use `ExtensionRef` custom filter
