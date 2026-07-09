@@ -3351,6 +3351,13 @@ func schema_sigsk8sio_gateway_api_apis_v1_CookieConfig(ref common.ReferenceCallb
 				Description: "CookieConfig defines the configuration for cookie-based session persistence.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
+					"path": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Path defines the cookie Path attribute. When not specified, implementations MUST default the cookie path to \"/\".\n\n<gateway:util:excludeFromCRD> This field is Extended because not all dataplanes support configuring the cookie path (e.g. HAProxy hardcodes path=/). Implementations SHOULD support this field if the underlying dataplane allows setting the cookie path attribute. </gateway:util:excludeFromCRD>\n\nSupport: Extended",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
 					"lifetimeType": {
 						SchemaProps: spec.SchemaProps{
 							Description: "LifetimeType specifies whether the cookie has a permanent or session-based lifetime. A permanent cookie persists until its specified expiry time, defined by the Expires or Max-Age cookie attributes, while a session cookie is deleted when the current session ends.\n\nWhen set to \"Permanent\", AbsoluteTimeout indicates the cookie's lifetime via the Expires or Max-Age cookie attributes and is required.\n\nWhen set to \"Session\", AbsoluteTimeout indicates the absolute lifetime of the cookie tracked by the gateway and is optional.\n\nDefaults to \"Session\".\n\nSupport: Core for \"Session\" type\n\nSupport: Extended for \"Permanent\" type",

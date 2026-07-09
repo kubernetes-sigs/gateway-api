@@ -18,7 +18,7 @@ Before this GEP graduates to the Standard channel, we must fulfill the following
 - [ ] At least 3 implementations passing conformance tests
 - [ ] Comprehensive conformance test suite covering cookie and header persistence types
 - [ ] Resolve attachment model ([#4462](https://github.com/kubernetes-sigs/gateway-api/discussions/4462)) for session persistence (route-inline, [BackendTrafficPolicy](../gep-3388/index.md), [Backend](../gep-4488/index.md), or combination)
-- [ ] Define cookie path default behavior ([#4713](https://github.com/kubernetes-sigs/gateway-api/issues/4713))
+- [x] Define cookie path default behavior ([#4713](https://github.com/kubernetes-sigs/gateway-api/issues/4713))
 - [ ] Define session name conflict resolution rules ([#4268](https://github.com/kubernetes-sigs/gateway-api/issues/4268))
 - [ ] Sign-off from GAMMA leads to ensure service mesh is fully considered
 
@@ -500,6 +500,15 @@ const (
 
 // CookieConfig defines the configuration for cookie-based session persistence.
 type CookieConfig struct {
+    // Path defines the cookie Path attribute. When not specified,
+    // implementations MUST default the cookie path to "/".
+    //
+    // Support: Extended
+    //
+    // +optional
+    // +kubebuilder:validation:MaxLength=1024
+    Path *string `json:"path,omitempty"`
+
     // LifetimeType specifies whether the cookie has a permanent or
     // session-based lifetime. A permanent cookie persists until its
     // specified expiry time, defined by the Expires or Max-Age cookie
@@ -736,27 +745,23 @@ between permanent and session cookies.
 #### Path
 
 The cookie's `Path` attribute defines the URL path that must exist in order for the client to send the `cookie` header.
-Whether attaching session persistence to an xRoute or a service, it's important to consider the relationship the cookie
-`Path` attribute has with the route path.
 
-When session persistence is enabled on a xRoute rule, the implementor should interpret the path as
-configured on the xRoute. To interpret the `Path` attribute from an xRoute, implementors should take note of the
-following:
+Implementations MUST default the cookie `Path` to `/` when no explicit path is configured.
 
-1. For an xRoute that matches all paths, the `Path` should be set to `/`.
-2. For an xRoute that has multiple paths, the `Path` should be interpreted based on the route path that was matched.
-3. For an xRoute using a path that is a regex, the `Path` should be set to the longest non-regex prefix (.e.g. if the
-   path is /p1/p2/*/p3 and the request path was /p1/p2/foo/p3, then the cookie path would be /p1/p2).
+This GEP previously specified that the cookie path should be computed from the matched route path. That approach was
+removed because no prior art computes a cookie path from route matches, it is underspecified for regex matches, and it
+breaks with edge proxy path rewrites (see [#4713](https://github.com/kubernetes-sigs/gateway-api/issues/4713)).
 
-It is also important to note that this design makes persistent session unique per route path. For instance, if two
-distinct routes, one with path prefix `/foo` and the other with `/bar`, both target the same service, the persistent
-session won't be shared between these two paths.
+Defaulting to `/` was chosen because it is the most portable behavior — the majority of implementations default to `/`
+and every dataplane can deliver it.
 
-Conversely, if the `BackendTrafficPolicy` policy is attached to a service, the `Path` attribute MUST be left
-unset. This is because multiple routes can target a single service. If the `Path` cookie attribute is configured in this
-scenario, it could result in problems due to the possibility of different paths being taken for the same cookie.
-Implementations MUST also handle the case where the client is a browser making requests to multiple persistent services
-from the same page.
+While `Path=/` is broader than a route-specific path, the security impact is limited. The cookie value is an opaque
+backend identifier (e.g., an encoded IP address), not a session token containing sensitive data. A cookie with `Path=/`
+being sent to other routes on the same domain does not expose sensitive information — it only causes the receiving
+route's proxy to attempt (and fail) to use the persistence token, falling back to normal load balancing.
+
+Users who need a cookie scoped to a specific path can configure it explicitly via the `cookie.path` field (Extended
+support). When set, `cookie.path` overrides the default `/`.
 
 #### Secure, HttpOnly, SameSite
 
