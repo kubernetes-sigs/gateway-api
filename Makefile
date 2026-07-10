@@ -52,7 +52,7 @@ clean-generated:
 
 # Run generators for protos, Deepcopy funcs, CRDs, and docs.
 .PHONY: generate
-generate: clean-generated update-codegen tidy
+generate: clean-generated update-codegen build-openapi-json tidy
 
 .PHONY: update-codegen
 update-codegen:
