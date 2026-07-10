@@ -57,6 +57,7 @@ for CHANNEL in "${CHANNELS[@]}"; do
       --version "$version" \
       --output "release/${CHANNEL}-swagger.json" \
       --add-gateway-api-object-defs \
+      --pretty-print \
       "./config/crd/${CHANNEL}/gateway"*
 done
 
