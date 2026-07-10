@@ -42,23 +42,20 @@ while [ -n "${1-}" ]; do
 done
 
 if [ -z "${version-}" ]; then
-    # If a tag matches this commit, return that tag. Otherwise, generate a
-    # valid Git reference string unique for this commit that contains the most
-    # recent previous version string.
-    version="$(git describe --tags --match 'v*' --match 'monthly-*')"
+    version="latest"
 fi
 
-mkdir -p release/
+mkdir -p api/openapi-spec
 
 for CHANNEL in "${CHANNELS[@]}"; do
     echo "$CHANNEL"
     go run ./tools/openapi-generator \
       --name "Gateway API ${CHANNEL} channel" \
       --version "$version" \
-      --output "release/${CHANNEL}-swagger.json" \
+      --output "api/openapi-spec/${CHANNEL}-swagger.json" \
       --add-gateway-api-object-defs \
       --pretty-print \
       "./config/crd/${CHANNEL}/gateway"*
 done
 
-echo "Generated:" release/*-swagger.json
+echo "Generated:" api/openapi-spec/*-swagger.json
