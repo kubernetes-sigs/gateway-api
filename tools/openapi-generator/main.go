@@ -22,6 +22,8 @@ with any CRDs, not just Gateway API ones.
 package main
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"os"
 
@@ -35,6 +37,7 @@ var (
 	version        string
 	output         string
 	gatewayAPIDefs bool
+	prettyPrint    bool
 )
 
 func main() {
@@ -61,6 +64,7 @@ OpenAPI/Swagger v2 spec file in JSON format.`,
 	flags.StringVarP(&version, "version", "v", "undefined", "Version of the API in the output spec")
 	flags.StringVarP(&output, "output", "o", "-", "Output file")
 	flags.BoolVar(&gatewayAPIDefs, "add-gateway-api-object-defs", false, "Add the non-top level Gateway API objects to the spec")
+	flags.BoolVarP(&prettyPrint, "pretty-print", "p", false, "Format the JSON output with indentation")
 
 	return cmd
 }
@@ -99,9 +103,17 @@ func run(_ *cobra.Command, args []string) error {
 		}
 	}
 
-	json, err := mergeSpecs.MarshalJSON()
+	jsonData, err := mergeSpecs.MarshalJSON()
 	if err != nil {
 		return err
+	}
+	if prettyPrint {
+		var indentedJSON bytes.Buffer
+		err = json.Indent(&indentedJSON, jsonData, "", "\t")
+		if err != nil {
+			return err
+		}
+		jsonData = indentedJSON.Bytes()
 	}
 
 	var writer *os.File
@@ -114,7 +126,7 @@ func run(_ *cobra.Command, args []string) error {
 		}
 	}
 
-	_, err = writer.Write(json)
+	_, err = writer.Write(jsonData)
 	if err != nil {
 		return err
 	}
