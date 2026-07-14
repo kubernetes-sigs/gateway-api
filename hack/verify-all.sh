@@ -20,6 +20,7 @@ set -o pipefail
 
 SCRIPT_ROOT=$(dirname "${BASH_SOURCE}")/..
 source "${SCRIPT_ROOT}/hack/kube-env.sh"
+PULL_BASE_REF=${PULL_BASE_REF:-}
 
 SILENT=true
 FAILED_TEST=()
@@ -53,6 +54,12 @@ if $SILENT ; then
 fi
 
 EXCLUDE="verify-all.sh"
+
+# On a release branch we must ignore the conformance reports checks
+if [[ -n "$PULL_BASE_REF" && "$PULL_BASE_REF" == release-* ]]; then
+  echo "Running on a release branch, extra tests may be ignored"
+  EXCLUDE="${EXCLUDE} verify-reports.sh"
+fi
 
 SCRIPTS=$(find "${SCRIPT_ROOT}"/hack -name "verify-*.sh")
 
