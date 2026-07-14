@@ -136,6 +136,8 @@ func TestConformanceOptions_PartialYAML(t *testing.T) {
 
 	assert.Equal(t, "partial-only", opts.MeshName)
 	assert.Equal(t, 5*time.Second, opts.TimeoutConfig.DeleteTimeout)
+	assert.Equal(t, 75*time.Second, opts.TimeoutConfig.TCPRouteMustHaveCondition)
+	assert.Equal(t, 90*time.Second, opts.TimeoutConfig.UDPRouteMustHaveCondition)
 	// Sibling timeout fields keep their default values.
 	assert.Equal(t, defaults.CreateTimeout, opts.TimeoutConfig.CreateTimeout)
 	assert.Equal(t, defaults.GetTimeout, opts.TimeoutConfig.GetTimeout)
