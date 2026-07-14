@@ -27,25 +27,25 @@ import (
 	"sigs.k8s.io/gateway-api/pkg/features"
 )
 
-const gatewayMaximumNameLengthPrefix = "gateway-max-name-length-"
+const gatewayNameMaximumLengthPrefix = "gateway-name-maximum-length-"
 
-var gatewayMaximumNameLengthName = gatewayMaximumNameLengthPrefix + strings.Repeat("a", 253-len(gatewayMaximumNameLengthPrefix))
+var gatewayNameMaximumLengthName = gatewayNameMaximumLengthPrefix + strings.Repeat("a", 253-len(gatewayNameMaximumLengthPrefix))
 
 func init() {
-	ConformanceTests = append(ConformanceTests, GatewayMaximumNameLength)
+	ConformanceTests = append(ConformanceTests, GatewayNameMaximumLength)
 }
 
-var GatewayMaximumNameLength = suite.ConformanceTest{
-	ShortName: "GatewayMaximumNameLength",
+var GatewayNameMaximumLength = suite.ConformanceTest{
+	ShortName: "GatewayNameMaximumLength",
 	Description: "A Gateway with a 253-character name should be reconciled by the implementation. " +
 		"The test only verifies that status conditions have an updated observedGeneration and does not assert specific condition values.",
 	Features: []features.FeatureName{
 		features.SupportGateway,
 	},
-	Manifests: []string{"tests/gateway-maximum-name-length.yaml"},
+	Manifests: []string{"tests/gateway-name-maximum-length.yaml"},
 	Parallel:  true,
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
-		gwNN := types.NamespacedName{Name: gatewayMaximumNameLengthName, Namespace: suite.InfrastructureNamespace}
+		gwNN := types.NamespacedName{Name: gatewayNameMaximumLengthName, Namespace: suite.InfrastructureNamespace}
 
 		kubernetes.GatewayMustHaveLatestConditions(t, s.Client, s.TimeoutConfig, gwNN)
 	},
