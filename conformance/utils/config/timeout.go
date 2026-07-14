@@ -86,11 +86,11 @@ type TimeoutConfig struct {
 
 	// TCPRouteMustHaveCondition represents the maximum time for a TCPRoute to have the supplied Condition.
 	// Max value for conformant implementation: None
-	TCPRouteMustHaveCondition time.Duration
+	TCPRouteMustHaveCondition time.Duration `json:"tcpRouteMustHaveCondition"`
 
 	// UDPRouteMustHaveCondition represents the maximum time for a UDPRoute to have the supplied Condition.
 	// Max value for conformant implementation: None
-	UDPRouteMustHaveCondition time.Duration
+	UDPRouteMustHaveCondition time.Duration `json:"udpRouteMustHaveCondition"`
 
 	// RouteMustHaveParents represents the maximum time for an xRoute to have parents in status that match the expected parents.
 	// Max value for conformant implementation: None
