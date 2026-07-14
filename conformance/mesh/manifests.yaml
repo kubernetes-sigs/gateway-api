@@ -36,6 +36,15 @@ spec:
             - --tls=8443
             - --crt=/cert.crt
             - --key=/cert.key
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+            - containerPort: 8443
+              protocol: TCP
+            - containerPort: 9090
+              protocol: TCP
+            - containerPort: 7070
+              protocol: TCP
 ---
 apiVersion: v1
 kind: Service
@@ -93,6 +102,15 @@ spec:
             - --tls=8443
             - --crt=/cert.crt
             - --key=/cert.key
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+            - containerPort: 8443
+              protocol: TCP
+            - containerPort: 9090
+              protocol: TCP
+            - containerPort: 7070
+              protocol: TCP
 ---
 apiVersion: v1
 kind: Service
@@ -174,3 +192,12 @@ spec:
         - name: echo
           image: registry.k8s.io/gateway-api/echo-advanced:v1.5.1
           imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+            - containerPort: 8443
+              protocol: TCP
+            - containerPort: 9090
+              protocol: TCP
+            - containerPort: 7070
+              protocol: TCP
