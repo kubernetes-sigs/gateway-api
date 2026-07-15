@@ -84,12 +84,9 @@ func MakeTCPRequestAndExpectEventuallyValidResponse(t *testing.T, timeoutConfig 
 // - TEST message matches assertions
 func WaitForValidTCPResponse(t *testing.T, dialer Dialer, gwAddr string, expected ExpectedResponse, maxTimeToConsistency time.Duration) {
 	t.Helper()
-	closeAndLog := func(t *testing.T, cl net.Conn, err error) bool {
+	retry := func(err error) bool {
 		if err != nil {
 			tlog.Logf(t, "an error occurred during assertion, will retry: %s", err)
-		}
-		if err := cl.Close(); err != nil {
-			tlog.Logf(t, "error closing connection, will not fail but this can leak: %s", err)
 		}
 		return false
 	}
@@ -100,40 +97,58 @@ func WaitForValidTCPResponse(t *testing.T, dialer Dialer, gwAddr string, expecte
 			tlog.Logf(t, "client could not connect: %s; retrying", err)
 			return false
 		}
+		defer func() {
+			if closeErr := client.Close(); closeErr != nil {
+				tlog.Logf(t, "error closing TCP connection: %s", closeErr)
+			}
+		}()
 		tlog.Logf(t, "tcp client connected")
 		message, err := bufio.NewReader(client).ReadString('\n')
 		if err != nil {
-			return closeAndLog(t, client, err)
+			return retry(err)
 		}
-		assert.Equal(t, tcpserver.WelcomeMessage, message, "TCPServer welcome message does not match")
+		if message != tcpserver.WelcomeMessage {
+			return retry(fmt.Errorf("TCP server welcome message does not match: got %q", message))
+		}
 
-		fmt.Fprintf(client, "PING\n")
+		if _, err = fmt.Fprint(client, "PING\n"); err != nil {
+			return retry(err)
+		}
 		message, err = bufio.NewReader(client).ReadString('\n')
 		if err != nil {
-			return closeAndLog(t, client, err)
+			return retry(err)
 		}
-		assert.Equal(t, "PONG\n", message)
+		if message != "PONG\n" {
+			return retry(fmt.Errorf("TCP server PING response does not match: got %q", message))
+		}
 
-		fmt.Fprintf(client, "IS_TLS\n")
+		if _, err = fmt.Fprint(client, "IS_TLS\n"); err != nil {
+			return retry(err)
+		}
 		message, err = bufio.NewReader(client).ReadString('\n')
 		if err != nil {
-			return closeAndLog(t, client, err)
+			return retry(err)
 		}
-		assert.Equal(t, fmt.Sprintf("%t", expected.BackendIsTLS), strings.TrimSuffix(message, "\n"))
+		if actual := strings.TrimSuffix(message, "\n"); actual != fmt.Sprintf("%t", expected.BackendIsTLS) {
+			return retry(fmt.Errorf("TCP server TLS response does not match: got %q", actual))
+		}
 
-		fmt.Fprintf(client, "TEST\n")
+		if _, err = fmt.Fprint(client, "TEST\n"); err != nil {
+			return retry(err)
+		}
 		message, err = bufio.NewReader(client).ReadString('\n')
 		if err != nil {
-			return closeAndLog(t, client, err)
+			return retry(err)
 		}
 
 		payload := &tcpserver.TCPAssertions{}
 		if err := json.Unmarshal([]byte(message), payload); err != nil {
-			return closeAndLog(t, client, err)
+			return retry(err)
 		}
 
-		// At this moment we can simply assume the message will be right, or fail
-		assertTestMessage(t, payload, expected)
+		if err := validateTestMessage(payload, expected); err != nil {
+			return retry(err)
+		}
 		return true
 	}, maxTimeToConsistency, time.Second)
 
@@ -150,17 +165,33 @@ func makeClient(tlsConfig *tls.Config) Dialer {
 	}
 }
 
-func assertTestMessage(t *testing.T, payload *tcpserver.TCPAssertions, expected ExpectedResponse) {
-	t.Helper()
-	require.NotNil(t, payload)
-	assert.Equal(t, expected.Namespace, payload.Namespace, "namespace does not match")
-	assert.True(t, strings.HasPrefix(payload.Pod, fmt.Sprintf("%s-", expected.Backend)), "backend name does not match with pod prefix. pod=%s and backend=%s", payload.Pod, expected.Backend) // Pod must contain "backend-"
+func validateTestMessage(payload *tcpserver.TCPAssertions, expected ExpectedResponse) error {
+	if payload == nil {
+		return fmt.Errorf("TCP response payload is nil")
+	}
+	if payload.Namespace != expected.Namespace {
+		return fmt.Errorf("namespace does not match: got %q, want %q", payload.Namespace, expected.Namespace)
+	}
+	if !strings.HasPrefix(payload.Pod, fmt.Sprintf("%s-", expected.Backend)) {
+		return fmt.Errorf("backend name does not match with pod prefix: pod=%q backend=%q", payload.Pod, expected.Backend)
+	}
 	if expected.Hostname != "" {
-		assert.Equal(t, expected.Hostname, payload.TLSAssertion.ServerName)
+		if payload.TLSAssertion == nil {
+			return fmt.Errorf("TLS server name does not match: no TLS assertions received, want %q", expected.Hostname)
+		}
+		if payload.TLSAssertion.ServerName != expected.Hostname {
+			return fmt.Errorf("TLS server name does not match: got %q, want %q", payload.TLSAssertion.ServerName, expected.Hostname)
+		}
 	}
 	if expected.TLSProtocol != "" {
-		assert.Equal(t, expected.TLSProtocol, payload.TLSAssertion.NegotiatedProtocol)
+		if payload.TLSAssertion == nil {
+			return fmt.Errorf("TLS protocol does not match: no TLS assertions received, want %q", expected.TLSProtocol)
+		}
+		if payload.TLSAssertion.NegotiatedProtocol != expected.TLSProtocol {
+			return fmt.Errorf("TLS protocol does not match: got %q, want %q", payload.TLSAssertion.NegotiatedProtocol, expected.TLSProtocol)
+		}
 	}
+	return nil
 }
 
 // EchoSendOnce opens a single TCP connection to gwAddr, performs the
