@@ -50,3 +50,4 @@ echo "Generating CRDs"
 go run ./tools/generator
 
 ./hack/update-clientset.sh
+./hack/update-openapi-json.sh
