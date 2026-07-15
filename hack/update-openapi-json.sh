@@ -21,31 +21,8 @@ CHANNELS=(standard experimental)
 
 set -o nounset
 
-while [ -n "${1-}" ]; do
-  case "$1" in
-      "--experimental-only")
-          CHANNELS=(experimental)
-          ;;
-      "--version"|"-v")
-          VERSION="$2"
-          shift
-          ;;
-      "--version="*)
-          VERSION="${1#"--version="}"
-          ;;
-      *)
-          printf 'Error: unknown argument "%s"\n' "$1" >> /dev/stderr
-          exit 1
-          ;;
-  esac
-  shift
-done
-
 if [ -z "${VERSION-}" ]; then
-    # If a tag matches this commit, return that tag. Otherwise, generate a
-    # valid Git reference string unique for this commit that contains the most
-    # recent previous version string.
-    VERSION="$(git describe --tags --match 'v*' --match 'monthly-*')"
+    VERSION="latest"
 fi
 
 mkdir -p release
@@ -55,9 +32,10 @@ for CHANNEL in "${CHANNELS[@]}"; do
     go run ./tools/openapi-generator \
       --name "Gateway API ${CHANNEL} channel" \
       --version "$VERSION" \
-      --output "release/${CHANNEL}-swagger.json" \
+      --output "api/openapi-spec/${CHANNEL}-swagger.json" \
       --add-gateway-api-object-defs \
+      --pretty-print \
       "./config/crd/${CHANNEL}/gateway"*
 done
 
-echo "Generated:" release/*-swagger.json
+echo "Generated:" "api/openapi-spec/"*-swagger.json
