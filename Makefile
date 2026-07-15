@@ -52,7 +52,7 @@ clean-generated:
 
 # Run generators for protos, Deepcopy funcs, CRDs, and docs.
 .PHONY: generate
-generate: clean-generated update-codegen build-openapi-json tidy
+generate: clean-generated update-codegen tidy
 
 .PHONY: update-codegen
 update-codegen:
@@ -69,6 +69,10 @@ build-monthly-yaml:
 .PHONY: build-openapi-json
 build-openapi-json:
 	hack/build-openapi-json.sh
+
+.PHONY: build-monthly-openapi
+build-monthly-openapi:
+	hack/build-monthly-openapi.sh
 
 # Run go fmt against code
 fmt:
