@@ -185,6 +185,19 @@ func main() {
 // The manifest is edited textually rather than round-tripped through a YAML
 // marshal to preserve its formatting, comments, and multi-document structure.
 func updateVAP(channel, bundleVersion string) error {
+	versionMatch := regexp.MustCompile(`^v(\d+)\.(\d+)`).FindStringSubmatch(bundleVersion)
+	if versionMatch == nil {
+		return fmt.Errorf("bundle version %q is not of the form vMAJOR.MINOR", bundleVersion)
+	}
+	minor, err := strconv.Atoi(versionMatch[2])
+	if err != nil {
+		return fmt.Errorf("invalid minor version in bundle version %q: %w", bundleVersion, err)
+	}
+	if minor < 1 {
+		// Skip if this runs on main or with the `v0.0.0-dev` bundle version
+		return nil
+	}
+
 	path := fmt.Sprintf("config/crd/%s/gateway.networking.k8s.io_vap_safeupgrades.yaml", channel)
 	data, err := os.ReadFile(path)
 	if err != nil {
@@ -202,18 +215,6 @@ func updateVAP(channel, bundleVersion string) error {
 	manifest = re.ReplaceAllString(manifest, "${1}"+bundleVersion)
 
 	if channel == "standard" {
-		versionMatch := regexp.MustCompile(`^v(\d+)\.(\d+)`).FindStringSubmatch(bundleVersion)
-		if versionMatch == nil {
-			return fmt.Errorf("bundle version %q is not of the form vMAJOR.MINOR", bundleVersion)
-		}
-		minor, err := strconv.Atoi(versionMatch[2])
-		if err != nil {
-			return fmt.Errorf("invalid minor version in bundle version %q: %w", bundleVersion, err)
-		}
-		if minor < 1 {
-			return fmt.Errorf("bundle version %q has no previous minor version to prohibit upgrades from", bundleVersion)
-		}
-
 		previousMinor := fmt.Sprintf("v1.[0-%d].", minor-2)
 		latestMinor := fmt.Sprintf("v1.[0-%d].", minor-1)
 		log.Printf("updating %s for prohibitions from version %s to %s\n", path, previousMinor, latestMinor)
