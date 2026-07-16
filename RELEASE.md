@@ -148,7 +148,7 @@ of the PR is the community consensus for a new release.
   the GitHub UI, but **note well**: if the release manager can't create the tag due to Git permissions, a maintainer will need to do it, and in that case it's more polite for the maintainer to create and push the _tag_, then let the release manager create the _release_, so that it's easier for people to find the manager if there are problems!
 - Run the `make build-install-yaml` command which will generate install files in the `release/` directory.
   Attach these files to the GitHub release.
-- Update the `README.md` and `site-src/guides/index.md` files to point links and examples to the new release.
+- Update the `README.md` and `site/content/en/guides/getting-started/introduction.md` files to point links and examples to the new release.
 
 #### For a **MAJOR** or **MINOR** release:
 - Cut a `release-major.minor` branch that we can tag things in as needed.
@@ -166,7 +166,7 @@ of the PR is the community consensus for a new release.
   GitHub's [release][release] page.
 - Run the `make build-install-yaml` command which will generate install files in the `release/` directory.
   Attach these files to the GitHub release.
-- Update the `README.md` and `site-src/guides/index.md` files to point links and examples to the new release.
+- Update the `README.md` and `site/content/en/guides/getting-started/introduction.md` files to point links and examples to the new release.
 - Edit the text blurb in `hack/docsy-generate-conformance.py` to reflect the added past version if necessary.
 
 #### For an **RC** release:

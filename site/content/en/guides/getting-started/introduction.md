@@ -66,7 +66,7 @@ beta, including GatewayClass, Gateway, HTTPRoute, and ReferenceGrant. To install
 this channel, run the following kubectl command:
 
 ```bash
-kubectl apply --server-side -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.6.0/standard-install.yaml
+kubectl apply --server-side -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.6.1/standard-install.yaml
 ```
 
 Refer to the [server-side apply documentation](https://kubernetes.io/docs/reference/using-api/server-side-apply/)
@@ -87,7 +87,7 @@ documentation](/docs/concepts/versioning/).
 To install the experimental channel, run the following kubectl command:
 
 ```bash
-kubectl apply --server-side -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.6.0/experimental-install.yaml
+kubectl apply --server-side -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.6.1/experimental-install.yaml
 ```
 
 Refer to the [server-side apply documentation](https://kubernetes.io/docs/reference/using-api/server-side-apply/)

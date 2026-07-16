@@ -167,9 +167,39 @@ func main() {
 		}
 	}
 
+	for _, channel := range channels {
+		updateVAPBundleVersion(channel, bundleVersion)
+	}
+
 	if loader.PrintErrors(roots, packages.TypeError) {
 		log.Fatalf("not all generators ran successfully")
 	}
+}
+
+// updateVAPBundleVersion updates the bundle-version annotation in the
+// hand-maintained ValidatingAdmissionPolicy manifest for the given channel.
+// The manifest is edited textually rather than round-tripped through a YAML
+// marshal to preserve its formatting, comments, and multi-document structure.
+func updateVAPBundleVersion(channel, bundleVersion string) {
+	path := fmt.Sprintf("config/crd/%s/gateway.networking.k8s.io_vap_safeupgrades.yaml", channel)
+	data, err := os.ReadFile(path)
+	if err != nil {
+		log.Fatalf("failed to read VAP manifest %s: %s", path, err)
+	}
+
+	// Only match annotation lines; the annotation key also appears inside CEL
+	// expressions, where it is never at the start of a line.
+	re := regexp.MustCompile(`(?m)^(\s*` + regexp.QuoteMeta(consts.BundleVersionAnnotation) + `:\s*).*$`)
+	if !re.Match(data) {
+		log.Fatalf("no %s annotation found in %s", consts.BundleVersionAnnotation, path)
+	}
+
+	updated := re.ReplaceAll(data, []byte("${1}"+bundleVersion))
+	if err := os.WriteFile(path, updated, 0o600); err != nil {
+		log.Fatalf("failed to write VAP manifest %s: %s", path, err)
+	}
+
+	log.Printf("updated %s %s to %s\n", path, consts.BundleVersionAnnotation, bundleVersion)
 }
 
 func marshalCRDManifest(customResourceDefinition apiext.CustomResourceDefinition) ([]byte, error) {
