@@ -169,7 +169,7 @@ func main() {
 	}
 
 	for _, channel := range channels {
-		err := updateVAPBundleVersion(channel, bundleVersion)
+		err := updateVAP(channel, bundleVersion)
 		if err != nil {
 			log.Fatalf("failed to update vap: %s", err)
 		}
@@ -180,11 +180,11 @@ func main() {
 	}
 }
 
-// updateVAPBundleVersion updates the bundle-version annotation in the
-// hand-maintained ValidatingAdmissionPolicy manifest for the given channel.
+// updateVAP updates the hand-maintained ValidatingAdmissionPolicy manifest
+// for the given channel.
 // The manifest is edited textually rather than round-tripped through a YAML
 // marshal to preserve its formatting, comments, and multi-document structure.
-func updateVAPBundleVersion(channel, bundleVersion string) error {
+func updateVAP(channel, bundleVersion string) error {
 	path := fmt.Sprintf("config/crd/%s/gateway.networking.k8s.io_vap_safeupgrades.yaml", channel)
 	data, err := os.ReadFile(path)
 	if err != nil {
