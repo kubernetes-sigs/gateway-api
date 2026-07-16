@@ -224,7 +224,7 @@ func updateVAP(channel, bundleVersion string) error {
 		manifest = strings.ReplaceAll(manifest, previousMinor, latestMinor)
 	}
 
-	if err := os.WriteFile(path, []byte(manifest), 0o600); err != nil {
+	if err := os.WriteFile(path, []byte(manifest), 0o600); err != nil { // #nosec G703 -- path is derived from a hardcoded channel list
 		return fmt.Errorf("failed to write VAP manifest %s: %s", path, err)
 	}
 
