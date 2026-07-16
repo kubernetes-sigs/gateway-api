@@ -132,14 +132,13 @@ Given that the release branch exists:
 - Create a `release-$tag` branch off the release branch.
 - Update the CHANGELOG as described above.
 - Update `pkg/consts/consts.go` with the new semver tag and any updates to the API review URL.
-- Update regex `spec.validations.expression` in
-  `config/crd/standard/gateway.networking.k8s.io_vap_safeupgrades.yaml`
-  to match older versions. (Look for a regex like `v1.[0-n].`, and make
-  sure that  the `n` in `0-n` is the current minor version number -1.)
 - Run the following command `BASE_REF=vmajor.minor.patch make generate` which
   will update generated docs with the correct version info. (Note that you can't
   test with these YAMLs yet as they contain references to elements which wont
   exist until the tag is cut and image is promoted to production registry.)
+- Verify `config/crd/standard/gateway.networking.k8s.io_vap_safeupgrades.yaml`
+  - Has the updated `gateway.networking.k8s.io/bundle-version`.
+  - Has the updated `spec.validations.expression` to match older versions. (Look for a regex like `v1.[0-3].`, where `3` is the latest minor version number -1)
 - Commit all of the above to the new `release-x.x.x` branch.
 - Create a pull request of the `release-x.x.x` branch into the `release-x.x` branch upstream. Add a hold on this PR waiting for at least one maintainer/codeowner to provide a `lgtm`. Approval
 of the PR is the community consensus for a new release.
