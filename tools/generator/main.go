@@ -22,6 +22,7 @@ import (
 	"log"
 	"os"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"golang.org/x/tools/go/packages"
@@ -168,7 +169,10 @@ func main() {
 	}
 
 	for _, channel := range channels {
-		updateVAPBundleVersion(channel, bundleVersion)
+		err := updateVAPBundleVersion(channel, bundleVersion)
+		if err != nil {
+			log.Fatalf("failed to update vap: %s", err)
+		}
 	}
 
 	if loader.PrintErrors(roots, packages.TypeError) {
@@ -180,12 +184,13 @@ func main() {
 // hand-maintained ValidatingAdmissionPolicy manifest for the given channel.
 // The manifest is edited textually rather than round-tripped through a YAML
 // marshal to preserve its formatting, comments, and multi-document structure.
-func updateVAPBundleVersion(channel, bundleVersion string) {
+func updateVAPBundleVersion(channel, bundleVersion string) error {
 	path := fmt.Sprintf("config/crd/%s/gateway.networking.k8s.io_vap_safeupgrades.yaml", channel)
 	data, err := os.ReadFile(path)
 	if err != nil {
 		log.Fatalf("failed to read VAP manifest %s: %s", path, err)
 	}
+	manifest := string(data)
 
 	// Only match annotation lines; the annotation key also appears inside CEL
 	// expressions, where it is never at the start of a line.
@@ -194,12 +199,36 @@ func updateVAPBundleVersion(channel, bundleVersion string) {
 		log.Fatalf("no %s annotation found in %s", consts.BundleVersionAnnotation, path)
 	}
 
-	updated := re.ReplaceAll(data, []byte("${1}"+bundleVersion))
-	if err := os.WriteFile(path, updated, 0o600); err != nil {
-		log.Fatalf("failed to write VAP manifest %s: %s", path, err)
+	manifest = re.ReplaceAllString(manifest, "${1}"+bundleVersion)
+
+	if channel == "standard" {
+		versionMatch := regexp.MustCompile(`^v(\d+)\.(\d+)`).FindStringSubmatch(bundleVersion)
+		if versionMatch == nil {
+			return fmt.Errorf("bundle version %q is not of the form vMAJOR.MINOR", bundleVersion)
+		}
+		minor, err := strconv.Atoi(versionMatch[2])
+		if err != nil {
+			return fmt.Errorf("invalid minor version in bundle version %q: %w", bundleVersion, err)
+		}
+		if minor < 1 {
+			return fmt.Errorf("bundle version %q has no previous minor version to prohibit upgrades from", bundleVersion)
+		}
+
+		previousMinor := fmt.Sprintf("v1.[0-%d].", minor-2)
+		latestMinor := fmt.Sprintf("v1.[0-%d].", minor-1)
+		log.Printf("updating %s for prohibitions from version %s to %s\n", path, previousMinor, latestMinor)
+
+		// Prohibit installing bundle versions older than the previous minor
+		// version, e.g. anything matching v1.[0-5]. when generating v1.6.x.
+		manifest = strings.ReplaceAll(manifest, previousMinor, latestMinor)
+	}
+
+	if err := os.WriteFile(path, []byte(manifest), 0o600); err != nil {
+		return fmt.Errorf("failed to write VAP manifest %s: %s", path, err)
 	}
 
 	log.Printf("updated %s %s to %s\n", path, consts.BundleVersionAnnotation, bundleVersion)
+	return nil
 }
 
 func marshalCRDManifest(customResourceDefinition apiext.CustomResourceDefinition) ([]byte, error) {
