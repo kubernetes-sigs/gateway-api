@@ -132,14 +132,13 @@ Given that the release branch exists:
 - Create a `release-$tag` branch off the release branch.
 - Update the CHANGELOG as described above.
 - Update `pkg/consts/consts.go` with the new semver tag and any updates to the API review URL.
-- Update regex `spec.validations.expression` in
-  `config/crd/standard/gateway.networking.k8s.io_vap_safeupgrades.yaml`
-  to match older versions. (Look for a regex like `v1.[0-n].`, and make
-  sure that  the `n` in `0-n` is the current minor version number -1.)
 - Run the following command `BASE_REF=vmajor.minor.patch make generate` which
   will update generated docs with the correct version info. (Note that you can't
   test with these YAMLs yet as they contain references to elements which wont
   exist until the tag is cut and image is promoted to production registry.)
+- Verify `config/crd/standard/gateway.networking.k8s.io_vap_safeupgrades.yaml`
+  - Has the updated `gateway.networking.k8s.io/bundle-version`.
+  - Has the updated `spec.validations.expression` to match older versions. (Look for a regex like `v1.[0-3].`, where `3` is the latest minor version number -1)
 - Commit all of the above to the new `release-x.x.x` branch.
 - Create a pull request of the `release-x.x.x` branch into the `release-x.x` branch upstream. Add a hold on this PR waiting for at least one maintainer/codeowner to provide a `lgtm`. Approval
 of the PR is the community consensus for a new release.
@@ -148,25 +147,25 @@ of the PR is the community consensus for a new release.
   the GitHub UI, but **note well**: if the release manager can't create the tag due to Git permissions, a maintainer will need to do it, and in that case it's more polite for the maintainer to create and push the _tag_, then let the release manager create the _release_, so that it's easier for people to find the manager if there are problems!
 - Run the `make build-install-yaml` command which will generate install files in the `release/` directory.
   Attach these files to the GitHub release.
-- Update the `README.md` and `site-src/guides/index.md` files to point links and examples to the new release.
+- Update the `README.md` and `site/content/en/guides/getting-started/introduction.md` files to point links and examples to the new release.
 
 #### For a **MAJOR** or **MINOR** release:
 - Cut a `release-major.minor` branch that we can tag things in as needed.
 - Check out the `release-major.minor` release branch locally.
 - Update `pkg/consts/consts.go` with the new semver tag and any updates to the API review URL.
-- Update `config/crd/standard/gateway.networking.k8s.io_vap_safeupgrades.yaml`
-  - Update the `gateway.networking.k8s.io/bundle-version`.
-  - Update regex `spec.validations.expression` to match older versions. (Look for a regex like `v1.[0-3].`, and replace the `3` with the new minor version number -1).
 - Run the following command `BASE_REF=vmajor.minor.patch make generate` which
   will update generated docs with the correct version info. (Note that you can't
   test with these YAMLs yet as they contain references to elements which wont
   exist until the tag is cut and image is promoted to production registry.)
+- Verify `config/crd/standard/gateway.networking.k8s.io_vap_safeupgrades.yaml`
+  - Has the updated `gateway.networking.k8s.io/bundle-version`.
+  - Has the updated `spec.validations.expression` to match older versions. (Look for a regex like `v1.[0-3].`, where `3` is the latest minor version number -1).
 - Verify the CI tests pass before continuing.
 - Create a tag using the `HEAD` of the `release-x.x` branch. This can be done using the `git` CLI or
   GitHub's [release][release] page.
 - Run the `make build-install-yaml` command which will generate install files in the `release/` directory.
   Attach these files to the GitHub release.
-- Update the `README.md` and `site-src/guides/index.md` files to point links and examples to the new release.
+- Update the `README.md` and `site/content/en/guides/getting-started/introduction.md` files to point links and examples to the new release.
 - Edit the text blurb in `hack/docsy-generate-conformance.py` to reflect the added past version if necessary.
 
 #### For an **RC** release:
