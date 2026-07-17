@@ -105,6 +105,7 @@ class.
 - [Sunbeam Proxy][47]
 - [Traefik Proxy][13]
 - [Varnish Gateway][45]
+- [WSO2 Gateway][48]
 
 ### Partially Conformant
 
@@ -173,6 +174,7 @@ class.
 [45]:#varnish-gateway
 [46]:#calico
 [47]:#sunbeam-proxy
+[48]:#wso2-gateway
 
 
 [gamma]: /docs/mesh/
@@ -540,6 +542,14 @@ customization, bypass conditions) at the Gateway, HTTPRoute, or rule level.
 [varnish-gateway]:https://gateway.varnish.org
 [varnish-software]:https://www.varnish-software.com/
 [varnish]:https://www.varnish.org/
+
+### WSO2 Gateway
+
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.5.1-WSO2%20Gateway-green)](https://github.com/kubernetes-sigs/gateway-api/tree/main/conformance/reports/v1.5.1/wso2-gateway)
+
+[WSO2 Gateway](https://wso2.com/api-platform/docs/) is an AI-ready, GitOps-driven platform for building, securing, and governing APIs across cloud, hybrid, and on-premises environments. It represents the next generation of the [WSO2 Kubernetes Gateway (APK)](https://apk.docs.wso2.com/en/latest/), delivering a unified Kubernetes-native gateway experience with deeper platform integration and modern GitOps workflows.
+
+For supported Gateway API resources and features, see the [Gateway API support guide](https://wso2.com/api-platform/docs/api-gateway/next/deployment/deployment-modes/kubernetes/gateway-operator/#kubernetes-gateway-api-path). For questions and contributions, visit [GitHub](https://github.com/wso2/api-platform). 
 
 ## Integrations
 
