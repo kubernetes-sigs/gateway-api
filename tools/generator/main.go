@@ -182,53 +182,80 @@ func main() {
 
 // updateVAP updates the hand-maintained ValidatingAdmissionPolicy manifest
 // for the given channel.
-// The manifest is edited textually rather than round-tripped through a YAML
-// marshal to preserve its formatting, comments, and multi-document structure.
 func updateVAP(channel, bundleVersion string) error {
-	versionMatch := regexp.MustCompile(`^v(\d+)\.(\d+)`).FindStringSubmatch(bundleVersion)
-	if versionMatch == nil {
-		return fmt.Errorf("bundle version %q is not of the form vMAJOR.MINOR", bundleVersion)
-	}
-	minor, err := strconv.Atoi(versionMatch[2])
+	path := fmt.Sprintf("config/crd/%s/gateway.networking.k8s.io_vap_safeupgrades.yaml", channel)
+
+	manifest, err := readVAPManifest(path)
 	if err != nil {
-		return fmt.Errorf("invalid minor version in bundle version %q: %w", bundleVersion, err)
+		return err
 	}
-	if minor < 1 {
-		// Skip if this runs on main or with the `v0.0.0-dev` bundle version
+
+	updated, err := updateVAPManifest(manifest, channel, bundleVersion)
+	if err != nil {
+		return fmt.Errorf("failed to update VAP manifest %s: %w", path, err)
+	}
+	if updated == manifest {
+		// Nothing changed, e.g. when running on main with the `v0.0.0-dev`
+		// bundle version.
 		return nil
 	}
 
-	path := fmt.Sprintf("config/crd/%s/gateway.networking.k8s.io_vap_safeupgrades.yaml", channel)
+	if err := writeVAPManifest(path, updated); err != nil {
+		return err
+	}
+
+	log.Printf("updated %s %s to %s\n", path, consts.BundleVersionAnnotation, bundleVersion)
+	return nil
+}
+
+func readVAPManifest(path string) (string, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
-		log.Fatalf("failed to read VAP manifest %s: %s", path, err)
+		return "", fmt.Errorf("failed to read VAP manifest %s: %w", path, err)
 	}
-	manifest := string(data)
+	return string(data), nil
+}
+
+// updateVAPManifest stamps the bundle version into the manifest's annotations
+// and, for the standard channel, bumps the prohibited-version range.
+// The manifest is edited textually rather than round-tripped through a YAML
+// marshal to preserve its formatting, comments, and multi-document structure.
+func updateVAPManifest(manifest, channel, bundleVersion string) (string, error) {
+	versionMatch := regexp.MustCompile(`^v(\d+)\.(\d+)`).FindStringSubmatch(bundleVersion)
+	if versionMatch == nil {
+		return "", fmt.Errorf("bundle version %q is not of the form vMAJOR.MINOR", bundleVersion)
+	}
+	minor, err := strconv.Atoi(versionMatch[2])
+	if err != nil {
+		return "", fmt.Errorf("invalid minor version in bundle version %q: %w", bundleVersion, err)
+	}
+	if minor < 1 {
+		// Skip if this runs on main or with the `v0.0.0-dev` bundle version
+		return manifest, nil
+	}
 
 	// Only match annotation lines; the annotation key also appears inside CEL
 	// expressions, where it is never at the start of a line.
 	re := regexp.MustCompile(`(?m)^(\s*` + regexp.QuoteMeta(consts.BundleVersionAnnotation) + `:\s*).*$`)
-	if !re.Match(data) {
-		log.Fatalf("no %s annotation found in %s", consts.BundleVersionAnnotation, path)
-	}
-
 	manifest = re.ReplaceAllString(manifest, "${1}"+bundleVersion)
 
 	if channel == "standard" {
 		previousMinor := fmt.Sprintf("v1.[0-%d].", minor-2)
 		latestMinor := fmt.Sprintf("v1.[0-%d].", minor-1)
-		log.Printf("updating %s for prohibitions from version %s to %s\n", path, previousMinor, latestMinor)
+		log.Printf("updating prohibitions from version %s to %s\n", previousMinor, latestMinor)
 
 		// Prohibit installing bundle versions older than the previous minor
 		// version, e.g. anything matching v1.[0-5]. when generating v1.6.x.
 		manifest = strings.ReplaceAll(manifest, previousMinor, latestMinor)
 	}
 
-	if err := os.WriteFile(path, []byte(manifest), 0o600); err != nil { // #nosec G703 -- path is derived from a hardcoded channel list
-		return fmt.Errorf("failed to write VAP manifest %s: %s", path, err)
-	}
+	return manifest, nil
+}
 
-	log.Printf("updated %s %s to %s\n", path, consts.BundleVersionAnnotation, bundleVersion)
+func writeVAPManifest(path, manifest string) error {
+	if err := os.WriteFile(path, []byte(manifest), 0o600); err != nil { // #nosec G703 -- path is derived from a hardcoded channel list
+		return fmt.Errorf("failed to write VAP manifest %s: %w", path, err)
+	}
 	return nil
 }
 
