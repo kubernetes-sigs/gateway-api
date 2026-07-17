@@ -192,28 +192,13 @@ In this section you will find specific links to blog posts, documentation and ot
 It is the first and only proxy designed specifically for the Kubernetes Gateway API, powered by a high performance and scalable Rust dataplane implementation.
 
 ### Airlock Microgateway
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.6-Airlock%20Microgateway-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.6/airlock-microgateway)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.6.0-Airlock%20Microgateway-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.6/airlock-microgateway)
 
-[Airlock Microgateway][airlock-microgateway] is a Kubernetes native WAAP (Web Application and API Protection) solution optimized for Kubernetes environments and certified for Red Hat OpenShift.
-Modern application security is embedded in the development workflow and follows DevSecOps paradigms.
-Airlock Microgateway protects your applications and microservices with the tried-and-tested Airlock security features against attacks, while also providing a high degree of scalability.
-
-#### Features
-- Comprehensive set of security features, including deny rules to protect against known attacks (OWASP Top 10), header filtering, JSON parsing, OpenAPI specification enforcement, GraphQL schema validation, and antivirus scanning with ICAP
-- Identity aware proxy which makes it possible to enforce authentication using client certificate based authentication, JWT authentication or OIDC with step-up authentication to realize multi factor authentication (MFA). Provides OAuth 2.0 Token Introspection and Token Exchange for continuous validation and secure delegation across services
-- Reverse proxy functionality with request routing rules, TLS termination, and remote IP extraction
-- Easy-to-use Grafana dashboards which provide valuable insights in allowed and blocked traffic and other metrics
-
-#### Documentation and links
-- [Product documentation][airlock-microgateway-documentation]
-- [Gateway API guide][airlock-microgateway-guide]
-- Check our [Airlock community forum][airlock-microgateway-community-support] and [support process][airlock-microgateway-premium-support] for support.
+[Airlock Microgateway][airlock-microgateway] is a Kubernetes-native security solution that extends the routing capabilities of the Gateway API with WAAP (Web Application and API Protection) features and identity-aware proxying.
+It filters requests using deny rules against known attacks (OWASP Top 10), along with header filtering, JSON parsing, OpenAPI specification enforcement, GraphQL schema validation, and antivirus scanning via ICAP.
+Authentication can be enforced via client certificates, JWT, or OIDC with step-up authentication for MFA, with support for OAuth 2.0 Token Introspection and Token Exchange. Airlock Microgateway is certified for Red Hat OpenShift, and built-in Grafana dashboards provide real-time reporting on system health, traffic and threats.
 
 [airlock-microgateway]:https://www.airlock.com/en/secure-access-hub/components/microgateway
-[airlock-microgateway-documentation]:https://docs.airlock.com/microgateway/latest
-[airlock-microgateway-guide]:https://docs.airlock.com/microgateway/latest/?topic=MGW-00000142
-[airlock-microgateway-community-support]:https://forum.airlock.com/
-[airlock-microgateway-premium-support]:https://techzone.ergon.ch/support-process
 
 ### Alibaba Cloud Service Mesh
 
