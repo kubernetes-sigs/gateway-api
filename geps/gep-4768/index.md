@@ -3,27 +3,27 @@ title: "GEP: Standardized Telemetry API"
 ---
 
 * Issue: #4768
-* Status: Provisional
+* Status: Experimental
 
 ## TLDR
 
-This proposal introduces a standardized, provider-agnostic Telemetry API to configure observability signals (metrics, access logs, and traces) for North/South (Gateway) traffic, addressing the fragmentation caused by vendor-specific CRDs.
+This proposal introduces a standardized, provider-agnostic Telemetry API to configure observability signals for North/South (Gateway) traffic, addressing the fragmentation caused by vendor-specific CRDs. While a comprehensive telemetry API includes metrics, access logs, and traces, this iteration of the GEP focuses exclusively on Tracing. Future iterations will add (via this GEP or via additional GEPs) support for Logging and Metrics.
 
 ## Goals
 
-* Establish a standardized model to configure provider-agnostic telemetry (metrics, access logs, and traces) for Gateways.
+* Establish a standardized model to configure provider-agnostic tracing for Gateways.
 
 ## Non-Goals
 
 1. Defining how the telemetry is exported (sinks/shippers) beyond specifying the provider endpoint and relevant connectivity parameters.
 2. Replacing the underlying telemetry infrastructure (OTLP collectors, Prometheus, etc.).
-3. Standardizing metrics; this proposal exclusively focuses on the telemetry configuration API.
+3. Defining the API for Metrics and Access Logs configuration. These signals are out of scope for this initial tracing-focused iteration, but will be added in future iterations or separate GEPs.
 
 ## Introduction / Overview
 
-This GEP proposes the addition of a standardized, provider-agnostic Telemetry API to the Gateway API project. The proposal aims to define a unified configuration model for the generation and propagation of telemetry signals (i.e., metrics, access logs, distributed traces) for North/South (Gateway) traffic.
+This GEP proposes the addition of a standardized, provider-agnostic Telemetry API to the Gateway API project. The proposal aims to define a unified configuration model for the generation and propagation of telemetry signals for North/South (Gateway) traffic.
 
-The API focuses on providing a consistent way to express observability intent, such as sampling rates for tracing, metric customization, and log filtering, regardless of the underlying data plane implementation.
+The API focuses on providing a consistent way to express observability intent, such as sampling rates for tracing, regardless of the underlying data plane implementation. While a comprehensive telemetry API must account for metrics, access logs, and distributed traces, this iteration of the GEP focuses exclusively on distributed traces. Future iterations will expand this API (via this GEP or via additional GEPs) to include support for metrics and access logs.
 
 ## Purpose (Why and Who)
 
@@ -57,9 +57,12 @@ To mitigate the challenge of complex merging semantics, this GEP restricts confi
 ### High-level Considerations:
 
 - **Tracing**: Configuration for OTLP endpoints, sampling rates (probabilistic and parent-based), and custom resource/span attributes.
+- **Export Configuration**: Supporting TLS connections to telemetry collectors and the ability to inject custom headers (e.g., `Authorization`) into telemetry requests.
+
+#### Future Considerations:
+
 - **Metrics**: Ability to enable/disable specific metric families and customize dimensions (labels/attributes).
 - **Access Logs**: Filtering for smart logging (e.g., only log 5xx errors or high latency), multi-protocol support, and log format customization (including field selection).
-- **Export Configuration**: Supporting TLS connections to telemetry collectors and the ability to inject custom headers (e.g., `Authorization`) into telemetry requests.
 
 ### Request Flow
 
@@ -86,7 +89,7 @@ spec:
     kind: Gateway
     name: my-gateway
   
-  # 1. Tracing Configuration
+  # Tracing Configuration
   tracing:
     mode: "On"
     provider:
@@ -109,40 +112,6 @@ spec:
       - name: "mcp_tool_name"
         type: Reference
         attributeRef: "gen_ai.tool.name"
-
-  # 2. Metrics Configuration
-  metrics:
-    mode: "On"
-    overrides:
-      - name: "example.com/http/request_count"
-        attributes: # Inject custom attributes/labels
-          - name: "x-model-id"
-            type: Header
-            headerName: "X-Model-Id"
-          - name: "mcp_tool_name"
-            type: Reference
-            attributeRef: "gen_ai.tool.name"
-          - name: "environment"
-            type: Literal
-            literalValue: "production"
-
-  # 3. Access Logs Configuration
-  accessLogs:
-    mode: "Off" # Explicitly disabled while keeping the configuration intact
-    matches: "response.code >= 500" # Conditional logging, CEL filtering for errors
-    fields: # Configure specific fields to include, indicating their source
-      - path: ["http", "request", "start_time"] # Standard nested JSON structure
-        type: Reference
-        attributeRef: "timestamp"
-      - path: ["http", "response", "status_code"]
-        type: Reference
-        attributeRef: "http.response.status_code"
-      - path: ["token-usage"]
-        type: Header
-        headerName: "X-Token-Usage"
-      - path: ["mcp.method"] # Segment with dots (Preserved verbatim as flat key)
-        type: Reference
-        attributeRef: "mcp.method.name"
 ```
 
 #### Detailed Resource Description
@@ -175,8 +144,8 @@ The following are the Go structs modeling the proposed specification.
 //
 // Conformance:
 // Implementations MUST support the core resource structure and `targetRefs`.
-// Support for tracing, metrics, and accessLogs blocks is Extended, but if supported,
-// their respective conformance profiles must be met.
+// Support for the tracing block is Extended, but if supported,
+// its respective conformance profile must be met.
 // </gateway:util:excludeFromCRD>
 //
 // Support: Core (Resource shell and targetRefs), Extended (Signals)
@@ -198,7 +167,7 @@ type TelemetryPolicy struct {
 // TelemetryPolicySpec defines the desired state and target of TelemetryPolicy.
 //
 // Specifying at least one target resource in `targetRefs` is required.
-// Signals (tracing, metrics, and accessLogs) can be individually configured.
+// Tracing behavior can be configured via the `tracing` field.
 //
 // Support: Core
 type TelemetryPolicySpec struct {
@@ -226,27 +195,6 @@ type TelemetryPolicySpec struct {
   //
   // +optional
   Tracing *TracingConfig `json:"tracing,omitempty"`
-
-  // Metrics defines the configuration for metric generation and custom attributes.
-  //
-  // When configured, custom metric attributes are applied. In the absence of this
-  // configuration, metrics are generated according to implementation-default definitions.
-  //
-  // Support: Extended
-  //
-  // +optional
-  Metrics *MetricsConfig `json:"metrics,omitempty"`
-
-  // AccessLogs defines the configuration for access log generation and filters.
-  //
-  // When configured, access log generation, filtering, and attribute customisation are
-  // applied. In the absence of this configuration, access logging is determined by
-  // implementation defaults.
-  //
-  // Support: Extended
-  //
-  // +optional
-  AccessLogs *AccessLogsConfig `json:"accessLogs,omitempty"`
 }
 
 // TelemetryMode defines the enablement state of a telemetry signal.
@@ -285,15 +233,15 @@ const (
   AttributeSourceReference = "Reference"
 )
 
-// Attribute defines a single flat key-value pair to attach to metrics and traces.
+// Attribute defines a single flat key-value pair to attach to traces.
 //
-// This allows users to enrich spans and metrics with context like HTTP headers
+// This allows users to enrich spans with context like HTTP headers
 // (e.g., "X-User-ID"), static tags, or built-in variables.
 //
 // Support: Core
 type Attribute struct {
-  // Name is the key of the attribute as it will appear in the output.
-  // (e.g., as a span tag or metric label).
+  // Name is the key of the attribute as it will appear in the output
+  // (i.e., as a span tag).
   //
   // +required
   Name string `json:"name"`
@@ -321,46 +269,6 @@ type Attribute struct {
   // For example: "http.response.status_code" or "http.request.method".
   // This is required if Type is "Reference".
   // See: https://opentelemetry.io/docs/specs/semconv/
-  //
-  // +optional
-  AttributeRef *string `json:"attributeRef,omitempty"`
-}
-
-// LogField defines a structured, potentially nested, field to include in JSON access logs.
-//
-// Support: Core
-type LogField struct {
-  // Path defines the nested key path under which the field value will be stored in the JSON payload.
-  // Each element of the slice represents a nesting level. Any individual segment can contain dots,
-  // which are preserved verbatim at that specific level of nesting.
-  // For example, ["user.metadata", "id"] will serialize to {"user.metadata": {"id": "<value>"}}.
-  //
-  // +required
-  // +kubebuilder:validation:MinItems=1
-  Path []string `json:"path"`
-
-  // Type specifies where the attribute value comes from.
-  // Valid values are "Header", "Literal", or "Reference".
-  //
-  // +required
-  // +kubebuilder:validation:Enum=Header;Literal;Reference
-  Type AttributeSourceType `json:"type"`
-
-  // HeaderName specifies the HTTP header to extract the value from.
-  // This is required if Type is "Header".
-  //
-  // +optional
-  HeaderName *string `json:"headerName,omitempty"`
-
-  // LiteralValue specifies a static string value to attach.
-  // This is required if Type is "Literal".
-  //
-  // +optional
-  LiteralValue *string `json:"literalValue,omitempty"`
-
-  // AttributeRef refers to a standard OpenTelemetry attribute.
-  // For example: "http.response.status_code" or "http.request.method".
-  // This is required if Type is "Reference".
   //
   // +optional
   AttributeRef *string `json:"attributeRef,omitempty"`
@@ -513,116 +421,6 @@ type ParentBasedSampling struct {
   //
   // +optional
   SamplingRate *Fraction `json:"samplingRate,omitempty"`
-}
-
-// --- Metrics Types ---
-
-// MetricsConfig defines configuration options for proxy metric generation.
-//
-// Metrics provide numeric measurements (counters, gauges, histograms) representing traffic
-// volume, error rates, latency, proxy performance, etc. Gateway users get high-level
-// observability into the behavior of their API traffic.
-//
-// Support: Extended
-type MetricsConfig struct {
-  // Mode explicitly controls if metric generation is enabled. Valid values are "On" or "Off".
-  //
-  // Defaults to "On" if the metrics block is configured.
-  //
-  // Support: Core (within Metrics feature)
-  //
-  // +kubebuilder:validation:Enum=On;Off
-  // +kubebuilder:default=On
-  Mode TelemetryMode `json:"mode,omitempty"`
-
-  // Overrides defines a list of customizations to specific metric families.
-  //
-  // When configured, these overrides alter standard metrics by adding custom attributes
-  // (labels) or changing metric-specific settings. In the absence of overrides, only
-  // standard out-of-the-box proxy metrics are generated.
-  //
-  // Support: Extended
-  //
-  // +optional
-  Overrides []MetricOverride `json:"overrides,omitempty"`
-}
-
-// MetricOverride configures customization for a specific named metric family.
-//
-// At present it allows the inclusion of additional attributes for existing metrics.
-//
-// Support: Extended
-type MetricOverride struct {
-  // Name specifies the exact name of the metric to override (e.g., "http_requests_total"
-  // or "example.com/http/request_count").
-  //
-  // Support: Core (within Metrics override feature)
-  //
-  // +required
-  Name string `json:"name"`
-
-  // Attributes defines custom labels/dimensions to append to the overridden metric.
-  //
-  // These allow tracking business or environment-specific tags on standard metrics,
-  // such as classifying metrics by incoming API token metadata or model identifiers.
-  //
-  // Support: Extended
-  //
-  // +optional
-  Attributes []Attribute `json:"attributes,omitempty"`
-}
-
-// --- Access Logs Types ---
-
-// AccessLogsConfig defines the configuration for access log generation.
-//
-// Access logs record metadata for every individual request/response transaction
-// (e.g., start time, status code, request path, size). Users get a persistent, readable audit
-// trail of all traffic passing through the Gateway, which is critical for security audits,
-// compliance, and troubleshooting of failures.
-//
-// Support: Extended
-type AccessLogsConfig struct {
-  // Mode explicitly controls if access logging is enabled. Valid values are "On" or "Off".
-  //
-  // Defaults to "On" if the accessLogs block is configured.
-  //
-  // Support: Core (within AccessLogs feature)
-  //
-  // +kubebuilder:validation:Enum=On;Off
-  // +kubebuilder:default=On
-  Mode TelemetryMode `json:"mode,omitempty"`
-
-  // Matches specifies a Common Expression Language (CEL) expression used to filter
-  // which requests are logged (e.g., "response.code >= 500").
-  //
-  // When configured, only requests matching the condition are written to access logs.
-  // This enables "smart logging" (logging only errors or slow requests), reducing log volume
-  // and storage costs. In the absence of a match filter, all requests are logged.
-  //
-  // <gateway:util:excludeFromCRD>
-  // Notes for implementors:
-  //
-  // Not all data plane engines natively support CEL evaluation. If an implementation
-  // cannot support CEL-based log filtering, it MUST raise an `Accepted` condition of
-  // `False` with reason `UnsupportedField` or `Invalid` on the policy status when this field is used.
-  // </gateway:util:excludeFromCRD>
-  //
-  // Support: Implementation-specific
-  //
-  // +optional
-  Matches string `json:"matches,omitempty"`
-
-  // Fields specifies the structured JSON fields and variables included in the generated access logs.
-  //
-  // When configured, the generated JSON log records will include these fields at the paths
-  // defined by each LogField. In the absence of fields, the proxy uses its default structured
-  // JSON format.
-  //
-  // Support: Extended
-  //
-  // +optional
-  Fields []LogField `json:"fields,omitempty"`
 }
 
 // --- Policy Status ---
