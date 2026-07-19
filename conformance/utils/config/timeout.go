@@ -184,7 +184,7 @@ func parseDuration(val any) (time.Duration, error) {
 func DefaultTimeoutConfig() TimeoutConfig {
 	return TimeoutConfig{
 		CreateTimeout:                          60 * time.Second,
-		DeleteTimeout:                          10 * time.Second,
+		DeleteTimeout:                          30 * time.Second,
 		GetTimeout:                             10 * time.Second,
 		GatewayMustHaveAddress:                 180 * time.Second,
 		GatewayMustHaveCondition:               180 * time.Second,
