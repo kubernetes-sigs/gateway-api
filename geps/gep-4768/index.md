@@ -242,6 +242,11 @@ const (
 // (e.g., "X-User-ID"), static tags, or built-in variables.
 //
 // Support: Core
+//
+// +union
+// +kubebuilder:validation:XValidation:rule="self.type == 'Header' ? has(self.headerName) : !has(self.headerName)",message="headerName is required when type is Header, and must be empty otherwise"
+// +kubebuilder:validation:XValidation:rule="self.type == 'Literal' ? has(self.literalValue) : !has(self.literalValue)",message="literalValue is required when type is Literal, and must be empty otherwise"
+// +kubebuilder:validation:XValidation:rule="self.type == 'Reference' ? has(self.attributeRef) : !has(self.attributeRef)",message="attributeRef is required when type is Reference, and must be empty otherwise"
 type Attribute struct {
   // Name is the key of the attribute as it will appear in the output
   // (i.e., as a span tag).
@@ -252,6 +257,7 @@ type Attribute struct {
   // Type specifies where the attribute value comes from.
   // Valid values are "Header", "Literal", or "Reference".
   //
+  // +unionDiscriminator
   // +required
   // +kubebuilder:validation:Enum=Header;Literal;Reference
   Type AttributeSourceType `json:"type"`
