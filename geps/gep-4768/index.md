@@ -201,10 +201,13 @@ type TelemetryPolicySpec struct {
 type TelemetryMode string
 
 const (
-  // TelemetryModeOn explicitly enables the telemetry signal.
-  TelemetryModeOn  TelemetryMode = "On"
-  // TelemetryModeOff explicitly disables the telemetry signal.
-  TelemetryModeOff TelemetryMode = "Off"
+  // TelemetryModeEnabled explicitly enables the telemetry signal.
+  TelemetryModeEnabled  TelemetryMode = "Enabled"
+  // TelemetryModeDisabled explicitly disables the telemetry signal.
+  TelemetryModeDisabled TelemetryMode = "Disabled"
+  // TelemetryModeImplementationDefault means that the code should
+  // use the implementation's default behavior for telemetry.
+  TelemetryModeImplementationDefault TelemetryMode = "ImplementationDefault"
 )
 
 // AttributeSourceType defines the source from which a telemetry attribute
@@ -293,10 +296,10 @@ type TracingConfig struct {
   //
   // In the absence of this field, it defaults to "On".
   //
-  // Support: Core (within Tracing feature)
+  // Support: Core (within TracingPolicy feature)
   //
-  // +kubebuilder:validation:Enum=On;Off
-  // +kubebuilder:default=On
+  // +kubebuilder:validation:Enum=On;Off;ImplementationDefault
+  // +kubebuilder:default=ImplementationDefault
   Mode TelemetryMode `json:"mode,omitempty"`
 
   // Provider specifies the tracing collector or backend endpoint receiving OTLP spans.
