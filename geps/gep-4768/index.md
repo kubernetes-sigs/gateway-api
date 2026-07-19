@@ -91,7 +91,7 @@ spec:
   
   # Tracing Configuration
   tracing:
-    mode: "On"
+    mode: "Enabled"
     provider:
       backendRef:
         group: ""
@@ -102,7 +102,7 @@ spec:
     samplingRate: 
       numerator: 5 # Represents 5/100 (5%) because denominator defaults to 100
     parentBasedSampling:
-      mode: "On"
+      mode: "Enabled"
       samplingRate:
         numerator: 50 # Represents 50/100 (50%)
     attributes:
@@ -189,7 +189,7 @@ type TelemetryPolicySpec struct {
   //
   // When configured, distributed tracing spans are generated and exported. In the
   // absence of this configuration, tracing behavior is determined by implementation
-  // defaults (typically disabled).
+  // defaults.
   //
   // Support: Extended
   //
@@ -291,14 +291,18 @@ type Attribute struct {
 // across complex distributed systems.
 //
 // Support: Extended
+//
+// +kubebuilder:validation:XValidation:rule="self.mode == 'Enabled' ? has(self.provider) : true",message="provider must be specified when mode is Enabled"
+// +kubebuilder:validation:XValidation:rule="self.mode == 'Disabled' ? !has(self.provider) : true",message="provider must be empty when mode is Disabled"
 type TracingConfig struct {
-  // Mode explicitly controls if tracing is enabled. Valid values are "On" or "Off".
+  // Mode explicitly controls if tracing is enabled. Valid values are "Enabled", "Disabled",
+  // "ImplementationDefault".
   //
-  // In the absence of this field, it defaults to "On".
+  // In the absence of this field, it defaults to "ImplementationDefault".
   //
-  // Support: Core (within TracingPolicy feature)
+  // Support: Core (within TelemetryPolicy feature)
   //
-  // +kubebuilder:validation:Enum=On;Off;ImplementationDefault
+  // +kubebuilder:validation:Enum=Enabled;Disabled;ImplementationDefault
   // +kubebuilder:default=ImplementationDefault
   Mode TelemetryMode `json:"mode,omitempty"`
 
@@ -335,8 +339,10 @@ type TracingConfig struct {
 
   // ParentBasedSampling configures whether to respect the sampling decision of the parent span.
   //
-  // * When Mode is "On", the proxy will respect the upstream trace parent's sampling decision.
-  // * When Mode is "Off" or absent, the proxy applies its own local sampling rate decision.
+  // * When Mode is "Enabled", the proxy will respect the upstream trace parent's sampling
+  //   decision.
+  // * When Mode is "Disabled" or absent, the proxy applies its own local sampling rate 
+  //   decision.
   //
   // Support: Extended
   //
@@ -381,6 +387,8 @@ type TracingProvider struct {
 // The probability is calculated as numerator / denominator (e.g. 5 / 100 = 5%).
 //
 // Support: Core (within Tracing feature)
+//
+// +kubebuilder:validation:XValidation:rule="has(self.denominator) ? self.numerator <= self.denominator : self.numerator <= 100",message="numerator cannot be greater than denominator"
 type Fraction struct {
   // Numerator specifies the top of the fraction.
   //
