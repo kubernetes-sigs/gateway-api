@@ -46,11 +46,19 @@ updates:
       - ok-to-test
       - release-note-none
 
-  # Dependencies listed in Dockerfile
+  # Images listed in Dockerfile or Kubernetes manifests
   - package-ecosystem: "docker"
-    directory: "/"
+    directories:
+      - "/conformance/base"
+      - "/conformance/mesh"
+      - "/conformance/tests"
+      - "/conformance/tests/mesh"
     schedule:
-      interval: "weekly"
+      interval: "daily"
+    groups:
+      gateway-api-conformance:
+        patterns:
+          - "registry.k8s.io/gateway-api/conformance/*"
     labels:
       - docker
       - dependencies
