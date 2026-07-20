@@ -31,7 +31,7 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 
-	pb "sigs.k8s.io/gateway-api/conformance/echo-basic/grpcechoserver"
+	pb "sigs.k8s.io/gateway-api-conformance-images/echo-basic/grpcechoserver"
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/tlog"

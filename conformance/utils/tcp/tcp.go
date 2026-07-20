@@ -32,7 +32,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"k8s.io/apimachinery/pkg/util/wait"
 
-	tcpserver "sigs.k8s.io/gateway-api/conformance/echo-basic/tcpserver"
+	tcpserver "sigs.k8s.io/gateway-api-conformance-images/echo-basic/tcpserver"
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
 	"sigs.k8s.io/gateway-api/conformance/utils/tlog"
 )

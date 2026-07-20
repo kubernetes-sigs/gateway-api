@@ -27,7 +27,7 @@ import (
 
 	"k8s.io/apimachinery/pkg/types"
 
-	"sigs.k8s.io/gateway-api/conformance/echo-basic/udpechoserver"
+	"sigs.k8s.io/gateway-api-conformance-images/echo-basic/udpechoserver"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	confsuite "sigs.k8s.io/gateway-api/conformance/utils/suite"
 	"sigs.k8s.io/gateway-api/conformance/utils/tlog"
