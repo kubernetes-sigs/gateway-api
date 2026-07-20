@@ -299,6 +299,29 @@ func MakeRequestAndExpectEventuallyConsistentResponse(t *testing.T, c Client, ti
 	tlog.Logf(t, "Request passed")
 }
 
+func MakeRequestAndExpectEventuallyConsistentFailure(t *testing.T, c Client, timeoutConfig config.TimeoutConfig, gwAddr string, expected ExpectedResponse) {
+	t.Helper()
+	validateExpectedResponse(t, expected)
+	if c == nil {
+		c = &DefaultClient{Conn: nil}
+	}
+	defer c.Close()
+	sendRPC := func(elapsed time.Duration) bool {
+		resp, err := c.SendRPC(t, gwAddr, expected, timeoutConfig.MaxTimeToConsistency-elapsed)
+		if err != nil {
+			tlog.Logf(t, "Failed to send RPC, not ready yet: %v (after %v)", err, elapsed)
+			return false
+		}
+		if resp.Code == codes.OK {
+			t.Fatalf("Request should have failed, but got status OK")
+			return false
+		}
+		return true
+	}
+	http.AwaitConvergence(t, 5, timeoutConfig.MaxTimeToConsistency, sendRPC)
+	tlog.Logf(t, "Expectation for failing request met")
+}
+
 // AddEntropy adds randomness to ExpectedResponse to avoid caching issues and ensure each request is unique.
 // It randomly chooses to add a delay, random metadata, or both.
 func AddEntropy(exp *ExpectedResponse) error {
