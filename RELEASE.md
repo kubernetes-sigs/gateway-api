@@ -183,20 +183,12 @@ of the PR is the community consensus for a new release.
   install files in the `release/` directory.
 - Attach these files to the GitHub release.
 
-### Promoting images to production registry
-Gateway API follows the standard kubernetes image promotion process described [here][kubernetes-image-promotion].
+### Promoting conformance images to production registry
 
-1. Once the tag has been cut and the image is available in the staging registry,
-   identify the SHA-256 image digest of the image that you want to promote.
-2. Modify the
-   [k8s-staging-gateway-api/images.yaml](https://github.com/kubernetes/k8s.io/blob/main/registry.k8s.io/images/k8s-staging-gateway-api/images.yaml)
-   file under [kubernetes/k8s.io](https://github.com/kubernetes/k8s.io)
-   repository and add the image digest along with the new tag under the correct
-   component.
-   1. Currently, the following images are included: `admission-server`, `echo-server`
-3. Create a PR with the above changes.
-4. Image will get promoted by [automated prow jobs][kubernetes-image-promotion]
-   once the PR merges
+Conformance test images, i.e., `echo-basic`, `echo-advanced`, are now maintained in the [gateway-api-conformance-images](https://github.com/kubernetes-sigs/gateway-api-conformance-images) repository.
+The image release and promotion process is documented in that repository's [RELEASE.md](https://github.com/kubernetes-sigs/gateway-api-conformance-images/blob/main/RELEASE.md).
+
+It may be worth releasing the conformance test images *before* drafting a new Gateway API release, so the release can reference up-to-date image tags.
 
 [release]: https://github.com/kubernetes-sigs/gateway-api/releases
 [gateway-api-team]: https://github.com/kubernetes/org/blob/main/config/kubernetes-sigs/sig-network/teams.yaml
