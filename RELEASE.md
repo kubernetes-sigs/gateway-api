@@ -183,6 +183,13 @@ of the PR is the community consensus for a new release.
   install files in the `release/` directory.
 - Attach these files to the GitHub release.
 
+### Promoting conformance images to production registry
+
+Conformance test images, i.e., `echo-basic`, `echo-advanced`, are now maintained in the [gateway-api-conformance-images](https://github.com/kubernetes-sigs/gateway-api-conformance-images) repository.
+The image release and promotion process is documented in that repository's [RELEASE.md](https://github.com/kubernetes-sigs/gateway-api-conformance-images/blob/main/RELEASE.md).
+
+It may be worth releasing the conformance test images *before* drafting a new Gateway API release, so the release can reference up-to-date image tags.
+
 [release]: https://github.com/kubernetes-sigs/gateway-api/releases
 [gateway-api-team]: https://github.com/kubernetes/org/blob/main/config/kubernetes-sigs/sig-network/teams.yaml
 [kubernetes-image-promotion]: https://github.com/kubernetes/k8s.io/tree/main/registry.k8s.io#image-promoter
