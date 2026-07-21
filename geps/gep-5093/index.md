@@ -99,6 +99,7 @@ An implementation MUST NOT satisfy an entry with an address of a different reach
 
 If a requested routability cannot be satisfied, the correct behavior is to leave that entry unsatisfied and report it. Implementations MUST NOT substitute a different scope.
 
+`spec.addresses` MAY contain references to different routability types, with a different type on each requested address (and this MAY be combined with requesting specific addresses). In this case, implementations MUST evaluate each address request separately according to the rules above, and MUST populate `status.addresses` (including `routability`) for each configured address.
 **Full and Partially Accepted Address Entry Semantics**
 
 If ***all*** spec address entries can be satisfied, the implementation programs the Gateway normally.
