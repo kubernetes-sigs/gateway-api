@@ -794,7 +794,7 @@ spec:
         - args:
             - -conf
             - /root/Corefile
-          image: registry.k8s.io/coredns/coredns:v1.12.2
+          image: registry.k8s.io/coredns/coredns:v1.14.6
           imagePullPolicy: IfNotPresent
           name: coredns
           securityContext:
