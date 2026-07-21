@@ -38,7 +38,7 @@ type ForwardBodyConfigApplyConfiguration struct {
 	// for more.
 	//
 	// If 0, the body will not be sent to the authorization server.
-	MaxSize *uint16 `json:"maxSize,omitempty"`
+	MaxSize *int32 `json:"maxSize,omitempty"`
 }
 
 // ForwardBodyConfigApplyConfiguration constructs a declarative configuration of the ForwardBodyConfig type for use with
@@ -50,7 +50,7 @@ func ForwardBodyConfig() *ForwardBodyConfigApplyConfiguration {
 // WithMaxSize sets the MaxSize field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the MaxSize field is set to the value of the last call.
-func (b *ForwardBodyConfigApplyConfiguration) WithMaxSize(value uint16) *ForwardBodyConfigApplyConfiguration {
+func (b *ForwardBodyConfigApplyConfiguration) WithMaxSize(value int32) *ForwardBodyConfigApplyConfiguration {
 	b.MaxSize = &value
 	return b
 }
