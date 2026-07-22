@@ -115,6 +115,7 @@ class.
 - [Envoy Gateway][18]
 - [Gravitee Kubernetes Operator][42]
 - [Kong Operator][35]
+- [Lexfrei's Cloudflare Tunnel Gateway Controller][49]
 
 ### Stale
 
@@ -175,6 +176,7 @@ class.
 [46]:#calico
 [47]:#sunbeam-proxy
 [48]:#wso2-gateway
+[49]:#lexfreis-cloudflare-tunnel-gateway-controller
 
 
 [gamma]: /docs/mesh/
@@ -449,6 +451,17 @@ For help and support with Kong Operator please feel free to [create an issue][ko
 [Kubvernor][kubvernor] is an open-source, highly experimental implementation of API controller in Rust programming language. Currently, Kubvernor supports Envoy Proxy. The project aims to be as generic as possible so Kubvernor can be used to manage/deploy different gateways (Envoy, Nginx, HAProxy, etc.).
 
 [kubvernor]:https://github.com/kubvernor/kubvernor
+
+### Lexfrei's Cloudflare Tunnel Gateway Controller
+
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Partial%20Conformance%20v1.6.1-Lexfrei%27s%20Cloudflare%20Tunnel%20Gateway%20Controller-orange)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.6/lexfrei-cloudflare-tunnel-gateway-controller)
+
+[Lexfrei's Cloudflare Tunnel Gateway Controller][cloudflare-tunnel-gateway-controller] is a Kubernetes controller that implements the Gateway API on top of Cloudflare Tunnel: it watches Gateway, HTTPRoute, and GRPCRoute resources and programs Cloudflare Tunnel ingress through the Cloudflare API, serving traffic through an in-process L7 proxy data plane that embeds the cloudflared tunnel transport.
+
+It is open source under the BSD-3-Clause license, maintained by an individual (lexfrei), and not affiliated with or endorsed by Cloudflare; see the [documentation][cloudflare-tunnel-gateway-controller-docs] for setup and configuration.
+
+[cloudflare-tunnel-gateway-controller]: https://github.com/lexfrei/cloudflare-tunnel-gateway-controller
+[cloudflare-tunnel-gateway-controller-docs]: https://cf.k8s.lex.la
 
 ### Linkerd
 
