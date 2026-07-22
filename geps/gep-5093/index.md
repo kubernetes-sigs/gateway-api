@@ -19,7 +19,7 @@ This gap blocks several use cases:
 
 * **Internal-only gateways.** Knative and similar projects need to deploy Gateways that are reachable within the cluster but not from the public internet (\#1651). Today this requires implementation-specific annotations or out-of-band Service manipulation.
 
-* **Egress gateways.** Workloads that route outbound traffic through a Gateway need a cluster-internal address to connect to. Without a portable way to request or identify such an address, egress patterns cannot be standardized. Standardizing such patterns has been requested by the wg-ai-gateway in service of generative AI use cases: for example, a `Gateway` with a  `Cluster` scoped address and a `Backend` pointing to an external inference provider should generally not be reachable from the open internet, to avoid injecting inference credentials into arbitrary requests. (see [\#4746](https://github.com/kubernetes-sigs/gateway-api/pull/4746) discussions on “open relays”.)
+* **Egress gateways.** Workloads that route outbound traffic through a Gateway need a cluster-internal address to connect to. Without a portable way to request or identify such an address, egress patterns cannot be standardized. Standardizing such patterns has been requested by the wg-ai-gateway in service of generative AI use cases: for example, a `Gateway` with a  `Cluster` scoped address and a `Backend` pointing to an external inference provider should generally not be reachable from the open internet, to avoid injecting inference credentials into arbitrary requests. (see [\#4746](https://github.com/kubernetes-sigs/gateway-api/pull/4746) discussions on "open relays".)
 
 * **Multi-address gateways.** A Gateway may be provisioned with both a public and an internal address. Clients currently have no way to determine which address is appropriate for their context.
 
@@ -35,16 +35,16 @@ GEP-1651 correctly identified the problem and `Cluster` is preserved here. Its "
 
 GEP-1651 did not progress past Provisional. The blocking concerns were:
 
-* **`Private` needs decomposition.** It was defined as "routable inside a private network larger than a single cluster (e.g. VPC) and MAY include RFC1918 address space." Reviewer comments reveal a need to decompose `Private` into two distinct scopes–a VPC-internal address and a cluster-internal address–with different operational implications (whether kube-proxy captures traffic, whether the address is reachable from adjacent clusters). Without that decomposition, a precise definition could not be agreed.
+* **`Private` needs decomposition.** It was defined as "routable inside a private network larger than a single cluster (e.g. VPC) and MAY include RFC1918 address space." Reviewer comments reveal a need to decompose `Private` into two distinct scopes--a VPC-internal address and a cluster-internal address--with different operational implications (whether kube-proxy captures traffic, whether the address is reachable from adjacent clusters). Without that decomposition, a precise definition could not be agreed.
 * **Multi-network Kubernetes.** Concurrent work on multi-network support upstream ([KEP-3700](https://github.com/kubernetes/enhancements/pull/3700)) made any binary classification of "private" feel premature, because the boundary of "the private network" is itself becoming an administrator-defined concept.
 * **Single scope per Gateway is too coarse.** Real deployments provision Gateways with both a public and a cluster-internal address (e.g. an ingress Gateway also reachable from inside the cluster for mesh-internal callers). A Gateway-level field cannot express this.
 * **No portable per-address discovery.** Consumers (workloads, agents, egress tooling) had no reliable way to read the reachability of an *individual* address from `status.addresses`, because the scope lived on the Gateway rather than on each address.
 
 ### GEP-4747: L7 reverse-proxy egress
 
-The second line of origin is GEP-4747 ([PR \#4746](https://github.com/kubernetes-sigs/gateway-api/pull/4746)), which proposed L7 reverse-proxy egress using the existing `Gateway` resource. During review, a portable way to request a cluster-internal address was listed by Gateway API maintainers as the GEP's "biggest requirement"–agents need an IP to connect to and must be able to *programmatically* determine its reachability from the Gateway's status ([\#4746 comment](https://github.com/kubernetes-sigs/gateway-api/pull/4746#issuecomment-4349943298)).
+The second line of origin is GEP-4747 ([PR \#4746](https://github.com/kubernetes-sigs/gateway-api/pull/4746)), which proposed L7 reverse-proxy egress using the existing `Gateway` resource. During review, a portable way to request a cluster-internal address was listed by Gateway API maintainers as the GEP's "biggest requirement"--agents need an IP to connect to and must be able to *programmatically* determine its reachability from the Gateway's status ([\#4746 comment](https://github.com/kubernetes-sigs/gateway-api/pull/4746#issuecomment-4349943298)).
 
-An initial attempt to absorb that requirement into GEP-4747 (by adding `ClusterIP` as an address type and a Gateway `type` field) caused the GEP to accumulate unrelated debates–TLS policy scoping, open-relay prevention, ingress/egress intent encoding–that were valuable in their own right but not load-bearing for the core egress model. At [howardjohn's](https://github.com/howardjohn) suggestion ([review](https://github.com/kubernetes-sigs/gateway-api/pull/4746#pullrequestreview-4573981917)), the GEP was closed and split into smaller proposals, of which this is the first ([closing comment](https://github.com/kubernetes-sigs/gateway-api/pull/4746#issuecomment-4367626623)).
+An initial attempt to absorb that requirement into GEP-4747 (by adding `ClusterIP` as an address type and a Gateway `type` field) caused the GEP to accumulate unrelated debates--TLS policy scoping, open-relay prevention, ingress/egress intent encoding--that were valuable in their own right but not load-bearing for the core egress model. At [howardjohn's](https://github.com/howardjohn) suggestion ([review](https://github.com/kubernetes-sigs/gateway-api/pull/4746#pullrequestreview-4573981917)), the GEP was closed and split into smaller proposals, of which this is the first ([closing comment](https://github.com/kubernetes-sigs/gateway-api/pull/4746#issuecomment-4367626623)).
 
 The split was deliberate: reachability is a prerequisite for egress, but its scope is broader than egress alone (it also covers internal-only ingress, multi-address Gateways, and discovery by arbitrary consumers). Pursuing it here lets GEP-4747 and any companion proposals reference a settled reachability model rather than re-litigating it.
 
@@ -91,9 +91,9 @@ The field also accepts domain-prefixed values (e.g. `example.com/CorpWan, exampl
 
 ### Spec Semantics
 
-When `routability` is set in `spec.addresses`, it forms a **requirement** on any address the implementation provisions for that entry–the same way specifying an exact `value` does.
+When `routability` is set in `spec.addresses`, it forms a **requirement** on any address the implementation provisions for that entry--the same way specifying an exact `value` does.
 
-`Cluster` MUST use an address from the cluster’s service networking range; `External` MUST NOT.
+`Cluster` MUST use an address from the cluster's service networking range; `External` MUST NOT.
 
 An implementation MUST NOT satisfy an entry with an address of a different reachability value and MUST treat an unrecognized routability value as unsatisfiable.
 
@@ -110,7 +110,7 @@ If ***some***, but not all, entries can be satisfied, the implementation SHOULD 
 * MUST surface the partial failure(s) with reason `AddressesPartiallyAssigned`, with a message enumerating the unsatisfied entries.
 * MUST display *only* satisfied addresses in `status.addresses`.
 
-Vendors that opt to reject partially satisfied address entries MUST follow the same semantics as the “no entries can be satisfied” behavior below.
+Vendors that opt to reject partially satisfied address entries MUST follow the same semantics as the "no entries can be satisfied" behavior below.
 
 If ***no*** entries can be satisfied, the Gateway MUST NOT be programmed. The implementation
 
@@ -138,7 +138,7 @@ When a Gateway supplies multiple addresses with the same routability value and t
 
 **Exceptions to Address Equivalence**
 
-* Draining and rotating load balancers – all listeners may not drain at the same rate.
+* Draining and rotating load balancers -- all listeners may not drain at the same rate.
 * Making equivalence a MUST implies an admission policy which is out of scope for this proposal. If an operator wishes to deny clients access to a particular address on a particular listener, this should be allowed.
 * Per-address or per-client authn/authz decisions remain permitted.
 
