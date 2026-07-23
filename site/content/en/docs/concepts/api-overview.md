@@ -145,6 +145,27 @@ As of v1, four Route resource types are included with the API. Custom Route type
 that are implementation-specific are encouraged for other protocols. New route
 types may be added to the API in future.
 
+#### Choosing a Route type
+
+Choose the Route type that matches the protocol information the Gateway needs to
+inspect to make routing decisions:
+
+- Use **[HTTPRoute](/reference/api-types/httproute/)** for HTTP traffic, including
+  HTTPS traffic that is terminated at the Gateway. HTTPRoute can match and modify
+  HTTP-specific data such as hostnames, paths, headers, methods, and query
+  parameters.
+- Use **[GRPCRoute](/reference/api-types/grpcroute/)** for gRPC services when you
+  want routing semantics that are specific to gRPC over HTTP/2.
+- Use **[TLSRoute](/reference/api-types/tlsroute/)** for TLS traffic that should
+  be routed using TLS properties such as SNI, especially when the Gateway should
+  not inspect HTTP data inside the encrypted connection.
+- Use **TCPRoute** or **UDPRoute** when the Gateway only needs to forward raw TCP
+  or UDP traffic to backends. Because these Routes do not have higher-level
+  routing discriminators, they are generally selected by listener port.
+
+The summary table below compares the discriminators and TLS behavior for each
+Route type.
+
 #### HTTPRoute
 
 {{< details title="Standard Channel since v0.5.0" color="success" >}}
@@ -220,9 +241,9 @@ This table summarizes the various Route types included in Gateway API, with thei
 
 |Object|Protocol|OSI Layer|Routing Discriminator|Listener TLS Support|Backend TLS Support|Purpose|
 |------|--------|---------|---------------------|-----------|-------|-------|
-|HTTPRoute|HTTP or HTTPS| Layer 7 | Anything in the HTTP Protocol | Terminated only | Via BackendTLSPolicy |HTTP and HTTPS Routing|
-|TLSRoute|TLS| Somewhere between layer 4 and 7| SNI or other TLS properties| Passthrough or Terminated | Via BackendTLSPolicy (Extended, when Terminated)|Routing of TLS protocols including HTTPS where inspection of the HTTP stream is not required.|
-|GRPCRoute|HTTP or HTTPS| Layer 7 | Anything in the gRPC Protocol | Terminated only | Via BackendTLSPolicy (Extended)| gRPC Routing over HTTP/2 and HTTP/2 cleartext|
+|[HTTPRoute](/reference/api-types/httproute/)|HTTP or HTTPS| Layer 7 | Anything in the HTTP Protocol | Terminated only | Via BackendTLSPolicy |HTTP and HTTPS Routing|
+|[TLSRoute](/reference/api-types/tlsroute/)|TLS| Somewhere between layer 4 and 7| SNI or other TLS properties| Passthrough or Terminated | Via BackendTLSPolicy (Extended, when Terminated)|Routing of TLS protocols including HTTPS where inspection of the HTTP stream is not required.|
+|[GRPCRoute](/reference/api-types/grpcroute/)|HTTP or HTTPS| Layer 7 | Anything in the gRPC Protocol | Terminated only | Via BackendTLSPolicy (Extended)| gRPC Routing over HTTP/2 and HTTP/2 cleartext|
 |TCPRoute|TCP| Layer 4| None | Passthrough or Terminated | Via BackendTLSPolicy (Extended, when Terminated)| Allows for forwarding of a TCP stream from the Listener to the Backends |
 |UDPRoute|UDP| Layer 4| None | None | None | Allows for forwarding of a UDP stream from the Listener to the Backends. |
 
