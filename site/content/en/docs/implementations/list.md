@@ -260,7 +260,7 @@ commercial and maintainer inquiries, see the [Tigera contact form][tigera-contac
 
 ### Cilium
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.5.1-Cilium-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.5.1/cilium)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.6.1-Cilium-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.6/cilium)
 
 [Cilium][cilium] is an eBPF-based networking, observability and security
 solution for Kubernetes and other networking environments. It includes [Cilium

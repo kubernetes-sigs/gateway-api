@@ -1,0 +1,238 @@
+apiVersion: gateway.networking.k8s.io/v1
+date: "2026-07-23T17:18:44+02:00"
+gatewayAPIChannel: standard
+gatewayAPIVersion: v1.6.1
+implementation:
+  contact:
+  - https://github.com/cilium/community/blob/main/roles/Maintainers.md
+  organization: cilium
+  project: cilium
+  url: github.com/cilium/cilium
+  version: v1.20.0-rc.1
+kind: ConformanceReport
+mode: default
+profiles:
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 37
+      Skipped: 0
+  extended:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 46
+      Skipped: 0
+    supportedFeatures:
+    - BackendTLSPolicy
+    - GatewayAddressEmpty
+    - GatewayHTTPListenerIsolation
+    - GatewayInfrastructurePropagation
+    - GatewayPort8080
+    - GatewayStaticAddresses
+    - HTTPRoute303RedirectStatusCode
+    - HTTPRoute307RedirectStatusCode
+    - HTTPRoute308RedirectStatusCode
+    - HTTPRouteBackendProtocolH2C
+    - HTTPRouteBackendProtocolWebSocket
+    - HTTPRouteBackendRequestHeaderModification
+    - HTTPRouteBackendTimeout
+    - HTTPRouteCORS
+    - HTTPRouteDestinationPortMatching
+    - HTTPRouteHostRewrite
+    - HTTPRouteMethodMatching
+    - HTTPRouteNamedRouteRule
+    - HTTPRoutePathRedirect
+    - HTTPRoutePathRewrite
+    - HTTPRoutePortRedirect
+    - HTTPRouteQueryParamMatching
+    - HTTPRouteRequestMirror
+    - HTTPRouteRequestMultipleMirrors
+    - HTTPRouteRequestPercentageMirror
+    - HTTPRouteRequestTimeout
+    - HTTPRouteResponseHeaderModification
+    - HTTPRouteSchemeRedirect
+    - ListenerSet
+    unsupportedFeatures:
+    - BackendTLSPolicySANValidation
+    - GatewayBackendClientCertificate
+    - GatewayFrontendClientCertificateValidation
+    - GatewayFrontendClientCertificateValidationInsecureFallback
+    - GatewayHTTPSListenerDetectMisdirectedRequests
+    - HTTPRouteParentRefPort
+    - HTTPRouteRetry
+    - HTTPRouteRetryBackendTimeout
+    - HTTPRouteRetryConnectionError
+  name: GATEWAY-HTTP
+  summary: Core tests succeeded. Extended tests succeeded.
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 15
+      Skipped: 0
+  extended:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 10
+      Skipped: 0
+    supportedFeatures:
+    - GatewayAddressEmpty
+    - GatewayHTTPListenerIsolation
+    - GatewayInfrastructurePropagation
+    - GatewayPort8080
+    - GatewayStaticAddresses
+    - ListenerSet
+    unsupportedFeatures:
+    - GatewayBackendClientCertificate
+    - GatewayFrontendClientCertificateValidation
+    - GatewayFrontendClientCertificateValidationInsecureFallback
+    - GatewayHTTPSListenerDetectMisdirectedRequests
+  name: GATEWAY-GRPC
+  summary: Core tests succeeded. Extended tests succeeded.
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 19
+      Skipped: 0
+  extended:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 10
+      Skipped: 0
+    supportedFeatures:
+    - GatewayAddressEmpty
+    - GatewayHTTPListenerIsolation
+    - GatewayInfrastructurePropagation
+    - GatewayPort8080
+    - GatewayStaticAddresses
+    - ListenerSet
+    - TCPRoute
+    unsupportedFeatures:
+    - GatewayBackendClientCertificate
+    - GatewayFrontendClientCertificateValidation
+    - GatewayFrontendClientCertificateValidationInsecureFallback
+    - GatewayHTTPSListenerDetectMisdirectedRequests
+  name: GATEWAY-TCP
+  summary: Core tests succeeded. Extended tests succeeded.
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 20
+      Skipped: 0
+  extended:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 11
+      Skipped: 0
+    supportedFeatures:
+    - GatewayAddressEmpty
+    - GatewayHTTPListenerIsolation
+    - GatewayInfrastructurePropagation
+    - GatewayPort8080
+    - GatewayStaticAddresses
+    - ListenerSet
+    unsupportedFeatures:
+    - GatewayBackendClientCertificate
+    - GatewayFrontendClientCertificateValidation
+    - GatewayFrontendClientCertificateValidationInsecureFallback
+    - GatewayHTTPSListenerDetectMisdirectedRequests
+    - TLSRouteModeMixed
+    - TLSRouteModeTerminate
+  name: GATEWAY-TLS
+  summary: Core tests succeeded. Extended tests succeeded.
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 20
+      Skipped: 0
+  extended:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 10
+      Skipped: 0
+    supportedFeatures:
+    - GatewayAddressEmpty
+    - GatewayHTTPListenerIsolation
+    - GatewayInfrastructurePropagation
+    - GatewayPort8080
+    - GatewayStaticAddresses
+    - ListenerSet
+    - UDPRoute
+    unsupportedFeatures:
+    - GatewayBackendClientCertificate
+    - GatewayFrontendClientCertificateValidation
+    - GatewayFrontendClientCertificateValidationInsecureFallback
+    - GatewayHTTPSListenerDetectMisdirectedRequests
+  name: GATEWAY-UDP
+  summary: Core tests succeeded. Extended tests succeeded.
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 2
+      Skipped: 0
+  name: MESH-GRPC
+  summary: Core tests succeeded.
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 7
+      Skipped: 0
+  extended:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 7
+      Skipped: 0
+    supportedFeatures:
+    - MeshClusterIPMatching
+    - MeshHTTPRouteBackendRequestHeaderModification
+    - MeshHTTPRouteNamedRouteRule
+    - MeshHTTPRouteQueryParamMatching
+    - MeshHTTPRouteRedirectPath
+    - MeshHTTPRouteRedirectPort
+    - MeshHTTPRouteRewritePath
+    - MeshHTTPRouteSchemeRedirect
+    unsupportedFeatures:
+    - MeshConsumerRoute
+  name: MESH-HTTP
+  summary: Core tests succeeded. Extended tests succeeded.
+succeededProvisionalTests:
+- GRPCRouteNamedRule
+- GatewayInfrastructure
+- GatewayOptionalAddressValue
+- HTTPRoute303Redirect
+- HTTPRoute307Redirect
+- HTTPRoute308Redirect
+- HTTPRouteNamedRule
+- HTTPRouteRequestPercentageMirror
+- MeshHTTPRoute303Redirect
+- MeshHTTPRoute307Redirect
+- MeshHTTPRoute308Redirect
+- MeshHTTPRouteNamedRule
+- TCPRouteInvalidBackendRefNonexistent
+- TCPRouteInvalidCrossNamespaceBackendRef
+- TCPRouteInvalidNonTCPListener
+- TCPRouteParentRefAttachAll
+- TCPRouteParentRefPortAndSectionName
+- TCPRouteReferenceGrant
+- TCPRouteWeightedRouting
+- UDPRoute
+- UDPRouteInvalidBackendRefNonexistent
+- UDPRouteInvalidCrossNamespaceBackendRef
+- UDPRouteMultipleRoutesAttachment
+- UDPRouteNotAllowedByListeners
+- UDPRouteParentRefAttachAllListeners
+- UDPRouteParentRefPortAndSectionName
+- UDPRouteReferenceGrant
+- UDPRouteWeightedRouting
