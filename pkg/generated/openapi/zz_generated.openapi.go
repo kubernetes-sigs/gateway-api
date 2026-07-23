@@ -3942,7 +3942,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GRPCRouteRule(ref common.ReferenceCall
 					},
 					"sessionPersistence": {
 						SchemaProps: spec.SchemaProps{
-							Description: "SessionPersistence defines and configures session persistence for the route rule.\n\nSupport: Extended\n\n<gateway:experimental>",
+							Description: "Deprecated: use the Backend resource for session persistence (GEP-4894).\n\nSessionPersistence defines and configures session persistence for the route rule.\n\nSupport: Extended\n\n<gateway:experimental>",
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.SessionPersistence"),
 						},
 					},
@@ -5693,7 +5693,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteRule(ref common.ReferenceCall
 					},
 					"sessionPersistence": {
 						SchemaProps: spec.SchemaProps{
-							Description: "SessionPersistence defines and configures session persistence for the route rule.\n\nSupport: Extended\n\n<gateway:experimental>",
+							Description: "Deprecated: use the Backend resource for session persistence (GEP-4894).\n\nSessionPersistence defines and configures session persistence for the route rule.\n\nSupport: Extended\n\n<gateway:experimental>",
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.SessionPersistence"),
 						},
 					},
@@ -10250,7 +10250,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendTrafficPolicySpec(ref co
 					},
 					"sessionPersistence": {
 						SchemaProps: spec.SchemaProps{
-							Description: "SessionPersistence defines and configures session persistence for the backend.\n\nSupport: Extended",
+							Description: "Deprecated: use the Backend resource for session persistence (GEP-4894).\n\nSessionPersistence defines and configures session persistence for the backend.\n\nSupport: Extended",
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.SessionPersistence"),
 						},
 					},
