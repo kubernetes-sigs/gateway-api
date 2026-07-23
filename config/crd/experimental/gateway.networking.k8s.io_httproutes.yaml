@@ -3815,6 +3815,15 @@ spec:
                               - Permanent
                               - Session
                               type: string
+                            path:
+                              description: |-
+                                Path defines the cookie Path attribute. When not specified,
+                                implementations MUST default the cookie path to "/".
+
+
+                                Support: Extended
+                              maxLength: 1024
+                              type: string
                           type: object
                         sessionName:
                           description: |-
@@ -8069,6 +8078,15 @@ spec:
                               enum:
                               - Permanent
                               - Session
+                              type: string
+                            path:
+                              description: |-
+                                Path defines the cookie Path attribute. When not specified,
+                                implementations MUST default the cookie path to "/".
+
+
+                                Support: Extended
+                              maxLength: 1024
                               type: string
                           type: object
                         sessionName:
