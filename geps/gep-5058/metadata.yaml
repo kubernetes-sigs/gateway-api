@@ -1,0 +1,10 @@
+apiVersion: internal.gateway.networking.k8s.io/v1alpha1
+kind: GEPDetails
+number: 5058
+name: Support multiple targets in PolicyStatus
+status: Provisional
+authors:
+  - kl52752
+extends:
+  - number: 713
+    name: Metaresources and Policy Attachment
