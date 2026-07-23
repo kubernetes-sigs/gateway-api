@@ -143,6 +143,12 @@ func main() {
 					channelCrd.Spec.Versions[i].Served = false
 				}
 				version.Schema.OpenAPIV3Schema.Properties = gatewayTweaksMap(channel, version.Schema.OpenAPIV3Schema.Properties)
+
+				// gatewayTweaksMap only walks Properties, so the Kind's own
+				// doc comment (the top level schema description) never gets
+				// touched. If not parsed by formatDescription,
+				// tags like <gateway:union:...> leak straight into the CRD.
+				version.Schema.OpenAPIV3Schema.Description = formatDescription(version.Schema.OpenAPIV3Schema.Description, channel, groupKind.Kind)
 			}
 
 			convObj, err := crd.AsVersion(*channelCrd, apiext.SchemeGroupVersion)

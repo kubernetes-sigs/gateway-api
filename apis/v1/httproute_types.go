@@ -1313,6 +1313,11 @@ type HTTPURLRewriteFilter struct {
 }
 
 // HTTPRequestMirrorFilter defines configuration for the RequestMirror filter.
+//
+// HTTPRequestMirrorFilter is expected to interoperate with BackendTLSPolicy (a
+// Union Feature).
+//
+// <gateway:union:BackendTLSPolicy>
 type HTTPRequestMirrorFilter struct {
 	// BackendRef references a resource where mirrored requests are sent.
 	//
