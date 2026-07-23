@@ -1,0 +1,72 @@
+apiVersion: gateway.networking.k8s.io/v1
+date: "2026-07-23T09:26:19Z"
+gatewayAPIChannel: standard
+gatewayAPIVersion: v1.6.0
+implementation:
+  contact:
+  - gke-gateway-dev@google.com
+  organization: GKE
+  project: gke-gateway
+  url: https://cloud.google.com/kubernetes-engine/docs/concepts/gateway-api
+  version: 1.36.2-gke.2154000
+kind: ConformanceReport
+mode: default
+profiles:
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 37
+      Skipped: 0
+  extended:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 19
+      Skipped: 0
+    supportedFeatures:
+    - BackendTLSPolicy
+    - BackendTLSPolicySANValidation
+    - GatewayBackendClientCertificate
+    - GatewayFrontendClientCertificateValidation
+    - GatewayPort8080
+    - HTTPRouteHostRewrite
+    - HTTPRoutePathRedirect
+    - HTTPRouteQueryParamMatching
+    - HTTPRouteRequestMirror
+    - HTTPRouteRequestPercentageMirror
+    - HTTPRouteResponseHeaderModification
+    - HTTPRouteSchemeRedirect
+    unsupportedFeatures:
+    - GatewayAddressEmpty
+    - GatewayFrontendClientCertificateValidationInsecureFallback
+    - GatewayHTTPListenerIsolation
+    - GatewayHTTPSListenerDetectMisdirectedRequests
+    - GatewayInfrastructurePropagation
+    - GatewayStaticAddresses
+    - HTTPRoute303RedirectStatusCode
+    - HTTPRoute307RedirectStatusCode
+    - HTTPRoute308RedirectStatusCode
+    - HTTPRouteBackendProtocolH2C
+    - HTTPRouteBackendProtocolWebSocket
+    - HTTPRouteBackendRequestHeaderModification
+    - HTTPRouteBackendRequestRedirect
+    - HTTPRouteBackendTimeout
+    - HTTPRouteBackendURLRewrite
+    - HTTPRouteCORS
+    - HTTPRouteDestinationPortMatching
+    - HTTPRouteMethodMatching
+    - HTTPRouteNamedRouteRule
+    - HTTPRouteParentRefPort
+    - HTTPRoutePathRewrite
+    - HTTPRoutePortRedirect
+    - HTTPRouteRequestMultipleMirrors
+    - HTTPRouteRequestTimeout
+    - HTTPRouteRetry
+    - HTTPRouteRetryBackendTimeout
+    - HTTPRouteRetryConnectionError
+    - ListenerSet
+  name: GATEWAY-HTTP
+  summary: Core tests succeeded. Extended tests succeeded.
+succeededProvisionalTests:
+- HTTPRouteRequestPercentageMirror
