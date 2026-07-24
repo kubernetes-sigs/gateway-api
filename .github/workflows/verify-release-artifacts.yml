@@ -21,7 +21,7 @@ permissions:
 
 jobs:
   verify-standard-install:
-    name: standard-install.yaml matches source at tag
+    name: standard-install.yaml and standard-swagger.json matches source at tag
     runs-on: ubuntu-latest
     steps:
       - name: Set tag for verification
@@ -53,9 +53,9 @@ jobs:
           workdir=$(mktemp -d)
           cd "$workdir"
 
-          # A) Get standard-install.yaml from this release
+          # A) Get standard-install.yaml and standard-swagger.json from this release
           echo "Downloading release assets."
-          gh release download "$TAG" --repo "$REPO" --pattern "standard-install.yaml" --dir .
+          gh release download "$TAG" --repo "$REPO" --pattern "standard-install.yaml" --pattern "standard-swagger.json" --dir .
 
           # B) Get source tarball from release, or fall back to GitHub archive for this tag
           echo "Downloading source tarball"
@@ -64,6 +64,8 @@ jobs:
           cd gateway-api-*
           echo "Building standard-install.yaml from source at tag $TAG (same version)..."
           VERSION=$TAG make build-install-yaml 2>/dev/null || make build-install-yaml
+          echo "Building standard-swagger.json from source at tag $TAG (same version)..."
+          VERSION=$TAG make build-openapi-json
 
           # C) Normalize build files
           sed 's/Copyright [0-9]\{4\}/Copyright YEAR/' ../standard-install.yaml > /tmp/release.yaml
@@ -74,6 +76,12 @@ jobs:
           if ! diff -u /tmp/release.yaml /tmp/built.yaml; then
               echo ""
               echo "::error::Validation FAILED. The CRD logic in the release does not match the source code."
+              exit 1
+          fi
+          # These files are not pretty printed, so the diff will be unreadable.
+          if ! diff -u ../standard-swagger.json release/standard-swagger.json; then
+              echo ""
+              echo "::error::Validation FAILED. The OpenAPI Swagger definitions in the release does not match the source code."
               exit 1
           fi
           echo ""
