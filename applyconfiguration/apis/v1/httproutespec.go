@@ -59,6 +59,12 @@ type HTTPRouteSpecApplyConfiguration struct {
 	// as a suffix match. That means that a match for `*.example.com` would match
 	// both `test.example.com`, and `foo.test.example.com`, but not `example.com`.
 	//
+	// Support: Core
+	//
+	// <gateway:util:excludeFromCRD>
+	//
+	// Notes for implementers:
+	//
 	// If both the Listener and HTTPRoute have specified hostnames, any
 	// HTTPRoute hostnames that do not match the Listener hostname MUST be
 	// ignored. For example, if a Listener specified `*.example.com`, and the
@@ -80,7 +86,7 @@ type HTTPRouteSpecApplyConfiguration struct {
 	// If ties exist across multiple Routes, the matching precedence rules for
 	// HTTPRouteMatches takes over.
 	//
-	// Support: Core
+	// </gateway:util:excludeFromCRD>
 	Hostnames []apisv1.Hostname `json:"hostnames,omitempty"`
 	// Rules are a list of HTTP matchers, filters and actions.
 	//

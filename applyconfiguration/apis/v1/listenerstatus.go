@@ -34,14 +34,27 @@ type ListenerStatusApplyConfiguration struct {
 	// listener. This MUST represent the kinds supported by an implementation for
 	// that Listener configuration.
 	//
+	// <gateway:util:excludeFromCRD>
+	//
+	// Notes for implementers:
+	//
 	// If kinds are specified in Spec that are not supported, they MUST NOT
 	// appear in this list and an implementation MUST set the "ResolvedRefs"
 	// condition to "False" with the "InvalidRouteKinds" reason. If both valid
 	// and invalid Route kinds are specified, the implementation MUST
 	// reference the valid Route kinds that have been specified.
+	//
+	// </gateway:util:excludeFromCRD>
 	SupportedKinds []RouteGroupKindApplyConfiguration `json:"supportedKinds,omitempty"`
-	// AttachedRoutes represents the total number of Routes that have been
+	// AttachedRoutes represents the total number of accepted Routes that have been
 	// successfully attached to this Listener.
+	//
+	// Uses for this field include troubleshooting Route attachment and
+	// measuring blast radius/impact of changes to a Listener.
+	//
+	// <gateway:util:excludeFromCRD>
+	//
+	// Notes for implementers:
 	//
 	// Successful attachment of a Route to a Listener is based solely on the
 	// combination of the AllowedRoutes field on the corresponding Listener
@@ -58,8 +71,7 @@ type ListenerStatusApplyConfiguration struct {
 	// Routes with any other value for the Accepted condition MUST NOT be included
 	// in this count.
 	//
-	// Uses for this field include troubleshooting Route attachment and
-	// measuring blast radius/impact of changes to a Listener.
+	// </gateway:util:excludeFromCRD>
 	AttachedRoutes *int32 `json:"attachedRoutes,omitempty"`
 	// Conditions describe the current condition of this listener.
 	//
