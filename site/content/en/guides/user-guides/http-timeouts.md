@@ -1,6 +1,6 @@
 ---
 title: "HTTP timeouts"
-weight: 9
+weight: 10
 ---
 
 {{< details title="Extended Support Feature: HTTPRouteRequestTimeout" open="true" >}}
