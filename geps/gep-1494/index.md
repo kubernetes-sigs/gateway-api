@@ -477,7 +477,7 @@ type ForwardBodyConfig struct {
     // truncated to `maxSize` bytes.
 	//
 	// If 0, the body will not be sent to the authorization server.
-	MaxSize uint16 `json:"maxSize,omitempty"`
+	MaxSize int32 `json:"maxSize,omitempty"`
 }
 
 ```

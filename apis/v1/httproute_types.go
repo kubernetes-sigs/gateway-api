@@ -1791,7 +1791,8 @@ type ForwardBodyConfig struct {
 	//
 	// If 0, the body will not be sent to the authorization server.
 	// +optional
-	MaxSize uint16 `json:"maxSize,omitempty"`
+	// +kubebuilder:validation:Minimum=0
+	MaxSize int32 `json:"maxSize,omitempty"`
 }
 
 // HTTPBackendRef defines how a HTTPRoute forwards a HTTP request.

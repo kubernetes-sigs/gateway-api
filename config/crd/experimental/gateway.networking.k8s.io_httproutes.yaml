@@ -916,6 +916,8 @@ spec:
                                             for more.
 
                                             If 0, the body will not be sent to the authorization server.
+                                          format: int32
+                                          minimum: 0
                                           type: integer
                                       type: object
                                     grpc:
@@ -2445,6 +2447,8 @@ spec:
                                       for more.
 
                                       If 0, the body will not be sent to the authorization server.
+                                    format: int32
+                                    minimum: 0
                                     type: integer
                                 type: object
                               grpc:
@@ -5171,6 +5175,8 @@ spec:
                                             for more.
 
                                             If 0, the body will not be sent to the authorization server.
+                                          format: int32
+                                          minimum: 0
                                           type: integer
                                       type: object
                                     grpc:
@@ -6700,6 +6706,8 @@ spec:
                                       for more.
 
                                       If 0, the body will not be sent to the authorization server.
+                                    format: int32
+                                    minimum: 0
                                     type: integer
                                 type: object
                               grpc:
