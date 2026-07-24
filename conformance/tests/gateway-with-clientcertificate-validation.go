@@ -106,7 +106,7 @@ var GatewayFrontendClientCertificateValidation = confsuite.ConformanceTest{
 				Request:   http.Request{Host: "example.org", Path: "/"},
 				Namespace: confsuite.InfrastructureNamespace,
 			}
-			tls.MakeTLSRequestAndExpectFailureResponse(t, suite.RoundTripper, defaultAddr, serverCertPem, clientCertPerPortPem, clientCertPerPortKey, "example.org", expectedFailure)
+			tls.MakeTLSRequestAndExpectEventuallyConsistentFailureResponse(t, suite.RoundTripper, suite.TimeoutConfig, defaultAddr, serverCertPem, clientCertPerPortPem, clientCertPerPortKey, "example.org", expectedFailure)
 		})
 
 		t.Run("Validate per port configuration", func(t *testing.T) {
@@ -126,7 +126,7 @@ var GatewayFrontendClientCertificateValidation = confsuite.ConformanceTest{
 				Request:   http.Request{Host: "second-example.org", Path: "/"},
 				Namespace: confsuite.InfrastructureNamespace,
 			}
-			tls.MakeTLSRequestAndExpectFailureResponse(t, suite.RoundTripper, perPortAddr, serverCertPem, clientCertPem, clientCertKey, "second-example.org", expectedFailure)
+			tls.MakeTLSRequestAndExpectEventuallyConsistentFailureResponse(t, suite.RoundTripper, suite.TimeoutConfig, perPortAddr, serverCertPem, clientCertPem, clientCertKey, "second-example.org", expectedFailure)
 		})
 	},
 }
