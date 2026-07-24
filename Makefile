@@ -84,7 +84,7 @@ vet:
 
 # Run go test against code
 test:
-	go test -race -cover ./apis/... ./conformance/utils/...
+	go test -race -cover ./apis/... ./conformance/utils/... ./tools/openapi-generator
 
 .PHONY: tidy
 tidy:
