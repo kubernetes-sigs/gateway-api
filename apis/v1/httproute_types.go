@@ -1791,6 +1791,7 @@ type ForwardBodyConfig struct {
 	//
 	// If 0, the body will not be sent to the authorization server.
 	// +optional
+	// +kubebuilder:validation:Minimum=0
 	MaxSize int32 `json:"maxSize,omitempty"`
 }
 
