@@ -126,7 +126,7 @@ var GatewayFrontendInvalidDefaultClientCertificateValidation = confsuite.Conform
 				Namespace: confsuite.InfrastructureNamespace,
 			}
 			// send request to the second listener and validate that it is failing
-			tls.MakeTLSRequestAndExpectFailureResponse(t, suite.RoundTripper, httpsAddr, serverCertPem, nil, nil, "example.org", expectedFailure)
+			tls.MakeTLSRequestAndExpectEventuallyConsistentFailureResponse(t, suite.RoundTripper, suite.TimeoutConfig, httpsAddr, serverCertPem, nil, nil, "example.org", expectedFailure)
 		})
 	},
 }

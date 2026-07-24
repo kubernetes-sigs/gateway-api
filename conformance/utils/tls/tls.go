@@ -90,9 +90,11 @@ func WaitForConsistentTLSResponse(t *testing.T, r roundtripper.RoundTripper, req
 	tlog.Logf(t, "Request passed")
 }
 
-// MakeTLSRequestAndExpectFailureResponse makes one shot request. This function fails
-// when HTTP Status OK (200) is returned.
-func MakeTLSRequestAndExpectFailureResponse(t *testing.T, r roundtripper.RoundTripper, gwAddr string, serverCertificate, clientCertificate, clientCertificateKey []byte, serverName string, expected http.ExpectedResponse) {
+// MakeTLSRequestAndExpectEventuallyConsistentFailureResponse makes a TLS request, retrying until
+// it fails consistently or the timeout elapses. This is used for requests that are expected to be
+// rejected (e.g. due to client certificate validation or invalid TLS config), avoiding races where
+// the implementation's config has not yet fully propagated when the request is sent.
+func MakeTLSRequestAndExpectEventuallyConsistentFailureResponse(t *testing.T, r roundtripper.RoundTripper, timeoutConfig config.TimeoutConfig, gwAddr string, serverCertificate, clientCertificate, clientCertificateKey []byte, serverName string, expected http.ExpectedResponse) {
 	t.Helper()
 
 	req := http.MakeRequest(t, &expected, gwAddr, roundtripper.HTTPSProtocol, "https")
@@ -106,8 +108,6 @@ func MakeTLSRequestAndExpectFailureResponse(t *testing.T, r roundtripper.RoundTr
 			t.Fatalf("unexpected error creating client cert: %v", err)
 		}
 
-		// GetClientCertificateHook is a hook called when server asks for client certificate during TLS handshake,
-		// to verify that a client certificate has been requested.
 		req.GetClientCertificateHook = func(_ *cryptotls.CertificateRequestInfo) (*cryptotls.Certificate, error) {
 			t.Log("GetClientCertificateHook was called")
 			clientCertificatePresented = true
@@ -115,10 +115,15 @@ func MakeTLSRequestAndExpectFailureResponse(t *testing.T, r roundtripper.RoundTr
 		}
 	}
 
-	_, _, err := r.CaptureRoundTrip(req)
-	if err == nil {
-		t.Fatalf("Request should fail")
-	}
+	http.AwaitConvergence(t, timeoutConfig.RequiredConsecutiveSuccesses, timeoutConfig.MaxTimeToConsistency, func(elapsed time.Duration) bool {
+		_, _, err := r.CaptureRoundTrip(req)
+		if err == nil {
+			tlog.Logf(t, "Request unexpectedly succeeded, not ready yet (after %v)", elapsed)
+			return false
+		}
+		return true
+	})
+	tlog.Logf(t, "Request failed as expected")
 
 	if clientCertificate != nil && clientCertificateKey != nil {
 		assert.True(t, clientCertificatePresented, "client certificate was not presented during the handshake")
