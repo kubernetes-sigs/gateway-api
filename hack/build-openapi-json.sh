@@ -15,16 +15,29 @@
 # limitations under the License.
 
 set -o errexit
+set -o nounset
 set -o pipefail
+
+ROOT=$(dirname "${BASH_SOURCE[0]}")/..
+cd "$ROOT" || exit 1
 
 CHANNELS=(standard experimental)
 
-set -o nounset
+OUTPUT_DIR="${OUTPUT_DIR:-"release"}"
 
 while [ -n "${1-}" ]; do
   case "$1" in
       "--experimental-only")
           CHANNELS=(experimental)
+          ;;
+      "--monthly")
+          VERSION=${TAG:-monthly-$(date +"%Y.%m")}
+          ;;
+      "--pretty-print")
+          PRETTY=true
+          ;;
+      "--version-as-filename")
+          VERSION_AS_NAME=true
           ;;
       "--version"|"-v")
           VERSION="$2"
@@ -48,16 +61,24 @@ if [ -z "${VERSION-}" ]; then
     VERSION="$(git describe --tags --match 'v*' --match 'monthly-*')"
 fi
 
-mkdir -p release
+mkdir -p "$OUTPUT_DIR"
 
 for CHANNEL in "${CHANNELS[@]}"; do
     echo "$CHANNEL"
+
+    if [[ "${VERSION_AS_NAME-}" == "true" ]]; then
+      name="$VERSION"
+    else
+      name="$CHANNEL"
+    fi
+
     go run ./tools/openapi-generator \
       --name "Gateway API ${CHANNEL} channel" \
       --version "$VERSION" \
-      --output "release/${CHANNEL}-swagger.json" \
+      --output "${OUTPUT_DIR}/${name}-swagger.json" \
       --add-gateway-api-object-defs \
+      --pretty-print="${PRETTY:-false}" \
       "./config/crd/${CHANNEL}/gateway"*
 done
 
-echo "Generated:" release/*-swagger.json
+echo "Generated:" "$OUTPUT_DIR"/*-swagger.json

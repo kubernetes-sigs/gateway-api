@@ -72,7 +72,7 @@ build-openapi-json:
 
 .PHONY: build-monthly-openapi
 build-monthly-openapi:
-	hack/build-monthly-openapi.sh
+	hack/build-openapi-json.sh --monthly --version-as-filename --experimental-only
 
 # Run go fmt against code
 fmt:
