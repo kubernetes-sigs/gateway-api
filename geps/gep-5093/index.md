@@ -5,7 +5,7 @@
 
 (See [status definitions](../overview.md#gep-states).)
 
-This GEP obsoletes [GEP-1651: Gateway Routability](https://gateway-api.sigs.k8s.io/geps/gep-1651/). See [Background](#background) for the relationship and prior iterations.
+This GEP obsoletes [GEP-1651: Gateway Routability](../gep-1651/). See [Background](#background) for the relationship and prior iterations.
 
 ## TLDR
 
@@ -17,9 +17,9 @@ Gateway API currently treats all addresses as opaque values with a `type` (`IPAd
 
 This gap blocks several use cases:
 
-* **Internal-only gateways.** Knative and similar projects need to deploy Gateways that are reachable within the cluster but not from the public internet (\#1651). Today this requires implementation-specific annotations or out-of-band Service manipulation.
+* **Internal-only gateways.** Knative and similar projects need to deploy Gateways that are reachable within the cluster but not from the public internet ([#1651](https://github.com/kubernetes-sigs/gateway-api/issues/1651)). Today this requires implementation-specific annotations or out-of-band Service manipulation.
 
-* **Egress gateways.** Workloads that route outbound traffic through a Gateway need a cluster-internal address to connect to. Without a portable way to request or identify such an address, egress patterns cannot be standardized. Standardizing such patterns has been requested by the wg-ai-gateway in service of generative AI use cases: for example, a `Gateway` with a  `Cluster` scoped address and a `Backend` pointing to an external inference provider should generally not be reachable from the open internet, to avoid injecting inference credentials into arbitrary requests. (see [\#4746](https://github.com/kubernetes-sigs/gateway-api/pull/4746) discussions on "open relays".)
+* **Egress gateways.** Workloads that route outbound traffic through a Gateway need a cluster-internal address to connect to. Without a portable way to request or identify such an address, egress patterns cannot be standardized. Standardizing such patterns has been requested by the wg-ai-gateway in service of generative AI use cases: for example, a `Gateway` with a  `Cluster` scoped address and a `Backend` pointing to an external inference provider should generally not be reachable from the open internet, to avoid injecting inference credentials into arbitrary requests. (see [#4746](https://github.com/kubernetes-sigs/gateway-api/pull/4746) discussions on "open relays".)
 
 * **Multi-address gateways.** A Gateway may be provisioned with both a public and an internal address. Clients currently have no way to determine which address is appropriate for their context.
 
@@ -100,7 +100,8 @@ An implementation MUST NOT satisfy an entry with an address of a different reach
 If a requested routability cannot be satisfied, the correct behavior is to leave that entry unsatisfied and report it. Implementations MUST NOT substitute a different scope.
 
 `spec.addresses` MAY contain references to different routability types, with a different type on each requested address (and this MAY be combined with requesting specific addresses). In this case, implementations MUST evaluate each address request separately according to the rules above, and MUST populate `status.addresses` (including `routability`) for each configured address.
-**Full and Partially Accepted Address Entry Semantics**
+
+#### Full and Partially Accepted Address Entry Semantics
 
 If ***all*** spec address entries can be satisfied, the implementation programs the Gateway normally.
 
