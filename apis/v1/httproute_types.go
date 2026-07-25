@@ -821,7 +821,7 @@ type HTTPRouteMatch struct {
 	Method *HTTPMethod `json:"method,omitempty"`
 
 	// Methods specifies HTTP method matchers.
-	// When specified, this route will be matched if the request has any of the 
+	// When specified, this route will be matched if the request has any of the
 	// specified methods.
 	//
 	// When this field is specified, Method must also be specified and must match
