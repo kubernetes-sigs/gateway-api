@@ -2847,7 +2847,12 @@ spec:
                           match below will match a HTTP request only if its path\nstarts
                           with `/foo` AND it contains the `version: v1` header:\n\n```\nmatch:\n\n\tpath:\n\t
                           \ value: \"/foo\"\n\theaders:\n\t- name: \"version\"\n\t
-                          \ value \"v1\"\n\n```"
+                          \ value \"v1\"\n\n```\n\nMultiple HTTP methods can be matched
+                          in a single match using the Methods\nfield. When Methods
+                          is specified, Method must also be specified and must\nmatch
+                          Methods[0]:\n\n```\nmatch:\n\n\tpath:\n\t  type: PathPrefix\n\t
+                          \ value: /api/\n\tmethod: GET\n\tmethods:\n\t- GET\n\t-
+                          POST\n\t- PUT\n\n```"
                         properties:
                           headers:
                             description: |-
@@ -2916,6 +2921,9 @@ spec:
                               Method specifies HTTP method matcher.
                               When specified, this route will be matched only if the request has the
                               specified method.
+
+                              When Methods is specified, Method must also be specified and must match
+                              Methods[0].
 
                               Support: Extended
                             enum:
@@ -6297,7 +6305,12 @@ spec:
                           match below will match a HTTP request only if its path\nstarts
                           with `/foo` AND it contains the `version: v1` header:\n\n```\nmatch:\n\n\tpath:\n\t
                           \ value: \"/foo\"\n\theaders:\n\t- name: \"version\"\n\t
-                          \ value \"v1\"\n\n```"
+                          \ value \"v1\"\n\n```\n\nMultiple HTTP methods can be matched
+                          in a single match using the Methods\nfield. When Methods
+                          is specified, Method must also be specified and must\nmatch
+                          Methods[0]:\n\n```\nmatch:\n\n\tpath:\n\t  type: PathPrefix\n\t
+                          \ value: /api/\n\tmethod: GET\n\tmethods:\n\t- GET\n\t-
+                          POST\n\t- PUT\n\n```"
                         properties:
                           headers:
                             description: |-
@@ -6366,6 +6379,9 @@ spec:
                               Method specifies HTTP method matcher.
                               When specified, this route will be matched only if the request has the
                               specified method.
+
+                              When Methods is specified, Method must also be specified and must match
+                              Methods[0].
 
                               Support: Extended
                             enum:

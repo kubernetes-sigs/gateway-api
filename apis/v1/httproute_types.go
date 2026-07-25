@@ -758,6 +758,26 @@ const (
 //	  value "v1"
 //
 // ```
+//
+// Multiple HTTP methods can be matched in a single match using the Methods
+// field. When Methods is specified, Method must also be specified and must
+// match Methods[0]:
+//
+// ```
+// match:
+//
+//	path:
+//	  type: PathPrefix
+//	  value: /api/
+//	method: GET
+//	methods:
+//	- GET
+// 	- POST
+//	- PUT
+// 
+// ```
+//
+// <gateway:experimental:validation:XValidation:message="method must be specified and match methods[0] when methods is set",rule="size(self.methods) == 0 || (has(self.method) && self.method == self.methods[0])">
 type HTTPRouteMatch struct {
 	// Path specifies a HTTP request path matcher. If this field is not
 	// specified, a default prefix match on the "/" path is provided.
@@ -792,10 +812,28 @@ type HTTPRouteMatch struct {
 	// When specified, this route will be matched only if the request has the
 	// specified method.
 	//
+	// When Methods is specified, Method must also be specified and must match
+	// Methods[0].
+	//
 	// Support: Extended
 	//
 	// +optional
 	Method *HTTPMethod `json:"method,omitempty"`
+
+	// Methods specifies HTTP method matchers.
+	// When specified, this route will be matched if the request has any of the 
+	// specified methods.
+	//
+	// When this field is specified, Method must also be specified and must match
+	// Methods[0].
+	//
+	// Support: Extended
+	//
+	// +listType=set
+	// +kubebuilder:validation:MaxItems=9
+	// +optional
+	// <gateway:experimental>
+	Methods []HTTPMethod `json:"methods,omitempty"`
 }
 
 // HTTPRouteFilter defines processing steps that must be completed during the

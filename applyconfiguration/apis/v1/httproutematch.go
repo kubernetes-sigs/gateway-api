@@ -42,6 +42,26 @@ import (
 // value "v1"
 //
 // ```
+//
+// Multiple HTTP methods can be matched in a single match using the Methods
+// field. When Methods is specified, Method must also be specified and must
+// match Methods[0]:
+//
+// ```
+// match:
+//
+// path:
+// type: PathPrefix
+// value: /api/
+// method: GET
+// methods:
+// - GET
+// - POST
+// - PUT
+//
+// ```
+//
+// <gateway:experimental:validation:XValidation:message="method must be specified and match methods[0] when methods is set",rule="size(self.methods) == 0 || (has(self.method) && self.method == self.methods[0])">
 type HTTPRouteMatchApplyConfiguration struct {
 	// Path specifies a HTTP request path matcher. If this field is not
 	// specified, a default prefix match on the "/" path is provided.
@@ -60,8 +80,22 @@ type HTTPRouteMatchApplyConfiguration struct {
 	// When specified, this route will be matched only if the request has the
 	// specified method.
 	//
+	// When Methods is specified, Method must also be specified and must match
+	// Methods[0].
+	//
 	// Support: Extended
 	Method *apisv1.HTTPMethod `json:"method,omitempty"`
+	// Methods specifies HTTP method matchers.
+	// When specified, this route will be matched if the request has any of the
+	// specified methods.
+	//
+	// When this field is specified, Method must also be specified and must match
+	// Methods[0].
+	//
+	// Support: Extended
+	//
+	// <gateway:experimental>
+	Methods []apisv1.HTTPMethod `json:"methods,omitempty"`
 }
 
 // HTTPRouteMatchApplyConfiguration constructs a declarative configuration of the HTTPRouteMatch type for use with
@@ -109,5 +143,15 @@ func (b *HTTPRouteMatchApplyConfiguration) WithQueryParams(values ...*HTTPQueryP
 // If called multiple times, the Method field is set to the value of the last call.
 func (b *HTTPRouteMatchApplyConfiguration) WithMethod(value apisv1.HTTPMethod) *HTTPRouteMatchApplyConfiguration {
 	b.Method = &value
+	return b
+}
+
+// WithMethods adds the given value to the Methods field in the declarative configuration
+// and returns the receiver, so that objects can be build by chaining "With" function invocations.
+// If called multiple times, values provided by each call will be appended to the Methods field.
+func (b *HTTPRouteMatchApplyConfiguration) WithMethods(values ...apisv1.HTTPMethod) *HTTPRouteMatchApplyConfiguration {
+	for i := range values {
+		b.Methods = append(b.Methods, values[i])
+	}
 	return b
 }

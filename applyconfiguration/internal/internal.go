@@ -1035,6 +1035,12 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: method
       type:
         scalar: string
+    - name: methods
+      type:
+        list:
+          elementType:
+            scalar: string
+          elementRelationship: associative
     - name: path
       type:
         namedType: io.k8s.sigs.gateway-api.apis.v1.HTTPPathMatch

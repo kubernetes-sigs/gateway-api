@@ -5493,7 +5493,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteMatch(ref common.ReferenceCal
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "HTTPRouteMatch defines the predicate used to match requests to a given action. Multiple match types are ANDed together, i.e. the match will evaluate to true only if all conditions are satisfied.\n\nFor example, the match below will match a HTTP request only if its path starts with `/foo` AND it contains the `version: v1` header:\n\n``` match:\n\n\tpath:\n\t  value: \"/foo\"\n\theaders:\n\t- name: \"version\"\n\t  value \"v1\"\n\n```",
+				Description: "HTTPRouteMatch defines the predicate used to match requests to a given action. Multiple match types are ANDed together, i.e. the match will evaluate to true only if all conditions are satisfied.\n\nFor example, the match below will match a HTTP request only if its path starts with `/foo` AND it contains the `version: v1` header:\n\n``` match:\n\n\tpath:\n\t  value: \"/foo\"\n\theaders:\n\t- name: \"version\"\n\t  value \"v1\"\n\n```\n\nMultiple HTTP methods can be matched in a single match using the Methods field. When Methods is specified, Method must also be specified and must match Methods[0]:\n\n``` match:\n\n\tpath:\n\t  type: PathPrefix\n\t  value: /api/\n\tmethod: GET\n\tmethods:\n\t- GET\n\t- POST\n\t- PUT\n\n```\n\n<gateway:experimental:validation:XValidation:message=\"method must be specified and match methods[0] when methods is set\",rule=\"size(self.methods) == 0 || (has(self.method) && self.method == self.methods[0])\">",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"path": {
@@ -5548,9 +5548,29 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteMatch(ref common.ReferenceCal
 					},
 					"method": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Method specifies HTTP method matcher. When specified, this route will be matched only if the request has the specified method.\n\nSupport: Extended",
+							Description: "Method specifies HTTP method matcher. When specified, this route will be matched only if the request has the specified method.\n\nWhen Methods is specified, Method must also be specified and must match Methods[0].\n\nSupport: Extended",
 							Type:        []string{"string"},
 							Format:      "",
+						},
+					},
+					"methods": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-type": "set",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "Methods specifies HTTP method matchers. When specified, this route will be matched if the request has any of the specified methods.\n\nWhen this field is specified, Method must also be specified and must match Methods[0].\n\nSupport: Extended\n\n<gateway:experimental>",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: "",
+										Type:    []string{"string"},
+										Format:  "",
+									},
+								},
+							},
 						},
 					},
 				},
