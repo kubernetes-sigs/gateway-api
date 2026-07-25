@@ -777,7 +777,7 @@ const (
 // 
 // ```
 //
-// <gateway:experimental:validation:XValidation:message="method must be specified and match methods[0] when methods is set",rule="size(self.methods) == 0 || (has(self.method) && self.method == self.methods[0])">
+// <gateway:experimental:validation:XValidation:message="method must be specified and match methods[0] when methods is set",rule="!has(self.methods) || size(self.methods) == 0 || (has(self.method) && self.method == self.methods[0])">
 type HTTPRouteMatch struct {
 	// Path specifies a HTTP request path matcher. If this field is not
 	// specified, a default prefix match on the "/" path is provided.

@@ -614,3 +614,91 @@ func TestHTTPExternalAuthFilterExperimental(t *testing.T) {
 	}
 
 }
+
+func TestHTTPRouteMatchMethods(t *testing.T) {
+	method := func(m gatewayv1.HTTPMethod) *gatewayv1.HTTPMethod {
+		return &m
+	}
+
+	tests := []struct {
+		name	string
+		wantErrors []string
+		match	   gatewayv1.HTTPRouteMatch 
+	}{
+		{
+			name: "valid with method only",
+			match: gatewayv1.HTTPRouteMatch{Method: method(gatewayv1.HTTPMethodGet)},
+		},
+		{
+			name: "valid with method and methods where method matches methods[0]",
+			match: gatewayv1.HTTPRouteMatch{
+				Method: method(gatewayv1.HTTPMethodGet),
+				Methods: []gatewayv1.HTTPMethod{gatewayv1.HTTPMethodGet, gatewayv1.HTTPMethodPost},
+			},
+		},
+		{
+			name: "valid with all standard HTTP methods",
+			match: gatewayv1.HTTPRouteMatch{
+				Method: method(gatewayv1.HTTPMethodGet),
+				Methods: []gatewayv1.HTTPMethod{
+					gatewayv1.HTTPMethodGet,
+					gatewayv1.HTTPMethodHead,
+					gatewayv1.HTTPMethodPost,
+					gatewayv1.HTTPMethodPut,
+					gatewayv1.HTTPMethodDelete,
+					gatewayv1.HTTPMethodConnect,
+					gatewayv1.HTTPMethodOptions,
+					gatewayv1.HTTPMethodTrace,
+					gatewayv1.HTTPMethodPatch,					
+				},
+			},
+		},
+		{
+			name:       "invalid when methods is set without method",
+			wantErrors: []string{"method must be specified and match methods[0] when methods is set"},
+			match: gatewayv1.HTTPRouteMatch{
+				Methods: []gatewayv1.HTTPMethod{gatewayv1.HTTPMethodGet, gatewayv1.HTTPMethodPost},			
+		    },
+	    },
+		{
+			name:       "invalid when method does not match methods[0]",
+			wantErrors: []string{"method must be specified and match methods[0] when methods is set"},
+			match: gatewayv1.HTTPRouteMatch{
+				Method:  method(gatewayv1.HTTPMethodGet),
+				Methods: []gatewayv1.HTTPMethod{gatewayv1.HTTPMethodPost},
+			},
+		},
+		{
+			name:       "invalid when methods contains an invalid enum value",
+			wantErrors: []string{"Unsupported value"},
+			match: gatewayv1.HTTPRouteMatch{
+				Method:  method(gatewayv1.HTTPMethodGet),
+				Methods: []gatewayv1.HTTPMethod{"BAZINGA"},
+			},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			route := &gatewayv1.HTTPRoute{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      fmt.Sprintf("foo-%v", time.Now().UnixNano()),
+					Namespace: metav1.NamespaceDefault,
+				},
+				Spec: gatewayv1.HTTPRouteSpec{
+					Rules: []gatewayv1.HTTPRouteRule{{
+						Matches: []gatewayv1.HTTPRouteMatch{tc.match},
+						BackendRefs: []gatewayv1.HTTPBackendRef{{
+							BackendRef: gatewayv1.BackendRef{
+								BackendObjectReference: gatewayv1.BackendObjectReference{
+									Name: gatewayv1.ObjectName("test"),
+									Port: new(gatewayv1.PortNumber(8080)),
+								},
+							},
+						}},
+					}},
+				},
+			}
+			validateHTTPRoute(t, route, tc.wantErrors)
+		})
+	}
+}
