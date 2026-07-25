@@ -78,6 +78,42 @@ matching. The following rules demonstrate this:
       port: 8080
 ```
 
+## Matching multiple methods in a single match
+
+{{< details title="Experimental Support Feature: HTTPRouteMultipleMethodMatching" open="true" >}}
+The `methods` field is part of experimental support. For more information on
+support levels, refer to our [conformance guide](/docs/concepts/conformance/).
+{{< /details >}}
+
+When the `methods` field is used, you can list multiple HTTP methods in one
+`HTTPRouteMatch`. A request matches if its method is any value in `methods`.
+When `methods` is specified, `method` must also be specified and must equal
+`methods[0]`. This differs from [ORing matches](#oring-matches) below, where
+multiple `matches` entries are combined with OR across separate match blocks.
+
+```yaml
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /api/
+      method: GET
+      methods:
+      - GET
+      - HEAD
+      - POST
+      - PUT
+      - DELETE
+      - PATCH
+      - OPTIONS
+    backendRefs:
+    - name: infra-backend-v1
+      port: 8080
+```
+
+- A request to `/api/` with method `GET`, `HEAD`, `POST`, `PUT`, `DELETE`,
+  `PATCH`, or `OPTIONS` will be routed to `infra-backend-v1`.
+- A request with method `TRACE` will not match this rule.
+
 ## ORing matches
 
 If a rule has multiple `matches`, a request will be routed if it satisfies any

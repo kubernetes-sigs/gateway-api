@@ -10,8 +10,10 @@ spec:
   rules:
   - matches:
     - method: POST
-    - method: PUT
-    - method: DELETE
+      methods:
+      - POST
+      - PUT
+      - DELETE
     backendRefs:
     - group: multicluster.x-k8s.io
       kind: ServiceImport
