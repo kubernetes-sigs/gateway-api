@@ -772,9 +772,9 @@ const (
 //	method: GET
 //	methods:
 //	- GET
-// 	- POST
+//	- POST
 //	- PUT
-// 
+//
 // ```
 //
 // <gateway:experimental:validation:XValidation:message="method must be specified and match methods[0] when methods is set",rule="!has(self.methods) || size(self.methods) == 0 || (has(self.method) && self.method == self.methods[0])">
