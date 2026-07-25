@@ -56,6 +56,9 @@ const (
 	// This option indicates support for HTTPRoute method matching (extended conformance).
 	SupportHTTPRouteMethodMatching FeatureName = "HTTPRouteMethodMatching"
 
+	// This option indicates support for matching multiple HTTP methods in a single HTTPRouteMatch (extended conformance).
+	SupportHTTPRouteMultipleMethodMatching FeatureName = "HTTPRouteMultipleMethodMatching"
+
 	// This option indicates support for HTTPRoute response header modification (extended conformance).
 	SupportHTTPRouteResponseHeaderModification FeatureName = "HTTPRouteResponseHeaderModification"
 
@@ -148,6 +151,11 @@ var (
 	HTTPRouteMethodMatchingFeature = Feature{
 		Name:    SupportHTTPRouteMethodMatching,
 		Channel: FeatureChannelStandard,
+	}
+	// HTTPRouteMultipleMethodMatchingFeature contains metadata for the HTTPRouteMultipleMethodMatching feature.
+	HTTPRouteMultipleMethodMatchingFeature = Feature{
+		Name:    SupportHTTPRouteMultipleMethodMatching,
+		Channel: FeatureChannelExperimental,
 	}
 	// HTTPRouteResponseHeaderModificationFeature contains metadata for the HTTPRouteResponseHeaderModification feature.
 	HTTPRouteResponseHeaderModificationFeature = Feature{
@@ -279,6 +287,7 @@ var HTTPRouteExtendedFeatures = sets.New(
 	HTTPRouteBackendRequestHeaderModificationFeature,
 	HTTPRouteQueryParamMatchingFeature,
 	HTTPRouteMethodMatchingFeature,
+	HTTPRouteMultipleMethodMatchingFeature,
 	HTTPRouteResponseHeaderModificationFeature,
 	HTTPRoutePortRedirectFeature,
 	HTTPRouteSchemeRedirectFeature,
