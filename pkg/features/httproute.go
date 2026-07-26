@@ -126,6 +126,15 @@ const (
 
 	// This option indicates support for RequestRedirect filter on HTTPRoute BackendRef (extended conformance).
 	SupportHTTPRouteBackendRequestRedirect FeatureName = "HTTPRouteBackendRequestRedirect"
+
+	// This option indicates support for the ExternalAuth filter in HTTPRoute (experimental conformance).
+	SupportHTTPRouteExternalAuth FeatureName = "HTTPRouteExternalAuth"
+
+	// This option indicates support for the ExternalAuth filter with gRPC protocol in HTTPRoute (experimental conformance).
+	SupportHTTPRouteExternalAuthGRPC FeatureName = "HTTPRouteExternalAuthGRPC"
+
+	// This option indicates support for the ExternalAuth filter with HTTP protocol in HTTPRoute (experimental conformance).
+	SupportHTTPRouteExternalAuthHTTP FeatureName = "HTTPRouteExternalAuthHTTP"
 )
 
 var (
@@ -269,6 +278,21 @@ var (
 		Name:    SupportHTTPRouteBackendRequestRedirect,
 		Channel: FeatureChannelStandard,
 	}
+	// HTTPRouteExternalAuthFeature contains metadata for the HTTPRouteExternalAuth feature.
+	HTTPRouteExternalAuthFeature = Feature{
+		Name:    SupportHTTPRouteExternalAuth,
+		Channel: FeatureChannelExperimental,
+	}
+	// HTTPRouteExternalAuthGRPCFeature contains metadata for the HTTPRouteExternalAuthGRPC feature.
+	HTTPRouteExternalAuthGRPCFeature = Feature{
+		Name:    SupportHTTPRouteExternalAuthGRPC,
+		Channel: FeatureChannelExperimental,
+	}
+	// HTTPRouteExternalAuthHTTPFeature contains metadata for the HTTPRouteExternalAuthHTTP feature.
+	HTTPRouteExternalAuthHTTPFeature = Feature{
+		Name:    SupportHTTPRouteExternalAuthHTTP,
+		Channel: FeatureChannelExperimental,
+	}
 )
 
 // HTTPRouteExtendedFeatures includes all extended features for HTTPRoute
@@ -303,4 +327,7 @@ var HTTPRouteExtendedFeatures = sets.New(
 	HTTPRouteRetryConnectionErrorFeature,
 	HTTPRouteBackendURLRewriteFeature,
 	HTTPRouteBackendRequestRedirectFeature,
+	HTTPRouteExternalAuthFeature,
+	HTTPRouteExternalAuthGRPCFeature,
+	HTTPRouteExternalAuthHTTPFeature,
 )
