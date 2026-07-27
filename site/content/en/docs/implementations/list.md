@@ -94,13 +94,12 @@ class.
 ### Conformant
 - [Agentgateway][40]
 - [Airlock Microgateway][34]
-- [Calico][46]
 - [Cilium][16]
-- [Gloo Gateway][5]
 - [Google Kubernetes Engine][6]
 - [HAProxy Ingress][7]
 - [Istio][9]
 - [kgateway][37]
+- [Kong Operator][35] 
 - [NGINX Gateway Fabric][12]
 - [Sunbeam Proxy][47]
 - [Traefik Proxy][13]
@@ -111,16 +110,10 @@ class.
 
 - [Amazon Elastic Kubernetes Service][23]
 - [AWS Load Balancer Controller][44]
-- [Contour][3]
+- [Calico][46]
 - [Envoy Gateway][18]
+- [Gloo Gateway][5]
 - [Gravitee Kubernetes Operator][42]
-- [Kong Operator][35]
-
-### Stale
-
-- [Azure Application Gateway for Containers][27]
-- [Kong Ingress Controller][10]
-- [Kubvernor][39]
 
 ## Service Mesh Implementation Status <a name="meshes"></a>
 
@@ -128,11 +121,6 @@ class.
 
 - [Istio][9]
 - [Cilium][16]
-
-### Partially Conformant
-
-- [Alibaba Cloud Service Mesh][43]
-- [Linkerd][28]
 
 ## Integrations <a name="integrations"></a>
 
@@ -143,12 +131,10 @@ class.
 - [Kuadrant][26] (GA)
 - [kruise-rollouts][41] (alpha)
 
-[3]:#contour
 [5]:#gloo-gateway
 [6]:#google-kubernetes-engine
 [7]:#haproxy-ingress
 [9]:#istio
-[10]:#kong-kubernetes-ingress-controller
 [12]:#nginx-gateway-fabric
 [13]:#traefik-proxy
 [14]:#flagger
@@ -159,17 +145,13 @@ class.
 [23]:#amazon-elastic-kubernetes-service
 [24]:#knative
 [26]:#kuadrant
-[27]:#azure-application-gateway-for-containers
-[28]:#linkerd
 [33]:#ngrok-kubernetes-operator
 [34]:#airlock-microgateway
 [35]:#kong-operator
 [37]:#kgateway
-[39]:#kubvernor
 [40]:#agentgateway
 [41]:#kruise-rollouts
 [42]:#gravitee-kubernetes-operator
-[43]:#alibaba-cloud-service-mesh
 [44]:#aws-load-balancer-controller
 [45]:#varnish-gateway
 [46]:#calico
@@ -199,14 +181,6 @@ It filters requests using deny rules against known attacks (OWASP Top 10), along
 Authentication can be enforced via client certificates, JWT, or OIDC with step-up authentication for MFA, with support for OAuth 2.0 Token Introspection and Token Exchange. Airlock Microgateway is certified for Red Hat OpenShift, and built-in Grafana dashboards provide real-time reporting on system health, traffic and threats.
 
 [airlock-microgateway]:https://www.airlock.com/en/secure-access-hub/components/microgateway
-
-### Alibaba Cloud Service Mesh
-
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.3.0-Alibaba%20Cloud%20Service%20Mesh-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.3.0/alibaba-cloud-servicemesh)
-
-[Alibaba Cloud Service Mesh (ASM)][asm] provides a fully managed service mesh platform that is compatible with the community Istio. It simplifies service governance, including traffic routing and split management between service calls, authentication security for inter-service communication, and mesh observability capabilities, thereby greatly reducing the workload of development and operations.
-
-[asm]: https://www.alibabacloud.com/help/en/asm/product-overview/what-is-asm
 
 ### Amazon Elastic Kubernetes Service
 
@@ -282,27 +256,6 @@ effort, check out the #development channel or join our [weekly developer meeting
 [cilium118blog]: https://isovalent.com/blog/post/cilium-1-18/#service-mesh-gateway-api
 [cilium-slack]: https://slack.cilium.io
 [cilium-meeting]: https://github.com/cilium/cilium#weekly-developer-meeting
-
-### Contour
-
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.3.0-Contour-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.3.0/projectcontour-contour)
-
-[Contour][contour] is a CNCF open source Envoy-based ingress controller for Kubernetes.
-
-Contour [v1.33.0][contour-release] implements Gateway API v1.3.0.
-All [Standard channel][contour-standard] v1 API group resources (GatewayClass, Gateway, HTTPRoute, ReferenceGrant), plus most v1alpha2 API group resources (TLSRoute, TCPRoute, GRPCRoute, ReferenceGrant, and BackendTLSPolicy) are supported.
-Contour's implementation passes most core extended Gateway API conformance tests included in the v1.3.0 release.
-
-See the [Contour Gateway API Guide][contour-guide] for information on how to deploy and use Contour's Gateway API implementation.
-
-For help and support with Contour's implementation, [create an issue][contour-issue-new] or ask for help in the [#contour channel on Kubernetes slack][contour-slack].
-
-[contour]:https://projectcontour.io
-[contour-release]:https://github.com/projectcontour/contour/releases/tag/v1.33.0
-[contour-standard]:/docs/concepts/versioning/#release-channels
-[contour-guide]:https://projectcontour.io/docs/1.33/guides/gateway-api/
-[contour-issue-new]:https://github.com/projectcontour/contour/issues/new/choose
-[contour-slack]:https://kubernetes.slack.com/archives/C8XRH2R4J
 
 ### Envoy Gateway
 
@@ -413,23 +366,6 @@ Kgateway is generally available with its 2.0 release.
 
 [kgateway]:https://kgateway.dev/docs
 
-### Kong Kubernetes Ingress Controller
-
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.2.1-Kong%20Ingress%20Controller-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.2.1/kong-kubernetes-ingress-controller)
-
-[Kong][kong] is an open source API Gateway built for hybrid and multi-cloud environments.
-
-The [Kong Kubernetes Ingress Controller (KIC)][kic] can be used to configure unmanaged Gateways. See the [Gateway API Guide][kong-gw-guide] for usage information.. See the [Gateway API Guide][kong-gw-guide] for usage information.
-
-For help and support with Kong Kubernetes Ingress Controller please feel free to [create an issue][kic-issue-new] or a [discussion][kic-disc-new]. You can also ask for help in the [#kong channel on Kubernetes slack][kong-slack].
-
-[kong]: https://konghq.com
-[kic]: https://github.com/kong/kubernetes-ingress-controller
-[kong-gw-guide]: https://docs.konghq.com/kubernetes-ingress-controller/latest/guides/using-gateway-api/
-[kic-issue-new]: https://github.com/Kong/kubernetes-ingress-controller/issues/new
-[kic-disc-new]: https://github.com/Kong/kubernetes-ingress-controller/discussions/new
-[kong-slack]: https://kubernetes.slack.com/archives/CDCA87FRD
-
 ### Kong Operator
 
 [![Conformance](https://img.shields.io/badge/Gateway%20API%20Partial%20Conformance%20v1.5.1-Kong%20Operator-orange)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.5.1/kong-operator)
@@ -443,25 +379,6 @@ For help and support with Kong Operator please feel free to [create an issue][ko
 [kong-operator-docs]: https://developer.konghq.com/operator/
 [kong-operator-issue-new]: https://github.com/Kong/kong-operator/issues/new
 [kong-operator-disc-new]: https://github.com/Kong/kong-operator/discussions/new
-
-
-### Kubvernor
-[Kubvernor][kubvernor] is an open-source, highly experimental implementation of API controller in Rust programming language. Currently, Kubvernor supports Envoy Proxy. The project aims to be as generic as possible so Kubvernor can be used to manage/deploy different gateways (Envoy, Nginx, HAProxy, etc.).
-
-[kubvernor]:https://github.com/kubvernor/kubvernor
-
-### Linkerd
-
-[Linkerd][linkerd] is the first CNCF graduated [service mesh][linkerd-mesh].
-It is the only major mesh not based on Envoy, instead relying on a
-purpose-built Rust micro-proxy to bring security, observability, and
-reliability to Kubernetes, without the complexity.
-
-Linkerd 2.14 and later support the [GAMMA initiative's][gamma]
-Gateway API [support for east-west traffic management][gamma] within the mesh.
-
-[linkerd]:https://linkerd.io/
-[linkerd-mesh]:https://buoyant.io/service-mesh-manifesto
 
 ### NGINX Gateway Fabric
 
@@ -639,11 +556,10 @@ Page review timeline, starting with the v1.4 Page Review:
 * Gateway API v1.5 release Page Review (at least one month after the actual
   release): A maintainer will perform the Page Review process again, removing
   any implementations that are still Stale (after a right-of-reply period).
-  **You are here**
 * Gateway API v1.6 release Page Review (at least one month after the actual
   release): We will remove the Stale category, and implementation maintainers
   will need to be at least partially conformant on each review, or during the
-  right-of-reply period, or be removed from the implementations page.
+  right-of-reply period, or be removed from the implementations page. **You are here**
 
 This means that, after the Gateway API v1.6 release, implementations cannot be
 added to this page unless they have submitted at least a Partially Conformant
