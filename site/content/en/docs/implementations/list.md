@@ -465,7 +465,7 @@ Gateway API [support for east-west traffic management][gamma] within the mesh.
 
 ### NGINX Gateway Fabric
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.6.1-NGINX%20Gateway%20Fabric-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.6.1/nginx-nginx-gateway-fabric)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.6.1-NGINX%20Gateway%20Fabric-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.6/nginx-nginx-gateway-fabric)
 
 [NGINX Gateway Fabric][nginx-gateway-fabric] is an open-source project that provides an implementation of the Gateway API using [NGINX][nginx] as the data plane. The goal of this project is to implement the core Gateway API to configure an HTTP or TCP/UDP load balancer, reverse-proxy, or API gateway for applications running on Kubernetes. You can find the comprehensive NGINX Gateway Fabric user documentation on the [NGINX Documentation][nginx-docs] website.
 
