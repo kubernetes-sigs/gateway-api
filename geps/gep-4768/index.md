@@ -77,7 +77,7 @@ We propose the `TelemetryPolicy` as a direct policy attachment in the `gateway.n
 The following is an example that demonstrates the structure of the `TelemetryPolicy`.
 
 ```yaml
-apiVersion: agentic.networking.x-k8s.io/v1alpha1
+apiVersion: gateway.networking.x-k8s.io/v1alpha1
 kind: TelemetryPolicy
 metadata:
   name: standard-telemetry
