@@ -322,9 +322,7 @@ type TracingConfig struct {
 
   // SamplingRate specifies the base probability of sampling new traces.
   //
-  // Represented as a fraction. The probability of trace sampling is calculated as:
-  //
-  // $$ \text{Sampling Probability} = \frac{\text{Numerator}}{\text{Denominator}} $$
+  // The sampling probability is represented as a fraction.
   //
   // For example, a Numerator of 5 and Denominator of 100 represents a 5% sampling rate.
   // * If configured, only the specified percentage of new traces will be initiated.
