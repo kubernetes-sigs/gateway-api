@@ -168,8 +168,6 @@ type TelemetryPolicy struct {
 //
 // Specifying at least one target resource in `targetRefs` is required.
 // Tracing behavior can be configured via the `tracing` field.
-//
-// Support: Core
 type TelemetryPolicySpec struct {
   // TargetRefs identifies the gateways to which this policy applies (GEP-713).
   //
@@ -179,7 +177,7 @@ type TelemetryPolicySpec struct {
   //
   // TargetRefs must be distinct.
   //
-  // Support: Core
+  // Support: Core for Gateway
   //
   // +required
   // +kubebuilder:validation:MinItems=1
@@ -368,7 +366,9 @@ type TracingConfig struct {
 
 // TracingProvider identifies the tracing backend that receives generated spans.
 //
-// Support: Core (within Tracing feature)
+// Support: Core for Service
+//
+// Support: Implementation-specific for any other resource
 type TracingProvider struct {
   // BackendRef is a reference to a Kubernetes Service or other supported 
   // backend that receives OTLP traces.
