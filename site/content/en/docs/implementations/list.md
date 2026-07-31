@@ -495,7 +495,7 @@ It passes the v1.5.1 experimental conformance suite for the `GATEWAY-HTTP`, `GAT
 
 ### Traefik Proxy
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.6.1-Traefik%20Proxy-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.6.1/traefik-traefik)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.6.1-Traefik%20Proxy-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.6/traefik-traefik)
 
 [Traefik Proxy][traefik-proxy] is an open source cloud-native application proxy.
 
