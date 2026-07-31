@@ -400,6 +400,15 @@ type TracingProvider struct {
   //
   // +required
   BackendRef BackendObjectReference `json:"backendRef"`
+
+  // Headers specifies a list of custom headers to be added to the telemetry
+  // export requests (e.g., for authentication).
+  //
+  // Support: Extended
+  //
+  // +optional
+  // +kubebuilder:validation:MaxItems=16
+  Headers []v1.HTTPHeader `json:"headers,omitempty"`
 }
 
 // Fraction represents a ratio used for probabilistic sampling rates.
