@@ -513,6 +513,31 @@ When users specify an `attributeRef`, they must use these standardized keys (e.g
 
 Implementations MUST NOT expose internal, proxy-specific variables through the `Reference` type. If an implementation does not support mapping a specific standard attribute, it SHOULD gracefully omit it or signal the limitation via policy status conditions.
 
+### Conformance Tests
+
+To ensure consistent implementation of the `TelemetryPolicy` API, the following basic conformance test scenarios are proposed for the initial `Tracing` support.
+
+#### 1. Enabling TelemetryPolicy (Core)
+* **Description**: Verify that applying a `TelemetryPolicy` with tracing enabled successfully configures the Gateway to generate and export traces.
+* **Test**:
+  * Apply a `TelemetryPolicy` targeting a `Gateway`, with `tracing.mode` set to `Enabled` and a valid `BackendRef` pointing to a mock OTLP collector.
+  * Send a request through the Gateway.
+  * **Assertion**: The configured OTLP collector receives the tracing spans for the request.
+
+#### 2. Setting Custom Values (Literal and Header) (Core)
+* **Description**: Verify that the Gateway proxy can inject static literal values and dynamically extract HTTP headers into span attributes.
+* **Test**:
+  * Configure a `TelemetryPolicy` with an `Attribute` of type `Literal` (e.g., `literalValue: "test-env"`) and an `Attribute` of type `Header` (e.g., `headerName: "X-Test-Header"`).
+  * Send a request through the Gateway with the HTTP header `X-Test-Header: my-value`.
+  * **Assertion**: The exported span includes both the literal attribute and the extracted header attribute.
+
+#### 3. Setting OpenTelemetry Attributes (Extended)
+* **Description**: Verify that the Gateway proxy can map standard OpenTelemetry semantic conventions to its spans.
+* **Test**:
+  * Configure a `TelemetryPolicy` with an `Attribute` of type `Reference` (e.g., `attributeRef: "http.request.method"`).
+  * Send a request through the Gateway.
+  * **Assertion**: The exported span includes the requested standard attribute.
+
 ## Alternatives Considered
 
 ### Implementation-Specific OpenTelemetry Enablement
