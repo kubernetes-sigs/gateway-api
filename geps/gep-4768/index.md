@@ -351,6 +351,22 @@ type TracingConfig struct {
   // +optional
   ParentBasedSampling *ParentBasedSampling `json:"parentBasedSampling,omitempty"`
 
+  // ServiceName is the "service.name" attribute of the OpenTelemetry resource.
+  // If absent, the implementation's default service name will be used.
+  //
+  // Support: Extended
+  //
+  // +optional
+  ServiceName *string `json:"serviceName,omitempty"`
+
+  // SpanName defines a custom name for the OTel span. By default, the name 
+  // is implementation-specific.
+  //
+  // Support: Extended
+  //
+  // +optional
+  SpanName *string `json:"spanName,omitempty"`
+
   // Attributes is a list of custom key-value pairs (or variables) attached to every span.
   //
   // When configured, these attributes are injected into every generated tracing span.
