@@ -4,8 +4,8 @@
 
 | API channel  | Implementation version | Mode | Report |
 |--------------|------------------------|------|--------|
-|   standard   | [v1.20.0-rc.1](https://github.com/cilium/cilium/releases/tag/v1.20.0-rc.1) | default | [v1.20.0-rc.1 report](./standard-v1.20.0-rc.1-default-report.yaml)     |
-| experimental | [v1.20.0-rc.1](https://github.com/cilium/cilium/releases/tag/v1.20.0-rc.1) | default | [v1.20.0-rc.1 report](./experimental-v1.20.0-rc.1-default-report.yaml) |
+|   standard   | [v1.20.0](https://github.com/cilium/cilium/releases/tag/v1.20.0) | default | [v1.20.0 report](./standard-v1.20.0-default-report.yaml)     |
+| experimental | [v1.20.0](https://github.com/cilium/cilium/releases/tag/v1.20.0) | default | [v1.20.0 report](./experimental-v1.20.0-default-report.yaml) |
 
 ## Reproduce
 
