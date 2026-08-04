@@ -92,13 +92,14 @@ Gateway API Regex should be a subset of most modern regex engines.
 
 ## Inputs
 
-For Gateway API Regex we only explicitly support strings composed of ASCII characters that are not null, not control characters, and not spaces (other than space and tab) as inputs.
-In other words, only the following code points are supported:
+For Gateway API Regex we only explicitly support strings composed of ASCII characters that are not null, not control characters, and not spaces (other than space and tab) **as inputs**.
+In other words, only the following code points are supported **as inputs**:
 
 * `0x09` (tab)
 * `0x20` (space)
 * `0x21-0x7E` (printable characters)
 
+Again, this is not a restriction on the regex syntax itself, but rather a restriction on the inputs to the regex.
 The reason for this restriction is that most modern regex engines differ in their support for line breaks, Unicode, and control characters.
 Supporting such inputs would add ambiguity and diminish portability with little practical benefits as such characters are rarely used in traffic routing and manipulation 
 (notably, [HTTP header values can have `0x80-0xFF` code points](https://datatracker.ietf.org/doc/html/rfc9110#section-5.5), but their use is rare).
@@ -141,6 +142,12 @@ Some notable omissions implied from our construction of Gateway API Regex are:
 * Interval range expressions without starting numbers (`a{,2}`, `a{,}`).
 
 If a regex contains undefined syntax, then the behavior is implementation specific, and implementations are not required to reject such regexes.
+
+### Warnings
+
+Exposing regexes in an API has a lot of sharp corners since its hard to validate the validity of regexes in at the API level.
+**APIs that use Gateway API Regex should provide warnings that regexes outside of this GEP are not portable across implementations and there is no validation surrounding the portability of specific patterns.**
+**Implementations are responsible for ensuring that regexes (even invalid ones) fail gracefully and do not create configuration injection vulnerabilities.**
 
 ### Examples
 
@@ -324,7 +331,7 @@ However, this pattern is invalid in Rust.
 
 Consecutive usually redundant and may have surprising behaviour.
 For example, in the pattern `a+?` is different than `(a+)?` in RE2.
-In the pattern `a+?`, the `?` modifies the `+` quanitifier  be lazy.
+In the pattern `a+?`, the `?` modifies the `+` quanitifier to be lazy.
 In POSIX ERE, `a+?` and `(a+)?` are equivalent.
 To avoid these kinds of ambiguities, we leave consecutive quantifiers undefined.
 
