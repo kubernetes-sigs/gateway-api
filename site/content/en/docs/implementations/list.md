@@ -203,16 +203,6 @@ See the [AWS Load Balancer Controller documentation][aws-lbc-docs] for informati
 [aws-lbc]:https://github.com/kubernetes-sigs/aws-load-balancer-controller
 [aws-lbc-docs]:https://kubernetes-sigs.github.io/aws-load-balancer-controller/
 
-### Azure Application Gateway for Containers
-
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.2.1-Azure%20Application%20Gateway%20for%20Containers-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.2.1/azure-application-gateway-for-containers)
-
-[Application Gateway for Containers][azure-application-gateway-for-containers] is a managed application (layer 7) load balancing solution, providing dynamic traffic management capabilities for workloads running in a Kubernetes cluster in Azure. Follow the [quickstart guide][azure-application-gateway-for-containers-quickstart-controller] to deploy the ALB controller and get started with Gateway API.
-
-
-[azure-application-gateway-for-containers]: https://aka.ms/appgwcontainers/docs
-[azure-application-gateway-for-containers-quickstart-controller]: https://learn.microsoft.com/azure/application-gateway/for-containers/quickstart-deploy-application-gateway-for-containers-alb-controller
-
 ### Calico
 
 [![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.4.1-Calico-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.4.1/projectcalico-calico/experimental-v3.32.0-default-report.yaml)
@@ -372,13 +362,15 @@ Kgateway is generally available with its 2.0 release.
 
 [Kong][kong] is an open source API Gateway built for hybrid and multi-cloud environments.
 
-The [Kong Operator][kong-operator-docs] can be used to configure managed Gateways and orchestrate instances of [Kong Kubernetes Ingress Controllers](#kong-kubernetes-ingress-controller).
+The [Kong Operator][kong-operator-docs] can be used to configure managed Gateways and orchestrate instances of Kong Kubernetes Ingress Controllers.
 
 For help and support with Kong Operator please feel free to [create an issue][kong-operator-issue-new] or a [discussion][kong-operator-disc-new]. You can also ask for help in the [#kong channel on Kubernetes slack][kong-slack].
 
 [kong-operator-docs]: https://developer.konghq.com/operator/
 [kong-operator-issue-new]: https://github.com/Kong/kong-operator/issues/new
 [kong-operator-disc-new]: https://github.com/Kong/kong-operator/discussions/new
+[kong]: https://konghq.com
+[kong-slack]: https://kubernetes.slack.com/archives/CDCA87FRD
 
 ### NGINX Gateway Fabric
 
