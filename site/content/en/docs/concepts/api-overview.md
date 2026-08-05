@@ -122,17 +122,16 @@ If they are, then the entire Gateway is invalid and will not reach `Accepted` st
 
 {{< details title="Distinctiveness rules, in increasing order of complexity" color="purple" >}}
 
-* `TCP` and `UDP` Listeners are distinct only on the combination of `protocol` and `port`.
+- `TCP` and `UDP` Listeners are distinct only on the combination of `protocol` and `port`.
 So, two Listeners that listen on port `53`, but where one has `protocol` set to `TCP` and the other `UDP` are distinct, but two Listeners that both have `protocol` `TCP`, and `port` `22` are not distinct, and are thus Conflicted.
-* `TLS` Listeners are distinct based on the combination of the fields `protocol`, `port`, and `hostname`.
+- `TLS` Listeners are distinct based on the combination of the fields `protocol`, `port`, and `hostname`.
 In this case, the `hostname` describes the Server Name Indicator (SNI) used as part of the TLS handshake, which can be used as a routing discriminator.
 Note that, in this case the TLS config in the `tls` stanza is _not_ relevant, as that allows you to specify whether or not the connection is terminated, which is not relevant in this case - because only the SNI, which applies in either terminated or not terminated cases, is defined.
-* `HTTP` Listeners are distinct via the combination of the fields `protocol`, `port`, `hostname`.
+- `HTTP` Listeners are distinct via the combination of the fields `protocol`, `port`, `hostname`.
 Two Listeners that both expose `HTTP` on port `80`, with different `hostname` fields, are distinct.
-* `HTTPS` Listeners are distinct via the combination of the fields `protocol`, `port`, `hostname`, but there is an additional requirement.
+- `HTTPS` Listeners are distinct via the combination of the fields `protocol`, `port`, `hostname`, but there is an additional requirement.
 If the protocol is `HTTPS`, then you must have a Secret reference that points to a Kubernetes Secret of type `kubernetes.io/tls`. Listeners with different `hostnames` may point to different Secrets, but we don't mandate that (since a single certificate can support many hostnames).
 So, two Listeners that expose `HTTPS` on port `443` are distinct if they have different `hostname` fields.
-
 
 {{< /details >}}
 
@@ -251,8 +250,8 @@ different relationships that Gateways and Routes can have:
 
 For a Route to attach to a Listener, two things have to be true:
 
-* The Route must reference a Gateway (or one of its Listeners via a `sectionName`) in its `parentRefs` stanza. All Routes **must** contain a `parentRefs` stanza to be a Gateway API compliant Route object.
-* The Listener must _accept_ the Route's attachment. There are many ways for Listeners to describe the shape of what Routes should attach to a given Listener, and some attachments require agreement between the Listener and the Route about protocol-specific details (for example, matching hostnames between a Listener and a HTTPRoute).
+- The Route must reference a Gateway (or one of its Listeners via a `sectionName`) in its `parentRefs` stanza. All Routes **must** contain a `parentRefs` stanza to be a Gateway API compliant Route object.
+- The Listener must _accept_ the Route's attachment. There are many ways for Listeners to describe the shape of what Routes should attach to a given Listener, and some attachments require agreement between the Listener and the Route about protocol-specific details (for example, matching hostnames between a Listener and a HTTPRoute).
 
 The Route side of this is intended to ensure that, at all times, control over where an application is exposed is in the hands of Ana, the Application Developer.
 Chihiro, the Cluster Admin and Gateway owner, can limit what _shapes_ Routes that can attach to their Gateway can take (via their Kind or their namespace),but they can't force Ana to expose her application.
@@ -323,10 +322,10 @@ following mechanisms:
 2. **Namespaces:** The `allowedRoutes.namespaces` field on a listener can be
    used to restrict where Routes may be attached from. The `namespaces.from`
    field supports the following values:
-    * `Same` is the default option. Only Routes in the same namespace
+    - `Same` is the default option. Only Routes in the same namespace
       as this Gateway may be attached.
-    * `All` will allow Routes from all Namespaces to be attached.
-    * `Selector` means that Routes from a subset of Namespaces selected by a
+    - `All` will allow Routes from all Namespaces to be attached.
+    - `Selector` means that Routes from a subset of Namespaces selected by a
       Namespace label selector may be attached to this Gateway. When `Selector`
       is used, the `namespaces.selector` field must be used to specify label
       selectors. This field is not supported with `All` or `Same`.
@@ -396,7 +395,6 @@ to any traffic directed to the Service. How and which Routes attach to a given
 Service is controlled by the Routes themselves (working with Kubernetes RBAC),
 as covered in the [GAMMA routing documentation].
 
-[GAMMA]: /docs/mesh/
 [GAMMA routing documentation]: /docs/mesh/mesh-overview/#connecting-routes-and-services
 [service mesh]: /docs/glossary/#service-mesh
 
