@@ -17,7 +17,9 @@ limitations under the License.
 package tls
 
 import (
+	"context"
 	cryptotls "crypto/tls"
+	"crypto/x509"
 	"errors"
 	"io"
 	"strings"
@@ -128,6 +130,51 @@ func MakeTLSRequestAndExpectEventuallyConsistentFailureResponse(t *testing.T, r 
 	if clientCertificate != nil && clientCertificateKey != nil {
 		assert.True(t, clientCertificatePresented, "client certificate was not presented during the handshake")
 	}
+}
+
+// MakeTLSConnectionAndExpectEventuallyConsistentFailure initiates a TCP
+// connection and TLS handshake using the supplied server certificate as a trust
+// anchor, then expects it to fail.
+//
+// Note that this function must make a "raw" TLS connection, because we expect
+// the connection itself to fail. In the case that we are using it to connect to
+// a terminating listener, we have to be sure that it is not failing simply
+// because the TLS handshake was invalid. So, it must have the potential to make
+// a valid TLS handshake.
+func MakeTLSConnectionAndExpectEventuallyConsistentFailure(
+	t *testing.T,
+	timeoutConfig config.TimeoutConfig,
+	gwAddr string,
+	serverCertificate []byte,
+	serverName string,
+) {
+	t.Helper()
+
+	certPool := x509.NewCertPool()
+	if !certPool.AppendCertsFromPEM(serverCertificate) {
+		t.Fatal("failed to add server certificate to trust pool")
+	}
+
+	dialer := &cryptotls.Dialer{
+		Config: &cryptotls.Config{
+			RootCAs:    certPool,
+			ServerName: serverName,
+			MinVersion: cryptotls.VersionTLS12,
+		},
+	}
+
+	http.AwaitConvergence(t,
+		timeoutConfig.RequiredConsecutiveSuccesses, timeoutConfig.MaxTimeToConsistency,
+		func(_ time.Duration) bool {
+			attemptCtx, cancel := context.WithTimeout(t.Context(), time.Second)
+			conn, err := dialer.DialContext(attemptCtx, "tcp", gwAddr)
+			cancel()
+			if conn != nil {
+				conn.Close()
+			}
+			return err != nil
+		},
+	)
 }
 
 // MakeTLSConnectionAndExpectEventuallyConnectionRejection initiates a TCP connection, then initiates TLS Handshake, and expects the TCP connection to be eventually rejected.
