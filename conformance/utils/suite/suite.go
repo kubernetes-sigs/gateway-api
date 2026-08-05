@@ -490,11 +490,16 @@ func (suite *ConformanceTestSuite) Run(t *testing.T, tests []ConformanceTest) er
 	// if the test suite is not currently running, reset reporting and start a
 	// new test run.
 	suite.running = true
-	suite.results = nil
+	suite.results = make(map[string]testResult)
 	suite.lock.Unlock()
 
+	t.Cleanup(func() {
+		suite.lock.Lock()
+		suite.running = false
+		suite.lock.Unlock()
+	})
+
 	// run all tests and collect the test results for conformance reporting
-	results := make(map[string]testResult)
 	sleepForTestIsolation := false
 	for _, test := range tests {
 		res := testSucceeded
@@ -518,28 +523,20 @@ func (suite *ConformanceTestSuite) Run(t *testing.T, tests []ConformanceTest) er
 			time.Sleep(suite.TimeoutConfig.TestIsolation)
 		}
 
-		succeeded := t.Run(test.ShortName, func(t *testing.T) {
+		t.Run(test.ShortName, func(subT *testing.T) {
+			subT.Cleanup(func() {
+				suite.recordTestResult(subT, test, res)
+				if suite.Hook != nil {
+					suite.Hook(subT, test, suite)
+				}
+			})
 			err := suite.setClientsetForTest(test)
-			require.NoError(t, err, "failed to create new clientset for test")
-			test.Run(t, suite)
+			require.NoError(subT, err, "failed to create new clientset for test")
+			test.Run(subT, suite)
 		})
-		if !succeeded {
-			res = testFailed
-		}
 
-		results[test.ShortName] = testResult{
-			test:   test,
-			result: res,
-		}
-		if res == testSucceeded || res == testFailed {
+		if res == testSucceeded {
 			sleepForTestIsolation = true
-		}
-
-		// call the hook function if it was provided,
-		// this's useful for running custom logic after each test at suite level,
-		// such as collecting current state of the cluster for debugging.
-		if suite.Hook != nil {
-			suite.Hook(t, test, suite)
 		}
 
 		if suite.failFast && res == testFailed {
@@ -547,14 +544,33 @@ func (suite *ConformanceTestSuite) Run(t *testing.T, tests []ConformanceTest) er
 		}
 	}
 
-	// now that the tests have completed, mark the test suite as not running
-	// and report the test results.
-	suite.lock.Lock()
-	suite.running = false
-	suite.results = results
-	suite.lock.Unlock()
-
 	return nil
+}
+
+func (suite *ConformanceTestSuite) recordTestResult(t *testing.T, test ConformanceTest, initialRes resultType) {
+	res := initialRes
+	switch {
+	case t.Failed():
+		res = testFailed
+	case t.Skipped():
+		if res != testNotSupported && res != testProvisionalSkipped {
+			res = testSkipped
+		}
+	default:
+		if res != testNotSupported && res != testProvisionalSkipped && res != testSkipped {
+			res = testSucceeded
+		}
+	}
+
+	suite.lock.Lock()
+	defer suite.lock.Unlock()
+	// This function assumes that suite.results is created.
+	// Before re-using this function make sure that it is always called after
+	// results is initialized.
+	suite.results[test.ShortName] = testResult{
+		test:   test,
+		result: res,
+	}
 }
 
 // Report emits a ConformanceReport for the previously completed test run.
