@@ -331,7 +331,7 @@ However, this pattern is invalid in Rust.
 
 Consecutive usually redundant and may have surprising behaviour.
 For example, in the pattern `a+?` is different than `(a+)?` in RE2.
-In the pattern `a+?`, the `?` modifies the `+` quanitifier to be lazy.
+In the pattern `a+?`, the `?` modifies the `+` quantifier to be lazy.
 In POSIX ERE, `a+?` and `(a+)?` are equivalent.
 To avoid these kinds of ambiguities, we leave consecutive quantifiers undefined.
 
