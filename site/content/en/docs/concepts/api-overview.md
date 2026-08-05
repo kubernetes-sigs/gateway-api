@@ -99,7 +99,7 @@ Gateway objects bind one or more **Addresses** to one or more **Listeners**.
 **Addresses** are how the Gateway is reached, and are usually IP addresses, although some implementations (particularly ones that route traffic via an AWS load balancer) use domain names instead.
 
 **Listeners** describe how the Gateway should listen for traffic, and have a `port`, a `protocol`, and other protocol-specific details.
-Listeners that are not **distinct** are in conflict, and Gateway API includes instructions for what happens in various conflict cases. What makes Listeners distinct is a bit complicated and is discussed in the Distinctiveness section (link).
+Listeners that are not **distinct** are in conflict, and Gateway API includes instructions for what happens in various conflict cases. What makes Listeners distinct is a bit complicated and is discussed in the [Distinctiveness section](#distinctiveness).
 
 A critical reason for the requirement that Listeners are distinct is that traffic flowing through a Gateway **must only match a single Listener**.
 Any particular traffic must only be able to be assigned to a single Listener, and once that Listener is chosen, the traffic **must** be routable via an attached, protocol-specific Route, **or it must be dropped by the Gateway**.
