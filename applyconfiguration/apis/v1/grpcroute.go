@@ -57,6 +57,11 @@ import (
 // for the affected listener with a reason of "UnsupportedProtocol".
 // Implementations MAY also accept HTTP/2 connections with an upgrade from
 // HTTP/1, i.e. without prior knowledge.
+//
+// GRPCRoute is expected to interoperate with BackendTLSPolicy (a Union
+// Feature).
+//
+// <gateway:union:BackendTLSPolicy>
 type GRPCRouteApplyConfiguration struct {
 	metav1.TypeMetaApplyConfiguration    `json:",inline"`
 	*metav1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`

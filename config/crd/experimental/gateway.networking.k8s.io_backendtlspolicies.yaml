@@ -31,6 +31,9 @@ spec:
         description: |-
           BackendTLSPolicy provides a way to configure how a Gateway
           connects to a Backend via TLS.
+
+          BackendTLSPolicy is a Union Feature: It is expected to be combined with
+          another feature that forwards traffic to a backend.
         properties:
           apiVersion:
             description: |-
@@ -726,6 +729,9 @@ spec:
         description: |-
           BackendTLSPolicy provides a way to configure how a Gateway
           connects to a Backend via TLS.
+
+          BackendTLSPolicy is a Union Feature: It is expected to be combined with
+          another feature that forwards traffic to a backend.
         properties:
           apiVersion:
             description: |-

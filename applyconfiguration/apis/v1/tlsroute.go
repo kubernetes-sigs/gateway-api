@@ -36,6 +36,11 @@ import (
 //
 // If you need to forward traffic to a single target for a TLS listener, you
 // could choose to use a TCPRoute with a TLS listener.
+//
+// TLSRoute is expected to interoperate with BackendTLSPolicy (a Union
+// Feature).
+//
+// <gateway:union:BackendTLSPolicy>
 type TLSRouteApplyConfiguration struct {
 	metav1.TypeMetaApplyConfiguration    `json:",inline"`
 	*metav1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
