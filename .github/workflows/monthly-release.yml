@@ -75,6 +75,12 @@ jobs:
         run: |
           make build-monthly-yaml
 
+      - name: Build monthly OpenAPI JSON
+        env:
+          TAG: ${{ steps.tag.outputs.tag }}
+        run: |
+          make build-monthly-openapi
+
       - name: Release with notes
         id: release
         env:
@@ -135,7 +141,9 @@ jobs:
             --title "${STEPS_TAG_OUTPUTS_TAG}" \
             -F release-notes.md \
             --prerelease \
-            --draft release/${STEPS_TAG_OUTPUTS_TAG}-install.yaml
+            --draft \
+            "release/${STEPS_TAG_OUTPUTS_TAG}-install.yaml" \
+            "release/${STEPS_TAG_OUTPUTS_TAG}-swagger.json"
 
       - name: Cleanup
         if: always()
