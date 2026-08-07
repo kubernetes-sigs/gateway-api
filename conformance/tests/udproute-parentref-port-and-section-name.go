@@ -112,7 +112,7 @@ var UDPRouteParentRefPortAndSectionName = confsuite.ConformanceTest{
 				if err != nil {
 					t.Fatalf("error getting gateway address for listener %q: %v", s.listener, err)
 				}
-				udp.ExpectEchoResponseFromBackend(t, suite.TimeoutConfig.DefaultTestTimeout, gwAddr, udp.ExpectedResponse{
+				udp.ExpectEchoResponseFromBackend(t, suite.TimeoutConfig, gwAddr, udp.ExpectedResponse{
 					Service:   s.backend,
 					Namespace: ns,
 				})

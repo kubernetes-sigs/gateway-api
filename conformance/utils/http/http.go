@@ -168,7 +168,7 @@ func MakeRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtripp
 
 	req := MakeRequest(t, &expected, gwAddr, "HTTP", "http")
 
-	WaitForConsistentResponse(t, r, req, expected, timeoutConfig.RequiredConsecutiveSuccesses, timeoutConfig.MaxTimeToConsistency)
+	WaitForConsistentResponse(t, r, req, expected, timeoutConfig)
 }
 
 // MakeRequestAndExpectFailure makes a request with the given parameters.
@@ -179,7 +179,7 @@ func MakeRequestAndExpectFailure(t *testing.T, r roundtripper.RoundTripper, time
 
 	req := MakeRequest(t, &expected, gwAddr, "HTTP", "http")
 
-	WaitForConsistentFailureResponse(t, r, req, 5, timeoutConfig.MaxTimeToConsistency)
+	WaitForConsistentFailureResponse(t, r, req, timeoutConfig)
 }
 
 func MakeRequest(t *testing.T, expected *ExpectedResponse, gwAddr, protocol, scheme string) roundtripper.Request {
@@ -273,14 +273,13 @@ func Ipv6SafeHost(host string) string {
 	return host
 }
 
-// AwaitConvergence runs the given function until it returns 'true' `threshold` times in a row.
-// Each failed attempt has a 1s delay; successful attempts have no delay.
-func AwaitConvergence(t *testing.T, threshold int, maxTimeToConsistency time.Duration, fn func(elapsed time.Duration) bool) {
+// AwaitConvergence runs the given function until it returns 'true' the configured number of times
+// in a row. Each failed attempt waits for the configured poll interval; successful attempts have no delay.
+func AwaitConvergence(t *testing.T, timeoutConfig config.TimeoutConfig, fn func(elapsed time.Duration) bool) {
 	successes := 0
 	attempts := 0
 	start := time.Now()
-	to := time.After(maxTimeToConsistency)
-	delay := time.Second
+	to := time.After(timeoutConfig.MaxTimeToConsistency)
 	for {
 		select {
 		case <-to:
@@ -292,7 +291,7 @@ func AwaitConvergence(t *testing.T, threshold int, maxTimeToConsistency time.Dur
 		attempts++
 		if completed {
 			successes++
-			if successes >= threshold {
+			if successes >= timeoutConfig.RequiredConsecutiveSuccesses {
 				return
 			}
 			// Skip delay if we have a success
@@ -303,18 +302,17 @@ func AwaitConvergence(t *testing.T, threshold int, maxTimeToConsistency time.Dur
 		select {
 		// Capture the overall timeout
 		case <-to:
-			tlog.Fatalf(t, "timeout while waiting after %d attempts, %d/%d successes", attempts, successes, threshold)
+			tlog.Fatalf(t, "timeout while waiting after %d attempts, %d/%d successes", attempts, successes, timeoutConfig.RequiredConsecutiveSuccesses)
 			// And the per-try delay
-		case <-time.After(delay):
+		case <-time.After(timeoutConfig.DefaultPollInterval):
 		}
 	}
 }
 
 // WaitForConsistentResponse repeats the provided request until it completes with a response having
-// the expected response consistently. The provided threshold determines how many times in
-// a row this must occur to be considered "consistent".
-func WaitForConsistentResponse(t *testing.T, r roundtripper.RoundTripper, req roundtripper.Request, expected ExpectedResponse, threshold int, maxTimeToConsistency time.Duration) {
-	AwaitConvergence(t, threshold, maxTimeToConsistency, func(elapsed time.Duration) bool {
+// the expected response consistently.
+func WaitForConsistentResponse(t *testing.T, r roundtripper.RoundTripper, req roundtripper.Request, expected ExpectedResponse, timeoutConfig config.TimeoutConfig) {
+	AwaitConvergence(t, timeoutConfig, func(elapsed time.Duration) bool {
 		cReq, cRes, err := r.CaptureRoundTrip(req)
 		if err != nil {
 			tlog.Logf(t, "Request failed, not ready yet: %v (after %v)", err.Error(), elapsed)
@@ -334,8 +332,8 @@ func WaitForConsistentResponse(t *testing.T, r roundtripper.RoundTripper, req ro
 // WaitForConsistentFailureResponse repeats the provided request for the given
 // period of time and ensures an error is returned each time. This function fails
 // when HTTP Status OK (200) is returned.
-func WaitForConsistentFailureResponse(t *testing.T, r roundtripper.RoundTripper, req roundtripper.Request, threshold int, maxTimeToConsistency time.Duration) {
-	AwaitConvergence(t, threshold, maxTimeToConsistency, func(elapsed time.Duration) bool {
+func WaitForConsistentFailureResponse(t *testing.T, r roundtripper.RoundTripper, req roundtripper.Request, timeoutConfig config.TimeoutConfig) {
+	AwaitConvergence(t, timeoutConfig, func(elapsed time.Duration) bool {
 		_, cRes, err := r.CaptureRoundTrip(req)
 		if err != nil {
 			tlog.Logf(t, "Request failed, not ready yet: %v (after %v)", err.Error(), elapsed)

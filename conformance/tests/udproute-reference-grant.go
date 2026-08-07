@@ -66,7 +66,7 @@ var UDPRouteReferenceGrant = confsuite.ConformanceTest{
 		})
 
 		t.Run("UDP echo request reaches the cross-namespace backend while the ReferenceGrant exists", func(t *testing.T) {
-			udp.ExpectEchoResponse(t, suite.TimeoutConfig.DefaultTestTimeout, gwAddr)
+			udp.ExpectEchoResponse(t, suite.TimeoutConfig, gwAddr)
 		})
 
 		ctx, cancel := context.WithTimeout(context.Background(), suite.TimeoutConfig.DeleteTimeout)

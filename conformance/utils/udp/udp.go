@@ -26,6 +26,7 @@ import (
 
 	"k8s.io/apimachinery/pkg/util/wait"
 
+	"sigs.k8s.io/gateway-api/conformance/utils/config"
 	"sigs.k8s.io/gateway-api/conformance/utils/tlog"
 )
 
@@ -53,15 +54,15 @@ type echoResponse struct {
 
 // ExpectEchoResponse polls until a UDP echo round-trip against the given
 // gateway address succeeds, or the timeout is exceeded.
-func ExpectEchoResponse(t *testing.T, timeout time.Duration, gwAddr string) {
+func ExpectEchoResponse(t *testing.T, timeoutConfig config.TimeoutConfig, gwAddr string) {
 	t.Helper()
-	ExpectEchoResponseFromBackend(t, timeout, gwAddr, ExpectedResponse{})
+	ExpectEchoResponseFromBackend(t, timeoutConfig, gwAddr, ExpectedResponse{})
 }
 
 // ExpectEchoResponseFromBackend polls until a UDP echo round-trip against the
 // given gateway address succeeds and (when set) the response identifies the
 // expected backend Service and/or Namespace, or the timeout is exceeded.
-func ExpectEchoResponseFromBackend(t *testing.T, timeout time.Duration, gwAddr string, expected ExpectedResponse) {
+func ExpectEchoResponseFromBackend(t *testing.T, timeoutConfig config.TimeoutConfig, gwAddr string, expected ExpectedResponse) {
 	t.Helper()
 
 	const probe = "gateway-api-conformance-udp-echo"
@@ -72,7 +73,7 @@ func ExpectEchoResponseFromBackend(t *testing.T, timeout time.Duration, gwAddr s
 		tlog.Logf(t, "performing UDP echo probe on %s", gwAddr)
 	}
 
-	err := wait.PollUntilContextTimeout(context.TODO(), time.Second, timeout, true,
+	err := wait.PollUntilContextTimeout(t.Context(), timeoutConfig.DefaultPollInterval, timeoutConfig.MaxTimeToConsistency, true,
 		func(ctx context.Context) (bool, error) {
 			var dialer net.Dialer
 			conn, err := dialer.DialContext(ctx, "udp", gwAddr)
@@ -82,7 +83,7 @@ func ExpectEchoResponseFromBackend(t *testing.T, timeout time.Duration, gwAddr s
 			}
 			defer conn.Close()
 
-			if err = conn.SetDeadline(time.Now().Add(2 * time.Second)); err != nil {
+			if err = conn.SetDeadline(time.Now().Add(timeoutConfig.RequestTimeout)); err != nil {
 				return false, fmt.Errorf("setting UDP deadline: %w", err)
 			}
 			if _, err = conn.Write([]byte(probe)); err != nil {

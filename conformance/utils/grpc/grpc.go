@@ -310,7 +310,7 @@ func MakeRequestAndExpectEventuallyConsistentResponse(t *testing.T, c Client, ti
 		}
 		return true
 	}
-	http.AwaitConvergence(t, timeoutConfig.RequiredConsecutiveSuccesses, timeoutConfig.MaxTimeToConsistency, sendRPC)
+	http.AwaitConvergence(t, timeoutConfig, sendRPC)
 	tlog.Logf(t, "Request passed")
 }
 

@@ -67,7 +67,7 @@ func MakeTLSRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtr
 		}
 	}
 
-	WaitForConsistentTLSResponse(t, r, req, expected, timeoutConfig.RequiredConsecutiveSuccesses, timeoutConfig.MaxTimeToConsistency)
+	WaitForConsistentTLSResponse(t, r, req, expected, timeoutConfig)
 
 	if clientCertificate != nil && clientCertificateKey != nil {
 		assert.True(t, clientCertificatePresented, "client certificate was not presented during the handshake")
@@ -75,10 +75,9 @@ func MakeTLSRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtr
 }
 
 // WaitForConsistentTLSResponse - repeats the provided request until it completes with a response having
-// the expected response consistently. The provided threshold determines how many times in
-// a row this must occur to be considered "consistent".
-func WaitForConsistentTLSResponse(t *testing.T, r roundtripper.RoundTripper, req roundtripper.Request, expected http.ExpectedResponse, threshold int, maxTimeToConsistency time.Duration) {
-	http.AwaitConvergence(t, threshold, maxTimeToConsistency, func(elapsed time.Duration) bool {
+// the expected response consistently.
+func WaitForConsistentTLSResponse(t *testing.T, r roundtripper.RoundTripper, req roundtripper.Request, expected http.ExpectedResponse, timeoutConfig config.TimeoutConfig) {
+	http.AwaitConvergence(t, timeoutConfig, func(elapsed time.Duration) bool {
 		cReq, cRes, err := r.CaptureRoundTrip(req)
 		if err != nil {
 			tlog.Logf(t, "Request failed, not ready yet: %v (after %v)", err.Error(), elapsed)
@@ -121,7 +120,7 @@ func MakeTLSRequestAndExpectEventuallyConsistentFailureResponse(t *testing.T, r 
 		}
 	}
 
-	http.AwaitConvergence(t, timeoutConfig.RequiredConsecutiveSuccesses, timeoutConfig.MaxTimeToConsistency, func(elapsed time.Duration) bool {
+	http.AwaitConvergence(t, timeoutConfig, func(elapsed time.Duration) bool {
 		_, _, err := r.CaptureRoundTrip(req)
 		if err == nil {
 			tlog.Logf(t, "Request unexpectedly succeeded, not ready yet (after %v)", elapsed)
@@ -148,10 +147,10 @@ func MakeTLSConnectionAndExpectEventuallyConnectionRejection(t *testing.T, timeo
 		},
 	}
 
-	waitForTLSConnectionRejection(t, timeoutConfig, dialer, gwAddr, time.Second)
+	waitForTLSConnectionRejection(t, timeoutConfig, dialer, gwAddr)
 }
 
-func waitForTLSConnectionRejection(t *testing.T, timeoutConfig config.TimeoutConfig, dialer contextDialer, gwAddr string, retryInterval time.Duration) {
+func waitForTLSConnectionRejection(t *testing.T, timeoutConfig config.TimeoutConfig, dialer contextDialer, gwAddr string) {
 	t.Helper()
 
 	overallCtx, cancel := context.WithTimeout(t.Context(), timeoutConfig.MaxTimeToConsistency)
@@ -178,7 +177,7 @@ func waitForTLSConnectionRejection(t *testing.T, timeoutConfig config.TimeoutCon
 		}
 		tlog.Logf(t, "client could connect")
 		return false
-	}, timeoutConfig.MaxTimeToConsistency, retryInterval)
+	}, timeoutConfig.MaxTimeToConsistency, timeoutConfig.DefaultPollInterval)
 }
 
 // isConnectionRejected checks if an error indicates either a TCP RST (ECONNRESET)

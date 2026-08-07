@@ -57,9 +57,10 @@ func TestWaitForTLSConnectionRejectionRetriesAfterAttemptTimeout(t *testing.T) {
 	timeoutConfig := config.TimeoutConfig{
 		MaxTimeToConsistency: 500 * time.Millisecond,
 		RequestTimeout:       20 * time.Millisecond,
+		DefaultPollInterval:  time.Millisecond,
 	}
 
-	waitForTLSConnectionRejection(t, timeoutConfig, dialer, "example.com:443", time.Millisecond)
+	waitForTLSConnectionRejection(t, timeoutConfig, dialer, "example.com:443")
 
 	assert.GreaterOrEqual(t, attempts.Load(), int32(2))
 }
@@ -79,9 +80,10 @@ func TestWaitForTLSConnectionRejectionClosesUnexpectedConnection(t *testing.T) {
 	timeoutConfig := config.TimeoutConfig{
 		MaxTimeToConsistency: 500 * time.Millisecond,
 		RequestTimeout:       20 * time.Millisecond,
+		DefaultPollInterval:  time.Millisecond,
 	}
 
-	waitForTLSConnectionRejection(t, timeoutConfig, dialer, "example.com:443", time.Millisecond)
+	waitForTLSConnectionRejection(t, timeoutConfig, dialer, "example.com:443")
 
 	assert.True(t, conn.closed.Load())
 }
