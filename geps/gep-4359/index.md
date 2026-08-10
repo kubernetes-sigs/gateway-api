@@ -1,13 +1,13 @@
 # GEP-4359: Gateway API Regex
 
 * Issue: [#4359](https://github.com/kubernetes-sigs/gateway-api/issues/4359)
-* Status: Provisional
+* Status: Memorandum
 
 ## TLDR
 
 Regular expressions provide a powerful and concise method for traffic routing and manipulation, but present portability challenges due to the variety of regex engines.
 The goal of this proposal is to define a common regex syntax and semantics that all implementations should support to ensure portability, but mostly testability.
-We use POSIX ERE (as defined in Chapter 9 of the [The Open Group Base Specifications Issue 8]) as the common denominator, with some feature exclusions.
+We use POSIX ERE (as defined in Chapter 9 of the [The Open Group Base Specifications Issue 8](https://pubs.opengroup.org/onlinepubs/9799919799/)) as the common denominator, with some feature exclusions.
 
 ## Goals
 
@@ -39,7 +39,7 @@ Although out of scope for this proposal, some use cases are:
 
 The goal here is to define a common regex syntax and semantics that all implementations should support.
 **Individual implementations can support more features.**
-**This give us portability guarantees between implementations, but also lets us define conformance tests with regular expressions**
+**This allows us to set a minimum functionality floor that is testable using the conformance suite, and so will be guaranteed to be portable.**
 
 For example, a **hypothetical** path rewrite filter could look something like
 
@@ -131,10 +131,12 @@ We use IEEE POSIX ERE (as defined in Chapter 9 of the [The Open Group Base Speci
 * `\d` matches any digit (`[0-9]`), `\w` matches any word character (`[a-zA-Z0-9_]`), `\W` matches any non-word character `[^\w]`, `\s` any whitespace character (in this context, this is only tabs and spaces).
 
 IEEE POSIX ERE is a good common denominator because
+
 * The set of supported features is small (e.g. no backreferences within patterns)
 * Broadly compatible across most modern regex engines, especially because we don't have to worry about unicode, line breaks, and control sequences.
 
 Some notable omissions implied from our construction of Gateway API Regex are:
+
 * Backreferences (e.g. `\1`, `\2`, etc.) within patterns.
 * Matching flags (e.g. `(?i)` for case-insensitive matching).
 * Hex encoding of characters (e.g. `\xFF` or `\uFFFF`).
@@ -146,7 +148,7 @@ If a regex contains undefined syntax, then the behavior is implementation specif
 ### Warnings
 
 Exposing regexes in an API has a lot of sharp corners since its hard to validate the validity of regexes in at the API level.
-**APIs that use Gateway API Regex should provide warnings that regexes outside of this GEP are not portable across implementations and there is no validation surrounding the portability of specific patterns.**
+**APIs that use Gateway API Regex MUST provide warnings that regexes outside of this GEP are not portable across implementations and there is no validation surrounding the portability of specific patterns.**
 **Implementations are responsible for ensuring that regexes (even invalid ones) fail gracefully and do not create configuration injection vulnerabilities.**
 
 ### Examples
@@ -275,6 +277,7 @@ For the pattern `[\-Z]`:
 
 Replacement is usually straightforward, but has some semantic ambiguities.
 Given a pattern, a replacement, and an input, we allow higher level APIs to define semantics such as
+
 * whether the first or all matches should be replaced.
 * if replacing all matches, repeatedly find the next non-overlapping leftmost-first match, replace it, then continue scanning after the replaced match.
     * This means that some instances of patterns might be skipped if there are overlaps.

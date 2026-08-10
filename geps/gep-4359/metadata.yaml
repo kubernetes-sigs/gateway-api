@@ -2,7 +2,7 @@ apiVersion: internal.gateway.networking.k8s.io/v1alpha1
 kind: GEPDetails
 number: 4359
 name: Gateway API Regex
-status: Provisional
+status: Memorandum
 authors:
   - Stevenjin8
 references:
@@ -13,5 +13,3 @@ references:
   - https://regex101.com
   - https://datatracker.ietf.org/doc/html/rfc9110
   - https://pubs.opengroup.org/onlinepubs/7908799/xbd/locale.html
-featureNames:
-  - Gateway API Regex
