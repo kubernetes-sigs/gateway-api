@@ -195,17 +195,17 @@ type TelemetryPolicySpec struct {
   Tracing *TracingConfig `json:"tracing,omitempty"`
 }
 
-// TelemetryMode defines the enablement state of a telemetry signal.
-type TelemetryMode string
+// TracingMode defines the enablement state of tracing.
+type TracingMode string
 
 const (
-  // TelemetryModeEnabled explicitly enables the telemetry signal.
-  TelemetryModeEnabled  TelemetryMode = "Enabled"
-  // TelemetryModeDisabled explicitly disables the telemetry signal.
-  TelemetryModeDisabled TelemetryMode = "Disabled"
-  // TelemetryModeImplementationDefault means that the code should
-  // use the implementation's default behavior for telemetry.
-  TelemetryModeImplementationDefault TelemetryMode = "ImplementationDefault"
+  // TracingModeEnabled explicitly enables tracing.
+  TracingModeEnabled TracingMode = "Enabled"
+  // TracingModeDisabled explicitly disables tracing.
+  TracingModeDisabled TracingMode = "Disabled"
+  // TracingModeImplementationDefault means that the code should
+  // use the implementation's default behavior for tracing.
+  TracingModeImplementationDefault TracingMode = "ImplementationDefault"
 )
 
 // AttributeSourceType defines the source from which a telemetry attribute
@@ -281,8 +281,6 @@ type Attribute struct {
   AttributeRef *string `json:"attributeRef,omitempty"`
 }
 
-// --- Tracing Types ---
-
 // TracingConfig defines the configuration for distributed tracing.
 //
 // Distributed tracing tracks the lifecycle of an individual request as it propagates through
@@ -308,7 +306,7 @@ type TracingConfig struct {
   //
   // +kubebuilder:validation:Enum=Enabled;Disabled;ImplementationDefault
   // +kubebuilder:default=ImplementationDefault
-  Mode TelemetryMode `json:"mode,omitempty"`
+  Mode TracingMode `json:"mode,omitempty"`
 
   // Provider specifies the tracing collector or backend endpoint receiving OTLP spans.
   //
@@ -411,20 +409,34 @@ type TracingProvider struct {
   Headers []v1.HTTPHeader `json:"headers,omitempty"`
 }
 
+// ParentBasedSamplingMode defines the enablement mode for parent-based sampling.
+type ParentBasedSamplingMode string
+
+const (
+  // ParentBasedSamplingModeEnabled explicitly enables parent-based sampling.
+  ParentBasedSamplingModeEnabled ParentBasedSamplingMode = "Enabled"
+  // ParentBasedSamplingModeDisabled explicitly disables parent-based sampling.
+  ParentBasedSamplingModeDisabled ParentBasedSamplingMode = "Disabled"
+  // ParentBasedSamplingModeImplementationDefault means that the code should
+  // use the implementation's default behavior for parent-based sampling.
+  ParentBasedSamplingModeImplementationDefault ParentBasedSamplingMode = "ImplementationDefault"
+)
+
 // ParentBasedSampling defines the sampling behavior when a request has a pre-existing upstream
 // trace parent.
 //
 // Support: Extended
 type ParentBasedSampling struct {
-  // Mode explicitly controls if parent-based sampling is enabled. Valid values are "On" or "Off".
+  // Mode explicitly controls if parent-based sampling is enabled. Valid values are "Enabled",
+  // "Disabled", "ImplementationDefault".
   //
-  // Defaults to "On" if parent-based sampling is configured.
+  // In the absence of this field, it defaults to "ImplementationDefault".
   //
   // Support: Extended
   //
-  // +kubebuilder:validation:Enum=On;Off
-  // +kubebuilder:default=On
-  Mode TelemetryMode `json:"mode,omitempty"`
+  // +kubebuilder:validation:Enum=Enabled;Disabled;ImplementationDefault
+  // +kubebuilder:default=ImplementationDefault
+  Mode ParentBasedSamplingMode `json:"mode,omitempty"`
   
   // SamplingRate is the sampling rate to apply when parent-based sampling is active.
   //
