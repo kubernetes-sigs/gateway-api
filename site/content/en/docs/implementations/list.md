@@ -96,6 +96,7 @@ class.
 - [Airlock Microgateway][34]
 - [Cilium][16]
 - [Google Kubernetes Engine][6]
+- [Gravitee Kubernetes Operator][42]
 - [HAProxy Ingress][7]
 - [Istio][9]
 - [kgateway][37]
@@ -113,7 +114,6 @@ class.
 - [Calico][46]
 - [Envoy Gateway][18]
 - [Gloo Gateway][5]
-- [Gravitee Kubernetes Operator][42]
 
 ## Service Mesh Implementation Status <a name="meshes"></a>
 
@@ -313,6 +313,15 @@ v1.5.0 release for the GATEWAY_HTTP conformance profile.
 [gke-gateway]:https://cloud.google.com/kubernetes-engine/docs/concepts/gateway-api
 [gke-gateway-deploy]:https://cloud.google.com/kubernetes-engine/docs/how-to/deploying-gateways
 [gke-multi-cluster-gateway]:https://cloud.google.com/kubernetes-engine/docs/how-to/deploying-multi-cluster-gateways
+
+### Gravitee Kubernetes Operator
+
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.6.1-Gravitee%20Kubernetes%20Operator-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.6/gravitee)
+
+The [Gravitee Kubernetes Operator](https://documentation.gravitee.io/gravitee-kubernetes-operator-gko) (GKO) lets you manage [Gravitee](https://www.gravitee.io/) APIs, applications, and other assets in a Kubernetes-native and declarative way.
+
+
+For support, feedback, or to engage in a discussion about the Gravitee Kubernetes Operator, please feel free to submit an [issue](https://github.com/gravitee-io/issues/issues) or visit our community [forum](https://community.gravitee.io/c/support/gravitee-kubernetes-operator-gko/26).
 
 ### HAProxy Ingress
 
