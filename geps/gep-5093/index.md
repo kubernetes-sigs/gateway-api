@@ -188,7 +188,19 @@ status:
 
 ## Open Questions
 
+### Well-known values
+
 * Scopes between `Cluster` and `External` (e.g. VPC-internal, corporate WAN) are left to domain-prefixed values. Should the spec recommend a common domain prefix (e.g. `gateway.networking.k8s.io/VPC`, `gateway.networking.k8s.io/Internal`) for widely-used intermediate scopes, so that implementations converge on shared names rather than each inventing their own? This would provide a middle ground between the two well-known values and fully vendor-specific prefixes.
+
+### Status condition semantics
+
+* This GEP currently sets `Programmed=True` with a reason of `AddressesPartiallyAssigned` to surface partial address satisfaction. A dedicated condition for address routability (analogous to `ResolvedRefs` for references) seems more appropriate, so that users do not need to inspect the reason on an otherwise-successful `Programmed` condition. This should be revisited during Experimental.
+
+### Per-address attributes
+
+* Some implementations may need per-address configuration beyond `routability` (e.g. load balancer class, traffic policy). If so, the principle should be that addresses sharing the same routability value and IP family MUST produce equivalent routing results, but MAY carry distinct implementation-specific metadata. Whether and how to expose such metadata (and how to avoid an open-ended `map[string]string`) is currently deferred to a follow-on proposal.
+
+### External address provisioning
 
 * The `External` definition requires that the reported address MUST NOT be from the cluster's service networking range, while explicitly scoping out how the implementation internally provisions that address (e.g. a LoadBalancer backed by a Service with a ClusterIP). Is this distinction clear enough, or should the spec say more about the boundary between the reported address and the implementation's internal plumbing?
 
