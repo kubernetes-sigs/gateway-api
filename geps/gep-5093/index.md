@@ -148,12 +148,6 @@ When a Gateway supplies multiple addresses that share the same effective attribu
 * Making equivalence a MUST implies an admission policy which is out of scope for this proposal. If an operator wishes to deny clients access to a particular address on a particular listener, this should be allowed.
 * Per-address or per-client authn/authz decisions remain permitted.
 
-**Routing to Equivalent Addresses**
-
-Implementations SHOULD support round-robin as a strategy for distributing traffic equally between listeners.
-
-Round-robin among such addresses is a viable strategy; this establishes a floor of interchangeability, not a recommended algorithm.
-
 ### Hostname Addresses
 
 For addresses of `type: Hostname`, the `routability` value is expected to apply to any addresses the hostname resolves to. That is, a `type: Hostname` address with `routability: Cluster` carries the same reachability expectations as a `type: IPAddress` with `routability: Cluster`. Operators are responsible for ensuring that the hostname's resolution is consistent with the declared scope.
@@ -196,6 +190,10 @@ status:
 ### Well-known values
 
 * Scopes between `Cluster` and `External` (e.g. VPC-internal, corporate WAN) are left to domain-prefixed values. Should the spec recommend a common domain prefix (e.g. `gateway.networking.k8s.io/VPC`, `gateway.networking.k8s.io/Internal`) for widely-used intermediate scopes, so that implementations converge on shared names rather than each inventing their own? This would provide a middle ground between the two well-known values and fully vendor-specific prefixes.
+
+### Traffic distribution across equivalent addresses
+
+* When a Gateway has multiple addresses in the same equivalence class, should the spec recommend a default distribution strategy (e.g. round-robin) to prevent implementations from funneling all traffic to a single address? The equivalence statement establishes that such addresses are interchangeable, but does not currently guide implementations on whether or how to actively balance across them.
 
 ### Per-address attributes
 
