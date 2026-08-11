@@ -2,7 +2,12 @@ apiVersion: internal.gateway.networking.k8s.io/v1alpha1
 kind: GEPDetails
 number: 1651
 name: Gateway Routability
-status: Provisional
+status: Declined
 authors:
   - dprotaso
   - sunjayBhatia
+relationships:
+  obsoletedBy:
+    - number: 5093
+      name: Gateway Address Routability
+      description: Moves routability from a Gateway-level field to individual addresses.

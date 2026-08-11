@@ -1,0 +1,12 @@
+apiVersion: internal.gateway.networking.k8s.io/v1alpha1
+kind: GEPDetails
+number: 5093
+name: Gateway Address Routability
+status: Provisional
+authors:
+  - usize
+relationships:
+  obsoletes:
+    - number: 1651
+      name: Gateway Routability
+      description: GEP-1651 proposed Gateway-level routability; this GEP moves routability to individual addresses.
