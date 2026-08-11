@@ -411,29 +411,6 @@ type TracingProvider struct {
   Headers []v1.HTTPHeader `json:"headers,omitempty"`
 }
 
-// Fraction represents a ratio used for probabilistic sampling rates.
-//
-// The probability is calculated as numerator / denominator (e.g. 5 / 100 = 5%).
-//
-// Support: Core (within Tracing feature)
-//
-// +kubebuilder:validation:XValidation:rule="has(self.denominator) ? self.numerator <= self.denominator : self.numerator <= 100",message="numerator cannot be greater than denominator"
-type Fraction struct {
-  // Numerator specifies the top of the fraction.
-  //
-  // +required
-  Numerator int32 `json:"numerator"`
-
-  // Denominator specifies the bottom of the fraction.
-  //
-  // Defaults to 100 if unspecified.
-  //
-  // +kubebuilder:default=100
-  // +kubebuilder:validation:Minimum=1
-  // +optional
-  Denominator int32 `json:"denominator,omitempty"` // Allows e.g., 1 / 10000 for 0.01%
-}
-
 // ParentBasedSampling defines the sampling behavior when a request has a pre-existing upstream
 // trace parent.
 //
