@@ -126,8 +126,8 @@ func TestConformanceOptions_EmptyYAML(t *testing.T) {
 }
 
 func TestConformanceOptions_PartialYAML(t *testing.T) {
-	// A YAML file that sets only a subset of fields (here meshName and a
-	// single timeoutConfig entry) must override exactly those fields and
+	// A YAML file that sets only a subset of fields (here meshName and selected
+	// timeoutConfig entries) must override exactly those fields and
 	// preserve defaults for everything else, including sibling fields
 	// inside timeoutConfig.
 	opts := loadConfigurableOptionsFromYAML(t, "data/test-conformance-options-partial.yaml")
@@ -136,6 +136,7 @@ func TestConformanceOptions_PartialYAML(t *testing.T) {
 
 	assert.Equal(t, "partial-only", opts.MeshName)
 	assert.Equal(t, 5*time.Second, opts.TimeoutConfig.DeleteTimeout)
+	assert.Equal(t, 5, opts.TimeoutConfig.RequiredConsecutiveSuccesses)
 	assert.Equal(t, 75*time.Second, opts.TimeoutConfig.TCPRouteMustHaveCondition)
 	assert.Equal(t, 90*time.Second, opts.TimeoutConfig.UDPRouteMustHaveCondition)
 	// Sibling timeout fields keep their default values.

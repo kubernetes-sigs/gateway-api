@@ -39,3 +39,11 @@ func TestSetupTimeoutConfigAppliesAllDefaults(t *testing.T) {
 	assert.Equal(t, defaults.ListenerSetListenersMustHaveConditions, cfg.ListenerSetListenersMustHaveConditions)
 	assert.Equal(t, defaults.RequiredConsecutiveSuccesses, cfg.RequiredConsecutiveSuccesses)
 }
+
+func TestTimeoutConfigUnmarshalsRequiredConsecutiveSuccesses(t *testing.T) {
+	cfg := DefaultTimeoutConfig()
+
+	require.NoError(t, json.Unmarshal([]byte(`{"requiredConsecutiveSuccesses":5}`), &cfg))
+
+	assert.Equal(t, 5, cfg.RequiredConsecutiveSuccesses)
+}
