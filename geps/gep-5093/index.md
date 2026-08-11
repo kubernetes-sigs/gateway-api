@@ -140,7 +140,7 @@ Some existing implementations may currently assign non-globally-routable address
 
 ### Address Equivalence
 
-When a Gateway supplies multiple addresses with the same routability value and the same IP family (IPv4 or IPv6), traffic to any of those addresses SHOULD produce equivalent results. Implementations SHOULD NOT specialize listener or routing behavior within such a set.
+When a Gateway supplies multiple addresses that share the same effective attributes -- routability value, IP family (IPv4 or IPv6), and any future or implementation-specific per-address attributes -- traffic to any of those addresses SHOULD produce equivalent results. Implementations SHOULD NOT specialize listener or routing behavior within such a set. This definition is intentionally extensible: as new per-address attributes are introduced, they narrow the equivalence class rather than conflicting with it.
 
 **Exceptions to Address Equivalence**
 
