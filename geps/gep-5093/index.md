@@ -71,7 +71,7 @@ The split was deliberate: reachability is a prerequisite for egress, but its sco
 
 ## API
 
-**TODO**: Concrete type definitions will be added once there is consensus on the motivation, values, and field placement described below. This includes the `routability` field on `GatewaySpecAddress` and `GatewayStatusAddress`, as well as a new `GatewayConditionReason` for `AddressesPartiallyAssigned`.
+**TODO**: Concrete type definitions will be added once there is consensus on the motivation, values, and field placement described below. This includes the `routability` field on `GatewaySpecAddress` and `GatewayStatusAddress`, as well as a new `GatewayConditionType` `AddressesAssigned` with reasons `Assigned`, `PartiallyAssigned`, and `NotAssigned`.
 
 ### Routability Field
 
@@ -103,20 +103,25 @@ If a requested routability cannot be satisfied, the correct behavior is to leave
 
 #### Full and Partially Accepted Address Entry Semantics
 
+A new `AddressesAssigned` condition is added to Gateway status to surface address assignment outcomes independently of `Programmed`.
+
 If ***all*** spec address entries can be satisfied, the implementation programs the Gateway normally.
+
+* MUST set `Programmed=True`
+* MUST set `AddressesAssigned=True` with reason `Assigned`
 
 If ***some***, but not all, entries can be satisfied, the implementation SHOULD program the Gateway using the addresses it can satisfy. If the Gateway is partially programmed:
 
 * MUST set `Programmed=True`
-* MUST surface the partial failure(s) with reason `AddressesPartiallyAssigned`, with a message enumerating the unsatisfied entries.
+* MUST set `AddressesAssigned=False` with reason `PartiallyAssigned`, with a message enumerating the unsatisfied entries.
 * MUST display *only* satisfied addresses in `status.addresses`.
 
 Vendors that opt to reject partially satisfied address entries MUST follow the same semantics as the "no entries can be satisfied" behavior below.
 
 If ***no*** entries can be satisfied, the Gateway MUST NOT be programmed. The implementation
 
-* MUST set `Programmed=False`
-* MUST use the existing reason, `AddressNotAssigned`
+* MUST set `Programmed=False` with reason `AddressNotAssigned`
+* MUST set `AddressesAssigned=False` with reason `NotAssigned`
 
 When `routability` is omitted from a spec address entry, the implementation MAY provision whatever routability it supports.
 
@@ -192,10 +197,6 @@ status:
 
 * Scopes between `Cluster` and `External` (e.g. VPC-internal, corporate WAN) are left to domain-prefixed values. Should the spec recommend a common domain prefix (e.g. `gateway.networking.k8s.io/VPC`, `gateway.networking.k8s.io/Internal`) for widely-used intermediate scopes, so that implementations converge on shared names rather than each inventing their own? This would provide a middle ground between the two well-known values and fully vendor-specific prefixes.
 
-### Status condition semantics
-
-* This GEP currently sets `Programmed=True` with a reason of `AddressesPartiallyAssigned` to surface partial address satisfaction. A dedicated condition for address routability (analogous to `ResolvedRefs` for references) seems more appropriate, so that users do not need to inspect the reason on an otherwise-successful `Programmed` condition. This should be revisited during Experimental.
-
 ### Per-address attributes
 
 * Some implementations may need per-address configuration beyond `routability` (e.g. load balancer class, traffic policy). If so, the principle should be that addresses sharing the same routability value and IP family MUST produce equivalent routing results, but MAY carry distinct implementation-specific metadata. Whether and how to expose such metadata (and how to avoid an open-ended `map[string]string`) is currently deferred to a follow-on proposal.
@@ -208,8 +209,9 @@ status:
 
 **TODO**: Conformance details will be developed as the proposal matures beyond Provisional. At a minimum, the following should be testable:
 
-* An implementation that cannot satisfy **any** requested routability sets `Programmed=False` with reason `AddressNotAssigned`.
-* An implementation that satisfies **some but not all** requested routabilities programs the Gateway with the satisfiable addresses and surfaces the partial failure in status (reason `AddressesPartiallyAssigned`).
+* An implementation that satisfies **all** requested routabilities sets `AddressesAssigned=True` with reason `Assigned`.
+* An implementation that satisfies **some but not all** requested routabilities programs the Gateway with the satisfiable addresses and sets `AddressesAssigned=False` with reason `PartiallyAssigned`.
+* An implementation that cannot satisfy **any** requested routability sets `Programmed=False` and `AddressesAssigned=False` with reason `NotAssigned`.
 * An implementation never provisions an address whose routability differs from the one requested for that entry.
 
 Support is expected to be an Extended conformance feature.
