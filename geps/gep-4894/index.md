@@ -68,6 +68,7 @@ The current approach to adding Gateway-specific behavior to Services is through 
 
 - **Introduce Backend resource** as a namespace-scoped, consumer-focused resource for representing destinations and their Gateway-specific connection metadata
 - **Decorate existing Services**: Allow `Backend` of type `EndpointSelector` to wrap a `Service` (or other endpoint-producing resource) with TLS, protocol, and other connection configuration, without modifying the underlying Service
+- **Unblock backend-level features for Services**: Allow Backend to bind to a Kubernetes `Service` for endpoint resolution
 - **Support external destinations**: Provide first-class `ExternalHostname` support as an Extended feature, replacing the need for synthetic `ExternalName` Services
 - **Provide a home for backend-level configuration**: Inline TLS, protocol metadata, and (in the future) retries, session persistence, load balancing, and other destination-bound settings
 - **Maintain Service compatibility**: Existing Service-based `backendRef`s continue to work indefinitely; Backend is additive, not a replacement
@@ -216,9 +217,8 @@ type BackendSpec struct {
   ExternalHostname *ExternalHostnameBackend `json:"externalHostname,omitempty"`
 
   // EndpointSelector specifies the configuration for an EndpointSelector backend. Only used if type is EndpointSelector.
-  // As defined in GEP-4731, creation of a `Backend` of type `EndpointSelector` should result in `Backend` controllers
+  // As defined in KEP-6116, creation of a `Backend` of type `EndpointSelector` should result in `Backend` controllers
   // creating the requisite `EndpointSelector` resource and setting ownerReferences appropriately.
-  // TODO: Add link when GEP-4731 merges.
   // +optional
   EndpointSelector *EndpointSelectorBackend `json:"endpointSelector,omitempty"`
 
@@ -287,10 +287,20 @@ type BackendPort struct {
 
 // +kubebuilder:validation:ExactlyOneOf=SelectorRef,Selector
 type EndpointSelectorBackend struct {
-  // SelectorRef specifies the reference to the EndpointSelector resource that manages the EndpointSlices for this backend.
+  // SelectorRef specifies a reference to a resource whose EndpointSlices should be used for this backend.
+  //
+  // Supported kinds:
+  // - Service (Core): Uses the Service's EndpointSlices for endpoint resolution. Only the "service backend"
+  //   role is used — the ClusterIP, DNS name, and other "service frontend" properties are ignored.
+  //   Only ClusterIP and headless (clusterIP: None)
+  //   Services are supported. ExternalName, NodePort, and LoadBalancer Service types MUST be rejected, as
+  //   they carry frontend semantics that are not relevant to Backend's consumer-focused role.
+  // - EndpointSelector (Core): References an EndpointSelector resource that manages the EndpointSlices
+  //   for this backend.
+  //
   // If omitted, the controller creating this Backend is expected to create an EndpointSelector
   // resource on behalf of the user and set ownerReferences appropriately so that the lifecycle
-  // of the EndpointSelector is tied to this Backend (as described in GEP-4731).
+  // of the EndpointSelector is tied to this Backend (as described in KEP-6116).
   // Cross-namespace references are allowed and indicate a consumer override.
   // +optional
   SelectorRef *ObjectReference `json:"selectorRef"`
@@ -603,9 +613,44 @@ spec:
 
 Backends MUST live in the same namespace as any route (or other parent resource) that references them. For `EndpointSelector` type Backends, consumer override scenarios are supported using the pre-existing GAMMA pattern of creating a route (and therefore a `Backend`) in the consumer namespace and the `Backend` will reference an `EndpointSelector` in a different, producer namespace.
 
-## EndpointSelector Type
+## EndpointSelector Types
 
-TODO: Reference GEP 4731 once it merges.
+### EndpointSelector Resource
+
+The EndpointSelector resource is being pursued upstream via
+[KEP-6116](https://github.com/kubernetes/enhancements/issues/6116). Once available, `SelectorRef` will accept
+`kind: EndpointSelector` to reference it. EndpointSelector decomposes the endpoint selection role of Service into a
+standalone resource, giving Gateway API a clean abstraction for endpoint resolution without the baggage of Service's
+frontend concerns (ClusterIP, DNS).
+
+### Service Binding
+
+Without Service binding, the `EndpointSelector` Backend type can only be used once the upstream EndpointSelector
+resource (KEP-6116) is available. Since KEP-6116 targets Kubernetes 1.38 at the earliest and Gateway API policy
+requires GA+5 versions for Standard dependencies, that timeline would block Backend from being usable for internal
+Services for years. This would prevent backend-level features like session persistence, retries, and load balancing
+from progressing, despite significant community demand.
+
+To unblock this, `SelectorRef` accepts `kind: Service` for endpoint resolution. This allows Backend to reference an
+existing Kubernetes Service today, enabling the full range of Backend configuration (TLS, protocol, session
+persistence, etc.) for internal Services without waiting for EndpointSelector.
+
+**What Service binding does:**
+
+- The implementation resolves the Service's EndpointSlices, the same way it does for a `kind: Service` backendRef
+  today. No new controllers or endpoint management logic is required.
+- Only the "service backend" role is used. The ClusterIP, DNS name, and other "service frontend" properties are
+  ignored.
+- Only `ClusterIP` and headless (`clusterIP: None`) Services are supported. `ExternalName`, `NodePort`, and
+  `LoadBalancer` types MUST be rejected.
+- Service binding does not add new capabilities to Service itself. All configuration (TLS, protocol, session
+  persistence) lives on the Backend resource.
+
+**What happens when EndpointSelector lands:**
+
+Service binding uses the same `SelectorRef` field that will accept `kind: EndpointSelector`. Both kinds coexist —
+there are no plans to deprecate `kind: Service`, as it provides a simpler path for users who do not need the
+additional flexibility of EndpointSelector.
 
 ## Extension Framework
 
@@ -677,11 +722,11 @@ This GEP follows the standard [Gateway API graduation criteria](/docs/concepts/v
 
 ### Implementable
 
-- [ ] Backend resource CRD with full schema validation
-- [ ] Documentation and examples for common use cases
+- [x] Backend resource CRD with full schema validation
 
 ### Experimental
 
+- [ ] Documentation and examples for common use cases
 - [ ] Basic conformance tests for FQDN and Service destination types
 - [ ] Security review and RBAC documentation
 
@@ -716,3 +761,22 @@ Using only policy attachment without a dedicated Backend resource was considered
 - **Policy target ambiguity**: Policies would still need to target synthetic Services
 - **Extension limitations**: Protocol and connection options don't fit policy patterns well
 - **CRD proliferation**: Each new backend-level concern would require its own policy CRD, leading to poor discoverability and implementation complexity. The Backend resource provides a single home for configuration that describes "how to connect to a destination"
+
+### Gateway API EndpointSelector CRD
+
+A [provisional GEP](https://github.com/kubernetes-sigs/gateway-api/pull/4731) proposed defining an EndpointSelector CRD
+within Gateway API as the sole endpoint selection reference for Backend, never promoting it past experimental and
+replacing it with the upstream EndpointSelector ([KEP-6116](https://github.com/kubernetes/enhancements/issues/6116))
+once available. This was rejected because:
+
+- **No stable EndpointSlice controller library**: The proposal was to provide a common library rather than each
+  implementation building its own. However, the upstream EndpointSlice controller in `k/k` is tightly coupled to its
+  Kubernetes version and SIG Network maintainers were reluctant to commit to it as a stable, importable library.
+- **Timeline**: KEP-6116 targets Kubernetes 1.38 at the earliest. Gateway API's policy of depending only on GA+5
+  resources means EndpointSelector would not be available for Standard graduation for years, blocking backend-level
+  features like session persistence.
+- **Throwaway work**: Implementations would build against a CRD that would eventually be replaced by the upstream
+  resource.
+
+Instead, `SelectorRef` accepts `kind: Service` for endpoint resolution today, using the same `ObjectReference` field
+that will accept `kind: EndpointSelector` once KEP-6116 is available.
