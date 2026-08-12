@@ -217,8 +217,6 @@ type BackendSpec struct {
   ExternalHostname *ExternalHostnameBackend `json:"externalHostname,omitempty"`
 
   // EndpointSelector specifies the configuration for an EndpointSelector backend. Only used if type is EndpointSelector.
-  // As defined in KEP-6116, creation of a `Backend` of type `EndpointSelector` should result in `Backend` controllers
-  // creating the requisite `EndpointSelector` resource and setting ownerReferences appropriately.
   // +optional
   EndpointSelector *EndpointSelectorBackend `json:"endpointSelector,omitempty"`
 
@@ -285,32 +283,28 @@ type BackendPort struct {
   Port PortNumber `json:"port,omitempty" protobuf:"bytes,3,opt,name=port"`
 }
 
-// +kubebuilder:validation:ExactlyOneOf=SelectorRef,Selector
 type EndpointSelectorBackend struct {
   // SelectorRef specifies a reference to a resource whose EndpointSlices should be used for this backend.
   //
   // Supported kinds:
-  // - Service (Core): Uses the Service's EndpointSlices for endpoint resolution. Only the "service backend"
-  //   role is used — the ClusterIP, DNS name, and other "service frontend" properties are ignored.
-  //   Only ClusterIP and headless (clusterIP: None)
-  //   Services are supported. ExternalName, NodePort, and LoadBalancer Service types MUST be rejected, as
-  //   they carry frontend semantics that are not relevant to Backend's consumer-focused role.
-  // - EndpointSelector (Core): References an EndpointSelector resource that manages the EndpointSlices
-  //   for this backend.
+  // - Service (Core): Only the Service's EndpointSlices are used for endpoint resolution. All other
+  //   Service spec fields - including ClusterIP, DNS, internalTrafficPolicy, externalTrafficPolicy,
+  //   sessionAffinity, and trafficDistribution - are not used. Only ClusterIP and headless (clusterIP: None)
+  //   Services are supported. ExternalName, NodePort, and LoadBalancer Service types MUST be rejected.
   //
-  // If omitted, the controller creating this Backend is expected to create an EndpointSelector
-  // resource on behalf of the user and set ownerReferences appropriately so that the lifecycle
-  // of the EndpointSelector is tied to this Backend (as described in KEP-6116).
   // Cross-namespace references are allowed and indicate a consumer override.
-  // +optional
-  SelectorRef *ObjectReference `json:"selectorRef"`
-
-  // Selector defines the label selector used to identify the set of pods whose IP addresses
-  // will make up the endpoints that this Backend should route traffic to.
-  // This field is only used if SelectorRef is not specified.
-  // We make this an embedded struct to avoid stuttering in the API (i.e. `selector.selector`).
-  // +optional
-  *metav1.LabelSelector
+  //
+  // <gateway:util:excludeFromCRD>
+  // Notes for implementers:
+  //
+  // When the upstream EndpointSelector resource (KEP-6116) reaches GA,
+  // SelectorRef will also accept kind: EndpointSelector. Implementations
+  // should anticipate this field becoming optional and supporting additional
+  // kinds in the future.
+  // </gateway:util:excludeFromCRD>
+  //
+  // +required
+  SelectorRef ObjectReference `json:"selectorRef"`
 }
 
 // +kubebuilder:validation:XValidation:rule="self.mode == 'ClientAndServer' ? has(self.clientCertificateRef) : !has(self.clientCertificateRef)",message="clientCertificateRef must be set if and only if mode is ClientAndServer"
@@ -373,11 +367,7 @@ type BackendParentStatus struct {
   // https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#typical-status-properties
   // conditions represent the current state of the Backend resource.
   // Each condition has a unique type and reflects the status of a specific aspect of the resource.
-  //
-  // Standard condition types include:
-  // - "Available": the resource is fully functional
-  // - "Progressing": the resource is being created or updated
-  // - "Degraded": the resource failed to reach or maintain its desired state
+  // See BackendConditionType for defined condition types.
   //
   // The status of each condition is one of True, False, or Unknown.
   // +listType=map
@@ -385,6 +375,38 @@ type BackendParentStatus struct {
   // +optional
   Conditions []metav1.Condition `json:"conditions,omitempty"`
 }
+
+// BackendConditionType is a type of condition for a Backend.
+type BackendConditionType string
+
+// BackendConditionReason is a reason for a Backend condition.
+type BackendConditionReason string
+
+const (
+  // This condition indicates whether the Backend has been accepted by a controller.
+  BackendConditionAccepted BackendConditionType = "Accepted"
+
+  // This reason is used with the "Accepted" condition when the Backend has been accepted.
+  BackendReasonAccepted BackendConditionReason = "Accepted"
+
+  // This condition indicates whether all references in the Backend spec have been resolved.
+  BackendConditionResolvedRefs BackendConditionType = "ResolvedRefs"
+
+  // This reason is used with the "ResolvedRefs" condition when all references have been resolved.
+  BackendReasonResolvedRefs BackendConditionReason = "ResolvedRefs"
+
+  // This reason is used with the "ResolvedRefs" condition when the SelectorRef references
+  // an unknown or unsupported Group and/or Kind.
+  BackendReasonInvalidKind BackendConditionReason = "InvalidKind"
+
+  // This reason is used with the "ResolvedRefs" condition when the SelectorRef references
+  // a resource that does not exist.
+  BackendReasonRefNotFound BackendConditionReason = "RefNotFound"
+
+  // This reason is used with the "ResolvedRefs" condition when the referenced Service has
+  // a type that is not supported (only ClusterIP and headless Services are valid).
+  BackendReasonInvalidServiceType BackendConditionReason = "InvalidServiceType"
+)
 ```
 
 ### ExternalHostname Backend Configuration
@@ -620,8 +642,29 @@ Backends MUST live in the same namespace as any route (or other parent resource)
 The EndpointSelector resource is being pursued upstream via
 [KEP-6116](https://github.com/kubernetes/enhancements/issues/6116). Once available, `SelectorRef` will accept
 `kind: EndpointSelector` to reference it. EndpointSelector decomposes the endpoint selection role of Service into a
-standalone resource, giving Gateway API a clean abstraction for endpoint resolution without the baggage of Service's
-frontend concerns (ClusterIP, DNS).
+standalone resource, giving Gateway API a clean abstraction for endpoint resolution without the overhead of Service's
+frontend concerns (ClusterIP, DNS, kube-proxy NAT/filtering rules, CoreDNS reconciliation, etc.).
+
+When EndpointSelector is available, the following API changes are expected:
+
+```go
+// +kubebuilder:validation:ExactlyOneOf=SelectorRef,Selector
+type EndpointSelectorBackend struct {
+  // SelectorRef becomes optional when Selector is supported.
+  // +optional
+  SelectorRef *ObjectReference `json:"selectorRef"`
+
+  // Selector defines the label selector used to identify the set of pods whose IP addresses
+  // will make up the endpoints that this Backend should route traffic to.
+  // This field is only used if SelectorRef is not specified.
+  // We make this an embedded struct to avoid stuttering in the API (i.e. `selector.selector`).
+  // If omitted, the controller creating this Backend is expected to create an EndpointSelector
+  // resource on behalf of the user and set ownerReferences appropriately so that the lifecycle
+  // of the EndpointSelector is tied to this Backend.
+  // +optional
+  *metav1.LabelSelector
+}
+```
 
 ### Service Binding
 
@@ -639,8 +682,9 @@ persistence, etc.) for internal Services without waiting for EndpointSelector.
 
 - The implementation resolves the Service's EndpointSlices, the same way it does for a `kind: Service` backendRef
   today. No new controllers or endpoint management logic is required.
-- Only the "service backend" role is used. The ClusterIP, DNS name, and other "service frontend" properties are
-  ignored.
+- Only the Service's EndpointSlices are used for endpoint resolution. All other Service spec fields - including
+  `ClusterIP`, DNS, `internalTrafficPolicy`, `externalTrafficPolicy`, `sessionAffinity`, and `trafficDistribution` -
+  are not used.
 - Only `ClusterIP` and headless (`clusterIP: None`) Services are supported. `ExternalName`, `NodePort`, and
   `LoadBalancer` types MUST be rejected.
 - Service binding does not add new capabilities to Service itself. All configuration (TLS, protocol, session
@@ -648,7 +692,7 @@ persistence, etc.) for internal Services without waiting for EndpointSelector.
 
 **What happens when EndpointSelector lands:**
 
-Service binding uses the same `SelectorRef` field that will accept `kind: EndpointSelector`. Both kinds coexist —
+Service binding uses the same `SelectorRef` field that will accept `kind: EndpointSelector`. Both kinds coexist -
 there are no plans to deprecate `kind: Service`, as it provides a simpler path for users who do not need the
 additional flexibility of EndpointSelector.
 
@@ -780,3 +824,10 @@ once available. This was rejected because:
 
 Instead, `SelectorRef` accepts `kind: Service` for endpoint resolution today, using the same `ObjectReference` field
 that will accept `kind: EndpointSelector` once KEP-6116 is available.
+
+## Open Questions
+
+### Cross-namespace SelectorRef references
+
+We need to figure out whether cross-namespace `SelectorRef` references require a `ReferenceGrant`, consistent with
+other cross-namespace backend references in Gateway API.
