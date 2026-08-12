@@ -1863,6 +1863,8 @@ spec:
                       type: string
                     sessionPersistence:
                       description: |-
+                        Deprecated: use the Backend resource for session persistence (GEP-4894).
+
                         SessionPersistence defines and configures session persistence
                         for the route rule.
 
