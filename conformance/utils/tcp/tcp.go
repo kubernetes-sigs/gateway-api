@@ -72,7 +72,7 @@ func MakeTCPRequestAndExpectEventuallyValidResponse(t *testing.T, timeoutConfig 
 		}
 	}
 	dialer := makeClient(tlsConfig)
-	WaitForValidTCPResponse(t, dialer, gwAddr, expected, timeoutConfig.MaxTimeToConsistency)
+	WaitForValidTCPResponse(t, dialer, gwAddr, expected, timeoutConfig)
 }
 
 // WaitForConsistentTCPResponse - repeats the provided request until it completes with a response having
@@ -82,7 +82,7 @@ func MakeTCPRequestAndExpectEventuallyValidResponse(t *testing.T, timeoutConfig 
 // - WelcomeMessage matches
 // - IS_TLS message matches
 // - TEST message matches assertions
-func WaitForValidTCPResponse(t *testing.T, dialer Dialer, gwAddr string, expected ExpectedResponse, maxTimeToConsistency time.Duration) {
+func WaitForValidTCPResponse(t *testing.T, dialer Dialer, gwAddr string, expected ExpectedResponse, timeoutConfig config.TimeoutConfig) {
 	t.Helper()
 	closeAndLog := func(t *testing.T, cl net.Conn, err error) bool {
 		if err != nil {
@@ -95,10 +95,16 @@ func WaitForValidTCPResponse(t *testing.T, dialer Dialer, gwAddr string, expecte
 	}
 
 	assert.Eventually(t, func() bool {
-		client, err := dialer.DialContext(t.Context(), "tcp", gwAddr)
+		attemptCtx, cancel := context.WithTimeout(t.Context(), timeoutConfig.RequestTimeout)
+		defer cancel()
+
+		client, err := dialer.DialContext(attemptCtx, "tcp", gwAddr)
 		if err != nil {
 			tlog.Logf(t, "client could not connect: %s; retrying", err)
 			return false
+		}
+		if deadlineErr := client.SetDeadline(time.Now().Add(timeoutConfig.RequestTimeout)); deadlineErr != nil {
+			return closeAndLog(t, client, deadlineErr)
 		}
 		tlog.Logf(t, "tcp client connected")
 		message, err := bufio.NewReader(client).ReadString('\n')
@@ -135,7 +141,7 @@ func WaitForValidTCPResponse(t *testing.T, dialer Dialer, gwAddr string, expecte
 		// At this moment we can simply assume the message will be right, or fail
 		assertTestMessage(t, payload, expected)
 		return true
-	}, maxTimeToConsistency, time.Second)
+	}, timeoutConfig.MaxTimeToConsistency, timeoutConfig.DefaultPollInterval)
 
 	tlog.Logf(t, "Request passed")
 }
@@ -211,11 +217,11 @@ func EchoSendOnce(ctx context.Context, gwAddr string, timeout time.Duration) (st
 // can be established, or fails the test if the timeout expires. It only verifies
 // that the address accepts TCP connections; it does not validate an echo response
 // or backend selection.
-func ExpectAddressBeAvailable(t *testing.T, interval, timeout time.Duration, address string) {
+func ExpectAddressBeAvailable(t *testing.T, timeoutConfig config.TimeoutConfig, address string) {
 	t.Helper()
 
 	tlog.Logf(t, "performing TCP connection probe on %s", address)
-	err := wait.PollUntilContextTimeout(t.Context(), interval, timeout, true,
+	err := wait.PollUntilContextTimeout(t.Context(), timeoutConfig.DefaultPollInterval, timeoutConfig.MaxTimeToConsistency, true,
 		func(ctx context.Context) (bool, error) {
 			var dialer net.Dialer
 			conn, err := dialer.DialContext(ctx, "tcp", address)
@@ -230,5 +236,5 @@ func ExpectAddressBeAvailable(t *testing.T, interval, timeout time.Duration, add
 
 			return true, nil
 		})
-	require.NoError(t, err, "failed waiting for TCP connection to %s after %v", address, timeout)
+	require.NoError(t, err, "failed waiting for TCP connection to %s after %v", address, timeoutConfig.MaxTimeToConsistency)
 }

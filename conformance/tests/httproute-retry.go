@@ -198,7 +198,7 @@ var HTTPRouteRetry = confsuite.ConformanceTest{
 func assertConsistentRetryBehaviour(t *testing.T, suite *confsuite.ConformanceTestSuite, gwAddr string, ns string, path string, values url.Values, response http.Response) {
 	t.Helper()
 
-	http.AwaitConvergence(t, suite.TimeoutConfig.RequiredConsecutiveSuccesses, suite.TimeoutConfig.MaxTimeToConsistency, func(elapsed time.Duration) bool {
+	http.AwaitConvergence(t, suite.TimeoutConfig, func(elapsed time.Duration) bool {
 		// regenerate UUID on each probe so the retry simulation handler in the echo-basic backend tracks retries independently
 		values.Set("uuid", uuid.New().String())
 

@@ -128,12 +128,13 @@ type TimeoutConfig struct {
 	// RequiredConsecutiveSuccesses is the number of requests that must succeed in a row
 	// to consider a response "consistent" before making additional assertions on the response body.
 	// If this number is not reached within MaxTimeToConsistency, the test will fail.
-	RequiredConsecutiveSuccesses int
+	RequiredConsecutiveSuccesses int `json:"requiredConsecutiveSuccesses"`
 }
 
-// UnmarshalJSON ensures time.Duration values are parsed correctly.
+// UnmarshalJSON ensures time.Duration values are parsed correctly while other
+// supported fields retain their standard JSON unmarshalling behavior.
 func (tc *TimeoutConfig) UnmarshalJSON(data []byte) error {
-	var raw map[string]any
+	var raw map[string]json.RawMessage
 	if err := json.Unmarshal(data, &raw); err != nil {
 		return err
 	}
@@ -148,19 +149,31 @@ func (tc *TimeoutConfig) UnmarshalJSON(data []byte) error {
 		if jsonTag == "" {
 			continue
 		}
-		if field.Type != durationType {
-			return fmt.Errorf("field %q has json tag but unsupported type %s; "+
-				"TimeoutConfig.UnmarshalJSON only supports time.Duration fields", field.Name, field.Type)
-		}
 		val, ok := raw[jsonTag]
 		if !ok {
 			continue
 		}
-		d, err := parseDuration(val)
-		if err != nil {
-			return fmt.Errorf("field %q: %w", jsonTag, err)
+		switch {
+		case field.Type == durationType:
+			var durationValue any
+			if err := json.Unmarshal(val, &durationValue); err != nil {
+				return fmt.Errorf("field %q: %w", jsonTag, err)
+			}
+			d, err := parseDuration(durationValue)
+			if err != nil {
+				return fmt.Errorf("field %q: %w", jsonTag, err)
+			}
+			v.Field(i).SetInt(int64(d))
+		case field.Type.Kind() == reflect.Int:
+			var intValue int
+			if err := json.Unmarshal(val, &intValue); err != nil {
+				return fmt.Errorf("field %q: %w", jsonTag, err)
+			}
+			v.Field(i).SetInt(int64(intValue))
+		default:
+			return fmt.Errorf("field %q has json tag but unsupported type %s; "+
+				"TimeoutConfig.UnmarshalJSON only supports time.Duration and int fields", field.Name, field.Type)
 		}
-		v.Field(i).SetInt(int64(d))
 	}
 
 	return nil

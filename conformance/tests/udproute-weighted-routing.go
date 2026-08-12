@@ -71,7 +71,7 @@ var UDPRouteWeightedRouting = confsuite.ConformanceTest{
 				"udp-backend-v3": 0.0,
 			}
 
-			udp.ExpectEchoResponse(t, suite.TimeoutConfig.MaxTimeToConsistency, gwAddr)
+			udp.ExpectEchoResponse(t, suite.TimeoutConfig, gwAddr)
 
 			sender := weight.NewFunctionBasedSender(func() (string, error) {
 				return udpEchoSendOnce(t.Context(), gwAddr, 2*time.Second)

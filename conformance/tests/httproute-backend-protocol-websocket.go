@@ -54,11 +54,8 @@ var HTTPRouteBackendProtocolWebSocket = confsuite.ConformanceTest{
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: ns}
 		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
 
-		threshold := suite.TimeoutConfig.RequiredConsecutiveSuccesses
-		maxTimeToConsistency := suite.TimeoutConfig.MaxTimeToConsistency
-
 		t.Run("websocket connection should reach backend", func(t *testing.T) {
-			http.AwaitConvergence(t, threshold, maxTimeToConsistency, func(_ time.Duration) bool {
+			http.AwaitConvergence(t, suite.TimeoutConfig, func(_ time.Duration) bool {
 				origin := fmt.Sprintf("ws://gateway/%s", t.Name())
 				remote := fmt.Sprintf("ws://%s/ws", gwAddr)
 
