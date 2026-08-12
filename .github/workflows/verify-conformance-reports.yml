@@ -1,0 +1,83 @@
+name: Verify Conformance Reports
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'conformance/reports/**'
+
+# Remove all permissions from GITHUB_TOKEN except metadata.
+permissions: {}
+
+jobs:
+  verify-changed-reports:
+    name: Verify Changed Reports
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # tag=v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Install yq
+        run: |
+          VERSION="v4.53.3"
+          BINARY="yq_linux_amd64"
+          wget "https://github.com/mikefarah/yq/releases/download/${VERSION}/${BINARY}" -O /tmp/yq
+          chmod +x /tmp/yq
+          sudo mv /tmp/yq /usr/local/bin/yq
+          yq --version
+
+      - name: Detect changed report directories
+        id: changed-dirs
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -e
+
+          echo "Comparing ${BASE_SHA}...${HEAD_SHA}"
+
+          # Get all changed files in conformance/reports/
+          CHANGED_FILES=$(git diff --name-only "${BASE_SHA}...${HEAD_SHA}" -- 'conformance/reports/')
+
+          if [ -z "$CHANGED_FILES" ]; then
+            echo "No conformance report changes detected"
+            echo "implementation_dirs=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "Changed files:"
+          echo "$CHANGED_FILES"
+
+          # Extract unique implementation directories (format: conformance/reports/v1.x.x/implementation-name/)
+          # Filter for directories >= v1.1.0 (matching verify-reports.sh logic)
+          IMPL_DIRS=$(echo "$CHANGED_FILES" | \
+            grep -E '^conformance/reports/v[0-9]+\.[0-9]+(\.[0-9]+)?/' | \
+            sed 's|^\(conformance/reports/v[0-9]\+\.[0-9]\+\(\.[0-9]\+\)\?/[^/]\+\)/.*|\1|' | \
+            sort -u)
+
+          if [ -z "$IMPL_DIRS" ]; then
+            echo "No valid implementation directories found in changes"
+            echo "implementation_dirs=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "Implementation directories to validate:"
+          echo "$IMPL_DIRS"
+
+          # Note: Symlink resolution and deduplication (e.g., v1.6.0 -> v1.6) is handled
+          # by verify-reports.sh to keep the logic in one place and support direct script usage
+
+          # Convert to space-separated list for script argument
+          DIRS_LIST=$(echo "$IMPL_DIRS" | tr '\n' ' ')
+          echo "implementation_dirs=${DIRS_LIST}" >> "$GITHUB_OUTPUT"
+
+      - name: Validate changed reports
+        if: steps.changed-dirs.outputs.implementation_dirs != ''
+        env:
+          DIRS: ${{ steps.changed-dirs.outputs.implementation_dirs }}
+        run: |
+          echo "Validating directories: ${DIRS}"
+          hack/verify-reports.sh ${DIRS}

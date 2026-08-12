@@ -124,6 +124,11 @@ uninstall:
 verify:
 	hack/verify-all.sh -v
 
+# Verify conformance reports.
+.PHONY: verify-reports
+verify-reports:
+	hack/verify-reports.sh
+
 # Docs
 
 PYTHON ?= $(shell if [ -x .venv/bin/python3 ]; then echo "./.venv/bin/python3"; else echo "python3"; fi)

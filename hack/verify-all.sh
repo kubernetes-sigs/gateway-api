@@ -20,7 +20,6 @@ set -o pipefail
 
 SCRIPT_ROOT=$(dirname "${BASH_SOURCE}")/..
 source "${SCRIPT_ROOT}/hack/kube-env.sh"
-PULL_BASE_REF=${PULL_BASE_REF:-}
 
 SILENT=true
 FAILED_TEST=()
@@ -39,40 +38,34 @@ function is-excluded {
 
 while getopts ":v" opt; do
   case $opt in
-    v)
-      SILENT=false
-      ;;
-    \?)
-      echo "Invalid flag: -$OPTARG" >&2
-      exit 1
-      ;;
+  v)
+    SILENT=false
+    ;;
+  \?)
+    echo "Invalid flag: -$OPTARG" >&2
+    exit 1
+    ;;
   esac
 done
 
-if $SILENT ; then
+if $SILENT; then
   echo "Running in the silent mode, run with -v if you want to see script logs."
 fi
 
-EXCLUDE="verify-all.sh"
-
-# On a release branch we must ignore the conformance reports checks
-if [[ -n "$PULL_BASE_REF" && "$PULL_BASE_REF" == release-* ]]; then
-  echo "Running on a release branch, extra tests may be ignored"
-  EXCLUDE="${EXCLUDE} verify-reports.sh"
-fi
+EXCLUDE="verify-all.sh verify-reports.sh"
 
 SCRIPTS=$(find "${SCRIPT_ROOT}"/hack -name "verify-*.sh")
 
 ret=0
-for t in $SCRIPTS;
-do
-  if is-excluded "${t}" ; then
-    echo "Skipping $t"
+for t in $SCRIPTS; do
+  echo "$(date) - Starting test ${t}"
+  if is-excluded "${t}"; then
+    echo "$(date) - Skipping $t"
     continue
   fi
-  if $SILENT ; then
+  if $SILENT; then
     echo -e "Verifying $t"
-    if bash "$t" &> /dev/null; then
+    if bash "$t" &>/dev/null; then
       echo -e "${color_green}SUCCESS${color_norm}"
     else
       echo -e "${color_red}FAILED: $t ${color_norm}"
@@ -84,10 +77,11 @@ do
       echo -e "${color_green}SUCCESS: $t ${color_norm}"
     else
       echo -e "${color_red}Test FAILED: $t ${color_norm}"
-       FAILED_TEST+=("$t")
+      FAILED_TEST+=("$t")
       ret=1
     fi
   fi
+  echo "$(date) - Finished test ${t}"
 done
 
 if [ ${#FAILED_TEST[@]} -ne 0 ]; then

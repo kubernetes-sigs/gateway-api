@@ -79,31 +79,89 @@ REPORTS_DIR=$(dirname "${BASH_SOURCE}")/../conformance/reports
 # Regex to match the report file name pattern defined in https://github.com/kubernetes-sigs/gateway-api/blob/release-1.1/conformance/reports/README.md#how-this-folder-is-structured
 EXIT_VALUE=0
 
-for dir in ${REPORTS_DIR}/*
-do
-    element="${dir##*/}"
-    if check_ge_v1.1.0 "${element}"; then
-        if [[ -d "${dir}" ]]; then
-            gateway_api_version="${element}"
-            for implementation_dir in ${dir}/*
-            do
-                implementation=$(basename "${implementation_dir}")
-                info "Checking ${implementation} project directory for Gateway API version ${gateway_api_version}"
-            
-                if [[ -f "${implementation_dir}/README.md" ]]; then
-                # Check if the README.md has broken links
-                    docker run -v $(readlink -f "$implementation_dir"):/${implementation}:ro --rm -i ghcr.io/tcort/markdown-link-check:stable /${implementation}/README.md
-                else
-                    error "missing README.md in ${implementation_dir}"
-                    EXIT_VALUE=1
-                fi
-                for report in ${implementation_dir}/*.yaml
-                do
-                    check_report_fields "${report}" "${gateway_api_version}"
-                done
-            done
-        fi
+# Function to validate a specific implementation directory
+validate_implementation_dir() {
+    local implementation_dir=$1
+    local gateway_api_version=$2
+    local implementation=$(basename "${implementation_dir}")
+
+    info "Checking ${implementation} project directory for Gateway API version ${gateway_api_version}"
+
+    if [[ -f "${implementation_dir}/README.md" ]]; then
+    # Check if the README.md has broken links
+        docker run -v "$(readlink -f "$implementation_dir"):/${implementation}:ro" --rm -i ghcr.io/tcort/markdown-link-check:stable /${implementation}/README.md
+    else
+        error "missing README.md in ${implementation_dir}"
+        EXIT_VALUE=1
     fi
-done
+    for report in "${implementation_dir}"/*.yaml
+    do
+        # Skip if no yaml files exist (glob didn't match)
+        [[ -e "${report}" ]] || continue
+        check_report_fields "${report}" "${gateway_api_version}"
+    done
+}
+
+# If specific directories are provided as arguments, validate only those
+if [[ $# -gt 0 ]]; then
+    info "Validating specific directories: $@"
+
+    # First pass: resolve symlinks and deduplicate
+    declare -A validated_dirs
+    for target_dir in "$@"
+    do
+        # Normalize path (remove trailing slash, make relative to repo root)
+        target_dir="${target_dir%/}"
+
+        # Check if directory exists
+        if [[ ! -d "${target_dir}" ]]; then
+            error "Directory does not exist: ${target_dir}"
+            EXIT_VALUE=1
+            continue
+        fi
+
+        # Resolve symlinks to canonical path
+        canonical_dir=$(readlink -f "${target_dir}")
+
+        # Check if we've already validated this canonical path
+        if [[ -v "validated_dirs[$canonical_dir]" ]]; then
+            info "Skipping ${target_dir} (already validated as ${validated_dirs[$canonical_dir]})"
+            continue
+        fi
+
+        # Extract version from the resolved canonical path
+        version=$(echo "${canonical_dir}" | sed -n 's|.*/conformance/reports/\(v[0-9]\+\.[0-9]\+\(\.[0-9]\+\)\?\)/.*|\1|p')
+        if [[ -z "${version}" ]]; then
+            error "Could not extract version from path: ${canonical_dir}"
+            EXIT_VALUE=1
+            continue
+        fi
+
+        if ! check_ge_v1.1.0 "${version}"; then
+            info "Skipping ${target_dir} (version ${version} is < v1.1.0)"
+            continue
+        fi
+
+        # Mark this canonical path as validated and store the original path for display
+        validated_dirs[$canonical_dir]="${target_dir}"
+
+        validate_implementation_dir "${canonical_dir}" "${version}"
+    done
+else
+    # No arguments provided, validate all directories (original behavior)
+    for dir in ${REPORTS_DIR}/*
+    do
+        element="${dir##*/}"
+        if check_ge_v1.1.0 "${element}"; then
+            if [[ -d "${dir}" ]]; then
+                gateway_api_version="${element}"
+                for implementation_dir in ${dir}/*
+                do
+                    validate_implementation_dir "${implementation_dir}" "${gateway_api_version}"
+                done
+            fi
+        fi
+    done
+fi
 
 exit ${EXIT_VALUE}
