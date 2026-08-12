@@ -1923,6 +1923,16 @@ spec:
                               minLength: 1
                               pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
                               type: string
+                            path:
+                              default: /
+                              description: |-
+                                Path defines the cookie Path attribute. When not specified,
+                                implementations MUST default the cookie path to "/".
+
+
+                                Support: Extended
+                              maxLength: 1024
+                              type: string
                           type: object
                         header:
                           description: |-

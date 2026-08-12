@@ -277,6 +277,11 @@ func (in *CookieConfig) DeepCopyInto(out *CookieConfig) {
 		*out = new(CookieName)
 		**out = **in
 	}
+	if in.Path != nil {
+		in, out := &in.Path, &out.Path
+		*out = new(string)
+		**out = **in
+	}
 	if in.LifetimeType != nil {
 		in, out := &in.LifetimeType, &out.LifetimeType
 		*out = new(CookieLifetimeType)

@@ -41,6 +41,18 @@ type CookieConfigApplyConfiguration struct {
 	//
 	// Support: Extended
 	Name *apisv1.CookieName `json:"name,omitempty"`
+	// Path defines the cookie Path attribute. When not specified,
+	// implementations MUST default the cookie path to "/".
+	//
+	// <gateway:util:excludeFromCRD>
+	// This field is Extended because not all dataplanes support
+	// configuring the cookie path (e.g. HAProxy hardcodes path=/).
+	// Implementations SHOULD support this field if the underlying
+	// dataplane allows setting the cookie path attribute.
+	// </gateway:util:excludeFromCRD>
+	//
+	// Support: Extended
+	Path *string `json:"path,omitempty"`
 	// LifetimeType specifies whether the cookie has a permanent or
 	// session-based lifetime. A permanent cookie persists until its
 	// specified expiry time, defined by the Expires or Max-Age cookie
@@ -74,6 +86,14 @@ func CookieConfig() *CookieConfigApplyConfiguration {
 // If called multiple times, the Name field is set to the value of the last call.
 func (b *CookieConfigApplyConfiguration) WithName(value apisv1.CookieName) *CookieConfigApplyConfiguration {
 	b.Name = &value
+	return b
+}
+
+// WithPath sets the Path field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the Path field is set to the value of the last call.
+func (b *CookieConfigApplyConfiguration) WithPath(value string) *CookieConfigApplyConfiguration {
+	b.Path = &value
 	return b
 }
 

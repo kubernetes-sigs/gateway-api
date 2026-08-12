@@ -352,6 +352,9 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: name
       type:
         scalar: string
+    - name: path
+      type:
+        scalar: string
 - name: io.k8s.sigs.gateway-api.apis.v1.ForwardBodyConfig
   map:
     fields:

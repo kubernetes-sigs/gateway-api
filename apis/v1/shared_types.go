@@ -1002,6 +1002,23 @@ type CookieConfig struct {
 	// +optional
 	Name *CookieName `json:"name,omitempty"`
 
+	// Path defines the cookie Path attribute. When not specified,
+	// implementations MUST default the cookie path to "/".
+	//
+	// <gateway:util:excludeFromCRD>
+	// This field is Extended because not all dataplanes support
+	// configuring the cookie path (e.g. HAProxy hardcodes path=/).
+	// Implementations SHOULD support this field if the underlying
+	// dataplane allows setting the cookie path attribute.
+	// </gateway:util:excludeFromCRD>
+	//
+	// Support: Extended
+	//
+	// +optional
+	// +kubebuilder:default="/"
+	// +kubebuilder:validation:MaxLength=1024
+	Path *string `json:"path,omitempty"`
+
 	// LifetimeType specifies whether the cookie has a permanent or
 	// session-based lifetime. A permanent cookie persists until its
 	// specified expiry time, defined by the Expires or Max-Age cookie
