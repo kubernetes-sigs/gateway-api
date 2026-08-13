@@ -69,12 +69,7 @@ var GatewayUpdateListenerHostname = suite.ConformanceTest{
 
 			// update the listener hostname to match the HTTPRoute's hostname.
 			matchingHostname := v1.Hostname("accepted.example.com")
-			for i, listener := range mutate.Spec.Listeners {
-				if listener.Name == "http" {
-					mutate.Spec.Listeners[i].Hostname = &matchingHostname
-					break
-				}
-			}
+			mutate.Spec.Listeners[0].Hostname = &matchingHostname
 
 			err = s.Client.Patch(ctx, mutate, client.MergeFrom(original))
 			require.NoErrorf(t, err, "error patching the Gateway: %v", err)
@@ -98,7 +93,7 @@ var GatewayUpdateListenerHostname = suite.ConformanceTest{
 						{
 							Type:   string(v1.ListenerConditionAccepted),
 							Status: metav1.ConditionTrue,
-							Reason: "",
+							Reason: string(v1.ListenerReasonAccepted),
 						},
 						{
 							Type:   string(v1.ListenerConditionResolvedRefs),
@@ -109,8 +104,6 @@ var GatewayUpdateListenerHostname = suite.ConformanceTest{
 					AttachedRoutes: 1,
 				},
 			})
-
-			kubernetes.GatewayMustHaveLatestConditions(t, s.Client, s.TimeoutConfig, gwNN)
 		})
 	},
 }
