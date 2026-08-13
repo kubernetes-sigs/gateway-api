@@ -288,20 +288,16 @@ type EndpointSelectorBackend struct {
   //
   // Supported kinds:
   // - Service (Core): Only the Service's EndpointSlices are used for endpoint resolution. All other
-  //   Service spec fields - including ClusterIP, DNS, internalTrafficPolicy, externalTrafficPolicy,
-  //   sessionAffinity, and trafficDistribution - are not used. Only ClusterIP and headless (clusterIP: None)
-  //   Services are supported. ExternalName, NodePort, and LoadBalancer Service types MUST be rejected.
+  //   Service spec fields - including but not limited to ClusterIP, DNS, internalTrafficPolicy,
+  //   externalTrafficPolicy, sessionAffinity, and trafficDistribution - are not used. Only ClusterIP
+  //   and headless (clusterIP: None) Services are supported. ExternalName, NodePort, and LoadBalancer
+  //   Service types MUST be rejected.
+  //
+  // Note: Support for kind: Service is temporary and will be deprecated once the
+  // upstream EndpointSelector resource (KEP-6116) is available. Users are expected
+  // to migrate to EndpointSelector at that point.
   //
   // Cross-namespace references are allowed and indicate a consumer override.
-  //
-  // <gateway:util:excludeFromCRD>
-  // Notes for implementers:
-  //
-  // When the upstream EndpointSelector resource (KEP-6116) reaches GA,
-  // SelectorRef will also accept kind: EndpointSelector. Implementations
-  // should anticipate this field becoming optional and supporting additional
-  // kinds in the future.
-  // </gateway:util:excludeFromCRD>
   //
   // +required
   SelectorRef ObjectReference `json:"selectorRef"`
@@ -682,9 +678,9 @@ persistence, etc.) for internal Services without waiting for EndpointSelector.
 
 - The implementation resolves the Service's EndpointSlices, the same way it does for a `kind: Service` backendRef
   today. No new controllers or endpoint management logic is required.
-- Only the Service's EndpointSlices are used for endpoint resolution. All other Service spec fields - including
-  `ClusterIP`, DNS, `internalTrafficPolicy`, `externalTrafficPolicy`, `sessionAffinity`, and `trafficDistribution` -
-  are not used.
+- Only the Service's EndpointSlices are used for endpoint resolution. All other Service spec fields - including but not
+  limited to `ClusterIP`, DNS, `internalTrafficPolicy`, `externalTrafficPolicy`, `sessionAffinity`, and
+  `trafficDistribution` - are not used.
 - Only `ClusterIP` and headless (`clusterIP: None`) Services are supported. `ExternalName`, `NodePort`, and
   `LoadBalancer` types MUST be rejected.
 - Service binding does not add new capabilities to Service itself. All configuration (TLS, protocol, session
@@ -692,9 +688,9 @@ persistence, etc.) for internal Services without waiting for EndpointSelector.
 
 **What happens when EndpointSelector lands:**
 
-Service binding uses the same `SelectorRef` field that will accept `kind: EndpointSelector`. Both kinds coexist -
-there are no plans to deprecate `kind: Service`, as it provides a simpler path for users who do not need the
-additional flexibility of EndpointSelector.
+Service binding is temporary. It uses the same `SelectorRef` field that will accept `kind: EndpointSelector`, so both
+kinds can coexist during migration. Once `kind: EndpointSelector` is available, users are expected to migrate to it,
+and `kind: Service` will be deprecated.
 
 ## Extension Framework
 
