@@ -98,6 +98,7 @@ class.
 - [Google Kubernetes Engine][6]
 - [Gravitee Kubernetes Operator][42]
 - [HAProxy Ingress][7]
+- [Higress][49]
 - [Istio][9]
 - [kgateway][37]
 - [Kong Operator][35] 
@@ -157,6 +158,7 @@ class.
 [46]:#calico
 [47]:#sunbeam-proxy
 [48]:#wso2-gateway
+[49]:#higress
 
 
 [gamma]: /docs/mesh/
@@ -332,6 +334,18 @@ For support, feedback, or to engage in a discussion about the Gravitee Kubernete
 HAProxy Ingress is a conformant Gateway API implementation since `v0.17`. It implements all core features from the standard channel, as well as TLSRoute and TCPRoute APIs from the experimental channel.
 
 [h1]:https://haproxy-ingress.github.io/
+
+### Higress
+
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.6.0-Higress-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.6/higress-group-higress)
+
+[Higress](https://higress.ai/) is a cloud-native API gateway built on Istio and
+Envoy. It provides Kubernetes Gateway API and Ingress support alongside API
+management and AI gateway capabilities. Higress is an open source
+[CNCF project](https://www.cncf.io/projects/higress/).
+
+Source code, documentation, and issue tracking are available in the
+[Higress repository](https://github.com/higress-group/higress).
 
 ### Istio
 
