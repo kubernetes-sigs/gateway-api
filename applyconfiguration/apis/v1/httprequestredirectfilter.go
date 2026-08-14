@@ -87,7 +87,14 @@ type HTTPRequestRedirectFilterApplyConfiguration struct {
 	// Accepted Condition for the Route to `status: False`, with a
 	// Reason of `UnsupportedValue`.
 	//
-	// Support: Core
+	// Support: statusCode 301 and 302 are Core; all others are Extended.
+	//
+	// <gateway:util:excludeFromCRD>
+	// Extended codes have their own features:
+	// HTTPRoute303RedirectStatusCode,
+	// HTTPRoute307RedirectStatusCode, and
+	// HTTPRoute308RedirectStatusCode
+	// </gateway:util:excludeFromCRD>
 	StatusCode *int `json:"statusCode,omitempty"`
 }
 
