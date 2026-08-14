@@ -151,8 +151,7 @@ endif
 .PHONY: install-deps
 install-deps:
 	cd site && npm install
-	if [ ! -d .venv ]; then python3 -m venv .venv; fi
-	.venv/bin/pip install --index-url https://pypi.org/simple pandas PyYAML semver python-frontmatter tabulate
+	pip install --index-url https://pypi.org/simple pandas PyYAML semver python-frontmatter tabulate
 
 .PHONY: docs
 docs: install-deps
