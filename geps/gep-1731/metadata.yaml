@@ -7,6 +7,7 @@ status: Experimental
 # their GitHub handle.
 authors:
   - mikemorris
+  - snorwin
 relationships:
   # obsoletes indicates that a GEP makes the linked GEP obsolete, and completely
   # replaces that GEP. The obsoleted GEP MUST have its obsoletedBy field
