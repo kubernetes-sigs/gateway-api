@@ -1,17 +1,17 @@
 ---
-title: "GEP-5091: PayloadProcessor Resource"
+title: "GEP-5091: PayloadProcessor Resource - Internal Processing"
 ---
 
 * Issue: [#5091](https://github.com/kubernetes-sigs/gateway-api/issues/5091)
   * Incubated by the [AI Gateway Working Group](https://github.com/kubernetes-sigs/wg-ai-gateway/blob/main/proposals/7-payload-processing.md)
 * Status: Provisional
 
-## TLDR
+## Summary
 
 This GEP proposes a new `PayloadProcessor` resource that enables declarative,
 ordered processing of HTTP request and response **payloads** (headers *and*
 body) within the Gateway API framework. Today, Gateway API filters operate on
-headers, paths, and query parameters — but cannot inspect or act on the request
+headers, paths, and query parameters — but do not define mechanisms for acting on the request and response
 body. Modern workloads, particularly AI inference, require body-level
 processing for routing, security, and compliance decisions.
 
@@ -24,11 +24,11 @@ Processors execute sequentially with per-processor failure modes, enabling
 composable processing pipelines such as "extract model name from body → set
 routing header → reject if PII detected."
 
-While the API surface supports both InProcess and ExtProcess processor types,
-this GEP's initial scope is limited to InProcess header and body field mutation
-from request body content, which has been validated by a
-[proof-of-concept implementation]. The ExtProcess processing protocol
-standardization is deferred to a follow-on GEP.
+While the envision API would supports both InProcess and ExtProcess processor types,
+this GEP's scope is limited to InProcess header and body field mutation
+from request and response body content, which has been validated by a
+[proof-of-concept implementation]. The ExtProcess API and protocol
+standardization is deferred to a follow-up GEP.
 
 [GEP-713]: https://gateway-api.sigs.k8s.io/geps/gep-713/
 [proof-of-concept implementation]: https://github.com/kubernetes-sigs/wg-ai-gateway/pull/56
@@ -42,13 +42,14 @@ method. There is no standardized mechanism for Gateway API implementations to
 inspect or act on the **body** of a request or response. This gap creates
 friction in several areas:
 
-### No Body Access in Gateway API
+### No API Mechanism for Response Access and Modification
 
 Gateway API's `HTTPRoute` filters (`RequestHeaderModifier`,
-`RequestRedirect`, `URLRewrite`, `RequestMirror`, `ExtensionRef`) all operate
-on request metadata. None can read or act on the request body. This means
-common patterns like "route based on a field in the JSON body" require
-implementation-specific extensions with no portability.
+`RequestRedirect`, `URLRewrite`, `RequestMirror`, `ExtensionRef`, `ExternalAuth`) all operate
+on request metadata. They can read the request body but none can read or act on the response body. This means
+patterns for response access and modification require
+implementation-specific extensions with no portability or are incompatible
+with the required protocol (ext_authz).
 
 ### AI Inference Requires Body-Level Decisions
 
@@ -61,13 +62,17 @@ implementation of the pluggable BBR framework proposed by [Gateway API Inference
 This proposal is in a draft state and the reference implementation is no longer
 within the GAIE repo.
 
-### External Processing Varies Per Proxy
+### No Standard Mechanism for In-Process Payload Actions
 
-Envoy's `ext_proc` filter, NGINX's `mirror` and Lua scripting, and other proxy
-mechanisms provide body processing capabilities, but each uses a different
-protocol and configuration model. There is no Kubernetes-native abstraction for
-"send this request's body to an external service for processing before
-routing."
+A significant class of payload processing consists of deterministic field-level
+operations: reading a value from a JSON body, copying it into a header,
+removing a field, or setting a field to a fixed value. These operations require
+no external state or networking calls, and can be performed locally by
+existing data planes. The only portable option is to forward the entire payload to an
+external service, which adds a network round trip and requires a separately
+deployed, scaled, and secured workload. Equivalent in-process mechanisms exist
+across data planes but are not united under a common API and expression language.
+For example, Envoy's [`transform` filter](https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/transform_filter) and [`json_to_metadata` filter](https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/json_to_metadata_filter) provide similar functionality, but are not portable across implementations like agentgateway. 
 
 ### Composability Gap
 
@@ -85,12 +90,9 @@ external services or implementation-specific chaining mechanisms.
 * Introduce a `PayloadProcessor` resource as a namespace-scoped, policy-attached
   resource for declaring ordered payload processing steps on HTTP requests and
   responses.
-* Support **InProcess** processors that use CEL expressions to extract data from
-  request bodies and mutate headers and body fields, enabling body-based routing
+* Support **InProcess** processors that support a standard set of CEL expressions and functions to extract data from
+  request and response bodies and mutate headers and body fields, enabling body-based routing
   without external services.
-* Support **ExtProcess** processors that delegate payload processing to external
-  gRPC services referenced via `backendRef`, enabling arbitrary processing
-  logic (security scanning, PII detection, semantic analysis).
 * Provide per-processor **failure modes** (`FailClosed`, `FailOpen`) to enable
   safe composition of security-critical and optimization processors.
 * Define **ordered, sequential execution** with short-circuit rejection — if
@@ -98,16 +100,10 @@ external services or implementation-specific chaining mechanisms.
 * Support attachment to both `Gateway` (pre-routing, applies to all traffic)
   and `HTTPRoute` (post-routing, applies to matched traffic) via the standard
   policy attachment pattern ([GEP-713]).
-* Ensure the API is extensible for future capabilities (response body mutation,
-  body rewriting, metadata extraction) without breaking changes.
+* Ensure the API is extensible for future capabilities (`ExtProcess`) without breaking changes.
 
 ## Non-Goals
 
-* **Standardizing the ExtProc protocol**: The wire protocol between the gateway
-  and external processor services (gRPC service definition, message format,
-  streaming semantics) is explicitly deferred to a follow-on GEP. This GEP
-  defines the Kubernetes resource API only; implementations may use Envoy
-  ext_proc, a custom gRPC protocol, or other mechanisms.
 * **Replacing existing HTTPRoute filters**: PayloadProcessor complements, not
   replaces, existing filters. Header-only operations should continue to use
   `RequestHeaderModifier` and similar filters.
@@ -120,18 +116,43 @@ external services or implementation-specific chaining mechanisms.
   defined, but the API does not currently distinguish between request and response
   processing for ExtProc. [agentgateway's implementation] can be referenced as prior
   art.
-* **Develop a CEL standard library**: While CEL is the recommended expression language for InProcess processors, the
-  development of a standard library of CEL functions for common payload processing
-  tasks (JSON parsing, string manipulation, semantic similarity) is deferred to
-  future work. However, for the payload processor resource to be portable and have
-  consistent behavior across implementations, CEL standardization is a critical
-  dependency that must be addressed in parallel.
-
-[agentgateway's implementation]: https://github.com/agentgateway/agentgateway/pull/1787
+* **TCP/UDP/TLS payload processing**: These protocols lack the structured,
+  inspectable body and header-matching model this resource depends on. Support
+  for GRPCRoute is possible for future work, but is not in scope for this GEP.
 
 ## User Stories
 
-### As an AI Platform Engineer
+A processor belongs in **InProcess** when it is deterministic, requires no
+external state, no network call, and no model inference, and completes in
+bounded CPU time. Reading a field, rewriting a field, applying a default,
+removing a field, and matching a fixed pattern all satisfy this test. These
+operations are strong candidates for in-process execution for three reasons
+beyond latency:
+
+* **Buffering can be derived from the expression.** An implementation can
+  determine from the processor's expressions whether the body is needed at all,
+  and buffer only when it is. An external processor must fix its buffering
+  behavior at configuration time, before any request is seen.
+* **Sensitive data does not leave the proxy.** Prompts, credentials, and
+  regulated fields are not serialized across a pod boundary to a second
+  workload.
+* **It runs before routing without an added hop.** Pre-routing processing sits
+  ahead of every other decision in the request path.
+
+A processor belongs in **ExtProcess** when it needs something the data plane
+fundamentally does not have: a trained model, external state, or a large and
+frequently updated ruleset.
+
+Note that this boundary does not split cleanly by *problem domain*. PII
+handling appears on both sides — deterministic pattern-based detection and
+field redaction are in-process, while classifier-based detection is external.
+The test is the nature of the computation, not the category of the use case.
+The exact boundary is implementation-defined, but the following stories
+illustrate the distinction.
+
+### InProcess Use Cases
+
+#### As an AI Platform Engineer
 
 > "I want to route inference requests to the correct model backend based on the
 > `model` field in the JSON request body, without modifying my application or
@@ -139,37 +160,70 @@ external services or implementation-specific chaining mechanisms.
 > Body-Based Router API and implementation, but I want a portable Gateway API
 > solution."
 
-### As a Security Engineer
+#### As a Platform Engineer
 
-> "I want to add a processing step that scans inference request bodies for
-> prompt injection attacks and PII before they reach the model backend. If the
-> scan detects a threat, the request should be rejected with a clear error. If
-> the scanning service is unavailable, the request should be rejected
-> (fail-closed) for security processors but allowed through (fail-open) for
-> non-critical enrichment processors."
+> "I want to normalize inference requests before they reach a backend. I want to
+> force usage accounting, apply defaults for fields the client omitted,
+> and reject requests that are missing a required field. Today this requires
+> either changing every client or deploying an external service to edit two
+> keys in a JSON document."
 
-### As a Compliance Officer
+#### As a Compliance Officer
 
-> "I want to examine both inference requests and responses for personally
-> identifiable information so that PII can be blocked, sanitized, or reported.
-> I need this to be declarative, auditable, and composable with other
-> processing steps."
+> "I want to strip known sensitive fields from request and response bodies, and
+> reject payloads matching a defined pattern, so that regulated data never
+> reaches a backend or a client. Because the data is sensitive, I specifically
+> do not want it forwarded to an additional service in order to be inspected. I
+> need this to be declarative, auditable, and composable with other processing
+> steps."
 
-### As a Developer of Agentic AI Platforms
+#### As a Developer of Agentic AI Platforms
 
 > "I need to process Model Context Protocol (MCP) request payloads to extract
 > tool names and session identifiers for routing decisions. I want to set
 > headers based on payload attributes so the gateway can route to the correct
 > backend MCP server."
 
-### As a Cluster Administrator
+#### As an API Owner
+
+> "I want to enrich requests with context derived from the payload and the
+> verified caller identity — request identifiers for tracing, tenant headers
+> for downstream attribution — without adding a network hop to a request that
+> is otherwise served entirely from cache."
+
+### ExtProcess Use Cases
+
+The following stories motivate the `ExtProcess` extension point. The
+`ExtProcess` API and its wire protocol are deferred to a follow-up GEP, but the
+resource is shaped so they can be added without breaking changes.
+
+#### As a Security Engineer
+
+> "I want to add a processing step that classifies inference request bodies for
+> prompt injection attacks before they reach the model backend. Detection
+> requires a trained model, so it cannot run in the data plane. If the scan
+> detects a threat, the request should be rejected with a clear error. If the
+> scanning service is unavailable, the request should be rejected (fail-closed)
+> for security processors but allowed through (fail-open) for non-critical
+> enrichment processors."
+
+#### As a Compliance Officer
+
+> "I want to examine inference responses for personally identifiable
+> information that cannot be expressed as a fixed pattern, so that it can be
+> blocked, sanitized, or reported. This requires a detection model, and I accept
+> the additional hop in exchange for the detection quality."
+
+#### As a Cluster Administrator
 
 > "I want to add semantic caching to inference requests — detecting repeated
 > or semantically similar requests and returning cached results to reduce
-> inference costs and improve latency. This requires reading the request body
-> to compute similarity, which no current Gateway API resource supports."
+> inference costs and improve latency. This requires computing embeddings and
+> querying a vector store, neither of which belongs in the data plane."
 
-### As a Gateway API Implementation Author
+### Applies to Both
+
+#### As a Gateway API Implementation Author
 
 > "I want a clear, standardized resource definition for payload processing so
 > I can implement it consistently. I need the specification to be unambiguous
@@ -181,37 +235,6 @@ external services or implementation-specific chaining mechanisms.
 The `PayloadProcessor` resource is a namespace-scoped, policy-attached resource
 that declares an ordered list of processors to be applied to HTTP request
 and/or response payloads.
-
-### Resource Overview
-
-```
-┌─────────────────────────────────────────────────┐
-│  PayloadProcessor                               │
-│  targetRef: Gateway or HTTPRoute                │
-│  phase: PreRouting | PostRouting                 │
-│  processors:                                    │
-│    ┌─────────────────────────────────────────┐   │
-│    │ [0] extract-model (InProcess)           │   │
-│    │     CEL: json(request.body).model       │   │
-│    │     → Set X-Gateway-Model-Name header   │   │
-│    │     failureMode: FailClosed             │   │
-│    ├─────────────────────────────────────────┤   │
-│    │ [1] scan-pii (ExtProcess)               │   │
-│    │     backendRef: pii-scanner:4444        │   │
-│    │     failureMode: FailClosed             │   │
-│    ├─────────────────────────────────────────┤   │
-│    │ [2] enrich-context (ExtProcess)         │   │
-│    │     backendRef: context-service:8080    │   │
-│    │     failureMode: FailOpen               │   │
-│    └─────────────────────────────────────────┘   │
-└──────────────────┬──────────────────────────────┘
-                   │ targetRef
-                   ▼
-┌─────────────────────────────────────────────────┐
-│  Gateway or HTTPRoute                           │
-│  (standard routing continues after processing)  │
-└─────────────────────────────────────────────────┘
-```
 
 ### API Definition
 
@@ -231,6 +254,7 @@ spec:
     group: gateway.networking.k8s.io
     kind: Gateway          # or HTTPRoute
     name: my-gateway
+    sectionName: http # optional, targets a specific Listener or ListenerSet (or HTTPRouteRule name)
 
   # phase determines when processors execute relative to route selection.
   # PreRouting: before HTTPRoute matching (targets Gateway or ListenerSet)
@@ -242,7 +266,7 @@ spec:
   # are skipped and the request is rejected.
   processors:
   - name: extract-model             # unique within this resource, 1-63 chars
-    type: InProcess                  # InProcess or ExtProcess
+    type: InProcess                  # InProcess or ExtProcess (deferred to follow-up GEP)
     failureMode: FailClosed          # FailClosed (default) or FailOpen
     timeout: "500ms"                 # optional per-processor timeout
 
@@ -267,19 +291,6 @@ spec:
         # removeBodyFields: remove body fields by name (JSONPath)
         removeBodyFields:
         - name: '$.user_email'                # JSONPath
-
-  - name: pii-scanner
-    type: ExtProcess
-    failureMode: FailClosed
-    timeout: "1s"
-
-    # extProcess: configuration for external processor.
-    # Required when type is ExtProcess.
-    extProcess:
-      backendRef:
-        kind: Service
-        name: pii-scanner-service
-        port: 4444
 ```
 
 ### Phase Model
@@ -334,9 +345,9 @@ to extract data from the request body and mutate request headers and body
 fields. This is the primary mechanism for body-based routing and lightweight
 request transformation.
 
-**CEL Context Available:**
+**CEL Standard Library:**
 
-TODO: Define a CEL standard library for payload processing with functions like `json()`, `form.decode()`, and `merge()`.
+Multiple GEPs have called out the need for a standard set of CEL attributes (ex. Telemetry). This motivates the creation of a set of supported attributes for Gateway API. The [OTEL semantic conventions](https://opentelemetry.io/docs/specs/semconv/registry/attributes/http/) has laid a strong foundation for a dictionary of attributes. Defining the standard attributes is not in scope for the provisional stage of this GEP, but the following attributes are proposed for discussion:
 
 | Variable | Type | Description |
 |----------|------|-------------|
@@ -345,15 +356,6 @@ TODO: Define a CEL standard library for payload processing with functions like `
 | `request.method` | `string` | HTTP method |
 | `request.path` | `string` | Request path |
 | `json(request.body)` | `map` | Parsed JSON body (convenience function) |
-
-**Header and Body Field Mutation Operations:**
-
-| Operation | Behavior |
-|-----------|----------|
-| `setHeaders` | Overwrites an existing header or creates a new one. Value is a CEL expression. |
-| `removeHeaders` | Removes a header by name. |
-| `setBodyFields` | Overwrites or creates a body field addressed by JSONPath. Value is a static value or a CEL expression evaluated over the payload body. |
-| `removeBodyFields` | Removes a body field addressed by JSONPath. |
 
 **Body Buffering:** When any CEL expression references `request.body`, or a
 processor sets or removes body fields, the gateway implementation MUST buffer
@@ -376,6 +378,7 @@ spec:
     group: gateway.networking.k8s.io
     kind: Gateway
     name: ai-gateway
+    sectionName: http
   phase: PreRouting
   processors:
   - name: extract-model
@@ -407,41 +410,6 @@ spec:
     - name: gpt4-backend
       port: 8080
 ```
-
-### ExtProcess Processors
-
-ExtProcess processors delegate payload processing to an external service
-referenced via `backendRef`. The external service receives the request payload
-and can signal approval, rejection, or header/body mutations.
-
-**Note:** The wire protocol between the gateway and the ExtProcess service is
-**not standardized by this GEP**. Implementations MAY use Envoy's ext_proc
-gRPC protocol, a custom protocol, or any other mechanism. A follow-on GEP will
-propose a standardized processing protocol.
-
-```yaml
-processors:
-- name: pii-scanner
-  type: ExtProcess
-  failureMode: FailClosed
-  timeout: "1s"
-  extProcess:
-    backendRef:
-      kind: Service
-      name: pii-scanner-service
-      port: 4444
-```
-
-**ExtProcess Service Requirements:**
-* The service MUST be reachable from the gateway data plane.
-* Implementations MUST support referencing Kubernetes `Service` resources.
-* Implementations MAY support other backend kinds (e.g., `Backend` from
-  [GEP-4488]).
-* The `timeout` field, if specified, MUST be enforced by the gateway. If the
-  external service does not respond within the timeout, the gateway MUST apply
-  the processor's `failureMode`.
-
-[GEP-4488]: https://gateway-api.sigs.k8s.io/geps/gep-4488/
 
 ### Failure Modes
 
@@ -484,42 +452,6 @@ normal point in the request lifecycle. The relative ordering is:
 PreRouting PayloadProcessors → HTTPRoute Matching → HTTPRoute Filters → PostRouting PayloadProcessors → Backend
 ```
 
-### Validation
-
-The `PayloadProcessor` CRD uses Kubernetes-native validation mechanisms:
-
-* **Schema validation**: Field types, enums, string lengths, array bounds
-  (1-16 processors, 1-63 char names, 1-256 char header names)
-* **CEL validation rules** (`x-kubernetes-validations`):
-  * Exactly one of `inProcess` or `extProcess` MUST be set per processor
-    (enforced by: `has(self.inProcess) != has(self.extProcess)`)
-  * `targetRef.kind` MUST be `Gateway` or `ListenerSet` when `phase` is
-    `PreRouting`
-  * Processor names MUST be unique within the resource
-
-### Status
-
-The `PayloadProcessor` resource reports status following the standard policy
-attachment pattern ([GEP-713]):
-
-```yaml
-status:
-  ancestors:
-  - ancestorRef:
-      group: gateway.networking.k8s.io
-      kind: Gateway
-      name: ai-gateway
-    controllerName: example.com/gateway-controller
-    conditions:
-    - type: Accepted
-      status: "True"
-      reason: Accepted
-      message: "PayloadProcessor accepted by gateway"
-    - type: Attached  # XXX: This name is under discussion
-      status: "True"
-      reason: Attached
-```
-
 ## Conformance Tiers
 
 The PayloadProcessor resource is designed with a clear separation between Core
@@ -554,16 +486,6 @@ portable, reusable way:
 A future proposal may explore re-implementing BBR using PayloadProcessor as
 the underlying mechanism, providing consistency and reducing implementation
 complexity. However, this GEP does not propose deprecating or replacing BBR.
-
-### Envoy ext_proc
-
-Envoy's [External Processing filter] provides a mature, streaming-capable
-protocol for external payload processing. PayloadProcessor's ExtProcess type is
-conceptually similar but does not mandate the Envoy ext_proc wire protocol.
-Implementations using Envoy MAY map ExtProc processors directly to Envoy
-ext_proc filters. The standardization of a common wire protocol is deferred.
-
-[External Processing filter]: https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/ext_proc_filter
 
 ### Gateway API Firewall GEP
 
@@ -609,7 +531,7 @@ are additional criteria specific to this GEP:
 
 ### Standard
 
-* At least 2 conformant implementations with production usage
+* At least 3 conformant implementations with production usage
 * Comprehensive conformance test suite covering Core and Extended features
 * ExtProc wire protocol standardized in a companion GEP
 * Documentation of body buffering limits and performance characteristics
@@ -672,9 +594,72 @@ is a significant design decision. We evaluated several alternatives:
 * **Verdict**: Too powerful and too risky for inline expressions; better
   suited for ExtProc implementations
 
+### Body Field Addressing for Body Mutation
+
+The expression language question above concerns how mutation *values* are
+computed. A separate decision is how body mutations are **addressed**: whether
+the API identifies individual fields to change, or replaces the body wholesale.
+This choice is independent of the selection of CEL for value expressions.
+
+#### JSONPath (current draft)
+
+* **Strengths**: Familiar from `kubectl -o jsonpath`; compact syntax for nested
+  access; wildcards and filters allow one expression to select many nodes.
+* **Weaknesses**: [RFC 9535] specifies JSONPath as a *query* language that
+  returns a nodelist. It does not define assignment semantics. `$.messages[*]
+  .content` is a valid query with no defined write behavior, and the results of
+  zero-match and multi-match queries would be implementation-defined. There is
+  no defined escaping for keys that themselves contain `.`, and no notation for
+  appending to an array.
+* **Verdict**: Selection semantics exceed what field mutation requires, and the
+  resulting ambiguity would have to be specified by this GEP rather than
+  inherited from the RFC.
+
+#### JSON Pointer
+
+* **Strengths**: [RFC 6901] identifies exactly one location in a document,
+  matching the semantics of `setBodyFields` and `removeBodyFields`. It defines
+  escaping (`~0` for `~`, `~1` for `/`) so keys containing separators are
+  addressable, and defines the `-` token for the position after the last array
+  element, giving array append a standard notation. Kubernetes users already
+  encounter the syntax through `kubectl patch --type=json`, which takes
+  [RFC 6902] JSON Patch documents whose `path` values are JSON Pointers.
+* **Weaknesses**: No wildcard or filter selection, so bulk operations such as
+  "redact the content of every message" cannot be expressed as a single entry.
+  Visually less familiar than JSONPath.
+* **Verdict**: Matches the single-location mutation model without inventing
+  semantics. The absence of wildcards limits only the restructuring cases,
+  which a whole-body expression serves better.
+
+#### Whole-Body CEL Expression
+
+* **Strengths**: Maximally expressive — parse, transform, and re-serialize the
+  document in a single expression, for example
+  `toJson(json(request.body).filterKeys(k, !k.startsWith("x_")).merge({...}))`.
+  Supports restructuring, conditional logic, and bulk operations that field
+  addressing cannot express. This is the mechanism used by the
+  [proof-of-concept implementation].
+* **Weaknesses**: Requires a full parse and re-serialize even to change one
+  key, which does not guarantee round-trip fidelity for key order, number
+  formatting, or unknown extension fields. The set of affected fields is not
+  statically visible in the resource, which weakens auditability and makes
+  per-operation conformance testing harder.
+* **Verdict**: Necessary for restructuring use cases. A candidate for a
+  distinct field (for example `setBody`) that can be added later without
+  breaking a field-level API.
+
+Whether field-level addressing and whole-body replacement should both exist,
+and how they would be ordered relative to each other, is unresolved. See
+[Header and Body Modification Order](#header-and-body-modification-order).
+
+[RFC 9535]: https://www.rfc-editor.org/rfc/rfc9535
+[RFC 6901]: https://www.rfc-editor.org/rfc/rfc6901
+[RFC 6902]: https://www.rfc-editor.org/rfc/rfc6902
+
 ### Inline HTTPRoute Filter vs. Separate CRD
 
-Two API shapes were considered for how payload processing is configured:
+The following API shapes were considered for how payload processing is configured.
+The final design design decision is out of scope for the provisional stage of this GEP.
 
 #### Option A: Inline HTTPRoute Filter
 
@@ -691,12 +676,12 @@ spec:
           ...
 ```
 
-* **Pro**: Familiar filter pattern; processing is visible inline with routing
-* **Con**: HTTPRoute rules can already be complex; adding processor
+* **Pros**: Familiar filter pattern; processing is visible inline with routing
+* **Cons**: HTTPRoute rules can already be complex; adding processor
   configuration (potentially 16 processors with CEL expressions, backendRefs,
   failure modes) would make HTTPRoutes unwieldy. Cannot reuse the same
   processor configuration across multiple routes. Cannot target Gateway-level
-  (pre-routing) processing.
+  (pre-routing) processing introducing the need to reevaluate routes
 
 #### Option B: Separate CRD with Policy Attachment (Chosen)
 
@@ -714,12 +699,60 @@ spec:
     ...
 ```
 
-* **Pro**: Reusable across routes; supports Gateway-level attachment;
+* **Pros**: Reusable across routes; supports Gateway-level attachment;
   consistent with GEP-713 pattern; keeps HTTPRoute focused on routing
-* **Con**: Less discoverable from HTTPRoute; requires cross-referencing
+* **Cons**: Less discoverable from HTTPRoute; requires cross-referencing
   resources
 
-**Decision**: Option B was chosen because:
+#### Option C: Rule-level HTTPRoute Filters with PayloadProcessorRef and Gateway PolicyRef
+
+This option allows a PayloadProcessor to be defined as a separate resource and referenced from an HTTPRoute
+filter. This would allow for reusability while keeping the configuration inline and ordered with other
+HTTPRoutefilters. This configuration would support the post-routing phase. However, it introduces complexity in
+the APIand doesn't capture the pre-routing use case, which is a primary motivation for this GEP. To address this
+gap, we could allow the PayloadProcessor resource to target a Gateway, but this doesn't fix the issue of ordering in the case other policy resources target the gateway.
+
+```yaml
+apiVersion: gateway.networking.k8s.io/v1alpha1
+kind: HTTPRoute
+metadata:
+  name: example-httproute
+spec:
+  parentRefs:
+  - name: example-gateway
+  hostnames:
+  - "www.example.com"
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /query
+    backendRefs:
+    - name: example-svc
+      port: 8080
+    filters:
+    - type: PayloadProcessingRef
+      payloadProcessingRef:
+        name: prompt-injection-protection
+---
+apiVersion: gateway.networking.k8s.io/v1alpha1
+kind: PayloadProcessingPipeline
+metadata:
+  name: prompt-injection-protection
+spec:
+  phase: PostRouting
+  processors:
+  - name: pii-scanner
+    type: InProcess
+    failureMode: FailClosed
+    timeout: "1s"
+    inProcess:
+      removeBodyFields:
+      - name: '$.user_email'
+      - name: '$.metadata.customer_id'
+```
+
+**Summary of considerations**
 1. Pre-routing processing (the primary use case) requires Gateway-level
    attachment, which inline filters cannot express
 2. Processing pipelines can be complex and benefit from dedicated resources
@@ -744,20 +777,11 @@ or entire pipelines:
 The following questions are under active discussion and will be resolved
 before this GEP moves to Experimental:
 
-### ExtProc Wire Protocol
-
-> What wire protocol should external processors implement?
-
-Options include extending Envoy's ext_proc v3 protocol, defining a new
-Gateway API-specific protocol, or allowing implementation-defined protocols.
-This is deferred to a companion GEP. In the interim, implementations MAY
-use any protocol.
-
 ### Processing Loops
 
 > Can a mutating PayloadProcessor trigger re-evaluation of HTTPRoute matching?
 
-The current design says no — PreRouting processors execute once, mutate
+PreRouting processors execute once, mutate
 headers, and then HTTPRoute matching occurs on the mutated headers. There is
 no re-entry. This avoids infinite loops but limits some advanced use cases.
 PostRouting processors can mutate headers, but those mutations do not affect
@@ -886,3 +910,6 @@ curl -X POST http://localhost:8080/v1/chat/completions \
 * [Gateway API Firewall GEP (#3614)](https://github.com/kubernetes-sigs/gateway-api/issues/3614)
 * [CEL Specification](https://github.com/google/cel-spec)
 * [Standard CEL Vocabulary](https://github.com/kubernetes-sigs/wg-ai-gateway/pull/57)
+* [RFC 6901: JavaScript Object Notation (JSON) Pointer](https://www.rfc-editor.org/rfc/rfc6901)
+* [RFC 6902: JavaScript Object Notation (JSON) Patch](https://www.rfc-editor.org/rfc/rfc6902)
+* [RFC 9535: JSONPath — Query Expressions for JSON](https://www.rfc-editor.org/rfc/rfc9535)
