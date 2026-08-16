@@ -82,9 +82,10 @@ There are two main contrasting sets of conformance tests:
 * Gateway related tests (can also be thought of as ingress tests)
 * Service Mesh related tests
 
-For `Gateway` tests you must enable the `Gateway` test feature, and then
-opt-in to any other specific tests you want to run (e.g. `HTTPRoute`). For
-Mesh related tests you must enable `Mesh`.
+By default, the suite infers supported features from GatewayClass and XMesh
+status. To select features manually for development, use the
+`-supported-features` flag. When this flag is set, only the listed features are
+enabled.
 
 We'll cover each use case separately, but it's also possible to combine these
 if your implementation implements both. There are also options which pertain
@@ -106,7 +107,7 @@ The following runs all the tests relevant to `Gateway`, `HTTPRoute`, and
 ```shell
 go test ./conformance -run TestConformance -args \
     --gateway-class=my-gateway-class \
-    --supported-features=Gateway,HTTPRoute
+    --supported-features=Gateway,HTTPRoute,ReferenceGrant
 ```
 
 Other useful flags may be found in [conformance flags][cflags].
@@ -148,18 +149,16 @@ go test ./conformance -run TestConformance -args \
 
 so that the test namespaces are correctly injected into the mesh.
 
-#### Excluding Tests
+#### Excluding Features
 
-The `Gateway` and `ReferenceGrant` features are enabled by default.
-You do not need to explicitly list them using the `-supported-features` flag.
-However, if you don't want to run them, you will need to disable them using
-the `-exempt-features` flag. For example, to run only the `Mesh` tests,
-and nothing else:
+The `-exempt-features` flag removes features from a manual selection. This can
+be useful when focusing on a smaller set of tests during development. For
+example, the following excludes `ReferenceGrant` tests:
 
 ```shell
 go test ./conformance -run TestConformance -args \
-    --supported-features=Mesh \
-    --exempt-features=Gateway,ReferenceGrant
+    --supported-features=Gateway,HTTPRoute,ReferenceGrant \
+    --exempt-features=ReferenceGrant
 ```
 
 #### Suite Level Options
