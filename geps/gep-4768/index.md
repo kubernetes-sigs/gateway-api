@@ -465,16 +465,15 @@ type TelemetryPolicyStatus struct {
   // For Policy Status API conventions, see:
   // https://gateway-api.sigs.k8s.io/geps/gep-713/#the-status-stanza-of-policy-objects
   //
-  // Ancestors is a list of ancestor resources (usually Gateway) that are
-  // associated with the policy, and the status of the policy with respect to
-  // each ancestor. When this policy attaches to a parent, the controller that
-  // manages the parent and the ancestors MUST add an entry to this list when
-  // the controller first sees the policy and SHOULD update the entry as
-  // appropriate when the relevant ancestor is modified.
+  // Ancestors is a list of ancestor resources (specifically Gateway resources)
+  // that are associated with the policy, and the status of the policy with
+  // respect to each ancestor. When this policy attaches to a parent, the
+  // controller that manages the parent and the ancestors MUST add an entry
+  // to this list when the controller first sees the policy and SHOULD update
+  // the entry as appropriate when the relevant ancestor is modified.
   //
-  // Note that choosing the relevant ancestor is left to the Policy designers;
-  // an important part of Policy design is designing the right object level at
-  // which to namespace this status.
+  // For TelemetryPolicy, the ancestor MUST be the Gateway resource
+  // referenced in spec.targetRefs.
   //
   // Note also that implementations MUST ONLY populate ancestor status for
   // the Ancestor resources they are responsible for. Implementations MUST
