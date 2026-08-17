@@ -210,6 +210,13 @@ const (
   TracingModeImplementationDefault TracingMode = "ImplementationDefault"
 )
 
+// AttributeName defines the key of a span attribute or tag.
+//
+// +kubebuilder:validation:MinLength=1
+// +kubebuilder:validation:MaxLength=256
+// +kubebuilder:validation:Pattern=`^[a-zA-Z0-9_.:/-]+$`
+type AttributeName string
+
 // AttributeSourceType defines the source from which a telemetry attribute
 // value is retrieved.
 //
@@ -252,7 +259,7 @@ type Attribute struct {
   // (i.e., as a span tag).
   //
   // +required
-  Name string `json:"name"`
+  Name AttributeName `json:"name"`
 
   // Type specifies where the attribute value comes from.
   // Valid values are "Header", "Literal", or "Attribute".
@@ -266,12 +273,13 @@ type Attribute struct {
   // This is required if Type is "Header".
   //
   // +optional
-  HeaderName *string `json:"headerName,omitempty"`
+  HeaderName *v1.HTTPHeaderName `json:"headerName,omitempty"`
 
   // LiteralValue specifies a static string value to attach.
   // This is required if Type is "Literal".
   //
   // +optional
+  // +kubebuilder:validation:MaxLength=1024
   LiteralValue *string `json:"literalValue,omitempty"`
 
   // AttributeKey refers to a standard OpenTelemetry attribute.
@@ -280,6 +288,9 @@ type Attribute struct {
   // See: https://opentelemetry.io/docs/specs/semconv/
   //
   // +optional
+  // +kubebuilder:validation:MinLength=1
+  // +kubebuilder:validation:MaxLength=256
+  // +kubebuilder:validation:Pattern=`^[a-z0-9_.-]+$`
   AttributeKey *string `json:"attributeKey,omitempty"`
 }
 
@@ -357,6 +368,8 @@ type TracingConfig struct {
   // Support: Extended
   //
   // +optional
+  // +kubebuilder:validation:MinLength=1
+  // +kubebuilder:validation:MaxLength=253
   ServiceName *string `json:"serviceName,omitempty"`
 
   // SpanName defines a custom name for the OTel span. By default, the name 
@@ -365,6 +378,8 @@ type TracingConfig struct {
   // Support: Extended
   //
   // +optional
+  // +kubebuilder:validation:MinLength=1
+  // +kubebuilder:validation:MaxLength=256
   SpanName *string `json:"spanName,omitempty"`
 
   // Attributes is a list of custom key-value pairs (or variables) attached to every span.
@@ -460,8 +475,6 @@ type ParentBasedSampling struct {
   // +kubebuilder:default={numerator: 100}
   SamplingRate *Fraction `json:"samplingRate,omitempty"`
 }
-
-// --- Policy Status ---
 
 // TelemetryPolicyStatus defines the observed state of TelemetryPolicy.
 type TelemetryPolicyStatus struct {
