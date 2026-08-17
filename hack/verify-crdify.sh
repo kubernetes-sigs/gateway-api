@@ -23,6 +23,7 @@ readonly SCRIPT_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 CRDIFY_ENFORCE=${CRDIFY_ENFORCE:-true}
 CRDIFY_BASE_REF=${CRDIFY_BASE_REF:-${PULL_BASE_SHA:-main}}
 REMOTE=${REMOTE:-origin}
+CRDIFY_CONFIG_FILE="${CRDIFY_CONFIG_FILE:-${SCRIPT_ROOT}/crdify.yaml}"
 
 cd "${SCRIPT_ROOT}"
 
@@ -48,7 +49,8 @@ for file in config/crd/standard/*.yaml; do
   echo -e "\n${filename}:"
   if ! ${GOTOOL} sigs.k8s.io/crdify \
     "git://${CRDIFY_BASE_REF}?path=${file}" \
-    "file://${SCRIPT_ROOT}/${file}"; then
+    "file://${SCRIPT_ROOT}/${file}" \
+    --config "${CRDIFY_CONFIG_FILE}"; then
     error_count=$((error_count + 1))
     error_files="${error_files}\n- ${filename}"
   fi
