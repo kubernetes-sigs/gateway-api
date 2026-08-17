@@ -535,6 +535,43 @@ To ensure consistent implementation of the `TelemetryPolicy` API, the following 
   * Send a request through the Gateway.
   * **Assertion**: The exported span includes the requested standard attribute.
 
+#### 4. Conflict Resolution for Multiple Policies (Core)
+* **Description**: Verify that when multiple `TelemetryPolicy` resources target the same `Gateway`, only the oldest policy is accepted, while subsequent conflicting policies are rejected with `Accepted: False` and `Reason: Conflicted`.
+* **Test**:
+  * Create `TelemetryPolicy` A targeting `Gateway` G.
+  * Create `TelemetryPolicy` B targeting the same `Gateway` G at a later creation timestamp.
+  * Send a request through the `Gateway`.
+* **Assertion**:
+  * `TelemetryPolicy` A status shows `Accepted: True`.
+  * `TelemetryPolicy` B status shows `Accepted: False` with `Reason: Conflicted`.
+  * The proxy applies the configuration from `TelemetryPolicy` A only.
+
+#### 5. Target Gateway Not Found (Core)
+* **Description**: Verify policy status behavior when a `TelemetryPolicy` references a non-existent `Gateway`.
+* **Test**:
+  * Apply a `TelemetryPolicy` with `targetRefs` pointing to a `Gateway` name that does not exist in the cluster.
+* **Assertion**:
+  * The policy's `status.ancestors` reflects `Accepted: False` with `Reason: TargetNotFound`.
+
+#### 6. Disabling Tracing (Core)
+* **Description**: Verify that updating `tracing.mode` to `Disabled` stops span emission.
+* **Test**:
+  * Apply a valid `TelemetryPolicy` with `tracing.mode: Enabled` and send traffic to confirm spans are received.
+  * Update the policy setting `tracing.mode: Disabled`.
+  * Send subsequent requests through the Gateway.
+* **Assertion**:
+  * The OTLP collector stops receiving new tracing spans after configuration propagation.
+
+#### 7. Sampling Rate Validation (Extended)
+* **Description**: Verify both valid sampling rates (0% and 100%) and invalid fraction validation.
+* **Test**:
+  * Apply a `TelemetryPolicy` with `samplingRate` set to `numerator: 0` (0% sampling) and verify 0 spans are emitted.
+  * Apply a `TelemetryPolicy` with `samplingRate` set to `numerator: 100`, `denominator: 100` (100% sampling) and verify all requests produce spans.
+  * Attempt to apply a policy where `numerator` > `denominator` (e.g., `numerator: 150`, `denominator: 100`).
+* **Assertion**:
+  * 0% sampling emits no spans; 100% sampling emits spans for every request.
+  * Invalid fraction configuration (`numerator > denominator`) is rejected by schema validation or flagged as `Accepted: False` with `Reason: Invalid`.
+
 ## Open Questions
 
 1. **Standard OpenTelemetry Attribute Dictionary**: 
