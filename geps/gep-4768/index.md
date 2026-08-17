@@ -452,9 +452,12 @@ type ParentBasedSampling struct {
   // filter so that it can respect the parent's intent while still controlling the volume
   // of spans reported.
   //
+  // In the absence of this field, it defaults to 100% ({numerator: 100}).
+  //
   // Support: Extended
   //
   // +optional
+  // +kubebuilder:default={numerator: 100}
   SamplingRate *Fraction `json:"samplingRate,omitempty"`
 }
 
