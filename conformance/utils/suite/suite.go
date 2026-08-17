@@ -78,6 +78,7 @@ type ConformanceTestSuite struct {
 	TimeoutConfig            config.TimeoutConfig
 	SkipTests                sets.Set[string]
 	SkipProvisionalTests     bool
+	DisableParallelTests     bool
 	RunTest                  string
 	Hook                     func(t *testing.T, test ConformanceTest, suite *ConformanceTestSuite)
 	ManifestFS               []fs.FS
@@ -157,6 +158,11 @@ type ConfigurableOptions struct {
 	SkipTests []string `json:"skipTests"`
 	// SkipProvisionalTests indicates whether or not to skip provisional tests.
 	SkipProvisionalTests bool `json:"skipProvisionalTests"`
+	// DisableParallelTests forces all tests to run sequentially, even those
+	// marked as Parallel. Useful for debugging or for implementations that
+	// can't support concurrent test execution. This also help to run tests
+	// with limited resources.
+	DisableParallelTests bool `json:"disableParallelTests"`
 	// RunTest is a single test to run, mostly for development/debugging convenience.
 	RunTest             string                   `json:"runTest"`
 	Mode                string                   `json:"mode"`
@@ -319,6 +325,7 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 		SkipTests:                   sets.New(options.SkipTests...),
 		RunTest:                     options.RunTest,
 		SkipProvisionalTests:        options.SkipProvisionalTests,
+		DisableParallelTests:        options.DisableParallelTests,
 		ManifestFS:                  options.ManifestFS,
 		UsableNetworkAddresses:      options.UsableNetworkAddresses,
 		UnusableNetworkAddresses:    options.UnusableNetworkAddresses,
