@@ -1,4 +1,6 @@
-# GEP-4359: Gateway API Regex
+---
+title: "GEP-4359: Gateway API Regex"
+---
 
 * Issue: [#4359](https://github.com/kubernetes-sigs/gateway-api/issues/4359)
 * Status: Memorandum

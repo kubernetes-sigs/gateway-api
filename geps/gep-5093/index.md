@@ -1,4 +1,6 @@
-# GEP-5093: Gateway Address Routability
+---
+title: "GEP-5093: Gateway Address Routability"
+---
 
 * Issue: [\#5093](https://github.com/kubernetes-sigs/gateway-api/issues/5093)
 * Status: Provisional
