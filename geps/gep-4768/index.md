@@ -591,10 +591,11 @@ To ensure consistent implementation of the `TelemetryPolicy` API, the following 
 1. **Standard OpenTelemetry Attribute Dictionary**: 
    What is the minimal mandated set of standard OpenTelemetry semantic convention attributes that implementations MUST support when `type: Attribute` is used? 
    While implementations MAY support additional attributes, the exact dictionary of required attributes and how conformance will be tested needs to be determined.
-2. **Attribute Type Handling and Failure Modes**:
-   How should attribute data types (such as boolean, integer, or string) be handled and preserved when emitting custom span attributes or mapping dynamic header values? 
-   Should an optional field (e.g., `valueType`) be added to the `Attribute` struct to allow explicitly specifying the output type for custom attribute keys, while relying on OpenTelemetry Semantic Conventions for standard keys? 
-   Furthermore, what is the standardized failure handling and status condition behavior (e.g., setting `Accepted: False` with `Reason: InvalidConfig`) when type coercion fails or an invalid attribute key is supplied?
+
+## Potential Future Additions
+
+1. **Explicit Attribute Type Configuration (`valueType`)**:
+For `Attribute` sources of type `Header` or `Literal`, values currently default to strings, while `Attribute` sources rely on OpenTelemetry Semantic Conventions for type mapping. If a need arises to emit non-string types for headers or static literals, an optional `valueType` field can be added to the `Attribute` struct in a future iteration.
 
 ## Alternatives Considered
 
