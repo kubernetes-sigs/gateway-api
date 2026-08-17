@@ -110,8 +110,8 @@ spec:
         type: Literal
         literalValue: "production"
       - name: "mcp_tool_name"
-        type: Reference
-        attributeRef: "gen_ai.tool.name"
+        type: Attribute
+        attributeKey: "gen_ai.tool.name"
 ```
 
 #### Detailed Resource Description
@@ -228,12 +228,12 @@ const (
   // Support: Core
   AttributeSourceLiteral AttributeSourceType = "Literal"
 
-  // AttributeSourceReference extracts the value from a proxy-builtin reference variable
+  // AttributeSourceAttribute extracts the value from a proxy-builtin reference variable
   // mapped to OpenTelemetry Semantic Conventions (e.g., "http.request.method").
   // See: https://opentelemetry.io/docs/specs/semconv/
   //
   // Support: Extended
-  AttributeSourceReference AttributeSourceType = "Reference"
+  AttributeSourceAttribute AttributeSourceType = "Attribute"
 )
 
 // Attribute defines a single flat key-value pair to attach to traces.
@@ -246,7 +246,7 @@ const (
 // +union
 // +kubebuilder:validation:XValidation:rule="self.type == 'Header' ? has(self.headerName) : !has(self.headerName)",message="headerName is required when type is Header, and must be empty otherwise"
 // +kubebuilder:validation:XValidation:rule="self.type == 'Literal' ? has(self.literalValue) : !has(self.literalValue)",message="literalValue is required when type is Literal, and must be empty otherwise"
-// +kubebuilder:validation:XValidation:rule="self.type == 'Reference' ? has(self.attributeRef) : !has(self.attributeRef)",message="attributeRef is required when type is Reference, and must be empty otherwise"
+// +kubebuilder:validation:XValidation:rule="self.type == 'Attribute' ? has(self.attributeKey) : !has(self.attributeKey)",message="attributeKey is required when type is Attribute, and must be empty otherwise"
 type Attribute struct {
   // Name is the key of the attribute as it will appear in the output
   // (i.e., as a span tag).
@@ -255,11 +255,11 @@ type Attribute struct {
   Name string `json:"name"`
 
   // Type specifies where the attribute value comes from.
-  // Valid values are "Header", "Literal", or "Reference".
+  // Valid values are "Header", "Literal", or "Attribute".
   //
   // +unionDiscriminator
   // +required
-  // +kubebuilder:validation:Enum=Header;Literal;Reference
+  // +kubebuilder:validation:Enum=Header;Literal;Attribute
   Type AttributeSourceType `json:"type"`
 
   // HeaderName specifies the HTTP header to extract the value from.
@@ -274,13 +274,13 @@ type Attribute struct {
   // +optional
   LiteralValue *string `json:"literalValue,omitempty"`
 
-  // AttributeRef refers to a standard OpenTelemetry attribute.
+  // AttributeKey refers to a standard OpenTelemetry attribute.
   // For example: "http.response.status_code" or "http.request.method".
-  // This is required if Type is "Reference".
+  // This is required if Type is "Attribute".
   // See: https://opentelemetry.io/docs/specs/semconv/
   //
   // +optional
-  AttributeRef *string `json:"attributeRef,omitempty"`
+  AttributeKey *string `json:"attributeKey,omitempty"`
 }
 
 // TracingConfig defines the configuration for distributed tracing.
@@ -500,13 +500,13 @@ type TelemetryPolicyStatus struct {
 }
 ```
 
-#### Attribute References and Portability
+#### Attributes and Portability
 
-To ensure portability and avoid implementation-specific lock-in, the `Reference` attribute source type relies exclusively on standard [OpenTelemetry Semantic Conventions](https://opentelemetry.io/docs/specs/semconv/).
+To ensure portability and avoid implementation-specific lock-in, the `Attribute` attribute source type relies exclusively on standard [OpenTelemetry Semantic Conventions](https://opentelemetry.io/docs/specs/semconv/).
 
-When users specify an `attributeRef`, they must use these standardized keys (e.g., `http.request.method`, `http.response.status_code`). The underlying Gateway API implementations are responsible for mapping these standard OpenTelemetry keys to their proxy-specific internal variables.
+When users specify an `attributeKey`, they must use these standardized keys (e.g., `http.request.method`, `http.response.status_code`). The underlying Gateway API implementations are responsible for mapping these standard OpenTelemetry keys to their proxy-specific internal variables.
 
-Implementations MUST NOT expose internal, proxy-specific variables through the `Reference` type. If an implementation does not support mapping a specific standard attribute, it SHOULD gracefully omit it or signal the limitation via policy status conditions.
+Implementations MUST NOT expose internal, proxy-specific variables through the `Attribute` type. If an implementation does not support mapping a specific standard attribute, it SHOULD gracefully omit it or signal the limitation via policy status conditions.
 
 ### Conformance Tests
 
@@ -529,19 +529,19 @@ To ensure consistent implementation of the `TelemetryPolicy` API, the following 
 #### 3. Setting OpenTelemetry Attributes (Extended)
 * **Description**: Verify that the Gateway proxy can map standard OpenTelemetry semantic conventions to its spans.
 * **Test**:
-  * Configure a `TelemetryPolicy` with an `Attribute` of type `Reference` (e.g., `attributeRef: "http.request.method"`).
+  * Configure a `TelemetryPolicy` with an `Attribute` of type `Attribute` (e.g., `attributeKey: "http.request.method"`).
   * Send a request through the Gateway.
   * **Assertion**: The exported span includes the requested standard attribute.
 
 ## Open Questions
 
 1. **Standard OpenTelemetry Attribute Dictionary**: 
-   What is the minimal mandated set of standard OpenTelemetry semantic convention attributes that implementations MUST support when `type: Reference` is used? 
+   What is the minimal mandated set of standard OpenTelemetry semantic convention attributes that implementations MUST support when `type: Attribute` is used? 
    While implementations MAY support additional attributes, the exact dictionary of required attributes and how conformance will be tested needs to be determined.
 2. **Attribute Type Handling and Failure Modes**:
    How should attribute data types (such as boolean, integer, or string) be handled and preserved when emitting custom span attributes or mapping dynamic header values? 
    Should an optional field (e.g., `valueType`) be added to the `Attribute` struct to allow explicitly specifying the output type for custom attribute keys, while relying on OpenTelemetry Semantic Conventions for standard keys? 
-   Furthermore, what is the standardized failure handling and status condition behavior (e.g., setting `Accepted: False` with `Reason: InvalidConfig`) when type coercion fails or an invalid attribute reference is supplied?
+   Furthermore, what is the standardized failure handling and status condition behavior (e.g., setting `Accepted: False` with `Reason: InvalidConfig`) when type coercion fails or an invalid attribute key is supplied?
 
 ## Alternatives Considered
 
