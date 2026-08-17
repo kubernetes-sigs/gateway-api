@@ -218,7 +218,7 @@ const (
   // extracted from a specific HTTP header in the request or response.
   //
   // Support: Core
-  AttributeSourceHeader = "Header"
+  AttributeSourceHeader AttributeSourceType = "Header"
 
   // AttributeSourceLiteral indicates that the attribute value is a static 
   // string provided directly in the policy configuration.
@@ -372,6 +372,8 @@ type TracingConfig struct {
   //
   // Support: Extended
   //
+  // +listType=map
+  // +listMapKey=name
   // +optional
   Attributes []Attribute `json:"attributes,omitempty"`
 }
