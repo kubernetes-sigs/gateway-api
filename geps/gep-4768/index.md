@@ -201,8 +201,10 @@ type TracingMode string
 const (
   // TracingModeEnabled explicitly enables tracing.
   TracingModeEnabled TracingMode = "Enabled"
+
   // TracingModeDisabled explicitly disables tracing.
   TracingModeDisabled TracingMode = "Disabled"
+
   // TracingModeImplementationDefault means that the code should
   // use the implementation's default behavior for tracing.
   TracingModeImplementationDefault TracingMode = "ImplementationDefault"
@@ -224,14 +226,14 @@ const (
   // string provided directly in the policy configuration.
   //
   // Support: Core
-  AttributeSourceLiteral = "Literal"
+  AttributeSourceLiteral AttributeSourceType = "Literal"
 
   // AttributeSourceReference extracts the value from a proxy-builtin reference variable
   // mapped to OpenTelemetry Semantic Conventions (e.g., "http.request.method").
   // See: https://opentelemetry.io/docs/specs/semconv/
   //
   // Support: Extended
-  AttributeSourceReference = "Reference"
+  AttributeSourceReference AttributeSourceType = "Reference"
 )
 
 // Attribute defines a single flat key-value pair to attach to traces.
@@ -417,8 +419,10 @@ type ParentBasedSamplingMode string
 const (
   // ParentBasedSamplingModeEnabled explicitly enables parent-based sampling.
   ParentBasedSamplingModeEnabled ParentBasedSamplingMode = "Enabled"
+
   // ParentBasedSamplingModeDisabled explicitly disables parent-based sampling.
   ParentBasedSamplingModeDisabled ParentBasedSamplingMode = "Disabled"
+
   // ParentBasedSamplingModeImplementationDefault means that the code should
   // use the implementation's default behavior for parent-based sampling.
   ParentBasedSamplingModeImplementationDefault ParentBasedSamplingMode = "ImplementationDefault"
