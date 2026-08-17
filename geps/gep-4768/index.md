@@ -306,7 +306,8 @@ type Attribute struct {
 // across complex distributed systems.
 //
 // Support: Extended
-//
+// +kubebuilder:validation:XValidation:rule="!has(self.mode) || self.mode != 'Enabled' || has(self.provider)",message="provider must be specified when mode is Enabled"
+// +kubebuilder:validation:XValidation:rule="!has(self.mode) || self.mode != 'Disabled' || !has(self.provider)",message="provider must be empty when mode is Disabled"
 // +kubebuilder:validation:XValidation:rule="self.mode == 'Enabled' ? has(self.provider) : true",message="provider must be specified when mode is Enabled"
 // +kubebuilder:validation:XValidation:rule="self.mode == 'Disabled' ? !has(self.provider) : true",message="provider must be empty when mode is Disabled"
 type TracingConfig struct {
