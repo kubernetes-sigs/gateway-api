@@ -68,12 +68,7 @@ var ListenerSetUpdateListenerHostname = suite.ConformanceTest{
 
 			// update the listener hostname to match the HTTPRoute's hostname.
 			matchingHostname := v1.Hostname("accepted.example.com")
-			for i, listener := range mutate.Spec.Listeners {
-				if listener.Name == "http" {
-					mutate.Spec.Listeners[i].Hostname = &matchingHostname
-					break
-				}
-			}
+			mutate.Spec.Listeners[0].Hostname = &matchingHostname
 
 			err = s.Client.Patch(ctx, mutate, client.MergeFrom(original))
 			require.NoErrorf(t, err, "error patching the ListenerSet: %v", err)

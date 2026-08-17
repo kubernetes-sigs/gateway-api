@@ -14,7 +14,7 @@ spec:
     protocol: HTTP
     allowedRoutes:
       namespaces:
-        from: All
+        from: Same
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: ListenerSet
@@ -34,7 +34,7 @@ spec:
     hostname: "other.example.com"
     allowedRoutes:
       namespaces:
-        from: All
+        from: Same
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
