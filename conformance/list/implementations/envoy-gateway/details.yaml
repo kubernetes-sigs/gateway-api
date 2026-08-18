@@ -1,0 +1,15 @@
+apiVersion: gateway.networking.kubernetes.io/v1
+kind: ImplementationListDetails
+organization: envoyproxy
+project: envoy-gateway
+fullName: Envoy Gateway
+description: |
+  [Envoy Gateway][eg-home] is an [Envoy][envoy-org] subproject for managing Envoy-based application gateways. The supported
+  APIs and fields of the Gateway API are outlined [here][eg-supported].
+  Use the [quickstart][eg-quickstart] to get Envoy Gateway running with Gateway API in a
+  few simple steps.
+
+  [eg-home]:https://gateway.envoyproxy.io/
+  [envoy-org]:https://github.com/envoyproxy
+  [eg-supported]:https://gateway.envoyproxy.io/docs/tasks/quickstart/
+  [eg-quickstart]:https://gateway.envoyproxy.io/docs/tasks/quickstart

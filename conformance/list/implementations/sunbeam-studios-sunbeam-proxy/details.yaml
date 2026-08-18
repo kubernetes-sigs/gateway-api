@@ -1,0 +1,9 @@
+apiVersion: gateway.networking.kubernetes.io/v1
+kind: ImplementationListDetails
+organization: sunbeamdotpt
+project: sunbeam-proxy
+fullName: Sunbeam Proxy
+description: |
+  [Sunbeam Proxy][sunbeam-proxy] is a cloud-native reverse proxy with adaptive machine learning threat detection which implements the Kubernetes Gateway API control plane and data plane.
+
+  [sunbeam-proxy]: https://github.com/sunbeamdotpt/proxy

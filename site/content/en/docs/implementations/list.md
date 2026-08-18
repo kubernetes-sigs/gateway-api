@@ -92,73 +92,48 @@ class.
 ## Gateway Controller Implementation Status <a name="gateways"></a>
 
 ### Conformant
-- [Agentgateway][40]
-- [Airlock Microgateway][34]
-- [Cilium][16]
-- [Envoy Gateway][18]
-- [Google Kubernetes Engine][6]
-- [Gravitee Kubernetes Operator][42]
-- [HAProxy Ingress][7]
-- [Higress][49]
-- [Istio][9]
-- [kgateway][37]
-- [Kong Operator][35]
-- [NGINX Gateway Fabric][12]
-- [Sunbeam Proxy][47]
-- [Traefik Proxy][13]
-- [Varnish Gateway][45]
-- [WSO2 Gateway][48]
+- [Agentgateway](#agentgateway)
+- [Airlock Microgateway](#airlock-microgateway)
+- [Cilium](#cilium)
+- [Envoy Gateway](#envoy-gateway)
+- [Google Kubernetes Engine](#google-kubernetes-engine)
+- [Gravitee Kubernetes Operator](#gravitee-kubernetes-operator)
+- [HAProxy Ingress](#haproxy-ingress)
+- [Higress](#higress)
+- [Istio](#istio)
+- [Kong Operator](#kong-operator)
+- [NGINX Gateway Fabric](#nginx-gateway-fabric)
+- [Sunbeam Proxy](#sunbeam-proxy)
+- [Traefik Proxy](#traefik-proxy)
+- [Varnish Gateway](#varnish-gateway)
+- [WSO2 Gateway](#wso2-gateway)
+- [kgateway](#kgateway)
+
 
 ### Partially Conformant
+- [AWS Load Balancer Controller](#aws-load-balancer-controller)
+- [Amazon Elastic Kubernetes Service](#amazon-elastic-kubernetes-service)
+- [Calico](#calico)
+- [Gloo Gateway](#gloo-gateway)
 
-- [Amazon Elastic Kubernetes Service][23]
-- [AWS Load Balancer Controller][44]
-- [Calico][46]
-- [Gloo Gateway][5]
 
 ## Service Mesh Implementation Status <a name="meshes"></a>
 
 ### Conformant
+- [Cilium](#cilium)
+- [Istio](#istio)
 
-- [Istio][9]
-- [Cilium][16]
+
+
 
 ## Integrations <a name="integrations"></a>
 
-- [Flagger][14] (public preview)
-- [cert-manager][15] (alpha)
-- [argo-rollouts][22] (alpha)
-- [Knative][24] (alpha)
-- [Kuadrant][26] (GA)
-- [kruise-rollouts][41] (alpha)
 
-[5]:#gloo-gateway
-[6]:#google-kubernetes-engine
-[7]:#haproxy-ingress
-[9]:#istio
-[12]:#nginx-gateway-fabric
-[13]:#traefik-proxy
-[14]:#flagger
-[15]:#cert-manager
-[16]:#cilium
-[18]:#envoy-gateway
-[22]:#argo-rollouts
-[23]:#amazon-elastic-kubernetes-service
-[24]:#knative
-[26]:#kuadrant
-[33]:#ngrok-kubernetes-operator
-[34]:#airlock-microgateway
-[35]:#kong-operator
-[37]:#kgateway
-[40]:#agentgateway
-[41]:#kruise-rollouts
-[42]:#gravitee-kubernetes-operator
-[44]:#aws-load-balancer-controller
-[45]:#varnish-gateway
-[46]:#calico
-[47]:#sunbeam-proxy
-[48]:#wso2-gateway
-[49]:#higress
+- [Argo Rollouts](#argo-rollouts)
+- [cert-manager](#cert-manager)
+- [Flagger](#flagger)
+- [Knative](#knative)
+- [OpenKruise Rollouts](#openkruise-rollouts)
 
 
 [gamma]: /docs/mesh/
@@ -169,32 +144,11 @@ class.
 
 In this section you will find specific links to blog posts, documentation and other Gateway API references for specific implementations.
 
-### Agentgateway
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.6.0-Agentgateway-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.6.0/agentgateway-agentgateway)
 
-[Agentgateway](https://agentgateway.dev/) is an open source Gateway API implementation hosted as a part of the Linux Foundation, focusing on AI use cases, including LLM consumption, LLM serving, agent-to-agent ([A2A](https://a2aproject.github.io/A2A/latest/)), agent-to-tool ([MCP](https://modelcontextprotocol.io/introduction)), as well as traditional TCP/HTTP traffic serving.
-It is the first and only proxy designed specifically for the Kubernetes Gateway API, powered by a high performance and scalable Rust dataplane implementation.
-
-### Airlock Microgateway
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.6.0-Airlock%20Microgateway-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.6/airlock-microgateway)
-
-[Airlock Microgateway][airlock-microgateway] is a Kubernetes-native security solution that extends the routing capabilities of the Gateway API with WAAP (Web Application and API Protection) features and identity-aware proxying.
-It filters requests using deny rules against known attacks (OWASP Top 10), along with header filtering, JSON parsing, OpenAPI specification enforcement, GraphQL schema validation, and antivirus scanning via ICAP.
-Authentication can be enforced via client certificates, JWT, or OIDC with step-up authentication for MFA, with support for OAuth 2.0 Token Introspection and Token Exchange. Airlock Microgateway is certified for Red Hat OpenShift, and built-in Grafana dashboards provide real-time reporting on system health, traffic and threats.
-
-[airlock-microgateway]:https://www.airlock.com/en/secure-access-hub/components/microgateway
-
-### Amazon Elastic Kubernetes Service
-
-[Amazon Elastic Kubernetes Service (EKS)][eks] is a managed service that you can use to run Kubernetes on AWS without needing to install, operate, and maintain your own Kubernetes control plane or nodes. EKS's implementation of the Gateway API is through [AWS Gateway API Controller][eks-gateway] which provisions [Amazon VPC Lattice][vpc-lattice] Resources for gateway(s), HTTPRoute(s) in EKS clusters.
-
-[eks]:https://docs.aws.amazon.com/eks/latest/userguide/what-is-eks.html
-[eks-gateway]:https://github.com/aws/aws-application-networking-k8s
-[vpc-lattice]:https://aws.amazon.com/vpc/lattice/
 
 ### AWS Load Balancer Controller
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Partial%20Conformance%20v1.6-AWS%20Load%20Balancer%20Controller-orange)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.6/aws-load-balancer-controller)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.6.1-AWS+Load+Balancer+Controller-orange)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.6/aws-load-balancer-controller/conformance-report.yaml)
 
 [AWS Load Balancer Controller][aws-lbc] manages AWS Elastic Load Balancers for Kubernetes clusters. The controller provisions AWS Application Load Balancers (ALB) when you create a Kubernetes Ingress and AWS Network Load Balancers (NLB) when you create a Kubernetes Service of type LoadBalancer.
 
@@ -205,9 +159,38 @@ See the [AWS Load Balancer Controller documentation][aws-lbc-docs] for informati
 [aws-lbc]:https://github.com/kubernetes-sigs/aws-load-balancer-controller
 [aws-lbc-docs]:https://kubernetes-sigs.github.io/aws-load-balancer-controller/
 
+
+### Agentgateway
+
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.6.0-Agentgateway-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.6/agentgateway-agentgateway/v1.3.1-report.yaml)
+
+[Agentgateway](https://agentgateway.dev/) is an open source Gateway API implementation hosted as a part of the Linux Foundation, focusing on AI use cases, including LLM consumption, LLM serving, agent-to-agent ([A2A](https://a2aproject.github.io/A2A/latest/)), agent-to-tool ([MCP](https://modelcontextprotocol.io/introduction)), as well as traditional TCP/HTTP traffic serving.
+It is the first and only proxy designed specifically for the Kubernetes Gateway API, powered by a high performance and scalable Rust dataplane implementation.
+
+
+### Airlock Microgateway
+
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.6.0-Airlock+Microgateway-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.6/airlock-microgateway/experimental-5.1.0-default-report.yaml)
+
+[Airlock Microgateway][airlock-microgateway] is a Kubernetes-native security solution that extends the routing capabilities of the Gateway API with WAAP (Web Application and API Protection) features and identity-aware proxying.
+It filters requests using deny rules against known attacks (OWASP Top 10), along with header filtering, JSON parsing, OpenAPI specification enforcement, GraphQL schema validation, and antivirus scanning via ICAP.
+Authentication can be enforced via client certificates, JWT, or OIDC with step-up authentication for MFA, with support for OAuth 2.0 Token Introspection and Token Exchange. Airlock Microgateway is certified for Red Hat OpenShift, and built-in Grafana dashboards provide real-time reporting on system health, traffic and threats.
+
+
+### Amazon Elastic Kubernetes Service
+
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.4.0-Amazon+Elastic+Kubernetes+Service-orange)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.4.0/aws-aws-application-networking-k8s/experimental-v2.0.1-default-report.yaml)
+
+[Amazon Elastic Kubernetes Service (EKS)][eks] is a managed service that you can use to run Kubernetes on AWS without needing to install, operate, and maintain your own Kubernetes control plane or nodes. EKS's implementation of the Gateway API is through [AWS Gateway API Controller][eks-gateway] which provisions [Amazon VPC Lattice][vpc-lattice] Resources for gateway(s), HTTPRoute(s) in EKS clusters.
+
+[eks]:https://docs.aws.amazon.com/eks/latest/userguide/what-is-eks.html
+[eks-gateway]:https://github.com/aws/aws-application-networking-k8s
+[vpc-lattice]:https://aws.amazon.com/vpc/lattice/
+
+
 ### Calico
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.4.1-Calico-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.4.1/projectcalico-calico/experimental-v3.32.0-default-report.yaml)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.4.1-Calico-orange)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.4.1/projectcalico-calico/experimental-v3.32.0-default-report.yaml)
 
 [Calico][calico] is an open-source networking and security solution for
 Kubernetes and other cloud-native environments. Calico's Gateway API
@@ -217,18 +200,19 @@ custom resource, provisions an Envoy Gateway control plane, and creates
 a default `tigera-gateway-class` GatewayClass on the cluster.
 
 Questions and contributions are welcome on [GitHub][calico]. For
-commercial and maintainer inquiries, see the [Tigera contact form][tigera-contact].
+maintainer inquiries, see the [Tigera contact form][tigera-contact].
 
 [calico]: https://github.com/projectcalico/calico
 [calico-operator]: https://github.com/tigera/operator
 [envoy-gateway]: https://gateway.envoyproxy.io
 [tigera-contact]: https://www.tigera.io/contact/
 
+
 ### Cilium
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.6.1-Cilium-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.6/cilium)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.6.1-Cilium-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.6/cilium/experimental-v1.20.0-default-report.yaml)
 
-[Cilium][cilium] is an eBPF-based networking, observability and security
+Cilium][cilium] is an eBPF-based networking, observability and security
 solution for Kubernetes and other networking environments. It includes [Cilium
 Service Mesh][cilium-service-mesh], a highly efficient mesh data plane that can
 be run in [sidecarless mode][cilium-sidecarless] to dramatically improve
@@ -249,9 +233,10 @@ effort, check out the #development channel or join our [weekly developer meeting
 [cilium-slack]: https://slack.cilium.io
 [cilium-meeting]: https://github.com/cilium/cilium#weekly-developer-meeting
 
+
 ### Envoy Gateway
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.4.0-EnvoyGateway-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.4.0/envoy-gateway)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.6.1-Envoy+Gateway-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.6/envoy-gateway/experimental-v1.9.0-default-report.yaml)
 
 [Envoy Gateway][eg-home] is an [Envoy][envoy-org] subproject for managing Envoy-based application gateways. The supported
 APIs and fields of the Gateway API are outlined [here][eg-supported].
@@ -263,40 +248,21 @@ few simple steps.
 [eg-supported]:https://gateway.envoyproxy.io/docs/tasks/quickstart/
 [eg-quickstart]:https://gateway.envoyproxy.io/docs/tasks/quickstart
 
+
 ### Gloo Gateway
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.0.0-GlooGateway-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.0.0/gloo-gateway)
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Partial%20Conformance%20v1.1.0-GlooGateway-orange)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.1.0/gloo-gateway)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.4.1-Gloo+Gateway-orange)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.4.1/gloo-gateway/v1.21.3-report.yaml)
 
 [Gloo Gateway][gloogateway] by [Solo.io][solo] is a feature-rich, Kubernetes-native ingress controller and next-generation API gateway.
 Gloo Gateway brings the full power and community support of Gateway API to its existing control-plane implementation.
 
-The Gloo Gateway ingress controller passes all the core Gateway API conformance tests in the v1.1.0 release for the GATEWAY_HTTP conformance
-profile except `HTTPRouteServiceTypes`.
-
 [gloogateway]: https://docs.solo.io/gateway/latest/
 [solo]: https://www.solo.io
 
-### Google Cloud Service Mesh
-
-
-[Google Kubernetes Engine (GKE)][gke] is a managed Kubernetes platform offered
-by Google Cloud.
-
-GKE's implementation of Gateway For Mesh (GAMMA) is through the [Cloud Service Mesh][cloud-service-mesh].
-
-
-Google Cloud Service Mesh supports [Envoy-based sidecar mesh][envoy-sidecar-mesh] and [Proxyless-GRPC][proxyless-grpc-mesh] (using GRPCRoute).
-
-
-[gke]: https://cloud.google.com/kubernetes-engine
-[cloud-service-mesh]: https://cloud.google.com/products/service-mesh
-[envoy-sidecar-mesh]: https://cloud.google.com/service-mesh/docs/gateway/set-up-envoy-mesh
-[proxyless-grpc-mesh]: https://cloud.google.com/service-mesh/docs/gateway/proxyless-grpc-mesh
 
 ### Google Kubernetes Engine
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.6.0-Google_Kubernetes_Engine-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.6.0/gke-gateway)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.6.0-Google+Kubernetes+Engine-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.6/gke-gateway/v1.6.0-gke-report.yaml)
 
 [Google Kubernetes Engine (GKE)][gke] is a managed Kubernetes platform offered
 by Google Cloud. GKE's implementation of the Gateway API is through the [GKE
@@ -308,26 +274,24 @@ advanced routing, multi-cluster load balancing and more. See the docs to deploy
 [private or public Gateways][gke-gateway-deploy] and also [multi-cluster
 Gateways][gke-multi-cluster-gateway].
 
-The GKE Gateway controller passes all the core Gateway API conformance tests in the
-v1.5.0 release for the GATEWAY_HTTP conformance profile.
-
 [gke]:https://cloud.google.com/kubernetes-engine
 [gke-gateway]:https://cloud.google.com/kubernetes-engine/docs/concepts/gateway-api
 [gke-gateway-deploy]:https://cloud.google.com/kubernetes-engine/docs/how-to/deploying-gateways
 [gke-multi-cluster-gateway]:https://cloud.google.com/kubernetes-engine/docs/how-to/deploying-multi-cluster-gateways
 
+
 ### Gravitee Kubernetes Operator
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.6.1-Gravitee%20Kubernetes%20Operator-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.6/gravitee)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.6.1-Gravitee+Kubernetes+Operator-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.6/gravitee/standard-4.12.10-default-report.yaml)
 
 The [Gravitee Kubernetes Operator](https://documentation.gravitee.io/gravitee-kubernetes-operator-gko) (GKO) lets you manage [Gravitee](https://www.gravitee.io/) APIs, applications, and other assets in a Kubernetes-native and declarative way.
 
-
 For support, feedback, or to engage in a discussion about the Gravitee Kubernetes Operator, please feel free to submit an [issue](https://github.com/gravitee-io/issues/issues) or visit our community [forum](https://community.gravitee.io/c/support/gravitee-kubernetes-operator-gko/26).
+
 
 ### HAProxy Ingress
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.5.1-HAProxy%20Ingress-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.5.1/haproxy-ingress)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.5.1-HAProxy+Ingress-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.5/haproxy-ingress/experimental-v0.17.0-alpha.1-default-report.yaml)
 
 [HAProxy Ingress][h1] is a community driven ingress controller implementation for HAProxy.
 
@@ -335,9 +299,10 @@ HAProxy Ingress is a conformant Gateway API implementation since `v0.17`. It imp
 
 [h1]:https://haproxy-ingress.github.io/
 
+
 ### Higress
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.6.0-Higress-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.6/higress-group-higress)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.6.0-Higress-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.6/higress-group-higress/standard-v2.2.4-default-report.yaml)
 
 [Higress](https://higress.ai/) is a cloud-native API gateway built on Istio and
 Envoy. It provides Kubernetes Gateway API and Ingress support alongside API
@@ -347,9 +312,10 @@ management and AI gateway capabilities. Higress is an open source
 Source code, documentation, and issue tracking are available in the
 [Higress repository](https://github.com/higress-group/higress).
 
+
 ### Istio
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.5.1-Istio-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.5.1/istio-istio)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.5.1-Istio-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.5/istio-istio/1.30.0-default-report.yaml)
 
 [Istio][istio] is an open source [service mesh][istio-mesh] and gateway implementation.
 
@@ -368,20 +334,10 @@ Check out the [Gateway API task][istio-2] for more information about the Gateway
 [istio-1]: https://istio.io/latest/docs/tasks/traffic-management/ingress/
 [istio-2]: https://istio.io/latest/docs/tasks/traffic-management/ingress/gateway-api/
 
-### kgateway
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.6.1-kgateway-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.6/kgateway)
-
-The [kgateway] project is a feature-rich, Kubernetes-native ingress controller and next-generation API gateway.
-It is focused on maintaining a great HTTP experience, extending features for advanced routing in scenarios such as AI and MCP gateways, and interoperating with a service mesh such as Istio in both ambient and sidecar modes.
-This focus means that you can easily configure a set of Envoy instances that are reasonably distributed in a performant way across many north-south and east-west use cases.
-
-Kgateway is generally available with its 2.0 release.
-
-[kgateway]:https://kgateway.dev/docs
 
 ### Kong Operator
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.6.1-Kong%20Operator-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.6/kong-operator)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.6.1-Kong+Operator-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.6/kong-operator/experimental-v2.3.0-rc.3-expressions-standard-report.yaml)
 
 [Kong][kong] is an open source API Gateway built for hybrid and multi-cloud environments.
 
@@ -395,9 +351,10 @@ For help and support with Kong Operator please feel free to [create an issue][ko
 [kong]: https://konghq.com
 [kong-slack]: https://kubernetes.slack.com/archives/CDCA87FRD
 
+
 ### NGINX Gateway Fabric
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.6.1-NGINX%20Gateway%20Fabric-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.6/nginx-nginx-gateway-fabric)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.6.1-NGINX+Gateway+Fabric-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.6/nginx-nginx-gateway-fabric/experimental-2.7.0-pre-release-default-report.yaml)
 
 [NGINX Gateway Fabric][nginx-gateway-fabric] is an open-source project that provides an implementation of the Gateway API using [NGINX][nginx] as the data plane. The goal of this project is to implement the core Gateway API to configure an HTTP or TCP/UDP load balancer, reverse-proxy, or API gateway for applications running on Kubernetes. You can find the comprehensive NGINX Gateway Fabric user documentation on the [NGINX Documentation][nginx-docs] website.
 
@@ -416,23 +373,18 @@ If you have any suggestions or experience issues with NGINX Gateway Fabric, plea
 
 ### Sunbeam Proxy
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.5.1-Sunbeam%20Proxy-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.5/sunbeam-studios-sunbeam-proxy)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.5.1-Sunbeam+Proxy-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.5/sunbeam-studios-sunbeam-proxy/experimental-v0.2.0-default-report.yaml)
 
-[Sunbeam Proxy][sunbeam-proxy] is a cloud-native reverse proxy with adaptive machine learning threat detection which implements the Kubernetes Gateway API v1.5.1 control plane and data plane.
-
-It passes the v1.5.1 experimental conformance suite for the `GATEWAY-HTTP`, `GATEWAY-GRPC`, and `GATEWAY-TLS` profiles, including all core and claimed extended features. It supports TCPRoute and UDPRoute from the experimental channels.
+[Sunbeam Proxy][sunbeam-proxy] is a cloud-native reverse proxy with adaptive machine learning threat detection which implements the Kubernetes Gateway API control plane and data plane.
 
 [sunbeam-proxy]: https://github.com/sunbeamdotpt/proxy
 
 
 ### Traefik Proxy
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.6.1-Traefik%20Proxy-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.6/traefik-traefik)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.6.1-Traefik+Proxy-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.6/traefik-traefik/experimental-v3.7.10-default-report.yaml)
 
-[Traefik Proxy][traefik-proxy] is an open source cloud-native application proxy.
-
-Traefik Proxy currently supports version `v1.6.1` of the Gateway API specification, check the [Kubernetes Gateway Provider Documentation][traefik-proxy-gateway-api-doc] for more information on how to deploy and use it.
-Traefik Proxy fully supports all HTTPRoute core and some extended features, like BackendTLSPolicy, GRPCRoute, and TLSRoute resources from the Standard channel, as well as TCPRoute from the Experimental channel.
+Traefik Proxy supports the Gateway API specification, check the [Kubernetes Gateway Provider Documentation][traefik-proxy-gateway-api-doc] for more information on how to deploy and use it.
 
 For help and support with Traefik Proxy, [create an issue][traefik-proxy-issue-new] or ask for help in the [Traefik Labs Community Forum][traefiklabs-community-forum].
 
@@ -441,16 +393,13 @@ For help and support with Traefik Proxy, [create an issue][traefik-proxy-issue-n
 [traefik-proxy-issue-new]:https://github.com/traefik/traefik/issues/new/choose
 [traefiklabs-community-forum]:https://community.traefik.io/c/traefik/traefik-v3/21
 
+
 ### Varnish Gateway
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.5.0-Varnish%20Gateway-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.5/varnish-software-varnish-gateway)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.5.0-Varnish+Gateway-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.5/varnish-software-varnish-gateway/standard-v0.20.0-default-report.yaml)
 
 [Varnish Gateway][varnish-gateway] is an open source Kubernetes Gateway API implementation
 developed by [Varnish Software AS][varnish-software], using [Varnish][varnish] as its data plane.
-It implements the Gateway API standard channel and passes the v1.5.0 conformance suite for the
-GATEWAY-HTTP profile (core, plus extended features for path/host/scheme/port redirects, path/host
-rewrites, method and query parameter matching, response header modification, and HTTP listener
-isolation).
 
 In addition to Gateway API resources, Varnish Gateway exposes a `VarnishCachePolicy` policy
 attachment for fine-grained caching control (TTL, grace, request coalescing, cache key
@@ -460,26 +409,45 @@ customization, bypass conditions) at the Gateway, HTTPRoute, or rule level.
 [varnish-software]:https://www.varnish-software.com/
 [varnish]:https://www.varnish.org/
 
+
 ### WSO2 Gateway
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.5.1-WSO2%20Gateway-green)](https://github.com/kubernetes-sigs/gateway-api/tree/main/conformance/reports/v1.5.1/wso2-gateway)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.5.1-WSO2+Gateway-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.5/wso2-gateway/v1.2.0-alpha2-report.yaml)
 
 [WSO2 Gateway](https://wso2.com/api-platform/docs/) is an AI-ready, GitOps-driven platform for building, securing, and governing APIs across cloud, hybrid, and on-premises environments. It represents the next generation of the [WSO2 Kubernetes Gateway (APK)](https://apk.docs.wso2.com/en/latest/), delivering a unified Kubernetes-native gateway experience with deeper platform integration and modern GitOps workflows.
 
 For supported Gateway API resources and features, see the [Gateway API support guide](https://wso2.com/api-platform/docs/api-gateway/next/deployment/deployment-modes/kubernetes/gateway-operator/#kubernetes-gateway-api-path). For questions and contributions, visit [GitHub](https://github.com/wso2/api-platform).
 
+
+### kgateway
+
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.6.1-kgateway-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.6/kgateway/v2.4.0-rc.1-report.yaml)
+
+The [kgateway] project is a feature-rich, Kubernetes-native ingress controller and next-generation API gateway.
+It is focused on maintaining a great HTTP experience, extending features for advanced routing in scenarios such as AI and MCP gateways, and interoperating with a service mesh such as Istio in both ambient and sidecar modes.
+This focus means that you can easily configure a set of Envoy instances that are reasonably distributed in a performant way across many north-south and east-west use cases.
+
+Kgateway is generally available with its 2.0 release.
+
+[kgateway]:https://kgateway.dev/docs
+
+
+
+
 ## Integrations
 
 In this section you will find specific links to blog posts, documentation and other Gateway API references for specific integrations.
 
-### Flagger
 
-[Flagger][flagger] is a progressive delivery tool that automates the release process for applications running on Kubernetes.
 
-Flagger can be used to automate canary deployments and A/B testing using Gateway API. It supports both the `v1alpha2` and `v1beta1` spec of Gateway API. You can refer to [this tutorial][flagger-tutorial] to use Flagger with any implementation of Gateway API.
+### Argo Rollouts
 
-[flagger]: https://flagger.app
-[flagger-tutorial]: https://docs.flagger.app/tutorials/gatewayapi-progressive-delivery
+[Argo Rollouts][argo-rollouts] is a progressive delivery controller for Kubernetes. It supports several advanced deployment methods such as blue/green and canaries. Argo Rollouts supports the Gateway API via [a plugin][argo-rollouts-plugin].
+
+[argo-rollouts]: https://argo-rollouts.readthedocs.io/en/stable/
+[argo-rollouts-plugin]: https://github.com/argoproj-labs/rollouts-gatewayapi-trafficrouter-plugin/
+
+
 
 ### cert-manager
 
@@ -490,12 +458,18 @@ cert-manager can generate TLS certificates for Gateway resources. This is config
 [cert-manager]: https://cert-manager.io/
 [cert-manager-docs]: https://cert-manager.io/docs/usage/gateway/
 
-### Argo rollouts
 
-[Argo Rollouts][argo-rollouts] is a progressive delivery controller for Kubernetes. It supports several advanced deployment methods such as blue/green and canaries. Argo Rollouts supports the Gateway API via [a plugin][argo-rollouts-plugin].
 
-[argo-rollouts]: https://argo-rollouts.readthedocs.io/en/stable/
-[argo-rollouts-plugin]: https://github.com/argoproj-labs/rollouts-gatewayapi-trafficrouter-plugin/
+### Flagger
+
+[Flagger][flagger] is a progressive delivery tool that automates the release process for applications running on Kubernetes.
+
+Flagger can be used to automate canary deployments and A/B testing using Gateway API. You can refer to [this tutorial][flagger-tutorial] to use Flagger with any implementation of Gateway API.
+
+[flagger]: https://flagger.app
+[flagger-tutorial]: https://docs.flagger.app/tutorials/gatewayapi-progressive-delivery
+
+
 
 ### Knative
 
@@ -504,24 +478,17 @@ cert-manager can generate TLS certificates for Gateway resources. This is config
 [knative]: https://knative.dev/
 [knative-net-gateway-api]: https://github.com/knative-sandbox/net-gateway-api
 
-### Kuadrant
 
-[Kuadrant][kuadrant] is an open source multi cluster Gateway API controller that integrates with and provides policies via policy attachment to other Gateway API providers.
-
-Kuadrant supports Gateway API for defining gateways centrally and attaching policies such as DNS, TLS, Auth and Rate Limiting that apply to all of your Gateways.
-
-Kuadrant works with both Istio and Envoy Gateway as underlying Gateway API providers, with plans to work with other gateway providers in future.
-
-For help and support with Kuadrant's implementation please feel free to [create an issue][kuadrant-issue-new] or ask for help in the [#kuadrant channel on Kubernetes slack][kuadrant-slack].
-
-[kuadrant]: https://kuadrant.io/
-[kuadrant-issue-new]: https://github.com/Kuadrant/kuadrant-operator/issues/new
-[kuadrant-slack]: https://kubernetes.slack.com/archives/C05J0D0V525
 
 ### OpenKruise Rollouts
+
 [OpenKruise Rollouts][kruise-rollouts] is a plugin-n-play progressive delivery controller for Kubernetes. It supports several advanced deployment methods such as blue/green and canaries. OpenKruise Rollouts has built-in support for the Gateway API.
 
 [kruise-rollouts]: https://openkruise.io/rollouts/introduction
+
+
+
+
 
 ## Adding new entries
 
@@ -579,3 +546,4 @@ Page review timeline, starting with the v1.4 Page Review:
 This means that, after the Gateway API v1.6 release, implementations cannot be
 added to this page unless they have submitted at least a Partially Conformant
 conformance report.
+

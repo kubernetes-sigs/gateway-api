@@ -1,0 +1,9 @@
+apiVersion: gateway.networking.kubernetes.io/v1
+kind: ImplementationListDetails
+organization: WSO2
+project: api-platform-gateway
+fullName: WSO2 Gateway
+description: |
+  [WSO2 Gateway](https://wso2.com/api-platform/docs/) is an AI-ready, GitOps-driven platform for building, securing, and governing APIs across cloud, hybrid, and on-premises environments. It represents the next generation of the [WSO2 Kubernetes Gateway (APK)](https://apk.docs.wso2.com/en/latest/), delivering a unified Kubernetes-native gateway experience with deeper platform integration and modern GitOps workflows.
+
+  For supported Gateway API resources and features, see the [Gateway API support guide](https://wso2.com/api-platform/docs/api-gateway/next/deployment/deployment-modes/kubernetes/gateway-operator/#kubernetes-gateway-api-path). For questions and contributions, visit [GitHub](https://github.com/wso2/api-platform).
