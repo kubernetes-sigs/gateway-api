@@ -295,7 +295,7 @@ type HTTPRouteRetry struct {
     // +optional
     // +kubebuilder:default=1
     // +kubebuilder:validation:Minimum:=1
-    Attempts *int `json:"attempts,omitempty"`
+    Attempts int `json:"attempts,omitempty"`
     
     // Backoff specifies the base interval for an exponential backoff strategy
     // between retry attempts and is represented in Gateway API Duration
@@ -338,7 +338,7 @@ type HTTPRouteRetry struct {
     // MUST set the Accepted Condition for the Route to `status: False` with
     // a Reason of `UnsupportedValue` when this field is set.
     //
-    // Support: Extended
+    // Support: Implementation-specific
     //
     // +optional
     Backoff *Duration `json:"backoff,omitempty"`
@@ -423,7 +423,7 @@ Retrying requests based on HTTP status codes will be gated under the following f
 
 {{% alert color="warning" %}}
 
-Backoff is not tested for conformance. Since implementations may add jitter, only the distribution of delays over many requests is testable. This would require statistical timing assertions, which are too complex and too sensitive to timing variance for the current conformance suite.
+Backoff is not tested for conformance and is therefore considered implementation-specific. Since implementations may add jitter, only the distribution of delays over many requests is testable. This would require statistical timing assertions, which are too complex and too sensitive to timing variance for the current conformance suite.
 
 {{% /alert %}}
 
