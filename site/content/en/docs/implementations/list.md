@@ -100,7 +100,7 @@ class.
 - [HAProxy Ingress][7]
 - [Istio][9]
 - [kgateway][37]
-- [Kong Operator][35] 
+- [Kong Operator][35]
 - [NGINX Gateway Fabric][12]
 - [Sunbeam Proxy][47]
 - [Traefik Proxy][13]
@@ -367,7 +367,7 @@ Kgateway is generally available with its 2.0 release.
 
 ### Kong Operator
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Partial%20Conformance%20v1.5.1-Kong%20Operator-orange)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.5.1/kong-operator)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.6.1-Kong%20Operator-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.6/kong-operator)
 
 [Kong][kong] is an open source API Gateway built for hybrid and multi-cloud environments.
 
