@@ -17,8 +17,6 @@ limitations under the License.
 package tests
 
 import (
-	"fmt"
-	"net/url"
 	"testing"
 
 	"k8s.io/apimachinery/pkg/types"
@@ -40,51 +38,26 @@ var HTTPRouteRetryConnectionError = confsuite.ConformanceTest{
 	Features: []features.FeatureName{
 		features.SupportGateway,
 		features.SupportHTTPRoute,
-		features.SupportHTTPRouteRetry,
 		features.SupportHTTPRouteRetryConnectionError,
 	},
 	Test: func(t *testing.T, suite *confsuite.ConformanceTestSuite) {
-		ns := confsuite.InfrastructureNamespace
-		routeNN := types.NamespacedName{Name: "retries-connection-error", Namespace: ns}
-		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: ns}
+		routeNN := types.NamespacedName{Name: "retries-connection-error", Namespace: confsuite.InfrastructureNamespace}
+		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: confsuite.InfrastructureNamespace}
 		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
 		kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN)
 
-		type args struct {
-			path                  string
-			retrySimulationConfig url.Values
-		}
-		testCases := []struct {
-			name string
-			args args
-			want http.Response
-		}{
-			{
-				name: "succeeds after 2 retries on connection errors and max attempts is 3",
-				args: args{
-					path: "/retry/no-status-code-attempts-3",
-					retrySimulationConfig: url.Values{
-						"succeedAfter": []string{"2"},
-					},
-				},
-				want: http.Response{StatusCode: 200},
-			},
-			{
-				name: "fails when required retries on connection errors exceed max attempts",
-				args: args{
-					path: "/retry/no-status-code-attempts-3",
-					retrySimulationConfig: url.Values{
-						"succeedAfter": []string{"4"},
-					},
-				},
-				want: http.Response{StatusCodes: []int{500, 503}},
-			},
-		}
-		for i := range testCases {
-			tc := testCases[i]
-			t.Run(fmt.Sprintf("%d request to '%s' %s", i, tc.args.path, tc.name), func(t *testing.T) {
-				assertConsistentRetryBehaviour(t, suite, gwAddr, ns, tc.args.path, tc.args.retrySimulationConfig, tc.want)
-			})
-		}
+		kubernetes.NamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, []string{confsuite.InfrastructureNamespace})
+
+		// use dedicated time out config with an increased number of required consecutive successes,
+		// so that a test run is very unlikely to miss the unhealthy backend
+		dedicatedTimeoutConfig := suite.TimeoutConfig
+		dedicatedTimeoutConfig.RequiredConsecutiveSuccesses = 10
+
+		http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, dedicatedTimeoutConfig, gwAddr, http.ExpectedResponse{
+			Request:   http.Request{Path: "/retry-on-connection-errors"},
+			Response:  http.Response{StatusCode: 200},
+			Backend:   "infra-backend-connection-error-healthy",
+			Namespace: confsuite.InfrastructureNamespace,
+		})
 	},
 }
