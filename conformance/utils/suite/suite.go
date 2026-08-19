@@ -533,13 +533,15 @@ func (suite *ConformanceTestSuite) Run(t *testing.T, tests []ConformanceTest) er
 		t.Run(test.ShortName, func(subT *testing.T) {
 			subT.Cleanup(func() {
 				suite.recordTestResult(subT, test, res)
-				if suite.Hook != nil {
-					suite.Hook(subT, test, suite)
-				}
 			})
 			err := suite.setClientsetForTest(test)
 			require.NoError(subT, err, "failed to create new clientset for test")
 			test.Run(subT, suite)
+			if suite.Hook != nil {
+				subT.Cleanup(func() {
+					suite.Hook(subT, test, suite)
+				})
+			}
 		})
 
 		if res == testSucceeded {
