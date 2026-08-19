@@ -1,6 +1,6 @@
 ---
 title: "Cross-Namespace routing"
-weight: 11
+weight: 12
 ---
 
 Gateway API has core support for cross Namespace routing. This is useful
