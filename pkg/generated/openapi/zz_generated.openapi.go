@@ -10060,7 +10060,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendAncestorStatus(ref commo
 							Format:      "",
 						},
 					},
-					"parentRef": {
+					"ancestorRef": {
 						SchemaProps: spec.SchemaProps{
 							Description: "AncestorRef identifies the parent resource that this status is associated with.",
 							Default:     map[string]interface{}{},
@@ -10090,7 +10090,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendAncestorStatus(ref commo
 						},
 					},
 				},
-				Required: []string{"controllerName", "parentRef"},
+				Required: []string{"controllerName", "ancestorRef"},
 			},
 		},
 		Dependencies: []string{
