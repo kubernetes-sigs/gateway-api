@@ -516,8 +516,8 @@ spec:
                       pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/[A-Za-z0-9\/\-._~%!$&'()*+,;=:]+$
                       type: string
                     parentRef:
-                      description: AncestorRef identifies the parent resource that
-                        this status is associated with.
+                      description: ParentRef identifies the parent resource that this
+                        status is associated with.
                       properties:
                         group:
                           default: gateway.networking.k8s.io
