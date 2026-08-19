@@ -95,6 +95,7 @@ class.
 - [Agentgateway][40]
 - [Airlock Microgateway][34]
 - [Cilium][16]
+- [Envoy Gateway][18]
 - [Google Kubernetes Engine][6]
 - [Gravitee Kubernetes Operator][42]
 - [HAProxy Ingress][7]
@@ -113,7 +114,6 @@ class.
 - [Amazon Elastic Kubernetes Service][23]
 - [AWS Load Balancer Controller][44]
 - [Calico][46]
-- [Envoy Gateway][18]
 - [Gloo Gateway][5]
 
 ## Service Mesh Implementation Status <a name="meshes"></a>
