@@ -5305,7 +5305,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRequestRedirectFilter(ref common.R
 					},
 					"statusCode": {
 						SchemaProps: spec.SchemaProps{
-							Description: "StatusCode is the HTTP status code to be used in response.\n\nNote that values may be added to this enum, implementations must ensure that unknown values will not cause a crash.\n\nUnknown values here must result in the implementation setting the Accepted Condition for the Route to `status: False`, with a Reason of `UnsupportedValue`.\n\nSupport: Core",
+							Description: "StatusCode is the HTTP status code to be used in response.\n\nNote that values may be added to this enum, implementations must ensure that unknown values will not cause a crash.\n\nUnknown values here must result in the implementation setting the Accepted Condition for the Route to `status: False`, with a Reason of `UnsupportedValue`.\n\nSupport: statusCode 301 and 302 are Core; all others are Extended.\n\n<gateway:util:excludeFromCRD> Extended codes have their own features:\n  HTTPRoute303RedirectStatusCode,\n  HTTPRoute307RedirectStatusCode, and\n  HTTPRoute308RedirectStatusCode\n</gateway:util:excludeFromCRD>",
 							Type:        []string{"integer"},
 							Format:      "int32",
 						},
