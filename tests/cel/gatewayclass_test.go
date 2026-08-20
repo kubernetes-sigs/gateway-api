@@ -52,7 +52,7 @@ func TestValidateGatewayClassUpdate(t *testing.T) {
 			updationMutate: func(gwc *gatewayv1.GatewayClass) {
 				gwc.Spec.ControllerName = "example.net/gateway-controller-2"
 			},
-			wantError: "Value is immutable",
+			wantError: "field is immutable",
 		},
 	}
 

@@ -88,7 +88,7 @@ type GatewayClassSpec struct {
 	//
 	// Support: Core
 	//
-	// +kubebuilder:validation:XValidation:message="Value is immutable",rule="self == oldSelf"
+	// +k8s:immutable
 	// +required
 	ControllerName GatewayController `json:"controllerName"`
 
