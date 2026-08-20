@@ -135,6 +135,9 @@ const (
 
 	// This option indicates support for the ExternalAuth filter with HTTP protocol in HTTPRoute (experimental conformance).
 	SupportHTTPRouteExternalAuthHTTP FeatureName = "HTTPRouteExternalAuthHTTP"
+
+	// This option indicates support for forwarding the request body to the external auth server in HTTPRoute (experimental conformance).
+	SupportHTTPRouteExternalAuthForwardBody FeatureName = "HTTPRouteExternalAuthForwardBody"
 )
 
 var (
@@ -293,6 +296,11 @@ var (
 		Name:    SupportHTTPRouteExternalAuthHTTP,
 		Channel: FeatureChannelExperimental,
 	}
+	// HTTPRouteExternalAuthForwardBodyFeature contains metadata for the HTTPRouteExternalAuthForwardBody feature.
+	HTTPRouteExternalAuthForwardBodyFeature = Feature{
+		Name:    SupportHTTPRouteExternalAuthForwardBody,
+		Channel: FeatureChannelExperimental,
+	}
 )
 
 // HTTPRouteExtendedFeatures includes all extended features for HTTPRoute
@@ -330,4 +338,5 @@ var HTTPRouteExtendedFeatures = sets.New(
 	HTTPRouteExternalAuthFeature,
 	HTTPRouteExternalAuthGRPCFeature,
 	HTTPRouteExternalAuthHTTPFeature,
+	HTTPRouteExternalAuthForwardBodyFeature,
 )
