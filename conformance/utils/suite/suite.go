@@ -139,6 +139,7 @@ type ConformanceTestSuite struct {
 type ConfigurableOptions struct {
 	GatewayClassName     string            `json:"gatewayClassName"`
 	MeshName             string            `json:"meshName"`
+	ExpectedAPIVersion   string            `json:"expectedApiVersion"`
 	Debug                bool              `json:"debug"`
 	NamespaceLabels      map[string]string `json:"namespaceLabels"`
 	NamespaceAnnotations map[string]string `json:"namespaceAnnotations"`
@@ -290,7 +291,7 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 	if err != nil {
 		return nil, err
 	}
-	apiVersion, apiChannel, err := getAPIVersionAndChannel(installedCRDs.Items)
+	apiVersion, apiChannel, err := getAPIVersionAndChannel(&options, installedCRDs.Items)
 	if err != nil {
 		// in case an error is returned and the AllowCRDsMismatch flag is false, the suite fails.
 		// This is the default behavior but can be customized in case one wants to experiment
@@ -727,7 +728,7 @@ func shouldInferSupportedFeatures(opts *ConformanceOptions) bool {
 
 // getAPIVersionAndChannel iterates over all the crds installed in the cluster and check the version and channel annotations.
 // In case the annotations are not found or there are crds with different versions or channels, an error is returned.
-func getAPIVersionAndChannel(crds []apiextensionsv1.CustomResourceDefinition) (version string, channel string, err error) {
+func getAPIVersionAndChannel(opts *ConformanceOptions, crds []apiextensionsv1.CustomResourceDefinition) (version string, channel string, err error) {
 	for _, crd := range crds {
 		v, okv := crd.Annotations[consts.BundleVersionAnnotation]
 		c, okc := crd.Annotations[consts.ChannelAnnotation]
@@ -749,8 +750,8 @@ func getAPIVersionAndChannel(crds []apiextensionsv1.CustomResourceDefinition) (v
 	if version == "" || channel == "" {
 		return "", "", errors.New("no Gateway API CRDs with the proper annotations found in the cluster")
 	}
-	if version != consts.BundleVersion {
-		return "", "", errors.New("the installed CRDs version is different from the suite version")
+	if version != opts.ExpectedAPIVersion {
+		return "", "", fmt.Errorf("Gateway API %s is installed, but the expected version is %s", version, opts.ExpectedAPIVersion)
 	}
 
 	return version, channel, nil
