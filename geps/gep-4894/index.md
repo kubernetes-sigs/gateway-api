@@ -14,7 +14,7 @@ title: "GEP-4894: Backend Resource"
 
 ## TLDR
 
-This GEP proposes a new `Backend` resource that fills the [backend role](/geps/gep-2907/) — a **general-purpose decorator for backend destinations** within Gateway API. The Kubernetes `Service` resource is mature and stable, but it is effectively frozen and SIG-Network leadership is very careful about any potential features that would further bloat `Service`'s responsibilities. Previous approaches to extend Service behavior (like `BackendTLSPolicy`) have significant limitations around discoverability, implementation complexity, and the conflation of producer and consumer concerns. `BackendTLSPolicy` in particular was the right solution at the time, but feedback has shown that policy attachment was not the right approach for TLS configuration.
+This GEP proposes a new `Backend` resource that fills the [backend role](/geps/gep-2907/) — a **general-purpose decorator for backend destinations** within Gateway API. The Kubernetes `Service` resource is mature and stable, but it is effectively frozen and SIG-Network leadership is very careful about any potential features that would further bloat `Service`'s responsibilities. Previous approaches to extend Service behavior (like `BackendTLSPolicy`) have significant limitations around discoverability, implementation complexity, and the conflation of producer and consumer concerns. `BackendTLSPolicy` in particular was the right solution at the time, but feedback has shown that for the common case, inline configuration on the backend is simpler to author and often preferable.
 
 The `Backend` resource provides a namespace-scoped, consumer-focused resource that can:
 
@@ -213,7 +213,9 @@ type BackendSpec struct {
   // +unionDiscriminator
   // +required
   Type BackendType `json:"type"`
-  // Port defines the port that the implementation should use when connecting to this backend.
+  // Port defines the port to connect to on this backend.
+  // For ExternalHostname, this is the port on the external host.
+  // For EndpointSelector, this specifies which endpoint port to connect to.
   // +required
   Port BackendPort `json:"port,omitempty"`
 
@@ -290,6 +292,19 @@ type BackendPort struct {
   Port PortNumber `json:"port,omitempty" protobuf:"bytes,3,opt,name=port"`
 }
 
+// LabelSelector defines a query for resources based on their labels.
+// This simplified version uses only the matchLabels field.
+type LabelSelector struct {
+  // MatchLabels contains a set of required {key,value} pairs.
+  // An object must match every label in this map to be selected.
+  // The matching logic is an AND operation on all entries.
+  //
+  // +required
+  // +kubebuilder:validation:MinProperties=1
+  // +kubebuilder:validation:MaxProperties=64
+  MatchLabels map[LabelKey]LabelValue `json:"matchLabels"`
+}
+
 type EndpointSelectorBackend struct {
   // Selector defines the label selector used to identify the set of pods whose IP addresses
   // will make up the endpoints that this Backend should route traffic to.
@@ -305,13 +320,15 @@ type EndpointSelectorBackend struct {
   // upstream EndpointSelector resource (KEP-6116) is available. Implementations SHOULD set ownerReferences
   // so the created resource's lifecycle is tied to this Backend. This Service only exists to produce EndpointSlices;
   // Service-level behaviors (including but not limited to internalTrafficPolicy, externalTrafficPolicy,
-  // sessionAffinity, and trafficDistribution) play no role, and its ports are unused since the Gateway
-  // connects to the discovered endpoints using the Backend's port. Implementations SHOULD create the
+  // sessionAffinity, and trafficDistribution) play no role. The Service port (ClusterIP frontend) is unused;
+  // the targetPort SHOULD be set to Backend.spec.port. Implementations SHOULD create the
   // Service as headless (clusterIP: None), since no ClusterIP or kube-proxy load balancing is needed.
+  // Implementations MUST name the Service with generateName rather than a predictable name, so that a
+  // name like <backend-name>-backend.svc.cluster.local does not become a relied-upon DNS entry.
   // </gateway:util:excludeFromCRD>
   //
   // +required
-  *metav1.LabelSelector
+  LabelSelector
 }
 
 // +kubebuilder:validation:XValidation:rule="self.mode == 'ClientAndServer' ? has(self.clientCertificateRef) : !has(self.clientCertificateRef)",message="clientCertificateRef must be set if and only if mode is ClientAndServer"
@@ -620,6 +637,26 @@ spec:
 - Network-level controls (firewalls, proxy configuration) provide defense in depth
 - Backend resources provide audit trail for external dependencies
 
+### EndpointSelector Security Analysis
+
+#### Identified Security Risks
+
+A namespace admin should not be able to use the gateway to reach or expose anything outside the boundaries of their
+namespace. For example, [CVE-2021-25740](https://github.com/kubernetes/kubernetes/issues/103675) is a pre-existing
+confused-deputy issue where a user who can write `Endpoints`/`EndpointSlices` supplies arbitrary backend IPs that a
+trusted gateway forwards to, reaching other namespaces or internal addresses. This is not specific to `Backend`: the
+same confused deputy exists wherever a tenant can write endpoints and a gateway routes to that Service, including
+`HTTPRoute` -> `Service` today. Its mitigation is cluster-admin RBAC that removes endpoint write from tenants.
+
+#### Risk Assessment and Mitigations
+
+`EndpointSelector` does not reintroduce this: it selects pods by label, resolved by the control plane, so there is
+no user-supplied IP, and a `Selector` is namespace-scoped. A user only authors a `Backend` and never writes
+endpoints, so this holds without granting tenants endpoint access.
+
+TODO: Revisit this risk assessment when `selectorRef` is added, since cross-namespace selection crosses the
+namespace boundary.
+
 ### Route Attachment and Consumer Overrides
 
 Backends MUST live in the same namespace as any route (or other parent resource) that references them. For `EndpointSelector` type Backends, consumer override scenarios are supported using the pre-existing GAMMA pattern of creating a route (and therefore a `Backend`) in the consumer namespace and the `Backend` will reference an `EndpointSelector` in a different, producer namespace. This cross-namespace referencing will be provided by the `selectorRef` field, added once the upstream EndpointSelector resource is available (see [EndpointSelector Type](#endpointselector-type)).
@@ -777,8 +814,11 @@ back with an upstream EndpointSelector once KEP-6116 is available, with no user-
 ## Open Questions
 
 - When we add `selectorRef`, will `ReferenceGrant` be required for cross-namespace references?
+- Should cross-namespace Route -> Backend references be supported (via ReferenceGrant)?
 - Should the `Backend` surface a status condition reporting whether the `Selector` resolved to any endpoints (for
   example, to flag a selector that matches no pods)?
-- Where should the port be defined for each `Backend` type? The `Backend` is the only place it can live for
-  `Selector` and `ExternalHostname`, but for a future `selectorRef` the referenced EndpointSelector already
-  defines its own ports, which may make `Backend.port` redundant.
+- What should the structure of `Backend.spec.port` be to align with Service and the future EndpointSelector backing?
+- What is the long-term relationship between the `Backend` resource and `BackendTLSPolicy`? Inline TLS on `Backend`
+  serves the common, backend-owner-authored case, but `BackendTLSPolicy` may still be the better fit where the
+  configuring persona differs from the backend owner (for example, a Gateway or cluster operator enforcing trust
+  settings for a backend they do not own).
