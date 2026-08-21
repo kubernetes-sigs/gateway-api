@@ -1,0 +1,141 @@
+apiVersion: gateway.networking.k8s.io/v1
+date: "2026-08-19T00:25:09Z"
+gatewayAPIChannel: experimental
+gatewayAPIVersion: v1.6.0
+implementation:
+  contact:
+  - https://github.com/apache/apisix-ingress-controller/issues
+  organization: apache
+  project: apisix-ingress-controller
+  url: https://github.com/apache/apisix-ingress-controller
+  version: 2.2.0
+kind: ConformanceReport
+mode: apisix-standalone
+profiles:
+- core:
+    result: partial
+    skippedTests:
+    - TLSRouteHostnameIntersection
+    - TLSRouteInvalidBackendRefNonexistent
+    - TLSRouteInvalidBackendRefUnknownKind
+    - TLSRouteSimpleSameNamespace
+    statistics:
+      Failed: 0
+      Passed: 16
+      Skipped: 4
+  extended:
+    result: partial
+    skippedTests:
+    - TLSRouteTerminateSimpleSameNamespace
+    statistics:
+      Failed: 0
+      Passed: 3
+      Skipped: 1
+    supportedFeatures:
+    - GatewayAddressEmpty
+    - GatewayPort8080
+    - TLSRouteModeTerminate
+    unsupportedFeatures:
+    - GatewayBackendClientCertificate
+    - GatewayFrontendClientCertificateValidation
+    - GatewayFrontendClientCertificateValidationInsecureFallback
+    - GatewayHTTPListenerIsolation
+    - GatewayHTTPSListenerDetectMisdirectedRequests
+    - GatewayInfrastructurePropagation
+    - GatewayStaticAddresses
+    - ListenerSet
+    - TLSRouteModeMixed
+  name: GATEWAY-TLS
+  summary: Core tests partially succeeded with 4 test skips. Extended tests partially
+    succeeded with 1 test skips.
+- core:
+    result: partial
+    skippedTests:
+    - HTTPRouteHTTPSListener
+    - HTTPRouteInvalidBackendRefUnknownKind
+    - HTTPRouteInvalidCrossNamespaceBackendRef
+    - HTTPRouteInvalidNonExistentBackendRef
+    - HTTPRouteMultipleGateways
+    statistics:
+      Failed: 0
+      Passed: 32
+      Skipped: 5
+  extended:
+    result: partial
+    skippedTests:
+    - HTTPRouteRedirectPortAndScheme
+    statistics:
+      Failed: 0
+      Passed: 12
+      Skipped: 1
+    supportedFeatures:
+    - GatewayAddressEmpty
+    - GatewayPort8080
+    - HTTPRouteBackendProtocolWebSocket
+    - HTTPRouteDestinationPortMatching
+    - HTTPRouteHostRewrite
+    - HTTPRouteMethodMatching
+    - HTTPRoutePathRewrite
+    - HTTPRoutePortRedirect
+    - HTTPRouteQueryParamMatching
+    - HTTPRouteRequestMirror
+    - HTTPRouteResponseHeaderModification
+    - HTTPRouteSchemeRedirect
+    unsupportedFeatures:
+    - BackendTLSPolicy
+    - BackendTLSPolicySANValidation
+    - GatewayBackendClientCertificate
+    - GatewayFrontendClientCertificateValidation
+    - GatewayFrontendClientCertificateValidationInsecureFallback
+    - GatewayHTTPListenerIsolation
+    - GatewayHTTPSListenerDetectMisdirectedRequests
+    - GatewayInfrastructurePropagation
+    - GatewayStaticAddresses
+    - HTTPRoute303RedirectStatusCode
+    - HTTPRoute307RedirectStatusCode
+    - HTTPRoute308RedirectStatusCode
+    - HTTPRouteBackendProtocolH2C
+    - HTTPRouteBackendRequestHeaderModification
+    - HTTPRouteBackendTimeout
+    - HTTPRouteCORS
+    - HTTPRouteNamedRouteRule
+    - HTTPRouteParentRefPort
+    - HTTPRoutePathRedirect
+    - HTTPRouteRequestMultipleMirrors
+    - HTTPRouteRequestPercentageMirror
+    - HTTPRouteRequestTimeout
+    - HTTPRouteRetry
+    - HTTPRouteRetryBackendTimeout
+    - HTTPRouteRetryConnectionError
+    - ListenerSet
+  name: GATEWAY-HTTP
+  summary: Core tests partially succeeded with 5 test skips. Extended tests partially
+    succeeded with 1 test skips.
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 15
+      Skipped: 0
+  extended:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 1
+      Skipped: 0
+    supportedFeatures:
+    - GatewayAddressEmpty
+    - GatewayPort8080
+    unsupportedFeatures:
+    - GatewayBackendClientCertificate
+    - GatewayFrontendClientCertificateValidation
+    - GatewayFrontendClientCertificateValidationInsecureFallback
+    - GatewayHTTPListenerIsolation
+    - GatewayHTTPSListenerDetectMisdirectedRequests
+    - GatewayInfrastructurePropagation
+    - GatewayStaticAddresses
+    - ListenerSet
+  name: GATEWAY-GRPC
+  summary: Core tests succeeded. Extended tests succeeded.
+succeededProvisionalTests:
+- GatewayOptionalAddressValue
