@@ -52,6 +52,12 @@ import (
 // tests which validate fixing broken Gateways, e.t.c.
 const GatewayExcludedFromReadinessChecks = "gateway-api/skip-this-for-readiness"
 
+// StaleControllerName is a controllerName that tests can put on a Route
+// status.parents entry to stand in for another implementation sharing the
+// cluster. Nothing reconciles such an entry, so RouteMustHaveParents leaves its
+// observedGeneration alone.
+const StaleControllerName = gatewayv1.GatewayController("gateway.networking.k8s.io/stale-controller")
+
 const GatewayKind = gatewayv1.Kind("Gateway")
 
 // GatewayRef is a tiny type for specifying an HTTP Route ParentRef without
@@ -793,6 +799,23 @@ func RouteTypeMustHaveParentsField(t *testing.T, routeType any) string {
 	return routeTypeName
 }
 
+// staleParentStatus returns the first status entry whose conditions have not
+// caught up with the object generation. Entries owned by StaleControllerName
+// are exempt: nothing reconciles them, so their observedGeneration never moves.
+func staleParentStatus(obj metav1.Object, parents []gatewayv1.RouteParentStatus) (gatewayv1.RouteParentStatus, error) {
+	for _, parent := range parents {
+		if parent.ControllerName == StaleControllerName {
+			continue
+		}
+
+		if err := ConditionsHaveLatestObservedGeneration(obj, parent.Conditions); err != nil {
+			return parent, err
+		}
+	}
+
+	return gatewayv1.RouteParentStatus{}, nil
+}
+
 func RouteMustHaveParents(t *testing.T, cli client.Client, timeoutConfig config.TimeoutConfig, routeName types.NamespacedName, parents []gatewayv1.RouteParentStatus, namespaceRequired bool, routeType any) {
 	t.Helper()
 
@@ -811,14 +834,13 @@ func RouteMustHaveParents(t *testing.T, cli client.Client, timeoutConfig config.
 			return false, fmt.Errorf("error fetching %s: %w", routeTypeName, err)
 		}
 
-		for _, parent := range actual {
-			if err := ConditionsHaveLatestObservedGeneration(metaObj, parent.Conditions); err != nil {
-				tlog.Logf(t, "%s(controller=%v,ref=%#v) %v", routeTypeName, parent.ControllerName, parent, err)
-				return false, nil
-			}
+		actual = reflect.ValueOf(cliObj).Elem().FieldByName("Status").FieldByName("Parents").Interface().([]v1alpha2.RouteParentStatus)
+
+		if parent, err := staleParentStatus(metaObj, actual); err != nil {
+			tlog.Logf(t, "%s(controller=%v,ref=%#v) %v", routeTypeName, parent.ControllerName, parent, err)
+			return false, nil
 		}
 
-		actual = reflect.ValueOf(cliObj).Elem().FieldByName("Status").FieldByName("Parents").Interface().([]v1alpha2.RouteParentStatus)
 		return parentsForRouteMatch(t, routeName, parents, actual, namespaceRequired), nil
 	})
 	require.NoErrorf(t, waitErr, "error waiting for %s to have parents matching expectations", routeTypeName)
