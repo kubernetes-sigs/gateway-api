@@ -302,10 +302,10 @@ type BackendAncestorStatus struct {
 	// +required
 	ControllerName v1.GatewayController `json:"controllerName"`
 
-	// AncestorRef identifies the parent resource that this status is associated with.
+	// ParentRef identifies the parent resource that this status is associated with.
 	//
 	// +required
-	AncestorRef v1.ParentReference `json:"parentRef"`
+	ParentRef v1.ParentReference `json:"parentRef"`
 
 	// For Kubernetes API conventions, see:
 	// https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#typical-status-properties

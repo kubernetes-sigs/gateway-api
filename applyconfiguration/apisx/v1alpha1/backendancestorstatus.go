@@ -47,8 +47,8 @@ type BackendAncestorStatusApplyConfiguration struct {
 	// they are no longer necessary.
 	// </gateway:util:excludeFromCRD>
 	ControllerName *v1.GatewayController `json:"controllerName,omitempty"`
-	// AncestorRef identifies the parent resource that this status is associated with.
-	AncestorRef *apisv1.ParentReferenceApplyConfiguration `json:"parentRef,omitempty"`
+	// ParentRef identifies the parent resource that this status is associated with.
+	ParentRef *apisv1.ParentReferenceApplyConfiguration `json:"parentRef,omitempty"`
 	// For Kubernetes API conventions, see:
 	// https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#typical-status-properties
 	// conditions represent the current state of the Backend resource.
@@ -75,11 +75,11 @@ func (b *BackendAncestorStatusApplyConfiguration) WithControllerName(value v1.Ga
 	return b
 }
 
-// WithAncestorRef sets the AncestorRef field in the declarative configuration to the given value
+// WithParentRef sets the ParentRef field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
-// If called multiple times, the AncestorRef field is set to the value of the last call.
-func (b *BackendAncestorStatusApplyConfiguration) WithAncestorRef(value *apisv1.ParentReferenceApplyConfiguration) *BackendAncestorStatusApplyConfiguration {
-	b.AncestorRef = value
+// If called multiple times, the ParentRef field is set to the value of the last call.
+func (b *BackendAncestorStatusApplyConfiguration) WithParentRef(value *apisv1.ParentReferenceApplyConfiguration) *BackendAncestorStatusApplyConfiguration {
+	b.ParentRef = value
 	return b
 }
 
