@@ -22,8 +22,6 @@ kind: Gateway
 metadata:
   name: gateway-supported-and-invalid-route-kind
   namespace: gateway-conformance-infra
-  annotations:
-    gateway-api/skip-this-for-readiness: "true"
 spec:
   gatewayClassName: "{GATEWAY_CLASS_NAME}"
   listeners:
@@ -36,3 +34,19 @@ spec:
         kinds:
           - kind: InvalidRoute
           - kind: HTTPRoute
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: gateway-supported-and-invalid-route-kind-control
+  namespace: gateway-conformance-infra
+spec:
+  parentRefs:
+    - name: gateway-supported-and-invalid-route-kind
+      sectionName: http
+  hostnames:
+    - supported-route-kind.example.com
+  rules:
+    - backendRefs:
+        - name: infra-backend-v1
+          port: 8080

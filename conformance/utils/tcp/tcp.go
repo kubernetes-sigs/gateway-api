@@ -34,6 +34,7 @@ import (
 
 	tcpserver "sigs.k8s.io/gateway-api-conformance-images/echo-basic/tcpserver"
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
+	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/tlog"
 )
 
@@ -48,6 +49,22 @@ type ExpectedResponse struct {
 	Namespace    string
 	TLSProtocol  string // Optional, if set will validate and value should match the definitions from tls.VersionName()
 	Hostname     string // Optional, if set will verify if the SNI hostname captured by TLS matches this value
+}
+
+// MakeTCPConnectionAndExpectEventuallyConsistentFailure attempts a TCP connection and
+// expects it to fail. This is useful for testing listeners that must not be programmed.
+func MakeTCPConnectionAndExpectEventuallyConsistentFailure(t *testing.T, timeoutConfig config.TimeoutConfig, address string) {
+	t.Helper()
+
+	http.AwaitConvergence(t, timeoutConfig.RequiredConsecutiveSuccesses, timeoutConfig.MaxTimeToConsistency, func(_ time.Duration) bool {
+		attemptCtx, cancel := context.WithTimeout(t.Context(), time.Second)
+		conn, err := (&net.Dialer{}).DialContext(attemptCtx, "tcp", address)
+		cancel()
+		if conn != nil {
+			conn.Close()
+		}
+		return err != nil
+	})
 }
 
 // MakeTCPRequestAndExpectEventuallyValidResponse makes a TCP request with the given parameters,
