@@ -74,6 +74,11 @@ const (
 	// with ListenerSets
 	SupportListenerSet FeatureName = "ListenerSet"
 
+	// SupportGatewayNonDisruptiveConfig option indicates support for
+	// non-disruptive configuration changes, such as migrating routes between
+	// listeners/ListenerSets or changing route backends without traffic disruption.
+	SupportGatewayNonDisruptiveConfig FeatureName = "GatewayNonDisruptiveConfig"
+
 	// SupportGatewayBackendClientCertificate option indicates support for
 	// specifying client certificates when the Gateway originates the connection
 	// to the backend.
@@ -127,6 +132,12 @@ var (
 		Channel: FeatureChannelStandard,
 	}
 
+	// GatewayNonDisruptiveConfigFeature contains metadata for the SupportGatewayNonDisruptiveConfig feature.
+	GatewayNonDisruptiveConfigFeature = Feature{
+		Name:    SupportGatewayNonDisruptiveConfig,
+		Channel: FeatureChannelStandard,
+	}
+
 	// GatewayBackendClientCertificateFeature contains metadata for the SupportGatewayBackendClientCertificate feature.
 	GatewayBackendClientCertificateFeature = Feature{
 		Name:    SupportGatewayBackendClientCertificate,
@@ -154,6 +165,7 @@ var GatewayExtendedFeatures = sets.New(
 	GatewayHTTPSListenerDetectMisdirectedRequestsFeature,
 	GatewayInfrastructurePropagationFeature,
 	GatewayEmptyAddressFeature,
+	GatewayNonDisruptiveConfigFeature,
 	GatewayBackendClientCertificateFeature,
 	GatewayFrontendClientCertificateValidationFeature,
 	GatewayFrontendClientCertificateValidationInsecureFallbackFeature,
