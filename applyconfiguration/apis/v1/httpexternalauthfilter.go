@@ -32,12 +32,10 @@ import (
 // Feature Name: HTTPRouteExternalAuth
 type HTTPExternalAuthFilterApplyConfiguration struct {
 	// ExternalAuthProtocol describes which protocol to use when communicating with an
-	// ext_authz authorization server.
+	// external authorization server.
 	//
-	// When this is set to GRPC, each backend must use the Envoy ext_authz protocol
-	// on the port specified in `backendRefs`. Requests and responses are defined
-	// in the protobufs explained at:
-	// https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/external_auth.proto
+	// When this is set to GRPC, each backend must use the GRPC ext_authz protocol
+	// on the port specified in `backendRefs`.
 	//
 	// When this is set to HTTP, each backend must respond with a `200` status
 	// code in on a successful authorization. Any other code is considered
@@ -46,6 +44,16 @@ type HTTPExternalAuthFilterApplyConfiguration struct {
 	// Feature Names:
 	// GRPC Support - HTTPRouteExternalAuthGRPC
 	// HTTP Support - HTTPRouteExternalAuthHTTP
+	//
+	// <gateway:util:excludeFromCRD>
+	//
+	// Notes for implementers:
+	//
+	// When the protocol is GRPC, requests and responses are defined in the
+	// Envoy ext_authz protobufs explained at:
+	// https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/external_auth.proto
+	//
+	// </gateway:util:excludeFromCRD>
 	ExternalAuthProtocol *apisv1.HTTPRouteExternalAuthProtocol `json:"protocol,omitempty"`
 	// BackendRef is a reference to a backend to send authorization
 	// requests to.

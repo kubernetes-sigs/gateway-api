@@ -39,17 +39,23 @@ type GatewaySpecApplyConfiguration struct {
 	// logical endpoints that are bound on this Gateway's addresses.
 	// At least one Listener MUST be specified.
 	//
+	// Each Listener in a Gateway MUST be _distinct_, meaning that each traffic
+	// flow MUST be assignable to exactly one Listener. Practically, this means
+	// that each Listener MUST have a unique combination of Port, Protocol, and,
+	// if supported by the protocol, Hostname.
+	//
+	// Support: Core
+	//
+	// <gateway:util:excludeFromCRD>
+	//
+	// Notes for implementers:
+	//
 	// ## Distinct Listeners
 	//
-	// Each Listener in a set of Listeners (for example, in a single Gateway)
-	// MUST be _distinct_, in that a traffic flow MUST be able to be assigned to
-	// exactly one listener. (This section uses "set of Listeners" rather than
-	// "Listeners in a single Gateway" because implementations MAY merge configuration
-	// from multiple Gateways onto a single data plane, and these rules _also_
-	// apply in that case).
-	//
-	// Practically, this means that each listener in a set MUST have a unique
-	// combination of Port, Protocol, and, if supported by the protocol, Hostname.
+	// This section uses "set of Listeners" rather than "Listeners in a single
+	// Gateway" because implementations MAY merge configuration from multiple
+	// Gateways onto a single data plane, and these rules _also_ apply in that
+	// case.
 	//
 	// Some combinations of port, protocol, and TLS settings are considered
 	// Core support and MUST be supported by implementations based on the objects
@@ -201,7 +207,7 @@ type GatewaySpecApplyConfiguration struct {
 	//
 	// In a future release the MinItems=1 requirement MAY be dropped.
 	//
-	// Support: Core
+	// </gateway:util:excludeFromCRD>
 	Listeners []ListenerApplyConfiguration `json:"listeners,omitempty"`
 	// Addresses requested for this Gateway. This is optional and behavior can
 	// depend on the implementation. If a value is set in the spec and the
@@ -218,11 +224,17 @@ type GatewaySpecApplyConfiguration struct {
 	// Gateway in an implementation-specific manner, assigning an appropriate
 	// set of Addresses.
 	//
+	// Support: Extended
+	//
+	// <gateway:util:excludeFromCRD>
+	//
+	// Notes for implementers:
+	//
 	// The implementation MUST bind all Listeners to every GatewayAddress that
 	// it assigns to the Gateway and add a corresponding entry in
 	// GatewayStatus.Addresses.
 	//
-	// Support: Extended
+	// </gateway:util:excludeFromCRD>
 	//
 	// <gateway:validateIPAddress>
 	Addresses []GatewaySpecAddressApplyConfiguration `json:"addresses,omitempty"`

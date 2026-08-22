@@ -42,6 +42,21 @@ type BackendTLSPolicySpecApplyConfiguration struct {
 	// be unique across all targetRef entries in the BackendTLSPolicy.
 	// * They select different sectionNames in the same target.
 	//
+	// Support Levels:
+	//
+	// * Extended: Kubernetes Service referenced by backendRefs used on a Route.
+	// - HTTPRoute, GRPCRoute, TLSRoute with termination
+	// - Filters that needs a backend of type Service, like Mirror and External Authorization
+	//
+	// * Implementation-Specific: Implementations MAY use BackendTLSPolicy for:
+	// - Services not referenced by any Route (e.g., infrastructure services)
+	// - Service mesh workload-to-service communication
+	// - Other resource types beyond Service
+	//
+	// <gateway:util:excludeFromCRD>
+	//
+	// Notes for implementers:
+	//
 	// When more than one BackendTLSPolicy selects the same target and
 	// sectionName, implementations MUST determine precedence using the
 	// following criteria, continuing on ties:
@@ -64,17 +79,6 @@ type BackendTLSPolicySpecApplyConfiguration struct {
 	// clarified in a future release, the safest approach is to support a single
 	// targetRef.
 	//
-	// Support Levels:
-	//
-	// * Extended: Kubernetes Service referenced by backendRefs used on a Route.
-	// - HTTPRoute, GRPCRoute, TLSRoute with termination
-	// - Filters that needs a backend of type Service, like Mirror and External Authorization
-	//
-	// * Implementation-Specific: Implementations MAY use BackendTLSPolicy for:
-	// - Services not referenced by any Route (e.g., infrastructure services)
-	// - Service mesh workload-to-service communication
-	// - Other resource types beyond Service
-	//
 	// Implementations SHOULD aim to ensure that BackendTLSPolicy behavior is consistent,
 	// even outside of the extended HTTPRoute -(backendRef) -> Service path.
 	// They SHOULD clearly document how BackendTLSPolicy is interpreted in these
@@ -86,6 +90,8 @@ type BackendTLSPolicySpecApplyConfiguration struct {
 	// Note that this config applies to the entire referenced resource
 	// by default, but this default may change in the future to provide
 	// a more granular application of the policy.
+	//
+	// </gateway:util:excludeFromCRD>
 	//
 	// <gateway:util:excludeFromCRD>
 	// Mirrors the parentRefs consistency/uniqueness rules from CommonRouteSpec.ParentRefs.
