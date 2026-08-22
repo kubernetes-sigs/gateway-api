@@ -532,7 +532,7 @@ func (suite *ConformanceTestSuite) Run(t *testing.T, tests []ConformanceTest) er
 			time.Sleep(suite.TimeoutConfig.TestIsolation)
 		}
 
-		t.Run(test.ShortName, func(subT *testing.T) {
+		passed := t.Run(test.ShortName, func(subT *testing.T) {
 			subT.Cleanup(func() {
 				suite.recordTestResult(subT, test, res)
 				if suite.Hook != nil {
@@ -543,6 +543,14 @@ func (suite *ConformanceTestSuite) Run(t *testing.T, tests []ConformanceTest) er
 			require.NoError(subT, err, "failed to create new clientset for test")
 			test.Run(subT, suite)
 		})
+		// t.Run's return value is the only reliable signal of whether the test
+		// actually failed: `res` above only reflects pre-run skip/support
+		// classification, and recordTestResult computes pass/fail into its own
+		// local variable that never propagates back here. Without this, the
+		// failFast check below could never see a testFailed result.
+		if res == testSucceeded && !passed {
+			res = testFailed
+		}
 
 		if res == testSucceeded {
 			sleepForTestIsolation = true
