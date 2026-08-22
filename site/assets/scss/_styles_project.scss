@@ -2,4 +2,22 @@
   background-color: #326ce5 !important;
 }
 
+.conditions-compact-table {
+  display: block;
+  overflow-x: auto;
+  width: fit-content;
+  max-width: 100%;
+
+  table {
+    width: auto;
+  }
+
+  th:nth-child(n + 2),
+  td:nth-child(n + 2) {
+    text-align: center;
+    white-space: nowrap;
+    width: 1%;
+  }
+}
+
 @import 'td/code-dark';
