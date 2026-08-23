@@ -537,6 +537,11 @@ func (suite *ConformanceTestSuite) Run(t *testing.T, tests []ConformanceTest) er
 			err := suite.setClientsetForTest(test)
 			require.NoError(subT, err, "failed to create new clientset for test")
 			test.Run(subT, suite)
+			// Register the Hook's cleanup only after test.Run has returned, so it is
+			// the last cleanup registered on subT. testing.T runs Cleanup funcs in
+			// LIFO order, so this makes the Hook run before any cleanup the test
+			// itself registered during test.Run (e.g. deleting the resources it
+			// created), while resources are still present for the Hook to inspect.
 			if suite.Hook != nil {
 				subT.Cleanup(func() {
 					suite.Hook(subT, test, suite)
