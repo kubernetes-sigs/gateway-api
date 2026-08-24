@@ -144,7 +144,7 @@ type BackendPort struct {
 	//
 	// +optional
 	// +kubebuilder:validation:MaxLength=63
-	// +kubebuilder:validation:XValidation:rule="size(self) == 0 || format.dns1123Label().validate(self) == null",message="Name must be a valid DNS label"
+	// +kubebuilder:validation:XValidation:rule="size(self) == 0 || !format.dns1123Label().validate(self).hasValue()",message="Name must be a valid DNS label"
 	Name *string `json:"name,omitempty"`
 
 	// Port represents the port number of the endpoint.

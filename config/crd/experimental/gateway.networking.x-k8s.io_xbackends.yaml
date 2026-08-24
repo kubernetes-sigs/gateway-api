@@ -90,8 +90,7 @@ spec:
                     type: string
                     x-kubernetes-validations:
                     - message: Name must be a valid DNS label
-                      rule: size(self) == 0 || format.dns1123Label().validate(self)
-                        == null
+                      rule: size(self) == 0 || !format.dns1123Label().validate(self).hasValue()
                   port:
                     description: Port represents the port number of the endpoint.
                     format: int32
