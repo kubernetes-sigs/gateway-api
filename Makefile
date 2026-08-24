@@ -175,7 +175,7 @@ verify-docs: build-docs
 	docker run --init --rm -w /input -v ${PWD}:/input $(DOCS_VERIFY_CONTAINER_IMAGE) --root-dir /input/site/public --include "sigs.k8s.io" --accept 200 --max-concurrency 10 --include-fragments --cache $(VALIDATE_DOCS_EXTRA_FLAGS) /input/site/public/**/*.html
 
 .PHONY: build-docs-netlify
-build-docs-netlify: install-deps update-geps api-ref-docs wizard-wasm wizard-data conformance-data
+build-docs-netlify: install-deps update-geps update-implist api-ref-docs wizard-wasm wizard-data conformance-data
 	$(HUGO) --source site
 
 .PHONY: live-docs
@@ -185,6 +185,10 @@ live-docs: update-geps api-ref-docs
 .PHONY: update-geps
 update-geps:
 	hack/update-geps.sh
+
+.PHONY: update-implist
+update-implist:
+	hack/update-implist.sh
 
 .PHONY: api-ref-docs
 api-ref-docs:
@@ -211,6 +215,6 @@ conformance-data:
 	$(PYTHON) hack/docsy-generate-conformance.py
 
 .PHONY: serve
-serve: wizard-wasm update-geps api-ref-docs
+serve: wizard-wasm update-geps update-implist api-ref-docs
 	@echo "Tip: Run 'make wizard-data' first if you have conformance/reports/ to load implementation data."
 	$(HUGO_SERVER) --source site
