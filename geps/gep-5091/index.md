@@ -12,8 +12,12 @@ This GEP proposes a new `PayloadProcessor` resource that enables declarative,
 ordered processing of HTTP request and response **payloads** (headers *and*
 body) within the Gateway API framework. Today, Gateway API filters operate on
 headers, paths, and query parameters but do not define mechanisms for acting on the request and response
-body. Modern workloads, particularly AI inference, require body-level
-processing for routing, security, and compliance decisions.
+body. Body-level processing is a long-established requirement across
+multi-tenant SaaS routing, regulatory redaction (PCI-DSS, HIPAA), API
+schema evolution, integration webhook fan-out, and observability
+enrichment. AI inference has made this gap more visible and more
+urgent, but it did not create it, and any API defined here needs to
+serve both audiences.
 
 This provisional revision is scoped to the *what*, *who*, and
 *why*. It establishes that payload processing belongs in Gateway API and
@@ -45,9 +49,51 @@ implementation-specific extensions with no portability, or are shoehorned
 into filters whose semantics do not fit. For example, `ExternalAuth` is
 scoped to authorization decisions on the request, not to response mutation.
 
-### AI Inference Requires Body-Level Decisions
+### Body-Level Processing Is a Long-Established Need
 
-AI inference workloads send model selection, prompt content, and
+Reading, mutating, and routing on HTTP body content is not a new
+requirement introduced by AI workloads. It underpins patterns that have
+been in production for years across enterprise API gateways, integration
+platforms, and web application firewalls:
+
+* **Multi-tenant SaaS routing**, where `tenant_id` lives inside the
+  request JSON and has to be extracted for per-tenant backend selection
+  or downstream authorization and metering.
+* **Regulatory data redaction**, such as PCI-DSS 4.0 Requirement 3.4
+  masking of Primary Account Numbers in response bodies, and HIPAA-
+  driven PHI stripping when data crosses a non-Business-Associate
+  boundary.
+* **API schema evolution**, where a v1 client payload must be translated
+  into a v2 backend schema (field renames, defaults, restructuring) so
+  clients can migrate at their own pace without forcing a synchronized
+  cut-over.
+* **Integration webhook fan-out**, where inbound webhooks from third
+  parties (GitHub, Stripe, EDI trading partners) are routed by an
+  `event_type` or document-type field inside the body rather than by
+  any header.
+* **Observability and audit correlation**, where a business identifier
+  such as `order_id` is extracted from the body and projected into a
+  trace or log correlation header so distributed traces are anchored to
+  the business transaction rather than the HTTP hop.
+* **Body-level WAF rules**, such as ModSecurity CRS SQL-injection
+  (rule set 942xxx) and XSS (941xxx) patterns applied to JSON request
+  fields.
+
+These patterns are implemented today via Envoy's
+[`transform`](https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/transform_filter)
+and
+[`json_to_metadata`](https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/json_to_metadata_filter)
+filters, Kong `request-transformer` and `response-transformer`, NGINX
+`sub_filter` and Lua modules, ModSecurity, and vendor policies in AWS
+API Gateway, Azure API Management, and IBM DataPower. They are not
+united under a common API, so an operator cannot express a body-based
+route, a PCI-DSS redaction, or a webhook-dispatch rule once and have
+it apply across data planes.
+
+### AI Inference Makes the Gap Acute
+
+AI inference is the current-day accelerator on top of the pattern above.
+Inference workloads send model selection, prompt content, and
 configuration in the request body (typically JSON). Key decisions, which
 model to route to, whether the prompt contains PII or an injection attack,
 whether the response can be served from a cache, all require reading the
@@ -56,7 +102,9 @@ names for routing. That BBR is the primary implementation of the pluggable
 BBR framework proposed by the [Gateway API Inference Extension (GAIE)]. That
 proposal is in a draft state and its reference implementation no longer
 lives inside the GAIE repo, so downstream users have no portable, upstream
-answer for what is a foundational AI-gateway pattern.
+answer for what is a foundational AI-gateway pattern, and the same lack
+of a portable answer is what the traditional patterns above have been
+living with for years.
 
 ### Body-Level Processing Is Not Portable Today
 
@@ -78,10 +126,13 @@ not united under a common API.
 
 ### Composability Gap
 
-Real-world payload processing requires ordered, composable pipelines, for
-example, "first extract the model name for routing, then scan for PII, then
-check for prompt injection." Current approaches require either monolithic
-external services or implementation-specific chaining mechanisms.
+Real-world payload processing requires ordered, composable pipelines. For
+an AI gateway that could read "first extract the model name for routing,
+then scan for PII, then check for prompt injection." For a payments
+gateway it reads "first verify the HMAC signature, then extract the
+tenant for routing, then mask the PAN on the response." Current
+approaches require either monolithic external services or
+implementation-specific chaining mechanisms.
 
 [Gateway API Inference Extension (GAIE)]: https://github.com/kubernetes-sigs/gateway-api-inference-extension
 [llm-d]: https://github.com/llm-d/llm-d-inference-payload-processor
@@ -133,13 +184,39 @@ external services or implementation-specific chaining mechanisms.
 
 ## User Stories
 
-The following stories describe *what* users want to accomplish. They are
-intentionally described independently of whether the underlying processing
-runs in-data-plane, in an external service, or both, that dimension is
-one of the API design questions and is discussed under
+The following stories describe *what* users want to accomplish. They
+intentionally span both long-established API-gateway patterns
+(multi-tenant routing, regulatory redaction, schema translation,
+webhook dispatch) and emerging workloads (AI inference, agentic MCP).
+Body-level processing is not a capability introduced by AI, and the
+API defined here needs to serve both audiences. Each story is written
+independently of whether the underlying processing runs in-data-plane,
+in an external service, or both, that dimension is one of the API
+design questions and is discussed under
 [Options Under Consideration](#options-under-consideration).
 
 ### Body-Based Routing
+
+**As a SaaS Platform Engineer:**
+
+> "My multi-tenant backend expects `tenant_id` inside the request JSON,
+> per an API contract I cannot change on the client side. I need the
+> gateway to extract that identifier and either route to a per-tenant
+> backend or project it into an `X-Tenant-ID` header so downstream
+> authorization and metering can enforce isolation. Today I either run
+> a dedicated router sidecar whose only job is to read the body and
+> re-header the request, or I push tenant extraction into every
+> downstream service."
+
+**As an Integration Engineer Handling Inbound Webhooks:**
+
+> "I ingest webhooks from third parties like GitHub, Stripe, and EDI
+> trading partners, where the routing decision lives in an
+> `event_type`, `action`, or `document_type` field inside the JSON
+> body, not in any header. Today I run a small dispatcher service in
+> front of my real handlers whose only responsibility is to read the
+> body and forward. I want to declare that routing rule on the
+> `HTTPRoute` itself and drop the extra hop."
 
 **As an AI Platform Engineer:**
 
@@ -156,6 +233,26 @@ one of the API design questions and is discussed under
 > that the gateway can route to the correct backend MCP server."
 
 ### Security and Compliance
+
+**As a Payments Compliance Officer:**
+
+> "PCI-DSS 4.0 Requirement 3.4 mandates that Primary Account Numbers are
+> rendered unreadable wherever they are stored or transmitted. My
+> settlement and reconciliation backends return full PAN in response
+> bodies, and I want the gateway to mask all but the last four digits on
+> the way out, auditable in the same place as my routing configuration.
+> Trusting every backend team to redact correctly, or standing up a
+> separate scrubbing proxy, has repeatedly caused audit findings."
+
+**As a B2B API Integration Engineer:**
+
+> "My banking and payment partners sign requests by canonicalizing a
+> subset of JSON body fields (timestamp, account, amount) and sending
+> an HMAC-SHA256 signature in a header. I need the gateway to
+> reconstruct that canonical form, verify the signature, and reject on
+> mismatch before the request ever reaches a backend, the same way it
+> already terminates TLS. This is the same pattern used by GitHub
+> webhook signatures, AWS SigV4, and most payment-partner APIs."
 
 **As a Compliance Officer:**
 
@@ -184,6 +281,15 @@ one of the API design questions and is discussed under
 
 ### Request and Response Enrichment
 
+**As an Integration Engineer Owning a Version Migration:**
+
+> "My backend has moved from a v1 to a v2 request schema, but a long
+> tail of clients still send v1 payloads: renamed fields, missing
+> defaults, and one or two newly-required fields the old client never
+> knew about. I want the gateway to translate v1 requests into v2 in
+> flight, so I can migrate clients at their own pace without
+> maintaining a v1 compatibility shim in every backend service."
+
 **As a Platform Engineer:**
 
 > "I want to normalize inference requests before they reach a backend,
@@ -200,6 +306,16 @@ one of the API design questions and is discussed under
 > request that is otherwise served entirely from cache."
 
 ### Optimization
+
+**As a Platform Engineer Serving Mobile Clients:**
+
+> "My backend returns a verbose JSON response, but mobile clients need
+> only a handful of the fields; the rest cost bandwidth and battery. I
+> want the gateway to strip fields from the response body based on an
+> `Accept-Version` header or a client-supplied field list, so I can
+> offer a mobile-optimized shape without forking the backend, and so
+> the projection composes with the other response-processing steps I
+> already run."
 
 **As a Cluster Administrator:**
 
