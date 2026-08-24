@@ -14,7 +14,7 @@ be no longer than a few paragraphs.
 
 ## Conformance levels
 
-There are three levels of Gateway API conformance:
+There are two levels of Gateway API conformance:
 
 ### Conformant implementations
 
@@ -41,21 +41,9 @@ of the tests to be Conformant (as above) for one of the three (3) most recent
 Gateway API releases. Note that the requirements to be considered "partially
 conformant" may be tightened in a future release of Gateway API.
 
-### Stale implementations
+## Implementation traffic types
 
-These implementations may not be being actively developed and will be removed
-from this page on the next page review unless they submit a conformance report
-moving them to one of the other categories.
-
-Page reviews are performed at least one month after every Gateway API release,
-with the first being performed after the release of Gateway API v1.3, in late
-June 2025. Following the Gateway API v1.5 review process, due in mid-2026,
-stale implementations will no longer be listed.
-
-## Implementation profiles
-
-Implementations also generally fall into two categories, which are called
-_profiles_:
+Implementations may also support two types of traffic:
 
 * **Gateway** controllers reconcile the Gateway resource and are intended to
 handle north-south traffic, mainly concerned with coming from outside the
@@ -64,10 +52,10 @@ cluster to inside.
 and are intended to handle east-west traffic, within the same cluster or
 set of clusters.
 
-Each profile has a set of conformance tests associated with it, that lay out
+Each parent resource has a set of conformance tests associated with it, that lay out
 the expected behavior for implementations to be conformant (as above).
 
-Implementations may also fit both profiles.
+Implementations may also handle both parent resources.
 
 ## Integrations
 
@@ -85,6 +73,6 @@ class.
 
 {{% alert color="info" title="Compare extended supported features across implementations" %}}
 
-[View a table to quickly compare supported features of projects](/docs/implementations/versions/v1.4/). These outline Gateway controller implementations that have passed core conformance tests, and focus on extended conformance features that they have implemented. These tables will be generated and uploaded to the site once at least 3 implementations have uploaded their conformance reports under the [conformance reports](https://github.com/kubernetes-sigs/gateway-api/tree/main/conformance/reports).
+[View a table to quickly compare supported features of projects](/docs/implementations/versions/v1.6/). These outline Gateway controller implementations that have passed core conformance tests, and focus on extended conformance features that they have implemented. These tables will be generated and uploaded to the site once at least 3 implementations have uploaded their conformance reports under the [conformance reports](https://github.com/kubernetes-sigs/gateway-api/tree/main/conformance/reports).
 
 {{% /alert %}}
