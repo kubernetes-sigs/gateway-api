@@ -305,7 +305,7 @@ type BackendAncestorStatus struct {
 	// AncestorRef identifies the parent resource that this status is associated with.
 	//
 	// +required
-	AncestorRef v1.ParentReference `json:"parentRef"`
+	AncestorRef v1.ParentReference `json:"ancestorRef"`
 
 	// For Kubernetes API conventions, see:
 	// https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#typical-status-properties

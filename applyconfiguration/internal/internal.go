@@ -2200,6 +2200,10 @@ var schemaYAML = typed.YAMLObject(`types:
 - name: io.k8s.sigs.gateway-api.apisx.v1alpha1.BackendAncestorStatus
   map:
     fields:
+    - name: ancestorRef
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1.ParentReference
+      default: {}
     - name: conditions
       type:
         list:
@@ -2212,10 +2216,6 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         scalar: string
       default: ""
-    - name: parentRef
-      type:
-        namedType: io.k8s.sigs.gateway-api.apis.v1.ParentReference
-      default: {}
 - name: io.k8s.sigs.gateway-api.apisx.v1alpha1.BackendPort
   map:
     fields:
