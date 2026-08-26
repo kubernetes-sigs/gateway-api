@@ -408,10 +408,6 @@ Basic support for configuring retries in HTTPRoute up to a specified maximum cou
 
 Retrying requests based on HTTP status codes will be gated under the following features:
 
-* `SupportHTTPRouteRetryBackendTimeout`
-
-  * Will test that backend requests that exceed a BackendRequest timeout duration are retried if a `retry` stanza is configured.
-
 * `SupportHTTPRouteRetryCodes`
 
   * Only 500, 502, 503 and 504 will be tested for conformance.
