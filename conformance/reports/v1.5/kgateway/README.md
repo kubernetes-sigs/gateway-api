@@ -4,7 +4,7 @@
 
 | API channel  | Implementation version                                                     | Mode    | Report                                              |
 |--------------|----------------------------------------------------------------------------|---------|-----------------------------------------------------|
-| experimental | [v2.3.0-beta.3](https://github.com/kgateway-dev/kgateway/releases/tag/v2.3.0-beta.3) | default | [Link](./v2.3.0-beta.3-report.yaml) |
+| experimental | [v2.3.7](https://github.com/kgateway-dev/kgateway/releases/tag/v2.3.7) | default | [Link](./v2.3.7-report.yaml) |
 
 ## Reproduce
 
@@ -13,8 +13,8 @@
 1. Clone the kgateway repository:
 
    ```sh
-   export VERSION="v2.3.0-beta.3"
-   git clone https://github.com/kgateway-dev/kgateway.git && cd kgateway && git checkout b98e8e36d80afe0ce05b7872b131264e881e0fc5
+   export VERSION="v2.3.7"
+   git clone https://github.com/kgateway-dev/kgateway.git && cd kgateway && git checkout 1eb924fe752ba65ed1ce089a96c06af90fcdb827
    ```
 
 2. Bootstrap a KinD cluster with all the necessary components installed:
