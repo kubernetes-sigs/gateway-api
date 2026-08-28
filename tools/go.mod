@@ -22,8 +22,8 @@ require (
 	github.com/stretchr/testify v1.12.1
 	golang.org/x/mod v0.39.0
 	golang.org/x/tools v0.49.0
-	k8s.io/apiextensions-apiserver v0.36.3
-	k8s.io/apimachinery v0.36.3
+	k8s.io/apiextensions-apiserver v0.36.4
+	k8s.io/apimachinery v0.36.4
 	k8s.io/kube-openapi v0.0.0-20260501160325-927ab1f70cd6
 	sigs.k8s.io/controller-tools v0.21.0
 	sigs.k8s.io/gateway-api v0.0.0
@@ -154,14 +154,14 @@ require (
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	k8s.io/api v0.36.3 // indirect
-	k8s.io/apiserver v0.36.3 // indirect
-	k8s.io/client-go v0.36.3 // indirect
-	k8s.io/code-generator v0.36.3 // indirect
-	k8s.io/component-base v0.36.3 // indirect
+	k8s.io/api v0.36.4 // indirect
+	k8s.io/apiserver v0.36.4 // indirect
+	k8s.io/client-go v0.36.4 // indirect
+	k8s.io/code-generator v0.36.4 // indirect
+	k8s.io/component-base v0.36.4 // indirect
 	k8s.io/gengo/v2 v2.0.0-20250922181213-ec3ebc5fd46b // indirect
 	k8s.io/klog/v2 v2.140.0 // indirect
-	k8s.io/streaming v0.36.3 // indirect
+	k8s.io/streaming v0.36.4 // indirect
 	k8s.io/utils v0.0.0-20260319190234-28399d86e0b5 // indirect
 	sigs.k8s.io/apiserver-network-proxy/konnectivity-client v0.34.0 // indirect
 	sigs.k8s.io/controller-runtime v0.24.1 // indirect
