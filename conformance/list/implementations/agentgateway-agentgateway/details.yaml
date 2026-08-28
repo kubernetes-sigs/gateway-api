@@ -1,0 +1,8 @@
+apiVersion: gateway.networking.kubernetes.io/v1
+kind: ImplementationListDetails
+organization: agentgateway
+project: agentgateway
+fullName: "Agentgateway"
+description: |
+  [Agentgateway](https://agentgateway.dev/) is an open source Gateway API implementation hosted as a part of the Linux Foundation, focusing on AI use cases, including LLM consumption, LLM serving, agent-to-agent ([A2A](https://a2aproject.github.io/A2A/latest/)), agent-to-tool ([MCP](https://modelcontextprotocol.io/introduction)), as well as traditional TCP/HTTP traffic serving.
+  It is the first and only proxy designed specifically for the Kubernetes Gateway API, powered by a high performance and scalable Rust dataplane implementation.

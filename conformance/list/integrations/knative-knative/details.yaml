@@ -1,0 +1,11 @@
+apiVersion: gateway.networking.kubernetes.io/v1
+kind: ImplementationListDetails
+organization: knative
+project: net-gateway-api
+url: http://github.com/knative-sandbox/net-gateway-api
+fullName: "Knative"
+description: |
+  [Knative][knative] is a serverless platform built on Kubernetes.  Knative Serving provides a simple API for running stateless containers with automatic management of URLs, traffic splitting between revisions, request-based autoscaling (including scale to zero), and automatic TLS provisioning.  Knative Serving supports multiple HTTP routers through a plugin architecture, including a [gateway API plugin][knative-net-gateway-api] which is currently in alpha as not all Knative features are supported.
+
+  [knative]: https://knative.dev/
+  [knative-net-gateway-api]: https://github.com/knative-sandbox/net-gateway-api

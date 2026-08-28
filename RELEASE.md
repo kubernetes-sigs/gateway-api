@@ -149,6 +149,11 @@ of the PR is the community consensus for a new release.
 - Run the `make build-openapi-json` command which will generate OpenAPIv2 schema files in the `release/` directory.
 - Attach the files in the `release/` directory to the GitHub release.
 - Update the `README.md` and `site/content/en/guides/getting-started/introduction.md` files to point links and examples to the new release.
+- Update the versions in `tools/implist/main.go`:
+  * CurrentVersion     is the new release
+  * ConformantVersions is the last _two_ versions. So, n, and n - 1
+  * StaleVersions      is the version before that (n-2)
+	
 
 #### For a **MAJOR** or **MINOR** release:
 - Cut a `release-major.minor` branch that we can tag things in as needed.

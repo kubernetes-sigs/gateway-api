@@ -1,0 +1,11 @@
+apiVersion: gateway.networking.kubernetes.io/v1
+kind: ImplementationListDetails
+organization: solo.io
+project: gloo-gateway
+fullName: Gloo Gateway
+description: |
+  [Gloo Gateway][gloogateway] by [Solo.io][solo] is a feature-rich, Kubernetes-native ingress controller and next-generation API gateway.
+  Gloo Gateway brings the full power and community support of Gateway API to its existing control-plane implementation.
+
+  [gloogateway]: https://docs.solo.io/gateway/latest/
+  [solo]: https://www.solo.io
