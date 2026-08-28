@@ -94,6 +94,7 @@ class.
 ### Conformant
 - [Agentgateway][40]
 - [Airlock Microgateway][34]
+- [Apache APISIX Ingress Controller][50]
 - [Cilium][16]
 - [Envoy Gateway][18]
 - [Google Kubernetes Engine][6]
@@ -159,6 +160,7 @@ class.
 [47]:#sunbeam-proxy
 [48]:#wso2-gateway
 [49]:#higress
+[50]:#apache-apisix-ingress-controller
 
 
 [gamma]: /docs/mesh/
@@ -191,6 +193,18 @@ Authentication can be enforced via client certificates, JWT, or OIDC with step-u
 [eks]:https://docs.aws.amazon.com/eks/latest/userguide/what-is-eks.html
 [eks-gateway]:https://github.com/aws/aws-application-networking-k8s
 [vpc-lattice]:https://aws.amazon.com/vpc/lattice/
+
+### Apache APISIX Ingress Controller
+
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.6.0-Apache%20APISIX%20Ingress%20Controller-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.6/apache-apisix-ingress-controller)
+
+[Apache APISIX Ingress Controller](https://github.com/apache/apisix-ingress-controller)
+configures [Apache APISIX](https://apisix.apache.org/) from Kubernetes
+resources. It implements Gateway API alongside Ingress and its own CRDs, and
+supports both the etcd-backed and the API-driven APISIX deployment modes.
+
+Source code, documentation, and issue tracking are available in the
+[apisix-ingress-controller repository](https://github.com/apache/apisix-ingress-controller).
 
 ### AWS Load Balancer Controller
 
