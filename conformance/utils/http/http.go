@@ -521,7 +521,7 @@ func CompareRoundTrip(t *testing.T, req *roundtripper.Request, cReq *roundtrippe
 			if strings.ToLower(cRes.RedirectRequest.Scheme) == "https" && gotPort != "443" && gotPort != "" {
 				return fmt.Errorf("for https scheme, expected redirected port to be 443 or not set, got %q", gotPort)
 			}
-			if strings.ToLower(cRes.RedirectRequest.Scheme) != "http" || strings.ToLower(cRes.RedirectRequest.Scheme) != "https" {
+			if !isKnownRedirectScheme(cRes.RedirectRequest.Scheme) {
 				tlog.Logf(t, "Can't validate redirectPort for unrecognized scheme %v", cRes.RedirectRequest.Scheme)
 			}
 		} else if expected.RedirectRequest.Port != gotPort {
@@ -577,6 +577,18 @@ func setRedirectRequestDefaults(req *roundtripper.Request, cRes *roundtripper.Ca
 
 	if expected.RedirectRequest.Path == "" {
 		expected.RedirectRequest.Path = req.URL.Path
+	}
+}
+
+// isKnownRedirectScheme reports whether scheme is one that CompareRoundTrip knows
+// how to derive a default redirect port for. For any other scheme the redirect
+// port check is skipped.
+func isKnownRedirectScheme(scheme string) bool {
+	switch strings.ToLower(scheme) {
+	case "http", "https":
+		return true
+	default:
+		return false
 	}
 }
 
