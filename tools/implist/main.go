@@ -197,9 +197,10 @@ func readReports(dir string) (ReportsMap, error) {
 		}
 
 		reportVersion := strings.Split(relPath, "/")[0]
+		majorMinorVersion := semver.MajorMinor(reportVersion)
 
-		if slices.Contains(ConformantVersions, semver.MajorMinor(reportVersion)) &&
-			slices.Contains(StaleVersions, semver.MajorMinor(reportVersion)) {
+		if !slices.Contains(ConformantVersions, majorMinorVersion) &&
+			!slices.Contains(StaleVersions, majorMinorVersion) {
 			return nil
 		}
 
