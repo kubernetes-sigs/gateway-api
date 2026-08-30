@@ -108,6 +108,23 @@ func TestVerifyConditionsMatchGeneration(t *testing.T) {
 			},
 		},
 		{
+			name: "a StaleConditionType condition is exempt from the generation check",
+			obj:  &gatewayv1.Gateway{ObjectMeta: metav1.ObjectMeta{Name: "fake-gateway", Generation: 20}},
+			conditions: []metav1.Condition{
+				{Type: "FakeCondition1", ObservedGeneration: 20},
+				{Type: StaleConditionType, ObservedGeneration: 3},
+			},
+		},
+		{
+			name: "the StaleConditionType exemption does not extend to other conditions",
+			obj:  &gatewayv1.Gateway{ObjectMeta: metav1.ObjectMeta{Name: "fake-gateway", Generation: 20}},
+			conditions: []metav1.Condition{
+				{Type: "FakeCondition1", ObservedGeneration: 19},
+				{Type: StaleConditionType, ObservedGeneration: 3},
+			},
+			expected: fmt.Errorf("expected observedGeneration to be updated to 20 for all conditions, only 1/2 were updated. stale conditions are: FakeCondition1 (generation 19)"),
+		},
+		{
 			name: "conditions where one does not match the generation fail verification",
 			obj:  &gatewayv1.Gateway{ObjectMeta: metav1.ObjectMeta{Name: "fake-gateway", Generation: 20}},
 			conditions: []metav1.Condition{
@@ -516,6 +533,67 @@ func Test_staleParentStatus(t *testing.T) {
 			require.Equal(t, tt.wantOwner, stale.ControllerName)
 		})
 	}
+}
+
+// TestBackendTLSPolicyMustHaveConditionIgnoresStaleAncestors seeds an ancestor
+// that is stale on purpose: it sits at generation 1 while the policy is at
+// generation 2, so the wait only succeeds if ancestors owned by
+// StaleControllerName are left out of the observedGeneration check.
+func TestBackendTLSPolicyMustHaveConditionIgnoresStaleAncestors(t *testing.T) {
+	const ownController = gatewayv1.GatewayController("example.com/gateway-controller")
+
+	scheme := runtime.NewScheme()
+	require.NoError(t, InstallGatewayV1(scheme))
+
+	policyNN := types.NamespacedName{Name: "test-policy", Namespace: "default"}
+	gwNN := types.NamespacedName{Name: "test-gateway", Namespace: "default"}
+	gwNamespace := gatewayv1.Namespace(gwNN.Namespace)
+
+	ancestor := func(name gatewayv1.ObjectName, controller gatewayv1.GatewayController, observedGeneration int64) gatewayv1.PolicyAncestorStatus {
+		return gatewayv1.PolicyAncestorStatus{
+			AncestorRef: gatewayv1.ParentReference{
+				Name:      name,
+				Namespace: &gwNamespace,
+			},
+			ControllerName: controller,
+			Conditions: []metav1.Condition{{
+				Type:               string(gatewayv1.PolicyConditionAccepted),
+				Status:             metav1.ConditionTrue,
+				Reason:             string(gatewayv1.PolicyReasonAccepted),
+				ObservedGeneration: observedGeneration,
+				LastTransitionTime: metav1.Now(),
+			}},
+		}
+	}
+
+	policy := &gatewayv1.BackendTLSPolicy{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:       policyNN.Name,
+			Namespace:  policyNN.Namespace,
+			Generation: 2,
+		},
+		Status: gatewayv1.PolicyStatus{
+			Ancestors: []gatewayv1.PolicyAncestorStatus{
+				ancestor(gatewayv1.ObjectName(gwNN.Name), ownController, 2),
+				ancestor("unmanaged-gateway", StaleControllerName, 1),
+			},
+		},
+	}
+
+	c := fake.NewClientBuilder().WithScheme(scheme).WithObjects(policy).Build()
+
+	timeoutConfig := config.TimeoutConfig{
+		HTTPRouteMustHaveCondition: 2 * time.Second,
+		DefaultPollInterval:        100 * time.Millisecond,
+	}
+
+	BackendTLSPolicyMustHaveCondition(t, c, timeoutConfig, policyNN, gwNN, metav1.Condition{
+		Type:   string(gatewayv1.PolicyConditionAccepted),
+		Status: metav1.ConditionTrue,
+		Reason: string(gatewayv1.PolicyReasonAccepted),
+	})
+
+	BackendTLSPolicyMustHaveLatestConditions(t, policy)
 }
 
 // TestRouteMustHaveParentsChecksTheStatusItJustRead pins the order of the two

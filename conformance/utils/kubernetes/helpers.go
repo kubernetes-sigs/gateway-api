@@ -53,10 +53,16 @@ import (
 const GatewayExcludedFromReadinessChecks = "gateway-api/skip-this-for-readiness"
 
 // StaleControllerName is a controllerName that tests can put on a Route
-// status.parents entry to stand in for another implementation sharing the
-// cluster. Nothing reconciles such an entry, so RouteMustHaveParents leaves its
-// observedGeneration alone.
+// status.parents or Policy status.ancestors entry to stand in for another
+// implementation sharing the cluster. Nothing reconciles such an entry, so the
+// status helpers leave its observedGeneration alone.
 const StaleControllerName = gatewayv1.GatewayController("gateway.networking.k8s.io/stale-controller")
+
+// StaleConditionType is a condition type that tests can seed into a status
+// conditions list to stand in for a condition owned by another controller.
+// Nothing reconciles such a condition, so FilterStaleConditions leaves its
+// observedGeneration alone.
+const StaleConditionType = "conformance.gateway.networking.k8s.io/StaleCondition"
 
 const GatewayKind = gatewayv1.Kind("Gateway")
 
@@ -245,10 +251,15 @@ func ConditionsHaveLatestObservedGeneration(obj metav1.Object, conditions []meta
 }
 
 // FilterStaleConditions returns the list of status condition whose observedGeneration does not
-// match the object's metadata.Generation
+// match the object's metadata.Generation. Conditions of StaleConditionType are
+// exempt: they belong to no controller, so they never catch up.
 func FilterStaleConditions(obj metav1.Object, conditions []metav1.Condition) []metav1.Condition {
 	stale := make([]metav1.Condition, 0, len(conditions))
 	for _, condition := range conditions {
+		if condition.Type == StaleConditionType {
+			continue
+		}
+
 		if obj.GetGeneration() != condition.ObservedGeneration {
 			stale = append(stale, condition)
 		}
@@ -1650,6 +1661,10 @@ func BackendTLSPolicyMustHaveCondition(t *testing.T, client client.Client, timeo
 		}
 
 		for _, parent := range policy.Status.Ancestors {
+			if parent.ControllerName == StaleControllerName {
+				continue
+			}
+
 			if err := ConditionsHaveLatestObservedGeneration(policy, parent.Conditions); err != nil {
 				tlog.Logf(t, "BackendTLSPolicy %s (parentRef=%v) %v",
 					policyNN, parentRefToString(parent.AncestorRef), err,
@@ -1684,6 +1699,10 @@ func BackendTLSPolicyMustHaveLatestConditions(t *testing.T, r *gatewayv1.Backend
 	t.Helper()
 
 	for _, ancestor := range r.Status.Ancestors {
+		if ancestor.ControllerName == StaleControllerName {
+			continue
+		}
+
 		if err := ConditionsHaveLatestObservedGeneration(r, ancestor.Conditions); err != nil {
 			tlog.Fatalf(t, "BackendTLSPolicy(controller=%v, ancestorRef=%#v) %v", ancestor.ControllerName, parentRefToString(ancestor.AncestorRef), err)
 		}
