@@ -600,18 +600,15 @@ How these implementations handle the intersection is left to the implementation.
 
 ### Traffic Splitting
 
-In scenarios involving traffic splitting, session persistence impacts load balancing done after routing.
-When a persistent session is established and traffic splitting is configured across backends, the persistence to a
-single backend MUST be maintained, even if the weight is set to 0. Consequently, a persistent session takes precedence
-over traffic split weights when selecting a backend after route matching. It's important to note that session
-persistence does not impact the process of route matching.
+In scenarios involving traffic splitting, session persistence operates after backend selection. Traffic splitting
+selects which backend receives the request based on configured weights, and session persistence then pins the client
+to a specific endpoint within the selected backend. Session persistence MUST NOT override which backend is selected
+during traffic splitting, and it MUST NOT impact the process of route matching.
 
-When using multiple backends in traffic splitting, all backends should have session persistence enabled. Nonetheless,
-implementations MUST carefully consider how to manage traffic splitting scenarios in which one backend has persistence
-enabled while the other does not. This includes scenarios where users are transitioning to or from an implementation
-version designed with or without persistence. For traffic splitting scenarios, this GEP leaves the decision to the
-implementation. Implementations MUST choose to apply session persistence to all backends equally, reject the session
-persistence configuration entirely, or apply session persistence only for the backends with it configured.
+When using multiple backends in traffic splitting, all backends should have session persistence enabled for consistent
+behavior. In scenarios where one backend has persistence enabled while the other does not, each backend operates
+independently: the backend with session persistence will pin returning clients to a specific endpoint, while the
+backend without session persistence will distribute requests normally.
 
 See [Edge Case Behavior](#edge-case-behavior) for more use cases on traffic splitting.
 
@@ -786,7 +783,7 @@ This is an invalid configuration as two separate sessions cannot have the same c
 address this scenario in manner they deem appropriate. Implementations MAY choose to reject the configuration, or they
 MAY non-deterministically allow one cookie to work (e.g. whichever cookie is configured first).
 
-#### Traffic Splitting with Session Persistence on All Backends
+#### Traffic Splitting with Session Persistence
 
 Consider the scenario where a route is traffic splitting between two Backends, both with session persistence:
 
@@ -823,50 +820,13 @@ spec:
       name: session-v2
 ```
 
-When a session cookie is not present, traffic is routed based on the `weight` configuration. Once a session is
-established with a specific pod, subsequent requests with the cookie MUST continue to route to that pod regardless
-of weight configuration.
+Traffic splitting selects a backend based on the `weight` configuration. Once a backend is selected and session
+persistence is configured on that backend, the client is pinned to a specific endpoint within that backend. On
+subsequent requests, traffic splitting selects a backend again based on weights. If the same backend is selected,
+the session cookie routes the client to the same endpoint. If a different backend is selected, a new session is
+established within that backend.
 
-#### Traffic Splitting with Session Persistence on Some Backends
-
-Consider the scenario where a route is traffic splitting between two Backends, but only one has session persistence:
-
-```yaml
-kind: HTTPRoute
-metadata:
-  name: split-route
-spec:
-  rules:
-  - backendRefs:
-    - kind: Backend
-      name: backend-with-sp
-      weight: 50
-    - kind: Backend
-      name: backend-without-sp
-      weight: 50
----
-kind: Backend
-metadata:
-  name: backend-with-sp
-spec:
-  sessionPersistence:
-    type: Cookie
-    cookie:
-      name: my-session
----
-kind: Backend
-metadata:
-  name: backend-without-sp
-spec: {}
-```
-
-This GEP leaves the decision to the implementation. An implementation MUST choose one of the following:
-
-1. Apply session persistence to all backends equally
-2. Reject the session persistence configuration entirely
-3. Apply session persistence for only `backend-with-sp`, potentially causing all traffic to eventually migrate to it
-
-This is also described in [Traffic Splitting](#traffic-splitting).
+In summary, session persistence applies after the routing decision, not before it.
 
 #### A Service's Selector is Dynamically Updated
 
@@ -901,12 +861,7 @@ supported by some implementations due to their current designs.
 | :---- | :---- | :---- |
 | Simple Cookie Session Persistence: An HTTPRoute with sessionPersistence configured with type: Cookie (default) on a single backend in gateway-conformance-infra namespace. | HTTPRoute MUST have Accepted=True in parent status. First request MUST receive a Set-Cookie header in response. Subsequent requests with the cookie MUST route to the same backend pod. Verify by checking pod identity across N requests (N>=50). | HTTPRouteSessionPersistence |
 | Session Cookie Lifetime (Default): HTTPRoute with sessionPersistence and cookie.lifetimeType: Session (default). | HTTPRoute MUST have Accepted=True in parent status. Cookie MUST NOT contain `Expires` or `Max-Age`. | HTTPRouteSessionPersistence |
-<<<<<<< Updated upstream
-| Multiple Weighted Backends - Initial Distribution Honored: HTTPRoute with sessionPersistence and multiple backendRefs with weights (e.g., 70/30) on a path. | HTTPRoute MUST have Accepted=True in parent status. Initial requests (without session cookie) MUST respect weight distribution (~70/30 within statistical tolerance). Once session is established, subsequent requests with cookie MUST route to the same backend regardless of weight configuration. | HTTPRouteSessionPersistence |
-| Session Persistence Scoped to Route Rule: HTTPRoute with two rules: Rule 1 (path /a) and Rule 2 (path /b), both with sessionPersistence configured, routing to the same backend Service with multiple pods. | HTTPRoute MUST have Accepted=True in parent status. Each rule MUST independently establish and maintain its own session. Verify with: 1) Send an initial request to /a (no cookie) — the response sets a session cookie binding /a to Pod-A, 2) Send an initial request to /b (no cookie) — the response sets a session cookie independently binding /b to Pod-B (Pod-B may or may not be the same pod as Pod-A), 3) N subsequent requests to /a with the /a session cookie MUST all route to Pod-A, 4) N subsequent requests to /b with the /b session cookie MUST all route to Pod-B. | HTTPRouteSessionPersistence |
-=======
 | Multiple Weighted Backends - Session Persistence Does Not Override Traffic Splitting: HTTPRoute with sessionPersistence and multiple backendRefs with weights (e.g., 70/30) on a path. | HTTPRoute MUST have Accepted=True in parent status. Requests MUST respect weight distribution (~70/30 within statistical tolerance). Session persistence MUST NOT override backend selection. | HTTPRouteSessionPersistence |
->>>>>>> Stashed changes
 | Session Persistence with cookie.lifetimeType: Permanent and absoluteTimeout: 5min. | HTTPRoute MUST have Accepted=True in parent status. Response Set-Cookie header MUST contain `Expires` or `Max-Age` attribute. The expiry value MUST correspond to the configured absoluteTimeout duration. Session persistence MUST function correctly until cookie expires. | HTTPRouteSessionPersistence, HTTPRouteSessionPersistenceCookieLifetimeTypePermanent |
 
 ### GRPCRoute Feature Names
@@ -921,12 +876,7 @@ supported by some implementations due to their current designs.
 | Simple Cookie-based Session Persistence (GRPCRoute): A GRPCRoute with sessionPersistence configured with type: Cookie (default) on a single backend. The test client MUST explicitly extract the Set-Cookie response header and include it as a Cookie header in subsequent requests. | GRPCRoute MUST have Accepted=True in parent status. First request MUST receive a Set-Cookie response header. Subsequent requests with the cookie header MUST route to the same backend pod. Verify by checking pod identity across N requests (N>=50). | GRPCRouteSessionPersistence |
 | Header-based Session Persistence (GRPCRoute): A GRPCRoute with sessionPersistence configured with type: Header on a single backend. | GRPCRoute MUST have Accepted=True in parent status. First request MUST receive a session identity header in the response metadata. Subsequent requests with that header included in request metadata MUST route to the same backend pod. Verify by checking pod identity across N requests (N>=50). | GRPCRouteSessionPersistence, GRPCRouteSessionPersistenceHeader |
 | Session Cookie Lifetime (Default) (GRPCRoute): GRPCRoute with sessionPersistence and cookie.lifetimeType: Session (default). | GRPCRoute MUST have Accepted=True in parent status. Cookie MUST NOT contain `Expires` or `Max-Age` attributes. | GRPCRouteSessionPersistence |
-<<<<<<< Updated upstream
-| Multiple Weighted Backends - Initial Distribution Honored (GRPCRoute): GRPCRoute with sessionPersistence and multiple backendRefs with weights (e.g., 70/30). | GRPCRoute MUST have Accepted=True in parent status. Initial requests (without session token) MUST respect weight distribution (~70/30 within statistical tolerance). Once session is established, subsequent requests with the session token MUST route to the same backend regardless of weight configuration. | GRPCRouteSessionPersistence |
-| Session Persistence Scoped to Route Rule (GRPCRoute): GRPCRoute with two rules matching different gRPC methods (e.g., Rule 1 matches `/service.Foo/MethodA` and Rule 2 matches `/service.Foo/MethodB`), both with sessionPersistence configured, routing to the same backend Service with multiple pods. | GRPCRoute MUST have Accepted=True in parent status. Each rule MUST independently establish and maintain its own session. Verify with: 1) Send an initial request to MethodA (no session token) — the response sets a session token binding MethodA to Pod-A, 2) Send an initial request to MethodB (no session token) — the response sets a session token independently binding MethodB to Pod-B (Pod-B may or may not be the same pod as Pod-A), 3) N subsequent requests to MethodA with the MethodA session token MUST all route to Pod-A, 4) N subsequent requests to MethodB with the MethodB session token MUST all route to Pod-B. | GRPCRouteSessionPersistence |
-=======
 | Multiple Weighted Backends - Session Persistence Does Not Override Traffic Splitting (GRPCRoute): GRPCRoute with sessionPersistence and multiple backendRefs with weights (e.g., 70/30). | GRPCRoute MUST have Accepted=True in parent status. Requests MUST respect weight distribution (~70/30 within statistical tolerance). Session persistence MUST NOT override backend selection. | GRPCRouteSessionPersistence |
->>>>>>> Stashed changes
 
 ## Alternatives
 
