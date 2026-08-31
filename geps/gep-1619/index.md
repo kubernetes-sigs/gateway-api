@@ -607,11 +607,9 @@ over traffic split weights when selecting a backend after route matching. It's i
 persistence does not impact the process of route matching.
 
 When using multiple backends in traffic splitting, all backends should have session persistence enabled. Nonetheless,
-implementations MUST carefully consider how to manage traffic splitting scenarios in which one backend has persistence
-enabled while the other does not. This includes scenarios where users are transitioning to or from an implementation
-version designed with or without persistence. For traffic splitting scenarios, this GEP leaves the decision to the
-implementation. Implementations MUST choose to apply session persistence to all backends equally, reject the session
-persistence configuration entirely, or apply session persistence only for the backends with it configured.
+in scenarios where one backend has persistence enabled while the other does not, session persistence takes precedence.
+Backends with session persistence configured will maintain persistent sessions, while backends without session
+persistence receive new session traffic according to weight distribution.
 
 See [Edge Case Behavior](#edge-case-behavior) for more use cases on traffic splitting.
 
@@ -829,7 +827,9 @@ of weight configuration.
 
 #### Traffic Splitting with Session Persistence on Some Backends
 
-Consider the scenario where a route is traffic splitting between two Backends, but only one has session persistence:
+While all backends in a traffic split should have session persistence configured consistently, mixed configurations
+may occur during transitions. In the scenario below, a route is traffic splitting between two Backends, but only
+one has session persistence:
 
 ```yaml
 kind: HTTPRoute
@@ -860,11 +860,10 @@ metadata:
 spec: {}
 ```
 
-This GEP leaves the decision to the implementation. An implementation MUST choose one of the following:
-
-1. Apply session persistence to all backends equally
-2. Reject the session persistence configuration entirely
-3. Apply session persistence for only `backend-with-sp`, potentially causing all traffic to eventually migrate to it
+Session persistence takes precedence over traffic splitting weights. The backend with session persistence configured
+(`backend-with-sp`) will maintain persistent sessions, while `backend-without-sp` receives new session traffic per
+the weight distribution. New clients are distributed 50/50; returning clients with a session always route to
+`backend-with-sp` regardless of weights.
 
 This is also described in [Traffic Splitting](#traffic-splitting).
 
