@@ -48,8 +48,7 @@ var ListenerSetUpdateListenerHostname = suite.ConformanceTest{
 		t.Run("should update HTTPRoute Accepted condition after ListenerSet listener hostname is changed to match", func(t *testing.T) {
 			lsNN := types.NamespacedName{Name: "listenerset-update-listener-hostname", Namespace: suite.InfrastructureNamespace}
 			routeNN := types.NamespacedName{Name: "httproute-listenerset-update-listener-hostname", Namespace: suite.InfrastructureNamespace}
-			namespaces := []string{suite.InfrastructureNamespace}
-			kubernetes.NamespacesMustBeReady(t, s.Client, s.TimeoutConfig, namespaces)
+			kubernetes.NamespacesMustBeReady(t, s.Client, s.TimeoutConfig, []string{suite.InfrastructureNamespace})
 
 			kubernetes.HTTPRouteMustHaveCondition(t, s.Client, s.TimeoutConfig, routeNN, lsNN, metav1.Condition{
 				Type:   string(v1.RouteConditionAccepted),
@@ -72,8 +71,6 @@ var ListenerSetUpdateListenerHostname = suite.ConformanceTest{
 
 			err = s.Client.Patch(ctx, mutate, client.MergeFrom(original))
 			require.NoErrorf(t, err, "error patching the ListenerSet: %v", err)
-
-			kubernetes.NamespacesMustBeReady(t, s.Client, s.TimeoutConfig, namespaces)
 
 			kubernetes.HTTPRouteMustHaveCondition(t, s.Client, s.TimeoutConfig, routeNN, lsNN, metav1.Condition{
 				Type:   string(v1.RouteConditionAccepted),
