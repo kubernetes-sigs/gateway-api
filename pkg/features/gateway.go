@@ -93,6 +93,12 @@ const (
 
 	// SupportGatewayAddressRoutabilityCluster option indicates support for Cluster Gateway address routability.
 	SupportGatewayAddressRoutabilityCluster FeatureName = "GatewayAddressRoutabilityCluster"
+
+	// SupportGatewayRouteHostnameIntersectionPrecedence option indicates support
+	// for resolving HTTPRoute, GRPCRoute, and TLSRoute precedence using original
+	// route hostname specificity rather than the calculated listener/route
+	// hostname intersection.
+	SupportGatewayRouteHostnameIntersectionPrecedence FeatureName = "GatewayRouteHostnameIntersectionPrecedence"
 )
 
 var (
@@ -159,6 +165,12 @@ var (
 		Name:    SupportGatewayAddressRoutabilityCluster,
 		Channel: FeatureChannelExperimental,
 	}
+
+	// GatewayRouteHostnameIntersectionPrecedenceFeature contains metadata for the GatewayRouteHostnameIntersectionPrecedence feature.
+	GatewayRouteHostnameIntersectionPrecedenceFeature = Feature{
+		Name:    SupportGatewayRouteHostnameIntersectionPrecedence,
+		Channel: FeatureChannelStandard,
+	}
 )
 
 // GatewayExtendedFeatures are extra generic features that implementations may
@@ -175,5 +187,6 @@ var GatewayExtendedFeatures = sets.New(
 	GatewayFrontendClientCertificateValidationInsecureFallbackFeature,
 	GatewayAddressRoutabilityFeature,
 	GatewayAddressRoutabilityClusterFeature,
+	GatewayRouteHostnameIntersectionPrecedenceFeature,
 	ListenerSetFeature,
 )
