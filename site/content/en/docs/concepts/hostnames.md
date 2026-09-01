@@ -238,6 +238,16 @@ These rules apply whether the Listener in question is inside a Gateway _or_ a Li
 
 Some common examples, with recommendations, are below.
 
+### Route precedence resolution
+
+When multiple Routes attach to the same Listener and yield identical intersected hostnames, the Gateway SHOULD evaluate [precedence](/guides/api-design/#conflicts) using the **original hostnames** configured on the Route (`spec.hostnames`), not the calculated intersected hostname.
+
+For example, if a Listener specifies `*.foo.com`, Route A specifies `*.foo.com`, and Route B specifies `*.com`:
+* Both routes intersect to `*.foo.com`.
+* When routing a request to `bar.foo.com`, Route A takes precedence over Route B because Route A's original hostname (`*.foo.com`) is more specific than Route B's (`*.com`). The creation timestamp (oldest Route wins) is used only when there is a tie in original hostname specificity.
+
+Note: Support for conflict resolution using original Route hostname specificity is an Extended `GatewayRouteHostnameIntersectionPrecedence` feature.
+
 ### General notes for integrators
 
 For writers of controllers that programmatically use the `hostname` field, it's important to remember the general Gateway API principle,
@@ -257,8 +267,7 @@ This means that controllers must:
 * Find all Routes that point to those Gateways or ListenerSets that have `Accepted` Conditions with `status: true`.
 * Do the hostname intersection calculation for each Gateway-Route pair or each ListenerSet-Route pair.
 * Create things (DNS records or certificates, or whatever) based on the intersected hostnames.
-  Note that you should also respect the standard conflict resolution rules, basically:
-  if there are two places where the same config is present, the oldest one by creation time wins.
+* Determining Rout precedence using the original hostnames configured on the Routes (not the calculated hostnames intersections). If the original hostnames are equally specific, fall back to creation timestamp (oldest wins), then alphabetical name ordering.
 
 
 ### Automatic Provisioning of DNS records
