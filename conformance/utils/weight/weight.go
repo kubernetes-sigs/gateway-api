@@ -258,11 +258,11 @@ func ExpectWeightedDistributionBatch(t *testing.T, timeoutConfig config.TimeoutC
 	var lastErr error
 	err := wait.PollUntilContextTimeout(t.Context(), timeoutConfig.DefaultPollInterval, timeoutConfig.MaxTimeToConsistency, true,
 		func(_ context.Context) (bool, error) {
-			if lastErr = TestWeightedDistributionBatch(sender, expectedWeights); lastErr != nil {
-				tlog.Logf(t, "traffic distribution does not match the expected weights yet: %s", lastErr)
-				return false, nil
+			if lastErr = TestWeightedDistributionBatch(sender, expectedWeights); lastErr == nil {
+				return true, nil
 			}
-			return true, nil
+			tlog.Logf(t, "traffic distribution does not match the expected weights yet: %s", lastErr)
+			return false, nil
 		})
 	require.NoErrorf(t, err, "traffic distribution did not match the expected weights after %v: %s", timeoutConfig.MaxTimeToConsistency, lastErr)
 }
