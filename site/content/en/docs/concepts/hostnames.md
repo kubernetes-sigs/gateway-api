@@ -240,13 +240,16 @@ Some common examples, with recommendations, are below.
 
 ### Route precedence resolution
 
+{{< details title="Extended Support Feature: GatewayRouteHostnameIntersectionPrecedence" open="true" >}}
+This feature is part of extended support. For more information on support levels, refer to our [conformance guide](/docs/concepts/conformance/).
+
+{{< /details >}}
+
 When multiple Routes attach to the same Listener and yield identical intersected hostnames, the Gateway SHOULD evaluate [precedence](/guides/api-design/#conflicts) using the **original hostnames** configured on the Route (`spec.hostnames`), not the calculated intersected hostname.
 
 For example, if a Listener specifies `*.foo.com`, Route A specifies `*.foo.com`, and Route B specifies `*.com`:
 * Both routes intersect to `*.foo.com`.
 * When routing a request to `bar.foo.com`, Route A takes precedence over Route B because Route A's original hostname (`*.foo.com`) is more specific than Route B's (`*.com`). The creation timestamp (oldest Route wins) is used only when there is a tie in original hostname specificity.
-
-Note: Support for conflict resolution using original Route hostname specificity is an Extended `GatewayRouteHostnameIntersectionPrecedence` feature.
 
 ### General notes for integrators
 
@@ -267,7 +270,7 @@ This means that controllers must:
 * Find all Routes that point to those Gateways or ListenerSets that have `Accepted` Conditions with `status: true`.
 * Do the hostname intersection calculation for each Gateway-Route pair or each ListenerSet-Route pair.
 * Create things (DNS records or certificates, or whatever) based on the intersected hostnames.
-* Determining Rout precedence using the original hostnames configured on the Routes (not the calculated hostnames intersections). If the original hostnames are equally specific, fall back to creation timestamp (oldest wins), then alphabetical name ordering.
+* Determine Route precedence using the original hostnames configured on the Routes (not the calculated hostname intersections). If the original hostnames are equally specific, fall back to creation timestamp (oldest wins), then alphabetical name ordering.
 
 
 ### Automatic Provisioning of DNS records
