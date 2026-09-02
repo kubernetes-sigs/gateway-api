@@ -1,5 +1,5 @@
 apiVersion: gateway.networking.k8s.io/v1
-date: "2026-07-27T23:38:37Z"
+date: "2026-09-02T19:32:16Z"
 gatewayAPIChannel: experimental
 gatewayAPIVersion: v1.6.1
 implementation:
@@ -8,7 +8,7 @@ implementation:
   organization: nginx
   project: nginx-gateway-fabric
   url: https://github.com/nginx/nginx-gateway-fabric
-  version: v2.7.0-pre-release
+  version: v2.7.0
 kind: ConformanceReport
 mode: default
 profiles:
