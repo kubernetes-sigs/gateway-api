@@ -1,6 +1,6 @@
 ---
 title: "gRPC routing"
-weight: 15
+weight: 16
 ---
 
 The [GRPCRoute resource](/reference/api-types/grpcroute/) allows you to match on gRPC traffic and
