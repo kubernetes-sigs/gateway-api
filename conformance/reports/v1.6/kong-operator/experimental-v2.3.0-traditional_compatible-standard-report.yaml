@@ -1,5 +1,5 @@
 apiVersion: gateway.networking.k8s.io/v1
-date: "2026-08-13T15:17:03Z"
+date: "2026-09-01T16:01:59Z"
 gatewayAPIChannel: experimental
 gatewayAPIVersion: v1.6.1
 implementation:
@@ -8,10 +8,37 @@ implementation:
   organization: Kong
   project: kong-operator
   url: https://github.com/kong/kong-operator
-  version: v2.3.0-rc.3
+  version: v2.3.0
 kind: ConformanceReport
-mode: traditional_compatible
+mode: traditional_compatible-standard
 profiles:
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 20
+      Skipped: 0
+  extended:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 2
+      Skipped: 0
+    supportedFeatures:
+    - GatewayAddressEmpty
+    - GatewayInfrastructurePropagation
+    - GatewayPort8080
+    - UDPRoute
+    unsupportedFeatures:
+    - GatewayBackendClientCertificate
+    - GatewayFrontendClientCertificateValidation
+    - GatewayFrontendClientCertificateValidationInsecureFallback
+    - GatewayHTTPListenerIsolation
+    - GatewayHTTPSListenerDetectMisdirectedRequests
+    - GatewayStaticAddresses
+    - ListenerSet
+  name: GATEWAY-UDP
+  summary: Core tests succeeded. Extended tests succeeded.
 - core:
     result: success
     statistics:
@@ -67,15 +94,11 @@ profiles:
   name: GATEWAY-HTTP
   summary: Core tests succeeded. Extended tests succeeded.
 - core:
-    result: partial
-    skippedTests:
-    - GRPCExactMethodMatching
-    - GRPCRouteHeaderMatching
-    - GRPCRouteListenerHostnameMatching
+    result: success
     statistics:
       Failed: 0
-      Passed: 12
-      Skipped: 3
+      Passed: 15
+      Skipped: 0
   extended:
     result: success
     statistics:
@@ -95,7 +118,7 @@ profiles:
     - GatewayStaticAddresses
     - ListenerSet
   name: GATEWAY-GRPC
-  summary: Core tests partially succeeded with 3 test skips. Extended tests succeeded.
+  summary: Core tests succeeded. Extended tests succeeded.
 - core:
     result: partial
     skippedTests:
@@ -152,33 +175,6 @@ profiles:
     - ListenerSet
     - TLSRouteModeMixed
   name: GATEWAY-TLS
-  summary: Core tests succeeded. Extended tests succeeded.
-- core:
-    result: success
-    statistics:
-      Failed: 0
-      Passed: 20
-      Skipped: 0
-  extended:
-    result: success
-    statistics:
-      Failed: 0
-      Passed: 2
-      Skipped: 0
-    supportedFeatures:
-    - GatewayAddressEmpty
-    - GatewayInfrastructurePropagation
-    - GatewayPort8080
-    - UDPRoute
-    unsupportedFeatures:
-    - GatewayBackendClientCertificate
-    - GatewayFrontendClientCertificateValidation
-    - GatewayFrontendClientCertificateValidationInsecureFallback
-    - GatewayHTTPListenerIsolation
-    - GatewayHTTPSListenerDetectMisdirectedRequests
-    - GatewayStaticAddresses
-    - ListenerSet
-  name: GATEWAY-UDP
   summary: Core tests succeeded. Extended tests succeeded.
 succeededProvisionalTests:
 - GatewayInfrastructure
