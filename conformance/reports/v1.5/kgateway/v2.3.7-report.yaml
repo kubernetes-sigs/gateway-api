@@ -1,5 +1,5 @@
 apiVersion: gateway.networking.k8s.io/v1
-date: "2026-03-20T16:52:21-04:00"
+date: "2026-08-26T05:24:02Z"
 gatewayAPIChannel: experimental
 gatewayAPIVersion: v1.5.1
 implementation:
@@ -8,7 +8,7 @@ implementation:
   organization: kgateway-dev
   project: kgateway
   url: github.com/kgateway-dev/kgateway
-  version: v2.3.0-beta.3
+  version: v2.3.7
 kind: ConformanceReport
 mode: default
 profiles:
@@ -22,11 +22,14 @@ profiles:
     result: success
     statistics:
       Failed: 0
-      Passed: 43
+      Passed: 51
       Skipped: 0
     supportedFeatures:
+    - BackendTLSPolicy
     - GatewayAddressEmpty
+    - GatewayBackendClientCertificate
     - GatewayFrontendClientCertificateValidation
+    - GatewayFrontendClientCertificateValidationInsecureFallback
     - GatewayInfrastructurePropagation
     - GatewayPort8080
     - GatewayStaticAddresses
@@ -55,10 +58,7 @@ profiles:
     - HTTPRouteSchemeRedirect
     - ListenerSet
     unsupportedFeatures:
-    - BackendTLSPolicy
     - BackendTLSPolicySANValidation
-    - GatewayBackendClientCertificate
-    - GatewayFrontendClientCertificateValidationInsecureFallback
     - GatewayHTTPListenerIsolation
     - GatewayHTTPSListenerDetectMisdirectedRequests
   name: GATEWAY-HTTP
@@ -77,14 +77,14 @@ profiles:
       Skipped: 0
     supportedFeatures:
     - GatewayAddressEmpty
+    - GatewayBackendClientCertificate
     - GatewayFrontendClientCertificateValidation
+    - GatewayFrontendClientCertificateValidationInsecureFallback
     - GatewayInfrastructurePropagation
     - GatewayPort8080
     - GatewayStaticAddresses
     - ListenerSet
     unsupportedFeatures:
-    - GatewayBackendClientCertificate
-    - GatewayFrontendClientCertificateValidationInsecureFallback
     - GatewayHTTPListenerIsolation
     - GatewayHTTPSListenerDetectMisdirectedRequests
   name: GATEWAY-GRPC
@@ -103,7 +103,9 @@ profiles:
       Skipped: 0
     supportedFeatures:
     - GatewayAddressEmpty
+    - GatewayBackendClientCertificate
     - GatewayFrontendClientCertificateValidation
+    - GatewayFrontendClientCertificateValidationInsecureFallback
     - GatewayInfrastructurePropagation
     - GatewayPort8080
     - GatewayStaticAddresses
@@ -111,8 +113,6 @@ profiles:
     - TLSRouteModeMixed
     - TLSRouteModeTerminate
     unsupportedFeatures:
-    - GatewayBackendClientCertificate
-    - GatewayFrontendClientCertificateValidationInsecureFallback
     - GatewayHTTPListenerIsolation
     - GatewayHTTPSListenerDetectMisdirectedRequests
   name: GATEWAY-TLS
