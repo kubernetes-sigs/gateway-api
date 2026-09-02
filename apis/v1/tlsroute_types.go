@@ -98,6 +98,24 @@ type TLSRouteSpec struct {
 	// Extended: Listener with `protocol` `TLS` and `tls.mode` `Terminate`. The feature name for this Extended feature is `TLSRouteTermination`.
 	// </gateway:util:excludeFromCRD>
 	//
+	// In the event that multiple TLSRoutes specify intersecting hostnames (e.g.
+	// overlapping wildcard matching and exact matching hostnames), precedence must
+	// be given to rules from the TLSRoute with the largest number of:
+	//
+	// * Characters in a matching non-wildcard hostname.
+	// * Characters in a matching hostname.
+	//
+	// When multiple TLSRoutes attach to the same Listener and yield identical
+	// Listener/Route intersected hostnames, implementations SHOULD evaluate
+	// precedence using the original hostnames configured on the Route, not the
+	// calculated Listener/Route hostname intersection.
+	//
+	// Resolving Route precedence using original Route hostname specificity is an
+	// Extended feature. Implementations that support this behavior SHOULD claim
+	// support for the `GatewayRouteHostnameIntersectionPrecedence` feature.
+	// Implementations that do not support this feature MAY evaluate precedence
+	// using the calculated Listener/Route hostname intersection.
+	//
 	// +required
 	// +listType=atomic
 	// +kubebuilder:validation:MinItems=1

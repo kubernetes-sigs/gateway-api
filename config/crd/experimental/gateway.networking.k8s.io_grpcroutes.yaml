@@ -114,6 +114,24 @@ spec:
                   the implementation. The implementation MUST raise an 'Accepted' Condition
                   with a status of `False` in the corresponding RouteParentStatus.
 
+                  In the event that multiple GRPCRoutes specify intersecting hostnames (e.g.
+                  overlapping wildcard matching and exact matching hostnames), precedence must
+                  be given to rules from the GRPCRoute with the largest number of:
+
+                  * Characters in a matching non-wildcard hostname.
+                  * Characters in a matching hostname.
+
+                  When multiple GRPCRoutes attach to the same Listener and yield identical
+                  Listener/Route intersected hostnames, implementations SHOULD evaluate
+                  precedence using the original hostnames configured on the Route, not the
+                  calculated Listener/Route hostname intersection.
+
+                  Resolving Route precedence using original Route hostname specificity is an
+                  Extended feature. Implementations that support this behavior SHOULD claim
+                  support for the `GatewayRouteHostnameIntersectionPrecedence` feature.
+                  Implementations that do not support this feature MAY evaluate precedence
+                  using the calculated Listener/Route hostname intersection.
+
                   If a Route (A) of type HTTPRoute or GRPCRoute is attached to a
                   Listener and that listener already has another Route (B) of the other
                   type attached and the intersection of the hostnames of A and B is
