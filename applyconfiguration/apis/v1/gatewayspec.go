@@ -202,6 +202,9 @@ type GatewaySpecApplyConfiguration struct {
 	// In a future release the MinItems=1 requirement MAY be dropped.
 	//
 	// Support: Core
+	//
+	// <gateway:standard:validation:XValidation:message="tls mode must be Terminate for protocol HTTPS",rule="self.all(l, (l.protocol == 'HTTPS' && has(l.tls)) ? (l.tls.mode == ” || l.tls.mode == 'Terminate') : true)">
+	// <gateway:experimental:validation:XValidation:message="tls is required and tls mode must be Terminate for protocol HTTPS",rule="self.all(l, (l.protocol == 'HTTPS' ? has(l.tls) && (l.tls.mode == ” || l.tls.mode == 'Terminate') : true))">
 	Listeners []ListenerApplyConfiguration `json:"listeners,omitempty"`
 	// Addresses requested for this Gateway. This is optional and behavior can
 	// depend on the implementation. If a value is set in the spec and the
