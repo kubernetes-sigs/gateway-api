@@ -27,16 +27,17 @@ import (
 //
 // HTTPHeader represents an HTTP Header name and value as defined by RFC 7230.
 type HTTPHeaderApplyConfiguration struct {
-	// Name is the name of the HTTP Header to be matched. Name matching MUST be
+	// Name is the name of the HTTP Header. Name matching MUST be
 	// case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
 	//
-	// If multiple entries specify equivalent header names, the first entry with
-	// an equivalent name MUST be considered for a match. Subsequent entries
-	// with an equivalent header name MUST be ignored. Due to the
-	// case-insensitivity of header names, "foo" and "Foo" are considered
-	// equivalent.
+	// Due to the case-insensitivity of header names, "foo" and "Foo" are
+	// considered equivalent. Each header name within an HTTPHeaderFilter list
+	// must be unique; entries with identical names are invalid. When two
+	// entries are equivalent only because of case (for example "foo" and
+	// "Foo"), the first entry MUST be applied and the subsequent entry MUST be
+	// ignored.
 	Name *apisv1.HTTPHeaderName `json:"name,omitempty"`
-	// Value is the value of HTTP Header to be matched.
+	// Value is the value of HTTP Header.
 	// <gateway:experimental:description>
 	// Must consist of printable US-ASCII characters, optionally separated
 	// by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
