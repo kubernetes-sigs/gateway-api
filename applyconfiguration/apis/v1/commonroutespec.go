@@ -58,7 +58,23 @@ type CommonRouteSpecApplyConfiguration struct {
 	// optional fields to different values. If one ParentRef sets a
 	// combination of optional fields, all must set the same combination.
 	//
-	// Some examples:
+	// <gateway:experimental:description>
+	// ParentRefs from a Route to a Service in the same namespace are "producer"
+	// routes, which apply default routing rules to inbound connections from
+	// any namespace to the Service.
+	//
+	// ParentRefs from a Route to a Service in a different namespace are
+	// "consumer" routes, and these routing rules are only applied to outbound
+	// connections originating from the same namespace as the Route, for which
+	// the intended destination of the connections are a Service targeted as a
+	// ParentRef of the Route.
+	// </gateway:experimental:description>
+	//
+	// <gateway:util:excludeFromCRD>
+	//
+	// Notes for implementers:
+	//
+	// Some examples of distinct ParentRefs:
 	//
 	// * If one ParentRef sets `sectionName`, all ParentRefs referencing the
 	// same object must also set `sectionName`.
@@ -79,17 +95,7 @@ type CommonRouteSpecApplyConfiguration struct {
 	// Gateway has the AllowedRoutes field, and ReferenceGrant provides a
 	// generic way to enable other kinds of cross-namespace reference.
 	//
-	// <gateway:experimental:description>
-	// ParentRefs from a Route to a Service in the same namespace are "producer"
-	// routes, which apply default routing rules to inbound connections from
-	// any namespace to the Service.
-	//
-	// ParentRefs from a Route to a Service in a different namespace are
-	// "consumer" routes, and these routing rules are only applied to outbound
-	// connections originating from the same namespace as the Route, for which
-	// the intended destination of the connections are a Service targeted as a
-	// ParentRef of the Route.
-	// </gateway:experimental:description>
+	// </gateway:util:excludeFromCRD>
 	//
 	// <gateway:util:excludeFromCRD>
 	// Ensures that when the same parent is referenced more than once, each reference

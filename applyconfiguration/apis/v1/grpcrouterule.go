@@ -61,6 +61,10 @@ type GRPCRouteRuleApplyConfiguration struct {
 	//
 	// If no matches are specified, the implementation MUST match every gRPC request.
 	//
+	// <gateway:util:excludeFromCRD>
+	//
+	// Notes for implementers:
+	//
 	// Proxy or Load Balancer routing configuration generated from GRPCRoutes
 	// MUST prioritize rules based on the following criteria, continuing on
 	// ties. Merging MUST not be done between GRPCRoutes and HTTPRoutes.
@@ -82,12 +86,11 @@ type GRPCRouteRuleApplyConfiguration struct {
 	// If ties still exist within the Route that has been given precedence,
 	// matching precedence MUST be granted to the first matching rule meeting
 	// the above criteria.
+	//
+	// </gateway:util:excludeFromCRD>
 	Matches []GRPCRouteMatchApplyConfiguration `json:"matches,omitempty"`
 	// Filters define the filters that are applied to requests that match
 	// this rule.
-	//
-	// The effects of ordering of multiple behaviors are currently unspecified.
-	// This can change in the future based on feedback during the alpha stage.
 	//
 	// Conformance-levels at this level are defined based on the type of filter:
 	//
@@ -100,16 +103,35 @@ type GRPCRouteRuleApplyConfiguration struct {
 	// Specifying the same filter multiple times is not supported unless explicitly
 	// indicated in the filter.
 	//
+	// Support: Core
+	//
+	// <gateway:util:excludeFromCRD>
+	//
+	// Notes for implementers:
+	//
+	// The effects of ordering of multiple behaviors are currently unspecified.
+	// This can change in the future based on feedback during the alpha stage.
+	//
 	// If an implementation cannot support a combination of filters, it must clearly
 	// document that limitation. In cases where incompatible or unsupported
 	// filters are specified and cause the `Accepted` condition to be set to status
 	// `False`, implementations may use the `IncompatibleFilters` reason to specify
 	// this configuration error.
 	//
-	// Support: Core
+	// </gateway:util:excludeFromCRD>
 	Filters []GRPCRouteFilterApplyConfiguration `json:"filters,omitempty"`
 	// BackendRefs defines the backend(s) where matching requests should be
 	// sent.
+	//
+	// Support: Core for Kubernetes Service
+	//
+	// Support: Implementation-specific for any other resource
+	//
+	// Support for weight: Core
+	//
+	// <gateway:util:excludeFromCRD>
+	//
+	// Notes for implementers:
 	//
 	// Failure behavior here depends on how many BackendRefs are specified and
 	// how many are invalid.
@@ -131,11 +153,7 @@ type GRPCRouteRuleApplyConfiguration struct {
 	// invalid, 50 percent of traffic MUST receive an `UNAVAILABLE` status.
 	// Implementations may choose how that 50 percent is determined.
 	//
-	// Support: Core for Kubernetes Service
-	//
-	// Support: Implementation-specific for any other resource
-	//
-	// Support for weight: Core
+	// </gateway:util:excludeFromCRD>
 	BackendRefs []GRPCBackendRefApplyConfiguration `json:"backendRefs,omitempty"`
 	// SessionPersistence defines and configures session persistence
 	// for the route rule.

@@ -52,6 +52,20 @@ import (
 type GRPCBackendRefApplyConfiguration struct {
 	// BackendRef is a reference to a backend to forward matched requests to.
 	//
+	// Support: Core for Kubernetes Service
+	//
+	// Support: Extended for Kubernetes ServiceImport
+	//
+	// Support: Implementation-specific for any other resource
+	//
+	// Support for weight: Core
+	//
+	// Support for BackendTLSPolicy: Extended
+	//
+	// <gateway:util:excludeFromCRD>
+	//
+	// Notes for implementers:
+	//
 	// A BackendRef can be invalid for the following reasons. In all cases, the
 	// implementation MUST ensure the `ResolvedRefs` Condition on the Route
 	// is set to `status: False`, with a Reason and Message that indicate
@@ -76,15 +90,7 @@ type GRPCBackendRefApplyConfiguration struct {
 	// is present that refers to the Service, and the implementation is unable
 	// to meet the requirement.
 	//
-	// Support: Core for Kubernetes Service
-	//
-	// Support: Extended for Kubernetes ServiceImport
-	//
-	// Support: Implementation-specific for any other resource
-	//
-	// Support for weight: Core
-	//
-	// Support for BackendTLSPolicy: Extended
+	// </gateway:util:excludeFromCRD>
 	BackendRefApplyConfiguration `json:",inline"`
 	// Filters defined at this level MUST be executed if and only if the
 	// request is being forwarded to the backend defined here.

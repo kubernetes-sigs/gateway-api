@@ -27,6 +27,14 @@ type GatewayBackendTLSApplyConfiguration struct {
 	// and its associated private key. It can reference standard Kubernetes resources,
 	// i.e., Secret, or implementation-specific custom resources.
 	//
+	// Support: Core - Reference to a Kubernetes TLS Secret (with the type `kubernetes.io/tls`).
+	// Support: Implementation-specific - Other resource kinds or Secrets with a
+	// different type (e.g., `Opaque`).
+	//
+	// <gateway:util:excludeFromCRD>
+	//
+	// Notes for implementers:
+	//
 	// A ClientCertificateRef is considered invalid if:
 	//
 	// * It refers to a resource that cannot be resolved (e.g., the referenced resource
@@ -44,9 +52,7 @@ type GatewayBackendTLSApplyConfiguration struct {
 	// content (e.g., checking expiry or enforcing specific formats). In such cases,
 	// an implementation-specific Reason and Message MUST be set.
 	//
-	// Support: Core - Reference to a Kubernetes TLS Secret (with the type `kubernetes.io/tls`).
-	// Support: Implementation-specific - Other resource kinds or Secrets with a
-	// different type (e.g., `Opaque`).
+	// </gateway:util:excludeFromCRD>
 	ClientCertificateRef *SecretObjectReferenceApplyConfiguration `json:"clientCertificateRef,omitempty"`
 }
 

@@ -36,6 +36,20 @@ type BackendTLSPolicyValidationApplyConfiguration struct {
 	// not both. If CACertificateRefs is empty or unspecified, the configuration for
 	// WellKnownCACertificates MUST be honored instead if supported by the implementation.
 	//
+	// A single CACertificateRef to a Kubernetes ConfigMap kind has "Core" support.
+	// Implementations MAY choose to support attaching multiple certificates to
+	// a backend, but this behavior is implementation-specific.
+	//
+	// Support: Core - An optional single reference to a Kubernetes ConfigMap,
+	// with the CA certificate in a key named `ca.crt`.
+	//
+	// Support: Implementation-specific - More than one reference, other kinds
+	// of resources, or a single reference that includes multiple certificates.
+	//
+	// <gateway:util:excludeFromCRD>
+	//
+	// Notes for implementers:
+	//
 	// A CACertificateRef is invalid if:
 	//
 	// * It refers to a resource that cannot be resolved (e.g., the referenced resource
@@ -62,15 +76,7 @@ type BackendTLSPolicyValidationApplyConfiguration struct {
 	// ensure the `Accepted` Condition on the BackendTLSPolicy is set to
 	// `status: False`, with a Reason `NoValidCACertificate`.
 	//
-	// A single CACertificateRef to a Kubernetes ConfigMap kind has "Core" support.
-	// Implementations MAY choose to support attaching multiple certificates to
-	// a backend, but this behavior is implementation-specific.
-	//
-	// Support: Core - An optional single reference to a Kubernetes ConfigMap,
-	// with the CA certificate in a key named `ca.crt`.
-	//
-	// Support: Implementation-specific - More than one reference, other kinds
-	// of resources, or a single reference that includes multiple certificates.
+	// </gateway:util:excludeFromCRD>
 	CACertificateRefs []LocalObjectReferenceApplyConfiguration `json:"caCertificateRefs,omitempty"`
 	// WellKnownCACertificates specifies whether a well-known set of CA certificates
 	// may be used in the TLS handshake between the gateway and backend pod.

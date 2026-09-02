@@ -29,6 +29,18 @@ type HTTPRequestMirrorFilterApplyConfiguration struct {
 	// within this BackendRef, irrespective of how many endpoints are present
 	// within this BackendRef.
 	//
+	// If the backend service requires TLS, use BackendTLSPolicy to tell the
+	// implementation to supply the TLS details to be used to connect to that
+	// backend.
+	//
+	// Support: Extended for Kubernetes Service
+	//
+	// Support: Implementation-specific for any other resource
+	//
+	// <gateway:util:excludeFromCRD>
+	//
+	// Notes for implementers:
+	//
 	// If the referent cannot be found, this BackendRef is invalid and must be
 	// dropped from the Gateway. The controller must ensure the "ResolvedRefs"
 	// condition on the Route status is set to `status: False` and not configure
@@ -43,13 +55,7 @@ type HTTPRequestMirrorFilterApplyConfiguration struct {
 	// In either error case, the Message of the `ResolvedRefs` Condition
 	// should be used to provide more detail about the problem.
 	//
-	// Support: Extended for Kubernetes Service
-	//
-	// Support: Implementation-specific for any other resource
-	//
-	// If the backend service requires TLS, use BackendTLSPolicy to tell the
-	// implementation to supply the TLS details to be used to connect to that
-	// backend.
+	// </gateway:util:excludeFromCRD>
 	BackendRef *BackendObjectReferenceApplyConfiguration `json:"backendRef,omitempty"`
 	// Percent represents the percentage of requests that should be
 	// mirrored to BackendRef. Its minimum value is 0 (indicating 0% of

@@ -104,6 +104,13 @@ type ParentReference struct {
 	// interpreted.
 	//
 	// When unspecified (empty string), this will reference the entire resource.
+	//
+	// Support: Core
+	//
+	// <gateway:util:excludeFromCRD>
+	//
+	// Notes for implementers:
+	//
 	// For the purpose of status, an attachment is considered successful if at
 	// least one section in the parent resource accepts it. For example, Gateway
 	// listeners can restrict which Routes can attach to them by Route kind,
@@ -112,7 +119,7 @@ type ParentReference struct {
 	// attached. If no Gateway listeners accept attachment from this Route, the
 	// Route MUST be considered detached from the Gateway.
 	//
-	// Support: Core
+	// </gateway:util:excludeFromCRD>
 	//
 	// +optional
 	SectionName *SectionName `json:"sectionName,omitempty"`
@@ -138,6 +145,12 @@ type ParentReference struct {
 	// Implementations supporting other types of parent resources MUST clearly
 	// document how/if Port is interpreted.
 	//
+	// Support: Extended
+	//
+	// <gateway:util:excludeFromCRD>
+	//
+	// Notes for implementers:
+	//
 	// For the purpose of status, an attachment is considered successful as
 	// long as the parent resource accepts it partially. For example, Gateway
 	// listeners can restrict which Routes can attach to them by Route kind,
@@ -146,7 +159,7 @@ type ParentReference struct {
 	// attached. If no Gateway listeners accept attachment from this Route,
 	// the Route MUST be considered detached from the Gateway.
 	//
-	// Support: Extended
+	// </gateway:util:excludeFromCRD>
 	//
 	// +optional
 	//
@@ -207,7 +220,23 @@ type CommonRouteSpec struct {
 	//   optional fields to different values. If one ParentRef sets a
 	//   combination of optional fields, all must set the same combination.
 	//
-	// Some examples:
+	// <gateway:experimental:description>
+	// ParentRefs from a Route to a Service in the same namespace are "producer"
+	// routes, which apply default routing rules to inbound connections from
+	// any namespace to the Service.
+	//
+	// ParentRefs from a Route to a Service in a different namespace are
+	// "consumer" routes, and these routing rules are only applied to outbound
+	// connections originating from the same namespace as the Route, for which
+	// the intended destination of the connections are a Service targeted as a
+	// ParentRef of the Route.
+	// </gateway:experimental:description>
+	//
+	// <gateway:util:excludeFromCRD>
+	//
+	// Notes for implementers:
+	//
+	// Some examples of distinct ParentRefs:
 	//
 	// * If one ParentRef sets `sectionName`, all ParentRefs referencing the
 	//   same object must also set `sectionName`.
@@ -228,17 +257,7 @@ type CommonRouteSpec struct {
 	// Gateway has the AllowedRoutes field, and ReferenceGrant provides a
 	// generic way to enable other kinds of cross-namespace reference.
 	//
-	// <gateway:experimental:description>
-	// ParentRefs from a Route to a Service in the same namespace are "producer"
-	// routes, which apply default routing rules to inbound connections from
-	// any namespace to the Service.
-	//
-	// ParentRefs from a Route to a Service in a different namespace are
-	// "consumer" routes, and these routing rules are only applied to outbound
-	// connections originating from the same namespace as the Route, for which
-	// the intended destination of the connections are a Service targeted as a
-	// ParentRef of the Route.
-	// </gateway:experimental:description>
+	// </gateway:util:excludeFromCRD>
 	//
 	// +optional
 	// +listType=atomic
