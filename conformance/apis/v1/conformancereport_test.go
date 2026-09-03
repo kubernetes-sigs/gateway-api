@@ -18,6 +18,110 @@ package v1
 
 import "testing"
 
+func TestImplementation_Validate(t *testing.T) {
+	validImpl := Implementation{
+		Organization: "sigs-k8s",
+		Project:      "gateway-api",
+		URL:          "https://github.com/kubernetes-sigs/gateway-api",
+		Version:      "v1.0.0",
+		Contact:      []string{"@kubernetes-sigs/gateway-api-maintainers"},
+	}
+
+	tests := []struct {
+		name    string
+		mutate  func(i Implementation) Implementation
+		wantErr bool
+	}{
+		{
+			name:    "valid implementation",
+			mutate:  func(i Implementation) Implementation { return i },
+			wantErr: false,
+		},
+		{
+			name: "empty organization",
+			mutate: func(i Implementation) Implementation {
+				i.Organization = ""
+				return i
+			},
+			wantErr: true,
+		},
+		{
+			name: "empty project",
+			mutate: func(i Implementation) Implementation {
+				i.Project = ""
+				return i
+			},
+			wantErr: true,
+		},
+		{
+			name: "empty url",
+			mutate: func(i Implementation) Implementation {
+				i.URL = ""
+				return i
+			},
+			wantErr: true,
+		},
+		{
+			name: "url missing scheme",
+			mutate: func(i Implementation) Implementation {
+				i.URL = "github.com/kubernetes-sigs/gateway-api"
+				return i
+			},
+			wantErr: true,
+		},
+		{
+			name: "url with unsupported scheme",
+			mutate: func(i Implementation) Implementation {
+				i.URL = "ftp://github.com/kubernetes-sigs/gateway-api"
+				return i
+			},
+			wantErr: true,
+		},
+		{
+			name: "url missing host",
+			mutate: func(i Implementation) Implementation {
+				i.URL = "https:///path-only"
+				return i
+			},
+			wantErr: true,
+		},
+		{
+			name: "malformed url",
+			mutate: func(i Implementation) Implementation {
+				i.URL = "https://exa mple.com"
+				return i
+			},
+			wantErr: true,
+		},
+		{
+			name: "empty version",
+			mutate: func(i Implementation) Implementation {
+				i.Version = ""
+				return i
+			},
+			wantErr: true,
+		},
+		{
+			name: "empty contact",
+			mutate: func(i Implementation) Implementation {
+				i.Contact = nil
+				return i
+			},
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			impl := tt.mutate(validImpl)
+			err := impl.Validate()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Validate() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
 func Test_updateResult(t *testing.T) {
 	tests := []struct {
 		name string // description of this test case

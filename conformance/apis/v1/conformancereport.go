@@ -19,6 +19,7 @@ package v1
 import (
 	"errors"
 	"fmt"
+	"net/url"
 	"strings"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -88,9 +89,9 @@ type Implementation struct {
 	Contact []string `json:"contact"`
 }
 
-// Validate ensures that the Implementation struct has valid fields set
+// Validate ensures that the Implementation struct has valid fields set.
+// See https://github.com/kubernetes-sigs/gateway-api/issues/2178.
 func (i *Implementation) Validate() error {
-	// TODO: add data validation https://github.com/kubernetes-sigs/gateway-api/issues/2178
 	if i.Organization == "" {
 		return errors.New("implementation's organization cannot be empty")
 	}
@@ -100,11 +101,34 @@ func (i *Implementation) Validate() error {
 	if i.URL == "" {
 		return errors.New("implementation's url cannot be empty")
 	}
+	if err := validateURL(i.URL); err != nil {
+		return fmt.Errorf("implementation's url is invalid: %w", err)
+	}
 	if i.Version == "" {
 		return errors.New("implementation's version cannot be empty")
 	}
 	if len(i.Contact) == 0 {
 		return errors.New("implementation's contact cannot be empty")
+	}
+	return nil
+}
+
+// validateURL ensures that rawURL is a well-formed, absolute URL with a
+// recognized http(s) scheme and a non-empty host, so that it can reliably
+// point maintainers to more information about an implementation.
+func validateURL(rawURL string) error {
+	parsed, err := url.Parse(rawURL)
+	if err != nil {
+		return fmt.Errorf("could not parse url: %w", err)
+	}
+	if !parsed.IsAbs() {
+		return errors.New("url must be absolute (missing scheme)")
+	}
+	if parsed.Scheme != "http" && parsed.Scheme != "https" {
+		return fmt.Errorf("url scheme must be http or https, got %q", parsed.Scheme)
+	}
+	if parsed.Host == "" {
+		return errors.New("url must include a host")
 	}
 	return nil
 }
