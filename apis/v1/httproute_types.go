@@ -108,8 +108,16 @@ type HTTPRouteSpec struct {
 	// * Characters in a matching non-wildcard hostname.
 	// * Characters in a matching hostname.
 	//
-	// If ties exist across multiple Routes, the matching precedence rules for
-	// HTTPRouteMatches takes over.
+	// When multiple HTTPRoutes attach to the same Listener and yield identical
+	// Listener/Route intersected hostnames, implementations SHOULD evaluate
+	// precedence using the original hostnames configured on the Route, not the
+	// calculated Listener/Route hostname intersection.
+	//
+	// Resolving Route precedence using original Route hostname specificity is an
+	// Extended feature. Implementations that support this behavior SHOULD claim
+	// support for the `GatewayRouteHostnameIntersectionPrecedence` feature.
+	// Implementations that do not support this feature MAY evaluate precedence
+	// using the calculated Listener/Route hostname intersection.
 	//
 	// Support: Core
 	//
