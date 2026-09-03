@@ -18,8 +18,10 @@ package kubernetes
 
 import (
 	"context"
+	"io/fs"
 	"strings"
 	"testing"
+	"testing/fstest"
 	"time"
 
 	"github.com/stretchr/testify/require"
@@ -35,6 +37,53 @@ import (
 
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
 )
+
+func TestGetContentsFromManifestFS(t *testing.T) {
+	tests := []struct {
+		name       string
+		manifestFS []fs.FS
+		location   string
+		want       string
+		wantErr    error
+	}{
+		{
+			name: "manifest found in later filesystem",
+			manifestFS: []fs.FS{
+				fstest.MapFS{},
+				fstest.MapFS{"manifest.yaml": {Data: []byte("kind: ConfigMap\n")}},
+			},
+			location: "manifest.yaml",
+			want:     "kind: ConfigMap\n",
+		},
+		{
+			name:       "empty manifest exists",
+			manifestFS: []fs.FS{fstest.MapFS{"manifest.yaml": {Data: nil}}},
+			location:   "manifest.yaml",
+		},
+		{
+			name: "manifest missing from all filesystems",
+			manifestFS: []fs.FS{
+				fstest.MapFS{},
+				fstest.MapFS{"other.yaml": {Data: []byte("kind: Secret\n")}},
+			},
+			location: "manifest.yaml",
+			wantErr:  fs.ErrNotExist,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			contents, err := getContentsFromPathOrURL(test.manifestFS, test.location, config.DefaultTimeoutConfig())
+			if test.wantErr != nil {
+				require.ErrorIs(t, err, test.wantErr)
+				return
+			}
+
+			require.NoError(t, err)
+			require.Equal(t, test.want, contents.String())
+		})
+	}
+}
 
 func TestPrepareResources(t *testing.T) {
 	tests := []struct {
