@@ -460,7 +460,7 @@ spec:
                   associated with the route, and the status of the route with respect to
                   each parent. When this route attaches to a parent, the controller that
                   manages the parent must add an entry to this list when the controller
-                  first sees the route and should update the entry as appropriate when the
+                  first sees the route and MUST update the entry as appropriate when the
                   route or gateway is modified.
 
                   Note that parent references that cannot be resolved by an implementation
@@ -1169,7 +1169,7 @@ spec:
                   associated with the route, and the status of the route with respect to
                   each parent. When this route attaches to a parent, the controller that
                   manages the parent must add an entry to this list when the controller
-                  first sees the route and should update the entry as appropriate when the
+                  first sees the route and MUST update the entry as appropriate when the
                   route or gateway is modified.
 
                   Note that parent references that cannot be resolved by an implementation
@@ -1868,7 +1868,7 @@ spec:
                   associated with the route, and the status of the route with respect to
                   each parent. When this route attaches to a parent, the controller that
                   manages the parent must add an entry to this list when the controller
-                  first sees the route and should update the entry as appropriate when the
+                  first sees the route and MUST update the entry as appropriate when the
                   route or gateway is modified.
 
                   Note that parent references that cannot be resolved by an implementation
