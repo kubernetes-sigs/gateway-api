@@ -10,17 +10,6 @@ spec:
     - matches:
         - path:
             type: PathPrefix
-            value: /retry/backend-request-timeout-200ms
-      retry:
-        attempts: 2
-      timeouts:
-        backendRequest: 200ms
-      backendRefs:
-        - name: infra-backend-v3
-          port: 8080
-    - matches:
-        - path:
-            type: PathPrefix
             value: /retry/request-timeout-200ms
       retry:
         codes:
