@@ -74,6 +74,7 @@ build-openapi-json:
 build-monthly-openapi:
 	hack/build-openapi-json.sh --monthly --version-as-filename --experimental-only
 
+.PHONY: fmt vet test golint lint
 # Run go fmt against code
 fmt:
 	go fmt ./...
@@ -85,6 +86,11 @@ vet:
 # Run go test against code
 test:
 	go test -race -cover ./apis/... ./conformance/utils/... ./tools/openapi-generator
+
+golint:
+	hack/verify-golint.sh
+
+lint: fmt vet golint
 
 .PHONY: tidy
 tidy:
