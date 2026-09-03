@@ -3,3 +3,28 @@
 }
 
 @import 'td/code-dark';
+
+/* Light/Dark mode image switching */
+.img-dark-only {
+  display: none !important;
+}
+
+[data-bs-theme="dark"] {
+  .img-light-only {
+    display: none !important;
+  }
+  .img-dark-only {
+    display: initial !important;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  html:not([data-bs-theme="light"]) {
+    .img-light-only {
+      display: none !important;
+    }
+    .img-dark-only {
+      display: initial !important;
+    }
+  }
+}

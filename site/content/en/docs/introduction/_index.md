@@ -13,7 +13,7 @@ The overall resource model focuses on 3 separate
 they are expected to manage:
 
 <!-- Source: https://docs.google.com/presentation/d/11HEYCgFi-aya7FS91JvAfllHiIlvfgcp7qpi_Azjk4E/edit#slide=id.g292839eca6d_1_0 -->
-<img src="/images/resource-model.png" alt="Gateway API Resource Model" class="center" />
+![Gateway API Resource Model](/images/resource-model.png)
 
 Most of the configuration in this API is contained in the Routing layer. These
 protocol-specific resources ([HTTPRoute](/reference/api-types/httproute/),
@@ -24,7 +24,7 @@ The Gateway API Logo helps illustrate the dual purpose of this API, enabling
 routing for both North-South (Ingress) and East-West (Mesh) traffic to share the
 same configuration.
 
-<img src="/images/logo/logo-text-horizontal.png" alt="Gateway API Logo" class="center" />
+![Gateway API Logo](/images/logo/logo-text-horizontal.png)
 
 ## Gateway API for Ingress <a name="for-ingress"></a>
 
