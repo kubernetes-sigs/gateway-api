@@ -147,8 +147,8 @@ type GRPCRouteSpec struct {
 	//
 	// +optional
 	// +listType=atomic
-	// +kubebuilder:validation:MaxItems=16
-	// +kubebuilder:validation:XValidation:message="While 16 rules and 64 matches per rule are allowed, the total number of matches across all rules in a route must be less than 128",rule="(self.size() > 0 ? (has(self[0].matches) ? self[0].matches.size() : 0) : 0) + (self.size() > 1 ? (has(self[1].matches) ? self[1].matches.size() : 0) : 0) + (self.size() > 2 ? (has(self[2].matches) ? self[2].matches.size() : 0) : 0) + (self.size() > 3 ? (has(self[3].matches) ? self[3].matches.size() : 0) : 0) + (self.size() > 4 ? (has(self[4].matches) ? self[4].matches.size() : 0) : 0) + (self.size() > 5 ? (has(self[5].matches) ? self[5].matches.size() : 0) : 0) + (self.size() > 6 ? (has(self[6].matches) ? self[6].matches.size() : 0) : 0) + (self.size() > 7 ? (has(self[7].matches) ? self[7].matches.size() : 0) : 0) + (self.size() > 8 ? (has(self[8].matches) ? self[8].matches.size() : 0) : 0) + (self.size() > 9 ? (has(self[9].matches) ? self[9].matches.size() : 0) : 0) + (self.size() > 10 ? (has(self[10].matches) ? self[10].matches.size() : 0) : 0) + (self.size() > 11 ? (has(self[11].matches) ? self[11].matches.size() : 0) : 0) + (self.size() > 12 ? (has(self[12].matches) ? self[12].matches.size() : 0) : 0) + (self.size() > 13 ? (has(self[13].matches) ? self[13].matches.size() : 0) : 0) + (self.size() > 14 ? (has(self[14].matches) ? self[14].matches.size() : 0) : 0) + (self.size() > 15 ? (has(self[15].matches) ? self[15].matches.size() : 0) : 0) <= 128"
+	// +kubebuilder:validation:MaxItems=64
+	// +kubebuilder:validation:XValidation:message="While 64 rules and 64 matches per rule are allowed, the total number of matches across all rules in a route must be at most 128",rule="self.map(r, has(r.matches) ? r.matches.size() : 0).sum() <= 128"
 	// <gateway:experimental:validation:XValidation:message="Rule name must be unique within the route",rule="self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name) && l1.name == l2.name))">
 	Rules []GRPCRouteRule `json:"rules,omitempty"`
 }
@@ -156,6 +156,25 @@ type GRPCRouteSpec struct {
 // GRPCRouteRule defines the semantics for matching a gRPC request based on
 // conditions (matches), processing it (filters), and forwarding the request to
 // an API object (backendRefs).
+//
+// <gateway:util:excludeFromCRD>
+// The service and method character-class checks are applied from here rather
+// than on GRPCMethodMatch. The apiserver prices a CEL rule statically as its
+// cost times the maxItems of every enclosing list, so a regex rule on
+// GRPCMethodMatch is charged rules x matches (64 x 64) times and exceeds the
+// per-rule budget. Iterating over a literal list of match indexes from the
+// rule level is charged per rule instead, and the 64 indexes are split across
+// four rules per check to stay within budget.
+// </gateway:util:excludeFromCRD>
+//
+// +kubebuilder:validation:XValidation:message="matches[].method.service must only contain valid characters (matching ^(?i)\\.?[a-z_][a-z_0-9]*(\\.[a-z_][a-z_0-9]*)*$)",rule="!has(self.matches) || [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15].all(i, self.matches.size() <= i || !has(self.matches[i].method) || !(!has(self.matches[i].method.type) || self.matches[i].method.type == 'Exact') || !has(self.matches[i].method.service) || self.matches[i].method.service.matches(r\"\"\"^(?i)\\.?[a-z_][a-z_0-9]*(\\.[a-z_][a-z_0-9]*)*$\"\"\"))"
+// +kubebuilder:validation:XValidation:message="matches[].method.service must only contain valid characters (matching ^(?i)\\.?[a-z_][a-z_0-9]*(\\.[a-z_][a-z_0-9]*)*$)",rule="!has(self.matches) || [16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31].all(i, self.matches.size() <= i || !has(self.matches[i].method) || !(!has(self.matches[i].method.type) || self.matches[i].method.type == 'Exact') || !has(self.matches[i].method.service) || self.matches[i].method.service.matches(r\"\"\"^(?i)\\.?[a-z_][a-z_0-9]*(\\.[a-z_][a-z_0-9]*)*$\"\"\"))"
+// +kubebuilder:validation:XValidation:message="matches[].method.service must only contain valid characters (matching ^(?i)\\.?[a-z_][a-z_0-9]*(\\.[a-z_][a-z_0-9]*)*$)",rule="!has(self.matches) || [32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47].all(i, self.matches.size() <= i || !has(self.matches[i].method) || !(!has(self.matches[i].method.type) || self.matches[i].method.type == 'Exact') || !has(self.matches[i].method.service) || self.matches[i].method.service.matches(r\"\"\"^(?i)\\.?[a-z_][a-z_0-9]*(\\.[a-z_][a-z_0-9]*)*$\"\"\"))"
+// +kubebuilder:validation:XValidation:message="matches[].method.service must only contain valid characters (matching ^(?i)\\.?[a-z_][a-z_0-9]*(\\.[a-z_][a-z_0-9]*)*$)",rule="!has(self.matches) || [48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63].all(i, self.matches.size() <= i || !has(self.matches[i].method) || !(!has(self.matches[i].method.type) || self.matches[i].method.type == 'Exact') || !has(self.matches[i].method.service) || self.matches[i].method.service.matches(r\"\"\"^(?i)\\.?[a-z_][a-z_0-9]*(\\.[a-z_][a-z_0-9]*)*$\"\"\"))"
+// +kubebuilder:validation:XValidation:message="matches[].method.method must only contain valid characters (matching ^[A-Za-z_][A-Za-z_0-9]*$)",rule="!has(self.matches) || [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15].all(i, self.matches.size() <= i || !has(self.matches[i].method) || !(!has(self.matches[i].method.type) || self.matches[i].method.type == 'Exact') || !has(self.matches[i].method.method) || self.matches[i].method.method.matches(r\"\"\"^[A-Za-z_][A-Za-z_0-9]*$\"\"\"))"
+// +kubebuilder:validation:XValidation:message="matches[].method.method must only contain valid characters (matching ^[A-Za-z_][A-Za-z_0-9]*$)",rule="!has(self.matches) || [16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31].all(i, self.matches.size() <= i || !has(self.matches[i].method) || !(!has(self.matches[i].method.type) || self.matches[i].method.type == 'Exact') || !has(self.matches[i].method.method) || self.matches[i].method.method.matches(r\"\"\"^[A-Za-z_][A-Za-z_0-9]*$\"\"\"))"
+// +kubebuilder:validation:XValidation:message="matches[].method.method must only contain valid characters (matching ^[A-Za-z_][A-Za-z_0-9]*$)",rule="!has(self.matches) || [32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47].all(i, self.matches.size() <= i || !has(self.matches[i].method) || !(!has(self.matches[i].method.type) || self.matches[i].method.type == 'Exact') || !has(self.matches[i].method.method) || self.matches[i].method.method.matches(r\"\"\"^[A-Za-z_][A-Za-z_0-9]*$\"\"\"))"
+// +kubebuilder:validation:XValidation:message="matches[].method.method must only contain valid characters (matching ^[A-Za-z_][A-Za-z_0-9]*$)",rule="!has(self.matches) || [48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63].all(i, self.matches.size() <= i || !has(self.matches[i].method) || !(!has(self.matches[i].method.type) || self.matches[i].method.type == 'Exact') || !has(self.matches[i].method.method) || self.matches[i].method.method.matches(r\"\"\"^[A-Za-z_][A-Za-z_0-9]*$\"\"\"))"
 type GRPCRouteRule struct {
 	// Name is the name of the route rule. This name MUST be unique within a Route if it is set.
 	//
@@ -335,8 +354,6 @@ type GRPCRouteMatch struct {
 // At least one of Service and Method MUST be a non-empty string.
 //
 // +kubebuilder:validation:XValidation:message="One or both of 'service' or 'method' must be specified",rule="has(self.type) ? has(self.service) || has(self.method) : true"
-// +kubebuilder:validation:XValidation:message="service must only contain valid characters (matching ^(?i)\\.?[a-z_][a-z_0-9]*(\\.[a-z_][a-z_0-9]*)*$)",rule="(!has(self.type) || self.type == 'Exact') && has(self.service) ? self.service.matches(r\"\"\"^(?i)\\.?[a-z_][a-z_0-9]*(\\.[a-z_][a-z_0-9]*)*$\"\"\"): true"
-// +kubebuilder:validation:XValidation:message="method must only contain valid characters (matching ^[A-Za-z_][A-Za-z_0-9]*$)",rule="(!has(self.type) || self.type == 'Exact') && has(self.method) ? self.method.matches(r\"\"\"^[A-Za-z_][A-Za-z_0-9]*$\"\"\"): true"
 type GRPCMethodMatch struct {
 	// Type specifies how to match against the service and/or method.
 	// Support: Core (Exact with service and method specified)
