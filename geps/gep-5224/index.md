@@ -9,7 +9,7 @@ title: "GEP-5224: Pre-Routing Filters"
 
 ## TLDR
 
-This GEP proposes that Gateway API gain a way to express **pre-routing
+This GEP proposes that Gateway API define a way to express **pre-routing
 filters**: processing steps that run **before** a route is selected and that
 may therefore influence which route, and ultimately which backend, is chosen.
 Every filter Gateway API defines today, from `RequestHeaderModifier` to
@@ -70,7 +70,7 @@ current API, and therefore no supported place for a filter to run before
 
 The consequence is that Gateway API can express "once you know where this
 request is going, transform it" but cannot express "before you decide where
-this request goes, do X." That second capability is what pre-routing filters
+this request goes, do X." The capabilities of the latter are what pre-routing filters
 are about.
 
 ### Real Workloads Need to Act Before the Route Is Chosen
@@ -91,9 +91,9 @@ selection:
   depends on *who* the caller is, the identity has to be established before the
   route is selected, not after.
 
-None of these can be expressed with a post-routing filter, because in each case
+None of these can be expressed natively in Gateway API with a post-routing filter, because in each case
 the very information the route depends on is produced by the processing step.
-[GEP-5091][gep-5091] already elevates this to a goal for the specific case of
+[GEP-5091](https://github.com/kubernetes-sigs/gateway-api/pull/5091) already elevates this to a goal for the specific case of
 payload processing; this GEP generalizes the underlying phase so that it is not
 tied to any single kind of processing.
 
@@ -118,22 +118,19 @@ Filter ordering in Gateway API is currently a `SHOULD`, not a `MUST`:
 > strictly [...]"
 > — `HTTPRouteRule.Filters`, [apis/v1/httproute_types.go](../../apis/v1/httproute_types.go)
 
-[Issue #5194][issue-5194] revisits whether that ordering should become a
+[Issue #5194](https://github.com/kubernetes-sigs/gateway-api/issues/5194) revisits whether that ordering should become a
 guarantee. As noted there, when filters were "largely commutative header and
 path manipulations," soft ordering was tolerable; now that filters can
 authorize, terminate, or mutate a request, order changes the result. Pre-routing
 processing is exactly where ordering is load-bearing: "extract a value from a
 body and push it into a header, order of those operations will probably
-matter." The community's working resolution on #5194 is to introduce the
+matter." The community's working resolution on [Issue #5194](https://github.com/kubernetes-sigs/gateway-api/issues/5194) is to introduce the
 pre-routing phase (this GEP) and to make ordering strict for pre-routing
 filters from the moment they are introduced, rather than retrofitting a
 guarantee onto the existing GA post-routing filter list. Establishing a clean
 pre-routing phase with strict ordering from day one avoids the backwards
-compatibility problem that a global `SHOULD`→`MUST` change would create for
+compatibility problem that a global `SHOULD`->`MUST` change would create for
 existing post-routing filters.
-
-[gep-5091]: https://github.com/kubernetes-sigs/gateway-api/pull/5092
-[issue-5194]: https://github.com/kubernetes-sigs/gateway-api/issues/5194
 
 ## Goals
 
@@ -152,7 +149,7 @@ existing post-routing filters.
   matching-input normalization.
 * Establish that ordering among pre-routing filters is significant and should
   be a guarantee from the introduction of the phase, providing a concrete
-  answer to the pre-routing portion of [#5194][issue-5194].
+  answer to the pre-routing portion of [#5194](https://github.com/kubernetes-sigs/gateway-api/issues/5194).
 * Enumerate the API-shape and semantic decisions that must be resolved at the
   Experimental stage, without committing to any of them here.
 
@@ -166,12 +163,12 @@ existing post-routing filters.
   filter types can run in the pre-routing phase, and which new ones are
   introduced, is out of scope for a provisional GEP.
 * **Body-level processing semantics.** How the body is addressed, buffered, or
-  mutated is the subject of the body-based routing / [GEP-5091][gep-5091] work.
+  mutated is the subject of the body-based routing / [GEP-5091](https://github.com/kubernetes-sigs/gateway-api/pull/5091) work.
   This GEP is about the *phase*, not the *body*.
 * **External processing wire protocols.** Invoking an external service is the
   subject of the external-callouts split. Pre-routing filters may eventually
   host such callouts, but the protocol is out of scope here.
-* **Re-litigating post-routing filter ordering.** [#5194][issue-5194] asks a
+* **Re-litigating post-routing filter ordering.** [#5194](https://github.com/kubernetes-sigs/gateway-api/issues/5194) asks a
   broader question about the existing GA filter list. This GEP only commits to
   strict ordering *within the new pre-routing phase*; the post-routing question
   is left to that issue.
@@ -179,7 +176,7 @@ existing post-routing filters.
   complement `HTTPRoute` matching and existing filters; they do not replace
   header/path/method matching or post-routing transformation.
 * **TCP/UDP/TLS-layer processing.** SNI/TLS-based selection
-  ([GEP-2643](https://gateway-api.sigs.k8s.io/geps/gep-2643/)) is a different,
+  ([GEP-2643](https://github.com/kubernetes-sigs/gateway-api/pull/2643)) is a different,
   lower-layer form of pre-routing and is not in scope here.
 
 ## User Stories
@@ -272,7 +269,7 @@ Client Request
 
 Naming the phases has three concrete consequences:
 
-1. **Only pre-routing processing can affect routing.** This is the defining
+1. **Only pre-routing processing can affect route selection.** This is the defining
    difference. A post-routing filter, no matter what it does, runs against a
    request whose destination is fixed. If the goal is to *change where a
    request goes* based on some computed signal, it can only be done
@@ -291,17 +288,17 @@ Naming the phases has three concrete consequences:
 ## Prior Art
 
 Reviewing how existing data planes model this is instructive, because the
-pre-routing vs. post-routing split is not a novel invention; it is how most
-proxies already work internally. Gateway API is unusual in *only* exposing the
-post-routing hook. Per the guidance on writing provisional GEPs, this review
-covers more than one data plane; Envoy is necessary but not sufficient.
+pre-routing vs. post-routing split is not a novel concept for gateway implementations.
 
 ### Envoy
 
-Envoy's HTTP filter chain runs *before* the terminal `router` filter, which is
-what actually performs route selection. Downstream filters "do stream
-processing on each downstream request before routing." A filter that mutates a
-routing-relevant input can force the route to be recomputed via
+Envoy's HTTP Connection Manager resolves and caches a route when it finishes
+decoding the request headers. Route matching can consider the request path,
+method, authority, headers, cookies, and filter-populated dynamic metadata or
+filter state, but not the request body. Downstream decoder filters run before
+the terminal `router` filter and may influence the route ultimately used by
+mutating these inputs and clearing or replacing the cached route. A filter that
+mutates a routing-relevant input can force the route to be recomputed via
 `clearRouteCache()`; several filters (Lua, ext_proc, the Golang filter,
 `json_to_metadata`) can do exactly this. Conversely, `typed_per_filter_config`
 attaches configuration to an already-selected route or virtual host, and is by
@@ -321,9 +318,7 @@ Location (route) selection happens in a dedicated phase,
 `NGX_HTTP_REWRITE_PHASE` runs *after* location selection and can rewrite the
 URI, which sends the request back through `FIND_CONFIG` for re-selection. NGINX
 thus has both an explicit pre-routing hook (server rewrite) and an explicit
-mechanism for a post-selection mutation to trigger re-routing. This is a direct
-analogue of the phase model this GEP describes, and NGINX Gateway Fabric's
-body-based routing work is exploring how to surface it through Gateway API.
+mechanism for a post-selection mutation to trigger re-routing.
 
 ### HAProxy
 
@@ -336,13 +331,33 @@ users already reason in terms of "before backend selection" (pre-routing) and
 
 ### Istio
 
-Istio builds on Envoy and inherits its filter-chain-before-router model. It
-additionally exposes phase/insertion semantics for extensions: `EnvoyFilter`
-insertion points and WasmPlugin `phase` values (for example `AUTHN`, `AUTHZ`,
-`STATS`) let operators place custom processing at defined points relative to
-routing and authorization. The existence of these knobs reflects that operators
-need to control *where in the pipeline, relative to routing,* their processing
-runs.
+Istio builds on Envoy (via sidecars and waypoints) and inherits its filter-chain-before-router model, so the
+same "filters before the terminal `router` filter can influence routing"
+property applies. On top of that, Istio exposes insertion semantics for
+extensions: `EnvoyFilter` lets operators splice a custom HTTP filter into the
+connection manager's filter chain at a chosen position, including *before* the
+terminal `router` filter, which is the position that makes a filter effectively
+pre-routing. `WasmPlugin` additionally offers a coarser `phase` field
+(`AUTHN`, `AUTHZ`, `STATS`) that orders a plugin relative to Istio's
+authentication, authorization, and telemetry filters rather than relative to
+route selection directly; because those phases all sit within the pre-router
+filter chain, a plugin placed there still runs before routing, but the field is
+not a general-purpose "before/after route selection" control. The `EnvoyFilter`
+insertion point is therefore the more precise example of an operator explicitly
+choosing where, relative to routing, custom processing runs.
+
+### agentgateway
+
+agentgateway is an AI-native, Gateway API-based data plane aimed at LLM, MCP,
+and A2A traffic, and is the closest existing analogue to this GEP because it
+already exposes a **named pre-routing phase in Gateway API terms**. Every
+request flows through four fixed, ordered phases — Frontend, PreRouting,
+PostRouting, Backend — with route selection between PreRouting and PostRouting;
+PreRouting filters run before a route is chosen and can influence selection,
+while PostRouting filters cannot. A PreRouting policy can only target a
+`Gateway` or `ListenerSet` (never an `HTTPRoute`, since no route has matched),
+and the phase admits only a fixed, ordered subset of filters (JWT, basic, and
+API-key auth, external authorization, external processing, and transformation).
 
 ### Apache HTTP Server
 
@@ -366,9 +381,10 @@ configurations that cannot be honored.
 
 ### Takeaway
 
-Across Envoy, NGINX, HAProxy, Istio, Apache, and cloud load balancers, the same
-shape recurs: request processing is a sequence of ordered phases with a distinct
-route/backend-selection step, and hooks exist both *before* and *after* it.
+Across Envoy, NGINX, HAProxy, Istio, agentgateway, Apache, and cloud load
+balancers, the same shape recurs: request processing is a sequence of ordered
+phases with a distinct route/backend-selection step, and hooks exist both
+*before* and *after* it.
 Gateway API's filter model currently exposes only the post-routing hook. A
 pre-routing filter API would map onto capabilities these data planes already
 have, rather than asking them to build something new.
@@ -403,9 +419,6 @@ Experimental stage.
 
 ## Open Questions
 
-* **Does this belong in Gateway API core or as an extension?** The capability
-  serves users well beyond AI gateways, so where it ships is unresolved and
-  interacts with the API-shape decision.
 * **How does a pre-routing mutation interact with route selection precisely?**
   The provisional position is single-pass: pre-routing filters run in order,
   then matching evaluates the mutated request once. This must be reconciled
