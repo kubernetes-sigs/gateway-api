@@ -1,0 +1,51 @@
+apiVersion: gateway.networking.k8s.io/v1
+date: "2026-09-09T00:36:59-04:00"
+gatewayAPIChannel: standard
+gatewayAPIVersion: v1.6.2
+implementation:
+  contact:
+  - gateway-api@buoyant.io
+  organization: Linkerd
+  project: Linkerd
+  url: https://github.com/linkerd/linkerd2
+  version: "2.20"
+kind: ConformanceReport
+mode: default
+profiles:
+- core:
+    result: partial
+    skippedTests:
+    - MeshGRPCRouteRequestHeaderModifier
+    statistics:
+      Failed: 0
+      Passed: 2
+      Skipped: 1
+  name: MESH-GRPC
+  summary: Core tests partially succeeded with 1 test skips.
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 7
+      Skipped: 0
+  extended:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 5
+      Skipped: 0
+    supportedFeatures:
+    - MeshClusterIPMatching
+    - MeshConsumerRoute
+    - MeshHTTPRouteBackendRequestHeaderModification
+    - MeshHTTPRouteNamedRouteRule
+    - MeshHTTPRouteQueryParamMatching
+    - MeshHTTPRouteRedirectPort
+    - MeshHTTPRouteSchemeRedirect
+    unsupportedFeatures:
+    - MeshHTTPRouteRedirectPath
+    - MeshHTTPRouteRewritePath
+  name: MESH-HTTP
+  summary: Core tests succeeded. Extended tests succeeded.
+succeededProvisionalTests:
+- MeshHTTPRouteNamedRule
