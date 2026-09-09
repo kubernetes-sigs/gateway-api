@@ -2,11 +2,11 @@
 
 ## Table of Contents
 
-| API channel  | Implementation version                                                        | Mode                   | Report                                                                                                                       |
-|--------------|-------------------------------------------------------------------------------|------------------------|------------------------------------------------------------------------------------------------------------------------------|
-| experimental | [v2.3.0](https://github.com/Kong/kong-operator/releases/tag/v2.3.0)           | expressions            | [v2.3.0 expressions report](./experimental-v2.3.0-expressions-standard-report.yaml)                                          |
-| experimental | [v2.3.0](https://github.com/Kong/kong-operator/releases/tag/v2.3.0)           | traditional_compatible | [v2.3.0 traditional compatible standard report](./experimental-v2.3.0-traditional_compatible-standard-report.yaml)           |
-| experimental | [v2.3.0](https://github.com/Kong/kong-operator/releases/tag/v2.3.0)           | traditional_compatible | [v2.3.0 traditional compatible hybrid report](./experimental-v2.3.0-traditional_compatible-hybrid-report.yaml)               |
+| API channel  | Implementation version                                              | Mode                            | Report                                                                                                                  |
+|--------------|---------------------------------------------------------------------|---------------------------------|-------------------------------------------------------------------------------------------------------------------------|
+| experimental | [v2.3.1](https://github.com/Kong/kong-operator/releases/tag/v2.3.1) | expressions-standard            | [v2.3.1 expressions standard report](./experimental-v2.3.1-expressions-standard-report.yaml)                            |
+| experimental | [v2.3.1](https://github.com/Kong/kong-operator/releases/tag/v2.3.1) | traditional_compatible-standard | [v2.3.1 traditional compatible standard report](./experimental-v2.3.1-traditional_compatible-standard-report.yaml)      |
+| experimental | [v2.3.1](https://github.com/Kong/kong-operator/releases/tag/v2.3.1) | traditional_compatible-hybrid   | [v2.3.1 traditional compatible hybrid report](./experimental-v2.3.1-traditional_compatible-hybrid-report.yaml)          |
 
 ## Reproduce
 
@@ -39,7 +39,9 @@ components.
 3. Run the conformance tests
 
    ```bash
-   TEST_KONG_ROUTER_FLAVOR=<traditional_compatible|expressions> make test.conformance
+   TEST_KONG_ROUTER_FLAVOR=<traditional_compatible|expressions> \
+   KONG_TEST_CONFORMANCE_GATEWAY_TYPE=<standard|hybrid> \
+   make test.conformance
    ```
 
 4. Check the produced report

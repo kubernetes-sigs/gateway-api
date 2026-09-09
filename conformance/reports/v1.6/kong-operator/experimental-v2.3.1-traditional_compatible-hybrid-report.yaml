@@ -1,16 +1,16 @@
 apiVersion: gateway.networking.k8s.io/v1
-date: "2026-09-01T15:59:55Z"
+date: "2026-09-09T05:43:18Z"
 gatewayAPIChannel: experimental
-gatewayAPIVersion: v1.6.1
+gatewayAPIVersion: v1.6.2
 implementation:
   contact:
   - https://github.com/kong/kong-operator/issues/new/choose
   organization: Kong
   project: kong-operator
   url: https://github.com/kong/kong-operator
-  version: v2.3.0
+  version: v2.3.1
 kind: ConformanceReport
-mode: expressions-standard
+mode: traditional_compatible-hybrid
 profiles:
 - core:
     result: success
@@ -22,7 +22,7 @@ profiles:
     result: success
     statistics:
       Failed: 0
-      Passed: 9
+      Passed: 7
       Skipped: 0
     supportedFeatures:
     - GatewayAddressEmpty
@@ -30,9 +30,7 @@ profiles:
     - GatewayPort8080
     - HTTPRouteBackendTimeout
     - HTTPRouteHostRewrite
-    - HTTPRouteMethodMatching
     - HTTPRoutePathRewrite
-    - HTTPRouteQueryParamMatching
     - HTTPRouteResponseHeaderModification
     unsupportedFeatures:
     - BackendTLSPolicy
@@ -51,10 +49,12 @@ profiles:
     - HTTPRouteBackendRequestHeaderModification
     - HTTPRouteCORS
     - HTTPRouteDestinationPortMatching
+    - HTTPRouteMethodMatching
     - HTTPRouteNamedRouteRule
     - HTTPRouteParentRefPort
     - HTTPRoutePathRedirect
     - HTTPRoutePortRedirect
+    - HTTPRouteQueryParamMatching
     - HTTPRouteRequestMirror
     - HTTPRouteRequestMultipleMirrors
     - HTTPRouteRequestPercentageMirror
@@ -93,13 +93,11 @@ profiles:
   name: GATEWAY-GRPC
   summary: Core tests succeeded. Extended tests succeeded.
 - core:
-    result: partial
-    skippedTests:
-    - TCPRouteWeightedRouting
+    result: success
     statistics:
       Failed: 0
-      Passed: 18
-      Skipped: 1
+      Passed: 19
+      Skipped: 0
   extended:
     result: success
     statistics:
@@ -120,7 +118,7 @@ profiles:
     - GatewayStaticAddresses
     - ListenerSet
   name: GATEWAY-TCP
-  summary: Core tests partially succeeded with 1 test skips. Extended tests succeeded.
+  summary: Core tests succeeded. Extended tests succeeded.
 - core:
     result: success
     statistics:
@@ -185,6 +183,7 @@ succeededProvisionalTests:
 - TCPRouteParentRefAttachAll
 - TCPRouteParentRefPortAndSectionName
 - TCPRouteReferenceGrant
+- TCPRouteWeightedRouting
 - TLSRouteTerminateSimpleSameNamespace
 - UDPRoute
 - UDPRouteInvalidBackendRefNonexistent
