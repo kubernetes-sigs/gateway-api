@@ -9,30 +9,45 @@ We are using the GitHub issues and project dashboard to manage the list of TODOs
 for this project:
 
 * [Open issues][gh-issues]
-* [Project dashboard][gh-dashboard]
 
 Issues labeled `good first issue` and `help wanted` are especially good for a
 first contribution.
 
-We use [milestones][gh-milestones] to track our progress towards releases.
-These milestones are generally labeled according to the [semver][semver]
-release version tag that they represent, meaning that in general we only focus
-on the next release in the sequence until it is closed and the release is
-finished. Only Gateway API maintainers are able to create and attach issues to
-milestones.
-
 We use [priority labels][prio-labels] to help indicate the timing importance of
 resolving an issue, or whether an issue needs more support from its creator or
-the community to be prioritized. These labels can be set with the [/priority
-command in PR and issue comments][issue-cmds]. For example,
+the community to be prioritized. These labels can be set with the `/priority`
+command in [PR and issue comments][issue-cmds]. For example,
 `/priority important-soon`.
 
+AI assisted submissions are acceptable, but must abide by the Gateway API
+[AI Policy][ai-policy]. Please see that policy for details.
+
+## Types of change
+
+There are a few common types of change in Gateway API, here are some tips for getting
+started:
+
+* In general, new contributors should not open an unsolicited PR against the repo without
+discussing with the community first. In general, you should [open an issue][gh-issues]
+before opening a PR. Some more specifics:
+  * If you are looking to add a new feature, use the GEP (Gateway
+Enhancement Proposal) process. See [Enhancement Requests](./enhancement-requests.md)
+for more information about the process.
+  * If you want to modify an existing feature, [open an issue][gh-issues] and ask if
+it needs a GEP.
+  * Anything that changes the files in the `apis` or `apisx` directories probably needs
+a GEP, and at the very least will need a discussion before a PR. Please
+[open an issue][gh-issues] with your request.
+  * If you want to add or update conformance tests, please [open an issue][gh-issues]
+describing what you want to add. In this case _only_, you may also open a PR at the
+same time, but each conformance update PR must also include information about which
+implementation it has been tested against. Conformance PRs must not be opened without
+testing with at least one implementation first.
+
 [gh-issues]: https://github.com/kubernetes-sigs/gateway-api/issues
-[gh-dashboard]: https://github.com/kubernetes-sigs/gateway-api/projects
-[gh-milestones]: https://github.com/kubernetes-sigs/gateway-api/milestones
-[semver]: https://semver.org/
 [prio-labels]: https://github.com/kubernetes-sigs/gateway-api/labels?q=priority
 [issue-cmds]: https://prow.k8s.io/command-help?repo=kubernetes-sigs%2Fgateway-api
+[ai-policy]: https://github.com/kubernetes-sigs/gateway-api/blob/main/AI-POLICY.md
 
 ## Prerequisites
 

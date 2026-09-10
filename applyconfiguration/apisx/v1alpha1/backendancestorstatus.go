@@ -48,7 +48,7 @@ type BackendAncestorStatusApplyConfiguration struct {
 	// </gateway:util:excludeFromCRD>
 	ControllerName *v1.GatewayController `json:"controllerName,omitempty"`
 	// AncestorRef identifies the parent resource that this status is associated with.
-	AncestorRef *apisv1.ParentReferenceApplyConfiguration `json:"parentRef,omitempty"`
+	AncestorRef *apisv1.ParentReferenceApplyConfiguration `json:"ancestorRef,omitempty"`
 	// For Kubernetes API conventions, see:
 	// https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#typical-status-properties
 	// conditions represent the current state of the Backend resource.

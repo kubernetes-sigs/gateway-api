@@ -1,5 +1,6 @@
 meshName: "partial-only"
 timeoutConfig:
   deleteTimeout: "5s"
+  requiredConsecutiveSuccesses: 5
   tcpRouteMustHaveCondition: "75s"
   udpRouteMustHaveCondition: "90s"

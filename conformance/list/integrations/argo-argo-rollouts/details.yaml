@@ -1,0 +1,11 @@
+apiVersion: gateway.networking.kubernetes.io/v1
+kind: ImplementationListDetails
+organization: argoproj
+project: argo-rollouts
+url: http://github.com/argoproj/argo-rollouts
+fullName: "Argo Rollouts"
+description: |
+  [Argo Rollouts][argo-rollouts] is a progressive delivery controller for Kubernetes. It supports several advanced deployment methods such as blue/green and canaries. Argo Rollouts supports the Gateway API via [a plugin][argo-rollouts-plugin].
+
+  [argo-rollouts]: https://argo-rollouts.readthedocs.io/en/stable/
+  [argo-rollouts-plugin]: https://github.com/argoproj-labs/rollouts-gatewayapi-trafficrouter-plugin/

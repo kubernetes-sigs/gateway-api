@@ -33,7 +33,7 @@ spec:
     spec:
       containers:
         - name: udp-echo
-          image: registry.k8s.io/gateway-api/echo-basic:v1.6.0-dev.2
+          image: registry.k8s.io/gateway-api/conformance/echo-basic:v0.1.0
           imagePullPolicy: IfNotPresent
           env:
             - name: UDP_ECHO_SERVER
@@ -90,7 +90,7 @@ spec:
     spec:
       containers:
         - name: udp-echo
-          image: registry.k8s.io/gateway-api/echo-basic:v1.6.0-dev.2
+          image: registry.k8s.io/gateway-api/conformance/echo-basic:v0.1.0
           imagePullPolicy: IfNotPresent
           env:
             - name: UDP_ECHO_SERVER
@@ -147,7 +147,7 @@ spec:
     spec:
       containers:
         - name: udp-echo
-          image: registry.k8s.io/gateway-api/echo-basic:v1.6.0-dev.2
+          image: registry.k8s.io/gateway-api/conformance/echo-basic:v0.1.0
           imagePullPolicy: IfNotPresent
           env:
             - name: UDP_ECHO_SERVER

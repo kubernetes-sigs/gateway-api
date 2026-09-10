@@ -18,6 +18,8 @@ package v1
 
 import (
 	"errors"
+	"fmt"
+	"strings"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -105,4 +107,77 @@ func (i *Implementation) Validate() error {
 		return errors.New("implementation's contact cannot be empty")
 	}
 	return nil
+}
+
+// IsConformant returns Result values for Gateway, Mesh, and an error that describes
+// if something went wrong.
+func (c *ConformanceReport) IsConformant(version string) (Result, Result, error) {
+	// Firstly, the Implementation struct must be valid.
+	if err := c.Validate(); err != nil {
+		return Failure, Failure, err
+	}
+
+	var returnErr error
+
+	gatewayResult := Failure
+	meshResult := Failure
+
+	// At least one profile must be valid for the report to be conformant.
+	for _, profile := range c.ProfileReports {
+		err := profile.IsConformant(version)
+		if err == nil {
+			// Assume this profile is good for now
+			profileResult := Success
+
+			// Do some additional checks here that require access to multiple parts
+			// of the report
+			// If the result was marked as partial, then it can only be partial.
+			if profile.Core.Result == Partial {
+				profileResult = Partial
+			}
+			// If there are Core skipped tests, then the profile can only ever be partial.
+			if len(profile.Core.SkippedTests) > 0 {
+				returnErr = errors.Join(returnErr, fmt.Errorf("core tests were skipped for %s", profile.Name))
+				profileResult = Partial
+			}
+
+			// Update the overall result with the temp result
+			if strings.HasPrefix(profile.Name, "MESH") {
+				meshResult = updateResult(meshResult, profileResult)
+			} else {
+				gatewayResult = updateResult(gatewayResult, profileResult)
+			}
+		} else {
+			// If there's errors, then this profile is counted as a Failure
+			// Update the overall results accordingly.
+			if strings.HasPrefix(profile.Name, "MESH") {
+				meshResult = updateResult(meshResult, Failure)
+			} else {
+				gatewayResult = updateResult(gatewayResult, Failure)
+			}
+			returnErr = errors.Join(returnErr, err)
+		}
+	}
+	return gatewayResult, meshResult, returnErr
+}
+
+func updateResult(oldResult, newResult Result) Result {
+	if oldResult == newResult {
+		return oldResult
+	}
+
+	if oldResult == Success {
+		return oldResult
+	}
+
+	if oldResult == Partial {
+		if newResult == Success {
+			return newResult
+		}
+		if newResult == Failure {
+			return oldResult
+		}
+	}
+
+	return newResult
 }

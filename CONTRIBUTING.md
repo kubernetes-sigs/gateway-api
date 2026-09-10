@@ -1,6 +1,8 @@
 # Contributing Guidelines
 
-Welcome to Kubernetes. We are excited about the prospect of you joining our [community](https://git.k8s.io/community)! The Kubernetes community abides by the CNCF [code of conduct](code-of-conduct.md). Here is an excerpt:
+Welcome to Gateway API.
+
+We are excited about the prospect of you joining our community! As a part of the Kubernetes community, Gateway API abides by the CNCF [code of conduct](code-of-conduct.md). Here is an excerpt:
 
 _As contributors and maintainers of this project, and in the interest of fostering an open and welcoming community, we pledge to respect all people who contribute through reporting issues, posting feature requests, updating documentation, submitting pull requests or patches, and other activities._
 
@@ -8,31 +10,14 @@ _As contributors and maintainers of this project, and in the interest of fosteri
 
 We have full documentation on how to get started contributing here:
 
-<!---
-If your repo has certain guidelines for contribution, put them here ahead of the general k8s resources
--->
-
+- [Getting Involved](https://gateway-api.sigs.k8s.io/contributing/get-involved/) - general advice for getting started.
+- [Developer Guide](https://gateway-api.sigs.k8s.io/contributing/devguide/) - understanding our project management and build process.
+- [AI Policy](https://github.com/kubernetes-sigs/gateway-api/blob/main/AI-POLICY.md) - Gateway API policy on the use of LLMs and AI tools.
+- [Enhancement Requests](https://gateway-api.sigs.k8s.io/contributing/enhancement-requests/) - information about the GEP (Gateway Enhancement Proposal) process.
+- [Slack channel](https://kubernetes.slack.com/messages/sig-network-gateway-api)
 - [Contributor License Agreement](https://git.k8s.io/community/CLA.md) Kubernetes projects require that you sign a Contributor License Agreement (CLA) before we can accept your pull requests
 - [Kubernetes Contributor Guide](https://git.k8s.io/community/contributors/guide) - Main contributor documentation, or you can just jump directly to the [contributing section](https://git.k8s.io/community/contributors/guide#contributing)
-- [Contributor Cheat Sheet](https://git.k8s.io/community/contributors/guide/contributor-cheatsheet) - Common resources for existing developers
-
-## Mentorship
-
-- [Mentoring Initiatives](https://git.k8s.io/community/mentoring) - We have a diverse set of mentorship programs available that are always looking for volunteers!
-
-<!---
-Custom Information - if you're copying this template for the first time you can add custom content here, for example:
-
-## Contact Information
-
-- [Slack channel](https://kubernetes.slack.com/messages/kubernetes-users) - Replace `kubernetes-users` with your slack channel string, this will send users directly to your channel. 
-- [Mailing list](URL)
-
--->
-
-## Project Management
-
-The [maintainers](https://github.com/kubernetes-sigs/gateway-api/blob/main/OWNERS_ALIASES#L12) of this project (and often others who have official positions on the [contributor ladder](https://github.com/kubernetes-sigs/gateway-api/blob/main/OWNERS_ALIASES)) are responsible for performing project management which oversees development and maintenance of the API, tests, tools, etc. While we try to be generally flexible when it comes to the management of individual pieces (such as Issues or PRs), we have some rules and guidelines which help us plan, coordinate and reduce waste. In this section you'll find some rules/guidelines for contributors related to project management which may extend or go beyond what you would find in the standard [Kubernetes Contributor Guide](https://git.k8s.io/community/contributors/guide).
+- [Contributor Cheat Sheet](https://git.k8s.io/community/contributors/guide/contributor-cheatsheet) - Common resources for existing Kubernetes developers
 
 ### Bumping stale and closed Issues & PRs
 

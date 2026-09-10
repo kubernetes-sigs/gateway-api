@@ -1,0 +1,11 @@
+apiVersion: gateway.networking.kubernetes.io/v1
+kind: ImplementationListDetails
+organization: HAProxy Ingress
+project: haproxy-ingress
+fullName: HAProxy Ingress
+description: |
+  [HAProxy Ingress][h1] is a community driven ingress controller implementation for HAProxy.
+
+  HAProxy Ingress is a conformant Gateway API implementation since `v0.17`. It implements all core features from the standard channel, as well as TLSRoute and TCPRoute APIs from the experimental channel.
+
+  [h1]:https://haproxy-ingress.github.io/

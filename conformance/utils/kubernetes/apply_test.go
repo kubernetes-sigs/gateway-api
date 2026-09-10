@@ -17,12 +17,23 @@ limitations under the License.
 package kubernetes
 
 import (
+	"context"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
+	corev1 "k8s.io/api/core/v1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/yaml"
+	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/client/fake"
+	"sigs.k8s.io/controller-runtime/pkg/client/interceptor"
+
+	"sigs.k8s.io/gateway-api/conformance/utils/config"
 )
 
 func TestPrepareResources(t *testing.T) {
@@ -178,6 +189,59 @@ spec:
 
 			require.NoError(t, err, "unexpected error preparing resources")
 			require.Equal(t, tc.expected, resources)
+		})
+	}
+}
+
+func TestDeleteAndWaitBlocksUntilGone(t *testing.T) {
+	scheme := runtime.NewScheme()
+	require.NoError(t, corev1.AddToScheme(scheme))
+
+	tests := []struct {
+		name string
+		obj  client.Object
+	}{
+		{
+			name: "namespace held by a finalizer",
+			obj: &corev1.Namespace{ObjectMeta: metav1.ObjectMeta{
+				Name: "conformance-ns", Finalizers: []string{"conformance.gateway-api/test"},
+			}},
+		},
+		{
+			name: "namespaced resource held by a finalizer",
+			obj: &corev1.ConfigMap{ObjectMeta: metav1.ObjectMeta{
+				Name: "held", Namespace: "default", Finalizers: []string{"conformance.gateway-api/test"},
+			}},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			key := client.ObjectKeyFromObject(tc.obj)
+
+			// Object present on the first poll, gone on the next: drives the wait loop with no timing dependence.
+			var polls int
+			c := fake.NewClientBuilder().WithScheme(scheme).WithObjects(tc.obj).
+				WithInterceptorFuncs(interceptor.Funcs{
+					Get: func(ctx context.Context, cl client.WithWatch, key client.ObjectKey, obj client.Object, opts ...client.GetOption) error {
+						polls++
+						if polls >= 2 {
+							fresh := tc.obj.DeepCopyObject().(client.Object)
+							if err := cl.Get(ctx, key, fresh); err == nil {
+								fresh.SetFinalizers(nil)
+								_ = cl.Update(ctx, fresh)
+							}
+						}
+						return cl.Get(ctx, key, obj, opts...)
+					},
+				}).Build()
+
+			deleteAndWait(t, c, tc.obj, config.TimeoutConfig{DeleteTimeout: 5 * time.Second, DefaultPollInterval: time.Millisecond})
+
+			probe := tc.obj.DeepCopyObject().(client.Object)
+			err := c.Get(context.Background(), key, probe)
+			require.True(t, apierrors.IsNotFound(err),
+				"%s must be fully deleted after deleteAndWait returns, got err=%v", tc.name, err)
 		})
 	}
 }

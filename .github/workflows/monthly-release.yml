@@ -21,13 +21,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # tag=v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # tag=v7.0.1
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Go
-        uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # tag=v6.5.0
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # tag=v7.0.0
         with:
           go-version-file: "go.work"
 
@@ -74,6 +74,12 @@ jobs:
           MONTHLY_NONINTERACTIVE: "true"
         run: |
           make build-monthly-yaml
+
+      - name: Build monthly OpenAPI JSON
+        env:
+          TAG: ${{ steps.tag.outputs.tag }}
+        run: |
+          make build-monthly-openapi
 
       - name: Release with notes
         id: release
@@ -135,7 +141,9 @@ jobs:
             --title "${STEPS_TAG_OUTPUTS_TAG}" \
             -F release-notes.md \
             --prerelease \
-            --draft release/${STEPS_TAG_OUTPUTS_TAG}-install.yaml
+            --draft \
+            "release/${STEPS_TAG_OUTPUTS_TAG}-install.yaml" \
+            "release/${STEPS_TAG_OUTPUTS_TAG}-swagger.json"
 
       - name: Cleanup
         if: always()

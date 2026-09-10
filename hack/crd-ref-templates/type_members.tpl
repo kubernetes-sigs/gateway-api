@@ -4,6 +4,6 @@
 Refer to Kubernetes API documentation for fields of `metadata`.
 {{- else -}}
 {{- $cleanDoc := regexReplaceAllLiteral "(?s)<gateway:util:excludeFromCRD>.*?</gateway:util:excludeFromCRD>" $field.Doc "" -}}
-{{ markdownRenderFieldDoc $cleanDoc }}
+{{ markdownRenderFieldHTML $cleanDoc }}
 {{- end -}}
 {{- end -}}

@@ -9,7 +9,7 @@ The `GatewayClass` resource is GA and has been part of the Standard Channel sinc
 guide](/docs/concepts/versioning/).
 {{< /details >}}
 
-[GatewayClass][gatewayclass] is cluster-scoped resource defined by the
+[GatewayClass][gatewayclass] is a cluster-scoped resource defined by the
 infrastructure provider. This resource represents a class of Gateways that can
 be instantiated.
 

@@ -41,7 +41,6 @@ var TCPRouteWeightedRouting = confsuite.ConformanceTest{
 		features.SupportGateway,
 		features.SupportTCPRoute,
 	},
-	Provisional: true,
 	Test: func(t *testing.T, suite *confsuite.ConformanceTestSuite) {
 		ns := confsuite.InfrastructureNamespace
 		gwNN := types.NamespacedName{Name: "tcp-weighted-gateway", Namespace: ns}
@@ -61,7 +60,8 @@ var TCPRouteWeightedRouting = confsuite.ConformanceTest{
 				"tcp-backend-v3": 0.0,
 			}
 
-			tcp.ExpectAddressBeAvailable(t, suite.TimeoutConfig.DefaultPollInterval, suite.TimeoutConfig.MaxTimeToConsistency, gwAddr)
+			tcp.ExpectAddressBeAvailable(t, suite.TimeoutConfig, gwAddr)
+			tcp.ExpectEchoResponse(t, suite.TimeoutConfig, gwAddr)
 
 			sender := weight.NewFunctionBasedSender(func() (string, error) {
 				return tcp.EchoSendOnce(t.Context(), gwAddr, suite.TimeoutConfig.RequestTimeout)

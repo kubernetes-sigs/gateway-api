@@ -27,6 +27,32 @@ import (
 //
 // CookieConfig defines the configuration for cookie-based session persistence.
 type CookieConfigApplyConfiguration struct {
+	// Name defines the name of the cookie used for session persistence.
+	// If not specified, a unique cookie name SHOULD be generated.
+	// Users should avoid reusing cookie names to prevent unintended
+	// consequences, such as rejection or unpredictable behavior.
+	//
+	// <gateway:util:excludeFromCRD>
+	// This field is Extended because not all implementations can
+	// control the cookie name. Implementations SHOULD support this
+	// field if the underlying dataplane allows configuring the cookie
+	// name.
+	// </gateway:util:excludeFromCRD>
+	//
+	// Support: Extended
+	Name *apisv1.CookieName `json:"name,omitempty"`
+	// Path defines the cookie Path attribute. When not specified,
+	// implementations MUST default the cookie path to "/".
+	//
+	// <gateway:util:excludeFromCRD>
+	// This field is Extended because not all dataplanes support
+	// configuring the cookie path (e.g. HAProxy hardcodes path=/).
+	// Implementations SHOULD support this field if the underlying
+	// dataplane allows setting the cookie path attribute.
+	// </gateway:util:excludeFromCRD>
+	//
+	// Support: Extended
+	Path *string `json:"path,omitempty"`
 	// LifetimeType specifies whether the cookie has a permanent or
 	// session-based lifetime. A permanent cookie persists until its
 	// specified expiry time, defined by the Expires or Max-Age cookie
@@ -53,6 +79,22 @@ type CookieConfigApplyConfiguration struct {
 // apply.
 func CookieConfig() *CookieConfigApplyConfiguration {
 	return &CookieConfigApplyConfiguration{}
+}
+
+// WithName sets the Name field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the Name field is set to the value of the last call.
+func (b *CookieConfigApplyConfiguration) WithName(value apisv1.CookieName) *CookieConfigApplyConfiguration {
+	b.Name = &value
+	return b
+}
+
+// WithPath sets the Path field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the Path field is set to the value of the last call.
+func (b *CookieConfigApplyConfiguration) WithPath(value string) *CookieConfigApplyConfiguration {
+	b.Path = &value
+	return b
 }
 
 // WithLifetimeType sets the LifetimeType field in the declarative configuration to the given value

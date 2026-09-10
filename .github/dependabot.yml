@@ -24,33 +24,19 @@ updates:
       - ok-to-test
       - release-note-none
 
-  # Dependencies listed in conformance/echo-basic/go.mod
-  - package-ecosystem: "gomod"
-    directory: "/conformance/echo-basic/" # Location of package manifests
-    schedule:
-      interval: "weekly"
-    groups:
-      non-k8s:
-        patterns:
-          - "*"
-        exclude-patterns:
-          - "k8s.io/*"
-          - "sigs.k8s.io/*"
-      k8s.io: # Group k8s.io golang dependencies updates
-        patterns:
-          - "k8s.io/*"
-          - "sigs.k8s.io/*"
-    labels:
-      - go
-      - dependencies
-      - ok-to-test
-      - release-note-none
-
-  # Dependencies listed in Dockerfile
+  # Images listed in Dockerfile or Kubernetes manifests
   - package-ecosystem: "docker"
-    directory: "/"
+    directories:
+      - "/conformance/base"
+      - "/conformance/mesh"
+      - "/conformance/tests"
+      - "/conformance/tests/mesh"
     schedule:
-      interval: "weekly"
+      interval: "daily"
+    groups:
+      gateway-api-conformance:
+        patterns:
+          - "registry.k8s.io/gateway-api/conformance/*"
     labels:
       - docker
       - dependencies

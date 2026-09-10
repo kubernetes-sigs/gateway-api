@@ -165,7 +165,7 @@ spec:
       containers:
         - name: infra-backend-v1
           # Originally from https://github.com/kubernetes-sigs/ingress-controller-conformance/tree/master/images/echoserver
-          image: registry.k8s.io/gateway-api/echo-basic:v1.5.1
+          image: registry.k8s.io/gateway-api/conformance/echo-basic:v0.1.0
           env:
             - name: POD_NAME
               valueFrom:
@@ -211,7 +211,7 @@ spec:
     spec:
       containers:
         - name: infra-backend-v2
-          image: registry.k8s.io/gateway-api/echo-basic:v1.5.1
+          image: registry.k8s.io/gateway-api/conformance/echo-basic:v0.1.0
           env:
             - name: POD_NAME
               valueFrom:
@@ -259,7 +259,7 @@ spec:
     spec:
       containers:
         - name: infra-backend-v3
-          image: registry.k8s.io/gateway-api/echo-basic:v1.6.0-dev.3
+          image: registry.k8s.io/gateway-api/conformance/echo-basic:v0.1.0
           env:
             - name: POD_NAME
               valueFrom:
@@ -305,7 +305,7 @@ spec:
     spec:
       containers:
         - name: tls-backend
-          image: registry.k8s.io/gateway-api/echo-basic:v1.5.1
+          image: registry.k8s.io/gateway-api/conformance/echo-basic:v0.1.0
           volumeMounts:
             - name: secret-volume
               mountPath: /etc/secret-volume
@@ -367,7 +367,7 @@ spec:
     spec:
       containers:
         - name: tls-backend-2
-          image: registry.k8s.io/gateway-api/echo-basic:v1.5.1
+          image: registry.k8s.io/gateway-api/conformance/echo-basic:v0.1.0
           volumeMounts:
             - name: secret-volume
               mountPath: /etc/secret-volume
@@ -436,7 +436,7 @@ spec:
     spec:
       containers:
         - name: tls-backend
-          image: registry.k8s.io/gateway-api/echo-basic:v1.5.1
+          image: registry.k8s.io/gateway-api/conformance/echo-basic:v0.1.0
           volumeMounts:
             - name: secret-volume
               mountPath: /etc/secret-volume
@@ -498,7 +498,7 @@ spec:
     spec:
       containers:
         - name: app-backend-v1
-          image: registry.k8s.io/gateway-api/echo-basic:v1.5.1
+          image: registry.k8s.io/gateway-api/conformance/echo-basic:v0.1.0
           env:
             - name: POD_NAME
               valueFrom:
@@ -544,7 +544,7 @@ spec:
     spec:
       containers:
         - name: app-backend-v2
-          image: registry.k8s.io/gateway-api/echo-basic:v1.5.1
+          image: registry.k8s.io/gateway-api/conformance/echo-basic:v0.1.0
           env:
             - name: POD_NAME
               valueFrom:
@@ -597,7 +597,7 @@ spec:
     spec:
       containers:
         - name: web-backend
-          image: registry.k8s.io/gateway-api/echo-basic:v1.5.1
+          image: registry.k8s.io/gateway-api/conformance/echo-basic:v0.1.0
           env:
             - name: POD_NAME
               valueFrom:
@@ -644,7 +644,10 @@ spec:
     spec:
       containers:
         - name: grpc-infra-backend-v1
-          image: registry.k8s.io/gateway-api/echo-basic:v1.5.1
+          image: registry.k8s.io/gateway-api/conformance/echo-basic:v0.1.0
+          volumeMounts:
+            - name: secret-volume
+              mountPath: /etc/secret-volume
           env:
             - name: POD_NAME
               valueFrom:
@@ -656,9 +659,22 @@ spec:
                   fieldPath: metadata.namespace
             - name: GRPC_ECHO_SERVER
               value: "1"
+            - name: TLS_SERVER_CERT
+              value: /etc/secret-volume/crt
+            - name: TLS_SERVER_PRIV_KEY
+              value: /etc/secret-volume/key
           resources:
             requests:
               cpu: 10m
+      volumes:
+        - name: secret-volume
+          secret:
+            secretName: tls-checks-certificate
+            items:
+              - key: tls.crt
+                path: crt
+              - key: tls.key
+                path: key
 ---
 apiVersion: v1
 kind: Service
@@ -693,7 +709,7 @@ spec:
     spec:
       containers:
         - name: grpc-infra-backend-v2
-          image: registry.k8s.io/gateway-api/echo-basic:v1.5.1
+          image: registry.k8s.io/gateway-api/conformance/echo-basic:v0.1.0
           env:
             - name: POD_NAME
               valueFrom:
@@ -742,7 +758,7 @@ spec:
     spec:
       containers:
         - name: grpc-infra-backend-v3
-          image: registry.k8s.io/gateway-api/echo-basic:v1.5.1
+          image: registry.k8s.io/gateway-api/conformance/echo-basic:v0.1.0
           env:
             - name: POD_NAME
               valueFrom:
@@ -794,7 +810,7 @@ spec:
         - args:
             - -conf
             - /root/Corefile
-          image: registry.k8s.io/coredns/coredns:v1.12.2
+          image: registry.k8s.io/coredns/coredns:v1.14.7
           imagePullPolicy: IfNotPresent
           name: coredns
           securityContext:
@@ -866,7 +882,7 @@ spec:
     spec:
       containers:
         - name: tcp-backend
-          image: registry.k8s.io/gateway-api/echo-basic:v1.5.1
+          image: registry.k8s.io/gateway-api/conformance/echo-basic:v0.1.0
           resources:
             requests:
               cpu: 10m

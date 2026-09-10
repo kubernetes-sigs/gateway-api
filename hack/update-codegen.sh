@@ -50,4 +50,4 @@ echo "Generating CRDs"
 go run ./tools/generator
 
 ./hack/update-clientset.sh
-./hack/update-protos.sh
+OUTPUT_DIR="api/openapi-spec" ./hack/build-openapi-json.sh --version=latest --pretty-print

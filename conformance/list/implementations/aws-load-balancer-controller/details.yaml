@@ -1,0 +1,14 @@
+apiVersion: gateway.networking.kubernetes.io/v1
+kind: ImplementationListDetails
+organization: aws
+project: aws-load-balancer-controller
+fullName: AWS Load Balancer Controller
+description: |
+  [AWS Load Balancer Controller][aws-lbc] manages AWS Elastic Load Balancers for Kubernetes clusters. The controller provisions AWS Application Load Balancers (ALB) when you create a Kubernetes Ingress and AWS Network Load Balancers (NLB) when you create a Kubernetes Service of type LoadBalancer.
+
+  Gateway API support is GA for both Layer 4 (L4) and Layer 7 (L7) routing, enabling customers to provision and manage AWS NLBs and ALBs directly from Kubernetes clusters using the extensible Gateway API.
+
+  See the [AWS Load Balancer Controller documentation][aws-lbc-docs] for information on how to deploy and use the Gateway API implementation.
+
+  [aws-lbc]:https://github.com/kubernetes-sigs/aws-load-balancer-controller
+  [aws-lbc-docs]:https://kubernetes-sigs.github.io/aws-load-balancer-controller/

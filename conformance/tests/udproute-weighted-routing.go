@@ -27,7 +27,7 @@ import (
 
 	"k8s.io/apimachinery/pkg/types"
 
-	"sigs.k8s.io/gateway-api/conformance/echo-basic/udpechoserver"
+	"sigs.k8s.io/gateway-api-conformance-images/echo-basic/udpechoserver"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	confsuite "sigs.k8s.io/gateway-api/conformance/utils/suite"
 	"sigs.k8s.io/gateway-api/conformance/utils/tlog"
@@ -48,7 +48,6 @@ var UDPRouteWeightedRouting = confsuite.ConformanceTest{
 		features.SupportGateway,
 		features.SupportUDPRoute,
 	},
-	Provisional: true,
 	Test: func(t *testing.T, suite *confsuite.ConformanceTestSuite) {
 		ns := confsuite.InfrastructureNamespace
 		gwNN := types.NamespacedName{Name: "udp-weighted-gateway", Namespace: ns}
@@ -71,7 +70,7 @@ var UDPRouteWeightedRouting = confsuite.ConformanceTest{
 				"udp-backend-v3": 0.0,
 			}
 
-			udp.ExpectEchoResponse(t, suite.TimeoutConfig.MaxTimeToConsistency, gwAddr)
+			udp.ExpectEchoResponse(t, suite.TimeoutConfig, gwAddr)
 
 			sender := weight.NewFunctionBasedSender(func() (string, error) {
 				return udpEchoSendOnce(t.Context(), gwAddr, 2*time.Second)

@@ -1282,7 +1282,14 @@ type HTTPRequestRedirectFilter struct {
 	// Accepted Condition for the Route to `status: False`, with a
 	// Reason of `UnsupportedValue`.
 	//
-	// Support: Core
+	// Support: statusCode 301 and 302 are Core; all others are Extended.
+	//
+	// <gateway:util:excludeFromCRD>
+	// Extended codes have their own features:
+	//   HTTPRoute303RedirectStatusCode,
+	//   HTTPRoute307RedirectStatusCode, and
+	//   HTTPRoute308RedirectStatusCode
+	// </gateway:util:excludeFromCRD>
 	//
 	// +optional
 	// +kubebuilder:default=302
@@ -1791,7 +1798,8 @@ type ForwardBodyConfig struct {
 	//
 	// If 0, the body will not be sent to the authorization server.
 	// +optional
-	MaxSize uint16 `json:"maxSize,omitempty"`
+	// +kubebuilder:validation:Minimum=0
+	MaxSize int32 `json:"maxSize,omitempty"`
 }
 
 // HTTPBackendRef defines how a HTTPRoute forwards a HTTP request.

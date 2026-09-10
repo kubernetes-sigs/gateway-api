@@ -144,7 +144,7 @@ type BackendPort struct {
 	//
 	// +optional
 	// +kubebuilder:validation:MaxLength=63
-	// +kubebuilder:validation:XValidation:rule="size(self) == 0 || format.dns1123Label().validate(self) == null",message="Name must be a valid DNS label"
+	// +kubebuilder:validation:XValidation:rule="size(self) == 0 || !format.dns1123Label().validate(self).hasValue()",message="Name must be a valid DNS label"
 	Name *string `json:"name,omitempty"`
 
 	// Port represents the port number of the endpoint.
@@ -305,7 +305,7 @@ type BackendAncestorStatus struct {
 	// AncestorRef identifies the parent resource that this status is associated with.
 	//
 	// +required
-	AncestorRef v1.ParentReference `json:"parentRef"`
+	AncestorRef v1.ParentReference `json:"ancestorRef"`
 
 	// For Kubernetes API conventions, see:
 	// https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#typical-status-properties

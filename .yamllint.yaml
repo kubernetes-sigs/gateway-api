@@ -5,7 +5,6 @@ ignore: |
   .golangci.yml
   mkdocs.yml
   nav.yml
-  cloudbuild.yaml
   config/crd
 
 rules:

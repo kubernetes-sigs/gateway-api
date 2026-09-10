@@ -1,0 +1,78 @@
+## Gateway Controller Implementation Status <a name="gateways"></a>
+
+{{ if .GatewayConformantImpls -}}
+### Conformant
+{{ range $fullname, $error := .GatewayConformantImpls -}}
+- [{{ $fullname }}]({{ FullNameToHeadingLink $fullname }})
+{{ end -}}
+{{- end }}
+
+{{ if .GatewayPartialImpls -}}
+### Partially Conformant
+{{ range $fullname, $error := .GatewayPartialImpls -}}
+- [{{ $fullname }}]({{ FullNameToHeadingLink $fullname }})
+{{ end -}}
+{{- end }}
+
+## Service Mesh Implementation Status <a name="meshes"></a>
+
+{{ if .MeshConformantImpls -}}
+### Conformant
+{{ range $fullname, $error := .MeshConformantImpls -}}
+- [{{ $fullname }}]({{ FullNameToHeadingLink $fullname }})
+{{ end -}}
+{{- end }}
+
+{{ if .MeshPartialImpls -}}
+### Partially Conformant
+{{ range $fullname, $error := .MeshPartialImpls -}}
+- [{{ $fullname }}]({{ FullNameToHeadingLink $fullname }})
+{{ end -}}
+{{- end }}
+
+## Integrations <a name="integrations"></a>
+
+{{ if .Integrations }}
+{{ range .Integrations -}}
+- [{{ .FullName }}]({{ FullNameToHeadingLink .FullName }})
+{{ end -}}
+{{ end }}
+
+[gamma]: /docs/mesh/
+
+
+
+## Implementations
+
+In this section you will find specific links to blog posts, documentation and other Gateway API references for specific implementations.
+
+{{ if .AllImplementations }}
+{{ range .AllImplementations }}
+### {{ .ImplList.FullName }}
+
+{{ $gatewayDetails := (linkDetails .ImplList.FullName "Gateway") -}}
+{{ if ne $gatewayDetails.Color "red"  -}}
+[![Conformance](https://img.shields.io/badge/Gateway%20Conformance%20{{ .Version }}-{{ pathEscape $gatewayDetails.Result }}-{{ $gatewayDetails.Color }})](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/{{ .Path}})
+{{- end -}}
+{{- $meshDetails := (linkDetails .ImplList.FullName "Mesh") -}}
+{{- if ne $meshDetails.Color "red"  -}}
+[![Conformance](https://img.shields.io/badge/Mesh%20Conformance%20{{ .Version }}-{{ pathEscape $meshDetails.Result }}-{{ $meshDetails.Color }})](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/{{ .Path}})
+{{- end }}
+
+
+{{ .ImplList.Description }}
+{{ end }}
+{{ end }}
+
+## Integrations
+
+In this section you will find specific links to blog posts, documentation and other Gateway API references for specific integrations.
+
+{{ if .Integrations }}
+{{ range .Integrations }}
+### {{ .FullName }}
+
+{{ .Description }}
+
+{{ end }}
+{{ end }}

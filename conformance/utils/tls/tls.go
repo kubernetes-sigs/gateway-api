@@ -17,9 +17,11 @@ limitations under the License.
 package tls
 
 import (
+	"context"
 	cryptotls "crypto/tls"
 	"errors"
 	"io"
+	"net"
 	"strings"
 	"syscall"
 	"testing"
@@ -32,6 +34,10 @@ import (
 	"sigs.k8s.io/gateway-api/conformance/utils/roundtripper"
 	"sigs.k8s.io/gateway-api/conformance/utils/tlog"
 )
+
+type contextDialer interface {
+	DialContext(ctx context.Context, network, address string) (net.Conn, error)
+}
 
 // MakeTLSRequestAndExpectEventuallyConsistentResponse makes a request with the given parameters,
 // understanding that the request may fail for some amount of time.
@@ -61,7 +67,7 @@ func MakeTLSRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtr
 		}
 	}
 
-	WaitForConsistentTLSResponse(t, r, req, expected, timeoutConfig.RequiredConsecutiveSuccesses, timeoutConfig.MaxTimeToConsistency)
+	WaitForConsistentTLSResponse(t, r, req, expected, timeoutConfig)
 
 	if clientCertificate != nil && clientCertificateKey != nil {
 		assert.True(t, clientCertificatePresented, "client certificate was not presented during the handshake")
@@ -69,10 +75,9 @@ func MakeTLSRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtr
 }
 
 // WaitForConsistentTLSResponse - repeats the provided request until it completes with a response having
-// the expected response consistently. The provided threshold determines how many times in
-// a row this must occur to be considered "consistent".
-func WaitForConsistentTLSResponse(t *testing.T, r roundtripper.RoundTripper, req roundtripper.Request, expected http.ExpectedResponse, threshold int, maxTimeToConsistency time.Duration) {
-	http.AwaitConvergence(t, threshold, maxTimeToConsistency, func(elapsed time.Duration) bool {
+// the expected response consistently.
+func WaitForConsistentTLSResponse(t *testing.T, r roundtripper.RoundTripper, req roundtripper.Request, expected http.ExpectedResponse, timeoutConfig config.TimeoutConfig) {
+	http.AwaitConvergence(t, timeoutConfig, func(elapsed time.Duration) bool {
 		cReq, cRes, err := r.CaptureRoundTrip(req)
 		if err != nil {
 			tlog.Logf(t, "Request failed, not ready yet: %v (after %v)", err.Error(), elapsed)
@@ -90,9 +95,11 @@ func WaitForConsistentTLSResponse(t *testing.T, r roundtripper.RoundTripper, req
 	tlog.Logf(t, "Request passed")
 }
 
-// MakeTLSRequestAndExpectFailureResponse makes one shot request. This function fails
-// when HTTP Status OK (200) is returned.
-func MakeTLSRequestAndExpectFailureResponse(t *testing.T, r roundtripper.RoundTripper, gwAddr string, serverCertificate, clientCertificate, clientCertificateKey []byte, serverName string, expected http.ExpectedResponse) {
+// MakeTLSRequestAndExpectEventuallyConsistentFailureResponse makes a TLS request, retrying until
+// it fails consistently or the timeout elapses. This is used for requests that are expected to be
+// rejected (e.g. due to client certificate validation or invalid TLS config), avoiding races where
+// the implementation's config has not yet fully propagated when the request is sent.
+func MakeTLSRequestAndExpectEventuallyConsistentFailureResponse(t *testing.T, r roundtripper.RoundTripper, timeoutConfig config.TimeoutConfig, gwAddr string, serverCertificate, clientCertificate, clientCertificateKey []byte, serverName string, expected http.ExpectedResponse) {
 	t.Helper()
 
 	req := http.MakeRequest(t, &expected, gwAddr, roundtripper.HTTPSProtocol, "https")
@@ -106,8 +113,6 @@ func MakeTLSRequestAndExpectFailureResponse(t *testing.T, r roundtripper.RoundTr
 			t.Fatalf("unexpected error creating client cert: %v", err)
 		}
 
-		// GetClientCertificateHook is a hook called when server asks for client certificate during TLS handshake,
-		// to verify that a client certificate has been requested.
 		req.GetClientCertificateHook = func(_ *cryptotls.CertificateRequestInfo) (*cryptotls.Certificate, error) {
 			t.Log("GetClientCertificateHook was called")
 			clientCertificatePresented = true
@@ -115,10 +120,15 @@ func MakeTLSRequestAndExpectFailureResponse(t *testing.T, r roundtripper.RoundTr
 		}
 	}
 
-	_, _, err := r.CaptureRoundTrip(req)
-	if err == nil {
-		t.Fatalf("Request should fail")
-	}
+	http.AwaitConvergence(t, timeoutConfig, func(elapsed time.Duration) bool {
+		_, _, err := r.CaptureRoundTrip(req)
+		if err == nil {
+			tlog.Logf(t, "Request unexpectedly succeeded, not ready yet (after %v)", elapsed)
+			return false
+		}
+		return true
+	})
+	tlog.Logf(t, "Request failed as expected")
 
 	if clientCertificate != nil && clientCertificateKey != nil {
 		assert.True(t, clientCertificatePresented, "client certificate was not presented during the handshake")
@@ -137,8 +147,26 @@ func MakeTLSConnectionAndExpectEventuallyConnectionRejection(t *testing.T, timeo
 		},
 	}
 
+	waitForTLSConnectionRejection(t, timeoutConfig, dialer, gwAddr)
+}
+
+func waitForTLSConnectionRejection(t *testing.T, timeoutConfig config.TimeoutConfig, dialer contextDialer, gwAddr string) {
+	t.Helper()
+
+	overallCtx, cancel := context.WithTimeout(t.Context(), timeoutConfig.MaxTimeToConsistency)
+	defer cancel()
+
 	assert.Eventually(t, func() bool {
-		_, err := dialer.DialContext(t.Context(), "tcp", gwAddr)
+		attemptCtx, cancelAttempt := context.WithTimeout(overallCtx, timeoutConfig.RequestTimeout)
+		conn, err := dialer.DialContext(attemptCtx, "tcp", gwAddr)
+		cancelAttempt()
+
+		if conn != nil {
+			if closeErr := conn.Close(); closeErr != nil {
+				tlog.Logf(t, "error closing connection: %s", closeErr)
+			}
+		}
+
 		if err != nil {
 			if isConnectionRejected(err) {
 				tlog.Logf(t, "connection was rejected during dial: %s", err)
@@ -149,7 +177,7 @@ func MakeTLSConnectionAndExpectEventuallyConnectionRejection(t *testing.T, timeo
 		}
 		tlog.Logf(t, "client could connect")
 		return false
-	}, timeoutConfig.MaxTimeToConsistency, time.Second)
+	}, timeoutConfig.MaxTimeToConsistency, timeoutConfig.DefaultPollInterval)
 }
 
 // isConnectionRejected checks if an error indicates either a TCP RST (ECONNRESET)
