@@ -60,6 +60,14 @@ If yes, please enter a release note below:
 
 **Was AI used in preparing this PR?**
 <!--
-Please declare if any AI was used in the preparation of this PR.
-Use the AIL scale, https://danielmiessler.com/blog/ai-influence-level-ail.
+Please declare if any AI was used in the preparation of this PR by applying one of the 
+following labels based on the the AIL scale 
+(https://danielmiessler.com/blog/ai-influence-level-ail).
+
+/label ail/0
+/label ail/1
+/label ail/2
+/label ail/3
+/label ail/4
+/label ail/5
 -->
