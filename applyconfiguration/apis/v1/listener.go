@@ -80,11 +80,14 @@ type ListenerApplyConfiguration struct {
 	// both `test.example.com`, and `foo.test.example.com`, but not `example.com`.
 	//
 	// Support: Core
+	//
 	Hostname *apisv1.Hostname `json:"hostname,omitempty"`
 	// Port is the network port. Multiple listeners may use the
 	// same port, subject to the Listener compatibility rules.
 	//
 	// Support: Core
+	//
+	//
 	Port *int32 `json:"port,omitempty"`
 	// Protocol specifies the network protocol this listener expects to receive.
 	//
@@ -101,6 +104,7 @@ type ListenerApplyConfiguration struct {
 	// available certificates for any TLS handshake.
 	//
 	// Support: Core
+	//
 	TLS *ListenerTLSConfigApplyConfiguration `json:"tls,omitempty"`
 	// AllowedRoutes defines the types of routes that MAY be attached to a
 	// Listener and the trusted namespaces where those Route resources MAY be

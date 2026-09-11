@@ -29,6 +29,7 @@ import (
 type UDPRouteSpecApplyConfiguration struct {
 	CommonRouteSpecApplyConfiguration `json:",inline"`
 	// Rules are a list of UDP matchers and actions.
+	//
 	Rules []UDPRouteRuleApplyConfiguration `json:"rules,omitempty"`
 }
 

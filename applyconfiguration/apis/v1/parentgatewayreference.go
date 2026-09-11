@@ -29,14 +29,17 @@ import (
 // defaulting to Gateway.
 type ParentGatewayReferenceApplyConfiguration struct {
 	// Group is the group of the referent.
+	//
 	Group *apisv1.Group `json:"group,omitempty"`
 	// Kind is kind of the referent. For example "Gateway".
+	//
 	Kind *apisv1.Kind `json:"kind,omitempty"`
 	// Name is the name of the referent.
 	Name *apisv1.ObjectName `json:"name,omitempty"`
 	// Namespace is the namespace of the referent.  If not present,
 	// the namespace of the referent is assumed to be the same as
 	// the namespace of the referring object.
+	//
 	Namespace *apisv1.Namespace `json:"namespace,omitempty"`
 }
 

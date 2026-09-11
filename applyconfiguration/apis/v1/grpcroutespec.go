@@ -78,6 +78,7 @@ type GRPCRouteSpecApplyConfiguration struct {
 	// 'False' in the corresponding RouteParentStatus.
 	//
 	// Support: Core
+	//
 	Hostnames []apisv1.Hostname `json:"hostnames,omitempty"`
 	// Rules are a list of GRPC matchers, filters and actions.
 	//

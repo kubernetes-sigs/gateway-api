@@ -40,6 +40,7 @@ type GatewayApplyConfiguration struct {
 	// Spec defines the desired state of Gateway.
 	Spec *GatewaySpecApplyConfiguration `json:"spec,omitempty"`
 	// Status defines the current state of Gateway.
+	//
 	Status *GatewayStatusApplyConfiguration `json:"status,omitempty"`
 }
 

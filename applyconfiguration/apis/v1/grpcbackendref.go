@@ -85,12 +85,14 @@ type GRPCBackendRefApplyConfiguration struct {
 	// Support for weight: Core
 	//
 	// Support for BackendTLSPolicy: Extended
+	//
 	BackendRefApplyConfiguration `json:",inline"`
 	// Filters defined at this level MUST be executed if and only if the
 	// request is being forwarded to the backend defined here.
 	//
 	// Support: Implementation-specific (For broader support of filters, use the
 	// Filters field in GRPCRouteRule.)
+	//
 	Filters []GRPCRouteFilterApplyConfiguration `json:"filters,omitempty"`
 }
 

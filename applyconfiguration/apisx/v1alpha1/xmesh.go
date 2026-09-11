@@ -42,6 +42,7 @@ type XMeshApplyConfiguration struct {
 	// Implementations MUST populate status on all Mesh resources which
 	// specify their controller name.
 	// </gateway:util:excludeFromCRD>
+	//
 	Status *MeshStatusApplyConfiguration `json:"status,omitempty"`
 }
 

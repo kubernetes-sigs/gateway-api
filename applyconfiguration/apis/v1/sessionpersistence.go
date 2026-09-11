@@ -32,6 +32,7 @@ type SessionPersistenceApplyConfiguration struct {
 	// session becomes invalid.
 	//
 	// Support: Extended
+	//
 	AbsoluteTimeout *apisv1.Duration `json:"absoluteTimeout,omitempty"`
 	// Type defines the type of session persistence such as through
 	// the use of a header or cookie. Defaults to cookie based session
@@ -40,16 +41,19 @@ type SessionPersistenceApplyConfiguration struct {
 	// Support: Core for "Cookie" type
 	//
 	// Support: Extended for "Header" type
+	//
 	Type *apisv1.SessionPersistenceType `json:"type,omitempty"`
 	// Cookie provides configuration settings that are specific
 	// to cookie-based session persistence.
 	//
 	// Support: Core
+	//
 	Cookie *CookieConfigApplyConfiguration `json:"cookie,omitempty"`
 	// Header provides configuration settings that are specific
 	// to header-based session persistence.
 	//
 	// Support: Extended
+	//
 	Header *HeaderConfigApplyConfiguration `json:"header,omitempty"`
 }
 

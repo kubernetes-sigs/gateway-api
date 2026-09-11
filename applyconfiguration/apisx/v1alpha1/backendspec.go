@@ -28,15 +28,18 @@ import (
 // BackendSpec defines the desired state of a Backend.
 type BackendSpecApplyConfiguration struct {
 	// Type defines the backend type.
+	//
 	Type *apisxv1alpha1.BackendType `json:"type,omitempty"`
 	// Port defines the port that the implementation should use when connecting
 	// to this backend.
+	//
 	Port *BackendPortApplyConfiguration `json:"port,omitempty"`
 	// ExternalHostname specifies the configuration for an ExternalHostname
 	// backend. This field must be set when type is ExternalHostname and must
 	// be unset otherwise.
 	//
 	// Support: Extended
+	//
 	ExternalHostname *ExternalHostnameBackendApplyConfiguration `json:"externalHostname,omitempty"`
 	// Protocol defines the protocol for backend communication.
 	//
@@ -61,6 +64,7 @@ type BackendSpecApplyConfiguration struct {
 	// Upgrade or ALPN), implementations MUST include the protocol set here
 	// in the negotiation options presented to the backend.
 	// </gateway:util:excludeFromCRD>
+	//
 	Protocol *apisxv1alpha1.BackendProtocol `json:"protocol,omitempty"`
 	// TLS defines the TLS configuration that the implementation should use
 	// when connecting to the backend.
@@ -69,6 +73,7 @@ type BackendSpecApplyConfiguration struct {
 	// for external hostnames should be considered insecure and a security risk.
 	//
 	// Support: Extended
+	//
 	TLS *BackendTLSApplyConfiguration `json:"tls,omitempty"`
 }
 
