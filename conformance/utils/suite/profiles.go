@@ -91,6 +91,7 @@ var (
 				features.HTTPRouteExtendedFeatures,
 				features.BackendTLSPolicyCoreFeatures,
 				features.BackendTLSPolicyExtendedFeatures,
+				features.ServiceImportExtendedFeatures,
 			).UnsortedList()...),
 	}
 
@@ -109,6 +110,7 @@ var (
 				features.TLSRouteExtendedFeatures,
 				features.BackendTLSPolicyCoreFeatures,
 				features.BackendTLSPolicyExtendedFeatures,
+				features.ServiceImportExtendedFeatures,
 			).UnsortedList()...),
 	}
 
@@ -156,6 +158,7 @@ var (
 				features.GatewayExtendedFeatures,
 				features.BackendTLSPolicyCoreFeatures,
 				features.BackendTLSPolicyExtendedFeatures,
+				features.ServiceImportExtendedFeatures,
 			).UnsortedList()...),
 	}
 
