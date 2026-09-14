@@ -55,7 +55,7 @@ type BackendAncestorStatusApplyConfiguration struct {
 	// Each condition has a unique type and reflects the status of a specific aspect of the resource.
 	//
 	// Defined condition types include:
-	// - "Accepted": the resource has been acknowledged and accepteed by the controller
+	// - "Accepted": the resource has been acknowledged and accepted by the controller
 	//
 	// The status of each condition is one of True, False, or Unknown.
 	Conditions []metav1.ConditionApplyConfiguration `json:"conditions,omitempty"`
