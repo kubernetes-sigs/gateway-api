@@ -29,7 +29,9 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
+	"sigs.k8s.io/controller-runtime/pkg/client/interceptor"
 
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/gateway-api/apis/v1alpha2"
@@ -378,4 +380,224 @@ func Test_listenersMatch(t *testing.T) {
 			assert.Equal(t, test.want, gatewayListenersMatch(t, test.expected, test.actual))
 		})
 	}
+}
+
+// TestRouteMustHaveParentsIgnoresStaleControllerEntries seeds an entry that is
+// stale on purpose: it sits at generation 1 while the Route is at generation 2,
+// so the wait only succeeds if entries owned by StaleControllerName are left out
+// of the observedGeneration check.
+func TestRouteMustHaveParentsIgnoresStaleControllerEntries(t *testing.T) {
+	const ownController = gatewayv1.GatewayController("example.com/gateway-controller")
+
+	scheme := runtime.NewScheme()
+	require.NoError(t, InstallGatewayV1(scheme))
+
+	routeNN := types.NamespacedName{Name: "test-route", Namespace: "default"}
+	gwNamespace := gatewayv1.Namespace("default")
+
+	acceptedCondition := func(observedGeneration int64) []metav1.Condition {
+		return []metav1.Condition{{
+			Type:               string(gatewayv1.RouteConditionAccepted),
+			Status:             metav1.ConditionTrue,
+			Reason:             string(gatewayv1.RouteReasonAccepted),
+			ObservedGeneration: observedGeneration,
+			LastTransitionTime: metav1.Now(),
+		}}
+	}
+
+	route := &gatewayv1.HTTPRoute{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:       routeNN.Name,
+			Namespace:  routeNN.Namespace,
+			Generation: 2,
+		},
+		Status: gatewayv1.HTTPRouteStatus{
+			RouteStatus: gatewayv1.RouteStatus{
+				Parents: []gatewayv1.RouteParentStatus{
+					{
+						ParentRef: gatewayv1.ParentReference{
+							Name:      "test-gateway",
+							Namespace: &gwNamespace,
+						},
+						ControllerName: ownController,
+						Conditions:     acceptedCondition(2),
+					},
+					{
+						ParentRef: gatewayv1.ParentReference{
+							Name:      "unmanaged-gateway",
+							Namespace: &gwNamespace,
+						},
+						ControllerName: StaleControllerName,
+						Conditions:     acceptedCondition(1),
+					},
+				},
+			},
+		},
+	}
+
+	c := fake.NewClientBuilder().WithScheme(scheme).WithObjects(route).Build()
+
+	timeoutConfig := config.TimeoutConfig{
+		RouteMustHaveParents: 2 * time.Second,
+		DefaultPollInterval:  100 * time.Millisecond,
+	}
+
+	HTTPRouteMustHaveParents(t, c, timeoutConfig, routeNN, []gatewayv1.RouteParentStatus{
+		{
+			ParentRef: gatewayv1.ParentReference{
+				Name:      "test-gateway",
+				Namespace: &gwNamespace,
+			},
+			ControllerName: ownController,
+			Conditions: []metav1.Condition{{
+				Type:   string(gatewayv1.RouteConditionAccepted),
+				Status: metav1.ConditionTrue,
+			}},
+		},
+	}, true)
+}
+
+func Test_staleParentStatus(t *testing.T) {
+	const (
+		ownController   = gatewayv1.GatewayController("example.com/gateway-controller")
+		otherController = gatewayv1.GatewayController("example.com/other-controller")
+	)
+
+	route := &gatewayv1.HTTPRoute{ObjectMeta: metav1.ObjectMeta{Generation: 2}}
+
+	parent := func(controller gatewayv1.GatewayController, observedGeneration int64) gatewayv1.RouteParentStatus {
+		return gatewayv1.RouteParentStatus{
+			ParentRef:      gatewayv1.ParentReference{Name: "test-gateway"},
+			ControllerName: controller,
+			Conditions: []metav1.Condition{{
+				Type:               string(gatewayv1.RouteConditionAccepted),
+				Status:             metav1.ConditionTrue,
+				Reason:             string(gatewayv1.RouteReasonAccepted),
+				ObservedGeneration: observedGeneration,
+			}},
+		}
+	}
+
+	tests := []struct {
+		name      string
+		parents   []gatewayv1.RouteParentStatus
+		wantOwner gatewayv1.GatewayController
+	}{
+		{
+			name:    "every entry has caught up",
+			parents: []gatewayv1.RouteParentStatus{parent(ownController, 2), parent(otherController, 2)},
+		},
+		{
+			name:      "own entry is behind",
+			parents:   []gatewayv1.RouteParentStatus{parent(ownController, 1)},
+			wantOwner: ownController,
+		},
+		{
+			name:    "sentinel entry is exempt while it is behind",
+			parents: []gatewayv1.RouteParentStatus{parent(ownController, 2), parent(StaleControllerName, 1)},
+		},
+		{
+			name:      "the exemption does not extend to other foreign entries",
+			parents:   []gatewayv1.RouteParentStatus{parent(ownController, 2), parent(otherController, 1)},
+			wantOwner: otherController,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			stale, err := staleParentStatus(route, tt.parents)
+
+			if tt.wantOwner == "" {
+				require.NoError(t, err)
+				return
+			}
+
+			require.Error(t, err)
+			require.Equal(t, tt.wantOwner, stale.ControllerName)
+		})
+	}
+}
+
+// TestRouteMustHaveParentsChecksTheStatusItJustRead pins the order of the two
+// steps inside the poll: the status has to be read before the
+// observedGeneration check runs against it. When the read came last, the first
+// iteration checked an empty slice, so a Route whose conditions still carried a
+// stale observedGeneration satisfied the wait right away and the check never
+// ran at all on the common fast path.
+func TestRouteMustHaveParentsChecksTheStatusItJustRead(t *testing.T) {
+	const ownController = gatewayv1.GatewayController("example.com/gateway-controller")
+
+	scheme := runtime.NewScheme()
+	require.NoError(t, InstallGatewayV1(scheme))
+
+	routeNN := types.NamespacedName{Name: "test-route", Namespace: "default"}
+	gwNamespace := gatewayv1.Namespace("default")
+
+	route := &gatewayv1.HTTPRoute{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:       routeNN.Name,
+			Namespace:  routeNN.Namespace,
+			Generation: 2,
+		},
+		Status: gatewayv1.HTTPRouteStatus{
+			RouteStatus: gatewayv1.RouteStatus{
+				Parents: []gatewayv1.RouteParentStatus{{
+					ParentRef: gatewayv1.ParentReference{
+						Name:      "test-gateway",
+						Namespace: &gwNamespace,
+					},
+					ControllerName: ownController,
+					Conditions: []metav1.Condition{{
+						Type:               string(gatewayv1.RouteConditionAccepted),
+						Status:             metav1.ConditionTrue,
+						Reason:             string(gatewayv1.RouteReasonAccepted),
+						ObservedGeneration: 1,
+						LastTransitionTime: metav1.Now(),
+					}},
+				}},
+			},
+		},
+	}
+
+	var reads int
+	c := fake.NewClientBuilder().
+		WithScheme(scheme).
+		WithObjects(route).
+		WithInterceptorFuncs(interceptor.Funcs{
+			Get: func(ctx context.Context, cli client.WithWatch, key client.ObjectKey, obj client.Object, opts ...client.GetOption) error {
+				if err := cli.Get(ctx, key, obj, opts...); err != nil {
+					return err
+				}
+
+				// The implementation catches up, but only after the first read.
+				reads++
+				if reads > 1 {
+					obj.(*gatewayv1.HTTPRoute).Status.Parents[0].Conditions[0].ObservedGeneration = 2
+				}
+
+				return nil
+			},
+		}).
+		Build()
+
+	timeoutConfig := config.TimeoutConfig{
+		RouteMustHaveParents: 2 * time.Second,
+		DefaultPollInterval:  100 * time.Millisecond,
+	}
+
+	HTTPRouteMustHaveParents(t, c, timeoutConfig, routeNN, []gatewayv1.RouteParentStatus{
+		{
+			ParentRef: gatewayv1.ParentReference{
+				Name:      "test-gateway",
+				Namespace: &gwNamespace,
+			},
+			ControllerName: ownController,
+			Conditions: []metav1.Condition{{
+				Type:   string(gatewayv1.RouteConditionAccepted),
+				Status: metav1.ConditionTrue,
+			}},
+		},
+	}, true)
+
+	require.Greater(t, reads, 1, "wait was satisfied by the first read, leaving the stale observedGeneration unchecked")
 }
