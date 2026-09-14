@@ -52,6 +52,18 @@ import (
 // tests which validate fixing broken Gateways, e.t.c.
 const GatewayExcludedFromReadinessChecks = "gateway-api/skip-this-for-readiness"
 
+// StaleControllerName is a controllerName that tests can put on a Route
+// status.parents or Policy status.ancestors entry to stand in for another
+// implementation sharing the cluster. Nothing reconciles such an entry, so the
+// status helpers leave its observedGeneration alone.
+const StaleControllerName = gatewayv1.GatewayController("gateway.networking.k8s.io/stale-controller")
+
+// StaleConditionType is a condition type that tests can seed into a status
+// conditions list to stand in for a condition owned by another controller.
+// Nothing reconciles such a condition, so FilterStaleConditions leaves its
+// observedGeneration alone.
+const StaleConditionType = "conformance.gateway.networking.k8s.io/StaleCondition"
+
 const GatewayKind = gatewayv1.Kind("Gateway")
 
 // GatewayRef is a tiny type for specifying an HTTP Route ParentRef without
@@ -239,10 +251,15 @@ func ConditionsHaveLatestObservedGeneration(obj metav1.Object, conditions []meta
 }
 
 // FilterStaleConditions returns the list of status condition whose observedGeneration does not
-// match the object's metadata.Generation
+// match the object's metadata.Generation. Conditions of StaleConditionType are
+// exempt: they belong to no controller, so they never catch up.
 func FilterStaleConditions(obj metav1.Object, conditions []metav1.Condition) []metav1.Condition {
 	stale := make([]metav1.Condition, 0, len(conditions))
 	for _, condition := range conditions {
+		if condition.Type == StaleConditionType {
+			continue
+		}
+
 		if obj.GetGeneration() != condition.ObservedGeneration {
 			stale = append(stale, condition)
 		}
@@ -793,6 +810,23 @@ func RouteTypeMustHaveParentsField(t *testing.T, routeType any) string {
 	return routeTypeName
 }
 
+// staleParentStatus returns the first status entry whose conditions have not
+// caught up with the object generation. Entries owned by StaleControllerName
+// are exempt: nothing reconciles them, so their observedGeneration never moves.
+func staleParentStatus(obj metav1.Object, parents []gatewayv1.RouteParentStatus) (gatewayv1.RouteParentStatus, error) {
+	for _, parent := range parents {
+		if parent.ControllerName == StaleControllerName {
+			continue
+		}
+
+		if err := ConditionsHaveLatestObservedGeneration(obj, parent.Conditions); err != nil {
+			return parent, err
+		}
+	}
+
+	return gatewayv1.RouteParentStatus{}, nil
+}
+
 func RouteMustHaveParents(t *testing.T, cli client.Client, timeoutConfig config.TimeoutConfig, routeName types.NamespacedName, parents []gatewayv1.RouteParentStatus, namespaceRequired bool, routeType any) {
 	t.Helper()
 
@@ -811,14 +845,13 @@ func RouteMustHaveParents(t *testing.T, cli client.Client, timeoutConfig config.
 			return false, fmt.Errorf("error fetching %s: %w", routeTypeName, err)
 		}
 
-		for _, parent := range actual {
-			if err := ConditionsHaveLatestObservedGeneration(metaObj, parent.Conditions); err != nil {
-				tlog.Logf(t, "%s(controller=%v,ref=%#v) %v", routeTypeName, parent.ControllerName, parent, err)
-				return false, nil
-			}
+		actual = reflect.ValueOf(cliObj).Elem().FieldByName("Status").FieldByName("Parents").Interface().([]v1alpha2.RouteParentStatus)
+
+		if parent, err := staleParentStatus(metaObj, actual); err != nil {
+			tlog.Logf(t, "%s(controller=%v,ref=%#v) %v", routeTypeName, parent.ControllerName, parent, err)
+			return false, nil
 		}
 
-		actual = reflect.ValueOf(cliObj).Elem().FieldByName("Status").FieldByName("Parents").Interface().([]v1alpha2.RouteParentStatus)
 		return parentsForRouteMatch(t, routeName, parents, actual, namespaceRequired), nil
 	})
 	require.NoErrorf(t, waitErr, "error waiting for %s to have parents matching expectations", routeTypeName)
@@ -1628,6 +1661,10 @@ func BackendTLSPolicyMustHaveCondition(t *testing.T, client client.Client, timeo
 		}
 
 		for _, parent := range policy.Status.Ancestors {
+			if parent.ControllerName == StaleControllerName {
+				continue
+			}
+
 			if err := ConditionsHaveLatestObservedGeneration(policy, parent.Conditions); err != nil {
 				tlog.Logf(t, "BackendTLSPolicy %s (parentRef=%v) %v",
 					policyNN, parentRefToString(parent.AncestorRef), err,
@@ -1662,6 +1699,10 @@ func BackendTLSPolicyMustHaveLatestConditions(t *testing.T, r *gatewayv1.Backend
 	t.Helper()
 
 	for _, ancestor := range r.Status.Ancestors {
+		if ancestor.ControllerName == StaleControllerName {
+			continue
+		}
+
 		if err := ConditionsHaveLatestObservedGeneration(r, ancestor.Conditions); err != nil {
 			tlog.Fatalf(t, "BackendTLSPolicy(controller=%v, ancestorRef=%#v) %v", ancestor.ControllerName, parentRefToString(ancestor.AncestorRef), err)
 		}
