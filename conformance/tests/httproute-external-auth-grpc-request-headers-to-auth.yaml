@@ -1,0 +1,22 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: external-auth-grpc-request-headers-to-auth
+  namespace: gateway-conformance-infra
+spec:
+  parentRefs:
+  - name: same-namespace
+  rules:
+  - filters:
+    - type: ExternalAuth
+      externalAuth:
+        protocol: GRPC
+        backendRef:
+          name: external-auth-grpc
+          port: 9001
+        grpc:
+          allowedHeaders:
+          - X-Test-Header
+    backendRefs:
+    - name: infra-backend-v1
+      port: 8080
