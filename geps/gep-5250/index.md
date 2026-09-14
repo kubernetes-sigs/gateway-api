@@ -9,7 +9,7 @@ title: "GEP-5250: Multi Stage Routing"
 
 ## TLDR
 
-This GEP proposes to define standards in Gateway API for expressing a single logical client request that is fulfilled by multiple, ordered backend
+This GEP was incubated in [WG AI-Gateway](https://github.com/kubernetes-sigs/wg-ai-gateway), and proposes to define standards in Gateway API for expressing a single logical client request that is fulfilled by multiple, ordered backend
 interactions, rather than by a single backend interaction. Routing in Kubernetes today assumes that one client request maps to one backend interaction,
 and that assumption is deeply embedded in how routes, policies and observability are defined. A growing class of workloads breaks it: what the client
 sees as one request is fulfilled by a sequence of distinct backend interactions, each independently routable, and each potentially needing its own
