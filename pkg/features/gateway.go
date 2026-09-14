@@ -87,6 +87,12 @@ const (
 	// SupportGatewayFrontendClientCertificateValidationInsecureFallback option indicates support
 	// for the `AllowInsecureFallback` client certificate validation mode.
 	SupportGatewayFrontendClientCertificateValidationInsecureFallback FeatureName = "GatewayFrontendClientCertificateValidationInsecureFallback"
+
+	// SupportGatewayRouteHostnameIntersectionPrecedence option indicates support
+	// for resolving HTTPRoute, GRPCRoute, and TLSRoute precedence using original
+	// route hostname specificity rather than the calculated listener/route
+	// hostname intersection.
+	SupportGatewayRouteHostnameIntersectionPrecedence FeatureName = "GatewayRouteHostnameIntersectionPrecedence"
 )
 
 var (
@@ -143,6 +149,12 @@ var (
 		Name:    SupportGatewayFrontendClientCertificateValidationInsecureFallback,
 		Channel: FeatureChannelStandard,
 	}
+
+	// GatewayRouteHostnameIntersectionPrecedenceFeature contains metadata for the GatewayRouteHostnameIntersectionPrecedence feature.
+	GatewayRouteHostnameIntersectionPrecedenceFeature = Feature{
+		Name:    SupportGatewayRouteHostnameIntersectionPrecedence,
+		Channel: FeatureChannelStandard,
+	}
 )
 
 // GatewayExtendedFeatures are extra generic features that implementations may
@@ -157,5 +169,6 @@ var GatewayExtendedFeatures = sets.New(
 	GatewayBackendClientCertificateFeature,
 	GatewayFrontendClientCertificateValidationFeature,
 	GatewayFrontendClientCertificateValidationInsecureFallbackFeature,
+	GatewayRouteHostnameIntersectionPrecedenceFeature,
 	ListenerSetFeature,
 )

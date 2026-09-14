@@ -61,6 +61,25 @@ spec:
                   1. IPs are not allowed in SNI hostnames per RFC 6066.
                   2. A hostname may be prefixed with a wildcard label (`*.`). The wildcard
                      label must appear by itself as the first label.
+
+
+                  In the event that multiple TLSRoutes specify intersecting hostnames (e.g.
+                  overlapping wildcard matching and exact matching hostnames), precedence must
+                  be given to rules from the TLSRoute with the largest number of:
+
+                  * Characters in a matching non-wildcard hostname.
+                  * Characters in a matching hostname.
+
+                  When multiple TLSRoutes attach to the same Listener and yield identical
+                  Listener/Route intersected hostnames, implementations SHOULD evaluate
+                  precedence using the original hostnames configured on the Route, not the
+                  calculated Listener/Route hostname intersection.
+
+                  Resolving Route precedence using original Route hostname specificity is an
+                  Extended feature. Implementations that support this behavior SHOULD claim
+                  support for the `GatewayRouteHostnameIntersectionPrecedence` feature.
+                  Implementations that do not support this feature MAY evaluate precedence
+                  using the calculated Listener/Route hostname intersection.
                 items:
                   description: |-
                     Hostname is the fully qualified domain name of a network host. This matches
@@ -1641,6 +1660,25 @@ spec:
                   1. IPs are not allowed in SNI hostnames per RFC 6066.
                   2. A hostname may be prefixed with a wildcard label (`*.`). The wildcard
                      label must appear by itself as the first label.
+
+
+                  In the event that multiple TLSRoutes specify intersecting hostnames (e.g.
+                  overlapping wildcard matching and exact matching hostnames), precedence must
+                  be given to rules from the TLSRoute with the largest number of:
+
+                  * Characters in a matching non-wildcard hostname.
+                  * Characters in a matching hostname.
+
+                  When multiple TLSRoutes attach to the same Listener and yield identical
+                  Listener/Route intersected hostnames, implementations SHOULD evaluate
+                  precedence using the original hostnames configured on the Route, not the
+                  calculated Listener/Route hostname intersection.
+
+                  Resolving Route precedence using original Route hostname specificity is an
+                  Extended feature. Implementations that support this behavior SHOULD claim
+                  support for the `GatewayRouteHostnameIntersectionPrecedence` feature.
+                  Implementations that do not support this feature MAY evaluate precedence
+                  using the calculated Listener/Route hostname intersection.
                 items:
                   description: |-
                     Hostname is the fully qualified domain name of a network host. This matches
