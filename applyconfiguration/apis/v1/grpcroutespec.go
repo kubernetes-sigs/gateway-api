@@ -80,8 +80,6 @@ type GRPCRouteSpecApplyConfiguration struct {
 	// Support: Core
 	Hostnames []apisv1.Hostname `json:"hostnames,omitempty"`
 	// Rules are a list of GRPC matchers, filters and actions.
-	//
-	// <gateway:experimental:validation:XValidation:message="Rule name must be unique within the route",rule="self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name) && l1.name == l2.name))">
 	Rules []GRPCRouteRuleApplyConfiguration `json:"rules,omitempty"`
 }
 
