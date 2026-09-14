@@ -2228,6 +2228,9 @@ var schemaYAML = typed.YAMLObject(`types:
 - name: io.k8s.sigs.gateway-api.apisx.v1alpha1.BackendSpec
   map:
     fields:
+    - name: endpointSelector
+      type:
+        namedType: io.k8s.sigs.gateway-api.apisx.v1alpha1.EndpointSelectorBackend
     - name: externalHostname
       type:
         namedType: io.k8s.sigs.gateway-api.apisx.v1alpha1.ExternalHostnameBackend
@@ -2296,6 +2299,14 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: percent
       type:
         scalar: numeric
+- name: io.k8s.sigs.gateway-api.apisx.v1alpha1.EndpointSelectorBackend
+  map:
+    fields:
+    - name: matchLabels
+      type:
+        map:
+          elementType:
+            scalar: string
 - name: io.k8s.sigs.gateway-api.apisx.v1alpha1.ExternalHostnameBackend
   map:
     fields:

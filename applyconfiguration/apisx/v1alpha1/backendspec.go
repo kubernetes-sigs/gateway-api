@@ -29,8 +29,9 @@ import (
 type BackendSpecApplyConfiguration struct {
 	// Type defines the backend type.
 	Type *apisxv1alpha1.BackendType `json:"type,omitempty"`
-	// Port defines the port that the implementation should use when connecting
-	// to this backend.
+	// Port defines the port to connect to on this backend.
+	// For ExternalHostname, this is the port on the external host.
+	// For EndpointSelector, this specifies which endpoint port to connect to.
 	Port *BackendPortApplyConfiguration `json:"port,omitempty"`
 	// ExternalHostname specifies the configuration for an ExternalHostname
 	// backend. This field must be set when type is ExternalHostname and must
@@ -38,6 +39,10 @@ type BackendSpecApplyConfiguration struct {
 	//
 	// Support: Extended
 	ExternalHostname *ExternalHostnameBackendApplyConfiguration `json:"externalHostname,omitempty"`
+	// EndpointSelector specifies the configuration for an EndpointSelector
+	// backend. This field must be set when type is EndpointSelector and must
+	// be unset otherwise.
+	EndpointSelector *EndpointSelectorBackendApplyConfiguration `json:"endpointSelector,omitempty"`
 	// Protocol defines the protocol for backend communication.
 	//
 	// In the common case, the underlying transport protocol for the
@@ -99,6 +104,14 @@ func (b *BackendSpecApplyConfiguration) WithPort(value *BackendPortApplyConfigur
 // If called multiple times, the ExternalHostname field is set to the value of the last call.
 func (b *BackendSpecApplyConfiguration) WithExternalHostname(value *ExternalHostnameBackendApplyConfiguration) *BackendSpecApplyConfiguration {
 	b.ExternalHostname = value
+	return b
+}
+
+// WithEndpointSelector sets the EndpointSelector field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the EndpointSelector field is set to the value of the last call.
+func (b *BackendSpecApplyConfiguration) WithEndpointSelector(value *EndpointSelectorBackendApplyConfiguration) *BackendSpecApplyConfiguration {
+	b.EndpointSelector = value
 	return b
 }
 

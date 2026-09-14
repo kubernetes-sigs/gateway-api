@@ -304,8 +304,12 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisxv1alpha1.BackendTrafficPolicySpecApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("BudgetDetails"):
 		return &apisxv1alpha1.BudgetDetailsApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("EndpointSelectorBackend"):
+		return &apisxv1alpha1.EndpointSelectorBackendApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("ExternalHostnameBackend"):
 		return &apisxv1alpha1.ExternalHostnameBackendApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("LabelSelector"):
+		return &apisxv1alpha1.LabelSelectorApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("MeshSpec"):
 		return &apisxv1alpha1.MeshSpecApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("MeshStatus"):

@@ -15695,7 +15695,7 @@
 					"$ref": "io.k8s.networking.gateway.v1.ParentReference"
 				},
 				"conditions": {
-					"description": "For Kubernetes API conventions, see: https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#typical-status-properties conditions represent the current state of the Backend resource. Each condition has a unique type and reflects the status of a specific aspect of the resource.\n\nDefined condition types include: - \"Accepted\": the resource has been acknowledged and accepteed by the controller\n\nThe status of each condition is one of True, False, or Unknown.",
+					"description": "For Kubernetes API conventions, see: https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#typical-status-properties conditions represent the current state of the Backend resource. Each condition has a unique type and reflects the status of a specific aspect of the resource.\n\nDefined condition types include: - \"Accepted\": the resource has been acknowledged and accepted by the controller\n\nThe status of each condition is one of True, False, or Unknown.",
 					"type": "array",
 					"items": {
 						"$ref": "io.k8s.apimachinery.pkg.apis.meta.v1.Condition"
@@ -15738,12 +15738,16 @@
 				"port"
 			],
 			"properties": {
+				"endpointSelector": {
+					"description": "EndpointSelector specifies the configuration for an EndpointSelector backend. This field must be set when type is EndpointSelector and must be unset otherwise.",
+					"$ref": "io.x-k8s.networking.gateway.v1alpha1.EndpointSelectorBackend"
+				},
 				"externalHostname": {
 					"description": "ExternalHostname specifies the configuration for an ExternalHostname backend. This field must be set when type is ExternalHostname and must be unset otherwise.\n\nSupport: Extended",
 					"$ref": "io.x-k8s.networking.gateway.v1alpha1.ExternalHostnameBackend"
 				},
 				"port": {
-					"description": "Port defines the port that the implementation should use when connecting to this backend.",
+					"description": "Port defines the port to connect to on this backend. For ExternalHostname, this is the port on the external host. For EndpointSelector, this specifies which endpoint port to connect to.",
 					"default": {},
 					"$ref": "io.x-k8s.networking.gateway.v1alpha1.BackendPort"
 				},
@@ -15844,6 +15848,22 @@
 				}
 			}
 		},
+		"io.x-k8s.networking.gateway.v1alpha1.EndpointSelectorBackend": {
+			"description": "EndpointSelectorBackend specifies the configuration for a backend that selects a set of pods by label.",
+			"type": "object",
+			"required": [
+				"matchLabels"
+			],
+			"properties": {
+				"matchLabels": {
+					"description": "MatchLabels contains a set of required {key,value} pairs. An object must match every label in this map to be selected. The matching logic is an AND operation on all entries.",
+					"type": "object",
+					"additionalProperties": {
+						"type": "string"
+					}
+				}
+			}
+		},
 		"io.x-k8s.networking.gateway.v1alpha1.ExternalHostnameBackend": {
 			"description": "ExternalHostnameBackend specifies the configuration for a backend that represents an external hostname destination.",
 			"type": "object",
@@ -15854,6 +15874,22 @@
 				"hostname": {
 					"description": "Hostname specifies the FQDN used to reach this backend. IP addresses are not allowed in this field.\n\n<gateway:util:excludeFromCRD> Notes for implementers:\n\nImplementations that are aware of custom trust domains being used for Service FQDNs MUST also enforce that hostnames ending with those trust domains (e.g. .cluster.local) are not allowed. </gateway:util:excludeFromCRD>",
 					"type": "string"
+				}
+			}
+		},
+		"io.x-k8s.networking.gateway.v1alpha1.LabelSelector": {
+			"description": "LabelSelector defines a query for resources based on their labels.",
+			"type": "object",
+			"required": [
+				"matchLabels"
+			],
+			"properties": {
+				"matchLabels": {
+					"description": "MatchLabels contains a set of required {key,value} pairs. An object must match every label in this map to be selected. The matching logic is an AND operation on all entries.",
+					"type": "object",
+					"additionalProperties": {
+						"type": "string"
+					}
 				}
 			}
 		},

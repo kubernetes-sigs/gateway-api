@@ -53,6 +53,42 @@ spec:
           spec:
             description: Spec defines the desired state of XBackend.
             properties:
+              endpointSelector:
+                description: |-
+                  EndpointSelector specifies the configuration for an EndpointSelector
+                  backend. This field must be set when type is EndpointSelector and must
+                  be unset otherwise.
+                properties:
+                  matchLabels:
+                    additionalProperties:
+                      description: |-
+                        LabelValue is the value of a label in the Gateway API. This is used for validation
+                        of maps such as Gateway infrastructure labels. This matches the Kubernetes
+                        label validation rules:
+                        * must be 63 characters or less (can be empty),
+                        * unless empty, must begin and end with an alphanumeric character ([a-z0-9A-Z]),
+                        * could contain dashes (-), underscores (_), dots (.), and alphanumerics between.
+
+                        Valid values include:
+
+                        * MyValue
+                        * my.name
+                        * 123-my-value
+                      maxLength: 63
+                      minLength: 0
+                      pattern: ^(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])?$
+                      type: string
+                    description: |-
+                      MatchLabels contains a set of required {key,value} pairs.
+                      An object must match every label in this map to be selected.
+                      The matching logic is an AND operation on all entries.
+                    maxProperties: 64
+                    minProperties: 1
+                    type: object
+                required:
+                - ""
+                - matchLabels
+                type: object
               externalHostname:
                 description: |-
                   ExternalHostname specifies the configuration for an ExternalHostname
@@ -77,8 +113,9 @@ spec:
                 type: object
               port:
                 description: |-
-                  Port defines the port that the implementation should use when connecting
-                  to this backend.
+                  Port defines the port to connect to on this backend.
+                  For ExternalHostname, this is the port on the external host.
+                  For EndpointSelector, this specifies which endpoint port to connect to.
                 properties:
                   name:
                     description: |-
@@ -405,6 +442,7 @@ spec:
                 description: Type defines the backend type.
                 enum:
                 - ExternalHostname
+                - EndpointSelector
                 type: string
             required:
             - port
@@ -415,6 +453,10 @@ spec:
                 and must be unset otherwise
               rule: 'self.type == ''ExternalHostname'' ? has(self.externalHostname)
                 : !has(self.externalHostname)'
+            - message: endpointSelector must be set when type is EndpointSelector
+                and must be unset otherwise
+              rule: 'self.type == ''EndpointSelector'' ? has(self.endpointSelector)
+                : !has(self.endpointSelector)'
           status:
             description: Status defines the current state of XBackend.
             properties:
@@ -574,7 +616,7 @@ spec:
                         Each condition has a unique type and reflects the status of a specific aspect of the resource.
 
                         Defined condition types include:
-                        - "Accepted": the resource has been acknowledged and accepteed by the controller
+                        - "Accepted": the resource has been acknowledged and accepted by the controller
 
                         The status of each condition is one of True, False, or Unknown.
                       items:
