@@ -47,53 +47,50 @@ Gateway API resources and policies may reference the following attributes. For e
 
 | Attribute | OTel Data Type |
 | --- | --- |
-| http.request.method | Enum (string) |
-| http.request.method_original | string |
-| http.response.status_code | int |
-| http.route | string |
-| http.request.header.<key> | string[] |
-| http.response.header.<key> | string[] |
-| http.request.resend_count | int |
-| user_agent.original | string |
-| error.type | Enum (string) |
+| [http.request.method](https://opentelemetry.io/docs/specs/semconv/registry/attributes/http/#http-request-method) | string |
+| [http.request.method_original](https://opentelemetry.io/docs/specs/semconv/registry/attributes/http/#http-request-method-original) | string |
+| [http.response.status_code](https://opentelemetry.io/docs/specs/semconv/registry/attributes/http/#http-response-status-code) | int |
+| [http.route](https://opentelemetry.io/docs/specs/semconv/registry/attributes/http/#http-route) | string |
+| [http.request.header.<key>](https://opentelemetry.io/docs/specs/semconv/registry/attributes/http/#http-request-header) | string[] |
+| [http.response.header.<key>](https://opentelemetry.io/docs/specs/semconv/registry/attributes/http/#http-response-header) | string[] |
+| [user_agent.original](https://opentelemetry.io/docs/specs/semconv/registry/attributes/user-agent/) | string |
+| [error.type](https://opentelemetry.io/docs/specs/semconv/registry/attributes/error/#error-type) | string |
 
 ### URL
 
 | Attribute | OTel Data Type |
 | --- | --- |
-| url.scheme | string |
-| url.path | string |
-| url.query | string |
-| url.full | string |
-| url.fragment | string |
+| [url.scheme](https://opentelemetry.io/docs/specs/semconv/registry/attributes/url/#url-scheme) | string |
+| [url.path](https://opentelemetry.io/docs/specs/semconv/registry/attributes/url/#url-path) | string |
+| [url.query](https://opentelemetry.io/docs/specs/semconv/registry/attributes/url/#url-query) | string |
+| [url.full](https://opentelemetry.io/docs/specs/semconv/registry/attributes/url/#url-full) | string |
+| [url.fragment](https://opentelemetry.io/docs/specs/semconv/registry/attributes/url/#url-fragment) | string |
 
 ### Connection
 
 | Attribute | OTel Data Type |
 | --- | --- |
-| client.address | string |
-| client.port | int |
-| server.address | string |
-| server.port | int |
-| network.peer.address | string |
-| network.peer.port | int |
-| network.local.address | string |
-| network.local.port | int |
-| network.protocol.name | string |
-| network.protocol.version | string |
-| network.transport | Enum (string) |
-| network.type | Enum (string) |
+| [client.address](https://opentelemetry.io/docs/specs/semconv/registry/attributes/client/#client-address) | string |
+| [client.port](https://opentelemetry.io/docs/specs/semconv/registry/attributes/client/#client-port) | int |
+| [server.address](https://opentelemetry.io/docs/specs/semconv/registry/attributes/server/#server-address) | string |
+| [server.port](https://opentelemetry.io/docs/specs/semconv/registry/attributes/server/#server-port) | int |
+| [network.peer.address](https://opentelemetry.io/docs/specs/semconv/registry/attributes/network/#network-peer-address) | string |
+| [network.peer.port](https://opentelemetry.io/docs/specs/semconv/registry/attributes/network/#network-peer-port) | int |
+| [network.protocol.name](https://opentelemetry.io/docs/specs/semconv/registry/attributes/network/#network-protocol-name) | string |
+| [network.protocol.version](https://opentelemetry.io/docs/specs/semconv/registry/attributes/network/#network-protocol-version) | string |
+| [network.transport](https://opentelemetry.io/docs/specs/semconv/registry/attributes/network/#network-transport) | string |
+| [network.type](https://opentelemetry.io/docs/specs/semconv/registry/attributes/network/#network-type) | string |
 
 ### Infrastructure
 
 | Attribute | OTel Data Type |
 | --- | --- |
-| service.name | string |
-| service.namespace | string |
-| service.version | string |
-| service.instance.id | string |
-| k8s.cluster.name | string |
-| k8s.cluster.uid | string |
+| [service.name](https://opentelemetry.io/docs/specs/semconv/registry/attributes/service/#service-name) | string |
+| [service.namespace](https://opentelemetry.io/docs/specs/semconv/registry/attributes/service/#service-namespace) | string |
+| [service.version](https://opentelemetry.io/docs/specs/semconv/registry/attributes/service/#service-version) | string |
+| [service.instance.id](https://opentelemetry.io/docs/specs/semconv/registry/attributes/service/#service-instance-id) | string |
+| [k8s.cluster.name](https://opentelemetry.io/docs/specs/semconv/registry/attributes/k8s/#k8s-cluster-name) | string |
+| [k8s.cluster.uid](https://opentelemetry.io/docs/specs/semconv/registry/attributes/k8s/#k8s-cluster-uid) | string |
 
 # Usage Guidelines Across Gateway API
 
