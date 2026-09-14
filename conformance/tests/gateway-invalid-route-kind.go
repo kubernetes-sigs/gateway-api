@@ -19,10 +19,12 @@ package tests
 import (
 	"testing"
 
+	"github.com/stretchr/testify/require"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
+	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
 	"sigs.k8s.io/gateway-api/pkg/features"
@@ -37,6 +39,7 @@ var GatewayInvalidRouteKind = suite.ConformanceTest{
 	Description: "A Gateway in the gateway-conformance-infra namespace should fail to become ready an invalid Route kind is specified.",
 	Features: []features.FeatureName{
 		features.SupportGateway,
+		features.SupportHTTPRoute,
 	},
 	Manifests: []string{"tests/gateway-invalid-route-kind.yaml"},
 	Parallel:  true,
@@ -53,7 +56,6 @@ var GatewayInvalidRouteKind = suite.ConformanceTest{
 				}},
 				AttachedRoutes: 0,
 			}}
-
 			kubernetes.GatewayStatusMustHaveListeners(t, s.Client, s.TimeoutConfig, gwNN, listeners)
 		})
 
@@ -70,10 +72,22 @@ var GatewayInvalidRouteKind = suite.ConformanceTest{
 					Status: metav1.ConditionFalse,
 					Reason: string(v1.ListenerReasonInvalidRouteKinds),
 				}},
-				AttachedRoutes: 0,
+				AttachedRoutes: 1,
 			}}
-
 			kubernetes.GatewayStatusMustHaveListeners(t, s.Client, s.TimeoutConfig, gwNN, listeners)
+
+			t.Run("Supported route kind is fully programmed", func(t *testing.T) {
+				gwAddr, err := kubernetes.WaitForGatewayAddress(t, s.Client, s.TimeoutConfig, kubernetes.NewGatewayRef(gwNN, "http"))
+				require.NoErrorf(t, err, "timed out waiting for Gateway address to be assigned")
+				controlRouteNN := types.NamespacedName{Name: "gateway-supported-and-invalid-route-kind-control", Namespace: suite.InfrastructureNamespace}
+				kubernetes.HTTPRouteMustHaveRouteAcceptedConditionsTrue(t, s.Client, s.TimeoutConfig, controlRouteNN, gwNN)
+				http.MakeRequestAndExpectEventuallyConsistentResponse(t, s.RoundTripper, s.TimeoutConfig, gwAddr, http.ExpectedResponse{
+					Request:   http.Request{Host: "supported-route-kind.example.com", Path: "/"},
+					Response:  http.Response{StatusCode: 200},
+					Backend:   suite.InfraBackendServiceNameV1,
+					Namespace: suite.InfrastructureNamespace,
+				})
+			})
 		})
 	},
 }

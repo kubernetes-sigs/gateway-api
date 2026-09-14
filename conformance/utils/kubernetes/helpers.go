@@ -646,6 +646,32 @@ func GatewayListenerMustHaveConditions(t *testing.T, client client.Client, timeo
 	require.NoErrorf(t, waitErr, "error waiting for Gateway status to have conditions matching expectations on listener %s", lName)
 }
 
+// GatewayListenerMustHaveAttachedRoutes waits for the named Gateway listener
+// to report the expected number of attached Routes.
+func GatewayListenerMustHaveAttachedRoutes(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, gwName types.NamespacedName, lName string, attachedRoutes int32) {
+	t.Helper()
+
+	waitErr := wait.PollUntilContextTimeout(context.Background(), timeoutConfig.DefaultPollInterval, timeoutConfig.GatewayStatusMustHaveListeners, true, func(ctx context.Context) (bool, error) {
+		gw := &gatewayv1.Gateway{}
+		if err := client.Get(ctx, gwName, gw); err != nil {
+			return false, fmt.Errorf("error fetching Gateway: %w", err)
+		}
+		if err := ConditionsHaveLatestObservedGeneration(gw, gw.Status.Conditions); err != nil {
+			tlog.Log(t, "Gateway ", err)
+			return false, nil
+		}
+
+		for _, listener := range gw.Status.Listeners {
+			if string(listener.Name) == lName {
+				return listener.AttachedRoutes == attachedRoutes, nil
+			}
+		}
+		return false, nil
+	})
+
+	require.NoErrorf(t, waitErr, "error waiting for Gateway listener %s to have %d attached Routes", lName, attachedRoutes)
+}
+
 // GatewayMustHaveZeroRoutes validates that the gateway has zero routes attached.  The status
 // may indicate a single listener with zero attached routes or no listeners.
 func GatewayMustHaveZeroRoutes(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, gwName types.NamespacedName) {
