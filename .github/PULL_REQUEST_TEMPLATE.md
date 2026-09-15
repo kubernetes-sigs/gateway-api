@@ -61,7 +61,7 @@ If yes, please enter a release note below:
 **Was AI used in preparing this PR?**
 <!--
 Please declare if any AI was used in the preparation of this PR by applying one of the 
-following labels based on the the AIL scale 
+following labels based on the AIL scale 
 (https://danielmiessler.com/blog/ai-influence-level-ail).
 
 /label ail/0
