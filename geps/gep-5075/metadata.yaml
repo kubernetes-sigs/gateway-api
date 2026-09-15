@@ -1,0 +1,12 @@
+apiVersion: internal.gateway.networking.k8s.io/v1alpha1
+kind: GEPDetails
+number: 5075
+name: Support ClusterTrustBundle as a valid caCertificateRef
+status: Provisional
+authors:
+  - davidesalerno
+relationships:
+  seeAlso:
+    - number: 3787
+      name: Support CA Certs from other namespaces in BackendTLSPolicy
+      description: Related to CA Certs configuration and validation for BackendTLSPolicy.
