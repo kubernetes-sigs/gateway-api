@@ -3846,7 +3846,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GRPCRouteRule(ref common.ReferenceCall
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "GRPCRouteRule defines the semantics for matching a gRPC request based on conditions (matches), processing it (filters), and forwarding the request to an API object (backendRefs).",
+				Description: "GRPCRouteRule defines the semantics for matching a gRPC request based on conditions (matches), processing it (filters), and forwarding the request to an API object (backendRefs).\n\n<gateway:util:excludeFromCRD> The service and method character-class checks are applied from here rather than on GRPCMethodMatch. The apiserver prices a CEL rule statically as its cost times the maxItems of every enclosing list, so a regex rule on GRPCMethodMatch is charged rules x matches (64 x 64) times and exceeds the per-rule budget. Iterating over a literal list of match indexes from the rule level is charged per rule instead, and the 64 indexes are split across four rules per check to stay within budget. </gateway:util:excludeFromCRD>",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"name": {
@@ -5554,7 +5554,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteRule(ref common.ReferenceCall
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "HTTPRouteRule defines semantics for matching an HTTP request based on conditions (matches), processing it (filters), and forwarding the request to an API object (backendRefs).",
+				Description: "HTTPRouteRule defines semantics for matching an HTTP request based on conditions (matches), processing it (filters), and forwarding the request to an API object (backendRefs).\n\n<gateway:util:excludeFromCRD> The path.value character-class check is applied from here rather than on HTTPPathMatch. The apiserver prices a CEL rule statically as its cost times the maxItems of every enclosing list, so a regex rule on HTTPPathMatch is charged rules x matches (64 x 64) times and exceeds the per-rule budget. Iterating over a literal list of match indexes from the rule level is charged per rule instead, and the 64 indexes are split across four rules to stay within budget. </gateway:util:excludeFromCRD>",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"name": {
@@ -5702,7 +5702,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteSpec(ref common.ReferenceCall
 							},
 						},
 						SchemaProps: spec.SchemaProps{
-							Description: "Rules are a list of HTTP matchers, filters and actions.\n\n<gateway:experimental:validation:XValidation:message=\"Rule name must be unique within the route\",rule=\"self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name) && l1.name == l2.name))\"> <gateway:util:excludeFromCRD> Validates that the total number of matches across all rules does not exceed 128. CEL does not support aggregate functions like sum() over lists, so each of the (up to 16) rules is checked individually and their match counts are summed explicitly. </gateway:util:excludeFromCRD>",
+							Description: "Rules are a list of HTTP matchers, filters and actions.\n\n<gateway:experimental:validation:XValidation:message=\"Rule name must be unique within the route\",rule=\"self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name) && l1.name == l2.name))\">",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{

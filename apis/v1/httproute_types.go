@@ -124,14 +124,9 @@ type HTTPRouteSpec struct {
 	// +listType=atomic
 	// <gateway:experimental:validation:XValidation:message="Rule name must be unique within the route",rule="self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name) && l1.name == l2.name))">
 	// +kubebuilder:validation:MinItems=1
-	// +kubebuilder:validation:MaxItems=16
+	// +kubebuilder:validation:MaxItems=64
 	// +kubebuilder:default={{matches: {{path: {type: "PathPrefix", value: "/"}}}}}
-	// <gateway:util:excludeFromCRD>
-	// Validates that the total number of matches across all rules does not exceed 128.
-	// CEL does not support aggregate functions like sum() over lists, so each of the
-	// (up to 16) rules is checked individually and their match counts are summed explicitly.
-	// </gateway:util:excludeFromCRD>
-	// +kubebuilder:validation:XValidation:message="While 16 rules and 64 matches per rule are allowed, the total number of matches across all rules in a route must be less than 128",rule="(self.size() > 0 ? self[0].matches.size() : 0) + (self.size() > 1 ? self[1].matches.size() : 0) + (self.size() > 2 ? self[2].matches.size() : 0) + (self.size() > 3 ? self[3].matches.size() : 0) + (self.size() > 4 ? self[4].matches.size() : 0) + (self.size() > 5 ? self[5].matches.size() : 0) + (self.size() > 6 ? self[6].matches.size() : 0) + (self.size() > 7 ? self[7].matches.size() : 0) + (self.size() > 8 ? self[8].matches.size() : 0) + (self.size() > 9 ? self[9].matches.size() : 0) + (self.size() > 10 ? self[10].matches.size() : 0) + (self.size() > 11 ? self[11].matches.size() : 0) + (self.size() > 12 ? self[12].matches.size() : 0) + (self.size() > 13 ? self[13].matches.size() : 0) + (self.size() > 14 ? self[14].matches.size() : 0) + (self.size() > 15 ? self[15].matches.size() : 0) <= 128"
+	// +kubebuilder:validation:XValidation:message="While 64 rules and 64 matches per rule are allowed, the total number of matches across all rules in a route must be at most 128",rule="self.map(r, r.matches.size()).sum() <= 128"
 	Rules []HTTPRouteRule `json:"rules,omitempty"`
 }
 
@@ -144,6 +139,20 @@ type HTTPRouteSpec struct {
 // +kubebuilder:validation:XValidation:message="When using URLRewrite filter with path.replacePrefixMatch, exactly one PathPrefix match must be specified",rule="(has(self.filters) && self.filters.exists_one(f, has(f.urlRewrite) && has(f.urlRewrite.path) && f.urlRewrite.path.type == 'ReplacePrefixMatch' && has(f.urlRewrite.path.replacePrefixMatch))) ? ((size(self.matches) != 1 || !has(self.matches[0].path) || self.matches[0].path.type != 'PathPrefix') ? false : true) : true"
 // +kubebuilder:validation:XValidation:message="Within backendRefs, when using RequestRedirect filter with path.replacePrefixMatch, exactly one PathPrefix match must be specified",rule="(has(self.backendRefs) && self.backendRefs.exists_one(b, (has(b.filters) && b.filters.exists_one(f, has(f.requestRedirect) && has(f.requestRedirect.path) && f.requestRedirect.path.type == 'ReplacePrefixMatch' && has(f.requestRedirect.path.replacePrefixMatch))) )) ? ((size(self.matches) != 1 || !has(self.matches[0].path) || self.matches[0].path.type != 'PathPrefix') ? false : true) : true"
 // +kubebuilder:validation:XValidation:message="Within backendRefs, When using URLRewrite filter with path.replacePrefixMatch, exactly one PathPrefix match must be specified",rule="(has(self.backendRefs) && self.backendRefs.exists_one(b, (has(b.filters) && b.filters.exists_one(f, has(f.urlRewrite) && has(f.urlRewrite.path) && f.urlRewrite.path.type == 'ReplacePrefixMatch' && has(f.urlRewrite.path.replacePrefixMatch))) )) ? ((size(self.matches) != 1 || !has(self.matches[0].path) || self.matches[0].path.type != 'PathPrefix') ? false : true) : true"
+// <gateway:util:excludeFromCRD>
+// The path.value character-class check is applied from here rather than on
+// HTTPPathMatch. The apiserver prices a CEL rule statically as its cost times
+// the maxItems of every enclosing list, so a regex rule on HTTPPathMatch is
+// charged rules x matches (64 x 64) times and exceeds the per-rule budget.
+// Iterating over a literal list of match indexes from the rule level is
+// charged per rule instead, and the 64 indexes are split across four rules to
+// stay within budget.
+// </gateway:util:excludeFromCRD>
+//
+// +kubebuilder:validation:XValidation:message="matches[].path.value must only contain valid characters (matching ^(?:[-A-Za-z0-9/._~!$&'()*+,;=:@]|[%][0-9a-fA-F]{2})+$) for types ['Exact', 'PathPrefix']",rule="!has(self.matches) || [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15].all(i, self.matches.size() <= i || !has(self.matches[i].path) || !(self.matches[i].path.type in ['Exact','PathPrefix']) || self.matches[i].path.value.matches(r\"\"\"^(?:[-A-Za-z0-9/._~!$&'()*+,;=:@]|[%][0-9a-fA-F]{2})+$\"\"\"))"
+// +kubebuilder:validation:XValidation:message="matches[].path.value must only contain valid characters (matching ^(?:[-A-Za-z0-9/._~!$&'()*+,;=:@]|[%][0-9a-fA-F]{2})+$) for types ['Exact', 'PathPrefix']",rule="!has(self.matches) || [16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31].all(i, self.matches.size() <= i || !has(self.matches[i].path) || !(self.matches[i].path.type in ['Exact','PathPrefix']) || self.matches[i].path.value.matches(r\"\"\"^(?:[-A-Za-z0-9/._~!$&'()*+,;=:@]|[%][0-9a-fA-F]{2})+$\"\"\"))"
+// +kubebuilder:validation:XValidation:message="matches[].path.value must only contain valid characters (matching ^(?:[-A-Za-z0-9/._~!$&'()*+,;=:@]|[%][0-9a-fA-F]{2})+$) for types ['Exact', 'PathPrefix']",rule="!has(self.matches) || [32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47].all(i, self.matches.size() <= i || !has(self.matches[i].path) || !(self.matches[i].path.type in ['Exact','PathPrefix']) || self.matches[i].path.value.matches(r\"\"\"^(?:[-A-Za-z0-9/._~!$&'()*+,;=:@]|[%][0-9a-fA-F]{2})+$\"\"\"))"
+// +kubebuilder:validation:XValidation:message="matches[].path.value must only contain valid characters (matching ^(?:[-A-Za-z0-9/._~!$&'()*+,;=:@]|[%][0-9a-fA-F]{2})+$) for types ['Exact', 'PathPrefix']",rule="!has(self.matches) || [48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63].all(i, self.matches.size() <= i || !has(self.matches[i].path) || !(self.matches[i].path.type in ['Exact','PathPrefix']) || self.matches[i].path.value.matches(r\"\"\"^(?:[-A-Za-z0-9/._~!$&'()*+,;=:@]|[%][0-9a-fA-F]{2})+$\"\"\"))"
 type HTTPRouteRule struct {
 	// Name is the name of the route rule. This name MUST be unique within a Route if it is set.
 	//
@@ -537,7 +546,6 @@ const (
 // +kubebuilder:validation:XValidation:message="must not end with '/..' when type one of ['Exact', 'PathPrefix']",rule="(self.type in ['Exact','PathPrefix']) ? !self.value.endsWith('/..') : true"
 // +kubebuilder:validation:XValidation:message="must not end with '/.' when type one of ['Exact', 'PathPrefix']",rule="(self.type in ['Exact','PathPrefix']) ? !self.value.endsWith('/.') : true"
 // +kubebuilder:validation:XValidation:message="type must be one of ['Exact', 'PathPrefix', 'RegularExpression']",rule="self.type in ['Exact','PathPrefix'] || self.type == 'RegularExpression'"
-// +kubebuilder:validation:XValidation:message="must only contain valid characters (matching ^(?:[-A-Za-z0-9/._~!$&'()*+,;=:@]|[%][0-9a-fA-F]{2})+$) for types ['Exact', 'PathPrefix']",rule="(self.type in ['Exact','PathPrefix']) ? self.value.matches(r\"\"\"^(?:[-A-Za-z0-9/._~!$&'()*+,;=:@]|[%][0-9a-fA-F]{2})+$\"\"\") : true"
 type HTTPPathMatch struct {
 	// Type specifies how to match against the path Value.
 	//

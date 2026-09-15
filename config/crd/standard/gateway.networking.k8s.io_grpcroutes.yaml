@@ -1759,16 +1759,6 @@ spec:
                                 specified
                               rule: 'has(self.type) ? has(self.service) || has(self.method)
                                 : true'
-                            - message: service must only contain valid characters
-                                (matching ^(?i)\.?[a-z_][a-z_0-9]*(\.[a-z_][a-z_0-9]*)*$)
-                              rule: '(!has(self.type) || self.type == ''Exact'') &&
-                                has(self.service) ? self.service.matches(r"""^(?i)\.?[a-z_][a-z_0-9]*(\.[a-z_][a-z_0-9]*)*$"""):
-                                true'
-                            - message: method must only contain valid characters (matching
-                                ^[A-Za-z_][A-Za-z_0-9]*$)
-                              rule: '(!has(self.type) || self.type == ''Exact'') &&
-                                has(self.method) ? self.method.matches(r"""^[A-Za-z_][A-Za-z_0-9]*$"""):
-                                true'
                         type: object
                       maxItems: 64
                       type: array
@@ -1783,30 +1773,64 @@ spec:
                       pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                       type: string
                   type: object
-                maxItems: 16
+                  x-kubernetes-validations:
+                  - message: matches[].method.service must only contain valid characters
+                      (matching ^(?i)\.?[a-z_][a-z_0-9]*(\.[a-z_][a-z_0-9]*)*$)
+                    rule: '!has(self.matches) || [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15].all(i,
+                      self.matches.size() <= i || !has(self.matches[i].method) ||
+                      !(!has(self.matches[i].method.type) || self.matches[i].method.type
+                      == ''Exact'') || !has(self.matches[i].method.service) || self.matches[i].method.service.matches(r"""^(?i)\.?[a-z_][a-z_0-9]*(\.[a-z_][a-z_0-9]*)*$"""))'
+                  - message: matches[].method.service must only contain valid characters
+                      (matching ^(?i)\.?[a-z_][a-z_0-9]*(\.[a-z_][a-z_0-9]*)*$)
+                    rule: '!has(self.matches) || [16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31].all(i,
+                      self.matches.size() <= i || !has(self.matches[i].method) ||
+                      !(!has(self.matches[i].method.type) || self.matches[i].method.type
+                      == ''Exact'') || !has(self.matches[i].method.service) || self.matches[i].method.service.matches(r"""^(?i)\.?[a-z_][a-z_0-9]*(\.[a-z_][a-z_0-9]*)*$"""))'
+                  - message: matches[].method.service must only contain valid characters
+                      (matching ^(?i)\.?[a-z_][a-z_0-9]*(\.[a-z_][a-z_0-9]*)*$)
+                    rule: '!has(self.matches) || [32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47].all(i,
+                      self.matches.size() <= i || !has(self.matches[i].method) ||
+                      !(!has(self.matches[i].method.type) || self.matches[i].method.type
+                      == ''Exact'') || !has(self.matches[i].method.service) || self.matches[i].method.service.matches(r"""^(?i)\.?[a-z_][a-z_0-9]*(\.[a-z_][a-z_0-9]*)*$"""))'
+                  - message: matches[].method.service must only contain valid characters
+                      (matching ^(?i)\.?[a-z_][a-z_0-9]*(\.[a-z_][a-z_0-9]*)*$)
+                    rule: '!has(self.matches) || [48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63].all(i,
+                      self.matches.size() <= i || !has(self.matches[i].method) ||
+                      !(!has(self.matches[i].method.type) || self.matches[i].method.type
+                      == ''Exact'') || !has(self.matches[i].method.service) || self.matches[i].method.service.matches(r"""^(?i)\.?[a-z_][a-z_0-9]*(\.[a-z_][a-z_0-9]*)*$"""))'
+                  - message: matches[].method.method must only contain valid characters
+                      (matching ^[A-Za-z_][A-Za-z_0-9]*$)
+                    rule: '!has(self.matches) || [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15].all(i,
+                      self.matches.size() <= i || !has(self.matches[i].method) ||
+                      !(!has(self.matches[i].method.type) || self.matches[i].method.type
+                      == ''Exact'') || !has(self.matches[i].method.method) || self.matches[i].method.method.matches(r"""^[A-Za-z_][A-Za-z_0-9]*$"""))'
+                  - message: matches[].method.method must only contain valid characters
+                      (matching ^[A-Za-z_][A-Za-z_0-9]*$)
+                    rule: '!has(self.matches) || [16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31].all(i,
+                      self.matches.size() <= i || !has(self.matches[i].method) ||
+                      !(!has(self.matches[i].method.type) || self.matches[i].method.type
+                      == ''Exact'') || !has(self.matches[i].method.method) || self.matches[i].method.method.matches(r"""^[A-Za-z_][A-Za-z_0-9]*$"""))'
+                  - message: matches[].method.method must only contain valid characters
+                      (matching ^[A-Za-z_][A-Za-z_0-9]*$)
+                    rule: '!has(self.matches) || [32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47].all(i,
+                      self.matches.size() <= i || !has(self.matches[i].method) ||
+                      !(!has(self.matches[i].method.type) || self.matches[i].method.type
+                      == ''Exact'') || !has(self.matches[i].method.method) || self.matches[i].method.method.matches(r"""^[A-Za-z_][A-Za-z_0-9]*$"""))'
+                  - message: matches[].method.method must only contain valid characters
+                      (matching ^[A-Za-z_][A-Za-z_0-9]*$)
+                    rule: '!has(self.matches) || [48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63].all(i,
+                      self.matches.size() <= i || !has(self.matches[i].method) ||
+                      !(!has(self.matches[i].method.type) || self.matches[i].method.type
+                      == ''Exact'') || !has(self.matches[i].method.method) || self.matches[i].method.method.matches(r"""^[A-Za-z_][A-Za-z_0-9]*$"""))'
+                maxItems: 64
                 type: array
                 x-kubernetes-list-type: atomic
                 x-kubernetes-validations:
-                - message: While 16 rules and 64 matches per rule are allowed, the
-                    total number of matches across all rules in a route must be less
-                    than 128
-                  rule: '(self.size() > 0 ? (has(self[0].matches) ? self[0].matches.size()
-                    : 0) : 0) + (self.size() > 1 ? (has(self[1].matches) ? self[1].matches.size()
-                    : 0) : 0) + (self.size() > 2 ? (has(self[2].matches) ? self[2].matches.size()
-                    : 0) : 0) + (self.size() > 3 ? (has(self[3].matches) ? self[3].matches.size()
-                    : 0) : 0) + (self.size() > 4 ? (has(self[4].matches) ? self[4].matches.size()
-                    : 0) : 0) + (self.size() > 5 ? (has(self[5].matches) ? self[5].matches.size()
-                    : 0) : 0) + (self.size() > 6 ? (has(self[6].matches) ? self[6].matches.size()
-                    : 0) : 0) + (self.size() > 7 ? (has(self[7].matches) ? self[7].matches.size()
-                    : 0) : 0) + (self.size() > 8 ? (has(self[8].matches) ? self[8].matches.size()
-                    : 0) : 0) + (self.size() > 9 ? (has(self[9].matches) ? self[9].matches.size()
-                    : 0) : 0) + (self.size() > 10 ? (has(self[10].matches) ? self[10].matches.size()
-                    : 0) : 0) + (self.size() > 11 ? (has(self[11].matches) ? self[11].matches.size()
-                    : 0) : 0) + (self.size() > 12 ? (has(self[12].matches) ? self[12].matches.size()
-                    : 0) : 0) + (self.size() > 13 ? (has(self[13].matches) ? self[13].matches.size()
-                    : 0) : 0) + (self.size() > 14 ? (has(self[14].matches) ? self[14].matches.size()
-                    : 0) : 0) + (self.size() > 15 ? (has(self[15].matches) ? self[15].matches.size()
-                    : 0) : 0) <= 128'
+                - message: While 64 rules and 64 matches per rule are allowed, the
+                    total number of matches across all rules in a route must be at
+                    most 128
+                  rule: 'self.map(r, has(r.matches) ? r.matches.size() : 0).sum()
+                    <= 128'
             type: object
           status:
             description: Status defines the current state of GRPCRoute.
