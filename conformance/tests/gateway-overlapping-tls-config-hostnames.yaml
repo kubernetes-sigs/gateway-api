@@ -1,0 +1,112 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: gateway-overlapping-hostnames
+  namespace: gateway-conformance-infra
+spec:
+  gatewayClassName: "{GATEWAY_CLASS_NAME}"
+  listeners:
+    - name: foo-example-https
+      port: 443
+      protocol: HTTPS
+      hostname: foo.example.com
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - kind: Secret
+            group: ""
+            name: tls-validity-checks-certificate
+      allowedRoutes:
+        namespaces:
+          from: Same
+    - name: bar-example-https
+      port: 443
+      protocol: HTTPS
+      hostname: bar.bar.example.com
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - kind: Secret
+            group: ""
+            name: tls-validity-checks-certificate
+      allowedRoutes:
+        namespaces:
+          from: Same
+    - name: wildcard-example-https
+      port: 443
+      protocol: HTTPS
+      hostname: "*.example.com"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - kind: Secret
+            group: ""
+            name: tls-validity-checks-certificate
+      allowedRoutes:
+        namespaces:
+          from: Same
+    - name: wildcard-other-https
+      port: 443
+      protocol: HTTPS
+      hostname: "*.other.com"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - kind: Secret
+            group: ""
+            name: tls-validity-checks-certificate
+      allowedRoutes:
+        namespaces:
+          from: Same
+    - name: wildcard-bar-other-https
+      port: 443
+      protocol: HTTPS
+      hostname: "*.bar.other.com"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - kind: Secret
+            group: ""
+            name: tls-validity-checks-certificate
+      allowedRoutes:
+        namespaces:
+          from: Same
+    - name: not-overlapping-https
+      port: 443
+      protocol: HTTPS
+      hostname: "example.com"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - kind: Secret
+            group: ""
+            name: tls-validity-checks-certificate
+      allowedRoutes:
+        namespaces:
+          from: Same
+    - name: not-overlapping-wildcard-https
+      port: 443
+      protocol: HTTPS
+      hostname: "*.example.io"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - kind: Secret
+            group: ""
+            name: tls-validity-checks-certificate
+      allowedRoutes:
+        namespaces:
+          from: Same
+    - name: not-overlapping-other-port
+      port: 9443
+      protocol: HTTPS
+      hostname: foo.example.com
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - kind: Secret
+            group: ""
+            name: tls-validity-checks-certificate
+      allowedRoutes:
+        namespaces:
+          from: Same
