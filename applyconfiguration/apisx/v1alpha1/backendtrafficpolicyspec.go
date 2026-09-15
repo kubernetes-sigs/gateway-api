@@ -68,6 +68,8 @@ type BackendTrafficPolicySpecApplyConfiguration struct {
 	//
 	// <gateway:experimental>
 	RetryConstraint *RetryConstraintApplyConfiguration `json:"retryConstraint,omitempty"`
+	// Deprecated: use the Backend resource for session persistence (GEP-4894).
+	//
 	// SessionPersistence defines and configures session persistence
 	// for the backend.
 	//
