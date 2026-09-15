@@ -112,11 +112,8 @@ const (
 	// This option indicates support for HTTPRoute additional redirect status code 303 (extended conformance)
 	SupportHTTPRoute308RedirectStatusCode FeatureName = "HTTPRoute308RedirectStatusCode"
 
-	// This option indicates support for HTTPRoute retry (extended conformance)
-	SupportHTTPRouteRetry FeatureName = "HTTPRouteRetry"
-
-	// This option indicates support for HTTPRoute retry on backend timeout (extended conformance)
-	SupportHTTPRouteRetryBackendTimeout FeatureName = "HTTPRouteRetryBackendTimeout"
+	// This option indicates support for HTTPRoute retry on status codes (extended conformance)
+	SupportHTTPRouteRetryCodes FeatureName = "HTTPRouteRetryCodes"
 
 	// This option indicates support for HTTPRoute retry on connection error (extended conformance)
 	SupportHTTPRouteRetryConnectionError FeatureName = "HTTPRouteRetryConnectionError"
@@ -244,14 +241,9 @@ var (
 		Name:    SupportHTTPRoute308RedirectStatusCode,
 		Channel: FeatureChannelStandard,
 	}
-	// HTTPRouteRetryFeature contains metadata for the HTTPRouteRetry feature.
-	HTTPRouteRetryFeature = Feature{
-		Name:    SupportHTTPRouteRetry,
-		Channel: FeatureChannelExperimental,
-	}
-	// HTTPRouteRetryBackendTimeoutFeature contains metadata for the HTTPRouteRetryBackendTimeout feature.
-	HTTPRouteRetryBackendTimeoutFeature = Feature{
-		Name:    SupportHTTPRouteRetryBackendTimeout,
+	// HTTPRouteRetryCodesFeature contains metadata for the HTTPRouteRetryCodes feature.
+	HTTPRouteRetryCodesFeature = Feature{
+		Name:    SupportHTTPRouteRetryCodes,
 		Channel: FeatureChannelExperimental,
 	}
 	// HTTPRouteRetryConnectionErrorFeature contains metadata for the HTTPRouteRetryConnectionError feature.
@@ -298,8 +290,7 @@ var HTTPRouteExtendedFeatures = sets.New(
 	HTTPRoute303RedirectStatusCodeFeature,
 	HTTPRoute307RedirectStatusCodeFeature,
 	HTTPRoute308RedirectStatusCodeFeature,
-	HTTPRouteRetryFeature,
-	HTTPRouteRetryBackendTimeoutFeature,
+	HTTPRouteRetryCodesFeature,
 	HTTPRouteRetryConnectionErrorFeature,
 	HTTPRouteBackendURLRewriteFeature,
 	HTTPRouteBackendRequestRedirectFeature,
