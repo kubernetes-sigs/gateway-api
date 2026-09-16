@@ -241,7 +241,9 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendTLS":                               schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendTLS(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendTrafficPolicySpec":                 schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendTrafficPolicySpec(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.BudgetDetails":                            schema_sigsk8sio_gateway_api_apisx_v1alpha1_BudgetDetails(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.EndpointSelectorBackend":                  schema_sigsk8sio_gateway_api_apisx_v1alpha1_EndpointSelectorBackend(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.ExternalHostnameBackend":                  schema_sigsk8sio_gateway_api_apisx_v1alpha1_ExternalHostnameBackend(ref),
+		"sigs.k8s.io/gateway-api/apisx/v1alpha1.LabelSelector":                            schema_sigsk8sio_gateway_api_apisx_v1alpha1_LabelSelector(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.MeshSpec":                                 schema_sigsk8sio_gateway_api_apisx_v1alpha1_MeshSpec(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.MeshStatus":                               schema_sigsk8sio_gateway_api_apisx_v1alpha1_MeshStatus(ref),
 		"sigs.k8s.io/gateway-api/apisx/v1alpha1.RequestRate":                              schema_sigsk8sio_gateway_api_apisx_v1alpha1_RequestRate(ref),
@@ -9935,7 +9937,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendAncestorStatus(ref commo
 							},
 						},
 						SchemaProps: spec.SchemaProps{
-							Description: "For Kubernetes API conventions, see: https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#typical-status-properties conditions represent the current state of the Backend resource. Each condition has a unique type and reflects the status of a specific aspect of the resource.\n\nDefined condition types include: - \"Accepted\": the resource has been acknowledged and accepteed by the controller\n\nThe status of each condition is one of True, False, or Unknown.",
+							Description: "For Kubernetes API conventions, see: https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#typical-status-properties conditions represent the current state of the Backend resource. Each condition has a unique type and reflects the status of a specific aspect of the resource.\n\nDefined condition types include: - \"Accepted\": the resource has been acknowledged and accepted by the controller\n\nThe status of each condition is one of True, False, or Unknown.",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -10000,7 +10002,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendSpec(ref common.Referenc
 					},
 					"port": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Port defines the port that the implementation should use when connecting to this backend.",
+							Description: "Port defines the port to connect to on this backend. For ExternalHostname, this is the port on the external host. For EndpointSelector, this specifies which endpoint port to connect to.",
 							Default:     map[string]interface{}{},
 							Ref:         ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendPort"),
 						},
@@ -10009,6 +10011,12 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendSpec(ref common.Referenc
 						SchemaProps: spec.SchemaProps{
 							Description: "ExternalHostname specifies the configuration for an ExternalHostname backend. This field must be set when type is ExternalHostname and must be unset otherwise.\n\nSupport: Extended",
 							Ref:         ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.ExternalHostnameBackend"),
+						},
+					},
+					"endpointSelector": {
+						SchemaProps: spec.SchemaProps{
+							Description: "EndpointSelector specifies the configuration for an EndpointSelector backend. This field must be set when type is EndpointSelector and must be unset otherwise.",
+							Ref:         ref("sigs.k8s.io/gateway-api/apisx/v1alpha1.EndpointSelectorBackend"),
 						},
 					},
 					"protocol": {
@@ -10029,7 +10037,7 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BackendSpec(ref common.Referenc
 			},
 		},
 		Dependencies: []string{
-			"sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendPort", "sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendTLS", "sigs.k8s.io/gateway-api/apisx/v1alpha1.ExternalHostnameBackend"},
+			"sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendPort", "sigs.k8s.io/gateway-api/apisx/v1alpha1.BackendTLS", "sigs.k8s.io/gateway-api/apisx/v1alpha1.EndpointSelectorBackend", "sigs.k8s.io/gateway-api/apisx/v1alpha1.ExternalHostnameBackend"},
 	}
 }
 
@@ -10181,6 +10189,35 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_BudgetDetails(ref common.Refere
 	}
 }
 
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_EndpointSelectorBackend(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "EndpointSelectorBackend specifies the configuration for a backend that selects a set of pods by label.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"matchLabels": {
+						SchemaProps: spec.SchemaProps{
+							Description: "MatchLabels contains a set of required {key,value} pairs. An object must match every label in this map to be selected. The matching logic is an AND operation on all entries.",
+							Type:        []string{"object"},
+							AdditionalProperties: &spec.SchemaOrBool{
+								Allows: true,
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Type:   []string{"string"},
+										Format: "",
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"matchLabels"},
+			},
+		},
+	}
+}
+
 func schema_sigsk8sio_gateway_api_apisx_v1alpha1_ExternalHostnameBackend(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -10197,6 +10234,35 @@ func schema_sigsk8sio_gateway_api_apisx_v1alpha1_ExternalHostnameBackend(ref com
 					},
 				},
 				Required: []string{"hostname"},
+			},
+		},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apisx_v1alpha1_LabelSelector(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "LabelSelector defines a query for resources based on their labels.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"matchLabels": {
+						SchemaProps: spec.SchemaProps{
+							Description: "MatchLabels contains a set of required {key,value} pairs. An object must match every label in this map to be selected. The matching logic is an AND operation on all entries.",
+							Type:        []string{"object"},
+							AdditionalProperties: &spec.SchemaOrBool{
+								Allows: true,
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Type:   []string{"string"},
+										Format: "",
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"matchLabels"},
 			},
 		},
 	}

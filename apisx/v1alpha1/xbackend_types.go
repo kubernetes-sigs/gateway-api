@@ -58,7 +58,7 @@ type XBackendList struct {
 
 // BackendType defines the type of backend destination.
 //
-// +kubebuilder:validation:Enum=ExternalHostname
+// +kubebuilder:validation:Enum=ExternalHostname;EndpointSelector
 type BackendType string
 
 const (
@@ -68,11 +68,20 @@ const (
 	//
 	// Support: Extended
 	BackendTypeExternalHostname BackendType = "ExternalHostname"
+
+	// BackendTypeEndpointSelector indicates that the backend routes to a
+	// selected set of in-cluster endpoints. This type behaves equivalently
+	// to a Service backendRef but provides a dedicated resource where
+	// backend-level configuration can live and grow.
+	//
+	// Support: Core
+	BackendTypeEndpointSelector BackendType = "EndpointSelector"
 )
 
 // BackendSpec defines the desired state of a Backend.
 //
 // +kubebuilder:validation:XValidation:rule="self.type == 'ExternalHostname' ? has(self.externalHostname) : !has(self.externalHostname)",message="externalHostname must be set when type is ExternalHostname and must be unset otherwise"
+// +kubebuilder:validation:XValidation:rule="self.type == 'EndpointSelector' ? has(self.endpointSelector) : !has(self.endpointSelector)",message="endpointSelector must be set when type is EndpointSelector and must be unset otherwise"
 type BackendSpec struct {
 	// Type defines the backend type.
 	//
@@ -80,8 +89,9 @@ type BackendSpec struct {
 	// +required
 	Type BackendType `json:"type"`
 
-	// Port defines the port that the implementation should use when connecting
-	// to this backend.
+	// Port defines the port to connect to on this backend.
+	// For ExternalHostname, this is the port on the external host.
+	// For EndpointSelector, this specifies which endpoint port to connect to.
 	//
 	// +required
 	Port BackendPort `json:"port"`
@@ -94,6 +104,13 @@ type BackendSpec struct {
 	//
 	// +optional
 	ExternalHostname *ExternalHostnameBackend `json:"externalHostname,omitempty"`
+
+	// EndpointSelector specifies the configuration for an EndpointSelector
+	// backend. This field must be set when type is EndpointSelector and must
+	// be unset otherwise.
+	//
+	// +optional
+	EndpointSelector *EndpointSelectorBackend `json:"endpointSelector,omitempty"`
 
 	// Protocol defines the protocol for backend communication.
 	//
@@ -170,6 +187,54 @@ type ExternalHostnameBackend struct {
 	// +kubebuilder:validation:XValidation:rule="!self.endsWith('.cluster.local')",message="hostname must not be an IP address or end with .cluster.local"
 	// +required
 	Hostname v1.PreciseHostname `json:"hostname,omitempty"`
+}
+
+// EndpointSelectorBackend specifies the configuration for a backend that
+// selects a set of pods by label.
+type EndpointSelectorBackend struct {
+	// Selector defines the label selector used to identify the set of pods whose
+	// IP addresses will make up the endpoints that this Backend should route
+	// traffic to.
+	//
+	// If this field is set, the endpoints are resolved automatically and stay up
+	// to date as pods matching the selector are added or removed; the user does
+	// not create or manage any separate endpoint resource.
+	//
+	// <gateway:util:excludeFromCRD>
+	// Notes for implementers:
+	//
+	// This is an embedded struct to avoid stuttering in the API
+	// (i.e. `endpointSelector.selector`).
+	//
+	// Implementations MAY create a Service from the label selector for endpoint
+	// resolution until the upstream EndpointSelector resource (KEP-6116) is
+	// available. Implementations SHOULD set ownerReferences so the created
+	// resource's lifecycle is tied to this Backend. This Service only exists to
+	// produce EndpointSlices; Service-level behaviors (including but not limited
+	// to internalTrafficPolicy, externalTrafficPolicy, sessionAffinity, and
+	// trafficDistribution) play no role. The Service port (ClusterIP frontend)
+	// is unused; the targetPort SHOULD be set to Backend.spec.port.
+	// Implementations SHOULD create the Service as headless (clusterIP: None),
+	// since no ClusterIP or kube-proxy load balancing is needed.
+	// Implementations MUST name the Service with generateName rather than a
+	// predictable name, so that a name like <backend-name>-backend.svc.cluster.local
+	// does not become a relied-upon DNS entry.
+	// </gateway:util:excludeFromCRD>
+	//
+	// +required
+	LabelSelector `json:",inline"`
+}
+
+// LabelSelector defines a query for resources based on their labels.
+type LabelSelector struct {
+	// MatchLabels contains a set of required {key,value} pairs.
+	// An object must match every label in this map to be selected.
+	// The matching logic is an AND operation on all entries.
+	//
+	// +required
+	// +kubebuilder:validation:MinProperties=1
+	// +kubebuilder:validation:MaxProperties=64
+	MatchLabels map[v1.LabelKey]v1.LabelValue `json:"matchLabels"` //nolint:kubeapilinter
 }
 
 // BackendProtocol defines the protocol used when connecting to a backend.
@@ -313,7 +378,7 @@ type BackendAncestorStatus struct {
 	// Each condition has a unique type and reflects the status of a specific aspect of the resource.
 	//
 	// Defined condition types include:
-	// - "Accepted": the resource has been acknowledged and accepteed by the controller
+	// - "Accepted": the resource has been acknowledged and accepted by the controller
 	//
 	// The status of each condition is one of True, False, or Unknown.
 	//
@@ -322,3 +387,19 @@ type BackendAncestorStatus struct {
 	// +optional
 	Conditions []metav1.Condition `json:"conditions,omitempty"`
 }
+
+// BackendConditionType is a type of condition for a Backend.
+type BackendConditionType string
+
+// BackendConditionReason is a reason for a Backend condition.
+type BackendConditionReason string
+
+const (
+	// BackendConditionAccepted indicates whether the Backend has been accepted
+	// by a controller.
+	BackendConditionAccepted BackendConditionType = "Accepted"
+
+	// BackendReasonAccepted is used with the "Accepted" condition when the
+	// Backend has been accepted.
+	BackendReasonAccepted BackendConditionReason = "Accepted"
+)

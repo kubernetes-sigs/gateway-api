@@ -308,7 +308,6 @@ type LabelSelector struct {
 type EndpointSelectorBackend struct {
   // Selector defines the label selector used to identify the set of pods whose IP addresses
   // will make up the endpoints that this Backend should route traffic to.
-  // We make this an embedded struct to avoid stuttering in the API (i.e. `endpointSelector.selector`).
   //
   // If this field is set, the endpoints are resolved automatically and stay up to date as pods matching the
   // selector are added or removed; the user does not create or manage any separate endpoint resource.
@@ -325,6 +324,8 @@ type EndpointSelectorBackend struct {
   // Service as headless (clusterIP: None), since no ClusterIP or kube-proxy load balancing is needed.
   // Implementations MUST name the Service with generateName rather than a predictable name, so that a
   // name like <backend-name>-backend.svc.cluster.local does not become a relied-upon DNS entry.
+  //
+  // This is an embedded struct to avoid stuttering in the API (i.e. `endpointSelector.selector`).
   // </gateway:util:excludeFromCRD>
   //
   // +required
@@ -361,10 +362,10 @@ type BackendStatus struct {
   // +kubebuilder:validation:MaxItems=32
   // +optional
   // +listType=atomic
-  Parents []BackendParentStatus `json:"parents,omitempty"`
+  Ancestors []BackendAncestorStatus `json:"parents,omitempty"`
 }
 
-type BackendParentStatus struct {
+type BackendAncestorStatus struct {
   // ControllerName is a domain/path string that indicates the name of the controller that manages the
   // Backend. Name corresponds to the GatewayClass controllerName field when the
   // controller will manage parents of type "Gateway". Otherwise, the name is implementation-specific.
@@ -378,20 +379,18 @@ type BackendParentStatus struct {
   // populated with their controller name are removed when they are no longer necessary.
   //
   // +required
-  Controller ControllerName `json:"name"`
+  ControllerName GatewayController `json:"controllerName"`
 
-  // ParentRef is used to identify the parent resource that this status
-  // is associated with. It is used to match the InferencePool with the parent
-  // resource, such as a Gateway.
+  // AncestorRef identifies the ancestor resource that this status is associated
+  // with, such as a Gateway.
   //
   // +required
-  ParentRef ParentReference `json:"parentRef,omitzero"`
+  AncestorRef ParentReference `json:"ancestorRef"`
 
   // For Kubernetes API conventions, see:
   // https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#typical-status-properties
   // conditions represent the current state of the Backend resource.
   // Each condition has a unique type and reflects the status of a specific aspect of the resource.
-  // See BackendConditionType for defined condition types.
   //
   // The status of each condition is one of True, False, or Unknown.
   // +listType=map
