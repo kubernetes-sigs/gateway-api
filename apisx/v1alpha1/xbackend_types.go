@@ -194,8 +194,7 @@ type ExternalHostnameBackend struct {
 type EndpointSelectorBackend struct {
 	// Selector defines the label selector used to identify the set of pods whose
 	// IP addresses will make up the endpoints that this Backend should route
-	// traffic to. We make this an embedded struct to avoid stuttering in the API
-	// (i.e. `endpointSelector.selector`).
+	// traffic to.
 	//
 	// If this field is set, the endpoints are resolved automatically and stay up
 	// to date as pods matching the selector are added or removed; the user does
@@ -203,6 +202,9 @@ type EndpointSelectorBackend struct {
 	//
 	// <gateway:util:excludeFromCRD>
 	// Notes for implementers:
+	//
+	// This is an embedded struct to avoid stuttering in the API
+	// (i.e. `endpointSelector.selector`).
 	//
 	// Implementations MAY create a Service from the label selector for endpoint
 	// resolution until the upstream EndpointSelector resource (KEP-6116) is

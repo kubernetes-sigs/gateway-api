@@ -308,7 +308,6 @@ type LabelSelector struct {
 type EndpointSelectorBackend struct {
   // Selector defines the label selector used to identify the set of pods whose IP addresses
   // will make up the endpoints that this Backend should route traffic to.
-  // We make this an embedded struct to avoid stuttering in the API (i.e. `endpointSelector.selector`).
   //
   // If this field is set, the endpoints are resolved automatically and stay up to date as pods matching the
   // selector are added or removed; the user does not create or manage any separate endpoint resource.
@@ -325,6 +324,8 @@ type EndpointSelectorBackend struct {
   // Service as headless (clusterIP: None), since no ClusterIP or kube-proxy load balancing is needed.
   // Implementations MUST name the Service with generateName rather than a predictable name, so that a
   // name like <backend-name>-backend.svc.cluster.local does not become a relied-upon DNS entry.
+  //
+  // This is an embedded struct to avoid stuttering in the API (i.e. `endpointSelector.selector`).
   // </gateway:util:excludeFromCRD>
   //
   // +required
