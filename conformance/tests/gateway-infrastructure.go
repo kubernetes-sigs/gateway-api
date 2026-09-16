@@ -43,7 +43,6 @@ var GatewayInfrastructureMetadata = suite.ConformanceTest{
 		features.SupportGateway,
 		features.SupportGatewayInfrastructure,
 	},
-	Provisional: true,
 	Manifests: []string{
 		"tests/gateway-infrastructure.yaml",
 	},
