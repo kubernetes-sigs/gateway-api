@@ -85,10 +85,6 @@ Gateway API resources and policies may reference the following attributes. For e
 
 | Attribute | OTel Data Type |
 | --- | --- |
-| [service.name](https://opentelemetry.io/docs/specs/semconv/registry/attributes/service/#service-name) | string |
-| [service.namespace](https://opentelemetry.io/docs/specs/semconv/registry/attributes/service/#service-namespace) | string |
-| [service.version](https://opentelemetry.io/docs/specs/semconv/registry/attributes/service/#service-version) | string |
-| [service.instance.id](https://opentelemetry.io/docs/specs/semconv/registry/attributes/service/#service-instance-id) | string |
 | [k8s.cluster.name](https://opentelemetry.io/docs/specs/semconv/registry/attributes/k8s/#k8s-cluster-name) | string |
 | [k8s.cluster.uid](https://opentelemetry.io/docs/specs/semconv/registry/attributes/k8s/#k8s-cluster-uid) | string |
 
