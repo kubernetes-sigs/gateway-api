@@ -2,9 +2,10 @@ apiVersion: internal.gateway.networking.k8s.io/v1alpha1
 kind: GEPDetails
 number: 5093
 name: Gateway Address Routability
-status: Provisional
+status: Implementable
 authors:
   - usize
+  - rikatz
 relationships:
   obsoletes:
     - number: 1651
