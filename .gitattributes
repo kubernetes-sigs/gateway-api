@@ -11,4 +11,4 @@ apis/**/generated.proto linguist-generated=true
 config/crd/experimental/** linguist-generated=true
 config/crd/standard/** linguist-generated=true
 pkg/client/** linguist-generated=true
-
+api/openapi-spec/** linguist-generated=true
