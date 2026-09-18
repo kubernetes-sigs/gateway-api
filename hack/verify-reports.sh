@@ -18,6 +18,10 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
+# Pinned by tag@digest in hack/Dockerfile.markdown-link-check, kept up to date by Dependabot.
+MARKDOWN_LINK_CHECK_IMAGE="$(awk '/^FROM/{print $2}' "$(dirname "${BASH_SOURCE}")/Dockerfile.markdown-link-check")"
+readonly MARKDOWN_LINK_CHECK_IMAGE
+
 error() {
   echo "ERROR: $*" 1>&2
 }
@@ -92,7 +96,7 @@ do
             
                 if [[ -f "${implementation_dir}/README.md" ]]; then
                 # Check if the README.md has broken links
-                    docker run -v $(readlink -f "$implementation_dir"):/${implementation}:ro --rm -i ghcr.io/tcort/markdown-link-check:stable /${implementation}/README.md
+                    docker run -v $(readlink -f "$implementation_dir"):/${implementation}:ro --rm -i "${MARKDOWN_LINK_CHECK_IMAGE}" /${implementation}/README.md
                 else
                     error "missing README.md in ${implementation_dir}"
                     EXIT_VALUE=1

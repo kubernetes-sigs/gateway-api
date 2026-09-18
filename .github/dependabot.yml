@@ -50,6 +50,7 @@ updates:
       - "/conformance/mesh"
       - "/conformance/tests"
       - "/conformance/tests/mesh"
+      - "/hack" # markdown-link-check image used by hack/verify-reports.sh
     schedule:
       interval: "daily"
     ignore:
