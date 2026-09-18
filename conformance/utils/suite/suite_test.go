@@ -177,8 +177,14 @@ func TestGetAPIVersionAndChannel(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
+		options := ConformanceOptions{
+			ConfigurableOptions: ConfigurableOptions{
+				ExpectedAPIVersion: consts.BundleVersion,
+			},
+		}
+
 		t.Run(tc.name, func(t *testing.T) {
-			version, channel, err := getAPIVersionAndChannel(tc.crds)
+			version, channel, err := getAPIVersionAndChannel(&options, tc.crds)
 			assert.Equal(t, tc.expectedVersion, version)
 			assert.Equal(t, tc.expectedChannel, channel)
 			assert.Equal(t, tc.err, err)
