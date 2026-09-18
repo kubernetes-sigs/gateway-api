@@ -54,10 +54,8 @@ var HTTPRouteRewriteHost = confsuite.ConformanceTest{
 					Host: "rewrite.example",
 				},
 				ExpectedRequest: &http.ExpectedRequest{
-					Request: http.Request{
-						Path: "/one",
-						Host: "one.example.org",
-					},
+					Path: "/one",
+					Host: "one.example.org",
 				},
 				Backend:   confsuite.InfraBackendServiceNameV1,
 				Namespace: ns,
@@ -67,10 +65,8 @@ var HTTPRouteRewriteHost = confsuite.ConformanceTest{
 					Host: "rewrite.example",
 				},
 				ExpectedRequest: &http.ExpectedRequest{
-					Request: http.Request{
-						Path: "/two",
-						Host: "example.org",
-					},
+					Path: "/two",
+					Host: "example.org",
 				},
 				Backend:   confsuite.InfraBackendServiceNameV2,
 				Namespace: ns,
@@ -84,14 +80,12 @@ var HTTPRouteRewriteHost = confsuite.ConformanceTest{
 					},
 				},
 				ExpectedRequest: &http.ExpectedRequest{
-					Request: http.Request{
-						Path: "/rewrite-host-and-modify-headers",
-						Host: "test.example.org",
-						Headers: map[string]string{
-							"X-Header-Add":        "header-val-1",
-							"X-Header-Add-Append": "append-val-1,header-val-2",
-							"X-Header-Set":        "set-overwrites-values",
-						},
+					Path: "/rewrite-host-and-modify-headers",
+					Host: "test.example.org",
+					Headers: map[string]string{
+						"X-Header-Add":        "header-val-1",
+						"X-Header-Add-Append": "append-val-1,header-val-2",
+						"X-Header-Set":        "set-overwrites-values",
 					},
 					AbsentHeaders: []string{"X-Header-Remove"},
 				},

@@ -134,7 +134,6 @@ type ExpectedRequest struct {
 
 // Response defines expected properties of a response from a backend.
 type Response struct {
-	// Deprecated: Use StatusCodes instead, which supports matching against multiple status codes.
 	StatusCode  int
 	StatusCodes []int
 	Headers     map[string]string

@@ -40,6 +40,7 @@ type BackendStatusApplyConfiguration struct {
 	// for little benefit. It may also be unnecessarily complex for implementations to manage.
 	// If so, we'll remove the ancestor-based grouping and make it controller only.
 	// </gateway:util:excludeFromCRD>
+	//
 	Ancestors []BackendAncestorStatusApplyConfiguration `json:"parents,omitempty"`
 }
 

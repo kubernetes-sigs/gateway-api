@@ -129,11 +129,9 @@ var MeshGRPCRouteRequestHeaderModifier = suite.ConformanceTest{
 				exp := http.ExpectedResponse{
 					Request: req,
 					ExpectedRequest: &http.ExpectedRequest{
-						Request: http.Request{
-							Protocol: "grpc",
-							Host:     "echo:7070",
-							Headers:  tc.expectedHeaders,
-						},
+						Protocol:      "grpc",
+						Host:          "echo:7070",
+						Headers:       tc.expectedHeaders,
 						AbsentHeaders: tc.absentHeaders,
 					},
 					Response: http.Response{

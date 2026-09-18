@@ -19,7 +19,7 @@ linters:
     - gocheckcompilerdirectives
     - gochecksumtype
     - gocritic
-    - gomodguard
+    - gomodguard_v2
     - gosec
     - gosmopolitan
     - loggercheck
@@ -44,7 +44,7 @@ linters:
     - zerologlint
   # all available settings of specific linters
   settings:
-    gomodguard:
+    gomodguard_v2:
       blocked:
         # List of blocked modules.
         modules:

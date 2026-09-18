@@ -82,6 +82,7 @@ type GRPCRouteRuleApplyConfiguration struct {
 	// If ties still exist within the Route that has been given precedence,
 	// matching precedence MUST be granted to the first matching rule meeting
 	// the above criteria.
+	//
 	Matches []GRPCRouteMatchApplyConfiguration `json:"matches,omitempty"`
 	// Filters define the filters that are applied to requests that match
 	// this rule.
@@ -107,6 +108,7 @@ type GRPCRouteRuleApplyConfiguration struct {
 	// this configuration error.
 	//
 	// Support: Core
+	//
 	Filters []GRPCRouteFilterApplyConfiguration `json:"filters,omitempty"`
 	// BackendRefs defines the backend(s) where matching requests should be
 	// sent.
@@ -136,6 +138,7 @@ type GRPCRouteRuleApplyConfiguration struct {
 	// Support: Implementation-specific for any other resource
 	//
 	// Support for weight: Core
+	//
 	BackendRefs []GRPCBackendRefApplyConfiguration `json:"backendRefs,omitempty"`
 	// SessionPersistence defines and configures session persistence
 	// for the route rule.

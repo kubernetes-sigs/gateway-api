@@ -81,6 +81,7 @@ type HTTPRouteSpecApplyConfiguration struct {
 	// HTTPRouteMatches takes over.
 	//
 	// Support: Core
+	//
 	Hostnames []apisv1.Hostname `json:"hostnames,omitempty"`
 	// Rules are a list of HTTP matchers, filters and actions.
 	//

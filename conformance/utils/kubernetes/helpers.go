@@ -1733,7 +1733,7 @@ func GetGatewayProgrammedCondition() metav1.Condition {
 // NOTE: Used in Gateway API Inference Extension conformance.
 func DeleteHTTPRoute(t *testing.T, c client.Client, routeNN types.NamespacedName) {
 	httpRoute := &gatewayv1.HTTPRoute{
-		ObjectMeta: metav1.ObjectMeta{Name: routeNN.Name, Namespace: routeNN.Namespace},
+		Name: routeNN.Name, Namespace: routeNN.Namespace,
 	}
 	t.Logf("Deleting HTTPRoute %s", routeNN.String())
 	require.NoError(t, c.Delete(context.TODO(), httpRoute), "failed to delete httproute %s", routeNN.String())

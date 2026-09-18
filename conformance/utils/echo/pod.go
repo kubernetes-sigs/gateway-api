@@ -98,8 +98,7 @@ func makeRequestWithCount(t *testing.T, exp *http.ExpectedResponse, count int) [
 		exp.Request.Method = "GET"
 	}
 
-	// if the deprecated field StatusCode is set, append it to StatusCodes for backwards compatibility
-	//nolint:staticcheck
+	// if StatusCode is set, append it to StatusCodes for backwards compatibility
 	if exp.Response.StatusCode != 0 && !slices.Contains(exp.Response.StatusCodes, exp.Response.StatusCode) {
 		exp.Response.StatusCodes = append(exp.Response.StatusCodes, exp.Response.StatusCode)
 	}

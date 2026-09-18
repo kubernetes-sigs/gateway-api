@@ -29,6 +29,7 @@ import (
 // headers.
 type GRPCHeaderMatchApplyConfiguration struct {
 	// Type specifies how to match against the value of the header.
+	//
 	Type *apisv1.GRPCHeaderMatchType `json:"type,omitempty"`
 	// Name is the name of the gRPC Header to be matched.
 	//
@@ -39,6 +40,7 @@ type GRPCHeaderMatchApplyConfiguration struct {
 	// equivalent.
 	Name *apisv1.GRPCHeaderName `json:"name,omitempty"`
 	// Value is the value of the gRPC Header to be matched.
+	//
 	Value *string `json:"value,omitempty"`
 }
 

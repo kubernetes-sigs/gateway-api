@@ -54,23 +54,17 @@ var HTTPRouteRequestMultipleMirrors = confsuite.ConformanceTest{
 					Path: "/multi-mirror",
 				},
 				ExpectedRequest: &http.ExpectedRequest{
-					Request: http.Request{
-						Path: "/multi-mirror",
-					},
+					Path: "/multi-mirror",
 				},
 				Backend: confsuite.InfraBackendServiceNameV1,
 				MirroredTo: []http.MirroredBackend{
 					{
-						BackendRef: http.BackendRef{
-							Name:      confsuite.InfraBackendServiceNameV2,
-							Namespace: ns,
-						},
+						Name:      confsuite.InfraBackendServiceNameV2,
+						Namespace: ns,
 					},
 					{
-						BackendRef: http.BackendRef{
-							Name:      confsuite.InfraBackendServiceNameV3,
-							Namespace: ns,
-						},
+						Name:      confsuite.InfraBackendServiceNameV3,
+						Namespace: ns,
 					},
 				},
 				Namespace: ns,
@@ -83,13 +77,11 @@ var HTTPRouteRequestMultipleMirrors = confsuite.ConformanceTest{
 					},
 				},
 				ExpectedRequest: &http.ExpectedRequest{
-					Request: http.Request{
-						Path: "/multi-mirror-and-modify-request-headers",
-						Headers: map[string]string{
-							"X-Header-Add":        "header-val-1",
-							"X-Header-Add-Append": "append-val-1,header-val-2",
-							"X-Header-Set":        "set-overwrites-values",
-						},
+					Path: "/multi-mirror-and-modify-request-headers",
+					Headers: map[string]string{
+						"X-Header-Add":        "header-val-1",
+						"X-Header-Add-Append": "append-val-1,header-val-2",
+						"X-Header-Set":        "set-overwrites-values",
 					},
 					AbsentHeaders: []string{"X-Header-Remove"},
 				},
@@ -97,16 +89,12 @@ var HTTPRouteRequestMultipleMirrors = confsuite.ConformanceTest{
 				Backend:   confsuite.InfraBackendServiceNameV1,
 				MirroredTo: []http.MirroredBackend{
 					{
-						BackendRef: http.BackendRef{
-							Name:      confsuite.InfraBackendServiceNameV2,
-							Namespace: ns,
-						},
+						Name:      confsuite.InfraBackendServiceNameV2,
+						Namespace: ns,
 					},
 					{
-						BackendRef: http.BackendRef{
-							Name:      confsuite.InfraBackendServiceNameV3,
-							Namespace: ns,
-						},
+						Name:      confsuite.InfraBackendServiceNameV3,
+						Namespace: ns,
 					},
 				},
 			},

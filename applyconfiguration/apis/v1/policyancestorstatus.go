@@ -105,6 +105,7 @@ type PolicyAncestorStatusApplyConfiguration struct {
 	// if relevant.)
 	//
 	// </gateway:util:excludeFromCRD>
+	//
 	Conditions []metav1.ConditionApplyConfiguration `json:"conditions,omitempty"`
 }
 

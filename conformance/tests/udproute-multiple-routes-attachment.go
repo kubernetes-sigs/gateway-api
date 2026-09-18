@@ -67,10 +67,8 @@ var UDPRouteMultipleRoutesAttachment = confsuite.ConformanceTest{
 		time.Sleep(time.Second)
 
 		newerRoute := &v1alpha2.UDPRoute{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      newerRouteNN.Name,
-				Namespace: newerRouteNN.Namespace,
-			},
+			Name:      newerRouteNN.Name,
+			Namespace: newerRouteNN.Namespace,
 			Spec: v1alpha2.UDPRouteSpec{
 				CommonRouteSpec: gatewayv1.CommonRouteSpec{
 					ParentRefs: []gatewayv1.ParentReference{{
@@ -80,10 +78,8 @@ var UDPRouteMultipleRoutesAttachment = confsuite.ConformanceTest{
 				},
 				Rules: []v1alpha2.UDPRouteRule{{
 					BackendRefs: []gatewayv1.BackendRef{{
-						BackendObjectReference: gatewayv1.BackendObjectReference{
-							Name: gatewayv1.ObjectName("udp-attach-backend-2"),
-							Port: ptr.To(gatewayv1.PortNumber(8080)),
-						},
+						Name: gatewayv1.ObjectName("udp-attach-backend-2"),
+						Port: ptr.To(gatewayv1.PortNumber(8080)),
 					}},
 				}},
 			},

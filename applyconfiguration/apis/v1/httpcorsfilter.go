@@ -98,6 +98,7 @@ type HTTPCORSFilterApplyConfiguration struct {
 	// behavior).
 	//
 	// Support: Extended
+	//
 	AllowCredentials *bool `json:"allowCredentials,omitempty"`
 	// AllowMethods indicates which HTTP methods are supported for accessing the
 	// requested resource.
@@ -139,6 +140,7 @@ type HTTPCORSFilterApplyConfiguration struct {
 	// the gateway must omit the `Access-Control-Allow-Methods` response header.
 	//
 	// Support: Extended
+	//
 	AllowMethods []apisv1.HTTPMethodWithWildcard `json:"allowMethods,omitempty"`
 	// AllowHeaders indicates which HTTP request headers are supported for
 	// accessing the requested resource.
@@ -178,6 +180,7 @@ type HTTPCORSFilterApplyConfiguration struct {
 	// response header.
 	//
 	// Support: Extended
+	//
 	AllowHeaders []apisv1.HTTPHeaderName `json:"allowHeaders,omitempty"`
 	// ExposeHeaders indicates which HTTP response headers can be exposed
 	// to client-side scripts in response to a cross-origin request.
@@ -216,6 +219,7 @@ type HTTPCORSFilterApplyConfiguration struct {
 	// in the `Access-Control-Expose-Headers` response header.
 	//
 	// Support: Extended
+	//
 	ExposeHeaders []apisv1.HTTPHeaderName `json:"exposeHeaders,omitempty"`
 	// MaxAge indicates the duration (in seconds) for the client to cache the
 	// results of a "preflight" request.
@@ -229,6 +233,7 @@ type HTTPCORSFilterApplyConfiguration struct {
 	//
 	// When the `MaxAge` field is unspecified, the gateway sets the response
 	// header "Access-Control-Max-Age: 5" by default.
+	//
 	MaxAge *int32 `json:"maxAge,omitempty"`
 }
 

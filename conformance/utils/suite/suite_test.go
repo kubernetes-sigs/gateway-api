@@ -52,21 +52,17 @@ func TestGetAPIVersionAndChannel(t *testing.T) {
 			name: "properly installed Gateway API CRDs",
 			crds: []apiextensionsv1.CustomResourceDefinition{
 				{
-					ObjectMeta: metav1.ObjectMeta{
-						Name: "gateways.gateway.networking.k8s.io",
-						Annotations: map[string]string{
-							consts.BundleVersionAnnotation: consts.BundleVersion,
-							consts.ChannelAnnotation:       "standard",
-						},
+					Name: "gateways.gateway.networking.k8s.io",
+					Annotations: map[string]string{
+						consts.BundleVersionAnnotation: consts.BundleVersion,
+						consts.ChannelAnnotation:       "standard",
 					},
 				},
 				{
-					ObjectMeta: metav1.ObjectMeta{
-						Name: "httproutes.gateway.networking.k8s.io",
-						Annotations: map[string]string{
-							consts.BundleVersionAnnotation: consts.BundleVersion,
-							consts.ChannelAnnotation:       "standard",
-						},
+					Name: "httproutes.gateway.networking.k8s.io",
+					Annotations: map[string]string{
+						consts.BundleVersionAnnotation: consts.BundleVersion,
+						consts.ChannelAnnotation:       "standard",
 					},
 				},
 			},
@@ -77,27 +73,21 @@ func TestGetAPIVersionAndChannel(t *testing.T) {
 			name: "properly installed Gateway API CRDs, with additional CRDs",
 			crds: []apiextensionsv1.CustomResourceDefinition{
 				{
-					ObjectMeta: metav1.ObjectMeta{
-						Name: "gateways.gateway.networking.k8s.io",
-						Annotations: map[string]string{
-							consts.BundleVersionAnnotation: consts.BundleVersion,
-							consts.ChannelAnnotation:       "standard",
-						},
+					Name: "gateways.gateway.networking.k8s.io",
+					Annotations: map[string]string{
+						consts.BundleVersionAnnotation: consts.BundleVersion,
+						consts.ChannelAnnotation:       "standard",
 					},
 				},
 				{
-					ObjectMeta: metav1.ObjectMeta{
-						Name: "httproutes.gateway.networking.k8s.io",
-						Annotations: map[string]string{
-							consts.BundleVersionAnnotation: consts.BundleVersion,
-							consts.ChannelAnnotation:       "standard",
-						},
+					Name: "httproutes.gateway.networking.k8s.io",
+					Annotations: map[string]string{
+						consts.BundleVersionAnnotation: consts.BundleVersion,
+						consts.ChannelAnnotation:       "standard",
 					},
 				},
 				{
-					ObjectMeta: metav1.ObjectMeta{
-						Name: "crd.fake.group.k8s.io",
-					},
+					Name: "crd.fake.group.k8s.io",
 				},
 			},
 			expectedVersion: consts.BundleVersion,
@@ -107,21 +97,17 @@ func TestGetAPIVersionAndChannel(t *testing.T) {
 			name: "installed Gateway API CRDs having multiple versions",
 			crds: []apiextensionsv1.CustomResourceDefinition{
 				{
-					ObjectMeta: metav1.ObjectMeta{
-						Name: "gateways.gateway.networking.k8s.io",
-						Annotations: map[string]string{
-							consts.BundleVersionAnnotation: consts.BundleVersion,
-							consts.ChannelAnnotation:       "standard",
-						},
+					Name: "gateways.gateway.networking.k8s.io",
+					Annotations: map[string]string{
+						consts.BundleVersionAnnotation: consts.BundleVersion,
+						consts.ChannelAnnotation:       "standard",
 					},
 				},
 				{
-					ObjectMeta: metav1.ObjectMeta{
-						Name: "httproutes.gateway.networking.k8s.io",
-						Annotations: map[string]string{
-							consts.BundleVersionAnnotation: "v2.0.0",
-							consts.ChannelAnnotation:       "standard",
-						},
+					Name: "httproutes.gateway.networking.k8s.io",
+					Annotations: map[string]string{
+						consts.BundleVersionAnnotation: "v2.0.0",
+						consts.ChannelAnnotation:       "standard",
 					},
 				},
 			},
@@ -131,21 +117,17 @@ func TestGetAPIVersionAndChannel(t *testing.T) {
 			name: "installed Gateway API  CRDs having multiple channels",
 			crds: []apiextensionsv1.CustomResourceDefinition{
 				{
-					ObjectMeta: metav1.ObjectMeta{
-						Name: "gateways.gateway.networking.k8s.io",
-						Annotations: map[string]string{
-							consts.BundleVersionAnnotation: consts.BundleVersion,
-							consts.ChannelAnnotation:       "standard",
-						},
+					Name: "gateways.gateway.networking.k8s.io",
+					Annotations: map[string]string{
+						consts.BundleVersionAnnotation: consts.BundleVersion,
+						consts.ChannelAnnotation:       "standard",
 					},
 				},
 				{
-					ObjectMeta: metav1.ObjectMeta{
-						Name: "httproutes.gateway.networking.k8s.io",
-						Annotations: map[string]string{
-							consts.BundleVersionAnnotation: consts.BundleVersion,
-							consts.ChannelAnnotation:       "experimental",
-						},
+					Name: "httproutes.gateway.networking.k8s.io",
+					Annotations: map[string]string{
+						consts.BundleVersionAnnotation: consts.BundleVersion,
+						consts.ChannelAnnotation:       "experimental",
 					},
 				},
 			},
@@ -155,20 +137,16 @@ func TestGetAPIVersionAndChannel(t *testing.T) {
 			name: "installed Gateway API CRDs having partial annotations",
 			crds: []apiextensionsv1.CustomResourceDefinition{
 				{
-					ObjectMeta: metav1.ObjectMeta{
-						Name: "gateways.gateway.networking.k8s.io",
-						Annotations: map[string]string{
-							consts.BundleVersionAnnotation: consts.BundleVersion,
-							consts.ChannelAnnotation:       "standard",
-						},
+					Name: "gateways.gateway.networking.k8s.io",
+					Annotations: map[string]string{
+						consts.BundleVersionAnnotation: consts.BundleVersion,
+						consts.ChannelAnnotation:       "standard",
 					},
 				},
 				{
-					ObjectMeta: metav1.ObjectMeta{
-						Name: "httproutes.gateway.networking.k8s.io",
-						Annotations: map[string]string{
-							consts.BundleVersionAnnotation: consts.BundleVersion,
-						},
+					Name: "httproutes.gateway.networking.k8s.io",
+					Annotations: map[string]string{
+						consts.BundleVersionAnnotation: consts.BundleVersion,
 					},
 				},
 			},
@@ -268,12 +246,8 @@ func TestSuiteReport(t *testing.T) {
 							},
 						},
 						Extended: &confv1.ExtendedStatus{
-							Status: confv1.Status{
-								Result: confv1.Success,
-								Statistics: confv1.Statistics{
-									Passed: 2,
-								},
-							},
+							Result:            confv1.Success,
+							Passed:            2,
 							SupportedFeatures: []string{string(extendedFeature)},
 						},
 					},
@@ -325,14 +299,10 @@ func TestSuiteReport(t *testing.T) {
 							},
 						},
 						Extended: &confv1.ExtendedStatus{
-							Status: confv1.Status{
-								Result: confv1.Partial,
-								Statistics: confv1.Statistics{
-									Skipped: 1,
-								},
-								SkippedTests: []string{
-									extendedTest.ShortName,
-								},
+							Result:  confv1.Partial,
+							Skipped: 1,
+							SkippedTests: []string{
+								extendedTest.ShortName,
 							},
 							SupportedFeatures: []string{string(extendedFeature)},
 						},
@@ -381,12 +351,8 @@ func TestSuiteReport(t *testing.T) {
 							},
 						},
 						Extended: &confv1.ExtendedStatus{
-							Status: confv1.Status{
-								Result: confv1.Success,
-								Statistics: confv1.Statistics{
-									Passed: 1,
-								},
-							},
+							Result:            confv1.Success,
+							Passed:            1,
 							SupportedFeatures: []string{string(extendedFeature)},
 						},
 					},
@@ -500,9 +466,7 @@ func TestInferGWCSupportedFeatures(t *testing.T) {
 
 	gwcName := "ochopintre"
 	gwc := &gatewayv1.GatewayClass{
-		ObjectMeta: metav1.ObjectMeta{
-			Name: gwcName,
-		},
+		Name: gwcName,
 		Spec: gatewayv1.GatewayClassSpec{
 			ControllerName: "example.com/gateway-controller",
 		},
@@ -529,15 +493,13 @@ func TestInferGWCSupportedFeatures(t *testing.T) {
 
 	for _, tc := range testCases {
 		options := ConformanceOptions{
-			ConfigurableOptions: ConfigurableOptions{
-				AllowCRDsMismatch:          true,
-				GatewayClassName:           gwcName,
-				EnableAllSupportedFeatures: tc.allowAllFeatures,
-				SupportedFeatures:          tc.supportedFeatures,
-				ExemptFeatures:             tc.exemptFeatures,
-				ConformanceProfiles:        tc.ConformanceProfile,
-			},
-			Client: fakeClient,
+			AllowCRDsMismatch:          true,
+			GatewayClassName:           gwcName,
+			EnableAllSupportedFeatures: tc.allowAllFeatures,
+			SupportedFeatures:          tc.supportedFeatures,
+			ExemptFeatures:             tc.exemptFeatures,
+			ConformanceProfiles:        tc.ConformanceProfile,
+			Client:                     fakeClient,
 		}
 
 		t.Run(tc.name, func(t *testing.T) {
@@ -578,8 +540,8 @@ func TestNewConformanceTestSuiteWebSocketDialer(t *testing.T) {
 	gatewayv1.Install(scheme)
 	apiextensionsv1.AddToScheme(scheme)
 	gwc := &gatewayv1.GatewayClass{
-		ObjectMeta: metav1.ObjectMeta{Name: "gateway-conformance"},
-		Spec:       gatewayv1.GatewayClassSpec{ControllerName: "example.com/gateway-controller"},
+		Name: "gateway-conformance",
+		Spec: gatewayv1.GatewayClassSpec{ControllerName: "example.com/gateway-controller"},
 	}
 	fakeClient := fake.NewClientBuilder().
 		WithScheme(scheme).
@@ -590,13 +552,11 @@ func TestNewConformanceTestSuiteWebSocketDialer(t *testing.T) {
 	newSuite := func(t *testing.T, dialer websocket.Dialer) *ConformanceTestSuite {
 		t.Helper()
 		cSuite, err := NewConformanceTestSuite(ConformanceOptions{
-			ConfigurableOptions: ConfigurableOptions{
-				AllowCRDsMismatch:          true,
-				GatewayClassName:           "gateway-conformance",
-				EnableAllSupportedFeatures: true,
-			},
-			Client:          fakeClient,
-			WebSocketDialer: dialer,
+			AllowCRDsMismatch:          true,
+			GatewayClassName:           "gateway-conformance",
+			EnableAllSupportedFeatures: true,
+			Client:                     fakeClient,
+			WebSocketDialer:            dialer,
 		})
 		if err != nil {
 			t.Fatalf("error initializing conformance suite: %v", err)
@@ -670,9 +630,7 @@ func TestXMeshInferSupportedFeatures(t *testing.T) {
 
 	meshName := "xochopintre"
 	xmesh := &xmeshv1alpha1.XMesh{
-		ObjectMeta: metav1.ObjectMeta{
-			Name: meshName,
-		},
+		Name: meshName,
 		Spec: xmeshv1alpha1.MeshSpec{
 			ControllerName: "example.com/mesh-controller",
 		},
@@ -699,15 +657,13 @@ func TestXMeshInferSupportedFeatures(t *testing.T) {
 
 	for _, tc := range testCases {
 		options := ConformanceOptions{
-			ConfigurableOptions: ConfigurableOptions{
-				AllowCRDsMismatch:          true,
-				MeshName:                   meshName,
-				EnableAllSupportedFeatures: tc.allowAllFeatures,
-				SupportedFeatures:          tc.supportedFeatures,
-				ExemptFeatures:             tc.exemptFeatures,
-				ConformanceProfiles:        tc.ConformanceProfile,
-			},
-			Client: fakeClient,
+			AllowCRDsMismatch:          true,
+			MeshName:                   meshName,
+			EnableAllSupportedFeatures: tc.allowAllFeatures,
+			SupportedFeatures:          tc.supportedFeatures,
+			ExemptFeatures:             tc.exemptFeatures,
+			ConformanceProfiles:        tc.ConformanceProfile,
+			Client:                     fakeClient,
 		}
 
 		t.Run(tc.name, func(t *testing.T) {
@@ -730,9 +686,7 @@ func TestXMeshInferSupportedFeatures(t *testing.T) {
 func TestGWCPublishedMeshFeatures(t *testing.T) {
 	gwcName := "ochopintre"
 	gwc := &gatewayv1.GatewayClass{
-		ObjectMeta: metav1.ObjectMeta{
-			Name: gwcName,
-		},
+		Name: gwcName,
 		Spec: gatewayv1.GatewayClassSpec{
 			ControllerName: "example.com/gateway-controller",
 		},
@@ -762,11 +716,9 @@ func TestGWCPublishedMeshFeatures(t *testing.T) {
 		Build()
 
 	options := ConformanceOptions{
-		ConfigurableOptions: ConfigurableOptions{
-			AllowCRDsMismatch: true,
-			GatewayClassName:  gwcName,
-		},
-		Client: fakeClient,
+		AllowCRDsMismatch: true,
+		GatewayClassName:  gwcName,
+		Client:            fakeClient,
 	}
 
 	suite, err := NewConformanceTestSuite(options)

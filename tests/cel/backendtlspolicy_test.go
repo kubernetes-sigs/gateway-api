@@ -39,40 +39,30 @@ func TestBackendTLSPolicyTargetRefs(t *testing.T) {
 			name:       "invalid because duplicate target refs without section name",
 			wantErrors: []string{"sectionName must be unique when targetRefs includes 2 or more references to the same target"},
 			targetRefs: []gatewayv1.LocalPolicyTargetReferenceWithSectionName{{
-				LocalPolicyTargetReference: gatewayv1.LocalPolicyTargetReference{
-					Group: gatewayv1.Group(corev1.GroupName),
-					Kind:  gatewayv1.Kind("Service"),
-					Name:  "example",
-				},
+				Group: gatewayv1.Group(corev1.GroupName),
+				Kind:  gatewayv1.Kind("Service"),
+				Name:  "example",
 			}, {
-				LocalPolicyTargetReference: gatewayv1.LocalPolicyTargetReference{
-					Group: gatewayv1.Group(corev1.GroupName),
-					Kind:  gatewayv1.Kind("Service"),
-					Name:  "example",
-				},
+				Group: gatewayv1.Group(corev1.GroupName),
+				Kind:  gatewayv1.Kind("Service"),
+				Name:  "example",
 			}},
 		},
 		{
 			name:       "invalid because duplicate target refs with only one section name",
 			wantErrors: []string{"sectionName must be specified when targetRefs includes 2 or more references to the same target"},
 			targetRefs: []gatewayv1.LocalPolicyTargetReferenceWithSectionName{{
-				LocalPolicyTargetReference: gatewayv1.LocalPolicyTargetReference{
-					Group: gatewayv1.Group(corev1.GroupName),
-					Kind:  gatewayv1.Kind("Service"),
-					Name:  "example",
-				},
+				Group: gatewayv1.Group(corev1.GroupName),
+				Kind:  gatewayv1.Kind("Service"),
+				Name:  "example",
 			}, {
-				LocalPolicyTargetReference: gatewayv1.LocalPolicyTargetReference{
-					Group: gatewayv1.Group(corev1.GroupName),
-					Kind:  gatewayv1.Kind("Service"),
-					Name:  "example2",
-				},
+				Group: gatewayv1.Group(corev1.GroupName),
+				Kind:  gatewayv1.Kind("Service"),
+				Name:  "example2",
 			}, {
-				LocalPolicyTargetReference: gatewayv1.LocalPolicyTargetReference{
-					Group: gatewayv1.Group(corev1.GroupName),
-					Kind:  gatewayv1.Kind("Service"),
-					Name:  "example",
-				},
+				Group:       gatewayv1.Group(corev1.GroupName),
+				Kind:        gatewayv1.Kind("Service"),
+				Name:        "example",
 				SectionName: new(gatewayv1.SectionName("foo")),
 			}},
 		},
@@ -80,25 +70,19 @@ func TestBackendTLSPolicyTargetRefs(t *testing.T) {
 			name:       "invalid because duplicate target refs with duplicate section names",
 			wantErrors: []string{"sectionName must be unique when targetRefs includes 2 or more references to the same target"},
 			targetRefs: []gatewayv1.LocalPolicyTargetReferenceWithSectionName{{
-				LocalPolicyTargetReference: gatewayv1.LocalPolicyTargetReference{
-					Group: gatewayv1.Group(corev1.GroupName),
-					Kind:  gatewayv1.Kind("Service"),
-					Name:  "example",
-				},
+				Group:       gatewayv1.Group(corev1.GroupName),
+				Kind:        gatewayv1.Kind("Service"),
+				Name:        "example",
 				SectionName: new(gatewayv1.SectionName("foo")),
 			}, {
-				LocalPolicyTargetReference: gatewayv1.LocalPolicyTargetReference{
-					Group: gatewayv1.Group(corev1.GroupName),
-					Kind:  gatewayv1.Kind("Service"),
-					Name:  "example",
-				},
+				Group:       gatewayv1.Group(corev1.GroupName),
+				Kind:        gatewayv1.Kind("Service"),
+				Name:        "example",
 				SectionName: new(gatewayv1.SectionName("bar")),
 			}, {
-				LocalPolicyTargetReference: gatewayv1.LocalPolicyTargetReference{
-					Group: gatewayv1.Group(corev1.GroupName),
-					Kind:  gatewayv1.Kind("Service"),
-					Name:  "example",
-				},
+				Group:       gatewayv1.Group(corev1.GroupName),
+				Kind:        gatewayv1.Kind("Service"),
+				Name:        "example",
 				SectionName: new(gatewayv1.SectionName("foo")),
 			}},
 		},
@@ -106,22 +90,18 @@ func TestBackendTLSPolicyTargetRefs(t *testing.T) {
 			name:       "valid single targetRef without sectionName",
 			wantErrors: []string{},
 			targetRefs: []gatewayv1.LocalPolicyTargetReferenceWithSectionName{{
-				LocalPolicyTargetReference: gatewayv1.LocalPolicyTargetReference{
-					Group: gatewayv1.Group(corev1.GroupName),
-					Kind:  gatewayv1.Kind("Service"),
-					Name:  "example",
-				},
+				Group: gatewayv1.Group(corev1.GroupName),
+				Kind:  gatewayv1.Kind("Service"),
+				Name:  "example",
 			}},
 		},
 		{
 			name:       "valid single targetRef with sectionName",
 			wantErrors: []string{},
 			targetRefs: []gatewayv1.LocalPolicyTargetReferenceWithSectionName{{
-				LocalPolicyTargetReference: gatewayv1.LocalPolicyTargetReference{
-					Group: gatewayv1.Group(corev1.GroupName),
-					Kind:  gatewayv1.Kind("Service"),
-					Name:  "example",
-				},
+				Group:       gatewayv1.Group(corev1.GroupName),
+				Kind:        gatewayv1.Kind("Service"),
+				Name:        "example",
 				SectionName: new(gatewayv1.SectionName("foo")),
 			}},
 		},
@@ -129,25 +109,19 @@ func TestBackendTLSPolicyTargetRefs(t *testing.T) {
 			name:       "valid because duplicate target refs with different section names",
 			wantErrors: []string{},
 			targetRefs: []gatewayv1.LocalPolicyTargetReferenceWithSectionName{{
-				LocalPolicyTargetReference: gatewayv1.LocalPolicyTargetReference{
-					Group: gatewayv1.Group(corev1.GroupName),
-					Kind:  gatewayv1.Kind("Service"),
-					Name:  "example",
-				},
+				Group:       gatewayv1.Group(corev1.GroupName),
+				Kind:        gatewayv1.Kind("Service"),
+				Name:        "example",
 				SectionName: new(gatewayv1.SectionName("foo")),
 			}, {
-				LocalPolicyTargetReference: gatewayv1.LocalPolicyTargetReference{
-					Group: gatewayv1.Group(corev1.GroupName),
-					Kind:  gatewayv1.Kind("Service"),
-					Name:  "example",
-				},
+				Group:       gatewayv1.Group(corev1.GroupName),
+				Kind:        gatewayv1.Kind("Service"),
+				Name:        "example",
 				SectionName: new(gatewayv1.SectionName("bar")),
 			}, {
-				LocalPolicyTargetReference: gatewayv1.LocalPolicyTargetReference{
-					Group: gatewayv1.Group(corev1.GroupName),
-					Kind:  gatewayv1.Kind("Service"),
-					Name:  "example",
-				},
+				Group:       gatewayv1.Group(corev1.GroupName),
+				Kind:        gatewayv1.Kind("Service"),
+				Name:        "example",
 				SectionName: new(gatewayv1.SectionName("jin")),
 			}},
 		},
@@ -155,25 +129,19 @@ func TestBackendTLSPolicyTargetRefs(t *testing.T) {
 			name:       "valid because duplicate target refs with different names",
 			wantErrors: []string{},
 			targetRefs: []gatewayv1.LocalPolicyTargetReferenceWithSectionName{{
-				LocalPolicyTargetReference: gatewayv1.LocalPolicyTargetReference{
-					Group: gatewayv1.Group(corev1.GroupName),
-					Kind:  gatewayv1.Kind("Service"),
-					Name:  "example",
-				},
+				Group:       gatewayv1.Group(corev1.GroupName),
+				Kind:        gatewayv1.Kind("Service"),
+				Name:        "example",
 				SectionName: new(gatewayv1.SectionName("foo")),
 			}, {
-				LocalPolicyTargetReference: gatewayv1.LocalPolicyTargetReference{
-					Group: gatewayv1.Group(corev1.GroupName),
-					Kind:  gatewayv1.Kind("Service"),
-					Name:  "example2",
-				},
+				Group:       gatewayv1.Group(corev1.GroupName),
+				Kind:        gatewayv1.Kind("Service"),
+				Name:        "example2",
 				SectionName: new(gatewayv1.SectionName("foo")),
 			}, {
-				LocalPolicyTargetReference: gatewayv1.LocalPolicyTargetReference{
-					Group: gatewayv1.Group(corev1.GroupName),
-					Kind:  gatewayv1.Kind("Service"),
-					Name:  "example3",
-				},
+				Group:       gatewayv1.Group(corev1.GroupName),
+				Kind:        gatewayv1.Kind("Service"),
+				Name:        "example3",
 				SectionName: new(gatewayv1.SectionName("foo")),
 			}},
 		},
@@ -181,18 +149,14 @@ func TestBackendTLSPolicyTargetRefs(t *testing.T) {
 			name:       "valid because duplicate target refs with different kinds",
 			wantErrors: []string{},
 			targetRefs: []gatewayv1.LocalPolicyTargetReferenceWithSectionName{{
-				LocalPolicyTargetReference: gatewayv1.LocalPolicyTargetReference{
-					Group: gatewayv1.Group(corev1.GroupName),
-					Kind:  gatewayv1.Kind("Service"),
-					Name:  "example",
-				},
+				Group:       gatewayv1.Group(corev1.GroupName),
+				Kind:        gatewayv1.Kind("Service"),
+				Name:        "example",
 				SectionName: new(gatewayv1.SectionName("foo")),
 			}, {
-				LocalPolicyTargetReference: gatewayv1.LocalPolicyTargetReference{
-					Group: gatewayv1.Group(corev1.GroupName),
-					Kind:  gatewayv1.Kind("NotService"),
-					Name:  "example",
-				},
+				Group:       gatewayv1.Group(corev1.GroupName),
+				Kind:        gatewayv1.Kind("NotService"),
+				Name:        "example",
 				SectionName: new(gatewayv1.SectionName("foo")),
 			}},
 		},
@@ -200,18 +164,14 @@ func TestBackendTLSPolicyTargetRefs(t *testing.T) {
 			name:       "valid because duplicate target refs with different groups",
 			wantErrors: []string{},
 			targetRefs: []gatewayv1.LocalPolicyTargetReferenceWithSectionName{{
-				LocalPolicyTargetReference: gatewayv1.LocalPolicyTargetReference{
-					Group: gatewayv1.Group(corev1.GroupName),
-					Kind:  gatewayv1.Kind("Service"),
-					Name:  "example",
-				},
+				Group:       gatewayv1.Group(corev1.GroupName),
+				Kind:        gatewayv1.Kind("Service"),
+				Name:        "example",
 				SectionName: new(gatewayv1.SectionName("foo")),
 			}, {
-				LocalPolicyTargetReference: gatewayv1.LocalPolicyTargetReference{
-					Group: gatewayv1.Group("svc.other.io"),
-					Kind:  gatewayv1.Kind("Service"),
-					Name:  "example",
-				},
+				Group:       gatewayv1.Group("svc.other.io"),
+				Kind:        gatewayv1.Kind("Service"),
+				Name:        "example",
 				SectionName: new(gatewayv1.SectionName("foo")),
 			}},
 		},
@@ -219,10 +179,8 @@ func TestBackendTLSPolicyTargetRefs(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			policy := &gatewayv1.BackendTLSPolicy{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      fmt.Sprintf("foo-%v", time.Now().UnixNano()),
-					Namespace: metav1.NamespaceDefault,
-				},
+				Name:      fmt.Sprintf("foo-%v", time.Now().UnixNano()),
+				Namespace: metav1.NamespaceDefault,
 				Spec: gatewayv1.BackendTLSPolicySpec{
 					TargetRefs: tc.targetRefs,
 					Validation: gatewayv1.BackendTLSPolicyValidation{
@@ -497,18 +455,14 @@ func TestBackendTLSPolicyValidation(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			policy := &gatewayv1.BackendTLSPolicy{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      fmt.Sprintf("foo-%v", time.Now().UnixNano()),
-					Namespace: metav1.NamespaceDefault,
-				},
+				Name:      fmt.Sprintf("foo-%v", time.Now().UnixNano()),
+				Namespace: metav1.NamespaceDefault,
 				Spec: gatewayv1.BackendTLSPolicySpec{
 					TargetRefs: []gatewayv1.LocalPolicyTargetReferenceWithSectionName{
 						{
-							LocalPolicyTargetReference: gatewayv1.LocalPolicyTargetReference{
-								Group: "group",
-								Kind:  "kind",
-								Name:  "name",
-							},
+							Group: "group",
+							Kind:  "kind",
+							Name:  "name",
 							// SectionName cannot contain capital letters.
 							SectionName: new(gatewayv1.SectionName("section")),
 						},
