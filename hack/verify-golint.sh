@@ -18,8 +18,11 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-readonly VERSION="v2.13.2"
 readonly KUBE_ROOT=$(dirname "${BASH_SOURCE}")/..
+
+# Pinned by tag@digest in hack/Dockerfile.golangci-lint, kept up to date by Dependabot.
+GOLANGCI_LINT_IMAGE="$(awk '/^FROM/{print $2}' "${KUBE_ROOT}/hack/Dockerfile.golangci-lint")"
+readonly GOLANGCI_LINT_IMAGE
 
 cd "${KUBE_ROOT}"
 
@@ -44,7 +47,7 @@ for module in $(find . -name "go.mod" | xargs -n1 dirname); do
     -e GOFLAGS="-buildvcs=false" \
     -e GOOS="js" \
     -e GOARCH="wasm" \
-    "golangci/golangci-lint:$VERSION" \
+    "${GOLANGCI_LINT_IMAGE}" \
     golangci-lint run ./... || failed=true
 done
 
