@@ -79,8 +79,10 @@ type GatewayStatusApplyConfiguration struct {
 	// the implementation's copy of the object is stale and an update will be re-triggered
 	// if relevant.)
 	// </gateway:util:excludeFromCRD>
+	//
 	Conditions []metav1.ConditionApplyConfiguration `json:"conditions,omitempty"`
 	// Listeners provide status for each unique listener port defined in the Spec.
+	//
 	Listeners []ListenerStatusApplyConfiguration `json:"listeners,omitempty"`
 	// AttachedListenerSets represents the total number of ListenerSets that have been
 	// successfully attached to this Gateway.

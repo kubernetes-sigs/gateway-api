@@ -50,6 +50,7 @@ type HTTPRouteTimeoutsApplyConfiguration struct {
 	// field is unspecified, request timeout behavior is implementation-specific.
 	//
 	// Support: Extended
+	//
 	Request *apisv1.Duration `json:"request,omitempty"`
 	// BackendRequest specifies a timeout for an individual request from the gateway
 	// to a backend. This covers the time from when the request first starts being
@@ -70,6 +71,7 @@ type HTTPRouteTimeoutsApplyConfiguration struct {
 	// Request timeout (since the Request timeout encompasses the BackendRequest timeout).
 	//
 	// Support: Extended
+	//
 	BackendRequest *apisv1.Duration `json:"backendRequest,omitempty"`
 }
 

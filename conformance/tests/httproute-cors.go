@@ -70,12 +70,10 @@ var HTTPRouteCORS = confsuite.ConformanceTest{
 				// The response body is empty because the request is a preflight request,
 				// so we can't get the request properties from the echoserver.
 				ExpectedRequest: &http.ExpectedRequest{
-					Request: http.Request{
-						Host:    "",
-						Method:  "OPTIONS",
-						Path:    "",
-						Headers: nil,
-					},
+					Host:    "",
+					Method:  "OPTIONS",
+					Path:    "",
+					Headers: nil,
 				},
 				Namespace: "",
 				Response: http.Response{
@@ -118,12 +116,10 @@ var HTTPRouteCORS = confsuite.ConformanceTest{
 				// The response body is empty because the request is a preflight request,
 				// so we can't get the request properties from the echoserver.
 				ExpectedRequest: &http.ExpectedRequest{
-					Request: http.Request{
-						Host:    "",
-						Method:  "OPTIONS",
-						Path:    "",
-						Headers: nil,
-					},
+					Host:    "",
+					Method:  "OPTIONS",
+					Path:    "",
+					Headers: nil,
 				},
 				Namespace: "",
 				Response: http.Response{
@@ -166,12 +162,10 @@ var HTTPRouteCORS = confsuite.ConformanceTest{
 				// The response body is empty because the request is a preflight request,
 				// so we can't get the request properties from the echoserver.
 				ExpectedRequest: &http.ExpectedRequest{
-					Request: http.Request{
-						Host:    "",
-						Method:  "OPTIONS",
-						Path:    "",
-						Headers: nil,
-					},
+					Host:    "",
+					Method:  "OPTIONS",
+					Path:    "",
+					Headers: nil,
 				},
 				Namespace: "",
 				Response: http.Response{
@@ -213,12 +207,10 @@ var HTTPRouteCORS = confsuite.ConformanceTest{
 				// The response body is empty because the request is a preflight request,
 				// so we can't get the request properties from the echoserver.
 				ExpectedRequest: &http.ExpectedRequest{
-					Request: http.Request{
-						Host:    "",
-						Method:  "OPTIONS",
-						Path:    "",
-						Headers: nil,
-					},
+					Host:    "",
+					Method:  "OPTIONS",
+					Path:    "",
+					Headers: nil,
 				},
 				Namespace: "",
 				Response: http.Response{
@@ -298,12 +290,10 @@ var HTTPRouteCORS = confsuite.ConformanceTest{
 				// The response body is empty because the request is a preflight request,
 				// so we can't get the request properties from the echoserver.
 				ExpectedRequest: &http.ExpectedRequest{
-					Request: http.Request{
-						Host:    "",
-						Method:  "OPTIONS",
-						Path:    "",
-						Headers: nil,
-					},
+					Host:    "",
+					Method:  "OPTIONS",
+					Path:    "",
+					Headers: nil,
 				},
 				Namespace: "",
 				Response: http.Response{
@@ -332,12 +322,10 @@ var HTTPRouteCORS = confsuite.ConformanceTest{
 				// The response body is empty because the request is a preflight request,
 				// so we can't get the request properties from the echoserver.
 				ExpectedRequest: &http.ExpectedRequest{
-					Request: http.Request{
-						Host:    "",
-						Method:  "OPTIONS",
-						Path:    "",
-						Headers: nil,
-					},
+					Host:    "",
+					Method:  "OPTIONS",
+					Path:    "",
+					Headers: nil,
 				},
 				Namespace: "",
 				Response: http.Response{
@@ -357,12 +345,10 @@ var HTTPRouteCORS = confsuite.ConformanceTest{
 					},
 				},
 				ExpectedRequest: &http.ExpectedRequest{
-					Request: http.Request{
-						Host:    "",
-						Method:  "OPTIONS",
-						Path:    "",
-						Headers: nil,
-					},
+					Host:    "",
+					Method:  "OPTIONS",
+					Path:    "",
+					Headers: nil,
 				},
 				Response: http.Response{
 					StatusCodes: []int{200, 204},
@@ -391,12 +377,10 @@ var HTTPRouteCORS = confsuite.ConformanceTest{
 					},
 				},
 				ExpectedRequest: &http.ExpectedRequest{
-					Request: http.Request{
-						Host:    "",
-						Method:  "OPTIONS",
-						Path:    "",
-						Headers: nil,
-					},
+					Host:    "",
+					Method:  "OPTIONS",
+					Path:    "",
+					Headers: nil,
 				},
 				Response: http.Response{
 					StatusCodes: []int{200, 204},
@@ -476,12 +460,10 @@ var HTTPRouteCORS = confsuite.ConformanceTest{
 				// The response body is empty because the request is a preflight request,
 				// so we can't get the request properties from the echoserver.
 				ExpectedRequest: &http.ExpectedRequest{
-					Request: http.Request{
-						Host:    "",
-						Method:  "OPTIONS",
-						Path:    "",
-						Headers: nil,
-					},
+					Host:    "",
+					Method:  "OPTIONS",
+					Path:    "",
+					Headers: nil,
 				},
 				Namespace: "",
 				Response: http.Response{
@@ -516,12 +498,10 @@ var HTTPRouteCORS = confsuite.ConformanceTest{
 				// The response body is empty because the request is a preflight request,
 				// so we can't get the request properties from the echoserver.
 				ExpectedRequest: &http.ExpectedRequest{
-					Request: http.Request{
-						Host:    "",
-						Method:  "OPTIONS",
-						Path:    "",
-						Headers: nil,
-					},
+					Host:    "",
+					Method:  "OPTIONS",
+					Path:    "",
+					Headers: nil,
 				},
 				Namespace: "",
 				Response: http.Response{

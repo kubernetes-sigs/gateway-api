@@ -25,7 +25,6 @@ import (
 	"github.com/stretchr/testify/require"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/yaml"
@@ -203,15 +202,15 @@ func TestDeleteAndWaitBlocksUntilGone(t *testing.T) {
 	}{
 		{
 			name: "namespace held by a finalizer",
-			obj: &corev1.Namespace{ObjectMeta: metav1.ObjectMeta{
+			obj: &corev1.Namespace{
 				Name: "conformance-ns", Finalizers: []string{"conformance.gateway-api/test"},
-			}},
+			},
 		},
 		{
 			name: "namespaced resource held by a finalizer",
-			obj: &corev1.ConfigMap{ObjectMeta: metav1.ObjectMeta{
+			obj: &corev1.ConfigMap{
 				Name: "held", Namespace: "default", Finalizers: []string{"conformance.gateway-api/test"},
-			}},
+			},
 		},
 	}
 

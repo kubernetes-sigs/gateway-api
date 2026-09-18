@@ -24,6 +24,7 @@ package v1alpha1
 // RetryConstraint defines the configuration for when to retry a request.
 type RetryConstraintApplyConfiguration struct {
 	// Budget holds the details of the retry budget configuration.
+	//
 	Budget *BudgetDetailsApplyConfiguration `json:"budget,omitempty"`
 	// MinRetryRate defines the minimum rate of retries that will be allowable
 	// over a specified duration of time.
@@ -37,6 +38,7 @@ type RetryConstraintApplyConfiguration struct {
 	// value.
 	//
 	// Support: Extended
+	//
 	MinRetryRate *RequestRateApplyConfiguration `json:"minRetryRate,omitempty"`
 }
 

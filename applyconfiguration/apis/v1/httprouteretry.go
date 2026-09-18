@@ -34,6 +34,7 @@ type HTTPRouteRetryApplyConfiguration struct {
 	// should be retried.
 	//
 	// Support: Extended
+	//
 	Codes []apisv1.HTTPRouteRetryStatusCode `json:"codes,omitempty"`
 	// Attempts specifies the maximum number of times an individual request
 	// from the gateway to a backend should be retried.
@@ -45,6 +46,7 @@ type HTTPRouteRetryApplyConfiguration struct {
 	// a backend request is implementation-specific.
 	//
 	// Support: Extended
+	//
 	Attempts *int `json:"attempts,omitempty"`
 	// Backoff specifies the minimum duration a Gateway should wait between
 	// retry attempts and is represented in Gateway API Duration formatting.
@@ -82,6 +84,7 @@ type HTTPRouteRetryApplyConfiguration struct {
 	// is implementation-specific.
 	//
 	// Support: Extended
+	//
 	Backoff *apisv1.Duration `json:"backoff,omitempty"`
 }
 

@@ -35,6 +35,7 @@ type GatewayClassSpecApplyConfiguration struct {
 	// This field is not mutable and cannot be empty.
 	//
 	// Support: Core
+	//
 	ControllerName *apisv1.GatewayController `json:"controllerName,omitempty"`
 	// ParametersRef is a reference to a resource that contains the configuration
 	// parameters corresponding to the GatewayClass. This is optional if the
@@ -54,8 +55,10 @@ type GatewayClassSpecApplyConfiguration struct {
 	// It is generally recommended that GatewayClass provides defaults that can be overridden by a Gateway.
 	//
 	// Support: Implementation-specific
+	//
 	ParametersRef *ParametersReferenceApplyConfiguration `json:"parametersRef,omitempty"`
 	// Description helps describe a GatewayClass with more details.
+	//
 	Description *string `json:"description,omitempty"`
 }
 

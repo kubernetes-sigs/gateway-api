@@ -30,6 +30,7 @@ type ReferenceGrantSpecApplyConfiguration struct {
 	// this another way, entries MUST be combined using OR.
 	//
 	// Support: Core
+	//
 	From []ReferenceGrantFromApplyConfiguration `json:"from,omitempty"`
 	// To describes the resources that may be referenced by the resources
 	// described in "From". Each entry in this list MUST be considered to be an
@@ -37,6 +38,7 @@ type ReferenceGrantSpecApplyConfiguration struct {
 	// way, entries MUST be combined using OR.
 	//
 	// Support: Core
+	//
 	To []ReferenceGrantToApplyConfiguration `json:"to,omitempty"`
 }
 

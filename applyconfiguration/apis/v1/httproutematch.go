@@ -45,22 +45,26 @@ import (
 type HTTPRouteMatchApplyConfiguration struct {
 	// Path specifies a HTTP request path matcher. If this field is not
 	// specified, a default prefix match on the "/" path is provided.
+	//
 	Path *HTTPPathMatchApplyConfiguration `json:"path,omitempty"`
 	// Headers specifies HTTP request header matchers. Multiple match values are
 	// ANDed together, meaning, a request must match all the specified headers
 	// to select the route.
+	//
 	Headers []HTTPHeaderMatchApplyConfiguration `json:"headers,omitempty"`
 	// QueryParams specifies HTTP query parameter matchers. Multiple match
 	// values are ANDed together, meaning, a request must match all the
 	// specified query parameters to select the route.
 	//
 	// Support: Extended
+	//
 	QueryParams []HTTPQueryParamMatchApplyConfiguration `json:"queryParams,omitempty"`
 	// Method specifies HTTP method matcher.
 	// When specified, this route will be matched only if the request has the
 	// specified method.
 	//
 	// Support: Extended
+	//
 	Method *apisv1.HTTPMethod `json:"method,omitempty"`
 }
 

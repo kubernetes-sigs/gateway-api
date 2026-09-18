@@ -53,9 +53,7 @@ var HTTPRouteBackendURLRewrite = confsuite.ConformanceTest{
 					Path: "/full/original",
 				},
 				ExpectedRequest: &http.ExpectedRequest{
-					Request: http.Request{
-						Path: "/rewritten-full",
-					},
+					Path: "/rewritten-full",
 				},
 				Backend:   confsuite.InfraBackendServiceNameV1,
 				Namespace: ns,
@@ -65,9 +63,7 @@ var HTTPRouteBackendURLRewrite = confsuite.ConformanceTest{
 					Path: "/prefix/original",
 				},
 				ExpectedRequest: &http.ExpectedRequest{
-					Request: http.Request{
-						Path: "/rewritten-prefix/original",
-					},
+					Path: "/rewritten-prefix/original",
 				},
 				Backend:   confsuite.InfraBackendServiceNameV1,
 				Namespace: ns,

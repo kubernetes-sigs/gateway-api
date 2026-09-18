@@ -40,6 +40,7 @@ type ListenerTLSConfigApplyConfiguration struct {
 	// is ignored in this mode.
 	//
 	// Support: Core
+	//
 	Mode *apisv1.TLSModeType `json:"mode,omitempty"`
 	// CertificateRefs contains a series of references to Kubernetes objects that
 	// contains TLS certificates and private keys. These certificates are used to
@@ -65,6 +66,7 @@ type ListenerTLSConfigApplyConfiguration struct {
 	// Support: Core - A single reference to a Kubernetes Secret of type kubernetes.io/tls
 	//
 	// Support: Implementation-specific (More than one reference or other resource types)
+	//
 	CertificateRefs []SecretObjectReferenceApplyConfiguration `json:"certificateRefs,omitempty"`
 	// Options are a list of key/value pairs to enable extended TLS
 	// configuration for each implementation. For example, configuring the
@@ -76,6 +78,7 @@ type ListenerTLSConfigApplyConfiguration struct {
 	// Un-prefixed names are reserved for key names defined by Gateway API.
 	//
 	// Support: Implementation-specific
+	//
 	Options map[apisv1.AnnotationKey]apisv1.AnnotationValue `json:"options,omitempty"`
 }
 

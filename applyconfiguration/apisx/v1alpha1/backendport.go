@@ -32,8 +32,10 @@ type BackendPortApplyConfiguration struct {
 	// a unique name. Name must either be an empty string or pass DNS_LABEL
 	// validation (lowercase alphanumeric or '-', starting and ending with an
 	// alphanumeric character, at most 63 characters).
+	//
 	Name *string `json:"name,omitempty"`
 	// Port represents the port number of the endpoint.
+	//
 	Port *apisxv1alpha1.PortNumber `json:"port,omitempty"`
 }
 

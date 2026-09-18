@@ -98,7 +98,7 @@ func TestVerifyConditionsMatchGeneration(t *testing.T) {
 		},
 		{
 			name: "conditions where all match the generation pass verification",
-			obj:  &gatewayv1.Gateway{ObjectMeta: metav1.ObjectMeta{Name: "fake-gateway", Generation: 20}},
+			obj:  &gatewayv1.Gateway{Name: "fake-gateway", Generation: 20},
 			conditions: []metav1.Condition{
 				{Type: "FakeCondition1", ObservedGeneration: 20},
 				{Type: "FakeCondition2", ObservedGeneration: 20},
@@ -107,7 +107,7 @@ func TestVerifyConditionsMatchGeneration(t *testing.T) {
 		},
 		{
 			name: "conditions where one does not match the generation fail verification",
-			obj:  &gatewayv1.Gateway{ObjectMeta: metav1.ObjectMeta{Name: "fake-gateway", Generation: 20}},
+			obj:  &gatewayv1.Gateway{Name: "fake-gateway", Generation: 20},
 			conditions: []metav1.Condition{
 				{Type: "FakeCondition1", ObservedGeneration: 20},
 				{Type: "FakeCondition2", ObservedGeneration: 19},
@@ -117,7 +117,7 @@ func TestVerifyConditionsMatchGeneration(t *testing.T) {
 		},
 		{
 			name: "conditions where most do not match the generation fail verification",
-			obj:  &gatewayv1.Gateway{ObjectMeta: metav1.ObjectMeta{Name: "fake-gateway", Generation: 20}},
+			obj:  &gatewayv1.Gateway{Name: "fake-gateway", Generation: 20},
 			conditions: []metav1.Condition{
 				{Type: "FakeCondition1", ObservedGeneration: 18},
 				{Type: "FakeCondition2", ObservedGeneration: 18},
@@ -148,10 +148,8 @@ func TestHTTPRouteMustBeAcceptedAndResolved(t *testing.T) {
 
 	gwNamespace := gatewayv1.Namespace(gatewayNN.Namespace)
 	route := &gatewayv1.HTTPRoute{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      routeNN.Name,
-			Namespace: routeNN.Namespace,
-		},
+		Name:      routeNN.Name,
+		Namespace: routeNN.Namespace,
 		Status: gatewayv1.HTTPRouteStatus{
 			RouteStatus: gatewayv1.RouteStatus{
 				Parents: []gatewayv1.RouteParentStatus{

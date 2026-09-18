@@ -63,11 +63,13 @@ type GRPCRouteFilterApplyConfiguration struct {
 	// headers.
 	//
 	// Support: Core
+	//
 	RequestHeaderModifier *HTTPHeaderFilterApplyConfiguration `json:"requestHeaderModifier,omitempty"`
 	// ResponseHeaderModifier defines a schema for a filter that modifies response
 	// headers.
 	//
 	// Support: Extended
+	//
 	ResponseHeaderModifier *HTTPHeaderFilterApplyConfiguration `json:"responseHeaderModifier,omitempty"`
 	// RequestMirror defines a schema for a filter that mirrors requests.
 	// Requests are sent to the specified destination, but responses from
@@ -78,6 +80,8 @@ type GRPCRouteFilterApplyConfiguration struct {
 	// backends.
 	//
 	// Support: Extended
+	//
+	//
 	RequestMirror *HTTPRequestMirrorFilterApplyConfiguration `json:"requestMirror,omitempty"`
 	// ExtensionRef is an optional, implementation-specific extension to the
 	// "filter" behavior.  For example, resource "myroutefilter" in group
