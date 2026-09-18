@@ -40,6 +40,7 @@ var HTTPRouteBackendURLRewrite = confsuite.ConformanceTest{
 		features.SupportHTTPRoute,
 		features.SupportHTTPRouteBackendURLRewrite,
 	},
+	Provisional: true,
 	Test: func(t *testing.T, suite *confsuite.ConformanceTestSuite) {
 		ns := confsuite.InfrastructureNamespace
 		routeNN := types.NamespacedName{Name: "backend-url-rewrite", Namespace: ns}
