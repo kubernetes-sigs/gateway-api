@@ -28,6 +28,12 @@ const (
 
 	// This option indicates support for BackendTLSPolicy SubjectAltName Validation.
 	SupportBackendTLSPolicySANValidation FeatureName = "BackendTLSPolicySANValidation"
+
+	// This option indicates support for ClusterTrustBundle references in BackendTLSPolicyValidation.
+	SupportBackendTLSPolicyClusterTrustBundle FeatureName = "BackendTLSPolicyClusterTrustBundle"
+
+	// This option indicates support for ClusterTrustBundle references in Gateway frontend TLS validation.
+	SupportGatewayFrontendClusterTrustBundle FeatureName = "GatewayFrontendClusterTrustBundle"
 )
 
 // BackendTLSPolicyFeature contains metadata for the BackendTLSPolicy feature.
@@ -43,6 +49,20 @@ var BackendTLSPolicySanValidationFeature = Feature{
 	Channel: FeatureChannelStandard,
 }
 
+// BackendTLSPolicyClusterTrustBundleFeature contains metadata for the BackendTLSPolicy
+// ClusterTrustBundle reference feature.
+var BackendTLSPolicyClusterTrustBundleFeature = Feature{
+	Name:    SupportBackendTLSPolicyClusterTrustBundle,
+	Channel: FeatureChannelExperimental,
+}
+
+// GatewayFrontendClusterTrustBundleFeature contains metadata for the Gateway
+// frontend TLS ClusterTrustBundle reference feature.
+var GatewayFrontendClusterTrustBundleFeature = Feature{
+	Name:    SupportGatewayFrontendClusterTrustBundle,
+	Channel: FeatureChannelExperimental,
+}
+
 // BackendTLSPolicyCoreFeatures includes all the supported features for the
 // BackendTLSPolicy API at a Core level of support.
 var BackendTLSPolicyCoreFeatures = sets.New(
@@ -53,4 +73,6 @@ var BackendTLSPolicyCoreFeatures = sets.New(
 // BackendTLSPolicy API at a Extended level of support.
 var BackendTLSPolicyExtendedFeatures = sets.New(
 	BackendTLSPolicySanValidationFeature,
+	BackendTLSPolicyClusterTrustBundleFeature,
+	GatewayFrontendClusterTrustBundleFeature,
 )
